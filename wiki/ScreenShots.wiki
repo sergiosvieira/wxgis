@@ -6,6 +6,6 @@ This is screenshots of wxGIS components
 
 = wxGIS Catalog =
 
-
+[/images/wxGIS[catalog]1.jpg]
 
 = wxGIS Map =
