@@ -32,19 +32,19 @@
 class WXDLLIMPEXP_GIS_DSP wxRasterDrawThread : public wxThread
 {
 public:
-	wxRasterDrawThread(unsigned char* pOrigData, unsigned char* pDestData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel, int nYbeg, int nYend);
+	wxRasterDrawThread(const unsigned char* pOrigData, unsigned char* pDestData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel, int nYbeg, int nYend);
     virtual void *Entry();
     virtual void OnExit();
-    /*virtual*/ static void OnNearestNeighbourInterpolation(unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
-    /*virtual*/ static void OnBilinearInterpolation(unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
-     /*virtual*/ static void OnHalfBilinearInterpolation(unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
-     /*virtual*/ static void OnHalfQuadBilinearInterpolation(unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
-     /*virtual*/ static void OnFourQuadBilinearInterpolation(unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
-    /*virtual*/ static void OnBicubicInterpolation(unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
+    /*virtual*/ static void OnNearestNeighbourInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
+    /*virtual*/ static void OnBilinearInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
+     /*virtual*/ static void OnHalfBilinearInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
+     /*virtual*/ static void OnHalfQuadBilinearInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
+     /*virtual*/ static void OnFourQuadBilinearInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
+    /*virtual*/ static void OnBicubicInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
     static double BiCubicKernel(double x);
 private:
     ITrackCancel* m_pTrackCancel;
-    unsigned char* m_pOrigData;
+    const unsigned char* m_pOrigData;
     unsigned char* m_pDestData;
     int m_nOrigX;
     int m_nOrigY;
@@ -112,7 +112,7 @@ public:
 	virtual void SetDerty(bool bIsDerty);
 	virtual bool IsDerty(void);
 	virtual IDisplayTransformation* GetDisplayTransformation(void);
-    wxImage Scale(unsigned char* pData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel = NULL);
+    wxImage Scale(const unsigned char* pData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel = NULL);
     wxImage Scale(wxImage SourceImage, int nDestWidth, int nDestHeight, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel = NULL);
 	//ICachedDisplay
 	virtual bool IsCacheDerty(size_t cache_id);
