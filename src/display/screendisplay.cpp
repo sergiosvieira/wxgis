@@ -24,7 +24,7 @@
 // wxRasterDrawThread
 //-----------------------------------
 
-wxRasterDrawThread::wxRasterDrawThread(unsigned char* pOrigData, unsigned char* pDestData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel, int nYbeg, int nYend) : wxThread(wxTHREAD_JOINABLE)
+wxRasterDrawThread::wxRasterDrawThread(const unsigned char* pOrigData, unsigned char* pDestData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel, int nYbeg, int nYend) : wxThread(wxTHREAD_JOINABLE)
 {
     m_pTrackCancel = pTrackCancel;
     m_pOrigData = pOrigData;
@@ -73,7 +73,7 @@ void wxRasterDrawThread::OnExit()
 {
 }
 
-void wxRasterDrawThread::OnNearestNeighbourInterpolation(unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel)
+void wxRasterDrawThread::OnNearestNeighbourInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel)
 {
     for(int nDestPixY = nYbeg; nDestPixY < nYend; nDestPixY++)
     {
@@ -94,7 +94,7 @@ void wxRasterDrawThread::OnNearestNeighbourInterpolation(unsigned char* pOrigDat
     }
 }
 
-void wxRasterDrawThread::OnBilinearInterpolation(unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel)
+void wxRasterDrawThread::OnBilinearInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel)
 {
 	int srcpixymax = nOrigHeight - 1;
 	int srcpixxmax = nOrigWidth - 1;
@@ -155,7 +155,7 @@ void wxRasterDrawThread::OnBilinearInterpolation(unsigned char* pOrigData, unsig
 	}
 }
 
-void wxRasterDrawThread::OnHalfBilinearInterpolation(unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel)
+void wxRasterDrawThread::OnHalfBilinearInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel)
 {
 	int srcpixymax = nOrigHeight - 1;
 	int srcpixxmax = nOrigWidth - 1;
@@ -166,7 +166,7 @@ void wxRasterDrawThread::OnHalfBilinearInterpolation(unsigned char* pOrigData, u
 	double r2, g2, b2;
     long W = nDestWidth * 3;
 
-    for(int nDestPixY = nYbeg; nDestPixY < nYend; nDestPixY += 2)
+    for(int nDestPixY = nYbeg; nDestPixY < nYend - 1; nDestPixY += 2)
     {	
         // We need to calculate the source pixel to interpolate from - Y-axis
         srcpixy = double(nDestPixY) * rHRatio + rDeltaY;
@@ -226,7 +226,7 @@ void wxRasterDrawThread::OnHalfBilinearInterpolation(unsigned char* pOrigData, u
 	}
 }
 
-void wxRasterDrawThread::OnHalfQuadBilinearInterpolation(unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel)
+void wxRasterDrawThread::OnHalfQuadBilinearInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel)
 {
 	int srcpixymax = nOrigHeight - 1;
 	int srcpixxmax = nOrigWidth - 1;
@@ -237,7 +237,10 @@ void wxRasterDrawThread::OnHalfQuadBilinearInterpolation(unsigned char* pOrigDat
 	double r2, g2, b2;
     long W = nDestWidth * 3;
 
-    for(int nDestPixY = nYbeg; nDestPixY < nYend; nDestPixY += 2)
+	int ostX = nDestWidth % 2;
+	//int ostY = nYend % 2;
+
+    for(int nDestPixY = nYbeg; nDestPixY < nYend - 1; nDestPixY += 2)
     {	
         // We need to calculate the source pixel to interpolate from - Y-axis
         srcpixy = double(nDestPixY) * rHRatio + rDeltaY;
@@ -246,7 +249,7 @@ void wxRasterDrawThread::OnHalfQuadBilinearInterpolation(unsigned char* pOrigDat
         dy = srcpixy - srcpixy1;
         dy1 = 1.0 - dy;
 
-        for(int nDestPixX = 0; nDestPixX < nDestWidth; nDestPixX += 2)
+        for(int nDestPixX = 0; nDestPixX < nDestWidth - 1; nDestPixX += 2)
         {
             // X-axis of pixel to interpolate from
             srcpixx = double(nDestPixX) * rWRatio + rDeltaX;
@@ -299,11 +302,12 @@ void wxRasterDrawThread::OnHalfQuadBilinearInterpolation(unsigned char* pOrigDat
             if(pTrackCancel && !pTrackCancel->Continue())
                 return;
 		}
+		pDestData += ostX * 3;
         pDestData += W;
 	}
 }
 
-void wxRasterDrawThread::OnFourQuadBilinearInterpolation(unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel)
+void wxRasterDrawThread::OnFourQuadBilinearInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel)
 {
 	int srcpixymax = nOrigHeight - 1;
 	int srcpixxmax = nOrigWidth - 1;
@@ -314,7 +318,11 @@ void wxRasterDrawThread::OnFourQuadBilinearInterpolation(unsigned char* pOrigDat
 	double r2, g2, b2;
     long W = nDestWidth * 3;
 
-    for(int nDestPixY = nYbeg; nDestPixY < nYend; nDestPixY += 3)
+	int ostX = nDestWidth % 2;
+	//int ostY = nYend % 2;
+
+
+    for(int nDestPixY = nYbeg; nDestPixY < nYend - 1; nDestPixY += 3)
     {	
         // We need to calculate the source pixel to interpolate from - Y-axis
         srcpixy = double(nDestPixY) * rHRatio + rDeltaY;
@@ -323,7 +331,7 @@ void wxRasterDrawThread::OnFourQuadBilinearInterpolation(unsigned char* pOrigDat
         dy = srcpixy - srcpixy1;
         dy1 = 1.0 - dy;
 
-        for(int nDestPixX = 0; nDestPixX < nDestWidth; nDestPixX += 2)
+        for(int nDestPixX = 0; nDestPixX < nDestWidth - 1; nDestPixX += 2)
         {
             // X-axis of pixel to interpolate from
             srcpixx = double(nDestPixX) * rWRatio + rDeltaX;
@@ -383,6 +391,7 @@ void wxRasterDrawThread::OnFourQuadBilinearInterpolation(unsigned char* pOrigDat
             if(pTrackCancel && !pTrackCancel->Continue())
                 return;
 		}
+		pDestData += ostX * 3;
         pDestData += W * 2;
 	}
 }
@@ -405,7 +414,7 @@ double wxRasterDrawThread::BiCubicKernel(double x)
 	return ( 0.16666666666666666667 * ( a - ( 4.0 * b ) + ( 6.0 * c ) - ( 4.0 * d ) ) );
 }
 
-void wxRasterDrawThread::OnBicubicInterpolation(unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel)
+void wxRasterDrawThread::OnBicubicInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel)
 {
 	int srcpixymax = nOrigHeight - 1;
 	int srcpixxmax = nOrigWidth - 1;
@@ -590,7 +599,7 @@ void wxGISScreenDisplay::OnStretchDraw2(wxDC &dc, wxRect Rect, bool bClearBackgr
     wxRect DevRect = m_pDisplayTransformation->GetDeviceFrame();
 	wxImage Img = m_caches[m_caches.size() - 1].bmp.GetSubBitmap(Rect).ConvertToImage();
 	//Img = Img.Scale(DevRect.width, DevRect.height, quality);
-    Img = Scale(Img, DevRect.width, DevRect.height, quality);
+	Img = Scale(Img, DevRect.width, DevRect.height, quality);
 	if(bClearBackground)
 		dc.DrawBitmap(m_caches[0].bmp, 0, 0);
 	dc.DrawBitmap(Img, DevRect.x, DevRect.y);
@@ -768,13 +777,13 @@ void wxGISScreenDisplay::DrawBitmap(const wxBitmap& bitmap, wxCoord x, wxCoord y
 
 wxImage wxGISScreenDisplay::Scale(wxImage SourceImage, int nDestWidth, int nDestHeight, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel)
 {
-    unsigned char* pData = SourceImage.GetData();
+    const unsigned char* pData = SourceImage.GetData();
     int nSourceWidth = SourceImage.GetWidth();
     int nSourceHeight = SourceImage.GetHeight();
     return Scale(pData, nSourceWidth, nSourceHeight, nSourceWidth, nSourceHeight, nDestWidth, nDestHeight, 0, 0, Quality, pTrackCancel);
 }
 
-wxImage wxGISScreenDisplay::Scale(unsigned char* pData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel)
+wxImage wxGISScreenDisplay::Scale(const unsigned char* pData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel)
 {
     wxImage ResultImage(nDestX, nDestY, false);
     unsigned char* pDestData = ResultImage.GetData();

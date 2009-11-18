@@ -550,7 +550,7 @@ void wxGISMapView::OnMouseWheel(wxMouseEvent& event)
 			rc.height = rc.height * rc.height / m_virtualrc.height;
 			rc.x = client_rc.x + (client_rc.width - rc.width) / 2;
 			rc.y = client_rc.y + (client_rc.height - rc.height) / 2;
-			pGISScreenDisplay->OnStretchDraw2(CDC, rc, false, enumGISQualityFourQuadBilinear);//enumGISQualityHalfBilinear//enumGISQualityHalfQuadBilinear//enumGISQualityNearest//
+			pGISScreenDisplay->OnStretchDraw2(CDC, rc, false, enumGISQualityHalfBilinear);////enumGISQualityHalfQuadBilinear//enumGISQualityNearest//enumGISQualityFourQuadBilinear
 		}
 
 		pDisplayTransformation->SetBounds(m_virtualbounds);
