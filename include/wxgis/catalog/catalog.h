@@ -125,7 +125,7 @@ public:
 class IGxCatalog
 {
 public:
-	IGxCatalog(void) : m_bShowHidden(false), m_bShowExt(true), m_pSelection(NULL){};
+	IGxCatalog(void) : m_bShowHidden(false), m_bShowExt(true), m_pSelection(NULL), m_pConf(NULL){};
 	virtual ~IGxCatalog(void){};
 	virtual wxString ConstructFullName(IGxObject* pObject) = 0;
 	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray) = 0;
@@ -141,9 +141,11 @@ public:
 	virtual IGxObject* ConnectFolder(wxString sPath) = 0;
 	virtual void DisconnectFolder(wxString sPath) = 0;
 	virtual void SetLocation(wxString sPath) = 0;
+    virtual IGISConfig* GetConfig(void){return m_pConf;};
 protected:
 	bool m_bShowHidden, m_bShowExt;
 	IGxSelection* m_pSelection;
+    IGISConfig* m_pConf;
 };
 
 

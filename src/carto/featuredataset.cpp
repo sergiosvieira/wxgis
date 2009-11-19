@@ -21,7 +21,7 @@
 #include "wxgis/carto/featuredataset.h"
 #include <wx/filename.h>
 
-wxGISFeatureDataset::wxGISFeatureDataset(wxString sPath) : wxGISDataset(sPath), m_poDS(NULL), m_bIsOpened(false), m_psExtent(NULL), m_poLayer(NULL), m_pQuadTree(NULL)
+wxGISFeatureDataset::wxGISFeatureDataset(wxString sPath, wxString sEncoding) : wxGISDataset(sPath), m_poDS(NULL), m_bIsOpened(false), m_psExtent(NULL), m_poLayer(NULL), m_pQuadTree(NULL), m_sEncoding(sEncoding)
 {
 }
 
@@ -54,6 +54,12 @@ OGRLayer* wxGISFeatureDataset::GetLayer(int iLayer)
 	}
 	return NULL;	
 }
+
+bool wxGISFeatureDataset::Open(IGISConfig* pConfig)
+{
+    return Open(0);
+}
+
 
 bool wxGISFeatureDataset::Open(int iLayer)
 {
@@ -103,9 +109,10 @@ bool wxGISFeatureDataset::Open(int iLayer)
 	//	bool bOLCFastSetNextByIndex= pOGRLayer->TestCapability(OLCFastSetNextByIndex);
 	//	bool bOLCCreateField = pOGRLayer->TestCapability(OLCCreateField);
 	//	bool bOLCDeleteFeature = pOGRLayer->TestCapability(OLCDeleteFeature);
-	//	bool bOLCStringsAsUTF8 = pOGRLayer->TestCapability(OLCStringsAsUTF8);
+		m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
 	//	bool bOLCTransactions = pOGRLayer->TestCapability(OLCTransactions);
 	//	wxString sFIDColName = wgMB2WX(pOGRLayer->GetFIDColumn());
+
 
 	//	m_pGISFeatureSet = new IwxGISFeatureSet(m_poLayer);
 		
@@ -233,7 +240,13 @@ wxString wxGISFeatureDataset::GetAsString(int row, int col)
 		case OFTReal:				
 			return wxString::Format(_("%.6f"), pFeature->GetFieldAsDouble(col));
 		default:
-			return wgMB2WX(pFeature->GetFieldAsString(col));
+            if(m_bOLCStringsAsUTF8)
+                return wgMB2WX(pFeature->GetFieldAsString(col));
+            else            
+            {                
+                wxCSConv conv(m_sEncoding);
+                return conv.cMB2WX(pFeature->GetFieldAsString(col));
+            }
 		}
 		//return wgMB2WX(GetAt(row)->GetFieldAsString(col));
 	}

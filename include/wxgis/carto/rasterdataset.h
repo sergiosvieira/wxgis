@@ -33,7 +33,7 @@ public:
 	wxGISRasterDataset(wxString sPath);
 	virtual ~wxGISRasterDataset(void);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
-	virtual bool Open(void);
+	virtual bool Open(IGISConfig* pConfig = NULL);
 	virtual OGRSpatialReference* GetSpatialReference(void);
 	virtual OGREnvelope* GetEnvelope(void);
 	virtual GDALDataset* GetRaster(void){return m_poDataset;};

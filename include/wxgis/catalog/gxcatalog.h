@@ -91,7 +91,6 @@ public:
 	} OBJFACTORYDESC;
 private:
 	bool m_bIsChildrenLoaded;
-	IGISConfig* m_pConf;
 	std::vector<OBJFACTORYDESC> m_ObjectFactoriesArray;
 	std::map<wxString, IGxObject*> m_DiscConnections;
 	wxArrayString m_CatalogRootItemArray;

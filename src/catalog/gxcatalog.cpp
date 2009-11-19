@@ -28,7 +28,7 @@
 // ----------------------------------------------------------------------------
 
 
-wxGxCatalog::wxGxCatalog(void) : m_bIsChildrenLoaded(false), m_pConf(NULL)
+wxGxCatalog::wxGxCatalog(void) : IGxCatalog(), m_bIsChildrenLoaded(false)
 {
 	m_pSelection = new wxGxSelection();
 	m_pCatalog = NULL;
