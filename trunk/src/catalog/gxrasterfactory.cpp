@@ -66,6 +66,8 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 			goto REMOVE;
 		if(path.Find(wxT(".rrd")) != wxNOT_FOUND)
 			goto REMOVE;
+		if(path.Find(wxT(".ovr")) != wxNOT_FOUND)
+			goto REMOVE;
 		if(path.Find(wxT(".w")) != wxNOT_FOUND)//TODO: add other world file extensions
 			goto REMOVE;
 		if(path.Find(wxT(".wld")) != wxNOT_FOUND)

@@ -1,3 +1,24 @@
+/******************************************************************************
+ * Project:  wxGIS (GIS Catalog)
+ * Purpose:  wxGxDataset class.
+ * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ ******************************************************************************
+*   Copyright (C) 2009  Bishop
+*
+*    This program is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
+
 #include "wxgis/catalog/gxdataset.h"
 #include "../../art/shape_icon16.xpm"
 #include "../../art/shape_icon48.xpm"
@@ -67,13 +88,18 @@ wxGISDataset* wxGxDataset::GetDataset(void)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
-		m_pwxGISDataset = new wxGISFeatureDataset(m_sPath);
+		m_pwxGISDataset = new wxGISFeatureDataset(m_sPath, m_sEncoding);
 		//for storing internal pointer
 		m_pwxGISDataset->Reference();
 	}
 	//for outer pointer
 	m_pwxGISDataset->Reference();
 	return m_pwxGISDataset;
+}
+
+void wxGxDataset::SetEncoding(wxString sEncoding)
+{
+    m_sEncoding = sEncoding;
 }
 
 //--------------------------------------------------------------
@@ -148,13 +174,18 @@ wxGISDataset* wxGxShapefileDataset::GetDataset(void)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
-		m_pwxGISDataset = new wxGISFeatureDataset(m_sPath);
+		m_pwxGISDataset = new wxGISFeatureDataset(m_sPath, m_sEncoding);
 		//for storing internal pointer
 		m_pwxGISDataset->Reference();
 	}
 	//for outer pointer
 	m_pwxGISDataset->Reference();
 	return m_pwxGISDataset;
+}
+
+void wxGxShapefileDataset::SetEncoding(wxString sEncoding)
+{
+    m_sEncoding = sEncoding;
 }
 
 //--------------------------------------------------------------
@@ -232,8 +263,10 @@ wxGISDataset* wxGxRasterDataset::GetDataset(void)
 	if(m_pwxGISDataset == NULL)
 	{		
 		m_pwxGISDataset = new wxGISRasterDataset(m_sPath);
+        //open (ask for overviews)
+        m_pwxGISDataset->Open(m_pCatalog->GetConfig());
 		//for storing internal pointer
-		m_pwxGISDataset->Reference();
+		m_pwxGISDataset->Reference();        
 	}
 	//for outer pointer
 	m_pwxGISDataset->Reference();

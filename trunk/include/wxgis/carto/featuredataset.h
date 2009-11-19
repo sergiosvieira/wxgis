@@ -33,11 +33,12 @@ class WXDLLIMPEXP_GIS_CRT wxGISFeatureDataset :
 	public wxGISDataset
 {
 public:
-	wxGISFeatureDataset(wxString sPath);
+	wxGISFeatureDataset(wxString sPath, wxString sEncoding = wxEmptyString);
 	virtual ~wxGISFeatureDataset(void);
 	virtual OGRLayer* GetLayer(int iLayer = 0);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
 	virtual bool Open(int iLayer);
+    virtual bool Open(IGISConfig* pConfig = NULL);
 	virtual OGRSpatialReference* GetSpatialReference(void);
 	virtual OGREnvelope* GetEnvelope(void);
 	virtual void SetSpatialFilter(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);
@@ -54,6 +55,8 @@ protected:
 	OGREnvelope* m_psExtent;
 	OGRLayer* m_poLayer;
 	bool m_bIsOpened;
+    bool m_bOLCStringsAsUTF8;
 	std::vector<OGRFeature*> m_OGRFeatureArray;
 	CPLQuadTree* m_pQuadTree;
+    wxString m_sEncoding;
 };

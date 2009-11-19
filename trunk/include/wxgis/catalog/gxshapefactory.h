@@ -30,6 +30,7 @@ class wxGxShapeFactory :
 public:
 	wxGxShapeFactory(void);
 	virtual ~wxGxShapeFactory(void);
+    virtual wxString GetEncoding(wxString sPath);
 	//IGxObjectFactory
 	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray);
 };

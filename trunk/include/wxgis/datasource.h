@@ -56,6 +56,7 @@ public:
 	virtual ~wxGISDataset(void){};
 	virtual wxGISEnumDatasetType GetType(void) = 0;
 	virtual wxString GetPath(void){return m_sPath;};
+    virtual bool Open(IGISConfig* pConfig) = 0;
 protected:
 	wxString m_sPath;
     wxCriticalSection m_CritSect;

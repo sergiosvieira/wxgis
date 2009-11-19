@@ -34,7 +34,7 @@ wxGISRasterDataset::~wxGISRasterDataset(void)
 		GDALClose(m_poDataset);
 }
 
-bool wxGISRasterDataset::Open(void)
+bool wxGISRasterDataset::Open(IGISConfig* pConfig)
 {
 	if(m_bIsOpened)
 		return true;
@@ -70,16 +70,45 @@ bool wxGISRasterDataset::Open(void)
     }
     CSLDestroy( papszFileList );
 
-	CPLSetConfigOption( "USE_RRD", "YES" );
+	CPLSetConfigOption( "USE_RRD", "NO" );
 	CPLSetConfigOption( "HFA_USE_RRD", "YES" );
 	CPLSetConfigOption( "COMPRESS_OVERVIEW", "LZW" );
 
-	bool bAskCreateOvr = false;
-	if(!bHasOverviews && bAskCreateOvr)
+	bool bAskCreateOvr = true;
+    bHasOverviews = true;
+    if(pConfig)
+    {
+        wxXmlNode* pNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/raster")));
+        if(pNode)
+            bAskCreateOvr = wxAtoi(pNode->GetPropVal(wxT("create_ovr"), wxT("1")));
+        else
+        {
+            pNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog/raster")), true);
+            pNode->AddProperty(wxT("create_ovr"), wxT("1"));
+        }
+        if(bAskCreateOvr)
+        {
+            //show ask dialog
+        }
+    }
+
+	if(!bHasOverviews)
 	{
 		int anOverviewList[5] = { 4, 8, 16, 32, 64 };
-		CPLErr err = m_poDataset->BuildOverviews( "CUBIC", 5, anOverviewList, 0, NULL, GDALDummyProgress, NULL );
+		CPLErr err = m_poDataset->BuildOverviews( "GAUSS", 5, anOverviewList, 0, NULL, GDALDummyProgress, NULL );
 		//"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE" 
+ //        int MyTextProgress( double dfComplete, const char *pszMessage, void *pData)
+ //{
+ //    if( pszMessage != NULL )
+ //        printf( "%d%% complete: %s\n", (int) (dfComplete*100), pszMessage );
+ //    else if( pData != NULL )
+ //        printf( "%d%% complete:%s\n", (int) (dfComplete*100),
+ //                (char) pData );
+ //    else
+ //        printf( "%d%% complete.\n", (int) (dfComplete*100) );
+ //    
+ //    return TRUE;
+ //}
 	}
 
 	//GDALDriver* pDrv = m_poDataset->GetDriver();
