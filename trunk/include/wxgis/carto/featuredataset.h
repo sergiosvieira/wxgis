@@ -33,7 +33,7 @@ class WXDLLIMPEXP_GIS_CRT wxGISFeatureDataset :
 	public wxGISDataset
 {
 public:
-	wxGISFeatureDataset(wxString sPath, wxString sEncoding = wxEmptyString);
+	wxGISFeatureDataset(wxString sPath, wxFontEncoding Encoding = wxFONTENCODING_DEFAULT);
 	virtual ~wxGISFeatureDataset(void);
 	virtual OGRLayer* GetLayer(int iLayer = 0);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
@@ -58,5 +58,5 @@ protected:
     bool m_bOLCStringsAsUTF8;
 	std::vector<OGRFeature*> m_OGRFeatureArray;
 	CPLQuadTree* m_pQuadTree;
-    wxString m_sEncoding;
+    wxFontEncoding m_Encoding;
 };

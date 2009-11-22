@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/carto/rasterdataset.h"
+#include "wxgis/framework/application.h"
 #include "gdal_rat.h"
 
 wxGISRasterDataset::wxGISRasterDataset(wxString sPath) : wxGISDataset(sPath), m_bIsOpened(false), m_pSpaRef(NULL), m_psExtent(NULL)
@@ -74,6 +75,19 @@ bool wxGISRasterDataset::Open(IGISConfig* pConfig)
 	CPLSetConfigOption( "HFA_USE_RRD", "YES" );
 	CPLSetConfigOption( "COMPRESS_OVERVIEW", "LZW" );
 
+    //IApplication* pApp = ::GetApplication();
+    //IStatusBar* pStatusBar =  pApp->GetStatusBar();    
+    //wxGISProgressor* pP = dynamic_cast<wxGISProgressor*>(pStatusBar->GetProgressor());
+    //if(pP)
+    //{
+    //    pP->Show(true);
+    //    for(int i = 0; i < 100; i++)
+    //    {
+    //        pP->SetValue(i);
+    //    }
+    //}
+
+
 	bool bAskCreateOvr = true;
     bHasOverviews = true;
     if(pConfig)
@@ -110,6 +124,10 @@ bool wxGISRasterDataset::Open(IGISConfig* pConfig)
  //    return TRUE;
  //}
 	}
+
+    //if(pP)
+    //    pP->Show(false);
+
 
 	//GDALDriver* pDrv = m_poDataset->GetDriver();
 	//const char* desc = pDrv->GetDescription();

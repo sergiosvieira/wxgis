@@ -24,6 +24,7 @@
 #include "wxgis/framework/menubar.h"
 #include "wxgis/framework/commandbar.h"
 
+WXDLLIMPEXP_GIS_FRW IApplication* GetApplication();//{return m_pGlobalApp;};
 
 class WXDLLIMPEXP_GIS_FRW wxGISApplication : 
 	public wxFrame,

@@ -38,16 +38,16 @@ enum wxGISEnumMouseState
 
 enum wxGISEnumStatusBarPanes
 {
-	enumGISStatusMain = 1, 
-	enumGISStatusAnimation = 2,
-	enumGISStatusPosition = 4,
-	enumGISStatusPagePosition = 8,
-	enumGISStatusSize = 16,
-	enumGISStatusCapsLock = 32,
-	enumGISStatusNumLock = 64,
-	enumGISStatusScrollLock = 128,
-	enumGISStatusClock = 256,
-	enumGISStatusProgress = 512
+	enumGISStatusMain           = 0x0001, 
+	enumGISStatusAnimation      = 0x0002,
+	enumGISStatusPosition       = 0x0004,
+	enumGISStatusPagePosition   = 0x0008,
+	enumGISStatusSize           = 0x0010,
+	enumGISStatusCapsLock       = 0x0020,
+	enumGISStatusNumLock        = 0x0040,
+	enumGISStatusScrollLock     = 0x0080,
+	enumGISStatusClock          = 0x0100,
+	enumGISStatusProgress       = 0x0200
 }; 
 
 enum wxGISEnumCommandBars
@@ -108,6 +108,7 @@ public:
 	virtual wxString GetMessage(int i = 0) = 0;
 	virtual IProgressor* GetAnimation(void) = 0;
 	virtual IProgressor* GetProgressor(void) = 0;
+    virtual int GetPanePos(wxGISEnumStatusBarPanes nPane) = 0;
 	//
 	virtual WXDWORD GetPanes(void){return m_Panes;};
 	virtual void SetPanes(WXDWORD Panes){m_Panes = Panes;};

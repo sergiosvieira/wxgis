@@ -129,7 +129,7 @@ REMOVE:
 	return true;
 }
 
-wxString wxGxShapeFactory::GetEncoding(wxString sPath)
+wxFontEncoding wxGxShapeFactory::GetEncoding(wxString sPath)
 {
     wxFFile file(sPath);
     if(file.IsOpened())
@@ -144,46 +144,62 @@ wxString wxGxShapeFactory::GetEncoding(wxString sPath)
         //check encoding from code http://en.wikipedia.org/wiki/Code_page
         switch(nCP)
         {
-        case 65001:
-            return wxString(wxT("UTF-8"));
-        case 65000:
-            return wxString(wxT("UTF-7"));
-        case 437:
-        case 737:
-        case 775:
-        case 850:
-        case 852:
-        case 855:
-        case 857:
-        case 858:
-        case 860:
-        case 861:
-        case 862:
-        case 863:
-        case 865:
-        case 866:
-        case 869:
-            return wxString::Format(wxT("CP%d"), nCP);
-        case 874:
-        case 1250:
-        case 1251:
-        case 1252:
-        case 1253:
-        case 1254:
-        case 1255:
-        case 1256:
-        case 1257:
-        case 1258:
-            return wxString::Format(wxT("Windows-%d"), nCP);
-        case 1200:
-            return wxString(wxT("UCS-2LE"));
-        case 1201:
-            return wxString(wxT("UCS-2BE"));
-        default:
-            break;
+        case 28591: return wxFONTENCODING_ISO8859_1;
+        case 28592: return wxFONTENCODING_ISO8859_2;
+        case 28593: return wxFONTENCODING_ISO8859_3;
+        case 28594: return wxFONTENCODING_ISO8859_4;
+        case 28595: return wxFONTENCODING_ISO8859_5;
+        case 28596: return wxFONTENCODING_ISO8859_6;
+        case 28597: return wxFONTENCODING_ISO8859_7;
+        case 28598: return wxFONTENCODING_ISO8859_8;
+        case 28599: return wxFONTENCODING_ISO8859_9;
+        case 28600: return wxFONTENCODING_ISO8859_10;
+        //case 874: return wxFONTENCODING_ISO8859_11;
+        // case 28602: return wxFONTENCODING_ISO8859_12;      // doesn't exist currently, but put it
+        case 28603: return wxFONTENCODING_ISO8859_13;
+        // case 28604: return wxFONTENCODING_ISO8859_14:     ret = 28604; break; // no correspondence on Windows
+        case 28605: return wxFONTENCODING_ISO8859_15;
+        case 20866: return wxFONTENCODING_KOI8;
+        case 21866: return wxFONTENCODING_KOI8_U;
+        case 437: return wxFONTENCODING_CP437;
+        case 850: return wxFONTENCODING_CP850;
+        case 852: return wxFONTENCODING_CP852;
+        case 855: return wxFONTENCODING_CP855;
+        case 866: return wxFONTENCODING_CP866;
+        case 874: return wxFONTENCODING_CP874;
+        case 932: return wxFONTENCODING_CP932;
+        case 936: return wxFONTENCODING_CP936;
+        case 949: return wxFONTENCODING_CP949;
+        case 950: return wxFONTENCODING_CP950;
+        case 1250: return wxFONTENCODING_CP1250;
+        case 1251: return wxFONTENCODING_CP1251;
+        case 1252: return wxFONTENCODING_CP1252;
+        case 1253: return wxFONTENCODING_CP1253;
+        case 1254: return wxFONTENCODING_CP1254;
+        case 1255: return wxFONTENCODING_CP1255;
+        case 1256: return wxFONTENCODING_CP1256;
+        case 1257: return wxFONTENCODING_CP1257;
+        case 20932: return wxFONTENCODING_EUC_JP;
+        case 10000: return wxFONTENCODING_MACROMAN;
+        case 10001: return wxFONTENCODING_MACJAPANESE;
+        case 10002: return wxFONTENCODING_MACCHINESETRAD;
+        case 10003: return wxFONTENCODING_MACKOREAN;
+        case 10004: return wxFONTENCODING_MACARABIC;
+        case 10005: return wxFONTENCODING_MACHEBREW;
+        case 10006: return wxFONTENCODING_MACGREEK;
+        case 10007: return wxFONTENCODING_MACCYRILLIC;
+        case 10021: return wxFONTENCODING_MACTHAI;
+        case 10008: return wxFONTENCODING_MACCHINESESIMP;
+        case 10029: return wxFONTENCODING_MACCENTRALEUR;
+        case 10082: return wxFONTENCODING_MACCROATIAN;
+        case 10079: return wxFONTENCODING_MACICELANDIC;
+        case 10009: return wxFONTENCODING_MACROMANIAN;
+        case 65000: return wxFONTENCODING_UTF7;
+        case 65001: return wxFONTENCODING_UTF8;
+        default: return wxFONTENCODING_SYSTEM;
         }
-        return sCP;
+        return wxFONTENCODING_SYSTEM;
     }
-    return wxString();
+    return wxFONTENCODING_SYSTEM;
 }
-
+ 

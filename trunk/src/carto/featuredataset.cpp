@@ -21,7 +21,7 @@
 #include "wxgis/carto/featuredataset.h"
 #include <wx/filename.h>
 
-wxGISFeatureDataset::wxGISFeatureDataset(wxString sPath, wxString sEncoding) : wxGISDataset(sPath), m_poDS(NULL), m_bIsOpened(false), m_psExtent(NULL), m_poLayer(NULL), m_pQuadTree(NULL), m_sEncoding(sEncoding)
+wxGISFeatureDataset::wxGISFeatureDataset(wxString sPath, wxFontEncoding Encoding) : wxGISDataset(sPath), m_poDS(NULL), m_bIsOpened(false), m_psExtent(NULL), m_poLayer(NULL), m_pQuadTree(NULL), m_Encoding(Encoding)
 {
 }
 
@@ -244,7 +244,7 @@ wxString wxGISFeatureDataset::GetAsString(int row, int col)
                 return wgMB2WX(pFeature->GetFieldAsString(col));
             else            
             {                
-                wxCSConv conv(m_sEncoding);
+                wxCSConv conv(m_Encoding);
                 return conv.cMB2WX(pFeature->GetFieldAsString(col));
             }
 		}

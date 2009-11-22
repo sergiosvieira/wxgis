@@ -27,8 +27,19 @@ BEGIN_EVENT_TABLE(wxGISStatusBar, wxStatusBar)
 	EVT_RIGHT_DOWN(wxGISStatusBar::OnRightDown)
 END_EVENT_TABLE()
 
-wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, const wxString& name, WXDWORD panesstyle) : wxStatusBar(parent, id, style, name), IStatusBar(panesstyle), m_timer(this, TIMER_ID), m_pAni(NULL)
+wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, const wxString& name, WXDWORD panesstyle) : wxStatusBar(parent, id, style, name), IStatusBar(panesstyle), m_timer(this, TIMER_ID), m_pAni(NULL), m_pProgressBar(NULL)
 {
+    m_MsgPos = -1;
+    m_AniPos = -1;
+    m_ProgressPos = -1;
+    m_PositionPos = -1;
+    m_ClockPos = -1;
+    m_PagePositionPos = -1;
+    m_SizePos = -1;
+    m_CapsLockPos = -1;
+    m_NumLockPos = -1;
+    m_ScrollLockPos = -1;
+
 	m_pApp = dynamic_cast<IApplication*>(parent);
 
 	struct _statuspane
@@ -48,10 +59,10 @@ wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, cons
 	}
 	if(panesstyle & enumGISStatusProgress)
 	{
-		_statuspane data = {100, wxSB_FLAT};
+		_statuspane data = {100, /*wxSB_NORMAL*/wxSB_FLAT};
 		panes.push_back(data);
-		_statuspane data1 = {-1, wxSB_FLAT};
-		panes.push_back(data1);
+		m_pProgressBar = new wxGISProgressor(this, wxID_ANY);
+		m_pProgressBar->Hide();
 		m_ProgressPos = counter;
 		counter++;
 	}
@@ -69,36 +80,42 @@ wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, cons
 	{
 		_statuspane data = {200, wxSB_NORMAL};
 		panes.push_back(data);
+        m_PositionPos = counter;
 		counter++;
 	}
 	if(panesstyle & enumGISStatusPagePosition)
 	{
 		_statuspane data = {100, wxSB_NORMAL};
 		panes.push_back(data);
+        m_PagePositionPos = counter;
 		counter++;
 	}
 	if(panesstyle & enumGISStatusSize)
 	{
 		_statuspane data = {80, wxSB_NORMAL};
 		panes.push_back(data);
+        m_SizePos = counter;
 		counter++;
 	}
 	if(panesstyle & enumGISStatusCapsLock)
 	{
 		_statuspane data = {40, wxSB_NORMAL};
 		panes.push_back(data);
+        m_CapsLockPos = counter;
 		counter++;
 	}
 	if(panesstyle & enumGISStatusNumLock)
 	{
 		_statuspane data = {40, wxSB_NORMAL};
 		panes.push_back(data);
+        m_NumLockPos = counter;
 		counter++;
 	}
 	if(panesstyle & enumGISStatusScrollLock)
 	{
 		_statuspane data = {40, wxSB_NORMAL};
 		panes.push_back(data);
+        m_ScrollLockPos = counter;
 		counter++;
 	}
 	if(panesstyle & enumGISStatusClock)
@@ -150,10 +167,11 @@ void wxGISStatusBar::OnSize(wxSizeEvent &event)
 		m_pAni->SetSize(r);
 	}
 
-	//if( m_pProgressBar && GetFieldRect(STATUSBAR_PROGRESS, r) )
-	//{
-	//	m_pProgressBar->SetSize(r);
-	//}
+	if( m_pProgressBar && GetFieldRect(m_ProgressPos, r) )
+	{
+		//r.Deflate(2);
+		m_pProgressBar->SetSize(r);
+	}
 	event.Skip();
 }
 
@@ -177,4 +195,34 @@ void wxGISStatusBar::OnRightDown(wxMouseEvent& event)
 {
 	m_pApp->ShowToolBarMenu();
 	event.Skip();
+}
+
+int wxGISStatusBar::GetPanePos(wxGISEnumStatusBarPanes nPane)
+{
+    switch(nPane)
+    {
+    case enumGISStatusMain:
+        return m_MsgPos;
+    case enumGISStatusAnimation:
+        return m_AniPos;
+    case enumGISStatusPosition:
+        return m_PositionPos;
+    case enumGISStatusClock:
+        return m_ClockPos;
+    case enumGISStatusProgress:
+        return m_ProgressPos;
+    case enumGISStatusPagePosition:
+        return m_PagePositionPos;
+    case enumGISStatusSize:
+        return m_SizePos;
+    case enumGISStatusCapsLock:
+        return m_CapsLockPos;
+    case enumGISStatusNumLock:
+        return m_NumLockPos;
+    case enumGISStatusScrollLock:
+        return m_ScrollLockPos;
+    default:
+        return -1;
+    }
+    return -1;
 }
