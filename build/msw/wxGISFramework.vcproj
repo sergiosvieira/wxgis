@@ -215,6 +215,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\framework\progressor.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\framework\statusbar.cpp"
 				>
 			</File>
@@ -270,6 +274,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\framework\menubar.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\framework\progressor.h"
 				>
 			</File>
 			<File

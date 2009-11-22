@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxShapeFactory class.
+ * Purpose:  wxGISProgressor class. Progress of some process
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -20,17 +20,34 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/catalog/catalog.h"
+#include "wxgis/framework/framework.h"
+#include "wx/gauge.h"
 
-class wxGxShapeFactory :
-	public IGxObjectFactory,
-	public wxObject
+#define PTIMER_ID 1013
+
+class WXDLLIMPEXP_GIS_FRW wxGISProgressor : 
+	public wxControl,
+	public IProgressor
 {
-	DECLARE_DYNAMIC_CLASS(wxGxShapeFactory)
 public:
-	wxGxShapeFactory(void);
-	virtual ~wxGxShapeFactory(void);
-    virtual wxFontEncoding GetEncoding(wxString sPath);
-	//IGxObjectFactory
-	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray);
+	wxGISProgressor(wxWindow * parent, wxWindowID id = wxID_ANY, int range = 100, const wxPoint & pos = wxDefaultPosition, const wxSize & size = wxDefaultSize, long style = /*wxNO_BORDER*/wxSTATIC_BORDER, const wxString name = wxT("GISProgressor"));
+	virtual ~wxGISProgressor(void);
+    virtual void SetRange(int range);
+    virtual int GetRange();
+    virtual void SetValue(int value);
+    virtual int GetValue();
+    virtual void Pulse();
+    //events
+	void OnPaint(wxPaintEvent & event);
+	void OnEraseBackground(wxEraseEvent & event);
+    void OnTimer( wxTimerEvent & event);
+	//IProgressor
+	virtual bool Show(bool bShow);
+protected:
+    int m_nValue;
+    int m_nRange;
+    bool m_bPulse;
+	wxTimer m_timer;
+
+	DECLARE_EVENT_TABLE()
 };

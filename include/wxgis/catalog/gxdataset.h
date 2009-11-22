@@ -36,7 +36,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxDataset :
 public:
 	wxGxDataset(wxString Path, wxString Name, wxGISEnumDatasetType Type);
 	virtual ~wxGxDataset(void);
-    virtual void SetEncoding(wxString sEncoding);
+    virtual void SetEncoding(wxFontEncoding Encoding);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 	virtual wxString GetCategory(void){return wxString(_("Table"));};
@@ -56,7 +56,7 @@ public:
 	virtual wxGISEnumDatasetType GetType(void){return m_type;};
 protected:
 	wxString m_sName, m_sPath;
-    wxString m_sEncoding;
+    wxFontEncoding m_Encoding;
 	wxImageList m_ImageListSmall, m_ImageListLarge;
 	wxGISDataset* m_pwxGISDataset;
 	wxGISEnumDatasetType m_type;
@@ -75,7 +75,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxShapefileDataset :
 public:
 	wxGxShapefileDataset(wxString Path, wxString Name, wxGISEnumShapefileDatasetType Type);
 	virtual ~wxGxShapefileDataset(void);
-    virtual void SetEncoding(wxString sEncoding);
+    virtual void SetEncoding(wxFontEncoding Encoding);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 	virtual wxString GetCategory(void);
@@ -95,7 +95,7 @@ public:
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
 protected:
 	wxString m_sName, m_sPath;
-    wxString m_sEncoding;
+    wxFontEncoding m_Encoding;
 	wxImageList m_ImageListSmall, m_ImageListLarge;
 	wxGISDataset* m_pwxGISDataset;
 	wxGISEnumShapefileDatasetType m_type;

@@ -23,6 +23,12 @@
 #include <wx/tokenzr.h>
 #include "../../art/default_16.xpm"
 
+static IApplication* m_pGlobalApp;
+extern WXDLLIMPEXP_GIS_FRW IApplication* GetApplication()
+{
+    return m_pGlobalApp;
+}
+
 
 BEGIN_EVENT_TABLE(wxGISApplication, wxFrame)
     EVT_ERASE_BACKGROUND(wxGISApplication::OnEraseBackground)
@@ -72,6 +78,7 @@ wxGISApplication::wxGISApplication(IGISConfig* pConfig, wxWindow* parent, wxWind
 
 	SerializeFramePos(false);
 	SetAcceleratorTable(m_pGISAcceleratorTable->GetAcceleratorTable());
+    m_pGlobalApp = this;
 }
 
 wxGISApplication::~wxGISApplication(void)

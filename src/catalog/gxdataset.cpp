@@ -88,7 +88,7 @@ wxGISDataset* wxGxDataset::GetDataset(void)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
-		m_pwxGISDataset = new wxGISFeatureDataset(m_sPath, m_sEncoding);
+		m_pwxGISDataset = new wxGISFeatureDataset(m_sPath, m_Encoding);
 		//for storing internal pointer
 		m_pwxGISDataset->Reference();
 	}
@@ -97,9 +97,9 @@ wxGISDataset* wxGxDataset::GetDataset(void)
 	return m_pwxGISDataset;
 }
 
-void wxGxDataset::SetEncoding(wxString sEncoding)
+void wxGxDataset::SetEncoding(wxFontEncoding Encoding)
 {
-    m_sEncoding = sEncoding;
+    m_Encoding = Encoding;
 }
 
 //--------------------------------------------------------------
@@ -174,7 +174,7 @@ wxGISDataset* wxGxShapefileDataset::GetDataset(void)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
-		m_pwxGISDataset = new wxGISFeatureDataset(m_sPath, m_sEncoding);
+		m_pwxGISDataset = new wxGISFeatureDataset(m_sPath, m_Encoding);
 		//for storing internal pointer
 		m_pwxGISDataset->Reference();
 	}
@@ -183,9 +183,9 @@ wxGISDataset* wxGxShapefileDataset::GetDataset(void)
 	return m_pwxGISDataset;
 }
 
-void wxGxShapefileDataset::SetEncoding(wxString sEncoding)
+void wxGxShapefileDataset::SetEncoding(wxFontEncoding Encoding)
 {
-    m_sEncoding = sEncoding;
+    m_Encoding = Encoding;
 }
 
 //--------------------------------------------------------------

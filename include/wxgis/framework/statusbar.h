@@ -21,6 +21,7 @@
 #pragma once
 
 #include "wxgis/framework/animation.h"
+#include "wxgis/framework/progressor.h"
 
 #define TIMER_ID 1011
 
@@ -29,23 +30,24 @@ class WXDLLIMPEXP_GIS_FRW wxGISStatusBar :
 	public IStatusBar
 {
 public:
-	wxGISStatusBar(wxWindow *parent, wxWindowID id, long style = wxST_SIZEGRIP, const wxString& name = wxT("statusBar"), WXDWORD panesstyle = enumGISStatusMain | enumGISStatusAnimation | enumGISStatusPosition | enumGISStatusClock);
+	wxGISStatusBar(wxWindow *parent, wxWindowID id, long style = wxST_SIZEGRIP, const wxString& name = wxT("statusBar"), WXDWORD panesstyle = enumGISStatusMain | enumGISStatusProgress | enumGISStatusAnimation | enumGISStatusPosition | enumGISStatusClock);
 	virtual ~wxGISStatusBar(void);
 	void OnSize(wxSizeEvent &event);
 	virtual void SetMessage(const wxString& text, int i = 0);
 	virtual wxString GetMessage(int i = 0);
+    virtual int GetPanePos(wxGISEnumStatusBarPanes nPane);
 	virtual IProgressor* GetAnimation(void)
 	{
 		if(m_Panes & enumGISStatusAnimation)
 			return static_cast<IProgressor*>(m_pAni);
 		return NULL;
 	};
-	virtual IProgressor* GetProgressor(void)
+	virtual IProgressor* GetProgressor(void)//???
 	{
 		if(m_Panes & enumGISStatusProgress)
-			return NULL;
+			return static_cast<IProgressor*>(m_pProgressBar);
 		return NULL;
-	};//static_cast<IProgressor*>(m_pAni);};
+	};
 	//events
 	void OnRightDown(wxMouseEvent& event);
     void OnTimer( wxTimerEvent & event);
@@ -53,8 +55,8 @@ public:
 protected:
 	wxTimer m_timer;
 	wxGISAnimation* m_pAni;
-	int m_MsgPos, m_AniPos, m_ProgressPos, m_ClockPos;
-	//wxGauge		*m_pProgressBar;
+    wxGISProgressor* m_pProgressBar;
+	int m_MsgPos, m_AniPos, m_ProgressPos, m_PositionPos, m_ClockPos, m_PagePositionPos, m_SizePos, m_CapsLockPos, m_NumLockPos, m_ScrollLockPos;
 	IApplication* m_pApp;
 
 	DECLARE_EVENT_TABLE()

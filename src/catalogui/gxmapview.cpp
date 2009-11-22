@@ -152,7 +152,8 @@ void wxGxMapView::OnMouseMove(wxMouseEvent& event)
 	{
 		wxPoint* pDCPoint = new wxPoint(event.m_x, event.m_y);
 		OGRRawPoint* pGeoPoints = pDisplayTransformation->TransformCoordDC2World(pDCPoint, 1);
-		m_pStatusBar->SetMessage(wxString::Format(_("X: %.4f  Y: %.4f"), pGeoPoints->x, pGeoPoints->y), 2);//_("X: %u  Y: %u")
+        int nPanePos = m_pStatusBar->GetPanePos(enumGISStatusPosition);
+		m_pStatusBar->SetMessage(wxString::Format(_("X: %.4f  Y: %.4f"), pGeoPoints->x, pGeoPoints->y), nPanePos);//_("X: %u  Y: %u")
 		delete [] pDCPoint;
 		delete [] pGeoPoints;
 	}
