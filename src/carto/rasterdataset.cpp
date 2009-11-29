@@ -19,8 +19,41 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/carto/rasterdataset.h"
+#include "wxgis/framework/messagedlg.h"
 #include "wxgis/framework/application.h"
+
 #include "gdal_rat.h"
+
+typedef struct OvrProgressData
+{
+    IApplication* pApp;
+    IStatusBar* pStatusBar;
+    wxGISProgressor* pProgressor;
+    wxString sMessage;
+} *LPOVRPROGRESSDATA;
+
+int /*CPL_DLL*/ CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pData)
+{
+    LPOVRPROGRESSDATA pOvrData = (LPOVRPROGRESSDATA)pData;
+    if( pszMessage != NULL )
+        pOvrData->pStatusBar->SetMessage(wgMB2WX(pszMessage));
+    else if( pOvrData != NULL && !pOvrData->sMessage.IsEmpty() )
+        pOvrData->pStatusBar->SetMessage(pOvrData->sMessage);
+    else
+        pOvrData->pStatusBar->SetMessage(_("Building overviews"));
+
+    if(pOvrData->pProgressor)
+        pOvrData->pProgressor->SetValue((int) (dfComplete*100));
+
+    static wxWindow* pWnd(NULL);
+    if(!pWnd)
+        pWnd = dynamic_cast<wxWindow*>(pOvrData->pApp);
+    if(pWnd)
+        pWnd->Update();
+
+    bool bKeyState = wxGetKeyState(WXK_ESCAPE);
+    return bKeyState == true ? 0 : 1;
+}
 
 wxGISRasterDataset::wxGISRasterDataset(wxString sPath) : wxGISDataset(sPath), m_bIsOpened(false), m_pSpaRef(NULL), m_psExtent(NULL)
 {
@@ -71,26 +104,17 @@ bool wxGISRasterDataset::Open(IGISConfig* pConfig)
     }
     CSLDestroy( papszFileList );
 
-	CPLSetConfigOption( "USE_RRD", "NO" );
+	CPLSetConfigOption( "USE_RRD", "YES" );//NO
 	CPLSetConfigOption( "HFA_USE_RRD", "YES" );
 	CPLSetConfigOption( "COMPRESS_OVERVIEW", "LZW" );
 
-    //IApplication* pApp = ::GetApplication();
-    //IStatusBar* pStatusBar =  pApp->GetStatusBar();    
-    //wxGISProgressor* pP = dynamic_cast<wxGISProgressor*>(pStatusBar->GetProgressor());
-    //if(pP)
-    //{
-    //    pP->Show(true);
-    //    for(int i = 0; i < 100; i++)
-    //    {
-    //        pP->SetValue(i);
-    //    }
-    //}
-
-
 	bool bAskCreateOvr = true;
-    bHasOverviews = true;
-    if(pConfig)
+    wxString name, ext;
+    wxFileName::SplitPath(m_sPath, NULL, NULL, &name, &ext);
+    wxString sFileName = name + wxT(".") + ext;
+    if(nXSize < 2000 && nYSize < 2000)
+        bHasOverviews = true;
+    if(pConfig && !bHasOverviews)
     {
         wxXmlNode* pNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/raster")));
         if(pNode)
@@ -103,31 +127,38 @@ bool wxGISRasterDataset::Open(IGISConfig* pConfig)
         if(bAskCreateOvr)
         {
             //show ask dialog
+            
+            wxGISMessageDlg dlg(NULL, wxID_ANY, wxString::Format(_("Create pyramids for %s (%d x %d)"), sFileName.c_str(),nXSize, nYSize), wxString(_("This raster data source does not have pyramids. Pyramids allow for rapid display at varying resolutions.")), wxString(_("Pyramid buildin may take a few moments.\nWould you like to create pyramids?")), wxDefaultPosition, wxSize( 400,160 ));
+            if(dlg.ShowModal() == wxID_NO)
+            {
+                bHasOverviews = true;
+            }
+            if(!dlg.GetShowInFuture())
+            {
+                pNode->DeleteProperty(wxT("create_ovr"));
+                pNode->AddProperty(wxT("create_ovr"), wxT("0"));
+            }
         }
     }
 
+    //bHasOverviews = true;
 	if(!bHasOverviews)
 	{
 		int anOverviewList[5] = { 4, 8, 16, 32, 64 };
-		CPLErr err = m_poDataset->BuildOverviews( "GAUSS", 5, anOverviewList, 0, NULL, GDALDummyProgress, NULL );
+        wxString sProgressMsg = wxString::Format(_("Creating pyramids for : %s (%d bands)"), sFileName.c_str(), m_poDataset->GetRasterCount());
+        IApplication* pApp = ::GetApplication();
+        IStatusBar* pStatusBar = pApp->GetStatusBar();  
+        wxGISProgressor* pProgressor = dynamic_cast<wxGISProgressor*>(pStatusBar->GetProgressor());
+        if(pProgressor)
+            pProgressor->Show(true);
+
+        OvrProgressData Data = {pApp, pStatusBar, pProgressor, sProgressMsg}; 
+		CPLErr err = m_poDataset->BuildOverviews( "GAUSS", 5, anOverviewList, 0, NULL, /*GDALDummyProgress*/OvrProgress, (void*)&Data );
 		//"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE" 
- //        int MyTextProgress( double dfComplete, const char *pszMessage, void *pData)
- //{
- //    if( pszMessage != NULL )
- //        printf( "%d%% complete: %s\n", (int) (dfComplete*100), pszMessage );
- //    else if( pData != NULL )
- //        printf( "%d%% complete:%s\n", (int) (dfComplete*100),
- //                (char) pData );
- //    else
- //        printf( "%d%% complete.\n", (int) (dfComplete*100) );
- //    
- //    return TRUE;
- //}
+        if(pProgressor)
+            pProgressor->Show(false);
+        pStatusBar->SetMessage(_("Done"));
 	}
-
-    //if(pP)
-    //    pP->Show(false);
-
 
 	//GDALDriver* pDrv = m_poDataset->GetDriver();
 	//const char* desc = pDrv->GetDescription();

@@ -42,6 +42,7 @@ wxGxDataset::wxGxDataset(wxString Path, wxString Name, wxGISEnumDatasetType Type
 	m_sPath = Path;
 
 	m_pwxGISDataset = NULL;
+    m_Encoding = wxFONTENCODING_DEFAULT;
 }
 
 wxGxDataset::~wxGxDataset(void)

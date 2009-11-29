@@ -164,7 +164,7 @@ protected:
 class ITrackCancel
 {
 public:
-	ITrackCancel(void) : m_bIsCanceled(false){};
+	ITrackCancel(void) : m_bIsCanceled(false), m_pProgressor(NULL){};
 	virtual ~ITrackCancel(void){};
 	virtual void Cancel(void){m_bIsCanceled = true;};
 	virtual bool Continue(void){return !m_bIsCanceled;};

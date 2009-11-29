@@ -240,7 +240,7 @@ wxString wxGISFeatureDataset::GetAsString(int row, int col)
 		case OFTReal:				
 			return wxString::Format(_("%.6f"), pFeature->GetFieldAsDouble(col));
 		default:
-            if(m_bOLCStringsAsUTF8)
+            if(m_bOLCStringsAsUTF8 || m_Encoding == wxFONTENCODING_DEFAULT)
                 return wgMB2WX(pFeature->GetFieldAsString(col));
             else            
             {                

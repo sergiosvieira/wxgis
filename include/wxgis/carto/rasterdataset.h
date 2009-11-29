@@ -22,6 +22,8 @@
 
 #include "wxgis/carto/carto.h"
 
+//int CPL_DLL CPL_STDCALL OvrProgress( double, const char *, void *);
+
 //---------------------------------------
 // wxGISRasterDataset
 //---------------------------------------
