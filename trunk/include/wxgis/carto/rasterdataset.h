@@ -35,10 +35,13 @@ public:
 	wxGISRasterDataset(wxString sPath);
 	virtual ~wxGISRasterDataset(void);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
-	virtual bool Open(IGISConfig* pConfig = NULL);
+	virtual bool Open(void);
 	virtual OGRSpatialReference* GetSpatialReference(void);
 	virtual OGREnvelope* GetEnvelope(void);
 	virtual GDALDataset* GetRaster(void){return m_poDataset;};
+	virtual bool HasOverviews(void){return m_bHasOverviews;};
+    virtual int GetWidth(void){return m_nXSize;};
+    virtual int GetHeight(void){return m_nYSize;};
 
 //	virtual OGRLayer* GetLayer(int iLayer = 0);
 //	virtual void SetSpatialFilter(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);
@@ -55,6 +58,10 @@ protected:
 	GDALDataset  *m_poDataset;
 	OGRSpatialReference* m_pSpaRef;
 	bool m_bIsOpened;
+    bool m_bHasOverviews;
+	int m_nXSize;
+	int m_nYSize;
+
 //	OGRDataSource *m_poDS;
 //	OGRLayer* m_poLayer;
 //	std::vector<OGRFeature*> m_OGRFeatureArray;

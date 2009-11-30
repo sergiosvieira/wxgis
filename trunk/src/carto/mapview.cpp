@@ -23,6 +23,7 @@
 #include "wxgis/display/screendisplayplus.h"
 
 #define WAITTIME 650
+#define wxUSE_GRAPHICS_CONTEXT 0
 
 //-----------------------------------------------
 //wxDrawingThread
@@ -199,7 +200,6 @@ wxGISMapView::wxGISMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 
 	m_MouseState = enumGISMouseNone;
 	m_MapToolState = enumGISMapNone;
-
 }
 
 wxGISMapView::~wxGISMapView(void)

@@ -19,11 +19,13 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#include "wxgis/catalog/gxdataset.h"
 #include "../../art/shape_icon16.xpm"
 #include "../../art/shape_icon48.xpm"
+#include "wxgis/catalog/gxdataset.h"
 #include "wxgis/carto/featuredataset.h"
 #include "wxgis/carto/rasterdataset.h"
+#include "wxgis/framework/messagedlg.h"
+#include "wxgis/framework/application.h"
 
 //--------------------------------------------------------------
 //class wxGxDataset
@@ -258,16 +260,105 @@ wxString wxGxRasterDataset::GetCategory(void)
 	}
 }
 
+typedef struct OvrProgressData
+{
+    IApplication* pApp;
+    IStatusBar* pStatusBar;
+    wxGISProgressor* pProgressor;
+    wxString sMessage;
+} *LPOVRPROGRESSDATA;
+
+int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pData)
+{
+    LPOVRPROGRESSDATA pOvrData = (LPOVRPROGRESSDATA)pData;
+    if( pszMessage != NULL )
+        pOvrData->pStatusBar->SetMessage(wgMB2WX(pszMessage));
+    else if( pOvrData != NULL && !pOvrData->sMessage.IsEmpty() )
+        pOvrData->pStatusBar->SetMessage(pOvrData->sMessage);
+    else
+        pOvrData->pStatusBar->SetMessage(_("Building overviews"));
+
+    if(pOvrData->pProgressor)
+        pOvrData->pProgressor->SetValue((int) (dfComplete*100));
+
+    static wxWindow* pWnd(NULL);
+    if(!pWnd)
+        pWnd = dynamic_cast<wxWindow*>(pOvrData->pApp);
+    if(pWnd)
+        ::wxSafeYield(pWnd, true);
+
+    bool bKeyState = wxGetKeyState(WXK_ESCAPE);
+    return bKeyState == true ? 0 : 1;
+}
 
 wxGISDataset* wxGxRasterDataset::GetDataset(void)
 {
 	if(m_pwxGISDataset == NULL)
-	{		
-		m_pwxGISDataset = new wxGISRasterDataset(m_sPath);
+	{	
+        wxGISRasterDataset* pwxGISRasterDataset = new wxGISRasterDataset(m_sPath);
+
+		m_pwxGISDataset = static_cast<wxGISDataset*>(pwxGISRasterDataset);
         //open (ask for overviews)
-        m_pwxGISDataset->Open(m_pCatalog->GetConfig());
+        pwxGISRasterDataset->Open();
+        //pyramids
+        if(!pwxGISRasterDataset->HasOverviews())
+        {
+	        CPLSetConfigOption( "USE_RRD", "YES" );//NO
+	        CPLSetConfigOption( "HFA_USE_RRD", "YES" );
+	        CPLSetConfigOption( "COMPRESS_OVERVIEW", "LZW" );
+
+        	bool bAskCreateOvr = true;
+            wxString name, ext;
+            wxFileName::SplitPath(m_sPath, NULL, NULL, &name, &ext);
+            wxString sFileName = name + wxT(".") + ext;
+            IGISConfig*  pConfig = m_pCatalog->GetConfig();
+            bool bCreateOverviews = true;
+            if(pConfig)
+            {
+                wxXmlNode* pNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/raster")));
+                if(pNode)
+                    bAskCreateOvr = wxAtoi(pNode->GetPropVal(wxT("create_ovr"), wxT("1")));
+                else
+                {
+                    pNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog/raster")), true);
+                    pNode->AddProperty(wxT("create_ovr"), wxT("1"));
+                }
+                if(bAskCreateOvr)
+                {
+                    //show ask dialog
+                    wxGISMessageDlg dlg(NULL, wxID_ANY, wxString::Format(_("Create pyramids for %s (%d x %d)"), sFileName.c_str(),pwxGISRasterDataset->GetWidth(), pwxGISRasterDataset->GetHeight()), wxString(_("This raster data source does not have pyramids. Pyramids allow for rapid display at varying resolutions.")), wxString(_("Pyramid buildin may take a few moments.\nWould you like to create pyramids?")), wxDefaultPosition, wxSize( 400,160 ));
+                    if(dlg.ShowModal() == wxID_NO)
+                    {
+                        bCreateOverviews = false;
+                    }
+                    if(!dlg.GetShowInFuture())
+                    {
+                        pNode->DeleteProperty(wxT("create_ovr"));
+                        pNode->AddProperty(wxT("create_ovr"), wxT("0"));
+                    }
+                }
+            }
+
+	        if(bCreateOverviews)
+	        {
+		        int anOverviewList[5] = { 4, 8, 16, 32, 64 };
+                wxString sProgressMsg = wxString::Format(_("Creating pyramids for : %s (%d bands)"), sFileName.c_str(), pwxGISRasterDataset->GetRaster()->GetRasterCount());
+                IApplication* pApp = ::GetApplication();
+                IStatusBar* pStatusBar = pApp->GetStatusBar();  
+                wxGISProgressor* pProgressor = dynamic_cast<wxGISProgressor*>(pStatusBar->GetProgressor());
+                if(pProgressor)
+                    pProgressor->Show(true);
+
+                OvrProgressData Data = {pApp, pStatusBar, pProgressor, sProgressMsg}; 
+		        CPLErr err = pwxGISRasterDataset->GetRaster()->BuildOverviews( "GAUSS", 5, anOverviewList, 0, NULL, /*GDALDummyProgress*/OvrProgress, (void*)&Data );
+		        //"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE" 
+                if(pProgressor)
+                    pProgressor->Show(false);
+                pStatusBar->SetMessage(_("Done"));
+	        }
+        }
 		//for storing internal pointer
-		m_pwxGISDataset->Reference();        
+		m_pwxGISDataset->Reference();
 	}
 	//for outer pointer
 	m_pwxGISDataset->Reference();

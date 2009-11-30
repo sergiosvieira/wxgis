@@ -48,12 +48,12 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 	OGRSpatialReference* pDisplaySpatialReference = pDisplayTransformation->GetSpatialReference();
 	OGRSpatialReference* pRasterSpatialReference = pRaster->GetSpatialReference();
 	bool IsSpaRefSame(true);
-	if(pDisplaySpatialReference && pDisplaySpatialReference)
+	if(pDisplaySpatialReference && pRasterSpatialReference)
 		IsSpaRefSame = pDisplaySpatialReference->IsSame(pRasterSpatialReference);
 	OGREnvelope VisibleBounds = pDisplayTransformation->GetVisibleBounds();
 	OGREnvelope* pRasterExtent = pRaster->GetEnvelope();
-	OGREnvelope RasterEnvelope, DisplayEnvelope;
-
+    //calc envelopes
+	OGREnvelope RasterEnvelope;
 	if(!IsSpaRefSame)
 	{
 		RasterEnvelope = TransformEnvelope(pRasterExtent, pRasterSpatialReference, pDisplaySpatialReference);
@@ -73,7 +73,7 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 		DrawBounds.MinY = MAX(RasterEnvelope.MinY, VisibleBounds.MinY);
 		DrawBounds.MaxX = MIN(RasterEnvelope.MaxX, VisibleBounds.MaxX);
 		DrawBounds.MaxY = MIN(RasterEnvelope.MaxY, VisibleBounds.MaxY);
-
+        //convert draw bounds to DC coords
 		OGRRawPoint OGRRawPoints[2];
 		OGRRawPoints[0].x = DrawBounds.MinX;
 		OGRRawPoints[0].y = DrawBounds.MinY;
@@ -99,7 +99,7 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 		GDALDataset* pGDALDataset = pRaster->GetRaster();
 
 		int nBandCount = pGDALDataset->GetRasterCount();
-		//hack!
+		//hack! should check user configuration
 		int bands[3];
 		if(nBandCount < 3)
 		{
@@ -147,11 +147,6 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
     			GDALApplyGeoTransform( adfReverseGeoTransform, DrawBounds.MinX, DrawBounds.MinY, &rMinX, &rMaxY );
 	    		GDALApplyGeoTransform( adfReverseGeoTransform, DrawBounds.MaxX, DrawBounds.MaxY, &rMaxX, &rMinY );
             }
-            //double rRealMinX, rRealMinY, rRealMaxX, rRealMaxY;
-            //rRealMinX = MIN(rMinX, rMaxX);
-            //rRealMinY = MIN(rMinY, rMaxY);
-            //rRealMaxX = MAX(rMinX, rMaxX);
-            //rRealMaxY = MAX(rMinY, rMaxY);
 
             double rImgWidth = rMaxX - rMinX;
             double rImgHeight = rMaxY - rMinY;
@@ -159,38 +154,59 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 			int nImgHeight = ceil(rImgHeight) + 1;
             
 			//read in buffer
-            int nMinX = floor(rMinX);
-            int nMinY = floor(rMinY);
+            int nMinX = int/*floor*/(rMinX);
+            int nMinY = int/*floor*/(rMinY);
 			if(nMinX < 0) nMinX = 0;
 			if(nMinY < 0) nMinY = 0;
 
-            if(nImgWidth > nXSize - nMinX) nImgWidth -= 1;
-            if(nImgHeight > nYSize - nMinY) nImgHeight -= 1;
+            if(nImgWidth > nXSize - nMinX) nImgWidth = nXSize - nMinX;
+            if(nImgHeight > nYSize - nMinY) nImgHeight = nYSize - nMinY;
 
 		    //create buffer
-			int nWidthOut = nWidth > nImgWidth ? nImgWidth : (double)nWidth + 1.0  /*/ 1.2 / 2 * 2/ 1.5 + 1) / 2*/;
-			int nHeightOut = nHeight > nImgHeight ? nImgHeight : (double)nHeight + 1.0  /*/ 1.2 / 2 * 2 / 1.5 + 1) / 2*/;
-			double rImgWidthOut = nWidth > nImgWidth ? rImgWidth : (double)nWidthOut * rImgWidth / nImgWidth;
-			double rImgHeightOut = nHeight > nImgHeight ? rImgHeight : (double)nHeightOut * rImgHeight / nImgHeight;
+            int nWidthOut, nHeightOut;
+            double rImgWidthOut, rImgHeightOut;
+            if(nWidth > nImgWidth)
+            {
+			    nWidthOut = nImgWidth;
+			    rImgWidthOut = rImgWidth;
+            }
+            else
+            {
+			    nWidthOut = nWidth;
+			    rImgWidthOut = (double)nWidthOut * rImgWidth / nImgWidth;
+			    //nWidthOut++;
+            }
+            
+            if(nHeight > nImgHeight)
+            {
+			    nHeightOut = nImgHeight;
+			    rImgHeightOut = rImgHeight;
+            }
+            else
+            {
+			    nHeightOut = nHeight;
+			    rImgHeightOut = (double)nHeightOut * rImgHeight / nImgHeight;
+                //nHeightOut++;
+            }
 
 
 		    unsigned char* data = new unsigned char[nWidthOut * nHeightOut * 3];
 
-		    err = pGDALDataset->AdviseRead(nMinX, nMinY, nImgWidth, nImgHeight, nWidthOut/*nImgWidth*/, nHeightOut/*nImgHeight*/, GDT_Byte, 3, bands, NULL);
+		    err = pGDALDataset->AdviseRead(nMinX, nMinY, nImgWidth, nImgHeight, nWidthOut, nHeightOut, GDT_Byte, 3, bands, NULL);
 		    if(err != CE_None)
 		    {
-			    wxDELETEA(data);//delete[](data);
+			    wxDELETEA(data);
 			    return;
 		    }
 
-		    err = pGDALDataset->RasterIO(GF_Read, nMinX, nMinY, nImgWidth, nImgHeight, data, nWidthOut/*nImgWidth*/, nHeightOut/*nImgHeight*/, GDT_Byte, 3, bands, sizeof(unsigned char) * 3, 0, sizeof(unsigned char));
+		    err = pGDALDataset->RasterIO(GF_Read, nMinX, nMinY, nImgWidth, nImgHeight, data, nWidthOut, nHeightOut, GDT_Byte, 3, bands, sizeof(unsigned char) * 3, 0, sizeof(unsigned char));
 		    if(err != CE_None)
 		    {
-			    wxDELETEA(data);//delete[](data);
+			    wxDELETEA(data);
 			    return;
 		    }
 		    //scale pTempData to data using interpolation methods
-		    pDisplay->DrawBitmap(Scale(data, nWidthOut/*nImgWidth*/, nHeightOut/*nImgHeight*/, rImgWidthOut/*rImgWidth*/, rImgHeightOut/*rImgHeight*/, nWidth + 1 , nHeight + 1, rMinX - nMinX, rMinY - nMinY, /*enumGISQualityNearest*/enumGISQualityBilinear, pTrackCancel), nDCXOrig, nDCYOrig);
+		    pDisplay->DrawBitmap(Scale(data, nWidthOut, nHeightOut, rImgWidthOut/*rImgWidth*/, rImgHeightOut/*rImgHeight*/, nWidth, nHeight, rMinX - nMinX, rMinY - nMinY, enumGISQualityBilinear, pTrackCancel), nDCXOrig, nDCYOrig); //enumGISQualityNearest
 
             wxDELETEA(data);
 		}
@@ -380,15 +396,15 @@ OGREnvelope wxGISRasterRGBRenderer::TransformEnvelope(OGREnvelope* pEnvelope, OG
 
 wxImage wxGISRasterRGBRenderer::Scale(unsigned char* pData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel)
 {
- //   //simple way
- //   wxImage ResultImage(nOrigX, nOrigY, pData);
-	//ResultImage = ResultImage.Scale(nDestX, nDestY, nQuality);
- //   return ResultImage;
+    ////simple way
+    //wxImage ResultImage(nOrigX, nOrigY, pData);
+    //ResultImage = ResultImage.Scale(nDestX, nDestY, nQuality);
+    //return ResultImage;
 
     wxImage ResultImage(nDestX, nDestY, false);
     unsigned char* pDestData = ResultImage.GetData();
     //multithreaded
-    int CPUCount(2); //check cpu count
+    int CPUCount = wxThread::GetCPUCount();
     std::vector<wxRasterDrawThread*> threadarray;
     int nPartSize = nDestY / CPUCount;
     int nBegY(0), nEndY;
@@ -404,7 +420,7 @@ wxImage wxGISRasterRGBRenderer::Scale(unsigned char* pData, int nOrigX, int nOri
         thread->Create();
         thread->Run();
         threadarray.push_back(thread);
-        nBegY = nEndY/* + 1*/;
+        nBegY = nEndY;
     }
 
     for(size_t i = 0; i < threadarray.size(); i++)

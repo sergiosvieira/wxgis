@@ -55,12 +55,6 @@ OGRLayer* wxGISFeatureDataset::GetLayer(int iLayer)
 	return NULL;	
 }
 
-bool wxGISFeatureDataset::Open(IGISConfig* pConfig)
-{
-    return Open(0);
-}
-
-
 bool wxGISFeatureDataset::Open(int iLayer)
 {
 	if(m_bIsOpened)
@@ -281,7 +275,7 @@ wxGISFeatureSet* wxGISFeatureDataset::GetFeatureSet(IQueryFilter* pQFilter, ITra
 					break;
 				pGISFeatureSet->AddFeature(pFeatureArr[i]);
 			}
-			delete [] pFeatureArr;
+			wxDELETEA( pFeatureArr );
 		}
 	}
 	else

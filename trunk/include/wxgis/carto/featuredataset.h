@@ -38,7 +38,6 @@ public:
 	virtual OGRLayer* GetLayer(int iLayer = 0);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
 	virtual bool Open(int iLayer);
-    virtual bool Open(IGISConfig* pConfig = NULL);
 	virtual OGRSpatialReference* GetSpatialReference(void);
 	virtual OGREnvelope* GetEnvelope(void);
 	virtual void SetSpatialFilter(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);

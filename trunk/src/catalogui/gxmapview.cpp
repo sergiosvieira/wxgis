@@ -105,6 +105,7 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	IGxDataset* pGxDataset =  dynamic_cast<IGxDataset*>(pGxObj);
 	if(pGxDataset == NULL)
 		return;
+
 	wxGISDataset* pwxGISDataset = pGxDataset->GetDataset();
 	if(pwxGISDataset == NULL)
 		return;
