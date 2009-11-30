@@ -303,9 +303,9 @@ wxGISDataset* wxGxRasterDataset::GetDataset(void)
         //pyramids
         if(!pwxGISRasterDataset->HasOverviews())
         {
-	        CPLSetConfigOption( "USE_RRD", "YES" );//NO
+	        CPLSetConfigOption( "USE_RRD", "NO" );//YES
 	        CPLSetConfigOption( "HFA_USE_RRD", "YES" );
-	        CPLSetConfigOption( "COMPRESS_OVERVIEW", "LZW" );
+	        //CPLSetConfigOption( "COMPRESS_OVERVIEW", "DEFLATE" );//LZW
 
         	bool bAskCreateOvr = true;
             wxString name, ext;
