@@ -95,9 +95,9 @@ void wxSimpleFillSymbol::DrawPolygon(OGRPolygon* pPoly, IDisplay* pwxGISDisplay)
 			OGRRawPoint* pOGRRawPoints = new OGRRawPoint[nPointCount];
 			pLStr->getPoints(pOGRRawPoints);
 			wxPoint* pPoints = pDisplayTransformation->TransformCoordWorld2DC(pOGRRawPoints, nPointCount);
-			delete[](pOGRRawPoints);
+			wxDELETEA(pOGRRawPoints);
 			pwxGISDisplay->DrawPolygon(nPointCount, pPoints);
-			delete[](pPoints);
+			wxDELETEA(pPoints);
 		}
 		else
 		{
@@ -117,7 +117,7 @@ void wxSimpleFillSymbol::DrawPolygon(OGRPolygon* pPoly, IDisplay* pwxGISDisplay)
 			pLStr->getPoints(pOGRRawPoints);
 			int counter(0);
 			pDisplayTransformation->TransformCoordWorld2DC(pOGRRawPoints, nN[0], &pFullPoints[counter]);
-			delete[](pOGRRawPoints);
+			wxDELETEA(pOGRRawPoints);
 			counter += nN[0];
 
 			for(int iPart = 0; iPart < NumInteriorRings; iPart++)
@@ -127,14 +127,14 @@ void wxSimpleFillSymbol::DrawPolygon(OGRPolygon* pPoly, IDisplay* pwxGISDisplay)
 				pOGRRawPoints = new OGRRawPoint[nN[iPart + 1]];
 				pLStrInt->getPoints(pOGRRawPoints);
 				pDisplayTransformation->TransformCoordWorld2DC(pOGRRawPoints, nN[iPart + 1], &pFullPoints[counter]);
-				delete[](pOGRRawPoints);
+				wxDELETEA(pOGRRawPoints);
 				counter += nN[iPart + 1];
 			}
 
 			pwxGISDisplay->DrawPolyPolygon(NumInteriorRings + 1, nN, pFullPoints, 0, 0, wxODDEVEN_RULE);
 
-			delete[](pFullPoints);
-			delete[](nN);
+			wxDELETEA(pFullPoints);
+			wxDELETEA(nN);
 		}
 	}
 }
@@ -186,7 +186,7 @@ void wxSimpleFillSymbol::DrawPolyPolygon(OGRMultiPolygon* pPoly, IDisplay* pwxGI
 		pLStr->getPoints(pOGRRawPoints);
 		pDisplayTransformation->TransformCoordWorld2DC(pOGRRawPoints, nN[counter], &pFullPoints[pos]);
 		pos += nN[counter];
-		delete[](pOGRRawPoints);
+		wxDELETEA(pOGRRawPoints);
 		counter++;
 		int NumInteriorRings = pPolygon->getNumInteriorRings();
 		for(int iPart = 0; iPart < NumInteriorRings; iPart++)
@@ -197,12 +197,12 @@ void wxSimpleFillSymbol::DrawPolyPolygon(OGRMultiPolygon* pPoly, IDisplay* pwxGI
 			pLStrInt->getPoints(pOGRRawPoints);
 			pDisplayTransformation->TransformCoordWorld2DC(pOGRRawPoints, nN[counter], &pFullPoints[pos]);
 			pos += nN[counter];
-			delete[](pOGRRawPoints);
+			wxDELETEA(pOGRRawPoints);
 			counter++;
 		}
 	}
 
 	pwxGISDisplay->DrawPolyPolygon(nNumPolys, nN, pFullPoints, 0, 0, wxODDEVEN_RULE);
-	delete[](pFullPoints);
-	delete[](nN);
+	wxDELETEA(pFullPoints);
+	wxDELETEA(nN);
 }

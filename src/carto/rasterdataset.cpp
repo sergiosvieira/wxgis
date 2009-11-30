@@ -19,43 +19,10 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/carto/rasterdataset.h"
-#include "wxgis/framework/messagedlg.h"
-#include "wxgis/framework/application.h"
 
 #include "gdal_rat.h"
 
-typedef struct OvrProgressData
-{
-    IApplication* pApp;
-    IStatusBar* pStatusBar;
-    wxGISProgressor* pProgressor;
-    wxString sMessage;
-} *LPOVRPROGRESSDATA;
-
-int /*CPL_DLL*/ CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pData)
-{
-    LPOVRPROGRESSDATA pOvrData = (LPOVRPROGRESSDATA)pData;
-    if( pszMessage != NULL )
-        pOvrData->pStatusBar->SetMessage(wgMB2WX(pszMessage));
-    else if( pOvrData != NULL && !pOvrData->sMessage.IsEmpty() )
-        pOvrData->pStatusBar->SetMessage(pOvrData->sMessage);
-    else
-        pOvrData->pStatusBar->SetMessage(_("Building overviews"));
-
-    if(pOvrData->pProgressor)
-        pOvrData->pProgressor->SetValue((int) (dfComplete*100));
-
-    static wxWindow* pWnd(NULL);
-    if(!pWnd)
-        pWnd = dynamic_cast<wxWindow*>(pOvrData->pApp);
-    if(pWnd)
-        pWnd->Update();
-
-    bool bKeyState = wxGetKeyState(WXK_ESCAPE);
-    return bKeyState == true ? 0 : 1;
-}
-
-wxGISRasterDataset::wxGISRasterDataset(wxString sPath) : wxGISDataset(sPath), m_bIsOpened(false), m_pSpaRef(NULL), m_psExtent(NULL)
+wxGISRasterDataset::wxGISRasterDataset(wxString sPath) : wxGISDataset(sPath), m_bIsOpened(false), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false)
 {
 }
 
@@ -68,7 +35,7 @@ wxGISRasterDataset::~wxGISRasterDataset(void)
 		GDALClose(m_poDataset);
 }
 
-bool wxGISRasterDataset::Open(IGISConfig* pConfig)
+bool wxGISRasterDataset::Open(void)
 {
 	if(m_bIsOpened)
 		return true;
@@ -80,11 +47,8 @@ bool wxGISRasterDataset::Open(IGISConfig* pConfig)
 	if( m_poDataset == NULL )
 		return false;
 
-	int nXSize = m_poDataset->GetRasterXSize();
-	int nYSize = m_poDataset->GetRasterYSize();
-
-	bool bHasOverviews = false;
-
+	m_nXSize = m_poDataset->GetRasterXSize();
+	m_nYSize = m_poDataset->GetRasterYSize();
 
 	char** papszFileList = m_poDataset->GetFileList();
     if( CSLCount(papszFileList) == 0 )
@@ -98,67 +62,15 @@ bool wxGISRasterDataset::Open(IGISConfig* pConfig)
 		{
 			wxString sFileName = wgMB2WX(papszFileList[i]);
 			if(sFileName.Find(wxT(".rrd")) != wxNOT_FOUND || sFileName.Find(wxT(".ovr")) != wxNOT_FOUND)
-				bHasOverviews = true;
+				m_bHasOverviews = true;
 			wxLogDebug( wxT("       %s"), sFileName.c_str() );
 		}
     }
     CSLDestroy( papszFileList );
 
-	CPLSetConfigOption( "USE_RRD", "YES" );//NO
-	CPLSetConfigOption( "HFA_USE_RRD", "YES" );
-	CPLSetConfigOption( "COMPRESS_OVERVIEW", "LZW" );
+    if(m_nXSize < 2000 && m_nYSize < 2000)
+        m_bHasOverviews = true;
 
-	bool bAskCreateOvr = true;
-    wxString name, ext;
-    wxFileName::SplitPath(m_sPath, NULL, NULL, &name, &ext);
-    wxString sFileName = name + wxT(".") + ext;
-    if(nXSize < 2000 && nYSize < 2000)
-        bHasOverviews = true;
-    if(pConfig && !bHasOverviews)
-    {
-        wxXmlNode* pNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/raster")));
-        if(pNode)
-            bAskCreateOvr = wxAtoi(pNode->GetPropVal(wxT("create_ovr"), wxT("1")));
-        else
-        {
-            pNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog/raster")), true);
-            pNode->AddProperty(wxT("create_ovr"), wxT("1"));
-        }
-        if(bAskCreateOvr)
-        {
-            //show ask dialog
-            
-            wxGISMessageDlg dlg(NULL, wxID_ANY, wxString::Format(_("Create pyramids for %s (%d x %d)"), sFileName.c_str(),nXSize, nYSize), wxString(_("This raster data source does not have pyramids. Pyramids allow for rapid display at varying resolutions.")), wxString(_("Pyramid buildin may take a few moments.\nWould you like to create pyramids?")), wxDefaultPosition, wxSize( 400,160 ));
-            if(dlg.ShowModal() == wxID_NO)
-            {
-                bHasOverviews = true;
-            }
-            if(!dlg.GetShowInFuture())
-            {
-                pNode->DeleteProperty(wxT("create_ovr"));
-                pNode->AddProperty(wxT("create_ovr"), wxT("0"));
-            }
-        }
-    }
-
-    //bHasOverviews = true;
-	if(!bHasOverviews)
-	{
-		int anOverviewList[5] = { 4, 8, 16, 32, 64 };
-        wxString sProgressMsg = wxString::Format(_("Creating pyramids for : %s (%d bands)"), sFileName.c_str(), m_poDataset->GetRasterCount());
-        IApplication* pApp = ::GetApplication();
-        IStatusBar* pStatusBar = pApp->GetStatusBar();  
-        wxGISProgressor* pProgressor = dynamic_cast<wxGISProgressor*>(pStatusBar->GetProgressor());
-        if(pProgressor)
-            pProgressor->Show(true);
-
-        OvrProgressData Data = {pApp, pStatusBar, pProgressor, sProgressMsg}; 
-		CPLErr err = m_poDataset->BuildOverviews( "GAUSS", 5, anOverviewList, 0, NULL, /*GDALDummyProgress*/OvrProgress, (void*)&Data );
-		//"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE" 
-        if(pProgressor)
-            pProgressor->Show(false);
-        pStatusBar->SetMessage(_("Done"));
-	}
 
 	//GDALDriver* pDrv = m_poDataset->GetDriver();
 	//const char* desc = pDrv->GetDescription();
@@ -439,12 +351,12 @@ bool wxGISRasterDataset::Open(IGISConfig* pConfig)
 
 		inX[0] = 0;
 		inY[0] = 0;
-		inX[1] = nXSize;
+		inX[1] = m_nXSize;
 		inY[1] = 0;
-		inX[2] = nXSize;
-		inY[2] = nYSize;
+		inX[2] = m_nXSize;
+		inY[2] = m_nYSize;
 		inX[3] = 0;
-		inY[3] = nYSize;
+		inY[3] = m_nYSize;
 
 		m_psExtent->MaxX = 0;
 		m_psExtent->MaxY = 0;
