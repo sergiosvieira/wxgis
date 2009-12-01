@@ -65,6 +65,8 @@ public:
 	virtual OGREnvelope TransformRect(wxRect rect) = 0;
 };
 
+typedef std::vector<wxRect> RECTARARRAY;
+
 class IDisplay
 {
 public:
@@ -83,6 +85,7 @@ public:
 	virtual void DrawRectangle(wxCoord x, wxCoord y, wxCoord width, wxCoord height) = 0;
 	virtual void DrawBitmap(const wxBitmap& bitmap, wxCoord x, wxCoord y, bool transparent = false) = 0;
 	virtual IDisplayTransformation* GetDisplayTransformation(void) = 0;
+    virtual RECTARARRAY* GetInvalidRect(void) = 0;
 };
 
 class ICachedDisplay : 
@@ -93,6 +96,7 @@ public:
 	virtual void OnStretchDraw(wxDC &dc, wxCoord nDestWidth, wxCoord nDestHeight, wxCoord x = 0, wxCoord y = 0, bool bClearBackground = false, wxGISEnumDrawQuality quality = enumGISQualityNearest) = 0;
 	virtual void OnStretchDraw2(wxDC &dc, wxRect Rect, bool bClearBackground = false, wxGISEnumDrawQuality quality = enumGISQualityNearest) = 0;
 	virtual void OnPanDraw(wxDC &dc, wxCoord x, wxCoord y) = 0;
+    virtual void OnPanStop(wxDC &dc) = 0;
 	//virtual void OnDrawRectangle(wxDC &dc, wxCoord x, wxCoord y, wxCoord width, wxCoord height) = 0;
 	//Check if cache_id is derty
 	virtual bool IsCacheDerty(size_t cache_id) = 0;
