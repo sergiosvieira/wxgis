@@ -89,8 +89,8 @@ public:
 	//wxGISScreenDisplay
 	wxGISScreenDisplay(void);
 	virtual ~wxGISScreenDisplay(void);
-	//IDisplay
-	virtual void OnDraw(wxDC &dc, wxCoord x = 0, wxCoord y = 0, bool bClearBackground = false);
+    wxImage Scale(const unsigned char* pData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel = NULL);
+    wxImage Scale(wxImage SourceImage, int nDestWidth, int nDestHeight, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel = NULL);
 	//Stretch buffer to nDestWidth & nDestHeight and draw in x, y coordinates
 	//Drawing...
 	virtual void OnStretchDraw(wxDC &dc, wxCoord nDestWidth, wxCoord nDestHeight, wxCoord x = 0, wxCoord y = 0, bool bClearBackground = false, wxGISEnumDrawQuality quality = enumGISQualityNearest );
@@ -98,7 +98,9 @@ public:
 	virtual void OnStretchDraw2(wxDC &dc, wxRect Rect, bool bClearBackground = false, wxGISEnumDrawQuality quality = enumGISQualityNearest );
 	//
 	virtual void OnPanDraw(wxDC &dc, wxCoord x, wxCoord y);
+    virtual void OnPanStop(wxDC &dc);
 	//IDisplay
+	virtual void OnDraw(wxDC &dc, wxCoord x = 0, wxCoord y = 0, bool bClearBackground = false);
 	virtual void SetBrush(wxBrush& Brush);
 	virtual void SetPen(wxPen& Pen);
 	virtual void SetFont(wxFont& Font);
@@ -112,8 +114,8 @@ public:
 	virtual void SetDerty(bool bIsDerty);
 	virtual bool IsDerty(void);
 	virtual IDisplayTransformation* GetDisplayTransformation(void);
-    wxImage Scale(const unsigned char* pData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel = NULL);
-    wxImage Scale(wxImage SourceImage, int nDestWidth, int nDestHeight, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel = NULL);
+    virtual RECTARARRAY* GetInvalidRect(void);
+
 	//ICachedDisplay
 	virtual bool IsCacheDerty(size_t cache_id);
 	virtual void SetCacheDerty(size_t cache_id, bool bIsDerty);
@@ -129,6 +131,8 @@ public:
 		wxBitmap bmp;
 	} CACHEDATA;
 protected:
+    void AddInvalidRect(wxRect Rect);
+protected:
 	std::vector<CACHEDATA> m_caches;
 	wxMemoryDC m_dc;
 	//, m_GeoSelectionBuffer, m_AnnotationBuffer;
@@ -136,4 +140,5 @@ protected:
 	bool m_bIsDerty;
 	wxGISDisplayTransformation* m_pDisplayTransformation;
     wxCriticalSection m_CritSect;
+    RECTARARRAY m_InvalidRectArray;
 };

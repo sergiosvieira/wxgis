@@ -50,7 +50,29 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 	bool IsSpaRefSame(true);
 	if(pDisplaySpatialReference && pRasterSpatialReference)
 		IsSpaRefSame = pDisplaySpatialReference->IsSame(pRasterSpatialReference);
-	OGREnvelope VisibleBounds = pDisplayTransformation->GetVisibleBounds();
+	
+    //OGREnvelope VisibleBounds = pDisplayTransformation->GetVisibleBounds();
+    RECTARARRAY* pInvalidrectArray = pDisplay->GetInvalidRect();
+    OGREnvelope Envs[10];
+    size_t EnvCount = pInvalidrectArray->size();
+    if(EnvCount > 10)
+        EnvCount = 10;
+
+    if(EnvCount == 0)
+    {
+        Envs[0] = pDisplayTransformation->GetVisibleBounds();
+        EnvCount = 1;
+    }
+    else
+    {
+        for(size_t i = 0; i < EnvCount; i++)
+        {
+            wxRect Rect = pInvalidrectArray->operator[](i);   
+            Rect.Inflate(1,1);
+            Envs[i] = pDisplayTransformation->TransformRect(Rect);
+        }
+    }
+
 	OGREnvelope* pRasterExtent = pRaster->GetEnvelope();
     //calc envelopes
 	OGREnvelope RasterEnvelope;
@@ -62,237 +84,244 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 	{
 		RasterEnvelope = *pRasterExtent;
 	}
-	bool IsZoomIn(false);
-	//IsZoomIn = RasterEnvelope.Contains(VisibleBounds);
-	IsZoomIn = RasterEnvelope.MaxX > VisibleBounds.MaxX || RasterEnvelope.MaxY > VisibleBounds.MaxY || RasterEnvelope.MinX < VisibleBounds.MinX || RasterEnvelope.MinY < VisibleBounds.MinY;
-	if(IsZoomIn)
-	{
-		//intersect bounds
-		OGREnvelope DrawBounds;
-		DrawBounds.MinX = MAX(RasterEnvelope.MinX, VisibleBounds.MinX);
-		DrawBounds.MinY = MAX(RasterEnvelope.MinY, VisibleBounds.MinY);
-		DrawBounds.MaxX = MIN(RasterEnvelope.MaxX, VisibleBounds.MaxX);
-		DrawBounds.MaxY = MIN(RasterEnvelope.MaxY, VisibleBounds.MaxY);
-        //convert draw bounds to DC coords
-		OGRRawPoint OGRRawPoints[2];
-		OGRRawPoints[0].x = DrawBounds.MinX;
-		OGRRawPoints[0].y = DrawBounds.MinY;
-		OGRRawPoints[1].x = DrawBounds.MaxX;
-		OGRRawPoints[1].y = DrawBounds.MaxY;
-		wxPoint* pDCPoints = pDisplayTransformation->TransformCoordWorld2DC(OGRRawPoints, 2);	
 
-		if(!pDCPoints)
-		{
-			wxDELETEA(pDCPoints);
-			return;
-		}
+    for(size_t i = 0; i < EnvCount; i++)
+    {
+	    //1. get envelope
+	    OGREnvelope VisibleBounds = Envs[i];//pDisplayTransformation->GetVisibleBounds();
 
-		int nDCXOrig = pDCPoints[0].x;
-		int nDCYOrig = pDCPoints[1].y;
-		int nWidth = pDCPoints[1].x - pDCPoints[0].x;
-		int nHeight = pDCPoints[0].y - pDCPoints[1].y;
-		wxDELETEA(pDCPoints);
+	    bool IsZoomIn(false);
+	    //IsZoomIn = RasterEnvelope.Contains(VisibleBounds);
+	    IsZoomIn = RasterEnvelope.MaxX > VisibleBounds.MaxX || RasterEnvelope.MaxY > VisibleBounds.MaxY || RasterEnvelope.MinX < VisibleBounds.MinX || RasterEnvelope.MinY < VisibleBounds.MinY;
+	    if(IsZoomIn)
+	    {
+		    //intersect bounds
+		    OGREnvelope DrawBounds;
+		    DrawBounds.MinX = MAX(RasterEnvelope.MinX, VisibleBounds.MinX);
+		    DrawBounds.MinY = MAX(RasterEnvelope.MinY, VisibleBounds.MinY);
+		    DrawBounds.MaxX = MIN(RasterEnvelope.MaxX, VisibleBounds.MaxX);
+		    DrawBounds.MaxY = MIN(RasterEnvelope.MaxY, VisibleBounds.MaxY);
+            //convert draw bounds to DC coords
+		    OGRRawPoint OGRRawPoints[2];
+		    OGRRawPoints[0].x = DrawBounds.MinX;
+		    OGRRawPoints[0].y = DrawBounds.MinY;
+		    OGRRawPoints[1].x = DrawBounds.MaxX;
+		    OGRRawPoints[1].y = DrawBounds.MaxY;
+		    wxPoint* pDCPoints = pDisplayTransformation->TransformCoordWorld2DC(OGRRawPoints, 2);	
 
-        if(nWidth <= 20 || nHeight <= 20)
-			return;
+		    if(!pDCPoints)
+		    {
+			    wxDELETEA(pDCPoints);
+			    return;
+		    }
 
-		GDALDataset* pGDALDataset = pRaster->GetRaster();
+		    int nDCXOrig = pDCPoints[0].x;
+		    int nDCYOrig = pDCPoints[1].y;
+		    int nWidth = pDCPoints[1].x - pDCPoints[0].x;
+		    int nHeight = pDCPoints[0].y - pDCPoints[1].y;
+		    wxDELETEA(pDCPoints);
 
-		int nBandCount = pGDALDataset->GetRasterCount();
-		//hack! should check user configuration
-		int bands[3];
-		if(nBandCount < 3)
-		{
-			bands[0] = 1;
-			bands[1] = 1;
-			bands[2] = 1;	
-		}
-		else
-		{
-			bands[0] = 1;
-			bands[1] = 2;
-			bands[2] = 3;		
-		}
+       //     if(nWidth <= 20 || nHeight <= 20)
+			    //return;
 
-		double adfGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
-        double adfReverseGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
-		CPLErr err = pGDALDataset->GetGeoTransform(adfGeoTransform);
-        bool bNoTransform(false);
-        if(err != CE_None)
-        {
-            bNoTransform = true;
-        }
-        else
-        {
-            int nRes = GDALInvGeoTransform( adfGeoTransform, adfReverseGeoTransform );
-        }
+		    GDALDataset* pGDALDataset = pRaster->GetRaster();
 
-		//2. get image data from raster - draw part of the raster
-		if(IsSpaRefSame)
-		{
-			double rMinX, rMinY, rMaxX, rMaxY;
+		    int nBandCount = pGDALDataset->GetRasterCount();
+		    //hack! should check user configuration
+		    int bands[3];
+		    if(nBandCount < 3)
+		    {
+			    bands[0] = 1;
+			    bands[1] = 1;
+			    bands[2] = 1;	
+		    }
+		    else
+		    {
+			    bands[0] = 1;
+			    bands[1] = 2;
+			    bands[2] = 3;		
+		    }
 
-            int nXSize = pGDALDataset->GetRasterXSize();
-            int nYSize = pGDALDataset->GetRasterYSize();
-
-            if(bNoTransform)
+		    double adfGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
+            double adfReverseGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
+		    CPLErr err = pGDALDataset->GetGeoTransform(adfGeoTransform);
+            bool bNoTransform(false);
+            if(err != CE_None)
             {
-                rMinX = DrawBounds.MinX;
-                rMaxX = DrawBounds.MaxX;
-                rMaxY = nYSize - DrawBounds.MinY;
-                rMinY = nYSize - DrawBounds.MaxY;
+                bNoTransform = true;
             }
             else
             {
-    			GDALApplyGeoTransform( adfReverseGeoTransform, DrawBounds.MinX, DrawBounds.MinY, &rMinX, &rMaxY );
-	    		GDALApplyGeoTransform( adfReverseGeoTransform, DrawBounds.MaxX, DrawBounds.MaxY, &rMaxX, &rMinY );
+                int nRes = GDALInvGeoTransform( adfGeoTransform, adfReverseGeoTransform );
             }
 
-            double rImgWidth = rMaxX - rMinX;
-            double rImgHeight = rMaxY - rMinY;
-			int nImgWidth = ceil(rImgWidth) + 1;
-			int nImgHeight = ceil(rImgHeight) + 1;
-            
-			//read in buffer
-            int nMinX = int/*floor*/(rMinX);
-            int nMinY = int/*floor*/(rMinY);
-			if(nMinX < 0) nMinX = 0;
-			if(nMinY < 0) nMinY = 0;
+		    //2. get image data from raster - draw part of the raster
+		    if(IsSpaRefSame)
+		    {
+			    double rMinX, rMinY, rMaxX, rMaxY;
 
-            if(nImgWidth > nXSize - nMinX) nImgWidth = nXSize - nMinX;
-            if(nImgHeight > nYSize - nMinY) nImgHeight = nYSize - nMinY;
+                int nXSize = pGDALDataset->GetRasterXSize();
+                int nYSize = pGDALDataset->GetRasterYSize();
+
+                if(bNoTransform)
+                {
+                    rMinX = DrawBounds.MinX;
+                    rMaxX = DrawBounds.MaxX;
+                    rMaxY = nYSize - DrawBounds.MinY;
+                    rMinY = nYSize - DrawBounds.MaxY;
+                }
+                else
+                {
+    			    GDALApplyGeoTransform( adfReverseGeoTransform, DrawBounds.MinX, DrawBounds.MinY, &rMinX, &rMaxY );
+	    		    GDALApplyGeoTransform( adfReverseGeoTransform, DrawBounds.MaxX, DrawBounds.MaxY, &rMaxX, &rMinY );
+                }
+
+                double rImgWidth = rMaxX - rMinX;
+                double rImgHeight = rMaxY - rMinY;
+			    int nImgWidth = ceil(rImgWidth) + 1;
+			    int nImgHeight = ceil(rImgHeight) + 1;
+                
+			    //read in buffer
+                int nMinX = int/*floor*/(rMinX);
+                int nMinY = int/*floor*/(rMinY);
+			    if(nMinX < 0) nMinX = 0;
+			    if(nMinY < 0) nMinY = 0;
+
+                if(nImgWidth > nXSize - nMinX) nImgWidth = nXSize - nMinX;
+                if(nImgHeight > nYSize - nMinY) nImgHeight = nYSize - nMinY;
+
+		        //create buffer
+                int nWidthOut, nHeightOut;
+                double rImgWidthOut, rImgHeightOut;
+                if(nWidth > nImgWidth)
+                {
+			        nWidthOut = nImgWidth;
+			        rImgWidthOut = rImgWidth;
+                }
+                else
+                {
+			        nWidthOut = nWidth;
+			        rImgWidthOut = (double)nWidthOut * rImgWidth / nImgWidth;
+			        //nWidthOut++;
+                }
+                
+                if(nHeight > nImgHeight)
+                {
+			        nHeightOut = nImgHeight;
+			        rImgHeightOut = rImgHeight;
+                }
+                else
+                {
+			        nHeightOut = nHeight;
+			        rImgHeightOut = (double)nHeightOut * rImgHeight / nImgHeight;
+                    //nHeightOut++;
+                }
+
+
+		        unsigned char* data = new unsigned char[nWidthOut * nHeightOut * 3];
+
+		        err = pGDALDataset->AdviseRead(nMinX, nMinY, nImgWidth, nImgHeight, nWidthOut, nHeightOut, GDT_Byte, 3, bands, NULL);
+		        if(err != CE_None)
+		        {
+			        wxDELETEA(data);
+			        return;
+		        }
+
+		        err = pGDALDataset->RasterIO(GF_Read, nMinX, nMinY, nImgWidth, nImgHeight, data, nWidthOut, nHeightOut, GDT_Byte, 3, bands, sizeof(unsigned char) * 3, 0, sizeof(unsigned char));
+		        if(err != CE_None)
+		        {
+			        wxDELETEA(data);
+			        return;
+		        }
+		        //scale pTempData to data using interpolation methods
+		        pDisplay->DrawBitmap(Scale(data, nWidthOut, nHeightOut, rImgWidthOut/*rImgWidth*/, rImgHeightOut/*rImgHeight*/, nWidth, nHeight, rMinX - nMinX, rMinY - nMinY, enumGISQualityBilinear, pTrackCancel), nDCXOrig, nDCYOrig); //enumGISQualityNearest
+
+                wxDELETEA(data);
+		    }
+		    else
+		    {
+		    //void *hTransformArg = GDALCreateGenImgProjTransformer( hSrcDS, pszSrcWKT, NULL, pszDstWKT, FALSE, 0, 1 );
+		    //GDALDestroyGenImgProjTransformer( hTransformArg );
+	    ////		//get new envelope - it may rotate
+	    ////		OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pDisplaySpatialReference, pRasterSpatialReference);
+	    //////		get real envelope
+	    //////		poCT->Transform(1, &pRasterExtent->MaxX, &pRasterExtent->MaxY);
+	    //////		poCT->Transform(1, &pRasterExtent->MinX, &pRasterExtent->MinY);
+	    //////		poCT->Transform(1, &pRasterExtent->MaxX, &pRasterExtent->MinY);
+	    //////		poCT->Transform(1, &pRasterExtent->MinX, &pRasterExtent->MaxY);
+	    ////		OCTDestroyCoordinateTransformation(poCT);
+		    }
+	    }
+	    else
+	    {
+		    //1. convert newrasterenvelope to DC		
+		    OGRRawPoint OGRRawPoints[2];
+		    OGRRawPoints[0].x = RasterEnvelope.MinX;
+		    OGRRawPoints[0].y = RasterEnvelope.MinY;
+		    OGRRawPoints[1].x = RasterEnvelope.MaxX;
+		    OGRRawPoints[1].y = RasterEnvelope.MaxY;
+		    wxPoint* pDCPoints = pDisplayTransformation->TransformCoordWorld2DC(OGRRawPoints, 2);	
+
+		    //2. get image data from raster - buffer size = DC_X and DC_Y - draw full raster
+		    if(!pDCPoints)
+		    {
+			    wxDELETEA(pDCPoints);
+			    return;
+		    }
+		    int nDCXOrig = pDCPoints[0].x;
+		    int nDCYOrig = pDCPoints[1].y;
+		    int nWidth = pDCPoints[1].x - pDCPoints[0].x;
+		    int nHeight = pDCPoints[0].y - pDCPoints[1].y;
+		    delete[](pDCPoints);
+
+		    GDALDataset* pGDALDataset = pRaster->GetRaster();
+		    int nImgWidth = pGDALDataset->GetRasterXSize();
+		    int nImgHeight = pGDALDataset->GetRasterYSize();
+
+		    int nBandCount = pGDALDataset->GetRasterCount();
+		    //hack!
+		    int bands[3];
+		    if(nBandCount < 3)
+		    {
+			    bands[0] = 1;
+			    bands[1] = 1;
+			    bands[2] = 1;	
+		    }
+		    else
+		    {
+			    bands[0] = 1;
+			    bands[1] = 2;
+			    bands[2] = 3;		
+		    }
 
 		    //create buffer
-            int nWidthOut, nHeightOut;
-            double rImgWidthOut, rImgHeightOut;
-            if(nWidth > nImgWidth)
-            {
-			    nWidthOut = nImgWidth;
-			    rImgWidthOut = rImgWidth;
-            }
-            else
-            {
-			    nWidthOut = nWidth;
-			    rImgWidthOut = (double)nWidthOut * rImgWidth / nImgWidth;
-			    //nWidthOut++;
-            }
-            
-            if(nHeight > nImgHeight)
-            {
-			    nHeightOut = nImgHeight;
-			    rImgHeightOut = rImgHeight;
-            }
-            else
-            {
-			    nHeightOut = nHeight;
-			    rImgHeightOut = (double)nHeightOut * rImgHeight / nImgHeight;
-                //nHeightOut++;
-            }
-
-
-		    unsigned char* data = new unsigned char[nWidthOut * nHeightOut * 3];
-
-		    err = pGDALDataset->AdviseRead(nMinX, nMinY, nImgWidth, nImgHeight, nWidthOut, nHeightOut, GDT_Byte, 3, bands, NULL);
-		    if(err != CE_None)
+		    unsigned char* data = new unsigned char[nWidth * nHeight * 3];
+		    if(IsSpaRefSame)
 		    {
-			    wxDELETEA(data);
-			    return;
+			    //read in buffer
+			    CPLErr err = pGDALDataset->RasterIO(GF_Read, 0, 0, nImgWidth, nImgHeight, data, nWidth, nHeight, GDT_Byte, 3, bands, sizeof(unsigned char) * 3, 0, sizeof(unsigned char));
+			    if(err != CE_None)
+			    {
+				    wxDELETEA(data);
+				    return;
+			    }
 		    }
-
-		    err = pGDALDataset->RasterIO(GF_Read, nMinX, nMinY, nImgWidth, nImgHeight, data, nWidthOut, nHeightOut, GDT_Byte, 3, bands, sizeof(unsigned char) * 3, 0, sizeof(unsigned char));
-		    if(err != CE_None)
+		    else
 		    {
-			    wxDELETEA(data);
-			    return;
+			    //1. calc Width & Height of TempData with same aspect ratio of raster
+			    //2. create pTempData buffer
+			    unsigned char* pTempData;
+			    //3. fill data
+			    //4. for each pixel of data buffer get pixel from pTempData using OGRCreateCoordinateTransformation
+			    //delete[](data);
 		    }
-		    //scale pTempData to data using interpolation methods
-		    pDisplay->DrawBitmap(Scale(data, nWidthOut, nHeightOut, rImgWidthOut/*rImgWidth*/, rImgHeightOut/*rImgHeight*/, nWidth, nHeight, rMinX - nMinX, rMinY - nMinY, enumGISQualityBilinear, pTrackCancel), nDCXOrig, nDCYOrig); //enumGISQualityNearest
+		    //3. draw //think about transparancy!
+		    wxImage ResultImage(nWidth, nHeight, data);
+		    pDisplay->DrawBitmap(ResultImage, nDCXOrig, nDCYOrig);
 
-            wxDELETEA(data);
-		}
-		else
-		{
-		//void *hTransformArg = GDALCreateGenImgProjTransformer( hSrcDS, pszSrcWKT, NULL, pszDstWKT, FALSE, 0, 1 );
-		//GDALDestroyGenImgProjTransformer( hTransformArg );
-	////		//get new envelope - it may rotate
-	////		OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pDisplaySpatialReference, pRasterSpatialReference);
-	//////		get real envelope
-	//////		poCT->Transform(1, &pRasterExtent->MaxX, &pRasterExtent->MaxY);
-	//////		poCT->Transform(1, &pRasterExtent->MinX, &pRasterExtent->MinY);
-	//////		poCT->Transform(1, &pRasterExtent->MaxX, &pRasterExtent->MinY);
-	//////		poCT->Transform(1, &pRasterExtent->MinX, &pRasterExtent->MaxY);
-	////		OCTDestroyCoordinateTransformation(poCT);
-		}
-	}
-	else
-	{
-		//1. convert newrasterenvelope to DC		
-		OGRRawPoint OGRRawPoints[2];
-		OGRRawPoints[0].x = RasterEnvelope.MinX;
-		OGRRawPoints[0].y = RasterEnvelope.MinY;
-		OGRRawPoints[1].x = RasterEnvelope.MaxX;
-		OGRRawPoints[1].y = RasterEnvelope.MaxY;
-		wxPoint* pDCPoints = pDisplayTransformation->TransformCoordWorld2DC(OGRRawPoints, 2);	
-
-		//2. get image data from raster - buffer size = DC_X and DC_Y - draw full raster
-		if(!pDCPoints)
-		{
-			wxDELETEA(pDCPoints);
-			return;
-		}
-		int nDCXOrig = pDCPoints[0].x;
-		int nDCYOrig = pDCPoints[1].y;
-		int nWidth = pDCPoints[1].x - pDCPoints[0].x;
-		int nHeight = pDCPoints[0].y - pDCPoints[1].y;
-		delete[](pDCPoints);
-
-		GDALDataset* pGDALDataset = pRaster->GetRaster();
-		int nImgWidth = pGDALDataset->GetRasterXSize();
-		int nImgHeight = pGDALDataset->GetRasterYSize();
-
-		int nBandCount = pGDALDataset->GetRasterCount();
-		//hack!
-		int bands[3];
-		if(nBandCount < 3)
-		{
-			bands[0] = 1;
-			bands[1] = 1;
-			bands[2] = 1;	
-		}
-		else
-		{
-			bands[0] = 1;
-			bands[1] = 2;
-			bands[2] = 3;		
-		}
-
-		//create buffer
-		unsigned char* data = new unsigned char[nWidth * nHeight * 3];
-		if(IsSpaRefSame)
-		{
-			//read in buffer
-			CPLErr err = pGDALDataset->RasterIO(GF_Read, 0, 0, nImgWidth, nImgHeight, data, nWidth, nHeight, GDT_Byte, 3, bands, sizeof(unsigned char) * 3, 0, sizeof(unsigned char));
-			if(err != CE_None)
-			{
-				wxDELETEA(data);
-				return;
-			}
-		}
-		else
-		{
-			//1. calc Width & Height of TempData with same aspect ratio of raster
-			//2. create pTempData buffer
-			unsigned char* pTempData;
-			//3. fill data
-			//4. for each pixel of data buffer get pixel from pTempData using OGRCreateCoordinateTransformation
-			//delete[](data);
-		}
-		//3. draw //think about transparancy!
-		wxImage ResultImage(nWidth, nHeight, data);
-		pDisplay->DrawBitmap(ResultImage, nDCXOrig, nDCYOrig);
-
-		//delete[](data);
-	}
+		    //delete[](data);
+	    }
+    }
 }
 
 //wxImage wxGISRasterDataset::GetSubimage(IDisplayTransformation* pDisplayTransformation, IQueryFilter* pQFilter, ITrackCancel* pTrackCancel)

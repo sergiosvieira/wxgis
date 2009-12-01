@@ -713,8 +713,13 @@ void wxGISMapView::PanStop(wxPoint MouseLocation)
 		rect.Offset(x, y);
 		//rect.SetX(rect.GetX() - x);
 		//rect.SetY(rect.GetY() - y);
+
+		wxClientDC CDC(this);
+        pGISScreenDisplay->OnPanStop(CDC);
+
 		OGREnvelope Env = pDisplayTransformation->TransformRect(rect);
 		m_pExtenStack->Do(Env);
+        //m_pExtenStack->SetExtent(Env);
 //		pDisplayTransformation->SetBounds(Env);
 //		pGISScreenDisplay->SetDerty(true);
 //		Refresh(false);
