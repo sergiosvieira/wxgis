@@ -299,13 +299,14 @@ wxGISDataset* wxGxRasterDataset::GetDataset(void)
 
 		m_pwxGISDataset = static_cast<wxGISDataset*>(pwxGISRasterDataset);
         //open (ask for overviews)
-        pwxGISRasterDataset->Open();
+        if(!pwxGISRasterDataset->Open())
+			return NULL;
         //pyramids
         if(!pwxGISRasterDataset->HasOverviews())
         {
 	        CPLSetConfigOption( "USE_RRD", "NO" );//YES
 	        CPLSetConfigOption( "HFA_USE_RRD", "YES" );
-	        //CPLSetConfigOption( "COMPRESS_OVERVIEW", "DEFLATE" );//LZW
+	        //CPLSetConfigOption( "COMPRESS_OVERVIEW", "LZW" );//DEFLATE
 
         	bool bAskCreateOvr = true;
             wxString name, ext;

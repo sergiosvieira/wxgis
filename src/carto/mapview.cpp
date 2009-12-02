@@ -714,6 +714,9 @@ void wxGISMapView::PanStop(wxPoint MouseLocation)
 		//rect.SetX(rect.GetX() - x);
 		//rect.SetY(rect.GetY() - y);
 
+		if(m_pThread)
+			m_pThread->Wait();
+
 		wxClientDC CDC(this);
         pGISScreenDisplay->OnPanStop(CDC);
 

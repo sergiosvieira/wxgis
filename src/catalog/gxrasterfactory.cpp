@@ -54,7 +54,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}
-		if(ext == wxString(wxT("tif")) || ext == wxString(wxT("tiff")) || ext == wxString(wxT("png")))//TODO: add other raster file extensions
+		if(ext == wxString(wxT("tif")) || ext == wxString(wxT("tiff")) || ext == wxString(wxT("png")))
 		{
 			if(m_pCatalog->GetShowExt())
 				name += wxT(".") + ext;
@@ -62,6 +62,14 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}
+		if(ext == wxString(wxT("til")) || ext == wxString(wxT("jpeg")) || ext == wxString(wxT("jp2")))//TODO: add other raster file extensions
+		{
+			if(m_pCatalog->GetShowExt())
+				name += wxT(".") + ext;
+			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterUnknown);
+			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+			goto REMOVE;
+		}		
 		if(path.Find(wxT(".aux")) != wxNOT_FOUND)
 			goto REMOVE;
 		if(path.Find(wxT(".rrd")) != wxNOT_FOUND)
