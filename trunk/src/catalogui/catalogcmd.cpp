@@ -26,13 +26,18 @@
 #include "wxgis/catalog/gxdiscconnection.h"
 #include "wxgis/catalogui/gxlocationcombobox.h"
 
+#include "wxgis/framework/progressor.h"
+#include "wxgis/datasource.h"
+
 #include <wx/dirdlg.h>
+#include <wx/file.h>
 
 //	0	Up One Level
 //	1	Connect Folder
 //	2	Disconnect Folder
 //	3	Location
-//	4	?
+//	4	Generate SRS
+//	5	?
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogMainCmd, wxObject)
 
@@ -60,6 +65,7 @@ wxIcon wxGISCatalogMainCmd::GetBitmap(void)
 			return m_ImageList.GetIcon(3);
 		case 3:
 			return m_ImageList.GetIcon(5);
+		case 4:	
 		default:
 			return wxIcon();
 	}
@@ -77,6 +83,8 @@ wxString wxGISCatalogMainCmd::GetCaption(void)
 			return wxString(_("&Disconnect folder"));
 		case 3:	
 			return wxString(_("Location"));
+		case 4:	
+			return wxString(_("Generate SRS"));
 		default:
 			return wxString();
 	}
@@ -91,6 +99,7 @@ wxString wxGISCatalogMainCmd::GetCategory(void)
 		case 2:	
 		case 3:	
 			return wxString(_("Catalog"));
+		case 4:	
 		default:
 			return wxString(_("[No category]"));
 	}
@@ -142,6 +151,8 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 		}
 		case 3:
 			return true;
+		case 4://Gen SRS
+			return true;
 		default:
 			return false;
 	}
@@ -157,6 +168,8 @@ wxGISEnumCommandKind wxGISCatalogMainCmd::GetKind(void)
 			return enumGISCommandNormal;
 		case 3://location
 			return enumGISCommandControl;
+		case 4://Gen SRS
+			return enumGISCommandNormal;
 		default:
 			return enumGISCommandNormal;
 	}
@@ -174,6 +187,8 @@ wxString wxGISCatalogMainCmd::GetMessage(void)
 			return wxString(_("Disconnect folder"));
 		case 3:	
 			return wxString(_("Set or get location"));
+		case 4:	
+			return wxString(_("Gen SRS"));
 		default:
 			return wxString();
 	}
@@ -237,7 +252,119 @@ void wxGISCatalogMainCmd::OnClick(void)
 			}
 			return;
 		}
-		case 3:
+		case 4:
+            {
+                wxString sProjDir = wxString(wxT("e:\\temp\\srs\\Projected Coordinate Systems"));
+                if(!wxDirExists(sProjDir))
+		            wxFileName::Mkdir(sProjDir, 0755, wxPATH_MKDIR_FULL);
+                wxString sGeogDir = wxString(wxT("e:\\temp\\srs\\Geographic Coordinate Systems"));
+                if(!wxDirExists(sGeogDir))
+		            wxFileName::Mkdir(sGeogDir, 0755, wxPATH_MKDIR_FULL);
+                wxString sLoclDir = wxString(wxT("e:\\temp\\srs\\Vertical Coordinate Systems"));
+                if(!wxDirExists(sLoclDir))
+		            wxFileName::Mkdir(sLoclDir, 0755, wxPATH_MKDIR_FULL);
+
+                IStatusBar* pStatusBar = m_pApp->GetStatusBar();  
+                wxGISProgressor* pProgressor = dynamic_cast<wxGISProgressor*>(pStatusBar->GetProgressor());
+                if(pProgressor)
+                {
+                    pProgressor->Show(true);
+                    pProgressor->SetRange(70000);
+
+                    wxString sDirPath;
+
+                    for(size_t i = 0; i < 70000; i++)
+                    {
+                        OGRSpatialReference SpaRef;
+                        OGRErr err = SpaRef.importFromEPSG(i);
+                        if(err == OGRERR_NONE)
+                        {
+                           const char *pszProjection = SpaRef.GetAttrValue("PROJECTION"); 
+                           wxString sProjection;
+                           if(pszProjection)
+                               sProjection = wgMB2WX(pszProjection);
+                           if(SpaRef.IsProjected())
+                            {
+                                const char *pszProjcs = SpaRef.GetAttrValue("PROJCS");
+                                wxString sName = wgMB2WX(pszProjcs);
+                                if(sName.Find(wxT("depre")) != wxNOT_FOUND)
+                                    continue;
+                                wxString sFileName;
+                                int pos = sName.Find('/');
+                                if(pos != wxNOT_FOUND)
+                                {
+                                    wxString sSubFldr = sName.Right(sName.Len() - pos - 1);
+                                    sSubFldr.Trim(true); sSubFldr.Trim(false);
+                                    wxString sStorePath = sProjDir + wxFileName::GetPathSeparator() + sSubFldr;
+                                    if(!wxDirExists(sStorePath))
+		                                wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
+
+                                    sName.Replace(wxString(wxT("/")), wxString(wxT(""))); 
+                                    sName.Replace(wxString(wxT("  ")), wxString(wxT(" "))); 
+                                    sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".srml");
+                                }
+                                else
+                                {
+                                    sFileName = sProjDir + wxFileName::GetPathSeparator() + sName + wxT(".srml");
+                                }
+                                wxFile file;
+                                if(file.Create(sFileName))
+                                {
+                                    char* pData(NULL);
+                                    SpaRef.exportToXML(&pData);
+                                    wxString Data = wgMB2WX(pData);
+                                    file.Write(Data);
+                                    CPLFree(pData);
+                                }
+                            }
+                            else if(SpaRef.IsGeographic())
+                            {
+                                const char *pszProjcs = SpaRef.GetAttrValue("GEOGCS");
+                                wxString sName = wgMB2WX(pszProjcs);
+                                if(sName.Find(wxT("depre")) != wxNOT_FOUND)
+                                    continue;
+                                wxString sFileName;
+                                int pos = sName.Find('/');
+                                if(pos != wxNOT_FOUND)
+                                {
+                                    wxString sSubFldr = sName.Right(sName.Len() - pos - 1);
+                                    sSubFldr.Trim(true); sSubFldr.Trim(false);
+                                    wxString sStorePath = sGeogDir + wxFileName::GetPathSeparator() + sSubFldr;
+                                    if(!wxDirExists(sStorePath))
+		                                wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
+
+                                    sName.Replace(wxString(wxT("/")), wxString(wxT(""))); 
+                                    sName.Replace(wxString(wxT("  ")), wxString(wxT(" "))); 
+                                    sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".srml");
+                                }
+                                else
+                                {
+                                    sFileName = sGeogDir + wxFileName::GetPathSeparator() + sName + wxT(".srml");
+                                }
+                                wxFile file;
+                                if(file.Create(sFileName))
+                                {
+                                    char* pData(NULL);
+                                    SpaRef.exportToXML(&pData);
+                                    wxString Data = wgMB2WX(pData);
+                                    file.Write(Data);
+                                    CPLFree(pData);
+                                }
+                            }
+                            else
+                            {
+                                sDirPath = wxString(wxT("e:\\temp\\srs\\Vertical Coordinate Systems"));
+                            //bool bLoc = SpaRef.IsLocal();
+                            }
+                        }
+                        pProgressor->SetValue(i);
+                    }
+                    pProgressor->Show(false);
+                }
+                pStatusBar->SetMessage(_("Done"));
+            }			
+			break;
+        case 3:
 		default:
 			return;
 	}
@@ -261,6 +388,8 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 			return wxString(_("Disconnect folder"));
 		case 3:	
 			return wxString(_("Set or get location"));
+		case 4:	
+			return wxString(_("Gen SRS"));
 		default:
 			return wxString();
 	}
@@ -268,7 +397,7 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 
 unsigned char wxGISCatalogMainCmd::GetCount(void)
 {
-	return 4;
+	return 5;
 }
 
 IToolBarControl* wxGISCatalogMainCmd::GetControl(void)
@@ -286,6 +415,7 @@ IToolBarControl* wxGISCatalogMainCmd::GetControl(void)
 				wxGxLocationComboBox* pGxLocationComboBox = new wxGxLocationComboBox(dynamic_cast<wxWindow*>(m_pApp), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 400, 22 ), PathArray);
 				return static_cast<IToolBarControl*>(pGxLocationComboBox);
 			}
+		case 4:	
 		default:
 			return NULL;
 	}
@@ -301,6 +431,7 @@ wxString wxGISCatalogMainCmd::GetToolLabel(void)
 			return wxEmptyString;
 		case 3:	
 			return wxString(_("Path: "));
+		case 4:	
 		default:
 			return wxEmptyString;
 	}
@@ -316,6 +447,7 @@ bool wxGISCatalogMainCmd::HasToolLabel(void)
 			return false;
 		case 3:	
 			return true;
+		case 4:	
 		default:
 			return false;
 	}

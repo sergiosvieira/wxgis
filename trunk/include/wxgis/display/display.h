@@ -86,6 +86,7 @@ public:
 	virtual void DrawBitmap(const wxBitmap& bitmap, wxCoord x, wxCoord y, bool transparent = false) = 0;
 	virtual IDisplayTransformation* GetDisplayTransformation(void) = 0;
     virtual RECTARARRAY* GetInvalidRect(void) = 0;
+    virtual void AddInvalidRect(wxRect Rect) = 0;
 };
 
 class ICachedDisplay : 

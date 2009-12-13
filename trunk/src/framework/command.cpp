@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/framework/command.h"
+
 #include "../../art/mainframe.xpm"
 
 //	0	Exit
@@ -26,7 +27,7 @@
 //	2	Customize
 //	3	Separator
 //	4	StatusBar
-//	5	?
+//  5   ? 
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCommonCmd, wxObject)
 

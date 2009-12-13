@@ -119,6 +119,14 @@ void wxGISProgressor::SetValue(int value)
     m_nValue = value;
     if(m_nValue > m_nRange)
         m_nRange = m_nValue;
+
+    static wxWindow* pWnd(NULL);
+    if(!pWnd)
+        pWnd = GetParent()->GetParent();
+    if(pWnd)
+        ::wxSafeYield(pWnd, true);
+
+
     Refresh();
 }
 

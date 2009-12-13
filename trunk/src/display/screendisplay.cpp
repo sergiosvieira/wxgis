@@ -537,11 +537,21 @@ wxGISScreenDisplay::~wxGISScreenDisplay(void)
 
 void wxGISScreenDisplay::OnDraw(wxDC &dc, wxCoord x, wxCoord y, bool bClearBackground)
 {	
-	wxRect DevRect = m_pDisplayTransformation->GetDeviceFrame();
+    wxRect DevRect = m_pDisplayTransformation->GetDeviceFrame();
 	if(bClearBackground)
 		dc.DrawBitmap(m_caches[0].bmp.GetSubBitmap(DevRect), 0, 0);
-	dc.DrawBitmap(m_caches[m_caches.size() - 1].bmp.GetSubBitmap(DevRect), x, y);	//, true
-    m_InvalidRectArray.clear();
+    if(m_InvalidRectArray.size() > 0)
+    {
+        for(size_t i = 0; i < m_InvalidRectArray.size(); i++)
+        {
+            dc.DrawBitmap(m_caches[m_caches.size() - 1].bmp.GetSubBitmap(m_InvalidRectArray[i]), m_InvalidRectArray[i].x, m_InvalidRectArray[i].y);
+        }
+        m_InvalidRectArray.clear();
+    }
+    else
+    {
+        dc.DrawBitmap(m_caches[m_caches.size() - 1].bmp.GetSubBitmap(DevRect), x, y);	//, true
+    }
 }
 
 void wxGISScreenDisplay::OnPanDraw(wxDC &dc, wxCoord x, wxCoord y)
@@ -869,6 +879,7 @@ RECTARARRAY* wxGISScreenDisplay::GetInvalidRect(void)
 
 void wxGISScreenDisplay::AddInvalidRect(wxRect Rect)
 {
+    Rect.Intersect(m_pDisplayTransformation->GetDeviceFrame());
     for(size_t i = 0; i < m_InvalidRectArray.size(); i++)
     {
         if(m_InvalidRectArray[i].Contains(Rect))

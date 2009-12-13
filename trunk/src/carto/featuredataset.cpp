@@ -21,6 +21,8 @@
 #include "wxgis/carto/featuredataset.h"
 #include <wx/filename.h>
 
+#include <wx/file.h>
+
 wxGISFeatureDataset::wxGISFeatureDataset(wxString sPath, wxFontEncoding Encoding) : wxGISDataset(sPath), m_poDS(NULL), m_bIsOpened(false), m_psExtent(NULL), m_poLayer(NULL), m_pQuadTree(NULL), m_Encoding(Encoding)
 {
 }
@@ -135,7 +137,17 @@ OGRSpatialReference* wxGISFeatureDataset::GetSpatialReference(void)
 		if(!Open(0))
 			return NULL;
 	if(	m_poLayer )
+    {
+        //OGRSpatialReference* pSparef = m_poLayer->GetSpatialRef();
+        //char* pStr(NULL);
+        //pSparef->exportToXML(&pStr);
+        //wxFile file;
+        //file.Create(wxT("d:/test.srml"));
+        //wxString data(wgMB2WX(pStr));
+        //file.Write(data);
+        //CPLFree(pStr);
 		return m_poLayer->GetSpatialRef();
+    }
 	return NULL;
 }
 

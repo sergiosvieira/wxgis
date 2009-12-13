@@ -52,6 +52,7 @@ public:
 	virtual void ShowApplicationWindow(wxWindow* pWnd, bool bShow = true);
 	virtual WINDOWARRAY* GetChildWindows(void);
 	virtual void RegisterChildWindow(wxWindow* pWnd);
+    virtual wxString GetAppName(void){return wxString(APP_NAME);};
 protected:
 	wxAuiManager m_mgr;
 	wxGxTreeView* m_pTreeView;

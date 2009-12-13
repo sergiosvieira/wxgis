@@ -133,15 +133,21 @@ wxGISRubberEnvelope::~wxGISRubberEnvelope()
 
 void wxGISRubberEnvelope::OnMouseMove(wxMouseEvent& event)
 {
-	wxClientDC CDC(m_pWnd);
-	m_pCachedDisplay->OnDraw(CDC);
-
 	int EvX = event.GetX(), EvY = event.GetY();
 	int width, height, X, Y;
 	width = abs(EvX - m_StartX);
 	height = abs(EvY - m_StartY);
 	X = MIN(m_StartX, EvX);
-	Y = MIN(m_StartY, EvY);
+	Y = MIN(m_StartY, EvY);    
+
+    if(!m_PrevRect.IsEmpty())
+    {
+        m_PrevRect.Inflate(2,2);
+        m_pCachedDisplay->AddInvalidRect(m_PrevRect);
+    }
+	wxClientDC CDC(m_pWnd);
+    m_pCachedDisplay->OnDraw(CDC);
+
 
 //#if wxUSE_GRAPHICS_CONTEXT	
 //	wxGCDC GDC(CDC);
@@ -153,6 +159,7 @@ void wxGISRubberEnvelope::OnMouseMove(wxMouseEvent& event)
 	CDC.SetBrush(wxBrush(m_pSymbol->GetBrush().GetColour(), wxTRANSPARENT));
 	CDC.SetLogicalFunction(wxOR_REVERSE);
 	CDC.DrawRectangle(X, Y, width, height);
+    m_PrevRect = wxRect(X, Y, width, height);
 //#endif
 }
 
@@ -168,4 +175,6 @@ void wxGISRubberEnvelope::OnMouseUp(wxMouseEvent& event)
 	m_pRetGeom = static_cast<OGRGeometry*>(pLine);
 	delete [] pOGRPoints;
 	OnUnlock();
+    m_PrevRect.width = -1;
+    m_PrevRect.height = -1;
 }
