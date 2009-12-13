@@ -139,7 +139,8 @@ wxFontEncoding wxGxShapeFactory::GetEncoding(wxString sPath)
         int pos;
         if((pos = sCP.Find('\n')) != wxNOT_FOUND)
             sCP = sCP.Left(pos);
-        sCP.Replace(wxT("LCID/"), wxT(""));
+        if((pos = sCP.Find('/')) != wxNOT_FOUND)
+            sCP = sCP.Right(sCP.Len() - pos - 1);
         int nCP = wxAtoi(sCP);
         //check encoding from code http://en.wikipedia.org/wiki/Code_page
         switch(nCP)

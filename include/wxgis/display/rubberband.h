@@ -51,6 +51,8 @@ protected:
 	ICachedDisplay* m_pCachedDisplay;
 	ISymbol* m_pSymbol;
 
+    wxRect m_PrevRect;
+
 	DECLARE_EVENT_TABLE()
 };
 

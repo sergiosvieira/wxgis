@@ -73,6 +73,7 @@ public:
 	virtual void ShowStatusBar(bool bShow);
 	virtual bool IsStatusBarShown(void);
 	virtual void ShowToolBarMenu(void);
+	virtual wxString GetAppName(void) = 0;
 
 protected:
 	unsigned int m_nCmdCounter;

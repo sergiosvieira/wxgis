@@ -90,6 +90,9 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 	    //1. get envelope
 	    OGREnvelope VisibleBounds = Envs[i];//pDisplayTransformation->GetVisibleBounds();
 
+        if(!VisibleBounds.Intersects(RasterEnvelope))
+            continue;
+
 	    bool IsZoomIn(false);
 	    //IsZoomIn = RasterEnvelope.Contains(VisibleBounds);
 	    IsZoomIn = RasterEnvelope.MaxX > VisibleBounds.MaxX || RasterEnvelope.MaxY > VisibleBounds.MaxY || RasterEnvelope.MinX < VisibleBounds.MinX || RasterEnvelope.MinY < VisibleBounds.MinY;

@@ -262,7 +262,6 @@ wxString wxGxRasterDataset::GetCategory(void)
 
 typedef struct OvrProgressData
 {
-    IApplication* pApp;
     IStatusBar* pStatusBar;
     wxGISProgressor* pProgressor;
     wxString sMessage;
@@ -280,12 +279,6 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
 
     if(pOvrData->pProgressor)
         pOvrData->pProgressor->SetValue((int) (dfComplete*100));
-
-    static wxWindow* pWnd(NULL);
-    if(!pWnd)
-        pWnd = dynamic_cast<wxWindow*>(pOvrData->pApp);
-    if(pWnd)
-        ::wxSafeYield(pWnd, true);
 
     bool bKeyState = wxGetKeyState(WXK_ESCAPE);
     return bKeyState == true ? 0 : 1;
@@ -350,7 +343,7 @@ wxGISDataset* wxGxRasterDataset::GetDataset(void)
                 if(pProgressor)
                     pProgressor->Show(true);
 
-                OvrProgressData Data = {pApp, pStatusBar, pProgressor, sProgressMsg}; 
+                OvrProgressData Data = {pStatusBar, pProgressor, sProgressMsg}; 
 		        CPLErr err = pwxGISRasterDataset->GetRaster()->BuildOverviews( "GAUSS", 5, anOverviewList, 0, NULL, /*GDALDummyProgress*/OvrProgress, (void*)&Data );
 		        //"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE" 
                 if(pProgressor)

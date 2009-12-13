@@ -115,6 +115,7 @@ public:
 	virtual bool IsDerty(void);
 	virtual IDisplayTransformation* GetDisplayTransformation(void);
     virtual RECTARARRAY* GetInvalidRect(void);
+    virtual void AddInvalidRect(wxRect Rect);
 
 	//ICachedDisplay
 	virtual bool IsCacheDerty(size_t cache_id);
@@ -130,8 +131,6 @@ public:
 		bool IsDerty;
 		wxBitmap bmp;
 	} CACHEDATA;
-protected:
-    void AddInvalidRect(wxRect Rect);
 protected:
 	std::vector<CACHEDATA> m_caches;
 	wxMemoryDC m_dc;

@@ -222,6 +222,7 @@ public:
 	virtual void ShowApplicationWindow(wxWindow* pWnd, bool bShow = true) = 0;
 	virtual WINDOWARRAY* GetChildWindows(void) = 0;
 	virtual void RegisterChildWindow(wxWindow* pWnd) = 0;
+	virtual wxString GetAppName(void) = 0;
 };
 
 class ICommand :
