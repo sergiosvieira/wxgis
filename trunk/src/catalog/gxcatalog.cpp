@@ -23,6 +23,7 @@
 #include "wxgis/framework/config.h"
 #include <wx/volume.h>
 #include <wx/msgdlg.h>
+
 // ----------------------------------------------------------------------------
 // wxGxCatalog
 // ----------------------------------------------------------------------------
@@ -183,6 +184,7 @@ void wxGxCatalog::LoadChildren(wxXmlNode* pNode)
 {
 	if(!pNode)
 		return;
+
 	wxXmlNode* pChildren = pNode->GetChildren();
 	while(pChildren)
 	{// && pChildren->GetName() == wxT("RootItem")
@@ -325,8 +327,17 @@ void wxGxCatalog::SerializeDiscConnections(wxXmlNode* pNode, bool bStore)
 		bool bScanOnce = wxAtoi(pNode->GetPropVal(wxT("scan_once"), wxT("0")));
 		if(!bScanOnce)
 		{
-			wxArrayString arr = wxFSVolumeBase::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE | wxFS_VOL_REMOTE);
-			for(size_t i = 0; i < arr.size(); i++)
+            wxArrayString arr;
+#ifdef WIN32
+			arr = wxFSVolumeBase::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE | wxFS_VOL_REMOTE);
+#else
+            //linux paths
+            wxStandardPaths stp;
+            arr.Add(wxT("/"));
+            arr.Add(stp.GetUserConfigDir());
+            arr.Add(stp.GetDataDir());
+#endif		
+            for(size_t i = 0; i < arr.size(); i++)
 			{
 				if(m_DiscConnections[arr[i]] != NULL)
 					continue;
@@ -360,23 +371,28 @@ void wxGxCatalog::SerializeDiscConnections(wxXmlNode* pNode, bool bStore)
 
 IGxObject* wxGxCatalog::ConnectFolder(wxString sPath)
 {
+    IGxObject* pReturnObj(NULL);
 	if(m_DiscConnections[sPath] != NULL)
-		return m_DiscConnections[sPath];
-	//check if path is valid
-	if(!wxDir::Exists(sPath))
+		pReturnObj = m_DiscConnections[sPath];
+    else if(wxDir::Exists(sPath)) 	//check if path is valid
 	{
-		wxMessageBox(_("The directory is not exist!"), _("Error"), wxOK | wxICON_ERROR );
-		return NULL;
-	}
-	wxGxDiscConnection* pwxGxDiscConnection = new wxGxDiscConnection(sPath, sPath, m_bShowHidden);
-	IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
-	if(AddChild(pGxObject))
-	{
-		m_DiscConnections[sPath] = pGxObject;
-		ObjectAdded(pGxObject);
-		return pGxObject;
-	}
-	return NULL;
+	    wxGxDiscConnection* pwxGxDiscConnection = new wxGxDiscConnection(sPath, sPath, m_bShowHidden);
+	    pReturnObj = static_cast<IGxObject*>(pwxGxDiscConnection);
+	    if(AddChild(pReturnObj))
+	    {
+		    m_DiscConnections[sPath] = pReturnObj;
+		    ObjectAdded(pReturnObj);
+	    }
+        else
+		    pReturnObj = this;
+    }
+    else
+    {
+		//wxMessageBox(_("The directory is not exist!"), _("Error"), wxOK | wxICON_ERROR );
+		pReturnObj = this;
+    }
+    m_pSelection->Select(pReturnObj, false, IGxSelection::INIT_ALL);
+	return pReturnObj;
 }
 
 void wxGxCatalog::DisconnectFolder(wxString sPath)

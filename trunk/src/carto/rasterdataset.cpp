@@ -43,7 +43,15 @@ bool wxGISRasterDataset::Open(void)
 	wxCriticalSectionLocker locker(m_CritSect);
 
 
-	m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath.c_str()), GA_ReadOnly );
+    m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath.c_str()), GA_ReadOnly );
+    //bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
+	if( m_poDataset == NULL )
+    {
+        m_sPath.Replace(wxT("\\"), wxT("/"));
+        m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath.c_str()), GA_ReadOnly );
+    }
+    
+    //m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath.c_str()), GA_ReadOnly );
 	if( m_poDataset == NULL )
 		return false;
 

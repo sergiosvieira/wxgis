@@ -40,9 +40,9 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 		if(wxFileName::DirExists(path))
 			continue;
 
-		path.MakeLower();
 		wxString name, ext;
 		wxFileName::SplitPath(path, NULL, NULL, &name, &ext);
+		ext.MakeLower();
 		
 
 		IGxObject* pGxObj = NULL;
@@ -70,6 +70,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}		
+		path.MakeLower();
 		if(path.Find(wxT(".aux")) != wxNOT_FOUND)
 			goto REMOVE;
 		if(path.Find(wxT(".rrd")) != wxNOT_FOUND)

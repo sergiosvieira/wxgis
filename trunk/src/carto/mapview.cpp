@@ -378,12 +378,13 @@ void wxGISMapView::AddLayer(wxGISLayer* pLayer)
 	if(pEnv == NULL)
 		return;
 	OGRSpatialReference* pSpaRef = pLayer->GetSpatialReference();
+	OGRSpatialReference* pDisplaySpaRef = pDisplayTransformation->GetSpatialReference();
 
-	if(pSpaRef && pDisplayTransformation->GetSpatialReference())
+	if(pSpaRef && pDisplaySpaRef)
 	{
-		if(!pDisplayTransformation->GetSpatialReference()->IsSame(pSpaRef))
+		if(!pDisplaySpaRef->IsSame(pSpaRef))
 		{
-			OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pSpaRef, pDisplayTransformation->GetSpatialReference() );
+			OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pSpaRef, pDisplaySpaRef );
 			poCT->Transform(1, &pEnv->MaxX, &pEnv->MaxY);
 			poCT->Transform(1, &pEnv->MinX, &pEnv->MinY);
 		}
