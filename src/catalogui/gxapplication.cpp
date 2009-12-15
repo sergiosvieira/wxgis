@@ -97,21 +97,25 @@ wxGxApplication::~wxGxApplication(void)
 	{
 		if(pArr->size() > 0)
 		{
-			wxString sLastPath = pArr->at(0)->GetFullName();
-			if(sLastPath.IsEmpty())
-				sLastPath = pArr->at(0)->GetName();
+            IGxObject* pObj = pArr->at(0);
+            if(pObj != dynamic_cast<IGxObject*>(m_pCatalog))
+            {
+			    wxString sLastPath = pObj->GetFullName();
+			    if(sLastPath.IsEmpty())
+				    sLastPath = pArr->at(0)->GetName();
 
-			wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
-			if(pLastLocationNode)
-			{
-				if(pLastLocationNode->HasProp(wxT("path")))
-					pLastLocationNode->DeleteProperty(wxT("path"));
-			}
-			else
-			{
-				pLastLocationNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("lastpath")), true);
-			}
-			pLastLocationNode->AddProperty(wxT("path"), sLastPath);
+			    wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
+			    if(pLastLocationNode)
+			    {
+				    if(pLastLocationNode->HasProp(wxT("path")))
+					    pLastLocationNode->DeleteProperty(wxT("path"));
+			    }
+			    else
+			    {
+				    pLastLocationNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("lastpath")), true);
+			    }
+			    pLastLocationNode->AddProperty(wxT("path"), sLastPath);
+            }
 		}
 	}
 

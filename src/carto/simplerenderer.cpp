@@ -53,7 +53,7 @@ void wxGISSimpleRenderer::Draw(wxGISFeatureSet* pSet, wxGISEnumDrawPhase DrawPha
 	OGRSpatialReference* pDisplaySpatialReference = pDisplayTransformation->GetSpatialReference();
 	OGRSpatialReference* pSetSpatialReference = pSet->GetAt(0)->GetGeometryRef()->getSpatialReference();
 	bool IsSpaRefSame(true);
-	if(pDisplaySpatialReference && pDisplaySpatialReference)
+	if(pDisplaySpatialReference && pSetSpatialReference)
 		IsSpaRefSame = pDisplaySpatialReference->IsSame(pSetSpatialReference);
 
 	//if( (m_pDestroyThread->Pause() != wxTHREAD_NO_ERROR) )

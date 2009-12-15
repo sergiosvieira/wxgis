@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxfolderfactory.h"
-#include "wxgis/catalog/gxfolder.h"
+#include "wxgis/catalog/gxarchfolder.h"
 #include <wx/filename.h>
 #include <wx/dir.h>
 
@@ -39,12 +39,13 @@ bool wxGxFolderFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 	for(size_t i = 0; i < pFileNames->GetCount(); i++)
 	{
 		wxString path = pFileNames->Item(i);
+		wxString name, ext;
+		wxFileName::SplitPath(path, NULL, NULL, &name, &ext);
+    	ext.MakeLower();
 		if(wxFileName::DirExists(path))
 		{
 			//wxDir dir(path);
 			//wxFileName dir = wxFileName::DirName(path);
-			wxString name, ext;
-			wxFileName::SplitPath(path, NULL, NULL, &name, &ext);
 			//wxString name = dir.GetName();
 			wxGxFolder* pFolder = new wxGxFolder(path, name + ext, m_pCatalog->GetShowHidden());
 			IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
@@ -52,6 +53,17 @@ bool wxGxFolderFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 			pFileNames->RemoveAt(i);
 			i--;
 		}
+        else
+        {
+            if(ext == wxString(wxT("zip")) || ext == wxString(wxT("tar")) || ext == wxString(wxT("gz")))
+            {
+			    wxGxArchive* pFolder = new wxGxArchive(path, name, m_pCatalog->GetShowHidden());
+			    IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
+			    pObjArray->push_back(pGxObj);
+			    pFileNames->RemoveAt(i);
+			    i--;
+            }
+        }
 	}
 	return true;
 }

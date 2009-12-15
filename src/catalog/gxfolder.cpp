@@ -19,8 +19,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxfolder.h"
-#include "../../art/folder1_16.xpm"
-#include "../../art/folder1_48.xpm"
+#include "../../art/folder_16.xpm"
+#include "../../art/folder_48.xpm"
 
 wxGxFolder::wxGxFolder(wxString Path, wxString Name, bool bShowHidden) : m_bShowHidden(bShowHidden), m_bIsChildrenLoaded(false)
 {
@@ -84,12 +84,12 @@ void wxGxFolder::LoadChildren(void)
 
 wxIcon wxGxFolder::GetLargeImage(void)
 {
-	return wxIcon(folder1_48_xpm);
+	return wxIcon(folder_48_xpm);
 }
 
 wxIcon wxGxFolder::GetSmallImage(void)
 {
-	return wxIcon(folder1_16_xpm);
+	return wxIcon(folder_16_xpm);
 }
 
 bool wxGxFolder::Delete(void)
