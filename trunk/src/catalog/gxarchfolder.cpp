@@ -58,10 +58,11 @@ void wxGxArchive::LoadChildren(void)
 		return;
 
     wxBusyCursor wait;
-    wxString pp = wxT("/vsigzip/") + m_sPath;// + wxT("/");
-    char **papszFileList = VSIReadDir(wgWX2MB(pp));
     //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
     //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
+
+    wxString sArchPath = wxT("/vsizip/") + m_sPath;// + wxT("/");
+    char **papszFileList = VSIReadDir(wgWX2MB(sArchPath));
 
     if( CSLCount(papszFileList) == 0 )
     {
@@ -69,29 +70,46 @@ void wxGxArchive::LoadChildren(void)
     }
     else
     {
-        wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
+        //wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
+       	wxArrayString FileNames;
         for(int i = 0; papszFileList[i] != NULL; i++ )
 		{
 			wxString sFileName = wgMB2WX(papszFileList[i]);
-            if(i > 0)
-                wxLogDebug( wxT("       %s"), sFileName.c_str() );
+            //if(i > 0)
+            //    wxLogDebug( wxT("       %s"), sFileName.c_str() );
             VSIStatBufL BufL;
-            int ret = VSIStatL(wgWX2MB(pp + wxT("/") + sFileName), &BufL);
+			wxString sFolderPath = sArchPath + wxT("/") + sFileName;
+            int ret = VSIStatL(wgWX2MB(sFolderPath), &BufL);
             if(ret == 0)
             {
-                int x = 0;
+                //int x = 0;
                 if(VSI_ISDIR(BufL.st_mode))
                 {
-                    x = 1;
+					wxGxArchiveFolder* pFolder = new wxGxArchiveFolder(sFolderPath, sFileName, m_pCatalog->GetShowHidden());
+					IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
+					bool ret_code = AddChild(pGxObj);
                 }
                 else
                 {
-                    x = 2;
+                    FileNames.Add(sFileName);
                 }
             }
 		}
     }
     CSLDestroy( papszFileList );
+
+	//load names
+	GxObjectArray Array;	
+	if(m_pCatalog->GetChildren(sArchPath, &m_FileNames, &Array))
+	{
+		for(size_t i = 0; i < Array.size(); i++)
+		{
+			bool ret_code = AddChild(Array[i]);
+			if(!ret_code)
+				wxDELETE(Array[i]);
+		}
+	}
+	m_bIsChildrenLoaded = true;
 
     //std::auto_ptr<wxInputStream> in_stream(new wxFFileInputStream(m_sPath));
 
