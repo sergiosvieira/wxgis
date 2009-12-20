@@ -120,7 +120,8 @@ REMOVE:
 		}
 		if(CI->second.bHasPrj && !CI->second.bHasShp)
 		{
-			CI->first + wxT(".prj");
+			//CI->first + wxT(".prj");
+            pFileNames->push_back(CI->second.path + wxT(".prj"));
 			//create prj
 		}
 		if(pGxObj != NULL)
@@ -204,3 +205,19 @@ wxFontEncoding wxGxShapeFactory::GetEncoding(wxString sPath)
     return wxFONTENCODING_SYSTEM;
 }
  
+void wxGxShapeFactory::Serialize(wxXmlNode* pConfig, bool bStore)
+{
+    if(bStore)
+    {
+        if(pConfig->HasProp(wxT("factory_name")))
+            pConfig->DeleteProperty(wxT("factory_name"));
+        pConfig->AddProperty(wxT("factory_name"), GetName());  
+        if(pConfig->HasProp(wxT("is_enabled")))
+            pConfig->DeleteProperty(wxT("is_enabled"));
+        pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
+    }
+    else
+    {
+        m_bIsEnabled = wxAtoi(pConfig->GetPropVal(wxT("is_enabled"), wxT("1")));
+    }
+}

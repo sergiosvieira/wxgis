@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxShapeFactory class.
+ * Purpose:  wxGxFileFactory class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -22,17 +22,18 @@
 
 #include "wxgis/catalog/catalog.h"
 
-class wxGxShapeFactory :
+class wxGxFileFactory :
 	public IGxObjectFactory,
 	public wxObject
 {
-	DECLARE_DYNAMIC_CLASS(wxGxShapeFactory)
+	DECLARE_DYNAMIC_CLASS(wxGxFileFactory)
 public:
-	wxGxShapeFactory(void);
-	virtual ~wxGxShapeFactory(void);
-    virtual wxFontEncoding GetEncoding(wxString sPath);
+	wxGxFileFactory(void);
+	virtual ~wxGxFileFactory(void);
 	//IGxObjectFactory
 	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray);
     virtual void Serialize(wxXmlNode* pConfig, bool bStore);
-    virtual wxString GetName(void){return wxString(wxT("wxGxShapeFactory"));};
+    virtual wxString GetName(void){return wxString(wxT("wxGxFileFactory"));};
+protected:
+    wxArrayString m_ExtArray;
 };

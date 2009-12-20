@@ -60,15 +60,43 @@ bool wxGxFolderFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 		}
         else
         {
-            if(ext == wxString(wxT("zip"))/* || ext == wxString(wxT("tar")) || ext == wxString(wxT("gz"))*/)
+            //archive in archive not support acording performance issue
+            wxString sPref = path.Left(4);
+            if(ext == wxString(wxT("zip")) && sPref != wxString(wxT("/vsi")))// || ext == wxString(wxT("tar")) || ext == wxString(wxT("gz"))
             {
-			    wxGxArchive* pFolder = new wxGxArchive(path, name, m_pCatalog->GetShowHidden());
+			    wxGxArchive* pFolder = new wxGxArchive(path, name, m_pCatalog->GetShowHidden(), wxString(wxT("/vsizip/")));
 			    IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
 			    pObjArray->push_back(pGxObj);
 			    pFileNames->RemoveAt(i);
 			    i--;
             }
+       //     else if(ext == wxString(wxT("gz")) && sPref == wxString(wxT("/vsi")))
+       //     {
+			    //wxGxArchive* pFolder = new wxGxArchive(path, name, m_pCatalog->GetShowHidden(), wxString(wxT("/vsigzip/")));
+			    //IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
+			    //pObjArray->push_back(pGxObj);
+			    //pFileNames->RemoveAt(i);
+			    //i--;
+       //     }
         }
 	}
 	return true;
+}
+
+
+void wxGxFolderFactory::Serialize(wxXmlNode* pConfig, bool bStore)
+{
+    if(bStore)
+    {
+        if(pConfig->HasProp(wxT("factory_name")))
+            pConfig->DeleteProperty(wxT("factory_name"));
+        pConfig->AddProperty(wxT("factory_name"), GetName());  
+        if(pConfig->HasProp(wxT("is_enabled")))
+            pConfig->DeleteProperty(wxT("is_enabled"));
+        pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
+    }
+    else
+    {
+        m_bIsEnabled = wxAtoi(pConfig->GetPropVal(wxT("is_enabled"), wxT("1")));
+    }
 }

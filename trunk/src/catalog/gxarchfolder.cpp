@@ -22,20 +22,15 @@
 #include "../../art/folder_arch1_16.xpm"
 #include "../../art/folder_arch1_48.xpm"
 
-#include <wx/archive.h>
-#include <wx/stream.h>
-#include <wx/wfstream.h>
-
 #include "cpl_vsi_virtual.h"
 
 /////////////////////////////////////////////////////////////////////////
 // wxGxArchive
 /////////////////////////////////////////////////////////////////////////
 
-wxGxArchive::wxGxArchive(wxString Path, wxString Name, bool bShowHidden) : wxGxFolder(Path, Name, bShowHidden)
+wxGxArchive::wxGxArchive(wxString Path, wxString Name, bool bShowHidden, wxString sType) : wxGxFolder(Path, Name, bShowHidden)
 {
-	m_sName = Name;
-	m_sPath = Path;
+    m_sType = sType;
 }
 
 wxGxArchive::~wxGxArchive(void)
@@ -61,17 +56,17 @@ void wxGxArchive::LoadChildren(void)
     //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
     //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
 
-    wxString sArchPath = wxT("/vsizip/") + m_sPath;// + wxT("/");
+    wxString sArchPath = m_sType + m_sPath;//wxT("/vsizip/") + wxT("/");
     char **papszFileList = VSIReadDir(wgWX2MB(sArchPath));
 
     if( CSLCount(papszFileList) == 0 )
     {
-        wxLogDebug(wxT( "Files: no files or directories" ));
+        wxLogMessage(wxT( "wxGxArchive: no files or directories" ));
     }
     else
     {
         //wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
-       	wxArrayString FileNames;
+       	//wxArrayString FileNames;
         for(int i = 0; papszFileList[i] != NULL; i++ )
 		{
 			wxString sFileName = wgMB2WX(papszFileList[i]);
@@ -91,7 +86,7 @@ void wxGxArchive::LoadChildren(void)
                 }
                 else
                 {
-                    FileNames.Add(sFileName);
+                    m_FileNames.Add(sFolderPath);
                 }
             }
 		}
@@ -241,8 +236,6 @@ void wxGxArchive::LoadChildren(void)
 
 wxGxArchiveFolder::wxGxArchiveFolder(wxString Path, wxString Name, bool bShowHidden) : wxGxFolder(Path, Name, bShowHidden)
 {
-	m_sName = Name;
-	m_sPath = Path;
 }
 
 wxGxArchiveFolder::~wxGxArchiveFolder(void)
@@ -257,4 +250,64 @@ wxIcon wxGxArchiveFolder::GetLargeImage(void)
 wxIcon wxGxArchiveFolder::GetSmallImage(void)
 {
 	return wxIcon(folder_arch1_16_xpm);
+}
+
+void wxGxArchiveFolder::LoadChildren(void)
+{
+	if(m_bIsChildrenLoaded)
+		return;
+
+    wxBusyCursor wait;
+    //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
+    //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
+
+    wxString sArchPath = m_sPath;
+    char **papszFileList = VSIReadDir(wgWX2MB(sArchPath));
+
+    if( CSLCount(papszFileList) == 0 )
+    {
+        wxLogMessage(wxT( "wxGxArchive: no files or directories" ));
+    }
+    else
+    {
+        //wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
+       	//wxArrayString FileNames;
+        for(int i = 0; papszFileList[i] != NULL; i++ )
+		{
+			wxString sFileName = wgMB2WX(papszFileList[i]);
+            //if(i > 0)
+            //    wxLogDebug( wxT("       %s"), sFileName.c_str() );
+            VSIStatBufL BufL;
+			wxString sFolderPath = sArchPath + wxT("/") + sFileName;
+            int ret = VSIStatL(wgWX2MB(sFolderPath), &BufL);
+            if(ret == 0)
+            {
+                //int x = 0;
+                if(VSI_ISDIR(BufL.st_mode))
+                {
+					wxGxArchiveFolder* pFolder = new wxGxArchiveFolder(sFolderPath, sFileName, m_pCatalog->GetShowHidden());
+					IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
+					bool ret_code = AddChild(pGxObj);
+                }
+                else
+                {
+                    m_FileNames.Add(sFolderPath);
+                }
+            }
+		}
+    }
+    CSLDestroy( papszFileList );
+
+	//load names
+	GxObjectArray Array;	
+	if(m_pCatalog->GetChildren(sArchPath, &m_FileNames, &Array))
+	{
+		for(size_t i = 0; i < Array.size(); i++)
+		{
+			bool ret_code = AddChild(Array[i]);
+			if(!ret_code)
+				wxDELETE(Array[i]);
+		}
+	}
+	m_bIsChildrenLoaded = true;
 }

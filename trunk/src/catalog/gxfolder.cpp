@@ -48,7 +48,7 @@ void wxGxFolder::EmptyChildren(void)
 	for(size_t i = 0; i < m_Children.size(); i++)
 	{
 		m_Children[i]->Detach();
-		delete m_Children[i];
+		wxDELETE( m_Children[i] );
 	}
 	m_Children.empty();
 	m_bIsChildrenLoaded = false;

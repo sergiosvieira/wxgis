@@ -268,12 +268,19 @@ protected:
 class IGxObjectFactory
 {
 public:	
-	IGxObjectFactory(void) : m_pCatalog(NULL){};
+	IGxObjectFactory(void) : m_pCatalog(NULL), m_bIsEnabled(true){};
 	virtual ~IGxObjectFactory(void){};
+    //pure virtual
 	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray) = 0;
+    virtual void Serialize(wxXmlNode* pConfig, bool bStore) = 0;
+    virtual wxString GetName(void) = 0;
+    //
+    virtual bool GetEnabled(void){return m_bIsEnabled;};
+    virtual void SetEnabled(bool bIsEnabled){m_bIsEnabled = bIsEnabled;};
 	virtual void PutCatalogRef(IGxCatalog* pCatalog){m_pCatalog = pCatalog;};
 protected:
 	IGxCatalog* m_pCatalog;
+    bool m_bIsEnabled;
 };
 
 class IGxCatalogEvents
@@ -294,6 +301,32 @@ public:
 	virtual ~IGxDataset(void){};
 	virtual wxGISDataset* GetDataset(void) = 0;	
 	virtual wxGISEnumDatasetType GetType(void) = 0;
+};
+
+class IGxFile
+{
+public:	
+	virtual ~IGxFile(void){};
+	//virtual bool Open(void) = 0;	
+	//virtual bool Close(bool bSaveEdits) = 0;
+	//virtual void Edit(void) = 0;
+	//virtual void New(void) = 0;
+	//virtual bool Save(void) = 0;
+};
+
+class IGxRootObjectProperties
+{
+public:	
+	virtual ~IGxRootObjectProperties(void){};
+	virtual void Init(wxXmlNode* pConfigNode) = 0;
+};
+
+class IGxObjectSort
+{
+public:	
+	virtual ~IGxObjectSort(void){};
+	virtual bool IsAlwaysTop(void) = 0;
+	virtual bool IsSortEnabled(void) = 0;
 };
 
 //

@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxShapeFactory class.
+ * Purpose:  wxGxFile classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -18,21 +18,45 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#pragma once
+#include "wxgis/catalog/gxfile.h"
+#include "../../art/sr_16(2).xpm"
+#include "../../art/sr_48.xpm"
 
-#include "wxgis/catalog/catalog.h"
+//--------------------------------------------------------------
+//class wxGxFile
+//--------------------------------------------------------------
 
-class wxGxShapeFactory :
-	public IGxObjectFactory,
-	public wxObject
+wxGxFile::wxGxFile(wxString Path, wxString Name)
 {
-	DECLARE_DYNAMIC_CLASS(wxGxShapeFactory)
-public:
-	wxGxShapeFactory(void);
-	virtual ~wxGxShapeFactory(void);
-    virtual wxFontEncoding GetEncoding(wxString sPath);
-	//IGxObjectFactory
-	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray);
-    virtual void Serialize(wxXmlNode* pConfig, bool bStore);
-    virtual wxString GetName(void){return wxString(wxT("wxGxShapeFactory"));};
-};
+	m_sName = Name;
+	m_sPath = Path;
+}
+
+wxGxFile::~wxGxFile(void)
+{
+}
+
+
+//--------------------------------------------------------------
+//class wxGxPrjFile
+//--------------------------------------------------------------
+
+wxGxPrjFile::wxGxPrjFile(wxString Path, wxString Name, wxGISEnumPrjFileType Type) : wxGxFile(Path, Name)
+{
+    m_Type = Type;
+}
+
+wxGxPrjFile::~wxGxPrjFile(void)
+{
+}
+
+wxIcon wxGxPrjFile::GetLargeImage(void)
+{
+	return wxIcon(sr_48_xpm);
+}
+
+wxIcon wxGxPrjFile::GetSmallImage(void)
+{
+	return wxIcon(sr_16_2_xpm);
+}
+

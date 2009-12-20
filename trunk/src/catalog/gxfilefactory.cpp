@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxRasterFactory class.
+ * Purpose:  wxGxFileFactory class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -18,20 +18,21 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#include "wxgis/catalog/gxrasterfactory.h"
-#include "wxgis/catalog/gxdataset.h"
+#include "wxgis/catalog/gxfilefactory.h"
+#include "wxgis/catalog/gxfile.h"
+#include <wx/tokenzr.h>
 
-IMPLEMENT_DYNAMIC_CLASS(wxGxRasterFactory, wxObject)
+IMPLEMENT_DYNAMIC_CLASS(wxGxFileFactory, wxObject)
 
-wxGxRasterFactory::wxGxRasterFactory(void)
+wxGxFileFactory::wxGxFileFactory(void)
 {
 }
 
-wxGxRasterFactory::~wxGxRasterFactory(void)
+wxGxFileFactory::~wxGxFileFactory(void)
 {
 }
 
-bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray)
+bool wxGxFileFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray)
 {
 	for(size_t i = 0; i < pFileNames->GetCount(); i++)
 	{
@@ -46,45 +47,34 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 		
 
 		IGxObject* pGxObj = NULL;
-		if(ext == wxString(wxT("bmp")) || ext == wxString(wxT("jpg")) || ext == wxString(wxT("img")))
+		if(ext == wxString(wxT("srml")))
 		{
 			if(m_pCatalog->GetShowExt())
 				name += wxT(".") + ext;
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterUnknown);
-			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumSRMLfile);
+			pGxObj = dynamic_cast<IGxObject*>(pFile);
 			goto REMOVE;
 		}
-		if(ext == wxString(wxT("tif")) || ext == wxString(wxT("tiff")) || ext == wxString(wxT("png")))
+		if(ext == wxString(wxT("prj")))
 		{
 			if(m_pCatalog->GetShowExt())
 				name += wxT(".") + ext;
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterUnknown);
-			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumESRIPrjFile);
+			pGxObj = dynamic_cast<IGxObject*>(pFile);
 			goto REMOVE;
 		}
-		if(ext == wxString(wxT("til")) || ext == wxString(wxT("jpeg")) || ext == wxString(wxT("jp2")))//TODO: add other raster file extensions
-		{
-			if(m_pCatalog->GetShowExt())
-				name += wxT(".") + ext;
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterUnknown);
-			pGxObj = dynamic_cast<IGxObject*>(pDataset);
-			goto REMOVE;
-		}		
-		path.MakeLower();
-		if(path.Find(wxT(".aux")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".rrd")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".ovr")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".w")) != wxNOT_FOUND)//TODO: add other world file extensions
-			goto REMOVE;
-		if(path.Find(wxT(".wld")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".bpw")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".bmpw")) != wxNOT_FOUND)
-			goto REMOVE;
+        //add extensions from config
+        for(size_t j = 0; j < m_ExtArray.size(); j++)
+        {
+            if(m_ExtArray[j] == ext)
+            {
+                //if(m_pCatalog->GetShowExt())
+			    //	name += wxT(".") + ext;
+			    //wxGxTextFile* pFile = new wxGxTextFile(path, name);
+			    //pGxObj = dynamic_cast<IGxObject*>(pFile);
+			    goto REMOVE;
+            }
+        }
 		continue;
 REMOVE:
 		pFileNames->RemoveAt(i);
@@ -96,20 +86,37 @@ REMOVE:
 	return true;
 }
 
-
-void wxGxRasterFactory::Serialize(wxXmlNode* pConfig, bool bStore)
+void wxGxFileFactory::Serialize(wxXmlNode* pConfig, bool bStore)
 {
     if(bStore)
     {
         if(pConfig->HasProp(wxT("factory_name")))
             pConfig->DeleteProperty(wxT("factory_name"));
-        pConfig->AddProperty(wxT("factory_name"), GetName());  
+        pConfig->AddProperty(wxT("factory_name"), GetName());    
         if(pConfig->HasProp(wxT("is_enabled")))
             pConfig->DeleteProperty(wxT("is_enabled"));
         pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
+        wxString sExt;
+        for(size_t j = 0; j < m_ExtArray.size(); j++)
+        {
+            sExt += m_ExtArray[j];
+            sExt += wxT("|");
+        }
+        if(pConfig->HasProp(wxT("extensions")))
+            pConfig->DeleteProperty(wxT("extensions"));
+        pConfig->AddProperty(wxT("extensions"), sExt);    
     }
     else
     {
         m_bIsEnabled = wxAtoi(pConfig->GetPropVal(wxT("is_enabled"), wxT("1")));
+        wxString sExts = pConfig->GetPropVal(wxT("extensions"), wxT("txt|log|nfo|"));
+	    wxStringTokenizer tkz(sExts, wxString(wxT("|")), false );
+	    while ( tkz.HasMoreTokens() )
+	    {
+		    wxString token = tkz.GetNextToken();
+		    token.Replace(wxT("|"), wxT(""));	
+		    token.MakeLower();
+            m_ExtArray.Add(token);
+	    }
     }
 }

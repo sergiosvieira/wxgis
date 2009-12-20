@@ -47,12 +47,22 @@ enum wxGISEnumRasterDatasetType
 	enumRasterUnknown = 0
 };
 
+enum wxGISEnumPrjFileType
+{
+	enumESRIPrjFile = 1, 
+	enumSRMLfile = 2
+};
+
 //this class should be in wxGISGeodatabase
 class wxGISDataset :
 	public IPointer
 {
 public:	
-	wxGISDataset(wxString sPath) : IPointer(), m_sPath(sPath){};
+	wxGISDataset(wxString sPath) : IPointer()
+    {
+        m_sPath = sPath;
+        m_sPath.Replace(wxT("\\"), wxT("/"));
+    };
 	virtual ~wxGISDataset(void){};
 	virtual wxGISEnumDatasetType GetType(void) = 0;
 	virtual wxString GetPath(void){return m_sPath;};
