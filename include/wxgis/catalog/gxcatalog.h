@@ -84,14 +84,9 @@ public:
 	virtual void Init(void);
 	virtual void SerializeDiscConnections(wxXmlNode* pNode, bool bStore = false);
 
-	typedef struct _objfactory_desc
-	{
-		IGxObjectFactory* pFactory;
-		bool bIsEnabled;
-	} OBJFACTORYDESC;
 private:
 	bool m_bIsChildrenLoaded;
-	std::vector<OBJFACTORYDESC> m_ObjectFactoriesArray;
+	std::vector<IGxObjectFactory*> m_ObjectFactoriesArray;
 	std::map<wxString, IGxObject*> m_DiscConnections;
 	wxArrayString m_CatalogRootItemArray;
 };

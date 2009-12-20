@@ -43,3 +43,6 @@ protected:
 	wxGxApplication* m_pApplication;
 	wxXmlNode* m_pXmlConf;
 };
+
+int GxObjectCompareFunction(IGxObject* pObject1, IGxObject* pObject2, long sortData);
+

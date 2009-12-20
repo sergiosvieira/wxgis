@@ -53,7 +53,9 @@ class WXDLLIMPEXP_GIS_CLU wxGxTreeView :
 	public IGxSelectionEvents,
 	public IGxCatalogEvents
 {
+    DECLARE_DYNAMIC_CLASS(wxGxTreeView)
 public:
+    wxGxTreeView(void);
 	wxGxTreeView(wxWindow* parent, wxWindowID id = TREECTRLID);
 	virtual ~wxGxTreeView(void);
 	void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, bool sort = true);
@@ -74,6 +76,8 @@ public:
 	virtual void OnObjectDeleted(IGxObject* object);
 	virtual void OnObjectRefreshed(IGxObject* object);
 	virtual void OnRefreshAll(void);
+//wxGxView
+    virtual int OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2);
 
 	typedef std::map<IGxObject*, wxTreeItemId> WETREEMAP; 
 private:

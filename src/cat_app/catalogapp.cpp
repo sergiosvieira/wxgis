@@ -37,8 +37,8 @@ wxGISCatalogApp::~wxGISCatalogApp(void)
 {
 	//wxLogMessage(_("wxGISCatalogApp is exiting..."));
 
-	OGRCleanupAll();
 	GDALDestroyDriverManager();
+	OGRCleanupAll();
 
 	if(m_pszOldLocale != NULL)
 		setlocale(LC_NUMERIC, m_pszOldLocale);

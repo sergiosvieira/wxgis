@@ -69,7 +69,6 @@ public:
 	{
 		IGxObject* pObject;
 		int iImageIndex;
-		bool bContainer;
 	} ITEMDATA, *LPITEMDATA;
 
 private:

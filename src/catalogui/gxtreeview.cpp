@@ -27,6 +27,12 @@ BEGIN_EVENT_TABLE(wxGxTreeView, wxTreeCtrl)
     EVT_TREE_SEL_CHANGED(TREECTRLID, wxGxTreeView::OnSelChanged)
 END_EVENT_TABLE()
 
+IMPLEMENT_DYNAMIC_CLASS(wxGxTreeView, wxTreeCtrl)
+
+wxGxTreeView::wxGxTreeView(void) : wxTreeCtrl()
+{
+}
+
 wxGxTreeView::wxGxTreeView(wxWindow* parent, wxWindowID id) : wxTreeCtrl(parent, id, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS | wxBORDER_NONE | wxTR_EDIT_LABELS /*| wxTR_MULTIPLE| wxTR_HIDE_ROOT | wxTR_LINES_AT_ROOT*/, wxDefaultValidator, wxT("wxGxTreeView")), m_pConnectionPointCatalog(NULL), m_pConnectionPointSelection(NULL), m_ConnectionPointCatalogCookie(-1), m_ConnectionPointSelectionCookie(-1)
 {
 	m_TreeImageList.Create(16, 16);
@@ -116,7 +122,7 @@ void wxGxTreeView::OnItemExpanding(wxTreeEvent& event)
 						if(pArr->size() != 0)
 						{
 							for(size_t i = 0; i < pArr->size(); i++)
-								AddTreeItem(pArr->at(i), item, false);
+								AddTreeItem(pArr->at(i), item, true);//false
 							pData->m_bExpandedOnce = true;
 							return;
 						}
@@ -415,3 +421,14 @@ void wxGxTreeView::OnRefreshAll(void)
 	AddRoot(dynamic_cast<IGxObject*>(m_pCatalog));
 }
 
+int wxGxTreeView::OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2)
+{
+    wxGxTreeItemData* pData1 = (wxGxTreeItemData*)GetItemData(item1);
+    wxGxTreeItemData* pData2 = (wxGxTreeItemData*)GetItemData(item2);
+    if(pData1 != NULL && pData1 != NULL)
+    {
+        return GxObjectCompareFunction(pData1->m_pObject, pData2->m_pObject, 1);
+    }
+    return 0;   
+//   return wxTreeCtrl::OnCompareItems(item1, item2);
+}

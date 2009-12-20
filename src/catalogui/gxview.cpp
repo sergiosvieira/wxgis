@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxview.h"
 #include "wxgis/catalog/gxcatalog.h"
+#include "wxgis/catalog/gxdiscconnection.h"
 
 //-----------------------------------------------
 // wxGxView
@@ -56,4 +57,43 @@ bool wxGxView::Applies(IGxSelection* Selection)
 wxString wxGxView::GetName(void)
 {
 	return m_sViewName;
+}
+
+int GxObjectCompareFunction(IGxObject* pObject1, IGxObject* pObject2, long sortData)
+{
+	IGxObjectSort* pGxObjectSort1 = dynamic_cast<IGxObjectSort*>(pObject1);
+    IGxObjectSort* pGxObjectSort2 = dynamic_cast<IGxObjectSort*>(pObject2);
+    if(pGxObjectSort1 && !pGxObjectSort2)
+		return sortData == 0 ? 1 : -1;
+    if(!pGxObjectSort1 && pGxObjectSort2)
+		return sortData == 0 ? -1 : 1;
+    if(pGxObjectSort1 && pGxObjectSort2)
+    {
+        bool bAlwaysTop1 = pGxObjectSort1->IsAlwaysTop();
+        bool bAlwaysTop2 = pGxObjectSort2->IsAlwaysTop();
+        if(bAlwaysTop1 && !bAlwaysTop2)
+		    return sortData == 0 ? 1 : -1;
+        if(!bAlwaysTop1 && bAlwaysTop2)
+		    return sortData == 0 ? -1 : 1;
+        bool bSortEnables1 = pGxObjectSort1->IsSortEnabled();
+        bool bSortEnables2 = pGxObjectSort2->IsSortEnabled();
+        if(!bSortEnables1 || !bSortEnables1)
+            return 0;
+    }
+
+	bool bDiscConnection1 = dynamic_cast<wxGxDiscConnection*>(pObject1);
+    bool bDiscConnection2 = dynamic_cast<wxGxDiscConnection*>(pObject2);
+    if(bDiscConnection1 && !bDiscConnection2)
+		return sortData == 0 ? 1 : -1;
+    if(!bDiscConnection1 && bDiscConnection2)
+		return sortData == 0 ? -1 : 1;
+
+	bool bContainer1 = dynamic_cast<IGxObjectContainer*>(pObject1);
+    bool bContainer2 = dynamic_cast<IGxObjectContainer*>(pObject2);
+	if(bContainer1 && !bContainer2)
+		return sortData == 0 ? 1 : -1;
+	if(!bContainer1 && bContainer2)
+		return sortData == 0 ? -1 : 1;
+
+	return pObject1->GetName().CmpNoCase(pObject2->GetName()) * (sortData == 0 ? -1 : 1);
 }

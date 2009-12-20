@@ -194,6 +194,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\catalog\gxfile.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\catalog\gxfilefactory.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\catalog\gxfolder.cpp"
 				>
 			</File>
@@ -211,6 +219,10 @@
 			</File>
 			<File
 				RelativePath="..\..\src\catalog\gxshapefactory.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\catalog\gxspatreffolder.cpp"
 				>
 			</File>
 		</Filter>
@@ -240,6 +252,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\wxgis\catalog\gxfile.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalog\gxfilefactory.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wxgis\catalog\gxfolder.h"
 				>
 			</File>
@@ -257,6 +277,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalog\gxshapefactory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalog\gxspatreffolder.h"
 				>
 			</File>
 		</Filter>

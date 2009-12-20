@@ -29,7 +29,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxArchive :
 	public wxGxFolder
 {
 public:
-	wxGxArchive(wxString Path, wxString Name, bool bShowHidden);
+	wxGxArchive(wxString Path, wxString Name, bool bShowHidden, wxString sType);
 	virtual ~wxGxArchive(void);
 	//IGxObject
 	virtual wxString GetCategory(void){return wxString(_("Archive"));};
@@ -40,6 +40,8 @@ public:
 	virtual wxString NewMenu(void){return wxString(wxT("wxGxArchive.NewMenu"));};
 	//wxGxFolder
 	virtual void LoadChildren(void);
+protected:
+    wxString m_sType;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -59,5 +61,7 @@ public:
 	virtual wxIcon GetSmallImage(void);
 	virtual wxString ContextMenu(void){return wxString(wxT("wxGxArchiveFolder.ContextMenu"));};
 	virtual wxString NewMenu(void){return wxString(wxT("wxGxArchiveFolder.NewMenu"));};
+	//wxGxFolder
+	virtual void LoadChildren(void);
 };
 

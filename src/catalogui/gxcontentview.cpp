@@ -38,13 +38,8 @@ int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
 {
 	wxGxContentView::LPITEMDATA pItem1 = (wxGxContentView::LPITEMDATA)item1;
  	wxGxContentView::LPITEMDATA pItem2 = (wxGxContentView::LPITEMDATA)item2;
-   // inverse the order
-	if(pItem1->bContainer && !pItem2->bContainer)
-		return sortData == 0 ? 1 : -1;
-	if(!pItem1->bContainer && pItem2->bContainer)
-		return sortData == 0 ? -1 : 1;
 
-	return pItem1->pObject->GetName().CmpNoCase(pItem2->pObject->GetName()) * (sortData == 0 ? -1 : 1);
+    return GxObjectCompareFunction(pItem1->pObject, pItem2->pObject, sortData);
 }
 
 wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : 
@@ -154,13 +149,10 @@ void wxGxContentView::AddObject(IGxObject* pObject)
 	else
 		pos = m_ImageListLarge.Add(m_ImageListLarge.GetIcon(2));
 
-	IGxObjectContainer* pGxObjectContainer =  dynamic_cast<IGxObjectContainer*>(pObject);
-
 
 	LPITEMDATA pData = new _itemdata;
 	pData->pObject = pObject;
 	pData->iImageIndex = pos;
-	pData->bContainer = pGxObjectContainer == NULL ? false : true;
 
 	wxString name = pObject->GetName();
 	wxString type = pObject->GetCategory();
