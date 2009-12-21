@@ -19,8 +19,10 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/catalogcmd.h"
+
 #include "../../art/folder_conn_16.xpm"
 #include "../../art/location16.xpm"
+
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/catalogui/gxapplication.h"
 #include "wxgis/catalog/gxdiscconnection.h"
@@ -32,11 +34,14 @@
 #include <wx/dirdlg.h>
 #include <wx/file.h>
 
+#include "wxgis/catalogui/gxdialog.h"
+
+
 //	0	Up One Level
 //	1	Connect Folder
 //	2	Disconnect Folder
 //	3	Location
-//	4	Generate SRS
+//	4	Test GxDialog
 //	5	?
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogMainCmd, wxObject)
@@ -84,7 +89,7 @@ wxString wxGISCatalogMainCmd::GetCaption(void)
 		case 3:	
 			return wxString(_("Location"));
 		case 4:	
-			return wxString(_("Generate SRS"));
+			return wxString(_("Test GxDialog"));
 		default:
 			return wxString();
 	}
@@ -188,7 +193,7 @@ wxString wxGISCatalogMainCmd::GetMessage(void)
 		case 3:	
 			return wxString(_("Set or get location"));
 		case 4:	
-			return wxString(_("Gen SRS"));
+			return wxString(_("Test GxDialog"));
 		default:
 			return wxString();
 	}
@@ -254,114 +259,117 @@ void wxGISCatalogMainCmd::OnClick(void)
 		}
 		case 4:
             {
-                wxString sProjDir = wxString(wxT("e:\\temp\\srs\\Projected Coordinate Systems"));
-                if(!wxDirExists(sProjDir))
-		            wxFileName::Mkdir(sProjDir, 0755, wxPATH_MKDIR_FULL);
-                wxString sGeogDir = wxString(wxT("e:\\temp\\srs\\Geographic Coordinate Systems"));
-                if(!wxDirExists(sGeogDir))
-		            wxFileName::Mkdir(sGeogDir, 0755, wxPATH_MKDIR_FULL);
-                wxString sLoclDir = wxString(wxT("e:\\temp\\srs\\Vertical Coordinate Systems"));
-                if(!wxDirExists(sLoclDir))
-		            wxFileName::Mkdir(sLoclDir, 0755, wxPATH_MKDIR_FULL);
+                wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
+                wxGxDialog dlg(pWnd); 
+                dlg.ShowModal();
+              //  wxString sProjDir = wxString(wxT("e:\\temp\\srs\\Projected Coordinate Systems"));
+              //  if(!wxDirExists(sProjDir))
+		            //wxFileName::Mkdir(sProjDir, 0755, wxPATH_MKDIR_FULL);
+              //  wxString sGeogDir = wxString(wxT("e:\\temp\\srs\\Geographic Coordinate Systems"));
+              //  if(!wxDirExists(sGeogDir))
+		            //wxFileName::Mkdir(sGeogDir, 0755, wxPATH_MKDIR_FULL);
+              //  wxString sLoclDir = wxString(wxT("e:\\temp\\srs\\Vertical Coordinate Systems"));
+              //  if(!wxDirExists(sLoclDir))
+		            //wxFileName::Mkdir(sLoclDir, 0755, wxPATH_MKDIR_FULL);
 
-                IStatusBar* pStatusBar = m_pApp->GetStatusBar();  
-                wxGISProgressor* pProgressor = dynamic_cast<wxGISProgressor*>(pStatusBar->GetProgressor());
-                if(pProgressor)
-                {
-                    pProgressor->Show(true);
-                    pProgressor->SetRange(70000);
+              //  IStatusBar* pStatusBar = m_pApp->GetStatusBar();  
+              //  wxGISProgressor* pProgressor = dynamic_cast<wxGISProgressor*>(pStatusBar->GetProgressor());
+              //  if(pProgressor)
+              //  {
+              //      pProgressor->Show(true);
+              //      pProgressor->SetRange(70000);
 
-                    wxString sDirPath;
+              //      wxString sDirPath;
 
-                    for(size_t i = 0; i < 70000; i++)
-                    {
-                        OGRSpatialReference SpaRef;
-                        OGRErr err = SpaRef.importFromEPSG(i);
-                        if(err == OGRERR_NONE)
-                        {
-                           const char *pszProjection = SpaRef.GetAttrValue("PROJECTION"); 
-                           wxString sProjection;
-                           if(pszProjection)
-                               sProjection = wgMB2WX(pszProjection);
-                           if(SpaRef.IsProjected())
-                            {
-                                const char *pszProjcs = SpaRef.GetAttrValue("PROJCS");
-                                wxString sName = wgMB2WX(pszProjcs);
-                                if(sName.Find(wxT("depre")) != wxNOT_FOUND)
-                                    continue;
-                                wxString sFileName;
-                                int pos = sName.Find('/');
-                                if(pos != wxNOT_FOUND)
-                                {
-                                    wxString sSubFldr = sName.Right(sName.Len() - pos - 1);
-                                    sSubFldr.Trim(true); sSubFldr.Trim(false);
-                                    wxString sStorePath = sProjDir + wxFileName::GetPathSeparator() + sSubFldr;
-                                    if(!wxDirExists(sStorePath))
-		                                wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
+              //      for(size_t i = 0; i < 70000; i++)
+              //      {
+              //          OGRSpatialReference SpaRef;
+              //          OGRErr err = SpaRef.importFromEPSG(i);
+              //          if(err == OGRERR_NONE)
+              //          {
+              //             const char *pszProjection = SpaRef.GetAttrValue("PROJECTION"); 
+              //             wxString sProjection;
+              //             if(pszProjection)
+              //                 sProjection = wgMB2WX(pszProjection);
+              //             if(SpaRef.IsProjected())
+              //              {
+              //                  const char *pszProjcs = SpaRef.GetAttrValue("PROJCS");
+              //                  wxString sName = wgMB2WX(pszProjcs);
+              //                  if(sName.Find(wxT("depre")) != wxNOT_FOUND)
+              //                      continue;
+              //                  wxString sFileName;
+              //                  int pos = sName.Find('/');
+              //                  if(pos != wxNOT_FOUND)
+              //                  {
+              //                      wxString sSubFldr = sName.Right(sName.Len() - pos - 1);
+              //                      sSubFldr.Trim(true); sSubFldr.Trim(false);
+              //                      wxString sStorePath = sProjDir + wxFileName::GetPathSeparator() + sSubFldr;
+              //                      if(!wxDirExists(sStorePath))
+		            //                    wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
 
-                                    sName.Replace(wxString(wxT("/")), wxString(wxT(""))); 
-                                    sName.Replace(wxString(wxT("  ")), wxString(wxT(" "))); 
-                                    sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".srml");
-                                }
-                                else
-                                {
-                                    sFileName = sProjDir + wxFileName::GetPathSeparator() + sName + wxT(".srml");
-                                }
-                                wxFile file;
-                                if(file.Create(sFileName))
-                                {
-                                    char* pData(NULL);
-                                    SpaRef.exportToXML(&pData);
-                                    wxString Data = wgMB2WX(pData);
-                                    file.Write(Data);
-                                    CPLFree(pData);
-                                }
-                            }
-                            else if(SpaRef.IsGeographic())
-                            {
-                                const char *pszProjcs = SpaRef.GetAttrValue("GEOGCS");
-                                wxString sName = wgMB2WX(pszProjcs);
-                                if(sName.Find(wxT("depre")) != wxNOT_FOUND)
-                                    continue;
-                                wxString sFileName;
-                                int pos = sName.Find('/');
-                                if(pos != wxNOT_FOUND)
-                                {
-                                    wxString sSubFldr = sName.Right(sName.Len() - pos - 1);
-                                    sSubFldr.Trim(true); sSubFldr.Trim(false);
-                                    wxString sStorePath = sGeogDir + wxFileName::GetPathSeparator() + sSubFldr;
-                                    if(!wxDirExists(sStorePath))
-		                                wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
+              //                      sName.Replace(wxString(wxT("/")), wxString(wxT(""))); 
+              //                      sName.Replace(wxString(wxT("  ")), wxString(wxT(" "))); 
+              //                      sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".srml");
+              //                  }
+              //                  else
+              //                  {
+              //                      sFileName = sProjDir + wxFileName::GetPathSeparator() + sName + wxT(".srml");
+              //                  }
+              //                  wxFile file;
+              //                  if(file.Create(sFileName))
+              //                  {
+              //                      char* pData(NULL);
+              //                      SpaRef.exportToXML(&pData);
+              //                      wxString Data = wgMB2WX(pData);
+              //                      file.Write(Data);
+              //                      CPLFree(pData);
+              //                  }
+              //              }
+              //              else if(SpaRef.IsGeographic())
+              //              {
+              //                  const char *pszProjcs = SpaRef.GetAttrValue("GEOGCS");
+              //                  wxString sName = wgMB2WX(pszProjcs);
+              //                  if(sName.Find(wxT("depre")) != wxNOT_FOUND)
+              //                      continue;
+              //                  wxString sFileName;
+              //                  int pos = sName.Find('/');
+              //                  if(pos != wxNOT_FOUND)
+              //                  {
+              //                      wxString sSubFldr = sName.Right(sName.Len() - pos - 1);
+              //                      sSubFldr.Trim(true); sSubFldr.Trim(false);
+              //                      wxString sStorePath = sGeogDir + wxFileName::GetPathSeparator() + sSubFldr;
+              //                      if(!wxDirExists(sStorePath))
+		            //                    wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
 
-                                    sName.Replace(wxString(wxT("/")), wxString(wxT(""))); 
-                                    sName.Replace(wxString(wxT("  ")), wxString(wxT(" "))); 
-                                    sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".srml");
-                                }
-                                else
-                                {
-                                    sFileName = sGeogDir + wxFileName::GetPathSeparator() + sName + wxT(".srml");
-                                }
-                                wxFile file;
-                                if(file.Create(sFileName))
-                                {
-                                    char* pData(NULL);
-                                    SpaRef.exportToXML(&pData);
-                                    wxString Data = wgMB2WX(pData);
-                                    file.Write(Data);
-                                    CPLFree(pData);
-                                }
-                            }
-                            else
-                            {
-                                sDirPath = wxString(wxT("e:\\temp\\srs\\Vertical Coordinate Systems"));
-                            //bool bLoc = SpaRef.IsLocal();
-                            }
-                        }
-                        pProgressor->SetValue(i);
-                    }
-                    pProgressor->Show(false);
-                }
-                pStatusBar->SetMessage(_("Done"));
+              //                      sName.Replace(wxString(wxT("/")), wxString(wxT(""))); 
+              //                      sName.Replace(wxString(wxT("  ")), wxString(wxT(" "))); 
+              //                      sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".srml");
+              //                  }
+              //                  else
+              //                  {
+              //                      sFileName = sGeogDir + wxFileName::GetPathSeparator() + sName + wxT(".srml");
+              //                  }
+              //                  wxFile file;
+              //                  if(file.Create(sFileName))
+              //                  {
+              //                      char* pData(NULL);
+              //                      SpaRef.exportToXML(&pData);
+              //                      wxString Data = wgMB2WX(pData);
+              //                      file.Write(Data);
+              //                      CPLFree(pData);
+              //                  }
+              //              }
+              //              else
+              //              {
+              //                  sDirPath = wxString(wxT("e:\\temp\\srs\\Vertical Coordinate Systems"));
+              //              //bool bLoc = SpaRef.IsLocal();
+              //              }
+              //          }
+              //          pProgressor->SetValue(i);
+              //      }
+              //      pProgressor->Show(false);
+              //  }
+              //  pStatusBar->SetMessage(_("Done"));
             }			
 			break;
         case 3:
@@ -389,7 +397,7 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 		case 3:	
 			return wxString(_("Set or get location"));
 		case 4:	
-			return wxString(_("Gen SRS"));
+			return wxString(_("Test GxDialog"));
 		default:
 			return wxString();
 	}
