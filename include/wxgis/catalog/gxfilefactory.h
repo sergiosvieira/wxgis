@@ -33,7 +33,7 @@ public:
 	//IGxObjectFactory
 	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray);
     virtual void Serialize(wxXmlNode* pConfig, bool bStore);
-    virtual wxString GetName(void){return wxString(wxT("wxGxFileFactory"));};
+    virtual wxString GetName(void){return GetClassInfo()->GetClassName();};
 protected:
     wxArrayString m_ExtArray;
 };
