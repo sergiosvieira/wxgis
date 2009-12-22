@@ -66,16 +66,16 @@ wxGxContentView::~wxGxContentView(void)
 	ResetContents();
 }
 
-bool wxGxContentView::Activate(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* pConf)
+bool wxGxContentView::Activate(IGxApplication* application, wxXmlNode* pConf)
 {
-	wxGxView::Activate(application, Catalog, pConf);
+	wxGxView::Activate(application, pConf);
 	Serialize(m_pXmlConf, false);
 
-	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pCatalog );
+	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( application->GetCatalog() );
 	if(m_pConnectionPointCatalog != NULL)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
-	m_pSelection = m_pCatalog->GetSelection();
+	m_pSelection = application->GetCatalog()->GetSelection();
 	//m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( m_pSelection );
 	//if(m_pConnectionPointSelection != NULL)
 	//	m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);

@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxtreeview.h"
+#include "wxgis/framework/framework.h"
 
 BEGIN_EVENT_TABLE(wxGxTreeView, wxTreeCtrl)
     EVT_TREE_BEGIN_LABEL_EDIT(TREECTRLID, wxGxTreeView::OnBeginLabelEdit)
@@ -196,18 +197,18 @@ void wxGxTreeView::OnEndLabelEdit(wxTreeEvent& event)
 	}
 }
 
-bool wxGxTreeView::Activate(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* pConf)
+bool wxGxTreeView::Activate(IGxApplication* application, wxXmlNode* pConf)
 { 
-	if(!wxGxView::Activate(application, Catalog, pConf))
+	if(!wxGxView::Activate(application, pConf))
 		return false;
 
-	AddRoot(dynamic_cast<IGxObject*>(m_pCatalog));
+    AddRoot(dynamic_cast<IGxObject*>(application->GetCatalog()));
 
-	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pCatalog );
+	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( application->GetCatalog() );
 	if(m_pConnectionPointCatalog != NULL)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
-	m_pSelection = m_pCatalog->GetSelection();
+	m_pSelection = application->GetCatalog()->GetSelection();
 	m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( m_pSelection );
 	if(m_pConnectionPointSelection != NULL)
 		m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
@@ -418,7 +419,7 @@ void wxGxTreeView::OnObjectRefreshed(IGxObject* object)
 void wxGxTreeView::OnRefreshAll(void)
 {
 	DeleteAllItems();
-	AddRoot(dynamic_cast<IGxObject*>(m_pCatalog));
+	AddRoot(dynamic_cast<IGxObject*>(m_pApplication->GetCatalog()));
 }
 
 int wxGxTreeView::OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2)

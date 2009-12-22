@@ -58,10 +58,6 @@ public:
 	virtual void SerializeFramePos(bool bSave = false);
 	virtual void SerializeCommandBars(bool bSave = false);
 	virtual void OnCommand(ICommand* pCmd);
-	virtual void OnMouseDown(wxMouseEvent& event);
-	virtual void OnMouseUp(wxMouseEvent& event);
-	virtual void OnMouseDoubleClick(wxMouseEvent& event);
-	virtual void OnMouseMove(wxMouseEvent& event);
 //IApplication
 	virtual ICommand* GetCommand(long CmdID);
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
@@ -74,6 +70,10 @@ public:
 	virtual bool IsStatusBarShown(void);
 	virtual void ShowToolBarMenu(void);
 	virtual wxString GetAppName(void) = 0;
+	virtual void OnMouseDown(wxMouseEvent& event);
+	virtual void OnMouseUp(wxMouseEvent& event);
+	virtual void OnMouseDoubleClick(wxMouseEvent& event);
+	virtual void OnMouseMove(wxMouseEvent& event);
 
 protected:
 	unsigned int m_nCmdCounter;

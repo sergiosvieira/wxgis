@@ -22,25 +22,25 @@
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalog/catalog.h"
 
-class wxGxApplication;
 //-----------------------------------------------
 // wxGxView
 //-----------------------------------------------
 
-class wxGxView
+class wxGxView :
+    public IGxView
 {
 public:	
 	wxGxView(void);
 	virtual ~wxGxView(void);
-	virtual bool Activate(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* pConf);
+	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 	virtual bool Applies(IGxSelection* Selection);
 	virtual void Refresh(void){};
 	virtual wxString GetName(void);
 protected:
 	wxString m_sViewName;
-	IGxCatalog* m_pCatalog;
-	wxGxApplication* m_pApplication;
+	//IGxCatalog* m_pCatalog;
+	IGxApplication* m_pApplication;
 	wxXmlNode* m_pXmlConf;
 };
 

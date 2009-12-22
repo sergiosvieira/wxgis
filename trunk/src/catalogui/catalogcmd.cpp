@@ -24,7 +24,8 @@
 #include "../../art/location16.xpm"
 
 #include "wxgis/catalog/catalog.h"
-#include "wxgis/catalogui/gxapplication.h"
+#include "wxgis/catalogui/catalogui.h"
+//#include "wxgis/catalogui/gxapplication.h"
 #include "wxgis/catalog/gxdiscconnection.h"
 #include "wxgis/catalogui/gxlocationcombobox.h"
 
@@ -122,7 +123,7 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 		case 0://Up One Level
 		{
 			//check if not root
-			wxGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(m_pApp);
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
 			{
 				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
@@ -141,7 +142,7 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 		case 2:
 		{
 			//check if dynamic_cast<wxGxDiscConnection*>
-			wxGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(m_pApp);
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
 			{
 				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
@@ -205,7 +206,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 	{
 		case 0:	
 			{
-				wxGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(m_pApp);
+				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 				if(pGxApp)
 				{
 					IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
@@ -231,7 +232,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 			wxDirDialog dlg(dynamic_cast<wxWindow*>(m_pApp), wxString(_("Choose a folder to connect")));
 			if(dlg.ShowModal() == wxID_OK)
 			{
-				wxGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(m_pApp);
+				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 				if(pGxApp)
 				{
 					wxString sPath = dlg.GetPath();
@@ -242,7 +243,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 		}
 		case 2:	
 		{
-			wxGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(m_pApp);
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
 			{
 				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();

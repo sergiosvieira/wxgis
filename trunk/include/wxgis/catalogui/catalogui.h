@@ -22,6 +22,7 @@
 #pragma once
 
 #include "wxgis/base.h"
+#include "wxgis/catalog/catalog.h"
 
 #define TREECTRLID	1005 //wxGxCatalog tree
 #define LISTCTRLID	1006 //wxGxCatalog contents view
@@ -35,4 +36,22 @@ class IGxViewsFactory
 public:
 	virtual ~IGxViewsFactory(void){};
 	virtual wxWindow* CreateView(wxString sName, wxWindow* parent) = 0;
+};
+
+class IGxApplication
+{
+public:
+	virtual ~IGxApplication(void){};
+	virtual IGxCatalog* GetCatalog(void) = 0;
+};
+
+class IGxView
+{
+public:
+	virtual ~IGxView(void){};
+	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf) = 0;
+	virtual void Deactivate(void) = 0;
+	virtual bool Applies(IGxSelection* Selection) = 0;
+	virtual void Refresh(void) = 0;
+	virtual wxString GetName(void) = 0;
 };

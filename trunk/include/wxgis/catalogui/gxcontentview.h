@@ -41,7 +41,7 @@ public:
 	void SetStyle(LISTSTYLE style);
 	void ResetContents(void);
 //IGxView
-	virtual bool Activate(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* pConf);
+	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 	virtual bool Applies(IGxSelection* Selection);
 //IGxSelectionEvents

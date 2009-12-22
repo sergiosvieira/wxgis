@@ -29,10 +29,13 @@ BEGIN_EVENT_TABLE(wxGxTab, wxPanel)
 	EVT_CHOICE(wxID_ANY, wxGxTab::OnChoice)
 END_EVENT_TABLE()
 
-wxGxTab::wxGxTab(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* pTabDesc, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style), m_bShowChoices(false), m_pCurrentWnd(NULL)
+wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style), m_bShowChoices(false), m_pCurrentWnd(NULL)
 {
 	m_sName = wxGetTranslation( pTabDesc->GetPropVal(wxT("name"), NONAME) );
 	m_bShowChoices = pTabDesc->GetPropVal(wxT("show_choices"), wxT("f")) == wxT("f") ? false : true;
+    IApplication* pApp = dynamic_cast<IApplication*>(application);
+    if(!pApp)
+        return;
 
 	wxXmlNode* pChild = pTabDesc->GetChildren();
 	while(pChild)
@@ -50,12 +53,12 @@ wxGxTab::wxGxTab(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* p
 			if(pWnd != NULL)
 			{
 				pWnd->Hide();
-				application->RegisterChildWindow(pWnd);
+				pApp->RegisterChildWindow(pWnd);
 
 				wxGxView* pView = dynamic_cast<wxGxView*>(pWnd);
 				if(pView != NULL)
 				{
-					pView->Activate(application, Catalog, pChild);
+					pView->Activate(application, pChild);
 					if(m_pWindows.size() < nPriority)
 						for(size_t i = 0; i < nPriority + 1; i++)
 							m_pWindows.push_back(NULL);
@@ -134,7 +137,7 @@ wxGxTab::wxGxTab(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* p
 	this->SetSizer( m_bSizerMain );
 	this->Layout();
 
-	m_pSelection = Catalog->GetSelection();
+	m_pSelection = application->GetCatalog()->GetSelection();
 }
 
 wxGxTab::~wxGxTab(void)
@@ -326,17 +329,17 @@ wxGxTabView::~wxGxTabView(void)
 {
 }
 
-bool wxGxTabView::Activate(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* pConf)
+bool wxGxTabView::Activate(IGxApplication* application, wxXmlNode* pConf)
 {
-	if(!application || !Catalog || !pConf)
+	if(!application || !pConf)
 		return false;
-	wxGxView::Activate(application, Catalog, pConf);
+	wxGxView::Activate(application, pConf);
 
 	wxXmlNode* pChild = m_pXmlConf->GetChildren();
 	wxUint8 count(0);
 	while(pChild)
 	{
-		wxGxTab* pGxTab = new wxGxTab(application, Catalog, pChild, this);
+		wxGxTab* pGxTab = new wxGxTab(application, pChild, this);
 		//wxWindow* pWnd = pGxTab->GetWindow(0);
 		//if(pWnd == NULL)
 		//	pWnd = new wxWindow(this, wxID_ANY);
@@ -349,7 +352,7 @@ bool wxGxTabView::Activate(wxGxApplication* application, IGxCatalog* Catalog, wx
 		pChild = pChild->GetNext();
 	}
 
-	m_pSelection = m_pCatalog->GetSelection();
+	m_pSelection = application->GetCatalog()->GetSelection();
 	m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( m_pSelection );
 	if(m_pConnectionPointSelection != NULL)
 		m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
