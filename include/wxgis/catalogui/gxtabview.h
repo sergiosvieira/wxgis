@@ -42,7 +42,7 @@ class wxGxTab :
 	public IGxSelectionEvents
 {
 public:
-	wxGxTab(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* pTabDesc, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL);
+	wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL);
 	virtual ~wxGxTab(void);
 	virtual wxString GetName(void);
 	virtual wxWindow* GetWindow(int iIndex);
@@ -87,7 +87,7 @@ public:
 	virtual ~wxGxTabView(void);
 	virtual wxWindow* GetCurrentWnd(void);
 //IGxView
-	virtual bool Activate(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* pConf);
+	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 //IGxSelectionEvents
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);

@@ -21,7 +21,8 @@
 #include "wxgis/catalogui/gxmapview.h"
 #include "wxgis/carto/featurelayer.h"
 #include "wxgis/carto/rasterlayer.h"
-#include "wxgis/catalogui/gxapplication.h"
+#include "wxgis/framework/framework.h"
+//#include "wxgis/catalogui/gxapplication.h"
 
 BEGIN_EVENT_TABLE(wxGxMapView, wxGISMapView)
 	EVT_LEFT_DOWN(wxGxMapView::OnMouseDown)
@@ -36,7 +37,7 @@ BEGIN_EVENT_TABLE(wxGxMapView, wxGISMapView)
 	EVT_MOTION(wxGxMapView::OnMouseMove)
 END_EVENT_TABLE()
 
-wxGxMapView::wxGxMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxGISMapView(parent, id, pos, size)
+wxGxMapView::wxGxMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxGISMapView(parent, id, pos, size), m_pStatusBar(NULL)
 {
 	m_sViewName = wxString(_("Geography View"));
 }
@@ -45,13 +46,16 @@ wxGxMapView::~wxGxMapView(void)
 {
 }
 
-bool wxGxMapView::Activate(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* pConf)
+bool wxGxMapView::Activate(IGxApplication* application, wxXmlNode* pConf)
 {
-	wxGxView::Activate(application, Catalog, pConf);
+	wxGxView::Activate(application, pConf);
 	//Serialize(m_pXmlConf, false);
 
-	m_pSelection = m_pCatalog->GetSelection();
-	m_pStatusBar = application->GetStatusBar();
+    m_pSelection = application->GetCatalog()->GetSelection();
+    m_pApp = dynamic_cast<IApplication*>(application);
+    if(!m_pApp)
+        return false;
+	m_pStatusBar = m_pApp->GetStatusBar();
 	GetTrackCancel()->SetProgressor(m_pStatusBar->GetAnimation());
 	//m_pAni = static_cast<wxGISAnimation*>(m_pStatusBar->GetAnimation());
 
@@ -159,28 +163,28 @@ void wxGxMapView::OnMouseMove(wxMouseEvent& event)
 		delete [] pGeoPoints;
 	}
 
-	if(m_pApplication)
-		m_pApplication->OnMouseMove(event);
+	if(m_pApp)
+		m_pApp->OnMouseMove(event);
 	event.Skip();
 }
 
 void wxGxMapView::OnMouseDown(wxMouseEvent& event)
 {
-	if(m_pApplication)
-		m_pApplication->OnMouseDown(event);
+	if(m_pApp)
+		m_pApp->OnMouseDown(event);
 	event.Skip();
 }
 
 void wxGxMapView::OnMouseUp(wxMouseEvent& event)
 {
-	if(m_pApplication)
-		m_pApplication->OnMouseUp(event);
+	if(m_pApp)
+		m_pApp->OnMouseUp(event);
 	event.Skip();
 }
 
 void wxGxMapView::OnMouseDoubleClick(wxMouseEvent& event)
 {
-	if(m_pApplication)
-		m_pApplication->OnMouseDoubleClick(event);
+	if(m_pApp)
+		m_pApp->OnMouseDoubleClick(event);
 	event.Skip();
 }

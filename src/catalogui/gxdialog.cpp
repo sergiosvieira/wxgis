@@ -22,6 +22,23 @@
 #include "wxgis/catalogui/gxdialog.h"
 
 
+//////////////////////////////////////////////////////////////////////////////
+// wxTreeViewComboPopup
+//////////////////////////////////////////////////////////////////////////////
+
+BEGIN_EVENT_TABLE(wxTreeViewComboPopup, wxTreeCtrl)
+    EVT_MOTION(wxTreeViewComboPopup::OnMouseMove)
+    EVT_LEFT_UP(wxTreeViewComboPopup::OnMouseClick)
+END_EVENT_TABLE()
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// wxGxDialog
+//////////////////////////////////////////////////////////////////////////////
+
 wxGxDialog::wxGxDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxSize( 400,300 ), wxDefaultSize );
@@ -34,18 +51,21 @@ wxGxDialog::wxGxDialog( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_staticText1->Wrap( -1 );
 	bHeaderSizer->Add( m_staticText1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_treecombo = new wxComboBox( this, wxID_ANY, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
-	bHeaderSizer->Add( m_treecombo, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_TreeCombo = new wxComboCtrl( this, wxID_ANY, _("Combo!"), wxDefaultPosition, wxDefaultSize, wxCB_READONLY); 
+    wxTreeViewComboPopup* popupCtrl = new wxTreeViewComboPopup();
+    m_TreeCombo->SetPopupControl(popupCtrl);
+
+	bHeaderSizer->Add( m_TreeCombo, 1, wxALL | wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_toolBar = new wxToolBar( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTB_FLAT|wxTB_HORIZONTAL|wxTB_NODIVIDER );
-	m_toolBar->SetToolBitmapSize( wxSize( 16,16 ) );
-	//m_toolBar->AddTool( wxID_ANY, _("tool"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString );
-	//m_toolBar->AddTool( wxID_ANY, _("tool"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString );
-	//m_toolBar->AddTool( wxID_ANY, _("tool"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString );
-	//m_toolBar->AddTool( wxID_ANY, _("tool"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString );
-	//m_toolBar->Realize();
-	
-	bHeaderSizer->Add( m_toolBar, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	//m_toolBar = new wxToolBar( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTB_FLAT|wxTB_HORIZONTAL|wxTB_NODIVIDER );
+	//m_toolBar->SetToolBitmapSize( wxSize( 16,16 ) );
+	////m_toolBar->AddTool( wxID_ANY, _("tool"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString );
+	////m_toolBar->AddTool( wxID_ANY, _("tool"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString );
+	////m_toolBar->AddTool( wxID_ANY, _("tool"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString );
+	////m_toolBar->AddTool( wxID_ANY, _("tool"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString );
+	////m_toolBar->Realize();
+	//
+	//bHeaderSizer->Add( m_toolBar, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	bMainSizer->Add( bHeaderSizer, 0, wxEXPAND, 5 );
 	
@@ -72,8 +92,8 @@ wxGxDialog::wxGxDialog( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_staticText6->Wrap( -1 );
 	fgCeilSizer->Add( m_staticText6, 0, wxALL|wxALIGN_RIGHT, 5 );
 	
-	m_comboBox2 = new wxComboBox( this, wxID_ANY, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_DROPDOWN|wxCB_READONLY|wxCB_SORT ); 
-	fgCeilSizer->Add( m_comboBox2, 0, wxALL|wxEXPAND, 5 );
+	m_WildcardCombo = new wxComboBox( this, wxID_ANY, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_DROPDOWN|wxCB_READONLY|wxCB_SORT ); 
+	fgCeilSizer->Add( m_WildcardCombo, 0, wxALL|wxEXPAND, 5 );
 	
 	m_CancelButton = new wxButton( this, wxID_ANY, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgCeilSizer->Add( m_CancelButton, 0, wxALL, 5 );

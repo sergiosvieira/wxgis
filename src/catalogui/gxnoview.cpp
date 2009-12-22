@@ -26,9 +26,9 @@ BEGIN_EVENT_TABLE(wxGxNoView, wxControl)
     EVT_ERASE_BACKGROUND(wxGxNoView::OnEraseBackground)
 END_EVENT_TABLE()
 
-bool wxGxNoView::Activate(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* pConf)
+bool wxGxNoView::Activate(IGxApplication* application, wxXmlNode* pConf)
 {
-	wxGxView::Activate(application, Catalog, pConf);
+	wxGxView::Activate(application, pConf);
 	Serialize(m_pXmlConf, false);
 	return true;
 }

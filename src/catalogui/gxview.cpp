@@ -34,18 +34,18 @@ wxGxView::~wxGxView(void)
 {
 }
 
-bool wxGxView::Activate(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* pConf)
+bool wxGxView::Activate(IGxApplication* application, wxXmlNode* pConf)
 { 
-	m_pCatalog = Catalog; 
 	m_pApplication = application; 
+	//m_pCatalog = m_pApplication->GetCatalog(); 
 	m_pXmlConf = pConf;
 	return true; 
 }
 
 void wxGxView::Deactivate(void)
 {
-	m_pCatalog = NULL;
 	m_pApplication = NULL;
+	//m_pCatalog = NULL;
 	m_pXmlConf = NULL;
 }
 

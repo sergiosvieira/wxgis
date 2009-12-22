@@ -66,7 +66,7 @@ public:
     void OnEndLabelEdit(wxTreeEvent& event);
     void OnSelChanged(wxTreeEvent& event);
 //IGxView
-	virtual bool Activate(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* pConf);
+	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 //IGxSelectionEvents
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
@@ -76,7 +76,7 @@ public:
 	virtual void OnObjectDeleted(IGxObject* object);
 	virtual void OnObjectRefreshed(IGxObject* object);
 	virtual void OnRefreshAll(void);
-//wxGxView
+//wxTreeCtrl
     virtual int OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2);
 
 	typedef std::map<IGxObject*, wxTreeItemId> WETREEMAP; 

@@ -38,7 +38,7 @@ public:
 	void OnMouseUp(wxMouseEvent& event);
 	void OnMouseDoubleClick(wxMouseEvent& event);
 //IGxView
-	virtual bool Activate(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* pConf);
+	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 	virtual bool Applies(IGxSelection* Selection);
 //IGxSelectionEvents
@@ -47,6 +47,7 @@ private:
 	IGxSelection* m_pSelection;
 	IGxObject* m_pParentGxObject;
 	IStatusBar* m_pStatusBar;
+	IApplication* m_pApp;
 
 	DECLARE_EVENT_TABLE()
 };

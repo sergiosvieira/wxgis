@@ -35,7 +35,7 @@ public:
     void OnEraseBackground(wxEraseEvent& WXUNUSED(evt));
     void OnSize(wxSizeEvent& WXUNUSED(evt));
 //IGxView
-	virtual bool Activate(wxGxApplication* application, IGxCatalog* Catalog, wxXmlNode* pConf);
+	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 private:
 	unsigned char R,G,B;

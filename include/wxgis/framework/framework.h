@@ -223,6 +223,11 @@ public:
 	virtual WINDOWARRAY* GetChildWindows(void) = 0;
 	virtual void RegisterChildWindow(wxWindow* pWnd) = 0;
 	virtual wxString GetAppName(void) = 0;
+    //events
+	virtual void OnMouseDown(wxMouseEvent& event) = 0;
+	virtual void OnMouseUp(wxMouseEvent& event) = 0;
+	virtual void OnMouseDoubleClick(wxMouseEvent& event) = 0;
+	virtual void OnMouseMove(wxMouseEvent& event) = 0;
 };
 
 class ICommand :
