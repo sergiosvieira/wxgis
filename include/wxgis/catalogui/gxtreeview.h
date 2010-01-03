@@ -27,6 +27,10 @@
 
 #include "../../art/document.xpm"
 
+//////////////////////////////////////////////////////////////////////////////
+// wxGxTreeItemData
+//////////////////////////////////////////////////////////////////////////////
+
 class wxGxTreeItemData : public wxTreeItemData
 {
 public:
@@ -47,24 +51,24 @@ public:
 	bool m_bExpandedOnce;
 };
 
-class WXDLLIMPEXP_GIS_CLU wxGxTreeView :
+//////////////////////////////////////////////////////////////////////////////
+// wxGxTreeViewBase
+//////////////////////////////////////////////////////////////////////////////
+
+class WXDLLIMPEXP_GIS_CLU wxGxTreeViewBase :
 	public wxTreeCtrl,
 	public wxGxView,
 	public IGxSelectionEvents,
 	public IGxCatalogEvents
 {
-    DECLARE_DYNAMIC_CLASS(wxGxTreeView)
+    DECLARE_DYNAMIC_CLASS(wxGxTreeViewBase)
 public:
-    wxGxTreeView(void);
-	wxGxTreeView(wxWindow* parent, wxWindowID id = TREECTRLID);
-	virtual ~wxGxTreeView(void);
-	void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, bool sort = true);
-	void AddRoot(IGxObject* pGxObject);
-//
-	void OnItemExpanding(wxTreeEvent& event);
-    void OnBeginLabelEdit(wxTreeEvent& event);
-    void OnEndLabelEdit(wxTreeEvent& event);
-    void OnSelChanged(wxTreeEvent& event);
+    wxGxTreeViewBase(void);
+	wxGxTreeViewBase(wxWindow* parent, wxWindowID id, long style);
+	virtual ~wxGxTreeViewBase(void);
+    bool Create(wxWindow* parent, wxWindowID id, long style);
+	virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, bool sort = true);
+	virtual void AddRoot(IGxObject* pGxObject);
 //IGxView
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
@@ -78,14 +82,37 @@ public:
 	virtual void OnRefreshAll(void);
 //wxTreeCtrl
     virtual int OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2);
+//
+	virtual void OnItemExpanding(wxTreeEvent& event);
 
 	typedef std::map<IGxObject*, wxTreeItemId> WETREEMAP; 
-private:
+protected:
 	wxImageList m_TreeImageList;
 	WETREEMAP m_TreeMap;
 	IConnectionPointContainer* m_pConnectionPointCatalog, *m_pConnectionPointSelection;
 	long m_ConnectionPointCatalogCookie, m_ConnectionPointSelectionCookie;
 	IGxSelection* m_pSelection;
+
+    DECLARE_EVENT_TABLE()
+};
+
+
+//////////////////////////////////////////////////////////////////////////////
+// wxGxTreeView
+//////////////////////////////////////////////////////////////////////////////
+
+class WXDLLIMPEXP_GIS_CLU wxGxTreeView :
+	public wxGxTreeViewBase
+{
+    DECLARE_DYNAMIC_CLASS(wxGxTreeView)
+public:
+    wxGxTreeView(void);
+	wxGxTreeView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxBORDER_NONE | wxTR_EDIT_LABELS /*| wxTR_MULTIPLE| wxTR_HIDE_ROOT | wxTR_LINES_AT_ROOT*/);
+	virtual ~wxGxTreeView(void);
+//
+    void OnBeginLabelEdit(wxTreeEvent& event);
+    void OnEndLabelEdit(wxTreeEvent& event);
+    void OnSelChanged(wxTreeEvent& event);
 
     DECLARE_EVENT_TABLE()
 };

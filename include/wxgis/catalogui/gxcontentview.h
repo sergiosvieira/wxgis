@@ -34,7 +34,7 @@ public:
 	typedef enum _listsyle{ REPORT, SMALL, LARGE, LIST } LISTSTYLE, *LPLISTSTYLE;
 
 	wxGxContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, 
-						 const wxSize& size = wxDefaultSize);
+						 const wxSize& size = wxDefaultSize, long style = wxLC_REPORT | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING);
 	virtual ~wxGxContentView(void);
 	void Serialize(wxXmlNode* pRootNode, bool bStore);
 	void AddObject(IGxObject* pObject);
@@ -53,16 +53,16 @@ public:
 	virtual void OnObjectRefreshed(IGxObject* object);
 	virtual void OnRefreshAll(void);
 //events
-	void OnColClick(wxListEvent& event);
-    void OnContextMenu(wxContextMenuEvent& event);
-	void ShowContextMenu(const wxPoint& pos);
-	void SetColumnImage(int col, int image);
-    void OnActivated(wxListEvent& event);
-    void OnBeginLabelEdit(wxListEvent& event);
-	void OnEndLabelEdit(wxListEvent& event);
-	void OnSelected(wxListEvent& event);
-	void OnDeselected(wxListEvent& event);
-	void OnLeftDown(wxMouseEvent& event);
+	virtual void OnColClick(wxListEvent& event);
+    virtual void OnContextMenu(wxContextMenuEvent& event);
+	virtual void ShowContextMenu(const wxPoint& pos);
+	virtual void SetColumnImage(int col, int image);
+    virtual void OnActivated(wxListEvent& event);
+    virtual void OnBeginLabelEdit(wxListEvent& event);
+	virtual void OnEndLabelEdit(wxListEvent& event);
+	virtual void OnSelected(wxListEvent& event);
+	virtual void OnDeselected(wxListEvent& event);
+	virtual void OnLeftDown(wxMouseEvent& event);
 
 
 	typedef struct _itemdata
@@ -71,7 +71,7 @@ public:
 		int iImageIndex;
 	} ITEMDATA, *LPITEMDATA;
 
-private:
+protected:
 	bool m_bSortAsc;
 	short m_currentSortCol;
 	LISTSTYLE m_current_style;

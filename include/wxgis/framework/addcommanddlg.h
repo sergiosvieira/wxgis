@@ -47,7 +47,7 @@ class WXDLLIMPEXP_GIS_FRW wxGISAddCommandDlg : public wxDialog
 		ID_LSTBX = wxID_HIGHEST + 20,
 		ID_LSTCTRL,
 		ID_ONSETKEYCODE,
-		MENUID = wxGISApplication::ID_PLUGINCMD + 1200
+		MENUID = ID_PLUGINCMD + 1200
 	};
 public:
 	typedef std::map<wxString, COMMANDARRAY*> CATEGORYMAP;

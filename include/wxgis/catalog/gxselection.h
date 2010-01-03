@@ -35,6 +35,7 @@ public:
 	virtual ~wxGxSelection(void);
 	//IGxSelection
 	virtual void Select( IGxObject* pObject,  bool appendToExistingSelection, long nInitiator);
+    virtual void Select( IGxObject* pObject);
 	virtual void Unselect(IGxObject* pObject, long nInitiator);
 	virtual void Clear(long nInitiator);
 	//IConnectionPointContainer

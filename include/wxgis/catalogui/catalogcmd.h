@@ -22,9 +22,12 @@
 #include "wxgis/framework/framework.h"
 
 class wxGISCatalogMainCmd :
-	public IToolControl
+    public ICommand,
+	public IToolControl,
+    public IDropDownCommand
 {
-	DECLARE_DYNAMIC_CLASS(wxGISCatalogMainCmd)
+    DECLARE_DYNAMIC_CLASS(wxGISCatalogMainCmd)
+    
 public:
 	wxGISCatalogMainCmd(void);
 	virtual ~wxGISCatalogMainCmd(void);
@@ -44,6 +47,9 @@ public:
 	virtual IToolBarControl* GetControl(void);
 	virtual wxString GetToolLabel(void);
 	virtual bool HasToolLabel(void);
+    //IDropDownCommand
+   	virtual wxMenu* GetDropDownMenu(void);
+    virtual void OnDropDownCommand(int nID);
 private:
 	IApplication* m_pApp;
 	wxImageList m_ImageList;

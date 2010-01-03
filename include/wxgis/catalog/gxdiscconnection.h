@@ -37,6 +37,7 @@ public:
 	virtual wxString NewMenu(void){return wxString(wxT("wxGxDiscConnection.NewMenu"));};
 	//IGxObjectEdit
 	virtual bool Delete(void);
+	virtual bool CanDelete(void){return false;};
 	virtual bool Rename(wxString NewName);
 	virtual void EditProperties(wxWindow *parent);
 	//IGxObjectContainer

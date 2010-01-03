@@ -63,6 +63,11 @@ void wxGxLocationComboBox::OnSelectionChanged(IGxSelection* Selection, long nIni
 	if(sPath.IsEmpty())
 		sPath = pGxObj->GetName();
 	SetValue(sPath);
+    wxFrame* pFrame = dynamic_cast<wxFrame*>(m_pApp);
+    if(pFrame)
+    {
+        pFrame->SetTitle(m_pApp->GetAppName() + wxT(" - [") + sPath + wxT("]"));
+    }
 }
 
 void wxGxLocationComboBox::Activate(IApplication* pApp)

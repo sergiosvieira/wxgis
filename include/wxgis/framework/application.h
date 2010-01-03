@@ -31,11 +31,6 @@ class WXDLLIMPEXP_GIS_FRW wxGISApplication :
 	public IApplication
 {
 public:
-	enum
-    {
-		ID_PLUGINCMD = wxID_HIGHEST + 1
-    };	
-
 	//constructor
 	wxGISApplication(IGISConfig* pConfig, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER );//| wxWS_EX_VALIDATE_RECURSIVELY
 	//destructor
@@ -44,8 +39,11 @@ public:
     void OnEraseBackground(wxEraseEvent& event);
     void OnSize(wxSizeEvent& event);
 	void OnCommand(wxCommandEvent& event);
+	void OnDropDownCommand(wxCommandEvent& event);
 	void OnCommandUI(wxUpdateUIEvent& event);
 	void OnRightDown(wxMouseEvent& event);
+	void OnRightDown(wxAuiToolBarEvent& event);
+	void OnToolDropDown(wxAuiToolBarEvent& event);
 //
 	virtual wxStatusBar* OnCreateStatusBar(int number, long style, wxWindowID id, const wxString& name);
 	virtual void LoadCommands(wxXmlNode* pRootNode);
@@ -76,13 +74,13 @@ public:
 	virtual void OnMouseMove(wxMouseEvent& event);
 
 protected:
-	unsigned int m_nCmdCounter;
 	IGISConfig* m_pConfig;
 	COMMANDARRAY m_CommandArray;
 	COMMANDBARARRAY m_CommandBarArray;
 	wxGISAcceleratorTable* m_pGISAcceleratorTable;
 	wxGISMenuBar* m_pMenuBar;
 	ITool* m_CurrentTool;
+    IDropDownCommand* m_pDropDownCommand;
 
     DECLARE_EVENT_TABLE()
 };

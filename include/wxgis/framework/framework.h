@@ -28,6 +28,12 @@
 #define wgWX2MB(x)  wxConvCurrent->cWX2MB(x)
 #define wgMB2WX(x)  wxConvCurrent->cMB2WX(x)
 
+enum wxGISPluginIDs
+{
+	ID_PLUGINCMD = wxID_HIGHEST + 1,
+    ID_MENUCMD = ID_PLUGINCMD + 1050
+};	
+
 enum wxGISEnumMouseState
 {
 	enumGISMouseNone = 0x0000, 
@@ -67,7 +73,8 @@ enum wxGISEnumCommandKind
 	enumGISCommandRadio = wxITEM_RADIO,
 	enumGISCommandMax = wxITEM_MAX,
 	enumGISCommandMenu = wxITEM_MAX + 10,
-	enumGISCommandControl
+	enumGISCommandControl,
+    enumGISCommandDropDown
 };
 
 enum wxGISEnumConfigKey
@@ -268,8 +275,7 @@ public:
 	virtual void Deactivate(void) = 0;
 };
 
-class IToolControl :
-	public ICommand
+class IToolControl
 {
 public:
 	virtual ~IToolControl(void) {};
@@ -289,4 +295,12 @@ public:
 	virtual void OnMouseUp(wxMouseEvent& event) = 0;
 	virtual void OnMouseMove(wxMouseEvent& event) = 0;
 	virtual void OnMouseDoubleClick(wxMouseEvent& event) = 0;
+};
+
+class IDropDownCommand
+{
+public:
+	virtual ~IDropDownCommand(void) {};
+	virtual wxMenu* GetDropDownMenu(void) = 0;
+	virtual void OnDropDownCommand(int nID) = 0;
 };

@@ -126,6 +126,7 @@ void wxGISCommandBar::Serialize(IApplication* pApp, wxXmlNode* pNode, bool bStor
 				case enumGISCommandRadio:
 				case enumGISCommandNormal:
 				case enumGISCommandControl:
+				case enumGISCommandDropDown:
 				{
 					pNewNode->AddProperty(wxT("type"), wxT("cmd"));
 					wxObject* pObj = dynamic_cast<wxObject*>(pCmd);
@@ -234,9 +235,20 @@ void wxGISMenu::AddCommand(ICommand* pCmd)
 		break;
 	case enumGISCommandCheck:
 	case enumGISCommandRadio:
-	case enumGISCommandNormal:
+    case enumGISCommandNormal:
 		{
 			wxMenuItem *item = new wxMenuItem(this, pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), (wxItemKind)pCmd->GetKind());
+			wxBitmap Bmp = pCmd->GetBitmap();
+			if(Bmp.IsOk())
+				item->SetBitmaps(Bmp);//SetBitmap
+			Append(item);
+			//wxMenuItem* pItem = Append(pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), pCmd->GetKind());
+			//pItem->SetBitmaps(pCmd->GetBitmap());
+		}
+		break;	
+	case enumGISCommandDropDown:
+		{
+			wxMenuItem *item = new wxMenuItem(this, pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), (wxItemKind)enumGISCommandNormal);
 			wxBitmap Bmp = pCmd->GetBitmap();
 			if(Bmp.IsOk())
 				item->SetBitmaps(Bmp);//SetBitmap
@@ -363,6 +375,16 @@ void wxGISToolBar::AddCommand(ICommand* pCmd)
 		AddTool(pCmd->GetID(), wxStripMenuCodes(pCmd->GetCaption()), Bitmap, wxBitmap(), (wxItemKind)pCmd->GetKind(), pCmd->GetTooltip(), pCmd->GetMessage(), NULL);
 		}
 		break;
+	case enumGISCommandDropDown:
+		{
+		wxBitmap Bitmap = pCmd->GetBitmap();
+		if(!Bitmap.IsOk())
+			Bitmap = wxBitmap(default_16_xpm);
+
+		AddTool(pCmd->GetID(), wxStripMenuCodes(pCmd->GetCaption()), Bitmap, wxBitmap(), (wxItemKind)enumGISCommandNormal, pCmd->GetTooltip(), pCmd->GetMessage(), NULL);
+        SetToolDropDown(pCmd->GetID(), true);
+		}
+		break;
 	case enumGISCommandControl:
 		{
 			IToolControl* pToolCtrl = dynamic_cast<IToolControl*>(pCmd);
@@ -411,7 +433,17 @@ void wxGISToolBar::ReAddCommand(ICommand* pCmd)
 		AddTool(pCmd->GetID(), wxStripMenuCodes(pCmd->GetCaption()), Bitmap, wxBitmap(), (wxItemKind)pCmd->GetKind(), pCmd->GetTooltip(), pCmd->GetMessage(), NULL);
 		}
 		break;
-		case enumGISCommandControl:
+	case enumGISCommandDropDown:
+		{
+		wxBitmap Bitmap = pCmd->GetBitmap();
+		if(!Bitmap.IsOk())
+			Bitmap = wxBitmap(default_16_xpm);
+
+		AddTool(pCmd->GetID(), wxStripMenuCodes(pCmd->GetCaption()), Bitmap, wxBitmap(), (wxItemKind)enumGISCommandNormal, pCmd->GetTooltip(), pCmd->GetMessage(), NULL);
+        SetToolDropDown(pCmd->GetID(), true);
+		}
+		break;		
+    case enumGISCommandControl:
 			return;
 	}
 }
