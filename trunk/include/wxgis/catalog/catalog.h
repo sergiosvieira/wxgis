@@ -45,7 +45,7 @@ public:
 		INIT_ALL = -2, 
 		INIT_NONE = -1
 	} Initiator;
-	IGxSelection(void) : m_currentInitiator(-1){};
+	IGxSelection(void) : m_currentInitiator(-1), m_Pos(-1), m_bDoOp(false) {};
 	virtual ~IGxSelection(void)
 	{
 		for(std::map<long, GxObjectArray*>::iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
@@ -60,6 +60,8 @@ public:
 			m_SelectionMap[nInitiator] = new GxObjectArray;
 		m_SelectionMap[nInitiator]->push_back(pObject);
 	}
+	virtual void Select( IGxObject* pObject) = 0;
+
 	virtual void Unselect(IGxObject* pObject, long nInitiator)
 	{
 		if(pObject == NULL)
@@ -74,9 +76,17 @@ public:
 			}
 		}
 
+        GxObjectArray::iterator pos = std::find(m_DoArray.begin(), m_DoArray.end(), pObject);
+		if(pos != m_DoArray.end())
+        {
+            if(m_Pos > m_DoArray.begin() - pos)
+                m_Pos--;
+			m_DoArray.erase(pos);
+        }
+
 		if(m_SelectionMap[nInitiator] == NULL)
 			return;
-		GxObjectArray::iterator pos = std::find(m_SelectionMap[nInitiator]->begin(), m_SelectionMap[nInitiator]->end(), pObject);
+		pos = std::find(m_SelectionMap[nInitiator]->begin(), m_SelectionMap[nInitiator]->end(), pObject);
 		if(pos != m_SelectionMap[nInitiator]->end())
 			m_SelectionMap[nInitiator]->erase(pos);
 	}
@@ -109,10 +119,85 @@ public:
 	{
 		return m_SelectionMap[nInitiator];
 	}
+
+    virtual void Do(IGxObject* pObject)
+    {
+        if(m_bDoOp)
+            return;
+        if(!m_DoArray.empty())
+            if(m_DoArray[m_DoArray.size() - 1] == pObject)
+                return;
+	    m_Pos++;
+	    if(m_Pos == m_DoArray.size())
+		    m_DoArray.push_back(pObject);
+	    else
+	    {
+		    m_DoArray[m_Pos] = pObject;
+		    m_DoArray.erase(m_DoArray.begin() + m_Pos + 1, m_DoArray.end());
+	    }
+
+	    //Select(pObject);
+    }
+    virtual bool CanRedo()
+    {
+	    if(m_DoArray.empty())
+		    return false;
+        return m_Pos < m_DoArray.size() - 1;
+    }
+	virtual bool CanUndo()
+    {
+	    if(m_DoArray.empty())
+		    return false;
+	    return m_Pos > 0;
+    }
+    virtual void Redo(int nPos = -1)
+    {
+        if(nPos == -1)
+            m_Pos++;
+        else
+            m_Pos = nPos;
+	    if(m_Pos < m_DoArray.size())
+	    {
+		    IGxObject* pObject = m_DoArray[m_Pos];
+            m_bDoOp = true;
+		    Select(pObject);
+            m_bDoOp = false;
+	    }
+    }
+    virtual void Undo(int nPos = -1)
+    {
+        if(nPos == -1)
+            m_Pos--;
+        else
+            m_Pos = nPos;
+	    if(m_Pos > -1)
+	    {
+		    IGxObject* pObject = m_DoArray[m_Pos];
+            m_bDoOp = true;
+		    Select(pObject);
+            m_bDoOp = false;
+	    }
+    }
+    virtual void Reset()
+    {
+	    m_DoArray.clear();
+        m_bDoOp = false;
+	    m_Pos = -1;
+    }
+    virtual size_t GetSize()
+    {
+	    return m_DoArray.size();
+    }
+    virtual int GetDoPos(void){return m_Pos;};
+    virtual GxObjectArray* GetDoArray(void){return &m_DoArray;};
+
 protected:
 	//GxObjectArray m_Selection;
 	std::map<long, GxObjectArray*> m_SelectionMap;
 	long m_currentInitiator;
+	GxObjectArray m_DoArray;
+	int m_Pos;
+    bool m_bDoOp;
 };
 
 class IGxSelectionEvents

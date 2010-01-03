@@ -60,3 +60,27 @@ wxIcon wxGxPrjFile::GetSmallImage(void)
 	return wxIcon(sr_16_2_xpm);
 }
 
+bool wxGxPrjFile::Delete(void)
+{
+	//if(wxFileName::Rmdir(m_sPath))
+	//{
+	//	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
+	//	if(pGxObjectContainer == NULL)
+	//		return false;
+	//	return pGxObjectContainer->DeleteChild(this);		
+	//}
+	//else
+		return false;	
+}
+
+bool wxGxPrjFile::Rename(wxString NewName)
+{
+	//rename ?
+	m_sName = NewName; 
+	m_pCatalog->ObjectChanged(this);
+	return true;
+}
+
+void wxGxPrjFile::EditProperties(wxWindow *parent)
+{
+}

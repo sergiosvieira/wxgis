@@ -41,75 +41,83 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 
+#include "wxgis/framework/config.h"
+#include "wxgis/catalog/catalog.h"
+#include "wxgis/catalogui/catalogui.h"
+#include "wxgis/catalogui/gxcontentview.h"
+#include "wxgis/catalogui/gxtreeview.h"
+
+#define DLG_NAME wxT("wxGISDialog") 
+
+
 //////////////////////////////////////////////////////////////////////////////
 // wxTreeViewComboPopup
 //////////////////////////////////////////////////////////////////////////////
 
-class wxTreeViewComboPopup : public wxTreeCtrl,
+class wxTreeViewComboPopup : public wxGxTreeViewBase,
                              public wxComboPopup
 {
+    DECLARE_DYNAMIC_CLASS(wxTreeViewComboPopup)
 public:
 
     // Initialize member variables
-    virtual void Init()
-    {
-        m_value = -1;
-    }
-
+    virtual void Init();
+    virtual void OnPopup();
+    virtual void OnDismiss();
     // Create popup control
-    virtual bool Create(wxWindow* parent)
-    {
-        return wxTreeCtrl::Create(parent,1,wxPoint(0,0),wxDefaultSize, wxBORDER_SIMPLE | wxTR_NO_BUTTONS | wxTR_NO_LINES | wxTR_SINGLE );
-    }
-
+    virtual bool Create(wxWindow* parent);
     // Return pointer to the created control
     virtual wxWindow *GetControl() { return this; }
-
     // Translate string into a list selection
-    virtual void SetStringValue(const wxString& s)
-    {
-        //int n = wxListView::FindItem(-1,s);
-        //if ( n >= 0 && n < wxListView::GetItemCount() )
-        //    wxListView::Select(n);
-    }
-
+    virtual void SetStringValue(const wxString& s);
     // Get list selection as a string
-    virtual wxString GetStringValue() const
-    {
-        //if ( m_value >= 0 )
-        //    return wxListView::GetItemText(m_value);
-        return wxEmptyString;
-    }
-
+    virtual wxString GetStringValue() const;
+    //
     // Do mouse hot-tracking (which is typical in list popups)
-    void OnMouseMove(wxMouseEvent& event)
-    {
-        // TODO: Move selection to cursor
-    }
-
-    // On mouse left up, set the value and close the popup
-    void OnMouseClick(wxMouseEvent& WXUNUSED(event))
-    {
-        //m_value = wxListView::GetFirstSelected();
-
-        // TODO: Send event as well
-
-        Dismiss();
-    }
-
+    void OnMouseMove(wxMouseEvent& event);
+     // On mouse left up, set the value and close the popup
+    void OnMouseClick(wxMouseEvent& event);
+    void OnDblClick(wxTreeEvent& event);
+//IGxSelectionEvents
+	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
+//wxGxTreeViewBase
+    virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, bool sort = true);
 protected:
-
-    int             m_value; // current item index
-
+    wxTreeItemId m_PrewItemId;
+    bool m_bClicked;
 private:
     DECLARE_EVENT_TABLE()
 };
 
+//////////////////////////////////////////////////////////////////////////////
+// wxGxDialogContentView
+//////////////////////////////////////////////////////////////////////////////
+
+class wxGxDialogContentView : public wxGxContentView
+{
+public:
+	wxGxDialogContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, 
+						 const wxSize& size = wxDefaultSize, long style = wxLC_REPORT | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING);
+	virtual ~wxGxDialogContentView();	
+
+//IGxView
+	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
+	virtual void Deactivate(void);
+    //
+    virtual void OnActivated(wxListEvent& event);
+protected:
+	IConnectionPointContainer* m_pConnectionPointSelection;
+	long m_ConnectionPointSelectionCookie;
+};
 
 //////////////////////////////////////////////////////////////////////////////
 // wxGxDialog
 //////////////////////////////////////////////////////////////////////////////
-class wxGxDialog : public wxDialog 
+
+class wxGxDialog : 
+    public wxDialog,
+    public IGxApplication,
+    public IApplication
 {
 private:
 
@@ -117,6 +125,7 @@ protected:
 	wxBoxSizer* bMainSizer;
 	wxBoxSizer* bHeaderSizer;
 	wxStaticText* m_staticText1;
+	wxStaticText* m_staticText2;
 	wxComboCtrl* m_TreeCombo;
 	wxToolBar* m_toolBar;
 	wxListCtrl* m_listCtrl;
@@ -129,9 +138,48 @@ protected:
 	wxButton* m_CancelButton;
 
 public:
+	enum
+    {
+		ID_PLUGINCMD = wxID_HIGHEST + 1
+    };
+
 	wxGxDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,338 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 	~wxGxDialog();	
+    virtual void OnCommand(ICommand* pCmd);
+//IGxApplication
+    virtual IGxCatalog* GetCatalog(void){return m_pCatalog;};
+//IApplication
+	virtual ICommand* GetCommand(long CmdID);
+	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
+    virtual wxString GetAppName(void){return wxString(DLG_NAME);};
+    virtual IStatusBar* GetStatusBar(void){return NULL;};
+    virtual IGISConfig* GetConfig(void){return m_pConfig;};
+    virtual void OnAppAbout(void){};
+    virtual IGISCommandBar* GetCommandBar(wxString sName){return NULL;};
+    virtual void RemoveCommandBar(IGISCommandBar* pBar){};
+    virtual bool AddCommandBar(IGISCommandBar* pBar){return false;};
+    virtual void ShowStatusBar(bool bShow){};
+    virtual bool IsStatusBarShown(void){return false;};
+    virtual void ShowToolBarMenu(void){};
+	virtual WINDOWARRAY* GetChildWindows(void){return NULL;};
+    virtual void RegisterChildWindow(wxWindow* pWnd){};
+    virtual void Customize(void){};
+    virtual void ShowApplicationWindow(wxWindow* pWnd, bool bShow = true){};
+	virtual void OnMouseDown(wxMouseEvent& event){};
+	virtual void OnMouseUp(wxMouseEvent& event){};
+	virtual void OnMouseDoubleClick(wxMouseEvent& event){};
+	virtual void OnMouseMove(wxMouseEvent& event){};
+// events
+    void OnCommand(wxCommandEvent& event);
+	void OnCommandUI(wxUpdateUIEvent& event);
+protected:
+ 	COMMANDARRAY m_CommandArray;
+  	IGxCatalog* m_pCatalog;
+    wxGISAppConfig* m_pConfig;
+    wxGxDialogContentView* m_pwxGxContentView;
+    wxTreeViewComboPopup* m_PopupCtrl;
+
+    DECLARE_EVENT_TABLE()
 };
 //wxFileDialog(wxWindow* parent, const wxString& message = "Choose a file", const wxString& defaultDir = "", const wxString& defaultFile = "", const wxString& wildcard = "*.*", long style = wxFD_DEFAULT_STYLE, const wxPoint& pos = wxDefaultPosition, const wxSize& sz = wxDefaultSize, const wxString& name = "filedlg")
-
 

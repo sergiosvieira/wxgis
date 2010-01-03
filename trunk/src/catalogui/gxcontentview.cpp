@@ -42,8 +42,8 @@ int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
     return GxObjectCompareFunction(pItem1->pObject, pItem2->pObject, sortData);
 }
 
-wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : 
-wxListCtrl(parent, id, pos, size, wxLC_REPORT | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING), m_bSortAsc(true), m_current_style(REPORT), m_pConnectionPointCatalog(NULL), /*m_pConnectionPointSelection(NULL),*/ m_ConnectionPointCatalogCookie(-1)/*, m_ConnectionPointSelectionCookie(-1)*/, m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL)
+wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : 
+wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(REPORT), m_pConnectionPointCatalog(NULL), /*m_pConnectionPointSelection(NULL),*/ m_ConnectionPointCatalogCookie(-1)/*, m_ConnectionPointSelectionCookie(-1)*/, m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL)
 {
 	m_style = wxBORDER_NONE | wxLC_EDIT_LABELS;
 	InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150); 
@@ -265,6 +265,7 @@ void wxGxContentView::OnActivated(wxListEvent& event)
 	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pItemData->pObject);
 	if(pGxObjectContainer != NULL && pGxObjectContainer->HasChildren() )
 	{
+    //  m_pApplication->GetCatalog()->SetLocation(pItemData->pObject->GetFullName());
 		m_pSelection->Select(pItemData->pObject, false, GetId());
 	//	m_pCatalog->OnSelectObject(pItemData->pObject);
 	}

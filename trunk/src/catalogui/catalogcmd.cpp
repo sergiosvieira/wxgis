@@ -22,6 +22,7 @@
 
 #include "../../art/folder_conn_16.xpm"
 #include "../../art/location16.xpm"
+#include "../../art/oper_16.xpm"
 
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/catalogui/catalogui.h"
@@ -42,17 +43,21 @@
 //	1	Connect Folder
 //	2	Disconnect Folder
 //	3	Location
-//	4	Test GxDialog
-//	5	?
+//  4   Delete Item
+//  5   Back
+//  6   Forward
+//  7   Create Folder
+//	8	Test GxDialog
+//	9	?
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogMainCmd, wxObject)
-
 
 wxGISCatalogMainCmd::wxGISCatalogMainCmd(void)
 {
 	m_ImageList.Create(16, 16);
 	m_ImageList.Add(wxBitmap(folder_conn_16_xpm));	//4
-	m_ImageList.Add(wxBitmap(location16_xpm));		//7
+	m_ImageList.Add(wxBitmap(location16_xpm));		//9
+	m_ImageList.Add(wxBitmap(oper_16_xpm));		    //2
 }
 
 wxGISCatalogMainCmd::~wxGISCatalogMainCmd(void)
@@ -71,7 +76,15 @@ wxIcon wxGISCatalogMainCmd::GetBitmap(void)
 			return m_ImageList.GetIcon(3);
 		case 3:
 			return m_ImageList.GetIcon(5);
-		case 4:	
+		case 4:
+			return m_ImageList.GetIcon(14);
+		case 5:
+			return m_ImageList.GetIcon(11);
+		case 6:
+			return m_ImageList.GetIcon(12);
+		case 7:
+			return m_ImageList.GetIcon(13);
+		case 8:	
 		default:
 			return wxIcon();
 	}
@@ -90,6 +103,14 @@ wxString wxGISCatalogMainCmd::GetCaption(void)
 		case 3:	
 			return wxString(_("Location"));
 		case 4:	
+			return wxString(_("Delete"));
+		case 5:	
+			return wxString(_("Back"));//
+		case 6:	
+			return wxString(_("Forward"));//
+		case 7:	
+			return wxString(_("Create folder"));
+		case 8:	
 			return wxString(_("Test GxDialog"));
 		default:
 			return wxString();
@@ -104,8 +125,13 @@ wxString wxGISCatalogMainCmd::GetCategory(void)
 		case 1:	
 		case 2:	
 		case 3:	
-			return wxString(_("Catalog"));
 		case 4:	
+		case 5:	
+		case 6:	
+			return wxString(_("Catalog"));
+		case 7:	
+			return wxString(_("New"));
+		case 8:	
 		default:
 			return wxString(_("[No category]"));
 	}
@@ -157,7 +183,47 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 		}
 		case 3:
 			return true;
-		case 4://Gen SRS
+		case 4:
+        {
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+				GxObjectArray* pArr = pSel->GetSelectedObjects();
+                if(!pArr)
+                    return false;
+                for(size_t i = 0; i < pArr->size(); i++)
+                {
+                    IGxObject* pGxObject = pArr->at(i);
+                    IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject);
+                    if(pGxObjectEdit)
+                        if(pGxObjectEdit->CanDelete())
+                            return true;
+                }
+            }
+			return false;
+        }
+		case 5:
+        {
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+                return pGxApp->GetCatalog()->GetSelection()->CanUndo();
+            }
+			return false;
+        }
+		case 6:
+        {
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+                return pGxApp->GetCatalog()->GetSelection()->CanRedo();
+            }
+			return false;
+        }
+        case 7:
+			return false;
+		case 8://Gen SRS
 			return true;
 		default:
 			return false;
@@ -174,7 +240,15 @@ wxGISEnumCommandKind wxGISCatalogMainCmd::GetKind(void)
 			return enumGISCommandNormal;
 		case 3://location
 			return enumGISCommandControl;
-		case 4://Gen SRS
+		case 4://delete
+			return enumGISCommandNormal;
+		case 5://back
+			return enumGISCommandDropDown;
+		case 6://forward
+			return enumGISCommandDropDown;
+		case 7://create folder
+			return enumGISCommandNormal;
+		case 8://Gen SRS
 			return enumGISCommandNormal;
 		default:
 			return enumGISCommandNormal;
@@ -194,6 +268,14 @@ wxString wxGISCatalogMainCmd::GetMessage(void)
 		case 3:	
 			return wxString(_("Set or get location"));
 		case 4:	
+			return wxString(_("Delete item"));
+		case 5:	
+			return wxString(_("Go to previous location"));
+		case 6:	
+			return wxString(_("Go to next location"));
+		case 7:	
+			return wxString(_("Create folder"));
+		case 8:	
 			return wxString(_("Test GxDialog"));
 		default:
 			return wxString();
@@ -258,7 +340,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 			}
 			return;
 		}
-		case 4:
+		case 8:
             {
                 wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
                 wxGxDialog dlg(pWnd); 
@@ -374,6 +456,45 @@ void wxGISCatalogMainCmd::OnClick(void)
             }			
 			break;
         case 3:
+        {
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+				GxObjectArray* pArr = pSel->GetSelectedObjects();
+                if(!pArr)
+                    return;
+                //get from config
+                int answer = wxMessageBox(wxString::Format(_("Do you really wan to delete %d item(s)"), pArr->size()), wxString(_("Confirm")), wxCENTRE|wxYES_NO|wxICON_QUESTION, dynamic_cast<wxWindow*>(m_pApp) ); 
+                if (answer == wxNO)
+                    return;
+                for(size_t i = 0; i < pArr->size(); i++)
+                {
+                    IGxObject* pGxObject = pArr->at(i);
+                    IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject);
+                    if(pGxObjectEdit)
+                        pGxObjectEdit->Delete();                           
+                }
+            }
+			return;
+        }
+
+        case 4:
+        case 5:
+        {
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp && GetEnabled())
+                return pGxApp->GetCatalog()->GetSelection()->Undo();
+			return;
+        }
+        case 6:
+        {
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp && GetEnabled())
+                return pGxApp->GetCatalog()->GetSelection()->Redo();
+			return;
+        }
+        case 7:
 		default:
 			return;
 	}
@@ -398,6 +519,34 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 		case 3:	
 			return wxString(_("Set or get location"));
 		case 4:	
+			return wxString(_("Delete selected item"));
+		case 5:	
+        {
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp && GetEnabled())
+			{
+                IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                int nPos = pSel->GetDoPos();
+                GxObjectArray* pArr = pSel->GetDoArray();
+                return pArr->at(nPos - 1)->GetName();
+            }
+			return wxString(_("Go to previous location"));
+        }
+		case 6:	
+        {
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp && GetEnabled())
+			{
+                IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                int nPos = pSel->GetDoPos();
+                GxObjectArray* pArr = pSel->GetDoArray();
+                return pArr->at(nPos + 1 == pArr->size() ? nPos : nPos + 1)->GetName();
+            }
+			return wxString(_("Go to next location"));//
+        }
+		case 7:	
+			return wxString(_("Create new folder"));
+		case 8:	
 			return wxString(_("Test GxDialog"));
 		default:
 			return wxString();
@@ -406,7 +555,7 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 
 unsigned char wxGISCatalogMainCmd::GetCount(void)
 {
-	return 5;
+	return 9;
 }
 
 IToolBarControl* wxGISCatalogMainCmd::GetControl(void)
@@ -425,6 +574,10 @@ IToolBarControl* wxGISCatalogMainCmd::GetControl(void)
 				return static_cast<IToolBarControl*>(pGxLocationComboBox);
 			}
 		case 4:	
+		case 5:	
+		case 6:	
+		case 7:	
+		case 8:	
 		default:
 			return NULL;
 	}
@@ -441,6 +594,10 @@ wxString wxGISCatalogMainCmd::GetToolLabel(void)
 		case 3:	
 			return wxString(_("Path: "));
 		case 4:	
+		case 5:	
+		case 6:	
+		case 7:	
+		case 8:	
 		default:
 			return wxEmptyString;
 	}
@@ -457,7 +614,81 @@ bool wxGISCatalogMainCmd::HasToolLabel(void)
 		case 3:	
 			return true;
 		case 4:	
+		case 5:	
+		case 6:	
+		case 7:	
+		case 8:	
 		default:
 			return false;
 	}
 }
+
+wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
+{
+	switch(m_subtype)
+	{
+		case 0:	
+		case 1:	
+		case 2:	
+		case 3:	
+		case 4:	
+		case 5:
+        {
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp && GetEnabled())
+			{
+                IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                int nPos = pSel->GetDoPos();
+                GxObjectArray* pArr = pSel->GetDoArray();
+
+                wxMenu* pMenu = new wxMenu();
+
+                for(size_t i = 0; i < nPos; i++)
+                {
+                    pMenu->Append(ID_MENUCMD + i, pArr->at(i)->GetName());
+                }
+                return pMenu;                
+            }
+            return NULL;
+        }            
+		case 6:	
+        {
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp && GetEnabled())
+			{
+                IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                int nPos = pSel->GetDoPos();
+                GxObjectArray* pArr = pSel->GetDoArray();
+
+                wxMenu* pMenu = new wxMenu();
+
+                for(size_t i = nPos + 1; i < pArr->size(); i++)
+                {
+                    pMenu->Append(ID_MENUCMD + i, pArr->at(i)->GetName());
+                }
+                return pMenu;                
+            }
+            return NULL;
+        }            
+		case 7:	
+		case 8:	
+		default:
+			return NULL;
+	}
+}
+
+void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
+{
+	IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+	if(pGxApp && GetEnabled())
+	{
+        IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+        int nPos = pSel->GetDoPos();
+        int nNewPos = nID - ID_MENUCMD;
+        if(nNewPos > nPos)
+            pGxApp->GetCatalog()->GetSelection()->Redo(nNewPos);
+        else
+            pGxApp->GetCatalog()->GetSelection()->Undo(nNewPos);
+    }
+}
+

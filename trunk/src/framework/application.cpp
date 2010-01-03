@@ -34,11 +34,14 @@ BEGIN_EVENT_TABLE(wxGISApplication, wxFrame)
     EVT_ERASE_BACKGROUND(wxGISApplication::OnEraseBackground)
     EVT_SIZE(wxGISApplication::OnSize)
 	EVT_RIGHT_DOWN(wxGISApplication::OnRightDown)
-	EVT_MENU_RANGE(wxGISApplication::ID_PLUGINCMD, ID_PLUGINCMD + 512, wxGISApplication::OnCommand)
-	EVT_UPDATE_UI_RANGE(wxGISApplication::ID_PLUGINCMD, ID_PLUGINCMD + 512, wxGISApplication::OnCommandUI)
+    EVT_AUITOOLBAR_RIGHT_CLICK(wxID_ANY, wxGISApplication::OnRightDown)
+	EVT_MENU_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 512, wxGISApplication::OnCommand)
+	EVT_MENU_RANGE(ID_MENUCMD, ID_MENUCMD + 128, wxGISApplication::OnDropDownCommand)
+	EVT_UPDATE_UI_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 512, wxGISApplication::OnCommandUI)
+    EVT_AUITOOLBAR_TOOL_DROPDOWN(wxID_ANY, wxGISApplication::OnToolDropDown)
 END_EVENT_TABLE()
 
-wxGISApplication::wxGISApplication(IGISConfig* pConfig, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style), m_nCmdCounter(0), m_pGISAcceleratorTable(NULL), m_pMenuBar(NULL), m_CurrentTool(NULL)
+wxGISApplication::wxGISApplication(IGISConfig* pConfig, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style), m_pGISAcceleratorTable(NULL), m_pMenuBar(NULL), m_CurrentTool(NULL), m_pDropDownCommand(NULL)
 {
 	m_pConfig = pConfig;
 
@@ -117,6 +120,7 @@ ICommand* wxGISApplication::GetCommand(long CmdID)
 void wxGISApplication::LoadCommands(wxXmlNode* pRootNode)
 {
 	wxXmlNode *child = pRootNode->GetChildren();
+	unsigned int nCmdCounter(0);
 	while(child)
 	{
 		wxString sName = child->GetPropVal(wxT("name"), wxT(""));
@@ -132,10 +136,10 @@ void wxGISApplication::LoadCommands(wxXmlNode* pRootNode)
 					ICommand *pNewCmd = dynamic_cast<ICommand*>(newobj);
 					if(pNewCmd && pNewCmd->OnCreate(static_cast<IApplication*>(this)))
 					{
-						pNewCmd->SetID(ID_PLUGINCMD + m_nCmdCounter);
+						pNewCmd->SetID(ID_PLUGINCMD + nCmdCounter);
 						pNewCmd->SetSubType(i);
 						m_CommandArray.push_back(pNewCmd);
-						m_nCmdCounter++;
+						nCmdCounter++;
 					}
 				}
 				wxDELETE(pCmd);
@@ -194,6 +198,11 @@ void wxGISApplication::OnCommand(wxCommandEvent& event)
 	OnCommand(GetCommand(event.GetId()));
 }
 
+void wxGISApplication::OnDropDownCommand(wxCommandEvent& event)
+{
+    if(m_pDropDownCommand)
+        m_pDropDownCommand->OnDropDownCommand(event.GetId());
+}
 void wxGISApplication::OnCommand(ICommand* pCmd)
 {
 	ITool* pTool = dynamic_cast<ITool*>(pCmd);
@@ -250,6 +259,8 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 							pTool->SetBitmap(wxBitmap(default_16_xpm));
 						if(!sAcc.IsEmpty())
 							pTool->SetShortHelp(pCmd->GetTooltip() + wxT(" (") + sAcc + wxT(")"));//accelerator
+                        else
+							pTool->SetShortHelp(pCmd->GetTooltip());
 					}
 				}
 				break;
@@ -404,7 +415,8 @@ ICommand* wxGISApplication::GetCommand(wxString sCmdName, unsigned char nCmdSubT
 {
 	for(size_t i = 0; i < m_CommandArray.size(); i++)
 	{
-		wxClassInfo * pInfo = m_CommandArray[i]->GetClassInfo();
+        wxObject* pObj = dynamic_cast<wxObject*>(m_CommandArray[i]);
+		wxClassInfo * pInfo = pObj->GetClassInfo();
 		wxString sCommandName = pInfo->GetClassName();
 		if(sCommandName == sCmdName && m_CommandArray[i]->GetSubType() == nCmdSubType)
 			return m_CommandArray[i];								
@@ -515,6 +527,13 @@ void wxGISApplication::OnRightDown(wxMouseEvent& event)
 	event.Skip();
 }
 
+void wxGISApplication::OnRightDown(wxAuiToolBarEvent& event)
+{
+	ShowToolBarMenu();
+	event.Skip();
+}
+
+
 void wxGISApplication::ShowToolBarMenu(void)
 {
 	wxGISToolBarMenu* pToolBarMenu =  dynamic_cast<wxGISToolBarMenu*>(GetCommandBar(TOOLBARMENUNAME));
@@ -605,4 +624,22 @@ void wxGISApplication::LoadToolbars(wxXmlNode* pRootNode)
 			child = child->GetNext();
 		}
 	}
+}
+
+void wxGISApplication::OnToolDropDown(wxAuiToolBarEvent& event)
+{
+    if(event.IsDropDownClicked())
+    {
+        ICommand* pCmd = GetCommand(event.GetToolId());
+        m_pDropDownCommand = dynamic_cast<IDropDownCommand*>(pCmd);
+        if(m_pDropDownCommand)
+        {
+            wxMenu* pMenu = m_pDropDownCommand->GetDropDownMenu();
+            if(pMenu)
+            {
+                PopupMenu(pMenu, event.GetItemRect().GetBottomLeft());
+            }
+            wxDELETE(pMenu);
+        }
+    }
 }

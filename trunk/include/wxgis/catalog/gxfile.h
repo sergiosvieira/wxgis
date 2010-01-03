@@ -29,7 +29,8 @@
 class WXDLLIMPEXP_GIS_CLT wxGxFile :
 	public IGxObject,
 	public IGxObjectUI,
-    public IGxFile
+    public IGxFile, 
+    public IGxObjectEdit
 {
 public:
 	wxGxFile(wxString Path, wxString Name);
@@ -57,6 +58,12 @@ public:
 	virtual wxIcon GetSmallImage(void);
 	virtual wxString ContextMenu(void){return wxString(wxT("wxGxPrjFile.ContextMenu"));};
 	virtual wxString NewMenu(void){return wxString(wxT("wxGxPrjFile.NewMenu"));};
+	//IGxObjectEdit
+	virtual bool Delete(void);
+	virtual bool CanDelete(void){return true;};
+	virtual bool Rename(wxString NewName);
+	virtual bool CanRename(void){return true;};
+	virtual void EditProperties(wxWindow *parent);
 private:
     wxGISEnumPrjFileType m_Type;
 };
