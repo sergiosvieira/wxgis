@@ -47,8 +47,23 @@
 #include "wxgis/catalogui/gxcontentview.h"
 #include "wxgis/catalogui/gxtreeview.h"
 
+#include "wx/aui/aui.h"
+
 #define DLG_NAME wxT("wxGISDialog") 
 
+//////////////////////////////////////////////////////////////////////////////
+// wxGxToolBarArt
+//////////////////////////////////////////////////////////////////////////////
+
+class wxGxToolBarArt : public wxAuiDefaultToolBarArt
+{
+public:
+	virtual void DrawBackground(wxDC& dc, wxWindow* wnd, const wxRect& rect)
+	{
+		dc.SetBackground(wxBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE )));
+		dc.Clear();
+	}
+};
 
 //////////////////////////////////////////////////////////////////////////////
 // wxTreeViewComboPopup
@@ -96,18 +111,24 @@ private:
 class wxGxDialogContentView : public wxGxContentView
 {
 public:
-	wxGxDialogContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, 
-						 const wxSize& size = wxDefaultSize, long style = wxLC_REPORT | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING);
+	wxGxDialogContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxLC_REPORT | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING);
 	virtual ~wxGxDialogContentView();	
 
 //IGxView
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
-    //
+// events
     virtual void OnActivated(wxListEvent& event);
+//
+	virtual void SetFilters(LPOBJECTFILTERS pFiltersArray){m_pFiltersArray = pFiltersArray;};
+	virtual void SetCurrentFilter(size_t nFilterIndex);
+//wxGxContentView
+	virtual void AddObject(IGxObject* pObject);
 protected:
 	IConnectionPointContainer* m_pConnectionPointSelection;
 	long m_ConnectionPointSelectionCookie;
+	LPOBJECTFILTERS m_pFiltersArray;
+	size_t m_nFilterIndex;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -127,8 +148,9 @@ protected:
 	wxStaticText* m_staticText1;
 	wxStaticText* m_staticText2;
 	wxComboCtrl* m_TreeCombo;
-	wxToolBar* m_toolBar;
-	wxListCtrl* m_listCtrl;
+	//wxToolBar* m_toolBar;
+	wxAuiToolBar* m_toolBar;
+	//wxListCtrl* m_listCtrl;
 	wxFlexGridSizer* fgCeilSizer;
 	wxStaticText* m_staticText4;
 	wxTextCtrl* m_NameTextCtrl;
@@ -138,11 +160,6 @@ protected:
 	wxButton* m_CancelButton;
 
 public:
-	enum
-    {
-		ID_PLUGINCMD = wxID_HIGHEST + 1
-    };
-
 	wxGxDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,338 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 	~wxGxDialog();	
     virtual void OnCommand(ICommand* pCmd);
@@ -169,15 +186,35 @@ public:
 	virtual void OnMouseUp(wxMouseEvent& event){};
 	virtual void OnMouseDoubleClick(wxMouseEvent& event){};
 	virtual void OnMouseMove(wxMouseEvent& event){};
+	virtual void SetButtonCaption(wxString sOkBtLabel);
+	virtual void SetStartingLocation(wxString sStartPath);
+	virtual void SetName(wxString sName);
+	virtual void SetAllowMultiSelect(bool bAllowMultiSelect);
+	virtual void SetOverwritePrompt(bool bOverwritePrompt);
+	virtual int ShowModalOpen();
+	virtual int ShowModalSave();
+	virtual void OnInit();
+	virtual void AddFilter(IGxObjectFilter* pFilter, bool bDefault);
+	virtual void RemoveAllFilters(void);
 // events
     void OnCommand(wxCommandEvent& event);
 	void OnCommandUI(wxUpdateUIEvent& event);
+	void OnDropDownCommand(wxCommandEvent& event);
+	void OnToolDropDown(wxAuiToolBarEvent& event);
+	void OnItemSelected(wxListEvent& event);
 protected:
  	COMMANDARRAY m_CommandArray;
   	IGxCatalog* m_pCatalog;
     wxGISAppConfig* m_pConfig;
     wxGxDialogContentView* m_pwxGxContentView;
     wxTreeViewComboPopup* m_PopupCtrl;
+    IDropDownCommand* m_pDropDownCommand;
+	wxString m_sOkBtLabel;
+	wxString m_sStartPath;
+	wxString m_sName;
+	bool m_bAllowMultiSelect, m_bOverwritePrompt;
+	OBJECTFILTERS m_FilterArray;
+	size_t m_nDefaultFilter;
 
     DECLARE_EVENT_TABLE()
 };

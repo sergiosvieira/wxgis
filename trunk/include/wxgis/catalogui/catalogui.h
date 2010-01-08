@@ -31,6 +31,14 @@
 #define MAPCTRLID	1009 //wxGxCatalog map view
 //1010 reserved for NOTFIRESELID from catalog.h
 
+enum wxGISEnumSaveObjectResults
+{
+	enumGISSaveObjectNone = 0x0000, 
+	enumGISSaveObjectAccept = 0x0001,
+	enumGISSaveObjectExists = 0x0002,
+	enumGISSaveObjectDeny = 0x0004
+};
+
 class IGxViewsFactory
 {
 public:
@@ -55,3 +63,15 @@ public:
 	virtual void Refresh(void) = 0;
 	virtual wxString GetName(void) = 0;
 };
+
+class IGxObjectFilter
+{
+public:
+	virtual ~IGxObjectFilter(void){};
+	virtual bool CanChooseObject( IGxObject* pObject ) = 0;//, esriDoubleClickResult* result
+	virtual bool CanDisplayObject( IGxObject* pObject ) = 0;
+	virtual wxGISEnumSaveObjectResults CanSaveObject( IGxObject* pLocation, wxString sName ) = 0;
+	virtual wxString GetName(void) = 0;
+};
+
+typedef std::vector<IGxObjectFilter*> OBJECTFILTERS, *LPOBJECTFILTERS;

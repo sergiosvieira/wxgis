@@ -326,7 +326,7 @@ public:
 	virtual IGxObject* SearchChild(wxString sPath)
 	{
 		wxString sTestPath = sPath.MakeUpper();
-		if(GetName().MakeUpper() == sTestPath)
+		if(GetFullName().MakeUpper() == sTestPath)//GetName
 			return this;
 		for(size_t i = 0; i < m_Children.size(); i++)
 		{

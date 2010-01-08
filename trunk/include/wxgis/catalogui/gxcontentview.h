@@ -36,10 +36,10 @@ public:
 	wxGxContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, 
 						 const wxSize& size = wxDefaultSize, long style = wxLC_REPORT | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING);
 	virtual ~wxGxContentView(void);
-	void Serialize(wxXmlNode* pRootNode, bool bStore);
-	void AddObject(IGxObject* pObject);
-	void SetStyle(LISTSTYLE style);
-	void ResetContents(void);
+	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
+	virtual void AddObject(IGxObject* pObject);
+	virtual void SetStyle(LISTSTYLE style);
+	virtual void ResetContents(void);
 //IGxView
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
