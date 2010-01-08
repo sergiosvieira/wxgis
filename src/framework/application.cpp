@@ -203,6 +203,7 @@ void wxGISApplication::OnDropDownCommand(wxCommandEvent& event)
     if(m_pDropDownCommand)
         m_pDropDownCommand->OnDropDownCommand(event.GetId());
 }
+
 void wxGISApplication::OnCommand(ICommand* pCmd)
 {
 	ITool* pTool = dynamic_cast<ITool*>(pCmd);

@@ -46,6 +46,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 		
 
 		IGxObject* pGxObj = NULL;
+		//prj files
 		if(ext == wxString(wxT("bmp")) || ext == wxString(wxT("jpg")) || ext == wxString(wxT("img")))
 		{
 			if(m_pCatalog->GetShowExt())

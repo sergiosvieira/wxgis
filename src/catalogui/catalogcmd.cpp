@@ -37,6 +37,7 @@
 #include <wx/file.h>
 
 #include "wxgis/catalogui/gxdialog.h"
+#include "wxgis/catalogui/gxfilters.h"
 
 
 //	0	Up One Level
@@ -343,8 +344,12 @@ void wxGISCatalogMainCmd::OnClick(void)
 		case 8:
             {
                 wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
-                wxGxDialog dlg(pWnd); 
-                dlg.ShowModal();
+                wxGxDialog dlg(pWnd, wxID_ANY, _("Test")); 
+				//dlg.SetName(wxT("dsfdsfdsfsdf"));
+				//dlg.SetStartingLocation(wxT("Coordinate Systems"));
+				dlg.SetAllowMultiSelect(true);
+				dlg.AddFilter(new wxGxPrjFileFilter(), true);
+                dlg.ShowModalOpen();
               //  wxString sProjDir = wxString(wxT("e:\\temp\\srs\\Projected Coordinate Systems"));
               //  if(!wxDirExists(sProjDir))
 		            //wxFileName::Mkdir(sProjDir, 0755, wxPATH_MKDIR_FULL);
