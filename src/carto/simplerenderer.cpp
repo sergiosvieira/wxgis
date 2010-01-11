@@ -73,7 +73,10 @@ void wxGISSimpleRenderer::Draw(wxGISFeatureSet* pSet, wxGISEnumDrawPhase DrawPha
 			//proj goes here
 			OGRErr err = OGRERR_NONE;
 			if(!IsSpaRefSame)
+            {
+                //cut geom by max envelope
 				err = poGeometry->transformTo(pDisplaySpatialReference);
+            }
 			if(err == OGRERR_NONE)
 			{
 				switch(DrawPhase)
