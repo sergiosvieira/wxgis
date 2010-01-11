@@ -103,6 +103,20 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 			break;
 		case enumSRMLfile:
 			{
+   //             wxString Data;
+   //             char* pData(NULL);
+   //             OGRSpatialReference SpaRef;
+   //             OGRErr err = SpaRef.importFromEPSG(3752);//28407
+   //             if(err == OGRERR_NONE)
+   //             {
+   //                 SpaRef.exportToWkt(&pData);
+   //                 Data = wgMB2WX(pData);  
+   //                 wxLogDebug(Data);
+   //             }
+			//err = m_OGRSpatialReference.importFromWkt(&pData);
+   //         CPLFree(pData);
+
+
 			FILE *fp;
 			fp = VSIFOpenL( wgWX2MB(m_sPath), "rb" );
 			if( fp == NULL )
@@ -135,6 +149,6 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 		}
 	}
 	if(err == OGRERR_NONE)
-		return m_OGRSpatialReference.Clone();
+		return &m_OGRSpatialReference;
 	return NULL;
 }

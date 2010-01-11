@@ -117,14 +117,6 @@ double wxGISDisplayTransformation::GetScaleRatio(void)
 
 void wxGISDisplayTransformation::SetSpatialReference(OGRSpatialReference* pSpatialReference)
 {
-	if(m_pSpatialReference != NULL)
-	{
-	    OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( m_pSpatialReference, pSpatialReference );
-	    poCT->Transform(1, &m_Bounds.MaxX, &m_Bounds.MaxY);
-	    poCT->Transform(1, &m_Bounds.MinX, &m_Bounds.MinY);
-	    OCTDestroyCoordinateTransformation(poCT);
-		SetBounds(m_Bounds);
-	}
 	m_pSpatialReference = pSpatialReference;
 }
 

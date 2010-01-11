@@ -56,6 +56,7 @@ void wxGISRasterLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDispl
 			OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pEnvSpaRef, pLayerSpaRef );
 			poCT->Transform(1, &Env.MaxX, &Env.MaxY);
 			poCT->Transform(1, &Env.MinX, &Env.MinY);
+            OCTDestroyCoordinateTransformation(poCT);
 		}
 	}
 
