@@ -64,7 +64,7 @@ wxString wxGISCatalogViewsCmd::GetCategory(void)
 	switch(m_subtype)
 	{
 		case 0:	
-			return wxString(_("Catalog"));
+			return wxString(_("View"));
 		default:
 			return wxString(_("[No category]"));
 	}

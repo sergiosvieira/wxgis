@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "wxgis/carto/map.h"
 
-wxGISMap::wxGISMap(void)
+wxGISMap::wxGISMap(void) : m_pSpatialReference(NULL)
 {
 	m_sMapName = wxString(_("new map"));
 }
@@ -46,6 +46,8 @@ void wxGISMap::AddLayer(wxGISLayer* pLayer)
 {
 	if(!pLayer)
 		return;
+	if(m_pSpatialReference == NULL)
+		m_pSpatialReference = pLayer->GetSpatialReference();
 	m_Layers.push_back(pLayer);
 }
 
@@ -60,7 +62,20 @@ OGREnvelope wxGISMap::GetFullExtent(void)
 {
 	OGREnvelope res;
 	for(size_t i = 0; i < m_Layers.size(); i++)
+	{
 		//check if the spatial ref is same!!!
 		res.Merge(*m_Layers[i]->GetEnvelope());
+	}
 	return res;
 }
+
+void wxGISMap::SetSpatialReference(OGRSpatialReference* pSpatialReference)
+{
+	m_pSpatialReference = pSpatialReference;
+}
+
+OGRSpatialReference* wxGISMap::GetSpatialReference(void)
+{
+	return m_pSpatialReference;
+}
+

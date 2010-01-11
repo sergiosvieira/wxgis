@@ -21,6 +21,7 @@
 #include "wxgis/catalog/gxfile.h"
 #include "../../art/sr_16(2).xpm"
 #include "../../art/sr_48.xpm"
+#include "cpl_vsi.h"
 
 //--------------------------------------------------------------
 //class wxGxFile
@@ -83,4 +84,57 @@ bool wxGxPrjFile::Rename(wxString NewName)
 
 void wxGxPrjFile::EditProperties(wxWindow *parent)
 {
+}
+
+OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
+{
+	OGRErr err = OGRERR_NONE;
+	if(m_OGRSpatialReference.Validate() != OGRERR_NONE)
+	{
+
+		switch(m_Type)
+		{
+		case enumESRIPrjFile:
+			{
+			char **papszLines = CSLLoad( wgWX2MB(m_sPath) );
+			err = m_OGRSpatialReference.importFromESRI(papszLines);
+			CSLDestroy( papszLines );
+			}
+			break;
+		case enumSRMLfile:
+			{
+			FILE *fp;
+			fp = VSIFOpenL( wgWX2MB(m_sPath), "rb" );
+			if( fp == NULL )
+				return NULL;
+
+			VSIFSeekL( fp, 0, SEEK_END );
+			int nFileLen = VSIFTellL( fp );
+			VSIRewindL( fp );
+
+			char *pszRawData = (char *) CPLMalloc(nFileLen/* + 1*/);
+			if( (int)VSIFReadL( pszRawData, 1, nFileLen, fp ) != nFileLen )
+			{
+				CPLFree( pszRawData );
+				pszRawData = NULL;
+
+				wxLogError(wxString::Format(_("Read of file %s failed."), m_sPath.c_str() ));
+				return NULL;
+			}
+
+			//pszRawData[nFileLen] = '\0';
+			VSIFCloseL( fp );
+			fp = NULL;	
+			wxString sStr(pszRawData, *wxConvCurrent, nFileLen);
+			err = m_OGRSpatialReference.importFromXML(wgWX2MB(sStr));
+			CPLFree(pszRawData);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	if(err == OGRERR_NONE)
+		return m_OGRSpatialReference.Clone();
+	return NULL;
 }
