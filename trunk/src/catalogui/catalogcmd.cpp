@@ -380,6 +380,98 @@ void wxGISCatalogMainCmd::OnClick(void)
     //                        pMapView->SetSpatialReference(pRef->Clone());
     //                }
     //            }
+                #define SRS_WKT_WGS84 "GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9108\"]],AUTHORITY[\"EPSG\",\"4326\"]]"
+
+/* ==================================================================== */
+/*      Some "standard" strings.                                        */
+/* ==================================================================== */
+
+#define SRS_PT_ALBERS_CONIC_EQUAL_AREA                                  \
+                                "Albers_Conic_Equal_Area"
+#define SRS_PT_AZIMUTHAL_EQUIDISTANT "Azimuthal_Equidistant"
+#define SRS_PT_CASSINI_SOLDNER  "Cassini_Soldner"
+#define SRS_PT_CYLINDRICAL_EQUAL_AREA "Cylindrical_Equal_Area"
+#define SRS_PT_BONNE            "Bonne"
+#define SRS_PT_ECKERT_I         "Eckert_I"
+#define SRS_PT_ECKERT_II        "Eckert_II"
+#define SRS_PT_ECKERT_III       "Eckert_III"
+#define SRS_PT_ECKERT_IV        "Eckert_IV"
+#define SRS_PT_ECKERT_V         "Eckert_V"
+#define SRS_PT_ECKERT_VI        "Eckert_VI"
+#define SRS_PT_EQUIDISTANT_CONIC                                        \
+                                "Equidistant_Conic"
+#define SRS_PT_EQUIRECTANGULAR  "Equirectangular"
+#define SRS_PT_GALL_STEREOGRAPHIC                                       \
+                                "Gall_Stereographic"
+#define SRS_PT_GAUSSSCHREIBERTMERCATOR                                      \
+                                "Gauss_Schreiber_Transverse_Mercator"
+#define SRS_PT_GEOSTATIONARY_SATELLITE                                  \
+                                "Geostationary_Satellite"
+#define SRS_PT_GOODE_HOMOLOSINE "Goode_Homolosine"
+#define SRS_PT_GNOMONIC         "Gnomonic"
+#define SRS_PT_HOTINE_OBLIQUE_MERCATOR                                  \
+                                "Hotine_Oblique_Mercator"
+#define SRS_PT_HOTINE_OBLIQUE_MERCATOR_TWO_POINT_NATURAL_ORIGIN         \
+                            "Hotine_Oblique_Mercator_Two_Point_Natural_Origin"
+#define SRS_PT_LABORDE_OBLIQUE_MERCATOR                                 \
+                                "Laborde_Oblique_Mercator"
+#define SRS_PT_LAMBERT_CONFORMAL_CONIC_1SP                              \
+                                "Lambert_Conformal_Conic_1SP"
+#define SRS_PT_LAMBERT_CONFORMAL_CONIC_2SP                              \
+                                "Lambert_Conformal_Conic_2SP"
+#define SRS_PT_LAMBERT_CONFORMAL_CONIC_2SP_BELGIUM                      \
+                                "Lambert_Conformal_Conic_2SP_Belgium"
+#define SRS_PT_LAMBERT_AZIMUTHAL_EQUAL_AREA                     \
+                                "Lambert_Azimuthal_Equal_Area"
+#define SRS_PT_MERCATOR_1SP     "Mercator_1SP"
+#define SRS_PT_MERCATOR_2SP     "Mercator_2SP"
+#define SRS_PT_MILLER_CYLINDRICAL "Miller_Cylindrical"
+#define SRS_PT_MOLLWEIDE        "Mollweide"
+#define SRS_PT_NEW_ZEALAND_MAP_GRID                                     \
+                                "New_Zealand_Map_Grid"
+#define SRS_PT_OBLIQUE_STEREOGRAPHIC                                    \
+                                "Oblique_Stereographic"
+#define SRS_PT_ORTHOGRAPHIC     "Orthographic"
+#define SRS_PT_POLAR_STEREOGRAPHIC                                      \
+                                "Polar_Stereographic"
+#define SRS_PT_POLYCONIC        "Polyconic"
+#define SRS_PT_ROBINSON         "Robinson"
+#define SRS_PT_SINUSOIDAL       "Sinusoidal"
+#define SRS_PT_STEREOGRAPHIC    "Stereographic"
+#define SRS_PT_SWISS_OBLIQUE_CYLINDRICAL                                \
+                                "Swiss_Oblique_Cylindrical"
+#define SRS_PT_TRANSVERSE_MERCATOR                                      \
+                                "Transverse_Mercator"
+#define SRS_PT_TRANSVERSE_MERCATOR_SOUTH_ORIENTED                       \
+                                "Transverse_Mercator_South_Orientated"
+
+/* special mapinfo variants on Transverse Mercator */
+#define SRS_PT_TRANSVERSE_MERCATOR_MI_21 \
+                                "Transverse_Mercator_MapInfo_21"
+#define SRS_PT_TRANSVERSE_MERCATOR_MI_22 \
+                                "Transverse_Mercator_MapInfo_22"
+#define SRS_PT_TRANSVERSE_MERCATOR_MI_23 \
+                                "Transverse_Mercator_MapInfo_23"
+#define SRS_PT_TRANSVERSE_MERCATOR_MI_24 \
+                                "Transverse_Mercator_MapInfo_24"
+#define SRS_PT_TRANSVERSE_MERCATOR_MI_25 \
+                                "Transverse_Mercator_MapInfo_25"
+
+#define SRS_PT_TUNISIA_MINING_GRID                                      \
+                                "Tunisia_Mining_Grid"
+#define SRS_PT_TWO_POINT_EQUIDISTANT                                    \
+                                "Two_Point_Equidistant"
+#define SRS_PT_VANDERGRINTEN    "VanDerGrinten"
+#define SRS_PT_KROVAK           "Krovak"
+#define SRS_PT_IMW_POLYCONIC    "International_Map_of_the_World_Polyconic"
+#define SRS_PT_WAGNER_I         "Wagner_I"
+#define SRS_PT_WAGNER_II        "Wagner_II"
+#define SRS_PT_WAGNER_III       "Wagner_III"
+#define SRS_PT_WAGNER_IV        "Wagner_IV"
+#define SRS_PT_WAGNER_V         "Wagner_V"
+#define SRS_PT_WAGNER_VI        "Wagner_VI"
+#define SRS_PT_WAGNER_VII       "Wagner_VII"
+
                 wxString sProjDir = wxString(wxT("e:\\temp\\srs\\Projected Coordinate Systems"));
                 if(!wxDirExists(sProjDir))
 		            wxFileName::Mkdir(sProjDir, 0755, wxPATH_MKDIR_FULL);
