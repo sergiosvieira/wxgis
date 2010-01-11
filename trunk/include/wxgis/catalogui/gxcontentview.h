@@ -39,6 +39,7 @@ public:
 	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
 	virtual void AddObject(IGxObject* pObject);
 	virtual void SetStyle(LISTSTYLE style);
+    virtual LISTSTYLE GetStyle(void){return m_current_style;};
 	virtual void ResetContents(void);
 //IGxView
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
@@ -79,7 +80,6 @@ protected:
 	IConnectionPointContainer* m_pConnectionPointCatalog/*, *m_pConnectionPointSelection*/;
 	long m_ConnectionPointCatalogCookie/*, m_ConnectionPointSelectionCookie*/;
 	IGxSelection* m_pSelection;
-	long m_style;
 	IGxObject* m_pParentGxObject;
 	bool m_bCtrlDown;
 

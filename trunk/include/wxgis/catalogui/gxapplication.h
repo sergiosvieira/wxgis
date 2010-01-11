@@ -38,7 +38,6 @@ class WXDLLIMPEXP_GIS_CLU wxGxApplication :
 public:	
 	wxGxApplication(IGISConfig* pConfig, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER);
 	virtual ~wxGxApplication(void);
-	virtual void SerializeFramePos(bool bSave = false);
 	virtual wxAuiManager* GetAuiManager(void){return &m_mgr;};
 	virtual void ShowPane(wxWindow* pWnd, bool bShow = true);
 	virtual void ShowPane(const wxString& sName, bool bShow = true);
@@ -55,6 +54,8 @@ public:
 	virtual WINDOWARRAY* GetChildWindows(void);
 	virtual void RegisterChildWindow(wxWindow* pWnd);
     virtual wxString GetAppName(void){return wxString(APP_NAME);};
+protected:
+	virtual void SerializeFramePos(bool bSave = false);
 protected:
 	wxAuiManager m_mgr;
 	wxGxTreeView* m_pTreeView;

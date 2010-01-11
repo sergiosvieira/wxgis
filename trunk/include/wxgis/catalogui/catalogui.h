@@ -30,6 +30,8 @@
 #define TABCTRLID	1008 //wxGxCatalog tab with views - contents, preview & etc.
 #define MAPCTRLID	1009 //wxGxCatalog map view
 //1010 reserved for NOTFIRESELID from catalog.h
+#define FILTERCOMBO	1011 //wxGxDialog
+#define WXGISHIGHEST	1200 //
 
 enum wxGISEnumSaveObjectResults
 {

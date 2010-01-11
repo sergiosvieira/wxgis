@@ -119,6 +119,8 @@ bool wxGISCartoMainCmd::GetEnabled(void)
 			}
 		}
 	}
+	if(!m_pMapView)
+        return false;
 
 	switch(m_subtype)
 	{

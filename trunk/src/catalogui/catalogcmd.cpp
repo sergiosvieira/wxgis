@@ -347,9 +347,19 @@ void wxGISCatalogMainCmd::OnClick(void)
                 wxGxDialog dlg(pWnd, wxID_ANY, _("Test")); 
 				//dlg.SetName(wxT("dsfdsfdsfsdf"));
 				//dlg.SetStartingLocation(wxT("Coordinate Systems"));
-				dlg.SetAllowMultiSelect(true);
+				dlg.SetAllowMultiSelect(false);
 				dlg.AddFilter(new wxGxPrjFileFilter(), true);
-                dlg.ShowModalOpen();
+				dlg.AddFilter(new wxGxRasterDatasetFilter());
+                if(dlg.ShowModalOpen() == wxID_OK)
+                {
+                    GxObjectArray* pArr = dlg.GetSelectedObjects();
+                    if(!pArr)
+                        return;
+                    if(pArr->size() < 0)
+                         return;
+                    IGxObject* pObj = pArr->at(0);
+                    int x = 0;
+                }
               //  wxString sProjDir = wxString(wxT("e:\\temp\\srs\\Projected Coordinate Systems"));
               //  if(!wxDirExists(sProjDir))
 		            //wxFileName::Mkdir(sProjDir, 0755, wxPATH_MKDIR_FULL);

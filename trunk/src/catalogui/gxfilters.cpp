@@ -22,6 +22,57 @@
 #include "wxgis/catalogui/gxfilters.h"
 #include "wxgis/catalog/gxfile.h"
 #include "wxgis/catalog/gxspatreffolder.h"
+#include "wxgis/catalog/gxdataset.h"
+
+//------------------------------------------------------------
+// wxGxObjectFilter
+//------------------------------------------------------------
+
+wxGxObjectFilter::wxGxObjectFilter(void)
+{
+}
+
+wxGxObjectFilter::~wxGxObjectFilter(void)
+{
+}
+
+bool wxGxObjectFilter::CanChooseObject( IGxObject* pObject )
+{
+	return true;
+}
+
+bool wxGxObjectFilter::CanDisplayObject( IGxObject* pObject )
+{
+	return true;
+}
+
+wxGISEnumSaveObjectResults wxGxObjectFilter::CanSaveObject( IGxObject* pLocation, wxString sName )
+{
+	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pLocation);
+	if(!pContainer)
+		return enumGISSaveObjectDeny;
+	wxGxFolder* pGxFolder = dynamic_cast<wxGxFolder*>(pLocation);
+	{
+		if(wxFileName::IsDirWritable(pGxFolder->GetPath()) || wxFileName::IsFileWritable(pGxFolder->GetPath()))
+		{
+			if(pGxFolder->SearchChild(pLocation->GetFullName() + wxFileName::GetPathSeparator() + sName) == NULL)
+				return enumGISSaveObjectAccept;
+			else
+				return enumGISSaveObjectExists;
+		}
+	}
+	
+	return enumGISSaveObjectDeny;
+}
+
+wxString wxGxObjectFilter::GetName(void)
+{
+	return wxString(_("Any items (*.*)"));
+}
+
+//------------------------------------------------------------
+// wxGxPrjFileFilter
+//------------------------------------------------------------
 
 wxGxPrjFileFilter::wxGxPrjFileFilter(void)
 {
@@ -85,4 +136,42 @@ wxGISEnumSaveObjectResults wxGxPrjFileFilter::CanSaveObject( IGxObject* pLocatio
 wxString wxGxPrjFileFilter::GetName(void)
 {
 	return wxString(_("Coordinate Systems (*.prj, *.srml)"));
+}
+
+//------------------------------------------------------------
+// wxGxRasterDatasetFilter
+//------------------------------------------------------------
+
+wxGxRasterDatasetFilter::wxGxRasterDatasetFilter(void)
+{
+}
+
+wxGxRasterDatasetFilter::~wxGxRasterDatasetFilter(void)
+{
+}
+
+bool wxGxRasterDatasetFilter::CanChooseObject( IGxObject* pObject )
+{
+	wxGxRasterDataset* pGxRasterDataset = dynamic_cast<wxGxRasterDataset*>(pObject);
+	if(pGxRasterDataset)
+		return true;
+	else
+		return false;
+}
+
+bool wxGxRasterDatasetFilter::CanDisplayObject( IGxObject* pObject )
+{
+	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
+	if(pContainer)
+		return true;
+	wxGxRasterDataset* pGxRasterDataset = dynamic_cast<wxGxRasterDataset*>(pObject);
+	if(pGxRasterDataset)
+		return true;
+	else
+		return false;
+}
+
+wxString wxGxRasterDatasetFilter::GetName(void)
+{
+	return wxString(_("Rasters (*.img, *.tif, etc.)"));
 }

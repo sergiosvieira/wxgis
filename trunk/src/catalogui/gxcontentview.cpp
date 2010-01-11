@@ -45,7 +45,6 @@ int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
 wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : 
 wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(REPORT), m_pConnectionPointCatalog(NULL), /*m_pConnectionPointSelection(NULL),*/ m_ConnectionPointCatalogCookie(-1)/*, m_ConnectionPointSelectionCookie(-1)*/, m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL)
 {
-	m_style = wxBORDER_NONE | wxLC_EDIT_LABELS;
 	InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150); 
 	InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
 
@@ -100,30 +99,37 @@ void wxGxContentView::Serialize(wxXmlNode* pRootNode, bool bStore)
 	if(pRootNode == NULL)
 		return;
 
-	//if(Store)
-	//{
-	//	wxXmlProperty* pPropStyle = new wxXmlProperty(wxT("style"), wxString::Format(wxT("%d"), m_current_style), NULL);
-	//	wxXmlProperty* pPropSort = new wxXmlProperty(wxT("sort"), wxString::Format(wxT("%d"), SortAsc), pPropStyle);
-	//	wxXmlProperty* pPropName = new wxXmlProperty(wxT("name_width"), wxString::Format(wxT("%d"), GetColumnWidth(0)), pPropSort);
-	//	wxXmlProperty* pPropType = new wxXmlProperty(wxT("type_width"), wxString::Format(wxT("%d"), GetColumnWidth(1)), pPropName);
-	//	child->SetPropertys(pPropType);
-	//}
-	//else
-	//{
-	//	SortAsc = wxAtoi(child->GetPropVal(wxT("sort"), wxT("1")));
-	//	m_current_style = (LISTSTYLE)wxAtoi(child->GetPropVal(wxT("style"), wxT("0")));
-	//	int nw = wxAtoi(child->GetPropVal(wxT("name_width"), wxT("150")));
-	//	if(nw == 0)
-	//		nw = 150;
-	//	int tw = wxAtoi(child->GetPropVal(wxT("type_width"), wxT("250")));
-	//	if(tw == 0)
-	//		tw = 250;
-	//	SetColumnWidth(0, nw);
-	//	SetColumnWidth(1, tw);
-	//	SetStyle(m_current_style);
-	//	SortItems(MyCompareFunction, SortAsc);
-	//	SetColumnImage(0, SortAsc ? 0 : 1);
-	//}
+	if(bStore)
+	{
+        if(pRootNode->HasProp(wxT("style")))
+            pRootNode->DeleteProperty(wxT("style"));
+        pRootNode->AddProperty(wxT("style"), wxString::Format(wxT("%d"), m_current_style));
+        if(pRootNode->HasProp(wxT("sort")))
+            pRootNode->DeleteProperty(wxT("sort"));
+        pRootNode->AddProperty(wxT("sort"), wxString::Format(wxT("%d"), m_bSortAsc));
+        if(pRootNode->HasProp(wxT("name_width")))
+            pRootNode->DeleteProperty(wxT("name_width"));
+        pRootNode->AddProperty(wxT("name_width"), wxString::Format(wxT("%d"), GetColumnWidth(0)));
+        if(pRootNode->HasProp(wxT("type_width")))
+            pRootNode->DeleteProperty(wxT("type_width"));
+        pRootNode->AddProperty(wxT("type_width"), wxString::Format(wxT("%d"), GetColumnWidth(1)));
+	}
+	else
+	{
+		m_bSortAsc = wxAtoi(pRootNode->GetPropVal(wxT("sort"), wxT("1")));
+		LISTSTYLE style = (LISTSTYLE)wxAtoi(pRootNode->GetPropVal(wxT("style"), wxT("0")));
+		int nw = wxAtoi(pRootNode->GetPropVal(wxT("name_width"), wxT("150")));
+		if(nw == 0)
+			nw = 150;
+		int tw = wxAtoi(pRootNode->GetPropVal(wxT("type_width"), wxT("250")));
+		if(tw == 0)
+			tw = 250;
+		SetColumnWidth(0, nw);
+		SetColumnWidth(1, tw);
+		SetStyle(style);
+		SortItems(MyCompareFunction, m_bSortAsc);
+		SetColumnImage(0, m_bSortAsc ? 0 : 1);
+	}
 }
 
 void wxGxContentView::AddObject(IGxObject* pObject)
@@ -273,22 +279,44 @@ void wxGxContentView::OnActivated(wxListEvent& event)
 
 void wxGxContentView::SetStyle(LISTSTYLE style)
 {
-	m_current_style = style;
+    if(m_current_style == style)
+        return;
 	switch(style)
 	{
 	case REPORT:
-		SetWindowStyleFlag(m_style | wxLC_REPORT);
+        SetSingleStyle(wxLC_REPORT);
+		//SetWindowStyleFlag(m_style | wxLC_REPORT);
 		break;
 	case SMALL:
-		SetWindowStyleFlag(m_style | wxLC_SMALL_ICON );
+        SetSingleStyle(wxLC_SMALL_ICON);
+		//SetWindowStyleFlag(m_style | wxLC_SMALL_ICON );
 		break;
 	case LARGE:
-		SetWindowStyleFlag(m_style | wxLC_ICON );
+        SetSingleStyle(wxLC_ICON);
+		//SetWindowStyleFlag(m_style | wxLC_ICON );
 		break;
 	case LIST:
-		SetWindowStyleFlag(m_style | wxLC_LIST );
+        SetSingleStyle(wxLC_LIST);
+		//SetWindowStyleFlag(m_style | wxLC_LIST );
+		break;
+	}    
+    
+    switch(m_current_style)
+	{
+	case REPORT:
+        SetSingleStyle(wxLC_REPORT, false);
+		break;
+	case SMALL:
+        SetSingleStyle(wxLC_SMALL_ICON, false);
+		break;
+	case LARGE:
+        SetSingleStyle(wxLC_ICON, false);
+		break;
+	case LIST:
+        SetSingleStyle(wxLC_LIST, false);
 		break;
 	}
+	m_current_style = style;
 }
 
 //void wxGxContentView::UpdateSelection(void)
@@ -376,9 +404,11 @@ void wxGxContentView::OnEndLabelEdit(wxListEvent& event)
 
 void wxGxContentView::OnObjectAdded(IGxObject* pObj)
 {
-	//if(pObj->GetParent() == m_pParentObject)
-	//	AddObject(pObj);
-	//SortItems(MyCompareFunction, SortAsc/*(long)this*/);
+	if(pObj->GetParent() == m_pParentGxObject)
+    {
+		AddObject(pObj);
+	    SortItems(MyCompareFunction, m_bSortAsc);
+    }
 }
 
 void wxGxContentView::OnObjectDeleted(IGxObject* pObj)
@@ -446,6 +476,18 @@ void wxGxContentView::OnObjectRefreshed(IGxObject* pObj)
 
 void wxGxContentView::OnRefreshAll(void)
 {
+    ResetContents();
+	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(m_pParentGxObject);
+	if(pObjContainer == NULL || !pObjContainer->HasChildren())
+		return;
+	GxObjectArray* pArr = pObjContainer->GetChildren();
+	for(size_t i = 0; i < pArr->size(); i++)
+	{
+		AddObject(pArr->at(i));
+	}
+
+	SortItems(MyCompareFunction, m_bSortAsc);
+    SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 }
 
 void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)

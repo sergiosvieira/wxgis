@@ -23,7 +23,26 @@
 
 #include "wxgis/catalogui/catalogui.h"
 
-class wxGxPrjFileFilter : public IGxObjectFilter
+//------------------------------------------------------------
+// wxGxObjectFilter
+//------------------------------------------------------------
+
+class wxGxObjectFilter : public IGxObjectFilter
+{
+public:
+	wxGxObjectFilter(void);
+	~wxGxObjectFilter(void);
+	virtual bool CanChooseObject( IGxObject* pObject );
+	virtual bool CanDisplayObject( IGxObject* pObject );
+	virtual wxGISEnumSaveObjectResults CanSaveObject( IGxObject* pLocation, wxString sName );
+	virtual wxString GetName(void);
+};
+
+//------------------------------------------------------------
+// wxGxPrjFileFilter
+//------------------------------------------------------------
+
+class wxGxPrjFileFilter : public wxGxObjectFilter
 {
 public:
 	wxGxPrjFileFilter(void);
@@ -31,5 +50,19 @@ public:
 	virtual bool CanChooseObject( IGxObject* pObject );
 	virtual bool CanDisplayObject( IGxObject* pObject );
 	virtual wxGISEnumSaveObjectResults CanSaveObject( IGxObject* pLocation, wxString sName );
+	virtual wxString GetName(void);
+};
+
+//------------------------------------------------------------
+// wxGxRasterDatasetFilter
+//------------------------------------------------------------
+
+class wxGxRasterDatasetFilter : public wxGxObjectFilter
+{
+public:
+	wxGxRasterDatasetFilter(void);
+	~wxGxRasterDatasetFilter(void);
+	virtual bool CanChooseObject( IGxObject* pObject );
+	virtual bool CanDisplayObject( IGxObject* pObject );
 	virtual wxString GetName(void);
 };
