@@ -84,6 +84,7 @@ public:
 	//wxGISMap
 	virtual void AddLayer(wxGISLayer* pLayer);
 	virtual void ClearLayers(void);
+	virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference, bool bShouldDeleteSP = false);
 	//wxGISMapView
 	void OnThreadExit(void);
 	virtual ICachedDisplay* GetCachedDisplay(void){return pGISScreenDisplay;};
@@ -92,8 +93,6 @@ public:
 	virtual void SetFullExtent(void);
 	virtual void SetExtent(OGREnvelope Env);
 	virtual ExtenStack* GetExtenStack(void){return m_pExtenStack;};
-	virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference);
-	virtual OGRSpatialReference* GetSpatialReference(void);
 protected:
 	//events
 	virtual void OnEraseBackground(wxEraseEvent & event);
