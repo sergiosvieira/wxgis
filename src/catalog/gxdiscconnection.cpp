@@ -39,18 +39,18 @@ wxIcon wxGxDiscConnection::GetLargeImage(void)
 {
 	bool bIsOk = wxFileName::IsDirReadable(m_sPath);
 	if(bIsOk)
-		return wxIcon(m_ImageListSmall.GetIcon(0));
+		return wxIcon(m_ImageListLarge.GetIcon(0));
 	else
-		return wxIcon(m_ImageListSmall.GetIcon(1));
+		return wxIcon(m_ImageListLarge.GetIcon(1));
 }
 
 wxIcon wxGxDiscConnection::GetSmallImage(void)
 {
 	bool bIsOk = wxFileName::IsDirReadable(m_sPath);
 	if(bIsOk)
-		return wxIcon(m_ImageListLarge.GetIcon(0));
+		return wxIcon(m_ImageListSmall.GetIcon(0));
 	else
-		return wxIcon(m_ImageListLarge.GetIcon(1));
+		return wxIcon(m_ImageListSmall.GetIcon(1));
 }
 
 bool wxGxDiscConnection::Delete(void)

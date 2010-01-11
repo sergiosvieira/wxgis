@@ -81,16 +81,10 @@ public:
 	virtual void PanStart(wxPoint MouseLocation);
 	virtual void PanMoveTo(wxPoint MouseLocation);
 	virtual void PanStop(wxPoint MouseLocation);
-	//events
-	void OnEraseBackground(wxEraseEvent & event);
-	void OnSize(wxSizeEvent & event);
-	void OnKeyDown(wxKeyEvent & event);
-	void OnMouseWheel(wxMouseEvent& event);
-    void OnTimer( wxTimerEvent & event);
 	//wxGISMap
 	virtual void AddLayer(wxGISLayer* pLayer);
 	virtual void ClearLayers(void);
-	//
+	//wxGISMapView
 	void OnThreadExit(void);
 	virtual ICachedDisplay* GetCachedDisplay(void){return pGISScreenDisplay;};
 	virtual ITrackCancel* GetTrackCancel(void){return m_pTrackCancel;};
@@ -98,6 +92,15 @@ public:
 	virtual void SetFullExtent(void);
 	virtual void SetExtent(OGREnvelope Env);
 	virtual ExtenStack* GetExtenStack(void){return m_pExtenStack;};
+	virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference);
+	virtual OGRSpatialReference* GetSpatialReference(void);
+protected:
+	//events
+	virtual void OnEraseBackground(wxEraseEvent & event);
+	virtual void OnSize(wxSizeEvent & event);
+	virtual void OnKeyDown(wxKeyEvent & event);
+	virtual void OnMouseWheel(wxMouseEvent& event);
+    virtual void OnTimer( wxTimerEvent & event);
 protected:
 	ICachedDisplay* pGISScreenDisplay;
 	WXDWORD m_MouseState;

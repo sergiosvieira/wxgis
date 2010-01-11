@@ -29,16 +29,6 @@
 //wxDrawingThread
 //-----------------------------------------------
 
-//wxDrawingThread::wxDrawingThread(IwxGISCachedDisplay* pGISScreenDisplay, wxWindow* pWindow, std::vector<IwxGISLayer*>& Layers, ITrackCancel* pTrackCancel)
-//: wxThread(), m_pWindow(pWindow), m_Layers(Layers)
-//{
-//    m_pTrackCancel = pTrackCancel;
-//	m_pGISScreenDisplay = pGISScreenDisplay;
-//
-//	if(m_pTrackCancel)
-//		m_pTrackCancel->Reset();
-//}
-
 wxDrawingThread::wxDrawingThread(wxGISMapView* pView, std::vector<wxGISLayer*>& Layers) : wxThread(), m_pView(pView), m_Layers(Layers)
 {
     m_pTrackCancel = m_pView->GetTrackCancel();
@@ -572,13 +562,7 @@ void wxGISMapView::OnMouseWheel(wxMouseEvent& event)
 		CDC.SetPen(*wxBLACK_PEN);
 		int x1 = (size.x - width) / 2, y1 = (size.y - height) - 50/*/ 2*/;
 		CDC.DrawRectangle( x1 - 5, y1 - 2, width + 10, height + 4);
-
 		CDC.DrawText(format_s, x1, y1);
-
-		////SetToolTip( //96 * 2.54
-			//wxTipWindow* m_pTipWnd;
-		//if(m_pTipWnd)
-		//	wxDELETE(m_pTipWnd);
 
 		//wxRect client_rc = GetScreenRect();
 		//m_pTipWnd = new wxTipWindow(this, wxString::Format(_("1 : %.2f"), 1 / (m_virtualbounds.MaxX - m_virtualbounds.MinX)/*pDisplayTransformation->GetScaleRatio()*/ * 243.84), 200, &m_pTipWnd, &client_rc);
@@ -660,14 +644,6 @@ void wxGISMapView::SetFullExtent(void)
 void wxGISMapView::SetExtent(OGREnvelope Env)
 {
 	m_pExtenStack->Do(Env);
-
-	//m_pTrackCancel->Cancel();
-	//if(m_pThread)
-	//	m_pThread->Delete();
-	//IDisplayTransformation* pDisplayTransformation = pGISScreenDisplay->GetDisplayTransformation();
-	//pDisplayTransformation->SetBounds(Env);
-	//pGISScreenDisplay->SetDerty(true);
-	//Refresh(false);
 }
 
 void wxGISMapView::PanStart(wxPoint MouseLocation)
@@ -728,6 +704,23 @@ void wxGISMapView::PanStop(wxPoint MouseLocation)
 //		pGISScreenDisplay->SetDerty(true);
 //		Refresh(false);
 	}
+}
+
+void wxGISMapView::SetSpatialReference(OGRSpatialReference* pSpatialReference)
+{
+	if(pSpatialReference == NULL)
+		return;
+
+	IDisplayTransformation* pDisplayTransformation = pGISScreenDisplay->GetDisplayTransformation();
+	pDisplayTransformation->SetSpatialReference(pSpatialReference);
+	pGISScreenDisplay->SetDerty(true);
+	Refresh(false);
+}
+
+OGRSpatialReference* wxGISMapView::GetSpatialReference(void)
+{
+	IDisplayTransformation* pDisplayTransformation = pGISScreenDisplay->GetDisplayTransformation();
+	return pDisplayTransformation->GetSpatialReference();
 }
 
 

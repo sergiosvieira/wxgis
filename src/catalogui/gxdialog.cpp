@@ -258,7 +258,12 @@ void wxGxDialogContentView::OnActivated(wxListEvent& event)
 	if(pGxObjectContainer != NULL )
 	{
 		m_pSelection->Select(pItemData->pObject, false, IGxSelection::INIT_ALL);//GetId()
+		return;
 	}
+
+	wxCommandEvent butevent( wxEVT_COMMAND_BUTTON_CLICKED, wxID_OK );
+    GetParent()->GetEventHandler()->ProcessEvent( butevent );
+
 }
 
 void wxGxDialogContentView::SetCurrentFilter(size_t nFilterIndex)
@@ -296,7 +301,7 @@ BEGIN_EVENT_TABLE(wxGxDialog, wxDialog)
     EVT_UPDATE_UI(wxID_OK, wxGxDialog::OnOKUI)
 END_EVENT_TABLE()
 
-wxGxDialog::wxGxDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pDropDownCommand(NULL), m_bAllowMultiSelect(false), m_bOverwritePrompt(false), m_nDefaultFilter(0), m_pConfig(NULL), m_pObjectArray(NULL)
+wxGxDialog::wxGxDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pDropDownCommand(NULL), m_bAllowMultiSelect(false), m_bOverwritePrompt(false), m_nDefaultFilter(0), m_pConfig(NULL), m_pObjectArray(NULL), m_pwxGxContentView(NULL), m_PopupCtrl(NULL)
 {
 	this->SetSizeHints( wxSize( 400,300 ), wxDefaultSize );
 
@@ -320,14 +325,8 @@ wxGxDialog::wxGxDialog( wxWindow* parent, wxWindowID id, const wxString& title, 
 
 	bHeaderSizer->Add( m_TreeCombo, 1, wxALL | wxALIGN_CENTER_VERTICAL, 5 );
 
-	//wxAuiToolBar* pTb = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_TB_HORZ_LAYOUT|wxBORDER_NONE);
-	//pTb->Add
-	//m_toolBar = new wxToolBar( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTB_FLAT|wxTB_HORIZONTAL|wxTB_NODIVIDER/*|wxTB_NOALIGN|wxBORDER_NONE|wxCLIP_CHILDREN*/);
-	m_toolBar = new wxAuiToolBar( this, wxID_ANY, wxDefaultPosition, wxDefaultSize,  wxAUI_TB_HORZ_LAYOUT|wxBORDER_NONE/*|wxCLIP_CHILDREN*/);
+	m_toolBar = new wxAuiToolBar( this, wxID_ANY, wxDefaultPosition, wxDefaultSize,  wxAUI_TB_HORZ_LAYOUT|wxBORDER_NONE);
 	m_toolBar->SetToolBitmapSize( wxSize( 16,16 ) );
-	//m_toolBar->SetBackgroundStyle(wxBG_STYLE_SYSTEM);
-	//m_toolBar->SetBackgroundColour(wxColor(128,158,218));
-	//m_toolBar->SetOwnBackgroundColour(wxColor(128,158,218));
 	m_toolBar->SetArtProvider(new wxGxToolBarArt());
 
 //	0	Up One Level
@@ -380,8 +379,7 @@ wxGxDialog::wxGxDialog( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_staticText2->Wrap( -1 );
 	bHeaderSizer->Add( m_staticText2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
-	bMainSizer->Add( bHeaderSizer, 0, wxEXPAND, 5 );
-	
+	bMainSizer->Add( bHeaderSizer, 0, wxEXPAND, 5 );	
 //
 //
 	fgCeilSizer = new wxFlexGridSizer( 2, 3, 0, 0 );
@@ -510,14 +508,11 @@ void wxGxDialog::SetButtonCaption(wxString sOkBtLabel)
 void wxGxDialog::SetStartingLocation(wxString sStartPath)
 {
 	m_sStartPath = sStartPath;
-	m_pCatalog->SetLocation(m_sStartPath);
 }
 
 void wxGxDialog::SetName(wxString sName)
 {
 	m_sName = sName;
-	//if(m_NameTextCtrl)
-	//	m_NameTextCtrl->SetValue(m_sName);
 }
 
 void wxGxDialog::SetAllowMultiSelect(bool bAllowMultiSelect)
@@ -589,14 +584,19 @@ void wxGxDialog::OnInit()
 	m_pwxGxContentView->SetCurrentFilter(m_nDefaultFilter);
 	m_pwxGxContentView->SetFilters(&m_FilterArray);
 
-    wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
-	IGxObject* pObj = dynamic_cast<IGxObject*>(m_pCatalog);
-	wxString sLastPath;
-	if(pLastLocationNode)
-		sLastPath = pLastLocationNode->GetPropVal(wxT("path"), pObj->GetName());
+	if(m_sStartPath.IsEmpty())
+	{
+		wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
+		IGxObject* pObj = dynamic_cast<IGxObject*>(m_pCatalog);
+		wxString sLastPath;
+		if(pLastLocationNode)
+			sLastPath = pLastLocationNode->GetPropVal(wxT("path"), pObj->GetName());
+		else
+			sLastPath = pObj->GetName();
+		m_pCatalog->SetLocation(sLastPath);
+	}
 	else
-		sLastPath = pObj->GetName();
-	m_pCatalog->SetLocation(sLastPath);
+		m_pCatalog->SetLocation(m_sStartPath);
 
     SerializeFramePos(false);
 }

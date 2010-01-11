@@ -20,7 +20,7 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/catalog/catalog.h"
-
+#include "wxgis/carto/carto.h"
 
 //--------------------------------------------------------------
 //class wxGxFile
@@ -64,8 +64,11 @@ public:
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
 	virtual void EditProperties(wxWindow *parent);
+	//wxGxPrjFile
+	virtual OGRSpatialReference* GetSpatialReference(void);
 private:
     wxGISEnumPrjFileType m_Type;
+	OGRSpatialReference m_OGRSpatialReference;
 };
 
 //--------------------------------------------------------------

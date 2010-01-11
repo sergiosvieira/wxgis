@@ -38,6 +38,8 @@
 
 #include "wxgis/catalogui/gxdialog.h"
 #include "wxgis/catalogui/gxfilters.h"
+#include "wxgis/catalog/gxfile.h"
+#include "wxgis/carto/mapview.h"
 
 
 //	0	Up One Level
@@ -48,7 +50,7 @@
 //  5   Back
 //  6   Forward
 //  7   Create Folder
-//	8	Test GxDialog
+//	8	Test change proj
 //	9	?
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogMainCmd, wxObject)
@@ -112,7 +114,7 @@ wxString wxGISCatalogMainCmd::GetCaption(void)
 		case 7:	
 			return wxString(_("Create folder"));
 		case 8:	
-			return wxString(_("Test GxDialog"));
+			return wxString(_("Test change proj"));
 		default:
 			return wxString();
 	}
@@ -344,12 +346,11 @@ void wxGISCatalogMainCmd::OnClick(void)
 		case 8:
             {
                 wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
-                wxGxDialog dlg(pWnd, wxID_ANY, _("Test")); 
-				//dlg.SetName(wxT("dsfdsfdsfsdf"));
-				//dlg.SetStartingLocation(wxT("Coordinate Systems"));
+                wxGxDialog dlg(pWnd, wxID_ANY, _("Select projection")); 
 				dlg.SetAllowMultiSelect(false);
 				dlg.AddFilter(new wxGxPrjFileFilter(), true);
-				dlg.AddFilter(new wxGxRasterDatasetFilter());
+				dlg.SetButtonCaption(_("Select"));
+				dlg.SetStartingLocation(_("Coordinate Systems"));
                 if(dlg.ShowModalOpen() == wxID_OK)
                 {
                     GxObjectArray* pArr = dlg.GetSelectedObjects();
@@ -357,8 +358,23 @@ void wxGISCatalogMainCmd::OnClick(void)
                         return;
                     if(pArr->size() < 0)
                          return;
-                    IGxObject* pObj = pArr->at(0);
-                    int x = 0;
+					wxGxPrjFile* pGxPrjFile = dynamic_cast<wxGxPrjFile*>(pArr->at(0));
+					if(!pGxPrjFile)
+                         return;
+
+					wxGISMapView* pMapView(NULL);
+					WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
+					if(pWinArr)
+					{
+						for(size_t i = 0; i < pWinArr->size(); i++)
+						{
+							pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
+							if(pMapView)
+								break;
+						}
+					}
+					if(pMapView)
+						pMapView->SetSpatialReference(pGxPrjFile->GetSpatialReference());
                 }
               //  wxString sProjDir = wxString(wxT("e:\\temp\\srs\\Projected Coordinate Systems"));
               //  if(!wxDirExists(sProjDir))
@@ -562,7 +578,7 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 		case 7:	
 			return wxString(_("Create new folder"));
 		case 8:	
-			return wxString(_("Test GxDialog"));
+			return wxString(_("Test change proj"));
 		default:
 			return wxString();
 	}

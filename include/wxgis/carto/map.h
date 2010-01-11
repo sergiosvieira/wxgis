@@ -35,7 +35,10 @@ public:
 	virtual wxString GetDescription(void){return m_sDescription;};
 	virtual void SetDescription(wxString sDescription){m_sDescription = sDescription;};
 	virtual OGREnvelope GetFullExtent(void);
+	virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference);
+	virtual OGRSpatialReference* GetSpatialReference(void);
 protected:
 	wxString m_sMapName, m_sDescription;
 	std::vector<wxGISLayer*> m_Layers;
+	OGRSpatialReference* m_pSpatialReference;
 };
