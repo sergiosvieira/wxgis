@@ -35,27 +35,11 @@ public:
 	wxGISApplication(IGISConfig* pConfig, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER );//| wxWS_EX_VALIDATE_RECURSIVELY
 	//destructor
 	virtual ~wxGISApplication(void);
-	//events
-    void OnEraseBackground(wxEraseEvent& event);
-    void OnSize(wxSizeEvent& event);
-	void OnCommand(wxCommandEvent& event);
-	void OnDropDownCommand(wxCommandEvent& event);
-	void OnCommandUI(wxUpdateUIEvent& event);
-	void OnRightDown(wxMouseEvent& event);
-	void OnRightDown(wxAuiToolBarEvent& event);
-	void OnToolDropDown(wxAuiToolBarEvent& event);
-//
 	virtual wxStatusBar* OnCreateStatusBar(int number, long style, wxWindowID id, const wxString& name);
-	virtual void LoadCommands(wxXmlNode* pRootNode);
-	virtual void LoadMenues(wxXmlNode* pRootNode);
-	virtual void LoadToolbars(wxXmlNode* pRootNode);
 	virtual COMMANDBARARRAY* GetCommandBars(void);
 	virtual COMMANDARRAY* GetCommands(void);
 	virtual wxGISMenuBar* GetMenuBar(void);
 	virtual wxGISAcceleratorTable* GetGISAcceleratorTable(void);
-	virtual void SerializeFramePos(bool bSave = false);
-	virtual void SerializeCommandBars(bool bSave = false);
-	virtual void OnCommand(ICommand* pCmd);
 //IApplication
 	virtual ICommand* GetCommand(long CmdID);
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
@@ -72,7 +56,23 @@ public:
 	virtual void OnMouseUp(wxMouseEvent& event);
 	virtual void OnMouseDoubleClick(wxMouseEvent& event);
 	virtual void OnMouseMove(wxMouseEvent& event);
-
+protected:
+	virtual void LoadCommands(wxXmlNode* pRootNode);
+	virtual void LoadMenues(wxXmlNode* pRootNode);
+	virtual void LoadToolbars(wxXmlNode* pRootNode);
+	virtual void SerializeFramePos(bool bSave = false);
+	virtual void SerializeCommandBars(bool bSave = false);
+	virtual void OnCommand(ICommand* pCmd);
+	//events
+    virtual void OnEraseBackground(wxEraseEvent& event);
+    virtual void OnSize(wxSizeEvent& event);
+	virtual void OnCommand(wxCommandEvent& event);
+	virtual void OnDropDownCommand(wxCommandEvent& event);
+	virtual void OnCommandUI(wxUpdateUIEvent& event);
+	virtual void OnRightDown(wxMouseEvent& event);
+	virtual void OnRightDown(wxAuiToolBarEvent& event);
+	virtual void OnToolDropDown(wxAuiToolBarEvent& event);
+//
 protected:
 	IGISConfig* m_pConfig;
 	COMMANDARRAY m_CommandArray;

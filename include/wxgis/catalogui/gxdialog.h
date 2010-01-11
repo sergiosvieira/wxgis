@@ -42,7 +42,8 @@
 #include <wx/dialog.h>
 
 #include "wxgis/framework/config.h"
-#include "wxgis/catalog/catalog.h"
+//#include "wxgis/catalog/catalog.h"
+#include "wxgis/catalog/gxcatalog.h"
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalogui/gxcontentview.h"
 #include "wxgis/catalogui/gxtreeview.h"
@@ -97,6 +98,7 @@ public:
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 //wxGxTreeViewBase
     virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, bool sort = true);
+    virtual GxObjectArray* GetSelectedObjects(void){return m_pSelection->GetSelectedObjects(TREECTRLID);}
 protected:
     wxTreeItemId m_PrewItemId;
     bool m_bClicked;
@@ -124,6 +126,7 @@ public:
 	virtual void SetCurrentFilter(size_t nFilterIndex);
 //wxGxContentView
 	virtual void AddObject(IGxObject* pObject);
+    virtual GxObjectArray* GetSelectedObjects(void){return m_pSelection->GetSelectedObjects(/*LISTCTRLID*/);}
 protected:
 	IConnectionPointContainer* m_pConnectionPointSelection;
 	long m_ConnectionPointSelectionCookie;
@@ -162,9 +165,8 @@ protected:
 public:
 	wxGxDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,338 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 	~wxGxDialog();	
-    virtual void OnCommand(ICommand* pCmd);
 //IGxApplication
-    virtual IGxCatalog* GetCatalog(void){return m_pCatalog;};
+    virtual IGxCatalog* GetCatalog(void){return static_cast<IGxCatalog*>(m_pCatalog);};
 //IApplication
 	virtual ICommand* GetCommand(long CmdID);
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
@@ -178,14 +180,15 @@ public:
     virtual void ShowStatusBar(bool bShow){};
     virtual bool IsStatusBarShown(void){return false;};
     virtual void ShowToolBarMenu(void){};
-	virtual WINDOWARRAY* GetChildWindows(void){return NULL;};
-    virtual void RegisterChildWindow(wxWindow* pWnd){};
+	virtual WINDOWARRAY* GetChildWindows(void);
+    virtual void RegisterChildWindow(wxWindow* pWnd);
     virtual void Customize(void){};
     virtual void ShowApplicationWindow(wxWindow* pWnd, bool bShow = true){};
 	virtual void OnMouseDown(wxMouseEvent& event){};
 	virtual void OnMouseUp(wxMouseEvent& event){};
 	virtual void OnMouseDoubleClick(wxMouseEvent& event){};
 	virtual void OnMouseMove(wxMouseEvent& event){};
+//wxGxDialog
 	virtual void SetButtonCaption(wxString sOkBtLabel);
 	virtual void SetStartingLocation(wxString sStartPath);
 	virtual void SetName(wxString sName);
@@ -193,18 +196,30 @@ public:
 	virtual void SetOverwritePrompt(bool bOverwritePrompt);
 	virtual int ShowModalOpen();
 	virtual int ShowModalSave();
-	virtual void OnInit();
-	virtual void AddFilter(IGxObjectFilter* pFilter, bool bDefault);
+	virtual void AddFilter(IGxObjectFilter* pFilter, bool bDefault = false);
 	virtual void RemoveAllFilters(void);
+    virtual GxObjectArray* GetSelectedObjects(void){return m_pObjectArray;}
+    virtual wxString GetName(void);
+    virtual wxString GetFullPath(void);
+    virtual IGxObject* GetLocation(void);
+protected:
 // events
-    void OnCommand(wxCommandEvent& event);
-	void OnCommandUI(wxUpdateUIEvent& event);
-	void OnDropDownCommand(wxCommandEvent& event);
-	void OnToolDropDown(wxAuiToolBarEvent& event);
-	void OnItemSelected(wxListEvent& event);
+    virtual void OnCommand(wxCommandEvent& event);
+	virtual void OnCommandUI(wxUpdateUIEvent& event);
+	virtual void OnDropDownCommand(wxCommandEvent& event);
+	virtual void OnToolDropDown(wxAuiToolBarEvent& event);
+	virtual void OnItemSelected(wxListEvent& event);
+	virtual void OnFilerSelect(wxCommandEvent& event);
+    virtual void OnOK(wxCommandEvent& event);
+    virtual void OnOKUI(wxUpdateUIEvent& event);
+    virtual void OnCommand(ICommand* pCmd);
+//wxGxDialog
+	virtual void OnInit();
+    virtual void SerializeFramePos(bool bSave);
+    virtual bool DoSaveObject(wxGISEnumSaveObjectResults Result);
 protected:
  	COMMANDARRAY m_CommandArray;
-  	IGxCatalog* m_pCatalog;
+  	wxGxCatalog* m_pCatalog;
     wxGISAppConfig* m_pConfig;
     wxGxDialogContentView* m_pwxGxContentView;
     wxTreeViewComboPopup* m_PopupCtrl;
@@ -213,10 +228,13 @@ protected:
 	wxString m_sStartPath;
 	wxString m_sName;
 	bool m_bAllowMultiSelect, m_bOverwritePrompt;
+    bool m_bIsSaveDlg;
 	OBJECTFILTERS m_FilterArray;
 	size_t m_nDefaultFilter;
+    GxObjectArray* m_pObjectArray;
+    int m_nRetCode;
+   	WINDOWARRAY m_WindowArray;
 
     DECLARE_EVENT_TABLE()
 };
-//wxFileDialog(wxWindow* parent, const wxString& message = "Choose a file", const wxString& defaultDir = "", const wxString& defaultFile = "", const wxString& wildcard = "*.*", long style = wxFD_DEFAULT_STYLE, const wxPoint& pos = wxDefaultPosition, const wxSize& sz = wxDefaultSize, const wxString& name = "filedlg")
 

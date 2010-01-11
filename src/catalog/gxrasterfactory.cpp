@@ -33,6 +33,7 @@ wxGxRasterFactory::~wxGxRasterFactory(void)
 
 bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray)
 {
+    std::vector<wxString> remove_candidates;
 	for(size_t i = 0; i < pFileNames->GetCount(); i++)
 	{
 		wxString path = pFileNames->Item(i);
@@ -40,8 +41,8 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 		if(wxFileName::DirExists(path))
 			continue;
 
-		wxString name, ext;
-		wxFileName::SplitPath(path, NULL, NULL, &name, &ext);
+		wxString vol, shortpath, name, ext;
+		wxFileName::SplitPath(path, &vol, &shortpath, &name, &ext);
 		ext.MakeLower();
 		
 
@@ -49,6 +50,13 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 		//prj files
 		if(ext == wxString(wxT("bmp")) || ext == wxString(wxT("jpg")) || ext == wxString(wxT("img")))
 		{
+            wxString sRemCand;
+            if(vol.IsEmpty())
+                sRemCand = shortpath + wxFileName::GetPathSeparator() + name + wxT(".prj");
+            else
+                sRemCand = vol + wxT(":") + shortpath + wxFileName::GetPathSeparator() + name + wxT(".prj");
+            remove_candidates.push_back(sRemCand);
+
 			if(m_pCatalog->GetShowExt())
 				name += wxT(".") + ext;
 			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterUnknown);
@@ -57,6 +65,13 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 		}
 		if(ext == wxString(wxT("tif")) || ext == wxString(wxT("tiff")) || ext == wxString(wxT("png")))
 		{
+            wxString sRemCand;
+            if(vol.IsEmpty())
+                sRemCand = shortpath + wxFileName::GetPathSeparator() + name + wxT(".prj");
+            else
+                sRemCand = vol + wxT(":") + shortpath + wxFileName::GetPathSeparator() + name + wxT(".prj");
+            remove_candidates.push_back(sRemCand);
+
 			if(m_pCatalog->GetShowExt())
 				name += wxT(".") + ext;
 			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterUnknown);
@@ -65,6 +80,13 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 		}
 		if(ext == wxString(wxT("til")) || ext == wxString(wxT("jpeg")) || ext == wxString(wxT("jp2")))//TODO: add other raster file extensions
 		{
+            wxString sRemCand;
+            if(vol.IsEmpty())
+                sRemCand = shortpath + wxFileName::GetPathSeparator() + name + wxT(".prj");
+            else
+                sRemCand = vol + wxT(":") + shortpath + wxFileName::GetPathSeparator() + name + wxT(".prj");
+            remove_candidates.push_back(sRemCand);
+
 			if(m_pCatalog->GetShowExt())
 				name += wxT(".") + ext;
 			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterUnknown);
@@ -93,6 +115,20 @@ REMOVE:
 		if(pGxObj != NULL)
 			pObjArray->push_back(pGxObj);
 	}
+
+	for(size_t i = 0; i < pFileNames->GetCount(); i++)
+	{
+        wxString path = pFileNames->Item(i);
+        for(size_t j = 0; j < remove_candidates.size(); j++)
+        {
+            if(remove_candidates[j].CmpNoCase(path) == 0)
+            {
+                pFileNames->RemoveAt(i);
+                i--;
+                break;
+            }
+        }
+    }
 
 	return true;
 }

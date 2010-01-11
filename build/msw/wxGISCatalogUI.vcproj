@@ -227,6 +227,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\catalogui\viewscmd.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\catalogui\viewsfactory.cpp"
 				>
 			</File>
@@ -290,6 +294,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalogui\gxview.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\viewscmd.h"
 				>
 			</File>
 			<File
