@@ -347,7 +347,7 @@ void wxGISCatalogMainCmd::OnClick(void)
             {
     //            wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
     //            wxGxDialog dlg(pWnd, wxID_ANY, _("Select projection")); 
-				//dlg.SetAllowMultiSelect(false);
+				//dlg.SetAllowMultiSelect(true);
 				//dlg.AddFilter(new wxGxPrjFileFilter(), true);
 				//dlg.SetButtonCaption(_("Select"));
 				//dlg.SetStartingLocation(_("Coordinate Systems"));
@@ -358,127 +358,138 @@ void wxGISCatalogMainCmd::OnClick(void)
     //                    return;
     //                if(pArr->size() < 0)
     //                     return;
-				//	wxGxPrjFile* pGxPrjFile = dynamic_cast<wxGxPrjFile*>(pArr->at(0));
-				//	if(!pGxPrjFile)
-    //                     return;
-
-				//	wxGISMapView* pMapView(NULL);
-				//	WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
-				//	if(pWinArr)
+				//	for(size_t i = 0; i < pArr->size(); i++)
 				//	{
-				//		for(size_t i = 0; i < pWinArr->size(); i++)
+				//		wxGxPrjFile* pGxPrjFile = dynamic_cast<wxGxPrjFile*>(pArr->at(i));
+				//		if(!pGxPrjFile)
+				//			return;
+				//		OGRSpatialReference* pRef = pGxPrjFile->GetSpatialReference();
+				//		if(pRef)
 				//		{
-				//			pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
-				//			if(pMapView)
-				//				break;
+				//			wxString sProjDir = wxString(wxT("d:\\temp\\srs\\Projected Coordinate Systems"));
+				//			if(!wxDirExists(sProjDir))
+				//				wxFileName::Mkdir(sProjDir, 0755, wxPATH_MKDIR_FULL);
+				//			wxString sGeogDir = wxString(wxT("d:\\temp\\srs\\Geographic Coordinate Systems"));
+				//			if(!wxDirExists(sGeogDir))
+				//				wxFileName::Mkdir(sGeogDir, 0755, wxPATH_MKDIR_FULL);
+				//			wxString sLoclDir = wxString(wxT("d:\\temp\\srs\\Vertical Coordinate Systems"));
+				//			if(!wxDirExists(sLoclDir))
+				//				wxFileName::Mkdir(sLoclDir, 0755, wxPATH_MKDIR_FULL);
+
+				//			const char *pszProjection = pRef->GetAttrValue("PROJECTION"); 
+				//			wxString sProjection;
+				//			if(pszProjection)
+				//				sProjection = wgMB2WX(pszProjection);
+				//			if(pRef->IsProjected())
+				//			{
+				//				const char *pszProjcs = pRef->GetAttrValue("PROJCS");
+				//				wxString sName = wgMB2WX(pszProjcs);
+				//				wxString sFileName;
+				//				int pos = sName.Find('/');
+				//				if(pos != wxNOT_FOUND)
+				//				{
+				//					wxString sSubFldr = sName.Right(sName.Len() - pos - 1);
+				//					sSubFldr.Trim(true); sSubFldr.Trim(false);
+				//					wxString sStorePath = sProjDir + wxFileName::GetPathSeparator() + sSubFldr;
+				//					if(!wxDirExists(sStorePath))
+				//						wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
+
+				//					sName.Replace(wxString(wxT("/")), wxString(wxT(""))); 
+				//					sName.Replace(wxString(wxT("  ")), wxString(wxT(" "))); 
+				//					sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".spr");
+				//				}
+				//				else
+				//				{
+				//					sFileName = sProjDir + wxFileName::GetPathSeparator() + sName + wxT(".spr");
+				//				}
+				//				FILE *fp = VSIFOpenL( wgWX2MB(sFileName), "w");
+				//				if( fp != NULL )
+				//				{
+				//					char* pData(NULL);
+				//					pRef->exportToWkt(&pData);
+				//					VSIFWriteL( pData, 1, strlen(pData), fp );
+				//					CPLFree(pData);
+				//					VSIFCloseL(fp);
+				//				}
+				//			}
+				//			else if(pRef->IsGeographic())
+				//			{
+				//				const char *pszProjcs = pRef->GetAttrValue("GEOGCS");
+				//				wxString sName = wgMB2WX(pszProjcs);
+				//				if(sName.Find(wxT("depre")) != wxNOT_FOUND)
+				//					continue;
+				//				wxString sFileName;
+				//				int pos = sName.Find('/');
+				//				if(pos != wxNOT_FOUND)
+				//				{
+				//					wxString sSubFldr = sName.Right(sName.Len() - pos - 1);
+				//					sSubFldr.Trim(true); sSubFldr.Trim(false);
+				//					wxString sStorePath = sGeogDir + wxFileName::GetPathSeparator() + sSubFldr;
+				//					if(!wxDirExists(sStorePath))
+				//						wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
+
+				//					sName.Replace(wxString(wxT("/")), wxString(wxT(""))); 
+				//					sName.Replace(wxString(wxT("  ")), wxString(wxT(" "))); 
+				//					sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".spr");
+				//				}
+				//				else
+				//				{
+				//					sFileName = sGeogDir + wxFileName::GetPathSeparator() + sName + wxT(".spr");
+				//				}
+				//				FILE *fp = VSIFOpenL( wgWX2MB(sFileName), "w");
+				//				if( fp != NULL )
+				//				{
+				//					char* pData(NULL);
+				//					pRef->exportToWkt(&pData);
+				//					VSIFWriteL( pData, 1, strlen(pData), fp );
+				//					CPLFree(pData);
+				//					VSIFCloseL(fp);
+				//				}
+				//			}
 				//		}
+
+				//		//const char *pszProjcs = pRef->GetAttrValue("PROJCS");
+				//		//wxString sName = wgMB2WX(pszProjcs);
+				//		//wxString sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".spr");
+				//		//FILE *fp = VSIFOpenL( wgWX2MB(sFileName), "w");
+				//		//if( fp != NULL )
+				//		//{
+				//		//	char* pData(NULL);
+				//		//	SpaRef.exportToWkt(&pData);
+				//		//	VSIFWriteL( pData, 1, strlen(pData), fp );
+
+				//		//	CPLFree(pData);
+				//		//	VSIFCloseL(fp);
+				//		//}
 				//	}
-				//	if(pMapView)
-    //                {
-    //                    OGRSpatialReference* pRef = pGxPrjFile->GetSpatialReference();
-    //                    if(pRef)
-    //                        pMapView->SetSpatialReference(pRef->Clone());
-    //                }
+
+				//	//wxGISMapView* pMapView(NULL);
+				//	//WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
+				//	//if(pWinArr)
+				//	//{
+				//	//	for(size_t i = 0; i < pWinArr->size(); i++)
+				//	//	{
+				//	//		pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
+				//	//		if(pMapView)
+				//	//			break;
+				//	//	}
+				//	//}
+				//	//if(pMapView)
+    // //               {
+    // //                   OGRSpatialReference* pRef = pGxPrjFile->GetSpatialReference();
+    // //                   if(pRef)
+    // //                       pMapView->SetSpatialReference(pRef->Clone());
+    // //               }
     //            }
-                #define SRS_WKT_WGS84 "GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9108\"]],AUTHORITY[\"EPSG\",\"4326\"]]"
 
-/* ==================================================================== */
-/*      Some "standard" strings.                                        */
-/* ==================================================================== */
 
-#define SRS_PT_ALBERS_CONIC_EQUAL_AREA                                  \
-                                "Albers_Conic_Equal_Area"
-#define SRS_PT_AZIMUTHAL_EQUIDISTANT "Azimuthal_Equidistant"
-#define SRS_PT_CASSINI_SOLDNER  "Cassini_Soldner"
-#define SRS_PT_CYLINDRICAL_EQUAL_AREA "Cylindrical_Equal_Area"
-#define SRS_PT_BONNE            "Bonne"
-#define SRS_PT_ECKERT_I         "Eckert_I"
-#define SRS_PT_ECKERT_II        "Eckert_II"
-#define SRS_PT_ECKERT_III       "Eckert_III"
-#define SRS_PT_ECKERT_IV        "Eckert_IV"
-#define SRS_PT_ECKERT_V         "Eckert_V"
-#define SRS_PT_ECKERT_VI        "Eckert_VI"
-#define SRS_PT_EQUIDISTANT_CONIC                                        \
-                                "Equidistant_Conic"
-#define SRS_PT_EQUIRECTANGULAR  "Equirectangular"
-#define SRS_PT_GALL_STEREOGRAPHIC                                       \
-                                "Gall_Stereographic"
-#define SRS_PT_GAUSSSCHREIBERTMERCATOR                                      \
-                                "Gauss_Schreiber_Transverse_Mercator"
-#define SRS_PT_GEOSTATIONARY_SATELLITE                                  \
-                                "Geostationary_Satellite"
-#define SRS_PT_GOODE_HOMOLOSINE "Goode_Homolosine"
-#define SRS_PT_GNOMONIC         "Gnomonic"
-#define SRS_PT_HOTINE_OBLIQUE_MERCATOR                                  \
-                                "Hotine_Oblique_Mercator"
-#define SRS_PT_HOTINE_OBLIQUE_MERCATOR_TWO_POINT_NATURAL_ORIGIN         \
-                            "Hotine_Oblique_Mercator_Two_Point_Natural_Origin"
-#define SRS_PT_LABORDE_OBLIQUE_MERCATOR                                 \
-                                "Laborde_Oblique_Mercator"
-#define SRS_PT_LAMBERT_CONFORMAL_CONIC_1SP                              \
-                                "Lambert_Conformal_Conic_1SP"
-#define SRS_PT_LAMBERT_CONFORMAL_CONIC_2SP                              \
-                                "Lambert_Conformal_Conic_2SP"
-#define SRS_PT_LAMBERT_CONFORMAL_CONIC_2SP_BELGIUM                      \
-                                "Lambert_Conformal_Conic_2SP_Belgium"
-#define SRS_PT_LAMBERT_AZIMUTHAL_EQUAL_AREA                     \
-                                "Lambert_Azimuthal_Equal_Area"
-#define SRS_PT_MERCATOR_1SP     "Mercator_1SP"
-#define SRS_PT_MERCATOR_2SP     "Mercator_2SP"
-#define SRS_PT_MILLER_CYLINDRICAL "Miller_Cylindrical"
-#define SRS_PT_MOLLWEIDE        "Mollweide"
-#define SRS_PT_NEW_ZEALAND_MAP_GRID                                     \
-                                "New_Zealand_Map_Grid"
-#define SRS_PT_OBLIQUE_STEREOGRAPHIC                                    \
-                                "Oblique_Stereographic"
-#define SRS_PT_ORTHOGRAPHIC     "Orthographic"
-#define SRS_PT_POLAR_STEREOGRAPHIC                                      \
-                                "Polar_Stereographic"
-#define SRS_PT_POLYCONIC        "Polyconic"
-#define SRS_PT_ROBINSON         "Robinson"
-#define SRS_PT_SINUSOIDAL       "Sinusoidal"
-#define SRS_PT_STEREOGRAPHIC    "Stereographic"
-#define SRS_PT_SWISS_OBLIQUE_CYLINDRICAL                                \
-                                "Swiss_Oblique_Cylindrical"
-#define SRS_PT_TRANSVERSE_MERCATOR                                      \
-                                "Transverse_Mercator"
-#define SRS_PT_TRANSVERSE_MERCATOR_SOUTH_ORIENTED                       \
-                                "Transverse_Mercator_South_Orientated"
-
-/* special mapinfo variants on Transverse Mercator */
-#define SRS_PT_TRANSVERSE_MERCATOR_MI_21 \
-                                "Transverse_Mercator_MapInfo_21"
-#define SRS_PT_TRANSVERSE_MERCATOR_MI_22 \
-                                "Transverse_Mercator_MapInfo_22"
-#define SRS_PT_TRANSVERSE_MERCATOR_MI_23 \
-                                "Transverse_Mercator_MapInfo_23"
-#define SRS_PT_TRANSVERSE_MERCATOR_MI_24 \
-                                "Transverse_Mercator_MapInfo_24"
-#define SRS_PT_TRANSVERSE_MERCATOR_MI_25 \
-                                "Transverse_Mercator_MapInfo_25"
-
-#define SRS_PT_TUNISIA_MINING_GRID                                      \
-                                "Tunisia_Mining_Grid"
-#define SRS_PT_TWO_POINT_EQUIDISTANT                                    \
-                                "Two_Point_Equidistant"
-#define SRS_PT_VANDERGRINTEN    "VanDerGrinten"
-#define SRS_PT_KROVAK           "Krovak"
-#define SRS_PT_IMW_POLYCONIC    "International_Map_of_the_World_Polyconic"
-#define SRS_PT_WAGNER_I         "Wagner_I"
-#define SRS_PT_WAGNER_II        "Wagner_II"
-#define SRS_PT_WAGNER_III       "Wagner_III"
-#define SRS_PT_WAGNER_IV        "Wagner_IV"
-#define SRS_PT_WAGNER_V         "Wagner_V"
-#define SRS_PT_WAGNER_VI        "Wagner_VI"
-#define SRS_PT_WAGNER_VII       "Wagner_VII"
-
-                wxString sProjDir = wxString(wxT("e:\\temp\\srs\\Projected Coordinate Systems"));
+                wxString sProjDir = wxString(wxT("d:\\temp\\srs\\Projected Coordinate Systems"));
                 if(!wxDirExists(sProjDir))
 		            wxFileName::Mkdir(sProjDir, 0755, wxPATH_MKDIR_FULL);
-                wxString sGeogDir = wxString(wxT("e:\\temp\\srs\\Geographic Coordinate Systems"));
+                wxString sGeogDir = wxString(wxT("d:\\temp\\srs\\Geographic Coordinate Systems"));
                 if(!wxDirExists(sGeogDir))
 		            wxFileName::Mkdir(sGeogDir, 0755, wxPATH_MKDIR_FULL);
-                wxString sLoclDir = wxString(wxT("e:\\temp\\srs\\Vertical Coordinate Systems"));
+                wxString sLoclDir = wxString(wxT("d:\\temp\\srs\\Vertical Coordinate Systems"));
                 if(!wxDirExists(sLoclDir))
 		            wxFileName::Mkdir(sLoclDir, 0755, wxPATH_MKDIR_FULL);
 
@@ -491,7 +502,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 
                     wxString sDirPath;
 
-                    for(size_t i = 0; i < 70000; i++)
+                    for(size_t i = 4318; i < 4320; i++)
                     {
                         OGRSpatialReference SpaRef;
                         OGRErr err = SpaRef.importFromEPSG(i);
@@ -525,14 +536,19 @@ void wxGISCatalogMainCmd::OnClick(void)
                                 {
                                     sFileName = sProjDir + wxFileName::GetPathSeparator() + sName + wxT(".spr");
                                 }
-                                wxFile file;
-                                if(file.Create(sFileName))
+								FILE *fp = VSIFOpenL( wgWX2MB(sFileName), "w");
+								if( fp != NULL )
+                                //wxFile file;
+                                //if(file.Create(sFileName))
                                 {
                                     char* pData(NULL);
                                     SpaRef.exportToWkt(&pData);
-                                    wxString Data = wgMB2WX(pData);
-                                    file.Write(Data);
+                                    //wxString Data = wgMB2WX(pData);
+                                    //file.Write(Data);
+								    VSIFWriteL( pData, 1, strlen(pData), fp );
+
                                     CPLFree(pData);
+									VSIFCloseL(fp);
                                 }
                             }
                             else if(SpaRef.IsGeographic())
@@ -559,19 +575,23 @@ void wxGISCatalogMainCmd::OnClick(void)
                                 {
                                     sFileName = sGeogDir + wxFileName::GetPathSeparator() + sName + wxT(".spr");
                                 }
-                                wxFile file;
-                                if(file.Create(sFileName))
+                                //wxFile file;
+                                //if(file.Create(sFileName))
+								FILE *fp = VSIFOpenL( wgWX2MB(sFileName), "w");
+								if( fp != NULL )
                                 {
                                     char* pData(NULL);
                                     SpaRef.exportToWkt(&pData);
-                                    wxString Data = wgMB2WX(pData);
-                                    file.Write(Data);
+                                    //wxString Data = wgMB2WX(pData);
+                                    //file.Write(Data);
+								    VSIFWriteL( pData, 1, strlen(pData), fp );
                                     CPLFree(pData);
+									VSIFCloseL(fp);
                                 }
                             }
                             else
                             {
-                                sDirPath = wxString(wxT("e:\\temp\\srs\\Vertical Coordinate Systems"));
+                                sDirPath = wxString(wxT("d:\\temp\\srs\\Vertical Coordinate Systems"));
                             //bool bLoc = SpaRef.IsLocal();
                             }
                         }

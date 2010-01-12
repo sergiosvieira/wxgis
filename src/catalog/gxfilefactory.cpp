@@ -47,7 +47,7 @@ bool wxGxFileFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames
 		
 
 		IGxObject* pGxObj = NULL;
-		if(ext == wxString(wxT("srml")))
+		if(ext == wxString(wxT("spr")))
 		{
 			if(m_pCatalog->GetShowExt())
 				name += wxT(".") + ext;

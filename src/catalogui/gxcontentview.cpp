@@ -31,7 +31,6 @@ BEGIN_EVENT_TABLE(wxGxContentView, wxListCtrl)
 
     EVT_LIST_COL_CLICK(LISTCTRLID, wxGxContentView::OnColClick)
     EVT_CONTEXT_MENU(wxGxContentView::OnContextMenu)
-	EVT_LEFT_DOWN(wxGxContentView::OnLeftDown)
 END_EVENT_TABLE()
 
 int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
@@ -43,7 +42,7 @@ int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
 }
 
 wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : 
-wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(REPORT), m_pConnectionPointCatalog(NULL), /*m_pConnectionPointSelection(NULL),*/ m_ConnectionPointCatalogCookie(-1)/*, m_ConnectionPointSelectionCookie(-1)*/, m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL)
+wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(REPORT), m_pConnectionPointCatalog(NULL), /*m_pConnectionPointSelection(NULL),*/ m_ConnectionPointCatalogCookie(-1)/*, m_ConnectionPointSelectionCookie(-1)*/, m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL), m_bDragging(false)
 {
 	InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150); 
 	InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
@@ -57,7 +56,6 @@ wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(REPO
 
 	SetImageList(&m_ImageListLarge, wxIMAGE_LIST_NORMAL);
 	SetImageList(&m_ImageListSmall, wxIMAGE_LIST_SMALL);
-	m_bCtrlDown = false;
 }
 
 wxGxContentView::~wxGxContentView(void)
@@ -206,8 +204,15 @@ void wxGxContentView::OnSelected(wxListEvent& event)
 	if(pItemData == NULL)
 		return;
 
-	m_pSelection->Select(pItemData->pObject, m_bCtrlDown, NOTFIRESELID);
+	//wxMouseState mstate = wxGetMouseState();
+	//bool bCtrlDown = mstate.ControlDown();
+	//bool bAdd = bCtrlDown || m_bDragging;
+	//m_bDragging = false;
+
+	bool bAdd = true;
+	m_pSelection->Select(pItemData->pObject, bAdd, NOTFIRESELID);
 }
+
 void wxGxContentView::OnDeselected(wxListEvent& event)
 {
 	event.Skip();
@@ -540,10 +545,3 @@ void wxGxContentView::ResetContents(void)
 		delete (LPITEMDATA)GetItemData(i);
 	DeleteAllItems();
 }
-
-void wxGxContentView::OnLeftDown(wxMouseEvent& event)
-{
-	event.Skip();
-	m_bCtrlDown = event.m_controlDown;
-}
-
