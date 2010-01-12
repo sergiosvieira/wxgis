@@ -63,8 +63,6 @@ public:
 	virtual void OnEndLabelEdit(wxListEvent& event);
 	virtual void OnSelected(wxListEvent& event);
 	virtual void OnDeselected(wxListEvent& event);
-	virtual void OnLeftDown(wxMouseEvent& event);
-
 
 	typedef struct _itemdata
 	{
@@ -81,7 +79,7 @@ protected:
 	long m_ConnectionPointCatalogCookie/*, m_ConnectionPointSelectionCookie*/;
 	IGxSelection* m_pSelection;
 	IGxObject* m_pParentGxObject;
-	bool m_bCtrlDown;
+	bool m_bDragging;
 
 DECLARE_EVENT_TABLE()
 };

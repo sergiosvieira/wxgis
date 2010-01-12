@@ -126,7 +126,7 @@ public:
 	virtual void SetCurrentFilter(size_t nFilterIndex);
 //wxGxContentView
 	virtual void AddObject(IGxObject* pObject);
-    virtual GxObjectArray* GetSelectedObjects(void){return m_pSelection->GetSelectedObjects(/*LISTCTRLID*/);}
+    virtual GxObjectArray* GetSelectedObjects(void){return m_pSelection->GetSelectedObjects(NOTFIRESELID/*LISTCTRLID*/);}
 protected:
 	IConnectionPointContainer* m_pConnectionPointSelection;
 	long m_ConnectionPointSelectionCookie;
