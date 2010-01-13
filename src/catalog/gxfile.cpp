@@ -96,53 +96,10 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 		switch(m_Type)
 		{
 		case enumESRIPrjFile:
-			{
 			err = m_OGRSpatialReference.importFromESRI(papszLines);
-			}
 			break;
 		case enumSRMLfile:
-			{
 			err = m_OGRSpatialReference.importFromWkt(papszLines);
-   //             wxString Data;
-   //             char* pData(NULL);
-   //             OGRSpatialReference SpaRef;
-   //             OGRErr err = SpaRef.importFromEPSG(3752);//28407
-   //             if(err == OGRERR_NONE)
-   //             {
-   //                 SpaRef.exportToWkt(&pData);
-   //                 Data = wgMB2WX(pData);  
-   //                 wxLogDebug(Data);
-   //             }
-			//err = m_OGRSpatialReference.importFromWkt(&pData);
-   //         CPLFree(pData);
-
-
-			//FILE *fp;
-			//fp = VSIFOpenL( wgWX2MB(m_sPath), "rb" );
-			//if( fp == NULL )
-			//	return NULL;
-
-			//VSIFSeekL( fp, 0, SEEK_END );
-			//int nFileLen = VSIFTellL( fp );
-			//VSIRewindL( fp );
-
-			//char *pszRawData = (char *) CPLMalloc(nFileLen/* + 1*/);
-			//if( (int)VSIFReadL( pszRawData, 1, nFileLen, fp ) != nFileLen )
-			//{
-			//	CPLFree( pszRawData );
-			//	pszRawData = NULL;
-
-			//	wxLogError(wxString::Format(_("Read of file %s failed."), m_sPath.c_str() ));
-			//	return NULL;
-			//}
-
-			////pszRawData[nFileLen] = '\0';
-			//VSIFCloseL( fp );
-			//fp = NULL;	
-			//wxString sStr(pszRawData, *wxConvCurrent, nFileLen);
-			//err = m_OGRSpatialReference.importFromXML(wgWX2MB(sStr));
-			//CPLFree(pszRawData);
-			}
 			break;
 		default:
 			break;

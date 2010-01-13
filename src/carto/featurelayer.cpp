@@ -83,9 +83,12 @@ void wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisp
 		    if(!pLayerSpaRef->IsSame(pEnvSpaRef))
 		    {
 			    OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pEnvSpaRef, pLayerSpaRef );
-			    poCT->Transform(1, &Env.MaxX, &Env.MaxY);
-			    poCT->Transform(1, &Env.MinX, &Env.MinY);
-			    OCTDestroyCoordinateTransformation(poCT);
+                if(poCT)
+                {
+			        poCT->Transform(1, &Env.MaxX, &Env.MaxY);
+			        poCT->Transform(1, &Env.MinX, &Env.MinY);
+			        OCTDestroyCoordinateTransformation(poCT);
+                }
 		    }
 	    }
 
