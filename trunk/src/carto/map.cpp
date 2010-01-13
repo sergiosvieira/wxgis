@@ -109,9 +109,12 @@ OGREnvelope wxGISMap::GetFullExtent(void)
         if(!m_pSpatialReference->IsSame(m_Layers[i]->GetSpatialReference()))
         {        	
             OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( m_Layers[i]->GetSpatialReference(), m_pSpatialReference );
-			poCT->Transform(1, &Env.MaxX, &Env.MaxY);
-			poCT->Transform(1, &Env.MinX, &Env.MinY);
-            OCTDestroyCoordinateTransformation(poCT);
+            if(poCT)
+            {
+			    poCT->Transform(1, &Env.MaxX, &Env.MaxY);
+			    poCT->Transform(1, &Env.MinX, &Env.MinY);
+                OCTDestroyCoordinateTransformation(poCT);
+            }
         }
         res.Merge(Env);
 	}
