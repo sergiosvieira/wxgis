@@ -67,7 +67,7 @@ void wxGISSimpleRenderer::Draw(wxGISFeatureSet* pSet, wxGISEnumDrawPhase DrawPha
  //   while( (poFeature = pLayer->GetNextFeature()) != NULL )
 	for(size_t i = 0; i < pSet->GetSize(); i++)
     {
-		OGRGeometry *poGeometry = pSet->GetAt(i)->GetGeometryRef();
+		OGRGeometry *poGeometry = pSet->GetAt(i)->GetGeometryRef()->clone();
         if( poGeometry != NULL)
 		{
 			//proj goes here
@@ -93,7 +93,7 @@ void wxGISSimpleRenderer::Draw(wxGISFeatureSet* pSet, wxGISEnumDrawPhase DrawPha
 				}
 			}
 		}
-
+		wxDELETE(poGeometry);
 		if(pTrackCancel && !pTrackCancel->Continue()) //|| wxGetKeyState(WXK_ESCAPE)
 			break;
 	}

@@ -104,7 +104,7 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 		default:
 			break;
 		}
-		CSLDestroy( papszLines );
+		//CSLDestroy( papszLines );
 	}
 
 	if(err == OGRERR_NONE)
