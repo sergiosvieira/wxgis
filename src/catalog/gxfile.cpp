@@ -107,7 +107,8 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 		//CSLDestroy( papszLines );
 	}
 
-	if(err == OGRERR_NONE)
+    err = m_OGRSpatialReference.Fixup();
+	if(err == OGRERR_NONE && m_OGRSpatialReference.Validate() == OGRERR_NONE)
 		return &m_OGRSpatialReference;
 	return NULL;
 }
