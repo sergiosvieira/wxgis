@@ -106,9 +106,23 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 		}
 		//CSLDestroy( papszLines );
 	}
+	if(m_OGRSpatialReference.GetEPSGGeogCS() == -1)
+		m_OGRSpatialReference.SetWellKnownGeogCS("WGS84");
 
     err = m_OGRSpatialReference.Fixup();
-	if(err == OGRERR_NONE && m_OGRSpatialReference.Validate() == OGRERR_NONE)
+	//err = m_OGRSpatialReference.Validate();
+	if(err == OGRERR_NONE)
+	{
+		char *pszProj4Defn = NULL;
+		m_OGRSpatialReference.exportToProj4( &pszProj4Defn );
+        CPLFree( pszProj4Defn );
 		return &m_OGRSpatialReference;
+	}
+	else
+	{
+		const char* err = CPLGetLastErrorMsg();
+		wxString sErr = wxString::Format(_("wxGxPrjFile: OGR error #%d: %s"), err, wgMB2WX(err));
+		wxLogError(sErr);
+	}
 	return NULL;
 }
