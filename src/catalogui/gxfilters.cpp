@@ -135,7 +135,7 @@ wxGISEnumSaveObjectResults wxGxPrjFileFilter::CanSaveObject( IGxObject* pLocatio
 
 wxString wxGxPrjFileFilter::GetName(void)
 {
-	return wxString(_("Coordinate Systems (*.prj, *.srml)"));
+	return wxString(_("Coordinate Systems (*.prj, *.spr)"));
 }
 
 //------------------------------------------------------------
