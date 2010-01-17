@@ -96,6 +96,7 @@ public:
 	{
 		return GetAt(nIndex);
 	}
+    virtual void Clear(void){m_OGRFeatureArray.clear();};
 protected:
 	std::vector<OGRFeature*> m_OGRFeatureArray;
 };

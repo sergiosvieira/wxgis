@@ -343,6 +343,8 @@ void wxGISMapView::OnEraseBackground(wxEraseEvent & event)
 
 void wxGISMapView::AddLayer(wxGISLayer* pLayer)
 {
+    if(!pLayer)
+        return;
 	wxGISMap::AddLayer(pLayer);
     //set spa ref for display transformation
 	IDisplayTransformation* pDisplayTransformation = pGISScreenDisplay->GetDisplayTransformation();
@@ -350,46 +352,47 @@ void wxGISMapView::AddLayer(wxGISLayer* pLayer)
 	{
         pDisplayTransformation->SetSpatialReference(m_pSpatialReference);
 	}
+    pLayer->SetSpatialReference(m_pSpatialReference);
 	
 	OGREnvelope* pEnv = pLayer->GetEnvelope();
 	if(pEnv == NULL)
 		return;
      
-    OGREnvelope Env;
-    Env.MaxX = pEnv->MaxX;
-    Env.MaxY = pEnv->MaxY;
-    Env.MinX = pEnv->MinX;
-    Env.MinY = pEnv->MinY;
+ //   OGREnvelope Env;
+ //   Env.MaxX = pEnv->MaxX;
+ //   Env.MaxY = pEnv->MaxY;
+ //   Env.MinX = pEnv->MinX;
+ //   Env.MinY = pEnv->MinY;
 
-	OGRSpatialReference* pSpaRef = pLayer->GetSpatialReference();
-	if(pSpaRef && m_pSpatialReference)
-	{
-		if(!m_pSpatialReference->IsSame(pSpaRef))
-		{
-			OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pSpaRef, m_pSpatialReference );
-			poCT->Transform(1, &Env.MaxX, &Env.MaxY);
-			poCT->Transform(1, &Env.MinX, &Env.MinY);
-            OCTDestroyCoordinateTransformation(poCT);
-		}
-	}
+	//OGRSpatialReference* pSpaRef = pLayer->GetSpatialReference();
+	//if(pSpaRef && m_pSpatialReference)
+	//{
+	//	if(!m_pSpatialReference->IsSame(pSpaRef))
+	//	{
+	//		OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pSpaRef, m_pSpatialReference );
+	//		poCT->Transform(1, &Env.MaxX, &Env.MaxY);
+	//		poCT->Transform(1, &Env.MinX, &Env.MinY);
+ //           OCTDestroyCoordinateTransformation(poCT);
+	//	}
+	//}
 
     //increase 10%
-    double fDeltaX = (Env.MaxX - Env.MinX) / 20;
-    double fDeltaY = (Env.MaxY - Env.MinY) / 20;
+    double fDeltaX = (pEnv->MaxX - pEnv->MinX) / 20;
+    double fDeltaY = (pEnv->MaxY - pEnv->MinY) / 20;
     double fDelta = std::max(fDeltaX, fDeltaY);
-    Env.MaxX += fDelta;
-    Env.MinX -= fDelta;
-    Env.MaxY += fDelta;
-    Env.MinY -= fDelta;
+    pEnv->MaxX += fDelta;
+    pEnv->MinX -= fDelta;
+    pEnv->MaxY += fDelta;
+    pEnv->MinY -= fDelta;
 
 	if(!pDisplayTransformation->IsBoundsSet())
     {
-		pDisplayTransformation->SetBounds(Env);
+		pDisplayTransformation->SetBounds(*pEnv);
     }
 	else
 	{
 		OGREnvelope Bounds = pDisplayTransformation->GetBounds();
-		Bounds.Merge(Env);
+		Bounds.Merge(*pEnv);
 		pDisplayTransformation->SetBounds(Bounds);
 	}
 

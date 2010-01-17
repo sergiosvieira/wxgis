@@ -117,7 +117,20 @@ double wxGISDisplayTransformation::GetScaleRatio(void)
 
 void wxGISDisplayTransformation::SetSpatialReference(OGRSpatialReference* pSpatialReference)
 {
+    //set bounds in new spa ref
+    OGRPoint pt1(m_Bounds.MaxX, m_Bounds.MaxY);
+    OGRPoint pt2(m_Bounds.MinX, m_Bounds.MinY);
+    pt1.assignSpatialReference(m_pSpatialReference);
+    pt2.assignSpatialReference(m_pSpatialReference);
+    pt1.transformTo(pSpatialReference);
+    pt2.transformTo(pSpatialReference);
+    OGREnvelope Env;
+    Env.MaxX = pt1.getX();
+    Env.MaxY = pt1.getY();
+    Env.MinX = pt2.getX();
+    Env.MinY = pt2.getY();
 	m_pSpatialReference = pSpatialReference;
+    SetBounds(Env);
 }
 
 OGRSpatialReference* wxGISDisplayTransformation::GetSpatialReference(void)

@@ -60,7 +60,7 @@ void wxGISMap::AddLayer(wxGISLayer* pLayer)
 				if(pEnv->MaxX <= 180 && pEnv->MaxY <= 90 && pEnv->MinX >= -180 && pEnv->MinY >= -90)
 				{
 					m_pSpatialReference = new OGRSpatialReference();
-					m_pSpatialReference->SetWellKnownGeogCS("WGS84");
+					m_pSpatialReference->importFromEPSG(4326);//SetWellKnownGeogCS("WGS84");
                     m_bShouldDeleteSP = true;
 				}
 			}
@@ -92,11 +92,11 @@ OGREnvelope wxGISMap::GetFullExtent(void)
 	for(size_t i = 0; i < m_Layers.size(); i++)
 	{
         OGREnvelope* pEnv = m_Layers[i]->GetEnvelope();
-        OGREnvelope Env;
-        Env.MaxX = pEnv->MaxX;
-        Env.MaxY = pEnv->MaxY;
-        Env.MinX = pEnv->MinX;
-        Env.MinY = pEnv->MinY;
+        //OGREnvelope Env;
+        //Env.MaxX = pEnv->MaxX;
+        //Env.MaxY = pEnv->MaxY;
+        //Env.MinX = pEnv->MinX;
+        //Env.MinY = pEnv->MinY;
         //double fDeltaX = (Env.MaxX - Env.MinX) / 250;
         //double fDeltaY = (Env.MaxY - Env.MinY) / 250;
         //double fDelta = std::max(fDeltaX, fDeltaY);
@@ -106,17 +106,18 @@ OGREnvelope wxGISMap::GetFullExtent(void)
         //Env.MinY += fDelta;
 
 		//check if the spatial ref is not same
-        if(!m_pSpatialReference->IsSame(m_Layers[i]->GetSpatialReference()))
-        {        	
-            OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( m_Layers[i]->GetSpatialReference(), m_pSpatialReference );
-            if(poCT)
-            {
-			    poCT->Transform(1, &Env.MaxX, &Env.MaxY);
-			    poCT->Transform(1, &Env.MinX, &Env.MinY);
-                OCTDestroyCoordinateTransformation(poCT);
-            }
-        }
-        res.Merge(Env);
+
+       // if(!m_pSpatialReference->IsSame(m_Layers[i]->GetSpatialReference()))
+       // {        	
+       //     OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( m_Layers[i]->GetSpatialReference(), m_pSpatialReference );
+       //     if(poCT)
+       //     {
+			    //poCT->Transform(1, &Env.MaxX, &Env.MaxY);
+			    //poCT->Transform(1, &Env.MinX, &Env.MinY);
+       //         OCTDestroyCoordinateTransformation(poCT);
+       //     }
+       // }
+        res.Merge(*pEnv);
 	}
     //increase 10%
     double fDeltaX = (res.MaxX - res.MinX) / 20;
@@ -135,6 +136,8 @@ void wxGISMap::SetSpatialReference(OGRSpatialReference* pSpatialReference, bool 
         wxDELETE(m_pSpatialReference);
 	m_pSpatialReference = pSpatialReference;
     m_bShouldDeleteSP = bShouldDeleteSP;
+	for(size_t i = 0; i < m_Layers.size(); i++)
+		m_Layers[i]->SetSpatialReference(m_pSpatialReference);
 }
 
 OGRSpatialReference* wxGISMap::GetSpatialReference(void)
