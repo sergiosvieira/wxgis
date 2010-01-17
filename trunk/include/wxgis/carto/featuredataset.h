@@ -27,27 +27,25 @@
 // wxGISFeatureDataset
 //---------------------------------------
 
-void GetFeatureBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
-
 class WXDLLIMPEXP_GIS_CRT wxGISFeatureDataset :
 	public wxGISDataset
 {
 public:
 	wxGISFeatureDataset(wxString sPath, wxFontEncoding Encoding = wxFONTENCODING_DEFAULT);
 	virtual ~wxGISFeatureDataset(void);
-	virtual OGRLayer* GetLayer(int iLayer = 0);
+//wxGISDataset
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
+//wxGISFeatureDataset
 	virtual bool Open(int iLayer);
 	virtual OGRSpatialReference* GetSpatialReference(void);
 	virtual OGREnvelope* GetEnvelope(void);
 	virtual void SetSpatialFilter(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);
-	virtual void Empty(void);
-	virtual void AddFeature(OGRFeature* poFeature);
-	virtual OGRFeature* GetAt(int nIndex);
-	virtual OGRFeature* operator [](int nIndex);
-	virtual wxString GetAsString(int row, int col);
+	virtual OGRFeature* GetAt(long nIndex);
+	virtual OGRFeature* operator [](long nIndex);
+	virtual wxString GetAsString(long row, int col);
 	virtual wxGISFeatureSet* GetFeatureSet(IQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
 	virtual size_t GetSize(void){return m_poLayer->GetFeatureCount(false);};
+	virtual OGRLayer* GetLayer(int iLayer = 0);
 //
 protected:
 	OGRDataSource *m_poDS;
@@ -55,7 +53,5 @@ protected:
 	OGRLayer* m_poLayer;
 	bool m_bIsOpened;
     bool m_bOLCStringsAsUTF8;
-	std::vector<OGRFeature*> m_OGRFeatureArray;
-	CPLQuadTree* m_pQuadTree;
     wxFontEncoding m_Encoding;
 };

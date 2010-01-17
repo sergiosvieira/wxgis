@@ -46,6 +46,7 @@ public:
 	virtual~wxGISLayer(void){};
 	//pure virtual
 	virtual OGRSpatialReference* GetSpatialReference(void) = 0;
+	virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference) = 0;
 	virtual OGREnvelope* GetEnvelope(void) = 0;
 	virtual bool IsValid(void) = 0;
 	virtual void Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisplay, ITrackCancel* pTrackCancel) = 0;
@@ -54,7 +55,6 @@ public:
 	virtual double GetMaximumScale(void){return m_dMaxScale;};
 	virtual void SetMinimumScale(double dMinScale){m_dMinScale = dMinScale;};
 	virtual double GetMinimumScale(void){return m_dMinScale;};
-	//virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference){m_pSpatialReference = pSpatialReference;};
 	virtual bool GetVisible(void){return m_bVisible;};
 	virtual void SetVisible(bool bVisible){m_bVisible = bVisible;};
 	virtual void SetName(wxString sName){m_sName = sName;};

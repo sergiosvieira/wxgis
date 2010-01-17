@@ -23,6 +23,8 @@
 #include "wxgis/carto/carto.h"
 #include "wxgis/carto/featuredataset.h"
 
+void GetFeatureBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
+
 class WXDLLIMPEXP_GIS_CRT wxGISFeatureLayer :
 	public wxGISLayer
 {
@@ -32,13 +34,26 @@ public:
 //IwxGISLayer
 	virtual void Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisplay, ITrackCancel* pTrackCancel);
 	virtual OGRSpatialReference* GetSpatialReference(void);
+	virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference);
 	virtual OGREnvelope* GetEnvelope(void);
 	virtual bool IsValid(void);
 //wxGISFeatureLayer
 	virtual IFeatureRenderer* GetRenderer(void){return m_pFeatureRenderer;};
 	virtual void SetRenderer(IFeatureRenderer* pFeatureRenderer){m_pFeatureRenderer = pFeatureRenderer;};
 protected:
+    virtual void CreateQuadTree(OGREnvelope* pEnv);
+    virtual void DeleteQuadTree(void);
+    virtual void LoadFeatures(void);
+    virtual void UnloadFeatures(void);
+    virtual void Empty(void);
+protected:
 	wxGISFeatureDataset* m_pwxGISFeatureDataset;
 	IFeatureRenderer* m_pFeatureRenderer;
-	OGREnvelope m_pPreviousDisplayEnv;
+    OGREnvelope m_FullEnv;
+	OGREnvelope m_PreviousDisplayEnv;
+    OGRSpatialReference* m_pSpatialReference;
+
+	wxGISFeatureSet m_OGRFeatureArray;
+	CPLQuadTree* m_pQuadTree;
+    bool m_bIsFeaturesLoaded;
 };

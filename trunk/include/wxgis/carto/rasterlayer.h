@@ -32,6 +32,7 @@ public:
 //IwxGISLayer
 	virtual void Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisplay, ITrackCancel* pTrackCancel);
 	virtual OGRSpatialReference* GetSpatialReference(void);
+    virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference){};
 	virtual OGREnvelope* GetEnvelope(void);
 	virtual bool IsValid(void);
 //wxGISRasterLayer

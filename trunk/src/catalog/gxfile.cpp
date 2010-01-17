@@ -106,11 +106,16 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 		}
 		//CSLDestroy( papszLines );
 	}
-	if(m_OGRSpatialReference.GetEPSGGeogCS() == -1)
-		m_OGRSpatialReference.SetWellKnownGeogCS("WGS84");
+    //err = m_OGRSpatialReference.importFromProj4("+proj=bonne +a=6371000 +es=0 +lon_0=0 +lat_1=60 +units=m +no_defs");
+    //0x04e3c368 "+proj=bonne +ellps=sphere +lon_0=0 +lat_1=60 +units=m +no_defs "
+    //0x04e3c368 "+proj=aitoff +lon_0=0 +lat_1=60 +x_0=0 +y_0=0 +a=6371000 +b=6371000 +units=m +no_defs "
+	//if(m_OGRSpatialReference.GetEPSGGeogCS() == -1)
+	//	m_OGRSpatialReference.SetWellKnownGeogCS("sphere");//WGS84
 
-    err = m_OGRSpatialReference.Fixup();
+    //err = m_OGRSpatialReference.Fixup();
 	//err = m_OGRSpatialReference.Validate();
+    //m_OGRSpatialReference.set
+    //+over
 	if(err == OGRERR_NONE)
 	{
 		char *pszProj4Defn = NULL;
