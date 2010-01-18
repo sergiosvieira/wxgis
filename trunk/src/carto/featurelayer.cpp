@@ -45,9 +45,10 @@ wxGISFeatureLayer::wxGISFeatureLayer(wxGISDataset* pwxGISDataset) : wxGISLayer()
 	{
 		m_pwxGISFeatureDataset->Reference();
 		m_pFeatureRenderer = new wxGISSimpleRenderer();
-        m_pSpatialReference = m_pwxGISFeatureDataset->GetSpatialReference();
+//        m_pSpatialReference = ;
 		//pre load features
-        LoadFeatures();
+//        LoadFeatures();
+		SetSpatialReference(m_pwxGISFeatureDataset->GetSpatialReference());
 	}
 }
 
@@ -58,6 +59,7 @@ wxGISFeatureLayer::~wxGISFeatureLayer(void)
     UnloadFeatures();
 
 	wsDELETE(m_pwxGISFeatureDataset);
+    wxDELETE(m_pSpatialReference);
 }
 
 void wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisplay, ITrackCancel* pTrackCancel)
@@ -93,25 +95,7 @@ void wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisp
 	    OGREnvelope Env = Envs[i];//pDisplayTransformation->GetVisibleBounds();
 	    bool bSetFilter(false);
 	    if(fabs(m_PreviousDisplayEnv.MaxX - Env.MaxX) > DELTA || fabs(m_PreviousDisplayEnv.MaxY - Env.MaxY) > DELTA || fabs(m_PreviousDisplayEnv.MinX - Env.MinX) > DELTA || fabs(m_PreviousDisplayEnv.MinY - Env.MinY) > DELTA)
-		    bSetFilter = m_FullEnv.Intersects(Env);//.Contains(Env);
-        //if(!bSetFilter && EnvCount > 0)
-        //    bSetFilter = true;
-	    //OGRSpatialReference* pEnvSpaRef = pDisplayTransformation->GetSpatialReference();
-	    //OGRSpatialReference* pLayerSpaRef = m_pwxGISFeatureDataset->GetSpatialReference();
-
-	    //if(pLayerSpaRef && pEnvSpaRef)
-	    //{
-		   // if(!pLayerSpaRef->IsSame(pEnvSpaRef))
-		   // {
-			  //  OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pEnvSpaRef, pLayerSpaRef );
-     //           if(poCT)
-     //           {
-			  //      poCT->Transform(1, &Env.MaxX, &Env.MaxY);
-			  //      poCT->Transform(1, &Env.MinX, &Env.MinY);
-			  //      OCTDestroyCoordinateTransformation(poCT);
-     //           }
-		   // }
-	    //}
+		    bSetFilter = m_FullEnv.Intersects(Env);
 
 	    //2. set spatial filter
 	    pDisplay->StartDrawing(GetCacheID());
@@ -211,6 +195,7 @@ void wxGISFeatureLayer::LoadFeatures(void)
     }
 
 	OGRFeature* poFeature;
+    CPLSetConfigOption("CENTER_LONG", "112.0");
 	while((poFeature = pLayer->GetNextFeature()) != NULL)
     {
         //OGRFeature* pNewFeature = poFeature;//->Clone();
@@ -253,6 +238,8 @@ void wxGISFeatureLayer::LoadFeatures(void)
 
 void wxGISFeatureLayer::UnloadFeatures(void)
 {
+    if(!m_bIsFeaturesLoaded)
+        return;
     DeleteQuadTree();
     Empty();
     m_bIsFeaturesLoaded = false;
@@ -260,11 +247,12 @@ void wxGISFeatureLayer::UnloadFeatures(void)
 
 void wxGISFeatureLayer::SetSpatialReference(OGRSpatialReference* pSpatialReference)
 {
-    if(!pSpatialReference)
+    if(NULL == pSpatialReference)
         return;
-    if(m_pSpatialReference->IsSame(pSpatialReference))
+    if(m_pSpatialReference && m_pSpatialReference->IsSame(pSpatialReference))
         return;
-    m_pSpatialReference = pSpatialReference;
+    wxDELETE(m_pSpatialReference);
+    m_pSpatialReference = pSpatialReference->Clone();
     UnloadFeatures();
     LoadFeatures();
 }

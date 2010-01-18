@@ -349,33 +349,13 @@ void wxGISMapView::AddLayer(wxGISLayer* pLayer)
     //set spa ref for display transformation
 	IDisplayTransformation* pDisplayTransformation = pGISScreenDisplay->GetDisplayTransformation();
 	if(pDisplayTransformation->GetSpatialReference() == NULL)
-	{
         pDisplayTransformation->SetSpatialReference(m_pSpatialReference);
-	}
     pLayer->SetSpatialReference(m_pSpatialReference);
 	
 	OGREnvelope* pEnv = pLayer->GetEnvelope();
 	if(pEnv == NULL)
 		return;
      
- //   OGREnvelope Env;
- //   Env.MaxX = pEnv->MaxX;
- //   Env.MaxY = pEnv->MaxY;
- //   Env.MinX = pEnv->MinX;
- //   Env.MinY = pEnv->MinY;
-
-	//OGRSpatialReference* pSpaRef = pLayer->GetSpatialReference();
-	//if(pSpaRef && m_pSpatialReference)
-	//{
-	//	if(!m_pSpatialReference->IsSame(pSpaRef))
-	//	{
-	//		OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pSpaRef, m_pSpatialReference );
-	//		poCT->Transform(1, &Env.MaxX, &Env.MaxY);
-	//		poCT->Transform(1, &Env.MinX, &Env.MinY);
- //           OCTDestroyCoordinateTransformation(poCT);
-	//	}
-	//}
-
     //increase 10%
     double fDeltaX = (pEnv->MaxX - pEnv->MinX) / 20;
     double fDeltaY = (pEnv->MaxY - pEnv->MinY) / 20;
@@ -712,19 +692,20 @@ void wxGISMapView::PanStop(wxPoint MouseLocation)
 	}
 }
 
-void wxGISMapView::SetSpatialReference(OGRSpatialReference* pSpatialReference, bool bShouldDeleteSP)
+void wxGISMapView::SetSpatialReference(OGRSpatialReference* pSpatialReference)
 {
-	if(pSpatialReference == NULL)
+	if(NULL == pSpatialReference)
 		return;
 
-    wxGISMap::SetSpatialReference(pSpatialReference, bShouldDeleteSP);
+    wxGISMap::SetSpatialReference(pSpatialReference);
 
 	IDisplayTransformation* pDisplayTransformation = pGISScreenDisplay->GetDisplayTransformation();
+	pDisplayTransformation->SetSpatialReference(pSpatialReference);
     pDisplayTransformation->SetBounds(GetFullExtent());
-	pDisplayTransformation->SetSpatialReference(m_pSpatialReference);
 	pGISScreenDisplay->SetDerty(true);
 	Refresh(false);
 }
+
 
 
 

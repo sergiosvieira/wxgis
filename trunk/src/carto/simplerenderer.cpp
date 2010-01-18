@@ -49,52 +49,26 @@ void wxGISSimpleRenderer::Draw(wxGISFeatureSet* pSet, wxGISEnumDrawPhase DrawPha
 {
 	if(pSet == NULL || pSet->IsEmpty())
 		return;
-	IDisplayTransformation* pDisplayTransformation = pDisplay->GetDisplayTransformation();
-	OGRSpatialReference* pDisplaySpatialReference = pDisplayTransformation->GetSpatialReference();
-	OGRSpatialReference* pSetSpatialReference = pSet->GetAt(0)->GetGeometryRef()->getSpatialReference();
-	bool IsSpaRefSame(true);
-	if(pDisplaySpatialReference && pSetSpatialReference)
-		IsSpaRefSame = pDisplaySpatialReference->IsSame(pSetSpatialReference);
 
-	//if( (m_pDestroyThread->Pause() != wxTHREAD_NO_ERROR) )
-	//{
-	//	wxLogError(wxString(_("wxGISSimpleRenderer: Can't Pause wxDestroyFeaturesThread!")));
-	//	return;
-	//}
-
-    //pLayer->ResetReading();
-	//OGRFeature *poFeature;
- //   while( (poFeature = pLayer->GetNextFeature()) != NULL )
 	for(size_t i = 0; i < pSet->GetSize(); i++)
     {
-		OGRGeometry *poGeometry = pSet->GetAt(i)->GetGeometryRef()->clone();
+		OGRGeometry *poGeometry = pSet->GetAt(i)->GetGeometryRef();
         if( poGeometry != NULL)
 		{
-			//proj goes here
-			OGRErr err = OGRERR_NONE;
-			if(!IsSpaRefSame)
-            {
-                //cut geom by max envelope
-				err = poGeometry->transformTo(pDisplaySpatialReference);
-            }
-			if(err == OGRERR_NONE)
+			switch(DrawPhase)
 			{
-				switch(DrawPhase)
-				{
-				case wxGISDPGeography:
-					DrawGeometry(poGeometry, pDisplay);
-					break;
-				case wxGISDPAnnotation:
-					break;
-				case wxGISDPSelection:
-					break;
-				default:
-					break;
-				}
+			case wxGISDPGeography:
+				DrawGeometry(poGeometry, pDisplay);
+				break;
+			case wxGISDPAnnotation:
+				break;
+			case wxGISDPSelection:
+				break;
+			default:
+				break;
 			}
 		}
-		wxDELETE(poGeometry);
-		if(pTrackCancel && !pTrackCancel->Continue()) //|| wxGetKeyState(WXK_ESCAPE)
+		if(pTrackCancel && !pTrackCancel->Continue())
 			break;
 	}
 }
