@@ -20,17 +20,14 @@
  ****************************************************************************/
 #include "wxgis/carto/map.h"
 
-wxGISMap::wxGISMap(void) : m_pSpatialReference(NULL), m_bShouldDeleteSP(false)
+wxGISMap::wxGISMap(void) : m_pSpatialReference(NULL)
 {
 	m_sMapName = wxString(_("new map"));
 }
 
 wxGISMap::~wxGISMap(void)
 {
-	//std::for_each(m_Layers.begin(), m_Layers.end(), wxDELETE);
 	ClearLayers();
-    if(m_bShouldDeleteSP)
-        wxDELETE(m_pSpatialReference);
 }
 
 //The AddLayer method adds a layer to the Map. Use the LayerCount property to get the total number of layers in the map.
@@ -51,7 +48,9 @@ void wxGISMap::AddLayer(wxGISLayer* pLayer)
 
 	if(m_pSpatialReference == NULL)
     {
-		m_pSpatialReference = pLayer->GetSpatialReference();
+        OGRSpatialReference* pSpaRef = pLayer->GetSpatialReference();
+        if(pSpaRef)
+            m_pSpatialReference = pSpaRef->Clone();
 		if(!m_pSpatialReference)
 		{
 			OGREnvelope* pEnv = pLayer->GetEnvelope();
@@ -61,7 +60,6 @@ void wxGISMap::AddLayer(wxGISLayer* pLayer)
 				{
 					m_pSpatialReference = new OGRSpatialReference();
 					m_pSpatialReference->importFromEPSG(4326);//SetWellKnownGeogCS("WGS84");
-                    m_bShouldDeleteSP = true;
 				}
 			}
 		}
@@ -76,14 +74,7 @@ void wxGISMap::ClearLayers(void)
 		delete m_Layers[i];
 	m_Layers.clear();
 
-    if(m_bShouldDeleteSP)
-    {
-        wxDELETE(m_pSpatialReference);
-    }
-    else
-    {
-        m_pSpatialReference = NULL;
-    }
+    wxDELETE(m_pSpatialReference);
 }
 
 OGREnvelope wxGISMap::GetFullExtent(void)
@@ -92,31 +83,6 @@ OGREnvelope wxGISMap::GetFullExtent(void)
 	for(size_t i = 0; i < m_Layers.size(); i++)
 	{
         OGREnvelope* pEnv = m_Layers[i]->GetEnvelope();
-        //OGREnvelope Env;
-        //Env.MaxX = pEnv->MaxX;
-        //Env.MaxY = pEnv->MaxY;
-        //Env.MinX = pEnv->MinX;
-        //Env.MinY = pEnv->MinY;
-        //double fDeltaX = (Env.MaxX - Env.MinX) / 250;
-        //double fDeltaY = (Env.MaxY - Env.MinY) / 250;
-        //double fDelta = std::max(fDeltaX, fDeltaY);
-        //Env.MaxX -= fDelta;
-        //Env.MinX += fDelta;
-        //Env.MaxY -= fDelta;
-        //Env.MinY += fDelta;
-
-		//check if the spatial ref is not same
-
-       // if(!m_pSpatialReference->IsSame(m_Layers[i]->GetSpatialReference()))
-       // {        	
-       //     OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( m_Layers[i]->GetSpatialReference(), m_pSpatialReference );
-       //     if(poCT)
-       //     {
-			    //poCT->Transform(1, &Env.MaxX, &Env.MaxY);
-			    //poCT->Transform(1, &Env.MinX, &Env.MinY);
-       //         OCTDestroyCoordinateTransformation(poCT);
-       //     }
-       // }
         res.Merge(*pEnv);
 	}
     //increase 10%
@@ -130,14 +96,16 @@ OGREnvelope wxGISMap::GetFullExtent(void)
 	return res;
 }
 
-void wxGISMap::SetSpatialReference(OGRSpatialReference* pSpatialReference, bool bShouldDeleteSP)
+void wxGISMap::SetSpatialReference(OGRSpatialReference* pSpatialReference)
 {
-    if(m_bShouldDeleteSP)
-        wxDELETE(m_pSpatialReference);
-	m_pSpatialReference = pSpatialReference;
-    m_bShouldDeleteSP = bShouldDeleteSP;
+	if(NULL == pSpatialReference)
+		return;
+	if(m_pSpatialReference && m_pSpatialReference->IsSame(pSpatialReference))
+		return;
 	for(size_t i = 0; i < m_Layers.size(); i++)
-		m_Layers[i]->SetSpatialReference(m_pSpatialReference);
+		m_Layers[i]->SetSpatialReference(pSpatialReference);
+    wxDELETE(m_pSpatialReference);
+	m_pSpatialReference = pSpatialReference->Clone();
 }
 
 OGRSpatialReference* wxGISMap::GetSpatialReference(void)

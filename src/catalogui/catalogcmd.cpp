@@ -482,7 +482,7 @@ void wxGISCatalogMainCmd::OnClick(void)
                         OGRSpatialReference* pRef = pGxPrjFile->GetSpatialReference();
                         if(pRef)
                         {
-                            pMapView->SetSpatialReference(pRef->Clone());
+                            pMapView->SetSpatialReference(pRef);
                             pMapView->SetFullExtent();
                         }
                     }

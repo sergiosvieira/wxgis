@@ -97,30 +97,45 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 		{
 		case enumESRIPrjFile:
 			err = m_OGRSpatialReference.importFromESRI(papszLines);
+		    CSLDestroy( papszLines );
 			break;
-		case enumSRMLfile:
-			err = m_OGRSpatialReference.importFromWkt(papszLines);
+		case enumSPRfile:
+            {
+                char *pszWKT, *pszWKT2;
+                pszWKT = CPLStrdup(papszLines[0]);
+                for(int i = 1; papszLines[i] != NULL; i++ )
+                {
+                    pszWKT = (char *)CPLRealloc(pszWKT, strlen(pszWKT) + strlen( papszLines[i]) + 1 );
+                    strcat( pszWKT, papszLines[i] );
+                }
+                pszWKT2 = pszWKT;
+                err = m_OGRSpatialReference.importFromWkt( &pszWKT2 );//.importFromWkt(papszLines);
+		        CSLDestroy( papszLines );
+                CPLFree( pszWKT );
+            }
 			break;
 		default:
 			break;
 		}
-		//CSLDestroy( papszLines );
 	}
+    if(err != OGRERR_NONE)
+    	return NULL;
+
     //err = m_OGRSpatialReference.importFromProj4("+proj=bonne +a=6371000 +es=0 +lon_0=0 +lat_1=60 +units=m +no_defs");
     //0x04e3c368 "+proj=bonne +ellps=sphere +lon_0=0 +lat_1=60 +units=m +no_defs "
     //0x04e3c368 "+proj=aitoff +lon_0=0 +lat_1=60 +x_0=0 +y_0=0 +a=6371000 +b=6371000 +units=m +no_defs "
 	//if(m_OGRSpatialReference.GetEPSGGeogCS() == -1)
 	//	m_OGRSpatialReference.SetWellKnownGeogCS("sphere");//WGS84
 
-    //err = m_OGRSpatialReference.Fixup();
+ //   err = m_OGRSpatialReference.Fixup();
 	//err = m_OGRSpatialReference.Validate();
     //m_OGRSpatialReference.set
     //+over
 	if(err == OGRERR_NONE)
 	{
-		char *pszProj4Defn = NULL;
-		m_OGRSpatialReference.exportToProj4( &pszProj4Defn );
-        CPLFree( pszProj4Defn );
+		//char *pszProj4Defn = NULL;
+		//m_OGRSpatialReference.exportToProj4( &pszProj4Defn );
+  //      CPLFree( pszProj4Defn );
 		return &m_OGRSpatialReference;
 	}
 	else

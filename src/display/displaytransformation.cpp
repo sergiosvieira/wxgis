@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "wxgis/display/displaytransformation.h"
 
-wxGISDisplayTransformation::wxGISDisplayTransformation(void)
+wxGISDisplayTransformation::wxGISDisplayTransformation(void) : m_pSpatialReference(NULL)
 {
 	m_DeviceFrameRect.x = 0;
 	m_DeviceFrameRect.y = 0;
@@ -31,6 +31,7 @@ wxGISDisplayTransformation::wxGISDisplayTransformation(void)
 
 wxGISDisplayTransformation::~wxGISDisplayTransformation(void)
 {
+	wxDELETE(m_pSpatialReference);
 }
 
 void wxGISDisplayTransformation::Reset(void)
@@ -40,7 +41,7 @@ void wxGISDisplayTransformation::Reset(void)
 	m_Bounds.MaxY = 80;
 	m_Bounds.MinY = -80;
 
-	m_pSpatialReference = NULL;
+	wxDELETE(m_pSpatialReference);
 	m_bIsBoundsSet = false;
 }
 
@@ -118,19 +119,30 @@ double wxGISDisplayTransformation::GetScaleRatio(void)
 void wxGISDisplayTransformation::SetSpatialReference(OGRSpatialReference* pSpatialReference)
 {
     //set bounds in new spa ref
-    OGRPoint pt1(m_Bounds.MaxX, m_Bounds.MaxY);
-    OGRPoint pt2(m_Bounds.MinX, m_Bounds.MinY);
-    pt1.assignSpatialReference(m_pSpatialReference);
-    pt2.assignSpatialReference(m_pSpatialReference);
-    pt1.transformTo(pSpatialReference);
-    pt2.transformTo(pSpatialReference);
-    OGREnvelope Env;
-    Env.MaxX = pt1.getX();
-    Env.MaxY = pt1.getY();
-    Env.MinX = pt2.getX();
-    Env.MinY = pt2.getY();
-	m_pSpatialReference = pSpatialReference;
-    SetBounds(Env);
+	if(m_pSpatialReference)
+	{
+		OGRPoint *pPt1 = new OGRPoint(m_Bounds.MaxX, m_Bounds.MaxY);
+		OGRPoint *pPt2 = new OGRPoint(m_Bounds.MinX, m_Bounds.MinY);
+		pPt1->assignSpatialReference(m_pSpatialReference);
+		pPt2->assignSpatialReference(m_pSpatialReference);
+		pPt1->transformTo(pSpatialReference);
+		pPt2->transformTo(pSpatialReference);
+		OGREnvelope Env;
+		Env.MaxX = pPt1->getX();
+		Env.MaxY = pPt1->getY();
+		Env.MinX = pPt2->getX();
+		Env.MinY = pPt2->getY();
+
+        wxDELETE(pPt1);
+        wxDELETE(pPt2);
+		wxDELETE(m_pSpatialReference);
+		m_pSpatialReference = pSpatialReference->Clone();
+		SetBounds(Env);
+	}
+	else
+	{
+		m_pSpatialReference = pSpatialReference->Clone();
+	}
 }
 
 OGRSpatialReference* wxGISDisplayTransformation::GetSpatialReference(void)

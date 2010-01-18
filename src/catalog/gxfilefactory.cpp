@@ -51,7 +51,7 @@ bool wxGxFileFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames
 		{
 			if(m_pCatalog->GetShowExt())
 				name += wxT(".") + ext;
-			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumSRMLfile);
+			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumSPRfile);
 			pGxObj = dynamic_cast<IGxObject*>(pFile);
 			goto REMOVE;
 		}

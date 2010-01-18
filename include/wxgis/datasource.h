@@ -50,7 +50,7 @@ enum wxGISEnumRasterDatasetType
 enum wxGISEnumPrjFileType
 {
 	enumESRIPrjFile = 1, 
-	enumSRMLfile = 2
+	enumSPRfile = 2
 };
 
 //this class should be in wxGISGeodatabase

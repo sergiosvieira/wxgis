@@ -84,7 +84,7 @@ public:
 	//wxGISMap
 	virtual void AddLayer(wxGISLayer* pLayer);
 	virtual void ClearLayers(void);
-	virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference, bool bShouldDeleteSP = false);
+	virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference);
 	//wxGISMapView
 	void OnThreadExit(void);
 	virtual ICachedDisplay* GetCachedDisplay(void){return pGISScreenDisplay;};

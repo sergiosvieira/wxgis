@@ -174,6 +174,7 @@ wxString wxGISFeatureDataset::GetAsString(long row, int col)
 	{
 		OGRFeature* pFeature = GetAt(row);
 		OGRFieldDefn* pDef = pFeature->GetFieldDefnRef(col);
+        wxString sOut;
 		switch(pDef->GetType())
 		{
 		case OFTDate:
@@ -181,34 +182,35 @@ wxString wxGISFeatureDataset::GetAsString(long row, int col)
 				int year, mon, day, hour, min, sec, flag;
 				pFeature->GetFieldAsDateTime(col, &year, &mon, &day, &hour, &min, &sec, &flag);
 				wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
-				return dt.Format(_("%d-%m-%Y"));//wxString::Format(_("%.2u-%.2u-%.4u"), day, mon, year );
+				sOut = dt.Format(_("%d-%m-%Y"));//wxString::Format(_("%.2u-%.2u-%.4u"), day, mon, year );
 			}
 		case OFTTime:
 			{
 				int year, mon, day, hour, min, sec, flag;
 				pFeature->GetFieldAsDateTime(col, &year, &mon, &day, &hour, &min, &sec, &flag);
 				wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
-				return dt.Format(_("%H:%M:%S"));//wxString::Format(_("%.2u:%.2u:%.2u"), hour, min, sec);
+				sOut = dt.Format(_("%H:%M:%S"));//wxString::Format(_("%.2u:%.2u:%.2u"), hour, min, sec);
 			}
 		case OFTDateTime:
 			{
 				int year, mon, day, hour, min, sec, flag;
 				pFeature->GetFieldAsDateTime(col, &year, &mon, &day, &hour, &min, &sec, &flag);
 				wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
-				return dt.Format(_("%d-%m-%Y %H:%M:%S"));//wxString::Format(_("%.2u-%.2u-%.4u %.2u:%.2u:%.2u"), day, mon, year, hour, min, sec);
+				sOut = dt.Format(_("%d-%m-%Y %H:%M:%S"));//wxString::Format(_("%.2u-%.2u-%.4u %.2u:%.2u:%.2u"), day, mon, year, hour, min, sec);
 			}
 		case OFTReal:				
-			return wxString::Format(_("%.6f"), pFeature->GetFieldAsDouble(col));
+			sOut = wxString::Format(_("%.6f"), pFeature->GetFieldAsDouble(col));
 		default:
             if(m_bOLCStringsAsUTF8 || m_Encoding == wxFONTENCODING_DEFAULT)
-                return wgMB2WX(pFeature->GetFieldAsString(col));
+                sOut = wgMB2WX(pFeature->GetFieldAsString(col));
             else            
             {                
                 wxCSConv conv(m_Encoding);
-                return conv.cMB2WX(pFeature->GetFieldAsString(col));
+                sOut = conv.cMB2WX(pFeature->GetFieldAsString(col));
             }
 		}
-		//return wgMB2WX(GetAt(row)->GetFieldAsString(col));
+        OGRFeature::DestroyFeature(pFeature);
+		return sOut;//wgMB2WX(GetAt(row)->GetFieldAsString(col));
 	}
 }
 
