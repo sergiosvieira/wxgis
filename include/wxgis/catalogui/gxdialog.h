@@ -94,6 +94,7 @@ public:
      // On mouse left up, set the value and close the popup
     void OnMouseClick(wxMouseEvent& event);
     void OnDblClick(wxTreeEvent& event);
+    virtual wxSize GetAdjustedSize(int minWidth, int prefHeight, int maxHeight);
 //IGxSelectionEvents
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 //wxGxTreeViewBase

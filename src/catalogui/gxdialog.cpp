@@ -41,7 +41,7 @@ IMPLEMENT_DYNAMIC_CLASS(wxTreeViewComboPopup, wxGxTreeViewBase)
 bool wxTreeViewComboPopup::Create(wxWindow* parent)
 {
     m_bClicked = false;
-    return wxGxTreeViewBase::Create(parent, TREECTRLID, wxBORDER_SIMPLE | wxTR_NO_BUTTONS | wxTR_NO_LINES | wxTR_SINGLE  );//wxPoint(0,0),wxDefaultSize, 
+    return wxGxTreeViewBase::Create(parent, TREECTRLID, wxDefaultPosition, wxDefaultSize, wxBORDER_SIMPLE | wxTR_NO_BUTTONS | wxTR_NO_LINES | wxTR_SINGLE);
 }
 
 void wxTreeViewComboPopup::Init()
@@ -207,6 +207,11 @@ void wxTreeViewComboPopup::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParen
 	if(sort)
 		SortChildren(hParent);
 	wxTreeCtrl::Refresh();
+}
+
+wxSize wxTreeViewComboPopup::GetAdjustedSize(int minWidth, int prefHeight, int maxHeight)
+{
+    return wxSize(minWidth + 190, prefHeight);
 }
 
 
