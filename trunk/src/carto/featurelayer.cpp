@@ -195,7 +195,7 @@ void wxGISFeatureLayer::LoadFeatures(void)
     }
 
 	OGRFeature* poFeature;
-    CPLSetConfigOption("CENTER_LONG", "112.0");
+    //CPLSetConfigOption("CENTER_LONG", "0.0");
 	while((poFeature = pLayer->GetNextFeature()) != NULL)
     {
         //OGRFeature* pNewFeature = poFeature;//->Clone();
