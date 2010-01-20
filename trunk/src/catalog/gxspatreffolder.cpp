@@ -61,6 +61,9 @@ void wxGxSpatialReferencesFolder::Refresh(void)
 void wxGxSpatialReferencesFolder::Init(wxXmlNode* pConfigNode)
 {
     m_sPath = pConfigNode->GetPropVal(wxT("path"), NON);
+    if(!m_sPath.IsEmpty() && m_sPath != wxString(NON))
+        CPLSetConfigOption("wxGxSpatialReferencesFolder", wgWX2MB(m_sPath));
+
 }
 
 void wxGxSpatialReferencesFolder::EmptyChildren(void)

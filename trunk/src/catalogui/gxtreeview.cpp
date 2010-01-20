@@ -34,7 +34,7 @@ wxGxTreeViewBase::wxGxTreeViewBase(void) : wxTreeCtrl(), m_pConnectionPointCatal
 {
 }
 
-wxGxTreeViewBase::wxGxTreeViewBase(wxWindow* parent, wxWindowID id, long style) : wxTreeCtrl(parent, id, wxDefaultPosition, wxDefaultSize, style, wxDefaultValidator, wxT("wxGxTreeViewBase")), m_pConnectionPointCatalog(NULL), m_pConnectionPointSelection(NULL), m_ConnectionPointCatalogCookie(-1), m_ConnectionPointSelectionCookie(-1)
+wxGxTreeViewBase::wxGxTreeViewBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxTreeCtrl(parent, id, pos, size, style, wxDefaultValidator, wxT("wxGxTreeViewBase")), m_pConnectionPointCatalog(NULL), m_pConnectionPointSelection(NULL), m_ConnectionPointCatalogCookie(-1), m_ConnectionPointSelectionCookie(-1)
 {
 	m_TreeImageList.Create(16, 16);
 	SetImageList(&m_TreeImageList);
@@ -44,9 +44,9 @@ wxGxTreeViewBase::~wxGxTreeViewBase(void)
 {
 }
 
-bool wxGxTreeViewBase::Create(wxWindow* parent, wxWindowID id, long style)
+bool wxGxTreeViewBase::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
 {
-    bool result = wxTreeCtrl::Create(parent, id, wxDefaultPosition, wxDefaultSize, style);
+    bool result = wxTreeCtrl::Create(parent, id, pos, size, style);
     if(result)
     {
         m_TreeImageList.Create(16, 16);
@@ -332,7 +332,7 @@ wxGxTreeView::wxGxTreeView(void) : wxGxTreeViewBase()
 {
 }
 
-wxGxTreeView::wxGxTreeView(wxWindow* parent, wxWindowID id, long style) : wxGxTreeViewBase(parent, id, style)
+wxGxTreeView::wxGxTreeView(wxWindow* parent, wxWindowID id, long style) : wxGxTreeViewBase(parent, id, wxDefaultPosition, wxDefaultSize, style)
 {
 }
 

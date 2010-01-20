@@ -32,6 +32,10 @@ enum wxGISEnumMapToolState
 	enumGISMapRotating = 0x0004
 };
 
+typedef struct _Limits{
+    double minx, miny, maxx, maxy;
+}LIMITS, *LPLIMITS;
+
 class wxGISLayer 
 {
 public:
