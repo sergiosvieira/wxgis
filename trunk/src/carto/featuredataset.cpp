@@ -65,7 +65,6 @@ bool wxGISFeatureDataset::Open(int iLayer)
 		const char* err = CPLGetLastErrorMsg();
 		wxString sErr = wxString::Format(_("wxGISFeatureDataset: Open failed! Path '%s'. OGR error: %s"), m_sPath.c_str(), wgMB2WX(err));
 		wxLogError(sErr);
-		wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
 		return false;
 	}
 
