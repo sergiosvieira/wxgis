@@ -46,6 +46,7 @@ public:
 		m_dMinScale = -1;
 		m_bVisible = true;
 		m_bCached = false;
+        m_iCacheID = 0;
 	}
 	virtual~wxGISLayer(void){};
 	//pure virtual

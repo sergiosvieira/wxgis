@@ -85,14 +85,14 @@ void wxGISRasterLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDispl
 
 OGRSpatialReference* wxGISRasterLayer::GetSpatialReference(void)
 {
-	if(m_pwxGISRasterDataset)
+	if(IsValid())
 		return m_pwxGISRasterDataset->GetSpatialReference();
 	return NULL;
 }
 
 OGREnvelope* wxGISRasterLayer::GetEnvelope(void)
 {
-	if(m_pwxGISRasterDataset)
+	if(IsValid())
 		return m_pwxGISRasterDataset->GetEnvelope();
 	return NULL;
 }

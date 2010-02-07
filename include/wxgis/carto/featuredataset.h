@@ -36,7 +36,7 @@ public:
 //wxGISDataset
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
 //wxGISFeatureDataset
-	virtual bool Open(int iLayer);
+	virtual bool Open(int iLayer = 0);
 	virtual OGRSpatialReference* GetSpatialReference(void);
 	virtual OGREnvelope* GetEnvelope(void);
 	virtual void SetSpatialFilter(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);

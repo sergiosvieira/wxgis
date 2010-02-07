@@ -177,7 +177,18 @@ wxGISDataset* wxGxShapefileDataset::GetDataset(void)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
-		m_pwxGISDataset = new wxGISFeatureDataset(m_sPath, m_Encoding);
+        wxGISFeatureDataset* pwxGISFeatureDataset = new wxGISFeatureDataset(m_sPath, m_Encoding);
+
+        if(!pwxGISFeatureDataset->Open())
+        {
+		    const char* err = CPLGetLastErrorMsg();
+		    wxString sErr = wxString::Format(_("Open failed! OGR error: %s"), wgMB2WX(err));
+		    wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
+
+            wxDELETE(pwxGISFeatureDataset);
+			return NULL;
+        }
+		m_pwxGISDataset = static_cast<wxGISDataset*>(pwxGISFeatureDataset);
 		//for storing internal pointer
 		m_pwxGISDataset->Reference();
 	}
@@ -290,10 +301,16 @@ wxGISDataset* wxGxRasterDataset::GetDataset(void)
 	{	
         wxGISRasterDataset* pwxGISRasterDataset = new wxGISRasterDataset(m_sPath);
 
-		m_pwxGISDataset = static_cast<wxGISDataset*>(pwxGISRasterDataset);
         //open (ask for overviews)
         if(!pwxGISRasterDataset->Open())
+        {
+		    const char* err = CPLGetLastErrorMsg();
+		    wxString sErr = wxString::Format(_("Open failed! OGR error: %s"), wgMB2WX(err));
+		    wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
+
+            wxDELETE(pwxGISRasterDataset);
 			return NULL;
+        }
         //pyramids
         if(!pwxGISRasterDataset->HasOverviews())
         {
@@ -351,6 +368,8 @@ wxGISDataset* wxGxRasterDataset::GetDataset(void)
                 pStatusBar->SetMessage(_("Done"));
 	        }
         }
+        
+        m_pwxGISDataset = static_cast<wxGISDataset*>(pwxGISRasterDataset);
 		//for storing internal pointer
 		m_pwxGISDataset->Reference();
 	}

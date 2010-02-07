@@ -22,15 +22,17 @@
 #include "wxgis/carto/spvalidator.h"
 #include "wxgis/framework/config.h"
 
-#include <wx/wfstream.h>
+#include <wx/mstream.h>
 #include <wx/xml/xml.h>
+
+#define LIMITS_NAME wxString(wxT("area.xml"))
 
 wxGISSpatialReferenceValidator::wxGISSpatialReferenceValidator(void) : m_bIsOK(false)
 {
     m_sPath = wgMB2WX(CPLGetConfigOption("wxGxSpatialReferencesFolder",""));
     if(!m_sPath.IsEmpty())
     {
-        m_bIsOK = LoadData(m_sPath);
+        m_bIsOK = LoadData(m_sPath + wxT("/") + LIMITS_NAME);
         return;
     }
 	wxGISConfig m_Conf(wxString(wxT("wxCatalog")), CONFIG_DIR);
@@ -64,11 +66,39 @@ wxGISSpatialReferenceValidator::~wxGISSpatialReferenceValidator(void)
 
 bool wxGISSpatialReferenceValidator::LoadData(wxString sPath)
 {
-	FILE *fp = VSIFOpenL( wgWX2MB(sPath), "r");
+    FILE *fp = VSIFOpenL( wgWX2MB(sPath), "rb");
 	if( fp == NULL )
         return false;
-    wxFFileInputStream wfp(fp);
-    wxXmlDocument m_pXmlDoc(wfp);
+
+    unsigned int nLength;
+    VSIFSeekL( fp, 0, SEEK_END );
+    nLength = VSIFTellL( fp );
+    VSIFSeekL( fp, 0, SEEK_SET );
+        
+    nLength = MAX(0,nLength);
+    char *pszXML = (char *) VSIMalloc(nLength); //+ 1
+    if( pszXML == NULL )
+    {
+        VSIFCloseL(fp);
+        wxLogError(_("Failed to allocate %d byte buffer to hold xml file."), nLength );
+        return false;
+    }
+
+    if( VSIFReadL( pszXML, 1, nLength, fp ) != nLength )
+    {
+        VSIFCloseL(fp);
+        CPLFree( pszXML );
+        wxLogError(_("Failed to read %d bytes from xml file."), nLength );
+        return false;
+    }
+        
+//    pszXML[nLength] = '\0';
+    VSIFCloseL(fp);
+
+    wxMemoryInputStream mis(pszXML, nLength);   
+
+    wxXmlDocument m_pXmlDoc(mis);
+    CPLFree( pszXML );
     if(!m_pXmlDoc.IsOk())
         return false;
     wxXmlNode* pRootNode = m_pXmlDoc.GetRoot();

@@ -348,10 +348,13 @@ void wxGISMapView::AddLayer(wxGISLayer* pLayer)
 	wxGISMap::AddLayer(pLayer);
     //set spa ref for display transformation
 	IDisplayTransformation* pDisplayTransformation = pGISScreenDisplay->GetDisplayTransformation();
-	if(pDisplayTransformation->GetSpatialReference() == NULL)
-        pDisplayTransformation->SetSpatialReference(m_pSpatialReference);
-    pLayer->SetSpatialReference(m_pSpatialReference);
-	
+    if(m_pSpatialReference)
+    {
+	    if(pDisplayTransformation->GetSpatialReference() == NULL)
+            pDisplayTransformation->SetSpatialReference(m_pSpatialReference);
+        pLayer->SetSpatialReference(m_pSpatialReference);
+    }
+
 	OGREnvelope* pEnv = pLayer->GetEnvelope();
 	if(pEnv == NULL)
 		return;

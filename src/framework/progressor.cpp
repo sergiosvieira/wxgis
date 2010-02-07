@@ -105,6 +105,7 @@ void wxGISProgressor::OnEraseBackground(wxEraseEvent & event)
 void wxGISProgressor::SetRange(int range)
 {
     m_nRange = range;
+    m_nValue = 0;
 }
 
 int wxGISProgressor::GetRange()

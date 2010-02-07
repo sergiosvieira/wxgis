@@ -53,7 +53,13 @@ bool wxGISRasterDataset::Open(void)
     
     //m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath.c_str()), GA_ReadOnly );
 	if( m_poDataset == NULL )
+    {
+		const char* err = CPLGetLastErrorMsg();
+		wxString sErr = wxString::Format(_("wxGISRasterDataset: Open failed! Path '%s'. OGR error: %s"), m_sPath.c_str(), wgMB2WX(err));
+		wxLogError(sErr);
+
 		return false;
+    }
 
 	m_nXSize = m_poDataset->GetRasterXSize();
 	m_nYSize = m_poDataset->GetRasterYSize();
