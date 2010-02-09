@@ -219,7 +219,7 @@ void wxGISFeatureLayer::LoadFeatures(void)
             bTransform = true;
         }
     }
-     
+	
     OGRLayer* pLayer = m_pwxGISFeatureDataset->GetLayer();
     if(!pLayer)
     {
@@ -243,8 +243,16 @@ void wxGISFeatureLayer::LoadFeatures(void)
         pProgressor->SetRange(pLayer->GetFeatureCount(false) * 2);
     }
 
+    
+    OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pDatasetSpaRef, m_pSpatialReference );
+
 	OGRFeature* poFeature;
     //CPLSetConfigOption("CENTER_LONG", "0.0");
+
+    OGREnvelope RgnEnv;
+    if(pRgn)
+        pRgn->getEnvelope(&RgnEnv);
+
 	while((poFeature = pLayer->GetNextFeature()) != NULL)
     {
         //OGRFeature* pNewFeature = poFeature;//->Clone();
@@ -258,16 +266,17 @@ void wxGISFeatureLayer::LoadFeatures(void)
         {
             if(pRgn)
             {
-                OGREnvelope FeatureEnv, RgnEnv;
+                OGREnvelope FeatureEnv;
                 pFeatureGeom->getEnvelope(&FeatureEnv);
-                pRgn->getEnvelope(&RgnEnv);
                 if(!FeatureEnv.Intersects(RgnEnv))
                 {
                     OGRFeature::DestroyFeature(poFeature);
                     continue;
                 }
 
-                if(RgnEnv.Contains(FeatureEnv) && pFeatureGeom->Within(pRgn))
+                if(RgnEnv.Contains(FeatureEnv) )
+                    pGeom = pFeatureGeom->clone();
+                else if(pFeatureGeom->Within(pRgn))
                     pGeom = pFeatureGeom->clone();
                 else
                     pGeom = pFeatureGeom->Intersection(pRgn);//speed!Intersection
@@ -281,7 +290,7 @@ void wxGISFeatureLayer::LoadFeatures(void)
                 if(pGeom->getSpatialReference() == NULL)
                     pGeom->assignSpatialReference(pFeatureGeom->getSpatialReference());
 
-                if(pGeom->transformTo(m_pSpatialReference) != OGRERR_NONE)
+                if(pGeom->transform( poCT ) != OGRERR_NONE)
                 {
                     OGRFeature::DestroyFeature(poFeature);
                     continue;
@@ -297,7 +306,7 @@ void wxGISFeatureLayer::LoadFeatures(void)
             }
             else
             {
-                if(pFeatureGeom->transformTo(m_pSpatialReference) != OGRERR_NONE)
+                if(pFeatureGeom->transform( poCT ) != OGRERR_NONE)
                 {
                     OGRFeature::DestroyFeature(poFeature);
                     continue;
@@ -314,7 +323,8 @@ void wxGISFeatureLayer::LoadFeatures(void)
         if(pProgressor && nCounter % nStep == 0)
             pProgressor->SetValue(nCounter);
     }
-
+               
+    OCTDestroyCoordinateTransformation(poCT);
     wxDELETE(pRgn);
 
     CreateQuadTree(&m_FullEnv);
