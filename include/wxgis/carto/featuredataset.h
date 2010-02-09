@@ -54,4 +54,8 @@ protected:
 	bool m_bIsOpened;
     bool m_bOLCStringsAsUTF8;
     wxFontEncoding m_Encoding;
+    //
+    bool m_bIsFeaturesLoaded;
+    std::map<long nFID, OGRFeature*> m_FeaturesMap;
+    CPLQuadTree* m_pQuadTree;
 };
