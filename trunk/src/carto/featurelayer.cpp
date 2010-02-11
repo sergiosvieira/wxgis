@@ -25,22 +25,6 @@
 
 #define STEP 3.0
 
-void GetFeatureBoundsFunc(const void* hFeature, CPLRectObj* pBounds)
-{
-	OGRFeature* pFeature = (OGRFeature*)hFeature;
-	if(!pFeature)
-		return;
-	OGRGeometry* pGeom = pFeature->GetGeometryRef();
-	if(!pGeom)
-		return;
-	OGREnvelope Env;
-	pGeom->getEnvelope(&Env);
-	pBounds->minx = Env.MinX;
-	pBounds->maxx = Env.MaxX;
-	pBounds->miny = Env.MinY;
-	pBounds->maxy = Env.MaxY;
-}
-
 wxGISFeatureLayer::wxGISFeatureLayer(wxGISDataset* pwxGISDataset) : wxGISLayer(), m_pwxGISFeatureDataset(NULL), m_pFeatureRenderer(NULL), m_pQuadTree(NULL), m_pSpatialReference(NULL), m_bIsFeaturesLoaded(false)
 {
 	m_pwxGISFeatureDataset = dynamic_cast<wxGISFeatureDataset*>(pwxGISDataset);
@@ -220,8 +204,7 @@ void wxGISFeatureLayer::LoadFeatures(void)
         }
     }
 	
-    OGRLayer* pLayer = m_pwxGISFeatureDataset->GetLayer();
-    if(!pLayer)
+    if(!m_pwxGISFeatureDataset->Open())
     {
 		const char* err = CPLGetLastErrorMsg();
 		wxString sErr = wxString::Format(_("wxGISFeatureLayer: Open failed! OGR error: %s"), wgMB2WX(err));
@@ -230,17 +213,16 @@ void wxGISFeatureLayer::LoadFeatures(void)
         wxDELETE(pRgn);
         return;
     }
-    pLayer->ResetReading();
 
     IApplication* pApp = ::GetApplication();
     IStatusBar* pStatusBar = pApp->GetStatusBar();  
     wxGISProgressor* pProgressor = dynamic_cast<wxGISProgressor*>(pStatusBar->GetProgressor());
     size_t nCounter(0);
-    size_t nStep = pLayer->GetFeatureCount(false) < 20 ? 1 : pLayer->GetFeatureCount(false) / 20;
+    size_t nStep = m_pwxGISFeatureDataset->GetSize() < 20 ? 1 : m_pwxGISFeatureDataset->GetSize() / 20;
     if(pProgressor)
     {
         pProgressor->Show(true);
-        pProgressor->SetRange(pLayer->GetFeatureCount(false) * 2);
+        pProgressor->SetRange(m_pwxGISFeatureDataset->GetSize() * 2);
     }
 
     
@@ -253,7 +235,8 @@ void wxGISFeatureLayer::LoadFeatures(void)
     if(pRgn)
         pRgn->getEnvelope(&RgnEnv);
 
-	while((poFeature = pLayer->GetNextFeature()) != NULL)
+    m_pwxGISFeatureDataset->Reset();
+    while((poFeature = m_pwxGISFeatureDataset->Next()) != NULL)	
     {
         //OGRFeature* pNewFeature = poFeature;//->Clone();
         //OGRFeature::DestroyFeature(poFeature);

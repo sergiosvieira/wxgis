@@ -21,7 +21,9 @@
 #pragma once
 
 #include "wxgis/datasource.h"
-#include "cpl_quad_tree.h"
+
+void GetFeatureBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
+
 
 //---------------------------------------
 // wxGISFeatureDataset
@@ -39,14 +41,21 @@ public:
 	virtual bool Open(int iLayer = 0);
 	virtual OGRSpatialReference* GetSpatialReference(void);
 	virtual OGREnvelope* GetEnvelope(void);
-	virtual void SetSpatialFilter(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);
+	//virtual void SetSpatialFilter(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);
 	virtual OGRFeature* GetAt(long nIndex);
 	virtual OGRFeature* operator [](long nIndex);
 	virtual wxString GetAsString(long row, int col);
 	virtual wxGISFeatureSet* GetFeatureSet(IQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
-	virtual size_t GetSize(void){return m_poLayer->GetFeatureCount(false);};
-	virtual OGRLayer* GetLayer(int iLayer = 0);
-//
+	virtual size_t GetSize(void);
+	virtual OGRLayer* GetLayerRef(int iLayer = 0);
+    virtual OGRFeature* Next(void);
+    virtual void Reset(void);
+protected:
+    virtual void CreateQuadTree(OGREnvelope* pEnv);
+    virtual void DeleteQuadTree(void);
+    virtual void LoadFeatures(void);
+    virtual void UnloadFeatures(void);
+    virtual void Empty(void);
 protected:
 	OGRDataSource *m_poDS;
 	OGREnvelope* m_psExtent;
@@ -56,6 +65,8 @@ protected:
     wxFontEncoding m_Encoding;
     //
     bool m_bIsFeaturesLoaded;
-    std::map<long nFID, OGRFeature*> m_FeaturesMap;
+    std::map<long, OGRFeature*> m_FeaturesMap;
+    typedef std::map<long, OGRFeature*>::iterator Iterator;
+    Iterator m_IT;
     CPLQuadTree* m_pQuadTree;
 };

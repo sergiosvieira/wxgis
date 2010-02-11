@@ -28,7 +28,7 @@
 wxGISTable::wxGISTable(wxGISDataset* pwxGISDataset) : m_pwxGISDataset(NULL)
 {
 	m_pwxGISDataset = dynamic_cast<wxGISFeatureDataset*>(pwxGISDataset);
-	OGRLayer* pLayer = m_pwxGISDataset->GetLayer(0);
+	OGRLayer* pLayer = m_pwxGISDataset->GetLayerRef(0);
     if(pLayer)
     {
 	    m_sFIDKeyName = wgMB2WX(pLayer->GetFIDColumn());
