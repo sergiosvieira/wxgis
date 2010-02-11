@@ -25,6 +25,7 @@
 //#include "ogr_api.h"
 #include "gdal_priv.h"
 #include "gdal_alg_priv.h"
+#include "cpl_quad_tree.h"
 
 #include "wxgis/framework/framework.h"
 #include <wx/datetime.h>
@@ -128,3 +129,4 @@ public:
 protected:
 	OGREnvelope m_Env;
 };
+

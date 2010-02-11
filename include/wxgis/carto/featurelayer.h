@@ -23,8 +23,6 @@
 #include "wxgis/carto/carto.h"
 #include "wxgis/carto/featuredataset.h"
 
-void GetFeatureBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
-
 class WXDLLIMPEXP_GIS_CRT wxGISFeatureLayer :
 	public wxGISLayer
 {
