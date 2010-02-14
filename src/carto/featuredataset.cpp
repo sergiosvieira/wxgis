@@ -472,6 +472,7 @@ void wxGISFeatureDataset::UnloadFeatures(void)
 
 OGRFeature* wxGISFeatureDataset::Next(void)
 {
+    wxCriticalSectionLocker locker(m_CritSect);
     if(m_FeaturesMap.empty())
         return m_poLayer->GetNextFeature();
     else

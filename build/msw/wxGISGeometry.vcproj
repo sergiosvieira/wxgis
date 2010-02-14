@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="wxGISCarto"
-	ProjectGUID="{E749616F-3D5F-4A58-98F0-456D1BE60A1C}"
-	RootNamespace="wxGISCarto"
+	Name="wxGISGeometry"
+	ProjectGUID="{9FE95E21-0CA3-4F51-B8CC-31397652B12E}"
+	RootNamespace="wxGISGeometry"
 	>
 	<Platforms>
 		<Platform
@@ -39,8 +39,6 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(GDAL)\alg&quot;;&quot;$(GDAL)\gcore&quot;;&quot;$(GDAL)\port&quot;;&quot;$(GDAL)\ogr&quot;;&quot;$(GDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CRT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -59,10 +57,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib cpld.lib ogrd.lib gdald.lib wxGISFrameworkd.lib wxGISDisplayd.lib"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(GDAL)\wxGIS\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib"
+				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				ImportLibrary="..\..\lib\$(TargetName).lib"
@@ -91,8 +89,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="copy from debug to lib"
-				CommandLine="copy $(TargetPath) ..\..\lib\"
 			/>
 		</Configuration>
 		<Configuration
@@ -175,54 +171,6 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
-			<File
-				RelativePath="..\..\src\carto\cartocmd.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\carto\featuredataset.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\carto\featurelayer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\carto\map.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\carto\mapview.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\carto\rasterdataset.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\carto\rasterlayer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\carto\rasterrenderer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\carto\simplerenderer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\carto\spvalidator.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\carto\tableview.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\carto\transformthreads.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -230,55 +178,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\include\wxgis\carto\carto.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\carto\cartocmd.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\carto\featuredataset.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\carto\featurelayer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\carto\map.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\carto\mapview.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\carto\rasterdataset.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\carto\rasterlayer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\carto\rasterrenderer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\carto\simplerenderer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\carto\spvalidator.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\carto\tableview.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\carto\transformthreads.h"
+				RelativePath="..\..\include\wxgis\geometry\geometry.h"
 				>
 			</File>
 		</Filter>
