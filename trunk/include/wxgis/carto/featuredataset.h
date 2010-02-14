@@ -69,4 +69,5 @@ protected:
     typedef std::map<long, OGRFeature*>::iterator Iterator;
     Iterator m_IT;
     CPLQuadTree* m_pQuadTree;
+    wxCriticalSection m_CritSect;
 };
