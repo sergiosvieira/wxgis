@@ -39,6 +39,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include;&quot;$(GDAL)\ogr&quot;;&quot;$(GDAL)\port&quot;;&quot;$(GDAL)\gcore&quot;;&quot;$(GEOS)\capi&quot;;&quot;$(GEOS)\source\headers&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_GEOM"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -57,10 +59,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib cpld.lib ogrd.lib gdald.lib geosd.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;"
+				AdditionalLibraryDirectories="&quot;$(GDAL)\wxGIS\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib;&quot;$(GEOS)\lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				ImportLibrary="..\..\lib\$(TargetName).lib"
@@ -171,6 +173,10 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath="..\..\src\geometry\point.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -179,6 +185,10 @@
 			>
 			<File
 				RelativePath="..\..\include\wxgis\geometry\geometry.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geometry\point.h"
 				>
 			</File>
 		</Filter>
