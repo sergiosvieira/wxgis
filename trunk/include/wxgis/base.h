@@ -86,6 +86,16 @@
 #    define WXDLLIMPEXP_DATA_GIS_CLU(type) type
 #endif
 
+#ifdef WXMAKINGDLL_GIS_GEOM
+#    define WXDLLIMPEXP_GIS_GEOM WXEXPORT
+#    define WXDLLIMPEXP_DATA_GIS_GEOM(type) WXEXPORT type
+#elif defined(WXUSINGDLL)
+#    define WXDLLIMPEXP_GIS_GEOM WXIMPORT
+#    define WXDLLIMPEXP_DATA_GIS_GEOMU(type) WXIMPORT type
+#else /* not making nor using DLL */
+#    define WXDLLIMPEXP_GIS_GEOM
+#    define WXDLLIMPEXP_DATA_GIS_GEOM(type) type
+#endif
 
 //#define WXDLLEXPORT WXMAKINGDLL_GIS
 //#define WXDLLEXPORT_DATA WXDLLIMPEXP_DATA_GIS

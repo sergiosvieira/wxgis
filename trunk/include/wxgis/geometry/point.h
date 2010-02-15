@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  geometry header.
+ * Purpose:  wxGISPoint header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -18,45 +18,23 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-
 #pragma once
 
-#include "wxgis/base.h"
-#include "ogr_geometry.h"
-#include "geos_c.h"
-#include "geos/geom/prep/PreparedGeometry.h"
-#include "geos/geom/prep/PreparedGeometryFactory.h"
-#include "geos/geom/Geometry.h" 
+#include "wxgis/geometry/geometry.h"
 
-#include <geos/export.h>
-
-using geos::geom::Geometry;
-using geos::geom::prep::PreparedGeometry;
-using geos::geom::prep::PreparedGeometryFactory;
-//using geos::geom::LineString;
-//using geos::geom::Polygon;
-//using geos::geom::CoordinateSequence;
-//using geos::geom::GeometryFactory;
-
-class wxGISGeometry
+class WXDLLIMPEXP_GIS_GEOM wxGISPoint : 
+    public OGRPoint,
+    public wxGISGeometry
 {
 public:
-    wxGISGeometry(void) : m_pGeosPrepGeom(NULL){};
-    virtual ~wxGISGeometry(void)
-    {
-        PreparedGeometryFactory::destroy(m_pGeosPrepGeom);
-    }
-    virtual const Geometry* GetGEOSGeom(void)
-    {
-        if(m_pGeosPrepGeom)
-        {
-            const Geometry &wxGEOSGeom = m_pGeosPrepGeom->getGeometry();
-            return &wxGEOSGeom;
-        }
-        else
-            return NULL;
-    }
-protected:
-    const PreparedGeometry* m_pGeosPrepGeom;
+    wxGISPoint();
+    wxGISPoint( double x, double y );
+    wxGISPoint( double x, double y, double z );
+    wxGISPoint(OGRPoint* pPoint);
+    virtual ~wxGISPoint();
+    virtual void empty();
+    virtual wxGISPoint &operator=(const OGRPoint &oSource);
+    virtual void FillGEOS(void);
+    virtual bool Intersects( wxGISGeometry* pGeom ) const;
 };
 
