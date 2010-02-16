@@ -247,17 +247,15 @@ OGRGeometry* wxGISFeatureTransformThread::Intersection(OGRGeometry* pFeatureGeom
     OGREnvelope FeatureEnv;
     pFeatureGeom->getEnvelope(&FeatureEnv);
 
-    OGRwkbGeometryType gType = pFeatureGeom->getGeometryType();
+    OGRwkbGeometryType gType = wkbFlatten(pFeatureGeom->getGeometryType());
     switch(gType)
     {
-    case wkbPoint25D:
     case wkbPoint:
         if(pRgnEnv && pRgnEnv->Contains(FeatureEnv) )
             return pFeatureGeom->clone();
         if(pRgn && pFeatureGeom->Within(pRgn))
             return pFeatureGeom->clone();
         break;
-    case wkbLineString25D:
     case wkbLineString:
         if(pRgnEnv && pRgnEnv->Contains(FeatureEnv) )
             return pFeatureGeom->clone();
@@ -265,7 +263,6 @@ OGRGeometry* wxGISFeatureTransformThread::Intersection(OGRGeometry* pFeatureGeom
             return pFeatureGeom->clone();
         return pFeatureGeom->Intersection(pRgn);
         break;
-    case wkbPolygon25D:
     case wkbPolygon:
         if(pRgnEnv && pRgnEnv->Contains(FeatureEnv) )
             return pFeatureGeom->clone();
@@ -280,10 +277,6 @@ OGRGeometry* wxGISFeatureTransformThread::Intersection(OGRGeometry* pFeatureGeom
             return pFeatureGeom->clone();
         return pFeatureGeom->Intersection(pRgn);
         break;
-    case wkbMultiPoint25D:
-    case wkbMultiLineString25D:
-    case wkbMultiPolygon25D:
-    case wkbGeometryCollection25D:
     case wkbMultiPoint:
     case wkbMultiLineString:
     case wkbMultiPolygon:

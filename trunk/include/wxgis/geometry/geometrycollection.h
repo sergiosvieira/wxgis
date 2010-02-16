@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGISPoint header.
+ * Purpose:  geometry collection header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -21,19 +21,4 @@
 #pragma once
 
 #include "wxgis/geometry/geometry.h"
-
-class WXDLLIMPEXP_GIS_GEOM wxGISPoint : 
-    public OGRPoint,
-    public wxGISGeometry
-{
-public:
-    wxGISPoint();
-    wxGISPoint( double x, double y );
-    wxGISPoint( double x, double y, double z );
-    wxGISPoint(OGRPoint* pPoint);
-    virtual ~wxGISPoint();
-    virtual void empty();
-    virtual wxGISPoint &operator=(const OGRPoint &oSource);
-    virtual void FillGEOS(void);
-};
 
