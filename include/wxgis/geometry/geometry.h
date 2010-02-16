@@ -27,36 +27,124 @@
 #include "geos/geom/prep/PreparedGeometry.h"
 #include "geos/geom/prep/PreparedGeometryFactory.h"
 #include "geos/geom/Geometry.h" 
+#include "geos/geom/GeometryFactory.h" 
 
 #include <geos/export.h>
 
 using geos::geom::Geometry;
+using geos::geom::GeometryFactory;
 using geos::geom::prep::PreparedGeometry;
 using geos::geom::prep::PreparedGeometryFactory;
 //using geos::geom::LineString;
 //using geos::geom::Polygon;
 //using geos::geom::CoordinateSequence;
-//using geos::geom::GeometryFactory;
 
 class wxGISGeometry
 {
 public:
-    wxGISGeometry(void) : m_pGeosPrepGeom(NULL){};
+    wxGISGeometry(void) : m_pGeosPrepGeom(NULL), m_pGeosGeom(NULL){};
     virtual ~wxGISGeometry(void)
     {
-        PreparedGeometryFactory::destroy(m_pGeosPrepGeom);
+        empty();
     }
     virtual const Geometry* GetGEOSGeom(void)
     {
+        return m_pGeosGeom;
+        //if(m_pGeosPrepGeom)
+        //{
+        //    const Geometry &wxGEOSGeom = m_pGeosPrepGeom->getGeometry();
+        //    return &wxGEOSGeom;
+        //}
+        //else
+        //    return NULL;
+    }
+    virtual bool Intersects( wxGISGeometry* pGeom ) const
+    {
+        if(!m_pGeosPrepGeom)
+            return true;
+        if(!pGeom)
+            return true;
+        const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
+        if(!pGEOSGeom)
+            return true;
+        return m_pGeosPrepGeom->intersects(pGEOSGeom);
+    }
+    virtual bool Within( wxGISGeometry* pGeom ) const
+    {
+        if(!m_pGeosPrepGeom)
+            return true;
+        if(!pGeom)
+            return true;
+        const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
+        if(!pGEOSGeom)
+            return true;
+        return m_pGeosPrepGeom->within(pGEOSGeom);
+    }
+    virtual bool Touches( wxGISGeometry* pGeom ) const
+    {
+        if(!m_pGeosPrepGeom)
+            return true;
+        if(!pGeom)
+            return true;
+        const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
+        if(!pGEOSGeom)
+            return true;
+        return m_pGeosPrepGeom->touches(pGEOSGeom);
+    }
+    virtual bool Disjoint( wxGISGeometry* pGeom ) const
+    {
+        if(!m_pGeosPrepGeom)
+            return true;
+        if(!pGeom)
+            return true;
+        const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
+        if(!pGEOSGeom)
+            return true;
+        return m_pGeosPrepGeom->disjoint(pGEOSGeom);
+    }
+    virtual bool Crosses( wxGISGeometry* pGeom ) const
+    {
+        if(!m_pGeosPrepGeom)
+            return true;
+        if(!pGeom)
+            return true;
+        const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
+        if(!pGEOSGeom)
+            return true;
+        return m_pGeosPrepGeom->crosses(pGEOSGeom);
+    }
+    virtual bool Contains( wxGISGeometry* pGeom ) const
+    {
+        if(!m_pGeosPrepGeom)
+            return true;
+        if(!pGeom)
+            return true;
+        const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
+        if(!pGEOSGeom)
+            return true;
+        return m_pGeosPrepGeom->contains(pGEOSGeom);
+    }
+    virtual bool Overlaps( wxGISGeometry* pGeom ) const
+    {
+        if(!m_pGeosPrepGeom)
+            return true;
+        if(!pGeom)
+            return true;
+        const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
+        if(!pGEOSGeom)
+            return true;
+        return m_pGeosPrepGeom->overlaps(pGEOSGeom);
+    }
+    virtual void FillGEOS(void) = 0;
+    virtual void empty(void)
+    {
+        if(m_pGeosGeom)
+            GEOSGeom_destroy((GEOSGeometry*)m_pGeosGeom);
         if(m_pGeosPrepGeom)
-        {
-            const Geometry &wxGEOSGeom = m_pGeosPrepGeom->getGeometry();
-            return &wxGEOSGeom;
-        }
-        else
-            return NULL;
+            PreparedGeometryFactory::destroy(m_pGeosPrepGeom);
     }
 protected:
     const PreparedGeometry* m_pGeosPrepGeom;
+    const Geometry* m_pGeosGeom;
 };
 

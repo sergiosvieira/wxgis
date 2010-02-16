@@ -174,7 +174,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\src\geometry\geometrycollection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\geometry\linestring.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\geometry\point.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\geometry\polygon.cpp"
 				>
 			</File>
 		</Filter>
@@ -188,7 +200,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\wxgis\geometry\geometrycollection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geometry\linestring.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wxgis\geometry\point.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geometry\polygon.h"
 				>
 			</File>
 		</Filter>

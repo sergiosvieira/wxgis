@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGISPoint header.
+ * Purpose:  wxGISPolygon header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -19,45 +19,39 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#include "wxgis/geometry/point.h"
+#include "wxgis/geometry/polygon.h"
 
-wxGISPoint::wxGISPoint() : OGRPoint(), wxGISGeometry()
+wxGISPolygon::wxGISPolygon() : OGRPolygon(), m_psEnvelope(NULL)
 {
 }
-    
-wxGISPoint::wxGISPoint( double x, double y ) : OGRPoint(x, y), wxGISGeometry()
+
+wxGISPolygon::wxGISPolygon(OGRPolygon* pPolygon) : OGRPolygon(), m_psEnvelope(NULL)
 {
+    addRing(pPolygon->getExteriorRing());
+    for(size_t i = 0; i < pPolygon->getNumInteriorRings(); i++)
+        addRing(pPolygon->getInteriorRing(i));
+    nCoordDimension = pPolygon->getCoordinateDimension();
+    assignSpatialReference(pPolygon->getSpatialReference());
     FillGEOS();
 }
 
-wxGISPoint::wxGISPoint( double x, double y, double z ) : OGRPoint(x, y, z), wxGISGeometry()
+wxGISPolygon::~wxGISPolygon()
 {
-    FillGEOS();
+    wxDELETE(m_psEnvelope);
 }
 
-wxGISPoint::wxGISPoint(OGRPoint* pPoint) : OGRPoint(pPoint->getX(), pPoint->getY(), pPoint->getZ()), wxGISGeometry()
+void wxGISPolygon::empty()
 {
-    assignSpatialReference(pPoint->getSpatialReference());
-    nCoordDimension = pPoint->getCoordinateDimension();
-    FillGEOS();
+    wxGISGeometry::empty();
+    return OGRPolygon::empty();
 }
 
-wxGISPoint::~wxGISPoint()
+wxGISPolygon &wxGISPolygon::operator=(const OGRPolygon &oSource)
 {
-}
-
-void wxGISPoint::empty()
-{
-   wxGISGeometry::empty();
-   return OGRPoint::empty();
-}
-
-wxGISPoint &wxGISPoint::operator=(const OGRPoint &oSource)
-{
-    wxGISPoint::empty();
-    setX( oSource.getX() );
-    setY( oSource.getY() );
-    setZ( oSource.getZ() );
+    wxGISPolygon::empty();
+    addRing((OGRLinearRing*)oSource.getExteriorRing());
+    for(size_t i = 0; i < oSource.getNumInteriorRings(); i++)
+        addRing((OGRLinearRing*)oSource.getInteriorRing(i));
     nCoordDimension = oSource.getCoordinateDimension();
     assignSpatialReference(oSource.getSpatialReference());
     FillGEOS();
@@ -65,9 +59,20 @@ wxGISPoint &wxGISPoint::operator=(const OGRPoint &oSource)
     return *this;
 }
 
-void wxGISPoint::FillGEOS(void)
+void wxGISPolygon::FillGEOS(void)
 {
     wxGISGeometry::empty();
     m_pGeosGeom = (const Geometry*)exportToGEOS();
     m_pGeosPrepGeom = PreparedGeometryFactory::prepare(m_pGeosGeom);
+    GetEnvelope();
+}
+
+OGREnvelope* wxGISPolygon::GetEnvelope( void )
+{
+    if(NULL == m_psEnvelope)
+    {
+        m_psEnvelope = new OGREnvelope();
+        OGRPolygon::getEnvelope(m_psEnvelope);
+    }
+    return m_psEnvelope;
 }
