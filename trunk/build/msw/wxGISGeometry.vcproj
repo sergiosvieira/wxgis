@@ -174,7 +174,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\src\geometry\geometry.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\geometry\geometrycollection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geometry\geometryfactory.h"
 				>
 			</File>
 			<File
@@ -201,6 +209,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\geometry\geometrycollection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\geometry\geometryfactory.cpp"
 				>
 			</File>
 			<File

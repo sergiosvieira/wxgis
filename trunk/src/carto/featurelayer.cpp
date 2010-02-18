@@ -23,6 +23,7 @@
 #include "wxgis/carto/spvalidator.h"
 #include "wxgis/framework/application.h"
 #include "wxgis/carto/transformthreads.h"
+#include "wxgis/geometry/polygon.h"
 
 #define STEP 3.0
 
@@ -173,8 +174,8 @@ void wxGISFeatureLayer::LoadFeatures(void)
     }
 
     bool bTransform(false);
-    OGRPolygon* pRgn1 = NULL;
-    OGRPolygon* pRgn2 = NULL;
+    wxGISPolygon* pRgn1 = NULL;
+    wxGISPolygon* pRgn2 = NULL;
 
 	OGRSpatialReference* pDatasetSpaRef = m_pwxGISFeatureDataset->GetSpatialReference();
     //get cut poly
@@ -201,7 +202,7 @@ void wxGISFeatureLayer::LoadFeatures(void)
                     ring1.addPoint(180.0,lims.miny);
                     ring1.closeRings();
 
-                    pRgn1 = new OGRPolygon();
+                    pRgn1 = new wxGISPolygon();
                     pRgn1->addRing(&ring1);	
                     pRgn1->flattenTo2D();
 
@@ -212,7 +213,7 @@ void wxGISFeatureLayer::LoadFeatures(void)
                     ring2.addPoint(lims.maxx,lims.miny);
                     ring2.closeRings();
 
-                    pRgn2 = new OGRPolygon();
+                    pRgn2 = new wxGISPolygon();
                     pRgn2->addRing(&ring2);	
                     pRgn2->flattenTo2D();
                 }
@@ -225,7 +226,7 @@ void wxGISFeatureLayer::LoadFeatures(void)
                     ring.addPoint(lims.maxx,lims.miny);
                     ring.closeRings();
 
-                    pRgn1 = new OGRPolygon();
+                    pRgn1 = new wxGISPolygon();
                     pRgn1->addRing(&ring);	
                     pRgn1->flattenTo2D();
                 }
