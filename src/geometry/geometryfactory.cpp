@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGISPolygon header.
+ * Purpose:  wxGISGeometryFactory header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -18,30 +18,42 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#pragma once
 
-#include "wxgis/geometry/geometry.h"
+#include "wxgis/geometry/geometryfactory.h"
+#include "wxgis/geometry/point.h"
+#include "wxgis/geometry/polygon.h"
 
-class WXDLLIMPEXP_GIS_GEOM wxGISPolygon : 
-    public OGRPolygon,
-    public wxGISGeometry
+wxGISGeometryFactory::wxGISGeometryFactory(void)
 {
-public:
-    wxGISPolygon();
-    wxGISPolygon(OGRPolygon* pPolygon);
-    wxGISPolygon(Geometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDim);
-    virtual ~wxGISPolygon();
-    virtual void empty();
-    virtual wxGISPolygon &operator=(const OGRPolygon &oSource);
-    virtual void FillGEOS(void);
-    virtual OGREnvelope* GetEnvelope( void );
-    virtual wxGISGeometry *Clone() const;
-    virtual OGRErr Transform( OGRCoordinateTransformation *poCT );
-    virtual void SetSpatialReference( OGRSpatialReference * poSR );
-    virtual OGRSpatialReference *GetSpatialReference( void ) const;
-    virtual void SetCoordinateDimension( int nCoordDim );
-    virtual int GetCoordinateDimension( void ) const;
-    virtual OGRGeometry* GetOGRGeom( void ) const{return this;};
-protected:
-    OGREnvelope * m_psEnvelope;
-};
+}
+
+wxGISGeometryFactory::~wxGISGeometryFactory(void)
+{
+}
+
+wxGISGeometry *wxGISGeometryFactory::CreateGeometry( Geometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDimension )
+{
+    GeometryTypeId nType = pGEOSGeom->getGeometryTypeId();
+    switch(nType)
+    {
+    case GEOS_POINT:
+        return new wxGISPoint(pGEOSGeom, poSRS, nCoordDimension);
+    case GEOS_LINESTRING:
+        break;
+	case GEOS_LINEARRING:
+        break;
+	case GEOS_POLYGON:
+        return new wxGISPolygon(pGEOSGeom, poSRS, nCoordDimension);
+	case GEOS_MULTIPOINT:
+        break;
+	case GEOS_MULTILINESTRING:
+        break;
+	case GEOS_MULTIPOLYGON:
+        break;
+	case GEOS_GEOMETRYCOLLECTION:
+        break;
+    default:
+        return NULL;
+    };
+}
+

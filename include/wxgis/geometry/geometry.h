@@ -35,114 +35,42 @@ using geos::geom::Geometry;
 using geos::geom::GeometryFactory;
 using geos::geom::prep::PreparedGeometry;
 using geos::geom::prep::PreparedGeometryFactory;
+using geos::geom::Coordinate;
+using geos::geom::GeometryTypeId;
+
 //using geos::geom::LineString;
 //using geos::geom::Polygon;
 //using geos::geom::CoordinateSequence;
 
-class wxGISGeometry
+class WXDLLIMPEXP_GIS_GEOM wxGISGeometry
 {
 public:
-    wxGISGeometry(void) : m_pGeosPrepGeom(NULL), m_pGeosGeom(NULL){};
-    virtual ~wxGISGeometry(void)
-    {
-        empty();
-    }
-    virtual const Geometry* GetGEOSGeom(void)
-    {
-        return m_pGeosGeom;
-        //if(m_pGeosPrepGeom)
-        //{
-        //    const Geometry &wxGEOSGeom = m_pGeosPrepGeom->getGeometry();
-        //    return &wxGEOSGeom;
-        //}
-        //else
-        //    return NULL;
-    }
-    virtual bool Intersects( wxGISGeometry* pGeom ) const
-    {
-        if(!m_pGeosPrepGeom)
-            return true;
-        if(!pGeom)
-            return true;
-        const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
-        if(!pGEOSGeom)
-            return true;
-        return m_pGeosPrepGeom->intersects(pGEOSGeom);
-    }
-    virtual bool Within( wxGISGeometry* pGeom ) const
-    {
-        if(!m_pGeosPrepGeom)
-            return true;
-        if(!pGeom)
-            return true;
-        const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
-        if(!pGEOSGeom)
-            return true;
-        return m_pGeosPrepGeom->within(pGEOSGeom);
-    }
-    virtual bool Touches( wxGISGeometry* pGeom ) const
-    {
-        if(!m_pGeosPrepGeom)
-            return true;
-        if(!pGeom)
-            return true;
-        const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
-        if(!pGEOSGeom)
-            return true;
-        return m_pGeosPrepGeom->touches(pGEOSGeom);
-    }
-    virtual bool Disjoint( wxGISGeometry* pGeom ) const
-    {
-        if(!m_pGeosPrepGeom)
-            return true;
-        if(!pGeom)
-            return true;
-        const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
-        if(!pGEOSGeom)
-            return true;
-        return m_pGeosPrepGeom->disjoint(pGEOSGeom);
-    }
-    virtual bool Crosses( wxGISGeometry* pGeom ) const
-    {
-        if(!m_pGeosPrepGeom)
-            return true;
-        if(!pGeom)
-            return true;
-        const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
-        if(!pGEOSGeom)
-            return true;
-        return m_pGeosPrepGeom->crosses(pGEOSGeom);
-    }
-    virtual bool Contains( wxGISGeometry* pGeom ) const
-    {
-        if(!m_pGeosPrepGeom)
-            return true;
-        if(!pGeom)
-            return true;
-        const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
-        if(!pGEOSGeom)
-            return true;
-        return m_pGeosPrepGeom->contains(pGEOSGeom);
-    }
-    virtual bool Overlaps( wxGISGeometry* pGeom ) const
-    {
-        if(!m_pGeosPrepGeom)
-            return true;
-        if(!pGeom)
-            return true;
-        const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
-        if(!pGEOSGeom)
-            return true;
-        return m_pGeosPrepGeom->overlaps(pGEOSGeom);
-    }
+    wxGISGeometry(void);
+    virtual ~wxGISGeometry(void);
+    virtual const Geometry* GetGEOSGeom(void);
+
+    virtual bool Intersects( wxGISGeometry* pGeom ) const;
+    virtual bool Within( wxGISGeometry* pGeom ) const;
+    virtual bool Touches( wxGISGeometry* pGeom ) const;
+    virtual bool Disjoint( wxGISGeometry* pGeom ) const;
+    virtual bool Crosses( wxGISGeometry* pGeom ) const;
+    virtual bool Contains( wxGISGeometry* pGeom ) const;
+    virtual bool Overlaps( wxGISGeometry* pGeom ) const;
+
+    virtual void empty(void);
+
+    virtual wxGISGeometry *Intersection( wxGISGeometry *pwxGISGeometry) const;
+
     virtual void FillGEOS(void) = 0;
-    virtual void empty(void)
-    {
-        if(m_pGeosGeom)
-            GEOSGeom_destroy((GEOSGeometry*)m_pGeosGeom);
-        if(m_pGeosPrepGeom)
-            PreparedGeometryFactory::destroy(m_pGeosPrepGeom);
-    }
+    virtual wxGISGeometry *Clone() const = 0;
+    virtual OGRErr Transform( OGRCoordinateTransformation *poCT ) = 0;
+    virtual OGREnvelope* GetEnvelope( void ) = 0;
+    virtual void SetSpatialReference( OGRSpatialReference * poSR ) = 0;
+    virtual OGRSpatialReference *GetSpatialReference( void ) const = 0;
+    virtual void SetCoordinateDimension( int nCoordDim ) = 0;
+    virtual int GetCoordinateDimension( void ) const = 0;
+    virtual OGRGeometry* GetOGRGeom( void ) const = 0;
+
 protected:
     const PreparedGeometry* m_pGeosPrepGeom;
     const Geometry* m_pGeosGeom;

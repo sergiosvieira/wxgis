@@ -27,12 +27,30 @@ wxGISPolygon::wxGISPolygon() : OGRPolygon(), m_psEnvelope(NULL)
 
 wxGISPolygon::wxGISPolygon(OGRPolygon* pPolygon) : OGRPolygon(), m_psEnvelope(NULL)
 {
-    addRing(pPolygon->getExteriorRing());
+    OGRPolygon::addRing(pPolygon->getExteriorRing());
     for(size_t i = 0; i < pPolygon->getNumInteriorRings(); i++)
-        addRing(pPolygon->getInteriorRing(i));
+        OGRPolygon::addRing(pPolygon->getInteriorRing(i));
     nCoordDimension = pPolygon->getCoordinateDimension();
     assignSpatialReference(pPolygon->getSpatialReference());
     FillGEOS();
+}
+
+wxGISPolygon::wxGISPolygon(Geometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDim)
+{
+    const LineString * 	getExteriorRing () const
+    size_t 	getNumInteriorRing () const
+    const LineString * 	getInteriorRingN (size_t n) const
+    //Coordinate *pCoord = pGEOSGeom->getCoordinate();
+    //if(pCoord)
+    //{
+    //    setX( pCoord->x );
+    //    setY( pCoord->y );
+    //    setZ( pCoord->z );
+    //}
+    m_pGeosGeom = pGEOSGeom;
+    m_pGeosPrepGeom = PreparedGeometryFactory::prepare(m_pGeosGeom);
+    nCoordDimension = nCoordDim;
+    SetSpatialReference(poSRS);
 }
 
 wxGISPolygon::~wxGISPolygon()
@@ -49,9 +67,9 @@ void wxGISPolygon::empty()
 wxGISPolygon &wxGISPolygon::operator=(const OGRPolygon &oSource)
 {
     wxGISPolygon::empty();
-    addRing((OGRLinearRing*)oSource.getExteriorRing());
+    OGRPolygon::addRing((OGRLinearRing*)oSource.getExteriorRing());
     for(size_t i = 0; i < oSource.getNumInteriorRings(); i++)
-        addRing((OGRLinearRing*)oSource.getInteriorRing(i));
+        OGRPolygon::addRing((OGRLinearRing*)oSource.getInteriorRing(i));
     nCoordDimension = oSource.getCoordinateDimension();
     assignSpatialReference(oSource.getSpatialReference());
     FillGEOS();
@@ -75,4 +93,44 @@ OGREnvelope* wxGISPolygon::GetEnvelope( void )
         OGRPolygon::getEnvelope(m_psEnvelope);
     }
     return m_psEnvelope;
+}
+
+wxGISGeometry *wxGISPolygon::Clone() const
+{
+    wxGISPolygon  *poNewPolygon = new wxGISPolygon();
+     
+    poNewPolygon->SetSpatialReference( GetSpatialReference() );
+    poNewPolygon->SetCoordinateDimension( GetCoordinateDimension() );
+
+    poNewPolygon->addRing((OGRLinearRing*)getExteriorRing());
+    for(size_t i = 0; i < getNumInteriorRings(); i++)
+        poNewPolygon->addRing((OGRLinearRing*)getInteriorRing(i));
+
+    poNewPolygon->FillGEOS();
+    return poNewPolygon;
+}
+
+OGRErr wxGISPolygon::Transform( OGRCoordinateTransformation *poCT )
+{
+    return OGRPolygon::transform( poCT );
+}
+
+void wxGISPolygon::SetSpatialReference( OGRSpatialReference * poSR )
+{
+    OGRPolygon::assignSpatialReference(poSR);
+}
+
+OGRSpatialReference *wxGISPolygon::GetSpatialReference( void ) const
+{
+    return OGRPolygon::getSpatialReference();
+}
+
+void wxGISPolygon::SetCoordinateDimension( int nCoordDim )
+{
+    nCoordDimension = nCoordDim;
+}
+
+int wxGISPolygon::GetCoordinateDimension( void ) const
+{
+    return nCoordDimension;
 }

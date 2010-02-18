@@ -23,19 +23,20 @@
 #include "wxgis/carto/carto.h"
 #include "wxgis/carto/featuredataset.h"
 #include "wxgis/framework/application.h"
+#include "wxgis/geometry/geometry.h"
 
 class wxGISFeatureTransformThread : public wxThread
 {
 public:
-	wxGISFeatureTransformThread(wxGISFeatureDataset* pwxGISFeatureDataset, OGRCoordinateTransformation *poCT, bool bTransform, OGRPolygon* pRgn1, OGRPolygon* pRgn2, wxCriticalSection* pCritSect, OGREnvelope* pFullEnv, wxGISFeatureSet* pOGRFeatureArray, size_t &nCounter, wxGISProgressor* pProgressor = NULL, ITrackCancel* pTrackCancel = NULL);
+	wxGISFeatureTransformThread(wxGISFeatureDataset* pwxGISFeatureDataset, OGRCoordinateTransformation *poCT, bool bTransform, wxGISGeometry* pRgn1, wxGISGeometry* pRgn2, wxCriticalSection* pCritSect, OGREnvelope* pFullEnv, wxGISFeatureSet* pOGRFeatureArray, size_t &nCounter, wxGISProgressor* pProgressor = NULL, ITrackCancel* pTrackCancel = NULL);
     virtual void *Entry();
     virtual void OnExit();
 protected:
     virtual OGRGeometry* CheckRgnAndTransform(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn, OGREnvelope* pRgnEnv, OGRCoordinateTransformation *poCT);
-    virtual OGRGeometry* CheckRgnAndTransform1(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn1, OGRPolygon* pRgn2, OGREnvelope* pRgnEnv1, OGREnvelope* pRgnEnv2, OGRCoordinateTransformation *poCT);
+    virtual wxGISGeometry* CheckRgnAndTransform1(wxGISGeometry* pwxGISGeom, wxGISGeometry* pRgn1, wxGISGeometry* pRgn2, OGREnvelope* pRgnEnv1, OGREnvelope* pRgnEnv2, OGRCoordinateTransformation *poCT);
     virtual OGRGeometry* Intersection(OGRGeometry* pFeatureGeom, OGRGeometry* pRgn, OGREnvelope* pRgnEnv);
 protected:
-    OGRPolygon *m_pRgn1, *m_pRgn2;
+    wxGISGeometry *m_pRgn1, *m_pRgn2;
     ITrackCancel *m_pTrackCancel;
     wxGISFeatureDataset *m_pwxGISFeatureDataset;
     OGRCoordinateTransformation *m_poCT;

@@ -21,29 +21,45 @@
 
 #include "wxgis/geometry/point.h"
 
-wxGISPoint::wxGISPoint() : OGRPoint(), wxGISGeometry()
+wxGISPoint::wxGISPoint() : OGRPoint(), wxGISGeometry(), m_psEnvelope(NULL)
 {
 }
     
-wxGISPoint::wxGISPoint( double x, double y ) : OGRPoint(x, y), wxGISGeometry()
+wxGISPoint::wxGISPoint( double x, double y ) : OGRPoint(x, y), wxGISGeometry(), m_psEnvelope(NULL)
 {
     FillGEOS();
 }
 
-wxGISPoint::wxGISPoint( double x, double y, double z ) : OGRPoint(x, y, z), wxGISGeometry()
+wxGISPoint::wxGISPoint( double x, double y, double z ) : OGRPoint(x, y, z), wxGISGeometry(), m_psEnvelope(NULL)
 {
     FillGEOS();
 }
 
-wxGISPoint::wxGISPoint(OGRPoint* pPoint) : OGRPoint(pPoint->getX(), pPoint->getY(), pPoint->getZ()), wxGISGeometry()
+wxGISPoint::wxGISPoint(OGRPoint* pPoint) : OGRPoint(pPoint->getX(), pPoint->getY(), pPoint->getZ()), wxGISGeometry(), m_psEnvelope(NULL)
 {
-    assignSpatialReference(pPoint->getSpatialReference());
-    nCoordDimension = pPoint->getCoordinateDimension();
+    SetCoordinateDimension(pPoint->getCoordinateDimension());
+    SetSpatialReference(pPoint->getSpatialReference());
     FillGEOS();
+}
+
+wxGISPoint::wxGISPoint(Geometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDim)
+{
+    const Coordinate *pCoord = pGEOSGeom->getCoordinate();
+    if(pCoord)
+    {
+        setX( pCoord->x );
+        setY( pCoord->y );
+        setZ( pCoord->z );
+    }
+    m_pGeosGeom = pGEOSGeom;
+    m_pGeosPrepGeom = PreparedGeometryFactory::prepare(m_pGeosGeom);
+    SetCoordinateDimension(nCoordDim);
+    SetSpatialReference(poSRS);
 }
 
 wxGISPoint::~wxGISPoint()
 {
+    wxDELETE(m_psEnvelope);
 }
 
 void wxGISPoint::empty()
@@ -58,8 +74,8 @@ wxGISPoint &wxGISPoint::operator=(const OGRPoint &oSource)
     setX( oSource.getX() );
     setY( oSource.getY() );
     setZ( oSource.getZ() );
-    nCoordDimension = oSource.getCoordinateDimension();
-    assignSpatialReference(oSource.getSpatialReference());
+    SetCoordinateDimension( oSource.getCoordinateDimension() );
+    SetSpatialReference(oSource.getSpatialReference());
     FillGEOS();
 
     return *this;
@@ -67,7 +83,55 @@ wxGISPoint &wxGISPoint::operator=(const OGRPoint &oSource)
 
 void wxGISPoint::FillGEOS(void)
 {
+    wxDELETE(m_psEnvelope);
     wxGISGeometry::empty();
     m_pGeosGeom = (const Geometry*)exportToGEOS();
     m_pGeosPrepGeom = PreparedGeometryFactory::prepare(m_pGeosGeom);
 }
+
+wxGISGeometry *wxGISPoint::Clone() const
+{
+    wxGISPoint *poNewPoint = new wxGISPoint( getX(), getY(), getZ() );
+
+    poNewPoint->SetSpatialReference( GetSpatialReference() );
+    poNewPoint->SetCoordinateDimension( GetCoordinateDimension() );
+    poNewPoint->FillGEOS();
+
+    return poNewPoint;
+}
+
+OGRErr wxGISPoint::Transform( OGRCoordinateTransformation *poCT )
+{
+    return OGRPoint::transform( poCT );
+}
+
+OGREnvelope* wxGISPoint::GetEnvelope( void )
+{
+    if(NULL == m_psEnvelope)
+    {
+        m_psEnvelope = new OGREnvelope();
+        OGRPoint::getEnvelope(m_psEnvelope);
+    }
+    return m_psEnvelope;
+}
+
+void wxGISPoint::SetSpatialReference( OGRSpatialReference * poSR )
+{
+    OGRPoint::assignSpatialReference(poSR);
+}
+
+OGRSpatialReference *wxGISPoint::GetSpatialReference( void ) const
+{
+    return OGRPoint::getSpatialReference();
+}
+
+void wxGISPoint::SetCoordinateDimension( int nCoordDim )
+{
+    nCoordDimension = nCoordDim;
+}
+
+int wxGISPoint::GetCoordinateDimension( void ) const
+{
+    return nCoordDimension;
+}
+

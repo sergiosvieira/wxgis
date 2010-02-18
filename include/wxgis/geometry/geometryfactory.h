@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGISPoint header.
+ * Purpose:  wxGISGeometryFactory header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -22,29 +22,11 @@
 
 #include "wxgis/geometry/geometry.h"
 
-class WXDLLIMPEXP_GIS_GEOM wxGISPoint : 
-    public OGRPoint,
-    public wxGISGeometry
+class wxGISGeometryFactory
 {
 public:
-    wxGISPoint();
-    wxGISPoint( double x, double y );
-    wxGISPoint( double x, double y, double z );
-    wxGISPoint(OGRPoint* pPoint);
-    wxGISPoint(Geometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDim);
-    virtual ~wxGISPoint();
-    virtual void empty();
-    virtual wxGISPoint &operator=(const OGRPoint &oSource);
-    virtual void FillGEOS(void);
-    virtual wxGISGeometry *Clone() const;
-    virtual OGRErr Transform( OGRCoordinateTransformation *poCT );
-    virtual OGREnvelope* GetEnvelope( void );
-    virtual void SetSpatialReference( OGRSpatialReference * poSR );
-    virtual OGRSpatialReference *GetSpatialReference( void ) const;
-    virtual void SetCoordinateDimension( int nCoordDim );
-    virtual int GetCoordinateDimension( void ) const;
-    virtual OGRGeometry* GetOGRGeom( void ) const{return this;};
-protected:
-    OGREnvelope * m_psEnvelope;
+    wxGISGeometryFactory(void);
+    virtual ~wxGISGeometryFactory(void);
+    static wxGISGeometry *CreateGeometry( Geometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDimension );
 };
 
