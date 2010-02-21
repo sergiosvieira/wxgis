@@ -23,31 +23,43 @@
 
 #include "wxgis/base.h"
 #include "ogr_geometry.h"
-#include "geos_c.h"
-#include "geos/geom/prep/PreparedGeometry.h"
-#include "geos/geom/prep/PreparedGeometryFactory.h"
+//#include "geos_c.h"
+
 #include "geos/geom/Geometry.h" 
 #include "geos/geom/GeometryFactory.h" 
+#include "geos/geom/GeometryCollection.h" 
+#include "geos/geom/LineString.h" 
+#include "geos/geom/Polygon.h" 
+#include "geos/geom/CoordinateSequence.h" 
+#include "geos/geom/prep/PreparedGeometryFactory.h"
+#include "geos/geom/prep/PreparedGeometry.h"
 
-#include <geos/export.h>
-
-using geos::geom::Geometry;
-using geos::geom::GeometryFactory;
-using geos::geom::prep::PreparedGeometry;
-using geos::geom::prep::PreparedGeometryFactory;
-using geos::geom::Coordinate;
-using geos::geom::GeometryTypeId;
-
+//using geos::geom::Geometry;
+//using geos::geom::GeometryFactory;
+//using geos::geom::prep::PreparedGeometry;
+//using geos::geom::prep::PreparedGeometryFactory;
+//using geos::geom::Coordinate;
+//using geos::geom::GeometryTypeId;
 //using geos::geom::LineString;
 //using geos::geom::Polygon;
 //using geos::geom::CoordinateSequence;
+//using geos::geom::GeometryCollection;
+#define wxGEOSGeometry geos::geom::Geometry 
+#define wxGEOSPreparedGeometry geos::geom::prep::PreparedGeometry 
+#define wxGEOSPreparedGeometryFactory geos::geom::prep::PreparedGeometryFactory 
+#define wxGEOSCoordinate geos::geom::Coordinate
+#define wxGEOSPolygon geos::geom::Polygon
+#define wxGEOSLineString geos::geom::LineString
+#define wxGEOSCoordinateSequence geos::geom::CoordinateSequence
+#define wxGEOSGeometryCollection geos::geom::GeometryCollection
+#define wxGEOSGeometryTypeId geos::geom::GeometryTypeId
 
 class WXDLLIMPEXP_GIS_GEOM wxGISGeometry
 {
 public:
     wxGISGeometry(void);
     virtual ~wxGISGeometry(void);
-    virtual const Geometry* GetGEOSGeom(void);
+    virtual const wxGEOSGeometry* GetGEOSGeom(void);
 
     virtual bool Intersects( wxGISGeometry* pGeom ) const;
     virtual bool Within( wxGISGeometry* pGeom ) const;
@@ -69,10 +81,10 @@ public:
     virtual OGRSpatialReference *GetSpatialReference( void ) const = 0;
     virtual void SetCoordinateDimension( int nCoordDim ) = 0;
     virtual int GetCoordinateDimension( void ) const = 0;
-    virtual OGRGeometry* GetOGRGeom( void ) const = 0;
+    virtual OGRGeometry* GetOGRGeom( void ) = 0;
 
 protected:
-    const PreparedGeometry* m_pGeosPrepGeom;
-    const Geometry* m_pGeosGeom;
+    const wxGEOSPreparedGeometry* m_pGeosPrepGeom;
+    const wxGEOSGeometry* m_pGeosGeom;
 };
 

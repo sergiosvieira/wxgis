@@ -27,6 +27,6 @@ class wxGISGeometryFactory
 public:
     wxGISGeometryFactory(void);
     virtual ~wxGISGeometryFactory(void);
-    static wxGISGeometry *CreateGeometry( Geometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDimension );
+    static wxGISGeometry *CreateGeometry( wxGEOSGeometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDimension );
 };
 

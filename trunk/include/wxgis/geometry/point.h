@@ -31,7 +31,7 @@ public:
     wxGISPoint( double x, double y );
     wxGISPoint( double x, double y, double z );
     wxGISPoint(OGRPoint* pPoint);
-    wxGISPoint(Geometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDim);
+    wxGISPoint(wxGEOSGeometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDim);
     virtual ~wxGISPoint();
     virtual void empty();
     virtual wxGISPoint &operator=(const OGRPoint &oSource);
@@ -43,7 +43,7 @@ public:
     virtual OGRSpatialReference *GetSpatialReference( void ) const;
     virtual void SetCoordinateDimension( int nCoordDim );
     virtual int GetCoordinateDimension( void ) const;
-    virtual OGRGeometry* GetOGRGeom( void ) const{return this;};
+    virtual OGRGeometry* GetOGRGeom( void ){return this;};
 protected:
     OGREnvelope * m_psEnvelope;
 };

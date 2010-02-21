@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/geometry/polygon.h"
+#include "wxgis/geometry/linestring.h"
 
 wxGISPolygon::wxGISPolygon() : OGRPolygon(), m_psEnvelope(NULL)
 {
@@ -31,24 +32,27 @@ wxGISPolygon::wxGISPolygon(OGRPolygon* pPolygon) : OGRPolygon(), m_psEnvelope(NU
     for(size_t i = 0; i < pPolygon->getNumInteriorRings(); i++)
         OGRPolygon::addRing(pPolygon->getInteriorRing(i));
     nCoordDimension = pPolygon->getCoordinateDimension();
-    assignSpatialReference(pPolygon->getSpatialReference());
+    SetSpatialReference(pPolygon->getSpatialReference());
     FillGEOS();
 }
 
-wxGISPolygon::wxGISPolygon(Geometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDim)
+wxGISPolygon::wxGISPolygon(wxGEOSGeometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDim) : OGRPolygon(), m_psEnvelope(NULL)
 {
-    const LineString * 	getExteriorRing () const
-    size_t 	getNumInteriorRing () const
-    const LineString * 	getInteriorRingN (size_t n) const
-    //Coordinate *pCoord = pGEOSGeom->getCoordinate();
-    //if(pCoord)
-    //{
-    //    setX( pCoord->x );
-    //    setY( pCoord->y );
-    //    setZ( pCoord->z );
-    //}
+    wxGEOSPolygon* pGEOSPoly = dynamic_cast<wxGEOSPolygon*>(pGEOSGeom);
+    if(!pGEOSPoly)
+        return;
+    wxGEOSLineString* pGEOSLineString = (wxGEOSLineString*)pGEOSPoly->getExteriorRing();
+    wxGISLineString* pwxGISLineString = new wxGISLineString(static_cast<wxGEOSGeometry*>(pGEOSLineString->clone()), poSRS, nCoordDim);
+    OGRPolygon::addRingDirectly((OGRLinearRing*)(pwxGISLineString));//static_cast<OGRLineString*>
+    for(size_t i = 0; i < pGEOSPoly->getNumInteriorRing(); i++)
+    {
+        pGEOSLineString = (wxGEOSLineString*)pGEOSPoly->getInteriorRingN(i);
+        pwxGISLineString = new wxGISLineString(static_cast<wxGEOSGeometry*>(pGEOSLineString->clone()), poSRS, nCoordDim);
+        OGRPolygon::addRingDirectly((OGRLinearRing*)(pwxGISLineString));//static_cast<OGRLineString*>
+    }
+    
     m_pGeosGeom = pGEOSGeom;
-    m_pGeosPrepGeom = PreparedGeometryFactory::prepare(m_pGeosGeom);
+    m_pGeosPrepGeom = wxGEOSPreparedGeometryFactory::prepare(m_pGeosGeom);
     nCoordDimension = nCoordDim;
     SetSpatialReference(poSRS);
 }
@@ -80,9 +84,9 @@ wxGISPolygon &wxGISPolygon::operator=(const OGRPolygon &oSource)
 void wxGISPolygon::FillGEOS(void)
 {
     wxGISGeometry::empty();
-    m_pGeosGeom = (const Geometry*)exportToGEOS();
-    m_pGeosPrepGeom = PreparedGeometryFactory::prepare(m_pGeosGeom);
-    GetEnvelope();
+    m_pGeosGeom = (const wxGEOSGeometry*)exportToGEOS();
+    m_pGeosPrepGeom = wxGEOSPreparedGeometryFactory::prepare(m_pGeosGeom);
+    wxDELETE(m_psEnvelope);
 }
 
 OGREnvelope* wxGISPolygon::GetEnvelope( void )
