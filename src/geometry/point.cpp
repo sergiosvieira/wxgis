@@ -42,9 +42,9 @@ wxGISPoint::wxGISPoint(OGRPoint* pPoint) : OGRPoint(pPoint->getX(), pPoint->getY
     FillGEOS();
 }
 
-wxGISPoint::wxGISPoint(Geometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDim)
+wxGISPoint::wxGISPoint(wxGEOSGeometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDim)
 {
-    const Coordinate *pCoord = pGEOSGeom->getCoordinate();
+    const wxGEOSCoordinate *pCoord = pGEOSGeom->getCoordinate();
     if(pCoord)
     {
         setX( pCoord->x );
@@ -52,7 +52,9 @@ wxGISPoint::wxGISPoint(Geometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoo
         setZ( pCoord->z );
     }
     m_pGeosGeom = pGEOSGeom;
-    m_pGeosPrepGeom = PreparedGeometryFactory::prepare(m_pGeosGeom);
+    //wxGEOSPreparedGeometryFactory PrepFact;
+    //m_pGeosPrepGeom = PrepFact.create(m_pGeosGeom);
+    m_pGeosPrepGeom = wxGEOSPreparedGeometryFactory::prepare(m_pGeosGeom);
     SetCoordinateDimension(nCoordDim);
     SetSpatialReference(poSRS);
 }
@@ -85,8 +87,8 @@ void wxGISPoint::FillGEOS(void)
 {
     wxDELETE(m_psEnvelope);
     wxGISGeometry::empty();
-    m_pGeosGeom = (const Geometry*)exportToGEOS();
-    m_pGeosPrepGeom = PreparedGeometryFactory::prepare(m_pGeosGeom);
+    m_pGeosGeom = (const wxGEOSGeometry*)exportToGEOS();
+    m_pGeosPrepGeom = wxGEOSPreparedGeometryFactory::prepare(m_pGeosGeom);
 }
 
 wxGISGeometry *wxGISPoint::Clone() const

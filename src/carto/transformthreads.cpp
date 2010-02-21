@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/carto/transformthreads.h"
+#include "wxgis/geometry/geometrycollection.h"
 
 wxGISFeatureTransformThread::wxGISFeatureTransformThread(wxGISFeatureDataset* pwxGISFeatureDataset, OGRCoordinateTransformation *poCT, bool bTransform, wxGISGeometry* pRgn1, wxGISGeometry* pRgn2, wxCriticalSection* pCritSect, OGREnvelope* pFullEnv, wxGISFeatureSet* pOGRFeatureArray, size_t &nCounter, wxGISProgressor* pProgressor, ITrackCancel* pTrackCancel) : wxThread(wxTHREAD_JOINABLE), m_nCounter(nCounter)
 {
@@ -120,7 +121,8 @@ void *wxGISFeatureTransformThread::Entry()
 
         m_pCritSect->Leave();
     }
-    
+
+    Sleep(300);
 	return NULL;
 }
 void wxGISFeatureTransformThread::OnExit()
@@ -220,6 +222,11 @@ wxGISGeometry* wxGISFeatureTransformThread::CheckRgnAndTransform1(wxGISGeometry*
         pGeom = pGeom2;
     else if(pGeom1 && pGeom2)
     {
+        wxGISGeometryCollection* pGeometryCollection = new wxGISGeometryCollection();
+        pGeometryCollection->addGeometryDirectly(pGeom1->GetOGRGeom());
+        pGeometryCollection->addGeometryDirectly(pGeom2->GetOGRGeom());
+        pGeom = pGeometryCollection; 
+
         //OGRGeometryCollection* pGeometryCollection = new OGRGeometryCollection();
         //pGeometryCollection->addGeometryDirectly(pGeom1);
         //pGeometryCollection->addGeometryDirectly(pGeom2);

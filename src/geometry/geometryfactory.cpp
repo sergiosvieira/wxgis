@@ -22,6 +22,8 @@
 #include "wxgis/geometry/geometryfactory.h"
 #include "wxgis/geometry/point.h"
 #include "wxgis/geometry/polygon.h"
+#include "wxgis/geometry/linestring.h"
+#include "wxgis/geometry/geometrycollection.h"
 
 wxGISGeometryFactory::wxGISGeometryFactory(void)
 {
@@ -31,29 +33,32 @@ wxGISGeometryFactory::~wxGISGeometryFactory(void)
 {
 }
 
-wxGISGeometry *wxGISGeometryFactory::CreateGeometry( Geometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDimension )
+wxGISGeometry *wxGISGeometryFactory::CreateGeometry( wxGEOSGeometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDimension )
 {
-    GeometryTypeId nType = pGEOSGeom->getGeometryTypeId();
+    wxGEOSGeometryTypeId nType = pGEOSGeom->getGeometryTypeId();
     switch(nType)
     {
-    case GEOS_POINT:
+    case wxGEOSGeometryTypeId::GEOS_POINT:
         return new wxGISPoint(pGEOSGeom, poSRS, nCoordDimension);
-    case GEOS_LINESTRING:
+    case wxGEOSGeometryTypeId::GEOS_LINESTRING:
+        return new wxGISLineString(pGEOSGeom, poSRS, nCoordDimension);
+	case wxGEOSGeometryTypeId::GEOS_LINEARRING:
+        wxDELETE(pGEOSGeom);
         break;
-	case GEOS_LINEARRING:
-        break;
-	case GEOS_POLYGON:
+	case wxGEOSGeometryTypeId::GEOS_POLYGON:
         return new wxGISPolygon(pGEOSGeom, poSRS, nCoordDimension);
-	case GEOS_MULTIPOINT:
-        break;
-	case GEOS_MULTILINESTRING:
-        break;
-	case GEOS_MULTIPOLYGON:
-        break;
-	case GEOS_GEOMETRYCOLLECTION:
-        break;
+	case wxGEOSGeometryTypeId::GEOS_MULTIPOINT:
+        return new wxGISGeometryCollection(pGEOSGeom, poSRS, nCoordDimension);
+	case wxGEOSGeometryTypeId::GEOS_MULTILINESTRING:
+        return new wxGISGeometryCollection(pGEOSGeom, poSRS, nCoordDimension);
+	case wxGEOSGeometryTypeId::GEOS_MULTIPOLYGON:
+        return new wxGISGeometryCollection(pGEOSGeom, poSRS, nCoordDimension);
+	case wxGEOSGeometryTypeId::GEOS_GEOMETRYCOLLECTION:
+        return new wxGISGeometryCollection(pGEOSGeom, poSRS, nCoordDimension);
     default:
+        wxDELETE(pGEOSGeom);
         return NULL;
     };
+    return NULL;
 }
 

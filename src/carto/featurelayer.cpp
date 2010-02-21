@@ -25,7 +25,7 @@
 #include "wxgis/carto/transformthreads.h"
 #include "wxgis/geometry/polygon.h"
 
-#define STEP 3.0
+#define STEP 1.0
 
 wxGISFeatureLayer::wxGISFeatureLayer(wxGISDataset* pwxGISDataset) : wxGISLayer(), m_pwxGISFeatureDataset(NULL), m_pFeatureRenderer(NULL), m_pQuadTree(NULL), m_pSpatialReference(NULL), m_bIsFeaturesLoaded(false)
 {
@@ -277,10 +277,19 @@ void wxGISFeatureLayer::LoadFeatures(void)
     wxCriticalSection CritSect;
     size_t nCounter(0);
 
+    if(pRgn1) pRgn1->FillGEOS();
+    if(pRgn2) pRgn2->FillGEOS();
+
     for(int i = 0; i < CPUCount; i++)
     {        
         wxGISFeatureTransformThread *thread = new wxGISFeatureTransformThread(m_pwxGISFeatureDataset, poCT, bTransform, pRgn1, pRgn2, &CritSect, &m_FullEnv, &m_OGRFeatureArray, nCounter, pProgressor, NULL);
-        thread->Create();
+        if(!thread)
+            continue;
+        if(thread->Create() != wxTHREAD_NO_ERROR)
+        {
+            wxDELETE(thread);
+            continue;
+        }
         thread->Run();
         threadarray.push_back(thread);
     }

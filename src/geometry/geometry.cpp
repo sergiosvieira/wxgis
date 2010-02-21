@@ -32,7 +32,7 @@ wxGISGeometry::~wxGISGeometry(void)
     empty();
 }
 
-const Geometry* wxGISGeometry::GetGEOSGeom(void)
+const wxGEOSGeometry* wxGISGeometry::GetGEOSGeom(void)
 {
     return m_pGeosGeom;
 }
@@ -43,7 +43,7 @@ bool wxGISGeometry::Intersects( wxGISGeometry* pGeom ) const
         return true;
     if(!pGeom)
         return true;
-    const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
+    const wxGEOSGeometry* pGEOSGeom = pGeom->GetGEOSGeom();
     if(!pGEOSGeom)
         return true;
     return m_pGeosPrepGeom->intersects(pGEOSGeom);
@@ -55,7 +55,7 @@ bool wxGISGeometry::Within( wxGISGeometry* pGeom ) const
         return true;
     if(!pGeom)
         return true;
-    const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
+    const wxGEOSGeometry* pGEOSGeom = pGeom->GetGEOSGeom();
     if(!pGEOSGeom)
         return true;
     return m_pGeosPrepGeom->within(pGEOSGeom);
@@ -67,7 +67,7 @@ bool wxGISGeometry::Touches( wxGISGeometry* pGeom ) const
         return true;
     if(!pGeom)
         return true;
-    const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
+    const wxGEOSGeometry* pGEOSGeom = pGeom->GetGEOSGeom();
     if(!pGEOSGeom)
         return true;
     return m_pGeosPrepGeom->touches(pGEOSGeom);
@@ -79,7 +79,7 @@ bool wxGISGeometry::Disjoint( wxGISGeometry* pGeom ) const
         return true;
     if(!pGeom)
         return true;
-    const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
+    const wxGEOSGeometry* pGEOSGeom = pGeom->GetGEOSGeom();
     if(!pGEOSGeom)
         return true;
     return m_pGeosPrepGeom->disjoint(pGEOSGeom);
@@ -91,7 +91,7 @@ bool wxGISGeometry::Crosses( wxGISGeometry* pGeom ) const
         return true;
     if(!pGeom)
         return true;
-    const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
+    const wxGEOSGeometry* pGEOSGeom = pGeom->GetGEOSGeom();
     if(!pGEOSGeom)
         return true;
     return m_pGeosPrepGeom->crosses(pGEOSGeom);
@@ -103,7 +103,7 @@ bool wxGISGeometry::Contains( wxGISGeometry* pGeom ) const
         return true;
     if(!pGeom)
         return true;
-    const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
+    const wxGEOSGeometry* pGEOSGeom = pGeom->GetGEOSGeom();
     if(!pGEOSGeom)
         return true;
     return m_pGeosPrepGeom->contains(pGEOSGeom);
@@ -115,7 +115,7 @@ bool wxGISGeometry::Overlaps( wxGISGeometry* pGeom ) const
         return true;
     if(!pGeom)
         return true;
-    const Geometry* pGEOSGeom = pGeom->GetGEOSGeom();
+    const wxGEOSGeometry* pGEOSGeom = pGeom->GetGEOSGeom();
     if(!pGEOSGeom)
         return true;
     return m_pGeosPrepGeom->overlaps(pGEOSGeom);
@@ -123,19 +123,27 @@ bool wxGISGeometry::Overlaps( wxGISGeometry* pGeom ) const
 
 void wxGISGeometry::empty(void)
 {
-    if(m_pGeosGeom)
-        GEOSGeom_destroy((GEOSGeometry*)m_pGeosGeom);
-    if(m_pGeosPrepGeom)
-        PreparedGeometryFactory::destroy(m_pGeosPrepGeom);
+    wxDELETE(m_pGeosPrepGeom);
+    wxDELETE(m_pGeosGeom);
+    //if(m_pGeosGeom)
+    //{
+    //    GEOSGeom_destroy((GEOSGeometry*)m_pGeosGeom);
+    //    m_pGeosGeom = NULL;
+    //}
+    //if(m_pGeosPrepGeom)
+    //{
+    //    PreparedGeometryFactory::destroy(m_pGeosPrepGeom);
+    //    m_pGeosPrepGeom = NULL;
+    //}
 }
 
 wxGISGeometry *wxGISGeometry::Intersection( wxGISGeometry *pwxGISGeometry) const
 {
-    const Geometry* pOtherGeosGeom = pwxGISGeometry->GetGEOSGeom();
+    const wxGEOSGeometry* pOtherGeosGeom = pwxGISGeometry->GetGEOSGeom();
 
     if( m_pGeosGeom != NULL && pOtherGeosGeom != NULL )
     {
-        Geometry* pResultGeom =  m_pGeosGeom->intersection(pOtherGeosGeom);
+        wxGEOSGeometry* pResultGeom =  m_pGeosGeom->intersection(pOtherGeosGeom);
         if( pResultGeom != NULL )
             return wxGISGeometryFactory::CreateGeometry(pResultGeom, GetSpatialReference(), GetCoordinateDimension() );
     }

@@ -21,6 +21,8 @@
 #include "wxgis/carto/featuredataset.h"
 #include "wxgis/geometry/polygon.h"
 #include "wxgis/geometry/point.h"
+#include "wxgis/geometry/linestring.h"
+#include "wxgis/geometry/geometrycollection.h"
 
 #include <wx/filename.h>
 
@@ -512,11 +514,13 @@ OGRGeometry* wxGISFeatureDataset::ModifyGeometry(OGRGeometry* pGeom)
 	case wkbPoint:
         return static_cast<OGRGeometry*>(new wxGISPoint((OGRPoint*)pGeom));
 	case wkbLineString:
+        return static_cast<OGRGeometry*>(new wxGISLineString((OGRLineString*)pGeom));
 	case wkbMultiPolygon:
-	case wkbLinearRing:
 	case wkbMultiPoint:
 	case wkbMultiLineString:
 	case wkbGeometryCollection:
+        return static_cast<OGRGeometry*>(new wxGISGeometryCollection((OGRGeometryCollection*)pGeom));
+	case wkbLinearRing:
 	case wkbUnknown:
 	case wkbNone:
 	default:

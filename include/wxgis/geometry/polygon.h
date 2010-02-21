@@ -29,7 +29,7 @@ class WXDLLIMPEXP_GIS_GEOM wxGISPolygon :
 public:
     wxGISPolygon();
     wxGISPolygon(OGRPolygon* pPolygon);
-    wxGISPolygon(Geometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDim);
+    wxGISPolygon(wxGEOSGeometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDim);
     virtual ~wxGISPolygon();
     virtual void empty();
     virtual wxGISPolygon &operator=(const OGRPolygon &oSource);
@@ -41,7 +41,7 @@ public:
     virtual OGRSpatialReference *GetSpatialReference( void ) const;
     virtual void SetCoordinateDimension( int nCoordDim );
     virtual int GetCoordinateDimension( void ) const;
-    virtual OGRGeometry* GetOGRGeom( void ) const{return this;};
+    virtual OGRGeometry* GetOGRGeom( void ){return this;};
 protected:
     OGREnvelope * m_psEnvelope;
 };

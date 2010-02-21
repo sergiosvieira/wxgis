@@ -22,3 +22,26 @@
 
 #include "wxgis/geometry/geometry.h"
 
+class WXDLLIMPEXP_GIS_GEOM wxGISGeometryCollection : 
+    public OGRGeometryCollection,
+    public wxGISGeometry
+{
+public:
+    wxGISGeometryCollection();
+    wxGISGeometryCollection(OGRGeometryCollection* pGeometryCollection);
+    wxGISGeometryCollection(wxGEOSGeometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDim);
+    virtual ~wxGISGeometryCollection();
+    virtual void empty();
+    virtual wxGISGeometryCollection &operator=(const OGRGeometryCollection &oSource);
+    virtual void FillGEOS(void);
+    virtual OGREnvelope* GetEnvelope( void );
+    virtual wxGISGeometry *Clone() const;
+    virtual OGRErr Transform( OGRCoordinateTransformation *poCT );
+    virtual void SetSpatialReference( OGRSpatialReference * poSR );
+    virtual OGRSpatialReference *GetSpatialReference( void ) const;
+    virtual void SetCoordinateDimension( int nCoordDim );
+    virtual int GetCoordinateDimension( void ) const;
+    virtual OGRGeometry* GetOGRGeom( void ){return this;};
+protected:
+    OGREnvelope * m_psEnvelope;
+};
