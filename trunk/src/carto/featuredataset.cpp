@@ -19,11 +19,6 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/carto/featuredataset.h"
-#include "wxgis/geometry/polygon.h"
-#include "wxgis/geometry/point.h"
-#include "wxgis/geometry/linestring.h"
-#include "wxgis/geometry/geometrycollection.h"
-
 #include <wx/filename.h>
 
 #include <wx/file.h>
@@ -445,7 +440,6 @@ void wxGISFeatureDataset::LoadFeatures(void)
 		{
             if(!bHasFID)
                 poFeature->SetFID(counter);
-            poFeature->SetGeometryDirectly(ModifyGeometry(poFeature->GetGeometryRef()));
             m_FeaturesMap[poFeature->GetFID()] = poFeature;
             if(bSetEnv)
             {
@@ -480,13 +474,7 @@ OGRFeature* wxGISFeatureDataset::Next(void)
 {
     wxCriticalSectionLocker locker(m_CritSect);
     if(m_FeaturesMap.empty())
-    {
-        OGRFeature* pOGRFeature = m_poLayer->GetNextFeature();
-        if(!pOGRFeature)
-            return pOGRFeature;
-        pOGRFeature->SetGeometryDirectly(ModifyGeometry(pOGRFeature->GetGeometryRef()));
-        return pOGRFeature;
-    }
+        return m_poLayer->GetNextFeature();
     else
     {
         if(m_IT == m_FeaturesMap.end())
@@ -500,32 +488,5 @@ void wxGISFeatureDataset::Reset(void)
 {
     m_poLayer->ResetReading();
     m_IT = m_FeaturesMap.begin();
-}
-
-OGRGeometry* wxGISFeatureDataset::ModifyGeometry(OGRGeometry* pGeom)
-{
-    if(!pGeom)
-        return NULL;
-    OGRwkbGeometryType Type = wkbFlatten(pGeom->getGeometryType());
-    switch(Type)
-    {
-	case wkbPolygon:
-        return static_cast<OGRGeometry*>(new wxGISPolygon((OGRPolygon*)pGeom));
-	case wkbPoint:
-        return static_cast<OGRGeometry*>(new wxGISPoint((OGRPoint*)pGeom));
-	case wkbLineString:
-        return static_cast<OGRGeometry*>(new wxGISLineString((OGRLineString*)pGeom));
-	case wkbMultiPolygon:
-	case wkbMultiPoint:
-	case wkbMultiLineString:
-	case wkbGeometryCollection:
-        return static_cast<OGRGeometry*>(new wxGISGeometryCollection((OGRGeometryCollection*)pGeom));
-	case wkbLinearRing:
-	case wkbUnknown:
-	case wkbNone:
-	default:
-		break;
-    }
-    return NULL;
 }
 
