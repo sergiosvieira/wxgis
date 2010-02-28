@@ -91,7 +91,7 @@
 #    define WXDLLIMPEXP_DATA_GIS_GEOM(type) WXEXPORT type
 #elif defined(WXUSINGDLL)
 #    define WXDLLIMPEXP_GIS_GEOM WXIMPORT
-#    define WXDLLIMPEXP_DATA_GIS_GEOMU(type) WXIMPORT type
+#    define WXDLLIMPEXP_DATA_GIS_GEOM(type) WXIMPORT type
 #else /* not making nor using DLL */
 #    define WXDLLIMPEXP_GIS_GEOM
 #    define WXDLLIMPEXP_DATA_GIS_GEOM(type) type
