@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGISGeometryFactory header.
+ * Purpose:  Algorithm header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -22,11 +22,14 @@
 
 #include "wxgis/geometry/geometry.h"
 
-class wxGISGeometryFactory
+class WXDLLIMPEXP_GIS_GEOM wxGISAlgorithm
 {
 public:
-    wxGISGeometryFactory(void);
-    virtual ~wxGISGeometryFactory(void);
-    static wxGISGeometry *CreateGeometry( wxGEOSGeometry* pGEOSGeom, OGRSpatialReference* poSRS, int nCoordDimension );
+    wxGISAlgorithm(void);
+    virtual ~wxGISAlgorithm(void);
+    virtual OGRGeometry* FastLineIntersection(OGRGeometry* pGeom1, OGRGeometry* pGeom2);
+    virtual OGRGeometry* FastPolyIntersection(OGRGeometry* pGeom1, OGRGeometry* pGeom2);
+protected:
+    virtual OGRRawPoint* wxGISAlgorithm::Crossing(OGRRawPoint p11, OGRRawPoint p12, OGRRawPoint p21, OGRRawPoint p22);
+    virtual void wxGISAlgorithm::SetPointOnEnvelope(OGRRawPoint* a, OGRRawPoint* b, OGRRawPoint* c, OGREnvelope* r, int code);
 };
-
