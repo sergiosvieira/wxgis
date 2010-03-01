@@ -32,4 +32,29 @@ public:
 protected:
     virtual OGRRawPoint* wxGISAlgorithm::Crossing(OGRRawPoint p11, OGRRawPoint p12, OGRRawPoint p21, OGRRawPoint p22);
     virtual void wxGISAlgorithm::SetPointOnEnvelope(OGRRawPoint* a, OGRRawPoint* b, OGRRawPoint* c, OGREnvelope* r, int code);
+    virtual OGRLinearRing* PolyIntersection(OGREnvelope* pEnv, OGRLineString* pOGRLineString);
+};
+
+//--------------------------------------
+// ClipWindow
+//--------------------------------------
+class wxClipWindow
+{
+public:
+    typedef enum _vertex_type{wxVERTEX, wxENTER, wxEXIT} VERTEXTYPE;
+
+    wxClipWindow(OGREnvelope* pEnv);
+    virtual ~wxClipWindow(void);
+    virtual int AddPoint(OGRRawPoint* a, int nIndex, VERTEXTYPE Type);
+    virtual size_t GetSize(void){return m_Env.size();};
+    virtual CLIPVERT GetItem(int nIndex){return m_Env[nIndex];};
+
+    typedef struct _clip_vert
+    {
+        OGRRawPoint pt;
+        long nItemPtr;
+        VERTEXTYPE Type;
+    } CLIPVERT;
+protected:
+    std::vector<CLIPVERT> m_Env;
 };
