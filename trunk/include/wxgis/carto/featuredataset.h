@@ -56,7 +56,6 @@ protected:
     virtual void LoadFeatures(void);
     virtual void UnloadFeatures(void);
     virtual void Empty(void);
-    virtual OGRGeometry* ModifyGeometry(OGRGeometry* pGeom);
 protected:
 	OGRDataSource *m_poDS;
 	OGREnvelope* m_psExtent;
