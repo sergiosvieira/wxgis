@@ -71,6 +71,19 @@ OGRLayer* wxGISFeatureDataset::GetLayerRef(int iLayer)
 	return NULL;	
 }
 
+bool wxGISFeatureDataset::Delete(int iLayer)
+{
+	wxCriticalSectionLocker locker(m_CritSect);
+	if( m_poDS == NULL )
+       m_poDS = OGRSFDriverRegistrar::Open( wgWX2MB(m_sPath.c_str()), TRUE );
+	if( m_poDS == NULL )
+		return false;
+    OGRErr err = m_poDS->DeleteLayer(iLayer);
+    if(err == OGRERR_NONE)
+        return true;
+	return false;    
+}
+
 bool wxGISFeatureDataset::Open(int iLayer)
 {
 	if(m_bIsOpened)

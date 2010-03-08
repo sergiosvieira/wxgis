@@ -428,17 +428,6 @@ void wxGxTreeView::OnEndLabelEdit(wxTreeEvent& event)
 //		}
 //	}
 //}
-//
-//void wxGxTreeView::OnObjectDeleted(IGxObject* pObject)
-//{
-//	if(pObject == NULL)
-//		return;
-//
-//	wxTreeItemId TreeItemId = m_TreeMap[pObject];	
-//	if(TreeItemId.IsOk())
-//		wxTreeCtrl::Delete(TreeItemId);
-//	m_TreeMap.erase(pObject);
-//}
 
 void wxGxTreeView::OnSelChanged(wxTreeEvent& event)
 {

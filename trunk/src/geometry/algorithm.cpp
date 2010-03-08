@@ -34,6 +34,182 @@
 	 (((p)->y < (r)->MinY) ? BOT : 0)   +  /* +4 если точка ниже прямоугольника */  \
 	 (((p)->y > (r)->MaxY) ? TOP : 0))     /* +8 если точка выше прямоугольника */
 
+#define STEP 3.0
+
+//------------------------------------------------------------------------------------
+// wxWAList
+//------------------------------------------------------------------------------------
+wxWAList::wxWAList(void)
+{
+}
+
+wxWAList::~wxWAList(void)
+{
+    for(size_t i = 0; i < m_ItemsArr.size(); i++)
+    {
+        wxDELETE(m_ItemsArr[i]);
+    }
+}
+
+wxWAListItem* wxWAList::AddPoint(OGRRawPoint Point, VERTEXTYPE Type)
+{
+    wxWAListItem* pItem = new wxWAListItem();
+    pItem->m_Point = Point;
+    pItem->m_Type = Type;
+    if(GetSize() > 0)
+        m_ItemsArr[m_ItemsArr.size() - 1]->m_pNext = (long)pItem;
+    m_ItemsArr.push_back(pItem);
+    return pItem;
+}
+
+wxWAListItem* wxWAList::InsertPoint(size_t nIndex, OGRRawPoint Point, VERTEXTYPE Type)
+{
+    wxWAListItem* pItem = new wxWAListItem();
+    pItem->m_Point = Point;
+    pItem->m_Type = Type;
+    if(nIndex == 0)
+    {
+        pItem->m_pNext = (long)m_ItemsArr[0];
+    }
+    else if(nIndex == GetSize())
+    {
+        m_ItemsArr[m_ItemsArr.size() - 1]->m_pNext = (long)pItem;
+    }
+    else
+    {
+        m_ItemsArr[nIndex - 1]->m_pNext = (long)pItem;
+        pItem->m_pNext = (long)m_ItemsArr[nIndex];
+    }
+    m_ItemsArr.insert(m_ItemsArr.begin() + nIndex, pItem);
+    return pItem;
+}
+
+wxWAListItem* wxWAList::RemovePoint(wxWAListItem* pItem)
+{
+    for(size_t i = 0; i < m_ItemsArr.size(); i++)
+    {
+        if(m_ItemsArr[i] == pItem)
+        {
+            // point to new item
+            if(i > 0 && i < m_ItemsArr.size() - 1)
+                m_ItemsArr[i - 1]->m_pNext = (long)m_ItemsArr[i + 1];
+            else if(i == 0)
+                m_ItemsArr[m_ItemsArr.size() - 1]->m_pNext = NULL;
+            else if(i = m_ItemsArr.size() - 1)
+                m_ItemsArr[m_ItemsArr.size() - 2]->m_pNext = NULL;
+
+            wxWAListItem* pResItem = (wxWAListItem*)m_ItemsArr[i]->m_pNext;
+            wxDELETE(m_ItemsArr[i]);
+            m_ItemsArr.erase(m_ItemsArr.begin() + i);
+            return pResItem;
+        }
+    }
+    return NULL;
+}
+
+wxWAListItem* wxWAList::GetHead(void)
+{
+    if(GetSize() == NULL)
+        return NULL;
+    return m_ItemsArr[0];
+}
+
+wxWAListItem* wxWAList::operator[](size_t nIndex)
+{
+    if(nIndex >= GetSize())
+        return NULL;
+    return m_ItemsArr[nIndex];
+}
+
+
+//--------------------------------------
+// ClipWindow
+//--------------------------------------
+
+wxClipWindow::wxClipWindow(OGREnvelope* pEnv) : wxWAList()
+{
+    OGRRawPoint pt;
+    pt.x = pEnv->MinX;
+    pt.y = pEnv->MinY;
+    wxWAList::AddPoint(pt, wxVERTEX);
+    for(double i = pEnv->MinY + STEP; i < pEnv->MaxY; i += STEP)
+    {
+        pt.x = pEnv->MinX;
+        pt.y = i;
+        wxWAList::AddPoint(pt, wxVERTEX);
+    }
+    pt.x = pEnv->MinX;
+    pt.y = pEnv->MaxY;
+    wxWAList::AddPoint(pt, wxVERTEX);
+    for(double i = pEnv->MinX + STEP; i < pEnv->MaxX; i += STEP)
+    {
+        pt.x = i;
+        pt.y = pEnv->MaxY;
+        wxWAList::AddPoint(pt, wxVERTEX);
+    }
+    pt.x = pEnv->MaxX;
+    pt.y = pEnv->MaxY;
+    wxWAList::AddPoint(pt, wxVERTEX);
+    for(double i = pEnv->MaxY - STEP; i > pEnv->MinY; i -= STEP)
+    {
+        pt.x = pEnv->MaxX;
+        pt.y = i;
+        wxWAList::AddPoint(pt, wxVERTEX);
+    }
+    pt.x = pEnv->MaxX;
+    pt.y = pEnv->MinY;
+    wxWAList::AddPoint(pt, wxVERTEX);
+    for(double i = pEnv->MaxX - STEP; i > pEnv->MinX; i -= STEP)
+    {
+        pt.x = i;
+        pt.y = pEnv->MinY;
+        wxWAList::AddPoint(pt, wxVERTEX);
+    }
+    pt.x = pEnv->MinX;
+    pt.y = pEnv->MinY;
+    wxWAListItem* pItem = wxWAList::AddPoint(pt, wxVERTEX);
+    pItem->m_pNext = (long)m_ItemsArr[0];
+}
+
+wxClipWindow::~wxClipWindow(void)
+{
+}
+
+wxWAListItem* wxClipWindow::AddPoint(OGRRawPoint Point, VERTEXTYPE Type)
+{
+    for(size_t i = 0; i < m_ItemsArr.size() - 1; i++)
+    {
+        //1 MinX - x - MaxX MinY
+        if(m_ItemsArr[i]->m_Point.y == Point.y)
+        {
+            if(m_ItemsArr[i]->m_Point.x <= Point.x && m_ItemsArr[i + 1]->m_Point.x > Point.x)
+            {
+                return InsertPoint(i + 1, Point, Type);
+            }
+            if(m_ItemsArr[i]->m_Point.x > Point.x && m_ItemsArr[i + 1]->m_Point.x <= Point.x)
+            {
+                return InsertPoint(i + 1, Point, Type);
+            }
+        }
+        if(m_ItemsArr[i]->m_Point.x == Point.x)
+        {
+            if(m_ItemsArr[i]->m_Point.y <= Point.y && m_ItemsArr[i + 1]->m_Point.y > Point.y)
+            {
+                return InsertPoint(i + 1, Point, Type);
+            }
+            if(m_ItemsArr[i]->m_Point.y > Point.y && m_ItemsArr[i + 1]->m_Point.y <= Point.y)
+            {
+                return InsertPoint(i + 1, Point, Type);
+            }
+        }
+    }
+    wxASSERT(0);
+    return NULL;
+}
+
+//------------------------------------------------------------------------------------
+// wxGISAlgorithm
+//------------------------------------------------------------------------------------
 
 wxGISAlgorithm::wxGISAlgorithm(void)
 {
@@ -74,7 +250,38 @@ OGRGeometry* wxGISAlgorithm::FastLineIntersection(OGRGeometry* pGeom1, OGRGeomet
         //wxLogDebug(wxT("x:%f y:%f code_a:%d code_b:%d"), pPoints[i].x, pPoints[i].y, code_a, code_b);
 
         if (code_a > 0 && code_b > 0)
-            continue;
+        {
+            if(code_a == code_b)
+                continue;
+            else
+            {
+                OGRRawPoint pt = pPoints[i];
+                SetPointOnEnvelope(&pPoints[i], &pPoints[i + 1], &pt, &Env, code_a);
+                pNewPoints[pos] = pt;
+                if(pZValues)
+                    pNewZValues[pos] = pZValues[i] + (pZValues[i - 1] - pZValues[i]) / 2;
+                pos++;
+                OGRRawPoint pt1 = pPoints[i + 1];
+                SetPointOnEnvelope(&pt, &pPoints[i + 1], &pt1, &Env, code_b);
+                pNewPoints[pos] = pt1;
+                if(pZValues)
+                    pNewZValues[pos] = pZValues[i] + (pNewZValues[pos - 1] - pZValues[i]) / 2;
+                pos++;
+
+                if(pos > 1)
+                {
+                    //create & add new geom
+                    OGRLineString* pOGRNewLineString = new OGRLineString();
+                    pOGRNewLineString->setCoordinateDimension(pOGRLineString->getCoordinateDimension());
+                    pOGRNewLineString->assignSpatialReference(pOGRLineString->getSpatialReference());
+                    pOGRNewLineString->setPoints(pos, pNewPoints, pNewZValues);
+                    pNewOGRGeometryCollection->addGeometryDirectly(pOGRNewLineString);
+                }
+                pos = 0;
+                continue;
+            }
+        }
+        
         //curve inside envelope
         if (!code_a && !code_b)
         {
@@ -99,6 +306,13 @@ OGRGeometry* wxGISAlgorithm::FastLineIntersection(OGRGeometry* pGeom1, OGRGeomet
         //curve exit envelope
         if(!code_a && code_b > 0)
         {
+            //add point a
+            pNewPoints[pos] = pPoints[i];
+            if(pZValues)
+                pNewZValues[pos] = pZValues[i];
+            pos++;
+
+            //add point on intesection a ---|--- b
             OGRRawPoint pt = pPoints[i + 1];
             SetPointOnEnvelope(&pPoints[i], &pPoints[i + 1], &pt, &Env, code_b);
 
@@ -119,9 +333,19 @@ OGRGeometry* wxGISAlgorithm::FastLineIntersection(OGRGeometry* pGeom1, OGRGeomet
             continue;
         }
     }
+    //last point
+    int code = vcode(&Env, &pPoints[nPointCount - 1]);
+    if(code == 0)
+    {
+        pNewPoints[pos] = pPoints[nPointCount - 1];
+        if(pZValues)
+            pNewZValues[pos] = pZValues[nPointCount - 1];
+        pos++;
+    }
 
     if(pos > 1)
     {
+
         OGRLineString* pOGRNewLineString = new OGRLineString();
         pOGRNewLineString->setCoordinateDimension(pOGRLineString->getCoordinateDimension());
         pOGRNewLineString->assignSpatialReference(pOGRLineString->getSpatialReference());
@@ -159,42 +383,115 @@ OGRGeometry* wxGISAlgorithm::FastPolyIntersection(OGRGeometry* pGeom1, OGRGeomet
 
     OGRPolygon* pPoly = (OGRPolygon*)pGeom1;
     OGRLineString* pOGRLineString = pPoly->getExteriorRing();
-    OGRLinearRing* pExtRing = PolyIntersection(&Env, pOGRLineString);
-    if(!pExtRing)
+    OGRGeometry* pExtRingGeom = PolyIntersection(&Env, pOGRLineString);
+    if(!pExtRingGeom)
         return NULL;
-    OGRPolygon* pNewPoly = new OGRPolygon();
-    pNewPoly->setCoordinateDimension(pGeom1->getCoordinateDimension());
-    pNewPoly->assignSpatialReference(pGeom1->getSpatialReference());
-    pNewPoly->addRingDirectly(pExtRing);
+    OGRwkbGeometryType Type = wkbFlatten(pExtRingGeom->getGeometryType());
+    bool bIsRing = (Type == wkbLinearRing) || (Type == wkbLineString);
+    OGRGeometry* pOutGeom(NULL);
+    OGRPolygon* pNewPoly(NULL);
+    OGRGeometryCollection* pNewOGRGeometryCollection(NULL);
+    if(bIsRing)
+    {
+        OGRLinearRing* pExtRing = (OGRLinearRing*)pExtRingGeom;
+        if(!pExtRing)
+            return NULL;
+
+        pNewPoly = new OGRPolygon();
+        pNewPoly->setCoordinateDimension(pGeom1->getCoordinateDimension());
+        pNewPoly->assignSpatialReference(pGeom1->getSpatialReference());
+        pNewPoly->addRingDirectly(pExtRing);
+        pOutGeom = pNewPoly;
+    }
+    else
+    {
+        pNewOGRGeometryCollection = new OGRGeometryCollection();
+        OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pExtRingGeom;
+        while(pOGRGeometryCollection->getNumGeometries() > 0)
+        {
+            pNewPoly = new OGRPolygon();
+            pNewPoly->setCoordinateDimension(pGeom1->getCoordinateDimension());
+            pNewPoly->assignSpatialReference(pGeom1->getSpatialReference());
+            pNewPoly->addRingDirectly((OGRLinearRing*)pOGRGeometryCollection->getGeometryRef(0));
+            pOGRGeometryCollection->removeGeometry(0, 0);
+            pNewOGRGeometryCollection->addGeometryDirectly(pNewPoly);
+        }
+        wxDELETE(pOGRGeometryCollection);
+        pOutGeom = pNewOGRGeometryCollection;
+    }
 
     int nCount = pPoly->getNumInteriorRings();
     for(size_t i = 0; i < nCount; i++)
-    {
+    {        
         pOGRLineString = pPoly->getInteriorRing(i);
-        OGRLinearRing* pIntRing = PolyIntersection(&Env, pOGRLineString);
-        if(!pIntRing)
+        //change for holes!!!
+        OGRGeometry* pIntRingGeom = PolyIntersection(&Env, pOGRLineString);
+        if(pIntRingGeom == NULL)
             continue;
-        pNewPoly->addRingDirectly(pIntRing);
+        Type = wkbFlatten(pIntRingGeom->getGeometryType());
+        bIsRing = (Type == wkbLinearRing) || (Type == wkbLineString);
+        if(bIsRing)
+        {
+            if(pNewPoly)
+                pNewPoly->addRingDirectly((OGRLinearRing*)pIntRingGeom);
+            if(pNewOGRGeometryCollection)
+            {
+                for(size_t i = 0; i < pNewOGRGeometryCollection->getNumGeometries(); i++)
+                {
+                    OGRGeometry* pPolyGeom = pNewOGRGeometryCollection->getGeometryRef(i);
+                    if(pPolyGeom->Contains(pIntRingGeom))
+                    {
+                        OGRPolygon* pPoly = (OGRPolygon*)pPolyGeom;
+                        pPoly->addRingDirectly((OGRLinearRing*)pIntRingGeom);
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pExtRingGeom;
+            while(pOGRGeometryCollection->getNumGeometries() > 0)
+            {
+                if(pNewPoly)
+                    pNewPoly->addRingDirectly((OGRLinearRing*)pOGRGeometryCollection->getGeometryRef(0));
+                if(pNewOGRGeometryCollection)
+                {
+                    for(size_t i = 0; i < pNewOGRGeometryCollection->getNumGeometries(); i++)
+                    {
+                        OGRGeometry* pPolyGeom = pNewOGRGeometryCollection->getGeometryRef(i);
+                        if(pPolyGeom->Contains(pOGRGeometryCollection->getGeometryRef(0)))
+                        {
+                            OGRPolygon* pPoly = (OGRPolygon*)pPolyGeom;
+                            pPoly->addRingDirectly((OGRLinearRing*)pOGRGeometryCollection->getGeometryRef(0));
+                            break;
+                        }
+                    }
+                }
+                pOGRGeometryCollection->removeGeometry(0, 0);
+            }
+            wxDELETE(pOGRGeometryCollection);
+       }
     } 
-    return pNewPoly;
+    return pOutGeom;
 }
 
-OGRLinearRing* wxGISAlgorithm::PolyIntersection(OGREnvelope* pEnv, OGRLineString* pOGRLineString)
+OGRGeometry* wxGISAlgorithm::PolyIntersection(OGREnvelope* pEnv, OGRLineString* pOGRLineString)
 {
     int nPointCount = pOGRLineString->getNumPoints();
 
     OGRRawPoint* pPoints = new OGRRawPoint[nPointCount];
-    OGRRawPoint* pNewPoints = new OGRRawPoint[nPointCount];
+    OGRRawPoint* pNewPoints = new OGRRawPoint[nPointCount * 10];
     double* pZValues(NULL);
     double* pNewZValues(NULL); 
     if(pOGRLineString->getCoordinateDimension() > 2)
     {
         pZValues = new double[nPointCount];
-        pNewZValues = new double[nPointCount];
+        pNewZValues = new double[nPointCount * 10];
     }
 
-    wxClipWindow win(pEnv);
-    std::vector<wxClipWindow::CLIPVERT> PolyData;
+    wxClipWindow Win(pEnv);
+    wxWAList PolyData;
 
     pOGRLineString->getPoints(pPoints, pZValues);
 
@@ -206,7 +503,34 @@ OGRLinearRing* wxGISAlgorithm::PolyIntersection(OGREnvelope* pEnv, OGRLineString
         //wxLogDebug(wxT("x:%f y:%f code_a:%d code_b:%d"), pPoints[i].x, pPoints[i].y, code_a, code_b);
 
         if (code_a > 0 && code_b > 0)
-            continue;
+        {
+            if(code_a == code_b)
+                continue;
+            else
+            {
+                OGRRawPoint pt = pPoints[i];
+                SetPointOnEnvelope(&pPoints[i], &pPoints[i + 1], &pt, pEnv, code_a);
+
+                wxWAListItem* pItem = Win.AddPoint(pt, wxENTER);
+                wxWAListItem* pPolyItem = PolyData.AddPoint(pt, wxENTER);
+                pPolyItem->m_pData = (long)pItem;
+                pItem->m_pData = (long)pPolyItem;
+                //if(pZValues)
+                //    pNewZValues[pos] = pZValues[i] + (pZValues[i - 1] - pZValues[i]) / 2;
+
+                OGRRawPoint pt1 = pPoints[i + 1];
+                SetPointOnEnvelope(&pt, &pPoints[i + 1], &pt1, pEnv, code_b);
+
+                wxWAListItem* pItem1 = Win.AddPoint(pt1, wxEXIT);
+                wxWAListItem* pPolyItem1 = PolyData.AddPoint(pt1, wxEXIT);
+                pPolyItem1->m_pData = (long)pItem1;
+                pItem1->m_pData = (long)pPolyItem1;
+                //if(pZValues)
+                //    pNewZValues[pos] = pZValues[i] + (pNewZValues[pos - 1] - pZValues[i]) / 2;
+                continue;
+            }
+        }
+
         //curve inside envelope
         if (!code_a && !code_b)
         {
@@ -214,8 +538,7 @@ OGRLinearRing* wxGISAlgorithm::PolyIntersection(OGREnvelope* pEnv, OGRLineString
             //if(pZValues)
             //    pNewZValues[pos] = pZValues[i];
             //pos++;
-            wxClipWindow::CLIPVERT data = {pPoints[i], -1, wxClipWindow::wxVERTEX};
-            PolyData.push_back(data);
+            PolyData.AddPoint(pPoints[i], wxVERTEX);
             continue;
         }
         //curve enter envelope
@@ -224,10 +547,10 @@ OGRLinearRing* wxGISAlgorithm::PolyIntersection(OGREnvelope* pEnv, OGRLineString
             OGRRawPoint pt = pPoints[i];
             SetPointOnEnvelope(&pPoints[i], &pPoints[i + 1], &pt, pEnv, code_a);
 
-            int nInd = win.AddPoint(&pt, PolyData.size(), wxClipWindow::wxENTER);
-
-            wxClipWindow::CLIPVERT data = {pt, nInd, wxClipWindow::wxENTER};
-            PolyData.push_back(data);
+            wxWAListItem* pItem = Win.AddPoint(pt, wxENTER);
+            wxWAListItem* pPolyItem = PolyData.AddPoint(pt, wxENTER);
+            pPolyItem->m_pData = (long)pItem;
+            pItem->m_pData = (long)pPolyItem;
 
             //pNewPoints[pos] = pt;
             //if(pZValues)
@@ -238,86 +561,146 @@ OGRLinearRing* wxGISAlgorithm::PolyIntersection(OGREnvelope* pEnv, OGRLineString
         //curve exit envelope
         if(!code_a && code_b > 0)
         {
+            //add point a
+            PolyData.AddPoint(pPoints[i], wxVERTEX);
+            //if(pZValues)
+            //    pNewZValues[pos] = pZValues[i];
+
+            //add point on intesection a ---|--- b
             OGRRawPoint pt = pPoints[i + 1];
             SetPointOnEnvelope(&pPoints[i], &pPoints[i + 1], &pt, pEnv, code_b);
 
-            int nInd = win.AddPoint(&pt, PolyData.size(), wxClipWindow::wxEXIT);
-
-            wxClipWindow::CLIPVERT data = {pt, nInd, wxClipWindow::wxEXIT};
-            PolyData.push_back(data);
-
+            wxWAListItem* pItem = Win.AddPoint(pt, wxEXIT);
+            wxWAListItem* pPolyItem = PolyData.AddPoint(pt, wxEXIT);
+            pPolyItem->m_pData = (long)pItem;
+            pItem->m_pData = (long)pPolyItem;
 
             //pNewPoints[pos] = pt;
             //if(pZValues)
             //    pNewZValues[pos] = pZValues[i] + (pZValues[i - 1] - pZValues[i]) / 2;
-            //pos++;
-            //if(pos > 1)
-            //{
-            //    //create & add new geom
-            //    //OGRLineString* pOGRNewLineString = new OGRLineString();
-            //    //pOGRNewLineString->setCoordinateDimension(pOGRLineString->getCoordinateDimension());
-            //    //pOGRNewLineString->assignSpatialReference(pOGRLineString->getSpatialReference());
-            //    //pOGRNewLineString->setPoints(pos, pNewPoints, pNewZValues);
-            //    //pNewOGRGeometryCollection->addGeometryDirectly(pOGRNewLineString);
-            //}
-            //pos = 0;
             continue;
         }
     }
 
-    //if(pos > 1)
-    //{
-    //    //OGRLineString* pOGRNewLineString = new OGRLineString();
-    //    //pOGRNewLineString->setCoordinateDimension(pOGRLineString->getCoordinateDimension());
-    //    //pOGRNewLineString->assignSpatialReference(pOGRLineString->getSpatialReference());
-    //    //pOGRNewLineString->setPoints(pos, pNewPoints, pNewZValues);
-    //    //pNewOGRGeometryCollection->addGeometryDirectly(pOGRNewLineString);
-    //}
+    //last point
+    int code = vcode(pEnv, &pPoints[nPointCount - 1]);
+    if(code == 0)
+    {
+        PolyData.AddPoint(pPoints[nPointCount - 1], wxVERTEX);
+        //if(pZValues)
+        //    pNewZValues[pos] = pZValues[nPointCount - 1];
+    }
 
-    int pos = 0;    
-    for(size_t i = 0; i < PolyData.size(); i++)
-    {       
-        if(PolyData[i].pt == pNewPoints[0])
-        {
-            //create new poly
+        
+    OGRGeometryCollection* pNewOGRGeometryCollection = new OGRGeometryCollection();
+
+    while(PolyData.GetSize() > 2)
+    {
+        int pos = 0;    
+        wxWAListItem* pPolyItem = PolyData.GetHead();
+        if(pPolyItem == NULL)
+            goto EXIT;
+
+        while(pPolyItem != NULL && pPolyItem->m_pNext != NULL)
+        {       
+            if(pPolyItem->m_Point.x == pNewPoints[0].x && pPolyItem->m_Point.y == pNewPoints[0].y)
+            {
+                //create new poly
+                if(pos > 2)
+                {
+                    OGRLinearRing* pOGRNewLinearRing = new OGRLinearRing();
+                    pOGRNewLinearRing->setCoordinateDimension(pOGRLineString->getCoordinateDimension());
+                    pOGRNewLinearRing->assignSpatialReference(pOGRLineString->getSpatialReference());
+                    pOGRNewLinearRing->setPoints(pos, pNewPoints, pNewZValues);
+                    pOGRNewLinearRing->closeRings();
+                    pNewOGRGeometryCollection->addGeometryDirectly(pOGRNewLinearRing);
+                }
+                pos = 0;
+            }
+
+
+            switch(pPolyItem->m_Type)
+            {
+            case wxENTER:
+            case wxVERTEX:
+                pNewPoints[pos] = pPolyItem->m_Point;
+                pos++;
+                //remove point
+                pPolyItem = PolyData.RemovePoint(pPolyItem);
+                continue;
+                ////pNewPoints[pos] = PolyData[i].pt;
+                //continue;
+            case wxEXIT:
+                {
+                    wxWAListItem* pEnvItem = (wxWAListItem*)pPolyItem->m_pData;
+                    //dont doubled
+                    pEnvItem = pEnvItem->GetNext();
+                    pNewPoints[pos] = pPolyItem->m_Point;
+                    pos++;
+                    PolyData.RemovePoint(pPolyItem);
+                    while(pEnvItem->m_Type != wxENTER)
+                    {
+                        pNewPoints[pos] = pEnvItem->m_Point;
+                        pos++;
+                        pEnvItem = pEnvItem->GetNext();
+                    }
+                    pPolyItem = (wxWAListItem*)pEnvItem->m_pData;
+                }
+                continue;
+            }
         }
 
-        //remove point
-
-        switch(PolyData[i].Type)
+        if(pPolyItem)
         {
-        case wxClipWindow::wxVERTEX:
-            pNewPoints[pos] = PolyData[i].pt;
+            pNewPoints[pos] = pPolyItem->m_Point;
             pos++;
-            PolyData[i].Type = wxNONE;
-            continue;
-        case wxClipWindow::wxENTER:
-            //pNewPoints[pos] = PolyData[i].pt;
-            continue;
-        case wxClipWindow::wxEXIT:
+            if(pPolyItem->m_Type == wxEXIT)
             {
-                for(size_t j = PolyData[i].nIndex + 1; j < win.GetSize(); j++)
+                wxWAListItem* pEnvItem = (wxWAListItem*)pPolyItem->m_pData;
+                //dont doubled
+                pEnvItem = pEnvItem->GetNext();
+                while(pEnvItem->m_Type != wxENTER)
                 {
-                    wxClipWindow::CLIPVERT data = win.GetItem(j);
-                    pNewPoints[pos] = data.pt;
+                    pNewPoints[pos] = pEnvItem->m_Point;
                     pos++;
-                    if(data.Type == wxClipWindow::wxENTER)
-                    {
-                        i = data.nIndex;
-                        break;
-                    }
+                    pEnvItem = pEnvItem->GetNext();
                 }
             }
-            continue;
+            PolyData.RemovePoint(pPolyItem);
+        }
+
+        if(pos > 2)
+        {
+            OGRLinearRing* pOGRNewLinearRing = new OGRLinearRing();
+            pOGRNewLinearRing->setCoordinateDimension(pOGRLineString->getCoordinateDimension());
+            pOGRNewLinearRing->assignSpatialReference(pOGRLineString->getSpatialReference());
+            pOGRNewLinearRing->setPoints(pos, pNewPoints, pNewZValues);
+            pOGRNewLinearRing->closeRings();
+            pNewOGRGeometryCollection->addGeometryDirectly(pOGRNewLinearRing);
         }
     }
 
+EXIT:
     wxDELETEA(pPoints);
     wxDELETEA(pZValues);
     wxDELETEA(pNewPoints);
     wxDELETEA(pNewZValues);
 
-    return NULL;
+    if(pNewOGRGeometryCollection->getNumGeometries() == 0)
+    {
+        wxDELETE(pNewOGRGeometryCollection);
+        return NULL;
+    }
+    
+    if(pNewOGRGeometryCollection->getNumGeometries() == 1)
+    {
+        OGRGeometry* pRetGeom = pNewOGRGeometryCollection->getGeometryRef(0);
+        pNewOGRGeometryCollection->removeGeometry(0, 0);
+        wxDELETE(pNewOGRGeometryCollection);
+        return pRetGeom;
+    }
+
+    return pNewOGRGeometryCollection;
 }
 
 void wxGISAlgorithm::SetPointOnEnvelope(OGRRawPoint* a, OGRRawPoint* b, OGRRawPoint* c, OGREnvelope* r, int code)
@@ -397,77 +780,4 @@ OGRRawPoint* wxGISAlgorithm::Crossing(OGRRawPoint p11, OGRRawPoint p12, OGRRawPo
 
     //return poOGRProduct;
 
-//--------------------------------------
-// ClipWindow
-//--------------------------------------
-
-wxClipWindow::wxClipWindow(OGREnvelope* pEnv)
-{
-    OGRRawPoint pt;
-    pt.x = pEnv->MinX;
-    pt.y = pEnv->MinY;
-    CLIPVERT data1 = {pt, -1, wxVERTEX};
-    m_Env.push_back(data1);
-    pt.x = pEnv->MaxX;
-    pt.y = pEnv->MinY;
-    CLIPVERT data2 = {pt, -1, wxVERTEX};
-    m_Env.push_back(data2);
-    pt.x = pEnv->MaxX;
-    pt.y = pEnv->MaxY;
-    CLIPVERT data3 = {pt, -1, wxVERTEX};
-    m_Env.push_back(data3);
-    pt.x = pEnv->MinX;
-    pt.y = pEnv->MaxY;
-    CLIPVERT data4 = {pt, -1, wxVERTEX};
-    m_Env.push_back(data4);
-    pt.x = pEnv->MinX;
-    pt.y = pEnv->MinY;
-    CLIPVERT data5 = {pt, -1, wxVERTEX};
-    m_Env.push_back(data5);
-}
-
-wxClipWindow::~wxClipWindow(void)
-{
-}
-
-int wxClipWindow::AddPoint(OGRRawPoint* a, int nIndex, VERTEXTYPE Type)
-{
-    OGRRawPoint pt;
-    pt.x = a->x;
-    pt.y = a->y;
-    CLIPVERT data = {pt, nIndex, Type};
-
-    for(size_t i = 0; i < m_Env.size() - 1; i++)
-    {
-        //1 MinX - x - MaxX MinY
-        if(m_Env[i].pt.y == a->y)
-        {
-            if(m_Env[i].pt.x < a->x && m_Env[i + 1].pt.x > a->x)
-            {
-                m_Env.insert(m_Env.begin() + i, data);
-                return i;
-            }
-            if(m_Env[i].pt.x > a->x && m_Env[i + 1].pt.x < a->x)
-            {
-                m_Env.insert(m_Env.begin() + i, data);
-                return i;
-            }
-        }
-        if(m_Env[i].pt.x == a->x)
-        {
-            if(m_Env[i].pt.y < a->y && m_Env[i + 1].pt.y > a->y)
-            {
-                m_Env.insert(m_Env.begin() + i, data);
-                return i;
-            }
-            if(m_Env[i].pt.y > a->y && m_Env[i + 1].pt.y < a->y)
-            {
-                m_Env.insert(m_Env.begin() + i, data);
-                return i;
-            }
-        }
-    }
-    wxASSERT(1);
-    return -1;
-}
 

@@ -94,7 +94,14 @@ wxIcon wxGxFolder::GetSmallImage(void)
 
 bool wxGxFolder::Delete(void)
 {
-	if(wxFileName::Rmdir(m_sPath))
+    //delete all files
+
+    //delete all dirs
+
+    //delete
+    int ret = VSIRmdir(wgWX2MB(m_sPath));//recursive!!!
+    if(ret == 0)
+	//if(wxFileName::Rmdir(m_sPath))//recursive del wil be in >= 2.9.0
 	{
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer == NULL)
@@ -102,7 +109,11 @@ bool wxGxFolder::Delete(void)
 		return pGxObjectContainer->DeleteChild(this);		
 	}
 	else
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;	
+    }
 }
 
 bool wxGxFolder::Rename(wxString NewName)
@@ -134,8 +145,8 @@ bool wxGxFolder::DeleteChild(IGxObject* pChild)
 	bool bHasChildren = m_Children.size() > 0 ? true : false;
 	if(!IGxObjectContainer::DeleteChild(pChild))
 		return false;
+    m_pCatalog->ObjectDeleted(pChild);
 	if(bHasChildren != m_Children.size() > 0 ? true : false)
 		m_pCatalog->ObjectChanged(this);
 	return true;		
-
 }

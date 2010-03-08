@@ -74,7 +74,24 @@ wxIcon wxGxDataset::GetSmallImage(void)
 
 bool wxGxDataset::Delete(void)
 {
-	return true;
+    wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset());
+    if(!pDSet)
+        return false;
+
+    bool bRet = pDSet->Delete();
+    if(bRet)
+	{
+		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
+		if(pGxObjectContainer == NULL)
+			return false;
+		return pGxObjectContainer->DeleteChild(this);		
+	}
+	else
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+		return false;	
+    }
 }
 
 bool wxGxDataset::Rename(wxString NewName)
@@ -160,7 +177,24 @@ wxIcon wxGxShapefileDataset::GetSmallImage(void)
 
 bool wxGxShapefileDataset::Delete(void)
 {
-	return true;
+    wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset());
+    if(!pDSet)
+        return false;
+
+    bool bRet = pDSet->Delete();
+    if(bRet)
+	{
+		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
+		if(pGxObjectContainer == NULL)
+			return false;
+		return pGxObjectContainer->DeleteChild(this);		
+	}
+	else
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+		return false;	
+    }
 }
 
 bool wxGxShapefileDataset::Rename(wxString NewName)

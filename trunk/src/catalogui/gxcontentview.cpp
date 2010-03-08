@@ -274,7 +274,7 @@ void wxGxContentView::OnActivated(wxListEvent& event)
 			return;
 
 	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pItemData->pObject);
-	if(pGxObjectContainer != NULL && pGxObjectContainer->HasChildren() )
+	if(pGxObjectContainer != NULL )//&& pGxObjectContainer->HasChildren() )
 	{
     //  m_pApplication->GetCatalog()->SetLocation(pItemData->pObject->GetFullName());
 		m_pSelection->Select(pItemData->pObject, false, GetId());
@@ -418,18 +418,18 @@ void wxGxContentView::OnObjectAdded(IGxObject* pObj)
 
 void wxGxContentView::OnObjectDeleted(IGxObject* pObj)
 {
-	//for(long i = 0; i < GetItemCount(); i++)
-	//{
-	//	LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
-	//	if(pItemData == NULL)
-	//		continue;
-	//	if(pItemData->pObject != pObj)
-	//		continue;
-	//	delete pItemData;
-	//	DeleteItem(i);
-	//	Refresh();
-	//	return;
-	//}
+	for(long i = 0; i < GetItemCount(); i++)
+	{
+		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
+		if(pItemData == NULL)
+			continue;
+		if(pItemData->pObject != pObj)
+			continue;
+		delete pItemData;
+		DeleteItem(i);
+		//Refresh();
+		return;
+	}
 }
 
 void wxGxContentView::OnObjectChanged(IGxObject* pObj)
@@ -503,15 +503,17 @@ void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiato
 	if(pGxObjectArray == NULL || pGxObjectArray->size() == 0)
 		return;
 	IGxObject* pGxObj = pGxObjectArray->at(pGxObjectArray->size() - 1);	
-	if(m_pParentGxObject == pGxObj)
-		return;
+	//if(m_pParentGxObject == pGxObj)
+	//	return;
 
 	//reset 
 	ResetContents();
+	m_pParentGxObject = pGxObj;
 
 	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(pGxObj);
 	if(pObjContainer == NULL || !pObjContainer->HasChildren())
 		return;
+
 	GxObjectArray* pArr = pObjContainer->GetChildren();
 	for(size_t i = 0; i < pArr->size(); i++)
 	{
@@ -520,8 +522,6 @@ void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiato
 
 	SortItems(MyCompareFunction, m_bSortAsc);
     SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
-
-	m_pParentGxObject = pGxObj;
 }
 
 bool wxGxContentView::Applies(IGxSelection* Selection)
