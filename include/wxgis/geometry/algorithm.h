@@ -32,29 +32,53 @@ public:
 protected:
     virtual OGRRawPoint* wxGISAlgorithm::Crossing(OGRRawPoint p11, OGRRawPoint p12, OGRRawPoint p21, OGRRawPoint p22);
     virtual void wxGISAlgorithm::SetPointOnEnvelope(OGRRawPoint* a, OGRRawPoint* b, OGRRawPoint* c, OGREnvelope* r, int code);
-    virtual OGRLinearRing* PolyIntersection(OGREnvelope* pEnv, OGRLineString* pOGRLineString);
+    virtual OGRGeometry* PolyIntersection(OGREnvelope* pEnv, OGRLineString* pOGRLineString);
+};
+
+typedef enum _vertex_type{wxVERTEX, wxENTER, wxEXIT} VERTEXTYPE;
+
+//--------------------------------------
+// wxWAListItem
+//--------------------------------------
+
+class wxWAListItem
+{
+public:
+    wxWAListItem(void) : m_pNext(NULL), m_pData(NULL){};
+    virtual wxWAListItem* GetNext(void){return (wxWAListItem*)m_pNext;};
+public:
+    OGRRawPoint m_Point;
+    VERTEXTYPE m_Type;
+    long m_pNext;
+    long m_pData;
+};
+
+//--------------------------------------
+// wxWAList
+//--------------------------------------
+
+class wxWAList
+{
+public:
+    wxWAList(void);
+    virtual ~wxWAList(void);
+    virtual wxWAListItem* AddPoint(OGRRawPoint Point, VERTEXTYPE Type);
+    virtual wxWAListItem* InsertPoint(size_t nIndex, OGRRawPoint Point, VERTEXTYPE Type);
+    virtual wxWAListItem* RemovePoint(wxWAListItem* pItem);
+    virtual size_t GetSize(void){return m_ItemsArr.size();};
+    virtual wxWAListItem* GetHead(void);
+    virtual wxWAListItem* operator[](size_t nIndex);
+protected:
+    std::vector<wxWAListItem*> m_ItemsArr;
 };
 
 //--------------------------------------
 // ClipWindow
 //--------------------------------------
-class wxClipWindow
+class wxClipWindow : public wxWAList
 {
 public:
-    typedef enum _vertex_type{wxVERTEX, wxENTER, wxEXIT} VERTEXTYPE;
-
     wxClipWindow(OGREnvelope* pEnv);
     virtual ~wxClipWindow(void);
-    virtual int AddPoint(OGRRawPoint* a, int nIndex, VERTEXTYPE Type);
-    virtual size_t GetSize(void){return m_Env.size();};
-    virtual CLIPVERT GetItem(int nIndex){return m_Env[nIndex];};
-
-    typedef struct _clip_vert
-    {
-        OGRRawPoint pt;
-        long nItemPtr;
-        VERTEXTYPE Type;
-    } CLIPVERT;
-protected:
-    std::vector<CLIPVERT> m_Env;
+    virtual wxWAListItem* AddPoint(OGRRawPoint Point, VERTEXTYPE Type);
 };

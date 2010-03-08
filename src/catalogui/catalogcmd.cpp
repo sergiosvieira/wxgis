@@ -199,9 +199,8 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
                 {
                     IGxObject* pGxObject = pArr->at(i);
                     IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject);
-                    if(pGxObjectEdit)
-                        if(pGxObjectEdit->CanDelete())
-                            return true;
+                    if(pGxObjectEdit && pGxObjectEdit->CanDelete())
+                        return true;
                 }
             }
 			return false;
@@ -633,6 +632,36 @@ void wxGISCatalogMainCmd::OnClick(void)
         }
 
         case 4:
+        {
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp && GetEnabled())
+            {
+				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+				GxObjectArray* pArr = pSel->GetSelectedObjects();
+                if(!pArr)
+                    return;
+
+                GxObjectArray TempArr;
+                for(size_t i = 0; i < pArr->size(); i++)
+                    TempArr.push_back(pArr->at(i));
+
+                for(size_t i = 0; i < TempArr.size(); i++)
+                {
+                    IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(TempArr[i]);
+                    if(pGxObjectEdit && pGxObjectEdit->CanDelete())
+                    {
+                        if(!pGxObjectEdit->Delete())
+                        {
+                            wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
+                            wxMessageDialog dlg(pWnd, wxString::Format(_("Cannot delete '%s'\nContinue?"),pArr->at(i)->GetName().c_str()),_("Error"), wxYES_NO | wxICON_QUESTION);
+                            if(dlg.ShowModal() == wxID_NO)
+                                return;
+                        }
+                    }
+                }
+            }
+			return;
+        }
         case 5:
         {
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);

@@ -78,7 +78,7 @@ void wxSimpleLineSymbol::DrawLine(OGRLineString* pLine, IDisplay* pwxGISDisplay)
 	IDisplayTransformation* pDisplayTransformation = pwxGISDisplay->GetDisplayTransformation();
 
 	int nPointCount = pLine->getNumPoints();
-	if(nPointCount > 2)
+	if(nPointCount > 1)
 	{
 		OGRRawPoint* pOGRRawPoints = new OGRRawPoint[nPointCount];
 		pLine->getPoints(pOGRRawPoints);

@@ -63,15 +63,21 @@ wxIcon wxGxPrjFile::GetSmallImage(void)
 
 bool wxGxPrjFile::Delete(void)
 {
-	//if(wxFileName::Rmdir(m_sPath))
-	//{
-	//	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
-	//	if(pGxObjectContainer == NULL)
-	//		return false;
-	//	return pGxObjectContainer->DeleteChild(this);		
-	//}
-	//else
+    int ret = VSIUnlink(wgWX2MB(m_sPath));
+    if(ret == 0)
+	//if(wxFileName::Rmdir(m_sPath))//recursive del wil be in >= 2.9.0
+	{
+		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
+		if(pGxObjectContainer == NULL)
+			return false;
+		return pGxObjectContainer->DeleteChild(this);		
+	}
+	else
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;	
+    }
 }
 
 bool wxGxPrjFile::Rename(wxString NewName)
