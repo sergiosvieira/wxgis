@@ -202,7 +202,7 @@ void wxGISCommandBar::Serialize(IApplication* pApp, wxXmlNode* pNode, bool bStor
 //----------------------------------------------------------------------
 // wxGISMenu
 //----------------------------------------------------------------------
-wxGISMenu::wxGISMenu(const wxString& sName, const wxString& sCaption, wxGISEnumCommandBars type, const wxString& title, long style) : wxMenu(title, style), wxGISCommandBar(sName, sCaption, type)
+wxGISMenu::wxGISMenu(const wxString& sName, const wxString& sCaption, wxGISEnumCommandBars type, const wxString& title, long style) : wxMenu(title, style), wxGISCommandBar(sName, sCaption, type) 
 {
 }
 
@@ -240,7 +240,7 @@ void wxGISMenu::AddCommand(ICommand* pCmd)
 			wxMenuItem *item = new wxMenuItem(this, pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), (wxItemKind)pCmd->GetKind());
 			wxBitmap Bmp = pCmd->GetBitmap();
 			if(Bmp.IsOk())
-				item->SetBitmaps(Bmp);//SetBitmap
+				item->SetBitmaps(Bmp);//SetBitmap//
 			Append(item);
 			//wxMenuItem* pItem = Append(pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), pCmd->GetKind());
 			//pItem->SetBitmaps(pCmd->GetBitmap());

@@ -28,6 +28,7 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxTreeViewBase, wxTreeCtrl)
 
 BEGIN_EVENT_TABLE(wxGxTreeViewBase, wxTreeCtrl)
     EVT_TREE_ITEM_EXPANDING(TREECTRLID, wxGxTreeViewBase::OnItemExpanding)
+    EVT_TREE_ITEM_RIGHT_CLICK(TREECTRLID, wxGxTreeViewBase::OnItemRightClick)
 END_EVENT_TABLE()
 
 wxGxTreeViewBase::wxGxTreeViewBase(void) : wxTreeCtrl(), m_pConnectionPointCatalog(NULL), m_pConnectionPointSelection(NULL), m_ConnectionPointCatalogCookie(-1), m_ConnectionPointSelectionCookie(-1)
@@ -274,6 +275,32 @@ int wxGxTreeViewBase::OnCompareItems(const wxTreeItemId& item1, const wxTreeItem
 //   return wxTreeCtrl::OnCompareItems(item1, item2);
 }
 
+void wxGxTreeViewBase::OnItemRightClick(wxTreeEvent& event)
+{
+	wxTreeItemId item = event.GetItem();
+
+	if(!item.IsOk())
+		return;
+	wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(item);
+	if(pData != NULL)
+	{
+        IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pData->m_pObject);
+        if(pGxObjectUI)
+        {
+            wxString psContextMenu = pGxObjectUI->ContextMenu();
+            IApplication* pApp = dynamic_cast<IApplication*>(m_pApplication);
+            if(pApp)
+            {
+                wxMenu* pMenu = dynamic_cast<wxMenu*>(pApp->GetCommandBar(psContextMenu));
+                if(pMenu)
+                {
+                    PopupMenu(pMenu, event.GetPoint());
+                }
+            }
+        }
+    }
+}
+
 void wxGxTreeViewBase::OnItemExpanding(wxTreeEvent& event)
 {
 	wxTreeItemId item = event.GetItem();
@@ -458,5 +485,15 @@ void wxGxTreeView::OnSelChanged(wxTreeEvent& event)
 	//if(pData != NULL)
 	//	OnObjectSelected(pData->m_pObject);
 }
+
+void wxGxTreeView::OnItemRightClick(wxTreeEvent& event)
+{
+	wxTreeItemId item = event.GetItem();
+	if(!item.IsOk())
+		return;
+    SelectItem(item);
+    wxGxTreeViewBase::OnItemRightClick(event);
+}
+
 
 

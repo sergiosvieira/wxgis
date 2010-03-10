@@ -235,6 +235,8 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 		{
 			switch(m_CommandBarArray[i]->GetType())
 			{
+			case enumGISCBSubMenu:
+			case enumGISCBContextmenu:
 			case enumGISCBMenubar:
 				{
 					wxMenu* pMenu = dynamic_cast<wxMenu*>(m_CommandBarArray[i]);
@@ -266,8 +268,6 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 				}
 				break;
 			case enumGISCBNone:
-			case enumGISCBContextmenu:
-			case enumGISCBSubMenu:
 			default:
 				break;
 			}
@@ -587,7 +587,7 @@ void wxGISApplication::LoadMenues(wxXmlNode* pRootNode)
 			if(bAdd)
 			{
 				wxString sCaption = child->GetPropVal(wxT("caption"), wxT("No Title"));
-				wxGISMenu* pMenu = new wxGISMenu(sName, sCaption, enumGISCBContextmenu);//sCaption for Title
+				wxGISMenu* pMenu = new wxGISMenu(sName, sCaption, enumGISCBContextmenu);//sCaption for Title enumGISCBMenubar
 				pMenu->Serialize(this, child, false);
 				pMenu->Reference();
 				m_CommandBarArray.push_back(pMenu);

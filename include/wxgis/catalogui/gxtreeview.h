@@ -84,6 +84,7 @@ public:
     virtual int OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2);
 //
 	virtual void OnItemExpanding(wxTreeEvent& event);
+	virtual void OnItemRightClick(wxTreeEvent& event);
 
 	typedef std::map<IGxObject*, wxTreeItemId> WETREEMAP; 
 protected:
@@ -110,9 +111,10 @@ public:
 	wxGxTreeView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxBORDER_NONE | wxTR_EDIT_LABELS /*| wxTR_MULTIPLE| wxTR_HIDE_ROOT | wxTR_LINES_AT_ROOT*/);
 	virtual ~wxGxTreeView(void);
 //
-    void OnBeginLabelEdit(wxTreeEvent& event);
-    void OnEndLabelEdit(wxTreeEvent& event);
-    void OnSelChanged(wxTreeEvent& event);
+    virtual void OnBeginLabelEdit(wxTreeEvent& event);
+    virtual void OnEndLabelEdit(wxTreeEvent& event);
+    virtual void OnSelChanged(wxTreeEvent& event);
+	virtual void OnItemRightClick(wxTreeEvent& event);
 
     DECLARE_EVENT_TABLE()
 };
