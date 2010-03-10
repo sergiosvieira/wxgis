@@ -225,31 +225,48 @@ void wxGxContentView::OnDeselected(wxListEvent& event)
 
 void wxGxContentView::ShowContextMenu(const wxPoint& pos)
 {
-	//long item = -1;
- //   item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	//if(item == -1)
-	//{
-	//	IweObjectUI* pweObjectUI = dynamic_cast<IweObjectUI*>(m_pParentObject);
-	//	if(pweObjectUI != NULL)
-	//	{
-	//		wxMenu* pMenu = m_pParent->GetMenu(pweObjectUI->ContextMenu());
-	//		if(pMenu != NULL)
-	//			PopupMenu(pMenu, pos.x, pos.y);
-	//	}
-	//	return;
-	//}
+	long item = -1;
+    item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if(item == -1)
+	{
+		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(m_pParentGxObject);
+        if(pGxObjectUI)
+        {
+            wxString psContextMenu = pGxObjectUI->ContextMenu();
+            IApplication* pApp = dynamic_cast<IApplication*>(m_pApplication);
+            if(pApp)
+            {
+                wxMenu* pMenu = dynamic_cast<wxMenu*>(pApp->GetCommandBar(psContextMenu));
+                if(pMenu)
+                {
+                    PopupMenu(pMenu, pos.x, pos.y);
+                }
+            }
+        }
+		return;
+	}
 
-	//LPITEMDATA pData = (LPITEMDATA)GetItemData(item);
-	//if(pData != NULL)
-	//{
-	//	IweObjectUI* pweObjectUI = dynamic_cast<IweObjectUI*>(pData->pObject);
-	//	if(pweObjectUI != NULL)
-	//	{
-	//		wxMenu* pMenu = m_pParent->GetMenu(pweObjectUI->ContextMenu());
-	//		if(pMenu != NULL)
-	//			PopupMenu(pMenu, pos.x, pos.y);
-	//	}
-	//}
+	LPITEMDATA pItemData = (LPITEMDATA)GetItemData(item);
+	if(pItemData != NULL)
+	{
+        bool bAdd = true;
+        m_pSelection->Select(pItemData->pObject, bAdd, NOTFIRESELID);
+
+		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pItemData->pObject);
+		if(pGxObjectUI != NULL)
+		{
+            wxString psContextMenu = pGxObjectUI->ContextMenu();
+            IApplication* pApp = dynamic_cast<IApplication*>(m_pApplication);
+            if(pApp)
+            {
+                wxMenu* pMenu = dynamic_cast<wxMenu*>(pApp->GetCommandBar(psContextMenu));
+                if(pMenu)
+                {
+                    PopupMenu(pMenu, pos.x, pos.y);
+                }
+            }
+		}
+	}
 }
 
 void wxGxContentView::SetColumnImage(int col, int image)
