@@ -124,7 +124,7 @@ OGRSpatialReference* wxGISFeatureLayer::GetSpatialReference(void)
 	return m_pSpatialReference;
 }
 
-OGREnvelope* wxGISFeatureLayer::GetEnvelope(void)
+const OGREnvelope* wxGISFeatureLayer::GetEnvelope(void)
 {
 	return &m_FullEnv;
 }

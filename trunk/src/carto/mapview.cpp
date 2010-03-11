@@ -355,27 +355,28 @@ void wxGISMapView::AddLayer(wxGISLayer* pLayer)
         pLayer->SetSpatialReference(m_pSpatialReference);
     }
 
-	OGREnvelope* pEnv = pLayer->GetEnvelope();
+	const OGREnvelope* pEnv = pLayer->GetEnvelope();
 	if(pEnv == NULL)
 		return;
+    OGREnvelope Env = *pEnv;
      
     //increase 10%
     double fDeltaX = (pEnv->MaxX - pEnv->MinX) / 20;
     double fDeltaY = (pEnv->MaxY - pEnv->MinY) / 20;
     double fDelta = std::max(fDeltaX, fDeltaY);
-    pEnv->MaxX += fDelta;
-    pEnv->MinX -= fDelta;
-    pEnv->MaxY += fDelta;
-    pEnv->MinY -= fDelta;
+    Env.MaxX += fDelta;
+    Env.MinX -= fDelta;
+    Env.MaxY += fDelta;
+    Env.MinY -= fDelta;
 
 	if(!pDisplayTransformation->IsBoundsSet())
     {
-		pDisplayTransformation->SetBounds(*pEnv);
+		pDisplayTransformation->SetBounds(Env);
     }
 	else
 	{
 		OGREnvelope Bounds = pDisplayTransformation->GetBounds();
-		Bounds.Merge(*pEnv);
+		Bounds.Merge(Env);
 		pDisplayTransformation->SetBounds(Bounds);
 	}
 

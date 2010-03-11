@@ -52,7 +52,7 @@ public:
 	//pure virtual
 	virtual OGRSpatialReference* GetSpatialReference(void) = 0;
 	virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference) = 0;
-	virtual OGREnvelope* GetEnvelope(void) = 0;
+	virtual const OGREnvelope* GetEnvelope(void) = 0;
 	virtual bool IsValid(void) = 0;
 	virtual void Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisplay, ITrackCancel* pTrackCancel) = 0;
 	//

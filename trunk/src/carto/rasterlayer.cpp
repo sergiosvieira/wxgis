@@ -44,21 +44,21 @@ void wxGISRasterLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDispl
 	if(!pDisplayTransformation)
 		return;
 	//1. get envelope
-	OGREnvelope Env = pDisplayTransformation->GetVisibleBounds();
-	OGREnvelope* LayerEnv = m_pwxGISRasterDataset->GetEnvelope();
-	OGRSpatialReference* pEnvSpaRef = pDisplayTransformation->GetSpatialReference();
-	OGRSpatialReference* pLayerSpaRef = m_pwxGISRasterDataset->GetSpatialReference();
+    OGREnvelope Env = pDisplayTransformation->GetVisibleBounds();
+    const OGREnvelope* LayerEnv = m_pwxGISRasterDataset->GetEnvelope();
+    OGRSpatialReference* pEnvSpaRef = pDisplayTransformation->GetSpatialReference();
+    OGRSpatialReference* pLayerSpaRef = m_pwxGISRasterDataset->GetSpatialReference();
 
-	if(pLayerSpaRef && pEnvSpaRef)
-	{
-		if(!pLayerSpaRef->IsSame(pEnvSpaRef))
-		{
-			OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pEnvSpaRef, pLayerSpaRef );
-			poCT->Transform(1, &Env.MaxX, &Env.MaxY);
-			poCT->Transform(1, &Env.MinX, &Env.MinY);
+    if(pLayerSpaRef && pEnvSpaRef)
+    {
+        if(!pLayerSpaRef->IsSame(pEnvSpaRef))
+        {
+            OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pEnvSpaRef, pLayerSpaRef );
+            poCT->Transform(1, &Env.MaxX, &Env.MaxY);
+            poCT->Transform(1, &Env.MinX, &Env.MinY);
             OCTDestroyCoordinateTransformation(poCT);
-		}
-	}
+        }
+    }
 
 	//2. set spatial filter
 	pDisplay->StartDrawing(GetCacheID());
@@ -90,7 +90,7 @@ OGRSpatialReference* wxGISRasterLayer::GetSpatialReference(void)
 	return NULL;
 }
 
-OGREnvelope* wxGISRasterLayer::GetEnvelope(void)
+const OGREnvelope* wxGISRasterLayer::GetEnvelope(void)
 {
 	if(IsValid())
 		return m_pwxGISRasterDataset->GetEnvelope();

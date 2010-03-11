@@ -37,7 +37,7 @@ public:
 	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
 	virtual bool Open(void);
 	virtual OGRSpatialReference* GetSpatialReference(void);
-	virtual OGREnvelope* GetEnvelope(void);
+	virtual const OGREnvelope* GetEnvelope(void);
 	virtual GDALDataset* GetRaster(void){return m_poDataset;};
 	virtual bool HasOverviews(void){return m_bHasOverviews;};
     virtual int GetWidth(void){return m_nXSize;};
