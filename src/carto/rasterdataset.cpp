@@ -424,7 +424,7 @@ OGRSpatialReference* wxGISRasterDataset::GetSpatialReference(void)
 	return NULL;
 }
 
-OGREnvelope* wxGISRasterDataset::GetEnvelope(void)
+const OGREnvelope* wxGISRasterDataset::GetEnvelope(void)
 {
 	if(m_psExtent)
 		return m_psExtent;

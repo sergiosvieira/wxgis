@@ -53,7 +53,7 @@ void wxGISMap::AddLayer(wxGISLayer* pLayer)
             m_pSpatialReference = pSpaRef->Clone();
 		if(!m_pSpatialReference)
 		{
-			OGREnvelope* pEnv = pLayer->GetEnvelope();
+			const OGREnvelope* pEnv = pLayer->GetEnvelope();
 			if(pEnv)
 			{
 				if(pEnv->MaxX <= 180 && pEnv->MaxY <= 90 && pEnv->MinX >= -180 && pEnv->MinY >= -90)
@@ -82,7 +82,7 @@ OGREnvelope wxGISMap::GetFullExtent(void)
 	OGREnvelope res;
 	for(size_t i = 0; i < m_Layers.size(); i++)
 	{
-        OGREnvelope* pEnv = m_Layers[i]->GetEnvelope();
+        const OGREnvelope* pEnv = m_Layers[i]->GetEnvelope();
         res.Merge(*pEnv);
 	}
     //increase 10%

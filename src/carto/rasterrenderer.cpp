@@ -73,7 +73,7 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
         }
     }
 
-	OGREnvelope* pRasterExtent = pRaster->GetEnvelope();
+	const OGREnvelope* pRasterExtent = pRaster->GetEnvelope();
     //calc envelopes
 	OGREnvelope RasterEnvelope;
 	if(!IsSpaRefSame)
@@ -226,6 +226,9 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 		        err = pGDALDataset->AdviseRead(nMinX, nMinY, nImgWidth, nImgHeight, nWidthOut, nHeightOut, GDT_Byte, 3, bands, NULL);
 		        if(err != CE_None)
 		        {
+                    const char* pszerr = CPLGetLastErrorMsg();
+                    wxLogError(_("AdviseRead failed! OGR error: %s"), wgMB2WX(pszerr));
+
 			        wxDELETEA(data);
 			        return;
 		        }
@@ -233,6 +236,9 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 		        err = pGDALDataset->RasterIO(GF_Read, nMinX, nMinY, nImgWidth, nImgHeight, data, nWidthOut, nHeightOut, GDT_Byte, 3, bands, sizeof(unsigned char) * 3, 0, sizeof(unsigned char));
 		        if(err != CE_None)
 		        {
+                    const char* pszerr = CPLGetLastErrorMsg();
+                    wxLogError(_("RasterIO failed! OGR error: %s"), wgMB2WX(pszerr));
+
 			        wxDELETEA(data);
 			        return;
 		        }
@@ -305,6 +311,8 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 			    CPLErr err = pGDALDataset->RasterIO(GF_Read, 0, 0, nImgWidth, nImgHeight, data, nWidth, nHeight, GDT_Byte, 3, bands, sizeof(unsigned char) * 3, 0, sizeof(unsigned char));
 			    if(err != CE_None)
 			    {
+                    const char* pszerr = CPLGetLastErrorMsg();
+                    wxLogError(_("RasterIO failed! OGR error: %s"), wgMB2WX(pszerr));
 				    wxDELETEA(data);
 				    return;
 			    }
@@ -401,7 +409,7 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 //	return wxImage();
 //}
 
-OGREnvelope wxGISRasterRGBRenderer::TransformEnvelope(OGREnvelope* pEnvelope, OGRSpatialReference* pSrsSpatialReference, OGRSpatialReference* pDstSpatialReference)
+OGREnvelope wxGISRasterRGBRenderer::TransformEnvelope(const OGREnvelope* pEnvelope, OGRSpatialReference* pSrsSpatialReference, OGRSpatialReference* pDstSpatialReference)
 {
 	//get new envelope - it may rotate
 	OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pSrsSpatialReference, pDstSpatialReference);
@@ -429,9 +437,9 @@ OGREnvelope wxGISRasterRGBRenderer::TransformEnvelope(OGREnvelope* pEnvelope, OG
 wxImage wxGISRasterRGBRenderer::Scale(unsigned char* pData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel)
 {
     ////simple way
-    //wxImage ResultImage(nOrigX, nOrigY, pData);
-    //ResultImage = ResultImage.Scale(nDestX, nDestY, nQuality);
-    //return ResultImage;
+    //wxImage ResultImage1(nOrigX, nOrigY, pData);
+    //ResultImage1 = ResultImage1.Scale(nDestX, nDestY, Quality);
+    //return ResultImage1;
 
     wxImage ResultImage(nDestX, nDestY, false);
     unsigned char* pDestData = ResultImage.GetData();
