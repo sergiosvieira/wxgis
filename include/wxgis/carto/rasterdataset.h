@@ -56,6 +56,7 @@ public:
 protected:
 	OGREnvelope* m_psExtent;
 	GDALDataset  *m_poDataset;
+	GDALDataset  *m_poMainDataset;
 	OGRSpatialReference* m_pSpaRef;
 	bool m_bIsOpened;
     bool m_bHasOverviews;

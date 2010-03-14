@@ -22,7 +22,7 @@
 
 #include "gdal_rat.h"
 
-wxGISRasterDataset::wxGISRasterDataset(wxString sPath) : wxGISDataset(sPath), m_bIsOpened(false), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false)
+wxGISRasterDataset::wxGISRasterDataset(wxString sPath) : wxGISDataset(sPath), m_bIsOpened(false), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false), m_poMainDataset(NULL), m_poDataset(NULL)
 {
 }
 
@@ -32,7 +32,12 @@ wxGISRasterDataset::~wxGISRasterDataset(void)
 	wxDELETE(m_psExtent);
 
 	if(m_bIsOpened)
-		GDALClose(m_poDataset);
+    {
+        if(m_poMainDataset)
+            GDALDereferenceDataset(m_poMainDataset);
+        if(m_poDataset)
+            GDALClose(m_poDataset);
+    }
 }
 
 bool wxGISRasterDataset::Open(void)
@@ -54,6 +59,7 @@ bool wxGISRasterDataset::Open(void)
     //m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath.c_str()), GA_ReadOnly );
 	if( m_poDataset == NULL )
     {
+        //if ( CPLGetLastErrorNo() != CPLE_OpenFailed )
 		const char* err = CPLGetLastErrorMsg();
 		wxString sErr = wxString::Format(_("wxGISRasterDataset: Open failed! Path '%s'. OGR error: %s"), m_sPath.c_str(), wgMB2WX(err));
 		wxLogError(sErr);
@@ -61,26 +67,65 @@ bool wxGISRasterDataset::Open(void)
 		return false;
     }
 
+    double adfGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
+	CPLErr err = m_poDataset->GetGeoTransform(adfGeoTransform);
+    bool bHasGeoTransform = false;
+    if(err != CE_Fatal)
+    {
+        bHasGeoTransform = true;
+        if (( adfGeoTransform[1] < 0.0 || adfGeoTransform[2] != 0.0 || adfGeoTransform[4] != 0.0 || adfGeoTransform[5] > 0.0 ) || m_poDataset->GetGCPCount() > 0)
+        {
+            bHasGeoTransform = false;
+            m_poMainDataset = m_poDataset;
+            m_poDataset = (GDALDataset *) GDALAutoCreateWarpedVRT( m_poMainDataset, NULL, NULL, GRA_NearestNeighbour, 0.5, NULL );
+            if(m_poDataset == NULL)
+            {
+                m_poDataset = m_poMainDataset;
+                m_poMainDataset = NULL;
+            }
+            else
+            {
+                //create pyramids
+                int anOverviewList[5] = { 4, 8, 16, 32, 64 };
+                CPLErr err = m_poDataset->BuildOverviews( "NEAREST", 5, anOverviewList, 0, NULL, GDALDummyProgress, NULL );
+		        //"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE" 
+            }
+        }
+    }
+
 	m_nXSize = m_poDataset->GetRasterXSize();
 	m_nYSize = m_poDataset->GetRasterYSize();
 
-	char** papszFileList = m_poDataset->GetFileList();
-    if( CSLCount(papszFileList) == 0 )
+    GDALRasterBand* pBand(NULL);
+    if(m_poMainDataset)
+        pBand = m_poMainDataset->GetRasterBand(1);
+    else if(m_poDataset)
+        pBand = m_poDataset->GetRasterBand(1);
+    if(!pBand)
     {
-        wxLogDebug(wxT( "Files: none associated" ));
+		wxLogError(_("wxGISRasterDataset: Open failed! Path '%s'. Raster have no bands"), m_sPath.c_str());
+		return false;
     }
-    else
-    {
-        wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
-        for(int i = 1; papszFileList[i] != NULL; i++ )
-		{
-			wxString sFileName = wgMB2WX(papszFileList[i]);
-			if(sFileName.Find(wxT(".rrd")) != wxNOT_FOUND || sFileName.Find(wxT(".ovr")) != wxNOT_FOUND)
-				m_bHasOverviews = true;
-			wxLogDebug( wxT("       %s"), sFileName.c_str() );
-		}
-    }
-    CSLDestroy( papszFileList );
+    if(pBand && pBand->GetOverviewCount() > 0)
+        m_bHasOverviews = true;
+
+	//char** papszFileList = m_poDataset->GetFileList();
+ //   if( CSLCount(papszFileList) == 0 )
+ //   {
+ //       wxLogDebug(wxT( "Files: none associated" ));
+ //   }
+ //   else
+ //   {
+ //       wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
+ //       for(int i = 1; papszFileList[i] != NULL; i++ )
+	//	{
+	//		wxString sFileName = wgMB2WX(papszFileList[i]);
+	//		if(sFileName.Find(wxT(".rrd")) != wxNOT_FOUND || sFileName.Find(wxT(".ovr")) != wxNOT_FOUND)
+	//			m_bHasOverviews = true;
+	//		wxLogDebug( wxT("       %s"), sFileName.c_str() );
+	//	}
+ //   }
+ //   CSLDestroy( papszFileList );
 
     if(m_nXSize < 2000 && m_nYSize < 2000)
         m_bHasOverviews = true;
@@ -90,15 +135,15 @@ bool wxGISRasterDataset::Open(void)
 	//const char* desc = pDrv->GetDescription();
 	//wxLogDebug( wxT("Driver: %s/%s"), wgMB2WX(GDALGetDriverShortName( pDrv )), wgMB2WX(GDALGetDriverLongName( pDrv )) );
 
-	//char** papszMetadata = m_poDataset->GetMetadata();
- //   if( CSLCount(papszMetadata) > 0 )
- //   {
- //       wxLogDebug( wxT( "Metadata:" ));
- //       for(int i = 0; papszMetadata[i] != NULL; i++ )
- //       {
- //           wxLogDebug( wxT( "  %s"), wgMB2WX(papszMetadata[i]) );
- //       }
- //   }
+	char** papszMetadata = m_poDataset->GetMetadata();
+    if( CSLCount(papszMetadata) > 0 )
+    {
+        wxLogDebug( wxT( "Metadata:" ));
+        for(int i = 0; papszMetadata[i] != NULL; i++ )
+        {
+            wxLogDebug( wxT( "  %s"), wgMB2WX(papszMetadata[i]) );
+        }
+    }
 
 	///* -------------------------------------------------------------------- */
 	///*      Report "IMAGE_STRUCTURE" metadata.                              */
@@ -357,8 +402,15 @@ bool wxGISRasterDataset::Open(void)
     //CPLCleanupTLS();
 
 	m_psExtent = new OGREnvelope();
-	double adfGeoTransform[6];	
-	if(m_poDataset->GetGeoTransform( adfGeoTransform ) != CE_Fatal )
+
+    if(!bHasGeoTransform)
+    {
+        CPLErr err = m_poDataset->GetGeoTransform(adfGeoTransform);
+        if(err != CE_Fatal)
+            bHasGeoTransform = true;
+    }
+
+	if(bHasGeoTransform)
 	{
 		double inX[4];
 		double inY[4];
@@ -372,8 +424,8 @@ bool wxGISRasterDataset::Open(void)
 		inX[3] = 0;
 		inY[3] = m_nYSize;
 
-		m_psExtent->MaxX = 0;
-		m_psExtent->MaxY = 0;
+		m_psExtent->MaxX = -1000000000;
+		m_psExtent->MaxY = -1000000000;
 		m_psExtent->MinX = 1000000000;
 		m_psExtent->MinY = 1000000000;
 		for(int i = 0; i < 4; i++)
@@ -392,8 +444,10 @@ bool wxGISRasterDataset::Open(void)
 	}
 	else
 	{
-		wxDELETE(m_psExtent);
-		m_psExtent = NULL;
+		m_psExtent->MaxX = m_nXSize;
+		m_psExtent->MaxY = m_nYSize;
+		m_psExtent->MinX = 0;
+		m_psExtent->MinY = 0;
 	}
 
 //    if( poDataset->GetGeoTransform( adfGeoTransform ) == CE_None )
