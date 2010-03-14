@@ -99,11 +99,12 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 	    if(IsZoomIn)
 	    {
 		    //intersect bounds
-		    OGREnvelope DrawBounds;
-		    DrawBounds.MinX = MAX(RasterEnvelope.MinX, VisibleBounds.MinX);
-		    DrawBounds.MinY = MAX(RasterEnvelope.MinY, VisibleBounds.MinY);
-		    DrawBounds.MaxX = MIN(RasterEnvelope.MaxX, VisibleBounds.MaxX);
-		    DrawBounds.MaxY = MIN(RasterEnvelope.MaxY, VisibleBounds.MaxY);
+		    OGREnvelope DrawBounds = RasterEnvelope;
+            DrawBounds.Intersect(VisibleBounds);
+		    //DrawBounds.MinX = MAX(RasterEnvelope.MinX, VisibleBounds.MinX);
+		    //DrawBounds.MinY = MAX(RasterEnvelope.MinY, VisibleBounds.MinY);
+		    //DrawBounds.MaxX = MIN(RasterEnvelope.MaxX, VisibleBounds.MaxX);
+		    //DrawBounds.MaxY = MIN(RasterEnvelope.MaxY, VisibleBounds.MaxY);
             //convert draw bounds to DC coords
 		    OGRRawPoint OGRRawPoints[2];
 		    OGRRawPoints[0].x = DrawBounds.MinX;
@@ -328,6 +329,28 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 		    }
 		    //3. draw //think about transparancy!
 		    wxImage ResultImage(nWidth, nHeight, data);
+
+		    //double adfGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
+      //      double adfReverseGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
+		    //CPLErr err = pGDALDataset->GetGeoTransform(adfGeoTransform);
+      //      if(err == CE_None)
+      //      {
+      //          int nRet = GDALInvGeoTransform( adfGeoTransform, adfReverseGeoTransform );
+      //          ResultImage = ResultImage.Rotate(adfReverseGeoTransform[4] /** 180 / PI*/, wxPoint(0,0));
+      //      }
+
+
+            //bool bNoTransform(false);
+            //if(err != CE_None)
+            //{
+            //    bNoTransform = true;
+            //}
+            //else
+            //{
+            //    int nRes = GDALInvGeoTransform( adfGeoTransform, adfReverseGeoTransform );
+            //}
+
+
 		    pDisplay->DrawBitmap(ResultImage, nDCXOrig, nDCYOrig);
 
 		    //delete[](data);

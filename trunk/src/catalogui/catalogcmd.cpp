@@ -653,8 +653,8 @@ void wxGISCatalogMainCmd::OnClick(void)
                         if(!pGxObjectEdit->Delete())
                         {
                             wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
-                            wxMessageDialog dlg(pWnd, wxString::Format(_("Cannot delete '%s'\nContinue?"),pArr->at(i)->GetName().c_str()),_("Error"), wxYES_NO | wxICON_QUESTION);
-                            if(dlg.ShowModal() == wxID_NO)
+                            int nRes = wxMessageBox(wxString::Format(_("Cannot delete '%s'\nContinue?"),pArr->at(i)->GetName().c_str()), _("Error"), wxYES_NO | wxICON_QUESTION, pWnd);
+                            if(nRes == wxNO)
                                 return;
                         }
                     }

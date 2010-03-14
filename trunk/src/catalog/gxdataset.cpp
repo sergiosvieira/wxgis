@@ -397,9 +397,19 @@ wxGISDataset* wxGxRasterDataset::GetDataset(void)
                 OvrProgressData Data = {pStatusBar, pProgressor, sProgressMsg}; 
 		        CPLErr err = pwxGISRasterDataset->GetRaster()->BuildOverviews( "GAUSS", 5, anOverviewList, 0, NULL, /*GDALDummyProgress*/OvrProgress, (void*)&Data );
 		        //"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE" 
+
                 if(pProgressor)
                     pProgressor->Show(false);
                 pStatusBar->SetMessage(_("Done"));
+
+			    if(err != CE_None)
+			    {
+                    const char* pszerr = CPLGetLastErrorMsg();
+                    wxLogError(_("BuildOverviews failed! OGR error: %s"), wgMB2WX(pszerr));
+                    int nRes = wxMessageBox(_("Build Overviews failed! Continue?"), _("Question"), wxICON_QUESTION | wxYES_NO);
+                    if(nRes == wxNO)
+                        return NULL;
+			    }
 	        }
         }
         

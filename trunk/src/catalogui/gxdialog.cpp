@@ -860,9 +860,9 @@ bool wxGxDialog::DoSaveObject(wxGISEnumSaveObjectResults Result)
     else if(Result == enumGISSaveObjectExists && m_bOverwritePrompt)
     {
         int nRes = wxMessageBox(_("The item is exist! Overwrite?"), _("Question"), wxICON_QUESTION | wxYES_NO | wxCANCEL, this);
-        if(nRes == wxID_CANCEL)
+        if(nRes == wxCANCEL)
             return false;
-        else if(nRes == wxID_NO)
+        else if(nRes == wxNO)
             m_nRetCode = wxID_CANCEL;
         else
         {
