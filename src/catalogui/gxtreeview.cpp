@@ -351,6 +351,7 @@ BEGIN_EVENT_TABLE(wxGxTreeView, wxGxTreeViewBase)
     EVT_TREE_BEGIN_LABEL_EDIT(TREECTRLID, wxGxTreeView::OnBeginLabelEdit)
     EVT_TREE_END_LABEL_EDIT(TREECTRLID, wxGxTreeView::OnEndLabelEdit)
     EVT_TREE_SEL_CHANGED(TREECTRLID, wxGxTreeView::OnSelChanged)
+    EVT_SET_FOCUS(wxGxTreeView::OnSetFocus)
 END_EVENT_TABLE()
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxTreeView, wxGxTreeViewBase)
@@ -458,15 +459,29 @@ void wxGxTreeView::OnEndLabelEdit(wxTreeEvent& event)
 
 void wxGxTreeView::OnSelChanged(wxTreeEvent& event)
 {
-	wxTreeItemId item = event.GetItem();
-	if(!item.IsOk())
-		return;
-	wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(item);
-	if(pData != NULL)
-	{
-		//wxKeyEvent kevt = event.GetKeyEvent();
-		m_pSelection->Select(pData->m_pObject, false/*kevt.m_controlDown*/, GetId());
-	}
+    event.Skip();
+
+    wxArrayTreeItemIds treearray;
+    size_t count = GetSelections(treearray);
+    m_pSelection->Clear(GetId());
+    for(size_t i = 0; i < count; i++)
+    {
+	    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(treearray[i]);
+	    if(pData != NULL)
+	    {
+		    m_pSelection->Select(pData->m_pObject, true, GetId());
+	    }
+    }
+
+	//wxTreeItemId item = event.GetItem();
+	//if(!item.IsOk())
+	//	return;
+	//wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(item);
+	//if(pData != NULL)
+	//{
+	//	//wxKeyEvent kevt = event.GetKeyEvent();
+	//	m_pSelection->Select(pData->m_pObject, false/*kevt.m_controlDown*/, GetId());
+	//}
 
 	//wxArrayTreeItemIds treearray;
  //   size_t count = GetSelections(treearray);
@@ -485,6 +500,27 @@ void wxGxTreeView::OnSelChanged(wxTreeEvent& event)
 	//if(pData != NULL)
 	//	OnObjectSelected(pData->m_pObject);
 }
+
+void wxGxTreeView::OnSetFocus(wxFocusEvent& event)
+{
+    event.Skip();
+    if(event.GetWindow() == this)
+        return;
+    wxArrayTreeItemIds treearray;
+    size_t count = GetSelections(treearray);
+    if(count == 0)
+        return;
+    m_pSelection->Clear(NOTFIRESELID);
+    for(size_t i = 0; i < count; i++)
+    {
+	    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(treearray[i]);
+	    if(pData != NULL)
+	    {
+		    m_pSelection->Select(pData->m_pObject, true, NOTFIRESELID);
+	    }
+    }
+}
+
 
 void wxGxTreeView::OnItemRightClick(wxTreeEvent& event)
 {

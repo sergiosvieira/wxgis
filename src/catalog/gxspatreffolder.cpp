@@ -73,7 +73,7 @@ void wxGxSpatialReferencesFolder::EmptyChildren(void)
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
 	}
-	m_Children.empty();
+	m_Children.clear();
 	m_bIsChildrenLoaded = false;
 }
 

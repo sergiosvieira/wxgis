@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/cat_app/catalogframe.h"
+#include "wx/version.h"
 
 //-----------------------------------------------------------
 // wxGISCatalogFrame
@@ -41,6 +42,6 @@ wxGISCatalogFrame::~wxGISCatalogFrame(void)
 
 void wxGISCatalogFrame::OnAppAbout(void)
 {
-	wxMessageBox(wxString::Format(_("wxGIS [%s]\nVersion: %s\n(c) 2009 Dmitry Barishnikov (bishop)"), APP_NAME, APP_VER), _("About"), wxICON_INFORMATION | wxOK);
+	wxMessageBox(wxString::Format(_("wxGIS [%s]\nVersion: %s\n(c) 2009 Dmitry Barishnikov (Bishop)\n\nGDAL %s\n%s"), APP_NAME, APP_VER, wgMB2WX(GDAL_RELEASE_NAME), wxVERSION_STRING ), _("About"), wxICON_INFORMATION | wxOK);
 }
 

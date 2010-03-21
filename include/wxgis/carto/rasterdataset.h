@@ -42,6 +42,7 @@ public:
 	virtual bool HasOverviews(void){return m_bHasOverviews;};
     virtual int GetWidth(void){return m_nXSize;};
     virtual int GetHeight(void){return m_nYSize;};
+    virtual bool Delete(void);
 
 //	virtual OGRLayer* GetLayer(int iLayer = 0);
 //	virtual void SetSpatialFilter(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);
@@ -62,6 +63,7 @@ protected:
     bool m_bHasOverviews;
 	int m_nXSize;
 	int m_nYSize;
+    wxCriticalSection m_CritSect;
 
 //	OGRDataSource *m_poDS;
 //	OGRLayer* m_poLayer;

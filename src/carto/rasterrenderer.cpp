@@ -308,8 +308,17 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 		    unsigned char* data = new unsigned char[nWidth * nHeight * 3];
 		    if(IsSpaRefSame)
 		    {
+		        CPLErr err = pGDALDataset->AdviseRead(0, 0, nImgWidth, nImgHeight, nWidth, nHeight, GDT_Byte, 3, bands, NULL);
+		        if(err != CE_None)
+		        {
+                    const char* pszerr = CPLGetLastErrorMsg();
+                    wxLogError(_("AdviseRead failed! OGR error: %s"), wgMB2WX(pszerr));
+				    wxDELETEA(data);
+				    return;
+		        }
+
 			    //read in buffer
-			    CPLErr err = pGDALDataset->RasterIO(GF_Read, 0, 0, nImgWidth, nImgHeight, data, nWidth, nHeight, GDT_Byte, 3, bands, sizeof(unsigned char) * 3, 0, sizeof(unsigned char));
+			    err = pGDALDataset->RasterIO(GF_Read, 0, 0, nImgWidth, nImgHeight, data, nWidth, nHeight, GDT_Byte, 3, bands, sizeof(unsigned char) * 3, 0, sizeof(unsigned char));
 			    if(err != CE_None)
 			    {
                     const char* pszerr = CPLGetLastErrorMsg();
@@ -329,28 +338,6 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 		    }
 		    //3. draw //think about transparancy!
 		    wxImage ResultImage(nWidth, nHeight, data);
-
-		    //double adfGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
-      //      double adfReverseGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
-		    //CPLErr err = pGDALDataset->GetGeoTransform(adfGeoTransform);
-      //      if(err == CE_None)
-      //      {
-      //          int nRet = GDALInvGeoTransform( adfGeoTransform, adfReverseGeoTransform );
-      //          ResultImage = ResultImage.Rotate(adfReverseGeoTransform[4] /** 180 / PI*/, wxPoint(0,0));
-      //      }
-
-
-            //bool bNoTransform(false);
-            //if(err != CE_None)
-            //{
-            //    bNoTransform = true;
-            //}
-            //else
-            //{
-            //    int nRes = GDALInvGeoTransform( adfGeoTransform, adfReverseGeoTransform );
-            //}
-
-
 		    pDisplay->DrawBitmap(ResultImage, nDCXOrig, nDCYOrig);
 
 		    //delete[](data);

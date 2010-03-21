@@ -66,6 +66,15 @@ public:
 	{
 		if(pObject == NULL)
 			return;
+
+        GxObjectArray::iterator pos;
+		while((pos = std::find(m_DoArray.begin(), m_DoArray.end(), pObject)) != m_DoArray.end())
+        {
+            if(m_Pos > m_DoArray.begin() - pos)
+                m_Pos--;
+			m_DoArray.erase(pos);
+        }
+
 		if(nInitiator == INIT_ALL)
 		{
 			for(std::map<long, GxObjectArray*>::const_iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
@@ -75,16 +84,8 @@ public:
 					CI->second->erase(pos);
 			}
 		}
-
-        GxObjectArray::iterator pos = std::find(m_DoArray.begin(), m_DoArray.end(), pObject);
-		if(pos != m_DoArray.end())
-        {
-            if(m_Pos > m_DoArray.begin() - pos)
-                m_Pos--;
-			m_DoArray.erase(pos);
-        }
-
-		if(m_SelectionMap[nInitiator] == NULL)
+        
+        if(m_SelectionMap[nInitiator] == NULL)
 			return;
 		pos = std::find(m_SelectionMap[nInitiator]->begin(), m_SelectionMap[nInitiator]->end(), pObject);
 		if(pos != m_SelectionMap[nInitiator]->end())
