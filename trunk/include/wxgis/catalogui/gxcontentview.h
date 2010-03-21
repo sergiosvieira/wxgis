@@ -63,6 +63,7 @@ public:
 	virtual void OnEndLabelEdit(wxListEvent& event);
 	virtual void OnSelected(wxListEvent& event);
 	virtual void OnDeselected(wxListEvent& event);
+    virtual void OnSetFocus(wxFocusEvent& event);
 
 	typedef struct _itemdata
 	{

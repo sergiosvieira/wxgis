@@ -126,7 +126,7 @@ void wxGxCatalog::EmptyChildren(void)
 		m_Children[i]->Detach();
 		delete m_Children[i];
 	}
-	m_Children.empty();
+	m_Children.clear();
 	m_bIsChildrenLoaded = false;
 }
 
@@ -136,7 +136,7 @@ void wxGxCatalog::EmptyObjectFactories(void)
 	{
 		wxDELETE(m_ObjectFactoriesArray[i]);
 	}
-	m_ObjectFactoriesArray.empty();
+	m_ObjectFactoriesArray.clear();
 }
 
 void wxGxCatalog::Init(void)

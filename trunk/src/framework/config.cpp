@@ -74,7 +74,7 @@ void wxGISConfig::Clean(void)
 		m_configs_arr[i].pXmlDoc->Save(m_configs_arr[i].xml_path);
 		wxDELETE(m_configs_arr[i].pXmlDoc);
 	}
-	m_configs_arr.empty();
+	m_configs_arr.clear();
 }
 
 wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)

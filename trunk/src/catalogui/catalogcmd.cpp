@@ -51,7 +51,8 @@
 //  6   Forward
 //  7   Create Folder
 //	8	Test change proj
-//	9	?
+//	9	Refresh
+//  10  ?
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogMainCmd, wxObject)
 
@@ -60,7 +61,7 @@ wxGISCatalogMainCmd::wxGISCatalogMainCmd(void)
 	m_ImageList.Create(16, 16);
 	m_ImageList.Add(wxBitmap(folder_conn_16_xpm));	//4
 	m_ImageList.Add(wxBitmap(location16_xpm));		//9
-	m_ImageList.Add(wxBitmap(oper_16_xpm));		    //2
+	m_ImageList.Add(wxBitmap(oper_16_xpm));		    //3
 }
 
 wxGISCatalogMainCmd::~wxGISCatalogMainCmd(void)
@@ -87,6 +88,8 @@ wxIcon wxGISCatalogMainCmd::GetBitmap(void)
 			return m_ImageList.GetIcon(12);
 		case 7:
 			return m_ImageList.GetIcon(13);
+		case 9:
+			return m_ImageList.GetIcon(15);
 		case 8:	
 		default:
 			return wxIcon();
@@ -115,6 +118,8 @@ wxString wxGISCatalogMainCmd::GetCaption(void)
 			return wxString(_("Create folder"));
 		case 8:	
 			return wxString(_("Test change proj"));
+		case 9:	
+			return wxString(_("Refresh"));
 		default:
 			return wxString();
 	}
@@ -131,6 +136,7 @@ wxString wxGISCatalogMainCmd::GetCategory(void)
 		case 4:	
 		case 5:	
 		case 6:	
+		case 9:	
 			return wxString(_("Catalog"));
 		case 7:	
 			return wxString(_("New"));
@@ -227,6 +233,17 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			return false;
 		case 8://Gen SRS
 			return true;
+		case 9://Refresh
+		{
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+				if(pSel->GetCount() > 0)
+					return true;
+			}
+			return false;
+		}
 		default:
 			return false;
 	}
@@ -251,6 +268,8 @@ wxGISEnumCommandKind wxGISCatalogMainCmd::GetKind(void)
 		case 7://create folder
 			return enumGISCommandNormal;
 		case 8://Gen SRS
+			return enumGISCommandNormal;
+		case 9://Refresh
 			return enumGISCommandNormal;
 		default:
 			return enumGISCommandNormal;
@@ -279,6 +298,8 @@ wxString wxGISCatalogMainCmd::GetMessage(void)
 			return wxString(_("Create folder"));
 		case 8:	
 			return wxString(_("Test GxDialog"));
+		case 9:	
+			return wxString(_("Refresh item"));
 		default:
 			return wxString();
 	}
@@ -676,6 +697,23 @@ void wxGISCatalogMainCmd::OnClick(void)
                 return pGxApp->GetCatalog()->GetSelection()->Redo();
 			return;
         }
+        case 9:
+		{
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+				GxObjectArray* pArr = pSel->GetSelectedObjects();
+                if(!pArr)
+                    return;
+                for(size_t i = 0; i < pArr->size(); i++)
+                {
+				    IGxObject* pGxObject = pArr->at(i);
+                    pGxObject->Refresh();
+                }
+			}
+    		break;
+		}
         case 7:
 		default:
 			return;
@@ -730,6 +768,8 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 			return wxString(_("Create new folder"));
 		case 8:	
 			return wxString(_("Test change proj"));
+		case 9:	
+			return wxString(_("Refresh selected item"));
 		default:
 			return wxString();
 	}
@@ -737,7 +777,7 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 
 unsigned char wxGISCatalogMainCmd::GetCount(void)
 {
-	return 9;
+	return 10;
 }
 
 IToolBarControl* wxGISCatalogMainCmd::GetControl(void)
@@ -760,6 +800,7 @@ IToolBarControl* wxGISCatalogMainCmd::GetControl(void)
 		case 6:	
 		case 7:	
 		case 8:	
+		case 9:	
 		default:
 			return NULL;
 	}
@@ -780,6 +821,7 @@ wxString wxGISCatalogMainCmd::GetToolLabel(void)
 		case 6:	
 		case 7:	
 		case 8:	
+		case 9:	
 		default:
 			return wxEmptyString;
 	}
@@ -800,6 +842,7 @@ bool wxGISCatalogMainCmd::HasToolLabel(void)
 		case 6:	
 		case 7:	
 		case 8:	
+		case 9:	
 		default:
 			return false;
 	}
@@ -854,6 +897,7 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
         }            
 		case 7:	
 		case 8:	
+		case 9:	
 		default:
 			return NULL;
 	}

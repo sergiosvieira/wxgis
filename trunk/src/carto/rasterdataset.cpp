@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/carto/rasterdataset.h"
+#include "vrtwarpedoverview.h"
 
 #include "gdal_rat.h"
 
@@ -35,9 +36,48 @@ wxGISRasterDataset::~wxGISRasterDataset(void)
     {
         if(m_poMainDataset)
             GDALDereferenceDataset(m_poMainDataset);
+            //if(GDALDereferenceDataset(m_poMainDataset) < 1)
+            //    GDALClose(m_poMainDataset);
         if(m_poDataset)
             GDALClose(m_poDataset);
     }
+}
+
+bool wxGISRasterDataset::Delete(void)
+{
+	wxCriticalSectionLocker locker(m_CritSect);
+    GDALDriver* pDrv = NULL;
+	if(m_bIsOpened)
+    {
+        if(m_poMainDataset)
+        {
+            pDrv = m_poMainDataset->GetDriver();
+            GDALDereferenceDataset(m_poMainDataset);
+        }
+            //if(GDALDereferenceDataset(m_poMainDataset) < 1)
+            //    GDALClose(m_poMainDataset);
+        if(m_poDataset)
+        {
+            if(!pDrv)
+                pDrv = m_poDataset->GetDriver();
+            GDALClose(m_poDataset);
+        }
+    }
+    else
+    {
+       m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath.c_str()), GA_ReadOnly );
+       if( m_poDataset == NULL )
+           return false;
+       pDrv = m_poDataset->GetDriver();
+       GDALClose(m_poDataset);
+   }
+    if(pDrv)
+    {        
+        CPLErr eErr = pDrv->Delete(wgWX2MB(m_sPath.c_str()));
+        if(eErr != CE_Fatal)
+            return true;
+    }
+	return false;    
 }
 
 bool wxGISRasterDataset::Open(void)
@@ -53,7 +93,7 @@ bool wxGISRasterDataset::Open(void)
 	if( m_poDataset == NULL )
     {
         m_sPath.Replace(wxT("\\"), wxT("/"));
-        m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath.c_str()), GA_ReadOnly );
+        m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath.c_str()), GA_ReadOnly );//GA_Update
     }
     
     //m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath.c_str()), GA_ReadOnly );
@@ -77,19 +117,26 @@ bool wxGISRasterDataset::Open(void)
         {
             bHasGeoTransform = false;
             m_poMainDataset = m_poDataset;
-            m_poDataset = (GDALDataset *) GDALAutoCreateWarpedVRT( m_poMainDataset, NULL, NULL, GRA_NearestNeighbour, 0.5, NULL );
+            m_poDataset = (GDALDataset *) GDALAutoCreateWarpedVRT( m_poMainDataset, NULL, NULL, GRA_NearestNeighbour, 0.3, NULL );
+            m_poMainDataset->Dereference();
             if(m_poDataset == NULL)
             {
                 m_poDataset = m_poMainDataset;
                 m_poMainDataset = NULL;
             }
-            else
-            {
-                //create pyramids
-                int anOverviewList[5] = { 4, 8, 16, 32, 64 };
-                CPLErr err = m_poDataset->BuildOverviews( "NEAREST", 5, anOverviewList, 0, NULL, GDALDummyProgress, NULL );
-		        //"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE" 
-            }
+          //  else
+          //  {
+          //      //create pyramids
+          //      //int anOverviewList[9] = { 2, 4, 8, 16, 32, 64, 96, 128, 256 };
+          //      //CPLErr err = m_poDataset->BuildOverviews( "NEAREST", 9, anOverviewList, 0, NULL, GDALDummyProgress, NULL );
+		        ////"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE" 
+
+          //      //get first overview
+          //      //GDALDataset* pDS = m_poMainDataset->GetRasterBand(1)->GetOverview(4)->GetDataset();
+          //      //VRTWarpedOverviewDataset* pOVDS = new  VRTWarpedOverviewDataset(pDS, m_poMainDataset);
+          //      ////m_poDataset = pDS;
+          //      //m_poDataset = (GDALDataset *) GDALAutoCreateWarpedVRT( pOVDS, NULL, NULL, GRA_NearestNeighbour, 0.5, NULL );
+          //  }
         }
     }
 
@@ -400,6 +447,7 @@ bool wxGISRasterDataset::Open(void)
 	//}
 
     //CPLCleanupTLS();
+
 
 	m_psExtent = new OGREnvelope();
 

@@ -41,6 +41,7 @@ void wxGxFolder::Refresh(void)
 {
 	EmptyChildren();
 	LoadChildren();
+    m_pCatalog->ObjectRefreshed(this);
 }
 
 void wxGxFolder::EmptyChildren(void)
@@ -50,7 +51,7 @@ void wxGxFolder::EmptyChildren(void)
 		m_Children[i]->Detach();
 		wxDELETE( m_Children[i] );
 	}
-	m_Children.empty();
+    m_Children.clear();
 	m_bIsChildrenLoaded = false;
 }
 
@@ -94,14 +95,38 @@ wxIcon wxGxFolder::GetSmallImage(void)
 
 bool wxGxFolder::Delete(void)
 {
+    LoadChildren();
+    //delete all items that can be deleted
+    while(m_Children.size() > 0)
+    {
+        IGxObjectEdit* pEditObj = dynamic_cast<IGxObjectEdit*>(m_Children[0]);
+        if(pEditObj)
+            pEditObj->Delete();
+    }
     //delete all files
-
+	wxDir* pDir = new wxDir(m_sPath);
+	if(pDir->IsOpened())
+	{
+        m_FileNames.Clear();
+	    WXDWORD style = wxDIR_FILES | wxDIR_HIDDEN;
+        pDir->Traverse(*this, wxEmptyString, style );
+        for(size_t i = 0; i < m_FileNames.size(); i++)
+        {
+            int nRetCode = VSIUnlink(wgWX2MB(m_FileNames[i]));
+            if(nRetCode != 0)
+            {
+                const char* err = CPLGetLastErrorMsg();
+                wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+            }
+        }
+    }
+    wxDELETE(pDir);
     //delete all dirs
 
-    //delete
-    int ret = VSIRmdir(wgWX2MB(m_sPath));//recursive!!!
-    if(ret == 0)
-	//if(wxFileName::Rmdir(m_sPath))//recursive del wil be in >= 2.9.0
+    //delete    
+    //int ret = VSIRmdir(wgWX2MB(m_sPath));//recursive!!!
+    //if(ret == 0)
+	if(wxFileName::Rmdir(m_sPath))//recursive del wil be in >= 2.9.0
 	{
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer == NULL)
@@ -142,10 +167,10 @@ wxDirTraverseResult wxGxFolder::OnDir(const wxString& dirname)
 
 bool wxGxFolder::DeleteChild(IGxObject* pChild)
 {
+    m_pCatalog->ObjectDeleted(pChild);
 	bool bHasChildren = m_Children.size() > 0 ? true : false;
 	if(!IGxObjectContainer::DeleteChild(pChild))
 		return false;
-    m_pCatalog->ObjectDeleted(pChild);
 	if(bHasChildren != m_Children.size() > 0 ? true : false)
 		m_pCatalog->ObjectChanged(this);
 	return true;		

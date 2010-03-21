@@ -184,6 +184,18 @@ bool wxGxShapefileDataset::Delete(void)
     bool bRet = pDSet->Delete();
     if(bRet)
 	{
+        wxString vol, shortpath, name, ext;
+        wxFileName::SplitPath(m_sPath, &vol, &shortpath, &name, &ext);
+        wxString sRemNames;
+        if(vol.IsEmpty())
+            sRemNames = shortpath + wxFileName::GetPathSeparator() + name;
+        else
+            sRemNames = vol + wxT(":") + shortpath + wxFileName::GetPathSeparator() + name;        
+        //del filename.sbn filename.sbx filename.shp.xml
+        VSIUnlink(wgWX2MB(sRemNames + wxT(".sbn")));
+        VSIUnlink(wgWX2MB(sRemNames + wxT(".sbx")));
+        VSIUnlink(wgWX2MB(sRemNames + wxT(".shp.xml")));
+        //
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer == NULL)
 			return false;
@@ -282,7 +294,48 @@ wxIcon wxGxRasterDataset::GetSmallImage(void)
 
 bool wxGxRasterDataset::Delete(void)
 {
-	return true;
+    wxGISRasterDataset* pDSet = NULL;
+ 	if(m_pwxGISDataset == NULL)
+        pDSet = new wxGISRasterDataset(m_sPath);
+    else
+    {
+        m_pwxGISDataset->Release();
+        pDSet = dynamic_cast<wxGISRasterDataset*>(m_pwxGISDataset);
+    }
+    
+    if(!pDSet)
+        return false;
+
+    bool bRet = pDSet->Delete();
+    if(bRet)
+	{
+        wxString vol, shortpath, name, ext;
+        wxFileName::SplitPath(m_sPath, &vol, &shortpath, &name, &ext);
+        wxString sRemNames;
+        if(vol.IsEmpty())
+            sRemNames = shortpath + wxFileName::GetPathSeparator() + name;
+        else
+            sRemNames = vol + wxT(":") + shortpath + wxFileName::GetPathSeparator() + name;        
+        //del filename.aux filename.ext.aux filename.ext.aux.xml filename.ext.ovr.aux.xml
+        VSIUnlink(wgWX2MB(sRemNames + wxT(".aux")));
+        VSIUnlink(wgWX2MB(sRemNames + wxT(".lgo")));
+        VSIUnlink(wgWX2MB(sRemNames + wxT(".xml")));
+        VSIUnlink(wgWX2MB(sRemNames + wxT(".") + ext + wxT(".xml")));
+        VSIUnlink(wgWX2MB(sRemNames + wxT(".") + ext + wxT(".aux")));
+        VSIUnlink(wgWX2MB(sRemNames + wxT(".") + ext + wxT(".aux.xml")));
+        VSIUnlink(wgWX2MB(sRemNames + wxT(".") + ext + wxT(".ovr.aux.xml")));
+        //
+		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
+		if(pGxObjectContainer == NULL)
+			return false;
+		return pGxObjectContainer->DeleteChild(this);		
+	}
+	else
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+		return false;	
+    }
 }
 
 bool wxGxRasterDataset::Rename(wxString NewName)

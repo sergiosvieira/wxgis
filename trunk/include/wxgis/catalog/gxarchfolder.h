@@ -38,6 +38,12 @@ public:
 	virtual wxIcon GetSmallImage(void);
 	virtual wxString ContextMenu(void){return wxString(wxT("wxGxArchive.ContextMenu"));};
 	virtual wxString NewMenu(void){return wxString(wxT("wxGxArchive.NewMenu"));};
+	//IGxObjectEdit
+	virtual bool Delete(void);
+	virtual bool CanDelete(void){return true;};
+	virtual bool Rename(wxString NewName);
+	virtual bool CanRename(void){return true;};
+	virtual void EditProperties(wxWindow *parent);
 	//wxGxFolder
 	virtual void LoadChildren(void);
 protected:

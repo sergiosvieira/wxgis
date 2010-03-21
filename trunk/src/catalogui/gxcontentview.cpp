@@ -31,6 +31,7 @@ BEGIN_EVENT_TABLE(wxGxContentView, wxListCtrl)
 
     EVT_LIST_COL_CLICK(LISTCTRLID, wxGxContentView::OnColClick)
     EVT_CONTEXT_MENU(wxGxContentView::OnContextMenu)
+    EVT_SET_FOCUS(wxGxContentView::OnSetFocus)
 END_EVENT_TABLE()
 
 int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
@@ -199,18 +200,52 @@ void wxGxContentView::OnContextMenu(wxContextMenuEvent& event)
 
 void wxGxContentView::OnSelected(wxListEvent& event)
 {
-	event.Skip();
-	LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
-	if(pItemData == NULL)
-		return;
+	//event.Skip();
+	//LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
+	//if(pItemData == NULL)
+	//	return;
 
-	//wxMouseState mstate = wxGetMouseState();
-	//bool bCtrlDown = mstate.ControlDown();
-	//bool bAdd = bCtrlDown || m_bDragging;
-	//m_bDragging = false;
+	////wxMouseState mstate = wxGetMouseState();
+	////bool bCtrlDown = mstate.ControlDown();
+	////bool bAdd = bCtrlDown || m_bDragging;
+	////m_bDragging = false;
 
-	bool bAdd = true;
-	m_pSelection->Select(pItemData->pObject, bAdd, NOTFIRESELID);
+	//bool bAdd = true;
+	//m_pSelection->Select(pItemData->pObject, bAdd, NOTFIRESELID);
+
+    m_pSelection->Clear(NOTFIRESELID);
+    long nItem = -1;
+    for ( ;; )
+    {
+        nItem = GetNextItem(nItem, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+        if ( nItem == -1 )
+            break;
+        LPITEMDATA pItemData = (LPITEMDATA)GetItemData(nItem);
+	    if(pItemData == NULL)
+            continue;
+        m_pSelection->Select(pItemData->pObject, true, NOTFIRESELID);
+    }
+}
+
+void wxGxContentView::OnSetFocus(wxFocusEvent& event)
+{
+    event.Skip();
+    if(event.GetWindow() == this)
+        return;
+    if(GetSelectedItemCount() == 0)
+        return;
+    m_pSelection->Clear(NOTFIRESELID);
+    long nItem = -1;
+    for ( ;; )
+    {
+        nItem = GetNextItem(nItem, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+        if ( nItem == -1 )
+            break;
+        LPITEMDATA pItemData = (LPITEMDATA)GetItemData(nItem);
+	    if(pItemData == NULL)
+            continue;
+        m_pSelection->Select(pItemData->pObject, true, NOTFIRESELID);
+    }
 }
 
 void wxGxContentView::OnDeselected(wxListEvent& event)
@@ -494,6 +529,8 @@ void wxGxContentView::OnObjectChanged(IGxObject* pObj)
 
 void wxGxContentView::OnObjectRefreshed(IGxObject* pObj)
 {
+    if(m_pParentGxObject == pObj)
+        OnRefreshAll();
 }
 
 void wxGxContentView::OnRefreshAll(void)

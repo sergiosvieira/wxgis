@@ -230,6 +230,36 @@ void wxGxArchive::LoadChildren(void)
     //}
 }
 
+bool wxGxArchive::Delete(void)
+{
+    int ret = VSIUnlink(wgWX2MB(m_sPath));
+    if(ret == 0)
+	{
+		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
+		if(pGxObjectContainer == NULL)
+			return false;
+		return pGxObjectContainer->DeleteChild(this);		
+	}
+	else
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+		return false;	
+    }
+}
+
+bool wxGxArchive::Rename(wxString NewName)
+{
+	//rename ?
+	m_sName = NewName; 
+	m_pCatalog->ObjectChanged(this);
+	return true;
+}
+
+void wxGxArchive::EditProperties(wxWindow *parent)
+{
+}
+
 /////////////////////////////////////////////////////////////////////////
 // wxGxArchiveFolder
 /////////////////////////////////////////////////////////////////////////
