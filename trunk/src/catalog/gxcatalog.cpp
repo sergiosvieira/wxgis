@@ -90,6 +90,7 @@ void wxGxCatalog::Refresh(void)
 {
 	for(size_t i = 0; i < m_Children.size(); i++)
 		m_Children[i]->Refresh();
+    m_pCatalog->ObjectRefreshed(this);
 }
 
 void wxGxCatalog::EditProperties(wxWindow *parent)
@@ -123,6 +124,12 @@ void wxGxCatalog::EmptyChildren(void)
 {
 	for(size_t i = 0; i < m_Children.size(); i++)
 	{
+        if(m_pCatalog)
+        {
+            IGxSelection* pSel = m_pCatalog->GetSelection();
+            if(pSel)
+                m_pCatalog->GetSelection()->Unselect(m_Children[i], IGxSelection::INIT_ALL);
+        }
 		m_Children[i]->Detach();
 		delete m_Children[i];
 	}
