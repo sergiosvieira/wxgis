@@ -48,6 +48,12 @@ void wxGxFolder::EmptyChildren(void)
 {
 	for(size_t i = 0; i < m_Children.size(); i++)
 	{
+        if(m_pCatalog)
+        {
+            IGxSelection* pSel = m_pCatalog->GetSelection();
+            if(pSel)
+                m_pCatalog->GetSelection()->Unselect(m_Children[i], IGxSelection::INIT_ALL);
+        }
 		m_Children[i]->Detach();
 		wxDELETE( m_Children[i] );
 	}
