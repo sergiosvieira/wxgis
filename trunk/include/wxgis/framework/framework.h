@@ -95,6 +95,7 @@ public:
 	//virtual wxXmlNode* GetXmlConfig(wxString sApp, bool bUser) = 0;
     virtual wxXmlNode* GetConfigNode(wxGISEnumConfigKey Key, wxString sPath) = 0;
 	virtual wxXmlNode* CreateConfigNode(wxGISEnumConfigKey Key, wxString sPath, bool bUniq) = 0;
+    virtual wxXmlNode* GetConfigNode(wxString sPath, bool bCreateInCU, bool bUniq) = 0;
 };
 
 class IProgressor

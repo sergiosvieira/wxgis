@@ -21,6 +21,10 @@
 #include "wxgis/cat_app/catalogframe.h"
 #include "wx/version.h"
 
+//
+#include "geos_c.h"
+#include "proj_api.h"
+
 //-----------------------------------------------------------
 // wxGISCatalogFrame
 //-----------------------------------------------------------
@@ -42,6 +46,6 @@ wxGISCatalogFrame::~wxGISCatalogFrame(void)
 
 void wxGISCatalogFrame::OnAppAbout(void)
 {
-	wxMessageBox(wxString::Format(_("wxGIS [%s]\nVersion: %s\n(c) 2009 Dmitry Barishnikov (Bishop)\n\nGDAL %s\n%s"), APP_NAME, APP_VER, wgMB2WX(GDAL_RELEASE_NAME), wxVERSION_STRING ), _("About"), wxICON_INFORMATION | wxOK);
+	wxMessageBox(wxString::Format(_("wxGIS [%s]\nVersion: %s\n(c) 2009 Dmitry Barishnikov (Bishop)\n-----------------------------\nGDAL %s\nGEOS %s\nPROJ %s\n%s"), APP_NAME, APP_VER, wgMB2WX(GDAL_RELEASE_NAME), wgMB2WX(GEOSversion()), wgMB2WX(pj_get_release()), wxVERSION_STRING ), _("About"), wxICON_INFORMATION | wxOK);
 }
 
