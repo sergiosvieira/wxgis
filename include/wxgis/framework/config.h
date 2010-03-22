@@ -43,6 +43,8 @@ public:
 	//IGISConfig
     virtual wxXmlNode* GetConfigNode(wxGISEnumConfigKey Key, wxString sPath);
     virtual wxXmlNode* CreateConfigNode(wxGISEnumConfigKey Key, wxString sPath, bool bUniq = true);
+    virtual wxXmlNode* GetConfigNode(wxString sPath, bool bCreateInCU, bool bUniq);
+    //
 	static void DeleteNodeChildren(wxXmlNode* pNode);
 
 	virtual void Clean(void);

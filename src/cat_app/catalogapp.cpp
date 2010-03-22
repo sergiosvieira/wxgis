@@ -49,7 +49,11 @@ wxGISCatalogApp::~wxGISCatalogApp(void)
 
 bool wxGISCatalogApp::OnInit()
 {
+#ifdef __WXDEBUG__
 	m_pConfig = new wxGISAppConfig(APP_NAME, CONFIG_DIR);
+#else
+    m_pConfig = new wxGISAppConfig(APP_NAME, CONFIG_DIR, true);
+#endif
 	//setup loging
 	wxString sLogDir = m_pConfig->GetLogDir();
 	if(sLogDir.IsEmpty())

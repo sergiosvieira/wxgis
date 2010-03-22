@@ -283,6 +283,19 @@ void wxGISConfig::DeleteNodeChildren(wxXmlNode* pNode)
 	}
 }
 
+
+wxXmlNode* wxGISConfig::GetConfigNode(wxString sPath, bool bCreateInCU, bool bUniq)
+{
+	wxXmlNode* pConfXmlNode = GetConfigNode(enumGISHKCU, sPath);
+	if(!pConfXmlNode)
+		pConfXmlNode = GetConfigNode(enumGISHKLM, sPath);
+    if(bCreateInCU)
+        pConfXmlNode = CreateConfigNode(enumGISHKCU, sPath, bUniq);
+	if(!pConfXmlNode)
+		return NULL;
+    return pConfXmlNode;
+}
+
 //---------------------------------------------------------------
 // wxGISAppConfig
 //---------------------------------------------------------------
