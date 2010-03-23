@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalog/gxspatreffolder.h"
 #include "cpl_vsi_virtual.h"
+#include <wx/stdpaths.h>
 
 #include "../../art/folder_prj_16.xpm"
 #include "../../art/folder_prj_48.xpm"
@@ -50,6 +51,9 @@ wxIcon wxGxSpatialReferencesFolder::GetSmallImage(void)
 void wxGxSpatialReferencesFolder::Detach(void)
 {
 	EmptyChildren();
+    if(m_pConfigNode->HasProp(wxT("path")))
+	    m_pConfigNode->DeleteProperty(wxT("path"));
+    m_pConfigNode->AddProperty(wxT("path"), m_sPath);
 }
 
 void wxGxSpatialReferencesFolder::Refresh(void)
@@ -61,9 +65,18 @@ void wxGxSpatialReferencesFolder::Refresh(void)
  
 void wxGxSpatialReferencesFolder::Init(wxXmlNode* pConfigNode)
 {
+    m_pConfigNode = pConfigNode;
     m_sPath = pConfigNode->GetPropVal(wxT("path"), NON);
-    if(!m_sPath.IsEmpty() && m_sPath != wxString(NON))
-        CPLSetConfigOption("wxGxSpatialReferencesFolder", wgWX2MB(m_sPath));
+    if(m_sPath.IsEmpty() || m_sPath == wxString(NON))
+    {
+        ///vsizip/c:/wxGIS/sys/cs.zip/cs
+        wxStandardPaths stp;
+        wxString sExeDirPath = wxPathOnly(stp.GetExecutablePath());
+        m_sPath = wxT("/vsizip/") + sExeDirPath + wxT("/sys/cs.zip/cs");
+        m_sPath.Replace(wxT("\\"), wxT("/"));
+        wxLogMessage(_("wxGxSpatialReferencesFolder: The path set to '%s'"), m_sPath.c_str());
+    }
+    CPLSetConfigOption("wxGxSpatialReferencesFolder", wgWX2MB(m_sPath));
 
 }
 

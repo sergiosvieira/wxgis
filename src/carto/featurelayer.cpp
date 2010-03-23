@@ -277,7 +277,9 @@ void wxGISFeatureLayer::LoadFeatures(void)
     wxCriticalSection CritSect;
     size_t nCounter(0);
 
+#ifdef __WXDEBUG__
     wxStopWatch sw;
+#endif
 
     for(int i = 0; i < CPUCount; i++)
     {        
@@ -292,7 +294,9 @@ void wxGISFeatureLayer::LoadFeatures(void)
         wgDELETE(threadarray[i], Wait());
     }
 
-    wxLogMessage(wxT("The long running function took %ldms to execute"), sw.Time());
+#ifdef __WXDEBUG__
+    wxLogDebug(wxT("The long running function took %ldms to execute"), sw.Time());
+#endif
 
               
     OCTDestroyCoordinateTransformation(poCT);

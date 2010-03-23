@@ -57,6 +57,7 @@ protected:
 	wxString m_sPath;
 	wxArrayString m_FileNames;
 	bool m_bIsChildrenLoaded;
+    wxXmlNode* m_pConfigNode;
 };
 
 /////////////////////////////////////////////////////////////////////////
