@@ -82,7 +82,7 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
     //path: wxGISCatalog\Frame\Views
     for(size_t i = 0; i < m_confignodes_arr.size(); i++)
 	{
-        if(m_confignodes_arr[i].sXmlPath == sPath && m_confignodes_arr[i].Key == Key)
+        if(m_confignodes_arr[i].sXmlPath == sPath.Lower() && m_confignodes_arr[i].Key == Key)
 		{
             return m_confignodes_arr[i].pXmlNode;
 		}
@@ -144,8 +144,8 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 		{
 			if(Key == enumGISHKLM)
 			{
-				wxString sPath = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("config") +  wxFileName::GetPathSeparator() + sRootNodeName + wxT(".xml");
-				pDoc = new wxXmlDocument(sPath);
+				wxString sXMLPath = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("config") +  wxFileName::GetPathSeparator() + sRootNodeName + wxT(".xml");
+				pDoc = new wxXmlDocument(sXMLPath);
 			}
 
 			if(!pDoc)
@@ -168,7 +168,7 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 
     wxXmlNode* pChildNode = pRoot->GetChildren();
 
-    wxStringTokenizer tkz(sPath, wxString(wxT("/")), false );
+    wxStringTokenizer tkz(sPath.Lower(), wxString(wxT("/")), false );
 	wxString token, sChildName;
 	while ( tkz.HasMoreTokens() )
 	{
@@ -191,7 +191,7 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
     }
     if(token == sChildName)
     {
-        WXXMLCONFNODE confnode = {pChildNode, sPath, Key};
+        WXXMLCONFNODE confnode = {pChildNode, sPath.Lower(), Key};
 		m_confignodes_arr.push_back(confnode);
         return pChildNode;
     }

@@ -563,9 +563,13 @@ int wxGxDialog::ShowModalSave()
 
 void wxGxDialog::OnInit()
 {
-    m_pConfig = new wxGISAppConfig(DLG_NAME, CONFIG_DIR);
-
-	long nStyle = wxLC_REPORT | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxBORDER_THEME;
+#ifdef WXGISPORTABLE
+    m_pConfig = new wxGISAppConfig(DLG_NAME, CONFIG_DIR, true);
+#else
+	m_pConfig = new wxGISAppConfig(DLG_NAME, CONFIG_DIR);
+#endif
+    
+    long nStyle = wxLC_REPORT | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxBORDER_THEME;
 	if(!m_bAllowMultiSelect)
 		nStyle |= wxLC_SINGLE_SEL;
    	m_pwxGxContentView = new wxGxDialogContentView(this, LISTCTRLID, wxDefaultPosition, wxDefaultSize, nStyle);

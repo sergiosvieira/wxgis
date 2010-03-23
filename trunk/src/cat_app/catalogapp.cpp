@@ -49,10 +49,10 @@ wxGISCatalogApp::~wxGISCatalogApp(void)
 
 bool wxGISCatalogApp::OnInit()
 {
-#ifdef __WXDEBUG__
-	m_pConfig = new wxGISAppConfig(APP_NAME, CONFIG_DIR);
-#else
+#ifdef WXGISPORTABLE
     m_pConfig = new wxGISAppConfig(APP_NAME, CONFIG_DIR, true);
+#else
+	m_pConfig = new wxGISAppConfig(APP_NAME, CONFIG_DIR);
 #endif
 	//setup loging
 	wxString sLogDir = m_pConfig->GetLogDir();

@@ -151,7 +151,11 @@ void wxGxCatalog::Init(void)
 	if(m_bIsChildrenLoaded)
 		return;
 
+#ifdef WXGISPORTABLE
+	m_pConf = new wxGISConfig(wxString(wxT("wxCatalog")), CONFIG_DIR, true);
+#else
 	m_pConf = new wxGISConfig(wxString(wxT("wxCatalog")), CONFIG_DIR);
+#endif
 
 	wxXmlNode* pConfXmlNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog")));
 	if(!pConfXmlNode)
@@ -377,9 +381,10 @@ void wxGxCatalog::SerializeDiscConnections(wxXmlNode* pNode, bool bStore)
 	}
 	else
 	{
-		bool bScanOnce = wxAtoi(pNode->GetPropVal(wxT("scan_once"), wxT("0")));
-		if(!bScanOnce)
+		short bScanOnce = wxAtoi(pNode->GetPropVal(wxT("scan_once"), wxT("0")));
+		if(bScanOnce == 0)
 		{
+            wxLogMessage(_("wxGxCatalog: Procceed scan disc connections"));
             wxArrayString arr;
 #ifdef WIN32
 			arr = wxFSVolumeBase::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE | wxFS_VOL_REMOTE);
@@ -397,7 +402,10 @@ void wxGxCatalog::SerializeDiscConnections(wxXmlNode* pNode, bool bStore)
 				wxGxDiscConnection* pwxGxDiscConnection = new wxGxDiscConnection(arr[i], arr[i], m_bShowHidden);
 				IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
 				if(AddChild(pGxObject))
+                {
 					m_DiscConnections[arr[i]] = pGxObject;
+                    wxLogMessage(_("wxGxCatalog: Add new disc connection [%s]"), pGxObject->GetName().c_str());
+                }
 			}
 		}
 		else
@@ -414,7 +422,10 @@ void wxGxCatalog::SerializeDiscConnections(wxXmlNode* pNode, bool bStore)
 					wxGxDiscConnection* pwxGxDiscConnection = new wxGxDiscConnection(sPath, sName, m_bShowHidden);
 					IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
 					if(AddChild(pGxObject))
+                    {
 						m_DiscConnections[sPath] = pGxObject;
+                        wxLogMessage(_("wxGxCatalog: Add disc connection [%s]"), sName.c_str());
+                    }
 				}
 				pDiscConn = pDiscConn->GetNext();
 			}
