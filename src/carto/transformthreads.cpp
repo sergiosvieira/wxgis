@@ -26,7 +26,7 @@
 
 
 
-wxGISFeatureTransformThread::wxGISFeatureTransformThread(wxGISFeatureDataset* pwxGISFeatureDataset, OGRCoordinateTransformation *poCT, bool bTransform, OGRPolygon* pRgn1, OGRPolygon* pRgn2, wxCriticalSection* pCritSect, OGREnvelope* pFullEnv, wxGISFeatureSet* pOGRFeatureArray, size_t &nCounter, wxGISProgressor* pProgressor, ITrackCancel* pTrackCancel) : wxThread(wxTHREAD_JOINABLE), m_nCounter(nCounter)
+wxGISFeatureTransformThread::wxGISFeatureTransformThread(wxGISFeatureDataset* pwxGISFeatureDataset, OGRCoordinateTransformation *poCT, bool bTransform, OGRPolygon* pRgn1, OGRPolygon* pRgn2, wxCriticalSection* pCritSect, OGREnvelope* pFullEnv, wxGISGeometrySet* pOGRGeometrySet, size_t &nCounter, wxGISProgressor* pProgressor, ITrackCancel* pTrackCancel) : wxThread(wxTHREAD_JOINABLE), m_nCounter(nCounter)
 {
     m_pwxGISFeatureDataset = pwxGISFeatureDataset;
     m_poCT = poCT;
@@ -36,7 +36,7 @@ wxGISFeatureTransformThread::wxGISFeatureTransformThread(wxGISFeatureDataset* pw
     m_pRgn2 = pRgn2;
     m_pCritSect = pCritSect;
     m_pFullEnv = pFullEnv;
-    m_pOGRFeatureArray = pOGRFeatureArray;
+    m_pOGRGeometrySet = pOGRGeometrySet;
     m_pProgressor = pProgressor;
 //??
     if(m_poCT && m_poCT->GetSourceCS()->IsGeographic())
@@ -56,7 +56,9 @@ void *wxGISFeatureTransformThread::Entry()
         if(m_pTrackCancel && !m_pTrackCancel->Continue())
             return NULL;
 
-        OGRGeometry* pFeatureGeom = poFeature->GetGeometryRef();
+        OGRGeometry* pFeatureGeom = poFeature->GetGeometryRef()->clone();
+        long nOID = poFeature->GetFID();
+        OGRFeature::DestroyFeature(poFeature);
 
         if(m_bTransform)
         {
@@ -64,7 +66,7 @@ void *wxGISFeatureTransformThread::Entry()
             {
                 if(pFeatureGeom->transform( m_poCT ) != OGRERR_NONE)
                 {
-                    OGRFeature::DestroyFeature(poFeature);
+                    wxDELETE(pFeatureGeom);
                     continue;
                 }
             }
@@ -87,10 +89,10 @@ void *wxGISFeatureTransformThread::Entry()
                 OGRGeometry* pGeom = CheckRgnAndTransform1(pFeatureGeom, m_pRgn1, m_pRgn2, pRgnEnv1, pRgnEnv2, m_poCT);
                 wxDELETE(pRgnEnv1);
                 wxDELETE(pRgnEnv2);
+                wxDELETE(pFeatureGeom);
 
                 if(pGeom)
-                    poFeature->SetGeometryDirectly(pGeom);
-
+                    pFeatureGeom = pGeom;
                 //OGRGeometry* pGeom1 = CheckRgnAndTransform(pFeatureGeom, m_pRgn1, pRgnEnv1, m_poCT);
                 //OGRGeometry* pGeom2 = CheckRgnAndTransform(pFeatureGeom, m_pRgn2, pRgnEnv2, m_poCT);
                 //OGRGeometry *pGeom(NULL), *pGeom1(NULL), *pGeom2(NULL);
@@ -120,19 +122,16 @@ void *wxGISFeatureTransformThread::Entry()
                 //    poFeature->SetGeometryDirectly(pGeometryCollection); 
                 //}
                 else
-                {
-                    OGRFeature::DestroyFeature(poFeature);
                     continue;
-                }
             }
         }
 
         OGREnvelope Env;
-        poFeature->GetGeometryRef()->getEnvelope(&Env);
+        pFeatureGeom->getEnvelope(&Env);
         m_pCritSect->Enter();
 
         m_pFullEnv->Merge(Env);
-	    m_pOGRFeatureArray->AddFeature(poFeature);
+	    m_pOGRGeometrySet->AddGeometry(pFeatureGeom, nOID);
 
         m_nCounter++;
         if(m_pProgressor && m_nCounter % nStep == 0)

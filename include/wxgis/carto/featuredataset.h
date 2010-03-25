@@ -33,7 +33,7 @@ class WXDLLIMPEXP_GIS_CRT wxGISFeatureDataset :
 	public wxGISDataset
 {
 public:
-	wxGISFeatureDataset(wxString sPath, wxFontEncoding Encoding = wxFONTENCODING_DEFAULT);
+	wxGISFeatureDataset(wxString sPath, wxMBConv* pPathEncoding = wxConvCurrent, wxFontEncoding Encoding = wxFONTENCODING_DEFAULT);
 	virtual ~wxGISFeatureDataset(void);
 //wxGISDataset
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};

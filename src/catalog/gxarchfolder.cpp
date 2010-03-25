@@ -31,10 +31,12 @@
 wxGxArchive::wxGxArchive(wxString Path, wxString Name, bool bShowHidden, wxString sType) : wxGxFolder(Path, Name, bShowHidden)
 {
     m_sType = sType;
+    m_pMBConv = new wxCSConv(wxT("cp-866"));
 }
 
 wxGxArchive::~wxGxArchive(void)
 {
+    wxDELETE(m_pMBConv);
 }
 
 wxIcon wxGxArchive::GetLargeImage(void)
@@ -69,12 +71,13 @@ void wxGxArchive::LoadChildren(void)
        	//wxArrayString FileNames;
         for(int i = 0; papszFileList[i] != NULL; i++ )
 		{
-			wxString sFileName = wgMB2WX(papszFileList[i]);
-            //if(i > 0)
-            //    wxLogDebug( wxT("       %s"), sFileName.c_str() );
+            wxString sFileName(papszFileList[i], *m_pMBConv);
+//			wxString sFileName = wgMB2WX(papszFileList[i]);
             VSIStatBufL BufL;
 			wxString sFolderPath = sArchPath + wxT("/") + sFileName;
-            int ret = VSIStatL(wgWX2MB(sFolderPath), &BufL);
+
+            //int ret = VSIStatL(wgWX2MB(sFolderPath), &BufL);
+            int ret = VSIStatL((const char*) sFolderPath.mb_str(*m_pMBConv), &BufL);
             if(ret == 0)
             {
                 //int x = 0;
@@ -99,6 +102,9 @@ void wxGxArchive::LoadChildren(void)
 	{
 		for(size_t i = 0; i < Array.size(); i++)
 		{
+            IGxDataset* pDSet = dynamic_cast<IGxDataset*>(Array[i]);
+            if(pDSet)
+                pDSet->SetPathEncoding(m_pMBConv);
 			bool ret_code = AddChild(Array[i]);
 			if(!ret_code)
 				wxDELETE(Array[i]);
@@ -266,10 +272,12 @@ void wxGxArchive::EditProperties(wxWindow *parent)
 
 wxGxArchiveFolder::wxGxArchiveFolder(wxString Path, wxString Name, bool bShowHidden) : wxGxFolder(Path, Name, bShowHidden)
 {
+    m_pMBConv = new wxCSConv(wxT("cp-866"));
 }
 
 wxGxArchiveFolder::~wxGxArchiveFolder(void)
 {
+    wxDELETE(m_pMBConv);
 }
 
 wxIcon wxGxArchiveFolder::GetLargeImage(void)
@@ -304,12 +312,16 @@ void wxGxArchiveFolder::LoadChildren(void)
        	//wxArrayString FileNames;
         for(int i = 0; papszFileList[i] != NULL; i++ )
 		{
-			wxString sFileName = wgMB2WX(papszFileList[i]);
+            wxString sFileName(papszFileList[i], *m_pMBConv);
+
+
+			//wxString sFileName = wgMB2WX(papszFileList[i]);
             //if(i > 0)
             //    wxLogDebug( wxT("       %s"), sFileName.c_str() );
             VSIStatBufL BufL;
 			wxString sFolderPath = sArchPath + wxT("/") + sFileName;
-            int ret = VSIStatL(wgWX2MB(sFolderPath), &BufL);
+            int ret = VSIStatL((const char*) sFolderPath.mb_str(*m_pMBConv), &BufL);
+            //int ret = VSIStatL(wgWX2MB(sFolderPath), &BufL);
             if(ret == 0)
             {
                 //int x = 0;
@@ -334,6 +346,9 @@ void wxGxArchiveFolder::LoadChildren(void)
 	{
 		for(size_t i = 0; i < Array.size(); i++)
 		{
+            IGxDataset* pDSet = dynamic_cast<IGxDataset*>(Array[i]);
+            if(pDSet)
+                pDSet->SetPathEncoding(m_pMBConv);
 			bool ret_code = AddChild(Array[i]);
 			if(!ret_code)
 				wxDELETE(Array[i]);

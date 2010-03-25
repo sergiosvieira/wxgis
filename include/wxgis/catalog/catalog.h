@@ -387,6 +387,7 @@ public:
 	virtual ~IGxDataset(void){};
 	virtual wxGISDataset* GetDataset(void) = 0;	
 	virtual wxGISEnumDatasetType GetType(void) = 0;
+	virtual void SetPathEncoding(wxMBConv* pPathEncoding) = 0;
 };
 
 class IGxFile

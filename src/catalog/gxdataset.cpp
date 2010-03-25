@@ -44,7 +44,8 @@ wxGxDataset::wxGxDataset(wxString Path, wxString Name, wxGISEnumDatasetType Type
 	m_sPath = Path;
 
 	m_pwxGISDataset = NULL;
-    m_Encoding = wxFONTENCODING_DEFAULT;
+    m_Encoding = wxFONTENCODING_DEFAULT;//wxFONTENCODING_UTF8;//
+    m_pPathEncoding = wxConvCurrent;
 }
 
 wxGxDataset::~wxGxDataset(void)
@@ -108,7 +109,7 @@ wxGISDataset* wxGxDataset::GetDataset(void)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
-		m_pwxGISDataset = new wxGISFeatureDataset(m_sPath, m_Encoding);
+		m_pwxGISDataset = new wxGISFeatureDataset(m_sPath, m_pPathEncoding, m_Encoding);
 		//for storing internal pointer
 		m_pwxGISDataset->Reference();
 	}
@@ -139,6 +140,9 @@ wxGxShapefileDataset::wxGxShapefileDataset(wxString Path, wxString Name, wxGISEn
 	m_sPath = Path;
 
 	m_pwxGISDataset = NULL;
+
+    m_Encoding = wxFONTENCODING_UTF8;
+    m_pPathEncoding = wxConvCurrent;
 }
 
 wxGxShapefileDataset::~wxGxShapefileDataset(void)
@@ -223,7 +227,7 @@ wxGISDataset* wxGxShapefileDataset::GetDataset(void)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
-        wxGISFeatureDataset* pwxGISFeatureDataset = new wxGISFeatureDataset(m_sPath, m_Encoding);
+        wxGISFeatureDataset* pwxGISFeatureDataset = new wxGISFeatureDataset(m_sPath, m_pPathEncoding, m_Encoding);
 
         if(!pwxGISFeatureDataset->Open())
         {
@@ -265,6 +269,7 @@ wxGxRasterDataset::wxGxRasterDataset(wxString Path, wxString Name, wxGISEnumRast
 	m_sPath = Path;
 
 	m_pwxGISDataset = NULL;
+    m_pPathEncoding = wxConvCurrent;
 }
 
 wxGxRasterDataset::~wxGxRasterDataset(void)
@@ -386,7 +391,7 @@ wxGISDataset* wxGxRasterDataset::GetDataset(void)
 {
 	if(m_pwxGISDataset == NULL)
 	{	
-        wxGISRasterDataset* pwxGISRasterDataset = new wxGISRasterDataset(m_sPath);
+        wxGISRasterDataset* pwxGISRasterDataset = new wxGISRasterDataset(m_sPath, m_pPathEncoding);
 
         //open (ask for overviews)
         if(!pwxGISRasterDataset->Open())

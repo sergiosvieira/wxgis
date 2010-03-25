@@ -32,7 +32,7 @@ public:
 	~wxGISSimpleRenderer(void);
 //IFeatureRenderer
 	virtual bool CanRender(wxGISDataset* pDataset);
-	virtual void Draw(wxGISFeatureSet* pSet, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel);
+	virtual void Draw(wxGISGeometrySet* pSet, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel);
 	virtual void DrawGeometry(OGRGeometry *poGeometry, IDisplay* pDisplay);
 protected:
 	ISymbol* m_pFillSymbol;

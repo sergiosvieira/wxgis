@@ -32,7 +32,7 @@ class WXDLLIMPEXP_GIS_CRT wxGISRasterDataset :
 	public wxGISDataset
 {
 public:
-	wxGISRasterDataset(wxString sPath);
+	wxGISRasterDataset(wxString sPath, wxMBConv* pPathEncoding = wxConvCurrent);
 	virtual ~wxGISRasterDataset(void);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
 	virtual bool Open(void);

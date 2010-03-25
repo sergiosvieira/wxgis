@@ -87,7 +87,7 @@ class IFeatureRenderer : public IRenderer
 {
 public:
 	virtual ~IFeatureRenderer(void){};
-	virtual void Draw(wxGISFeatureSet* pSet, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel) = 0;
+	virtual void Draw(wxGISGeometrySet* pSet, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel) = 0;
 };
 
 class IRasterRenderer : public IRenderer

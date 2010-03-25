@@ -45,29 +45,28 @@ bool wxGISSimpleRenderer::CanRender(wxGISDataset* pDataset)
 	return pDataset->GetType() == enumGISFeatureDataset ? true : false;
 }
 
-void wxGISSimpleRenderer::Draw(wxGISFeatureSet* pSet, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel)
+void wxGISSimpleRenderer::Draw(wxGISGeometrySet* pSet, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel)
 {
 	if(pSet == NULL || pSet->IsEmpty())
 		return;
 
-	for(size_t i = 0; i < pSet->GetSize(); i++)
+    pSet->Reset();
+    OGRGeometry *poGeometry;
+    while((poGeometry = pSet->Next()) != NULL)	
     {
-		OGRGeometry *poGeometry = pSet->GetAt(i)->GetGeometryRef();
-        if( poGeometry != NULL)
+		switch(DrawPhase)
 		{
-			switch(DrawPhase)
-			{
-			case wxGISDPGeography:
-				DrawGeometry(poGeometry, pDisplay);
-				break;
-			case wxGISDPAnnotation:
-				break;
-			case wxGISDPSelection:
-				break;
-			default:
-				break;
-			}
+		case wxGISDPGeography:
+			DrawGeometry(poGeometry, pDisplay);
+			break;
+		case wxGISDPAnnotation:
+			break;
+		case wxGISDPSelection:
+			break;
+		default:
+			break;
 		}
+
 		if(pTrackCancel && !pTrackCancel->Continue())
 			break;
 	}
