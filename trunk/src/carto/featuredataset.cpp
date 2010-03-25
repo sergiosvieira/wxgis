@@ -39,7 +39,7 @@ void GetFeatureBoundsFunc(const void* hFeature, CPLRectObj* pBounds)
 	pBounds->maxy = Env.MaxY;
 }
 
-wxGISFeatureDataset::wxGISFeatureDataset(wxString sPath, wxFontEncoding Encoding) : wxGISDataset(sPath), m_poDS(NULL), m_bIsOpened(false), m_psExtent(NULL), m_poLayer(NULL), m_Encoding(Encoding), m_bIsFeaturesLoaded(false), m_pQuadTree(NULL)
+wxGISFeatureDataset::wxGISFeatureDataset(wxString sPath, wxMBConv* pPathEncoding, wxFontEncoding Encoding) : wxGISDataset(sPath, pPathEncoding), m_poDS(NULL), m_bIsOpened(false), m_psExtent(NULL), m_poLayer(NULL), m_Encoding(Encoding), m_bIsFeaturesLoaded(false), m_pQuadTree(NULL)
 {
 }
 
@@ -82,7 +82,7 @@ bool wxGISFeatureDataset::Delete(int iLayer)
         m_poDS = NULL;
     }
 	if( m_poDS == NULL )
-       m_poDS = OGRSFDriverRegistrar::Open( wgWX2MB(m_sPath.c_str()), TRUE );
+       m_poDS = OGRSFDriverRegistrar::Open( (const char*) m_sPath.mb_str(*m_pPathEncoding), TRUE );
 	if( m_poDS == NULL )
 		return false;
     OGRErr err = m_poDS->DeleteLayer(iLayer);
@@ -98,7 +98,7 @@ bool wxGISFeatureDataset::Open(int iLayer)
 
 	wxCriticalSectionLocker locker(m_CritSect);
 
-    m_poDS = OGRSFDriverRegistrar::Open( wgWX2MB(m_sPath.c_str()), FALSE );
+    m_poDS = OGRSFDriverRegistrar::Open( (const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/, FALSE );
 	if( m_poDS == NULL )
 	{
 		const char* err = CPLGetLastErrorMsg();
@@ -281,6 +281,8 @@ wxString wxGISFeatureDataset::GetAsString(long row, int col)
             {                
                 wxCSConv conv(m_Encoding);
                 sOut = conv.cMB2WX(pFeature->GetFieldAsString(col));
+                if(sOut.IsEmpty())
+                    sOut = wgMB2WX(pFeature->GetFieldAsString(col));
             }
 		}
         OGRFeature::DestroyFeature(pFeature);

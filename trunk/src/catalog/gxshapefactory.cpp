@@ -202,7 +202,7 @@ wxFontEncoding wxGxShapeFactory::GetEncoding(wxString sPath)
         }
         return wxFONTENCODING_SYSTEM;
     }
-    return wxFONTENCODING_SYSTEM;
+    return wxFONTENCODING_UTF8;
 }
  
 void wxGxShapeFactory::Serialize(wxXmlNode* pConfig, bool bStore)

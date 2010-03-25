@@ -60,17 +60,18 @@ class wxGISDataset :
 	public IPointer
 {
 public:	
-	wxGISDataset(wxString sPath) : IPointer()
+	wxGISDataset(wxString sPath, wxMBConv* pPathEncoding = wxConvCurrent) : IPointer(), m_pPathEncoding(pPathEncoding)
     {
         m_sPath = sPath;
         m_sPath.Replace(wxT("\\"), wxT("/"));
     };
-	virtual ~wxGISDataset(void){};
+	virtual ~wxGISDataset(void){ };
 	virtual wxGISEnumDatasetType GetType(void) = 0;
 	virtual wxString GetPath(void){return m_sPath;};
 protected:
 	wxString m_sPath;
     wxCriticalSection m_CritSect;
+    wxMBConv* m_pPathEncoding;
 };
 
 class wxGISFeatureSet
@@ -101,6 +102,61 @@ public:
     virtual void Clear(void){m_OGRFeatureArray.clear();};
 protected:
 	std::vector<OGRFeature*> m_OGRFeatureArray;
+};
+
+class wxGISGeometrySet
+{
+public:
+	wxGISGeometrySet(wxGISDataset* pDataset = NULL, bool bOwnGeometry = false)
+	{ 
+        m_pDataset = pDataset;
+        if(m_pDataset)
+            m_pDataset->Reference();
+        SetOwnGeometry(bOwnGeometry);
+	}
+	virtual ~wxGISGeometrySet(void)
+    {
+        if(m_pDataset)
+            m_pDataset->Dereference();
+        if(m_bOwnGeometry)
+            Clear();
+    }
+	virtual void AddGeometry(OGRGeometry* poGeometry, long nOID){m_OGRGeometryMap[poGeometry] = nOID;};
+	virtual size_t GetSize(void){return m_OGRGeometryMap.size();};
+	virtual bool IsEmpty(void){return m_OGRGeometryMap.empty();};
+    virtual void Clear(void)
+    {
+        Reset();
+        OGRGeometry* pOutGeom;
+        while((pOutGeom = Next()) != NULL)
+            wxDELETE(pOutGeom);
+        m_OGRGeometryMap.clear();
+    };
+    virtual void Reset(void){m_Iterator = m_OGRGeometryMap.begin();};
+    virtual OGRGeometry* Next(void)
+    {
+        if(m_Iterator == m_OGRGeometryMap.end())
+            return NULL;
+        OGRGeometry* pOutGeom = m_Iterator->first;
+        ++m_Iterator;
+        return pOutGeom;
+    };
+    virtual void SetDataset(wxGISDataset* pDataset)
+    {
+        if(!pDataset)
+            return;
+        if(m_pDataset)
+            m_pDataset->Dereference();
+        m_pDataset = pDataset;
+        m_pDataset->Reference();
+    };
+    virtual long operator[](OGRGeometry* pGeom){return m_OGRGeometryMap[pGeom];};
+    virtual void SetOwnGeometry(bool bOwnGeometry){m_bOwnGeometry = bOwnGeometry;};
+protected:
+	std::map<OGRGeometry*, long> m_OGRGeometryMap;	
+    std::map<OGRGeometry*, long>::const_iterator m_Iterator;
+    wxGISDataset* m_pDataset;
+    bool m_bOwnGeometry;
 };
 
 class IQueryFilter

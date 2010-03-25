@@ -66,6 +66,9 @@
 				AdditionalLibraryDirectories="&quot;$(PROJ)\wxGIS\lib&quot;;&quot;$(GEOS)\lib&quot;;..\..\lib;&quot;$(GDAL)\wxGIS\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				HeapReserveSize="0"
+				StackReserveSize="0"
+				LargeAddressAware="0"
 				TargetMachine="1"
 			/>
 			<Tool

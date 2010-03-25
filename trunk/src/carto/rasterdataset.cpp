@@ -23,7 +23,7 @@
 
 #include "gdal_rat.h"
 
-wxGISRasterDataset::wxGISRasterDataset(wxString sPath) : wxGISDataset(sPath), m_bIsOpened(false), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false), m_poMainDataset(NULL), m_poDataset(NULL)
+wxGISRasterDataset::wxGISRasterDataset(wxString sPath, wxMBConv* pPathEncoding) : wxGISDataset(sPath, pPathEncoding), m_bIsOpened(false), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false), m_poMainDataset(NULL), m_poDataset(NULL)
 {
 }
 
@@ -65,7 +65,7 @@ bool wxGISRasterDataset::Delete(void)
     }
     else
     {
-       m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath.c_str()), GA_ReadOnly );
+       m_poDataset = (GDALDataset *) GDALOpen( (const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/, GA_ReadOnly );
        if( m_poDataset == NULL )
            return false;
        pDrv = m_poDataset->GetDriver();
@@ -73,7 +73,7 @@ bool wxGISRasterDataset::Delete(void)
    }
     if(pDrv)
     {        
-        CPLErr eErr = pDrv->Delete(wgWX2MB(m_sPath.c_str()));
+        CPLErr eErr = pDrv->Delete((const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/);
         if(eErr != CE_Fatal)
             return true;
     }
@@ -88,12 +88,12 @@ bool wxGISRasterDataset::Open(void)
 	wxCriticalSectionLocker locker(m_CritSect);
 
 
-    m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath.c_str()), GA_ReadOnly );
+    m_poDataset = (GDALDataset *) GDALOpen( (const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/, GA_ReadOnly );
     //bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
 	if( m_poDataset == NULL )
     {
         m_sPath.Replace(wxT("\\"), wxT("/"));
-        m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath.c_str()), GA_ReadOnly );//GA_Update
+        m_poDataset = (GDALDataset *) GDALOpen( (const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/, GA_ReadOnly );//GA_Update
     }
     
     //m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath.c_str()), GA_ReadOnly );

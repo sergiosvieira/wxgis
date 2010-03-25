@@ -27,6 +27,19 @@
 
 #define STEP 3.0
 
+void GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds)
+{
+	OGRGeometry* pGeometry = (OGRGeometry*)hFeature;
+	if(!pGeometry)
+		return;
+	OGREnvelope Env;
+	pGeometry->getEnvelope(&Env);
+	pBounds->minx = Env.MinX;
+	pBounds->maxx = Env.MaxX;
+	pBounds->miny = Env.MinY;
+	pBounds->maxy = Env.MaxY;
+}
+
 wxGISFeatureLayer::wxGISFeatureLayer(wxGISDataset* pwxGISDataset) : wxGISLayer(), m_pwxGISFeatureDataset(NULL), m_pFeatureRenderer(NULL), m_pQuadTree(NULL), m_pSpatialReference(NULL), m_bIsFeaturesLoaded(false)
 {
 	m_pwxGISFeatureDataset = dynamic_cast<wxGISFeatureDataset*>(pwxGISDataset);
@@ -38,6 +51,8 @@ wxGISFeatureLayer::wxGISFeatureLayer(wxGISDataset* pwxGISDataset) : wxGISLayer()
 		//pre load features
 //        LoadFeatures();
 		SetSpatialReference(m_pwxGISFeatureDataset->GetSpatialReference());
+        m_OGRGeometrySet.SetDataset(m_pwxGISFeatureDataset);
+        m_OGRGeometrySet.SetOwnGeometry(true);
 	}
 }
 
@@ -98,19 +113,19 @@ void wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisp
 
 			    int count(0);
 			    CPLRectObj Rect = {Env.MinX, Env.MinY, Env.MaxX, Env.MaxY};
-			    OGRFeature** pFeatureArr = (OGRFeature**)CPLQuadTreeSearch(m_pQuadTree, &Rect, &count);
-		        wxGISFeatureSet GISFeatureSet(count);
+			    OGRGeometry** pGeometryArr = (OGRGeometry**)CPLQuadTreeSearch(m_pQuadTree, &Rect, &count);
+		        wxGISGeometrySet GISGeometrySet(m_pwxGISFeatureDataset);
 			    for(size_t i = 0; i < count; i++)
 			    {
 				    if(pTrackCancel && !pTrackCancel->Continue())
 					    break;
-				    GISFeatureSet.AddFeature(pFeatureArr[i]);
+                    GISGeometrySet.AddGeometry(pGeometryArr[i], m_OGRGeometrySet[pGeometryArr[i]]);
 			    }
-			    wxDELETEA( pFeatureArr );
-		        m_pFeatureRenderer->Draw(&GISFeatureSet, DrawPhase, pDisplay, pTrackCancel);
+			    wxDELETEA( pGeometryArr );
+		        m_pFeatureRenderer->Draw(&GISGeometrySet, DrawPhase, pDisplay, pTrackCancel);
 		    }
 		    else
-                m_pFeatureRenderer->Draw(&m_OGRFeatureArray, DrawPhase, pDisplay, pTrackCancel);
+                m_pFeatureRenderer->Draw(&m_OGRGeometrySet, DrawPhase, pDisplay, pTrackCancel);
 		    //4. send it to renderer
 		    m_PreviousDisplayEnv = Env;
 	    }
@@ -136,16 +151,14 @@ bool wxGISFeatureLayer::IsValid(void)
 
 void wxGISFeatureLayer::Empty(void)
 {
-	for(size_t i = 0; i < m_OGRFeatureArray.GetSize(); i++)
-		OGRFeature::DestroyFeature( m_OGRFeatureArray[i] );
-	m_OGRFeatureArray.Clear();
+	m_OGRGeometrySet.Clear();
 }
 
 void wxGISFeatureLayer::CreateQuadTree(OGREnvelope* pEnv)
 {
     DeleteQuadTree();
     CPLRectObj Rect = {pEnv->MinX, pEnv->MinY, pEnv->MaxX, pEnv->MaxY};
-    m_pQuadTree = CPLQuadTreeCreate(&Rect, GetFeatureBoundsFunc);
+    m_pQuadTree = CPLQuadTreeCreate(&Rect, GetGeometryBoundsFunc);
 }
 
 void wxGISFeatureLayer::DeleteQuadTree(void)
@@ -283,7 +296,7 @@ void wxGISFeatureLayer::LoadFeatures(void)
 
     for(int i = 0; i < CPUCount; i++)
     {        
-        wxGISFeatureTransformThread *thread = new wxGISFeatureTransformThread(m_pwxGISFeatureDataset, poCT, bTransform, pRgn1, pRgn2, &CritSect, &m_FullEnv, &m_OGRFeatureArray, nCounter, pProgressor, NULL);
+        wxGISFeatureTransformThread *thread = new wxGISFeatureTransformThread(m_pwxGISFeatureDataset, poCT, bTransform, pRgn1, pRgn2, &CritSect, &m_FullEnv, &m_OGRGeometrySet, nCounter, pProgressor, NULL);
         thread->Create();
         thread->Run();
         threadarray.push_back(thread);
@@ -298,30 +311,37 @@ void wxGISFeatureLayer::LoadFeatures(void)
     wxLogDebug(wxT("The long running function took %ldms to execute"), sw.Time());
 #endif
 
-              
     OCTDestroyCoordinateTransformation(poCT);
     wxDELETE(pRgn1);
     wxDELETE(pRgn2);
-
+             
     CreateQuadTree(&m_FullEnv);
 
     size_t nStep = m_pwxGISFeatureDataset->GetSize() < 20 ? 1 : m_pwxGISFeatureDataset->GetSize() / 20;
 
-    for(size_t i = 0; i < m_OGRFeatureArray.GetSize(); i++)
+    m_OGRGeometrySet.Reset();
+    OGRGeometry* pOutGeom;
+
+    //int nCounter1 = 0;
+    while((pOutGeom = m_OGRGeometrySet.Next()) != NULL)
     {
+        //if(nCounter1 == 90000)
+        //    break;
+        //nCounter1++;
+
 	    if(m_pQuadTree)
-		    CPLQuadTreeInsert(m_pQuadTree, m_OGRFeatureArray[i]);
+		    CPLQuadTreeInsert(m_pQuadTree, pOutGeom);
 
         nCounter++;
         if(pProgressor && nCounter % nStep == 0)
             pProgressor->SetValue(nCounter);
+
     }
 
     if(pProgressor)
         pProgressor->Show(false);
     pStatusBar->SetMessage(_("Done"));
     m_bIsFeaturesLoaded = true;
-
 }
 
 void wxGISFeatureLayer::UnloadFeatures(void)
