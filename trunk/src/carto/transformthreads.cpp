@@ -241,11 +241,14 @@ OGRGeometry* wxGISFeatureTransformThread::Intersection(OGRGeometry* pFeatureGeom
     case wkbLineString:
         if(pRgnEnv && pRgnEnv->Contains(FeatureEnv) )
             return pFeatureGeom->clone();
+#ifdef FAST_BISHOP_INTERSECTION
         {
             wxGISAlgorithm alg;
             return alg.FastLineIntersection(pFeatureGeom, pRgn);
         }
-        //return pFeatureGeom->Intersection(pRgn);
+#else
+        return pFeatureGeom->Intersection(pRgn);
+#endif
     case wkbPolygon:
         if(pRgnEnv && pRgnEnv->Contains(FeatureEnv) )
             return pFeatureGeom->clone();

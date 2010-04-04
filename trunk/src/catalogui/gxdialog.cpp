@@ -612,7 +612,9 @@ void wxGxDialog::OnInit()
 
 void wxGxDialog::OnItemSelected(wxListEvent& event)
 {
-	m_sName.Empty();
+	event.Skip();
+
+    m_sName.Empty();
 	long item = -1;
 	while(1)
     {
