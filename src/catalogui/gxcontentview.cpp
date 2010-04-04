@@ -200,7 +200,7 @@ void wxGxContentView::OnContextMenu(wxContextMenuEvent& event)
 
 void wxGxContentView::OnSelected(wxListEvent& event)
 {
-	//event.Skip();
+	event.Skip();
 	//LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
 	//if(pItemData == NULL)
 	//	return;
