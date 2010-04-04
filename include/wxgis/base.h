@@ -31,6 +31,18 @@
     #include "wx/wx.h"
 #endif
 
+
+#ifdef WXMAKINGDLL_GIS_CORE
+#    define WXDLLIMPEXP_GIS_CORE WXEXPORT
+#    define WXDLLIMPEXP_DATA_GIS_CORE(type) WXEXPORT type
+#elif defined(WXUSINGDLL)
+#    define WXDLLIMPEXP_GIS_CORE WXIMPORT
+#    define WXDLLIMPEXP_DATA_GIS_CORE(type) WXIMPORT type
+#else /* not making nor using DLL */
+#    define WXDLLIMPEXP_GIS_CORE
+#    define WXDLLIMPEXP_DATA_GIS_CORE(type) type
+#endif
+
 #ifdef WXMAKINGDLL_GIS_FRW
 #    define WXDLLIMPEXP_GIS_FRW WXEXPORT
 #    define WXDLLIMPEXP_DATA_GIS_FRW(type) WXEXPORT type

@@ -22,7 +22,7 @@
 #pragma once
 
 #include "wxgis/base.h"
-#include "wxgis/framework/config.h"
+#include "wxgis/core/config.h"
 
 #include <wx/dir.h>
 #include <wx/filename.h>

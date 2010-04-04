@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib cpld.lib ogrd.lib gdald.lib wxGISCatalogd.lib wxGISFrameworkd.lib wxGISCartod.lib"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib cpld.lib ogrd.lib gdald.lib wxGISCatalogd.lib wxGISFrameworkd.lib wxGISCored.lib wxGISCartod.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(GDAL)\wxGIS\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib"
@@ -138,7 +138,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28u.lib wxbase28u_net.lib wxmsw28u_core.lib wxbase28u_xml.lib wxmsw28u_aui.lib wxmsw28u_adv.lib wxzlib.lib wxregexu.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib cpl.lib ogr.lib gdal.lib wxGISCatalog.lib wxGISFramework.lib wxGISCarto.lib"
+				AdditionalDependencies="wxbase28u.lib wxbase28u_net.lib wxmsw28u_core.lib wxbase28u_xml.lib wxmsw28u_aui.lib wxmsw28u_adv.lib wxzlib.lib wxregexu.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib cpl.lib ogr.lib gdal.lib wxGISCatalog.lib wxGISCore.lib wxGISFramework.lib wxGISCarto.lib"
 				LinkIncremental="0"
 				AdditionalLibraryDirectories="&quot;$(GDAL)\wxGIS\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib"
 				GenerateDebugInformation="false"

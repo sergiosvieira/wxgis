@@ -23,7 +23,7 @@
 #include "wxgis/carto/carto.h"
 #include "wxgis/carto/featuredataset.h"
 
-void GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
+//void GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
 
 
 class WXDLLIMPEXP_GIS_CRT wxGISFeatureLayer :
@@ -44,9 +44,8 @@ public:
 protected:
     virtual void CreateQuadTree(OGREnvelope* pEnv);
     virtual void DeleteQuadTree(void);
-    virtual void LoadFeatures(void);
-    virtual void UnloadFeatures(void);
-    virtual void Empty(void);
+    virtual void LoadGeometry(void);
+    virtual void UnloadGeometry(void);
 protected:
 	wxGISFeatureDataset* m_pwxGISFeatureDataset;
 	IFeatureRenderer* m_pFeatureRenderer;
@@ -55,7 +54,7 @@ protected:
     OGRSpatialReference* m_pSpatialReference;
 
 //	wxGISFeatureSet m_OGRFeatureArray;
-    wxGISGeometrySet m_OGRGeometrySet;
+    wxGISGeometrySet *m_pOGRGeometrySet;
 	CPLQuadTree* m_pQuadTree;
-    bool m_bIsFeaturesLoaded;
+    bool m_bIsGeometryLoaded;
 };

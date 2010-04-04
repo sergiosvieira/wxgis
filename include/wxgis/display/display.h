@@ -72,6 +72,8 @@ class IDisplay
 public:
 	virtual ~IDisplay(void){};
 	virtual void OnDraw(wxDC &dc, wxCoord x = 0, wxCoord y = 0, bool bClearBackground = false) = 0;
+    virtual void OnUpdate(void) = 0;
+    virtual void SetDC(wxDC *pdc) = 0;
 	virtual bool IsDerty(void) = 0;
 	virtual void SetDerty(bool bIsDerty) = 0;
 	virtual void SetBrush(wxBrush& Brush) = 0;

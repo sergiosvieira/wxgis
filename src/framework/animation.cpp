@@ -139,4 +139,5 @@ void wxGISAnimation::OnEraseBackground(wxEraseEvent & event)
 void wxGISAnimation::OnTimer( wxTimerEvent& event )
 {
 	Refresh();
+    ::wxSafeYield(NULL, true);
 }

@@ -104,7 +104,8 @@ protected:
 	std::vector<OGRFeature*> m_OGRFeatureArray;
 };
 
-class wxGISGeometrySet
+class wxGISGeometrySet :
+	public IPointer
 {
 public:
 	wxGISGeometrySet(wxGISDataset* pDataset = NULL, bool bOwnGeometry = false)
@@ -113,13 +114,13 @@ public:
         if(m_pDataset)
             m_pDataset->Reference();
         SetOwnGeometry(bOwnGeometry);
+        m_Iterator = m_OGRGeometryMap.begin();
 	}
 	virtual ~wxGISGeometrySet(void)
     {
         if(m_pDataset)
             m_pDataset->Dereference();
-        if(m_bOwnGeometry)
-            Clear();
+        Clear();
     }
 	virtual void AddGeometry(OGRGeometry* poGeometry, long nOID){m_OGRGeometryMap[poGeometry] = nOID;};
 	virtual size_t GetSize(void){return m_OGRGeometryMap.size();};
@@ -127,14 +128,19 @@ public:
     virtual void Clear(void)
     {
         Reset();
-        OGRGeometry* pOutGeom;
-        while((pOutGeom = Next()) != NULL)
-            wxDELETE(pOutGeom);
+        if(m_bOwnGeometry)
+        {
+            OGRGeometry* pOutGeom;
+            while((pOutGeom = Next()) != NULL)
+                wxDELETE(pOutGeom);
+        }
         m_OGRGeometryMap.clear();
     };
     virtual void Reset(void){m_Iterator = m_OGRGeometryMap.begin();};
     virtual OGRGeometry* Next(void)
     {
+        if(GetSize() == 0)
+            return NULL;
         if(m_Iterator == m_OGRGeometryMap.end())
             return NULL;
         OGRGeometry* pOutGeom = m_Iterator->first;

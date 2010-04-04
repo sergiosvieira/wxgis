@@ -22,7 +22,7 @@
 #pragma once
 #include "wxgis/framework/framework.h"
 #include <wx/accel.h>
-#include "wxgis/framework/config.h"
+#include "wxgis/core/config.h"
 
 class WXDLLIMPEXP_GIS_FRW wxGISAcceleratorTable
 {

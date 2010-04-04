@@ -20,12 +20,9 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/framework/framework.h"
+#include "wxgis/core/core.h"
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
-
-//#define CONFIG_DIR wxT("wxGIS") 
-//#define CONFIG_DIR_PORTABLE wxT("config") 
 
 #define HKCU_CONFIG_NAME wxT("hkcu_config.xml")
 #define HKLM_CONFIG_NAME wxT("hklm_config.xml")
@@ -34,7 +31,7 @@
 // wxGISConfig
 //---------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_FRW wxGISConfig : 
+class WXDLLIMPEXP_GIS_CORE wxGISConfig : 
 	public IGISConfig
 {
 public:
@@ -73,7 +70,7 @@ protected:
 // wxGISAppConfig
 //---------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_FRW wxGISAppConfig : 
+class WXDLLIMPEXP_GIS_CORE wxGISAppConfig : 
 	public wxGISConfig
 {
 public:
@@ -91,3 +88,4 @@ public:
 	virtual void SetLogDir(wxString sLogDir);
     virtual void SetDebugMode(bool bDebug);
 };
+

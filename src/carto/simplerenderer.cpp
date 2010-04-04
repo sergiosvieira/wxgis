@@ -47,17 +47,18 @@ bool wxGISSimpleRenderer::CanRender(wxGISDataset* pDataset)
 
 void wxGISSimpleRenderer::Draw(wxGISGeometrySet* pSet, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel)
 {
-	if(pSet == NULL || pSet->IsEmpty())
+	if(pSet == NULL)
 		return;
 
+    OGRGeometry *poGeom;
+    int nCounter = 0;
     pSet->Reset();
-    OGRGeometry *poGeometry;
-    while((poGeometry = pSet->Next()) != NULL)	
+    while((poGeom = pSet->Next()) != NULL)	
     {
 		switch(DrawPhase)
 		{
 		case wxGISDPGeography:
-			DrawGeometry(poGeometry, pDisplay);
+			DrawGeometry(poGeom, pDisplay);
 			break;
 		case wxGISDPAnnotation:
 			break;
@@ -67,6 +68,13 @@ void wxGISSimpleRenderer::Draw(wxGISGeometrySet* pSet, wxGISEnumDrawPhase DrawPh
 			break;
 		}
 
+        if(nCounter > 20000)
+        {
+            pDisplay->OnUpdate();
+            nCounter = 0;
+        }
+        nCounter++;
+
 		if(pTrackCancel && !pTrackCancel->Continue())
 			break;
 	}
@@ -74,6 +82,8 @@ void wxGISSimpleRenderer::Draw(wxGISGeometrySet* pSet, wxGISEnumDrawPhase DrawPh
 
 void wxGISSimpleRenderer::DrawGeometry(OGRGeometry *poGeometry, IDisplay* pDisplay)
 {
+    if(!poGeometry)
+        return;
 	IDisplayTransformation* pDisplayTransformation = pDisplay->GetDisplayTransformation();
 	OGRwkbGeometryType type = wkbFlatten(poGeometry->getGeometryType());
 	switch(type)

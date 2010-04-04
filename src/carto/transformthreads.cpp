@@ -48,7 +48,7 @@ wxGISFeatureTransformThread::wxGISFeatureTransformThread(wxGISFeatureDataset* pw
 void *wxGISFeatureTransformThread::Entry()
 {
     
-    size_t nStep = m_pwxGISFeatureDataset->GetSize() < 20 ? 1 : m_pwxGISFeatureDataset->GetSize() / 20;
+    size_t nStep = m_pwxGISFeatureDataset->GetSize() < 10 ? 1 : m_pwxGISFeatureDataset->GetSize() / 10;
 
  	OGRFeature* poFeature;
     while((poFeature = m_pwxGISFeatureDataset->Next()) != NULL)	
@@ -56,7 +56,13 @@ void *wxGISFeatureTransformThread::Entry()
         if(m_pTrackCancel && !m_pTrackCancel->Continue())
             return NULL;
 
-        OGRGeometry* pFeatureGeom = poFeature->GetGeometryRef()->clone();
+        OGRGeometry* pGeom = poFeature->StealGeometry();//GetGeometryRef();
+        if(!pGeom)
+        {
+            OGRFeature::DestroyFeature(poFeature);
+            continue;
+        }
+        OGRGeometry* pFeatureGeom = pGeom;//->clone();
         long nOID = poFeature->GetFID();
         OGRFeature::DestroyFeature(poFeature);
 

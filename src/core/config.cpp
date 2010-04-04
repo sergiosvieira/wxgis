@@ -18,10 +18,9 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#include "wxgis/framework/config.h"
-#include "wxgis/framework/application.h"
-
+#include "wxgis/core/config.h"
 #include <wx/tokenzr.h>
+
 
 //---------------------------------------------------------------
 // wxGISConfig
@@ -44,12 +43,12 @@ wxGISConfig::wxGISConfig(wxString sAppName, wxString sConfigDir, bool bPortable)
     }
     else
     {
-        wxString sExeAppName;
-        IApplication* pApp = ::GetApplication();
-        if(pApp)
-            sExeAppName = pApp->GetAppName();
-        else 
-            sExeAppName = sAppName;
+        wxString sExeAppName = sAppName;
+        //IApplication* pApp = ::GetApplication();
+        //if(pApp)
+        //    sExeAppName = pApp->GetAppName();
+        //else 
+        //    sExeAppName = sAppName;
         m_sUserConfigDir = stp.GetUserConfigDir() + wxFileName::GetPathSeparator() + sConfigDir;
         m_sSysConfigDir = stp.GetConfigDir() + wxFileName::GetPathSeparator() + sConfigDir;
         if(m_sSysConfigDir.Find(sExeAppName) != wxNOT_FOUND)

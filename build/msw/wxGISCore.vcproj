@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="wxGISFramework"
-	ProjectGUID="{7503AD61-A5E6-4EB7-BC1A-DC98BDB258C2}"
-	RootNamespace="wxGISFramework"
+	Name="wxGISCore"
+	ProjectGUID="{D7C200AC-A29B-4894-B222-1C77030545BE}"
+	RootNamespace="wxGISCore"
 	>
 	<Platforms>
 		<Platform
@@ -40,7 +40,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_FRW"
+				PreprocessorDefinitions="WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CORE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -59,10 +59,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxGISCored.lib"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_adv.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib"
+				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				ImportLibrary="..\..\lib\$(TargetName).lib"
@@ -121,7 +121,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;__WXMSW__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_FRW"
+				PreprocessorDefinitions="WIN32;NDEBUG;__WXMSW__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CORE"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -139,10 +139,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wxbase28u.lib wxbase28u_net.lib wxmsw28u_core.lib wxbase28u_xml.lib wxmsw28u_aui.lib wxmsw28u_adv.lib wxzlib.lib wxregexu.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib"
-				LinkIncremental="0"
 				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;"
 				GenerateDebugInformation="false"
-				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				ImportLibrary="..\..\lib\$(TargetName).lib"
@@ -185,55 +183,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\framework\accelerator.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\framework\addcommanddlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\framework\animation.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\framework\application.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\framework\command.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\framework\commandbar.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\framework\createcbdlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\framework\keycodedlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\framework\menubar.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\framework\messagedlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\framework\progressor.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\framework\statusbar.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\framework\toolbarmenu.cpp"
+				RelativePath="..\..\src\core\config.cpp"
 				>
 			</File>
 		</Filter>
@@ -243,59 +193,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\include\wxgis\framework\accelerator.h"
+				RelativePath="..\..\include\wxgis\core\config.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wxgis\framework\addcommanddlg.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\framework\animation.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\framework\application.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\framework\command.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\framework\commandbar.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\framework\createcbdlg.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\framework\framework.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\framework\keycodedlg.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\framework\menubar.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\framework\messagedlg.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\framework\progressor.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\framework\statusbar.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\framework\toolbarmenu.h"
+				RelativePath="..\..\include\wxgis\core\core.h"
 				>
 			</File>
 		</Filter>

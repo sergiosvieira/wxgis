@@ -101,6 +101,8 @@ public:
     virtual void OnPanStop(wxDC &dc);
 	//IDisplay
 	virtual void OnDraw(wxDC &dc, wxCoord x = 0, wxCoord y = 0, bool bClearBackground = false);
+	virtual void OnUpdate(void);
+    virtual void SetDC(wxDC *pdc){m_pDrawDC = pdc;};
 	virtual void SetBrush(wxBrush& Brush);
 	virtual void SetPen(wxPen& Pen);
 	virtual void SetFont(wxFont& Font);
@@ -134,8 +136,10 @@ public:
 protected:
 	std::vector<CACHEDATA> m_caches;
 	wxMemoryDC m_dc;
+    wxDC *m_pDrawDC;
 	//, m_GeoSelectionBuffer, m_AnnotationBuffer;
-	size_t m_nLastCacheID, m_nDrawCacheID;
+	size_t m_nLastCacheID;
+    int m_nDrawCacheID;
 	bool m_bIsDerty;
 	wxGISDisplayTransformation* m_pDisplayTransformation;
     wxCriticalSection m_CritSect;
