@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/framework/menubar.h"
-#include "wxgis/framework/config.h"
+#include "wxgis/core/config.h"
 #include "wxgis/framework/toolbarmenu.h"
 
 wxGISMenuBar::wxGISMenuBar(long style, IApplication* pApp, wxXmlNode* pConf) : wxMenuBar(style)

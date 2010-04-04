@@ -41,6 +41,7 @@ wxDrawingThread::wxDrawingThread(wxGISMapView* pView, std::vector<wxGISLayer*>& 
 void *wxDrawingThread::Entry()
 {
 	wxClientDC CDC(m_pView);
+    m_pGISScreenDisplay->SetDC(&CDC);
 
 	for(size_t i = 0; i < m_Layers.size(); i++)
 	{

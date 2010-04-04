@@ -22,8 +22,7 @@
 
 #include "wxgis/datasource.h"
 
-void GetFeatureBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
-
+void GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
 
 //---------------------------------------
 // wxGISFeatureDataset
@@ -46,7 +45,9 @@ public:
 	virtual OGRFeature* GetAt(long nIndex);
 	virtual OGRFeature* operator [](long nIndex);
 	virtual wxString GetAsString(long row, int col);
-	virtual wxGISFeatureSet* GetFeatureSet(IQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
+	//virtual wxGISFeatureSet* GetFeatureSet(IQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
+	virtual wxGISGeometrySet* GetGeometrySet(IQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
+    virtual wxGISGeometrySet* GetGeometries(void);
 	virtual size_t GetSize(void);
 	virtual OGRLayer* GetLayerRef(int iLayer = 0);
     virtual OGRFeature* Next(void);
@@ -54,9 +55,8 @@ public:
 protected:
     virtual void CreateQuadTree(OGREnvelope* pEnv);
     virtual void DeleteQuadTree(void);
-    virtual void LoadFeatures(void);
-    virtual void UnloadFeatures(void);
-    virtual void Empty(void);
+    virtual void LoadGeometry(void);
+    virtual void UnloadGeometry(void);
 protected:
 	OGRDataSource *m_poDS;
 	OGREnvelope* m_psExtent;
@@ -65,10 +65,38 @@ protected:
     bool m_bOLCStringsAsUTF8;
     wxFontEncoding m_Encoding;
     //
-    bool m_bIsFeaturesLoaded;
-    std::map<long, OGRFeature*> m_FeaturesMap;
-    typedef std::map<long, OGRFeature*>::iterator Iterator;
-    Iterator m_IT;
+    bool m_bIsGeometryLoaded;
+    wxGISGeometrySet *m_pGeometrySet;
     CPLQuadTree* m_pQuadTree;
     wxCriticalSection m_CritSect;
 };
+
+////---------------------------------------
+//// wxGISShapeFeatureDataset
+////---------------------------------------
+//
+//class WXDLLIMPEXP_GIS_CRT wxGISShapeFeatureDataset :
+//	public wxGISFeatureDataset
+//{
+//public:
+//	wxGISShapeFeatureDataset(wxString sPath, wxMBConv* pPathEncoding = wxConvCurrent, wxFontEncoding Encoding = wxFONTENCODING_DEFAULT);
+//	virtual ~wxGISShapeFeatureDataset(void);
+////wxGISFeatureDataset
+//	virtual bool Open(int iLayer = 0);
+//    virtual OGRErr CreateSpatialIndex(void);
+//};
+//
+////---------------------------------------
+//// wxGISFeatureCursor
+////---------------------------------------
+//
+//class WXDLLIMPEXP_GIS_CRT wxGISFeatureCursor :
+//    public IFeatureCursor
+//{
+//public:
+//    wxGISFeatureCursor(wxGISFeatureDataset* pSet){m_pSet = pSet;};
+//    virtual ~wxGISFeatureCursor(void){};
+//    virtual OGRFeature* NextFeature(void){return m_pSet->Next();};
+//protected:
+//    wxGISFeatureDataset* m_pSet;
+//};

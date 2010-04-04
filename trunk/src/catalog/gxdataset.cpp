@@ -27,6 +27,9 @@
 #include "wxgis/framework/messagedlg.h"
 #include "wxgis/framework/application.h"
 
+#include <wx/busyinfo.h>
+#include <wx/utils.h>
+
 //--------------------------------------------------------------
 //class wxGxDataset
 //--------------------------------------------------------------
@@ -50,7 +53,7 @@ wxGxDataset::wxGxDataset(wxString Path, wxString Name, wxGISEnumDatasetType Type
 
 wxGxDataset::~wxGxDataset(void)
 {
-	wsDELETE(m_pwxGISDataset);
+    wsDELETE(m_pwxGISDataset);
 }
 
 wxIcon wxGxDataset::GetLargeImage(void)
@@ -82,6 +85,8 @@ bool wxGxDataset::Delete(void)
     bool bRet = pDSet->Delete();
     if(bRet)
 	{
+        wsDELETE(pDSet);
+
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer == NULL)
 			return false;
@@ -147,7 +152,7 @@ wxGxShapefileDataset::wxGxShapefileDataset(wxString Path, wxString Name, wxGISEn
 
 wxGxShapefileDataset::~wxGxShapefileDataset(void)
 {
-	wsDELETE(m_pwxGISDataset);
+    wsDELETE(m_pwxGISDataset);
 }
 
 wxString wxGxShapefileDataset::GetCategory(void)
@@ -188,6 +193,8 @@ bool wxGxShapefileDataset::Delete(void)
     bool bRet = pDSet->Delete();
     if(bRet)
 	{
+        wsDELETE(pDSet);
+
         wxString vol, shortpath, name, ext;
         wxFileName::SplitPath(m_sPath, &vol, &shortpath, &name, &ext);
         wxString sRemNames;
@@ -238,9 +245,62 @@ wxGISDataset* wxGxShapefileDataset::GetDataset(void)
             wxDELETE(pwxGISFeatureDataset);
 			return NULL;
         }
+
+       // //Spatial Index
+       // if(!pwxGISFeatureDataset->HasSpatialIndex())
+       // {
+       // 	bool bAskSpaInd = true;
+       //     wxString name, ext;
+       //     wxFileName::SplitPath(m_sPath, NULL, NULL, &name, &ext);
+       //     wxString sFileName = name + wxT(".") + ext;
+       //     IGISConfig*  pConfig = m_pCatalog->GetConfig();
+       //     bool bCreateSpaInd = true;
+       //     if(pConfig)
+       //     {
+       //         wxXmlNode* pNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/vector")));
+       //         if(pNode)
+       //             bAskSpaInd = wxAtoi(pNode->GetPropVal(wxT("create_tree"), wxT("1")));
+       //         else
+       //         {
+       //             pNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog/vector")), true);
+       //             pNode->AddProperty(wxT("create_tree"), wxT("1"));
+       //         }
+       //         if(bAskSpaInd)
+       //         {
+       //             //show ask dialog
+       //             wxGISMessageDlg dlg(NULL, wxID_ANY, wxString::Format(_("Create spatial index for %s"), sFileName.c_str()), wxString(_("This vector data source does not have spatial index. Spatial index allow for rapid display at varying resolutions.")), wxString(_("Spatial index buildin may take a few moments.\nWould you like to create spatial index?")), wxDefaultPosition, wxSize( 400,160 ));
+       //             if(dlg.ShowModal() == wxID_NO)
+       //             {
+       //                 bCreateSpaInd = false;
+       //             }
+       //             if(!dlg.GetShowInFuture())
+       //             {
+       //                 pNode->DeleteProperty(wxT("create_tree"));
+       //                 pNode->AddProperty(wxT("create_tree"), wxT("0"));
+       //             }
+       //         }
+       //     }
+
+	      //  if(bCreateSpaInd)
+	      //  {
+       //         wxWindowDisabler disableAll;
+       //         wxBusyInfo wait(_("Please wait, working..."));
+
+       //         OGRErr err = pwxGISFeatureDataset->CreateSpatialIndex();
+			    //if(err != OGRERR_NONE)
+			    //{
+       //             const char* pszerr = CPLGetLastErrorMsg();
+       //             wxLogError(_("Build Spatial Index failed! OGR error: %s"), wgMB2WX(pszerr));
+       //             int nRes = wxMessageBox(_("Build Spatial Index! Continue?"), _("Question"), wxICON_QUESTION | wxYES_NO);
+       //             if(nRes == wxNO)
+       //                 return NULL;
+			    //}
+	      //  }
+       // }
+
 		m_pwxGISDataset = static_cast<wxGISDataset*>(pwxGISFeatureDataset);
 		//for storing internal pointer
-		m_pwxGISDataset->Reference();
+		//m_pwxGISDataset->Reference();
 	}
 	//for outer pointer
 	m_pwxGISDataset->Reference();

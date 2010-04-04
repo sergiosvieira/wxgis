@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalog/gxcatalog.h"
 #include "wxgis/catalog/gxdiscconnection.h"
-#include "wxgis/framework/config.h"
+#include "wxgis/core/config.h"
 #include <wx/volume.h>
 #include <wx/msgdlg.h>
 

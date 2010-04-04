@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/carto/spvalidator.h"
-#include "wxgis/framework/config.h"
+#include "wxgis/core/config.h"
 
 #include <wx/mstream.h>
 #include <wx/xml/xml.h>

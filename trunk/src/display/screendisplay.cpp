@@ -511,7 +511,7 @@ IDisplayTransformation* wxGISDisplay::GetDisplayTransformation(void)
 //-----------------------------------------------------
 
 
-wxGISScreenDisplay::wxGISScreenDisplay(void) : m_bIsDerty(true), m_nLastCacheID(1)
+wxGISScreenDisplay::wxGISScreenDisplay(void) : m_bIsDerty(true), m_nLastCacheID(1), m_nDrawCacheID(-1)
 {
 	m_pDisplayTransformation = new wxGISDisplayTransformation();
 
@@ -533,6 +533,17 @@ wxGISScreenDisplay::wxGISScreenDisplay(void) : m_bIsDerty(true), m_nLastCacheID(
 wxGISScreenDisplay::~wxGISScreenDisplay(void)
 {
 	wxDELETE(m_pDisplayTransformation);
+}
+
+void wxGISScreenDisplay::OnUpdate(void)
+{
+    if(m_nDrawCacheID > 0)
+    {
+        int nTmpID = m_nDrawCacheID;
+        FinishDrawing();
+        OnDraw(*m_pDrawDC);
+        StartDrawing(nTmpID);
+    }
 }
 
 void wxGISScreenDisplay::OnDraw(wxDC &dc, wxCoord x, wxCoord y, bool bClearBackground)
@@ -734,6 +745,8 @@ void wxGISScreenDisplay::StartDrawing(size_t CacheID)
     wxCriticalSectionLocker locker(m_CritSect);
 
 	m_dc.SelectObject(m_caches[CacheID].bmp);
+
+    m_nDrawCacheID = CacheID;
 }
 
 void wxGISScreenDisplay::FinishDrawing(void)
@@ -741,6 +754,8 @@ void wxGISScreenDisplay::FinishDrawing(void)
     wxCriticalSectionLocker locker(m_CritSect);
 
     m_dc.SelectObject(wxNullBitmap);
+
+    m_nDrawCacheID = -1;
 }
 
 size_t wxGISScreenDisplay::GetLastCacheID(void)

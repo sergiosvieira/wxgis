@@ -41,7 +41,7 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 
-#include "wxgis/framework/config.h"
+#include "wxgis/core/config.h"
 //#include "wxgis/catalog/catalog.h"
 #include "wxgis/catalog/gxcatalog.h"
 #include "wxgis/catalogui/catalogui.h"
