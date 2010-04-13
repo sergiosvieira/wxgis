@@ -74,7 +74,7 @@ void wxGISToolBarMenu::OnCommand(wxCommandEvent& event)
 
 wxIcon wxGISToolBarMenu::GetBitmap(void)
 {
-	return wxIcon();
+	return wxNullIcon;
 }
 
 wxString wxGISToolBarMenu::GetCaption(void)

@@ -56,7 +56,7 @@ wxIcon wxGISCartoMainCmd::GetBitmap(void)
 		case 2:
 			return m_ImageList.GetIcon(7);
 		default:
-			return wxIcon();
+			return wxNullIcon;
 	}
 }
 
@@ -71,7 +71,7 @@ wxString wxGISCartoMainCmd::GetCaption(void)
 		case 2:	
 			return wxString(_("&Next Extent"));
 		default:
-			return wxString();
+			return wxEmptyString;
 	}
 }
 
@@ -159,7 +159,7 @@ wxString wxGISCartoMainCmd::GetMessage(void)
 		case 2:	
 			return wxString(_("Next extent of the map"));
 		default:
-			return wxString();
+			return wxEmptyString;
 	}
 }
 
@@ -196,7 +196,7 @@ wxString wxGISCartoMainCmd::GetTooltip(void)
 		case 2:	
 			return wxString(_("Next Extent"));
 		default:
-			return wxString();
+			return wxEmptyString;
 	}
 }
 
@@ -241,7 +241,7 @@ wxIcon wxGISCartoMainTool::GetBitmap(void)
 		case 3:
 			return m_ImageList.GetIcon(10);
 		default:
-			return wxIcon();
+			return wxNullIcon;
 	}
 }
 
@@ -258,7 +258,7 @@ wxString wxGISCartoMainTool::GetCaption(void)
 		case 3:	
 			return wxString(_("&Information"));
 		default:
-			return wxString();
+			return wxEmptyString;
 	}
 }
 
@@ -352,7 +352,7 @@ wxString wxGISCartoMainTool::GetMessage(void)
 		case 3:	
 			return wxString(_("Feature information"));
 		default:
-			return wxString();
+			return wxEmptyString;
 	}
 }
 
@@ -389,7 +389,7 @@ wxString wxGISCartoMainTool::GetTooltip(void)
 		case 3:	
 			return wxString(_("Information"));
 		default:
-			return wxString();
+			return wxEmptyString;
 	}
 }
 

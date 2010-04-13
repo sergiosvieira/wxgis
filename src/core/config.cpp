@@ -43,12 +43,10 @@ wxGISConfig::wxGISConfig(wxString sAppName, wxString sConfigDir, bool bPortable)
     }
     else
     {
-        wxString sExeAppName = sAppName;
-        //IApplication* pApp = ::GetApplication();
-        //if(pApp)
-        //    sExeAppName = pApp->GetAppName();
-        //else 
-        //    sExeAppName = sAppName;
+        wxString sExeAppName = wxFileNameFromPath(stp.GetExecutablePath());
+        wxStripExtension(sExeAppName);
+        //sExeAppName = sAppName;
+
         m_sUserConfigDir = stp.GetUserConfigDir() + wxFileName::GetPathSeparator() + sConfigDir;
         m_sSysConfigDir = stp.GetConfigDir() + wxFileName::GetPathSeparator() + sConfigDir;
         if(m_sSysConfigDir.Find(sExeAppName) != wxNOT_FOUND)
@@ -141,11 +139,12 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 			pDoc = new wxXmlDocument(sXMLDocPath);
 		else
 		{
-			if(Key == enumGISHKLM)
-			{
+			//if(Key == enumGISHKLM)
+			//{
 				wxString sXMLPath = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("config") +  wxFileName::GetPathSeparator() + sRootNodeName + wxT(".xml");
-				pDoc = new wxXmlDocument(sXMLPath);
-			}
+                if(wxFileName::FileExists(sXMLPath))
+                    pDoc = new wxXmlDocument(sXMLPath);
+			//}
 
 			if(!pDoc)
 			{

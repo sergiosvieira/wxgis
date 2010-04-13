@@ -26,97 +26,37 @@
 //-----------------------------------------------
 // wxGxApplication
 //-----------------------------------------------
-wxGxApplication::wxGxApplication(IGISConfig* pConfig, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxGISApplication(pConfig, parent, id, title, pos, size, style), m_pCatalog(NULL), m_pTreeView(NULL), m_pTabView(NULL)
+wxGxApplication::wxGxApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxGISApplication(parent, id, title, pos, size, style), m_pCatalog(NULL), m_pTreeView(NULL), m_pTabView(NULL)
 {
-	wxLogMessage(_("wxGxApplication: Creating main application frame..."));
-	
-	m_mgr.SetManagedWindow(this);
-
-	wxGxCatalog* pCatalog = new wxGxCatalog();
-	pCatalog->Init();
-	m_pCatalog = static_cast<IGxCatalog*>(pCatalog);
-
-	wxXmlNode* pViewsNode = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame/views")));
-
-	if(!pViewsNode)
-	{
-		wxLogError(_("wxGxApplication: Error find <views> XML Node"));
-		return;
-	}
-
-	m_pTreeView = new wxGxTreeView(this, TREECTRLID);
-	if(m_pTreeView->Activate(this, m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame/views/treeview")))))
-	{
-		m_mgr.AddPane(m_pTreeView, wxAuiPaneInfo().Name(wxT("tree_window")).Caption(_("Tree Pane")).BestSize(wxSize(280,128)).MinSize(wxSize(200,64)).Left().Layer(1/*2*/).Position(1).CloseButton(true));
-		RegisterChildWindow(m_pTreeView);
-	}
-	else
-		wxDELETE(m_pTreeView);
-
-	m_pTabView = new wxGxTabView(this);
-	if(m_pTabView->Activate(this, m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame/views/tabview")))))
-	{
-		m_mgr.AddPane(m_pTabView, wxAuiPaneInfo().Name(wxT("main_window")).CenterPane());//.PaneBorder(true)
-		RegisterChildWindow(m_pTabView);
-	}
-	else
-		wxDELETE(m_pTabView);
-	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
-	{
-		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
-		{
-			wxGISToolBar* pToolBar = dynamic_cast<wxGISToolBar*>(m_CommandBarArray[i]);
-			if(pToolBar)
-			{
-				m_mgr.AddPane(pToolBar, wxAuiPaneInfo().Name(pToolBar->GetName()).Caption(wxGetTranslation(pToolBar->GetCaption())).ToolbarPane().Top().Position(i).LeftDockable(pToolBar->GetLeftDockable()).RightDockable(pToolBar->GetRightDockable()).BestSize(-1,-1));
-				pToolBar->Activate(this);
-			}
-		}
-	}
-
-	SerializeFramePos(false);
-
-	m_mgr.Update();
-
-	wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
-	IGxObject* pObj = dynamic_cast<IGxObject*>(m_pCatalog);
-	wxString sLastPath;
-	if(pLastLocationNode)
-		sLastPath = pLastLocationNode->GetPropVal(wxT("path"), pObj->GetName());
-	else
-		sLastPath = pObj->GetName();
-	m_pCatalog->SetLocation(sLastPath);
-
-	wxLogMessage(_("wxGxApplication: Creation complete"));
 }
 
 wxGxApplication::~wxGxApplication(void)
 {
-	GxObjectArray* pArr = m_pCatalog->GetSelection()->GetSelectedObjects(TREECTRLID);
-	if(pArr)
-	{
-		if(pArr->size() > 0)
-		{
-            IGxObject* pObj = pArr->at(0);
-            if(pObj != dynamic_cast<IGxObject*>(m_pCatalog))
-            {
-			    wxString sLastPath = pObj->GetFullName();
-			    if(sLastPath.IsEmpty())
-				    sLastPath = pArr->at(0)->GetName();
+    m_pNewMenu->UnInit();
 
-			    wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
-			    if(pLastLocationNode)
-			    {
-				    if(pLastLocationNode->HasProp(wxT("path")))
-					    pLastLocationNode->DeleteProperty(wxT("path"));
-			    }
-			    else
-			    {
-				    pLastLocationNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("lastpath")), true);
-			    }
-			    pLastLocationNode->AddProperty(wxT("path"), sLastPath);
-            }
-		}
+    IGxSelection* pSel = m_pCatalog->GetSelection();
+
+    if(pSel->GetCount(TREECTRLID) > 0)
+	{
+        IGxObject* pObj = pSel->GetSelectedObjects(TREECTRLID, 0);
+        if(pObj && pObj != dynamic_cast<IGxObject*>(m_pCatalog))
+        {
+		    wxString sLastPath = pObj->GetFullName();
+		    if(sLastPath.IsEmpty())
+			    sLastPath = pObj->GetName();
+
+		    wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
+		    if(pLastLocationNode)
+		    {
+			    if(pLastLocationNode->HasProp(wxT("path")))
+				    pLastLocationNode->DeleteProperty(wxT("path"));
+		    }
+		    else
+		    {
+			    pLastLocationNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("lastpath")), true);
+		    }
+		    pLastLocationNode->AddProperty(wxT("path"), sLastPath);
+        }
 	}
 
 	if(m_pTreeView)
@@ -139,6 +79,7 @@ wxGxApplication::~wxGxApplication(void)
 
 	SerializeFramePos(true);
 	//should remove toolbars from commandbar array as m_mgr manage toolbars by itself 
+
 	m_mgr.UnInit();
 	wxDELETE(m_pCatalog);
 }
@@ -148,10 +89,8 @@ IGxCatalog* wxGxApplication::GetCatalog(void)
 	return m_pCatalog;
 }
 
-void wxGxApplication::SerializeFramePos(bool bSave)
+void wxGxApplication::SerializeGxFramePos(bool bSave)
 {
-	wxGISApplication::SerializeFramePos(bSave);
-
 	wxXmlNode *pPerspectiveXmlNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/perspective")));
 	if(bSave)
 	{
@@ -288,4 +227,79 @@ void wxGxApplication::RegisterChildWindow(wxWindow* pWnd)
 	m_WindowArray.push_back(pWnd);
 }
 
+bool wxGxApplication::Create(IGISConfig* pConfig)
+{
+    m_pNewMenu = new wxGISNewMenu();
+    m_pNewMenu->OnCreate(this);
+    m_pNewMenu->Reference();
+    m_CommandBarArray.push_back(m_pNewMenu);
+    m_pNewMenu->Reference();
+    m_CommandArray.push_back(m_pNewMenu);
+
+    wxGISApplication::Create(pConfig);
+    
+	wxLogMessage(_("wxGxApplication: Creating main application frame..."));
+
+	m_mgr.SetManagedWindow(this);
+
+	wxGxCatalog* pCatalog = new wxGxCatalog();
+	pCatalog->Init();
+	m_pCatalog = static_cast<IGxCatalog*>(pCatalog);
+
+	wxXmlNode* pViewsNode = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame/views")));
+
+	if(!pViewsNode)
+	{
+		wxLogError(_("wxGxApplication: Error find <views> XML Node"));
+		return false;
+	}
+
+	m_pTreeView = new wxGxTreeView(this, TREECTRLID);
+	if(m_pTreeView->Activate(this, m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame/views/treeview")))))
+	{
+		m_mgr.AddPane(m_pTreeView, wxAuiPaneInfo().Name(wxT("tree_window")).Caption(_("Tree Pane")).BestSize(wxSize(280,128)).MinSize(wxSize(200,64)).Left().Layer(1/*2*/).Position(1).CloseButton(true));
+		RegisterChildWindow(m_pTreeView);
+	}
+	else
+		wxDELETE(m_pTreeView);
+
+	m_pTabView = new wxGxTabView(this);
+	if(m_pTabView->Activate(this, m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame/views/tabview")))))
+	{
+		m_mgr.AddPane(m_pTabView, wxAuiPaneInfo().Name(wxT("main_window")).CenterPane());//.PaneBorder(true)
+		RegisterChildWindow(m_pTabView);
+	}
+	else
+		wxDELETE(m_pTabView);
+	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
+	{
+		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
+		{
+			wxGISToolBar* pToolBar = dynamic_cast<wxGISToolBar*>(m_CommandBarArray[i]);
+			if(pToolBar)
+			{
+				m_mgr.AddPane(pToolBar, wxAuiPaneInfo().Name(pToolBar->GetName()).Caption(wxGetTranslation(pToolBar->GetCaption())).ToolbarPane().Top().Position(i).LeftDockable(pToolBar->GetLeftDockable()).RightDockable(pToolBar->GetRightDockable()).BestSize(-1,-1));
+				pToolBar->Activate(this);
+			}
+		}
+	}
+
+	SerializeGxFramePos(false);
+
+    m_pNewMenu->Init();
+	m_mgr.Update();
+
+	wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
+	IGxObject* pObj = dynamic_cast<IGxObject*>(m_pCatalog);
+	wxString sLastPath;
+	if(pLastLocationNode)
+		sLastPath = pLastLocationNode->GetPropVal(wxT("path"), pObj->GetName());
+	else
+		sLastPath = pObj->GetName();
+	m_pCatalog->SetLocation(sLastPath);
+
+	wxLogMessage(_("wxGxApplication: Creation complete"));
+
+    return true;
+}
 

@@ -168,17 +168,14 @@ void wxGxTab::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	if(!Selection)
 		return;
 
-	wxBusyCursor wait;
-
 	if(nInitiator == GetId())
 		return;
 	//select in tree ctrl
 	if(nInitiator != TREECTRLID && nInitiator != LISTCTRLID)
 	{
-		GxObjectArray* pGxObjectArray = Selection->GetSelectedObjects();
-		if(!pGxObjectArray || pGxObjectArray->size() == 0)
+		IGxObject* pGxObj = Selection->GetLastSelectedObject();
+		if(pGxObj == NULL)
 			return;
-		IGxObject* pGxObj = pGxObjectArray->at(pGxObjectArray->size() - 1);
 		//wxString sName = pGxObj->GetName();
 		Selection->Select(pGxObj , false, GetId());
 		return;
@@ -199,7 +196,7 @@ void wxGxTab::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 				continue;
 			if(pView->Applies(Selection))
 			{
-				if(pView->GetName() != _("NoView"))
+				if(pView->GetName() != wxString(_("NoView")))
 					m_choice->Append(pView->GetName(), pWnd);
 				else
 					pNoWnd = pWnd;
@@ -253,7 +250,7 @@ void wxGxTab::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	{
 		//get first apply window
 		wxGxView* pCurrView = dynamic_cast<wxGxView*>(m_pCurrentWnd);
-		if(pCurrView != NULL && pCurrView->GetName() != _("NoView"))
+		if(pCurrView && pCurrView->GetName() != wxString(_("NoView")))
 		{
 			if(pCurrView->Applies(Selection))
 				goto END;
@@ -375,6 +372,8 @@ void wxGxTabView::Deactivate(void)
 void wxGxTabView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 {
 	int nSelTab = GetSelection();
+    if(nSelTab < 0)
+        return;
 	wxASSERT(nSelTab >= 0 && nSelTab < m_Tabs.size());
 
 	wxGxTab* pCurrTab = m_Tabs[nSelTab];
@@ -418,6 +417,8 @@ void wxGxTabView::OnAUINotebookPageChanged(wxAuiNotebookEvent& event)
 	//update view while changing focus of tabs
 	event.Skip();
 	int nSelTab = event.GetSelection();
+    if(nSelTab < 0)
+        return;
 	wxASSERT(nSelTab >= 0 && nSelTab < m_Tabs.size());
 
 	wxGxTab* pCurrTab = m_Tabs[nSelTab];

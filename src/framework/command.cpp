@@ -51,7 +51,7 @@ wxIcon wxGISCommonCmd::GetBitmap(void)
 		case 3:	
 		case 4:	
 		default:
-			return wxIcon();
+			return wxNullIcon;
 	}
 }
 
@@ -70,7 +70,7 @@ wxString wxGISCommonCmd::GetCaption(void)
 		case 4:	
 			return wxString(_("StatusBar"));
 		default:
-			return wxString();
+			return wxEmptyString;
 	}
 }
 
@@ -160,7 +160,7 @@ wxString wxGISCommonCmd::GetMessage(void)
 		case 4:	
 			return wxString(_("Show/hide statusbar"));
 		default:
-			return wxString();
+			return wxEmptyString;
 	}
 }
 
@@ -210,7 +210,7 @@ wxString wxGISCommonCmd::GetTooltip(void)
 			return wxString(_("Show/hide statusbar"));
 		case 3:	
 		default:
-			return wxString();
+			return wxEmptyString;
 	}
 }
 

@@ -41,47 +41,8 @@ BEGIN_EVENT_TABLE(wxGISApplication, wxFrame)
     EVT_AUITOOLBAR_TOOL_DROPDOWN(wxID_ANY, wxGISApplication::OnToolDropDown)
 END_EVENT_TABLE()
 
-wxGISApplication::wxGISApplication(IGISConfig* pConfig, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style), m_pGISAcceleratorTable(NULL), m_pMenuBar(NULL), m_CurrentTool(NULL), m_pDropDownCommand(NULL)
+wxGISApplication::wxGISApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style), m_pGISAcceleratorTable(NULL), m_pMenuBar(NULL), m_CurrentTool(NULL), m_pDropDownCommand(NULL)
 {
-	m_pConfig = pConfig;
-
-	CreateStatusBar();
-	wxFrame::GetStatusBar()->SetStatusText(_("Ready"));
-
-	//load commands
-	wxXmlNode* pCommandsNode = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("commands")));
-	if(pCommandsNode)
-		LoadCommands(pCommandsNode);
-	//load commandbars
-	SerializeCommandBars();
-	//load accelerators
-	m_pGISAcceleratorTable = new wxGISAcceleratorTable(this, pConfig);
-
-
-    // create MenuBar
-	wxXmlNode* pMenuBarNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/menubar")));
-	if(!pMenuBarNode)
-	{
-		wxXmlNode* pMenuBarNodeLM = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame/menubar")));
-		pMenuBarNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame/menubar")), true);
-		pMenuBarNode->operator=(*pMenuBarNodeLM);
-	}
-    m_pMenuBar = new wxGISMenuBar(0, static_cast<IApplication*>(this), pMenuBarNode); //wxMB_DOCKABLE
-    SetMenuBar(static_cast<wxMenuBar*>(m_pMenuBar));
-
-	//mark menues from menu bar as enumGISTAMMenubar
-	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
-		if(m_pMenuBar->IsMenuBarMenu(m_CommandBarArray[i]->GetName()))
-			m_CommandBarArray[i]->SetType(enumGISCBMenubar);
-
-    // min size for the frame itself isn't completely done.
-    // see the end up wxAuiManager::Update() for the test
-    // code. For now, just hard code a frame minimum size
-    SetMinSize(wxSize(800,480));
-
-	SerializeFramePos(false);
-	SetAcceleratorTable(m_pGISAcceleratorTable->GetAcceleratorTable());
-    m_pGlobalApp = this;
 }
 
 wxGISApplication::~wxGISApplication(void)
@@ -107,6 +68,9 @@ wxGISApplication::~wxGISApplication(void)
 
 	for(size_t i = 0; i < m_CommandArray.size(); i++)
 		wxDELETE(m_CommandArray[i]);
+
+    for(size_t i = 0; i < m_LibArr.size(); i++)
+		wxDELETE(m_LibArr[i]);
 }
 
 ICommand* wxGISApplication::GetCommand(long CmdID)
@@ -222,40 +186,103 @@ void wxGISApplication::OnCommand(ICommand* pCmd)
 
 void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 {
+    //event.Skip();
+
 	ICommand* pCmd = GetCommand(event.GetId());
 	if(pCmd)
 	{
 		if(pCmd->GetKind() == enumGISCommandCheck)
-			event.Check(pCmd->GetChecked());
-		event.Enable(pCmd->GetEnabled());
-		wxString sAcc = m_pGISAcceleratorTable->GetText(event.GetId());
-		event.SetText(pCmd->GetCaption() + wxT("\t") + sAcc);//accelerator
+            if(event.GetChecked() != pCmd->GetChecked())
+                event.Check(pCmd->GetChecked());
+        //if(event.GetEnabled() != pCmd->GetEnabled())
+        event.Enable(pCmd->GetEnabled());
+
+        wxString sAcc = m_pGISAcceleratorTable->GetText(event.GetId());
+        //if(pCmd->GetKind() == enumGISCommandNormal)
+        //{
+        //    if(sAcc.IsEmpty())
+        //    //    event.SetText(pCmd->GetCaption() + wxT("\t"));//accelerator
+        //    //else
+        //        event.SetText(pCmd->GetCaption() + wxT("\t") + sAcc);//accelerator
+        //        //event.SetText(pCmd->GetCaption() + wxT(" ") + sAcc);//accelerator
+        //}
+        //if(pCmd->GetKind() != enumGISCommandNormal)
+        //return;
 		////set bitmap
 		for(size_t i = 0; i < m_CommandBarArray.size(); i++)
 		{
 			switch(m_CommandBarArray[i]->GetType())
 			{
 			case enumGISCBSubMenu:
-			case enumGISCBContextmenu:
 			case enumGISCBMenubar:
 				{
 					wxMenu* pMenu = dynamic_cast<wxMenu*>(m_CommandBarArray[i]);
+// dirty hack
+                    wxMenuItemList& pLst = pMenu->GetMenuItems();
+                    wxMenuItemList::iterator iter;
+                    for (iter = pLst.begin(); iter != pLst.end(); ++iter)
+                    {
+                        wxMenuItem* pItem = *iter;
+                        if(pItem->IsSubMenu())
+                        {
+                            pItem->SetBitmap(wxNullBitmap);
+                            wxString sT = pItem->GetText();
+                            pItem->SetItemLabel(wxT(" "));// derty hack
+                            pItem->SetItemLabel(sT);
+                        }
+                    }
+// dirty hack end
 					wxMenuItem *pItem = pMenu->FindItem(event.GetId());
 					if(pItem != NULL)
 					{
-						wxBitmap Bmp = pCmd->GetBitmap();
+                        if(pItem->IsSubMenu())
+                            break;
+						wxIcon Bmp = pCmd->GetBitmap();
 						//if(Bmp.IsOk())
 							pItem->SetBitmap(Bmp);//double text??
+                            pItem->SetItemLabel(wxT(" ")); // derty hack
+                            pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
 					}
 				}
 				break;
-			case enumGISCBToolbar:
+			case enumGISCBContextmenu:
+				{
+					wxMenu* pMenu = dynamic_cast<wxMenu*>(m_CommandBarArray[i]);
+// dirty hack
+                    wxMenuItemList& pLst = pMenu->GetMenuItems();
+                    wxMenuItemList::iterator iter;
+                    for (iter = pLst.begin(); iter != pLst.end(); ++iter)
+                    {
+                        wxMenuItem* pItem = *iter;
+                        if(pItem->IsSubMenu())
+                        {
+                            pItem->SetBitmap(wxNullBitmap);
+                            wxString sT = pItem->GetText();
+                            pItem->SetItemLabel(wxT(" "));// derty hack
+                            pItem->SetItemLabel(sT);
+                        }
+                    }
+// dirty hack end
+                    wxMenuItem *pItem = pMenu->FindItem(event.GetId());
+					if(pItem != NULL)
+					{
+						wxIcon Bmp = pCmd->GetBitmap();
+						//if(Bmp.IsOk())
+							pItem->SetBitmap(Bmp);//double text??
+                        pItem->SetItemLabel(wxT(" ")); // derty hack
+                        pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
+					}
+				}
+				break;            
+            case enumGISCBToolbar:
 				{
 					wxAuiToolBar* pToolbar = dynamic_cast<wxAuiToolBar*>(m_CommandBarArray[i]);
 					wxAuiToolBarItem* pTool =pToolbar->FindTool(event.GetId());
 					if(pTool != NULL)
 					{
-						wxBitmap Bmp = pCmd->GetBitmap();
+                        if(pTool->GetBitmap().IsOk())
+                            break;
+						wxIcon Bmp = pCmd->GetBitmap();
 						if(Bmp.IsOk())
 							pTool->SetBitmap(Bmp);
 						else
@@ -272,7 +299,10 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 				break;
 			}
 		}
+
+        return;
 	}
+    event.Skip();
 }
 
 void wxGISApplication::SerializeFramePos(bool bSave)
@@ -353,7 +383,7 @@ void wxGISApplication::SerializeFramePos(bool bSave)
 		if(pStatusBarNode)
 		{
 			bool bStatusBarShow = pStatusBarNode->GetPropVal(wxT("shown"), wxT("t")) == wxString(wxT("t")) ? true : false;
-			ShowStatusBar(bStatusBarShow);
+			wxGISApplication::ShowStatusBar(bStatusBarShow);
 		}
 	}
 }
@@ -446,14 +476,13 @@ void wxGISApplication::SerializeCommandBars(bool bSave)
 	
 		for(size_t i = m_CommandBarArray.size(); i > 0; i--)
 		{
-			//skip wxGISToolBarMenu
-			if(m_CommandBarArray[i - 1]->GetName() == TOOLBARMENUNAME)
-				continue;
+			////skip wxGISToolBarMenu
+			//if(m_CommandBarArray[i - 1]->GetName() == TOOLBARMENUNAME)
+			//	continue;
 			switch(m_CommandBarArray[i - 1]->GetType())
 			{
 			case enumGISCBMenubar:
 			case enumGISCBContextmenu:
-			case enumGISCBSubMenu:
 				{
 					wxXmlNode* pNewNode = new wxXmlNode(pMenuesNode, wxXML_ELEMENT_NODE, wxString(wxT("menu")));
 					m_CommandBarArray[i - 1]->Serialize(this, pNewNode, bSave);
@@ -465,6 +494,7 @@ void wxGISApplication::SerializeCommandBars(bool bSave)
 					m_CommandBarArray[i - 1]->Serialize(this, pNewNode, bSave);
 				}
 				break;
+			case enumGISCBSubMenu:
 			case enumGISCBNone:
 			default:
 				break;
@@ -644,3 +674,75 @@ void wxGISApplication::OnToolDropDown(wxAuiToolBarEvent& event)
         }
     }
 }
+
+void wxGISApplication::LoadLibs(wxXmlNode* pRootNode)
+{
+	wxXmlNode *child = pRootNode->GetChildren();
+	while(child)
+	{
+		wxString sPath = child->GetPropVal(wxT("path"), wxT(""));
+		if(sPath.Len() > 0)
+		{
+			wxDynamicLibrary* pLib = new wxDynamicLibrary(sPath);
+			if(pLib != NULL)
+			{
+				wxLogMessage(_("wxGISApplication: Library %s loaded"), sPath.c_str());
+				m_LibArr.push_back(pLib);
+			}
+			else
+				wxLogError(_("wxGISApplication: Error loading library %s"), sPath.c_str());
+		}
+		child = child->GetNext();
+	}
+}
+
+bool wxGISApplication::Create(IGISConfig* pConfig)
+{
+	m_pConfig = pConfig;
+
+	CreateStatusBar();
+	wxFrame::GetStatusBar()->SetStatusText(_("Ready"));
+
+    //load libs
+	wxXmlNode* pLibsNode = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("libs")));
+	if(pLibsNode)
+		LoadLibs(pLibsNode);
+
+	//load commands
+	wxXmlNode* pCommandsNode = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("commands")));
+	if(pCommandsNode)
+		LoadCommands(pCommandsNode);
+	//load commandbars
+	SerializeCommandBars();
+	//load accelerators
+	m_pGISAcceleratorTable = new wxGISAcceleratorTable(this, pConfig);
+
+
+    // create MenuBar
+	wxXmlNode* pMenuBarNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/menubar")));
+	if(!pMenuBarNode)
+	{
+		wxXmlNode* pMenuBarNodeLM = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame/menubar")));
+		pMenuBarNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame/menubar")), true);
+		pMenuBarNode->operator=(*pMenuBarNodeLM);
+	}
+    m_pMenuBar = new wxGISMenuBar(0, static_cast<IApplication*>(this), pMenuBarNode); //wxMB_DOCKABLE
+    SetMenuBar(static_cast<wxMenuBar*>(m_pMenuBar));
+
+	//mark menues from menu bar as enumGISTAMMenubar
+	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
+		if(m_pMenuBar->IsMenuBarMenu(m_CommandBarArray[i]->GetName()))
+			m_CommandBarArray[i]->SetType(enumGISCBMenubar);
+
+    // min size for the frame itself isn't completely done.
+    // see the end up wxAuiManager::Update() for the test
+    // code. For now, just hard code a frame minimum size
+    SetMinSize(wxSize(800,480));
+
+	SerializeFramePos(false);
+	SetAcceleratorTable(m_pGISAcceleratorTable->GetAcceleratorTable());
+    m_pGlobalApp = this;
+
+    return true;
+}
+

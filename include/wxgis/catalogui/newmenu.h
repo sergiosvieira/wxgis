@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  toolbar check menu class.
+ * Purpose:  wxGISNewMenu class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -19,18 +19,25 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
+#include "wxgis/catalogui/catalogui.h"
 #include "wxgis/framework/framework.h"
-#include "wxgis/framework/application.h"
+//#include "wxgis/framework/application.h"
+#include "wxgis/framework/commandbar.h"
 
-#define TOOLBARMENUNAME _("Application.ToolbarsMenu")
+#define NEWMENUNAME _("Application.NewMenu")
 
-class wxGISToolBarMenu :
+//----------------------------------------------------------------------
+// wxGISNewMenu
+//----------------------------------------------------------------------
+
+class WXDLLIMPEXP_GIS_CLU wxGISNewMenu :
 	public wxGISMenu,
-	public ICommand
+	public ICommand,
+	public IGxSelectionEvents
 {
 public:
-	wxGISToolBarMenu(const wxString& sName = TOOLBARMENUNAME, const wxString& sCaption = _("Toolbars"), wxGISEnumCommandBars type = enumGISCBSubMenu, const wxString& title = _(""), long style = 0);
-	~wxGISToolBarMenu(void);
+	wxGISNewMenu(const wxString& sName = NEWMENUNAME, const wxString& sCaption = _("New"), wxGISEnumCommandBars type = enumGISCBSubMenu, const wxString& title = _(""), long style = 0);
+	~wxGISNewMenu(void);
 	//wxGISMenu
 	virtual void AddCommand(ICommand* pCmd){};
 	virtual void RemoveCommand(size_t nIndex){};
@@ -48,14 +55,16 @@ public:
 	virtual bool OnCreate(IApplication* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
-    //wxGISToolBarMenu
-	virtual void Update(void);
-	//events
-	void OnCommand(wxCommandEvent& event);
+    //wxGISMenu
+	virtual void Init(void);
+    virtual void UnInit(void);
+	//IGxSelectionEvents
+	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 protected:
-	wxGISApplication* m_pApp;
-	std::vector<wxMenuItem*> m_delitems;
-
-	DECLARE_EVENT_TABLE()
+    std::vector<wxMenuItem*> m_delitems;
+	IApplication* m_pApp;
+	IConnectionPointContainer* m_pConnectionPointSelection;
+	long m_ConnectionPointSelectionCookie;
 };
+
 

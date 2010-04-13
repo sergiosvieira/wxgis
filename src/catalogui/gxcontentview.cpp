@@ -233,7 +233,10 @@ void wxGxContentView::OnSetFocus(wxFocusEvent& event)
     if(event.GetWindow() == this)
         return;
     if(GetSelectedItemCount() == 0)
+    {
+        m_pSelection->Select(m_pParentGxObject, false, NOTFIRESELID);
         return;
+    }
     m_pSelection->Clear(NOTFIRESELID);
     long nItem = -1;
     for ( ;; )
@@ -251,6 +254,9 @@ void wxGxContentView::OnSetFocus(wxFocusEvent& event)
 void wxGxContentView::OnDeselected(wxListEvent& event)
 {
 	event.Skip();
+    if(GetSelectedItemCount() == 0)
+        m_pSelection->Select(m_pParentGxObject, false, NOTFIRESELID);
+
 	LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
 	if(pItemData == NULL)
 		return;
@@ -477,7 +483,8 @@ void wxGxContentView::OnObjectDeleted(IGxObject* pObj)
 			continue;
 		if(pItemData->pObject != pObj)
 			continue;
-		delete pItemData;
+        SetItemData(i, NULL);
+		//delete pItemData;
 		DeleteItem(i);
 		//Refresh();
 		return;
@@ -553,10 +560,7 @@ void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiato
 {
 	if(nInitiator == GetId())
 		return;
-	GxObjectArray* pGxObjectArray = m_pSelection->GetSelectedObjects();
-	if(pGxObjectArray == NULL || pGxObjectArray->size() == 0)
-		return;
-	IGxObject* pGxObj = pGxObjectArray->at(pGxObjectArray->size() - 1);	
+	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();	
 	//if(m_pParentGxObject == pGxObj)
 	//	return;
 
@@ -583,10 +587,9 @@ bool wxGxContentView::Applies(IGxSelection* Selection)
 	if(Selection == NULL)
 		return false;
 
-	GxObjectArray* pGxObjectArray = Selection->GetSelectedObjects();
-	for(size_t i = 0; i < pGxObjectArray->size(); i++)
+	for(size_t i = 0; i < Selection->GetCount(); i++)
 	{
-		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>( pGxObjectArray->at(i) );
+		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>( Selection->GetSelectedObjects(i) );
 		if(pGxObjectContainer != NULL)
 			return true;
 	}

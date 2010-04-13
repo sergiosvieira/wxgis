@@ -226,6 +226,7 @@ void wxGxCatalog::LoadChildren(wxXmlNode* pNode)
 	{
 		wxString sCatalogRootItemName = pChildren->GetPropVal(wxT("name"), NONAME);
         bool bIsEnabled = wxAtoi(pChildren->GetPropVal(wxT("is_enabled"), wxT("1")));
+        bool bContin = false;
         if(!bIsEnabled)
 		{
 			pChildren = pChildren->GetNext();
@@ -237,9 +238,13 @@ void wxGxCatalog::LoadChildren(wxXmlNode* pNode)
 			if(m_CatalogRootItemArray[i] == sCatalogRootItemName)
 			{
 				pChildren = pChildren->GetNext();
-				continue;		
+                bContin = true;
+				break;		
 			}
 		}
+
+        if(bContin)
+            continue;
 
 		if(sCatalogRootItemName == DISCCONNCAT)
 		{
@@ -254,6 +259,7 @@ void wxGxCatalog::LoadChildren(wxXmlNode* pNode)
 			{
                 if(AddChild(pGxObject))
                 {
+                    m_CatalogRootItemArray.Add(sCatalogRootItemName);
                     IGxRootObjectProperties* pGxRootObjectProperties = dynamic_cast<IGxRootObjectProperties*>(pGxObject);
                     if(pGxRootObjectProperties)
                         pGxRootObjectProperties->Init(pChildren);
@@ -300,8 +306,8 @@ void wxGxCatalog::SetShowExt(bool bShowExt)
 void wxGxCatalog::ObjectDeleted(IGxObject* pObject)
 {	
 	//if selected remove from m_Selection
-	if(m_pSelection != NULL)
-		m_pSelection->Unselect(pObject, IGxSelection::INIT_ALL);
+	//if(m_pSelection != NULL)
+	//	m_pSelection->Unselect(pObject, IGxSelection::INIT_ALL);
 
 	wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
 
@@ -478,6 +484,26 @@ void wxGxCatalog::SetLocation(wxString sPath)
 		m_pSelection->Select(pObj, false, IGxSelection::INIT_ALL);
 	else
 		ConnectFolder(sPath);
+}
+
+void wxGxCatalog::Undo(int nPos)
+{
+    if(m_pSelection->CanUndo())
+    {
+        wxString sPath = m_pSelection->Undo(nPos);
+        if(!sPath.IsEmpty())
+            SetLocation(sPath);
+    }
+}
+
+void wxGxCatalog::Redo(int nPos)
+{
+    if(m_pSelection->CanRedo())
+    {
+        wxString sPath = m_pSelection->Redo(nPos);
+        if(!sPath.IsEmpty())
+           SetLocation(sPath);
+    }
 }
 
 wxString wxGxCatalog::ConstructFullName(IGxObject* pObject)

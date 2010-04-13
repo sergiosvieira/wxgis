@@ -23,6 +23,7 @@
 #include "wxgis/framework/application.h"
 #include "wxgis/catalogui/gxtreeview.h"
 #include "wxgis/catalogui/gxtabview.h"
+#include "wxgis/catalogui/newmenu.h"
 
 #include "wx/aui/aui.h"
 #include "wx/artprov.h"
@@ -36,7 +37,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxApplication :
     public IGxApplication
 {
 public:	
-	wxGxApplication(IGISConfig* pConfig, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER);
+	wxGxApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER);
 	virtual ~wxGxApplication(void);
 	virtual wxAuiManager* GetAuiManager(void){return &m_mgr;};
 	virtual void ShowPane(wxWindow* pWnd, bool bShow = true);
@@ -54,12 +55,15 @@ public:
 	virtual WINDOWARRAY* GetChildWindows(void);
 	virtual void RegisterChildWindow(wxWindow* pWnd);
     virtual wxString GetAppName(void){return wxString(APP_NAME);};
+    virtual bool Create(IGISConfig* pConfig);
 protected:
-	virtual void SerializeFramePos(bool bSave = false);
+    //wxGxApplication
+	virtual void SerializeGxFramePos(bool bSave = false);
 protected:
 	wxAuiManager m_mgr;
 	wxGxTreeView* m_pTreeView;
 	wxGxTabView* m_pTabView;
 	IGxCatalog* m_pCatalog;
 	WINDOWARRAY m_WindowArray;
+    wxGISNewMenu* m_pNewMenu;
 };

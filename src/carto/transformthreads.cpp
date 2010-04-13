@@ -50,14 +50,19 @@ void *wxGISFeatureTransformThread::Entry()
     
     size_t nStep = m_pwxGISFeatureDataset->GetSize() < 10 ? 1 : m_pwxGISFeatureDataset->GetSize() / 10;
 
+    OGREnvelope* pEnv = m_pwxGISFeatureDataset->GetEnvelope();
+
  	OGRFeature* poFeature;
     while((poFeature = m_pwxGISFeatureDataset->Next()) != NULL)	
     {
         if(m_pTrackCancel && !m_pTrackCancel->Continue())
             return NULL;
 
-        OGRGeometry* pGeom = poFeature->StealGeometry();//GetGeometryRef();
-        if(!pGeom)
+        OGRGeometry* pGeom = poFeature->StealGeometry();//GetGeometryRef();    
+        OGREnvelope GEnv;
+        pGeom->getEnvelope(&GEnv);
+        
+        if(!pGeom || !pEnv->Contains(GEnv))
         {
             OGRFeature::DestroyFeature(poFeature);
             continue;

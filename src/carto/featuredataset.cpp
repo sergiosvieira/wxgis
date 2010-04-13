@@ -27,12 +27,20 @@
 void GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds)
 {
 	OGRGeometry* pGeometry = (OGRGeometry*)hFeature;
-	if(!pGeometry)
+    if(!pGeometry)
 		return;
 	OGREnvelope Env;
 	pGeometry->getEnvelope(&Env);
-    if(Env.MinX == Env.MaxX) Env.MaxX += 0.0001;
-    if(Env.MinY == Env.MaxY) Env.MaxY += 0.0001;
+    if(fabs(Env.MinX - Env.MaxX) < DELTA)
+    {
+        //wxLogDebug(wxT("%f %f"), Env.MinX, Env.MaxX);
+        Env.MaxX += DELTA;
+    }
+    if(fabs(Env.MinY - Env.MaxY) < DELTA)
+    {
+        //wxLogDebug(wxT("%f %f"), Env.MinX, Env.MaxX);
+        Env.MaxY += DELTA;
+    }
 
 	pBounds->minx = Env.MinX;
 	pBounds->maxx = Env.MaxX;
@@ -82,7 +90,7 @@ bool wxGISFeatureDataset::Delete(int iLayer)
     if(m_poDS)
     {
         DeleteQuadTree();
-        m_pGeometrySet->Release();
+        wsDELETE(m_pGeometrySet);
         OGRDataSource::DestroyDataSource( m_poDS );
         m_poDS = NULL;
     }
@@ -252,7 +260,7 @@ OGRFeature* wxGISFeatureDataset::operator [](long nIndex) //const    same as Get
 wxString wxGISFeatureDataset::GetAsString(long row, int col)
 {
 	if(GetSize() <= row) 
-		return wxString(); 
+		return wxEmptyString; 
 	else 
 	{
 		OGRFeature* pFeature = GetAt(row);

@@ -51,9 +51,7 @@ void wxTreeViewComboPopup::Init()
 void wxTreeViewComboPopup::OnPopup()
 {
    m_bClicked = false;
-   GxObjectArray* pGxObjectArray = m_pSelection->GetSelectedObjects();
-   if(pGxObjectArray)
-       SelectItem(m_TreeMap[pGxObjectArray->at(pGxObjectArray->size() - 1)]);
+   SelectItem(m_TreeMap[m_pSelection->GetLastSelectedObject()]);
 }
 
 void wxTreeViewComboPopup::OnDismiss()
@@ -73,9 +71,9 @@ wxString wxTreeViewComboPopup::GetStringValue() const
 {
     if( m_bClicked == false )
     {
-        GxObjectArray* pGxObjectArray = m_pSelection->GetSelectedObjects();
-        if(pGxObjectArray)
-            return 	pGxObjectArray->at(pGxObjectArray->size() - 1)->GetName();	
+        IGxObject* pGxObject = m_pSelection->GetLastSelectedObject();
+        if(pGxObject)
+            return pGxObject->GetName();	
         return wxEmptyString;
     }
 
@@ -134,13 +132,8 @@ void wxTreeViewComboPopup::OnSelectionChanged(IGxSelection* Selection, long nIni
 {
 	if(nInitiator == GetId())
 		return;
-	GxObjectArray* pGxObjectArray = m_pSelection->GetSelectedObjects();
-	if(pGxObjectArray == NULL || pGxObjectArray->size() == 0)
-		return;
-    //
-    //wxTreeCtrl::CollapseAll();
-    //
-	IGxObject* pGxObj = pGxObjectArray->at(pGxObjectArray->size() - 1);	
+
+    IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();	
 	wxTreeItemId ItemId = m_TreeMap[pGxObj];
 	if(ItemId.IsOk())
 	{
@@ -306,7 +299,7 @@ BEGIN_EVENT_TABLE(wxGxDialog, wxDialog)
     EVT_UPDATE_UI(wxID_OK, wxGxDialog::OnOKUI)
 END_EVENT_TABLE()
 
-wxGxDialog::wxGxDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pDropDownCommand(NULL), m_bAllowMultiSelect(false), m_bOverwritePrompt(false), m_nDefaultFilter(0), m_pConfig(NULL), m_pObjectArray(NULL), m_pwxGxContentView(NULL), m_PopupCtrl(NULL)
+wxGxDialog::wxGxDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pDropDownCommand(NULL), m_bAllowMultiSelect(false), m_bOverwritePrompt(false), m_nDefaultFilter(0), m_pConfig(NULL), m_pwxGxContentView(NULL), m_PopupCtrl(NULL)
 {
 	this->SetSizeHints( wxSize( 400,300 ), wxDefaultSize );
 
@@ -676,22 +669,24 @@ void wxGxDialog::OnOK(wxCommandEvent& event)
         }
         else
         {
-            m_pObjectArray = m_pwxGxContentView->GetSelectedObjects();
-            if(!m_pObjectArray)
-                return;
-            for(size_t i = 0; i < m_pObjectArray->size(); i++)
+            IGxSelection* pSel = m_pwxGxContentView->GetSelectedObjects();
+            for(size_t i = 0; i < pSel->GetCount(); i++)
+            {
+                m_ObjectArray.push_back(pSel->GetSelectedObjects(i));
+            }
+            for(size_t i = 0; i < m_ObjectArray.size(); i++)
             {
                 if(nPos != m_FilterArray.size())
                 {
-                    if(!m_FilterArray[nPos]->CanChooseObject(m_pObjectArray->at(i)))
+                    if(!m_FilterArray[nPos]->CanChooseObject(m_ObjectArray[i]))
                     {
-                        IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(m_pObjectArray->at(i));
+                        IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(m_ObjectArray[i]);
                         if(pObjCont)
                         {
-                            m_pCatalog->GetSelection()->Select(m_pObjectArray->at(i), false, IGxSelection::INIT_ALL);
+                            m_pCatalog->GetSelection()->Select(m_ObjectArray[i], false, IGxSelection::INIT_ALL);
                             return;
                         }
-                        m_pObjectArray->erase(m_pObjectArray->begin() + i);
+                        m_ObjectArray.erase(m_ObjectArray.begin() + i);
                         i--;
                     }
                 }
@@ -700,26 +695,26 @@ void wxGxDialog::OnOK(wxCommandEvent& event)
                     for(size_t j = 0; j < m_FilterArray.size(); j++)
                     {
                         bool bCanChooseObject = false;
-                        if(m_FilterArray[j]->CanChooseObject(m_pObjectArray->at(i)))
+                        if(m_FilterArray[j]->CanChooseObject(m_ObjectArray[i]))
                         {
                             bCanChooseObject = true;
                             break;
                         }
                         if(!bCanChooseObject)
                         {
-                            IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(m_pObjectArray->at(i));
+                            IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(m_ObjectArray[i]);
                             if(pObjCont)
                             {
-                                m_pCatalog->GetSelection()->Select(m_pObjectArray->at(i), false, IGxSelection::INIT_ALL);
+                                m_pCatalog->GetSelection()->Select(m_ObjectArray[i], false, IGxSelection::INIT_ALL);
                                 return;
                             }
-                            m_pObjectArray->erase(m_pObjectArray->begin() + i);
+                            m_ObjectArray.erase(m_ObjectArray.begin() + i);
                             i--;
                         }
                     }
                 }
             }
-            if(m_pObjectArray->size() == 0)
+            if(m_ObjectArray.size() == 0)
             {
                 wxMessageBox(_("The item(s) cannot be choosen!"), _("Error"), wxICON_ERROR | wxOK, this);
                 return;
@@ -849,10 +844,9 @@ wxString wxGxDialog::GetFullPath(void)
 
 IGxObject* wxGxDialog::GetLocation(void)
 {
-    GxObjectArray* pArr = m_PopupCtrl->GetSelectedObjects();
-    if(pArr)
-        if(pArr->size() > 0)
-            return pArr->at(0);
+    IGxSelection* pSel = m_PopupCtrl->GetSelectedObjects();
+    if(pSel && pSel->GetCount() > 0)
+        return pSel->GetSelectedObjects(0);
     return NULL;
 }
 

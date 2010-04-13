@@ -146,10 +146,7 @@ void wxGxTreeViewBase::OnSelectionChanged(IGxSelection* Selection, long nInitiat
 {
 	if(nInitiator == GetId())
 		return;
-	GxObjectArray* pGxObjectArray = m_pSelection->GetSelectedObjects();
-	if(pGxObjectArray == NULL || pGxObjectArray->size() == 0)
-		return;
-	IGxObject* pGxObj = pGxObjectArray->at(pGxObjectArray->size() - 1);	
+	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();	
 	wxTreeItemId ItemId = m_TreeMap[pGxObj];
 	if(ItemId.IsOk())
 	{

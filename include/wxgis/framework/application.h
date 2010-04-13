@@ -24,6 +24,9 @@
 #include "wxgis/framework/menubar.h"
 #include "wxgis/framework/commandbar.h"
 
+#include "wx/dynload.h"
+#include "wx/dynlib.h"
+
 WXDLLIMPEXP_GIS_FRW IApplication* GetApplication();//{return m_pGlobalApp;};
 
 class WXDLLIMPEXP_GIS_FRW wxGISApplication : 
@@ -32,7 +35,7 @@ class WXDLLIMPEXP_GIS_FRW wxGISApplication :
 {
 public:
 	//constructor
-	wxGISApplication(IGISConfig* pConfig, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER );//| wxWS_EX_VALIDATE_RECURSIVELY
+	wxGISApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER );//| wxWS_EX_VALIDATE_RECURSIVELY
 	//destructor
 	virtual ~wxGISApplication(void);
 	virtual wxStatusBar* OnCreateStatusBar(int number, long style, wxWindowID id, const wxString& name);
@@ -56,7 +59,11 @@ public:
 	virtual void OnMouseUp(wxMouseEvent& event);
 	virtual void OnMouseDoubleClick(wxMouseEvent& event);
 	virtual void OnMouseMove(wxMouseEvent& event);
+    virtual bool Create(IGISConfig* pConfig);
+
+    typedef std::vector<wxDynamicLibrary*> LIBRARYARRAY;
 protected:
+	virtual void LoadLibs(wxXmlNode* pRootNode);
 	virtual void LoadCommands(wxXmlNode* pRootNode);
 	virtual void LoadMenues(wxXmlNode* pRootNode);
 	virtual void LoadToolbars(wxXmlNode* pRootNode);
@@ -81,6 +88,7 @@ protected:
 	wxGISMenuBar* m_pMenuBar;
 	ITool* m_CurrentTool;
     IDropDownCommand* m_pDropDownCommand;
+    LIBRARYARRAY m_LibArr;
 
     DECLARE_EVENT_TABLE()
 };

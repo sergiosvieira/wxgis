@@ -52,7 +52,7 @@ bool wxGISCatalogApp::OnInit()
 #ifdef WXGISPORTABLE
     m_pConfig = new wxGISAppConfig(APP_NAME, CONFIG_DIR, true);
 #else
-	m_pConfig = new wxGISAppConfig(APP_NAME, CONFIG_DIR);
+	m_pConfig = new wxGISAppConfig(APP_NAME, CONFIG_DIR, false);
 #endif
 	//setup loging
 	wxString sLogDir = m_pConfig->GetLogDir();
@@ -177,7 +177,9 @@ bool wxGISCatalogApp::OnInit()
 	m_pConfig->SetSysDir(sSysDir);
 	m_pConfig->SetDebugMode(bDebugMode);
 
-	wxFrame* frame = new wxGISCatalogFrame(m_pConfig, NULL, wxID_ANY, _("wxGIS Catalog"), wxDefaultPosition, wxSize(800, 480) );
+	wxGISCatalogFrame* frame = new wxGISCatalogFrame(NULL, wxID_ANY, _("wxGIS Catalog"), wxDefaultPosition, wxSize(800, 480) );
+    if(!frame->Create(m_pConfig))
+        return false;
     SetTopWindow(frame);
     frame->Show();
 
