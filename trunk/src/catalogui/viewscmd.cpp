@@ -44,7 +44,7 @@ wxIcon wxGISCatalogViewsCmd::GetBitmap(void)
 		case 0:
 			return m_ImageList.GetIcon(0);
 		default:
-			return wxIcon();
+			return wxNullIcon;
 	}
 }
 
@@ -55,7 +55,7 @@ wxString wxGISCatalogViewsCmd::GetCaption(void)
 		case 0:	
 			return wxString(_("View"));
 		default:
-			return wxString();
+			return wxEmptyString;
 	}
 }
 
@@ -122,7 +122,7 @@ wxString wxGISCatalogViewsCmd::GetMessage(void)
 		case 0:	
 			return wxString(_("Select view"));
 		default:
-			return wxString();
+			return wxEmptyString;
 	}
 }
 

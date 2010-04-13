@@ -74,10 +74,9 @@ bool wxGxMapView::Applies(IGxSelection* Selection)
 	if(Selection == NULL)
 		return false;
 
-	GxObjectArray* pGxObjectArray = Selection->GetSelectedObjects();
-	for(size_t i = 0; i < pGxObjectArray->size(); i++)
+	for(size_t i = 0; i < Selection->GetCount(); i++)
 	{
-		IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>( pGxObjectArray->at(i) );
+		IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>( Selection->GetSelectedObjects(i) );
 		if(pGxDataset != NULL)
 		{			
 			wxGISEnumDatasetType type = pGxDataset->GetType();
@@ -99,10 +98,7 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	if(nInitiator == GetId())
 		return;
 
-	GxObjectArray* pGxObjectArray = m_pSelection->GetSelectedObjects();
-	if(pGxObjectArray == NULL || pGxObjectArray->size() == 0)
-		return;
-	IGxObject* pGxObj = pGxObjectArray->at(pGxObjectArray->size() - 1);	
+    IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();	
 	if(m_pParentGxObject == pGxObj)
 		return;
 

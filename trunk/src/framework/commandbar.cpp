@@ -295,6 +295,7 @@ void wxGISMenu::AddMenu(wxMenu* pMenu, wxString sName)
 	m_SubmenuArray.push_back(data);
 }
 
+
 //----------------------------------------------------------------------
 // wxGISToolbar
 //----------------------------------------------------------------------

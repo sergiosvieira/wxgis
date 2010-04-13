@@ -173,10 +173,10 @@ wxDirTraverseResult wxGxFolder::OnDir(const wxString& dirname)
 
 bool wxGxFolder::DeleteChild(IGxObject* pChild)
 {
-    m_pCatalog->ObjectDeleted(pChild);
 	bool bHasChildren = m_Children.size() > 0 ? true : false;
 	if(!IGxObjectContainer::DeleteChild(pChild))
 		return false;
+    m_pCatalog->ObjectDeleted(pChild);
 	if(bHasChildren != m_Children.size() > 0 ? true : false)
 		m_pCatalog->ObjectChanged(this);
 	return true;		

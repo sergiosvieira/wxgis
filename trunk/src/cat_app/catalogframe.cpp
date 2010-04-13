@@ -34,7 +34,7 @@ BEGIN_EVENT_TABLE(wxGISCatalogFrame, wxGxApplication)
 END_EVENT_TABLE()
 
 
-wxGISCatalogFrame::wxGISCatalogFrame(IGISConfig* pConfig, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxGxApplication(pConfig, parent, id, title, pos, size, style)
+wxGISCatalogFrame::wxGISCatalogFrame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxGxApplication(parent, id, title, pos, size, style)
 {
 	//set app main icon
 	SetIcon(wxIcon(mainframe_xpm));

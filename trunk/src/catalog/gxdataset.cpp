@@ -168,7 +168,7 @@ wxIcon wxGxShapefileDataset::GetLargeImage(void)
 		return wxIcon(m_ImageListLarge.GetIcon(0));
 	case enumMapinfoTabfile:
 	default:
-		return wxIcon();
+		return wxNullIcon;
 	}
 }
 
@@ -180,19 +180,27 @@ wxIcon wxGxShapefileDataset::GetSmallImage(void)
 		return wxIcon(m_ImageListSmall.GetIcon(0));
 	case enumMapinfoTabfile:
 	default:
-		return wxIcon();
+		return wxNullIcon;
 	}
 }
 
 bool wxGxShapefileDataset::Delete(void)
 {
-    wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset());
+    wxGISFeatureDataset* pDSet;
+ 	if(m_pwxGISDataset == NULL)
+        pDSet = new wxGISFeatureDataset(m_sPath, m_pPathEncoding, m_Encoding);
+    else
+    {
+        pDSet = dynamic_cast<wxGISFeatureDataset*>(m_pwxGISDataset);
+        wsDELETE(m_pwxGISDataset);
+    }
+    
     if(!pDSet)
         return false;
 
     bool bRet = pDSet->Delete();
     if(bRet)
-	{
+	{        
         wsDELETE(pDSet);
 
         wxString vol, shortpath, name, ext;
@@ -359,13 +367,14 @@ wxIcon wxGxRasterDataset::GetSmallImage(void)
 
 bool wxGxRasterDataset::Delete(void)
 {
-    wxGISRasterDataset* pDSet = NULL;
+    wxGISRasterDataset* pDSet;
  	if(m_pwxGISDataset == NULL)
         pDSet = new wxGISRasterDataset(m_sPath);
     else
     {
         m_pwxGISDataset->Release();
         pDSet = dynamic_cast<wxGISRasterDataset*>(m_pwxGISDataset);
+        m_pwxGISDataset = NULL;
     }
     
     if(!pDSet)
@@ -374,6 +383,8 @@ bool wxGxRasterDataset::Delete(void)
     bool bRet = pDSet->Delete();
     if(bRet)
 	{
+        wsDELETE(pDSet);
+
         wxString vol, shortpath, name, ext;
         wxFileName::SplitPath(m_sPath, &vol, &shortpath, &name, &ext);
         wxString sRemNames;

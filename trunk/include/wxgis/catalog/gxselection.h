@@ -38,6 +38,31 @@ public:
     virtual void Select( IGxObject* pObject);
 	virtual void Unselect(IGxObject* pObject, long nInitiator);
 	virtual void Clear(long nInitiator);
-	//IConnectionPointContainer
+    virtual size_t GetCount(void);
+    virtual size_t GetCount(long nInitiator);
+	virtual IGxObject* GetSelectedObjects(size_t nIndex);
+	virtual IGxObject* GetSelectedObjects(long nInitiator, size_t nIndex);
+    virtual IGxObject* GetLastSelectedObject(void);
+	virtual void SetInitiator(long nInitiator);
+    virtual void Do(IGxObject* pObject);
+    virtual bool CanRedo();
+	virtual bool CanUndo();
+    virtual wxString Redo(int nPos = -1);
+    virtual wxString Undo(int nPos = -1);
+    virtual void Reset();
+    virtual size_t GetDoSize();
+    virtual int GetDoPos(void){return m_Pos;};
+    virtual wxString GetDoPath(size_t nIndex);
+    //virtual wxArrayString* GetDoArray(void){return &m_DoArray;};
+    //IConnectionPointContainer
 	virtual long Advise(wxObject* pObject);
+protected:
+    wxArrayString m_DoArray;
+	int m_Pos;
+    bool m_bDoOp;
+    IGxObject* m_pPrevObject;
+    wxCriticalSection m_DoCritSect, m_CritSect;
+
+	std::map<long, GxObjectArray*> m_SelectionMap;
+	long m_currentInitiator;
 };

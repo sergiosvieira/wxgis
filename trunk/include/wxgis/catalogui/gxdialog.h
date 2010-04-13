@@ -99,7 +99,12 @@ public:
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 //wxGxTreeViewBase
     virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, bool sort = true);
-    virtual GxObjectArray* GetSelectedObjects(void){return m_pSelection->GetSelectedObjects(TREECTRLID);}
+    //
+    virtual IGxSelection* GetSelectedObjects(void)
+    {
+        m_pSelection->SetInitiator(TREECTRLID);
+        return m_pSelection;
+    }
 protected:
     wxTreeItemId m_PrewItemId;
     bool m_bClicked;
@@ -127,7 +132,12 @@ public:
 	virtual void SetCurrentFilter(size_t nFilterIndex);
 //wxGxContentView
 	virtual void AddObject(IGxObject* pObject);
-    virtual GxObjectArray* GetSelectedObjects(void){return m_pSelection->GetSelectedObjects(NOTFIRESELID/*LISTCTRLID*/);}
+    //
+    virtual IGxSelection* GetSelectedObjects(void)
+    {
+        m_pSelection->SetInitiator(NOTFIRESELID/*LISTCTRLID*/);
+        return m_pSelection;
+    }
 protected:
 	IConnectionPointContainer* m_pConnectionPointSelection;
 	long m_ConnectionPointSelectionCookie;
@@ -189,6 +199,7 @@ public:
 	virtual void OnMouseUp(wxMouseEvent& event){};
 	virtual void OnMouseDoubleClick(wxMouseEvent& event){};
 	virtual void OnMouseMove(wxMouseEvent& event){};
+    virtual bool Create(IGISConfig* pConfig){return true;};
 //wxGxDialog
 	virtual void SetButtonCaption(wxString sOkBtLabel);
 	virtual void SetStartingLocation(wxString sStartPath);
@@ -199,7 +210,7 @@ public:
 	virtual int ShowModalSave();
 	virtual void AddFilter(IGxObjectFilter* pFilter, bool bDefault = false);
 	virtual void RemoveAllFilters(void);
-    virtual GxObjectArray* GetSelectedObjects(void){return m_pObjectArray;}
+    virtual GxObjectArray* GetSelectedObjects(void){return &m_ObjectArray;}
     virtual wxString GetName(void);
     virtual wxString GetFullPath(void);
     virtual IGxObject* GetLocation(void);
@@ -232,7 +243,7 @@ protected:
     bool m_bIsSaveDlg;
 	OBJECTFILTERS m_FilterArray;
 	size_t m_nDefaultFilter;
-    GxObjectArray* m_pObjectArray;
+    GxObjectArray m_ObjectArray;
     int m_nRetCode;
    	WINDOWARRAY m_WindowArray;
 

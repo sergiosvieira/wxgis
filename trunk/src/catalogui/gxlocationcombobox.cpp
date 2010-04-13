@@ -55,10 +55,9 @@ void wxGxLocationComboBox::OnSelectionChanged(IGxSelection* Selection, long nIni
 {
 	if(nInitiator != TREECTRLID)
 		return;
-	GxObjectArray* pGxObjectArray = Selection->GetSelectedObjects();
-	if(pGxObjectArray == NULL || pGxObjectArray->size() == 0)
-		return;
-	IGxObject* pGxObj = pGxObjectArray->at(pGxObjectArray->size() - 1);	
+    IGxObject* pGxObj = Selection->GetLastSelectedObject();	
+    if(!pGxObj)
+        return;
 	wxString sPath = pGxObj->GetFullName();
 	if(sPath.IsEmpty())
 		sPath = pGxObj->GetName();

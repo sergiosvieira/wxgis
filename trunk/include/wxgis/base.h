@@ -118,18 +118,25 @@
 #include <algorithm>
 #include <map>
 #include <vector>
+#include <queue>
 
 #define CONFIG_DIR wxT("wxGIS") 
 #define DEF wxT("~def~") 
 #define NON wxT("~non~") 
 #define ERR wxT("~err~") 
 #define NONAME _("no name") 
-#define DELTA 0.0001
+#define DELTA 0.001
 #define CACHE_SIZE 3000
 #define ZOOM_FACTOR 0.25
 #define PI 3.1415926535897932384626433832795
 #define PIDEG 0.017453292519943295769236907684886
+
+#ifndef _DEBUG
 #define WXGISPORTABLE
+#endif
+
+#define WIN 0
+#define LIN 1
 
 static wxString DoubleToString(double Val, bool IsLon)
 {

@@ -46,7 +46,7 @@ public:
 	virtual IGxObject* GetParent(void){return NULL;};
 	virtual void Refresh(void);
 	//IGxObjectUI
-	virtual wxIcon GetLargeImage(void){return wxIcon();};
+	virtual wxIcon GetLargeImage(void){return wxNullIcon;};
 	virtual wxIcon GetSmallImage(void){return wxIcon(mainframe_xpm);};
 	virtual wxString ContextMenu(void){return wxString(wxT("wxGxCatalog.ContextMenu"));};
 	virtual wxString NewMenu(void){return wxString(wxT("wxGxCatalog.NewMenu"));};
@@ -74,6 +74,8 @@ public:
 	virtual IGxObject* ConnectFolder(wxString sPath);
 	virtual void DisconnectFolder(wxString sPath);
 	virtual void SetLocation(wxString sPath);
+    virtual void Undo(int nPos = -1);
+    virtual void Redo(int nPos = -1);
 	//IConnectionPointContainer
 	virtual long Advise(wxObject* pObject);
 	//wxGxCatalog

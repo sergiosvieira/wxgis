@@ -148,7 +148,7 @@ wxString wxGISAcceleratorTable::GetText(int cmd)
 			return res;
 		}
 	}
-	return wxString();
+	return wxEmptyString;
 }
 
 void wxGISAcceleratorTable::Store(void)

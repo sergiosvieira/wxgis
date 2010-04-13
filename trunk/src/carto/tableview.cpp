@@ -63,7 +63,7 @@ int wxGISTable::GetNumberRows()
 wxString wxGISTable::GetValue(int row, int col)
 {
 	if(GetNumberCols() <= col || GetNumberRows() <= row)
-		return wxString();
+		return wxEmptyString;
 
 	//fetch more data
 	wxBusyCursor wait;
@@ -89,7 +89,7 @@ wxString wxGISTable::GetColLabelValue(int col)
 
 wxString wxGISTable::GetRowLabelValue(int row)
 {
-	return wxString();
+	return wxEmptyString;
 }
 
 //-------------------------------------
