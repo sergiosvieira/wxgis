@@ -32,17 +32,18 @@ class WXDLLIMPEXP_GIS_FRW wxGISProgressor :
 public:
 	wxGISProgressor(wxWindow * parent, wxWindowID id = wxID_ANY, int range = 100, const wxPoint & pos = wxDefaultPosition, const wxSize & size = wxDefaultSize, long style = /*wxNO_BORDER*/wxSTATIC_BORDER, const wxString name = wxT("GISProgressor"));
 	virtual ~wxGISProgressor(void);
-    virtual void SetRange(int range);
-    virtual int GetRange();
-    virtual void SetValue(int value);
-    virtual int GetValue();
-    virtual void Pulse();
     //events
 	void OnPaint(wxPaintEvent & event);
 	void OnEraseBackground(wxEraseEvent & event);
     void OnTimer( wxTimerEvent & event);
 	//IProgressor
 	virtual bool Show(bool bShow);
+    virtual void SetRange(int range);
+    virtual int GetRange();
+    virtual void SetValue(int value);
+    virtual int GetValue();
+	virtual void Play(void);
+	virtual void Stop(void);
 protected:
     int m_nValue;
     int m_nRange;

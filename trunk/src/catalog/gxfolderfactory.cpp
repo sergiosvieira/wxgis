@@ -39,9 +39,12 @@ bool wxGxFolderFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 	for(size_t i = 0; i < pFileNames->GetCount(); i++)
 	{
 		wxString path = pFileNames->Item(i);
-		wxString name, ext;
-		wxFileName::SplitPath(path, NULL, NULL, &name, &ext);
-    	ext.MakeLower();
+
+        wxFileName FName(path);
+        wxString ext = FName.GetExt().MakeLower();
+        FName.ClearExt();
+        wxString name = FName.GetName();
+
 		if(wxFileName::DirExists(path))
 		{
 			//wxDir dir(path);

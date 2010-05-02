@@ -64,6 +64,7 @@ protected:
 	wxString m_sAppName;
 	std::vector<WXXMLCONF> m_configs_arr;
 	std::vector<WXXMLCONFNODE> m_confignodes_arr;
+    bool m_bPortable;
 };
 
 //---------------------------------------------------------------

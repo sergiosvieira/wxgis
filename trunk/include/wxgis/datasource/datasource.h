@@ -21,32 +21,49 @@
 
 #pragma once
 
+#include "wxgis/framework/framework.h"
+#include "wx/datetime.h"
+
 #include "ogrsf_frmts.h"
 //#include "ogr_api.h"
 #include "gdal_priv.h"
 #include "gdalwarper.h"
 #include "gdal_alg_priv.h"
 #include "cpl_quad_tree.h"
-
-#include "wxgis/framework/framework.h"
-#include <wx/datetime.h>
+#include "cpl_string.h"
 
 enum wxGISEnumDatasetType
 {
 	enumGISFeatureDataset = 1, 
 	enumGISTableDataset = 2, 
-	enumGISRasterDataset = 4
+	enumGISRasterDataset = 3,
+	enumGISContainer = 4
 };
 
-enum wxGISEnumShapefileDatasetType
+enum wxGISEnumVectorDatasetType
 {
-	enumESRIShapefile = 1, 
-	enumMapinfoTabfile = 2
+	enumVecUnknown = 0, 
+	enumVecESRIShapefile = 1, 
+	enumVecMapinfoTab = 2,
+    enumVecMapinfoMif = 3, 
+    enumVecKML = 4,
+    enumVecDXF = 5
 };
 
 enum wxGISEnumRasterDatasetType
 {
-	enumRasterUnknown = 0
+	enumRasterUnknown = 0,
+	enumRasterBmp = 1,
+	enumRasterTiff = 2,
+	enumRasterImg = 3,
+	enumRasterJpeg = 4,
+	enumRasterPng = 5
+};
+
+enum wxGISEnumTableDatasetType
+{
+	enumTableUnknown = 0,
+    enumTableDBF = 1
 };
 
 enum wxGISEnumPrjFileType
@@ -54,6 +71,12 @@ enum wxGISEnumPrjFileType
 	enumESRIPrjFile = 1, 
 	enumSPRfile = 2
 };
+
+typedef struct _Limits
+{
+    double minx, miny, maxx, maxy;
+}
+LIMITS, *LPLIMITS;
 
 //this class should be in wxGISGeodatabase
 class wxGISDataset :
@@ -67,11 +90,17 @@ public:
     };
 	virtual ~wxGISDataset(void){ };
 	virtual wxGISEnumDatasetType GetType(void) = 0;
+    virtual int GetSubType(void){return m_nSubType;};
+    virtual void SetSubType(int nSubType){m_nSubType = nSubType;};
 	virtual wxString GetPath(void){return m_sPath;};
+    virtual size_t GetSubsetsCount(void){return 0;};
+    virtual wxGISDataset* GetSubset(size_t nIndex){return NULL;};
+    virtual wxString GetName(void){return wxEmptyString;};
 protected:
 	wxString m_sPath;
     wxCriticalSection m_CritSect;
     wxMBConv* m_pPathEncoding;
+    int m_nSubType;
 };
 
 class wxGISFeatureSet
@@ -108,18 +137,13 @@ class wxGISGeometrySet :
 	public IPointer
 {
 public:
-	wxGISGeometrySet(wxGISDataset* pDataset = NULL, bool bOwnGeometry = false)
+	wxGISGeometrySet(bool bOwnGeometry = false)
 	{ 
-        m_pDataset = pDataset;
-        if(m_pDataset)
-            m_pDataset->Reference();
         SetOwnGeometry(bOwnGeometry);
         m_Iterator = m_OGRGeometryMap.begin();
 	}
 	virtual ~wxGISGeometrySet(void)
     {
-        if(m_pDataset)
-            m_pDataset->Dereference();
         Clear();
     }
 	virtual void AddGeometry(OGRGeometry* poGeometry, long nOID){m_OGRGeometryMap[poGeometry] = nOID;};
@@ -147,32 +171,27 @@ public:
         ++m_Iterator;
         return pOutGeom;
     };
-    virtual void SetDataset(wxGISDataset* pDataset)
-    {
-        if(!pDataset)
-            return;
-        if(m_pDataset)
-            m_pDataset->Dereference();
-        m_pDataset = pDataset;
-        m_pDataset->Reference();
-    };
     virtual long operator[](OGRGeometry* pGeom){return m_OGRGeometryMap[pGeom];};
     virtual void SetOwnGeometry(bool bOwnGeometry){m_bOwnGeometry = bOwnGeometry;};
 protected:
 	std::map<OGRGeometry*, long> m_OGRGeometryMap;	
     std::map<OGRGeometry*, long>::const_iterator m_Iterator;
-    wxGISDataset* m_pDataset;
     bool m_bOwnGeometry;
 };
 
-class IQueryFilter
+class wxGISQueryFilter
 {
 public:
-	virtual ~IQueryFilter(void){};
-
+    wxGISQueryFilter(void){};
+    wxGISQueryFilter(wxString sWhereClause){m_sWhereClause = sWhereClause;};
+	virtual ~wxGISQueryFilter(void){};
+    virtual void SetWhereClause(wxString sWhereClause){m_sWhereClause = sWhereClause;};
+    virtual wxString GetWhereClause(void){return m_sWhereClause;};
+protected:
+    wxString m_sWhereClause;
 };
 
-class wxGISSpatialFilter : public IQueryFilter
+class wxGISSpatialFilter : public wxGISQueryFilter
 {
 public:
 	virtual ~wxGISSpatialFilter(void){};

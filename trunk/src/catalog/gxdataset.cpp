@@ -21,9 +21,15 @@
 
 #include "../../art/shape_icon16.xpm"
 #include "../../art/shape_icon48.xpm"
+#include "../../art/mi_dset_16.xpm"
+#include "../../art/mi_dset_48.xpm"
+#include "../../art/md_dset_16.xpm"
+#include "../../art/md_dset_48.xpm"
+#include "../../art/dxf_dset_16.xpm"
+#include "../../art/dxf_dset_48.xpm"
 #include "wxgis/catalog/gxdataset.h"
-#include "wxgis/carto/featuredataset.h"
-#include "wxgis/carto/rasterdataset.h"
+#include "wxgis/datasource/featuredataset.h"
+#include "wxgis/datasource/rasterdataset.h"
 #include "wxgis/framework/messagedlg.h"
 #include "wxgis/framework/application.h"
 
@@ -31,32 +37,31 @@
 #include <wx/utils.h>
 
 //--------------------------------------------------------------
-//class wxGxDataset
+//class wxGxTableDataset
 //--------------------------------------------------------------
 
-wxGxDataset::wxGxDataset(wxString Path, wxString Name, wxGISEnumDatasetType Type)
+wxGxTableDataset::wxGxTableDataset(wxString Path, wxString Name, wxGISEnumTableDatasetType nType)
 {
 	m_ImageListSmall.Create(16, 16);
 	m_ImageListSmall.Add(wxBitmap(shape_icon16_xpm));
 	m_ImageListLarge.Create(48, 48);
 	m_ImageListLarge.Add(wxBitmap(shape_icon48_xpm));
 
-	m_type = Type;
+	m_type = nType;
 
 	m_sName = Name;
 	m_sPath = Path;
 
 	m_pwxGISDataset = NULL;
-    m_Encoding = wxFONTENCODING_DEFAULT;//wxFONTENCODING_UTF8;//
     m_pPathEncoding = wxConvCurrent;
 }
 
-wxGxDataset::~wxGxDataset(void)
+wxGxTableDataset::~wxGxTableDataset(void)
 {
     wsDELETE(m_pwxGISDataset);
 }
 
-wxIcon wxGxDataset::GetLargeImage(void)
+wxIcon wxGxTableDataset::GetLargeImage(void)
 {
 ////	return wxIcon(m_ImageListLarge.GetIcon(2));
 //	switch(m_type)
@@ -71,17 +76,18 @@ wxIcon wxGxDataset::GetLargeImage(void)
 	//}
 }
 
-wxIcon wxGxDataset::GetSmallImage(void)
+wxIcon wxGxTableDataset::GetSmallImage(void)
 {
 	return wxIcon(m_ImageListSmall.GetIcon(1));
 }
 
-bool wxGxDataset::Delete(void)
+bool wxGxTableDataset::Delete(void)
 {
     wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset());
     if(!pDSet)
         return false;
 
+    //pDSet->Reference();
     bool bRet = pDSet->Delete();
     if(bRet)
 	{
@@ -100,21 +106,21 @@ bool wxGxDataset::Delete(void)
     }
 }
 
-bool wxGxDataset::Rename(wxString NewName)
+bool wxGxTableDataset::Rename(wxString NewName)
 {
 	m_sName = NewName; 
 	return true;
 }
 
-void wxGxDataset::EditProperties(wxWindow *parent)
+void wxGxTableDataset::EditProperties(wxWindow *parent)
 {
 }
 
-wxGISDataset* wxGxDataset::GetDataset(void)
+wxGISDataset* wxGxTableDataset::GetDataset(void)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
-		m_pwxGISDataset = new wxGISFeatureDataset(m_sPath, m_pPathEncoding, m_Encoding);
+		m_pwxGISDataset = new wxGISFeatureDataset(m_sPath, enumVecUnknown, m_pPathEncoding);
 		//for storing internal pointer
 		m_pwxGISDataset->Reference();
 	}
@@ -123,16 +129,12 @@ wxGISDataset* wxGxDataset::GetDataset(void)
 	return m_pwxGISDataset;
 }
 
-void wxGxDataset::SetEncoding(wxFontEncoding Encoding)
-{
-    m_Encoding = Encoding;
-}
 
 //--------------------------------------------------------------
-//class wxGxShapefileDataset
+//class wxGxFeatureDataset
 //--------------------------------------------------------------
 
-wxGxShapefileDataset::wxGxShapefileDataset(wxString Path, wxString Name, wxGISEnumShapefileDatasetType Type)
+wxGxFeatureDataset::wxGxFeatureDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type)
 {
 	m_ImageListSmall.Create(16, 16);
 	m_ImageListSmall.Add(wxBitmap(shape_icon16_xpm));
@@ -146,53 +148,68 @@ wxGxShapefileDataset::wxGxShapefileDataset(wxString Path, wxString Name, wxGISEn
 
 	m_pwxGISDataset = NULL;
 
-    m_Encoding = wxFONTENCODING_UTF8;
     m_pPathEncoding = wxConvCurrent;
 }
 
-wxGxShapefileDataset::~wxGxShapefileDataset(void)
+wxGxFeatureDataset::~wxGxFeatureDataset(void)
 {
     wsDELETE(m_pwxGISDataset);
 }
 
-wxString wxGxShapefileDataset::GetCategory(void)
+wxString wxGxFeatureDataset::GetCategory(void)
 {
 	return wxString(_("Feature class"));
 }
 
-wxIcon wxGxShapefileDataset::GetLargeImage(void)
+wxIcon wxGxFeatureDataset::GetLargeImage(void)
 {
 	switch(m_type)
 	{
-	case enumESRIShapefile:
+	case enumVecESRIShapefile:
 		return wxIcon(m_ImageListLarge.GetIcon(0));
-	case enumMapinfoTabfile:
+	case enumVecMapinfoTab:
+        return wxIcon(mi_dset_48_xpm);
+	case enumVecMapinfoMif:
+        return wxIcon(md_dset_48_xpm);
+	case enumVecKML:
+		return wxIcon(m_ImageListLarge.GetIcon(4));
+	case enumVecDXF:
+		return wxIcon(dxf_dset_48_xpm);
 	default:
 		return wxNullIcon;
 	}
 }
 
-wxIcon wxGxShapefileDataset::GetSmallImage(void)
+wxIcon wxGxFeatureDataset::GetSmallImage(void)
 {
 	switch(m_type)
 	{
-	case enumESRIShapefile:
+	case enumVecESRIShapefile:
 		return wxIcon(m_ImageListSmall.GetIcon(0));
-	case enumMapinfoTabfile:
+	case enumVecMapinfoTab:
+        return wxIcon(mi_dset_16_xpm);
+	case enumVecMapinfoMif:
+        return wxIcon(md_dset_16_xpm);
+	case enumVecKML:
+		return wxIcon(m_ImageListSmall.GetIcon(4));
+	case enumVecDXF:
+		return wxIcon(dxf_dset_16_xpm);
 	default:
 		return wxNullIcon;
 	}
 }
 
-bool wxGxShapefileDataset::Delete(void)
+bool wxGxFeatureDataset::Delete(void)
 {
     wxGISFeatureDataset* pDSet;
  	if(m_pwxGISDataset == NULL)
-        pDSet = new wxGISFeatureDataset(m_sPath, m_pPathEncoding, m_Encoding);
+    {
+        pDSet = new wxGISFeatureDataset(m_sPath, m_type, m_pPathEncoding);
+        m_pwxGISDataset = static_cast<wxGISDataset*>(pDSet);
+    }
     else
     {
         pDSet = dynamic_cast<wxGISFeatureDataset*>(m_pwxGISDataset);
-        wsDELETE(m_pwxGISDataset);
     }
     
     if(!pDSet)
@@ -200,21 +217,8 @@ bool wxGxShapefileDataset::Delete(void)
 
     bool bRet = pDSet->Delete();
     if(bRet)
-	{        
-        wsDELETE(pDSet);
-
-        wxString vol, shortpath, name, ext;
-        wxFileName::SplitPath(m_sPath, &vol, &shortpath, &name, &ext);
-        wxString sRemNames;
-        if(vol.IsEmpty())
-            sRemNames = shortpath + wxFileName::GetPathSeparator() + name;
-        else
-            sRemNames = vol + wxT(":") + shortpath + wxFileName::GetPathSeparator() + name;        
-        //del filename.sbn filename.sbx filename.shp.xml
-        VSIUnlink(wgWX2MB(sRemNames + wxT(".sbn")));
-        VSIUnlink(wgWX2MB(sRemNames + wxT(".sbx")));
-        VSIUnlink(wgWX2MB(sRemNames + wxT(".shp.xml")));
-        //
+	{
+        //wsDELETE(pDSet);
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer == NULL)
 			return false;
@@ -228,21 +232,21 @@ bool wxGxShapefileDataset::Delete(void)
     }
 }
 
-bool wxGxShapefileDataset::Rename(wxString NewName)
+bool wxGxFeatureDataset::Rename(wxString NewName)
 {
 	m_sName = NewName; 
 	return true;
 }
 
-void wxGxShapefileDataset::EditProperties(wxWindow *parent)
+void wxGxFeatureDataset::EditProperties(wxWindow *parent)
 {
 }
 
-wxGISDataset* wxGxShapefileDataset::GetDataset(void)
+wxGISDataset* wxGxFeatureDataset::GetDataset(void)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
-        wxGISFeatureDataset* pwxGISFeatureDataset = new wxGISFeatureDataset(m_sPath, m_pPathEncoding, m_Encoding);
+        wxGISFeatureDataset* pwxGISFeatureDataset = new wxGISFeatureDataset(m_sPath, m_type, m_pPathEncoding);
 
         if(!pwxGISFeatureDataset->Open())
         {
@@ -307,17 +311,13 @@ wxGISDataset* wxGxShapefileDataset::GetDataset(void)
        // }
 
 		m_pwxGISDataset = static_cast<wxGISDataset*>(pwxGISFeatureDataset);
+        m_pwxGISDataset->SetSubType(m_type);
 		//for storing internal pointer
-		//m_pwxGISDataset->Reference();
+		m_pwxGISDataset->Reference();
 	}
 	//for outer pointer
 	m_pwxGISDataset->Reference();
 	return m_pwxGISDataset;
-}
-
-void wxGxShapefileDataset::SetEncoding(wxFontEncoding Encoding)
-{
-    m_Encoding = Encoding;
 }
 
 //--------------------------------------------------------------
@@ -369,7 +369,7 @@ bool wxGxRasterDataset::Delete(void)
 {
     wxGISRasterDataset* pDSet;
  	if(m_pwxGISDataset == NULL)
-        pDSet = new wxGISRasterDataset(m_sPath);
+        pDSet = new wxGISRasterDataset(m_sPath, m_type);
     else
     {
         m_pwxGISDataset->Release();
@@ -384,22 +384,6 @@ bool wxGxRasterDataset::Delete(void)
     if(bRet)
 	{
         wsDELETE(pDSet);
-
-        wxString vol, shortpath, name, ext;
-        wxFileName::SplitPath(m_sPath, &vol, &shortpath, &name, &ext);
-        wxString sRemNames;
-        if(vol.IsEmpty())
-            sRemNames = shortpath + wxFileName::GetPathSeparator() + name;
-        else
-            sRemNames = vol + wxT(":") + shortpath + wxFileName::GetPathSeparator() + name;        
-        //del filename.aux filename.ext.aux filename.ext.aux.xml filename.ext.ovr.aux.xml
-        VSIUnlink(wgWX2MB(sRemNames + wxT(".aux")));
-        VSIUnlink(wgWX2MB(sRemNames + wxT(".lgo")));
-        VSIUnlink(wgWX2MB(sRemNames + wxT(".xml")));
-        VSIUnlink(wgWX2MB(sRemNames + wxT(".") + ext + wxT(".xml")));
-        VSIUnlink(wgWX2MB(sRemNames + wxT(".") + ext + wxT(".aux")));
-        VSIUnlink(wgWX2MB(sRemNames + wxT(".") + ext + wxT(".aux.xml")));
-        VSIUnlink(wgWX2MB(sRemNames + wxT(".") + ext + wxT(".ovr.aux.xml")));
         //
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer == NULL)
@@ -437,7 +421,7 @@ wxString wxGxRasterDataset::GetCategory(void)
 typedef struct OvrProgressData
 {
     IStatusBar* pStatusBar;
-    wxGISProgressor* pProgressor;
+    IProgressor* pProgressor;
     wxString sMessage;
 } *LPOVRPROGRESSDATA;
 
@@ -462,7 +446,7 @@ wxGISDataset* wxGxRasterDataset::GetDataset(void)
 {
 	if(m_pwxGISDataset == NULL)
 	{	
-        wxGISRasterDataset* pwxGISRasterDataset = new wxGISRasterDataset(m_sPath, m_pPathEncoding);
+        wxGISRasterDataset* pwxGISRasterDataset = new wxGISRasterDataset(m_sPath, m_type, m_pPathEncoding);
 
         //open (ask for overviews)
         if(!pwxGISRasterDataset->Open())
@@ -479,7 +463,7 @@ wxGISDataset* wxGxRasterDataset::GetDataset(void)
         {
 	        CPLSetConfigOption( "USE_RRD", "NO" );//YES
 	        CPLSetConfigOption( "HFA_USE_RRD", "YES" );
-	        //CPLSetConfigOption( "COMPRESS_OVERVIEW", "LZW" );//DEFLATE
+	        //CPLSetConfigOption( "COMPRESS_OVERVIEW", "DEFLATE" );//LZW
 
         	bool bAskCreateOvr = true;
             wxString name, ext;
@@ -487,16 +471,26 @@ wxGISDataset* wxGxRasterDataset::GetDataset(void)
             wxString sFileName = name + wxT(".") + ext;
             IGISConfig*  pConfig = m_pCatalog->GetConfig();
             bool bCreateOverviews = true;
+            wxString sResampleMethod(wxT("GAUSS"));
             if(pConfig)
             {
+                wxString sCompress;
                 wxXmlNode* pNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/raster")));
                 if(pNode)
+                {
                     bAskCreateOvr = wxAtoi(pNode->GetPropVal(wxT("create_ovr"), wxT("1")));
+                    sCompress = pNode->GetPropVal(wxT("ovr_compress"), wxT("NONE"));
+                    sResampleMethod = pNode->GetPropVal(wxT("ovr_resample"), wxT("GAUSS"));
+                    //"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE" 
+                }
                 else
                 {
                     pNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog/raster")), true);
                     pNode->AddProperty(wxT("create_ovr"), wxT("1"));
+                    pNode->AddProperty(wxT("ovr_compress"), wxT("NONE"));
+                    pNode->AddProperty(wxT("ovr_resample"), wxT("GAUSS"));
                 }
+                CPLSetConfigOption( "COMPRESS_OVERVIEW",  wgWX2MB(sCompress) );//LZW "DEFLATE"
                 if(bAskCreateOvr)
                 {
                     //show ask dialog
@@ -519,13 +513,15 @@ wxGISDataset* wxGxRasterDataset::GetDataset(void)
                 wxString sProgressMsg = wxString::Format(_("Creating pyramids for : %s (%d bands)"), sFileName.c_str(), pwxGISRasterDataset->GetRaster()->GetRasterCount());
                 IApplication* pApp = ::GetApplication();
                 IStatusBar* pStatusBar = pApp->GetStatusBar();  
-                wxGISProgressor* pProgressor = dynamic_cast<wxGISProgressor*>(pStatusBar->GetProgressor());
+                IProgressor* pProgressor = pStatusBar->GetProgressor();
                 if(pProgressor)
                     pProgressor->Show(true);
 
                 OvrProgressData Data = {pStatusBar, pProgressor, sProgressMsg}; 
-		        CPLErr err = pwxGISRasterDataset->GetRaster()->BuildOverviews( "GAUSS", 5, anOverviewList, 0, NULL, /*GDALDummyProgress*/OvrProgress, (void*)&Data );
-		        //"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE" 
+                GDALDataset* pDSet = pwxGISRasterDataset->GetRaster();
+                if(!pDSet)
+                    return NULL;
+		        CPLErr err = pDSet->BuildOverviews( wgWX2MB(sResampleMethod), 5, anOverviewList, 0, NULL, /*GDALDummyProgress*/OvrProgress, (void*)&Data );		        
 
                 if(pProgressor)
                     pProgressor->Show(false);

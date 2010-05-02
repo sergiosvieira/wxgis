@@ -109,6 +109,38 @@
 #    define WXDLLIMPEXP_DATA_GIS_GEOM(type) type
 #endif
 
+#ifdef WXMAKINGDLL_GIS_DS
+#    define WXDLLIMPEXP_GIS_DS WXEXPORT
+#    define WXDLLIMPEXP_DATA_GIS_DS(type) WXEXPORT type
+#elif defined(WXUSINGDLL)
+#    define WXDLLIMPEXP_GIS_DS WXIMPORT
+#    define WXDLLIMPEXP_DATA_GIS_DS(type) WXIMPORT type
+#else /* not making nor using DLL */
+#    define WXDLLIMPEXP_GIS_DS
+#    define WXDLLIMPEXP_DATA_GIS_DS(type) type
+#endif
+
+#ifdef WXMAKINGDLL_GIS_GP
+#    define WXDLLIMPEXP_GIS_GP WXEXPORT
+#    define WXDLLIMPEXP_DATA_GIS_GP(type) WXEXPORT type
+#elif defined(WXUSINGDLL)
+#    define WXDLLIMPEXP_GIS_GP WXIMPORT
+#    define WXDLLIMPEXP_DATA_GIS_GP(type) WXIMPORT type
+#else /* not making nor using DLL */
+#    define WXDLLIMPEXP_GIS_GP
+#    define WXDLLIMPEXP_DATA_GIS_GP(type) type
+#endif
+
+#ifdef WXMAKINGDLL_GIS_GPU
+#    define WXDLLIMPEXP_GIS_GPU WXEXPORT
+#    define WXDLLIMPEXP_DATA_GIS_GPU(type) WXEXPORT type
+#elif defined(WXUSINGDLL)
+#    define WXDLLIMPEXP_GIS_GPU WXIMPORT
+#    define WXDLLIMPEXP_DATA_GIS_GPU(type) WXIMPORT type
+#else /* not making nor using DLL */
+#    define WXDLLIMPEXP_GIS_GPU
+#    define WXDLLIMPEXP_DATA_GIS_GPU(type) type
+#endif
 //#define WXDLLEXPORT WXMAKINGDLL_GIS
 //#define WXDLLEXPORT_DATA WXDLLIMPEXP_DATA_GIS
 

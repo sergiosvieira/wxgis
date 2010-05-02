@@ -31,12 +31,12 @@
 #include "wxgis/catalogui/gxlocationcombobox.h"
 
 #include "wxgis/framework/progressor.h"
-#include "wxgis/datasource.h"
+#include "wxgis/datasource/datasource.h"
 
 #include <wx/dirdlg.h>
 #include <wx/file.h>
 
-#include "wxgis/catalogui/gxdialog.h"
+#include "wxgis/catalogui/gxobjdialog.h"
 #include "wxgis/catalogui/gxfilters.h"
 #include "wxgis/catalog/gxfile.h"
 #include "wxgis/carto/mapview.h"
@@ -62,6 +62,9 @@ wxGISCatalogMainCmd::wxGISCatalogMainCmd(void)
 	m_ImageList.Add(wxBitmap(folder_conn_16_xpm));	//4
 	m_ImageList.Add(wxBitmap(location16_xpm));		//9
 	m_ImageList.Add(wxBitmap(oper_16_xpm));		    //3
+
+    m_CreateTypesArray.Add(wxString(_("Folder")));
+    m_CreateTypesArray.Add(wxString(_("Folder Connection")));
 }
 
 wxGISCatalogMainCmd::~wxGISCatalogMainCmd(void)
@@ -239,7 +242,28 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			return false;
         }
         case 7:
+        {
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+                IGxCatalog* pCatalog = pGxApp->GetCatalog();
+                if(pCatalog)
+                {
+                    IGxSelection* pSel = pCatalog->GetSelection();
+                    if(pSel)
+                    {
+                        IGxObject* pCont = pSel->GetSelectedObjects(0);
+                        if(pCont)
+                        {
+                            for(size_t i = 0; i < m_CreateTypesArray.GetCount(); i++)
+                                if(pCont->GetCategory() == m_CreateTypesArray[i])
+                                    return true;
+                        }
+                    }
+                }
+            }
 			return false;
+        }
 		case 8://Gen SRS
 			return true;
 		case 9://Refresh
@@ -375,7 +399,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 		case 8:
             {
                 wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
-                wxGxDialog dlg(pWnd, wxID_ANY, _("Select projection")); 
+                wxGxObjectDialog dlg(pWnd, wxID_ANY, _("Select projection")); 
 				dlg.SetAllowMultiSelect(false);
 				dlg.AddFilter(new wxGxPrjFileFilter(), true);
 				dlg.SetButtonCaption(_("Select"));
@@ -664,18 +688,18 @@ void wxGISCatalogMainCmd::OnClick(void)
 			if(pGxApp && GetEnabled())
             {
 				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
-                GxObjectArray TempArr;
 
                 for(size_t i = 0; i < pSel->GetCount(); i++)
                 {
-                    IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pSel->GetSelectedObjects(i));
+                    IGxObject* pGxObject = pSel->GetSelectedObjects(i);
+                    IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject);
                     if(pGxObjectEdit && pGxObjectEdit->CanDelete())
                     {
                         //pSel->Unselect(TempArr[i], IGxSelection::INIT_ALL);
                         if(!pGxObjectEdit->Delete())
                         {
                             wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
-                            int nRes = wxMessageBox(wxString::Format(_("Cannot delete '%s'\nContinue?"),TempArr[i]->GetName().c_str()), _("Error"), wxYES_NO | wxICON_QUESTION, pWnd);
+                            int nRes = wxMessageBox(wxString::Format(_("Cannot delete '%s'\nContinue?"),pGxObject->GetName().c_str()), _("Error"), wxYES_NO | wxICON_QUESTION, pWnd);
                             if(nRes == wxNO)
                                 return;
                         }
@@ -867,7 +891,7 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
 
                 wxMenu* pMenu = new wxMenu();
 
-                for(size_t i = 0; i < nPos; i++)
+                for(size_t i = nPos > 7 ? nPos - 7 : 0; i < nPos; i++)
                 {
                     wxString sPath = pSel->GetDoPath(i);
                     if(!sPath.IsEmpty())
@@ -889,6 +913,8 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
 
                 for(size_t i = nPos + 1; i < pSel->GetDoSize(); i++)
                 {
+                    if(i > nPos + 7)
+                        break;
                     wxString sPath = pSel->GetDoPath(i);
                     if(!sPath.IsEmpty())
                         pMenu->Append(ID_MENUCMD + i, sPath);

@@ -48,17 +48,15 @@ bool wxGxFileFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames
 
 		IGxObject* pGxObj = NULL;
 		if(ext == wxString(wxT("spr")))
-		{
-			if(m_pCatalog->GetShowExt())
-				name += wxT(".") + ext;
+		{ 
+            name += wxT(".") + ext;
 			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumSPRfile);
 			pGxObj = dynamic_cast<IGxObject*>(pFile);
 			goto REMOVE;
 		}
 		if(ext == wxString(wxT("prj")))
 		{
-			if(m_pCatalog->GetShowExt())
-				name += wxT(".") + ext;
+			name += wxT(".") + ext;
 			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumESRIPrjFile);
 			pGxObj = dynamic_cast<IGxObject*>(pFile);
 			goto REMOVE;

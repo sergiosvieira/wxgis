@@ -18,13 +18,16 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#include "wxgis/carto/rasterdataset.h"
-#include "vrtwarpedoverview.h"
+#include "wxgis/datasource/rasterdataset.h"
+#include "wxgis/datasource/sysop.h"
+#include "wx/filename.h"
 
+#include "vrtwarpedoverview.h"
 #include "gdal_rat.h"
 
-wxGISRasterDataset::wxGISRasterDataset(wxString sPath, wxMBConv* pPathEncoding) : wxGISDataset(sPath, pPathEncoding), m_bIsOpened(false), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false), m_poMainDataset(NULL), m_poDataset(NULL)
+wxGISRasterDataset::wxGISRasterDataset(wxString sPath, wxGISEnumRasterDatasetType nType, wxMBConv* pPathEncoding) : wxGISDataset(sPath, pPathEncoding), m_bIsOpened(false), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false), m_poMainDataset(NULL), m_poDataset(NULL)
 {
+    m_nSubType = (int)nType;
 }
 
 wxGISRasterDataset::~wxGISRasterDataset(void)
@@ -46,36 +49,66 @@ wxGISRasterDataset::~wxGISRasterDataset(void)
 bool wxGISRasterDataset::Delete(void)
 {
 	wxCriticalSectionLocker locker(m_CritSect);
-    GDALDriver* pDrv = NULL;
+    //GDALDriver* pDrv = NULL;
+    //close everything
 	if(m_bIsOpened)
     {
         if(m_poMainDataset)
         {
-            pDrv = m_poMainDataset->GetDriver();
+            //pDrv = m_poMainDataset->GetDriver();
             GDALDereferenceDataset(m_poMainDataset);
         }
             //if(GDALDereferenceDataset(m_poMainDataset) < 1)
             //    GDALClose(m_poMainDataset);
         if(m_poDataset)
         {
-            if(!pDrv)
-                pDrv = m_poDataset->GetDriver();
+            //if(!pDrv)
+            //    pDrv = m_poDataset->GetDriver();
             GDALClose(m_poDataset);
         }
     }
-    else
+   // else
+   // {
+   //    m_poDataset = (GDALDataset *) GDALOpen( (const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/, GA_ReadOnly );
+   //    if( m_poDataset == NULL )
+   //        return false;
+   //    pDrv = m_poDataset->GetDriver();
+   //    GDALClose(m_poDataset);
+   //}
+   // if(pDrv)
+   // {        
+   //     CPLErr eErr = pDrv->Delete((const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/);
+   //     if(eErr != CE_Fatal)
+   //         return true;
+   // }
+
+    wxFileName FName( m_sPath );
+    wxString sExt = FName.GetExt();
+    FName.ClearExt();
+    wxString sPath = FName.GetFullPath();
+
+    switch(m_nSubType)
     {
-       m_poDataset = (GDALDataset *) GDALOpen( (const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/, GA_ReadOnly );
-       if( m_poDataset == NULL )
-           return false;
-       pDrv = m_poDataset->GetDriver();
-       GDALClose(m_poDataset);
-   }
-    if(pDrv)
-    {        
-        CPLErr eErr = pDrv->Delete((const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/);
-        if(eErr != CE_Fatal)
-            return true;
+    case enumRasterBmp:
+	case enumRasterTiff:
+	case enumRasterImg:
+	case enumRasterJpeg:
+	case enumRasterPng:
+        if(!DeleteFile(m_sPath, m_pPathEncoding))
+            return false;
+        DeleteFile(sPath + sExt  + wxT("w"), m_pPathEncoding);
+        DeleteFile(sPath + sExt + wxT(".xml"), m_pPathEncoding);
+        DeleteFile(sPath + wxT(".lgo"), m_pPathEncoding);
+        DeleteFile(sPath + wxT(".aux"), m_pPathEncoding);
+        DeleteFile(sPath + sExt + wxT(".aux"), m_pPathEncoding);
+        DeleteFile(sPath + sExt  + wxT(".aux.xml"), m_pPathEncoding);
+        DeleteFile(sPath + wxT(".ovr"), m_pPathEncoding);
+        DeleteFile(sPath + sExt  + wxT(".ovr"), m_pPathEncoding);
+        DeleteFile(sPath + sExt  + wxT(".ovr.aux.xml"), m_pPathEncoding);
+        DeleteFile(sPath + wxT(".xml"), m_pPathEncoding);
+        return true;
+    case enumRasterUnknown:
+    default: return false;
     }
 	return false;    
 }

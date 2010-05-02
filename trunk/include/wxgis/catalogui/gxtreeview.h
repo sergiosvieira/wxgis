@@ -93,6 +93,7 @@ protected:
 	IConnectionPointContainer* m_pConnectionPointCatalog, *m_pConnectionPointSelection;
 	long m_ConnectionPointCatalogCookie, m_ConnectionPointSelectionCookie;
 	IGxSelection* m_pSelection;
+    IGxCatalog* m_pCatalog;
 
     DECLARE_EVENT_TABLE()
 };
@@ -116,6 +117,7 @@ public:
     virtual void OnSelChanged(wxTreeEvent& event);
 	virtual void OnItemRightClick(wxTreeEvent& event);
     virtual void OnSetFocus(wxFocusEvent& event);
+	virtual void OnBeginDrag(wxTreeEvent& event);
 
     DECLARE_EVENT_TABLE()
 };

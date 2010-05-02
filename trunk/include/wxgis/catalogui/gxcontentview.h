@@ -34,13 +34,14 @@ public:
 	typedef enum _listsyle{ REPORT, SMALL, LARGE, LIST } LISTSTYLE, *LPLISTSTYLE;
 
 	wxGxContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, 
-						 const wxSize& size = wxDefaultSize, long style = wxLC_REPORT | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING);
+						 const wxSize& size = wxDefaultSize, long style = wxLC_REPORT | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE );
 	virtual ~wxGxContentView(void);
 	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
 	virtual void AddObject(IGxObject* pObject);
 	virtual void SetStyle(LISTSTYLE style);
     virtual LISTSTYLE GetStyle(void){return m_current_style;};
 	virtual void ResetContents(void);
+    virtual IGxObject* GetParentGxObject(void){return m_pParentGxObject;};
 //IGxView
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
@@ -64,6 +65,7 @@ public:
 	virtual void OnSelected(wxListEvent& event);
 	virtual void OnDeselected(wxListEvent& event);
     virtual void OnSetFocus(wxFocusEvent& event);
+    virtual void OnBeginDrag(wxListEvent& event);
 
 	typedef struct _itemdata
 	{
@@ -79,6 +81,7 @@ protected:
 	IConnectionPointContainer* m_pConnectionPointCatalog/*, *m_pConnectionPointSelection*/;
 	long m_ConnectionPointCatalogCookie/*, m_ConnectionPointSelectionCookie*/;
 	IGxSelection* m_pSelection;
+    IGxCatalog* m_pCatalog;
 	IGxObject* m_pParentGxObject;
 	bool m_bDragging;
 

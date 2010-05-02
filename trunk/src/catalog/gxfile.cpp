@@ -63,9 +63,7 @@ wxIcon wxGxPrjFile::GetSmallImage(void)
 
 bool wxGxPrjFile::Delete(void)
 {
-    int ret = VSIUnlink(wgWX2MB(m_sPath));
-    if(ret == 0)
-	//if(wxFileName::Rmdir(m_sPath))//recursive del wil be in >= 2.9.0
+    if(DeleteFile(m_sPath/*, m_pPathEncoding*/))
 	{
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer == NULL)

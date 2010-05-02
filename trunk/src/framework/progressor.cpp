@@ -115,8 +115,7 @@ int wxGISProgressor::GetRange()
 
 void wxGISProgressor::SetValue(int value)
 {
-    m_bPulse = false;
-    m_timer.Stop();
+    Stop();
     m_nValue = value;
     if(m_nValue > m_nRange)
         m_nRange = m_nValue;
@@ -136,10 +135,16 @@ int wxGISProgressor::GetValue()
     return m_nValue;
 }
 
-void wxGISProgressor::Pulse()
+void wxGISProgressor::Play()
 {
     m_bPulse = true;
     m_timer.Start(50);
+}
+
+void wxGISProgressor::Stop()
+{
+    m_bPulse = false;
+    m_timer.Stop();
 }
 
 void wxGISProgressor::OnTimer( wxTimerEvent& event )

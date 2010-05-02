@@ -22,7 +22,7 @@
 #pragma once
 
 #include "wxgis/display/display.h"
-#include "wxgis/datasource.h"
+#include "wxgis/datasource/datasource.h"
 
 enum wxGISEnumMapToolState
 {
@@ -31,10 +31,6 @@ enum wxGISEnumMapToolState
 	enumGISMapZooming = 0x0002,
 	enumGISMapRotating = 0x0004
 };
-
-typedef struct _Limits{
-    double minx, miny, maxx, maxy;
-}LIMITS, *LPLIMITS;
 
 class wxGISLayer 
 {

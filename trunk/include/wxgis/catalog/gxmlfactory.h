@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGISSpatialReferenceValidator class. Return SpatialReference limits
+ * Purpose:  wxGxMLFactory class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -20,21 +20,18 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/carto/carto.h"
+#include "wxgis/catalog/catalog.h"
 
-class WXDLLIMPEXP_GIS_CRT wxGISSpatialReferenceValidator
+class wxGxMLFactory :
+	public IGxObjectFactory,
+	public wxObject
 {
+	DECLARE_DYNAMIC_CLASS(wxGxMLFactory)
 public:
-	wxGISSpatialReferenceValidator(void);
-	virtual ~wxGISSpatialReferenceValidator(void);
-    virtual bool IsOk(void){return m_bIsOK;}
-    virtual LIMITS GetLimits(wxString sProj){return m_DataMap[sProj];};
-    virtual bool IsLimitsSet(wxString sProj);
-protected:
-    virtual bool LoadData(wxString sPath);
-    wxString GetPath(wxXmlNode* pNode);
-protected:
-    bool m_bIsOK;
-    wxString m_sPath;
-    std::map<wxString, LIMITS> m_DataMap;
+	wxGxMLFactory(void);
+	virtual ~wxGxMLFactory(void);
+	//IGxObjectFactory
+	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray);
+    virtual void Serialize(wxXmlNode* pConfig, bool bStore);
+	virtual wxString GetName(void){return GetClassInfo()->GetClassName();};
 };

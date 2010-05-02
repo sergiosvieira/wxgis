@@ -60,12 +60,16 @@ void *wxDrawingThread::Entry()
 			if(CacheIDCurrent != CacheIDPrevious)				
 			{
 				m_pGISScreenDisplay->MergeCaches(CacheIDPrevious, CacheIDCurrent);
-				m_pGISScreenDisplay->SetCacheDerty(CacheIDCurrent, false);
+                //???????????????
+                //if(m_Layers.size() > i + 2 && m_Layers[i + 1]->GetCacheID() != CacheIDCurrent)
+                //    m_pGISScreenDisplay->SetCacheDerty(CacheIDCurrent, false);
 			}
 
 			if(m_pTrackCancel && !m_pTrackCancel->Continue())
 				break;
 			m_Layers[i]->Draw(wxGISDPGeography, m_pGISScreenDisplay, m_pTrackCancel);
+            if(m_Layers.size() - 1 == i || (m_Layers.size() - 1 > i && m_Layers[i + 1]->GetCacheID() != CacheIDCurrent))
+                m_pGISScreenDisplay->SetCacheDerty(CacheIDCurrent, false);
 		}
 	}
 	m_pGISScreenDisplay->SetDerty(false);
@@ -219,7 +223,7 @@ void wxGISMapView::OnDraw(wxDC& dc)
 	}
 
 	if(m_pTrackCancel && !m_pAni)
-		m_pAni = static_cast<wxGISAnimation*>(m_pTrackCancel->GetProgressor());//static_cast<wxGISAnimation*>(m_pTrackCancel->GetProgressor());
+		m_pAni = m_pTrackCancel->GetProgressor();
 
 
 	if(pGISScreenDisplay->IsDerty())
@@ -446,7 +450,7 @@ void wxGISMapView::OnThreadExit(void)
 	if(m_pAni)
 	{
 		m_pAni->Stop();
-		m_pAni->Hide();
+		m_pAni->Show(false);
 	}
 }
 

@@ -88,12 +88,18 @@ int GxObjectCompareFunction(IGxObject* pObject1, IGxObject* pObject2, long sortD
     if(!bDiscConnection1 && bDiscConnection2)
 		return sortData == 0 ? -1 : 1;
 
+	bool bContainerDst1 = dynamic_cast<IGxDataset*>(pObject1);
+    bool bContainerDst2 = dynamic_cast<IGxDataset*>(pObject2);
 	bool bContainer1 = dynamic_cast<IGxObjectContainer*>(pObject1);
     bool bContainer2 = dynamic_cast<IGxObjectContainer*>(pObject2);
-	if(bContainer1 && !bContainer2)
-		return sortData == 0 ? 1 : -1;
-	if(!bContainer1 && bContainer2)
-		return sortData == 0 ? -1 : 1;
+    if(bContainer1 && !bContainerDst1 && bContainerDst2)
+	    return sortData == 0 ? 1 : -1;
+    if(bContainer2 && !bContainerDst2 && bContainerDst1)
+	    return sortData == 0 ? -1 : 1;
+    if(bContainer1 && !bContainer2)
+	    return sortData == 0 ? 1 : -1;
+    if(!bContainer1 && bContainer2)
+	    return sortData == 0 ? -1 : 1;
 
 	return pObject1->GetName().CmpNoCase(pObject2->GetName()) * (sortData == 0 ? -1 : 1);
 }

@@ -29,7 +29,6 @@
 
 wxGISNewMenu::wxGISNewMenu(const wxString& sName, const wxString& sCaption, wxGISEnumCommandBars type, const wxString& title, long style) : wxGISMenu(sName, sCaption, type, title, style), m_ConnectionPointSelectionCookie(-1)
 {
-    //Update();
 }
 
 wxGISNewMenu::~wxGISNewMenu(void)
@@ -64,7 +63,6 @@ bool wxGISNewMenu::GetChecked(void)
 
 bool wxGISNewMenu::GetEnabled(void)
 {
-    //update here
 	return true;
 }
 
@@ -112,35 +110,7 @@ void wxGISNewMenu::Init(void)
     if(m_pConnectionPointSelection != NULL)
 	    m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(pMenu);
 
-    //for(size_t i = 0; i < m_delitems.size(); i++)
-    //    Remove(m_delitems[i]);
-
-    //m_delitems.clear();
-
-    //IGxCatalog* pCat = m_pGxApp->GetCatalog();
-    //if(pCat)
-    //{
-    //    IGxObjectUI* pGxObjUI = dynamic_cast<IGxObjectUI*>(pCat->GetSelection()->GetLastSelectedObject());
-    //    if(pGxObjUI)
-    //    {
-    //        wxMenu* pCmdMenu = dynamic_cast<wxMenu*>(m_pApp->GetCommandBar( pGxObjUI->NewMenu() ));
-    //        if(pCmdMenu)
-    //        {
-    //            wxMenuItemList& pLst = pCmdMenu->GetMenuItems();
-    //            wxMenuItemList::iterator iter;
-    //            for (iter = pLst.begin(); iter != pLst.end(); ++iter)
-    //            {
-    //                //MyListElement *current = *iter;  
-    //                wxMenuItem* pItem = Append(*iter);
-    //                m_delitems.push_back(pItem);
-    //            }
-    //            return;
-    //        }
-    //    }
-    //}
-
-
-    wxMenuItem* pItem = Append(ID_MENUCMD - 1, wxT(" "), wxT(""), wxITEM_NORMAL);
+    wxMenuItem* pItem = Append(ID_MENUCMD - 1, wxT(" "), wxEmptyString, wxITEM_NORMAL);
     pItem->Enable(false);
     m_delitems.push_back(pItem);
 }
@@ -182,7 +152,7 @@ void wxGISNewMenu::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
             return;
         }
     }
-    wxMenuItem* pItem = Append(ID_MENUCMD - 1, wxT(" "), wxT(""), wxITEM_NORMAL);
+    wxMenuItem* pItem = Append(ID_MENUCMD - 1, wxT(" "), wxEmptyString, wxITEM_NORMAL);
     pItem->Enable(false);
     m_delitems.push_back(pItem);
 }

@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDialog filters of GxObjects to show.
+ * Purpose:  wxGxObjectDialog filters of GxObjects to show.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -22,7 +22,7 @@
 #include "wxgis/catalogui/gxfilters.h"
 #include "wxgis/catalog/gxfile.h"
 #include "wxgis/catalog/gxspatreffolder.h"
-#include "wxgis/catalog/gxdataset.h"
+#include "wxgis/datasource/datasource.h"
 
 //------------------------------------------------------------
 // wxGxObjectFilter
@@ -68,6 +68,21 @@ wxGISEnumSaveObjectResults wxGxObjectFilter::CanSaveObject( IGxObject* pLocation
 wxString wxGxObjectFilter::GetName(void)
 {
 	return wxString(_("Any items (*.*)"));
+}
+
+wxString wxGxObjectFilter::GetExt(void)
+{
+	return wxEmptyString;
+}
+
+wxString wxGxObjectFilter::GetDriver(void)
+{
+	return wxEmptyString;
+}
+
+int wxGxObjectFilter::GetSubType(void)
+{
+    return 0;
 }
 
 //------------------------------------------------------------
@@ -138,6 +153,12 @@ wxString wxGxPrjFileFilter::GetName(void)
 	return wxString(_("Coordinate Systems (*.prj, *.spr)"));
 }
 
+wxString wxGxPrjFileFilter::GetExt(void)
+{
+	return wxString(wxT("spr"));
+}
+
+
 //------------------------------------------------------------
 // wxGxRasterDatasetFilter
 //------------------------------------------------------------
@@ -152,11 +173,12 @@ wxGxRasterDatasetFilter::~wxGxRasterDatasetFilter(void)
 
 bool wxGxRasterDatasetFilter::CanChooseObject( IGxObject* pObject )
 {
-	wxGxRasterDataset* pGxRasterDataset = dynamic_cast<wxGxRasterDataset*>(pObject);
-	if(pGxRasterDataset)
-		return true;
-	else
+	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
+	if(!pGxDataset)
 		return false;
+    if(pGxDataset->GetType() != enumGISRasterDataset)
+		return false;
+    return true;
 }
 
 bool wxGxRasterDatasetFilter::CanDisplayObject( IGxObject* pObject )
@@ -164,14 +186,225 @@ bool wxGxRasterDatasetFilter::CanDisplayObject( IGxObject* pObject )
 	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
 	if(pContainer)
 		return true;
-	wxGxRasterDataset* pGxRasterDataset = dynamic_cast<wxGxRasterDataset*>(pObject);
-	if(pGxRasterDataset)
-		return true;
-	else
+	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
+	if(!pGxDataset)
 		return false;
+    if(pGxDataset->GetType() != enumGISRasterDataset)
+		return false;
+    return true;
 }
 
 wxString wxGxRasterDatasetFilter::GetName(void)
 {
 	return wxString(_("Rasters (*.img, *.tif, etc.)"));
 }
+
+
+//------------------------------------------------------------
+// wxGxShapeFileFilter
+//------------------------------------------------------------
+
+wxGxShapeFileFilter::wxGxShapeFileFilter(void)
+{
+}
+
+wxGxShapeFileFilter::~wxGxShapeFileFilter(void)
+{
+}
+
+bool wxGxShapeFileFilter::CanChooseObject( IGxObject* pObject )
+{
+	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
+	if(!pGxDataset)
+		return false;
+    if(pGxDataset->GetType() != enumGISFeatureDataset)
+		return false;
+    if(pGxDataset->GetSubType() != GetSubType())
+		return false;
+    return true;
+}
+
+bool wxGxShapeFileFilter::CanDisplayObject( IGxObject* pObject )
+{
+	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
+	if(pContainer)
+		return true;
+	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
+	if(!pGxDataset)
+		return false;
+    if(pGxDataset->GetType() != enumGISFeatureDataset)
+		return false;
+    if(pGxDataset->GetSubType() != GetSubType())
+		return false;
+    return true;
+}
+
+wxString wxGxShapeFileFilter::GetName(void)
+{
+	return wxString(_("ESRI Shapefile (*.shp)"));
+}
+
+wxString wxGxShapeFileFilter::GetExt(void)
+{
+	return wxString(wxT("shp"));
+}
+
+wxString wxGxShapeFileFilter::GetDriver(void)
+{
+	return wxString(wxT("ESRI Shapefile"));
+}
+
+int wxGxShapeFileFilter::GetSubType(void)
+{
+    return enumVecESRIShapefile;
+}
+
+//------------------------------------------------------------
+// wxGxMapInfoFilter
+//------------------------------------------------------------
+
+wxGxMapInfoFilter::wxGxMapInfoFilter(bool bIsTab)
+{
+    m_bIsTab = bIsTab;
+}
+
+wxGxMapInfoFilter::~wxGxMapInfoFilter(void)
+{
+}
+
+wxString wxGxMapInfoFilter::GetName(void)
+{
+    if(m_bIsTab)
+        return wxString(_("MapInfo File (*.tab)"));
+    else
+        return wxString(_("MapInfo File (*.mid/*.mif)"));
+}
+
+wxString wxGxMapInfoFilter::GetExt(void)
+{
+    if(m_bIsTab)
+	    return wxString(wxT("tab"));
+    else
+        return wxString(wxT("mif"));
+}
+
+wxString wxGxMapInfoFilter::GetDriver(void)
+{
+	return wxString(wxT("MapInfo File"));
+}
+
+int wxGxMapInfoFilter::GetSubType(void)
+{
+    return enumVecMapinfoTab;
+}
+
+//------------------------------------------------------------
+// wxGxKMLFilter
+//------------------------------------------------------------
+
+wxGxKMLFilter::wxGxKMLFilter(void)
+{
+}
+
+wxGxKMLFilter::~wxGxKMLFilter(void)
+{
+}
+
+wxString wxGxKMLFilter::GetName(void)
+{
+	return wxString(_("Google KML files (*.kml)"));
+}
+
+wxString wxGxKMLFilter::GetExt(void)
+{
+	return wxString(wxT("kml"));
+}
+
+wxString wxGxKMLFilter::GetDriver(void)
+{
+	return wxString(wxT("KML"));
+}
+
+int wxGxKMLFilter::GetSubType(void)
+{
+    return enumVecKML;
+}
+
+//------------------------------------------------------------
+// wxGxDXFFilter
+//------------------------------------------------------------
+
+wxGxDXFFilter::wxGxDXFFilter(void)
+{
+}
+
+wxGxDXFFilter::~wxGxDXFFilter(void)
+{
+}
+
+wxString wxGxDXFFilter::GetName(void)
+{
+	return wxString(_("AutoCAD DXF files (*.dxf)"));
+}
+
+wxString wxGxDXFFilter::GetExt(void)
+{
+	return wxString(wxT("dxf"));
+}
+
+wxString wxGxDXFFilter::GetDriver(void)
+{
+	return wxString(wxT("DXF"));
+}
+
+int wxGxDXFFilter::GetSubType(void)
+{
+    return enumVecDXF;
+}
+
+//------------------------------------------------------------
+// wxGxFolderFilter
+//------------------------------------------------------------
+
+wxGxFolderFilter::wxGxFolderFilter(void)
+{
+}
+
+wxGxFolderFilter::~wxGxFolderFilter(void)
+{
+}
+
+bool wxGxFolderFilter::CanChooseObject( IGxObject* pObject )
+{
+	wxGxFolder* pGxFolder = dynamic_cast<wxGxFolder*>(pObject);
+	if(!pGxFolder)
+		return false;
+    if(pObject->GetCategory() == wxString(_("Folder")))
+        return true;
+    if(pObject->GetCategory() == wxString(_("Folder Connection")))
+        return true;
+    return false;
+}
+
+bool wxGxFolderFilter::CanDisplayObject( IGxObject* pObject )
+{
+	//IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
+	//if(pContainer)
+	//	return true;
+	wxGxFolder* pGxFolder = dynamic_cast<wxGxFolder*>(pObject);
+	if(!pGxFolder)
+		return false;
+    if(pObject->GetCategory() == wxString(_("Folder")))
+        return true;
+    if(pObject->GetCategory() == wxString(wxT("Root")))
+        return true;
+    if(pObject->GetCategory() == wxString(_("Folder Connection")))
+        return true;
+    return false;
+}
+
+wxString wxGxFolderFilter::GetName(void)
+{
+	return wxString(_("Folder"));
+}
+

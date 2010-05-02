@@ -26,7 +26,7 @@
 
 
 
-wxGISFeatureTransformThread::wxGISFeatureTransformThread(wxGISFeatureDataset* pwxGISFeatureDataset, OGRCoordinateTransformation *poCT, bool bTransform, OGRPolygon* pRgn1, OGRPolygon* pRgn2, wxCriticalSection* pCritSect, OGREnvelope* pFullEnv, wxGISGeometrySet* pOGRGeometrySet, size_t &nCounter, wxGISProgressor* pProgressor, ITrackCancel* pTrackCancel) : wxThread(wxTHREAD_JOINABLE), m_nCounter(nCounter)
+wxGISFeatureTransformThread::wxGISFeatureTransformThread(wxGISFeatureDataset* pwxGISFeatureDataset, OGRCoordinateTransformation *poCT, bool bTransform, OGRPolygon* pRgn1, OGRPolygon* pRgn2, wxCriticalSection* pCritSect, OGREnvelope* pFullEnv, wxGISGeometrySet* pOGRGeometrySet, size_t &nCounter, ITrackCancel* pTrackCancel) : wxThread(wxTHREAD_JOINABLE), m_nCounter(nCounter)
 {
     m_pwxGISFeatureDataset = pwxGISFeatureDataset;
     m_poCT = poCT;
@@ -37,7 +37,7 @@ wxGISFeatureTransformThread::wxGISFeatureTransformThread(wxGISFeatureDataset* pw
     m_pCritSect = pCritSect;
     m_pFullEnv = pFullEnv;
     m_pOGRGeometrySet = pOGRGeometrySet;
-    m_pProgressor = pProgressor;
+    m_pProgressor = pTrackCancel->GetProgressor();
 //??
     if(m_poCT && m_poCT->GetSourceCS()->IsGeographic())
         m_fSegSize = 3.0;
@@ -56,13 +56,22 @@ void *wxGISFeatureTransformThread::Entry()
     while((poFeature = m_pwxGISFeatureDataset->Next()) != NULL)	
     {
         if(m_pTrackCancel && !m_pTrackCancel->Continue())
+        {
+            OGRFeature::DestroyFeature(poFeature);
             return NULL;
+        }
 
-        OGRGeometry* pGeom = poFeature->StealGeometry();//GetGeometryRef();    
+        OGRGeometry* pGeom = poFeature->StealGeometry();//GetGeometryRef();   
+        if(!pGeom)
+        {
+            OGRFeature::DestroyFeature(poFeature);
+            continue;
+        }
+
         OGREnvelope GEnv;
         pGeom->getEnvelope(&GEnv);
         
-        if(!pGeom || !pEnv->Contains(GEnv))
+        if(!pEnv->Contains(GEnv))
         {
             OGRFeature::DestroyFeature(poFeature);
             continue;

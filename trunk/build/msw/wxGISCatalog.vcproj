@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib cpld.lib ogrd.lib gdald.lib wxGISCartod.lib wxGISFrameworkd.lib wxGISCored.lib"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib cpld.lib ogrd.lib gdald.lib wxGISCartod.lib wxGISFrameworkd.lib wxGISCored.lib wxGISDataSourced.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="0"
 				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(GDAL)\wxGIS\lib&quot;;..\..\lib"
@@ -219,6 +219,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\catalog\gxkmldataset.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\catalog\gxmapinfofactory.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\catalog\gxmlfactory.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\catalog\gxrasterfactory.cpp"
 				>
 			</File>
@@ -274,6 +286,18 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalog\gxfolderfactory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalog\gxkmldataset.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalog\gxmapinfofactory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalog\gxmlfactory.h"
 				>
 			</File>
 			<File

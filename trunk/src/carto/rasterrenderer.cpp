@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/carto/rasterrenderer.h"
-#include "wxgis/carto/rasterdataset.h"
+#include "wxgis/datasource/rasterdataset.h"
 #include "wxgis/display/screendisplay.h"
 
 //-----------------------------------

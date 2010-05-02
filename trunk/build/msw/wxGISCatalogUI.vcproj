@@ -197,11 +197,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\catalogui\gxcontentview.cpp"
+				RelativePath="..\..\src\catalogui\gxcontdialog.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\catalogui\gxdialog.cpp"
+				RelativePath="..\..\src\catalogui\gxcontentview.cpp"
 				>
 			</File>
 			<File
@@ -218,6 +218,10 @@
 			</File>
 			<File
 				RelativePath="..\..\src\catalogui\gxnoview.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\catalogui\gxobgdialog.cpp"
 				>
 			</File>
 			<File
@@ -271,11 +275,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wxgis\catalogui\gxcontentview.h"
+				RelativePath="..\..\include\wxgis\catalogui\gxcontdialog.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wxgis\catalogui\gxdialog.h"
+				RelativePath="..\..\include\wxgis\catalogui\gxcontentview.h"
 				>
 			</File>
 			<File
@@ -292,6 +296,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalogui\gxnoview.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxobjdialog.h"
 				>
 			</File>
 			<File

@@ -21,7 +21,7 @@
 #pragma once
 
 #include "wxgis/carto/carto.h"
-#include "wxgis/carto/featuredataset.h"
+#include "wxgis/datasource/featuredataset.h"
 
 //void GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
 

@@ -22,12 +22,17 @@
 #include "../../art/cont_view_16.xpm"
 #include "../../art/cont_view_48.xpm"
 
+#include "wx/dnd.h"
+#include "wx/dataobj.h"
+
 BEGIN_EVENT_TABLE(wxGxContentView, wxListCtrl)
     EVT_LIST_BEGIN_LABEL_EDIT(LISTCTRLID, wxGxContentView::OnBeginLabelEdit)
     EVT_LIST_END_LABEL_EDIT(LISTCTRLID, wxGxContentView::OnEndLabelEdit)
     EVT_LIST_ITEM_SELECTED(LISTCTRLID, wxGxContentView::OnSelected)
     EVT_LIST_ITEM_DESELECTED(LISTCTRLID, wxGxContentView::OnDeselected)
     EVT_LIST_ITEM_ACTIVATED(LISTCTRLID, wxGxContentView::OnActivated)
+
+    EVT_LIST_BEGIN_DRAG(LISTCTRLID, wxGxContentView::OnBeginDrag)
 
     EVT_LIST_COL_CLICK(LISTCTRLID, wxGxContentView::OnColClick)
     EVT_CONTEXT_MENU(wxGxContentView::OnContextMenu)
@@ -69,11 +74,13 @@ bool wxGxContentView::Activate(IGxApplication* application, wxXmlNode* pConf)
 	wxGxView::Activate(application, pConf);
 	Serialize(m_pXmlConf, false);
 
-	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( application->GetCatalog() );
+    m_pCatalog = application->GetCatalog();
+
+	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pCatalog );
 	if(m_pConnectionPointCatalog != NULL)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
-	m_pSelection = application->GetCatalog()->GetSelection();
+	m_pSelection = m_pCatalog->GetSelection();
 	//m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( m_pSelection );
 	//if(m_pConnectionPointSelection != NULL)
 	//	m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
@@ -160,6 +167,12 @@ void wxGxContentView::AddObject(IGxObject* pObject)
 	pData->iImageIndex = pos;
 
 	wxString name = pObject->GetName();
+    if(!m_pCatalog->GetShowExt())
+    {
+        wxFileName FileName(name);
+        FileName.SetEmptyExt();
+        name = FileName.GetName();
+    }
 	wxString type = pObject->GetCategory();
 
 	long ListItemID = InsertItem(GetItemCount(), name, pos);
@@ -601,4 +614,31 @@ void wxGxContentView::ResetContents(void)
 	for(long i = 0; i < GetItemCount(); i++)
 		delete (LPITEMDATA)GetItemData(i);
 	DeleteAllItems();
+}
+
+void wxGxContentView::OnBeginDrag(wxListEvent& event)
+{
+    event.Skip();
+    wxFileDataObject my_data;
+    long nItem = -1;
+    for ( ;; )
+    {
+        nItem = GetNextItem(nItem, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+        if ( nItem == -1 )
+            break;
+        LPITEMDATA pItemData = (LPITEMDATA)GetItemData(nItem);
+	    if(pItemData == NULL)
+            continue;
+        if(!pItemData->pObject)
+            continue;
+        IGxDataset* pDSet = dynamic_cast<IGxDataset*>(pItemData->pObject);
+        if(pDSet)
+        {        
+            my_data.AddFile(pDSet->GetPath());
+        }
+    }
+    //my_data.AddFile( wxT("/vsizip/E:/Archive.zip/тест русский.shp") );
+    wxDropSource dragSource( this );
+	dragSource.SetData( my_data );
+	wxDragResult result = dragSource.DoDragDrop( TRUE );
 }

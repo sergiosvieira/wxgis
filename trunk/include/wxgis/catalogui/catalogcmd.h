@@ -53,4 +53,5 @@ public:
 private:
 	IApplication* m_pApp;
 	wxImageList m_ImageList;
+    wxArrayString m_CreateTypesArray;
 };

@@ -21,6 +21,9 @@
 #include "wxgis/catalogui/gxtreeview.h"
 #include "wxgis/framework/framework.h"
 
+#include "wx/dnd.h"
+#include "wx/dataobj.h"
+
 //////////////////////////////////////////////////////////////////////////////
 // wxGxTreeViewBase
 //////////////////////////////////////////////////////////////////////////////
@@ -100,7 +103,15 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, b
 
 	wxGxTreeItemData* pData = new wxGxTreeItemData(pGxObject, pos, false);
 
-	wxTreeItemId NewTreeItem = AppendItem(hParent, pGxObject->GetName(), pos, -1, pData);
+    wxString sName = pGxObject->GetName();
+    if(!m_pCatalog->GetShowExt())
+    {
+        wxFileName FileName(sName);
+        FileName.SetEmptyExt();
+        sName = FileName.GetName();
+    }
+
+	wxTreeItemId NewTreeItem = AppendItem(hParent, sName, pos, -1, pData);
 	m_TreeMap[pGxObject] = NewTreeItem;
 
 	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pGxObject);
@@ -118,7 +129,8 @@ bool wxGxTreeViewBase::Activate(IGxApplication* application, wxXmlNode* pConf)
 	if(!wxGxView::Activate(application, pConf))
 		return false;
 
-    AddRoot(dynamic_cast<IGxObject*>(application->GetCatalog()));
+    m_pCatalog = application->GetCatalog();
+    AddRoot(dynamic_cast<IGxObject*>(m_pCatalog));
 
 	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( application->GetCatalog() );
 	if(m_pConnectionPointCatalog != NULL)
@@ -206,6 +218,12 @@ void wxGxTreeViewBase::OnObjectChanged(IGxObject* object)
 			if(pGxObjectUI != NULL)
 			{
 				wxString sName = pData->m_pObject->GetName();
+                if(!m_pCatalog->GetShowExt())
+                {
+                    wxFileName FileName(sName);
+                    FileName.SetEmptyExt();
+                    sName = FileName.GetName();
+                }
 				wxIcon icon = pGxObjectUI->GetSmallImage();
 
 				if(icon.IsOk())
@@ -246,10 +264,22 @@ void wxGxTreeViewBase::OnObjectRefreshed(IGxObject* object)
 		{
 			if(pData->m_bExpandedOnce)
 			{
+                //store current sel
+                Unselect();
 				DeleteChildren(TreeItemId);
 				pData->m_bExpandedOnce = false;
 				Expand(TreeItemId);
+                //restore current sel
 			}
+            else
+            {
+			    IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(object);
+			    if(pGxObjectContainer && pGxObjectContainer->HasChildren() && !ItemHasChildren(TreeItemId))
+                {
+                    SetItemHasChildren(TreeItemId);
+                    wxTreeCtrl::Refresh();
+                }
+            }
 		}
 	}
 }
@@ -348,7 +378,8 @@ BEGIN_EVENT_TABLE(wxGxTreeView, wxGxTreeViewBase)
     EVT_TREE_BEGIN_LABEL_EDIT(TREECTRLID, wxGxTreeView::OnBeginLabelEdit)
     EVT_TREE_END_LABEL_EDIT(TREECTRLID, wxGxTreeView::OnEndLabelEdit)
     EVT_TREE_SEL_CHANGED(TREECTRLID, wxGxTreeView::OnSelChanged)
-    EVT_SET_FOCUS(wxGxTreeView::OnSetFocus)
+    EVT_SET_FOCUS(wxGxTreeView::OnSetFocus)        
+    EVT_TREE_BEGIN_DRAG(TREECTRLID, wxGxTreeView::OnBeginDrag)
 END_EVENT_TABLE()
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxTreeView, wxGxTreeViewBase)
@@ -528,5 +559,34 @@ void wxGxTreeView::OnItemRightClick(wxTreeEvent& event)
     wxGxTreeViewBase::OnItemRightClick(event);
 }
 
+void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
+{
+    event.Skip();
+	wxTreeItemId item = event.GetItem();
+	if(!item.IsOk())
+		return;
+    SelectItem(item);
+
+    wxFileDataObject my_data;
+
+    wxArrayTreeItemIds treearray;
+    size_t count = GetSelections(treearray);
+    if(count == 0)
+        return;
+    for(size_t i = 0; i < count; i++)
+    {
+	    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(treearray[i]);
+	    if(pData == NULL)
+            continue;
+        if(!pData->m_pObject)
+            continue;
+        IGxDataset* pDSet = dynamic_cast<IGxDataset*>(pData->m_pObject);
+        if(pDSet)
+            my_data.AddFile(pDSet->GetPath());
+    }
+    wxDropSource dragSource( this );
+	dragSource.SetData( my_data );
+	wxDragResult result = dragSource.DoDragDrop( TRUE );
+}
 
 

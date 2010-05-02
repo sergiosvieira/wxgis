@@ -37,7 +37,7 @@
 #include <wx/panel.h>
 
 #include "wxgis/carto/carto.h"
-#include "wxgis/carto/featuredataset.h"
+#include "wxgis/datasource/featuredataset.h"
 
 //------------------------------------------------------------------
 // wxGISTable

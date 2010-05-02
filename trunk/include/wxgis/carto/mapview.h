@@ -106,7 +106,7 @@ protected:
 	WXDWORD m_MapToolState;
 	ITrackCancel* m_pTrackCancel;
 	wxDrawingThread* m_pThread;
-	wxGISAnimation* m_pAni;
+	IProgressor* m_pAni;
 	wxCriticalSection m_CriticalSection;
 	wxTimer m_timer;
 	wxRect m_virtualrc;

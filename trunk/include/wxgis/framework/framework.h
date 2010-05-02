@@ -78,6 +78,14 @@ public:
 	virtual ~IProgressor(void){};
 	//pure virtual
 	virtual bool Show(bool bShow) = 0;
+    //
+    virtual void SetRange(int range) = 0;
+    virtual int GetRange() = 0;
+    virtual void SetValue(int value) = 0;
+    virtual int GetValue() = 0;
+    //
+	virtual void Play(void) = 0;
+	virtual void Stop(void) = 0;
 };
 
 class IStatusBar
@@ -108,6 +116,7 @@ public:
 	virtual void Reset(void){m_bIsCanceled = false;};
 	virtual IProgressor* GetProgressor(void){return m_pProgressor;};
 	virtual void SetProgressor(IProgressor* pProgressor){m_pProgressor = pProgressor; };
+	virtual void PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType){};//wxDateTime::Now().Format(_("%d-%m-%Y %H:%M:%S")).c_str(), 
 protected:
 	bool m_bIsCanceled;
 	IProgressor* m_pProgressor;

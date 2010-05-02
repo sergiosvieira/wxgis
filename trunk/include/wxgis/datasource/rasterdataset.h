@@ -20,7 +20,7 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/carto/carto.h"
+#include "wxgis/datasource/datasource.h"
 
 //int CPL_DLL CPL_STDCALL OvrProgress( double, const char *, void *);
 
@@ -28,32 +28,24 @@
 // wxGISRasterDataset
 //---------------------------------------
 
-class WXDLLIMPEXP_GIS_CRT wxGISRasterDataset :
+class WXDLLIMPEXP_GIS_DS wxGISRasterDataset :
 	public wxGISDataset
 {
 public:
-	wxGISRasterDataset(wxString sPath, wxMBConv* pPathEncoding = wxConvCurrent);
+	wxGISRasterDataset(wxString sPath, wxGISEnumRasterDatasetType nType, wxMBConv* pPathEncoding = wxConvCurrent);
 	virtual ~wxGISRasterDataset(void);
+    // wxGISDataset
 	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
+    // wxGISRasterDataset
 	virtual bool Open(void);
 	virtual OGRSpatialReference* GetSpatialReference(void);
 	virtual const OGREnvelope* GetEnvelope(void);
 	virtual GDALDataset* GetRaster(void){return m_poDataset;};
+	virtual GDALDataset* GetMainRaster(void){return m_poMainDataset;};
 	virtual bool HasOverviews(void){return m_bHasOverviews;};
     virtual int GetWidth(void){return m_nXSize;};
     virtual int GetHeight(void){return m_nYSize;};
     virtual bool Delete(void);
-
-//	virtual OGRLayer* GetLayer(int iLayer = 0);
-//	virtual void SetSpatialFilter(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);
-//	virtual void Empty(void);
-//	virtual void AddFeature(OGRFeature* poFeature);
-//	virtual OGRFeature* GetAt(int nIndex);
-//	virtual OGRFeature* operator [](int nIndex);
-//	virtual wxString GetAsString(int row, int col);
-//	virtual wxGISFeatureSet* GetFeatureSet(IQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
-//	virtual size_t GetSize(void){return m_poLayer->GetFeatureCount(false);};
-////
 protected:
 	OGREnvelope* m_psExtent;
 	GDALDataset  *m_poDataset;
@@ -64,9 +56,4 @@ protected:
 	int m_nXSize;
 	int m_nYSize;
     wxCriticalSection m_CritSect;
-
-//	OGRDataSource *m_poDS;
-//	OGRLayer* m_poLayer;
-//	std::vector<OGRFeature*> m_OGRFeatureArray;
-//	CPLQuadTree* m_pQuadTree;
 };
