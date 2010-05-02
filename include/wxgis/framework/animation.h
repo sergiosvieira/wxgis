@@ -39,15 +39,14 @@ public:
 	void OnPaint(wxPaintEvent & event);
 	void OnEraseBackground(wxEraseEvent & event);
     void OnTimer( wxTimerEvent & event);
-	//void OnSize(wxSizeEvent & event);
-	//void OnRefreshTimer(wxTimerEvent & event);
-	//virtual wxSize DoGetBestSize() const;
-	//void DoDraw(wxDC & dc);
-	virtual void Play(void){ m_timer.Start(50); };
-	virtual void Stop(void){ m_timer.Stop(); };
-
 	//IProgressor
 	virtual bool Show(bool bShow){return wxControl::Show(bShow);};
+	virtual void Play(void){ m_timer.Start(50); };
+	virtual void Stop(void){ m_timer.Stop(); };
+    virtual void SetRange(int range){};
+    virtual int GetRange(){return 0;};
+    virtual void SetValue(int value){};
+    virtual int GetValue(){return 0;};
 protected:
 	wxImageList m_ImageList;
 	int m_nImgPos;

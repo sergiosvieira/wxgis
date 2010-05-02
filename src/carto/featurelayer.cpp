@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "wxgis/carto/featurelayer.h"
 #include "wxgis/carto/simplerenderer.h"
-#include "wxgis/carto/spvalidator.h"
+#include "wxgis/datasource/spvalidator.h"
 #include "wxgis/framework/application.h"
 #include "wxgis/carto/transformthreads.h"
 #include <wx/stopwatch.h>
@@ -58,7 +58,7 @@ wxGISFeatureLayer::wxGISFeatureLayer(wxGISDataset* pwxGISDataset) : wxGISLayer()
 //        m_pSpatialReference = ;
 		//pre load features
 //        LoadFeatures();
-        m_pOGRGeometrySet = new wxGISGeometrySet(m_pwxGISFeatureDataset, true);
+        m_pOGRGeometrySet = new wxGISGeometrySet(true);
 		SetSpatialReference(m_pwxGISFeatureDataset->GetSpatialReference());
 	}
 }
@@ -122,7 +122,7 @@ void wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisp
 			    int count(0);
 			    CPLRectObj Rect = {Env.MinX, Env.MinY, Env.MaxX, Env.MaxY};
 			    OGRGeometry** pGeometryArr = (OGRGeometry**)CPLQuadTreeSearch(m_pQuadTree, &Rect, &count);
-		        wxGISGeometrySet GISGeometrySet(m_pwxGISFeatureDataset, false);
+		        wxGISGeometrySet GISGeometrySet(false);
              
 			    for(size_t i = 0; i < count; i++)
 			    {
@@ -289,7 +289,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
 
     IApplication* pApp = ::GetApplication();
     IStatusBar* pStatusBar = pApp->GetStatusBar();  
-    wxGISProgressor* pProgressor = dynamic_cast<wxGISProgressor*>(pStatusBar->GetProgressor());
+    IProgressor* pProgressor = pStatusBar->GetProgressor();
     if(pProgressor)
     {
         pProgressor->Show(true);
@@ -318,9 +318,12 @@ void wxGISFeatureLayer::LoadGeometry(void)
     //    OGRFeature::DestroyFeature(pF);
     //}
 
+    ITrackCancel TrackCancel;
+    TrackCancel.SetProgressor(pProgressor);
+
     for(int i = 0; i < CPUCount; i++)
     {        
-        wxGISFeatureTransformThread *thread = new wxGISFeatureTransformThread(m_pwxGISFeatureDataset, poCT, bTransform, pRgn1, pRgn2, &CritSect, &m_FullEnv, m_pOGRGeometrySet, nCounter, pProgressor, NULL);
+        wxGISFeatureTransformThread *thread = new wxGISFeatureTransformThread(m_pwxGISFeatureDataset, poCT, bTransform, pRgn1, pRgn2, &CritSect, &m_FullEnv, m_pOGRGeometrySet, nCounter, &TrackCancel);
         thread->Create();
         thread->Run();
         threadarray.push_back(thread);
@@ -338,6 +341,17 @@ void wxGISFeatureLayer::LoadGeometry(void)
     OCTDestroyCoordinateTransformation(poCT);
     wxDELETE(pRgn1);
     wxDELETE(pRgn2);
+
+    if(fabs(m_FullEnv.MinX - m_FullEnv.MaxX) < DELTA)
+    {
+        m_FullEnv.MaxX += 1;
+        m_FullEnv.MinX -= 1;
+    }
+    if(fabs(m_FullEnv.MinY - m_FullEnv.MaxY) < DELTA)
+    {
+        m_FullEnv.MaxY += 1;
+        m_FullEnv.MinY -= 1;
+    }
              
     CreateQuadTree(&m_FullEnv);
 

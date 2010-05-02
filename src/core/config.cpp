@@ -32,6 +32,8 @@ wxGISConfig::wxGISConfig(wxString sAppName, wxString sConfigDir, bool bPortable)
 	m_sAppName = sAppName;
 
 	m_sExeDirPath = wxPathOnly(stp.GetExecutablePath());
+
+    m_bPortable = bPortable;
 	
     if(bPortable)
     {
@@ -320,7 +322,7 @@ wxString wxGISAppConfig::GetLocaleDir(void)
     wxXmlNode* pNode = GetConfigNode(enumGISHKCU, wxString(wxT("loc")));
     
     wxString sDefaultOut = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("locale");
-    if(!pNode)
+    if(!pNode || m_bPortable)
         return sDefaultOut;
     return pNode->GetPropVal(wxT("path"), sDefaultOut);
 }
@@ -341,7 +343,7 @@ wxString wxGISAppConfig::GetSysDir(void)
     wxXmlNode* pNode = GetConfigNode(enumGISHKLM, wxString(wxT("sys")));
     
     wxString sDefaultOut = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("sys");
-    if(!pNode)
+    if(!pNode || m_bPortable)
         return sDefaultOut;
     return pNode->GetPropVal(wxT("path"), sDefaultOut);
 }
@@ -374,6 +376,8 @@ void wxGISAppConfig::SetLocale(wxString sLocale)
 
 void wxGISAppConfig::SetLocaleDir(wxString sLocaleDir)
 {
+    if(m_bPortable)
+        return;
 	wxString sPropPath(wxT("loc"));
     wxXmlNode* pNode = GetConfigNode(enumGISHKCU, sPropPath);
     if(!pNode)
@@ -389,6 +393,8 @@ void wxGISAppConfig::SetLocaleDir(wxString sLocaleDir)
 
 void wxGISAppConfig::SetSysDir(wxString sSysDir)
 {
+    if(m_bPortable)
+        return;
 	wxString sPropPath(wxT("sys"));
     wxXmlNode* pNode = GetConfigNode(enumGISHKLM, sPropPath);
     if(!pNode)
@@ -404,6 +410,8 @@ void wxGISAppConfig::SetSysDir(wxString sSysDir)
 
 void wxGISAppConfig::SetLogDir(wxString sLogDir)
 {
+    if(m_bPortable)
+        return;
 	wxString sPropPath(wxT("log"));
     wxXmlNode* pNode = GetConfigNode(enumGISHKCU, sPropPath);
     if(!pNode)

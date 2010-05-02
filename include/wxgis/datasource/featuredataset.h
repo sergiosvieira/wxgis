@@ -20,38 +20,51 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/datasource.h"
+#include "wxgis/datasource/datasource.h"
 
-void GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
+class wxGISFeatureDataset;
+
+void WXDLLIMPEXP_GIS_DS GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
+wxGISFeatureDataset WXDLLIMPEXP_GIS_DS *CreateVectorLayer(wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *poFields, OGRSpatialReference *poSpatialRef = NULL, OGRwkbGeometryType eGType = wkbUnknown, char ** papszDataSourceOptions = NULL, char ** papszLayerOptions = NULL, wxMBConv* pPathEncoding = wxConvCurrent); 
 
 //---------------------------------------
 // wxGISFeatureDataset
 //---------------------------------------
 
-class WXDLLIMPEXP_GIS_CRT wxGISFeatureDataset :
+class WXDLLIMPEXP_GIS_DS wxGISFeatureDataset :
 	public wxGISDataset
 {
 public:
-	wxGISFeatureDataset(wxString sPath, wxMBConv* pPathEncoding = wxConvCurrent, wxFontEncoding Encoding = wxFONTENCODING_DEFAULT);
+	wxGISFeatureDataset(wxString sPath, wxGISEnumVectorDatasetType nType, wxMBConv* pPathEncoding = wxConvCurrent);
+	wxGISFeatureDataset(OGRDataSource *poDS, OGRLayer* poLayer, wxString sPath, wxGISEnumVectorDatasetType nType, wxMBConv* pPathEncoding = wxConvCurrent);
 	virtual ~wxGISFeatureDataset(void);
 //wxGISDataset
-	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
+	virtual wxGISEnumDatasetType GetType(void){return m_nType;};
+    virtual size_t GetSubsetsCount(void);
+    virtual wxGISDataset* GetSubset(size_t nIndex);
+    virtual wxString GetName(void);
 //wxGISFeatureDataset
 	virtual bool Open(int iLayer = 0);
 	virtual bool Delete(int iLayer = 0);
 	virtual OGRSpatialReference* GetSpatialReference(void);
 	virtual OGREnvelope* GetEnvelope(void);
+    virtual OGRwkbGeometryType GetGeometryType(void);
+    virtual OGRFeatureDefn* GetDefiniton(void);
+    virtual OGRErr SetFilter(wxGISQueryFilter* pQFilter = NULL);
 	//virtual void SetSpatialFilter(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);
 	virtual OGRFeature* GetAt(long nIndex);
 	virtual OGRFeature* operator [](long nIndex);
 	virtual wxString GetAsString(long row, int col);
 	//virtual wxGISFeatureSet* GetFeatureSet(IQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
-	virtual wxGISGeometrySet* GetGeometrySet(IQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
+	virtual wxGISGeometrySet* GetGeometrySet(wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
     virtual wxGISGeometrySet* GetGeometries(void);
 	virtual size_t GetSize(void);
 	virtual OGRLayer* GetLayerRef(int iLayer = 0);
     virtual OGRFeature* Next(void);
     virtual void Reset(void);
+    virtual OGRErr CreateFeature(OGRFeature* poFeature);
+    virtual wxFontEncoding GetEncoding(void){return m_Encoding;};
+    virtual void SetEncoding(wxFontEncoding Encoding){m_Encoding = Encoding;};
 protected:
     virtual void CreateQuadTree(OGREnvelope* pEnv);
     virtual void DeleteQuadTree(void);
@@ -63,7 +76,10 @@ protected:
 	OGRLayer* m_poLayer;
 	bool m_bIsOpened;
     bool m_bOLCStringsAsUTF8;
+    wxGISEnumDatasetType m_nType;
     wxFontEncoding m_Encoding;
+    std::map<long, OGRFeature*> m_FeaturesMap;
+    std::map<long, OGRFeature*>::iterator m_IT;
     //
     bool m_bIsGeometryLoaded;
     wxGISGeometrySet *m_pGeometrySet;

@@ -308,6 +308,8 @@ void wxGxCatalog::ObjectDeleted(IGxObject* pObject)
 	//if selected remove from m_Selection
 	//if(m_pSelection != NULL)
 	//	m_pSelection->Unselect(pObject, IGxSelection::INIT_ALL);
+    
+    m_pSelection->RemoveDo(pObject->GetFullName());
 
 	wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
 
@@ -470,8 +472,8 @@ void wxGxCatalog::DisconnectFolder(wxString sPath)
 	if(m_DiscConnections[sPath] != NULL)
 	{
         IGxObject* pGxObj = m_DiscConnections[sPath]->GetParent();
-		DeleteChild(m_DiscConnections[sPath]);
 		ObjectDeleted(m_DiscConnections[sPath]);
+		DeleteChild(m_DiscConnections[sPath]);
         m_pSelection->Select(pGxObj, false, IGxSelection::INIT_ALL);
 		m_DiscConnections[sPath] = NULL;
 	}

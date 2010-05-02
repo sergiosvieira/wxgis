@@ -21,18 +21,18 @@
 
 #pragma once
 
-#include "wxgis/datasource.h"
-#include <wx/filename.h>
+#include "wxgis/datasource/datasource.h"
+#include "wx/filename.h"
 
 #define APP_NAME wxT("wxGISCatalog") 
-#define APP_VER wxT("0.0.1 alpha")
+#define APP_VER wxT("0.0.1 beta")
 
 //#include <wx/dynload.h>
 //#include <wx/dynlib.h>
 //#include <algorithm>
 //#include <map>
 
-#define NOTFIRESELID 1010
+#define NOTFIRESELID    1010
 
 class IGxObject;
 typedef std::vector<IGxObject*> GxObjectArray;
@@ -59,6 +59,7 @@ public:
     virtual void Do(IGxObject* pObject) = 0;
     virtual bool CanRedo() = 0;
 	virtual bool CanUndo() = 0;
+	virtual void RemoveDo(wxString sPath) = 0;
     virtual wxString Redo(int nPos = -1) = 0;
     virtual wxString Undo(int nPos = -1) = 0;
     virtual void Reset() = 0;
@@ -255,7 +256,10 @@ public:
 	virtual ~IGxDataset(void){};
 	virtual wxGISDataset* GetDataset(void) = 0;	
 	virtual wxGISEnumDatasetType GetType(void) = 0;
+	virtual int GetSubType(void) = 0;
 	virtual void SetPathEncoding(wxMBConv* pPathEncoding) = 0;
+	virtual wxMBConv* GetPathEncoding(void) = 0;
+    virtual wxString GetPath(void) = 0;
 };
 
 class IGxFile

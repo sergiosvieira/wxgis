@@ -49,6 +49,7 @@ public:
 	virtual bool CanUndo();
     virtual wxString Redo(int nPos = -1);
     virtual wxString Undo(int nPos = -1);
+	virtual void RemoveDo(wxString sPath);
     virtual void Reset();
     virtual size_t GetDoSize();
     virtual int GetDoPos(void){return m_Pos;};

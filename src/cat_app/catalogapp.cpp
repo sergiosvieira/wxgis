@@ -161,7 +161,7 @@ bool wxGISCatalogApp::OnInit()
 	CPLSetConfigOption("CPL_DEBUG", bDebugMode == true ? "ON" : "OFF");
 	CPLSetConfigOption("CPL_TIMESTAMP", "ON");
 	CPLSetConfigOption("CPL_LOG_ERRORS", bDebugMode == true ? "ON" : "OFF");
-	CPLSetConfigOption("GDAL_DATA", wgWX2MB( (sSysDir + wxFileName::GetPathSeparator() + wxString(wxT("epsg_csv")) + wxFileName::GetPathSeparator()).c_str() ) );
+	CPLSetConfigOption("GDAL_DATA", wgWX2MB( (sSysDir + wxFileName::GetPathSeparator() + wxString(wxT("gdal")) + wxFileName::GetPathSeparator()).c_str() ) );//epsg_csv
 	wxString sCPLLogPath = sLogDir + wxFileName::GetPathSeparator() + wxString(wxT("gdal_log_cat.txt"));
 	CPLSetConfigOption("CPL_LOG", wgWX2MB(sCPLLogPath.c_str()) );
 

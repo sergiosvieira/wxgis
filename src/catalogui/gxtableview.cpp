@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxtableview.h"
-#include "wxgis/carto/featuredataset.h"
+#include "wxgis/datasource/featuredataset.h"
 
 wxGxTableView::wxGxTableView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxGISTableView(parent, id, pos, size)
 {
@@ -95,6 +95,7 @@ void wxGxTableView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	if(pGxDataset == NULL)
 		return;
 
+    wxBusyCursor wait;
 	wxGISDataset* pwxGISDataset = pGxDataset->GetDataset();
 	if(pwxGISDataset == NULL)
 		return;

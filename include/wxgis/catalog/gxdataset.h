@@ -24,19 +24,18 @@
 #include <wx/imaglist.h>
 
 //--------------------------------------------------------------
-//class wxGxDataset
+//class wxGxTableDataset
 //--------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CLT wxGxDataset :
+class WXDLLIMPEXP_GIS_CLT wxGxTableDataset :
 	public IGxObject,
 	public IGxObjectUI,
 	public IGxObjectEdit,
 	public IGxDataset
 {
 public:
-	wxGxDataset(wxString Path, wxString Name, wxGISEnumDatasetType Type);
-	virtual ~wxGxDataset(void);
-    virtual void SetEncoding(wxFontEncoding Encoding);
+	wxGxTableDataset(wxString Path, wxString Name, wxGISEnumTableDatasetType nType);
+	virtual ~wxGxTableDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 	virtual wxString GetCategory(void){return wxString(_("Table"));};
@@ -53,31 +52,32 @@ public:
 	virtual void EditProperties(wxWindow *parent);
 	//IGxDataset
 	virtual wxGISDataset* GetDataset(void);
-	virtual wxGISEnumDatasetType GetType(void){return m_type;};
+	virtual wxGISEnumDatasetType GetType(void){return enumGISTableDataset;};
     virtual void SetPathEncoding(wxMBConv* pPathEncoding){m_pPathEncoding = pPathEncoding;};
+    virtual wxMBConv* GetPathEncoding(void){return m_pPathEncoding;};
+    virtual int GetSubType(void){return m_type;};
+    virtual wxString GetPath(void){return m_sPath;};
 protected:
 	wxString m_sName, m_sPath;
-    wxFontEncoding m_Encoding;
 	wxImageList m_ImageListSmall, m_ImageListLarge;
 	wxGISDataset* m_pwxGISDataset;
-	wxGISEnumDatasetType m_type;
+	wxGISEnumTableDatasetType m_type;
     wxMBConv* m_pPathEncoding;
 };
 
 //--------------------------------------------------------------
-//class wxGxShapefileDataset
+//class wxGxFeatureDataset
 //--------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CLT wxGxShapefileDataset :
+class WXDLLIMPEXP_GIS_CLT wxGxFeatureDataset :
 	public IGxObject,
 	public IGxObjectUI,
 	public IGxObjectEdit,
 	public IGxDataset
 {
 public:
-	wxGxShapefileDataset(wxString Path, wxString Name, wxGISEnumShapefileDatasetType Type);
-	virtual ~wxGxShapefileDataset(void);
-    virtual void SetEncoding(wxFontEncoding Encoding);
+	wxGxFeatureDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type);
+	virtual ~wxGxFeatureDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 	virtual wxString GetCategory(void);
@@ -85,7 +85,7 @@ public:
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
 	virtual wxString ContextMenu(void){return wxString(wxT("wxGxShapefileDataset.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxShapefileDataset.NewMenu"));};
+	virtual wxString NewMenu(void){return wxEmptyString;};//wxString(wxT("wxGxShapefileDataset.NewMenu"))
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
@@ -96,12 +96,15 @@ public:
 	virtual wxGISDataset* GetDataset(void);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
     virtual void SetPathEncoding(wxMBConv* pPathEncoding){m_pPathEncoding = pPathEncoding;};
+    virtual wxMBConv* GetPathEncoding(void){return m_pPathEncoding;};
+    virtual int GetSubType(void){return (int)m_type;};
+    virtual wxString GetPath(void){return m_sPath;};
 protected:
 	wxString m_sName, m_sPath;
     wxFontEncoding m_Encoding;
 	wxImageList m_ImageListSmall, m_ImageListLarge;
 	wxGISDataset* m_pwxGISDataset;
-	wxGISEnumShapefileDatasetType m_type;
+	wxGISEnumVectorDatasetType m_type;
     wxMBConv* m_pPathEncoding;
 };
 
@@ -136,6 +139,9 @@ public:
 	virtual wxGISDataset* GetDataset(void);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
     virtual void SetPathEncoding(wxMBConv* pPathEncoding){m_pPathEncoding = pPathEncoding;};
+    virtual wxMBConv* GetPathEncoding(void){return m_pPathEncoding;};
+    virtual int GetSubType(void){return (int)m_type;};
+    virtual wxString GetPath(void){return m_sPath;};
 protected:
 	wxString m_sName, m_sPath;
 	wxImageList m_ImageListSmall, m_ImageListLarge;

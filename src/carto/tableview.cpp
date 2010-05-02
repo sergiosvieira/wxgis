@@ -28,6 +28,7 @@
 wxGISTable::wxGISTable(wxGISDataset* pwxGISDataset) : m_pwxGISDataset(NULL)
 {
 	m_pwxGISDataset = dynamic_cast<wxGISFeatureDataset*>(pwxGISDataset);
+    //m_pwxGISDataset->Reference();
 	OGRLayer* pLayer = m_pwxGISDataset->GetLayerRef(0);
     if(pLayer)
     {

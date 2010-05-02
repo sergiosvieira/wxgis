@@ -21,14 +21,14 @@
 #pragma once
 
 #include "wxgis/carto/carto.h"
-#include "wxgis/carto/featuredataset.h"
+#include "wxgis/datasource/featuredataset.h"
 #include "wxgis/framework/application.h"
 #include "wxgis/geometry/geometry.h"
 
 class wxGISFeatureTransformThread : public wxThread
 {
 public:
-	wxGISFeatureTransformThread(wxGISFeatureDataset* pwxGISFeatureDataset, OGRCoordinateTransformation *poCT, bool bTransform, OGRPolygon* pRgn1, OGRPolygon* pRgn2, wxCriticalSection* pCritSect, OGREnvelope* pFullEnv, wxGISGeometrySet* pOGRGeometrySet, size_t &nCounter, wxGISProgressor* pProgressor = NULL, ITrackCancel* pTrackCancel = NULL);
+	wxGISFeatureTransformThread(wxGISFeatureDataset* pwxGISFeatureDataset, OGRCoordinateTransformation *poCT, bool bTransform, OGRPolygon* pRgn1, OGRPolygon* pRgn2, wxCriticalSection* pCritSect, OGREnvelope* pFullEnv, wxGISGeometrySet* pOGRGeometrySet, size_t &nCounter, ITrackCancel* pTrackCancel = NULL);
     virtual void *Entry();
     virtual void OnExit();
 protected:
@@ -46,6 +46,6 @@ protected:
     wxGISGeometrySet* m_pOGRGeometrySet;
     //progress
     size_t &m_nCounter;
-    wxGISProgressor *m_pProgressor;
+    IProgressor *m_pProgressor;
     double m_fSegSize;
 };

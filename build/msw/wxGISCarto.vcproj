@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(GDAL)\alg&quot;;&quot;$(GDAL)\frmts\vrt&quot;;&quot;$(GDAL)\gcore&quot;;&quot;$(GDAL)\port&quot;;&quot;$(GDAL)\ogr&quot;;&quot;$(GDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include;&quot;$(GEOS)\capi&quot;;&quot;$(GEOS)\source\headers&quot;"
+				AdditionalIncludeDirectories="&quot;$(GDAL)\alg&quot;;&quot;$(GDAL)\gcore&quot;;&quot;$(GDAL)\port&quot;;&quot;$(GDAL)\ogr&quot;;&quot;$(GDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CRT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib cpld.lib ogrd.lib gdald.lib wxGISCored.lib wxGISFrameworkd.lib wxGISDisplayd.lib wxGISGeometryd.lib"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib cpld.lib ogrd.lib gdald.lib wxGISCored.lib wxGISFrameworkd.lib wxGISDisplayd.lib wxGISGeometryd.lib wxGISDataSourced.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="0"
 				AdditionalLibraryDirectories="&quot;$(GDAL)\wxGIS\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib"
@@ -192,10 +192,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\carto\featuredataset.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\carto\featurelayer.cpp"
 				>
 			</File>
@@ -208,10 +204,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\carto\rasterdataset.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\carto\rasterlayer.cpp"
 				>
 			</File>
@@ -221,10 +213,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\carto\simplerenderer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\carto\spvalidator.cpp"
 				>
 			</File>
 			<File
@@ -250,10 +238,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wxgis\carto\featuredataset.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\include\wxgis\carto\featurelayer.h"
 				>
 			</File>
@@ -266,10 +250,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wxgis\carto\rasterdataset.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\include\wxgis\carto\rasterlayer.h"
 				>
 			</File>
@@ -279,10 +259,6 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\carto\simplerenderer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\carto\spvalidator.h"
 				>
 			</File>
 			<File

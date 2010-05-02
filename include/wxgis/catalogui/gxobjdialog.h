@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDialog class.
+ * Purpose:  wxGxObjectDialog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -50,7 +50,7 @@
 
 #include "wx/aui/aui.h"
 
-#define DLG_NAME wxT("wxGISDialog") 
+#define OBJDLG_NAME wxT("wxGISObjDialog") 
 
 //////////////////////////////////////////////////////////////////////////////
 // wxGxToolBarArt
@@ -146,10 +146,10 @@ protected:
 };
 
 //////////////////////////////////////////////////////////////////////////////
-// wxGxDialog
+// wxGxObjectDialog
 //////////////////////////////////////////////////////////////////////////////
 
-class wxGxDialog : 
+class WXDLLIMPEXP_GIS_CLU wxGxObjectDialog : 
     public wxDialog,
     public IGxApplication,
     public IApplication
@@ -174,14 +174,14 @@ protected:
 	wxButton* m_CancelButton;
 
 public:
-	wxGxDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,338 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
-	~wxGxDialog();	
+	wxGxObjectDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,338 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+	~wxGxObjectDialog();	
 //IGxApplication
     virtual IGxCatalog* GetCatalog(void){return static_cast<IGxCatalog*>(m_pCatalog);};
 //IApplication
 	virtual ICommand* GetCommand(long CmdID);
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
-    virtual wxString GetAppName(void){return wxString(DLG_NAME);};
+    virtual wxString GetAppName(void){return wxString(OBJDLG_NAME);};
     virtual IStatusBar* GetStatusBar(void){return NULL;};
     virtual IGISConfig* GetConfig(void){return m_pConfig;};
     virtual void OnAppAbout(void){};
@@ -200,20 +200,24 @@ public:
 	virtual void OnMouseDoubleClick(wxMouseEvent& event){};
 	virtual void OnMouseMove(wxMouseEvent& event){};
     virtual bool Create(IGISConfig* pConfig){return true;};
-//wxGxDialog
+//wxGxObjectDialog
 	virtual void SetButtonCaption(wxString sOkBtLabel);
 	virtual void SetStartingLocation(wxString sStartPath);
 	virtual void SetName(wxString sName);
 	virtual void SetAllowMultiSelect(bool bAllowMultiSelect);
 	virtual void SetOverwritePrompt(bool bOverwritePrompt);
+	virtual void SetAllFilters(bool bAllFilters);
 	virtual int ShowModalOpen();
 	virtual int ShowModalSave();
 	virtual void AddFilter(IGxObjectFilter* pFilter, bool bDefault = false);
 	virtual void RemoveAllFilters(void);
     virtual GxObjectArray* GetSelectedObjects(void){return &m_ObjectArray;}
     virtual wxString GetName(void);
+    virtual wxString GetNameWithExt(void);
     virtual wxString GetFullPath(void);
+    virtual wxString GetPath(void);
     virtual IGxObject* GetLocation(void);
+    virtual IGxObjectFilter* GetCurrentFilter(void);
 protected:
 // events
     virtual void OnCommand(wxCommandEvent& event);
@@ -225,7 +229,7 @@ protected:
     virtual void OnOK(wxCommandEvent& event);
     virtual void OnOKUI(wxUpdateUIEvent& event);
     virtual void OnCommand(ICommand* pCmd);
-//wxGxDialog
+//wxGxObjectDialog
 	virtual void OnInit();
     virtual void SerializeFramePos(bool bSave);
     virtual bool DoSaveObject(wxGISEnumSaveObjectResults Result);
@@ -239,7 +243,7 @@ protected:
 	wxString m_sOkBtLabel;
 	wxString m_sStartPath;
 	wxString m_sName;
-	bool m_bAllowMultiSelect, m_bOverwritePrompt;
+	bool m_bAllowMultiSelect, m_bOverwritePrompt, m_bAllFilters;
     bool m_bIsSaveDlg;
 	OBJECTFILTERS m_FilterArray;
 	size_t m_nDefaultFilter;

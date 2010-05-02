@@ -221,6 +221,12 @@ IGxObject* wxGxSelection::GetSelectedObjects(size_t nIndex)
 	if(m_currentInitiator == INIT_NONE || m_SelectionMap[m_currentInitiator] == NULL)
 		return NULL;
 
+    if(!m_SelectionMap[m_currentInitiator])
+        return NULL;
+
+    if(m_SelectionMap[m_currentInitiator]->size() == 0)
+        return NULL;
+
     if(m_SelectionMap[m_currentInitiator]->size() - 1 >= nIndex)
         return m_SelectionMap[m_currentInitiator]->at(nIndex);
     
@@ -230,14 +236,20 @@ IGxObject* wxGxSelection::GetSelectedObjects(size_t nIndex)
 IGxObject* wxGxSelection::GetSelectedObjects(long nInitiator, size_t nIndex)
 {
    wxCriticalSectionLocker locker(m_CritSect);
-   if(m_SelectionMap[nInitiator] && m_SelectionMap[nInitiator]->size() - 1 >= nIndex)
-        return m_SelectionMap[nInitiator]->at(nIndex);
+   if(m_SelectionMap[nInitiator])
+   {
+        if(m_SelectionMap[m_currentInitiator]->size() == 0)
+            return NULL;
+        if(m_SelectionMap[nInitiator]->size() - 1 >= nIndex)
+            return m_SelectionMap[nInitiator]->at(nIndex);
+   }
     else
         return NULL;
 }
 
 void wxGxSelection::Do(IGxObject* pObject)
 {
+    wxCriticalSectionLocker locker(m_DoCritSect);
     if(m_pPrevObject == pObject)
         return;
 
@@ -249,13 +261,17 @@ void wxGxSelection::Do(IGxObject* pObject)
         return;
     }
 
-    wxCriticalSectionLocker locker(m_DoCritSect);
     if(!m_DoArray.IsEmpty())
         if(m_DoArray.Last() == pObject->GetFullName())
             return;
     m_Pos++;
     if(m_Pos == m_DoArray.GetCount())
         m_DoArray.Add(pObject->GetFullName());
+    else if(m_Pos > m_DoArray.GetCount())
+    {
+        m_DoArray.Add(pObject->GetFullName());
+        m_Pos = m_DoArray.GetCount() - 1;
+    }
     else
     {
 	    m_DoArray[m_Pos] = pObject->GetFullName();
@@ -314,6 +330,25 @@ wxString wxGxSelection::Undo(int nPos)
   //      m_bDoOp = false;
     }
     return wxEmptyString;
+}
+
+void wxGxSelection::RemoveDo(wxString sPath)
+{
+    wxCriticalSectionLocker locker(m_DoCritSect);
+    for(size_t i = 0; i < m_DoArray.size(); i++)
+    {
+        //clean from doubles
+        if(i > 0 && m_DoArray[i - 1] == m_DoArray[i])
+        {
+            m_DoArray.RemoveAt(i);
+            i--;
+        }
+        if(m_DoArray[i] == sPath)
+        {
+            m_DoArray.RemoveAt(i);
+            i--;
+        }
+    }
 }
 
 void wxGxSelection::Reset()

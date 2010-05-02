@@ -41,58 +41,69 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 		if(wxFileName::DirExists(path))
 			continue;
 
-		wxString vol, shortpath, name, ext;
-		wxFileName::SplitPath(path, &vol, &shortpath, &name, &ext);
+        wxFileName FName(path);
+		wxString ext = FName.GetExt();
 		ext.MakeLower();
+        wxString sPath = sParentDir+ wxFileName::GetPathSeparator() + FName.GetName();//FName.GetFullPath();
 		
-
 		IGxObject* pGxObj = NULL;
 		//prj files
-		if(ext == wxString(wxT("bmp")) || ext == wxString(wxT("jpg")) || ext == wxString(wxT("img")))
+		if(ext == wxString(wxT("bmp")))
 		{
-            wxString sRemCand;
-            if(vol.IsEmpty())
-                sRemCand = shortpath + wxFileName::GetPathSeparator() + name + wxT(".prj");
-            else
-                sRemCand = vol + wxT(":") + shortpath + wxFileName::GetPathSeparator() + name + wxT(".prj");
+            wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
 
-			if(m_pCatalog->GetShowExt())
-				name += wxT(".") + ext;
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterUnknown);
+			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetName(), enumRasterBmp);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}
-		if(ext == wxString(wxT("tif")) || ext == wxString(wxT("tiff")) || ext == wxString(wxT("png")))
+		if(ext == wxString(wxT("jpg")) || ext == wxString(wxT("jpeg")))
 		{
-            wxString sRemCand;
-            if(vol.IsEmpty())
-                sRemCand = shortpath + wxFileName::GetPathSeparator() + name + wxT(".prj");
-            else
-                sRemCand = vol + wxT(":") + shortpath + wxFileName::GetPathSeparator() + name + wxT(".prj");
+            wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
 
-			if(m_pCatalog->GetShowExt())
-				name += wxT(".") + ext;
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterUnknown);
+			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetName(), enumRasterJpeg);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}
-		if(ext == wxString(wxT("til")) || ext == wxString(wxT("jpeg")) || ext == wxString(wxT("jp2")))//TODO: add other raster file extensions
+		if(ext == wxString(wxT("img")))
 		{
-            wxString sRemCand;
-            if(vol.IsEmpty())
-                sRemCand = shortpath + wxFileName::GetPathSeparator() + name + wxT(".prj");
-            else
-                sRemCand = vol + wxT(":") + shortpath + wxFileName::GetPathSeparator() + name + wxT(".prj");
+            wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
 
-			if(m_pCatalog->GetShowExt())
-				name += wxT(".") + ext;
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterUnknown);
+			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetName(), enumRasterImg);
+			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+			goto REMOVE;
+		}
+		if(ext == wxString(wxT("tif")) || ext == wxString(wxT("tiff")))
+		{
+            wxString sRemCand = sPath + wxT(".prj");
+            remove_candidates.push_back(sRemCand);
+
+			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetName(), enumRasterTiff);
+			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+			goto REMOVE;
+		}
+        if( ext == wxString(wxT("png")) )
+		{
+            wxString sRemCand = sPath + wxT(".prj");
+            remove_candidates.push_back(sRemCand);
+
+			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetName(), enumRasterPng);
+			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+			goto REMOVE;
+		}
+		if(ext == wxString(wxT("til"))  || ext == wxString(wxT("jp2")))
+		{
+            wxString sRemCand = sPath + wxT(".prj");
+            remove_candidates.push_back(sRemCand);
+
+			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetName(), enumRasterUnknown);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}		
+        //TODO: add other raster file extensions
+
 		path.MakeLower();
 		if(path.Find(wxT(".aux")) != wxNOT_FOUND)
 			goto REMOVE;

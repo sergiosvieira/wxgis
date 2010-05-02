@@ -19,6 +19,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxfolder.h"
+#include "wxgis/datasource/sysop.h"
+
 #include "../../art/folder_16.xpm"
 #include "../../art/folder_48.xpm"
 
@@ -107,7 +109,8 @@ bool wxGxFolder::Delete(void)
     {
         IGxObjectEdit* pEditObj = dynamic_cast<IGxObjectEdit*>(m_Children[0]);
         if(pEditObj)
-            pEditObj->Delete();
+            if(!pEditObj->Delete())
+                return false;
     }
     //delete all files
 	wxDir* pDir = new wxDir(m_sPath);
@@ -118,12 +121,8 @@ bool wxGxFolder::Delete(void)
         pDir->Traverse(*this, wxEmptyString, style );
         for(size_t i = 0; i < m_FileNames.size(); i++)
         {
-            int nRetCode = VSIUnlink(wgWX2MB(m_FileNames[i]));
-            if(nRetCode != 0)
-            {
-                const char* err = CPLGetLastErrorMsg();
-                wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
-            }
+            if(!DeleteFile(m_FileNames[i]))
+                wxLogError(_("Delete failed! File '%s'"), m_FileNames[i].c_str());
         }
     }
     wxDELETE(pDir);
@@ -174,9 +173,9 @@ wxDirTraverseResult wxGxFolder::OnDir(const wxString& dirname)
 bool wxGxFolder::DeleteChild(IGxObject* pChild)
 {
 	bool bHasChildren = m_Children.size() > 0 ? true : false;
+    m_pCatalog->ObjectDeleted(pChild);
 	if(!IGxObjectContainer::DeleteChild(pChild))
 		return false;
-    m_pCatalog->ObjectDeleted(pChild);
 	if(bHasChildren != m_Children.size() > 0 ? true : false)
 		m_pCatalog->ObjectChanged(this);
 	return true;		

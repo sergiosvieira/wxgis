@@ -22,4 +22,4 @@
 #pragma once
 
 #include "wxgis/base.h"
-#include "wxgis/datasource.h"
+#include "wxgis/datasource/datasource.h"

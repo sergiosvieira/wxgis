@@ -22,7 +22,7 @@
 #pragma once
 
 #include "wxgis/base.h"
-#include "ogrsf_frmts.h"
+#include "wxgis/datasource/datasource.h"
 
 #define wxUSE_GRAPHICS_CONTEXT 1
 

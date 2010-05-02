@@ -94,4 +94,12 @@ protected:
 	wxInt32 m_RefCount;
 };
 
+enum wxGISEnumMessageType
+{
+	enumGISMessageUnk, 
+	enumGISMessageErr,
+	enumGISMessageNorm,
+	enumGISMessageQuestion,
+    enumGISMessageInfo
+};
 

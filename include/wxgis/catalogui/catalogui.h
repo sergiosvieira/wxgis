@@ -30,7 +30,7 @@
 #define TABCTRLID	1008 //wxGxCatalog tab with views - contents, preview & etc.
 #define MAPCTRLID	1009 //wxGxCatalog map view
 //1010 reserved for NOTFIRESELID from catalog.h
-#define FILTERCOMBO	1011 //wxGxDialog
+#define FILTERCOMBO	1011 //wxGxObjectDialog
 #define WXGISHIGHEST	1200 //
 
 enum wxGISEnumSaveObjectResults
@@ -74,6 +74,9 @@ public:
 	virtual bool CanDisplayObject( IGxObject* pObject ) = 0;
 	virtual wxGISEnumSaveObjectResults CanSaveObject( IGxObject* pLocation, wxString sName ) = 0;
 	virtual wxString GetName(void) = 0;
+    virtual wxString GetExt(void) = 0;
+    virtual wxString GetDriver(void) = 0;
+    virtual int GetSubType(void) = 0;
 };
 
 typedef std::vector<IGxObjectFilter*> OBJECTFILTERS, *LPOBJECTFILTERS;

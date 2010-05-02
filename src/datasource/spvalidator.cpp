@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#include "wxgis/carto/spvalidator.h"
+#include "wxgis/datasource/spvalidator.h"
 #include "wxgis/core/config.h"
 
 #include <wx/mstream.h>
