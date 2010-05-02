@@ -9,5 +9,3 @@ This is screenshots of wxGIS components
 <p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/wxGIS[catalog]1.jpg </p>
 <p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/wxGIS[catalog]2.jpg </p>
 <p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/wxGIS[catalog]3.jpg </p>
-
-= wxGIS Map =
