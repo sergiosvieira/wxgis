@@ -56,7 +56,7 @@ bool CopyRows(wxGISFeatureDataset* pSrcDataSet, wxGISFeatureDataset* pDstDataSet
                 pProgressor->Show(false);
             return false;
         }
-        if( !bSame )
+        if( !bSame && poCT )
         {
             OGRGeometry *pGeom = pFeature->GetGeometryRef()->clone();
             if(pGeom)

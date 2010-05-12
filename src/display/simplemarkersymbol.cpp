@@ -40,6 +40,8 @@ wxSimpleMarkerSymbol::~wxSimpleMarkerSymbol(void)
 void wxSimpleMarkerSymbol::Draw(OGRGeometry* pGeometry, IDisplay* pwxGISDisplay)
 {
 	IDisplayTransformation* pDisplayTransformation = pwxGISDisplay->GetDisplayTransformation();
+    if(!pDisplayTransformation)
+        return;
 	OGRwkbGeometryType type = wkbFlatten(pGeometry->getGeometryType());
 	switch(type)
 	{

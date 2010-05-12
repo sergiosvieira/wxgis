@@ -145,6 +145,8 @@ void ExtenStack::SetExtent(OGREnvelope Env)
 	if(m_pView->m_pThread)
 		m_pView->m_pThread->Delete();
 	IDisplayTransformation* pDisplayTransformation = m_pView->pGISScreenDisplay->GetDisplayTransformation();
+    if(!pDisplayTransformation)
+        return;
 	pDisplayTransformation->SetBounds(Env);
 	m_pView->pGISScreenDisplay->SetDerty(true);
 	m_pView->Refresh(false);
@@ -219,25 +221,25 @@ void wxGISMapView::OnDraw(wxDC& dc)
 	if(m_pExtenStack->GetSize() == 0)
 	{		
 		IDisplayTransformation* pDisplayTransformation = pGISScreenDisplay->GetDisplayTransformation();
-		m_pExtenStack->Do(pDisplayTransformation->GetBounds());
+        if(!pDisplayTransformation)
+		    m_pExtenStack->Do(pDisplayTransformation->GetBounds());
 	}
-
-	if(m_pTrackCancel && !m_pAni)
-		m_pAni = m_pTrackCancel->GetProgressor();
-
 
 	if(pGISScreenDisplay->IsDerty())
 	{
 		wxCriticalSectionLocker locker(m_CriticalSection);
+
+	    m_pTrackCancel->Cancel();
+		if(m_pThread)
+			m_pThread->Delete();
+			
+	    if(m_pTrackCancel && !m_pAni)
+		    m_pAni = m_pTrackCancel->GetProgressor();
 		if(m_pAni)
 		{
 			m_pAni->Show(true);
 			m_pAni->Play();
 		}
-
-		if(m_pThread)
-			m_pThread->Delete();
-			
 		//start draw thread
 		m_pThread = new wxDrawingThread(this, m_Layers);
 		if ( !m_pThread || m_pThread->Create() != wxTHREAD_NO_ERROR )
@@ -480,6 +482,9 @@ void wxGISMapView::OnMouseWheel(wxMouseEvent& event)
 		
 		double world_zoom = ZOOM_FACTOR * (double)factor;
 
+        double sc = pDisplayTransformation->GetScaleRatio();
+        if(sc <= 1 && world_zoom > 0)
+			return;
 
 		//calc zoom dc
 		int dx(0), dy(0);
@@ -541,7 +546,7 @@ void wxGISMapView::OnMouseWheel(wxMouseEvent& event)
 
 		pDisplayTransformation->SetBounds(m_virtualbounds);
 		//draw scale text
-		double sc = pDisplayTransformation->GetScaleRatio();
+		sc = pDisplayTransformation->GetScaleRatio();
 		wxString format_s = NumberScale(sc);
 		format_s.Prepend(wxT("1 : "));
 		//wxString s = wxString::Format(_("1 : %.2f"), sc);

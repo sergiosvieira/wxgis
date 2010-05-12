@@ -157,7 +157,7 @@
 #define NON wxT("~non~") 
 #define ERR wxT("~err~") 
 #define NONAME _("no name") 
-#define DELTA 0.001
+#define DELTA 0.00001
 #define CACHE_SIZE 3000
 #define ZOOM_FACTOR 0.25
 #define PI 3.1415926535897932384626433832795

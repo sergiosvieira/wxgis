@@ -26,6 +26,9 @@
 
 #define wxUSE_GRAPHICS_CONTEXT 1
 
+#define MINPOLYAREA 0.25
+#define MINPOLYDRAWAREA 2.2
+
 enum wxGISEnumDrawPhase
 {
 	wxGISDPGeography = 0x0001, 

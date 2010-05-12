@@ -76,6 +76,8 @@ void wxSimpleLineSymbol::Draw(OGRGeometry* pGeometry, IDisplay* pwxGISDisplay)
 void wxSimpleLineSymbol::DrawLine(OGRLineString* pLine, IDisplay* pwxGISDisplay)
 {
 	IDisplayTransformation* pDisplayTransformation = pwxGISDisplay->GetDisplayTransformation();
+    if(!pDisplayTransformation)
+        return;
 
 	int nPointCount = pLine->getNumPoints();
 	if(nPointCount > 1)
@@ -92,7 +94,10 @@ void wxSimpleLineSymbol::DrawLine(OGRLineString* pLine, IDisplay* pwxGISDisplay)
 void wxSimpleLineSymbol::DrawPolyLine(OGRMultiLineString* pLine, IDisplay* pwxGISDisplay)
 {
 	IDisplayTransformation* pDisplayTransformation = pwxGISDisplay->GetDisplayTransformation();
-	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pLine;
+    if(!pDisplayTransformation)
+        return;
+
+    OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pLine;
 	for(int i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
 	{
 		OGRLineString* pLineString = (OGRLineString*)pOGRGeometryCollection->getGeometryRef(i);

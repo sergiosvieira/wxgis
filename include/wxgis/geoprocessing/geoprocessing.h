@@ -23,3 +23,70 @@
 
 #include "wxgis/datasource/datasource.h"
 
+//GPFunctionTool 1
+//GPModelTool 2
+//GPScriptTool 3
+//GPCustomTool 
+
+enum wxGISEnumGPParameterType
+{
+    enumGISGPParameterTypeRequired = 1,
+    enumGISGPParameterTypeOptional,
+    enumGISGPParameterTypeDerived 
+};
+
+enum wxGISEnumGPParameterDirection
+{
+    enumGISGPParameterDirectionInput = 1,
+    enumGISGPParameterDirectionOutput 
+};
+
+enum wxGISEnumGPParameterDataType
+{
+    enumGISGPParamDTUnknown = 0,
+	enumGISGPParamDTBool,
+	enumGISGPParamDTInteger,
+	enumGISGPParamDTDouble,
+	enumGISGPParamDTString,
+
+	enumGISGPParamDTPath
+};
+
+class IGPParameter
+{
+public:
+    virtual ~IGPParameter(void){};
+    virtual bool GetAltered(void) = 0;
+    virtual void SetAltered(bool bAltered) = 0;
+    virtual bool GetHasBeenValidated(void) = 0;
+    virtual void SetHasBeenValidated(bool bHasBeenValidated) = 0;
+    virtual wxString GetName(void) = 0;
+    virtual void SetName(wxString sName) = 0;
+    virtual wxString GetDisplayName(void) = 0;
+    virtual void SetDisplayName(wxString sDisplayName) = 0;
+    virtual wxGISEnumGPParameterDataType GetDataType(void) = 0;
+    virtual void SetDataType(wxGISEnumGPParameterDataType nType) = 0;
+    virtual wxGISEnumGPParameterDirection GetDirection(void) = 0;
+    virtual void GetDirection(wxGISEnumGPParameterDirection nDirection) = 0;
+    virtual wxArrayString* GetParameterDependencies(void) = 0;
+    virtual void AddParameterDependency(wxString sDependency) = 0;
+    virtual wxGISEnumGPParameterType GetParameterType(void) = 0;
+    virtual void SetParameterType(wxGISEnumGPParameterType nType) = 0;
+    virtual wxVariant* GetValue(void) = 0;
+    virtual void GetValue(wxVariant Val) = 0;
+};
+
+typedef std::vector<IGPParameter*> GPParameters;
+
+class IGPTool
+{
+public:
+    virtual ~IGPTool(void){};
+    virtual wxString GetDisplayName(void) = 0;
+    virtual wxString GetName(void) = 0;
+    virtual wxString GetCategory(void) = 0;
+    //virtual Execute(...) = 0;
+    virtual GPParameters* GetParameterInfo(void) = 0;
+    //virtual GetToolType(void) = 0;
+};
+

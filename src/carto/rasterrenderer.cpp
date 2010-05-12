@@ -45,7 +45,10 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 	if(!pRaster)
 		return;
 	IDisplayTransformation* pDisplayTransformation = pDisplay->GetDisplayTransformation();
-	OGRSpatialReference* pDisplaySpatialReference = pDisplayTransformation->GetSpatialReference();
+    if(!pDisplayTransformation)
+        return;
+
+    OGRSpatialReference* pDisplaySpatialReference = pDisplayTransformation->GetSpatialReference();
 	OGRSpatialReference* pRasterSpatialReference = pRaster->GetSpatialReference();
 	bool IsSpaRefSame(true);
 	if(pDisplaySpatialReference && pRasterSpatialReference)

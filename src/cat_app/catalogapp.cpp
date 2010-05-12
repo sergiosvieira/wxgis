@@ -79,8 +79,7 @@ bool wxGISCatalogApp::OnInit()
 	wxLogMessage(wxT("####################################################################")); 
 	wxLogMessage(_("HOST '%s': OS desc - %s, free memory - %u Mb"), wxGetFullHostName().c_str(),wxGetOsDescription().c_str(), wxGetFreeMemory()/1048576);
 
-
-	wxLogMessage(_("wxGISCatalogApp: Initializing..."));
+	wxLogMessage(_("wxGISCatalogApp: %s %s is initializing..."), APP_NAME, APP_VER);
 	wxLogMessage(_("wxGISCatalogApp: Log file: %s"), logfilename.c_str());
 	wxLogMessage(_("wxGISCatalogApp: Initialize locale"));	
 

@@ -461,15 +461,18 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 				if(Env.MaxX == Env.MinX || Env.MaxY == Env.MinY)
 				{
 					OGREnvelope CurrentEnv = m_pMapView->GetCachedDisplay()->GetDisplayTransformation()->GetBounds();					
-					int widthdiv4 = (CurrentEnv.MaxX - CurrentEnv.MinX) / 4;
-					int heightdiv4 = (CurrentEnv.MaxY - CurrentEnv.MinY) / 4;
+					double widthdiv4 = (CurrentEnv.MaxX - CurrentEnv.MinX) / 4;
+					double heightdiv4 = (CurrentEnv.MaxY - CurrentEnv.MinY) / 4;
 
 					Env.MinX -= widthdiv4;
 					Env.MinY -= heightdiv4;
 					Env.MaxX += widthdiv4;
 					Env.MaxY += heightdiv4;
 				}
-				m_pMapView->SetExtent(Env);
+
+                double sc = m_pMapView->GetCachedDisplay()->GetDisplayTransformation()->GetScaleRatio();
+                if(sc > 1)
+                    m_pMapView->SetExtent(Env);
 			}
 			wxDELETE(pGeom);
 			break;

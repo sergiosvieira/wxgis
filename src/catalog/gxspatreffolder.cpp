@@ -51,9 +51,11 @@ wxIcon wxGxSpatialReferencesFolder::GetSmallImage(void)
 void wxGxSpatialReferencesFolder::Detach(void)
 {
 	EmptyChildren();
+#ifndef WXGISPORTABLE
     if(m_pConfigNode->HasProp(wxT("path")))
 	    m_pConfigNode->DeleteProperty(wxT("path"));
     m_pConfigNode->AddProperty(wxT("path"), m_sPath);
+#endif
 }
 
 void wxGxSpatialReferencesFolder::Refresh(void)

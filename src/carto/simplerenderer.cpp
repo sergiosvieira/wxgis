@@ -23,9 +23,6 @@
 #include "wxgis/display/simplelinesymbol.h"
 #include "wxgis/display/simplemarkersymbol.h"
 
-#define MINPOLYAREA 0.25
-#define MINPOLYDRAWAREA 2.2
-
 wxGISSimpleRenderer::wxGISSimpleRenderer(void)
 {
 	m_pFillSymbol = new wxSimpleFillSymbol();
@@ -85,6 +82,9 @@ void wxGISSimpleRenderer::DrawGeometry(OGRGeometry *poGeometry, IDisplay* pDispl
     if(!poGeometry)
         return;
 	IDisplayTransformation* pDisplayTransformation = pDisplay->GetDisplayTransformation();
+    if(!pDisplayTransformation)
+        return;
+
 	OGRwkbGeometryType type = wkbFlatten(poGeometry->getGeometryType());
 	switch(type)
 	{
