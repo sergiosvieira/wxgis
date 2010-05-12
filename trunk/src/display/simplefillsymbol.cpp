@@ -83,66 +83,143 @@ void wxSimpleFillSymbol::Draw(OGRGeometry* pGeometry, IDisplay* pwxGISDisplay)
 void wxSimpleFillSymbol::DrawPolygon(OGRPolygon* pPoly, IDisplay* pwxGISDisplay)
 {
 	IDisplayTransformation* pDisplayTransformation = pwxGISDisplay->GetDisplayTransformation();
+    if(!pDisplayTransformation)
+        return;
+
+	double m_World2DC = pDisplayTransformation->GetRatio();
+    OGREnvelope VisEnv = pDisplayTransformation->GetVisibleBounds();
+
 
 	int NumInteriorRings = pPoly->getNumInteriorRings();
 	OGRLinearRing *pRing = pPoly->getExteriorRing();
 	OGRLineString *pLStr = (OGRLineString*)pRing;
 	int nPointCount = pLStr->getNumPoints();
-	if(nPointCount > 2)
+	if(nPointCount <= 2)
+        return;
+
+    OGREnvelope sEnvelope;
+    pLStr->getEnvelope(&sEnvelope);
+    if(!VisEnv.Intersects(sEnvelope))
+        return;
+
+    //check if poly is too small
+    double EnvWidth = sEnvelope.MaxX - sEnvelope.MinX;
+    double EnvHeight = sEnvelope.MaxY - sEnvelope.MinY;
+    if(	(m_World2DC * EnvWidth) <= MINPOLYDRAWAREA && (m_World2DC * EnvHeight) <= MINPOLYDRAWAREA )
+    {
+	    //if(	m_World2DC * EnvWidth >= MINPOLYAREA && m_World2DC * EnvHeight >= MINPOLYAREA )
+		   // m_pMarkerSymbol->Draw(poGeometry, pDisplay);
+	    //return;
+        return;
+    }
+
+	if(NumInteriorRings == 0)
 	{
-		if(NumInteriorRings == 0)
+        OGRRawPoint* pOGRRawPoints = new OGRRawPoint[nPointCount];
+		pLStr->getPoints(pOGRRawPoints);
+		wxPoint* pPoints = pDisplayTransformation->TransformCoordWorld2DC(pOGRRawPoints, nPointCount);
+		wxDELETEA(pOGRRawPoints);
+		pwxGISDisplay->DrawPolygon(nPointCount, pPoints);
+		wxDELETEA(pPoints);
+	}
+	else
+	{
+		//int *nN = new int[NumInteriorRings + 1];
+		//nN[0] = nPointCount;
+		//int jPoint(nPointCount);
+
+		//for(int iPart = 0; iPart < NumInteriorRings; iPart++)
+		//{
+		//	pRing = pPoly->getInteriorRing(iPart);
+		//	OGRLineString *pLStrInt = (OGRLineString*)pRing;
+		//	nPointCount = pLStrInt->getNumPoints();
+		//	jPoint += (nN[iPart + 1] = nPointCount > 2 ? nPointCount/* + 1*/ : 0);
+		//}
+
+		//wxPoint *pFullPoints = new wxPoint[jPoint];
+		//OGRRawPoint* pOGRRawPoints = new OGRRawPoint[nN[0]];
+		//pLStr->getPoints(pOGRRawPoints);
+		//int counter(0);
+		//pDisplayTransformation->TransformCoordWorld2DC(pOGRRawPoints, nN[0], &pFullPoints[counter]);
+		//wxDELETEA(pOGRRawPoints);
+		//counter += nN[0];
+
+		//for(int iPart = 0; iPart < NumInteriorRings; iPart++)
+		//{
+		//	pRing = pPoly->getInteriorRing(iPart);
+		//	OGRLineString *pLStrInt = (OGRLineString*)pRing;
+		//	pOGRRawPoints = new OGRRawPoint[nN[iPart + 1]];
+		//	pLStrInt->getPoints(pOGRRawPoints);
+		//	pDisplayTransformation->TransformCoordWorld2DC(pOGRRawPoints, nN[iPart + 1], &pFullPoints[counter]);
+		//	wxDELETEA(pOGRRawPoints);
+		//	counter += nN[iPart + 1];
+		//}
+
+ 		int *nN = new int[NumInteriorRings + 1];
+		nN[0] = nPointCount;
+		int jPoint(nPointCount);
+        wxPoint *pFullPoints = (wxPoint *)CPLMalloc( nPointCount * sizeof(wxPoint));
+
+		OGRRawPoint* pOGRRawPoints = new OGRRawPoint[nPointCount];
+		pLStr->getPoints(pOGRRawPoints);
+		int counter(0);
+		pDisplayTransformation->TransformCoordWorld2DC(pOGRRawPoints, nPointCount, &pFullPoints[counter]);
+		wxDELETEA(pOGRRawPoints);
+		counter += nPointCount;
+
+        int nRealNumRings = 1;
+		for(int iPart = 0; iPart < NumInteriorRings; iPart++)
 		{
-			OGRRawPoint* pOGRRawPoints = new OGRRawPoint[nPointCount];
-			pLStr->getPoints(pOGRRawPoints);
-			wxPoint* pPoints = pDisplayTransformation->TransformCoordWorld2DC(pOGRRawPoints, nPointCount);
+            pRing = pPoly->getInteriorRing(iPart);
+			OGRLineString *pLStrInt = (OGRLineString*)pRing;
+
+			nPointCount = pLStrInt->getNumPoints();
+            if(nPointCount <= 2)
+                continue;
+
+		    pLStrInt->getEnvelope(&sEnvelope);
+            if(!VisEnv.Intersects(sEnvelope))
+                continue;
+
+		    //check if poly is too small
+		    double EnvWidth = sEnvelope.MaxX - sEnvelope.MinX;
+		    double EnvHeight = sEnvelope.MaxY - sEnvelope.MinY;
+		    if(	(m_World2DC * EnvWidth) <= MINPOLYDRAWAREA && (m_World2DC * EnvHeight) <= MINPOLYDRAWAREA )
+		    {
+			    //if(	m_World2DC * EnvWidth >= MINPOLYAREA && m_World2DC * EnvHeight >= MINPOLYAREA )
+				   // m_pMarkerSymbol->Draw(poGeometry, pDisplay);
+			    //return;
+                continue;
+		    }
+
+            nN[nRealNumRings] = nPointCount;
+            nRealNumRings++;
+			jPoint += nPointCount;
+
+			pOGRRawPoints = new OGRRawPoint[nPointCount];
+			pLStrInt->getPoints(pOGRRawPoints);
+
+            pFullPoints = (wxPoint *) CPLRealloc( pFullPoints, jPoint * sizeof(wxPoint) );
+
+			pDisplayTransformation->TransformCoordWorld2DC(pOGRRawPoints, nPointCount, &pFullPoints[counter]);
 			wxDELETEA(pOGRRawPoints);
-			pwxGISDisplay->DrawPolygon(nPointCount, pPoints);
-			wxDELETEA(pPoints);
+			counter += nPointCount;
 		}
-		else
-		{
-			int *nN = new int[NumInteriorRings + 1];
-			nN[0] = nPointCount;
-			int jPoint(nPointCount);
-			for(int iPart = 0; iPart < NumInteriorRings; iPart++)
-			{
-				pRing = pPoly->getInteriorRing(iPart);
-				OGRLineString *pLStrInt = (OGRLineString*)pRing;
-				nPointCount = pLStrInt->getNumPoints();
-				jPoint += (nN[iPart + 1] = nPointCount > 2 ? nPointCount/* + 1*/ : 0);
-			}
 
-			wxPoint *pFullPoints = new wxPoint[jPoint];
-			OGRRawPoint* pOGRRawPoints = new OGRRawPoint[nN[0]];
-			pLStr->getPoints(pOGRRawPoints);
-			int counter(0);
-			pDisplayTransformation->TransformCoordWorld2DC(pOGRRawPoints, nN[0], &pFullPoints[counter]);
-			wxDELETEA(pOGRRawPoints);
-			counter += nN[0];
+		pwxGISDisplay->DrawPolyPolygon(nRealNumRings, nN, pFullPoints, 0, 0, wxODDEVEN_RULE);
 
-			for(int iPart = 0; iPart < NumInteriorRings; iPart++)
-			{
-				pRing = pPoly->getInteriorRing(iPart);
-				OGRLineString *pLStrInt = (OGRLineString*)pRing;
-				pOGRRawPoints = new OGRRawPoint[nN[iPart + 1]];
-				pLStrInt->getPoints(pOGRRawPoints);
-				pDisplayTransformation->TransformCoordWorld2DC(pOGRRawPoints, nN[iPart + 1], &pFullPoints[counter]);
-				wxDELETEA(pOGRRawPoints);
-				counter += nN[iPart + 1];
-			}
-
-			pwxGISDisplay->DrawPolyPolygon(NumInteriorRings + 1, nN, pFullPoints, 0, 0, wxODDEVEN_RULE);
-
-			wxDELETEA(pFullPoints);
-			wxDELETEA(nN);
-		}
+		wxDELETEA(pFullPoints);
+		wxDELETEA(nN);
 	}
 }
 
 void wxSimpleFillSymbol::DrawPolyPolygon(OGRMultiPolygon* pPoly, IDisplay* pwxGISDisplay)
 {
 	IDisplayTransformation* pDisplayTransformation = pwxGISDisplay->GetDisplayTransformation();
-	long nNumPolys(0);
+    if(!pDisplayTransformation)
+        return;
+
+    long nNumPolys(0);
 	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pPoly;
 	for(int i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
 	{

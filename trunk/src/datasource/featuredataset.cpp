@@ -114,7 +114,7 @@ wxGISFeatureDataset* CreateVectorLayer(wxString sPath, wxString sName, wxString 
 //---------------------------------------
 // wxGISFeatureDataset
 //---------------------------------------
-wxGISFeatureDataset::wxGISFeatureDataset(OGRDataSource *poDS, OGRLayer* poLayer, wxString sPath, wxGISEnumVectorDatasetType nType, wxMBConv* pPathEncoding) : wxGISDataset(sPath, pPathEncoding), m_poDS(NULL), m_bIsOpened(false), m_psExtent(NULL), m_poLayer(NULL), m_bIsGeometryLoaded(false), m_pQuadTree(NULL)
+wxGISFeatureDataset::wxGISFeatureDataset(OGRDataSource *poDS, OGRLayer* poLayer, wxString sPath, wxGISEnumVectorDatasetType nType, wxMBConv* pPathEncoding) : wxGISDataset(sPath, pPathEncoding), m_poDS(NULL), m_bIsOpened(false), m_psExtent(NULL), m_poLayer(NULL), m_bIsGeometryLoaded(false), m_pQuadTree(NULL), m_FieldCount(-1)
 {
 	m_poDS = poDS;
 	m_poLayer = poLayer;
@@ -138,7 +138,7 @@ wxGISFeatureDataset::wxGISFeatureDataset(OGRDataSource *poDS, OGRLayer* poLayer,
     m_pGeometrySet->Reference();
 }
 
-wxGISFeatureDataset::wxGISFeatureDataset(wxString sPath, wxGISEnumVectorDatasetType nType, wxMBConv* pPathEncoding) : wxGISDataset(sPath, pPathEncoding), m_poDS(NULL), m_bIsOpened(false), m_psExtent(NULL), m_poLayer(NULL), m_bIsGeometryLoaded(false), m_pQuadTree(NULL)
+wxGISFeatureDataset::wxGISFeatureDataset(wxString sPath, wxGISEnumVectorDatasetType nType, wxMBConv* pPathEncoding) : wxGISDataset(sPath, pPathEncoding), m_poDS(NULL), m_bIsOpened(false), m_psExtent(NULL), m_poLayer(NULL), m_bIsGeometryLoaded(false), m_pQuadTree(NULL), m_FieldCount(-1)
 {
     m_pGeometrySet = new wxGISGeometrySet(true);
     m_pGeometrySet->Reference();
@@ -382,6 +382,7 @@ bool wxGISFeatureDataset::Open(int iLayer)
 
 		    m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
 
+
 		    //m_OGRFeatureArray.reserve(m_poLayer->GetFeatureCount(true)); 
 
 		    //size_t count(0); 
@@ -517,27 +518,32 @@ OGRFeature* wxGISFeatureDataset::GetAt(long nIndex) //const    0 based
     if(bOLCFastSetNextByIndex)
     {
         m_poLayer->SetNextByIndex(nIndex);
-        return m_poLayer->GetNextFeature();
+        OGRFeature* pFeature = m_poLayer->GetNextFeature();
+        //store in m_FeaturesMap
+        return pFeature;
     }
     else
     {
         wxCriticalSectionLocker locker(m_CritSect);
-        if(m_FeaturesMap.empty())
+        if(m_FeaturesMap.size() - 1 < nIndex)
         {
             m_poLayer->SetNextByIndex(nIndex);
             OGRFeature* pFeature = m_poLayer->GetNextFeature();
-            if(pFeature)
-                return pFeature->Clone();
-            return NULL;
+            if(!pFeature)
+                return NULL;
+            m_FeaturesMap[pFeature->GetFID()] = pFeature;
+            return pFeature->Clone();
         }
-        std::map<long, OGRFeature*>::iterator it( m_FeaturesMap.begin() );
+        std::map<long, OGRFeature*>::iterator it = m_FeaturesMap.begin();
         std::advance( it, nIndex );
         if(it == m_FeaturesMap.end())
         {
-            m_poLayer->SetNextByIndex(nIndex);
-            OGRFeature* pFeature = m_poLayer->GetNextFeature();
-            m_FeaturesMap[pFeature->GetFID()] = pFeature;
-            return pFeature->Clone();
+            //m_poLayer->SetNextByIndex(nIndex);
+            //OGRFeature* pFeature = m_poLayer->GetNextFeature();
+            //if(!pFeature)
+                return NULL;
+            //m_FeaturesMap[pFeature->GetFID()] = pFeature;
+            //return pFeature->Clone();
         }
         return it->second->Clone();
     }
@@ -555,11 +561,23 @@ wxString wxGISFeatureDataset::GetAsString(long row, int col)
 		return wxEmptyString; 
 	else 
 	{
+        wxCriticalSectionLocker locker(m_CritSect);
+        if(m_FieldCount == -1)
+        {
+            OGRFeatureDefn *pFDef = m_poLayer->GetLayerDefn();
+            m_FieldCount = pFDef->GetFieldCount();
+        }
+
+        long pos = row * m_FieldCount + col;
+        if(m_FeatureStringData.GetCount() > pos)
+            if(m_FeatureStringData[pos] != wxEmptyString)
+                return m_FeatureStringData[pos];
+
 		OGRFeature* pFeature = GetAt(row);
         if(!pFeature)
     		return wxEmptyString; 
 		OGRFieldDefn* pDef = pFeature->GetFieldDefnRef(col);
-        wxString sOut;
+        wxString sOut(wxT(" "));
 		switch(pDef->GetType())
 		{
 		case OFTDate:
@@ -568,6 +586,8 @@ wxString wxGISFeatureDataset::GetAsString(long row, int col)
 				pFeature->GetFieldAsDateTime(col, &year, &mon, &day, &hour, &min, &sec, &flag);
 				wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
 				sOut = dt.Format(_("%d-%m-%Y"));//wxString::Format(_("%.2u-%.2u-%.4u"), day, mon, year );
+                if(sOut == wxEmptyString)
+                    sOut = wxT("NULL");
 			}
 		case OFTTime:
 			{
@@ -575,6 +595,8 @@ wxString wxGISFeatureDataset::GetAsString(long row, int col)
 				pFeature->GetFieldAsDateTime(col, &year, &mon, &day, &hour, &min, &sec, &flag);
 				wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
 				sOut = dt.Format(_("%H:%M:%S"));//wxString::Format(_("%.2u:%.2u:%.2u"), hour, min, sec);
+                if(sOut == wxEmptyString)
+                    sOut = wxT("NULL");
 			}
 		case OFTDateTime:
 			{
@@ -582,21 +604,42 @@ wxString wxGISFeatureDataset::GetAsString(long row, int col)
 				pFeature->GetFieldAsDateTime(col, &year, &mon, &day, &hour, &min, &sec, &flag);
 				wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
 				sOut = dt.Format(_("%d-%m-%Y %H:%M:%S"));//wxString::Format(_("%.2u-%.2u-%.4u %.2u:%.2u:%.2u"), day, mon, year, hour, min, sec);
+                if(sOut == wxEmptyString)
+                    sOut = wxT("NULL");
 			}
 		case OFTReal:				
 			sOut = wxString::Format(_("%.6f"), pFeature->GetFieldAsDouble(col));
+            if(sOut == wxEmptyString)
+                sOut = wxT("NULL");
 		default:
             if(m_bOLCStringsAsUTF8 || m_Encoding == wxFONTENCODING_DEFAULT)
+            {
                 sOut = wgMB2WX(pFeature->GetFieldAsString(col));
+                if(sOut == wxEmptyString)
+                    sOut = wxT(" ");
+            }
             else            
             {                
                 wxCSConv conv(m_Encoding);
                 sOut = conv.cMB2WX(pFeature->GetFieldAsString(col));
                 if(sOut.IsEmpty())
                     sOut = wgMB2WX(pFeature->GetFieldAsString(col));
+                if(sOut == wxEmptyString)
+                    sOut = wxT(" ");
             }
 		}
         OGRFeature::DestroyFeature(pFeature);
+
+        if(pos < 1000000)
+        {
+            if(m_FeatureStringData.GetCount() <= pos)
+            {
+                m_FeatureStringData.Add(wxEmptyString, pos - m_FeatureStringData.GetCount());
+                m_FeatureStringData.Add(sOut);
+            }
+            else
+                m_FeatureStringData[pos] = sOut;
+        }
 		return sOut;//wgMB2WX(GetAt(row)->GetFieldAsString(col));
 	}
 }
@@ -867,6 +910,7 @@ void wxGISFeatureDataset::LoadGeometry(void)
                 pGeom->getEnvelope(&Env);
                 m_psExtent->Merge(Env);
             }
+            //store field as string in array
 			counter++;
             if(bOLCFastSetNextByIndex)
                 OGRFeature::DestroyFeature(poFeature);
@@ -915,7 +959,7 @@ void wxGISFeatureDataset::UnloadGeometry(void)
 OGRFeature* wxGISFeatureDataset::Next(void)
 {
     wxCriticalSectionLocker locker(m_CritSect);
-    if(m_FeaturesMap.empty())
+    if(m_FeaturesMap.empty() || m_FeaturesMap.size() < GetSize())
         return m_poLayer->GetNextFeature();
     else
     {

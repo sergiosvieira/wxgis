@@ -80,6 +80,8 @@ protected:
     wxFontEncoding m_Encoding;
     std::map<long, OGRFeature*> m_FeaturesMap;
     std::map<long, OGRFeature*>::iterator m_IT;
+    int m_FieldCount;
+    wxArrayString m_FeatureStringData;
     //
     bool m_bIsGeometryLoaded;
     wxGISGeometrySet *m_pGeometrySet;

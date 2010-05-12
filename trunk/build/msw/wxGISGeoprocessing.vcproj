@@ -182,6 +182,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\src\geoprocessing\gpexporttool.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\geoprocessing\gptoolmngr.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\geoprocessing\gpvector.cpp"
 				>
 			</File>
@@ -193,6 +201,14 @@
 			>
 			<File
 				RelativePath="..\..\include\wxgis\geoprocessing\geoprocessing.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geoprocessing\gpexporttool.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geoprocessing\gptoolmngr.h"
 				>
 			</File>
 			<File

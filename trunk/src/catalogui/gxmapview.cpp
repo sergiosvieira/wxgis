@@ -167,7 +167,8 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 
 	m_pParentGxObject = pGxObj;
 
-	wxGISMapView::Refresh();
+    SetFullExtent();
+	//wxGISMapView::Refresh();
 }
 
 void wxGxMapView::OnMouseMove(wxMouseEvent& event)

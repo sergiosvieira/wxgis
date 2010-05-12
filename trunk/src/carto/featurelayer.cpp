@@ -123,13 +123,15 @@ void wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisp
 			    CPLRectObj Rect = {Env.MinX, Env.MinY, Env.MaxX, Env.MaxY};
 			    OGRGeometry** pGeometryArr = (OGRGeometry**)CPLQuadTreeSearch(m_pQuadTree, &Rect, &count);
 		        wxGISGeometrySet GISGeometrySet(false);
-             
+
 			    for(size_t i = 0; i < count; i++)
 			    {
 				    if(pTrackCancel && !pTrackCancel->Continue())
 					    break;
-                    
-                    GISGeometrySet.AddGeometry(pGeometryArr[i], m_pOGRGeometrySet->operator[](pGeometryArr[i]));
+                                        
+                    long nID = m_pOGRGeometrySet->operator[](pGeometryArr[i]);
+                    OGRGeometry* pGeom = pGeometryArr[i];
+                    GISGeometrySet.AddGeometry(pGeom, nID);
                     if(GISGeometrySet.GetSize() == 20000)
                     {
                         m_pFeatureRenderer->Draw(&GISGeometrySet, DrawPhase, pDisplay, pTrackCancel);

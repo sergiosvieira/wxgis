@@ -54,7 +54,12 @@ void wxGISDisplayTransformation::SetDeviceFrame(wxRect rc)
 	m_DCYDelta = double(m_DeviceFrameRect.GetHeight()) / 2;
 	double sc1 = fabs(m_DCXDelta / m_WorldXDelta);
 	double sc2 = fabs(m_DCYDelta / m_WorldYDelta);
-	m_World2DC	= MIN(sc1, sc2);
+    if(sc1 <= DELTA)
+        m_World2DC = sc2;
+    else if(sc2 <= DELTA)
+        m_World2DC = sc1;
+    else
+        m_World2DC	= MIN(sc1, sc2);
 }
 
 wxRect wxGISDisplayTransformation::GetDeviceFrame(void)
@@ -76,7 +81,12 @@ void wxGISDisplayTransformation::SetBounds(OGREnvelope bounds)
 	m_DCYDelta = double(m_DeviceFrameRect.GetHeight()) / 2;
 	double sc1 = fabs(m_DCXDelta / m_WorldXDelta);
 	double sc2 = fabs(m_DCYDelta / m_WorldYDelta);
-	m_World2DC	= MIN(sc1, sc2);
+    if(sc1 <= DELTA)
+        m_World2DC = sc2;
+    else if(sc2 <= DELTA)
+        m_World2DC = sc1;
+    else
+        m_World2DC	= MIN(sc1, sc2);
 	m_bIsBoundsSet = true;
 }
 
