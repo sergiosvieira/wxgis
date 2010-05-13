@@ -23,6 +23,12 @@
 #include "wxgis/catalogui/gxview.h"
 #include <wx/listctrl.h>
 
+typedef struct _sortdata
+{
+    bool bSortAsc;
+    short currentSortCol;
+} SORTDATA, *LPSORTDATA;
+
 
 class WXDLLIMPEXP_GIS_CLU wxGxContentView :
 	public wxListCtrl, 
@@ -42,6 +48,7 @@ public:
     virtual LISTSTYLE GetStyle(void){return m_current_style;};
 	virtual void ResetContents(void);
     virtual IGxObject* GetParentGxObject(void){return m_pParentGxObject;};
+    virtual void SelectAll(void);
 //IGxView
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);

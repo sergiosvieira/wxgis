@@ -40,5 +40,7 @@ public:
     virtual wxString GetDisplayName(void);
     virtual wxString GetName(void);
     virtual wxString GetCategory(void);
-    virtual GPParameters* GetParameterInfo(void){return NULL;};
+    virtual GPParameters* GetParameterInfo(void);
+protected:
+    GPParameters* m_pParamArr;
 };

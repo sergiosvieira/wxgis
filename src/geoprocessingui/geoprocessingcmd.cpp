@@ -436,7 +436,7 @@ EXIT:
                         wxString sPath = dlg.GetPath();
 
                         //create multiexport dialog
-                        wxGISProgressDlg ProgressDlg(pWnd);
+                        wxGISProgressDlg ProgressDlg(NULL/*pWnd*/);
                         wxWindowDisabler disableAll(&ProgressDlg);
                         ProgressDlg.Show(true);
 //                        ProgressDlg.ShowModal(); test purpose
@@ -620,8 +620,8 @@ EXIT:
                             wsDELETE(pDSet);
                             wxDELETE(pNewSpaRef);
                         }
-                        ProgressDlg.Show(false);
-                        pWnd->Raise();//SetFocus();
+                        //ProgressDlg.Show(false);
+                        //pWnd->Raise();//SetFocus();
 
                         //add new IGxObject's
                         IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);

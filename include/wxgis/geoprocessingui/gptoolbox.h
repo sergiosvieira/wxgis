@@ -111,7 +111,7 @@ public:
 	virtual wxString ContextMenu(void){return wxString(wxT("wxGxTool.ContextMenu"));};
 	virtual wxString NewMenu(void){return wxEmptyString;};
     //IGxObjectWizard
-    virtual bool Invoke(wxWindow* pParentWnd){return false;};
+    virtual bool Invoke(wxWindow* pParentWnd);
 	//wxGxTool
 protected:
 	//wxString m_sPath;

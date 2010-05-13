@@ -118,6 +118,7 @@ public:
 	virtual void OnItemRightClick(wxTreeEvent& event);
     virtual void OnSetFocus(wxFocusEvent& event);
 	virtual void OnBeginDrag(wxTreeEvent& event);
+	virtual void OnActivated(wxTreeEvent& event);
 
     DECLARE_EVENT_TABLE()
 };

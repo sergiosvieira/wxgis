@@ -369,12 +369,13 @@ bool wxGxRasterDataset::Delete(void)
 {
     wxGISRasterDataset* pDSet;
  	if(m_pwxGISDataset == NULL)
+    {
         pDSet = new wxGISRasterDataset(m_sPath, m_type);
+        m_pwxGISDataset = static_cast<wxGISDataset*>(pDSet);
+    }
     else
     {
-        m_pwxGISDataset->Release();
         pDSet = dynamic_cast<wxGISRasterDataset*>(m_pwxGISDataset);
-        m_pwxGISDataset = NULL;
     }
     
     if(!pDSet)
@@ -383,8 +384,7 @@ bool wxGxRasterDataset::Delete(void)
     bool bRet = pDSet->Delete();
     if(bRet)
 	{
-        wsDELETE(pDSet);
-        //
+        //wsDELETE(pDSet);
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer == NULL)
 			return false;

@@ -22,7 +22,8 @@
 #include "../../art/views16.xpm"
 
 //	0	ContentsView states
-//	1	?
+//	1	Select All
+//  2   ?
 
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogViewsCmd, wxObject)
@@ -43,6 +44,7 @@ wxIcon wxGISCatalogViewsCmd::GetBitmap(void)
 	{
 		case 0:
 			return m_ImageList.GetIcon(0);
+		case 1:
 		default:
 			return wxNullIcon;
 	}
@@ -54,6 +56,8 @@ wxString wxGISCatalogViewsCmd::GetCaption(void)
 	{
 		case 0:	
 			return wxString(_("View"));
+		case 1:
+			return wxString(_("Select All"));
 		default:
 			return wxEmptyString;
 	}
@@ -65,6 +69,8 @@ wxString wxGISCatalogViewsCmd::GetCategory(void)
 	{
 		case 0:	
 			return wxString(_("View"));
+		case 1:
+			return wxString(_("Edit"));
 		default:
 			return wxString(_("[No category]"));
 	}
@@ -98,6 +104,7 @@ bool wxGISCatalogViewsCmd::GetEnabled(void)
 	switch(m_subtype)
 	{
 		case 0:
+		case 1:
 			return m_pContentsView->IsShown();
  		default:
 			return false;
@@ -108,8 +115,9 @@ wxGISEnumCommandKind wxGISCatalogViewsCmd::GetKind(void)
 {
 	switch(m_subtype)
 	{
-		case 0://Up One Level
+		case 0://View
 			return enumGISCommandDropDown;
+		case 1://Select All
 		default:
 			return enumGISCommandNormal;
 	}
@@ -121,6 +129,8 @@ wxString wxGISCatalogViewsCmd::GetMessage(void)
 	{
 		case 0:	
 			return wxString(_("Select view"));
+		case 1:	
+			return wxString(_("Select All objects"));
 		default:
 			return wxEmptyString;
 	}
@@ -137,6 +147,10 @@ void wxGISCatalogViewsCmd::OnClick(void)
                     nStyle = wxGxContentView::REPORT;
                 m_pContentsView->SetStyle((wxGxContentView::LISTSTYLE)(nStyle));
 			}
+			break;
+		case 1:	
+            m_pContentsView->SelectAll();
+            m_pContentsView->SetFocus();
 			break;
 		default:
 			return;
@@ -155,6 +169,8 @@ wxString wxGISCatalogViewsCmd::GetTooltip(void)
 	{
 		case 0:	
 			return wxString(_("Select view"));
+		case 1:	
+			return wxString(_("Select All"));
 		default:
 			return wxEmptyString;
 	}
@@ -162,7 +178,7 @@ wxString wxGISCatalogViewsCmd::GetTooltip(void)
 
 unsigned char wxGISCatalogViewsCmd::GetCount(void)
 {
-	return 1;
+	return 2;
 }
 
 wxMenu* wxGISCatalogViewsCmd::GetDropDownMenu(void)
@@ -185,6 +201,7 @@ wxMenu* wxGISCatalogViewsCmd::GetDropDownMenu(void)
             }
             return NULL;
         }            
+		case 1:	
 		default:
 			return NULL;
 	}

@@ -27,12 +27,13 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISGPExportTool, wxObject)
 
-wxGISGPExportTool::wxGISGPExportTool(void)
+wxGISGPExportTool::wxGISGPExportTool(void) : m_pParamArr(NULL)
 {
 }
 
 wxGISGPExportTool::~wxGISGPExportTool(void)
 {
+    wxDELETE(m_pParamArr);
 }
 
 wxString wxGISGPExportTool::GetDisplayName(void)
@@ -48,4 +49,13 @@ wxString wxGISGPExportTool::GetName(void)
 wxString wxGISGPExportTool::GetCategory(void)
 {
     return wxString(_("Conversion Tools/Vector"));
+}
+
+GPParameters* wxGISGPExportTool::GetParameterInfo(void)
+{
+    if(m_pParamArr)
+        return m_pParamArr;
+    m_pParamArr = new GPParameters;
+
+    return m_pParamArr;
 }

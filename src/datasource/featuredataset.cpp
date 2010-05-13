@@ -258,6 +258,7 @@ bool wxGISFeatureDataset::Delete(int iLayer)
 
     wxFileName FName( m_sPath );
     wxString sExt = FName.GetExt();
+    sExt.Prepend(wxT("."));
     FName.ClearExt();
     wxString sPath = FName.GetFullPath();
     switch(m_nSubType)

@@ -380,6 +380,7 @@ BEGIN_EVENT_TABLE(wxGxTreeView, wxGxTreeViewBase)
     EVT_TREE_SEL_CHANGED(TREECTRLID, wxGxTreeView::OnSelChanged)
     EVT_SET_FOCUS(wxGxTreeView::OnSetFocus)        
     EVT_TREE_BEGIN_DRAG(TREECTRLID, wxGxTreeView::OnBeginDrag)
+    EVT_TREE_ITEM_ACTIVATED(TREECTRLID, wxGxTreeView::OnActivated)
 END_EVENT_TABLE()
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxTreeView, wxGxTreeViewBase)
@@ -424,7 +425,7 @@ void wxGxTreeView::OnEndLabelEdit(wxTreeEvent& event)
 {
     if ( event.GetLabel().IsEmpty() )
     {
-        wxMessageDialog(this, _("Too short label. Please add longer text!"), _("Warning"), wxOK | wxICON_EXCLAMATION);
+        //wxMessageDialog(this, _("Too short label. Please add longer text!"), _("Warning"), wxOK | wxICON_EXCLAMATION);
         event.Veto();
     }
 	else
@@ -589,4 +590,23 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
 	wxDragResult result = dragSource.DoDragDrop( TRUE );
 }
 
+void wxGxTreeView::OnActivated(wxTreeEvent& event)
+{
+    event.Skip();
+
+	wxTreeItemId item = event.GetItem();
+
+	if(!item.IsOk())
+		return;
+
+	wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(item);
+	if(pData == NULL)
+		return;
+
+	IGxObjectWizard* pGxObjectWizard = dynamic_cast<IGxObjectWizard*>(pData->m_pObject);
+	if(pGxObjectWizard != NULL)
+		if(!pGxObjectWizard->Invoke(this))
+			return;
+
+}
 
