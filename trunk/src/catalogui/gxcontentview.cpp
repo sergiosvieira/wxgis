@@ -19,6 +19,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxcontentview.h"
+#include "wxgis/catalog/gxdiscconnection.h"
+
 #include "../../art/cont_view_16.xpm"
 #include "../../art/cont_view_48.xpm"
 
@@ -43,8 +45,55 @@ int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
 {
 	wxGxContentView::LPITEMDATA pItem1 = (wxGxContentView::LPITEMDATA)item1;
  	wxGxContentView::LPITEMDATA pItem2 = (wxGxContentView::LPITEMDATA)item2;
+    LPSORTDATA psortdata = (LPSORTDATA)sortData;
+    if(psortdata->currentSortCol == 0)
+        return GxObjectCompareFunction(pItem1->pObject, pItem2->pObject, psortdata->bSortAsc);
+    else
+    {
+	    IGxObjectSort* pGxObjectSort1 = dynamic_cast<IGxObjectSort*>(pItem1->pObject);
+        IGxObjectSort* pGxObjectSort2 = dynamic_cast<IGxObjectSort*>(pItem2->pObject);
+        if(pGxObjectSort1 && !pGxObjectSort2)
+		    return psortdata->bSortAsc == 0 ? 1 : -1;
+        if(!pGxObjectSort1 && pGxObjectSort2)
+		    return psortdata->bSortAsc == 0 ? -1 : 1;
+        if(pGxObjectSort1 && pGxObjectSort2)
+        {
+            bool bAlwaysTop1 = pGxObjectSort1->IsAlwaysTop();
+            bool bAlwaysTop2 = pGxObjectSort2->IsAlwaysTop();
+            if(bAlwaysTop1 && !bAlwaysTop2)
+		        return psortdata->bSortAsc == 0 ? 1 : -1;
+            if(!bAlwaysTop1 && bAlwaysTop2)
+		        return psortdata->bSortAsc == 0 ? -1 : 1;
+            bool bSortEnables1 = pGxObjectSort1->IsSortEnabled();
+            bool bSortEnables2 = pGxObjectSort2->IsSortEnabled();
+            if(!bSortEnables1 || !bSortEnables1)
+                return 0;
+        }
 
-    return GxObjectCompareFunction(pItem1->pObject, pItem2->pObject, sortData);
+	    bool bDiscConnection1 = dynamic_cast<wxGxDiscConnection*>(pItem1->pObject);
+        bool bDiscConnection2 = dynamic_cast<wxGxDiscConnection*>(pItem2->pObject);
+        if(bDiscConnection1 && !bDiscConnection2)
+		    return psortdata->bSortAsc == 0 ? 1 : -1;
+        if(!bDiscConnection1 && bDiscConnection2)
+		    return psortdata->bSortAsc == 0 ? -1 : 1;
+
+	    bool bContainerDst1 = dynamic_cast<IGxDataset*>(pItem1->pObject);
+        bool bContainerDst2 = dynamic_cast<IGxDataset*>(pItem2->pObject);
+	    bool bContainer1 = dynamic_cast<IGxObjectContainer*>(pItem1->pObject);
+        bool bContainer2 = dynamic_cast<IGxObjectContainer*>(pItem2->pObject);
+        if(bContainer1 && !bContainerDst1 && bContainerDst2)
+	        return psortdata->bSortAsc == 0 ? 1 : -1;
+        if(bContainer2 && !bContainerDst2 && bContainerDst1)
+	        return psortdata->bSortAsc == 0 ? -1 : 1;
+        if(bContainer1 && !bContainer2)
+	        return psortdata->bSortAsc == 0 ? 1 : -1;
+        if(!bContainer1 && bContainer2)
+	        return psortdata->bSortAsc == 0 ? -1 : 1;
+
+	    return pItem1->pObject->GetCategory().CmpNoCase(pItem2->pObject->GetCategory()) * (psortdata->bSortAsc == 0 ? -1 : 1);
+    }
+    return 0;
+//        return GxObjectCompareFunction(pItem1->pObject, pItem2->pObject, psortdata->bSortAsc);
 }
 
 wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : 
@@ -113,6 +162,9 @@ void wxGxContentView::Serialize(wxXmlNode* pRootNode, bool bStore)
         if(pRootNode->HasProp(wxT("sort")))
             pRootNode->DeleteProperty(wxT("sort"));
         pRootNode->AddProperty(wxT("sort"), wxString::Format(wxT("%d"), m_bSortAsc));
+        if(pRootNode->HasProp(wxT("sort_col")))
+            pRootNode->DeleteProperty(wxT("sort_col"));
+        pRootNode->AddProperty(wxT("sort_col"), wxString::Format(wxT("%d"), m_currentSortCol));
         if(pRootNode->HasProp(wxT("name_width")))
             pRootNode->DeleteProperty(wxT("name_width"));
         pRootNode->AddProperty(wxT("name_width"), wxString::Format(wxT("%d"), GetColumnWidth(0)));
@@ -123,6 +175,7 @@ void wxGxContentView::Serialize(wxXmlNode* pRootNode, bool bStore)
 	else
 	{
 		m_bSortAsc = wxAtoi(pRootNode->GetPropVal(wxT("sort"), wxT("1")));
+		m_currentSortCol = wxAtoi(pRootNode->GetPropVal(wxT("sort_col"), wxT("0")));
 		LISTSTYLE style = (LISTSTYLE)wxAtoi(pRootNode->GetPropVal(wxT("style"), wxT("0")));
 		int nw = wxAtoi(pRootNode->GetPropVal(wxT("name_width"), wxT("150")));
 		if(nw == 0)
@@ -133,8 +186,10 @@ void wxGxContentView::Serialize(wxXmlNode* pRootNode, bool bStore)
 		SetColumnWidth(0, nw);
 		SetColumnWidth(1, tw);
 		SetStyle(style);
-		SortItems(MyCompareFunction, m_bSortAsc);
-		SetColumnImage(0, m_bSortAsc ? 0 : 1);
+
+        SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
+		SortItems(MyCompareFunction, (long)&sortdata);
+		SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 	}
 }
 
@@ -184,14 +239,15 @@ void wxGxContentView::AddObject(IGxObject* pObject)
 
 void wxGxContentView::OnColClick(wxListEvent& event)
 {
-	int col = event.GetColumn();
-	if(col != 0)
-	   return;
-
+	//int col = event.GetColumn();
+	//if(col != 0)
+	//   return;
+    m_currentSortCol = event.GetColumn();
 	m_bSortAsc = !m_bSortAsc;
-	SortItems(MyCompareFunction, m_bSortAsc);
 
-    SetColumnImage(col, m_bSortAsc ? 0 : 1);
+    SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
+	SortItems(MyCompareFunction, (long)&sortdata);
+	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 }
 
 void wxGxContentView::OnContextMenu(wxContextMenuEvent& event)
@@ -327,6 +383,12 @@ void wxGxContentView::SetColumnImage(int col, int image)
 {
     wxListItem item;
     item.SetMask(wxLIST_MASK_IMAGE);
+
+    //reset image
+    item.SetImage(-1);
+    for(size_t i = 0; i < GetColumnCount(); i++)
+        SetColumn(i, item);
+
     item.SetImage(image);
     SetColumn(col, item);
 }
@@ -457,7 +519,7 @@ void wxGxContentView::OnEndLabelEdit(wxListEvent& event)
 {
     if ( event.GetLabel().Len() == 0 )
     {
-        wxMessageBox(_("wxGxContentView: Too short label. Please add longer text!"));
+        //wxMessageBox(_("wxGxContentView: Too short label. Please add longer text!"));
         event.Veto();
     }
 	else
@@ -483,7 +545,9 @@ void wxGxContentView::OnObjectAdded(IGxObject* pObj)
 	if(pObj->GetParent() == m_pParentGxObject)
     {
 		AddObject(pObj);
-	    SortItems(MyCompareFunction, m_bSortAsc);
+        SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
+	    SortItems(MyCompareFunction, (long)&sortdata);
+	    //SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
     }
 }
 
@@ -565,8 +629,9 @@ void wxGxContentView::OnRefreshAll(void)
 		AddObject(pArr->at(i));
 	}
 
-	SortItems(MyCompareFunction, m_bSortAsc);
-    SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+    SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
+	SortItems(MyCompareFunction, (long)&sortdata);
+	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 }
 
 void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
@@ -591,8 +656,9 @@ void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiato
 		AddObject(pArr->at(i));
 	}
 
-	SortItems(MyCompareFunction, m_bSortAsc);
-    SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+    SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
+	SortItems(MyCompareFunction, (long)&sortdata);
+	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 }
 
 bool wxGxContentView::Applies(IGxSelection* Selection)
@@ -641,4 +707,10 @@ void wxGxContentView::OnBeginDrag(wxListEvent& event)
     wxDropSource dragSource( this );
 	dragSource.SetData( my_data );
 	wxDragResult result = dragSource.DoDragDrop( TRUE );
+}
+
+void wxGxContentView::SelectAll(void)
+{
+	for(long item = 0; item < GetItemCount(); item++)
+        SetItemState(item, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }

@@ -57,6 +57,7 @@ bool wxGISRasterDataset::Delete(void)
         {
             //pDrv = m_poMainDataset->GetDriver();
             GDALDereferenceDataset(m_poMainDataset);
+            m_poMainDataset = NULL;
         }
             //if(GDALDereferenceDataset(m_poMainDataset) < 1)
             //    GDALClose(m_poMainDataset);
@@ -65,6 +66,7 @@ bool wxGISRasterDataset::Delete(void)
             //if(!pDrv)
             //    pDrv = m_poDataset->GetDriver();
             GDALClose(m_poDataset);
+            m_poDataset = NULL;
         }
     }
    // else
@@ -84,6 +86,7 @@ bool wxGISRasterDataset::Delete(void)
 
     wxFileName FName( m_sPath );
     wxString sExt = FName.GetExt();
+    sExt.Prepend(wxT("."));
     FName.ClearExt();
     wxString sPath = FName.GetFullPath();
 
@@ -106,6 +109,7 @@ bool wxGISRasterDataset::Delete(void)
         DeleteFile(sPath + sExt  + wxT(".ovr"), m_pPathEncoding);
         DeleteFile(sPath + sExt  + wxT(".ovr.aux.xml"), m_pPathEncoding);
         DeleteFile(sPath + wxT(".xml"), m_pPathEncoding);
+        DeleteFile(sPath + wxT(".rrd"), m_pPathEncoding);
         return true;
     case enumRasterUnknown:
     default: return false;

@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/geoprocessingui/gptoolbox.h"
+#include "wxgis/geoprocessingui/gptooldlg.h"
 
 #include <wx/stdpaths.h>
 
@@ -292,3 +293,16 @@ wxIcon wxGxTool::GetSmallImage(void)
 	return wxIcon(tool_16_xpm);
 }
 
+bool wxGxTool::Invoke(wxWindow* pParentWnd)
+{
+    //wxGISGPToolDlg dlg(pParentWnd);
+    //dlg.ShowModal();//(true);
+
+    //    IGPTool* m_pTool;
+
+    wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(pParentWnd);
+    pDlg->Show(true);
+    //dlg.ShowModal();//(true);
+
+    return false;
+}
