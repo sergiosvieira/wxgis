@@ -278,6 +278,7 @@ class IGxRootObjectProperties
 public:	
 	virtual ~IGxRootObjectProperties(void){};
 	virtual void Init(wxXmlNode* pConfigNode) = 0;
+	virtual wxXmlNode* GetProperties(void) = 0;
 };
 
 class IGxObjectSort

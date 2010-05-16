@@ -85,6 +85,7 @@ public:
 	virtual void EmptyObjectFactories(void);
 	virtual void Init(void);
 	virtual void SerializeDiscConnections(wxXmlNode* pNode, bool bStore = false);
+    virtual void SerializePlugins(wxXmlNode* pNode, bool bStore = false);
 
 private:
 	bool m_bIsChildrenLoaded;

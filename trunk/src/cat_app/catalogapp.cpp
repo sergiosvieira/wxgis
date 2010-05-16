@@ -58,7 +58,7 @@ bool wxGISCatalogApp::OnInit()
 	wxString sLogDir = m_pConfig->GetLogDir();
 	if(sLogDir.IsEmpty())
 	{
-		wxLogError(_("wxGISCatalogApp: Filed to get log dir"));
+		wxLogError(_("wxGISCatalogApp: Failed to get log dir"));
         return false;
 	}
 	if(!wxDirExists(sLogDir))
@@ -69,7 +69,7 @@ bool wxGISCatalogApp::OnInit()
 	wxString logfilename = sLogDir + wxFileName::GetPathSeparator() + wxString::Format(wxT("log_%.4d%.2d%.2d.log"),dt.GetYear(), dt.GetMonth() + 1, dt.GetDay());
 
 	if(!m_LogFile.Open(logfilename.GetData(), wxT("a+")))
-		wxLogError(_("wxGISCatalogApp: Filed to open log file %s"), logfilename.c_str());
+		wxLogError(_("wxGISCatalogApp: Failed to open log file %s"), logfilename.c_str());
 
 	wxLog::SetActiveTarget(new wxLogStderr(m_LogFile.fp()));
 

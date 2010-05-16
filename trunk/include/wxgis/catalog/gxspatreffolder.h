@@ -50,6 +50,7 @@ public:
 	virtual bool HasChildren(void){LoadChildren(); return m_Children.size() > 0 ? true : false;};
     //IGxRootObjectProperties
     virtual void Init(wxXmlNode* pConfigNode);
+    virtual wxXmlNode* GetProperties(void);
 	//wxGxSpatialReferencesFolder
 	virtual void LoadChildren(void);
 	virtual void EmptyChildren(void);
@@ -57,7 +58,6 @@ protected:
 	wxString m_sPath;
 	wxArrayString m_FileNames;
 	bool m_bIsChildrenLoaded;
-    wxXmlNode* m_pConfigNode;
 };
 
 /////////////////////////////////////////////////////////////////////////

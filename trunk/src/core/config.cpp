@@ -81,7 +81,7 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
     //path: wxGISCatalog\Frame\Views
     for(size_t i = 0; i < m_confignodes_arr.size(); i++)
 	{
-        if(m_confignodes_arr[i].sXmlPath == sPath.Lower() && m_confignodes_arr[i].Key == Key)
+        if(m_confignodes_arr[i].sXmlPath.CmpNoCase(sPath) == 0 && m_confignodes_arr[i].Key == Key)
 		{
             return m_confignodes_arr[i].pXmlNode;
 		}
@@ -94,7 +94,7 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 
 	for(size_t i = 0; i < m_configs_arr.size(); i++)
 	{
-		if(m_configs_arr[i].sRootNodeName == sRootNodeName && m_configs_arr[i].Key == Key)
+		if(m_configs_arr[i].sRootNodeName.CmpNoCase(sRootNodeName) == 0 && m_configs_arr[i].Key == Key)
 		{
 			pDoc = m_configs_arr[i].pXmlDoc;
 			break;
