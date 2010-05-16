@@ -23,3 +23,6 @@
 
 #include "wxgis/catalogui/catalogui.h"
 
+#define SASHCTRLID	1012
+
+

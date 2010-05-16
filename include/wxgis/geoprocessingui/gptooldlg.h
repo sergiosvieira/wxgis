@@ -20,6 +20,8 @@
  ****************************************************************************/
 #pragma once
 
+#include "wxgis/geoprocessingui/geoprocessingui.h"
+
 #include <wx/intl.h>
 
 #include <wx/sizer.h>
@@ -51,17 +53,22 @@ protected:
     wxButton* m_sdbSizer1Cancel;
     wxButton* m_sdbSizer1Help;
     //wxPanel* m_helppanel;
-    wxHtmlWindow* m_htmlWin2;
+    wxHtmlWindow* m_htmlWin;
 
 public:
-    wxGISGPToolDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Tool name"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 641,616 ), long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX|wxRESIZE_BORDER|wxSYSTEM_MENU );
+    wxGISGPToolDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Tool name"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 480,600 ), long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX|wxRESIZE_BORDER|wxSYSTEM_MENU|wxSTAY_ON_TOP|wxDIALOG_NO_PARENT|wxCLIP_CHILDREN );
     ~wxGISGPToolDlg();
     void m_splitterOnIdle( wxIdleEvent& )
     {
         m_splitter->SetSashPosition( 0 );
         m_splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISGPToolDlg::m_splitterOnIdle ), NULL, this );
     }
+//events
+    virtual void OnHelp(wxCommandEvent& event);
+    virtual void OnHelpUI(wxUpdateUIEvent& event);
+protected:
+    int m_DataWidth, m_HtmlWidth;
 
-
+    DECLARE_EVENT_TABLE()
 };
 

@@ -32,6 +32,9 @@ wxGxApplication::wxGxApplication(wxWindow* parent, wxWindowID id, const wxString
 
 wxGxApplication::~wxGxApplication(void)
 {
+	SerializeGxFramePos(true);
+	//should remove toolbars from commandbar array as m_mgr manage toolbars by itself 
+
     m_pNewMenu->UnInit();
 
     IGxSelection* pSel = m_pCatalog->GetSelection();
@@ -76,9 +79,6 @@ wxGxApplication::~wxGxApplication(void)
 				pToolBar->Deactivate();
 		}
 	}
-
-	SerializeFramePos(true);
-	//should remove toolbars from commandbar array as m_mgr manage toolbars by itself 
 
 	m_mgr.UnInit();
 	wxDELETE(m_pCatalog);

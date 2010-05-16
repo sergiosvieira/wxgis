@@ -30,7 +30,7 @@
 /////////////////////////////////////////////////////////////////////////
 IMPLEMENT_DYNAMIC_CLASS(wxGxSpatialReferencesFolder, wxObject)
 
-wxGxSpatialReferencesFolder::wxGxSpatialReferencesFolder(void) : m_bIsChildrenLoaded(false) 
+wxGxSpatialReferencesFolder::wxGxSpatialReferencesFolder(void) : m_bIsChildrenLoaded(false)
 {
 }
 
@@ -51,11 +51,6 @@ wxIcon wxGxSpatialReferencesFolder::GetSmallImage(void)
 void wxGxSpatialReferencesFolder::Detach(void)
 {
 	EmptyChildren();
-#ifndef WXGISPORTABLE
-    if(m_pConfigNode->HasProp(wxT("path")))
-	    m_pConfigNode->DeleteProperty(wxT("path"));
-    m_pConfigNode->AddProperty(wxT("path"), m_sPath);
-#endif
 }
 
 void wxGxSpatialReferencesFolder::Refresh(void)
@@ -67,7 +62,6 @@ void wxGxSpatialReferencesFolder::Refresh(void)
  
 void wxGxSpatialReferencesFolder::Init(wxXmlNode* pConfigNode)
 {
-    m_pConfigNode = pConfigNode;
     m_sPath = pConfigNode->GetPropVal(wxT("path"), NON);
     if(m_sPath.IsEmpty() || m_sPath == wxString(NON))
     {
@@ -79,7 +73,21 @@ void wxGxSpatialReferencesFolder::Init(wxXmlNode* pConfigNode)
         wxLogMessage(_("wxGxSpatialReferencesFolder: The path set to '%s'"), m_sPath.c_str());
     }
     CPLSetConfigOption("wxGxSpatialReferencesFolder", wgWX2MB(m_sPath));
+}
 
+wxXmlNode* wxGxSpatialReferencesFolder::GetProperties(void)
+{
+    wxXmlNode* pNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("rootitem"));
+    wxClassInfo* pInfo = GetClassInfo();
+    if(pInfo)
+        pNode->AddProperty(wxT("name"), pInfo->GetClassName());
+    pNode->AddProperty(wxT("is_enabled"), wxT("1"));    
+#ifndef WXGISPORTABLE
+    if(pNode->HasProp(wxT("path")))
+        pNode->DeleteProperty(wxT("path"));
+    pNode->AddProperty(wxT("path"), m_sPath);
+#endif  
+    return pNode;
 }
 
 void wxGxSpatialReferencesFolder::EmptyChildren(void)

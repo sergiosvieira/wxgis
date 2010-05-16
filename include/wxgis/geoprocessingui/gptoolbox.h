@@ -32,8 +32,8 @@ class WXDLLIMPEXP_GIS_GPU wxGxToolbox :
 	public IGxObjectContainer
 {
 public:
-	wxGxToolbox(wxGISGPToolManager* pToolMngr = NULL);//wxString Path, wxString Name, bool bShowHidden
-	wxGxToolbox(wxXmlNode* pDataNode, wxGISGPToolManager* pToolMngr = NULL);
+	wxGxToolbox(wxGISGPToolManager* pToolMngr = NULL, wxXmlNode* pPropNode = NULL);//wxString Path, wxString Name, bool bShowHidden
+	wxGxToolbox(wxXmlNode* pDataNode, wxGISGPToolManager* pToolMngr = NULL, wxXmlNode* pPropNode = NULL);
 	virtual ~wxGxToolbox(void);
 	//IGxObject
 	virtual void Detach(void);
@@ -59,6 +59,7 @@ protected:
 	bool m_bIsChildrenLoaded;
     wxXmlNode* m_pDataNode;
     wxGISGPToolManager* m_pToolMngr;
+    wxXmlNode* m_pPropNode;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -79,13 +80,13 @@ public:
 	virtual wxString GetName(void){return wxString(_("Toolboxes"));};
     //IGxRootObjectProperties
     virtual void Init(wxXmlNode* pConfigNode);
+    virtual wxXmlNode* GetProperties(void);
 	//wxGxRootToolbox
 	virtual void LoadChildren(void);
 protected:
 	wxString m_sPath;
 	//wxArrayString m_FileNames;
 	bool m_bIsChildrenLoaded;
-    wxXmlNode* m_pConfigNode;
     wxXmlDocument m_XmlDoc;
 };
 
@@ -99,8 +100,8 @@ class WXDLLIMPEXP_GIS_GPU wxGxTool :
     public IGxObjectWizard
 {
 public:
-	wxGxTool(wxGISGPToolManager* pToolMngr = NULL);//wxString Path, wxString Name, bool bShowHidden
-	wxGxTool(wxXmlNode* pDataNode, wxGISGPToolManager* pToolMngr = NULL);
+	wxGxTool(wxGISGPToolManager* pToolMngr = NULL, wxXmlNode* pPropNode = NULL);//wxString Path, wxString Name, bool bShowHidden
+	wxGxTool(wxXmlNode* pDataNode, wxGISGPToolManager* pToolMngr = NULL, wxXmlNode* pPropNode = NULL);
 	virtual ~wxGxTool(void);
 	//IGxObject
     virtual wxString GetName(void){return m_sName;};
@@ -119,4 +120,7 @@ protected:
     IGPTool* m_pTool;
     wxXmlNode* m_pDataNode;
     wxGISGPToolManager* m_pToolMngr;
+    wxXmlNode* m_pPropNode;
+
+    std::vector<wxDialog*> m_DestroyArr;
 };
