@@ -21,6 +21,10 @@
 
 #include "wxgis/geoprocessing/gptoolmngr.h"
 
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISGPToolManager
+///////////////////////////////////////////////////////////////////////////////
+
 wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode)
 {
     m_pToolsNode = pToolsNode;
@@ -39,8 +43,8 @@ wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode)
 		if(pTool != NULL)
 		{
             wxString sInternalName = pTool->GetName();
-            if(m_ToolsMap[sInternalName] == NULL)
-                m_ToolsMap[sInternalName] = pTool;
+            m_ToolsMap[sInternalName] = sName;
+            wxDELETE(pTool);
         }
         pChild = pChild->GetNext();
     }
@@ -48,12 +52,128 @@ wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode)
 
 wxGISGPToolManager::~wxGISGPToolManager(void)
 {
-    typedef std::map<wxString, IGPTool*>::iterator IT;
-    for(IT it = m_ToolsMap.begin(); it != m_ToolsMap.end(); ++it)
-        wxDELETE(it->second);
+    //typedef std::map<wxString, IGPTool*>::iterator IT;
+    //for(IT it = m_ToolsMap.begin(); it != m_ToolsMap.end(); ++it)
+    //    wxDELETE(it->second);
 }
 
 IGPTool* wxGISGPToolManager::GetTool(wxString sToolName)
 {
-    return m_ToolsMap[sToolName];
+	wxObject *pObj = wxCreateDynamicObject(m_ToolsMap[sToolName]);
+	return dynamic_cast<IGPTool*>(pObj);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISGPParameter
+///////////////////////////////////////////////////////////////////////////////
+wxGISGPParameter::wxGISGPParameter()
+{
+    m_bAltered = false;
+    m_bHasBeenValidated = false;
+    m_pDomain = NULL;
+}
+
+wxGISGPParameter::~wxGISGPParameter()
+{
+    wxDELETE(m_pDomain);
+}
+
+bool wxGISGPParameter::GetAltered(void)
+{
+    return m_bAltered;
+}
+
+void wxGISGPParameter::SetAltered(bool bAltered)
+{
+    m_bAltered = bAltered;
+}
+
+bool wxGISGPParameter::GetHasBeenValidated(void)
+{
+    return m_bHasBeenValidated;
+}
+
+void wxGISGPParameter::SetHasBeenValidated(bool bHasBeenValidated)
+{
+    m_bHasBeenValidated = bHasBeenValidated;
+}
+
+wxString wxGISGPParameter::GetName(void)
+{
+    return m_sName;
+}
+
+void wxGISGPParameter::SetName(wxString sName)
+{
+    m_sName = sName;
+}
+
+wxString wxGISGPParameter::GetDisplayName(void)
+{
+    return m_sDisplayName;
+}
+
+void wxGISGPParameter::SetDisplayName(wxString sDisplayName)
+{
+    m_sDisplayName = sDisplayName;
+}
+
+wxGISEnumGPParameterDataType wxGISGPParameter::GetDataType(void)
+{
+    return m_DataType;
+}
+
+void wxGISGPParameter::SetDataType(wxGISEnumGPParameterDataType nType)
+{
+    m_DataType = nType;
+}
+
+wxGISEnumGPParameterDirection wxGISGPParameter::GetDirection(void)
+{
+    return m_Direction;
+}
+
+void wxGISGPParameter::SetDirection(wxGISEnumGPParameterDirection nDirection)
+{
+    m_Direction = nDirection;
+}
+
+wxArrayString* wxGISGPParameter::GetParameterDependencies(void)
+{
+    return NULL;
+}
+
+void wxGISGPParameter::AddParameterDependency(wxString sDependency)
+{
+}
+
+wxGISEnumGPParameterType wxGISGPParameter::GetParameterType(void)
+{
+    return m_ParameterType;
+}
+
+void wxGISGPParameter::SetParameterType(wxGISEnumGPParameterType nType)
+{
+    m_ParameterType = nType;
+}
+
+wxVariant* wxGISGPParameter::GetValue(void)
+{
+    return &m_Value;
+}
+
+void wxGISGPParameter::SetValue(wxVariant Val)
+{
+    m_Value = Val;
+}
+
+IGPDomain* wxGISGPParameter::GetDomain(void)
+{
+    return m_pDomain;
+}
+
+void wxGISGPParameter::SetDomain(IGPDomain* pDomain)
+{
+    m_pDomain = pDomain;
+}
+

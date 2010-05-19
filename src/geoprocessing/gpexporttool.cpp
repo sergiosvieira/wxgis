@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessing/gpexporttool.h"
+#include "wxgis/geoprocessing/gptoolmngr.h"
 
 /////////////////////////////////////////////////////////////////////////
 // wxGISGPExportTool
@@ -33,7 +34,12 @@ wxGISGPExportTool::wxGISGPExportTool(void) : m_pParamArr(NULL)
 
 wxGISGPExportTool::~wxGISGPExportTool(void)
 {
-    wxDELETE(m_pParamArr);
+    if(m_pParamArr)
+    {
+        for(size_t i = 0; i < m_pParamArr->size(); i++)
+            wxDELETE(m_pParamArr->operator[](i));
+        wxDELETE(m_pParamArr);
+    }
 }
 
 wxString wxGISGPExportTool::GetDisplayName(void)
@@ -56,6 +62,19 @@ GPParameters* wxGISGPExportTool::GetParameterInfo(void)
     if(m_pParamArr)
         return m_pParamArr;
     m_pParamArr = new GPParameters;
+
+    //src path
+    wxGISGPParameter* pParam1 = new wxGISGPParameter();
+    pParam1->SetName(wxT("src_path"));
+    pParam1->SetDisplayName(_("Source feature class"));
+    pParam1->SetParameterType(enumGISGPParameterTypeRequired);
+    pParam1->SetDataType(enumGISGPParamDTPath);
+    pParam1->SetDirection(enumGISGPParameterDirectionInput);
+    m_pParamArr->push_back(pParam1);
+
+    //SQL statement
+
+    //dst path
 
     return m_pParamArr;
 }

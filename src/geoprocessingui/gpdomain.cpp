@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  geoprocessingui header.
+ * Purpose:  geoprocessing tool parameters domains.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -19,11 +19,5 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#pragma once
-
-#include "wxgis/catalogui/catalogui.h"
-#include "wxgis/geoprocessing/geoprocessing.h"
-
-#define SASHCTRLID	1012
-
+#include "wxgis/geoprocessingui/gpdomain.h"
 
