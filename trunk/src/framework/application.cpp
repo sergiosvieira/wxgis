@@ -192,7 +192,7 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 	if(pCmd)
 	{
 		if(pCmd->GetKind() == enumGISCommandCheck)
-            if(event.GetChecked() != pCmd->GetChecked())
+            //if(event.GetChecked() != pCmd->GetChecked())
                 event.Check(pCmd->GetChecked());
         //if(event.GetEnabled() != pCmd->GetEnabled())
         event.Enable(pCmd->GetEnabled());

@@ -289,17 +289,18 @@ wxGxTool::wxGxTool(wxXmlNode* pDataNode, wxGISGPToolManager* pToolMngr, wxXmlNod
     m_pPropNode = pPropNode;
     if(m_pDataNode && m_pToolMngr)
     {
-        wxString sName = m_pDataNode->GetPropVal(wxT("name"), NONAME);
-        m_pTool = m_pToolMngr->GetTool(sName);
-        if(m_pTool)
-            m_sName = m_pTool->GetDisplayName();
+        m_sInternalName = m_pDataNode->GetPropVal(wxT("name"), NONAME);
+        IGPTool* pTool = m_pToolMngr->GetTool(m_sInternalName);
+        if(pTool)
+        {
+            m_sName = pTool->GetDisplayName();
+            wxDELETE(pTool);
+        }
     }
 }
 
 wxGxTool::~wxGxTool(void)
 {
-    for(size_t i = 0; i < m_DestroyArr.size(); i++)
-        wxDELETE(m_DestroyArr[i]);
 }
 
 wxIcon wxGxTool::GetLargeImage(void)
@@ -314,15 +315,12 @@ wxIcon wxGxTool::GetSmallImage(void)
 
 bool wxGxTool::Invoke(wxWindow* pParentWnd)
 {
-    //wxGISGPToolDlg dlg(pParentWnd);
+    IGPTool* pTool = m_pToolMngr->GetTool(m_sInternalName);
+    if(pTool)
+    {
+        wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(pTool, m_pPropNode);//pParentWnd);
+        pDlg->Show(true);
     //dlg.ShowModal();//(true);
-
-    //    IGPTool* m_pTool;
-
-    wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(NULL);//pParentWnd);
-    m_DestroyArr.push_back(pDlg);
-    pDlg->Show(true);
-    //dlg.ShowModal();//(true);
-
+    }
     return false;
 }

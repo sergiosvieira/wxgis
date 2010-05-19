@@ -20,6 +20,7 @@
  ****************************************************************************/
 #pragma once
 
+#include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 
 #include <wx/intl.h>
@@ -36,6 +37,8 @@
 #include <wx/splitter.h>
 #include <wx/dialog.h>
 
+#include <wx/scrolwin.h>
+
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -48,6 +51,7 @@ private:
 protected:
     wxSplitterWindow* m_splitter;
     wxPanel* m_toolpanel;
+    wxPanel* m_tools;
     wxStdDialogButtonSizer* m_sdbSizer1;
     wxButton* m_sdbSizer1OK;
     wxButton* m_sdbSizer1Cancel;
@@ -56,7 +60,7 @@ protected:
     wxHtmlWindow* m_htmlWin;
 
 public:
-    wxGISGPToolDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Tool name"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 480,600 ), long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX|wxRESIZE_BORDER|wxSYSTEM_MENU|wxSTAY_ON_TOP|wxDIALOG_NO_PARENT|wxCLIP_CHILDREN );
+    wxGISGPToolDlg( IGPTool* pTool, wxXmlNode* pPropNode = NULL, wxWindow* parent = NULL, wxWindowID id = wxID_ANY, const wxString& title = _("Tool name"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 480,600 ), long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX|wxRESIZE_BORDER|wxSYSTEM_MENU|wxSTAY_ON_TOP|wxDIALOG_NO_PARENT|wxCLIP_CHILDREN );
     ~wxGISGPToolDlg();
     void m_splitterOnIdle( wxIdleEvent& )
     {
@@ -66,8 +70,12 @@ public:
 //events
     virtual void OnHelp(wxCommandEvent& event);
     virtual void OnHelpUI(wxUpdateUIEvent& event);
+    virtual void OnOk(wxCommandEvent& event);
+    virtual void OnCancel(wxCommandEvent& event);
 protected:
     int m_DataWidth, m_HtmlWidth;
+    IGPTool* m_pTool;
+    wxXmlNode* m_pPropNode;
 
     DECLARE_EVENT_TABLE()
 };

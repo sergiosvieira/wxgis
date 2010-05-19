@@ -187,6 +187,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\geoprocessingui\gpcontrols.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\geoprocessingui\gpdomain.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\geoprocessingui\gptoolbox.cpp"
 				>
 			</File>
@@ -206,6 +214,14 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\geoprocessingui\geoprocessingui.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geoprocessingui\gpcontrols.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geoprocessingui\gpdomain.h"
 				>
 			</File>
 			<File

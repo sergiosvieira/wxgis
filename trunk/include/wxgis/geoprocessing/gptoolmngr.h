@@ -23,6 +23,10 @@
 
 #include "wxgis/geoprocessing/geoprocessing.h"
 
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISGPToolManager
+///////////////////////////////////////////////////////////////////////////////
+
 class WXDLLIMPEXP_GIS_GP wxGISGPToolManager
 {
 public:
@@ -31,5 +35,47 @@ public:
     IGPTool* GetTool(wxString sToolName);
 protected:
     wxXmlNode* m_pToolsNode;
-    std::map<wxString, IGPTool*> m_ToolsMap;
+    std::map<wxString, wxString> m_ToolsMap; //internal name, class name
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISGPParameter
+///////////////////////////////////////////////////////////////////////////////
+
+class wxGISGPParameter : public IGPParameter
+{
+public:
+    wxGISGPParameter(void);
+    virtual ~wxGISGPParameter(void);
+    //IGPParameter
+    virtual bool GetAltered(void);
+    virtual void SetAltered(bool bAltered);
+    virtual bool GetHasBeenValidated(void);
+    virtual void SetHasBeenValidated(bool bHasBeenValidated);
+    virtual wxString GetName(void);
+    virtual void SetName(wxString sName);
+    virtual wxString GetDisplayName(void);
+    virtual void SetDisplayName(wxString sDisplayName);
+    virtual wxGISEnumGPParameterDataType GetDataType(void);
+    virtual void SetDataType(wxGISEnumGPParameterDataType nType);
+    virtual wxGISEnumGPParameterDirection GetDirection(void);
+    virtual void SetDirection(wxGISEnumGPParameterDirection nDirection);
+    virtual wxArrayString* GetParameterDependencies(void);
+    virtual void AddParameterDependency(wxString sDependency);
+    virtual wxGISEnumGPParameterType GetParameterType(void);
+    virtual void SetParameterType(wxGISEnumGPParameterType nType);
+    virtual wxVariant* GetValue(void);
+    virtual void SetValue(wxVariant Val);
+    virtual IGPDomain* GetDomain(void);
+    virtual void SetDomain(IGPDomain* pDomain);
+protected:
+    bool m_bAltered;
+    bool m_bHasBeenValidated;
+    wxString m_sName;
+    wxString m_sDisplayName;
+    wxGISEnumGPParameterDataType m_DataType;
+    wxGISEnumGPParameterDirection m_Direction;
+    wxGISEnumGPParameterType m_ParameterType;
+    wxVariant m_Value;
+    IGPDomain* m_pDomain;
 };

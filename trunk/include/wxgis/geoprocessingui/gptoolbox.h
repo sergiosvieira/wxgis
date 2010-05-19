@@ -116,11 +116,8 @@ public:
 	//wxGxTool
 protected:
 	//wxString m_sPath;
-	wxString m_sName;
-    IGPTool* m_pTool;
+	wxString m_sName, m_sInternalName;
     wxXmlNode* m_pDataNode;
     wxGISGPToolManager* m_pToolMngr;
     wxXmlNode* m_pPropNode;
-
-    std::vector<wxDialog*> m_DestroyArr;
 };

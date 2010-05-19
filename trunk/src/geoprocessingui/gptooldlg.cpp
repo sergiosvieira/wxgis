@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessingui/gptooldlg.h"
+#include "wxgis/geoprocessingui/gpcontrols.h"
 
 #include "../../art/tool_16.xpm"
 
@@ -28,12 +29,18 @@
 BEGIN_EVENT_TABLE(wxGISGPToolDlg, wxDialog)
 	EVT_BUTTON(wxID_HELP, wxGISGPToolDlg::OnHelp)
 	EVT_UPDATE_UI(wxID_HELP, wxGISGPToolDlg::OnHelpUI)
+	EVT_BUTTON(wxID_CANCEL, wxGISGPToolDlg::OnCancel)
+	EVT_BUTTON(wxID_OK, wxGISGPToolDlg::OnOk)
 END_EVENT_TABLE()
 
-wxGISGPToolDlg::wxGISGPToolDlg( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+wxGISGPToolDlg::wxGISGPToolDlg( IGPTool* pTool, wxXmlNode* pPropNode, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	SetIcon( wxIcon(tool_16_xpm) );
 	this->SetSizeHints( wxSize( 350,500 ) );
+
+    m_pTool = pTool;
+    m_pPropNode = pPropNode;
+    SetLabel(m_pTool->GetDisplayName());
 
 	//this->SetSizeHints( wxDefaultSize, wxDefaultSize );
     m_DataWidth = 350;
@@ -47,10 +54,65 @@ wxGISGPToolDlg::wxGISGPToolDlg( wxWindow* parent, wxWindowID id, const wxString&
 	m_toolpanel = new wxPanel( m_splitter, wxID_ANY, wxDefaultPosition, wxSize(m_DataWidth, size.y)/*wxDefaultSize*/, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer2 = new wxBoxSizer( wxVERTICAL );
 	
+    //m_tools = new wxPanel( m_toolpanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL/*|wxVSCROLL*/|wxBORDER_SUNKEN );
+    wxScrolledWindow* m_tools = new wxScrolledWindow(m_toolpanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxBORDER_SUNKEN|wxVSCROLL );
+    m_tools->SetScrollbars(20, 20, 50, 50);
+
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer( wxVERTICAL );
-	
-	bSizer2->Add( bSizer4, 1, wxEXPAND, 5 );
+
+    GPParameters* pParams = m_pTool->GetParameterInfo();
+    if(pParams)
+    {
+        for(size_t i = 0; i < pParams->size(); i++)
+        {
+            IGPParameter* pParam = pParams->operator[](i);
+            if(!pParam)
+                continue;
+            switch(pParam->GetDataType())
+            {
+            case enumGISGPParamDTPath:
+                {
+                    wxGISDTPath* pPath = new wxGISDTPath(pParam, m_tools);
+                    bSizer4->Add( pPath, 0, wxEXPAND, 5 );
+                }
+                break;
+            default:
+                break;
+            }
+        }
+ //   wxGISDTChoice* pCh1 = new wxGISDTChoice(m_tools);
+	//bSizer4->Add( pCh1, 0, wxEXPAND, 5 );
+ //   wxGISDTChoice* pCh2 = new wxGISDTChoice(m_tools);
+	//bSizer4->Add( pCh2, 0, wxEXPAND, 5 );
+ //   wxGISDTChoice* pCh3 = new wxGISDTChoice(m_tools);
+	//bSizer4->Add( pCh3, 0, wxEXPAND, 5 );
+ //   wxGISDTChoice* pCh4 = new wxGISDTChoice(m_tools);
+	//bSizer4->Add( pCh4, 0, wxEXPAND, 5 );
+ //   wxGISDTChoice* pCh5 = new wxGISDTChoice(m_tools);
+	//bSizer4->Add( pCh5, 0, wxEXPAND, 5 );
+ //   wxGISDTChoice* pCh6 = new wxGISDTChoice(m_tools);
+	//bSizer4->Add( pCh6, 0, wxEXPAND, 5 );
+
+ //   wxGISDTChoice* pCh7 = new wxGISDTChoice(m_tools);
+	//bSizer4->Add( pCh7, 0, wxEXPAND, 5 );
+ //   wxGISDTChoice* pCh8 = new wxGISDTChoice(m_tools);
+	//bSizer4->Add( pCh8, 0, wxEXPAND, 5 );
+ //   wxGISDTChoice* pCh9 = new wxGISDTChoice(m_tools);
+	//bSizer4->Add( pCh9, 0, wxEXPAND, 5 );
+ //   wxGISDTChoice* pCh10 = new wxGISDTChoice(m_tools);
+	//bSizer4->Add( pCh10, 0, wxEXPAND, 5 );
+ //   wxGISDTChoice* pCh11 = new wxGISDTChoice(m_tools);
+	//bSizer4->Add( pCh11, 0, wxEXPAND, 5 );
+ //   wxGISDTChoice* pCh12 = new wxGISDTChoice(m_tools);
+	//bSizer4->Add( pCh12, 0, wxEXPAND, 5 );
+    }
+
+    m_tools->SetSizer( bSizer4 );
+	m_tools->Layout();
+	bSizer4->Fit( m_tools );
+
+	bSizer2->Add( m_tools/*bSizer4*/, 1, wxEXPAND, 5 );
 	
 	m_sdbSizer1 = new wxStdDialogButtonSizer();
 	m_sdbSizer1OK = new wxButton( m_toolpanel, wxID_OK, wxString(_("OK")) );
@@ -98,6 +160,7 @@ wxGISGPToolDlg::wxGISGPToolDlg( wxWindow* parent, wxWindowID id, const wxString&
 
 wxGISGPToolDlg::~wxGISGPToolDlg()
 {
+    wxDELETE(m_pTool);
 }
 
 void wxGISGPToolDlg::OnHelp(wxCommandEvent& event)
@@ -126,4 +189,14 @@ void wxGISGPToolDlg::OnHelpUI(wxUpdateUIEvent& event)
     event.SetText(m_splitter->IsSplit() == true ? _("Hide Help <<") : _("Show Help >>"));
 }
 
+void wxGISGPToolDlg::OnOk(wxCommandEvent& event)
+{
+    //event.Skip();
+}
+
+void wxGISGPToolDlg::OnCancel(wxCommandEvent& event)
+{
+    //store properties
+    delete this;
+}
 
