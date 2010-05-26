@@ -210,7 +210,7 @@ void wxGxRootToolbox::LoadChildren(void)
         pChild = pChild->GetNext();
     }
 
-    m_pToolMngr = new wxGISGPToolManager(pToolsChild);
+    m_pToolMngr = new wxGISGPToolManager(pToolsChild, m_pCatalog);
     LoadChildrenFromXml(pToolboxesChild);
 
  //   //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
@@ -318,8 +318,9 @@ bool wxGxTool::Invoke(wxWindow* pParentWnd)
     IGPTool* pTool = m_pToolMngr->GetTool(m_sInternalName);
     if(pTool)
     {
-        wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(pTool, m_pPropNode);//pParentWnd);
+        wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(pTool, m_pPropNode);//, pParentWnd);//
         pDlg->Show(true);
+        //pDlg->SetParent(pParentWnd);
     //dlg.ShowModal();//(true);
     }
     return false;

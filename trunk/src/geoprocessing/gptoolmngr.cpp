@@ -25,9 +25,10 @@
 /// Class wxGISGPToolManager
 ///////////////////////////////////////////////////////////////////////////////
 
-wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode)
+wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode, IGxCatalog* pCatalog) : m_pCatalog(NULL)
 {
     m_pToolsNode = pToolsNode;
+    m_pCatalog = pCatalog;
     wxXmlNode *pChild = m_pToolsNode->GetChildren();
     while (pChild) 
     {
@@ -60,7 +61,11 @@ wxGISGPToolManager::~wxGISGPToolManager(void)
 IGPTool* wxGISGPToolManager::GetTool(wxString sToolName)
 {
 	wxObject *pObj = wxCreateDynamicObject(m_ToolsMap[sToolName]);
-	return dynamic_cast<IGPTool*>(pObj);
+    IGPTool* pTool = dynamic_cast<IGPTool*>(pObj);
+    if(!pTool)
+        return NULL;
+    pTool->SetCatalog(m_pCatalog);
+	return pTool;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -70,6 +75,7 @@ wxGISGPParameter::wxGISGPParameter()
 {
     m_bAltered = false;
     m_bHasBeenValidated = false;
+    m_bIsValid = false;
     m_pDomain = NULL;
 }
 
@@ -96,6 +102,16 @@ bool wxGISGPParameter::GetHasBeenValidated(void)
 void wxGISGPParameter::SetHasBeenValidated(bool bHasBeenValidated)
 {
     m_bHasBeenValidated = bHasBeenValidated;
+}
+
+bool wxGISGPParameter::GetIsValid(void)
+{
+    return m_bIsValid;
+}
+
+void wxGISGPParameter::SetIsValid(bool bIsValid)
+{
+    m_bIsValid = bIsValid;
 }
 
 wxString wxGISGPParameter::GetName(void)
@@ -157,9 +173,9 @@ void wxGISGPParameter::SetParameterType(wxGISEnumGPParameterType nType)
     m_ParameterType = nType;
 }
 
-wxVariant* wxGISGPParameter::GetValue(void)
+wxVariant wxGISGPParameter::GetValue(void)
 {
-    return &m_Value;
+    return m_Value;
 }
 
 void wxGISGPParameter::SetValue(wxVariant Val)

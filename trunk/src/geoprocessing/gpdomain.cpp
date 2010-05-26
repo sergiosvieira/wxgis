@@ -19,5 +19,31 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#include "wxgis/geoprocessingui/gpdomain.h"
+#include "wxgis/geoprocessing/gpdomain.h"
 
+wxGISGPGxObjectDomain::wxGISGPGxObjectDomain(void)
+{
+}
+
+wxGISGPGxObjectDomain::~wxGISGPGxObjectDomain(void)
+{
+    for(size_t i = 0; i < m_FilterArray.size(); i++)
+        wxDELETE(m_FilterArray[i]);
+}
+
+void wxGISGPGxObjectDomain::AddFilter(IGxObjectFilter* pFilter)
+{
+    m_FilterArray.push_back(pFilter);
+}
+
+IGxObjectFilter* wxGISGPGxObjectDomain::GetFilter(size_t nIndex)
+{
+    if(nIndex >= GetFilterCount())
+        return NULL;
+    return m_FilterArray[nIndex];
+}
+
+size_t wxGISGPGxObjectDomain::GetFilterCount(void)
+{
+    return m_FilterArray.size();
+}

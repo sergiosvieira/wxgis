@@ -309,7 +309,7 @@ BEGIN_EVENT_TABLE(wxGxObjectDialog, wxDialog)
     EVT_UPDATE_UI(wxID_OK, wxGxObjectDialog::OnOKUI)
 END_EVENT_TABLE()
 
-wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pDropDownCommand(NULL), m_bAllowMultiSelect(false), m_bOverwritePrompt(false), m_nDefaultFilter(0), m_pConfig(NULL), m_pwxGxContentView(NULL), m_PopupCtrl(NULL), m_bAllFilters(true)
+wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pDropDownCommand(NULL), m_bAllowMultiSelect(false), m_bOverwritePrompt(false), m_nDefaultFilter(0), m_pConfig(NULL), m_pwxGxContentView(NULL), m_PopupCtrl(NULL), m_bAllFilters(true), m_bOwnFilter(true)
 {
 	this->SetSizeHints( wxSize( 400,300 ), wxDefaultSize );
 
@@ -657,8 +657,9 @@ void wxGxObjectDialog::AddFilter(IGxObjectFilter* pFilter, bool bDefault)
 
 void wxGxObjectDialog::RemoveAllFilters(void)
 {
-	for(size_t i = 0; i < m_FilterArray.size(); i++)
-		wxDELETE(m_FilterArray[i]);
+    if(m_bOwnFilter)
+        for(size_t i = 0; i < m_FilterArray.size(); i++)
+            wxDELETE(m_FilterArray[i]);
 }
 
 void wxGxObjectDialog::OnFilerSelect(wxCommandEvent& event)
@@ -707,6 +708,15 @@ void wxGxObjectDialog::OnOK(wxCommandEvent& event)
         else
         {
             IGxSelection* pSel = m_pwxGxContentView->GetSelectedObjects();
+
+            IGxObject* pGxObj = pSel->GetSelectedObjects(0);
+            IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObj);
+            if(pObjCont)
+            {
+                m_pCatalog->GetSelection()->Select(pGxObj, false, IGxSelection::INIT_ALL);
+                return;
+            }
+
             for(size_t i = 0; i < pSel->GetCount(); i++)
             {
                 m_ObjectArray.push_back(pSel->GetSelectedObjects(i));

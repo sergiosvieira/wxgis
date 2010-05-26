@@ -37,7 +37,7 @@
 #include <wx/file.h>
 
 #include "wxgis/catalogui/gxobjdialog.h"
-#include "wxgis/catalogui/gxfilters.h"
+#include "wxgis/catalog/gxfilters.h"
 #include "wxgis/catalog/gxfile.h"
 #include "wxgis/carto/mapview.h"
 

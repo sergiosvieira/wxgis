@@ -18,7 +18,10 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+#include "wxgis/geoprocessing/gpdomain.h"
+#include "wxgis/catalogui/gxobjdialog.h"
 #include "wxgis/geoprocessingui/gpcontrols.h"
+#include "wx/dnd.h"
 
 #include "../../art/state_16.xpm"
 #include "../../art/open_16.xpm"
@@ -39,6 +42,35 @@ wxGISDTBase::~wxGISDTBase()
 {
 }
 
+IGPParameter* wxGISDTBase::GetParameter(void)
+{
+    return m_pParam;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISTextCtrl
+///////////////////////////////////////////////////////////////////////////////
+BEGIN_EVENT_TABLE(wxGISTextCtrl, wxTextCtrl)
+    EVT_KILL_FOCUS(wxGISTextCtrl::OnKillFocus)
+END_EVENT_TABLE()
+
+wxGISTextCtrl::wxGISTextCtrl(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, long style, const wxValidator& validator, const wxString& name) : wxTextCtrl(parent, id, value, pos, size, style, validator, name)
+{
+    m_pBaseCtrl = dynamic_cast<wxGISDTBase*>(parent);
+}
+
+wxGISTextCtrl::~wxGISTextCtrl(void)
+{
+}
+
+void wxGISTextCtrl::OnKillFocus(wxFocusEvent& event)
+{
+    event.Skip();
+    IGPParameter* pParam = m_pBaseCtrl->GetParameter();
+    pParam->SetValue(wxVariant(GetValue(), wxT("path")));
+    pParam->SetAltered(true);
+    m_pBaseCtrl->Validate();
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISDTPath
@@ -48,8 +80,9 @@ BEGIN_EVENT_TABLE(wxGISDTPath, wxPanel)
 	EVT_BUTTON(wxID_OPEN, wxGISDTPath::OnOpen)
 END_EVENT_TABLE()
 
-wxGISDTPath::wxGISDTPath( IGPParameter* pParam, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxGISDTBase( pParam, parent, id, pos, size, style )
+wxGISDTPath::wxGISDTPath( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxGISDTBase( pParam, parent, id, pos, size, style )
 {
+    m_pCatalog = pCatalog;
 	wxFlexGridSizer* fgSizer1;
 	fgSizer1 = new wxFlexGridSizer( 2, 2, 0, 0 );
 	fgSizer1->AddGrowableCol( 1 );
@@ -70,8 +103,9 @@ wxGISDTPath::wxGISDTPath( IGPParameter* pParam, wxWindow* parent, wxWindowID id,
 	wxBoxSizer* bPathSizer;
 	bPathSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_PathTextCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bPathSizer->Add( m_PathTextCtrl, 1, wxALL|wxEXPAND, 5 );
+	m_PathTextCtrl = new wxGISTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_BESTWRAP );
+    //m_PathTextCtrl->SetDropTarget(new wxFileDropTarget());
+	bPathSizer->Add( m_PathTextCtrl, 1, wxALL|wxEXPAND, 5 );     
 	
 	m_bpButton = new wxBitmapButton( this, wxID_OPEN, wxBitmap(open_16_xpm), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	//m_bpButton = new wxBitmapButton( this, wxID_ANY, wxBitmap(sql_16_xpm), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
@@ -86,9 +120,110 @@ wxGISDTPath::~wxGISDTPath()
 {
 }
 
+void wxGISDTPath::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
+{
+    switch(nType)
+    {
+    case wxGISEnumGPMessageInformation:
+        m_StateBitmap->SetBitmap(m_ImageList.GetIcon(0));
+        break;
+    case wxGISEnumGPMessageError:
+        m_StateBitmap->SetBitmap(m_ImageList.GetIcon(2));
+        break;
+    case wxGISEnumGPMessageWarning:
+        m_StateBitmap->SetBitmap(m_ImageList.GetIcon(3));
+        break;
+    case wxGISEnumGPMessageOk:
+        m_StateBitmap->SetBitmap(m_ImageList.GetIcon(1));
+        break;
+    case wxGISEnumGPMessageNone:
+        m_StateBitmap->SetBitmap(wxNullBitmap);
+        break;
+    default:
+    case wxGISEnumGPMessageUnknown:
+        m_StateBitmap->SetBitmap(wxNullBitmap);
+        break;
+    }
+    m_StateBitmap->SetToolTip(sMsg);
+}
+
+//void wxGISDTPath::OnTextChanged(wxCommandEvent& event)
+//{
+//}
+
 void wxGISDTPath::OnOpen(wxCommandEvent& event)
 {
-    //m_pParam
+    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParam->GetDomain());
+
+    if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
+    {        
+        wxGxObjectDialog dlg(this, wxID_ANY, _("Select input object")); 
+        dlg.SetAllowMultiSelect(false);
+        dlg.SetAllFilters(false);
+        dlg.SetOwnsFilter(false);
+        if(pDomain)
+        {
+            for(size_t i = 0; i < pDomain->GetFilterCount(); i++)
+                dlg.AddFilter(pDomain->GetFilter(i), false);
+        }
+        dlg.SetOverwritePrompt(false);
+        if(dlg.ShowModalOpen() == wxID_OK)
+        {
+            wxString sPath = dlg.GetFullPath();
+            sPath.Replace(wxT("\\\\"), wxT("\\"));
+            m_PathTextCtrl->ChangeValue( sPath );
+            m_pParam->SetValue(wxVariant(sPath, wxT("path")));
+            m_pParam->SetAltered(true);
+            Validate();
+        }
+    }
+    else
+    {
+        wxGxObjectDialog dlg(this, wxID_ANY, _("Select output object")); 
+        //dlg.SetName(sName);???
+        dlg.SetAllowMultiSelect(false);
+        dlg.SetAllFilters(false);
+        dlg.SetOwnsFilter(false);
+        if(pDomain)
+        {
+            for(size_t i = 0; i < pDomain->GetFilterCount(); i++)
+                dlg.AddFilter(pDomain->GetFilter(i), false);
+        }
+        dlg.SetOverwritePrompt(false);
+        if(dlg.ShowModalSave() == wxID_OK)
+        {
+            m_pParam->SetAltered(true);
+            Validate();
+        }
+    }
+}
+
+//validate
+bool wxGISDTPath::Validate(void)
+{
+    wxString sPath = m_pParam->GetValue();
+    if(sPath.IsEmpty())
+        return true;
+    if(m_pCatalog)
+    {
+        IGxObjectContainer* pGxContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
+        IGxObject* pGxObj = pGxContainer->SearchChild(sPath);
+        if(pGxObj)
+        {
+            m_pParam->SetIsValid(true);
+            SetMessage(wxGISEnumGPMessageOk, wxEmptyString);
+        }
+        else
+        {
+            m_pParam->SetIsValid(false);
+            SetMessage(wxGISEnumGPMessageError, _("The input object is not exist"));
+        }
+
+        //int ret = VSIStatL((const char*) sFolderPath.mb_str(*m_pMBConv), &BufL);
+        //if(ret == 0)
+    }
+    //validate in dialog all parameters
+    return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

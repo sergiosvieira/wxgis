@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#include "wxgis/catalogui/gxfilters.h"
+#include "wxgis/catalog/gxfilters.h"
 #include "wxgis/catalog/gxfile.h"
 #include "wxgis/catalog/gxspatreffolder.h"
 #include "wxgis/datasource/datasource.h"

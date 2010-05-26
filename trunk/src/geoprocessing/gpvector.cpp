@@ -106,7 +106,7 @@ bool CopyRows(wxGISFeatureDataset* pSrcDataSet, wxGISFeatureDataset* pDstDataSet
                     //wxString sFieldString(cplstr.
                     ////wxString sFieldString(wgMB2WX(pFeature->GetFieldAsString(i)));
                     //wxCSConv outconv(OutputEncoding);
-                    //pFeature->SetField(i, sFieldString.mb_str(outconv));                        
+                    //pFeature->SetField(i, sFieldString.mb_str(outconv));   
 
                     if(OutputEncoding == wxFONTENCODING_DEFAULT)
                         pFeature->SetField(i, wgWX2MB(sFieldString));

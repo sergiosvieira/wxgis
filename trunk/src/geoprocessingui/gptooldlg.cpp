@@ -73,7 +73,7 @@ wxGISGPToolDlg::wxGISGPToolDlg( IGPTool* pTool, wxXmlNode* pPropNode, wxWindow* 
             {
             case enumGISGPParamDTPath:
                 {
-                    wxGISDTPath* pPath = new wxGISDTPath(pParam, m_tools);
+                    wxGISDTPath* pPath = new wxGISDTPath(pParam, m_pTool->GetCatalog(), m_tools);
                     bSizer4->Add( pPath, 0, wxEXPAND, 5 );
                 }
                 break;

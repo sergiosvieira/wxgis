@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib cpld.lib ogrd.lib gdald.lib wxGISFrameworkd.lib wxGISCored.lib wxGISDatasourced.lib"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib cpld.lib ogrd.lib gdald.lib wxGISFrameworkd.lib wxGISCored.lib wxGISDatasourced.lib wxGISCatalogd.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				AdditionalLibraryDirectories="&quot;$(GDAL)\wxGIS\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib"
 				GenerateDebugInformation="true"
@@ -182,6 +182,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\src\geoprocessing\gpdomain.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\geoprocessing\gpexporttool.cpp"
 				>
 			</File>
@@ -201,6 +205,10 @@
 			>
 			<File
 				RelativePath="..\..\include\wxgis\geoprocessing\geoprocessing.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geoprocessing\gpdomain.h"
 				>
 			</File>
 			<File

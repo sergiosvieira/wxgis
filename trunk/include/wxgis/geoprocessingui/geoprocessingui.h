@@ -26,4 +26,14 @@
 
 #define SASHCTRLID	1012
 
+enum wxGISEnumGPMessageType
+{
+    wxGISEnumGPMessageUnknown = 0,
+	wxGISEnumGPMessageInformation,
+	wxGISEnumGPMessageError,
+	wxGISEnumGPMessageWarning,
+	wxGISEnumGPMessageOk,
+	wxGISEnumGPMessageNone
+};
+
 

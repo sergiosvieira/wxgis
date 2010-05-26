@@ -30,12 +30,13 @@
 class WXDLLIMPEXP_GIS_GP wxGISGPToolManager
 {
 public:
-    wxGISGPToolManager(wxXmlNode* pToolsNode);
+    wxGISGPToolManager(wxXmlNode* pToolsNode, IGxCatalog* pCatalog = NULL);
     ~wxGISGPToolManager(void);
     IGPTool* GetTool(wxString sToolName);
 protected:
     wxXmlNode* m_pToolsNode;
     std::map<wxString, wxString> m_ToolsMap; //internal name, class name
+    IGxCatalog* m_pCatalog;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,6 +53,8 @@ public:
     virtual void SetAltered(bool bAltered);
     virtual bool GetHasBeenValidated(void);
     virtual void SetHasBeenValidated(bool bHasBeenValidated);
+    virtual bool GetIsValid(void);
+    virtual void SetIsValid(bool bIsValid);
     virtual wxString GetName(void);
     virtual void SetName(wxString sName);
     virtual wxString GetDisplayName(void);
@@ -64,13 +67,14 @@ public:
     virtual void AddParameterDependency(wxString sDependency);
     virtual wxGISEnumGPParameterType GetParameterType(void);
     virtual void SetParameterType(wxGISEnumGPParameterType nType);
-    virtual wxVariant* GetValue(void);
+    virtual wxVariant GetValue(void);
     virtual void SetValue(wxVariant Val);
     virtual IGPDomain* GetDomain(void);
     virtual void SetDomain(IGPDomain* pDomain);
 protected:
     bool m_bAltered;
     bool m_bHasBeenValidated;
+    bool m_bIsValid;
     wxString m_sName;
     wxString m_sDisplayName;
     wxGISEnumGPParameterDataType m_DataType;

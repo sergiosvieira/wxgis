@@ -33,13 +33,6 @@
 #define FILTERCOMBO	1011 //wxGxObjectDialog
 #define WXGISHIGHEST	1200 //
 
-enum wxGISEnumSaveObjectResults
-{
-	enumGISSaveObjectNone = 0x0000, 
-	enumGISSaveObjectAccept = 0x0001,
-	enumGISSaveObjectExists = 0x0002,
-	enumGISSaveObjectDeny = 0x0004
-};
 
 class IGxViewsFactory
 {
@@ -65,18 +58,3 @@ public:
 	virtual void Refresh(void) = 0;
 	virtual wxString GetName(void) = 0;
 };
-
-class IGxObjectFilter
-{
-public:
-	virtual ~IGxObjectFilter(void){};
-	virtual bool CanChooseObject( IGxObject* pObject ) = 0;//, esriDoubleClickResult* result
-	virtual bool CanDisplayObject( IGxObject* pObject ) = 0;
-	virtual wxGISEnumSaveObjectResults CanSaveObject( IGxObject* pLocation, wxString sName ) = 0;
-	virtual wxString GetName(void) = 0;
-    virtual wxString GetExt(void) = 0;
-    virtual wxString GetDriver(void) = 0;
-    virtual int GetSubType(void) = 0;
-};
-
-typedef std::vector<IGxObjectFilter*> OBJECTFILTERS, *LPOBJECTFILTERS;

@@ -22,6 +22,7 @@
 #pragma once
 
 #include "wxgis/datasource/datasource.h"
+#include "wxgis/catalog/catalog.h"
 
 //GPFunctionTool 1
 //GPModelTool 2
@@ -49,7 +50,8 @@ enum wxGISEnumGPParameterDataType
 	enumGISGPParamDTDouble,
 	enumGISGPParamDTString,
 
-	enumGISGPParamDTPath
+	enumGISGPParamDTPath,
+	enumGISGPParamDTPathArray
 };
 
 class IGPDomain
@@ -66,6 +68,8 @@ public:
     virtual void SetAltered(bool bAltered) = 0;
     virtual bool GetHasBeenValidated(void) = 0;
     virtual void SetHasBeenValidated(bool bHasBeenValidated) = 0;
+    virtual bool GetIsValid(void) = 0;
+    virtual void SetIsValid(bool bIsValidated) = 0;
     virtual wxString GetName(void) = 0;
     virtual void SetName(wxString sName) = 0;
     virtual wxString GetDisplayName(void) = 0;
@@ -78,7 +82,7 @@ public:
     virtual void AddParameterDependency(wxString sDependency) = 0;
     virtual wxGISEnumGPParameterType GetParameterType(void) = 0;
     virtual void SetParameterType(wxGISEnumGPParameterType nType) = 0;
-    virtual wxVariant* GetValue(void) = 0;
+    virtual wxVariant GetValue(void) = 0;
     virtual void SetValue(wxVariant Val) = 0;
     virtual IGPDomain* GetDomain(void) = 0;
     virtual void SetDomain(IGPDomain* pDomain) = 0;
@@ -96,5 +100,7 @@ public:
     //virtual Execute(...) = 0;
     virtual GPParameters* GetParameterInfo(void) = 0;
     //virtual GetToolType(void) = 0;
+    virtual void SetCatalog(IGxCatalog* pCatalog) = 0;
+    virtual IGxCatalog* GetCatalog(void) = 0;
 };
 
