@@ -205,10 +205,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\catalogui\gxfilters.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\catalogui\gxlocationcombobox.cpp"
 				>
 			</File>
@@ -280,10 +276,6 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalogui\gxcontentview.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\catalogui\gxfilters.h"
 				>
 			</File>
 			<File

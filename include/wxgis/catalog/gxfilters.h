@@ -21,17 +21,17 @@
 
 #pragma once
 
-#include "wxgis/catalogui/catalogui.h"
+#include "wxgis/catalog/catalog.h"
 
 //------------------------------------------------------------
 // wxGxObjectFilter
 //------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CLU wxGxObjectFilter : public IGxObjectFilter
+class WXDLLIMPEXP_GIS_CLT wxGxObjectFilter : public IGxObjectFilter
 {
 public:
 	wxGxObjectFilter(void);
-	~wxGxObjectFilter(void);
+	virtual ~wxGxObjectFilter(void);
 	virtual bool CanChooseObject( IGxObject* pObject );
 	virtual bool CanDisplayObject( IGxObject* pObject );
 	virtual wxGISEnumSaveObjectResults CanSaveObject( IGxObject* pLocation, wxString sName );
@@ -45,11 +45,11 @@ public:
 // wxGxPrjFileFilter
 //------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CLU wxGxPrjFileFilter : public wxGxObjectFilter
+class WXDLLIMPEXP_GIS_CLT wxGxPrjFileFilter : public wxGxObjectFilter
 {
 public:
 	wxGxPrjFileFilter(void);
-	~wxGxPrjFileFilter(void);
+	virtual ~wxGxPrjFileFilter(void);
 	virtual bool CanChooseObject( IGxObject* pObject );
 	virtual bool CanDisplayObject( IGxObject* pObject );
 	virtual wxGISEnumSaveObjectResults CanSaveObject( IGxObject* pLocation, wxString sName );
@@ -61,11 +61,11 @@ public:
 // wxGxRasterDatasetFilter
 //------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CLU wxGxRasterDatasetFilter : public wxGxObjectFilter
+class WXDLLIMPEXP_GIS_CLT wxGxRasterDatasetFilter : public wxGxObjectFilter
 {
 public:
 	wxGxRasterDatasetFilter(void);
-	~wxGxRasterDatasetFilter(void);
+	virtual ~wxGxRasterDatasetFilter(void);
 	virtual bool CanChooseObject( IGxObject* pObject );
 	virtual bool CanDisplayObject( IGxObject* pObject );
 	virtual wxString GetName(void);
@@ -75,11 +75,11 @@ public:
 // wxGxShapeFileFilter
 //------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CLU wxGxShapeFileFilter : public wxGxObjectFilter
+class WXDLLIMPEXP_GIS_CLT wxGxShapeFileFilter : public wxGxObjectFilter
 {
 public:
 	wxGxShapeFileFilter(void);
-	~wxGxShapeFileFilter(void);
+	virtual ~wxGxShapeFileFilter(void);
 	virtual bool CanChooseObject( IGxObject* pObject );
 	virtual bool CanDisplayObject( IGxObject* pObject );
 	virtual wxString GetName(void);
@@ -92,11 +92,11 @@ public:
 // wxGxMapInfoFilter
 //------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CLU wxGxMapInfoFilter : public wxGxShapeFileFilter
+class WXDLLIMPEXP_GIS_CLT wxGxMapInfoFilter : public wxGxShapeFileFilter
 {
 public:
 	wxGxMapInfoFilter(bool bIsTab = true);
-	~wxGxMapInfoFilter(void);
+	virtual ~wxGxMapInfoFilter(void);
 	virtual wxString GetName(void);
     virtual wxString GetExt(void);
     virtual wxString GetDriver(void);
@@ -109,11 +109,11 @@ protected:
 // wxGxKMLFilter
 //------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CLU wxGxKMLFilter : public wxGxShapeFileFilter
+class WXDLLIMPEXP_GIS_CLT wxGxKMLFilter : public wxGxShapeFileFilter
 {
 public:
 	wxGxKMLFilter(void);
-	~wxGxKMLFilter(void);
+	virtual ~wxGxKMLFilter(void);
 	virtual wxString GetName(void);
     virtual wxString GetExt(void);
     virtual wxString GetDriver(void);
@@ -125,11 +125,11 @@ public:
 // wxGxDXFFilter
 //------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CLU wxGxDXFFilter : public wxGxShapeFileFilter
+class WXDLLIMPEXP_GIS_CLT wxGxDXFFilter : public wxGxShapeFileFilter
 {
 public:
 	wxGxDXFFilter(void);
-	~wxGxDXFFilter(void);
+	virtual ~wxGxDXFFilter(void);
 	virtual wxString GetName(void);
     virtual wxString GetExt(void);
     virtual wxString GetDriver(void);
@@ -140,11 +140,11 @@ public:
 // wxGxFolderFilter
 //------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CLU wxGxFolderFilter : public wxGxObjectFilter
+class WXDLLIMPEXP_GIS_CLT wxGxFolderFilter : public wxGxObjectFilter
 {
 public:
 	wxGxFolderFilter(void);
-	~wxGxFolderFilter(void);
+	virtual ~wxGxFolderFilter(void);
 	virtual bool CanChooseObject( IGxObject* pObject );
 	virtual bool CanDisplayObject( IGxObject* pObject );
 	virtual wxString GetName(void);

@@ -211,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\catalog\gxfilters.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\catalog\gxfolder.cpp"
 				>
 			</File>
@@ -278,6 +282,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalog\gxfilefactory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalog\gxfilters.h"
 				>
 			</File>
 			<File

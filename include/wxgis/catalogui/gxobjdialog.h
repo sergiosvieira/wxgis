@@ -210,6 +210,7 @@ public:
 	virtual int ShowModalOpen();
 	virtual int ShowModalSave();
 	virtual void AddFilter(IGxObjectFilter* pFilter, bool bDefault = false);
+    virtual void SetOwnsFilter(bool bOwnFilter){m_bOwnFilter = bOwnFilter;};
 	virtual void RemoveAllFilters(void);
     virtual GxObjectArray* GetSelectedObjects(void){return &m_ObjectArray;}
     virtual wxString GetName(void);
@@ -250,6 +251,7 @@ protected:
     GxObjectArray m_ObjectArray;
     int m_nRetCode;
    	WINDOWARRAY m_WindowArray;
+    bool m_bOwnFilter;
 
     DECLARE_EVENT_TABLE()
 };

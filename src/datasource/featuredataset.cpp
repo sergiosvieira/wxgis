@@ -344,6 +344,7 @@ bool wxGISFeatureDataset::Open(int iLayer)
         //m_poLayer = m_poDS->ExecuteSQL(wgWX2MB(sStatement), NULL, NULL);
 	    if(m_poLayer)
 	    {
+            //OGREncoding nEnc = m_poLayer->GetEncoding();
             //const char *txxt = m_poLayer->GetLayerDefn()->GetName();
 		    //bool bOLCFastGetExtent = pOGRLayer->TestCapability(OLCFastGetExtent);
       //      if(bOLCFastGetExtent)

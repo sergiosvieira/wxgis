@@ -21,6 +21,8 @@
 
 #include "wxgis/geoprocessing/gpexporttool.h"
 #include "wxgis/geoprocessing/gptoolmngr.h"
+#include "wxgis/geoprocessing/gpdomain.h"
+#include "wxgis/catalog/gxfilters.h"
 
 /////////////////////////////////////////////////////////////////////////
 // wxGISGPExportTool
@@ -28,7 +30,7 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISGPExportTool, wxObject)
 
-wxGISGPExportTool::wxGISGPExportTool(void) : m_pParamArr(NULL)
+wxGISGPExportTool::wxGISGPExportTool(void) : m_pParamArr(NULL), m_pCatalog(NULL)
 {
 }
 
@@ -70,6 +72,11 @@ GPParameters* wxGISGPExportTool::GetParameterInfo(void)
     pParam1->SetParameterType(enumGISGPParameterTypeRequired);
     pParam1->SetDataType(enumGISGPParamDTPath);
     pParam1->SetDirection(enumGISGPParameterDirectionInput);
+
+    wxGISGPGxObjectDomain* pDomain = new wxGISGPGxObjectDomain();
+    pDomain->AddFilter(new wxGxShapeFileFilter());
+    pParam1->SetDomain(pDomain);
+
     m_pParamArr->push_back(pParam1);
 
     //SQL statement
@@ -78,3 +85,16 @@ GPParameters* wxGISGPExportTool::GetParameterInfo(void)
 
     return m_pParamArr;
 }
+
+void wxGISGPExportTool::SetCatalog(IGxCatalog* pCatalog)
+{
+    m_pCatalog = pCatalog;
+}
+
+IGxCatalog* wxGISGPExportTool::GetCatalog(void)
+{
+    return m_pCatalog;
+}
+
+
+

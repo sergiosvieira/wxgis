@@ -21,11 +21,17 @@
 
 #pragma once
 
-#include "wxgis/geoprocessingui/geoprocessingui.h"
+#include "wxgis/geoprocessing/geoprocessing.h"
+#include "wxgis/catalog/catalog.h"
 
-class wxGISGPGxObjectDomain : public IGPDomain
+class WXDLLIMPEXP_GIS_GP wxGISGPGxObjectDomain : public IGPDomain
 {
 public:
     wxGISGPGxObjectDomain (void);
-    ~wxGISGPGxObjectDomain (void);
+    virtual ~wxGISGPGxObjectDomain (void);
+	virtual void AddFilter(IGxObjectFilter* pFilter);
+    virtual IGxObjectFilter* GetFilter(size_t nIndex);
+    virtual size_t GetFilterCount(void);
+protected:
+	OBJECTFILTERS m_FilterArray;
 };

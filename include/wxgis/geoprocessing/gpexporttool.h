@@ -41,6 +41,9 @@ public:
     virtual wxString GetName(void);
     virtual wxString GetCategory(void);
     virtual GPParameters* GetParameterInfo(void);
+    virtual void SetCatalog(IGxCatalog* pCatalog);
+    virtual IGxCatalog* GetCatalog(void);
 protected:
     GPParameters* m_pParamArr;
+    IGxCatalog* m_pCatalog;
 };

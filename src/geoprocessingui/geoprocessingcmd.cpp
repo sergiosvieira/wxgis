@@ -28,7 +28,7 @@
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalogui/gxobjdialog.h"
 #include "wxgis/catalogui/gxcontdialog.h"
-#include "wxgis/catalogui/gxfilters.h"
+#include "wxgis/catalog/gxfilters.h"
 #include "wxgis/geoprocessing/gpvector.h"
 #include "wxgis/framework/progressdlg.h"
 
