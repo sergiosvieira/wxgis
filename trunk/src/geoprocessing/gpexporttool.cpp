@@ -30,18 +30,14 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISGPExportTool, wxObject)
 
-wxGISGPExportTool::wxGISGPExportTool(void) : m_pParamArr(NULL), m_pCatalog(NULL)
+wxGISGPExportTool::wxGISGPExportTool(void) : m_pCatalog(NULL)
 {
 }
 
 wxGISGPExportTool::~wxGISGPExportTool(void)
 {
-    if(m_pParamArr)
-    {
-        for(size_t i = 0; i < m_pParamArr->size(); i++)
-            wxDELETE(m_pParamArr->operator[](i));
-        wxDELETE(m_pParamArr);
-    }
+    for(size_t i = 0; i < m_pParamArr.size(); i++)
+        wxDELETE(m_pParamArr[i]);
 }
 
 wxString wxGISGPExportTool::GetDisplayName(void)
@@ -61,29 +57,42 @@ wxString wxGISGPExportTool::GetCategory(void)
 
 GPParameters* wxGISGPExportTool::GetParameterInfo(void)
 {
-    if(m_pParamArr)
-        return m_pParamArr;
-    m_pParamArr = new GPParameters;
+    if(m_pParamArr.empty())
+    {
+        //src path
+        wxGISGPParameter* pParam1 = new wxGISGPParameter();
+        pParam1->SetName(wxT("src_path"));
+        pParam1->SetDisplayName(_("Source feature class"));
+        pParam1->SetParameterType(enumGISGPParameterTypeRequired);
+        pParam1->SetDataType(enumGISGPParamDTPath);
+        pParam1->SetDirection(enumGISGPParameterDirectionInput);
 
-    //src path
-    wxGISGPParameter* pParam1 = new wxGISGPParameter();
-    pParam1->SetName(wxT("src_path"));
-    pParam1->SetDisplayName(_("Source feature class"));
-    pParam1->SetParameterType(enumGISGPParameterTypeRequired);
-    pParam1->SetDataType(enumGISGPParamDTPath);
-    pParam1->SetDirection(enumGISGPParameterDirectionInput);
+        wxGISGPGxObjectDomain* pDomain1 = new wxGISGPGxObjectDomain();
+        pDomain1->AddFilter(new wxGxShapeFileFilter());
+        pParam1->SetDomain(pDomain1);
 
-    wxGISGPGxObjectDomain* pDomain = new wxGISGPGxObjectDomain();
-    pDomain->AddFilter(new wxGxShapeFileFilter());
-    pParam1->SetDomain(pDomain);
+        m_pParamArr.push_back(pParam1);
 
-    m_pParamArr->push_back(pParam1);
+        //SQL statement
 
-    //SQL statement
+        //dst path
+        wxGISGPParameter* pParam2 = new wxGISGPParameter();
+        pParam2->SetName(wxT("dst_path"));
+        pParam2->SetDisplayName(_("Destination feature class"));
+        pParam2->SetParameterType(enumGISGPParameterTypeRequired);
+        pParam2->SetDataType(enumGISGPParamDTPath);
+        pParam2->SetDirection(enumGISGPParameterDirectionOutput);
 
-    //dst path
+        wxGISGPGxObjectDomain* pDomain2 = new wxGISGPGxObjectDomain();
+        pDomain2->AddFilter(new wxGxShapeFileFilter());
+        pParam2->SetDomain(pDomain2);
 
-    return m_pParamArr;
+        //pParam2->AddParameterDependency(wxT("src_path"));
+
+        m_pParamArr.push_back(pParam2);
+
+    }
+    return &m_pParamArr;
 }
 
 void wxGISGPExportTool::SetCatalog(IGxCatalog* pCatalog)
@@ -96,5 +105,37 @@ IGxCatalog* wxGISGPExportTool::GetCatalog(void)
     return m_pCatalog;
 }
 
+bool wxGISGPExportTool::Validate(void)
+{
+    if(!m_pParamArr[1]->GetAltered())
+    {
+        if(m_pParamArr[0]->GetIsValid())
+        {
+            //generate temp name
+            wxString sPath = m_pParamArr[0]->GetValue();
+            //wxFileName Name(sPath);
+            //Name.
+            m_pParamArr[1]->SetValue(wxVariant(sPath, wxT("path")));
+            m_pParamArr[1]->SetAltered(true);//??
+        }
+    }
 
-
+    //check if input & output types is same!
+    if(m_pParamArr[0]->GetIsValid())
+    {
+        if(!m_pParamArr[1]->GetHasBeenValidated())
+        {
+            //TODO: Maybe IGxDataset in future?
+            //IGxDataset* pDset1 = m_pCatalog->SearchChild()
+            wxFileName Name1(m_pParamArr[0]->GetValue());
+            wxFileName Name2(m_pParamArr[1]->GetValue());
+            if(Name1.GetExt() == Name2.GetExt())
+            {
+                m_pParamArr[1]->SetIsValid(false);
+                m_pParamArr[1]->SetMessage(wxGISEnumGPMessageError, _("Cannot export to the same format"));
+                return false;
+            }
+        }
+    }
+    return true;
+}

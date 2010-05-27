@@ -77,6 +77,8 @@ wxGISGPParameter::wxGISGPParameter()
     m_bHasBeenValidated = false;
     m_bIsValid = false;
     m_pDomain = NULL;
+    m_nMsgType = wxGISEnumGPMessageUnknown;
+    m_sMessage = wxEmptyString;
 }
 
 wxGISGPParameter::~wxGISGPParameter()
@@ -180,6 +182,7 @@ wxVariant wxGISGPParameter::GetValue(void)
 
 void wxGISGPParameter::SetValue(wxVariant Val)
 {
+    m_bHasBeenValidated = false;
     m_Value = Val;
 }
 
@@ -193,3 +196,18 @@ void wxGISGPParameter::SetDomain(IGPDomain* pDomain)
     m_pDomain = pDomain;
 }
 
+wxString wxGISGPParameter::GetMessage(void)
+{
+    return m_sMessage;
+}
+
+wxGISEnumGPMessageType wxGISGPParameter::GetÌessageType(void)
+{
+    return m_nMsgType;
+}
+
+void wxGISGPParameter::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
+{
+    m_sMessage = sMsg;
+    m_nMsgType = nType;
+}

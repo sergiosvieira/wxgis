@@ -630,8 +630,8 @@ void wxGxObjectDialog::OnInit()
 void wxGxObjectDialog::OnItemSelected(wxListEvent& event)
 {
 	event.Skip();
-    if(m_bIsSaveDlg)
-        return;
+    //if(m_bIsSaveDlg)
+    //    return;
 
     m_sName.Empty();
 	long item = -1;

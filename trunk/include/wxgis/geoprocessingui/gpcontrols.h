@@ -50,6 +50,7 @@ public:
     virtual ~wxGISDTBase();
     virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString) = 0;
     virtual bool Validate(void) = 0;
+    virtual void Update(void) = 0;
     virtual IGPParameter* GetParameter(void);
 protected:
 	wxStaticBitmap* m_StateBitmap;
@@ -85,8 +86,8 @@ public:
     virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString);
 //events
     virtual void OnOpen(wxCommandEvent& event);
-    //virtual void OnTextChanged(wxCommandEvent& event);
     virtual bool Validate(void);
+    virtual void Update(void);
 protected:
     wxGISTextCtrl* m_PathTextCtrl;
 	wxBitmapButton* m_bpButton;

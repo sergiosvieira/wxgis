@@ -22,6 +22,7 @@
 
 #include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/geoprocessingui/geoprocessingui.h"
+#include "wxgis/geoprocessingui/gpcontrols.h"
 
 #include <wx/intl.h>
 
@@ -72,10 +73,12 @@ public:
     virtual void OnHelpUI(wxUpdateUIEvent& event);
     virtual void OnOk(wxCommandEvent& event);
     virtual void OnCancel(wxCommandEvent& event);
+    virtual void OnOkUI(wxUpdateUIEvent& event);
 protected:
     int m_DataWidth, m_HtmlWidth;
     IGPTool* m_pTool;
     wxXmlNode* m_pPropNode;
+    std::vector<wxGISDTBase*> m_pControlsArray;
 
     DECLARE_EVENT_TABLE()
 };

@@ -20,7 +20,6 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessingui/gptooldlg.h"
-#include "wxgis/geoprocessingui/gpcontrols.h"
 
 #include "../../art/tool_16.xpm"
 
@@ -31,6 +30,7 @@ BEGIN_EVENT_TABLE(wxGISGPToolDlg, wxDialog)
 	EVT_UPDATE_UI(wxID_HELP, wxGISGPToolDlg::OnHelpUI)
 	EVT_BUTTON(wxID_CANCEL, wxGISGPToolDlg::OnCancel)
 	EVT_BUTTON(wxID_OK, wxGISGPToolDlg::OnOk)
+	EVT_UPDATE_UI(wxID_OK, wxGISGPToolDlg::OnOkUI)
 END_EVENT_TABLE()
 
 wxGISGPToolDlg::wxGISGPToolDlg( IGPTool* pTool, wxXmlNode* pPropNode, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -68,13 +68,17 @@ wxGISGPToolDlg::wxGISGPToolDlg( IGPTool* pTool, wxXmlNode* pPropNode, wxWindow* 
         {
             IGPParameter* pParam = pParams->operator[](i);
             if(!pParam)
+            {
+                m_pControlsArray.push_back(NULL);
                 continue;
+            }
             switch(pParam->GetDataType())
             {
             case enumGISGPParamDTPath:
                 {
                     wxGISDTPath* pPath = new wxGISDTPath(pParam, m_pTool->GetCatalog(), m_tools);
                     bSizer4->Add( pPath, 0, wxEXPAND, 5 );
+                    m_pControlsArray.push_back(pPath);
                 }
                 break;
             default:
@@ -116,6 +120,7 @@ wxGISGPToolDlg::wxGISGPToolDlg( IGPTool* pTool, wxXmlNode* pPropNode, wxWindow* 
 	
 	m_sdbSizer1 = new wxStdDialogButtonSizer();
 	m_sdbSizer1OK = new wxButton( m_toolpanel, wxID_OK, wxString(_("OK")) );
+    m_sdbSizer1OK->Enable(false);
 	m_sdbSizer1->AddButton( m_sdbSizer1OK );
 	m_sdbSizer1Cancel = new wxButton( m_toolpanel, wxID_CANCEL, wxString(_("Cancel")) );
 	m_sdbSizer1->AddButton( m_sdbSizer1Cancel );
@@ -200,3 +205,44 @@ void wxGISGPToolDlg::OnCancel(wxCommandEvent& event)
     delete this;
 }
 
+void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
+{
+    event.Enable(false);
+    //internal control validate
+    for(size_t i = 0; i < m_pControlsArray.size(); i++)
+    {
+        if(m_pControlsArray[i] == NULL)
+            continue;
+        //if(!m_pControlsArray[i]->Validate())
+        //    return;
+        m_pControlsArray[i]->Validate();
+    }
+
+    //tool validate
+    bool bIsValid = m_pTool->Validate();
+    
+    short nNonValid(0);
+    GPParameters* pParams = m_pTool->GetParameterInfo();
+    if(!pParams)
+        return;
+    //update controls state
+    for(size_t i = 0; i < pParams->size(); i++)
+    {
+        IGPParameter* pParam = pParams->operator[](i);
+        if(!pParam)
+            continue;
+        if(!pParam->GetIsValid())
+            nNonValid++; 
+        if(pParam->GetHasBeenValidated())
+            continue;
+        if(m_pControlsArray[i] != NULL)
+        {
+            m_pControlsArray[i]->Update();
+            m_pControlsArray[i]->SetMessage(pParam->GetÌessageType(), pParam->GetMessage());
+        }
+        pParam->SetHasBeenValidated(true);
+    }
+    if(nNonValid > 0)
+        return;
+    event.Enable(true);
+}

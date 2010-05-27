@@ -71,6 +71,9 @@ public:
     virtual void SetValue(wxVariant Val);
     virtual IGPDomain* GetDomain(void);
     virtual void SetDomain(IGPDomain* pDomain);
+    virtual wxString GetMessage(void);
+    virtual wxGISEnumGPMessageType GetÌessageType(void);
+    virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString);
 protected:
     bool m_bAltered;
     bool m_bHasBeenValidated;
@@ -82,4 +85,7 @@ protected:
     wxGISEnumGPParameterType m_ParameterType;
     wxVariant m_Value;
     IGPDomain* m_pDomain;
+    wxString m_sMessage;
+    wxGISEnumGPMessageType m_nMsgType;
+    //wxArrayString m_ParamDepStr;
 };

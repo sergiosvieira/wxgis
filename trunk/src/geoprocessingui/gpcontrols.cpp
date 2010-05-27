@@ -69,7 +69,6 @@ void wxGISTextCtrl::OnKillFocus(wxFocusEvent& event)
     IGPParameter* pParam = m_pBaseCtrl->GetParameter();
     pParam->SetValue(wxVariant(GetValue(), wxT("path")));
     pParam->SetAltered(true);
-    m_pBaseCtrl->Validate();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -90,7 +89,6 @@ wxGISDTPath::wxGISDTPath( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* 
 	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
     m_StateBitmap = new wxStaticBitmap( this, wxID_ANY, m_pParam->GetParameterType() == enumGISGPParameterTypeRequired ? m_ImageList.GetIcon(4) : wxNullBitmap , wxDefaultPosition, wxDefaultSize, 0 );
-    //m_StateBitmap->SetToolTip( wxT("some tip") );
 	fgSizer1->Add( m_StateBitmap, 0, wxALL, 5 );
 	
     m_sParamDisplayName = new wxStaticText( this, wxID_ANY, m_pParam->GetParameterType() == enumGISGPParameterTypeOptional ? m_pParam->GetDisplayName() + _(" (optional)") : m_pParam->GetDisplayName(), wxDefaultPosition, wxDefaultSize, 0 );
@@ -133,6 +131,9 @@ void wxGISDTPath::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
     case wxGISEnumGPMessageWarning:
         m_StateBitmap->SetBitmap(m_ImageList.GetIcon(3));
         break;
+    case wxGISEnumGPMessageRequired:
+        m_StateBitmap->SetBitmap(m_ImageList.GetIcon(4));
+        break;
     case wxGISEnumGPMessageOk:
         m_StateBitmap->SetBitmap(m_ImageList.GetIcon(1));
         break;
@@ -146,10 +147,6 @@ void wxGISDTPath::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
     }
     m_StateBitmap->SetToolTip(sMsg);
 }
-
-//void wxGISDTPath::OnTextChanged(wxCommandEvent& event)
-//{
-//}
 
 void wxGISDTPath::OnOpen(wxCommandEvent& event)
 {
@@ -171,10 +168,9 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
         {
             wxString sPath = dlg.GetFullPath();
             sPath.Replace(wxT("\\\\"), wxT("\\"));
-            m_PathTextCtrl->ChangeValue( sPath );
+            //m_PathTextCtrl->ChangeValue( sPath );
             m_pParam->SetValue(wxVariant(sPath, wxT("path")));
             m_pParam->SetAltered(true);
-            Validate();
         }
     }
     else
@@ -192,8 +188,11 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
         dlg.SetOverwritePrompt(false);
         if(dlg.ShowModalSave() == wxID_OK)
         {
+            wxString sPath = dlg.GetFullPath();
+            sPath.Replace(wxT("\\\\"), wxT("\\"));
+            //m_PathTextCtrl->ChangeValue( sPath );
+            m_pParam->SetValue(wxVariant(sPath, wxT("path")));
             m_pParam->SetAltered(true);
-            Validate();
         }
     }
 }
@@ -203,28 +202,67 @@ bool wxGISDTPath::Validate(void)
 {
     wxString sPath = m_pParam->GetValue();
     if(sPath.IsEmpty())
-        return true;
+    {
+        m_pParam->SetAltered(false);
+        if(m_pParam->GetParameterType() != enumGISGPParameterTypeRequired)
+        {
+            m_pParam->SetIsValid(true);
+            m_pParam->SetMessage(wxGISEnumGPMessageNone);
+            return true;
+        }
+        else
+        {
+            m_pParam->SetIsValid(false);
+            m_pParam->SetMessage(wxGISEnumGPMessageRequired, _("The value is required"));
+            return false;
+        }
+    }
     if(m_pCatalog)
     {
         IGxObjectContainer* pGxContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
         IGxObject* pGxObj = pGxContainer->SearchChild(sPath);
         if(pGxObj)
         {
-            m_pParam->SetIsValid(true);
-            SetMessage(wxGISEnumGPMessageOk, wxEmptyString);
+           if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
+           {
+               m_pParam->SetIsValid(true);
+               m_pParam->SetMessage(wxGISEnumGPMessageOk);
+           }
+           else
+           {
+               m_pParam->SetIsValid(true);
+               m_pParam->SetMessage(wxGISEnumGPMessageWarning, _("The output object is exist. It will be overwrited!"));
+           }
+           return true;
         }
         else
         {
-            m_pParam->SetIsValid(false);
-            SetMessage(wxGISEnumGPMessageError, _("The input object is not exist"));
+           if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
+           {
+                m_pParam->SetIsValid(false);
+                m_pParam->SetMessage(wxGISEnumGPMessageError, _("The input object is not exist"));
+                return false;
+           }
+           else
+           {
+               m_pParam->SetIsValid(true);
+               m_pParam->SetMessage(wxGISEnumGPMessageOk);
+               return true;
+           }
         }
 
         //int ret = VSIStatL((const char*) sFolderPath.mb_str(*m_pMBConv), &BufL);
         //if(ret == 0)
     }
-    //validate in dialog all parameters
     return true;
 }
+
+void wxGISDTPath::Update(void)
+{
+    m_PathTextCtrl->ChangeValue( m_pParam->GetValue() );
+    //Validate();
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISDTChoice
