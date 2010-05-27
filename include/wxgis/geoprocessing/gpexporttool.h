@@ -40,10 +40,11 @@ public:
     virtual wxString GetDisplayName(void);
     virtual wxString GetName(void);
     virtual wxString GetCategory(void);
+    virtual bool Validate(void);
     virtual GPParameters* GetParameterInfo(void);
     virtual void SetCatalog(IGxCatalog* pCatalog);
     virtual IGxCatalog* GetCatalog(void);
 protected:
-    GPParameters* m_pParamArr;
+    GPParameters m_pParamArr;
     IGxCatalog* m_pCatalog;
 };
