@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxView class.
+ * Purpose:  extended tooltip class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -18,31 +18,43 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+
 #pragma once
-#include "wxgis/catalogui/catalogui.h"
-#include "wxgis/catalog/catalog.h"
+#include "wxgis/framework/framework.h"
 
-//-----------------------------------------------
-// wxGxView
-//-----------------------------------------------
+#define TIMER_BALOON 1014
 
-class WXDLLIMPEXP_GIS_CLU wxGxView :
-    public IGxView
+class WXDLLIMPEXP_GIS_FRW wxGISBaloonTip : public wxFrame
 {
-public:	
-	wxGxView(void);
-	virtual ~wxGxView(void);
-	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
-	virtual void Deactivate(void);
-	virtual bool Applies(IGxSelection* Selection);
-	virtual void Refresh(void){};
-	virtual wxString GetName(void);
-protected:
-	wxString m_sViewName;
-	//IGxCatalog* m_pCatalog;
-	IGxApplication* m_pApplication;
-	wxXmlNode* m_pXmlConf;
+    public:
+        wxGISBaloonTip(wxString sTitle, wxIcon Icon, wxString sMessage);
+        virtual ~wxGISBaloonTip() { delete timer; }
+ 
+        /** painting bg */
+        void OnPaint(wxPaintEvent& event);
+        /** timer to close window */
+        void OnTimerTick(wxTimerEvent & event);
+        /** click on the baloon */
+        void OnClick(wxMouseEvent & event){ };
+        /** click esc */
+        void OnEscape(wxKeyEvent & event)
+        { 
+            if(event.GetKeyCode() == WXK_ESCAPE)
+                Close();
+        };
+        /** click close */
+        void OnClose(wxCommandEvent & event)
+        {    
+            Close();
+        };
+ 
+        /** display the baloon and run the timer */
+        void showBaloon(unsigned int iTimeout);
+
+        virtual void Close(void);
+    private:
+        wxTimer * timer;
+ 
+        DECLARE_EVENT_TABLE();
+ 
 };
-
-int GxObjectCompareFunction(IGxObject* pObject1, IGxObject* pObject2, long sortData);
-

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS (GIS Toolbox)
  * Purpose:  Geoprocessing Main Commands class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
@@ -50,8 +50,6 @@ IMPLEMENT_DYNAMIC_CLASS(wxGISGeoprocessingCmd, wxObject)
 
 wxGISGeoprocessingCmd::wxGISGeoprocessingCmd(void)
 {
-	m_ImageList.Create(16, 16);
-	m_ImageList.Add(wxBitmap(gp_menu_16_xpm));
 }
 
 wxGISGeoprocessingCmd::~wxGISGeoprocessingCmd(void)
@@ -63,7 +61,7 @@ wxIcon wxGISGeoprocessingCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
-			return m_ImageList.GetIcon(0);
+			return wxIcon(gp_menu_16_xpm);
 		default:
 			return wxNullIcon;
 	}

@@ -110,8 +110,10 @@ public:
     virtual void ShowToolBarMenu(void){};
 	virtual WINDOWARRAY* GetChildWindows(void){return NULL;};
     virtual void RegisterChildWindow(wxWindow* pWnd){};
+    virtual void UnRegisterChildWindow(wxWindow* pWnd){};
     virtual void Customize(void){};
     virtual void ShowApplicationWindow(wxWindow* pWnd, bool bShow = true){};
+    virtual bool IsApplicationWindowShown(wxWindow* pWnd){return true;};
 	virtual void OnMouseDown(wxMouseEvent& event){};
 	virtual void OnMouseUp(wxMouseEvent& event){};
 	virtual void OnMouseDoubleClick(wxMouseEvent& event){};

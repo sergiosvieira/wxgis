@@ -977,6 +977,18 @@ void wxGxObjectDialog::RegisterChildWindow(wxWindow* pWnd)
 	m_WindowArray.push_back(pWnd);
 }
 
+void wxGxObjectDialog::UnRegisterChildWindow(wxWindow* pWnd)
+{
+	for(size_t i = 0; i < m_WindowArray.size(); i++)
+    {
+		if(m_WindowArray[i] == pWnd)
+        {
+			m_WindowArray.erase(m_WindowArray.begin() + i);
+            return;
+        }
+    }
+}
+
 IGxObjectFilter* wxGxObjectDialog::GetCurrentFilter(void)
 {
     if(m_FilterArray.size() == 0)

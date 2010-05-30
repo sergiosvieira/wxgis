@@ -50,6 +50,7 @@ public:
 	virtual size_t GetCount(void){return m_pWindows.size();};
 	virtual bool Show(bool bShow);
 	//virtual wxWindow* GetWindowByName(wxString sName);
+	virtual void Deactivate(void);
 //IGxSelectionEvents
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 //events
@@ -69,6 +70,7 @@ private:
 	wxWindow* m_pCurrentWnd;
 
 	IGxSelection* m_pSelection;
+    IApplication* m_pApp;
 
 DECLARE_EVENT_TABLE()
 };

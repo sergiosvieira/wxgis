@@ -1,5 +1,5 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS (GIS Toolbox)
  * Purpose:  controls classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
@@ -26,6 +26,9 @@
 #include "../../art/state_16.xpm"
 #include "../../art/open_16.xpm"
 #include "../../art/sql_16.xpm"
+
+#include "wxgis/framework/tooltip.h"
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISDTBase
@@ -106,7 +109,6 @@ wxGISDTPath::wxGISDTPath( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* 
 	bPathSizer->Add( m_PathTextCtrl, 1, wxALL|wxEXPAND, 5 );     
 	
 	m_bpButton = new wxBitmapButton( this, wxID_OPEN, wxBitmap(open_16_xpm), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	//m_bpButton = new wxBitmapButton( this, wxID_ANY, wxBitmap(sql_16_xpm), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	bPathSizer->Add( m_bpButton, 0, wxALL, 5 );
 	fgSizer1->Add( bPathSizer, 0, wxALL|wxEXPAND, 5 );
 
@@ -150,6 +152,9 @@ void wxGISDTPath::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
 
 void wxGISDTPath::OnOpen(wxCommandEvent& event)
 {
+    //wxGISBaloonTip* pTip = new wxGISBaloonTip(wxT("test baloon"), m_ImageList.GetIcon(0), wxT("Èíôîðìàöèÿ îá èçîáðàæåíèè\nÐàçìåð:	445 Õ 344\nÒèï:	15KB PNG"));
+    //pTip->showBaloon(5000);
+    //return;
     wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParam->GetDomain());
 
     if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
@@ -200,6 +205,9 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
 //validate
 bool wxGISDTPath::Validate(void)
 {
+    if(m_pParam->GetHasBeenValidated())
+        return true;
+
     wxString sPath = m_pParam->GetValue();
     if(sPath.IsEmpty())
     {
@@ -260,6 +268,7 @@ bool wxGISDTPath::Validate(void)
 void wxGISDTPath::Update(void)
 {
     m_PathTextCtrl->ChangeValue( m_pParam->GetValue() );
+    SetMessage(m_pParam->GetÌessageType(), m_pParam->GetMessage());
     //Validate();
 }
 

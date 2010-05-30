@@ -240,6 +240,10 @@
 				RelativePath="..\..\src\framework\toolbarmenu.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\src\framework\tooltip.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -304,6 +308,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\framework\toolbarmenu.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\framework\tooltip.h"
 				>
 			</File>
 		</Filter>

@@ -240,7 +240,11 @@ void wxGISMenu::AddCommand(ICommand* pCmd)
 			wxMenuItem *item = new wxMenuItem(this, pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), (wxItemKind)pCmd->GetKind());
 			wxBitmap Bmp = pCmd->GetBitmap();
 			if(Bmp.IsOk())
-				item->SetBitmaps(Bmp);//SetBitmap//
+            {
+                wxImage Img = Bmp.ConvertToImage();
+                //Img.RotateHue(-0.1);
+				item->SetBitmaps(Bmp, Img.ConvertToGreyscale());//SetBitmap//
+            }
 			Append(item);
 			//wxMenuItem* pItem = Append(pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), pCmd->GetKind());
 			//pItem->SetBitmaps(pCmd->GetBitmap());
@@ -251,7 +255,7 @@ void wxGISMenu::AddCommand(ICommand* pCmd)
 			wxMenuItem *item = new wxMenuItem(this, pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), (wxItemKind)enumGISCommandNormal);
 			wxBitmap Bmp = pCmd->GetBitmap();
 			if(Bmp.IsOk())
-				item->SetBitmaps(Bmp);//SetBitmap
+				item->SetBitmaps(Bmp, Bmp);//SetBitmap
 			Append(item);
 			//wxMenuItem* pItem = Append(pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), pCmd->GetKind());
 			//pItem->SetBitmaps(pCmd->GetBitmap());

@@ -52,8 +52,10 @@ public:
 	virtual void Customize(void);
 	virtual void ShowStatusBar(bool bShow);
 	virtual void ShowApplicationWindow(wxWindow* pWnd, bool bShow = true);
+	virtual bool IsApplicationWindowShown(wxWindow* pWnd);
 	virtual WINDOWARRAY* GetChildWindows(void);
 	virtual void RegisterChildWindow(wxWindow* pWnd);
+	virtual void UnRegisterChildWindow(wxWindow* pWnd);
     virtual wxString GetAppName(void){return wxString(APP_NAME);};
     virtual bool Create(IGISConfig* pConfig);
 protected:

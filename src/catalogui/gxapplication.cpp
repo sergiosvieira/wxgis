@@ -67,8 +67,14 @@ wxGxApplication::~wxGxApplication(void)
 	if(m_pTabView)
 		m_pTabView->Deactivate();
 
-	wxDELETE(m_pTreeView);
-	wxDELETE(m_pTabView);
+	////wxDELETE(m_pTreeView);
+ //   m_pTreeView->Destroy();
+	////wxDELETE(m_pTabView);
+ //   m_pTabView->Destroy();
+    for(size_t i = 0; i < m_WindowArray.size(); i++)
+        //if(m_WindowArray[i])
+        //    if(!m_WindowArray[i]->Destroy()) //?? the last window didn't destroy?
+        wxDELETE(m_WindowArray[i]);
 
 	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
 	{
@@ -169,6 +175,11 @@ bool wxGxApplication::IsPaneShown(const wxString& sName)
 	return m_mgr.GetPane(sName).IsShown();
 }
 
+bool wxGxApplication::IsApplicationWindowShown(wxWindow* pWnd)
+{
+	return m_mgr.GetPane(pWnd).IsShown();
+}
+
 bool wxGxApplication::AddCommandBar(IGISCommandBar* pBar)
 {
 	if(!pBar)
@@ -227,6 +238,18 @@ void wxGxApplication::RegisterChildWindow(wxWindow* pWnd)
 	m_WindowArray.push_back(pWnd);
 }
 
+void wxGxApplication::UnRegisterChildWindow(wxWindow* pWnd)
+{
+	for(size_t i = 0; i < m_WindowArray.size(); i++)
+    {
+		if(m_WindowArray[i] == pWnd)
+        {
+			m_WindowArray.erase(m_WindowArray.begin() + i);
+            return;
+        }
+    }
+}
+
 bool wxGxApplication::Create(IGISConfig* pConfig)
 {
     m_pNewMenu = new wxGISNewMenu();
@@ -254,23 +277,55 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
 		return false;
 	}
 
-	m_pTreeView = new wxGxTreeView(this, TREECTRLID);
-	if(m_pTreeView->Activate(this, m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame/views/treeview")))))
-	{
-		m_mgr.AddPane(m_pTreeView, wxAuiPaneInfo().Name(wxT("tree_window")).Caption(_("Tree Pane")).BestSize(wxSize(280,128)).MinSize(wxSize(200,64)).Left().Layer(1/*2*/).Position(1).CloseButton(true));
-		RegisterChildWindow(m_pTreeView);
-	}
-	else
-		wxDELETE(m_pTreeView);
+    int nPaneCount(0);
+    wxXmlNode* pViewsChildNode = pViewsNode->GetChildren();
+    while(pViewsChildNode)
+    {
+        if(pViewsChildNode->GetName().CmpNoCase(wxT("treeview")) == 0)
+        {
+	        m_pTreeView = new wxGxTreeView(this, TREECTRLID);
+	        if(m_pTreeView->Activate(this, pViewsChildNode))
+	        {
+		        m_mgr.AddPane(m_pTreeView, wxAuiPaneInfo().Name(wxT("tree_window")).Caption(_("Tree Pane")).BestSize(wxSize(280,128)).MinSize(wxSize(200,64)).Left().Layer(1/*2*/).Position(1).CloseButton(true));
+		        RegisterChildWindow(m_pTreeView);
+	        }
+	        else
+		        wxDELETE(m_pTreeView);
+        }
+        else if(pViewsChildNode->GetName().CmpNoCase(wxT("tabview")) == 0)
+        {
+	        m_pTabView = new wxGxTabView(this);
+	        if(m_pTabView->Activate(this, pViewsChildNode))
+	        {
+		        m_mgr.AddPane(m_pTabView, wxAuiPaneInfo().Name(wxT("main_window")).CenterPane());//.PaneBorder(true)
+		        RegisterChildWindow(m_pTabView);
+	        }
+	        else
+		        wxDELETE(m_pTabView);
+        }
+        else
+        {
+            //create & register over wnd
+            wxString sClassName = pViewsChildNode->GetPropVal(wxT("name"), NONAME);
+            if(!sClassName.IsEmpty() && sClassName.CmpNoCase(NONAME) != 0)
+            {
+    		    wxObject *pObj = wxCreateDynamicObject(sClassName);
+                IGxView* pView = dynamic_cast<IGxView*>(pObj);
+                wxWindow* pWnd = dynamic_cast<wxWindow*>(pObj);
+                pWnd->SetParent(this);
+	            if(pView->Activate(this, pViewsChildNode))
+	            {
+                    nPaneCount++;
+                    m_mgr.AddPane(pWnd, wxAuiPaneInfo().Name(wxString::Format(wxT("window_%d"), nPaneCount)).Caption(pView->GetName()).BestSize(wxSize(280,128)).MinSize(wxSize(200,64)).Right().Layer(1).Position(nPaneCount).CloseButton(true));
+		            RegisterChildWindow(pWnd);
+	            }
+	            else
+		            wxDELETE(pObj);
+            }
+        }
 
-	m_pTabView = new wxGxTabView(this);
-	if(m_pTabView->Activate(this, m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame/views/tabview")))))
-	{
-		m_mgr.AddPane(m_pTabView, wxAuiPaneInfo().Name(wxT("main_window")).CenterPane());//.PaneBorder(true)
-		RegisterChildWindow(m_pTabView);
-	}
-	else
-		wxDELETE(m_pTabView);
+        pViewsChildNode = pViewsChildNode->GetNext();
+    }
 	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
 	{
 		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)

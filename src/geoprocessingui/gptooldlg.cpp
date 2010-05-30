@@ -1,5 +1,5 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS (GIS Toolbox)
  * Purpose:  tool dialog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessingui/gptooldlg.h"
+#include "wxgis/framework/application.h"
 
 #include "../../art/tool_16.xpm"
 
@@ -161,6 +162,9 @@ wxGISGPToolDlg::wxGISGPToolDlg( IGPTool* pTool, wxXmlNode* pPropNode, wxWindow* 
     wxSize DlgSize = size;
     DlgSize.x = m_DataWidth;
     SetSize(DlgSize);
+
+    IApplication* pApp = ::GetApplication();
+    pApp->RegisterChildWindow(this);
 }
 
 wxGISGPToolDlg::~wxGISGPToolDlg()
@@ -196,13 +200,17 @@ void wxGISGPToolDlg::OnHelpUI(wxUpdateUIEvent& event)
 
 void wxGISGPToolDlg::OnOk(wxCommandEvent& event)
 {
+    IApplication* pApp = ::GetApplication();
+    pApp->UnRegisterChildWindow(this);
     //event.Skip();
 }
 
 void wxGISGPToolDlg::OnCancel(wxCommandEvent& event)
 {
+    IApplication* pApp = ::GetApplication();
+    pApp->UnRegisterChildWindow(this);
     //store properties
-    delete this;
+    this->Destroy();
 }
 
 void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
@@ -219,7 +227,7 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
     }
 
     //tool validate
-    bool bIsValid = m_pTool->Validate();
+    /*bool bIsValid = */m_pTool->Validate();
     
     short nNonValid(0);
     GPParameters* pParams = m_pTool->GetParameterInfo();
@@ -236,10 +244,7 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
         if(pParam->GetHasBeenValidated())
             continue;
         if(m_pControlsArray[i] != NULL)
-        {
             m_pControlsArray[i]->Update();
-            m_pControlsArray[i]->SetMessage(pParam->GetÌessageType(), pParam->GetMessage());
-        }
         pParam->SetHasBeenValidated(true);
     }
     if(nNonValid > 0)

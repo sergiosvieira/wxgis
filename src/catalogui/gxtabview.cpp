@@ -33,8 +33,8 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 {
 	m_sName = wxGetTranslation( pTabDesc->GetPropVal(wxT("name"), NONAME) );
 	m_bShowChoices = pTabDesc->GetPropVal(wxT("show_choices"), wxT("f")) == wxT("f") ? false : true;
-    IApplication* pApp = dynamic_cast<IApplication*>(application);
-    if(!pApp)
+    m_pApp = dynamic_cast<IApplication*>(application);
+    if(!m_pApp)
         return;
 
 	wxXmlNode* pChild = pTabDesc->GetChildren();
@@ -53,7 +53,7 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 			if(pWnd != NULL)
 			{
 				pWnd->Hide();
-				pApp->RegisterChildWindow(pWnd);
+				m_pApp->RegisterChildWindow(pWnd);
 
 				wxGxView* pView = dynamic_cast<wxGxView*>(pWnd);
 				if(pView != NULL)
@@ -142,13 +142,17 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 
 wxGxTab::~wxGxTab(void)
 {
-	for(size_t i = 0; i < m_pWindows.size(); i++)
-	{
-		wxGxView* pView = dynamic_cast<wxGxView*>(m_pWindows[i]);
-		if(pView != NULL)
-			pView->Deactivate();
-		wxDELETE(m_pWindows[i]);
-	}
+	//for(size_t i = 0; i < m_pWindows.size(); i++)
+	//{
+	//	wxGxView* pView = dynamic_cast<wxGxView*>(m_pWindows[i]);
+	//	if(pView != NULL)
+ //       {
+	//		pView->Deactivate();
+ //           m_pApp->UnRegisterChildWindow(m_pWindows[i]);
+ //       }
+	//	//wxDELETE(m_pWindows[i]);//destroy in registerwindows array
+ //       m_pWindows[i]->Destroy();
+	//}
 }
 
 wxString wxGxTab::GetName(void)
@@ -310,6 +314,22 @@ bool wxGxTab::Show(bool bShow)
 	return wxWindow::Show(bShow);
 }
 
+void wxGxTab::Deactivate(void)
+{
+	for(size_t i = 0; i < m_pWindows.size(); i++)
+	{
+		wxGxView* pView = dynamic_cast<wxGxView*>(m_pWindows[i]);
+		if(pView != NULL)
+        {
+			pView->Deactivate();
+            m_pApp->UnRegisterChildWindow(m_pWindows[i]);
+        }
+		//wxDELETE(m_pWindows[i]);//destroy in registerwindows array
+        if(m_pWindows[i])
+            m_pWindows[i]->Destroy();
+	}
+}
+
 //-------------------------------------------------------------------
 // wxGxTabView
 //-------------------------------------------------------------------
@@ -362,11 +382,12 @@ void wxGxTabView::Deactivate(void)
 	if(m_ConnectionPointSelectionCookie != -1)
 		m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
 
-	//for(size_t i = 0; i < m_Tabs.size(); i++)
-	//{
-	//	RemovePage(0);
-	//	wxDELETE(m_Tabs[i]);
-	//}
+	for(size_t i = 0; i < m_Tabs.size(); i++)
+	{
+		//RemovePage(0);
+		//wxDELETE(m_Tabs[i]);
+        m_Tabs[i]->Deactivate();
+	}
 }
 
 void wxGxTabView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
