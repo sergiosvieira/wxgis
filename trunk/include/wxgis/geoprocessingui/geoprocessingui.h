@@ -1,5 +1,5 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS (GIS Toolbox)
  * Purpose:  geoprocessingui header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
@@ -25,6 +25,7 @@
 #include "wxgis/geoprocessing/geoprocessing.h"
 
 #define SASHCTRLID	1012
+#define TOOLVIEWCTRLID	1015
 
 
 

@@ -48,6 +48,6 @@ public:
     virtual void OnDropDownCommand(int nID);
 private:
 	IApplication* m_pApp;
-	wxImageList m_ImageList;
     wxGxContentView* m_pContentsView;
+    wxWindow* m_pTreeView;
 };

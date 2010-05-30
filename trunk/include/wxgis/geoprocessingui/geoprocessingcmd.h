@@ -1,5 +1,5 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS (GIS Toolbox)
  * Purpose:  Geoprocessing Main Commands class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
@@ -50,6 +50,5 @@ protected:
     bool OnExport(wxGISFeatureDataset* pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel);
 private:
 	IApplication* m_pApp;
-	wxImageList m_ImageList;
     wxString m_sLastError;
 };

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS (GIS Toolbox)
  * Purpose:  geoprocessing tool parameters domains.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************

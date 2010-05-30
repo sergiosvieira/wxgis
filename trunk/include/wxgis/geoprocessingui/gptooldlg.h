@@ -1,5 +1,5 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS (GIS Toolbox)
  * Purpose:  tool dialog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
@@ -74,6 +74,8 @@ public:
     virtual void OnOk(wxCommandEvent& event);
     virtual void OnCancel(wxCommandEvent& event);
     virtual void OnOkUI(wxUpdateUIEvent& event);
+//wxTopLevelWindow
+    //virtual bool ShouldPreventAppExit(); 
 protected:
     int m_DataWidth, m_HtmlWidth;
     IGPTool* m_pTool;

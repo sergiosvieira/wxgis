@@ -191,11 +191,11 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 	ICommand* pCmd = GetCommand(event.GetId());
 	if(pCmd)
 	{
+        event.Enable(pCmd->GetEnabled());
 		if(pCmd->GetKind() == enumGISCommandCheck)
             //if(event.GetChecked() != pCmd->GetChecked())
                 event.Check(pCmd->GetChecked());
         //if(event.GetEnabled() != pCmd->GetEnabled())
-        event.Enable(pCmd->GetEnabled());
 
         wxString sAcc = m_pGISAcceleratorTable->GetText(event.GetId());
         //if(pCmd->GetKind() == enumGISCommandNormal)
@@ -237,11 +237,15 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 					{
                         if(pItem->IsSubMenu())
                             break;
+
+                        if(pItem->GetKind() != enumGISCommandCheck)
+                        {
 						wxIcon Bmp = pCmd->GetBitmap();
 						//if(Bmp.IsOk())
 							pItem->SetBitmap(Bmp);//double text??
                             pItem->SetItemLabel(wxT(" ")); // derty hack
                             pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
+                        }
 					}
 				}
 				break;

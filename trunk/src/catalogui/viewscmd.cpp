@@ -19,19 +19,21 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/viewscmd.h"
+#include "wxgis/catalogui/gxtreeview.h"
+
 #include "../../art/views16.xpm"
+#include "../../art/treeview_16.xpm"
 
 //	0	ContentsView states
 //	1	Select All
-//  2   ?
+//  2   Show/hide tree view
+//  3   ?
 
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogViewsCmd, wxObject)
 
-wxGISCatalogViewsCmd::wxGISCatalogViewsCmd(void) : m_pContentsView(NULL)
+wxGISCatalogViewsCmd::wxGISCatalogViewsCmd(void) : m_pContentsView(NULL), m_pTreeView(NULL)
 {
-	m_ImageList.Create(16, 16);
-	m_ImageList.Add(wxBitmap(views16_xpm));
 }
 
 wxGISCatalogViewsCmd::~wxGISCatalogViewsCmd(void)
@@ -43,7 +45,9 @@ wxIcon wxGISCatalogViewsCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
-			return m_ImageList.GetIcon(0);
+			return wxIcon(views16_xpm);
+		case 2:
+			return wxIcon(treeview_16_xpm);
 		case 1:
 		default:
 			return wxNullIcon;
@@ -58,6 +62,8 @@ wxString wxGISCatalogViewsCmd::GetCaption(void)
 			return wxString(_("View"));
 		case 1:
 			return wxString(_("Select All"));
+		case 2:
+			return wxString(_("Show/hide tree pane"));
 		default:
 			return wxEmptyString;
 	}
@@ -68,6 +74,7 @@ wxString wxGISCatalogViewsCmd::GetCategory(void)
 	switch(m_subtype)
 	{
 		case 0:	
+		case 2:	
 			return wxString(_("View"));
 		case 1:
 			return wxString(_("Edit"));
@@ -78,11 +85,37 @@ wxString wxGISCatalogViewsCmd::GetCategory(void)
 
 bool wxGISCatalogViewsCmd::GetChecked(void)
 {
+	switch(m_subtype)
+	{
+		case 2:	
+            return m_pApp->IsApplicationWindowShown(m_pTreeView);
+		case 0:	
+		case 1:
+		default:
+	        return false;
+	}
 	return false;
 }
 
 bool wxGISCatalogViewsCmd::GetEnabled(void)
 {
+	if(!m_pTreeView)
+	{
+		WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
+		if(pWinArr)
+		{
+			for(size_t i = 0; i < pWinArr->size(); i++)
+			{
+				wxGxTreeView* pTreeView = dynamic_cast<wxGxTreeView*>(pWinArr->at(i));
+				if(pTreeView)
+				{
+					m_pTreeView = pTreeView;
+					break;
+				}
+			}
+		}
+	}
+
 	if(!m_pContentsView)
 	{
 		WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
@@ -99,13 +132,14 @@ bool wxGISCatalogViewsCmd::GetEnabled(void)
 			}
 		}
 	}
-	if(!m_pContentsView)
-        return false;
-	switch(m_subtype)
+
+    switch(m_subtype)
 	{
+		case 2:
+            return m_pTreeView != NULL;
 		case 0:
 		case 1:
-			return m_pContentsView->IsShown();
+			return m_pContentsView && m_pContentsView->IsShown();
  		default:
 			return false;
 	}
@@ -117,7 +151,9 @@ wxGISEnumCommandKind wxGISCatalogViewsCmd::GetKind(void)
 	{
 		case 0://View
 			return enumGISCommandDropDown;
-		case 1://Select All
+		case 2://Show/hide tree pane
+            return enumGISCommandCheck;
+        case 1://Select All
 		default:
 			return enumGISCommandNormal;
 	}
@@ -131,6 +167,8 @@ wxString wxGISCatalogViewsCmd::GetMessage(void)
 			return wxString(_("Select view"));
 		case 1:	
 			return wxString(_("Select All objects"));
+		case 2:	
+			return wxString(_("Show/hide tree pane"));
 		default:
 			return wxEmptyString;
 	}
@@ -152,6 +190,8 @@ void wxGISCatalogViewsCmd::OnClick(void)
             m_pContentsView->SelectAll();
             m_pContentsView->SetFocus();
 			break;
+		case 2:	
+            m_pApp->ShowApplicationWindow(m_pTreeView, !m_pApp->IsApplicationWindowShown(m_pTreeView));
 		default:
 			return;
 	}
@@ -171,6 +211,8 @@ wxString wxGISCatalogViewsCmd::GetTooltip(void)
 			return wxString(_("Select view"));
 		case 1:	
 			return wxString(_("Select All"));
+		case 2:	
+			return wxString(_("Show/hide tree pane"));
 		default:
 			return wxEmptyString;
 	}
@@ -178,7 +220,7 @@ wxString wxGISCatalogViewsCmd::GetTooltip(void)
 
 unsigned char wxGISCatalogViewsCmd::GetCount(void)
 {
-	return 2;
+	return 3;
 }
 
 wxMenu* wxGISCatalogViewsCmd::GetDropDownMenu(void)
