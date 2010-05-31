@@ -20,8 +20,10 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessingui/geoprocessingcmd.h"
+#include "wxgis/geoprocessingui/gptoolboxview.h"
 
 #include "../../art/gp_menu_16.xpm"
+#include "../../art/toolbox_16.xpm"
 
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/catalog/gxdataset.h"
@@ -44,11 +46,12 @@
 
 
 //	0	Export
-//  1   ?
+//  1   Show/hide toolbox pane
+//  2   ?
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISGeoprocessingCmd, wxObject)
 
-wxGISGeoprocessingCmd::wxGISGeoprocessingCmd(void)
+wxGISGeoprocessingCmd::wxGISGeoprocessingCmd(void) : m_pToolboxView(NULL)
 {
 }
 
@@ -62,6 +65,8 @@ wxIcon wxGISGeoprocessingCmd::GetBitmap(void)
 	{
 		case 0:
 			return wxIcon(gp_menu_16_xpm);
+		case 1:
+			return wxIcon(toolbox_16_xpm);
 		default:
 			return wxNullIcon;
 	}
@@ -73,8 +78,10 @@ wxString wxGISGeoprocessingCmd::GetCaption(void)
 	{
 		case 0:	
 			return wxString(_("&Export"));
+		case 1:	
+			return wxString(_("Show/Hide &Toolbox pane"));
 		default:
-			return wxEmptyString;
+		return wxEmptyString; 
 	}
 }
 
@@ -84,6 +91,8 @@ wxString wxGISGeoprocessingCmd::GetCategory(void)
 	{
 		case 0:	
 			return wxString(_("Geoprocessing"));
+		case 1:	
+			return wxString(_("View"));
 		default:
 			return wxString(_("[No category]"));
 	}
@@ -91,12 +100,37 @@ wxString wxGISGeoprocessingCmd::GetCategory(void)
 
 bool wxGISGeoprocessingCmd::GetChecked(void)
 {
+	switch(m_subtype)
+	{
+		case 1:	
+            return m_pApp->IsApplicationWindowShown(m_pToolboxView);
+		case 0:	
+		default:
+	        return false;
+	}
 	return false;
 }
 
 bool wxGISGeoprocessingCmd::GetEnabled(void)
 {
-	switch(m_subtype)
+	if(!m_pToolboxView)
+	{
+		WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
+		if(pWinArr)
+		{
+			for(size_t i = 0; i < pWinArr->size(); i++)
+			{
+				wxGxToolboxView* pwxGxToolboxView = dynamic_cast<wxGxToolboxView*>(pWinArr->at(i));
+				if(pwxGxToolboxView)
+				{
+					m_pToolboxView = pwxGxToolboxView;
+					break;
+				}
+			}
+		}
+	}
+
+    switch(m_subtype)
 	{
 		case 0://Export
 		{
@@ -112,7 +146,9 @@ bool wxGISGeoprocessingCmd::GetEnabled(void)
                 }
 			}
 			return false;
-		}
+        }
+		case 1://Show/Hide Toolbox pane
+            return m_pToolboxView;
 		default:
 			return false;
 	}
@@ -122,6 +158,8 @@ wxGISEnumCommandKind wxGISGeoprocessingCmd::GetKind(void)
 {
 	switch(m_subtype)
 	{
+		case 1://Show/hide toolbox pane
+            return enumGISCommandCheck;
 		case 0://Export
 		default:
 			return enumGISCommandNormal;
@@ -134,6 +172,8 @@ wxString wxGISGeoprocessingCmd::GetMessage(void)
 	{
 		case 0:	
 			return wxString(_("Export item to another format"));
+		case 1:	
+			return wxString(_("Show/Hide toolbox pane"));
 		default:
 			return wxEmptyString;
 	}
@@ -638,6 +678,8 @@ EXIT:
                 }
 			}
 			break;
+		case 1:	
+            m_pApp->ShowApplicationWindow(m_pToolboxView, !m_pApp->IsApplicationWindowShown(m_pToolboxView));
 		default:
 			return;
 	}
@@ -655,6 +697,8 @@ wxString wxGISGeoprocessingCmd::GetTooltip(void)
 	{
 		case 0:	
 			return wxString(_("Export item"));
+		case 1:	
+			return wxString(_("Show/Hide Toolbox pane"));
 		default:
 			return wxEmptyString;
 	}
@@ -662,7 +706,7 @@ wxString wxGISGeoprocessingCmd::GetTooltip(void)
 
 unsigned char wxGISGeoprocessingCmd::GetCount(void)
 {
-	return 1;
+	return 2;
 }
 
 bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType)

@@ -136,7 +136,7 @@ bool wxGISCatalogViewsCmd::GetEnabled(void)
     switch(m_subtype)
 	{
 		case 2:
-            return m_pTreeView != NULL;
+            return m_pTreeView;
 		case 0:
 		case 1:
 			return m_pContentsView && m_pContentsView->IsShown();

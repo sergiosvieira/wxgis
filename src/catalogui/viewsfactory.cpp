@@ -37,22 +37,22 @@ wxGISViewsFactory::~wxGISViewsFactory(void)
 
 wxWindow* wxGISViewsFactory::CreateView(wxString sName, wxWindow* parent)
 {
-	if(sName == wxT("NoView"))
+	if(sName.CmpNoCase(wxT("NoView")) == 0)
 	{
 		wxGxNoView* pwxGxNoView = new wxGxNoView(parent, wxID_ANY);
 		return static_cast<wxWindow*>(pwxGxNoView);//wxStaticCast(pwxGxNoView, wxWindow);//
 	}
-	if(sName == wxT("ContentsView"))
+	if(sName.CmpNoCase(wxT("ContentsView")) == 0)
 	{
 		wxGxContentView* pwxGxContentView = new wxGxContentView(parent);
 		return static_cast<wxWindow*>(pwxGxContentView);//wxStaticCast(pwxGxContentView, wxWindow);//
 	}
-	if(sName == wxT("GeographicView"))
+	if(sName.CmpNoCase(wxT("GeographicView")) == 0)
 	{
 		wxGxMapView* pwxGxMapView = new wxGxMapView(parent);
 		return static_cast<wxWindow*>(pwxGxMapView);//wxStaticCast(pwxGxMapView, wxWindow);//
 	}
-	if(sName == wxT("TableView"))
+	if(sName.CmpNoCase(wxT("TableView")) == 0)
 	{
 		wxGxTableView* pwxGxTableView = new wxGxTableView(parent);
 		return static_cast<wxWindow*>(pwxGxTableView);//wxStaticCast(pwxGxTableView, wxWindow);//

@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessingui/gptoolboxview.h"
+#include "wxgis/geoprocessingui/gptasksview.h"
 
 //-------------------------------------------------------------------
 // wxGxToolboxView
@@ -29,7 +30,7 @@ BEGIN_EVENT_TABLE(wxGxToolboxView, wxAuiNotebook)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(TOOLVIEWCTRLID, wxGxToolboxView::OnAUINotebookPageChanged)
 END_EVENT_TABLE()
 
-IMPLEMENT_DYNAMIC_CLASS(wxGxToolboxView, wxAuiNotebook)
+//IMPLEMENT_DYNAMIC_CLASS(wxGxToolboxView, wxAuiNotebook)
 
 wxGxToolboxView::wxGxToolboxView(void)
 {
@@ -51,7 +52,7 @@ bool wxGxToolboxView::Activate(IGxApplication* application, wxXmlNode* pConf)
 	wxGxView::Activate(application, pConf);
 
 	//wxXmlNode* pChild = m_pXmlConf->GetChildren();
-	//wxUint8 count(0);
+	wxUint8 count(0);
 	//while(pChild)
 	//{
 	//	wxGxTab* pGxTab = new wxGxTab(application, pChild, this);
@@ -60,7 +61,8 @@ bool wxGxToolboxView::Activate(IGxApplication* application, wxXmlNode* pConf)
 	//	//	pWnd = new wxWindow(this, wxID_ANY);
 	//	m_Tabs.push_back(pGxTab);
 
-	//	AddPage(static_cast<wxWindow*>(pGxTab), pGxTab->GetName(), count == 0 ? true : false/*, m_ImageListSmall.GetBitmap(9)*/);
+    AddPage(new wxGxTasksView(this), wxT("test"), count == 0 ? true : false);
+		//AddPage(static_cast<wxWindow*>(pGxTab), pGxTab->GetName(), count == 0 ? true : false/*, m_ImageListSmall.GetBitmap(9)*/);
 	//	
 	//	count++;
 
