@@ -51,4 +51,5 @@ protected:
 private:
 	IApplication* m_pApp;
     wxString m_sLastError;
+    wxWindow* m_pToolboxView;
 };

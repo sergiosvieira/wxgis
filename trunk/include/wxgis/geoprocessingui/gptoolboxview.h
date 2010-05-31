@@ -28,7 +28,7 @@ class WXDLLIMPEXP_GIS_GPU wxGxToolboxView :
 	public wxAuiNotebook,
 	public wxGxView
 {
-    DECLARE_DYNAMIC_CLASS(wxGxToolboxView)
+    //DECLARE_DYNAMIC_CLASS(wxGxToolboxView)
 public:
     wxGxToolboxView(void);
 	wxGxToolboxView(wxWindow* parent, wxWindowID id = TOOLVIEWCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);

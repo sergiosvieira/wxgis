@@ -191,11 +191,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\geoprocessingui\gptasksview.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\geoprocessingui\gptoolbox.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\geoprocessingui\gptoolboxview.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\geoprocessingui\gptoolboxviewfactory.cpp"
 				>
 			</File>
 			<File
@@ -221,11 +229,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\wxgis\geoprocessingui\gptasksview.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wxgis\geoprocessingui\gptoolbox.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\geoprocessingui\gptoolboxview.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geoprocessingui\gptoolboxviewfactory.h"
 				>
 			</File>
 			<File

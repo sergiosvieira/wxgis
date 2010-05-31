@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
- * Purpose:  geoprocessingui header.
+ * Purpose:  wxGxToolboxViewFactory class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -18,15 +18,18 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-
 #pragma once
 
+#include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/catalogui/catalogui.h"
-#include "wxgis/geoprocessing/geoprocessing.h"
 
-#define SASHCTRLID	1012
-#define TOOLVIEWCTRLID	1015
-#define TASKSVIEWCTRLID	1016
-
-
-
+class wxGxToolboxViewFactory :
+	public wxObject,
+	public IGxViewsFactory
+{
+	DECLARE_DYNAMIC_CLASS(wxGxToolboxViewFactory)
+public:
+	wxGxToolboxViewFactory(void);
+	virtual ~wxGxToolboxViewFactory(void);
+	virtual wxWindow* CreateView(wxString sName, wxWindow* parent);
+};

@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
- * Purpose:  geoprocessingui header.
+ * Purpose:  wxGxTasksView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -19,14 +19,29 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#pragma once
+#include "wxgis/geoprocessingui/gptasksview.h"
 
-#include "wxgis/catalogui/catalogui.h"
-#include "wxgis/geoprocessing/geoprocessing.h"
+BEGIN_EVENT_TABLE(wxGxTasksView, wxScrolledWindow)
+END_EVENT_TABLE()
 
-#define SASHCTRLID	1012
-#define TOOLVIEWCTRLID	1015
-#define TASKSVIEWCTRLID	1016
+wxGxTasksView::wxGxTasksView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : 
+wxScrolledWindow(parent, id, pos, size, style)
+{
+}
 
+wxGxTasksView::~wxGxTasksView(void)
+{
+}
 
+bool wxGxTasksView::Activate(IGxApplication* application, wxXmlNode* pConf)
+{
+	wxGxView::Activate(application, pConf);
+
+	return true;
+}
+
+void wxGxTasksView::Deactivate(void)
+{
+	wxGxView::Deactivate();
+}
 
