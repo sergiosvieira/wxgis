@@ -28,6 +28,7 @@
 
 wxGxView::wxGxView(void)
 {
+    m_Icon = wxNullIcon;
 }
 
 wxGxView::~wxGxView(void)
@@ -54,9 +55,19 @@ bool wxGxView::Applies(IGxSelection* Selection)
 	return NULL == Selection ? false : true; 
 };
 
-wxString wxGxView::GetName(void)
+wxString wxGxView::GetViewName(void)
 {
 	return m_sViewName;
+}
+
+wxIcon wxGxView::GetViewIcon(void)
+{
+    return m_Icon;
+}
+
+void wxGxView::SetViewIcon(wxIcon Icon)
+{
+    m_Icon = Icon;
 }
 
 int GxObjectCompareFunction(IGxObject* pObject1, IGxObject* pObject2, long sortData)

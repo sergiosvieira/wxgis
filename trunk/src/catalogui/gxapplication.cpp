@@ -323,7 +323,7 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
 					    if(pView->Activate(this, pViewsChildNode))
                         {
                             nPaneCount++;
-                            m_mgr.AddPane(pWnd, wxAuiPaneInfo().Name(wxString::Format(wxT("window_%d"), nPaneCount)).Caption(pView->GetName()).BestSize(wxSize(280,128)).MinSize(wxSize(200,64)).Right().Layer(1).Position(nPaneCount).CloseButton(true));
+                            m_mgr.AddPane(pWnd, wxAuiPaneInfo().Name(wxString::Format(wxT("window_%d"), nPaneCount)).Caption(pView->GetViewName()).BestSize(wxSize(280,128)).MinSize(wxSize(200,64)).Right().Layer(1).Position(nPaneCount).CloseButton(true));
                             RegisterChildWindow(pWnd);
                             wxLogMessage(_("wxGxApplication: View class %s.%s initialise"), sClass.c_str(), sName.c_str());
                         }

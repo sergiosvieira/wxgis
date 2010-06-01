@@ -56,5 +56,7 @@ public:
 	virtual void Deactivate(void) = 0;
 	virtual bool Applies(IGxSelection* Selection) = 0;
 	virtual void Refresh(void) = 0;
-	virtual wxString GetName(void) = 0;
+	virtual wxString GetViewName(void) = 0;
+	virtual wxIcon GetViewIcon(void) = 0;
+	virtual void SetViewIcon(wxIcon Icon) = 0;
 };

@@ -36,12 +36,15 @@ public:
 	virtual void Deactivate(void);
 	virtual bool Applies(IGxSelection* Selection);
 	virtual void Refresh(void){};
-	virtual wxString GetName(void);
+	virtual wxString GetViewName(void);
+	virtual wxIcon GetViewIcon(void);
+	virtual void SetViewIcon(wxIcon Icon);
 protected:
 	wxString m_sViewName;
 	//IGxCatalog* m_pCatalog;
 	IGxApplication* m_pApplication;
 	wxXmlNode* m_pXmlConf;
+    wxIcon m_Icon;
 };
 
 int GxObjectCompareFunction(IGxObject* pObject1, IGxObject* pObject2, long sortData);

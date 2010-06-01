@@ -51,7 +51,7 @@ wxGISProgressor::~wxGISProgressor()
 void wxGISProgressor::OnPaint(wxPaintEvent & event)
 {
 	wxPaintDC dc(this);
-	wxSize size = GetClientSize();
+    wxSize size = wxControl::GetClientSize();
 	//dc.SetBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
  //   dc.SetPen(*wxMEDIUM_GREY_PEN);
 	//dc.DrawRectangle( 0, 0, size.x, size.y);

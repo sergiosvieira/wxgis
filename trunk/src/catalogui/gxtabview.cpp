@@ -200,8 +200,8 @@ void wxGxTab::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 				continue;
 			if(pView->Applies(Selection))
 			{
-				if(pView->GetName() != wxString(_("NoView")))
-					m_choice->Append(pView->GetName(), pWnd);
+				if(pView->GetViewName() != wxString(_("NoView")))
+					m_choice->Append(pView->GetViewName(), pWnd);
 				else
 					pNoWnd = pWnd;
 			}
@@ -254,7 +254,7 @@ void wxGxTab::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	{
 		//get first apply window
 		wxGxView* pCurrView = dynamic_cast<wxGxView*>(m_pCurrentWnd);
-		if(pCurrView && pCurrView->GetName() != wxString(_("NoView")))
+		if(pCurrView && pCurrView->GetViewName() != wxString(_("NoView")))
 		{
 			if(pCurrView->Applies(Selection))
 				goto END;
