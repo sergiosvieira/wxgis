@@ -61,8 +61,14 @@ bool wxGxToolboxView::Activate(IGxApplication* application, wxXmlNode* pConf)
 	//	//	pWnd = new wxWindow(this, wxID_ANY);
 	//	m_Tabs.push_back(pGxTab);
 
-    AddPage(new wxGxTasksView(this), wxT("test"), count == 0 ? true : false);
-		//AddPage(static_cast<wxWindow*>(pGxTab), pGxTab->GetName(), count == 0 ? true : false/*, m_ImageListSmall.GetBitmap(9)*/);
+    //add tasks vindow
+    wxGxTasksView* pView = new wxGxTasksView(this);    
+    AddPage(pView, pView->GetViewName(), count == 0 ? true : false, pView->GetViewIcon());
+    count++;
+
+    //add tree tools window
+
+	//AddPage(static_cast<wxWindow*>(pGxTab), pGxTab->GetName(), count == 0 ? true : false/*, m_ImageListSmall.GetBitmap(9)*/);
 	//	
 	//	count++;
 

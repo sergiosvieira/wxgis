@@ -152,9 +152,9 @@ void wxGISDTPath::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
 
 void wxGISDTPath::OnOpen(wxCommandEvent& event)
 {
-    //wxGISBaloonTip* pTip = new wxGISBaloonTip(wxT("test baloon"), m_ImageList.GetIcon(0), wxT("Информация об изображении\nРазмер:	445 Х 344\nТип:	15KB PNG"));
-    //pTip->showBaloon(5000);
-    //return;
+    wxGISBaloonTip* pTip = new wxGISBaloonTip(wxT("test baloon"), m_ImageList.GetIcon(0), wxT("Информация об изображении\nРазмер:	445 Х 344\nТип:	15KB PNG"));
+    pTip->showBaloon(5000);
+    return;
     wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParam->GetDomain());
 
     if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)

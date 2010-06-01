@@ -48,7 +48,7 @@ wxGISBaloonTip::wxGISBaloonTip(wxString sTitle, wxIcon Icon, wxString sMessage) 
     wxStaticBitmap* pStateBitmap = new wxStaticBitmap( this, wxID_ANY, Icon, wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( pStateBitmap, 0, wxALL, 5 );
 	
-    wxStaticText * title = new wxStaticText(this, -1, sTitle);
+    wxStaticText * title = new wxStaticText(this, wxID_ANY, sTitle);
     wxFont titleFont = this->GetFont();
     titleFont.SetWeight(wxFONTWEIGHT_BOLD);
     title->SetFont(titleFont);
@@ -66,9 +66,10 @@ wxGISBaloonTip::wxGISBaloonTip(wxString sTitle, wxIcon Icon, wxString sMessage) 
     bpCloseButton->SetBitmapSelected(wxBitmap(close_16_xpm));
     //bpCloseButton->SetBitmapFocus(wxBitmap(close_16_xpm));
     bpCloseButton->SetBitmapHover(wxBitmap(close_16_xpm));
+    bpCloseButton->SetToolTip(_("Close"));
 	fgSizer1->Add( bpCloseButton, 2, wxALL, 5 );
     //
-    //wxStaticText * title = new wxStaticText(this, -1, sTitle);
+    //wxStaticText * title = new wxStaticText(this, wxID_ANY, sTitle);
     //wxFont titleFont = this->GetFont();
     //titleFont.SetWeight(wxFONTWEIGHT_BOLD);
     //title->SetFont(titleFont);
@@ -79,7 +80,7 @@ wxGISBaloonTip::wxGISBaloonTip(wxString sTitle, wxIcon Icon, wxString sMessage) 
     //mainSizer->Add(fgSizer1,1,wxEXPAND | wxBOTTOM | wxLEFT | wxRIGHT, 5);
     mainSizer->Add(fgSizer1,0,wxEXPAND/* | wxBOTTOM */| wxLEFT | wxRIGHT, 5);
  
-    wxStaticText * text = new wxStaticText(this, -1, sMessage);
+    wxStaticText * text = new wxStaticText(this, wxID_ANY, sMessage);
     mainSizer->Add(text,1,wxEXPAND | wxBOTTOM | wxLEFT | wxRIGHT, 5);
     text->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(wxGISBaloonTip::OnClick), NULL, this );
     text->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(wxGISBaloonTip::OnEscape), NULL, this );

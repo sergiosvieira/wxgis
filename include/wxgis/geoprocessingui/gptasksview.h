@@ -23,6 +23,31 @@
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/catalogui/gxview.h"
 
+//////////////////////////////////////////////////////////////////
+// wxGxTaskPanel
+//////////////////////////////////////////////////////////////////
+
+class WXDLLIMPEXP_GIS_GPU wxGxTaskPanel :
+	public wxPanel
+{
+public:
+	wxGxTaskPanel(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL|wxBORDER_RAISED );
+    ~wxGxTaskPanel(void);
+    //events
+    virtual void OnExpand(wxCommandEvent & event);
+protected:
+    wxImageList m_ImageList;
+    bool m_bExpand;
+    wxTextCtrl* m_pRichTextCtrl;
+    wxBoxSizer* m_bMainSizer;
+
+    DECLARE_EVENT_TABLE();
+};
+
+//////////////////////////////////////////////////////////////////
+// wxGxTasksView
+//////////////////////////////////////////////////////////////////
+
 class WXDLLIMPEXP_GIS_GPU wxGxTasksView :
 	public wxScrolledWindow, 
 	public wxGxView
