@@ -173,18 +173,19 @@ void wxGxRootToolbox::Init(wxXmlNode* pConfigNode)
         wxString sExeDirPath = wxPathOnly(stp.GetExecutablePath());
         m_sPath = sExeDirPath + wxT("/sys/toolbox.xml");
         m_sPath.Replace(wxT("\\"), wxT("/"));
-        wxLogMessage(_("wxGxRootToolbox: The path set to '%s'"), m_sPath.c_str());
     }
+    wxLogMessage(_("wxGxRootToolbox: The path set to '%s'"), m_sPath.c_str());
 
-    m_pPropNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("rootitem"));
-    wxClassInfo* pInfo = GetClassInfo();
-    if(pInfo)
-        m_pPropNode->AddProperty(wxT("name"), pInfo->GetClassName());
-    m_pPropNode->AddProperty(wxT("is_enabled"), wxT("1"));    
-#ifndef WXGISPORTABLE
+    m_pPropNode = new wxXmlNode(*pConfigNode);
+    //m_pPropNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("rootitem"));
+    //wxClassInfo* pInfo = GetClassInfo();
+    //if(pInfo)
+    //    m_pPropNode->AddProperty(wxT("name"), pInfo->GetClassName());
+    //m_pPropNode->AddProperty(wxT("is_enabled"), wxT("1"));    
+#ifdef WXGISPORTABLE
     if(m_pPropNode->HasProp(wxT("path")))
         m_pPropNode->DeleteProperty(wxT("path"));
-    m_pPropNode->AddProperty(wxT("path"), m_sPath);
+    m_pPropNode->AddProperty(wxT("path"), wxEmptyString);
 #endif  
 }
 

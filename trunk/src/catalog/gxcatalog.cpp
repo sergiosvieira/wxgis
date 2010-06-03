@@ -240,7 +240,7 @@ void wxGxCatalog::LoadChildren(wxXmlNode* pNode)
 
 		for(size_t i = 0; i < m_CatalogRootItemArray.Count(); i++)
 		{
-			if(m_CatalogRootItemArray[i] == sCatalogRootItemName)
+			if(m_CatalogRootItemArray[i].IsSameAs(sCatalogRootItemName, false))
 			{
 				pChildren = pChildren->GetNext();
                 bContin = true;
@@ -251,7 +251,9 @@ void wxGxCatalog::LoadChildren(wxXmlNode* pNode)
         if(bContin)
             continue;
 
-		if(sCatalogRootItemName == DISCCONNCAT)
+        m_CatalogRootItemArray.Add(sCatalogRootItemName);
+
+		if(sCatalogRootItemName.IsSameAs(DISCCONNCAT, false))
 		{
 			SerializeDiscConnections(pChildren);
 		}
@@ -264,7 +266,7 @@ void wxGxCatalog::LoadChildren(wxXmlNode* pNode)
 			{
                 if(AddChild(pGxObject))
                 {
-                    m_CatalogRootItemArray.Add(sCatalogRootItemName);
+                    //m_CatalogRootItemArray.Add(sCatalogRootItemName);
                     IGxRootObjectProperties* pGxRootObjectProperties = dynamic_cast<IGxRootObjectProperties*>(pGxObject);
                     if(pGxRootObjectProperties)
                         pGxRootObjectProperties->Init(pChildren);

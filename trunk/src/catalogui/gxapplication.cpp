@@ -32,61 +32,7 @@ wxGxApplication::wxGxApplication(wxWindow* parent, wxWindowID id, const wxString
 
 wxGxApplication::~wxGxApplication(void)
 {
-	SerializeGxFramePos(true);
-	//should remove toolbars from commandbar array as m_mgr manage toolbars by itself 
-
-    m_pNewMenu->UnInit();
-
-    IGxSelection* pSel = m_pCatalog->GetSelection();
-
-    if(pSel->GetCount(TREECTRLID) > 0)
-	{
-        IGxObject* pObj = pSel->GetSelectedObjects(TREECTRLID, 0);
-        if(pObj && pObj != dynamic_cast<IGxObject*>(m_pCatalog))
-        {
-		    wxString sLastPath = pObj->GetFullName();
-		    if(sLastPath.IsEmpty())
-			    sLastPath = pObj->GetName();
-
-		    wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
-		    if(pLastLocationNode)
-		    {
-			    if(pLastLocationNode->HasProp(wxT("path")))
-				    pLastLocationNode->DeleteProperty(wxT("path"));
-		    }
-		    else
-		    {
-			    pLastLocationNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("lastpath")), true);
-		    }
-		    pLastLocationNode->AddProperty(wxT("path"), sLastPath);
-        }
-	}
-
-	if(m_pTreeView)
-		m_pTreeView->Deactivate();
-	if(m_pTabView)
-		m_pTabView->Deactivate();
-
-	////wxDELETE(m_pTreeView);
- //   m_pTreeView->Destroy();
-	////wxDELETE(m_pTabView);
- //   m_pTabView->Destroy();
-    for(size_t i = 0; i < m_WindowArray.size(); i++)
-        //if(m_WindowArray[i])
-        //    if(!m_WindowArray[i]->Destroy()) //?? the last window didn't destroy?
-        wxDELETE(m_WindowArray[i]);
-
-	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
-	{
-		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
-		{
-			wxGISToolBar* pToolBar = dynamic_cast<wxGISToolBar*>(m_CommandBarArray[i]);
-			if(pToolBar)
-				pToolBar->Deactivate();
-		}
-	}
-
-	m_mgr.UnInit();
+    m_mgr.UnInit();
 	wxDELETE(m_pCatalog);
 }
 
@@ -381,5 +327,66 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
 	wxLogMessage(_("wxGxApplication: Creation complete"));
 
     return true;
+}
+
+void wxGxApplication::OnClose(wxCloseEvent& event)
+{
+    event.Skip();
+	//should remove toolbars from commandbar array as m_mgr manage toolbars by itself 
+    m_pNewMenu->UnInit();
+
+    IGxSelection* pSel = m_pCatalog->GetSelection();
+
+    if(pSel->GetCount(TREECTRLID) > 0)
+	{
+        IGxObject* pObj = pSel->GetSelectedObjects(TREECTRLID, 0);
+        if(pObj && pObj != dynamic_cast<IGxObject*>(m_pCatalog))
+        {
+		    wxString sLastPath = pObj->GetFullName();
+		    if(sLastPath.IsEmpty())
+			    sLastPath = pObj->GetName();
+
+		    wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
+		    if(pLastLocationNode)
+		    {
+			    if(pLastLocationNode->HasProp(wxT("path")))
+				    pLastLocationNode->DeleteProperty(wxT("path"));
+		    }
+		    else
+		    {
+			    pLastLocationNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("lastpath")), true);
+		    }
+		    pLastLocationNode->AddProperty(wxT("path"), sLastPath);
+        }
+	}
+
+	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
+	{
+		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
+		{
+			wxGISToolBar* pToolBar = dynamic_cast<wxGISToolBar*>(m_CommandBarArray[i]);
+			if(pToolBar)
+				pToolBar->Deactivate();
+		}
+	}
+
+	if(m_pTreeView)
+		m_pTreeView->Deactivate();
+	if(m_pTabView)
+		m_pTabView->Deactivate();
+
+    wxGISApplication::OnClose(event);
+
+	////wxDELETE(m_pTreeView);
+ //   m_pTreeView->Destroy();
+	////wxDELETE(m_pTabView);
+ //   m_pTabView->Destroy();
+
+    for(size_t i = 0; i < m_WindowArray.size(); i++)
+        if(m_WindowArray[i])
+            if(!m_WindowArray[i]->Destroy()) //?? the last window didn't destroy?
+                wxDELETE(m_WindowArray[i]);
+
+ 	SerializeGxFramePos(true);
 }
 

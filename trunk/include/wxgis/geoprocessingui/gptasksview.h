@@ -23,6 +23,8 @@
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/catalogui/gxview.h"
 
+#include <wx/html/htmlwin.h>
+
 //////////////////////////////////////////////////////////////////
 // wxGxTaskPanel
 //////////////////////////////////////////////////////////////////
@@ -38,8 +40,10 @@ public:
 protected:
     wxImageList m_ImageList;
     bool m_bExpand;
-    wxTextCtrl* m_pRichTextCtrl;
+    wxHtmlWindow* m_pHtmlWindow;
     wxBoxSizer* m_bMainSizer;
+    wxBitmap m_ExpandBitmapBW, m_ExpandBitmap, m_ExpandBitmapBWRotated, m_ExpandBitmapRotated;
+    wxBitmapButton* m_bpExpandButton;
 
     DECLARE_EVENT_TABLE();
 };

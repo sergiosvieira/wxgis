@@ -22,8 +22,9 @@
 #include "wxgis/framework/tooltip.h"
 #include "wxgis/framework/application.h"
 
-#include "../../art/close_16.xpm"
-#include "../../art/close_bw_16.xpm"
+//#include "../../art/close_16.xpm"
+//#include "../../art/close_bw_16.xpm"
+#include "../../art/close_16a.xpm"
 
 BEGIN_EVENT_TABLE(wxGISBaloonTip, wxFrame)
     EVT_PAINT(wxGISBaloonTip::OnPaint)
@@ -60,12 +61,17 @@ wxGISBaloonTip::wxGISBaloonTip(wxString sTitle, wxIcon Icon, wxString sMessage) 
     title->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(wxGISBaloonTip::OnEscape), NULL, this );
 
     //wxStaticBitmap* pCloseBitmap = new wxStaticBitmap( this, wxID_ANY, wxIcon(close_16_xpm), wxDefaultPosition, wxDefaultSize, 0 );
-    wxBitmapButton* bpCloseButton = new wxBitmapButton( this, wxID_CLOSE, wxBitmap(close_bw_16_xpm), wxDefaultPosition, wxDefaultSize, 0 );
-    bpCloseButton->SetBitmapDisabled(wxBitmap(close_bw_16_xpm));
-    bpCloseButton->SetBitmapLabel(wxBitmap(close_bw_16_xpm));
-    bpCloseButton->SetBitmapSelected(wxBitmap(close_16_xpm));
-    //bpCloseButton->SetBitmapFocus(wxBitmap(close_16_xpm));
-    bpCloseButton->SetBitmapHover(wxBitmap(close_16_xpm));
+    wxBitmap NormalBitmap = wxBitmap(close_16a_xpm);
+    wxImage bwImage = NormalBitmap.ConvertToImage();
+    wxBitmap bwBitmap = bwImage.ConvertToGreyscale();
+    wxBitmapButton* bpCloseButton = new wxBitmapButton( this, wxID_CLOSE, bwBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+    bpCloseButton->SetBackgroundColour(bgColour);
+    ////wxBitmapButton* bpCloseButton = new wxBitmapButton( this, wxID_CLOSE, wxBitmap(close_bw_16_xpm), wxDefaultPosition, wxDefaultSize, 0 );
+    bpCloseButton->SetBitmapDisabled(bwBitmap);
+    bpCloseButton->SetBitmapLabel(bwBitmap);
+    bpCloseButton->SetBitmapSelected(NormalBitmap);
+ ////   //bpCloseButton->SetBitmapFocus(wxBitmap(close_16_xpm));
+    bpCloseButton->SetBitmapHover(NormalBitmap);
     bpCloseButton->SetToolTip(_("Close"));
 	fgSizer1->Add( bpCloseButton, 2, wxALL, 5 );
     //

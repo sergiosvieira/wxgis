@@ -57,16 +57,32 @@ wxGxTaskPanel::wxGxTaskPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos
     title->Wrap( -1 );
 	fgSizer1->Add( title, 1, wxALL | wxEXPAND, 5 );
 
-    wxBitmapButton* bpExpandButton = new wxBitmapButton( this, wxID_MORE, wxBitmap(expand_16_xpm), wxDefaultPosition, wxDefaultSize, 0 );
-    bpExpandButton->SetToolTip(_("Expand"));
-	fgSizer1->Add( bpExpandButton, 0, wxALL, 5 );
 
-    wxBitmapButton* bpCloseButton = new wxBitmapButton( this, wxID_CLOSE, wxBitmap(close_16a_xpm), wxDefaultPosition, wxDefaultSize, 0 );
-    //bpCloseButton->SetBitmapDisabled(wxBitmap(close_bw_16_xpm));
-    //bpCloseButton->SetBitmapLabel(wxBitmap(close_bw_16_xpm));
-    //bpCloseButton->SetBitmapSelected(wxBitmap(close_16_xpm));
-    ////bpCloseButton->SetBitmapFocus(wxBitmap(close_16_xpm));
-    //bpCloseButton->SetBitmapHover(wxBitmap(close_16_xpm));
+    m_ExpandBitmap = wxBitmap(expand_16_xpm);
+    wxImage bwImage = m_ExpandBitmap.ConvertToImage();
+    m_ExpandBitmapRotated = wxBitmap(bwImage.Mirror(false));
+    m_ExpandBitmapBW = wxBitmap(bwImage.ConvertToGreyscale());
+    m_ExpandBitmapBWRotated = wxBitmap(bwImage.ConvertToGreyscale().Mirror(false));
+    m_bpExpandButton = new wxBitmapButton( this, wxID_MORE, m_ExpandBitmapBW, wxDefaultPosition, wxDefaultSize, 0 );
+//    m_bpExpandButton->SetBackgroundColour(bgColour);
+    m_bpExpandButton->SetBitmapDisabled(m_ExpandBitmapBW);
+    m_bpExpandButton->SetBitmapLabel(m_ExpandBitmapBW);
+    m_bpExpandButton->SetBitmapSelected(m_ExpandBitmap);
+    m_bpExpandButton->SetBitmapHover(m_ExpandBitmap);
+    //wxBitmapButton* bpExpandButton = new wxBitmapButton( this, wxID_MORE, wxBitmap(expand_16_xpm), wxDefaultPosition, wxDefaultSize, 0 );
+    m_bpExpandButton->SetToolTip(_("Expand"));
+	fgSizer1->Add( m_bpExpandButton, 0, wxALL, 5 );
+
+    wxBitmap NormalCBitmap = wxBitmap(close_16a_xpm);
+    bwImage = NormalCBitmap.ConvertToImage();
+    wxBitmap bwCBitmap = bwImage.ConvertToGreyscale();
+    wxBitmapButton* bpCloseButton = new wxBitmapButton( this, wxID_CLOSE, bwCBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+//    bpCloseButton->SetBackgroundColour(bgColour);
+    bpCloseButton->SetBitmapDisabled(bwCBitmap);
+    bpCloseButton->SetBitmapLabel(bwCBitmap);
+    bpCloseButton->SetBitmapSelected(NormalCBitmap);
+    bpCloseButton->SetBitmapHover(NormalCBitmap);
+    //wxBitmapButton* bpCloseButton = new wxBitmapButton( this, wxID_CLOSE, wxBitmap(close_16a_xpm), wxDefaultPosition, wxDefaultSize, 0 );
     bpCloseButton->SetToolTip(_("Close"));
     fgSizer1->Add( bpCloseButton, 0, wxALL, 5 );
 
@@ -88,13 +104,11 @@ wxGxTaskPanel::wxGxTaskPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos
 
 */
     wxStaticText * text = new wxStaticText(this, wxID_ANY, _("status message"));// very long to fit in control may be and try again status message very long to fit in control may be, wxDefaultPosition, wxDefaultSize, wxST_NO_AUTORESIZE
-    //text->Wrap(100);
     text->Wrap( -1 );
     m_bMainSizer->Add(text, 0, wxEXPAND | wxALL, 5);
 
     wxGISProgressor* pProgressor = new wxGISProgressor(this);
     pProgressor->SetInitialSize(wxSize(-1, 18));
-    //pProgressor->SetVirtualSizeHints(-1, 15, -1, 15);
     m_bMainSizer->Add(pProgressor, 0, wxALL|wxEXPAND, 5);
 
 /*     wxGISProgressor* pProgressor = new wxGISProgressor(this);
@@ -105,10 +119,10 @@ wxGxTaskPanel::wxGxTaskPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos
     m_bMainSizer->Add(pChkBox, 0, /*wxEXPAND | */wxALL, 5);
 
 //    wxRichTextCtrl* pRichTextCtrl = new wxRichTextCtrl(this, wxID_ANY);
-    m_pRichTextCtrl = new wxTextCtrl(this, wxID_ANY);
-    m_pRichTextCtrl->SetInitialSize(wxSize(-1, 255));
-    m_bMainSizer->Add(m_pRichTextCtrl, 0, wxEXPAND | wxALL, 5);
-    m_pRichTextCtrl->Show(false);
+    m_pHtmlWindow = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHW_DEFAULT_STYLE | wxBORDER_THEME);
+    m_pHtmlWindow->SetInitialSize(wxSize(-1, 255));
+    m_bMainSizer->Add(m_pHtmlWindow, 0, wxEXPAND | wxALL, 5);
+    m_pHtmlWindow->Show(false);
 
    	this->SetSizer( m_bMainSizer );
 	this->Layout();
@@ -124,13 +138,18 @@ wxGxTaskPanel::~wxGxTaskPanel(void)
 void wxGxTaskPanel::OnExpand(wxCommandEvent & event)
 {
     m_bExpand = !m_bExpand;
-    m_pRichTextCtrl->Show(m_bExpand);
+
+    m_bpExpandButton->SetBitmapDisabled(m_bExpand == false ? m_ExpandBitmapBW : m_ExpandBitmapBWRotated);
+    m_bpExpandButton->SetBitmapLabel(m_bExpand == false ? m_ExpandBitmapBW : m_ExpandBitmapBWRotated);
+    m_bpExpandButton->SetBitmapSelected(m_bExpand == false ? m_ExpandBitmap : m_ExpandBitmapRotated);
+    m_bpExpandButton->SetBitmapHover(m_bExpand == false ? m_ExpandBitmap : m_ExpandBitmapRotated);
+
+    m_pHtmlWindow->Show(m_bExpand);
     wxSize Size = GetSize();
     Fit();
     wxSize NewSize = GetSize();
     SetSize(wxSize(Size.x, NewSize.y));
-    GetParent()->Layout();
-    //GetParent()->GetParent()->Refresh();
+    GetParent()->FitInside();
 }
 
 //////////////////////////////////////////////////////////////////

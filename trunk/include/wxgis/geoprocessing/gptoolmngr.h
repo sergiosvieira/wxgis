@@ -33,9 +33,15 @@ public:
     wxGISGPToolManager(wxXmlNode* pToolsNode, IGxCatalog* pCatalog = NULL);
     ~wxGISGPToolManager(void);
     IGPTool* GetTool(wxString sToolName);
+    typedef struct _toolinfo
+    {
+        wxString ClassName;
+        wxXmlNode* pConfig;
+    } TOOLINFO;
+
 protected:
     wxXmlNode* m_pToolsNode;
-    std::map<wxString, wxString> m_ToolsMap; //internal name, class name
+    std::map<wxString, TOOLINFO> m_ToolsMap; //internal name, class name
     IGxCatalog* m_pCatalog;
 };
 
