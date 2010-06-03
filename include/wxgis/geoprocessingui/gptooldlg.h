@@ -68,6 +68,7 @@ public:
         m_splitter->SetSashPosition( 0 );
         m_splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISGPToolDlg::m_splitterOnIdle ), NULL, this );
     }
+    void SerializeFramePos(bool bSave = true);
 //events
     virtual void OnHelp(wxCommandEvent& event);
     virtual void OnHelpUI(wxUpdateUIEvent& event);

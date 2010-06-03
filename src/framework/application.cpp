@@ -39,6 +39,7 @@ BEGIN_EVENT_TABLE(wxGISApplication, wxFrame)
 	EVT_MENU_RANGE(ID_MENUCMD, ID_MENUCMD + 128, wxGISApplication::OnDropDownCommand)
 	EVT_UPDATE_UI_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 512, wxGISApplication::OnCommandUI)
     EVT_AUITOOLBAR_TOOL_DROPDOWN(wxID_ANY, wxGISApplication::OnToolDropDown)
+    EVT_CLOSE(wxGISApplication::OnClose)
 END_EVENT_TABLE()
 
 wxGISApplication::wxGISApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style), m_pGISAcceleratorTable(NULL), m_pMenuBar(NULL), m_CurrentTool(NULL), m_pDropDownCommand(NULL)
@@ -47,28 +48,6 @@ wxGISApplication::wxGISApplication(wxWindow* parent, wxWindowID id, const wxStri
 
 wxGISApplication::~wxGISApplication(void)
 {
-	if(m_pGISAcceleratorTable)
-		m_pGISAcceleratorTable->Store();
-	wxDELETE(m_pGISAcceleratorTable);
-	if(m_pMenuBar)
-	{
-		wxXmlNode* pMenuBarNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/menubar")));
-		if(!pMenuBarNode)
-			pMenuBarNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame/menubar")), true);
-		m_pMenuBar->Serialize(pMenuBarNode);
-	}
-	//wxDELETE(m_pMenuBar); delete by wxApp
-
-	SerializeCommandBars(true);
-	SerializeFramePos(true);
-
-	//delete oposite direction to prevent delete sub menues // refcount!
-	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
-	    wsDELETE(m_CommandBarArray[i]);
-
-	for(size_t i = 0; i < m_CommandArray.size(); i++)
-		wxDELETE(m_CommandArray[i]);
-
     for(size_t i = 0; i < m_LibArr.size(); i++)
 		wxDELETE(m_LibArr[i]);
 }
@@ -748,5 +727,31 @@ bool wxGISApplication::Create(IGISConfig* pConfig)
     m_pGlobalApp = this;
 
     return true;
+}
+
+void wxGISApplication::OnClose(wxCloseEvent& event)
+{
+    event.Skip();
+
+	if(m_pGISAcceleratorTable)
+		m_pGISAcceleratorTable->Store();
+	wxDELETE(m_pGISAcceleratorTable);
+	if(m_pMenuBar)
+	{
+		wxXmlNode* pMenuBarNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/menubar")));
+		if(!pMenuBarNode)
+			pMenuBarNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame/menubar")), true);
+		m_pMenuBar->Serialize(pMenuBarNode);
+	}
+	//wxDELETE(m_pMenuBar); delete by wxApp
+	SerializeCommandBars(true);
+	//delete oposite direction to prevent delete sub menues // refcount!
+	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
+	    wsDELETE(m_CommandBarArray[i]);
+
+	for(size_t i = 0; i < m_CommandArray.size(); i++)
+		wxDELETE(m_CommandArray[i]);
+
+	SerializeFramePos(true);
 }
 

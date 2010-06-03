@@ -86,31 +86,6 @@ wxGISGPToolDlg::wxGISGPToolDlg( IGPTool* pTool, wxXmlNode* pPropNode, wxWindow* 
                 break;
             }
         }
- //   wxGISDTChoice* pCh1 = new wxGISDTChoice(m_tools);
-	//bSizer4->Add( pCh1, 0, wxEXPAND, 5 );
- //   wxGISDTChoice* pCh2 = new wxGISDTChoice(m_tools);
-	//bSizer4->Add( pCh2, 0, wxEXPAND, 5 );
- //   wxGISDTChoice* pCh3 = new wxGISDTChoice(m_tools);
-	//bSizer4->Add( pCh3, 0, wxEXPAND, 5 );
- //   wxGISDTChoice* pCh4 = new wxGISDTChoice(m_tools);
-	//bSizer4->Add( pCh4, 0, wxEXPAND, 5 );
- //   wxGISDTChoice* pCh5 = new wxGISDTChoice(m_tools);
-	//bSizer4->Add( pCh5, 0, wxEXPAND, 5 );
- //   wxGISDTChoice* pCh6 = new wxGISDTChoice(m_tools);
-	//bSizer4->Add( pCh6, 0, wxEXPAND, 5 );
-
- //   wxGISDTChoice* pCh7 = new wxGISDTChoice(m_tools);
-	//bSizer4->Add( pCh7, 0, wxEXPAND, 5 );
- //   wxGISDTChoice* pCh8 = new wxGISDTChoice(m_tools);
-	//bSizer4->Add( pCh8, 0, wxEXPAND, 5 );
- //   wxGISDTChoice* pCh9 = new wxGISDTChoice(m_tools);
-	//bSizer4->Add( pCh9, 0, wxEXPAND, 5 );
- //   wxGISDTChoice* pCh10 = new wxGISDTChoice(m_tools);
-	//bSizer4->Add( pCh10, 0, wxEXPAND, 5 );
- //   wxGISDTChoice* pCh11 = new wxGISDTChoice(m_tools);
-	//bSizer4->Add( pCh11, 0, wxEXPAND, 5 );
- //   wxGISDTChoice* pCh12 = new wxGISDTChoice(m_tools);
-	//bSizer4->Add( pCh12, 0, wxEXPAND, 5 );
     }
 
     m_tools->SetSizer( bSizer4 );
@@ -165,10 +140,12 @@ wxGISGPToolDlg::wxGISGPToolDlg( IGPTool* pTool, wxXmlNode* pPropNode, wxWindow* 
 
     IApplication* pApp = ::GetApplication();
     pApp->RegisterChildWindow(this);
+    SerializeFramePos(false);
 }
 
 wxGISGPToolDlg::~wxGISGPToolDlg()
 {
+    SerializeFramePos(true);
     wxDELETE(m_pTool);
 }
 
@@ -203,6 +180,10 @@ void wxGISGPToolDlg::OnOk(wxCommandEvent& event)
     IApplication* pApp = ::GetApplication();
     pApp->UnRegisterChildWindow(this);
     //event.Skip();
+
+    //create panel - get progress with messages
+
+    //mngr - run execute
 }
 
 void wxGISGPToolDlg::OnCancel(wxCommandEvent& event)
@@ -250,4 +231,61 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
     if(nNonValid > 0)
         return;
     event.Enable(true);
+}
+
+void wxGISGPToolDlg::SerializeFramePos(bool bSave)
+{
+	if(!m_pPropNode)
+		return;
+	if(bSave)
+	{
+
+		if( IsMaximized() )
+		{
+			if(m_pPropNode->HasProp(wxT("maxi")))
+				m_pPropNode->DeleteProperty(wxT("maxi"));
+			m_pPropNode->AddProperty(wxT("maxi"), wxT("1"));
+		}
+		else
+		{
+			int x, y, w, h;
+			GetClientSize(&w, &h);
+			GetPosition(&x, &y);
+
+			if(m_pPropNode->HasProp(wxT("Height")))
+				m_pPropNode->DeleteProperty(wxT("Height"));
+			m_pPropNode->AddProperty(wxT("Height"), wxString::Format(wxT("%u"), h));
+			if(m_pPropNode->HasProp(wxT("Width")))
+				m_pPropNode->DeleteProperty(wxT("Width"));
+			m_pPropNode->AddProperty(wxT("Width"), wxString::Format(wxT("%u"), w));
+			if(m_pPropNode->HasProp(wxT("YPos")))
+				m_pPropNode->DeleteProperty(wxT("YPos"));
+			m_pPropNode->AddProperty(wxT("YPos"), wxString::Format(wxT("%d"), y));
+			if(m_pPropNode->HasProp(wxT("XPos")))
+				m_pPropNode->DeleteProperty(wxT("XPos"));
+			m_pPropNode->AddProperty(wxT("XPos"), wxString::Format(wxT("%d"), x));
+			if(m_pPropNode->HasProp(wxT("maxi")))
+				m_pPropNode->DeleteProperty(wxT("maxi"));
+			m_pPropNode->AddProperty(wxT("maxi"), wxT("0"));
+		}
+	}
+	else
+	{
+		//load
+		bool bMaxi = wxAtoi(m_pPropNode->GetPropVal(wxT("maxi"), wxT("0")));
+		if(!bMaxi)
+		{
+			int x = wxAtoi(m_pPropNode->GetPropVal(wxT("XPos"), wxT("50")));
+			int y = wxAtoi(m_pPropNode->GetPropVal(wxT("YPos"), wxT("50")));
+			int w = wxAtoi(m_pPropNode->GetPropVal(wxT("Width"), wxT("850")));
+			int h = wxAtoi(m_pPropNode->GetPropVal(wxT("Height"), wxT("530")));
+			
+			Move(x, y);
+			SetClientSize(w, h);
+		}
+		else
+		{
+			Maximize();
+		}
+	}
 }

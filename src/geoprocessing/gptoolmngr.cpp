@@ -44,7 +44,8 @@ wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode, IGxCatalog* pCatal
 		if(pTool != NULL)
 		{
             wxString sInternalName = pTool->GetName();
-            m_ToolsMap[sInternalName] = sName;
+            TOOLINFO info = {sName, pChild};
+            m_ToolsMap[sInternalName] = info;
             wxDELETE(pTool);
         }
         pChild = pChild->GetNext();
@@ -60,7 +61,7 @@ wxGISGPToolManager::~wxGISGPToolManager(void)
 
 IGPTool* wxGISGPToolManager::GetTool(wxString sToolName)
 {
-	wxObject *pObj = wxCreateDynamicObject(m_ToolsMap[sToolName]);
+	wxObject *pObj = wxCreateDynamicObject(m_ToolsMap[sToolName].ClassName);
     IGPTool* pTool = dynamic_cast<IGPTool*>(pObj);
     if(!pTool)
         return NULL;

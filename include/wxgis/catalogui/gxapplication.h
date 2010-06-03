@@ -48,6 +48,8 @@ public:
 	//wxGISApplication
 	virtual void RemoveCommandBar(IGISCommandBar* pBar);
 	virtual bool AddCommandBar(IGISCommandBar* pBar);
+    //events 
+    virtual void OnClose(wxCloseEvent& event);
 	//IApplication
 	virtual void Customize(void);
 	virtual void ShowStatusBar(bool bShow);

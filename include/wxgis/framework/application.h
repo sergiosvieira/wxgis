@@ -79,6 +79,7 @@ protected:
 	virtual void OnRightDown(wxMouseEvent& event);
 	virtual void OnRightDown(wxAuiToolBarEvent& event);
 	virtual void OnToolDropDown(wxAuiToolBarEvent& event);
+	virtual void OnClose(wxCloseEvent& event);
 //
 protected:
 	IGISConfig* m_pConfig;
