@@ -21,12 +21,13 @@
 #include "wxgis/framework/progressor.h"
 
 BEGIN_EVENT_TABLE(wxGISProgressor, wxGauge)
+	EVT_SIZE(wxGISProgressor::OnSize)
 	EVT_PAINT(wxGISProgressor::OnPaint)
 	EVT_ERASE_BACKGROUND(wxGISProgressor::OnEraseBackground)
     EVT_TIMER( PTIMER_ID, wxGISProgressor::OnTimer )
 END_EVENT_TABLE()
 
-wxGISProgressor::wxGISProgressor(wxWindow * parent, wxWindowID id, int range, const wxPoint & pos, const wxSize & size, long style, const wxString name) : wxControl(parent, id, pos, size, style, wxDefaultValidator, name), m_nRange(range), m_nValue(0), m_bPulse(false), m_timer(this, PTIMER_ID)
+wxGISProgressor::wxGISProgressor(wxWindow * parent, wxWindowID id, int range, const wxPoint & pos, const wxSize & size, long style, const wxString name) : wxControl(parent, id, pos, size, style, wxDefaultValidator, name), m_nRange(range), m_nValue(0), m_bPulse(false), m_timer(this, PTIMER_ID), m_bYield(true)
 {
 	//m_nImgPos = 0;
 	//m_ImageList.Create(bitmap_size, bitmap_size);
@@ -46,6 +47,11 @@ wxGISProgressor::~wxGISProgressor()
 	//{
 	//	wxDELETE(m_Timer);
 	//}
+}
+
+void wxGISProgressor::OnSize(wxSizeEvent & event)
+{
+    Refresh();
 }
 
 void wxGISProgressor::OnPaint(wxPaintEvent & event)
@@ -124,11 +130,18 @@ void wxGISProgressor::SetValue(int value)
     //if(!pWnd)
     //    pWnd = GetParent()->GetParent();
     //if(pWnd)
+    if(m_bYield)
         ::wxSafeYield(NULL, true);//(pWnd, true);
 
 
     Refresh();
 }
+
+void wxGISProgressor::SetYield(bool bYield)
+{
+    m_bYield = bYield;
+}
+
 
 int wxGISProgressor::GetValue()
 {

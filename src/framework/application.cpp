@@ -20,7 +20,10 @@
  ****************************************************************************/
 #include "wxgis/framework/application.h"
 #include "wxgis/framework/toolbarmenu.h"
-#include <wx/tokenzr.h>
+
+#include "wx/tokenzr.h"
+#include "wx/wxhtml.h"
+
 #include "../../art/default_16.xpm"
 
 static IApplication* m_pGlobalApp;
@@ -725,6 +728,11 @@ bool wxGISApplication::Create(IGISConfig* pConfig)
 	SerializeFramePos(false);
 	SetAcceleratorTable(m_pGISAcceleratorTable->GetAcceleratorTable());
     m_pGlobalApp = this;
+
+    wxHtmlWindow *pHtmlText = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHW_DEFAULT_STYLE | wxBORDER_THEME);
+    pHtmlText->SetPage(wxT("<html><body><h1>Error</h1>Some error occurred :-H)</body></hmtl>"));
+    pHtmlText->Show(false);
+    RegisterChildWindow(pHtmlText);
 
     return true;
 }

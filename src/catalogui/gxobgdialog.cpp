@@ -304,7 +304,7 @@ BEGIN_EVENT_TABLE(wxGxObjectDialog, wxDialog)
 	EVT_MENU_RANGE(ID_MENUCMD, ID_MENUCMD + 128, wxGxObjectDialog::OnDropDownCommand)
 	EVT_UPDATE_UI_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 10, wxGxObjectDialog::OnCommandUI)
     EVT_AUITOOLBAR_TOOL_DROPDOWN(wxID_ANY, wxGxObjectDialog::OnToolDropDown)
-    EVT_COMBOBOX(FILTERCOMBO, wxGxObjectDialog::OnFilerSelect)
+    EVT_COMBOBOX(FILTERCOMBO, wxGxObjectDialog::OnFilterSelect)
     EVT_BUTTON(wxID_OK, wxGxObjectDialog::OnOK)
     EVT_UPDATE_UI(wxID_OK, wxGxObjectDialog::OnOKUI)
 END_EVENT_TABLE()
@@ -662,7 +662,7 @@ void wxGxObjectDialog::RemoveAllFilters(void)
             wxDELETE(m_FilterArray[i]);
 }
 
-void wxGxObjectDialog::OnFilerSelect(wxCommandEvent& event)
+void wxGxObjectDialog::OnFilterSelect(wxCommandEvent& event)
 {
     m_nDefaultFilter = m_WildcardCombo->GetCurrentSelection();
     m_pwxGxContentView->SetCurrentFilter(m_nDefaultFilter);
@@ -894,6 +894,16 @@ wxString wxGxObjectDialog::GetNameWithExt(void)
 wxString wxGxObjectDialog::GetName(void)
 {
     wxString sName = m_NameTextCtrl->GetValue();
+
+    IGxObjectFilter* pFilter = GetCurrentFilter();
+    if(pFilter)
+    {
+        wxString sExt;
+        sExt = pFilter->GetExt();
+        if(sExt.IsEmpty())
+            return sName;
+    }
+
     wxFileName FileName(sName);
     FileName.SetEmptyExt();
     sName = FileName.GetName();
@@ -994,4 +1004,9 @@ IGxObjectFilter* wxGxObjectDialog::GetCurrentFilter(void)
     if(m_FilterArray.size() == 0)
         return NULL;
     return m_FilterArray[m_nDefaultFilter];
+}
+
+size_t wxGxObjectDialog::GetCurrentFilterId(void)
+{
+    return m_nDefaultFilter;
 }

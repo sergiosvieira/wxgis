@@ -319,7 +319,7 @@ bool wxGxTool::Invoke(wxWindow* pParentWnd)
     IGPTool* pTool = m_pToolMngr->GetTool(m_sInternalName);
     if(pTool)
     {
-        wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(pTool, m_pPropNode);//, pParentWnd);//
+        wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(pTool, m_pToolMngr, m_pPropNode, pParentWnd);//);//
         pDlg->Show(true);
         //pDlg->SetParent(pParentWnd);
     //dlg.ShowModal();//(true);

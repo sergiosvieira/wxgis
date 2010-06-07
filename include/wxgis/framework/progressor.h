@@ -33,9 +33,11 @@ public:
 	wxGISProgressor(wxWindow * parent, wxWindowID id = wxID_ANY, int range = 100, const wxPoint & pos = wxDefaultPosition, const wxSize & size = wxDefaultSize, long style = /*wxNO_BORDER*/wxSTATIC_BORDER, const wxString name = wxT("GISProgressor"));
 	virtual ~wxGISProgressor(void);
     //events
+    void OnSize(wxSizeEvent & event);
 	void OnPaint(wxPaintEvent & event);
 	void OnEraseBackground(wxEraseEvent & event);
     void OnTimer( wxTimerEvent & event);
+	virtual void SetYield(bool bYield = false);
 	//IProgressor
 	virtual bool Show(bool bShow);
     virtual void SetRange(int range);
@@ -49,6 +51,7 @@ protected:
     int m_nRange;
     bool m_bPulse;
 	wxTimer m_timer;
+    bool m_bYield;
 
 	DECLARE_EVENT_TABLE()
 };

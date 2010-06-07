@@ -21,7 +21,7 @@
 
 #include "wxgis/geoprocessing/gpdomain.h"
 
-wxGISGPGxObjectDomain::wxGISGPGxObjectDomain(void)
+wxGISGPGxObjectDomain::wxGISGPGxObjectDomain(void) : m_nSelFilterIndex(0)
 {
 }
 
@@ -47,3 +47,14 @@ size_t wxGISGPGxObjectDomain::GetFilterCount(void)
 {
     return m_FilterArray.size();
 }
+
+ void wxGISGPGxObjectDomain::SetSelFilter(size_t nIndex)
+ {
+     m_nSelFilterIndex = nIndex;
+ }
+
+ size_t wxGISGPGxObjectDomain::GetSelFilter(void)
+ {
+     return m_nSelFilterIndex;
+ }
+

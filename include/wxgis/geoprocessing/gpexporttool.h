@@ -22,6 +22,7 @@
 #pragma once
 
 #include "wxgis/geoprocessing/geoprocessing.h"
+#include "wxgis/geoprocessing/gpvector.h"
 
 /////////////////////////////////////////////////////////////////////////
 // wxGISGPExportTool
@@ -40,10 +41,12 @@ public:
     virtual wxString GetDisplayName(void);
     virtual wxString GetName(void);
     virtual wxString GetCategory(void);
+    virtual bool Execute(ITrackCancel* pTrackCancel);
     virtual bool Validate(void);
     virtual GPParameters* GetParameterInfo(void);
     virtual void SetCatalog(IGxCatalog* pCatalog);
     virtual IGxCatalog* GetCatalog(void);
+    virtual bool OnExport(wxGISFeatureDataset* pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel);
 protected:
     GPParameters m_pParamArr;
     IGxCatalog* m_pCatalog;

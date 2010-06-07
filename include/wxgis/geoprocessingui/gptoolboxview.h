@@ -22,7 +22,9 @@
 
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/catalogui/gxview.h"
-#include <wx/aui/aui.h>
+#include "wxgis/geoprocessingui/gptasksview.h"
+
+#include "wx/aui/aui.h"
 
 class WXDLLIMPEXP_GIS_GPU wxGxToolboxView : 
 	public wxAuiNotebook,
@@ -40,6 +42,8 @@ public:
 //Events
 	void OnAUINotebookPageChanged(wxAuiNotebookEvent& event);
 protected:
+    IApplication* m_pApp;
+    wxGxTasksView* m_pGxTasksView;
 	//std::vector<wxGxTab*> m_Tabs;
 	//IConnectionPointContainer *m_pConnectionPointSelection;
 	//long m_ConnectionPointSelectionCookie;

@@ -221,6 +221,7 @@ public:
     virtual wxString GetPath(void);
     virtual IGxObject* GetLocation(void);
     virtual IGxObjectFilter* GetCurrentFilter(void);
+    virtual size_t GetCurrentFilterId(void);
 protected:
 // events
     virtual void OnCommand(wxCommandEvent& event);
@@ -228,7 +229,7 @@ protected:
 	virtual void OnDropDownCommand(wxCommandEvent& event);
 	virtual void OnToolDropDown(wxAuiToolBarEvent& event);
 	virtual void OnItemSelected(wxListEvent& event);
-	virtual void OnFilerSelect(wxCommandEvent& event);
+	virtual void OnFilterSelect(wxCommandEvent& event);
     virtual void OnOK(wxCommandEvent& event);
     virtual void OnOKUI(wxUpdateUIEvent& event);
     virtual void OnCommand(ICommand* pCmd);

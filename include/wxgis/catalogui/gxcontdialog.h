@@ -119,6 +119,7 @@ public:
 	virtual void OnMouseDoubleClick(wxMouseEvent& event){};
 	virtual void OnMouseMove(wxMouseEvent& event){};
     virtual bool Create(IGISConfig* pConfig){return true;};
+
 //wxDialog
     int ShowModal(void);
 //wxGxContainerDialog

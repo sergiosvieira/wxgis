@@ -100,6 +100,9 @@ enum wxGISEnumMessageType
 	enumGISMessageErr,
 	enumGISMessageNorm,
 	enumGISMessageQuestion,
-    enumGISMessageInfo
+    enumGISMessageInfo,
+    enumGISMessageWarning,
+    enumGISMessageTitle,
+    enumGISMessageOK
 };
 

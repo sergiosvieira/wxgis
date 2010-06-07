@@ -32,6 +32,9 @@ public:
 	virtual void AddFilter(IGxObjectFilter* pFilter);
     virtual IGxObjectFilter* GetFilter(size_t nIndex);
     virtual size_t GetFilterCount(void);
+    virtual void SetSelFilter(size_t nIndex);
+    virtual size_t GetSelFilter(void);
 protected:
 	OBJECTFILTERS m_FilterArray;
+    size_t m_nSelFilterIndex;
 };

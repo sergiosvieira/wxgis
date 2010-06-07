@@ -97,6 +97,8 @@ public:
     virtual void SetValue(wxVariant Val) = 0;
     virtual IGPDomain* GetDomain(void) = 0;
     virtual void SetDomain(IGPDomain* pDomain) = 0;
+    //virtual IGPDomain* GetDomain(void) = 0;
+    //virtual void SetDomain(IGPDomain* pDomain) = 0;
     virtual wxString GetMessage(void) = 0;
     virtual wxGISEnumGPMessageType GetÌessageType(void) = 0;
     virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString) = 0;
@@ -111,11 +113,18 @@ public:
     virtual wxString GetDisplayName(void) = 0;
     virtual wxString GetName(void) = 0;
     virtual wxString GetCategory(void) = 0;
-    //virtual Execute(...) = 0;
+    virtual bool Execute(ITrackCancel* pTrackCancel) = 0;
     virtual bool Validate(void) = 0;
     virtual GPParameters* GetParameterInfo(void) = 0;
     virtual void SetCatalog(IGxCatalog* pCatalog) = 0;
     virtual IGxCatalog* GetCatalog(void) = 0;
     //virtual GetToolType(void) = 0;
+};
+
+class IGPCallBack
+{
+public:
+    virtual ~IGPCallBack(void){};
+    virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL) = 0;
 };
 

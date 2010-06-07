@@ -22,6 +22,25 @@
 #pragma once
 
 #include "wxgis/geoprocessing/geoprocessing.h"
+#include "wx/thread.h"
+
+class WXDLLIMPEXP_GIS_GP wxGISGPToolManager;
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISGPTaskThread
+///////////////////////////////////////////////////////////////////////////////
+
+class wxGISGPTaskThread : public wxThread
+{
+public:
+	wxGISGPTaskThread(wxGISGPToolManager* pMngr, IGPTool* pTool, ITrackCancel* pTrackCancel);
+    virtual void *Entry();
+    virtual void OnExit();
+private:
+    ITrackCancel* m_pTrackCancel;
+    wxGISGPToolManager* m_pMngr;
+    IGPTool* m_pTool;
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISGPToolManager
@@ -31,18 +50,28 @@ class WXDLLIMPEXP_GIS_GP wxGISGPToolManager
 {
 public:
     wxGISGPToolManager(wxXmlNode* pToolsNode, IGxCatalog* pCatalog = NULL);
-    ~wxGISGPToolManager(void);
-    IGPTool* GetTool(wxString sToolName);
+    virtual ~wxGISGPToolManager(void);
+    virtual IGPTool* GetTool(wxString sToolName);
+    //return the thread ID
+    virtual long OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel = NULL, IGPCallBack* pCallBack = NULL);
+    virtual void OnFinish(unsigned long nThreadId, bool bHasErrors, IGPTool* pTool);
     typedef struct _toolinfo
     {
         wxString ClassName;
         wxXmlNode* pConfig;
     } TOOLINFO;
-
+    typedef struct _threaddata
+    {
+        wxGISGPTaskThread* pThread;
+        IGPCallBack* pCallBack;
+        ITrackCancel* pTrackCancel;
+    } THREADDATA;
 protected:
     wxXmlNode* m_pToolsNode;
     std::map<wxString, TOOLINFO> m_ToolsMap; //internal name, class name
     IGxCatalog* m_pCatalog;
+    short m_nMaxThreads, m_nRunningThreads;
+    std::map<unsigned long, THREADDATA> m_TasksThreadMap; //internal name, class name
 };
 
 ///////////////////////////////////////////////////////////////////////////////

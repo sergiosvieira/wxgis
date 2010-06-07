@@ -23,7 +23,6 @@
 
 bool CopyRows(wxGISFeatureDataset* pSrcDataSet, wxGISFeatureDataset* pDstDataSet, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel)
 {
-    wxStopWatch sw;
     OGRSpatialReference* pSrsSRS = pSrcDataSet->GetSpatialReference();
     OGRSpatialReference* pDstSRS = pDstDataSet->GetSpatialReference();
     OGRCoordinateTransformation *poCT(NULL);
@@ -36,15 +35,13 @@ bool CopyRows(wxGISFeatureDataset* pSrcDataSet, wxGISFeatureDataset* pDstDataSet
     if(pTrackCancel)
     {
        pProgressor = pTrackCancel->GetProgressor();
-       pTrackCancel->PutMessage(wxString::Format(_("Start CopyRows from '%s' to '%s'"), pSrcDataSet->GetPath().c_str(), pDstDataSet->GetPath().c_str()), 1000, enumGISMessageInfo);
+       pTrackCancel->PutMessage(wxString::Format(_("Start CopyRows from '%s' to '%s'"), pSrcDataSet->GetPath().c_str(), pDstDataSet->GetPath().c_str()), -1, enumGISMessageNorm);
     }
     int nCounter(0);
     size_t nStep = pSrcDataSet->GetSize() < 10 ? 1 : pSrcDataSet->GetSize() / 10;
     if(pProgressor)
-    {
         pProgressor->SetRange(pSrcDataSet->GetSize());
-        pProgressor->Show(true);
-    }
+
     pSrcDataSet->Reset();
     OGRFeature* pFeature;
     while((pFeature = pSrcDataSet->Next()) != NULL)
@@ -52,8 +49,6 @@ bool CopyRows(wxGISFeatureDataset* pSrcDataSet, wxGISFeatureDataset* pDstDataSet
         if(pTrackCancel && !pTrackCancel->Continue())
         {
             OGRFeature::DestroyFeature(pFeature);
-            if(pProgressor)
-                pProgressor->Show(false);
             return false;
         }
         if( !bSame && poCT )
@@ -138,7 +133,7 @@ bool CopyRows(wxGISFeatureDataset* pSrcDataSet, wxGISFeatureDataset* pDstDataSet
                 const char* err = CPLGetLastErrorMsg();
                 wxString sErr = wxString::Format(_("Error while adding OGRFeature! OGR error: %s"), wgMB2WX(err));
                 wxLogError(sErr);
-                pTrackCancel->PutMessage(sErr, 1000, enumGISMessageErr);
+                pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
             }
         }
         nCounter++;
@@ -149,22 +144,5 @@ bool CopyRows(wxGISFeatureDataset* pSrcDataSet, wxGISFeatureDataset* pDstDataSet
     if(poCT)
         OCTDestroyCoordinateTransformation(poCT);
 
-    if(pProgressor)
-        pProgressor->Show(false);
-    if(pTrackCancel)
-    {
-        wxString sMsg;     
-        double fSec = sw.Time() / 1000;
-        if(fSec < 60)
-        {
-            double fMin = fSec / 60;
-            fSec -= fMin * 60;
-            sMsg = wxString::Format(_("The execution tooks %ld min %lds"), (long)fMin, (long)fSec);
-        }
-        else
-            sMsg = wxString::Format(_("The execution tooks %lds"), (long)fSec);
-//        wxString sMsg = wxString::Format(_("The execution tooks %ldms"), sw.Time());
-        pTrackCancel->PutMessage(sMsg, 1000, enumGISMessageInfo);
-    }
     return true;
 }

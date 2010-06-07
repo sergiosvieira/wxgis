@@ -1,6 +1,6 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
- * Purpose:  extended tooltip class.
+ * Project:  wxGIS (GIS Toolbox)
+ * Purpose:  ortho correct geoprocessing tools.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -20,40 +20,32 @@
  ****************************************************************************/
 
 #pragma once
-#include "wxgis/framework/framework.h"
 
-#define TIMER_BALOON 1014
+#include "wxgis/geoprocessing/geoprocessing.h"
 
-class WXDLLIMPEXP_GIS_FRW wxGISBaloonTip : public wxFrame
+/////////////////////////////////////////////////////////////////////////
+// wxGISGPOrthoCorrectTool
+/////////////////////////////////////////////////////////////////////////
+
+class WXDLLIMPEXP_GIS_GP wxGISGPOrthoCorrectTool : 
+    public IGPTool,
+    public wxObject
 {
+   DECLARE_DYNAMIC_CLASS(wxGISGPOrthoCorrectTool)
+
 public:
-    wxGISBaloonTip(wxString sTitle, wxIcon Icon, wxString sMessage);
-    virtual ~wxGISBaloonTip() { delete timer; }
-
-    /** painting bg */
-    virtual void OnPaint(wxPaintEvent& event);
-    /** timer to close window */
-    virtual void OnTimerTick(wxTimerEvent & event);
-    /** click on the baloon */
-    virtual void OnClick(wxMouseEvent & event){ };
-    /** click esc */
-    virtual void OnEscape(wxKeyEvent & event)
-    { 
-        if(event.GetKeyCode() == WXK_ESCAPE)
-            Close();
-    };
-    /** click close */
-    virtual void OnClose(wxCommandEvent & event)
-    {    
-        Close();
-    };
-
-    /** display the baloon and run the timer */
-    virtual void ShowBaloon(unsigned int iTimeout);
-    virtual void Close(void);
-private:
-    wxTimer * timer;
-
-    DECLARE_EVENT_TABLE();
-
+    wxGISGPOrthoCorrectTool(void);
+    ~wxGISGPOrthoCorrectTool(void);
+    //IGPTool
+    virtual wxString GetDisplayName(void);
+    virtual wxString GetName(void);
+    virtual wxString GetCategory(void);
+    virtual bool Execute(ITrackCancel* pTrackCancel);
+    virtual bool Validate(void);
+    virtual GPParameters* GetParameterInfo(void);
+    virtual void SetCatalog(IGxCatalog* pCatalog);
+    virtual IGxCatalog* GetCatalog(void);
+protected:
+    GPParameters m_pParamArr;
+    IGxCatalog* m_pCatalog;
 };

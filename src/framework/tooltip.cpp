@@ -26,6 +26,8 @@
 //#include "../../art/close_bw_16.xpm"
 #include "../../art/close_16a.xpm"
 
+#define FRAMENAME wxT("baloontip")
+
 BEGIN_EVENT_TABLE(wxGISBaloonTip, wxFrame)
     EVT_PAINT(wxGISBaloonTip::OnPaint)
     EVT_LEFT_DOWN(wxGISBaloonTip::OnClick)
@@ -33,11 +35,11 @@ BEGIN_EVENT_TABLE(wxGISBaloonTip, wxFrame)
     EVT_BUTTON(wxID_CLOSE, wxGISBaloonTip::OnClose)
 END_EVENT_TABLE()
  
-wxGISBaloonTip::wxGISBaloonTip(wxString sTitle, wxIcon Icon, wxString sMessage) : wxFrame(NULL,-1,wxT("no title"),wxDefaultPosition,wxDefaultSize,wxNO_BORDER | wxSTAY_ON_TOP | wxFRAME_SHAPED | wxFRAME_NO_TASKBAR)
+wxGISBaloonTip::wxGISBaloonTip(wxString sTitle, wxIcon Icon, wxString sMessage) : wxFrame(NULL, wxID_ANY, wxT("no title"), wxDefaultPosition, wxDefaultSize,wxNO_BORDER | wxSTAY_ON_TOP | wxFRAME_SHAPED | wxFRAME_NO_TASKBAR, FRAMENAME)
 {
     //wxColour bgColour(255,255,231); // yellow BG
     wxColour bgColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
-    this->SetBackgroundColour(bgColour);
+    SetBackgroundColour(bgColour);
     wxBoxSizer * mainSizer = new wxBoxSizer(wxVERTICAL);
 
     //
@@ -90,19 +92,35 @@ wxGISBaloonTip::wxGISBaloonTip(wxString sTitle, wxIcon Icon, wxString sMessage) 
     mainSizer->Add(text,1,wxEXPAND | wxBOTTOM | wxLEFT | wxRIGHT, 5);
     text->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(wxGISBaloonTip::OnClick), NULL, this );
     text->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(wxGISBaloonTip::OnEscape), NULL, this );
+
+    mainSizer->AddStretchSpacer();
  
-    this->SetSizer(mainSizer);
+    SetSizer(mainSizer);
     mainSizer->SetSizeHints( this );
  
-    this->timer = new wxTimer(this,TIMER_BALOON);
+    this->timer = new wxTimer(this, TIMER_BALOON);
  
     // here, we try to align the frame to the right bottom corner
-    this->Center();
-    int iX = 0, iY = 0;
-    this->GetPosition( &iX, &iY );
-    iX = (iX * 2) - 3;
-    iY = (iY * 2) - 3;
-    this->Move( iX, iY );
+    wxWindow* pOtherTip = wxWindow::FindWindowByName(FRAMENAME);
+    if(pOtherTip && pOtherTip != this)
+    {
+        wxSize size = GetSize();
+        wxRect rect = pOtherTip->GetRect();
+        int iX = 0, iY = 0;
+        wxPoint PointTR = rect.GetTopRight();
+        iX = PointTR.x - size.GetWidth();
+        iY = PointTR.y - 3 - size.GetHeight();
+        Move( iX, iY );
+    }
+    else
+    {
+        Center();
+        int iX = 0, iY = 0;
+        GetPosition( &iX, &iY );
+        iX = (iX * 2) - 3;
+        iY = (iY * 2) - 3;
+        Move( iX, iY );
+    }
 
     IApplication* pApp = ::GetApplication();
     pApp->RegisterChildWindow(this);
@@ -113,12 +131,12 @@ void wxGISBaloonTip::OnPaint(wxPaintEvent& event)
     wxPaintDC dc(this);
  
     int iWidth = 0, iHeight = 0;
-    this->GetClientSize( &iWidth, &iHeight );
+    GetClientSize( &iWidth, &iHeight );
  
-    wxPen pen(this->GetForegroundColour());
+    wxPen pen(GetForegroundColour());
     dc.SetPen(pen);
  
-    wxBrush brush(this->GetBackgroundColour());
+    wxBrush brush(GetBackgroundColour());
     dc.SetBrush(brush);
  
     dc.Clear();
@@ -133,16 +151,16 @@ void wxGISBaloonTip::OnTimerTick(wxTimerEvent & event)
 }
  
 /** showing frame and running timer */
-void wxGISBaloonTip::showBaloon(unsigned int iTimeout)
+void wxGISBaloonTip::ShowBaloon(unsigned int iTimeout)
 {
-    this->Show(false);
-    this->Show(true);
-    this->timer->Start(iTimeout,wxTIMER_ONE_SHOT);
+    Show(false);
+    Show(true);
+    this->timer->Start(iTimeout, wxTIMER_ONE_SHOT);
 }
 
 void wxGISBaloonTip::Close(void)
 {
     IApplication* pApp = ::GetApplication();
     pApp->UnRegisterChildWindow(this);
-    this->Destroy();
+    Destroy();
 }
