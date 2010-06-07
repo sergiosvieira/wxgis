@@ -53,7 +53,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
 
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetName(), enumRasterBmp);
+            wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetFullName(), enumRasterBmp);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}
@@ -62,7 +62,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
 
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetName(), enumRasterJpeg);
+			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetFullName(), enumRasterJpeg);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}
@@ -71,7 +71,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
 
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetName(), enumRasterImg);
+			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetFullName(), enumRasterImg);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}
@@ -80,7 +80,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
 
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetName(), enumRasterTiff);
+			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetFullName(), enumRasterTiff);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}
@@ -89,7 +89,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
 
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetName(), enumRasterPng);
+			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetFullName(), enumRasterPng);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}
@@ -98,7 +98,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
 
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetName(), enumRasterUnknown);
+			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, FName.GetFullName(), enumRasterUnknown);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}		

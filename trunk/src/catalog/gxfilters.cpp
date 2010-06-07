@@ -160,28 +160,29 @@ wxString wxGxPrjFileFilter::GetExt(void)
 
 
 //------------------------------------------------------------
-// wxGxRasterDatasetFilter
+// wxGxDatasetFilter
 //------------------------------------------------------------
 
-wxGxRasterDatasetFilter::wxGxRasterDatasetFilter(void)
+wxGxDatasetFilter::wxGxDatasetFilter(wxGISEnumDatasetType nType)
+{
+    m_nType = nType;
+}
+
+wxGxDatasetFilter::~wxGxDatasetFilter(void)
 {
 }
 
-wxGxRasterDatasetFilter::~wxGxRasterDatasetFilter(void)
-{
-}
-
-bool wxGxRasterDatasetFilter::CanChooseObject( IGxObject* pObject )
+bool wxGxDatasetFilter::CanChooseObject( IGxObject* pObject )
 {
 	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
 	if(!pGxDataset)
 		return false;
-    if(pGxDataset->GetType() != enumGISRasterDataset)
+    if(pGxDataset->GetType() != m_nType)
 		return false;
     return true;
 }
 
-bool wxGxRasterDatasetFilter::CanDisplayObject( IGxObject* pObject )
+bool wxGxDatasetFilter::CanDisplayObject( IGxObject* pObject )
 {
 	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
 	if(pContainer)
@@ -189,14 +190,21 @@ bool wxGxRasterDatasetFilter::CanDisplayObject( IGxObject* pObject )
 	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
 	if(!pGxDataset)
 		return false;
-    if(pGxDataset->GetType() != enumGISRasterDataset)
+    if(pGxDataset->GetType() != m_nType)
 		return false;
     return true;
 }
 
-wxString wxGxRasterDatasetFilter::GetName(void)
+wxString wxGxDatasetFilter::GetName(void)
 {
-	return wxString(_("Rasters (*.img, *.tif, etc.)"));
+    switch(m_nType)
+    {
+    case enumGISRasterDataset:
+        return wxString(_("Rasters (*.img, *.tif, etc.)"));
+    case enumGISFeatureDataset:
+        return wxString(_("Vectors (*.shp, *.tab, etc.)"));
+    }
+    return wxEmptyString;
 }
 
 
@@ -408,3 +416,61 @@ wxString wxGxFolderFilter::GetName(void)
 	return wxString(_("Folder"));
 }
 
+//------------------------------------------------------------
+// wxGxTiffFilter
+//------------------------------------------------------------
+
+wxGxTiffFilter::wxGxTiffFilter(void)
+{
+}
+
+wxGxTiffFilter::~wxGxTiffFilter(void)
+{
+}
+
+bool wxGxTiffFilter::CanChooseObject( IGxObject* pObject )
+{
+	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
+	if(!pGxDataset)
+		return false;
+    if(pGxDataset->GetType() != enumGISRasterDataset)
+		return false;
+    if(pGxDataset->GetSubType() != GetSubType())
+		return false;
+    return true;
+}
+
+bool wxGxTiffFilter::CanDisplayObject( IGxObject* pObject )
+{
+	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
+	if(pContainer)
+		return true;
+	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
+	if(!pGxDataset)
+		return false;
+    if(pGxDataset->GetType() != enumGISRasterDataset)
+		return false;
+    if(pGxDataset->GetSubType() != GetSubType())
+		return false;
+    return true;
+}
+
+wxString wxGxTiffFilter::GetName(void)
+{
+	return wxString(_("TIFF Format (*.tif, *.tiff)"));
+}
+
+wxString wxGxTiffFilter::GetExt(void)
+{
+	return wxString(wxT("tif"));
+}
+
+wxString wxGxTiffFilter::GetDriver(void)
+{
+	return wxString(wxT("GTiff"));
+}
+
+int wxGxTiffFilter::GetSubType(void)
+{
+    return enumRasterTiff;
+}

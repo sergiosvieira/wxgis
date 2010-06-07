@@ -322,11 +322,11 @@ void wxGxTab::Deactivate(void)
 		if(pView != NULL)
         {
 			pView->Deactivate();
-            m_pApp->UnRegisterChildWindow(m_pWindows[i]);
+            //m_pApp->UnRegisterChildWindow(m_pWindows[i]);
         }
 		//wxDELETE(m_pWindows[i]);//destroy in registerwindows array
-        if(m_pWindows[i])
-            m_pWindows[i]->Destroy();
+        //if(m_pWindows[i])
+        //    m_pWindows[i]->Destroy();
 	}
 }
 

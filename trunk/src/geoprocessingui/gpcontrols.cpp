@@ -27,8 +27,7 @@
 #include "../../art/open_16.xpm"
 #include "../../art/sql_16.xpm"
 
-#include "wxgis/framework/tooltip.h"
-
+#include "wxgis/framework/messagedlg.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISDTBase
@@ -104,7 +103,7 @@ wxGISDTPath::wxGISDTPath( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* 
 	wxBoxSizer* bPathSizer;
 	bPathSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_PathTextCtrl = new wxGISTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_BESTWRAP );
+    m_PathTextCtrl = new wxGISTextCtrl( this, wxID_ANY, pParam->GetValue(), wxDefaultPosition, wxDefaultSize, wxTE_BESTWRAP );
     //m_PathTextCtrl->SetDropTarget(new wxFileDropTarget());
 	bPathSizer->Add( m_PathTextCtrl, 1, wxALL|wxEXPAND, 5 );     
 	
@@ -152,9 +151,6 @@ void wxGISDTPath::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
 
 void wxGISDTPath::OnOpen(wxCommandEvent& event)
 {
-    wxGISBaloonTip* pTip = new wxGISBaloonTip(wxT("test baloon"), m_ImageList.GetIcon(0), wxT("Информация об изображении\nРазмер:	445 Х 344\nТип:	15KB PNG"));
-    pTip->showBaloon(5000);
-    return;
     wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParam->GetDomain());
 
     if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
@@ -166,7 +162,12 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
         if(pDomain)
         {
             for(size_t i = 0; i < pDomain->GetFilterCount(); i++)
-                dlg.AddFilter(pDomain->GetFilter(i), false);
+            {
+                if(i == pDomain->GetSelFilter())
+                    dlg.AddFilter(pDomain->GetFilter(i), true);
+                else
+                    dlg.AddFilter(pDomain->GetFilter(i), false);
+            }
         }
         dlg.SetOverwritePrompt(false);
         if(dlg.ShowModalOpen() == wxID_OK)
@@ -176,6 +177,7 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
             //m_PathTextCtrl->ChangeValue( sPath );
             m_pParam->SetValue(wxVariant(sPath, wxT("path")));
             m_pParam->SetAltered(true);
+            pDomain->SetSelFilter(dlg.GetCurrentFilterId());
         }
     }
     else
@@ -188,7 +190,12 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
         if(pDomain)
         {
             for(size_t i = 0; i < pDomain->GetFilterCount(); i++)
-                dlg.AddFilter(pDomain->GetFilter(i), false);
+            {
+                if(i == pDomain->GetSelFilter())
+                    dlg.AddFilter(pDomain->GetFilter(i), true);
+                else
+                    dlg.AddFilter(pDomain->GetFilter(i), false);
+            }
         }
         dlg.SetOverwritePrompt(false);
         if(dlg.ShowModalSave() == wxID_OK)
@@ -198,6 +205,7 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
             //m_PathTextCtrl->ChangeValue( sPath );
             m_pParam->SetValue(wxVariant(sPath, wxT("path")));
             m_pParam->SetAltered(true);
+            pDomain->SetSelFilter(dlg.GetCurrentFilterId());
         }
     }
 }

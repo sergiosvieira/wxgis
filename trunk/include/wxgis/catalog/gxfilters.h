@@ -58,17 +58,19 @@ public:
 };
 
 //------------------------------------------------------------
-// wxGxRasterDatasetFilter
+// wxGxDatasetFilter
 //------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CLT wxGxRasterDatasetFilter : public wxGxObjectFilter
+class WXDLLIMPEXP_GIS_CLT wxGxDatasetFilter : public wxGxObjectFilter
 {
 public:
-	wxGxRasterDatasetFilter(void);
-	virtual ~wxGxRasterDatasetFilter(void);
+	wxGxDatasetFilter(wxGISEnumDatasetType nType);
+	virtual ~wxGxDatasetFilter(void);
 	virtual bool CanChooseObject( IGxObject* pObject );
 	virtual bool CanDisplayObject( IGxObject* pObject );
 	virtual wxString GetName(void);
+protected:
+    wxGISEnumDatasetType m_nType;
 };
 
 //------------------------------------------------------------
@@ -148,4 +150,21 @@ public:
 	virtual bool CanChooseObject( IGxObject* pObject );
 	virtual bool CanDisplayObject( IGxObject* pObject );
 	virtual wxString GetName(void);
+};
+
+//------------------------------------------------------------
+// wxGxTiffFilter
+//------------------------------------------------------------
+
+class WXDLLIMPEXP_GIS_CLT wxGxTiffFilter : public wxGxObjectFilter
+{
+public:
+	wxGxTiffFilter(void);
+	virtual ~wxGxTiffFilter(void);
+	virtual bool CanChooseObject( IGxObject* pObject );
+	virtual bool CanDisplayObject( IGxObject* pObject );
+	virtual wxString GetName(void);
+    virtual wxString GetExt(void);
+    virtual wxString GetDriver(void);
+    virtual int GetSubType(void);
 };

@@ -720,9 +720,15 @@ bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath,
 
     IStatusBar* pStatusBar = m_pApp->GetStatusBar();
     ITrackCancel TrackCancel;
+    IProgressor* pProgressor;
     if(pStatusBar)
     {                            
-        TrackCancel.SetProgressor(pStatusBar->GetProgressor());
+        pProgressor = pStatusBar->GetProgressor();
+        if(pProgressor)
+        {
+            TrackCancel.SetProgressor(pProgressor);
+            pProgressor->Show(true);
+        }
         pStatusBar->SetMessage(wxString::Format(_("Exporting %s to %s"), pDSet->GetName().c_str(), sName.c_str()));
     }
 
@@ -755,6 +761,8 @@ bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath,
     //}
     if(pStatusBar)
         pStatusBar->SetMessage(_("Done"));
+    if(pProgressor)
+        pProgressor->Show(false);
     return true;
 }
 

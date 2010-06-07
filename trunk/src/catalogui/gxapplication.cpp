@@ -370,21 +370,18 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
 		}
 	}
 
-	if(m_pTreeView)
-		m_pTreeView->Deactivate();
-	if(m_pTabView)
-		m_pTabView->Deactivate();
+    for(size_t i = 0; i < m_WindowArray.size(); i++)
+    {
+        IGxView* pGxView = dynamic_cast<IGxView*>(m_WindowArray[i]);
+        if(pGxView) 
+            pGxView->Deactivate();
+    }
 
     wxGISApplication::OnClose(event);
 
-	////wxDELETE(m_pTreeView);
- //   m_pTreeView->Destroy();
-	////wxDELETE(m_pTabView);
- //   m_pTabView->Destroy();
-
     for(size_t i = 0; i < m_WindowArray.size(); i++)
         if(m_WindowArray[i])
-            if(!m_WindowArray[i]->Destroy()) //?? the last window didn't destroy?
+            if(!m_WindowArray[i]->Destroy())
                 wxDELETE(m_WindowArray[i]);
 
  	SerializeGxFramePos(true);

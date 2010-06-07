@@ -20,7 +20,6 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessingui/gptoolboxview.h"
-#include "wxgis/geoprocessingui/gptasksview.h"
 
 //-------------------------------------------------------------------
 // wxGxToolboxView
@@ -51,6 +50,7 @@ bool wxGxToolboxView::Activate(IGxApplication* application, wxXmlNode* pConf)
 		return false;
 	wxGxView::Activate(application, pConf);
 
+    m_pApp = dynamic_cast<IApplication*>(application);
 	//wxXmlNode* pChild = m_pXmlConf->GetChildren();
 	wxUint8 count(0);
 	//while(pChild)
@@ -62,8 +62,9 @@ bool wxGxToolboxView::Activate(IGxApplication* application, wxXmlNode* pConf)
 	//	m_Tabs.push_back(pGxTab);
 
     //add tasks vindow
-    wxGxTasksView* pView = new wxGxTasksView(this);    
-    AddPage(pView, pView->GetViewName(), count == 0 ? true : false, pView->GetViewIcon());
+    m_pGxTasksView = new wxGxTasksView(this);    
+    AddPage(m_pGxTasksView, m_pGxTasksView->GetViewName(), count == 0 ? true : false, m_pGxTasksView->GetViewIcon());
+    m_pApp->RegisterChildWindow(m_pGxTasksView);
     count++;
 
     //add tree tools window
@@ -85,15 +86,13 @@ bool wxGxToolboxView::Activate(IGxApplication* application, wxXmlNode* pConf)
 
 void wxGxToolboxView::Deactivate(void)
 {
+    while(GetPageCount() > 0)
+        RemovePage(0); //will delete in app destructor
+    m_pGxTasksView->Deactivate();
+    //m_pApp->UnRegisterChildWindow(m_pGxTasksView);
+
 	//if(m_ConnectionPointSelectionCookie != -1)
 	//	m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
-
-	//for(size_t i = 0; i < m_Tabs.size(); i++)
-	//{
-	//	//RemovePage(0);
-	//	//wxDELETE(m_Tabs[i]);
- //       m_Tabs[i]->Deactivate();
-	//}
 }
 
 void wxGxToolboxView::OnAUINotebookPageChanged(wxAuiNotebookEvent& event)

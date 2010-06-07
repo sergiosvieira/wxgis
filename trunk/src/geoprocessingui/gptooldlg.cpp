@@ -20,13 +20,14 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessingui/gptooldlg.h"
+#include "wxgis/geoprocessingui/gptasksview.h"
 #include "wxgis/framework/application.h"
 
 #include "../../art/tool_16.xpm"
 
 #include "wx/icon.h"
 ///////////////////////////////////////////////////////////////////////////
-BEGIN_EVENT_TABLE(wxGISGPToolDlg, wxDialog)
+BEGIN_EVENT_TABLE(wxGISGPToolDlg, wxFrame)
 	EVT_BUTTON(wxID_HELP, wxGISGPToolDlg::OnHelp)
 	EVT_UPDATE_UI(wxID_HELP, wxGISGPToolDlg::OnHelpUI)
 	EVT_BUTTON(wxID_CANCEL, wxGISGPToolDlg::OnCancel)
@@ -34,13 +35,15 @@ BEGIN_EVENT_TABLE(wxGISGPToolDlg, wxDialog)
 	EVT_UPDATE_UI(wxID_OK, wxGISGPToolDlg::OnOkUI)
 END_EVENT_TABLE()
 
-wxGISGPToolDlg::wxGISGPToolDlg( IGPTool* pTool, wxXmlNode* pPropNode, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+wxGISGPToolDlg::wxGISGPToolDlg( IGPTool* pTool, wxGISGPToolManager* pToolManager, wxXmlNode* pPropNode, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style ), m_pToolManager(NULL)
 {
 	SetIcon( wxIcon(tool_16_xpm) );
 	this->SetSizeHints( wxSize( 350,500 ) );
 
     m_pTool = pTool;
     m_pPropNode = pPropNode;
+    m_pToolManager = pToolManager;
+
     SetLabel(m_pTool->GetDisplayName());
 
 	//this->SetSizeHints( wxDefaultSize, wxDefaultSize );
@@ -177,13 +180,54 @@ void wxGISGPToolDlg::OnHelpUI(wxUpdateUIEvent& event)
 
 void wxGISGPToolDlg::OnOk(wxCommandEvent& event)
 {
-    IApplication* pApp = ::GetApplication();
-    pApp->UnRegisterChildWindow(this);
     //event.Skip();
-
+    if(!m_pToolManager)
+        return;
+    IApplication* pApp = ::GetApplication();
     //create panel - get progress with messages
+    ITrackCancel* pTrackCancel(NULL);
+    IGPCallBack* pCallBack(NULL);
+    wxGxTasksView* pGxTasksView(NULL);
+
+    WINDOWARRAY* pWndArr = pApp->GetChildWindows();
+    if(pWndArr)
+    {
+        for(size_t i = 0; i < pWndArr->size(); i++)
+        {
+            wxWindow* pWnd = pWndArr->operator[](i);
+            if(!pWnd)
+                continue;
+            pGxTasksView = dynamic_cast<wxGxTasksView*>(pWnd);
+            if(!pGxTasksView)
+                continue;
+            break;
+        }
+    }
+
+    wxGxTaskPanel* pGxTaskPanel;
+    if(pGxTasksView)
+    {
+        pGxTaskPanel = new wxGxTaskPanel(m_pToolManager, m_pTool, pGxTasksView);
+
+        pTrackCancel = dynamic_cast<ITrackCancel*>(pGxTaskPanel);
+        pCallBack = dynamic_cast<IGPCallBack*>(pGxTaskPanel);
+
+        pGxTasksView->InsertPanel(pGxTaskPanel);
+    }
 
     //mngr - run execute
+    long nThreadId = m_pToolManager->OnExecute(m_pTool, pTrackCancel, pCallBack);
+    if(pGxTasksView)
+    {
+        pGxTaskPanel->SetTaskThreadId(nThreadId);
+        pGxTaskPanel->SetToolDialog(GetParent(), m_pPropNode);
+    }
+    //to prevent destroy tool in this dialog (the tool should destroy in panel)
+    m_pTool = NULL;
+        
+    pApp->UnRegisterChildWindow(this);
+    this->GetParent()->SetFocus();
+    this->Destroy();
 }
 
 void wxGISGPToolDlg::OnCancel(wxCommandEvent& event)
@@ -191,6 +235,7 @@ void wxGISGPToolDlg::OnCancel(wxCommandEvent& event)
     IApplication* pApp = ::GetApplication();
     pApp->UnRegisterChildWindow(this);
     //store properties
+    this->GetParent()->SetFocus();
     this->Destroy();
 }
 
@@ -208,7 +253,7 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
     }
 
     //tool validate
-    /*bool bIsValid = */m_pTool->Validate();
+    bool bIsValid = m_pTool->Validate();
     
     short nNonValid(0);
     GPParameters* pParams = m_pTool->GetParameterInfo();
@@ -225,7 +270,11 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
         if(pParam->GetHasBeenValidated())
             continue;
         if(m_pControlsArray[i] != NULL)
+        {
+            if(bIsValid)
+                m_pControlsArray[i]->Validate();
             m_pControlsArray[i]->Update();
+        }
         pParam->SetHasBeenValidated(true);
     }
     if(nNonValid > 0)
