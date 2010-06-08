@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxtreeview.h"
 #include "wxgis/framework/framework.h"
+#include "../../art/doc_16.xpm"
 
 #include "wx/dnd.h"
 #include "wx/dataobj.h"
@@ -98,8 +99,10 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, b
 	if(pObjUI != NULL)
 		icon = pObjUI->GetSmallImage();
 	int pos(-1);
-	if(icon.IsOk())
-		pos = m_TreeImageList.Add(icon);
+	if(!icon.IsOk())
+        icon = wxIcon(doc_16_xpm);
+		
+    pos = m_TreeImageList.Add(icon);
 
 	wxGxTreeItemData* pData = new wxGxTreeItemData(pGxObject, pos, false);
 

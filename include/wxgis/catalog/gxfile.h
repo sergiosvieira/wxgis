@@ -35,6 +35,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxFile :
 public:
 	wxGxFile(wxString Path, wxString Name);
 	virtual ~wxGxFile(void);
+    virtual wxString GetPath(void){return m_sPath;};
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 protected:
@@ -66,7 +67,7 @@ public:
 	virtual void EditProperties(wxWindow *parent);
 	//wxGxPrjFile
 	virtual OGRSpatialReference* GetSpatialReference(void);
-private:
+protected:
     wxGISEnumPrjFileType m_Type;
 	OGRSpatialReference m_OGRSpatialReference;
 };
@@ -74,3 +75,27 @@ private:
 //--------------------------------------------------------------
 //class wxGxTextFile
 //--------------------------------------------------------------
+
+class WXDLLIMPEXP_GIS_CLT wxGxTextFile :
+    public wxGxFile
+{
+public:
+	wxGxTextFile(wxString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	virtual ~wxGxTextFile(void);
+	//IGxObject
+	virtual wxString GetCategory(void){return wxString(_("Text file"));};
+	//IGxObjectUI
+	virtual wxIcon GetLargeImage(void);
+	virtual wxIcon GetSmallImage(void);
+	virtual wxString ContextMenu(void){return wxString(wxT("wxGxTextFile.ContextMenu"));};
+	virtual wxString NewMenu(void){return wxString(wxT("wxGxTextFile.NewMenu"));};
+	//IGxObjectEdit
+	virtual bool Delete(void);
+	virtual bool CanDelete(void){return true;};
+	virtual bool Rename(wxString NewName);
+	virtual bool CanRename(void){return true;};
+	virtual void EditProperties(wxWindow *parent);
+protected:
+    wxIcon m_oLargeIcon;
+    wxIcon m_oSmallIcon;
+};
