@@ -474,3 +474,51 @@ int wxGxTiffFilter::GetSubType(void)
 {
     return enumRasterTiff;
 }
+
+//------------------------------------------------------------
+// wxGxTextFilter
+//------------------------------------------------------------
+
+wxGxTextFilter::wxGxTextFilter(wxString soName, wxString soExt)
+{
+    m_soName = soName;
+    m_soExt = soExt;
+}
+
+wxGxTextFilter::~wxGxTextFilter(void)
+{
+}
+
+bool wxGxTextFilter::CanChooseObject( IGxObject* pObject )
+{
+	wxGxTextFile* poGxTextFile = dynamic_cast<wxGxTextFile*>(pObject);
+	if(!poGxTextFile)
+		return false;
+    if(poGxTextFile->GetPath().Lower().Find(m_soExt) != wxNOT_FOUND)
+		return true;
+	return false;
+}
+
+bool wxGxTextFilter::CanDisplayObject( IGxObject* pObject )
+{
+	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
+	if(pContainer)
+		return true;
+	wxGxTextFile* poGxTextFile = dynamic_cast<wxGxTextFile*>(pObject);
+	if(!poGxTextFile)
+		return false;
+    if(poGxTextFile->GetPath().Lower().Find(m_soExt) != wxNOT_FOUND)
+		return true;
+	return false;
+}
+
+wxString wxGxTextFilter::GetName(void)
+{
+	return m_soName;
+}
+
+wxString wxGxTextFilter::GetExt(void)
+{
+	return m_soExt;
+}
+

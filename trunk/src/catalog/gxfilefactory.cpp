@@ -21,6 +21,8 @@
 #include "wxgis/catalog/gxfilefactory.h"
 #include "wxgis/catalog/gxfile.h"
 #include <wx/tokenzr.h>
+#include "../../art/other_16.xpm"
+#include "../../art/other_48.xpm"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxFileFactory, wxObject)
 
@@ -61,15 +63,21 @@ bool wxGxFileFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames
 			pGxObj = dynamic_cast<IGxObject*>(pFile);
 			goto REMOVE;
 		}
+        if(ext == wxString(wxT("rpb")) || ext == wxString(wxT("rpc")) || name.Find(wxT(".rpc")) != wxNOT_FOUND)
+		{
+			wxFileName FName(path);
+			wxGxTextFile* pFile = new wxGxTextFile(path, FName.GetFullName(), wxIcon(other_48_xpm), wxIcon(other_16_xpm));
+			pGxObj = dynamic_cast<IGxObject*>(pFile);
+			goto REMOVE;
+		}
         //add extensions from config
         for(size_t j = 0; j < m_ExtArray.size(); j++)
         {
             if(m_ExtArray[j] == ext)
             {
-                //if(m_pCatalog->GetShowExt())
-			    //	name += wxT(".") + ext;
-			    //wxGxTextFile* pFile = new wxGxTextFile(path, name);
-			    //pGxObj = dynamic_cast<IGxObject*>(pFile);
+			    name += wxT(".") + ext;
+			    wxGxTextFile* pFile = new wxGxTextFile(path, name);
+			    pGxObj = dynamic_cast<IGxObject*>(pFile);
 			    goto REMOVE;
             }
         }

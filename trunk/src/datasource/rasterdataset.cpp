@@ -219,15 +219,15 @@ bool wxGISRasterDataset::Open(void)
 	//const char* desc = pDrv->GetDescription();
 	//wxLogDebug( wxT("Driver: %s/%s"), wgMB2WX(GDALGetDriverShortName( pDrv )), wgMB2WX(GDALGetDriverLongName( pDrv )) );
 
-	char** papszMetadata = m_poDataset->GetMetadata();
-    if( CSLCount(papszMetadata) > 0 )
-    {
-        wxLogDebug( wxT( "Metadata:" ));
-        for(int i = 0; papszMetadata[i] != NULL; i++ )
-        {
-            wxLogDebug( wxT( "  %s"), wgMB2WX(papszMetadata[i]) );
-        }
-    }
+	//char** papszMetadata = m_poDataset->GetMetadata();
+ //   if( CSLCount(papszMetadata) > 0 )
+ //   {
+ //       wxLogDebug( wxT( "Metadata:" ));
+ //       for(int i = 0; papszMetadata[i] != NULL; i++ )
+ //       {
+ //           wxLogDebug( wxT( "  %s"), wgMB2WX(papszMetadata[i]) );
+ //       }
+ //   }
 
 	///* -------------------------------------------------------------------- */
 	///*      Report "IMAGE_STRUCTURE" metadata.                              */

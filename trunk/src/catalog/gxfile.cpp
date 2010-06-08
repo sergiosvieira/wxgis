@@ -150,3 +150,57 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 	}
 	return NULL;
 }
+
+//--------------------------------------------------------------
+//class wxGxTextFile
+//--------------------------------------------------------------
+
+wxGxTextFile::wxGxTextFile(wxString Path, wxString Name, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxFile(Path, Name)
+{
+    m_oLargeIcon = LargeIcon;
+    m_oSmallIcon = SmallIcon;
+}
+
+wxGxTextFile::~wxGxTextFile(void)
+{
+}
+
+wxIcon wxGxTextFile::GetLargeImage(void)
+{
+	return m_oLargeIcon;
+}
+
+wxIcon wxGxTextFile::GetSmallImage(void)
+{
+	return m_oSmallIcon;
+}
+
+bool wxGxTextFile::Delete(void)
+{
+
+    if(DeleteFile(m_sPath/*, m_pPathEncoding*/))
+	{
+		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
+		if(pGxObjectContainer == NULL)
+			return false;
+		return pGxObjectContainer->DeleteChild(this);		
+	}
+	else
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+		return false;	
+    }
+}
+
+bool wxGxTextFile::Rename(wxString NewName)
+{
+	//rename ?
+	m_sName = NewName; 
+	m_pCatalog->ObjectChanged(this);
+	return true;
+}
+
+void wxGxTextFile::EditProperties(wxWindow *parent)
+{
+}

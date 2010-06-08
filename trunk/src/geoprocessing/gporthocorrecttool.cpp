@@ -77,7 +77,7 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         //dst path
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
         pParam2->SetName(wxT("dst_path"));
-        pParam2->SetDisplayName(_("Destination feature class"));
+        pParam2->SetDisplayName(_("Destination raster"));
         pParam2->SetParameterType(enumGISGPParameterTypeRequired);
         pParam2->SetDataType(enumGISGPParamDTPath);
         pParam2->SetDirection(enumGISGPParameterDirectionOutput);
@@ -90,6 +90,30 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
 
         m_pParamArr.push_back(pParam2);
 
+        //DEM_raster
+        wxGISGPParameter* pParam3 = new wxGISGPParameter();
+        pParam3->SetName(wxT("dem_path"));
+        pParam3->SetDisplayName(_("DEM raster"));
+        pParam3->SetParameterType(enumGISGPParameterTypeOptional);
+        pParam3->SetDataType(enumGISGPParamDTPath);
+        pParam3->SetDirection(enumGISGPParameterDirectionInput);
+
+        wxGISGPGxObjectDomain* pDomain3 = new wxGISGPGxObjectDomain();
+        pDomain3->AddFilter(new wxGxTiffFilter());
+        pParam3->SetDomain(pDomain3);
+
+        m_pParamArr.push_back(pParam3);
+
+        ////constant_ elevation double
+        //wxGISGPParameter* pParam4 = new wxGISGPParameter();
+        //pParam4->SetName(wxT("cons_elev"));
+        //pParam4->SetDisplayName(_("Constant elevation value"));
+        //pParam4->SetParameterType(enumGISGPParameterTypeOptional);
+        //pParam4->SetDataType(enumGISGPParamDTDouble);
+        //pParam4->SetDirection(enumGISGPParameterDirectionInput);
+        //pParam4->SetValue(0.0);
+
+        //m_pParamArr.push_back(pParam4);
     }
     return &m_pParamArr;
 }
@@ -141,11 +165,6 @@ bool wxGISGPOrthoCorrectTool::Validate(void)
 
 bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
 {
-    //GDALCreateRPCTransformer apszOptions 	Other transformer options (ie. RPC_HEIGHT=<z>).
-    //GDALCreateGenImgProjTransformer2
-    //RPC_HEIGHT: A fixed height to be used with RPC calculations.
-    //RPC_DEM: The name of a DEM file to be used with RPC calculations.
-
     if(!Validate())
     {
         //add messages to pTrackCancel
@@ -208,139 +227,131 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     wxString sExt = pFilter->GetExt();
     int nNewSubType = pFilter->GetSubType();
 
-    //OGRSpatialReference* pSrcSpaRef = pSrcDataSet->GetSpatialReference();
-    //OGRSpatialReference* pNewSpaRef(NULL);
+    if(!pSrcDataSet->Open())
+    {
+        //add messages to pTrackCancel
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("Error opening raster"), -1, enumGISMessageErr);
+        return false;
+    }
 
-    //if(nNewSubType == enumVecKML)
-    //    pNewSpaRef = new OGRSpatialReference(SRS_WKT_WGS84);
-    //else
-    //    if(pSrcSpaRef)
-    //        pNewSpaRef = pSrcSpaRef->Clone();
+    GDALDataset* poGDALDataset = pSrcDataSet->GetRaster();
+    if(!poGDALDataset)
+    {
+        //add messages to pTrackCancel
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("Error getting raster"), -1, enumGISMessageErr);
+        return false;
+    }
 
-    //if(!pSrcSpaRef && pNewSpaRef)
+    GDALDriver* poDriver = (GDALDriver*)GDALGetDriverByName( wgWX2MB(sDriver) );
+    GDALRasterBand * poGDALRasterBand = poGDALDataset->GetRasterBand(1);
+
+    if(!poGDALRasterBand)
+    {
+        //add messages to pTrackCancel
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("The raster has no bands"), -1, enumGISMessageErr);
+        return false;
+    }
+    GDALDataType eDT = poGDALRasterBand->GetRasterDataType();
+    const char *apszOptions[3] = { "METHOD=RPC", NULL, NULL };//
+    wxString soDEMPath = m_pParamArr[2]->GetValue();
+
+    if(pGxObjectContainer)
+    {
+        IGxObject* pGxDemObj = pGxObjectContainer->SearchChild(soDEMPath);
+        if(pGxDemObj)
+        {
+            //pGxDemObj-> ?? get internal path
+        }
+    }
+
+    //double dfDEMHeight = m_pParamArr[3]->GetValue();
+    //if(soDEMPath.IsEmpty())
     //{
-    //    if(pTrackCancel)
-    //        pTrackCancel->PutMessage(_("The input spatial reference is not defined!"), -1, enumGISMessageErr);
-
-    //    wsDELETE(pSrcDataSet);
-    //    wxDELETE(pNewSpaRef);
-    //}
-
-    ////set filter
-    //wxGISQueryFilter* pQFilter(NULL);
-
-    //bool bHasErrors(false);
-    ////check multi geometry
-    //OGRwkbGeometryType nGeomType = pSrcDataSet->GetGeometryType();
-    //bool bIsMultigeom = nNewSubType == enumVecESRIShapefile && (wkbFlatten(nGeomType) == wkbUnknown || wkbFlatten(nGeomType) == wkbGeometryCollection);
-    //if(bIsMultigeom)
-    //{
-    //    //TODO: combain filters
-    //    wxGISQueryFilter Filter(wxString(wxT("OGR_GEOMETRY='POINT'")));
-    //    if(pSrcDataSet->SetFilter(&Filter) == OGRERR_NONE)
-    //    {
-    //        int nCount = pSrcDataSet->GetSize();
-    //        if(nCount > 0)
-    //        {
-    //            wxString sNewName = sName + wxString(_("_point"));
-    //            OGRFeatureDefn *pNewDef = pDef->Clone();
-    //            pNewDef->SetGeomType( wkbPoint );
-    //            //check overwrite for sNewName
-    //            if(!OnExport(pSrcDataSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType, pTrackCancel))
-    //                bHasErrors = true;
-    //        }
-    //    }
-    //    Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='POLYGON'")));
-    //    if(pSrcDataSet->SetFilter(&Filter) == OGRERR_NONE)
-    //    {
-    //        int nCount = pSrcDataSet->GetSize();
-    //        if(nCount > 0)
-    //        {
-    //            wxString sNewName = sName + wxString(_("_polygon"));
-    //            OGRFeatureDefn *pNewDef = pDef->Clone();
-    //            pNewDef->SetGeomType( wkbPolygon );
-    //            //check overwrite for sNewName
-    //            if(!OnExport(pSrcDataSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType, pTrackCancel))
-    //                bHasErrors = true;
-    //        }
-    //    }
-    //    Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='LINESTRING'")));
-    //    if(pSrcDataSet->SetFilter(&Filter) == OGRERR_NONE)
-    //    {
-    //        int nCount = pSrcDataSet->GetSize();
-    //        if(nCount > 0)
-    //        {
-    //            wxString sNewName = sName + wxString(_("_line"));
-    //            OGRFeatureDefn *pNewDef = pDef->Clone();
-    //            pNewDef->SetGeomType( wkbLineString );
-    //            //check overwrite for sNewName
-    //            if(!OnExport(pSrcDataSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType, pTrackCancel))
-    //                bHasErrors = true;
-    //        }
-    //    }
-    //    Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTIPOINT'")));
-    //    if(pSrcDataSet->SetFilter(&Filter) == OGRERR_NONE)
-    //    {
-    //        int nCount = pSrcDataSet->GetSize();
-    //        if(nCount > 0)
-    //        {
-    //            wxString sNewName = sName + wxString(_("_mpoint"));
-    //            OGRFeatureDefn *pNewDef = pDef->Clone();
-    //            pNewDef->SetGeomType( wkbMultiPoint );
-    //            //check overwrite for sNewName
-    //            if(!OnExport(pSrcDataSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType, pTrackCancel))
-    //                bHasErrors = true;
-    //        }
-    //    }
-    //    Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTILINESTRING'")));
-    //    if(pSrcDataSet->SetFilter(&Filter) == OGRERR_NONE)
-    //    {
-    //        int nCount = pSrcDataSet->GetSize();
-    //        if(nCount > 0)
-    //        {
-    //            wxString sNewName = sName + wxString(_("_mline"));
-    //            OGRFeatureDefn *pNewDef = pDef->Clone();
-    //            pNewDef->SetGeomType( wkbMultiLineString );
-    //            //check overwrite for sNewName
-    //            if(!OnExport(pSrcDataSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType, pTrackCancel))
-    //                bHasErrors = true;
-    //        }
-    //    }
-    //    Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTIPOLYGON'")));
-    //    if(pSrcDataSet->SetFilter(&Filter) == OGRERR_NONE)
-    //    {
-    //        int nCount = pSrcDataSet->GetSize();
-    //        if(nCount > 0)
-    //        {
-    //            wxString sNewName = sName + wxString(_("_mpolygon"));
-    //            OGRFeatureDefn *pNewDef = pDef->Clone();
-    //            pNewDef->SetGeomType( wkbMultiPolygon );
-    //            //check overwrite for sNewName
-    //            if(!OnExport(pSrcDataSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType, pTrackCancel))
-    //                bHasErrors = true;
-    //        }
-    //    }
+    //    CPLString osDEMFileOpt = "RPC_HEIGHT=";
+    //    osDEMFileOpt += wgWX2MB(wxString::Format(wxT("%f"), dfDEMHeight));
+    //    apszOptions[1] = osDEMFileOpt.c_str();
     //}
     //else
     //{
-    //    if(!OnExport(pSrcDataSet, sPath, sName, sExt, sDriver, pDef->Clone(), pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType, pTrackCancel))
-    //        bHasErrors = true;
+    //    CPLString osDEMFileOpt = "RPC_DEM=";
+    //    osDEMFileOpt += wgWX2MB(soDEMPath);
+    //    apszOptions[1] = osDEMFileOpt.c_str();
     //}
+    CPLString osDEMFileOpt = "RPC_DEM=0";
+    apszOptions[1] = osDEMFileOpt.c_str();
+
+    void *hTransformArg = GDALCreateGenImgProjTransformer2( poGDALDataset, NULL, (char **)apszOptions );
+
+    double adfDstGeoTransform[6];
+    int nPixels=0, nLines=0;
+
+    CPLErr eErr = GDALSuggestedWarpOutput( poGDALDataset, GDALGenImgProjTransform, hTransformArg, adfDstGeoTransform, &nPixels, &nLines );
+    if(eErr != CE_None)
+    {
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("Error determine output raster size"), -1, enumGISMessageErr);
+        return false;
+    }
+
+
+    GDALDestroyGenImgProjTransformer( hTransformArg );
+
+    // Create the output file.  
+    GDALDataset * poOutputGDALDataset = poDriver->Create( wgWX2MB(sDstPath), nPixels, nLines, poGDALDataset->GetRasterCount(), eDT, NULL );
+    if(poOutputGDALDataset == NULL)
+    {
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("Error creating output raster"), -1, enumGISMessageErr);
+        return false;
+    }
+
+    poOutputGDALDataset->SetProjection(poGDALDataset->GetProjectionRef());
+    poOutputGDALDataset->SetGeoTransform( adfDstGeoTransform );
+
+    if(poOutputGDALDataset)
+        GDALClose(poOutputGDALDataset);
+
+
+    //hDstDS = GDALCreate( hDriver, "out.tif", nPixels, nLines, 
+    //                     GDALGetRasterCount(hSrcDS), eDT, NULL );
+    //
+    //CPLAssert( hDstDS != NULL );
+
+    //// Write out the projection definition. 
+
+    //GDALSetProjection( hDstDS, pszDstWKT );
+    //GDALSetGeoTransform( hDstDS, adfDstGeoTransform );
+
+    //// Copy the color table, if required.
+
+    //GDALColorTableH hCT;
+
+    //hCT = GDALGetRasterColorTable( GDALGetRasterBand(hSrcDS,1) );
+    //if( hCT != NULL )
+    //    GDALSetRasterColorTable( GDALGetRasterBand(hDstDS,1), hCT );
 
     //wsDELETE(pSrcDataSet);
     //wxDELETE(pNewSpaRef);
 
     //IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
-    //if(pCont)
-    //{
-    //    IGxObject* pParentLoc = pCont->SearchChild(sPath);
-    //    if(pParentLoc)
-    //        pParentLoc->Refresh();
-    //}
+    if(pGxObjectContainer)
+    {
+        IGxObject* pParentLoc = pGxObjectContainer->SearchChild(sPath);
+        if(pParentLoc)
+            pParentLoc->Refresh();
+    }
 
     //return !bHasErrors;
     return false;
 }
+
+    //GDALCreateRPCTransformer apszOptions 	Other transformer options (ie. RPC_HEIGHT=<z>).
+    //GDALCreateGenImgProjTransformer2
+    //RPC_HEIGHT: A fixed height to be used with RPC calculations.
+    //RPC_DEM: The name of a DEM file to be used with RPC calculations.
 
 
 //    GDALDriverH hDriver;

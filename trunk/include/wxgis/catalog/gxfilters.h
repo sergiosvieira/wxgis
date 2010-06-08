@@ -168,3 +168,21 @@ public:
     virtual wxString GetDriver(void);
     virtual int GetSubType(void);
 };
+
+//------------------------------------------------------------
+// wxGxTextFilter
+//------------------------------------------------------------
+
+class WXDLLIMPEXP_GIS_CLT wxGxTextFilter : public wxGxObjectFilter
+{
+public:
+	wxGxTextFilter(wxString soName, wxString soExt);
+	virtual ~wxGxTextFilter(void);
+	virtual bool CanChooseObject( IGxObject* pObject );
+	virtual bool CanDisplayObject( IGxObject* pObject );
+	virtual wxString GetName(void);
+    virtual wxString GetExt(void);
+protected:
+    wxString m_soName;
+    wxString m_soExt;
+};
