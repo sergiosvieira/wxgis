@@ -48,7 +48,6 @@ public:
 	virtual void LoadChildren(void);
 protected:
     wxString m_sType;
-    wxMBConv* m_pMBConv;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -70,7 +69,5 @@ public:
 	virtual wxString NewMenu(void){return wxString(wxT("wxGxArchiveFolder.NewMenu"));};
 	//wxGxFolder
 	virtual void LoadChildren(void);
-protected:
-    wxMBConv* m_pMBConv;
 };
 

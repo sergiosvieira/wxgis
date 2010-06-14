@@ -33,6 +33,8 @@ public:
 	wxGxMapView(wxWindow* parent, wxWindowID id = MAPCTRLID, const wxPoint& pos = wxDefaultPosition, 
 						 const wxSize& size = wxDefaultSize);
 	virtual ~wxGxMapView(void);
+    virtual void CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileName);
+    //events
 	void OnMouseMove(wxMouseEvent& event);
 	void OnMouseDown(wxMouseEvent& event);
 	void OnMouseUp(wxMouseEvent& event);
@@ -45,6 +47,7 @@ public:
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 private:
 	IGxSelection* m_pSelection;
+    IGxCatalog* m_pCatalog;
 	IGxObject* m_pParentGxObject;
 	IStatusBar* m_pStatusBar;
 	IApplication* m_pApp;

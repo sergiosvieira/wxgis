@@ -83,7 +83,7 @@ class wxGISDataset :
 	public IPointer
 {
 public:	
-	wxGISDataset(wxString sPath, wxMBConv* pPathEncoding = wxConvCurrent) : IPointer(), m_pPathEncoding(pPathEncoding)
+	wxGISDataset(wxString sPath) : IPointer()
     {
         m_sPath = sPath;
         m_sPath.Replace(wxT("\\"), wxT("/"));
@@ -99,7 +99,6 @@ public:
 protected:
 	wxString m_sPath;
     wxCriticalSection m_CritSect;
-    wxMBConv* m_pPathEncoding;
     int m_nSubType;
 };
 

@@ -97,6 +97,23 @@ protected:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISDTDigit
+///////////////////////////////////////////////////////////////////////////////
+class wxGISDTDigit : public wxGISDTBase 
+{
+public:
+	wxGISDTDigit( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+	virtual ~wxGISDTDigit();	
+    virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString);
+//events
+    virtual bool Validate(void);
+    virtual void Update(void);
+protected:
+    wxGISTextCtrl* m_PathTextCtrl;
+    IGxCatalog* m_pCatalog;
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISDTChoice
 ///////////////////////////////////////////////////////////////////////////////
 class wxGISDTChoice : public wxPanel 

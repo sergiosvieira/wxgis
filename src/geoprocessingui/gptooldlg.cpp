@@ -85,6 +85,15 @@ wxGISGPToolDlg::wxGISGPToolDlg( IGPTool* pTool, wxGISGPToolManager* pToolManager
                     m_pControlsArray.push_back(pPath);
                 }
                 break;
+            case enumGISGPParamDTString:
+            case enumGISGPParamDTInteger:
+            case enumGISGPParamDTDouble:
+                {
+                    wxGISDTDigit* poDigit = new wxGISDTDigit(pParam, m_pTool->GetCatalog(), m_tools);
+                    bSizer4->Add( poDigit, 0, wxEXPAND, 5 );
+                    m_pControlsArray.push_back(poDigit);
+                }
+                break;
             default:
                 break;
             }

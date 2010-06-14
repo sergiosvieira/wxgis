@@ -22,7 +22,7 @@
 #include "wxgis/carto/featurelayer.h"
 #include "wxgis/carto/rasterlayer.h"
 #include "wxgis/framework/framework.h"
-//#include "wxgis/catalogui/gxapplication.h"
+#include "wxgis/framework/messagedlg.h"
 
 BEGIN_EVENT_TABLE(wxGxMapView, wxGISMapView)
 	EVT_LEFT_DOWN(wxGxMapView::OnMouseDown)
@@ -51,7 +51,8 @@ bool wxGxMapView::Activate(IGxApplication* application, wxXmlNode* pConf)
 	wxGxView::Activate(application, pConf);
 	//Serialize(m_pXmlConf, false);
 
-    m_pSelection = application->GetCatalog()->GetSelection();
+    m_pCatalog = application->GetCatalog();
+    m_pSelection = m_pCatalog->GetSelection();
     m_pApp = dynamic_cast<IApplication*>(application);
     if(!m_pApp)
         return false;
@@ -123,6 +124,7 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
         pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISDataset->GetName());
 		break;
 	case enumGISRasterDataset:
+        CheckOverviews(pwxGISDataset, pGxObj->GetName());
 		pwxGISLayers.push_back(new wxGISRasterLayer(pwxGISDataset));
         pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISDataset->GetName());
 		break;
@@ -141,6 +143,7 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
                 pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISSubDataset->GetName());
 		        break;
 	        case enumGISRasterDataset:
+                CheckOverviews(pwxGISSubDataset, pGxObj->GetName());
 		        pwxGISLayers.push_back(new wxGISRasterLayer(pwxGISSubDataset));
                 pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISSubDataset->GetName());
 		        break;
@@ -151,24 +154,17 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 		break;
 	}
 
-	//OGRLayer* pOGRLayer = pwxGISDataset->GetDataset();
-	//if(pOGRLayer == NULL)
-	//{
-	//	return;
-	//}
-
-	ClearLayers();
+    ClearLayers();
 
     for(size_t i = 0; i < pwxGISLayers.size(); i++)
     {
 	    if(pwxGISLayers[i] && pwxGISLayers[i]->IsValid())
-		    AddLayer(pwxGISLayers[i]);//m_GISMap.
+		    AddLayer(pwxGISLayers[i]);
     }
 
 	m_pParentGxObject = pGxObj;
 
     SetFullExtent();
-	//wxGISMapView::Refresh();
 }
 
 void wxGxMapView::OnMouseMove(wxMouseEvent& event)
@@ -208,4 +204,115 @@ void wxGxMapView::OnMouseDoubleClick(wxMouseEvent& event)
 	if(m_pApp)
 		m_pApp->OnMouseDoubleClick(event);
 	event.Skip();
+}
+
+typedef struct OvrProgressData
+{
+    IStatusBar* pStatusBar;
+    IProgressor* pProgressor;
+    wxString sMessage;
+} *LPOVRPROGRESSDATA;
+
+int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pData)
+{
+    LPOVRPROGRESSDATA pOvrData = (LPOVRPROGRESSDATA)pData;
+    if( pszMessage != NULL )
+        pOvrData->pStatusBar->SetMessage(wgMB2WX(pszMessage));
+    else if( pOvrData != NULL && !pOvrData->sMessage.IsEmpty() )
+        pOvrData->pStatusBar->SetMessage(pOvrData->sMessage);
+    else
+        pOvrData->pStatusBar->SetMessage(_("Building overviews"));
+
+    if(pOvrData->pProgressor)
+        pOvrData->pProgressor->SetValue((int) (dfComplete*100));
+
+    bool bKeyState = wxGetKeyState(WXK_ESCAPE);
+    return bKeyState == true ? 0 : 1;
+}
+
+void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileName)
+{
+ 	wxGISRasterDataset *pwxGISRasterDataset = dynamic_cast<wxGISRasterDataset*>(pwxGISDataset);
+    if(!pwxGISRasterDataset)
+        return;
+   //pyramids
+    if(!pwxGISRasterDataset->HasOverviews())
+    {
+        CPLSetConfigOption( "USE_RRD", "NO" );//YES
+        CPLSetConfigOption( "HFA_USE_RRD", "YES" );
+        //CPLSetConfigOption( "COMPRESS_OVERVIEW", "DEFLATE" );//LZW
+
+    	bool bAskCreateOvr = true;
+        IGISConfig*  pConfig = m_pCatalog->GetConfig();
+
+        bool bCreateOverviews = true;
+        wxString sResampleMethod(wxT("GAUSS"));
+        if(pConfig)
+        {
+            wxString sCompress;
+            wxXmlNode* pNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/raster")));
+            if(pNode)
+            {
+                bAskCreateOvr = wxAtoi(pNode->GetPropVal(wxT("ask_create_ovr"), wxT("1")));
+                sCompress = pNode->GetPropVal(wxT("ovr_compress"), wxT("NONE"));
+                sResampleMethod = pNode->GetPropVal(wxT("ovr_resample"), wxT("GAUSS"));
+                //"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE" 
+                bCreateOverviews = wxAtoi(pNode->GetPropVal(wxT("create_ovr"), wxT("1")));
+            }
+            else
+            {
+                pNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog/raster")), true);
+                pNode->AddProperty(wxT("create_ovr"), wxT("1"));
+                pNode->AddProperty(wxT("ask_create_ovr"), wxT("1"));
+                pNode->AddProperty(wxT("ovr_compress"), wxT("NONE"));
+                pNode->AddProperty(wxT("ovr_resample"), wxT("GAUSS"));
+            }
+            CPLSetConfigOption( "COMPRESS_OVERVIEW",  wgWX2MB(sCompress) );//LZW "DEFLATE"
+            if(bAskCreateOvr)
+            {
+                //show ask dialog
+                wxGISMessageDlg dlg(NULL, wxID_ANY, wxString::Format(_("Create pyramids for %s (%d x %d)"), soFileName.c_str(), pwxGISRasterDataset->GetWidth(), pwxGISRasterDataset->GetHeight()), wxString(_("This raster data source does not have pyramids. Pyramids allow for rapid display at varying resolutions.")), wxString(_("Pyramid buildin may take a few moments.\nWould you like to create pyramids?")), wxDefaultPosition, wxSize( 400,160 ));
+
+                if(dlg.ShowModal() == wxID_NO)
+                    bCreateOverviews = false;
+                else
+                    bCreateOverviews = true;
+
+                if(!dlg.GetShowInFuture())
+                {
+                    pNode->DeleteProperty(wxT("ask_create_ovr"));
+                    pNode->AddProperty(wxT("ask_create_ovr"), wxT("0"));
+                    pNode->DeleteProperty(wxT("create_ovr"));
+                    pNode->AddProperty(wxT("create_ovr"), wxString::Format(wxT("%d"), bCreateOverviews));
+                }
+            }
+        }
+
+        if(bCreateOverviews)
+        {
+	        int anOverviewList[5] = { 4, 8, 16, 32, 64 };
+            wxString sProgressMsg = wxString::Format(_("Creating pyramids for : %s (%d bands)"), soFileName.c_str(), pwxGISRasterDataset->GetRaster()->GetRasterCount());
+            IStatusBar* pStatusBar = m_pApp->GetStatusBar();  
+            IProgressor* pProgressor = pStatusBar->GetProgressor();
+            if(pProgressor)
+                pProgressor->Show(true);
+
+            OvrProgressData Data = {pStatusBar, pProgressor, sProgressMsg}; 
+            GDALDataset* pDSet = pwxGISRasterDataset->GetRaster();
+            if(!pDSet)
+                return;
+	        CPLErr eErr = pDSet->BuildOverviews( wgWX2MB(sResampleMethod), 5, anOverviewList, 0, NULL, OvrProgress, (void*)&Data );		        
+
+            if(pProgressor)
+                pProgressor->Show(false);
+            pStatusBar->SetMessage(_("Done"));
+
+		    if(eErr != CE_None)
+		    {
+                const char* pszErr = CPLGetLastErrorMsg();
+                wxLogError(_("BuildOverviews failed! OGR error: %s"), wgMB2WX(pszErr));
+                wxMessageBox(_("Build Overviews failed!"), _("Error"), wxICON_ERROR | wxOK );
+		    }
+        }
+    }
 }

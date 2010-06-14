@@ -35,8 +35,8 @@ class WXDLLIMPEXP_GIS_DS wxGISFeatureDataset :
 	public wxGISDataset
 {
 public:
-	wxGISFeatureDataset(wxString sPath, wxGISEnumVectorDatasetType nType, wxMBConv* pPathEncoding = wxConvCurrent);
-	wxGISFeatureDataset(OGRDataSource *poDS, OGRLayer* poLayer, wxString sPath, wxGISEnumVectorDatasetType nType, wxMBConv* pPathEncoding = wxConvCurrent);
+	wxGISFeatureDataset(wxString sPath, wxGISEnumVectorDatasetType nType);
+	wxGISFeatureDataset(OGRDataSource *poDS, OGRLayer* poLayer, wxString sPath, wxGISEnumVectorDatasetType nType);
 	virtual ~wxGISFeatureDataset(void);
 //wxGISDataset
 	virtual wxGISEnumDatasetType GetType(void){return m_nType;};

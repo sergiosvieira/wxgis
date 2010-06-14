@@ -21,18 +21,18 @@
 
 #include "wxgis/datasource/sysop.h"
 
-bool DeleteFile(wxString sPath, wxMBConv* conv)
+bool DeleteFile(wxString sPath)
 {
-    int result = VSIUnlink((const char*) sPath.mb_str(*conv));
+    int result = VSIUnlink(wgWX2MB(sPath));
     if (result == -1)
         return false;
     return true;
 }
 
-wxFontEncoding GetEncodingFromCpg(wxString sPath, wxMBConv* conv)
+wxFontEncoding GetEncodingFromCpg(wxString sPath)
 {
     sPath += wxT(".cpg");
-    char **papszLines = CSLLoad( (const char*) sPath.mb_str(*conv));
+    char **papszLines = CSLLoad( wgWX2MB(sPath));
     if(papszLines == NULL)
         return wxFONTENCODING_DEFAULT;
 

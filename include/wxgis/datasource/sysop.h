@@ -22,5 +22,5 @@
 
 #include "wxgis/datasource/datasource.h"
 
-bool WXDLLIMPEXP_GIS_DS DeleteFile(wxString sPath, wxMBConv* conv = wxConvCurrent);
-wxFontEncoding WXDLLIMPEXP_GIS_DS GetEncodingFromCpg(wxString sPath, wxMBConv* conv = wxConvCurrent);
+bool WXDLLIMPEXP_GIS_DS DeleteFile(wxString sPath);
+wxFontEncoding WXDLLIMPEXP_GIS_DS GetEncodingFromCpg(wxString sPath);

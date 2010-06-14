@@ -50,7 +50,17 @@ bool wxGxShapeFactory::GetChildren(wxString sParentDir, wxArrayString* pFileName
         wxFileName FName(path);
         wxString ext = FName.GetExt().MakeLower();
         FName.ClearExt();
-        wxString name = FName.GetName();
+
+        //name conv cp866 if zip
+        wxString name;
+        if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
+        {
+            wxString str(FName.GetName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
+            name = str;
+        }
+        else
+            name = FName.GetName();
+
 
 		if(data_map[name].bHasShp != 1)
 			data_map[name].bHasShp = (ext == wxT("shp")) ? 1 : 0;
@@ -59,7 +69,7 @@ bool wxGxShapeFactory::GetChildren(wxString sParentDir, wxArrayString* pFileName
 		if(data_map[name].bHasPrj != 1)
 			data_map[name].bHasPrj = (ext == wxT("prj")) ? 1 : 0;
 		if(data_map[name].path.IsEmpty() && (data_map[name].bHasShp || data_map[name].bHasDbf || data_map[name].bHasPrj))
-			data_map[name].path = sParentDir+ wxFileName::GetPathSeparator() + name;
+			data_map[name].path = sParentDir+ wxFileName::GetPathSeparator() + FName.GetName();
 		if(data_map[name].path.IsEmpty())	
 			data_map.erase(name);
 
@@ -89,8 +99,7 @@ REMOVE:
 		
 		if(CI->second.bHasShp)
 		{
-			wxString name;
-			name = CI->first + wxT(".shp");
+			wxString name = CI->first + wxT(".shp");
 			wxString path = CI->second.path + wxT(".shp");
 			//create shp
 			wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, enumVecESRIShapefile);
@@ -100,6 +109,7 @@ REMOVE:
 		{
 			wxString name = CI->first + wxT(".dbf");
 			wxString path = CI->second.path + wxT(".dbf");
+
 			//create dbf
 			wxGxTableDataset* pDataset = new wxGxTableDataset(path, name, enumTableDBF);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);

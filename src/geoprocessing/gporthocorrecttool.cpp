@@ -104,16 +104,27 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
 
         m_pParamArr.push_back(pParam3);
 
-        ////constant_ elevation double
-        //wxGISGPParameter* pParam4 = new wxGISGPParameter();
-        //pParam4->SetName(wxT("cons_elev"));
-        //pParam4->SetDisplayName(_("Constant elevation value"));
-        //pParam4->SetParameterType(enumGISGPParameterTypeOptional);
-        //pParam4->SetDataType(enumGISGPParamDTDouble);
-        //pParam4->SetDirection(enumGISGPParameterDirectionInput);
-        //pParam4->SetValue(0.0);
+        //constant_ elevation double
+        wxGISGPParameter* pParam4 = new wxGISGPParameter();
+        pParam4->SetName(wxT("cons_elev"));
+        pParam4->SetDisplayName(_("Constant elevation value or base value to the DEM"));
+        pParam4->SetParameterType(enumGISGPParameterTypeOptional);
+        pParam4->SetDataType(enumGISGPParamDTDouble);
+        pParam4->SetDirection(enumGISGPParameterDirectionInput);
+        pParam4->SetValue(0.0);
 
-        //m_pParamArr.push_back(pParam4);
+        m_pParamArr.push_back(pParam4);
+
+        //constant_ elevation double
+        wxGISGPParameter* pParam5 = new wxGISGPParameter();
+        pParam5->SetName(wxT("elev_scale"));
+        pParam5->SetDisplayName(_("The scaling factor used to convert the elevation values"));
+        pParam5->SetParameterType(enumGISGPParameterTypeOptional);
+        pParam5->SetDataType(enumGISGPParamDTDouble);
+        pParam5->SetDirection(enumGISGPParameterDirectionInput);
+        pParam5->SetValue(1.0);
+
+        m_pParamArr.push_back(pParam5);
     }
     return &m_pParamArr;
 }
@@ -161,6 +172,28 @@ bool wxGISGPOrthoCorrectTool::Validate(void)
     //    }
     //}
     return true;
+}
+
+int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pData)
+{
+    bool bCancel = false;
+    ITrackCancel* pTrackCancel = (ITrackCancel*)pData;
+    if(pTrackCancel)
+    {
+        if( pszMessage )
+        {
+            wxString soMsg(wgMB2WX(pszMessage)); 
+            if(!soMsg.IsEmpty())
+                pTrackCancel->PutMessage( wgMB2WX(pszMessage), -1, enumGISMessageNorm );
+        }
+        IProgressor* pRogress = pTrackCancel->GetProgressor();
+        if( pRogress )
+            pRogress->SetValue((int) (dfComplete * 100));
+        bCancel = !pTrackCancel->Continue();
+    }
+
+    bool bKeyState = wxGetKeyState(WXK_ESCAPE);    
+    return bKeyState || bCancel ? 0 : 1;
 }
 
 bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
@@ -227,14 +260,6 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     wxString sExt = pFilter->GetExt();
     int nNewSubType = pFilter->GetSubType();
 
-    if(!pSrcDataSet->Open())
-    {
-        //add messages to pTrackCancel
-        if(pTrackCancel)
-            pTrackCancel->PutMessage(_("Error opening raster"), -1, enumGISMessageErr);
-        return false;
-    }
-
     GDALDataset* poGDALDataset = pSrcDataSet->GetRaster();
     if(!poGDALDataset)
     {
@@ -255,37 +280,34 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
     GDALDataType eDT = poGDALRasterBand->GetRasterDataType();
-    const char *apszOptions[3] = { "METHOD=RPC", NULL, NULL };//
+        
+    //CPLString osSRCSRSOpt = "SRC_SRS=";
+    //osSRCSRSOpt += poGDALDataset->GetProjectionRef();
+    CPLString osDSTSRSOpt = "DST_SRS=";
+    osDSTSRSOpt += poGDALDataset->GetProjectionRef();
+
+    const char *apszOptions[4] = { osDSTSRSOpt.c_str(), "METHOD=RPC", NULL, NULL};//, NULL  osSRCSRSOpt.c_str(), 
     wxString soDEMPath = m_pParamArr[2]->GetValue();
 
+    CPLString soCPLDemPath;
     if(pGxObjectContainer)
     {
-        IGxObject* pGxDemObj = pGxObjectContainer->SearchChild(soDEMPath);
+        IGxDataset* pGxDemObj = dynamic_cast<IGxDataset*>(pGxObjectContainer->SearchChild(soDEMPath));
         if(pGxDemObj)
         {
-            //pGxDemObj-> ?? get internal path
+            soCPLDemPath = CPLString((const char *)wgWX2MB(pGxDemObj->GetPath()));
         }
     }
 
-    //double dfDEMHeight = m_pParamArr[3]->GetValue();
-    //if(soDEMPath.IsEmpty())
-    //{
-    //    CPLString osDEMFileOpt = "RPC_HEIGHT=";
-    //    osDEMFileOpt += wgWX2MB(wxString::Format(wxT("%f"), dfDEMHeight));
-    //    apszOptions[1] = osDEMFileOpt.c_str();
-    //}
-    //else
-    //{
-    //    CPLString osDEMFileOpt = "RPC_DEM=";
-    //    osDEMFileOpt += wgWX2MB(soDEMPath);
-    //    apszOptions[1] = osDEMFileOpt.c_str();
-    //}
-    CPLString osDEMFileOpt = "RPC_DEM=0";
-    apszOptions[1] = osDEMFileOpt.c_str();
+    CPLString osDEMFileOpt = "RPC_DEM=";
+    osDEMFileOpt += soCPLDemPath;
+    apszOptions[2] = osDEMFileOpt.c_str();
+    //CPLString osDEMHOpt = "RPC_HEIGHT=-1784.21";
+    //apszOptions[3] = osDEMHOpt.c_str();
 
     void *hTransformArg = GDALCreateGenImgProjTransformer2( poGDALDataset, NULL, (char **)apszOptions );
 
-    double adfDstGeoTransform[6];
+    double adfDstGeoTransform[6] = {0,0,0,0,0,0};
     int nPixels=0, nLines=0;
 
     CPLErr eErr = GDALSuggestedWarpOutput( poGDALDataset, GDALGenImgProjTransform, hTransformArg, adfDstGeoTransform, &nPixels, &nLines );
@@ -311,32 +333,57 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     poOutputGDALDataset->SetProjection(poGDALDataset->GetProjectionRef());
     poOutputGDALDataset->SetGeoTransform( adfDstGeoTransform );
 
-    if(poOutputGDALDataset)
-        GDALClose(poOutputGDALDataset);
+    // Copy the color table, if required.
+    GDALColorTableH hCT;
+
+    hCT = GDALGetRasterColorTable( GDALGetRasterBand(poGDALDataset,1) );
+    if( hCT != NULL )
+        GDALSetRasterColorTable( GDALGetRasterBand(poOutputGDALDataset,1), hCT );
 
 
-    //hDstDS = GDALCreate( hDriver, "out.tif", nPixels, nLines, 
-    //                     GDALGetRasterCount(hSrcDS), eDT, NULL );
-    //
-    //CPLAssert( hDstDS != NULL );
+    // Setup warp options. 
+    
+    GDALWarpOptions *psWarpOptions = GDALCreateWarpOptions();
 
-    //// Write out the projection definition. 
+    psWarpOptions->hSrcDS = poGDALDataset;
+    psWarpOptions->hDstDS = poOutputGDALDataset;
 
-    //GDALSetProjection( hDstDS, pszDstWKT );
-    //GDALSetGeoTransform( hDstDS, adfDstGeoTransform );
+    //psWarpOptions->nBandCount = 1;
+    //psWarpOptions->panSrcBands = 
+    //    (int *) CPLMalloc(sizeof(int) * psWarpOptions->nBandCount );
+    //psWarpOptions->panSrcBands[0] = 1;
+    //psWarpOptions->panDstBands = 
+    //    (int *) CPLMalloc(sizeof(int) * psWarpOptions->nBandCount );
+    //psWarpOptions->panDstBands[0] = 1;
 
-    //// Copy the color table, if required.
+    psWarpOptions->pfnProgress = OvrProgress;   
+    psWarpOptions->pProgressArg = (void*)pTrackCancel;
 
-    //GDALColorTableH hCT;
+    // Establish reprojection transformer. 
 
-    //hCT = GDALGetRasterColorTable( GDALGetRasterBand(hSrcDS,1) );
-    //if( hCT != NULL )
-    //    GDALSetRasterColorTable( GDALGetRasterBand(hDstDS,1), hCT );
+    psWarpOptions->pTransformerArg = GDALCreateGenImgProjTransformer2( poGDALDataset, poOutputGDALDataset, (char **)apszOptions );
+    psWarpOptions->pfnTransformer = GDALGenImgProjTransform;
 
-    //wsDELETE(pSrcDataSet);
-    //wxDELETE(pNewSpaRef);
+    // Initialize and execute the warp operation. 
 
-    //IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
+    GDALWarpOperation oOperation;
+
+    oOperation.Initialize( psWarpOptions );
+    eErr = oOperation.ChunkAndWarpImage( 0, 0, nPixels, nLines );
+    if(eErr != CE_None)
+    {
+        const char* pszErr = CPLGetLastErrorMsg();
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wxString::Format(_("OrthoCorrect failed! OGR error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
+        return false;
+    }
+
+    GDALDestroyGenImgProjTransformer( psWarpOptions->pTransformerArg );
+    GDALDestroyWarpOptions( psWarpOptions );
+
+    GDALClose(poOutputGDALDataset);
+    wsDELETE(pSrcDataSet);
+
     if(pGxObjectContainer)
     {
         IGxObject* pParentLoc = pGxObjectContainer->SearchChild(sPath);
@@ -344,150 +391,6 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
             pParentLoc->Refresh();
     }
 
-    //return !bHasErrors;
-    return false;
+    return true;
 }
 
-    //GDALCreateRPCTransformer apszOptions 	Other transformer options (ie. RPC_HEIGHT=<z>).
-    //GDALCreateGenImgProjTransformer2
-    //RPC_HEIGHT: A fixed height to be used with RPC calculations.
-    //RPC_DEM: The name of a DEM file to be used with RPC calculations.
-
-
-//    GDALDriverH hDriver;
-//    GDALDataType eDT;
-//    GDALDatasetH hDstDS;
-//    GDALDatasetH hSrcDS;
-//
-//    // Open the source file. 
-//
-//    hSrcDS = GDALOpen( "in.tif", GA_ReadOnly );
-//    CPLAssert( hSrcDS != NULL );
-//    
-//    // Create output with same datatype as first input band. 
-//
-//    eDT = GDALGetRasterDataType(GDALGetRasterBand(hSrcDS,1));
-//
-//    // Get output driver (GeoTIFF format)
-//
-//    hDriver = GDALGetDriverByName( "GTiff" );
-//    CPLAssert( hDriver != NULL );
-//
-//    // Get Source coordinate system. 
-//
-//    const char *pszSrcWKT, *pszDstWKT = NULL;
-//
-//    pszSrcWKT = GDALGetProjectionRef( hSrcDS );
-//    CPLAssert( pszSrcWKT != NULL && strlen(pszSrcWKT) > 0 );
-//
-//    // Setup output coordinate system that is UTM 11 WGS84. 
-//
-//    OGRSpatialReference oSRS;
-//
-//    oSRS.SetUTM( 11, TRUE );
-//    oSRS.SetWellKnownGeogCS( "WGS84" );
-//
-//    oSRS.exportToWkt( &pszDstWKT );
-//
-//    // Create a transformer that maps from source pixel/line coordinates
-//    // to destination georeferenced coordinates (not destination 
-//    // pixel line).  We do that by omitting the destination dataset
-//    // handle (setting it to NULL). 
-//
-//    void *hTransformArg;
-//
-//    hTransformArg = 
-//        GDALCreateGenImgProjTransformer( hSrcDS, pszSrcWKT, NULL, pszDstWKT, 
-//                                         FALSE, 0, 1 );
-//    CPLAssert( hTransformArg != NULL );
-//
-//    // Get approximate output georeferenced bounds and resolution for file. 
-//
-//    double adfDstGeoTransform[6];
-//    int nPixels=0, nLines=0;
-//    CPLErr eErr;
-//
-//    eErr = GDALSuggestedWarpOutput( hSrcDS, 
-//                                    GDALGenImgProjTransform, hTransformArg, 
-//                                    adfDstGeoTransform, &nPixels, &nLines );
-//    CPLAssert( eErr == CE_None );
-//
-//    GDALDestroyGenImgProjTransformer( hTransformArg );
-//
-//    // Create the output file.  
-//
-//    hDstDS = GDALCreate( hDriver, "out.tif", nPixels, nLines, 
-//                         GDALGetRasterCount(hSrcDS), eDT, NULL );
-//    
-//    CPLAssert( hDstDS != NULL );
-//
-//    // Write out the projection definition. 
-//
-//    GDALSetProjection( hDstDS, pszDstWKT );
-//    GDALSetGeoTransform( hDstDS, adfDstGeoTransform );
-//
-//    // Copy the color table, if required.
-//
-//    GDALColorTableH hCT;
-//
-//    hCT = GDALGetRasterColorTable( GDALGetRasterBand(hSrcDS,1) );
-//    if( hCT != NULL )
-//        GDALSetRasterColorTable( GDALGetRasterBand(hDstDS,1), hCT );
-//
-//    ... proceed with warp as before ...
-//
-//int main()
-//{
-//    GDALDatasetH  hSrcDS, hDstDS;
-//
-//    // Open input and output files. 
-//
-//    GDALAllRegister();
-//
-//    hSrcDS = GDALOpen( "in.tif", GA_ReadOnly );
-//    hDstDS = GDALOpen( "out.tif", GA_Update );
-//
-//    // Setup warp options. 
-//    
-//    GDALWarpOptions *psWarpOptions = GDALCreateWarpOptions();
-//
-//    psWarpOptions->hSrcDS = hSrcDS;
-//    psWarpOptions->hDstDS = hDstDS;
-//
-//    psWarpOptions->nBandCount = 1;
-//    psWarpOptions->panSrcBands = 
-//        (int *) CPLMalloc(sizeof(int) * psWarpOptions->nBandCount );
-//    psWarpOptions->panSrcBands[0] = 1;
-//    psWarpOptions->panDstBands = 
-//        (int *) CPLMalloc(sizeof(int) * psWarpOptions->nBandCount );
-//    psWarpOptions->panDstBands[0] = 1;
-//
-//    psWarpOptions->pfnProgress = GDALTermProgress;   
-//
-//    // Establish reprojection transformer. 
-//
-//    psWarpOptions->pTransformerArg = 
-//        GDALCreateGenImgProjTransformer( hSrcDS, 
-//                                         GDALGetProjectionRef(hSrcDS), 
-//                                         hDstDS,
-//                                         GDALGetProjectionRef(hDstDS), 
-//                                         FALSE, 0.0, 1 );
-//    psWarpOptions->pfnTransformer = GDALGenImgProjTransform;
-//
-//    // Initialize and execute the warp operation. 
-//
-//    GDALWarpOperation oOperation;
-//
-//    oOperation.Initialize( psWarpOptions );
-//    oOperation.ChunkAndWarpImage( 0, 0, 
-//                                  GDALGetRasterXSize( hDstDS ), 
-//                                  GDALGetRasterYSize( hDstDS ) );
-//
-//    GDALDestroyGenImgProjTransformer( psWarpOptions->pTransformerArg );
-//    GDALDestroyWarpOptions( psWarpOptions );
-//
-//    GDALClose( hDstDS );
-//    GDALClose( hSrcDS );
-//
-//    return 0;
-//}
