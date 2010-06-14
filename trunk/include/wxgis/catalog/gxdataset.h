@@ -53,8 +53,6 @@ public:
 	//IGxDataset
 	virtual wxGISDataset* GetDataset(void);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISTableDataset;};
-    virtual void SetPathEncoding(wxMBConv* pPathEncoding){m_pPathEncoding = pPathEncoding;};
-    virtual wxMBConv* GetPathEncoding(void){return m_pPathEncoding;};
     virtual int GetSubType(void){return m_type;};
     virtual wxString GetPath(void){return m_sPath;};
 protected:
@@ -95,8 +93,6 @@ public:
 	//IGxDataset
 	virtual wxGISDataset* GetDataset(void);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
-    virtual void SetPathEncoding(wxMBConv* pPathEncoding){m_pPathEncoding = pPathEncoding;};
-    virtual wxMBConv* GetPathEncoding(void){return m_pPathEncoding;};
     virtual int GetSubType(void){return (int)m_type;};
     virtual wxString GetPath(void){return m_sPath;};
 protected:
@@ -138,8 +134,6 @@ public:
 	//IGxDataset
 	virtual wxGISDataset* GetDataset(void);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
-    virtual void SetPathEncoding(wxMBConv* pPathEncoding){m_pPathEncoding = pPathEncoding;};
-    virtual wxMBConv* GetPathEncoding(void){return m_pPathEncoding;};
     virtual int GetSubType(void){return (int)m_type;};
     virtual wxString GetPath(void){return m_sPath;};
 protected:
@@ -147,5 +141,4 @@ protected:
 	wxImageList m_ImageListSmall, m_ImageListLarge;
 	wxGISDataset* m_pwxGISDataset;
 	wxGISEnumRasterDatasetType m_type;
-    wxMBConv* m_pPathEncoding;
 };

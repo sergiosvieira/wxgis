@@ -22,6 +22,7 @@
 #include "wxgis/catalogui/gxobjdialog.h"
 #include "wxgis/geoprocessingui/gpcontrols.h"
 #include "wx/dnd.h"
+#include "wx/valgen.h"
 
 #include "../../art/state_16.xpm"
 #include "../../art/open_16.xpm"
@@ -67,10 +68,19 @@ wxGISTextCtrl::~wxGISTextCtrl(void)
 
 void wxGISTextCtrl::OnKillFocus(wxFocusEvent& event)
 {
-    event.Skip();
     IGPParameter* pParam = m_pBaseCtrl->GetParameter();
-    pParam->SetValue(wxVariant(GetValue(), wxT("path")));
-    pParam->SetAltered(true);
+    wxValidator* poValid = GetValidator();
+    if ( !poValid || poValid->Validate(this)/*Validate() && TransferDataFromWindow()*/ )
+    {
+        pParam->SetValue(wxVariant(GetValue(), wxT("path")));
+        pParam->SetAltered(true);
+    }
+    else
+    {
+        pParam->SetIsValid(false);
+        pParam->SetMessage(wxGISEnumGPMessageError, _("The input data is invalid"));
+    }
+    event.Skip();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -280,6 +290,159 @@ void wxGISDTPath::Update(void)
     //Validate();
 }
 
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISDTDigit
+///////////////////////////////////////////////////////////////////////////////
+
+wxGISDTDigit::wxGISDTDigit( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxGISDTBase( pParam, parent, id, pos, size, style )
+{
+    m_pCatalog = pCatalog;
+	wxFlexGridSizer* fgSizer1;
+	fgSizer1 = new wxFlexGridSizer( 2, 2, 0, 0 );
+	fgSizer1->AddGrowableCol( 1 );
+	fgSizer1->SetFlexibleDirection( wxBOTH );
+	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+    m_StateBitmap = new wxStaticBitmap( this, wxID_ANY, m_pParam->GetParameterType() == enumGISGPParameterTypeRequired ? m_ImageList.GetIcon(4) : wxNullBitmap , wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer1->Add( m_StateBitmap, 0, wxALL, 5 );
+	
+    m_sParamDisplayName = new wxStaticText( this, wxID_ANY, m_pParam->GetParameterType() == enumGISGPParameterTypeOptional ? m_pParam->GetDisplayName() + _(" (optional)") : m_pParam->GetDisplayName(), wxDefaultPosition, wxDefaultSize, 0 );
+	m_sParamDisplayName->Wrap( -1 );
+	fgSizer1->Add( m_sParamDisplayName, 1, wxALL|wxEXPAND, 5 );
+	
+	m_bitmap = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer1->Add( m_bitmap, 0, wxALL, 5 );
+	
+	wxBoxSizer* bPathSizer;
+	bPathSizer = new wxBoxSizer( wxHORIZONTAL );	
+     
+    wxTextValidator oValidator( wxFILTER_INCLUDE_LIST );
+    wxArrayString asInc;
+    if(pParam->GetDataType() == enumGISGPParamDTDouble)
+        asInc.Add(wxT("."));
+    asInc.Add(wxT("0"));
+    asInc.Add(wxT("1"));
+    asInc.Add(wxT("2"));
+    asInc.Add(wxT("3"));
+    asInc.Add(wxT("4"));
+    asInc.Add(wxT("5"));
+    asInc.Add(wxT("6"));
+    asInc.Add(wxT("7"));
+    asInc.Add(wxT("8"));
+    asInc.Add(wxT("9"));
+    oValidator.SetIncludes(asInc);
+    m_PathTextCtrl = new wxGISTextCtrl( this, wxID_ANY, pParam->GetValue(), wxDefaultPosition, wxDefaultSize, wxTE_RIGHT, oValidator  );
+    //m_PathTextCtrl->SetDropTarget(new wxFileDropTarget());
+	bPathSizer->Add( m_PathTextCtrl, 1, wxALL|wxEXPAND, 5 );     
+	
+	fgSizer1->Add( bPathSizer, 0, wxALL|wxEXPAND, 5 );
+
+	this->SetSizer( fgSizer1 );
+	this->Layout();
+}
+
+wxGISDTDigit::~wxGISDTDigit()
+{
+}
+
+void wxGISDTDigit::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
+{
+    switch(nType)
+    {
+    case wxGISEnumGPMessageInformation:
+        m_StateBitmap->SetBitmap(m_ImageList.GetIcon(0));
+        break;
+    case wxGISEnumGPMessageError:
+        m_StateBitmap->SetBitmap(m_ImageList.GetIcon(2));
+        break;
+    case wxGISEnumGPMessageWarning:
+        m_StateBitmap->SetBitmap(m_ImageList.GetIcon(3));
+        break;
+    case wxGISEnumGPMessageRequired:
+        m_StateBitmap->SetBitmap(m_ImageList.GetIcon(4));
+        break;
+    case wxGISEnumGPMessageOk:
+        m_StateBitmap->SetBitmap(m_ImageList.GetIcon(1));
+        break;
+    case wxGISEnumGPMessageNone:
+        m_StateBitmap->SetBitmap(wxNullBitmap);
+        break;
+    default:
+    case wxGISEnumGPMessageUnknown:
+        m_StateBitmap->SetBitmap(wxNullBitmap);
+        break;
+    }
+    m_StateBitmap->SetToolTip(sMsg);
+}
+
+bool wxGISDTDigit::Validate(void)
+{
+    //if(m_pParam->GetHasBeenValidated())
+    //    return true;
+
+    //wxString sPath = m_pParam->GetValue();
+    //if(sPath.IsEmpty())
+    //{
+    //    m_pParam->SetAltered(false);
+    //    if(m_pParam->GetParameterType() != enumGISGPParameterTypeRequired)
+    //    {
+    //        m_pParam->SetIsValid(true);
+    //        m_pParam->SetMessage(wxGISEnumGPMessageNone);
+    //        return true;
+    //    }
+    //    else
+    //    {
+    //        m_pParam->SetIsValid(false);
+    //        m_pParam->SetMessage(wxGISEnumGPMessageRequired, _("The value is required"));
+    //        return false;
+    //    }
+    //}
+    //if(m_pCatalog)
+    //{
+    //    IGxObjectContainer* pGxContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
+    //    IGxObject* pGxObj = pGxContainer->SearchChild(sPath);
+    //    if(pGxObj)
+    //    {
+    //       if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
+    //       {
+    //           m_pParam->SetIsValid(true);
+    //           m_pParam->SetMessage(wxGISEnumGPMessageOk);
+    //       }
+    //       else
+    //       {
+    //           m_pParam->SetIsValid(true);
+    //           m_pParam->SetMessage(wxGISEnumGPMessageWarning, _("The output object is exist. It will be overwrited!"));
+    //       }
+    //       return true;
+    //    }
+    //    else
+    //    {
+    //       if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
+    //       {
+    //            m_pParam->SetIsValid(false);
+    //            m_pParam->SetMessage(wxGISEnumGPMessageError, _("The input object is not exist"));
+    //            return false;
+    //       }
+    //       else
+    //       {
+    //           m_pParam->SetIsValid(true);
+    //           m_pParam->SetMessage(wxGISEnumGPMessageOk);
+    //           return true;
+    //       }
+    //    }
+
+    //    //int ret = VSIStatL((const char*) sFolderPath.mb_str(*m_pMBConv), &BufL);
+    //    //if(ret == 0)
+    //}
+    return true;
+}
+
+void wxGISDTDigit::Update(void)
+{
+    //m_PathTextCtrl->ChangeValue( m_pParam->GetValue() );
+    SetMessage(m_pParam->GetÌessageType(), m_pParam->GetMessage());
+    //Validate();
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISDTChoice

@@ -50,7 +50,16 @@ bool wxGxMapInfoFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNa
         wxFileName FName(path);
         wxString ext = FName.GetExt().MakeLower();
         FName.ClearExt();
-        wxString name = FName.GetName();
+        //name conv cp866 if zip
+        wxString name;
+        if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
+        {
+            wxString str(FName.GetName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
+            name = str;
+        }
+        else
+            name = FName.GetName();
+
 
 		if(data_map[name].bHasTab != 1)
 			data_map[name].bHasTab = (ext == wxT("tab")) ? 1 : 0;
@@ -67,7 +76,7 @@ bool wxGxMapInfoFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNa
 		if(data_map[name].bHasMif != 1)
 			data_map[name].bHasMif = (ext == wxT("mif")) ? 1 : 0;
 		if(data_map[name].path.IsEmpty() && (data_map[name].bHasTab || data_map[name].bHasMif || data_map[name].bHasDat || data_map[name].bHasID || data_map[name].bHasMap || data_map[name].bHasInd || data_map[name].bHasMid))
-            data_map[name].path = sParentDir+ wxFileName::GetPathSeparator() + name;
+            data_map[name].path = sParentDir+ wxFileName::GetPathSeparator() + FName.GetName();
 		if(data_map[name].path.IsEmpty())	
 			data_map.erase(name);
 

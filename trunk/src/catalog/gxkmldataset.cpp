@@ -88,7 +88,7 @@ bool wxGxKMLDataset::Delete(void)
     }      
     else
     {
-        wxGISFeatureDataset* pwxGISFeatureDataset = new wxGISFeatureDataset(m_sPath, m_type, m_pPathEncoding);
+        wxGISFeatureDataset* pwxGISFeatureDataset = new wxGISFeatureDataset(m_sPath, m_type);
         bRet = pwxGISFeatureDataset->Delete();
     }
 
@@ -149,7 +149,7 @@ void wxGxKMLDataset::LoadChildren(void)
 
 	if(m_pwxGISDataset == NULL)
 	{		
-        wxGISFeatureDataset* pwxGISFeatureDataset = new wxGISFeatureDataset(m_sPath, m_type, m_pPathEncoding);
+        wxGISFeatureDataset* pwxGISFeatureDataset = new wxGISFeatureDataset(m_sPath, m_type);
 
         if(!pwxGISFeatureDataset->Open())
         {

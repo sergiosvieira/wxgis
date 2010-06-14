@@ -107,14 +107,14 @@ wxGISFeatureDataset* CreateVectorLayer(wxString sPath, wxString sName, wxString 
     }
     poFields->Release();
 
-    wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(poDS, poLayerDest, sFullPath, nSubType, pPathEncoding);
+    wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(poDS, poLayerDest, sFullPath, nSubType);
     return pDataSet;
 }
 
 //---------------------------------------
 // wxGISFeatureDataset
 //---------------------------------------
-wxGISFeatureDataset::wxGISFeatureDataset(OGRDataSource *poDS, OGRLayer* poLayer, wxString sPath, wxGISEnumVectorDatasetType nType, wxMBConv* pPathEncoding) : wxGISDataset(sPath, pPathEncoding), m_poDS(NULL), m_bIsOpened(false), m_psExtent(NULL), m_poLayer(NULL), m_bIsGeometryLoaded(false), m_pQuadTree(NULL), m_FieldCount(-1)
+wxGISFeatureDataset::wxGISFeatureDataset(OGRDataSource *poDS, OGRLayer* poLayer, wxString sPath, wxGISEnumVectorDatasetType nType) : wxGISDataset(sPath), m_poDS(NULL), m_bIsOpened(false), m_psExtent(NULL), m_poLayer(NULL), m_bIsGeometryLoaded(false), m_pQuadTree(NULL), m_FieldCount(-1)
 {
 	m_poDS = poDS;
 	m_poLayer = poLayer;
@@ -138,7 +138,7 @@ wxGISFeatureDataset::wxGISFeatureDataset(OGRDataSource *poDS, OGRLayer* poLayer,
     m_pGeometrySet->Reference();
 }
 
-wxGISFeatureDataset::wxGISFeatureDataset(wxString sPath, wxGISEnumVectorDatasetType nType, wxMBConv* pPathEncoding) : wxGISDataset(sPath, pPathEncoding), m_poDS(NULL), m_bIsOpened(false), m_psExtent(NULL), m_poLayer(NULL), m_bIsGeometryLoaded(false), m_pQuadTree(NULL), m_FieldCount(-1)
+wxGISFeatureDataset::wxGISFeatureDataset(wxString sPath, wxGISEnumVectorDatasetType nType) : wxGISDataset(sPath), m_poDS(NULL), m_bIsOpened(false), m_psExtent(NULL), m_poLayer(NULL), m_bIsGeometryLoaded(false), m_pQuadTree(NULL), m_FieldCount(-1)
 {
     m_pGeometrySet = new wxGISGeometrySet(true);
     m_pGeometrySet->Reference();
@@ -194,7 +194,7 @@ wxGISDataset* wxGISFeatureDataset::GetSubset(size_t nIndex)
         if(poLayer)
         {
             m_poDS->Reference();
-            wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, wxEmptyString, (wxGISEnumVectorDatasetType)m_nSubType, m_pPathEncoding);
+            wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, wxEmptyString, (wxGISEnumVectorDatasetType)m_nSubType);
             pDataSet->SetEncoding(m_Encoding);
             pDataSet->Reference();
             return static_cast<wxGISDataset*>(pDataSet);
@@ -264,46 +264,46 @@ bool wxGISFeatureDataset::Delete(int iLayer)
     switch(m_nSubType)
     {
     case enumVecESRIShapefile: 
-        if(!DeleteFile(m_sPath, m_pPathEncoding))
+        if(!DeleteFile(m_sPath))
             return false;
-        DeleteFile(sPath + wxT(".shx"), m_pPathEncoding);
-        DeleteFile(sPath + wxT(".dbf"), m_pPathEncoding);
-        DeleteFile(sPath + wxT(".prj"), m_pPathEncoding);
-        DeleteFile(sPath + wxT(".qix"), m_pPathEncoding);
-        DeleteFile(sPath + wxT(".sbn"), m_pPathEncoding);
-        DeleteFile(sPath + wxT(".sbx"), m_pPathEncoding);
-        DeleteFile(sPath + wxT(".cpg"), m_pPathEncoding);
-        DeleteFile(sPath + sExt + wxT(".xml"), m_pPathEncoding);
+        DeleteFile(sPath + wxT(".shx"));
+        DeleteFile(sPath + wxT(".dbf"));
+        DeleteFile(sPath + wxT(".prj"));
+        DeleteFile(sPath + wxT(".qix"));
+        DeleteFile(sPath + wxT(".sbn"));
+        DeleteFile(sPath + wxT(".sbx"));
+        DeleteFile(sPath + wxT(".cpg"));
+        DeleteFile(sPath + sExt + wxT(".xml"));
         return true;
     case enumVecMapinfoTab:
-        if(!DeleteFile(m_sPath, m_pPathEncoding))
+        if(!DeleteFile(m_sPath))
             return false;
-        DeleteFile(sPath + wxT(".dat"), m_pPathEncoding);
-        DeleteFile(sPath + wxT(".id"), m_pPathEncoding);
-        DeleteFile(sPath + wxT(".ind"), m_pPathEncoding);
-        DeleteFile(sPath + wxT(".map"), m_pPathEncoding);
-        DeleteFile(sPath + wxT(".cpg"), m_pPathEncoding);
-        DeleteFile(sPath + sExt + wxT(".metadata.xml"), m_pPathEncoding);
-        DeleteFile(sPath + sExt + wxT(".xml"), m_pPathEncoding);
+        DeleteFile(sPath + wxT(".dat"));
+        DeleteFile(sPath + wxT(".id"));
+        DeleteFile(sPath + wxT(".ind"));
+        DeleteFile(sPath + wxT(".map"));
+        DeleteFile(sPath + wxT(".cpg"));
+        DeleteFile(sPath + sExt + wxT(".metadata.xml"));
+        DeleteFile(sPath + sExt + wxT(".xml"));
         return true;
     case enumVecMapinfoMif: 
-        if(!DeleteFile(m_sPath, m_pPathEncoding))
+        if(!DeleteFile(m_sPath))
             return false;
-        DeleteFile(sPath + wxT(".mid"), m_pPathEncoding);
-        DeleteFile(sPath + sExt + wxT(".metadata.xml"), m_pPathEncoding);
-        DeleteFile(sPath + sExt + wxT(".xml"), m_pPathEncoding);
+        DeleteFile(sPath + wxT(".mid"));
+        DeleteFile(sPath + sExt + wxT(".metadata.xml"));
+        DeleteFile(sPath + sExt + wxT(".xml"));
         return true;
     case enumVecKML:
         if(enumGISContainer)
         {
-            if(!DeleteFile(m_sPath, m_pPathEncoding))
+            if(!DeleteFile(m_sPath))
                 return false;
         }
         else
             return false;
         return true;
     case enumVecDXF:
-        if(!DeleteFile(m_sPath, m_pPathEncoding))
+        if(!DeleteFile(m_sPath))
             return false;
         return true;
     case enumVecUnknown: 
@@ -319,7 +319,7 @@ bool wxGISFeatureDataset::Open(int iLayer)
 
 	wxCriticalSectionLocker locker(m_CritSect);
 
-    m_poDS = OGRSFDriverRegistrar::Open( (const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/, FALSE );
+    m_poDS = OGRSFDriverRegistrar::Open( wgWX2MB(m_sPath), FALSE );
 	if( m_poDS == NULL )
 	{
 		const char* err = CPLGetLastErrorMsg();
@@ -332,7 +332,7 @@ bool wxGISFeatureDataset::Open(int iLayer)
     FName.ClearExt();
     wxString sPath = FName.GetFullPath();
 
-    wxFontEncoding FEnc = GetEncodingFromCpg(sPath, m_pPathEncoding);
+    wxFontEncoding FEnc = GetEncodingFromCpg(sPath);
     if(FEnc != wxFONTENCODING_DEFAULT)
         m_Encoding = FEnc;
 

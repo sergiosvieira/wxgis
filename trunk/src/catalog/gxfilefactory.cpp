@@ -21,8 +21,6 @@
 #include "wxgis/catalog/gxfilefactory.h"
 #include "wxgis/catalog/gxfile.h"
 #include <wx/tokenzr.h>
-#include "../../art/other_16.xpm"
-#include "../../art/other_48.xpm"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxFileFactory, wxObject)
 
@@ -46,7 +44,13 @@ bool wxGxFileFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames
 		wxString name, ext;
 		wxFileName::SplitPath(path, NULL, NULL, &name, &ext);
 		ext.MakeLower();
-		
+
+        //name conv cp866 if zip
+        if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
+        {
+            wxString str(name.mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
+            name = str;
+        }
 
 		IGxObject* pGxObj = NULL;
 		if(ext == wxString(wxT("spr")))
@@ -60,13 +64,6 @@ bool wxGxFileFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames
 		{
 			name += wxT(".") + ext;
 			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumESRIPrjFile);
-			pGxObj = dynamic_cast<IGxObject*>(pFile);
-			goto REMOVE;
-		}
-        if(ext == wxString(wxT("rpb")) || ext == wxString(wxT("rpc")) || name.Find(wxT(".rpc")) != wxNOT_FOUND)
-		{
-			wxFileName FName(path);
-			wxGxTextFile* pFile = new wxGxTextFile(path, FName.GetFullName(), wxIcon(other_48_xpm), wxIcon(other_16_xpm));
 			pGxObj = dynamic_cast<IGxObject*>(pFile);
 			goto REMOVE;
 		}

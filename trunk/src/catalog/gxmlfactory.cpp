@@ -46,7 +46,17 @@ bool wxGxMLFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames, 
         wxFileName FName(path);
         wxString ext = FName.GetExt().MakeLower();
         FName.ClearExt();
-        wxString name = FName.GetName();
+
+        //name conv cp866 if zip
+        wxString name;
+        if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
+        {
+            wxString str(FName.GetName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
+            name = str;
+        }
+        else
+            name = FName.GetName();
+
 
 		IGxObject* pGxObj = NULL;
 		if(ext == wxString(wxT("kml")))

@@ -25,7 +25,7 @@
 #include "vrtwarpedoverview.h"
 #include "gdal_rat.h"
 
-wxGISRasterDataset::wxGISRasterDataset(wxString sPath, wxGISEnumRasterDatasetType nType, wxMBConv* pPathEncoding) : wxGISDataset(sPath, pPathEncoding), m_bIsOpened(false), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false), m_poMainDataset(NULL), m_poDataset(NULL)
+wxGISRasterDataset::wxGISRasterDataset(wxString sPath, wxGISEnumRasterDatasetType nType) : wxGISDataset(sPath), m_bIsOpened(false), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false), m_poMainDataset(NULL), m_poDataset(NULL)
 {
     m_nSubType = (int)nType;
 }
@@ -97,19 +97,22 @@ bool wxGISRasterDataset::Delete(void)
 	case enumRasterImg:
 	case enumRasterJpeg:
 	case enumRasterPng:
-        if(!DeleteFile(m_sPath, m_pPathEncoding))
+        if(!DeleteFile(m_sPath))
             return false;
-        DeleteFile(sPath + sExt  + wxT("w"), m_pPathEncoding);
-        DeleteFile(sPath + sExt + wxT(".xml"), m_pPathEncoding);
-        DeleteFile(sPath + wxT(".lgo"), m_pPathEncoding);
-        DeleteFile(sPath + wxT(".aux"), m_pPathEncoding);
-        DeleteFile(sPath + sExt + wxT(".aux"), m_pPathEncoding);
-        DeleteFile(sPath + sExt  + wxT(".aux.xml"), m_pPathEncoding);
-        DeleteFile(sPath + wxT(".ovr"), m_pPathEncoding);
-        DeleteFile(sPath + sExt  + wxT(".ovr"), m_pPathEncoding);
-        DeleteFile(sPath + sExt  + wxT(".ovr.aux.xml"), m_pPathEncoding);
-        DeleteFile(sPath + wxT(".xml"), m_pPathEncoding);
-        DeleteFile(sPath + wxT(".rrd"), m_pPathEncoding);
+        DeleteFile(sPath + sExt  + wxT("w"));
+        DeleteFile(sPath + sExt + wxT(".xml"));
+        DeleteFile(sPath + wxT(".lgo"));
+        DeleteFile(sPath + wxT(".aux"));
+        DeleteFile(sPath + sExt + wxT(".aux"));
+        DeleteFile(sPath + sExt  + wxT(".aux.xml"));
+        DeleteFile(sPath + wxT(".ovr"));
+        DeleteFile(sPath + sExt  + wxT(".ovr"));
+        DeleteFile(sPath + sExt  + wxT(".ovr.aux.xml"));
+        DeleteFile(sPath + wxT(".xml"));
+        DeleteFile(sPath + wxT(".rrd"));
+        DeleteFile(sPath + wxT(".rpb"));
+        DeleteFile(sPath + wxT(".rpc"));
+        DeleteFile(sPath + wxT(".rpc.txt"));
         return true;
     case enumRasterUnknown:
     default: return false;
@@ -125,15 +128,15 @@ bool wxGISRasterDataset::Open(void)
 	wxCriticalSectionLocker locker(m_CritSect);
 
 
-    m_poDataset = (GDALDataset *) GDALOpen( (const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/, GA_ReadOnly );
+    m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath), GA_ReadOnly );
     //bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
 	if( m_poDataset == NULL )
     {
         m_sPath.Replace(wxT("\\"), wxT("/"));
-        m_poDataset = (GDALDataset *) GDALOpen( (const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/, GA_ReadOnly );//GA_Update
+        m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath), GA_ReadOnly );
     }
     
-    //m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath.c_str()), GA_ReadOnly );
+    //m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath), GA_ReadOnly );
 	if( m_poDataset == NULL )
     {
         //if ( CPLGetLastErrorNo() != CPLE_OpenFailed )
