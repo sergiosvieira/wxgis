@@ -86,10 +86,10 @@ bool wxGxToolboxView::Activate(IGxApplication* application, wxXmlNode* pConf)
 
 void wxGxToolboxView::Deactivate(void)
 {
+    //m_pGxTasksView->Deactivate();
+    m_pApp->UnRegisterChildWindow(m_pGxTasksView);
     while(GetPageCount() > 0)
         RemovePage(0); //will delete in app destructor
-    m_pGxTasksView->Deactivate();
-    //m_pApp->UnRegisterChildWindow(m_pGxTasksView);
 
 	//if(m_ConnectionPointSelectionCookie != -1)
 	//	m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);

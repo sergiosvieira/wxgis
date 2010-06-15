@@ -154,23 +154,6 @@ bool wxGISGPOrthoCorrectTool::Validate(void)
         }
     }
 
-    ////check if input & output types is same!
-    //if(m_pParamArr[0]->GetIsValid())
-    //{
-    //    if(!m_pParamArr[1]->GetHasBeenValidated())
-    //    {
-    //        //TODO: Maybe IGxDataset in future?
-    //        //IGxDataset* pDset1 = m_pCatalog->SearchChild()
-    //        wxFileName Name1(m_pParamArr[0]->GetValue());
-    //        wxFileName Name2(m_pParamArr[1]->GetValue());
-    //        if(Name1.GetExt() == Name2.GetExt())
-    //        {
-    //            m_pParamArr[1]->SetIsValid(false);
-    //            m_pParamArr[1]->SetMessage(wxGISEnumGPMessageError, _("Cannot export to the same format"));
-    //            return false;
-    //        }
-    //    }
-    //}
     return true;
 }
 
@@ -286,7 +269,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     CPLString osDSTSRSOpt = "DST_SRS=";
     osDSTSRSOpt += poGDALDataset->GetProjectionRef();
 
-    const char *apszOptions[4] = { osDSTSRSOpt.c_str(), "METHOD=RPC", NULL, NULL};//, NULL  osSRCSRSOpt.c_str(), 
+    const char *apszOptions[6] = { osDSTSRSOpt.c_str(), "METHOD=RPC", NULL, NULL, NULL, NULL};//, NULL  osSRCSRSOpt.c_str(), 
     wxString soDEMPath = m_pParamArr[2]->GetValue();
 
     CPLString soCPLDemPath;
@@ -302,8 +285,16 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     CPLString osDEMFileOpt = "RPC_DEM=";
     osDEMFileOpt += soCPLDemPath;
     apszOptions[2] = osDEMFileOpt.c_str();
-    //CPLString osDEMHOpt = "RPC_HEIGHT=-1784.21";
-    //apszOptions[3] = osDEMHOpt.c_str();
+
+    wxString soHeight = m_pParamArr[3]->GetValue();
+    CPLString osHeightOpt = "RPC_HEIGHT=";
+    osHeightOpt += wgWX2MB(soHeight);
+    apszOptions[3] = osHeightOpt.c_str();
+
+    wxString soHeightScale = m_pParamArr[4]->GetValue();
+    CPLString osHeightScaleOpt = "RPC_HEIGHT_SCALE=";
+    osHeightScaleOpt += wgWX2MB(soHeightScale);
+    apszOptions[4] = osHeightScaleOpt.c_str();
 
     void *hTransformArg = GDALCreateGenImgProjTransformer2( poGDALDataset, NULL, (char **)apszOptions );
 

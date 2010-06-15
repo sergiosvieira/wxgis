@@ -379,11 +379,19 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
 
     wxGISApplication::OnClose(event);
 
-    for(size_t i = 0; i < m_WindowArray.size(); i++)
-        if(m_WindowArray[i])
-            if(!m_WindowArray[i]->Destroy())
-                wxDELETE(m_WindowArray[i]);
+    //for(size_t i = 0; i < m_WindowArray.size(); i++)
+    //    if(m_WindowArray[i])
+    //        if(!m_WindowArray[i]->Destroy())
+    //            wxDELETE(m_WindowArray[i]);
 
+    while (!m_WindowArray.empty())
+    {
+        wxWindow* poWnd = m_WindowArray.back();
+        if(!poWnd->Destroy())
+            wxDELETE(poWnd);
+        m_WindowArray.pop_back();
+    }
+    
  	SerializeGxFramePos(true);
 }
 

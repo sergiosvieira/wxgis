@@ -29,6 +29,21 @@ bool DeleteFile(wxString sPath)
     return true;
 }
 
+wxString ClearExt(wxString sPath)
+{
+    wxString sResPath = sPath;
+    int pos = sPath.Find('.', true);
+    if(pos != wxNOT_FOUND)
+        sResPath = sPath.Left(pos);
+    return sResPath;
+}
+    ////wxFileName FName( m_sPath );
+    ////FName.ClearExt();
+    ////wxString sPath = FName.GetFullPath();
+    ////if(sPath.Left(2) == wxT("\\\\"))
+    ////    sPath = sPath.Right(sPath.Len() -2 );
+
+
 wxFontEncoding GetEncodingFromCpg(wxString sPath)
 {
     sPath += wxT(".cpg");

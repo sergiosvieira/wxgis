@@ -69,15 +69,58 @@ wxGISTextCtrl::~wxGISTextCtrl(void)
 void wxGISTextCtrl::OnKillFocus(wxFocusEvent& event)
 {
     IGPParameter* pParam = m_pBaseCtrl->GetParameter();
-    wxValidator* poValid = GetValidator();
-    if ( !poValid || poValid->Validate(this)/*Validate() && TransferDataFromWindow()*/ )
+    wxString sData = GetValue();
+    bool bValid(false);
+    long dVal(0);
+    double dfVal(0);
+    switch(pParam->GetDataType())
     {
-        pParam->SetValue(wxVariant(GetValue(), wxT("path")));
-        pParam->SetAltered(true);
+    case enumGISGPParamDTInteger:
+        bValid = sData.ToLong(&dVal);
+        break;
+    case enumGISGPParamDTDouble:
+        bValid = sData.ToDouble(&dfVal);
+        break;
+    case enumGISGPParamDTString:
+    case enumGISGPParamDTPath:
+        bValid = true;
+        break;
+    default:
+        bValid = true;
+        break;
+    }
+    
+    pParam->SetIsValid(bValid);
+    if ( bValid )
+    {
+        pParam->SetMessage(wxGISEnumGPMessageNone);
+        switch(pParam->GetDataType())
+        {
+        case enumGISGPParamDTInteger:
+            pParam->SetValue(wxVariant(dVal, wxT("integer")));
+            pParam->SetAltered(true);
+            return;
+        case enumGISGPParamDTDouble:
+            pParam->SetValue(wxVariant(dfVal, wxT("double")));
+            pParam->SetAltered(true);
+            return;
+        case enumGISGPParamDTString:
+            pParam->SetValue(wxVariant(sData, wxT("string")));
+            pParam->SetAltered(true);
+            return;
+        case enumGISGPParamDTPath:
+            pParam->SetValue(wxVariant(sData, wxT("path")));
+            pParam->SetAltered(true);
+            return;
+           default:
+            pParam->SetValue(wxVariant(sData, wxT("val")));
+            pParam->SetAltered(true);
+            return;
+        }
     }
     else
     {
-        pParam->SetIsValid(false);
+        pParam->SetValue(wxVariant(sData, wxT("val")));
         pParam->SetMessage(wxGISEnumGPMessageError, _("The input data is invalid"));
     }
     event.Skip();
@@ -316,22 +359,7 @@ wxGISDTDigit::wxGISDTDigit( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow
 	wxBoxSizer* bPathSizer;
 	bPathSizer = new wxBoxSizer( wxHORIZONTAL );	
      
-    wxTextValidator oValidator( wxFILTER_INCLUDE_LIST );
-    wxArrayString asInc;
-    if(pParam->GetDataType() == enumGISGPParamDTDouble)
-        asInc.Add(wxT("."));
-    asInc.Add(wxT("0"));
-    asInc.Add(wxT("1"));
-    asInc.Add(wxT("2"));
-    asInc.Add(wxT("3"));
-    asInc.Add(wxT("4"));
-    asInc.Add(wxT("5"));
-    asInc.Add(wxT("6"));
-    asInc.Add(wxT("7"));
-    asInc.Add(wxT("8"));
-    asInc.Add(wxT("9"));
-    oValidator.SetIncludes(asInc);
-    m_PathTextCtrl = new wxGISTextCtrl( this, wxID_ANY, pParam->GetValue(), wxDefaultPosition, wxDefaultSize, wxTE_RIGHT, oValidator  );
+    m_PathTextCtrl = new wxGISTextCtrl( this, wxID_ANY, pParam->GetValue(), wxDefaultPosition, wxDefaultSize, wxTE_RIGHT  );
     //m_PathTextCtrl->SetDropTarget(new wxFileDropTarget());
 	bPathSizer->Add( m_PathTextCtrl, 1, wxALL|wxEXPAND, 5 );     
 	
@@ -377,69 +405,50 @@ void wxGISDTDigit::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
 
 bool wxGISDTDigit::Validate(void)
 {
-    //if(m_pParam->GetHasBeenValidated())
-    //    return true;
+    if(m_pParam->GetHasBeenValidated())
+        return true;
 
-    //wxString sPath = m_pParam->GetValue();
-    //if(sPath.IsEmpty())
-    //{
-    //    m_pParam->SetAltered(false);
-    //    if(m_pParam->GetParameterType() != enumGISGPParameterTypeRequired)
-    //    {
-    //        m_pParam->SetIsValid(true);
-    //        m_pParam->SetMessage(wxGISEnumGPMessageNone);
-    //        return true;
-    //    }
-    //    else
-    //    {
-    //        m_pParam->SetIsValid(false);
-    //        m_pParam->SetMessage(wxGISEnumGPMessageRequired, _("The value is required"));
-    //        return false;
-    //    }
-    //}
-    //if(m_pCatalog)
-    //{
-    //    IGxObjectContainer* pGxContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
-    //    IGxObject* pGxObj = pGxContainer->SearchChild(sPath);
-    //    if(pGxObj)
-    //    {
-    //       if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
-    //       {
-    //           m_pParam->SetIsValid(true);
-    //           m_pParam->SetMessage(wxGISEnumGPMessageOk);
-    //       }
-    //       else
-    //       {
-    //           m_pParam->SetIsValid(true);
-    //           m_pParam->SetMessage(wxGISEnumGPMessageWarning, _("The output object is exist. It will be overwrited!"));
-    //       }
-    //       return true;
-    //    }
-    //    else
-    //    {
-    //       if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
-    //       {
-    //            m_pParam->SetIsValid(false);
-    //            m_pParam->SetMessage(wxGISEnumGPMessageError, _("The input object is not exist"));
-    //            return false;
-    //       }
-    //       else
-    //       {
-    //           m_pParam->SetIsValid(true);
-    //           m_pParam->SetMessage(wxGISEnumGPMessageOk);
-    //           return true;
-    //       }
-    //    }
-
-    //    //int ret = VSIStatL((const char*) sFolderPath.mb_str(*m_pMBConv), &BufL);
-    //    //if(ret == 0)
-    //}
+    wxString sData = m_pParam->GetValue();
+    bool bValid(false);
+    long dVal(0);
+    double dfVal(0);
+    switch(m_pParam->GetDataType())
+    {
+    case enumGISGPParamDTInteger:
+        bValid = sData.ToLong(&dVal);
+        break;
+    case enumGISGPParamDTDouble:
+        bValid = sData.ToDouble(&dfVal);
+        break;
+    default:
+        bValid = false;
+        break;
+    }
+    
+    m_pParam->SetIsValid(bValid);
+    if ( bValid )
+    {
+        m_pParam->SetMessage(wxGISEnumGPMessageOk);
+        switch(m_pParam->GetDataType())
+        {
+        case enumGISGPParamDTInteger:
+        case enumGISGPParamDTDouble:
+        default:
+            m_pParam->SetAltered(true);
+            return true;
+        }
+    }
+    else
+    {
+        m_pParam->SetMessage(wxGISEnumGPMessageError, _("The input data is invalid"));
+        return false;
+    }
     return true;
 }
 
 void wxGISDTDigit::Update(void)
 {
-    //m_PathTextCtrl->ChangeValue( m_pParam->GetValue() );
+    m_PathTextCtrl->ChangeValue( m_pParam->GetValue() );
     SetMessage(m_pParam->GetÌessageType(), m_pParam->GetMessage());
     //Validate();
 }
