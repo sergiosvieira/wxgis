@@ -1,8 +1,8 @@
 #summary This is screenshots of wxGIS components.
 
 = ScreenShots =
- * [ScreenShots#wxGIS Catalog]
- * [ScreenShots#wxGIS Toolbox]
+ * [ScreenShots#wxGIS_Catalog]
+ * [ScreenShots#wxGIS_Toolbox]
 
 This is screenshots of wxGIS components
 
