@@ -328,9 +328,7 @@ bool wxGISFeatureDataset::Open(int iLayer)
 		return false;
 	}
 
-    wxFileName FName( m_sPath );
-    FName.ClearExt();
-    wxString sPath = FName.GetFullPath();
+    wxString sPath = ClearExt(m_sPath);
 
     wxFontEncoding FEnc = GetEncodingFromCpg(sPath);
     if(FEnc != wxFONTENCODING_DEFAULT)

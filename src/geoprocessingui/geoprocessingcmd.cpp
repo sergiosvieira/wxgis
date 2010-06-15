@@ -21,6 +21,7 @@
 
 #include "wxgis/geoprocessingui/geoprocessingcmd.h"
 #include "wxgis/geoprocessingui/gptoolboxview.h"
+#include "wxgis/datasource/sysop.h"
 
 #include "../../art/gp_menu_16.xpm"
 #include "../../art/toolbox_16.xpm"
@@ -219,9 +220,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
                 {
                     IGxObject* pGxSrcObj = dynamic_cast<IGxObject*>(DatasetArray[0]);
                     wxString sName = pGxSrcObj->GetName();
-                    wxFileName FName(sName);
-                    FName.ClearExt();
-                    sName = FName.GetName();
+                    sName = ClearExt(sName);
 
                     IGxObject* pGxParentObj = pGxSrcObj->GetParent();
                     wxString sStartLoc;
@@ -492,9 +491,7 @@ EXIT:
 
                             IGxObject* pGxSrcObj = dynamic_cast<IGxObject*>(DatasetArray[i]);
                             wxString sName = pGxSrcObj->GetName();
-                            wxFileName FName(sName);
-                            FName.ClearExt();
-                            sName = FName.GetName();
+                            sName = ClearExt(sName);
 
                             wxGISEnumVectorDatasetType nSubType = (wxGISEnumVectorDatasetType)DatasetArray[i]->GetSubType();
                             //if types is same scip exporting

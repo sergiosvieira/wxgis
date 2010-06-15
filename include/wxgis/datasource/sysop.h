@@ -24,3 +24,4 @@
 
 bool WXDLLIMPEXP_GIS_DS DeleteFile(wxString sPath);
 wxFontEncoding WXDLLIMPEXP_GIS_DS GetEncodingFromCpg(wxString sPath);
+wxString WXDLLIMPEXP_GIS_DS ClearExt(wxString sPath);

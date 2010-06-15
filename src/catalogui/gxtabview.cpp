@@ -142,13 +142,21 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 
 wxGxTab::~wxGxTab(void)
 {
+    while (!m_pWindows.empty())
+    {
+        wxWindow* poWnd = m_pWindows.back();
+        m_pApp->UnRegisterChildWindow(poWnd);
+        m_pWindows.pop_back();
+    }
+
+
 	//for(size_t i = 0; i < m_pWindows.size(); i++)
 	//{
 	//	wxGxView* pView = dynamic_cast<wxGxView*>(m_pWindows[i]);
 	//	if(pView != NULL)
  //       {
 	//		pView->Deactivate();
- //           m_pApp->UnRegisterChildWindow(m_pWindows[i]);
+            //m_pApp->UnRegisterChildWindow(m_pWindows[i]);
  //       }
 	//	//wxDELETE(m_pWindows[i]);//destroy in registerwindows array
  //       m_pWindows[i]->Destroy();
