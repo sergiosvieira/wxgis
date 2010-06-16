@@ -112,7 +112,7 @@ bool wxGISRasterDataset::Delete(void)
         DeleteFile(sPath + wxT(".rrd"));
         DeleteFile(sPath + wxT(".rpb"));
         DeleteFile(sPath + wxT(".rpc"));
-        DeleteFile(sPath + wxT(".rpc.txt"));
+        DeleteFile(sPath + wxT("_rpc.txt"));
         return true;
     case enumRasterUnknown:
     default: return false;
@@ -274,15 +274,15 @@ bool wxGISRasterDataset::Open(void)
 	///* -------------------------------------------------------------------- */
 	///*      Report RPCs                                                     */
 	///* -------------------------------------------------------------------- */
- //   papszMetadata = m_poDataset->GetMetadata("RPC");
- //   if( CSLCount(papszMetadata) > 0 )
- //   {
- //       wxLogDebug( wxT( "RPC Metadata:" ));
- //       for(int i = 0; papszMetadata[i] != NULL; i++ )
- //       {
- //           wxLogDebug( wxT( "  %s"), wgMB2WX(papszMetadata[i]) );
- //       }
- //   }
+    //papszMetadata = m_poDataset->GetMetadata("RPC");
+    //if( CSLCount(papszMetadata) > 0 )
+    //{
+    //    wxLogDebug( wxT( "RPC Metadata:" ));
+    //    for(int i = 0; papszMetadata[i] != NULL; i++ )
+    //    {
+    //        wxLogDebug( wxT( "  %s"), wgMB2WX(papszMetadata[i]) );
+    //    }
+    //}
 
 	//for(int nBand = 0; nBand < m_poDataset->GetRasterCount(); nBand++ )
  //   {

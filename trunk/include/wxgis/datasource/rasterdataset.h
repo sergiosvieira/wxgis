@@ -43,6 +43,7 @@ public:
 	virtual GDALDataset* GetRaster(void){return m_poDataset;};
 	virtual GDALDataset* GetMainRaster(void){return m_poMainDataset;};
 	virtual bool HasOverviews(void){return m_bHasOverviews;};
+	virtual void SetHasOverviews(bool bVal){m_bHasOverviews = bVal;};
     virtual int GetWidth(void){return m_nXSize;};
     virtual int GetHeight(void){return m_nYSize;};
     virtual bool Delete(void);
