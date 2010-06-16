@@ -313,6 +313,8 @@ void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileNam
                 wxLogError(_("BuildOverviews failed! OGR error: %s"), wgMB2WX(pszErr));
                 wxMessageBox(_("Build Overviews failed!"), _("Error"), wxICON_ERROR | wxOK );
 		    }
+            else
+                pwxGISRasterDataset->SetHasOverviews(true);
         }
     }
 }
