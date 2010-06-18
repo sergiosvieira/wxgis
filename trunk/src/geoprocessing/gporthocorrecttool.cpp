@@ -69,7 +69,7 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         pParam1->SetDirection(enumGISGPParameterDirectionInput);
 
         wxGISGPGxObjectDomain* pDomain1 = new wxGISGPGxObjectDomain();
-        pDomain1->AddFilter(new wxGxDatasetFilter(enumGISRasterDataset));
+        pDomain1->AddFilter(new wxGxTiffFilter());
         pParam1->SetDomain(pDomain1);
 
         m_pParamArr.push_back(pParam1);
@@ -84,6 +84,10 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
 
         wxGISGPGxObjectDomain* pDomain2 = new wxGISGPGxObjectDomain();
         pDomain2->AddFilter(new wxGxTiffFilter());
+        pDomain2->AddFilter(new wxGxImgFilter());
+        pDomain2->AddFilter(new wxGxBmpFilter());
+        pDomain2->AddFilter(new wxGxJpegFilter());
+        pDomain2->AddFilter(new wxGxPngFilter());
         pParam2->SetDomain(pDomain2);
 
         //pParam2->AddParameterDependency(wxT("src_path"));
@@ -99,7 +103,7 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         pParam3->SetDirection(enumGISGPParameterDirectionInput);
 
         wxGISGPGxObjectDomain* pDomain3 = new wxGISGPGxObjectDomain();
-        pDomain3->AddFilter(new wxGxTiffFilter());
+        pDomain3->AddFilter(new wxGxDatasetFilter(enumGISRasterDataset));
         pParam3->SetDomain(pDomain3);
 
         m_pParamArr.push_back(pParam3);

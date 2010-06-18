@@ -62,6 +62,7 @@ public:
 	virtual bool AreChildrenViewable(void){return true;};
 	virtual bool HasChildren(void){return true;};
 	virtual GxObjectArray* GetChildren(void){return &m_Children;};
+    virtual IGxObject* SearchChild(wxString sPath);
 	//IGxCatalog
 	virtual wxString ConstructFullName(IGxObject* pObject);
 	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray);

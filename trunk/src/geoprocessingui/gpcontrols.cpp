@@ -82,8 +82,36 @@ void wxGISTextCtrl::OnKillFocus(wxFocusEvent& event)
         bValid = sData.ToDouble(&dfVal);
         break;
     case enumGISGPParamDTString:
-    case enumGISGPParamDTPath:
         bValid = true;
+        break;
+    case enumGISGPParamDTPath:
+        {
+            bValid = false;
+            wxGISGPGxObjectDomain* poDomain = dynamic_cast<wxGISGPGxObjectDomain*>(pParam->GetDomain());
+            IGxObjectFilter* poFilter = poDomain->GetFilter(poDomain->GetSelFilter());
+            wxFileName oName(sData);
+            if(poFilter)
+            {
+                if(oName.GetExt().CmpNoCase(poFilter->GetExt()) == 0)
+                {
+                    bValid = true;
+                    break;
+                }
+            }
+            for(size_t i = 0; i < poDomain->GetFilterCount(); i++)
+            {
+                poFilter = poDomain->GetFilter(i);
+                if(poFilter)
+                {
+                    if(oName.GetExt().CmpNoCase(poFilter->GetExt()) == 0)
+                    {
+                        poDomain->SetSelFilter(i);
+                        bValid = true;
+                        break;
+                    }
+                }
+            }
+        }
         break;
     default:
         bValid = true;
@@ -226,7 +254,7 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
         if(dlg.ShowModalOpen() == wxID_OK)
         {
             wxString sPath = dlg.GetFullPath();
-            sPath.Replace(wxT("\\\\"), wxT("\\"));
+            //sPath.Replace(wxT("\\\\"), wxT("\\"));
             //m_PathTextCtrl->ChangeValue( sPath );
             m_pParam->SetValue(wxVariant(sPath, wxT("path")));
             m_pParam->SetAltered(true);
@@ -294,11 +322,15 @@ bool wxGISDTPath::Validate(void)
         {
            if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
            {
+               if(m_pParam->GetÌessageType() == wxGISEnumGPMessageError)
+                   return false;
                m_pParam->SetIsValid(true);
                m_pParam->SetMessage(wxGISEnumGPMessageOk);
            }
            else
            {
+               if(m_pParam->GetÌessageType() == wxGISEnumGPMessageError)
+                   return false;
                m_pParam->SetIsValid(true);
                m_pParam->SetMessage(wxGISEnumGPMessageWarning, _("The output object is exist. It will be overwrited!"));
            }
@@ -314,6 +346,9 @@ bool wxGISDTPath::Validate(void)
            }
            else
            {
+               if(m_pParam->GetÌessageType() == wxGISEnumGPMessageError)
+                   return false;
+
                m_pParam->SetIsValid(true);
                m_pParam->SetMessage(wxGISEnumGPMessageOk);
                return true;

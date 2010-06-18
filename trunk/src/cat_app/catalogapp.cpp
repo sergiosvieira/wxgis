@@ -73,6 +73,9 @@ bool wxGISCatalogApp::OnInit()
 
 	wxLog::SetActiveTarget(new wxLogStderr(m_LogFile.fp()));
 
+#ifdef WXGISPORTABLE
+	wxLogMessage(wxT("Portable")); 
+#endif
 	wxLogMessage(wxT(" ")); 
 	wxLogMessage(wxT("####################################################################")); 
 	wxLogMessage(wxT("##                    %s                    ##"),wxNow().c_str()); 

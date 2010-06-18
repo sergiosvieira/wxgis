@@ -914,8 +914,11 @@ wxString wxGxObjectDialog::GetName(void)
 wxString wxGxObjectDialog::GetFullPath(void)
 {
     wxString sPath = GetPath();
-    
-    wxString sFPath = sPath + wxFileName::GetPathSeparator() + GetNameWithExt();
+    wxString sFPath;
+    if(sPath[sPath.Len() - 1] == '\\')
+        sFPath = sPath + GetNameWithExt();
+    else
+        sFPath = sPath + wxFileName::GetPathSeparator() + GetNameWithExt();
     return sFPath;
 }
 
