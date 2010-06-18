@@ -126,7 +126,6 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 			if(!wxDirExists(user_dir))
 			{
 				wxFileName::Mkdir(user_dir, 0755, wxPATH_MKDIR_FULL);
-				return NULL;
 			}
 			sXMLDocPath = user_path;
 			break;

@@ -204,13 +204,13 @@ public:
 	virtual GxObjectArray* GetChildren(void){return &m_Children;};
 	virtual IGxObject* SearchChild(wxString sPath)
 	{
-		wxString sTestPath = sPath.MakeUpper();
-		if(GetFullName().MakeUpper() == sTestPath)//GetName
+		wxString sTestPath = sPath;
+		if(GetFullName().CmpNoCase(sPath) == 0)//GetName
 			return this;
 		for(size_t i = 0; i < m_Children.size(); i++)
 		{
-			wxString sTestedPath = m_Children[i]->GetFullName().MakeUpper();
-			if(sTestedPath == sPath)
+			wxString sTestedPath = m_Children[i]->GetFullName();
+			if(sTestedPath.CmpNoCase(sPath) == 0)
 				return m_Children[i];
 			if(sPath.Find(sTestedPath) != wxNOT_FOUND)
 			{

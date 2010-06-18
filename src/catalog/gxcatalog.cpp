@@ -467,6 +467,24 @@ IGxObject* wxGxCatalog::ConnectFolder(wxString sPath)
 	return pReturnObj;
 }
 
+IGxObject* wxGxCatalog::SearchChild(wxString sPath)
+{
+    IGxObject* pOutObj = IGxObjectContainer::SearchChild(sPath);
+    if(pOutObj)
+        return pOutObj;
+    //try to connect parents obj
+    wxFileName oName(sPath);
+    //if(oName.IsDir())
+    //    return NULL;
+    IGxObjectContainer* poObjCont = dynamic_cast<IGxObjectContainer*>(ConnectFolder(oName.GetPath()));
+    if(poObjCont == this)
+        return NULL;
+    if(!poObjCont)
+        return poObjCont;
+    return poObjCont->SearchChild(sPath);
+}
+
+
 void wxGxCatalog::DisconnectFolder(wxString sPath)
 {
 	if(m_DiscConnections[sPath] != NULL)

@@ -98,6 +98,15 @@ int GxObjectCompareFunction(IGxObject* pObject1, IGxObject* pObject2, long sortD
 		return sortData == 0 ? 1 : -1;
     if(!bDiscConnection1 && bDiscConnection2)
 		return sortData == 0 ? -1 : 1;
+    if(bDiscConnection1 && bDiscConnection2)
+    {
+        bool bShare1 = pObject1->GetName().Left(2) == wxT("\\\\");
+        bool bShare2 = pObject2->GetName().Left(2) == wxT("\\\\");
+        if(bShare1 && !bShare2)
+            return 1;
+        if(!bShare1 && bShare2)
+            return 0;
+    }
 
 	bool bContainerDst1 = dynamic_cast<IGxDataset*>(pObject1);
     bool bContainerDst2 = dynamic_cast<IGxDataset*>(pObject2);

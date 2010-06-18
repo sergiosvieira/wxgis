@@ -417,18 +417,18 @@ wxString wxGxFolderFilter::GetName(void)
 }
 
 //------------------------------------------------------------
-// wxGxTiffFilter
+// wxGxRasterFilter
 //------------------------------------------------------------
 
-wxGxTiffFilter::wxGxTiffFilter(void)
+wxGxRasterFilter::wxGxRasterFilter(void)
 {
 }
 
-wxGxTiffFilter::~wxGxTiffFilter(void)
+wxGxRasterFilter::~wxGxRasterFilter(void)
 {
 }
 
-bool wxGxTiffFilter::CanChooseObject( IGxObject* pObject )
+bool wxGxRasterFilter::CanChooseObject( IGxObject* pObject )
 {
 	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
 	if(!pGxDataset)
@@ -440,7 +440,7 @@ bool wxGxTiffFilter::CanChooseObject( IGxObject* pObject )
     return true;
 }
 
-bool wxGxTiffFilter::CanDisplayObject( IGxObject* pObject )
+bool wxGxRasterFilter::CanDisplayObject( IGxObject* pObject )
 {
 	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
 	if(pContainer)
@@ -453,6 +453,18 @@ bool wxGxTiffFilter::CanDisplayObject( IGxObject* pObject )
     if(pGxDataset->GetSubType() != GetSubType())
 		return false;
     return true;
+}
+
+//------------------------------------------------------------
+// wxGxTiffFilter
+//------------------------------------------------------------
+
+wxGxTiffFilter::wxGxTiffFilter(void)
+{
+}
+
+wxGxTiffFilter::~wxGxTiffFilter(void)
+{
 }
 
 wxString wxGxTiffFilter::GetName(void)
@@ -473,6 +485,134 @@ wxString wxGxTiffFilter::GetDriver(void)
 int wxGxTiffFilter::GetSubType(void)
 {
     return enumRasterTiff;
+}
+
+//------------------------------------------------------------
+// wxGxImgFilter
+//------------------------------------------------------------
+
+wxGxImgFilter::wxGxImgFilter(void)
+{
+}
+
+wxGxImgFilter::~wxGxImgFilter(void)
+{
+}
+
+wxString wxGxImgFilter::GetName(void)
+{
+	return wxString(_("Erdas Imagine Images (*.img)"));
+}
+
+wxString wxGxImgFilter::GetExt(void)
+{
+	return wxString(wxT("img"));
+}
+
+wxString wxGxImgFilter::GetDriver(void)
+{
+	return wxString(wxT("HFA"));
+}
+
+int wxGxImgFilter::GetSubType(void)
+{
+    return enumRasterImg;
+}
+
+//------------------------------------------------------------
+// wxGxBmpFilter
+//------------------------------------------------------------
+
+wxGxBmpFilter::wxGxBmpFilter(void)
+{
+}
+
+wxGxBmpFilter::~wxGxBmpFilter(void)
+{
+}
+
+wxString wxGxBmpFilter::GetName(void)
+{
+	return wxString(_("Windows Device Independent Bitmap (*.bmp)"));
+}
+
+wxString wxGxBmpFilter::GetExt(void)
+{
+	return wxString(wxT("bmp"));
+}
+
+wxString wxGxBmpFilter::GetDriver(void)
+{
+	return wxString(wxT("BMP"));
+}
+
+int wxGxBmpFilter::GetSubType(void)
+{
+    return enumRasterBmp;
+}
+
+//------------------------------------------------------------
+// wxGxJpegFilter
+//------------------------------------------------------------
+
+wxGxJpegFilter::wxGxJpegFilter(void)
+{
+}
+
+wxGxJpegFilter::~wxGxJpegFilter(void)
+{
+}
+
+wxString wxGxJpegFilter::GetName(void)
+{
+	return wxString(_("JPEG image (*.jpeg, *.jfif, *.jpg, *.jpe)"));
+}
+
+wxString wxGxJpegFilter::GetExt(void)
+{
+	return wxString(wxT("jpg"));
+}
+
+wxString wxGxJpegFilter::GetDriver(void)
+{
+	return wxString(wxT("JPEG"));
+}
+
+int wxGxJpegFilter::GetSubType(void)
+{
+    return enumRasterJpeg;
+}
+
+//------------------------------------------------------------
+// wxGxPngFilter
+//------------------------------------------------------------
+
+wxGxPngFilter::wxGxPngFilter(void)
+{
+}
+
+wxGxPngFilter::~wxGxPngFilter(void)
+{
+}
+
+wxString wxGxPngFilter::GetName(void)
+{
+	return wxString(_("Portable Network Graphics (*.png)"));
+}
+
+wxString wxGxPngFilter::GetExt(void)
+{
+	return wxString(wxT("png"));
+}
+
+wxString wxGxPngFilter::GetDriver(void)
+{
+	return wxString(wxT("PNG"));
+}
+
+int wxGxPngFilter::GetSubType(void)
+{
+    return enumRasterPng;
 }
 
 //------------------------------------------------------------

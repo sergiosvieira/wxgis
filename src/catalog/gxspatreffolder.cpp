@@ -70,8 +70,10 @@ void wxGxSpatialReferencesFolder::Init(wxXmlNode* pConfigNode)
         wxString sExeDirPath = wxPathOnly(stp.GetExecutablePath());
         m_sPath = wxT("/vsizip/") + sExeDirPath + wxT("/sys/cs.zip/cs");
         m_sPath.Replace(wxT("\\"), wxT("/"));
-        wxLogMessage(_("wxGxSpatialReferencesFolder: The path set to '%s'"), m_sPath.c_str());
     }
+    else
+        m_sPath.Replace(wxT("\\"), wxT("/"));
+    wxLogMessage(_("wxGxSpatialReferencesFolder: The path set to '%s'"), m_sPath.c_str());
     CPLSetConfigOption("wxGxSpatialReferencesFolder", wgWX2MB(m_sPath));
 }
 
