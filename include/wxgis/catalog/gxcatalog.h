@@ -72,7 +72,7 @@ public:
 	virtual void ObjectChanged(IGxObject* pObject);
 	virtual void ObjectDeleted(IGxObject* pObject);
 	virtual void ObjectRefreshed(IGxObject* pObject);
-	virtual IGxObject* ConnectFolder(wxString sPath);
+	virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true);
 	virtual void DisconnectFolder(wxString sPath);
 	virtual void SetLocation(wxString sPath);
     virtual void Undo(int nPos = -1);

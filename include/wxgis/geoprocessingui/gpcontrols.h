@@ -48,7 +48,7 @@ class wxGISDTBase : public wxPanel
 public:
 	wxGISDTBase( IGPParameter* pParam, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
     virtual ~wxGISDTBase();
-    virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString) = 0;
+    virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString);
     virtual bool Validate(void) = 0;
     virtual void Update(void) = 0;
     virtual IGPParameter* GetParameter(void);
@@ -83,7 +83,6 @@ class wxGISDTPath : public wxGISDTBase
 public:
 	wxGISDTPath( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISDTPath();	
-    virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString);
 //events
     virtual void OnOpen(wxCommandEvent& event);
     virtual bool Validate(void);
@@ -104,7 +103,6 @@ class wxGISDTDigit : public wxGISDTBase
 public:
 	wxGISDTDigit( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISDTDigit();	
-    virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString);
 //events
     virtual bool Validate(void);
     virtual void Update(void);
@@ -116,18 +114,20 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISDTChoice
 ///////////////////////////////////////////////////////////////////////////////
-class wxGISDTChoice : public wxPanel 
+class wxGISDTChoice : public wxGISDTBase 
 {
-	private:
-	
-	protected:
-		wxStaticBitmap* m_bitmap1;
-		wxStaticText* m_staticText1;
-		wxStaticBitmap* m_bitmap2;
-		wxChoice* m_choice1;
-	
-	public:
-		wxGISDTChoice( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
-		~wxGISDTChoice();
-	
+    enum
+	{
+		ID_CHOICESTR = wxID_HIGHEST + 36
+	};
+public:
+	wxGISDTChoice( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+	~wxGISDTChoice();
+//events
+    virtual bool Validate(void);
+    virtual void Update(void);
+    virtual void OnChoice(wxCommandEvent& event);
+protected:
+	wxChoice* m_choice;
+DECLARE_EVENT_TABLE()
 };

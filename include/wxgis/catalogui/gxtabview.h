@@ -41,6 +41,11 @@ class wxGxTab :
 	public wxPanel,
 	public IGxSelectionEvents
 {
+    enum
+	{
+		ID_WNDCHOICE = wxID_HIGHEST + 35
+	};
+
 public:
 	wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL);
 	virtual ~wxGxTab(void);

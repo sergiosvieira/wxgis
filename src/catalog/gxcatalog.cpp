@@ -441,7 +441,7 @@ void wxGxCatalog::SerializeDiscConnections(wxXmlNode* pNode, bool bStore)
 	}
 }
 
-IGxObject* wxGxCatalog::ConnectFolder(wxString sPath)
+IGxObject* wxGxCatalog::ConnectFolder(wxString sPath, bool bSelect)
 {
     IGxObject* pReturnObj(NULL);
 	if(m_DiscConnections[sPath] != NULL)
@@ -463,7 +463,8 @@ IGxObject* wxGxCatalog::ConnectFolder(wxString sPath)
 		//wxMessageBox(_("The directory is not exist!"), _("Error"), wxOK | wxICON_ERROR );
 		pReturnObj = this;
     }
-    m_pSelection->Select(pReturnObj, false, IGxSelection::INIT_ALL);
+    if(bSelect)
+        m_pSelection->Select(pReturnObj, false, IGxSelection::INIT_ALL);
 	return pReturnObj;
 }
 
@@ -476,7 +477,13 @@ IGxObject* wxGxCatalog::SearchChild(wxString sPath)
     wxFileName oName(sPath);
     //if(oName.IsDir())
     //    return NULL;
-    IGxObjectContainer* poObjCont = dynamic_cast<IGxObjectContainer*>(ConnectFolder(oName.GetPath()));
+
+    //the container is exist but item is absent
+    pOutObj = IGxObjectContainer::SearchChild(oName.GetPath());
+    if(pOutObj)
+        return NULL;
+    //try connect path & search child
+    IGxObjectContainer* poObjCont = dynamic_cast<IGxObjectContainer*>(ConnectFolder(oName.GetPath(), false));
     if(poObjCont == this)
         return NULL;
     if(!poObjCont)

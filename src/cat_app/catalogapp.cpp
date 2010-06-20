@@ -167,7 +167,7 @@ bool wxGISCatalogApp::OnInit()
 	wxString sCPLLogPath = sLogDir + wxFileName::GetPathSeparator() + wxString(wxT("gdal_log_cat.txt"));
 	CPLSetConfigOption("CPL_LOG", wgWX2MB(sCPLLogPath.c_str()) );
 
-    CPLSetConfigOption( "GDAL_CACHEMAX", "64" );
+    CPLSetConfigOption( "GDAL_CACHEMAX", "128" );
     //GDAL_CACHEMAX
     //GDAL_MAX_DATASET_POOL_SIZE
     //OGR_ARC_STEPSIZE

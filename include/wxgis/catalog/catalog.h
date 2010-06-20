@@ -25,7 +25,7 @@
 #include "wx/filename.h"
 
 #define APP_NAME wxT("wxGISCatalog") 
-#define APP_VER wxT("0.1.0 RC1")
+#define APP_VER wxT("0.1.1 RC1")
 
 //#include <wx/dynload.h>
 //#include <wx/dynlib.h>
@@ -100,7 +100,7 @@ public:
 	virtual void ObjectDeleted(IGxObject* pObject) = 0;
 	virtual void ObjectRefreshed(IGxObject* pObject) = 0;
 	virtual IGxSelection* GetSelection(void){return m_pSelection;};
-	virtual IGxObject* ConnectFolder(wxString sPath) = 0;
+	virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true) = 0;
 	virtual void DisconnectFolder(wxString sPath) = 0;
 	virtual void SetLocation(wxString sPath) = 0;
     virtual IGISConfig* GetConfig(void){return m_pConf;};
