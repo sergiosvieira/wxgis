@@ -129,6 +129,23 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         pParam5->SetValue(1.0);
 
         m_pParamArr.push_back(pParam5);
+
+        //elevation interpolation type
+        wxGISGPParameter* pParam6 = new wxGISGPParameter();
+        pParam6->SetName(wxT("elev_interpol"));
+        pParam6->SetDisplayName(_("The elevation values interpolation"));
+        pParam6->SetParameterType(enumGISGPParameterTypeOptional);
+        pParam6->SetDataType(enumGISGPParamDTStringList);
+        pParam6->SetDirection(enumGISGPParameterDirectionInput);
+
+        wxGISGPStringDomain* pDomain6 = new wxGISGPStringDomain();
+        pDomain6->AddString(_("Bilinear"));
+        pDomain6->AddString(_("Cubic"));
+        pParam6->SetDomain(pDomain6);
+
+        pParam6->SetValue(_("Bilinear"));
+
+        m_pParamArr.push_back(pParam6);
     }
     return &m_pParamArr;
 }
@@ -271,6 +288,11 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
     GDALDataType eDT = poGDALRasterBand->GetRasterDataType();
+
+    wxString soChoice = m_pParamArr[5]->GetValue();
+    if(soChoice == wxString(_("Cubic")))
+        CPLSetConfigOption( "GDAL_RPCDEMINTERPOLATION", "CUBIC" ); //BILINEAR
+
         
     //CPLString osSRCSRSOpt = "SRC_SRS=";
     //osSRCSRSOpt += poGDALDataset->GetProjectionRef();

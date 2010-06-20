@@ -60,6 +60,7 @@ enum wxGISEnumGPParameterDataType
 	enumGISGPParamDTInteger,
 	enumGISGPParamDTDouble,
 	enumGISGPParamDTString,
+    enumGISGPParamDTStringList,
 
 	enumGISGPParamDTPath,
 	enumGISGPParamDTPathArray

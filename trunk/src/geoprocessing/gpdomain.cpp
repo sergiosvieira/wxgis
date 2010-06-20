@@ -21,6 +21,10 @@
 
 #include "wxgis/geoprocessing/gpdomain.h"
 
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISGPGxObjectDomain
+///////////////////////////////////////////////////////////////////////////////
+
 wxGISGPGxObjectDomain::wxGISGPGxObjectDomain(void) : m_nSelFilterIndex(0)
 {
 }
@@ -58,3 +62,44 @@ size_t wxGISGPGxObjectDomain::GetFilterCount(void)
      return m_nSelFilterIndex;
  }
 
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISGPStringDomain
+///////////////////////////////////////////////////////////////////////////////
+
+wxGISGPStringDomain::wxGISGPStringDomain(void) : m_nSelFilterIndex(0)
+{
+}
+
+wxGISGPStringDomain::~wxGISGPStringDomain(void)
+{
+}
+
+void wxGISGPStringDomain::AddString(wxString soStr)
+{
+    m_asoData.Add(soStr);
+}
+
+size_t wxGISGPStringDomain::GetStringCount(void)
+{
+    return m_asoData.GetCount();
+}
+
+wxString wxGISGPStringDomain::GetString(size_t dIndex)
+{
+    return m_asoData[dIndex];
+}
+
+wxArrayString wxGISGPStringDomain::GetArrayString() const
+{
+    return m_asoData;
+}
+
+void wxGISGPStringDomain::SetSelString(size_t nIndex)
+{
+     m_nSelFilterIndex = nIndex;
+}
+
+size_t wxGISGPStringDomain::GetSelString(void)
+{
+     return m_nSelFilterIndex;
+}

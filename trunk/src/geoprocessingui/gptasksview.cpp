@@ -38,6 +38,7 @@ BEGIN_EVENT_TABLE(wxGxTaskPanel, wxPanel)
     EVT_BUTTON(wxID_MORE, wxGxTaskPanel::OnExpand)
     EVT_BUTTON(wxID_CANCEL, wxGxTaskPanel::OnCancel)
     EVT_BUTTON(ID_SHOW_BALLOON, wxGxTaskPanel::OnShowBallon)
+    EVT_BUTTON(ID_UPDATEMESSAGES, wxGxTaskPanel::OnUpdateMessages)
 END_EVENT_TABLE()
 
 wxGxTaskPanel::wxGxTaskPanel(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxPanel(parent, id, pos, size, style), m_bExpand(false), m_nTaskThreadId(-1), m_pToolDialogPropNode(NULL), m_nState(enumGISMessageUnk)
@@ -212,6 +213,11 @@ void wxGxTaskPanel::FillHtmlWindow()
     m_pHtmlWindow->Scroll(-1, 5000);
 }
 
+void wxGxTaskPanel::OnUpdateMessages(wxCommandEvent & event)
+{
+    FillHtmlWindow();
+}
+
 void wxGxTaskPanel::OnFinish(bool bHasErrors, IGPTool* pTool)
 {
     m_nState = bHasErrors == true ? enumGISMessageErr : enumGISMessageOK;
@@ -309,7 +315,9 @@ void wxGxTaskPanel::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessag
     if(!m_bExpand)
         return;
     //htmlwin -> SetPage("<html><body>Hello, world!</body></html>");
-    FillHtmlWindow();
+    //FillHtmlWindow();
+    wxCommandEvent event(wxEVT_COMMAND_BUTTON_CLICKED, ID_UPDATEMESSAGES);
+    ::wxPostEvent(this, event);
 }
 
 //////////////////////////////////////////////////////////////////

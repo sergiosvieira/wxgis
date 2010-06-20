@@ -37,7 +37,8 @@ class WXDLLIMPEXP_GIS_GPU wxGxTaskPanel :
 {
     enum
 	{
-		ID_SHOW_BALLOON = wxID_HIGHEST + 30
+		ID_SHOW_BALLOON = wxID_HIGHEST + 30,
+        ID_UPDATEMESSAGES
 	};
 public:
 	wxGxTaskPanel(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL|wxBORDER_RAISED );
@@ -49,6 +50,7 @@ public:
     virtual void OnExpand(wxCommandEvent & event);
     virtual void OnCancel(wxCommandEvent & event);
     virtual void OnShowBallon(wxCommandEvent & event);
+    virtual void OnUpdateMessages(wxCommandEvent & event);
     //IGPCallBack
     virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL);
     //ITrackCancel

@@ -24,6 +24,10 @@
 #include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/catalog/catalog.h"
 
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISGPGxObjectDomain
+///////////////////////////////////////////////////////////////////////////////
+
 class WXDLLIMPEXP_GIS_GP wxGISGPGxObjectDomain : public IGPDomain
 {
 public:
@@ -36,5 +40,26 @@ public:
     virtual size_t GetSelFilter(void);
 protected:
 	OBJECTFILTERS m_FilterArray;
+    size_t m_nSelFilterIndex;
+};
+
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISGPStringDomain
+///////////////////////////////////////////////////////////////////////////////
+
+class WXDLLIMPEXP_GIS_GP wxGISGPStringDomain : public IGPDomain
+{
+public:
+    wxGISGPStringDomain (void);
+    virtual ~wxGISGPStringDomain (void);
+	virtual void AddString(wxString soStr);
+    virtual size_t GetStringCount(void);
+    virtual wxString GetString(size_t dIndex);
+    virtual wxArrayString GetArrayString() const;
+    virtual void SetSelString(size_t nIndex);
+    virtual size_t GetSelString(void);
+protected:
+	wxArrayString m_asoData;
     size_t m_nSelFilterIndex;
 };

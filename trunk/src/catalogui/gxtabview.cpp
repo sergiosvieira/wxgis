@@ -26,7 +26,7 @@
 // wxGxTab
 //-------------------------------------------------------------------
 BEGIN_EVENT_TABLE(wxGxTab, wxPanel)
-	EVT_CHOICE(wxID_ANY, wxGxTab::OnChoice)
+	EVT_CHOICE(ID_WNDCHOICE, wxGxTab::OnChoice)
 END_EVENT_TABLE()
 
 wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style), m_bShowChoices(false), m_pCurrentWnd(NULL)
@@ -123,7 +123,7 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 		m_staticText->Wrap( -1 );
 		bSizerMinor->Add( m_staticText, 0, wxALIGN_CENTER_VERTICAL, 5 );
 		
-		m_choice = new wxChoice( m_tabselector, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, 0 );
+		m_choice = new wxChoice( m_tabselector, ID_WNDCHOICE, wxDefaultPosition, wxDefaultSize, 0, 0 );
 		m_choice->Disable();
 		m_choice->SetMinSize( wxSize( 170,-1 ) );
 		

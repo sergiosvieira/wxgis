@@ -44,7 +44,7 @@ SetCompressor lzma
 !define GEOS_VERSION "3.2.2"
 !define PROJ_VERSION "4.7.1"
 
-!define VERSION "0.1.0"
+!define VERSION "0.1.1"
 !define SUBVERSION "RC1"
 !define PRODUCT "wxGIS ${VERSION} ${SUBVERSION}"
 
