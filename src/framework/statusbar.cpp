@@ -42,24 +42,18 @@ wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, cons
 
 	m_pApp = dynamic_cast<IApplication*>(parent);
 
-	struct _statuspane
-	{
-		int size;
-		long style;
-	};
-
-	std::vector<_statuspane> panes;
+	std::vector<STATUSPANE> panes;
 	int counter(0);
 	if(panesstyle & enumGISStatusMain)
 	{
-		_statuspane data = {-1, wxSB_FLAT};
+		STATUSPANE data = {-1, wxSB_FLAT};
 		panes.push_back(data);
 		m_MsgPos = counter;
 		counter++;
 	}
 	if(panesstyle & enumGISStatusProgress)
 	{
-		_statuspane data = {100, /*wxSB_NORMAL*/wxSB_FLAT};
+		STATUSPANE data = {100, /*wxSB_NORMAL*/wxSB_FLAT};
 		panes.push_back(data);
 		m_pProgressBar = new wxGISProgressor(this, wxID_ANY);
 		m_pProgressBar->Hide();
@@ -68,7 +62,7 @@ wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, cons
 	}
 	if(panesstyle & enumGISStatusAnimation)
 	{
-		_statuspane data = {23, wxSB_NORMAL};
+		STATUSPANE data = {23, wxSB_NORMAL};
 		panes.push_back(data);
 		//bitmap
 		m_pAni = new wxGISAnimation(this, wxID_ANY, wxBitmap(globe_imglst14_xpm),14);
@@ -78,56 +72,56 @@ wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, cons
 	}
 	if(panesstyle & enumGISStatusPosition)
 	{
-		_statuspane data = {200, wxSB_NORMAL};
+		STATUSPANE data = {200, wxSB_NORMAL};
 		panes.push_back(data);
         m_PositionPos = counter;
 		counter++;
 	}
 	if(panesstyle & enumGISStatusPagePosition)
 	{
-		_statuspane data = {100, wxSB_NORMAL};
+		STATUSPANE data = {100, wxSB_NORMAL};
 		panes.push_back(data);
         m_PagePositionPos = counter;
 		counter++;
 	}
 	if(panesstyle & enumGISStatusSize)
 	{
-		_statuspane data = {80, wxSB_NORMAL};
+		STATUSPANE data = {80, wxSB_NORMAL};
 		panes.push_back(data);
         m_SizePos = counter;
 		counter++;
 	}
 	if(panesstyle & enumGISStatusCapsLock)
 	{
-		_statuspane data = {40, wxSB_NORMAL};
+		STATUSPANE data = {40, wxSB_NORMAL};
 		panes.push_back(data);
         m_CapsLockPos = counter;
 		counter++;
 	}
 	if(panesstyle & enumGISStatusNumLock)
 	{
-		_statuspane data = {40, wxSB_NORMAL};
+		STATUSPANE data = {40, wxSB_NORMAL};
 		panes.push_back(data);
         m_NumLockPos = counter;
 		counter++;
 	}
 	if(panesstyle & enumGISStatusScrollLock)
 	{
-		_statuspane data = {40, wxSB_NORMAL};
+		STATUSPANE data = {40, wxSB_NORMAL};
 		panes.push_back(data);
         m_ScrollLockPos = counter;
 		counter++;
 	}
 	if(panesstyle & enumGISStatusClock)
 	{
-		_statuspane data = {38, wxSB_NORMAL};
+		STATUSPANE data = {38, wxSB_NORMAL};
 		panes.push_back(data);
 		m_ClockPos = counter;
 		counter++;
 	}
-	_statuspane data = {1, wxSB_FLAT};
+	STATUSPANE data = {1, wxSB_FLAT};
 	panes.push_back(data);
-	_statuspane data1 = {15, wxSB_FLAT};
+	STATUSPANE data1 = {15, wxSB_FLAT};
 	panes.push_back(data1);
 
 	int *STATUSBAR_Sizes = new int[panes.size()];
@@ -146,8 +140,8 @@ wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, cons
 	//m_pProgressBar	= new wxGauge(this, ID_WND_PROGRESSBAR, 100);
 	//set text & start timer
 	if(panesstyle & enumGISStatusClock)
-	{	
-		SetMessage(wxDateTime::Now().Format(_("%H:%M")), m_ClockPos);	
+	{
+		SetMessage(wxDateTime::Now().Format(_("%H:%M")), m_ClockPos);
 		m_timer.Start(30000);    // 1 minute interval
 	}
 }
@@ -187,7 +181,7 @@ wxString wxGISStatusBar::GetMessage(int i)
 
 void wxGISStatusBar::OnTimer( wxTimerEvent& event )
 {
-	SetMessage(wxDateTime::Now().Format(_("%H:%M")), m_ClockPos);	
+	SetMessage(wxDateTime::Now().Format(_("%H:%M")), m_ClockPos);
 }
 
 

@@ -25,7 +25,7 @@
 
 #define TIMER_ID 1011
 
-class WXDLLIMPEXP_GIS_FRW wxGISStatusBar : 
+class WXDLLIMPEXP_GIS_FRW wxGISStatusBar :
 	public wxStatusBar,
 	public IStatusBar
 {
@@ -51,6 +51,12 @@ public:
 	//events
 	void OnRightDown(wxMouseEvent& event);
     void OnTimer( wxTimerEvent & event);
+
+typedef struct _statuspane
+	{
+		int size;
+		long style;
+	}STATUSPANE;
 
 protected:
 	wxTimer m_timer;

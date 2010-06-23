@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "wxgis/framework/progressor.h"
 
-BEGIN_EVENT_TABLE(wxGISProgressor, wxGauge)
+BEGIN_EVENT_TABLE(wxGISProgressor, wxControl)
 	EVT_SIZE(wxGISProgressor::OnSize)
 	EVT_PAINT(wxGISProgressor::OnPaint)
 	EVT_ERASE_BACKGROUND(wxGISProgressor::OnEraseBackground)
@@ -32,10 +32,10 @@ wxGISProgressor::wxGISProgressor(wxWindow * parent, wxWindowID id, int range, co
 	//m_nImgPos = 0;
 	//m_ImageList.Create(bitmap_size, bitmap_size);
 	//m_ImageList.Add(bitmap);
-	
-	//Play();  
 
-	//	m_BackgroundBitmap = bitmap;	
+	//Play();
+
+	//	m_BackgroundBitmap = bitmap;
 	//	m_Timer = new wxTimer(this, ID_PAINTING_TEST_CTRL_TIMER);
 	//	m_Timer->Start(500);
 	//Create(parent, id, bitmap, bitmap_size, pos, size, style, name);
@@ -61,7 +61,7 @@ void wxGISProgressor::OnPaint(wxPaintEvent & event)
 	//dc.SetBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
  //   dc.SetPen(*wxMEDIUM_GREY_PEN);
 	//dc.DrawRectangle( 0, 0, size.x, size.y);
-    
+
 	wxBrush br(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     if(m_bPulse)
     {
@@ -72,7 +72,7 @@ void wxGISProgressor::OnPaint(wxPaintEvent & event)
 
         int pos = size.x * m_nValue / m_nRange;
         int psize = 8/*m_nRange / 12*/;
-        
+
 	    dc.DrawRectangle( pos, 1, psize, size.y - 2);
         pos -= psize + 2;
 	    dc.DrawRectangle( pos, 1, psize, size.y - 2);
@@ -93,7 +93,7 @@ void wxGISProgressor::OnPaint(wxPaintEvent & event)
 	    dc.SetFont(Font);
 	    dc.GetTextExtent(format_s, &width, &height);
         int x1 = (size.x - width) / 2, y1 = (size.y - height) / 2;
-        dc.DrawText(format_s, x1, y1);  
+        dc.DrawText(format_s, x1, y1);
 
         dc.SetLogicalFunction(wxOR_REVERSE);
 
@@ -105,7 +105,7 @@ void wxGISProgressor::OnPaint(wxPaintEvent & event)
 
 void wxGISProgressor::OnEraseBackground(wxEraseEvent & event)
 {
-    wxControl::OnEraseBackground(event);
+    ClearBackground();//wxControl::OnEraseBackground(event);
 }
 
 void wxGISProgressor::SetRange(int range)

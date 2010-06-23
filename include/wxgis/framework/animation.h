@@ -21,10 +21,11 @@
 #pragma once
 
 #include "wxgis/framework/framework.h"
+#include "wx/imaglist.h"
 
 #define ATIMER_ID 1012
 
-class WXDLLIMPEXP_GIS_FRW wxGISAnimation : 
+class WXDLLIMPEXP_GIS_FRW wxGISAnimation :
 	public wxControl,
 	public IProgressor
 {

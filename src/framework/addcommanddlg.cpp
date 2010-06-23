@@ -28,7 +28,7 @@ BEGIN_EVENT_TABLE(wxGISAddCommandDlg, wxDialog)
 	EVT_SPLITTER_DCLICK(wxID_ANY, wxGISAddCommandDlg::OnDoubleClickSash)
 	EVT_LIST_ITEM_ACTIVATED(wxGISAddCommandDlg::ID_LSTCTRL, wxGISAddCommandDlg::OnListctrlActivated)
 	EVT_UPDATE_UI(wxID_OK, wxGISAddCommandDlg::OnUpdateOKUI)
-	EVT_BUTTON(wxID_OK, OnOk)
+	EVT_BUTTON(wxID_OK, wxGISAddCommandDlg::OnOk)
 END_EVENT_TABLE()
 
 wxGISAddCommandDlg::wxGISAddCommandDlg( wxGISApplication* pGxApp, wxWindow* parent,  wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -39,7 +39,7 @@ wxGISAddCommandDlg::wxGISAddCommandDlg( wxGISApplication* pGxApp, wxWindow* pare
 	this->SetSizeHints( wxSize( 540,400 ), wxDefaultSize );
 	wxBoxSizer* bSizer5;
 	bSizer5 = new wxBoxSizer( wxVERTICAL );
-	
+
 	m_splitter2 = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D | wxNO_BORDER );
 	m_splitter2->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISAddCommandDlg::m_splitter2OnIdle ), NULL, this );
 	bSizer5->Add( m_splitter2, 1, wxEXPAND, 5 );
@@ -62,11 +62,11 @@ wxGISAddCommandDlg::wxGISAddCommandDlg( wxGISApplication* pGxApp, wxWindow* pare
 	{
 		CatArray.Add(IT->first);
 	}
-	
-	m_listBox1 = new wxListBox( m_splitter2, wxGISAddCommandDlg::ID_LSTBX, wxDefaultPosition, wxDefaultSize, CatArray, wxLC_SINGLE_SEL|wxLC_SORT_ASCENDING  |wxNO_BORDER); 
+
+	m_listBox1 = new wxListBox( m_splitter2, wxGISAddCommandDlg::ID_LSTBX, wxDefaultPosition, wxDefaultSize, CatArray, wxLC_SINGLE_SEL|wxLC_SORT_ASCENDING  |wxNO_BORDER);
 //	m_listBox1->InsertColumn(0, _("Category"));
 	//bSizer5->Add( m_listBox1, 0, wxALL, 5 );
-	
+
 	m_listCtrl3 = new wxListView( m_splitter2, wxGISAddCommandDlg::ID_LSTCTRL, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SORT_ASCENDING | wxNO_BORDER );
 	m_listCtrl3->InsertColumn(0, _("Command Name"), wxLIST_FORMAT_LEFT, 90);
 	m_listCtrl3->InsertColumn(1, _("Description"), wxLIST_FORMAT_LEFT, 120);
@@ -110,7 +110,7 @@ void wxGISAddCommandDlg::OnListboxSelect(wxCommandEvent& event)
 		return;
 
 	wxString selName = m_listBox1->GetString(selpos);
-	COMMANDARRAY* pArr = m_CategoryMap[selName];	
+	COMMANDARRAY* pArr = m_CategoryMap[selName];
 	if(pArr != NULL)
 	{
 		m_listCtrl3->DeleteAllItems();

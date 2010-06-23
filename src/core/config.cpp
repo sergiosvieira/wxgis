@@ -34,7 +34,7 @@ wxGISConfig::wxGISConfig(wxString sAppName, wxString sConfigDir, bool bPortable)
 	m_sExeDirPath = wxPathOnly(stp.GetExecutablePath());
 
     m_bPortable = bPortable;
-	
+
     if(bPortable)
     {
         //if potable - config path: [app.exe path\config]
@@ -88,7 +88,7 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 	}
 
     //get root name
-    wxString sRootNodeName = m_sAppName;	
+    wxString sRootNodeName = m_sAppName;
 
     wxXmlDocument* pDoc(NULL);
 
@@ -194,13 +194,13 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 		m_confignodes_arr.push_back(confnode);
         return pChildNode;
     }
-    
+
     return NULL;
 }
 
 wxXmlNode* wxGISConfig::CreateConfigNode(wxGISEnumConfigKey Key, wxString sPath, bool bUniq)
 {
-    wxString sRootNodeName = m_sAppName;	
+    wxString sRootNodeName = m_sAppName;
 
     wxXmlDocument* pDoc(NULL);
 
@@ -319,7 +319,7 @@ wxString wxGISAppConfig::GetLocale(void)
 wxString wxGISAppConfig::GetLocaleDir(void)
 {
     wxXmlNode* pNode = GetConfigNode(enumGISHKCU, wxString(wxT("loc")));
-    
+
     wxString sDefaultOut = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("locale");
     if(!pNode || m_bPortable)
         return sDefaultOut;
@@ -329,7 +329,7 @@ wxString wxGISAppConfig::GetLocaleDir(void)
 wxString wxGISAppConfig::GetLogDir(void)
 {
     wxXmlNode* pNode = GetConfigNode(enumGISHKCU, wxString(wxT("log")));
-    
+
     wxString sDefaultOut = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("log");
     if(!pNode)
         return sDefaultOut;
@@ -340,7 +340,7 @@ wxString wxGISAppConfig::GetLogDir(void)
 wxString wxGISAppConfig::GetSysDir(void)
 {
     wxXmlNode* pNode = GetConfigNode(enumGISHKLM, wxString(wxT("sys")));
-    
+
     wxString sDefaultOut = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("sys");
     if(!pNode || m_bPortable)
         return sDefaultOut;
@@ -350,7 +350,7 @@ wxString wxGISAppConfig::GetSysDir(void)
 bool wxGISAppConfig::GetDebugMode(void)
 {
     wxXmlNode* pNode = GetConfigNode(enumGISHKLM, wxString(wxT("debug")));
-    
+
     bool bDefaultOut = false;
     if(!pNode)
         return bDefaultOut;

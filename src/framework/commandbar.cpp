@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGISCommandBar class, and diferent implementation - wxGISMneu, wxGISToolBar 
+ * Purpose:  wxGISCommandBar class, and diferent implementation - wxGISMneu, wxGISToolBar
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -193,8 +193,8 @@ void wxGISCommandBar::Serialize(IApplication* pApp, wxXmlNode* pNode, bool bStor
 				ICommand* pSubCmd = pApp->GetCommand(wxT("wxGISCommonCmd"), 3);
 				if(pSubCmd)
 					AddCommand(pSubCmd);
-			}			
-			subchild = subchild->GetNext();	
+			}
+			subchild = subchild->GetNext();
 		}
 	}
 }
@@ -202,7 +202,7 @@ void wxGISCommandBar::Serialize(IApplication* pApp, wxXmlNode* pNode, bool bStor
 //----------------------------------------------------------------------
 // wxGISMenu
 //----------------------------------------------------------------------
-wxGISMenu::wxGISMenu(const wxString& sName, const wxString& sCaption, wxGISEnumCommandBars type, const wxString& title, long style) : wxMenu(title, style), wxGISCommandBar(sName, sCaption, type) 
+wxGISMenu::wxGISMenu(const wxString& sName, const wxString& sCaption, wxGISEnumCommandBars type, const wxString& title, long style) : wxMenu(title, style), wxGISCommandBar(sName, sCaption, type)
 {
 }
 
@@ -241,24 +241,24 @@ void wxGISMenu::AddCommand(ICommand* pCmd)
 			wxBitmap Bmp = pCmd->GetBitmap();
 			if(Bmp.IsOk())
             {
+#ifdef __WIN32__
                 wxImage Img = Bmp.ConvertToImage();
                 //Img.RotateHue(-0.1);
 				item->SetBitmaps(Bmp, Img.ConvertToGreyscale());//SetBitmap//
+#else
+                item->SetBitmap(Bmp);
+#endif
             }
 			Append(item);
-			//wxMenuItem* pItem = Append(pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), pCmd->GetKind());
-			//pItem->SetBitmaps(pCmd->GetBitmap());
 		}
-		break;	
+		break;
 	case enumGISCommandDropDown:
 		{
 			wxMenuItem *item = new wxMenuItem(this, pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), (wxItemKind)enumGISCommandNormal);
 			wxBitmap Bmp = pCmd->GetBitmap();
 			if(Bmp.IsOk())
-				item->SetBitmaps(Bmp, Bmp);//SetBitmap
+				item->SetBitmap(Bmp);
 			Append(item);
-			//wxMenuItem* pItem = Append(pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), pCmd->GetKind());
-			//pItem->SetBitmaps(pCmd->GetBitmap());
 		}
 		break;
 	case enumGISCommandControl:
@@ -291,7 +291,7 @@ void wxGISMenu::MoveCommandRight(size_t nIndex)
 }
 
 void wxGISMenu::AddMenu(wxMenu* pMenu, wxString sName)
-{		
+{
 	IGISCommandBar* pGISCommandBar = dynamic_cast<IGISCommandBar*>(pMenu);
 	if(pGISCommandBar)
 		pGISCommandBar->Reference();
@@ -447,7 +447,7 @@ void wxGISToolBar::ReAddCommand(ICommand* pCmd)
 		AddTool(pCmd->GetID(), wxStripMenuCodes(pCmd->GetCaption()), Bitmap, wxBitmap(), (wxItemKind)enumGISCommandNormal, pCmd->GetTooltip(), pCmd->GetMessage(), NULL);
         SetToolDropDown(pCmd->GetID(), true);
 		}
-		break;		
+		break;
     case enumGISCommandControl:
 			return;
 	}
@@ -543,7 +543,7 @@ void wxGISToolBar::Serialize(IApplication* pApp, wxXmlNode* pNode, bool bStore)
 		wxAuiToolBarItemArray append_items;
 		ICommand* pCmd = pApp->GetCommand(wxT("wxGISCommonCmd"), 2);
 		if(pCmd)
-		{				
+		{
 			wxAuiToolBarItem item;
 			item.SetKind(wxITEM_SEPARATOR);
 			append_items.Add(item);
@@ -559,7 +559,7 @@ void wxGISToolBar::Serialize(IApplication* pApp, wxXmlNode* pNode, bool bStore)
 }
 
 void wxGISToolBar::AddMenu(wxMenu* pMenu, wxString sName)
-{						
+{
 	//m_SubmenuArray.push_back(AppendSubMenu(pMenu, sName);
 }
 
