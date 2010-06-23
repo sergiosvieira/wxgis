@@ -152,11 +152,11 @@
 #include <vector>
 #include <queue>
 
-#define CONFIG_DIR wxT("wxGIS") 
-#define DEF wxT("~def~") 
-#define NON wxT("~non~") 
-#define ERR wxT("~err~") 
-#define NONAME _("no name") 
+#define CONFIG_DIR wxT("wxGIS")
+#define DEF wxT("~def~")
+#define NON wxT("~non~")
+#define ERR wxT("~err~")
+#define NONAME _("no name")
 #define DELTA 0.00001
 #define CACHE_SIZE 3000
 #define ZOOM_FACTOR 0.25
@@ -169,6 +169,10 @@
 
 #define WIN 0
 #define LIN 1
+
+#ifndef WXDWORD
+    #define WXDWORD unsigned long
+#endif
 
 static wxString DoubleToString(double Val, bool IsLon)
 {
@@ -207,7 +211,7 @@ static double StringToDouble(wxString Val, wxString asterisk)
 		{
 			switch(counter)
 			{
-				case 0:				
+				case 0:
 				grad = wxAtoi(buff.c_str());
 				break;
 				case 1:
@@ -217,8 +221,8 @@ static double StringToDouble(wxString Val, wxString asterisk)
 				sec = wxAtoi(buff.c_str());
 				break;
 			}
-		}		
-	}	
+		}
+	}
 	int mul = -1;
 	if(buff == _(" E") || buff == _(" N"))
 		mul = 1;
@@ -227,7 +231,7 @@ static double StringToDouble(wxString Val, wxString asterisk)
 
 static wxString NumberScale(double fScaleRatio)
 {
-	wxString str = wxString::Format(wxT("%.2f"), fScaleRatio);	
+	wxString str = wxString::Format(wxT("%.2f"), fScaleRatio);
 	int pos = str.Find(wxT("."));
 	if(pos == wxNOT_FOUND)
 		pos = str.Len();

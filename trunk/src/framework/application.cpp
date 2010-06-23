@@ -37,7 +37,7 @@ BEGIN_EVENT_TABLE(wxGISApplication, wxFrame)
     EVT_ERASE_BACKGROUND(wxGISApplication::OnEraseBackground)
     EVT_SIZE(wxGISApplication::OnSize)
 	EVT_RIGHT_DOWN(wxGISApplication::OnRightDown)
-    EVT_AUITOOLBAR_RIGHT_CLICK(wxID_ANY, wxGISApplication::OnRightDown)
+    EVT_AUITOOLBAR_RIGHT_CLICK(wxID_ANY, wxGISApplication::OnAuiRightDown)
 	EVT_MENU_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 512, wxGISApplication::OnCommand)
 	EVT_MENU_RANGE(ID_MENUCMD, ID_MENUCMD + 128, wxGISApplication::OnDropDownCommand)
 	EVT_UPDATE_UI_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 512, wxGISApplication::OnCommandUI)
@@ -91,7 +91,7 @@ void wxGISApplication::LoadCommands(wxXmlNode* pRootNode)
 				wxDELETE(pCmd);
 			}
 		}
-		child = child->GetNext();				
+		child = child->GetNext();
 	}
 }
 
@@ -141,7 +141,7 @@ void wxGISApplication::OnSize(wxSizeEvent& event)
 
 void wxGISApplication::OnCommand(wxCommandEvent& event)
 {
-	OnCommand(GetCommand(event.GetId()));
+	Command(GetCommand(event.GetId()));
 }
 
 void wxGISApplication::OnDropDownCommand(wxCommandEvent& event)
@@ -150,7 +150,7 @@ void wxGISApplication::OnDropDownCommand(wxCommandEvent& event)
         m_pDropDownCommand->OnDropDownCommand(event.GetId());
 }
 
-void wxGISApplication::OnCommand(ICommand* pCmd)
+void wxGISApplication::Command(ICommand* pCmd)
 {
 	ITool* pTool = dynamic_cast<ITool*>(pCmd);
 	if(pTool)
@@ -162,7 +162,7 @@ void wxGISApplication::OnCommand(ICommand* pCmd)
 		pTool->SetChecked(true);
 		m_CurrentTool = pTool;
 	}
-	else 
+	else
 		pCmd->OnClick();
 }
 
@@ -259,7 +259,7 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
                         pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
 					}
 				}
-				break;            
+				break;
             case enumGISCBToolbar:
 				{
 					wxAuiToolBar* pToolbar = dynamic_cast<wxAuiToolBar*>(m_CommandBarArray[i]);
@@ -356,7 +356,7 @@ void wxGISApplication::SerializeFramePos(bool bSave)
 			int y = wxAtoi(pFrameXmlNode->GetPropVal(wxT("YPos"), wxT("50")));
 			int w = wxAtoi(pFrameXmlNode->GetPropVal(wxT("Width"), wxT("850")));
 			int h = wxAtoi(pFrameXmlNode->GetPropVal(wxT("Height"), wxT("530")));
-			
+
 			Move(x, y);
 			SetClientSize(w, h);
 		}
@@ -398,10 +398,10 @@ void wxGISApplication::RemoveCommandBar(IGISCommandBar* pBar)
 			case enumGISCBToolbar:
 			case enumGISCBContextmenu:
 			case enumGISCBSubMenu:
-			case enumGISCBNone: 
+			case enumGISCBNone:
 				break;
-			}			
-			wsDELETE(pBar);			
+			}
+			wsDELETE(pBar);
 			m_CommandBarArray.erase(m_CommandBarArray.begin() + i);
 			break;
 		}
@@ -422,9 +422,9 @@ bool wxGISApplication::AddCommandBar(IGISCommandBar* pBar)
 	case enumGISCBToolbar:
 	case enumGISCBContextmenu:
 	case enumGISCBSubMenu:
-	case enumGISCBNone: 
+	case enumGISCBNone:
 		break;
-	}	
+	}
 	return true;
 }
 
@@ -436,7 +436,7 @@ ICommand* wxGISApplication::GetCommand(wxString sCmdName, unsigned char nCmdSubT
 		wxClassInfo * pInfo = pObj->GetClassInfo();
 		wxString sCommandName = pInfo->GetClassName();
 		if(sCommandName == sCmdName && m_CommandArray[i]->GetSubType() == nCmdSubType)
-			return m_CommandArray[i];								
+			return m_CommandArray[i];
 	}
 	return NULL;
 }
@@ -459,7 +459,7 @@ void wxGISApplication::SerializeCommandBars(bool bSave)
 		else
 			wxGISConfig::DeleteNodeChildren(pToolbarsNode);
 
-	
+
 		for(size_t i = m_CommandBarArray.size(); i > 0; i--)
 		{
 			////skip wxGISToolBarMenu
@@ -518,7 +518,7 @@ void wxGISApplication::SerializeCommandBars(bool bSave)
 		//pATB->AddLabel(wxID_ANY, wxT("Test:"), 25);
 		////wxButton* but = new wxButton( pATB, wxID_ANY, _("Menu"), wxDefaultPosition, wxDefaultSize, 0 );
 		////pATB->AddControl(but, wxT("TestCtrl"));
-		//wxComboBox* comboBox1 = new wxComboBox( pATB, wxID_ANY, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
+		//wxComboBox* comboBox1 = new wxComboBox( pATB, wxID_ANY, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
 		//pATB->AddControl(comboBox1, wxT("TestCtrl"));
 		//m_CommandBarArray.push_back(pTB);
 		////////////////
@@ -544,7 +544,7 @@ void wxGISApplication::OnRightDown(wxMouseEvent& event)
 	event.Skip();
 }
 
-void wxGISApplication::OnRightDown(wxAuiToolBarEvent& event)
+void wxGISApplication::OnAuiRightDown(wxAuiToolBarEvent& event)
 {
 	ShowToolBarMenu();
 	event.Skip();

@@ -29,7 +29,7 @@
 
 WXDLLIMPEXP_GIS_FRW IApplication* GetApplication();//{return m_pGlobalApp;};
 
-class WXDLLIMPEXP_GIS_FRW wxGISApplication : 
+class WXDLLIMPEXP_GIS_FRW wxGISApplication :
 	public wxFrame,
 	public IApplication
 {
@@ -69,7 +69,7 @@ protected:
 	virtual void LoadToolbars(wxXmlNode* pRootNode);
 	virtual void SerializeFramePos(bool bSave = false);
 	virtual void SerializeCommandBars(bool bSave = false);
-	virtual void OnCommand(ICommand* pCmd);
+	virtual void Command(ICommand* pCmd);
 	//events
     virtual void OnEraseBackground(wxEraseEvent& event);
     virtual void OnSize(wxSizeEvent& event);
@@ -77,7 +77,7 @@ protected:
 	virtual void OnDropDownCommand(wxCommandEvent& event);
 	virtual void OnCommandUI(wxUpdateUIEvent& event);
 	virtual void OnRightDown(wxMouseEvent& event);
-	virtual void OnRightDown(wxAuiToolBarEvent& event);
+	virtual void OnAuiRightDown(wxAuiToolBarEvent& event);
 	virtual void OnToolDropDown(wxAuiToolBarEvent& event);
 	virtual void OnClose(wxCloseEvent& event);
 //
