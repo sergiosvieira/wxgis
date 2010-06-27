@@ -163,9 +163,9 @@
 #define PI 3.1415926535897932384626433832795
 #define PIDEG 0.017453292519943295769236907684886
 
-#ifndef _DEBUG
+//#ifndef _DEBUG
     #define WXGISPORTABLE
-#endif
+//#endif
 
 #define WIN 0
 #define LIN 1
@@ -173,6 +173,7 @@
 #ifndef WXDWORD
     #define WXDWORD unsigned long
 #endif
+
 
 static wxString DoubleToString(double Val, bool IsLon)
 {

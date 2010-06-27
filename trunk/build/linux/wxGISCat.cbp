@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="wxGISCat" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../debug/wxGISCatd" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-D__UNIX__" />
+					<Add option="-D__WXGTK__" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-DNOPCH" />
+				</Compiler>
+				<Linker>
+					<Add library="$(GDAL)/wxgis/bin/cpld.so" />
+					<Add library="$(GDAL)/wxgis/bin/ogrd.so" />
+					<Add library="$(GDAL)/wxgis/bin/gdald.so" />
+					<Add library="../debug/wxGISCored.so" />
+					<Add library="/usr/lib/libcurl.so" />
+					<Add library="/usr/lib/libgeos_c.so" />
+					<Add library="/usr/lib/libproj.so" />
+					<Add library="../debug/wxGISCartod.so" />
+					<Add library="../debug/wxGISCartoUId.so" />
+					<Add library="../debug/wxGISCatalogd.so" />
+					<Add library="../debug/wxGISCatalogUId.so" />
+					<Add library="../debug/wxGISDataSourced.so" />
+					<Add library="../debug/wxGISDisplayd.so" />
+					<Add library="../debug/wxGISFrameworkd.so" />
+					<Add library="../debug/wxGISGeometryd.so" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="../release/wxGISCat" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="../../include" />
+			<Add directory="$(GDAL)/ogr" />
+			<Add directory="$(GDAL)/ogr/ogrsf_frmts" />
+			<Add directory="$(GDAL)/port" />
+			<Add directory="$(GDAL)/gcore" />
+			<Add directory="$(GDAL)/alg" />
+			<Add directory="../../include/wxgis" />
+		</Compiler>
+		<Unit filename="../../include/wxgis/cat_app/catalogapp.h" />
+		<Unit filename="../../include/wxgis/cat_app/catalogframe.h" />
+		<Unit filename="../../include/wxgis/cat_app/resource.h" />
+		<Unit filename="../../src/cat_app/catalogapp.cpp" />
+		<Unit filename="../../src/cat_app/catalogframe.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

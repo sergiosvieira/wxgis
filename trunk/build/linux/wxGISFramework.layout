@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="../../include/wxgis/framework/animation.h" open="0" top="0" tabpos="0">
+		<Cursor position="1168" topLine="9" />
+	</File>
+	<File name="../../include/wxgis/framework/application.h" open="0" top="0" tabpos="2">
+		<Cursor position="3342" topLine="59" />
+	</File>
+	<File name="../../include/wxgis/framework/framework.h" open="0" top="0" tabpos="0">
+		<Cursor position="1157" topLine="14" />
+	</File>
+	<File name="../../include/wxgis/framework/keycodedlg.h" open="0" top="0" tabpos="0">
+		<Cursor position="1152" topLine="11" />
+	</File>
+	<File name="../../include/wxgis/framework/progressdlg.h" open="0" top="0" tabpos="0">
+		<Cursor position="737" topLine="30" />
+	</File>
+	<File name="../../include/wxgis/framework/progressor.h" open="0" top="0" tabpos="4">
+		<Cursor position="1599" topLine="31" />
+	</File>
+	<File name="../../include/wxgis/framework/statusbar.h" open="0" top="0" tabpos="7">
+		<Cursor position="2308" topLine="43" />
+	</File>
+	<File name="../../include/wxgis/framework/toolbarmenu.h" open="1" top="0" tabpos="10">
+		<Cursor position="0" topLine="22" />
+	</File>
+	<File name="../../src/framework/addcommanddlg.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="5664" topLine="138" />
+	</File>
+	<File name="../../src/framework/application.cpp" open="1" top="1" tabpos="8">
+		<Cursor position="4645" topLine="134" />
+	</File>
+	<File name="../../src/framework/commandbar.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="7653" topLine="241" />
+	</File>
+	<File name="../../src/framework/progressor.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="1200" topLine="9" />
+	</File>
+	<File name="../../src/framework/statusbar.cpp" open="0" top="0" tabpos="6">
+		<Cursor position="3685" topLine="27" />
+	</File>
+	<File name="../../src/framework/toolbarmenu.cpp" open="1" top="0" tabpos="9">
+		<Cursor position="1126" topLine="19" />
+	</File>
+</CodeBlocks_layout_file>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="wxGISCatalogUI" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../debug/wxGISCatalogUId" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-D__UNIX__" />
+					<Add option="-D__WXGTK__" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-D_USRDLL" />
+					<Add option="-DWXMAKINGDLL_GIS_CLU" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="../release/wxGISCatalogUI" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="../../include" />
+			<Add directory="$(GDAL)/ogr" />
+			<Add directory="$(GDAL)/ogr/ogrsf_frmts" />
+			<Add directory="$(GDAL)/gcore" />
+			<Add directory="$(GDAL)/port" />
+			<Add directory="$(GDAL)/alg" />
+			<Add directory="../../include/wxgis" />
+		</Compiler>
+		<Unit filename="../../include/wxgis/catalogui/catalogcmd.h" />
+		<Unit filename="../../include/wxgis/catalogui/catalogui.h" />
+		<Unit filename="../../include/wxgis/catalogui/customizedlg.h" />
+		<Unit filename="../../include/wxgis/catalogui/gxapplication.h" />
+		<Unit filename="../../include/wxgis/catalogui/gxcontdialog.h" />
+		<Unit filename="../../include/wxgis/catalogui/gxcontentview.h" />
+		<Unit filename="../../include/wxgis/catalogui/gxlocationcombobox.h" />
+		<Unit filename="../../include/wxgis/catalogui/gxmapview.h" />
+		<Unit filename="../../include/wxgis/catalogui/gxnoview.h" />
+		<Unit filename="../../include/wxgis/catalogui/gxobjdialog.h" />
+		<Unit filename="../../include/wxgis/catalogui/gxtableview.h" />
+		<Unit filename="../../include/wxgis/catalogui/gxtabview.h" />
+		<Unit filename="../../include/wxgis/catalogui/gxtreeview.h" />
+		<Unit filename="../../include/wxgis/catalogui/gxview.h" />
+		<Unit filename="../../include/wxgis/catalogui/newmenu.h" />
+		<Unit filename="../../include/wxgis/catalogui/viewscmd.h" />
+		<Unit filename="../../include/wxgis/catalogui/viewsfactory.h" />
+		<Unit filename="../../src/catalogui/catalogcmd.cpp" />
+		<Unit filename="../../src/catalogui/customizedlg.cpp" />
+		<Unit filename="../../src/catalogui/gxapplication.cpp" />
+		<Unit filename="../../src/catalogui/gxcontdialog.cpp" />
+		<Unit filename="../../src/catalogui/gxcontentview.cpp" />
+		<Unit filename="../../src/catalogui/gxlocationcombobox.cpp" />
+		<Unit filename="../../src/catalogui/gxmapview.cpp" />
+		<Unit filename="../../src/catalogui/gxnoview.cpp" />
+		<Unit filename="../../src/catalogui/gxobgdialog.cpp" />
+		<Unit filename="../../src/catalogui/gxtableview.cpp" />
+		<Unit filename="../../src/catalogui/gxtabview.cpp" />
+		<Unit filename="../../src/catalogui/gxtreeview.cpp" />
+		<Unit filename="../../src/catalogui/gxview.cpp" />
+		<Unit filename="../../src/catalogui/newmenu.cpp" />
+		<Unit filename="../../src/catalogui/viewscmd.cpp" />
+		<Unit filename="../../src/catalogui/viewsfactory.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

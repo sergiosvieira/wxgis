@@ -58,7 +58,7 @@ wxString wxGISCatalogViewsCmd::GetCaption(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("View"));
 		case 1:
 			return wxString(_("Select All"));
@@ -73,8 +73,8 @@ wxString wxGISCatalogViewsCmd::GetCategory(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
-		case 2:	
+		case 0:
+		case 2:
 			return wxString(_("View"));
 		case 1:
 			return wxString(_("Edit"));
@@ -87,9 +87,9 @@ bool wxGISCatalogViewsCmd::GetChecked(void)
 {
 	switch(m_subtype)
 	{
-		case 2:	
+		case 2:
             return m_pApp->IsApplicationWindowShown(m_pTreeView);
-		case 0:	
+		case 0:
 		case 1:
 		default:
 	        return false;
@@ -152,7 +152,9 @@ wxGISEnumCommandKind wxGISCatalogViewsCmd::GetKind(void)
 		case 0://View
 			return enumGISCommandDropDown;
 		case 2://Show/hide tree pane
+#ifdef __WXMSW__
             return enumGISCommandCheck;
+#endif
         case 1://Select All
 		default:
 			return enumGISCommandNormal;
@@ -163,11 +165,11 @@ wxString wxGISCatalogViewsCmd::GetMessage(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("Select view"));
-		case 1:	
+		case 1:
 			return wxString(_("Select All objects"));
-		case 2:	
+		case 2:
 			return wxString(_("Show/hide tree pane"));
 		default:
 			return wxEmptyString;
@@ -178,7 +180,7 @@ void wxGISCatalogViewsCmd::OnClick(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			{
                 int nStyle = m_pContentsView->GetStyle() + 1;
                 if(nStyle > wxGxContentView::LIST)
@@ -186,11 +188,11 @@ void wxGISCatalogViewsCmd::OnClick(void)
                 m_pContentsView->SetStyle((wxGxContentView::LISTSTYLE)(nStyle));
 			}
 			break;
-		case 1:	
+		case 1:
             m_pContentsView->SelectAll();
             m_pContentsView->SetFocus();
 			break;
-		case 2:	
+		case 2:
             m_pApp->ShowApplicationWindow(m_pTreeView, !m_pApp->IsApplicationWindowShown(m_pTreeView));
 		default:
 			return;
@@ -207,11 +209,11 @@ wxString wxGISCatalogViewsCmd::GetTooltip(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("Select view"));
-		case 1:	
+		case 1:
 			return wxString(_("Select All"));
-		case 2:	
+		case 2:
 			return wxString(_("Show/hide tree pane"));
 		default:
 			return wxEmptyString;
@@ -227,7 +229,7 @@ wxMenu* wxGISCatalogViewsCmd::GetDropDownMenu(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
         {
 			if(GetEnabled())
 			{
@@ -239,11 +241,11 @@ wxMenu* wxGISCatalogViewsCmd::GetDropDownMenu(void)
                 //check
                 wxGxContentView::LISTSTYLE nStyle = m_pContentsView->GetStyle();
                 pMenu->Check(ID_MENUCMD + (int)nStyle, true);
-                return pMenu;                
+                return pMenu;
             }
             return NULL;
-        }            
-		case 1:	
+        }
+		case 1:
 		default:
 			return NULL;
 	}

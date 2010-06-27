@@ -50,7 +50,7 @@
 
 #include "wx/aui/aui.h"
 
-#define OBJDLG_NAME wxT("wxGISObjDialog") 
+#define OBJDLG_NAME wxT("wxGISObjDialog")
 
 //////////////////////////////////////////////////////////////////////////////
 // wxGxToolBarArt
@@ -120,7 +120,7 @@ class wxGxDialogContentView : public wxGxContentView
 {
 public:
 	wxGxDialogContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxLC_REPORT | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING);
-	virtual ~wxGxDialogContentView();	
+	virtual ~wxGxDialogContentView();
 
 //IGxView
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
@@ -149,7 +149,7 @@ protected:
 // wxGxObjectDialog
 //////////////////////////////////////////////////////////////////////////////
 
-class WXDLLIMPEXP_GIS_CLU wxGxObjectDialog : 
+class WXDLLIMPEXP_GIS_CLU wxGxObjectDialog :
     public wxDialog,
     public IGxApplication,
     public IApplication
@@ -175,7 +175,7 @@ protected:
 
 public:
 	wxGxObjectDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,338 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
-	~wxGxObjectDialog();	
+	~wxGxObjectDialog();
 //IGxApplication
     virtual IGxCatalog* GetCatalog(void){return static_cast<IGxCatalog*>(m_pCatalog);};
 //IApplication
@@ -232,7 +232,7 @@ protected:
 	virtual void OnFilterSelect(wxCommandEvent& event);
     virtual void OnOK(wxCommandEvent& event);
     virtual void OnOKUI(wxUpdateUIEvent& event);
-    virtual void OnCommand(ICommand* pCmd);
+    virtual void Command(ICommand* pCmd);
 //wxGxObjectDialog
 	virtual void OnInit();
     virtual void SerializeFramePos(bool bSave);

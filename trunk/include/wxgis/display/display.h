@@ -23,6 +23,7 @@
 
 #include "wxgis/base.h"
 #include "wxgis/datasource/datasource.h"
+#include "wx/image.h"
 
 #define wxUSE_GRAPHICS_CONTEXT 1
 
@@ -31,17 +32,17 @@
 
 enum wxGISEnumDrawPhase
 {
-	wxGISDPGeography = 0x0001, 
-	wxGISDPAnnotation = 0x0002, 
+	wxGISDPGeography = 0x0001,
+	wxGISDPAnnotation = 0x0002,
 	wxGISDPSelection = 0x0004
 };
 
 enum wxGISEnumDrawQuality
 {
-	enumGISQualityNearest = wxIMAGE_QUALITY_NEAREST, 
-	enumGISQualityBilinear = wxIMAGE_QUALITY_BILINEAR,
-	enumGISQualityBicubic = wxIMAGE_QUALITY_BICUBIC,
-	enumGISQualityHalfBilinear = wxIMAGE_QUALITY_HALFBILINEAR,
+	enumGISQualityNearest,
+	enumGISQualityBilinear,
+	enumGISQualityBicubic,
+	enumGISQualityHalfBilinear,
     enumGISQualityHalfQuadBilinear,
     enumGISQualityFourQuadBilinear
 };
@@ -94,7 +95,7 @@ public:
     virtual void AddInvalidRect(wxRect Rect) = 0;
 };
 
-class ICachedDisplay : 
+class ICachedDisplay :
 	public IDisplay
 {
 public:

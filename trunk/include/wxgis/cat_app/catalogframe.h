@@ -41,11 +41,11 @@
 
 class wxGISCatalogApp;
 
-class wxGISCatalogFrame : 
+class wxGISCatalogFrame :
 	public wxGxApplication
 {
 public:
-	wxGISCatalogFrame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER /*| wxWS_EX_VALIDATE_RECURSIVELY*/);
+	wxGISCatalogFrame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER);//| wxWS_EX_VALIDATE_RECURSIVELY
 	~wxGISCatalogFrame(void);
 //IApplication
 	virtual void OnAppAbout(void);
@@ -54,3 +54,4 @@ private:
 
     DECLARE_EVENT_TABLE()
 };
+

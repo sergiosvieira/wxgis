@@ -38,9 +38,9 @@ BEGIN_EVENT_TABLE(wxGISApplication, wxFrame)
     EVT_SIZE(wxGISApplication::OnSize)
 	EVT_RIGHT_DOWN(wxGISApplication::OnRightDown)
     EVT_AUITOOLBAR_RIGHT_CLICK(wxID_ANY, wxGISApplication::OnAuiRightDown)
-	EVT_MENU_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 512, wxGISApplication::OnCommand)
+	EVT_MENU_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 260, wxGISApplication::OnCommand)
 	EVT_MENU_RANGE(ID_MENUCMD, ID_MENUCMD + 128, wxGISApplication::OnDropDownCommand)
-	EVT_UPDATE_UI_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 512, wxGISApplication::OnCommandUI)
+	EVT_UPDATE_UI_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 260, wxGISApplication::OnCommandUI)
     EVT_AUITOOLBAR_TOOL_DROPDOWN(wxID_ANY, wxGISApplication::OnToolDropDown)
     EVT_CLOSE(wxGISApplication::OnClose)
 END_EVENT_TABLE()
@@ -152,6 +152,8 @@ void wxGISApplication::OnDropDownCommand(wxCommandEvent& event)
 
 void wxGISApplication::Command(ICommand* pCmd)
 {
+    if(!pCmd)
+        return;
 	ITool* pTool = dynamic_cast<ITool*>(pCmd);
 	if(pTool)
 	{

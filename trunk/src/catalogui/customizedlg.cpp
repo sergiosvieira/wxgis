@@ -50,15 +50,15 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGxApplication* pGxApp, wxWindow* parent, 
 	m_pGxApp = pGxApp;
 	wxBoxSizer* bSizer;
 	bSizer = new wxBoxSizer( wxHORIZONTAL );
-	
+
 	m_splitter1 = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D  | wxNO_BORDER);
 	m_splitter1->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISToolBarPanel::m_splitter1OnIdle ), NULL, this );
 	bSizer->Add( m_splitter1, 1, wxEXPAND, 5 );
-	
+
 	wxArrayString m_commandbarlistChoices;
 	m_commandbarlist = new wxCheckListBox( m_splitter1, wxGISToolBarPanel::ID_CHKLSTBX, wxDefaultPosition, wxDefaultSize, m_commandbarlistChoices,  wxNO_BORDER );
 	/*bSizer->Add( m_toolbarlist, 0, wxALL, 5 );*/
-	
+
 	m_buttonslist = new wxListView( m_splitter1, wxGISToolBarPanel::ID_BUTTONSLST, wxDefaultPosition, wxDefaultSize,/* wxLC_NO_SORT_HEADER|*/wxLC_REPORT|wxLC_SINGLE_SEL/*|wxLC_SORT_ASCENDING*/  | wxNO_BORDER);
 	//bSizer->Add( m_buttonslist, 0, wxALL, 5 );
 	m_buttonslist->InsertColumn(0, _("Command Name"), wxLIST_FORMAT_LEFT, 90);
@@ -66,22 +66,22 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGxApplication* pGxApp, wxWindow* parent, 
 	m_buttonslist->InsertColumn(2, _("KeyCode"), wxLIST_FORMAT_LEFT, 60);
 	m_ImageList.Create(16, 16);
 	m_buttonslist->SetImageList(&m_ImageList, wxIMAGE_LIST_SMALL);
-	
+
 	wxBoxSizer* bSizer3;
 	bSizer3 = new wxBoxSizer( wxVERTICAL );
-	
+
 	m_createbutton = new wxButton( this, wxGISToolBarPanel::ID_CREATECB, _("Create toolbar/menu"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer3->Add( m_createbutton, 0, wxALL|wxEXPAND, 5 );
-	
+
 	m_deletebutton = new wxButton( this, wxGISToolBarPanel::ID_DELETECB, _("Delete toolbar/menu"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer3->Add( m_deletebutton, 0, wxALL|wxEXPAND, 5 );
-	
+
 	m_addbutton = new wxButton( this, wxGISToolBarPanel::ID_ADDBUTTON, _("Add button"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer3->Add( m_addbutton, 0, wxALL|wxEXPAND, 5 );
-	
+
 	m_rembutton = new wxButton( this, wxGISToolBarPanel::ID_REMOVEBUTTON, _("Remove button"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer3->Add( m_rembutton, 0, wxALL|wxEXPAND, 5 );
-	
+
 	m_moveup = new wxButton( this, wxGISToolBarPanel::ID_MOVECONTROLUP, _("Move up"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer3->Add( m_moveup, 0, wxALL|wxEXPAND, 5 );
 	m_movedown = new wxButton( this, wxGISToolBarPanel::ID_MOVECONTROLDOWN, _("Move down"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -95,8 +95,8 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGxApplication* pGxApp, wxWindow* parent, 
 	m_pContextMenu = new wxMenu(/*_("Command menu")*/);
 	wxMenuItem *item = new wxMenuItem(m_pContextMenu, ID_ONSETKEYCODE, _("Set keycode"));
 	item->SetBitmap(wxKeyCodeDlg::GetBitmap());
-	m_pContextMenu->Append(item);	
-	
+	m_pContextMenu->Append(item);
+
 	this->SetSizer( bSizer );
 	this->Layout();
 
@@ -200,7 +200,7 @@ void wxGISToolBarPanel::OnCheckboxToggle(wxCommandEvent& event)
 		if(pToolBar)
 		{
 			bool bIsChecked = m_commandbarlist->IsChecked(pos);
-			m_pGxApp->ShowPane(pToolBar->GetName(), bIsChecked); 
+			m_pGxApp->ShowPane(pToolBar->GetName(), bIsChecked);
 		}
 	}
 }
@@ -241,7 +241,7 @@ void wxGISToolBarPanel::LoadCommands(void)
 
 void wxGISToolBarPanel::OnListctrlActivated(wxListEvent& event)
 {
-	OnSetKeyCode(event.GetIndex());
+	SetKeyCode(event.GetIndex());
 }
 
 void wxGISToolBarPanel::OnListctrlRClick(wxListEvent& event)
@@ -249,7 +249,7 @@ void wxGISToolBarPanel::OnListctrlRClick(wxListEvent& event)
 	PopupMenu(m_pContextMenu);
 }
 
-void wxGISToolBarPanel::OnSetKeyCode(int pos)
+void wxGISToolBarPanel::SetKeyCode(int pos)
 {
 	wxKeyCodeDlg dlg(this);
 	wxListItem item;
@@ -281,7 +281,7 @@ void wxGISToolBarPanel::OnSetKeyCode(wxCommandEvent& event)
 {
 	long item = GetSelectedCommandItem();
 	if(item != wxNOT_FOUND)
-		OnSetKeyCode(item);
+		SetKeyCode(item);
 }
 
 void wxGISToolBarPanel::OnUpdateUI(wxUpdateUIEvent& event)
@@ -440,7 +440,7 @@ void wxGISToolBarPanel::OnCreateCommandBar(wxCommandEvent& event)
 				wxAuiToolBarItemArray append_items;
 				ICommand* pCmd = m_pGxApp->GetCommand(wxT("wxGISCommonCmd"), 2);
 				if(pCmd)
-				{	
+				{
 					wxAuiToolBarItem item;
 					item.SetKind(wxITEM_SEPARATOR);
 					append_items.Add(item);
@@ -543,7 +543,7 @@ void wxGISToolBarPanel::OnMoveUp(wxCommandEvent& event)
 		IGISCommandBar* pBar = m_CategoryArray[selpos];
 		m_CategoryArray[selpos] = m_CategoryArray[selpos - 1];
 		m_CategoryArray[selpos - 1] = pBar;
-		
+
 		selpos -= (m_nMenubarPos + 1);
 		wxGISMenuBar* pwxGISMenuBar = m_pGxApp->GetMenuBar();
 		pwxGISMenuBar->MoveLeft(selpos);
@@ -557,7 +557,7 @@ void wxGISToolBarPanel::OnMoveUp(wxCommandEvent& event)
 			IGISCommandBar* pBar = m_CategoryArray[selpos];
 			pBar->MoveCommandLeft(item);
 			m_pGxApp->GetAuiManager()->Update();
-			
+
 			LoadCommands();
 			m_buttonslist->Select(item - 1);
 			m_buttonslist->SetFocus();
@@ -628,7 +628,7 @@ wxGISCommandPanel::wxGISCommandPanel( wxGxApplication* pGxApp, wxWindow* parent,
 	m_pGxApp = pGxApp;
 	wxBoxSizer* bSizer5;
 	bSizer5 = new wxBoxSizer( wxHORIZONTAL );
-	
+
 	m_splitter2 = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D | wxNO_BORDER );
 	m_splitter2->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISCommandPanel::m_splitter2OnIdle ), NULL, this );
 	bSizer5->Add( m_splitter2, 1, wxEXPAND, 5 );
@@ -650,11 +650,11 @@ wxGISCommandPanel::wxGISCommandPanel( wxGxApplication* pGxApp, wxWindow* parent,
 	{
 		CatArray.Add(IT->first);
 	}
-	
-	m_listBox1 = new wxListBox( m_splitter2, wxGISCommandPanel::ID_LSTBX, wxDefaultPosition, wxDefaultSize, CatArray, wxLC_SINGLE_SEL|wxLC_SORT_ASCENDING| wxNO_BORDER ); 
+
+	m_listBox1 = new wxListBox( m_splitter2, wxGISCommandPanel::ID_LSTBX, wxDefaultPosition, wxDefaultSize, CatArray, wxLC_SINGLE_SEL|wxLC_SORT_ASCENDING| wxNO_BORDER );
 //	m_listBox1->InsertColumn(0, _("Category"));
 	//bSizer5->Add( m_listBox1, 0, wxALL, 5 );
-	
+
 	m_listCtrl3 = new wxListCtrl( m_splitter2, wxGISCommandPanel::ID_LSTCTRL, wxDefaultPosition, wxDefaultSize, /*wxLC_EDIT_LABELS|wxLC_NO_HEADER|wxLC_VRULES*/wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_SORT_ASCENDING|wxNO_BORDER );
 	m_listCtrl3->InsertColumn(0, _("Command Name"), wxLIST_FORMAT_LEFT, 90);
 	m_listCtrl3->InsertColumn(1, _("Description"), wxLIST_FORMAT_LEFT, 120);
@@ -668,7 +668,7 @@ wxGISCommandPanel::wxGISCommandPanel( wxGxApplication* pGxApp, wxWindow* parent,
 	m_pContextMenu = new wxMenu(/*_("Command menu")*/);
 	wxMenuItem *item = new wxMenuItem(m_pContextMenu, ID_ONSETKEYCODE, _("Set keycode"));
 	item->SetBitmap(wxKeyCodeDlg::GetBitmap());
-	m_pContextMenu->Append(item);	
+	m_pContextMenu->Append(item);
 
 	this->SetSizer( bSizer5 );
 	this->Layout();
@@ -695,7 +695,7 @@ void wxGISCommandPanel::OnListboxSelect(wxCommandEvent& event)
 		return;
 
 	wxString selName = m_listBox1->GetString(selpos);
-	COMMANDARRAY* pArr = m_CategoryMap[selName];	
+	COMMANDARRAY* pArr = m_CategoryMap[selName];
 	if(pArr != NULL)
 	{
 		m_listCtrl3->DeleteAllItems();
@@ -723,7 +723,7 @@ void wxGISCommandPanel::OnDoubleClickSash(wxSplitterEvent& event)
 void wxGISCommandPanel::OnListctrlActivated(wxListEvent& event)
 {
 	m_CurSelection = event.GetIndex();
-	OnSetKeyCode(event.GetIndex());
+	SetKeyCode(event.GetIndex());
 }
 
 void wxGISCommandPanel::OnListctrlRClick(wxListEvent& event)
@@ -732,7 +732,7 @@ void wxGISCommandPanel::OnListctrlRClick(wxListEvent& event)
 	PopupMenu(m_pContextMenu);
 }
 
-void wxGISCommandPanel::OnSetKeyCode(int pos)
+void wxGISCommandPanel::SetKeyCode(int pos)
 {
 	wxKeyCodeDlg dlg(this);
 	wxListItem item;
@@ -762,7 +762,7 @@ void wxGISCommandPanel::OnSetKeyCode(int pos)
 
 void wxGISCommandPanel::OnSetKeyCode(wxCommandEvent& event)
 {
-	OnSetKeyCode(m_CurSelection);
+	SetKeyCode(m_CurSelection);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -778,13 +778,13 @@ wxGISCustomizeDlg::wxGISCustomizeDlg( wxWindow* parent, wxWindowID id, const wxS
 
 	wxBoxSizer* bSizerMain;
 	bSizerMain = new wxBoxSizer( wxVERTICAL );
-	
+
 	m_auinotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE/*|wxSIMPLE_BORDER */);
 	m_auinotebook->AddPage(new wxGISToolBarPanel(m_pGxApp, m_auinotebook), _("ToolBars & Menues"));
 	m_auinotebook->AddPage(new wxGISCommandPanel(m_pGxApp, m_auinotebook), _("Commands"));
-	
+
 	bSizerMain->Add( m_auinotebook, 1, wxEXPAND | wxALL, 5 );
-	
+
 	m_sdbSizer = new wxStdDialogButtonSizer();
 	m_sdbSizerOK = new wxButton( this, wxID_OK, wxString(_("Close")) );
 	m_sdbSizer->AddButton( m_sdbSizerOK );
@@ -792,7 +792,7 @@ wxGISCustomizeDlg::wxGISCustomizeDlg( wxWindow* parent, wxWindowID id, const wxS
 	//m_sdbSizer->AddButton( m_sdbSizerCancel );
 	m_sdbSizer->Realize();
 	bSizerMain->Add( m_sdbSizer, 0, wxALL|wxEXPAND, 5 );
-	
+
 	this->SetSizer( bSizerMain );
 	this->Layout();
 }

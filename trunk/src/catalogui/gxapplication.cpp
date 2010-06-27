@@ -91,12 +91,12 @@ void wxGxApplication::RemoveCommandBar(IGISCommandBar* pBar)
 			case enumGISCBToolbar:
 				m_mgr.DetachPane(dynamic_cast<wxWindow*>(pBar));
 				m_mgr.Update();
-				break;	
+				break;
 			case enumGISCBContextmenu:
 			case enumGISCBSubMenu:
-			case enumGISCBNone: 
+			case enumGISCBNone:
 				break;
-			}			
+			}
 			wxDELETE(pBar);
 			m_CommandBarArray.erase(m_CommandBarArray.begin() + i);
 			break;
@@ -148,7 +148,7 @@ bool wxGxApplication::AddCommandBar(IGISCommandBar* pBar)
 		break;
 	case enumGISCBContextmenu:
 	case enumGISCBSubMenu:
-	case enumGISCBNone: 
+	case enumGISCBNone:
 		break;
 	}
 	return true;
@@ -206,7 +206,7 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
     m_CommandArray.push_back(m_pNewMenu);
 
     wxGISApplication::Create(pConfig);
-    
+
 	wxLogMessage(_("wxGxApplication: Creating main application frame..."));
 
 	m_mgr.SetManagedWindow(this);
@@ -332,7 +332,7 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
 void wxGxApplication::OnClose(wxCloseEvent& event)
 {
     event.Skip();
-	//should remove toolbars from commandbar array as m_mgr manage toolbars by itself 
+	//should remove toolbars from commandbar array as m_mgr manage toolbars by itself
     m_pNewMenu->UnInit();
 
     IGxSelection* pSel = m_pCatalog->GetSelection();
@@ -373,7 +373,7 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
     for(size_t i = 0; i < m_WindowArray.size(); i++)
     {
         IGxView* pGxView = dynamic_cast<IGxView*>(m_WindowArray[i]);
-        if(pGxView) 
+        if(pGxView)
             pGxView->Deactivate();
     }
 
@@ -391,7 +391,7 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
             wxDELETE(poWnd);
         m_WindowArray.pop_back();
     }
-    
+
  	SerializeGxFramePos(true);
 }
 

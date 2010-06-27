@@ -22,7 +22,9 @@
 
 #include "wxgis/catalogui/gxview.h"
 
-#include <wx/treectrl.h>
+#include "wx/treectrl.h"
+#include "wx/imaglist.h"
+
 //#include <wx/msgdlg.h>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -84,7 +86,7 @@ public:
 	virtual void OnItemExpanding(wxTreeEvent& event);
 	virtual void OnItemRightClick(wxTreeEvent& event);
 
-	typedef std::map<IGxObject*, wxTreeItemId> WETREEMAP; 
+	typedef std::map<IGxObject*, wxTreeItemId> WETREEMAP;
 protected:
 	wxImageList m_TreeImageList;
 	WETREEMAP m_TreeMap;

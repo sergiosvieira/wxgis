@@ -29,7 +29,7 @@
 
 enum wxGISEnumConfigKey
 {
-	enumGISHKLM = 0x0000, 
+	enumGISHKLM = 0x0000,
 	enumGISHKCU = 0x0001,
 	enumGISHKCC = 0x0002,
 	enumGISHKCR = 0x0004
@@ -64,12 +64,12 @@ public:
 	{
 		if(nCookie < 0 || m_pPointsArray.size() <= nCookie)
 			return;
-		wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
+		//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
 		m_pPointsArray[nCookie] = NULL;
 	}
 protected:
 	std::vector<wxObject*> m_pPointsArray;
-	wxCriticalSection m_PointsArrayCriticalSection;
+	//wxCriticalSection m_PointsArrayCriticalSection;
 };
 
 class IPointer
@@ -96,7 +96,7 @@ protected:
 
 enum wxGISEnumMessageType
 {
-	enumGISMessageUnk, 
+	enumGISMessageUnk,
 	enumGISMessageErr,
 	enumGISMessageNorm,
 	enumGISMessageQuestion,

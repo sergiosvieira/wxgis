@@ -51,8 +51,12 @@ void wxGxSelection::Select( IGxObject* pObject,  bool appendToExistingSelection,
         return;
     }
     m_currentInitiator = nInitiator;
+    m_CritSect.Leave();
+
     if(!appendToExistingSelection)
 	    Clear(nInitiator);
+
+	m_CritSect.Enter();
     if(m_SelectionMap[nInitiator] == NULL)
 	    m_SelectionMap[nInitiator] = new GxObjectArray;
     m_SelectionMap[nInitiator]->push_back(pObject);
@@ -66,7 +70,7 @@ void wxGxSelection::Select( IGxObject* pObject,  bool appendToExistingSelection,
     Do(pObject);
 
 	//fire event
-	wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
+	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
 		IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pPointsArray[i]);
@@ -93,7 +97,7 @@ void wxGxSelection::Select( IGxObject* pObject)
     m_CritSect.Leave();
 
 	//fire event
-	wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
+	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
 		IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pPointsArray[i]);
@@ -119,7 +123,7 @@ void wxGxSelection::Unselect(IGxObject* pObject, long nInitiator)
 				CI->second->erase(pos);
 		}
 	}
-    
+
     if(m_SelectionMap[nInitiator] == NULL)
     {
         m_CritSect.Leave();
@@ -190,7 +194,7 @@ size_t wxGxSelection::GetCount(void)
     wxCriticalSectionLocker locker(m_CritSect);
 	if(m_currentInitiator == INIT_NONE || m_SelectionMap[m_currentInitiator] == NULL)
 		return 0;
-	else 
+	else
 		return m_SelectionMap[m_currentInitiator]->size();
 }
 
@@ -199,7 +203,7 @@ size_t wxGxSelection::GetCount(long nInitiator)
     wxCriticalSectionLocker locker(m_CritSect);
 	if(m_SelectionMap[nInitiator] == NULL)
 		return 0;
-	else 
+	else
 		return m_SelectionMap[nInitiator]->size();
 }
 
@@ -229,7 +233,7 @@ IGxObject* wxGxSelection::GetSelectedObjects(size_t nIndex)
 
     if(m_SelectionMap[m_currentInitiator]->size() - 1 >= nIndex)
         return m_SelectionMap[m_currentInitiator]->at(nIndex);
-    
+
     return NULL;
 }
 

@@ -46,7 +46,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISToolBarPanel
 ///////////////////////////////////////////////////////////////////////////////
-class wxGISToolBarPanel : public wxPanel 
+class wxGISToolBarPanel : public wxPanel
 {
 	enum
 	{
@@ -101,17 +101,17 @@ public:
 	void OnMoveUp(wxCommandEvent& event);
 	void OnMoveDown(wxCommandEvent& event);
 
-	void OnSetKeyCode(int pos);
+	void SetKeyCode(int pos);
 	long GetSelectedCommandItem(void);
 	void LoadCommands(void);
 
-    DECLARE_EVENT_TABLE()	
+    DECLARE_EVENT_TABLE()
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISCommandPanel
 ///////////////////////////////////////////////////////////////////////////////
-class wxGISCommandPanel : public wxPanel 
+class wxGISCommandPanel : public wxPanel
 {
 	enum
 	{
@@ -141,7 +141,7 @@ public:
 	{
 	m_splitter2->SetSashPosition( 150 );
 	m_splitter2->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISCommandPanel::m_splitter2OnIdle ), NULL, this );
-	}	
+	}
 	//events
 	void OnListboxSelect(wxCommandEvent& event);
 	void OnDoubleClickSash(wxSplitterEvent& event);
@@ -149,7 +149,7 @@ public:
 	void OnListctrlRClick(wxListEvent& event);
 	void OnSetKeyCode(wxCommandEvent& event);
 
-	void OnSetKeyCode(int pos);
+	void SetKeyCode(int pos);
 
     DECLARE_EVENT_TABLE()
 };
@@ -157,20 +157,20 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISCustomizeDlg
 ///////////////////////////////////////////////////////////////////////////////
-class wxGISCustomizeDlg : public wxDialog 
+class wxGISCustomizeDlg : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxAuiNotebook* m_auinotebook;
 		wxStdDialogButtonSizer* m_sdbSizer;
 		wxButton* m_sdbSizerOK;
 		//wxButton* m_sdbSizerCancel;
 		wxGxApplication* m_pGxApp;
-	
+
 	public:
 		wxGISCustomizeDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Customize"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,400 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~wxGISCustomizeDlg();
-	
+
 };
 

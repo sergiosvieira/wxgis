@@ -57,7 +57,7 @@ void wxGxArchive::LoadChildren(void)
     wxBusyCursor wait;
 
     wxString sArchPath = m_sType + m_sPath;//wxT("/vsizip/") + wxT("/");
-    CPLString soArchPath = wgWX2MB(sArchPath);
+    CPLString soArchPath(wgWX2MB(sArchPath));
     char **papszFileList = VSIReadDir(soArchPath);
 
     if( CSLCount(papszFileList) == 0 )
@@ -73,7 +73,7 @@ void wxGxArchive::LoadChildren(void)
             wxString sFileName(papszFileList[i], wxCSConv(wxT("cp-866")));
 //			wxString sFileName = wgMB2WX(papszFileList[i]);
             VSIStatBufL BufL;
-            
+
             CPLString soArchPathF = soArchPath;
             soArchPathF += "/";
             soArchPathF += papszFileList[i];
@@ -101,7 +101,7 @@ void wxGxArchive::LoadChildren(void)
     CSLDestroy( papszFileList );
 
 	//load names
-	GxObjectArray Array;	
+	GxObjectArray Array;
 	if(m_pCatalog->GetChildren(sArchPath, &m_FileNames, &Array))
 	{
 		for(size_t i = 0; i < Array.size(); i++)
@@ -124,20 +124,20 @@ bool wxGxArchive::Delete(void)
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer == NULL)
 			return false;
-		return pGxObjectContainer->DeleteChild(this);		
+		return pGxObjectContainer->DeleteChild(this);
 	}
 	else
     {
         const char* err = CPLGetLastErrorMsg();
         wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
-		return false;	
+		return false;
     }
 }
 
 bool wxGxArchive::Rename(wxString NewName)
 {
 	//rename ?
-	m_sName = NewName; 
+	m_sName = NewName;
 	m_pCatalog->ObjectChanged(this);
 	return true;
 }
@@ -178,7 +178,7 @@ void wxGxArchiveFolder::LoadChildren(void)
     //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
 
     wxString sArchPath = m_sPath;
-    CPLString soArchPath = wgWX2MB(sArchPath);
+    CPLString soArchPath(wgWX2MB(sArchPath));
     char **papszFileList = VSIReadDir(soArchPath);
 
     if( CSLCount(papszFileList) == 0 )
@@ -220,7 +220,7 @@ void wxGxArchiveFolder::LoadChildren(void)
     CSLDestroy( papszFileList );
 
 	//load names
-	GxObjectArray Array;	
+	GxObjectArray Array;
 	if(m_pCatalog->GetChildren(sArchPath, &m_FileNames, &Array))
 	{
 		for(size_t i = 0; i < Array.size(); i++)
@@ -244,7 +244,7 @@ void wxGxArchiveFolder::LoadChildren(void)
     //    wxString sExt = m_sPath;
     //    // look for a filter handler, e.g. for '.gz'
     //    const wxFilterClassFactory *fcf = wxFilterClassFactory::Find(m_sPath, wxSTREAM_FILEEXT);
-    //    if (fcf) 
+    //    if (fcf)
     //    {
     //        in_stream.reset(fcf->NewStream(in_stream.release()));
     //        // pop the extension, so if it was '.tar.gz' it is now just '.tar'
@@ -254,7 +254,7 @@ void wxGxArchiveFolder::LoadChildren(void)
     //    // look for a archive handler, e.g. for '.zip' or '.tar'
     //    const wxArchiveClassFactory *acf = wxArchiveClassFactory::Find(sExt, wxSTREAM_FILEEXT);
     //    wxString sProtocol = acf->GetProtocol();
-    //    if (acf) 
+    //    if (acf)
     //    {
     //        std::auto_ptr<wxArchiveInputStream> arc(acf->NewStream(in_stream.release()));
     //        std::auto_ptr<wxArchiveEntry> entry;
@@ -282,8 +282,8 @@ void wxGxArchiveFolder::LoadChildren(void)
     //        ////    x = 1;
     //            //std::wcout << entry->GetName().c_str() << "\n";
     //        }
-	   //     GxObjectArray Array;	
-    //         
+	   //     GxObjectArray Array;
+    //
     //        //wxString name, ext;
     //        //wxFileName::SplitPath(m_sPath, NULL, NULL, &name, &ext);
 
@@ -298,13 +298,13 @@ void wxGxArchiveFolder::LoadChildren(void)
 	   //     }
 	   //     m_bIsChildrenLoaded = true;
     //    }
-    //    else 
+    //    else
     //    {
     //        wxLogError(_("wxGxArchiveFolder: can't handle '%s'"), m_sPath.c_str());
     //    }
     //}
 
-    
+
     ////auto_ptr<wxArchiveClassFactory> factory(wxArchiveClassFactory::Find(m_sPath, wxSTREAM_FILEEXT));
     ////if (factory.get())
     ////{
