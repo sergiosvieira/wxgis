@@ -21,6 +21,9 @@
 #include "wxgis/carto/tableview.h"
 #include "../../art/db2.xpm"
 
+#include "wx/imaglist.h"
+#include "wx/renderer.h"
+
 //------------------------------------------------------------------
 // wxGISTable
 //------------------------------------------------------------------
@@ -35,7 +38,7 @@ wxGISTable::wxGISTable(wxGISDataset* pwxGISDataset) : m_pwxGISDataset(NULL)
 	    m_sFIDKeyName = wgMB2WX(pLayer->GetFIDColumn());
 
 	    m_pOGRFeatureDefn = pLayer->GetLayerDefn();
-	    nCols = m_pOGRFeatureDefn->GetFieldCount();	
+	    nCols = m_pOGRFeatureDefn->GetFieldCount();
 	    nRows = m_pwxGISDataset->GetSize();
     }
     else
@@ -153,7 +156,7 @@ void wxGridCtrl::DrawRowLabel(wxDC& dc, int row)
 
 void wxGridCtrl::OnLabelLeftClick(wxGridEvent& event)
 {
-    if (event.GetRow() != -1) 
+    if (event.GetRow() != -1)
 	{
         SetGridCursor(event.GetRow(),0);
     }
@@ -179,84 +182,84 @@ BEGIN_EVENT_TABLE(wxGISTableView, wxPanel)
 	EVT_BUTTON(wxGISTableView::ID_NEXT, wxGISTableView::OnBtnNext)
 	EVT_BUTTON(wxGISTableView::ID_PREV, wxGISTableView::OnBtnPrev)
 	EVT_BUTTON(wxGISTableView::ID_LAST, wxGISTableView::OnBtnLast)
-	EVT_TEXT_ENTER(wxGISTableView::ID_POS, wxGISTableView::OnSetPos) 
+	EVT_TEXT_ENTER(wxGISTableView::ID_POS, wxGISTableView::OnSetPos)
 END_EVENT_TABLE();
 
-wxGISTableView::wxGISTableView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) 
+wxGISTableView::wxGISTableView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style )
 : wxPanel( parent, id, pos, size, style )
 {
 	wxBoxSizer* bSizerMain;
 	bSizerMain = new wxBoxSizer( wxVERTICAL );
-	
+
 	m_grid = new wxGridCtrl( this, wxID_ANY);
-	
+
 	// Grid
 	m_grid->CreateGrid( 5, 5 );
 	m_grid->EnableEditing( false );
 	m_grid->EnableGridLines( true );
 	m_grid->EnableDragGridSize( false );
 	m_grid->SetMargins( 0, 0 );
-	
+
 	// Columns
 	m_grid->EnableDragColMove( false );
 	m_grid->EnableDragColSize( true );
 	m_grid->SetColLabelSize( 20 );
 	m_grid->SetColLabelAlignment( wxALIGN_CENTRE, wxALIGN_CENTRE );
-	
+
 	// Rows
 	m_grid->EnableDragRowSize( true );
 	m_grid->SetRowLabelSize( 15 );
 	m_grid->SetRowLabelAlignment( wxALIGN_CENTRE, wxALIGN_CENTRE );
-	
+
 	// Label Appearance
-	
+
 	// Cell Defaults
 	m_grid->SetDefaultCellAlignment( wxALIGN_LEFT, wxALIGN_TOP );
 	//m_grid->SetDefaultCellBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
 
 	bSizerMain->Add( m_grid, 1, wxALL|wxEXPAND, 0 );
-	
+
 	wxBoxSizer* bSizerLow;
 	bSizerLow = new wxBoxSizer( wxHORIZONTAL );
-	
+
 	m_staticText1 = new wxStaticText( this, wxID_ANY, _("Record:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1->Wrap( -1 );
 	bSizerLow->Add( m_staticText1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
+
 	m_bpFirst = new wxBitmapButton( this, wxGISTableView::ID_FIRST, m_grid->m_pImageList->GetBitmap(0), wxDefaultPosition, wxSize( BITBUTTONSIZE,BITBUTTONSIZE ), wxBU_AUTODRAW );
 	m_bpFirst->SetMinSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
 	m_bpFirst->SetMaxSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
-	
+
 	bSizerLow->Add( m_bpFirst, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
-	
+
 	m_bpPrev = new wxBitmapButton( this, wxGISTableView::ID_PREV, m_grid->m_pImageList->GetBitmap(1), wxDefaultPosition, wxSize( BITBUTTONSIZE,BITBUTTONSIZE ), wxBU_AUTODRAW );
 	m_bpPrev->SetMinSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
 	m_bpPrev->SetMaxSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
-	
+
 	bSizerLow->Add( m_bpPrev, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
-	
+
 	m_position = new wxTextCtrl( this, wxGISTableView::ID_POS, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_CENTRE|wxTE_PROCESS_ENTER  );
 	bSizerLow->Add( m_position, 0, wxALL, 5 );
-	
+
 	m_bpNext = new wxBitmapButton( this, wxGISTableView::ID_NEXT, m_grid->m_pImageList->GetBitmap(2), wxDefaultPosition, wxSize( BITBUTTONSIZE,BITBUTTONSIZE ), wxBU_AUTODRAW );
 	m_bpNext->SetMinSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
 	m_bpNext->SetMaxSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
-	
+
 	bSizerLow->Add( m_bpNext, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
-	
+
 	m_bpLast = new wxBitmapButton( this, wxGISTableView::ID_LAST, m_grid->m_pImageList->GetBitmap(3), wxDefaultPosition, wxSize( BITBUTTONSIZE,BITBUTTONSIZE ), wxBU_AUTODRAW );
 	m_bpLast->SetMinSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
 	m_bpLast->SetMaxSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
-	
+
 	bSizerLow->Add( m_bpLast, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
 
 	m_staticText2 = new wxStaticText( this, wxID_ANY, wxT("of"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText2->Wrap( -1 );
 	bSizerLow->Add( m_staticText2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
-	
+
 	bSizerMain->Add( bSizerLow, 0, wxEXPAND, 5 );
-	
+
 	this->SetSizer( bSizerMain );
 
 	(*m_position) << 1;

@@ -74,17 +74,17 @@ bool wxGISCatalogApp::OnInit()
 	wxLog::SetActiveTarget(new wxLogStderr(m_LogFile.fp()));
 
 #ifdef WXGISPORTABLE
-	wxLogMessage(wxT("Portable")); 
+	wxLogMessage(wxT("Portable"));
 #endif
-	wxLogMessage(wxT(" ")); 
-	wxLogMessage(wxT("####################################################################")); 
-	wxLogMessage(wxT("##                    %s                    ##"),wxNow().c_str()); 
-	wxLogMessage(wxT("####################################################################")); 
-	wxLogMessage(_("HOST '%s': OS desc - %s, free memory - %u Mb"), wxGetFullHostName().c_str(),wxGetOsDescription().c_str(), wxGetFreeMemory()/1048576);
-
+	wxLogMessage(wxT(" "));
+	wxLogMessage(wxT("####################################################################"));
+	wxLogMessage(wxT("##                    %s                    ##"),wxNow().c_str());
+	wxLogMessage(wxT("####################################################################"));
+	long dFreeMem =  (long)(wxGetFreeMemory().ToLong() / 1048576);
+	wxLogMessage(_("HOST '%s': OS desc - %s, free memory - %u Mb"), wxGetFullHostName().c_str(), wxGetOsDescription().c_str(), dFreeMem);
 	wxLogMessage(_("wxGISCatalogApp: %s %s is initializing..."), APP_NAME, APP_VER);
 	wxLogMessage(_("wxGISCatalogApp: Log file: %s"), logfilename.c_str());
-	wxLogMessage(_("wxGISCatalogApp: Initialize locale"));	
+	wxLogMessage(_("wxGISCatalogApp: Initialize locale"));
 
 
 	wxString sLocale = m_pConfig->GetLocale();

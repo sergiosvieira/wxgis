@@ -34,4 +34,8 @@ public:
 	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray);
     virtual void Serialize(wxXmlNode* pConfig, bool bStore);
 	virtual wxString GetName(void){return GetClassInfo()->GetClassName();};
+	typedef struct _data{
+		wxString path;
+		int bHasShp, bHasDbf, bHasPrj;
+	}DATA;
 };

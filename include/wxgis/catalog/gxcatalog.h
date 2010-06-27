@@ -42,6 +42,7 @@ public:
 	virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog){m_pParent = NULL;	m_pCatalog = NULL; return true;};
 	virtual void Detach(void);
 	virtual wxString GetName(void){return wxString(_("Catalog"));};
+	virtual wxString GetFullName(void){return wxString(_("Catalog"));};
 	virtual wxString GetCategory(void){return wxString(wxT("Root"));};
 	virtual IGxObject* GetParent(void){return NULL;};
 	virtual void Refresh(void);

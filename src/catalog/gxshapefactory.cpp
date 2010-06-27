@@ -34,10 +34,6 @@ wxGxShapeFactory::~wxGxShapeFactory(void)
 
 bool wxGxShapeFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray)
 {
-	typedef struct _data{
-		wxString path;
-		int bHasShp, bHasDbf, bHasPrj;
-	}DATA;
 	std::map<wxString, DATA> data_map;
 
 	for(size_t i = 0; i < pFileNames->GetCount(); i++)
@@ -70,7 +66,7 @@ bool wxGxShapeFactory::GetChildren(wxString sParentDir, wxArrayString* pFileName
 			data_map[name].bHasPrj = (ext == wxT("prj")) ? 1 : 0;
 		if(data_map[name].path.IsEmpty() && (data_map[name].bHasShp || data_map[name].bHasDbf || data_map[name].bHasPrj))
 			data_map[name].path = sParentDir+ wxFileName::GetPathSeparator() + FName.GetName();
-		if(data_map[name].path.IsEmpty())	
+		if(data_map[name].path.IsEmpty())
 			data_map.erase(name);
 
 		if(path.Find(wxT(".shp")) != wxNOT_FOUND)
@@ -96,7 +92,7 @@ REMOVE:
 	for(std::map<wxString, DATA>::const_iterator CI = data_map.begin(); CI != data_map.end(); ++CI)
 	{
 		IGxObject* pGxObj = NULL;
-		
+
 		if(CI->second.bHasShp)
 		{
 			wxString name = CI->first + wxT(".shp");
@@ -132,10 +128,10 @@ void wxGxShapeFactory::Serialize(wxXmlNode* pConfig, bool bStore)
     {
         if(pConfig->HasProp(wxT("factory_name")))
             pConfig->DeleteProperty(wxT("factory_name"));
-        pConfig->AddProperty(wxT("factory_name"), GetName());  
+        pConfig->AddProperty(wxT("factory_name"), GetName());
         if(pConfig->HasProp(wxT("is_enabled")))
             pConfig->DeleteProperty(wxT("is_enabled"));
-        pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
+        pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));
     }
     else
     {

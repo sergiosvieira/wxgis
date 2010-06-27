@@ -20,6 +20,7 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/framework/framework.h"
+#include "wx/imaglist.h"
 
 class wxGISCatalogMainCmd :
     public ICommand,
@@ -27,7 +28,7 @@ class wxGISCatalogMainCmd :
     public IDropDownCommand
 {
     DECLARE_DYNAMIC_CLASS(wxGISCatalogMainCmd)
-    
+
 public:
 	wxGISCatalogMainCmd(void);
 	virtual ~wxGISCatalogMainCmd(void);

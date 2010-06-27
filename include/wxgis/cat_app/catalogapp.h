@@ -24,14 +24,15 @@
 #include "wxgis/base.h"
 #include "wxgis/core/config.h"
 
-#include <wx/dir.h>
-#include <wx/filename.h>
-#include <wx/file.h>
-#include <wx/ffile.h>
-#include <wx/datetime.h>
-#include <wx/intl.h>
+#include "wx/app.h"
+#include "wx/dir.h"
+#include "wx/filename.h"
+#include "wx/file.h"
+#include "wx/ffile.h"
+#include "wx/datetime.h"
+#include "wx/intl.h"
 
-class wxGISCatalogApp : 
+class wxGISCatalogApp :
 	public wxApp
 {
 public:

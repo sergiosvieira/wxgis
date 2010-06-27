@@ -172,15 +172,15 @@ void wxGxCatalog::Init(void)
 	m_bShowExt = wxAtoi(pConfXmlNode->GetPropVal(wxT("show_ext"), wxT("1")));
 
 	//loads current user and when local machine items
-	wxXmlNode* pObjectFactoriesNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/objectfactories"))); 
+	wxXmlNode* pObjectFactoriesNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/objectfactories")));
 	LoadObjectFactories(pObjectFactoriesNode);
-	pObjectFactoriesNode = m_pConf->GetConfigNode(enumGISHKLM, wxString(wxT("catalog/objectfactories"))); 
+	pObjectFactoriesNode = m_pConf->GetConfigNode(enumGISHKLM, wxString(wxT("catalog/objectfactories")));
 	LoadObjectFactories(pObjectFactoriesNode);
 
 	//loads current user and when local machine items
-	wxXmlNode* pRootItemsNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/rootitems"))); 
+	wxXmlNode* pRootItemsNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/rootitems")));
 	LoadChildren(pRootItemsNode);
-	pRootItemsNode = m_pConf->GetConfigNode(enumGISHKLM, wxString(wxT("catalog/rootitems"))); 
+	pRootItemsNode = m_pConf->GetConfigNode(enumGISHKLM, wxString(wxT("catalog/rootitems")));
 	LoadChildren(pRootItemsNode);
 }
 
@@ -199,7 +199,7 @@ void wxGxCatalog::LoadObjectFactories(wxXmlNode* pNode)
             if(m_ObjectFactoriesArray[i]->GetName() == sName)
 			{
 				sName.Empty();
-				break;		
+				break;
 			}
 		}
 
@@ -235,7 +235,7 @@ void wxGxCatalog::LoadChildren(wxXmlNode* pNode)
         if(!bIsEnabled)
 		{
 			pChildren = pChildren->GetNext();
-			continue;		
+			continue;
 		}
 
 		for(size_t i = 0; i < m_CatalogRootItemArray.Count(); i++)
@@ -244,7 +244,7 @@ void wxGxCatalog::LoadChildren(wxXmlNode* pNode)
 			{
 				pChildren = pChildren->GetNext();
                 bContin = true;
-				break;		
+				break;
 			}
 		}
 
@@ -270,7 +270,7 @@ void wxGxCatalog::LoadChildren(wxXmlNode* pNode)
                     IGxRootObjectProperties* pGxRootObjectProperties = dynamic_cast<IGxRootObjectProperties*>(pGxObject);
                     if(pGxRootObjectProperties)
                         pGxRootObjectProperties->Init(pChildren);
-    				wxLogMessage(_("wxGxCatalog: Root Object %s initialize"), sCatalogRootItemName.c_str());	    			
+    				wxLogMessage(_("wxGxCatalog: Root Object %s initialize"), sCatalogRootItemName.c_str());
                 }
 			}
 			else
@@ -311,14 +311,14 @@ void wxGxCatalog::SetShowExt(bool bShowExt)
 }
 
 void wxGxCatalog::ObjectDeleted(IGxObject* pObject)
-{	
+{
 	//if selected remove from m_Selection
 	//if(m_pSelection != NULL)
 	//	m_pSelection->Unselect(pObject, IGxSelection::INIT_ALL);
-    
+
     m_pSelection->RemoveDo(pObject->GetFullName());
 
-	wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
+	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
 
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
@@ -330,7 +330,7 @@ void wxGxCatalog::ObjectDeleted(IGxObject* pObject)
 
 void  wxGxCatalog::ObjectAdded(IGxObject* pObject)
 {
-	wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
+	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
 		IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
@@ -341,7 +341,7 @@ void  wxGxCatalog::ObjectAdded(IGxObject* pObject)
 
 void  wxGxCatalog::ObjectChanged(IGxObject* pObject)
 {
-	wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
+	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
 		IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
@@ -352,7 +352,7 @@ void  wxGxCatalog::ObjectChanged(IGxObject* pObject)
 
 void  wxGxCatalog::ObjectRefreshed(IGxObject* pObject)
 {
-	wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
+	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
 		IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
@@ -402,7 +402,7 @@ void wxGxCatalog::SerializeDiscConnections(wxXmlNode* pNode, bool bStore)
             arr.Add(wxT("/"));
             arr.Add(stp.GetUserConfigDir());
             arr.Add(stp.GetDataDir());
-#endif		
+#endif
             for(size_t i = 0; i < arr.size(); i++)
 			{
 				if(m_DiscConnections[arr[i]] != NULL)
@@ -564,7 +564,7 @@ void wxGxCatalog::SerializePlugins(wxXmlNode* pNode, bool bStore)
             //    continue;
             //wxClassInfo* pClInfo = pObj->GetClassInfo();
             //if(!pClInfo)
-            //    continue;            
+            //    continue;
 
     		//pNode = m_pConf->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog/rootitems/rootitem")), false);
 	    	//pNode->AddProperty(wxT("name"), pClInfo->GetClassName());

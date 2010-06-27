@@ -114,7 +114,11 @@ wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, cons
 	}
 	if(panesstyle & enumGISStatusClock)
 	{
+#ifdef __WXGTK__
+		STATUSPANE data = {48, wxSB_NORMAL};
+#else
 		STATUSPANE data = {38, wxSB_NORMAL};
+#endif
 		panes.push_back(data);
 		m_ClockPos = counter;
 		counter++;

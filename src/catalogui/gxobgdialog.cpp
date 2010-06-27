@@ -73,7 +73,7 @@ wxString wxTreeViewComboPopup::GetStringValue() const
     {
         IGxObject* pGxObject = m_pSelection->GetLastSelectedObject();
         if(pGxObject)
-            return pGxObject->GetName();	
+            return pGxObject->GetName();
         return wxEmptyString;
     }
 
@@ -133,7 +133,7 @@ void wxTreeViewComboPopup::OnSelectionChanged(IGxSelection* Selection, long nIni
 	if(nInitiator == GetId())
 		return;
 
-    IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();	
+    IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
 	wxTreeItemId ItemId = m_TreeMap[pGxObj];
 	if(ItemId.IsOk())
 	{
@@ -317,14 +317,14 @@ wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, wxWindowID id, const wxStr
 	m_pCatalog->Init();
 
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
-	
+
 	bHeaderSizer = new wxBoxSizer( wxHORIZONTAL );
-	
+
 	m_staticText1 = new wxStaticText( this, wxID_ANY, _("Look in:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	m_staticText1->Wrap( -1 );
 	bHeaderSizer->Add( m_staticText1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_TreeCombo = new wxComboCtrl( this, wxID_ANY, _("Combo!"), wxDefaultPosition, wxDefaultSize, wxCB_READONLY); 
+
+	m_TreeCombo = new wxComboCtrl( this, wxID_ANY, _("Combo!"), wxDefaultPosition, wxDefaultSize, wxCB_READONLY);
     m_PopupCtrl = new wxTreeViewComboPopup();
     m_TreeCombo->UseAltPopupWindow(true);
     m_TreeCombo->SetPopupControl(m_PopupCtrl);
@@ -380,44 +380,44 @@ wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, wxWindowID id, const wxStr
 		m_toolBar->SetToolDropDown(pwxGISCatalogViewsCmd->GetID(), true);
 
 	m_toolBar->Realize();
-	
+
 	bHeaderSizer->Add( m_toolBar, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
 	m_staticText2 = new wxStaticText( this, wxID_ANY, _("  "), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	m_staticText2->Wrap( -1 );
 	bHeaderSizer->Add( m_staticText2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
-	bMainSizer->Add( bHeaderSizer, 0, wxEXPAND, 5 );	
+	bMainSizer->Add( bHeaderSizer, 0, wxEXPAND, 5 );
 //
 //
 	fgCeilSizer = new wxFlexGridSizer( 2, 3, 0, 0 );
 	fgCeilSizer->AddGrowableCol( 1 );
 	fgCeilSizer->SetFlexibleDirection( wxBOTH );
 	fgCeilSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+
 	m_staticText4 = new wxStaticText( this, wxID_ANY, _("Name:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	m_staticText4->Wrap( -1 );
 	fgCeilSizer->Add( m_staticText4, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
-	
+
 	m_NameTextCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_NO_VSCROLL, wxGenericValidator(&m_sName) );
 	fgCeilSizer->Add( m_NameTextCtrl, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-	
+
 	m_OkButton = new wxButton( this, wxID_OK , _("Activate"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_OkButton->SetDefault(); 
+	m_OkButton->SetDefault();
 	fgCeilSizer->Add( m_OkButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
+
 	m_staticText6 = new wxStaticText( this, wxID_ANY, _("Show of type:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	m_staticText6->Wrap( -1 );
 	fgCeilSizer->Add( m_staticText6, 0, wxALL|wxALIGN_RIGHT, 5 );
-	
-	m_WildcardCombo = new wxComboBox( this, FILTERCOMBO, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_DROPDOWN|wxCB_READONLY/*|wxCB_SORT*/ ); 
+
+	m_WildcardCombo = new wxComboBox( this, FILTERCOMBO, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_DROPDOWN|wxCB_READONLY/*|wxCB_SORT*/ );
 	fgCeilSizer->Add( m_WildcardCombo, 0, wxALL|wxEXPAND, 5 );
-	
+
 	m_CancelButton = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgCeilSizer->Add( m_CancelButton, 0, wxALL, 5 );
-	
+
 	bMainSizer->Add( fgCeilSizer, 0, wxEXPAND, 5 );
-	
+
 	this->SetSizer( bMainSizer );
 	this->Layout();
 }
@@ -428,7 +428,7 @@ wxGxObjectDialog::~wxGxObjectDialog()
 		m_pwxGxContentView->Deactivate();
 	if(m_PopupCtrl)
 		m_PopupCtrl->Deactivate();
-    
+
     SerializeFramePos(true);
 
 	for(size_t i = 0; i < m_CommandArray.size(); i++)
@@ -443,10 +443,10 @@ wxGxObjectDialog::~wxGxObjectDialog()
 
 void wxGxObjectDialog::OnCommand(wxCommandEvent& event)
 {
-	OnCommand(GetCommand(event.GetId()));
+	Command(GetCommand(event.GetId()));
 }
 
-void wxGxObjectDialog::OnCommand(ICommand* pCmd)
+void wxGxObjectDialog::Command(ICommand* pCmd)
 {
 	pCmd->OnClick();
     if(pCmd->GetSubType() == 4)
@@ -486,7 +486,7 @@ ICommand* wxGxObjectDialog::GetCommand(wxString sCmdName, unsigned char nCmdSubT
 		wxClassInfo * pInfo = pObj->GetClassInfo();
 		wxString sCommandName = pInfo->GetClassName();
 		if(sCommandName == sCmdName && m_CommandArray[i]->GetSubType() == nCmdSubType)
-			return m_CommandArray[i];								
+			return m_CommandArray[i];
 	}
 	return NULL;
 }
@@ -583,7 +583,7 @@ void wxGxObjectDialog::OnInit()
 #else
 	m_pConfig = new wxGISAppConfig(OBJDLG_NAME, CONFIG_DIR);
 #endif
-    
+
     long nStyle = wxLC_REPORT | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxBORDER_THEME;
 	if(!m_bAllowMultiSelect)
 		nStyle |= wxLC_SINGLE_SEL;
@@ -680,7 +680,7 @@ void wxGxObjectDialog::OnOK(wxCommandEvent& event)
         {
             IGxSelection* pSel = m_pwxGxContentView->GetSelectedObjects();
             if(!pSel)
-                return;    
+                return;
             IGxObject* pGxObj = pSel->GetSelectedObjects(0);
             IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObj);
             if(pObjCont)
@@ -854,7 +854,7 @@ void wxGxObjectDialog::SerializeFramePos(bool bSave)
 			int y = wxAtoi(pFrameXmlNode->GetPropVal(wxT("YPos"), wxT("50")));
 			int w = wxAtoi(pFrameXmlNode->GetPropVal(wxT("Width"), wxT("850")));
 			int h = wxAtoi(pFrameXmlNode->GetPropVal(wxT("Height"), wxT("530")));
-			
+
 			Move(x, y);
 			SetClientSize(w, h);
 		}

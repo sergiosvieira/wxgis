@@ -34,10 +34,6 @@ wxGxMapInfoFactory::~wxGxMapInfoFactory(void)
 
 bool wxGxMapInfoFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray)
 {
-	typedef struct _data{
-		wxString path;
-		int bHasTab, bHasMap, bHasInd, bHasID, bHasDat, bHasMif, bHasMid;
-	}DATA;
 	std::map<wxString, DATA> data_map;
 
 	for(size_t i = 0; i < pFileNames->GetCount(); i++)
@@ -77,7 +73,7 @@ bool wxGxMapInfoFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNa
 			data_map[name].bHasMif = (ext == wxT("mif")) ? 1 : 0;
 		if(data_map[name].path.IsEmpty() && (data_map[name].bHasTab || data_map[name].bHasMif || data_map[name].bHasDat || data_map[name].bHasID || data_map[name].bHasMap || data_map[name].bHasInd || data_map[name].bHasMid))
             data_map[name].path = sParentDir+ wxFileName::GetPathSeparator() + FName.GetName();
-		if(data_map[name].path.IsEmpty())	
+		if(data_map[name].path.IsEmpty())
 			data_map.erase(name);
 
 		if(path.Find(wxT(".tab")) != wxNOT_FOUND)
@@ -103,7 +99,7 @@ REMOVE:
 	for(std::map<wxString, DATA>::const_iterator CI = data_map.begin(); CI != data_map.end(); ++CI)
 	{
 		IGxObject* pGxObj = NULL;
-		
+
 		if(CI->second.bHasTab && CI->second.bHasMap && CI->second.bHasDat)
 		{
 			wxString name;
@@ -156,10 +152,10 @@ void wxGxMapInfoFactory::Serialize(wxXmlNode* pConfig, bool bStore)
     {
         if(pConfig->HasProp(wxT("factory_name")))
             pConfig->DeleteProperty(wxT("factory_name"));
-        pConfig->AddProperty(wxT("factory_name"), GetName());  
+        pConfig->AddProperty(wxT("factory_name"), GetName());
         if(pConfig->HasProp(wxT("is_enabled")))
             pConfig->DeleteProperty(wxT("is_enabled"));
-        pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
+        pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));
     }
     else
     {

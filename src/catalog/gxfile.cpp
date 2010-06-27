@@ -19,9 +19,11 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxfile.h"
+#include "wxgis/datasource/sysop.h"
 #include "../../art/sr_16(2).xpm"
 #include "../../art/sr_48.xpm"
 #include "cpl_vsi.h"
+
 
 //--------------------------------------------------------------
 //class wxGxFile
@@ -68,20 +70,20 @@ bool wxGxPrjFile::Delete(void)
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer == NULL)
 			return false;
-		return pGxObjectContainer->DeleteChild(this);		
+		return pGxObjectContainer->DeleteChild(this);
 	}
 	else
     {
         const char* err = CPLGetLastErrorMsg();
         wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
-		return false;	
+		return false;
     }
 }
 
 bool wxGxPrjFile::Rename(wxString NewName)
 {
 	//rename ?
-	m_sName = NewName; 
+	m_sName = NewName;
 	m_pCatalog->ObjectChanged(this);
 	return true;
 }
@@ -183,20 +185,20 @@ bool wxGxTextFile::Delete(void)
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer == NULL)
 			return false;
-		return pGxObjectContainer->DeleteChild(this);		
+		return pGxObjectContainer->DeleteChild(this);
 	}
 	else
     {
         const char* err = CPLGetLastErrorMsg();
         wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
-		return false;	
+		return false;
     }
 }
 
 bool wxGxTextFile::Rename(wxString NewName)
 {
 	//rename ?
-	m_sName = NewName; 
+	m_sName = NewName;
 	m_pCatalog->ObjectChanged(this);
 	return true;
 }

@@ -21,7 +21,8 @@
 
 #pragma once
 #include "wxgis/catalogui/gxview.h"
-#include <wx/listctrl.h>
+#include "wx/listctrl.h"
+#include "wx/imaglist.h"
 
 typedef struct _sortdata
 {
@@ -31,7 +32,7 @@ typedef struct _sortdata
 
 
 class WXDLLIMPEXP_GIS_CLU wxGxContentView :
-	public wxListCtrl, 
+	public wxListCtrl,
 	public wxGxView,
 	public IGxSelectionEvents,
 	public IGxCatalogEvents
@@ -39,7 +40,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxContentView :
 public:
 	typedef enum _listsyle{ REPORT, SMALL, LARGE, LIST } LISTSTYLE, *LPLISTSTYLE;
 
-	wxGxContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, 
+	wxGxContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition,
 						 const wxSize& size = wxDefaultSize, long style = wxLC_REPORT | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE );
 	virtual ~wxGxContentView(void);
 	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
