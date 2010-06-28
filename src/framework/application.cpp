@@ -245,9 +245,9 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
                         if(pItem->IsSubMenu())
                         {
                             pItem->SetBitmap(wxNullBitmap);
-                            wxString sT = pItem->GetText();
                             pItem->SetItemLabel(wxT(" "));// derty hack
-                            pItem->SetItemLabel(sT);
+                            //wxString sT = pItem->GetText();
+                            //pItem->SetItemLabel(sT);
                         }
                     }
 // dirty hack end
@@ -258,8 +258,15 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 						//if(Bmp.IsOk())
 							pItem->SetBitmap(Bmp);//double text??
                         pItem->SetItemLabel(wxT(" ")); // derty hack
+#ifdef __WXGTK__
+                        if(sAcc.IsEmpty())
+                            pItem->SetItemLabel(pCmd->GetCaption());
+                        else
+                            pItem->SetItemLabel(pCmd->GetCaption() + wxT("          ") + sAcc);
+#else
                         pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
-					}
+#endif
+                    }
 				}
 				break;
             case enumGISCBToolbar:
@@ -557,7 +564,9 @@ void wxGISApplication::ShowToolBarMenu(void)
 {
 	wxGISToolBarMenu* pToolBarMenu =  dynamic_cast<wxGISToolBarMenu*>(GetCommandBar(TOOLBARMENUNAME));
 	if(pToolBarMenu)
+	{
 		PopupMenu(pToolBarMenu);
+	}
 }
 
 void wxGISApplication::OnMouseDown(wxMouseEvent& event)
@@ -656,7 +665,13 @@ void wxGISApplication::OnToolDropDown(wxAuiToolBarEvent& event)
             wxMenu* pMenu = m_pDropDownCommand->GetDropDownMenu();
             if(pMenu)
             {
+#ifdef __WXGTK__
+                PushEventHandler(pMenu);
                 PopupMenu(pMenu, event.GetItemRect().GetBottomLeft());
+                PopEventHandler();
+#else
+                PopupMenu(pMenu, event.GetItemRect().GetBottomLeft());
+#endif
             }
             wxDELETE(pMenu);
         }
@@ -735,6 +750,12 @@ bool wxGISApplication::Create(IGISConfig* pConfig)
     pHtmlText->SetPage(wxT("<html><body><h1>Error</h1>Some error occurred :-H)</body></hmtl>"));
     pHtmlText->Show(false);
     RegisterChildWindow(pHtmlText);
+
+#ifdef __WXGTK__
+    wxGISToolBarMenu* pToolBarMenu =  dynamic_cast<wxGISToolBarMenu*>(GetCommandBar(TOOLBARMENUNAME));
+	if(pToolBarMenu)
+	    PushEventHandler(pToolBarMenu);
+#endif
 
     return true;
 }
