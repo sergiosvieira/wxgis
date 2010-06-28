@@ -57,7 +57,7 @@ void *wxDrawingThread::Entry()
 
 			CacheIDCurrent = m_Layers[i]->GetCacheID();
 
-			if(CacheIDCurrent != CacheIDPrevious)				
+			if(CacheIDCurrent != CacheIDPrevious)
 			{
 				m_pGISScreenDisplay->MergeCaches(CacheIDPrevious, CacheIDCurrent);
                 //???????????????
@@ -180,13 +180,13 @@ wxGISMapView::wxGISMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 {
 	//set map init envelope
 
-#if wxUSE_GRAPHICS_CONTEXT	
+#if wxUSE_GRAPHICS_CONTEXT	& __WXMSW__
 	pGISScreenDisplay = new wxGISScreenDisplayPlus();
 #else
     pGISScreenDisplay = new wxGISScreenDisplay();
 #endif
 	m_pExtenStack = new ExtenStack(this);
-	
+
 	m_pTrackCancel = new ITrackCancel();
 	m_pTrackCancel->Reset();
 
@@ -219,7 +219,7 @@ void wxGISMapView::OnDraw(wxDC& dc)
 	//wxClientDC CDC(this);
 
 	if(m_pExtenStack->GetSize() == 0)
-	{		
+	{
 		IDisplayTransformation* pDisplayTransformation = pGISScreenDisplay->GetDisplayTransformation();
         if(!pDisplayTransformation)
 		    m_pExtenStack->Do(pDisplayTransformation->GetBounds());
@@ -232,7 +232,7 @@ void wxGISMapView::OnDraw(wxDC& dc)
 	    m_pTrackCancel->Cancel();
 		if(m_pThread)
 			m_pThread->Delete();
-			
+
 	    if(m_pTrackCancel && !m_pAni)
 		    m_pAni = m_pTrackCancel->GetProgressor();
 		if(m_pAni)
@@ -271,7 +271,7 @@ void wxGISMapView::OnDraw(wxDC& dc)
 
 		//		CacheIDCurrent = m_Layers[i]->GetCacheID();
 
-		//		if(CacheIDCurrent != CacheIDPrevious)				
+		//		if(CacheIDCurrent != CacheIDPrevious)
 		//		{
 		//			pGISScreenDisplay->MergeCaches(CacheIDPrevious, CacheIDCurrent);
 		//			pGISScreenDisplay->SetCacheDerty(CacheIDCurrent, false);
@@ -366,7 +366,7 @@ void wxGISMapView::AddLayer(wxGISLayer* pLayer)
 	if(pEnv == NULL)
 		return;
     OGREnvelope Env = *pEnv;
-     
+
     //increase 10%
     double fDeltaX = (pEnv->MaxX - pEnv->MinX) / 20;
     double fDeltaY = (pEnv->MaxY - pEnv->MinY) / 20;
@@ -479,7 +479,7 @@ void wxGISMapView::OnMouseWheel(wxMouseEvent& event)
 		int direction = event.GetWheelRotation();
 		int delta = event.GetWheelDelta();
 		int factor = direction / delta;
-		
+
 		double world_zoom = ZOOM_FACTOR * (double)factor;
 
         double sc = pDisplayTransformation->GetScaleRatio();
@@ -566,7 +566,7 @@ void wxGISMapView::OnMouseWheel(wxMouseEvent& event)
 
 		//wxRect client_rc = GetScreenRect();
 		//m_pTipWnd = new wxTipWindow(this, wxString::Format(_("1 : %.2f"), 1 / (m_virtualbounds.MaxX - m_virtualbounds.MinX)/*pDisplayTransformation->GetScaleRatio()*/ * 243.84), 200, &m_pTipWnd, &client_rc);
-		//m_pTipWnd->Hide();		
+		//m_pTipWnd->Hide();
 		//wxPoint pt = client_rc.GetPosition();
 		//pt.x += client_rc.width / 2 - m_pTipWnd->GetSize().GetWidth() * 1.5 ;
 		//pt.y += client_rc.height / 2 - m_pTipWnd->GetSize().GetHeight() * 1.5;

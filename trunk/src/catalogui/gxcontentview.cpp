@@ -96,10 +96,10 @@ int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
 //        return GxObjectCompareFunction(pItem1->pObject, pItem2->pObject, psortdata->bSortAsc);
 }
 
-wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : 
+wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
 wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(REPORT), m_pConnectionPointCatalog(NULL), /*m_pConnectionPointSelection(NULL),*/ m_ConnectionPointCatalogCookie(-1)/*, m_ConnectionPointSelectionCookie(-1)*/, m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL), m_bDragging(false)
 {
-	InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150); 
+	InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150);
 	InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
 
 	m_ImageListSmall.Create(16, 16);
@@ -230,7 +230,14 @@ void wxGxContentView::AddObject(IGxObject* pObject)
     }
 	wxString type = pObject->GetCategory();
 
-	long ListItemID = InsertItem(GetItemCount(), name, pos);
+#ifdef __WXGTK__
+    if(GetColumnCount() < 2)
+    {
+        InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150);
+        InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
+    }
+#endif
+	long ListItemID = InsertItem(0, name, pos);//GetItemCount()
 	SetItem(ListItemID, 1, type);
 	SetItemPtrData(ListItemID, (wxUIntPtr) pData);
 
@@ -254,13 +261,13 @@ void wxGxContentView::OnContextMenu(wxContextMenuEvent& event)
 {
     wxPoint point = event.GetPosition();
     // If from keyboard
-    if (point.x == -1 && point.y == -1) 
+    if (point.x == -1 && point.y == -1)
 	{
         wxSize size = GetSize();
         point.x = size.x / 2;
         point.y = size.y / 2;
-    } 
-	else 
+    }
+	else
 	{
         point = ScreenToClient(point);
     }
@@ -437,8 +444,8 @@ void wxGxContentView::SetStyle(LISTSTYLE style)
         SetSingleStyle(wxLC_LIST);
 		//SetWindowStyleFlag(m_style | wxLC_LIST );
 		break;
-	}    
-    
+	}
+
     switch(m_current_style)
 	{
 	case REPORT:
@@ -455,6 +462,9 @@ void wxGxContentView::SetStyle(LISTSTYLE style)
 		break;
 	}
 	m_current_style = style;
+#ifdef __WXGTK__
+    OnRefreshAll();
+#endif
 }
 
 //void wxGxContentView::UpdateSelection(void)
@@ -508,7 +518,7 @@ void wxGxContentView::OnBeginLabelEdit(wxListEvent& event)
 		event.Veto();
 		return;
 	}
-	if(!pObjEdit->CanRename())	
+	if(!pObjEdit->CanRename())
 	{
 		event.Veto();
 		return;
@@ -638,11 +648,11 @@ void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiato
 {
 	if(nInitiator == GetId())
 		return;
-	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();	
+	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
 	//if(m_pParentGxObject == pGxObj)
 	//	return;
 
-	//reset 
+	//reset
 	ResetContents();
 	m_pParentGxObject = pGxObj;
 
@@ -699,7 +709,7 @@ void wxGxContentView::OnBeginDrag(wxListEvent& event)
             continue;
         IGxDataset* pDSet = dynamic_cast<IGxDataset*>(pItemData->pObject);
         if(pDSet)
-        {        
+        {
             my_data.AddFile(pDSet->GetPath());
         }
     }
