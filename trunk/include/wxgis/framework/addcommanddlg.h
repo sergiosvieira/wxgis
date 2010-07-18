@@ -22,22 +22,22 @@
 //#include "wxgis/framework/framework.h"
 #include "wxgis/framework/application.h"
 
-#include <wx/intl.h>
+#include "wx/intl.h"
 
-#include <wx/gdicmn.h>
-#include <wx/aui/auibook.h>
-#include <wx/font.h>
-#include <wx/colour.h>
-#include <wx/settings.h>
-#include <wx/string.h>
-#include <wx/sizer.h>
-#include <wx/button.h>
-#include <wx/dialog.h>
-#include <wx/splitter.h>
-#include <wx/checklst.h>
-#include <wx/listctrl.h>
-#include <wx/panel.h>
-#include <wx/listbox.h>
+#include "wx/gdicmn.h"
+#include "wx/aui/auibook.h"
+#include "wx/font.h"
+#include "wx/colour.h"
+#include "wx/settings.h"
+#include "wx/string.h"
+#include "wx/sizer.h"
+#include "wx/button.h"
+#include "wx/dialog.h"
+#include "wx/splitter.h"
+#include "wx/checklst.h"
+#include "wx/listctrl.h"
+#include "wx/panel.h"
+#include "wx/listbox.h"
 
 
 class WXDLLIMPEXP_GIS_FRW wxGISAddCommandDlg : public wxDialog
@@ -57,9 +57,9 @@ private:
 	CATEGORYMAP m_CategoryMap;
 
 protected:
-	wxSplitterWindow* m_splitter2;
-	wxListBox* m_listBox1;
-	wxListView* m_listCtrl3;
+	wxSplitterWindow* m_Splitter;
+	wxListBox* m_ListBox;
+	wxListView* m_ListCtrl;
 	wxGISApplication* m_pGxApp;
 	wxImageList m_ImageList;
 	int m_CurSelection;
@@ -71,10 +71,10 @@ public:
 	wxGISAddCommandDlg( wxGISApplication* pGxApp, wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Add command"),const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,400 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 	~wxGISAddCommandDlg(void);
 	void FillIDArray(void);
-	void m_splitter2OnIdle( wxIdleEvent& )
+	void SplitterOnIdle( wxIdleEvent& )
 	{
-	m_splitter2->SetSashPosition( 150 );
-	m_splitter2->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISAddCommandDlg::m_splitter2OnIdle ), NULL, this );
+		m_Splitter->SetSashPosition( 150 );
+		m_Splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISAddCommandDlg::SplitterOnIdle ), NULL, this );
 	}	
 	//events
 	void OnListboxSelect(wxCommandEvent& event);

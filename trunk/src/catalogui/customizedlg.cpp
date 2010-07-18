@@ -22,17 +22,21 @@
 #include "wxgis/framework/keycodedlg.h"
 #include "wxgis/framework/createcbdlg.h"
 #include "wxgis/framework/addcommanddlg.h"
-#include <wx/accel.h>
-#include <wx/utils.h>
+#include "wx/accel.h"
+#include "wx/utils.h"
+
+#include "../../art/check_16.xpm"
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISToolBarPanel
 ///////////////////////////////////////////////////////////////////////////////
 BEGIN_EVENT_TABLE(wxGISToolBarPanel, wxPanel)
-	EVT_LISTBOX(wxGISToolBarPanel::ID_CHKLSTBX, wxGISToolBarPanel::OnListboxSelect)
+	EVT_LEFT_DOWN( wxGISToolBarPanel::OnLeftDown )
+	EVT_TREE_SEL_CHANGED(wxGISToolBarPanel::ID_TREECTRL, wxGISToolBarPanel::OnSelChanged)
+	//EVT_LISTBOX(wxGISToolBarPanel::ID_CHKLSTBX, wxGISToolBarPanel::OnListboxSelect)
 	EVT_SPLITTER_DCLICK(wxID_ANY, wxGISToolBarPanel::OnDoubleClickSash)
-	EVT_CHECKLISTBOX(wxGISToolBarPanel::ID_CHKLSTBX, wxGISToolBarPanel::OnCheckboxToggle)
+	//EVT_CHECKLISTBOX(wxGISToolBarPanel::ID_CHKLSTBX, wxGISToolBarPanel::OnCheckboxToggle)
 	EVT_LIST_ITEM_RIGHT_CLICK(wxGISToolBarPanel::ID_BUTTONSLST, wxGISToolBarPanel::OnListctrlRClick)
 	EVT_LIST_ITEM_ACTIVATED(wxGISToolBarPanel::ID_BUTTONSLST, wxGISToolBarPanel::OnListctrlActivated)
 	EVT_MENU(wxGISToolBarPanel::ID_ONSETKEYCODE, wxGISToolBarPanel::OnSetKeyCode)
@@ -48,19 +52,20 @@ END_EVENT_TABLE()
 wxGISToolBarPanel::wxGISToolBarPanel(wxGxApplication* pGxApp, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style ), m_bToolsFocus(false), m_bCmdFocus(false)
 {
 	m_pGxApp = pGxApp;
-	wxBoxSizer* bSizer;
-	bSizer = new wxBoxSizer( wxHORIZONTAL );
+	wxBoxSizer* bSizer = new wxBoxSizer( wxHORIZONTAL );
 
-	m_splitter1 = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D  | wxNO_BORDER);
-	m_splitter1->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISToolBarPanel::m_splitter1OnIdle ), NULL, this );
-	bSizer->Add( m_splitter1, 1, wxEXPAND, 5 );
+	m_Splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D  | wxNO_BORDER);
+	m_Splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISToolBarPanel::SplitterOnIdle ), NULL, this );
+	bSizer->Add( m_Splitter, 1, wxEXPAND, 5 );
 
-	wxArrayString m_commandbarlistChoices;
-	m_commandbarlist = new wxCheckListBox( m_splitter1, wxGISToolBarPanel::ID_CHKLSTBX, wxDefaultPosition, wxDefaultSize, m_commandbarlistChoices,  wxNO_BORDER );
-	/*bSizer->Add( m_toolbarlist, 0, wxALL, 5 );*/
+	//wxArrayString m_commandbarlistChoices;
+	//m_commandbarlist = new wxCheckListBox( m_Splitter, wxGISToolBarPanel::ID_CHKLSTBX, wxDefaultPosition, wxDefaultSize, m_commandbarlistChoices,  wxNO_BORDER );
+	m_TreeImageList.Create(16, 16);
+	m_TreeImageList.Add(wxBitmap(check_16_xpm));
+	m_pTreeCtrl = new wxTreeCtrl( m_Splitter, wxGISToolBarPanel::ID_TREECTRL, wxDefaultPosition, wxDefaultSize, /*wxTR_NO_BUTTONS | */wxTR_NO_LINES | wxTR_HIDE_ROOT | wxBORDER_NONE );
+	m_pTreeCtrl->SetImageList(&m_TreeImageList);
 
-	m_buttonslist = new wxListView( m_splitter1, wxGISToolBarPanel::ID_BUTTONSLST, wxDefaultPosition, wxDefaultSize,/* wxLC_NO_SORT_HEADER|*/wxLC_REPORT|wxLC_SINGLE_SEL/*|wxLC_SORT_ASCENDING*/  | wxNO_BORDER);
-	//bSizer->Add( m_buttonslist, 0, wxALL, 5 );
+	m_buttonslist = new wxListView( m_Splitter, wxGISToolBarPanel::ID_BUTTONSLST, wxDefaultPosition, wxDefaultSize,/* wxLC_NO_SORT_HEADER|*/wxLC_REPORT|wxLC_SINGLE_SEL/*|wxLC_SORT_ASCENDING*/  | wxNO_BORDER);
 	m_buttonslist->InsertColumn(0, _("Command Name"), wxLIST_FORMAT_LEFT, 90);
 	m_buttonslist->InsertColumn(1, _("Description"), wxLIST_FORMAT_LEFT, 120);
 	m_buttonslist->InsertColumn(2, _("KeyCode"), wxLIST_FORMAT_LEFT, 60);
@@ -89,8 +94,11 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGxApplication* pGxApp, wxWindow* parent, 
 
 	bSizer->Add( bSizer3, 0, wxEXPAND, 5 );
 
-	m_splitter1->SetSashGravity(0.5);
-	m_splitter1->SplitVertically(m_commandbarlist, m_buttonslist, 100);
+	m_Splitter->SetSashGravity(0.5);
+//	m_Splitter->SplitVertically(m_commandbarlist, m_buttonslist, 100);
+	m_Splitter->SplitVertically(m_pTreeCtrl, m_buttonslist, 100);
+	m_pTreeCtrl->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( wxGISToolBarPanel::OnLeftDown ), NULL, this );
+
 
 	m_pContextMenu = new wxMenu(/*_("Command menu")*/);
 	wxMenuItem *item = new wxMenuItem(m_pContextMenu, ID_ONSETKEYCODE, _("Set keycode"));
@@ -101,13 +109,24 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGxApplication* pGxApp, wxWindow* parent, 
 	this->Layout();
 
 	//load toolbars & menues
-	unsigned int counter(0);
-	m_nMenubarPos = counter;
 
-	wxString sName = _("--- Menubar ---");
-	m_commandbarlist->Insert(sName, counter);
-	m_CategoryArray.push_back(NULL);
-	counter++;
+	//add root
+	wxTreeItemId nRootId = m_pTreeCtrl->AddRoot(wxT("Commands"));
+	//add sets
+	m_nMenubarId = m_pTreeCtrl->AppendItem(nRootId, _("Menubar"), 2, 2);
+	m_pTreeCtrl->SetItemBold(m_nMenubarId);
+	m_nContextMenuesId = m_pTreeCtrl->AppendItem(nRootId, _("Context Menues"), 2, 2);
+	m_pTreeCtrl->SetItemBold(m_nContextMenuesId);
+	m_nToolBarsId = m_pTreeCtrl->AppendItem(nRootId, _("ToolBars"), 2, 2);
+	m_pTreeCtrl->SetItemBold(m_nToolBarsId);
+
+	//unsigned int counter(0);
+	//m_nMenubarPos = counter;
+
+	//wxString sName = _("--- Menubar ---");
+	//m_commandbarlist->Insert(sName, counter);
+	//m_CategoryArray.push_back(NULL);
+	//counter++;
 
 	wxGISMenuBar* pwxGISMenuBar = m_pGxApp->GetMenuBar();
 	COMMANDBARARRAY* pMenuBarArray = pwxGISMenuBar->GetMenuBarArray();
@@ -116,17 +135,20 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGxApplication* pGxApp, wxWindow* parent, 
 		IGISCommandBar* pBar = pMenuBarArray->at(i);
 		wxString sCaption = pBar->GetCaption();
 		sCaption += wxString(_(" menu"));
+		sCaption.Replace(wxT("&"), wxT(""));
 
-		m_CategoryArray.push_back(pBar);
+		m_pTreeCtrl->AppendItem(m_nMenubarId, sCaption, -1, -1, new wxBarTreeItemData(pBar));
 
-		m_commandbarlist->Insert(sCaption, counter);
-		m_commandbarlist->Check(counter);
-		counter++;
+	//	m_CategoryArray.push_back(pBar);
+
+	//	m_commandbarlist->Insert(sCaption, counter);
+	//	m_commandbarlist->Check(counter);
+	//	counter++;
 	}
-	m_nContextMenuPos = counter;
-	m_CategoryArray.push_back(NULL);
-	m_commandbarlist->Insert(_("--- Context menues ---"), counter);
-	counter++;
+	//m_nContextMenuPos = counter;
+	//m_CategoryArray.push_back(NULL);
+	//m_commandbarlist->Insert(_("--- Context menues ---"), counter);
+	//counter++;
 
 	COMMANDBARARRAY* pMenuArray = m_pGxApp->GetCommandBars();
 	for(size_t i = 0; i < pMenuArray->size(); i++)
@@ -136,35 +158,60 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGxApplication* pGxApp, wxWindow* parent, 
 		{
 			wxString sCaption = pBar->GetCaption();
 			sCaption += wxString(_(" context menu"));
+			sCaption.Replace(wxT(".ContextMenu"), wxT(""));
+			sCaption.Replace(wxT("wxGx"), wxT(""));
 
-			m_CategoryArray.push_back(pBar);
-
-			m_commandbarlist->Insert(sCaption, counter);
-			counter++;
+			m_pTreeCtrl->AppendItem(m_nContextMenuesId, sCaption, -1, -1, new wxBarTreeItemData(pBar));
 		}
-	}
-
-	m_nToolbarPos = counter;
-	m_commandbarlist->Insert(_("--- ToolBars ---"), counter);
-	m_CategoryArray.push_back(NULL);
-	counter++;
-
-	COMMANDBARARRAY* pToolBarArray = m_pGxApp->GetCommandBars();
-	for(size_t i = 0; i < pToolBarArray->size(); i++)
-	{
-		IGISCommandBar* pBar = pToolBarArray->at(i);
-		if(pBar->GetType() == enumGISCBToolbar)
+		else if(pBar->GetType() == enumGISCBToolbar)
 		{
 			wxString sCaption = pBar->GetCaption();
 			sCaption += wxString(_(" toolbar"));
 
-			m_CategoryArray.push_back(pBar);
-
-			m_commandbarlist->Insert(sCaption, counter);
-			m_commandbarlist->Check(counter, m_pGxApp->IsPaneShown(pBar->GetName()));
-			counter++;
+			int nImgIndex = m_pGxApp->IsPaneShown(pBar->GetName()) == true ? 1 : 0;
+			m_pTreeCtrl->AppendItem(m_nToolBarsId, sCaption, nImgIndex, nImgIndex, new wxBarTreeItemData(pBar));
 		}
 	}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+	//for(size_t i = 0; i < pMenuArray->size(); i++)
+	//{
+	//	IGISCommandBar* pBar = pMenuArray->at(i);
+	//	if(pBar->GetType() == enumGISCBContextmenu)
+	//	{
+	//		wxString sCaption = pBar->GetCaption();
+	//		sCaption += wxString(_(" context menu"));
+
+	//		m_CategoryArray.push_back(pBar);
+
+	//		m_commandbarlist->Insert(sCaption, counter);
+	//		counter++;
+	//	}
+	//}
+
+	//m_nToolbarPos = counter;
+	//m_commandbarlist->Insert(_("--- ToolBars ---"), counter);
+	//m_CategoryArray.push_back(NULL);
+	//counter++;
+
+	//COMMANDBARARRAY* pToolBarArray = m_pGxApp->GetCommandBars();
+	//for(size_t i = 0; i < pToolBarArray->size(); i++)
+	//{
+	//	IGISCommandBar* pBar = pToolBarArray->at(i);
+	//	if(pBar->GetType() == enumGISCBToolbar)
+	//	{
+	//		wxString sCaption = pBar->GetCaption();
+	//		sCaption += wxString(_(" toolbar"));
+
+	//		m_CategoryArray.push_back(pBar);
+
+	//		m_commandbarlist->Insert(sCaption, counter);
+	//		m_commandbarlist->Check(counter, m_pGxApp->IsPaneShown(pBar->GetName()));
+	//		counter++;
+	//	}
+	//}
+	m_pTreeCtrl->ExpandAll();
 }
 
 wxGISToolBarPanel::~wxGISToolBarPanel()
@@ -177,65 +224,93 @@ void wxGISToolBarPanel::OnDoubleClickSash(wxSplitterEvent& event)
 	event.Veto();
 }
 
-void wxGISToolBarPanel::OnCheckboxToggle(wxCommandEvent& event)
-{
-	int pos = event.GetInt();
-	if(pos == wxNOT_FOUND)
-		return;
-	if(m_CategoryArray[pos] == NULL)
-	{
-		//event.Veto();
-		bool bIsChecked = m_commandbarlist->IsChecked(pos);
-		m_commandbarlist->Check(pos, !bIsChecked);
-	}
-	else if(m_CategoryArray[pos]->GetType() != enumGISCBToolbar)
-	{
-		//event.Veto();
-		bool bIsChecked = m_commandbarlist->IsChecked(pos);
-		m_commandbarlist->Check(pos, !bIsChecked);
-	}
-	else
-	{
-		IGISCommandBar* pToolBar = m_CategoryArray[pos];
-		if(pToolBar)
-		{
-			bool bIsChecked = m_commandbarlist->IsChecked(pos);
-			m_pGxApp->ShowPane(pToolBar->GetName(), bIsChecked);
-		}
-	}
-}
-
-void wxGISToolBarPanel::OnListboxSelect(wxCommandEvent& event)
+//void wxGISToolBarPanel::OnCheckboxToggle(wxCommandEvent& event)
+//{
+//	int pos = event.GetInt();
+//	//if(pos == wxNOT_FOUND)
+//	//	return;
+//	//if(m_CategoryArray[pos] == NULL)
+//	//{
+//	//	//event.Veto();
+//	//	bool bIsChecked = m_commandbarlist->IsChecked(pos);
+//	//	m_commandbarlist->Check(pos, !bIsChecked);
+//	//}
+//	//else if(m_CategoryArray[pos]->GetType() != enumGISCBToolbar)
+//	//{
+//	//	//event.Veto();
+//	//	bool bIsChecked = m_commandbarlist->IsChecked(pos);
+//	//	m_commandbarlist->Check(pos, !bIsChecked);
+//	//}
+//	//else
+//	//{
+//	//	IGISCommandBar* pToolBar = m_CategoryArray[pos];
+//	//	if(pToolBar)
+//	//	{
+//	//		bool bIsChecked = m_commandbarlist->IsChecked(pos);
+//	//		m_pGxApp->ShowPane(pToolBar->GetName(), bIsChecked);
+//	//	}
+//	//}
+//}
+//
+//void wxGISToolBarPanel::OnListboxSelect(wxCommandEvent& event)
+//{
+//	LoadCommands();
+//}
+void wxGISToolBarPanel::OnSelChanged(wxTreeEvent& event)
 {
 	LoadCommands();
 }
 
 void wxGISToolBarPanel::LoadCommands(void)
 {
-	m_buttonslist->DeleteAllItems();
-	int selpos = m_commandbarlist->GetSelection();
-	if(selpos == wxNOT_FOUND)
-		return;
+		m_buttonslist->DeleteAllItems();
+		m_ImageList.RemoveAll();
+	wxTreeItemId nSelId = m_pTreeCtrl->GetSelection();
+    if(nSelId.IsOk())
+    {
+		wxBarTreeItemData* pData = (wxBarTreeItemData*)m_pTreeCtrl->GetItemData(nSelId);
+		if(pData == NULL)
+			return;
+		IGISCommandBar* pBar = pData->m_pBar;
 
-	IGISCommandBar* pwxGISCommandBar = m_CategoryArray[selpos];
-	if(pwxGISCommandBar == NULL)
-		return;
+		for(size_t i = 0; i < pBar->GetCommandCount(); i++)
+		{
+			ICommand* pCommand = pBar->GetCommand(i);
+			wxString sName = wxStripMenuCodes(pCommand->GetCaption());
+			wxString sMessage = pCommand->GetMessage();
 
-	m_ImageList.RemoveAll();
-	for(size_t i = 0; i < pwxGISCommandBar->GetCommandCount(); i++)
-	{
-		ICommand* pCommand = pwxGISCommandBar->GetCommand(i);
-		wxString sName = wxStripMenuCodes(pCommand->GetCaption());
-		wxString sMessage = pCommand->GetMessage();
-
-		wxString sKeyCode = m_pGxApp->GetGISAcceleratorTable()->GetText(pCommand->GetID());
-		int nIndex = m_ImageList.Add(pCommand->GetBitmap());
-		long pos = m_buttonslist->InsertItem(i, sName, nIndex);
-		m_buttonslist->SetItem(pos, 1, sMessage);
-		m_buttonslist->SetItem(pos, 2, sKeyCode);
-		m_buttonslist->SetItemData(pos, pCommand->GetID());
+			wxString sKeyCode = m_pGxApp->GetGISAcceleratorTable()->GetText(pCommand->GetID());
+			int nIndex = m_ImageList.Add(pCommand->GetBitmap());
+			long pos = m_buttonslist->InsertItem(i, sName, nIndex);
+			m_buttonslist->SetItem(pos, 1, sMessage);
+			m_buttonslist->SetItem(pos, 2, sKeyCode);
+			m_buttonslist->SetItemData(pos, pCommand->GetID());
+		}
+		m_buttonslist->Update();
 	}
-	m_buttonslist->Update();
+	//int selpos = m_commandbarlist->GetSelection();
+	//if(selpos == wxNOT_FOUND)
+	//	return;
+
+	//IGISCommandBar* pwxGISCommandBar = m_CategoryArray[selpos];
+	//if(pwxGISCommandBar == NULL)
+	//	return;
+
+	//m_ImageList.RemoveAll();
+	//for(size_t i = 0; i < pwxGISCommandBar->GetCommandCount(); i++)
+	//{
+	//	ICommand* pCommand = pwxGISCommandBar->GetCommand(i);
+	//	wxString sName = wxStripMenuCodes(pCommand->GetCaption());
+	//	wxString sMessage = pCommand->GetMessage();
+
+	//	wxString sKeyCode = m_pGxApp->GetGISAcceleratorTable()->GetText(pCommand->GetID());
+	//	int nIndex = m_ImageList.Add(pCommand->GetBitmap());
+	//	long pos = m_buttonslist->InsertItem(i, sName, nIndex);
+	//	m_buttonslist->SetItem(pos, 1, sMessage);
+	//	m_buttonslist->SetItem(pos, 2, sKeyCode);
+	//	m_buttonslist->SetItemData(pos, pCommand->GetID());
+	//}
+	//m_buttonslist->Update();
 }
 
 
@@ -291,10 +366,19 @@ void wxGISToolBarPanel::OnUpdateUI(wxUpdateUIEvent& event)
 		m_bCmdFocus = true;
 		m_bToolsFocus = false;
 	}
-	if(wxWindow::FindFocus() == m_commandbarlist)
+	if(wxWindow::FindFocus() == m_pTreeCtrl/*m_commandbarlist*/)
 	{
 		m_bCmdFocus = false;
 		m_bToolsFocus = true;
+	}
+
+	IGISCommandBar* pBar(NULL);
+	wxTreeItemId nSelId = m_pTreeCtrl->GetSelection();
+	if(nSelId.IsOk())
+	{
+		wxBarTreeItemData* pData = (wxBarTreeItemData*)m_pTreeCtrl->GetItemData(nSelId);
+		if(pData != NULL)
+			pBar = pData->m_pBar;
 	}
 
 	switch(event.GetId())
@@ -302,28 +386,33 @@ void wxGISToolBarPanel::OnUpdateUI(wxUpdateUIEvent& event)
 	case wxGISToolBarPanel::ID_CREATECB:
 		break;
 	case wxGISToolBarPanel::ID_DELETECB:
-		if(m_commandbarlist->GetSelection() == wxNOT_FOUND)
+		//if(m_commandbarlist->GetSelection() == wxNOT_FOUND)
+		if(pBar == NULL)
 			event.Enable(false);
 		else
-		{
-			int pos = m_commandbarlist->GetSelection();
-			if(pos != m_nContextMenuPos && pos != m_nMenubarPos && pos != m_nToolbarPos)
-				event.Enable(true);
-			else
-				event.Enable(false);
-		}
+			event.Enable(true);
+		//{
+		//	//int pos = m_commandbarlist->GetSelection();
+		//	//if(pos != m_nContextMenuPos && pos != m_nMenubarPos && pos != m_nToolbarPos)
+		//	//	event.Enable(true);
+		//	//else
+		//	//	event.Enable(false);
+		//}
 		break;
 	case wxGISToolBarPanel::ID_ADDBUTTON:
-		if(m_commandbarlist->GetSelection() == wxNOT_FOUND)
+		//if(m_commandbarlist->GetSelection() == wxNOT_FOUND)
+		if(pBar == NULL)
 			event.Enable(false);
 		else
-		{
-			int pos = m_commandbarlist->GetSelection();
-			if(pos != m_nContextMenuPos && pos != m_nMenubarPos && pos != m_nToolbarPos)
-				event.Enable(true);
-			else
-				event.Enable(false);
-		}
+			event.Enable(true);
+		//else
+		//{
+		//	int pos = m_commandbarlist->GetSelection();
+		//	if(pos != m_nContextMenuPos && pos != m_nMenubarPos && pos != m_nToolbarPos)
+		//		event.Enable(true);
+		//	else
+		//		event.Enable(false);
+		//}
 		break;
 	case wxGISToolBarPanel::ID_REMOVEBUTTON:
 		if(m_buttonslist->GetSelectedItemCount() == 1)
@@ -343,18 +432,29 @@ void wxGISToolBarPanel::OnUpdateUI(wxUpdateUIEvent& event)
 		}
 		if(m_bToolsFocus)
 		{
-			int selpos = m_commandbarlist->GetSelection();
-			if(selpos != wxNOT_FOUND)
+			if(pBar != NULL && pBar->GetType() == enumGISCBMenubar)
 			{
-				if(m_CategoryArray[selpos] != NULL && m_CategoryArray[selpos]->GetType() == enumGISCBMenubar)
+				wxGISMenuBar* pwxGISMenuBar = m_pGxApp->GetMenuBar();
+				int nPos = pwxGISMenuBar->GetMenuPos(pBar);
+				if(nPos > 0)
 				{
-					if(selpos > m_nMenubarPos + 1 && selpos <= m_nContextMenuPos - 1)
-						event.Enable(true);
-					else
-						event.Enable(false);
+					event.Enable(true);
 					break;
 				}
 			}
+
+			//int selpos = m_commandbarlist->GetSelection();
+			//if(selpos != wxNOT_FOUND)
+			//{
+			//	if(m_CategoryArray[selpos] != NULL && m_CategoryArray[selpos]->GetType() == enumGISCBMenubar)
+			//	{
+			//		if(selpos > m_nMenubarPos + 1 && selpos <= m_nContextMenuPos - 1)
+			//			event.Enable(true);
+			//		else
+			//			event.Enable(false);
+			//		break;
+			//	}
+			//}
 		}
 		event.Enable(false);
 		break;
@@ -370,18 +470,29 @@ void wxGISToolBarPanel::OnUpdateUI(wxUpdateUIEvent& event)
 		}
 		if(m_bToolsFocus)
 		{
-			int selpos = m_commandbarlist->GetSelection();
-			if(selpos != wxNOT_FOUND)
+			if(pBar != NULL && pBar->GetType() == enumGISCBMenubar)
 			{
-				if(m_CategoryArray[selpos] != NULL && m_CategoryArray[selpos]->GetType() == enumGISCBMenubar)
+				wxGISMenuBar* pwxGISMenuBar = m_pGxApp->GetMenuBar();
+				int nPos = pwxGISMenuBar->GetMenuPos(pBar);
+				int nCount = m_pTreeCtrl->GetChildrenCount(m_nMenubarId);
+				if(nPos < nCount - 1)
 				{
-					if(selpos >= m_nMenubarPos + 1 && selpos < m_nContextMenuPos - 1)
-						event.Enable(true);
-					else
-						event.Enable(false);
+					event.Enable(true);
 					break;
 				}
 			}
+			//int selpos = m_commandbarlist->GetSelection();
+			//if(selpos != wxNOT_FOUND)
+			//{
+			//	if(m_CategoryArray[selpos] != NULL && m_CategoryArray[selpos]->GetType() == enumGISCBMenubar)
+			//	{
+			//		if(selpos >= m_nMenubarPos + 1 && selpos < m_nContextMenuPos - 1)
+			//			event.Enable(true);
+			//		else
+			//			event.Enable(false);
+			//		break;
+			//	}
+			//}
 		}
 		event.Enable(false);
 		break;
@@ -402,13 +513,17 @@ void wxGISToolBarPanel::OnCreateCommandBar(wxCommandEvent& event)
 			{
 				wxString sCaption = pMenu->GetCaption();
 				sCaption += wxString(_(" menu"));
+				sCaption.Replace(wxT("&"), wxT(""));
 
-				m_CategoryArray.insert(m_CategoryArray.begin() + m_nContextMenuPos, static_cast<IGISCommandBar*>(pMenu));
+				IGISCommandBar* pBar = static_cast<IGISCommandBar*>(pMenu);
+				m_pTreeCtrl->AppendItem(m_nMenubarId, sCaption, -1, -1, new wxBarTreeItemData(pBar));
 
-				m_commandbarlist->Insert(sCaption, m_nContextMenuPos);
-				m_commandbarlist->Check(m_nContextMenuPos);
-				m_nContextMenuPos++;
-				m_nToolbarPos++;
+				//m_CategoryArray.insert(m_CategoryArray.begin() + m_nContextMenuPos, static_cast<IGISCommandBar*>(pMenu));
+
+				//m_commandbarlist->Insert(sCaption, m_nContextMenuPos);
+				//m_commandbarlist->Check(m_nContextMenuPos);
+				//m_nContextMenuPos++;
+				//m_nToolbarPos++;
 			}
 			}
 			break;
@@ -420,11 +535,13 @@ void wxGISToolBarPanel::OnCreateCommandBar(wxCommandEvent& event)
 				wxString sCaption = pMenu->GetCaption();
 				sCaption += wxString(_(" context menu"));
 
-				m_CategoryArray.insert(m_CategoryArray.begin() + m_nToolbarPos, static_cast<IGISCommandBar*>(pMenu));
+				IGISCommandBar* pBar = static_cast<IGISCommandBar*>(pMenu);
+				m_pTreeCtrl->AppendItem(m_nContextMenuesId, sCaption, -1, -1, new wxBarTreeItemData(pBar));
+				//m_CategoryArray.insert(m_CategoryArray.begin() + m_nToolbarPos, static_cast<IGISCommandBar*>(pMenu));
 
-				m_commandbarlist->Insert(sCaption, m_nToolbarPos);
-				m_commandbarlist->Check(m_nToolbarPos, false);
-				m_nToolbarPos++;
+				//m_commandbarlist->Insert(sCaption, m_nToolbarPos);
+				//m_commandbarlist->Check(m_nToolbarPos, false);
+				//m_nToolbarPos++;
 			}
 			}
 			break;
@@ -454,10 +571,13 @@ void wxGISToolBarPanel::OnCreateCommandBar(wxCommandEvent& event)
 				wxString sCaption = pGISToolBar->GetCaption();
 				sCaption += wxString(_(" toolbar"));
 
-				m_CategoryArray.push_back(static_cast<IGISCommandBar*>(pGISToolBar));
+				IGISCommandBar* pBar = static_cast<IGISCommandBar*>(pGISToolBar);
+				int nImgIndex = m_pGxApp->IsPaneShown(pBar->GetName()) == true ? 1 : 0;
+				m_pTreeCtrl->AppendItem(m_nToolBarsId, sCaption, nImgIndex, nImgIndex, new wxBarTreeItemData(pBar));
+				//m_CategoryArray.push_back(static_cast<IGISCommandBar*>(pGISToolBar));
 
-				m_commandbarlist->Append(sCaption);
-				m_commandbarlist->Check(m_commandbarlist->GetCount() - 1, m_pGxApp->IsPaneShown(pGISToolBar->GetName()));
+				//m_commandbarlist->Append(sCaption);
+				//m_commandbarlist->Check(m_commandbarlist->GetCount() - 1, m_pGxApp->IsPaneShown(pGISToolBar->GetName()));
 			}
 			}
 			break;
@@ -471,12 +591,22 @@ void wxGISToolBarPanel::OnCreateCommandBar(wxCommandEvent& event)
 
 void wxGISToolBarPanel::OnDeleteCommandBar(wxCommandEvent& event)
 {
-	int selpos = m_commandbarlist->GetSelection();
-	if(selpos != wxNOT_FOUND)
-	{
-		m_commandbarlist->Delete(selpos);
-		m_pGxApp->RemoveCommandBar(m_CategoryArray[selpos]);
-	}
+	wxTreeItemId nSelId = m_pTreeCtrl->GetSelection();
+	if(!nSelId.IsOk())
+		return;
+	wxBarTreeItemData* pData = (wxBarTreeItemData*)m_pTreeCtrl->GetItemData(nSelId);
+	if(pData == NULL)
+		return;
+	IGISCommandBar* pBar = pData->m_pBar;
+	m_pTreeCtrl->Delete(nSelId);
+	m_pGxApp->RemoveCommandBar(pBar);
+
+	//int selpos = m_commandbarlist->GetSelection();
+	//if(selpos != wxNOT_FOUND)
+	//{
+	//	m_commandbarlist->Delete(selpos);
+	//	m_pGxApp->RemoveCommandBar(m_CategoryArray[selpos]);
+	//}
 }
 
 void wxGISToolBarPanel::OnAddButton(wxCommandEvent& event)
@@ -484,22 +614,30 @@ void wxGISToolBarPanel::OnAddButton(wxCommandEvent& event)
 	wxGISAddCommandDlg dlg(m_pGxApp, this);
 	if(dlg.ShowModal() == wxID_OK)
 	{
+		wxTreeItemId nSelId = m_pTreeCtrl->GetSelection();
+		if(!nSelId.IsOk())
+			return;
+		wxBarTreeItemData* pData = (wxBarTreeItemData*)m_pTreeCtrl->GetItemData(nSelId);
+		if(pData == NULL)
+			return;
+		IGISCommandBar* pBar = pData->m_pBar;
+		wxWindow* pWnd = dynamic_cast<wxWindow*>(pBar);
+
 		for(size_t i = 0; i < dlg.m_IDArray.size(); i++)
 		{
-			int selpos = m_commandbarlist->GetSelection();
-			if(selpos < 0 || selpos >= m_CategoryArray.size())
-				return;
-			IGISCommandBar* pBar = m_CategoryArray[selpos];
+			//int selpos = m_commandbarlist->GetSelection();
+			//if(selpos < 0 || selpos >= m_CategoryArray.size())
+			//	return;
+			//IGISCommandBar* pBar = m_CategoryArray[selpos];
 			pBar->AddCommand(m_pGxApp->GetCommand(dlg.m_IDArray[i]));
-			wxWindow* pWnd = dynamic_cast<wxWindow*>(pBar);
 			if(pWnd)
 			{
 				wxSize sz = pWnd->GetSize();
 				m_pGxApp->GetAuiManager()->GetPane(pWnd).BestSize(sz);
 			}
-			m_pGxApp->GetAuiManager()->Update();
-			LoadCommands();
 		}
+		m_pGxApp->GetAuiManager()->Update();
+		LoadCommands();
 	}
 }
 
@@ -508,53 +646,75 @@ void wxGISToolBarPanel::OnRemoveButton(wxCommandEvent& event)
 	long item = GetSelectedCommandItem();
 	if(item != wxNOT_FOUND)
 	{
-		int selpos = m_commandbarlist->GetSelection();
-		if(selpos != wxNOT_FOUND)
+		wxTreeItemId nSelId = m_pTreeCtrl->GetSelection();
+		if(nSelId.IsOk())
 		{
 			m_buttonslist->DeleteItem(item);
-			m_CategoryArray[selpos]->RemoveCommand(item);
-			wxWindow* pWnd = dynamic_cast<wxWindow*>(m_CategoryArray[selpos]);
-			if(pWnd)
+			wxBarTreeItemData* pData = (wxBarTreeItemData*)m_pTreeCtrl->GetItemData(nSelId);
+			if(pData != NULL)
 			{
-				wxSize sz = pWnd->GetSize();
-				m_pGxApp->GetAuiManager()->GetPane(pWnd).BestSize(sz);
+				IGISCommandBar* pBar = pData->m_pBar;
+				pBar->RemoveCommand(item);
+				wxWindow* pWnd = dynamic_cast<wxWindow*>(pBar);
+				if(pWnd)
+				{
+					wxSize sz = pWnd->GetSize();
+					m_pGxApp->GetAuiManager()->GetPane(pWnd).BestSize(sz);
+				}
+				m_pGxApp->GetAuiManager()->Update();
 			}
-			m_pGxApp->GetAuiManager()->Update();
 		}
+		//int selpos = m_commandbarlist->GetSelection();
+		//if(selpos != wxNOT_FOUND)
+		//{
+		//	m_buttonslist->DeleteItem(item);
+		//	m_CategoryArray[selpos]->RemoveCommand(item);
+		//	wxWindow* pWnd = dynamic_cast<wxWindow*>(m_CategoryArray[selpos]);
+		//	if(pWnd)
+		//	{
+		//		wxSize sz = pWnd->GetSize();
+		//		m_pGxApp->GetAuiManager()->GetPane(pWnd).BestSize(sz);
+		//	}
+		//	m_pGxApp->GetAuiManager()->Update();
+		//}
 	}
 }
 
 void wxGISToolBarPanel::OnMoveUp(wxCommandEvent& event)
 {
-	int selpos = m_commandbarlist->GetSelection();
-	if(selpos == wxNOT_FOUND)
+	wxTreeItemId nSelId = m_pTreeCtrl->GetSelection();
+	if(!nSelId.IsOk())
 		return;
+	wxBarTreeItemData* pData = (wxBarTreeItemData*)m_pTreeCtrl->GetItemData(nSelId);
+	if(pData == NULL)
+		return;
+	IGISCommandBar* pBar = pData->m_pBar;
 	if(m_bToolsFocus)
 	{
-		wxString sCaption = m_commandbarlist->GetString(selpos);
-		bool bIsCheck = m_commandbarlist->IsChecked(selpos);
-		m_commandbarlist->Delete(selpos);
-		m_commandbarlist->Insert(sCaption, selpos - 1);
-		m_commandbarlist->Check(selpos - 1, bIsCheck);
-		m_commandbarlist->Select(selpos - 1);
-		m_commandbarlist->Update();
+		wxString sCaption = pBar->GetCaption();
+		sCaption += wxString(_(" menu"));
+		sCaption.Replace(wxT("&"), wxT(""));
 
-		//swap
-		IGISCommandBar* pBar = m_CategoryArray[selpos];
-		m_CategoryArray[selpos] = m_CategoryArray[selpos - 1];
-		m_CategoryArray[selpos - 1] = pBar;
-
-		selpos -= (m_nMenubarPos + 1);
 		wxGISMenuBar* pwxGISMenuBar = m_pGxApp->GetMenuBar();
-		pwxGISMenuBar->MoveLeft(selpos);
+		int nPos = pwxGISMenuBar->GetMenuPos(pBar);
+		if(nPos == wxNOT_FOUND)
+			return;
+
+		wxTreeItemId nNewItemId = m_pTreeCtrl->InsertItem(m_nMenubarId, nPos - 1, sCaption, -1, -1, new wxBarTreeItemData(pBar));
+		m_pTreeCtrl->Delete(nSelId);
+		m_pTreeCtrl->SelectItem(nNewItemId);
+
+		pwxGISMenuBar->MoveLeft(nPos);
 		pwxGISMenuBar->Update();
+
+		m_pTreeCtrl->SetFocus();
 	}
 	if(m_bCmdFocus)
 	{
 		long item = GetSelectedCommandItem();
 		if(item != wxNOT_FOUND)
 		{
-			IGISCommandBar* pBar = m_CategoryArray[selpos];
+			//IGISCommandBar* pBar = m_CategoryArray[selpos];
 			pBar->MoveCommandLeft(item);
 			m_pGxApp->GetAuiManager()->Update();
 
@@ -563,39 +723,79 @@ void wxGISToolBarPanel::OnMoveUp(wxCommandEvent& event)
 			m_buttonslist->SetFocus();
 		}
 	}
+	//int selpos = m_commandbarlist->GetSelection();
+	//if(selpos == wxNOT_FOUND)
+	//	return;
+	//if(m_bToolsFocus)
+	//{
+	//	wxString sCaption = m_commandbarlist->GetString(selpos);
+	//	bool bIsCheck = m_commandbarlist->IsChecked(selpos);
+	//	m_commandbarlist->Delete(selpos);
+	//	m_commandbarlist->Insert(sCaption, selpos - 1);
+	//	m_commandbarlist->Check(selpos - 1, bIsCheck);
+	//	m_commandbarlist->Select(selpos - 1);
+	//	m_commandbarlist->Update();
+
+	//	//swap
+	//	IGISCommandBar* pBar = m_CategoryArray[selpos];
+	//	m_CategoryArray[selpos] = m_CategoryArray[selpos - 1];
+	//	m_CategoryArray[selpos - 1] = pBar;
+
+	//	selpos -= (m_nMenubarPos + 1);
+	//	wxGISMenuBar* pwxGISMenuBar = m_pGxApp->GetMenuBar();
+	//	pwxGISMenuBar->MoveLeft(selpos);
+	//	pwxGISMenuBar->Update();
+	//}
+	//if(m_bCmdFocus)
+	//{
+	//	long item = GetSelectedCommandItem();
+	//	if(item != wxNOT_FOUND)
+	//	{
+	//		IGISCommandBar* pBar = m_CategoryArray[selpos];
+	//		pBar->MoveCommandLeft(item);
+	//		m_pGxApp->GetAuiManager()->Update();
+
+	//		LoadCommands();
+	//		m_buttonslist->Select(item - 1);
+	//		m_buttonslist->SetFocus();
+	//	}
+	//}
 }
 
 void wxGISToolBarPanel::OnMoveDown(wxCommandEvent& event)
 {
-	int selpos = m_commandbarlist->GetSelection();
-	if(selpos == wxNOT_FOUND)
+	wxTreeItemId nSelId = m_pTreeCtrl->GetSelection();
+	if(!nSelId.IsOk())
 		return;
+	wxBarTreeItemData* pData = (wxBarTreeItemData*)m_pTreeCtrl->GetItemData(nSelId);
+	if(pData == NULL)
+		return;
+	IGISCommandBar* pBar = pData->m_pBar;
 	if(m_bToolsFocus)
 	{
-		wxString sCaption = m_commandbarlist->GetString(selpos);
-		bool bIsCheck = m_commandbarlist->IsChecked(selpos);
-		m_commandbarlist->Delete(selpos);
-		m_commandbarlist->Insert(sCaption, selpos + 1);
-		m_commandbarlist->Check(selpos + 1, bIsCheck);
-		m_commandbarlist->Select(selpos + 1);
-		m_commandbarlist->Update();
+		wxString sCaption = pBar->GetCaption();
+		sCaption += wxString(_(" menu"));
+		sCaption.Replace(wxT("&"), wxT(""));
 
-		//swap
-		IGISCommandBar* pBar = m_CategoryArray[selpos];
-		m_CategoryArray[selpos] = m_CategoryArray[selpos + 1];
-		m_CategoryArray[selpos + 1] = pBar;
-
-		selpos -= (m_nMenubarPos + 1);
 		wxGISMenuBar* pwxGISMenuBar = m_pGxApp->GetMenuBar();
-		pwxGISMenuBar->MoveRight(selpos);
+		int nPos = pwxGISMenuBar->GetMenuPos(pBar);
+		if(nPos == wxNOT_FOUND)
+			return;
+
+		wxTreeItemId nNewItemId = m_pTreeCtrl->InsertItem(m_nMenubarId, nPos + 2, sCaption, -1, -1, new wxBarTreeItemData(pBar));
+		m_pTreeCtrl->Delete(nSelId);
+		m_pTreeCtrl->SelectItem(nNewItemId);
+
+		pwxGISMenuBar->MoveRight(nPos);
 		pwxGISMenuBar->Update();
+
+		m_pTreeCtrl->SetFocus();
 	}
 	if(m_bCmdFocus)
 	{
 		long item = GetSelectedCommandItem();
 		if(item != wxNOT_FOUND)
 		{
-			IGISCommandBar* pBar = m_CategoryArray[selpos];
 			pBar->MoveCommandRight(item);
 			m_pGxApp->GetAuiManager()->Update();
 
@@ -603,6 +803,67 @@ void wxGISToolBarPanel::OnMoveDown(wxCommandEvent& event)
 			m_buttonslist->Select(item + 1);
 			m_buttonslist->SetFocus();
 		}
+	}
+
+	//int selpos = m_commandbarlist->GetSelection();
+	//if(selpos == wxNOT_FOUND)
+	//	return;
+	//if(m_bToolsFocus)
+	//{
+	//	wxString sCaption = m_commandbarlist->GetString(selpos);
+	//	bool bIsCheck = m_commandbarlist->IsChecked(selpos);
+	//	m_commandbarlist->Delete(selpos);
+	//	m_commandbarlist->Insert(sCaption, selpos + 1);
+	//	m_commandbarlist->Check(selpos + 1, bIsCheck);
+	//	m_commandbarlist->Select(selpos + 1);
+	//	m_commandbarlist->Update();
+
+	//	//swap
+	//	IGISCommandBar* pBar = m_CategoryArray[selpos];
+	//	m_CategoryArray[selpos] = m_CategoryArray[selpos + 1];
+	//	m_CategoryArray[selpos + 1] = pBar;
+
+	//	selpos -= (m_nMenubarPos + 1);
+	//	wxGISMenuBar* pwxGISMenuBar = m_pGxApp->GetMenuBar();
+	//	pwxGISMenuBar->MoveRight(selpos);
+	//	pwxGISMenuBar->Update();
+	//}
+	//if(m_bCmdFocus)
+	//{
+	//	long item = GetSelectedCommandItem();
+	//	if(item != wxNOT_FOUND)
+	//	{
+	//		IGISCommandBar* pBar = m_CategoryArray[selpos];
+	//		pBar->MoveCommandRight(item);
+	//		m_pGxApp->GetAuiManager()->Update();
+
+	//		LoadCommands();
+	//		m_buttonslist->Select(item + 1);
+	//		m_buttonslist->SetFocus();
+	//	}
+	//}
+}
+
+void wxGISToolBarPanel::OnLeftDown(wxMouseEvent& event)
+{
+	event.Skip();
+	wxPoint pt = event.GetPosition();
+	unsigned long nFlags(0);
+	wxTreeItemId nItemId = m_pTreeCtrl->HitTest(pt, (int &)nFlags);
+	if(nItemId.IsOk() && (nFlags & wxTREE_HITTEST_ONITEMICON))
+	{
+		wxBarTreeItemData* pData = (wxBarTreeItemData*)m_pTreeCtrl->GetItemData(nItemId);
+		if(pData == NULL)
+			return;
+		IGISCommandBar* pBar = pData->m_pBar;
+		if(pBar->GetType() ==  enumGISCBToolbar)
+		{
+			bool bCheck = m_pGxApp->IsPaneShown(pBar->GetName());
+			bCheck = !bCheck;
+			m_pGxApp->ShowPane(pBar->GetName(), bCheck);
+			m_pTreeCtrl->SetItemImage(nItemId, bCheck == true ? 1 : 0);
+			m_pTreeCtrl->SetItemImage(nItemId, bCheck == true ? 1 : 0, wxTreeItemIcon_Selected);
+		}		
 	}
 }
 
@@ -776,20 +1037,17 @@ wxGISCustomizeDlg::wxGISCustomizeDlg( wxWindow* parent, wxWindowID id, const wxS
 	if(!m_pGxApp)
 		return;
 
-	wxBoxSizer* bSizerMain;
-	bSizerMain = new wxBoxSizer( wxVERTICAL );
+	wxBoxSizer* bSizerMain = new wxBoxSizer( wxVERTICAL );
 
-	m_auinotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE/*|wxSIMPLE_BORDER */);
-	m_auinotebook->AddPage(new wxGISToolBarPanel(m_pGxApp, m_auinotebook), _("ToolBars & Menues"));
-	m_auinotebook->AddPage(new wxGISCommandPanel(m_pGxApp, m_auinotebook), _("Commands"));
+	m_AuiNotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE );
+	m_AuiNotebook->AddPage(new wxGISToolBarPanel(m_pGxApp, m_AuiNotebook), _("ToolBars & Menues"));
+	m_AuiNotebook->AddPage(new wxGISCommandPanel(m_pGxApp, m_AuiNotebook), _("Commands"));
 
-	bSizerMain->Add( m_auinotebook, 1, wxEXPAND | wxALL, 5 );
+	bSizerMain->Add( m_AuiNotebook, 1, wxEXPAND | wxALL, 5 );
 
 	m_sdbSizer = new wxStdDialogButtonSizer();
 	m_sdbSizerOK = new wxButton( this, wxID_OK, wxString(_("Close")) );
 	m_sdbSizer->AddButton( m_sdbSizerOK );
-	//m_sdbSizerCancel = new wxButton( this, wxID_CANCEL );
-	//m_sdbSizer->AddButton( m_sdbSizerCancel );
 	m_sdbSizer->Realize();
 	bSizerMain->Add( m_sdbSizer, 0, wxALL|wxEXPAND, 5 );
 

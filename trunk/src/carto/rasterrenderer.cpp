@@ -103,11 +103,11 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 	    {
 		    //intersect bounds
 		    OGREnvelope DrawBounds = RasterEnvelope;
-            DrawBounds.Intersect(VisibleBounds);
-		    //DrawBounds.MinX = MAX(RasterEnvelope.MinX, VisibleBounds.MinX);
-		    //DrawBounds.MinY = MAX(RasterEnvelope.MinY, VisibleBounds.MinY);
-		    //DrawBounds.MaxX = MIN(RasterEnvelope.MaxX, VisibleBounds.MaxX);
-		    //DrawBounds.MaxY = MIN(RasterEnvelope.MaxY, VisibleBounds.MaxY);
+//            DrawBounds.Intersect(VisibleBounds);
+		    DrawBounds.MinX = MAX(RasterEnvelope.MinX, VisibleBounds.MinX);
+		    DrawBounds.MinY = MAX(RasterEnvelope.MinY, VisibleBounds.MinY);
+		    DrawBounds.MaxX = MIN(RasterEnvelope.MaxX, VisibleBounds.MaxX);
+		    DrawBounds.MaxY = MIN(RasterEnvelope.MaxY, VisibleBounds.MaxY);
             //convert draw bounds to DC coords
 		    OGRRawPoint OGRRawPoints[2];
 		    OGRRawPoints[0].x = DrawBounds.MinX;
@@ -451,7 +451,7 @@ wxImage wxGISRasterRGBRenderer::Scale(unsigned char* pData, int nOrigX, int nOri
 {
     ////simple way
     //wxImage ResultImage1(nOrigX, nOrigY, pData);
-    //ResultImage1 = ResultImage1.Scale(nDestX, nDestY, Quality);
+    //ResultImage1 = ResultImage1.Scale(nDestX, nDestY);
     //return ResultImage1;
 
     wxImage ResultImage(nDestX, nDestY, false);

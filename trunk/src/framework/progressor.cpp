@@ -58,9 +58,6 @@ void wxGISProgressor::OnPaint(wxPaintEvent & event)
 {
 	wxPaintDC dc(this);
     wxSize size = wxControl::GetClientSize();
-	//dc.SetBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
- //   dc.SetPen(*wxMEDIUM_GREY_PEN);
-	//dc.DrawRectangle( 0, 0, size.x, size.y);
 
 	wxBrush br(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     if(m_bPulse)
@@ -68,7 +65,8 @@ void wxGISProgressor::OnPaint(wxPaintEvent & event)
         if(m_nValue >= m_nRange + 22)
             m_nValue = 0;
 	    dc.SetBrush(br);
-	    dc.SetPen(wxNullPen);
+	    dc.SetPen(*wxTRANSPARENT_PEN);
+//	    dc.SetPen(wxNullPen);
 
         int pos = size.x * m_nValue / m_nRange;
         int psize = 8/*m_nRange / 12*/;
@@ -97,8 +95,8 @@ void wxGISProgressor::OnPaint(wxPaintEvent & event)
 
         dc.SetLogicalFunction(wxOR_REVERSE);
 
+	    dc.SetPen(*wxTRANSPARENT_PEN/*wxNullPen*/);
 	    dc.SetBrush(br);
-	    dc.SetPen(wxNullPen);
 	    dc.DrawRectangle( 0, 0, size.x * m_nValue / m_nRange, size.y);
     }
 }
