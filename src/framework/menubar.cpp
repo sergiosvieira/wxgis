@@ -80,6 +80,29 @@ void wxGISMenuBar::MoveRight(int pos)
 	Insert(pos + 1, Remove(pos), m_MenubarArray[pos + 1]->GetCaption());	
 }
 
+void wxGISMenuBar::MoveLeft(IGISCommandBar* pBar)
+{
+	int nPos = GetMenuPos(pBar);
+	if(nPos != wxNOT_FOUND)
+		MoveLeft(nPos);
+}
+
+void wxGISMenuBar::MoveRight(IGISCommandBar* pBar)
+{
+	int nPos = GetMenuPos(pBar);
+	if(nPos != wxNOT_FOUND)
+		MoveRight(nPos);
+}
+
+int wxGISMenuBar::GetMenuPos(IGISCommandBar* pBar)
+{
+	if(pBar == NULL)
+		return wxNOT_FOUND;
+	for(size_t i = 0; i < m_MenubarArray.size(); i++)
+		if(m_MenubarArray[i] == pBar)
+			return i;
+}
+
 void wxGISMenuBar::RemoveMenu(IGISCommandBar* pBar)
 {
 	for(size_t i = 0; i < m_MenubarArray.size(); i++)

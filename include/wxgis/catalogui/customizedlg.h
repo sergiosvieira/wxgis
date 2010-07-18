@@ -24,24 +24,43 @@
 //#include "wxgis/catalogui/catalogui.h"
 //#include "wxgis/framework/framework.h"
 
-#include <wx/intl.h>
+#include "wx/intl.h"
 
-#include <wx/gdicmn.h>
-#include <wx/aui/auibook.h>
-#include <wx/font.h>
-#include <wx/colour.h>
-#include <wx/settings.h>
-#include <wx/string.h>
-#include <wx/sizer.h>
-#include <wx/button.h>
-#include <wx/dialog.h>
-#include <wx/splitter.h>
-#include <wx/checklst.h>
-#include <wx/listctrl.h>
-#include <wx/panel.h>
-#include <wx/listbox.h>
+#include "wx/gdicmn.h"
+#include "wx/aui/auibook.h"
+#include "wx/font.h"
+#include "wx/colour.h"
+#include "wx/settings.h"
+#include "wx/string.h"
+#include "wx/sizer.h"
+#include "wx/button.h"
+#include "wx/dialog.h"
+#include "wx/splitter.h"
+#include "wx/checklst.h"
+#include "wx/listctrl.h"
+#include "wx/treectrl.h"
+#include "wx/panel.h"
+//#include "wx/listbox.h"
 
 ///////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+// wxBarTreeItemData
+//////////////////////////////////////////////////////////////////////////////
+
+class wxBarTreeItemData : public wxTreeItemData
+{
+public:
+	wxBarTreeItemData(IGISCommandBar* pBar)
+	{
+		m_pBar = pBar;
+	}
+
+	~wxBarTreeItemData(void)
+	{
+	}
+
+	IGISCommandBar* m_pBar;
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISToolBarPanel
@@ -50,7 +69,8 @@ class wxGISToolBarPanel : public wxPanel
 {
 	enum
 	{
-		ID_CHKLSTBX = wxID_HIGHEST + 30,
+		//ID_CHKLSTBX = wxID_HIGHEST + 30,
+		ID_TREECTRL = wxID_HIGHEST + 30,
 		ID_BUTTONSLST,
 		ID_ONSETKEYCODE,
 		ID_CREATECB,
@@ -60,36 +80,19 @@ class wxGISToolBarPanel : public wxPanel
 		ID_MOVECONTROLUP,
 		ID_MOVECONTROLDOWN
 	};
-private:
-	COMMANDBARARRAY m_CategoryArray;
-protected:
-	wxSplitterWindow* m_splitter1;
-	wxCheckListBox* m_commandbarlist;
-	wxListView* m_buttonslist;
-	wxButton* m_createbutton;
-	wxButton* m_deletebutton;
-	wxButton* m_addbutton;
-	wxButton* m_rembutton;
-	wxButton* m_moveup;
-	wxButton* m_movedown;
-	wxGxApplication* m_pGxApp;
-	wxImageList m_ImageList;
-	bool m_bToolsFocus, m_bCmdFocus;
-	wxMenu* m_pContextMenu;
-	int m_nContextMenuPos, m_nMenubarPos, m_nToolbarPos;
-
 public:
 	wxGISToolBarPanel(wxGxApplication* pGxApp, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,400 ), long style = wxTAB_TRAVERSAL );
 	~wxGISToolBarPanel();
-	void m_splitter1OnIdle( wxIdleEvent& )
+	void SplitterOnIdle( wxIdleEvent& )
 	{
-	m_splitter1->SetSashPosition( 150 );
-	m_splitter1->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISToolBarPanel::m_splitter1OnIdle ), NULL, this );
+		m_Splitter->SetSashPosition( 150 );
+		m_Splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISToolBarPanel::SplitterOnIdle ), NULL, this );
 	}
 	//events
-	void OnListboxSelect(wxCommandEvent& event);
+	void OnSelChanged(wxTreeEvent& event);
+	//void OnListboxSelect(wxCommandEvent& event);
 	void OnDoubleClickSash(wxSplitterEvent& event);
-	void OnCheckboxToggle(wxCommandEvent& event);
+	//void OnCheckboxToggle(wxCommandEvent& event);
 	void OnListctrlActivated(wxListEvent& event);
 	void OnListctrlRClick(wxListEvent& event);
 	void OnSetKeyCode(wxCommandEvent& event);
@@ -100,10 +103,30 @@ public:
 	void OnRemoveButton(wxCommandEvent& event);
 	void OnMoveUp(wxCommandEvent& event);
 	void OnMoveDown(wxCommandEvent& event);
+	void OnLeftDown(wxMouseEvent& event);
 
 	void SetKeyCode(int pos);
 	long GetSelectedCommandItem(void);
 	void LoadCommands(void);
+//private:
+//	COMMANDBARARRAY m_CategoryArray;
+protected:
+	wxSplitterWindow* m_Splitter;
+	//wxCheckListBox* m_commandbarlist;
+	wxTreeCtrl* m_pTreeCtrl;
+	wxListView* m_buttonslist;
+	wxButton* m_createbutton;
+	wxButton* m_deletebutton;
+	wxButton* m_addbutton;
+	wxButton* m_rembutton;
+	wxButton* m_moveup;
+	wxButton* m_movedown;
+	wxGxApplication* m_pGxApp;
+	wxImageList m_ImageList, m_TreeImageList;
+	wxMenu* m_pContextMenu;
+	bool m_bToolsFocus, m_bCmdFocus;
+	//int m_nContextMenuPos, m_nMenubarPos, m_nToolbarPos;
+	wxTreeItemId m_nMenubarId, m_nContextMenuesId, m_nToolBarsId;
 
     DECLARE_EVENT_TABLE()
 };
@@ -159,18 +182,14 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 class wxGISCustomizeDlg : public wxDialog
 {
-	private:
-
-	protected:
-		wxAuiNotebook* m_auinotebook;
-		wxStdDialogButtonSizer* m_sdbSizer;
-		wxButton* m_sdbSizerOK;
-		//wxButton* m_sdbSizerCancel;
-		wxGxApplication* m_pGxApp;
-
-	public:
-		wxGISCustomizeDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Customize"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,400 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
-		~wxGISCustomizeDlg();
-
+public:
+	wxGISCustomizeDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Customize"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,400 ), long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
+	~wxGISCustomizeDlg();
+protected:
+	wxAuiNotebook* m_AuiNotebook;
+	wxStdDialogButtonSizer* m_sdbSizer;
+	wxButton* m_sdbSizerOK;
+	//wxButton* m_sdbSizerCancel;
+	wxGxApplication* m_pGxApp;
 };
 

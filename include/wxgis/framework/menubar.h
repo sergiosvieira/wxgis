@@ -32,10 +32,12 @@ public:
 	virtual COMMANDBARARRAY* GetMenuBarArray(void);
 	virtual void MoveLeft(int pos);
 	virtual void MoveRight(int pos);
+	virtual void MoveLeft(IGISCommandBar* pBar);
+	virtual void MoveRight(IGISCommandBar* pBar);
 	virtual void RemoveMenu(IGISCommandBar* pBar);
 	virtual bool AddMenu(IGISCommandBar* pBar);
 	virtual void Serialize(wxXmlNode* pConf);
-
+	virtual int GetMenuPos(IGISCommandBar* pBar);
 protected:
 	COMMANDBARARRAY m_MenubarArray;
 };
