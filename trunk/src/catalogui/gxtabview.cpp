@@ -44,7 +44,6 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 		wxString sName = pChild->GetPropVal(wxT("name"), NONAME);
 		int nPriority = wxAtoi(pChild->GetPropVal(wxT("priority"), wxT("0")));
 
-
 		wxObject *obj = wxCreateDynamicObject(sClass);
 		IGxViewsFactory *pFactory = dynamic_cast<IGxViewsFactory*>(obj);
 		if(pFactory != NULL)
@@ -59,7 +58,7 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 				if(pView != NULL)
 				{
 					pView->Activate(application, pChild);
-					if(m_pWindows.size() < nPriority)
+					if(m_pWindows.size() <= nPriority)
 						for(size_t i = 0; i < nPriority + 1; i++)
 							m_pWindows.push_back(NULL);
 
@@ -75,17 +74,15 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 			else
 			{
 				wxLogError(_("wxGxTab: Error creating view %s.%s"), sClass.c_str(), sName.c_str());
-				wxDELETE(pFactory);
 			}
 		}
 		else
 		{
 			wxLogError(_("wxGxTab: Error initializing ViewsFactory %s"), sClass.c_str());
-			wxDELETE(obj);
 		}
 
-		wxDELETE(pFactory);
-		
+		wxDELETE(obj);
+
 		pChild = pChild->GetNext();
 	}
 
@@ -112,27 +109,27 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 	//}
 
 	if(m_bShowChoices)
-	{	
-		
+	{
+
 		m_tabselector = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxTAB_TRAVERSAL );
 		m_tabselector->SetMaxSize( wxSize( -1,30 ) );
-		
+
 		wxBoxSizer* bSizerMinor = new wxBoxSizer( wxHORIZONTAL );
-		
+
 		m_staticText = new wxStaticText( m_tabselector, wxID_ANY, _("Preview: "), wxDefaultPosition, wxDefaultSize, 0 );
 		m_staticText->Wrap( -1 );
 		bSizerMinor->Add( m_staticText, 0, wxALIGN_CENTER_VERTICAL, 5 );
-		
+
 		m_choice = new wxChoice( m_tabselector, ID_WNDCHOICE, wxDefaultPosition, wxDefaultSize, 0, 0 );
 		m_choice->Disable();
 		m_choice->SetMinSize( wxSize( 170,-1 ) );
-		
+
 		bSizerMinor->Add( m_choice, 0, wxALIGN_CENTER_VERTICAL, 5 );
-		
+
 		m_tabselector->SetSizer( bSizerMinor );
 		m_tabselector->Layout();
 		bSizerMinor->Fit( m_tabselector );
-		m_bSizerMain->Add( m_tabselector, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );		
+		m_bSizerMain->Add( m_tabselector, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	}
 	this->SetSizer( m_bSizerMain );
 	this->Layout();
@@ -177,11 +174,14 @@ wxWindow* wxGxTab::GetWindow(int iIndex)
 
 void wxGxTab::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 {
+    this->Layout();
+
 	if(!Selection)
 		return;
 
 	if(nInitiator == GetId())
 		return;
+
 	//select in tree ctrl
 	if(nInitiator != TREECTRLID && nInitiator != LISTCTRLID)
 	{
@@ -285,7 +285,7 @@ void wxGxTab::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 				}
 				goto END;
 			}
-		}	
+		}
 	}
 END:
 	IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pCurrentWnd);
@@ -301,17 +301,19 @@ void wxGxTab::OnChoice(wxCommandEvent& event)
 		return;
 
 	wxWindow* pWnd = (wxWindow*) m_choice->GetClientData(pos);
-	if(pWnd != NULL && m_pCurrentWnd != pWnd)
+	if(pWnd && m_pCurrentWnd != pWnd)
 	{
 		m_pCurrentWnd->Hide();
 		m_bSizerMain->Replace(m_pCurrentWnd, pWnd);
 		pWnd->Show();
 		m_pCurrentWnd = pWnd;
+
+		this->Layout();
+
 		IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pCurrentWnd);
 		if(pGxSelectionEvents != NULL)
 			pGxSelectionEvents->OnSelectionChanged(m_pSelection, GetId());
 
-		this->Layout();		
 	}
 }
 
@@ -371,7 +373,7 @@ bool wxGxTabView::Activate(IGxApplication* application, wxXmlNode* pConf)
 		m_Tabs.push_back(pGxTab);
 
 		AddPage(static_cast<wxWindow*>(pGxTab), pGxTab->GetName(), count == 0 ? true : false/*, m_ImageListSmall.GetBitmap(9)*/);
-		
+
 		count++;
 
 		pChild = pChild->GetNext();
@@ -406,7 +408,7 @@ void wxGxTabView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	wxASSERT(nSelTab >= 0 && nSelTab < m_Tabs.size());
 
 	wxGxTab* pCurrTab = m_Tabs[nSelTab];
-	if(pCurrTab != NULL)
+	if(pCurrTab)
 		pCurrTab->OnSelectionChanged(Selection, nInitiator);
 
 	//wxWindow* pCurrWnd = GetPage(nSelTab);
@@ -451,8 +453,8 @@ void wxGxTabView::OnAUINotebookPageChanged(wxAuiNotebookEvent& event)
 	wxASSERT(nSelTab >= 0 && nSelTab < m_Tabs.size());
 
 	wxGxTab* pCurrTab = m_Tabs[nSelTab];
-	if(pCurrTab != NULL && m_pSelection != NULL)
-		pCurrTab->OnSelectionChanged(m_pSelection, IGxSelection::INIT_ALL);
+	if(pCurrTab && m_pSelection)
+		pCurrTab->OnSelectionChanged(m_pSelection, TREECTRLID);
 }
 
 wxWindow* wxGxTabView::GetCurrentWnd(void)

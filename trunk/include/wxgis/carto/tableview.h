@@ -43,7 +43,7 @@
 // wxGISTable
 //------------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CRT wxGISTable : 
+class WXDLLIMPEXP_GIS_CRT wxGISTable :
 	public wxGridTableBase
 {
 public:
@@ -117,8 +117,8 @@ private:
 // wxGridCtrl
 //------------------------------------------------------------------
 
-class wxGridCtrl: 
-	public wxGrid 
+class wxGridCtrl:
+	public wxGrid
 {
 	DECLARE_DYNAMIC_CLASS(wxGridCtrl)
 protected:
@@ -134,9 +134,13 @@ public:
     DECLARE_EVENT_TABLE();
 };
 
+#ifdef __WXMSW__
+    #define WXGISBITBUTTONSIZE BITBUTTONSIZE
+#else
+    #define WXGISBITBUTTONSIZE 24
+#endif
 
-
-class WXDLLIMPEXP_GIS_CRT wxGISTableView : 
+class WXDLLIMPEXP_GIS_CRT wxGISTableView :
 	public wxPanel
 {
 enum
@@ -151,7 +155,7 @@ public:
 	wxGISTableView(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxSTATIC_BORDER|wxTAB_TRAVERSAL);
 	virtual ~wxGISTableView(void);
 	virtual void SetTable(wxGridTableBase* table, bool takeOwnership = false, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells)
-	{		
+	{
 		if(m_grid)
 		{
 			//m_grid->ClearSelection();

@@ -22,13 +22,16 @@
 	<File name="../../include/wxgis/framework/statusbar.h" open="0" top="0" tabpos="7">
 		<Cursor position="2308" topLine="43" />
 	</File>
-	<File name="../../include/wxgis/framework/toolbarmenu.h" open="1" top="0" tabpos="10">
+	<File name="../../include/wxgis/framework/toolbarmenu.h" open="0" top="0" tabpos="3">
 		<Cursor position="0" topLine="22" />
 	</File>
 	<File name="../../src/framework/addcommanddlg.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="5664" topLine="138" />
 	</File>
-	<File name="../../src/framework/application.cpp" open="1" top="1" tabpos="8">
+	<File name="../../src/framework/animation.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="2279" topLine="42" />
+	</File>
+	<File name="../../src/framework/application.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="4645" topLine="134" />
 	</File>
 	<File name="../../src/framework/commandbar.cpp" open="0" top="0" tabpos="0">
@@ -40,7 +43,7 @@
 	<File name="../../src/framework/statusbar.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="3685" topLine="27" />
 	</File>
-	<File name="../../src/framework/toolbarmenu.cpp" open="1" top="0" tabpos="9">
+	<File name="../../src/framework/toolbarmenu.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="1126" topLine="19" />
 	</File>
 </CodeBlocks_layout_file>

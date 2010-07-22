@@ -130,15 +130,6 @@ void wxGridCtrl::DrawRowLabel(wxDC& dc, int row)
     if (GetRowHeight(row) <= 0 || m_rowLabelWidth <= 0)
         return;
     wxRect rect;
-#ifdef __WXGTK20__
-    rect.SetX(1);
-    rect.SetY(GetRowTop(row) + 1);
-    rect.SetWidth(m_rowLabelWidth - 2);
-    rect.SetHeight(GetRowHeight(row) - 2);
-    CalcScrolledPosition(0, rect.y, NULL, &rect.y);
-    wxWindowDC *win_dc = (wxWindowDC*)&dc;
-    wxRendererNative::Get().DrawHeaderButton(win_dc->m_owner, dc, rect, 0);
-#else
     int rowTop = GetRowTop(row), rowBottom = GetRowBottom(row) - 1;
     dc.SetPen(wxPen(wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW), 1, wxSOLID));
     dc.DrawLine(m_rowLabelWidth - 1, rowTop, m_rowLabelWidth - 1, rowBottom);
@@ -147,7 +138,6 @@ void wxGridCtrl::DrawRowLabel(wxDC& dc, int row)
     dc.SetPen(*wxWHITE_PEN);
     dc.DrawLine(1, rowTop, 1, rowBottom);
     dc.DrawLine(1, rowTop, m_rowLabelWidth - 1, rowTop);
-#endif
     if (row == GetGridCursorRow())
 	{
 		dc.DrawBitmap(m_pImageList->GetBitmap(4), 0, GetRowTop(row), true);
@@ -226,30 +216,30 @@ wxGISTableView::wxGISTableView(wxWindow* parent, wxWindowID id, const wxPoint& p
 	m_staticText1->Wrap( -1 );
 	bSizerLow->Add( m_staticText1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
-	m_bpFirst = new wxBitmapButton( this, wxGISTableView::ID_FIRST, m_grid->m_pImageList->GetBitmap(0), wxDefaultPosition, wxSize( BITBUTTONSIZE,BITBUTTONSIZE ), wxBU_AUTODRAW );
-	m_bpFirst->SetMinSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
-	m_bpFirst->SetMaxSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
+	m_bpFirst = new wxBitmapButton( this, wxGISTableView::ID_FIRST, m_grid->m_pImageList->GetBitmap(0), wxDefaultPosition, wxSize( WXGISBITBUTTONSIZE, WXGISBITBUTTONSIZE ), wxBU_AUTODRAW );
+	m_bpFirst->SetMinSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
+	m_bpFirst->SetMaxSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
 
 	bSizerLow->Add( m_bpFirst, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
 
-	m_bpPrev = new wxBitmapButton( this, wxGISTableView::ID_PREV, m_grid->m_pImageList->GetBitmap(1), wxDefaultPosition, wxSize( BITBUTTONSIZE,BITBUTTONSIZE ), wxBU_AUTODRAW );
-	m_bpPrev->SetMinSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
-	m_bpPrev->SetMaxSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
+	m_bpPrev = new wxBitmapButton( this, wxGISTableView::ID_PREV, m_grid->m_pImageList->GetBitmap(1), wxDefaultPosition, wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ), wxBU_AUTODRAW );
+	m_bpPrev->SetMinSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
+	m_bpPrev->SetMaxSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
 
 	bSizerLow->Add( m_bpPrev, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
 
 	m_position = new wxTextCtrl( this, wxGISTableView::ID_POS, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_CENTRE|wxTE_PROCESS_ENTER  );
 	bSizerLow->Add( m_position, 0, wxALL, 5 );
 
-	m_bpNext = new wxBitmapButton( this, wxGISTableView::ID_NEXT, m_grid->m_pImageList->GetBitmap(2), wxDefaultPosition, wxSize( BITBUTTONSIZE,BITBUTTONSIZE ), wxBU_AUTODRAW );
-	m_bpNext->SetMinSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
-	m_bpNext->SetMaxSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
+	m_bpNext = new wxBitmapButton( this, wxGISTableView::ID_NEXT, m_grid->m_pImageList->GetBitmap(2), wxDefaultPosition, wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ), wxBU_AUTODRAW );
+	m_bpNext->SetMinSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
+	m_bpNext->SetMaxSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
 
 	bSizerLow->Add( m_bpNext, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
 
-	m_bpLast = new wxBitmapButton( this, wxGISTableView::ID_LAST, m_grid->m_pImageList->GetBitmap(3), wxDefaultPosition, wxSize( BITBUTTONSIZE,BITBUTTONSIZE ), wxBU_AUTODRAW );
-	m_bpLast->SetMinSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
-	m_bpLast->SetMaxSize( wxSize( BITBUTTONSIZE,BITBUTTONSIZE ) );
+	m_bpLast = new wxBitmapButton( this, wxGISTableView::ID_LAST, m_grid->m_pImageList->GetBitmap(3), wxDefaultPosition, wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ), wxBU_AUTODRAW );
+	m_bpLast->SetMinSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
+	m_bpLast->SetMaxSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
 
 	bSizerLow->Add( m_bpLast, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
 
