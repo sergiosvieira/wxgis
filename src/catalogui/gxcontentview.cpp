@@ -246,6 +246,7 @@ void wxGxContentView::AddObject(IGxObject* pObject)
 
 void wxGxContentView::OnColClick(wxListEvent& event)
 {
+    event.Skip();
 	//int col = event.GetColumn();
 	//if(col != 0)
 	//   return;
@@ -259,6 +260,7 @@ void wxGxContentView::OnColClick(wxListEvent& event)
 
 void wxGxContentView::OnContextMenu(wxContextMenuEvent& event)
 {
+    event.Skip();
     wxPoint point = event.GetPosition();
     // If from keyboard
     if (point.x == -1 && point.y == -1)

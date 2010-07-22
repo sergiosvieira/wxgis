@@ -40,6 +40,7 @@ wxDrawingThread::wxDrawingThread(wxGISMapView* pView, std::vector<wxGISLayer*>& 
 
 void *wxDrawingThread::Entry()
 {
+
 	wxClientDC CDC(m_pView);
     m_pGISScreenDisplay->SetDC(&CDC);
 
@@ -211,7 +212,7 @@ wxGISMapView::~wxGISMapView(void)
 void wxGISMapView::OnDraw(wxDC& dc)
 {
 	//if(m_MapToolState & enumGISMapPanning)
-	//	return;
+    //    return;
 
 	//ITrackCancel* pTrackCancel(NULL);
 	//if map has it's own cache check it and draw from cache if posible
@@ -240,6 +241,7 @@ void wxGISMapView::OnDraw(wxDC& dc)
 			m_pAni->Show(true);
 			m_pAni->Play();
 		}
+
 		//start draw thread
 		m_pThread = new wxDrawingThread(this, m_Layers);
 		if ( !m_pThread || m_pThread->Create() != wxTHREAD_NO_ERROR )
@@ -247,7 +249,7 @@ void wxGISMapView::OnDraw(wxDC& dc)
 			wxLogError(wxString(_("wxGISMapView: Can't create wxDrawingThread!")));
 			return;
 		}
-		if( !m_pThread || m_pThread->Run() != wxTHREAD_NO_ERROR )
+        if( !m_pThread || m_pThread->Run() != wxTHREAD_NO_ERROR )
 		{
 			wxLogError(wxString(_("wxGISMapView: Can't run wxDrawingThread!")));
 			return;
@@ -310,6 +312,7 @@ void wxGISMapView::OnDraw(wxDC& dc)
 		return;
 	if(m_MapToolState != enumGISMapNone)
 		return;
+
 	pGISScreenDisplay->OnDraw(dc);
 	//}
 }

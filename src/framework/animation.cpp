@@ -33,10 +33,10 @@ wxGISAnimation::wxGISAnimation(wxWindow * parent, wxWindowID id, const wxBitmap 
 	m_nImgPos = 0;
 	m_ImageList.Create(bitmap_size, bitmap_size);
 	m_ImageList.Add(bitmap);
-	
-	//Play();  
 
-	//	m_BackgroundBitmap = bitmap;	
+	//Play();
+
+	//	m_BackgroundBitmap = bitmap;
 	//	m_Timer = new wxTimer(this, ID_PAINTING_TEST_CTRL_TIMER);
 	//	m_Timer->Start(500);
 	//Create(parent, id, bitmap, bitmap_size, pos, size, style, name);
@@ -59,20 +59,20 @@ void wxGISAnimation::OnPaint(wxPaintEvent & event)
 	wxRect rc = GetClientRect();
 	x = (rc.width - x) / 2;
 	y = (rc.height - y) / 2;
-	m_ImageList.Draw(m_nImgPos, dc, x, y, wxIMAGELIST_DRAW_NORMAL, true);
+	m_ImageList.Draw(m_nImgPos, dc, x, y, wxIMAGELIST_DRAW_TRANSPARENT /*wxIMAGELIST_DRAW_NORMAL*/, true);
 	m_nImgPos++;
 	if(m_ImageList.GetImageCount() <= m_nImgPos)
 		m_nImgPos = 0;
 }
 
 //void wxPaintingTestCtrl::DoDraw(wxDC & dc)
-//{	
+//{
 //	int x, y, w, h, i;
 //	double angle;
-//	GetClientSize(&w, &h);	
-//	int cx(w/2), cy(h/2), radius(min(cx,cy)-10);	
+//	GetClientSize(&w, &h);
+//	int cx(w/2), cy(h/2), radius(min(cx,cy)-10);
 //	if(m_BackgroundBitmap.Ok())
-//	{		
+//	{
 //		for(y = 0; y < h; y += m_BackgroundBitmap.GetHeight())
 //		{
 //			for(x = 0; x < w; x += m_BackgroundBitmap.GetWidth())
@@ -85,11 +85,11 @@ void wxGISAnimation::OnPaint(wxPaintEvent & event)
 //	{
 //		dc.SetBackground(wxBrush(GetBackgroundColour(), wxSOLID));
 //		dc.Clear();
-//	}	
+//	}
 //	if(m_CenterBitmap.Ok())
 //	{
 //		radius = (m_CenterBitmap.GetWidth()/2) * 5.0 / 6.0;
-//		dc.DrawBitmap(m_CenterBitmap, cx-m_CenterBitmap.GetWidth()/2, 
+//		dc.DrawBitmap(m_CenterBitmap, cx-m_CenterBitmap.GetWidth()/2,
 //			cy-m_CenterBitmap.GetHeight()/2, true);
 //	}
 //	wxPen linePen(*wxBLACK, 2, wxSOLID);
@@ -118,7 +118,7 @@ void wxGISAnimation::OnPaint(wxPaintEvent & event)
 //}
 //
 //void wxPaintingTestCtrl::OnSize(wxSizeEvent & event)
-//{	
+//{
 //	m_DoubleBufferDC.SelectObject(wxNullBitmap);
 //	m_DoubleBuffer = wxBitmap(event.GetSize().GetWidth(), event.GetSize().GetHeight());
 //	m_DoubleBufferDC.SelectObject(m_DoubleBuffer);

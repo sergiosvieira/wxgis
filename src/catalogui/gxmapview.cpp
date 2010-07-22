@@ -24,6 +24,8 @@
 #include "wxgis/framework/framework.h"
 #include "wxgis/framework/messagedlg.h"
 
+#include "wx/msgdlg.h"
+
 BEGIN_EVENT_TABLE(wxGxMapView, wxGISMapView)
 	EVT_LEFT_DOWN(wxGxMapView::OnMouseDown)
 	EVT_MIDDLE_DOWN(wxGxMapView::OnMouseDown)
@@ -79,7 +81,7 @@ bool wxGxMapView::Applies(IGxSelection* Selection)
 	{
 		IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>( Selection->GetSelectedObjects(i) );
 		if(pGxDataset != NULL)
-		{			
+		{
 			wxGISEnumDatasetType type = pGxDataset->GetType();
 			switch(type)
 			{
@@ -100,7 +102,7 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	if(nInitiator == GetId())
 		return;
 
-    IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();	
+    IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
 	if(m_pParentGxObject == pGxObj)
 		return;
 
@@ -112,7 +114,7 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	wxGISDataset* pwxGISDataset = pGxDataset->GetDataset();
 	if(pwxGISDataset == NULL)
 		return;
-    //the pOGRLayer will live while IGxObject live. IGxObject( from IGxSelection ) store IwxGISDataset, and destroy it then catalog destroyed 
+    //the pOGRLayer will live while IGxObject live. IGxObject( from IGxSelection ) store IwxGISDataset, and destroy it then catalog destroyed
     pwxGISDataset->Dereference();
 
 	wxGISEnumDatasetType type = pwxGISDataset->GetType();
@@ -256,7 +258,7 @@ void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileNam
                 bAskCreateOvr = wxAtoi(pNode->GetPropVal(wxT("ask_create_ovr"), wxT("1")));
                 sCompress = pNode->GetPropVal(wxT("ovr_compress"), wxT("NONE"));
                 sResampleMethod = pNode->GetPropVal(wxT("ovr_resample"), wxT("GAUSS"));
-                //"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE" 
+                //"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE"
                 bCreateOverviews = wxAtoi(pNode->GetPropVal(wxT("create_ovr"), wxT("1")));
             }
             else
@@ -292,16 +294,16 @@ void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileNam
         {
 	        int anOverviewList[5] = { 4, 8, 16, 32, 64 };
             wxString sProgressMsg = wxString::Format(_("Creating pyramids for : %s (%d bands)"), soFileName.c_str(), pwxGISRasterDataset->GetRaster()->GetRasterCount());
-            IStatusBar* pStatusBar = m_pApp->GetStatusBar();  
+            IStatusBar* pStatusBar = m_pApp->GetStatusBar();
             IProgressor* pProgressor = pStatusBar->GetProgressor();
             if(pProgressor)
                 pProgressor->Show(true);
 
-            OvrProgressData Data = {pStatusBar, pProgressor, sProgressMsg}; 
+            OvrProgressData Data = {pStatusBar, pProgressor, sProgressMsg};
             GDALDataset* pDSet = pwxGISRasterDataset->GetRaster();
             if(!pDSet)
                 return;
-	        CPLErr eErr = pDSet->BuildOverviews( wgWX2MB(sResampleMethod), 5, anOverviewList, 0, NULL, OvrProgress, (void*)&Data );		        
+	        CPLErr eErr = pDSet->BuildOverviews( wgWX2MB(sResampleMethod), 5, anOverviewList, 0, NULL, OvrProgress, (void*)&Data );
 
             if(pProgressor)
                 pProgressor->Show(false);

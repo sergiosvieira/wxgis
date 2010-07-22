@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="../../include/wxgis/catalogui/catalogcmd.h" open="0" top="0" tabpos="0">
+		<Cursor position="1171" topLine="9" />
+	</File>
+	<File name="../../include/wxgis/catalogui/customizedlg.h" open="0" top="0" tabpos="1">
+		<Cursor position="5124" topLine="150" />
+	</File>
+	<File name="../../include/wxgis/catalogui/gxcontentview.h" open="0" top="0" tabpos="3">
+		<Cursor position="1191" topLine="15" />
+	</File>
+	<File name="../../include/wxgis/catalogui/gxobjdialog.h" open="0" top="0" tabpos="4">
+		<Cursor position="9108" topLine="217" />
+	</File>
+	<File name="../../include/wxgis/catalogui/gxtreeview.h" open="0" top="0" tabpos="6">
+		<Cursor position="3379" topLine="75" />
+	</File>
+	<File name="../../src/catalogui/customizedlg.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="8654" topLine="205" />
+	</File>
+	<File name="../../src/catalogui/gxapplication.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="10228" topLine="0" />
+	</File>
+	<File name="../../src/catalogui/gxcontentview.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="21326" topLine="668" />
+	</File>
+	<File name="../../src/catalogui/gxobgdialog.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="15604" topLine="297" />
+	</File>
+	<File name="../../src/catalogui/gxtabview.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="6110" topLine="168" />
+	</File>
+	<File name="../../src/catalogui/gxtreeview.cpp" open="0" top="0" tabpos="7">
+		<Cursor position="1485" topLine="12" />
+	</File>
+	<File name="../../src/catalogui/viewscmd.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="3646" topLine="136" />
+	</File>
+	<File name="../../src/catalogui/viewsfactory.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="2385" topLine="31" />
+	</File>
+</CodeBlocks_layout_file>
