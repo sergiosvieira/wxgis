@@ -64,11 +64,11 @@ wxString wxGISCartoMainCmd::GetCaption(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("&Full Extent"));
-		case 1:	
+		case 1:
 			return wxString(_("&Previous Extent"));
-		case 2:	
+		case 2:
 			return wxString(_("&Next Extent"));
 		default:
 			return wxEmptyString;
@@ -79,7 +79,7 @@ wxString wxGISCartoMainCmd::GetCategory(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 		case 1:
 		case 2:
 			return wxString(_("Geography"));
@@ -152,11 +152,11 @@ wxString wxGISCartoMainCmd::GetMessage(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("Full extent of the map"));
-		case 1:	
+		case 1:
 			return wxString(_("Previous extent of the map"));
-		case 2:	
+		case 2:
 			return wxString(_("Next extent of the map"));
 		default:
 			return wxEmptyString;
@@ -167,12 +167,12 @@ void wxGISCartoMainCmd::OnClick(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			m_pMapView->SetFullExtent();
 			break;
-		case 1:	
+		case 1:
 			return m_pMapView->GetExtenStack()->Undo();
-		case 2:	
+		case 2:
 			return m_pMapView->GetExtenStack()->Redo();
 		default:
 			break;
@@ -189,11 +189,11 @@ wxString wxGISCartoMainCmd::GetTooltip(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("Full Extent"));
-		case 1:	
+		case 1:
 			return wxString(_("Previous Extent"));
-		case 2:	
+		case 2:
 			return wxString(_("Next Extent"));
 		default:
 			return wxEmptyString;
@@ -249,13 +249,13 @@ wxString wxGISCartoMainTool::GetCaption(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("Zoom &In"));
-		case 1:	
+		case 1:
 			return wxString(_("Zoom &Out"));
-		case 2:	
+		case 2:
 			return wxString(_("&Pan"));
-		case 3:	
+		case 3:
 			return wxString(_("&Information"));
 		default:
 			return wxEmptyString;
@@ -266,10 +266,10 @@ wxString wxGISCartoMainTool::GetCategory(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
-		case 1:	
-		case 2:	
-		case 3:	
+		case 0:
+		case 1:
+		case 2:
+		case 3:
 			return wxString(_("Geography"));
 		default:
 			return wxString(_("[No category]"));
@@ -343,13 +343,13 @@ wxString wxGISCartoMainTool::GetMessage(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("Zoom map in"));
-		case 1:	
+		case 1:
 			return wxString(_("Zoom map out"));
-		case 2:	
+		case 2:
 			return wxString(_("Pan map"));
-		case 3:	
+		case 3:
 			return wxString(_("Feature information"));
 		default:
 			return wxEmptyString;
@@ -360,9 +360,9 @@ void wxGISCartoMainTool::OnClick(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
-		case 1:	
-		case 2:	
+		case 0:
+		case 1:
+		case 2:
 		case 3:
 			break;
 		default:
@@ -380,13 +380,13 @@ wxString wxGISCartoMainTool::GetTooltip(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("Zoom In"));
-		case 1:	
+		case 1:
 			return wxString(_("Zoom Out"));
-		case 2:	
+		case 2:
 			return wxString(_("Pan"));
-		case 3:	
+		case 3:
 			return wxString(_("Information"));
 		default:
 			return wxEmptyString;
@@ -444,6 +444,7 @@ void wxGISCartoMainTool::SetChecked(bool bCheck)
 
 void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 {
+    event.Skip();
 	switch(m_subtype)
 	{
 		case 0:	//z_in
@@ -460,7 +461,7 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 				pGeom->getEnvelope(&Env);
 				if(Env.MaxX == Env.MinX || Env.MaxY == Env.MinY)
 				{
-					OGREnvelope CurrentEnv = m_pMapView->GetCachedDisplay()->GetDisplayTransformation()->GetBounds();					
+					OGREnvelope CurrentEnv = m_pMapView->GetCachedDisplay()->GetDisplayTransformation()->GetBounds();
 					double widthdiv4 = (CurrentEnv.MaxX - CurrentEnv.MinX) / 4;
 					double heightdiv4 = (CurrentEnv.MaxY - CurrentEnv.MinY) / 4;
 
@@ -498,7 +499,7 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 				m_pMapView->SetExtent(NewEnv);
 			}
 			wxDELETE(pGeom);
-			break;		
+			break;
 		}
 		case 2:	//pan
 		{
@@ -532,6 +533,7 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 
 void wxGISCartoMainTool::OnMouseUp(wxMouseEvent& event)
 {
+    event.Skip();
 	switch(m_subtype)
 	{
 		case 0:	//z_in
@@ -551,6 +553,7 @@ void wxGISCartoMainTool::OnMouseUp(wxMouseEvent& event)
 
 void wxGISCartoMainTool::OnMouseMove(wxMouseEvent& event)
 {
+    event.Skip();
 	switch(m_subtype)
 	{
 		case 0:	//z_in
@@ -565,12 +568,12 @@ void wxGISCartoMainTool::OnMouseMove(wxMouseEvent& event)
 			break;
 		default:
 			break;
-	}	
+	}
 }
 
 void wxGISCartoMainTool::OnMouseDoubleClick(wxMouseEvent& event)
 {
-
+    event.Skip();
 }
 
 

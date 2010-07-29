@@ -550,30 +550,61 @@ void wxGISScreenDisplay::OnDraw(wxDC &dc, wxCoord x, wxCoord y, bool bClearBackg
 {
     if(m_caches.size() < 1)
         return;
+
+    //wxCriticalSectionLocker locker(m_DrawCritSect);
     wxRect DevRect = m_pDisplayTransformation->GetDeviceFrame();
-	if(bClearBackground)
-		dc.DrawBitmap(m_caches[0].bmp.GetSubBitmap(DevRect), 0, 0);
+//
+    wxMemoryDC memDC;
+    if(bClearBackground)
+    {
+        memDC.SelectObject(m_caches[0].bmp);
+        dc.Blit(0, 0, DevRect.GetWidth(), DevRect.GetHeight(), &memDC, 0, 0, wxCOPY, false);
+    }
+
     if(m_InvalidRectArray.size() > 0)
     {
         for(size_t i = 0; i < m_InvalidRectArray.size(); i++)
         {
-            dc.DrawBitmap(m_caches[m_caches.size() - 1].bmp.GetSubBitmap(m_InvalidRectArray[i]), m_InvalidRectArray[i].x, m_InvalidRectArray[i].y);
+            memDC.SelectObject(m_caches[m_caches.size() - 1].bmp);
+            dc.Blit(m_InvalidRectArray[i].x, m_InvalidRectArray[i].y, m_InvalidRectArray[i].GetWidth(), m_InvalidRectArray[i].GetHeight(), &memDC, m_InvalidRectArray[i].GetX(), m_InvalidRectArray[i].GetY(), wxCOPY, false);
         }
         m_InvalidRectArray.clear();
     }
     else
     {
-        dc.DrawBitmap(m_caches[m_caches.size() - 1].bmp.GetSubBitmap(DevRect), x, y);	//, true
+        memDC.SelectObject(m_caches[m_caches.size() - 1].bmp);
+        dc.Blit(x, y, DevRect.GetWidth(), DevRect.GetHeight(), &memDC, DevRect.GetX(), DevRect.GetY(), wxCOPY, false);
     }
+
+//	if(bClearBackground)
+//		dc.DrawBitmap(m_caches[0].bmp.GetSubBitmap(DevRect), 0, 0);
+//    if(m_caches.size() == 1)
+//        return;
+//
+//    if(m_InvalidRectArray.size() > 0)
+//    {
+//        for(size_t i = 0; i < m_InvalidRectArray.size(); i++)
+//        {
+//            dc.DrawBitmap(m_caches[m_caches.size() - 1].bmp.GetSubBitmap(m_InvalidRectArray[i]), m_InvalidRectArray[i].x, m_InvalidRectArray[i].y);
+//        }
+//        m_InvalidRectArray.clear();
+//    }
+//    else
+//    {
+//        dc.DrawBitmap(m_caches[m_caches.size() - 1].bmp.GetSubBitmap(DevRect), x, y);	//, true
+//    }
 }
 
 void wxGISScreenDisplay::OnPanDraw(wxDC &dc, wxCoord x, wxCoord y)
 {
 	wxRect DispRect = m_pDisplayTransformation->GetDeviceFrame();
 
+    wxMemoryDC memDC;
 	if(abs(x) > DispRect.GetHeight() &&  abs(y) > DispRect.GetWidth())
 	{
 		dc.DrawBitmap(m_caches[0].bmp.GetSubBitmap(DispRect), 0, 0);	//, true
+//        memDC.SelectObject(m_caches[0].bmp);
+//        dc.Blit(0, 0, DispRect.GetWidth(), DispRect.GetHeight(), &memDC, 0, 0, wxCOPY, false);
         AddInvalidRect(DispRect);
 		return;
 	}
@@ -622,9 +653,18 @@ void wxGISScreenDisplay::OnStretchDraw(wxDC &dc, wxCoord nDestWidth, wxCoord nDe
 	wxImage Img = m_caches[m_caches.size() - 1].bmp.GetSubBitmap(Rect).ConvertToImage();
 	Img = Img.Scale(nDestWidth, nDestHeight, quality);
     //Img = Scale(Img, nDestWidth, nDestHeight, quality);
-	if(bClearBackground)
-		dc.DrawBitmap(m_caches[0].bmp, 0, 0);
-	dc.DrawBitmap(Img, x, y);
+//	if(bClearBackground)
+//		dc.DrawBitmap(m_caches[0].bmp, 0, 0);
+//	dc.DrawBitmap(Img, x, y);
+    wxMemoryDC memDC;
+    if(bClearBackground)
+    {
+        memDC.SelectObject(m_caches[0].bmp);
+        dc.Blit(0, 0, Rect.width, Rect.height, &memDC, 0, 0, wxCOPY, false);
+    }
+    wxBitmap TempBmp(Img);
+    memDC.SelectObject(TempBmp);
+    dc.Blit(x, y, nDestWidth, nDestHeight, &memDC, 0, 0, wxCOPY, false);
 }
 
 void wxGISScreenDisplay::OnStretchDraw2(wxDC &dc, wxRect Rect, bool bClearBackground, wxGISEnumDrawQuality quality )
@@ -635,9 +675,19 @@ void wxGISScreenDisplay::OnStretchDraw2(wxDC &dc, wxRect Rect, bool bClearBackgr
 	wxImage Img = m_caches[m_caches.size() - 1].bmp.GetSubBitmap(Rect).ConvertToImage();
 	//Img = Img.Scale(DevRect.width, DevRect.height, quality);
 	Img = Scale(Img, DevRect.width, DevRect.height, quality);
-	if(bClearBackground)
-		dc.DrawBitmap(m_caches[0].bmp, 0, 0);
-	dc.DrawBitmap(Img, DevRect.x, DevRect.y);
+//	if(bClearBackground)
+//		dc.DrawBitmap(m_caches[0].bmp, 0, 0);
+//	dc.DrawBitmap(Img, DevRect.x, DevRect.y);
+
+    wxMemoryDC memDC;
+    if(bClearBackground)
+    {
+        memDC.SelectObject(m_caches[0].bmp);
+        dc.Blit(0, 0, DevRect.GetWidth(), DevRect.GetHeight(), &memDC, 0, 0, wxCOPY, false);
+    }
+    wxBitmap TempBmp(Img);
+    memDC.SelectObject(TempBmp);
+    dc.Blit(DevRect.GetX(), DevRect.GetY(), DevRect.GetWidth(), DevRect.GetHeight(), &memDC, 0, 0, wxCOPY, false);
 }
 
 void wxGISScreenDisplay::DrawPolygon(int n, wxPoint points[], wxCoord xoffset, wxCoord yoffset, int fill_style)
@@ -733,13 +783,25 @@ void wxGISScreenDisplay::MergeCaches(size_t SrcCacheID, size_t DstCacheID)
 {
     wxCriticalSectionLocker locker(m_CritSect);
 
-	m_dc.SelectObject(m_caches[DstCacheID].bmp);
-    if(m_InvalidRectArray.size() == 0)
-        m_dc.DrawBitmap(m_caches[SrcCacheID].bmp, 0, 0);
-    else
-        for(size_t i = 0; i < m_InvalidRectArray.size(); i++)
-            m_dc.DrawBitmap(m_caches[SrcCacheID].bmp.GetSubBitmap(m_InvalidRectArray[i]), m_InvalidRectArray[i].x, m_InvalidRectArray[i].y);
-	m_dc.SelectObject(wxNullBitmap);
+    wxRect DevRect = m_pDisplayTransformation->GetDeviceFrame();
+
+    wxMemoryDC DestDC;
+    DestDC.SelectObject(m_caches[DstCacheID].bmp);
+
+//	m_dc.SelectObject(m_caches[DstCacheID].bmp);
+
+	wxMemoryDC SourceDC;
+	SourceDC.SelectObject(m_caches[SrcCacheID].bmp);
+
+	DestDC.Blit(0, 0, DevRect.GetWidth(), DevRect.GetHeight(), &SourceDC, DevRect.GetX(), DevRect.GetY(), wxCOPY, false);
+//
+//    if(m_InvalidRectArray.size() == 0)
+//        //m_dc.DrawBitmap(m_caches[SrcCacheID].bmp.GetSubBitmap(DevRect), 0, 0);
+//        m_dc.Blit(0, 0, DevRect.GetWidth(), DevRect.GetHeight(), &SourceDC, DevRect.GetX(), DevRect.GetY(), wxCOPY, false);
+//    else
+//        for(size_t i = 0; i < m_InvalidRectArray.size(); i++)
+//            m_dc.DrawBitmap(m_caches[SrcCacheID].bmp.GetSubBitmap(m_InvalidRectArray[i]), m_InvalidRectArray[i].x, m_InvalidRectArray[i].y);
+//	m_dc.SelectObject(wxNullBitmap);
 }
 
 void wxGISScreenDisplay::StartDrawing(size_t CacheID)
