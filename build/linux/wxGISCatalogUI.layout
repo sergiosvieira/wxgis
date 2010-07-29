@@ -25,11 +25,14 @@
 	<File name="../../src/catalogui/gxcontentview.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="21326" topLine="668" />
 	</File>
+	<File name="../../src/catalogui/gxmapview.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="5692" topLine="145" />
+	</File>
 	<File name="../../src/catalogui/gxobgdialog.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="15604" topLine="297" />
 	</File>
 	<File name="../../src/catalogui/gxtabview.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="6110" topLine="168" />
+		<Cursor position="9409" topLine="302" />
 	</File>
 	<File name="../../src/catalogui/gxtreeview.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="1485" topLine="12" />
@@ -37,7 +40,7 @@
 	<File name="../../src/catalogui/viewscmd.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="3646" topLine="136" />
 	</File>
-	<File name="../../src/catalogui/viewsfactory.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="2385" topLine="31" />
+	<File name="../../src/catalogui/viewsfactory.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="1787" topLine="30" />
 	</File>
 </CodeBlocks_layout_file>

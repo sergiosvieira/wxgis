@@ -321,6 +321,8 @@ bool wxGxTab::Show(bool bShow)
 {
 	if(m_pCurrentWnd)
 		m_pCurrentWnd->Show(bShow);
+    if(bShow)
+        this->Layout();
 	return wxWindow::Show(bShow);
 }
 

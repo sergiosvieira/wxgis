@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="../../include/wxgis/carto/mapview.h" open="1" top="0" tabpos="3">
-		<Cursor position="1292" topLine="24" />
+	<File name="../../include/wxgis/carto/map.h" open="0" top="0" tabpos="0">
+		<Cursor position="1894" topLine="13" />
+	</File>
+	<File name="../../include/wxgis/carto/mapview.h" open="1" top="0" tabpos="1">
+		<Cursor position="2677" topLine="70" />
 	</File>
 	<File name="../../include/wxgis/carto/tableview.h" open="0" top="0" tabpos="0">
 		<Cursor position="4611" topLine="121" />
 	</File>
-	<File name="../../src/carto/mapview.cpp" open="1" top="1" tabpos="4">
-		<Cursor position="2967" topLine="55" />
+	<File name="../../src/carto/cartocmd.cpp" open="1" top="1" tabpos="6">
+		<Cursor position="652" topLine="0" />
+	</File>
+	<File name="../../src/carto/featurelayer.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="4295" topLine="107" />
+	</File>
+	<File name="../../src/carto/mapview.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="19625" topLine="693" />
 	</File>
 	<File name="../../src/carto/tableview.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="9684" topLine="276" />

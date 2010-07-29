@@ -166,6 +166,8 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 
 	m_pParentGxObject = pGxObj;
 
+	wxMilliSleep(200);
+
     SetFullExtent();
 }
 

@@ -63,7 +63,7 @@ private:
 // wxGISDisplay
 //-----------------------------------------------------
 
-class WXDLLIMPEXP_GIS_DSP wxGISDisplay : 
+class WXDLLIMPEXP_GIS_DSP wxGISDisplay :
 	public IDisplay
 {
 public:

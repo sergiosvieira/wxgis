@@ -95,7 +95,7 @@ void wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisp
     {
         for(size_t i = 0; i < EnvCount; i++)
         {
-            wxRect Rect = pInvalidrectArray->operator[](i);            
+            wxRect Rect = pInvalidrectArray->operator[](i);
             Rect.Inflate(1,1);
             Envs[i] = pDisplayTransformation->TransformRect(Rect);
         }
@@ -128,7 +128,7 @@ void wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisp
 			    {
 				    if(pTrackCancel && !pTrackCancel->Continue())
 					    break;
-                                        
+
                     long nID = m_pOGRGeometrySet->operator[](pGeometryArr[i]);
                     OGRGeometry* pGeom = pGeometryArr[i];
                     GISGeometrySet.AddGeometry(pGeom, nID);
@@ -137,23 +137,23 @@ void wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisp
                         m_pFeatureRenderer->Draw(&GISGeometrySet, DrawPhase, pDisplay, pTrackCancel);
                         GISGeometrySet.Clear();
                         pDisplay->OnUpdate();
-                        
+
                         if(pTrackCancel && !pTrackCancel->Continue())
                             break;
                     }
 			    }
-		        m_pFeatureRenderer->Draw(&GISGeometrySet, DrawPhase, pDisplay, pTrackCancel);                
+		        m_pFeatureRenderer->Draw(&GISGeometrySet, DrawPhase, pDisplay, pTrackCancel);
 			    wxDELETEA( pGeometryArr );
 		    }
 		    else
                 m_pFeatureRenderer->Draw(m_pOGRGeometrySet, DrawPhase, pDisplay, pTrackCancel);
-                
+
 
 		    //4. send it to renderer
 		    m_PreviousDisplayEnv = Env;
 	    }
     }
-	//5. clear a spatial filter		
+	//5. clear a spatial filter
 	pDisplay->FinishDrawing();
 }
 
@@ -218,9 +218,9 @@ void wxGISFeatureLayer::LoadGeometry(void)
             wxGISSpatialReferenceValidator GISSpaRefValidator;
             wxString sProjName;
             if(m_pSpatialReference->IsProjected())
-                sProjName = wgMB2WX(m_pSpatialReference->GetAttrValue("PROJCS")); 
+                sProjName = wgMB2WX(m_pSpatialReference->GetAttrValue("PROJCS"));
             else
-                sProjName = wgMB2WX(m_pSpatialReference->GetAttrValue("GEOGCS")); 
+                sProjName = wgMB2WX(m_pSpatialReference->GetAttrValue("GEOGCS"));
             if(GISSpaRefValidator.IsLimitsSet(sProjName))
             {
                 LIMITS lims = GISSpaRefValidator.GetLimits(sProjName);
@@ -234,7 +234,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
                     ring1.closeRings();
 
                     pRgn1 = new OGRPolygon();
-                    pRgn1->addRing(&ring1);	
+                    pRgn1->addRing(&ring1);
                     pRgn1->flattenTo2D();
 
                     OGRLinearRing ring2;
@@ -245,7 +245,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
                     ring2.closeRings();
 
                     pRgn2 = new OGRPolygon();
-                    pRgn2->addRing(&ring2);	
+                    pRgn2->addRing(&ring2);
                     pRgn2->flattenTo2D();
                 }
                 else
@@ -258,10 +258,10 @@ void wxGISFeatureLayer::LoadGeometry(void)
                     ring.closeRings();
 
                     pRgn1 = new OGRPolygon();
-                    pRgn1->addRing(&ring);	
+                    pRgn1->addRing(&ring);
                     pRgn1->flattenTo2D();
                 }
-                //WGS84     
+                //WGS84
                 OGRSpatialReference* pWGSSpaRef = new OGRSpatialReference(SRS_WKT_WGS84);
 
                 if(pRgn1 != NULL)
@@ -275,7 +275,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
                     pRgn2->segmentize(STEP);
                 }
                 pWGSSpaRef->Dereference();
-                
+
                 if(!pDatasetSpaRef->IsSame(pWGSSpaRef))
                 {
                     if(pRgn1->transformTo(pDatasetSpaRef) != OGRERR_NONE)
@@ -290,7 +290,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
     }
 
     IApplication* pApp = ::GetApplication();
-    IStatusBar* pStatusBar = pApp->GetStatusBar();  
+    IStatusBar* pStatusBar = pApp->GetStatusBar();
     IProgressor* pProgressor = pStatusBar->GetProgressor();
     if(pProgressor)
     {
@@ -298,7 +298,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
         pProgressor->SetRange(m_pwxGISFeatureDataset->GetSize() * 2);
     }
 
-    
+
     OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pDatasetSpaRef, m_pSpatialReference );
 
     m_pwxGISFeatureDataset->Reset();
@@ -324,7 +324,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
     TrackCancel.SetProgressor(pProgressor);
 
     for(int i = 0; i < CPUCount; i++)
-    {        
+    {
         wxGISFeatureTransformThread *thread = new wxGISFeatureTransformThread(m_pwxGISFeatureDataset, poCT, bTransform, pRgn1, pRgn2, &CritSect, &m_FullEnv, m_pOGRGeometrySet, nCounter, &TrackCancel);
         thread->Create();
         thread->Run();
@@ -354,7 +354,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
         m_FullEnv.MaxY += 1;
         m_FullEnv.MinY -= 1;
     }
-             
+
     CreateQuadTree(&m_FullEnv);
 
     size_t nStep = m_pwxGISFeatureDataset->GetSize() < 10 ? 1 : m_pwxGISFeatureDataset->GetSize() / 10;
@@ -406,7 +406,7 @@ void wxGISFeatureLayer::SetSpatialReference(OGRSpatialReference* pSpatialReferen
 
 	//while(nIndex + 1 > m_OGRFeatureArray.size()) //m_pOGRLayer->GetFeatureCount()**
 	//{
-	//	size_t count(0); 
+	//	size_t count(0);
 	//	OGRFeature *poFeature;
 	//	while( (count < CACHE_SIZE) && (poFeature = m_poLayer->GetNextFeature()) != NULL )
 	//	{
