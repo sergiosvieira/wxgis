@@ -277,8 +277,8 @@ void wxGISGeoprocessingCmd::OnClick(void)
                         OGRFeatureDefn *pDef = pDSet->GetDefiniton();
                         if(!pDef)
                         {
-                            wxMessageBox(wxString(_("Error read dataset definition")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
-                            wxLogError(_("Error read dataset definition"));
+                            wxMessageBox(wxString(_("Error reading dataset definition")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
+                            wxLogError(_("Error reading dataset definition"));
                             wsDELETE(pDSet);
                             return; 
                         }
