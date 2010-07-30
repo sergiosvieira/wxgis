@@ -10,8 +10,8 @@
 	<File name="../../include/wxgis/carto/tableview.h" open="0" top="0" tabpos="0">
 		<Cursor position="4611" topLine="121" />
 	</File>
-	<File name="../../src/carto/cartocmd.cpp" open="1" top="1" tabpos="6">
-		<Cursor position="652" topLine="0" />
+	<File name="../../src/carto/cartocmd.cpp" open="1" top="1" tabpos="4">
+		<Cursor position="8687" topLine="409" />
 	</File>
 	<File name="../../src/carto/featurelayer.cpp" open="1" top="0" tabpos="3">
 		<Cursor position="4295" topLine="107" />

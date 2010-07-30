@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/carto/cartocmd.h"
 #include "../../art/geography16.xpm"
+#include "../../art/cursors_16.xpm"
 #include "wxgis/display/rubberband.h"
 #include "wxgis/display/simplefillsymbol.h"
 
@@ -400,32 +401,34 @@ unsigned char wxGISCartoMainTool::GetCount(void)
 
 wxCursor wxGISCartoMainTool::GetCursor(void)
 {
+    wxImageList oCursorList(16, 16);
+    oCursorList.Add(wxBitmap(cursors_16_xpm));
 	switch(m_subtype)
 	{
 		case 0:	//z_in
 		{
-			wxImage CursorImage = m_ImageList.GetBitmap(13).ConvertToImage();
+			wxImage CursorImage = oCursorList.GetBitmap(0).ConvertToImage();//m_ImageList.GetBitmap(13).ConvertToImage();
 			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 6);
 			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 6);
 			return wxCursor(CursorImage);
 		}
 		case 1:	//z_out
 		{
-			wxImage CursorImage = m_ImageList.GetBitmap(14).ConvertToImage();
+			wxImage CursorImage = oCursorList.GetBitmap(1).ConvertToImage();//m_ImageList.GetBitmap(14).ConvertToImage();
 			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 6);
 			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 6);
 			return wxCursor(CursorImage);
 		}
 		case 2:	//pan
 		{
-			wxImage CursorImage = m_ImageList.GetBitmap(1).ConvertToImage();
+			wxImage CursorImage = oCursorList.GetBitmap(3).ConvertToImage();//m_ImageList.GetBitmap(1).ConvertToImage();
 			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 7);
 			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 7);
 			return wxCursor(CursorImage);//wxCURSOR_HAND
 		}
 		case 3:	//inf
 		{
-			wxImage CursorImage = m_ImageList.GetBitmap(12).ConvertToImage();
+			wxImage CursorImage = oCursorList.GetBitmap(2).ConvertToImage();//m_ImageList.GetBitmap(12).ConvertToImage();
 			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 0);
 			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 0);
 			return wxCursor(CursorImage);//*wxSTANDARD_CURSOR
@@ -503,7 +506,9 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 		}
 		case 2:	//pan
 		{
-			wxImage CursorImage = m_ImageList.GetBitmap(11).ConvertToImage();
+		    wxImageList oCursorList(16, 16);
+		    oCursorList.Add(wxBitmap(cursors_16_xpm));
+			wxImage CursorImage = oCursorList.GetBitmap(4).ConvertToImage();//m_ImageList.GetBitmap(11).ConvertToImage();
 			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 7);
 			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 7);
 			m_pMapView->SetCursor(wxCursor(CursorImage));
