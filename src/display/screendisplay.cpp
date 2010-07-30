@@ -642,7 +642,8 @@ void wxGISScreenDisplay::OnPanStop(wxDC &dc)
 {
     StartDrawing(m_caches.size() - 1);
 	wxRect rect = m_pDisplayTransformation->GetDeviceFrame();
-    bool bTest = m_dc.Blit(0, 0, rect.GetWidth(), rect.GetHeight(), &dc, 0, 0);
+    m_dc.Blit(0, 0, rect.GetWidth(), rect.GetHeight(), &dc, 0, 0);
+    FinishDrawing();
 }
 
 void wxGISScreenDisplay::OnStretchDraw(wxDC &dc, wxCoord nDestWidth, wxCoord nDestHeight, wxCoord x, wxCoord y, bool bClearBackground, wxGISEnumDrawQuality quality )
