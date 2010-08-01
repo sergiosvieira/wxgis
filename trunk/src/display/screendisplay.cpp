@@ -548,8 +548,8 @@ void wxGISScreenDisplay::OnUpdate(void)
 
 void wxGISScreenDisplay::OnDraw(wxDC &dc, wxCoord x, wxCoord y, bool bClearBackground)
 {
-    if(m_caches.size() < 1)
-        return;
+    //if(m_caches.size() < 1)
+    //    return;
 
     //wxCriticalSectionLocker locker(m_DrawCritSect);
     wxRect DevRect = m_pDisplayTransformation->GetDeviceFrame();
@@ -599,12 +599,9 @@ void wxGISScreenDisplay::OnPanDraw(wxDC &dc, wxCoord x, wxCoord y)
 {
 	wxRect DispRect = m_pDisplayTransformation->GetDeviceFrame();
 
-    wxMemoryDC memDC;
 	if(abs(x) > DispRect.GetHeight() &&  abs(y) > DispRect.GetWidth())
 	{
 		dc.DrawBitmap(m_caches[0].bmp.GetSubBitmap(DispRect), 0, 0);	//, true
-//        memDC.SelectObject(m_caches[0].bmp);
-//        dc.Blit(0, 0, DispRect.GetWidth(), DispRect.GetHeight(), &memDC, 0, 0, wxCOPY, false);
         AddInvalidRect(DispRect);
 		return;
 	}
@@ -786,23 +783,23 @@ void wxGISScreenDisplay::MergeCaches(size_t SrcCacheID, size_t DstCacheID)
 
     wxRect DevRect = m_pDisplayTransformation->GetDeviceFrame();
 
-    wxMemoryDC DestDC;
-    DestDC.SelectObject(m_caches[DstCacheID].bmp);
+    //wxMemoryDC DestDC;
+    //DestDC.SelectObject(m_caches[DstCacheID].bmp);
 
-//	m_dc.SelectObject(m_caches[DstCacheID].bmp);
+	m_dc.SelectObject(m_caches[DstCacheID].bmp);
 
-	wxMemoryDC SourceDC;
-	SourceDC.SelectObject(m_caches[SrcCacheID].bmp);
+	//wxMemoryDC SourceDC;
+	//SourceDC.SelectObject(m_caches[SrcCacheID].bmp);
 
-	DestDC.Blit(0, 0, DevRect.GetWidth(), DevRect.GetHeight(), &SourceDC, DevRect.GetX(), DevRect.GetY(), wxCOPY, false);
-//
-//    if(m_InvalidRectArray.size() == 0)
-//        //m_dc.DrawBitmap(m_caches[SrcCacheID].bmp.GetSubBitmap(DevRect), 0, 0);
-//        m_dc.Blit(0, 0, DevRect.GetWidth(), DevRect.GetHeight(), &SourceDC, DevRect.GetX(), DevRect.GetY(), wxCOPY, false);
-//    else
-//        for(size_t i = 0; i < m_InvalidRectArray.size(); i++)
-//            m_dc.DrawBitmap(m_caches[SrcCacheID].bmp.GetSubBitmap(m_InvalidRectArray[i]), m_InvalidRectArray[i].x, m_InvalidRectArray[i].y);
-//	m_dc.SelectObject(wxNullBitmap);
+	//DestDC.Blit(0, 0, DevRect.GetWidth(), DevRect.GetHeight(), &SourceDC, DevRect.GetX(), DevRect.GetY(), wxCOPY, false);
+
+    if(m_InvalidRectArray.size() == 0)
+        m_dc.DrawBitmap(m_caches[SrcCacheID].bmp.GetSubBitmap(DevRect), 0, 0);
+        //m_dc.Blit(0, 0, DevRect.GetWidth(), DevRect.GetHeight(), &SourceDC, DevRect.GetX(), DevRect.GetY(), wxCOPY, false);
+    else
+        for(size_t i = 0; i < m_InvalidRectArray.size(); i++)
+            m_dc.DrawBitmap(m_caches[SrcCacheID].bmp.GetSubBitmap(m_InvalidRectArray[i]), m_InvalidRectArray[i].x, m_InvalidRectArray[i].y);
+	m_dc.SelectObject(wxNullBitmap);
 }
 
 void wxGISScreenDisplay::StartDrawing(size_t CacheID)
