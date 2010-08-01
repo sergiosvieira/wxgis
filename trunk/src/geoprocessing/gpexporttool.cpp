@@ -177,7 +177,7 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
     {
         //add messages to pTrackCancel
         if(pTrackCancel)
-            pTrackCancel->PutMessage(_("The source object is incompatible type"), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(_("The source object is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
     wxGISFeatureDataset* pSrcDataSet = dynamic_cast<wxGISFeatureDataset*>(pGxDataset->GetDataset());
@@ -185,7 +185,7 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
     {
         //add messages to pTrackCancel
         if(pTrackCancel)
-            pTrackCancel->PutMessage(_("The source dataset is incompatible type"), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(_("The source dataset is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
     
@@ -357,7 +357,7 @@ bool wxGISGPExportTool::OnExport(wxGISFeatureDataset* pDSet, wxString sPath, wxS
     if(!pNewDSet)
     {
         if(pTrackCancel)
-            pTrackCancel->PutMessage(_("Error create new dataset"), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(_("Error creating new dataset"), -1, enumGISMessageErr);
         return false; 
     }
 
@@ -369,7 +369,7 @@ bool wxGISGPExportTool::OnExport(wxGISFeatureDataset* pDSet, wxString sPath, wxS
     if(!CopyRows(pDSet, pNewDSet, NULL, pTrackCancel))
     {
         if(pTrackCancel)
-            pTrackCancel->PutMessage(_("Error copy data to new dataset"), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(_("Error copying data to new dataset"), -1, enumGISMessageErr);
         wsDELETE(pNewDSet);
         return false; 
     }
