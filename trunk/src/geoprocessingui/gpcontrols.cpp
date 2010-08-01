@@ -179,7 +179,7 @@ void wxGISTextCtrl::OnKillFocus(wxFocusEvent& event)
     else
     {
         pParam->SetValue(wxVariant(sData, wxT("val")));
-        pParam->SetMessage(wxGISEnumGPMessageError, _("The input data is invalid"));
+        pParam->SetMessage(wxGISEnumGPMessageError, _("The input data are invalid"));
     }
     event.Skip();
 }
@@ -332,7 +332,7 @@ bool wxGISDTPath::Validate(void)
                if(m_pParam->GetÌessageType() == wxGISEnumGPMessageError)
                    return false;
                m_pParam->SetIsValid(true);
-               m_pParam->SetMessage(wxGISEnumGPMessageWarning, _("The output object is exist. It will be overwrited!"));
+               m_pParam->SetMessage(wxGISEnumGPMessageWarning, _("The output object exists and will be overwritten!"));
            }
            return true;
         }
@@ -341,7 +341,7 @@ bool wxGISDTPath::Validate(void)
            if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
            {
                 m_pParam->SetIsValid(false);
-                m_pParam->SetMessage(wxGISEnumGPMessageError, _("The input object is not exist"));
+                m_pParam->SetMessage(wxGISEnumGPMessageError, _("The input object doesn't exist"));
                 return false;
            }
            else
@@ -445,7 +445,7 @@ bool wxGISDTDigit::Validate(void)
     }
     else
     {
-        m_pParam->SetMessage(wxGISEnumGPMessageError, _("The input data is invalid"));
+        m_pParam->SetMessage(wxGISEnumGPMessageError, _("The input data are invalid"));
         return false;
     }
     return true;
