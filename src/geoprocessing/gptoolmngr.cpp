@@ -53,7 +53,7 @@ void *wxGISGPTaskThread::Entry()
             m_pTrackCancel->PutMessage(wxString::Format(_("Executed (%s) successfully"), m_pTool->GetName().c_str()), -1, enumGISMessageInfo);
         else
         {
-            m_pTrackCancel->PutMessage(wxString::Format(_("An error was encountered while executing %s. Failed to execute (%s)."), m_pTool->GetName().c_str(), m_pTool->GetName().c_str()), -1, enumGISMessageErr);
+            m_pTrackCancel->PutMessage(wxString::Format(_("An error occured while executing %s. Failed to execute (%s)."), m_pTool->GetName().c_str(), m_pTool->GetName().c_str()), -1, enumGISMessageErr);
         }
         wxTimeSpan span = end - begin;
         m_pTrackCancel->PutMessage(wxString::Format(_("End Time: %s (Elapsed Time: %s)"), end.Format().c_str(), span.Format(_("%H hours %M min. %S sec.")).c_str()), -1, enumGISMessageInfo);

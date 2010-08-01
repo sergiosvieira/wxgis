@@ -122,7 +122,7 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         //constant_ elevation double
         wxGISGPParameter* pParam5 = new wxGISGPParameter();
         pParam5->SetName(wxT("elev_scale"));
-        pParam5->SetDisplayName(_("The scaling factor used to convert the elevation values"));
+        pParam5->SetDisplayName(_("Scaling factor to convert elevation values"));
         pParam5->SetParameterType(enumGISGPParameterTypeOptional);
         pParam5->SetDataType(enumGISGPParamDTDouble);
         pParam5->SetDirection(enumGISGPParameterDirectionInput);
@@ -133,7 +133,7 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         //elevation interpolation type
         wxGISGPParameter* pParam6 = new wxGISGPParameter();
         pParam6->SetName(wxT("elev_interpol"));
-        pParam6->SetDisplayName(_("The elevation values interpolation"));
+        pParam6->SetDisplayName(_("Elevation values interpolation"));
         pParam6->SetParameterType(enumGISGPParameterTypeOptional);
         pParam6->SetDataType(enumGISGPParamDTStringList);
         pParam6->SetDirection(enumGISGPParameterDirectionInput);
@@ -233,7 +233,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     {
         //add messages to pTrackCancel
         if(pTrackCancel)
-            pTrackCancel->PutMessage(_("The source object is incompatible type"), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(_("Source object is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
     wxGISRasterDataset* pSrcDataSet = dynamic_cast<wxGISRasterDataset*>(pGxDataset->GetDataset());
@@ -241,7 +241,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     {
         //add messages to pTrackCancel
         if(pTrackCancel)
-            pTrackCancel->PutMessage(_("The source dataset is incompatible type"), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(_("Source dataset is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
     
@@ -343,7 +343,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     if(eErr != CE_None)
     {
         if(pTrackCancel)
-            pTrackCancel->PutMessage(_("Error determine output raster size"), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(_("Error determining output raster size"), -1, enumGISMessageErr);
         wsDELETE(pSrcDataSet);
         return false;
     }
