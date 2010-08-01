@@ -115,7 +115,7 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGxApplication* pGxApp, wxWindow* parent, 
 	//add sets
 	m_nMenubarId = m_pTreeCtrl->AppendItem(nRootId, _("Menubar"), 2, 2);
 	m_pTreeCtrl->SetItemBold(m_nMenubarId);
-	m_nContextMenuesId = m_pTreeCtrl->AppendItem(nRootId, _("Context Menues"), 2, 2);
+	m_nContextMenuesId = m_pTreeCtrl->AppendItem(nRootId, _("Context Menus"), 2, 2);
 	m_pTreeCtrl->SetItemBold(m_nContextMenuesId);
 	m_nToolBarsId = m_pTreeCtrl->AppendItem(nRootId, _("ToolBars"), 2, 2);
 	m_pTreeCtrl->SetItemBold(m_nToolBarsId);

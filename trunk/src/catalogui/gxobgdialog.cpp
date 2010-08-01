@@ -763,7 +763,7 @@ void wxGxObjectDialog::OnOK(wxCommandEvent& event)
             }
             if(m_ObjectArray.size() == 0)
             {
-                wxMessageBox(_("The item(s) cannot be choosen!"), _("Error"), wxICON_ERROR | wxOK, this);
+                wxMessageBox(_("Cannot choose item(s)"), _("Error"), wxICON_ERROR | wxOK, this);
                 return;
             }
         }
@@ -941,12 +941,12 @@ bool wxGxObjectDialog::DoSaveObject(wxGISEnumSaveObjectResults Result)
 {
     if(Result == enumGISSaveObjectDeny)
     {
-        wxMessageBox(_("The item cannot be save!"), _("Error"), wxICON_ERROR | wxOK, this);
+        wxMessageBox(_("Cannot save item!"), _("Error"), wxICON_ERROR | wxOK, this);
         return false;
     }
     else if(Result == enumGISSaveObjectExists && m_bOverwritePrompt)
     {
-        int nRes = wxMessageBox(_("The item is exist! Overwrite?"), _("Question"), wxICON_QUESTION | wxYES_NO | wxCANCEL, this);
+        int nRes = wxMessageBox(_("Item exists! Overwrite?"), _("Question"), wxICON_QUESTION | wxYES_NO | wxCANCEL, this);
         if(nRes == wxCANCEL)
             return false;
         else if(nRes == wxNO)
@@ -957,19 +957,19 @@ bool wxGxObjectDialog::DoSaveObject(wxGISEnumSaveObjectResults Result)
             //Delete item
             if(!pObjEd)
             {
-                wxMessageBox(_("The item cannot be deleted!"), _("Error"), wxICON_ERROR | wxOK, this);
+                wxMessageBox(_("Cannot delete item!"), _("Error"), wxICON_ERROR | wxOK, this);
                 return false;
             }
 
             if(!pObjEd->CanDelete())
             {
-                wxMessageBox(_("The item cannot be deleted!"), _("Error"), wxICON_ERROR | wxOK, this);
+                wxMessageBox(_("Cannot delete item!"), _("Error"), wxICON_ERROR | wxOK, this);
                 return false;
             }
 
             if(!pObjEd->Delete())
             {
-                wxMessageBox(_("The item cannot be deleted!"), _("Error"), wxICON_ERROR | wxOK, this);
+                wxMessageBox(_("Cannot delete item!"), _("Error"), wxICON_ERROR | wxOK, this);
                 return false;
             }
         }

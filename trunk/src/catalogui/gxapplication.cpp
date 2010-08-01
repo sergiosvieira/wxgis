@@ -219,7 +219,7 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
 
 	if(!pViewsNode)
 	{
-		wxLogError(_("wxGxApplication: Error find <views> XML Node"));
+		wxLogError(_("wxGxApplication: Error finding <views> XML Node"));
 		return false;
 	}
 
