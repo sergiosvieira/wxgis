@@ -126,7 +126,7 @@ wxGxTaskPanel::wxGxTaskPanel(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow
     pProgressor->SetInitialSize(wxSize(-1, 18));
     bMainSizer->Add(pProgressor, 0, wxALL|wxEXPAND, 5);
 */
-    m_pCheckBox = new wxCheckBox(this, wxID_ANY, _("Close when complited successfully"));
+    m_pCheckBox = new wxCheckBox(this, wxID_ANY, _("Close when completed successfully"));
     m_bMainSizer->Add(m_pCheckBox, 0, /*wxEXPAND | */wxALL, 5);
 
 //    wxRichTextCtrl* pRichTextCtrl = new wxRichTextCtrl(this, wxID_ANY);
@@ -228,14 +228,14 @@ void wxGxTaskPanel::OnFinish(bool bHasErrors, IGPTool* pTool)
     {
         m_Icon = m_ImageList.GetIcon(2);
         m_pStateBitmap->SetIcon(m_Icon);
-        m_sNote = wxString(_("Complete with errors!"));
+        m_sNote = wxString(_("Completed with errors!"));
     }
     else
     {
         m_Icon = m_ImageList.GetIcon(1);
         m_pStateBitmap->SetIcon(m_Icon);
         wxDELETE(pTool);
-        m_sNote = wxString(_("Complete successful!"));
+        m_sNote = wxString(_("Completed successfully!"));
     }
 
     wxCommandEvent event(wxEVT_COMMAND_BUTTON_CLICKED, ID_SHOW_BALLOON);

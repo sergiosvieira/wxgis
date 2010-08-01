@@ -174,7 +174,7 @@ void wxGxRootToolbox::Init(wxXmlNode* pConfigNode)
         m_sPath = sExeDirPath + wxT("/sys/toolbox.xml");
         m_sPath.Replace(wxT("\\"), wxT("/"));
     }
-    wxLogMessage(_("wxGxRootToolbox: The path set to '%s'"), m_sPath.c_str());
+    wxLogMessage(_("wxGxRootToolbox: The path is set to '%s'"), m_sPath.c_str());
 
     m_pPropNode = new wxXmlNode(*pConfigNode);
     //m_pPropNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("rootitem"));

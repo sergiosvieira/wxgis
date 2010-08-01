@@ -293,8 +293,8 @@ void wxGISGeoprocessingCmd::OnClick(void)
 
                         if(!pSrcSpaRef && pNewSpaRef)
                         {
-                            wxMessageBox(wxString(_("The input spatial reference is not defined!")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
-                            wxLogError(_("The input spatial reference is not defined!"));
+                            wxMessageBox(wxString(_("Input spatial reference is not defined")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
+                            wxLogError(_("Input spatial reference is not defined"));
                             goto EXIT; 
                         }
 
@@ -508,7 +508,7 @@ EXIT:
                             OGRFeatureDefn *pDef = pDSet->GetDefiniton();
                             if(!pDef)
                             {
-                                ProgressDlg.SetText1(wxString::Format(_("Error read %d dataset definition"), i));
+                                ProgressDlg.SetText1(wxString::Format(_("Error reading %d dataset definition"), i));
                                 wsDELETE(pDSet);
                                 continue;
                             }
@@ -523,7 +523,7 @@ EXIT:
 
                             if(!pSrcSpaRef && pNewSpaRef)
                             {
-                                ProgressDlg.SetText1(wxString(_("The input spatial reference is not defined!")));
+                                ProgressDlg.SetText1(wxString(_("Input spatial reference is not defined")));
                                 wsDELETE(pDSet);
                                 wxDELETE(pNewSpaRef);
                                 continue;
@@ -711,7 +711,7 @@ bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath,
     wxGISFeatureDataset* pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
     if(!pNewDSet)
     {
-        m_sLastError = wxString(_("Error create new dataset"));
+        m_sLastError = wxString(_("Error creating new dataset"));
         return false; 
     }
 
@@ -732,7 +732,7 @@ bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath,
     //copy data
     if(!CopyRows(pDSet, pNewDSet, NULL, &TrackCancel))
     {
-        m_sLastError = wxString(_("Error copy data to new dataset"));
+        m_sLastError = wxString(_("Error copying data to a new dataset"));
         wsDELETE(pNewDSet);
         return false; 
     }
@@ -768,14 +768,14 @@ bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath,
     wxGISFeatureDataset* pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
     if(!pNewDSet)
     {
-        m_sLastError = wxString(_("Error create new dataset"));
+        m_sLastError = wxString(_("Error creating new dataset"));
         return false; 
     }
 
     //copy data
     if(!CopyRows(pDSet, pNewDSet, NULL, pTrackCancel))
     {
-        m_sLastError = wxString(_("Error copy data to new dataset"));
+        m_sLastError = wxString(_("Error copying data to a new dataset"));
         wsDELETE(pNewDSet);
         return false; 
     }
