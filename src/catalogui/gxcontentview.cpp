@@ -531,7 +531,7 @@ void wxGxContentView::OnEndLabelEdit(wxListEvent& event)
 {
     if ( event.GetLabel().Len() == 0 )
     {
-        //wxMessageBox(_("wxGxContentView: Too short label. Please add longer text!"));
+        //wxMessageBox(_("wxGxContentView: Label is too short. Please make it longer!"));
         event.Veto();
     }
 	else

@@ -200,9 +200,9 @@ wxString wxGxDatasetFilter::GetName(void)
     switch(m_nType)
     {
     case enumGISRasterDataset:
-        return wxString(_("Rasters (*.img, *.tif, etc.)"));
+        return wxString(_("Raster (*.img, *.tif, etc.)"));
     case enumGISFeatureDataset:
-        return wxString(_("Vectors (*.shp, *.tab, etc.)"));
+        return wxString(_("Vector (*.shp, *.tab, etc.)"));
     }
     return wxEmptyString;
 }
@@ -320,7 +320,7 @@ wxGxKMLFilter::~wxGxKMLFilter(void)
 
 wxString wxGxKMLFilter::GetName(void)
 {
-	return wxString(_("Google KML files (*.kml)"));
+	return wxString(_("KML file (*.kml)"));
 }
 
 wxString wxGxKMLFilter::GetExt(void)
@@ -352,7 +352,7 @@ wxGxDXFFilter::~wxGxDXFFilter(void)
 
 wxString wxGxDXFFilter::GetName(void)
 {
-	return wxString(_("AutoCAD DXF files (*.dxf)"));
+	return wxString(_("AutoCAD DXF file (*.dxf)"));
 }
 
 wxString wxGxDXFFilter::GetExt(void)
@@ -469,7 +469,7 @@ wxGxTiffFilter::~wxGxTiffFilter(void)
 
 wxString wxGxTiffFilter::GetName(void)
 {
-	return wxString(_("TIFF Format (*.tif, *.tiff)"));
+	return wxString(_("GeoTIFF (*.tif, *.tiff)"));
 }
 
 wxString wxGxTiffFilter::GetExt(void)
@@ -501,7 +501,7 @@ wxGxImgFilter::~wxGxImgFilter(void)
 
 wxString wxGxImgFilter::GetName(void)
 {
-	return wxString(_("Erdas Imagine Images (*.img)"));
+	return wxString(_("Erdas IMAGINE image (*.img)"));
 }
 
 wxString wxGxImgFilter::GetExt(void)

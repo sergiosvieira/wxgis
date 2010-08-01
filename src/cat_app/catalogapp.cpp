@@ -58,7 +58,7 @@ bool wxGISCatalogApp::OnInit()
 	wxString sLogDir = m_pConfig->GetLogDir();
 	if(sLogDir.IsEmpty())
 	{
-		wxLogError(_("wxGISCatalogApp: Failed to get log dir"));
+		wxLogError(_("wxGISCatalogApp: Failed to get log folder"));
         return false;
 	}
 	if(!wxDirExists(sLogDir))
@@ -96,7 +96,7 @@ bool wxGISCatalogApp::OnInit()
 		if(loc_info != NULL)
 		{
 			iLocale = loc_info->Language;
-			wxLogMessage(_("wxGISCatalogApp: Language set to %s"), loc_info->Description.c_str());
+			wxLogMessage(_("wxGISCatalogApp: Language is set to %s"), loc_info->Description.c_str());
 		}
 
         // don't use wxLOCALE_LOAD_DEFAULT flag so that Init() doesn't return
@@ -154,7 +154,7 @@ bool wxGISCatalogApp::OnInit()
 	wxString sSysDir = m_pConfig->GetSysDir();
 	if(!wxDirExists(sSysDir))
 	{
-		wxLogError(wxString::Format(_("wxGISCatalogApp: System dir is absent! Lookup path '%s'"), sSysDir.c_str()));
+		wxLogError(wxString::Format(_("wxGISCatalogApp: System folder is absent! Lookup path '%s'"), sSysDir.c_str()));
 		return false;
 	}
 

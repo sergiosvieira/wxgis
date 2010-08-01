@@ -279,7 +279,7 @@ wxGISDataset* wxGxFeatureDataset::GetDataset(void)
        //         if(bAskSpaInd)
        //         {
        //             //show ask dialog
-       //             wxGISMessageDlg dlg(NULL, wxID_ANY, wxString::Format(_("Create spatial index for %s"), sFileName.c_str()), wxString(_("This vector data source does not have spatial index. Spatial index allow for rapid display at varying resolutions.")), wxString(_("Spatial index buildin may take a few moments.\nWould you like to create spatial index?")), wxDefaultPosition, wxSize( 400,160 ));
+       //             wxGISMessageDlg dlg(NULL, wxID_ANY, wxString::Format(_("Create spatial index for %s"), sFileName.c_str()), wxString(_("This vector datasource does not have spatial index. Spatial index allows rapid display at different resolutions.")), wxString(_("Spatial index building may take few moments.\nWould you like to create spatial index?")), wxDefaultPosition, wxSize( 400,160 ));
        //             if(dlg.ShowModal() == wxID_NO)
        //             {
        //                 bCreateSpaInd = false;

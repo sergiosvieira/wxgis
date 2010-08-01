@@ -73,7 +73,7 @@ void wxGxSpatialReferencesFolder::Init(wxXmlNode* pConfigNode)
     }
     else
         m_sPath.Replace(wxT("\\"), wxT("/"));
-    wxLogMessage(_("wxGxSpatialReferencesFolder: The path set to '%s'"), m_sPath.c_str());
+    wxLogMessage(_("wxGxSpatialReferencesFolder: The path is set to '%s'"), m_sPath.c_str());
     CPLSetConfigOption("wxGxSpatialReferencesFolder", wgWX2MB(m_sPath));
 }
 

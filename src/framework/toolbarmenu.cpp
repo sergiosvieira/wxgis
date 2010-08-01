@@ -84,7 +84,7 @@ wxString wxGISToolBarMenu::GetCaption(void)
 
 wxString wxGISToolBarMenu::GetCategory(void)
 {
-	return wxString(_("[Menues]"));
+	return wxString(_("[Menus]"));
 }
 
 bool wxGISToolBarMenu::GetChecked(void)

@@ -392,7 +392,7 @@ void wxGxCatalog::SerializeDiscConnections(wxXmlNode* pNode, bool bStore)
 		short bScanOnce = wxAtoi(pNode->GetPropVal(wxT("scan_once"), wxT("0")));
 		if(bScanOnce == 0)
 		{
-            wxLogMessage(_("wxGxCatalog: Procceed scan disc connections"));
+            wxLogMessage(_("wxGxCatalog: Continue scanning folder connections"));
             wxArrayString arr;
 #ifdef WIN32
 			arr = wxFSVolumeBase::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE | wxFS_VOL_REMOTE);
@@ -412,7 +412,7 @@ void wxGxCatalog::SerializeDiscConnections(wxXmlNode* pNode, bool bStore)
 				if(AddChild(pGxObject))
                 {
 					m_DiscConnections[arr[i]] = pGxObject;
-                    wxLogMessage(_("wxGxCatalog: Add new disc connection [%s]"), pGxObject->GetName().c_str());
+                    wxLogMessage(_("wxGxCatalog: Add new folder connection [%s]"), pGxObject->GetName().c_str());
                 }
 			}
 		}
@@ -432,7 +432,7 @@ void wxGxCatalog::SerializeDiscConnections(wxXmlNode* pNode, bool bStore)
 					if(AddChild(pGxObject))
                     {
 						m_DiscConnections[sPath] = pGxObject;
-                        wxLogMessage(_("wxGxCatalog: Add disc connection [%s]"), sName.c_str());
+                        wxLogMessage(_("wxGxCatalog: Add folder connection [%s]"), sName.c_str());
                     }
 				}
 				pDiscConn = pDiscConn->GetNext();
@@ -460,7 +460,7 @@ IGxObject* wxGxCatalog::ConnectFolder(wxString sPath, bool bSelect)
     }
     else
     {
-		//wxMessageBox(_("The directory is not exist!"), _("Error"), wxOK | wxICON_ERROR );
+		//wxMessageBox(_("The directory does not exist!"), _("Error"), wxOK | wxICON_ERROR );
 		pReturnObj = this;
     }
     if(bSelect)

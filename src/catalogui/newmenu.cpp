@@ -53,7 +53,7 @@ wxString wxGISNewMenu::GetCaption(void)
 
 wxString wxGISNewMenu::GetCategory(void)
 {
-	return wxString(_("[Menues]"));
+	return wxString(_("[Menus]"));
 }
 
 bool wxGISNewMenu::GetChecked(void)

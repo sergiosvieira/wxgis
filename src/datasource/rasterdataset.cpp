@@ -190,7 +190,7 @@ bool wxGISRasterDataset::Open(void)
         pBand = m_poDataset->GetRasterBand(1);
     if(!pBand)
     {
-		wxLogError(_("wxGISRasterDataset: Open failed! Path '%s'. Raster have no bands"), m_sPath.c_str());
+		wxLogError(_("wxGISRasterDataset: Open failed! Path '%s'. Raster has no bands"), m_sPath.c_str());
 		return false;
     }
     if(pBand && pBand->GetOverviewCount() > 0)

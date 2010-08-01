@@ -428,7 +428,7 @@ void wxGxTreeView::OnEndLabelEdit(wxTreeEvent& event)
 {
     if ( event.GetLabel().IsEmpty() )
     {
-        //wxMessageDialog(this, _("Too short label. Please add longer text!"), _("Warning"), wxOK | wxICON_EXCLAMATION);
+        //wxMessageDialog(this, _("Label is too short. Please make it longer!"), _("Warning"), wxOK | wxICON_EXCLAMATION);
         event.Veto();
     }
 	else

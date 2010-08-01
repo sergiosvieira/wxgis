@@ -668,7 +668,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 			{
 				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
                 //get from config
-                int answer = wxMessageBox(wxString::Format(_("Do you really wan to delete %d item(s)"), pSel->GetCount()), wxString(_("Confirm")), wxCENTRE|wxYES_NO|wxICON_QUESTION, dynamic_cast<wxWindow*>(m_pApp) ); 
+                int answer = wxMessageBox(wxString::Format(_("Do you really want to delete %d item(s)"), pSel->GetCount()), wxString(_("Confirm")), wxCENTRE|wxYES_NO|wxICON_QUESTION, dynamic_cast<wxWindow*>(m_pApp) ); 
                 if (answer == wxNO)
                     return;
                 for(size_t i = 0; i < pSel->GetCount(); i++)

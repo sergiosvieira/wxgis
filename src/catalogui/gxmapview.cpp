@@ -275,7 +275,7 @@ void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileNam
             if(bAskCreateOvr)
             {
                 //show ask dialog
-                wxGISMessageDlg dlg(NULL, wxID_ANY, wxString::Format(_("Create pyramids for %s (%d x %d)"), soFileName.c_str(), pwxGISRasterDataset->GetWidth(), pwxGISRasterDataset->GetHeight()), wxString(_("This raster data source does not have pyramids. Pyramids allow for rapid display at varying resolutions.")), wxString(_("Pyramid buildin may take a few moments.\nWould you like to create pyramids?")), wxDefaultPosition, wxSize( 400,160 ));
+                wxGISMessageDlg dlg(NULL, wxID_ANY, wxString::Format(_("Create pyramids for %s (%d x %d)"), soFileName.c_str(), pwxGISRasterDataset->GetWidth(), pwxGISRasterDataset->GetHeight()), wxString(_("This raster datasource does not have pyramids. Pyramids allow rapid display at different resolutions.")), wxString(_("Pyramids building may take few moments.\nWould you like to create pyramids?")), wxDefaultPosition, wxSize( 400,160 ));
 
                 if(dlg.ShowModal() == wxID_NO)
                     bCreateOverviews = false;
