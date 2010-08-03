@@ -52,13 +52,12 @@ wxGISMessageDlg::wxGISMessageDlg( wxWindow* parent, wxWindowID id, const wxStrin
 
 	m_sdbSizer1 = new wxStdDialogButtonSizer();
 	m_sdbSizer1Yes = new wxButton( this, wxID_YES, _("Yes") );
+	m_sdbSizer1Yes->SetDefault();
 	m_sdbSizer1->AddButton( m_sdbSizer1Yes );
 	m_sdbSizer1No = new wxButton( this, wxID_NO, _("No") );
 	m_sdbSizer1->AddButton( m_sdbSizer1No );
 	m_sdbSizer1->Realize();
 	bSizer1->Add( m_sdbSizer1, 0, wxEXPAND|wxALL, 5 );
-
-	m_sdbSizer1Yes->SetFocus();
 
 	m_checkBox = new wxCheckBox( this, wxID_ANY, _("Use my choice and do not show this dialog in future."), wxDefaultPosition, wxDefaultSize, 0, wxGenericValidator(&m_bNotShowInFuture) );
 
@@ -66,6 +65,8 @@ wxGISMessageDlg::wxGISMessageDlg( wxWindow* parent, wxWindowID id, const wxStrin
 
 	this->SetSizer( bSizer1 );
 	this->Layout();
+
+	this->Centre( wxBOTH );
 }
 
 wxGISMessageDlg::~wxGISMessageDlg()

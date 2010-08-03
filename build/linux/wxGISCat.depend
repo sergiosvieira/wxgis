@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1277586143 source:/home/bishop/projects/wxGIS/src/cat_app/catalogapp.cpp
+1280699921 source:/home/bishop/projects/wxGIS/src/cat_app/catalogapp.cpp
 	"wxgis/catalog/catalog.h"
 	"wxgis/cat_app/catalogapp.h"
 	"wxgis/cat_app/catalogframe.h"
@@ -1913,7 +1913,7 @@
 
 1277060084 /home/bishop/projects/wxGIS/art/mainframe.xpm
 
-1277671766 source:/home/bishop/projects/wxGIS/src/cat_app/catalogframe.cpp
+1280699921 source:/home/bishop/projects/wxGIS/src/cat_app/catalogframe.cpp
 	"wxgis/cat_app/catalogframe.h"
 	"wx/version.h"
 	"geos_c.h"

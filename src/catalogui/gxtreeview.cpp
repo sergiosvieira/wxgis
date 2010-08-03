@@ -101,7 +101,7 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, b
 	int pos(-1);
 	if(!icon.IsOk())
         icon = wxIcon(doc_16_xpm);
-		
+
     pos = m_TreeImageList.Add(icon);
 
 	wxGxTreeItemData* pData = new wxGxTreeItemData(pGxObject, pos, false);
@@ -128,7 +128,7 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, b
 }
 
 bool wxGxTreeViewBase::Activate(IGxApplication* application, wxXmlNode* pConf)
-{ 
+{
 	if(!wxGxView::Activate(application, pConf))
 		return false;
 
@@ -144,7 +144,7 @@ bool wxGxTreeViewBase::Activate(IGxApplication* application, wxXmlNode* pConf)
 	if(m_pConnectionPointSelection != NULL)
 		m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
 
-	return true; 
+	return true;
 };
 
 void wxGxTreeViewBase::Deactivate(void)
@@ -161,7 +161,7 @@ void wxGxTreeViewBase::OnSelectionChanged(IGxSelection* Selection, long nInitiat
 {
 	if(nInitiator == GetId())
 		return;
-	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();	
+	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
 	wxTreeItemId ItemId = m_TreeMap[pGxObj];
 	if(ItemId.IsOk())
 	{
@@ -191,7 +191,7 @@ void wxGxTreeViewBase::OnObjectAdded(IGxObject* object)
 	if(object == NULL)
 		return;
 	IGxObject* pParentObject = object->GetParent();
-	wxTreeItemId TreeItemId = m_TreeMap[pParentObject];	
+	wxTreeItemId TreeItemId = m_TreeMap[pParentObject];
 	if(TreeItemId.IsOk())
 	{
 		wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(TreeItemId);
@@ -200,7 +200,7 @@ void wxGxTreeViewBase::OnObjectAdded(IGxObject* object)
 			if(pData->m_bExpandedOnce)
 				AddTreeItem(object,TreeItemId);
 			else
-				SetItemHasChildren(TreeItemId, true);	
+				SetItemHasChildren(TreeItemId, true);
 		}
 	}
 }
@@ -210,7 +210,7 @@ void wxGxTreeViewBase::OnObjectChanged(IGxObject* object)
 	if(object == NULL)
 		return;
 
-	wxTreeItemId TreeItemId = m_TreeMap[object];	
+	wxTreeItemId TreeItemId = m_TreeMap[object];
 	if(TreeItemId.IsOk())
 	{
 		wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(TreeItemId);
@@ -240,7 +240,7 @@ void wxGxTreeViewBase::OnObjectChanged(IGxObject* object)
 					SetItemHasChildren(TreeItemId, bItemHasChildren && pGxObjectContainer->AreChildrenViewable());
 				}
 				wxTreeCtrl::Refresh();
-			}	
+			}
 		}
 	}
 }
@@ -249,7 +249,7 @@ void wxGxTreeViewBase::OnObjectDeleted(IGxObject* object)
 {
 	if(object == NULL)
 		return;
-	wxTreeItemId TreeItemId = m_TreeMap[object];	
+	wxTreeItemId TreeItemId = m_TreeMap[object];
 	if(TreeItemId.IsOk())
 		Delete(TreeItemId);
 	m_TreeMap.erase(object);
@@ -259,7 +259,7 @@ void wxGxTreeViewBase::OnObjectRefreshed(IGxObject* object)
 {
 	if(object == NULL)
 		return;
-	wxTreeItemId TreeItemId = m_TreeMap[object];	
+	wxTreeItemId TreeItemId = m_TreeMap[object];
 	if(TreeItemId.IsOk())
 	{
 		wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(TreeItemId);
@@ -301,7 +301,7 @@ int wxGxTreeViewBase::OnCompareItems(const wxTreeItemId& item1, const wxTreeItem
     {
         return GxObjectCompareFunction(pData1->m_pObject, pData2->m_pObject, 1);
     }
-    return 0;   
+    return 0;
 //   return wxTreeCtrl::OnCompareItems(item1, item2);
 }
 
@@ -381,7 +381,7 @@ BEGIN_EVENT_TABLE(wxGxTreeView, wxGxTreeViewBase)
     EVT_TREE_BEGIN_LABEL_EDIT(TREECTRLID, wxGxTreeView::OnBeginLabelEdit)
     EVT_TREE_END_LABEL_EDIT(TREECTRLID, wxGxTreeView::OnEndLabelEdit)
     EVT_TREE_SEL_CHANGED(TREECTRLID, wxGxTreeView::OnSelChanged)
-    EVT_SET_FOCUS(wxGxTreeView::OnSetFocus)        
+    EVT_SET_FOCUS(wxGxTreeView::OnSetFocus)
     EVT_TREE_BEGIN_DRAG(TREECTRLID, wxGxTreeView::OnBeginDrag)
     EVT_TREE_ITEM_ACTIVATED(TREECTRLID, wxGxTreeView::OnActivated)
 END_EVENT_TABLE()
@@ -417,7 +417,7 @@ void wxGxTreeView::OnBeginLabelEdit(wxTreeEvent& event)
 		event.Veto();
 		return;
 	}
-	if(!pObjEdit->CanRename())	
+	if(!pObjEdit->CanRename())
 	{
 		event.Veto();
 		return;
@@ -460,7 +460,7 @@ void wxGxTreeView::OnEndLabelEdit(wxTreeEvent& event)
 //	if(pObject == NULL)
 //		return;
 //
-//	wxTreeItemId TreeItemId = m_TreeMap[pObject];	
+//	wxTreeItemId TreeItemId = m_TreeMap[pObject];
 //	if(TreeItemId.IsOk())
 //	{
 //		wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(TreeItemId);
@@ -484,7 +484,7 @@ void wxGxTreeView::OnEndLabelEdit(wxTreeEvent& event)
 //					SetItemHasChildren(TreeItemId, bItemHasChildren && pGxObjectContainer->AreChildrenViewable());
 //				}
 //				wxTreeCtrl::Refresh();
-//			}	
+//			}
 //		}
 //	}
 //}
@@ -535,7 +535,7 @@ void wxGxTreeView::OnSelChanged(wxTreeEvent& event)
 
 void wxGxTreeView::OnSetFocus(wxFocusEvent& event)
 {
-    event.Skip();
+//    event.Skip();
     if(event.GetWindow() == this)
         return;
     wxArrayTreeItemIds treearray;
