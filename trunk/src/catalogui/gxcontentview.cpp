@@ -3,7 +3,7 @@
  * Purpose:  wxGxContentView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -307,7 +307,7 @@ void wxGxContentView::OnSelected(wxListEvent& event)
 
 void wxGxContentView::OnSetFocus(wxFocusEvent& event)
 {
-    event.Skip();
+//    event.Skip();
     if(event.GetWindow() == this)
         return;
     if(GetSelectedItemCount() == 0)
@@ -696,9 +696,9 @@ void wxGxContentView::ResetContents(void)
 
 void wxGxContentView::OnBeginDrag(wxListEvent& event)
 {
-    event.Skip();
     wxFileDataObject my_data;
     long nItem = -1;
+    int nCount(0);
     for ( ;; )
     {
         nItem = GetNextItem(nItem, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
@@ -713,9 +713,12 @@ void wxGxContentView::OnBeginDrag(wxListEvent& event)
         if(pDSet)
         {
             my_data.AddFile(pDSet->GetPath());
+            nCount++;
         }
     }
-    //my_data.AddFile( wxT("/vsizip/E:/Archive.zip/тест русский.shp") );
+    if(nCount == 0)
+        return;
+
     wxDropSource dragSource( this );
 	dragSource.SetData( my_data );
 	wxDragResult result = dragSource.DoDragDrop( TRUE );

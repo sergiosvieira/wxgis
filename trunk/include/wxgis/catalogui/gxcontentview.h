@@ -3,7 +3,7 @@
  * Purpose:  wxGxContentView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@
 #include "wx/listctrl.h"
 #include "wx/imaglist.h"
 
+//TODO: Fix mouse selection dragging
+
 typedef struct _sortdata
 {
     bool bSortAsc;
@@ -41,7 +43,7 @@ public:
 	typedef enum _listsyle{ REPORT, SMALL, LARGE, LIST } LISTSTYLE, *LPLISTSTYLE;
 
 	wxGxContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition,
-						 const wxSize& size = wxDefaultSize, long style = wxLC_REPORT | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE );
+						 const wxSize& size = wxDefaultSize, long style = wxLC_LIST | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE);//
 	virtual ~wxGxContentView(void);
 	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
 	virtual void AddObject(IGxObject* pObject);
@@ -86,8 +88,8 @@ protected:
 	short m_currentSortCol;
 	LISTSTYLE m_current_style;
 	wxImageList m_ImageListSmall, m_ImageListLarge;
-	IConnectionPointContainer* m_pConnectionPointCatalog/*, *m_pConnectionPointSelection*/;
-	long m_ConnectionPointCatalogCookie/*, m_ConnectionPointSelectionCookie*/;
+	IConnectionPointContainer* m_pConnectionPointCatalog;
+	long m_ConnectionPointCatalogCookie;
 	IGxSelection* m_pSelection;
     IGxCatalog* m_pCatalog;
 	IGxObject* m_pParentGxObject;

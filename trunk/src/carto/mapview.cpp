@@ -21,6 +21,7 @@
 #include "wxgis/carto/mapview.h"
 //#include "wxgis/display/screendisplay.h"
 #include "wxgis/display/screendisplayplus.h"
+#include "wx/sysopt.h"
 
 #define WAITTIME 650
 #define wxUSE_GRAPHICS_CONTEXT 0
@@ -189,6 +190,13 @@ END_EVENT_TABLE()
 wxGISMapView::wxGISMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxScrolledWindow(parent, id, pos, size, style | wxHSCROLL | wxVSCROLL )/*| wxSTATIC_BORDER | wxBORDER_NONEwxBORDER_SUNKEN*/, wxGISMap(), m_pTrackCancel(NULL), m_pThread(NULL), m_pAni(NULL), m_timer(this, TIMER_ID)
 {
 	//set map init envelope
+#ifdef __WXGTK__
+//    wxSystemOptions::SetOption(wxT("gtk.window.force-background-colour"), 1);
+	SetBackgroundColour(wxColour(240, 255, 255));
+	SetForegroundColour(wxColour(240, 255, 255));
+	SetBackgroundStyle(wxBG_STYLE_CUSTOM);
+//	SetThemeEnabled(false);
+#endif
 
 #if wxUSE_GRAPHICS_CONTEXT	& __WXMSW__
 	pGISScreenDisplay = new wxGISScreenDisplayPlus();
@@ -268,7 +276,7 @@ void wxGISMapView::OnDraw(wxDC& dc)
 			return;
 		}
 
-		wxScrolledWindow::SetFocus();
+		//wxScrolledWindow::SetFocus();
 
 		//m_pTrackCancel->Reset();
 
@@ -297,6 +305,8 @@ void wxGISMapView::OnDraw(wxDC& dc)
 		//}
 		//pGISScreenDisplay->SetDerty(false);
 		//pGISScreenDisplay->OnDraw(CDC/*dc*/);
+
+        dc.SetBackgroundMode(wxTRANSPARENT);
 		return;
 	}
 
@@ -367,6 +377,7 @@ void wxGISMapView::OnSize(wxSizeEvent & event)
 
 void wxGISMapView::OnEraseBackground(wxEraseEvent & event)
 {
+    event.Skip(false);
 }
 
 void wxGISMapView::AddLayer(wxGISLayer* pLayer)
@@ -707,7 +718,6 @@ void wxGISMapView::PanStop(wxPoint MouseLocation)
 	if(m_MapToolState & enumGISMapPanning)
 	{
 		m_MapToolState &= ~enumGISMapPanning;
-		ReleaseMouse();
 		wxCoord x =  m_StartMouseLocation.x - MouseLocation.x;
 		wxCoord y =  m_StartMouseLocation.y - MouseLocation.y;
 		//calc new Envelope
@@ -723,13 +733,15 @@ void wxGISMapView::PanStop(wxPoint MouseLocation)
 		wxClientDC CDC(this);
         pGISScreenDisplay->OnPanStop(CDC);
 
+        ReleaseMouse();
+
 		OGREnvelope Env = pDisplayTransformation->TransformRect(rect);
 		m_pExtenStack->Do(Env);
         //m_pExtenStack->SetExtent(Env);
 //		pDisplayTransformation->SetBounds(Env);
 //		pGISScreenDisplay->SetDerty(true);
 //		Refresh(false);
-	}
+    }
 }
 
 void wxGISMapView::SetSpatialReference(OGRSpatialReference* pSpatialReference)

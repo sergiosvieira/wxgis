@@ -110,7 +110,7 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	if(pGxDataset == NULL)
 		return;
 
-    wxBusyCursor wait;
+//    wxBusyCursor wait;
 	wxGISDataset* pwxGISDataset = pGxDataset->GetDataset();
 	if(pwxGISDataset == NULL)
 		return;
@@ -166,7 +166,7 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 
 	m_pParentGxObject = pGxObj;
 
-	wxMilliSleep(200);
+//	wxMilliSleep(200);
 
     SetFullExtent();
 }
@@ -236,6 +236,10 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
 
 void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileName)
 {
+//    ::wxSafeYield(NULL, true);
+    wxMessageDialog dlg(NULL, wxT("dfgsdg"));
+    dlg.ShowModal();
+
  	wxGISRasterDataset *pwxGISRasterDataset = dynamic_cast<wxGISRasterDataset*>(pwxGISDataset);
     if(!pwxGISRasterDataset)
         return;
@@ -275,12 +279,14 @@ void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileNam
             if(bAskCreateOvr)
             {
                 //show ask dialog
-                wxGISMessageDlg dlg(NULL, wxID_ANY, wxString::Format(_("Create pyramids for %s (%d x %d)"), soFileName.c_str(), pwxGISRasterDataset->GetWidth(), pwxGISRasterDataset->GetHeight()), wxString(_("This raster datasource does not have pyramids. Pyramids allow rapid display at different resolutions.")), wxString(_("Pyramids building may take few moments.\nWould you like to create pyramids?")), wxDefaultPosition, wxSize( 400,160 ));
+                wxGISMessageDlg dlg(this->GetParent()->GetParent(), wxID_ANY, wxString::Format(_("Create pyramids for %s (%d x %d)"), soFileName.c_str(), pwxGISRasterDataset->GetWidth(), pwxGISRasterDataset->GetHeight()), wxString(_("This raster datasource does not have pyramids. Pyramids allow rapid display at different resolutions.")), wxString(_("Pyramids building may take few moments.\nWould you like to create pyramids?")), wxDefaultPosition, wxSize( 400,160 ));
 
                 if(dlg.ShowModal() == wxID_NO)
                     bCreateOverviews = false;
                 else
                     bCreateOverviews = true;
+
+                SetFocus();
 
                 if(!dlg.GetShowInFuture())
                 {

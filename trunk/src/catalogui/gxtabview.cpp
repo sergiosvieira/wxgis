@@ -448,7 +448,7 @@ void wxGxTabView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 void wxGxTabView::OnAUINotebookPageChanged(wxAuiNotebookEvent& event)
 {
 	//update view while changing focus of tabs
-	event.Skip();
+	//event.Skip();
 	int nSelTab = event.GetSelection();
     if(nSelTab < 0)
         return;
