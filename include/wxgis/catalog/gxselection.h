@@ -22,6 +22,32 @@
 
 #include "wxgis/catalog/catalog.h"
 
+class wxGxSelection;
+
+// ----------------------------------------------------------------------------
+// wxGxSelectionCallback
+// ----------------------------------------------------------------------------
+class wxGxSelectionCallback :
+	public wxThread
+{
+public:
+	wxGxSelectionCallback(wxGxSelection* pSelection);
+    virtual void *Entry();
+    virtual void OnExit();
+    virtual void AddEvent(IGxSelection* Selection, long nInitiator);
+private:
+    typedef struct _eventdata
+    {
+        IGxSelection* Selection;
+        long nInitiator;
+    } EVENTDATA;
+    std::vector<EVENTDATA> m_EventsArray;
+    wxGxSelection* m_pSelection;
+    wxCriticalSection m_CritSect;
+};
+
+
+
 // ----------------------------------------------------------------------------
 // wxGxSelection
 // ----------------------------------------------------------------------------
@@ -30,6 +56,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxSelection :
 	public IConnectionPointContainer,
 	public IGxSelection
 {
+    friend class wxGxSelectionCallback;
 public:
 	wxGxSelection(void);
 	virtual ~wxGxSelection(void);
@@ -66,4 +93,5 @@ protected:
 
 	std::map<long, GxObjectArray*> m_SelectionMap;
 	long m_currentInitiator;
+    wxGxSelectionCallback* m_pSelectionCallback;
 };

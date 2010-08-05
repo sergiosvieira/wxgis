@@ -117,8 +117,9 @@ void wxGISNewMenu::Init(void)
 
 void wxGISNewMenu::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 {
-	//if(nInitiator != TREECTRLID)
-	//	return;
+//	if(nInitiator != IGxSelection::INIT_ALL)
+	if(nInitiator != TREECTRLID)
+		return;
 
     for(size_t i = 0; i < m_delitems.size(); i++)
     {

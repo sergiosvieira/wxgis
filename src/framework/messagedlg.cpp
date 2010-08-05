@@ -76,7 +76,7 @@ wxGISMessageDlg::~wxGISMessageDlg()
 
 void wxGISMessageDlg::OnQuit( wxCommandEvent& event )
 {
-    event.Skip();
+    //event.Skip();
     Validate();
     TransferDataFromWindow();
     EndModal(event.GetId());
