@@ -26,6 +26,7 @@
 
 #include "wx/dnd.h"
 #include "wx/dataobj.h"
+#include "wx/wupdlock.h"
 
 BEGIN_EVENT_TABLE(wxGxContentView, wxListCtrl)
     EVT_LIST_BEGIN_LABEL_EDIT(LISTCTRLID, wxGxContentView::OnBeginLabelEdit)
@@ -246,7 +247,6 @@ void wxGxContentView::AddObject(IGxObject* pObject)
 
 void wxGxContentView::OnColClick(wxListEvent& event)
 {
-    event.Skip();
 	//int col = event.GetColumn();
 	//if(col != 0)
 	//   return;
@@ -260,7 +260,6 @@ void wxGxContentView::OnColClick(wxListEvent& event)
 
 void wxGxContentView::OnContextMenu(wxContextMenuEvent& event)
 {
-    event.Skip();
     wxPoint point = event.GetPosition();
     // If from keyboard
     if (point.x == -1 && point.y == -1)
@@ -278,7 +277,7 @@ void wxGxContentView::OnContextMenu(wxContextMenuEvent& event)
 
 void wxGxContentView::OnSelected(wxListEvent& event)
 {
-	event.Skip();
+	//event.Skip();
 	//LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
 	//if(pItemData == NULL)
 	//	return;
@@ -331,7 +330,7 @@ void wxGxContentView::OnSetFocus(wxFocusEvent& event)
 
 void wxGxContentView::OnDeselected(wxListEvent& event)
 {
-	event.Skip();
+	//event.Skip();
     if(GetSelectedItemCount() == 0)
         m_pSelection->Select(m_pParentGxObject, false, NOTFIRESELID);
 
@@ -404,7 +403,7 @@ void wxGxContentView::SetColumnImage(int col, int image)
 
 void wxGxContentView::OnActivated(wxListEvent& event)
 {
-	event.Skip();
+	//event.Skip();
 	//dbl click
 	LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
 	if(pItemData == NULL)
@@ -631,11 +630,15 @@ void wxGxContentView::OnObjectRefreshed(IGxObject* pObj)
 
 void wxGxContentView::OnRefreshAll(void)
 {
+    wxBusyCursor wait; 
+    wxWindowUpdateLocker noUpdates(this);
     ResetContents();
 	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(m_pParentGxObject);
 	if(pObjContainer == NULL || !pObjContainer->HasChildren())
 		return;
 	GxObjectArray* pArr = pObjContainer->GetChildren();
+
+
 	for(size_t i = 0; i < pArr->size(); i++)
 	{
 		AddObject(pArr->at(i));
@@ -648,11 +651,13 @@ void wxGxContentView::OnRefreshAll(void)
 
 void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 {
-	if(nInitiator == GetId())
+    wxBusyCursor wait; 
+    wxWindowUpdateLocker noUpdates(this);
+    if(nInitiator == GetId())
 		return;
 	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
-	//if(m_pParentGxObject == pGxObj)
-	//	return;
+	if(m_pParentGxObject == pGxObj)
+		return;
 
 	//reset
 	ResetContents();
@@ -661,6 +666,7 @@ void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiato
 	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(pGxObj);
 	if(pObjContainer == NULL || !pObjContainer->HasChildren())
 		return;
+
 
 	GxObjectArray* pArr = pObjContainer->GetChildren();
 	for(size_t i = 0; i < pArr->size(); i++)
@@ -671,6 +677,7 @@ void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiato
     SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
 	SortItems(MyCompareFunction, (long)&sortdata);
 	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+    wxWindow::Refresh(false);
 }
 
 bool wxGxContentView::Applies(IGxSelection* Selection)

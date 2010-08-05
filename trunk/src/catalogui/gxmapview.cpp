@@ -102,6 +102,9 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	if(nInitiator == GetId())
 		return;
 
+    wxCriticalSectionLocker locker(m_CritSect);
+
+
     IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
 	if(m_pParentGxObject == pGxObj)
 		return;
@@ -230,26 +233,21 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
     if(pOvrData->pProgressor)
         pOvrData->pProgressor->SetValue((int) (dfComplete*100));
 
+    if(wxGetKeyState(WXK_SHIFT) || wxGetKeyState(WXK_ALT) || wxGetKeyState(WXK_CONTROL))
+        return 1;
+
     bool bKeyState = wxGetKeyState(WXK_ESCAPE);
     return bKeyState == true ? 0 : 1;
 }
 
 void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileName)
 {
-//    ::wxSafeYield(NULL, true);
-    wxMessageDialog dlg(NULL, wxT("dfgsdg"));
-    dlg.ShowModal();
-
  	wxGISRasterDataset *pwxGISRasterDataset = dynamic_cast<wxGISRasterDataset*>(pwxGISDataset);
     if(!pwxGISRasterDataset)
         return;
    //pyramids
     if(!pwxGISRasterDataset->HasOverviews())
     {
-        CPLSetConfigOption( "USE_RRD", "NO" );//YES
-        CPLSetConfigOption( "HFA_USE_RRD", "YES" );
-        //CPLSetConfigOption( "COMPRESS_OVERVIEW", "DEFLATE" );//LZW
-
     	bool bAskCreateOvr = true;
         IGISConfig*  pConfig = m_pCatalog->GetConfig();
 
@@ -278,17 +276,16 @@ void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileNam
             CPLSetConfigOption( "COMPRESS_OVERVIEW",  wgWX2MB(sCompress) );//LZW "DEFLATE"
             if(bAskCreateOvr)
             {
+//                SetFocus();
                 //show ask dialog
-                wxGISMessageDlg dlg(this->GetParent()->GetParent(), wxID_ANY, wxString::Format(_("Create pyramids for %s (%d x %d)"), soFileName.c_str(), pwxGISRasterDataset->GetWidth(), pwxGISRasterDataset->GetHeight()), wxString(_("This raster datasource does not have pyramids. Pyramids allow rapid display at different resolutions.")), wxString(_("Pyramids building may take few moments.\nWould you like to create pyramids?")), wxDefaultPosition, wxSize( 400,160 ));
+                wxGISMessageDlg dlg(NULL, wxID_ANY, wxString::Format(_("Create pyramids for %s (%d x %d)"), soFileName.c_str(), pwxGISRasterDataset->GetWidth(), pwxGISRasterDataset->GetHeight()), wxString(_("This raster datasource does not have pyramids. Pyramids allow rapid display at different resolutions.")), wxString(_("Pyramids building may take few moments.\nWould you like to create pyramids?")), wxDefaultPosition, wxSize( 400,160 ));
 
                 if(dlg.ShowModal() == wxID_NO)
                     bCreateOverviews = false;
                 else
                     bCreateOverviews = true;
 
-                SetFocus();
-
-                if(!dlg.GetShowInFuture())
+                  if(!dlg.GetShowInFuture())
                 {
                     pNode->DeleteProperty(wxT("ask_create_ovr"));
                     pNode->AddProperty(wxT("ask_create_ovr"), wxT("0"));
@@ -311,6 +308,11 @@ void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileNam
             GDALDataset* pDSet = pwxGISRasterDataset->GetRaster();
             if(!pDSet)
                 return;
+
+            CPLSetConfigOption( "USE_RRD", pwxGISRasterDataset->GetSubType() == enumRasterImg ? "YES" : "NO" );
+            CPLSetConfigOption( "HFA_USE_RRD", "YES" );
+            //CPLSetConfigOption( "COMPRESS_OVERVIEW", "DEFLATE" );//LZW
+
 	        CPLErr eErr = pDSet->BuildOverviews( wgWX2MB(sResampleMethod), 5, anOverviewList, 0, NULL, OvrProgress, (void*)&Data );
 
             if(pProgressor)

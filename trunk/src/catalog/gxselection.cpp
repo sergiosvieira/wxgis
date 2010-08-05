@@ -20,12 +20,77 @@
  ****************************************************************************/
 #include "wxgis/catalog/gxselection.h"
 
+// ----------------------------------------------------------------------------
+// wxGxSelectionCallback
+// ----------------------------------------------------------------------------
+
+wxGxSelectionCallback::wxGxSelectionCallback(wxGxSelection* pSelection) : wxThread(wxTHREAD_DETACHED)
+{
+    m_pSelection = pSelection;
+}
+
+void *wxGxSelectionCallback::Entry()
+{
+    while(1)
+    {
+        while( m_EventsArray.size() > 0)
+        {
+	        for(size_t i = 0; i < m_pSelection->m_pPointsArray.size(); i++)
+	        {
+		        IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pSelection->m_pPointsArray[i]);
+		        if(pGxSelectionEvents != NULL)
+			        pGxSelectionEvents->OnSelectionChanged(m_EventsArray.back().Selection, m_EventsArray.back().nInitiator);
+	        }
+            wxCriticalSectionLocker locker(m_CritSect);
+            m_EventsArray.pop_back();
+        }
+        if(TestDestroy())
+            break;
+
+        Sleep(100);
+    }
+	return NULL;
+}
+
+void wxGxSelectionCallback::OnExit()
+{
+}
+
+void wxGxSelectionCallback::AddEvent(IGxSelection* Selection, long nInitiator)
+{
+    for(size_t i = 0; i < m_EventsArray.size(); i++)
+        if(m_EventsArray[i].Selection == Selection && m_EventsArray[i].nInitiator == nInitiator)
+            return;
+    EVENTDATA data = {Selection, nInitiator};
+    wxCriticalSectionLocker locker(m_CritSect);
+    m_EventsArray.insert(m_EventsArray.begin(), data);
+}
+
+// ----------------------------------------------------------------------------
+// wxGxSelection
+// ----------------------------------------------------------------------------
+
 wxGxSelection::wxGxSelection(void) : m_Pos(-1), m_bDoOp(false), m_currentInitiator(-1)
 {
+    m_pSelectionCallback = new wxGxSelectionCallback(this);
+	if ( !m_pSelectionCallback || m_pSelectionCallback->Create() != wxTHREAD_NO_ERROR )
+	{
+		wxLogError(wxString(_("wxGxSelection: Can't create SelectionCallback !")));
+        wxDELETE(m_pSelectionCallback);
+		return;
+	}
+    if( !m_pSelectionCallback || m_pSelectionCallback->Run() != wxTHREAD_NO_ERROR )
+	{
+		wxLogError(wxString(_("wxGxSelection: Can't run SelectionCallback !")));
+        wxDELETE(m_pSelectionCallback);
+		return;
+	}
 }
 
 wxGxSelection::~wxGxSelection(void)
 {
+    m_pSelectionCallback->Delete();
+
 	for(std::map<long, GxObjectArray*>::iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
 		wxDELETE(CI->second);
 }
@@ -70,13 +135,16 @@ void wxGxSelection::Select( IGxObject* pObject,  bool appendToExistingSelection,
     Do(pObject);
 
 	//fire event
+    if(m_pSelectionCallback)
+        m_pSelectionCallback->AddEvent(this, nInitiator);
+
 	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
-	for(size_t i = 0; i < m_pPointsArray.size(); i++)
-	{
-		IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pPointsArray[i]);
-		if(pGxSelectionEvents != NULL)
-			pGxSelectionEvents->OnSelectionChanged(this, nInitiator);
-	}
+	//for(size_t i = 0; i < m_pPointsArray.size(); i++)
+	//{
+	//	IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pPointsArray[i]);
+	//	if(pGxSelectionEvents != NULL)
+	//		pGxSelectionEvents->OnSelectionChanged(this, nInitiator);
+	//}
 }
 
 void wxGxSelection::SetInitiator(long nInitiator)
@@ -97,13 +165,16 @@ void wxGxSelection::Select( IGxObject* pObject)
     m_CritSect.Leave();
 
 	//fire event
+    if(m_pSelectionCallback)
+        m_pSelectionCallback->AddEvent(this, INIT_ALL);
+
 	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
-	for(size_t i = 0; i < m_pPointsArray.size(); i++)
-	{
-		IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pPointsArray[i]);
-		if(pGxSelectionEvents != NULL)
-			pGxSelectionEvents->OnSelectionChanged(this, INIT_ALL);
-	}
+	//for(size_t i = 0; i < m_pPointsArray.size(); i++)
+	//{
+	//	IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pPointsArray[i]);
+	//	if(pGxSelectionEvents != NULL)
+	//		pGxSelectionEvents->OnSelectionChanged(this, INIT_ALL);
+	//}
 }
 
 void wxGxSelection::Unselect(IGxObject* pObject, long nInitiator)

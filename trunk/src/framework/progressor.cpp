@@ -56,6 +56,9 @@ void wxGISProgressor::OnSize(wxSizeEvent & event)
 
 void wxGISProgressor::OnPaint(wxPaintEvent & event)
 {
+   if(m_nRange == 0)
+       return;
+
 	wxPaintDC dc(this);
     wxSize size = wxControl::GetClientSize();
 

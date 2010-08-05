@@ -182,16 +182,16 @@ void wxGxTab::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	if(nInitiator == GetId())
 		return;
 
-	//select in tree ctrl
-	if(nInitiator != TREECTRLID && nInitiator != LISTCTRLID)
-	{
+	////select in tree ctrl
+	//if(nInitiator != TREECTRLID && nInitiator != LISTCTRLID)
+	//{
 		IGxObject* pGxObj = Selection->GetLastSelectedObject();
 		if(pGxObj == NULL)
 			return;
-		//wxString sName = pGxObj->GetName();
+	//	//wxString sName = pGxObj->GetName();
 		Selection->Select(pGxObj , false, GetId());
-		return;
-	}
+	//	return;
+	//}
 
 	if(m_bShowChoices)
 	{
@@ -239,6 +239,7 @@ void wxGxTab::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 					m_pCurrentWnd->Hide();
 					m_bSizerMain->Replace(m_pCurrentWnd, pWnd);
 					pWnd->Show();
+                    pWnd->SetFocus();
 					m_pCurrentWnd = pWnd;
 					this->Layout();
 				}
@@ -280,6 +281,7 @@ void wxGxTab::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 					m_pCurrentWnd->Hide();
 					m_bSizerMain->Replace(m_pCurrentWnd, pWnd);
 					pWnd->Show();
+                    pWnd->SetFocus();
 					m_pCurrentWnd = pWnd;
 					this->Layout();
 				}
@@ -289,13 +291,13 @@ void wxGxTab::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	}
 END:
 	IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pCurrentWnd);
-	if(pGxSelectionEvents != NULL)
+	if(pGxSelectionEvents != NULL && nInitiator != IGxSelection::INIT_ALL)
 		pGxSelectionEvents->OnSelectionChanged(Selection, nInitiator);
 }
 
 void wxGxTab::OnChoice(wxCommandEvent& event)
 {
-	event.Skip();
+	//event.Skip();
 	int pos = event.GetSelection();
 	if(pos < 0)
 		return;
@@ -306,6 +308,7 @@ void wxGxTab::OnChoice(wxCommandEvent& event)
 		m_pCurrentWnd->Hide();
 		m_bSizerMain->Replace(m_pCurrentWnd, pWnd);
 		pWnd->Show();
+        pWnd->SetFocus();
 		m_pCurrentWnd = pWnd;
 
 		this->Layout();
@@ -322,7 +325,10 @@ bool wxGxTab::Show(bool bShow)
 	if(m_pCurrentWnd)
 		m_pCurrentWnd->Show(bShow);
     if(bShow)
+    {
+        m_pCurrentWnd->SetFocus();
         this->Layout();
+    }
 	return wxWindow::Show(bShow);
 }
 
@@ -412,43 +418,13 @@ void wxGxTabView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	wxGxTab* pCurrTab = m_Tabs[nSelTab];
 	if(pCurrTab)
 		pCurrTab->OnSelectionChanged(Selection, nInitiator);
-
-	//wxWindow* pCurrWnd = GetPage(nSelTab);
-	//IGxView* pCurrView = dynamic_cast<IGxView*>(pCurrWnd);
-	//if(pCurrView != NULL && pCurrView->GetName() != _("NoView"))
-	//{
-	//	if(pCurrView->Applies(Selection))
-	//		return;
-	//}
-
-	//wxGxTab* pCurrTab = m_Tabs[nSelTab];
-	//if(pCurrTab == NULL)
-	//	return;
-	//for(size_t i = 0; i < pCurrTab->GetCount(); i++)
-	//{
-	//	wxWindow* pWnd = pCurrTab->GetWindow(i);
-	//	IGxView* pView = dynamic_cast<IGxView*>(pWnd);
-	//	if(pView == NULL)
-	//		continue;
-	//	if(pView->Applies(Selection))
-	//	{
-	//		if(pCurrView != pView)
-	//		{
-	//			pCurrWnd->Hide();
-	//			RemovePage(nSelTab);
-	//			InsertPage(nSelTab, pWnd, pCurrTab->GetName(), true);
-	//			pWnd->Show();
-	//		}
-	//		return;
-	//	}
-	//}
-	////IConnectionPointContainer* pConnectionPointContainer = dynamic_cast<IConnectionPointContainer*>( m_pSelection );
 }
 
 void wxGxTabView::OnAUINotebookPageChanged(wxAuiNotebookEvent& event)
 {
 	//update view while changing focus of tabs
 	//event.Skip();
+
 	int nSelTab = event.GetSelection();
     if(nSelTab < 0)
         return;

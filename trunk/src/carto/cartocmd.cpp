@@ -447,7 +447,6 @@ void wxGISCartoMainTool::SetChecked(bool bCheck)
 
 void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 {
-    event.Skip();
 	switch(m_subtype)
 	{
 		case 0:	//z_in
@@ -534,11 +533,11 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 		default:
 			break;
 	}
+    event.Skip();
 }
 
 void wxGISCartoMainTool::OnMouseUp(wxMouseEvent& event)
 {
-    event.Skip();
 	switch(m_subtype)
 	{
 		case 0:	//z_in
@@ -554,11 +553,11 @@ void wxGISCartoMainTool::OnMouseUp(wxMouseEvent& event)
 		default:
 			break;
 	}
+    event.Skip();
 }
 
 void wxGISCartoMainTool::OnMouseMove(wxMouseEvent& event)
 {
-    event.Skip();
 	switch(m_subtype)
 	{
 		case 0:	//z_in
@@ -574,6 +573,7 @@ void wxGISCartoMainTool::OnMouseMove(wxMouseEvent& event)
 		default:
 			break;
 	}
+    event.Skip();
 }
 
 void wxGISCartoMainTool::OnMouseDoubleClick(wxMouseEvent& event)
