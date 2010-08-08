@@ -246,7 +246,7 @@ void wxGxContentView::AddObject(IGxObject* pObject)
 
 void wxGxContentView::OnColClick(wxListEvent& event)
 {
-    event.Skip();
+    //event.Skip();
 	//int col = event.GetColumn();
 	//if(col != 0)
 	//   return;
@@ -260,7 +260,7 @@ void wxGxContentView::OnColClick(wxListEvent& event)
 
 void wxGxContentView::OnContextMenu(wxContextMenuEvent& event)
 {
-    event.Skip();
+    //event.Skip();
     wxPoint point = event.GetPosition();
     // If from keyboard
     if (point.x == -1 && point.y == -1)
@@ -278,7 +278,7 @@ void wxGxContentView::OnContextMenu(wxContextMenuEvent& event)
 
 void wxGxContentView::OnSelected(wxListEvent& event)
 {
-	event.Skip();
+	//event.Skip();
 	//LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
 	//if(pItemData == NULL)
 	//	return;
@@ -331,7 +331,7 @@ void wxGxContentView::OnSetFocus(wxFocusEvent& event)
 
 void wxGxContentView::OnDeselected(wxListEvent& event)
 {
-	event.Skip();
+	//event.Skip();
     if(GetSelectedItemCount() == 0)
         m_pSelection->Select(m_pParentGxObject, false, NOTFIRESELID);
 
@@ -404,7 +404,7 @@ void wxGxContentView::SetColumnImage(int col, int image)
 
 void wxGxContentView::OnActivated(wxListEvent& event)
 {
-	event.Skip();
+	//event.Skip();
 	//dbl click
 	LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
 	if(pItemData == NULL)

@@ -230,6 +230,9 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
     if(pOvrData->pProgressor)
         pOvrData->pProgressor->SetValue((int) (dfComplete*100));
 
+    if(wxGetKeyState(WXK_SHIFT) || wxGetKeyState(WXK_ALT) || wxGetKeyState(WXK_CONTROL))
+        return 1;
+
     bool bKeyState = wxGetKeyState(WXK_ESCAPE);
     return bKeyState == true ? 0 : 1;
 }
@@ -237,8 +240,10 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
 void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileName)
 {
 //    ::wxSafeYield(NULL, true);
-    wxMessageDialog dlg(NULL, wxT("dfgsdg"));
-    dlg.ShowModal();
+
+    wxMessageDialog *dial = new wxMessageDialog(NULL,wxT("Error loading file"), wxT("Error"), wxOK | wxICON_ERROR);
+    dial->ShowModal();
+    dial->Destroy();
 
  	wxGISRasterDataset *pwxGISRasterDataset = dynamic_cast<wxGISRasterDataset*>(pwxGISDataset);
     if(!pwxGISRasterDataset)

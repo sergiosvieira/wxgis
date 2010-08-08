@@ -39,6 +39,8 @@ public:
     /** click esc */
     virtual void OnEscape(wxKeyEvent & event)
     { 
+        if(event.GetKeyCode() == WXK_SHIFT || event.GetKeyCode() == WXK_ALT || event.GetKeyCode() == WXK_CONTROL)
+            return;
         if(event.GetKeyCode() == WXK_ESCAPE)
             Close();
     };

@@ -25,9 +25,9 @@
 // wxGxToolboxView
 //-------------------------------------------------------------------
 
-BEGIN_EVENT_TABLE(wxGxToolboxView, wxAuiNotebook)
-	EVT_AUINOTEBOOK_PAGE_CHANGED(TOOLVIEWCTRLID, wxGxToolboxView::OnAUINotebookPageChanged)
-END_EVENT_TABLE()
+//BEGIN_EVENT_TABLE(wxGxToolboxView, wxAuiNotebook)
+//	EVT_AUINOTEBOOK_PAGE_CHANGED(TOOLVIEWCTRLID, wxGxToolboxView::OnAUINotebookPageChanged)
+//END_EVENT_TABLE()
 
 //IMPLEMENT_DYNAMIC_CLASS(wxGxToolboxView, wxAuiNotebook)
 
@@ -95,19 +95,19 @@ void wxGxToolboxView::Deactivate(void)
 	//	m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
 }
 
-void wxGxToolboxView::OnAUINotebookPageChanged(wxAuiNotebookEvent& event)
-{
-	//update view while changing focus of tabs
-	event.Skip();
-	//int nSelTab = event.GetSelection();
- //   if(nSelTab < 0)
- //       return;
-	//wxASSERT(nSelTab >= 0 && nSelTab < m_Tabs.size());
-
-	//wxGxTab* pCurrTab = m_Tabs[nSelTab];
-	//if(pCurrTab != NULL && m_pSelection != NULL)
-	//	pCurrTab->OnSelectionChanged(m_pSelection, IGxSelection::INIT_ALL);
-}
+//void wxGxToolboxView::OnAUINotebookPageChanged(wxAuiNotebookEvent& event)
+//{
+//	//update view while changing focus of tabs
+//	event.Skip();
+//	//int nSelTab = event.GetSelection();
+// //   if(nSelTab < 0)
+// //       return;
+//	//wxASSERT(nSelTab >= 0 && nSelTab < m_Tabs.size());
+//
+//	//wxGxTab* pCurrTab = m_Tabs[nSelTab];
+//	//if(pCurrTab != NULL && m_pSelection != NULL)
+//	//	pCurrTab->OnSelectionChanged(m_pSelection, IGxSelection::INIT_ALL);
+//}
 
 wxWindow* wxGxToolboxView::GetCurrentWnd(void)
 {

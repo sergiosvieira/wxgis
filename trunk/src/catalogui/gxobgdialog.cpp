@@ -248,7 +248,7 @@ void wxGxDialogContentView::Deactivate(void)
 
 void wxGxDialogContentView::OnActivated(wxListEvent& event)
 {
-	event.Skip();
+	//event.Skip();
 	//dbl click
 	LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
 	if(pItemData == NULL)
@@ -629,7 +629,7 @@ void wxGxObjectDialog::OnInit()
 
 void wxGxObjectDialog::OnItemSelected(wxListEvent& event)
 {
-	event.Skip();
+	//event.Skip();
     //if(m_bIsSaveDlg)
     //    return;
 

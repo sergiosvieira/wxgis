@@ -452,6 +452,7 @@ void wxGISMapView::ClearLayers(void)
 
 void wxGISMapView::OnKeyDown(wxKeyEvent & event)
 {
+	event.Skip();
 	switch(event.GetKeyCode())
 	{
 	case WXK_ESCAPE:
@@ -460,7 +461,6 @@ void wxGISMapView::OnKeyDown(wxKeyEvent & event)
 	default:
 		break;
 	}
-	event.Skip();
 }
 
 void wxGISMapView::SetTrackCancel(ITrackCancel* pTrackCancel)

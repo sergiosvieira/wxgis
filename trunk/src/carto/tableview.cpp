@@ -146,17 +146,17 @@ void wxGridCtrl::DrawRowLabel(wxDC& dc, int row)
 
 void wxGridCtrl::OnLabelLeftClick(wxGridEvent& event)
 {
+    event.Skip();
     if (event.GetRow() != -1)
 	{
         SetGridCursor(event.GetRow(),0);
     }
-    event.Skip();
 }
 
 void wxGridCtrl::OnSelectCell(wxGridEvent& event)
 {
-    GetGridRowLabelWindow()->Refresh();
     event.Skip();
+    GetGridRowLabelWindow()->Refresh();
 }
 
 //-------------------------------------
@@ -268,10 +268,10 @@ void wxGISTableView::OnLabelLeftClick(wxGridEvent& event)
 
 void wxGISTableView::OnSelectCell(wxGridEvent& event)
 {
+    event.Skip();
 	m_position->Clear();
 	(*m_position) << event.GetRow() + 1;
 
-    event.Skip();
 }
 
 void wxGISTableView::OnBtnFirst(wxCommandEvent& event)

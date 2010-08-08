@@ -98,6 +98,7 @@ wxGISTextCtrl::~wxGISTextCtrl(void)
 
 void wxGISTextCtrl::OnKillFocus(wxFocusEvent& event)
 {
+//    event.Skip();
     IGPParameter* pParam = m_pBaseCtrl->GetParameter();
     wxString sData = GetValue();
     bool bValid(false);
@@ -181,7 +182,6 @@ void wxGISTextCtrl::OnKillFocus(wxFocusEvent& event)
         pParam->SetValue(wxVariant(sData, wxT("val")));
         pParam->SetMessage(wxGISEnumGPMessageError, _("The input data are invalid"));
     }
-    event.Skip();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

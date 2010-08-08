@@ -40,7 +40,7 @@ public:
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 //Events
-	void OnAUINotebookPageChanged(wxAuiNotebookEvent& event);
+	//void OnAUINotebookPageChanged(wxAuiNotebookEvent& event);
 protected:
     IApplication* m_pApp;
     wxGxTasksView* m_pGxTasksView;
@@ -49,5 +49,5 @@ protected:
 	//long m_ConnectionPointSelectionCookie;
 	//IGxSelection* m_pSelection;
 
-DECLARE_EVENT_TABLE()
+//DECLARE_EVENT_TABLE()
 };
