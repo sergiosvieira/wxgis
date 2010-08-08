@@ -80,9 +80,6 @@ void wxGISRubberBand::OnUnlock(void)
 
 void wxGISRubberBand::OnKeyDown(wxKeyEvent & event)
 {
-    if(event.GetModifiers() != wxMOD_NONE) 
-        return;
-
 	switch(event.GetKeyCode())
 	{
 	case WXK_ESCAPE:

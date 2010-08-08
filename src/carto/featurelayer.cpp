@@ -346,16 +346,16 @@ void wxGISFeatureLayer::LoadGeometry(void)
 
     if(fabs(m_FullEnv.MinX - m_FullEnv.MaxX) < DELTA)
     {
-        m_FullEnv.MaxX += 10;
-        m_FullEnv.MinX -= 10;
+        m_FullEnv.MaxX += 1;
+        m_FullEnv.MinX -= 1;
     }
     if(fabs(m_FullEnv.MinY - m_FullEnv.MaxY) < DELTA)
     {
-        m_FullEnv.MaxY += 10;
-        m_FullEnv.MinY -= 10;
+        m_FullEnv.MaxY += 1;
+        m_FullEnv.MinY -= 1;
     }
 
-    wxGISFeatureLayer::CreateQuadTree(&m_FullEnv);
+    CreateQuadTree(&m_FullEnv);
 
     size_t nStep = m_pwxGISFeatureDataset->GetSize() < 10 ? 1 : m_pwxGISFeatureDataset->GetSize() / 10;
 

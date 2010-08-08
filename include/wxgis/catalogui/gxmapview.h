@@ -51,7 +51,6 @@ private:
 	IGxObject* m_pParentGxObject;
 	IStatusBar* m_pStatusBar;
 	IApplication* m_pApp;
-    wxCriticalSection m_CritSect;
 
 	DECLARE_EVENT_TABLE()
 };

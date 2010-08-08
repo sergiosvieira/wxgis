@@ -75,9 +75,9 @@ wxGISProgressDlg::~wxGISProgressDlg()
 
 void wxGISProgressDlg::OnCancel( wxCommandEvent& event )
 { 
+    event.Skip(); 
     if(m_pTrackCancel)
         m_pTrackCancel->Cancel();
-//    event.Skip(); 
 }
 
 void wxGISProgressDlg::SetText1(wxString sNewText)

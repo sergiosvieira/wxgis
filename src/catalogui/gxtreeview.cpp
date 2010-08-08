@@ -83,6 +83,11 @@ void wxGxTreeViewBase::AddRoot(IGxObject* pGxObject)
 
 	wxTreeCtrl::SortChildren(wxTreeItemIdRoot);
 	wxTreeCtrl::Refresh();
+
+	//IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pGxObject);
+	//if(pContainer != NULL)
+	//	if(pContainer->AreChildrenViewable())
+	//		SetItemHasChildren(NewTreeItem);
 }
 
 void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, bool sort)
@@ -157,9 +162,6 @@ void wxGxTreeViewBase::OnSelectionChanged(IGxSelection* Selection, long nInitiat
 	if(nInitiator == GetId())
 		return;
 	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
-    if(!pGxObj)
-        return;
-
 	wxTreeItemId ItemId = m_TreeMap[pGxObj];
 	if(ItemId.IsOk())
 	{
@@ -180,8 +182,7 @@ void wxGxTreeViewBase::OnSelectionChanged(IGxSelection* Selection, long nInitiat
 			else
 				pParentGxObj = pParentGxObj->GetParent();
 		}
-        //move throw the tree to sel element
-        OnSelectionChanged(Selection, nInitiator);
+		OnSelectionChanged(Selection, nInitiator);
 	}
 }
 
@@ -490,7 +491,7 @@ void wxGxTreeView::OnEndLabelEdit(wxTreeEvent& event)
 
 void wxGxTreeView::OnSelChanged(wxTreeEvent& event)
 {
-    //event.Skip();
+    event.Skip();
 
     wxArrayTreeItemIds treearray;
     size_t count = GetSelections(treearray);
@@ -503,11 +504,38 @@ void wxGxTreeView::OnSelChanged(wxTreeEvent& event)
 		    m_pSelection->Select(pData->m_pObject, true, GetId());
 	    }
     }
+
+	//wxTreeItemId item = event.GetItem();
+	//if(!item.IsOk())
+	//	return;
+	//wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(item);
+	//if(pData != NULL)
+	//{
+	//	//wxKeyEvent kevt = event.GetKeyEvent();
+	//	m_pSelection->Select(pData->m_pObject, false/*kevt.m_controlDown*/, GetId());
+	//}
+
+	//wxArrayTreeItemIds treearray;
+ //   size_t count = GetSelections(treearray);
+	//if(!item.IsOk() || count == 0)
+	//{
+	//	m_pParent->SetNewMenu(wxT(""));
+	//	weViewData* pEvtData = NULL;
+	//	pEvtData = new weViewData((wxWindow*)NULL);
+	//	wxCommandEvent notifevtview(wxEVT_ONVIEW, m_pParent->GetView()->GetId());
+	//	notifevtview.SetEventObject(pEvtData);
+	//	wxPostEvent(m_pParent->GetView(), notifevtview);
+
+	//	return;
+	//}
+	//UpdateSelection();
+	//if(pData != NULL)
+	//	OnObjectSelected(pData->m_pObject);
 }
 
 void wxGxTreeView::OnSetFocus(wxFocusEvent& event)
 {
-    event.Skip();
+//    event.Skip();
     if(event.GetWindow() == this)
         return;
     wxArrayTreeItemIds treearray;
@@ -525,6 +553,7 @@ void wxGxTreeView::OnSetFocus(wxFocusEvent& event)
     }
 }
 
+
 void wxGxTreeView::OnItemRightClick(wxTreeEvent& event)
 {
 	wxTreeItemId item = event.GetItem();
@@ -536,7 +565,7 @@ void wxGxTreeView::OnItemRightClick(wxTreeEvent& event)
 
 void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
 {
-    //event.Skip();
+    event.Skip();
 	wxTreeItemId item = event.GetItem();
 	if(!item.IsOk())
 		return;
@@ -566,7 +595,7 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
 
 void wxGxTreeView::OnActivated(wxTreeEvent& event)
 {
-    //event.Skip();
+    event.Skip();
 
 	wxTreeItemId item = event.GetItem();
 
