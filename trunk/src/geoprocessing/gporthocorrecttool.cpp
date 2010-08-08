@@ -196,9 +196,6 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
         bCancel = !pTrackCancel->Continue();
     }
 
-    if(wxGetKeyState(WXK_SHIFT) || wxGetKeyState(WXK_ALT) || wxGetKeyState(WXK_CONTROL))
-        return 1;
-
     bool bKeyState = wxGetKeyState(WXK_ESCAPE);    
     return bKeyState || bCancel ? 0 : 1;
 }

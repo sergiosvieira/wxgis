@@ -119,7 +119,7 @@ bool wxTreeContainerView::CanChooseObject( IGxObject* pObject )
 
 void wxTreeContainerView::OnSelChanged(wxTreeEvent& event)
 {
-    //event.Skip();
+    event.Skip();
 
     wxArrayTreeItemIds treearray;
     size_t count = GetSelections(treearray);

@@ -131,7 +131,7 @@ IStatusBar* wxGISApplication::GetStatusBar(void)
 
 void wxGISApplication::OnEraseBackground(wxEraseEvent& event)
 {
-    //event.Skip();
+    event.Skip();
 }
 
 void wxGISApplication::OnSize(wxSizeEvent& event)
@@ -214,19 +214,23 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
                             pItem->SetItemLabel(wxT(" "));// derty hack
                             pItem->SetItemLabel(sT);
                         }
-                        else if(pItem->GetId() == event.GetId())
-                        {
-                            if(pItem->GetKind() != enumGISCommandCheck)
-                            {
-                                wxIcon Bmp = pCmd->GetBitmap();
-                                //if(Bmp.IsOk())
-							    pItem->SetBitmap(Bmp);//double text??
-                                pItem->SetItemLabel(wxT(" ")); // derty hack
-                                pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
-                            }
-                        }
                     }
 // dirty hack end
+					wxMenuItem *pItem = pMenu->FindItem(event.GetId());
+					if(pItem != NULL)
+					{
+                        if(pItem->IsSubMenu())
+                            break;
+
+                        if(pItem->GetKind() != enumGISCommandCheck)
+                        {
+						wxIcon Bmp = pCmd->GetBitmap();
+						//if(Bmp.IsOk())
+							pItem->SetBitmap(Bmp);//double text??
+                            pItem->SetItemLabel(wxT(" ")); // derty hack
+                            pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
+                        }
+					}
 				}
 				break;
 			case enumGISCBContextmenu:
@@ -245,23 +249,24 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
                             //wxString sT = pItem->GetText();
                             //pItem->SetItemLabel(sT);
                         }
-                        else if(pItem->GetId() == event.GetId())
-                        {
-						    wxIcon Bmp = pCmd->GetBitmap();
-						    //if(Bmp.IsOk())
-							    pItem->SetBitmap(Bmp);//double text??
-                            pItem->SetItemLabel(wxT(" ")); // derty hack
-    #ifdef __WXGTK__
-                            if(sAcc.IsEmpty())
-                                pItem->SetItemLabel(pCmd->GetCaption());
-                            else
-                                pItem->SetItemLabel(pCmd->GetCaption() + wxT("          ") + sAcc);
-    #else
-                            pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
-    #endif
-                        }
                     }
 // dirty hack end
+                    wxMenuItem *pItem = pMenu->FindItem(event.GetId());
+					if(pItem != NULL)
+					{
+						wxIcon Bmp = pCmd->GetBitmap();
+						//if(Bmp.IsOk())
+							pItem->SetBitmap(Bmp);//double text??
+                        pItem->SetItemLabel(wxT(" ")); // derty hack
+#ifdef __WXGTK__
+                        if(sAcc.IsEmpty())
+                            pItem->SetItemLabel(pCmd->GetCaption());
+                        else
+                            pItem->SetItemLabel(pCmd->GetCaption() + wxT("          ") + sAcc);
+#else
+                        pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
+#endif
+                    }
 				}
 				break;
             case enumGISCBToolbar:
@@ -292,7 +297,7 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 
         return;
 	}
-    //event.Skip();
+    event.Skip();
 }
 
 void wxGISApplication::SerializeFramePos(bool bSave)
