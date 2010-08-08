@@ -491,7 +491,7 @@ void wxGxTreeView::OnEndLabelEdit(wxTreeEvent& event)
 
 void wxGxTreeView::OnSelChanged(wxTreeEvent& event)
 {
-    event.Skip();
+    //event.Skip();
 
     wxArrayTreeItemIds treearray;
     size_t count = GetSelections(treearray);
@@ -565,7 +565,7 @@ void wxGxTreeView::OnItemRightClick(wxTreeEvent& event)
 
 void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
 {
-    event.Skip();
+    //event.Skip();
 	wxTreeItemId item = event.GetItem();
 	if(!item.IsOk())
 		return;
@@ -595,7 +595,7 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
 
 void wxGxTreeView::OnActivated(wxTreeEvent& event)
 {
-    event.Skip();
+    //event.Skip();
 
 	wxTreeItemId item = event.GetItem();
 

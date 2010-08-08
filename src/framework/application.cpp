@@ -131,7 +131,7 @@ IStatusBar* wxGISApplication::GetStatusBar(void)
 
 void wxGISApplication::OnEraseBackground(wxEraseEvent& event)
 {
-    event.Skip();
+    //event.Skip();
 }
 
 void wxGISApplication::OnSize(wxSizeEvent& event)
@@ -297,7 +297,7 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 
         return;
 	}
-    event.Skip();
+    //event.Skip();
 }
 
 void wxGISApplication::SerializeFramePos(bool bSave)
@@ -549,14 +549,14 @@ bool wxGISApplication::IsStatusBarShown(void)
 
 void wxGISApplication::OnRightDown(wxMouseEvent& event)
 {
-	ShowToolBarMenu();
 	event.Skip();
+	ShowToolBarMenu();
 }
 
 void wxGISApplication::OnAuiRightDown(wxAuiToolBarEvent& event)
 {
-	ShowToolBarMenu();
 	event.Skip();
+	ShowToolBarMenu();
 }
 
 

@@ -191,8 +191,8 @@ void wxGISStatusBar::OnTimer( wxTimerEvent& event )
 
 void wxGISStatusBar::OnRightDown(wxMouseEvent& event)
 {
-	m_pApp->ShowToolBarMenu();
 	event.Skip();
+	m_pApp->ShowToolBarMenu();
 }
 
 int wxGISStatusBar::GetPanePos(wxGISEnumStatusBarPanes nPane)

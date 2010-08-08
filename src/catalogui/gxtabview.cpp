@@ -295,7 +295,7 @@ END:
 
 void wxGxTab::OnChoice(wxCommandEvent& event)
 {
-	event.Skip();
+	//event.Skip();
 	int pos = event.GetSelection();
 	if(pos < 0)
 		return;

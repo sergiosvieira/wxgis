@@ -92,7 +92,7 @@ void wxGISRubberBand::OnKeyDown(wxKeyEvent & event)
 	default:
 		break;
 	}
-	event.Skip();
+	//event.Skip();
 }
 
 void wxGISRubberBand::OnMouseMove(wxMouseEvent& event)
