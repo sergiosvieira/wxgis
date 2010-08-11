@@ -27,7 +27,7 @@
 //GPFunctionTool 1
 //GPModelTool 2
 //GPScriptTool 3
-//GPCustomTool 
+//GPCustomTool
 
 enum wxGISEnumGPMessageType
 {
@@ -44,13 +44,13 @@ enum wxGISEnumGPParameterType
 {
     enumGISGPParameterTypeRequired = 1,
     enumGISGPParameterTypeOptional,
-    enumGISGPParameterTypeDerived 
+    enumGISGPParameterTypeDerived
 };
 
 enum wxGISEnumGPParameterDirection
 {
     enumGISGPParameterDirectionInput = 1,
-    enumGISGPParameterDirectionOutput 
+    enumGISGPParameterDirectionOutput
 };
 
 enum wxGISEnumGPParameterDataType
@@ -101,7 +101,7 @@ public:
     //virtual IGPDomain* GetDomain(void) = 0;
     //virtual void SetDomain(IGPDomain* pDomain) = 0;
     virtual wxString GetMessage(void) = 0;
-    virtual wxGISEnumGPMessageType GetÌessageType(void) = 0;
+    virtual wxGISEnumGPMessageType GetMessageType(void) = 0;
     virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString) = 0;
 };
 

@@ -538,7 +538,7 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 
 void wxGISCartoMainTool::OnMouseUp(wxMouseEvent& event)
 {
-    event.Skip();
+//    event.Skip();
 	switch(m_subtype)
 	{
 		case 0:	//z_in
@@ -546,8 +546,8 @@ void wxGISCartoMainTool::OnMouseUp(wxMouseEvent& event)
 		case 1:	//z_out
 			break;
 		case 2:	//pan
-			m_pMapView->SetCursor(GetCursor());
 			m_pMapView->PanStop(event.GetPosition());
+			m_pMapView->SetCursor(GetCursor());
 			break;
 		case 3:	//inf
 			break;
@@ -558,7 +558,7 @@ void wxGISCartoMainTool::OnMouseUp(wxMouseEvent& event)
 
 void wxGISCartoMainTool::OnMouseMove(wxMouseEvent& event)
 {
-    event.Skip();
+    //event.Skip();
 	switch(m_subtype)
 	{
 		case 0:	//z_in

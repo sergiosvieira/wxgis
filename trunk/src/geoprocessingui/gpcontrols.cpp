@@ -148,7 +148,7 @@ void wxGISTextCtrl::OnKillFocus(wxFocusEvent& event)
         bValid = true;
         break;
     }
-    
+
     pParam->SetIsValid(bValid);
     if ( bValid )
     {
@@ -200,24 +200,24 @@ wxGISDTPath::wxGISDTPath( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* 
 	fgSizer1->AddGrowableCol( 1 );
 	fgSizer1->SetFlexibleDirection( wxBOTH );
 	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+
     m_StateBitmap = new wxStaticBitmap( this, wxID_ANY, m_pParam->GetParameterType() == enumGISGPParameterTypeRequired ? m_ImageList.GetIcon(4) : wxNullBitmap , wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( m_StateBitmap, 0, wxALL, 5 );
-	
+
     m_sParamDisplayName = new wxStaticText( this, wxID_ANY, m_pParam->GetParameterType() == enumGISGPParameterTypeOptional ? m_pParam->GetDisplayName() + _(" (optional)") : m_pParam->GetDisplayName(), wxDefaultPosition, wxDefaultSize, 0 );
 	m_sParamDisplayName->Wrap( -1 );
 	fgSizer1->Add( m_sParamDisplayName, 1, wxALL|wxEXPAND, 5 );
-	
+
 	m_bitmap = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( m_bitmap, 0, wxALL, 5 );
-	
+
 	wxBoxSizer* bPathSizer;
 	bPathSizer = new wxBoxSizer( wxHORIZONTAL );
-	
+
     m_PathTextCtrl = new wxGISTextCtrl( this, wxID_ANY, pParam->GetValue(), wxDefaultPosition, wxDefaultSize, wxTE_BESTWRAP );
     //m_PathTextCtrl->SetDropTarget(new wxFileDropTarget());
-	bPathSizer->Add( m_PathTextCtrl, 1, wxALL|wxEXPAND, 5 );     
-	
+	bPathSizer->Add( m_PathTextCtrl, 1, wxALL|wxEXPAND, 5 );
+
 	m_bpButton = new wxBitmapButton( this, wxID_OPEN, wxBitmap(open_16_xpm), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	bPathSizer->Add( m_bpButton, 0, wxALL, 5 );
 	fgSizer1->Add( bPathSizer, 0, wxALL|wxEXPAND, 5 );
@@ -235,8 +235,8 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
     wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParam->GetDomain());
 
     if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
-    {        
-        wxGxObjectDialog dlg(this, wxID_ANY, _("Select input object")); 
+    {
+        wxGxObjectDialog dlg(this, wxID_ANY, _("Select input object"));
         dlg.SetAllowMultiSelect(false);
         dlg.SetAllFilters(false);
         dlg.SetOwnsFilter(false);
@@ -263,7 +263,7 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
     }
     else
     {
-        wxGxObjectDialog dlg(this, wxID_ANY, _("Select output object")); 
+        wxGxObjectDialog dlg(this, wxID_ANY, _("Select output object"));
         //dlg.SetName(sName);???
         dlg.SetAllowMultiSelect(false);
         dlg.SetAllFilters(false);
@@ -322,14 +322,14 @@ bool wxGISDTPath::Validate(void)
         {
            if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
            {
-               if(m_pParam->GetÌessageType() == wxGISEnumGPMessageError)
+               if(m_pParam->GetMessageType() == wxGISEnumGPMessageError)
                    return false;
                m_pParam->SetIsValid(true);
                m_pParam->SetMessage(wxGISEnumGPMessageOk);
            }
            else
            {
-               if(m_pParam->GetÌessageType() == wxGISEnumGPMessageError)
+               if(m_pParam->GetMessageType() == wxGISEnumGPMessageError)
                    return false;
                m_pParam->SetIsValid(true);
                m_pParam->SetMessage(wxGISEnumGPMessageWarning, _("The output object exists and will be overwritten!"));
@@ -346,7 +346,7 @@ bool wxGISDTPath::Validate(void)
            }
            else
            {
-               if(m_pParam->GetÌessageType() == wxGISEnumGPMessageError)
+               if(m_pParam->GetMessageType() == wxGISEnumGPMessageError)
                    return false;
 
                m_pParam->SetIsValid(true);
@@ -364,7 +364,7 @@ bool wxGISDTPath::Validate(void)
 void wxGISDTPath::Update(void)
 {
     m_PathTextCtrl->ChangeValue( m_pParam->GetValue() );
-    SetMessage(m_pParam->GetÌessageType(), m_pParam->GetMessage());
+    SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
     //Validate();
 }
 
@@ -380,24 +380,24 @@ wxGISDTDigit::wxGISDTDigit( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow
 	fgSizer1->AddGrowableCol( 1 );
 	fgSizer1->SetFlexibleDirection( wxBOTH );
 	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+
     m_StateBitmap = new wxStaticBitmap( this, wxID_ANY, m_pParam->GetParameterType() == enumGISGPParameterTypeRequired ? m_ImageList.GetIcon(4) : wxNullBitmap , wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( m_StateBitmap, 0, wxALL, 5 );
-	
+
     m_sParamDisplayName = new wxStaticText( this, wxID_ANY, m_pParam->GetParameterType() == enumGISGPParameterTypeOptional ? m_pParam->GetDisplayName() + _(" (optional)") : m_pParam->GetDisplayName(), wxDefaultPosition, wxDefaultSize, 0 );
 	m_sParamDisplayName->Wrap( -1 );
 	fgSizer1->Add( m_sParamDisplayName, 1, wxALL|wxEXPAND, 5 );
-	
+
 	m_bitmap = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( m_bitmap, 0, wxALL, 5 );
-	
+
 	wxBoxSizer* bPathSizer;
-	bPathSizer = new wxBoxSizer( wxHORIZONTAL );	
-     
+	bPathSizer = new wxBoxSizer( wxHORIZONTAL );
+
     m_PathTextCtrl = new wxGISTextCtrl( this, wxID_ANY, pParam->GetValue(), wxDefaultPosition, wxDefaultSize, wxTE_RIGHT  );
     //m_PathTextCtrl->SetDropTarget(new wxFileDropTarget());
-	bPathSizer->Add( m_PathTextCtrl, 1, wxALL|wxEXPAND, 5 );     
-	
+	bPathSizer->Add( m_PathTextCtrl, 1, wxALL|wxEXPAND, 5 );
+
 	fgSizer1->Add( bPathSizer, 0, wxALL|wxEXPAND, 5 );
 
 	this->SetSizer( fgSizer1 );
@@ -429,7 +429,7 @@ bool wxGISDTDigit::Validate(void)
         bValid = false;
         break;
     }
-    
+
     m_pParam->SetIsValid(bValid);
     if ( bValid )
     {
@@ -454,7 +454,7 @@ bool wxGISDTDigit::Validate(void)
 void wxGISDTDigit::Update(void)
 {
     m_PathTextCtrl->ChangeValue( m_pParam->GetValue() );
-    SetMessage(m_pParam->GetÌessageType(), m_pParam->GetMessage());
+    SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
     //Validate();
 }
 
@@ -473,20 +473,20 @@ wxGISDTChoice::wxGISDTChoice( IGPParameter* pParam, IGxCatalog* pCatalog, wxWind
 	fgSizer1->AddGrowableCol( 1 );
 	fgSizer1->SetFlexibleDirection( wxBOTH );
 	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+
     m_StateBitmap = new wxStaticBitmap( this, wxID_ANY, m_pParam->GetParameterType() == enumGISGPParameterTypeRequired ? m_ImageList.GetIcon(4) : wxNullBitmap , wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( m_StateBitmap, 0, wxALL, 5 );
-	
+
     m_sParamDisplayName = new wxStaticText( this, wxID_ANY, m_pParam->GetParameterType() == enumGISGPParameterTypeOptional ? m_pParam->GetDisplayName() + _(" (optional)") : m_pParam->GetDisplayName(), wxDefaultPosition, wxDefaultSize, 0 );
 	m_sParamDisplayName->Wrap( -1 );
 	fgSizer1->Add( m_sParamDisplayName, 1, wxALL|wxEXPAND, 5 );
-	
+
 	m_bitmap = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( m_bitmap, 0, wxALL, 5 );
-	
+
 	wxBoxSizer* bPathSizer;
-	bPathSizer = new wxBoxSizer( wxHORIZONTAL );	
-	
+	bPathSizer = new wxBoxSizer( wxHORIZONTAL );
+
 	wxArrayString Choices;
 
     wxGISGPStringDomain* poGPStringDomain = dynamic_cast<wxGISGPStringDomain*>(m_pParam->GetDomain());
@@ -498,9 +498,9 @@ wxGISDTChoice::wxGISDTChoice( IGPParameter* pParam, IGxCatalog* pCatalog, wxWind
         m_choice->SetSelection( 0 );
     else
         m_choice->SetStringSelection( m_pParam->GetValue() );
-	
-	bPathSizer->Add( m_choice, 1, wxALL|wxEXPAND, 5 );     
-	
+
+	bPathSizer->Add( m_choice, 1, wxALL|wxEXPAND, 5 );
+
 	fgSizer1->Add( bPathSizer, 0, wxALL|wxEXPAND, 5 );
 
 	this->SetSizer( fgSizer1 );
@@ -527,13 +527,13 @@ void wxGISDTChoice::Update(void)
     //wxGISGPStringDomain* poGPStringDomain = dynamic_cast<wxGISGPStringDomain*>(m_pParam->GetDomain());
     //if(poGPStringDomain)
     //    poGPStringDomain->SetSelString(m_choice->GetCurrentSelection());
-    SetMessage(m_pParam->GetÌessageType(), m_pParam->GetMessage());
+    SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
     //Validate();
 }
 
 void wxGISDTChoice::OnChoice(wxCommandEvent& event)
 {
-    m_pParam->SetValue(m_choice->GetStringSelection());    
+    m_pParam->SetValue(m_choice->GetStringSelection());
     wxGISGPStringDomain* poGPStringDomain = dynamic_cast<wxGISGPStringDomain*>(m_pParam->GetDomain());
     if(poGPStringDomain)
         poGPStringDomain->SetSelString(m_choice->GetCurrentSelection());

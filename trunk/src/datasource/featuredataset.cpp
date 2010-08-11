@@ -155,7 +155,7 @@ wxGISFeatureDataset::wxGISFeatureDataset(wxString sPath, wxGISEnumVectorDatasetT
 
 wxGISFeatureDataset::~wxGISFeatureDataset(void)
 {
-    DeleteQuadTree();    
+    DeleteQuadTree();
 
 	wxDELETE(m_psExtent);
     wsDELETE(m_pGeometrySet);
@@ -217,7 +217,7 @@ OGRLayer* wxGISFeatureDataset::GetLayerRef(int iLayer)
 		else
 			return NULL;
 	}
-	return NULL;	
+	return NULL;
 }
 
 bool wxGISFeatureDataset::Delete(int iLayer)
@@ -227,7 +227,7 @@ bool wxGISFeatureDataset::Delete(int iLayer)
     {
         OGRDataSource::DestroyDataSource( m_poDS );
         m_poDS = NULL;
-    }    
+    }
 	//if( m_poDS == NULL )
  //      m_poDS = OGRSFDriverRegistrar::Open( (const char*) m_sPath.mb_str(*m_pPathEncoding), TRUE );
 	//if( m_poDS == NULL )
@@ -263,7 +263,7 @@ bool wxGISFeatureDataset::Delete(int iLayer)
     wxString sPath = FName.GetFullPath();
     switch(m_nSubType)
     {
-    case enumVecESRIShapefile: 
+    case enumVecESRIShapefile:
         if(!DeleteFile(m_sPath))
             return false;
         DeleteFile(sPath + wxT(".shx"));
@@ -286,7 +286,7 @@ bool wxGISFeatureDataset::Delete(int iLayer)
         DeleteFile(sPath + sExt + wxT(".metadata.xml"));
         DeleteFile(sPath + sExt + wxT(".xml"));
         return true;
-    case enumVecMapinfoMif: 
+    case enumVecMapinfoMif:
         if(!DeleteFile(m_sPath))
             return false;
         DeleteFile(sPath + wxT(".mid"));
@@ -306,10 +306,10 @@ bool wxGISFeatureDataset::Delete(int iLayer)
         if(!DeleteFile(m_sPath))
             return false;
         return true;
-    case enumVecUnknown: 
+    case enumVecUnknown:
     default: return false;
     }
-	return false;    
+	return false;
 }
 
 bool wxGISFeatureDataset::Open(int iLayer)
@@ -362,7 +362,7 @@ bool wxGISFeatureDataset::Open(int iLayer)
 		    //	{
 		    //		OGREnvelope Env = *m_psExtent;
 		    //		CPLRectObj Rect = {Env.MinX, Env.MinY, Env.MaxX, Env.MaxY};
-		    //		m_pQuadTree = CPLQuadTreeCreate(&Rect, GetFeatureBoundsFunc); 
+		    //		m_pQuadTree = CPLQuadTreeCreate(&Rect, GetFeatureBoundsFunc);
 		    //	}
 
 		    //	//wxFileName FileName(m_sPath);
@@ -383,9 +383,9 @@ bool wxGISFeatureDataset::Open(int iLayer)
 		    m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
 
 
-		    //m_OGRFeatureArray.reserve(m_poLayer->GetFeatureCount(true)); 
+		    //m_OGRFeatureArray.reserve(m_poLayer->GetFeatureCount(true));
 
-		    //size_t count(0); 
+		    //size_t count(0);
 		    //OGRFeature *poFeature;
 		    //while( (count < CACHE_SIZE) && ((poFeature = m_poLayer->GetNextFeature()) != NULL) )
 		    //{
@@ -414,8 +414,8 @@ wxString wxGISFeatureDataset::GetName(void)
         wxString sOut;
         if(m_bOLCStringsAsUTF8 || m_Encoding == wxFONTENCODING_DEFAULT)
             sOut = wgMB2WX(m_poLayer->GetLayerDefn()->GetName());
-        else            
-        {                
+        else
+        {
             wxCSConv conv(m_Encoding);
             sOut = conv.cMB2WX(m_poLayer->GetLayerDefn()->GetName());
             if(sOut.IsEmpty())
@@ -557,11 +557,11 @@ OGRFeature* wxGISFeatureDataset::operator [](long nIndex) //const    same as Get
 
 wxString wxGISFeatureDataset::GetAsString(long row, int col)
 {
-	if(GetSize() <= row) 
-		return wxEmptyString; 
-	else 
+	if(GetSize() <= row)
+		return wxEmptyString;
+	else
 	{
-        wxCriticalSectionLocker locker(m_CritSect);
+        //wxCriticalSectionLocker locker(m_CritSect);
         if(m_FieldCount == -1)
         {
             OGRFeatureDefn *pFDef = m_poLayer->GetLayerDefn();
@@ -575,7 +575,7 @@ wxString wxGISFeatureDataset::GetAsString(long row, int col)
 
 		OGRFeature* pFeature = GetAt(row);
         if(!pFeature)
-    		return wxEmptyString; 
+    		return wxEmptyString;
 		OGRFieldDefn* pDef = pFeature->GetFieldDefnRef(col);
         wxString sOut(wxT(" "));
 		switch(pDef->GetType())
@@ -607,7 +607,7 @@ wxString wxGISFeatureDataset::GetAsString(long row, int col)
                 if(sOut == wxEmptyString)
                     sOut = wxT("NULL");
 			}
-		case OFTReal:				
+		case OFTReal:
 			sOut = wxString::Format(_("%.6f"), pFeature->GetFieldAsDouble(col));
             if(sOut == wxEmptyString)
                 sOut = wxT("NULL");
@@ -618,8 +618,8 @@ wxString wxGISFeatureDataset::GetAsString(long row, int col)
                 if(sOut == wxEmptyString)
                     sOut = wxT(" ");
             }
-            else            
-            {                
+            else
+            {
                 wxCSConv conv(m_Encoding);
                 sOut = conv.cMB2WX(pFeature->GetFieldAsString(col));
                 if(sOut.IsEmpty())
@@ -734,12 +734,12 @@ wxGISGeometrySet* wxGISFeatureDataset::GetGeometrySet(wxGISQueryFilter* pQFilter
 // 		                OGRFeature *poFeature;
 //		                while((poFeature = m_poLayer->GetNextFeature()) != NULL )
 //                        {
-//                            pGISFeatureSet->AddFeature(poFeature);        
+//                            pGISFeatureSet->AddFeature(poFeature);
 //                            if(pTrackCancel && !pTrackCancel->Continue())
 //                                break;
 //                        }
 //                        return pGISFeatureSet;
-//                    }  
+//                    }
 //                    else
 //                    {
 //                        LoadFeatures();
@@ -834,14 +834,14 @@ size_t wxGISFeatureDataset::GetSize(void)
         else
             return m_poLayer->GetFeatureCount(true);
     }
-    return 0;    
+    return 0;
 }
 
 void wxGISFeatureDataset::LoadGeometry(void)
 {
     if(m_bIsGeometryLoaded)
         return;
-    
+
     if(!m_bIsOpened)
         if(!Open(0))
             return;
@@ -979,7 +979,7 @@ void wxGISFeatureDataset::Reset(void)
         m_poLayer->ResetReading();
     else
         m_IT = m_FeaturesMap.begin();
-    m_pGeometrySet->Reset();    
+    m_pGeometrySet->Reset();
 }
 
 OGRErr wxGISFeatureDataset::CreateFeature(OGRFeature* poFeature)
@@ -1066,14 +1066,14 @@ OGRErr wxGISFeatureDataset::SetFilter(wxGISQueryFilter* pQFilter)
         if(!Open(0))
             return OGRERR_FAILURE;
     if(	m_poLayer )
-    {        
+    {
         OGRErr eErr = m_poLayer->SetAttributeFilter(wgWX2MB(pQFilter->GetWhereClause()));
         if(eErr != OGRERR_NONE)
             return eErr;
-        
+
         wxDELETE(m_psExtent);
         UnloadGeometry();
-        
+
         m_bIsGeometryLoaded = false;
         return eErr;
     }

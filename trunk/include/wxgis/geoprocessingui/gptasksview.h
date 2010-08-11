@@ -3,7 +3,7 @@
  * Purpose:  wxGxTasksView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "wxgis/catalogui/gxview.h"
 
 #include "wx/wxhtml.h"
+#include "wx/imaglist.h"
 
 //////////////////////////////////////////////////////////////////
 // wxGxTaskPanel
@@ -93,7 +94,7 @@ protected:
 //////////////////////////////////////////////////////////////////
 
 class WXDLLIMPEXP_GIS_GPU wxGxTasksView :
-	public wxScrolledWindow, 
+	public wxScrolledWindow,
 	public wxGxView
 {
 public:

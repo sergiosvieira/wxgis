@@ -77,12 +77,12 @@ wxString wxGISGeoprocessingCmd::GetCaption(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("&Export"));
-		case 1:	
+		case 1:
 			return wxString(_("Show/Hide &Toolbox pane"));
 		default:
-		return wxEmptyString; 
+		return wxEmptyString;
 	}
 }
 
@@ -90,9 +90,9 @@ wxString wxGISGeoprocessingCmd::GetCategory(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("Geoprocessing"));
-		case 1:	
+		case 1:
 			return wxString(_("View"));
 		default:
 			return wxString(_("[No category]"));
@@ -103,9 +103,9 @@ bool wxGISGeoprocessingCmd::GetChecked(void)
 {
 	switch(m_subtype)
 	{
-		case 1:	
+		case 1:
             return m_pApp->IsApplicationWindowShown(m_pToolboxView);
-		case 0:	
+		case 0:
 		default:
 	        return false;
 	}
@@ -171,9 +171,9 @@ wxString wxGISGeoprocessingCmd::GetMessage(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("Export item to another format"));
-		case 1:	
+		case 1:
 			return wxString(_("Show/Hide toolbox pane"));
 		default:
 			return wxEmptyString;
@@ -184,7 +184,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			{
                 //1. get the GxObject's list
                 std::vector<IGxDataset*> DatasetArray;
@@ -213,7 +213,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
                             DatasetArray.push_back(pGxDSet);
                     }
                 }
-                
+
                 wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
                 //2. if single GxObject progress in status bar
                 if(DatasetArray.size() == 1)
@@ -226,8 +226,8 @@ void wxGISGeoprocessingCmd::OnClick(void)
                     wxString sStartLoc;
                     if(pGxParentObj)
                         sStartLoc = pGxParentObj->GetFullName();
-                    
-                    wxGxObjectDialog dlg(pWnd, wxID_ANY, _("Select output")); 
+
+                    wxGxObjectDialog dlg(pWnd, wxID_ANY, _("Select output"));
                     dlg.SetName(sName);
 				    dlg.SetAllowMultiSelect(false);
 				    dlg.SetAllFilters(false);
@@ -258,7 +258,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
                         if(!pFilter)
                         {
                             wxLogError(_("Null IGxObjectFilter returned"));
-                            return; 
+                            return;
                         }
                         wxString sDriver = pFilter->GetDriver();
                         wxString sExt = pFilter->GetExt();
@@ -271,7 +271,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
                         {
                             wxMessageBox(wxString(_("The dataset is empty")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
                             wxLogError(_("Null wxGISDataset returned"));
-                            return; 
+                            return;
                         }
 
                         OGRFeatureDefn *pDef = pDSet->GetDefiniton();
@@ -280,7 +280,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
                             wxMessageBox(wxString(_("Error reading dataset definition")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
                             wxLogError(_("Error reading dataset definition"));
                             wsDELETE(pDSet);
-                            return; 
+                            return;
                         }
 
                         OGRSpatialReference* pSrcSpaRef = pDSet->GetSpatialReference();
@@ -291,16 +291,18 @@ void wxGISGeoprocessingCmd::OnClick(void)
                             if(pSrcSpaRef)
                                 pNewSpaRef = pSrcSpaRef->Clone();
 
+                         //check multi geometry
+                        OGRwkbGeometryType nGeomType = pDSet->GetGeometryType();
+                        bool bIsMultigeom = nNewSubType == enumVecESRIShapefile && (wkbFlatten(nGeomType) == wkbUnknown || wkbFlatten(nGeomType) == wkbGeometryCollection);
+
+
                         if(!pSrcSpaRef && pNewSpaRef)
                         {
                             wxMessageBox(wxString(_("Input spatial reference is not defined")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
                             wxLogError(_("Input spatial reference is not defined"));
-                            goto EXIT; 
+                            goto EXIT;
                         }
 
-                        //check multi geometry
-                        OGRwkbGeometryType nGeomType = pDSet->GetGeometryType();
-                        bool bIsMultigeom = nNewSubType == enumVecESRIShapefile && (wkbFlatten(nGeomType) == wkbUnknown || wkbFlatten(nGeomType) == wkbGeometryCollection);
                         if(bIsMultigeom)
                         {
                             wxGISQueryFilter Filter(wxString(wxT("OGR_GEOMETRY='POINT'")));
@@ -448,7 +450,7 @@ EXIT:
                 //3. if not single GxObject progress in special dialog
                 else
                 {
-                    wxGxContainerDialog dlg(pWnd, wxID_ANY, _("Select output")); 
+                    wxGxContainerDialog dlg(pWnd, wxID_ANY, _("Select output"));
 				    dlg.SetAllFilters(false);
                     dlg.ShowExportFormats(true);
                     dlg.AddFilter(new wxGxKMLFilter(), true);
@@ -465,7 +467,7 @@ EXIT:
                         if(!pFilter)
                         {
                             wxLogError(_("Null IGxObjectFilter returned"));
-                            return; 
+                            return;
                         }
                         wxString sDriver = pFilter->GetDriver();
                         wxString sExt = pFilter->GetExt();
@@ -675,7 +677,7 @@ EXIT:
                 }
 			}
 			break;
-		case 1:	
+		case 1:
             m_pApp->ShowApplicationWindow(m_pToolboxView, !m_pApp->IsApplicationWindowShown(m_pToolboxView));
 		default:
 			return;
@@ -692,9 +694,9 @@ wxString wxGISGeoprocessingCmd::GetTooltip(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("Export item"));
-		case 1:	
+		case 1:
 			return wxString(_("Show/Hide Toolbox pane"));
 		default:
 			return wxEmptyString;
@@ -712,14 +714,14 @@ bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath,
     if(!pNewDSet)
     {
         m_sLastError = wxString(_("Error creating new dataset"));
-        return false; 
+        return false;
     }
 
     IStatusBar* pStatusBar = m_pApp->GetStatusBar();
     ITrackCancel TrackCancel;
     IProgressor* pProgressor;
     if(pStatusBar)
-    {                            
+    {
         pProgressor = pStatusBar->GetProgressor();
         if(pProgressor)
         {
@@ -734,7 +736,7 @@ bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath,
     {
         m_sLastError = wxString(_("Error copying data to a new dataset"));
         wsDELETE(pNewDSet);
-        return false; 
+        return false;
     }
 
     wsDELETE(pNewDSet);
@@ -769,7 +771,7 @@ bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath,
     if(!pNewDSet)
     {
         m_sLastError = wxString(_("Error creating new dataset"));
-        return false; 
+        return false;
     }
 
     //copy data
@@ -777,7 +779,7 @@ bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath,
     {
         m_sLastError = wxString(_("Error copying data to a new dataset"));
         wsDELETE(pNewDSet);
-        return false; 
+        return false;
     }
 
     wsDELETE(pNewDSet);

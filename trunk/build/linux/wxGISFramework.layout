@@ -37,10 +37,10 @@
 	<File name="../../src/framework/commandbar.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="7653" topLine="241" />
 	</File>
-	<File name="../../src/framework/messagedlg.cpp" open="1" top="0" tabpos="8">
+	<File name="../../src/framework/messagedlg.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="1604" topLine="16" />
 	</File>
-	<File name="../../src/framework/progressor.cpp" open="1" top="0" tabpos="14">
+	<File name="../../src/framework/progressor.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="4278" topLine="120" />
 	</File>
 	<File name="../../src/framework/statusbar.cpp" open="0" top="0" tabpos="6">

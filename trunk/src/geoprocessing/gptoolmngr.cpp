@@ -78,10 +78,10 @@ void wxGISGPTaskThread::OnExit()
 wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode, IGxCatalog* pCatalog) : m_pCatalog(NULL), m_nMaxThreads(50), m_nRunningThreads(0)
 {
     m_pToolsNode = pToolsNode;
-    m_nMaxThreads = wxAtoi(m_pToolsNode->GetPropVal(wxT("max_tasks"), wxT("100"))); 
+    m_nMaxThreads = wxAtoi(m_pToolsNode->GetPropVal(wxT("max_tasks"), wxT("100")));
     m_pCatalog = pCatalog;
     wxXmlNode *pChild = m_pToolsNode->GetChildren();
-    while (pChild) 
+    while (pChild)
     {
         wxString sName = pChild->GetPropVal(wxT("object"), NONAME);
         if(sName.IsEmpty() || sName.CmpNoCase(NONAME) == 0)
@@ -89,7 +89,7 @@ wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode, IGxCatalog* pCatal
             pChild = pChild->GetNext();
             continue;
         }
-            
+
 		wxObject *pObj = wxCreateDynamicObject(sName);
 		IGPTool *pTool = dynamic_cast<IGPTool*>(pObj);
 		if(pTool != NULL)
@@ -155,7 +155,7 @@ long wxGISGPToolManager::OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel, I
             pTrackCancel->PutMessage(wxString::Format(_("Cannot create task (%s) thread"), pTool->GetDisplayName().c_str()), -1, enumGISMessageErr);
         if(pCallBack)
             pCallBack->OnFinish(true, pTool);
-        return -1; 
+        return -1;
     }
     if(m_nRunningThreads < m_nMaxThreads)
     {
@@ -166,7 +166,7 @@ long wxGISGPToolManager::OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel, I
                 pTrackCancel->PutMessage(wxString::Format(_("Cannot run task (%s) thread"), pTool->GetDisplayName().c_str()), -1, enumGISMessageErr);
             if(pCallBack)
                 pCallBack->OnFinish(true, pTool);
-            return -1; 
+            return -1;
         }
         m_nRunningThreads++;
     }
@@ -348,7 +348,7 @@ wxString wxGISGPParameter::GetMessage(void)
     return m_sMessage;
 }
 
-wxGISEnumGPMessageType wxGISGPParameter::GetÌessageType(void)
+wxGISEnumGPMessageType wxGISGPParameter::GetMessageType(void)
 {
     return m_nMsgType;
 }
