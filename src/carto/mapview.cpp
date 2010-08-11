@@ -185,6 +185,7 @@ BEGIN_EVENT_TABLE(wxGISMapView, wxScrolledWindow)
 	EVT_MOUSEWHEEL(wxGISMapView::OnMouseWheel)
 	EVT_KEY_DOWN(wxGISMapView::OnKeyDown)
 	EVT_TIMER( TIMER_ID, wxGISMapView::OnTimer )
+	EVT_MOUSE_CAPTURE_LOST(wxGISMapView::OnCaptureLost)
 END_EVENT_TABLE()
 
 wxGISMapView::wxGISMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxScrolledWindow(parent, id, pos, size, style | wxHSCROLL | wxVSCROLL )/*| wxSTATIC_BORDER | wxBORDER_NONEwxBORDER_SUNKEN*/, wxGISMap(), m_pTrackCancel(NULL), m_pThread(NULL), m_pAni(NULL), m_timer(this, TIMER_ID)
@@ -230,8 +231,13 @@ wxGISMapView::~wxGISMapView(void)
 
 void wxGISMapView::OnDraw(wxDC& dc)
 {
-	//if(m_MapToolState & enumGISMapPanning)
-    //    return;
+#ifdef __WXGTK__
+    if(m_MapToolState & enumGISMapPanning)
+    {
+        PanMoveTo(ScreenToClient(wxGetMousePosition()));
+        return;
+    }
+#endif
 
 	//ITrackCancel* pTrackCancel(NULL);
 	//if map has it's own cache check it and draw from cache if posible
@@ -247,6 +253,7 @@ void wxGISMapView::OnDraw(wxDC& dc)
 
 	if(pGISScreenDisplay->IsDerty())
 	{
+	    dc.SetBackgroundMode(wxTRANSPARENT);
 	    wxCriticalSectionLocker locker(m_CriticalSection);
 
         if(m_pTrackCancel)
@@ -306,7 +313,6 @@ void wxGISMapView::OnDraw(wxDC& dc)
 		//pGISScreenDisplay->SetDerty(false);
 		//pGISScreenDisplay->OnDraw(CDC/*dc*/);
 
-        dc.SetBackgroundMode(wxTRANSPARENT);
 		return;
 	}
 
@@ -377,7 +383,7 @@ void wxGISMapView::OnSize(wxSizeEvent & event)
 
 void wxGISMapView::OnEraseBackground(wxEraseEvent & event)
 {
-    event.Skip(false);
+//    event.Skip(false);
 }
 
 void wxGISMapView::AddLayer(wxGISLayer* pLayer)
@@ -491,7 +497,7 @@ void wxGISMapView::OnThreadExit(void)
 
 void wxGISMapView::OnMouseWheel(wxMouseEvent& event)
 {
-	event.Skip(false);
+	//event.Skip(false);
 
 	m_pTrackCancel->Cancel();
 	if(m_pThread)
@@ -615,6 +621,11 @@ void wxGISMapView::OnMouseWheel(wxMouseEvent& event)
 	}
 }
 
+void wxGISMapView::OnCaptureLost(wxMouseCaptureLostEvent & event)
+{
+    ReleaseMouse();
+}
+
 void wxGISMapView::OnTimer( wxTimerEvent& event )
 {
 	wxMouseState state = wxGetMouseState();
@@ -715,6 +726,7 @@ void wxGISMapView::PanMoveTo(wxPoint MouseLocation)
 
 void wxGISMapView::PanStop(wxPoint MouseLocation)
 {
+    ReleaseMouse();
 	if(m_MapToolState & enumGISMapPanning)
 	{
 		m_MapToolState &= ~enumGISMapPanning;
@@ -732,8 +744,6 @@ void wxGISMapView::PanStop(wxPoint MouseLocation)
 
 		wxClientDC CDC(this);
         pGISScreenDisplay->OnPanStop(CDC);
-
-        ReleaseMouse();
 
 		OGREnvelope Env = pDisplayTransformation->TransformRect(rect);
 		m_pExtenStack->Do(Env);

@@ -7,37 +7,40 @@
 	<File name="../../include/wxgis/catalogui/customizedlg.h" open="0" top="0" tabpos="1">
 		<Cursor position="5124" topLine="150" />
 	</File>
-	<File name="../../include/wxgis/catalogui/gxcontentview.h" open="1" top="0" tabpos="6">
+	<File name="../../include/wxgis/catalogui/gxcontentview.h" open="0" top="0" tabpos="6">
 		<Cursor position="3219" topLine="68" />
 	</File>
-	<File name="../../include/wxgis/catalogui/gxmapview.h" open="1" top="0" tabpos="7">
-		<Cursor position="2177" topLine="38" />
+	<File name="../../include/wxgis/catalogui/gxmapview.h" open="0" top="0" tabpos="7">
+		<Cursor position="1869" topLine="36" />
 	</File>
-	<File name="../../include/wxgis/catalogui/gxobjdialog.h" open="0" top="0" tabpos="4">
-		<Cursor position="9108" topLine="217" />
+	<File name="../../include/wxgis/catalogui/gxobjdialog.h" open="1" top="1" tabpos="3">
+		<Cursor position="3915" topLine="93" />
 	</File>
-	<File name="../../include/wxgis/catalogui/gxtreeview.h" open="1" top="0" tabpos="5">
-		<Cursor position="4516" topLine="107" />
+	<File name="../../include/wxgis/catalogui/gxtreeview.h" open="0" top="0" tabpos="5">
+		<Cursor position="4516" topLine="99" />
 	</File>
 	<File name="../../src/catalogui/customizedlg.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="8654" topLine="205" />
 	</File>
 	<File name="../../src/catalogui/gxapplication.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="10228" topLine="0" />
+		<Cursor position="12112" topLine="369" />
 	</File>
-	<File name="../../src/catalogui/gxcontentview.cpp" open="1" top="0" tabpos="4">
+	<File name="../../src/catalogui/gxcontentview.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="11815" topLine="311" />
 	</File>
-	<File name="../../src/catalogui/gxmapview.cpp" open="1" top="1" tabpos="2">
-		<Cursor position="3330" topLine="86" />
+	<File name="../../src/catalogui/gxlocationcombobox.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="0" topLine="18" />
 	</File>
-	<File name="../../src/catalogui/gxobgdialog.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="15604" topLine="297" />
+	<File name="../../src/catalogui/gxmapview.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="5659" topLine="151" />
 	</File>
-	<File name="../../src/catalogui/gxtabview.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="13070" topLine="446" />
+	<File name="../../src/catalogui/gxobgdialog.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="1890" topLine="38" />
 	</File>
-	<File name="../../src/catalogui/gxtreeview.cpp" open="1" top="0" tabpos="3">
+	<File name="../../src/catalogui/gxtabview.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="12925" topLine="429" />
+	</File>
+	<File name="../../src/catalogui/gxtreeview.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="16057" topLine="527" />
 	</File>
 	<File name="../../src/catalogui/viewscmd.cpp" open="0" top="0" tabpos="2">

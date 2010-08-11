@@ -37,6 +37,7 @@ BEGIN_EVENT_TABLE(wxGxMapView, wxGISMapView)
 	EVT_MIDDLE_DCLICK(wxGxMapView::OnMouseDoubleClick)
 	EVT_RIGHT_DCLICK(wxGxMapView::OnMouseDoubleClick)
 	EVT_MOTION(wxGxMapView::OnMouseMove)
+	EVT_BUTTON(ID_SELCHANGED, wxGxMapView::OnSelChanged)
 END_EVENT_TABLE()
 
 wxGxMapView::wxGxMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxGISMapView(parent, id, pos, size), m_pStatusBar(NULL)
@@ -97,11 +98,8 @@ bool wxGxMapView::Applies(IGxSelection* Selection)
 	return false;
 }
 
-void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
+void wxGxMapView::OnSelChanged(wxCommandEvent & event)
 {
-	if(nInitiator == GetId())
-		return;
-
     IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
 	if(m_pParentGxObject == pGxObj)
 		return;
@@ -166,9 +164,20 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 
 	m_pParentGxObject = pGxObj;
 
-//	wxMilliSleep(200);
+#ifdef __WXGTK__
+	wxMilliSleep(200);
+#endif
 
     SetFullExtent();
+}
+
+void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
+{
+	if(nInitiator == GetId())
+		return;
+
+    wxCommandEvent event(wxEVT_COMMAND_BUTTON_CLICKED, ID_SELCHANGED);
+    ::wxPostEvent(this, event);
 }
 
 void wxGxMapView::OnMouseMove(wxMouseEvent& event)
@@ -239,12 +248,6 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
 
 void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileName)
 {
-//    ::wxSafeYield(NULL, true);
-
-    wxMessageDialog *dial = new wxMessageDialog(NULL,wxT("Error loading file"), wxT("Error"), wxOK | wxICON_ERROR);
-    dial->ShowModal();
-    dial->Destroy();
-
  	wxGISRasterDataset *pwxGISRasterDataset = dynamic_cast<wxGISRasterDataset*>(pwxGISDataset);
     if(!pwxGISRasterDataset)
         return;
@@ -287,7 +290,7 @@ void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileNam
                 else
                     bCreateOverviews = true;
 
-                SetFocus();
+                //SetFocus();
 
                 if(!dlg.GetShowInFuture())
                 {

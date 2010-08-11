@@ -3,7 +3,7 @@
  * Purpose:  tool dialog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISGPToolDlg
 ///////////////////////////////////////////////////////////////////////////////
-class wxGISGPToolDlg : public wxFrame //Dialog 
+class wxGISGPToolDlg : public wxFrame //Dialog
 {
 private:
 
@@ -78,7 +78,7 @@ public:
     virtual void OnCancel(wxCommandEvent& event);
     virtual void OnOkUI(wxUpdateUIEvent& event);
 //wxTopLevelWindow
-    //virtual bool ShouldPreventAppExit(); 
+    //virtual bool ShouldPreventAppExit();
 protected:
     int m_DataWidth, m_HtmlWidth;
     IGPTool* m_pTool;

@@ -40,5 +40,17 @@
 		</Project>
 		<Project filename="wxGISCatalogUI.cbp" />
 		<Project filename="wxGISCat.cbp" active="1" />
+		<Project filename="wxGISGeoprocessing.cbp">
+			<Depends filename="wxGISCore.cbp" />
+			<Depends filename="wxGISDataSource.cbp" />
+			<Depends filename="wxGISFramework.cbp" />
+		</Project>
+		<Project filename="wxGISGeoprocessingUI.cbp">
+			<Depends filename="wxGISDataSource.cbp" />
+			<Depends filename="wxGISFramework.cbp" />
+			<Depends filename="wxGISCatalog.cbp" />
+			<Depends filename="wxGISCatalogUI.cbp" />
+			<Depends filename="wxGISGeoprocessing.cbp" />
+		</Project>
 	</Workspace>
 </CodeBlocks_workspace_file>

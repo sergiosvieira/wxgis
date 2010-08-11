@@ -3,7 +3,7 @@
  * Purpose:  controls classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -38,12 +38,14 @@
 #include <wx/sizer.h>
 #include <wx/panel.h>
 
+#include  "wx/imaglist.h"
+
 /////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISDTBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxGISDTBase : public wxPanel 
+class wxGISDTBase : public wxPanel
 {
 public:
 	wxGISDTBase( IGPParameter* pParam, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
@@ -78,11 +80,11 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISDTPath
 ///////////////////////////////////////////////////////////////////////////////
-class wxGISDTPath : public wxGISDTBase 
+class wxGISDTPath : public wxGISDTBase
 {
 public:
 	wxGISDTPath( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
-	virtual ~wxGISDTPath();	
+	virtual ~wxGISDTPath();
 //events
     virtual void OnOpen(wxCommandEvent& event);
     virtual bool Validate(void);
@@ -98,11 +100,11 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISDTDigit
 ///////////////////////////////////////////////////////////////////////////////
-class wxGISDTDigit : public wxGISDTBase 
+class wxGISDTDigit : public wxGISDTBase
 {
 public:
 	wxGISDTDigit( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
-	virtual ~wxGISDTDigit();	
+	virtual ~wxGISDTDigit();
 //events
     virtual bool Validate(void);
     virtual void Update(void);
@@ -114,7 +116,7 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISDTChoice
 ///////////////////////////////////////////////////////////////////////////////
-class wxGISDTChoice : public wxGISDTBase 
+class wxGISDTChoice : public wxGISDTBase
 {
     enum
 	{

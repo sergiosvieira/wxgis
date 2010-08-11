@@ -107,7 +107,7 @@ public:
     virtual IGPDomain* GetDomain(void);
     virtual void SetDomain(IGPDomain* pDomain);
     virtual wxString GetMessage(void);
-    virtual wxGISEnumGPMessageType GetÌessageType(void);
+    virtual wxGISEnumGPMessageType GetMessageType(void);
     virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString);
 protected:
     bool m_bAltered;
