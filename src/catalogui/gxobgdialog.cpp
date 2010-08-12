@@ -29,14 +29,14 @@
 // wxTreeViewComboPopup
 //////////////////////////////////////////////////////////////////////////////
 
+IMPLEMENT_DYNAMIC_CLASS(wxTreeViewComboPopup, wxGxTreeViewBase)
+
 BEGIN_EVENT_TABLE(wxTreeViewComboPopup, wxGxTreeViewBase)
     //EVT_LEFT_UP(wxTreeViewComboPopup::OnMouseClick)
     EVT_LEFT_DOWN(wxTreeViewComboPopup::OnMouseClick)
     EVT_MOTION(wxTreeViewComboPopup::OnMouseMove)
     EVT_TREE_ITEM_ACTIVATED(TREECTRLID, wxTreeViewComboPopup::OnDblClick)
 END_EVENT_TABLE()
-
-IMPLEMENT_DYNAMIC_CLASS(wxTreeViewComboPopup, wxGxTreeViewBase)
 
 bool wxTreeViewComboPopup::Create(wxWindow* parent)
 {
@@ -52,6 +52,7 @@ void wxTreeViewComboPopup::OnPopup()
 {
    m_bClicked = false;
    SelectItem(m_TreeMap[m_pSelection->GetLastSelectedObject()]);
+   //CaptureMouse();
 }
 
 void wxTreeViewComboPopup::OnDismiss()
@@ -325,8 +326,12 @@ wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, wxWindowID id, const wxStr
 	bHeaderSizer->Add( m_staticText1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 	m_TreeCombo = new wxComboCtrl( this, wxID_ANY, _("Combo!"), wxDefaultPosition, wxDefaultSize, wxCB_READONLY);
-    m_PopupCtrl = new wxTreeViewComboPopup();
+#ifdef __WXMSW__
     m_TreeCombo->UseAltPopupWindow(true);
+#else
+    m_TreeCombo->UseAltPopupWindow(false);
+#endif
+    m_PopupCtrl = new wxTreeViewComboPopup();
     m_TreeCombo->SetPopupControl(m_PopupCtrl);
     m_TreeCombo->EnablePopupAnimation(true);
     m_PopupCtrl->Activate(this, NULL);//!!!!
@@ -596,6 +601,10 @@ void wxGxObjectDialog::OnInit()
     RegisterChildWindow(static_cast<wxWindow*>(m_pwxGxContentView));
 
 	bMainSizer->Insert(1, m_pwxGxContentView, 1, wxALL|wxEXPAND, 5 );
+#ifdef __WXGTK__
+    m_pwxGxContentView->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( wxGxObjectDialog::OnItemSelected ), NULL, this );
+    m_pwxGxContentView->Connect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( wxGxObjectDialog::OnItemSelected ), NULL, this );
+#endif
 
 	for(size_t i = 0; i < m_FilterArray.size(); i++)
 		m_WildcardCombo->AppendString(m_FilterArray[i]->GetName());
@@ -629,7 +638,7 @@ void wxGxObjectDialog::OnInit()
 
 void wxGxObjectDialog::OnItemSelected(wxListEvent& event)
 {
-	//event.Skip();
+	event.Skip();
     //if(m_bIsSaveDlg)
     //    return;
 
