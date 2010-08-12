@@ -41,6 +41,21 @@ void *wxGISGPTaskThread::Entry()
     if(m_pTrackCancel)
     {
         m_pTrackCancel->PutMessage(wxString::Format(_("Executing (%s)"), m_pTool->GetName().c_str()), -1, enumGISMessageInfo);
+        //add some tool info
+        GPParameters* pParams = m_pTool->GetParameterInfo();
+        if(pParams)
+        {
+            m_pTrackCancel->PutMessage(wxString(_("Parameters:")), -1, enumGISMessageInfo);
+            for(size_t i = 0; i < pParams->size(); i++)
+            {
+                IGPParameter* pParam = pParams->operator[](i);
+                if(!pParam)
+                    continue;
+                wxString sParamName = pParam->GetName();
+                wxString sParamValue = pParam->GetValue();
+                m_pTrackCancel->PutMessage(wxString::Format(wxT("%s = %s"), sParamName.c_str(), sParamValue.c_str()), -1, enumGISMessageNorm);
+            }
+        }
         m_pTrackCancel->PutMessage(wxString::Format(_("Start Time: %s"), begin.Format().c_str()), -1, enumGISMessageInfo);
     }
     bool bResult = m_pTool->Execute(m_pTrackCancel);

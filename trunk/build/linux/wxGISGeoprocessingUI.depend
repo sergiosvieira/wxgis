@@ -1,25 +1,23 @@
 # depslib dependency file v1.0
-1280699921 source:/home/bishop/projects/wxGIS/src/cat_app/catalogapp.cpp
+1281303078 source:/home/bishop/projects/wxGIS/src/geoprocessingui/geoprocessingcmd.cpp
+	"wxgis/geoprocessingui/geoprocessingcmd.h"
+	"wxgis/geoprocessingui/gptoolboxview.h"
+	"wxgis/datasource/sysop.h"
+	"../../art/gp_menu_16.xpm"
+	"../../art/toolbox_16.xpm"
 	"wxgis/catalog/catalog.h"
-	"wxgis/cat_app/catalogapp.h"
-	"wxgis/cat_app/catalogframe.h"
-	<locale.h>
-	"ogrsf_frmts.h"
-	"ogr_api.h"
+	"wxgis/catalog/gxdataset.h"
+	"wxgis/catalogui/catalogui.h"
+	"wxgis/catalogui/gxobjdialog.h"
+	"wxgis/catalogui/gxcontdialog.h"
+	"wxgis/catalog/gxfilters.h"
+	"wxgis/geoprocessing/gpvector.h"
+	"wxgis/framework/progressdlg.h"
+	"wx/busyinfo.h"
 
-1277060083 /home/bishop/projects/wxGIS/include/wxgis/catalog/catalog.h
-	"wxgis/datasource/datasource.h"
-	"wx/filename.h"
-
-1277060083 /home/bishop/projects/wxGIS/include/wxgis/datasource/datasource.h
+1277060082 /home/bishop/projects/wxGIS/include/wxgis/geoprocessingui/geoprocessingcmd.h
 	"wxgis/framework/framework.h"
-	"wx/datetime.h"
-	"ogrsf_frmts.h"
-	"gdal_priv.h"
-	"gdalwarper.h"
-	"gdal_alg_priv.h"
-	"cpl_quad_tree.h"
-	"cpl_string.h"
+	"wxgis/datasource/featuredataset.h"
 
 1277060083 /home/bishop/projects/wxGIS/include/wxgis/framework/framework.h
 	"wxgis/core/core.h"
@@ -1506,6 +1504,19 @@
 	"wx/object.h"
 	"wx/list.h"
 
+1277060083 /home/bishop/projects/wxGIS/include/wxgis/datasource/featuredataset.h
+	"wxgis/datasource/datasource.h"
+
+1277060083 /home/bishop/projects/wxGIS/include/wxgis/datasource/datasource.h
+	"wxgis/framework/framework.h"
+	"wx/datetime.h"
+	"ogrsf_frmts.h"
+	"gdal_priv.h"
+	"gdalwarper.h"
+	"gdal_alg_priv.h"
+	"cpl_quad_tree.h"
+	"cpl_string.h"
+
 1274733213 /home/bishop/projects/gdal-1.7.2/ogr/ogrsf_frmts/ogrsf_frmts.h
 	"ogr_feature.h"
 	"ogr_featurestyle.h"
@@ -1622,43 +1633,132 @@
 1272025262 /home/bishop/projects/gdal-1.7.2/port/cpl_quad_tree.h
 	"cpl_port.h"
 
+1281472402 /home/bishop/projects/wxGIS/include/wxgis/geoprocessingui/gptoolboxview.h
+	"wxgis/geoprocessingui/geoprocessingui.h"
+	"wxgis/catalogui/gxview.h"
+	"wxgis/geoprocessingui/gptasksview.h"
+	"wx/aui/aui.h"
+
+1281470185 /home/bishop/projects/wxGIS/include/wxgis/geoprocessingui/geoprocessingui.h
+	"wxgis/catalogui/catalogui.h"
+	"wxgis/geoprocessing/geoprocessing.h"
+
+1277060082 /home/bishop/projects/wxGIS/include/wxgis/catalogui/catalogui.h
+	"wxgis/base.h"
+	"wxgis/catalog/catalog.h"
+
+1277060083 /home/bishop/projects/wxGIS/include/wxgis/catalog/catalog.h
+	"wxgis/datasource/datasource.h"
+	"wx/filename.h"
+
 1250033142 /usr/include/wx-2.8/wx/filename.h
 	"wx/arrstr.h"
 	"wx/filefn.h"
 	"wx/datetime.h"
 	"wx/intl.h"
 
-1277455388 /home/bishop/projects/wxGIS/include/wxgis/cat_app/catalogapp.h
-	"wxgis/base.h"
-	"wxgis/core/config.h"
-	"wx/app.h"
-	"wx/dir.h"
-	"wx/filename.h"
-	"wx/file.h"
-	"wx/ffile.h"
+1281302745 /home/bishop/projects/wxGIS/include/wxgis/geoprocessing/geoprocessing.h
+	"wxgis/datasource/datasource.h"
+	"wxgis/catalog/catalog.h"
+
+1277060082 /home/bishop/projects/wxGIS/include/wxgis/catalogui/gxview.h
+	"wxgis/catalogui/catalogui.h"
+	"wxgis/catalog/catalog.h"
+
+1281472402 /home/bishop/projects/wxGIS/include/wxgis/geoprocessingui/gptasksview.h
+	"wxgis/geoprocessingui/geoprocessingui.h"
+	"wxgis/geoprocessing/gptoolmngr.h"
+	"wxgis/catalogui/gxview.h"
+	"wx/wxhtml.h"
+	"wx/imaglist.h"
+
+1281302761 /home/bishop/projects/wxGIS/include/wxgis/geoprocessing/gptoolmngr.h
+	"wxgis/geoprocessing/geoprocessing.h"
+	"wx/thread.h"
+
+1250033144 /usr/include/wx-2.8/wx/wxhtml.h
+	"wx/html/htmldefs.h"
+	"wx/html/htmltag.h"
+	"wx/html/htmlcell.h"
+	"wx/html/htmlpars.h"
+	"wx/html/htmlwin.h"
+	"wx/html/winpars.h"
+	"wx/filesys.h"
+	"wx/html/helpctrl.h"
+
+1250033144 /usr/include/wx-2.8/wx/html/htmldefs.h
+	"wx/defs.h"
+
+1250033144 /usr/include/wx-2.8/wx/html/htmltag.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/arrstr.h"
+
+1250033144 /usr/include/wx-2.8/wx/html/htmlcell.h
+	"wx/defs.h"
+	"wx/html/htmltag.h"
+	"wx/html/htmldefs.h"
+	"wx/window.h"
+
+1250033144 /usr/include/wx-2.8/wx/html/htmlpars.h
+	"wx/defs.h"
+	"wx/html/htmltag.h"
+	"wx/filesys.h"
+	"wx/hash.h"
+	"wx/fontenc.h"
+
+1250033142 /usr/include/wx-2.8/wx/filesys.h
+	"wx/defs.h"
+	"wx/stream.h"
 	"wx/datetime.h"
-	"wx/intl.h"
+	"wx/filename.h"
+	"wx/hashmap.h"
 
-1277060083 /home/bishop/projects/wxGIS/include/wxgis/core/config.h
-	"wxgis/core/core.h"
-	<wx/stdpaths.h>
-	<wx/filename.h>
+1250033144 /usr/include/wx-2.8/wx/html/htmlwin.h
+	"wx/defs.h"
+	"wx/window.h"
+	"wx/scrolwin.h"
+	"wx/config.h"
+	"wx/stopwatch.h"
+	"wx/html/winpars.h"
+	"wx/html/htmlcell.h"
+	"wx/filesys.h"
+	"wx/html/htmlfilt.h"
+	"wx/filename.h"
+	"wx/bitmap.h"
 
-1250033142 /usr/include/wx-2.8/wx/stdpaths.h
+1250033142 /usr/include/wx-2.8/wx/config.h
+	"wx/confbase.h"
+	"wx/msw/regconf.h"
+	"wx/msw/iniconf.h"
+	"wx/palmos/prefconf.h"
+	"wx/fileconf.h"
+
+1250033142 /usr/include/wx-2.8/wx/confbase.h
 	"wx/defs.h"
 	"wx/string.h"
-	"wx/filefn.h"
-	"wx/msw/stdpaths.h"
-	"wx/mac/corefoundation/stdpaths.h"
-	"wx/os2/stdpaths.h"
-	"wx/unix/stdpaths.h"
-	"wx/palmos/stdpaths.h"
-
-1250033142 /usr/include/wx-2.8/wx/unix/stdpaths.h
-
-1250033142 /usr/include/wx-2.8/wx/dir.h
-	"wx/longlong.h"
 	"wx/string.h"
+
+1250033142 /usr/include/wx-2.8/wx/fileconf.h
+	"wx/defs.h"
+	"wx/textfile.h"
+	"wx/string.h"
+	"wx/confbase.h"
+
+1250033142 /usr/include/wx-2.8/wx/textfile.h
+	"wx/defs.h"
+	"wx/textbuf.h"
+	"wx/file.h"
+
+1250033142 /usr/include/wx-2.8/wx/textbuf.h
+	"wx/defs.h"
+	"wx/arrstr.h"
+	"wx/convauto.h"
+	"wx/string.h"
+	"wx/dynarray.h"
+
+1250033142 /usr/include/wx-2.8/wx/convauto.h
+	"wx/strconv.h"
 
 1250033142 /usr/include/wx-2.8/wx/file.h
 	"wx/defs.h"
@@ -1666,50 +1766,152 @@
 	"wx/filefn.h"
 	"wx/strconv.h"
 
-1250033142 /usr/include/wx-2.8/wx/ffile.h
+1250033144 /usr/include/wx-2.8/wx/html/winpars.h
 	"wx/defs.h"
+	"wx/module.h"
+	"wx/font.h"
+	"wx/html/htmlpars.h"
+	"wx/html/htmlcell.h"
+	"wx/encconv.h"
+
+1250033142 /usr/include/wx-2.8/wx/encconv.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/fontenc.h"
+	"wx/dynarray.h"
+
+1250033144 /usr/include/wx-2.8/wx/html/htmlfilt.h
+	"wx/defs.h"
+	"wx/filesys.h"
+
+1250033144 /usr/include/wx-2.8/wx/html/helpctrl.h
+	"wx/defs.h"
+	"wx/helpbase.h"
+	"wx/html/helpfrm.h"
+
+1250033143 /usr/include/wx-2.8/wx/helpbase.h
+	"wx/defs.h"
+	"wx/object.h"
 	"wx/string.h"
-	"wx/filefn.h"
-	"wx/convauto.h"
-	<stdio.h>
+	"wx/gdicmn.h"
+	"wx/frame.h"
 
-1250033142 /usr/include/wx-2.8/wx/convauto.h
-	"wx/strconv.h"
+1250033144 /usr/include/wx-2.8/wx/html/helpfrm.h
+	"wx/defs.h"
+	"wx/helpbase.h"
+	"wx/html/helpdata.h"
+	"wx/window.h"
+	"wx/frame.h"
+	"wx/config.h"
+	"wx/splitter.h"
+	"wx/notebook.h"
+	"wx/listbox.h"
+	"wx/choice.h"
+	"wx/combobox.h"
+	"wx/checkbox.h"
+	"wx/stattext.h"
+	"wx/html/htmlwin.h"
+	"wx/html/helpwnd.h"
+	"wx/html/htmprint.h"
 
-1277586206 /home/bishop/projects/wxGIS/include/wxgis/cat_app/catalogframe.h
-	"wxgis/framework/framework.h"
-	"wxgis/catalogui/gxapplication.h"
-	"../../art/mainframe.xpm"
-	"wx/aui/aui.h"
-	"wx/generic/logg.h"
-	"wx/artprov.h"
-	<wx/event.h>
-	<wx/menu.h>
+1250033144 /usr/include/wx-2.8/wx/html/helpdata.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/filesys.h"
+	"wx/dynarray.h"
+	"wx/font.h"
 
-1277060082 /home/bishop/projects/wxGIS/include/wxgis/catalogui/gxapplication.h
-	"wxgis/catalog/catalog.h"
-	"wxgis/framework/application.h"
-	"wxgis/catalogui/gxtreeview.h"
-	"wxgis/catalogui/gxtabview.h"
-	"wxgis/catalogui/newmenu.h"
-	"wx/aui/aui.h"
-	"wx/artprov.h"
+1250033143 /usr/include/wx-2.8/wx/splitter.h
+	"wx/event.h"
+	"wx/generic/splitter.h"
 
-1277318913 /home/bishop/projects/wxGIS/include/wxgis/framework/application.h
-	"wxgis/framework/statusbar.h"
-	"wxgis/framework/accelerator.h"
-	"wxgis/framework/menubar.h"
-	"wxgis/framework/commandbar.h"
-	"wx/dynload.h"
-	"wx/dynlib.h"
+1250033143 /usr/include/wx-2.8/wx/generic/splitter.h
+	"wx/window.h"
+	"wx/containr.h"
 
-1277322722 /home/bishop/projects/wxGIS/include/wxgis/framework/statusbar.h
-	"wxgis/framework/animation.h"
-	"wxgis/framework/progressor.h"
+1250033143 /usr/include/wx-2.8/wx/notebook.h
+	"wx/defs.h"
+	"wx/bookctrl.h"
+	"wx/univ/notebook.h"
+	"wx/msw/notebook.h"
+	"wx/generic/notebook.h"
+	"wx/gtk/notebook.h"
+	"wx/gtk1/notebook.h"
+	"wx/mac/notebook.h"
+	"wx/cocoa/notebook.h"
+	"wx/os2/notebook.h"
 
-1277316655 /home/bishop/projects/wxGIS/include/wxgis/framework/animation.h
-	"wxgis/framework/framework.h"
-	"wx/imaglist.h"
+1250033143 /usr/include/wx-2.8/wx/bookctrl.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/dynarray.h"
+	"wx/notebook.h"
+	"wx/choicebk.h"
+
+1250033143 /usr/include/wx-2.8/wx/choicebk.h
+	"wx/defs.h"
+	"wx/bookctrl.h"
+	"wx/choice.h"
+
+1250033143 /usr/include/wx-2.8/wx/generic/notebook.h
+	"wx/event.h"
+	"wx/control.h"
+
+1250033144 /usr/include/wx-2.8/wx/gtk/notebook.h
+	"wx/list.h"
+
+1250033144 /usr/include/wx-2.8/wx/html/helpwnd.h
+	"wx/defs.h"
+	"wx/helpbase.h"
+	"wx/html/helpdata.h"
+	"wx/window.h"
+	"wx/frame.h"
+	"wx/config.h"
+	"wx/splitter.h"
+	"wx/notebook.h"
+	"wx/listbox.h"
+	"wx/choice.h"
+	"wx/combobox.h"
+	"wx/checkbox.h"
+	"wx/stattext.h"
+	"wx/html/htmlwin.h"
+	"wx/html/htmprint.h"
+
+1250033144 /usr/include/wx-2.8/wx/html/htmprint.h
+	"wx/defs.h"
+	"wx/html/htmlcell.h"
+	"wx/html/winpars.h"
+	"wx/html/htmlfilt.h"
+	"wx/print.h"
+	"wx/printdlg.h"
+	<limits.h>
+
+1250033143 /usr/include/wx-2.8/wx/print.h
+	"wx/defs.h"
+	"wx/msw/printwin.h"
+	"wx/mac/printmac.h"
+	"wx/os2/printos2.h"
+	"wx/generic/printps.h"
+
+1250033143 /usr/include/wx-2.8/wx/generic/printps.h
+	"wx/prntbase.h"
+
+1250033143 /usr/include/wx-2.8/wx/prntbase.h
+	"wx/defs.h"
+	"wx/event.h"
+	"wx/cmndata.h"
+	"wx/panel.h"
+	"wx/scrolwin.h"
+	"wx/dialog.h"
+	"wx/frame.h"
+
+1250033143 /usr/include/wx-2.8/wx/printdlg.h
+	"wx/defs.h"
+	"wx/event.h"
+	"wx/dialog.h"
+	"wx/intl.h"
+	"wx/cmndata.h"
 
 1250033143 /usr/include/wx-2.8/wx/imaglist.h
 	"wx/generic/imaglist.h"
@@ -1720,23 +1922,6 @@
 	"wx/defs.h"
 	"wx/list.h"
 	"wx/icon.h"
-
-1277060083 /home/bishop/projects/wxGIS/include/wxgis/framework/progressor.h
-	"wxgis/framework/framework.h"
-	"wx/gauge.h"
-
-1277060083 /home/bishop/projects/wxGIS/include/wxgis/framework/accelerator.h
-	"wxgis/framework/framework.h"
-	<wx/accel.h>
-	"wxgis/core/config.h"
-
-1279727853 /home/bishop/projects/wxGIS/include/wxgis/framework/menubar.h
-	"wxgis/framework/framework.h"
-	"wxgis/framework/commandbar.h"
-
-1277060083 /home/bishop/projects/wxGIS/include/wxgis/framework/commandbar.h
-	"wxgis/framework/framework.h"
-	"wx/aui/aui.h"
 
 1250033144 /usr/include/wx-2.8/wx/aui/aui.h
 	"wx/aui/framemanager.h"
@@ -1802,65 +1987,60 @@
 	"wx/icon.h"
 	"wx/aui/auibook.h"
 
-1250033143 /usr/include/wx-2.8/wx/notebook.h
-	"wx/defs.h"
-	"wx/bookctrl.h"
-	"wx/univ/notebook.h"
-	"wx/msw/notebook.h"
-	"wx/generic/notebook.h"
-	"wx/gtk/notebook.h"
-	"wx/gtk1/notebook.h"
-	"wx/mac/notebook.h"
-	"wx/cocoa/notebook.h"
-	"wx/os2/notebook.h"
+1277060083 /home/bishop/projects/wxGIS/include/wxgis/datasource/sysop.h
+	"wxgis/datasource/datasource.h"
 
-1250033143 /usr/include/wx-2.8/wx/bookctrl.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/dynarray.h"
-	"wx/notebook.h"
-	"wx/choicebk.h"
+1277060084 /home/bishop/projects/wxGIS/art/gp_menu_16.xpm
 
-1250033143 /usr/include/wx-2.8/wx/choicebk.h
-	"wx/defs.h"
-	"wx/bookctrl.h"
-	"wx/choice.h"
+1277060084 /home/bishop/projects/wxGIS/art/toolbox_16.xpm
 
-1250033143 /usr/include/wx-2.8/wx/generic/notebook.h
-	"wx/event.h"
-	"wx/control.h"
+1277060083 /home/bishop/projects/wxGIS/include/wxgis/catalog/gxdataset.h
+	"wxgis/catalog/catalog.h"
+	<wx/imaglist.h>
 
-1250033144 /usr/include/wx-2.8/wx/gtk/notebook.h
-	"wx/list.h"
-
-1250033142 /usr/include/wx-2.8/wx/dynload.h
-	"wx/defs.h"
-	"wx/dynlib.h"
-	"wx/hashmap.h"
-	"wx/module.h"
-
-1250033142 /usr/include/wx-2.8/wx/dynlib.h
-	"wx/defs.h"
-	"wx/string.h"
-	"wx/dynarray.h"
-	"wx/os2/private.h"
-	"wx/msw/private.h"
-	<dlfcn.h>
-	<dl.h>
-	<CodeFragments.h>
-
-1281622669 /home/bishop/projects/wxGIS/include/wxgis/catalogui/gxtreeview.h
-	"wxgis/catalogui/gxview.h"
-	"wx/treectrl.h"
-	"wx/imaglist.h"
-
-1277060082 /home/bishop/projects/wxGIS/include/wxgis/catalogui/gxview.h
+1281635220 /home/bishop/projects/wxGIS/include/wxgis/catalogui/gxobjdialog.h
+	<wx/intl.h>
+	<wx/string.h>
+	<wx/stattext.h>
+	<wx/gdicmn.h>
+	<wx/font.h>
+	<wx/colour.h>
+	<wx/settings.h>
+	<wx/combo.h>
+	<wx/treectrl.h>
+	<wx/combobox.h>
+	<wx/bitmap.h>
+	<wx/image.h>
+	<wx/icon.h>
+	<wx/toolbar.h>
+	<wx/sizer.h>
+	<wx/listctrl.h>
+	<wx/textctrl.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	"wxgis/core/config.h"
+	"wxgis/catalog/gxcatalog.h"
 	"wxgis/catalogui/catalogui.h"
-	"wxgis/catalog/catalog.h"
+	"wxgis/catalogui/gxcontentview.h"
+	"wxgis/catalogui/gxtreeview.h"
+	"wx/aui/aui.h"
 
-1277060082 /home/bishop/projects/wxGIS/include/wxgis/catalogui/catalogui.h
-	"wxgis/base.h"
-	"wxgis/catalog/catalog.h"
+1250033143 /usr/include/wx-2.8/wx/combo.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/renderer.h"
+	"wx/bitmap.h"
+	"wx/msw/combo.h"
+	"wx/generic/combo.h"
+
+1250033143 /usr/include/wx-2.8/wx/renderer.h
+	"wx/gdicmn.h"
+	"wx/colour.h"
+	"wx/font.h"
+	"wx/bitmap.h"
+	"wx/string.h"
+
+1250033143 /usr/include/wx-2.8/wx/generic/combo.h
 
 1250033143 /usr/include/wx-2.8/wx/treectrl.h
 	"wx/defs.h"
@@ -1886,36 +2066,282 @@
 	"wx/scrolwin.h"
 	"wx/pen.h"
 
-1277060082 /home/bishop/projects/wxGIS/include/wxgis/catalogui/gxtabview.h
-	"wxgis/catalogui/gxview.h"
+1277060083 /home/bishop/projects/wxGIS/include/wxgis/core/config.h
+	"wxgis/core/core.h"
+	<wx/stdpaths.h>
+	<wx/filename.h>
+
+1250033142 /usr/include/wx-2.8/wx/stdpaths.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/filefn.h"
+	"wx/msw/stdpaths.h"
+	"wx/mac/corefoundation/stdpaths.h"
+	"wx/os2/stdpaths.h"
+	"wx/unix/stdpaths.h"
+	"wx/palmos/stdpaths.h"
+
+1250033142 /usr/include/wx-2.8/wx/unix/stdpaths.h
+
+1280862788 /home/bishop/projects/wxGIS/include/wxgis/catalog/gxcatalog.h
 	"wxgis/catalog/catalog.h"
-	<wx/aui/aui.h>
-	<wx/artprov.h>
-	<wx/panel.h>
+	"../../art/mainframe.xpm"
+	"wxgis/catalog/gxselection.h"
+
+1277060084 /home/bishop/projects/wxGIS/art/mainframe.xpm
+
+1281298464 /home/bishop/projects/wxGIS/include/wxgis/catalog/gxselection.h
+	"wxgis/catalog/catalog.h"
+
+1280867111 /home/bishop/projects/wxGIS/include/wxgis/catalogui/gxcontentview.h
+	"wxgis/catalogui/gxview.h"
+	"wx/listctrl.h"
+	"wx/imaglist.h"
+
+1281622669 /home/bishop/projects/wxGIS/include/wxgis/catalogui/gxtreeview.h
+	"wxgis/catalogui/gxview.h"
+	"wx/treectrl.h"
+	"wx/imaglist.h"
+
+1277060082 /home/bishop/projects/wxGIS/include/wxgis/catalogui/gxcontdialog.h
+	<wx/intl.h>
+	<wx/string.h>
+	<wx/stattext.h>
+	<wx/gdicmn.h>
+	<wx/font.h>
+	<wx/colour.h>
+	<wx/settings.h>
+	<wx/treectrl.h>
+	<wx/toolbar.h>
+	<wx/sizer.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	"wxgis/core/config.h"
+	"wxgis/catalog/gxcatalog.h"
+	"wxgis/catalogui/catalogui.h"
+	"wxgis/catalogui/gxcontentview.h"
+	"wxgis/catalogui/gxtreeview.h"
+	"wx/aui/aui.h"
+
+1277060083 /home/bishop/projects/wxGIS/include/wxgis/catalog/gxfilters.h
+	"wxgis/catalog/catalog.h"
+
+1277060082 /home/bishop/projects/wxGIS/include/wxgis/geoprocessing/gpvector.h
+	"wxgis/geoprocessing/geoprocessing.h"
+	"wxgis/datasource/featuredataset.h"
+
+1277060083 /home/bishop/projects/wxGIS/include/wxgis/framework/progressdlg.h
+	"wxgis/framework/framework.h"
+	<wx/intl.h>
+	<wx/string.h>
+	<wx/stattext.h>
+	<wx/gdicmn.h>
+	<wx/font.h>
+	<wx/colour.h>
+	<wx/settings.h>
+	<wx/sizer.h>
+	<wx/button.h>
+	<wx/dialog.h>
+
+1250033143 /usr/include/wx-2.8/wx/busyinfo.h
+	"wx/defs.h"
+	"wx/generic/busyinfo.h"
+
+1250033143 /usr/include/wx-2.8/wx/generic/busyinfo.h
+	"wx/defs.h"
+
+1281303116 source:/home/bishop/projects/wxGIS/src/geoprocessingui/gpcontrols.cpp
+	"wxgis/geoprocessing/gpdomain.h"
+	"wxgis/catalogui/gxobjdialog.h"
+	"wxgis/geoprocessingui/gpcontrols.h"
+	"wx/dnd.h"
+	"wx/valgen.h"
+	"../../art/state_16.xpm"
+	"../../art/open_16.xpm"
+	"../../art/sql_16.xpm"
+	"wxgis/framework/messagedlg.h"
+
+1277060082 /home/bishop/projects/wxGIS/include/wxgis/geoprocessing/gpdomain.h
+	"wxgis/geoprocessing/geoprocessing.h"
+	"wxgis/catalog/catalog.h"
+
+1281470185 /home/bishop/projects/wxGIS/include/wxgis/geoprocessingui/gpcontrols.h
+	"wxgis/geoprocessingui/geoprocessingui.h"
+	"wxgis/geoprocessing/geoprocessing.h"
+	<wx/intl.h>
+	<wx/bitmap.h>
+	<wx/image.h>
+	<wx/icon.h>
+	<wx/statbmp.h>
 	<wx/gdicmn.h>
 	<wx/font.h>
 	<wx/colour.h>
 	<wx/settings.h>
 	<wx/string.h>
-	<wx/combobox.h>
 	<wx/stattext.h>
+	<wx/choice.h>
 	<wx/sizer.h>
+	<wx/panel.h>
+	"wx/imaglist.h"
 
-1250033143 /usr/include/wx-2.8/wx/artprov.h
-	"wx/string.h"
-	"wx/bitmap.h"
+1250033143 /usr/include/wx-2.8/wx/dnd.h
+	"wx/defs.h"
+	"wx/dataobj.h"
+	"wx/cursor.h"
+	"wx/msw/ole/dropsrc.h"
+	"wx/msw/ole/droptgt.h"
+	"wx/motif/dnd.h"
+	"wx/x11/dnd.h"
+	"wx/gtk/dnd.h"
+	"wx/gtk1/dnd.h"
+	"wx/mac/dnd.h"
+	"wx/os2/dnd.h"
+
+1250033143 /usr/include/wx-2.8/wx/gtk/dnd.h
 	"wx/icon.h"
 
-1277060082 /home/bishop/projects/wxGIS/include/wxgis/catalogui/newmenu.h
+1250033143 /usr/include/wx-2.8/wx/valgen.h
+	"wx/validate.h"
+
+1277060084 /home/bishop/projects/wxGIS/art/state_16.xpm
+
+1277060084 /home/bishop/projects/wxGIS/art/open_16.xpm
+
+1277060084 /home/bishop/projects/wxGIS/art/sql_16.xpm
+
+1277060083 /home/bishop/projects/wxGIS/include/wxgis/framework/messagedlg.h
+	"wxgis/framework/framework.h"
+	<wx/intl.h>
+	<wx/string.h>
+	<wx/stattext.h>
+	<wx/gdicmn.h>
+	<wx/font.h>
+	<wx/colour.h>
+	<wx/settings.h>
+	<wx/sizer.h>
+	<wx/button.h>
+	<wx/checkbox.h>
+	<wx/dialog.h>
+
+1281642628 source:/home/bishop/projects/wxGIS/src/geoprocessingui/gptasksview.cpp
+	"wxgis/geoprocessingui/gptasksview.h"
+	"wxgis/geoprocessingui/gptooldlg.h"
+	"wxgis/framework/progressor.h"
+	"wxgis/framework/tooltip.h"
+	"../../art/tool_16.xpm"
+	"../../art/close_16a.xpm"
+	"../../art/expand_16.xpm"
+	"../../art/state_16.xpm"
+
+1281642452 /home/bishop/projects/wxGIS/include/wxgis/geoprocessingui/gptooldlg.h
+	"wxgis/geoprocessing/geoprocessing.h"
+	"wxgis/geoprocessingui/geoprocessingui.h"
+	"wxgis/geoprocessingui/gpcontrols.h"
+	"wxgis/geoprocessing/gptoolmngr.h"
+	<wx/intl.h>
+	<wx/sizer.h>
+	<wx/gdicmn.h>
+	<wx/button.h>
+	<wx/panel.h>
+	<wx/font.h>
+	<wx/colour.h>
+	<wx/settings.h>
+	<wx/string.h>
+	<wx/html/htmlwin.h>
+	<wx/splitter.h>
+	<wx/dialog.h>
+	<wx/scrolwin.h>
+
+1277060083 /home/bishop/projects/wxGIS/include/wxgis/framework/progressor.h
+	"wxgis/framework/framework.h"
+	"wx/gauge.h"
+
+1281298464 /home/bishop/projects/wxGIS/include/wxgis/framework/tooltip.h
+	"wxgis/framework/framework.h"
+
+1277060084 /home/bishop/projects/wxGIS/art/tool_16.xpm
+
+1277060084 /home/bishop/projects/wxGIS/art/close_16a.xpm
+
+1277060084 /home/bishop/projects/wxGIS/art/expand_16.xpm
+
+1281642628 source:/home/bishop/projects/wxGIS/src/geoprocessingui/gptoolbox.cpp
+	"wxgis/geoprocessingui/gptoolbox.h"
+	"wxgis/geoprocessingui/gptooldlg.h"
+	<wx/stdpaths.h>
+	"../../art/toolbox_16.xpm"
+	"../../art/toolbox_48.xpm"
+	"../../art/tool_16.xpm"
+	"../../art/tool_48.xpm"
+
+1281472402 /home/bishop/projects/wxGIS/include/wxgis/geoprocessingui/gptoolbox.h
+	"wxgis/catalog/catalog.h"
+	"wxgis/geoprocessing/gptoolmngr.h"
+
+1277060084 /home/bishop/projects/wxGIS/art/toolbox_48.xpm
+
+1277060084 /home/bishop/projects/wxGIS/art/tool_48.xpm
+
+1281298464 source:/home/bishop/projects/wxGIS/src/geoprocessingui/gptoolboxview.cpp
+	"wxgis/geoprocessingui/gptoolboxview.h"
+
+1277060084 source:/home/bishop/projects/wxGIS/src/geoprocessingui/gptoolboxviewfactory.cpp
+	"wxgis/geoprocessingui/gptoolboxviewfactory.h"
+	"wxgis/geoprocessingui/gptoolboxview.h"
+
+1281470185 /home/bishop/projects/wxGIS/include/wxgis/geoprocessingui/gptoolboxviewfactory.h
+	"wxgis/geoprocessingui/geoprocessingui.h"
 	"wxgis/catalogui/catalogui.h"
+
+1281642628 source:/home/bishop/projects/wxGIS/src/geoprocessingui/gptooldlg.cpp
+	"wxgis/geoprocessingui/gptooldlg.h"
+	"wxgis/geoprocessingui/gptasksview.h"
+	"wxgis/framework/application.h"
+	"../../art/tool_16.xpm"
+	"wx/icon.h"
+
+1277318913 /home/bishop/projects/wxGIS/include/wxgis/framework/application.h
+	"wxgis/framework/statusbar.h"
+	"wxgis/framework/accelerator.h"
+	"wxgis/framework/menubar.h"
+	"wxgis/framework/commandbar.h"
+	"wx/dynload.h"
+	"wx/dynlib.h"
+
+1277322722 /home/bishop/projects/wxGIS/include/wxgis/framework/statusbar.h
+	"wxgis/framework/animation.h"
+	"wxgis/framework/progressor.h"
+
+1277316655 /home/bishop/projects/wxGIS/include/wxgis/framework/animation.h
+	"wxgis/framework/framework.h"
+	"wx/imaglist.h"
+
+1277060083 /home/bishop/projects/wxGIS/include/wxgis/framework/accelerator.h
+	"wxgis/framework/framework.h"
+	<wx/accel.h>
+	"wxgis/core/config.h"
+
+1279727853 /home/bishop/projects/wxGIS/include/wxgis/framework/menubar.h
 	"wxgis/framework/framework.h"
 	"wxgis/framework/commandbar.h"
 
-1277060084 /home/bishop/projects/wxGIS/art/mainframe.xpm
+1277060083 /home/bishop/projects/wxGIS/include/wxgis/framework/commandbar.h
+	"wxgis/framework/framework.h"
+	"wx/aui/aui.h"
 
-1280699921 source:/home/bishop/projects/wxGIS/src/cat_app/catalogframe.cpp
-	"wxgis/cat_app/catalogframe.h"
-	"wx/version.h"
-	"geos_c.h"
-	"proj_api.h"
+1250033142 /usr/include/wx-2.8/wx/dynload.h
+	"wx/defs.h"
+	"wx/dynlib.h"
+	"wx/hashmap.h"
+	"wx/module.h"
+
+1250033142 /usr/include/wx-2.8/wx/dynlib.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/dynarray.h"
+	"wx/os2/private.h"
+	"wx/msw/private.h"
+	<dlfcn.h>
+	<dl.h>
+	<CodeFragments.h>
 

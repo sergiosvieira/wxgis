@@ -72,7 +72,7 @@ void wxGxToolbox::Refresh(void)
 	LoadChildren();
     m_pCatalog->ObjectRefreshed(this);
 }
- 
+
 void wxGxToolbox::EmptyChildren(void)
 {
 	for(size_t i = 0; i < m_Children.size(); i++)
@@ -103,7 +103,7 @@ bool wxGxToolbox::DeleteChild(IGxObject* pChild)
 void wxGxToolbox::LoadChildren(void)
 {
 	if(m_bIsChildrenLoaded)
-		return;	
+		return;
 
     wxBusyCursor wait;
     LoadChildrenFromXml(m_pDataNode);
@@ -118,16 +118,16 @@ wxString wxGxToolbox::GetName(void)
 void wxGxToolbox::LoadChildrenFromXml(wxXmlNode* pNode)
 {
     wxXmlNode *pChild = pNode->GetChildren();
-    while (pChild) 
+    while (pChild)
     {
-        if(pChild->GetName().IsSameAs(wxT("toolbox"), false)) 
+        if(pChild->GetName().IsSameAs(wxT("toolbox"), false))
         {
             wxGxToolbox* pToolbox = new wxGxToolbox(pChild, m_pToolMngr, m_pPropNode);
             IGxObject* pGxObj = static_cast<IGxObject*>(pToolbox);
             if(!AddChild(pGxObj))
                 wxDELETE(pGxObj);
         }
-        else if(pChild->GetName().IsSameAs(wxT("tool"), false)) 
+        else if(pChild->GetName().IsSameAs(wxT("tool"), false))
         {
             wxGxTool* pTool = new wxGxTool(pChild, m_pToolMngr, m_pPropNode);
             IGxObject* pGxObj = static_cast<IGxObject*>(pTool);
@@ -181,25 +181,25 @@ void wxGxRootToolbox::Init(wxXmlNode* pConfigNode)
     //wxClassInfo* pInfo = GetClassInfo();
     //if(pInfo)
     //    m_pPropNode->AddProperty(wxT("name"), pInfo->GetClassName());
-    //m_pPropNode->AddProperty(wxT("is_enabled"), wxT("1"));    
+    //m_pPropNode->AddProperty(wxT("is_enabled"), wxT("1"));
 #ifdef WXGISPORTABLE
     if(m_pPropNode->HasProp(wxT("path")))
         m_pPropNode->DeleteProperty(wxT("path"));
     m_pPropNode->AddProperty(wxT("path"), wxEmptyString);
-#endif  
+#endif
 }
 
 void wxGxRootToolbox::LoadChildren(void)
 {
 	if(m_bIsChildrenLoaded)
-		return;	
+		return;
 
     wxBusyCursor wait;
     if( !m_XmlDoc.Load(m_sPath) )
         return;
     if (m_XmlDoc.GetRoot()->GetName() != wxT("wxToolboxes"))
         return;
-    
+
     wxXmlNode *pToolsChild(NULL), *pToolboxesChild(NULL);
     wxXmlNode* pChild = m_XmlDoc.GetRoot()->GetChildren();
     while(pChild)
@@ -254,7 +254,7 @@ void wxGxRootToolbox::LoadChildren(void)
  //   CSLDestroy( papszFileList );
 
 	////load names
-	//GxObjectArray Array;	
+	//GxObjectArray Array;
 	//if(m_pCatalog->GetChildren(m_sPath, &m_FileNames, &Array))
 	//{
 	//	for(size_t i = 0; i < Array.size(); i++)
@@ -319,7 +319,7 @@ bool wxGxTool::Invoke(wxWindow* pParentWnd)
     IGPTool* pTool = m_pToolMngr->GetTool(m_sInternalName);
     if(pTool)
     {
-        wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(pTool, m_pToolMngr, m_pPropNode, pParentWnd);//);//
+        wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(pTool, m_pToolMngr, m_pPropNode, pParentWnd, wxID_ANY, pTool->GetDisplayName());//);//
         pDlg->Show(true);
         //pDlg->SetParent(pParentWnd);
     //dlg.ShowModal();//(true);

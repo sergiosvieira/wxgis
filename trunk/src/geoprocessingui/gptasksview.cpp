@@ -54,10 +54,10 @@ wxGxTaskPanel::wxGxTaskPanel(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow
 	fgSizer1->AddGrowableCol( 1 );
 	fgSizer1->SetFlexibleDirection( wxHORIZONTAL );
 	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+
     m_pStateBitmap = new wxStaticBitmap( this, wxID_ANY, m_ImageList.GetIcon(4), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( m_pStateBitmap, 0, wxALL, 5 );
-	
+
     wxStaticText * title = new wxStaticText(this, wxID_ANY, pTool->GetDisplayName());
     wxFont titleFont = this->GetFont();
     titleFont.SetWeight(wxFONTWEIGHT_BOLD);
@@ -104,7 +104,7 @@ wxGxTaskPanel::wxGxTaskPanel(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow
     wxStaticText * text = new wxStaticText(this, wxID_ANY, _("status message"));// very long to fit in control may be and try again status message very long to fit in control may be, wxDefaultPosition, wxDefaultSize, wxST_NO_AUTORESIZE
     text->Wrap( -1 );
     fgSizer2->Add(text, 0, wxEXPAND | wxALL, 5);
- 
+
     wxGISProgressor* pProgressor = new wxGISProgressor(this);
     pProgressor->SetInitialSize(wxSize(130, 18));
     fgSizer2->Add(pProgressor, 0, wxALL|wxEXPAND, 5);
@@ -205,7 +205,7 @@ void wxGxTaskPanel::FillHtmlWindow()
         case enumGISMessageUnk:
         default:
             sText += m_MessageArray[i].sMessage;
-        }        
+        }
         sText += wxString(wxT("<br>"));
     }
     sText += wxString(wxT("</body></html>"));
@@ -274,7 +274,7 @@ void wxGxTaskPanel::OnCancel(wxCommandEvent & event)
         if(m_nState == enumGISMessageErr)
         {
             //create new dialog
-            wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(m_pTool, m_pMngr, m_pToolDialogPropNode, m_pToolDialogWindow);
+            wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(m_pTool, m_pMngr, m_pToolDialogPropNode, m_pToolDialogWindow, wxID_ANY, m_pTool->GetDisplayName());
             pDlg->Show(true);
         }
         //remove from parent
@@ -327,7 +327,7 @@ void wxGxTaskPanel::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessag
 BEGIN_EVENT_TABLE(wxGxTasksView, wxScrolledWindow)
 END_EVENT_TABLE()
 
-wxGxTasksView::wxGxTasksView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : 
+wxGxTasksView::wxGxTasksView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
 wxScrolledWindow(parent, id, pos, size, style)
 {
     m_sViewName = wxString(_("Tasks"));

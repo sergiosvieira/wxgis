@@ -82,7 +82,7 @@ public:
 	virtual void OnRefreshAll(void);
 //wxTreeCtrl
     virtual int OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2);
-//
+//events
 	virtual void OnItemExpanding(wxTreeEvent& event);
 	virtual void OnItemRightClick(wxTreeEvent& event);
 

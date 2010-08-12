@@ -186,7 +186,7 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
     {
         if( pszMessage )
         {
-            wxString soMsg(wgMB2WX(pszMessage)); 
+            wxString soMsg(wgMB2WX(pszMessage));
             if(!soMsg.IsEmpty())
                 pTrackCancel->PutMessage( wgMB2WX(pszMessage), -1, enumGISMessageNorm );
         }
@@ -196,10 +196,16 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
         bCancel = !pTrackCancel->Continue();
     }
 
+#ifdef __WXGTK__
+    wxMutexGuiEnter();
+#endif
     if(wxGetKeyState(WXK_SHIFT) || wxGetKeyState(WXK_ALT) || wxGetKeyState(WXK_CONTROL))
         return 1;
 
-    bool bKeyState = wxGetKeyState(WXK_ESCAPE);    
+    bool bKeyState = wxGetKeyState(WXK_ESCAPE);
+#ifdef __WXGTK__
+    wxMutexGuiLeave();
+#endif
     return bKeyState || bCancel ? 0 : 1;
 }
 
@@ -247,12 +253,12 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("Source dataset is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
-    
+
     wxString sDstPath = m_pParamArr[1]->GetValue();
     wxFileName sDstFileName(sDstPath);
     wxString sPath = sDstFileName.GetPath();
     wxString sName = sDstFileName.GetName();
-    
+
     wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[1]->GetDomain());
     IGxObjectFilter* pFilter = pDomain->GetFilter(pDomain->GetSelFilter());
     if(!pFilter)
@@ -264,7 +270,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         wsDELETE(pSrcDataSet);
         return false;
     }
-        
+
     wxString sDriver = pFilter->GetDriver();
     wxString sExt = pFilter->GetExt();
     int nNewSubType = pFilter->GetSubType();
@@ -296,13 +302,13 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     if(soChoice == wxString(_("Cubic")))
         CPLSetConfigOption( "GDAL_RPCDEMINTERPOLATION", "CUBIC" ); //BILINEAR
 
-        
+
     //CPLString osSRCSRSOpt = "SRC_SRS=";
     //osSRCSRSOpt += poGDALDataset->GetProjectionRef();
     CPLString osDSTSRSOpt = "DST_SRS=";
     osDSTSRSOpt += poGDALDataset->GetProjectionRef();
 
-    const char *apszOptions[6] = { osDSTSRSOpt.c_str(), "METHOD=RPC", NULL, NULL, NULL, NULL};//, NULL  osSRCSRSOpt.c_str(), 
+    const char *apszOptions[6] = { osDSTSRSOpt.c_str(), "METHOD=RPC", NULL, NULL, NULL, NULL};//, NULL  osSRCSRSOpt.c_str(),
     wxString soDEMPath = m_pParamArr[2]->GetValue();
 
     CPLString soCPLDemPath;
@@ -354,7 +360,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
 
     GDALDestroyGenImgProjTransformer( hTransformArg );
 
-    // Create the output file.  
+    // Create the output file.
     GDALDataset * poOutputGDALDataset = poDriver->Create( wgWX2MB(sDstPath), nPixels, nLines, poGDALDataset->GetRasterCount(), eDT, NULL );
     if(poOutputGDALDataset == NULL)
     {
@@ -375,30 +381,30 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         GDALSetRasterColorTable( GDALGetRasterBand(poOutputGDALDataset,1), hCT );
 
 
-    // Setup warp options. 
-    
+    // Setup warp options.
+
     GDALWarpOptions *psWarpOptions = GDALCreateWarpOptions();
 
     psWarpOptions->hSrcDS = poGDALDataset;
     psWarpOptions->hDstDS = poOutputGDALDataset;
 
     //psWarpOptions->nBandCount = 1;
-    //psWarpOptions->panSrcBands = 
+    //psWarpOptions->panSrcBands =
     //    (int *) CPLMalloc(sizeof(int) * psWarpOptions->nBandCount );
     //psWarpOptions->panSrcBands[0] = 1;
-    //psWarpOptions->panDstBands = 
+    //psWarpOptions->panDstBands =
     //    (int *) CPLMalloc(sizeof(int) * psWarpOptions->nBandCount );
     //psWarpOptions->panDstBands[0] = 1;
 
-    psWarpOptions->pfnProgress = OvrProgress;   
+    psWarpOptions->pfnProgress = OvrProgress;
     psWarpOptions->pProgressArg = (void*)pTrackCancel;
 
-    // Establish reprojection transformer. 
+    // Establish reprojection transformer.
 
     psWarpOptions->pTransformerArg = GDALCreateGenImgProjTransformer2( poGDALDataset, poOutputGDALDataset, (char **)apszOptions );
     psWarpOptions->pfnTransformer = GDALGenImgProjTransform;
 
-    // Initialize and execute the warp operation. 
+    // Initialize and execute the warp operation.
 
     GDALWarpOperation oOperation;
 

@@ -72,7 +72,11 @@ wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, cons
 	}
 	if(panesstyle & enumGISStatusPosition)
 	{
+#ifdef __WXGTK__
+		STATUSPANE data = {225, wxSB_NORMAL};
+#else
 		STATUSPANE data = {200, wxSB_NORMAL};
+#endif
 		panes.push_back(data);
         m_PositionPos = counter;
 		counter++;
