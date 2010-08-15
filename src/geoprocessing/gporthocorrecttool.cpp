@@ -182,6 +182,9 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
 {
     bool bCancel = false;
     ITrackCancel* pTrackCancel = (ITrackCancel*)pData;
+
+    //wxSleep(1);
+
     if(pTrackCancel)
     {
         if( pszMessage )
@@ -414,7 +417,10 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     {
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wxString::Format(_("OrthoCorrect failed! OGR error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
+        {
+            wxString sErr = wgMB2WX(pszErr);
+            pTrackCancel->PutMessage(wxString::Format(_("OrthoCorrect failed! OGR error: %s"), sErr.c_str()), -1, enumGISMessageErr);
+        }
         GDALClose(poOutputGDALDataset);
         wsDELETE(pSrcDataSet);
         return false;

@@ -448,7 +448,7 @@ void wxGxTabView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 void wxGxTabView::OnAUINotebookPageChanged(wxAuiNotebookEvent& event)
 {
 	//update view while changing focus of tabs
-	//event.Skip();
+	event.Skip();
 	int nSelTab = event.GetSelection();
     if(nSelTab < 0)
         return;
@@ -456,7 +456,7 @@ void wxGxTabView::OnAUINotebookPageChanged(wxAuiNotebookEvent& event)
 
 	wxGxTab* pCurrTab = m_Tabs[nSelTab];
 	if(pCurrTab && m_pSelection)
-		pCurrTab->OnSelectionChanged(m_pSelection, TREECTRLID);
+		pCurrTab->OnSelectionChanged(m_pSelection, IGxSelection::INIT_ALL);
 }
 
 wxWindow* wxGxTabView::GetCurrentWnd(void)

@@ -23,7 +23,7 @@
 		<Cursor position="6109" topLine="89" />
 	</File>
 	<File name="../../src/catalogui/gxapplication.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="11869" topLine="369" />
+		<Cursor position="12112" topLine="369" />
 	</File>
 	<File name="../../src/catalogui/gxcontentview.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="11815" topLine="311" />
@@ -34,11 +34,11 @@
 	<File name="../../src/catalogui/gxmapview.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="5659" topLine="151" />
 	</File>
-	<File name="../../src/catalogui/gxobgdialog.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="22293" topLine="688" />
+	<File name="../../src/catalogui/gxobgdialog.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="14894" topLine="399" />
 	</File>
 	<File name="../../src/catalogui/gxtabview.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="12925" topLine="429" />
+		<Cursor position="5951" topLine="157" />
 	</File>
 	<File name="../../src/catalogui/gxtreeview.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2397" topLine="39" />
