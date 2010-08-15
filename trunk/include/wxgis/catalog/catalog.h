@@ -24,8 +24,8 @@
 #include "wxgis/datasource/datasource.h"
 #include "wx/filename.h"
 
-#define APP_NAME wxT("wxGISCatalog") 
-#define APP_VER wxT("0.1.1 RC1")
+#define APP_NAME wxT("wxGISCatalog")
+#define APP_VER wxT("0.2.0 Beta")
 
 //#include <wx/dynload.h>
 //#include <wx/dynlib.h>
@@ -37,7 +37,7 @@
 
 enum wxGISEnumSaveObjectResults
 {
-	enumGISSaveObjectNone = 0x0000, 
+	enumGISSaveObjectNone = 0x0000,
 	enumGISSaveObjectAccept = 0x0001,
 	enumGISSaveObjectExists = 0x0002,
 	enumGISSaveObjectDeny = 0x0004
@@ -51,7 +51,7 @@ class IGxSelection
 public:
 	enum wxGISEnumInitiators
 	{
-		INIT_ALL = -2, 
+		INIT_ALL = -2,
 		INIT_NONE = -1
 	} Initiator;
 	virtual ~IGxSelection(void){};
@@ -79,7 +79,7 @@ public:
 
 class IGxSelectionEvents
 {
-public:	
+public:
 	virtual ~IGxSelectionEvents(void){};
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator) = 0;
 };
@@ -231,7 +231,7 @@ protected:
 
 class IGxObjectFactory
 {
-public:	
+public:
 	IGxObjectFactory(void) : m_pCatalog(NULL), m_bIsEnabled(true){};
 	virtual ~IGxObjectFactory(void){};
     //pure virtual
@@ -249,7 +249,7 @@ protected:
 
 class IGxCatalogEvents
 {
-public:	
+public:
 	virtual ~IGxCatalogEvents(void){};
 	virtual void OnObjectAdded(IGxObject* object) = 0;
 	virtual void OnObjectChanged(IGxObject* object) = 0;
@@ -261,9 +261,9 @@ public:
 
 class IGxDataset
 {
-public:	
+public:
 	virtual ~IGxDataset(void){};
-	virtual wxGISDataset* GetDataset(void) = 0;	
+	virtual wxGISDataset* GetDataset(void) = 0;
 	virtual wxGISEnumDatasetType GetType(void) = 0;
 	virtual int GetSubType(void) = 0;
     virtual wxString GetPath(void) = 0;
@@ -271,9 +271,9 @@ public:
 
 class IGxFile
 {
-public:	
+public:
 	virtual ~IGxFile(void){};
-	//virtual bool Open(void) = 0;	
+	//virtual bool Open(void) = 0;
 	//virtual bool Close(bool bSaveEdits) = 0;
 	//virtual void Edit(void) = 0;
 	//virtual void New(void) = 0;
@@ -282,7 +282,7 @@ public:
 
 class IGxRootObjectProperties
 {
-public:	
+public:
 	virtual ~IGxRootObjectProperties(void){};
 	virtual void Init(wxXmlNode* pConfigNode) = 0;
 	virtual wxXmlNode* GetProperties(void) = 0;
@@ -290,7 +290,7 @@ public:
 
 class IGxObjectSort
 {
-public:	
+public:
 	virtual ~IGxObjectSort(void){};
 	virtual bool IsAlwaysTop(void) = 0;
 	virtual bool IsSortEnabled(void) = 0;
@@ -315,7 +315,7 @@ typedef std::vector<IGxObjectFilter*> OBJECTFILTERS, *LPOBJECTFILTERS;
 //
 //class IGxObjectFactories
 //{
-//public:	
+//public:
 //	virtual ~IGxObjectFactories(void){};
 //	virtual GxObjectFactoryArray* GetEnabledGxObjectFactories() = 0;
 //};

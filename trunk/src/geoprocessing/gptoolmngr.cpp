@@ -58,6 +58,7 @@ void *wxGISGPTaskThread::Entry()
         }
         m_pTrackCancel->PutMessage(wxString::Format(_("Start Time: %s"), begin.Format().c_str()), -1, enumGISMessageInfo);
     }
+
     bool bResult = m_pTool->Execute(m_pTrackCancel);
 
     //add finish message
@@ -77,8 +78,15 @@ void *wxGISGPTaskThread::Entry()
         else
             m_pTrackCancel->PutMessage(_("Error!"), -1, enumGISMessageTitle);
     }
+#ifdef __WXGTK__
+    wxMutexGuiEnter();
+#endif
 
     m_pMngr->OnFinish(this->GetId(), !bResult, m_pTool);
+
+#ifdef __WXGTK__
+    wxMutexGuiLeave();
+#endif
     return NULL;
 }
 
