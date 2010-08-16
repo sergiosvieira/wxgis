@@ -80,7 +80,7 @@ wxString wxGISGeoprocessingCmd::GetCaption(void)
 		case 0:
 			return wxString(_("&Export"));
 		case 1:
-			return wxString(_("Show/Hide &Toolbox pane"));
+			return wxString(_("Show/Hide &Tasks pane"));
 		default:
 		return wxEmptyString;
 	}
@@ -174,7 +174,7 @@ wxString wxGISGeoprocessingCmd::GetMessage(void)
 		case 0:
 			return wxString(_("Export item to another format"));
 		case 1:
-			return wxString(_("Show/Hide toolbox pane"));
+			return wxString(_("Show/Hide tasks pane"));
 		default:
 			return wxEmptyString;
 	}
@@ -697,7 +697,7 @@ wxString wxGISGeoprocessingCmd::GetTooltip(void)
 		case 0:
 			return wxString(_("Export item"));
 		case 1:
-			return wxString(_("Show/Hide Toolbox pane"));
+			return wxString(_("Show/Hide Tasks pane"));
 		default:
 			return wxEmptyString;
 	}

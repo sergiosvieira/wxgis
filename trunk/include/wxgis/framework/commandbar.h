@@ -22,6 +22,10 @@
 #include "wxgis/framework/framework.h"
 #include "wx/aui/aui.h"
 
+#define STANDARDSTR _("Standard")
+#define LOCATIONSTR _("Location")
+#define GEOGRAPHYOSTR _("Geography")
+
 //----------------------------------------------------------------------
 // wxGISCommandBar
 //----------------------------------------------------------------------
@@ -63,7 +67,7 @@ class WXDLLIMPEXP_GIS_FRW wxGISMenu :
 	public wxGISCommandBar
 {
 public:
-	wxGISMenu(const wxString& sName = NONAME, const wxString& sCaption = _("No Caption"), wxGISEnumCommandBars type = enumGISCBNone, const wxString& title = _(""), long style = 0);
+	wxGISMenu(const wxString& sName = NONAME, const wxString& sCaption = _("No Caption"), wxGISEnumCommandBars type = enumGISCBNone, const wxString& title = wxEmptyString, long style = 0);
 	virtual ~wxGISMenu(void);
 	virtual void AddCommand(ICommand* pCmd);
 	virtual void RemoveCommand(size_t nIndex);

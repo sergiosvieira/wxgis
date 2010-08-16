@@ -299,8 +299,8 @@ void wxGxDialogContentView::AddObject(IGxObject* pObject)
 // wxGxObjectDialog
 //////////////////////////////////////////////////////////////////////////////
 BEGIN_EVENT_TABLE(wxGxObjectDialog, wxDialog)
-	EVT_LIST_ITEM_SELECTED(LISTCTRLID, wxGxObjectDialog::OnItemSelected)
-	EVT_LIST_ITEM_DESELECTED(LISTCTRLID, wxGxObjectDialog::OnItemSelected)
+	//EVT_LIST_ITEM_SELECTED(LISTCTRLID, wxGxObjectDialog::OnItemSelected)
+	//EVT_LIST_ITEM_DESELECTED(LISTCTRLID, wxGxObjectDialog::OnItemSelected)
 	EVT_MENU_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 10, wxGxObjectDialog::OnCommand)
 	EVT_MENU_RANGE(ID_MENUCMD, ID_MENUCMD + 128, wxGxObjectDialog::OnDropDownCommand)
 	EVT_UPDATE_UI_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 10, wxGxObjectDialog::OnCommandUI)
@@ -388,7 +388,7 @@ wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, wxWindowID id, const wxStr
 
 	bHeaderSizer->Add( m_toolBar, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
-	m_staticText2 = new wxStaticText( this, wxID_ANY, _("  "), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+	m_staticText2 = new wxStaticText( this, wxID_ANY, wxT("  "), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	m_staticText2->Wrap( -1 );
 	bHeaderSizer->Add( m_staticText2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
@@ -601,10 +601,10 @@ void wxGxObjectDialog::OnInit()
     RegisterChildWindow(static_cast<wxWindow*>(m_pwxGxContentView));
 
 	bMainSizer->Insert(1, m_pwxGxContentView, 1, wxALL|wxEXPAND, 5 );
-#ifdef __WXGTK__
+//#ifdef __WXGTK__
     m_pwxGxContentView->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( wxGxObjectDialog::OnItemSelected ), NULL, this );
     m_pwxGxContentView->Connect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( wxGxObjectDialog::OnItemSelected ), NULL, this );
-#endif
+//#endif
 
 	for(size_t i = 0; i < m_FilterArray.size(); i++)
 		m_WildcardCombo->AppendString(m_FilterArray[i]->GetName());

@@ -132,6 +132,10 @@ void wxGISBaloonTip::OnPaint(wxPaintEvent& event)
  
     int iWidth = 0, iHeight = 0;
     GetClientSize( &iWidth, &iHeight );
+
+    //dc.SetBackground(*wxTRANSPARENT_BRUSH);
+    //dc.SetBrush(*wxTRANSPARENT_BRUSH);
+    //dc.Clear();
  
     wxPen pen(GetForegroundColour());
     dc.SetPen(pen);
@@ -139,7 +143,6 @@ void wxGISBaloonTip::OnPaint(wxPaintEvent& event)
     wxBrush brush(GetBackgroundColour());
     dc.SetBrush(brush);
  
-    dc.Clear();
 //    dc.DrawRectangle(0,0,iWidth,iHeight);
     dc.DrawRoundedRectangle(0,0,iWidth,iHeight, 3);
 }

@@ -22,6 +22,13 @@
 #include "wxgis/framework/framework.h"
 #include "wxgis/framework/commandbar.h"
 
+#define FILESTR _("&File")
+#define EDITSTR _("&Edit")
+#define GOSTR _("&Go")
+#define VIEWSTR _("&View")
+#define HELPSTR _("&Help")
+#define WINDOWSSTR _("&Windows")
+
 class WXDLLIMPEXP_GIS_FRW wxGISMenuBar :
 	public wxMenuBar
 {

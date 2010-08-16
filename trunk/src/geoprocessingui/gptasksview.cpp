@@ -112,7 +112,7 @@ wxGxTaskPanel::wxGxTaskPanel(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow
     bMainSizer->Add(fgSizer2, 0 ,wxEXPAND| wxLEFT | wxRIGHT, 5);
 
 */
-    m_Text = new wxStaticText(this, wxID_ANY, wxEmptyString);//_("")status message very long to fit in control may be and try again status message very long to fit in control may be, wxDefaultPosition, wxDefaultSize, wxST_NO_AUTORESIZE
+    m_Text = new wxStaticText(this, wxID_ANY, wxEmptyString);//status message very long to fit in control may be and try again status message very long to fit in control may be, wxDefaultPosition, wxDefaultSize, wxST_NO_AUTORESIZE
     m_Text->Wrap( -1 );
     m_bMainSizer->Add(m_Text, 0, wxEXPAND | wxALL, 5);
 

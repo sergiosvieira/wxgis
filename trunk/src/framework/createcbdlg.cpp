@@ -72,7 +72,7 @@ wxGISCreateCommandBarDlg::wxGISCreateCommandBarDlg( wxWindow* parent, wxWindowID
 	m_staticText41->Wrap( -1 );
 	fgSizer2->Add( m_staticText41, 0, wxALL|wxEXPAND, 5 );
 	
-	m_checkLeftD = new wxCheckBox( this, wxID_ANY, _(" "), wxDefaultPosition, wxDefaultSize, 0, wxGenericValidator(&m_bLeftDockable) );
+	m_checkLeftD = new wxCheckBox( this, wxID_ANY, wxT(" "), wxDefaultPosition, wxDefaultSize, 0, wxGenericValidator(&m_bLeftDockable) );
 	
 	fgSizer2->Add( m_checkLeftD, 0, wxALL, 5 );
 	
@@ -80,7 +80,7 @@ wxGISCreateCommandBarDlg::wxGISCreateCommandBarDlg( wxWindow* parent, wxWindowID
 	m_staticText51->Wrap( -1 );
 	fgSizer2->Add( m_staticText51, 0, wxALL|wxEXPAND, 5 );
 	
-	m_checkRightD = new wxCheckBox( this, wxID_ANY, _(" "), wxDefaultPosition, wxDefaultSize, 0, wxGenericValidator(&m_bRightDockable) );
+	m_checkRightD = new wxCheckBox( this, wxID_ANY, wxT(" "), wxDefaultPosition, wxDefaultSize, 0, wxGenericValidator(&m_bRightDockable) );
 	
 	fgSizer2->Add( m_checkRightD, 0, wxALL, 5 );
 	

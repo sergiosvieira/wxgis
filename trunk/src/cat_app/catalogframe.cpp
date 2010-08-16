@@ -51,7 +51,7 @@ void wxGISCatalogFrame::OnAppAbout(void)
     wxString sPrjStr = wgMB2WX(pj_get_release());
     wxString sGDALStr = wgMB2WX(GDAL_RELEASE_NAME);
     wxString sWXStr = wxVERSION_STRING;
-	wxMessageBox(wxString::Format(_("wxGIS [%s]\nVersion: %s\n(c) 2010 Dmitry Barishnikov (Bishop)\n-----------------------------\nGDAL %s\nGEOS %s\nPROJ %s\n%s"), APP_NAME, APP_VER, sGDALStr.c_str(), sGEOSStr.c_str(), sPrjStr.c_str(), sWXStr.c_str() ), _("About"), wxICON_INFORMATION | wxOK);
+	wxMessageBox(wxString::Format(_("wxGIS [%s]\nVersion: %s\n(c) 2009-2010 Dmitry Barishnikov (Bishop)\n-----------------------------\nGDAL %s\nGEOS %s\nPROJ %s\n%s"), APP_NAME, APP_VER, sGDALStr.c_str(), sGEOSStr.c_str(), sPrjStr.c_str(), sWXStr.c_str() ), _("About"), wxICON_INFORMATION | wxOK);
 }
 
 
