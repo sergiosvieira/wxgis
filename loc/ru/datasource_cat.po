@@ -1,0 +1,77 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wxGIS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-08-17 02:03+0300\n"
+"PO-Revision-Date: 2010-08-17 02:03+0300\n"
+"Last-Translator: Bishop <polimax@mail.ru>\n"
+"Language-Team: gis-lab <sim@gis-lab.info>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-Basepath: c:\\temp\\wxgis\\src\\\n"
+"X-Poedit-Language: Russian\n"
+"X-Poedit-Country: RUSSIAN FEDERATION\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-SearchPath-0: D:\\work\\Projects\\wxGIS\\src\\datasource\n"
+"X-Poedit-SearchPath-1: D:\\work\\Projects\\wxGIS\\include\\wxgis\\datasource\n"
+
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:60
+#, c-format
+msgid "The driver '%s' is not available"
+msgstr "Драйвер '%s' не доступен"
+
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:82
+#, c-format
+msgid "Creation of output file '%s' failed"
+msgstr "Не удалось создать выходной файл '%s'"
+
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:93
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:103
+#, c-format
+msgid "Creation of output layer '%s' failed"
+msgstr "Не удалось создать выходной слой '%s'"
+
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:326
+#, c-format
+msgid "wxGISFeatureDataset: Open failed! Path '%s'. OGR error: %s"
+msgstr "wxGISFeatureDataset: Невозможно открыть! Путь '%s'.Ошибка OGR: %s"
+
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:588
+msgid "%d-%m-%Y"
+msgstr "%d-%m-%Y"
+
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:597
+msgid "%H:%M:%S"
+msgstr "%H:%M:%S"
+
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:606
+msgid "%d-%m-%Y %H:%M:%S"
+msgstr "%d-%m-%Y %H:%M:%S"
+
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:611
+#, c-format
+msgid "%.6f"
+msgstr "%.6f"
+
+#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:144
+#, c-format
+msgid "wxGISRasterDataset: Open failed! Path '%s'. OGR error: %s"
+msgstr "wxGISRasterDataset: Невозможно открыть! Путь '%s'. Ошибка OGR: %s"
+
+#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:193
+#, c-format
+msgid "wxGISRasterDataset: Open failed! Path '%s'. Raster has no bands"
+msgstr "wxGISRasterDataset: Невозможно открыть! Путь '%s'. Нет каналов в растре"
+
+#: D:\work\Projects\wxGIS\src\datasource/spvalidator.cpp:83
+#, c-format
+msgid "Failed to allocate %d byte buffer to hold xml file."
+msgstr "Невозможно создать  буфер размером %d для записи файла xml."
+
+#: D:\work\Projects\wxGIS\src\datasource/spvalidator.cpp:91
+#, c-format
+msgid "Failed to read %d bytes from xml file."
+msgstr "Невозможно прочитать %d байт xml файла."
+

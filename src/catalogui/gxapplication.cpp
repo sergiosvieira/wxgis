@@ -141,7 +141,7 @@ bool wxGxApplication::AddCommandBar(IGISCommandBar* pBar)
 			wxGISToolBar* pToolBar = dynamic_cast<wxGISToolBar*>(pBar);
 			if(pToolBar)
 			{
-				m_mgr.AddPane(pToolBar, wxAuiPaneInfo().Name(pToolBar->GetName()).Caption(wxGetTranslation(pToolBar->GetCaption())).ToolbarPane().Top().Position(100).LeftDockable(pToolBar->GetLeftDockable()).RightDockable(pToolBar->GetRightDockable()));
+				m_mgr.AddPane(pToolBar, wxAuiPaneInfo().Name(pToolBar->GetName()).Caption(pToolBar->GetCaption()).ToolbarPane().Top().Position(100).LeftDockable(pToolBar->GetLeftDockable()).RightDockable(pToolBar->GetRightDockable()));
 				m_mgr.Update();
 			}
 		}
@@ -304,7 +304,7 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
 			wxGISToolBar* pToolBar = dynamic_cast<wxGISToolBar*>(m_CommandBarArray[i]);
 			if(pToolBar)
 			{
-				m_mgr.AddPane(pToolBar, wxAuiPaneInfo().Name(pToolBar->GetName()).Caption(wxGetTranslation(pToolBar->GetCaption())).ToolbarPane().Top().Position(i).LeftDockable(pToolBar->GetLeftDockable()).RightDockable(pToolBar->GetRightDockable()).BestSize(-1,-1));
+				m_mgr.AddPane(pToolBar, wxAuiPaneInfo().Name(pToolBar->GetName()).Caption(pToolBar->GetCaption()).ToolbarPane().Top().Position(i).LeftDockable(pToolBar->GetLeftDockable()).RightDockable(pToolBar->GetRightDockable()).BestSize(-1,-1));
 				pToolBar->Activate(this);
 			}
 		}

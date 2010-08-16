@@ -24,6 +24,11 @@
 #include "wxgis/datasource/datasource.h"
 #include "wxgis/catalog/catalog.h"
 
+#define CTSTR _("Conversion Tools")
+#define VECSTR _("Vector")
+#define DMTSTR _("Data Management Tools")
+#define RASSTR _("Raster")
+
 //GPFunctionTool 1
 //GPModelTool 2
 //GPScriptTool 3

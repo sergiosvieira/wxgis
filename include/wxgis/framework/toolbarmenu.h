@@ -22,14 +22,14 @@
 #include "wxgis/framework/framework.h"
 #include "wxgis/framework/application.h"
 
-#define TOOLBARMENUNAME _("Application.ToolbarsMenu")
+#define TOOLBARMENUNAME wxT("Application.ToolbarsMenu")
 
 class wxGISToolBarMenu :
 	public wxGISMenu,
 	public ICommand
 {
 public:
-	wxGISToolBarMenu(const wxString& sName = TOOLBARMENUNAME, const wxString& sCaption = _("Toolbars"), wxGISEnumCommandBars type = enumGISCBSubMenu, const wxString& title = _(""), long style = 0);
+	wxGISToolBarMenu(const wxString& sName = TOOLBARMENUNAME, const wxString& sCaption = _("Toolbars"), wxGISEnumCommandBars type = enumGISCBSubMenu, const wxString& title = wxEmptyString, long style = 0);
 	~wxGISToolBarMenu(void);
 	//wxGISMenu
 	virtual void AddCommand(ICommand* pCmd){};

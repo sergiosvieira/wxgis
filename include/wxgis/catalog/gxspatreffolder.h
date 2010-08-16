@@ -23,6 +23,10 @@
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/catalog/gxarchfolder.h"
 
+#define GEOGCSSTR _("Geographic Coordinate Systems")
+#define PROJCSSTR _("Projected Coordinate Systems")
+
+
 class WXDLLIMPEXP_GIS_CLT wxGxSpatialReferencesFolder :
 	public IGxObjectUI,
 	public IGxObjectContainer,

@@ -37,7 +37,7 @@ wxGxToolboxView::wxGxToolboxView(void)
 
 wxGxToolboxView::wxGxToolboxView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxAuiNotebook(parent, id, pos, size, wxAUI_NB_BOTTOM | wxNO_BORDER | wxAUI_NB_TAB_MOVE)
 {
-    m_sViewName = wxString(_("Toolbox pane"));
+    m_sViewName = wxString(_("Tasks pane"));
 }
 
 wxGxToolboxView::~wxGxToolboxView(void)

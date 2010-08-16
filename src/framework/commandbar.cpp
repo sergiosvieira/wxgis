@@ -53,7 +53,7 @@ void wxGISCommandBar::SetCaption(const wxString& sCaption)
 
 wxString wxGISCommandBar::GetCaption(void)
 {
-	return m_sCaption;
+	return wxGetTranslation(m_sCaption);
 }
 
 void wxGISCommandBar::SetType(wxGISEnumCommandBars type)

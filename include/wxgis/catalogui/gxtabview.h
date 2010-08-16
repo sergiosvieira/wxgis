@@ -34,6 +34,9 @@
 #include <wx/stattext.h>
 #include <wx/sizer.h>
 
+#define LISTSTR _("List")
+#define PREVIEWSTR _("Preview")
+
 //-------------------------------------------------------------------
 // wxGxTab
 //-------------------------------------------------------------------

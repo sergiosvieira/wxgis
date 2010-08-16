@@ -36,7 +36,7 @@ class WXDLLIMPEXP_GIS_CLU wxGISNewMenu :
 	public IGxSelectionEvents
 {
 public:
-	wxGISNewMenu(const wxString& sName = NEWMENUNAME, const wxString& sCaption = _("New"), wxGISEnumCommandBars type = enumGISCBSubMenu, const wxString& title = _(""), long style = 0);
+	wxGISNewMenu(const wxString& sName = NEWMENUNAME, const wxString& sCaption = _("New"), wxGISEnumCommandBars type = enumGISCBSubMenu, const wxString& title = wxEmptyString, long style = 0);
 	~wxGISNewMenu(void);
 	//wxGISMenu
 	virtual void AddCommand(ICommand* pCmd){};
