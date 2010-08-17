@@ -194,6 +194,10 @@
 				RelativePath="..\..\src\cat_app\catalogframe.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\src\cat_app\gisaboutdlg.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -206,6 +210,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\cat_app\catalogframe.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\cat_app\gisaboutdlg.h"
 				>
 			</File>
 			<File

@@ -33,7 +33,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxKMLDataset :
 	public IGxDataset
 {
 public:
-	wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type);
+	wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxKMLDataset(void);
     virtual void SetEncoding(wxFontEncoding Encoding);
 	//IGxObject
@@ -72,6 +72,8 @@ protected:
 	wxGISEnumVectorDatasetType m_type;
     wxMBConv* m_pPathEncoding;
     bool m_bIsChildrenLoaded;
+    wxIcon m_LargeIcon, m_SmallIcon;
+    wxIcon m_LargeSubIcon, m_SmallSubIcon;
 };
 
 //--------------------------------------------------------------
@@ -84,7 +86,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxKMLSubDataset :
 	public IGxDataset
 {
 public:
-	wxGxKMLSubDataset(wxString sName, wxGISDataset* pwxGISDataset, wxGISEnumVectorDatasetType nType);
+	wxGxKMLSubDataset(wxString sName, wxGISDataset* pwxGISDataset, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxKMLSubDataset(void);
     virtual void SetEncoding(wxFontEncoding Encoding);
 	//IGxObject
@@ -108,4 +110,5 @@ protected:
 	wxGISDataset* m_pwxGISDataset;
 	wxGISEnumVectorDatasetType m_type;
     wxMBConv* m_pPathEncoding;
+    wxIcon m_LargeIcon, m_SmallIcon;
 };

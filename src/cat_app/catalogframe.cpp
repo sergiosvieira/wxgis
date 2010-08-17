@@ -19,12 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/cat_app/catalogframe.h"
-
-#include "wx/version.h"
-
-//
-#include "geos_c.h"
-#include "proj_api.h"
+#include "wxgis/cat_app/gisaboutdlg.h"
 
 //-----------------------------------------------------------
 // wxGISCatalogFrame
@@ -47,11 +42,8 @@ wxGISCatalogFrame::~wxGISCatalogFrame(void)
 
 void wxGISCatalogFrame::OnAppAbout(void)
 {
-    wxString sGEOSStr = wgMB2WX(GEOSversion());
-    wxString sPrjStr = wgMB2WX(pj_get_release());
-    wxString sGDALStr = wgMB2WX(GDAL_RELEASE_NAME);
-    wxString sWXStr = wxVERSION_STRING;
-	wxMessageBox(wxString::Format(_("wxGIS [%s]\nVersion: %s\n(c) 2009-2010 Dmitry Barishnikov (Bishop)\n-----------------------------\nGDAL %s\nGEOS %s\nPROJ %s\n%s"), APP_NAME, APP_VER, sGDALStr.c_str(), sGEOSStr.c_str(), sPrjStr.c_str(), sWXStr.c_str() ), _("About"), wxICON_INFORMATION | wxOK);
+    wxGISAboutDialog oDialog(this);
+    oDialog.ShowModal();
 }
 
 

@@ -44,8 +44,8 @@ SetCompressor lzma
 !define GEOS_VERSION "3.2.2"
 !define PROJ_VERSION "4.7.1"
 
-!define VERSION "0.1.1"
-!define SUBVERSION "RC1"
+!define VERSION "0.2.0"
+!define SUBVERSION "Beta"
 !define PRODUCT "wxGIS ${VERSION} ${SUBVERSION}"
 
 ; Use the new WIN32DIST build directory
@@ -177,14 +177,14 @@ LicenseLangString myVerData ${LANG_RUSSIAN} "${WXGIS_DIR}\build\release\ChangeLo
   VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" "wxGIS"
   VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "wxGIS"
   VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VERSION}.0"
-  VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© 2009 Bishop"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© 2009-2010 Bishop"
   VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VERSION}.0"
  
   VIAddVersionKey /LANG=${LANG_RUSSIAN} "ProductName" "wxGIS"
   VIAddVersionKey /LANG=${LANG_RUSSIAN} "Comments" "wxGIS"
   VIAddVersionKey /LANG=${LANG_RUSSIAN} "FileDescription" "wxGIS"
   VIAddVersionKey /LANG=${LANG_RUSSIAN} "FileVersion" "${VERSION}.0" 
-  VIAddVersionKey /LANG=${LANG_RUSSIAN} "LegalCopyright" "© 2009 Bishop"
+  VIAddVersionKey /LANG=${LANG_RUSSIAN} "LegalCopyright" "© 2009-2010 Bishop"
   VIAddVersionKey /LANG=${LANG_RUSSIAN} "ProductVersion" "${VERSION}.0"
 
 ;--------------------------------
@@ -252,6 +252,9 @@ Section !$(CommonName) SecCommon
   WriteRegStr HKLM "Software\wxgis" "" $INSTDIR
  
 	; Store uninstall information
+	;Delete previous uninstal info
+	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
+	;Create uninstal info
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName" "${PRODUCT}"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString" '"$INSTDIR\Uninstall.exe"'
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayIcon" '"$INSTDIR\Uninstall.exe"'  
@@ -295,7 +298,7 @@ SectionGroup /e "!wxGIS" SecwxGIS
 
 		${xml::LoadFile} "$INSTDIR\bin\config\wxGISCatalog.xml" $0
 			${xml::GotoPath} "/wxGISCatalog" $0			
-			${xml::CreateNode} "<loc locale=$\"en$\" path=$\"$INSTDIR\locale$\"/>" $1
+			${xml::CreateNode} "<loc locale=$\"$(Language)$\" path=$\"$INSTDIR\locale$\"/>" $1
 			${xml::InsertEndChild} "$1" $0				
 			${xml::CreateNode} "<log path=$\"$INSTDIR\log$\"/>" $1
 			${xml::InsertAfterNode} "$1" $0
@@ -303,6 +306,15 @@ SectionGroup /e "!wxGIS" SecwxGIS
 			${xml::InsertAfterNode} "$1" $0			
 		${xml::SaveFile} "" $0	
 		${xml::Unload}	  
+		
+		;Set lang if app has been installed (current user)
+		;All users should select the lang from properties
+		SetShellVarContext current
+		${xml::LoadFile} "$APPDATA\wxGIS\wxGISCatalog\hkcu_config.xml" $0
+			${xml::GotoPath} "/wxGISCatalog/loc" $0
+			${xml::SetAttribute} "locale" "$(Language)" $0
+		${xml::SaveFile} "" $0	
+		${xml::Unload}	
 		
 	SectionEnd
 	Section "Toolbox" SecToolbox
@@ -336,6 +348,11 @@ SectionGroup /e "!wxGIS" SecwxGIS
 			${xml::CreateNode} "<ToolboxView class=$\"wxGxToolboxViewFactory$\" name=$\"ToolboxView$\"/>" $1	
 			${xml::InsertEndChild} "$1" $0	
 			${xml::GotoPath} "/wxGISCatalog/Frame/ToolBars/ToolBar" $0
+			${xml::CreateNode} "<Item type=$\"sep$\"/>" $1
+			${xml::InsertEndChild} "$1" $0	
+			${xml::CreateNode} "<Item type=$\"cmd$\" cmd_name=$\"wxGISGeoprocessingCmd$\" subtype=$\"1$\" name=$\"Show/Hide &amp;Toolbox pane$\"/>" $1
+			${xml::InsertAfterNode} "$1" $0
+			${xml::GotoPath} "/wxGISCatalog/Frame/Menues/Menu" $0
 			${xml::CreateNode} "<Item type=$\"sep$\"/>" $1
 			${xml::InsertEndChild} "$1" $0	
 			${xml::CreateNode} "<Item type=$\"cmd$\" cmd_name=$\"wxGISGeoprocessingCmd$\" subtype=$\"1$\" name=$\"Show/Hide &amp;Toolbox pane$\"/>" $1
@@ -385,6 +402,9 @@ LangString Catalog ${LANG_ENGLISH} "Catalog"
 LangString Catalog ${LANG_RUSSIAN} "Каталог"
 LangString Uninst ${LANG_ENGLISH} "Uninstall"
 LangString Uninst ${LANG_RUSSIAN} "Удалить"
+
+LangString Language ${LANG_ENGLISH} "en"
+LangString Language ${LANG_RUSSIAN} "ru"
 
   ;Assign descriptions to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN

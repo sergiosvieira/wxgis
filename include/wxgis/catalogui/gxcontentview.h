@@ -82,6 +82,12 @@ public:
 		IGxObject* pObject;
 		int iImageIndex;
 	} ITEMDATA, *LPITEMDATA;
+	typedef struct _icondata
+	{
+		wxIcon oIcon;
+		int iImageIndex;
+        bool bLarge;
+	} ICONDATA;
 
 protected:
 	bool m_bSortAsc;
@@ -94,6 +100,7 @@ protected:
     IGxCatalog* m_pCatalog;
 	IGxObject* m_pParentGxObject;
 	bool m_bDragging;
+    std::vector<ICONDATA> m_IconsArray;
 
 DECLARE_EVENT_TABLE()
 };

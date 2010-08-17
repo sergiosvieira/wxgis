@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-17 02:03+0300\n"
-"PO-Revision-Date: 2010-08-17 02:03+0300\n"
+"POT-Creation-Date: 2010-08-18 00:58+0300\n"
+"PO-Revision-Date: 2010-08-18 00:58+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -115,7 +115,7 @@ msgstr "Выход"
 
 #: D:\work\Projects\wxGIS\src\framework/command.cpp:206
 msgid "About"
-msgstr "О програме"
+msgstr "О программе"
 
 #: D:\work\Projects\wxGIS\src\framework/command.cpp:208
 msgid "Customize"

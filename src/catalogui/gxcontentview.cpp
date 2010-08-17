@@ -207,14 +207,49 @@ void wxGxContentView::AddObject(IGxObject* pObject)
 
 	int pos(0);
 	if(icon_small.IsOk())
-		pos = m_ImageListSmall.Add(icon_small);
+    {
+        for(size_t i = 0; i < m_IconsArray.size(); i++)
+        {
+            if(m_IconsArray[i].bLarge)
+                continue;
+            if(m_IconsArray[i].oIcon.IsSameAs(icon_small))
+            {
+                pos = m_IconsArray[i].iImageIndex;
+                break;
+            }
+        }
+        if(pos == 0)
+        {
+            pos = m_ImageListSmall.Add(icon_small);
+            ICONDATA myicondata = {icon_small, pos, false};
+            m_IconsArray.push_back(myicondata);
+
+        }
+    }
 	else
-		pos = m_ImageListSmall.Add(m_ImageListSmall.GetIcon(2));//0 col img, 1 - col img
+		pos = 2;//m_ImageListSmall.Add(m_ImageListSmall.GetIcon(2));//0 col img, 1 - col img
 
 	if(icon_large.IsOk())
-		pos = m_ImageListLarge.Add(icon_large);
+    {
+        for(size_t i = 0; i < m_IconsArray.size(); i++)
+        {
+            if(!m_IconsArray[i].bLarge)
+                continue;
+            if(m_IconsArray[i].oIcon.IsSameAs(icon_large))
+            {
+                pos = m_IconsArray[i].iImageIndex;
+                break;
+            }
+        }
+        if(pos == 0)
+        {
+            pos = m_ImageListLarge.Add(icon_large);
+            ICONDATA myicondata = {icon_large, pos, true};
+            m_IconsArray.push_back(myicondata);
+        }
+    }
 	else
-		pos = m_ImageListLarge.Add(m_ImageListLarge.GetIcon(2));
+		pos = 2;//m_ImageListLarge.Add(m_ImageListLarge.GetIcon(2));
 
 
 	LPITEMDATA pData = new _itemdata;

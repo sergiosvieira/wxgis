@@ -38,4 +38,7 @@ public:
 		wxString path;
 		int bHasTab, bHasMap, bHasInd, bHasID, bHasDat, bHasMif, bHasMid;
 	}DATA;
+protected:
+    wxIcon m_LargeTabIcon, m_SmallTabIcon;
+    wxIcon m_LargeMifIcon, m_SmallMifIcon;
 };
