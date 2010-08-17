@@ -22,10 +22,19 @@
 #include "wxgis/catalog/gxdataset.h"
 #include <wx/ffile.h>
 
+#include "../../art/mi_dset_16.xpm"
+#include "../../art/mi_dset_48.xpm"
+#include "../../art/md_dset_16.xpm"
+#include "../../art/md_dset_48.xpm"
+
 IMPLEMENT_DYNAMIC_CLASS(wxGxMapInfoFactory, wxObject)
 
 wxGxMapInfoFactory::wxGxMapInfoFactory(void)
 {
+    m_SmallTabIcon = wxIcon(mi_dset_16_xpm);
+    m_LargeTabIcon = wxIcon(mi_dset_48_xpm);
+    m_SmallMifIcon = wxIcon(md_dset_16_xpm);
+    m_LargeMifIcon = wxIcon(md_dset_48_xpm);
 }
 
 wxGxMapInfoFactory::~wxGxMapInfoFactory(void)
@@ -106,7 +115,7 @@ REMOVE:
 			name = CI->first + wxT(".tab");
 			wxString path = CI->second.path + wxT(".tab");
 			//create tab
-			wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, enumVecMapinfoTab);
+			wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, enumVecMapinfoTab, m_LargeTabIcon, m_SmallTabIcon);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 		    if(pGxObj != NULL)
 			    pObjArray->push_back(pGxObj);
@@ -118,7 +127,7 @@ REMOVE:
 			name = CI->first + wxT(".mif");
 			wxString path = CI->second.path + wxT(".mif");
 			//create mif
-			wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, enumVecMapinfoMif);
+			wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, enumVecMapinfoMif, m_LargeMifIcon, m_SmallMifIcon);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 		    if(pGxObj != NULL)
 			    pObjArray->push_back(pGxObj);

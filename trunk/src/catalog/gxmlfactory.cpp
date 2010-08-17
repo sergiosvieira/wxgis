@@ -24,10 +24,19 @@
 #include "wxgis/catalog/gxkmldataset.h"
 #include <wx/ffile.h>
 
+#include "../../art/dxf_dset_16.xpm"
+#include "../../art/dxf_dset_48.xpm"
+#include "../../art/kml_dset_16.xpm"
+#include "../../art/kml_dset_48.xpm"
+
 IMPLEMENT_DYNAMIC_CLASS(wxGxMLFactory, wxObject)
 
 wxGxMLFactory::wxGxMLFactory(void)
 {
+    m_SmallDXFIcon = wxIcon(dxf_dset_16_xpm);
+    m_LargeDXFIcon = wxIcon(dxf_dset_48_xpm);
+    m_SmallKMLIcon = wxIcon(kml_dset_16_xpm);
+    m_LargeKMLIcon = wxIcon(kml_dset_48_xpm);
 }
 
 wxGxMLFactory::~wxGxMLFactory(void)
@@ -62,7 +71,7 @@ bool wxGxMLFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames, 
 		if(ext == wxString(wxT("kml")))
 		{
 			name += wxT(".") + ext;
-            wxGxKMLDataset* pDataset = new wxGxKMLDataset(path, name, enumVecKML);
+            wxGxKMLDataset* pDataset = new wxGxKMLDataset(path, name, enumVecKML, m_LargeKMLIcon, m_SmallKMLIcon);
             pDataset->SetEncoding(wxFONTENCODING_UTF8);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
@@ -78,7 +87,7 @@ bool wxGxMLFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames, 
 		if(ext == wxString(wxT("dxf")))
 		{
 			name += wxT(".") + ext;
-            wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, enumVecDXF);
+            wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, enumVecDXF, m_LargeDXFIcon, m_SmallDXFIcon);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}

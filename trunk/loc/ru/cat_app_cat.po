@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-17 02:03+0300\n"
-"PO-Revision-Date: 2010-08-17 02:03+0300\n"
+"POT-Creation-Date: 2010-08-18 00:58+0300\n"
+"PO-Revision-Date: 2010-08-18 00:58+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -63,28 +63,104 @@ msgstr "wxGISCatalogApp: Загрузка главного фрейма"
 msgid "wxGIS Catalog"
 msgstr "Каталог wxGIS"
 
-#: D:\work\Projects\wxGIS\src\cat_app/catalogframe.cpp:54
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:70
+#, c-format
+msgid ""
+"\n"
+"wxGIS [%s]\n"
+"Version: %s"
+msgstr ""
+"\n"
+"wxGIS [%s]\n"
+"Версия: %s"
+
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:92
 #, c-format
 msgid ""
 "wxGIS [%s]\n"
+"\n"
 "Version: %s\n"
-"(c) 2009-2010 Dmitry Barishnikov (Bishop)\n"
-"-----------------------------\n"
+"\n"
+"(c) 2009-2010 Dmitry Barishnikov (Bishop)"
+msgstr ""
+"wxGIS [%s]\n"
+"\n"
+"Версия: %s\n"
+"\n"
+"(c) 2009-2010 Дмитрий Барышников (Bishop)"
+
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:93
+msgid "About application"
+msgstr "О программе"
+
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:96
+#, c-format
+msgid ""
+"HOST '%s'\n"
+"\n"
+"OS desc - %s\n"
+"\n"
+"Free memory - %u Mb\n"
+"\n"
+"Libs:\n"
+"\n"
 "GDAL %s\n"
 "GEOS %s\n"
 "PROJ %s\n"
 "%s"
 msgstr ""
-"wxGIS [%s]\n"
-"Версия: %s\n"
-"(c) 2009-2010 Дмитрий Барышников (Bishop)\n"
-"-----------------------------\n"
+"Имя ПК '%s'\n"
+"\n"
+"Описание ОС - %s\n"
+"\n"
+"Свободная память - %u Mb\n"
+"\n"
+"Библиотеки:\n"
+"\n"
 "GDAL %s\n"
 "GEOS %s\n"
 "PROJ %s\n"
 "%s"
 
-#: D:\work\Projects\wxGIS\src\cat_app/catalogframe.cpp:54
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:97
+msgid "About system"
+msgstr "О системе"
+
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:99
+msgid ""
+"Thanks GIS-LAB team for help in translating the interface, testing and searching for errors.\n"
+"Special thanks to Maxim Dubinin"
+msgstr ""
+"Спасибо команде ГИС-LAB за помощь в переводе интерфейса, тестировании и поиске ошибок.\n"
+"Отдельное спасибо Максиму Дубинину"
+
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:99
+msgid "Thanks"
+msgstr "Благодарности"
+
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:100
+msgid ""
+"This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n"
+"This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+"\n"
+"See the GNU General Public License for more details.\n"
+"You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>"
+msgstr ""
+"Эта программа является свободным программным обеспечением: вы можете распространять и/или модифицировать его в соответствии с условиями GNU General Public License, опубликованной Free Software Foundation, версии 3 Лицензии, либо (по вашему выбору) любой более поздней версии. \n"
+"Эта программа распространяется в надежде, что она будет полезной, но БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ, даже без подразумеваемых гарантий КОММЕРЧЕСКОЙ ЦЕННОСТИ или ПРИГОДНОСТИ ДЛЯ ОПРЕДЕЛЕННОЙ ЦЕЛИ. \n"
+"\n"
+"См. GNU General Public License для более подробной информации. \n"
+"Вы должны были получить копию GNU General Public License вместе с этой программой. Если нет, см. <http://www.gnu.org/licenses/>"
+
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:100
+msgid "License"
+msgstr "Лицензия"
+
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:105
+msgid "Close"
+msgstr "Закрыть"
+
+#: D:\work\Projects\wxGIS\include\wxgis\cat_app/gisaboutdlg.h:59
 msgid "About"
 msgstr "О программе"
 

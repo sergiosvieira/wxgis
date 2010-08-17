@@ -74,7 +74,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxFeatureDataset :
 	public IGxDataset
 {
 public:
-	wxGxFeatureDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type);
+	wxGxFeatureDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxFeatureDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
@@ -98,10 +98,11 @@ public:
 protected:
 	wxString m_sName, m_sPath;
     wxFontEncoding m_Encoding;
-	wxImageList m_ImageListSmall, m_ImageListLarge;
+	//wxImageList m_ImageListSmall, m_ImageListLarge;
 	wxGISDataset* m_pwxGISDataset;
 	wxGISEnumVectorDatasetType m_type;
     wxMBConv* m_pPathEncoding;
+    wxIcon m_LargeIcon, m_SmallIcon;
 };
 
 //--------------------------------------------------------------

@@ -21,12 +21,6 @@
 
 #include "../../art/shape_icon16.xpm"
 #include "../../art/shape_icon48.xpm"
-#include "../../art/mi_dset_16.xpm"
-#include "../../art/mi_dset_48.xpm"
-#include "../../art/md_dset_16.xpm"
-#include "../../art/md_dset_48.xpm"
-#include "../../art/dxf_dset_16.xpm"
-#include "../../art/dxf_dset_48.xpm"
 #include "wxgis/catalog/gxdataset.h"
 #include "wxgis/datasource/featuredataset.h"
 #include "wxgis/datasource/rasterdataset.h"
@@ -133,12 +127,12 @@ wxGISDataset* wxGxTableDataset::GetDataset(void)
 //class wxGxFeatureDataset
 //--------------------------------------------------------------
 
-wxGxFeatureDataset::wxGxFeatureDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type)
+wxGxFeatureDataset::wxGxFeatureDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type, wxIcon LargeIcon, wxIcon SmallIcon)
 {
-	m_ImageListSmall.Create(16, 16);
-	m_ImageListSmall.Add(wxBitmap(shape_icon16_xpm));
-	m_ImageListLarge.Create(48, 48);
-	m_ImageListLarge.Add(wxBitmap(shape_icon48_xpm));
+	//m_ImageListSmall.Create(16, 16);
+	//m_ImageListSmall.Add(wxBitmap(shape_icon16_xpm));
+	//m_ImageListLarge.Create(48, 48);
+	//m_ImageListLarge.Add(wxBitmap(shape_icon48_xpm));
 
 	m_type = Type;
 
@@ -148,6 +142,9 @@ wxGxFeatureDataset::wxGxFeatureDataset(wxString Path, wxString Name, wxGISEnumVe
 	m_pwxGISDataset = NULL;
 
     m_pPathEncoding = wxConvCurrent;
+
+    m_LargeIcon = LargeIcon;
+    m_SmallIcon = SmallIcon;
 }
 
 wxGxFeatureDataset::~wxGxFeatureDataset(void)
@@ -162,40 +159,42 @@ wxString wxGxFeatureDataset::GetCategory(void)
 
 wxIcon wxGxFeatureDataset::GetLargeImage(void)
 {
-	switch(m_type)
-	{
-	case enumVecESRIShapefile:
-		return wxIcon(m_ImageListLarge.GetIcon(0));
-	case enumVecMapinfoTab:
-        return wxIcon(mi_dset_48_xpm);
-	case enumVecMapinfoMif:
-        return wxIcon(md_dset_48_xpm);
-	case enumVecKML:
-		return wxIcon(m_ImageListLarge.GetIcon(4));
-	case enumVecDXF:
-		return wxIcon(dxf_dset_48_xpm);
-	default:
-		return wxNullIcon;
-	}
+	//switch(m_type)
+	//{
+	//case enumVecESRIShapefile:
+	//	return wxIcon(m_ImageListLarge.GetIcon(0));
+	//case enumVecMapinfoTab:
+ //       return wxIcon(mi_dset_48_xpm);
+	//case enumVecMapinfoMif:
+ //       return wxIcon(md_dset_48_xpm);
+	//case enumVecKML:
+	//	return wxIcon(m_ImageListLarge.GetIcon(4));
+	//case enumVecDXF:
+	//	return wxIcon(dxf_dset_48_xpm);
+	//default:
+	//	return wxNullIcon;
+	//}
+    return m_LargeIcon;
 }
 
 wxIcon wxGxFeatureDataset::GetSmallImage(void)
 {
-	switch(m_type)
-	{
-	case enumVecESRIShapefile:
-		return wxIcon(m_ImageListSmall.GetIcon(0));
-	case enumVecMapinfoTab:
-        return wxIcon(mi_dset_16_xpm);
-	case enumVecMapinfoMif:
-        return wxIcon(md_dset_16_xpm);
-	case enumVecKML:
-		return wxIcon(m_ImageListSmall.GetIcon(4));
-	case enumVecDXF:
-		return wxIcon(dxf_dset_16_xpm);
-	default:
-		return wxNullIcon;
-	}
+	//switch(m_type)
+	//{
+	//case enumVecESRIShapefile:
+	//	return wxIcon(m_ImageListSmall.GetIcon(0));
+	//case enumVecMapinfoTab:
+ //       return wxIcon(mi_dset_16_xpm);
+	//case enumVecMapinfoMif:
+ //       return wxIcon(md_dset_16_xpm);
+	//case enumVecKML:
+	//	return wxIcon(m_ImageListSmall.GetIcon(4));
+	//case enumVecDXF:
+	//	return wxIcon(dxf_dset_16_xpm);
+	//default:
+	//	return wxNullIcon;
+	//}
+    return m_SmallIcon;
 }
 
 bool wxGxFeatureDataset::Delete(void)

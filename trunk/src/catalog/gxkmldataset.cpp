@@ -21,8 +21,6 @@
 #include "wxgis/catalog/gxkmldataset.h"
 #include "wxgis/datasource/featuredataset.h"
 
-#include "../../art/kml_dset_16.xpm"
-#include "../../art/kml_dset_48.xpm"
 #include "../../art/kml_subdset_16.xpm"
 #include "../../art/kml_subdset_48.xpm"
 
@@ -31,7 +29,7 @@
 //class wxGxKMLDataset
 //--------------------------------------------------------------
 
-wxGxKMLDataset::wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type)
+wxGxKMLDataset::wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type, wxIcon LargeIcon, wxIcon SmallIcon)
 {
 	m_type = Type;
 
@@ -44,6 +42,11 @@ wxGxKMLDataset::wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorData
     m_pPathEncoding = wxConvCurrent;
 
     m_bIsChildrenLoaded = false;
+
+    m_LargeIcon = LargeIcon;
+    m_SmallIcon = SmallIcon;
+    m_LargeSubIcon = wxIcon(kml_subdset_16_xpm);
+    m_SmallSubIcon = wxIcon(kml_subdset_48_xpm);
 }
 
 wxGxKMLDataset::~wxGxKMLDataset(void)
@@ -68,12 +71,12 @@ wxString wxGxKMLDataset::GetCategory(void)
 
 wxIcon wxGxKMLDataset::GetLargeImage(void)
 {
-	return wxIcon(kml_dset_48_xpm);
+	return m_LargeIcon;
 }
 
 wxIcon wxGxKMLDataset::GetSmallImage(void)
 {
-	return wxIcon(kml_dset_16_xpm);
+	return m_SmallIcon;
 }
 
 bool wxGxKMLDataset::Delete(void)
@@ -170,7 +173,7 @@ void wxGxKMLDataset::LoadChildren(void)
     {
         wxGISFeatureDataset* pwxGISFeatureSuDataset = dynamic_cast<wxGISFeatureDataset*>(m_pwxGISDataset->GetSubset(i));//wxGISDataset* pSubSet 
         pwxGISFeatureSuDataset->SetSubType(m_type);
-        wxGxKMLSubDataset* pGxSubDataset = new wxGxKMLSubDataset(pwxGISFeatureSuDataset->GetName(), pwxGISFeatureSuDataset, m_type);
+        wxGxKMLSubDataset* pGxSubDataset = new wxGxKMLSubDataset(pwxGISFeatureSuDataset->GetName(), pwxGISFeatureSuDataset, m_type, m_LargeSubIcon, m_SmallSubIcon);
 		bool ret_code = AddChild(pGxSubDataset);
 		if(!ret_code)
 			wxDELETE(pGxSubDataset);
@@ -203,7 +206,7 @@ wxGISDataset* wxGxKMLDataset::GetDataset(void)
 //class wxGxKMLSubDataset
 //--------------------------------------------------------------
 
-wxGxKMLSubDataset::wxGxKMLSubDataset(wxString sName, wxGISDataset* pwxGISDataset, wxGISEnumVectorDatasetType nType)
+wxGxKMLSubDataset::wxGxKMLSubDataset(wxString sName, wxGISDataset* pwxGISDataset, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon)
 {
 	m_type = nType;
 
@@ -213,6 +216,9 @@ wxGxKMLSubDataset::wxGxKMLSubDataset(wxString sName, wxGISDataset* pwxGISDataset
 
     m_Encoding = wxFONTENCODING_UTF8;
     m_pPathEncoding = wxConvCurrent;
+
+    m_LargeIcon = LargeIcon;
+    m_SmallIcon = SmallIcon;
 }
 
 wxGxKMLSubDataset::~wxGxKMLSubDataset(void)
@@ -227,12 +233,12 @@ wxString wxGxKMLSubDataset::GetCategory(void)
 
 wxIcon wxGxKMLSubDataset::GetLargeImage(void)
 {
-	return wxIcon(kml_subdset_48_xpm);
+	return m_LargeIcon;
 }
 
 wxIcon wxGxKMLSubDataset::GetSmallImage(void)
 {
-	return wxIcon(kml_subdset_16_xpm);
+	return m_SmallIcon;
 }
 
 wxGISDataset* wxGxKMLSubDataset::GetDataset(void)
