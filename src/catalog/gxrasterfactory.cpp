@@ -21,10 +21,16 @@
 #include "wxgis/catalog/gxrasterfactory.h"
 #include "wxgis/catalog/gxdataset.h"
 
+#include "../../art/raster_16.xpm"
+#include "../../art/raster_48.xpm"
+
+
 IMPLEMENT_DYNAMIC_CLASS(wxGxRasterFactory, wxObject)
 
 wxGxRasterFactory::wxGxRasterFactory(void)
 {
+    m_SmallIcon = wxIcon(raster_16_xpm);
+    m_LargeIcon = wxIcon(raster_48_xpm);
 }
 
 wxGxRasterFactory::~wxGxRasterFactory(void)
@@ -63,7 +69,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             else
                 name = FName.GetFullName();
 
-            wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterBmp);
+            wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterBmp, m_LargeIcon, m_SmallIcon);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}
@@ -82,7 +88,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             else
                 name = FName.GetFullName();
 
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterJpeg);
+			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterJpeg, m_LargeIcon, m_SmallIcon);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}
@@ -101,7 +107,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             else
                 name = FName.GetFullName();
 
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterImg);
+			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterImg, m_LargeIcon, m_SmallIcon);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}
@@ -120,7 +126,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             else
                 name = FName.GetFullName();
 
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterTiff);
+			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterTiff, m_LargeIcon, m_SmallIcon);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}
@@ -139,7 +145,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             else
                 name = FName.GetFullName();
 
-            wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterPng);
+            wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterPng, m_LargeIcon, m_SmallIcon);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}
@@ -158,7 +164,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             else
                 name = FName.GetFullName();
 
-            wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterUnknown);
+            wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterUnknown, m_LargeIcon, m_SmallIcon);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 			goto REMOVE;
 		}		

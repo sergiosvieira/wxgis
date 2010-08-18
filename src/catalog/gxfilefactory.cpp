@@ -22,10 +22,15 @@
 #include "wxgis/catalog/gxfile.h"
 #include <wx/tokenzr.h>
 
+#include "../../art/sr_16(2).xpm"
+#include "../../art/sr_48.xpm"
+
 IMPLEMENT_DYNAMIC_CLASS(wxGxFileFactory, wxObject)
 
 wxGxFileFactory::wxGxFileFactory(void)
 {
+    m_LargePRJIcon = wxIcon(sr_48_xpm);
+    m_SmallPRJIcon = wxIcon(sr_16_2_xpm);
 }
 
 wxGxFileFactory::~wxGxFileFactory(void)
@@ -56,14 +61,14 @@ bool wxGxFileFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames
 		if(ext == wxString(wxT("spr")))
 		{ 
             name += wxT(".") + ext;
-			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumSPRfile);
+			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumSPRfile, m_LargePRJIcon, m_SmallPRJIcon);
 			pGxObj = dynamic_cast<IGxObject*>(pFile);
 			goto REMOVE;
 		}
 		if(ext == wxString(wxT("prj")))
 		{
 			name += wxT(".") + ext;
-			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumESRIPrjFile);
+			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumESRIPrjFile, m_LargePRJIcon, m_SmallPRJIcon);
 			pGxObj = dynamic_cast<IGxObject*>(pFile);
 			goto REMOVE;
 		}
