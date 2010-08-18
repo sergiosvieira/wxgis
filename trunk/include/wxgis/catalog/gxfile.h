@@ -50,7 +50,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxPrjFile :
     public wxGxFile
 {
 public:
-	wxGxPrjFile(wxString Path, wxString Name, wxGISEnumPrjFileType Type);
+	wxGxPrjFile(wxString Path, wxString Name, wxGISEnumPrjFileType Type, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxPrjFile(void);
 	//IGxObject
 	virtual wxString GetCategory(void){return wxString(_("Coordinate System"));};
@@ -70,6 +70,8 @@ public:
 protected:
     wxGISEnumPrjFileType m_Type;
 	OGRSpatialReference m_OGRSpatialReference;
+    wxIcon m_oLargeIcon;
+    wxIcon m_oSmallIcon;
 };
 
 //--------------------------------------------------------------

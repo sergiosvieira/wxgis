@@ -34,7 +34,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxTableDataset :
 	public IGxDataset
 {
 public:
-	wxGxTableDataset(wxString Path, wxString Name, wxGISEnumTableDatasetType nType);
+	wxGxTableDataset(wxString Path, wxString Name, wxGISEnumTableDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxTableDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
@@ -57,7 +57,7 @@ public:
     virtual wxString GetPath(void){return m_sPath;};
 protected:
 	wxString m_sName, m_sPath;
-	wxImageList m_ImageListSmall, m_ImageListLarge;
+    wxIcon m_LargeIcon, m_SmallIcon;
 	wxGISDataset* m_pwxGISDataset;
 	wxGISEnumTableDatasetType m_type;
     wxMBConv* m_pPathEncoding;
@@ -98,7 +98,6 @@ public:
 protected:
 	wxString m_sName, m_sPath;
     wxFontEncoding m_Encoding;
-	//wxImageList m_ImageListSmall, m_ImageListLarge;
 	wxGISDataset* m_pwxGISDataset;
 	wxGISEnumVectorDatasetType m_type;
     wxMBConv* m_pPathEncoding;
@@ -116,7 +115,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxRasterDataset :
 	public IGxDataset
 {
 public:
-	wxGxRasterDataset(wxString Path, wxString Name, wxGISEnumRasterDatasetType Type);
+	wxGxRasterDataset(wxString Path, wxString Name, wxGISEnumRasterDatasetType Type, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxRasterDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
@@ -139,7 +138,7 @@ public:
     virtual wxString GetPath(void){return m_sPath;};
 protected:
 	wxString m_sName, m_sPath;
-	wxImageList m_ImageListSmall, m_ImageListLarge;
+    wxIcon m_LargeIcon, m_SmallIcon;
 	wxGISDataset* m_pwxGISDataset;
 	wxGISEnumRasterDatasetType m_type;
 };

@@ -19,8 +19,6 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#include "../../art/shape_icon16.xpm"
-#include "../../art/shape_icon48.xpm"
 #include "wxgis/catalog/gxdataset.h"
 #include "wxgis/datasource/featuredataset.h"
 #include "wxgis/datasource/rasterdataset.h"
@@ -33,13 +31,8 @@
 //class wxGxTableDataset
 //--------------------------------------------------------------
 
-wxGxTableDataset::wxGxTableDataset(wxString Path, wxString Name, wxGISEnumTableDatasetType nType)
+wxGxTableDataset::wxGxTableDataset(wxString Path, wxString Name, wxGISEnumTableDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon)
 {
-	m_ImageListSmall.Create(16, 16);
-	m_ImageListSmall.Add(wxBitmap(shape_icon16_xpm));
-	m_ImageListLarge.Create(48, 48);
-	m_ImageListLarge.Add(wxBitmap(shape_icon48_xpm));
-
 	m_type = nType;
 
 	m_sName = Name;
@@ -47,6 +40,9 @@ wxGxTableDataset::wxGxTableDataset(wxString Path, wxString Name, wxGISEnumTableD
 
 	m_pwxGISDataset = NULL;
     m_pPathEncoding = wxConvCurrent;
+
+    m_LargeIcon = LargeIcon;
+    m_SmallIcon = SmallIcon;
 }
 
 wxGxTableDataset::~wxGxTableDataset(void)
@@ -56,22 +52,12 @@ wxGxTableDataset::~wxGxTableDataset(void)
 
 wxIcon wxGxTableDataset::GetLargeImage(void)
 {
-////	return wxIcon(m_ImageListLarge.GetIcon(2));
-//	switch(m_type)
-//	{
-//	case enumGISFeatureDataset:
-//		return wxIcon(m_ImageListLarge.GetIcon(0));
-//	case enumGISRasterDataset:
-//		return wxIcon(m_ImageListLarge.GetIcon(2));
-//	case enumGISTableDataset:
-//	default:
-		return wxIcon(m_ImageListLarge.GetIcon(1));
-	//}
+	return m_LargeIcon;
 }
 
 wxIcon wxGxTableDataset::GetSmallImage(void)
 {
-	return wxIcon(m_ImageListSmall.GetIcon(1));
+	return m_SmallIcon;
 }
 
 bool wxGxTableDataset::Delete(void)
@@ -129,11 +115,6 @@ wxGISDataset* wxGxTableDataset::GetDataset(void)
 
 wxGxFeatureDataset::wxGxFeatureDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type, wxIcon LargeIcon, wxIcon SmallIcon)
 {
-	//m_ImageListSmall.Create(16, 16);
-	//m_ImageListSmall.Add(wxBitmap(shape_icon16_xpm));
-	//m_ImageListLarge.Create(48, 48);
-	//m_ImageListLarge.Add(wxBitmap(shape_icon48_xpm));
-
 	m_type = Type;
 
 	m_sName = Name;
@@ -159,41 +140,11 @@ wxString wxGxFeatureDataset::GetCategory(void)
 
 wxIcon wxGxFeatureDataset::GetLargeImage(void)
 {
-	//switch(m_type)
-	//{
-	//case enumVecESRIShapefile:
-	//	return wxIcon(m_ImageListLarge.GetIcon(0));
-	//case enumVecMapinfoTab:
- //       return wxIcon(mi_dset_48_xpm);
-	//case enumVecMapinfoMif:
- //       return wxIcon(md_dset_48_xpm);
-	//case enumVecKML:
-	//	return wxIcon(m_ImageListLarge.GetIcon(4));
-	//case enumVecDXF:
-	//	return wxIcon(dxf_dset_48_xpm);
-	//default:
-	//	return wxNullIcon;
-	//}
     return m_LargeIcon;
 }
 
 wxIcon wxGxFeatureDataset::GetSmallImage(void)
 {
-	//switch(m_type)
-	//{
-	//case enumVecESRIShapefile:
-	//	return wxIcon(m_ImageListSmall.GetIcon(0));
-	//case enumVecMapinfoTab:
- //       return wxIcon(mi_dset_16_xpm);
-	//case enumVecMapinfoMif:
- //       return wxIcon(md_dset_16_xpm);
-	//case enumVecKML:
-	//	return wxIcon(m_ImageListSmall.GetIcon(4));
-	//case enumVecDXF:
-	//	return wxIcon(dxf_dset_16_xpm);
-	//default:
-	//	return wxNullIcon;
-	//}
     return m_SmallIcon;
 }
 
@@ -322,12 +273,8 @@ wxGISDataset* wxGxFeatureDataset::GetDataset(void)
 //class wxGxRasterDataset
 //--------------------------------------------------------------
 
-wxGxRasterDataset::wxGxRasterDataset(wxString Path, wxString Name, wxGISEnumRasterDatasetType Type)
+wxGxRasterDataset::wxGxRasterDataset(wxString Path, wxString Name, wxGISEnumRasterDatasetType Type, wxIcon LargeIcon, wxIcon SmallIcon)
 {
-	m_ImageListSmall.Create(16, 16);
-	m_ImageListSmall.Add(wxBitmap(shape_icon16_xpm));
-	m_ImageListLarge.Create(48, 48);
-	m_ImageListLarge.Add(wxBitmap(shape_icon48_xpm));
 
 	m_type = Type;
 
@@ -335,6 +282,9 @@ wxGxRasterDataset::wxGxRasterDataset(wxString Path, wxString Name, wxGISEnumRast
 	m_sPath = Path;
 
 	m_pwxGISDataset = NULL;
+
+    m_LargeIcon = LargeIcon;
+    m_SmallIcon = SmallIcon;
 }
 
 wxGxRasterDataset::~wxGxRasterDataset(void)
@@ -344,22 +294,12 @@ wxGxRasterDataset::~wxGxRasterDataset(void)
 
 wxIcon wxGxRasterDataset::GetLargeImage(void)
 {
-	switch(m_type)
-	{
-	case enumRasterUnknown:
-	default:
-		return wxIcon(m_ImageListLarge.GetIcon(2));
-	}
+	return m_LargeIcon;
 }
 
 wxIcon wxGxRasterDataset::GetSmallImage(void)
 {
-	switch(m_type)
-	{
-	case enumRasterUnknown:
-	default:
-		return wxIcon(m_ImageListSmall.GetIcon(2));
-	}
+	return m_SmallIcon;
 }
 
 bool wxGxRasterDataset::Delete(void)

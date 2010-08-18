@@ -67,7 +67,7 @@ public:
 	wxGxTreeViewBase(wxWindow* parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTR_HAS_BUTTONS );
 	virtual ~wxGxTreeViewBase(void);
     bool Create(wxWindow* parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTR_HAS_BUTTONS);
-	virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, bool sort = true);
+	virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent);
 	virtual void AddRoot(IGxObject* pGxObject);
 //IGxView
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
@@ -87,6 +87,12 @@ public:
 	virtual void OnItemRightClick(wxTreeEvent& event);
 
 	typedef std::map<IGxObject*, wxTreeItemId> WETREEMAP;
+	typedef struct _icondata
+	{
+		wxIcon oIcon;
+		int iImageIndex;
+	} ICONDATA;
+
 protected:
 	wxImageList m_TreeImageList;
 	WETREEMAP m_TreeMap;
@@ -94,6 +100,7 @@ protected:
 	long m_ConnectionPointCatalogCookie, m_ConnectionPointSelectionCookie;
 	IGxSelection* m_pSelection;
     IGxCatalog* m_pCatalog;
+    std::vector<ICONDATA> m_IconsArray;
 
     DECLARE_EVENT_TABLE()
 };

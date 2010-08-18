@@ -43,6 +43,7 @@ wxGxTreeViewBase::wxGxTreeViewBase(wxWindow* parent, wxWindowID id, const wxPoin
 {
 	m_TreeImageList.Create(16, 16);
 	SetImageList(&m_TreeImageList);
+    m_TreeImageList.Add(wxIcon(doc_16_xpm));
 }
 
 wxGxTreeViewBase::~wxGxTreeViewBase(void)
@@ -56,6 +57,7 @@ bool wxGxTreeViewBase::Create(wxWindow* parent, wxWindowID id, const wxPoint& po
     {
         m_TreeImageList.Create(16, 16);
         SetImageList(&m_TreeImageList);
+        m_TreeImageList.Add(wxIcon(doc_16_xpm));
     }
     return result;
 }
@@ -90,7 +92,7 @@ void wxGxTreeViewBase::AddRoot(IGxObject* pGxObject)
 	//		SetItemHasChildren(NewTreeItem);
 }
 
-void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, bool sort)
+void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
 {
 	if(NULL == pGxObject)
 		return;
@@ -98,11 +100,27 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, b
 	wxIcon icon;
 	if(pObjUI != NULL)
 		icon = pObjUI->GetSmallImage();
-	int pos(-1);
-	if(!icon.IsOk())
-        icon = wxIcon(doc_16_xpm);
 
-    pos = m_TreeImageList.Add(icon);
+	int pos(-1);
+	if(icon.IsOk())
+    {
+        for(size_t i = 0; i < m_IconsArray.size(); i++)
+        {
+            if(m_IconsArray[i].oIcon.IsSameAs(icon))
+            {
+                pos = m_IconsArray[i].iImageIndex;
+                break;
+            }
+        }
+        if(pos == -1)
+        {
+            pos = m_TreeImageList.Add(icon);
+            ICONDATA myicondata = {icon, pos};
+            m_IconsArray.push_back(myicondata);
+        }
+    }
+	else
+		pos = 0;//m_ImageListSmall.Add(m_ImageListSmall.GetIcon(2));//0 col img, 1 - col img
 
 	wxGxTreeItemData* pData = new wxGxTreeItemData(pGxObject, pos, false);
 
@@ -122,8 +140,7 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, b
 		if(pContainer->AreChildrenViewable())
 			SetItemHasChildren(NewTreeItem);
 
-	if(sort)
-		SortChildren(hParent);
+    //SortChildren(hParent);
 	wxTreeCtrl::Refresh();
 }
 
@@ -198,7 +215,10 @@ void wxGxTreeViewBase::OnObjectAdded(IGxObject* object)
 		if(pData != NULL)
 		{
 			if(pData->m_bExpandedOnce)
+            {
 				AddTreeItem(object,TreeItemId);
+                SortChildren(TreeItemId);
+            }
 			else
 				SetItemHasChildren(TreeItemId, true);
 		}
@@ -228,7 +248,7 @@ void wxGxTreeViewBase::OnObjectChanged(IGxObject* object)
                     sName = FileName.GetName();
                 }
 				wxIcon icon = pGxObjectUI->GetSmallImage();
-
+//TODO: Check if icon of is item is same to other items
 				if(icon.IsOk())
 					m_TreeImageList.Replace(pData->m_smallimage_index, icon);
 				SetItemText(TreeItemId, sName);
@@ -354,8 +374,9 @@ void wxGxTreeViewBase::OnItemExpanding(wxTreeEvent& event)
 						if(pArr->size() != 0)
 						{
 							for(size_t i = 0; i < pArr->size(); i++)
-								AddTreeItem(pArr->at(i), item, true);//false
+								AddTreeItem(pArr->at(i), item);//false
 							pData->m_bExpandedOnce = true;
+                            SortChildren(item);
 							return;
 						}
 					}
@@ -595,7 +616,7 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
 
 void wxGxTreeView::OnActivated(wxTreeEvent& event)
 {
-    //event.Skip();
+    event.Skip();
 
 	wxTreeItemId item = event.GetItem();
 

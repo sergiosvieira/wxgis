@@ -38,4 +38,7 @@ public:
 		wxString path;
 		int bHasShp, bHasDbf, bHasPrj;
 	}DATA;
+protected:
+    wxIcon m_LargeSHPIcon, m_SmallSHPIcon;
+    wxIcon m_LargeDXFIcon, m_SmallDXFIcon;
 };

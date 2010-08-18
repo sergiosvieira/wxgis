@@ -224,6 +224,9 @@ void wxGxContentView::AddObject(IGxObject* pObject)
             ICONDATA myicondata = {icon_small, pos, false};
             m_IconsArray.push_back(myicondata);
 
+            pos = m_ImageListLarge.Add(icon_large);
+            ICONDATA myicondata1 = {icon_large, pos, true};
+            m_IconsArray.push_back(myicondata1);
         }
     }
 	else
@@ -241,12 +244,12 @@ void wxGxContentView::AddObject(IGxObject* pObject)
                 break;
             }
         }
-        if(pos == 0)
-        {
-            pos = m_ImageListLarge.Add(icon_large);
-            ICONDATA myicondata = {icon_large, pos, true};
-            m_IconsArray.push_back(myicondata);
-        }
+        //if(pos == 0)
+        //{
+        //    pos = m_ImageListLarge.Add(icon_large);
+        //    ICONDATA myicondata = {icon_large, pos, true};
+        //    m_IconsArray.push_back(myicondata);
+        //}
     }
 	else
 		pos = 2;//m_ImageListLarge.Add(m_ImageListLarge.GetIcon(2));

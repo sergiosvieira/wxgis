@@ -22,10 +22,20 @@
 #include "wxgis/catalog/gxdataset.h"
 #include <wx/ffile.h>
 
+#include "../../art/shp_dset_16.xpm"
+#include "../../art/shp_dset_48.xpm"
+#include "../../art/dbf_dset_16.xpm"
+#include "../../art/dbf_dset_48.xpm"
+
+
 IMPLEMENT_DYNAMIC_CLASS(wxGxShapeFactory, wxObject)
 
 wxGxShapeFactory::wxGxShapeFactory(void)
 {
+    m_SmallSHPIcon = wxIcon(shp_dset_16_xpm);
+    m_LargeSHPIcon = wxIcon(shp_dset_48_xpm);
+    m_SmallDXFIcon = wxIcon(dbf_dset_16_xpm);
+    m_LargeDXFIcon = wxIcon(dbf_dset_48_xpm);
 }
 
 wxGxShapeFactory::~wxGxShapeFactory(void)
@@ -98,7 +108,7 @@ REMOVE:
 			wxString name = CI->first + wxT(".shp");
 			wxString path = CI->second.path + wxT(".shp");
 			//create shp
-			wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, enumVecESRIShapefile);
+			wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, enumVecESRIShapefile, m_LargeSHPIcon, m_SmallSHPIcon);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 		}
 		if(CI->second.bHasDbf && !CI->second.bHasShp)
@@ -107,7 +117,7 @@ REMOVE:
 			wxString path = CI->second.path + wxT(".dbf");
 
 			//create dbf
-			wxGxTableDataset* pDataset = new wxGxTableDataset(path, name, enumTableDBF);
+			wxGxTableDataset* pDataset = new wxGxTableDataset(path, name, enumTableDBF, m_LargeDXFIcon, m_SmallDXFIcon);
 			pGxObj = dynamic_cast<IGxObject*>(pDataset);
 		}
 		if(CI->second.bHasPrj && !CI->second.bHasShp)

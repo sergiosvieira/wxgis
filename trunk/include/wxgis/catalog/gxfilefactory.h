@@ -36,4 +36,5 @@ public:
     virtual wxString GetName(void){return GetClassInfo()->GetClassName();};
 protected:
     wxArrayString m_ExtArray;
+    wxIcon m_LargePRJIcon, m_SmallPRJIcon;
 };

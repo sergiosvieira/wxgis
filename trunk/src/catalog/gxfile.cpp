@@ -20,8 +20,6 @@
  ****************************************************************************/
 #include "wxgis/catalog/gxfile.h"
 #include "wxgis/datasource/sysop.h"
-#include "../../art/sr_16(2).xpm"
-#include "../../art/sr_48.xpm"
 #include "cpl_vsi.h"
 
 
@@ -44,9 +42,12 @@ wxGxFile::~wxGxFile(void)
 //class wxGxPrjFile
 //--------------------------------------------------------------
 
-wxGxPrjFile::wxGxPrjFile(wxString Path, wxString Name, wxGISEnumPrjFileType Type) : wxGxFile(Path, Name)
+wxGxPrjFile::wxGxPrjFile(wxString Path, wxString Name, wxGISEnumPrjFileType Type, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxFile(Path, Name)
 {
     m_Type = Type;
+
+    m_oLargeIcon = LargeIcon;
+    m_oSmallIcon = SmallIcon;
 }
 
 wxGxPrjFile::~wxGxPrjFile(void)
@@ -55,12 +56,12 @@ wxGxPrjFile::~wxGxPrjFile(void)
 
 wxIcon wxGxPrjFile::GetLargeImage(void)
 {
-	return wxIcon(sr_48_xpm);
+    return m_oLargeIcon;
 }
 
 wxIcon wxGxPrjFile::GetSmallImage(void)
 {
-	return wxIcon(sr_16_2_xpm);
+    return m_oSmallIcon;
 }
 
 bool wxGxPrjFile::Delete(void)
