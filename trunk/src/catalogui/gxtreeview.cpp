@@ -179,6 +179,8 @@ void wxGxTreeViewBase::OnSelectionChanged(IGxSelection* Selection, long nInitiat
 	if(nInitiator == GetId())
 		return;
 	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
+    if(pGxObj == NULL)
+        return;
 	wxTreeItemId ItemId = m_TreeMap[pGxObj];
 	if(ItemId.IsOk())
 	{
@@ -248,7 +250,7 @@ void wxGxTreeViewBase::OnObjectChanged(IGxObject* object)
                     sName = FileName.GetName();
                 }
 				wxIcon icon = pGxObjectUI->GetSmallImage();
-//TODO: Check if icon of is item is same to other items
+//TODO: Check if icon of this item is same to other items
 				if(icon.IsOk())
 					m_TreeImageList.Replace(pData->m_smallimage_index, icon);
 				SetItemText(TreeItemId, sName);
@@ -322,7 +324,6 @@ int wxGxTreeViewBase::OnCompareItems(const wxTreeItemId& item1, const wxTreeItem
         return GxObjectCompareFunction(pData1->m_pObject, pData2->m_pObject, 1);
     }
     return 0;
-//   return wxTreeCtrl::OnCompareItems(item1, item2);
 }
 
 void wxGxTreeViewBase::OnItemRightClick(wxTreeEvent& event)
@@ -402,7 +403,6 @@ BEGIN_EVENT_TABLE(wxGxTreeView, wxGxTreeViewBase)
     EVT_TREE_BEGIN_LABEL_EDIT(TREECTRLID, wxGxTreeView::OnBeginLabelEdit)
     EVT_TREE_END_LABEL_EDIT(TREECTRLID, wxGxTreeView::OnEndLabelEdit)
     EVT_TREE_SEL_CHANGED(TREECTRLID, wxGxTreeView::OnSelChanged)
-    EVT_SET_FOCUS(wxGxTreeView::OnSetFocus)
     EVT_TREE_BEGIN_DRAG(TREECTRLID, wxGxTreeView::OnBeginDrag)
     EVT_TREE_ITEM_ACTIVATED(TREECTRLID, wxGxTreeView::OnActivated)
 END_EVENT_TABLE()
@@ -553,27 +553,6 @@ void wxGxTreeView::OnSelChanged(wxTreeEvent& event)
 	//if(pData != NULL)
 	//	OnObjectSelected(pData->m_pObject);
 }
-
-void wxGxTreeView::OnSetFocus(wxFocusEvent& event)
-{
-//    event.Skip();
-    if(event.GetWindow() == this)
-        return;
-    wxArrayTreeItemIds treearray;
-    size_t count = GetSelections(treearray);
-    if(count == 0)
-        return;
-    m_pSelection->Clear(NOTFIRESELID);
-    for(size_t i = 0; i < count; i++)
-    {
-	    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(treearray[i]);
-	    if(pData != NULL)
-	    {
-		    m_pSelection->Select(pData->m_pObject, true, NOTFIRESELID);
-	    }
-    }
-}
-
 
 void wxGxTreeView::OnItemRightClick(wxTreeEvent& event)
 {

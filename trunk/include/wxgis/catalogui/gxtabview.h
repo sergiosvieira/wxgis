@@ -44,6 +44,8 @@ class wxGxTab :
 	public wxPanel,
 	public IGxSelectionEvents
 {
+    DECLARE_CLASS(wxGxTab)
+
     enum
 	{
 		ID_WNDCHOICE = wxID_HIGHEST + 35
@@ -92,6 +94,12 @@ class WXDLLIMPEXP_GIS_CLU wxGxTabView :
 	public wxGxView,
 	public IGxSelectionEvents
 {
+    DECLARE_CLASS(wxGxTabView)
+
+    enum
+	{
+		ID_SELCHANGED = wxID_HIGHEST + 30
+	};
 public:
 	wxGxTabView(wxWindow* parent, wxWindowID id = TABCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 	virtual ~wxGxTabView(void);
@@ -103,6 +111,7 @@ public:
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 //Events
 	void OnAUINotebookPageChanged(wxAuiNotebookEvent& event);
+    virtual void OnSelChanged(wxCommandEvent & event);
 protected:
 	std::vector<wxGxTab*> m_Tabs;
 	IConnectionPointContainer *m_pConnectionPointSelection;

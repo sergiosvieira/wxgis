@@ -48,9 +48,13 @@ void wxGxSelection::Select( IGxObject* pObject,  bool appendToExistingSelection,
     if(m_SelectionMap[nInitiator]->size() > 0 && m_SelectionMap[nInitiator]->at(m_SelectionMap[nInitiator]->size() - 1) == pObject)
     {
         m_CritSect.Leave();
+	    //not fire event id NOTFIRESELID
+	    if(nInitiator != NOTFIRESELID)
+            goto END;
         return;
     }
     m_currentInitiator = nInitiator;
+
     m_CritSect.Leave();
 
     if(!appendToExistingSelection)
@@ -71,6 +75,7 @@ void wxGxSelection::Select( IGxObject* pObject,  bool appendToExistingSelection,
 
 	//fire event
 	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
+END:
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
 		IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pPointsArray[i]);

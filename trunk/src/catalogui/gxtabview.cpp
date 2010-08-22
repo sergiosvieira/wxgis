@@ -25,6 +25,8 @@
 //-------------------------------------------------------------------
 // wxGxTab
 //-------------------------------------------------------------------
+IMPLEMENT_CLASS(wxGxTab, wxPanel)
+
 BEGIN_EVENT_TABLE(wxGxTab, wxPanel)
 	EVT_CHOICE(ID_WNDCHOICE, wxGxTab::OnChoice)
 END_EVENT_TABLE()
@@ -174,21 +176,21 @@ wxWindow* wxGxTab::GetWindow(int iIndex)
 
 void wxGxTab::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 {
-    this->Layout();
-
+    if(!IsShown())
+        return;
 	if(!Selection)
 		return;
 
 	if(nInitiator == GetId())
 		return;
 
+    this->Layout();
 	//select in tree ctrl
 	if(nInitiator != TREECTRLID && nInitiator != LISTCTRLID)
 	{
 		IGxObject* pGxObj = Selection->GetLastSelectedObject();
 		if(pGxObj == NULL)
 			return;
-		//wxString sName = pGxObj->GetName();
 		Selection->Select(pGxObj , false, GetId());
 		return;
 	}
@@ -295,7 +297,7 @@ END:
 
 void wxGxTab::OnChoice(wxCommandEvent& event)
 {
-	//event.Skip();
+	event.Skip();
 	int pos = event.GetSelection();
 	if(pos < 0)
 		return;
@@ -345,12 +347,14 @@ void wxGxTab::Deactivate(void)
 //-------------------------------------------------------------------
 // wxGxTabView
 //-------------------------------------------------------------------
+IMPLEMENT_CLASS(wxGxTabView, wxAuiNotebook)
 
 BEGIN_EVENT_TABLE(wxGxTabView, wxAuiNotebook)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(TABCTRLID, wxGxTabView::OnAUINotebookPageChanged)
+	EVT_BUTTON(ID_SELCHANGED, wxGxTabView::OnSelChanged)
 END_EVENT_TABLE()
 
-wxGxTabView::wxGxTabView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxAuiNotebook(parent, id, pos, size, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE)/*wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_TAB_EXTERNAL_MOVE | */ , m_pSelection(NULL)
+wxGxTabView::wxGxTabView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxAuiNotebook(parent, id, pos, size, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE), m_pSelection(NULL)
 {
 }
 
@@ -404,14 +408,22 @@ void wxGxTabView::Deactivate(void)
 
 void wxGxTabView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 {
-	int nSelTab = GetSelection();
+	if(nInitiator == GetId())
+		return;
+
+    int nSelTab = GetSelection();
     if(nSelTab < 0)
         return;
 	wxASSERT(nSelTab >= 0 && nSelTab < m_Tabs.size());
 
 	wxGxTab* pCurrTab = m_Tabs[nSelTab];
-	if(pCurrTab)
-		pCurrTab->OnSelectionChanged(Selection, nInitiator);
+	//if(pCurrTab)
+	//	pCurrTab->OnSelectionChanged(Selection, nInitiator);
+
+    wxCommandEvent event(wxEVT_COMMAND_BUTTON_CLICKED, ID_SELCHANGED);
+    event.SetClientData(pCurrTab);
+    event.SetExtraLong(nInitiator);
+    ::wxPostEvent(this, event);
 
 	//wxWindow* pCurrWnd = GetPage(nSelTab);
 	//IGxView* pCurrView = dynamic_cast<IGxView*>(pCurrWnd);
@@ -447,16 +459,21 @@ void wxGxTabView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 
 void wxGxTabView::OnAUINotebookPageChanged(wxAuiNotebookEvent& event)
 {
-	//update view while changing focus of tabs
 	event.Skip();
+    SetFocus();
+	//update view while changing focus of tabs
 	int nSelTab = event.GetSelection();
     if(nSelTab < 0)
         return;
 	wxASSERT(nSelTab >= 0 && nSelTab < m_Tabs.size());
 
 	wxGxTab* pCurrTab = m_Tabs[nSelTab];
-	if(pCurrTab && m_pSelection)
-		pCurrTab->OnSelectionChanged(m_pSelection, IGxSelection::INIT_ALL);
+	//if(pCurrTab && m_pSelection)
+	//	pCurrTab->OnSelectionChanged(m_pSelection, IGxSelection::INIT_ALL);
+    wxCommandEvent cevent(wxEVT_COMMAND_BUTTON_CLICKED, ID_SELCHANGED);
+    cevent.SetExtraLong(IGxSelection::INIT_ALL);
+    cevent.SetClientData(pCurrTab);
+    ::wxPostEvent(this, cevent);
 }
 
 wxWindow* wxGxTabView::GetCurrentWnd(void)
@@ -468,4 +485,23 @@ wxWindow* wxGxTabView::GetCurrentWnd(void)
 	if(pCurrTab)
 		return pCurrTab->GetCurrentWindow();
 	return NULL;
+}
+
+void wxGxTabView::OnSelChanged(wxCommandEvent & event)
+{
+	//int nSelTab = GetSelection();
+ //   if(nSelTab < 0)
+ //       return;
+	//wxASSERT(nSelTab >= 0 && nSelTab < m_Tabs.size());
+
+	//wxGxTab* pCurrTab = m_Tabs[nSelTab];
+	//if(pCurrTab)
+	//	pCurrTab->OnSelectionChanged(m_pSelection, event.GetExtraLong());
+    
+    wxGxTab* pCurrTab = (wxGxTab*)event.GetClientData();
+    //for(size_t i = 0; i < m_Tabs.size(); i++)
+    //    if(m_Tabs[i])
+    //        m_Tabs[i]->OnSelectionChanged(m_pSelection, event.GetExtraLong());
+	if(pCurrTab)
+		pCurrTab->OnSelectionChanged(m_pSelection, event.GetExtraLong());
 }

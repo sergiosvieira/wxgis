@@ -123,7 +123,6 @@ public:
     virtual void OnEndLabelEdit(wxTreeEvent& event);
     virtual void OnSelChanged(wxTreeEvent& event);
 	virtual void OnItemRightClick(wxTreeEvent& event);
-    virtual void OnSetFocus(wxFocusEvent& event);
 	virtual void OnBeginDrag(wxTreeEvent& event);
 	virtual void OnActivated(wxTreeEvent& event);
 

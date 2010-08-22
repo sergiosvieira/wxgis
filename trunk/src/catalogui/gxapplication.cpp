@@ -26,6 +26,8 @@
 //-----------------------------------------------
 // wxGxApplication
 //-----------------------------------------------
+IMPLEMENT_CLASS(wxGxApplication, wxGISApplication)
+
 wxGxApplication::wxGxApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxGISApplication(parent, id, title, pos, size, style), m_pCatalog(NULL), m_pTreeView(NULL), m_pTabView(NULL)
 {
 }

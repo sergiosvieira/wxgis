@@ -36,6 +36,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxApplication :
 	public wxGISApplication,
     public IGxApplication
 {
+    DECLARE_CLASS(wxGxApplication)
 public:	
 	wxGxApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER);
 	virtual ~wxGxApplication(void);

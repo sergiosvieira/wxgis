@@ -38,7 +38,6 @@ BEGIN_EVENT_TABLE(wxGxContentView, wxListCtrl)
 
     EVT_LIST_COL_CLICK(LISTCTRLID, wxGxContentView::OnColClick)
     EVT_CONTEXT_MENU(wxGxContentView::OnContextMenu)
-    EVT_SET_FOCUS(wxGxContentView::OnSetFocus)
 END_EVENT_TABLE()
 
 int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
@@ -232,27 +231,21 @@ void wxGxContentView::AddObject(IGxObject* pObject)
 	else
 		pos = 2;//m_ImageListSmall.Add(m_ImageListSmall.GetIcon(2));//0 col img, 1 - col img
 
-	if(icon_large.IsOk())
-    {
-        for(size_t i = 0; i < m_IconsArray.size(); i++)
-        {
-            if(!m_IconsArray[i].bLarge)
-                continue;
-            if(m_IconsArray[i].oIcon.IsSameAs(icon_large))
-            {
-                pos = m_IconsArray[i].iImageIndex;
-                break;
-            }
-        }
-        //if(pos == 0)
-        //{
-        //    pos = m_ImageListLarge.Add(icon_large);
-        //    ICONDATA myicondata = {icon_large, pos, true};
-        //    m_IconsArray.push_back(myicondata);
-        //}
-    }
-	else
-		pos = 2;//m_ImageListLarge.Add(m_ImageListLarge.GetIcon(2));
+	//if(icon_large.IsOk())
+ //   {
+ //       for(size_t i = 0; i < m_IconsArray.size(); i++)
+ //       {
+ //           if(!m_IconsArray[i].bLarge)
+ //               continue;
+ //           if(m_IconsArray[i].oIcon.IsSameAs(icon_large))
+ //           {
+ //               pos = m_IconsArray[i].iImageIndex;
+ //               break;
+ //           }
+ //       }
+ //   }
+	//else
+	//	pos = 2;//m_ImageListLarge.Add(m_ImageListLarge.GetIcon(2));
 
 
 	LPITEMDATA pData = new _itemdata;
@@ -317,18 +310,6 @@ void wxGxContentView::OnContextMenu(wxContextMenuEvent& event)
 void wxGxContentView::OnSelected(wxListEvent& event)
 {
 	//event.Skip();
-	//LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
-	//if(pItemData == NULL)
-	//	return;
-
-	////wxMouseState mstate = wxGetMouseState();
-	////bool bCtrlDown = mstate.ControlDown();
-	////bool bAdd = bCtrlDown || m_bDragging;
-	////m_bDragging = false;
-
-	//bool bAdd = true;
-	//m_pSelection->Select(pItemData->pObject, bAdd, NOTFIRESELID);
-
     m_pSelection->Clear(NOTFIRESELID);
     long nItem = -1;
     for ( ;; )
@@ -343,29 +324,24 @@ void wxGxContentView::OnSelected(wxListEvent& event)
     }
 }
 
-void wxGxContentView::OnSetFocus(wxFocusEvent& event)
+bool wxGxContentView::Show(bool show)
 {
-//    event.Skip();
-    if(event.GetWindow() == this)
-        return;
-    if(GetSelectedItemCount() == 0)
+    bool res = wxListCtrl::Show(show);
+    if(show)
     {
-        m_pSelection->Select(m_pParentGxObject, false, NOTFIRESELID);
-        return;
+        //deselect all items
+        long nItem = -1;
+        for ( ;; )
+        {
+            nItem = GetNextItem(nItem, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+            if ( nItem == -1 )
+                break;
+            SetItemState(nItem, 0, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
+        }
     }
-    m_pSelection->Clear(NOTFIRESELID);
-    long nItem = -1;
-    for ( ;; )
-    {
-        nItem = GetNextItem(nItem, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-        if ( nItem == -1 )
-            break;
-        LPITEMDATA pItemData = (LPITEMDATA)GetItemData(nItem);
-	    if(pItemData == NULL)
-            continue;
-        m_pSelection->Select(pItemData->pObject, true, NOTFIRESELID);
-    }
+    return res;
 }
+
 
 void wxGxContentView::OnDeselected(wxListEvent& event)
 {
@@ -689,8 +665,8 @@ void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiato
 	if(nInitiator == GetId())
 		return;
 	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
-	//if(m_pParentGxObject == pGxObj)
-	//	return;
+	if(m_pParentGxObject == pGxObj)
+		return;
 
 	//reset
 	ResetContents();

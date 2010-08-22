@@ -37,7 +37,6 @@ BEGIN_EVENT_TABLE(wxGxMapView, wxGISMapView)
 	EVT_MIDDLE_DCLICK(wxGxMapView::OnMouseDoubleClick)
 	EVT_RIGHT_DCLICK(wxGxMapView::OnMouseDoubleClick)
 	EVT_MOTION(wxGxMapView::OnMouseMove)
-	EVT_BUTTON(ID_SELCHANGED, wxGxMapView::OnSelChanged)
 END_EVENT_TABLE()
 
 wxGxMapView::wxGxMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxGISMapView(parent, id, pos, size), m_pStatusBar(NULL)
@@ -98,7 +97,7 @@ bool wxGxMapView::Applies(IGxSelection* Selection)
 	return false;
 }
 
-void wxGxMapView::OnSelChanged(wxCommandEvent & event)
+void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 {
     IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
 	if(m_pParentGxObject == pGxObj)
@@ -169,15 +168,6 @@ void wxGxMapView::OnSelChanged(wxCommandEvent & event)
 #endif
 
     SetFullExtent();
-}
-
-void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
-{
-	if(nInitiator == GetId())
-		return;
-
-    wxCommandEvent event(wxEVT_COMMAND_BUTTON_CLICKED, ID_SELCHANGED);
-    ::wxPostEvent(this, event);
 }
 
 void wxGxMapView::OnMouseMove(wxMouseEvent& event)
