@@ -26,6 +26,8 @@
 
 #include "../../art/default_16.xpm"
 
+IMPLEMENT_CLASS(wxGISApplication, wxFrame)
+
 static IApplication* m_pGlobalApp;
 extern WXDLLIMPEXP_GIS_FRW IApplication* GetApplication()
 {

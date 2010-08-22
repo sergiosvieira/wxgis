@@ -28,10 +28,6 @@ class WXDLLIMPEXP_GIS_CLU wxGxMapView :
 	public wxGxView,
 	public IGxSelectionEvents
 {
-    enum
-	{
-		ID_SELCHANGED = wxID_HIGHEST + 30
-	};
 public:
 //	wxGxMapView(void){};
 	wxGxMapView(wxWindow* parent, wxWindowID id = MAPCTRLID, const wxPoint& pos = wxDefaultPosition,
@@ -43,7 +39,6 @@ public:
 	void OnMouseDown(wxMouseEvent& event);
 	void OnMouseUp(wxMouseEvent& event);
 	void OnMouseDoubleClick(wxMouseEvent& event);
-    virtual void OnSelChanged(wxCommandEvent & event);
 //IGxView
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);

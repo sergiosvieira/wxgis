@@ -52,6 +52,7 @@ public:
 	virtual void ResetContents(void);
     virtual IGxObject* GetParentGxObject(void){return m_pParentGxObject;};
     virtual void SelectAll(void);
+    virtual bool Show(bool show = true);
 //IGxView
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
@@ -74,7 +75,6 @@ public:
 	virtual void OnEndLabelEdit(wxListEvent& event);
 	virtual void OnSelected(wxListEvent& event);
 	virtual void OnDeselected(wxListEvent& event);
-    virtual void OnSetFocus(wxFocusEvent& event);
     virtual void OnBeginDrag(wxListEvent& event);
 
 	typedef struct _itemdata

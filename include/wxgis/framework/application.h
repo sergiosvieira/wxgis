@@ -33,6 +33,7 @@ class WXDLLIMPEXP_GIS_FRW wxGISApplication :
 	public wxFrame,
 	public IApplication
 {
+    DECLARE_CLASS(wxGISApplication)
 public:
 	//constructor
 	wxGISApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER );//| wxWS_EX_VALIDATE_RECURSIVELY
