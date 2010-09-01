@@ -228,6 +228,9 @@ void wxGISGeoprocessingCmd::OnClick(void)
                         sStartLoc = pGxParentObj->GetFullName();
 
                     wxGxObjectDialog dlg(pWnd, wxID_ANY, _("Select output"));
+                    IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+                    if(pGxApp)
+                        dlg.SetExternalCatalog(pGxApp->GetCatalog());
                     dlg.SetName(sName);
 				    dlg.SetAllowMultiSelect(false);
 				    dlg.SetAllFilters(false);

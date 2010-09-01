@@ -101,7 +101,7 @@ public:
 	virtual void ObjectRefreshed(IGxObject* pObject) = 0;
 	virtual IGxSelection* GetSelection(void){return m_pSelection;};
 	virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true) = 0;
-	virtual void DisconnectFolder(wxString sPath) = 0;
+	virtual void DisconnectFolder(wxString sPath, bool bSelect = true) = 0;
 	virtual void SetLocation(wxString sPath) = 0;
     virtual IGISConfig* GetConfig(void){return m_pConf;};
     virtual void Undo(int nPos = -1) = 0;

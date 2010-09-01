@@ -60,7 +60,7 @@ wxGISApplication::~wxGISApplication(void)
 ICommand* wxGISApplication::GetCommand(long CmdID)
 {
 	for(size_t i = 0; i < m_CommandArray.size(); i++)
-		if(m_CommandArray[i]->GetID() == CmdID)
+		if(m_CommandArray[i] && m_CommandArray[i]->GetID() == CmdID)
 			return m_CommandArray[i];
 	return NULL;
 }

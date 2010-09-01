@@ -63,7 +63,7 @@ public:
     wxTreeContainerView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxTR_NO_LINES | wxTR_SINGLE/* | wxTR_HIDE_ROOT*/);
     virtual ~wxTreeContainerView(void);
 //wxGxTreeViewBase
-    virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, bool sort = true);
+    virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent);
 //wxTreeContainerView
 	virtual void AddShowFilter(IGxObjectFilter* pFilter);
 	virtual void RemoveAllShowFilters(void);

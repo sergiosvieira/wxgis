@@ -102,7 +102,7 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
     IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
 	if(m_pParentGxObject == pGxObj)
 		return;
-
+    	
 	IGxDataset* pGxDataset =  dynamic_cast<IGxDataset*>(pGxObj);
 	if(pGxDataset == NULL)
 		return;
@@ -111,6 +111,8 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	wxGISDataset* pwxGISDataset = pGxDataset->GetDataset();
 	if(pwxGISDataset == NULL)
 		return;
+
+    m_pParentGxObject = pGxObj;
     //the pOGRLayer will live while IGxObject live. IGxObject( from IGxSelection ) store IwxGISDataset, and destroy it then catalog destroyed
     pwxGISDataset->Dereference();
 
@@ -160,8 +162,6 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	    if(pwxGISLayers[i] && pwxGISLayers[i]->IsValid())
 		    AddLayer(pwxGISLayers[i]);
     }
-
-	m_pParentGxObject = pGxObj;
 
 #ifdef __WXGTK__
 	wxMilliSleep(200);
@@ -267,9 +267,9 @@ void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileNam
                 pNode->AddProperty(wxT("create_ovr"), wxT("1"));
                 pNode->AddProperty(wxT("ask_create_ovr"), wxT("1"));
                 pNode->AddProperty(wxT("ovr_compress"), wxT("NONE"));
-                pNode->AddProperty(wxT("ovr_resample"), wxT("GAUSS"));
+                pNode->AddProperty(wxT("ovr_resample"), wxT("NONE"));//wxT("GAUSS"));
             }
-            CPLSetConfigOption( "COMPRESS_OVERVIEW",  wgWX2MB(sCompress) );//LZW "DEFLATE"
+            CPLSetConfigOption( "COMPRESS_OVERVIEW", wgWX2MB(sCompress) );//LZW "DEFLATE"
             if(bAskCreateOvr)
             {
                 //show ask dialog
@@ -279,8 +279,6 @@ void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileNam
                     bCreateOverviews = false;
                 else
                     bCreateOverviews = true;
-
-                //SetFocus();
 
                 if(!dlg.GetShowInFuture())
                 {
@@ -294,7 +292,24 @@ void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileNam
 
         if(bCreateOverviews)
         {
-	        int anOverviewList[5] = { 4, 8, 16, 32, 64 };
+            int nSize = MIN(pwxGISRasterDataset->GetHeight(), pwxGISRasterDataset->GetWidth());
+            int anOverviewList[25] = {0};
+            int nLevel(1);
+            int nLevelCount(0);
+            while(1)
+            {
+                nSize /= 2;
+                if(nSize < 20)
+                    break;
+                nLevel *= 2;
+                if(nLevel != 2)
+                {
+                    anOverviewList[nLevelCount] = nLevel;
+                    nLevelCount++;
+                }
+            }
+	        //int anOverviewList[8] = { 4, 8, 16, 32, 64, 128, 256, 512 };
+
             wxString sProgressMsg = wxString::Format(_("Creating pyramids for : %s (%d bands)"), soFileName.c_str(), pwxGISRasterDataset->GetRaster()->GetRasterCount());
             IStatusBar* pStatusBar = m_pApp->GetStatusBar();
             IProgressor* pProgressor = pStatusBar->GetProgressor();
@@ -306,11 +321,15 @@ void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileNam
             if(!pDSet)
                 return;
 
-            CPLSetConfigOption( "USE_RRD", pwxGISRasterDataset->GetSubType() == enumRasterImg ? "YES" : "NO" );
-            CPLSetConfigOption( "HFA_USE_RRD", "YES" );
-            //CPLSetConfigOption( "COMPRESS_OVERVIEW", "DEFLATE" );//LZW
+            if(pwxGISRasterDataset->GetSubType() == enumRasterImg)
+            {
+                CPLSetConfigOption( "USE_RRD", "YES" );
+                CPLSetConfigOption( "HFA_USE_RRD", "YES" );
+            }
+            else
+                CPLSetConfigOption( "USE_RRD", "NO" );
 
-	        CPLErr eErr = pDSet->BuildOverviews( wgWX2MB(sResampleMethod), 5, anOverviewList, 0, NULL, OvrProgress, (void*)&Data );
+	        CPLErr eErr = pDSet->BuildOverviews( wgWX2MB(sResampleMethod), nLevelCount, anOverviewList, 0, NULL, OvrProgress, (void*)&Data );
 
             if(pProgressor)
                 pProgressor->Show(false);

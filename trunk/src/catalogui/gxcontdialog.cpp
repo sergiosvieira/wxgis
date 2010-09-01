@@ -44,7 +44,7 @@ wxTreeContainerView::~wxTreeContainerView(void)
     RemoveAllShowFilters();
 }
 
-void wxTreeContainerView::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, bool sort)
+void wxTreeContainerView::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
 {
 	if(NULL == pGxObject)
 		return;
@@ -69,9 +69,27 @@ ADD:
 	wxIcon icon;
 	if(pObjUI != NULL)
 		icon = pObjUI->GetSmallImage();
+
 	int pos(-1);
 	if(icon.IsOk())
-		pos = m_TreeImageList.Add(icon);
+    {
+        for(size_t i = 0; i < m_IconsArray.size(); i++)
+        {
+            if(m_IconsArray[i].oIcon.IsSameAs(icon))
+            {
+                pos = m_IconsArray[i].iImageIndex;
+                break;
+            }
+        }
+        if(pos == -1)
+        {
+            pos = m_TreeImageList.Add(icon);
+            ICONDATA myicondata = {icon, pos};
+            m_IconsArray.push_back(myicondata);
+        }
+    }
+	else
+		pos = 0;//m_ImageListSmall.Add(m_ImageListSmall.GetIcon(2));//0 col img, 1 - col img
 
 	wxGxTreeItemData* pData = new wxGxTreeItemData(pGxObject, pos, false);
 
@@ -89,8 +107,7 @@ ADD:
 	if(pContainer->AreChildrenViewable())
 		SetItemHasChildren(NewTreeItem);
 
-	if(sort)
-		SortChildren(hParent);
+//	SortChildren(hParent);
 	wxTreeCtrl::Refresh();
 }
 

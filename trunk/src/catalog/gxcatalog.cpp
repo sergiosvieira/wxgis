@@ -492,15 +492,16 @@ IGxObject* wxGxCatalog::SearchChild(wxString sPath)
 }
 
 
-void wxGxCatalog::DisconnectFolder(wxString sPath)
+void wxGxCatalog::DisconnectFolder(wxString sPath, bool bSelect)
 {
 	if(m_DiscConnections[sPath] != NULL)
 	{
         IGxObject* pGxObj = m_DiscConnections[sPath]->GetParent();
 		ObjectDeleted(m_DiscConnections[sPath]);
 		DeleteChild(m_DiscConnections[sPath]);
-        m_pSelection->Select(pGxObj, false, IGxSelection::INIT_ALL);
 		m_DiscConnections[sPath] = NULL;
+        if(bSelect)
+            m_pSelection->Select(pGxObj, false, IGxSelection::INIT_ALL);
 	}
 }
 
