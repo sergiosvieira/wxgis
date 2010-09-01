@@ -178,9 +178,11 @@ void wxGxTreeViewBase::OnSelectionChanged(IGxSelection* Selection, long nInitiat
 {
 	if(nInitiator == GetId())
 		return;
+
 	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
     if(pGxObj == NULL)
         return;
+
 	wxTreeItemId ItemId = m_TreeMap[pGxObj];
 	if(ItemId.IsOk())
 	{
@@ -512,6 +514,8 @@ void wxGxTreeView::OnEndLabelEdit(wxTreeEvent& event)
 
 void wxGxTreeView::OnSelChanged(wxTreeEvent& event)
 {
+    //if(!event.GetOldItem())
+    //    return;
     //event.Skip();
 
     wxArrayTreeItemIds treearray;

@@ -338,6 +338,8 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     osHeightScaleOpt += wgWX2MB(soHeightScale);
     apszOptions[4] = osHeightScaleOpt.c_str();
 
+    //double dfPixErrThreshold = MIN(adfDstGeoTransform[1], adfDstGeoTransform[5]);
+
     void *hTransformArg = GDALCreateGenImgProjTransformer2( poGDALDataset, NULL, (char **)apszOptions );
     if(!hTransformArg)
     {
@@ -406,13 +408,21 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
 
     psWarpOptions->pTransformerArg = GDALCreateGenImgProjTransformer2( poGDALDataset, poOutputGDALDataset, (char **)apszOptions );
     psWarpOptions->pfnTransformer = GDALGenImgProjTransform;
+    
+    //TODO: Add to config memory limit in % of free memory
+    double dfMemLim = wxGetFreeMemory().ToDouble() / wxThread::GetCPUCount();
+    if(dfMemLim > 135000000) //128Mb in bytes
+    {
+        psWarpOptions->dfWarpMemoryLimit = dfMemLim;
+        wxLogDebug(wxT("wxGISGPOrthoCorrectTool: The dfWarpMemoryLimit set to %f Mb"), dfMemLim / 1048576);
+    }
 
     // Initialize and execute the warp operation.
 
     GDALWarpOperation oOperation;
 
     oOperation.Initialize( psWarpOptions );
-    eErr = oOperation.ChunkAndWarpImage( 0, 0, nPixels, nLines );
+    eErr = oOperation.ChunkAndWarpImage( 0, 0, nPixels, nLines );//ChunkAndWarpMulti( 0, 0, nPixels, nLines );//
     if(eErr != CE_None)
     {
         const char* pszErr = CPLGetLastErrorMsg();

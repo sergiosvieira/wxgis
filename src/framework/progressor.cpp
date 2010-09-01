@@ -120,6 +120,8 @@ int wxGISProgressor::GetRange()
 void wxGISProgressor::SetValue(int value)
 {
     Stop();
+    if(m_nValue == value)
+        return;
     m_nValue = value;
     if(m_nValue > m_nRange)
         m_nRange = m_nValue;

@@ -98,7 +98,7 @@ public:
 //IGxSelectionEvents
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 //wxGxTreeViewBase
-    virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, bool sort = true);
+    virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent);
     //
     virtual IGxSelection* GetSelectedObjects(void)
     {
@@ -127,6 +127,9 @@ public:
 	virtual void Deactivate(void);
 // events
     virtual void OnActivated(wxListEvent& event);
+//IGxCatalogEvents
+	virtual void OnObjectAdded(IGxObject* object);
+	virtual void OnObjectDeleted(IGxObject* object);
 //
 	virtual void SetFilters(LPOBJECTFILTERS pFiltersArray){m_pFiltersArray = pFiltersArray;};
 	virtual void SetCurrentFilter(size_t nFilterIndex);
@@ -138,7 +141,9 @@ public:
         m_pSelection->SetInitiator(NOTFIRESELID/*LISTCTRLID*/);
         return m_pSelection;
     }
+    virtual void SetExternalCatalog(IGxCatalog* pCatalog = NULL){m_pExternalCatalog = pCatalog;};
 protected:
+  	IGxCatalog* m_pExternalCatalog;
 	IConnectionPointContainer* m_pConnectionPointSelection;
 	long m_ConnectionPointSelectionCookie;
 	LPOBJECTFILTERS m_pFiltersArray;
@@ -237,9 +242,12 @@ protected:
 	virtual void OnInit();
     virtual void SerializeFramePos(bool bSave);
     virtual bool DoSaveObject(wxGISEnumSaveObjectResults Result);
+public:
+    virtual void SetExternalCatalog(IGxCatalog* pCatalog = NULL){m_pExternalCatalog = pCatalog;};
 protected:
  	COMMANDARRAY m_CommandArray;
   	wxGxCatalog* m_pCatalog;
+  	IGxCatalog* m_pExternalCatalog;
     wxGISAppConfig* m_pConfig;
     wxGxDialogContentView* m_pwxGxContentView;
     wxTreeViewComboPopup* m_PopupCtrl;

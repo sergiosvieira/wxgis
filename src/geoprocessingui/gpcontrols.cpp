@@ -237,6 +237,7 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
     if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
     {
         wxGxObjectDialog dlg(this, wxID_ANY, _("Select input object"));
+        dlg.SetExternalCatalog(m_pCatalog);
         dlg.SetAllowMultiSelect(false);
         dlg.SetAllFilters(false);
         dlg.SetOwnsFilter(false);
@@ -264,6 +265,7 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
     else
     {
         wxGxObjectDialog dlg(this, wxID_ANY, _("Select output object"));
+        dlg.SetExternalCatalog(m_pCatalog);
         //dlg.SetName(sName);???
         dlg.SetAllowMultiSelect(false);
         dlg.SetAllFilters(false);

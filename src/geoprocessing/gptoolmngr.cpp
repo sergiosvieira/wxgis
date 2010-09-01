@@ -73,6 +73,9 @@ void *wxGISGPTaskThread::Entry()
         }
         wxTimeSpan span = end - begin;
         m_pTrackCancel->PutMessage(wxString::Format(_("End Time: %s (Elapsed Time: %s)"), end.Format().c_str(), span.Format(_("%H hours %M min. %S sec.")).c_str()), -1, enumGISMessageInfo);
+
+        wxLogMessage(_("wxGISGPToolManager: The tool %s execution took %s (%s)"),m_pTool->GetName().c_str(), span.Format(_("%H hours %M min. %S sec.")).c_str(), bResult == true ? _("success") : _("error"));
+
         if(bResult)
             m_pTrackCancel->PutMessage(_("Done"), -1, enumGISMessageTitle);
         else

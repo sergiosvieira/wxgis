@@ -128,12 +128,12 @@ bool wxGISRasterDataset::Open(void)
 	wxCriticalSectionLocker locker(m_CritSect);
 
 
-    m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath), GA_ReadOnly );
+    m_poDataset = (GDALDataset *) GDALOpenShared( wgWX2MB(m_sPath), GA_ReadOnly );
     //bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
 	if( m_poDataset == NULL )
     {
         m_sPath.Replace(wxT("\\"), wxT("/"));
-        m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath), GA_ReadOnly );
+        m_poDataset = (GDALDataset *) GDALOpenShared( wgWX2MB(m_sPath), GA_ReadOnly );
     }
     
     //m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath), GA_ReadOnly );

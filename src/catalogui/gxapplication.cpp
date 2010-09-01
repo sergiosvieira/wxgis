@@ -389,8 +389,11 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
     while (!m_WindowArray.empty())
     {
         wxWindow* poWnd = m_WindowArray.back();
-        if(!poWnd->Destroy())
-            wxDELETE(poWnd);
+        if(poWnd)
+        {
+            if(!poWnd->Destroy())
+                wxDELETE(poWnd);
+        }
         m_WindowArray.pop_back();
     }
 

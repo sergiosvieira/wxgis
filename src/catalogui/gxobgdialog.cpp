@@ -22,6 +22,7 @@
 #include "wxgis/catalogui/gxobjdialog.h"
 #include "wxgis/catalogui/catalogcmd.h"
 #include "wxgis/catalogui/viewscmd.h"
+#include "wxgis/catalog/gxdiscconnection.h"
 
 #include <wx/valgen.h>
 
@@ -174,7 +175,7 @@ void wxTreeViewComboPopup::OnDblClick(wxTreeEvent& event)
     wxComboPopup::Dismiss();
 }
 
-void wxTreeViewComboPopup::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent, bool sort)
+void wxTreeViewComboPopup::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
 {
 	if(NULL == pGxObject)
 		return;
@@ -186,11 +187,30 @@ void wxTreeViewComboPopup::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParen
 	wxIcon icon;
 	if(pObjUI != NULL)
 		icon = pObjUI->GetSmallImage();
+
 	int pos(-1);
 	if(icon.IsOk())
-		pos = m_TreeImageList.Add(icon);
+    {
+        for(size_t i = 0; i < m_IconsArray.size(); i++)
+        {
+            if(m_IconsArray[i].oIcon.IsSameAs(icon))
+            {
+                pos = m_IconsArray[i].iImageIndex;
+                break;
+            }
+        }
+        if(pos == -1)
+        {
+            pos = m_TreeImageList.Add(icon);
+            ICONDATA myicondata = {icon, pos};
+            m_IconsArray.push_back(myicondata);
+        }
+    }
+	else
+		pos = 0;//m_ImageListSmall.Add(m_ImageListSmall.GetIcon(2));//0 col img, 1 - col img
 
 	wxGxTreeItemData* pData = new wxGxTreeItemData(pGxObject, pos, false);
+
     wxString sName = pGxObject->GetName();
     if(!m_pCatalog->GetShowExt())
     {
@@ -205,8 +225,7 @@ void wxTreeViewComboPopup::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParen
 	if(pContainer->AreChildrenViewable())
 		SetItemHasChildren(NewTreeItem);
 
-	if(sort)
-		SortChildren(hParent);
+//	SortChildren(hParent);
 	wxTreeCtrl::Refresh();
 }
 
@@ -220,7 +239,7 @@ wxSize wxTreeViewComboPopup::GetAdjustedSize(int minWidth, int prefHeight, int m
 // wxGxDialogContentView
 //////////////////////////////////////////////////////////////////////////////
 
-wxGxDialogContentView::wxGxDialogContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxGxContentView(parent, id, pos, size, style), m_pConnectionPointSelection(NULL), m_ConnectionPointSelectionCookie(-1), m_nFilterIndex(0), m_pFiltersArray(NULL)
+wxGxDialogContentView::wxGxDialogContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxGxContentView(parent, id, pos, size, style), m_pConnectionPointSelection(NULL), m_ConnectionPointSelectionCookie(-1), m_nFilterIndex(0), m_pFiltersArray(NULL), m_pExternalCatalog(NULL)
 {
 }
 
@@ -295,6 +314,48 @@ void wxGxDialogContentView::AddObject(IGxObject* pObject)
 	}
 }
 
+void wxGxDialogContentView::OnObjectAdded(IGxObject* object)
+{
+    wxGxContentView::OnObjectAdded(object);
+    if(m_pExternalCatalog)
+    {
+        wxGxDiscConnection* pDiscConnection = dynamic_cast<wxGxDiscConnection*>(object);
+        if(pDiscConnection)
+        {
+            m_pExternalCatalog->ConnectFolder(object->GetFullName(), false);
+            return;
+        }
+        IGxObject* pParent = object->GetParent();
+        if(pParent)
+        {
+            IGxObjectContainer* pObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pExternalCatalog);
+            IGxObject* pParentObject = pObjectContainer->SearchChild(pParent->GetFullName());
+            pParentObject->Refresh();
+        }
+    }
+}
+
+void wxGxDialogContentView::OnObjectDeleted(IGxObject* object)
+{
+    wxGxContentView::OnObjectDeleted(object);
+    if(m_pExternalCatalog)
+    {
+        wxGxDiscConnection* pDiscConnection = dynamic_cast<wxGxDiscConnection*>(object);
+        if(pDiscConnection)
+        {
+            m_pExternalCatalog->DisconnectFolder(object->GetFullName(), false);
+            return;
+        }
+        IGxObject* pParent = object->GetParent();
+        if(pParent)
+        {
+            IGxObjectContainer* pObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pExternalCatalog);
+            IGxObject* pParentObject = pObjectContainer->SearchChild(pParent->GetFullName());
+            pParentObject->Refresh();
+        }
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // wxGxObjectDialog
 //////////////////////////////////////////////////////////////////////////////
@@ -310,7 +371,7 @@ BEGIN_EVENT_TABLE(wxGxObjectDialog, wxDialog)
     EVT_UPDATE_UI(wxID_OK, wxGxObjectDialog::OnOKUI)
 END_EVENT_TABLE()
 
-wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pDropDownCommand(NULL), m_bAllowMultiSelect(false), m_bOverwritePrompt(false), m_nDefaultFilter(0), m_pConfig(NULL), m_pwxGxContentView(NULL), m_PopupCtrl(NULL), m_bAllFilters(true), m_bOwnFilter(true)
+wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pDropDownCommand(NULL), m_bAllowMultiSelect(false), m_bOverwritePrompt(false), m_nDefaultFilter(0), m_pConfig(NULL), m_pwxGxContentView(NULL), m_PopupCtrl(NULL), m_bAllFilters(true), m_bOwnFilter(true), m_pExternalCatalog(NULL)
 {
 	this->SetSizeHints( wxSize( 400,300 ), wxDefaultSize );
 
@@ -325,7 +386,7 @@ wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, wxWindowID id, const wxStr
 	m_staticText1->Wrap( -1 );
 	bHeaderSizer->Add( m_staticText1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
-	m_TreeCombo = new wxComboCtrl( this, wxID_ANY, _("Combo!"), wxDefaultPosition, wxDefaultSize, wxCB_READONLY);
+	m_TreeCombo = new wxComboCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxCB_READONLY);
 #ifdef __WXMSW__
     m_TreeCombo->UseAltPopupWindow(true);
 #else
@@ -593,6 +654,7 @@ void wxGxObjectDialog::OnInit()
 	if(!m_bAllowMultiSelect)
 		nStyle |= wxLC_SINGLE_SEL;
    	m_pwxGxContentView = new wxGxDialogContentView(this, LISTCTRLID, wxDefaultPosition, wxDefaultSize, nStyle);
+    m_pwxGxContentView->SetExternalCatalog(m_pExternalCatalog);
     wxXmlNode* pContentViewConf = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/views/contentsview")));
     if(!pContentViewConf)
         pContentViewConf = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame/views/contentsview")));
