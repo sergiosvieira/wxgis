@@ -95,7 +95,8 @@ void wxGxCatalog::Refresh(void)
 {
 	for(size_t i = 0; i < m_Children.size(); i++)
 		m_Children[i]->Refresh();
-    m_pCatalog->ObjectRefreshed(this);
+	if(m_pCatalog)
+		m_pCatalog->ObjectRefreshed(this);
 }
 
 void wxGxCatalog::EditProperties(wxWindow *parent)

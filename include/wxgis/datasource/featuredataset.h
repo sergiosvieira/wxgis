@@ -45,6 +45,7 @@ public:
     virtual wxString GetName(void);
 //wxGISFeatureDataset
 	virtual bool Open(int iLayer = 0);
+	virtual void Close(void);
 	virtual bool Delete(int iLayer = 0);
 	virtual OGRSpatialReference* GetSpatialReference(void);
 	virtual OGREnvelope* GetEnvelope(void);

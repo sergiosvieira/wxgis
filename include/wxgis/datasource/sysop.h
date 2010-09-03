@@ -23,5 +23,6 @@
 #include "wxgis/datasource/datasource.h"
 
 bool WXDLLIMPEXP_GIS_DS DeleteFile(wxString sPath);
+bool WXDLLIMPEXP_GIS_DS RenameFile(wxString sOldPath, wxString sNewPath);
 wxFontEncoding WXDLLIMPEXP_GIS_DS GetEncodingFromCpg(wxString sPath);
 wxString WXDLLIMPEXP_GIS_DS ClearExt(wxString sPath);
