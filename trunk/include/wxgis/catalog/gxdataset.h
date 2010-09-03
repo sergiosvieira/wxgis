@@ -39,6 +39,7 @@ public:
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 	virtual wxString GetCategory(void){return wxString(_("Table"));};
+	virtual void Detach(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
@@ -79,6 +80,7 @@ public:
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 	virtual wxString GetCategory(void);
+	virtual void Detach(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
@@ -120,6 +122,7 @@ public:
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 	virtual wxString GetCategory(void);
+	virtual void Detach(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);

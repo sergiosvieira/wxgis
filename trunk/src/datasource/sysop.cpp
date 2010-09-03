@@ -29,6 +29,14 @@ bool DeleteFile(wxString sPath)
     return true;
 }
 
+bool RenameFile(wxString sOldPath, wxString sNewPath)
+{
+    int result = VSIRename(wgWX2MB(sOldPath), wgWX2MB(sNewPath));
+    if (result == -1)
+        return false;
+    return true;
+}
+
 wxString ClearExt(wxString sPath)
 {
     wxString sResPath = sPath;

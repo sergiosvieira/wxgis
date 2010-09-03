@@ -562,7 +562,11 @@ void wxGxContentView::OnEndLabelEdit(wxListEvent& event)
 			event.Veto();
 			return;
 		}
-		pObjEdit->Rename(event.GetLabel());
+		if(!pObjEdit->Rename(event.GetLabel()))
+		{
+			event.Veto();
+			wxMessageBox(_("Rename error!"), _("Error"), wxICON_ERROR | wxOK );
+		}
 	}
 }
 

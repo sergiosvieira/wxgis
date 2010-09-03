@@ -155,6 +155,11 @@ wxGISFeatureDataset::wxGISFeatureDataset(wxString sPath, wxGISEnumVectorDatasetT
 
 wxGISFeatureDataset::~wxGISFeatureDataset(void)
 {
+	Close();
+}
+
+void wxGISFeatureDataset::Close(void)
+{
     DeleteQuadTree();
 
 	wxDELETE(m_psExtent);
@@ -166,11 +171,12 @@ wxGISFeatureDataset::~wxGISFeatureDataset(void)
             OGRFeature::DestroyFeature(m_IT->second);
     }
     m_bIsGeometryLoaded = false;
-
+	m_bIsOpened = false;
 	//if( m_poDS )
 	//	OGRDataSource::DestroyDataSource( m_poDS );
     if(m_poDS && m_poDS->Dereference() <= 0)
         OGRDataSource::DestroyDataSource( m_poDS );
+	m_poDS = NULL;
 }
 
 size_t wxGISFeatureDataset::GetSubsetsCount(void)

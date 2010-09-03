@@ -85,6 +85,13 @@ bool wxGxTableDataset::Delete(void)
     }
 }
 
+	
+void wxGxTableDataset::Detach(void)
+{
+	IGxObject::Detach();
+    wsDELETE(m_pwxGISDataset);
+}
+
 bool wxGxTableDataset::Rename(wxString NewName)
 {
 	m_sName = NewName; 
@@ -136,6 +143,14 @@ wxGxFeatureDataset::~wxGxFeatureDataset(void)
 wxString wxGxFeatureDataset::GetCategory(void)
 {
 	return wxString(_("Feature class"));
+}
+	
+void wxGxFeatureDataset::Detach(void)
+{
+	IGxObject::Detach();
+	wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(m_pwxGISDataset);
+	if(pDSet)
+		pDSet->Close();
 }
 
 wxIcon wxGxFeatureDataset::GetLargeImage(void)
@@ -353,6 +368,13 @@ wxString wxGxRasterDataset::GetCategory(void)
 	default:
 		return wxString(_("Raster"));
 	}
+}
+
+	
+void wxGxRasterDataset::Detach(void)
+{
+	IGxObject::Detach();
+    wsDELETE(m_pwxGISDataset);
 }
 
 wxGISDataset* wxGxRasterDataset::GetDataset(void)

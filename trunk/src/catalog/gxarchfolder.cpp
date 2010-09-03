@@ -119,6 +119,7 @@ void wxGxArchive::LoadChildren(void)
 
 bool wxGxArchive::Delete(void)
 {
+	EmptyChildren();
     if(DeleteFile(m_sPath))
 	{
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
@@ -129,17 +130,36 @@ bool wxGxArchive::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;
     }
 }
 
 bool wxGxArchive::Rename(wxString NewName)
 {
-	//rename ?
-	m_sName = NewName;
-	m_pCatalog->ObjectChanged(this);
-	return true;
+	NewName = ClearExt(NewName);
+	wxFileName PathName(m_sPath);
+	PathName.SetName(NewName);
+
+	wxString m_sNewPath = PathName.GetFullPath();
+
+	//TODO: Free child items to rename parent;
+	//Close and Open again?
+	EmptyChildren();
+    if(RenameFile(m_sPath, m_sNewPath))
+	{
+		m_sPath = m_sNewPath;
+		m_sName = NewName;
+		m_pCatalog->ObjectChanged(this);
+		Refresh();
+		return true;
+	}
+	else
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+		return false;
+    }	
 }
 
 void wxGxArchive::EditProperties(wxWindow *parent)
