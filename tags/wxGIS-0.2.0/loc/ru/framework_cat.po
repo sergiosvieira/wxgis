@@ -1,0 +1,250 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wxGIS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-09-06 23:45+0300\n"
+"PO-Revision-Date: 2010-09-06 23:45+0300\n"
+"Last-Translator: Bishop <polimax@mail.ru>\n"
+"Language-Team: gis-lab <sim@gis-lab.info>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-Basepath: c:\\temp\\wxgis\\src\\\n"
+"X-Poedit-Language: Russian\n"
+"X-Poedit-Country: RUSSIAN FEDERATION\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-SearchPath-0: D:\\work\\Projects\\wxGIS\\src\\framework\n"
+"X-Poedit-SearchPath-1: D:\\work\\Projects\\wxGIS\\include\\wxgis\\framework\n"
+
+#: D:\work\Projects\wxGIS\src\framework/addcommanddlg.cpp:69
+msgid "Command Name"
+msgstr "Имя команды"
+
+#: D:\work\Projects\wxGIS\src\framework/addcommanddlg.cpp:70
+msgid "Description"
+msgstr "Описание"
+
+#: D:\work\Projects\wxGIS\src\framework/addcommanddlg.cpp:71
+msgid "KeyCode"
+msgstr "Клавиша"
+
+#: D:\work\Projects\wxGIS\src\framework/addcommanddlg.cpp:78
+#: D:\work\Projects\wxGIS\src\framework/createcbdlg.cpp:90
+#: D:\work\Projects\wxGIS\src\framework/keycodedlg.cpp:127
+msgid "OK"
+msgstr "ОК"
+
+#: D:\work\Projects\wxGIS\src\framework/addcommanddlg.cpp:80
+#: D:\work\Projects\wxGIS\src\framework/createcbdlg.cpp:92
+#: D:\work\Projects\wxGIS\src\framework/progressdlg.cpp:61
+msgid "Cancel"
+msgstr "Отмена"
+
+#: D:\work\Projects\wxGIS\src\framework/application.cpp:694
+#, c-format
+msgid "wxGISApplication: Library %s loaded"
+msgstr "wxGISApplication: Библиотека %s загружена"
+
+#: D:\work\Projects\wxGIS\src\framework/application.cpp:698
+#, c-format
+msgid "wxGISApplication: Error loading library %s"
+msgstr "wxGISApplication: Ошибка загрузки библиотеки %s"
+
+#: D:\work\Projects\wxGIS\src\framework/application.cpp:709
+msgid "Ready"
+msgstr "Готов"
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:63
+msgid "E&xit"
+msgstr "В&ыход"
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:65
+msgid "&About..."
+msgstr "&О программе..."
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:67
+msgid "Customize..."
+msgstr "Настроить..."
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:69
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:159
+msgid "Separator"
+msgstr "Разделитель"
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:71
+msgid "StatusBar"
+msgstr "Статусная строка"
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:82
+msgid "File"
+msgstr "Файл"
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:84
+msgid "Help"
+msgstr "Помощь"
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:87
+msgid "View"
+msgstr "Вид"
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:90
+msgid "[No category]"
+msgstr "[Без категории]"
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:153
+msgid "Exit application"
+msgstr "Выход"
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:155
+msgid "About application"
+msgstr "О программе"
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:157
+msgid "Customize application"
+msgstr "Настроить программу"
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:161
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:210
+msgid "Show/hide statusbar"
+msgstr "Показать/скрыть статусную строку"
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:204
+msgid "Exit"
+msgstr "Выход"
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:206
+msgid "About"
+msgstr "О программе"
+
+#: D:\work\Projects\wxGIS\src\framework/command.cpp:208
+msgid "Customize"
+msgstr "Настроить"
+
+#: D:\work\Projects\wxGIS\src\framework/createcbdlg.cpp:35
+msgid "New CommandBar"
+msgstr "Новая панель инструментов"
+
+#: D:\work\Projects\wxGIS\src\framework/createcbdlg.cpp:47
+msgid "Name"
+msgstr "Имя"
+
+#: D:\work\Projects\wxGIS\src\framework/createcbdlg.cpp:54
+msgid "Caption"
+msgstr "Подпись"
+
+#: D:\work\Projects\wxGIS\src\framework/createcbdlg.cpp:61
+msgid "Type"
+msgstr "Тип"
+
+#: D:\work\Projects\wxGIS\src\framework/createcbdlg.cpp:65
+msgid "Menu"
+msgstr "Меню"
+
+#: D:\work\Projects\wxGIS\src\framework/createcbdlg.cpp:65
+msgid "Context menu"
+msgstr "Контекстное меню"
+
+#: D:\work\Projects\wxGIS\src\framework/createcbdlg.cpp:65
+msgid "ToolBar"
+msgstr "Панель инструментов"
+
+#: D:\work\Projects\wxGIS\src\framework/createcbdlg.cpp:71
+msgid "Left dockable"
+msgstr "Прилепить слева"
+
+#: D:\work\Projects\wxGIS\src\framework/createcbdlg.cpp:79
+msgid "Right dockable"
+msgstr "Прилепить справа"
+
+#: D:\work\Projects\wxGIS\src\framework/messagedlg.cpp:54
+msgid "Yes"
+msgstr "Да"
+
+#: D:\work\Projects\wxGIS\src\framework/messagedlg.cpp:57
+msgid "No"
+msgstr "Нет"
+
+#: D:\work\Projects\wxGIS\src\framework/messagedlg.cpp:62
+msgid "Use my choice and do not show this dialog in future."
+msgstr "Использовать выбор и больше не показывать этот диалог."
+
+#: D:\work\Projects\wxGIS\src\framework/statusbar.cpp:152
+#: D:\work\Projects\wxGIS\src\framework/statusbar.cpp:192
+msgid "%H:%M"
+msgstr "%H:%M"
+
+#: D:\work\Projects\wxGIS\src\framework/toolbarmenu.cpp:82
+#: D:\work\Projects\wxGIS\src\framework/toolbarmenu.cpp:102
+#: D:\work\Projects\wxGIS\src\framework/toolbarmenu.cpp:122
+msgid "Toolbars"
+msgstr "Панели инструментов"
+
+#: D:\work\Projects\wxGIS\src\framework/toolbarmenu.cpp:87
+msgid "[Menus]"
+msgstr "[Меню]"
+
+#: D:\work\Projects\wxGIS\src\framework/tooltip.cpp:77
+msgid "Close"
+msgstr "Закрыть"
+
+#: D:\work\Projects\wxGIS\include\wxgis\framework/addcommanddlg.h:71
+msgid "Add command"
+msgstr "Добавить команду"
+
+#: D:\work\Projects\wxGIS\include\wxgis\framework/commandbar.h:25
+msgid "Standard"
+msgstr "Стандартная"
+
+#: D:\work\Projects\wxGIS\include\wxgis\framework/commandbar.h:26
+msgid "Location"
+msgstr "Путь"
+
+#: D:\work\Projects\wxGIS\include\wxgis\framework/commandbar.h:27
+msgid "Geography"
+msgstr "География"
+
+#: D:\work\Projects\wxGIS\include\wxgis\framework/commandbar.h:37
+#: D:\work\Projects\wxGIS\include\wxgis\framework/commandbar.h:70
+#: D:\work\Projects\wxGIS\include\wxgis\framework/commandbar.h:95
+msgid "No Caption"
+msgstr "Без подписи"
+
+#: D:\work\Projects\wxGIS\include\wxgis\framework/createcbdlg.h:69
+msgid "Create toolbar or menu"
+msgstr "Создать панель или меню"
+
+#: D:\work\Projects\wxGIS\include\wxgis\framework/keycodedlg.h:72
+msgid "Enter key code"
+msgstr "Ввести клавишу"
+
+#: D:\work\Projects\wxGIS\include\wxgis\framework/menubar.h:25
+msgid "&File"
+msgstr "&Файл"
+
+#: D:\work\Projects\wxGIS\include\wxgis\framework/menubar.h:26
+msgid "&Edit"
+msgstr "&Правка"
+
+#: D:\work\Projects\wxGIS\include\wxgis\framework/menubar.h:27
+msgid "&Go"
+msgstr "П&ерейти"
+
+#: D:\work\Projects\wxGIS\include\wxgis\framework/menubar.h:28
+msgid "&View"
+msgstr "&Вид"
+
+#: D:\work\Projects\wxGIS\include\wxgis\framework/menubar.h:29
+msgid "&Help"
+msgstr "По&мощь"
+
+#: D:\work\Projects\wxGIS\include\wxgis\framework/menubar.h:30
+msgid "&Windows"
+msgstr "&Окно"
+
+#: D:\work\Projects\wxGIS\include\wxgis\framework/progressdlg.h:58
+msgid "Progress..."
+msgstr "Прогресс..."
+
+#~ msgid "Application.ToolbarsMenu"
+#~ msgstr "Application.ToolbarsMenu"
