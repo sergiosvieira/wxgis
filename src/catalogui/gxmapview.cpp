@@ -23,6 +23,7 @@
 #include "wxgis/carto/rasterlayer.h"
 #include "wxgis/framework/framework.h"
 #include "wxgis/framework/messagedlg.h"
+#include "wxgis/framework/application.h"
 
 #include "wx/msgdlg.h"
 
@@ -228,6 +229,9 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
 
     if(pOvrData->pProgressor)
         pOvrData->pProgressor->SetValue((int) (dfComplete*100));
+
+	if(wxGetActiveWindow() != dynamic_cast<wxWindow*>(GetApplication()))
+		return 1;
 
     if(wxGetKeyState(WXK_SHIFT) || wxGetKeyState(WXK_ALT) || wxGetKeyState(WXK_CONTROL))
         return 1;

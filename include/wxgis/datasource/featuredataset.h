@@ -47,6 +47,7 @@ public:
 	virtual bool Open(int iLayer = 0);
 	virtual void Close(void);
 	virtual bool Delete(int iLayer = 0);
+	virtual bool Rename(wxString sNewName);
 	virtual OGRSpatialReference* GetSpatialReference(void);
 	virtual OGREnvelope* GetEnvelope(void);
     virtual OGRwkbGeometryType GetGeometryType(void);

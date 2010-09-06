@@ -38,6 +38,8 @@ public:
 	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
     // wxGISRasterDataset
 	virtual bool Open(void);
+	virtual bool Rename(wxString sNewName);
+	virtual void Close(void);
 	virtual OGRSpatialReference* GetSpatialReference(void);
 	virtual const OGREnvelope* GetEnvelope(void);
 	virtual GDALDataset* GetRaster(void){return m_poDataset;};

@@ -318,6 +318,80 @@ bool wxGISFeatureDataset::Delete(int iLayer)
 	return false;
 }
 
+bool wxGISFeatureDataset::Rename(wxString sNewName)
+{
+	wxCriticalSectionLocker locker(m_CritSect);
+	Close();
+	sNewName = ClearExt(sNewName);
+    wxFileName FName( m_sPath );
+    wxString sExt = FName.GetExt();
+    sExt.Prepend(wxT("."));
+    FName.ClearExt();
+    wxString sOldPath = FName.GetFullPath();
+	FName.SetName(sNewName);
+    wxString sNewPath = FName.GetFullPath();
+
+    switch(m_nSubType)
+    {
+    case enumVecESRIShapefile:
+        if(!RenameFile(sOldPath + sExt, sNewPath + sExt))
+            return false;
+        RenameFile(sOldPath + wxT(".shx"), sNewPath + wxT(".shx"));
+        RenameFile(sOldPath + wxT(".dbf"), sNewPath + wxT(".dbf"));
+        RenameFile(sOldPath + wxT(".prj"), sNewPath + wxT(".prj"));
+        RenameFile(sOldPath + wxT(".qix"), sNewPath + wxT(".qix"));
+        RenameFile(sOldPath + wxT(".sbn"), sNewPath + wxT(".sbn"));
+        RenameFile(sOldPath + wxT(".sbx"), sNewPath + wxT(".sbx"));
+        RenameFile(sOldPath + wxT(".cpg"), sNewPath + wxT(".cpg"));
+        RenameFile(sOldPath + sExt + wxT(".xml"), sNewPath + sExt + wxT(".xml"));
+		m_sPath = sNewPath + sExt;
+        return true;
+    case enumVecMapinfoTab:
+        if(!RenameFile(sOldPath + sExt, sNewPath + sExt))
+            return false;
+        RenameFile(sOldPath + wxT(".dat"), sNewPath + wxT(".dat"));
+        RenameFile(sOldPath + wxT(".id"), sNewPath + wxT(".id"));
+        RenameFile(sOldPath + wxT(".ind"), sNewPath + wxT(".ind"));
+        RenameFile(sOldPath + wxT(".map"), sNewPath + wxT(".map"));
+        RenameFile(sOldPath + wxT(".cpg"), sNewPath + wxT(".cpg"));
+        RenameFile(sOldPath + sExt + wxT(".metadata.xml"), sNewPath + sExt + wxT(".metadata.xml"));
+        RenameFile(sOldPath + sExt + wxT(".xml"), sNewPath + sExt + wxT(".xml"));
+		m_sPath = sNewPath + sExt;
+        return true;
+    case enumVecMapinfoMif:
+        if(!RenameFile(sOldPath + sExt, sNewPath + sExt))
+            return false;
+        RenameFile(sOldPath + wxT(".mid"), sNewPath + wxT(".mid"));
+        RenameFile(sOldPath + sExt + wxT(".metadata.xml"), sNewPath + sExt + wxT(".metadata.xml"));
+        RenameFile(sOldPath + sExt + wxT(".xml"), sNewPath + sExt + wxT(".xml"));
+ 		m_sPath = sNewPath + sExt;
+        return true;
+    case enumVecKML:
+        if(enumGISContainer)
+		{
+	        if(!RenameFile(sOldPath + sExt, sNewPath + sExt))
+                return false;
+		}
+        else
+            return false;
+		m_sPath = sNewPath + sExt;
+        return true;
+    case enumVecDXF:
+        if(!RenameFile(sOldPath + sExt, sNewPath + sExt))
+            return false;
+ 		m_sPath = sNewPath + sExt;
+        return true;
+    case enumVecUnknown:
+        if(!RenameFile(sOldPath + sExt, sNewPath + sExt))
+            return false;
+        RenameFile(sOldPath + wxT(".cpg"), sNewPath + wxT(".cpg"));
+		m_sPath = sNewPath + sExt;
+        return true;
+    default: return false;
+    }
+	return false;
+}
+
 bool wxGISFeatureDataset::Open(int iLayer)
 {
 	if(m_bIsOpened)
