@@ -76,17 +76,32 @@ bool wxGxPrjFile::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;
     }
 }
 
 bool wxGxPrjFile::Rename(wxString NewName)
 {
-	//rename ?
-	m_sName = NewName;
-	m_pCatalog->ObjectChanged(this);
-	return true;
+	NewName = ClearExt(NewName);
+	wxFileName PathName(m_sPath);
+	PathName.SetName(NewName);
+
+	wxString m_sNewPath = PathName.GetFullPath();
+
+    if(RenameFile(m_sPath, m_sNewPath))
+	{
+		m_sPath = m_sNewPath;
+		m_sName = NewName;
+		m_pCatalog->ObjectChanged(this);
+		return true;
+	}
+	else
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+		return false;
+    }	
 }
 
 void wxGxPrjFile::EditProperties(wxWindow *parent)
@@ -148,7 +163,7 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 	else
 	{
 		const char* err = CPLGetLastErrorMsg();
-		wxString sErr = wxString::Format(_("wxGxPrjFile: OGR error #%d: %s"), err, wgMB2WX(err));
+		wxString sErr = wxString::Format(_("wxGxPrjFile: GDAL error #%d: %s"), err, wgMB2WX(err));
 		wxLogError(sErr);
 	}
 	return NULL;
@@ -191,17 +206,32 @@ bool wxGxTextFile::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;
     }
 }
 
 bool wxGxTextFile::Rename(wxString NewName)
 {
-	//rename ?
-	m_sName = NewName;
-	m_pCatalog->ObjectChanged(this);
-	return true;
+	NewName = ClearExt(NewName);
+	wxFileName PathName(m_sPath);
+	PathName.SetName(NewName);
+
+	wxString m_sNewPath = PathName.GetFullPath();
+
+    if(RenameFile(m_sPath, m_sNewPath))
+	{
+		m_sPath = m_sNewPath;
+		m_sName = NewName;
+		m_pCatalog->ObjectChanged(this);
+		return true;
+	}
+	else
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+		return false;
+    }	
 }
 
 void wxGxTextFile::EditProperties(wxWindow *parent)

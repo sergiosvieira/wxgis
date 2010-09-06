@@ -44,6 +44,7 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 	wxGISRasterDataset* pRaster = dynamic_cast<wxGISRasterDataset*>(pRasterDataset);
 	if(!pRaster)
 		return;
+    pRaster->Open();
 	IDisplayTransformation* pDisplayTransformation = pDisplay->GetDisplayTransformation();
     if(!pDisplayTransformation)
         return;
@@ -231,7 +232,7 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 		        if(err != CE_None)
 		        {
                     const char* pszerr = CPLGetLastErrorMsg();
-                    wxLogError(_("AdviseRead failed! OGR error: %s"), wgMB2WX(pszerr));
+                    wxLogError(_("AdviseRead failed! GDAL error: %s"), wgMB2WX(pszerr));
 
 			        wxDELETEA(data);
 			        return;
@@ -241,7 +242,7 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 		        if(err != CE_None)
 		        {
                     const char* pszerr = CPLGetLastErrorMsg();
-                    wxLogError(_("RasterIO failed! OGR error: %s"), wgMB2WX(pszerr));
+                    wxLogError(_("RasterIO failed! GDAL error: %s"), wgMB2WX(pszerr));
 
 			        wxDELETEA(data);
 			        return;
@@ -315,7 +316,7 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 		        if(err != CE_None)
 		        {
                     const char* pszerr = CPLGetLastErrorMsg();
-                    wxLogError(_("AdviseRead failed! OGR error: %s"), wgMB2WX(pszerr));
+                    wxLogError(_("AdviseRead failed! GDAL error: %s"), wgMB2WX(pszerr));
 				    wxDELETEA(data);
 				    return;
 		        }
@@ -325,7 +326,7 @@ void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPha
 			    if(err != CE_None)
 			    {
                     const char* pszerr = CPLGetLastErrorMsg();
-                    wxLogError(_("RasterIO failed! OGR error: %s"), wgMB2WX(pszerr));
+                    wxLogError(_("RasterIO failed! GDAL error: %s"), wgMB2WX(pszerr));
 				    wxDELETEA(data);
 				    return;
 			    }

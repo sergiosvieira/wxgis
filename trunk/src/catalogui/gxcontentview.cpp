@@ -38,6 +38,7 @@ BEGIN_EVENT_TABLE(wxGxContentView, wxListCtrl)
 
     EVT_LIST_COL_CLICK(LISTCTRLID, wxGxContentView::OnColClick)
     EVT_CONTEXT_MENU(wxGxContentView::OnContextMenu)
+    EVT_CHAR(wxGxContentView::OnChar)
 END_EVENT_TABLE()
 
 int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
@@ -96,7 +97,7 @@ int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
 }
 
 wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
-wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(REPORT), m_pConnectionPointCatalog(NULL), /*m_pConnectionPointSelection(NULL),*/ m_ConnectionPointCatalogCookie(-1)/*, m_ConnectionPointSelectionCookie(-1)*/, m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL), m_bDragging(false)
+wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(REPORT), m_pConnectionPointCatalog(NULL), /*m_pConnectionPointSelection(NULL),*/ m_ConnectionPointCatalogCookie(-1)/*, m_ConnectionPointSelectionCookie(-1)*/, m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL), m_bDragging(false), m_pDeleteCmd(NULL)
 {
 	InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150);
 	InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
@@ -123,6 +124,12 @@ bool wxGxContentView::Activate(IGxApplication* application, wxXmlNode* pConf)
 	Serialize(m_pXmlConf, false);
 
     m_pCatalog = application->GetCatalog();
+
+    IApplication* pApp = dynamic_cast<IApplication*>(application);
+    if(pApp)
+    {
+        m_pDeleteCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
+    }
 
 	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pCatalog );
 	if(m_pConnectionPointCatalog != NULL)
@@ -746,4 +753,24 @@ void wxGxContentView::SelectAll(void)
 {
 	for(long item = 0; item < GetItemCount(); item++)
         SetItemState(item, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+}
+
+void wxGxContentView::OnChar(wxKeyEvent& event)
+{
+	if(event.GetModifiers() & wxMOD_ALT)
+		return;
+	if(event.GetModifiers() & wxMOD_CONTROL)
+		return;
+	if(event.GetModifiers() & wxMOD_SHIFT)
+		return;
+    switch(event.GetKeyCode())
+    {
+    case WXK_DELETE:
+    case WXK_NUMPAD_DELETE:
+        if(m_pDeleteCmd)
+            m_pDeleteCmd->OnClick();
+        break;
+    default:
+        break;
+    }
 }

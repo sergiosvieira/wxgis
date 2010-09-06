@@ -117,6 +117,13 @@ void wxGISAcceleratorTable::Remove(wxAcceleratorEntry entry)
 	}
 }
 
+wxAcceleratorEntry wxGISAcceleratorTable::GetEntry(int cmd)
+{
+	for(size_t i = 0; i < m_AccelEntryArray.size(); i++)
+		if(m_AccelEntryArray[i].GetCommand() == cmd)
+            return m_AccelEntryArray[i];
+}
+
 wxAcceleratorTable wxGISAcceleratorTable::GetAcceleratorTable(void)
 {
 	if(bHasChanges)

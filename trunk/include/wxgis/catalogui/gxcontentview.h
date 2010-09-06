@@ -76,6 +76,7 @@ public:
 	virtual void OnSelected(wxListEvent& event);
 	virtual void OnDeselected(wxListEvent& event);
     virtual void OnBeginDrag(wxListEvent& event);
+    virtual void OnChar(wxKeyEvent& event);
 
 	typedef struct _itemdata
 	{
@@ -98,6 +99,7 @@ protected:
 	long m_ConnectionPointCatalogCookie;
 	IGxSelection* m_pSelection;
     IGxCatalog* m_pCatalog;
+    ICommand* m_pDeleteCmd;
 	IGxObject* m_pParentGxObject;
 	bool m_bDragging;
     std::vector<ICONDATA> m_IconsArray;

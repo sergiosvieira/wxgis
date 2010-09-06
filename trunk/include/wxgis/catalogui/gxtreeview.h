@@ -85,6 +85,7 @@ public:
 //events
 	virtual void OnItemExpanding(wxTreeEvent& event);
 	virtual void OnItemRightClick(wxTreeEvent& event);
+    virtual void OnChar(wxKeyEvent& event);
 
 	typedef std::map<IGxObject*, wxTreeItemId> WETREEMAP;
 	typedef struct _icondata
@@ -100,6 +101,7 @@ protected:
 	long m_ConnectionPointCatalogCookie, m_ConnectionPointSelectionCookie;
 	IGxSelection* m_pSelection;
     IGxCatalog* m_pCatalog;
+    ICommand* m_pDeleteCmd;
     std::vector<ICONDATA> m_IconsArray;
 
     DECLARE_EVENT_TABLE()

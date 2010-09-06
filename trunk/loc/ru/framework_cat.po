@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-18 00:58+0300\n"
-"PO-Revision-Date: 2010-08-18 00:58+0300\n"
+"POT-Creation-Date: 2010-09-06 23:45+0300\n"
+"PO-Revision-Date: 2010-09-06 23:45+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -41,17 +41,17 @@ msgstr "ОК"
 msgid "Cancel"
 msgstr "Отмена"
 
-#: D:\work\Projects\wxGIS\src\framework/application.cpp:692
+#: D:\work\Projects\wxGIS\src\framework/application.cpp:694
 #, c-format
 msgid "wxGISApplication: Library %s loaded"
 msgstr "wxGISApplication: Библиотека %s загружена"
 
-#: D:\work\Projects\wxGIS\src\framework/application.cpp:696
+#: D:\work\Projects\wxGIS\src\framework/application.cpp:698
 #, c-format
 msgid "wxGISApplication: Error loading library %s"
 msgstr "wxGISApplication: Ошибка загрузки библиотеки %s"
 
-#: D:\work\Projects\wxGIS\src\framework/application.cpp:707
+#: D:\work\Projects\wxGIS\src\framework/application.cpp:709
 msgid "Ready"
 msgstr "Готов"
 

@@ -48,6 +48,7 @@ protected:
     //wxGISGeoprocessingCmd
     bool OnExport(wxGISFeatureDataset* pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType);
     bool OnExport(wxGISFeatureDataset* pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel);
+    wxString CheckUniqName(wxString sPath, wxString sName, wxString sExt, int nCounter = 0);
 private:
 	IApplication* m_pApp;
     wxString m_sLastError;

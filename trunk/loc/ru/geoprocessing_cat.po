@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-18 00:58+0300\n"
-"PO-Revision-Date: 2010-08-18 00:58+0300\n"
+"POT-Creation-Date: 2010-09-06 23:48+0300\n"
+"PO-Revision-Date: 2010-09-06 23:48+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -38,17 +38,17 @@ msgid "Cannot export to the same format"
 msgstr "Невозможно экспортировать в тот же формат"
 
 #: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:153
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:221
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:209
 msgid "Unexpected error occurred"
 msgstr "Неожиданная ошибка"
 
 #: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:162
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:230
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:218
 msgid "Error getting catalog object"
 msgstr "Ошибка получения объекта каталога"
 
 #: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:172
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:240
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:228
 msgid "Error getting source object"
 msgstr "Ошибка получения исходного объекта"
 
@@ -65,7 +65,7 @@ msgid "Error reading dataset definition"
 msgstr "Ошибка чтения определения набора данных"
 
 #: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:212
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:271
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:259
 msgid "Error getting selected destination filter"
 msgstr "Ошибка получения выбранного фильтра"
 
@@ -110,81 +110,83 @@ msgstr "Экспорт %s в %s"
 msgid "Error copying data to new dataset"
 msgstr "Ошибка копирования данных в новый набор"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:46
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:47
 msgid "Create Ortho-Corrected Raster"
 msgstr "Создать ортокорректированный растр"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:56
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:57
 msgid "Data Management Tools/Raster"
 msgstr "Управление данными/Растр"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:66
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:67
 msgid "Source raster"
 msgstr "Исходный растр"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:80
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:81
 msgid "Destination raster"
 msgstr "Выходной растр"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:100
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:101
 msgid "DEM raster"
 msgstr "Растр ЦМР"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:114
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:115
 msgid "Constant elevation value or base value to the DEM"
 msgstr "Постоянная высота или базовое значение относительно ЦМР"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:125
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:126
 msgid "Scaling factor to convert elevation values"
 msgstr "Параметр масштабирования для пересчета высот"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:136
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:137
 msgid "Elevation values interpolation"
 msgstr "Интерполяция значений высот"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:142
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:146
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:143
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:147
 msgid "Bilinear"
 msgstr "Билинейная"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:143
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:305
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:144
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:293
 msgid "Cubic"
 msgstr "Кубическая"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:248
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:236
 msgid "Source object is of incompatible type"
 msgstr "Исходный объект несовместимого типа"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:256
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:244
 msgid "Source dataset is of incompatible type"
 msgstr "Исходный набор данных несовместимого типа"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:286
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:274
 msgid "Error getting raster"
 msgstr "Ошибка получения растра"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:298
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:286
 msgid "The raster has no bands"
 msgstr "Растр без каналов"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:346
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:336
 #, c-format
-msgid "Error CreateGenImgProjTransformer. OGR Error: %s"
-msgstr "Ошибка CreateGenImgProjTransformer. Ошибка OGR: %s"
+msgid "Error CreateGenImgProjTransformer. GDAL Error: %s"
+msgstr "Ошибка CreateGenImgProjTransformer. Ошибка GDAL: %s"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:358
-msgid "Error determining output raster size"
-msgstr "Ошибка определение размера выходого растра"
-
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:371
-msgid "Error creating output raster"
-msgstr "Ошибка создания выходного растра"
-
-#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:422
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:349
 #, c-format
-msgid "OrthoCorrect failed! OGR error: %s"
-msgstr "Ошибка OrthoCorrect! Ошибка OGR: %s"
+msgid "Error determining output raster size. GDAL Error: %s"
+msgstr "Ошибка определение размера выходого растра. Ошибка GDAL: %s"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:363
+#, c-format
+msgid "Error creating output raster. GDAL Error: %s"
+msgstr "Ошибка создания выходного растра. Ошибка GDAL: %s"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:426
+#, c-format
+msgid "OrthoCorrect failed! GDAL error: %s"
+msgstr "Ошибка OrthoCorrect! Ошибка GDAL: %s"
 
 #: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:43
 #, c-format
@@ -216,35 +218,49 @@ msgid "End Time: %s (Elapsed Time: %s)"
 msgstr "Окончание: %s (Заняло: %s)"
 
 #: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:75
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:77
 msgid "%H hours %M min. %S sec."
 msgstr "%H час. %M мин. %S сек."
 
 #: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:77
+#, c-format
+msgid "wxGISGPToolManager: The tool %s execution took %s (%s)"
+msgstr "wxGISGPToolManager: Выполнение задачи %s заняло %s (%s)"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:77
+msgid "success"
+msgstr "успешно"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:77
+msgid "error"
+msgstr "ошибка"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:80
 msgid "Done"
 msgstr "Завершено"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:79
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:82
 msgid "Error!"
 msgstr "Ошибка!"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:176
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:179
 #, c-format
 msgid "wxGISGPToolManager: Cannot create task (%s) thread"
 msgstr "wxGISGPToolManager: Невозможно создать поток задачи (%s)"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:178
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:181
 #, c-format
 msgid "Cannot create task (%s) thread"
 msgstr "Невозможно создать поток задачи (%s)"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:187
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:225
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:190
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:228
 #, c-format
 msgid "wxGISGPToolManager: Cannot run task (%s) thread"
 msgstr "wxGISGPToolManager: Невозможно запустить поток задачи (%s)"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:189
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:227
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:192
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:230
 #, c-format
 msgid "Cannot run task (%s) thread"
 msgstr "Невозможно запустить поток задачи (%s)"

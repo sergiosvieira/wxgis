@@ -69,5 +69,8 @@ public:
 	virtual wxString NewMenu(void){return wxString(wxT("wxGxArchiveFolder.NewMenu"));};
 	//wxGxFolder
 	virtual void LoadChildren(void);
+	//IGxObjectEdit unsupported yet
+	virtual bool CanDelete(void){return false;};
+	virtual bool CanRename(void){return false;};
 };
 

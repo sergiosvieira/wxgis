@@ -198,7 +198,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
     if(!m_pwxGISFeatureDataset->Open())
     {
 		const char* err = CPLGetLastErrorMsg();
-		wxString sErr = wxString::Format(_("wxGISFeatureLayer: Open failed! OGR error: %s"), wgMB2WX(err));
+		wxString sErr = wxString::Format(_("wxGISFeatureLayer: Open failed! GDAL error: %s"), wgMB2WX(err));
 		wxLogError(sErr);
 		wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
         return;

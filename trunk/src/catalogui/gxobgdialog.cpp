@@ -704,18 +704,32 @@ void wxGxObjectDialog::OnItemSelected(wxListEvent& event)
     //if(m_bIsSaveDlg)
     //    return;
 
-    m_sName.Empty();
+    wxGxDialogContentView::LPITEMDATA pItemData = (wxGxDialogContentView::LPITEMDATA)event.GetData();
+	if(pItemData == NULL)
+		return;
+
+	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pItemData->pObject);
+    if(!pGxDataset)
+    {
+    	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pItemData->pObject);
+        if(pGxObjectContainer)
+            return;
+    }
+
+    wxString sTempName;
 	long item = -1;
 	while(1)
     {
         item = m_pwxGxContentView->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
         if ( item == -1 )
             break;
-		if(m_sName.IsEmpty())
-			m_sName += m_pwxGxContentView->GetItemText(item);
+		if(sTempName.IsEmpty())
+			sTempName += m_pwxGxContentView->GetItemText(item);
 		else
-			m_sName += wxT("; ") + m_pwxGxContentView->GetItemText(item);
+			sTempName += wxT("; ") + m_pwxGxContentView->GetItemText(item);
     }
+	if(!sTempName.IsEmpty())
+        m_sName = sTempName;
 	TransferDataToWindow();
 }
 

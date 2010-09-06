@@ -165,7 +165,7 @@ void wxGISFeatureDataset::Close(void)
 	wxDELETE(m_psExtent);
     wsDELETE(m_pGeometrySet);
 
-    if(!m_FeaturesMap.empty())
+    if(m_poDS && !m_FeaturesMap.empty())
     {
         for(m_IT = m_FeaturesMap.begin(); m_IT != m_FeaturesMap.end(); ++m_IT)
             OGRFeature::DestroyFeature(m_IT->second);
@@ -313,6 +313,10 @@ bool wxGISFeatureDataset::Delete(int iLayer)
             return false;
         return true;
     case enumVecUnknown:
+        if(!DeleteFile(m_sPath))
+            return false;
+        DeleteFile(sPath + wxT(".cpg"));
+        return true;
     default: return false;
     }
 	return false;

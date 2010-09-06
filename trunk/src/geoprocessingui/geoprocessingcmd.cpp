@@ -198,6 +198,8 @@ void wxGISGeoprocessingCmd::OnClick(void)
                         IGxObjectContainer* pObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxDSet);
                         if(pObjectContainer)
                         {
+                            if(!pObjectContainer->HasChildren())
+                                continue;
                             GxObjectArray* pArr = pObjectContainer->GetChildren();
                             if(pArr != NULL)
                             {
@@ -550,6 +552,7 @@ EXIT:
                                         pNewDef->SetGeomType( wkbPoint );
                                         ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
                                         //check overwrite for sNewName
+                                        sNewName = CheckUniqName(sPath, sNewName, sExt);
                                         if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType, &TrackCancel))
                                         {
                                             wxLogError(m_sLastError);
@@ -568,6 +571,7 @@ EXIT:
                                         pNewDef->SetGeomType( wkbPolygon );
                                         ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
                                         //check overwrite for sNewName
+                                        sNewName = CheckUniqName(sPath, sNewName, sExt);
                                         if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
                                         {
                                             wxLogError(m_sLastError);
@@ -586,6 +590,7 @@ EXIT:
                                         pNewDef->SetGeomType( wkbLineString );
                                         ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
                                         //check overwrite for sNewName
+                                        sNewName = CheckUniqName(sPath, sNewName, sExt);
                                         if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
                                         {
                                             wxLogError(m_sLastError);
@@ -604,6 +609,7 @@ EXIT:
                                         pNewDef->SetGeomType( wkbMultiPoint );
                                         ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
                                         //check overwrite for sNewName
+                                        sNewName = CheckUniqName(sPath, sNewName, sExt);
                                         if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
                                         {
                                             wxLogError(m_sLastError);
@@ -622,6 +628,7 @@ EXIT:
                                         pNewDef->SetGeomType( wkbMultiLineString );
                                         ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
                                         //check overwrite for sNewName
+                                        sNewName = CheckUniqName(sPath, sNewName, sExt);
                                         if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
                                         {
                                             wxLogError(m_sLastError);
@@ -640,6 +647,7 @@ EXIT:
                                         pNewDef->SetGeomType( wkbMultiPolygon );
                                         ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
                                         //check overwrite for sNewName
+                                        sNewName = CheckUniqName(sPath, sNewName, sExt);
                                         if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
                                         {
                                             wxLogError(m_sLastError);
@@ -651,6 +659,7 @@ EXIT:
                             else
                             {
                                 ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sName + wxT(".") + sExt).c_str()));
+                                sName = CheckUniqName(sPath, sName, sExt);
                                 if(!OnExport(pDSet, sPath, sName, sExt, sDriver, pDef->Clone(), pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType, &TrackCancel))
                                 {
                                     ProgressDlg.SetText1(m_sLastError);
@@ -788,4 +797,14 @@ bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath,
     wsDELETE(pNewDSet);
 
     return true;
+}
+
+wxString wxGISGeoprocessingCmd::CheckUniqName(wxString sPath, wxString sName, wxString sExt, int nCounter)
+{
+    wxString sResultName = sName + (nCounter > 0 ? wxString::Format(wxT("_%d"), nCounter) : wxEmptyString);
+    wxString sBaseName = sPath + wxFileName::GetPathSeparator() + sResultName + wxT(".") + sExt;
+    if(wxFileName::FileExists(sBaseName))
+        return CheckUniqName(sPath, sName, sExt, nCounter + 1);
+    else
+        return sResultName;
 }

@@ -80,7 +80,7 @@ protected:
 	virtual void OnRightDown(wxMouseEvent& event);
 	virtual void OnAuiRightDown(wxAuiToolBarEvent& event);
 	virtual void OnToolDropDown(wxAuiToolBarEvent& event);
-	virtual void OnClose(wxCloseEvent& event);
+	virtual void OnClose(wxCloseEvent & event);
 //
 protected:
 	IGISConfig* m_pConfig;
@@ -91,6 +91,7 @@ protected:
 	ITool* m_CurrentTool;
     IDropDownCommand* m_pDropDownCommand;
     LIBRARYARRAY m_LibArr;
+	ITrackCancel* m_pTrackCancel;
 
     DECLARE_EVENT_TABLE()
 };

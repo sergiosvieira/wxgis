@@ -230,9 +230,6 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
     if(pOvrData->pProgressor)
         pOvrData->pProgressor->SetValue((int) (dfComplete*100));
 
-	if(wxGetActiveWindow() != dynamic_cast<wxWindow*>(GetApplication()))
-		return 1;
-
     if(wxGetKeyState(WXK_SHIFT) || wxGetKeyState(WXK_ALT) || wxGetKeyState(WXK_CONTROL))
         return 1;
 
@@ -342,7 +339,7 @@ void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileNam
 		    if(eErr != CE_None)
 		    {
                 const char* pszErr = CPLGetLastErrorMsg();
-                wxLogError(_("BuildOverviews failed! OGR error: %s"), wgMB2WX(pszErr));
+                wxLogError(_("BuildOverviews failed! GDAL error: %s"), wgMB2WX(pszErr));
                 wxMessageBox(_("Build Overviews failed!"), _("Error"), wxICON_ERROR | wxOK );
 		    }
             else

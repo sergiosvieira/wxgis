@@ -151,6 +151,7 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
         RenameFile(sOldPath + wxT(".rpb"), sNewPath + wxT(".rpb"));
         RenameFile(sOldPath + wxT(".rpc"), sNewPath + wxT(".rpc"));
         RenameFile(sOldPath + wxT("_rpc.txt"), sNewPath + wxT("_rpc.txt"));
+        m_sPath = sNewPath + sExt;
         return true;
     case enumRasterUnknown:
     default: return false;
@@ -179,7 +180,7 @@ bool wxGISRasterDataset::Open(void)
     {
         //if ( CPLGetLastErrorNo() != CPLE_OpenFailed )
 		const char* err = CPLGetLastErrorMsg();
-		wxString sErr = wxString::Format(_("wxGISRasterDataset: Open failed! Path '%s'. OGR error: %s"), m_sPath.c_str(), wgMB2WX(err));
+		wxString sErr = wxString::Format(_("wxGISRasterDataset: Open failed! Path '%s'. GDAL error: %s"), m_sPath.c_str(), wgMB2WX(err));
 		wxLogError(sErr);
 
 		return false;
