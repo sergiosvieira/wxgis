@@ -34,15 +34,26 @@ wxGISRasterDataset::~wxGISRasterDataset(void)
 {
 	OSRDestroySpatialReference( m_pSpaRef );
 	wxDELETE(m_psExtent);
+	Close();
+}
 
+void wxGISRasterDataset::Close(void)
+{
 	if(m_bIsOpened)
     {
         if(m_poMainDataset)
+		{
             GDALDereferenceDataset(m_poMainDataset);
+			m_poMainDataset = NULL;
             //if(GDALDereferenceDataset(m_poMainDataset) < 1)
             //    GDALClose(m_poMainDataset);
+		}
         if(m_poDataset)
+		{
             GDALClose(m_poDataset);
+			m_poDataset = NULL;
+		}
+		m_bIsOpened = false;
     }
 }
 
@@ -51,25 +62,9 @@ bool wxGISRasterDataset::Delete(void)
 	wxCriticalSectionLocker locker(m_CritSect);
     //GDALDriver* pDrv = NULL;
     //close everything
-	if(m_bIsOpened)
-    {
-        if(m_poMainDataset)
-        {
-            //pDrv = m_poMainDataset->GetDriver();
-            GDALDereferenceDataset(m_poMainDataset);
-            m_poMainDataset = NULL;
-        }
-            //if(GDALDereferenceDataset(m_poMainDataset) < 1)
-            //    GDALClose(m_poMainDataset);
-        if(m_poDataset)
-        {
-            //if(!pDrv)
-            //    pDrv = m_poDataset->GetDriver();
-            GDALClose(m_poDataset);
-            m_poDataset = NULL;
-        }
-    }
-   // else
+
+	Close();
+	// else
    // {
    //    m_poDataset = (GDALDataset *) GDALOpen( (const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/, GA_ReadOnly );
    //    if( m_poDataset == NULL )
@@ -113,6 +108,49 @@ bool wxGISRasterDataset::Delete(void)
         DeleteFile(sPath + wxT(".rpb"));
         DeleteFile(sPath + wxT(".rpc"));
         DeleteFile(sPath + wxT("_rpc.txt"));
+        return true;
+    case enumRasterUnknown:
+    default: return false;
+    }
+	return false;    
+}
+
+bool wxGISRasterDataset::Rename(wxString sNewName)
+{
+	wxCriticalSectionLocker locker(m_CritSect);
+	Close();
+	sNewName = ClearExt(sNewName);
+    wxFileName FName( m_sPath );
+    wxString sExt = FName.GetExt();
+    sExt.Prepend(wxT("."));
+    FName.ClearExt();
+    wxString sOldPath = FName.GetFullPath();
+	FName.SetName(sNewName);
+    wxString sNewPath = FName.GetFullPath();
+
+    switch(m_nSubType)
+    {
+    case enumRasterBmp:
+	case enumRasterTiff:
+	case enumRasterImg:
+	case enumRasterJpeg:
+	case enumRasterPng:
+        if(!RenameFile(sOldPath + sExt, sNewPath + sExt))
+            return false;
+        RenameFile(sOldPath + sExt + wxT("w"), sNewPath + sExt + wxT("w"));
+        RenameFile(sOldPath + sExt + wxT(".xml"), sNewPath + sExt + wxT(".xml"));
+        RenameFile(sOldPath + wxT(".lgo"), sNewPath + wxT(".lgo"));
+        RenameFile(sOldPath + wxT(".aux"), sNewPath + wxT(".aux"));
+        RenameFile(sOldPath + sExt + wxT(".aux"), sNewPath + sExt + wxT(".aux"));
+        RenameFile(sOldPath + sExt + wxT(".aux.xml"), sNewPath + sExt + wxT(".aux.xml"));
+        RenameFile(sOldPath + wxT(".ovr"), sNewPath + wxT(".ovr"));
+        RenameFile(sOldPath + sExt + wxT(".ovr"), sNewPath + sExt + wxT(".ovr"));
+        RenameFile(sOldPath + sExt + wxT(".ovr.aux.xml"), sNewPath + sExt + wxT(".ovr.aux.xml"));
+        RenameFile(sOldPath + wxT(".xml"), sNewPath + wxT(".xml"));
+        RenameFile(sOldPath + wxT(".rrd"), sNewPath + wxT(".rrd"));
+        RenameFile(sOldPath + wxT(".rpb"), sNewPath + wxT(".rpb"));
+        RenameFile(sOldPath + wxT(".rpc"), sNewPath + wxT(".rpc"));
+        RenameFile(sOldPath + wxT("_rpc.txt"), sNewPath + wxT("_rpc.txt"));
         return true;
     case enumRasterUnknown:
     default: return false;

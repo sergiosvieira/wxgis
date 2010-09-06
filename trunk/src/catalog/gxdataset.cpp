@@ -23,6 +23,7 @@
 #include "wxgis/datasource/featuredataset.h"
 #include "wxgis/datasource/rasterdataset.h"
 #include "wxgis/framework/application.h"
+#include "wxgis/datasource/sysop.h"
 
 #include <wx/busyinfo.h>
 #include <wx/utils.h>
@@ -94,8 +95,26 @@ void wxGxTableDataset::Detach(void)
 
 bool wxGxTableDataset::Rename(wxString NewName)
 {
-	m_sName = NewName; 
-	return true;
+    wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset());
+    if(!pDSet)
+        return false;
+	if(pDSet->Rename(NewName))
+	{
+		NewName = ClearExt(NewName);
+		wxFileName PathName(m_sPath);
+		PathName.SetName(NewName);
+
+		m_sPath = PathName.GetFullPath();
+		m_sName = NewName;
+		m_pCatalog->ObjectChanged(this);
+		return true;
+	}
+	else
+	{
+		const char* err = CPLGetLastErrorMsg();
+		wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+		return false;
+	}	
 }
 
 void wxGxTableDataset::EditProperties(wxWindow *parent)
@@ -198,8 +217,26 @@ bool wxGxFeatureDataset::Delete(void)
 
 bool wxGxFeatureDataset::Rename(wxString NewName)
 {
-	m_sName = NewName; 
-	return true;
+    wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset());
+    if(!pDSet)
+        return false;
+	if(pDSet->Rename(NewName))
+	{
+		NewName = ClearExt(NewName);
+		wxFileName PathName(m_sPath);
+		PathName.SetName(NewName);
+
+		m_sPath = PathName.GetFullPath();
+		m_sName = NewName;
+		m_pCatalog->ObjectChanged(this);
+		return true;
+	}
+	else
+	{
+		const char* err = CPLGetLastErrorMsg();
+		wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+		return false;
+	}	
 }
 
 void wxGxFeatureDataset::EditProperties(wxWindow *parent)
@@ -352,8 +389,26 @@ bool wxGxRasterDataset::Delete(void)
 
 bool wxGxRasterDataset::Rename(wxString NewName)
 {
-	m_sName = NewName; 
-	return true;
+    wxGISRasterDataset* pDSet = dynamic_cast<wxGISRasterDataset*>(GetDataset());
+    if(!pDSet)
+        return false;
+	if(pDSet->Rename(NewName))
+	{
+		NewName = ClearExt(NewName);
+		wxFileName PathName(m_sPath);
+		PathName.SetName(NewName);
+
+		m_sPath = PathName.GetFullPath();
+		m_sName = NewName;
+		m_pCatalog->ObjectChanged(this);
+		return true;
+	}
+	else
+	{
+		const char* err = CPLGetLastErrorMsg();
+		wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+		return false;
+	}	
 }
 
 void wxGxRasterDataset::EditProperties(wxWindow *parent)

@@ -96,6 +96,7 @@ public:
     virtual size_t GetSubsetsCount(void){return 0;};
     virtual wxGISDataset* GetSubset(size_t nIndex){return NULL;};
     virtual wxString GetName(void){return wxEmptyString;};
+	virtual void Close(void) = 0;
 protected:
 	wxString m_sPath;
     wxCriticalSection m_CritSect;

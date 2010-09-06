@@ -24,6 +24,7 @@
 #include "wxgis/geoprocessing/gpdomain.h"
 #include "wxgis/catalog/gxfilters.h"
 #include "wxgis/datasource/rasterdataset.h"
+#include "wxgis/framework/application.h"
 
 /////////////////////////////////////////////////////////////////////////
 // wxGISGPOrthoCorrectTool
@@ -202,6 +203,9 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
 #ifdef __WXGTK__
     wxMutexGuiEnter();
 #endif
+	if(wxGetActiveWindow() != dynamic_cast<wxWindow*>(GetApplication()))
+		return 1;
+
     if(wxGetKeyState(WXK_SHIFT) || wxGetKeyState(WXK_ALT) || wxGetKeyState(WXK_CONTROL))
         return 1;
 
