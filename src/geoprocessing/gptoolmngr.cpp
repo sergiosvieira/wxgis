@@ -104,7 +104,7 @@ void wxGISGPTaskThread::OnExit()
 wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode, IGxCatalog* pCatalog) : m_pCatalog(NULL), m_nMaxThreads(50), m_nRunningThreads(0)
 {
     m_pToolsNode = pToolsNode;
-    m_nMaxThreads = wxAtoi(m_pToolsNode->GetPropVal(wxT("max_tasks"), wxT("100")));
+    m_nMaxThreads = wxAtoi(m_pToolsNode->GetPropVal(wxT("max_tasks"), wxString::Format(wxT("%d"), wxThread::GetCPUCount())));
     m_pCatalog = pCatalog;
     wxXmlNode *pChild = m_pToolsNode->GetChildren();
     while (pChild)

@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalog/gxkmldataset.h"
 #include "wxgis/datasource/featuredataset.h"
+#include "wxgis/datasource/sysop.h"
 
 #include "../../art/kml_subdset_16.xpm"
 #include "../../art/kml_subdset_48.xpm"
@@ -112,7 +113,7 @@ bool wxGxKMLDataset::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;	
     }
     return false;
@@ -120,8 +121,27 @@ bool wxGxKMLDataset::Delete(void)
 
 bool wxGxKMLDataset::Rename(wxString NewName)
 {
-	m_sName = NewName; 
-	return true;
+	NewName = ClearExt(NewName);
+	wxFileName PathName(m_sPath);
+	PathName.SetName(NewName);
+
+	wxString m_sNewPath = PathName.GetFullPath();
+
+	EmptyChildren();
+    if(RenameFile(m_sPath, m_sNewPath))
+	{
+		m_sPath = m_sNewPath;
+		m_sName = NewName;
+		m_pCatalog->ObjectChanged(this);
+		Refresh();
+		return true;
+	}
+	else
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+		return false;
+    }	
 }
 
 void wxGxKMLDataset::EditProperties(wxWindow *parent)
@@ -157,7 +177,7 @@ void wxGxKMLDataset::LoadChildren(void)
         if(!pwxGISFeatureDataset->Open())
         {
 		    const char* err = CPLGetLastErrorMsg();
-		    wxString sErr = wxString::Format(_("Open failed! OGR error: %s"), wgMB2WX(err));
+		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
 		    wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
 
             wxDELETE(pwxGISFeatureDataset);

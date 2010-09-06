@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-18 00:58+0300\n"
-"PO-Revision-Date: 2010-08-18 00:58+0300\n"
+"POT-Creation-Date: 2010-09-06 23:49+0300\n"
+"PO-Revision-Date: 2010-09-06 23:49+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -113,8 +113,8 @@ msgstr "Информация"
 
 #: D:\work\Projects\wxGIS\src\carto/featurelayer.cpp:201
 #, c-format
-msgid "wxGISFeatureLayer: Open failed! OGR error: %s"
-msgstr "wxGISFeatureLayer: Ошибка открытия! Ошибка OGR: %s"
+msgid "wxGISFeatureLayer: Open failed! GDAL error: %s"
+msgstr "wxGISFeatureLayer: Ошибка открытия! Ошибка GDAL: %s"
 
 #: D:\work\Projects\wxGIS\src\carto/featurelayer.cpp:203
 msgid "Error"
@@ -136,17 +136,17 @@ msgstr "wxGISMapView: Невозможно создать wxDrawingThread!"
 msgid "wxGISMapView: Can't run wxDrawingThread!"
 msgstr "wxGISMapView: Невозможно запустить wxDrawingThread!"
 
-#: D:\work\Projects\wxGIS\src\carto/rasterrenderer.cpp:234
-#: D:\work\Projects\wxGIS\src\carto/rasterrenderer.cpp:318
+#: D:\work\Projects\wxGIS\src\carto/rasterrenderer.cpp:235
+#: D:\work\Projects\wxGIS\src\carto/rasterrenderer.cpp:319
 #, c-format
-msgid "AdviseRead failed! OGR error: %s"
-msgstr "AdviseRead не удалось! Ошибка OGR: %s"
+msgid "AdviseRead failed! GDAL error: %s"
+msgstr "AdviseRead не удалось! Ошибка GDAL: %s"
 
-#: D:\work\Projects\wxGIS\src\carto/rasterrenderer.cpp:244
-#: D:\work\Projects\wxGIS\src\carto/rasterrenderer.cpp:328
+#: D:\work\Projects\wxGIS\src\carto/rasterrenderer.cpp:245
+#: D:\work\Projects\wxGIS\src\carto/rasterrenderer.cpp:329
 #, c-format
-msgid "RasterIO failed! OGR error: %s"
-msgstr "RasterIO не удалось! Ошибка OGR: %s"
+msgid "RasterIO failed! GDAL error: %s"
+msgstr "RasterIO не удалось! Ошибка GDAL: %s"
 
 #: D:\work\Projects\wxGIS\src\carto/tableview.cpp:89
 msgid " [*]"

@@ -184,8 +184,6 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
     bool bCancel = false;
     ITrackCancel* pTrackCancel = (ITrackCancel*)pData;
 
-    //wxSleep(1);
-
     if(pTrackCancel)
     {
         if( pszMessage )
@@ -199,21 +197,7 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
             pRogress->SetValue((int) (dfComplete * 100));
         bCancel = !pTrackCancel->Continue();
     }
-
-#ifdef __WXGTK__
-    wxMutexGuiEnter();
-#endif
-	if(wxGetActiveWindow() != dynamic_cast<wxWindow*>(GetApplication()))
-		return 1;
-
-    if(wxGetKeyState(WXK_SHIFT) || wxGetKeyState(WXK_ALT) || wxGetKeyState(WXK_CONTROL))
-        return 1;
-
-    bool bKeyState = wxGetKeyState(WXK_ESCAPE);
-#ifdef __WXGTK__
-    wxMutexGuiLeave();
-#endif
-    return bKeyState || bCancel ? 0 : 1;
+    return !bCancel;
 }
 
 bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
@@ -349,7 +333,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     {
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wxString::Format(_("Error CreateGenImgProjTransformer. OGR Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString::Format(_("Error CreateGenImgProjTransformer. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
         wsDELETE(pSrcDataSet);
         return false;
     }
@@ -360,8 +344,9 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     CPLErr eErr = GDALSuggestedWarpOutput( poGDALDataset, GDALGenImgProjTransform, hTransformArg, adfDstGeoTransform, &nPixels, &nLines );
     if(eErr != CE_None)
     {
+        const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
-            pTrackCancel->PutMessage(_("Error determining output raster size"), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString::Format(_("Error determining output raster size. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
         wsDELETE(pSrcDataSet);
         return false;
     }
@@ -373,8 +358,9 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     GDALDataset * poOutputGDALDataset = poDriver->Create( wgWX2MB(sDstPath), nPixels, nLines, poGDALDataset->GetRasterCount(), eDT, NULL );
     if(poOutputGDALDataset == NULL)
     {
+        const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
-            pTrackCancel->PutMessage(_("Error creating output raster"), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString::Format(_("Error creating output raster. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
         wsDELETE(pSrcDataSet);
         return false;
     }
@@ -421,6 +407,10 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         wxLogDebug(wxT("wxGISGPOrthoCorrectTool: The dfWarpMemoryLimit set to %f Mb"), dfMemLim / 1048576);
     }
 
+    psWarpOptions->papszWarpOptions = CSLSetNameValue(psWarpOptions->papszWarpOptions, "SOURCE_EXTRA", "5" );
+    psWarpOptions->papszWarpOptions = CSLSetNameValue(psWarpOptions->papszWarpOptions, "SAMPLE_STEPS", "101" );
+    psWarpOptions->eResampleAlg = GRA_Bilinear;
+
     // Initialize and execute the warp operation.
 
     GDALWarpOperation oOperation;
@@ -433,7 +423,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         if(pTrackCancel)
         {
             wxString sErr = wgMB2WX(pszErr);
-            pTrackCancel->PutMessage(wxString::Format(_("OrthoCorrect failed! OGR error: %s"), sErr.c_str()), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString::Format(_("OrthoCorrect failed! GDAL error: %s"), sErr.c_str()), -1, enumGISMessageErr);
         }
         GDALClose(poOutputGDALDataset);
         wsDELETE(pSrcDataSet);

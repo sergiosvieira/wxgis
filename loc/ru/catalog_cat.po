@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-18 00:58+0300\n"
-"PO-Revision-Date: 2010-08-18 00:58+0300\n"
+"POT-Creation-Date: 2010-09-06 23:50+0300\n"
+"PO-Revision-Date: 2010-09-06 23:50+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -17,77 +17,89 @@ msgstr ""
 "X-Poedit-SearchPath-0: D:\\work\\Projects\\wxGIS\\src\\catalog\n"
 "X-Poedit-SearchPath-1: D:\\work\\Projects\\wxGIS\\include\\wxgis\\catalog\n"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxarchfolder.cpp:132
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:103
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:229
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:394
-#: D:\work\Projects\wxGIS\src\catalog/gxfile.cpp:78
-#: D:\work\Projects\wxGIS\src\catalog/gxfile.cpp:193
+#: D:\work\Projects\wxGIS\src\catalog/gxarchfolder.cpp:133
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:84
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:115
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:213
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:237
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:385
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:409
+#: D:\work\Projects\wxGIS\src\catalog/gxfile.cpp:79
+#: D:\work\Projects\wxGIS\src\catalog/gxfile.cpp:209
 #: D:\work\Projects\wxGIS\src\catalog/gxfolder.cpp:144
-#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:112
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:116
 #, c-format
-msgid "Delete failed! OGR error: %s, file '%s'"
-msgstr "Ошибка удаления! Ошибка OGR: %s, файл '%s'"
+msgid "Delete failed! GDAL error: %s, file '%s'"
+msgstr "Ошибка удаления! Ошибка GDAL: %s, файл '%s'"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:215
+#: D:\work\Projects\wxGIS\src\catalog/gxarchfolder.cpp:158
+#: D:\work\Projects\wxGIS\src\catalog/gxfile.cpp:102
+#: D:\work\Projects\wxGIS\src\catalog/gxfile.cpp:232
+#: D:\work\Projects\wxGIS\src\catalog/gxfolder.cpp:168
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:142
+#, c-format
+msgid "Rename failed! GDAL error: %s, file '%s'"
+msgstr "Ошибка удаления! Ошибка GDAL: %s, файл '%s'"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:216
 #, c-format
 msgid "wxGxCatalog: ObjectFactory %s initialize"
 msgstr "wxGxCatalog: Инициализация объекта %s типа ObjectFactory"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:218
+#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:219
 #, c-format
 msgid "wxGxCatalog: Error initializing ObjectFactory %s"
 msgstr "wxGxCatalog: Ошибка инициализации модуля ObjectFactory %s"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:273
+#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:274
 #, c-format
 msgid "wxGxCatalog: Root Object %s initialize"
 msgstr "wxGxCatalog: Инициализация корневого элемента %s"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:277
+#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:278
 #, c-format
 msgid "wxGxCatalog: Error initializing Root Object %s"
 msgstr "wxGxCatalog: Ошибка инициализации корневого элемента %s"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:395
+#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:396
 msgid "wxGxCatalog: Continue scanning folder connections"
 msgstr "wxGxCatalog: Продоление сканирования подключений к папкам"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:415
+#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:416
 #, c-format
 msgid "wxGxCatalog: Add new folder connection [%s]"
 msgstr "wxGxCatalog: Добавить новое подключение к папке [%s]"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:435
+#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:436
 #, c-format
 msgid "wxGxCatalog: Add folder connection [%s]"
 msgstr "wxGxCatalog: Добавление подключенния к папке [%s]"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:160
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:164
 msgid "Feature class"
 msgstr "Класс пространственных объектов"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:253
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:429
-#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:157
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:255
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:445
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:180
 #, c-format
-msgid "Open failed! OGR error: %s"
-msgstr "Ошибка открытия! Ошибка OGR: %s"
+msgid "Open failed! GDAL error: %s"
+msgstr "Ошибка открытия! Ошибка GDAL: %s"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:254
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:430
-#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:158
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:256
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:446
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:181
 msgid "Error"
 msgstr "Ошибка"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:415
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:424
 msgid "Raster"
 msgstr "Растр"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfile.cpp:150
+#: D:\work\Projects\wxGIS\src\catalog/gxfile.cpp:166
 #, c-format
-msgid "wxGxPrjFile: OGR error #%d: %s"
-msgstr "wxGxPrjFile: Ошибка OGR #%d: %s"
+msgid "wxGxPrjFile: GDAL error #%d: %s"
+msgstr "wxGxPrjFile: Ошибка GDAL #%d: %s"
 
 #: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:70
 msgid "Any items (*.*)"
@@ -161,11 +173,11 @@ msgstr "Изображение PNG (*.png)"
 msgid "Delete failed! File '%s'"
 msgstr "Ошибка удаления. Файл '%s'"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:66
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:70
 msgid "KML Dataset"
 msgstr "Набор данных KML"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:225
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:251
 msgid "KML Feature class"
 msgstr "Класс пространственных объектов KML"
 
@@ -194,7 +206,7 @@ msgstr "Таблица"
 msgid "Coordinate System"
 msgstr "Система координат"
 
-#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxfile.h:86
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxfile.h:88
 msgid "Text file"
 msgstr "Текстовый файл"
 

@@ -139,14 +139,14 @@ wxKeyCodeDlg::~wxKeyCodeDlg()
 
 void wxKeyCodeDlg::OnUpdateUI(wxUpdateUIEvent& event)
 {
-	event.Enable(m_textCtrl1->m_Key == -1 ? false : true);
+	//event.Enable(m_textCtrl1->m_Key == -1 ? false : true);
 }
 
 bool wxKeyCodeDlg::TransferDataFromWindow()
 {
 	m_Key = m_textCtrl1->m_Key;
 	m_Flags = m_textCtrl1->m_Flags;
-	if(m_Key == -1)
-		return false;
+	//if(m_Key == -1)
+	//	return false;
 	return true;
 }

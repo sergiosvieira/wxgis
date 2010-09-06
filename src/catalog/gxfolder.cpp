@@ -141,17 +141,33 @@ bool wxGxFolder::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;	
     }
 }
 
 bool wxGxFolder::Rename(wxString NewName)
 {
-	//rename ?
-	m_sName = NewName; 
-	m_pCatalog->ObjectChanged(this);
-	return true;
+	wxFileName PathName(m_sPath);
+	PathName.SetName(NewName);
+
+	wxString m_sNewPath = PathName.GetFullPath();
+
+	EmptyChildren();
+    if(RenameFile(m_sPath, m_sNewPath))
+	{
+		m_sPath = m_sNewPath;
+		m_sName = NewName;
+		m_pCatalog->ObjectChanged(this);
+		Refresh();
+		return true;
+	}
+	else
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+		return false;
+    }	
 }
 
 void wxGxFolder::EditProperties(wxWindow *parent)

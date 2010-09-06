@@ -320,6 +320,22 @@ void wxGxTaskPanel::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessag
     ::wxPostEvent(this, event);
 }
 
+//void wxGxTaskPanel::OnKeyDown(wxKeyEvent & event)
+//{
+//    if(event.GetKeyCode() == WXK_SHIFT || event.GetKeyCode() == WXK_ALT || event.GetKeyCode() == WXK_CONTROL)
+//        return;
+//	switch(event.GetKeyCode())
+//	{
+//	case WXK_ESCAPE:
+//        PutMessage(_("Execution canceled by user"), -1, enumGISMessageWarning);
+//        Cancel();
+//        m_bpCloseButton->Enable(false);
+//		break;
+//	default:
+//		break;
+//	}
+//}
+
 //////////////////////////////////////////////////////////////////
 // wxGxTasksView
 //////////////////////////////////////////////////////////////////

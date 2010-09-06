@@ -81,7 +81,7 @@ bool wxGxTableDataset::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;	
     }
 }
@@ -210,7 +210,7 @@ bool wxGxFeatureDataset::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;	
     }
 }
@@ -252,7 +252,7 @@ wxGISDataset* wxGxFeatureDataset::GetDataset(void)
         if(!pwxGISFeatureDataset->Open())
         {
 		    const char* err = CPLGetLastErrorMsg();
-		    wxString sErr = wxString::Format(_("Open failed! OGR error: %s"), wgMB2WX(err));
+		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
 		    wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
 
             wxDELETE(pwxGISFeatureDataset);
@@ -382,7 +382,7 @@ bool wxGxRasterDataset::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! OGR error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;	
     }
 }
@@ -442,7 +442,7 @@ wxGISDataset* wxGxRasterDataset::GetDataset(void)
         if(!pwxGISRasterDataset->Open())
         {
 		    const char* err = CPLGetLastErrorMsg();
-		    wxString sErr = wxString::Format(_("Open failed! OGR error: %s"), wgMB2WX(err));
+		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
 		    wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
 
             wxDELETE(pwxGISRasterDataset);

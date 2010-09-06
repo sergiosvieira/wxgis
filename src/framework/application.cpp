@@ -47,7 +47,7 @@ BEGIN_EVENT_TABLE(wxGISApplication, wxFrame)
     EVT_CLOSE(wxGISApplication::OnClose)
 END_EVENT_TABLE()
 
-wxGISApplication::wxGISApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style), m_pGISAcceleratorTable(NULL), m_pMenuBar(NULL), m_CurrentTool(NULL), m_pDropDownCommand(NULL)
+wxGISApplication::wxGISApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style), m_pGISAcceleratorTable(NULL), m_pMenuBar(NULL), m_CurrentTool(NULL), m_pDropDownCommand(NULL), m_pTrackCancel(NULL)
 {
 }
 

@@ -459,6 +459,8 @@ void wxGISMapView::ClearLayers(void)
 void wxGISMapView::OnKeyDown(wxKeyEvent & event)
 {
 	event.Skip();
+    if(event.GetKeyCode() == WXK_SHIFT || event.GetKeyCode() == WXK_ALT || event.GetKeyCode() == WXK_CONTROL)
+        return;
 	switch(event.GetKeyCode())
 	{
 	case WXK_ESCAPE:

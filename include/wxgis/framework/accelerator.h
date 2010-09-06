@@ -34,6 +34,7 @@ public:
 	virtual wxAcceleratorTable GetAcceleratorTable(void);
 	virtual bool HasChanges(void){return bHasChanges;};
 	virtual wxString GetText(int cmd);
+	virtual wxAcceleratorEntry GetEntry(int cmd);
 	virtual void Store(void);
 protected:
 	int GetKeyCode(wxString sKeyCode);

@@ -335,18 +335,27 @@ void wxGISToolBarPanel::SetKeyCode(int pos)
 		dlg.m_sKeyCode = item.GetText();
 	if(dlg.ShowModal() == wxID_OK)
 	{
+        long cmd(wxID_ANY);
 		long CmdID = m_buttonslist->GetItemData(pos);
 		wxGISAcceleratorTable *pAccTab = m_pGxApp->GetGISAcceleratorTable();
-		long cmd = pAccTab->Add(wxAcceleratorEntry(dlg.m_Flags, dlg.m_Key, CmdID));
-		wxString sKeyCode = pAccTab->GetText(CmdID);
-		m_buttonslist->SetItem(pos, 2, sKeyCode);
+        if(dlg.m_Key == -1) //remove acc
+        {
+            m_buttonslist->SetItem(pos, 2, wxEmptyString);
+            pAccTab->Remove(pAccTab->GetEntry(CmdID));
+        }
+        else
+        {
+    		cmd = pAccTab->Add(wxAcceleratorEntry(dlg.m_Flags, dlg.m_Key, CmdID));
+	    	wxString sKeyCode = pAccTab->GetText(CmdID);
+    		m_buttonslist->SetItem(pos, 2, sKeyCode);
+        }
 		if(cmd != wxID_ANY)
 		{
 			for(size_t i = 0; i < m_buttonslist->GetItemCount(); i++)
 			{
 				long CahgedCmdID = m_buttonslist->GetItemData(i);
 				if(CahgedCmdID == cmd)
-				m_buttonslist->SetItem(pos, 2, wxT(""));
+				m_buttonslist->SetItem(pos, 2, wxEmptyString);
 			}
 		}
 	}
@@ -1004,11 +1013,20 @@ void wxGISCommandPanel::SetKeyCode(int pos)
 		dlg.m_sKeyCode = item.GetText();
 	if(dlg.ShowModal() == wxID_OK)
 	{
+        long cmd(wxID_ANY);
 		long CmdID = m_listCtrl3->GetItemData(pos);
 		wxGISAcceleratorTable *pAccTab = m_pGxApp->GetGISAcceleratorTable();
-		long cmd = pAccTab->Add(wxAcceleratorEntry(dlg.m_Flags, dlg.m_Key, CmdID));
-		wxString sKeyCode = pAccTab->GetText(CmdID);
-		m_listCtrl3->SetItem(pos, 2, sKeyCode);
+        if(dlg.m_Key == -1) //remove acc
+        {
+            m_listCtrl3->SetItem(pos, 2, wxEmptyString);
+            pAccTab->Remove(pAccTab->GetEntry(CmdID));
+        }
+        else
+        {
+		    cmd = pAccTab->Add(wxAcceleratorEntry(dlg.m_Flags, dlg.m_Key, CmdID));
+		    wxString sKeyCode = pAccTab->GetText(CmdID);
+		    m_listCtrl3->SetItem(pos, 2, sKeyCode);
+        }
 		if(cmd != wxID_ANY)
 		{
 			for(size_t i = 0; i < m_listCtrl3->GetItemCount(); i++)

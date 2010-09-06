@@ -33,13 +33,14 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxTreeViewBase, wxTreeCtrl)
 BEGIN_EVENT_TABLE(wxGxTreeViewBase, wxTreeCtrl)
     EVT_TREE_ITEM_EXPANDING(TREECTRLID, wxGxTreeViewBase::OnItemExpanding)
     EVT_TREE_ITEM_RIGHT_CLICK(TREECTRLID, wxGxTreeViewBase::OnItemRightClick)
+    EVT_CHAR(wxGxTreeViewBase::OnChar)
 END_EVENT_TABLE()
 
 wxGxTreeViewBase::wxGxTreeViewBase(void) : wxTreeCtrl(), m_pConnectionPointCatalog(NULL), m_pConnectionPointSelection(NULL), m_ConnectionPointCatalogCookie(-1), m_ConnectionPointSelectionCookie(-1)
 {
 }
 
-wxGxTreeViewBase::wxGxTreeViewBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxTreeCtrl(parent, id, pos, size, style, wxDefaultValidator, wxT("wxGxTreeViewBase")), m_pConnectionPointCatalog(NULL), m_pConnectionPointSelection(NULL), m_ConnectionPointCatalogCookie(-1), m_ConnectionPointSelectionCookie(-1)
+wxGxTreeViewBase::wxGxTreeViewBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxTreeCtrl(parent, id, pos, size, style, wxDefaultValidator, wxT("wxGxTreeViewBase")), m_pConnectionPointCatalog(NULL), m_pConnectionPointSelection(NULL), m_ConnectionPointCatalogCookie(-1), m_ConnectionPointSelectionCookie(-1), m_pDeleteCmd(NULL)
 {
 	m_TreeImageList.Create(16, 16);
 	SetImageList(&m_TreeImageList);
@@ -150,6 +151,12 @@ bool wxGxTreeViewBase::Activate(IGxApplication* application, wxXmlNode* pConf)
 		return false;
 
     m_pCatalog = application->GetCatalog();
+    IApplication* pApp = dynamic_cast<IApplication*>(application);
+    if(pApp)
+    {
+        m_pDeleteCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
+    }
+
     AddRoot(dynamic_cast<IGxObject*>(m_pCatalog));
 
 	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( application->GetCatalog() );
@@ -397,6 +404,27 @@ void wxGxTreeViewBase::OnItemExpanding(wxTreeEvent& event)
 	SetItemHasChildren(item, false);
 }
 
+
+void wxGxTreeViewBase::OnChar(wxKeyEvent& event)
+{
+	if(event.GetModifiers() & wxMOD_ALT)
+		return;
+	if(event.GetModifiers() & wxMOD_CONTROL)
+		return;
+	if(event.GetModifiers() & wxMOD_SHIFT)
+		return;
+    switch(event.GetKeyCode())
+    {
+    case WXK_DELETE:
+    case WXK_NUMPAD_DELETE:
+        if(m_pDeleteCmd)
+            m_pDeleteCmd->OnClick();
+        break;
+    default:
+        break;
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // wxGxTreeView
 //////////////////////////////////////////////////////////////////////////////
@@ -425,6 +453,7 @@ wxGxTreeView::~wxGxTreeView(void)
 
 void wxGxTreeView::OnBeginLabelEdit(wxTreeEvent& event)
 {
+    event.Skip();
 	wxTreeItemId item = event.GetItem();
 	if(!item.IsOk())
 		return;

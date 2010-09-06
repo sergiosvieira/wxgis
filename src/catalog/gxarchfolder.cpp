@@ -143,8 +143,6 @@ bool wxGxArchive::Rename(wxString NewName)
 
 	wxString m_sNewPath = PathName.GetFullPath();
 
-	//TODO: Free child items to rename parent;
-	//Close and Open again?
 	EmptyChildren();
     if(RenameFile(m_sPath, m_sNewPath))
 	{
@@ -157,7 +155,7 @@ bool wxGxArchive::Rename(wxString NewName)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;
     }	
 }
