@@ -801,7 +801,7 @@ bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath,
 
 wxString wxGISGeoprocessingCmd::CheckUniqName(wxString sPath, wxString sName, wxString sExt, int nCounter)
 {
-    wxString sResultName = sName + (nCounter > 0 ? wxString::Format(wxT("_%d"), nCounter) : wxEmptyString);
+    wxString sResultName = sName + (nCounter > 0 ? wxString::Format(wxT("_%d"), nCounter) : wxString(wxEmptyString));
     wxString sBaseName = sPath + wxFileName::GetPathSeparator() + sResultName + wxT(".") + sExt;
     if(wxFileName::FileExists(sBaseName))
         return CheckUniqName(sPath, sName, sExt, nCounter + 1);

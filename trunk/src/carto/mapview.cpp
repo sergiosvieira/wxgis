@@ -597,10 +597,15 @@ void wxGISMapView::OnMouseWheel(wxMouseEvent& event)
 
 		wxBrush br(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
 		CDC.SetBrush(br);
-		wxPen pen(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOTEXT));
+		wxPen pen(*wxBLACK_PEN);
 		CDC.SetPen(pen);
 		int x1 = (size.x - width) / 2, y1 = (size.y - height) - 50/*/ 2*/;
 		CDC.DrawRectangle( x1 - 5, y1 - 2, width + 10, height + 4);
+
+		wxColor TextColor(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOTEXT));
+		CDC.SetTextBackground(TextColor);
+		CDC.SetTextForeground(TextColor);
+
 		CDC.DrawText(format_s, x1, y1);
 
 		m_timer.Start(WAITTIME);

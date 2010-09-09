@@ -56,7 +56,7 @@ protected:
 class wxGISAboutDialog: public wxDialog
 {
 public:
-    wxGISAboutDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 387,505 ), long style = wxDEFAULT_DIALOG_STYLE);
+    wxGISAboutDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 440,440 ), long style = wxDEFAULT_DIALOG_STYLE);
     ~wxGISAboutDialog();
 protected:
 	wxStaticBitmap* m_bitmap;
