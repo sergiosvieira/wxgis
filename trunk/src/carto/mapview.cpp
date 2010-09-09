@@ -383,7 +383,6 @@ void wxGISMapView::OnSize(wxSizeEvent & event)
 
 void wxGISMapView::OnEraseBackground(wxEraseEvent & event)
 {
-//    event.Skip(false);
 }
 
 void wxGISMapView::AddLayer(wxGISLayer* pLayer)
@@ -391,7 +390,7 @@ void wxGISMapView::AddLayer(wxGISLayer* pLayer)
     if(!pLayer)
         return;
 	wxGISMap::AddLayer(pLayer);
-    //set spa ref for display transformation
+    //set spatial reference for display transformation
 	IDisplayTransformation* pDisplayTransformation = pGISScreenDisplay->GetDisplayTransformation();
     if(m_pSpatialReference)
     {
@@ -598,25 +597,11 @@ void wxGISMapView::OnMouseWheel(wxMouseEvent& event)
 
 		wxBrush br(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
 		CDC.SetBrush(br);
-		CDC.SetPen(*wxBLACK_PEN);
+		wxPen pen(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOTEXT));
+		CDC.SetPen(pen);
 		int x1 = (size.x - width) / 2, y1 = (size.y - height) - 50/*/ 2*/;
 		CDC.DrawRectangle( x1 - 5, y1 - 2, width + 10, height + 4);
 		CDC.DrawText(format_s, x1, y1);
-
-        //wxRect client_rc = GetScreenRect();
-		//m_pTipWnd = new wxTipWindow(this, wxString::Format(_("1 : %.2f"), 1 / (m_virtualbounds.MaxX - m_virtualbounds.MinX)/*pDisplayTransformation->GetScaleRatio()*/ * 243.84), 200, &m_pTipWnd, &client_rc);
-		//m_pTipWnd->Hide();
-		//wxPoint pt = client_rc.GetPosition();
-		//pt.x += client_rc.width / 2 - m_pTipWnd->GetSize().GetWidth() * 1.5 ;
-		//pt.y += client_rc.height / 2 - m_pTipWnd->GetSize().GetHeight() * 1.5;
-		//m_pTipWnd->Position(pt,m_pTipWnd->GetSize());
-		//m_pTipWnd->Show();
-		//if(m_pTipWnd)
-		//{
-		//	wxDELETE(m_pTipWnd);
-		//	m_pTipWnd = NULL;
-		//}
-		//, m_pTipWnd(NULL)
 
 		m_timer.Start(WAITTIME);
 
