@@ -50,7 +50,7 @@
 //  5   Back
 //  6   Forward
 //  7   Create Folder
-//	8	Test change proj
+//	8	Rename
 //	9	Refresh
 //  10  ?
 
@@ -120,7 +120,7 @@ wxString wxGISCatalogMainCmd::GetCaption(void)
 		case 7:	
 			return wxString(_("Create folder"));
 		case 8:	
-			return wxString(_("Test change proj"));
+			return wxString(_("Rename"));
 		case 9:	
 			return wxString(_("Refresh"));
 		default:
@@ -144,6 +144,7 @@ wxString wxGISCatalogMainCmd::GetCategory(void)
 		case 7:	
 			return wxString(_("New"));
 		case 8:	
+			return wxString(_("Edit"));
 		default:
 			return wxString(_("[No category]"));
 	}
