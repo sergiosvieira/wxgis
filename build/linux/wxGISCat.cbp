@@ -61,9 +61,11 @@
 		</Compiler>
 		<Unit filename="../../include/wxgis/cat_app/catalogapp.h" />
 		<Unit filename="../../include/wxgis/cat_app/catalogframe.h" />
+		<Unit filename="../../include/wxgis/cat_app/gisaboutdlg.h" />
 		<Unit filename="../../include/wxgis/cat_app/resource.h" />
 		<Unit filename="../../src/cat_app/catalogapp.cpp" />
 		<Unit filename="../../src/cat_app/catalogframe.cpp" />
+		<Unit filename="../../src/cat_app/gisaboutdlg.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
