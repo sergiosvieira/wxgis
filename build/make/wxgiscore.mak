@@ -1,5 +1,35 @@
-CPPFLAGS += -DWXMAKINGDLL_GIS_CORE 
+program_name := wxGISCore.so
 
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_CORE  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include  -c /home/bishop/projects/wxGIS/src/core/config.cpp -o ../obj/src/core/config.o
+include wxgis.mak
+CXXFLAGS += -DWXMAKINGDLL_GIS_CORE 
 
+source_dirs  := ../../src/core
+search_wildcards := $(addsuffix /*.cpp,$(source_dirs))
+obj_dir := ../obj/debug/core
+dst_dir := ../debug
+
+all: create_obj_out $(program_name)
+
+create_obj_out:
+	-mkdir -p $(obj_dir)
+	-mkdir -p $(dst_dir)
+test:
+	@echo $(notdir $(patsubst %.cpp,%.o,$(wildcard $(search_wildcards))))
+
+$(program_name): $(obj_dir)/$(notdir $(patsubst %.cpp,%.o,$(wildcard $(search_wildcards))))
+	$(CXX) -shared $^ -o $(dst_dir)/$@ `wx-config --libs`
+
+VPATH := $(source_dirs)
+     
+$(obj_dir)/%.o: %.cpp
+	$(CXX) $(CXXFLAGS) `wx-config --cflags` -c -MD $(addprefix -I,$(source_dirs)) $< -o $@
+
+include $(wildcard *.d) 
+
+clean:
+	rm -f $(obj_dir)/*.o $(obj_dir)/*.d
+	rmdir -p --ignore-fail-on-non-empty $(obj_dir)
+#	rmdir -p --ignore-fail-on-non-empty $(dst_dir)
+
+.PHONY: clean
 

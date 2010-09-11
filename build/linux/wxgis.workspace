@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="wxGIS">
-		<Project filename="wxGISCore.cbp" />
+		<Project filename="wxGISCore.cbp" active="1" />
 		<Project filename="wxGISGeometry.cbp">
 			<Depends filename="wxGISCore.cbp" />
 		</Project>
@@ -39,7 +39,7 @@
 			<Depends filename="wxGISCartoUI.cbp" />
 		</Project>
 		<Project filename="wxGISCatalogUI.cbp" />
-		<Project filename="wxGISCat.cbp" active="1" />
+		<Project filename="wxGISCat.cbp" />
 		<Project filename="wxGISGeoprocessing.cbp">
 			<Depends filename="wxGISCore.cbp" />
 			<Depends filename="wxGISDataSource.cbp" />

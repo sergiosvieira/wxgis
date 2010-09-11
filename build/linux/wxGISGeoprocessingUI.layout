@@ -7,22 +7,22 @@
 	<File name="../../include/wxgis/geoprocessingui/gptasksview.h" open="0" top="0" tabpos="1">
 		<Cursor position="1287" topLine="20" />
 	</File>
-	<File name="../../include/wxgis/geoprocessingui/gptooldlg.h" open="1" top="0" tabpos="2">
+	<File name="../../include/wxgis/geoprocessingui/gptooldlg.h" open="0" top="0" tabpos="2">
 		<Cursor position="2408" topLine="57" />
 	</File>
-	<File name="../../src/geoprocessingui/geoprocessingcmd.cpp" open="1" top="0" tabpos="4">
+	<File name="../../src/geoprocessingui/geoprocessingcmd.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="38904" topLine="786" />
 	</File>
 	<File name="../../src/geoprocessingui/gpcontrols.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="10898" topLine="298" />
 	</File>
-	<File name="../../src/geoprocessingui/gptasksview.cpp" open="1" top="0" tabpos="3">
+	<File name="../../src/geoprocessingui/gptasksview.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="11680" topLine="272" />
 	</File>
 	<File name="../../src/geoprocessingui/gptoolbox.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="9499" topLine="307" />
 	</File>
-	<File name="../../src/geoprocessingui/gptooldlg.cpp" open="1" top="0" tabpos="1">
+	<File name="../../src/geoprocessingui/gptooldlg.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="8989" topLine="269" />
 	</File>
 </CodeBlocks_layout_file>

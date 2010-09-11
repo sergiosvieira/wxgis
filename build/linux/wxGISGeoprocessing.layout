@@ -7,10 +7,10 @@
 	<File name="../../include/wxgis/geoprocessing/gptoolmngr.h" open="0" top="0" tabpos="2">
 		<Cursor position="4486" topLine="97" />
 	</File>
-	<File name="../../src/geoprocessing/gporthocorrecttool.cpp" open="1" top="0" tabpos="1">
+	<File name="../../src/geoprocessing/gporthocorrecttool.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="6881" topLine="176" />
 	</File>
-	<File name="../../src/geoprocessing/gptoolmngr.cpp" open="1" top="0" tabpos="2">
+	<File name="../../src/geoprocessing/gptoolmngr.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="2654" topLine="49" />
 	</File>
 </CodeBlocks_layout_file>
