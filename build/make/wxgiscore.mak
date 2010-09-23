@@ -5,7 +5,7 @@ CXXFLAGS += -DWXMAKINGDLL_GIS_CORE
 
 source_dirs  := ../../src/core
 search_wildcards := $(addsuffix /*.cpp,$(source_dirs))
-obj_dir := ../obj/debug/core
+obj_dir := ./obj/debug/core
 dst_dir := ../debug
 
 all: create_obj_out $(program_name)
@@ -22,7 +22,7 @@ $(program_name): $(obj_dir)/$(notdir $(patsubst %.cpp,%.o,$(wildcard $(search_wi
 VPATH := $(source_dirs)
      
 $(obj_dir)/%.o: %.cpp
-	$(CXX) $(CXXFLAGS) `wx-config --cflags` -c -MD $(addprefix -I,$(source_dirs)) $< -o $@
+	$(CXX) -c -MD $(CXXFLAGS) `wx-config --cflags` $(addprefix -I,$(source_dirs)) -o $@ $<
 
 include $(wildcard *.d) 
 
