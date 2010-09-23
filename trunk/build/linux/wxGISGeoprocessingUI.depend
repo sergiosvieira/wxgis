@@ -25,7 +25,7 @@
 1277670959 /home/bishop/projects/wxGIS/include/wxgis/core/core.h
 	"wxgis/base.h"
 
-1284050852 /home/bishop/projects/wxGIS/include/wxgis/base.h
+1285266729 /home/bishop/projects/wxGIS/include/wxgis/base.h
 	"wx/wxprec.h"
 	"wx/wx.h"
 	<wx/xml/xml.h>
@@ -1507,10 +1507,10 @@
 1284050046 /home/bishop/projects/wxGIS/include/wxgis/datasource/featuredataset.h
 	"wxgis/datasource/datasource.h"
 
-1284050046 /home/bishop/projects/wxGIS/include/wxgis/datasource/datasource.h
+1285267409 /home/bishop/projects/wxGIS/include/wxgis/datasource/datasource.h
 	"wxgis/framework/framework.h"
 	"wx/datetime.h"
-	"ogrsf_frmts.h"
+	"ogrsf_frmts/ogrsf_frmts.h"
 	"gdal_priv.h"
 	"gdalwarper.h"
 	"gdal_alg_priv.h"
@@ -1647,7 +1647,7 @@
 	"wxgis/base.h"
 	"wxgis/catalog/catalog.h"
 
-1284050046 /home/bishop/projects/wxGIS/include/wxgis/catalog/catalog.h
+1285266376 /home/bishop/projects/wxGIS/include/wxgis/catalog/catalog.h
 	"wxgis/datasource/datasource.h"
 	"wx/filename.h"
 
@@ -2344,4 +2344,120 @@
 	<dlfcn.h>
 	<dl.h>
 	<CodeFragments.h>
+
+1284216606 /home/bishop/projects/wxGISGDAL/ogr/ogrsf_frmts/ogrsf_frmts.h
+	"ogr_feature.h"
+	"ogr_featurestyle.h"
+
+1284216607 /home/bishop/projects/wxGISGDAL/ogr/ogr_feature.h
+	"ogr_geometry.h"
+	"ogr_featurestyle.h"
+	"cpl_atomic_ops.h"
+
+1284216607 /home/bishop/projects/wxGISGDAL/ogr/ogr_geometry.h
+	"ogr_core.h"
+	"ogr_spatialref.h"
+
+1284216607 /home/bishop/projects/wxGISGDAL/ogr/ogr_core.h
+	"cpl_port.h"
+	"cpl_string.h"
+	"gdal_version.h"
+
+1284235001 /home/bishop/projects/wxGISGDAL/port/cpl_port.h
+	<vld.h>
+	"cpl_config.h"
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<stdarg.h>
+	<string.h>
+	<ctype.h>
+	<limits.h>
+	<time.h>
+	<wce_time.h>
+	<wce_errno.h>
+	<errno.h>
+	<locale.h>
+	<direct.h>
+	<strings.h>
+	<dbmalloc.h>
+	<dmalloc.h>
+	<float.h>
+
+1284574508 /home/bishop/projects/wxGISGDAL/port/cpl_config.h
+
+1284216604 /home/bishop/projects/wxGISGDAL/port/cpl_string.h
+	"cpl_vsi.h"
+	"cpl_error.h"
+	"cpl_conv.h"
+	<string>
+
+1284216604 /home/bishop/projects/wxGISGDAL/port/cpl_vsi.h
+	"cpl_port.h"
+	<unistd.h>
+	<sys/stat.h>
+	<wce_stat.h>
+	"cpl_error.h"
+
+1284234799 /home/bishop/projects/wxGISGDAL/port/cpl_error.h
+	"cpl_port.h"
+
+1284216604 /home/bishop/projects/wxGISGDAL/port/cpl_conv.h
+	"cpl_port.h"
+	"cpl_vsi.h"
+	"cpl_error.h"
+
+1284216603 /home/bishop/projects/wxGISGDAL/gcore/gdal_version.h
+
+1284216607 /home/bishop/projects/wxGISGDAL/ogr/ogr_spatialref.h
+	"ogr_srs_api.h"
+
+1284216607 /home/bishop/projects/wxGISGDAL/ogr/ogr_srs_api.h
+	"ogr_core.h"
+
+1284216607 /home/bishop/projects/wxGISGDAL/ogr/ogr_featurestyle.h
+	"cpl_conv.h"
+	"cpl_string.h"
+	"ogr_core.h"
+
+1284216604 /home/bishop/projects/wxGISGDAL/port/cpl_atomic_ops.h
+	"cpl_port.h"
+
+1284216603 /home/bishop/projects/wxGISGDAL/gcore/gdal_priv.h
+	"gdal.h"
+	"gdal_frmts.h"
+	"cpl_vsi.h"
+	"cpl_conv.h"
+	"cpl_string.h"
+	"cpl_minixml.h"
+	<vector>
+
+1284216603 /home/bishop/projects/wxGISGDAL/gcore/gdal.h
+	"gdal_version.h"
+	"cpl_port.h"
+	"cpl_error.h"
+
+1284216603 /home/bishop/projects/wxGISGDAL/gcore/gdal_frmts.h
+	"cpl_port.h"
+
+1284216604 /home/bishop/projects/wxGISGDAL/port/cpl_minixml.h
+	"cpl_port.h"
+
+1284216604 /home/bishop/projects/wxGISGDAL/alg/gdalwarper.h
+	"gdal_alg.h"
+	"cpl_minixml.h"
+
+1284216604 /home/bishop/projects/wxGISGDAL/alg/gdal_alg.h
+	"gdal.h"
+	"cpl_minixml.h"
+	"ogr_api.h"
+
+1284216607 /home/bishop/projects/wxGISGDAL/ogr/ogr_api.h
+	"ogr_core.h"
+
+1284216604 /home/bishop/projects/wxGISGDAL/alg/gdal_alg_priv.h
+	"gdal_alg.h"
+
+1284216604 /home/bishop/projects/wxGISGDAL/port/cpl_quad_tree.h
+	"cpl_port.h"
 

@@ -58,12 +58,11 @@
 			<Add option="-D_USRDLL" />
 			<Add option="-DWXMAKINGDLL_GIS_GPU" />
 			<Add directory="../../include" />
+			<Add directory="../../include/wxgis" />
 			<Add directory="$(GDAL)/ogr" />
 			<Add directory="$(GDAL)/alg" />
 			<Add directory="$(GDAL)/gcore" />
 			<Add directory="$(GDAL)/port" />
-			<Add directory="../../include/wxgis" />
-			<Add directory="$(GDAL)/ogr/ogrsf_frmts" />
 		</Compiler>
 		<Unit filename="../../include/wxgis/geoprocessingui/geoprocessingcmd.h" />
 		<Unit filename="../../include/wxgis/geoprocessingui/geoprocessingui.h" />

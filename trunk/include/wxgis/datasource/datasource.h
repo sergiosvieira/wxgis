@@ -24,7 +24,7 @@
 #include "wxgis/framework/framework.h"
 #include "wx/datetime.h"
 
-#include "ogrsf_frmts.h"
+#include "ogrsf_frmts/ogrsf_frmts.h"
 //#include "ogr_api.h"
 #include "gdal_priv.h"
 #include "gdalwarper.h"
@@ -34,18 +34,18 @@
 
 enum wxGISEnumDatasetType
 {
-	enumGISFeatureDataset = 1, 
-	enumGISTableDataset = 2, 
+	enumGISFeatureDataset = 1,
+	enumGISTableDataset = 2,
 	enumGISRasterDataset = 3,
 	enumGISContainer = 4
 };
 
 enum wxGISEnumVectorDatasetType
 {
-	enumVecUnknown = 0, 
-	enumVecESRIShapefile = 1, 
+	enumVecUnknown = 0,
+	enumVecESRIShapefile = 1,
 	enumVecMapinfoTab = 2,
-    enumVecMapinfoMif = 3, 
+    enumVecMapinfoMif = 3,
     enumVecKML = 4,
     enumVecDXF = 5
 };
@@ -68,7 +68,7 @@ enum wxGISEnumTableDatasetType
 
 enum wxGISEnumPrjFileType
 {
-	enumESRIPrjFile = 1, 
+	enumESRIPrjFile = 1,
 	enumSPRfile = 2
 };
 
@@ -82,7 +82,7 @@ LIMITS, *LPLIMITS;
 class wxGISDataset :
 	public IPointer
 {
-public:	
+public:
 	wxGISDataset(wxString sPath) : IPointer()
     {
         m_sPath = sPath;
@@ -107,12 +107,12 @@ class wxGISFeatureSet
 {
 public:
 	wxGISFeatureSet(void)
-	{ 
-		m_OGRFeatureArray.reserve(1000); 
+	{
+		m_OGRFeatureArray.reserve(1000);
 	}
 	wxGISFeatureSet(size_t nReserve)
-	{ 
-		m_OGRFeatureArray.reserve(nReserve); 
+	{
+		m_OGRFeatureArray.reserve(nReserve);
 	}
 	virtual ~wxGISFeatureSet(void){ };
 	virtual void AddFeature(OGRFeature* poFeature){m_OGRFeatureArray.push_back(poFeature);};
@@ -138,7 +138,7 @@ class wxGISGeometrySet :
 {
 public:
 	wxGISGeometrySet(bool bOwnGeometry = false)
-	{ 
+	{
         SetOwnGeometry(bOwnGeometry);
         m_Iterator = m_OGRGeometryMap.begin();
 	}
@@ -174,7 +174,7 @@ public:
     virtual long operator[](OGRGeometry* pGeom){return m_OGRGeometryMap[pGeom];};
     virtual void SetOwnGeometry(bool bOwnGeometry){m_bOwnGeometry = bOwnGeometry;};
 protected:
-	std::map<OGRGeometry*, long> m_OGRGeometryMap;	
+	std::map<OGRGeometry*, long> m_OGRGeometryMap;
     std::map<OGRGeometry*, long>::const_iterator m_Iterator;
     bool m_bOwnGeometry;
 };
@@ -197,7 +197,7 @@ public:
 	virtual ~wxGISSpatialFilter(void){};
 	virtual void SetEnvelope(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY)
 	{
-		m_Env.MinX = dfMinX; 
+		m_Env.MinX = dfMinX;
 		m_Env.MaxX = dfMaxX;
 		m_Env.MinY = dfMinY;
 		m_Env.MaxY = dfMaxY;
@@ -205,7 +205,7 @@ public:
 	virtual void SetEnvelope(OGREnvelope Env)
 	{
 		m_Env = Env;
-	}	
+	}
 	virtual OGREnvelope GetEnvelope(void){return m_Env;};
 
 protected:

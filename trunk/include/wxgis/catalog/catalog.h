@@ -25,7 +25,7 @@
 #include "wx/filename.h"
 
 #define APP_NAME wxT("wxGISCatalog")
-#define APP_VER wxT("0.2.1")
+#define APP_VER wxT("0.2.0")
 
 //#include <wx/dynload.h>
 //#include <wx/dynlib.h>

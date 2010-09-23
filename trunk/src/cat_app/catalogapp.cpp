@@ -24,7 +24,7 @@
 #include "wxgis/cat_app/catalogframe.h"
 
 #include <locale.h>
-#include "ogrsf_frmts.h"
+#include "ogrsf_frmts/ogrsf_frmts.h"
 #include "ogr_api.h"
 
 IMPLEMENT_APP(wxGISCatalogApp);

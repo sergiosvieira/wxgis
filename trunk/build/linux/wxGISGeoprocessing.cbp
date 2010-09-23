@@ -62,7 +62,7 @@
 			<Add directory="$(GDAL)/alg" />
 			<Add directory="$(GDAL)/gcore" />
 			<Add directory="$(GDAL)/port" />
-			<Add directory="$(GDAL)/ogr/ogrsf_frmts" />
+			<Add directory="$(GDAL)/frmts" />
 		</Compiler>
 		<Unit filename="../../include/wxgis/geoprocessing/geoprocessing.h" />
 		<Unit filename="../../include/wxgis/geoprocessing/gpdomain.h" />

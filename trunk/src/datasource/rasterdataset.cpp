@@ -22,7 +22,7 @@
 #include "wxgis/datasource/sysop.h"
 #include "wx/filename.h"
 
-#include "vrtwarpedoverview.h"
+#include "vrt/vrtwarpedoverview.h"
 #include "gdal_rat.h"
 
 wxGISRasterDataset::wxGISRasterDataset(wxString sPath, wxGISEnumRasterDatasetType nType) : wxGISDataset(sPath), m_bIsOpened(false), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false), m_poMainDataset(NULL), m_poDataset(NULL)
@@ -73,7 +73,7 @@ bool wxGISRasterDataset::Delete(void)
    //    GDALClose(m_poDataset);
    //}
    // if(pDrv)
-   // {        
+   // {
    //     CPLErr eErr = pDrv->Delete((const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/);
    //     if(eErr != CE_Fatal)
    //         return true;
@@ -112,7 +112,7 @@ bool wxGISRasterDataset::Delete(void)
     case enumRasterUnknown:
     default: return false;
     }
-	return false;    
+	return false;
 }
 
 bool wxGISRasterDataset::Rename(wxString sNewName)
@@ -156,7 +156,7 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
     case enumRasterUnknown:
     default: return false;
     }
-	return false;    
+	return false;
 }
 
 bool wxGISRasterDataset::Open(void)
@@ -174,7 +174,7 @@ bool wxGISRasterDataset::Open(void)
         m_sPath.Replace(wxT("\\"), wxT("/"));
         m_poDataset = (GDALDataset *) GDALOpenShared( wgWX2MB(m_sPath), GA_ReadOnly );
     }
-    
+
     //m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath), GA_ReadOnly );
 	if( m_poDataset == NULL )
     {
@@ -208,7 +208,7 @@ bool wxGISRasterDataset::Open(void)
           //      //create pyramids
           //      //int anOverviewList[9] = { 2, 4, 8, 16, 32, 64, 96, 128, 256 };
           //      //CPLErr err = m_poDataset->BuildOverviews( "NEAREST", 9, anOverviewList, 0, NULL, GDALDummyProgress, NULL );
-		        ////"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE" 
+		        ////"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE"
 
           //      //get first overview
           //      //GDALDataset* pDS = m_poMainDataset->GetRasterBand(1)->GetOverview(4)->GetDataset();
@@ -342,7 +342,7 @@ bool wxGISRasterDataset::Open(void)
         //    nCount = GDALGetRandomRasterSample( hBand, 10000, afSample );
         //    printf( "Got %d samples.\n", nCount );
         //}
-        
+
 		pBand->GetBlockSize(&nBlockXSize, &nBlockYSize);
 		wxLogDebug( wxT( "Band %d Block=%dx%d Type=%s, ColorInterp=%s"), nBand + 1, nBlockXSize, nBlockYSize, wgMB2WX(GDALGetDataTypeName(pBand->GetRasterDataType())), wgMB2WX(GDALGetColorInterpretationName(pBand->GetColorInterpretation())));
 
@@ -357,7 +357,7 @@ bool wxGISRasterDataset::Open(void)
                 wxLogDebug( wxT( "Min=%.3f "), dfMin );
             if( bGotMax )
                 wxLogDebug( wxT( "Max=%.3f "), dfMax );
-        
+
 			pBand->ComputeRasterMinMax(FALSE, adfCMinMax );
             wxLogDebug( wxT("  Computed Min/Max=%.3f,%.3f"), adfCMinMax[0], adfCMinMax[1] );
         }
@@ -372,8 +372,8 @@ bool wxGISRasterDataset::Open(void)
         //{
         //    int nBucketCount, *panHistogram = NULL;
 
-        //    eErr = GDALGetDefaultHistogram( hBand, &dfMin, &dfMax, 
-        //                                    &nBucketCount, &panHistogram, 
+        //    eErr = GDALGetDefaultHistogram( hBand, &dfMin, &dfMax,
+        //                                    &nBucketCount, &panHistogram,
         //                                    TRUE, GDALTermProgress, NULL );
         //    if( eErr == CE_None )
         //    {
@@ -431,7 +431,7 @@ bool wxGISRasterDataset::Open(void)
         {
            wxLogDebug( wxT("  Overviews: arbitrary" ));
         }
-        
+
 		nMaskFlags = pBand->GetMaskFlags();
         if( (nMaskFlags & (GMF_NODATA|GMF_ALL_VALID)) == 0 )
         {
@@ -445,7 +445,7 @@ bool wxGISRasterDataset::Open(void)
             if( nMaskFlags & GMF_NODATA )
                 wxLogDebug( wxT("NODATA " ));
             if( nMaskFlags & GMF_ALL_VALID )
-               wxLogDebug( wxT("ALL_VALID " ));    
+               wxLogDebug( wxT("ALL_VALID " ));
 
 			if( pMaskBand != NULL && pMaskBand->GetOverviewCount() > 0 )
             {
@@ -472,7 +472,7 @@ bool wxGISRasterDataset::Open(void)
 
 		char **papszCategories = pBand->GetCategoryNames();
         if( papszCategories != NULL )
-        {            
+        {
             int i;
             wxLogDebug( wxT("  Categories:" ));
             for( i = 0; papszCategories[i] != NULL; i++ )
@@ -622,10 +622,10 @@ const OGREnvelope* wxGISRasterDataset::GetEnvelope(void)
 //	double        adfGeoTransform[6];
 //
 //    printf( "Driver: %s/%s\n",
-//            poDataset->GetDriver()->GetDescription(), 
+//            poDataset->GetDriver()->GetDescription(),
 //            poDataset->GetDriver()->GetMetadataItem( GDAL_DMD_LONGNAME ) );
 //
-//    printf( "Size is %dx%dx%d\n", 
+//    printf( "Size is %dx%dx%d\n",
 //            poDataset->GetRasterXSize(), poDataset->GetRasterYSize(),
 //            poDataset->GetRasterCount() );
 //
@@ -647,7 +647,7 @@ const OGREnvelope* wxGISRasterDataset::GetEnvelope(void)
 //        int             nBlockXSize, nBlockYSize;
 //        int             bGotMin, bGotMax;
 //        double          adfMinMax[2];
-//        
+//
 //        poBand = poDataset->GetRasterBand( 1 );
 //        poBand->GetBlockSize( &nBlockXSize, &nBlockYSize );
 //        printf( "Block=%dx%d Type=%s, ColorInterp=%s\n",
@@ -662,12 +662,12 @@ const OGREnvelope* wxGISRasterDataset::GetEnvelope(void)
 //            GDALComputeRasterMinMax((GDALRasterBandH)poBand, TRUE, adfMinMax);
 //
 //        printf( "Min=%.3fd, Max=%.3f\n", adfMinMax[0], adfMinMax[1] );
-//        
+//
 //        if( poBand->GetOverviewCount() > 0 )
 //            printf( "Band has %d overviews.\n", poBand->GetOverviewCount() );
 //
 //        if( poBand->GetColorTable() != NULL )
-//            printf( "Band has a color table with %d entries.\n", 
+//            printf( "Band has a color table with %d entries.\n",
 //                     poBand->GetColorTable()->GetColorEntryCount() );
 //
 //
@@ -676,6 +676,6 @@ const OGREnvelope* wxGISRasterDataset::GetEnvelope(void)
 //        int   nXSize = poBand->GetXSize();
 //
 //        pafScanline = (float *) CPLMalloc(sizeof(float)*nXSize);
-//        poBand->RasterIO( GF_Read, 0, 0, nXSize, 1, 
-//                          pafScanline, nXSize, 1, GDT_Float32, 
+//        poBand->RasterIO( GF_Read, 0, 0, nXSize, 1,
+//                          pafScanline, nXSize, 1, GDT_Float32,
 //                          0, 0 );

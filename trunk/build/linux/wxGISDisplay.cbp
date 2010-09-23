@@ -44,7 +44,6 @@
 			<Add directory="$(GDAL)/port" />
 			<Add directory="$(GDAL)/gcore" />
 			<Add directory="$(GDAL)/alg" />
-			<Add directory="$(GDAL)/ogr/ogrsf_frmts" />
 		</Compiler>
 		<Unit filename="../../include/wxgis/display/display.h" />
 		<Unit filename="../../include/wxgis/display/displaytransformation.h" />

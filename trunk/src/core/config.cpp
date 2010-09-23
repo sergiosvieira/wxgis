@@ -56,8 +56,8 @@ wxGISConfig::wxGISConfig(wxString sAppName, wxString sConfigDir, bool bPortable)
 
 	    if(!wxDirExists(m_sUserConfigDir))
 		    wxFileName::Mkdir(m_sUserConfigDir, 0755, wxPATH_MKDIR_FULL);
-	    if(!wxDirExists(m_sSysConfigDir))
-		    wxFileName::Mkdir(m_sSysConfigDir, 0775, wxPATH_MKDIR_FULL);
+//	    if(!wxDirExists(m_sSysConfigDir))
+//		    wxFileName::Mkdir(m_sSysConfigDir, 0775, wxPATH_MKDIR_FULL);
     }
 }
 
