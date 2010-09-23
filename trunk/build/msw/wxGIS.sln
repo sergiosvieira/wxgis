@@ -98,8 +98,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISDataSource", "wxGISDat
 		{D7C200AC-A29B-4894-B222-1C77030545BE} = {D7C200AC-A29B-4894-B222-1C77030545BE}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gdal", "..\..\..\gdal-1.7.2\wxGIS\gdal\gdal.vcproj", "{31B5B86E-738C-4AA9-ADEF-B204BDF1D891}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -154,8 +152,6 @@ Global
 		{0F6A3C59-9206-4987-9D82-B4725311FB57}.Debug|Win32.Build.0 = Debug|Win32
 		{0F6A3C59-9206-4987-9D82-B4725311FB57}.Release|Win32.ActiveCfg = Release|Win32
 		{0F6A3C59-9206-4987-9D82-B4725311FB57}.Release|Win32.Build.0 = Release|Win32
-		{31B5B86E-738C-4AA9-ADEF-B204BDF1D891}.Debug|Win32.ActiveCfg = Debug|Win32
-		{31B5B86E-738C-4AA9-ADEF-B204BDF1D891}.Release|Win32.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

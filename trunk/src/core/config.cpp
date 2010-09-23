@@ -70,7 +70,9 @@ void wxGISConfig::Clean(void)
 {
 	for(size_t i = 0; i < m_configs_arr.size(); i++)
 	{
-		m_configs_arr[i].pXmlDoc->Save(m_configs_arr[i].xml_path);
+        //Store only user settings. Common settings should be changed during install process
+        if(m_configs_arr[i].Key == enumGISHKCU)
+            m_configs_arr[i].pXmlDoc->Save(m_configs_arr[i].xml_path);
 		wxDELETE(m_configs_arr[i].pXmlDoc);
 	}
 	m_configs_arr.clear();
