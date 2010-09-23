@@ -85,8 +85,8 @@ void wxGISProgressor::OnPaint(wxPaintEvent & event)
         wxFont Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
         Font.SetWeight(wxFONTWEIGHT_BOLD);
         //dc.SetBackgroundMode(wxTRANSPARENT);
-        dc.SetTextForeground(*wxBLACK);
-        dc.SetTextBackground(*wxWHITE);
+        dc.SetTextForeground(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));//*wxBLACK);
+        dc.SetTextBackground(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));//*wxWHITE);
 
 	    dc.SetFont(Font);
 	    dc.GetTextExtent(format_s, &width, &height);
