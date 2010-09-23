@@ -76,6 +76,17 @@
 #    define WXDLLIMPEXP_DATA_GIS_CRT(type) type
 #endif
 
+#ifdef WXMAKINGDLL_GIS_CTU
+#    define WXDLLIMPEXP_GIS_CTU WXEXPORT
+#    define WXDLLIMPEXP_DATA_GIS_CTU(type) WXEXPORT type
+#elif defined(WXUSINGDLL)
+#    define WXDLLIMPEXP_GIS_CTU WXIMPORT
+#    define WXDLLIMPEXP_DATA_GIS_CTU(type) WXIMPORT type
+#else /* not making nor using DLL */
+#    define WXDLLIMPEXP_GIS_CTU
+#    define WXDLLIMPEXP_DATA_GIS_CTU(type) type
+#endif
+
 #ifdef WXMAKINGDLL_GIS_CLT
 #    define WXDLLIMPEXP_GIS_CLT WXEXPORT
 #    define WXDLLIMPEXP_DATA_GIS_CLT(type) WXEXPORT type

@@ -1,17 +1,41 @@
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_FRW  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include -I../../art -I../../include/wxgis  -c /home/bishop/projects/wxGIS/src/framework/accelerator.cpp -o ../obj/src/framework/accelerator.o
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_FRW  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include -I../../art -I../../include/wxgis  -c /home/bishop/projects/wxGIS/src/framework/addcommanddlg.cpp -o ../obj/src/framework/addcommanddlg.o
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_FRW  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include -I../../art -I../../include/wxgis  -c /home/bishop/projects/wxGIS/src/framework/animation.cpp -o ../obj/src/framework/animation.o
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_FRW  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include -I../../art -I../../include/wxgis  -c /home/bishop/projects/wxGIS/src/framework/application.cpp -o ../obj/src/framework/application.o
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_FRW  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include -I../../art -I../../include/wxgis  -c /home/bishop/projects/wxGIS/src/framework/command.cpp -o ../obj/src/framework/command.o
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_FRW  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include -I../../art -I../../include/wxgis  -c /home/bishop/projects/wxGIS/src/framework/commandbar.cpp -o ../obj/src/framework/commandbar.o
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_FRW  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include -I../../art -I../../include/wxgis  -c /home/bishop/projects/wxGIS/src/framework/createcbdlg.cpp -o ../obj/src/framework/createcbdlg.o
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_FRW  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include -I../../art -I../../include/wxgis  -c /home/bishop/projects/wxGIS/src/framework/keycodedlg.cpp -o ../obj/src/framework/keycodedlg.o
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_FRW  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include -I../../art -I../../include/wxgis  -c /home/bishop/projects/wxGIS/src/framework/menubar.cpp -o ../obj/src/framework/menubar.o
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_FRW  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include -I../../art -I../../include/wxgis  -c /home/bishop/projects/wxGIS/src/framework/messagedlg.cpp -o ../obj/src/framework/messagedlg.o
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_FRW  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include -I../../art -I../../include/wxgis  -c /home/bishop/projects/wxGIS/src/framework/progressdlg.cpp -o ../obj/src/framework/progressdlg.o
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_FRW  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include -I../../art -I../../include/wxgis  -c /home/bishop/projects/wxGIS/src/framework/progressor.cpp -o ../obj/src/framework/progressor.o
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_FRW  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include -I../../art -I../../include/wxgis  -c /home/bishop/projects/wxGIS/src/framework/statusbar.cpp -o ../obj/src/framework/statusbar.o
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_FRW  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include -I../../art -I../../include/wxgis  -c /home/bishop/projects/wxGIS/src/framework/toolbarmenu.cpp -o ../obj/src/framework/toolbarmenu.o
-g++ -Wall  -g -D__UNIX__ -D__WXGTK__ -DWXUSINGDLL -D_USRDLL -DWXMAKINGDLL_GIS_FRW  -g -I/usr/lib/wx/include/gtk2-unicode-release-2.8 -I/usr/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -pthread      -I../../include -I../../art -I../../include/wxgis  -c /home/bishop/projects/wxGIS/src/framework/tooltip.cpp -o ../obj/src/framework/tooltip.o
-g++ -shared  ../obj/src/framework/accelerator.o ../obj/src/framework/addcommanddlg.o ../obj/src/framework/animation.o ../obj/src/framework/application.o ../obj/src/framework/command.o ../obj/src/framework/commandbar.o ../obj/src/framework/createcbdlg.o ../obj/src/framework/keycodedlg.o ../obj/src/framework/menubar.o ../obj/src/framework/messagedlg.o ../obj/src/framework/progressdlg.o ../obj/src/framework/progressor.o ../obj/src/framework/statusbar.o ../obj/src/framework/toolbarmenu.o ../obj/src/framework/tooltip.o   -o ../debug/wxGISFrameworkd.so -pthread -Wl,-Bsymbolic-functions  -lwx_gtk2u_richtext-2.8 -lwx_gtk2u_aui-2.8 -lwx_gtk2u_xrc-2.8 -lwx_gtk2u_qa-2.8 -lwx_gtk2u_html-2.8 -lwx_gtk2u_adv-2.8 -lwx_gtk2u_core-2.8 -lwx_baseu_xml-2.8 -lwx_baseu_net-2.8 -lwx_baseu-2.8   -lcurl
+DESTDIR =
+
+version := 0.2.0
+postfix := framework
+name := wxgis$(postfix)
+program_name := $(name).so.$(version)
+
+include wxgiscommon.mak
+
+CXXFLAGS += -fPIC -s -O2 -c -MD
+CXXFLAGS += -I../../include -I../../include/wxgis -I../../include/wxgis$(postfix)
+CXXFLAGS += -DWXMAKINGDLL_GIS_FRW
+
+source_dirs  := ../../src/$(postfix)
+search_wildcards := $(addsuffix /*.cpp,$(source_dirs))
+obj_dir := ./obj/$(postfix)
+dst_dir := ../../tmp/usr/lib/wxgis
+
+all: create_out $(program_name)
+
+create_out:
+	-mkdir -p $(obj_dir)
+	-mkdir -p $(dst_dir)
+
+$(program_name): $(notdir $(patsubst %.cpp,%.o,$(wildcard $(search_wildcards))))	
+	$(CXX) -shared $(addprefix $(obj_dir)/,$^) -o $(dst_dir)/$@ `wx-config --libs`
+
+VPATH := $(source_dirs)
+     
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) `wx-config --cxxflags` $(addprefix -I,$(source_dirs)) -o $(obj_dir)/$@ $<
+
+include $(wildcard *.d)
+
+clean:
+	-rm -f ./$(obj_dir)/*.o ./$(obj_dir)/*.d
+	-rmdir -p --ignore-fail-on-non-empty ./$(obj_dir)
+	-rm -f $(dst_dir)/$(program_name)
+
+.PHONY: clean
 

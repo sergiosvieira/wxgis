@@ -52,12 +52,11 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add directory="../../include" />
+			<Add directory="../../include/wxgis" />
 			<Add directory="$(GDAL)/ogr" />
-			<Add directory="$(GDAL)/ogr/ogrsf_frmts" />
 			<Add directory="$(GDAL)/port" />
 			<Add directory="$(GDAL)/gcore" />
 			<Add directory="$(GDAL)/alg" />
-			<Add directory="../../include/wxgis" />
 		</Compiler>
 		<Unit filename="../../include/wxgis/cat_app/catalogapp.h" />
 		<Unit filename="../../include/wxgis/cat_app/catalogframe.h" />

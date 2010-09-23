@@ -40,8 +40,8 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add directory="../../include" />
-			<Add directory="../../art" />
 			<Add directory="../../include/wxgis" />
+			<Add directory="../../art" />
 		</Compiler>
 		<Unit filename="../../include/wxgis/framework/accelerator.h" />
 		<Unit filename="../../include/wxgis/framework/addcommanddlg.h" />

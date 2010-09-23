@@ -40,12 +40,11 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add directory="../../include" />
+			<Add directory="../../include/wxgis" />
 			<Add directory="$(GDAL)/ogr" />
-			<Add directory="$(GDAL)/ogr/ogrsf_frmts" />
 			<Add directory="$(GDAL)/gcore" />
 			<Add directory="$(GDAL)/port" />
 			<Add directory="$(GDAL)/alg" />
-			<Add directory="../../include/wxgis" />
 		</Compiler>
 		<Unit filename="../../include/wxgis/catalogui/catalogcmd.h" />
 		<Unit filename="../../include/wxgis/catalogui/catalogui.h" />

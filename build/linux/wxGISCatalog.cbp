@@ -40,12 +40,11 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add directory="../../include" />
+			<Add directory="../../include/wxgis" />
 			<Add directory="$(GDAL)/ogr" />
 			<Add directory="$(GDAL)/alg" />
 			<Add directory="$(GDAL)/gcore" />
 			<Add directory="$(GDAL)/port" />
-			<Add directory="$(GDAL)/ogr/ogrsf_frmts" />
-			<Add directory="../../include/wxgis" />
 		</Compiler>
 		<Unit filename="../../include/wxgis/catalog/catalog.h" />
 		<Unit filename="../../include/wxgis/catalog/gxarchfolder.h" />
