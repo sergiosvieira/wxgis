@@ -129,8 +129,6 @@ bool wxGISCatalogApp::OnInit()
 		{
 			wxFileName name(trans_arr[i]);
 			m_locale.AddCatalog(name.GetName());
-
-			//m_locale.AddCatalog(wxT("wxMonClient"));
 		}
 
 		// this catalog is installed in standard location on Linux systems and
@@ -168,7 +166,6 @@ bool wxGISCatalogApp::OnInit()
 	CPLSetConfigOption("CPL_LOG", wgWX2MB(sCPLLogPath.c_str()) );
 
     CPLSetConfigOption( "GDAL_CACHEMAX", "128" );
-    //GDAL_CACHEMAX
     //GDAL_MAX_DATASET_POOL_SIZE
     //OGR_ARC_STEPSIZE
 

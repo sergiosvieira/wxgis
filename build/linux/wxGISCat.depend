@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1285267409 source:/home/bishop/projects/wxGIS/src/cat_app/catalogapp.cpp
+1285412789 source:/home/bishop/projects/wxGIS/src/cat_app/catalogapp.cpp
 	"wxgis/catalog/catalog.h"
 	"wxgis/cat_app/catalogapp.h"
 	"wxgis/cat_app/catalogframe.h"
@@ -7,7 +7,7 @@
 	"ogrsf_frmts/ogrsf_frmts.h"
 	"ogr_api.h"
 
-1285266376 /home/bishop/projects/wxGIS/include/wxgis/catalog/catalog.h
+1285268794 /home/bishop/projects/wxGIS/include/wxgis/catalog/catalog.h
 	"wxgis/datasource/datasource.h"
 	"wx/filename.h"
 
@@ -27,7 +27,7 @@
 1277670959 /home/bishop/projects/wxGIS/include/wxgis/core/core.h
 	"wxgis/base.h"
 
-1285266729 /home/bishop/projects/wxGIS/include/wxgis/base.h
+1285276556 /home/bishop/projects/wxGIS/include/wxgis/base.h
 	"wx/wxprec.h"
 	"wx/wx.h"
 	<wx/xml/xml.h>

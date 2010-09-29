@@ -402,7 +402,7 @@ void wxGxCatalog::SerializeDiscConnections(wxXmlNode* pNode, bool bStore)
             wxStandardPaths stp;
             arr.Add(wxT("/"));
             arr.Add(stp.GetUserConfigDir());
-            arr.Add(stp.GetDataDir());
+//            arr.Add(stp.GetDataDir());
 #endif
             for(size_t i = 0; i < arr.size(); i++)
 			{

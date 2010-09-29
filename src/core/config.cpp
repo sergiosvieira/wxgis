@@ -311,8 +311,23 @@ wxGISAppConfig::~wxGISAppConfig(void)
 
 wxString wxGISAppConfig::GetLocale(void)
 {
-    wxXmlNode* pNode = GetConfigNode(enumGISHKCU, wxString(wxT("loc")));
-    wxString sDefaultOut(wxT("en"));
+    wxXmlNode* pNode = GetConfigNode(wxString(wxT("loc")), false, true);
+    const wxLanguageInfo* loc_info = wxLocale::GetLanguageInfo(wxLocale::GetSystemLanguage());
+    wxString sDefaultOut = loc_info->CanonicalName;
+    if(sDefaultOut.IsEmpty())
+        sDefaultOut = wxString(wxT("en"));
+    else
+    {
+        //remove duplicated part of name
+        int pos = sDefaultOut.Find(wxT("_"));
+        if(pos != wxNOT_FOUND)
+        {
+            wxString sPart1 = sDefaultOut.Left(pos);
+            wxString sPart2 = sDefaultOut.Right(sDefaultOut.Len() - pos - 1);
+            if(sPart1.CmpNoCase(sPart2) == 0)
+                sDefaultOut = sPart1;
+        }
+    }
     if(!pNode)
         return sDefaultOut;
     return pNode->GetPropVal(wxT("locale"), sDefaultOut);
@@ -320,7 +335,7 @@ wxString wxGISAppConfig::GetLocale(void)
 
 wxString wxGISAppConfig::GetLocaleDir(void)
 {
-    wxXmlNode* pNode = GetConfigNode(enumGISHKCU, wxString(wxT("loc")));
+    wxXmlNode* pNode = GetConfigNode(wxString(wxT("loc")), false, true);
 
     wxString sDefaultOut = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("locale");
     if(!pNode || m_bPortable)
@@ -330,7 +345,7 @@ wxString wxGISAppConfig::GetLocaleDir(void)
 
 wxString wxGISAppConfig::GetLogDir(void)
 {
-    wxXmlNode* pNode = GetConfigNode(enumGISHKCU, wxString(wxT("log")));
+    wxXmlNode* pNode = GetConfigNode(wxString(wxT("log")), false, true);
 
     wxString sDefaultOut = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("log");
     if(!pNode)
@@ -341,7 +356,7 @@ wxString wxGISAppConfig::GetLogDir(void)
 
 wxString wxGISAppConfig::GetSysDir(void)
 {
-    wxXmlNode* pNode = GetConfigNode(enumGISHKLM, wxString(wxT("sys")));
+    wxXmlNode* pNode = GetConfigNode(wxString(wxT("sys")), false, true);
 
     wxString sDefaultOut = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("sys");
     if(!pNode || m_bPortable)
@@ -351,7 +366,7 @@ wxString wxGISAppConfig::GetSysDir(void)
 
 bool wxGISAppConfig::GetDebugMode(void)
 {
-    wxXmlNode* pNode = GetConfigNode(enumGISHKLM, wxString(wxT("debug")));
+    wxXmlNode* pNode = GetConfigNode(wxString(wxT("debug")), false, true);
 
     bool bDefaultOut = false;
     if(!pNode)
@@ -397,10 +412,10 @@ void wxGISAppConfig::SetSysDir(wxString sSysDir)
     if(m_bPortable)
         return;
 	wxString sPropPath(wxT("sys"));
-    wxXmlNode* pNode = GetConfigNode(enumGISHKLM, sPropPath);
+    wxXmlNode* pNode = GetConfigNode(enumGISHKCU, sPropPath);
     if(!pNode)
 	{
-		pNode = CreateConfigNode(enumGISHKLM, sPropPath);
+		pNode = CreateConfigNode(enumGISHKCU, sPropPath);
 		if(!pNode)
 			return;
 	}
@@ -429,10 +444,10 @@ void wxGISAppConfig::SetLogDir(wxString sLogDir)
 void wxGISAppConfig::SetDebugMode(bool bDebug)
 {
 	wxString sPropPath = wxString(wxT("debug"));
-    wxXmlNode* pNode = GetConfigNode(enumGISHKLM, sPropPath);
+    wxXmlNode* pNode = GetConfigNode(enumGISHKCU, sPropPath);
     if(!pNode)
 	{
-		pNode = CreateConfigNode(enumGISHKLM, sPropPath);
+		pNode = CreateConfigNode(enumGISHKCU, sPropPath);
 		if(!pNode)
 			return;
 	}

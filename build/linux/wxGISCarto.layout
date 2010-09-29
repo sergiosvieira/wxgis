@@ -16,8 +16,8 @@
 	<File name="../../src/carto/featurelayer.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="4295" topLine="107" />
 	</File>
-	<File name="../../src/carto/mapview.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="16597" topLine="588" />
+	<File name="../../src/carto/mapview.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="1256" topLine="14" />
 	</File>
 	<File name="../../src/carto/tableview.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="2310" topLine="74" />
