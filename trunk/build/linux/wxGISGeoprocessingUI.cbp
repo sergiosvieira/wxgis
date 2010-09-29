@@ -17,9 +17,9 @@
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add library="$(GDAL)/bin/wxgiscpld.so" />
-					<Add library="$(GDAL)/bin/wxgisogrd.so" />
-					<Add library="$(GDAL)/bin/wxgisgdald.so" />
+					<Add library="/usr/lib/wxgis/wxgiscpl.so" />
+					<Add library="/usr/lib/wxgis/wxgisogr.so" />
+					<Add library="/usr/lib/wxgis/wxgisgdal.so" />
 					<Add library="/usr/lib/libcurl.so" />
 					<Add library="/usr/lib/libgeos_c.so" />
 					<Add library="/usr/lib/libproj.so" />
@@ -36,7 +36,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="../release/wxGISGeoprocessingUI" prefix_auto="1" extension_auto="1" />
+				<Option output="../release/wxgisgeoprocessingui" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../obj/" />
 				<Option type="3" />
 				<Option compiler="gcc" />

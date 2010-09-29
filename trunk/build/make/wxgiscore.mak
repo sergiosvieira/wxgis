@@ -7,7 +7,6 @@ program_name := $(name).so.$(version)
 
 include wxgiscommon.mak
 
-CXXFLAGS += -fPIC -s -O2 -c -MD
 CXXFLAGS += -I../../include -I../../include/wxgis -I../../include/wxgis$(postfix)
 CXXFLAGS += -DWXMAKINGDLL_GIS_CORE
 
@@ -23,12 +22,12 @@ create_out:
 	-mkdir -p $(dst_dir)
 
 $(program_name): $(notdir $(patsubst %.cpp,%.o,$(wildcard $(search_wildcards))))	
-	$(CXX) -shared $(addprefix $(obj_dir)/,$^) -o $(dst_dir)/$@ `wx-config --libs`
+	$(CXX) -shared $(addprefix $(obj_dir)/,$^) -o $(dst_dir)/$@ $(LDFLAGS) `wx-config --libs`
 
 VPATH := $(source_dirs)
      
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) `wx-config --cxxflags` $(addprefix -I,$(source_dirs)) -o $(obj_dir)/$@ $<
+	$(CXX) $(CXXFLAGS) `wx-config --cxxflags` $(addprefix -I,$(source_dirs)) -o $(obj_dir)/$@ -c $<
 
 include $(wildcard *.d)
 

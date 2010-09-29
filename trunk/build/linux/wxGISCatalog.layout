@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="../../include/wxgis/catalog/catalog.h" open="1" top="1" tabpos="2">
+	<File name="../../include/wxgis/catalog/catalog.h" open="0" top="0" tabpos="2">
 		<Cursor position="1238" topLine="19" />
 	</File>
 	<File name="../../include/wxgis/catalog/gxcatalog.h" open="0" top="0" tabpos="0">
@@ -19,8 +19,8 @@
 	<File name="../../src/catalog/gxarchfolder.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="5464" topLine="167" />
 	</File>
-	<File name="../../src/catalog/gxcatalog.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="9825" topLine="307" />
+	<File name="../../src/catalog/gxcatalog.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="12551" topLine="385" />
 	</File>
 	<File name="../../src/catalog/gxfile.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="1152" topLine="6" />
