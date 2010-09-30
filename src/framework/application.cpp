@@ -724,13 +724,8 @@ bool wxGISApplication::Create(IGISConfig* pConfig)
 
 
     // create MenuBar
-	wxXmlNode* pMenuBarNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/menubar")));
-	if(!pMenuBarNode)
-	{
-		wxXmlNode* pMenuBarNodeLM = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame/menubar")));
-		pMenuBarNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame/menubar")), true);
-		pMenuBarNode->operator=(*pMenuBarNodeLM);
-	}
+	wxXmlNode* pMenuBarNode = m_pConfig->GetConfigNode(wxString(wxT("frame/menubar")), true, true);
+
     m_pMenuBar = new wxGISMenuBar(0, static_cast<IApplication*>(this), pMenuBarNode); //wxMB_DOCKABLE
     SetMenuBar(static_cast<wxMenuBar*>(m_pMenuBar));
 

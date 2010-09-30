@@ -655,9 +655,7 @@ void wxGxObjectDialog::OnInit()
 		nStyle |= wxLC_SINGLE_SEL;
    	m_pwxGxContentView = new wxGxDialogContentView(this, LISTCTRLID, wxDefaultPosition, wxDefaultSize, nStyle);
     m_pwxGxContentView->SetExternalCatalog(m_pExternalCatalog);
-    wxXmlNode* pContentViewConf = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/views/contentsview")));
-    if(!pContentViewConf)
-        pContentViewConf = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame/views/contentsview")));
+    wxXmlNode* pContentViewConf = m_pConfig->GetConfigNode(wxString(wxT("frame/views/contentsview")), true, true);
 
     m_pwxGxContentView->Activate(this, pContentViewConf);
     RegisterChildWindow(static_cast<wxWindow*>(m_pwxGxContentView));

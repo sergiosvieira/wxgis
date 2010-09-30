@@ -130,9 +130,14 @@ void wxGxToolbox::LoadChildrenFromXml(wxXmlNode* pNode)
         else if(pChild->GetName().IsSameAs(wxT("tool"), false))
         {
             wxGxTool* pTool = new wxGxTool(pChild, m_pToolMngr, m_pPropNode);
-            IGxObject* pGxObj = static_cast<IGxObject*>(pTool);
-            if(!AddChild(pGxObj))
-                wxDELETE(pGxObj);
+            if(pTool->IsOk())
+            {
+                IGxObject* pGxObj = static_cast<IGxObject*>(pTool);
+                if(!AddChild(pGxObj))
+                    wxDELETE(pGxObj);
+            }
+            else
+                wxDELETE(pTool);
         }
         pChild = pChild->GetNext();
     }
@@ -143,7 +148,7 @@ void wxGxToolbox::LoadChildrenFromXml(wxXmlNode* pNode)
 /////////////////////////////////////////////////////////////////////////
 IMPLEMENT_DYNAMIC_CLASS(wxGxRootToolbox, wxObject)
 
-wxGxRootToolbox::wxGxRootToolbox(void) : m_bIsChildrenLoaded(false)
+wxGxRootToolbox::wxGxRootToolbox(void) : m_bIsChildrenLoaded(false), m_pConfig(NULL)
 {
     m_pToolMngr = NULL;
     m_pPropNode = NULL;
@@ -158,35 +163,44 @@ void wxGxRootToolbox::Detach(void)
 	EmptyChildren();
     wxDELETE(m_pToolMngr);
 
-    if(m_XmlDoc.IsOk())
-    {
-        m_XmlDoc.Save(m_sPath);
-    }
+    wxDELETE(m_pConfig);
+
+//    if(m_XmlDoc.IsOk())
+//    {
+//        m_XmlDoc.Save(m_sPath);
+//    }
 }
 
 void wxGxRootToolbox::Init(wxXmlNode* pConfigNode)
 {
-    m_sPath = pConfigNode->GetPropVal(wxT("path"), NON);
-    if(m_sPath.IsEmpty() || m_sPath == wxString(NON))
-    {
-        wxStandardPaths stp;
-        wxString sExeDirPath = wxPathOnly(stp.GetExecutablePath());
-        m_sPath = sExeDirPath + wxT("/sys/toolbox.xml");
-        m_sPath.Replace(wxT("\\"), wxT("/"));
-    }
-    wxLogMessage(_("wxGxRootToolbox: The path is set to '%s'"), m_sPath.c_str());
-
-    m_pPropNode = new wxXmlNode(*pConfigNode);
-    //m_pPropNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("rootitem"));
-    //wxClassInfo* pInfo = GetClassInfo();
-    //if(pInfo)
-    //    m_pPropNode->AddProperty(wxT("name"), pInfo->GetClassName());
-    //m_pPropNode->AddProperty(wxT("is_enabled"), wxT("1"));
 #ifdef WXGISPORTABLE
-    if(m_pPropNode->HasProp(wxT("path")))
-        m_pPropNode->DeleteProperty(wxT("path"));
-    m_pPropNode->AddProperty(wxT("path"), wxEmptyString);
+    m_pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, true);
+#else
+	m_pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, false);
 #endif
+
+
+//    m_sPath = pConfigNode->GetPropVal(wxT("path"), NON);
+//    if(m_sPath.IsEmpty() || m_sPath == wxString(NON))
+//    {
+//        wxStandardPaths stp;
+//        wxString sExeDirPath = wxPathOnly(stp.GetExecutablePath());
+//        m_sPath = sExeDirPath + wxT("/sys/toolbox.xml");
+//        m_sPath.Replace(wxT("\\"), wxT("/"));
+//    }
+//    wxLogMessage(_("wxGxRootToolbox: The path is set to '%s'"), m_sPath.c_str());
+//
+    m_pPropNode = new wxXmlNode(*pConfigNode);
+//    //m_pPropNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("rootitem"));
+//    //wxClassInfo* pInfo = GetClassInfo();
+//    //if(pInfo)
+//    //    m_pPropNode->AddProperty(wxT("name"), pInfo->GetClassName());
+//    //m_pPropNode->AddProperty(wxT("is_enabled"), wxT("1"));
+//#ifdef WXGISPORTABLE
+//    if(m_pPropNode->HasProp(wxT("path")))
+//        m_pPropNode->DeleteProperty(wxT("path"));
+//    m_pPropNode->AddProperty(wxT("path"), wxEmptyString);
+//#endif
 }
 
 void wxGxRootToolbox::LoadChildren(void)
@@ -195,24 +209,28 @@ void wxGxRootToolbox::LoadChildren(void)
 		return;
 
     wxBusyCursor wait;
-    if( !m_XmlDoc.Load(m_sPath) )
-        return;
-    if (m_XmlDoc.GetRoot()->GetName() != wxT("wxToolboxes"))
-        return;
+//    if( !m_XmlDoc.Load(m_sPath) )
+//        return;
+//    if (m_XmlDoc.GetRoot()->GetName() != wxT("wxToolboxes"))
+//        return;
 
     wxXmlNode *pToolsChild(NULL), *pToolboxesChild(NULL);
-    wxXmlNode* pChild = m_XmlDoc.GetRoot()->GetChildren();
-    while(pChild)
-    {
-        if(pChild->GetName().CmpNoCase(wxT("toolboxes")) == 0)
-            pToolboxesChild = pChild;
-        if(pChild->GetName().CmpNoCase(wxT("tools")) == 0)
-            pToolsChild = pChild;
-        pChild = pChild->GetNext();
-    }
+    pToolsChild = m_pConfig->GetConfigNode(wxT("tools"), false, true);
+    pToolboxesChild = m_pConfig->GetConfigNode(wxT("toolboxes"), false, true);
+
+//    wxXmlNode* pChild = m_XmlDoc.GetRoot()->GetChildren();
+//    while(pChild)
+//    {
+//        if(pChild->GetName().CmpNoCase(wxT("toolboxes")) == 0)
+//            pToolboxesChild = pChild;
+//        if(pChild->GetName().CmpNoCase(wxT("tools")) == 0)
+//            pToolsChild = pChild;
+//        pChild = pChild->GetNext();
+//    }
 
     m_pToolMngr = new wxGISGPToolManager(pToolsChild, m_pCatalog);
     LoadChildrenFromXml(pToolboxesChild);
+    //load children from local machine node exluding dupes
 
  //   //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
  //   //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
@@ -276,14 +294,14 @@ wxXmlNode* wxGxRootToolbox::GetProperties(void)
 /////////////////////////////////////////////////////////////////////////
 // wxGxTool
 /////////////////////////////////////////////////////////////////////////
-wxGxTool::wxGxTool(wxGISGPToolManager* pToolMngr, wxXmlNode* pPropNode) : m_pToolMngr(NULL), m_pPropNode(NULL)
+wxGxTool::wxGxTool(wxGISGPToolManager* pToolMngr, wxXmlNode* pPropNode) : m_pToolMngr(NULL), m_pPropNode(NULL), m_bIsOk(true)
 {
     m_sName = NONAME;
     m_pToolMngr = pToolMngr;
     m_pPropNode = pPropNode;
 }
 
-wxGxTool::wxGxTool(wxXmlNode* pDataNode, wxGISGPToolManager* pToolMngr, wxXmlNode* pPropNode) : m_pToolMngr(NULL), m_pPropNode(NULL)
+wxGxTool::wxGxTool(wxXmlNode* pDataNode, wxGISGPToolManager* pToolMngr, wxXmlNode* pPropNode) : m_pToolMngr(NULL), m_pPropNode(NULL), m_bIsOk(true)
 {
     m_pDataNode = pDataNode;
     m_pToolMngr = pToolMngr;
@@ -297,6 +315,8 @@ wxGxTool::wxGxTool(wxXmlNode* pDataNode, wxGISGPToolManager* pToolMngr, wxXmlNod
             m_sName = pTool->GetDisplayName();
             wxDELETE(pTool);
         }
+        else
+            m_bIsOk = false;
     }
 }
 

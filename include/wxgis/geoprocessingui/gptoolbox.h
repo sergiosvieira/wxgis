@@ -22,6 +22,9 @@
 
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/geoprocessing/gptoolmngr.h"
+#include "wxgis/core/config.h"
+
+#define TOOLBX_NAME wxT("wxGISToolbox")
 
 /////////////////////////////////////////////////////////////////////////
 // wxGxToolbox
@@ -87,7 +90,8 @@ protected:
 	wxString m_sPath;
 	//wxArrayString m_FileNames;
 	bool m_bIsChildrenLoaded;
-    wxXmlDocument m_XmlDoc;
+    //wxXmlDocument m_XmlDoc;
+    wxGISAppConfig* m_pConfig;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -114,10 +118,12 @@ public:
     //IGxObjectWizard
     virtual bool Invoke(wxWindow* pParentWnd);
 	//wxGxTool
+	virtual bool IsOk(void){return m_bIsOk;};
 protected:
 	//wxString m_sPath;
 	wxString m_sName, m_sInternalName;
     wxXmlNode* m_pDataNode;
     wxGISGPToolManager* m_pToolMngr;
     wxXmlNode* m_pPropNode;
+    bool m_bIsOk;
 };

@@ -1,0 +1,6 @@
+wxgislib (0.2-0ubuntu1~ppa0) lucid; urgency=low
+
+  * Initial release.
+  * The lib package needed fo wxGISCatalog & wxGISToolbox
+
+ -- Dmitriy Barishnikov <bishop.gis@gmail.com>  Mon, 25 Sep 2010 15:14:00 +0400
