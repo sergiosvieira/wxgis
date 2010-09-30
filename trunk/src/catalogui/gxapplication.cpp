@@ -216,15 +216,8 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
 	wxGxCatalog* pCatalog = new wxGxCatalog();
 	pCatalog->Init();
 	m_pCatalog = static_cast<IGxCatalog*>(pCatalog);
-    
-	wxXmlNode* pViewsNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/views")));
-	if(!pViewsNode)
-	{
-        //copy contents of HKLM node
-		wxXmlNode* pViewsNodeLM = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame/views")));
-		pViewsNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame/views")), true);
-		pViewsNode->operator=(*pViewsNodeLM);
-	}
+
+	wxXmlNode* pViewsNode = m_pConfig->GetConfigNode(wxString(wxT("frame/views")), true, true);
 
 	if(!pViewsNode)
 	{

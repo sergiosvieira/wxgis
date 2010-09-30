@@ -80,7 +80,7 @@ void wxGISConfig::Clean(void)
 
 wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 {
-    //path: wxGISCatalog\Frame\Views
+    //search cached configs nodes
     for(size_t i = 0; i < m_confignodes_arr.size(); i++)
 	{
         if(m_confignodes_arr[i].sXmlPath.CmpNoCase(sPath) == 0 && m_confignodes_arr[i].Key == Key)
@@ -94,6 +94,7 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 
     wxXmlDocument* pDoc(NULL);
 
+    //search cached configs
 	for(size_t i = 0; i < m_configs_arr.size(); i++)
 	{
 		if(m_configs_arr[i].sRootNodeName.CmpNoCase(sRootNodeName) == 0 && m_configs_arr[i].Key == Key)
@@ -114,9 +115,8 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 			wxString sys_path = sys_dir + wxFileName::GetPathSeparator() + HKLM_CONFIG_NAME;
 
 			if(!wxDirExists(sys_dir))
-			{
-				wxFileName::Mkdir(sys_dir, 0775, wxPATH_MKDIR_FULL);
-			}
+				wxFileName::Mkdir(sys_dir, 0755, wxPATH_MKDIR_FULL);
+
 			sXMLDocPath = sys_path;
 			break;
 		}
@@ -126,9 +126,8 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 			wxString user_path = user_dir + wxFileName::GetPathSeparator() + HKCU_CONFIG_NAME;
 
 			if(!wxDirExists(user_dir))
-			{
 				wxFileName::Mkdir(user_dir, 0755, wxPATH_MKDIR_FULL);
-			}
+
 			sXMLDocPath = user_path;
 			break;
 		}
@@ -144,10 +143,26 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 		{
 			//if(Key == enumGISHKLM)
 			//{
+			//	wxString sXMLPath = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("config") +  wxFileName::GetPathSeparator() + sRootNodeName + wxT(".xml");
+            //    if(wxFileName::FileExists(sXMLPath))
+            //        pDoc = new wxXmlDocument(sXMLPath);
+			//}
+
+			//get hklm confic if hkcu is not available
+			if(Key == enumGISHKCU)
+            {
+                wxString sys_dir = m_sSysConfigDir + wxFileName::GetPathSeparator() + sRootNodeName;
+                wxString sys_path = sys_dir + wxFileName::GetPathSeparator() + HKLM_CONFIG_NAME;
+                pDoc = new wxXmlDocument(sys_path);
+			}
+
+			//last chance
+			if(!pDoc)
+			{
 				wxString sXMLPath = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("config") +  wxFileName::GetPathSeparator() + sRootNodeName + wxT(".xml");
                 if(wxFileName::FileExists(sXMLPath))
                     pDoc = new wxXmlDocument(sXMLPath);
-			//}
+			}
 
 			if(!pDoc)
 			{
@@ -288,12 +303,21 @@ void wxGISConfig::DeleteNodeChildren(wxXmlNode* pNode)
 wxXmlNode* wxGISConfig::GetConfigNode(wxString sPath, bool bCreateInCU, bool bUniq)
 {
 	wxXmlNode* pConfXmlNode = GetConfigNode(enumGISHKCU, sPath);
-	if(!pConfXmlNode)
-		pConfXmlNode = GetConfigNode(enumGISHKLM, sPath);
+	if(pConfXmlNode)
+        return pConfXmlNode;
+
+    pConfXmlNode = GetConfigNode(enumGISHKLM, sPath);
     if(bCreateInCU)
-        pConfXmlNode = CreateConfigNode(enumGISHKCU, sPath, bUniq);
-	if(!pConfXmlNode)
-		return NULL;
+    {
+        if(pConfXmlNode)
+        {
+            wxXmlNode* pNewConfXmlNode = CreateConfigNode(enumGISHKCU, sPath, bUniq);
+            pNewConfXmlNode->operator=(*pConfXmlNode);
+            return pNewConfXmlNode;
+        }
+        else
+            pConfXmlNode = CreateConfigNode(enumGISHKCU, sPath, bUniq);
+    }
     return pConfXmlNode;
 }
 

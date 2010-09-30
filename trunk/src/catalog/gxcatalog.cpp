@@ -163,9 +163,7 @@ void wxGxCatalog::Init(void)
 	m_pConf = new wxGISConfig(wxString(wxT("wxCatalog")), CONFIG_DIR);
 #endif
 
-	wxXmlNode* pConfXmlNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog")));
-	if(!pConfXmlNode)
-		pConfXmlNode = m_pConf->GetConfigNode(enumGISHKLM, wxString(wxT("catalog")));
+	wxXmlNode* pConfXmlNode = m_pConf->GetConfigNode(wxString(wxT("catalog")), false, true);
 	if(!pConfXmlNode)
 		return;
 

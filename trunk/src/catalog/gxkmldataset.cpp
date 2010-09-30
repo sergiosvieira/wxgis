@@ -46,8 +46,8 @@ wxGxKMLDataset::wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorData
 
     m_LargeIcon = LargeIcon;
     m_SmallIcon = SmallIcon;
-    m_LargeSubIcon = wxIcon(kml_subdset_16_xpm);
-    m_SmallSubIcon = wxIcon(kml_subdset_48_xpm);
+    m_LargeSubIcon = wxIcon(kml_subdset_48_xpm);
+    m_SmallSubIcon = wxIcon(kml_subdset_16_xpm);
 }
 
 wxGxKMLDataset::~wxGxKMLDataset(void)
@@ -89,7 +89,7 @@ bool wxGxKMLDataset::Delete(void)
         wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(m_pwxGISDataset);
         if(pDSet)
             bRet = pDSet->Delete();
-    }      
+    }
     else
     {
         wxGISFeatureDataset* pwxGISFeatureDataset = new wxGISFeatureDataset(m_sPath, m_type);
@@ -108,13 +108,13 @@ bool wxGxKMLDataset::Delete(void)
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer == NULL)
 			return false;
-		return pGxObjectContainer->DeleteChild(this);		
+		return pGxObjectContainer->DeleteChild(this);
 	}
 	else
     {
         const char* err = CPLGetLastErrorMsg();
         wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
-		return false;	
+		return false;
     }
     return false;
 }
@@ -141,7 +141,7 @@ bool wxGxKMLDataset::Rename(wxString NewName)
         const char* err = CPLGetLastErrorMsg();
         wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;
-    }	
+    }
 }
 
 void wxGxKMLDataset::EditProperties(wxWindow *parent)
@@ -171,7 +171,7 @@ void wxGxKMLDataset::LoadChildren(void)
 		return;
 
 	if(m_pwxGISDataset == NULL)
-	{		
+	{
         wxGISFeatureDataset* pwxGISFeatureDataset = new wxGISFeatureDataset(m_sPath, m_type);
 
         if(!pwxGISFeatureDataset->Open())
@@ -191,7 +191,7 @@ void wxGxKMLDataset::LoadChildren(void)
 
     for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); i++)
     {
-        wxGISFeatureDataset* pwxGISFeatureSuDataset = dynamic_cast<wxGISFeatureDataset*>(m_pwxGISDataset->GetSubset(i));//wxGISDataset* pSubSet 
+        wxGISFeatureDataset* pwxGISFeatureSuDataset = dynamic_cast<wxGISFeatureDataset*>(m_pwxGISDataset->GetSubset(i));//wxGISDataset* pSubSet
         pwxGISFeatureSuDataset->SetSubType(m_type);
         wxGxKMLSubDataset* pGxSubDataset = new wxGxKMLSubDataset(pwxGISFeatureSuDataset->GetName(), pwxGISFeatureSuDataset, m_type, m_LargeSubIcon, m_SmallSubIcon);
 		bool ret_code = AddChild(pGxSubDataset);
@@ -209,7 +209,7 @@ bool wxGxKMLDataset::DeleteChild(IGxObject* pChild)
 		return false;
 	if(bHasChildren != m_Children.size() > 0 ? true : false)
 		m_pCatalog->ObjectChanged(this);
-	return true;		
+	return true;
 }
 
 wxGISDataset* wxGxKMLDataset::GetDataset(void)
