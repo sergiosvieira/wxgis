@@ -1,0 +1,14 @@
+#summary The Linux installation howto.
+#labels Featured,Phase-Deploy
+
+= Introduction =
+
+This topic describes Linux install. There is the Ubuntu packege on PPA now
+
+
+= Details =
+
+To instal wxGIS on Ubuntu your need:
+  * Add new source in your sources list (deb http://ppa.launchpad.net/bishop-gis/wxgis/ubuntu lucid main )
+  * Update package manager
+  * Install package wxgis0
