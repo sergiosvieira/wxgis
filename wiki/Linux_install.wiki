@@ -1,10 +1,9 @@
-#summary The Linux installation howto.
+#summary The wxGIS Linux install howto.
 #labels Featured,Phase-Deploy
 
 = Introduction =
 
-This topic describes Linux install. There is the Ubuntu packege on PPA now
-
+This topic describes Linux install. There is the Ubuntu package on PPA now (https://launchpad.net/~bishop-gis/+archive/wxgis)
 
 = Details =
 
