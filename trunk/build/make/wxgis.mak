@@ -21,7 +21,7 @@ create_out:
 	-mkdir -p $(dst_dir)
 
 $(program_name): $(notdir $(patsubst %.cpp,%.o,$(wildcard $(search_wildcards)))) 
-	$(CXX) $(addprefix $(obj_dir)/,$^) -o $(dst_dir)/$@ $(LDFLAGS) `wx-config --libs` /usr/lib/libcurl.so /usr/lib/libgeos_c.so /usr/lib/libproj.so /usr/lib/wxgis/wxgiscpl.so /usr/lib/wxgis/wxgisogr.so /usr/lib/wxgis/wxgisgdal.so /usr/lib/wxgis/wxgiscore.so /usr/lib/wxgis/wxgiscarto.so /usr/lib/wxgis/wxgiscartoui.so /usr/lib/wxgis/wxgiscatalog.so /usr/lib/wxgis/wxgiscatalogui.so /usr/lib/wxgis/wxgisdatasource.so /usr/lib/wxgis/wxgisdisplay.so /usr/lib/wxgis/wxgisframework.so /usr/lib/wxgis/wxgisgeometry.so
+	$(CXX) $(addprefix $(obj_dir)/,$^) -o $(dst_dir)/$@ $(LDFLAGS) `wx-config --libs` /usr/lib/libcurl.so /usr/lib/libgeos_c.so /usr/lib/libproj.so /usr/lib/wxgis/wxgiscpl.so /usr/lib/wxgis/wxgisogr.so /usr/lib/wxgis/wxgisgdal.so /usr/lib/wxgis/wxgiscore.so /usr/lib/wxgis/wxgiscarto.so /usr/lib/wxgis/wxgiscartoui.so /usr/lib/wxgis/wxgiscatalog.so /usr/lib/wxgis/wxgiscatalogui.so /usr/lib/wxgis/wxgisdatasource.so /usr/lib/wxgis/wxgisdisplay.so /usr/lib/wxgis/wxgisframework.so /usr/lib/wxgis/wxgisgeometry.so  /usr/lib/wxgis/wxgisgeoprocessing.so  /usr/lib/wxgis/wxgisgeoprocessingui.so
 
 VPATH := $(source_dirs)
 

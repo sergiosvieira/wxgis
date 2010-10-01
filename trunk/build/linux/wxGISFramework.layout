@@ -25,6 +25,9 @@
 	<File name="../../include/wxgis/framework/toolbarmenu.h" open="0" top="0" tabpos="3">
 		<Cursor position="0" topLine="22" />
 	</File>
+	<File name="../../src/framework/accelerator.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="5060" topLine="151" />
+	</File>
 	<File name="../../src/framework/addcommanddlg.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="5664" topLine="138" />
 	</File>
@@ -32,7 +35,7 @@
 		<Cursor position="2279" topLine="42" />
 	</File>
 	<File name="../../src/framework/application.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="21205" topLine="692" />
+		<Cursor position="23738" topLine="762" />
 	</File>
 	<File name="../../src/framework/commandbar.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="7653" topLine="241" />

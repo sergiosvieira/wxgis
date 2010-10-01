@@ -20,10 +20,16 @@
 		<Cursor position="5464" topLine="167" />
 	</File>
 	<File name="../../src/catalog/gxcatalog.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="12551" topLine="385" />
+		<Cursor position="4737" topLine="154" />
+	</File>
+	<File name="../../src/catalog/gxdataset.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="7310" topLine="261" />
 	</File>
 	<File name="../../src/catalog/gxfile.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="1152" topLine="6" />
+	</File>
+	<File name="../../src/catalog/gxkmldataset.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="1849" topLine="25" />
 	</File>
 	<File name="../../src/catalog/gxmapinfofactory.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="1480" topLine="27" />

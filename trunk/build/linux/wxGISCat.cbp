@@ -34,6 +34,8 @@
 					<Add library="../debug/wxGISDisplayd.so" />
 					<Add library="../debug/wxGISFrameworkd.so" />
 					<Add library="../debug/wxGISGeometryd.so" />
+					<Add library="../debug/wxGISGeoprocessing.so" />
+					<Add library="../debug/wxGISGeoprocessingUI.so" />
 				</Linker>
 			</Target>
 			<Target title="Release">

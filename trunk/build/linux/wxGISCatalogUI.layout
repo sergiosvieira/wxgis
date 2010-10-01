@@ -7,6 +7,9 @@
 	<File name="../../include/wxgis/catalogui/customizedlg.h" open="0" top="0" tabpos="1">
 		<Cursor position="5124" topLine="150" />
 	</File>
+	<File name="../../include/wxgis/catalogui/gxcontdialog.h" open="0" top="0" tabpos="0">
+		<Cursor position="6880" topLine="155" />
+	</File>
 	<File name="../../include/wxgis/catalogui/gxcontentview.h" open="0" top="0" tabpos="6">
 		<Cursor position="3219" topLine="68" />
 	</File>
@@ -22,8 +25,11 @@
 	<File name="../../src/catalogui/customizedlg.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="6109" topLine="89" />
 	</File>
-	<File name="../../src/catalogui/gxapplication.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="12112" topLine="369" />
+	<File name="../../src/catalogui/gxapplication.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="12157" topLine="380" />
+	</File>
+	<File name="../../src/catalogui/gxcontdialog.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="14461" topLine="456" />
 	</File>
 	<File name="../../src/catalogui/gxcontentview.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="11815" topLine="311" />
@@ -32,10 +38,10 @@
 		<Cursor position="0" topLine="18" />
 	</File>
 	<File name="../../src/catalogui/gxmapview.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="5659" topLine="151" />
+		<Cursor position="8156" topLine="256" />
 	</File>
 	<File name="../../src/catalogui/gxobgdialog.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="14894" topLine="399" />
+		<Cursor position="31157" topLine="918" />
 	</File>
 	<File name="../../src/catalogui/gxtabview.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="5951" topLine="157" />
