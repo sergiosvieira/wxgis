@@ -20,7 +20,7 @@ This topic describes Linux install. There is the Ubuntu package on PPA now (http
 make lib
 sudo make install_lib
 make app
-sudo make install_ap
+sudo make install_app
 }}}
   
 Before your run:
