@@ -1,4 +1,5 @@
 #summary This is screenshots of wxGIS components.
+#labels Featured,Phase-Design
 
 = ScreenShots =
  * [ScreenShots#wxGIS_Catalog wxGIS Catalog]
