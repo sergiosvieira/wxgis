@@ -21,7 +21,7 @@
 #pragma once
 
 #include "wxgis/display/screendisplay.h"
-
+#define wxUSE_GRAPHICS_CONTEXT 0
 #if wxUSE_GRAPHICS_CONTEXT	
 
 //-----------------------------------------------------
