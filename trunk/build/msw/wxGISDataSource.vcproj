@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\frmts\vrt&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include;&quot;$(GEOS)\capi&quot;;&quot;$(GEOS)\source\headers&quot;"
+				AdditionalIncludeDirectories="&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\frmts&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include;&quot;$(GEOS)\capi&quot;;&quot;$(GEOS)\source\headers&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_DS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -119,7 +119,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\frmts\vrt&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include;&quot;$(GEOS)\capi&quot;;&quot;$(GEOS)\source\headers&quot;"
+				AdditionalIncludeDirectories="&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\frmts&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include;&quot;$(GEOS)\capi&quot;;&quot;$(GEOS)\source\headers&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;__WXMSW__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_DS"
 				RuntimeLibrary="2"
 				WarningLevel="3"
