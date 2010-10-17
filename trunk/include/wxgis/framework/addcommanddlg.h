@@ -39,7 +39,6 @@
 #include "wx/panel.h"
 #include "wx/listbox.h"
 
-
 class WXDLLIMPEXP_GIS_FRW wxGISAddCommandDlg : public wxDialog
 {
 	enum
