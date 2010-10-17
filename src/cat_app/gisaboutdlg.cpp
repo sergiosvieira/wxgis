@@ -72,7 +72,7 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
     titleFont.SetWeight(wxFONTWEIGHT_BOLD);
     m_title->SetFont(titleFont);
 	m_title->Wrap( -1 );
-	m_title->SetBackgroundColour( wxColour( 255, 255, 255 ) );
+	m_title->SetBackgroundColour( BackColor );
  //   m_staticText1->
 	
 	bHeadSizer->Add( m_title, 1, wxEXPAND, 5 );
