@@ -3,7 +3,7 @@
  * Purpose:  Catalog Main Commands class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -58,11 +58,7 @@ IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogMainCmd, wxObject)
 
 wxGISCatalogMainCmd::wxGISCatalogMainCmd(void)
 {
-	m_ImageList.Create(16, 16);
-	m_ImageList.Add(wxBitmap(folder_conn_16_xpm));	//4
-	m_ImageList.Add(wxBitmap(location16_xpm));		//9
-	m_ImageList.Add(wxBitmap(oper_16_xpm));		    //3
-
+    m_LevelUp = wxIcon();
     m_CreateTypesArray.Add(wxString(_("Folder")));
     m_CreateTypesArray.Add(wxString(_("Folder Connection")));
 }

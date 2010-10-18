@@ -53,6 +53,6 @@ public:
     virtual void OnDropDownCommand(int nID);
 private:
 	IApplication* m_pApp;
-	wxImageList m_ImageList;
     wxArrayString m_CreateTypesArray;
+    wxIcon m_LevelUp;
 };
