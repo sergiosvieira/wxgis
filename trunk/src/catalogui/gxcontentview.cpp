@@ -552,7 +552,6 @@ void wxGxContentView::OnEndLabelEdit(wxListEvent& event)
 {
     if ( event.GetLabel().Len() == 0 )
     {
-        //wxMessageBox(_("wxGxContentView: Label is too short. Please make it longer!"));
         event.Veto();
     }
 	else
@@ -773,4 +772,14 @@ void wxGxContentView::OnChar(wxKeyEvent& event)
     default:
         break;
     }
+}
+
+
+void wxGxContentView::BeginRename(void)
+{
+
+    int nItem = GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+    if ( nItem == -1 )
+        return;
+    EditLabel(nItem);
 }

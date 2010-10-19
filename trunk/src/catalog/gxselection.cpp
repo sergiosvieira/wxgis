@@ -284,7 +284,11 @@ void wxGxSelection::Do(IGxObject* pObject)
     else
     {
 	    m_DoArray[m_Pos] = pObject->GetFullName();
-	    m_DoArray.RemoveAt(m_Pos + 1, m_DoArray.GetCount() - (m_Pos + 1));
+        size_t nCount = m_DoArray.GetCount() - (m_Pos + 1);
+        if(nCount == 0)
+            nCount = 1;
+        if(m_Pos + 1 < m_DoArray.GetCount() && nCount > 0)
+            m_DoArray.RemoveAt(m_Pos + 1, nCount);
     }
     //Select(pObject);
 }

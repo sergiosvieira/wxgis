@@ -3,7 +3,7 @@
  * Purpose:  wxGISApplication class. Base application functionality (commands, menues, etc.)
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #include "wx/tokenzr.h"
 #include "wx/wxhtml.h"
 
-#include "../../art/default_16.xpm"
+#include "../../art/tool_16.xpm"
 
 IMPLEMENT_CLASS(wxGISApplication, wxFrame)
 
@@ -283,7 +283,7 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 						if(Bmp.IsOk())
 							pTool->SetBitmap(Bmp);
 						else
-							pTool->SetBitmap(wxBitmap(default_16_xpm));
+							pTool->SetBitmap(wxBitmap(tool_16_xpm));
 						if(!sAcc.IsEmpty())
 							pTool->SetShortHelp(pCmd->GetTooltip() + wxT(" (") + sAcc + wxT(")"));//accelerator
                         else

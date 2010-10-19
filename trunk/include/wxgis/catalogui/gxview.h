@@ -3,7 +3,7 @@
  * Purpose:  wxGxView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ public:
 	virtual wxString GetViewName(void);
 	virtual wxIcon GetViewIcon(void);
 	virtual void SetViewIcon(wxIcon Icon);
+    virtual void BeginRename(void){};
 protected:
 	wxString m_sViewName;
 	//IGxCatalog* m_pCatalog;

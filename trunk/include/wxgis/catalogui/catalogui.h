@@ -3,7 +3,7 @@
  * Purpose:  wxCatalogUI main header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -59,4 +59,5 @@ public:
 	virtual wxString GetViewName(void) = 0;
 	virtual wxIcon GetViewIcon(void) = 0;
 	virtual void SetViewIcon(wxIcon Icon) = 0;
+    virtual void BeginRename(void) = 0;
 };

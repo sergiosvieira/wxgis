@@ -3,7 +3,7 @@
  * Purpose:  wxGISCommonCmd class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -158,7 +158,7 @@ wxString wxGISCommonCmd::GetMessage(void)
 		case 3:	
 			return wxString(_("Separator"));
 		case 4:	
-			return wxString(_("Show/hide statusbar"));
+			return wxString(_("Show/Hide Statusbar"));
 		default:
 			return wxEmptyString;
 	}
@@ -207,7 +207,7 @@ wxString wxGISCommonCmd::GetTooltip(void)
 		case 2:	
 			return wxString(_("Customize"));
 		case 4:	
-			return wxString(_("Show/hide statusbar"));
+			return wxString(_("Show/Hide Statusbar"));
 		case 3:	
 		default:
 			return wxEmptyString;

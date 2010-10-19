@@ -21,8 +21,8 @@
 #include "wxgis/catalog/gxarchfolder.h"
 #include "wxgis/datasource/sysop.h"
 
-#include "../../art/folder_arch1_16.xpm"
-#include "../../art/folder_arch1_48.xpm"
+#include "../../art/folder_arch_16.xpm"
+#include "../../art/folder_arch_48.xpm"
 
 #include "cpl_vsi_virtual.h"
 
@@ -41,12 +41,12 @@ wxGxArchive::~wxGxArchive(void)
 
 wxIcon wxGxArchive::GetLargeImage(void)
 {
-	return wxIcon(folder_arch1_48_xpm);
+	return wxIcon(folder_arch_48_xpm);
 }
 
 wxIcon wxGxArchive::GetSmallImage(void)
 {
-	return wxIcon(folder_arch1_16_xpm);
+	return wxIcon(folder_arch_16_xpm);
 }
 
 void wxGxArchive::LoadChildren(void)
@@ -178,12 +178,12 @@ wxGxArchiveFolder::~wxGxArchiveFolder(void)
 
 wxIcon wxGxArchiveFolder::GetLargeImage(void)
 {
-	return wxIcon(folder_arch1_48_xpm);
+	return wxIcon(folder_arch_48_xpm);
 }
 
 wxIcon wxGxArchiveFolder::GetSmallImage(void)
 {
-	return wxIcon(folder_arch1_16_xpm);
+	return wxIcon(folder_arch_16_xpm);
 }
 
 void wxGxArchiveFolder::LoadChildren(void)

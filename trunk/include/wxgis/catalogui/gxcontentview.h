@@ -57,6 +57,7 @@ public:
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 	virtual bool Applies(IGxSelection* Selection);
+    virtual void BeginRename(void);
 //IGxSelectionEvents
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 //IGxCatalogEvents
