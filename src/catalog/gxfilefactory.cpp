@@ -3,7 +3,7 @@
  * Purpose:  wxGxFileFactory class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include "wxgis/catalog/gxfile.h"
 #include <wx/tokenzr.h>
 
-#include "../../art/sr_16(2).xpm"
+#include "../../art/sr_16.xpm"
 #include "../../art/sr_48.xpm"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxFileFactory, wxObject)
@@ -30,7 +30,7 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxFileFactory, wxObject)
 wxGxFileFactory::wxGxFileFactory(void)
 {
     m_LargePRJIcon = wxIcon(sr_48_xpm);
-    m_SmallPRJIcon = wxIcon(sr_16_2_xpm);
+    m_SmallPRJIcon = wxIcon(sr_16_xpm);
 }
 
 wxGxFileFactory::~wxGxFileFactory(void)

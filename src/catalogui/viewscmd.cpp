@@ -3,7 +3,7 @@
  * Purpose:  Catalog Views Commands class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 #include "wxgis/catalogui/viewscmd.h"
 #include "wxgis/catalogui/gxtreeview.h"
 
-#include "../../art/views16.xpm"
-#include "../../art/treeview_16.xpm"
+#include "../../art/views.xpm"
+#include "../../art/treeview.xpm"
 
 //	0	ContentsView states
 //	1	Select All
@@ -45,9 +45,9 @@ wxIcon wxGISCatalogViewsCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
-			return wxIcon(views16_xpm);
+			return wxIcon(views_xpm);
 		case 2:
-			return wxIcon(treeview_16_xpm);
+			return wxIcon(treeview_xpm);
 		case 1:
 		default:
 			return wxNullIcon;
@@ -63,7 +63,7 @@ wxString wxGISCatalogViewsCmd::GetCaption(void)
 		case 1:
 			return wxString(_("Select All"));
 		case 2:
-			return wxString(_("Show/hide tree pane"));
+			return wxString(_("Show/Hide Tree pane"));
 		default:
 			return wxEmptyString;
 	}
@@ -151,7 +151,7 @@ wxGISEnumCommandKind wxGISCatalogViewsCmd::GetKind(void)
 	{
 		case 0://View
 			return enumGISCommandDropDown;
-		case 2://Show/hide tree pane
+		case 2://Show/Hide Tree Pane
 #ifdef __WXMSW__
             return enumGISCommandCheck;
 #endif
@@ -170,7 +170,7 @@ wxString wxGISCatalogViewsCmd::GetMessage(void)
 		case 1:
 			return wxString(_("Select All objects"));
 		case 2:
-			return wxString(_("Show/hide tree pane"));
+			return wxString(_("Show/Hide Tree pane"));
 		default:
 			return wxEmptyString;
 	}
@@ -214,7 +214,7 @@ wxString wxGISCatalogViewsCmd::GetTooltip(void)
 		case 1:
 			return wxString(_("Select All"));
 		case 2:
-			return wxString(_("Show/hide tree pane"));
+			return wxString(_("Show/Hide Tree pane"));
 		default:
 			return wxEmptyString;
 	}

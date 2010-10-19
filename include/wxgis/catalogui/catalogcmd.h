@@ -54,5 +54,4 @@ public:
 private:
 	IApplication* m_pApp;
     wxArrayString m_CreateTypesArray;
-    wxIcon m_LevelUp;
 };

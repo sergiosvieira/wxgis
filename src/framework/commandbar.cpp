@@ -3,7 +3,7 @@
  * Purpose:  wxGISCommandBar class, and diferent implementation - wxGISMneu, wxGISToolBar
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/framework/commandbar.h"
-#include "../../art/default_16.xpm"
+#include "../../art/tool_16.xpm"
 
 //----------------------------------------------------------------------
 // wxGISCommandBar
@@ -375,7 +375,7 @@ void wxGISToolBar::AddCommand(ICommand* pCmd)
 		{
 		wxBitmap Bitmap = pCmd->GetBitmap();
 		if(!Bitmap.IsOk())
-			Bitmap = wxBitmap(default_16_xpm);
+			Bitmap = wxBitmap(tool_16_xpm);
 
 		AddTool(pCmd->GetID(), wxStripMenuCodes(pCmd->GetCaption()), Bitmap, wxBitmap(), (wxItemKind)pCmd->GetKind(), pCmd->GetTooltip(), pCmd->GetMessage(), NULL);
 		}
@@ -384,7 +384,7 @@ void wxGISToolBar::AddCommand(ICommand* pCmd)
 		{
 		wxBitmap Bitmap = pCmd->GetBitmap();
 		if(!Bitmap.IsOk())
-			Bitmap = wxBitmap(default_16_xpm);
+			Bitmap = wxBitmap(tool_16_xpm);
 
 		AddTool(pCmd->GetID(), wxStripMenuCodes(pCmd->GetCaption()), Bitmap, wxBitmap(), (wxItemKind)enumGISCommandNormal, pCmd->GetTooltip(), pCmd->GetMessage(), NULL);
         SetToolDropDown(pCmd->GetID(), true);
@@ -433,7 +433,7 @@ void wxGISToolBar::ReAddCommand(ICommand* pCmd)
 		{
 		wxBitmap Bitmap = pCmd->GetBitmap();
 		if(!Bitmap.IsOk())
-			Bitmap = wxBitmap(default_16_xpm);
+			Bitmap = wxBitmap(tool_16_xpm);
 
 		AddTool(pCmd->GetID(), wxStripMenuCodes(pCmd->GetCaption()), Bitmap, wxBitmap(), (wxItemKind)pCmd->GetKind(), pCmd->GetTooltip(), pCmd->GetMessage(), NULL);
 		}
@@ -442,7 +442,7 @@ void wxGISToolBar::ReAddCommand(ICommand* pCmd)
 		{
 		wxBitmap Bitmap = pCmd->GetBitmap();
 		if(!Bitmap.IsOk())
-			Bitmap = wxBitmap(default_16_xpm);
+			Bitmap = wxBitmap(tool_16_xpm);
 
 		AddTool(pCmd->GetID(), wxStripMenuCodes(pCmd->GetCaption()), Bitmap, wxBitmap(), (wxItemKind)enumGISCommandNormal, pCmd->GetTooltip(), pCmd->GetMessage(), NULL);
         SetToolDropDown(pCmd->GetID(), true);

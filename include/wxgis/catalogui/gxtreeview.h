@@ -128,5 +128,7 @@ public:
 	virtual void OnBeginDrag(wxTreeEvent& event);
 	virtual void OnActivated(wxTreeEvent& event);
 
+    virtual void BeginRename(void);
+
     DECLARE_EVENT_TABLE()
 };
