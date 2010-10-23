@@ -98,6 +98,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISDataSource", "wxGISDat
 		{D7C200AC-A29B-4894-B222-1C77030545BE} = {D7C200AC-A29B-4894-B222-1C77030545BE}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxgisogr", "..\..\..\wxGISGDAL\build\msw\wxgisogr.vcproj", "{B55CF983-A77B-4F74-B1D4-CFB98CC149D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -152,6 +154,9 @@ Global
 		{0F6A3C59-9206-4987-9D82-B4725311FB57}.Debug|Win32.Build.0 = Debug|Win32
 		{0F6A3C59-9206-4987-9D82-B4725311FB57}.Release|Win32.ActiveCfg = Release|Win32
 		{0F6A3C59-9206-4987-9D82-B4725311FB57}.Release|Win32.Build.0 = Release|Win32
+		{B55CF983-A77B-4F74-B1D4-CFB98CC149D2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B55CF983-A77B-4F74-B1D4-CFB98CC149D2}.Release|Win32.ActiveCfg = Release|Win32
+		{B55CF983-A77B-4F74-B1D4-CFB98CC149D2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
