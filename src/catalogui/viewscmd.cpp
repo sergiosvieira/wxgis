@@ -23,6 +23,7 @@
 
 #include "../../art/views.xpm"
 #include "../../art/treeview.xpm"
+#include "../../art/select_all.xpm"
 
 //	0	ContentsView states
 //	1	Select All
@@ -46,9 +47,10 @@ wxIcon wxGISCatalogViewsCmd::GetBitmap(void)
 	{
 		case 0:
 			return wxIcon(views_xpm);
+		case 1:
+			return wxIcon(select_all_xpm);
 		case 2:
 			return wxIcon(treeview_xpm);
-		case 1:
 		default:
 			return wxNullIcon;
 	}

@@ -3,7 +3,7 @@
  * Purpose:  key code input dialog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #pragma once
 
 #include "wxgis/framework/framework.h"
-#include "../../art/charmap16.xpm"
+#include "../../art/character_map.xpm"
 
 #include <wx/intl.h>
 
@@ -71,7 +71,7 @@ protected:
 public:
 	wxKeyCodeDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Enter key code"), const wxPoint& pos = wxPoint( -1,-1 ), const wxSize& size = wxSize( 260,70 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 	~wxKeyCodeDlg();
-	static wxBitmap GetBitmap(){return wxBitmap(charmap16_xpm);};
+	static wxBitmap GetBitmap(){return wxBitmap(character_map_xpm);};
 	//events
 	void OnUpdateUI(wxUpdateUIEvent& event);
 	virtual bool TransferDataFromWindow();

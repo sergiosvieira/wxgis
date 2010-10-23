@@ -21,8 +21,10 @@
 #include "wxgis/catalogui/gxcontentview.h"
 #include "wxgis/catalog/gxdiscconnection.h"
 
-#include "../../art/cont_view_16.xpm"
-#include "../../art/cont_view_48.xpm"
+#include "../../art/document_16.xpm"
+#include "../../art/document_48.xpm"
+#include "../../art/small_up.xpm"
+#include "../../art/small_down.xpm"
 
 #include "wx/dnd.h"
 #include "wx/dataobj.h"
@@ -97,17 +99,23 @@ int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
 }
 
 wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
-wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(REPORT), m_pConnectionPointCatalog(NULL), /*m_pConnectionPointSelection(NULL),*/ m_ConnectionPointCatalogCookie(-1)/*, m_ConnectionPointSelectionCookie(-1)*/, m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL), m_bDragging(false), m_pDeleteCmd(NULL)
+wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(LIST), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(-1), m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL), m_bDragging(false), m_pDeleteCmd(NULL)
 {
 	InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150);
 	InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
 
 	m_ImageListSmall.Create(16, 16);
 	m_ImageListLarge.Create(48, 48);
+
 	//set default icons
 	//col ico & default
-	m_ImageListLarge.Add(wxBitmap(cont_view_48_xpm));
-	m_ImageListSmall.Add(wxBitmap(cont_view_16_xpm));
+    m_ImageListLarge.Add(wxBitmap(48, 48));
+    m_ImageListLarge.Add(wxBitmap(48, 48));
+	m_ImageListLarge.Add(wxBitmap(document_48_xpm));
+
+	m_ImageListSmall.Add(wxBitmap(small_down_xpm));
+	m_ImageListSmall.Add(wxBitmap(small_up_xpm));
+	m_ImageListSmall.Add(wxBitmap(document_16_xpm));
 
 	SetImageList(&m_ImageListLarge, wxIMAGE_LIST_NORMAL);
 	SetImageList(&m_ImageListSmall, wxIMAGE_LIST_SMALL);
@@ -136,17 +144,12 @@ bool wxGxContentView::Activate(IGxApplication* application, wxXmlNode* pConf)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
 	m_pSelection = m_pCatalog->GetSelection();
-	//m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( m_pSelection );
-	//if(m_pConnectionPointSelection != NULL)
-	//	m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
 
 	return true;
 }
 
 void wxGxContentView::Deactivate(void)
 {
-	//if(m_ConnectionPointSelectionCookie != -1)
-	//	m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
 	if(m_ConnectionPointCatalogCookie != -1)
 		m_pConnectionPointCatalog->Unadvise(m_ConnectionPointCatalogCookie);
 
@@ -191,11 +194,12 @@ void wxGxContentView::Serialize(wxXmlNode* pRootNode, bool bStore)
 			tw = 250;
 		SetColumnWidth(0, nw);
 		SetColumnWidth(1, tw);
-		SetStyle(style);
 
         SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
 		SortItems(MyCompareFunction, (long)&sortdata);
 		SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+
+		SetStyle(style);
 	}
 }
 

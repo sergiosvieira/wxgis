@@ -3,7 +3,7 @@
  * Purpose:  key code input dialog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -115,7 +115,7 @@ END_EVENT_TABLE()
 
 wxKeyCodeDlg::wxKeyCodeDlg( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-	SetIcon(wxIcon(charmap16_xpm));
+	SetIcon(wxIcon(character_map_xpm));
 	this->SetSizeHints( wxSize( 260,70 ), wxSize( -1,70 ) );
 	
 	wxBoxSizer* bSizer1;

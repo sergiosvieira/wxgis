@@ -3,7 +3,7 @@
  * Purpose:  wxGISTableView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -58,59 +58,12 @@ public:
     virtual void SetValue(int row, int col, const wxString &value);
     virtual wxString GetColLabelValue(int col);
 	virtual wxString GetRowLabelValue(int row);
-
-    //int GetNumberStoredRows();
-    //wxGridCellAttr* GetAttr(int row, int col, wxGridCellAttr::wxAttrKind kind);
-
-    //bool CanGetValueAs(int row, int col, const wxString& typeName);
-    //bool CanSetValueAs(int row, int col, const wxString& typeName);
-    //
-    //bool GetValueAsBool(int row, int col);
-    //void SetValueAsBool(int row, int col, bool b);
-
-    //bool needsResizing(int col) { return columns[col].needResize; }
-    //bool AppendRows(size_t rows);
-    //bool DeleteRows(size_t pos, size_t rows);
-    //int  LastRow() { return lastRow; }
-
-    //bool CheckInCache(int row);
-
-    //void StoreLine();
-    //void UndoLine(int row);
-
 private:
 	wxGISFeatureDataset* m_pwxGISDataset;
 	OGRFeatureDefn* m_pOGRFeatureDefn;
 	wxString m_sFIDKeyName;
 	int nCols;          // columns from dataSet
     int nRows;          // rows initially returned by dataSet
-
-
-    //pgQueryThread *thread;
-    //pgConn *connection;
-    //bool hasOids;
-    //char relkind;
-    //wxString tableName;
-    //Oid relid;
-    //wxString primaryKeyColNumbers;
-
-    //cacheLine *GetLine(int row);
-    //wxString MakeKey(cacheLine *line);
-    //void SetNumberEditor(int col, int len);
-
-    //cacheLinePool *dataPool, *addPool;
-    //cacheLine savedLine;
-    //int lastRow;
-
-    //int *lineIndex;     // reindex of lines in dataSet to handle deleted rows
-
-    //int rowsCached;     // rows read from dataset; if nRows=rowsCached, dataSet can be deleted
-    //int rowsAdded;      // rows added (never been in dataSet)
-    //int rowsStored;     // rows added and stored to db
-    //int rowsDeleted;    // rows deleted from initial dataSet
-    //sqlCellAttr *columns;
-
-    //friend class ctlSQLGrid;
 };
 
 //------------------------------------------------------------------
@@ -129,7 +82,6 @@ public:
 	wxGridCtrl();
 	virtual ~wxGridCtrl(void);
 	wxGridCtrl(wxWindow* parent, const long& id);
-	wxImageList* m_pImageList;
 
     DECLARE_EVENT_TABLE();
 };
@@ -158,8 +110,6 @@ public:
 	{
 		if(m_grid)
 		{
-			//m_grid->ClearSelection();
-			//m_grid->ClearGrid();
 			m_grid->SetTable(table, takeOwnership, selmode);
 			m_grid->SetGridCursor(0,0);
 			m_grid->MakeCellVisible(0,0);
@@ -167,10 +117,6 @@ public:
 			(*m_position) << 1;
 
 			m_staticText2->SetLabel(wxString::Format(_("of %u"), m_grid->GetNumberRows()));
-
-			//m_grid->Scroll(0,0);
-			//m_grid->SelectRow(0, false);
-			//m_grid->Refresh();
 		}
 	}
 	virtual void SetReadOnly(bool bIsReadOnly){if(m_grid) m_grid->EnableEditing( bIsReadOnly );};
