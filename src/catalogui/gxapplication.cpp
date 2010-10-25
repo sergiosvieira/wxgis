@@ -3,7 +3,7 @@
  * Purpose:  wxGxApplication class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,6 +22,10 @@
 #include "wxgis/catalogui/customizedlg.h"
 #include "wxgis/catalog/gxcatalog.h"
 #include "wxgis/framework/toolbarmenu.h"
+
+#include "wx/propdlg.h"
+//<wx/generic/propdlg.h>
+
 
 //-----------------------------------------------
 // wxGxApplication
@@ -79,6 +83,7 @@ void wxGxApplication::Customize(void)
 			pToolBarMenu->Update();
 	}
 }
+
 void wxGxApplication::RemoveCommandBar(IGISCommandBar* pBar)
 {
 	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
@@ -400,3 +405,60 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
  	SerializeGxFramePos(true);
 }
 
+#include "wxgis/catalogui/propertypages.h"
+
+void wxGxApplication::OnAppOptions(void)
+{
+    //read the config node for property pages and its names
+    wxXmlNode *pPPXmlNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("propertypages")));
+    if(!pPPXmlNode)
+    {
+        wxMessageBox(_("No Property Pages"), _("Error"), wxICON_ERROR | wxOK );
+        return;
+    }
+    //load pages to the dialog and show
+    wxPropertySheetDialog PropertySheetDialog;
+    //(this, wxID_ANY, _("Options"), wxDefaultPosition, wxSize( 480,600 ), wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+    if (!PropertySheetDialog.Create(this, wxID_ANY, _("Options"), wxDefaultPosition, wxSize( 480,600 ), wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER))
+        return;
+    //PropertySheetDialog.SetMinSize( wxSize( 480,600 ));
+    //PropertySheetDialog.SetSizeHints( wxSize( 480,600 ), wxDefaultSize );
+    //PropertySheetDialog. SetClientSize( wxSize( 480,600 ));
+
+
+    PropertySheetDialog.CreateButtons(wxOK|wxCANCEL);
+
+    wxWindow* pParentWnd = static_cast<wxWindow*>(PropertySheetDialog.GetBookCtrl());
+    // Add page
+    IApplication* pApp = static_cast<IApplication*>(this);
+    wxXmlNode *pPropPageNode = pPPXmlNode->GetChildren();
+    while(pPropPageNode)
+    {
+ 		wxString sClass = pPropPageNode->GetPropVal(wxT("class"), ERR);
+	    wxObject *obj = wxCreateDynamicObject(sClass);
+		IPropertyPage *pPage = dynamic_cast<IPropertyPage*>(obj);
+		if(pPage != NULL)
+		{
+            if(pPage->Create(pApp, PropertySheetDialog.GetBookCtrl(), wxID_ANY))
+            {
+                wxPanel* panel = static_cast<wxPanel*>(pPage);
+                if(panel)
+                    PropertySheetDialog.GetBookCtrl()->AddPage(panel, pPage->GetPageName());
+            }
+        }
+        pPropPageNode = pPropPageNode->GetNext();
+    }
+
+    PropertySheetDialog.LayoutDialog();
+
+    if(PropertySheetDialog.ShowModal() == wxID_OK)
+    {
+        //apply changes and exit        
+        for(size_t i = 0; i < PropertySheetDialog.GetBookCtrl()->GetPageCount(); i++)
+        {
+            IPropertyPage *pPage = dynamic_cast<IPropertyPage*>(PropertySheetDialog.GetBookCtrl()->GetPage(i));
+            if(pPage)
+                pPage->Apply();
+        }
+    }    
+}

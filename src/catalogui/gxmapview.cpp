@@ -3,7 +3,7 @@
  * Purpose:  wxGxMapView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -40,6 +40,12 @@ BEGIN_EVENT_TABLE(wxGxMapView, wxGISMapView)
 	EVT_MOTION(wxGxMapView::OnMouseMove)
 END_EVENT_TABLE()
 
+IMPLEMENT_DYNAMIC_CLASS(wxGxMapView, wxGISMapView)
+
+wxGxMapView::wxGxMapView(void)
+{
+}
+
 wxGxMapView::wxGxMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxGISMapView(parent, id, pos, size), m_pStatusBar(NULL)
 {
 	m_sViewName = wxString(_("Geography View"));
@@ -47,6 +53,13 @@ wxGxMapView::wxGxMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, co
 
 wxGxMapView::~wxGxMapView(void)
 {
+}
+    
+bool wxGxMapView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+{
+    m_pStatusBar = NULL;
+	m_sViewName = wxString(_("Geography View"));
+    return wxGISMapView::Create(parent, id, pos, size, style, name);
 }
 
 bool wxGxMapView::Activate(IGxApplication* application, wxXmlNode* pConf)

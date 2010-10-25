@@ -362,6 +362,12 @@ wxGxTabView::~wxGxTabView(void)
 {
 }
 
+bool wxGxTabView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+{
+    m_pSelection = NULL;
+    return wxAuiNotebook::Create(parent, id, pos, size, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE);
+}
+
 bool wxGxTabView::Activate(IGxApplication* application, wxXmlNode* pConf)
 {
 	if(!application || !pConf)

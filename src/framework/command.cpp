@@ -21,13 +21,15 @@
 #include "wxgis/framework/command.h"
 
 #include "../../art/mainframe.xpm"
+#include "../../art/options.xpm"
 
 //	0	Exit
 //	1	About
 //	2	Customize
 //	3	Separator
 //	4	StatusBar
-//  5   ? 
+//  5   Options
+//  6   ?
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCommonCmd, wxObject)
 
@@ -46,6 +48,8 @@ wxIcon wxGISCommonCmd::GetBitmap(void)
 	{
 		case 1:
 			return wxIcon(mainframe_xpm);
+		case 5:	
+			return wxIcon(options_xpm);
 		case 0:	
 		case 2:	
 		case 3:	
@@ -69,6 +73,8 @@ wxString wxGISCommonCmd::GetCaption(void)
 			return wxString(_("Separator"));
 		case 4:	
 			return wxString(_("StatusBar"));
+		case 5:	
+			return wxString(_("Options..."));
 		default:
 			return wxEmptyString;
 	}
@@ -85,6 +91,8 @@ wxString wxGISCommonCmd::GetCategory(void)
 		case 2:	
 		case 4:
 			return wxString(_("View"));
+		case 5:
+			return wxString(_("Tools"));
 		case 3:	
 		default:
 			return wxString(_("[No category]"));
@@ -99,6 +107,7 @@ bool wxGISCommonCmd::GetChecked(void)
 		case 1:	
 		case 2:	
 		case 3:	
+		case 5:	
 		default:
 			return false;
 		case 4:
@@ -121,6 +130,8 @@ bool wxGISCommonCmd::GetEnabled(void)
 			return true;
 		case 4://StatusBar
 			return true;
+		case 5://Options
+            return true;
 		default:
 			return false;
 	}
@@ -140,6 +151,8 @@ wxGISEnumCommandKind wxGISCommonCmd::GetKind(void)
 			return enumGISCommandSeparator;
 		case 4://StatusBar
 			return enumGISCommandCheck;
+		case 5://Options
+			return enumGISCommandNormal;
 		default:
 			return enumGISCommandNormal;
 	}
@@ -159,6 +172,8 @@ wxString wxGISCommonCmd::GetMessage(void)
 			return wxString(_("Separator"));
 		case 4:	
 			return wxString(_("Show/Hide Statusbar"));
+		case 5:	
+			return wxString(_("Application options"));
 		default:
 			return wxEmptyString;
 	}
@@ -184,6 +199,9 @@ void wxGISCommonCmd::OnClick(void)
 		case 4:
 			m_pApp->ShowStatusBar(!m_pApp->IsStatusBarShown());
 			break;
+		case 5:
+			m_pApp->OnAppOptions();
+			break;
 		case 3:
 		default:
 			return;
@@ -208,6 +226,8 @@ wxString wxGISCommonCmd::GetTooltip(void)
 			return wxString(_("Customize"));
 		case 4:	
 			return wxString(_("Show/Hide Statusbar"));
+		case 5:	
+			return wxString(_("Application options"));
 		case 3:	
 		default:
 			return wxEmptyString;
@@ -216,5 +236,5 @@ wxString wxGISCommonCmd::GetTooltip(void)
 
 unsigned char wxGISCommonCmd::GetCount(void)
 {
-	return 5;
+	return 6;
 }

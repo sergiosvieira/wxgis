@@ -26,15 +26,17 @@ class wxGxNoView :
 	public wxControl,
 	public wxGxView
 {
+    DECLARE_DYNAMIC_CLASS(wxGxNoView)
 public:
-	wxGxNoView(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, 
-						 const wxSize& size = wxDefaultSize);
+    wxGxNoView(void);
+	wxGxNoView(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 	virtual ~wxGxNoView(void);
 	void Serialize(wxXmlNode* pRootNode, bool bStore);
     void OnPaint(wxPaintEvent& WXUNUSED(evt));
     void OnEraseBackground(wxEraseEvent& WXUNUSED(evt));
     void OnSize(wxSizeEvent& WXUNUSED(evt));
 //IGxView
+    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("NoView"));
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 private:

@@ -25,7 +25,7 @@
 #include "wx/valgen.h"
 
 #include "../../art/state_16.xpm"
-#include "../../art/open_16.xpm"
+#include "../../art/open.xpm"
 
 #include "wxgis/framework/messagedlg.h"
 
@@ -217,7 +217,7 @@ wxGISDTPath::wxGISDTPath( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* 
     //m_PathTextCtrl->SetDropTarget(new wxFileDropTarget());
 	bPathSizer->Add( m_PathTextCtrl, 1, wxALL|wxEXPAND, 5 );
 
-	m_bpButton = new wxBitmapButton( this, wxID_OPEN, wxBitmap(open_16_xpm), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	m_bpButton = new wxBitmapButton( this, wxID_OPEN, wxBitmap(open_xpm), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	bPathSizer->Add( m_bpButton, 0, wxALL, 5 );
 	fgSizer1->Add( bPathSizer, 0, wxALL|wxEXPAND, 5 );
 

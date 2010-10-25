@@ -20,6 +20,8 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxnoview.h"
 
+IMPLEMENT_DYNAMIC_CLASS(wxGxNoView, wxControl)
+
 BEGIN_EVENT_TABLE(wxGxNoView, wxControl)
     EVT_PAINT(wxGxNoView::OnPaint)
     EVT_SIZE(wxGxNoView::OnSize)
@@ -39,8 +41,11 @@ void wxGxNoView::Deactivate(void)
 	wxGxView::Deactivate();
 }
 
-wxGxNoView::wxGxNoView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) 
-						: wxControl(parent, id, pos, size, wxNO_BORDER)
+wxGxNoView::wxGxNoView(void)
+{
+}
+
+wxGxNoView::wxGxNoView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxControl(parent, id, pos, size, wxNO_BORDER)
 {
 	m_sViewName = wxString(_("NoView"));
 	R = 255; G = 255; B = 230;
@@ -51,6 +56,16 @@ wxGxNoView::wxGxNoView(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
 
 wxGxNoView::~wxGxNoView(void)
 {
+}
+
+bool wxGxNoView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+{
+	m_sViewName = wxString(_("NoView"));
+	R = 255; G = 255; B = 230;
+	IsBold = true;
+	IsItalic = false;
+	FontSize = 12;
+    return wxControl::Create(parent, id, pos, size, style);
 }
 
 void wxGxNoView::Serialize(wxXmlNode* pRootNode, bool bStore)

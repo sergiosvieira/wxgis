@@ -43,6 +43,8 @@ BEGIN_EVENT_TABLE(wxGxContentView, wxListCtrl)
     EVT_CHAR(wxGxContentView::OnChar)
 END_EVENT_TABLE()
 
+IMPLEMENT_DYNAMIC_CLASS(wxGxContentView, wxListCtrl)
+
 int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
 {
 	wxGxContentView::LPITEMDATA pItem1 = (wxGxContentView::LPITEMDATA)item1;
@@ -98,6 +100,10 @@ int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
 //        return GxObjectCompareFunction(pItem1->pObject, pItem2->pObject, psortdata->bSortAsc);
 }
 
+wxGxContentView::wxGxContentView(void)
+{
+}
+
 wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
 wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(LIST), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(-1), m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL), m_bDragging(false), m_pDeleteCmd(NULL)
 {
@@ -124,6 +130,42 @@ wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(LIST
 wxGxContentView::~wxGxContentView(void)
 {
 	ResetContents();
+}
+
+bool wxGxContentView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+{
+    m_bSortAsc = true;
+    m_current_style = LIST;
+    m_pConnectionPointCatalog = NULL;
+    m_ConnectionPointCatalogCookie = -1;
+    m_pParentGxObject = NULL;
+    m_currentSortCol = 0;
+    m_pSelection = NULL;
+    m_bDragging = false;
+    m_pDeleteCmd = NULL;
+
+    wxListCtrl::Create(parent, id, pos, size, style);
+    
+    InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150);
+	InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
+
+	m_ImageListSmall.Create(16, 16);
+	m_ImageListLarge.Create(48, 48);
+
+	//set default icons
+	//col ico & default
+    m_ImageListLarge.Add(wxBitmap(48, 48));
+    m_ImageListLarge.Add(wxBitmap(48, 48));
+	m_ImageListLarge.Add(wxBitmap(document_48_xpm));
+
+	m_ImageListSmall.Add(wxBitmap(small_down_xpm));
+	m_ImageListSmall.Add(wxBitmap(small_up_xpm));
+	m_ImageListSmall.Add(wxBitmap(document_16_xpm));
+
+	SetImageList(&m_ImageListLarge, wxIMAGE_LIST_NORMAL);
+	SetImageList(&m_ImageListSmall, wxIMAGE_LIST_SMALL);
+
+    return true;
 }
 
 bool wxGxContentView::Activate(IGxApplication* application, wxXmlNode* pConf)

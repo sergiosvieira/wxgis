@@ -3,7 +3,7 @@
  * Purpose:  wxGxContainerDialog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -102,6 +102,7 @@ public:
     virtual IStatusBar* GetStatusBar(void){return NULL;};
     virtual IGISConfig* GetConfig(void){return m_pConfig;};
     virtual void OnAppAbout(void){};
+    virtual void OnAppOptions(void){};
     virtual IGISCommandBar* GetCommandBar(wxString sName){return NULL;};
     virtual void RemoveCommandBar(IGISCommandBar* pBar){};
     virtual bool AddCommandBar(IGISCommandBar* pBar){return false;};

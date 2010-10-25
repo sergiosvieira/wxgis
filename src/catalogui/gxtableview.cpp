@@ -21,6 +21,12 @@
 #include "wxgis/catalogui/gxtableview.h"
 #include "wxgis/datasource/featuredataset.h"
 
+IMPLEMENT_DYNAMIC_CLASS(wxGxTableView, wxGISTableView)
+
+wxGxTableView::wxGxTableView(void)
+{
+}
+
 wxGxTableView::wxGxTableView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxGISTableView(parent, id, pos, size)
 {
 	m_sViewName = wxString(_("Table View"));
@@ -29,6 +35,14 @@ wxGxTableView::wxGxTableView(wxWindow* parent, wxWindowID id, const wxPoint& pos
 
 wxGxTableView::~wxGxTableView(void)
 {
+}
+
+bool wxGxTableView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+{
+	m_sViewName = wxString(_("Table View"));
+    wxGISTableView::Create(parent, id, pos, size, style, name);
+	SetReadOnly(true);
+    return true;
 }
 
 bool wxGxTableView::Activate(IGxApplication* application, wxXmlNode* pConf)

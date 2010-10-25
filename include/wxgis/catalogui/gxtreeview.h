@@ -3,7 +3,7 @@
  * Purpose:  wxGxTreeView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -66,10 +66,10 @@ public:
     wxGxTreeViewBase(void);
 	wxGxTreeViewBase(wxWindow* parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTR_HAS_BUTTONS );
 	virtual ~wxGxTreeViewBase(void);
-    bool Create(wxWindow* parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTR_HAS_BUTTONS);
 	virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent);
 	virtual void AddRoot(IGxObject* pGxObject);
 //IGxView
+    virtual bool Create(wxWindow* parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTR_HAS_BUTTONS, const wxString& name = wxT("TreeView"));
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 //IGxSelectionEvents

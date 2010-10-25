@@ -97,7 +97,9 @@ class WXDLLIMPEXP_GIS_GPU wxGxTasksView :
 	public wxScrolledWindow,
 	public wxGxView
 {
+    DECLARE_DYNAMIC_CLASS(wxGxTasksView)
 public:
+    wxGxTasksView(void);
 	wxGxTasksView(wxWindow* parent, wxWindowID id = TASKSVIEWCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL|wxBORDER_SUNKEN|wxVSCROLL );
 	virtual ~wxGxTasksView(void);
 	virtual void AddPanel(wxGxTaskPanel* pGxTaskPanel);
@@ -105,6 +107,7 @@ public:
     virtual void RemovePanel(wxGxTaskPanel* pGxTaskPanel);
 //    virtual void Refresh(void){Refresh();};
 //IGxView
+    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("ToolView"));
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 protected:

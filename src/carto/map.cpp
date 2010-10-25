@@ -20,15 +20,23 @@
  ****************************************************************************/
 #include "wxgis/carto/map.h"
 
-wxGISMap::wxGISMap(void) : m_pSpatialReference(NULL)
+wxGISMap::wxGISMap(void)
 {
-	m_sMapName = wxString(_("new map"));
+	Create();
 }
 
 wxGISMap::~wxGISMap(void)
 {
 	ClearLayers();
 }
+
+bool wxGISMap::Create(void)
+{
+	m_sMapName = wxString(_("new map"));
+    m_pSpatialReference = NULL;
+    return true;
+}
+
 
 //The AddLayer method adds a layer to the Map. Use the LayerCount property to get the total number of layers in the map.
 //AddLayer automatically attempts to set the Map's SpatialReference property if a coordinate system has not yet been defined for the map.  

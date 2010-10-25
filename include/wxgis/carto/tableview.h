@@ -103,9 +103,12 @@ enum
     ID_LAST,
 	ID_POS
 };
+    DECLARE_CLASS(wxGISTableView)
 public:
+    wxGISTableView(void);
 	wxGISTableView(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxSTATIC_BORDER|wxTAB_TRAVERSAL);
 	virtual ~wxGISTableView(void);
+    bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxSTATIC_BORDER|wxTAB_TRAVERSAL, const wxString& name = wxT("GISTableView"));
 	virtual void SetTable(wxGridTableBase* table, bool takeOwnership = false, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells)
 	{
 		if(m_grid)
