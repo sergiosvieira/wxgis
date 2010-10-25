@@ -48,7 +48,6 @@
 #include "../../art/view-refresh.xpm"
 #include "../../art/go-previous.xpm"
 #include "../../art/go-next.xpm"
-#include "../../art/options.xpm"
 
 
 //	0	Up One Level
@@ -61,8 +60,7 @@
 //  7   Create Folder
 //	8	Rename
 //	9	Refresh
-//  10  Options
-//  11
+//  10  ?
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogMainCmd, wxObject)
 
@@ -98,8 +96,6 @@ wxIcon wxGISCatalogMainCmd::GetBitmap(void)
 			return wxIcon(edit_xpm);
 		case 9:
 			return wxIcon(view_refresh_xpm);
-		case 10:
-			return wxIcon(options_xpm);
 		case 3:
 		default:
 			return wxNullIcon;
@@ -130,8 +126,6 @@ wxString wxGISCatalogMainCmd::GetCaption(void)
 			return wxString(_("Rename"));
 		case 9:	
 			return wxString(_("Refresh"));
-		case 10:	
-			return wxString(_("Options..."));
 		default:
 			return wxEmptyString;
 	}
@@ -149,7 +143,6 @@ wxString wxGISCatalogMainCmd::GetCategory(void)
 		case 5:	
 		case 6:	
 		case 9:	
-		case 10:	
 			return wxString(_("Catalog"));
 		case 7:	
 			return wxString(_("New"));
@@ -304,8 +297,6 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			}
 			return false;
 		}
-		case 10://Options
-            return true;
 		default:
 			return false;
 	}
@@ -329,8 +320,6 @@ wxGISEnumCommandKind wxGISCatalogMainCmd::GetKind(void)
 		case 7://Create folder
 		case 8://Rename
 		case 9://Refresh
-		case 10://Options
-			return enumGISCommandNormal;
 		default:
 			return enumGISCommandNormal;
 	}
@@ -360,8 +349,6 @@ wxString wxGISCatalogMainCmd::GetMessage(void)
 			return wxString(_("Rename item"));
 		case 9:	
 			return wxString(_("Refresh item"));
-		case 10:	
-			return wxString(_("Application options"));
 		default:
 			return wxEmptyString;
 	}
@@ -527,7 +514,6 @@ void wxGISCatalogMainCmd::OnClick(void)
 		}
         case 3:
         case 7:
-        case 10:
 		default:
 			return;
 	}
@@ -585,8 +571,6 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 			return wxString(_("Rename selected item"));
 		case 9:	
 			return wxString(_("Refresh selected item"));
-		case 10:	
-			return wxString(_("Application options"));
 		default:
 			return wxEmptyString;
 	}
@@ -594,7 +578,7 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 
 unsigned char wxGISCatalogMainCmd::GetCount(void)
 {
-	return 11;
+	return 10;
 }
 
 IToolBarControl* wxGISCatalogMainCmd::GetControl(void)
@@ -618,7 +602,6 @@ IToolBarControl* wxGISCatalogMainCmd::GetControl(void)
 		case 7:	
 		case 8:	
 		case 9:	
-		case 10:	
 		default:
 			return NULL;
 	}
@@ -640,7 +623,6 @@ wxString wxGISCatalogMainCmd::GetToolLabel(void)
 		case 7:	
 		case 8:	
 		case 9:	
-		case 10:	
 		default:
 			return wxEmptyString;
 	}
@@ -662,7 +644,6 @@ bool wxGISCatalogMainCmd::HasToolLabel(void)
 		case 7:	
 		case 8:	
 		case 9:	
-		case 10:	
 		default:
 			return false;
 	}
@@ -722,7 +703,6 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
 		case 7:	
 		case 8:	
 		case 9:	
-		case 10:	
 		default:
 			return NULL;
 	}

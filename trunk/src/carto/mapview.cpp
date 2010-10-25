@@ -179,6 +179,8 @@ size_t ExtenStack::GetSize()
 // wxGISMapView
 //-----------------------------------------------
 
+IMPLEMENT_CLASS(wxGISMapView, wxScrolledWindow)
+
 BEGIN_EVENT_TABLE(wxGISMapView, wxScrolledWindow)
 	EVT_ERASE_BACKGROUND(wxGISMapView::OnEraseBackground)
 	EVT_SIZE(wxGISMapView::OnSize)
@@ -188,7 +190,25 @@ BEGIN_EVENT_TABLE(wxGISMapView, wxScrolledWindow)
 	EVT_MOUSE_CAPTURE_LOST(wxGISMapView::OnCaptureLost)
 END_EVENT_TABLE()
 
-wxGISMapView::wxGISMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxScrolledWindow(parent, id, pos, size, style | wxHSCROLL | wxVSCROLL )/*| wxSTATIC_BORDER | wxBORDER_NONEwxBORDER_SUNKEN*/, wxGISMap(), m_pTrackCancel(NULL), m_pThread(NULL), m_pAni(NULL), m_timer(this, TIMER_ID)
+wxGISMapView::wxGISMapView(void) : wxGISMap(), m_pTrackCancel(NULL), m_pThread(NULL), m_pAni(NULL), m_timer(this, TIMER_ID)
+{
+}
+
+wxGISMapView::wxGISMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxGISMap(), m_pTrackCancel(NULL), m_pThread(NULL), m_pAni(NULL), m_timer(this, TIMER_ID)
+{
+    Create(parent, id, pos, size, style);
+}
+
+wxGISMapView::~wxGISMapView(void)
+{
+	wxDELETE(pGISScreenDisplay);
+	wxDELETE(m_pExtenStack);
+	wxDELETE(m_pTrackCancel);
+	if(m_pThread)
+		m_pThread->Delete();
+}
+
+bool wxGISMapView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
 	//set map init envelope
 #ifdef __WXGTK__
@@ -218,15 +238,8 @@ wxGISMapView::wxGISMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 
 	m_MouseState = enumGISMouseNone;
 	m_MapToolState = enumGISMapNone;
-}
 
-wxGISMapView::~wxGISMapView(void)
-{
-	wxDELETE(pGISScreenDisplay);
-	wxDELETE(m_pExtenStack);
-	wxDELETE(m_pTrackCancel);
-	if(m_pThread)
-		m_pThread->Delete();
+    return wxScrolledWindow::Create(parent, id, pos, size, style | wxHSCROLL | wxVSCROLL );
 }
 
 void wxGISMapView::OnDraw(wxDC& dc)

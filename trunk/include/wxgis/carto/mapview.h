@@ -72,11 +72,14 @@ class WXDLLIMPEXP_GIS_CRT wxGISMapView :
 	public wxScrolledWindow,
 	public wxGISMap
 {
+    DECLARE_CLASS(wxGxMapView)
 public:
 	friend class ExtenStack;
 public:
+    wxGISMapView(void);
 	wxGISMapView(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxSTATIC_BORDER|wxTAB_TRAVERSAL);
 	virtual ~wxGISMapView(void);
+    bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxSTATIC_BORDER|wxTAB_TRAVERSAL, const wxString& name = wxT("GISMapView"));
 	virtual void OnDraw(wxDC& dc);
 	virtual void PanStart(wxPoint MouseLocation);
 	virtual void PanMoveTo(wxPoint MouseLocation);

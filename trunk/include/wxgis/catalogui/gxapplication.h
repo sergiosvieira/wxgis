@@ -3,7 +3,7 @@
  * Purpose:  wxGxApplication main header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -28,10 +28,17 @@
 #include "wx/aui/aui.h"
 #include "wx/artprov.h"
 
+/*! \file gxapplication.h
+    \brief wxGxApplication main header.
+*/
+
 //-----------------------------------------------
 // wxGxApplication
 //-----------------------------------------------
 
+/*! \class wxGxApplication
+    \brief A catalog application framework class.
+*/
 class WXDLLIMPEXP_GIS_CLU wxGxApplication :
 	public wxGISApplication,
     public IGxApplication
@@ -52,6 +59,7 @@ public:
     //events 
     virtual void OnClose(wxCloseEvent& event);
 	//IApplication
+    virtual void OnAppOptions(void);
 	virtual void Customize(void);
 	virtual void ShowStatusBar(bool bShow);
 	virtual void ShowApplicationWindow(wxWindow* pWnd, bool bShow = true);

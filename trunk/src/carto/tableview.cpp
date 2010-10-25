@@ -163,6 +163,8 @@ void wxGridCtrl::OnSelectCell(wxGridEvent& event)
 
 #define BITBUTTONSIZE 18
 
+IMPLEMENT_CLASS(wxGISTableView, wxPanel)
+
 BEGIN_EVENT_TABLE(wxGISTableView, wxPanel)
     EVT_GRID_LABEL_LEFT_CLICK(wxGISTableView::OnLabelLeftClick)
     EVT_GRID_SELECT_CELL(wxGISTableView::OnSelectCell)
@@ -173,9 +175,23 @@ BEGIN_EVENT_TABLE(wxGISTableView, wxPanel)
 	EVT_TEXT_ENTER(wxGISTableView::ID_POS, wxGISTableView::OnSetPos)
 END_EVENT_TABLE();
 
-wxGISTableView::wxGISTableView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style )
-: wxPanel( parent, id, pos, size, style )
+wxGISTableView::wxGISTableView(void)
 {
+}
+
+wxGISTableView::wxGISTableView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style )
+{
+    Create( parent, id, pos, size, style );
+}
+
+wxGISTableView::~wxGISTableView(void)
+{
+}
+
+bool wxGISTableView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+{
+    wxPanel::Create( parent, id, pos, size, style, name );
+
 	wxBoxSizer* bSizerMain;
 	bSizerMain = new wxBoxSizer( wxVERTICAL );
 
@@ -253,10 +269,8 @@ wxGISTableView::wxGISTableView(wxWindow* parent, wxWindowID id, const wxPoint& p
 	(*m_position) << 1;
 
 	this->Layout();
-}
 
-wxGISTableView::~wxGISTableView(void)
-{
+    return true;
 }
 
 void wxGISTableView::OnLabelLeftClick(wxGridEvent& event)

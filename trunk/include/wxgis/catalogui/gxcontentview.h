@@ -39,9 +39,11 @@ class WXDLLIMPEXP_GIS_CLU wxGxContentView :
 	public IGxSelectionEvents,
 	public IGxCatalogEvents
 {
+    DECLARE_DYNAMIC_CLASS(wxGxContentView)
 public:
 	typedef enum _listsyle{ REPORT, SMALL, LARGE, LIST } LISTSTYLE, *LPLISTSTYLE;
 
+    wxGxContentView(void);
 	wxGxContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition,
 						 const wxSize& size = wxDefaultSize, long style = wxLC_LIST | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE);//
 	virtual ~wxGxContentView(void);
@@ -54,6 +56,7 @@ public:
     virtual void SelectAll(void);
     virtual bool Show(bool show = true);
 //IGxView
+    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("ContentView"));
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 	virtual bool Applies(IGxSelection* Selection);

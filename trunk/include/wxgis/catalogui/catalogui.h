@@ -52,6 +52,7 @@ class IGxView
 {
 public:
 	virtual ~IGxView(void){};
+    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("view")) = 0;
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf) = 0;
 	virtual void Deactivate(void) = 0;
 	virtual bool Applies(IGxSelection* Selection) = 0;

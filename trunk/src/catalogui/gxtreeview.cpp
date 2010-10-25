@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxtreeview.h"
 #include "wxgis/framework/framework.h"
-#include "../../art/doc_16.xpm"
+#include "../../art/document_16.xpm"
 
 #include "wx/dnd.h"
 #include "wx/dataobj.h"
@@ -44,21 +44,21 @@ wxGxTreeViewBase::wxGxTreeViewBase(wxWindow* parent, wxWindowID id, const wxPoin
 {
 	m_TreeImageList.Create(16, 16);
 	SetImageList(&m_TreeImageList);
-    m_TreeImageList.Add(wxIcon(doc_16_xpm));
+    m_TreeImageList.Add(wxIcon(document_16_xpm));
 }
 
 wxGxTreeViewBase::~wxGxTreeViewBase(void)
 {
 }
 
-bool wxGxTreeViewBase::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+bool wxGxTreeViewBase::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     bool result = wxTreeCtrl::Create(parent, id, pos, size, style);
     if(result)
     {
         m_TreeImageList.Create(16, 16);
         SetImageList(&m_TreeImageList);
-        m_TreeImageList.Add(wxIcon(doc_16_xpm));
+        m_TreeImageList.Add(wxIcon(document_16_xpm));
     }
     return result;
 }

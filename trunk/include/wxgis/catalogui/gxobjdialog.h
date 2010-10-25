@@ -3,7 +3,7 @@
  * Purpose:  wxGxObjectDialog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -82,6 +82,7 @@ public:
     virtual void OnDismiss();
     // Create popup control
     virtual bool Create(wxWindow* parent);
+    virtual bool Create(wxWindow* parent, wxWindowID id = TREECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxBORDER_SIMPLE | wxTR_NO_BUTTONS | wxTR_NO_LINES | wxTR_SINGLE, const wxString& name = wxT("ViewComboPopup"));
     // Return pointer to the created control
     virtual wxWindow *GetControl() { return this; }
     // Translate string into a list selection
@@ -190,6 +191,7 @@ public:
     virtual IStatusBar* GetStatusBar(void){return NULL;};
     virtual IGISConfig* GetConfig(void){return m_pConfig;};
     virtual void OnAppAbout(void){};
+    virtual void OnAppOptions(void){};
     virtual IGISCommandBar* GetCommandBar(wxString sName){return NULL;};
     virtual void RemoveCommandBar(IGISCommandBar* pBar){};
     virtual bool AddCommandBar(IGISCommandBar* pBar){return false;};

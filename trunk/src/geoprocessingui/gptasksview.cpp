@@ -3,7 +3,7 @@
  * Purpose:  wxGxTasksView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -339,13 +339,28 @@ void wxGxTaskPanel::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessag
 //////////////////////////////////////////////////////////////////
 // wxGxTasksView
 //////////////////////////////////////////////////////////////////
+IMPLEMENT_DYNAMIC_CLASS(wxGxTasksView, wxScrolledWindow)
 
 BEGIN_EVENT_TABLE(wxGxTasksView, wxScrolledWindow)
 END_EVENT_TABLE()
 
-wxGxTasksView::wxGxTasksView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
-wxScrolledWindow(parent, id, pos, size, style)
+
+wxGxTasksView::wxGxTasksView(void)
 {
+}
+
+wxGxTasksView::wxGxTasksView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+{
+    Create(parent, id, pos, size, style);
+}
+
+wxGxTasksView::~wxGxTasksView(void)
+{
+}
+
+bool wxGxTasksView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+{
+    wxScrolledWindow::Create(parent, id, pos, size, style);
     m_sViewName = wxString(_("Tasks"));
     m_Icon = wxIcon(tool_16_xpm);
 
@@ -360,10 +375,8 @@ wxScrolledWindow(parent, id, pos, size, style)
 
   	this->SetSizer( m_bMainSizer );
 	this->Layout();
-}
 
-wxGxTasksView::~wxGxTasksView(void)
-{
+    return true;
 }
 
 bool wxGxTasksView::Activate(IGxApplication* application, wxXmlNode* pConf)

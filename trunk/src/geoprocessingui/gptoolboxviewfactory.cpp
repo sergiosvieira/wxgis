@@ -35,10 +35,10 @@ wxGxToolboxViewFactory::~wxGxToolboxViewFactory(void)
 
 wxWindow* wxGxToolboxViewFactory::CreateView(wxString sName, wxWindow* parent)
 {
-    if(sName.CmpNoCase(wxT("ToolboxView")) == 0)
-	{
-		wxGxToolboxView* pwxGxToolboxView = new wxGxToolboxView(parent);
-		return static_cast<wxWindow*>(pwxGxToolboxView);
-	}
+ //   if(sName.CmpNoCase(wxT("ToolboxView")) == 0)
+	//{
+	//	wxGxToolboxView* pwxGxToolboxView = new wxGxToolboxView(parent);
+	//	return static_cast<wxWindow*>(pwxGxToolboxView);
+	//}
 	return NULL;
 }

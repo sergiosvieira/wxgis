@@ -233,6 +233,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\framework\propertypages.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\framework\statusbar.cpp"
 				>
 			</File>
@@ -300,6 +304,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\framework\progressor.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\framework\propertypages.h"
 				>
 			</File>
 			<File

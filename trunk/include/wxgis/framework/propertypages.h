@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGISMap class.
+ * Purpose:  PropertyPages of Catalog.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,27 +19,21 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
+#include "wxgis/framework/framework.h"
 
-#include "wxgis/carto/carto.h"
-
-class WXDLLIMPEXP_GIS_CRT wxGISMap
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISMiscPropertyPage
+///////////////////////////////////////////////////////////////////////////////
+class wxGISMiscPropertyPage : 
+    public IPropertyPage
 {
+    DECLARE_DYNAMIC_CLASS(wxGISMiscPropertyPage)
 public:
-	wxGISMap(void);
-	virtual ~wxGISMap(void);
-    virtual bool Create(void);
-	virtual void SetName(wxString sName){m_sMapName = sName;};
-	virtual wxString GetName(void){return m_sMapName;};
-	virtual void AddLayer(wxGISLayer* pLayer);
-	virtual void ClearLayers(void);
-	virtual size_t GetLayerCount(void){return m_Layers.size();};
-	virtual wxString GetDescription(void){return m_sDescription;};
-	virtual void SetDescription(wxString sDescription){m_sDescription = sDescription;};
-	virtual OGREnvelope GetFullExtent(void);
-	virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference);
-	virtual OGRSpatialReference* GetSpatialReference(void);
+    wxGISMiscPropertyPage(void);
+	~wxGISMiscPropertyPage();
+    virtual bool Create(IApplication* application, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Misc_Panel"));
+//  IPropertyPage    
+    virtual wxString GetPageName(void){return wxString(_("Misc"));};
+    virtual void Apply(void);
 protected:
-	wxString m_sMapName, m_sDescription;
-	std::vector<wxGISLayer*> m_Layers;
-	OGRSpatialReference* m_pSpatialReference;
 };
