@@ -29,7 +29,7 @@
 //	EVT_AUINOTEBOOK_PAGE_CHANGED(TOOLVIEWCTRLID, wxGxToolboxView::OnAUINotebookPageChanged)
 //END_EVENT_TABLE()
 
-//IMPLEMENT_DYNAMIC_CLASS(wxGxToolboxView, wxAuiNotebook)
+IMPLEMENT_DYNAMIC_CLASS(wxGxToolboxView, wxAuiNotebook)
 
 wxGxToolboxView::wxGxToolboxView(void)
 {
@@ -42,6 +42,12 @@ wxGxToolboxView::wxGxToolboxView(wxWindow* parent, wxWindowID id, const wxPoint&
 
 wxGxToolboxView::~wxGxToolboxView(void)
 {
+}
+
+bool wxGxToolboxView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+{
+    m_sViewName = wxString(_("Tasks pane"));
+    return wxAuiNotebook::Create(parent, id, pos, size, wxAUI_NB_BOTTOM | wxNO_BORDER | wxAUI_NB_TAB_MOVE);
 }
 
 bool wxGxToolboxView::Activate(IGxApplication* application, wxXmlNode* pConf)

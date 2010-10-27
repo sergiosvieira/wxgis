@@ -203,10 +203,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\geoprocessingui\gptoolboxviewfactory.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\geoprocessingui\gptooldlg.cpp"
 				>
 			</File>
@@ -238,10 +234,6 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\geoprocessingui\gptoolboxview.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\geoprocessingui\gptoolboxviewfactory.h"
 				>
 			</File>
 			<File

@@ -65,7 +65,7 @@ bool wxGxNoView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, con
 	IsBold = true;
 	IsItalic = false;
 	FontSize = 12;
-    return wxControl::Create(parent, id, pos, size, style);
+    return wxControl::Create(parent, id, pos, size, wxNO_BORDER);
 }
 
 void wxGxNoView::Serialize(wxXmlNode* pRootNode, bool bStore)

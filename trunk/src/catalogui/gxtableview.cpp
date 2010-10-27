@@ -40,7 +40,7 @@ wxGxTableView::~wxGxTableView(void)
 bool wxGxTableView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
 	m_sViewName = wxString(_("Table View"));
-    wxGISTableView::Create(parent, id, pos, size, style, name);
+    wxGISTableView::Create(parent, TABLECTRLID, pos, size, style, name);
 	SetReadOnly(true);
     return true;
 }

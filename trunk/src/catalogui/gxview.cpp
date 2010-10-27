@@ -21,6 +21,7 @@
 #include "wxgis/catalogui/gxview.h"
 #include "wxgis/catalog/gxcatalog.h"
 #include "wxgis/catalog/gxdiscconnection.h"
+#include "wxgis/catalog/gxdiscconnections.h"
 
 //-----------------------------------------------
 // wxGxView
@@ -72,6 +73,13 @@ void wxGxView::SetViewIcon(wxIcon Icon)
 
 int GxObjectCompareFunction(IGxObject* pObject1, IGxObject* pObject2, long sortData)
 {
+	bool bDiscConnections1 = dynamic_cast<wxGxDiscConnections*>(pObject1);
+    bool bDiscConnections2 = dynamic_cast<wxGxDiscConnections*>(pObject2);
+    if(bDiscConnections1)
+		return sortData == 0 ? 1 : -1;
+    else if(bDiscConnections2)
+		return sortData == 0 ? -1 : 1;
+
 	IGxObjectSort* pGxObjectSort1 = dynamic_cast<IGxObjectSort*>(pObject1);
     IGxObjectSort* pGxObjectSort2 = dynamic_cast<IGxObjectSort*>(pObject2);
     if(pGxObjectSort1 && !pGxObjectSort2)

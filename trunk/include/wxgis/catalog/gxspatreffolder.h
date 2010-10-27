@@ -72,7 +72,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxPrjFolder :
 	public wxGxArchiveFolder
 {
 public:
-	wxGxPrjFolder(wxString Path, wxString Name, bool bShowHidden);
+	wxGxPrjFolder(wxString Path, wxString Name);
 	virtual ~wxGxPrjFolder(void);
 	//IGxObject
 	virtual wxString GetCategory(void){return wxString(_("Coordinate Systems Folder"));};

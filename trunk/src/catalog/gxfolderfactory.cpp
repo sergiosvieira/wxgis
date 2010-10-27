@@ -55,7 +55,7 @@ bool wxGxFolderFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 				sName = name;
 			else
 				sName = name + wxT(".") + ext;
-			wxGxFolder* pFolder = new wxGxFolder(path, sName, m_pCatalog->GetShowHidden());
+			wxGxFolder* pFolder = new wxGxFolder(path, sName);
 			IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
 			pObjArray->push_back(pGxObj);
 			pFileNames->RemoveAt(i);
@@ -67,7 +67,7 @@ bool wxGxFolderFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             wxString sPref = path.Left(4);
             if(ext == wxString(wxT("zip")) && sPref != wxString(wxT("/vsi")))// || ext == wxString(wxT("tar")) || ext == wxString(wxT("gz"))
             {
-			    wxGxArchive* pFolder = new wxGxArchive(path, name, m_pCatalog->GetShowHidden(), wxString(wxT("/vsizip/")));
+			    wxGxArchive* pFolder = new wxGxArchive(path, name, wxString(wxT("/vsizip/")));
 			    IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
 			    pObjArray->push_back(pGxObj);
 			    pFileNames->RemoveAt(i);

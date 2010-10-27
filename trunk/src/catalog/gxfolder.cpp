@@ -24,7 +24,7 @@
 #include "../../art/folder_16.xpm"
 #include "../../art/folder_48.xpm"
 
-wxGxFolder::wxGxFolder(wxString Path, wxString Name, bool bShowHidden) : m_bShowHidden(bShowHidden), m_bIsChildrenLoaded(false)
+wxGxFolder::wxGxFolder(wxString Path, wxString Name) : m_bIsChildrenLoaded(false)
 {
 	m_sName = Name;
 	m_sPath = Path;
@@ -71,7 +71,7 @@ void wxGxFolder::LoadChildren(void)
 	if(dir.IsOpened())
 	{
 		WXDWORD style = wxDIR_FILES | wxDIR_DIRS;
-		if(m_bShowHidden)
+        if(m_pCatalog->GetShowHidden())
 			style |= wxDIR_HIDDEN;
 
 		dir.Traverse(*this, wxEmptyString, style );

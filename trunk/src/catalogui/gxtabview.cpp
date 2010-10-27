@@ -3,7 +3,7 @@
  * Purpose:  wxGISTabView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxtabview.h"
-#include "wxgis/catalogui/viewsfactory.h"
 #include "wxgis/catalogui/gxapplication.h"
 
 //-------------------------------------------------------------------
@@ -43,47 +42,30 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 	while(pChild)
 	{
 		wxString sClass = pChild->GetPropVal(wxT("class"), ERR);
-		wxString sName = pChild->GetPropVal(wxT("name"), NONAME);
 		int nPriority = wxAtoi(pChild->GetPropVal(wxT("priority"), wxT("0")));
 
 		wxObject *obj = wxCreateDynamicObject(sClass);
-		IGxViewsFactory *pFactory = dynamic_cast<IGxViewsFactory*>(obj);
-		if(pFactory != NULL)
+		IGxView *pGxView = dynamic_cast<IGxView*>(obj);
+		wxWindow* pWnd = dynamic_cast<wxWindow*>(pGxView);
+		if(pGxView && pWnd)
 		{
-			wxWindow* pWnd = pFactory->CreateView(sName, this);
-			if(pWnd != NULL)
-			{
-				pWnd->Hide();
-				m_pApp->RegisterChildWindow(pWnd);
+            pGxView->Create(this);
+			pWnd->Hide();
+			m_pApp->RegisterChildWindow(pWnd);
 
-				wxGxView* pView = dynamic_cast<wxGxView*>(pWnd);
-				if(pView != NULL)
-				{
-					pView->Activate(application, pChild);
-					if(m_pWindows.size() <= nPriority)
-						for(size_t i = 0; i < nPriority + 1; i++)
-							m_pWindows.push_back(NULL);
+			pGxView->Activate(application, pChild);
+			if(m_pWindows.size() <= nPriority)
+			for(size_t i = 0; i < nPriority + 1; i++)
+				m_pWindows.push_back(NULL);
 
-					m_pWindows[nPriority] = pWnd;//.insert(/*((m_pWindows.begin() + nPriority) < m_pWindows.end()) ? m_pWindows.begin() + nPriority : */m_pWindows.begin(), 1, pWnd);//.push_back(pWnd);
-					wxLogMessage(_("wxGxTab: View class %s.%s in '%s' tab initialise"), sClass.c_str(), sName.c_str(), m_sName.c_str());
-				}
-				else
-				{
-					wxLogError(_("wxGxTab: This is not inherited IGxView class (%s.%s)"), sClass.c_str(), sName.c_str());
-					wxDELETE(pWnd);
-				}
-			}
-			else
-			{
-				wxLogError(_("wxGxTab: Error creating view %s.%s"), sClass.c_str(), sName.c_str());
-			}
+			m_pWindows[nPriority] = pWnd;
+			wxLogMessage(_("wxGxTab: View class %s in '%s' tab initialise"), sClass.c_str(), m_sName.c_str());
 		}
 		else
 		{
-			wxLogError(_("wxGxTab: Error initializing ViewsFactory %s"), sClass.c_str());
+			wxLogError(_("wxGxTab: Error creating view %s"), sClass.c_str());
+		    wxDELETE(pGxView);
 		}
-
-		wxDELETE(obj);
 
 		pChild = pChild->GetNext();
 	}
@@ -365,7 +347,7 @@ wxGxTabView::~wxGxTabView(void)
 bool wxGxTabView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     m_pSelection = NULL;
-    return wxAuiNotebook::Create(parent, id, pos, size, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE);
+    return wxAuiNotebook::Create(parent, TABCTRLID, pos, size, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE);
 }
 
 bool wxGxTabView::Activate(IGxApplication* application, wxXmlNode* pConf)

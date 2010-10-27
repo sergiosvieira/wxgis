@@ -151,7 +151,7 @@ void wxGxSpatialReferencesFolder::LoadChildren(void)
                 //int x = 0;
                 if(VSI_ISDIR(BufL.st_mode))
                 {
-					wxGxPrjFolder* pFolder = new wxGxPrjFolder(sFolderPath, wxGetTranslation(sFileName), m_pCatalog->GetShowHidden());
+					wxGxPrjFolder* pFolder = new wxGxPrjFolder(sFolderPath, wxGetTranslation(sFileName));
 					IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
 					bool ret_code = AddChild(pGxObj);
                 }
@@ -182,7 +182,7 @@ void wxGxSpatialReferencesFolder::LoadChildren(void)
 // wxGxPrjFolder
 /////////////////////////////////////////////////////////////////////////
 
-wxGxPrjFolder::wxGxPrjFolder(wxString Path, wxString Name, bool bShowHidden) : wxGxArchiveFolder(Path, Name, bShowHidden)
+wxGxPrjFolder::wxGxPrjFolder(wxString Path, wxString Name) : wxGxArchiveFolder(Path, Name)
 {
 }
 
@@ -233,7 +233,7 @@ void wxGxPrjFolder::LoadChildren(void)
                 //int x = 0;
                 if(VSI_ISDIR(BufL.st_mode))
                 {
-					wxGxPrjFolder* pFolder = new wxGxPrjFolder(sFolderPath, sFileName, m_pCatalog->GetShowHidden());
+					wxGxPrjFolder* pFolder = new wxGxPrjFolder(sFolderPath, sFileName);
 					IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
 					bool ret_code = AddChild(pGxObj);
                 }

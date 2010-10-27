@@ -212,7 +212,8 @@ public:
 			wxString sTestedPath = m_Children[i]->GetFullName();
 			if(sTestedPath.CmpNoCase(sPath) == 0)
 				return m_Children[i];
-			if(sPath.Find(sTestedPath) != wxNOT_FOUND)
+            bool bHavePart = sPath.MakeLower().Find(sTestedPath.MakeLower()) != wxNOT_FOUND;
+			if(bHavePart/*sPath.Find(sTestedPath)*/ )
 			{
 				IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(m_Children[i]);
 				if(pContainer && pContainer->HasChildren())
@@ -286,6 +287,10 @@ public:
 	virtual ~IGxRootObjectProperties(void){};
 	virtual void Init(wxXmlNode* pConfigNode) = 0;
 	virtual wxXmlNode* GetProperties(void) = 0;
+    virtual bool GetEnabled(void){return m_bEnabled;};
+    virtual void SetEnabled(bool bEnabled){m_bEnabled = bEnabled;};
+protected:
+    bool m_bEnabled;
 };
 
 class IGxObjectSort

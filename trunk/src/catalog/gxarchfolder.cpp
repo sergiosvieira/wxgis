@@ -30,7 +30,7 @@
 // wxGxArchive
 /////////////////////////////////////////////////////////////////////////
 
-wxGxArchive::wxGxArchive(wxString Path, wxString Name, bool bShowHidden, wxString sType) : wxGxFolder(Path, Name, bShowHidden)
+wxGxArchive::wxGxArchive(wxString Path, wxString Name, wxString sType) : wxGxFolder(Path, Name)
 {
     m_sType = sType;
 }
@@ -87,7 +87,7 @@ void wxGxArchive::LoadChildren(void)
                 //int x = 0;
                 if(VSI_ISDIR(BufL.st_mode))
                 {
-					wxGxArchiveFolder* pFolder = new wxGxArchiveFolder(sFolderPath, sFileName, m_pCatalog->GetShowHidden());
+					wxGxArchiveFolder* pFolder = new wxGxArchiveFolder(sFolderPath, sFileName);
 					IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
 					bool ret_code = AddChild(pGxObj);
                 }
@@ -168,7 +168,7 @@ void wxGxArchive::EditProperties(wxWindow *parent)
 // wxGxArchiveFolder
 /////////////////////////////////////////////////////////////////////////
 
-wxGxArchiveFolder::wxGxArchiveFolder(wxString Path, wxString Name, bool bShowHidden) : wxGxFolder(Path, Name, bShowHidden)
+wxGxArchiveFolder::wxGxArchiveFolder(wxString Path, wxString Name) : wxGxFolder(Path, Name)
 {
 }
 
@@ -224,7 +224,7 @@ void wxGxArchiveFolder::LoadChildren(void)
                 //int x = 0;
                 if(VSI_ISDIR(BufL.st_mode))
                 {
-					wxGxArchiveFolder* pFolder = new wxGxArchiveFolder(sFolderPath, sFileName, m_pCatalog->GetShowHidden());
+					wxGxArchiveFolder* pFolder = new wxGxArchiveFolder(sFolderPath, sFileName);
 					IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
 					bool ret_code = AddChild(pGxObj);
                 }

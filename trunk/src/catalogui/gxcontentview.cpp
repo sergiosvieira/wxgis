@@ -29,6 +29,8 @@
 #include "wx/dnd.h"
 #include "wx/dataobj.h"
 
+IMPLEMENT_DYNAMIC_CLASS(wxGxContentView, wxListCtrl)
+
 BEGIN_EVENT_TABLE(wxGxContentView, wxListCtrl)
     EVT_LIST_BEGIN_LABEL_EDIT(LISTCTRLID, wxGxContentView::OnBeginLabelEdit)
     EVT_LIST_END_LABEL_EDIT(LISTCTRLID, wxGxContentView::OnEndLabelEdit)
@@ -42,8 +44,6 @@ BEGIN_EVENT_TABLE(wxGxContentView, wxListCtrl)
     EVT_CONTEXT_MENU(wxGxContentView::OnContextMenu)
     EVT_CHAR(wxGxContentView::OnChar)
 END_EVENT_TABLE()
-
-IMPLEMENT_DYNAMIC_CLASS(wxGxContentView, wxListCtrl)
 
 int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
 {
@@ -144,7 +144,7 @@ bool wxGxContentView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos
     m_bDragging = false;
     m_pDeleteCmd = NULL;
 
-    wxListCtrl::Create(parent, id, pos, size, style);
+    wxListCtrl::Create(parent, LISTCTRLID, pos, size, wxLC_LIST | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE);
     
     InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150);
 	InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
@@ -472,7 +472,6 @@ void wxGxContentView::SetColumnImage(int col, int image)
 void wxGxContentView::OnActivated(wxListEvent& event)
 {
 	//event.Skip();
-	//dbl click
 	LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
 	if(pItemData == NULL)
 		return;

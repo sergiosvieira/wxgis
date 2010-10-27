@@ -259,47 +259,35 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
         else
         {
  		    wxString sClass = pViewsChildNode->GetPropVal(wxT("class"), ERR);
-		    wxString sName = pViewsChildNode->GetPropVal(wxT("name"), NONAME);
 
 		    wxObject *obj = wxCreateDynamicObject(sClass);
-		    IGxViewsFactory *pFactory = dynamic_cast<IGxViewsFactory*>(obj);
-		    if(pFactory != NULL)
-		    {
-			    wxWindow* pWnd = pFactory->CreateView(sName, this);
+		    IGxView *pGxView = dynamic_cast<IGxView*>(obj);
+            if(pGxView)
+            {
+                pGxView->Create(this);
+			    wxWindow* pWnd = dynamic_cast<wxWindow*>(pGxView);
 			    if(pWnd != NULL)
 			    {
 				    pWnd->Hide();
-
-				    wxGxView* pView = dynamic_cast<wxGxView*>(pWnd);
-				    if(pView != NULL)
-				    {
-					    if(pView->Activate(this, pViewsChildNode))
-                        {
-                            nPaneCount++;
-                            m_mgr.AddPane(pWnd, wxAuiPaneInfo().Name(wxString::Format(wxT("window_%d"), nPaneCount)).Caption(pView->GetViewName()).BestSize(wxSize(280,128)).MinSize(wxSize(200,64)).Right().Layer(1).Position(nPaneCount).CloseButton(true));
-                            RegisterChildWindow(pWnd);
-                            wxLogMessage(_("wxGxApplication: View class %s.%s initialise"), sClass.c_str(), sName.c_str());
-                        }
-				    }
+				    if(pGxView->Activate(this, pViewsChildNode))
+                    {
+                        nPaneCount++;
+                        m_mgr.AddPane(pWnd, wxAuiPaneInfo().Name(wxString::Format(wxT("window_%d"), nPaneCount)).Caption(pGxView->GetViewName()).BestSize(wxSize(280,128)).MinSize(wxSize(200,64)).Right().Layer(1).Position(nPaneCount).CloseButton(true));
+                        RegisterChildWindow(pWnd);
+                        wxLogMessage(_("wxGxApplication: View class %s initialise"), sClass.c_str());
+                    }
 				    else
 				    {
-					    wxLogError(_("wxGxApplication: This is not inherited IGxView class (%s.%s)"), sClass.c_str(), sName.c_str());
-					    wxDELETE(pWnd);
+					    wxLogError(_("wxGxApplication: Error activation IGxView class (%s)"), sClass.c_str());
+					    wxDELETE(pGxView);
 				    }
-			    }
-			    else
-			    {
-				    wxLogError(_("wxGxApplication: Error creating view %s.%s"), sClass.c_str(), sName.c_str());
-				    wxDELETE(pFactory);
 			    }
 		    }
 		    else
 		    {
-			    wxLogError(_("wxGxApplication: Error initializing ViewsFactory %s"), sClass.c_str());
-			    wxDELETE(obj);
+			    wxLogError(_("wxGxApplication: Error creating view %s"), sClass.c_str());
+			    wxDELETE(pGxView);
 		    }
-
-		    wxDELETE(pFactory);
         }
 
         pViewsChildNode = pViewsChildNode->GetNext();
@@ -404,8 +392,6 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
 
  	SerializeGxFramePos(true);
 }
-
-#include "wxgis/catalogui/propertypages.h"
 
 void wxGxApplication::OnAppOptions(void)
 {

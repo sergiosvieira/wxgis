@@ -21,8 +21,10 @@
 #pragma once
 
 #include "wxgis/catalog/catalog.h"
-#include "../../art/mainframe.xpm"
 #include "wxgis/catalog/gxselection.h"
+#include "wxgis/catalog/gxdiscconnections.h"
+
+#include "../../art/mainframe.xpm"
 // ----------------------------------------------------------------------------
 // wxGxCatalog
 // ----------------------------------------------------------------------------
@@ -67,8 +69,6 @@ public:
 	//IGxCatalog
 	virtual wxString ConstructFullName(IGxObject* pObject);
 	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray);
-	virtual void SetShowHidden(bool bShowHidden);
-	virtual void SetShowExt(bool bShowExt);
 	virtual void ObjectAdded(IGxObject* pObject);
 	virtual void ObjectChanged(IGxObject* pObject);
 	virtual void ObjectDeleted(IGxObject* pObject);
@@ -83,17 +83,19 @@ public:
 	//wxGxCatalog
 	virtual void LoadChildren(wxXmlNode* pNode);
 	virtual void EmptyChildren(void);
+	virtual void EmptyDisabledChildren(void);
 	virtual void LoadObjectFactories(wxXmlNode* pNode);
 	virtual void EmptyObjectFactories(void);
 	virtual void Init(void);
-	virtual void SerializeDiscConnections(wxXmlNode* pNode, bool bStore = false);
     virtual void SerializePlugins(wxXmlNode* pNode, bool bStore = false);
+	virtual void EnableRootItem(IGxObject* pRootItem, bool bEnable);
 
 private:
 	bool m_bIsChildrenLoaded;
 	std::vector<IGxObjectFactory*> m_ObjectFactoriesArray;
-	std::map<wxString, IGxObject*> m_DiscConnections;
 	wxArrayString m_CatalogRootItemArray;
+    wxGxDiscConnections* m_pGxDiscConnections;
+    GxObjectArray m_aRootItems;
 };
 
 //WXDLL_ENTRY_FUNCTION();

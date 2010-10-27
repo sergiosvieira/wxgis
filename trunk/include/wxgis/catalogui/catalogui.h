@@ -34,13 +34,6 @@
 #define WXGISHIGHEST	1200 //
 
 
-class IGxViewsFactory
-{
-public:
-	virtual ~IGxViewsFactory(void){};
-	virtual wxWindow* CreateView(wxString sName, wxWindow* parent) = 0;
-};
-
 class IGxApplication
 {
 public:

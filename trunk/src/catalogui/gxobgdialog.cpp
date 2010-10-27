@@ -47,7 +47,7 @@ bool wxTreeViewComboPopup::Create(wxWindow* parent)
 bool wxTreeViewComboPopup::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     m_bClicked = false;
-    return wxGxTreeViewBase::Create(parent, id, pos, size, style, name);
+    return wxGxTreeViewBase::Create(parent, TREECTRLID, pos, size, wxBORDER_SIMPLE | wxTR_NO_BUTTONS | wxTR_NO_LINES | wxTR_SINGLE, name);
 }
 
 void wxTreeViewComboPopup::Init()
