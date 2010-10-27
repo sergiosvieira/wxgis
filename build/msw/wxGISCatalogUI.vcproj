@@ -248,10 +248,6 @@
 				RelativePath="..\..\src\catalogui\viewscmd.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\..\src\catalogui\viewsfactory.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -324,10 +320,6 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalogui\viewscmd.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\catalogui\viewsfactory.h"
 				>
 			</File>
 		</Filter>

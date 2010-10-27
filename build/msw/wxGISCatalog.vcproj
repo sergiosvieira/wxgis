@@ -203,6 +203,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\catalog\gxdiscconnections.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\catalog\gxfile.cpp"
 				>
 			</File>
@@ -274,6 +278,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalog\gxdiscconnection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalog\gxdiscconnections.h"
 				>
 			</File>
 			<File

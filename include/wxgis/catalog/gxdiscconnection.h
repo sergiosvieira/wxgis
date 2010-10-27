@@ -3,7 +3,7 @@
  * Purpose:  wxGxDiscConnection class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxDiscConnection :
 	public wxGxFolder
 {
 public:
-	wxGxDiscConnection(wxString Path, wxString Name, bool bShowHidden);
+	wxGxDiscConnection(wxString Path, wxString Name);
 	virtual ~wxGxDiscConnection(void);
 	//IGxObject
 	virtual wxString GetCategory(void){return wxString(_("Folder Connection"));};
@@ -44,5 +44,4 @@ public:
 	//wxGxDiscConnection
 	//wxDirTraverser
 protected:
-	wxImageList m_ImageListSmall, m_ImageListLarge;
 };

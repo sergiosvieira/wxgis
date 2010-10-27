@@ -41,10 +41,12 @@
 
 #include "../../art/delete.xpm"
 #include "../../art/edit.xpm"
-#include "../../art/folder_conn_new16.xpm"
-#include "../../art/folder_conn_del16.xpm"
-#include "../../art/folder_new16.xpm"
-#include "../../art/folder_up16.xpm"
+
+#include "../../art/folder_conn_new.xpm"
+#include "../../art/folder_conn_del.xpm"
+#include "../../art/folder_new.xpm"
+#include "../../art/folder_up.xpm"
+
 #include "../../art/view-refresh.xpm"
 #include "../../art/go-previous.xpm"
 #include "../../art/go-next.xpm"
@@ -79,11 +81,11 @@ wxIcon wxGISCatalogMainCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
-			return wxIcon(folder_up16_xpm);
+			return wxIcon(folder_up_xpm);
 		case 1:
-			return wxIcon(folder_conn_new16_xpm);
+			return wxIcon(folder_conn_new_xpm);
 		case 2:
-			return wxIcon(folder_conn_del16_xpm);
+			return wxIcon(folder_conn_del_xpm);
 		case 4:
 			return wxIcon(delete_xpm);
 		case 5:
@@ -91,7 +93,7 @@ wxIcon wxGISCatalogMainCmd::GetBitmap(void)
 		case 6:
 			return wxIcon(go_next_xpm);
 		case 7:
-			return wxIcon(folder_new16_xpm);
+			return wxIcon(folder_new_xpm);
 		case 8:	
 			return wxIcon(edit_xpm);
 		case 9:

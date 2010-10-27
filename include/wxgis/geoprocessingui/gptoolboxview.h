@@ -30,13 +30,14 @@ class WXDLLIMPEXP_GIS_GPU wxGxToolboxView :
 	public wxAuiNotebook,
 	public wxGxView
 {
-    //DECLARE_DYNAMIC_CLASS(wxGxToolboxView)
+    DECLARE_DYNAMIC_CLASS(wxGxToolboxView)
 public:
     wxGxToolboxView(void);
 	wxGxToolboxView(wxWindow* parent, wxWindowID id = TOOLVIEWCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 	virtual ~wxGxToolboxView(void);
 	virtual wxWindow* GetCurrentWnd(void);
 //IGxView
+    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxAUI_NB_BOTTOM | wxNO_BORDER | wxAUI_NB_TAB_MOVE, const wxString& name = wxT("ToolboxView"));
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 //Events

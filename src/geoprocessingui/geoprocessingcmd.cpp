@@ -24,7 +24,7 @@
 #include "wxgis/datasource/sysop.h"
 
 #include "../../art/gp_menu_16.xpm"
-#include "../../art/toolbox_16.xpm"
+#include "../../art/toolview.xpm"
 
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/catalog/gxdataset.h"
@@ -36,15 +36,6 @@
 #include "wxgis/framework/progressdlg.h"
 
 #include "wx/busyinfo.h"
-
-//
-//#include "wxgis/framework/progressor.h"
-//#include "wxgis/datasource/datasource.h"
-//#include <wx/dirdlg.h>
-//#include <wx/file.h>
-//#include "wxgis/catalog/gxfile.h"
-//#include "wxgis/carto/mapview.h"
-
 
 //	0	Export
 //  1   Show/hide toolbox pane
@@ -67,7 +58,7 @@ wxIcon wxGISGeoprocessingCmd::GetBitmap(void)
 		case 0:
 			return wxIcon(gp_menu_16_xpm);
 		case 1:
-			return wxIcon(toolbox_16_xpm);
+			return wxIcon(toolview_xpm);
 		default:
 			return wxNullIcon;
 	}

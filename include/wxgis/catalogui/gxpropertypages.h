@@ -59,6 +59,7 @@ protected:
 	wxCheckListBox* m_checkList2;
 	wxButton* m_button2;
 	wxButton* m_button3;
-	wxCheckBox* m_checkBox1;
-	wxCheckBox* m_checkBox2;
+	wxCheckBox* m_checkBoxHideExt;
+	wxCheckBox* m_checkBoxLast;
+	wxCheckBox* m_checkBoxHidden;
 };

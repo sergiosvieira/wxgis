@@ -73,13 +73,19 @@ bool wxGISCatalogGeneralPropertyPage::Create(IApplication* application, wxWindow
 	
 	bMainSizer->Add( sbSizer, 1, wxEXPAND, 5 );
 	
-	m_checkBox1 = new wxCheckBox( this, wxID_ANY, _("Hide file extensions"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxHideExt = new wxCheckBox( this, wxID_ANY, _("Hide file extensions"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_checkBoxHideExt->SetValue(pCatalog->GetShowExt());
 	
-	bMainSizer->Add( m_checkBox1, 0, wxALL, 5 );
+	bMainSizer->Add( m_checkBoxHideExt, 0, wxALL, 5 );
 	
-	m_checkBox2 = new wxCheckBox( this, wxID_ANY, _("Return to last location when wxGISCatalog start up"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxLast = new wxCheckBox( this, wxID_ANY, _("Return to last location when wxGISCatalog start up"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_checkBoxLast->SetValue(pCatalog->GetShowHidden());
 	
-	bMainSizer->Add( m_checkBox2, 0, wxALL, 5 );
+	bMainSizer->Add( m_checkBoxLast, 0, wxALL, 5 );
+	
+	m_checkBoxHidden = new wxCheckBox( this, wxID_ANY, _("Show hidden items"), wxDefaultPosition, wxDefaultSize, 0 );
+	
+	bMainSizer->Add( m_checkBoxHidden, 0, wxALL, 5 );
 	
 	this->SetSizer( bMainSizer );
 	this->Layout();

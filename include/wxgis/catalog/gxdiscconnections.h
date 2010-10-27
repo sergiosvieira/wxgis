@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxFolder class.
+ * Purpose:  wxGxDiscConnections class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,46 +20,46 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/catalog/catalog.h"
-#include <wx/dir.h>
 
-class WXDLLIMPEXP_GIS_CLT wxGxFolder :
+class WXDLLIMPEXP_GIS_CLT wxGxDiscConnections :
 	public IGxObjectUI,
-	public IGxObjectEdit,
 	public IGxObjectContainer,
-	public wxDirTraverser
+    public IGxRootObjectProperties,
+    public wxObject
 {
+   DECLARE_DYNAMIC_CLASS(wxGxDiscConnections)
 public:
-	wxGxFolder(wxString Path, wxString Name);
-	virtual ~wxGxFolder(void);
+	wxGxDiscConnections(void);
+	virtual ~wxGxDiscConnections(void);
 	//IGxObject
 	virtual void Detach(void);
-	virtual wxString GetName(void){return m_sName;};
-	virtual wxString GetPath(void){return m_sPath;};
-	virtual wxString GetCategory(void){return wxString(_("Folder"));};
+	virtual wxString GetName(void){return wxString(_("Folder connections"));};
+    virtual wxString GetFullName(void){return wxEmptyString;};
+    virtual wxString GetPath(void){return wxEmptyString;};
+	virtual wxString GetCategory(void){return wxString(_("Folder connections"));};
 	virtual void Refresh(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxFolder.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxFolder.NewMenu"));};
-	//IGxObjectEdit
-	virtual bool Delete(void);
-	virtual bool CanDelete(void){return true;};
-	virtual bool Rename(wxString NewName);
-	virtual bool CanRename(void){return true;};
-	virtual void EditProperties(wxWindow *parent);
+	virtual wxString ContextMenu(void){return wxString(wxT("wxGxDiscConnections.ContextMenu"));};
+	virtual wxString NewMenu(void){return wxEmptyString/*wxString(wxT("wxGxDiscConnections.NewMenu"))*/;};
 	//IGxObjectContainer
 	virtual bool DeleteChild(IGxObject* pChild);
 	virtual bool AreChildrenViewable(void){return true;};
 	virtual bool HasChildren(void){LoadChildren(); return m_Children.size() > 0 ? true : false;};
-	//wxGxFolder
+    //IGxRootObjectProperties
+    virtual void Init(wxXmlNode* pConfigNode);
+    virtual wxXmlNode* GetProperties(void);
+	//wxGxDiscConnections
 	virtual void LoadChildren(void);
 	virtual void EmptyChildren(void);
-	//wxDirTraverser
-	virtual wxDirTraverseResult OnFile(const wxString& filename);
-	virtual wxDirTraverseResult OnDir(const wxString& dirname);
+    virtual IGxObject* ConnectFolder(wxString sPath);
+    virtual IGxObject* DisconnectFolder(wxString sPath);
+
+    typedef struct _conn_data{
+        wxString sName, sPath;
+    }CONN_DATA;
 protected:
-	wxString m_sName, m_sPath;
-	wxArrayString m_FileNames;
+    std::vector<CONN_DATA> m_aConnections;
 	bool m_bIsChildrenLoaded;
 };

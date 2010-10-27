@@ -59,7 +59,7 @@ bool wxGxMapView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, co
 {
     m_pStatusBar = NULL;
 	m_sViewName = wxString(_("Geography View"));
-    return wxGISMapView::Create(parent, id, pos, size, style, name);
+    return wxGISMapView::Create(parent, MAPCTRLID, pos, size, style, name);
 }
 
 bool wxGxMapView::Activate(IGxApplication* application, wxXmlNode* pConf)
