@@ -39,6 +39,11 @@ void wxGxFolder::Detach(void)
 	EmptyChildren();
 }
 
+wxString wxGxFolder::GetBaseName(void)
+{
+    return GetName();
+}
+
 void wxGxFolder::Refresh(void)
 {
 	EmptyChildren();

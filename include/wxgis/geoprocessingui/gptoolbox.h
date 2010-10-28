@@ -41,6 +41,7 @@ public:
 	//IGxObject
 	virtual void Detach(void);
 	virtual wxString GetName(void);
+    virtual wxString GetBaseName(void){return GetName();};
 	virtual wxString GetCategory(void){return wxString(_("Toolbox"));};
 	virtual void Refresh(void);
 	//IGxObjectUI
@@ -81,6 +82,7 @@ public:
 	//IGxObject
 	virtual void Detach(void);
 	virtual wxString GetName(void){return wxString(_("Toolboxes"));};
+    virtual wxString GetBaseName(void){return GetName();};
     //IGxRootObjectProperties
     virtual void Init(wxXmlNode* pConfigNode);
     virtual wxXmlNode* GetProperties(void);
@@ -109,6 +111,7 @@ public:
 	virtual ~wxGxTool(void);
 	//IGxObject
     virtual wxString GetName(void){return m_sName;};
+    virtual wxString GetBaseName(void){return GetName();};
 	virtual wxString GetCategory(void){return wxString(_("Tool"));};
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);

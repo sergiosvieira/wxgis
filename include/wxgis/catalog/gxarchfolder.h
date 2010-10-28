@@ -32,6 +32,7 @@ public:
 	wxGxArchive(wxString Path, wxString Name, wxString sType);
 	virtual ~wxGxArchive(void);
 	//IGxObject
+    virtual wxString GetBaseName(void);
 	virtual wxString GetCategory(void){return wxString(_("Archive"));};
     //IGxObjectUI
 	virtual wxIcon GetLargeImage(void);

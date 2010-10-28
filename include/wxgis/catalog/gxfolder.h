@@ -34,6 +34,7 @@ public:
 	//IGxObject
 	virtual void Detach(void);
 	virtual wxString GetName(void){return m_sName;};
+    virtual wxString GetBaseName(void);
 	virtual wxString GetPath(void){return m_sPath;};
 	virtual wxString GetCategory(void){return wxString(_("Folder"));};
 	virtual void Refresh(void);

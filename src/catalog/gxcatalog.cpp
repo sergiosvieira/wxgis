@@ -34,6 +34,7 @@ wxGxCatalog::wxGxCatalog(void) : IGxCatalog(), m_bIsChildrenLoaded(false), m_pGx
 
     m_bShowHidden = false;
     m_bShowExt = true;
+    m_bOpenLastPath = true;
 }
 
 wxGxCatalog::~wxGxCatalog(void)
@@ -54,6 +55,9 @@ void wxGxCatalog::Detach(void)
 	    if(pNode->HasProp(wxT("show_ext")))
 		    pNode->DeleteProperty(wxT("show_ext"));
 	    pNode->AddProperty(wxT("show_ext"), wxString::Format(wxT("%u"), m_bShowExt));
+	    if(pNode->HasProp(wxT("open_last_path")))
+		    pNode->DeleteProperty(wxT("open_last_path"));
+	    pNode->AddProperty(wxT("open_last_path"), wxString::Format(wxT("%u"), m_bOpenLastPath));
     }
 
 	pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/rootitems")));
@@ -170,6 +174,7 @@ void wxGxCatalog::Init(void)
 
 	m_bShowHidden = wxAtoi(pConfXmlNode->GetPropVal(wxT("show_hidden"), wxT("0")));
 	m_bShowExt = wxAtoi(pConfXmlNode->GetPropVal(wxT("show_ext"), wxT("1")));
+	m_bOpenLastPath = wxAtoi(pConfXmlNode->GetPropVal(wxT("open_last_path"), wxT("1")));
 
 	//loads current user and when local machine items
 	wxXmlNode* pObjectFactoriesNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/objectfactories")));
@@ -196,7 +201,7 @@ void wxGxCatalog::LoadObjectFactories(wxXmlNode* pNode)
 
 		for(size_t i = 0; i < m_ObjectFactoriesArray.size(); i++)
 		{
-            if(m_ObjectFactoriesArray[i]->GetName() == sName)
+            if(m_ObjectFactoriesArray[i]->GetClassName() == sName)
 			{
 				sName.Empty();
 				break;
@@ -437,14 +442,20 @@ void wxGxCatalog::Redo(int nPos)
 wxString wxGxCatalog::ConstructFullName(IGxObject* pObject)
 {
 	wxString sParentPath = pObject->GetParent()->GetFullName();
+    wxString sName;
+    if(m_bShowExt)
+        sName = pObject->GetName();
+    else
+        sName = pObject->GetBaseName();
+
 	if(sParentPath.IsEmpty())
-		return pObject->GetName();
+		return sName;
 	else
 	{
 		if(sParentPath[sParentPath.Len() - 1] == wxFileName::GetPathSeparator())
-			return sParentPath + pObject->GetName();
+			return sParentPath + sName;
 		else
-			return sParentPath + wxFileName::GetPathSeparator() + pObject->GetName();
+			return sParentPath + wxFileName::GetPathSeparator() + sName;
 	}
 }
 

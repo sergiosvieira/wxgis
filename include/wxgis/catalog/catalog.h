@@ -84,6 +84,9 @@ public:
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator) = 0;
 };
 
+class IGxObjectFactory;
+typedef std::vector<IGxObjectFactory*> GxObjectFactoryArray;
+
 class IGxCatalog
 {
 public:
@@ -91,10 +94,14 @@ public:
 	virtual ~IGxCatalog(void){};
 	virtual wxString ConstructFullName(IGxObject* pObject) = 0;
 	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray) = 0;
+	virtual GxObjectArray* GetDisabledRootItems(void){return &m_aRootItems;};
+    virtual GxObjectFactoryArray* GetObjectFactories(void){return &m_ObjectFactoriesArray;};
 	virtual bool GetShowHidden(void){return m_bShowHidden;};
 	virtual bool GetShowExt(void){return m_bShowExt;};
 	virtual void SetShowHidden(bool bShowHidden){m_bShowHidden = bShowHidden;};
 	virtual void SetShowExt(bool bShowExt){m_bShowExt = bShowExt;};
+    virtual void SetOpenLastPath(bool bOpenLast) {m_bOpenLastPath = bOpenLast;};
+    virtual bool GetOpenLastPath(void){return m_bOpenLastPath;};
 	virtual void ObjectAdded(IGxObject* pObject) = 0;
 	virtual void ObjectChanged(IGxObject* pObject) = 0;
 	virtual void ObjectDeleted(IGxObject* pObject) = 0;
@@ -107,9 +114,11 @@ public:
     virtual void Undo(int nPos = -1) = 0;
     virtual void Redo(int nPos = -1) = 0;
 protected:
-	bool m_bShowHidden, m_bShowExt;
+	bool m_bShowHidden, m_bShowExt, m_bOpenLastPath;
 	IGxSelection* m_pSelection;
     IGISConfig* m_pConf;
+    GxObjectArray m_aRootItems;
+    GxObjectFactoryArray m_ObjectFactoriesArray;
 };
 
 
@@ -129,6 +138,7 @@ public:
 		m_pCatalog = NULL;
 	};
 	virtual wxString GetName(void) = 0;
+	virtual wxString GetBaseName(void) = 0; //the name without ext
 	virtual wxString GetFullName(void)
 	{
 		if(m_pCatalog)
@@ -238,6 +248,7 @@ public:
     //pure virtual
 	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray) = 0;
     virtual void Serialize(wxXmlNode* pConfig, bool bStore) = 0;
+    virtual wxString GetClassName(void) = 0;
     virtual wxString GetName(void) = 0;
     //
     virtual bool GetEnabled(void){return m_bIsEnabled;};
@@ -316,7 +327,6 @@ public:
 
 typedef std::vector<IGxObjectFilter*> OBJECTFILTERS, *LPOBJECTFILTERS;
 //
-//typedef std::vector<IGxObjectFactory*> GxObjectFactoryArray;
 //
 //class IGxObjectFactories
 //{

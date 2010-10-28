@@ -44,6 +44,7 @@ public:
 	virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog){m_pParent = NULL;	m_pCatalog = NULL; return true;};
 	virtual void Detach(void);
 	virtual wxString GetName(void){return wxString(_("Catalog"));};
+    virtual wxString GetBaseName(void){return GetName();};
 	virtual wxString GetFullName(void){return wxEmptyString;}//wxString(_("Catalog"));};
 	virtual wxString GetCategory(void){return wxString(wxT("Root"));};
 	virtual IGxObject* GetParent(void){return NULL;};
@@ -92,10 +93,8 @@ public:
 
 private:
 	bool m_bIsChildrenLoaded;
-	std::vector<IGxObjectFactory*> m_ObjectFactoriesArray;
 	wxArrayString m_CatalogRootItemArray;
     wxGxDiscConnections* m_pGxDiscConnections;
-    GxObjectArray m_aRootItems;
 };
 
 //WXDLL_ENTRY_FUNCTION();

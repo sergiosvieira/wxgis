@@ -21,6 +21,7 @@
 #pragma once
 #include "wxgis/framework/framework.h"
 #include "wxgis/catalogui/catalogui.h"
+#include "wxgis/framework/checklist.h"
 
 #include <wx/intl.h>
 
@@ -30,7 +31,7 @@
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
-#include <wx/checklst.h>
+#include "wx/listctrl.h"
 #include <wx/button.h>
 #include <wx/sizer.h>
 #include <wx/statbox.h>
@@ -46,6 +47,12 @@ class wxGISCatalogGeneralPropertyPage :
     public IPropertyPage
 {
     DECLARE_DYNAMIC_CLASS(wxGISCatalogGeneralPropertyPage)
+	enum
+	{
+		ID_ROOTLISTCTRL = wxID_HIGHEST + 45,
+		ID_FACTORYLISTCTRL
+	};
+
 public:
     wxGISCatalogGeneralPropertyPage(void);
 	~wxGISCatalogGeneralPropertyPage();
@@ -54,12 +61,12 @@ public:
     virtual wxString GetPageName(void){return wxString(_("General"));};
     virtual void Apply(void);
 protected:
-	wxStaticText* m_staticText;
-	wxCheckListBox* m_checkList1;
-	wxCheckListBox* m_checkList2;
+    wxGISCheckList* m_pRootItems;
+    wxGISCheckList* m_pFactoryItems;
 	wxButton* m_button2;
 	wxButton* m_button3;
 	wxCheckBox* m_checkBoxHideExt;
 	wxCheckBox* m_checkBoxLast;
 	wxCheckBox* m_checkBoxHidden;
+    IGxCatalog* m_pCatalog;
 };

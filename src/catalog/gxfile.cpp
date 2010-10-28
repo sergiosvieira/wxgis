@@ -38,6 +38,13 @@ wxGxFile::~wxGxFile(void)
 }
 
 
+wxString wxGxFile::GetBaseName(void)
+{
+    wxFileName FileName(m_sName);
+    FileName.SetEmptyExt();
+    return FileName.GetName();
+}
+
 //--------------------------------------------------------------
 //class wxGxPrjFile
 //--------------------------------------------------------------

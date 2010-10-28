@@ -34,6 +34,7 @@ public:
 	//IGxObject
 	virtual void Detach(void);
 	virtual wxString GetName(void){return wxString(_("Folder connections"));};
+    virtual wxString GetBaseName(void){return GetName();};
     virtual wxString GetFullName(void){return wxEmptyString;};
     virtual wxString GetPath(void){return wxEmptyString;};
 	virtual wxString GetCategory(void){return wxString(_("Folder connections"));};

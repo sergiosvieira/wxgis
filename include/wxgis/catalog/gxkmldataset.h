@@ -39,6 +39,7 @@ public:
 	//IGxObject
     virtual void Detach(void);
 	virtual wxString GetName(void){return m_sName;};
+    virtual wxString GetBaseName(void);
 	virtual wxString GetCategory(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
@@ -91,6 +92,7 @@ public:
     virtual void SetEncoding(wxFontEncoding Encoding);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
+    virtual wxString GetBaseName(void){return GetName();};
 	virtual wxString GetCategory(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);

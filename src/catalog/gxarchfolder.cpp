@@ -49,6 +49,13 @@ wxIcon wxGxArchive::GetSmallImage(void)
 	return wxIcon(folder_arch_16_xpm);
 }
 
+wxString wxGxArchive::GetBaseName(void)
+{
+    wxFileName FileName(m_sName);
+    FileName.SetEmptyExt();
+    return FileName.GetName();
+}
+
 void wxGxArchive::LoadChildren(void)
 {
 	if(m_bIsChildrenLoaded)

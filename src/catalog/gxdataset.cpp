@@ -93,6 +93,13 @@ void wxGxTableDataset::Detach(void)
     wsDELETE(m_pwxGISDataset);
 }
 
+wxString wxGxTableDataset::GetBaseName(void)
+{
+    wxFileName FileName(m_sName);
+    FileName.SetEmptyExt();
+    return FileName.GetName();
+}
+
 bool wxGxTableDataset::Rename(wxString NewName)
 {
     wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset());
@@ -170,6 +177,13 @@ void wxGxFeatureDataset::Detach(void)
 	wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(m_pwxGISDataset);
 	if(pDSet)
 		pDSet->Close();
+}
+
+wxString wxGxFeatureDataset::GetBaseName(void)
+{
+    wxFileName FileName(m_sName);
+    FileName.SetEmptyExt();
+    return FileName.GetName();
 }
 
 wxIcon wxGxFeatureDataset::GetLargeImage(void)
@@ -385,6 +399,12 @@ bool wxGxRasterDataset::Delete(void)
         wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;	
     }
+}
+wxString wxGxRasterDataset::GetBaseName(void)
+{
+    wxFileName FileName(m_sName);
+    FileName.SetEmptyExt();
+    return FileName.GetName();
 }
 
 bool wxGxRasterDataset::Rename(wxString NewName)

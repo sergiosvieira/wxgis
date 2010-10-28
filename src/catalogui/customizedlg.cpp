@@ -25,7 +25,7 @@
 #include "wx/accel.h"
 #include "wx/utils.h"
 
-#include "../../art/check_16.xpm"
+#include "../../art/check_marks.xpm"
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGxApplication* pGxApp, wxWindow* parent, 
 	//wxArrayString m_commandbarlistChoices;
 	//m_commandbarlist = new wxCheckListBox( m_Splitter, wxGISToolBarPanel::ID_CHKLSTBX, wxDefaultPosition, wxDefaultSize, m_commandbarlistChoices,  wxNO_BORDER );
 	m_TreeImageList.Create(16, 16);
-	m_TreeImageList.Add(wxBitmap(check_16_xpm));
+	m_TreeImageList.Add(wxBitmap(check_marks_xpm));
 	m_pTreeCtrl = new wxTreeCtrl( m_Splitter, wxGISToolBarPanel::ID_TREECTRL, wxDefaultPosition, wxDefaultSize, /*wxTR_NO_BUTTONS | */wxTR_NO_LINES | wxTR_HIDE_ROOT | wxBORDER_NONE );
 	m_pTreeCtrl->SetImageList(&m_TreeImageList);
 
@@ -113,11 +113,11 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGxApplication* pGxApp, wxWindow* parent, 
 	//add root
 	wxTreeItemId nRootId = m_pTreeCtrl->AddRoot(wxT("Commands"));
 	//add sets
-	m_nMenubarId = m_pTreeCtrl->AppendItem(nRootId, _("Menubar"), 2, 2);
+	m_nMenubarId = m_pTreeCtrl->AppendItem(nRootId, _("Menubar"), 3, 3);
 	m_pTreeCtrl->SetItemBold(m_nMenubarId);
-	m_nContextMenuesId = m_pTreeCtrl->AppendItem(nRootId, _("Context Menus"), 2, 2);
+	m_nContextMenuesId = m_pTreeCtrl->AppendItem(nRootId, _("Context Menus"), 3, 3);
 	m_pTreeCtrl->SetItemBold(m_nContextMenuesId);
-	m_nToolBarsId = m_pTreeCtrl->AppendItem(nRootId, _("ToolBars"), 2, 2);
+	m_nToolBarsId = m_pTreeCtrl->AppendItem(nRootId, _("ToolBars"), 3, 3);
 	m_pTreeCtrl->SetItemBold(m_nToolBarsId);
 
 	//unsigned int counter(0);

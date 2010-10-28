@@ -38,6 +38,7 @@ public:
     virtual wxString GetPath(void){return m_sPath;};
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
+    virtual wxString GetBaseName(void);
 protected:
 	wxString m_sName, m_sPath;
 };

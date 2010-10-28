@@ -216,13 +216,12 @@ void wxTreeViewComboPopup::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParen
 
 	wxGxTreeItemData* pData = new wxGxTreeItemData(pGxObject, pos, false);
 
-    wxString sName = pGxObject->GetName();
-    if(!m_pCatalog->GetShowExt())
-    {
-        wxFileName FileName(sName);
-        FileName.SetEmptyExt();
-        sName = FileName.GetName();
-    }
+    wxString sName;
+    if(m_pCatalog->GetShowExt())
+        sName = pGxObject->GetName();
+    else
+        sName = pGxObject->GetBaseName();
+
 
 	wxTreeItemId NewTreeItem = AppendItem(hParent, sName, pos, -1, pData);
 	m_TreeMap[pGxObject] = NewTreeItem;
