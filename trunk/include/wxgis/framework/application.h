@@ -3,7 +3,7 @@
  * Purpose:  wxGISApplication class. Base application functionality (commands, menues, etc.)
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -61,6 +61,7 @@ public:
 	virtual void OnMouseDoubleClick(wxMouseEvent& event);
 	virtual void OnMouseMove(wxMouseEvent& event);
     virtual bool Create(IGISConfig* pConfig);
+    virtual void OnAppOptions(void);
 
     typedef std::vector<wxDynamicLibrary*> LIBRARYARRAY;
 protected:

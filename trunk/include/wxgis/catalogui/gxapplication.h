@@ -59,7 +59,6 @@ public:
     //events 
     virtual void OnClose(wxCloseEvent& event);
 	//IApplication
-    virtual void OnAppOptions(void);
 	virtual void Customize(void);
 	virtual void ShowStatusBar(bool bShow);
 	virtual void ShowApplicationWindow(wxWindow* pWnd, bool bShow = true);

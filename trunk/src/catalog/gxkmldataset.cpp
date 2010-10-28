@@ -65,6 +65,13 @@ void wxGxKMLDataset::Detach(void)
     EmptyChildren();
 }
 
+wxString wxGxKMLDataset::GetBaseName(void)
+{
+    wxFileName FileName(m_sName);
+    FileName.SetEmptyExt();
+    return FileName.GetName();
+}
+
 wxString wxGxKMLDataset::GetCategory(void)
 {
 	return wxString(_("KML Dataset"));

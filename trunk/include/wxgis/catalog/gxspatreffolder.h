@@ -40,6 +40,7 @@ public:
 	//IGxObject
 	virtual void Detach(void);
 	virtual wxString GetName(void){return wxString(_("Coordinate Systems"));};
+    virtual wxString GetBaseName(void){return GetName();};
 	virtual wxString GetPath(void){return m_sPath;};
 	virtual wxString GetCategory(void){return wxString(_("Coordinate Systems Folder"));};
 	virtual void Refresh(void);

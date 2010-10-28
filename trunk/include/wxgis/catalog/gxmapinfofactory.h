@@ -33,7 +33,8 @@ public:
 	//IGxObjectFactory
 	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray);
     virtual void Serialize(wxXmlNode* pConfig, bool bStore);
-	virtual wxString GetName(void){return GetClassInfo()->GetClassName();};
+	virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
+    virtual wxString GetName(void){return wxString(_("Mapinfo files"));};
     typedef struct _data{
 		wxString path;
 		int bHasTab, bHasMap, bHasInd, bHasID, bHasDat, bHasMif, bHasMid;

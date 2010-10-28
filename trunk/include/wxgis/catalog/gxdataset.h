@@ -38,6 +38,7 @@ public:
 	virtual ~wxGxTableDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
+	virtual wxString GetBaseName(void);
 	virtual wxString GetCategory(void){return wxString(_("Table"));};
 	virtual void Detach(void);
 	//IGxObjectUI
@@ -79,6 +80,7 @@ public:
 	virtual ~wxGxFeatureDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
+	virtual wxString GetBaseName(void);
 	virtual wxString GetCategory(void);
 	virtual void Detach(void);
 	//IGxObjectUI
@@ -121,6 +123,7 @@ public:
 	virtual ~wxGxRasterDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
+	virtual wxString GetBaseName(void);
 	virtual wxString GetCategory(void);
 	virtual void Detach(void);
 	//IGxObjectUI

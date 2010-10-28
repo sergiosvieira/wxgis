@@ -25,7 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogGeneralPropertyPage, wxPanel)
 
-wxGISCatalogGeneralPropertyPage::wxGISCatalogGeneralPropertyPage(void)
+wxGISCatalogGeneralPropertyPage::wxGISCatalogGeneralPropertyPage(void) : m_pCatalog(NULL)
 {
 }
 
@@ -40,50 +40,88 @@ bool wxGISCatalogGeneralPropertyPage::Create(IApplication* application, wxWindow
     IGxApplication* pGxApplication = dynamic_cast<IGxApplication*>(application);
     if(!pGxApplication)
         return false;
-    IGxCatalog* pCatalog = pGxApplication->GetCatalog();
-    if(!pCatalog)
+    m_pCatalog = pGxApplication->GetCatalog();
+    if(!m_pCatalog)
         return false;
+
+    IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
 
 	wxBoxSizer* bMainSizer;
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
+
+    wxStaticBoxSizer* sbRootSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("What top level entries do you want the Catalog to contain?") ), wxVERTICAL );
 	
-	m_staticText = new wxStaticText( this, wxID_ANY, _("What top level entries do you want the Catalog to contain?"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText->Wrap( -1 );
-	bMainSizer->Add( m_staticText, 0, wxALL, 5 );
+    //fill root items
+    m_pRootItems = new wxGISCheckList( this, ID_ROOTLISTCTRL);
+	//m_pRootItems->InsertColumn(0, wxT("..."), wxLIST_FORMAT_LEFT, 250);
+    //fill code
+    GxObjectArray* pRootItems = pGxObjectContainer->GetChildren();
+    for(size_t i = 0; i < pRootItems->size(); i++)
+    {
+        IGxObject* pGxObj = pRootItems->operator[](i);
+        wxString sName = pGxObj->GetName();
+        m_pRootItems->InsertItem(sName, 1);
+    }
+    pRootItems = m_pCatalog->GetDisabledRootItems();
+    for(size_t i = 0; i < pRootItems->size(); i++)
+    {
+        IGxObject* pGxObj = pRootItems->operator[](i);
+        wxString sName = pGxObj->GetName();
+        m_pRootItems->InsertItem(sName, 0);
+    }
+
+	sbRootSizer->Add( m_pRootItems, 1, wxALL | wxEXPAND, 5 );
+
+    wxBoxSizer* bSizer1 = new wxBoxSizer( wxVERTICAL );
 	
-	wxArrayString m_checkList1Choices;
-	m_checkList1 = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_checkList1Choices, 0 );
-	bMainSizer->Add( m_checkList1, 1, wxALL|wxEXPAND, 5 );
+	m_button3 = new wxButton( this, wxID_ANY, _("Properties"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_button3->Enable(false);
+	bSizer1->Add( m_button3, 0, wxALL|wxALIGN_RIGHT, 5 );
+
+	sbRootSizer->Add( bSizer1, 0, wxEXPAND, 5 );
+
+	bMainSizer->Add( sbRootSizer, 1, wxEXPAND, 5 );
+
+    //===================================================================
+
+    wxStaticBoxSizer* sbFactorySizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Which types of data do you want the Catalog to show?") ), wxVERTICAL );
 	
-	wxStaticBoxSizer* sbSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Which types of data do you want the Catalog to show?") ), wxVERTICAL );
+    //fill factories
+
+    m_pFactoryItems = new wxGISCheckList( this, ID_FACTORYLISTCTRL);
+    //fill code
+    GxObjectFactoryArray* pFactories = m_pCatalog->GetObjectFactories();
+    for(size_t i = 0; i < pFactories->size(); i++)
+    {
+        IGxObjectFactory* pGxObjectFactory = pFactories->operator[](i);
+        wxString sName = pGxObjectFactory->GetName();
+        m_pFactoryItems->InsertItem(sName, pGxObjectFactory->GetEnabled());
+    }
+
+    sbFactorySizer->Add( m_pFactoryItems, 1, wxALL|wxEXPAND, 5 );
 	
-	wxArrayString m_checkList2Choices;
-	m_checkList2 = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_checkList2Choices, 0 );
-	sbSizer->Add( m_checkList2, 1, wxALL|wxEXPAND, 5 );
+	wxBoxSizer* bSizer2 = new wxBoxSizer( wxVERTICAL );
 	
-	wxBoxSizer* bSizer = new wxBoxSizer( wxHORIZONTAL );
+	m_button2 = new wxButton( this, wxID_ANY, _("Properties"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_button2->Enable(false);
+	bSizer2->Add( m_button2, 0, wxALL|wxALIGN_RIGHT, 5 );
 	
-	m_button2 = new wxButton( this, wxID_ANY, _("MyButton"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer->Add( m_button2, 0, wxALL|wxALIGN_RIGHT, 5 );
+	sbFactorySizer->Add( bSizer2, 0, wxEXPAND, 5 );
 	
-	m_button3 = new wxButton( this, wxID_ANY, _("MyButton"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer->Add( m_button3, 0, wxALL, 5 );
-	
-	sbSizer->Add( bSizer, 0, wxEXPAND, 5 );
-	
-	bMainSizer->Add( sbSizer, 1, wxEXPAND, 5 );
+	bMainSizer->Add( sbFactorySizer, 1, wxEXPAND, 5 );
 	
 	m_checkBoxHideExt = new wxCheckBox( this, wxID_ANY, _("Hide file extensions"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_checkBoxHideExt->SetValue(pCatalog->GetShowExt());
+    m_checkBoxHideExt->SetValue(!m_pCatalog->GetShowExt());
 	
 	bMainSizer->Add( m_checkBoxHideExt, 0, wxALL, 5 );
 	
 	m_checkBoxLast = new wxCheckBox( this, wxID_ANY, _("Return to last location when wxGISCatalog start up"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_checkBoxLast->SetValue(pCatalog->GetShowHidden());
+    m_checkBoxLast->SetValue(m_pCatalog->GetOpenLastPath());
 	
 	bMainSizer->Add( m_checkBoxLast, 0, wxALL, 5 );
 	
 	m_checkBoxHidden = new wxCheckBox( this, wxID_ANY, _("Show hidden items"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_checkBoxHidden->SetValue(m_pCatalog->GetShowHidden());
 	
 	bMainSizer->Add( m_checkBoxHidden, 0, wxALL, 5 );
 	
@@ -95,4 +133,15 @@ bool wxGISCatalogGeneralPropertyPage::Create(IApplication* application, wxWindow
 
 void wxGISCatalogGeneralPropertyPage::Apply(void)
 {
+    bool bOpenLast = m_checkBoxLast->GetValue();
+    bool bHideExt = m_checkBoxHideExt->GetValue();
+    bool bShowHidden = m_checkBoxHidden->GetValue();
+
+    m_pCatalog->SetShowExt(!bHideExt);
+    m_pCatalog->SetShowHidden(bShowHidden);
+    m_pCatalog->SetOpenLastPath(bOpenLast);
+
+    IGxObject* pGxObj =  m_pCatalog->GetSelection()->GetLastSelectedObject();
+    if(pGxObj)
+        pGxObj->Refresh();
 }

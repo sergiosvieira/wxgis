@@ -305,14 +305,13 @@ void wxGxContentView::AddObject(IGxObject* pObject)
 	pData->pObject = pObject;
 	pData->iImageIndex = pos;
 
-	wxString name = pObject->GetName();
-    if(!m_pCatalog->GetShowExt())
-    {
-        wxFileName FileName(name);
-        FileName.SetEmptyExt();
-        name = FileName.GetName();
-    }
-	wxString type = pObject->GetCategory();
+    wxString sName;
+    if(m_pCatalog->GetShowExt())
+        sName = pObject->GetName();
+    else
+        sName = pObject->GetBaseName();
+
+	wxString sType = pObject->GetCategory();
 
 #ifdef __WXGTK__
     if(GetColumnCount() < 2)
@@ -321,8 +320,8 @@ void wxGxContentView::AddObject(IGxObject* pObject)
         InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
     }
 #endif
-	long ListItemID = InsertItem(0, name, pos);//GetItemCount()
-	SetItem(ListItemID, 1, type);
+	long ListItemID = InsertItem(0, sName, pos);//GetItemCount()
+	SetItem(ListItemID, 1, sType);
 	SetItemPtrData(ListItemID, (wxUIntPtr) pData);
 
 	wxListCtrl::Refresh();
