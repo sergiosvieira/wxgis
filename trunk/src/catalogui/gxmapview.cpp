@@ -67,8 +67,9 @@ bool wxGxMapView::Activate(IGxApplication* application, wxXmlNode* pConf)
 	wxGxView::Activate(application, pConf);
 	//Serialize(m_pXmlConf, false);
 
-    m_pCatalog = application->GetCatalog();
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
     m_pSelection = m_pCatalog->GetSelection();
+
     m_pApp = dynamic_cast<IApplication*>(application);
     if(!m_pApp)
         return false;

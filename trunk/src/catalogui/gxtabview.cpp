@@ -118,7 +118,8 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 	this->SetSizer( m_bSizerMain );
 	this->Layout();
 
-	m_pSelection = application->GetCatalog()->GetSelection();
+    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
+	m_pSelection = pGxCatalogUI->GetSelection();
 }
 
 wxGxTab::~wxGxTab(void)
@@ -373,7 +374,8 @@ bool wxGxTabView::Activate(IGxApplication* application, wxXmlNode* pConf)
 		pChild = pChild->GetNext();
 	}
 
-	m_pSelection = application->GetCatalog()->GetSelection();
+    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
+	m_pSelection = pGxCatalogUI->GetSelection();
 	m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( m_pSelection );
 	if(m_pConnectionPointSelection != NULL)
 		m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);

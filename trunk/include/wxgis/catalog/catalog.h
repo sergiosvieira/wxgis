@@ -24,9 +24,6 @@
 #include "wxgis/datasource/datasource.h"
 #include "wx/filename.h"
 
-#define APP_NAME wxT("wxGISCatalog")
-#define APP_VER wxT("0.3.0")
-
 //#include <wx/dynload.h>
 //#include <wx/dynlib.h>
 //#include <algorithm>
@@ -46,79 +43,35 @@ enum wxGISEnumSaveObjectResults
 class IGxObject;
 typedef std::vector<IGxObject*> GxObjectArray;
 
-class IGxSelection
-{
-public:
-	enum wxGISEnumInitiators
-	{
-		INIT_ALL = -2,
-		INIT_NONE = -1
-	} Initiator;
-	virtual ~IGxSelection(void){};
-	virtual void Select( IGxObject* pObject,  bool appendToExistingSelection, long nInitiator ) = 0;
-	virtual void Select( IGxObject* pObject) = 0;
-	virtual void Unselect(IGxObject* pObject, long nInitiator) = 0;
-	virtual void Clear(long nInitiator) = 0;
-	virtual size_t GetCount(void) = 0;
-	virtual size_t GetCount(long nInitiator) = 0;
-	virtual IGxObject* GetSelectedObjects(size_t nIndex) = 0;
-	virtual IGxObject* GetSelectedObjects(long nInitiator, size_t nIndex) = 0;
-	virtual IGxObject* GetLastSelectedObject(void) = 0;
-	virtual void SetInitiator(long nInitiator) = 0;
-    virtual void Do(IGxObject* pObject) = 0;
-    virtual bool CanRedo() = 0;
-	virtual bool CanUndo() = 0;
-	virtual void RemoveDo(wxString sPath) = 0;
-    virtual wxString Redo(int nPos = -1) = 0;
-    virtual wxString Undo(int nPos = -1) = 0;
-    virtual void Reset() = 0;
-    virtual size_t GetDoSize() = 0;
-    virtual int GetDoPos(void) = 0;
-    virtual wxString GetDoPath(size_t nIndex) = 0;
-};
-
-class IGxSelectionEvents
-{
-public:
-	virtual ~IGxSelectionEvents(void){};
-	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator) = 0;
-};
-
 class IGxObjectFactory;
 typedef std::vector<IGxObjectFactory*> GxObjectFactoryArray;
 
 class IGxCatalog
 {
 public:
-	IGxCatalog(void) : m_bShowHidden(false), m_bShowExt(true), m_pSelection(NULL), m_pConf(NULL){};
+	IGxCatalog(void) : m_pConf(NULL){};
 	virtual ~IGxCatalog(void){};
 	virtual wxString ConstructFullName(IGxObject* pObject) = 0;
 	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray) = 0;
 	virtual GxObjectArray* GetDisabledRootItems(void){return &m_aRootItems;};
     virtual GxObjectFactoryArray* GetObjectFactories(void){return &m_ObjectFactoriesArray;};
-	virtual bool GetShowHidden(void){return m_bShowHidden;};
-	virtual bool GetShowExt(void){return m_bShowExt;};
-	virtual void SetShowHidden(bool bShowHidden){m_bShowHidden = bShowHidden;};
-	virtual void SetShowExt(bool bShowExt){m_bShowExt = bShowExt;};
-    virtual void SetOpenLastPath(bool bOpenLast) {m_bOpenLastPath = bOpenLast;};
-    virtual bool GetOpenLastPath(void){return m_bOpenLastPath;};
 	virtual void ObjectAdded(IGxObject* pObject) = 0;
 	virtual void ObjectChanged(IGxObject* pObject) = 0;
 	virtual void ObjectDeleted(IGxObject* pObject) = 0;
 	virtual void ObjectRefreshed(IGxObject* pObject) = 0;
-	virtual IGxSelection* GetSelection(void){return m_pSelection;};
 	virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true) = 0;
 	virtual void DisconnectFolder(wxString sPath, bool bSelect = true) = 0;
-	virtual void SetLocation(wxString sPath) = 0;
     virtual IGISConfig* GetConfig(void){return m_pConf;};
-    virtual void Undo(int nPos = -1) = 0;
-    virtual void Redo(int nPos = -1) = 0;
+    virtual void EnableRootItem(IGxObject* pRootItem, bool bEnable) = 0;
+	virtual bool GetShowHidden(void){return m_bShowHidden;};
+	virtual bool GetShowExt(void){return m_bShowExt;};
+	virtual void SetShowHidden(bool bShowHidden){m_bShowHidden = bShowHidden;};
+	virtual void SetShowExt(bool bShowExt){m_bShowExt = bShowExt;};
 protected:
-	bool m_bShowHidden, m_bShowExt, m_bOpenLastPath;
-	IGxSelection* m_pSelection;
     IGISConfig* m_pConf;
     GxObjectArray m_aRootItems;
     GxObjectFactoryArray m_ObjectFactoriesArray;
+	bool m_bShowHidden, m_bShowExt;
 };
 
 
@@ -154,23 +107,9 @@ protected:
 	IGxCatalog* m_pCatalog;
 };
 
-class IGxObjectUI
-{
-public:
-	virtual ~IGxObjectUI(void){};
-	virtual wxIcon GetLargeImage(void) = 0;
-	virtual wxIcon GetSmallImage(void) = 0;
-	virtual wxString ContextMenu(void) = 0;
-	virtual wxString NewMenu(void) = 0;
-};
-
-class IGxObjectWizard
-{
-public:
-	virtual ~IGxObjectWizard(void){};
-	virtual bool Invoke(wxWindow* pParentWnd) = 0;
-};
-
+/** \class IGxObjectEdit catalog.h
+    \brief A GxObject edit interface.
+*/
 class IGxObjectEdit
 {
 public:
@@ -179,7 +118,6 @@ public:
 	virtual bool CanDelete(void){return false;};
 	virtual bool Rename(wxString NewName){return false;};
 	virtual bool CanRename(void){return false;};
-	virtual void EditProperties(wxWindow *parent){};
 };
 
 class IGxObjectContainer :
@@ -236,6 +174,7 @@ public:
 		}
 		return NULL;
 	}
+    virtual bool CanCreate(long nDataType, long DataSubtype){return false;}; 
 protected:
 	GxObjectArray m_Children;
 };
@@ -326,7 +265,7 @@ public:
 };
 
 typedef std::vector<IGxObjectFilter*> OBJECTFILTERS, *LPOBJECTFILTERS;
-//
+
 //
 //class IGxObjectFactories
 //{

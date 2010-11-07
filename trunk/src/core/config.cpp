@@ -154,6 +154,8 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
                 wxString sys_dir = m_sSysConfigDir + wxFileName::GetPathSeparator() + sRootNodeName;
                 wxString sys_path = sys_dir + wxFileName::GetPathSeparator() + HKLM_CONFIG_NAME;
                 pDoc = new wxXmlDocument(sys_path);
+                if(pDoc && !pDoc->IsOk())
+                    wxDELETE(pDoc);
 			}
 
 			//last chance
@@ -162,6 +164,8 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 				wxString sXMLPath = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("config") +  wxFileName::GetPathSeparator() + sRootNodeName + wxT(".xml");
                 if(wxFileName::FileExists(sXMLPath))
                     pDoc = new wxXmlDocument(sXMLPath);
+                if(pDoc && !pDoc->IsOk())
+                    wxDELETE(pDoc);
 			}
 
 			if(!pDoc)

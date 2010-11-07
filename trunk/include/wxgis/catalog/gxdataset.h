@@ -3,7 +3,7 @@
  * Purpose:  wxGxDataset class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,37 +21,29 @@
 #pragma once
 
 #include "wxgis/catalog/catalog.h"
-#include <wx/imaglist.h>
 
-//--------------------------------------------------------------
-//class wxGxTableDataset
-//--------------------------------------------------------------
+/** \class wxGxTableDataset gxdataset.h
+    \brief A Table Dataset GxObject.
+*/
 
 class WXDLLIMPEXP_GIS_CLT wxGxTableDataset :
 	public IGxObject,
-	public IGxObjectUI,
 	public IGxObjectEdit,
 	public IGxDataset
 {
 public:
-	wxGxTableDataset(wxString Path, wxString Name, wxGISEnumTableDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxTableDataset(wxString Path, wxString Name, wxGISEnumTableDatasetType nType);
 	virtual ~wxGxTableDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 	virtual wxString GetBaseName(void);
 	virtual wxString GetCategory(void){return wxString(_("Table"));};
 	virtual void Detach(void);
-	//IGxObjectUI
-	virtual wxIcon GetLargeImage(void);
-	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxDataset.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxDataset.NewMenu"));};
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
-	virtual void EditProperties(wxWindow *parent);
 	//IGxDataset
 	virtual wxGISDataset* GetDataset(void);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISTableDataset;};
@@ -59,24 +51,22 @@ public:
     virtual wxString GetPath(void){return m_sPath;};
 protected:
 	wxString m_sName, m_sPath;
-    wxIcon m_LargeIcon, m_SmallIcon;
 	wxGISDataset* m_pwxGISDataset;
 	wxGISEnumTableDatasetType m_type;
     wxMBConv* m_pPathEncoding;
 };
 
-//--------------------------------------------------------------
-//class wxGxFeatureDataset
-//--------------------------------------------------------------
+/** \class wxGxFeatureDataset gxdataset.h
+    \brief A Feature Dataset GxObject.
+*/
 
 class WXDLLIMPEXP_GIS_CLT wxGxFeatureDataset :
 	public IGxObject,
-	public IGxObjectUI,
 	public IGxObjectEdit,
 	public IGxDataset
 {
 public:
-	wxGxFeatureDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxFeatureDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType nType);
 	virtual ~wxGxFeatureDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
@@ -84,16 +74,11 @@ public:
 	virtual wxString GetCategory(void);
 	virtual void Detach(void);
 	//IGxObjectUI
-	virtual wxIcon GetLargeImage(void);
-	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxShapefileDataset.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxEmptyString;};//wxString(wxT("wxGxShapefileDataset.NewMenu"))
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
-	virtual void EditProperties(wxWindow *parent);
 	//IGxDataset
 	virtual wxGISDataset* GetDataset(void);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
@@ -105,38 +90,30 @@ protected:
 	wxGISDataset* m_pwxGISDataset;
 	wxGISEnumVectorDatasetType m_type;
     wxMBConv* m_pPathEncoding;
-    wxIcon m_LargeIcon, m_SmallIcon;
 };
 
-//--------------------------------------------------------------
-//class wxGxRasterDataset
-//--------------------------------------------------------------
+/** \class wxGxRasterDataset gxdataset.h
+    \brief A Raster Dataset GxObject.
+*/
 
 class WXDLLIMPEXP_GIS_CLT wxGxRasterDataset :
 	public IGxObject,
-	public IGxObjectUI,
 	public IGxObjectEdit,
 	public IGxDataset
 {
 public:
-	wxGxRasterDataset(wxString Path, wxString Name, wxGISEnumRasterDatasetType Type, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxRasterDataset(wxString Path, wxString Name, wxGISEnumRasterDatasetType nType);
 	virtual ~wxGxRasterDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 	virtual wxString GetBaseName(void);
 	virtual wxString GetCategory(void);
 	virtual void Detach(void);
-	//IGxObjectUI
-	virtual wxIcon GetLargeImage(void);
-	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxRasterDataset.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxRasterDataset.NewMenu"));};
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
-	virtual void EditProperties(wxWindow *parent);
 	//IGxDataset
 	virtual wxGISDataset* GetDataset(void);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
@@ -144,7 +121,6 @@ public:
     virtual wxString GetPath(void){return m_sPath;};
 protected:
 	wxString m_sName, m_sPath;
-    wxIcon m_LargeIcon, m_SmallIcon;
+    wxGISEnumRasterDatasetType m_type;
 	wxGISDataset* m_pwxGISDataset;
-	wxGISEnumRasterDatasetType m_type;
 };

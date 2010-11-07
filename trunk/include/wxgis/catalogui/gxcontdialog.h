@@ -42,8 +42,7 @@
 #include <wx/dialog.h>
 
 #include "wxgis/core/config.h"
-#include "wxgis/catalog/gxcatalog.h"
-#include "wxgis/catalogui/catalogui.h"
+#include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/gxcontentview.h"
 #include "wxgis/catalogui/gxtreeview.h"
 
@@ -55,12 +54,12 @@
 // wxTreeContainerView
 //////////////////////////////////////////////////////////////////////////////
 
-class wxTreeContainerView : public wxGxTreeViewBase
+class wxTreeContainerView : public wxGxTreeView
 {
     DECLARE_DYNAMIC_CLASS(wxTreeContainerView)
 public:
     wxTreeContainerView(void);
-    wxTreeContainerView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxTR_NO_LINES | wxTR_SINGLE/* | wxTR_HIDE_ROOT*/);
+    wxTreeContainerView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxTR_NO_LINES | wxTR_SINGLE | wxTR_EDIT_LABELS/* | wxTR_HIDE_ROOT*/);
     virtual ~wxTreeContainerView(void);
 //wxGxTreeViewBase
     virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent);
@@ -69,7 +68,11 @@ public:
 	virtual void RemoveAllShowFilters(void);
     virtual bool CanChooseObject( IGxObject* pObject );
 //events
-    virtual void OnSelChanged(wxTreeEvent& event);
+    //virtual void OnSelChanged(wxTreeEvent& event);
+    virtual void OnItemRightClick(wxTreeEvent& event){};
+    virtual void OnBeginDrag(wxTreeEvent& event){};
+    virtual void OnActivated(wxTreeEvent& event){};
+
 protected:
 	OBJECTFILTERS m_ShowFilterArray;
 
@@ -99,6 +102,7 @@ public:
     virtual ICommand* GetCommand(long CmdID){return NULL;};
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType){return NULL;};
     virtual wxString GetAppName(void){return wxString(CONTDLG_NAME);};
+    virtual wxString GetAppVersionString(void){return wxString(wxT("0.0.0"));};
     virtual IStatusBar* GetStatusBar(void){return NULL;};
     virtual IGISConfig* GetConfig(void){return m_pConfig;};
     virtual void OnAppAbout(void){};
@@ -120,6 +124,10 @@ public:
 	virtual void OnMouseDoubleClick(wxMouseEvent& event){};
 	virtual void OnMouseMove(wxMouseEvent& event){};
     virtual bool Create(IGISConfig* pConfig){return true;};
+    virtual bool SetupLog(wxString sLogPath){return true;};
+    virtual bool SetupLoc(wxString sLoc, wxString sLocPath){return true;};
+    virtual bool SetupSys(wxString sSysPath){return true;};
+    virtual void SetDebugMode(bool bDebugMode){};
 
 //wxDialog
     int ShowModal(void);
@@ -163,7 +171,7 @@ protected:
     virtual void SerializeFramePos(bool bSave);
 //    virtual bool DoSaveObject(wxGISEnumSaveObjectResults Result);
 protected:
-  	wxGxCatalog* m_pCatalog;
+  	wxGxCatalogUI* m_pCatalog;
     wxGISAppConfig* m_pConfig;
     wxTreeContainerView* m_pTree;
 	wxString m_sOkBtLabel;

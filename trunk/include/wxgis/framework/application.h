@@ -26,6 +26,13 @@
 
 #include "wx/dynload.h"
 #include "wx/dynlib.h"
+#include "wx/ffile.h"
+#include "wx/dir.h"
+#include "wx/filename.h"
+#include "wx/file.h"
+#include "wx/datetime.h"
+#include "wx/intl.h"
+
 
 WXDLLIMPEXP_GIS_FRW IApplication* GetApplication();//{return m_pGlobalApp;};
 
@@ -62,6 +69,9 @@ public:
 	virtual void OnMouseMove(wxMouseEvent& event);
     virtual bool Create(IGISConfig* pConfig);
     virtual void OnAppOptions(void);
+    virtual bool SetupLog(wxString sLogPath);
+    virtual bool SetupSys(wxString sSysPath);
+    virtual bool SetupLoc(wxString sLoc, wxString sLocPath);
 
     typedef std::vector<wxDynamicLibrary*> LIBRARYARRAY;
 protected:
@@ -93,6 +103,10 @@ protected:
     IDropDownCommand* m_pDropDownCommand;
     LIBRARYARRAY m_LibArr;
 	ITrackCancel* m_pTrackCancel;
+    //
+    wxFFile m_LogFile;
+    wxLocale* m_pLocale; // locale we'll be using
+	char* m_pszOldLocale;
 
     DECLARE_EVENT_TABLE()
 };

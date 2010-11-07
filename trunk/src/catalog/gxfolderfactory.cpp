@@ -3,7 +3,7 @@
  * Purpose:  wxGxFolderFactory class. Create new GxFolder objects
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,9 +20,9 @@
  ****************************************************************************/
 #include "wxgis/catalog/gxfolderfactory.h"
 #include "wxgis/catalog/gxarchfolder.h"
-#include <wx/filename.h>
-#include <wx/dir.h>
 
+#include "wx/filename.h"
+#include "wx/dir.h"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxFolderFactory, wxObject)
 
@@ -93,7 +93,7 @@ void wxGxFolderFactory::Serialize(wxXmlNode* pConfig, bool bStore)
     {
         if(pConfig->HasProp(wxT("factory_name")))
             pConfig->DeleteProperty(wxT("factory_name"));
-        pConfig->AddProperty(wxT("factory_name"), GetName());  
+        pConfig->AddProperty(wxT("factory_name"), GetClassName());  
         if(pConfig->HasProp(wxT("is_enabled")))
             pConfig->DeleteProperty(wxT("is_enabled"));
         pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    

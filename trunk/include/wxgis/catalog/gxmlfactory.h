@@ -3,7 +3,7 @@
  * Purpose:  wxGxMLFactory class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,7 +22,10 @@
 
 #include "wxgis/catalog/catalog.h"
 
-class wxGxMLFactory :
+/** \class wxGxMLFactory gxmlfactory.h
+    \brief A markup lang GxObject factory.
+*/
+class WXDLLIMPEXP_GIS_CLT wxGxMLFactory :
 	public IGxObjectFactory,
 	public wxObject
 {
@@ -35,7 +38,6 @@ public:
     virtual void Serialize(wxXmlNode* pConfig, bool bStore);
 	virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
     virtual wxString GetName(void){return wxString(_("Markup Languages files"));};
-protected:
-    wxIcon m_LargeDXFIcon, m_SmallDXFIcon;
-    wxIcon m_LargeKMLIcon, m_SmallKMLIcon;
+    //wxGxMLFactory
+    virtual IGxObject* GetGxDataset(wxString path, wxString name, wxGISEnumVectorDatasetType type);
 };

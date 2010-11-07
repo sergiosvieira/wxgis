@@ -21,8 +21,10 @@
 #pragma once
 #include "wxgis/catalog/catalog.h"
 
+/** \class wxGxDiscConnections gxdiscconnections.h
+    \brief A Disc Connections GxRootObject.
+*/
 class WXDLLIMPEXP_GIS_CLT wxGxDiscConnections :
-	public IGxObjectUI,
 	public IGxObjectContainer,
     public IGxRootObjectProperties,
     public wxObject
@@ -39,11 +41,6 @@ public:
     virtual wxString GetPath(void){return wxEmptyString;};
 	virtual wxString GetCategory(void){return wxString(_("Folder connections"));};
 	virtual void Refresh(void);
-	//IGxObjectUI
-	virtual wxIcon GetLargeImage(void);
-	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxDiscConnections.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxEmptyString/*wxString(wxT("wxGxDiscConnections.NewMenu"))*/;};
 	//IGxObjectContainer
 	virtual bool DeleteChild(IGxObject* pChild);
 	virtual bool AreChildrenViewable(void){return true;};

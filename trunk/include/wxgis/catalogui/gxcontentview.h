@@ -21,6 +21,7 @@
 
 #pragma once
 #include "wxgis/catalogui/gxview.h"
+#include "wxgis/catalogui/gxcatalogui.h"
 #include "wx/listctrl.h"
 #include "wx/imaglist.h"
 
@@ -60,7 +61,7 @@ public:
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 	virtual bool Applies(IGxSelection* Selection);
-    virtual void BeginRename(void);
+    virtual void BeginRename(IGxObject* pGxObject = NULL);
 //IGxSelectionEvents
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 //IGxCatalogEvents
@@ -102,7 +103,7 @@ protected:
 	IConnectionPointContainer* m_pConnectionPointCatalog;
 	long m_ConnectionPointCatalogCookie;
 	IGxSelection* m_pSelection;
-    IGxCatalog* m_pCatalog;
+    wxGxCatalogUI* m_pCatalog;
     ICommand* m_pDeleteCmd;
 	IGxObject* m_pParentGxObject;
 	bool m_bDragging;

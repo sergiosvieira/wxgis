@@ -19,12 +19,6 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxdiscconnection.h"
-#include "../../art/folder_conn_16.xpm"
-#include "../../art/folder_conn_48.xpm"
-#include "../../art/folder_conn_disbl_16.xpm"
-#include "../../art/folder_conn_disbl_48.xpm"
-
-#include <wx/filename.h>
 
 wxGxDiscConnection::wxGxDiscConnection(wxString Path, wxString Name) : wxGxFolder(Path, Name)
 {
@@ -32,24 +26,6 @@ wxGxDiscConnection::wxGxDiscConnection(wxString Path, wxString Name) : wxGxFolde
 
 wxGxDiscConnection::~wxGxDiscConnection(void)
 {
-}
-
-wxIcon wxGxDiscConnection::GetLargeImage(void)
-{
-	bool bIsOk = wxFileName::IsDirReadable(m_sPath);
-	if(bIsOk)
-		return wxIcon(folder_conn_48_xpm);
-	else
-		return wxIcon(folder_conn_disbl_48_xpm);
-}
-
-wxIcon wxGxDiscConnection::GetSmallImage(void)
-{
-	bool bIsOk = wxFileName::IsDirReadable(m_sPath);
-	if(bIsOk)
-		return wxIcon(folder_conn_16_xpm);
-	else
-		return wxIcon(folder_conn_disbl_16_xpm);
 }
 
 bool wxGxDiscConnection::Delete(void)
@@ -63,6 +39,3 @@ bool wxGxDiscConnection::Rename(wxString NewName)
 	return true;
 }
 
-void wxGxDiscConnection::EditProperties(wxWindow *parent)
-{
-}

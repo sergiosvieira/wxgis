@@ -40,7 +40,7 @@ public:
 	virtual wxString GetViewName(void);
 	virtual wxIcon GetViewIcon(void);
 	virtual void SetViewIcon(wxIcon Icon);
-    virtual void BeginRename(void){};
+    virtual void BeginRename(IGxObject* pGxObject = NULL){};
 protected:
 	wxString m_sViewName;
 	//IGxCatalog* m_pCatalog;

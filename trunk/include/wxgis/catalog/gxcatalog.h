@@ -21,18 +21,14 @@
 #pragma once
 
 #include "wxgis/catalog/catalog.h"
-#include "wxgis/catalog/gxselection.h"
 #include "wxgis/catalog/gxdiscconnections.h"
 
-#include "../../art/mainframe.xpm"
 // ----------------------------------------------------------------------------
 // wxGxCatalog
 // ----------------------------------------------------------------------------
-#define DISCCONNCAT wxT("wxGxDiscConnection")
+//#define DISCCONNCAT wxT("wxGxDiscConnection")
 
 class WXDLLIMPEXP_GIS_CLT wxGxCatalog :
-	public IGxObjectUI,
-	public IGxObjectEdit,
 	public IGxObjectContainer,
 	public IGxCatalog,
 	public IConnectionPointContainer
@@ -49,17 +45,6 @@ public:
 	virtual wxString GetCategory(void){return wxString(wxT("Root"));};
 	virtual IGxObject* GetParent(void){return NULL;};
 	virtual void Refresh(void);
-	//IGxObjectUI
-	virtual wxIcon GetLargeImage(void){return wxNullIcon;};
-	virtual wxIcon GetSmallImage(void){return wxIcon(mainframe_xpm);};
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxCatalog.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxCatalog.NewMenu"));};
-	//IGxObjectEdit
-	virtual bool Delete(void){return false;};
-	virtual bool CanDelete(void){return false;};
-	virtual bool Rename(wxString NewName){return false;};
-	virtual bool CanRename(void){return false;};
-	virtual void EditProperties(wxWindow *parent);
 	//IGxObjectContainer
 	virtual bool AddChild(IGxObject* pChild);
 	virtual bool DeleteChild(IGxObject* pChild);
@@ -76,9 +61,6 @@ public:
 	virtual void ObjectRefreshed(IGxObject* pObject);
 	virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true);
 	virtual void DisconnectFolder(wxString sPath, bool bSelect = true);
-	virtual void SetLocation(wxString sPath);
-    virtual void Undo(int nPos = -1);
-    virtual void Redo(int nPos = -1);
 	//IConnectionPointContainer
 	virtual long Advise(wxObject* pObject);
 	//wxGxCatalog
@@ -91,7 +73,7 @@ public:
     virtual void SerializePlugins(wxXmlNode* pNode, bool bStore = false);
 	virtual void EnableRootItem(IGxObject* pRootItem, bool bEnable);
 
-private:
+protected:
 	bool m_bIsChildrenLoaded;
 	wxArrayString m_CatalogRootItemArray;
     wxGxDiscConnections* m_pGxDiscConnections;

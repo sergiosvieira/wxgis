@@ -3,7 +3,7 @@
  * Purpose:  system operations.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,6 +20,14 @@
  ****************************************************************************/
 
 #include "wxgis/datasource/sysop.h"
+
+bool DeleteDir(wxString sPath)
+{
+    int result = VSIRmdir(wgWX2MB(sPath));
+    if (result == -1)
+        return false;
+    return true;
+}
 
 bool DeleteFile(wxString sPath)
 {
@@ -45,12 +53,6 @@ wxString ClearExt(wxString sPath)
         sResPath = sPath.Left(pos);
     return sResPath;
 }
-    ////wxFileName FName( m_sPath );
-    ////FName.ClearExt();
-    ////wxString sPath = FName.GetFullPath();
-    ////if(sPath.Left(2) == wxT("\\\\"))
-    ////    sPath = sPath.Right(sPath.Len() -2 );
-
 
 wxFontEncoding GetEncodingFromCpg(wxString sPath)
 {

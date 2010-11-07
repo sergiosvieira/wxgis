@@ -41,6 +41,70 @@ public:
 	virtual IGxCatalog* GetCatalog(void) = 0;
 };
 
+
+class IGxObjectWizard
+{
+public:
+	virtual ~IGxObjectWizard(void){};
+	virtual bool Invoke(wxWindow* pParentWnd) = 0;
+};
+
+
+class IGxObjectUI
+{
+public:
+	virtual ~IGxObjectUI(void){};
+	virtual wxIcon GetLargeImage(void) = 0;
+	virtual wxIcon GetSmallImage(void) = 0;
+	virtual wxString ContextMenu(void) = 0;
+	virtual wxString NewMenu(void) = 0;
+};
+
+class IGxObjectEditUI
+{
+public:
+	virtual ~IGxObjectEditUI(void){};
+	virtual void EditProperties(wxWindow *parent){};
+};
+
+class IGxSelection
+{
+public:
+	enum wxGISEnumInitiators
+	{
+		INIT_ALL = -2,
+		INIT_NONE = -1
+	} Initiator;
+	virtual ~IGxSelection(void){};
+	virtual void Select( IGxObject* pObject,  bool appendToExistingSelection, long nInitiator ) = 0;
+	virtual void Select( IGxObject* pObject) = 0;
+	virtual void Unselect(IGxObject* pObject, long nInitiator) = 0;
+	virtual void Clear(long nInitiator) = 0;
+	virtual size_t GetCount(void) = 0;
+	virtual size_t GetCount(long nInitiator) = 0;
+	virtual IGxObject* GetSelectedObjects(size_t nIndex) = 0;
+	virtual IGxObject* GetSelectedObjects(long nInitiator, size_t nIndex) = 0;
+	virtual IGxObject* GetLastSelectedObject(void) = 0;
+	virtual void SetInitiator(long nInitiator) = 0;
+    virtual void Do(IGxObject* pObject) = 0;
+    virtual bool CanRedo() = 0;
+	virtual bool CanUndo() = 0;
+	virtual void RemoveDo(wxString sPath) = 0;
+    virtual wxString Redo(int nPos = -1) = 0;
+    virtual wxString Undo(int nPos = -1) = 0;
+    virtual void Reset() = 0;
+    virtual size_t GetDoSize() = 0;
+    virtual int GetDoPos(void) = 0;
+    virtual wxString GetDoPath(size_t nIndex) = 0;
+};
+
+class IGxSelectionEvents
+{
+public:
+	virtual ~IGxSelectionEvents(void){};
+	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator) = 0;
+};
+
 class IGxView
 {
 public:
@@ -53,5 +117,5 @@ public:
 	virtual wxString GetViewName(void) = 0;
 	virtual wxIcon GetViewIcon(void) = 0;
 	virtual void SetViewIcon(wxIcon Icon) = 0;
-    virtual void BeginRename(void) = 0;
+    virtual void BeginRename(IGxObject* pGxObject = NULL) = 0;
 };

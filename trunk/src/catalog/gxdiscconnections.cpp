@@ -24,7 +24,6 @@
 #include "../../art/folder_conns_48.xpm"
 
 #include "wx/volume.h"
-#include "wx/msgdlg.h"
 #include "wx/dir.h"
 
 
@@ -37,16 +36,6 @@ wxGxDiscConnections::wxGxDiscConnections(void) : m_bIsChildrenLoaded(false)
 
 wxGxDiscConnections::~wxGxDiscConnections(void)
 {
-}
-
-wxIcon wxGxDiscConnections::GetLargeImage(void)
-{
-	return wxIcon(folder_conns_48_xpm);
-}
-
-wxIcon wxGxDiscConnections::GetSmallImage(void)
-{
-	return wxIcon(folder_conns_16_xpm);
 }
 
 void wxGxDiscConnections::Detach(void)
@@ -142,12 +131,6 @@ void wxGxDiscConnections::EmptyChildren(void)
         {
             CONN_DATA data = {pwxGxDiscConnection->GetName(), pwxGxDiscConnection->GetPath()};
             m_aConnections.push_back(data);
-        }
-        if(m_pCatalog)
-        {
-            IGxSelection* pSel = m_pCatalog->GetSelection();
-            if(pSel)
-                m_pCatalog->GetSelection()->Unselect(m_Children[i], IGxSelection::INIT_ALL);
         }
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);

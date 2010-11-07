@@ -22,9 +22,6 @@
 #include "cpl_vsi_virtual.h"
 #include <wx/stdpaths.h>
 
-#include "../../art/folder_prj_16.xpm"
-#include "../../art/folder_prj_48.xpm"
-
 /////////////////////////////////////////////////////////////////////////
 // wxGxSpatialReferencesFolder
 /////////////////////////////////////////////////////////////////////////
@@ -36,16 +33,6 @@ wxGxSpatialReferencesFolder::wxGxSpatialReferencesFolder(void) : m_bIsChildrenLo
 
 wxGxSpatialReferencesFolder::~wxGxSpatialReferencesFolder(void)
 {
-}
-
-wxIcon wxGxSpatialReferencesFolder::GetLargeImage(void)
-{
-	return wxIcon(folder_prj_48_xpm);
-}
-
-wxIcon wxGxSpatialReferencesFolder::GetSmallImage(void)
-{
-	return wxIcon(folder_prj_16_xpm);
 }
 
 void wxGxSpatialReferencesFolder::Detach(void)
@@ -83,7 +70,7 @@ wxXmlNode* wxGxSpatialReferencesFolder::GetProperties(void)
     wxClassInfo* pInfo = GetClassInfo();
     if(pInfo)
         pNode->AddProperty(wxT("name"), pInfo->GetClassName());
-    pNode->AddProperty(wxT("is_enabled"), wxT("1"));    
+    pNode->AddProperty(wxT("is_enabled"), m_bEnabled == true ? wxT("1") : wxT("0"));    
 #ifndef WXGISPORTABLE
     if(pNode->HasProp(wxT("path")))
         pNode->DeleteProperty(wxT("path"));
@@ -96,12 +83,6 @@ void wxGxSpatialReferencesFolder::EmptyChildren(void)
 {
 	for(size_t i = 0; i < m_Children.size(); i++)
 	{
-        if(m_pCatalog)
-        {
-            IGxSelection* pSel = m_pCatalog->GetSelection();
-            if(pSel)
-                m_pCatalog->GetSelection()->Unselect(m_Children[i], IGxSelection::INIT_ALL);
-        }
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
 	}
@@ -124,7 +105,6 @@ void wxGxSpatialReferencesFolder::LoadChildren(void)
 	if(m_bIsChildrenLoaded)
 		return;	
 
-    wxBusyCursor wait;
     //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
     //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
 
@@ -190,22 +170,11 @@ wxGxPrjFolder::~wxGxPrjFolder(void)
 {
 }
 
-wxIcon wxGxPrjFolder::GetLargeImage(void)
-{
-	return wxIcon(folder_prj_48_xpm);
-}
-
-wxIcon wxGxPrjFolder::GetSmallImage(void)
-{
-	return wxIcon(folder_prj_16_xpm);
-}
-
 void wxGxPrjFolder::LoadChildren(void)
 {
 	if(m_bIsChildrenLoaded)
 		return;
 
-    wxBusyCursor wait;
     //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
     //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
 

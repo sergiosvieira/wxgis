@@ -3,7 +3,7 @@
  * Purpose:  wxGxRasterFactory class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,16 +21,10 @@
 #include "wxgis/catalog/gxrasterfactory.h"
 #include "wxgis/catalog/gxdataset.h"
 
-#include "../../art/raster_16.xpm"
-#include "../../art/raster_48.xpm"
-
-
 IMPLEMENT_DYNAMIC_CLASS(wxGxRasterFactory, wxObject)
 
 wxGxRasterFactory::wxGxRasterFactory(void)
 {
-    m_SmallIcon = wxIcon(raster_16_xpm);
-    m_LargeIcon = wxIcon(raster_48_xpm);
 }
 
 wxGxRasterFactory::~wxGxRasterFactory(void)
@@ -69,8 +63,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             else
                 name = FName.GetFullName();
 
-            wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterBmp, m_LargeIcon, m_SmallIcon);
-			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+			pGxObj = GetGxDataset(path, name, enumRasterBmp);
 			goto REMOVE;
 		}
 		if(ext == wxString(wxT("jpg")) || ext == wxString(wxT("jpeg")))
@@ -88,8 +81,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             else
                 name = FName.GetFullName();
 
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterJpeg, m_LargeIcon, m_SmallIcon);
-			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+			pGxObj = GetGxDataset(path, name, enumRasterJpeg);
 			goto REMOVE;
 		}
 		if(ext == wxString(wxT("img")))
@@ -107,8 +99,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             else
                 name = FName.GetFullName();
 
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterImg, m_LargeIcon, m_SmallIcon);
-			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+			pGxObj = GetGxDataset(path, name, enumRasterImg);
 			goto REMOVE;
 		}
 		if(ext == wxString(wxT("tif")) || ext == wxString(wxT("tiff")))
@@ -126,8 +117,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             else
                 name = FName.GetFullName();
 
-			wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterTiff, m_LargeIcon, m_SmallIcon);
-			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+			pGxObj = GetGxDataset(path, name, enumRasterTiff);
 			goto REMOVE;
 		}
         if( ext == wxString(wxT("png")) )
@@ -145,8 +135,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             else
                 name = FName.GetFullName();
 
-            wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterPng, m_LargeIcon, m_SmallIcon);
-			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+            pGxObj = GetGxDataset(path, name, enumRasterPng);
 			goto REMOVE;
 		}
 		if(ext == wxString(wxT("til"))  || ext == wxString(wxT("jp2")))
@@ -164,8 +153,7 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             else
                 name = FName.GetFullName();
 
-            wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, enumRasterUnknown, m_LargeIcon, m_SmallIcon);
-			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+			pGxObj = GetGxDataset(path, name, enumRasterUnknown);
 			goto REMOVE;
 		}		
         //TODO: add other raster file extensions
@@ -217,7 +205,7 @@ void wxGxRasterFactory::Serialize(wxXmlNode* pConfig, bool bStore)
     {
         if(pConfig->HasProp(wxT("factory_name")))
             pConfig->DeleteProperty(wxT("factory_name"));
-        pConfig->AddProperty(wxT("factory_name"), GetName());  
+        pConfig->AddProperty(wxT("factory_name"), GetClassName());  
         if(pConfig->HasProp(wxT("is_enabled")))
             pConfig->DeleteProperty(wxT("is_enabled"));
         pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
@@ -227,3 +215,10 @@ void wxGxRasterFactory::Serialize(wxXmlNode* pConfig, bool bStore)
         m_bIsEnabled = wxAtoi(pConfig->GetPropVal(wxT("is_enabled"), wxT("1")));
     }
 }
+
+IGxObject* wxGxRasterFactory::GetGxDataset(wxString path, wxString name, wxGISEnumRasterDatasetType type)
+{
+    wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, type);
+    return static_cast<IGxObject*>(pDataset);
+}
+

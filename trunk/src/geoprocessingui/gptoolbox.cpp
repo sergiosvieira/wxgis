@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/geoprocessingui/gptoolbox.h"
 #include "wxgis/geoprocessingui/gptooldlg.h"
+#include "wxgis/catalogui/gxcatalogui.h"
 
 #include <wx/stdpaths.h>
 
@@ -77,11 +78,12 @@ void wxGxToolbox::EmptyChildren(void)
 {
 	for(size_t i = 0; i < m_Children.size(); i++)
 	{
-        if(m_pCatalog)
+        wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pCatalog);
+        if(pCatalog)
         {
-            IGxSelection* pSel = m_pCatalog->GetSelection();
+            IGxSelection* pSel = pCatalog->GetSelection();
             if(pSel)
-                m_pCatalog->GetSelection()->Unselect(m_Children[i], IGxSelection::INIT_ALL);
+                pSel->Unselect(m_Children[i], IGxSelection::INIT_ALL);
         }
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
@@ -288,6 +290,9 @@ void wxGxRootToolbox::LoadChildren(void)
 
 wxXmlNode* wxGxRootToolbox::GetProperties(void)
 {
+    if(m_pPropNode->HasProp(wxT("is_enabled")))
+        m_pPropNode->DeleteProperty(wxT("is_enabled"));
+    m_pPropNode->AddProperty(wxT("is_enabled"), m_bEnabled == true ? wxT("1") : wxT("0"));    
     return m_pPropNode;
 }
 

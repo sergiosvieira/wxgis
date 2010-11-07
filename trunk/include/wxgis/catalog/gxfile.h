@@ -3,7 +3,7 @@
  * Purpose:  wxGxFile classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,13 +22,11 @@
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/carto/carto.h"
 
-//--------------------------------------------------------------
-//class wxGxFile
-//--------------------------------------------------------------
-
+/** \class wxGxFile gxfileui.h
+    \brief A file GxObject.
+*/
 class WXDLLIMPEXP_GIS_CLT wxGxFile :
 	public IGxObject,
-	public IGxObjectUI,
     public IGxFile, 
     public IGxObjectEdit
 {
@@ -43,62 +41,43 @@ protected:
 	wxString m_sName, m_sPath;
 };
 
-//--------------------------------------------------------------
-//class wxGxPrjFile
-//--------------------------------------------------------------
-
+/** \class wxGxPrjFile gxfileui.h
+    \brief A proj file GxObject.
+*/
 class WXDLLIMPEXP_GIS_CLT wxGxPrjFile :
     public wxGxFile
 {
 public:
-	wxGxPrjFile(wxString Path, wxString Name, wxGISEnumPrjFileType Type, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxPrjFile(wxString Path, wxString Name, wxGISEnumPrjFileType nType);
 	virtual ~wxGxPrjFile(void);
 	//IGxObject
 	virtual wxString GetCategory(void){return wxString(_("Coordinate System"));};
-	//IGxObjectUI
-	virtual wxIcon GetLargeImage(void);
-	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxPrjFile.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxPrjFile.NewMenu"));};
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
-	virtual void EditProperties(wxWindow *parent);
 	//wxGxPrjFile
 	virtual OGRSpatialReference* GetSpatialReference(void);
 protected:
     wxGISEnumPrjFileType m_Type;
 	OGRSpatialReference m_OGRSpatialReference;
-    wxIcon m_oLargeIcon;
-    wxIcon m_oSmallIcon;
 };
 
-//--------------------------------------------------------------
-//class wxGxTextFile
-//--------------------------------------------------------------
-
+/** \class wxGxTextFile gxfileui.h
+    \brief A text file GxObject.
+*/
 class WXDLLIMPEXP_GIS_CLT wxGxTextFile :
     public wxGxFile
 {
 public:
-	wxGxTextFile(wxString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxTextFile(wxString Path, wxString Name);
 	virtual ~wxGxTextFile(void);
 	//IGxObject
 	virtual wxString GetCategory(void){return wxString(_("Text file"));};
-	//IGxObjectUI
-	virtual wxIcon GetLargeImage(void);
-	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxTextFile.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxTextFile.NewMenu"));};
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
-	virtual void EditProperties(wxWindow *parent);
-protected:
-    wxIcon m_oLargeIcon;
-    wxIcon m_oSmallIcon;
 };

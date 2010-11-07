@@ -3,7 +3,7 @@
  * Purpose:  wxGxRasterFactory class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,7 +22,10 @@
 
 #include "wxgis/catalog/catalog.h"
 
-class wxGxRasterFactory :
+/** \class wxGxRasterFactory gxrasterfactory.h
+    \brief A raster GxObject factory.
+*/
+class WXDLLIMPEXP_GIS_CLT wxGxRasterFactory :
 	public IGxObjectFactory,
 	public wxObject
 {
@@ -35,6 +38,6 @@ public:
     virtual void Serialize(wxXmlNode* pConfig, bool bStore);
     virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
     virtual wxString GetName(void){return wxString(_("Raster files"));};
-protected:
-    wxIcon m_LargeIcon, m_SmallIcon;
+    //wxGxRasterFactory
+    virtual IGxObject* GetGxDataset(wxString path, wxString name, wxGISEnumRasterDatasetType type);
 };

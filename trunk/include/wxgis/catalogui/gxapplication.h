@@ -19,14 +19,16 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-#include "wxgis/catalog/catalog.h"
 #include "wxgis/framework/application.h"
+#include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/gxtreeview.h"
 #include "wxgis/catalogui/gxtabview.h"
 #include "wxgis/catalogui/newmenu.h"
 
 #include "wx/aui/aui.h"
 #include "wx/artprov.h"
+
+#define APP_VER wxT("0.3.0") //should be global for all apps
 
 /*! \file gxapplication.h
     \brief wxGxApplication main header.
@@ -66,8 +68,12 @@ public:
 	virtual WINDOWARRAY* GetChildWindows(void);
 	virtual void RegisterChildWindow(wxWindow* pWnd);
 	virtual void UnRegisterChildWindow(wxWindow* pWnd);
-    virtual wxString GetAppName(void){return wxString(APP_NAME);};
+    virtual wxString GetAppName(void){return wxString(wxT("wxGISCatalog"));};
+    virtual wxString GetAppVersionString(void){return wxString(APP_VER);};
     virtual bool Create(IGISConfig* pConfig);
+    virtual bool SetupSys(wxString sSysPath);
+    virtual void SetDebugMode(bool bDebugMode);
+    virtual bool SetupLog(wxString sLogPath);
 protected:
     //wxGxApplication
 	virtual void SerializeGxFramePos(bool bSave = false);
@@ -75,7 +81,7 @@ protected:
 	wxAuiManager m_mgr;
 	wxGxTreeView* m_pTreeView;
 	wxGxTabView* m_pTabView;
-	IGxCatalog* m_pCatalog;
+	wxGxCatalogUI* m_pCatalog;
 	WINDOWARRAY m_WindowArray;
     wxGISNewMenu* m_pNewMenu;
 };

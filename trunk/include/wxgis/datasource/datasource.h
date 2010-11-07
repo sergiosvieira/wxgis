@@ -3,7 +3,7 @@
  * Purpose:  datasource header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@
 
 enum wxGISEnumDatasetType
 {
+    enumGISAny = 0,
 	enumGISFeatureDataset = 1,
 	enumGISTableDataset = 2,
 	enumGISRasterDataset = 3,
@@ -72,6 +73,15 @@ enum wxGISEnumPrjFileType
 	enumSPRfile = 2
 };
 
+
+enum wxGISEnumContainerType
+{
+    enumContAny = 0,
+	enumContFolder = 1,
+	enumContGDBFolder = 2,
+    enumCondDataset = 3
+};
+
 typedef struct _Limits
 {
     double minx, miny, maxx, maxy;
@@ -97,6 +107,7 @@ public:
     virtual wxGISDataset* GetSubset(size_t nIndex){return NULL;};
     virtual wxString GetName(void){return wxEmptyString;};
 	virtual void Close(void) = 0;
+	virtual OGRSpatialReference* GetSpatialReference(void) = 0;
 protected:
 	wxString m_sPath;
     wxCriticalSection m_CritSect;

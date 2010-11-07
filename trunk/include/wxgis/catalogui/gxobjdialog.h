@@ -43,8 +43,8 @@
 
 #include "wxgis/core/config.h"
 //#include "wxgis/catalog/catalog.h"
-#include "wxgis/catalog/gxcatalog.h"
 #include "wxgis/catalogui/catalogui.h"
+#include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/gxcontentview.h"
 #include "wxgis/catalogui/gxtreeview.h"
 
@@ -120,7 +120,7 @@ private:
 class wxGxDialogContentView : public wxGxContentView
 {
 public:
-	wxGxDialogContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxLC_REPORT | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING);
+	wxGxDialogContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxLC_LIST | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING);
 	virtual ~wxGxDialogContentView();
 
 //IGxView
@@ -188,6 +188,7 @@ public:
 	virtual ICommand* GetCommand(long CmdID);
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
     virtual wxString GetAppName(void){return wxString(OBJDLG_NAME);};
+    virtual wxString GetAppVersionString(void){return wxString(wxT("0.0.0"));};
     virtual IStatusBar* GetStatusBar(void){return NULL;};
     virtual IGISConfig* GetConfig(void){return m_pConfig;};
     virtual void OnAppAbout(void){};
@@ -209,6 +210,11 @@ public:
 	virtual void OnMouseDoubleClick(wxMouseEvent& event){};
 	virtual void OnMouseMove(wxMouseEvent& event){};
     virtual bool Create(IGISConfig* pConfig){return true;};
+    virtual bool SetupLog(wxString sLogPath){return true;};
+    virtual bool SetupLoc(wxString sLoc, wxString sLocPath){return true;};
+    virtual bool SetupSys(wxString sSysPath){return true;};
+    virtual void SetDebugMode(bool bDebugMode){};
+
 //wxGxObjectDialog
 	virtual void SetButtonCaption(wxString sOkBtLabel);
 	virtual void SetStartingLocation(wxString sStartPath);
@@ -248,7 +254,7 @@ public:
     virtual void SetExternalCatalog(IGxCatalog* pCatalog = NULL){m_pExternalCatalog = pCatalog;};
 protected:
  	COMMANDARRAY m_CommandArray;
-  	wxGxCatalog* m_pCatalog;
+  	wxGxCatalogUI* m_pCatalog;
   	IGxCatalog* m_pExternalCatalog;
     wxGISAppConfig* m_pConfig;
     wxGxDialogContentView* m_pwxGxContentView;

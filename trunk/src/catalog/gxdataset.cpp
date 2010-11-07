@@ -3,7 +3,7 @@
  * Purpose:  wxGxDataset class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,17 +22,13 @@
 #include "wxgis/catalog/gxdataset.h"
 #include "wxgis/datasource/featuredataset.h"
 #include "wxgis/datasource/rasterdataset.h"
-#include "wxgis/framework/application.h"
 #include "wxgis/datasource/sysop.h"
-
-#include <wx/busyinfo.h>
-#include <wx/utils.h>
 
 //--------------------------------------------------------------
 //class wxGxTableDataset
 //--------------------------------------------------------------
 
-wxGxTableDataset::wxGxTableDataset(wxString Path, wxString Name, wxGISEnumTableDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon)
+wxGxTableDataset::wxGxTableDataset(wxString Path, wxString Name, wxGISEnumTableDatasetType nType)
 {
 	m_type = nType;
 
@@ -41,24 +37,11 @@ wxGxTableDataset::wxGxTableDataset(wxString Path, wxString Name, wxGISEnumTableD
 
 	m_pwxGISDataset = NULL;
     m_pPathEncoding = wxConvCurrent;
-
-    m_LargeIcon = LargeIcon;
-    m_SmallIcon = SmallIcon;
 }
 
 wxGxTableDataset::~wxGxTableDataset(void)
 {
     wsDELETE(m_pwxGISDataset);
-}
-
-wxIcon wxGxTableDataset::GetLargeImage(void)
-{
-	return m_LargeIcon;
-}
-
-wxIcon wxGxTableDataset::GetSmallImage(void)
-{
-	return m_SmallIcon;
 }
 
 bool wxGxTableDataset::Delete(void)
@@ -124,10 +107,6 @@ bool wxGxTableDataset::Rename(wxString NewName)
 	}	
 }
 
-void wxGxTableDataset::EditProperties(wxWindow *parent)
-{
-}
-
 wxGISDataset* wxGxTableDataset::GetDataset(void)
 {
 	if(m_pwxGISDataset == NULL)
@@ -146,9 +125,9 @@ wxGISDataset* wxGxTableDataset::GetDataset(void)
 //class wxGxFeatureDataset
 //--------------------------------------------------------------
 
-wxGxFeatureDataset::wxGxFeatureDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type, wxIcon LargeIcon, wxIcon SmallIcon)
+wxGxFeatureDataset::wxGxFeatureDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType nType)
 {
-	m_type = Type;
+	m_type = nType;
 
 	m_sName = Name;
 	m_sPath = Path;
@@ -156,9 +135,6 @@ wxGxFeatureDataset::wxGxFeatureDataset(wxString Path, wxString Name, wxGISEnumVe
 	m_pwxGISDataset = NULL;
 
     m_pPathEncoding = wxConvCurrent;
-
-    m_LargeIcon = LargeIcon;
-    m_SmallIcon = SmallIcon;
 }
 
 wxGxFeatureDataset::~wxGxFeatureDataset(void)
@@ -184,16 +160,6 @@ wxString wxGxFeatureDataset::GetBaseName(void)
     wxFileName FileName(m_sName);
     FileName.SetEmptyExt();
     return FileName.GetName();
-}
-
-wxIcon wxGxFeatureDataset::GetLargeImage(void)
-{
-    return m_LargeIcon;
-}
-
-wxIcon wxGxFeatureDataset::GetSmallImage(void)
-{
-    return m_SmallIcon;
 }
 
 bool wxGxFeatureDataset::Delete(void)
@@ -253,10 +219,6 @@ bool wxGxFeatureDataset::Rename(wxString NewName)
 	}	
 }
 
-void wxGxFeatureDataset::EditProperties(wxWindow *parent)
-{
-}
-
 wxGISDataset* wxGxFeatureDataset::GetDataset(void)
 {
 	if(m_pwxGISDataset == NULL)
@@ -267,7 +229,7 @@ wxGISDataset* wxGxFeatureDataset::GetDataset(void)
         {
 		    const char* err = CPLGetLastErrorMsg();
 		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
-		    wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
+            wxLogError(sErr);
 
             wxDELETE(pwxGISFeatureDataset);
 			return NULL;
@@ -339,33 +301,20 @@ wxGISDataset* wxGxFeatureDataset::GetDataset(void)
 //class wxGxRasterDataset
 //--------------------------------------------------------------
 
-wxGxRasterDataset::wxGxRasterDataset(wxString Path, wxString Name, wxGISEnumRasterDatasetType Type, wxIcon LargeIcon, wxIcon SmallIcon)
+wxGxRasterDataset::wxGxRasterDataset(wxString Path, wxString Name, wxGISEnumRasterDatasetType nType)
 {
 
-	m_type = Type;
+	m_type = nType;
 
 	m_sName = Name;
 	m_sPath = Path;
 
 	m_pwxGISDataset = NULL;
-
-    m_LargeIcon = LargeIcon;
-    m_SmallIcon = SmallIcon;
 }
 
 wxGxRasterDataset::~wxGxRasterDataset(void)
 {
 	wsDELETE(m_pwxGISDataset);
-}
-
-wxIcon wxGxRasterDataset::GetLargeImage(void)
-{
-	return m_LargeIcon;
-}
-
-wxIcon wxGxRasterDataset::GetSmallImage(void)
-{
-	return m_SmallIcon;
 }
 
 bool wxGxRasterDataset::Delete(void)
@@ -431,10 +380,6 @@ bool wxGxRasterDataset::Rename(wxString NewName)
 	}	
 }
 
-void wxGxRasterDataset::EditProperties(wxWindow *parent)
-{
-}
-
 wxString wxGxRasterDataset::GetCategory(void)
 {
 	switch(m_type)
@@ -444,7 +389,6 @@ wxString wxGxRasterDataset::GetCategory(void)
 		return wxString(_("Raster"));
 	}
 }
-
 	
 void wxGxRasterDataset::Detach(void)
 {
@@ -458,12 +402,11 @@ wxGISDataset* wxGxRasterDataset::GetDataset(void)
 	{	
         wxGISRasterDataset* pwxGISRasterDataset = new wxGISRasterDataset(m_sPath, m_type);
 
-        //open (ask for overviews)
         if(!pwxGISRasterDataset->Open())
         {
 		    const char* err = CPLGetLastErrorMsg();
 		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
-		    wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
+            wxLogError(sErr);
 
             wxDELETE(pwxGISRasterDataset);
 			return NULL;

@@ -34,6 +34,8 @@ public:
     long InsertItem(const wxString& label, int nChecked);
     bool SetItemData(long item, long data);
     long GetItemData(long item) const;
+    bool IsItemChanged(long item);
+    int GetItemCheckState(long item);
     //events
     void OnLeftDown(wxMouseEvent& event);
 

@@ -3,7 +3,7 @@
  * Purpose:  wxGxKMLDataset class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,15 +22,11 @@
 #include "wxgis/datasource/featuredataset.h"
 #include "wxgis/datasource/sysop.h"
 
-#include "../../art/kml_subdset_16.xpm"
-#include "../../art/kml_subdset_48.xpm"
-
-
 //--------------------------------------------------------------
 //class wxGxKMLDataset
 //--------------------------------------------------------------
 
-wxGxKMLDataset::wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type, wxIcon LargeIcon, wxIcon SmallIcon)
+wxGxKMLDataset::wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type)
 {
 	m_type = Type;
 
@@ -44,10 +40,6 @@ wxGxKMLDataset::wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorData
 
     m_bIsChildrenLoaded = false;
 
-    m_LargeIcon = LargeIcon;
-    m_SmallIcon = SmallIcon;
-    m_LargeSubIcon = wxIcon(kml_subdset_48_xpm);
-    m_SmallSubIcon = wxIcon(kml_subdset_16_xpm);
 }
 
 wxGxKMLDataset::~wxGxKMLDataset(void)
@@ -75,16 +67,6 @@ wxString wxGxKMLDataset::GetBaseName(void)
 wxString wxGxKMLDataset::GetCategory(void)
 {
 	return wxString(_("KML Dataset"));
-}
-
-wxIcon wxGxKMLDataset::GetLargeImage(void)
-{
-	return m_LargeIcon;
-}
-
-wxIcon wxGxKMLDataset::GetSmallImage(void)
-{
-	return m_SmallIcon;
 }
 
 bool wxGxKMLDataset::Delete(void)
@@ -151,20 +133,10 @@ bool wxGxKMLDataset::Rename(wxString NewName)
     }
 }
 
-void wxGxKMLDataset::EditProperties(wxWindow *parent)
-{
-}
-
 void wxGxKMLDataset::EmptyChildren(void)
 {
 	for(size_t i = 0; i < m_Children.size(); i++)
 	{
-        if(m_pCatalog)
-        {
-            IGxSelection* pSel = m_pCatalog->GetSelection();
-            if(pSel)
-                m_pCatalog->GetSelection()->Unselect(m_Children[i], IGxSelection::INIT_ALL);
-        }
 		m_Children[i]->Detach();
 		wxDELETE( m_Children[i] );
 	}
@@ -185,7 +157,7 @@ void wxGxKMLDataset::LoadChildren(void)
         {
 		    const char* err = CPLGetLastErrorMsg();
 		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
-		    wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
+            wxLogError(sErr);
 
             wxDELETE(pwxGISFeatureDataset);
 			return;
@@ -200,7 +172,7 @@ void wxGxKMLDataset::LoadChildren(void)
     {
         wxGISFeatureDataset* pwxGISFeatureSuDataset = dynamic_cast<wxGISFeatureDataset*>(m_pwxGISDataset->GetSubset(i));//wxGISDataset* pSubSet
         pwxGISFeatureSuDataset->SetSubType(m_type);
-        wxGxKMLSubDataset* pGxSubDataset = new wxGxKMLSubDataset(pwxGISFeatureSuDataset->GetName(), pwxGISFeatureSuDataset, m_type, m_LargeSubIcon, m_SmallSubIcon);
+        wxGxKMLSubDataset* pGxSubDataset = new wxGxKMLSubDataset(pwxGISFeatureSuDataset->GetName(), pwxGISFeatureSuDataset, m_type);
 		bool ret_code = AddChild(pGxSubDataset);
 		if(!ret_code)
 			wxDELETE(pGxSubDataset);
@@ -233,7 +205,7 @@ wxGISDataset* wxGxKMLDataset::GetDataset(void)
 //class wxGxKMLSubDataset
 //--------------------------------------------------------------
 
-wxGxKMLSubDataset::wxGxKMLSubDataset(wxString sName, wxGISDataset* pwxGISDataset, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon)
+wxGxKMLSubDataset::wxGxKMLSubDataset(wxString sName, wxGISDataset* pwxGISDataset, wxGISEnumVectorDatasetType nType)
 {
 	m_type = nType;
 
@@ -243,9 +215,6 @@ wxGxKMLSubDataset::wxGxKMLSubDataset(wxString sName, wxGISDataset* pwxGISDataset
 
     m_Encoding = wxFONTENCODING_UTF8;
     m_pPathEncoding = wxConvCurrent;
-
-    m_LargeIcon = LargeIcon;
-    m_SmallIcon = SmallIcon;
 }
 
 wxGxKMLSubDataset::~wxGxKMLSubDataset(void)
@@ -256,16 +225,6 @@ wxGxKMLSubDataset::~wxGxKMLSubDataset(void)
 wxString wxGxKMLSubDataset::GetCategory(void)
 {
 	return wxString(_("KML Feature class"));
-}
-
-wxIcon wxGxKMLSubDataset::GetLargeImage(void)
-{
-	return m_LargeIcon;
-}
-
-wxIcon wxGxKMLSubDataset::GetSmallImage(void)
-{
-	return m_SmallIcon;
 }
 
 wxGISDataset* wxGxKMLSubDataset::GetDataset(void)

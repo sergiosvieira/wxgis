@@ -84,3 +84,17 @@ void wxGISCheckList::OnLeftDown(wxMouseEvent& event)
 	}
 }
 
+bool wxGISCheckList::IsItemChanged(long item)
+{
+    LPITEM_DATA pdata = (LPITEM_DATA)wxListView::GetItemData(item);
+    return pdata->bChanged;
+}
+
+
+int wxGISCheckList::GetItemCheckState(long item)
+{
+    LPITEM_DATA pdata = (LPITEM_DATA)wxListView::GetItemData(item);
+    return pdata->nCheckState;
+}
+
+

@@ -106,7 +106,8 @@ void wxGISNewMenu::Init(void)
 {
     IGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(m_pApp);
     wxMenu* pMenu = static_cast<wxMenu*>(this);
-    m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( pGxApp->GetCatalog()->GetSelection() );
+    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+    m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( pGxCatalogUI->GetSelection() );
     if(m_pConnectionPointSelection != NULL)
 	    m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(pMenu);
 

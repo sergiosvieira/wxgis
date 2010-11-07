@@ -3,7 +3,7 @@
  * Purpose:  wxGxMapInfoFactory class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,7 +22,11 @@
 
 #include "wxgis/catalog/catalog.h"
 
-class wxGxMapInfoFactory :
+/** \class wxGxMapInfoFactory gxmapinfofactory.h
+    \brief A MapInfo GxObject factory.
+*/
+
+class WXDLLIMPEXP_GIS_CLT wxGxMapInfoFactory :
 	public IGxObjectFactory,
 	public wxObject
 {
@@ -39,7 +43,6 @@ public:
 		wxString path;
 		int bHasTab, bHasMap, bHasInd, bHasID, bHasDat, bHasMif, bHasMid;
 	}DATA;
-protected:
-    wxIcon m_LargeTabIcon, m_SmallTabIcon;
-    wxIcon m_LargeMifIcon, m_SmallMifIcon;
+    //wxGxMapInfoFactory
+    virtual IGxObject* GetGxDataset(wxString path, wxString name, wxGISEnumVectorDatasetType type);
 };

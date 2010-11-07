@@ -22,7 +22,7 @@
 #include "wxgis/catalogui/gxobjdialog.h"
 #include "wxgis/catalogui/catalogcmd.h"
 #include "wxgis/catalogui/viewscmd.h"
-#include "wxgis/catalog/gxdiscconnection.h"
+#include "wxgis/catalogui/gxdiscconnectionui.h"
 
 #include <wx/valgen.h>
 
@@ -323,7 +323,7 @@ void wxGxDialogContentView::OnObjectAdded(IGxObject* object)
     wxGxContentView::OnObjectAdded(object);
     if(m_pExternalCatalog)
     {
-        wxGxDiscConnection* pDiscConnection = dynamic_cast<wxGxDiscConnection*>(object);
+        wxGxDiscConnectionUI* pDiscConnection = dynamic_cast<wxGxDiscConnectionUI*>(object);
         if(pDiscConnection)
         {
             m_pExternalCatalog->ConnectFolder(object->GetFullName(), false);
@@ -344,7 +344,7 @@ void wxGxDialogContentView::OnObjectDeleted(IGxObject* object)
     wxGxContentView::OnObjectDeleted(object);
     if(m_pExternalCatalog)
     {
-        wxGxDiscConnection* pDiscConnection = dynamic_cast<wxGxDiscConnection*>(object);
+        wxGxDiscConnectionUI* pDiscConnection = dynamic_cast<wxGxDiscConnectionUI*>(object);
         if(pDiscConnection)
         {
             m_pExternalCatalog->DisconnectFolder(object->GetFullName(), false);
@@ -379,7 +379,7 @@ wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, wxWindowID id, const wxStr
 {
 	this->SetSizeHints( wxSize( 400,300 ), wxDefaultSize );
 
-    m_pCatalog = new wxGxCatalog();
+    m_pCatalog = new wxGxCatalogUI();
 	m_pCatalog->Init();
 
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
@@ -507,7 +507,10 @@ wxGxObjectDialog::~wxGxObjectDialog()
 	RemoveAllFilters();
 
     wxDELETE(m_pwxGxContentView);
+    
+    m_pCatalog->Detach();
     wxDELETE(m_pCatalog);
+
     wxDELETE(m_pConfig);
 }
 
@@ -654,7 +657,7 @@ void wxGxObjectDialog::OnInit()
 	m_pConfig = new wxGISAppConfig(OBJDLG_NAME, CONFIG_DIR);
 #endif
 
-    long nStyle = wxLC_REPORT | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxBORDER_THEME;
+    long nStyle = wxLC_LIST | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxBORDER_THEME;
 	if(!m_bAllowMultiSelect)
 		nStyle |= wxLC_SINGLE_SEL;
    	m_pwxGxContentView = new wxGxDialogContentView(this, LISTCTRLID, wxDefaultPosition, wxDefaultSize, nStyle);

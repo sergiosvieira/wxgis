@@ -19,7 +19,27 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
+
+#include "wx/intl.h"
+#include "wx/string.h"
+#include "wx/stattext.h"
+#include "wx/statline.h"
+#include "wx/gdicmn.h"
+#include "wx/font.h"
+#include "wx/colour.h"
+#include "wx/settings.h"
+#include "wx/textctrl.h"
+#include "wx/bitmap.h"
+#include "wx/image.h"
+#include "wx/icon.h"
+#include "wx/bmpbuttn.h"
+#include "wx/button.h"
+#include "wx/sizer.h"
+#include "wx/choice.h"
+#include "wx/panel.h"
+
 #include "wxgis/framework/framework.h"
+#include "wxgis/core/config.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISMiscPropertyPage
@@ -33,7 +53,46 @@ public:
 	~wxGISMiscPropertyPage();
     virtual bool Create(IApplication* application, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Misc_Panel"));
 //  IPropertyPage    
-    virtual wxString GetPageName(void){return wxString(_("Misc"));};
+    virtual wxString GetPageName(void){return wxString(_("Miscellaneous"));};
     virtual void Apply(void);
+    //
+    virtual void FillLangArray(wxString sPath);
+    //events
+    void OnOpenLocPath(wxCommandEvent& event);
+    void OnOpenSysPath(wxCommandEvent& event);
+    void OnOpenLogPath(wxCommandEvent& event);
 protected:
+	enum
+	{
+		ID_LOCPATH = 1000,
+		ID_OPENLOCPATH,
+		ID_LANGCHOICE,
+		ID_SYSPATH,
+		ID_OPENSYSPATH,
+		ID_LOGPATH,
+		ID_OPENLOGPATH,
+	};
+	
+	wxStaticText* m_staticText1;
+	wxTextCtrl* m_LocalePath;
+	wxBitmapButton* m_bpOpenLocPath;
+	wxStaticText* m_staticText2;
+	wxChoice* m_LangChoice;
+	wxStaticText* m_staticText3;
+	wxTextCtrl* m_SysPath;
+	wxBitmapButton* m_bpOpenSysPath;
+	wxStaticText* m_staticText4;
+	wxTextCtrl* m_LogPath;
+	wxBitmapButton* m_bpOpenLogPath;
+    wxCheckBox* m_checkDebug;
+	wxStaticBitmap* m_bitmapwarn;
+	wxStaticText* m_staticTextWarn;
+    wxStaticLine* m_staticline;
+
+    IApplication* m_pApp;
+    wxGISAppConfig* m_pGISConfig;
+    wxArrayString m_aLangs;
+    wxImageList m_ImageList;
+
+    DECLARE_EVENT_TABLE()
 };

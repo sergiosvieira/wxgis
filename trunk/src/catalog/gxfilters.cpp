@@ -399,14 +399,16 @@ bool wxGxFolderFilter::CanDisplayObject( IGxObject* pObject )
 	//IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
 	//if(pContainer)
 	//	return true;
-	wxGxFolder* pGxFolder = dynamic_cast<wxGxFolder*>(pObject);
-	if(!pGxFolder)
-		return false;
-    if(pObject->GetCategory() == wxString(_("Folder")))
-        return true;
     if(pObject->GetCategory() == wxString(wxT("Root")))
         return true;
-    if(pObject->GetCategory() == wxString(_("Folder Connection")))
+    if(pObject->GetCategory() == wxString(_("Folder connections")))
+        return true;
+	//wxGxFolder* pGxFolder = dynamic_cast<wxGxFolder*>(pObject);
+	//if(!pGxFolder)
+	//	return false;
+    if(pObject->GetCategory() == wxString(_("Folder")))
+        return true;
+    if(pObject->GetCategory() == wxString(_("Folder connection")))
         return true;
     return false;
 }

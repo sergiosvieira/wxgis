@@ -43,12 +43,12 @@ public:
     virtual size_t GetSubsetsCount(void);
     virtual wxGISDataset* GetSubset(size_t nIndex);
     virtual wxString GetName(void);
+	virtual OGRSpatialReference* GetSpatialReference(void);
 //wxGISFeatureDataset
 	virtual bool Open(int iLayer = 0);
 	virtual void Close(void);
 	virtual bool Delete(int iLayer = 0);
 	virtual bool Rename(wxString sNewName);
-	virtual OGRSpatialReference* GetSpatialReference(void);
 	virtual OGREnvelope* GetEnvelope(void);
     virtual OGRwkbGeometryType GetGeometryType(void);
     virtual OGRFeatureDefn* GetDefiniton(void);

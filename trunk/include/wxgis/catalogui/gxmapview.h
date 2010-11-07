@@ -21,6 +21,7 @@
 
 #pragma once
 #include "wxgis/catalogui/gxview.h"
+#include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/carto/mapview.h"
 
 class WXDLLIMPEXP_GIS_CLU wxGxMapView :
@@ -49,7 +50,7 @@ public:
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 private:
 	IGxSelection* m_pSelection;
-    IGxCatalog* m_pCatalog;
+    wxGxCatalogUI* m_pCatalog;
 	IGxObject* m_pParentGxObject;
 	IStatusBar* m_pStatusBar;
 	IApplication* m_pApp;

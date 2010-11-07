@@ -129,7 +129,8 @@ bool wxGISGeoprocessingCmd::GetEnabled(void)
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
 			{
-				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pCatalog->GetSelection();
                 for(size_t i = 0; i < pSel->GetCount(); i++)
                 {
                     IGxDataset* pDSet = dynamic_cast<IGxDataset*>(pSel->GetSelectedObjects(i));
@@ -182,7 +183,8 @@ void wxGISGeoprocessingCmd::OnClick(void)
 				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 				if(pGxApp)
 				{
-					IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                    wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+					IGxSelection* pSel = pCatalog->GetSelection();
                     for(size_t i = 0; i < pSel->GetCount(); i++)
                     {
                         IGxDataset* pGxDSet = dynamic_cast<IGxDataset*>(pSel->GetSelectedObjects(i));
@@ -456,7 +458,7 @@ EXIT:
                     dlg.AddFilter(new wxGxDXFFilter(), false);
 
                     dlg.AddShowFilter(new wxGxFolderFilter());
-                    //dlg.ShowCreateButton(true);
+                    dlg.ShowCreateButton(true);
                     if(dlg.ShowModal() == wxID_OK)
                     {
                         IGxObjectFilter* pFilter = dlg.GetCurrentFilter();

@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxtableview.h"
+#include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/datasource/featuredataset.h"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxTableView, wxGISTableView)
@@ -54,7 +55,8 @@ bool wxGxTableView::Activate(IGxApplication* application, wxXmlNode* pConf)
 	//if(m_pConnectionPointCatalog != NULL)
 	//	m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
-	m_pSelection = application->GetCatalog()->GetSelection();
+    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
+	m_pSelection = pGxCatalogUI->GetSelection();
 	return true;
 }
 
