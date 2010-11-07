@@ -21,9 +21,6 @@
 #include "wxgis/catalog/gxfolder.h"
 #include "wxgis/datasource/sysop.h"
 
-#include "../../art/folder_16.xpm"
-#include "../../art/folder_48.xpm"
-
 wxGxFolder::wxGxFolder(wxString Path, wxString Name) : m_bIsChildrenLoaded(false)
 {
 	m_sName = Name;
@@ -55,12 +52,6 @@ void wxGxFolder::EmptyChildren(void)
 {
 	for(size_t i = 0; i < m_Children.size(); i++)
 	{
-        if(m_pCatalog)
-        {
-            IGxSelection* pSel = m_pCatalog->GetSelection();
-            if(pSel)
-                m_pCatalog->GetSelection()->Unselect(m_Children[i], IGxSelection::INIT_ALL);
-        }
 		m_Children[i]->Detach();
 		wxDELETE( m_Children[i] );
 	}
@@ -96,16 +87,6 @@ void wxGxFolder::LoadChildren(void)
 	m_bIsChildrenLoaded = true;
 }
 
-wxIcon wxGxFolder::GetLargeImage(void)
-{
-	return wxIcon(folder_48_xpm);
-}
-
-wxIcon wxGxFolder::GetSmallImage(void)
-{
-	return wxIcon(folder_16_xpm);
-}
-
 bool wxGxFolder::Delete(void)
 {
     LoadChildren();
@@ -127,28 +108,27 @@ bool wxGxFolder::Delete(void)
         for(size_t i = 0; i < m_FileNames.size(); i++)
         {
             if(!DeleteFile(m_FileNames[i]))
-                wxLogError(_("Delete failed! File '%s'"), m_FileNames[i].c_str());
+            {
+                const char* err = CPLGetLastErrorMsg();
+                wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_FileNames[i].c_str());
+            }
         }
     }
     wxDELETE(pDir);
     //delete all dirs
 
-    //delete    
-    //int ret = VSIRmdir(wgWX2MB(m_sPath));//recursive!!!
-    //if(ret == 0)
-	if(wxFileName::Rmdir(m_sPath))//recursive del wil be in >= 2.9.0
+	if(DeleteDir(m_sPath))//recursive del wil be in >= 2.9.0
 	{
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
-		if(pGxObjectContainer == NULL)
-			return false;
-		return pGxObjectContainer->DeleteChild(this);		
+		if(pGxObjectContainer)
+    		return pGxObjectContainer->DeleteChild(this);		
 	}
 	else
     {
         const char* err = CPLGetLastErrorMsg();
         wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
-		return false;	
     }
+	return false;	
 }
 
 bool wxGxFolder::Rename(wxString NewName)
@@ -175,10 +155,6 @@ bool wxGxFolder::Rename(wxString NewName)
     }	
 }
 
-void wxGxFolder::EditProperties(wxWindow *parent)
-{
-}
-
 wxDirTraverseResult wxGxFolder::OnFile(const wxString& filename)
 {
 	m_FileNames.Add(filename);
@@ -200,4 +176,11 @@ bool wxGxFolder::DeleteChild(IGxObject* pChild)
 	if(bHasChildren != m_Children.size() > 0 ? true : false)
 		m_pCatalog->ObjectChanged(this);
 	return true;		
+}
+
+bool wxGxFolder::CanCreate(long nDataType, long DataSubtype)
+{
+    if(!wxFileName::IsDirWritable(m_sPath))
+        return false;
+    return true;
 }

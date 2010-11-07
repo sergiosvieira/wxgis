@@ -3,7 +3,7 @@
  * Purpose:  wxGxShapeFactory class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,20 +22,10 @@
 #include "wxgis/catalog/gxdataset.h"
 #include <wx/ffile.h>
 
-#include "../../art/shp_dset_16.xpm"
-#include "../../art/shp_dset_48.xpm"
-#include "../../art/dbf_dset_16.xpm"
-#include "../../art/dbf_dset_48.xpm"
-
-
 IMPLEMENT_DYNAMIC_CLASS(wxGxShapeFactory, wxObject)
 
 wxGxShapeFactory::wxGxShapeFactory(void)
 {
-    m_SmallSHPIcon = wxIcon(shp_dset_16_xpm);
-    m_LargeSHPIcon = wxIcon(shp_dset_48_xpm);
-    m_SmallDXFIcon = wxIcon(dbf_dset_16_xpm);
-    m_LargeDXFIcon = wxIcon(dbf_dset_48_xpm);
 }
 
 wxGxShapeFactory::~wxGxShapeFactory(void)
@@ -108,8 +98,7 @@ REMOVE:
 			wxString name = CI->first + wxT(".shp");
 			wxString path = CI->second.path + wxT(".shp");
 			//create shp
-			wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, enumVecESRIShapefile, m_LargeSHPIcon, m_SmallSHPIcon);
-			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+			pGxObj = GetGxDataset(path, name, enumGISFeatureDataset);
 		}
 		if(CI->second.bHasDbf && !CI->second.bHasShp)
 		{
@@ -117,8 +106,7 @@ REMOVE:
 			wxString path = CI->second.path + wxT(".dbf");
 
 			//create dbf
-			wxGxTableDataset* pDataset = new wxGxTableDataset(path, name, enumTableDBF, m_LargeDXFIcon, m_SmallDXFIcon);
-			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+			pGxObj = GetGxDataset(path, name, enumGISTableDataset);
 		}
 		if(CI->second.bHasPrj && !CI->second.bHasShp)
 		{
@@ -138,7 +126,7 @@ void wxGxShapeFactory::Serialize(wxXmlNode* pConfig, bool bStore)
     {
         if(pConfig->HasProp(wxT("factory_name")))
             pConfig->DeleteProperty(wxT("factory_name"));
-        pConfig->AddProperty(wxT("factory_name"), GetName());
+        pConfig->AddProperty(wxT("factory_name"), GetClassName());
         if(pConfig->HasProp(wxT("is_enabled")))
             pConfig->DeleteProperty(wxT("is_enabled"));
         pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));
@@ -147,5 +135,23 @@ void wxGxShapeFactory::Serialize(wxXmlNode* pConfig, bool bStore)
     {
         m_bIsEnabled = wxAtoi(pConfig->GetPropVal(wxT("is_enabled"), wxT("1")));
     }
+}
+
+IGxObject* wxGxShapeFactory::GetGxDataset(wxString path, wxString name, wxGISEnumDatasetType type)
+{
+    switch(type)
+    {
+    case enumGISFeatureDataset:
+        {
+	    wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, enumVecESRIShapefile);
+        return static_cast<IGxObject*>(pDataset);
+        }
+    case enumGISTableDataset:
+        {
+        wxGxTableDataset* pDataset = new wxGxTableDataset(path, name, enumTableDBF);
+        return static_cast<IGxObject*>(pDataset);
+        }
+    }
+    return NULL;
 }
 

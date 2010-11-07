@@ -3,7 +3,7 @@
  * Purpose:  wxGxFile classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@ wxGxFile::~wxGxFile(void)
 {
 }
 
-
 wxString wxGxFile::GetBaseName(void)
 {
     wxFileName FileName(m_sName);
@@ -49,26 +48,13 @@ wxString wxGxFile::GetBaseName(void)
 //class wxGxPrjFile
 //--------------------------------------------------------------
 
-wxGxPrjFile::wxGxPrjFile(wxString Path, wxString Name, wxGISEnumPrjFileType Type, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxFile(Path, Name)
+wxGxPrjFile::wxGxPrjFile(wxString Path, wxString Name, wxGISEnumPrjFileType nType) : wxGxFile(Path, Name)
 {
-    m_Type = Type;
-
-    m_oLargeIcon = LargeIcon;
-    m_oSmallIcon = SmallIcon;
+    m_Type = nType;
 }
 
 wxGxPrjFile::~wxGxPrjFile(void)
 {
-}
-
-wxIcon wxGxPrjFile::GetLargeImage(void)
-{
-    return m_oLargeIcon;
-}
-
-wxIcon wxGxPrjFile::GetSmallImage(void)
-{
-    return m_oSmallIcon;
 }
 
 bool wxGxPrjFile::Delete(void)
@@ -109,10 +95,6 @@ bool wxGxPrjFile::Rename(wxString NewName)
         wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;
     }	
-}
-
-void wxGxPrjFile::EditProperties(wxWindow *parent)
-{
 }
 
 OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
@@ -180,24 +162,12 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 //class wxGxTextFile
 //--------------------------------------------------------------
 
-wxGxTextFile::wxGxTextFile(wxString Path, wxString Name, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxFile(Path, Name)
+wxGxTextFile::wxGxTextFile(wxString Path, wxString Name) : wxGxFile(Path, Name)
 {
-    m_oLargeIcon = LargeIcon;
-    m_oSmallIcon = SmallIcon;
 }
 
 wxGxTextFile::~wxGxTextFile(void)
 {
-}
-
-wxIcon wxGxTextFile::GetLargeImage(void)
-{
-	return m_oLargeIcon;
-}
-
-wxIcon wxGxTextFile::GetSmallImage(void)
-{
-	return m_oSmallIcon;
 }
 
 bool wxGxTextFile::Delete(void)
@@ -241,6 +211,3 @@ bool wxGxTextFile::Rename(wxString NewName)
     }	
 }
 
-void wxGxTextFile::EditProperties(wxWindow *parent)
-{
-}

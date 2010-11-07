@@ -29,7 +29,7 @@
 #include "../../art/tool_16.xpm"
 #include "../../art/close_16a.xpm"
 #include "../../art/expand_16.xpm"
-#include "../../art/state_16.xpm"
+#include "../../art/state.xpm"
 
 //////////////////////////////////////////////////////////////////
 // wxGxTaskPanel
@@ -44,7 +44,7 @@ END_EVENT_TABLE()
 wxGxTaskPanel::wxGxTaskPanel(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxPanel(parent, id, pos, size, style), m_bExpand(false), m_nTaskThreadId(-1), m_pToolDialogPropNode(NULL), m_nState(enumGISMessageUnk)
 {
     m_ImageList.Create(16, 16);
-	m_ImageList.Add(wxBitmap(state_16_xpm));
+	m_ImageList.Add(wxBitmap(state_xpm));
 
     m_pMngr = pMngr;
     m_pTool = pTool;

@@ -3,7 +3,7 @@
  * Purpose:  wxGxMapInfoFactory class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,19 +22,10 @@
 #include "wxgis/catalog/gxdataset.h"
 #include <wx/ffile.h>
 
-#include "../../art/mi_dset_16.xpm"
-#include "../../art/mi_dset_48.xpm"
-#include "../../art/md_dset_16.xpm"
-#include "../../art/md_dset_48.xpm"
-
 IMPLEMENT_DYNAMIC_CLASS(wxGxMapInfoFactory, wxObject)
 
 wxGxMapInfoFactory::wxGxMapInfoFactory(void)
 {
-    m_SmallTabIcon = wxIcon(mi_dset_16_xpm);
-    m_LargeTabIcon = wxIcon(mi_dset_48_xpm);
-    m_SmallMifIcon = wxIcon(md_dset_16_xpm);
-    m_LargeMifIcon = wxIcon(md_dset_48_xpm);
 }
 
 wxGxMapInfoFactory::~wxGxMapInfoFactory(void)
@@ -115,8 +106,7 @@ REMOVE:
 			name = CI->first + wxT(".tab");
 			wxString path = CI->second.path + wxT(".tab");
 			//create tab
-			wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, enumVecMapinfoTab, m_LargeTabIcon, m_SmallTabIcon);
-			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+			pGxObj = GetGxDataset(path, name, enumVecMapinfoTab);
 		    if(pGxObj != NULL)
 			    pObjArray->push_back(pGxObj);
 		}
@@ -127,8 +117,7 @@ REMOVE:
 			name = CI->first + wxT(".mif");
 			wxString path = CI->second.path + wxT(".mif");
 			//create mif
-			wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, enumVecMapinfoMif, m_LargeMifIcon, m_SmallMifIcon);
-			pGxObj = dynamic_cast<IGxObject*>(pDataset);
+			pGxObj = GetGxDataset(path, name, enumVecMapinfoMif);
 		    if(pGxObj != NULL)
 			    pObjArray->push_back(pGxObj);
 		}
@@ -161,7 +150,7 @@ void wxGxMapInfoFactory::Serialize(wxXmlNode* pConfig, bool bStore)
     {
         if(pConfig->HasProp(wxT("factory_name")))
             pConfig->DeleteProperty(wxT("factory_name"));
-        pConfig->AddProperty(wxT("factory_name"), GetName());
+        pConfig->AddProperty(wxT("factory_name"), GetClassName());
         if(pConfig->HasProp(wxT("is_enabled")))
             pConfig->DeleteProperty(wxT("is_enabled"));
         pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));
@@ -170,5 +159,11 @@ void wxGxMapInfoFactory::Serialize(wxXmlNode* pConfig, bool bStore)
     {
         m_bIsEnabled = wxAtoi(pConfig->GetPropVal(wxT("is_enabled"), wxT("1")));
     }
+}
+
+IGxObject* wxGxMapInfoFactory::GetGxDataset(wxString path, wxString name, wxGISEnumVectorDatasetType type)
+{
+	wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, type);
+    return static_cast<IGxObject*>(pDataset);
 }
 

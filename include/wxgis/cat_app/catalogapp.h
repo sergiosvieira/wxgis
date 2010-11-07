@@ -25,12 +25,6 @@
 #include "wxgis/core/config.h"
 
 #include "wx/app.h"
-#include "wx/dir.h"
-#include "wx/filename.h"
-#include "wx/file.h"
-#include "wx/ffile.h"
-#include "wx/datetime.h"
-#include "wx/intl.h"
 
 class wxGISCatalogApp :
 	public wxApp
@@ -40,9 +34,6 @@ public:
 	~wxGISCatalogApp(void);
 	virtual bool OnInit();
 private:
-    wxLocale m_locale; // locale we'll be using
-	char* m_pszOldLocale;
-	wxFFile m_LogFile;
 	wxGISAppConfig* m_pConfig;
 };
 

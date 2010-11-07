@@ -20,7 +20,7 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/catalog/catalog.h"
+#include "wxgis/catalogui/catalogui.h"
 #include "wxgis/geoprocessing/gptoolmngr.h"
 #include "wxgis/core/config.h"
 

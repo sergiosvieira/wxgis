@@ -20,17 +20,13 @@
  ****************************************************************************/
 #include "wxgis/catalog/gxfilefactory.h"
 #include "wxgis/catalog/gxfile.h"
-#include <wx/tokenzr.h>
 
-#include "../../art/sr_16.xpm"
-#include "../../art/sr_48.xpm"
+#include "wx/tokenzr.h"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxFileFactory, wxObject)
 
 wxGxFileFactory::wxGxFileFactory(void)
 {
-    m_LargePRJIcon = wxIcon(sr_48_xpm);
-    m_SmallPRJIcon = wxIcon(sr_16_xpm);
 }
 
 wxGxFileFactory::~wxGxFileFactory(void)
@@ -61,14 +57,14 @@ bool wxGxFileFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames
 		if(ext == wxString(wxT("spr")))
 		{ 
             name += wxT(".") + ext;
-			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumSPRfile, m_LargePRJIcon, m_SmallPRJIcon);
+			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumSPRfile);
 			pGxObj = dynamic_cast<IGxObject*>(pFile);
 			goto REMOVE;
 		}
 		if(ext == wxString(wxT("prj")))
 		{
 			name += wxT(".") + ext;
-			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumESRIPrjFile, m_LargePRJIcon, m_SmallPRJIcon);
+			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumESRIPrjFile);
 			pGxObj = dynamic_cast<IGxObject*>(pFile);
 			goto REMOVE;
 		}
@@ -100,7 +96,7 @@ void wxGxFileFactory::Serialize(wxXmlNode* pConfig, bool bStore)
     {
         if(pConfig->HasProp(wxT("factory_name")))
             pConfig->DeleteProperty(wxT("factory_name"));
-        pConfig->AddProperty(wxT("factory_name"), GetName());    
+        pConfig->AddProperty(wxT("factory_name"), GetClassName());    
         if(pConfig->HasProp(wxT("is_enabled")))
             pConfig->DeleteProperty(wxT("is_enabled"));
         pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    

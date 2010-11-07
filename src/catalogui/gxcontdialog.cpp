@@ -25,17 +25,16 @@
 //////////////////////////////////////////////////////////////////////////////
 // wxTreeContainerView
 //////////////////////////////////////////////////////////////////////////////
-IMPLEMENT_DYNAMIC_CLASS(wxTreeContainerView, wxGxTreeViewBase)
+IMPLEMENT_DYNAMIC_CLASS(wxTreeContainerView, wxGxTreeView)
 
-BEGIN_EVENT_TABLE(wxTreeContainerView, wxGxTreeViewBase)
-    EVT_TREE_SEL_CHANGED(TREECTRLID, wxTreeContainerView::OnSelChanged)
+BEGIN_EVENT_TABLE(wxTreeContainerView, wxGxTreeView)
 END_EVENT_TABLE()
 
-wxTreeContainerView::wxTreeContainerView(void) : wxGxTreeViewBase()
+wxTreeContainerView::wxTreeContainerView(void) : wxGxTreeView()
 {
 }
 
-wxTreeContainerView::wxTreeContainerView(wxWindow* parent, wxWindowID id, long style) : wxGxTreeViewBase(parent, id, wxDefaultPosition, wxDefaultSize, style)
+wxTreeContainerView::wxTreeContainerView(wxWindow* parent, wxWindowID id, long style) : wxGxTreeView(parent, id, /*wxDefaultPosition, wxDefaultSize, */style)
 {
 }
 
@@ -54,59 +53,12 @@ void wxTreeContainerView::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent
 		for(size_t i = 0; i < m_ShowFilterArray.size(); i++)
 			if(m_ShowFilterArray[i]->CanDisplayObject(pGxObject))
                 goto ADD;
-        SetItemHasChildren(hParent, false);
         return;
 	}
 
 
 ADD:
-    IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pGxObject);
-	if(NULL == pContainer)
-		return;
-
-
-	IGxObjectUI* pObjUI =  dynamic_cast<IGxObjectUI*>(pGxObject);
-	wxIcon icon;
-	if(pObjUI != NULL)
-		icon = pObjUI->GetSmallImage();
-
-	int pos(-1);
-	if(icon.IsOk())
-    {
-        for(size_t i = 0; i < m_IconsArray.size(); i++)
-        {
-            if(m_IconsArray[i].oIcon.IsSameAs(icon))
-            {
-                pos = m_IconsArray[i].iImageIndex;
-                break;
-            }
-        }
-        if(pos == -1)
-        {
-            pos = m_TreeImageList.Add(icon);
-            ICONDATA myicondata = {icon, pos};
-            m_IconsArray.push_back(myicondata);
-        }
-    }
-	else
-		pos = 0;//m_ImageListSmall.Add(m_ImageListSmall.GetIcon(2));//0 col img, 1 - col img
-
-	wxGxTreeItemData* pData = new wxGxTreeItemData(pGxObject, pos, false);
-
-    wxString sName;
-    if(m_pCatalog->GetShowExt())
-        sName = pGxObject->GetName();
-    else
-        sName = pGxObject->GetBaseName();
-
-	wxTreeItemId NewTreeItem = AppendItem(hParent, sName, pos, -1, pData);
-	m_TreeMap[pGxObject] = NewTreeItem;
-
-	if(pContainer->AreChildrenViewable())
-		SetItemHasChildren(NewTreeItem);
-
-//	SortChildren(hParent);
-	wxTreeCtrl::Refresh();
+    wxGxTreeViewBase::AddTreeItem(pGxObject, hParent);
 }
 
 void wxTreeContainerView::AddShowFilter(IGxObjectFilter* pFilter)
@@ -132,22 +84,22 @@ bool wxTreeContainerView::CanChooseObject( IGxObject* pObject )
     return false;
 }
 
-void wxTreeContainerView::OnSelChanged(wxTreeEvent& event)
-{
-//    event.Skip();
-
-    wxArrayTreeItemIds treearray;
-    size_t count = GetSelections(treearray);
-    m_pSelection->Clear(GetId());
-    for(size_t i = 0; i < count; i++)
-    {
-	    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(treearray[i]);
-	    if(pData != NULL)
-	    {
-		    m_pSelection->Select(pData->m_pObject, true, GetId());
-	    }
-    }
-}
+//void wxTreeContainerView::OnSelChanged(wxTreeEvent& event)
+//{
+////    event.Skip();
+//
+//    wxArrayTreeItemIds treearray;
+//    size_t count = GetSelections(treearray);
+//    m_pSelection->Clear(GetId());
+//    for(size_t i = 0; i < count; i++)
+//    {
+//	    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(treearray[i]);
+//	    if(pData != NULL)
+//	    {
+//		    m_pSelection->Select(pData->m_pObject, true, GetId());
+//	    }
+//    }
+//}
 
 ////////////////////////////////////////////////////////////////////////////////
 //// wxGxContainerDialog
@@ -164,7 +116,7 @@ wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, wxWindowID id, const
 {
 	this->SetSizeHints( wxSize( 400,300 ), wxDefaultSize );
 
-    m_pCatalog = new wxGxCatalog();
+    m_pCatalog = new wxGxCatalogUI();
 	m_pCatalog->Init();
 
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
@@ -231,6 +183,7 @@ wxGxContainerDialog::~wxGxContainerDialog()
 
 	RemoveAllFilters();
 
+    m_pCatalog->Detach();
     wxDELETE(m_pCatalog);
     wxDELETE(m_pConfig);
 }
@@ -487,6 +440,8 @@ void wxGxContainerDialog::OnOK(wxCommandEvent& event)
 
 void wxGxContainerDialog::OnCreate(wxCommandEvent& event)
 {
+    //focus tree view
+    m_pTree->SetFocus();
     if(m_pCreateCmd)
         m_pCreateCmd->OnClick();
 }

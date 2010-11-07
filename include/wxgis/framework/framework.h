@@ -308,7 +308,12 @@ public:
 	virtual void RegisterChildWindow(wxWindow* pWnd) = 0;
 	virtual void UnRegisterChildWindow(wxWindow* pWnd) = 0;
 	virtual wxString GetAppName(void) = 0;
+	virtual wxString GetAppVersionString(void) = 0;
     virtual bool Create(IGISConfig* pConfig) = 0;
+    virtual bool SetupLog(wxString sLogPath) = 0;
+    virtual bool SetupLoc(wxString sLoc, wxString sLocPath) = 0;
+    virtual bool SetupSys(wxString sSysPath) = 0;
+    virtual void SetDebugMode(bool bDebugMode) = 0;
     //events
 	virtual void OnMouseDown(wxMouseEvent& event) = 0;
 	virtual void OnMouseUp(wxMouseEvent& event) = 0;

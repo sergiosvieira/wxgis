@@ -3,7 +3,7 @@
  * Purpose:  wxGxSpatialReferencesFolder class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,9 +26,10 @@
 #define GEOGCSSTR _("Geographic Coordinate Systems")
 #define PROJCSSTR _("Projected Coordinate Systems")
 
-
+/** \class wxGxSpatialReferencesFolder gxspatreffolder.h
+    \brief A spatial reference root GxObject.
+*/
 class WXDLLIMPEXP_GIS_CLT wxGxSpatialReferencesFolder :
-	public IGxObjectUI,
 	public IGxObjectContainer,
     public IGxRootObjectProperties,
     public wxObject
@@ -44,11 +45,6 @@ public:
 	virtual wxString GetPath(void){return m_sPath;};
 	virtual wxString GetCategory(void){return wxString(_("Coordinate Systems Folder"));};
 	virtual void Refresh(void);
-	//IGxObjectUI
-	virtual wxIcon GetLargeImage(void);
-	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxSpatialReferencesFolder.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxSpatialReferencesFolder.NewMenu"));};
 	//IGxObjectContainer
 	virtual bool DeleteChild(IGxObject* pChild);
 	virtual bool AreChildrenViewable(void){return true;};
@@ -65,10 +61,9 @@ protected:
 	bool m_bIsChildrenLoaded;
 };
 
-/////////////////////////////////////////////////////////////////////////
-// wxGxPrjFolder
-/////////////////////////////////////////////////////////////////////////
-
+/** \class wxGxPrjFolder gxspatreffolder.h
+    \brief A projections folder root GxObject.
+*/
 class WXDLLIMPEXP_GIS_CLT wxGxPrjFolder :
 	public wxGxArchiveFolder
 {
@@ -77,9 +72,6 @@ public:
 	virtual ~wxGxPrjFolder(void);
 	//IGxObject
 	virtual wxString GetCategory(void){return wxString(_("Coordinate Systems Folder"));};
-    //IGxObjectUI
-	virtual wxIcon GetLargeImage(void);
-	virtual wxIcon GetSmallImage(void);
 	//wxGxFolder
 	virtual void LoadChildren(void);
 };

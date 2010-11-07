@@ -3,7 +3,7 @@
  * Purpose:  wxGxFileFactory class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 #include "wxgis/catalog/catalog.h"
 
-class wxGxFileFactory :
+class WXDLLIMPEXP_GIS_CLT wxGxFileFactory :
 	public IGxObjectFactory,
 	public wxObject
 {
@@ -37,5 +37,4 @@ public:
     virtual wxString GetName(void){return wxString(_("Files"));};
 protected:
     wxArrayString m_ExtArray;
-    wxIcon m_LargePRJIcon, m_SmallPRJIcon;
 };

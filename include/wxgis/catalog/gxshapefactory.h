@@ -3,7 +3,7 @@
  * Purpose:  wxGxShapeFactory class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,7 +22,10 @@
 
 #include "wxgis/catalog/catalog.h"
 
-class wxGxShapeFactory :
+/** \class wxGxShapeFactory gxshapefactory.h
+    \brief A shape file GxObject factory.
+*/
+class WXDLLIMPEXP_GIS_CLT wxGxShapeFactory :
 	public IGxObjectFactory,
 	public wxObject
 {
@@ -35,12 +38,11 @@ public:
     virtual void Serialize(wxXmlNode* pConfig, bool bStore);
 	virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
     virtual wxString GetName(void){return wxString(_("Shapefiles"));};
+    //wxGxShapeFactory
+    virtual IGxObject* GetGxDataset(wxString path, wxString name, wxGISEnumDatasetType type);
 
 	typedef struct _data{
 		wxString path;
 		int bHasShp, bHasDbf, bHasPrj;
 	}DATA;
-protected:
-    wxIcon m_LargeSHPIcon, m_SmallSHPIcon;
-    wxIcon m_LargeDXFIcon, m_SmallDXFIcon;
 };

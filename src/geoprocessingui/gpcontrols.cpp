@@ -24,7 +24,7 @@
 #include "wx/dnd.h"
 #include "wx/valgen.h"
 
-#include "../../art/state_16.xpm"
+#include "../../art/state.xpm"
 #include "../../art/open.xpm"
 
 #include "wxgis/framework/messagedlg.h"
@@ -37,7 +37,7 @@ wxGISDTBase::wxGISDTBase( IGPParameter* pParam, wxWindow* parent, wxWindowID id,
     m_pParam = pParam;
 
 	m_ImageList.Create(16, 16);
-	m_ImageList.Add(wxBitmap(state_16_xpm));
+	m_ImageList.Add(wxBitmap(state_xpm));
 }
 
 wxGISDTBase::~wxGISDTBase()

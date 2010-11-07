@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxapplication.h"
 #include "wxgis/catalogui/customizedlg.h"
-#include "wxgis/catalog/gxcatalog.h"
+#include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/framework/toolbarmenu.h"
 
 //-----------------------------------------------
@@ -35,6 +35,7 @@ wxGxApplication::wxGxApplication(wxWindow* parent, wxWindowID id, const wxString
 wxGxApplication::~wxGxApplication(void)
 {
     m_mgr.UnInit();
+    m_pCatalog->Detach();
 	wxDELETE(m_pCatalog);
 }
 
@@ -210,13 +211,12 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
 
     wxGISApplication::Create(pConfig);
 
-	wxLogMessage(_("wxGxApplication: Creating main application frame..."));
+	wxLogMessage(_("wxGxApplication: Start. Creating main application frame..."));
 
 	m_mgr.SetManagedWindow(this);
 
-	wxGxCatalog* pCatalog = new wxGxCatalog();
-	pCatalog->Init();
-	m_pCatalog = static_cast<IGxCatalog*>(pCatalog);
+	m_pCatalog = new wxGxCatalogUI();
+	m_pCatalog->Init();
 
 	wxXmlNode* pViewsNode = m_pConfig->GetConfigNode(wxString(wxT("frame/views")), true, true);
 
@@ -391,6 +391,30 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
     }
 
  	SerializeGxFramePos(true);
+}
+
+bool wxGxApplication::SetupSys(wxString sSysPath)
+{
+    if(!wxGISApplication::SetupSys(sSysPath))
+        return false;
+    CPLSetConfigOption("GDAL_DATA", wgWX2MB( (sSysPath + wxFileName::GetPathSeparator() + wxString(wxT("gdal")) + wxFileName::GetPathSeparator()).c_str() ) );
+    return true;
+}
+
+void wxGxApplication::SetDebugMode(bool bDebugMode)
+{
+	CPLSetConfigOption("CPL_DEBUG", bDebugMode == true ? "ON" : "OFF");
+	CPLSetConfigOption("CPL_TIMESTAMP", "ON");
+	CPLSetConfigOption("CPL_LOG_ERRORS", bDebugMode == true ? "ON" : "OFF");
+}
+
+bool wxGxApplication::SetupLog(wxString sLogPath)
+{
+    if(!wxGISApplication::SetupLog(sLogPath))
+        return false;
+	wxString sCPLLogPath = sLogPath + wxFileName::GetPathSeparator() + wxString(wxT("gdal_log_cat.txt"));
+	CPLSetConfigOption("CPL_LOG", wgWX2MB(sCPLLogPath.c_str()) );
+    return true;
 }
 
 

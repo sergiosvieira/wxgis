@@ -21,6 +21,7 @@
 #pragma once
 
 #include "wxgis/catalogui/gxview.h"
+#include "wxgis/catalogui/gxcatalogui.h"
 
 #include "wx/treectrl.h"
 #include "wx/imaglist.h"
@@ -100,7 +101,7 @@ protected:
 	IConnectionPointContainer* m_pConnectionPointCatalog, *m_pConnectionPointSelection;
 	long m_ConnectionPointCatalogCookie, m_ConnectionPointSelectionCookie;
 	IGxSelection* m_pSelection;
-    IGxCatalog* m_pCatalog;
+    wxGxCatalogUI* m_pCatalog;
     ICommand* m_pDeleteCmd;
     std::vector<ICONDATA> m_IconsArray;
 
@@ -128,7 +129,7 @@ public:
 	virtual void OnBeginDrag(wxTreeEvent& event);
 	virtual void OnActivated(wxTreeEvent& event);
 
-    virtual void BeginRename(void);
+    virtual void BeginRename(IGxObject* pGxObject = NULL);
 
     DECLARE_EVENT_TABLE()
 };

@@ -3,7 +3,7 @@
  * Purpose:  wxGxKMLDataset class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,18 +22,16 @@
 
 #include "wxgis/catalog/catalog.h"
 
-//--------------------------------------------------------------
-//class wxGxKMLDataset
-//--------------------------------------------------------------
-
+/** \class wxGxKMLDataset gxkmldataset.h
+    \brief A kml GxObject.
+*/
 class WXDLLIMPEXP_GIS_CLT wxGxKMLDataset :
-	public IGxObjectUI,
 	public IGxObjectEdit,
     public IGxObjectContainer,
 	public IGxDataset
 {
 public:
-	wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type);
 	virtual ~wxGxKMLDataset(void);
     virtual void SetEncoding(wxFontEncoding Encoding);
 	//IGxObject
@@ -41,17 +39,11 @@ public:
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void);
 	virtual wxString GetCategory(void);
-	//IGxObjectUI
-	virtual wxIcon GetLargeImage(void);
-	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxShapefileDataset.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxKMLDataset.NewMenu"));};
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
-	virtual void EditProperties(wxWindow *parent);
 	//IGxDataset
     virtual wxGISDataset* GetDataset(void);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISContainer;};
@@ -73,32 +65,23 @@ protected:
 	wxGISEnumVectorDatasetType m_type;
     wxMBConv* m_pPathEncoding;
     bool m_bIsChildrenLoaded;
-    wxIcon m_LargeIcon, m_SmallIcon;
-    wxIcon m_LargeSubIcon, m_SmallSubIcon;
 };
 
-//--------------------------------------------------------------
-//class wxGxKMLSubDataset
-//--------------------------------------------------------------
-
+/** \class wxGxKMLSubDataset gxkmldataset.h
+    \brief A kml layer GxObject.
+*/
 class WXDLLIMPEXP_GIS_CLT wxGxKMLSubDataset :
 	public IGxObject,
-	public IGxObjectUI,
 	public IGxDataset
 {
 public:
-	wxGxKMLSubDataset(wxString sName, wxGISDataset* pwxGISDataset, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxKMLSubDataset(wxString sName, wxGISDataset* pwxGISDataset, wxGISEnumVectorDatasetType nType);
 	virtual ~wxGxKMLSubDataset(void);
     virtual void SetEncoding(wxFontEncoding Encoding);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void){return GetName();};
 	virtual wxString GetCategory(void);
-	//IGxObjectUI
-	virtual wxIcon GetLargeImage(void);
-	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxKMLSubDataset.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxEmptyString;};
 	//IGxDataset
 	virtual wxGISDataset* GetDataset(void);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
@@ -112,5 +95,4 @@ protected:
 	wxGISDataset* m_pwxGISDataset;
 	wxGISEnumVectorDatasetType m_type;
     wxMBConv* m_pPathEncoding;
-    wxIcon m_LargeIcon, m_SmallIcon;
 };

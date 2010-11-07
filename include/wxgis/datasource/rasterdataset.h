@@ -3,7 +3,7 @@
  * Purpose:  RasterDataset class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -36,11 +36,12 @@ public:
 	virtual ~wxGISRasterDataset(void);
     // wxGISDataset
 	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
+	virtual OGRSpatialReference* GetSpatialReference(void);
+    virtual wxString GetName(void);
     // wxGISRasterDataset
 	virtual bool Open(void);
 	virtual bool Rename(wxString sNewName);
 	virtual void Close(void);
-	virtual OGRSpatialReference* GetSpatialReference(void);
 	virtual const OGREnvelope* GetEnvelope(void);
 	virtual GDALDataset* GetRaster(void){return m_poDataset;};
 	virtual GDALDataset* GetMainRaster(void){return m_poMainDataset;};
@@ -48,6 +49,7 @@ public:
 	virtual void SetHasOverviews(bool bVal){m_bHasOverviews = bVal;};
     virtual int GetWidth(void){return m_nXSize;};
     virtual int GetHeight(void){return m_nYSize;};
+    virtual int GetBandCount(void){return m_nBandCount;};
     virtual bool Delete(void);
 protected:
 	OGREnvelope* m_psExtent;
@@ -58,5 +60,6 @@ protected:
     bool m_bHasOverviews;
 	int m_nXSize;
 	int m_nYSize;
+	int m_nBandCount;
     wxCriticalSection m_CritSect;
 };

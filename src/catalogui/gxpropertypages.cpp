@@ -40,7 +40,7 @@ bool wxGISCatalogGeneralPropertyPage::Create(IApplication* application, wxWindow
     IGxApplication* pGxApplication = dynamic_cast<IGxApplication*>(application);
     if(!pGxApplication)
         return false;
-    m_pCatalog = pGxApplication->GetCatalog();
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApplication->GetCatalog());
     if(!m_pCatalog)
         return false;
 
@@ -60,14 +60,16 @@ bool wxGISCatalogGeneralPropertyPage::Create(IApplication* application, wxWindow
     {
         IGxObject* pGxObj = pRootItems->operator[](i);
         wxString sName = pGxObj->GetName();
-        m_pRootItems->InsertItem(sName, 1);
+        int nPos = m_pRootItems->InsertItem(sName, 1);
+        m_pRootItems->SetItemData(nPos, (long)pGxObj);
     }
     pRootItems = m_pCatalog->GetDisabledRootItems();
     for(size_t i = 0; i < pRootItems->size(); i++)
     {
         IGxObject* pGxObj = pRootItems->operator[](i);
         wxString sName = pGxObj->GetName();
-        m_pRootItems->InsertItem(sName, 0);
+        int nPos = m_pRootItems->InsertItem(sName, 0);
+        m_pRootItems->SetItemData(nPos, (long)pGxObj);
     }
 
 	sbRootSizer->Add( m_pRootItems, 1, wxALL | wxEXPAND, 5 );
@@ -95,7 +97,8 @@ bool wxGISCatalogGeneralPropertyPage::Create(IApplication* application, wxWindow
     {
         IGxObjectFactory* pGxObjectFactory = pFactories->operator[](i);
         wxString sName = pGxObjectFactory->GetName();
-        m_pFactoryItems->InsertItem(sName, pGxObjectFactory->GetEnabled());
+        long nPos = m_pFactoryItems->InsertItem(sName, pGxObjectFactory->GetEnabled());
+        m_pFactoryItems->SetItemData(nPos, (long)pGxObjectFactory);
     }
 
     sbFactorySizer->Add( m_pFactoryItems, 1, wxALL|wxEXPAND, 5 );
@@ -136,12 +139,39 @@ void wxGISCatalogGeneralPropertyPage::Apply(void)
     bool bOpenLast = m_checkBoxLast->GetValue();
     bool bHideExt = m_checkBoxHideExt->GetValue();
     bool bShowHidden = m_checkBoxHidden->GetValue();
+    bool bHaveChanges = bHideExt == m_pCatalog->GetShowExt() || bOpenLast != m_pCatalog->GetOpenLastPath() || bShowHidden != m_pCatalog->GetShowHidden();
 
     m_pCatalog->SetShowExt(!bHideExt);
     m_pCatalog->SetShowHidden(bShowHidden);
     m_pCatalog->SetOpenLastPath(bOpenLast);
 
-    IGxObject* pGxObj =  m_pCatalog->GetSelection()->GetLastSelectedObject();
-    if(pGxObj)
-        pGxObj->Refresh();
+    //update object factories
+    for(size_t i = 0; i < m_pFactoryItems->GetItemCount(); i++)
+    {
+        if(m_pFactoryItems->IsItemChanged(i))
+        {
+            if(!bHaveChanges)
+                bHaveChanges = true;
+            IGxObjectFactory* pGxObjectFactory = (IGxObjectFactory*)m_pFactoryItems->GetItemData(i);
+            pGxObjectFactory->SetEnabled(m_pFactoryItems->GetItemCheckState(i));
+        }
+    }
+
+    if(bHaveChanges)
+    {
+        IGxObject* pGxObj =  m_pCatalog->GetSelection()->GetLastSelectedObject();
+        if(pGxObj)
+            pGxObj->Refresh();
+    }
+
+    //update root items
+    for(size_t i = 0; i < m_pRootItems->GetItemCount(); i++)
+    {
+        if(m_pRootItems->IsItemChanged(i))
+        {
+            IGxObject* pGxObject = (IGxObject*)m_pRootItems->GetItemData(i);
+            bool bChecked = m_pRootItems->GetItemCheckState(i);
+            m_pCatalog->EnableRootItem(pGxObject, bChecked);
+        }
+    }
 }

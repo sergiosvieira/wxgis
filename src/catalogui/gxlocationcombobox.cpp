@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxlocationcombobox.h"
+#include "wxgis/catalogui/gxcatalogui.h"
 
 BEGIN_EVENT_TABLE(wxGxLocationComboBox, wxComboBox)
 	EVT_TEXT_ENTER(wxID_ANY, wxGxLocationComboBox::OnTextEnter)
@@ -38,7 +39,7 @@ void wxGxLocationComboBox::OnTextEnter(wxCommandEvent& event)
 	wxGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(m_pApp);
 	if(pGxApp)
 	{
-		IGxCatalog* pCatalog = pGxApp->GetCatalog();
+		wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 		if(pCatalog)
 		{
 			pCatalog->SetLocation(GetValue());
@@ -73,7 +74,8 @@ void wxGxLocationComboBox::Activate(IApplication* pApp)
 {
 	m_pApp = pApp;
 	wxGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(pApp);
-	m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( pGxApp->GetCatalog()->GetSelection() );
+    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+	m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( pGxCatalogUI->GetSelection() );
 	if(m_pConnectionPointSelection != NULL)
 		m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
 }

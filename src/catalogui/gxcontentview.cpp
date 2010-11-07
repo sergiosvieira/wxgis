@@ -173,7 +173,7 @@ bool wxGxContentView::Activate(IGxApplication* application, wxXmlNode* pConf)
 	wxGxView::Activate(application, pConf);
 	Serialize(m_pXmlConf, false);
 
-    m_pCatalog = application->GetCatalog();
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
 
     IApplication* pApp = dynamic_cast<IApplication*>(application);
     if(pApp)
@@ -819,8 +819,20 @@ void wxGxContentView::OnChar(wxKeyEvent& event)
 }
 
 
-void wxGxContentView::BeginRename(void)
+void wxGxContentView::BeginRename(IGxObject* pGxObject)
 {
+	for(long i = 0; i < GetItemCount(); i++)
+	{
+		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
+		if(pItemData == NULL)
+			continue;
+		if(pItemData->pObject == pGxObject)
+        {
+            SetItemState(i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+            m_pSelection->Select(pGxObject, true, NOTFIRESELID);
+            break;
+        }
+    }
 
     int nItem = GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
     if ( nItem == -1 )

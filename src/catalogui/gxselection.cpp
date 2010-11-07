@@ -18,7 +18,7 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#include "wxgis/catalog/gxselection.h"
+#include "wxgis/catalogui/gxselection.h"
 
 wxGxSelection::wxGxSelection(void) : m_Pos(-1), m_bDoOp(false), m_currentInitiator(-1)
 {

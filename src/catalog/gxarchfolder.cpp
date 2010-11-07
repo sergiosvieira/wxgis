@@ -21,9 +21,6 @@
 #include "wxgis/catalog/gxarchfolder.h"
 #include "wxgis/datasource/sysop.h"
 
-#include "../../art/folder_arch_16.xpm"
-#include "../../art/folder_arch_48.xpm"
-
 #include "cpl_vsi_virtual.h"
 
 /////////////////////////////////////////////////////////////////////////
@@ -39,16 +36,6 @@ wxGxArchive::~wxGxArchive(void)
 {
 }
 
-wxIcon wxGxArchive::GetLargeImage(void)
-{
-	return wxIcon(folder_arch_48_xpm);
-}
-
-wxIcon wxGxArchive::GetSmallImage(void)
-{
-	return wxIcon(folder_arch_16_xpm);
-}
-
 wxString wxGxArchive::GetBaseName(void)
 {
     wxFileName FileName(m_sName);
@@ -60,8 +47,6 @@ void wxGxArchive::LoadChildren(void)
 {
 	if(m_bIsChildrenLoaded)
 		return;
-
-    wxBusyCursor wait;
 
     wxString sArchPath = m_sType + m_sPath;//wxT("/vsizip/") + wxT("/");
     CPLString soArchPath(wgWX2MB(sArchPath));
@@ -167,10 +152,6 @@ bool wxGxArchive::Rename(wxString NewName)
     }	
 }
 
-void wxGxArchive::EditProperties(wxWindow *parent)
-{
-}
-
 /////////////////////////////////////////////////////////////////////////
 // wxGxArchiveFolder
 /////////////////////////////////////////////////////////////////////////
@@ -183,22 +164,11 @@ wxGxArchiveFolder::~wxGxArchiveFolder(void)
 {
 }
 
-wxIcon wxGxArchiveFolder::GetLargeImage(void)
-{
-	return wxIcon(folder_arch_48_xpm);
-}
-
-wxIcon wxGxArchiveFolder::GetSmallImage(void)
-{
-	return wxIcon(folder_arch_16_xpm);
-}
-
 void wxGxArchiveFolder::LoadChildren(void)
 {
 	if(m_bIsChildrenLoaded)
 		return;
 
-    wxBusyCursor wait;
     //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
     //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
 

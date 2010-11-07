@@ -50,7 +50,7 @@ BEGIN_EVENT_TABLE(wxGISApplication, wxFrame)
     EVT_CLOSE(wxGISApplication::OnClose)
 END_EVENT_TABLE()
 
-wxGISApplication::wxGISApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style), m_pGISAcceleratorTable(NULL), m_pMenuBar(NULL), m_CurrentTool(NULL), m_pDropDownCommand(NULL), m_pTrackCancel(NULL)
+wxGISApplication::wxGISApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style), m_pGISAcceleratorTable(NULL), m_pMenuBar(NULL), m_CurrentTool(NULL), m_pDropDownCommand(NULL), m_pTrackCancel(NULL), m_pszOldLocale(NULL), m_pLocale(NULL)
 {
 }
 
@@ -58,6 +58,11 @@ wxGISApplication::~wxGISApplication(void)
 {
     for(size_t i = 0; i < m_LibArr.size(); i++)
 		wxDELETE(m_LibArr[i]);
+
+    if(m_pszOldLocale != NULL)
+		setlocale(LC_NUMERIC, m_pszOldLocale);
+    wxDELETE(m_pLocale);
+	wxDELETE(m_pszOldLocale);
 }
 
 ICommand* wxGISApplication::GetCommand(long CmdID)
@@ -842,3 +847,128 @@ void wxGISApplication::OnAppOptions(void)
         }
     }    
 }
+
+bool wxGISApplication::SetupLog(wxString sLogPath)
+{
+	if(sLogPath.IsEmpty())
+	{
+		wxLogError(_("wxGISApplication: Failed to get log folder"));
+        return false;
+	}
+
+	if(!wxDirExists(sLogPath))
+		wxFileName::Mkdir(sLogPath, 0777, wxPATH_MKDIR_FULL);
+
+
+	wxDateTime dt(wxDateTime::Now());
+	wxString logfilename = sLogPath + wxFileName::GetPathSeparator() + wxString::Format(wxT("log_%.4d%.2d%.2d.log"),dt.GetYear(), dt.GetMonth() + 1, dt.GetDay());
+
+    if(m_LogFile.IsOpened())
+        m_LogFile.Close();
+
+	if(!m_LogFile.Open(logfilename.GetData(), wxT("a+")))
+		wxLogError(_("wxGISApplication: Failed to open log file %s"), logfilename.c_str());
+
+	wxLog::SetActiveTarget(new wxLogStderr(m_LogFile.fp()));
+
+#ifdef WXGISPORTABLE
+	wxLogMessage(wxT("Portable"));
+#endif
+	wxLogMessage(wxT(" "));
+	wxLogMessage(wxT("####################################################################"));
+	wxLogMessage(wxT("##                    %s                    ##"),wxNow().c_str());
+	wxLogMessage(wxT("####################################################################"));
+	long dFreeMem =  (long)(wxGetFreeMemory().ToLong() / 1048576);
+	wxLogMessage(_("HOST '%s': OS desc - %s, free memory - %u Mb"), wxGetFullHostName().c_str(), wxGetOsDescription().c_str(), dFreeMem);
+	wxLogMessage(_("wxGISApplication: %s %s is initializing..."), GetAppName(), GetAppVersionString());
+	wxLogMessage(_("wxGISApplication: Log file: %s"), logfilename.c_str());
+
+    return true;
+}
+
+bool wxGISApplication::SetupSys(wxString sSysPath)
+{
+	//setup sys dir
+	if(!wxDirExists(sSysPath))
+	{
+		wxLogError(wxString::Format(_("wxGISCatalogApp: System folder is absent! Lookup path '%s'"), sSysPath.c_str()));
+		return false;
+	}
+    return true;
+}
+
+bool wxGISApplication::SetupLoc(wxString sLoc, wxString sLocPath)
+{
+    wxLogMessage(_("wxGISApplication: Initialize locale"));
+
+    if(m_pszOldLocale != NULL)
+		setlocale(LC_NUMERIC, m_pszOldLocale);
+	wxDELETE(m_pszOldLocale);
+    wxDELETE(m_pLocale);
+
+	//init locale
+    if ( !sLoc.IsEmpty() )
+    {
+		int iLocale(0);
+		const wxLanguageInfo* loc_info = wxLocale::FindLanguageInfo(sLoc);
+		if(loc_info != NULL)
+		{
+			iLocale = loc_info->Language;
+			wxLogMessage(_("wxGISApplication: Language is set to %s"), loc_info->Description.c_str());
+		}
+
+        // don't use wxLOCALE_LOAD_DEFAULT flag so that Init() doesn't return
+        // false just because it failed to load wxstd catalog
+
+        m_pLocale = new wxLocale();
+        if ( !m_pLocale->Init(iLocale, wxLOCALE_CONV_ENCODING) )
+        {
+            wxLogError(wxT("wxGISApplication: This language is not supported by the system."));
+            return false;
+        }
+    }
+
+	//m_locale.Init(wxLANGUAGE_DEFAULT);
+
+    // normally this wouldn't be necessary as the catalog files would be found
+    // in the default locations, but when the program is not installed the
+    // catalogs are in the build directory where we wouldn't find them by
+    // default
+	wxString sLocalePath = sLocPath + wxFileName::GetPathSeparator() + sLoc;
+	if(wxDirExists(sLocalePath))
+	{
+		wxLocale::AddCatalogLookupPathPrefix(sLocalePath);
+
+		// Initialize the catalogs we'll be using
+		//load multicat from locale
+		wxArrayString trans_arr;
+		wxDir::GetAllFiles(sLocalePath, &trans_arr, wxT("*_cat.mo"));
+
+		for(size_t i = 0; i < trans_arr.size(); i++)
+		{
+			wxFileName name(trans_arr[i]);
+			m_pLocale->AddCatalog(name.GetName());
+		}
+
+		// this catalog is installed in standard location on Linux systems and
+		// shows that you may make use of the standard message catalogs as well
+		//
+		// if it's not installed on your system, it is just silently ignored
+	#ifdef __LINUX__
+		{
+			wxLogNull noLog;
+			m_pLocale->AddCatalog(_T("fileutils"));
+		}
+	#endif
+	}
+
+	//support of dot in doubles and floats
+	m_pszOldLocale = strdup(setlocale(LC_NUMERIC, NULL));
+    if( setlocale(LC_NUMERIC,"C") == NULL )
+        m_pszOldLocale = NULL;
+
+    return true;
+}
+
+
+

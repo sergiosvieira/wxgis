@@ -54,6 +54,7 @@ wxGISSimpleTextPanel::~wxGISSimpleTextPanel()
 
 wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
+    IApplication* pApp = dynamic_cast<IApplication*>(parent);
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 
     wxColour BackColor( 255, 255, 255 );
@@ -67,7 +68,7 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
 	
 	bHeadSizer->Add( m_bitmap, 0, 0, 5 );
 	
-	m_title = new wxStaticText( this, wxID_ANY, wxString::Format(_("\nwxGIS [%s]\nVersion: %s"), APP_NAME, APP_VER), wxDefaultPosition, wxDefaultSize, 0 );
+	m_title = new wxStaticText( this, wxID_ANY, wxString::Format(_("\nwxGIS [%s]\nVersion: %s"), pApp->GetAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0 );
     wxFont titleFont = this->GetFont();
     titleFont.SetWeight(wxFONTWEIGHT_BOLD);
     m_title->SetFont(titleFont);
@@ -89,7 +90,7 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
 
 	m_AuiNotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE );
 
-    wxString sAboutApp = wxString::Format(_("wxGIS [%s]\n\nVersion: %s\n\n(c) 2009-2010 Dmitry Barishnikov (Bishop)"), APP_NAME, APP_VER);
+    wxString sAboutApp = wxString::Format(_("wxGIS [%s]\n\nVersion: %s\n\n(c) 2009-2010 Dmitry Barishnikov (Bishop)"), pApp->GetAppName(), pApp->GetAppVersionString());
 	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutApp, m_AuiNotebook), _("About application"));
 
     long dFreeMem =  (long)(wxGetFreeMemory().ToLong() / 1048576);

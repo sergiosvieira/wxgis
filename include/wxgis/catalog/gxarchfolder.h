@@ -34,17 +34,11 @@ public:
 	//IGxObject
     virtual wxString GetBaseName(void);
 	virtual wxString GetCategory(void){return wxString(_("Archive"));};
-    //IGxObjectUI
-	virtual wxIcon GetLargeImage(void);
-	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxArchive.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxArchive.NewMenu"));};
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
-	virtual void EditProperties(wxWindow *parent);
 	//wxGxFolder
 	virtual void LoadChildren(void);
 protected:
@@ -63,11 +57,6 @@ public:
 	virtual ~wxGxArchiveFolder(void);
 	//IGxObject
 	virtual wxString GetCategory(void){return wxString(_("Archive folder"));};
-    //IGxObjectUI
-	virtual wxIcon GetLargeImage(void);
-	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxArchiveFolder.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxArchiveFolder.NewMenu"));};
 	//wxGxFolder
 	virtual void LoadChildren(void);
 	//IGxObjectEdit unsupported yet

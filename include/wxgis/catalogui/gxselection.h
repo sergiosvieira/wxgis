@@ -20,13 +20,13 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/catalog/catalog.h"
+#include "wxgis/catalogui/catalogui.h"
 
 // ----------------------------------------------------------------------------
 // wxGxSelection
 // ----------------------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CLT wxGxSelection :
+class WXDLLIMPEXP_GIS_CLU wxGxSelection :
 	public IConnectionPointContainer,
 	public IGxSelection
 {

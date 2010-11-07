@@ -30,6 +30,7 @@
 #include "wxgis/framework/messagedlg.h"
 
 #include "wxgis/datasource/datasource.h"
+#include "wxgis/datasource/datacontainer.h"
 
 #include <wx/dirdlg.h>
 #include <wx/file.h>
@@ -50,6 +51,7 @@
 #include "../../art/view-refresh.xpm"
 #include "../../art/go-previous.xpm"
 #include "../../art/go-next.xpm"
+#include "../../art/properties.xpm"
 
 
 //	0	Up One Level
@@ -62,14 +64,13 @@
 //  7   Create Folder
 //	8	Rename
 //	9	Refresh
-//  10  ?
+//  10  Properties
+//  11  ?
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogMainCmd, wxObject)
 
 wxGISCatalogMainCmd::wxGISCatalogMainCmd(void)
 {
-    m_CreateTypesArray.Add(wxString(_("Folder")));
-    m_CreateTypesArray.Add(wxString(_("Folder Connection")));
 }
 
 wxGISCatalogMainCmd::~wxGISCatalogMainCmd(void)
@@ -98,6 +99,8 @@ wxIcon wxGISCatalogMainCmd::GetBitmap(void)
 			return wxIcon(edit_xpm);
 		case 9:
 			return wxIcon(view_refresh_xpm);
+		case 10:
+			return wxIcon(properties_xpm);
 		case 3:
 		default:
 			return wxNullIcon;
@@ -128,6 +131,8 @@ wxString wxGISCatalogMainCmd::GetCaption(void)
 			return wxString(_("Rename"));
 		case 9:	
 			return wxString(_("Refresh"));
+		case 10:	
+			return wxString(_("Properties"));
 		default:
 			return wxEmptyString;
 	}
@@ -150,6 +155,8 @@ wxString wxGISCatalogMainCmd::GetCategory(void)
 			return wxString(_("New"));
 		case 8:	
 			return wxString(_("Edit"));
+		case 10:	
+			return wxString(_("Miscellaneous"));
 		default:
 			return wxString(_("[No category]"));
 	}
@@ -170,7 +177,8 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
 			{
-				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
 				if(pSel->GetCount() == 0)
 					return false;
 				IGxObject* pGxObject = pSel->GetSelectedObjects(0);
@@ -190,7 +198,8 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
 			{
-				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
 				if(pSel->GetCount() == 0)
 					return false;
 				IGxObject* pGxObject = pSel->GetSelectedObjects(0);
@@ -206,7 +215,8 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
 			{
-				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
                 for(size_t i = 0; i < pSel->GetCount(); i++)
                 {
                     IGxObject* pGxObject = pSel->GetSelectedObjects(i);
@@ -225,7 +235,8 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
                 IGxCatalog* pCatalog = pGxApp->GetCatalog();
                 if(pCatalog)
                 {
-                    IGxSelection* pSel = pCatalog->GetSelection();
+                    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pCatalog);
+                    IGxSelection* pSel = pGxCatalogUI->GetSelection();
                     if(pSel)
                         return pSel->CanUndo();
                 }
@@ -240,7 +251,8 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
                 IGxCatalog* pCatalog = pGxApp->GetCatalog();
                 if(pCatalog)
                 {
-                    IGxSelection* pSel = pCatalog->GetSelection();
+                    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pCatalog);
+                    IGxSelection* pSel = pGxCatalogUI->GetSelection();
                     if(pSel)
                         return pSel->CanRedo();
                 }
@@ -255,15 +267,14 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
                 IGxCatalog* pCatalog = pGxApp->GetCatalog();
                 if(pCatalog)
                 {
-                    IGxSelection* pSel = pCatalog->GetSelection();
+                    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pCatalog);
+                    IGxSelection* pSel = pGxCatalogUI->GetSelection();
                     if(pSel)
                     {
-                        IGxObject* pCont = pSel->GetSelectedObjects(0);
+                        IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(pSel->GetSelectedObjects(0));
                         if(pCont)
                         {
-                            for(size_t i = 0; i < m_CreateTypesArray.GetCount(); i++)
-                                if(pCont->GetCategory() == m_CreateTypesArray[i])
-                                    return true;
+                            return pCont->CanCreate(enumGISContainer, enumContAny);
                         }
                     }
                 }
@@ -275,7 +286,8 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
 			{
-				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
                 size_t nCounter(0);
                 for(size_t i = 0; i < pSel->GetCount(); i++)
                 {
@@ -293,10 +305,24 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
 			{
-				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
 				if(pSel->GetCount() > 0)
 					return true;
 			}
+			return false;
+		}
+		case 10://Properties
+		{
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
+                IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pSel->GetLastSelectedObject());
+                if(pGxObjectEdit)
+                    return true;
+            }
 			return false;
 		}
 		default:
@@ -322,6 +348,7 @@ wxGISEnumCommandKind wxGISCatalogMainCmd::GetKind(void)
 		case 7://Create folder
 		case 8://Rename
 		case 9://Refresh
+		case 10://Properties
 		default:
 			return enumGISCommandNormal;
 	}
@@ -351,6 +378,8 @@ wxString wxGISCatalogMainCmd::GetMessage(void)
 			return wxString(_("Rename item"));
 		case 9:	
 			return wxString(_("Refresh item"));
+		case 10:	
+			return wxString(_("Item properties"));
 		default:
 			return wxEmptyString;
 	}
@@ -365,7 +394,8 @@ void wxGISCatalogMainCmd::OnClick(void)
 				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 				if(pGxApp)
 				{
-					IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+					IGxSelection* pSel = pGxCatalogUI->GetSelection();
 					if(pSel->GetCount() == 0)
 						break;
 					IGxObject* pGxObject = pSel->GetSelectedObjects(0);
@@ -403,7 +433,8 @@ void wxGISCatalogMainCmd::OnClick(void)
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
 			{
-				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
 				IGxObject* pGxObject = pSel->GetSelectedObjects(0);
 				wxGxDiscConnection* pDiscConnection = dynamic_cast<wxGxDiscConnection*>(pGxObject);
 				if(pDiscConnection)
@@ -418,8 +449,17 @@ void wxGISCatalogMainCmd::OnClick(void)
             {
                 wxWindow* pFocusWnd = wxWindow::FindFocus();
                 IGxView* pGxView = dynamic_cast<IGxView*>(pFocusWnd);
+                			
+                IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+                IGxObject* pSelObj = NULL;
+                if(pGxApp)
+                {
+                    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+                    IGxSelection* pSel = pGxCatalogUI->GetSelection();
+                    pSelObj = pSel->GetLastSelectedObject();
+                }
                 if(pGxView)
-                    pGxView->BeginRename();
+                    pGxView->BeginRename(pSelObj);
             }			
 			break;
         case 4:
@@ -431,7 +471,8 @@ void wxGISCatalogMainCmd::OnClick(void)
                 bool bAskToDelete(true);
                 wxXmlNode* pNode(NULL);
                 
-                IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+                IGxSelection* pSel = pGxCatalogUI->GetSelection();
 
                 IGxCatalog* pCat = pGxApp->GetCatalog();
                 if(pCat)
@@ -489,15 +530,17 @@ void wxGISCatalogMainCmd::OnClick(void)
         case 5:
         {
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp && GetEnabled())
-                return pGxApp->GetCatalog()->Undo();
+            wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+			if(pGxCatalogUI && GetEnabled())
+                return pGxCatalogUI->Undo();
 			return;
         }
         case 6:
         {
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp && GetEnabled())
-                return pGxApp->GetCatalog()->Redo();
+            wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+			if(pGxCatalogUI && GetEnabled())
+                return pGxCatalogUI->Redo();
 			return;
         }
         case 9:
@@ -505,7 +548,8 @@ void wxGISCatalogMainCmd::OnClick(void)
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
 			{
-				IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
                 for(size_t i = 0; i < pSel->GetCount(); i++)
                 {
 				    IGxObject* pGxObject = pSel->GetSelectedObjects(i);
@@ -514,8 +558,56 @@ void wxGISCatalogMainCmd::OnClick(void)
 			}
     		break;
 		}
-        case 3:
+        case 10:
+		{
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
+                IGxObjectEditUI* pGxObjectEdit = dynamic_cast<IGxObjectEditUI*>(pSel->GetLastSelectedObject());
+                if(pGxObjectEdit)
+                    pGxObjectEdit->EditProperties(dynamic_cast<wxWindow*>(m_pApp));
+			}
+    		break;
+		}
         case 7:
+            {
+			    IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			    if(pGxApp)
+			    {
+                    IGxCatalog* pCatalog = pGxApp->GetCatalog();
+                    if(pCatalog)
+                    {
+                        wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pCatalog);
+                        IGxSelection* pSel = pGxCatalogUI->GetSelection();
+                        if(pSel)
+                        {
+                            //create folder
+                            IGxObject* pObj = pSel->GetSelectedObjects(0);
+                            wxString sFolderPath = pObj->GetFullName() + wxFileName::GetPathSeparator() + wxString(_("New folder"));
+                            if(!CreateFolder(sFolderPath))
+                            {
+                                wxMessageBox(_("Create folder error!"), _("Error"), wxICON_ERROR | wxOK );
+                                return;
+                            }
+                            //create GxObject
+                            wxGxFolder* pFolder = new wxGxFolder(sFolderPath, wxString(_("New folder")));
+                            IGxObject* pGxFolder = static_cast<IGxObject*>(pFolder);
+                            IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pObj);
+                            pObjCont->AddChild(pGxFolder);
+                            pCatalog->ObjectAdded(pGxFolder);
+                            //begin rename GxObject
+                            wxWindow* pFocusWnd = wxWindow::FindFocus();
+                            IGxView* pGxView = dynamic_cast<IGxView*>(pFocusWnd);
+                            if(pGxView)
+                                pGxView->BeginRename(pGxFolder);
+                        }
+                    }
+                }
+            }
+            break;
+        case 3:
 		default:
 			return;
 	}
@@ -546,7 +638,8 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp && GetEnabled())
 			{
-                IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+                IGxSelection* pSel = pGxCatalogUI->GetSelection();
                 int nPos = pSel->GetDoPos();
                 wxString sPath = pSel->GetDoPath(nPos - 1);
                 if(!sPath.IsEmpty())
@@ -559,7 +652,8 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp && GetEnabled())
 			{
-                IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+                IGxSelection* pSel = pGxCatalogUI->GetSelection();
                 int nPos = pSel->GetDoPos();
                 wxString sPath = pSel->GetDoPath(nPos + 1 == pSel->GetDoSize() ? nPos : nPos + 1);
                 if(!sPath.IsEmpty())
@@ -573,6 +667,8 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 			return wxString(_("Rename selected item"));
 		case 9:	
 			return wxString(_("Refresh selected item"));
+		case 10:	
+			return wxString(_("Show properties of selected item"));
 		default:
 			return wxEmptyString;
 	}
@@ -580,7 +676,7 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 
 unsigned char wxGISCatalogMainCmd::GetCount(void)
 {
-	return 10;
+	return 11;
 }
 
 IToolBarControl* wxGISCatalogMainCmd::GetControl(void)
@@ -625,6 +721,7 @@ wxString wxGISCatalogMainCmd::GetToolLabel(void)
 		case 7:	
 		case 8:	
 		case 9:	
+		case 10:	
 		default:
 			return wxEmptyString;
 	}
@@ -646,6 +743,7 @@ bool wxGISCatalogMainCmd::HasToolLabel(void)
 		case 7:	
 		case 8:	
 		case 9:	
+		case 10:	
 		default:
 			return false;
 	}
@@ -665,7 +763,8 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp /*&& GetEnabled()*/)
 			{
-                IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+                IGxSelection* pSel = pGxCatalogUI->GetSelection();
                 int nPos = pSel->GetDoPos();
 
                 wxMenu* pMenu = new wxMenu();
@@ -685,7 +784,8 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
             IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp /*&& GetEnabled()*/)
 			{
-                IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+                IGxSelection* pSel = pGxCatalogUI->GetSelection();
                 int nPos = pSel->GetDoPos();
 
                 wxMenu* pMenu = new wxMenu();
@@ -705,6 +805,7 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
 		case 7:	
 		case 8:	
 		case 9:	
+		case 10:	
 		default:
 			return NULL;
 	}
@@ -715,13 +816,14 @@ void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
 	IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 	if(pGxApp && GetEnabled())
 	{
-        IGxSelection* pSel = pGxApp->GetCatalog()->GetSelection();
+        wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+        IGxSelection* pSel = pGxCatalogUI->GetSelection();
         int nPos = pSel->GetDoPos();
         int nNewPos = nID - ID_MENUCMD;
         if(nNewPos > nPos)
-            pGxApp->GetCatalog()->Redo(nNewPos);
+            pGxCatalogUI->Redo(nNewPos);
         else
-            pGxApp->GetCatalog()->Undo(nNewPos);
+            pGxCatalogUI->Undo(nNewPos);
     }
 }
 

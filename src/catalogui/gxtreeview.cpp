@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxtreeview.h"
 #include "wxgis/framework/framework.h"
+
 #include "../../art/document_16.xpm"
 
 #include "wx/dnd.h"
@@ -149,7 +150,7 @@ bool wxGxTreeViewBase::Activate(IGxApplication* application, wxXmlNode* pConf)
 	if(!wxGxView::Activate(application, pConf))
 		return false;
 
-    m_pCatalog = application->GetCatalog();
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
     IApplication* pApp = dynamic_cast<IApplication*>(application);
     if(pApp)
     {
@@ -162,7 +163,7 @@ bool wxGxTreeViewBase::Activate(IGxApplication* application, wxXmlNode* pConf)
 	if(m_pConnectionPointCatalog != NULL)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
-	m_pSelection = application->GetCatalog()->GetSelection();
+	m_pSelection = m_pCatalog->GetSelection();
 	m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( m_pSelection );
 	if(m_pConnectionPointSelection != NULL)
 		m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
@@ -203,6 +204,7 @@ void wxGxTreeViewBase::OnSelectionChanged(IGxSelection* Selection, long nInitiat
 			wxTreeItemId ItemId = m_TreeMap[pParentGxObj];
 			if(ItemId.IsOk())
 			{
+                wxTreeCtrl::SetItemHasChildren(ItemId);
 				wxTreeCtrl::Expand(ItemId);
 				break;
 			}
@@ -385,6 +387,7 @@ void wxGxTreeViewBase::OnItemExpanding(wxTreeEvent& event)
 							for(size_t i = 0; i < pArr->size(); i++)
 								AddTreeItem(pArr->at(i), item);//false
 							pData->m_bExpandedOnce = true;
+                            SetItemHasChildren(item, GetChildrenCount(item, false) > 0);
                             SortChildren(item);
 							return;
 						}
@@ -452,7 +455,6 @@ wxGxTreeView::~wxGxTreeView(void)
 
 void wxGxTreeView::OnBeginLabelEdit(wxTreeEvent& event)
 {
-    event.Skip();
 	wxTreeItemId item = event.GetItem();
 	if(!item.IsOk())
 		return;
@@ -649,7 +651,20 @@ void wxGxTreeView::OnActivated(wxTreeEvent& event)
 
 }
 
-void wxGxTreeView::BeginRename(void)
+void wxGxTreeView::BeginRename(IGxObject* pGxObject)
 {
+	wxTreeItemId ItemId = m_TreeMap[pGxObject];
+	if(!ItemId.IsOk())
+    {
+        wxTreeCtrl::SetItemHasChildren(GetSelection());
+        wxTreeCtrl::Expand(GetSelection());  
+        ItemId = m_TreeMap[pGxObject];
+    }
+	if(ItemId.IsOk())
+	{
+		wxTreeCtrl::SelectItem(ItemId/*, false*/);
+		SetFocus();
+        m_pSelection->Select(pGxObject, true, GetId());
+	}
     EditLabel(GetSelection());
 }

@@ -23,9 +23,8 @@
 #include <wx/dir.h>
 
 class WXDLLIMPEXP_GIS_CLT wxGxFolder :
-	public IGxObjectUI,
-	public IGxObjectEdit,
 	public IGxObjectContainer,
+	public IGxObjectEdit,
 	public wxDirTraverser
 {
 public:
@@ -38,21 +37,16 @@ public:
 	virtual wxString GetPath(void){return m_sPath;};
 	virtual wxString GetCategory(void){return wxString(_("Folder"));};
 	virtual void Refresh(void);
-	//IGxObjectUI
-	virtual wxIcon GetLargeImage(void);
-	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxFolder.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxFolder.NewMenu"));};
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
-	virtual void EditProperties(wxWindow *parent);
 	//IGxObjectContainer
 	virtual bool DeleteChild(IGxObject* pChild);
 	virtual bool AreChildrenViewable(void){return true;};
 	virtual bool HasChildren(void){LoadChildren(); return m_Children.size() > 0 ? true : false;};
+    virtual bool CanCreate(long nDataType, long DataSubtype); 
 	//wxGxFolder
 	virtual void LoadChildren(void);
 	virtual void EmptyChildren(void);

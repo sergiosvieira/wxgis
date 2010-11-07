@@ -53,5 +53,4 @@ public:
     virtual void OnDropDownCommand(int nID);
 private:
 	IApplication* m_pApp;
-    wxArrayString m_CreateTypesArray;
 };

@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISCartod.lib wxGISFrameworkd.lib wxGISCored.lib wxGISDataSourced.lib"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxbase28ud_xml.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISCored.lib wxGISDataSourced.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="0"
 				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(WXGISGDAL)\lib&quot;;..\..\lib"
@@ -243,10 +243,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\catalog\gxselection.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\catalog\gxshapefactory.cpp"
 				>
 			</File>
@@ -318,10 +314,6 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalog\gxrasterfactory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\catalog\gxselection.h"
 				>
 			</File>
 			<File

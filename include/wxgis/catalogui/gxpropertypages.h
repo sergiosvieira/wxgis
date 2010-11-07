@@ -20,7 +20,7 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/framework/framework.h"
-#include "wxgis/catalogui/catalogui.h"
+#include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/framework/checklist.h"
 
 #include <wx/intl.h>
@@ -68,5 +68,5 @@ protected:
 	wxCheckBox* m_checkBoxHideExt;
 	wxCheckBox* m_checkBoxLast;
 	wxCheckBox* m_checkBoxHidden;
-    IGxCatalog* m_pCatalog;
+    wxGxCatalogUI* m_pCatalog;
 };
