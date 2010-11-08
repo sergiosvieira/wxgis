@@ -21,6 +21,88 @@
 
 #include "wxgis/catalogui/rasterpropertypage.h"
 
+#include "gdal_rat.h"
+
+//#define PREF_THUMBNAIL_HEIGHT       64
+//WX_PG_IMPLEMENT_PROPERTY_CLASS(wxTextAndButtonProperty, wxStringProperty, wxString, const wxString&, TextCtrl)
+//
+//wxTextAndButtonProperty::wxTextAndButtonProperty( const wxString& label, const wxString& name, const wxString& value, wxWindowID buttonid, const wxString& buttonCaption ) : wxStringProperty(label, name, value), m_button(NULL)
+//{
+//    m_buttonid = buttonid;
+//    m_buttonCaption = buttonCaption;
+//
+//}
+//
+//wxTextAndButtonProperty::~wxTextAndButtonProperty ()
+//{
+//    wxDELETE(m_button);
+//}
+//
+//wxSize wxTextAndButtonProperty::OnMeasureImage( int item ) const
+//{
+//    return wxSize(0, 0);
+//    //if ( item == -1 )
+//        //return wxPG_DEFAULT_IMAGE_SIZE;
+//
+//    //return wxSize(PREF_THUMBNAIL_HEIGHT,PREF_THUMBNAIL_HEIGHT);
+//}
+//
+//void wxTextAndButtonProperty::OnCustomPaint( wxDC& dc, const wxRect& rect, wxPGPaintData& pd )
+//{
+//    if(!m_button)
+//    {
+//        wxWindow* pWnd = GetGrid()->GetPanel();
+//        m_button = new wxButton(pWnd, m_buttonid, m_buttonCaption);
+//        m_button->Show(true);
+//    }
+//
+//    //if ( index >= 0 )
+//    //{
+//    //    LoadThumbnails(index);
+//
+//    // Is this a measure item call?
+//    //if ( rect.x < 0 )
+//    //{
+//    //    //// Variable height
+//    //    ////pd.m_drawnHeight = PREF_THUMBNAIL_HEIGHT;
+//    //    //wxBitmap* pBitmap = (wxBitmap*)g_myImageArray[index].m_pThumbnail2;
+//    //    //if ( pBitmap )
+//    //    //    pd.m_drawnHeight = pBitmap->GetHeight();
+//    //    //else
+//    //    //    pd.m_drawnHeight = 16;
+//    //    return;
+//    //}
+//
+//    //wxPoint pt = rect.GetRightTop();
+//    //wxSize sz = m_button->GetSize();
+//    //pt.x -= sz.GetWidth();
+//    //m_button->Move(pt.x, pt.y);
+//
+//    //    // Draw the thumbnail
+//
+//    //    wxBitmap* pBitmap;
+//
+//    //    if ( pd.m_choiceItem >= 0 )
+//    //        pBitmap = (wxBitmap*)g_myImageArray[index].m_pThumbnail2;
+//    //    else
+//    //        pBitmap = (wxBitmap*)g_myImageArray[index].m_pThumbnail1;
+//
+//    //    if ( pBitmap )
+//    //    {
+//    //        dc.DrawBitmap ( *pBitmap, rect.x, rect.y, FALSE );
+//
+//    //        // Tell the caller how wide we drew.
+//    //        pd.m_drawnWidth = pBitmap->GetWidth();
+//
+//    //        return;
+//    //    }
+//    //}
+//
+//    //// No valid file - just draw a white box.
+//    //dc.SetBrush ( *wxWHITE_BRUSH );
+//    //dc.DrawRectangle ( rect );
+//}
+
 IMPLEMENT_DYNAMIC_CLASS(wxGISRasterPropertyPage, wxPanel)
 
 wxGISRasterPropertyPage::wxGISRasterPropertyPage(void) : m_pDataset(NULL)
@@ -111,18 +193,18 @@ bool wxGISRasterPropertyPage::Create(wxGISDataset* pDataset, wxWindow* parent, w
     //Pyramids
     bool bHasOvr = m_pDataset->HasOverviews();
     if(bHasOvr)
-        AppendProperty( new wxStringProperty(_("Pyramids"), wxPG_LABEL, _("Present")) ); 
+        AppendProperty( new wxStringProperty(_("Overviews"), wxPG_LABEL, _("Present")) ); 
     else
     {
-        wxPGId pyrprop = AppendProperty( new wxStringProperty(_("Pyramids"), wxPG_LABEL, _("Absent")) );
+        wxPGId pyrprop = AppendProperty( new wxStringProperty(_("Overviews"), wxPG_LABEL, _("Absent")) );
         m_pg->SetPropertyEditor(pyrprop, wxPG_EDITOR(TextCtrlAndButton));
     }
     //Statistics
     wxPGId pstatprop = AppendProperty( new wxStringProperty(_("Statistics"), wxPG_LABEL, _("Absent")) ); 
     m_pg->SetPropertyEditor(pstatprop, wxPG_EDITOR(TextCtrlAndButton));
     //Histogram
-    wxPGId phistprop = AppendProperty( new wxStringProperty(_("Histogram"), wxPG_LABEL, _("Absent")) ); 
-    m_pg->SetPropertyEditor(phistprop, wxPG_EDITOR(TextCtrlAndButton));
+    //wxPGId phistprop = AppendProperty( new wxTextAndButtonProperty(_("Histogram"), wxPG_LABEL, _("Absent")) ); 
+    ////m_pg->SetPropertyEditor(phistprop, wxPG_EDITOR(TextCtrlAndButton));
 
     AppendProperty( new wxPropertyCategory(_("Extent")));
     const OGREnvelope* pEnv = m_pDataset->GetEnvelope();
@@ -244,7 +326,7 @@ bool wxGISRasterPropertyPage::Create(wxGISDataset* pDataset, wxWindow* parent, w
             for(size_t i = 0; i < poGDALDataset->GetGCPCount(); i++ )
             {
                 const GDAL_GCP *psGCP = poGDALDataset->GetGCPs( ) + i;
-                AppendProperty( new wxStringProperty(wxString::Format(wxT("GCP[%3d]"), i + 1), wxPG_LABEL, wxString::Format(_("Id='%s', Info='%s', (%.6g,%.6g) -> (%.6g,%.6g,%.6g)"), wgMB2WX(psGCP->pszId), wgMB2WX(psGCP->pszInfo), psGCP->dfGCPPixel, psGCP->dfGCPLine, psGCP->dfGCPX, psGCP->dfGCPY, psGCP->dfGCPZ)) );
+                AppendProperty( new wxStringProperty(wxString::Format(wxT("GCP[%03d]"), i + 1), wxPG_LABEL, wxString::Format(_("Id='%s', Info='%s', (%.6g,%.6g) -> (%.6g,%.6g,%.6g)"), wgMB2WX(psGCP->pszId), wgMB2WX(psGCP->pszInfo), psGCP->dfGCPPixel, psGCP->dfGCPLine, psGCP->dfGCPX, psGCP->dfGCPY, psGCP->dfGCPZ)) );
             }
         }
 
@@ -285,18 +367,13 @@ bool wxGISRasterPropertyPage::Create(wxGISDataset* pDataset, wxWindow* parent, w
                 AppendProperty( new wxFloatProperty(_("Std Dev"), wxPG_LABEL, dfStdDev ));
             }
 
-            //Histogram
-            int nBucketCount, *panHistogram = NULL;
-            if(pBand->GetDefaultHistogram(&dfMin, &dfMax, &nBucketCount, &panHistogram, false, GDALTermProgress, NULL ) == CE_None )
-            {
-                //int iBucket;
-
-                //printf( "  %d buckets from %g to %g:\n  ",
-                //        nBucketCount, dfMin, dfMax );
-                //for( iBucket = 0; iBucket < nBucketCount; iBucket++ )
-                //    printf( "%d ", panHistogram[iBucket] );
-                CPLFree( panHistogram );
-            }
+            ////Histogram
+            //int nBucketCount, *panHistogram = NULL;
+            //if(pBand->GetDefaultHistogram(&dfMin, &dfMax, &nBucketCount, &panHistogram, false, GDALTermProgress, NULL ) == CE_None )
+            //{
+            //    CPLFree( panHistogram );
+            //}
+            //else
 
             //Checksum
             //   wxLogDebug( wxT("  Checksum=%d"), GDALChecksumImage(pBand, 0, 0, nXSize, nYSize));
@@ -310,128 +387,128 @@ bool wxGISRasterPropertyPage::Create(wxGISDataset* pDataset, wxWindow* parent, w
             //Band Overviews
 		    if( pBand->GetOverviewCount() > 0 )
             {
-			    //wxString sOut(wxT("  Overviews: " ));
-       //         for(int iOverview = 0; iOverview < pBand->GetOverviewCount(); iOverview++ )
-       //         {
-       //             const char *pszResampling = NULL;
+                wxPGId povrid = AppendProperty(pbandid, new wxStringProperty(_("Overviews"), wxPG_LABEL, pBand->HasArbitraryOverviews() == true ? _("arbitrary") : wxEmptyString ) );
+                
+                for(int iOverview = 0; iOverview < pBand->GetOverviewCount(); iOverview++ )
+                {
+                    const char *pszResampling = NULL;
+                    
+                    GDALRasterBand*	pOverview = pBand->GetOverview( iOverview );
+                    wxString sOvrDesc = wxString::Format(wxT("%d x %d"), pOverview->GetXSize(), pOverview->GetYSize());
+                    pszResampling = pOverview->GetMetadataItem("RESAMPLING", "" );
+                    if( pszResampling != NULL && EQUALN(pszResampling, "AVERAGE_BIT2", 12) )
+                        sOvrDesc += wxT( ", *" );
+                    else
+                        sOvrDesc += wgMB2WX(pszResampling);
 
-       //             if( iOverview != 0 )
-       //                 sOut += wxT( ", " );
+                    AppendProperty(povrid, new wxStringProperty(wxString::Format(_("Overview %d"), iOverview + 1), wxPG_LABEL, sOvrDesc ));
+                }
+		    }	
+	
+            nMaskFlags = pBand->GetMaskFlags();
+            if( (nMaskFlags & (GMF_NODATA|GMF_ALL_VALID)) == 0 )
+            {
+                GDALRasterBand* pMaskBand = pBand->GetMaskBand() ;
+                
+                wxString sMaskStr;
+                if( nMaskFlags & GMF_PER_DATASET )
+                    sMaskStr += wxT("PER_DATASET" );
+                if( nMaskFlags & GMF_ALPHA )
+                {
+                    if(sMaskStr.Len() > 0)
+                        sMaskStr += wxT(", ");
+                    sMaskStr += wxT("ALPHA" );
+                }
+                if( nMaskFlags & GMF_NODATA )
+                {
+                    if(sMaskStr.Len() > 0)
+                        sMaskStr += wxT(", ");
+                    sMaskStr += wxT("NODATA" );
+                }
+                if( nMaskFlags & GMF_ALL_VALID )
+                {
+                    if(sMaskStr.Len() > 0)
+                        sMaskStr += wxT(", ");
+                    sMaskStr += wxT("ALL_VALID" );
+                }
 
-				   // GDALRasterBand*	pOverview = pBand->GetOverview( iOverview );
-				   // sOut += wxString::Format(wxT("%dx%d"), pOverview->GetXSize(), pOverview->GetYSize());
+                wxPGId pmfid = AppendProperty(pbandid, new wxStringProperty(_("Mask Flags"), wxPG_LABEL, sMaskStr ));
 
-				   // pszResampling = pOverview->GetMetadataItem("RESAMPLING", "" );
-       //             if( pszResampling != NULL && EQUALN(pszResampling, "AVERAGE_BIT2", 12) )
-       //                 sOut += wxT( "*" );
-       //         }
-       //         wxLogDebug(sOut);
-		    }
+                if( pMaskBand != NULL && pMaskBand->GetOverviewCount() > 0 )
+                {
+                    wxPGId pombid = AppendProperty(pmfid, new wxPropertyCategory(_("Overviews of mask band")) );
 
+                    for( int nOverview = 0; nOverview < pMaskBand->GetOverviewCount(); nOverview++ )
+                    {
+                        GDALRasterBand*	pOverview = pMaskBand->GetOverview( nOverview );
+                        AppendProperty(pombid, new wxStringProperty(wxString::Format(_("Overview %d"), nOverview + 1), wxPG_LABEL, wxString::Format(wxT("%dx%d"), pOverview->GetXSize(), pOverview->GetYSize() ))); 
+                    }
+                }
+            }
 
+            wxString sUnitType = wgMB2WX( pBand->GetUnitType() );
+		    if( sUnitType.Len() > 0 )
+            {
+                AppendProperty(pbandid, new wxStringProperty(_("Unit Type"), wxPG_LABEL, sUnitType));
+            }
 
+		    char **papszCategories = pBand->GetCategoryNames();
+            if( papszCategories != NULL )
+            {
+                wxPGId pcatid = AppendProperty(pbandid, new wxIntProperty(_("Categories"), wxPG_LABEL, CSLCount(papszCategories) ) );
+                for(int  i = 0; papszCategories[i] != NULL; i++ )
+                    AppendProperty(pcatid, new wxStringProperty(wxString::Format(wxT("%3d"), i), wxPG_LABEL, wgMB2WX(papszCategories[i]) ) );
+            }
 
+            double fScale = pBand->GetScale( &bSuccess );
+            if(bSuccess && fScale != 1.0)
+                AppendProperty(pbandid, new wxFloatProperty(_("Scale"), wxPG_LABEL, fScale ) );
+            double fOffset = pBand->GetOffset( &bSuccess );
+            if(bSuccess && fOffset != 0.0)
+                AppendProperty(pbandid, new wxFloatProperty(_("Offset"), wxPG_LABEL, fOffset ) );
 
-	//	if( pBand->HasArbitraryOverviews() )
- //       {
- //          wxLogDebug( wxT("  Overviews: arbitrary" ));
- //       }
+		    papszMetadata = pBand->GetMetadata();
+            if( CSLCount(papszMetadata) > 0 )
+            {
+                AppendProperty(pbandid, new wxPropertyCategory(_("Metadata") ) );
+                for( int i = 0; papszMetadata[i] != NULL; i++ )
+                {
+                    AppendMetadataProperty( wgMB2WX(papszMetadata[i]) );
+                }
+            }
 
-	//	nMaskFlags = pBand->GetMaskFlags();
- //       if( (nMaskFlags & (GMF_NODATA|GMF_ALL_VALID)) == 0 )
- //       {
-	//		GDALRasterBand* pMaskBand = pBand->GetMaskBand() ;
+            papszMetadata = pBand->GetMetadata( "IMAGE_STRUCTURE" );
+            if( CSLCount(papszMetadata) > 0 )
+            {
+                AppendProperty(pbandid, new wxPropertyCategory(_("Image Structure Metadata") ) );
+                for( int i = 0; papszMetadata[i] != NULL; i++ )
+                {
+                    AppendMetadataProperty( wgMB2WX(papszMetadata[i]) );
+                }
+            }
 
- //           wxLogDebug( wxT("  Mask Flags: " ));
- //           if( nMaskFlags & GMF_PER_DATASET )
- //               wxLogDebug( wxT("PER_DATASET " ));
- //           if( nMaskFlags & GMF_ALPHA )
- //               wxLogDebug( wxT("ALPHA " ));
- //           if( nMaskFlags & GMF_NODATA )
- //               wxLogDebug( wxT("NODATA " ));
- //           if( nMaskFlags & GMF_ALL_VALID )
- //              wxLogDebug( wxT("ALL_VALID " ));
+		    if( pBand->GetColorInterpretation() == GCI_PaletteIndex && (hTable = pBand->GetColorTable()) != NULL )
+            {
+                wxPGId pcpid = AppendProperty(pbandid, new wxStringProperty(_("Color Table"), wxPG_LABEL, wxString::Format(_("%s with %d entries"), wgMB2WX(GDALGetPaletteInterpretationName(hTable->GetPaletteInterpretation())), hTable->GetColorEntryCount()) ));
 
-	//		if( pMaskBand != NULL && pMaskBand->GetOverviewCount() > 0 )
- //           {
- //               int		iOverview;
+			    for(int	i = 0; i < hTable->GetColorEntryCount(); i++ )
+                {
+                    GDALColorEntry	sEntry;
+				    hTable->GetColorEntryAsRGB(i, &sEntry );
 
- //               wxLogDebug( wxT("  Overviews of mask band: " ));
- //               for( int nOverview = 0; nOverview < pMaskBand->GetOverviewCount(); nOverview++ )
- //               {
- //                   GDALRasterBand*	pOverview;
+                    AppendProperty(pcpid, new wxStringProperty(wxString::Format(_("%3d"), i), wxPG_LABEL, wxString::Format(_("%d,%d,%d,%d"), sEntry.c1, sEntry.c2, sEntry.c3, sEntry.c4 )));
+                }
+                m_pg->Collapse(pcpid);
+            }
 
- //                   if( nOverview != 0 )
- //                       wxLogDebug( wxT(", " ));
-
-	//				pOverview = pMaskBand->GetOverview( nOverview );
- //                   wxLogDebug( wxT("%dx%d"), pOverview->GetXSize(), pOverview->GetYSize());
- //               }
- //           }
- //       }
-
-	//	if( strlen(pBand->GetUnitType()) > 0 )
- //       {
-	//		wxLogDebug( wxT("  Unit Type: %s"),wgMB2WX( pBand->GetUnitType()) );
- //       }
-
-	//	char **papszCategories = pBand->GetCategoryNames();
- //       if( papszCategories != NULL )
- //       {
- //           int i;
- //           wxLogDebug( wxT("  Categories:" ));
- //           for( i = 0; papszCategories[i] != NULL; i++ )
- //               wxLogDebug( wxT("    %3d: %s"), i, wgMB2WX(papszCategories[i]) );
- //       }
-
-	//	if( pBand->GetScale( &bSuccess ) != 1.0 || pBand->GetOffset( &bSuccess ) != 0.0 )
- //           wxLogDebug( wxT("  Offset: %.15g,   Scale:%.15g"), pBand->GetOffset( &bSuccess ), pBand->GetScale( &bSuccess ) );
-
-	//	papszMetadata = pBand->GetMetadata();
- //       if( CSLCount(papszMetadata) > 0 )
- //       {
- //           wxLogDebug( wxT("  Metadata:" ));
- //           for( int i = 0; papszMetadata[i] != NULL; i++ )
- //           {
- //               wxLogDebug( wxT("    %s"), wgMB2WX(papszMetadata[i]) );
- //           }
- //       }
-
- //       papszMetadata = pBand->GetMetadata( "IMAGE_STRUCTURE" );
- //       if( CSLCount(papszMetadata) > 0 )
- //       {
- //           wxLogDebug( wxT("  Image Structure Metadata:" ));
- //           for( int i = 0; papszMetadata[i] != NULL; i++ )
- //           {
- //               wxLogDebug( wxT("    %s"), wgMB2WX(papszMetadata[i]));
- //           }
- //       }
-
-	//	if( pBand->GetColorInterpretation() == GCI_PaletteIndex && (hTable = pBand->GetColorTable()) != NULL )
- //       {
- //           int			i;
-
-	//		wxLogDebug( wxT("  Color Table (%s with %d entries)"), wgMB2WX(GDALGetPaletteInterpretationName(hTable->GetPaletteInterpretation())), hTable->GetColorEntryCount() );
-
-	//		for( i = 0; i < hTable->GetColorEntryCount(); i++ )
- //           {
- //               GDALColorEntry	sEntry;
-
-	//			hTable->GetColorEntryAsRGB(i, &sEntry );
- //               wxLogDebug( wxT("  %3d: %d,%d,%d,%d"), i, sEntry.c1, sEntry.c2, sEntry.c3, sEntry.c4 );
- //           }
- //       }
-
-	//	if( pBand->GetDefaultRAT() != NULL )
- //       {
-	//		const GDALRasterAttributeTable* pRAT = (const GDALRasterAttributeTable*)pBand->GetDefaultRAT();
-	//		GDALRasterAttributeTable* pRATn = (GDALRasterAttributeTable*)pRAT;
-	//		pRATn->DumpReadable();
- //       }
-	//}
-
+		    if( pBand->GetDefaultRAT() != NULL )
+            {
+			    const GDALRasterAttributeTable* pRAT = (const GDALRasterAttributeTable*)pBand->GetDefaultRAT();
+                
+                char *pszXMLText = CPLSerializeXMLTree( pRAT->Serialize() );
+                m_pg->AppendIn(pbandid, new wxLongStringProperty(_("Raster Attribute Table"), wxPG_LABEL, wgMB2WX(pszXMLText)));
+            }
         }
-
     }
 
     bMainSizer->Add( m_pg, 1, wxEXPAND | wxALL, 5 );
@@ -473,7 +550,10 @@ wxPGId wxGISRasterPropertyPage::AppendMetadataProperty(wxString sMeta)
             if(sVal[i] > 31 && sVal[i] != 127)
                 sCleanVal += sVal[i];
         }
-        return AppendProperty( new wxStringProperty(sName, wxPG_LABEL, sCleanVal) );
+        if(sCleanVal.Len() > 500)
+            return m_pg->Append( new wxLongStringProperty(sName, wxPG_LABEL, sCleanVal) );//??
+        else
+            return AppendProperty( new wxStringProperty(sName, wxPG_LABEL, sCleanVal) );
     }
 }
 
