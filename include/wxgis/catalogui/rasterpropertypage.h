@@ -25,6 +25,24 @@
 
 #include "wx/propgrid/propgrid.h"
 
+//class wxTextAndButtonProperty : public wxStringProperty
+//{
+//    WX_PG_DECLARE_PROPERTY_CLASS(wxTextAndButtonProperty)
+//public:
+//    wxTextAndButtonProperty( const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL, const wxString& value = wxEmptyString, wxWindowID buttonid = wxID_ANY, const wxString& buttonCaption = wxEmptyString );
+//    virtual ~wxTextAndButtonProperty ();
+//
+//    //void OnCustomPaint( wxDC& dc, const wxRect& rect, wxPGPaintData& pd );
+//
+//    WX_PG_DECLARE_CUSTOM_PAINT_METHODS()
+//protected:
+//    wxButton* m_button;
+//    wxWindowID m_buttonid;
+//    wxString m_buttonCaption;
+//};
+
+
+
 class WXDLLIMPEXP_GIS_CLU wxGISRasterPropertyPage : 
     public wxPanel
 {
