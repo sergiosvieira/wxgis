@@ -23,95 +23,22 @@
 
 #include "gdal_rat.h"
 
-//#define PREF_THUMBNAIL_HEIGHT       64
-//WX_PG_IMPLEMENT_PROPERTY_CLASS(wxTextAndButtonProperty, wxStringProperty, wxString, const wxString&, TextCtrl)
-//
-//wxTextAndButtonProperty::wxTextAndButtonProperty( const wxString& label, const wxString& name, const wxString& value, wxWindowID buttonid, const wxString& buttonCaption ) : wxStringProperty(label, name, value), m_button(NULL)
-//{
-//    m_buttonid = buttonid;
-//    m_buttonCaption = buttonCaption;
-//
-//}
-//
-//wxTextAndButtonProperty::~wxTextAndButtonProperty ()
-//{
-//    wxDELETE(m_button);
-//}
-//
-//wxSize wxTextAndButtonProperty::OnMeasureImage( int item ) const
-//{
-//    return wxSize(0, 0);
-//    //if ( item == -1 )
-//        //return wxPG_DEFAULT_IMAGE_SIZE;
-//
-//    //return wxSize(PREF_THUMBNAIL_HEIGHT,PREF_THUMBNAIL_HEIGHT);
-//}
-//
-//void wxTextAndButtonProperty::OnCustomPaint( wxDC& dc, const wxRect& rect, wxPGPaintData& pd )
-//{
-//    if(!m_button)
-//    {
-//        wxWindow* pWnd = GetGrid()->GetPanel();
-//        m_button = new wxButton(pWnd, m_buttonid, m_buttonCaption);
-//        m_button->Show(true);
-//    }
-//
-//    //if ( index >= 0 )
-//    //{
-//    //    LoadThumbnails(index);
-//
-//    // Is this a measure item call?
-//    //if ( rect.x < 0 )
-//    //{
-//    //    //// Variable height
-//    //    ////pd.m_drawnHeight = PREF_THUMBNAIL_HEIGHT;
-//    //    //wxBitmap* pBitmap = (wxBitmap*)g_myImageArray[index].m_pThumbnail2;
-//    //    //if ( pBitmap )
-//    //    //    pd.m_drawnHeight = pBitmap->GetHeight();
-//    //    //else
-//    //    //    pd.m_drawnHeight = 16;
-//    //    return;
-//    //}
-//
-//    //wxPoint pt = rect.GetRightTop();
-//    //wxSize sz = m_button->GetSize();
-//    //pt.x -= sz.GetWidth();
-//    //m_button->Move(pt.x, pt.y);
-//
-//    //    // Draw the thumbnail
-//
-//    //    wxBitmap* pBitmap;
-//
-//    //    if ( pd.m_choiceItem >= 0 )
-//    //        pBitmap = (wxBitmap*)g_myImageArray[index].m_pThumbnail2;
-//    //    else
-//    //        pBitmap = (wxBitmap*)g_myImageArray[index].m_pThumbnail1;
-//
-//    //    if ( pBitmap )
-//    //    {
-//    //        dc.DrawBitmap ( *pBitmap, rect.x, rect.y, FALSE );
-//
-//    //        // Tell the caller how wide we drew.
-//    //        pd.m_drawnWidth = pBitmap->GetWidth();
-//
-//    //        return;
-//    //    }
-//    //}
-//
-//    //// No valid file - just draw a white box.
-//    //dc.SetBrush ( *wxWHITE_BRUSH );
-//    //dc.DrawRectangle ( rect );
-//}
+#define STAT_TXT _("Statistics")
+#define OVR_TXT _("Overviews")
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISRasterPropertyPage, wxPanel)
+
+BEGIN_EVENT_TABLE(wxGISRasterPropertyPage, wxPanel)
+    EVT_BUTTON( ID_PPCTRL, wxGISRasterPropertyPage::OnPropertyGridButtonClick )
+END_EVENT_TABLE()
 
 wxGISRasterPropertyPage::wxGISRasterPropertyPage(void) : m_pDataset(NULL)
 {
 }
 
-wxGISRasterPropertyPage::wxGISRasterPropertyPage(wxGISDataset* pDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+wxGISRasterPropertyPage::wxGISRasterPropertyPage(wxGxRasterDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
-    Create(pDataset, parent, id, pos, size, style, name);
+    Create(pGxDataset, parent, id, pos, size, style, name);
 }
 
 wxGISRasterPropertyPage::~wxGISRasterPropertyPage()
@@ -119,11 +46,13 @@ wxGISRasterPropertyPage::~wxGISRasterPropertyPage()
     wsDELETE(m_pDataset);
 }
 
-bool wxGISRasterPropertyPage::Create(wxGISDataset* pDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+bool wxGISRasterPropertyPage::Create(wxGxRasterDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     wxPanel::Create(parent, id, pos, size, style, name);
 
-    m_pDataset = dynamic_cast<wxGISRasterDataset*>(pDataset);
+    m_pGxDataset = pGxDataset;
+
+    m_pDataset = dynamic_cast<wxGISRasterDataset*>(m_pGxDataset->GetDataset());
     if(!m_pDataset)
         return false;
 
@@ -134,10 +63,75 @@ bool wxGISRasterPropertyPage::Create(wxGISDataset* pDataset, wxWindow* parent, w
     m_pg->SetColumnProportion(0, 30);
     m_pg->SetColumnProportion(1, 70);
 
+    FillGrid();
+
+    bMainSizer->Add( m_pg, 1, wxEXPAND | wxALL, 5 );
+
+	this->SetSizer( bMainSizer );
+	this->Layout();
+
+    return true;
+}
+
+wxPGId wxGISRasterPropertyPage::AppendProperty(wxPGProperty* pProp)
+{
+    wxPGProperty* pNewProp = m_pg->Append(pProp);
+    pNewProp->SetFlag(wxPG_PROP_READONLY);
+    return pNewProp;
+}
+
+wxPGId wxGISRasterPropertyPage::AppendProperty(wxPGId pid, wxPGProperty* pProp)
+{
+    wxPGProperty* pNewProp = m_pg->AppendIn(pid, pProp);
+    pNewProp->SetFlag(wxPG_PROP_READONLY);
+    return pNewProp;
+}
+
+wxPGId wxGISRasterPropertyPage::AppendMetadataProperty(wxString sMeta)
+{
+    int nPos = sMeta.Find('=');
+    if(nPos == wxNOT_FOUND)
+        return AppendProperty( new wxStringProperty(_("Item"), wxPG_LABEL, sMeta) );
+    else
+    {
+        wxString sName = sMeta.Left(nPos);
+        wxString sVal = sMeta.Right(sMeta.Len() - nPos - 1);
+        //clean
+        wxString sCleanVal;
+        for(size_t i = 0; i < sVal.Len(); i++)
+        {
+            char c = sVal[i];
+            if(sVal[i] > 31 && sVal[i] != 127)
+                sCleanVal += sVal[i];
+        }
+        if(sCleanVal.Len() > 500)
+            return m_pg->Append( new wxLongStringProperty(sName, wxPG_LABEL, sCleanVal) );//??
+        else
+            return AppendProperty( new wxStringProperty(sName, wxPG_LABEL, sCleanVal) );
+    }
+}
+
+void wxGISRasterPropertyPage::FillGrid(void)
+{
+    //reset grid
+    m_pg->Clear();
+
     wxString sTmp;
     //fill propertygrid
     wxPGId pid = AppendProperty( new wxPropertyCategory(_("Data Source")) );
-    AppendProperty( new wxStringProperty(_("Raster"), wxPG_LABEL, m_pDataset->GetName()) );  
+    AppendProperty( new wxStringProperty(_("Raster"), wxPG_LABEL, m_pGxDataset->GetName()) );  
+
+    CPLString soPath(wgWX2MB(m_pDataset->GetPath()));
+
+    VSIStatBufL BufL;
+    wxULongLong nSize(0);
+    int ret = VSIStatL(soPath, &BufL);
+    if(ret == 0)
+    {
+        nSize += BufL.st_size;
+    }
+    //wxULongLong nSize = wxFileName::GetSize(m_pDataset->GetPath());
+
     //folder
     wxFileName FName(m_pDataset->GetPath());
     AppendProperty( new wxStringProperty(_("Folder"), wxPG_LABEL, FName.GetPath()) );  
@@ -150,7 +144,7 @@ bool wxGISRasterPropertyPage::Create(wxGISDataset* pDataset, wxWindow* parent, w
         char** papszFileList = poGDALDataset->GetFileList();
         if( CSLCount(papszFileList) < 2 )
         {
-            AppendProperty( new wxStringProperty(_("Files"), wxPG_LABEL, _("none associated")) );  
+            AppendProperty( new wxStringProperty(_("Files"), wxPG_LABEL, _("None associated")) );  
         }
         else
         {
@@ -159,10 +153,20 @@ bool wxGISRasterPropertyPage::Create(wxGISDataset* pDataset, wxWindow* parent, w
 		    {
 			    wxString sFileName = wgMB2WX(papszFileList[i]);
                 wxFileName FName(sFileName);
+                //nSize += FName.GetSize();
+                ret = VSIStatL(papszFileList[i], &BufL);
+                if(ret == 0)
+                {
+                    nSize += BufL.st_size;
+                }
+
                 AppendProperty(pfilesid, new wxStringProperty(_("File"), wxPG_LABEL, FName.GetFullName()) );  
 		    }
         }
         CSLDestroy( papszFileList );
+
+        //size        
+        AppendProperty(pid, new wxStringProperty(_("Total size"), wxPG_LABEL, wxFileName::GetHumanReadableSize(nSize)) );  
 
         GDALDriver* pDrv = poGDALDataset->GetDriver();
 	    sTmp = sTmp.Format(wxT("%s(%s)"), wgMB2WX(pDrv->GetMetadataItem( GDAL_DMD_LONGNAME )), wgMB2WX(pDrv->GetDescription()) );
@@ -190,21 +194,25 @@ bool wxGISRasterPropertyPage::Create(wxGISDataset* pDataset, wxWindow* parent, w
             AppendProperty( new wxStringProperty(_("GeoTransform"), wxPG_LABEL, wxString::Format(wxT("%.16g, %.16g, %.16g | %.16g, %.16g, %.16g"), adfGeoTransform[0], adfGeoTransform[1], adfGeoTransform[2], adfGeoTransform[3], adfGeoTransform[4], adfGeoTransform[5])));
         }
     }
+
     //Pyramids
     bool bHasOvr = m_pDataset->HasOverviews();
     if(bHasOvr)
-        AppendProperty( new wxStringProperty(_("Overviews"), wxPG_LABEL, _("Present")) ); 
+        AppendProperty( new wxStringProperty(OVR_TXT, wxPG_LABEL, _("Present")) ); 
     else
     {
-        wxPGId pyrprop = AppendProperty( new wxStringProperty(_("Overviews"), wxPG_LABEL, _("Absent")) );
+        wxPGId pyrprop = m_pg->Append( new wxStringProperty(OVR_TXT, wxPG_LABEL, _("Absent (click to build)")) );
         m_pg->SetPropertyEditor(pyrprop, wxPG_EDITOR(TextCtrlAndButton));
     }
     //Statistics
-    wxPGId pstatprop = AppendProperty( new wxStringProperty(_("Statistics"), wxPG_LABEL, _("Absent")) ); 
-    m_pg->SetPropertyEditor(pstatprop, wxPG_EDITOR(TextCtrlAndButton));
-    //Histogram
-    //wxPGId phistprop = AppendProperty( new wxTextAndButtonProperty(_("Histogram"), wxPG_LABEL, _("Absent")) ); 
-    ////m_pg->SetPropertyEditor(phistprop, wxPG_EDITOR(TextCtrlAndButton));
+    bool bHasStats = m_pDataset->HasStatistics();
+    if(bHasStats)
+        AppendProperty( new wxStringProperty(STAT_TXT, wxPG_LABEL, _("Present")) ); 
+    else
+    {
+        wxPGId pstatprop = m_pg->Append( new wxStringProperty(STAT_TXT, wxPG_LABEL, _("Absent (click to build)")) );
+        m_pg->SetPropertyEditor(pstatprop, wxPG_EDITOR(TextCtrlAndButton));
+    }
 
     AppendProperty( new wxPropertyCategory(_("Extent")));
     const OGREnvelope* pEnv = m_pDataset->GetEnvelope();
@@ -359,21 +367,13 @@ bool wxGISRasterPropertyPage::Create(wxGISDataset* pDataset, wxWindow* parent, w
                 AppendProperty( new wxStringProperty(_("Description"), wxPG_LABEL, sDescription ));
 
             //Statistics
-            if(pBand->GetStatistics(false, false, &dfMin, &dfMax, &dfMean, &dfStdDev) == CE_None)
+            if(pBand->GetStatistics(FALSE, FALSE, &dfMin, &dfMax, &dfMean, &dfStdDev) == CE_None)
             {
                 AppendProperty( new wxFloatProperty(_("Min"), wxPG_LABEL, dfMin ));
                 AppendProperty( new wxFloatProperty(_("Max"), wxPG_LABEL, dfMax ));
                 AppendProperty( new wxFloatProperty(_("Mean"), wxPG_LABEL, dfMean ));
                 AppendProperty( new wxFloatProperty(_("Std Dev"), wxPG_LABEL, dfStdDev ));
             }
-
-            ////Histogram
-            //int nBucketCount, *panHistogram = NULL;
-            //if(pBand->GetDefaultHistogram(&dfMin, &dfMax, &nBucketCount, &panHistogram, false, GDALTermProgress, NULL ) == CE_None )
-            //{
-            //    CPLFree( panHistogram );
-            //}
-            //else
 
             //Checksum
             //   wxLogDebug( wxT("  Checksum=%d"), GDALChecksumImage(pBand, 0, 0, nXSize, nYSize));
@@ -510,52 +510,41 @@ bool wxGISRasterPropertyPage::Create(wxGISDataset* pDataset, wxWindow* parent, w
             }
         }
     }
-
-    bMainSizer->Add( m_pg, 1, wxEXPAND | wxALL, 5 );
-
-	this->SetSizer( bMainSizer );
-	this->Layout();
-
-    return true;
 }
 
-wxPGId wxGISRasterPropertyPage::AppendProperty(wxPGProperty* pProp)
-{
-    wxPGProperty* pNewProp = m_pg->Append(pProp);
-    pNewProp->SetFlag(wxPG_PROP_READONLY);
-    return pNewProp;
-}
 
-wxPGId wxGISRasterPropertyPage::AppendProperty(wxPGId pid, wxPGProperty* pProp)
+void wxGISRasterPropertyPage::OnPropertyGridButtonClick ( wxCommandEvent& )
 {
-    wxPGProperty* pNewProp = m_pg->AppendIn(pid, pProp);
-    pNewProp->SetFlag(wxPG_PROP_READONLY);
-    return pNewProp;
-}
-
-wxPGId wxGISRasterPropertyPage::AppendMetadataProperty(wxString sMeta)
-{
-    int nPos = sMeta.Find('=');
-    if(nPos == wxNOT_FOUND)
-        return AppendProperty( new wxStringProperty(_("Item"), wxPG_LABEL, sMeta) );
-    else
+    wxPGProperty* prop = m_pg->GetSelectedProperty();
+    if ( prop )
     {
-        wxString sName = sMeta.Left(nPos);
-        wxString sVal = sMeta.Right(sMeta.Len() - nPos - 1);
-        //clean
-        wxString sCleanVal;
-        for(size_t i = 0; i < sVal.Len(); i++)
+        wxString sName = m_pg->GetPropertyName(prop);
+        if(sName.Cmp(STAT_TXT) == 0)
         {
-            char c = sVal[i];
-            if(sVal[i] > 31 && sVal[i] != 127)
-                sCleanVal += sVal[i];
+            //show calc stats tool
+            if(0)
+                FillGrid();
         }
-        if(sCleanVal.Len() > 500)
-            return m_pg->Append( new wxLongStringProperty(sName, wxPG_LABEL, sCleanVal) );//??
-        else
-            return AppendProperty( new wxStringProperty(sName, wxPG_LABEL, sCleanVal) );
+        else if(sName.Cmp(OVR_TXT) == 0)
+        {
+            //show create ovr tool
+             if(0)
+                FillGrid();
+        }
     }
 }
+
+    ////Histogram in new tab!
+    //wxPGId phistprop = m_pg->Append( new wxStringProperty(_("Histogram"), wxPG_LABEL, _("Absent (click to build)")) ); 
+    //m_pg->SetPropertyEditor(phistprop, wxPG_EDITOR(TextCtrlAndButton));
+            ////Histogram
+            //int nBucketCount, *panHistogram = NULL;
+            //if(pBand->GetDefaultHistogram(&dfMin, &dfMax, &nBucketCount, &panHistogram, false, GDALTermProgress, NULL ) == CE_None )
+            //{
+            //    CPLFree( panHistogram );
+            //}
+            //else
+
 
 
 	////for(int nBand = 0; nBand < m_poDataset->GetRasterCount(); nBand++ )
