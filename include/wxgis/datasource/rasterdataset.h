@@ -47,6 +47,8 @@ public:
 	virtual GDALDataset* GetMainRaster(void){return m_poMainDataset;};
 	virtual bool HasOverviews(void){return m_bHasOverviews;};
 	virtual void SetHasOverviews(bool bVal){m_bHasOverviews = bVal;};
+	virtual bool HasStatistics(void){return m_bHasStats;};
+	virtual void SetHasStatistics(bool bVal){m_bHasStats = bVal;};
     virtual int GetWidth(void){return m_nXSize;};
     virtual int GetHeight(void){return m_nYSize;};
     virtual int GetBandCount(void){return m_nBandCount;};
@@ -58,6 +60,7 @@ protected:
 	OGRSpatialReference* m_pSpaRef;
 	bool m_bIsOpened;
     bool m_bHasOverviews;
+    bool m_bHasStats;
 	int m_nXSize;
 	int m_nYSize;
 	int m_nBandCount;

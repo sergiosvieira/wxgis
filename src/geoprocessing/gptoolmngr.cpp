@@ -116,15 +116,23 @@ wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode, IGxCatalog* pCatal
             continue;
         }
 
-		wxObject *pObj = wxCreateDynamicObject(sName);
-		IGPTool *pTool = dynamic_cast<IGPTool*>(pObj);
-		if(pTool != NULL)
-		{
-            wxString sInternalName = pTool->GetName();
-            TOOLINFO info = {sName, pChild};
-            m_ToolsMap[sInternalName] = info;
-            wxDELETE(pTool);
+        int nCount = wxAtoi(pChild->GetPropVal(wxT("count"), wxT("0")));
+        wxString sCmdName = pChild->GetPropVal(wxT("name"), NONAME);
+        if(sName.IsEmpty() || sName.CmpNoCase(NONAME) == 0)
+        {
+		    wxObject *pObj = wxCreateDynamicObject(sName);
+		    IGPTool *pTool = dynamic_cast<IGPTool*>(pObj);
+		    if(pTool != NULL)
+		    {
+                sCmdName = pTool->GetName();
+                wxDELETE(pTool);
+            }
+            else 
+                continue;
         }
+        TOOLINFO info = {sName, nCount};
+        m_ToolsMap[sCmdName] = info;
+
         pChild = pChild->GetNext();
     }
 }
@@ -135,13 +143,25 @@ wxGISGPToolManager::~wxGISGPToolManager(void)
         m_pToolsNode->DeleteProperty(wxT("max_tasks"));
     m_pToolsNode->AddProperty(wxT("max_tasks"), wxString::Format(wxT("%d"), m_nMaxThreads));
 
-    //kill all active threads
-    typedef std::map<unsigned long, THREADDATA>::const_iterator IT;
-    for(IT pos = m_TasksThreadMap.begin(); pos != m_TasksThreadMap.end(); ++pos)
+    //readd tasks
+    wxGISConfig::DeleteNodeChildren(m_pToolsNode)
+    typedef std::map<wxString, TOOLINFO>::const_iterator IT;
+    for(IT pos = m_ToolsMap.begin(); pos != m_ToolsMap.end(); ++pos)
     {
-        //if(pos->second.pThread->IsRunning())
-            pos->second.pThread->Kill();
+        wxXmlNode* pNewNode = new wxXmlNode(m_pToolsNode, wxXML_ELEMENT_NODE, wxString(wxT("tool")));
+		pNewNode->AddProperty(wxT("object"), pos->second.sClassName);
+		pNewNode->AddProperty(wxT("name"), pos->first);
+		pNewNode->AddProperty(wxT("count"), pos->second.nCount);
     }
+
+    ////kill all active threads
+    //typedef std::map<unsigned long, THREADDATA>::const_iterator IT;
+    //for(IT pos = m_TasksThreadMap.begin(); pos != m_TasksThreadMap.end(); ++pos)
+    //{
+    //    //if(pos->second.pThread->IsRunning())
+    //        pos->second.pThread->Kill();
+    //}
+
 }
 
 IGPTool* wxGISGPToolManager::GetTool(wxString sToolName)
@@ -160,17 +180,7 @@ long wxGISGPToolManager::OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel, I
         return -1;
     //get tool name and add it to stat of exec
     wxString sToolName = pTool->GetName();
-    wxXmlNode* pConfig = m_ToolsMap[sToolName].pConfig;
-    if(pConfig)
-    {
-        int nCount(0);
-        if(pConfig->HasProp(wxT("count")))
-        {
-            nCount = wxAtoi(pConfig->GetPropVal(wxT("count"), wxT("0")));
-            pConfig->DeleteProperty(wxT("count"));
-        }
-        pConfig->AddProperty(wxT("count"), wxString::Format(wxT("%d"), ++nCount));
-    }
+    m_ToolsMap[sToolName].nCount++;
 
     //create execute thread
     wxGISGPTaskThread *pThread = new wxGISGPTaskThread(this, pTool, pTrackCancel);

@@ -57,8 +57,8 @@ public:
     virtual void OnFinish(unsigned long nThreadId, bool bHasErrors, IGPTool* pTool);
     typedef struct _toolinfo
     {
-        wxString ClassName;
-        wxXmlNode* pConfig;
+        wxString sClassName;
+        int nCount;
     } TOOLINFO;
     typedef struct _threaddata
     {

@@ -133,7 +133,7 @@ void wxGxRasterDatasetUI::EditProperties(wxWindow *parent)
     PropertySheetDialog.CreateButtons(wxOK);
     wxWindow* pParentWnd = static_cast<wxWindow*>(PropertySheetDialog.GetBookCtrl());
 
-    wxGISRasterPropertyPage* RasterPropertyPage = new wxGISRasterPropertyPage(GetDataset(), pParentWnd);
+    wxGISRasterPropertyPage* RasterPropertyPage = new wxGISRasterPropertyPage(this, pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(RasterPropertyPage, RasterPropertyPage->GetPageName());
     wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(GetDataset(), pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(SpatialReferencePropertyPage, SpatialReferencePropertyPage->GetPageName());

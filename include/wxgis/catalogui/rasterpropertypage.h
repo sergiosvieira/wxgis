@@ -21,27 +21,10 @@
 #pragma once
 
 #include "wxgis/catalogui/catalogui.h"
+#include "wxgis/catalog/gxdataset.h"
 #include "wxgis/datasource/rasterdataset.h"
 
 #include "wx/propgrid/propgrid.h"
-
-//class wxTextAndButtonProperty : public wxStringProperty
-//{
-//    WX_PG_DECLARE_PROPERTY_CLASS(wxTextAndButtonProperty)
-//public:
-//    wxTextAndButtonProperty( const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL, const wxString& value = wxEmptyString, wxWindowID buttonid = wxID_ANY, const wxString& buttonCaption = wxEmptyString );
-//    virtual ~wxTextAndButtonProperty ();
-//
-//    //void OnCustomPaint( wxDC& dc, const wxRect& rect, wxPGPaintData& pd );
-//
-//    WX_PG_DECLARE_CUSTOM_PAINT_METHODS()
-//protected:
-//    wxButton* m_button;
-//    wxWindowID m_buttonid;
-//    wxString m_buttonCaption;
-//};
-
-
 
 class WXDLLIMPEXP_GIS_CLU wxGISRasterPropertyPage : 
     public wxPanel
@@ -54,14 +37,20 @@ class WXDLLIMPEXP_GIS_CLU wxGISRasterPropertyPage :
 
 public:
     wxGISRasterPropertyPage(void);
-    wxGISRasterPropertyPage(wxGISDataset* pDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Raster"));
+    wxGISRasterPropertyPage(wxGxRasterDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Raster"));
 	~wxGISRasterPropertyPage();
-    virtual bool Create(wxGISDataset* pDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Raster"));
+    virtual bool Create(wxGxRasterDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Raster"));
     virtual wxString GetPageName(void){return wxString(_("Raster"));};
     wxPGId AppendProperty(wxPGProperty* pProp);
     wxPGId AppendProperty(wxPGId pid, wxPGProperty* pProp);
     wxPGId AppendMetadataProperty(wxString sMeta);
+    void FillGrid(void);
+    //events
+    void OnPropertyGridButtonClick ( wxCommandEvent& );
 protected:
     wxGISRasterDataset* m_pDataset;
+    wxGxRasterDataset* m_pGxDataset;
     wxPropertyGrid* m_pg;
+
+    DECLARE_EVENT_TABLE()
 };

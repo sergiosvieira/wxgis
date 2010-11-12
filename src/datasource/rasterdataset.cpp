@@ -25,7 +25,7 @@
 #include "vrt/vrtwarpedoverview.h"
 #include "gdal_rat.h"
 
-wxGISRasterDataset::wxGISRasterDataset(wxString sPath, wxGISEnumRasterDatasetType nType) : wxGISDataset(sPath), m_bIsOpened(false), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false), m_poMainDataset(NULL), m_poDataset(NULL), m_nBandCount(0)
+wxGISRasterDataset::wxGISRasterDataset(wxString sPath, wxGISEnumRasterDatasetType nType) : wxGISDataset(sPath), m_bIsOpened(false), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false), m_bHasStats(false), m_poMainDataset(NULL), m_poDataset(NULL), m_nBandCount(0)
 {
     m_nSubType = (int)nType;
 }
@@ -232,8 +232,16 @@ bool wxGISRasterDataset::Open(void)
 		wxLogError(_("wxGISRasterDataset: Open failed! Path '%s'. Raster has no bands"), m_sPath.c_str());
 		return false;
     }
-    if(pBand && pBand->GetOverviewCount() > 0)
-        m_bHasOverviews = true;
+    if(pBand)
+    {
+        if(pBand->GetOverviewCount() > 0)
+            m_bHasOverviews = true;
+
+        double dfMin, dfMax, dfMean, dfStdDev;
+        CPLErr eErr = pBand->GetStatistics(FALSE, FALSE, &dfMin, &dfMax, &dfMean, &dfStdDev ); 
+        if( eErr == CE_None )
+            m_bHasStats =  true;
+    }
 
     if(m_nXSize < 2000 && m_nYSize < 2000)
         m_bHasOverviews = true;

@@ -29,6 +29,8 @@
 #define DMTSTR _("Data Management Tools")
 #define RASSTR _("Raster")
 
+#define TOOLBX_NAME wxT("wxGISToolbox")
+
 //GPFunctionTool 1
 //GPModelTool 2
 //GPScriptTool 3
