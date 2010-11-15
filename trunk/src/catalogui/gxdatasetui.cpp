@@ -86,6 +86,26 @@ wxIcon wxGxFeatureDatasetUI::GetSmallImage(void)
 
 void wxGxFeatureDatasetUI::EditProperties(wxWindow *parent)
 {
+    wxPropertySheetDialog PropertySheetDialog;
+    if (!PropertySheetDialog.Create(parent, wxID_ANY, _("Properties"), wxDefaultPosition, wxSize( 480,640 ), wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER))
+        return;
+    PropertySheetDialog.SetIcon(properties_xpm);
+    PropertySheetDialog.CreateButtons(wxOK);
+    wxWindow* pParentWnd = static_cast<wxWindow*>(PropertySheetDialog.GetBookCtrl());
+
+	wxGISDataset* pDset = GetDataset();
+	if(pDset)
+	{
+		wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(pDset->GetSpatialReference(), pParentWnd);
+		PropertySheetDialog.GetBookCtrl()->AddPage(SpatialReferencePropertyPage, SpatialReferencePropertyPage->GetPageName());
+	}
+
+    PropertySheetDialog.LayoutDialog();
+    //center?
+    PropertySheetDialog.SetSize(480,640);
+    PropertySheetDialog.Center();
+
+    PropertySheetDialog.ShowModal();
 }
 
 wxGISDataset* wxGxFeatureDatasetUI::GetDataset(void)
@@ -98,6 +118,12 @@ wxGISDataset* wxGxFeatureDatasetUI::GetDataset(void)
         wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
     }
     return pOut;
+}
+
+bool wxGxFeatureDatasetUI::Invoke(wxWindow* pParentWnd)
+{
+    EditProperties(pParentWnd);
+    return true;
 }
 
 //--------------------------------------------------------------

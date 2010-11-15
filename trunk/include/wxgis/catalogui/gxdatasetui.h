@@ -53,7 +53,8 @@ protected:
 class WXDLLIMPEXP_GIS_CLU wxGxFeatureDatasetUI :
 	public wxGxFeatureDataset,
 	public IGxObjectUI,
-	public IGxObjectEditUI
+	public IGxObjectEditUI,
+    public IGxObjectWizard
 {
 public:
 	wxGxFeatureDatasetUI(wxString Path, wxString Name, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
@@ -67,6 +68,8 @@ public:
 	virtual wxString NewMenu(void){return wxEmptyString;};//wxString(wxT("wxGxShapefileDataset.NewMenu"))
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
+    //IGxObjectWizard
+    virtual bool Invoke(wxWindow* pParentWnd);
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
 };
