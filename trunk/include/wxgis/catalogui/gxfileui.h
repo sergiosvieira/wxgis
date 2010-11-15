@@ -42,7 +42,8 @@ public:
 class WXDLLIMPEXP_GIS_CLU wxGxPrjFileUI :
     public wxGxPrjFile,
 	public IGxObjectUI,
-    public IGxObjectEditUI
+    public IGxObjectEditUI,
+    public IGxObjectWizard
 {
 public:
 	wxGxPrjFileUI(wxString Path, wxString Name, wxGISEnumPrjFileType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
@@ -54,6 +55,8 @@ public:
 	virtual wxString NewMenu(void){return wxString(wxT("wxGxPrjFile.NewMenu"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
+    //IGxObjectWizard
+    virtual bool Invoke(wxWindow* pParentWnd);
 protected:
     wxIcon m_oLargeIcon;
     wxIcon m_oSmallIcon;

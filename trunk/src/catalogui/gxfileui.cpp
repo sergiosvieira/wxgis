@@ -20,6 +20,15 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxfileui.h"
+#include "wxgis/framework/application.h"
+
+//propertypages
+#include "wxgis/catalogui/spatrefpropertypage.h"
+
+#include "../../art/properties.xpm"
+
+#include "wx/propdlg.h"
+
 
 //--------------------------------------------------------------
 //class wxGxFileUI
@@ -60,8 +69,29 @@ wxIcon wxGxPrjFileUI::GetSmallImage(void)
 
 void wxGxPrjFileUI::EditProperties(wxWindow *parent)
 {
+    wxPropertySheetDialog PropertySheetDialog;
+    if (!PropertySheetDialog.Create(parent, wxID_ANY, _("Properties"), wxDefaultPosition, wxSize( 480,640 ), wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER))
+        return;
+    PropertySheetDialog.SetIcon(properties_xpm);
+    PropertySheetDialog.CreateButtons(wxOK);
+    wxWindow* pParentWnd = static_cast<wxWindow*>(PropertySheetDialog.GetBookCtrl());
+
+    wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(GetSpatialReference(), pParentWnd);
+    PropertySheetDialog.GetBookCtrl()->AddPage(SpatialReferencePropertyPage, SpatialReferencePropertyPage->GetPageName());
+
+    PropertySheetDialog.LayoutDialog();
+    //center?
+    PropertySheetDialog.SetSize(480,640);
+    PropertySheetDialog.Center();
+
+    PropertySheetDialog.ShowModal();
 }
 
+bool wxGxPrjFileUI::Invoke(wxWindow* pParentWnd)
+{
+    EditProperties(pParentWnd);
+    return true;
+}
 //--------------------------------------------------------------
 //class wxGxTextFileUI
 //--------------------------------------------------------------

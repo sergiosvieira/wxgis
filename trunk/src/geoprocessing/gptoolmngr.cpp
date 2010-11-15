@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessing/gptoolmngr.h"
+#include "wxgis/core/config.h"
 
 #include "wx/datetime.h"
 
@@ -144,14 +145,14 @@ wxGISGPToolManager::~wxGISGPToolManager(void)
     m_pToolsNode->AddProperty(wxT("max_tasks"), wxString::Format(wxT("%d"), m_nMaxThreads));
 
     //readd tasks
-    wxGISConfig::DeleteNodeChildren(m_pToolsNode)
+    wxGISConfig::DeleteNodeChildren(m_pToolsNode);
     typedef std::map<wxString, TOOLINFO>::const_iterator IT;
     for(IT pos = m_ToolsMap.begin(); pos != m_ToolsMap.end(); ++pos)
     {
         wxXmlNode* pNewNode = new wxXmlNode(m_pToolsNode, wxXML_ELEMENT_NODE, wxString(wxT("tool")));
 		pNewNode->AddProperty(wxT("object"), pos->second.sClassName);
 		pNewNode->AddProperty(wxT("name"), pos->first);
-		pNewNode->AddProperty(wxT("count"), pos->second.nCount);
+		pNewNode->AddProperty(wxT("count"), wxString::Format(wxT("%d"), pos->second.nCount));
     }
 
     ////kill all active threads
@@ -166,7 +167,7 @@ wxGISGPToolManager::~wxGISGPToolManager(void)
 
 IGPTool* wxGISGPToolManager::GetTool(wxString sToolName)
 {
-	wxObject *pObj = wxCreateDynamicObject(m_ToolsMap[sToolName].ClassName);
+	wxObject *pObj = wxCreateDynamicObject(m_ToolsMap[sToolName].sClassName);
     IGPTool* pTool = dynamic_cast<IGPTool*>(pObj);
     if(!pTool)
         return NULL;
