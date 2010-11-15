@@ -373,6 +373,7 @@ wxString wxGISAppConfig::GetLocaleDir(void)
 
 wxString wxGISAppConfig::GetLogDir(void)
 {
+	wxLogNull noLog;
     wxXmlNode* pNode = GetConfigNode(wxString(wxT("log")), false, true);
 
     wxString sDefaultOut = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("log");

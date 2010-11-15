@@ -35,9 +35,9 @@ class WXDLLIMPEXP_GIS_CLU wxGISSpatialReferencePropertyPage :
 
 public:
     wxGISSpatialReferencePropertyPage(void);
-    wxGISSpatialReferencePropertyPage(wxGISDataset* pDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Spatial Reference"));
+    wxGISSpatialReferencePropertyPage(OGRSpatialReference* poSRS, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Spatial Reference"));
 	~wxGISSpatialReferencePropertyPage();
-    virtual bool Create(wxGISDataset* pDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Spatial Reference"));
+    virtual bool Create(OGRSpatialReference* poSRS, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Spatial Reference"));
     virtual wxString GetPageName(void){return wxString(_("Spatial Reference"));};
     void FillUndefined(void);
     void FillProjected(OGRSpatialReference *poSRS);
@@ -47,6 +47,5 @@ public:
     wxPGId AppendProperty(wxPGProperty* pProp);
     wxPGId AppendProperty(wxPGId pid, wxPGProperty* pProp);
 protected:
-    wxGISDataset* m_pDataset;
     wxPropertyGrid* m_pg;
 };

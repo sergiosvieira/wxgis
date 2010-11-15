@@ -86,7 +86,7 @@ bool parse_commandline_parameters( int argc, char** argv )
 #else
 	    pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, false);
 #endif
-        wxXMLNode* pToolsChild = pConfig->GetConfigNode(wxT("tools"), false, true);
+        wxXmlNode* pToolsChild = pConfig->GetConfigNode(wxT("tools"), false, true);
         //wxGISGPToolManager* pGISGPToolManager(pToolsChild,
         //pGISGPToolManager->GetTool
     }

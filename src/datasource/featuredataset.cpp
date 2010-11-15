@@ -66,8 +66,8 @@ wxGISFeatureDataset* CreateVectorLayer(wxString sPath, wxString sName, wxString 
         nSubType = enumVecKML;
     else if(sDriver == wxString(wxT("DXF")))
         nSubType = enumVecDXF;
-    else if(sDriver == wxString(wxT("DXF")))
-        nSubType = enumVecDXF;
+    //else if(sDriver == wxString(wxT("DXF")))
+    //    nSubType = enumVecDXF;
     else if(sDriver == wxString(wxT("MapInfo File")) && sExt == wxString(wxT("tab")))
         nSubType = enumVecMapinfoTab;
     else if(sDriver == wxString(wxT("MapInfo File")) && sExt == wxString(wxT("mif")))

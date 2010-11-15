@@ -23,30 +23,25 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISSpatialReferencePropertyPage, wxPanel)
 
-wxGISSpatialReferencePropertyPage::wxGISSpatialReferencePropertyPage(void) : m_pDataset(NULL)
+wxGISSpatialReferencePropertyPage::wxGISSpatialReferencePropertyPage(void)
 {
 }
 
-wxGISSpatialReferencePropertyPage::wxGISSpatialReferencePropertyPage(wxGISDataset* pDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+wxGISSpatialReferencePropertyPage::wxGISSpatialReferencePropertyPage(OGRSpatialReference* poSRS, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
-    Create(pDataset, parent, id, pos, size, style, name);
+    Create(poSRS, parent, id, pos, size, style, name);
 }
 
 wxGISSpatialReferencePropertyPage::~wxGISSpatialReferencePropertyPage()
 {
-    wsDELETE(m_pDataset);
 }
 
-bool wxGISSpatialReferencePropertyPage::Create(wxGISDataset* pDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+bool wxGISSpatialReferencePropertyPage::Create(OGRSpatialReference* poSRS, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     wxPanel::Create(parent, id, pos, size, style, name);
 
-    m_pDataset = pDataset;
-    if(!m_pDataset)
-        return false;
-
-    OGRSpatialReference* poSRS = m_pDataset->GetSpatialReference();
-
+    //if(!poSRS)
+    //    return false;
 
 	wxBoxSizer* bMainSizer;
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
@@ -106,10 +101,13 @@ void wxGISSpatialReferencePropertyPage::FillProjected(OGRSpatialReference *poSRS
     const char *pszName = poSRS->GetAttrValue("PROJCS");
     //make bold!  wxPG_BOLD_MODIFIED
     AppendProperty( new wxStringProperty(_("Name"), wxPG_LABEL, wgMB2WX(pszName)) );
+
     //EPSG
     const char *pszAfCode = poSRS->GetAuthorityCode("PROJCS");
     const char *pszAfName = poSRS->GetAuthorityName("PROJCS");
-    AppendProperty( new wxStringProperty(wgMB2WX(pszAfName), wxPG_LABEL, wgMB2WX(pszAfCode))  );
+	if(pszAfName || pszAfCode)
+		AppendProperty( new wxStringProperty(wgMB2WX(pszAfName), wxPG_LABEL, wgMB2WX(pszAfCode))  );
+	//
 
     wxPGId pid = AppendProperty( new wxPropertyCategory(_("Projection")) );
     const char *pszNameProj = poSRS->GetAttrValue("PROJECTION");
@@ -160,10 +158,10 @@ void wxGISSpatialReferencePropertyPage::FillGeographic(OGRSpatialReference *poSR
     const char *pszName = poSRS->GetAttrValue("GEOGCS");
     AppendProperty( new wxStringProperty(_("Name"), wxPG_LABEL, wgMB2WX(pszName)) );
     //EPSG
-    //EPSG
     const char *pszAfCode = poSRS->GetAuthorityCode("GEOGCS");
     const char *pszAfName = poSRS->GetAuthorityName("GEOGCS");
-    AppendProperty( new wxStringProperty(wgMB2WX(pszAfName), wxPG_LABEL, wgMB2WX(pszAfCode))  );
+	if(pszAfName || pszAfCode)
+	    AppendProperty( new wxStringProperty(wgMB2WX(pszAfName), wxPG_LABEL, wgMB2WX(pszAfCode))  );
 
     wxPGId pid = AppendProperty( new wxPropertyCategory(_("Datum")) );
     const char *pszNameDatum = poSRS->GetAttrValue("DATUM");
