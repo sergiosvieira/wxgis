@@ -524,6 +524,16 @@ OGRSpatialReference* wxGISFeatureDataset::GetSpatialReference(void)
 	return NULL;
 }
 
+OGRDataSource* wxGISFeatureDataset::GetDataSource(void)
+{
+    if(m_poDS)
+        return m_poDS;
+    if(!m_bIsOpened)
+        if(!Open(0))
+            return NULL;
+    return m_poDS;
+}
+
 OGREnvelope* wxGISFeatureDataset::GetEnvelope(void)
 {
     if(m_psExtent)
