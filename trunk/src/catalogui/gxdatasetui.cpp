@@ -25,6 +25,7 @@
 //propertypages
 #include "wxgis/catalogui/spatrefpropertypage.h"
 #include "wxgis/catalogui/rasterpropertypage.h"
+#include "wxgis/catalogui/vectorpropertypage.h"
 
 #include "../../art/properties.xpm"
 
@@ -92,6 +93,9 @@ void wxGxFeatureDatasetUI::EditProperties(wxWindow *parent)
     PropertySheetDialog.SetIcon(properties_xpm);
     PropertySheetDialog.CreateButtons(wxOK);
     wxWindow* pParentWnd = static_cast<wxWindow*>(PropertySheetDialog.GetBookCtrl());
+
+    wxGISVectorPropertyPage* VectorPropertyPage = new wxGISVectorPropertyPage(this, pParentWnd);
+    PropertySheetDialog.GetBookCtrl()->AddPage(VectorPropertyPage, VectorPropertyPage->GetPageName());
 
 	wxGISDataset* pDset = GetDataset();
 	if(pDset)
