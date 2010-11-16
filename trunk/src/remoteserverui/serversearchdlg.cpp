@@ -133,24 +133,29 @@ void wxGISSearchServerDlg::OnSearch( wxCommandEvent& event )
 	//UpdateWindowUI(wxUPDATE_UI_RECURSE);
 
 	wxSocketBase::Initialize();
-	wxIPV4address myIp;
-	myIp.Hostname(wxGetHostName());
-	wxString ipAddr = myIp.IPAddress();
+	//wxIPV4address myIp;
+	//myIp.Hostname(wxGetHostName());
+	//wxString ipAddr = myIp.IPAddress();
 
 
-wxIPV4address *addr = new wxIPV4address; 
-addr->Service(MY_PORT); 
-addr->AnyAddress(); 
+wxIPV4address addr; 
+addr.Service(80); 
+addr.AnyAddress(); 
 
-wxIPV4address *otherAddr = new wxIPV4address; 
-otherAddr->Service(MY_PORT); 
-otherAddr->Hostname(0xFFFFFFFF); 
+wxIPV4address otherAddr; 
+otherAddr.Service(80); 
+otherAddr.Hostname(0xFFFFFFFF); 
 
-m_sock = new wxDatagramSocket(*addr, wxSOCKET_NONE); 
+wxDatagramSocket *m_sock = new wxDatagramSocket(addr, wxSOCKET_NONE); 
 const int optval = 1; 
 m_sock->SetOption(SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval)); 
 m_sock->SetOption(SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)); 
-m_sock->SendTo(*otherAddr, myMsg->GetMsg(), BROADCAST_MSG_LENGTH); 
+char* data = "GET /";
+m_sock->SendTo(otherAddr, data, strlen(data)); 
+char buff[500];
+m_sock->RecvFrom(otherAddr, &buff, 500); 
+
+m_sock->Destroy();
 
 	//size_t pos = ipAddr.rfind(wxT("."));
 	//if(pos == -1)

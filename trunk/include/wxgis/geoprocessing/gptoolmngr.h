@@ -3,7 +3,7 @@
  * Purpose:  tools manager.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,10 +26,9 @@
 
 class WXDLLIMPEXP_GIS_GP wxGISGPToolManager;
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISGPTaskThread
-///////////////////////////////////////////////////////////////////////////////
-
+/** \class wxGISGPTaskThread gptoolmngr.h
+ *  \brief A Geoprocessing tools execution thread.
+ */
 class wxGISGPTaskThread : public wxThread
 {
 public:
@@ -42,10 +41,11 @@ private:
     IGPTool* m_pTool;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISGPToolManager
-///////////////////////////////////////////////////////////////////////////////
-
+/** \class wxGISGPToolManager gptoolmngr.h
+ *  \brief A Geoprocessing tools manager.
+ *
+ *  Hold the geoprocessing tools list, execute tools, track tool execution statistics
+ */
 class WXDLLIMPEXP_GIS_GP wxGISGPToolManager
 {
 public:
@@ -74,53 +74,3 @@ protected:
     std::map<unsigned long, THREADDATA> m_TasksThreadMap; //internal name, class name
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISGPParameter
-///////////////////////////////////////////////////////////////////////////////
-
-class wxGISGPParameter : public IGPParameter
-{
-public:
-    wxGISGPParameter(void);
-    virtual ~wxGISGPParameter(void);
-    //IGPParameter
-    virtual bool GetAltered(void);
-    virtual void SetAltered(bool bAltered);
-    virtual bool GetHasBeenValidated(void);
-    virtual void SetHasBeenValidated(bool bHasBeenValidated);
-    virtual bool GetIsValid(void);
-    virtual void SetIsValid(bool bIsValid);
-    virtual wxString GetName(void);
-    virtual void SetName(wxString sName);
-    virtual wxString GetDisplayName(void);
-    virtual void SetDisplayName(wxString sDisplayName);
-    virtual wxGISEnumGPParameterDataType GetDataType(void);
-    virtual void SetDataType(wxGISEnumGPParameterDataType nType);
-    virtual wxGISEnumGPParameterDirection GetDirection(void);
-    virtual void SetDirection(wxGISEnumGPParameterDirection nDirection);
-    virtual wxArrayString* GetParameterDependencies(void);
-    virtual void AddParameterDependency(wxString sDependency);
-    virtual wxGISEnumGPParameterType GetParameterType(void);
-    virtual void SetParameterType(wxGISEnumGPParameterType nType);
-    virtual wxVariant GetValue(void);
-    virtual void SetValue(wxVariant Val);
-    virtual IGPDomain* GetDomain(void);
-    virtual void SetDomain(IGPDomain* pDomain);
-    virtual wxString GetMessage(void);
-    virtual wxGISEnumGPMessageType GetMessageType(void);
-    virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString);
-protected:
-    bool m_bAltered;
-    bool m_bHasBeenValidated;
-    bool m_bIsValid;
-    wxString m_sName;
-    wxString m_sDisplayName;
-    wxGISEnumGPParameterDataType m_DataType;
-    wxGISEnumGPParameterDirection m_Direction;
-    wxGISEnumGPParameterType m_ParameterType;
-    wxVariant m_Value;
-    IGPDomain* m_pDomain;
-    wxString m_sMessage;
-    wxGISEnumGPMessageType m_nMsgType;
-    //wxArrayString m_ParamDepStr;
-};
