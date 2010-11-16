@@ -20,8 +20,6 @@
  ****************************************************************************/
 #pragma once
 
-#define APP_VER wxT("0.3.0")
-
 #include "wxgis/geoprocess/geoprocess.h"
 
 bool parse_commandline_parameters( int argc, char** argv );

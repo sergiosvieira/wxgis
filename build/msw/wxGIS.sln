@@ -97,8 +97,15 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISGeoprocess", "wxGISGeoprocess.vcproj", "{4C6FCBB1-C5F0-46FD-AEED-FB7233951682}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISRemoteServerUI", "wxGISRemoteServerUI.vcproj", "{CDC27198-828F-45B3-BC3D-3CD22176FC61}"
+	ProjectSection(ProjectDependencies) = postProject
+		{797A29D8-295E-45B6-862D-F1B65C7955F8} = {797A29D8-295E-45B6-862D-F1B65C7955F8}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISRemoteServer", "wxGISRemoteServer.vcproj", "{797A29D8-295E-45B6-862D-F1B65C7955F8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D7C200AC-A29B-4894-B222-1C77030545BE} = {D7C200AC-A29B-4894-B222-1C77030545BE}
+		{0F6A3C59-9206-4987-9D82-B4725311FB57} = {0F6A3C59-9206-4987-9D82-B4725311FB57}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1A570546-6791-4B94-8A1E-FE3ACDA27E11}"
 	ProjectSection(SolutionItems) = preProject

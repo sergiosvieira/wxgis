@@ -28,19 +28,9 @@
 #include "wx/aui/aui.h"
 #include "wx/artprov.h"
 
-#define APP_VER wxT("0.3.0") //should be global for all apps
-
-/*! \file gxapplication.h
-    \brief wxGxApplication main header.
-*/
-
-//-----------------------------------------------
-// wxGxApplication
-//-----------------------------------------------
-
-/*! \class wxGxApplication
-    \brief A catalog application framework class.
-*/
+/** \class wxGxApplication gxapplication.h
+ *   \brief A catalog application framework class.
+ */
 class WXDLLIMPEXP_GIS_CLU wxGxApplication :
 	public wxGISApplication,
     public IGxApplication

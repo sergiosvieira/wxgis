@@ -36,15 +36,19 @@
 //GPScriptTool 3
 //GPCustomTool
 
+/** \enum wxGISEnumGPMessageType
+    \brief A geoprocessing tool parameter message type.
+*/
+
 enum wxGISEnumGPMessageType
 {
-    wxGISEnumGPMessageUnknown = 0,
-	wxGISEnumGPMessageInformation,
-	wxGISEnumGPMessageError,
-	wxGISEnumGPMessageWarning,
-	wxGISEnumGPMessageRequired,
-	wxGISEnumGPMessageOk,
-	wxGISEnumGPMessageNone
+    wxGISEnumGPMessageUnknown = 0,  /**< The message type is undefined */
+	wxGISEnumGPMessageInformation,  /**< The information message*/
+	wxGISEnumGPMessageError,        /**< The error message*/
+	wxGISEnumGPMessageWarning,      /**< The warning message*/
+	wxGISEnumGPMessageRequired,     /**< The required message - show required icon near param edit control*/
+	wxGISEnumGPMessageOk,           /**< The ok message - show ok icon near param edit control*/
+	wxGISEnumGPMessageNone          /**< The none message - show no icon near param edit control*/
 };
 
 enum wxGISEnumGPParameterType
@@ -79,6 +83,9 @@ public:
     virtual ~IGPDomain(void){};
 };
 
+/** \class IGPParameter
+ *  \brief A base class (virtual) for all geoprocessing tools parameters.
+ */
 class IGPParameter
 {
 public:
@@ -105,13 +112,24 @@ public:
     virtual void SetValue(wxVariant Val) = 0;
     virtual IGPDomain* GetDomain(void) = 0;
     virtual void SetDomain(IGPDomain* pDomain) = 0;
-    //virtual IGPDomain* GetDomain(void) = 0;
-    //virtual void SetDomain(IGPDomain* pDomain) = 0;
     virtual wxString GetMessage(void) = 0;
     virtual wxGISEnumGPMessageType GetMessageType(void) = 0;
     virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString) = 0;
+    /** \fn wxString GetAsString(void)
+     *  \brief Serialize parameter to string.
+     *  \return The string representation of parameter
+     */	
+    virtual wxString GetAsString(void) = 0;
+    /** \fn void SetFromString(wxString)
+     *  \brief Serialize parameter from string.
+     *  \param The string representation of parameter
+     */	
+    virtual void SetFromString(wxString) = 0;
 };
 
+/** \typedef GPParameters
+ *  \brief An parameters array.
+ */
 typedef std::vector<IGPParameter*> GPParameters;
 
 class IGPTool

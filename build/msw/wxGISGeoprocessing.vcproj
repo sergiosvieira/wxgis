@@ -194,6 +194,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\geoprocessing\gpparam.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\geoprocessing\gptoolmngr.cpp"
 				>
 			</File>
@@ -221,6 +225,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\geoprocessing\gporthocorrecttool.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geoprocessing\gpparam.h"
 				>
 			</File>
 			<File
