@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="wxGISDataSource"
-	ProjectGUID="{0F6A3C59-9206-4987-9D82-B4725311FB57}"
-	RootNamespace="wxGISDataSource"
+	Name="wxGISRemoteServer"
+	ProjectGUID="{797A29D8-295E-45B6-862D-F1B65C7955F8}"
+	RootNamespace="wxGISRemoteServer"
 	>
 	<Platforms>
 		<Platform
@@ -39,8 +39,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\frmts&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include;&quot;$(GEOS)\capi&quot;;&quot;$(GEOS)\source\headers&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_DS"
+				AdditionalIncludeDirectories="&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_RS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -59,11 +59,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISCored.lib wxGISFrameworkd.lib wxGISGeometryd.lib"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxbase28ud_xml.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISCored.lib wxGISDataSourced.lib wxGISCatalogd.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(WXGISGDAL)\lib&quot;;..\..\lib"
 				GenerateDebugInformation="true"
-				SubSystem="2"
 				ImportLibrary="..\..\lib\$(TargetName).lib"
 				TargetMachine="1"
 			/>
@@ -90,16 +89,14 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="copy from debug to lib"
-				CommandLine="copy $(TargetPath) ..\..\lib\"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
-			CharacterSet="1"
+			ConfigurationType="1"
+			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -119,8 +116,6 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\frmts&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include;&quot;$(GEOS)\capi&quot;;&quot;$(GEOS)\source\headers&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;__WXMSW__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_DS"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -137,13 +132,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28u.lib wxbase28u_net.lib wxmsw28u_core.lib wxbase28u_xml.lib wxmsw28u_aui.lib wxmsw28u_adv.lib wxzlib.lib wxregexu.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpl.lib wxgisogr.lib wxgisgdal.lib wxGISCore.lib wxGISFramework.lib wxGISGeometry.lib"
-				AdditionalLibraryDirectories="&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib"
-				GenerateDebugInformation="false"
-				SubSystem="2"
+				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="..\..\lib\$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -169,8 +160,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="copy from release to lib"
-				CommandLine="copy $(TargetPath) ..\..\lib\"
 			/>
 		</Configuration>
 	</Configurations>
@@ -183,23 +172,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\datasource\datacontainer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\datasource\featuredataset.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\datasource\rasterdataset.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\datasource\spvalidator.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\datasource\sysop.cpp"
+				RelativePath="..\..\src\remoteserver\gxremoteservers.cpp"
 				>
 			</File>
 		</Filter>
@@ -209,27 +182,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\include\wxgis\datasource\datacontainer.h"
+				RelativePath="..\..\include\wxgis\remoteserver\gxremoteservers.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wxgis\datasource\datasource.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\datasource\featuredataset.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\datasource\rasterdataset.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\datasource\spvalidator.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\datasource\sysop.h"
+				RelativePath="..\..\include\wxgis\remoteserver\remoteserver.h"
 				>
 			</File>
 		</Filter>

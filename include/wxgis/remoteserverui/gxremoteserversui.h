@@ -1,9 +1,9 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDiscConnectionsUI class.
+ * Project:  wxGIS (GIS Remote)
+ * Purpose:  wxGxRemoteServersUI class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2010  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,29 +20,28 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/catalogui/catalogui.h"
-#include "wxgis/catalog/gxdiscconnections.h"
+#include "wxgis/remoteserver/gxremoteservers.h"
 
-/** \class wxGxDiscConnectionsUI gxdiscconnectionsui.h
-    \brief A Disc Connections GxRootObject.
+/** \class wxGxRemoteServersUI gxremoteserversui.h
+    \brief A Remote Servers UI GxRootObject.
 */
-class WXDLLIMPEXP_GIS_CLU wxGxDiscConnectionsUI :
-    public wxGxDiscConnections,
+class WXDLLIMPEXP_GIS_RSU wxGxRemoteServersUI :
+    public wxGxRemoteServers,
 	public IGxObjectUI
 {
-   DECLARE_DYNAMIC_CLASS(wxGxDiscConnectionsUI)
+   DECLARE_DYNAMIC_CLASS(wxGxRemoteServersUI)
 public:
-	wxGxDiscConnectionsUI(void);
-	virtual ~wxGxDiscConnectionsUI(void);
+	wxGxRemoteServersUI(void);
+	virtual ~wxGxRemoteServersUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxDiscConnections.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxDiscConnections.NewMenu"));};
+	virtual wxString ContextMenu(void){return wxString(wxT("wxGxRemoteServersUI.ContextMenu"));};
+	virtual wxString NewMenu(void){return wxString(wxT("wxGxRemoteServersUI.NewMenu"));};
 	//wxGxDiscConnections
 	virtual void LoadChildren(void);
 	virtual void EmptyChildren(void);
-    virtual IGxObject* ConnectFolder(wxString sPath);
 protected:
-	wxIcon m_Conn16, m_Conn48;
-	wxIcon m_ConnDsbld16, m_ConnDsbld48;
+	wxIcon m_RemServ16, m_RemServ48;
+	wxIcon m_RemServDsbld16, m_RemServDsbld48;
 };

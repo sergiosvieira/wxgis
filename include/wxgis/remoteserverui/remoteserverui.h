@@ -1,6 +1,6 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDiscConnectionsUI class.
+ * Project:  wxGIS (GIS Remote)
+ * Purpose:  remote server UI header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010 Bishop
@@ -18,31 +18,7 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#pragma once
-#include "wxgis/catalogui/catalogui.h"
-#include "wxgis/catalog/gxdiscconnections.h"
 
-/** \class wxGxDiscConnectionsUI gxdiscconnectionsui.h
-    \brief A Disc Connections GxRootObject.
-*/
-class WXDLLIMPEXP_GIS_CLU wxGxDiscConnectionsUI :
-    public wxGxDiscConnections,
-	public IGxObjectUI
-{
-   DECLARE_DYNAMIC_CLASS(wxGxDiscConnectionsUI)
-public:
-	wxGxDiscConnectionsUI(void);
-	virtual ~wxGxDiscConnectionsUI(void);
-	//IGxObjectUI
-	virtual wxIcon GetLargeImage(void);
-	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxDiscConnections.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxDiscConnections.NewMenu"));};
-	//wxGxDiscConnections
-	virtual void LoadChildren(void);
-	virtual void EmptyChildren(void);
-    virtual IGxObject* ConnectFolder(wxString sPath);
-protected:
-	wxIcon m_Conn16, m_Conn48;
-	wxIcon m_ConnDsbld16, m_ConnDsbld48;
-};
+#pragma once
+
+#include "wxgis/remoteserver/remoteserver.h"

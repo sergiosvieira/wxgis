@@ -178,7 +178,11 @@ bool wxGxContentView::Activate(IGxApplication* application, wxXmlNode* pConf)
     IApplication* pApp = dynamic_cast<IApplication*>(application);
     if(pApp)
     {
+		//delete
         m_pDeleteCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
+		//new 
+		m_pNewMenu = dynamic_cast<wxGISNewMenu*>(pApp->GetCommandBar(NEWMENUNAME));
+
     }
 
 	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pCatalog );
@@ -364,6 +368,7 @@ void wxGxContentView::OnSelected(wxListEvent& event)
 	//event.Skip();
     m_pSelection->Clear(NOTFIRESELID);
     long nItem = -1;
+	size_t nCount(0);
     for ( ;; )
     {
         nItem = GetNextItem(nItem, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
@@ -372,8 +377,19 @@ void wxGxContentView::OnSelected(wxListEvent& event)
         LPITEMDATA pItemData = (LPITEMDATA)GetItemData(nItem);
 	    if(pItemData == NULL)
             continue;
+		nCount++;
         m_pSelection->Select(pItemData->pObject, true, NOTFIRESELID);
     }
+	if(	m_pNewMenu )
+	{
+		if(nCount > 0)
+			m_pNewMenu->Update(m_pSelection);
+		else
+		{
+			m_pSelection->SetInitiator(TREECTRLID);
+			m_pNewMenu->Update(m_pSelection);
+		}
+	}
 }
 
 bool wxGxContentView::Show(bool show)

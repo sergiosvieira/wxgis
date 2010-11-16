@@ -94,6 +94,7 @@ void wxGISApplication::LoadCommands(wxXmlNode* pRootNode)
 					{
 						pNewCmd->SetID(ID_PLUGINCMD + nCmdCounter);
 						pNewCmd->SetSubType(i);
+						//TODO: check doubles
 						m_CommandArray.push_back(pNewCmd);
 						nCmdCounter++;
 					}
@@ -255,15 +256,20 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
                         if(pItem->IsSubMenu())
                         {
                             pItem->SetBitmap(wxNullBitmap);
+                            wxString sT = pItem->GetText();
                             pItem->SetItemLabel(wxT(" "));// derty hack
-                            //wxString sT = pItem->GetText();
-                            //pItem->SetItemLabel(sT);
+                            pItem->SetItemLabel(sT);
                         }
                     }
 // dirty hack end
                     wxMenuItem *pItem = pMenu->FindItem(event.GetId());
 					if(pItem != NULL)
 					{
+                        if(pItem->IsSubMenu())
+                            break;
+                        if(pItem->GetKind() == enumGISCommandCheck)
+							break;
+
 						wxIcon Bmp = pCmd->GetBitmap();
 						//if(Bmp.IsOk())
 							pItem->SetBitmap(Bmp);//double text??
@@ -696,6 +702,7 @@ void wxGISApplication::LoadLibs(wxXmlNode* pRootNode)
 		wxString sPath = child->GetPropVal(wxT("path"), wxT(""));
 		if(sPath.Len() > 0)
 		{
+			//TODO: check for doubles
 			wxDynamicLibrary* pLib = new wxDynamicLibrary(sPath);
 			if(pLib != NULL)
 			{
@@ -717,12 +724,12 @@ bool wxGISApplication::Create(IGISConfig* pConfig)
 	wxFrame::GetStatusBar()->SetStatusText(_("Ready"));
 
     //load libs
-	wxXmlNode* pLibsNode = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("libs")));
+	wxXmlNode* pLibsNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("libs")));
 	if(pLibsNode)
 		LoadLibs(pLibsNode);
 
 	//load commands
-	wxXmlNode* pCommandsNode = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("commands")));
+	wxXmlNode* pCommandsNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("commands")));
 	if(pCommandsNode)
 		LoadCommands(pCommandsNode);
 	//load commandbars

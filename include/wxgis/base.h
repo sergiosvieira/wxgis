@@ -3,7 +3,7 @@
  * Purpose:  base header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -152,6 +152,29 @@
 #    define WXDLLIMPEXP_GIS_GPU
 #    define WXDLLIMPEXP_DATA_GIS_GPU(type) type
 #endif
+
+#ifdef WXMAKINGDLL_GIS_RS
+#    define WXDLLIMPEXP_GIS_RS WXEXPORT
+#    define WXDLLIMPEXP_DATA_GIS_RS(type) WXEXPORT type
+#elif defined(WXUSINGDLL)
+#    define WXDLLIMPEXP_GIS_RS WXIMPORT
+#    define WXDLLIMPEXP_DATA_GIS_RS(type) WXIMPORT type
+#else /* not making nor using DLL */
+#    define WXDLLIMPEXP_GIS_RS
+#    define WXDLLIMPEXP_DATA_GIS_RS(type) type
+#endif
+
+#ifdef WXMAKINGDLL_GIS_RSU
+#    define WXDLLIMPEXP_GIS_RSU WXEXPORT
+#    define WXDLLIMPEXP_DATA_GIS_RSU(type) WXEXPORT type
+#elif defined(WXUSINGDLL)
+#    define WXDLLIMPEXP_GIS_RSU WXIMPORT
+#    define WXDLLIMPEXP_DATA_GIS_RSU(type) WXIMPORT type
+#else /* not making nor using DLL */
+#    define WXDLLIMPEXP_GIS_RSU
+#    define WXDLLIMPEXP_DATA_GIS_RSU(type) type
+#endif
+
 //#define WXDLLEXPORT WXMAKINGDLL_GIS
 //#define WXDLLEXPORT_DATA WXDLLIMPEXP_DATA_GIS
 
@@ -177,9 +200,6 @@
 //#ifndef _DEBUG
 //   #define WXGISPORTABLE
 //#endif
-
-#define WIN 0
-#define LIN 1
 
 #ifndef WXDWORD
     #define WXDWORD unsigned long

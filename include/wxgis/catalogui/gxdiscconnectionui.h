@@ -3,7 +3,7 @@
  * Purpose:  wxGxDiscConnectionUI class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxDiscConnectionUI :
     public IGxObjectEditUI
 {
 public:
-	wxGxDiscConnectionUI(wxString Path, wxString Name);
+	wxGxDiscConnectionUI(wxString Path, wxString Name, wxIcon SmallIco, wxIcon LargeIco, wxIcon SmallIcoDsbl, wxIcon LargeIcoDsbl);
 	virtual ~wxGxDiscConnectionUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
@@ -41,4 +41,7 @@ public:
 	virtual wxString NewMenu(void){return wxString(wxT("wxGxDiscConnection.NewMenu"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
+protected:
+	wxIcon m_Conn16, m_Conn48;
+	wxIcon m_ConnDsbld16, m_ConnDsbld48;
 };

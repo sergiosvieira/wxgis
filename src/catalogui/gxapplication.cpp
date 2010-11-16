@@ -303,7 +303,7 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
 
 	SerializeGxFramePos(false);
 
-    m_pNewMenu->Init();
+    //m_pNewMenu->Init();
 	m_mgr.Update();
 
 	wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
@@ -328,7 +328,7 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
 {
     event.Skip();
 	//should remove toolbars from commandbar array as m_mgr manage toolbars by itself
-    m_pNewMenu->UnInit();
+    //m_pNewMenu->UnInit();
 
     IGxSelection* pSel = m_pCatalog->GetSelection();
 

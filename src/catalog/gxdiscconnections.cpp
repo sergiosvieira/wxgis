@@ -3,7 +3,7 @@
  * Purpose:  wxGxDiscConnections class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
  ****************************************************************************/
 #include "wxgis/catalog/gxdiscconnections.h"
 #include "wxgis/catalog/gxdiscconnection.h"
-#include "../../art/folder_conns_16.xpm"
-#include "../../art/folder_conns_48.xpm"
 
 #include "wx/volume.h"
 #include "wx/dir.h"
