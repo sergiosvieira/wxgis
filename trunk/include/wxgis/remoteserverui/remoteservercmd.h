@@ -1,9 +1,9 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGISNewMenu class.
+ * Project:  wxGIS (GIS Remote)
+ * Purpose:  Catalog Main Commands class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,30 +19,15 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-#include "wxgis/catalogui/catalogui.h"
 #include "wxgis/framework/framework.h"
-//#include "wxgis/framework/application.h"
-#include "wxgis/framework/commandbar.h"
 
-#define NEWMENUNAME _("Application.NewMenu")
-
-//----------------------------------------------------------------------
-// wxGISNewMenu
-//----------------------------------------------------------------------
-
-class WXDLLIMPEXP_GIS_CLU wxGISNewMenu :
-	public wxGISMenu,
-	public ICommand/*,
-	public IGxSelectionEvents*/
+class wxGISRemoteCmd :
+    public ICommand
 {
+	DECLARE_DYNAMIC_CLASS(wxGISRemoteCmd)
 public:
-	wxGISNewMenu(const wxString& sName = NEWMENUNAME, const wxString& sCaption = _("New"), wxGISEnumCommandBars type = enumGISCBSubMenu, const wxString& title = wxEmptyString, long style = 0);
-	~wxGISNewMenu(void);
-	//wxGISMenu
-	virtual void AddCommand(ICommand* pCmd){};
-	virtual void RemoveCommand(size_t nIndex){};
-	virtual void MoveCommandLeft(size_t nIndex){};
-	virtual void MoveCommandRight(size_t nIndex){};
+	wxGISRemoteCmd(void);
+	virtual ~wxGISRemoteCmd(void);
 	//ICommand
 	virtual wxIcon GetBitmap(void);
 	virtual wxString GetCaption(void);
@@ -55,18 +40,6 @@ public:
 	virtual bool OnCreate(IApplication* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
-    //wxGISMenu
-	virtual void Update(IGxSelection* Selection);
-
-	//virtual void Init(void);
- //   virtual void UnInit(void);
-	////IGxSelectionEvents
-	//virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
-protected:
-    std::vector<wxMenuItem*> m_delitems;
+private:
 	IApplication* m_pApp;
-	IConnectionPointContainer* m_pConnectionPointSelection;
-	long m_ConnectionPointSelectionCookie;
 };
-
-

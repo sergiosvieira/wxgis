@@ -22,8 +22,11 @@
 #pragma once
 #include "wxgis/catalogui/gxview.h"
 #include "wxgis/catalogui/gxcatalogui.h"
+#include "wxgis/catalogui/newmenu.h"
+
 #include "wx/listctrl.h"
 #include "wx/imaglist.h"
+
 
 //TODO: Fix mouse selection dragging
 
@@ -105,6 +108,7 @@ protected:
 	IGxSelection* m_pSelection;
     wxGxCatalogUI* m_pCatalog;
     ICommand* m_pDeleteCmd;
+	wxGISNewMenu* m_pNewMenu;
 	IGxObject* m_pParentGxObject;
 	bool m_bDragging;
     std::vector<ICONDATA> m_IconsArray;

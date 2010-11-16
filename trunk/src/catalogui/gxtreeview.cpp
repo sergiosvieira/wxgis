@@ -154,7 +154,10 @@ bool wxGxTreeViewBase::Activate(IGxApplication* application, wxXmlNode* pConf)
     IApplication* pApp = dynamic_cast<IApplication*>(application);
     if(pApp)
     {
+		//delete
         m_pDeleteCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
+		//new
+		m_pNewMenu = dynamic_cast<wxGISNewMenu*>(pApp->GetCommandBar(NEWMENUNAME));
     }
 
     AddRoot(dynamic_cast<IGxObject*>(m_pCatalog));
@@ -563,6 +566,8 @@ void wxGxTreeView::OnSelChanged(wxTreeEvent& event)
 		    m_pSelection->Select(pData->m_pObject, true, GetId());
 	    }
     }
+	if(	m_pNewMenu )
+		m_pNewMenu->Update(m_pSelection);
 
 	//wxTreeItemId item = event.GetItem();
 	//if(!item.IsOk())

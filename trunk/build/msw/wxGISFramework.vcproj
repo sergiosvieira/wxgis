@@ -252,6 +252,10 @@
 				RelativePath="..\..\src\framework\tooltip.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\src\framework\wxregexvalidator.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -328,6 +332,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\framework\tooltip.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\framework\wxregexvalidator.h"
 				>
 			</File>
 		</Filter>

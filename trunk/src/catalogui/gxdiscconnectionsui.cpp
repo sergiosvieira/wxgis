@@ -3,7 +3,7 @@
  * Purpose:  wxGxDiscConnectionsUI class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -24,6 +24,10 @@
 
 #include "../../art/folder_conns_16.xpm"
 #include "../../art/folder_conns_48.xpm"
+#include "../../art/folder_conn_16.xpm"
+#include "../../art/folder_conn_48.xpm"
+#include "../../art/folder_conn_disbl_16.xpm"
+#include "../../art/folder_conn_disbl_48.xpm"
 
 #include "wx/volume.h"
 #include "wx/msgdlg.h"
@@ -33,6 +37,10 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxDiscConnectionsUI, wxGxDiscConnections)
 
 wxGxDiscConnectionsUI::wxGxDiscConnectionsUI(void) : wxGxDiscConnections()
 {
+	m_Conn16 = wxIcon(folder_conn_16_xpm);
+	m_Conn48 = wxIcon(folder_conn_48_xpm);
+	m_ConnDsbld16 = wxIcon(folder_conn_disbl_16_xpm);
+	m_ConnDsbld48 = wxIcon(folder_conn_disbl_48_xpm);
 }
 
 wxGxDiscConnectionsUI::~wxGxDiscConnectionsUI(void)
@@ -81,7 +89,7 @@ void wxGxDiscConnectionsUI::LoadChildren(void)
 
     for(size_t i = 0; i < m_aConnections.size(); i++)
     {
-        wxGxDiscConnectionUI* pwxGxDiscConnection = new wxGxDiscConnectionUI(m_aConnections[i].sPath, m_aConnections[i].sName);
+        wxGxDiscConnectionUI* pwxGxDiscConnection = new wxGxDiscConnectionUI(m_aConnections[i].sPath, m_aConnections[i].sName, m_Conn16, m_Conn48, m_ConnDsbld16, m_ConnDsbld48);
         IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
         if(AddChild(pGxObject))
             wxLogMessage(_("wxGxDiscConnections: Add folder connection [%s]"), m_aConnections[i].sName.c_str());
@@ -104,7 +112,7 @@ IGxObject* wxGxDiscConnectionsUI::ConnectFolder(wxString sPath)
 
     if(wxDir::Exists(sPath)) 	//check if path is valid
 	{
-	    wxGxDiscConnectionUI* pwxGxDiscConnection = new wxGxDiscConnectionUI(sPath, sPath);
+	    wxGxDiscConnectionUI* pwxGxDiscConnection = new wxGxDiscConnectionUI(sPath, sPath, m_Conn16, m_Conn48, m_ConnDsbld16, m_ConnDsbld48);
         IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
         if(AddChild(pGxObject))
         {

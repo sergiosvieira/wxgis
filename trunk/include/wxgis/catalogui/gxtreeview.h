@@ -22,6 +22,7 @@
 
 #include "wxgis/catalogui/gxview.h"
 #include "wxgis/catalogui/gxcatalogui.h"
+#include "wxgis/catalogui/newmenu.h"
 
 #include "wx/treectrl.h"
 #include "wx/imaglist.h"
@@ -104,6 +105,7 @@ protected:
     wxGxCatalogUI* m_pCatalog;
     ICommand* m_pDeleteCmd;
     std::vector<ICONDATA> m_IconsArray;
+	wxGISNewMenu* m_pNewMenu;
 
     DECLARE_EVENT_TABLE()
 };

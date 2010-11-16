@@ -96,31 +96,29 @@ unsigned char wxGISNewMenu::GetCount(void)
 	return 1;
 }
 
-void wxGISNewMenu::UnInit(void)
+//void wxGISNewMenu::UnInit(void)
+//{
+//	if(m_ConnectionPointSelectionCookie != -1)
+//		m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
+//}
+//
+//void wxGISNewMenu::Init(void)
+//{
+//    IGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(m_pApp);
+//    wxMenu* pMenu = static_cast<wxMenu*>(this);
+//    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+//    m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( pGxCatalogUI->GetSelection() );
+//    if(m_pConnectionPointSelection != NULL)
+//	    m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(pMenu);
+//
+//    wxMenuItem* pItem = Append(ID_MENUCMD - 1, wxT(" "), wxEmptyString, wxITEM_NORMAL);
+//    pItem->Enable(false);
+//    m_delitems.push_back(pItem);
+//}
+//
+void wxGISNewMenu::Update(IGxSelection* Selection)
+//void wxGISNewMenu::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 {
-	if(m_ConnectionPointSelectionCookie != -1)
-		m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
-}
-
-void wxGISNewMenu::Init(void)
-{
-    IGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(m_pApp);
-    wxMenu* pMenu = static_cast<wxMenu*>(this);
-    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-    m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( pGxCatalogUI->GetSelection() );
-    if(m_pConnectionPointSelection != NULL)
-	    m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(pMenu);
-
-    wxMenuItem* pItem = Append(ID_MENUCMD - 1, wxT(" "), wxEmptyString, wxITEM_NORMAL);
-    pItem->Enable(false);
-    m_delitems.push_back(pItem);
-}
-
-void wxGISNewMenu::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
-{
-	//if(nInitiator != TREECTRLID)
-	//	return;
-
     for(size_t i = 0; i < m_delitems.size(); i++)
     {
         wxMenuItem* pItem = Remove(m_delitems[i]);
@@ -157,3 +155,4 @@ void wxGISNewMenu::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
     pItem->Enable(false);
     m_delitems.push_back(pItem);
 }
+

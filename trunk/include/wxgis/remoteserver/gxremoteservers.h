@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDiscConnections class.
+ * Purpose:  wxGxRemoteServers class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010 Bishop
@@ -19,27 +19,27 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-#include "wxgis/catalog/catalog.h"
+#include "wxgis/remoteserver/remoteserver.h"
 
-/** \class wxGxDiscConnections gxdiscconnections.h
-    \brief A Disc Connections GxRootObject.
+/** \class wxGxRemoteServers gxremoteservers.h
+    \brief A Remote Servers GxRootObject.
 */
-class WXDLLIMPEXP_GIS_CLT wxGxDiscConnections :
+class WXDLLIMPEXP_GIS_RS wxGxRemoteServers :
 	public IGxObjectContainer,
     public IGxRootObjectProperties,
     public wxObject
 {
-   DECLARE_DYNAMIC_CLASS(wxGxDiscConnections)
+   DECLARE_DYNAMIC_CLASS(wxGxRemoteServers)
 public:
-	wxGxDiscConnections(void);
-	virtual ~wxGxDiscConnections(void);
+	wxGxRemoteServers(void);
+	virtual ~wxGxRemoteServers(void);
 	//IGxObject
 	virtual void Detach(void);
-	virtual wxString GetName(void){return wxString(_("Folder connections"));};
+	virtual wxString GetName(void){return wxString(_("Remote Servers"));};
     virtual wxString GetBaseName(void){return GetName();};
     virtual wxString GetFullName(void){return wxEmptyString;};
     virtual wxString GetPath(void){return wxEmptyString;};
-	virtual wxString GetCategory(void){return wxString(_("Folder connections"));};
+	virtual wxString GetCategory(void){return wxString(_("Remote Servers"));};
 	virtual void Refresh(void);
 	//IGxObjectContainer
 	virtual bool DeleteChild(IGxObject* pChild);
@@ -48,16 +48,14 @@ public:
     //IGxRootObjectProperties
     virtual void Init(wxXmlNode* pConfigNode);
     virtual wxXmlNode* GetProperties(void);
-	//wxGxDiscConnections
+	//wxGxRemoteServers
 	virtual void LoadChildren(void);
 	virtual void EmptyChildren(void);
-    virtual IGxObject* ConnectFolder(wxString sPath);
-    virtual IGxObject* DisconnectFolder(wxString sPath);
 
-    typedef struct _conn_data{
-        wxString sName, sPath;
-    }CONN_DATA;
+    //typedef struct _conn_data{
+    //    wxString sName, sPath;
+    //}CONN_DATA;
 protected:
-    std::vector<CONN_DATA> m_aConnections;
+    //std::vector<CONN_DATA> m_aConnections;
 	bool m_bIsChildrenLoaded;
 };

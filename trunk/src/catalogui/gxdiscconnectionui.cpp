@@ -3,7 +3,7 @@
  * Purpose:  wxGxDiscConnectionUI class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,13 +20,12 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxdiscconnectionui.h"
 
-#include "../../art/folder_conn_16.xpm"
-#include "../../art/folder_conn_48.xpm"
-#include "../../art/folder_conn_disbl_16.xpm"
-#include "../../art/folder_conn_disbl_48.xpm"
-
-wxGxDiscConnectionUI::wxGxDiscConnectionUI(wxString Path, wxString Name) : wxGxDiscConnection(Path, Name)
+wxGxDiscConnectionUI::wxGxDiscConnectionUI(wxString Path, wxString Name, wxIcon SmallIco, wxIcon LargeIco, wxIcon SmallIcoDsbl, wxIcon LargeIcoDsbl) : wxGxDiscConnection(Path, Name)
 {
+	m_Conn16 = SmallIco;
+	m_Conn48 = LargeIco;
+	m_ConnDsbld16 = SmallIcoDsbl;
+	m_ConnDsbld48 = LargeIcoDsbl;
 }
 
 wxGxDiscConnectionUI::~wxGxDiscConnectionUI(void)
@@ -37,18 +36,18 @@ wxIcon wxGxDiscConnectionUI::GetLargeImage(void)
 {
 	bool bIsOk = wxFileName::IsDirReadable(m_sPath);
 	if(bIsOk)
-		return wxIcon(folder_conn_48_xpm);
+		return m_Conn48;
 	else
-		return wxIcon(folder_conn_disbl_48_xpm);
+		return m_ConnDsbld48;
 }
 
 wxIcon wxGxDiscConnectionUI::GetSmallImage(void)
 {
 	bool bIsOk = wxFileName::IsDirReadable(m_sPath);
 	if(bIsOk)
-		return wxIcon(folder_conn_16_xpm);
+		return m_Conn16;
 	else
-		return wxIcon(folder_conn_disbl_16_xpm);
+		return m_ConnDsbld16;
 }
 
 void wxGxDiscConnectionUI::EditProperties(wxWindow *parent)
