@@ -22,6 +22,7 @@
 #include "wxgis/geoprocessing/gporthocorrecttool.h"
 #include "wxgis/geoprocessing/gptoolmngr.h"
 #include "wxgis/geoprocessing/gpdomain.h"
+#include "wxgis/geoprocessing/gpparam.h"
 #include "wxgis/catalog/gxfilters.h"
 #include "wxgis/datasource/rasterdataset.h"
 #include "wxgis/framework/application.h"

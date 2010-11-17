@@ -175,9 +175,19 @@
 #    define WXDLLIMPEXP_DATA_GIS_RSU(type) type
 #endif
 
+#ifdef WXMAKINGDLL_GIS_NET
+#    define WXDLLIMPEXP_GIS_NET WXEXPORT
+#    define WXDLLIMPEXP_DATA_GIS_NET(type) WXEXPORT type
+#elif defined(WXUSINGDLL)
+#    define WXDLLIMPEXP_GIS_NET WXIMPORT
+#    define WXDLLIMPEXP_DATA_GIS_NET(type) WXIMPORT type
+#else /* not making nor using DLL */
+#    define WXDLLIMPEXP_GIS_NET
+#    define WXDLLIMPEXP_DATA_GIS_NET(type) type
+#endif
+
 //#define WXDLLEXPORT WXMAKINGDLL_GIS
 //#define WXDLLEXPORT_DATA WXDLLIMPEXP_DATA_GIS
-
 
 #include <wx/xml/xml.h>
 

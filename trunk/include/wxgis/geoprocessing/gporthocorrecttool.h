@@ -45,6 +45,8 @@ public:
     virtual GPParameters* GetParameterInfo(void);
     virtual void SetCatalog(IGxCatalog* pCatalog);
     virtual IGxCatalog* GetCatalog(void);
+	virtual wxString GetAsString(void){return wxEmptyString;};
+	virtual void SetFromString(wxString sParams){};
 protected:
     GPParameters m_pParamArr;
     IGxCatalog* m_pCatalog;

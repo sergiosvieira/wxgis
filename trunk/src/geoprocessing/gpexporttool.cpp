@@ -22,6 +22,7 @@
 #include "wxgis/geoprocessing/gpexporttool.h"
 #include "wxgis/geoprocessing/gptoolmngr.h"
 #include "wxgis/geoprocessing/gpdomain.h"
+#include "wxgis/geoprocessing/gpparam.h"
 #include "wxgis/catalog/gxfilters.h"
 
 /////////////////////////////////////////////////////////////////////////
