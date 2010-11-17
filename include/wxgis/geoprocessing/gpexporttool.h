@@ -47,6 +47,8 @@ public:
     virtual void SetCatalog(IGxCatalog* pCatalog);
     virtual IGxCatalog* GetCatalog(void);
     virtual bool OnExport(wxGISFeatureDataset* pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel);
+	virtual wxString GetAsString(void){return wxEmptyString;};
+	virtual void SetFromString(wxString sParams){};
 protected:
     GPParameters m_pParamArr;
     IGxCatalog* m_pCatalog;

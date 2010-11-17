@@ -161,3 +161,13 @@ void wxGISGPParameter::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
     m_sMessage = sMsg;
     m_nMsgType = nType;
 }
+
+wxString wxGISGPParameter::GetAsString(void)
+{
+	return wxEmptyString;
+}
+
+void wxGISGPParameter::SetFromString(wxString sParam)
+{
+}
+
