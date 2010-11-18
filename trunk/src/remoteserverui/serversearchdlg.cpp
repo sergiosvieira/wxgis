@@ -130,6 +130,7 @@ void wxGISSearchServerDlg::OnStopUI( wxUpdateUIEvent& event )
 void wxGISSearchServerDlg::OnSearch( wxCommandEvent& event )
 { 
 
+    //TODO: move to constructor + rcv thread
 	wxSocketBase::Initialize();
 
 	wxIPV4address BroadCastAddress; // For broadcast sending 
@@ -149,14 +150,23 @@ void wxGISSearchServerDlg::OnSearch( wxCommandEvent& event )
 	
 	wxString sMsg = wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStHello, enumGISPriorityHightest);
 	wxNetMessage msg(sMsg, wxID_ANY);
-	Socket->SendTo(BroadCastAddress, msg.GetData().c_str(), msg.GetDataLen() ); 
-	// Check for any errors 
-	int count = Socket->LastCount(); 
-	if( Socket->Error() ) 
-	{ 
-		wxSocketError err = Socket->LastError(); 
-	}
+    if(msg.IsOk())
+    {
+	    Socket->SendTo(BroadCastAddress, msg.GetData(), msg.GetDataLen() ); 
+	    // Check for any errors 
+	    int count = Socket->LastCount(); 
+	    if( Socket->Error() ) 
+	    { 
+		    wxSocketError err = Socket->LastError(); 
+	    }
+        
+ 	    unsigned char buff[BUFF] = {0};
+        wxIPV4address BroadCastAddress; // For broadcast sending 
+		Socket->RecvFrom(BroadCastAddress, &buff, BUFF); 
 
+        int x = 0;
+
+    }
 	Socket->Destroy();
 
 	//wxSocketBase::Shutdown();

@@ -24,6 +24,8 @@
 
 #define WXNETVER 2
 
+#define BUFF 1000
+
 #define WXNETMESSAGE1 wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg ver=\"%d\" st=\"%d\" prio=\"%u\">%s</msg>")
 #define WXNETMESSAGE2 wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg ver=\"%d\" st=\"%d\" prio=\"%u\"/>")
 
@@ -67,8 +69,10 @@ public:
     virtual bool IsOk(void);
     virtual wxGISMessageDirection GetDirection(void);
     virtual void SetDirection(wxGISMessageDirection nDirection);
+    virtual wxGISMessageState GetState(void);
+    virtual void SetState(wxGISMessageState nState);
 //    virtual wxXmlNode* GetRoot(void);
-    virtual wxString GetData(void);
+    virtual const unsigned char* GetData(void);
     virtual size_t GetDataLen(void);
 protected:
 	virtual wxString StrFromBuff(unsigned char* pBuff, size_t nBuffByteSize, size_t nValSize);
@@ -81,6 +85,7 @@ protected:
 	wxGISMessageState m_nState;
 	//wxString m_sMessage;
 	wxString m_sData;
+    unsigned char m_cData[BUFF];
 };
 //
 ////std::priority_queue<Message, std::deque<Message> > pq;
