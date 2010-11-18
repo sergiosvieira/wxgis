@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/remoteserverui/serversearchdlg.h"
+#include "wxgis/networking/message.h"
 
 #include "../../art/remoteservers_16.xpm"
 #include "../../art/remoteserver_16.xpm"
@@ -128,11 +129,63 @@ void wxGISSearchServerDlg::OnStopUI( wxUpdateUIEvent& event )
 
 void wxGISSearchServerDlg::OnSearch( wxCommandEvent& event )
 { 
+
+	wxSocketBase::Initialize();
+
+	wxIPV4address BroadCastAddress; // For broadcast sending 
+	wxIPV4address LocalAddress; // For the listening 
+	LocalAddress.AnyAddress(); 
+	BroadCastAddress.Hostname(_("255.255.255.255")); 
+	BroadCastAddress.Service(1977); // port on which we listen for the answers 
+	LocalAddress.Service(1977); // port on which we listen for the answers 
+
+	// Create the socket 
+	wxDatagramSocket* Socket = new wxDatagramSocket(LocalAddress, wxSOCKET_REUSEADDR);//wxSOCKET_NONE 
+	Socket->Notify(false);
+
+	static const int optval = 1; 
+	Socket->SetOption(SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval)); 
+	//Socket->SetOption(SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)); 	
+	
+	wxString sMsg = wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStHello, enumGISPriorityHightest);
+	wxNetMessage msg(sMsg, wxID_ANY);
+	Socket->SendTo(BroadCastAddress, msg.GetData().c_str(), msg.GetDataLen() ); 
+	// Check for any errors 
+	int count = Socket->LastCount(); 
+	if( Socket->Error() ) 
+	{ 
+		wxSocketError err = Socket->LastError(); 
+	}
+
+	Socket->Destroy();
+
+	//wxSocketBase::Shutdown();
+
 	//wxBusyCursor wait;
 	//m_bContinueSearch = true;
 	//UpdateWindowUI(wxUPDATE_UI_RECURSE);
 
-	wxSocketBase::Initialize();
+	//wxSocketBase::Initialize();
+
+	////UDP search
+	//wxIPV4address addr; 
+	//addr.Service(1977);
+	//addr.AnyAddress(); 
+
+	//wxIPV4address otherAddr; 
+	//otherAddr.Service(1977); 
+	////otherAddr.Hostname(0xFFFFFFFF); 
+	//otherAddr.AnyAddress();
+
+	//wxDatagramSocket* socket = new wxDatagramSocket(addr, wxSOCKET_NONE); 
+	//const int optval = 1; 
+	//socket->SetOption(SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval)); 
+	//socket->SetOption(SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)); 
+
+	//char* data = "HELLO";
+	//socket->SendTo(otherAddr, data, strlen(data)); 
+	//socket->Destroy();
+
 	//wxIPV4address myIp;
 	//myIp.Hostname(wxGetHostName());
 	//wxString ipAddr = myIp.IPAddress();

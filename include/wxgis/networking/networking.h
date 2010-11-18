@@ -24,6 +24,15 @@
 
 #include "wx/socket.h"
 
+#define WIN 0
+#define LIN 1
+
+#ifdef __WXMSW__
+	#define CURROS WIN
+#else
+	#define CURROS LIN
+#endif
+
 enum wxGISMessagePriority
 {
 	enumGISPriorityLowest   = 0, 
@@ -49,6 +58,7 @@ enum wxGISMessageState
     enumGISMsgStNote,
     enumGISMsgStGet,
     enumGISMsgStCmd,
+    enumGISMsgStHello,
     enumGISMsgStBye,
     enumGISMsgStSnd,
     enumGISMsgStRcv
