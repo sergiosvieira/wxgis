@@ -22,11 +22,6 @@
 
 #include "wxgis/networking/networking.h"
 
-//#ifdef __WXMSW__
-//#define CURROS WIN
-//#else
-//#define CURROS LIN
-//#endif
 //
 //class wxTCPNetworkPlugin;
 //

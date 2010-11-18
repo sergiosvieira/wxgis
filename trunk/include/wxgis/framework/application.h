@@ -3,7 +3,7 @@
  * Purpose:  wxGISApplication class. Base application functionality (commands, menues, etc.)
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -73,9 +73,10 @@ public:
     virtual bool SetupSys(wxString sSysPath);
     virtual bool SetupLoc(wxString sLoc, wxString sLocPath);
 
-    typedef std::vector<wxDynamicLibrary*> LIBRARYARRAY;
+    typedef std::map<wxString, wxDynamicLibrary*> LIBMAP;
 protected:
 	virtual void LoadLibs(wxXmlNode* pRootNode);
+	virtual void UnLoadLibs(void);
 	virtual void LoadCommands(wxXmlNode* pRootNode);
 	virtual void LoadMenues(wxXmlNode* pRootNode);
 	virtual void LoadToolbars(wxXmlNode* pRootNode);
@@ -101,7 +102,7 @@ protected:
 	wxGISMenuBar* m_pMenuBar;
 	ITool* m_CurrentTool;
     IDropDownCommand* m_pDropDownCommand;
-    LIBRARYARRAY m_LibArr;
+    LIBMAP m_LibMap;
 	ITrackCancel* m_pTrackCancel;
     //
     wxFFile m_LogFile;

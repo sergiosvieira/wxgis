@@ -20,41 +20,68 @@
  ****************************************************************************/
 #pragma once
 
-//#include "wxgissrv/framework/framework.h"
+#include "wxgis/networking/networking.h"
+
+#define WXNETVER 2
+
+#define WXNETMESSAGE1 wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg ver=\"%d\" st=\"%d\" prio=\"%u\">%s</msg>")
+#define WXNETMESSAGE2 wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg ver=\"%d\" st=\"%d\" prio=\"%u\"/>")
+
+//#define WEMESSAGE wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg ver=\"%d\" st=\"%d\" message=\"%s\" priority=\"%u\">%s</msg>")
 //
-//#define WXNETVER 2
 //
 //// ----------------------------------------------------------------------------
 //// wxNetMessage
 //// ----------------------------------------------------------------------------
 //
-////#define WEMESSAGE wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?><weMsg version=\"%d\" state=\"%d\" message=\"%s\" priority=\"%u\">%s</weMsg>")
-//
-//class WXDLLIMPEXP_GIS_FRW wxNetMessage : public INetMessage
-//{
-//public:
-//    wxNetMessage(void);
-//    wxNetMessage(wxString sMsgData, long nID);
+
+/** \class wxNetMessage message.h
+    \brief A network message class.
+
+	Used in messaging between server and client
+*/
+
+class WXDLLIMPEXP_GIS_NET wxNetMessage : public INetMessage
+{
+public:
+    /** \fn wxNetMessage(void)
+     *  \brief A default constructor.
+     */    
+	wxNetMessage(void);
+    /** \fn wxNetMessage(unsigned char* pBuff, size_t nSize)
+     *  \brief A constructor.
+	 *	\param pBuff input buffer
+	 *	\param nSize input buffer size
+     */    
+    wxNetMessage(unsigned char* pBuff, size_t nSize);
+    wxNetMessage(wxString sMsgData, long nID);
 //    wxNetMessage(long nID, wxGISMessageState nState = enumGISMsgStUnk, short nPriority = enumGISPriorityNormal, wxString sMessage = wxEmptyString, wxString sModuleSrc = wxEmptyString, wxString sModuleDst = wxEmptyString);
-//    virtual ~wxNetMessage(void);
-//    virtual short GetPriority(void);
-//    virtual void SetPriority(short nPriority);
-//    //virtual bool operator< (const INetMessage& msg) const;
-//    //virtual INetMessage& operator= (const INetMessage& oSource);
-//    virtual bool IsOk(void);
-//    virtual wxGISMessageDirection GetDirection(void);
-//    virtual void SetDirection(wxGISMessageDirection nDirection);
+    /** \fn virtual ~wxNetMessage(void)
+     *  \brief A destructor.
+     */
+	virtual ~wxNetMessage(void);
+    virtual short GetPriority(void);
+    virtual void SetPriority(short nPriority);
+////    //virtual bool operator< (const INetMessage& msg) const;
+////    //virtual INetMessage& operator= (const INetMessage& oSource);
+    virtual bool IsOk(void);
+    virtual wxGISMessageDirection GetDirection(void);
+    virtual void SetDirection(wxGISMessageDirection nDirection);
 //    virtual wxXmlNode* GetRoot(void);
-//    virtual wxString GetData(void);
-//protected:
-//    wxXmlDocument *m_pXmlDocument;
-//    long m_nID;
-//	bool m_bIsOk;
-//    short m_nPriority;
-//    wxGISMessageDirection m_nDirection;
-//    wxGISMessageState m_nState;
-//    wxString m_sMessage;
-//};
+    virtual wxString GetData(void);
+    virtual size_t GetDataLen(void);
+protected:
+	virtual wxString StrFromBuff(unsigned char* pBuff, size_t nBuffByteSize, size_t nValSize);
+protected:
+	wxXmlDocument *m_pXmlDocument;
+	long m_nID;
+	bool m_bIsOk;
+	short m_nPriority;
+	wxGISMessageDirection m_nDirection;
+	wxGISMessageState m_nState;
+	//wxString m_sMessage;
+	wxString m_sData;
+};
 //
 ////std::priority_queue<Message, std::deque<Message> > pq;
 
