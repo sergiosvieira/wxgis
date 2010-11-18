@@ -25,22 +25,42 @@
 
 wxNetMessage::wxNetMessage(unsigned char* pBuff, size_t nSize) : m_bIsOk(false), m_pXmlDocument(NULL)
 {
-	wxChar sys_type = (wxChar)pBuff[0];
-	pBuff += sizeof(wxChar);
+	wxUint8 sys_type = (wxUint8)pBuff[0];
+	pBuff += sizeof(wxUint8);
 	
 	if(sys_type == CURROS)
 	{
 		m_sData = wxString((const wxChar*)pBuff, nSize);
 	}
-	else if(CURROS == WIN)
+	else if(sys_type == WIN)
 	{
 		m_sData = StrFromBuff(pBuff, nSize, sizeof(wxUint32));
 	}
-	else if(CURROS == LIN)
+	else if(sys_type == LIN)
 	{
 		m_sData = StrFromBuff(pBuff, nSize, sizeof(wxUint16));
 	}
-	m_bIsOk = !m_sData.IsEmpty();
+
+
+    wxStringInputStream Stream(m_sData);
+    
+    m_pXmlDocument = new wxXmlDocument();
+	if(!m_pXmlDocument->Load(Stream) || !m_pXmlDocument->IsOk())
+		return;
+	
+	wxXmlNode *pRoot = m_pXmlDocument->GetRoot();
+	if(pRoot && pRoot->GetName() != wxT("msg"))
+		return;
+
+    if(wxAtoi(pRoot->GetPropVal(wxT("ver"), wxT("1"))) > WXNETVER)
+		return;
+
+    //header
+	m_nState = (wxGISMessageState)wxAtoi(pRoot->GetPropVal(wxT("st"), wxT("0")));
+	//m_sMessage = pRoot->GetPropVal(wxT("message"), wxT(""));
+	m_nPriority = wxAtoi(pRoot->GetPropVal(wxT("prio"), wxT("0")));
+
+    m_bIsOk = !m_sData.IsEmpty();
 }
 
 wxString wxNetMessage::StrFromBuff(unsigned char* pBuff, size_t nBuffByteSize, size_t nValSize)
@@ -186,15 +206,23 @@ void wxNetMessage::SetDirection(wxGISMessageDirection nDirection)
 //    return NULL;
 //}
 //
-wxString wxNetMessage::GetData(void)
+const unsigned char* wxNetMessage::GetData(void)
 {
 	if(m_sData.IsEmpty())
 	{
 		wxStringOutputStream Stream(&m_sData);
 		if(!m_pXmlDocument || !m_pXmlDocument->Save(Stream, wxXML_NO_INDENTATION))
-			return wxEmptyString;
+			return 0;
 	}
-	return m_sData;
+
+    if(GetDataLen() >= BUFF)
+        return 0;
+
+    wxUint8 sys_type = CURROS; 
+    memcpy(m_cData, &sys_type, sizeof(wxUint8));
+    memcpy(m_cData + sizeof(wxUint8), m_sData.GetData(), GetDataLen());
+    
+    return (const unsigned char*)m_cData;
 }
 
 size_t wxNetMessage::GetDataLen(void)
@@ -205,6 +233,15 @@ size_t wxNetMessage::GetDataLen(void)
 		if(!m_pXmlDocument || !m_pXmlDocument->Save(Stream, wxXML_NO_INDENTATION))
 			return 0;
 	}
-	return (m_sData.Len() + 1) * sizeof(wxChar);
+	return (m_sData.Len() + 1) * sizeof(wxChar) + sizeof(wxUint8);
 }
 
+wxGISMessageState wxNetMessage::GetState(void)
+{
+    return m_nState;
+}
+
+void wxNetMessage::SetState(wxGISMessageState nState)
+{
+    m_nState = nState;
+}
