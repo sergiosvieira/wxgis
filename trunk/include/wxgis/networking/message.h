@@ -71,11 +71,13 @@ public:
     virtual void SetDirection(wxGISMessageDirection nDirection);
     virtual wxGISMessageState GetState(void);
     virtual void SetState(wxGISMessageState nState);
-//    virtual wxXmlNode* GetRoot(void);
+    virtual wxXmlNode* GetRoot(void);
     virtual const unsigned char* GetData(void);
     virtual size_t GetDataLen(void);
 protected:
 	virtual wxString StrFromBuff(unsigned char* pBuff, size_t nBuffByteSize, size_t nValSize);
+	virtual bool LoadXMLFromStr(wxString sData);
+	virtual bool SavedXMLToStr(wxString sData);
 protected:
 	wxXmlDocument *m_pXmlDocument;
 	long m_nID;

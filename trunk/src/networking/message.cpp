@@ -42,23 +42,9 @@ wxNetMessage::wxNetMessage(unsigned char* pBuff, size_t nSize) : m_bIsOk(false),
 	}
 
 
-    wxStringInputStream Stream(m_sData);
-    
-    m_pXmlDocument = new wxXmlDocument();
-	if(!m_pXmlDocument->Load(Stream) || !m_pXmlDocument->IsOk())
+	//load xml
+	if(!LoadXMLFromStr(m_sData))
 		return;
-	
-	wxXmlNode *pRoot = m_pXmlDocument->GetRoot();
-	if(pRoot && pRoot->GetName() != wxT("msg"))
-		return;
-
-    if(wxAtoi(pRoot->GetPropVal(wxT("ver"), wxT("1"))) > WXNETVER)
-		return;
-
-    //header
-	m_nState = (wxGISMessageState)wxAtoi(pRoot->GetPropVal(wxT("st"), wxT("0")));
-	//m_sMessage = pRoot->GetPropVal(wxT("message"), wxT(""));
-	m_nPriority = wxAtoi(pRoot->GetPropVal(wxT("prio"), wxT("0")));
 
     m_bIsOk = !m_sData.IsEmpty();
 }
@@ -119,23 +105,9 @@ wxNetMessage::wxNetMessage(wxString sMsgData, long nID) : m_bIsOk(false), m_pXml
     m_nID = nID;
 	m_sData = sMsgData;
 
-	wxStringInputStream Stream(sMsgData);
-    
-    m_pXmlDocument = new wxXmlDocument();
-	if(!m_pXmlDocument->Load(Stream) || !m_pXmlDocument->IsOk())
+	//load xml
+	if(!LoadXMLFromStr(sMsgData))
 		return;
-	
-	wxXmlNode *pRoot = m_pXmlDocument->GetRoot();
-	if(pRoot && pRoot->GetName() != wxT("msg"))
-		return;
-
-    if(wxAtoi(pRoot->GetPropVal(wxT("ver"), wxT("1"))) > WXNETVER)
-		return;
-
-    //header
-	m_nState = (wxGISMessageState)wxAtoi(pRoot->GetPropVal(wxT("st"), wxT("0")));
-	//m_sMessage = pRoot->GetPropVal(wxT("message"), wxT(""));
-	m_nPriority = wxAtoi(pRoot->GetPropVal(wxT("prio"), wxT("0")));
 
 	m_bIsOk = true;
 }
@@ -183,10 +155,9 @@ void wxNetMessage::SetPriority(short nPriority)
 //
 bool wxNetMessage::IsOk(void)
 {
-    //if(!m_pXmlDocument)
-    //    return false;
-    //return m_pXmlDocument->IsOk() && m_bIsOk;
-	return m_bIsOk;
+    if(!m_pXmlDocument)
+        return false;
+    return m_pXmlDocument->IsOk() && m_bIsOk;
 }
 
 wxGISMessageDirection wxNetMessage::GetDirection(void)
@@ -199,26 +170,28 @@ void wxNetMessage::SetDirection(wxGISMessageDirection nDirection)
     m_nDirection = nDirection;
 }
 
-//wxXmlNode* wxNetMessage::GetRoot(void)
-//{
-//    if(m_pXmlDocument)
-//        return m_pXmlDocument->GetRoot();
-//    return NULL;
-//}
-//
+wxXmlNode* wxNetMessage::GetRoot(void)
+{
+	if(!m_pXmlDocument)
+		if(!LoadXMLFromStr(m_sData))
+			return NULL;
+    if(m_pXmlDocument)
+        return m_pXmlDocument->GetRoot();
+    return NULL;
+}
+
 const unsigned char* wxNetMessage::GetData(void)
 {
 	if(m_sData.IsEmpty())
-	{
-		wxStringOutputStream Stream(&m_sData);
-		if(!m_pXmlDocument || !m_pXmlDocument->Save(Stream, wxXML_NO_INDENTATION))
+		if(SavedXMLToStr(m_sData))
 			return 0;
-	}
 
     if(GetDataLen() >= BUFF)
         return 0;
 
     wxUint8 sys_type = CURROS; 
+
+	memset(m_cData, 0, sizeof(BUFF));
     memcpy(m_cData, &sys_type, sizeof(wxUint8));
     memcpy(m_cData + sizeof(wxUint8), m_sData.GetData(), GetDataLen());
     
@@ -228,11 +201,8 @@ const unsigned char* wxNetMessage::GetData(void)
 size_t wxNetMessage::GetDataLen(void)
 {
 	if(m_sData.IsEmpty())
-	{
-		wxStringOutputStream Stream(&m_sData);
-		if(!m_pXmlDocument || !m_pXmlDocument->Save(Stream, wxXML_NO_INDENTATION))
+		if(SavedXMLToStr(m_sData))
 			return 0;
-	}
 	return (m_sData.Len() + 1) * sizeof(wxChar) + sizeof(wxUint8);
 }
 
@@ -245,3 +215,34 @@ void wxNetMessage::SetState(wxGISMessageState nState)
 {
     m_nState = nState;
 }
+
+bool wxNetMessage::LoadXMLFromStr(wxString sData)
+{
+	wxStringInputStream Stream(sData);
+    
+	wxASSERT(m_pXmlDocument == NULL);
+    m_pXmlDocument = new wxXmlDocument();
+	if(!m_pXmlDocument->Load(Stream) || !m_pXmlDocument->IsOk())
+		return false;
+	
+	wxXmlNode *pRoot = m_pXmlDocument->GetRoot();
+	if(pRoot && pRoot->GetName() != wxT("msg"))
+		return false;
+
+    if(wxAtoi(pRoot->GetPropVal(wxT("ver"), wxT("1"))) > WXNETVER)
+		return false;
+
+    //header
+	m_nState = (wxGISMessageState)wxAtoi(pRoot->GetPropVal(wxT("st"), wxT("0")));
+	//m_sMessage = pRoot->GetPropVal(wxT("message"), wxT(""));
+	m_nPriority = wxAtoi(pRoot->GetPropVal(wxT("prio"), wxT("0")));
+}
+
+bool wxNetMessage::SavedXMLToStr(wxString sData)
+{
+	wxStringOutputStream Stream(&sData);
+	if(m_pXmlDocument)
+		return m_pXmlDocument->Save(Stream, wxXML_NO_INDENTATION);
+	return false;
+}
+
