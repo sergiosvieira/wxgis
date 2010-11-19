@@ -3,7 +3,7 @@
  * Purpose:  wxGISSearchServerDlg class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -24,13 +24,107 @@
 #include "../../art/remoteservers_16.xpm"
 #include "../../art/remoteserver_16.xpm"
 
-//#include "img/main_icons_small.xpm"
+wxClientUDPNotifier::wxClientUDPNotifier(wxGISSearchServerDlg* pParent, int nAdvPort) : wxThread()
+{
+	m_pParentDlg = pParent;
+	m_nAdvPort = nAdvPort;
+	wxIPV4address LocalAddress; // For the listening 
+	LocalAddress.Service(m_nAdvPort + 2); // port on which we listen for the answers 
+
+	bool bIsAddrSet = LocalAddress.AnyAddress(); 
+	if(!bIsAddrSet)
+	{
+		wxLogError(_("wxClientUDPNotifier: Invalid address"));
+		return;
+	}
+
+	m_socket = new wxDatagramSocket(LocalAddress, wxSOCKET_REUSEADDR | wxSOCKET_NOWAIT); 
+	const int optval = 1; 
+	m_socket->SetOption(SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval)); 
+	//m_socket->SetOption(SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval)); 
+	//m_socket->SetOption(SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)); 
+}
+
+void *wxClientUDPNotifier::Entry()
+{
+	unsigned char buff[BUFF] = {0};
+
+	//start loop
+	while(!TestDestroy())
+	{
+		wxIPV4address BroadCastAddress; // For broadcast sending 
+		BroadCastAddress.Service(m_nAdvPort + 2);
+		//WaitForRead
+		if(m_socket->WaitForRead(0, 100))
+		{
+			m_socket->RecvFrom(BroadCastAddress, &buff, BUFF); 
+			if(m_socket->Error())
+			{
+				wxYieldIfNeeded();
+				wxThread::Sleep(10);
+				continue;
+			}
+			size_t nSize = m_socket->LastCount();
+			wxNetMessage msg(buff, nSize);
+			if(!msg.IsOk())
+			{
+				wxYieldIfNeeded();
+				wxThread::Sleep(10);
+				continue;
+			}
+			if(msg.GetState() == enumGISMsgStOk)
+			{
+				wxXmlNode* pRootNode = msg.GetRoot();
+				wxXmlNode* pChild = pRootNode->GetChildren();
+				while(pChild)
+				{
+					if(pChild->GetName().CmpNoCase(wxT("srv_info")) == 0)
+					{
+						wxString sPort = pChild->GetPropVal(wxT("port"), wxT("1976"));
+						wxString sName = pChild->GetPropVal(wxT("name"), NONAME);
+						wxString sBanner = pChild->GetPropVal(wxT("banner"), wxEmptyString);
+						wxString sHost = BroadCastAddress.Hostname();
+						wxString sIP = BroadCastAddress.IPAddress();
+						//Add to list
+						if(m_pParentDlg)
+							m_pParentDlg->AddHost(sPort, sName, sHost, sIP, sBanner);
+					}
+					pChild = pChild->GetNext();
+				}
+			}
+		}
+		wxYieldIfNeeded();
+	}
+	return NULL;
+}
+
+void wxClientUDPNotifier::OnExit()
+{
+	if(m_socket)
+		m_socket->Destroy();
+}
+
+void wxClientUDPNotifier::SendBroadcastMsg(void)
+{
+	wxIPV4address BroadCastAddress; // For broadcast sending 
+	BroadCastAddress.Hostname(_("255.255.255.255")); 
+	BroadCastAddress.Service(m_nAdvPort); // port on which we listen for the answers 
+
+	// Create the socket 
+	wxString sMsg = wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStHello, enumGISPriorityHightest);
+	wxNetMessage msg(sMsg, wxID_ANY);
+    if(msg.IsOk())
+    {
+		m_socket->Discard();
+		if(m_socket->WaitForWrite(0, 100))
+		{
+			m_socket->SendTo(BroadCastAddress, msg.GetData(), msg.GetDataLen() ); 
+		}
+    }
+}
+
 //#include <wx/xml/xml.h>
-//#include "network.h"
-//#include "netmsg.h"
-//
-//
-///////////////////////////////////////////////////////////////////////////
+
 BEGIN_EVENT_TABLE( wxGISSearchServerDlg, wxDialog )
 	EVT_BUTTON(ID_SEARCHBT, wxGISSearchServerDlg::OnSearch )
 	EVT_BUTTON(ID_STOPBT, wxGISSearchServerDlg::OnStop )
@@ -59,13 +153,18 @@ wxGISSearchServerDlg::wxGISSearchServerDlg( wxWindow* parent, size_t port, wxWin
 	fgSizer2 = new wxFlexGridSizer( 2, 2, 0, 0 );
 	fgSizer2->SetFlexibleDirection( wxBOTH );
 	fgSizer2->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	fgSizer2->AddGrowableCol( 0 );
+	fgSizer2->AddGrowableRow( 0 );
 	
-	m_listCtrl = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_SINGLE_SEL );
+	m_listCtrl = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_SINGLE_SEL | wxLC_SORT_ASCENDING );
 	m_listCtrl->SetMinSize( wxSize( 250,150 ) );
 	m_listCtrl->SetImageList(&m_ImageList, wxIMAGE_LIST_SMALL);
-	m_listCtrl->InsertColumn(0, _("Address"), wxLIST_FORMAT_LEFT, 120);
-	m_listCtrl->InsertColumn(1, _("Name"), wxLIST_FORMAT_LEFT, 120);
-	
+	m_listCtrl->InsertColumn(0, _("Server name"), wxLIST_FORMAT_LEFT, 100);
+	m_listCtrl->InsertColumn(1, _("Server address"), wxLIST_FORMAT_LEFT, 100);
+	m_listCtrl->InsertColumn(2, _("Server port"), wxLIST_FORMAT_LEFT, 60);
+	m_listCtrl->InsertColumn(3, _("Host"), wxLIST_FORMAT_LEFT, 150);
+	m_listCtrl->InsertColumn(4, _("Banner"), wxLIST_FORMAT_LEFT, 200);
+
 	fgSizer2->Add( m_listCtrl, 1, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer4;
@@ -95,10 +194,31 @@ wxGISSearchServerDlg::wxGISSearchServerDlg( wxWindow* parent, size_t port, wxWin
 	this->Centre( wxBOTH );
 	wxUpdateUIEvent::SetUpdateInterval(10);
 	m_port = port;
+
+	wxSocketBase::Initialize();
+	//create & strart notify thread
+	m_pClientUDPNotifier = new wxClientUDPNotifier(this, 1977);
+    if ( m_pClientUDPNotifier->Create() != wxTHREAD_NO_ERROR )
+    {
+		wxLogError(_("wxGISSearchServerDlg: Can't create Notifier Thread!"));
+		return;
+    }
+	if(m_pClientUDPNotifier->Run() != wxTHREAD_NO_ERROR )
+    {
+		wxLogError(_("wxGISSearchServerDlg: Can't run Notifier Thread!"));
+		return;
+    }
+    wxLogMessage(_("wxGISSearchServerDlg: Wait Notifier Thread 0x%lx started (priority = %u)"), m_pClientUDPNotifier->GetId(), m_pClientUDPNotifier->GetPriority());
+	//send broadcast
+	m_pClientUDPNotifier->SendBroadcastMsg();
 }
 
 wxGISSearchServerDlg::~wxGISSearchServerDlg()
 {
+	//delete UDPNotifier thread
+	if(m_pClientUDPNotifier)
+		m_pClientUDPNotifier->Delete();
+
 	//m_bContinueSearch = false;
 }
 
@@ -130,45 +250,8 @@ void wxGISSearchServerDlg::OnStopUI( wxUpdateUIEvent& event )
 void wxGISSearchServerDlg::OnSearch( wxCommandEvent& event )
 { 
 
-    //TODO: move to constructor + rcv thread
-	wxSocketBase::Initialize();
-
-	wxIPV4address BroadCastAddress; // For broadcast sending 
-	wxIPV4address LocalAddress; // For the listening 
-	LocalAddress.AnyAddress(); 
-	BroadCastAddress.Hostname(_("255.255.255.255")); 
-	BroadCastAddress.Service(1977); // port on which we listen for the answers 
-	LocalAddress.Service(1977); // port on which we listen for the answers 
-
-	// Create the socket 
-	wxDatagramSocket* Socket = new wxDatagramSocket(LocalAddress, wxSOCKET_REUSEADDR);//wxSOCKET_NONE 
-	Socket->Notify(false);
-
-	static const int optval = 1; 
-	Socket->SetOption(SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval)); 
-	//Socket->SetOption(SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)); 	
-	
-	wxString sMsg = wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStHello, enumGISPriorityHightest);
-	wxNetMessage msg(sMsg, wxID_ANY);
-    if(msg.IsOk())
-    {
-	    Socket->SendTo(BroadCastAddress, msg.GetData(), msg.GetDataLen() ); 
-	    // Check for any errors 
-	    int count = Socket->LastCount(); 
-	    if( Socket->Error() ) 
-	    { 
-		    wxSocketError err = Socket->LastError(); 
-	    }
-        
- 	    unsigned char buff[BUFF] = {0};
-        wxIPV4address BroadCastAddress; // For broadcast sending 
-		Socket->RecvFrom(BroadCastAddress, &buff, BUFF); 
-
-        int x = 0;
-
-    }
-	Socket->Destroy();
-
+	if(m_pClientUDPNotifier)
+		m_pClientUDPNotifier->SendBroadcastMsg();
 	//wxSocketBase::Shutdown();
 
 	//wxBusyCursor wait;
@@ -316,6 +399,15 @@ void wxGISSearchServerDlg::OnSearch( wxCommandEvent& event )
 	//}
 	//m_bContinueSearch = false;
 
+}
+
+void wxGISSearchServerDlg::AddHost(wxString sPort, wxString sName, wxString sHost, wxString sIP, wxString sBanner)
+{
+	long pos = m_listCtrl->InsertItem(-1, sName,0);	//Server name
+	m_listCtrl->SetItem(pos, 1, sIP);				//Server address
+	m_listCtrl->SetItem(pos, 2, sPort);				//Server port
+	m_listCtrl->SetItem(pos, 3, sHost);				//Host
+	m_listCtrl->SetItem(pos, 4, sBanner);			//Banner
 }
 
 void wxGISSearchServerDlg::OnSearchUI( wxUpdateUIEvent& event )

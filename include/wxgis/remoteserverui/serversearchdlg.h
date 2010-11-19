@@ -3,7 +3,7 @@
  * Purpose:  wxGISSearchServerDlg class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -38,9 +38,23 @@
 #include <wx/log.h>
 #include <wx/msgdlg.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//#define MAX_SOCKETS 5
-//#define TIMEOUT 650
+/** \class wxClientUDPNotifier serversearchdlg.h
+    \brief The thread listening answers from remote servers on broadcast messages.
+*/
+class wxGISSearchServerDlg;
+
+class wxClientUDPNotifier : public wxThread
+{
+public:
+	wxClientUDPNotifier(wxGISSearchServerDlg* pParent, int nAdvPort = 1977);
+    virtual void *Entry();
+    virtual void OnExit();
+	virtual void SendBroadcastMsg(void);
+private:
+	wxDatagramSocket *m_socket;
+	wxGISSearchServerDlg* m_pParentDlg;
+	int m_nAdvPort;
+};
 
 /** \class wxGISSearchServerDlg serversearchdlg.h
     \brief The dialog to search remote servers.
@@ -56,8 +70,9 @@ public:
 		ID_ACCEPT
   };
 public:
-	wxGISSearchServerDlg( wxWindow* parent, size_t port = 1976, wxWindowID id = wxID_ANY, const wxString& title = _("Search Server"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 357,215 ), long style = wxDEFAULT_DIALOG_STYLE );
+	wxGISSearchServerDlg( wxWindow* parent, size_t port = 1976, wxWindowID id = wxID_ANY, const wxString& title = _("Search Server"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 400,300 ), long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
 	~wxGISSearchServerDlg();
+	void AddHost(wxString sPort, wxString sName, wxString sHost, wxString sIP, wxString sBanner);
 protected:
 	void OnSearch( wxCommandEvent& event );
 	void OnSearchUI( wxUpdateUIEvent& event );
@@ -66,7 +81,6 @@ protected:
 	void OnAccept( wxCommandEvent& event );
 	void OnAcceptUI( wxUpdateUIEvent& event );
 	void OnClose(wxCloseEvent& event);
-
 protected:
 	wxListCtrl* m_listCtrl;
 	wxButton* m_button_search;
@@ -79,6 +93,7 @@ private:
 	wxImageList m_ImageList;
 	bool m_bContinueSearch;
 	size_t m_port;
+	wxClientUDPNotifier* m_pClientUDPNotifier;
 	
 	DECLARE_EVENT_TABLE()		
 };
