@@ -17,9 +17,9 @@ http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/logo_catalog.png
 <p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/wxGIS(select_dlg_linux).jpg </p>
 
 Element properties
-<p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/prop(raster).jpg </p>
-<p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/prop(vector).jpg </p>
-<p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/prop(sparef).jpg </p>
+<p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/prop(raster).jpg 
+   http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/prop(vector).jpg 
+   http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/prop(sparef).jpg </p>
 
 = wxGIS Toolbox =
 http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/logo_toolbox.png
