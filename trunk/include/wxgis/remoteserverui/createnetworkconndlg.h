@@ -1,5 +1,5 @@
 ///******************************************************************************
-// * Project:  WebEye Monitoring Utility
+// * Project:  wxGIS (GIS Remote)
 // * Purpose:  Create network connection dialog
 // * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
 // ******************************************************************************

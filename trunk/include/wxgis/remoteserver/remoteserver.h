@@ -23,13 +23,23 @@
 
 #include "wxgis/catalog/catalog.h"
 
-#define WIN 0
-#define LIN 1
+class INetSearchCallback
+{
+    virtual ~INetSearchCallback(void){};
+	//pure virtual
+	virtual void AddHost(wxString sName, wxString sPlugin, wxString sHost, wxString sBanner, long pUserData) = 0;
+}
 
-#ifdef __WXMSW__
-	#define CURROS WIN
-#else
-	#define CURROS LIN
-#endif
-
-
+/** \class INetClientPlugin remoteserver.h
+    \brief The Network client interface class.
+*/
+class INetSearch
+{
+    virtual ~INetSearch(void){};
+	//pure virtual
+	virtual bool StartServerSearch() = 0;
+	virtual bool StopServerSearch() = 0;
+	virtual bool CanStopServerSearch() = 0;
+	virtual void SetCallback(INetSearchCallback* pCallback) = 0;
+	virtual INetSearchCallback* GetCallback(void) = 0;
+};

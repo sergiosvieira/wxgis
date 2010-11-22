@@ -126,7 +126,7 @@ void wxGISRemoteCmd::OnClick(void)
 	{
 		case 0:	
 			{
-			wxGISSearchServerDlg dlg(dynamic_cast<wxWindow*>(m_pApp));
+			wxGISSearchServerDlg dlg(true, dynamic_cast<wxWindow*>(m_pApp));
 			dlg.ShowModal();
 			}
 			return;

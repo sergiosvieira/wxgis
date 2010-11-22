@@ -21,6 +21,7 @@
 
 #include "wxgis/geoprocessingui/gxtoolexecview.h"
 
+/*
 //////////////////////////////////////////////////////////////////////////////
 // wxGISToolExecuteView
 //////////////////////////////////////////////////////////////////////////////
@@ -725,3 +726,5 @@ void wxGxTableView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	m_pParentGxObject = pGxObj;
 //	wxWindow::Refresh();
 }
+*/
+

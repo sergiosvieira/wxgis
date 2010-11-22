@@ -28,6 +28,8 @@
 /** \class wxGISToolExecuteView gxtoolexecview.h
     \brief The tasks execution view class.
 */
+
+/*
 class WXDLLIMPEXP_GIS_GPU wxGISToolExecuteView :
 	public wxListCtrl,
 	public IGxSelectionEvents,
@@ -42,7 +44,7 @@ public:
 
     wxGISToolExecuteView(void);
 	wxGISToolExecuteView(wxWindow* parent, wxWindowID id = TOOLEXECUTECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxLC_REPORT | wxBORDER_NONE | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE);
-	virtual ~wxGxContentView(void);
+	virtual ~wxGISToolExecuteView(void);
 	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
 	virtual void AddObject(IGxObject* pObject);
 	virtual void ResetContents(void);
@@ -96,11 +98,13 @@ protected:
 
 DECLARE_EVENT_TABLE()
 };
+*/
 
 /** \class wxGxToolExecuteView gxtoolexecview.h
     \brief The tasks execution gxcatalog view class.
 */
 
+/*
 class WXDLLIMPEXP_GIS_GPU wxGxToolExecuteView :
 	public wxGxView,
 	public IGxSelectionEvents
@@ -119,5 +123,5 @@ private:
 	IGxSelection* m_pSelection;
 	IGxObject* m_pParentGxObject;
 };
-
+*/
 

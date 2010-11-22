@@ -1,5 +1,5 @@
 ///******************************************************************************
-// * Project:  WebEye Monitoring Utility
+// * Project:  wxGIS (GIS Remote)
 // * Purpose:  TCP client panel class.
 // * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
 // ******************************************************************************

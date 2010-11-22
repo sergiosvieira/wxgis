@@ -22,6 +22,8 @@
 
 #include "wxgis/networking/networking.h"
 
+//read, write & waitlost threads
+
 //
 //class wxTCPNetworkPlugin;
 //

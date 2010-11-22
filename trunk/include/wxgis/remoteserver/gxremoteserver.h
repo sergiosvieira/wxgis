@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
- * Purpose:  wxGxRemoteServers class.
+ * Purpose:  wxGxRemoteServer class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010 Bishop
@@ -21,18 +21,17 @@
 #pragma once
 #include "wxgis/remoteserver/remoteserver.h"
 
-/** \class wxGxRemoteServers gxremoteservers.h
-    \brief A Remote Servers GxRootObject.
+/** \class wxGxRemoteServer gxremoteserver.h
+    \brief A Remote Server GxObject.
 */
-class WXDLLIMPEXP_GIS_RS wxGxRemoteServers :
+class WXDLLIMPEXP_GIS_RS wxGxRemoteServer :
 	public IGxObjectContainer,
-    public IGxRootObjectProperties,
     public wxObject
 {
-   DECLARE_DYNAMIC_CLASS(wxGxRemoteServers)
+   DECLARE_DYNAMIC_CLASS(wxGxRemoteServer)
 public:
-	wxGxRemoteServers(void);
-	virtual ~wxGxRemoteServers(void);
+	wxGxRemoteServer(void);
+	virtual ~wxGxRemoteServer(void);
 	//IGxObject
 	virtual void Detach(void);
 	virtual wxString GetName(void){return wxString(_("Remote Servers"));};
@@ -45,16 +44,11 @@ public:
 	virtual bool DeleteChild(IGxObject* pChild);
 	virtual bool AreChildrenViewable(void){return true;};
 	virtual bool HasChildren(void){LoadChildren(); return m_Children.size() > 0 ? true : false;};
-    //IGxRootObjectProperties
-    virtual void Init(wxXmlNode* pConfigNode);
-    virtual wxXmlNode* GetProperties(void);
 protected:
-	//wxGxRemoteServers
-	virtual void LoadChildren(wxXmlNode* pConf);
-	virtual void EmptyChildren(void);
-	virtual void LoadPlugins(wxXmlNode* pConf);
-	virtual void UnLoadPlugins(void);
+	//wxGxRemoteServer
+//	virtual void LoadChildren(void);
+//	virtual void EmptyChildren(void);
 protected:
-    NETPLUGINARRAY m_NetPluginArray;
+//    NETPLUGINARRAY m_NetPluginArray;
 	bool m_bIsChildrenLoaded;
 };

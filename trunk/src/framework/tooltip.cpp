@@ -24,7 +24,7 @@
 
 //#include "../../art/close_16.xpm"
 //#include "../../art/close_bw_16.xpm"
-#include "../../art/close_16a.xpm"
+#include "../../art/process_stop.xpm"
 
 #define FRAMENAME wxT("baloontip")
 
@@ -63,7 +63,7 @@ wxGISBaloonTip::wxGISBaloonTip(wxString sTitle, wxIcon Icon, wxString sMessage) 
     title->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(wxGISBaloonTip::OnEscape), NULL, this );
 
     //wxStaticBitmap* pCloseBitmap = new wxStaticBitmap( this, wxID_ANY, wxIcon(close_16_xpm), wxDefaultPosition, wxDefaultSize, 0 );
-    wxBitmap NormalBitmap = wxBitmap(close_16a_xpm);
+    wxBitmap NormalBitmap = wxBitmap(process_stop_xpm);
     wxImage bwImage = NormalBitmap.ConvertToImage();
     wxBitmap bwBitmap = bwImage.ConvertToGreyscale();
     wxBitmapButton* bpCloseButton = new wxBitmapButton( this, wxID_CLOSE, bwBitmap, wxDefaultPosition, wxDefaultSize, 0 );
