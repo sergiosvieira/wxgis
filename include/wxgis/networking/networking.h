@@ -103,3 +103,27 @@ public:
     virtual wxGISMessageDirection GetDirection(void) = 0;
     virtual void SetDirection(wxGISMessageDirection nDirection) = 0;
 };
+
+class INetPlugin
+{
+    virtual ~INetPlugin(void){};
+	//pure virtual
+    /** \fn wxXmlNode* GetProperties(void)
+     *  \brief Get Properties of plugin.
+     *  \return The properties of the plugin
+	 *
+	 *  It should be the new wxXmlNode (not a copy of setted properties)
+     */	 	
+	virtual wxXmlNode* GetProperties(void) = 0;
+    /** \fn void SetProperties(wxXmlNode* pProp)
+     *  \brief Set Properties of plugin.
+     *  \param pProp The properties of the plugin
+	 *
+	 *  Executed while LoadPlugins (after flugin created). 
+     */	  
+	virtual void SetProperties(wxXmlNode* pProp) = 0;
+	virtual wxString GetName(void) = 0;
+	//messages quere
+};
+
+typedef std::vector<INetPlugin*> NETPLUGINARRAY;

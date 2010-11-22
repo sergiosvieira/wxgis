@@ -24,119 +24,18 @@
 #include "../../art/remoteservers_16.xpm"
 #include "../../art/remoteserver_16.xpm"
 
-wxClientUDPNotifier::wxClientUDPNotifier(wxGISSearchServerDlg* pParent, int nAdvPort) : wxThread()
-{
-	m_pParentDlg = pParent;
-	m_nAdvPort = nAdvPort;
-	wxIPV4address LocalAddress; // For the listening 
-	LocalAddress.Service(m_nAdvPort + 2); // port on which we listen for the answers 
-
-	bool bIsAddrSet = LocalAddress.AnyAddress(); 
-	if(!bIsAddrSet)
-	{
-		wxLogError(_("wxClientUDPNotifier: Invalid address"));
-		return;
-	}
-
-	m_socket = new wxDatagramSocket(LocalAddress, wxSOCKET_REUSEADDR | wxSOCKET_NOWAIT); 
-	const int optval = 1; 
-	m_socket->SetOption(SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval)); 
-	//m_socket->SetOption(SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval)); 
-	//m_socket->SetOption(SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)); 
-}
-
-void *wxClientUDPNotifier::Entry()
-{
-	unsigned char buff[BUFF] = {0};
-
-	//start loop
-	while(!TestDestroy())
-	{
-		wxIPV4address BroadCastAddress; // For broadcast sending 
-		BroadCastAddress.Service(m_nAdvPort + 2);
-		//WaitForRead
-		if(m_socket->WaitForRead(0, 100))
-		{
-			m_socket->RecvFrom(BroadCastAddress, &buff, BUFF); 
-			if(m_socket->Error())
-			{
-				wxYieldIfNeeded();
-				wxThread::Sleep(10);
-				continue;
-			}
-			size_t nSize = m_socket->LastCount();
-			wxNetMessage msg(buff, nSize);
-			if(!msg.IsOk())
-			{
-				wxYieldIfNeeded();
-				wxThread::Sleep(10);
-				continue;
-			}
-			if(msg.GetState() == enumGISMsgStOk)
-			{
-				wxXmlNode* pRootNode = msg.GetRoot();
-				wxXmlNode* pChild = pRootNode->GetChildren();
-				while(pChild)
-				{
-					if(pChild->GetName().CmpNoCase(wxT("srv_info")) == 0)
-					{
-						wxString sPort = pChild->GetPropVal(wxT("port"), wxT("1976"));
-						wxString sName = pChild->GetPropVal(wxT("name"), NONAME);
-						wxString sBanner = pChild->GetPropVal(wxT("banner"), wxEmptyString);
-						wxString sHost = BroadCastAddress.Hostname();
-						wxString sIP = BroadCastAddress.IPAddress();
-						//Add to list
-						if(m_pParentDlg)
-							m_pParentDlg->AddHost(sPort, sName, sHost, sIP, sBanner);
-					}
-					pChild = pChild->GetNext();
-				}
-			}
-		}
-		wxYieldIfNeeded();
-	}
-	return NULL;
-}
-
-void wxClientUDPNotifier::OnExit()
-{
-	if(m_socket)
-		m_socket->Destroy();
-}
-
-void wxClientUDPNotifier::SendBroadcastMsg(void)
-{
-	wxIPV4address BroadCastAddress; // For broadcast sending 
-	BroadCastAddress.Hostname(_("255.255.255.255")); 
-	BroadCastAddress.Service(m_nAdvPort); // port on which we listen for the answers 
-
-	// Create the socket 
-	wxString sMsg = wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStHello, enumGISPriorityHightest);
-	wxNetMessage msg(sMsg, wxID_ANY);
-    if(msg.IsOk())
-    {
-		m_socket->Discard();
-		if(m_socket->WaitForWrite(0, 100))
-		{
-			m_socket->SendTo(BroadCastAddress, msg.GetData(), msg.GetDataLen() ); 
-		}
-    }
-}
-
-//#include <wx/xml/xml.h>
-
 BEGIN_EVENT_TABLE( wxGISSearchServerDlg, wxDialog )
 	EVT_BUTTON(ID_SEARCHBT, wxGISSearchServerDlg::OnSearch )
-	EVT_BUTTON(ID_STOPBT, wxGISSearchServerDlg::OnStop )
+	//EVT_BUTTON(ID_STOPBT, wxGISSearchServerDlg::OnStop )
 	EVT_BUTTON(ID_ACCEPT, wxGISSearchServerDlg::OnAccept )
 	EVT_UPDATE_UI(ID_SEARCHBT, wxGISSearchServerDlg::OnSearchUI )
-	EVT_UPDATE_UI(ID_STOPBT, wxGISSearchServerDlg::OnStopUI )
+	//EVT_UPDATE_UI(ID_STOPBT, wxGISSearchServerDlg::OnStopUI )
 	EVT_UPDATE_UI(ID_ACCEPT, wxGISSearchServerDlg::OnAcceptUI )
 	EVT_CLOSE(wxGISSearchServerDlg::OnClose)
 END_EVENT_TABLE()
 ///////////////////////////////////////////////////////////////////////////
 
-wxGISSearchServerDlg::wxGISSearchServerDlg( wxWindow* parent, size_t port, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )/*, m_bContinueSearch(false)*/
+wxGISSearchServerDlg::wxGISSearchServerDlg(bool bStandAlone, wxWindow* parent, size_t port, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )/*, m_bContinueSearch(false)*/
 {
 	m_ImageList.Create(16, 16);
 	m_ImageList.Add(wxBitmap(remoteserver_16_xpm));
@@ -156,7 +55,7 @@ wxGISSearchServerDlg::wxGISSearchServerDlg( wxWindow* parent, size_t port, wxWin
 	fgSizer2->AddGrowableCol( 0 );
 	fgSizer2->AddGrowableRow( 0 );
 	
-	m_listCtrl = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_SINGLE_SEL | wxLC_SORT_ASCENDING );
+	m_listCtrl = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_NO_SORT_HEADER | wxLC_SINGLE_SEL | wxLC_SORT_ASCENDING );
 	m_listCtrl->SetMinSize( wxSize( 250,150 ) );
 	m_listCtrl->SetImageList(&m_ImageList, wxIMAGE_LIST_SMALL);
 	m_listCtrl->InsertColumn(0, _("Server name"), wxLIST_FORMAT_LEFT, 100);
@@ -164,6 +63,7 @@ wxGISSearchServerDlg::wxGISSearchServerDlg( wxWindow* parent, size_t port, wxWin
 	m_listCtrl->InsertColumn(2, _("Server port"), wxLIST_FORMAT_LEFT, 60);
 	m_listCtrl->InsertColumn(3, _("Host"), wxLIST_FORMAT_LEFT, 150);
 	m_listCtrl->InsertColumn(4, _("Banner"), wxLIST_FORMAT_LEFT, 200);
+	m_listCtrl->InsertColumn(5, _("Module"), wxLIST_FORMAT_LEFT, 60);
 
 	fgSizer2->Add( m_listCtrl, 1, wxALL|wxEXPAND, 5 );
 	
@@ -173,20 +73,20 @@ wxGISSearchServerDlg::wxGISSearchServerDlg( wxWindow* parent, size_t port, wxWin
 	m_button_search = new wxButton( this, ID_SEARCHBT, _("Search"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer4->Add( m_button_search, 0, wxALL, 5 );
 	
-	m_button_stop = new wxButton( this, ID_STOPBT, _("Stop"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer4->Add( m_button_stop, 0, wxALL, 5 );
+	//m_button_stop = new wxButton( this, ID_STOPBT, _("Stop"), wxDefaultPosition, wxDefaultSize, 0 );
+	//bSizer4->Add( m_button_stop, 0, wxALL, 5 );
 	
-	m_button_accept = new wxButton( this, ID_ACCEPT, _("Accept"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button_accept = new wxButton( this, ID_ACCEPT, (bStandAlone == true ? _("Add server") : _("Accept")), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer4->Add( m_button_accept, 0, wxALL, 5 );
 	
 	fgSizer2->Add( bSizer4, 1, wxEXPAND, 5 );
 	
 	bSizer3->Add( fgSizer2, 1, wxEXPAND, 5 );
 	
-	m_gauge = new wxGauge( this, wxID_ANY, 254, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH );
-	m_gauge->SetMinSize( wxSize( -1,15 ) );
-	
-	bSizer3->Add( m_gauge, 0, wxALL|wxEXPAND, 5 );
+	//m_gauge = new wxGauge( this, wxID_ANY, 254, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH );
+	//m_gauge->SetMinSize( wxSize( -1,15 ) );
+	//
+	//bSizer3->Add( m_gauge, 0, wxALL|wxEXPAND, 5 );
 	
 	this->SetSizer( bSizer3 );
 	this->Layout();
@@ -233,19 +133,19 @@ void wxGISSearchServerDlg::OnClose(wxCloseEvent& event)
  //   else
         Destroy();
 }
-
-void wxGISSearchServerDlg::OnStop( wxCommandEvent& event )
-{ 
-	wxBusyCursor wait;
-	//m_bContinueSearch = false;
-	event.Skip(); 
-}
-
-void wxGISSearchServerDlg::OnStopUI( wxUpdateUIEvent& event )
-{ 
-	//event.Enable(m_bContinueSearch);
-	//event.Skip(); 
-}
+//
+//void wxGISSearchServerDlg::OnStop( wxCommandEvent& event )
+//{ 
+//	wxBusyCursor wait;
+//	//m_bContinueSearch = false;
+//	event.Skip(); 
+//}
+//
+//void wxGISSearchServerDlg::OnStopUI( wxUpdateUIEvent& event )
+//{ 
+//	//event.Enable(m_bContinueSearch);
+//	//event.Skip(); 
+//}
 
 void wxGISSearchServerDlg::OnSearch( wxCommandEvent& event )
 { 
@@ -403,12 +303,19 @@ void wxGISSearchServerDlg::OnSearch( wxCommandEvent& event )
 
 void wxGISSearchServerDlg::AddHost(wxString sPort, wxString sName, wxString sHost, wxString sIP, wxString sBanner)
 {
+	for(size_t i = 0; i < m_Hosts.size(); i++)
+		if(m_Hosts[i].sPort == sPort && m_Hosts[i].sIP == sIP)
+			return;
     //check duplicates
 	long pos = m_listCtrl->InsertItem(-1, sName,0);	//Server name
 	m_listCtrl->SetItem(pos, 1, sIP);				//Server address
 	m_listCtrl->SetItem(pos, 2, sPort);				//Server port
 	m_listCtrl->SetItem(pos, 3, sHost);				//Host
 	m_listCtrl->SetItem(pos, 4, sBanner);			//Banner
+	m_listCtrl->SetItem(pos, 5, _("TCP/IP"));
+
+	HOSTDATA data = {sPort, sIP};
+	m_Hosts.push_back(data);
 }
 
 void wxGISSearchServerDlg::OnSearchUI( wxUpdateUIEvent& event )
@@ -419,15 +326,22 @@ void wxGISSearchServerDlg::OnSearchUI( wxUpdateUIEvent& event )
 
 void wxGISSearchServerDlg::OnAccept( wxCommandEvent& event )
 {
-	long item = m_listCtrl->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	wxListItem it;
-	it.SetId(item);
-	it.SetColumn(0);
-	it.SetMask(wxLIST_MASK_TEXT);
-	if(m_listCtrl->GetItem(it))
+	if(m_bIsStandAlone)
 	{
-		m_ipaddress = it.GetText();
-		EndModal(ID_ACCEPT);
+		//open add server dialog
+	}
+	else
+	{
+		long item = m_listCtrl->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+		wxListItem it;
+		it.SetId(item);
+		it.SetColumn(0);
+		it.SetMask(wxLIST_MASK_TEXT);
+		if(m_listCtrl->GetItem(it))
+		{
+			m_ipaddress = it.GetText();
+			EndModal(ID_ACCEPT);
+		}
 	}
 	event.Skip(); 
 }

@@ -38,24 +38,6 @@
 #include <wx/log.h>
 #include <wx/msgdlg.h>
 
-/** \class wxClientUDPNotifier serversearchdlg.h
-    \brief The thread listening answers from remote servers on broadcast messages.
-*/
-class wxGISSearchServerDlg;
-
-class wxClientUDPNotifier : public wxThread
-{
-public:
-	wxClientUDPNotifier(wxGISSearchServerDlg* pParent, int nAdvPort = 1977);
-    virtual void *Entry();
-    virtual void OnExit();
-	virtual void SendBroadcastMsg(void);
-private:
-	wxDatagramSocket *m_socket;
-	wxGISSearchServerDlg* m_pParentDlg;
-	int m_nAdvPort;
-};
-
 /** \class wxGISSearchServerDlg serversearchdlg.h
     \brief The dialog to search remote servers.
 */
@@ -66,34 +48,42 @@ public:
   enum
   {
 		ID_SEARCHBT = wxID_HIGHEST + 1,
-		ID_STOPBT,
+		//ID_STOPBT,
 		ID_ACCEPT
   };
 public:
-	wxGISSearchServerDlg( wxWindow* parent, size_t port = 1976, wxWindowID id = wxID_ANY, const wxString& title = _("Search Server"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 400,300 ), long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
+	wxGISSearchServerDlg(bool bStandAlone, wxWindow* parent, size_t port = 1976, wxWindowID id = wxID_ANY, const wxString& title = _("Search Server"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 400,300 ), long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
 	~wxGISSearchServerDlg();
 	void AddHost(wxString sPort, wxString sName, wxString sHost, wxString sIP, wxString sBanner);
+public:
+	typedef struct _hostdata
+	{
+		wxString sPort;
+		wxString sIP;
+	}HOSTDATA;
 protected:
 	void OnSearch( wxCommandEvent& event );
 	void OnSearchUI( wxUpdateUIEvent& event );
-	void OnStop( wxCommandEvent& event );
-	void OnStopUI( wxUpdateUIEvent& event );
+	//void OnStop( wxCommandEvent& event );
+	//void OnStopUI( wxUpdateUIEvent& event );
 	void OnAccept( wxCommandEvent& event );
 	void OnAcceptUI( wxUpdateUIEvent& event );
 	void OnClose(wxCloseEvent& event);
 protected:
 	wxListCtrl* m_listCtrl;
 	wxButton* m_button_search;
-	wxButton* m_button_stop;
+	//wxButton* m_button_stop;
 	wxButton* m_button_accept;
-	wxGauge* m_gauge;
+	//wxGauge* m_gauge;
 	
 private:
 	wxString m_ipaddress;
 	wxImageList m_ImageList;
-	bool m_bContinueSearch;
+	//bool m_bContinueSearch;
 	size_t m_port;
 	wxClientUDPNotifier* m_pClientUDPNotifier;
+	std::vector<HOSTDATA> m_Hosts;
+	bool m_bIsStandAlone;
 	
 	DECLARE_EVENT_TABLE()		
 };

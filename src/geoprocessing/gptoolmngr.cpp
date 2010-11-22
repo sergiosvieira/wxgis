@@ -151,22 +151,16 @@ wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode) : m_nMaxTasks(50),
 
         int nCount = wxAtoi(pChild->GetPropVal(wxT("count"), wxT("0")));
         wxString sCmdName = pChild->GetPropVal(wxT("name"), NONAME);
-        if(sName.IsEmpty() || sName.CmpNoCase(NONAME) == 0)
-        {
-		    wxObject *pObj = wxCreateDynamicObject(sName);
-		    IGPTool *pTool = dynamic_cast<IGPTool*>(pObj);
-		    if(pTool != NULL)
-		    {
-                sCmdName = pTool->GetName();
-                wxDELETE(pTool);
-            }
-            else 
-                continue;
-        }
-        TOOLINFO info = {sName, nCount, NULL};
-        m_ToolsMap[sCmdName] = info;
-        m_ToolsPopularMap.insert(std::make_pair(nCount, sCmdName));
 
+	    wxObject *pObj = wxCreateDynamicObject(sName);
+	    IGPTool *pTool = dynamic_cast<IGPTool*>(pObj);
+	    if(pTool)
+	    {
+            sCmdName = pTool->GetName();
+			TOOLINFO info = {sName, nCount, pTool};
+			m_ToolsMap[sCmdName] = info;
+			m_ToolsPopularMap.insert(std::make_pair(nCount, sCmdName));
+        }
         pChild = pChild->GetNext();
     }
 }

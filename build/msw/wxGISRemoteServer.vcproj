@@ -172,7 +172,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\src\remoteserver\gxremoteserver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\remoteserver\gxremoteservers.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\remoteserver\tcpnetplugin.cpp"
 				>
 			</File>
 		</Filter>
@@ -182,11 +190,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\include\wxgis\remoteserver\gxremoteserver.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wxgis\remoteserver\gxremoteservers.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\remoteserver\remoteserver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\remoteserver\tcpnetplugin.h"
 				>
 			</File>
 		</Filter>

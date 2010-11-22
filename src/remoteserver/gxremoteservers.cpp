@@ -1,5 +1,5 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS (GIS Remote)
  * Purpose:  wxGxRemoteServers class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/remoteserver/gxremoteservers.h"
-//#include "wxgis/catalog/gxdiscconnection.h"
+#include "wxgis/remoteserver/gxremoteserver.h"
 
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxRemoteServers, wxObject)
@@ -36,52 +36,28 @@ wxGxRemoteServers::~wxGxRemoteServers(void)
 void wxGxRemoteServers::Detach(void)
 {
 	EmptyChildren();
+	UnLoadPlugins();
 }
 
 void wxGxRemoteServers::Refresh(void)
 {
-	EmptyChildren();
-	LoadChildren();
-    m_pCatalog->ObjectRefreshed(this);
+	//nothing to do
 }
  
 void wxGxRemoteServers::Init(wxXmlNode* pConfigNode)
 {
-//	short bScanOnce = wxAtoi(pConfigNode->GetPropVal(wxT("scan_once"), wxT("0")));
-//	if(bScanOnce == 0)
-//	{
-//        wxLogMessage(_("wxGxDiscConnections: Start scan folder connections"));
-//        wxArrayString arr;
-//#ifdef __WXMSW__
-//		arr = wxFSVolumeBase::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE | wxFS_VOL_REMOTE);
-//#else
-//        //linux paths
-//        wxStandardPaths stp;
-//        arr.Add(wxT("/"));
-//        arr.Add(stp.GetUserConfigDir());
-////      arr.Add(stp.GetDataDir());
-//#endif
-//        for(size_t i = 0; i < arr.size(); i++)
-//		{
-//            CONN_DATA data = {arr[i], arr[i]};
-//            m_aConnections.push_back(data);
-//		}
-//	}
-//	else
-//	{
-//		wxXmlNode* pDiscConn = pConfigNode->GetChildren();
-//		while(pDiscConn)
-//		{
-//			wxString sName = pDiscConn->GetPropVal(wxT("name"), NONAME);
-//			wxString sPath = pDiscConn->GetPropVal(wxT("path"), ERR);
-//			if(sPath != ERR)
-//			{
-//                CONN_DATA data = {sName, sPath};
-//                m_aConnections.push_back(data);
-//			}
-//			pDiscConn = pDiscConn->GetNext();
-//		}
-//	}
+	wxXmlNode *pPlugins, *pConnections;
+	wxXmlNode* pChild = pConfigNode->GetChildren();
+	while(pChild)
+	{
+		if(pChild->GetName().CmpNoCase(wxT("plugins")) == 0)
+			pPlugins = pChild;
+		else if(pChild->GetName().CmpNoCase(wxT("connections")) == 0)
+			pConnections = pChild;
+		pChild = pChild->GetNext();
+	}
+	LoadPlugins(pPlugins);
+	LoadChildren(pConnections);
 }
 
 wxXmlNode* wxGxRemoteServers::GetProperties(void)
@@ -91,9 +67,10 @@ wxXmlNode* wxGxRemoteServers::GetProperties(void)
     if(pInfo)
         pNode->AddProperty(wxT("name"), pInfo->GetClassName());
     pNode->AddProperty(wxT("is_enabled"), m_bEnabled == true ? wxT("1") : wxT("0"));    
-//#ifndef WXGISPORTABLE
-//	for(size_t i = 0; i < m_Children.size(); i++)
-//	{
+#ifndef WXGISPORTABLE
+	for(size_t i = 0; i < m_Children.size(); i++)
+	{
+		
 //        wxGxDiscConnection* pwxGxDiscConnection = dynamic_cast<wxGxDiscConnection*>(m_Children[i]);
 //        if(pwxGxDiscConnection)
 //        {
@@ -101,35 +78,28 @@ wxXmlNode* wxGxRemoteServers::GetProperties(void)
 //		    pDiscConn->AddProperty(wxT("name"), pwxGxDiscConnection->GetName());
 //		    pDiscConn->AddProperty(wxT("path"), pwxGxDiscConnection->GetPath());
 //        }
-//    }
-//    if(m_Children.empty() && !m_aConnections.empty())
-//    {
-//        for(size_t i = 0; i < m_aConnections.size(); i++)
-//        {
-//		    wxXmlNode* pDiscConn = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("DiscConnection"));
-//		    pDiscConn->AddProperty(wxT("name"), m_aConnections[i].sName);
-//		    pDiscConn->AddProperty(wxT("path"), m_aConnections[i].sPath);
-//        }
-//    }
-//#endif  
+    }
+    wxXmlNode* pPluginsNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("plugins"));
+	for(size_t i = 0; i < m_NetPluginArray.size(); i++)
+	{
+		wxXmlNode* pXmlNode = m_NetPluginArray[i]->GetProperties();
+		if(pXmlNode)
+			pXmlNode->SetParent(pPluginsNode);
+			//pPluginsNode->InsertChild(pXmlNode, NULL);
+	}
+
+#endif  
     return pNode;
 }
 
 void wxGxRemoteServers::EmptyChildren(void)
 {
- //   m_aConnections.clear();
-	//for(size_t i = 0; i < m_Children.size(); i++)
-	//{
- //       wxGxDiscConnection* pwxGxDiscConnection = dynamic_cast<wxGxDiscConnection*>(m_Children[i]);
- //       if(pwxGxDiscConnection)
- //       {
- //           CONN_DATA data = {pwxGxDiscConnection->GetName(), pwxGxDiscConnection->GetPath()};
- //           m_aConnections.push_back(data);
- //       }
-	//	m_Children[i]->Detach();
-	//	wxDELETE(m_Children[i]);
-	//}
-	//m_Children.clear();
+	for(size_t i = 0; i < m_Children.size(); i++)
+	{
+		m_Children[i]->Detach();
+		wxDELETE(m_Children[i]);
+	}
+	m_Children.clear();
 	m_bIsChildrenLoaded = false;
 }
 
@@ -144,19 +114,49 @@ bool wxGxRemoteServers::DeleteChild(IGxObject* pChild)
 	return true;
 }
 
-void wxGxRemoteServers::LoadChildren(void)
+void wxGxRemoteServers::LoadChildren(wxXmlNode* pConf)
 {
 	if(m_bIsChildrenLoaded)
 		return;	
-
-    //for(size_t i = 0; i < m_aConnections.size(); i++)
-    //{
-    //    wxGxDiscConnection* pwxGxDiscConnection = new wxGxDiscConnection(m_aConnections[i].sPath, m_aConnections[i].sName);
-    //    IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
-    //    if(AddChild(pGxObject))
-    //        wxLogMessage(_("wxGxDiscConnections: Add folder connection [%s]"), m_aConnections[i].sName.c_str());
-    //}
+	wxXmlNode* pChild = pConf->GetChildren();
+	while(pChild)
+	{
+		wxGxRemoteServer* pServerConn = new wxGxRemoteServer(pChild);//??? TODO
+		IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
+		if(!AddObject(pGxObj))
+			wxDELETE(pGxObj);
+		pChild = pChild->GetNext();
+	}
 
 	m_bIsChildrenLoaded = true;
 }
 
+void wxGxRemoteServers::LoadPlugins(wxXmlNode* pConf)
+{
+	wxXmlNode* pChild = pConf->GetChildren();
+	while(pChild)
+	{
+        wxString sName = pChild->GetPropVal(wxT("name"), NONAME);
+        if(sName.IsEmpty() || sName.CmpNoCase(NONAME) == 0)
+        {
+            pChild = pChild->GetNext();
+            continue;
+        }
+
+		wxObject *pObj = wxCreateDynamicObject(sName);
+		INetPlugin *pNetPlugin = dynamic_cast<INetPlugin*>(pObj);
+	    if(pNetPlugin)
+	    {
+			pNetPlugin->SetProperties(pChild);
+			m_NetPluginArray.push_back(pNetPlugin);
+			wxLogMessage(_("wxGxRemoteServers: Network plugin %s loaded"), pNetPlugin->GetName().c_str());
+        }
+		pChild = pChild->GetNext();
+	}
+}
+
+void wxGxRemoteServers::UnLoadPlugins()
+{
+	for(size_t i = 0; i < m_NetPluginArray.size(); i++)
+		wxDELETE(m_NetPluginArray[i]);
+}
