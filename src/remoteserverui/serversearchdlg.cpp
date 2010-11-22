@@ -403,6 +403,7 @@ void wxGISSearchServerDlg::OnSearch( wxCommandEvent& event )
 
 void wxGISSearchServerDlg::AddHost(wxString sPort, wxString sName, wxString sHost, wxString sIP, wxString sBanner)
 {
+    //check duplicates
 	long pos = m_listCtrl->InsertItem(-1, sName,0);	//Server name
 	m_listCtrl->SetItem(pos, 1, sIP);				//Server address
 	m_listCtrl->SetItem(pos, 2, sPort);				//Server port

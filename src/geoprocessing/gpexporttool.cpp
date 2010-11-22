@@ -29,9 +29,9 @@
 // wxGISGPExportTool
 /////////////////////////////////////////////////////////////////////////
 
-IMPLEMENT_DYNAMIC_CLASS(wxGISGPExportTool, wxObject)
+IMPLEMENT_DYNAMIC_CLASS(wxGISGPExportTool, wxGISGPTool)
 
-wxGISGPExportTool::wxGISGPExportTool(void) : m_pCatalog(NULL)
+wxGISGPExportTool::wxGISGPExportTool(void) : wxGISGPTool()
 {
 }
 
@@ -98,16 +98,6 @@ GPParameters* wxGISGPExportTool::GetParameterInfo(void)
 
     }
     return &m_pParamArr;
-}
-
-void wxGISGPExportTool::SetCatalog(IGxCatalog* pCatalog)
-{
-    m_pCatalog = pCatalog;
-}
-
-IGxCatalog* wxGISGPExportTool::GetCatalog(void)
-{
-    return m_pCatalog;
 }
 
 bool wxGISGPExportTool::Validate(void)

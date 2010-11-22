@@ -41,7 +41,7 @@ END_EVENT_TABLE()
 
 bool wxTreeViewComboPopup::Create(wxWindow* parent)
 {
-    return Create(parent, TREECTRLID);
+    return wxTreeViewComboPopup::Create(parent, TREECTRLID);
 }
 
 bool wxTreeViewComboPopup::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)

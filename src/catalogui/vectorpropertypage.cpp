@@ -155,6 +155,7 @@ void wxGISVectorPropertyPage::FillGrid(void)
             OGRLayer *poLayer = pDataSource->GetLayer(iLayer);
             //AppendProperty(new wxStringProperty(_("Name"), wxPG_LABEL, wgMB2WX(poLayer->GetName())));  
             AppendProperty(new wxStringProperty(_("Geometry type"), wxPG_LABEL, wgMB2WX(OGRGeometryTypeToName( m_pDataset->GetGeometryType() ))));  
+            AppendProperty(new wxIntProperty(_("Feature count"), wxPG_LABEL, m_pDataset->GetSize() ));  
 
         //OGREnvelope oExt;
         //if (poLayer->GetExtent(&oExt, TRUE) == OGRERR_NONE)

@@ -206,6 +206,10 @@
 				RelativePath="..\..\src\geoprocessingui\gptooldlg.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\src\geoprocessingui\gxtoolexecview.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -238,6 +242,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\geoprocessingui\gptooldlg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geoprocessingui\gxtoolexecview.h"
 				>
 			</File>
 		</Filter>

@@ -22,14 +22,16 @@
 #pragma once
 
 #include "wxgis/geoprocessing/geoprocessing.h"
+#include "wxgis/geoprocessing/gptool.h"
 
-/////////////////////////////////////////////////////////////////////////
-// wxGISGPOrthoCorrectTool
-/////////////////////////////////////////////////////////////////////////
+/** \class wxGISGPOrthoCorrectTool gporthocorrecttool.h
+    \brief The geoprocessing tool create ortho corrected rasters.
+
+    The input rasters should have RPC
+*/
 
 class WXDLLIMPEXP_GIS_GP wxGISGPOrthoCorrectTool : 
-    public IGPTool,
-    public wxObject
+    public wxGISGPTool
 {
    DECLARE_DYNAMIC_CLASS(wxGISGPOrthoCorrectTool)
 
@@ -43,11 +45,4 @@ public:
     virtual bool Execute(ITrackCancel* pTrackCancel);
     virtual bool Validate(void);
     virtual GPParameters* GetParameterInfo(void);
-    virtual void SetCatalog(IGxCatalog* pCatalog);
-    virtual IGxCatalog* GetCatalog(void);
-	virtual wxString GetAsString(void){return wxEmptyString;};
-	virtual void SetFromString(wxString sParams){};
-protected:
-    GPParameters m_pParamArr;
-    IGxCatalog* m_pCatalog;
 };

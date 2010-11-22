@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
- * Purpose:  wxGxTasksView class.
+ * Purpose:  wxGxTaskExecDlg class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,28 +20,27 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessingui/gptasksview.h"
-#include "wxgis/geoprocessingui/gptooldlg.h"
+//#include "wxgis/geoprocessingui/gptooldlg.h"
 #include "wxgis/framework/progressor.h"
-#include "wxgis/framework/tooltip.h"
+//#include "wxgis/framework/tooltip.h"
 
-//#include "wx/richtext/richtextctrl.h"
+//#include "../../art/tool_16.xpm"
+//#include "../../art/expand_16.xpm"
 
-#include "../../art/tool_16.xpm"
-#include "../../art/close_16a.xpm"
-#include "../../art/expand_16.xpm"
+#include "../../art/process_stop.xpm"
 #include "../../art/state.xpm"
 
 //////////////////////////////////////////////////////////////////
 // wxGxTaskPanel
 //////////////////////////////////////////////////////////////////
-BEGIN_EVENT_TABLE(wxGxTaskPanel, wxPanel)
-    EVT_BUTTON(wxID_MORE, wxGxTaskPanel::OnExpand)
-    EVT_BUTTON(wxID_CANCEL, wxGxTaskPanel::OnCancel)
-    EVT_BUTTON(ID_SHOW_BALLOON, wxGxTaskPanel::OnShowBallon)
-    EVT_BUTTON(ID_UPDATEMESSAGES, wxGxTaskPanel::OnUpdateMessages)
+BEGIN_EVENT_TABLE(wxGxTaskExecDlg, wxDialog)
+    EVT_BUTTON(wxID_MORE, wxGxTaskExecDlg::OnExpand)
+    EVT_BUTTON(wxID_CANCEL, wxGxTaskExecDlg::OnCancel)
+    //EVT_BUTTON(ID_SHOW_BALLOON, wxGxTaskExecDlg::OnShowBallon)
+    //EVT_BUTTON(ID_UPDATEMESSAGES, wxGxTaskExecDlg::OnUpdateMessages)
 END_EVENT_TABLE()
 
-wxGxTaskPanel::wxGxTaskPanel(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxPanel(parent, id, pos, size, style), m_bExpand(false), m_nTaskThreadId(-1), m_pToolDialogPropNode(NULL), m_nState(enumGISMessageUnk)
+wxGxTaskExecDlg::wxGxTaskExecDlg(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxDialog(parent, id, pTool->GetDisplayName(), pos, size, style), m_bExpand(false), m_nTaskThreadId(-1), m_pToolDialogPropNode(NULL), m_nState(enumGISMessageUnk)
 {
     m_ImageList.Create(16, 16);
 	m_ImageList.Add(wxBitmap(state_xpm));
@@ -66,8 +65,10 @@ wxGxTaskPanel::wxGxTaskPanel(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow
 	fgSizer1->Add( title, 1, wxALL | wxEXPAND, 5 );
 
 
-    m_ExpandBitmap = wxBitmap(expand_16_xpm);
+    m_ExpandBitmap = wxBitmap(m_ImageList.GetIcon(4));
     wxImage bwImage = m_ExpandBitmap.ConvertToImage();
+    bwImage = bwImage.Rotate90();
+    m_ExpandBitmap = wxBitmap(bwImage);
     m_ExpandBitmapRotated = wxBitmap(bwImage.Mirror(false));
     m_ExpandBitmapBW = wxBitmap(bwImage.ConvertToGreyscale());
     m_ExpandBitmapBWRotated = wxBitmap(bwImage.ConvertToGreyscale().Mirror(false));
@@ -81,17 +82,17 @@ wxGxTaskPanel::wxGxTaskPanel(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow
     m_bpExpandButton->SetToolTip(_("Expand"));
 	fgSizer1->Add( m_bpExpandButton, 0, wxALL, 5 );
 
-    wxBitmap NormalCBitmap = wxBitmap(close_16a_xpm);
+    wxBitmap NormalCBitmap = wxBitmap(process_stop_xpm);
     bwImage = NormalCBitmap.ConvertToImage();
 
     wxBitmap bwCBitmap = bwImage.ConvertToGreyscale();
     m_bpCloseButton = new wxBitmapButton( this, wxID_CANCEL, bwCBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-//    m_bpCloseButton->SetBackgroundColour(bgColour);
+    //m_bpCloseButton->SetBackgroundColour(bgColour);
     m_bpCloseButton->SetBitmapDisabled(bwCBitmap);
     m_bpCloseButton->SetBitmapLabel(bwCBitmap);
     m_bpCloseButton->SetBitmapSelected(NormalCBitmap);
     m_bpCloseButton->SetBitmapHover(NormalCBitmap);
-    //wxBitmapButton* bpCloseButton = new wxBitmapButton( this, wxID_CLOSE, wxBitmap(close_16a_xpm), wxDefaultPosition, wxDefaultSize, 0 );
+    //wxBitmapButton* bpCloseButton = new wxBitmapButton( this, wxID_CLOSE, wxBitmap(process_stop_xpm), wxDefaultPosition, wxDefaultSize, 0 );
     m_bpCloseButton->SetToolTip(_("Cancel"));
     fgSizer1->Add( m_bpCloseButton, 0, wxALL, 5 );
 
@@ -132,21 +133,23 @@ wxGxTaskPanel::wxGxTaskPanel(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow
 //    wxRichTextCtrl* pRichTextCtrl = new wxRichTextCtrl(this, wxID_ANY);
     m_pHtmlWindow = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHW_DEFAULT_STYLE | wxBORDER_THEME);
     m_pHtmlWindow->SetInitialSize(wxSize(-1, 255));
-    m_bMainSizer->Add(m_pHtmlWindow, 0, wxEXPAND | wxALL, 5);
+    m_bMainSizer->Add(m_pHtmlWindow, 1, wxEXPAND | wxALL, 5);
     m_pHtmlWindow->Show(false);
 
    	this->SetSizer( m_bMainSizer );
 	this->Layout();
 
+    Fit();
+
  	//this->SetSizeHints( wxDefaultSize, wxDefaultSize );
    //m_bMainSizer->SetSizeHints( this );
 }
 
-wxGxTaskPanel::~wxGxTaskPanel(void)
+wxGxTaskExecDlg::~wxGxTaskExecDlg(void)
 {
 }
 
-void wxGxTaskPanel::OnExpand(wxCommandEvent & event)
+void wxGxTaskExecDlg::OnExpand(wxCommandEvent & event)
 {
     m_bExpand = !m_bExpand;
 
@@ -165,16 +168,15 @@ void wxGxTaskPanel::OnExpand(wxCommandEvent & event)
     Fit();
     wxSize NewSize = GetSize();
     SetSize(wxSize(Size.x, NewSize.y));
-    GetParent()->FitInside();
-
+    //GetParent()->FitInside();
 }
 
-void wxGxTaskPanel::SetTaskThreadId(long nId)
-{
-    m_nTaskThreadId = nId;
-}
-
-void wxGxTaskPanel::FillHtmlWindow()
+//void wxGxTaskExecDlg::SetTaskThreadId(long nId)
+//{
+//    m_nTaskThreadId = nId;
+//}
+//
+void wxGxTaskExecDlg::FillHtmlWindow()
 {
     wxString sText(wxT("<html><body>"));
     for(size_t i = 0 ; i < m_MessageArray.size(); i++)
@@ -213,92 +215,92 @@ void wxGxTaskPanel::FillHtmlWindow()
     m_pHtmlWindow->Scroll(-1, 5000);
 }
 
-void wxGxTaskPanel::OnUpdateMessages(wxCommandEvent & event)
+//void wxGxTaskExecDlg::OnUpdateMessages(wxCommandEvent & event)
+//{
+//    FillHtmlWindow();
+//}
+//
+//void wxGxTaskExecDlg::OnFinish(bool bHasErrors, IGPTool* pTool)
+//{
+//    //m_nState = bHasErrors == true ? enumGISMessageErr : enumGISMessageOK;
+//    //m_bpCloseButton->Enable(true);
+//
+//    //m_sHead = wxString::Format(_("Tool %s"), pTool->GetDisplayName().c_str());
+//    //if(m_nState == enumGISMessageErr)
+//    //{
+//    //    m_Icon = m_ImageList.GetIcon(2);
+//    //    m_pStateBitmap->SetIcon(m_Icon);
+//    //    m_sNote = wxString(_("Completed with errors!"));
+//    //}
+//    //else
+//    //{
+//    //    m_Icon = m_ImageList.GetIcon(1);
+//    //    m_pStateBitmap->SetIcon(m_Icon);
+//    //    wxDELETE(pTool);
+//    //    m_sNote = wxString(_("Completed successfully!"));
+//    //}
+//
+//    //wxCommandEvent event(wxEVT_COMMAND_BUTTON_CLICKED, ID_SHOW_BALLOON);
+//    //::wxPostEvent(this, event);
+//
+//    //if(m_nState == enumGISMessageOK && m_pCheckBox->IsChecked())
+//    //{
+//    //    wxSleep(2);
+//    //    //remove from parent
+//    //    wxGxTasksView* pView = dynamic_cast<wxGxTasksView*>(GetParent());
+//    //    pView->RemovePanel(this);
+//    //    Show(false);
+//    //    //destroy
+//    //    this->Destroy();
+//    //}
+//    //else //move back
+//    //{
+//    //    wxGxTasksView* pView = dynamic_cast<wxGxTasksView*>(GetParent());
+//    //    pView->RemovePanel(this);
+//    //    pView->AddPanel(this);
+//    //    //refresh;
+//    //    Refresh();
+//    //}
+//}
+//
+//void wxGxTaskExecDlg::OnShowBallon(wxCommandEvent & event)
+//{
+//    wxGISBaloonTip* pTip = new wxGISBaloonTip(m_sHead, m_Icon, m_sNote);
+//    pTip->ShowBaloon(m_nState == enumGISMessageErr ? 15000 : 7000);
+//}
+//
+void wxGxTaskExecDlg::OnCancel(wxCommandEvent & event)
 {
-    FillHtmlWindow();
+    //if(m_nState != enumGISMessageUnk)
+    //{
+    //    if(m_nState == enumGISMessageErr)
+    //    {
+    //        //create new dialog
+    //        wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(m_pTool, m_pMngr, m_pToolDialogPropNode, m_pToolDialogWindow, wxID_ANY, m_pTool->GetDisplayName());
+    //        pDlg->Show(true);
+    //    }
+    //    //remove from parent
+    //    wxGxTasksView* pView = dynamic_cast<wxGxTasksView*>(GetParent());
+    //    pView->RemovePanel(this);
+    //    Show(false);
+    //    //destroy
+    //    this->Destroy();
+    //}
+    //else
+    //{
+    //    PutMessage(_("Execution canceled by user"), -1, enumGISMessageWarning);
+    //    Cancel();
+    //    m_bpCloseButton->Enable(false);
+    //}
 }
 
-void wxGxTaskPanel::OnFinish(bool bHasErrors, IGPTool* pTool)
-{
-    m_nState = bHasErrors == true ? enumGISMessageErr : enumGISMessageOK;
-    m_bpCloseButton->Enable(true);
-
-    m_sHead = wxString::Format(_("Tool %s"), pTool->GetDisplayName().c_str());
-    if(m_nState == enumGISMessageErr)
-    {
-        m_Icon = m_ImageList.GetIcon(2);
-        m_pStateBitmap->SetIcon(m_Icon);
-        m_sNote = wxString(_("Completed with errors!"));
-    }
-    else
-    {
-        m_Icon = m_ImageList.GetIcon(1);
-        m_pStateBitmap->SetIcon(m_Icon);
-        wxDELETE(pTool);
-        m_sNote = wxString(_("Completed successfully!"));
-    }
-
-    wxCommandEvent event(wxEVT_COMMAND_BUTTON_CLICKED, ID_SHOW_BALLOON);
-    ::wxPostEvent(this, event);
-
-    if(m_nState == enumGISMessageOK && m_pCheckBox->IsChecked())
-    {
-        wxSleep(2);
-        //remove from parent
-        wxGxTasksView* pView = dynamic_cast<wxGxTasksView*>(GetParent());
-        pView->RemovePanel(this);
-        Show(false);
-        //destroy
-        this->Destroy();
-    }
-    else //move back
-    {
-        wxGxTasksView* pView = dynamic_cast<wxGxTasksView*>(GetParent());
-        pView->RemovePanel(this);
-        pView->AddPanel(this);
-        //refresh;
-        Refresh();
-    }
-}
-
-void wxGxTaskPanel::OnShowBallon(wxCommandEvent & event)
-{
-    wxGISBaloonTip* pTip = new wxGISBaloonTip(m_sHead, m_Icon, m_sNote);
-    pTip->ShowBaloon(m_nState == enumGISMessageErr ? 15000 : 7000);
-}
-
-void wxGxTaskPanel::OnCancel(wxCommandEvent & event)
-{
-    if(m_nState != enumGISMessageUnk)
-    {
-        if(m_nState == enumGISMessageErr)
-        {
-            //create new dialog
-            wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(m_pTool, m_pMngr, m_pToolDialogPropNode, m_pToolDialogWindow, wxID_ANY, m_pTool->GetDisplayName());
-            pDlg->Show(true);
-        }
-        //remove from parent
-        wxGxTasksView* pView = dynamic_cast<wxGxTasksView*>(GetParent());
-        pView->RemovePanel(this);
-        Show(false);
-        //destroy
-        this->Destroy();
-    }
-    else
-    {
-        PutMessage(_("Execution canceled by user"), -1, enumGISMessageWarning);
-        Cancel();
-        m_bpCloseButton->Enable(false);
-    }
-}
-
-void wxGxTaskPanel::SetToolDialog(wxWindow* pWindow, wxXmlNode* pNode)
-{
-    m_pToolDialogWindow = pWindow;
-    m_pToolDialogPropNode = pNode;
-}
-
-void wxGxTaskPanel::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType)
+//void wxGxTaskExecDlg::SetToolDialog(wxWindow* pWindow, wxXmlNode* pNode)
+//{
+//    m_pToolDialogWindow = pWindow;
+//    m_pToolDialogPropNode = pNode;
+//}
+//
+void wxGxTaskExecDlg::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType)
 {
     wxCriticalSectionLocker locker(m_CritSec);
     if(nType == enumGISMessageTitle)
@@ -315,9 +317,9 @@ void wxGxTaskPanel::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessag
     if(!m_bExpand)
         return;
     //htmlwin -> SetPage("<html><body>Hello, world!</body></html>");
-    //FillHtmlWindow();
-    wxCommandEvent event(wxEVT_COMMAND_BUTTON_CLICKED, ID_UPDATEMESSAGES);
-    ::wxPostEvent(this, event);
+    FillHtmlWindow();
+    //wxCommandEvent event(wxEVT_COMMAND_BUTTON_CLICKED, ID_UPDATEMESSAGES);
+    //::wxPostEvent(this, event);
 }
 
 //void wxGxTaskPanel::OnKeyDown(wxKeyEvent & event)
@@ -336,80 +338,80 @@ void wxGxTaskPanel::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessag
 //	}
 //}
 
-//////////////////////////////////////////////////////////////////
-// wxGxTasksView
-//////////////////////////////////////////////////////////////////
-IMPLEMENT_DYNAMIC_CLASS(wxGxTasksView, wxScrolledWindow)
-
-BEGIN_EVENT_TABLE(wxGxTasksView, wxScrolledWindow)
-END_EVENT_TABLE()
-
-
-wxGxTasksView::wxGxTasksView(void)
-{
-}
-
-wxGxTasksView::wxGxTasksView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
-{
-    Create(parent, id, pos, size, style);
-}
-
-wxGxTasksView::~wxGxTasksView(void)
-{
-}
-
-bool wxGxTasksView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
-{
-    wxScrolledWindow::Create(parent, id, pos, size, style);
-    m_sViewName = wxString(_("Tasks"));
-    m_Icon = wxIcon(tool_16_xpm);
-
-    m_bMainSizer = new wxBoxSizer( wxVERTICAL );
-	//wxGxTaskPanel* pTaskPanel1 = new wxGxTaskPanel( this, wxID_ANY, wxDefaultPosition, wxSize(size.x, 100));//wxDefaultSize
- //   //pTaskPanel->SetBackgroundColour(*wxWHITE);
- //   bMainSizer->Add( pTaskPanel1, 0, wxEXPAND, 5 );
-	//wxGxTaskPanel* pTaskPanel2 = new wxGxTaskPanel( this, wxID_ANY, wxDefaultPosition, wxSize(size.x, 100));
- //   bMainSizer->Add( pTaskPanel2, 0, wxEXPAND, 5 );
-
-    SetScrollbars(20, 20, 50, 50);
-
-  	this->SetSizer( m_bMainSizer );
-	this->Layout();
-
-    return true;
-}
-
-bool wxGxTasksView::Activate(IGxApplication* application, wxXmlNode* pConf)
-{
-	wxGxView::Activate(application, pConf);
-
-	return true;
-}
-
-void wxGxTasksView::Deactivate(void)
-{
-	wxGxView::Deactivate();
-}
-
-void wxGxTasksView::AddPanel(wxGxTaskPanel* pGxTaskPanel)
-{
-    m_bMainSizer->Add( pGxTaskPanel, 0, wxEXPAND, 5 );
-    Layout();
-    FitInside();
-}
-
-void wxGxTasksView::RemovePanel(wxGxTaskPanel* pGxTaskPanel)
-{
-    m_bMainSizer->Detach( pGxTaskPanel );
-    Layout();
-    FitInside();
-}
-
-void wxGxTasksView::InsertPanel(wxGxTaskPanel* pGxTaskPanel, long nPos)
-{
-    m_bMainSizer->Insert(nPos, pGxTaskPanel, 0, wxEXPAND, 5 );
-    Layout();
-    FitInside();
-}
-
+////////////////////////////////////////////////////////////////////
+//// wxGxTasksView
+////////////////////////////////////////////////////////////////////
+//IMPLEMENT_DYNAMIC_CLASS(wxGxTasksView, wxScrolledWindow)
+//
+//BEGIN_EVENT_TABLE(wxGxTasksView, wxScrolledWindow)
+//END_EVENT_TABLE()
+//
+//
+//wxGxTasksView::wxGxTasksView(void)
+//{
+//}
+//
+//wxGxTasksView::wxGxTasksView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+//{
+//    Create(parent, id, pos, size, style);
+//}
+//
+//wxGxTasksView::~wxGxTasksView(void)
+//{
+//}
+//
+//bool wxGxTasksView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+//{
+//    wxScrolledWindow::Create(parent, id, pos, size, style);
+//    m_sViewName = wxString(_("Tasks"));
+//    m_Icon = wxIcon(tool_16_xpm);
+//
+//    m_bMainSizer = new wxBoxSizer( wxVERTICAL );
+//	//wxGxTaskPanel* pTaskPanel1 = new wxGxTaskPanel( this, wxID_ANY, wxDefaultPosition, wxSize(size.x, 100));//wxDefaultSize
+// //   //pTaskPanel->SetBackgroundColour(*wxWHITE);
+// //   bMainSizer->Add( pTaskPanel1, 0, wxEXPAND, 5 );
+//	//wxGxTaskPanel* pTaskPanel2 = new wxGxTaskPanel( this, wxID_ANY, wxDefaultPosition, wxSize(size.x, 100));
+// //   bMainSizer->Add( pTaskPanel2, 0, wxEXPAND, 5 );
+//
+//    SetScrollbars(20, 20, 50, 50);
+//
+//  	this->SetSizer( m_bMainSizer );
+//	this->Layout();
+//
+//    return true;
+//}
+//
+//bool wxGxTasksView::Activate(IGxApplication* application, wxXmlNode* pConf)
+//{
+//	wxGxView::Activate(application, pConf);
+//
+//	return true;
+//}
+//
+//void wxGxTasksView::Deactivate(void)
+//{
+//	wxGxView::Deactivate();
+//}
+//
+//void wxGxTasksView::AddPanel(wxGxTaskPanel* pGxTaskPanel)
+//{
+//    m_bMainSizer->Add( pGxTaskPanel, 0, wxEXPAND, 5 );
+//    Layout();
+//    FitInside();
+//}
+//
+//void wxGxTasksView::RemovePanel(wxGxTaskPanel* pGxTaskPanel)
+//{
+//    m_bMainSizer->Detach( pGxTaskPanel );
+//    Layout();
+//    FitInside();
+//}
+//
+//void wxGxTasksView::InsertPanel(wxGxTaskPanel* pGxTaskPanel, long nPos)
+//{
+//    m_bMainSizer->Insert(nPos, pGxTaskPanel, 0, wxEXPAND, 5 );
+//    Layout();
+//    FitInside();
+//}
+//
 

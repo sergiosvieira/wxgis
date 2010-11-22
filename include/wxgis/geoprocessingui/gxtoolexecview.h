@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxContentView class.
+ * Purpose:  wxGxToolExecuteView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,49 +21,39 @@
 
 #pragma once
 #include "wxgis/catalogui/gxview.h"
-#include "wxgis/catalogui/gxcatalogui.h"
-#include "wxgis/catalogui/newmenu.h"
 
 #include "wx/listctrl.h"
 #include "wx/imaglist.h"
 
-//TODO: Fix mouse selection dragging linux
-
-typedef struct _sortdata
-{
-    bool bSortAsc;
-    short currentSortCol;
-} SORTDATA, *LPSORTDATA;
-
-
-class WXDLLIMPEXP_GIS_CLU wxGxContentView :
+/** \class wxGISToolExecuteView gxtoolexecview.h
+    \brief The tasks execution view class.
+*/
+class WXDLLIMPEXP_GIS_GPU wxGISToolExecuteView :
 	public wxListCtrl,
-	public wxGxView,
 	public IGxSelectionEvents,
 	public IGxCatalogEvents
-{
-    DECLARE_DYNAMIC_CLASS(wxGxContentView)
+    {
+    DECLARE_DYNAMIC_CLASS(wxGISToolExecuteView)
 public:
-	typedef enum _listsyle{ REPORT, SMALL, LARGE, LIST } LISTSTYLE, *LPLISTSTYLE;
+	enum
+	{
+		TOOLEXECUTECTRLID = WXGISHIGHEST + 1
+    };
 
-    wxGxContentView(void);
-	wxGxContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition,
-						 const wxSize& size = wxDefaultSize, long style = wxLC_LIST | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE);//
+    wxGISToolExecuteView(void);
+	wxGISToolExecuteView(wxWindow* parent, wxWindowID id = TOOLEXECUTECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxLC_REPORT | wxBORDER_NONE | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE);
 	virtual ~wxGxContentView(void);
 	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
 	virtual void AddObject(IGxObject* pObject);
-	virtual void SetStyle(LISTSTYLE style);
-    virtual LISTSTYLE GetStyle(void){return m_current_style;};
 	virtual void ResetContents(void);
     virtual IGxObject* GetParentGxObject(void){return m_pParentGxObject;};
     virtual void SelectAll(void);
     virtual bool Show(bool show = true);
 //IGxView
-    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxLC_LIST | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE, const wxString& name = wxT("ContentView"));
+    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxLC_REPORT | wxBORDER_NONE | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE, const wxString& name = wxT("ToolExecuteView"));
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 	virtual bool Applies(IGxSelection* Selection);
-    virtual void BeginRename(IGxObject* pGxObject = NULL);
 //IGxSelectionEvents
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 //IGxCatalogEvents
@@ -78,12 +68,8 @@ public:
 	virtual void ShowContextMenu(const wxPoint& pos);
 	virtual void SetColumnImage(int col, int image);
     virtual void OnActivated(wxListEvent& event);
-    virtual void OnBeginLabelEdit(wxListEvent& event);
-	virtual void OnEndLabelEdit(wxListEvent& event);
 	virtual void OnSelected(wxListEvent& event);
 	virtual void OnDeselected(wxListEvent& event);
-    virtual void OnBeginDrag(wxListEvent& event);
-    virtual void OnChar(wxKeyEvent& event);
 
 	typedef struct _itemdata
 	{
@@ -100,17 +86,38 @@ public:
 protected:
 	bool m_bSortAsc;
 	short m_currentSortCol;
-	LISTSTYLE m_current_style;
-	wxImageList m_ImageListSmall, m_ImageListLarge;
+	wxImageList m_ImageList;
 	IConnectionPointContainer* m_pConnectionPointCatalog;
 	long m_ConnectionPointCatalogCookie;
 	IGxSelection* m_pSelection;
     wxGxCatalogUI* m_pCatalog;
-    ICommand* m_pDeleteCmd;
-	wxGISNewMenu* m_pNewMenu;
 	IGxObject* m_pParentGxObject;
-	bool m_bDragging;
     std::vector<ICONDATA> m_IconsArray;
 
 DECLARE_EVENT_TABLE()
 };
+
+/** \class wxGxToolExecuteView gxtoolexecview.h
+    \brief The tasks execution gxcatalog view class.
+*/
+
+class WXDLLIMPEXP_GIS_GPU wxGxToolExecuteView :
+	public wxGxView,
+	public IGxSelectionEvents
+{
+    DECLARE_DYNAMIC_CLASS(wxGxToolExecuteView)
+public:
+    wxGxToolExecuteView(void);
+	wxGxToolExecuteView(wxWindow* parent, wxWindowID id = TABLECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
+	virtual ~wxGxToolExecuteView(void);
+//IGxView
+    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("TableView"));
+	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
+	virtual void Deactivate(void);
+	virtual bool Applies(IGxSelection* Selection);
+private:
+	IGxSelection* m_pSelection;
+	IGxObject* m_pParentGxObject;
+};
+
+

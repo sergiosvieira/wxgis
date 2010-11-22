@@ -19,11 +19,9 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/carto/tableview.h"
-#include "../../art/left.xpm"
-#include "../../art/full_left.xpm"
-#include "../../art/right.xpm"
-#include "../../art/full_right.xpm"
-#include "../../art/small_right.xpm"
+#include "../../art/full_arrow.xpm"
+#include "../../art/arrow.xpm"
+#include "../../art/small_arrow.xpm"
 
 #include "wx/renderer.h"
 
@@ -138,7 +136,7 @@ void wxGridCtrl::DrawRowLabel(wxDC& dc, int row)
     dc.DrawLine(1, rowTop, m_rowLabelWidth - 1, rowTop);
     if (row == GetGridCursorRow())
 	{
-		dc.DrawBitmap(wxBitmap(small_right_xpm), 0, GetRowTop(row), true);
+		dc.DrawBitmap(wxBitmap(small_arrow_xpm), 0, GetRowTop(row), true);
     }
 }
 
@@ -230,13 +228,18 @@ bool wxGISTableView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 	m_staticText1->Wrap( -1 );
 	bSizerLow->Add( m_staticText1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
-	m_bpFirst = new wxBitmapButton( this, wxGISTableView::ID_FIRST, wxBitmap(full_left_xpm), wxDefaultPosition, wxSize( WXGISBITBUTTONSIZE, WXGISBITBUTTONSIZE ), wxBU_AUTODRAW );
+    wxBitmap FullArrowRight(full_arrow_xpm);
+    wxBitmap ArrowRight(arrow_xpm);
+    wxBitmap FullArrowLeft = FullArrowRight.ConvertToImage().Mirror();
+    wxBitmap ArrowLeft = ArrowRight.ConvertToImage().Mirror();
+
+	m_bpFirst = new wxBitmapButton( this, wxGISTableView::ID_FIRST, FullArrowLeft, wxDefaultPosition, wxSize( WXGISBITBUTTONSIZE, WXGISBITBUTTONSIZE ), wxBU_AUTODRAW );
 	m_bpFirst->SetMinSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
 	m_bpFirst->SetMaxSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
 
 	bSizerLow->Add( m_bpFirst, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
 
-	m_bpPrev = new wxBitmapButton( this, wxGISTableView::ID_PREV, wxBitmap(left_xpm), wxDefaultPosition, wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ), wxBU_AUTODRAW );
+	m_bpPrev = new wxBitmapButton( this, wxGISTableView::ID_PREV, ArrowLeft, wxDefaultPosition, wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ), wxBU_AUTODRAW );
 	m_bpPrev->SetMinSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
 	m_bpPrev->SetMaxSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
 
@@ -245,13 +248,13 @@ bool wxGISTableView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 	m_position = new wxTextCtrl( this, wxGISTableView::ID_POS, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_CENTRE|wxTE_PROCESS_ENTER  );
 	bSizerLow->Add( m_position, 0, wxALL, 5 );
 
-	m_bpNext = new wxBitmapButton( this, wxGISTableView::ID_NEXT, wxBitmap(right_xpm), wxDefaultPosition, wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ), wxBU_AUTODRAW );
+	m_bpNext = new wxBitmapButton( this, wxGISTableView::ID_NEXT, ArrowRight, wxDefaultPosition, wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ), wxBU_AUTODRAW );
 	m_bpNext->SetMinSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
 	m_bpNext->SetMaxSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
 
 	bSizerLow->Add( m_bpNext, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
 
-	m_bpLast = new wxBitmapButton( this, wxGISTableView::ID_LAST, wxBitmap(full_right_xpm), wxDefaultPosition, wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ), wxBU_AUTODRAW );
+	m_bpLast = new wxBitmapButton( this, wxGISTableView::ID_LAST, FullArrowRight, wxDefaultPosition, wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ), wxBU_AUTODRAW );
 	m_bpLast->SetMinSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
 	m_bpLast->SetMaxSize( wxSize( WXGISBITBUTTONSIZE,WXGISBITBUTTONSIZE ) );
 

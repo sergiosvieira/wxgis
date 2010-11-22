@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
- * Purpose:  export geoprocessing tools.
+ * Purpose:  base geoprocessing tool.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
@@ -22,26 +22,35 @@
 #pragma once
 
 #include "wxgis/geoprocessing/geoprocessing.h"
-#include "wxgis/geoprocessing/gptool.h"
-#include "wxgis/geoprocessing/gpvector.h"
 
-/** \class wxGISGPExportTool gpexporttool.h
-    \brief The geoprocessing tool export vector data to various formats.
+#define SEPARATOR wxT("|")
+
+/** \class wxGISGPTool gptool.h
+    \brief The base class for geoprocessing tools.
+
+    This class implements common functions.
 */
-class WXDLLIMPEXP_GIS_GP wxGISGPExportTool : 
-    public wxGISGPTool
-{
-   DECLARE_DYNAMIC_CLASS(wxGISGPExportTool)
 
+class WXDLLIMPEXP_GIS_GP wxGISGPTool : 
+    public IGPTool,
+    public wxObject
+{
 public:
-    wxGISGPExportTool(void);
-    ~wxGISGPExportTool(void);
+    wxGISGPTool(void);
+    ~wxGISGPTool(void);
     //IGPTool
-    virtual wxString GetDisplayName(void);
-    virtual wxString GetName(void);
-    virtual wxString GetCategory(void);
-    virtual bool Execute(ITrackCancel* pTrackCancel);
-    virtual bool Validate(void);
-    virtual GPParameters* GetParameterInfo(void);
-    virtual bool OnExport(wxGISFeatureDataset* pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel);
+    virtual wxString GetDisplayName(void) = 0;
+    virtual wxString GetName(void) = 0;
+    virtual wxString GetCategory(void) = 0;
+    virtual bool Execute(ITrackCancel* pTrackCancel) = 0;
+    virtual bool Validate(void) = 0;
+    virtual GPParameters* GetParameterInfo(void) = 0;
+    virtual void SetCatalog(IGxCatalog* pCatalog);
+    virtual IGxCatalog* GetCatalog(void);
+	virtual wxString GetAsString(void);
+	virtual void SetFromString(wxString sParams);
+    //TODO: export/import tool to XML for server execution
+protected:
+    GPParameters m_pParamArr;
+    IGxCatalog* m_pCatalog;
 };

@@ -164,7 +164,7 @@ void wxGISGPParameter::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
 
 wxString wxGISGPParameter::GetAsString(void)
 {
-	return wxEmptyString;
+	return m_Value.MakeString();
 }
 
 void wxGISGPParameter::SetFromString(wxString sParam)

@@ -229,7 +229,7 @@ public:
 	virtual void Reset(void){m_bIsCanceled = false;};
 	virtual IProgressor* GetProgressor(void){return m_pProgressor;};
 	virtual void SetProgressor(IProgressor* pProgressor){m_pProgressor = pProgressor; };
-	virtual void PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType){};//wxDateTime::Now().Format(_("%d-%m-%Y %H:%M:%S")).c_str(), 
+	virtual void PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType){};
 protected:
 	bool m_bIsCanceled;
 	IProgressor* m_pProgressor;

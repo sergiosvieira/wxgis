@@ -3,7 +3,7 @@
  * Purpose:  toolbox classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -28,24 +28,30 @@
 #include "../../art/toolbox_48.xpm"
 #include "../../art/tool_16.xpm"
 #include "../../art/tool_48.xpm"
+#include "../../art/toolboxfavor_16.xpm"
+#include "../../art/toolboxfavor_48.xpm"
+#include "../../art/toolexec_16.xpm"
+#include "../../art/toolexec_48.xpm"
 
 /////////////////////////////////////////////////////////////////////////
 // wxGxToolbox
 /////////////////////////////////////////////////////////////////////////
-
-wxGxToolbox::wxGxToolbox(wxGISGPToolManager* pToolMngr, wxXmlNode* pPropNode) : m_bIsChildrenLoaded(false), m_pToolMngr(NULL), m_pPropNode(NULL)
+wxGxToolbox::wxGxToolbox() : m_bIsChildrenLoaded(false)
 {
-    m_pToolMngr = pToolMngr;
-    m_pPropNode = pPropNode;
+    m_pRootToolbox = NULL;
+    m_pDataNode = NULL;
 }
 
-wxGxToolbox::wxGxToolbox(wxXmlNode* pDataNode, wxGISGPToolManager* pToolMngr, wxXmlNode* pPropNode) : m_bIsChildrenLoaded(false), m_pToolMngr(NULL), m_pPropNode(NULL)
+wxGxToolbox::wxGxToolbox(wxGxRootToolbox* pRootToolbox, wxXmlNode* pDataNode, wxIcon LargeToolboxIcon, wxIcon SmallToolboxIcon, wxIcon LargeToolIcon, wxIcon SmallToolIcon) : m_bIsChildrenLoaded(false)
 {
-    m_pToolMngr = pToolMngr;
-    m_pPropNode = pPropNode;
+    m_pRootToolbox = pRootToolbox;
     m_pDataNode = pDataNode;
     if(m_pDataNode)
         m_sName = wxGetTranslation( m_pDataNode->GetPropVal(wxT("name"), NONAME) );
+    m_LargeToolboxIcon = LargeToolboxIcon;
+    m_SmallToolboxIcon = SmallToolboxIcon;
+    m_LargeToolIcon = LargeToolIcon;
+    m_SmallToolIcon = SmallToolIcon;
 }
 
 wxGxToolbox::~wxGxToolbox(void)
@@ -54,12 +60,12 @@ wxGxToolbox::~wxGxToolbox(void)
 
 wxIcon wxGxToolbox::GetLargeImage(void)
 {
-	return wxIcon(toolbox_48_xpm);
+	return m_LargeToolboxIcon;
 }
 
 wxIcon wxGxToolbox::GetSmallImage(void)
 {
-	return wxIcon(toolbox_16_xpm);
+	return m_SmallToolboxIcon;
 }
 
 void wxGxToolbox::Detach(void)
@@ -107,7 +113,6 @@ void wxGxToolbox::LoadChildren(void)
 	if(m_bIsChildrenLoaded)
 		return;
 
-    wxBusyCursor wait;
     LoadChildrenFromXml(m_pDataNode);
     m_bIsChildrenLoaded = true;
 }
@@ -124,14 +129,14 @@ void wxGxToolbox::LoadChildrenFromXml(wxXmlNode* pNode)
     {
         if(pChild->GetName().IsSameAs(wxT("toolbox"), false))
         {
-            wxGxToolbox* pToolbox = new wxGxToolbox(pChild, m_pToolMngr, m_pPropNode);
+            wxGxToolbox* pToolbox = new wxGxToolbox(m_pRootToolbox, pChild, m_LargeToolboxIcon, m_SmallToolboxIcon, m_LargeToolIcon, m_SmallToolIcon);
             IGxObject* pGxObj = static_cast<IGxObject*>(pToolbox);
             if(!AddChild(pGxObj))
                 wxDELETE(pGxObj);
         }
         else if(pChild->GetName().IsSameAs(wxT("tool"), false))
         {
-            wxGxTool* pTool = new wxGxTool(pChild, m_pToolMngr, m_pPropNode);
+            wxGxTool* pTool = new wxGxTool(m_pRootToolbox, pChild, m_LargeToolIcon, m_SmallToolIcon);
             if(pTool->IsOk())
             {
                 IGxObject* pGxObj = static_cast<IGxObject*>(pTool);
@@ -154,6 +159,10 @@ wxGxRootToolbox::wxGxRootToolbox(void) : m_bIsChildrenLoaded(false), m_pConfig(N
 {
     m_pToolMngr = NULL;
     m_pPropNode = NULL;
+    m_LargeToolboxIcon = wxIcon(toolbox_48_xpm);
+    m_SmallToolboxIcon = wxIcon(toolbox_16_xpm);
+    m_LargeToolIcon = wxIcon(tool_48_xpm);
+    m_SmallToolIcon = wxIcon(tool_16_xpm);
 }
 
 wxGxRootToolbox::~wxGxRootToolbox(void)
@@ -163,14 +172,7 @@ wxGxRootToolbox::~wxGxRootToolbox(void)
 void wxGxRootToolbox::Detach(void)
 {
 	EmptyChildren();
-    wxDELETE(m_pToolMngr);
-
     wxDELETE(m_pConfig);
-
-//    if(m_XmlDoc.IsOk())
-//    {
-//        m_XmlDoc.Save(m_sPath);
-//    }
 }
 
 void wxGxRootToolbox::Init(wxXmlNode* pConfigNode)
@@ -180,29 +182,7 @@ void wxGxRootToolbox::Init(wxXmlNode* pConfigNode)
 #else
 	m_pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, false);
 #endif
-
-
-//    m_sPath = pConfigNode->GetPropVal(wxT("path"), NON);
-//    if(m_sPath.IsEmpty() || m_sPath == wxString(NON))
-//    {
-//        wxStandardPaths stp;
-//        wxString sExeDirPath = wxPathOnly(stp.GetExecutablePath());
-//        m_sPath = sExeDirPath + wxT("/sys/toolbox.xml");
-//        m_sPath.Replace(wxT("\\"), wxT("/"));
-//    }
-//    wxLogMessage(_("wxGxRootToolbox: The path is set to '%s'"), m_sPath.c_str());
-//
     m_pPropNode = new wxXmlNode(*pConfigNode);
-//    //m_pPropNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("rootitem"));
-//    //wxClassInfo* pInfo = GetClassInfo();
-//    //if(pInfo)
-//    //    m_pPropNode->AddProperty(wxT("name"), pInfo->GetClassName());
-//    //m_pPropNode->AddProperty(wxT("is_enabled"), wxT("1"));
-//#ifdef WXGISPORTABLE
-//    if(m_pPropNode->HasProp(wxT("path")))
-//        m_pPropNode->DeleteProperty(wxT("path"));
-//    m_pPropNode->AddProperty(wxT("path"), wxEmptyString);
-//#endif
 }
 
 void wxGxRootToolbox::LoadChildren(void)
@@ -210,83 +190,39 @@ void wxGxRootToolbox::LoadChildren(void)
 	if(m_bIsChildrenLoaded)
 		return;
 
-    wxBusyCursor wait;
-//    if( !m_XmlDoc.Load(m_sPath) )
-//        return;
-//    if (m_XmlDoc.GetRoot()->GetName() != wxT("wxToolboxes"))
-//        return;
-
     wxXmlNode *pToolsChild(NULL), *pToolboxesChild(NULL);
     pToolsChild = m_pConfig->GetConfigNode(wxT("tools"), false, true);
     pToolboxesChild = m_pConfig->GetConfigNode(wxT("toolboxes"), false, true);
 
-//    wxXmlNode* pChild = m_XmlDoc.GetRoot()->GetChildren();
-//    while(pChild)
-//    {
-//        if(pChild->GetName().CmpNoCase(wxT("toolboxes")) == 0)
-//            pToolboxesChild = pChild;
-//        if(pChild->GetName().CmpNoCase(wxT("tools")) == 0)
-//            pToolsChild = pChild;
-//        pChild = pChild->GetNext();
-//    }
+    m_pRootToolbox = this;
 
-    m_pToolMngr = new wxGISGPToolManager(pToolsChild, m_pCatalog);
+    //Add task exec
+    wxGxToolExecute* pToolExecute = new wxGxToolExecute(m_pRootToolbox, pToolsChild);
+    IGxObject* pGxObj = static_cast<IGxObject*>(pToolExecute);
+
+    if( !AddChild(pGxObj) )
+    {
+        wxDELETE(pGxObj);
+    }
+    else
+    {
+        m_pToolMngr = static_cast<wxGISGPToolManager*>(pToolExecute);
+    }
+
+    //Add favorites
+    bool bShowFavorites = wxAtoi(pToolboxesChild->GetPropVal(wxT("show_favorites"), wxT("1")));
+    if(bShowFavorites)
+    {
+        short nMax = wxAtoi(pToolboxesChild->GetPropVal(wxT("max_favorites"), wxT("10")));
+        wxGxFavoritesToolbox* pToolbox = new wxGxFavoritesToolbox(m_pRootToolbox, nMax, m_LargeToolIcon, m_SmallToolIcon);
+        IGxObject* pGxObj = static_cast<IGxObject*>(pToolbox);
+        if(!AddChild(pGxObj))
+            wxDELETE(pGxObj);
+    }
     LoadChildrenFromXml(pToolboxesChild);
-    //load children from local machine node exluding dupes
 
- //   //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
- //   //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
-
- //   char **papszFileList = VSIReadDir(wgWX2MB(m_sPath));
-
- //   if( CSLCount(papszFileList) == 0 )
- //   {
- //       wxLogMessage(wxT( "wxGxSpatialReferencesFolder: no files or directories" ));
- //   }
- //   else
- //   {
- //       //wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
- //      	//wxArrayString FileNames;
- //       for(int i = 0; papszFileList[i] != NULL; i++ )
-	//	{
-	//		wxString sFileName = wgMB2WX(papszFileList[i]);
- //           //if(i > 0)
- //           //    wxLogDebug( wxT("       %s"), sFileName.c_str() );
- //           VSIStatBufL BufL;
-	//		wxString sFolderPath = m_sPath + wxT("/") + sFileName;
- //           int ret = VSIStatL(wgWX2MB(sFolderPath), &BufL);
- //           if(ret == 0)
- //           {
- //               //int x = 0;
- //               if(VSI_ISDIR(BufL.st_mode))
- //               {
-	//				wxGxPrjFolder* pFolder = new wxGxPrjFolder(sFolderPath, sFileName, m_pCatalog->GetShowHidden());
-	//				IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
-	//				bool ret_code = AddChild(pGxObj);
- //               }
- //               else
- //               {
- //                   m_FileNames.Add(sFolderPath);
- //               }
- //           }
-	//	}
- //   }
- //   CSLDestroy( papszFileList );
-
-	////load names
-	//GxObjectArray Array;
-	//if(m_pCatalog->GetChildren(m_sPath, &m_FileNames, &Array))
-	//{
-	//	for(size_t i = 0; i < Array.size(); i++)
-	//	{
-	//		bool ret_code = AddChild(Array[i]);
-	//		if(!ret_code)
-	//			wxDELETE(Array[i]);
-	//	}
-	//}
 	m_bIsChildrenLoaded = true;
 }
-
 
 wxXmlNode* wxGxRootToolbox::GetProperties(void)
 {
@@ -296,33 +232,188 @@ wxXmlNode* wxGxRootToolbox::GetProperties(void)
     return m_pPropNode;
 }
 
+wxGISGPToolManager* wxGxRootToolbox::GetGPToolManager(void)
+{
+    return m_pToolMngr;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// wxGxFavoritesToolbox
+/////////////////////////////////////////////////////////////////////////
+
+wxGxFavoritesToolbox::wxGxFavoritesToolbox(wxGxRootToolbox* pRootToolbox, short nMaxCount, wxIcon LargeToolIcon, wxIcon SmallToolIcon) : m_bIsChildrenLoaded(false)
+{
+    m_pRootToolbox = pRootToolbox;
+    m_nMaxCount = nMaxCount;
+    m_LargeToolIcon = LargeToolIcon;
+    m_SmallToolIcon = SmallToolIcon;
+}
+
+wxGxFavoritesToolbox::~wxGxFavoritesToolbox(void)
+{
+}
+
+wxIcon wxGxFavoritesToolbox::GetLargeImage(void)
+{
+	return wxIcon(toolboxfavor_48_xpm);
+}
+
+wxIcon wxGxFavoritesToolbox::GetSmallImage(void)
+{
+	return wxIcon(toolboxfavor_16_xpm);
+}
+
+void wxGxFavoritesToolbox::Detach(void)
+{
+	EmptyChildren();
+}
+
+void wxGxFavoritesToolbox::Refresh(void)
+{
+	EmptyChildren();
+	LoadChildren();
+    m_pCatalog->ObjectRefreshed(this);
+}
+
+void wxGxFavoritesToolbox::EmptyChildren(void)
+{
+	for(size_t i = 0; i < m_Children.size(); i++)
+	{
+        wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pCatalog);
+        if(pCatalog)
+        {
+            IGxSelection* pSel = pCatalog->GetSelection();
+            if(pSel)
+                pSel->Unselect(m_Children[i], IGxSelection::INIT_ALL);
+        }
+		m_Children[i]->Detach();
+		wxDELETE(m_Children[i]);
+	}
+	m_Children.clear();
+	m_bIsChildrenLoaded = false;
+}
+
+bool wxGxFavoritesToolbox::DeleteChild(IGxObject* pChild)
+{
+	//bool bHasChildren = m_Children.size() > 0 ? true : false;
+	//if(!IGxObjectContainer::DeleteChild(pChild))
+		return false;
+	//if(bHasChildren != m_Children.size() > 0 ? true : false)
+	//	m_pCatalog->ObjectChanged(this);
+	//return true;
+}
+
+void wxGxFavoritesToolbox::LoadChildren(void)
+{
+	if(m_bIsChildrenLoaded)
+		return;
+
+    if(m_pRootToolbox)
+    {
+        wxGISGPToolManager* pGPToolManager = m_pRootToolbox->GetGPToolManager();
+        if(pGPToolManager)
+        {
+            int nCount = MIN(pGPToolManager->GetToolCount(), m_nMaxCount);
+            for(size_t i = 0; i < nCount; i++)
+            {
+                wxGxTool* pTool = new wxGxTool(m_pRootToolbox, pGPToolManager->GetPopularTool(i), m_LargeToolIcon, m_SmallToolIcon);
+                if(pTool->IsOk())
+                {
+                    IGxObject* pGxObj = static_cast<IGxObject*>(pTool);
+                    if(!AddChild(pGxObj))
+                        wxDELETE(pGxObj);
+                }
+                else
+                    wxDELETE(pTool);
+           }
+        }
+    }
+
+    m_bIsChildrenLoaded = true;
+}
+
+wxString wxGxFavoritesToolbox::GetName(void)
+{
+    return wxString(_("Favorites"));
+}
+
+/////////////////////////////////////////////////////////////////////////
+// wxGxToolExecute
+/////////////////////////////////////////////////////////////////////////
+
+wxGxToolExecute::wxGxToolExecute(wxGxRootToolbox* pRootToolbox, wxXmlNode* pToolsNode) : wxGISGPToolManager(pToolsNode)
+{
+    m_pRootToolbox = pRootToolbox;
+}
+
+wxGxToolExecute::~wxGxToolExecute(void)
+{
+}
+
+wxIcon wxGxToolExecute::GetLargeImage(void)
+{
+	return wxIcon(toolexec_48_xpm);
+}
+
+wxIcon wxGxToolExecute::GetSmallImage(void)
+{
+	return wxIcon(toolexec_16_xpm);
+}
+
+void wxGxToolExecute::Detach(void)
+{
+}
+
+void wxGxToolExecute::Refresh(void)
+{
+    m_pCatalog->ObjectRefreshed(this);
+}
+
+wxString wxGxToolExecute::GetName(void)
+{
+    return wxString::Format(_("Executed list [%d]"), m_nRunningTasks);
+}
+
 /////////////////////////////////////////////////////////////////////////
 // wxGxTool
 /////////////////////////////////////////////////////////////////////////
-wxGxTool::wxGxTool(wxGISGPToolManager* pToolMngr, wxXmlNode* pPropNode) : m_pToolMngr(NULL), m_pPropNode(NULL), m_bIsOk(true)
-{
-    m_sName = NONAME;
-    m_pToolMngr = pToolMngr;
-    m_pPropNode = pPropNode;
-}
 
-wxGxTool::wxGxTool(wxXmlNode* pDataNode, wxGISGPToolManager* pToolMngr, wxXmlNode* pPropNode) : m_pToolMngr(NULL), m_pPropNode(NULL), m_bIsOk(true)
+wxGxTool::wxGxTool(wxGxRootToolbox* pRootToolbox, wxXmlNode* pDataNode, wxIcon LargeToolIcon, wxIcon SmallToolIcon) : m_bIsOk(true)
 {
     m_pDataNode = pDataNode;
-    m_pToolMngr = pToolMngr;
-    m_pPropNode = pPropNode;
-    if(m_pDataNode && m_pToolMngr)
+    m_pRootToolbox = pRootToolbox;
+    if(m_pDataNode && m_pRootToolbox)
     {
         m_sInternalName = m_pDataNode->GetPropVal(wxT("name"), NONAME);
-        IGPTool* pTool = m_pToolMngr->GetTool(m_sInternalName);
+        wxGISGPToolManager* pGPToolManager = m_pRootToolbox->GetGPToolManager();
+        IGPTool* pTool = pGPToolManager->GetTool(m_sInternalName, m_pCatalog);
         if(pTool)
         {
             m_sName = pTool->GetDisplayName();
-            wxDELETE(pTool);
         }
         else
             m_bIsOk = false;
     }
+    m_LargeToolIcon = LargeToolIcon;
+    m_SmallToolIcon = SmallToolIcon;
+}
+
+wxGxTool::wxGxTool(wxGxRootToolbox* pRootToolbox, wxString sInternalName, wxIcon LargeToolIcon, wxIcon SmallToolIcon) : m_bIsOk(true)
+{
+    m_pDataNode = NULL;
+    m_pRootToolbox = pRootToolbox;
+    m_sInternalName = sInternalName;
+    wxGISGPToolManager* pGPToolManager = m_pRootToolbox->GetGPToolManager();
+    IGPTool* pTool = pGPToolManager->GetTool(m_sInternalName, m_pCatalog);
+    if(pTool)
+    {
+        m_sName = pTool->GetDisplayName();
+    }
+    else
+        m_bIsOk = false;
+
+    m_LargeToolIcon = LargeToolIcon;
+    m_SmallToolIcon = SmallToolIcon;
 }
 
 wxGxTool::~wxGxTool(void)
@@ -331,23 +422,22 @@ wxGxTool::~wxGxTool(void)
 
 wxIcon wxGxTool::GetLargeImage(void)
 {
-	return wxIcon(tool_48_xpm);
+	return m_LargeToolIcon;
 }
 
 wxIcon wxGxTool::GetSmallImage(void)
 {
-	return wxIcon(tool_16_xpm);
+	return m_SmallToolIcon;
 }
 
 bool wxGxTool::Invoke(wxWindow* pParentWnd)
 {
-    IGPTool* pTool = m_pToolMngr->GetTool(m_sInternalName);
+    wxGISGPToolManager* pGPToolManager = m_pRootToolbox->GetGPToolManager();
+    IGPTool* pTool = pGPToolManager->GetTool(m_sInternalName, m_pCatalog);
     if(pTool)
     {
-        wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(pTool, m_pToolMngr, m_pPropNode, pParentWnd, wxID_ANY, pTool->GetDisplayName());//);//
-        pDlg->Show(true);
-        //pDlg->SetParent(pParentWnd);
-    //dlg.ShowModal();//(true);
+        wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(pTool, pGPToolManager, m_pRootToolbox->GetProperties(), pParentWnd, wxID_ANY, pTool->GetDisplayName());
+        pDlg->Show(true);//dlg.ShowModal();
     }
     return false;
 }
