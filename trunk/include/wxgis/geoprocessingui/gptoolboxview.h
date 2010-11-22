@@ -3,7 +3,7 @@
  * Purpose:  wxGxToolboxView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/catalogui/gxview.h"
-#include "wxgis/geoprocessingui/gptasksview.h"
+//#include "wxgis/geoprocessingui/gptasksview.h"
 
 #include "wx/aui/aui.h"
 
@@ -44,7 +44,7 @@ public:
 	//void OnAUINotebookPageChanged(wxAuiNotebookEvent& event);
 protected:
     IApplication* m_pApp;
-    wxGxTasksView* m_pGxTasksView;
+    //wxGxTasksView* m_pGxTasksView;
 	//std::vector<wxGxTab*> m_Tabs;
 	//IConnectionPointContainer *m_pConnectionPointSelection;
 	//long m_ConnectionPointSelectionCookie;

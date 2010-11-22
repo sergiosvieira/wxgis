@@ -3,7 +3,7 @@
  * Purpose:  toolbox classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "wxgis/geoprocessing/gptoolmngr.h"
 #include "wxgis/core/config.h"
 
+class WXDLLIMPEXP_GIS_GPU wxGxRootToolbox;
 /////////////////////////////////////////////////////////////////////////
 // wxGxToolbox
 /////////////////////////////////////////////////////////////////////////
@@ -33,8 +34,8 @@ class WXDLLIMPEXP_GIS_GPU wxGxToolbox :
 	public IGxObjectContainer
 {
 public:
-	wxGxToolbox(wxGISGPToolManager* pToolMngr = NULL, wxXmlNode* pPropNode = NULL);//wxString Path, wxString Name, bool bShowHidden
-	wxGxToolbox(wxXmlNode* pDataNode, wxGISGPToolManager* pToolMngr = NULL, wxXmlNode* pPropNode = NULL);
+    wxGxToolbox(void);
+	wxGxToolbox(wxGxRootToolbox* pRootToolbox, wxXmlNode* pDataNode = NULL, wxIcon LargeToolboxIcon = wxNullIcon, wxIcon SmallToolboxIcon = wxNullIcon, wxIcon LargeToolIcon = wxNullIcon, wxIcon SmallToolIcon = wxNullIcon);
 	virtual ~wxGxToolbox(void);
 	//IGxObject
 	virtual void Detach(void);
@@ -56,12 +57,12 @@ public:
 	virtual void LoadChildrenFromXml(wxXmlNode* pNode);
 	virtual void EmptyChildren(void);
 protected:
-	//wxString m_sPath;
 	wxString m_sName;
 	bool m_bIsChildrenLoaded;
+    wxGxRootToolbox* m_pRootToolbox;
     wxXmlNode* m_pDataNode;
-    wxGISGPToolManager* m_pToolMngr;
-    wxXmlNode* m_pPropNode;
+    wxIcon m_LargeToolboxIcon, m_SmallToolboxIcon;
+    wxIcon m_LargeToolIcon, m_SmallToolIcon;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -75,7 +76,7 @@ class WXDLLIMPEXP_GIS_GPU wxGxRootToolbox :
 {
    DECLARE_DYNAMIC_CLASS(wxGxRootToolbox)
 public:
-	wxGxRootToolbox(void);//wxString Path, wxString Name, bool bShowHidden
+	wxGxRootToolbox(void);
 	virtual ~wxGxRootToolbox(void);
 	//IGxObject
 	virtual void Detach(void);
@@ -86,13 +87,86 @@ public:
     virtual wxXmlNode* GetProperties(void);
 	//wxGxRootToolbox
 	virtual void LoadChildren(void);
+	virtual wxGISGPToolManager* GetGPToolManager(void);
 protected:
 	wxString m_sPath;
-	//wxArrayString m_FileNames;
 	bool m_bIsChildrenLoaded;
-    //wxXmlDocument m_XmlDoc;
+    wxXmlNode* m_pPropNode;
     wxGISAppConfig* m_pConfig;
+    wxGISGPToolManager* m_pToolMngr;
 };
+
+/** \class wxGxFavoritesToolbox gptoolbox.h
+ *  \brief The most popular tools.
+ */
+
+class WXDLLIMPEXP_GIS_GPU wxGxFavoritesToolbox :
+	public IGxObjectUI,
+	public IGxObjectContainer,
+    public IGxObjectSort
+{
+public:
+	wxGxFavoritesToolbox(wxGxRootToolbox* pRootToolbox, short nMaxCount = 10, wxIcon LargeToolIcon = wxNullIcon, wxIcon SmallToolIcon = wxNullIcon);
+	virtual ~wxGxFavoritesToolbox(void);
+	//IGxObject
+	virtual void Detach(void);
+	virtual wxString GetName(void);
+    virtual wxString GetBaseName(void){return GetName();};
+	virtual wxString GetCategory(void){return wxString(_("Toolbox"));};
+	virtual void Refresh(void);
+	//IGxObjectUI
+	virtual wxIcon GetLargeImage(void);
+	virtual wxIcon GetSmallImage(void);
+	virtual wxString ContextMenu(void){return wxEmptyString;};
+	virtual wxString NewMenu(void){return wxEmptyString;};
+	//IGxObjectContainer
+	virtual bool DeleteChild(IGxObject* pChild);
+	virtual bool AreChildrenViewable(void){return true;};
+	virtual bool HasChildren(void){LoadChildren(); return m_Children.size() > 0 ? true : false;};
+	//IGxObjectSort
+    virtual bool IsAlwaysTop(void){return true;};
+	virtual bool IsSortEnabled(void){return false;};
+	//wxGxToolbox
+	virtual void LoadChildren(void);
+	virtual void EmptyChildren(void);
+protected:
+	bool m_bIsChildrenLoaded;
+    wxGxRootToolbox* m_pRootToolbox;
+    short m_nMaxCount;
+    wxIcon m_LargeToolIcon, m_SmallToolIcon;
+};
+
+/** \class wxGxFavoritesToolbox gptoolbox.h
+ *  \brief The most popular tools.
+ */
+
+class WXDLLIMPEXP_GIS_GPU wxGxToolExecute :
+	public IGxObject,
+	public IGxObjectUI,
+    public IGxObjectSort,
+    public wxGISGPToolManager
+{
+public:
+	wxGxToolExecute(wxGxRootToolbox* pRootToolbox, wxXmlNode* pToolsNode);
+	virtual ~wxGxToolExecute(void);
+	//IGxObject
+	virtual void Detach(void);
+	virtual wxString GetName(void);
+    virtual wxString GetBaseName(void){return GetName();};
+	virtual wxString GetCategory(void){return wxString(_("Toolbox"));};
+	virtual void Refresh(void);
+	//IGxObjectUI
+	virtual wxIcon GetLargeImage(void);
+	virtual wxIcon GetSmallImage(void);
+	virtual wxString ContextMenu(void){return wxEmptyString;};
+	virtual wxString NewMenu(void){return wxEmptyString;};
+	//IGxObjectSort
+    virtual bool IsAlwaysTop(void){return true;};
+	virtual bool IsSortEnabled(void){return false;};
+protected:
+    wxGxRootToolbox* m_pRootToolbox;
+};
+
 
 /////////////////////////////////////////////////////////////////////////
 // wxGxTool
@@ -104,8 +178,8 @@ class WXDLLIMPEXP_GIS_GPU wxGxTool :
     public IGxObjectWizard
 {
 public:
-	wxGxTool(wxGISGPToolManager* pToolMngr = NULL, wxXmlNode* pPropNode = NULL);//wxString Path, wxString Name, bool bShowHidden
-	wxGxTool(wxXmlNode* pDataNode, wxGISGPToolManager* pToolMngr = NULL, wxXmlNode* pPropNode = NULL);
+	wxGxTool(wxGxRootToolbox* pRootToolbox, wxXmlNode* pDataNode = NULL, wxIcon LargeToolIcon = wxNullIcon, wxIcon SmallToolIcon = wxNullIcon);
+    wxGxTool(wxGxRootToolbox* pRootToolbox, wxString sInternalName, wxIcon LargeToolIcon = wxNullIcon, wxIcon SmallToolIcon = wxNullIcon);
 	virtual ~wxGxTool(void);
 	//IGxObject
     virtual wxString GetName(void){return m_sName;};
@@ -124,7 +198,8 @@ protected:
 	//wxString m_sPath;
 	wxString m_sName, m_sInternalName;
     wxXmlNode* m_pDataNode;
-    wxGISGPToolManager* m_pToolMngr;
-    wxXmlNode* m_pPropNode;
+    wxGxRootToolbox* m_pRootToolbox;
     bool m_bIsOk;
+    wxIcon m_LargeToolIcon, m_SmallToolIcon;
 };
+

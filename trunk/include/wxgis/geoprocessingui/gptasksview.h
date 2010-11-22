@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
- * Purpose:  wxGxTasksView class.
+ * Purpose:  wxGxTaskExecDlg class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,38 +22,38 @@
 
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/geoprocessing/gptoolmngr.h"
-#include "wxgis/catalogui/gxview.h"
+//#include "wxgis/catalogui/gxview.h"
 
 #include "wx/wxhtml.h"
 #include "wx/imaglist.h"
 
 //////////////////////////////////////////////////////////////////
-// wxGxTaskPanel
+// wxGxTaskExecDlg
 //////////////////////////////////////////////////////////////////
 
-class WXDLLIMPEXP_GIS_GPU wxGxTaskPanel :
-	public wxPanel,
-    public ITrackCancel,
-    public IGPCallBack
+class WXDLLIMPEXP_GIS_GPU wxGxTaskExecDlg :
+	public wxDialog,
+    public ITrackCancel/*,
+    public IGPCallBack*/
 {
-    enum
-	{
-		ID_SHOW_BALLOON = wxID_HIGHEST + 30,
-        ID_UPDATEMESSAGES
-	};
+ //   enum
+	//{
+	//	ID_SHOW_BALLOON = wxID_HIGHEST + 30,
+ //       ID_UPDATEMESSAGES
+	//};
 public:
-	wxGxTaskPanel(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL|wxBORDER_RAISED );
-    ~wxGxTaskPanel(void);
-    virtual void SetTaskThreadId(long nId);
-    virtual void SetToolDialog(wxWindow* pWindow, wxXmlNode* pNode);
+	wxGxTaskExecDlg(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);//wxTAB_TRAVERSAL|wxBORDER_RAISED );
+    ~wxGxTaskExecDlg(void);
+    //virtual void SetTaskThreadId(long nId);
+    //virtual void SetToolDialog(wxWindow* pWindow, wxXmlNode* pNode);
     virtual void FillHtmlWindow();
     //events
     virtual void OnExpand(wxCommandEvent & event);
     virtual void OnCancel(wxCommandEvent & event);
-    virtual void OnShowBallon(wxCommandEvent & event);
-    virtual void OnUpdateMessages(wxCommandEvent & event);
+    //virtual void OnShowBallon(wxCommandEvent & event);
+    //virtual void OnUpdateMessages(wxCommandEvent & event);
     //IGPCallBack
-    virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL);
+    //virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL);
     //ITrackCancel
 	virtual void PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType);
     typedef struct _message{
@@ -89,29 +89,29 @@ protected:
     DECLARE_EVENT_TABLE();
 };
 
-//////////////////////////////////////////////////////////////////
-// wxGxTasksView
-//////////////////////////////////////////////////////////////////
-
-class WXDLLIMPEXP_GIS_GPU wxGxTasksView :
-	public wxScrolledWindow,
-	public wxGxView
-{
-    DECLARE_DYNAMIC_CLASS(wxGxTasksView)
-public:
-    wxGxTasksView(void);
-	wxGxTasksView(wxWindow* parent, wxWindowID id = TASKSVIEWCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL|wxBORDER_SUNKEN|wxVSCROLL );
-	virtual ~wxGxTasksView(void);
-	virtual void AddPanel(wxGxTaskPanel* pGxTaskPanel);
-	virtual void InsertPanel(wxGxTaskPanel* pGxTaskPanel, long nPos = 0);
-    virtual void RemovePanel(wxGxTaskPanel* pGxTaskPanel);
-//    virtual void Refresh(void){Refresh();};
-//IGxView
-    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("ToolView"));
-	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
-	virtual void Deactivate(void);
-protected:
-    wxBoxSizer* m_bMainSizer;
-
-DECLARE_EVENT_TABLE()
-};
+////////////////////////////////////////////////////////////////////
+//// wxGxTasksView
+////////////////////////////////////////////////////////////////////
+//
+//class WXDLLIMPEXP_GIS_GPU wxGxTasksView :
+//	public wxScrolledWindow,
+//	public wxGxView
+//{
+//    DECLARE_DYNAMIC_CLASS(wxGxTasksView)
+//public:
+//    wxGxTasksView(void);
+//	wxGxTasksView(wxWindow* parent, wxWindowID id = TASKSVIEWCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL|wxBORDER_SUNKEN|wxVSCROLL );
+//	virtual ~wxGxTasksView(void);
+//	virtual void AddPanel(wxGxTaskPanel* pGxTaskPanel);
+//	virtual void InsertPanel(wxGxTaskPanel* pGxTaskPanel, long nPos = 0);
+//    virtual void RemovePanel(wxGxTaskPanel* pGxTaskPanel);
+////    virtual void Refresh(void){Refresh();};
+////IGxView
+//    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("ToolView"));
+//	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
+//	virtual void Deactivate(void);
+//protected:
+//    wxBoxSizer* m_bMainSizer;
+//
+//DECLARE_EVENT_TABLE()
+//};

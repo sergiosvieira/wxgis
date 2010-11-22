@@ -31,9 +31,9 @@
 // wxGISGPOrthoCorrectTool
 /////////////////////////////////////////////////////////////////////////
 
-IMPLEMENT_DYNAMIC_CLASS(wxGISGPOrthoCorrectTool, wxObject)
+IMPLEMENT_DYNAMIC_CLASS(wxGISGPOrthoCorrectTool, wxGISGPTool)
 
-wxGISGPOrthoCorrectTool::wxGISGPOrthoCorrectTool(void) : m_pCatalog(NULL)
+wxGISGPOrthoCorrectTool::wxGISGPOrthoCorrectTool(void) : wxGISGPTool()
 {
 }
 
@@ -150,16 +150,6 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         m_pParamArr.push_back(pParam6);
     }
     return &m_pParamArr;
-}
-
-void wxGISGPOrthoCorrectTool::SetCatalog(IGxCatalog* pCatalog)
-{
-    m_pCatalog = pCatalog;
-}
-
-IGxCatalog* wxGISGPOrthoCorrectTool::GetCatalog(void)
-{
-    return m_pCatalog;
 }
 
 bool wxGISGPOrthoCorrectTool::Validate(void)

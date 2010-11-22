@@ -3,7 +3,7 @@
  * Purpose:  Catalog Views Commands class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -140,7 +140,7 @@ bool wxGISCatalogViewsCmd::GetEnabled(void)
 		case 2:
             return m_pTreeView;
 		case 0:
-		case 1:
+		case 1://TODO: Change m_pContentsView to IGxContentsView
 			return m_pContentsView && m_pContentsView->IsShown();
  		default:
 			return false;

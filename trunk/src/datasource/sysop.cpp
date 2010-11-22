@@ -3,7 +3,7 @@
  * Purpose:  system operations.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
  ****************************************************************************/
 
 #include "wxgis/datasource/sysop.h"
+
+#include "wx/filename.h"
 
 bool DeleteDir(wxString sPath)
 {
@@ -52,6 +54,17 @@ wxString ClearExt(wxString sPath)
     if(pos != wxNOT_FOUND)
         sResPath = sPath.Left(pos);
     return sResPath;
+}
+
+
+wxString CheckUniqName(wxString sPath, wxString sName, wxString sExt, int nCounter)
+{
+    wxString sResultName = sName + (nCounter > 0 ? wxString::Format(wxT("_%d"), nCounter) : wxString(wxEmptyString));
+    wxString sBaseName = sPath + wxFileName::GetPathSeparator() + sResultName + wxT(".") + sExt;
+    if(wxFileName::FileExists(sBaseName))
+        return CheckUniqName(sPath, sName, sExt, nCounter + 1);
+    else
+        return sResultName;
 }
 
 wxFontEncoding GetEncodingFromCpg(wxString sPath)

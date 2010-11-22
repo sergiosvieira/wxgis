@@ -3,7 +3,7 @@
  * Purpose:  wxGxToolboxView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ wxGxToolboxView::wxGxToolboxView(void)
 
 wxGxToolboxView::wxGxToolboxView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxAuiNotebook(parent, id, pos, size, wxAUI_NB_BOTTOM | wxNO_BORDER | wxAUI_NB_TAB_MOVE)
 {
-    m_sViewName = wxString(_("Tasks pane"));
+    m_sViewName = wxString(_("wxGISToolbox"));
 }
 
 wxGxToolboxView::~wxGxToolboxView(void)
@@ -46,7 +46,7 @@ wxGxToolboxView::~wxGxToolboxView(void)
 
 bool wxGxToolboxView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
-    m_sViewName = wxString(_("Tasks pane"));
+    m_sViewName = wxString(_("wxGISToolbox"));
     return wxAuiNotebook::Create(parent, id, pos, size, wxAUI_NB_BOTTOM | wxNO_BORDER | wxAUI_NB_TAB_MOVE);
 }
 
@@ -58,7 +58,7 @@ bool wxGxToolboxView::Activate(IGxApplication* application, wxXmlNode* pConf)
 
     m_pApp = dynamic_cast<IApplication*>(application);
 	//wxXmlNode* pChild = m_pXmlConf->GetChildren();
-	wxUint8 count(0);
+	//wxUint8 count(0);
 	//while(pChild)
 	//{
 	//	wxGxTab* pGxTab = new wxGxTab(application, pChild, this);
@@ -68,10 +68,10 @@ bool wxGxToolboxView::Activate(IGxApplication* application, wxXmlNode* pConf)
 	//	m_Tabs.push_back(pGxTab);
 
     //add tasks vindow
-    m_pGxTasksView = new wxGxTasksView(this);    
-    AddPage(m_pGxTasksView, m_pGxTasksView->GetViewName(), count == 0 ? true : false, m_pGxTasksView->GetViewIcon());
-    m_pApp->RegisterChildWindow(m_pGxTasksView);
-    count++;
+    //m_pGxTasksView = new wxGxTasksView(this);    
+    //AddPage(m_pGxTasksView, m_pGxTasksView->GetViewName(), count == 0 ? true : false, m_pGxTasksView->GetViewIcon());
+    //m_pApp->RegisterChildWindow(m_pGxTasksView);
+    //count++;
 
     //add tree tools window
 
@@ -93,9 +93,9 @@ bool wxGxToolboxView::Activate(IGxApplication* application, wxXmlNode* pConf)
 void wxGxToolboxView::Deactivate(void)
 {
     //m_pGxTasksView->Deactivate();
-    m_pApp->UnRegisterChildWindow(m_pGxTasksView);
-    while(GetPageCount() > 0)
-        RemovePage(0); //will delete in app destructor
+    //m_pApp->UnRegisterChildWindow(m_pGxTasksView);
+    //while(GetPageCount() > 0)
+    //    RemovePage(0); //will delete in app destructor
 
 	//if(m_ConnectionPointSelectionCookie != -1)
 	//	m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);

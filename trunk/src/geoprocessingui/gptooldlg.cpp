@@ -26,6 +26,7 @@
 #include "../../art/tool_16.xpm"
 
 #include "wx/icon.h"
+
 ///////////////////////////////////////////////////////////////////////////
 BEGIN_EVENT_TABLE(wxGISGPToolDlg, wxFrame)
 	EVT_BUTTON(wxID_HELP, wxGISGPToolDlg::OnHelp)
@@ -166,7 +167,6 @@ wxGISGPToolDlg::wxGISGPToolDlg( IGPTool* pTool, wxGISGPToolManager* pToolManager
 wxGISGPToolDlg::~wxGISGPToolDlg()
 {
     SerializeFramePos(true);
-    wxDELETE(m_pTool);
 }
 
 void wxGISGPToolDlg::OnHelp(wxCommandEvent& event)
@@ -200,51 +200,55 @@ void wxGISGPToolDlg::OnOk(wxCommandEvent& event)
     //event.Skip();
     if(!m_pToolManager)
         return;
-    IApplication* pApp = ::GetApplication();
-    //create panel - get progress with messages
-    ITrackCancel* pTrackCancel(NULL);
-    IGPCallBack* pCallBack(NULL);
-    wxGxTasksView* pGxTasksView(NULL);
 
-    WINDOWARRAY* pWndArr = pApp->GetChildWindows();
-    if(pWndArr)
-    {
-        for(size_t i = 0; i < pWndArr->size(); i++)
-        {
-            wxWindow* pWnd = pWndArr->operator[](i);
-            if(!pWnd)
-                continue;
-            pGxTasksView = dynamic_cast<wxGxTasksView*>(pWnd);
-            if(!pGxTasksView)
-                continue;
-            break;
-        }
-    }
+    //wxGxTaskExecDlg dlg(pGPToolManager, pTool, pParentWnd, wxID_ANY);
+    //dlg.ShowModal();
 
-    wxGxTaskPanel* pGxTaskPanel;
-    if(pGxTasksView)
-    {
-        pGxTaskPanel = new wxGxTaskPanel(m_pToolManager, m_pTool, pGxTasksView);
+    //IApplication* pApp = ::GetApplication();
+    ////create panel - get progress with messages
+    //ITrackCancel* pTrackCancel(NULL);
+    //IGPCallBack* pCallBack(NULL);
+    //wxGxTasksView* pGxTasksView(NULL);
 
-        pTrackCancel = dynamic_cast<ITrackCancel*>(pGxTaskPanel);
-        pCallBack = dynamic_cast<IGPCallBack*>(pGxTaskPanel);
+    //WINDOWARRAY* pWndArr = pApp->GetChildWindows();
+    //if(pWndArr)
+    //{
+    //    for(size_t i = 0; i < pWndArr->size(); i++)
+    //    {
+    //        wxWindow* pWnd = pWndArr->operator[](i);
+    //        if(!pWnd)
+    //            continue;
+    //        pGxTasksView = dynamic_cast<wxGxTasksView*>(pWnd);
+    //        if(!pGxTasksView)
+    //            continue;
+    //        break;
+    //    }
+    //}
 
-        pGxTasksView->InsertPanel(pGxTaskPanel);
-    }
+    //wxGxTaskPanel* pGxTaskPanel;
+    //if(pGxTasksView)
+    //{
+    //    pGxTaskPanel = new wxGxTaskPanel(m_pToolManager, m_pTool, pGxTasksView);
 
-    //mngr - run execute
-    long nThreadId = m_pToolManager->OnExecute(m_pTool, pTrackCancel, pCallBack);
-    if(pGxTasksView)
-    {
-        pGxTaskPanel->SetTaskThreadId(nThreadId);
-        pGxTaskPanel->SetToolDialog(GetParent(), m_pPropNode);
-    }
-    //to prevent destroy tool in this dialog (the tool should destroy in panel)
-    m_pTool = NULL;
+    //    pTrackCancel = dynamic_cast<ITrackCancel*>(pGxTaskPanel);
+    //    pCallBack = dynamic_cast<IGPCallBack*>(pGxTaskPanel);
 
-    pApp->UnRegisterChildWindow(this);
-    this->GetParent()->SetFocus();
-    this->Destroy();
+    //    pGxTasksView->InsertPanel(pGxTaskPanel);
+    //}
+
+    ////mngr - run execute
+    ////long nThreadId = m_pToolManager->OnExecute(m_pTool, pTrackCancel, pCallBack);
+    //if(pGxTasksView)
+    //{
+    //    //pGxTaskPanel->SetTaskThreadId(nThreadId);
+    //    pGxTaskPanel->SetToolDialog(GetParent(), m_pPropNode);
+    //}
+    ////to prevent destroy tool in this dialog (the tool should destroy in panel)
+    //m_pTool = NULL;
+
+    //pApp->UnRegisterChildWindow(this);
+    //this->GetParent()->SetFocus();
+    //this->Destroy();
 }
 
 void wxGISGPToolDlg::OnCancel(wxCommandEvent& event)

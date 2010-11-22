@@ -27,7 +27,8 @@
 */
 class WXDLLIMPEXP_GIS_CLU wxGxDiscConnectionsUI :
     public wxGxDiscConnections,
-	public IGxObjectUI
+	public IGxObjectUI,
+    public IGxObjectSort
 {
    DECLARE_DYNAMIC_CLASS(wxGxDiscConnectionsUI)
 public:
@@ -42,6 +43,9 @@ public:
 	virtual void LoadChildren(void);
 	virtual void EmptyChildren(void);
     virtual IGxObject* ConnectFolder(wxString sPath);
+	//IGxObjectSort
+    virtual bool IsAlwaysTop(void){return true;};
+	virtual bool IsSortEnabled(void){return false;};
 protected:
 	wxIcon m_Conn16, m_Conn48;
 	wxIcon m_ConnDsbld16, m_ConnDsbld48;
