@@ -104,7 +104,7 @@ wxGxContentView::wxGxContentView(void)
 }
 
 wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
-wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(LIST), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(-1), m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL), m_bDragging(false), m_pDeleteCmd(NULL)
+wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(enumGISCVList), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(-1), m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL), m_bDragging(false), m_pDeleteCmd(NULL)
 {
 	InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150);
 	InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
@@ -141,7 +141,7 @@ wxGxContentView::~wxGxContentView(void)
 bool wxGxContentView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     m_bSortAsc = true;
-    m_current_style = LIST;
+    m_current_style = enumGISCVList;
     m_pConnectionPointCatalog = NULL;
     m_ConnectionPointCatalogCookie = -1;
     m_pParentGxObject = NULL;
@@ -244,7 +244,7 @@ void wxGxContentView::Serialize(wxXmlNode* pRootNode, bool bStore)
 	{
 		m_bSortAsc = wxAtoi(pRootNode->GetPropVal(wxT("sort"), wxT("1")));
 		m_currentSortCol = wxAtoi(pRootNode->GetPropVal(wxT("sort_col"), wxT("0")));
-		LISTSTYLE style = (LISTSTYLE)wxAtoi(pRootNode->GetPropVal(wxT("style"), wxT("0")));
+		wxGISEnumContentsViewStyle style = (wxGISEnumContentsViewStyle)wxAtoi(pRootNode->GetPropVal(wxT("style"), wxT("0")));
 		int nw = wxAtoi(pRootNode->GetPropVal(wxT("name_width"), wxT("150")));
 		if(nw == 0)
 			nw = 150;
@@ -528,25 +528,25 @@ void wxGxContentView::OnActivated(wxListEvent& event)
 	}
 }
 
-void wxGxContentView::SetStyle(LISTSTYLE style)
+void wxGxContentView::SetStyle(wxGISEnumContentsViewStyle style)
 {
     if(m_current_style == style)
         return;
 	switch(style)
 	{
-	case REPORT:
+	case enumGISCVReport:
         SetSingleStyle(wxLC_REPORT);
 		//SetWindowStyleFlag(m_style | wxLC_REPORT);
 		break;
-	case SMALL:
+	case enumGISCVSmall:
         SetSingleStyle(wxLC_SMALL_ICON);
 		//SetWindowStyleFlag(m_style | wxLC_SMALL_ICON );
 		break;
-	case LARGE:
+	case enumGISCVLarge:
         SetSingleStyle(wxLC_ICON);
 		//SetWindowStyleFlag(m_style | wxLC_ICON );
 		break;
-	case LIST:
+	case enumGISCVList:
         SetSingleStyle(wxLC_LIST);
 		//SetWindowStyleFlag(m_style | wxLC_LIST );
 		break;
@@ -554,16 +554,16 @@ void wxGxContentView::SetStyle(LISTSTYLE style)
 
     switch(m_current_style)
 	{
-	case REPORT:
+	case enumGISCVReport:
         SetSingleStyle(wxLC_REPORT, false);
 		break;
-	case SMALL:
+	case enumGISCVSmall:
         SetSingleStyle(wxLC_SMALL_ICON, false);
 		break;
-	case LARGE:
+	case enumGISCVLarge:
         SetSingleStyle(wxLC_ICON, false);
 		break;
-	case LIST:
+	case enumGISCVList:
         SetSingleStyle(wxLC_LIST, false);
 		break;
 	}

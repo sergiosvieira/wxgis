@@ -20,38 +20,27 @@
  ****************************************************************************/
 #include "wxgis/remoteserver/gxremoteserver.h"
 
-
-IMPLEMENT_DYNAMIC_CLASS(wxGxRemoteServer, wxObject)
-
-wxGxRemoteServer::wxGxRemoteServer(void) : m_bIsChildrenLoaded(false)
+wxGxRemoteServer::wxGxRemoteServer(wxXmlNode* pConf) : m_bIsChildrenLoaded(false), m_pProperties(NULL), m_bIsConnected(false)
 {
-    m_bEnabled = true;
+    m_pProperties = new wxXmlNode(*pConf);
+    m_sName = m_pProperties->GetPropVal(wxT("name"), NONAME);
+    m_sClassName = m_pProperties->GetPropVal(wxT("class"), NONAME);
+    //create connection object ?
 }
 
 wxGxRemoteServer::~wxGxRemoteServer(void)
 {
+    wxDELETE(m_pProperties);
 }
 
 void wxGxRemoteServer::Detach(void)
 {
-	EmptyChildren();
 }
 
 void wxGxRemoteServer::Refresh(void)
 {
 }
  
-void wxGxRemoteServer::EmptyChildren(void)
-{
-	for(size_t i = 0; i < m_Children.size(); i++)
-	{
-		m_Children[i]->Detach();
-		wxDELETE(m_Children[i]);
-	}
-	m_Children.clear();
-	m_bIsChildrenLoaded = false;
-}
-
 bool wxGxRemoteServer::DeleteChild(IGxObject* pChild)
 {
 	bool bHasChildren = m_Children.size() > 0 ? true : false;
@@ -63,23 +52,22 @@ bool wxGxRemoteServer::DeleteChild(IGxObject* pChild)
 	return true;
 }
 
-void wxGxRemoteServer::LoadChildren(void)
+wxXmlNode* wxGxRemoteServer::GetProperties(void)
 {
-	if(m_bIsChildrenLoaded)
-		return;	
-	wxXmlNode* pChild = pConf->GetChildren();
-	while(pChild)
-	{
-		pChild = pChild->GetNext();
-	}
-
-    //for(size_t i = 0; i < m_aConnections.size(); i++)
-    //{
-    //    wxGxDiscConnection* pwxGxDiscConnection = new wxGxDiscConnection(m_aConnections[i].sPath, m_aConnections[i].sName);
-    //    IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
-    //    if(AddChild(pGxObject))
-    //        wxLogMessage(_("wxGxDiscConnections: Add folder connection [%s]"), m_aConnections[i].sName.c_str());
-    //}
-
-	m_bIsChildrenLoaded = true;
+    return m_pProperties;
 }
+
+bool wxGxRemoteServer::Connect(void)
+{
+    //1. create plugin
+    //2. set m_pProperties
+    //3. run
+    return false;
+}
+
+bool wxGxRemoteServer::Disconnect(void)
+{
+    return false;
+}
+
+

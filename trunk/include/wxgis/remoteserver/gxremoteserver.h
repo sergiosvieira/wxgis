@@ -25,30 +25,29 @@
     \brief A Remote Server GxObject.
 */
 class WXDLLIMPEXP_GIS_RS wxGxRemoteServer :
-	public IGxObjectContainer,
-    public wxObject
+	public IGxObjectContainer
 {
-   DECLARE_DYNAMIC_CLASS(wxGxRemoteServer)
 public:
-	wxGxRemoteServer(void);
+	wxGxRemoteServer(wxXmlNode* pConf);
 	virtual ~wxGxRemoteServer(void);
 	//IGxObject
 	virtual void Detach(void);
-	virtual wxString GetName(void){return wxString(_("Remote Servers"));};
+	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void){return GetName();};
-    virtual wxString GetFullName(void){return wxEmptyString;};
-    virtual wxString GetPath(void){return wxEmptyString;};
-	virtual wxString GetCategory(void){return wxString(_("Remote Servers"));};
+	virtual wxString GetCategory(void){return wxString(_("Remote Server"));};
 	virtual void Refresh(void);
 	//IGxObjectContainer
 	virtual bool DeleteChild(IGxObject* pChild);
 	virtual bool AreChildrenViewable(void){return true;};
-	virtual bool HasChildren(void){LoadChildren(); return m_Children.size() > 0 ? true : false;};
+	virtual bool HasChildren(void){/*LoadChildren();*/ return m_Children.size() > 0 ? true : false;};
+    //wxGxRemoteServer
+    virtual wxXmlNode* GetProperties(void);
+    virtual bool Connect(void);
+    virtual bool Disconnect(void);
 protected:
-	//wxGxRemoteServer
-//	virtual void LoadChildren(void);
-//	virtual void EmptyChildren(void);
-protected:
-//    NETPLUGINARRAY m_NetPluginArray;
+    wxXmlNode* m_pProperties;
+    wxString m_sName;
+    wxString m_sClassName;
 	bool m_bIsChildrenLoaded;
+	bool m_bIsConnected;
 };

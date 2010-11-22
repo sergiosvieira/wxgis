@@ -40,20 +40,17 @@ class WXDLLIMPEXP_GIS_CLU wxGxContentView :
 	public wxListCtrl,
 	public wxGxView,
 	public IGxSelectionEvents,
-	public IGxCatalogEvents
+	public IGxCatalogEvents,
+    public IGxContentsView
 {
     DECLARE_DYNAMIC_CLASS(wxGxContentView)
 public:
-	typedef enum _listsyle{ REPORT, SMALL, LARGE, LIST } LISTSTYLE, *LPLISTSTYLE;
-
     wxGxContentView(void);
 	wxGxContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition,
 						 const wxSize& size = wxDefaultSize, long style = wxLC_LIST | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE);//
 	virtual ~wxGxContentView(void);
 	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
 	virtual void AddObject(IGxObject* pObject);
-	virtual void SetStyle(LISTSTYLE style);
-    virtual LISTSTYLE GetStyle(void){return m_current_style;};
 	virtual void ResetContents(void);
     virtual IGxObject* GetParentGxObject(void){return m_pParentGxObject;};
     virtual void SelectAll(void);
@@ -72,6 +69,10 @@ public:
 	virtual void OnObjectDeleted(IGxObject* object);
 	virtual void OnObjectRefreshed(IGxObject* object);
 	virtual void OnRefreshAll(void);
+// IGxContentsView
+	virtual void SetStyle(wxGISEnumContentsViewStyle style);
+    virtual wxGISEnumContentsViewStyle GetStyle(void){return m_current_style;};
+    virtual bool CanSetStyle(void){return true;};
 //events
 	virtual void OnColClick(wxListEvent& event);
     virtual void OnContextMenu(wxContextMenuEvent& event);
@@ -100,7 +101,7 @@ public:
 protected:
 	bool m_bSortAsc;
 	short m_currentSortCol;
-	LISTSTYLE m_current_style;
+	wxGISEnumContentsViewStyle m_current_style;
 	wxImageList m_ImageListSmall, m_ImageListLarge;
 	IConnectionPointContainer* m_pConnectionPointCatalog;
 	long m_ConnectionPointCatalogCookie;

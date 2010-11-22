@@ -119,3 +119,21 @@ public:
 	virtual void SetViewIcon(wxIcon Icon) = 0;
     virtual void BeginRename(IGxObject* pGxObject = NULL) = 0;
 };
+
+enum wxGISEnumContentsViewStyle
+{
+	enumGISCVReport = 0, 
+	enumGISCVSmall,
+	enumGISCVLarge,
+	enumGISCVList
+};
+
+class IGxContentsView
+{
+public:
+	virtual ~IGxContentsView(void){};
+	virtual void SelectAll(void) = 0;
+    virtual bool CanSetStyle(void) = 0;
+	virtual void SetStyle(wxGISEnumContentsViewStyle style) = 0;
+    virtual wxGISEnumContentsViewStyle GetStyle(void) = 0;
+};

@@ -38,23 +38,24 @@ public:
 	virtual wxString GetName(void){return wxString(_("Remote Servers"));};
     virtual wxString GetBaseName(void){return GetName();};
     virtual wxString GetFullName(void){return wxEmptyString;};
-    virtual wxString GetPath(void){return wxEmptyString;};
 	virtual wxString GetCategory(void){return wxString(_("Remote Servers"));};
 	virtual void Refresh(void);
 	//IGxObjectContainer
 	virtual bool DeleteChild(IGxObject* pChild);
 	virtual bool AreChildrenViewable(void){return true;};
-	virtual bool HasChildren(void){LoadChildren(); return m_Children.size() > 0 ? true : false;};
+	virtual bool HasChildren(void){return m_Children.size() > 0 ? true : false;};
     //IGxRootObjectProperties
     virtual void Init(wxXmlNode* pConfigNode);
     virtual wxXmlNode* GetProperties(void);
+	//wxGxRemoteServers
+    virtual void CreateConnection(void);
 protected:
 	//wxGxRemoteServers
 	virtual void LoadChildren(wxXmlNode* pConf);
 	virtual void EmptyChildren(void);
-	virtual void LoadPlugins(wxXmlNode* pConf);
-	virtual void UnLoadPlugins(void);
+	virtual void LoadFactories(wxXmlNode* pConf);
+	virtual void UnLoadFactories(void);
 protected:
-    NETPLUGINARRAY m_NetPluginArray;
+    NETCONNFACTORYARRAY m_NetConnFactArray;
 	bool m_bIsChildrenLoaded;
 };

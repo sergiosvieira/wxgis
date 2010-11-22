@@ -97,27 +97,27 @@ wxGISSearchServerDlg::wxGISSearchServerDlg(bool bStandAlone, wxWindow* parent, s
 
 	wxSocketBase::Initialize();
 	//create & strart notify thread
-	m_pClientUDPNotifier = new wxClientUDPNotifier(this, 1977);
-    if ( m_pClientUDPNotifier->Create() != wxTHREAD_NO_ERROR )
-    {
-		wxLogError(_("wxGISSearchServerDlg: Can't create Notifier Thread!"));
-		return;
-    }
-	if(m_pClientUDPNotifier->Run() != wxTHREAD_NO_ERROR )
-    {
-		wxLogError(_("wxGISSearchServerDlg: Can't run Notifier Thread!"));
-		return;
-    }
-    wxLogMessage(_("wxGISSearchServerDlg: Wait Notifier Thread 0x%lx started (priority = %u)"), m_pClientUDPNotifier->GetId(), m_pClientUDPNotifier->GetPriority());
-	//send broadcast
-	m_pClientUDPNotifier->SendBroadcastMsg();
+	//m_pClientUDPNotifier = new wxClientUDPNotifier(this, 1977);
+ //   if ( m_pClientUDPNotifier->Create() != wxTHREAD_NO_ERROR )
+ //   {
+	//	wxLogError(_("wxGISSearchServerDlg: Can't create Notifier Thread!"));
+	//	return;
+ //   }
+	//if(m_pClientUDPNotifier->Run() != wxTHREAD_NO_ERROR )
+ //   {
+	//	wxLogError(_("wxGISSearchServerDlg: Can't run Notifier Thread!"));
+	//	return;
+ //   }
+ //   wxLogMessage(_("wxGISSearchServerDlg: Wait Notifier Thread 0x%lx started (priority = %u)"), m_pClientUDPNotifier->GetId(), m_pClientUDPNotifier->GetPriority());
+	////send broadcast
+	//m_pClientUDPNotifier->SendBroadcastMsg();
 }
 
 wxGISSearchServerDlg::~wxGISSearchServerDlg()
 {
 	//delete UDPNotifier thread
-	if(m_pClientUDPNotifier)
-		m_pClientUDPNotifier->Delete();
+	//if(m_pClientUDPNotifier)
+	//	m_pClientUDPNotifier->Delete();
 
 	//m_bContinueSearch = false;
 }
@@ -150,8 +150,8 @@ void wxGISSearchServerDlg::OnClose(wxCloseEvent& event)
 void wxGISSearchServerDlg::OnSearch( wxCommandEvent& event )
 { 
 
-	if(m_pClientUDPNotifier)
-		m_pClientUDPNotifier->SendBroadcastMsg();
+	//if(m_pClientUDPNotifier)
+	//	m_pClientUDPNotifier->SendBroadcastMsg();
 	//wxSocketBase::Shutdown();
 
 	//wxBusyCursor wait;

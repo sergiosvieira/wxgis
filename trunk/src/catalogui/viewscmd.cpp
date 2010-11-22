@@ -33,7 +33,7 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogViewsCmd, wxObject)
 
-wxGISCatalogViewsCmd::wxGISCatalogViewsCmd(void) : m_pContentsView(NULL), m_pTreeView(NULL)
+wxGISCatalogViewsCmd::wxGISCatalogViewsCmd(void) : m_pTabView(NULL), m_pTreeView(NULL)
 {
 }
 
@@ -118,17 +118,17 @@ bool wxGISCatalogViewsCmd::GetEnabled(void)
 		}
 	}
 
-	if(!m_pContentsView)
+	if(!m_pTabView)
 	{
 		WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
 		if(pWinArr)
 		{
 			for(size_t i = 0; i < pWinArr->size(); i++)
 			{
-				wxGxContentView* pContentsView = dynamic_cast<wxGxContentView*>(pWinArr->at(i));
-				if(pContentsView)
+				wxGxTabView* pTabView = dynamic_cast<wxGxTabView*>(pWinArr->at(i));
+				if(pTabView)
 				{
-					m_pContentsView = pContentsView;
+					m_pTabView = pTabView;
 					break;
 				}
 			}
@@ -141,7 +141,10 @@ bool wxGISCatalogViewsCmd::GetEnabled(void)
             return m_pTreeView;
 		case 0:
 		case 1://TODO: Change m_pContentsView to IGxContentsView
-			return m_pContentsView && m_pContentsView->IsShown();
+            {
+                IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_pTabView->GetCurrentWnd());
+			    return pGxContentsView;
+            }
  		default:
 			return false;
 	}
@@ -184,15 +187,26 @@ void wxGISCatalogViewsCmd::OnClick(void)
 	{
 		case 0:
 			{
-                int nStyle = m_pContentsView->GetStyle() + 1;
-                if(nStyle > wxGxContentView::LIST)
-                    nStyle = wxGxContentView::REPORT;
-                m_pContentsView->SetStyle((wxGxContentView::LISTSTYLE)(nStyle));
-			}
+                IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_pTabView->GetCurrentWnd());
+                if(pGxContentsView)
+                {
+                    if(pGxContentsView->CanSetStyle())
+                    {
+                        int nStyle = pGxContentsView->GetStyle() + 1;
+                        if(nStyle > enumGISCVList)
+                            nStyle = enumGISCVReport;
+                        pGxContentsView->SetStyle((wxGISEnumContentsViewStyle)(nStyle));
+                    }
+                }
+            }
 			break;
 		case 1:
-            m_pContentsView->SelectAll();
-            m_pContentsView->SetFocus();
+            {
+                IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_pTabView->GetCurrentWnd());
+                if(pGxContentsView)
+                    pGxContentsView->SelectAll();
+                //m_pContentsView->SetFocus();
+            }
 			break;
 		case 2:
             m_pApp->ShowApplicationWindow(m_pTreeView, !m_pApp->IsApplicationWindowShown(m_pTreeView));
@@ -236,13 +250,17 @@ wxMenu* wxGISCatalogViewsCmd::GetDropDownMenu(void)
 			if(GetEnabled())
 			{
                 wxMenu* pMenu = new wxMenu();
-                pMenu->AppendCheckItem(ID_MENUCMD + (int)wxGxContentView::LIST, _("List"));
-                pMenu->AppendCheckItem(ID_MENUCMD + (int)wxGxContentView::LARGE, _("Icons"));
-                pMenu->AppendCheckItem(ID_MENUCMD + (int)wxGxContentView::SMALL, _("Smal Icons"));
-                pMenu->AppendCheckItem(ID_MENUCMD + (int)wxGxContentView::REPORT, _("Details"));
+                pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVList, _("List"));
+                pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVLarge, _("Icons"));
+                pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVSmall, _("Smal Icons"));
+                pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVReport, _("Details"));
                 //check
-                wxGxContentView::LISTSTYLE nStyle = m_pContentsView->GetStyle();
-                pMenu->Check(ID_MENUCMD + (int)nStyle, true);
+                IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_pTabView->GetCurrentWnd());
+                if(pGxContentsView)
+                {
+                    wxGISEnumContentsViewStyle nStyle = pGxContentsView->GetStyle();
+                    pMenu->Check(ID_MENUCMD + (int)nStyle, true);
+                }
                 return pMenu;
             }
             return NULL;
@@ -257,7 +275,9 @@ void wxGISCatalogViewsCmd::OnDropDownCommand(int nID)
 {
     if(GetEnabled())
     {
-        m_pContentsView->SetStyle((wxGxContentView::LISTSTYLE)(nID - ID_MENUCMD));
+        IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_pTabView->GetCurrentWnd());
+        if(pGxContentsView)
+            pGxContentsView->SetStyle((wxGISEnumContentsViewStyle)(nID - ID_MENUCMD));
     }
 }
 

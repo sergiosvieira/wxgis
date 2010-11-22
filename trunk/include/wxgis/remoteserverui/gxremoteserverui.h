@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
- * Purpose:  wxGxRemoteServersUI class.
+ * Purpose:  wxGxRemoteServerUI class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,29 +19,27 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-#include "wxgis/catalogui/catalogui.h"
-#include "wxgis/remoteserver/gxremoteservers.h"
 
-/** \class wxGxRemoteServersUI gxremoteserversui.h
-    \brief A Remote Servers UI GxRootObject.
+#include "wxgis/remoteserverui/remoteserverui.h"
+#include "wxgis/remoteserver/gxremoteserver.h"
+#include "wxgis/catalogui/catalogui.h"
+
+/** \class wxGxRemoteServerUI gxremoteserverui.h
+    \brief A Remote Server UI GxObject.
 */
-class WXDLLIMPEXP_GIS_RSU wxGxRemoteServersUI :
-    public wxGxRemoteServers,
+class WXDLLIMPEXP_GIS_RSU wxGxRemoteServerUI :
+	public wxGxRemoteServer,
 	public IGxObjectUI
 {
-   DECLARE_DYNAMIC_CLASS(wxGxRemoteServersUI)
 public:
-	wxGxRemoteServersUI(void);
-	virtual ~wxGxRemoteServersUI(void);
+	wxGxRemoteServerUI(wxXmlNode* pConf, wxIcon SmallIcon = wxNullIcon, wxIcon LargeIcon = wxNullIcon, wxIcon SmallDsblIcon = wxNullIcon, wxIcon LargeDsblIcon = wxNullIcon);
+	virtual ~wxGxRemoteServerUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxRemoteServersUI.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxRemoteServersUI.NewMenu"));};
-	//wxGxRemoteServersUI
-	virtual void LoadChildren(wxXmlNode* pConf);
-	virtual void EmptyChildren(void);
+	virtual wxString ContextMenu(void){return wxString(wxT("wxGxRemoteServerUI.ContextMenu"));};
+	virtual wxString NewMenu(void){return wxEmptyString;};
 protected:
-	wxIcon m_RemServ16, m_RemServ48;
-	wxIcon m_RemServDsbld16, m_RemServDsbld48;
+    wxIcon m_SmallIcon, m_LargeIcon;
+    wxIcon m_SmallDsblIcon, m_LargeDsblIcon;
 };

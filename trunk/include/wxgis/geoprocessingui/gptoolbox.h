@@ -136,8 +136,8 @@ protected:
     wxIcon m_LargeToolIcon, m_SmallToolIcon;
 };
 
-/** \class wxGxFavoritesToolbox gptoolbox.h
- *  \brief The most popular tools.
+/** \class wxGxToolExecute gptoolbox.h
+ *  \brief The executed and pending tools.
  */
 
 class WXDLLIMPEXP_GIS_GPU wxGxToolExecute :

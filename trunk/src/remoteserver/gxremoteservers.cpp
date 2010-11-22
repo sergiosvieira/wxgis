@@ -36,7 +36,7 @@ wxGxRemoteServers::~wxGxRemoteServers(void)
 void wxGxRemoteServers::Detach(void)
 {
 	EmptyChildren();
-	UnLoadPlugins();
+	UnLoadFactories();
 }
 
 void wxGxRemoteServers::Refresh(void)
@@ -46,17 +46,17 @@ void wxGxRemoteServers::Refresh(void)
  
 void wxGxRemoteServers::Init(wxXmlNode* pConfigNode)
 {
-	wxXmlNode *pPlugins, *pConnections;
+	wxXmlNode *pFactories(NULL), *pConnections(NULL);
 	wxXmlNode* pChild = pConfigNode->GetChildren();
 	while(pChild)
 	{
-		if(pChild->GetName().CmpNoCase(wxT("plugins")) == 0)
-			pPlugins = pChild;
+		if(pChild->GetName().CmpNoCase(wxT("factories")) == 0)
+			pFactories = pChild;
 		else if(pChild->GetName().CmpNoCase(wxT("connections")) == 0)
 			pConnections = pChild;
 		pChild = pChild->GetNext();
 	}
-	LoadPlugins(pPlugins);
+	LoadFactories(pFactories);
 	LoadChildren(pConnections);
 }
 
@@ -68,26 +68,25 @@ wxXmlNode* wxGxRemoteServers::GetProperties(void)
         pNode->AddProperty(wxT("name"), pInfo->GetClassName());
     pNode->AddProperty(wxT("is_enabled"), m_bEnabled == true ? wxT("1") : wxT("0"));    
 #ifndef WXGISPORTABLE
+    wxXmlNode* pConsNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("connections"));
 	for(size_t i = 0; i < m_Children.size(); i++)
 	{
-		
-//        wxGxDiscConnection* pwxGxDiscConnection = dynamic_cast<wxGxDiscConnection*>(m_Children[i]);
-//        if(pwxGxDiscConnection)
-//        {
-//		    wxXmlNode* pDiscConn = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("DiscConnection"));
-//		    pDiscConn->AddProperty(wxT("name"), pwxGxDiscConnection->GetName());
-//		    pDiscConn->AddProperty(wxT("path"), pwxGxDiscConnection->GetPath());
-//        }
+        wxGxRemoteServer* pGxRemoteServer = dynamic_cast<wxGxRemoteServer*>(m_Children[i]);
+        if(pGxRemoteServer)
+        {
+		    wxXmlNode* pConn = pGxRemoteServer->GetProperties();
+            if(pConn)
+                pConn->SetParent(pConsNode);
+        }
     }
-    wxXmlNode* pPluginsNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("plugins"));
-	for(size_t i = 0; i < m_NetPluginArray.size(); i++)
+    wxXmlNode* pPluginsNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("factories"));
+	for(size_t i = 0; i < m_NetConnFactArray.size(); i++)
 	{
-		wxXmlNode* pXmlNode = m_NetPluginArray[i]->GetProperties();
+		wxXmlNode* pXmlNode = m_NetConnFactArray[i]->GetProperties();
 		if(pXmlNode)
 			pXmlNode->SetParent(pPluginsNode);
 			//pPluginsNode->InsertChild(pXmlNode, NULL);
 	}
-
 #endif  
     return pNode;
 }
@@ -116,14 +115,16 @@ bool wxGxRemoteServers::DeleteChild(IGxObject* pChild)
 
 void wxGxRemoteServers::LoadChildren(wxXmlNode* pConf)
 {
+    if(!pConf)
+        return;
 	if(m_bIsChildrenLoaded)
 		return;	
 	wxXmlNode* pChild = pConf->GetChildren();
 	while(pChild)
 	{
-		wxGxRemoteServer* pServerConn = new wxGxRemoteServer(pChild);//??? TODO
+		wxGxRemoteServer* pServerConn = new wxGxRemoteServer(pChild);
 		IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
-		if(!AddObject(pGxObj))
+		if(!AddChild(pGxObj))
 			wxDELETE(pGxObj);
 		pChild = pChild->GetNext();
 	}
@@ -131,8 +132,10 @@ void wxGxRemoteServers::LoadChildren(wxXmlNode* pConf)
 	m_bIsChildrenLoaded = true;
 }
 
-void wxGxRemoteServers::LoadPlugins(wxXmlNode* pConf)
+void wxGxRemoteServers::LoadFactories(wxXmlNode* pConf)
 {
+    if(!pConf)
+        return;
 	wxXmlNode* pChild = pConf->GetChildren();
 	while(pChild)
 	{
@@ -144,19 +147,24 @@ void wxGxRemoteServers::LoadPlugins(wxXmlNode* pConf)
         }
 
 		wxObject *pObj = wxCreateDynamicObject(sName);
-		INetPlugin *pNetPlugin = dynamic_cast<INetPlugin*>(pObj);
-	    if(pNetPlugin)
+		INetConnFactory *pNetConnFactory = dynamic_cast<INetConnFactory*>(pObj);
+	    if(pNetConnFactory)
 	    {
-			pNetPlugin->SetProperties(pChild);
-			m_NetPluginArray.push_back(pNetPlugin);
-			wxLogMessage(_("wxGxRemoteServers: Network plugin %s loaded"), pNetPlugin->GetName().c_str());
+			pNetConnFactory->SetProperties(pChild);
+			m_NetConnFactArray.push_back(pNetConnFactory);
+			wxLogMessage(_("wxGxRemoteServers: Network connectio factory %s loaded"), pNetConnFactory->GetName().c_str());
         }
 		pChild = pChild->GetNext();
 	}
 }
 
-void wxGxRemoteServers::UnLoadPlugins()
+void wxGxRemoteServers::UnLoadFactories()
 {
-	for(size_t i = 0; i < m_NetPluginArray.size(); i++)
-		wxDELETE(m_NetPluginArray[i]);
+	for(size_t i = 0; i < m_NetConnFactArray.size(); i++)
+		wxDELETE(m_NetConnFactArray[i]);
 }
+
+void wxGxRemoteServers::CreateConnection(void)
+{
+}
+
