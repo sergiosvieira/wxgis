@@ -104,9 +104,9 @@ public:
     virtual void SetDirection(wxGISMessageDirection nDirection) = 0;
 };
 
-class INetPlugin
+class INetConnection
 {
-    virtual ~INetPlugin(void){};
+    virtual ~INetConnection(void){};
 	//pure virtual
     /** \fn wxXmlNode* GetProperties(void)
      *  \brief Get Properties of plugin.
@@ -122,8 +122,8 @@ class INetPlugin
 	 *  Executed while LoadPlugins (after flugin created). 
      */	  
 	virtual void SetProperties(wxXmlNode* pProp) = 0;
-	virtual wxString GetName(void) = 0;
+	//virtual wxString GetName(void) = 0;
 	//messages quere
 };
 
-typedef std::vector<INetPlugin*> NETPLUGINARRAY;
+//typedef std::vector<INetConnection*> NETCONNARRAY;

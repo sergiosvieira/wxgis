@@ -20,7 +20,7 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/framework/framework.h"
-#include "wxgis/catalogui/gxcontentview.h"
+#include "wxgis/catalogui/gxtabview.h"
 
 class wxGISCatalogViewsCmd :
     public ICommand,
@@ -48,6 +48,6 @@ public:
     virtual void OnDropDownCommand(int nID);
 private:
 	IApplication* m_pApp;
-    wxGxContentView* m_pContentsView;
+    wxGxTabView* m_pTabView;
     wxWindow* m_pTreeView;
 };

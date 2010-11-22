@@ -19,15 +19,24 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/remoteserverui/gxremoteserversui.h"
+#include "wxgis/remoteserverui/gxremoteserverui.h"
 #include "wxgis/catalogui/gxcatalogui.h"
 
 #include "../../art/remoteservers_16.xpm"
 #include "../../art/remoteservers_48.xpm"
+#include "../../art/remoteserver_16.xpm"
+#include "../../art/remoteserver_48.xpm"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxRemoteServersUI, wxGxRemoteServers)
 
 wxGxRemoteServersUI::wxGxRemoteServersUI(void) : wxGxRemoteServers()
 {
+    m_RemServ16 = wxIcon(remoteserver_16_xpm);
+    m_RemServ48 = wxIcon(remoteserver_48_xpm);
+    wxBitmap RemServDsbld16 = wxBitmap(remoteserver_16_xpm).ConvertToImage().ConvertToGreyscale();
+    wxBitmap RemServDsbld48 = wxBitmap(remoteserver_48_xpm).ConvertToImage().ConvertToGreyscale();
+    m_RemServDsbld16.CopyFromBitmap(RemServDsbld16);
+    m_RemServDsbld48.CopyFromBitmap(RemServDsbld48);
 }
 
 wxGxRemoteServersUI::~wxGxRemoteServersUI(void)
@@ -46,41 +55,35 @@ wxIcon wxGxRemoteServersUI::GetSmallImage(void)
 
 void wxGxRemoteServersUI::EmptyChildren(void)
 {
- //   m_aConnections.clear();
-	//for(size_t i = 0; i < m_Children.size(); i++)
-	//{
- //       wxGxDiscConnectionUI* pwxGxDiscConnection = dynamic_cast<wxGxDiscConnectionUI*>(m_Children[i]);
- //       if(pwxGxDiscConnection)
- //       {
- //           CONN_DATA data = {pwxGxDiscConnection->GetName(), pwxGxDiscConnection->GetPath()};
- //           m_aConnections.push_back(data);
- //       }
- //       wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pCatalog);
- //       if(pCatalog)
- //       {
- //           IGxSelection* pSel = pCatalog->GetSelection();
- //           if(pSel)
- //               pSel->Unselect(m_Children[i], IGxSelection::INIT_ALL);
- //       }
-	//	m_Children[i]->Detach();
-	//	wxDELETE(m_Children[i]);
-	//}
-	//m_Children.clear();
+	for(size_t i = 0; i < m_Children.size(); i++)
+	{
+        wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pCatalog);
+        if(pCatalog)
+        {
+            IGxSelection* pSel = pCatalog->GetSelection();
+            if(pSel)
+                pSel->Unselect(m_Children[i], IGxSelection::INIT_ALL);
+        }
+		m_Children[i]->Detach();
+		wxDELETE(m_Children[i]);
+	}
+	m_Children.clear();
 	m_bIsChildrenLoaded = false;
 }
 
-void wxGxRemoteServersUI::LoadChildren(void)
+void wxGxRemoteServersUI::LoadChildren(wxXmlNode* pConf)
 {
-	if(m_bIsChildrenLoaded)
+	if(!pConf || m_bIsChildrenLoaded)
 		return;	
-
-    //for(size_t i = 0; i < m_aConnections.size(); i++)
-    //{
-    //    wxGxDiscConnectionUI* pwxGxDiscConnection = new wxGxDiscConnectionUI(m_aConnections[i].sPath, m_aConnections[i].sName);
-    //    IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
-    //    if(AddChild(pGxObject))
-    //        wxLogMessage(_("wxGxDiscConnections: Add folder connection [%s]"), m_aConnections[i].sName.c_str());
-    //}
-
+	wxXmlNode* pChild = pConf->GetChildren();
+	while(pChild)
+	{
+		wxGxRemoteServerUI* pServerConn = new wxGxRemoteServerUI(pChild, m_RemServ16, m_RemServ48, m_RemServDsbld16, m_RemServDsbld48);
+		IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
+		if(!AddChild(pGxObj))
+			wxDELETE(pGxObj);
+		pChild = pChild->GetNext();
+	}
 	m_bIsChildrenLoaded = true;
 }
+

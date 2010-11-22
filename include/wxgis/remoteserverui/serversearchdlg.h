@@ -81,7 +81,7 @@ private:
 	wxImageList m_ImageList;
 	//bool m_bContinueSearch;
 	size_t m_port;
-	wxClientUDPNotifier* m_pClientUDPNotifier;
+	//wxClientUDPNotifier* m_pClientUDPNotifier;
 	std::vector<HOSTDATA> m_Hosts;
 	bool m_bIsStandAlone;
 	

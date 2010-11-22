@@ -25,39 +25,56 @@
 /** \class wxClientUDPNotifier tcpnetplugin.h
     \brief The thread listening answers from remote servers on broadcast messages.
 */
-class wxClientUDPNotifier : public wxThread
-{
-public:
-	wxClientUDPNotifier(INetClientPlugin* pPlugin);
-    virtual void *Entry();
-    virtual void OnExit();
-	virtual void SendBroadcastMsg(void);
-private:
-	wxDatagramSocket *m_socket;
-	INetClientPlugin* m_pPlugin;
-	int m_nAdvPort;
-};
+//class wxClientUDPNotifier : public wxThread
+//{
+//public:
+//	wxClientUDPNotifier(INetSearch* pPlugin);
+//    virtual void *Entry();
+//    virtual void OnExit();
+//	virtual void SendBroadcastMsg(void);
+//private:
+//	wxDatagramSocket *m_socket;
+//	INetSearch* m_pPlugin;
+//	int m_nAdvPort;
+//};
 
-/** \class wxTCPNetPlugin tcpnetplugin.h
-    \brief The thread listening answers from remote servers on broadcast messages.
-*/
-class wxClientTCPNetPlugin : 
-	public wxObject,
-	public INetPlugin,
-	public INetSearch
-{
-    DECLARE_DYNAMIC_CLASS(wxClientTCPNetPlugin)
-public:
-	wxClientTCPNetPlugin(void);
-	~wxClientTCPNetPlugin(void);
-	//INetPlugin
-	virtual wxXmlNode* GetProperties(void);
-	virtual void SetProperties(wxXmlNode* pProp);
-	virtual wxString GetName(void){return wxString(_("TCP/IP Network"));};
-	//INetSearch
-	virtual bool StartServerSearch();
-	virtual bool StopServerSearch(){return false;};
-	virtual bool CanStopServerSearch(){return false;};
-	virtual void SetCallback(INetSearchCallback* pCallback);
-	virtual INetSearchCallback* GetCallback(void);
-};
+///** \class wxClientTCPNetConnectionFactory tcpnetplugin.h
+//    \brief The thread listening answers from remote servers on broadcast messages.
+//*/
+//class wxClientTCPNetConnectionFactory : 
+//	public wxObject,
+//	public INetSearch
+//{
+//    DECLARE_DYNAMIC_CLASS(wxClientTCPNetConnectionFactory)
+//public:
+//	wxClientTCPNetConnectionFactory(void);
+//	~wxClientTCPNetConnectionFactory(void);
+//	//INetSearch
+//	virtual wxString GetName(void){return wxString(_("TCP/IP Network"));};
+//	virtual bool StartServerSearch();
+//	virtual bool StopServerSearch(){return false;};
+//	virtual bool CanStopServerSearch(){return false;};
+//	virtual void SetCallback(INetSearchCallback* pCallback);
+//	virtual INetSearchCallback* GetCallback(void);
+//protected:
+//    INetSearchCallback* m_pCallback;
+//    wxXmlNode* m_pProperties;
+//};
+//
+///** \class wxClientTCPNetConnection tcpnetplugin.h
+//    \brief The connection to communicate with server.
+//*/
+//class wxClientTCPNetConnection : 
+//	public wxObject,
+//	public INetConnection
+//{
+//    DECLARE_DYNAMIC_CLASS(wxClientTCPNetConnection)
+//public:
+//	wxClientTCPNetConnection(void);
+//	~wxClientTCPNetConnection(void);
+//	//INetConnection
+//	virtual wxXmlNode* GetProperties(void);
+//	virtual void SetProperties(wxXmlNode* pProp);
+//protected:
+//    wxXmlNode* m_pProperties;
+//};
