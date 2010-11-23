@@ -113,7 +113,7 @@ public:
     virtual void ShowStatusBar(bool bShow){};
     virtual bool IsStatusBarShown(void){return false;};
     virtual void ShowToolBarMenu(void){};
-	virtual WINDOWARRAY* GetChildWindows(void){return NULL;};
+	virtual const WINDOWARRAY* GetChildWindows(void){return NULL;};
     virtual void RegisterChildWindow(wxWindow* pWnd){};
     virtual void UnRegisterChildWindow(wxWindow* pWnd){};
     virtual void Customize(void){};

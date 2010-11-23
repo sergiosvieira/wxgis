@@ -20,20 +20,24 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessingui/gxtoolexecview.h"
+#include "wxgis/geoprocessingui/gptoolbox.h"
 
-/*
+#include "../../art/small_arrow.xpm"
+
+
 //////////////////////////////////////////////////////////////////////////////
-// wxGISToolExecuteView
+// wxGxToolExecuteView
 //////////////////////////////////////////////////////////////////////////////
 
-IMPLEMENT_DYNAMIC_CLASS(wxGISToolExecuteView, wxListCtrl)
+IMPLEMENT_DYNAMIC_CLASS(wxGxToolExecuteView, wxListCtrl)
 
-BEGIN_EVENT_TABLE(wxGISToolExecuteView, wxListCtrl)
-    EVT_LIST_ITEM_SELECTED(TOOLEXECUTECTRLID, wxGISToolExecuteView::OnSelected)
-    EVT_LIST_ITEM_DESELECTED(TOOLEXECUTECTRLID, wxGISToolExecuteView::OnDeselected)
-    EVT_LIST_ITEM_ACTIVATED(TOOLEXECUTECTRLID, wxGISToolExecuteView::OnActivated)
-    EVT_LIST_COL_CLICK(TOOLEXECUTECTRLID, wxGISToolExecuteView::OnColClick)
-    EVT_CONTEXT_MENU(wxGISToolExecuteView::OnContextMenu)
+BEGIN_EVENT_TABLE(wxGxToolExecuteView, wxListCtrl)
+    EVT_LIST_ITEM_SELECTED(TOOLEXECUTECTRLID, wxGxToolExecuteView::OnSelected)
+    EVT_LIST_ITEM_DESELECTED(TOOLEXECUTECTRLID, wxGxToolExecuteView::OnDeselected)
+    EVT_LIST_ITEM_ACTIVATED(TOOLEXECUTECTRLID, wxGxToolExecuteView::OnActivated)
+    EVT_LIST_COL_CLICK(TOOLEXECUTECTRLID, wxGxToolExecuteView::OnColClick)
+    EVT_CONTEXT_MENU(wxGxToolExecuteView::OnContextMenu)
+    EVT_CHAR(wxGxToolExecuteView::OnChar)
 END_EVENT_TABLE()
 
 int wxCALLBACK TasksCompareFunction(long item1, long item2, long sortData)
@@ -80,25 +84,25 @@ int wxCALLBACK TasksCompareFunction(long item1, long item2, long sortData)
 
 	//    return pItem1->pObject->GetCategory().CmpNoCase(pItem2->pObject->GetCategory()) * (psortdata->bSortAsc == 0 ? -1 : 1);
  //   }
- //   return 0;
+   return 0;
 }
 
-wxGISToolExecuteView::wxGISToolExecuteView(void)
+wxGxToolExecuteView::wxGxToolExecuteView(void)
 {
 }
 
-wxGISToolExecuteView::wxGISToolExecuteView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
+wxGxToolExecuteView::wxGxToolExecuteView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
 wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(-1), m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL)
 {
     Create(parent, id, pos, size, style);
 }
 
-wxGISToolExecuteView::~wxGISToolExecuteView(void)
+wxGxToolExecuteView::~wxGxToolExecuteView(void)
 {
 	ResetContents();
 }
 
-bool wxGISToolExecuteView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+bool wxGxToolExecuteView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     m_bSortAsc = true;
     m_pConnectionPointCatalog = NULL;
@@ -106,16 +110,17 @@ bool wxGISToolExecuteView::Create(wxWindow* parent, wxWindowID id, const wxPoint
     m_pParentGxObject = NULL;
     m_currentSortCol = 0;
     m_pSelection = NULL;
-
-    wxListCtrl::Create(parent, LISTCTRLID, pos, size, TOOLEXECVIEWSTYLE);
     
-    //toolname
-    //percent
-    //begin
-    //end
-    //current message
-    InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150);
-	InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
+    m_sViewName = wxString(_("Tool Execute View"));
+
+
+    wxListCtrl::Create(parent, id, pos, size, TOOLEXECVIEWSTYLE);
+    
+    InsertColumn(0, _("Tool name"), wxLIST_FORMAT_LEFT, 150);    //toolname
+    InsertColumn(1, _("Start"), wxLIST_FORMAT_LEFT, 100);        //begin
+    InsertColumn(2, _("Finish"), wxLIST_FORMAT_LEFT, 100);       //end
+    InsertColumn(3, _("Done %"), wxLIST_FORMAT_CENTER, 50);      //percent
+    InsertColumn(4, _("Last message"), wxLIST_FORMAT_LEFT, 350); //current message
 
 	m_ImageList.Create(16, 16);
 
@@ -135,7 +140,7 @@ bool wxGISToolExecuteView::Create(wxWindow* parent, wxWindowID id, const wxPoint
     return true;
 }
 
-bool wxGISToolExecuteView::Activate(IGxApplication* application, wxXmlNode* pConf)
+bool wxGxToolExecuteView::Activate(IGxApplication* application, wxXmlNode* pConf)
 {
 	wxGxView::Activate(application, pConf);
 	Serialize(m_pXmlConf, false);
@@ -147,9 +152,6 @@ bool wxGISToolExecuteView::Activate(IGxApplication* application, wxXmlNode* pCon
     {
 		//delete
         m_pDeleteCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
-		//new 
-		m_pNewMenu = dynamic_cast<wxGISNewMenu*>(pApp->GetCommandBar(NEWMENUNAME));
-
     }
 
 	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pCatalog );
@@ -161,7 +163,7 @@ bool wxGISToolExecuteView::Activate(IGxApplication* application, wxXmlNode* pCon
 	return true;
 }
 
-void wxGISToolExecuteView::Deactivate(void)
+void wxGxToolExecuteView::Deactivate(void)
 {
 	if(m_ConnectionPointCatalogCookie != -1)
 		m_pConnectionPointCatalog->Unadvise(m_ConnectionPointCatalogCookie);
@@ -171,7 +173,7 @@ void wxGISToolExecuteView::Deactivate(void)
 }
 
 
-void wxGISToolExecuteView::Serialize(wxXmlNode* pRootNode, bool bStore)
+void wxGxToolExecuteView::Serialize(wxXmlNode* pRootNode, bool bStore)
 {
 	if(pRootNode == NULL)
 		return;
@@ -216,7 +218,7 @@ void wxGISToolExecuteView::Serialize(wxXmlNode* pRootNode, bool bStore)
 	}
 }
 
-void wxGISToolExecuteView::AddObject(IGxObject* pObject)
+void wxGxToolExecuteView::AddObject(IGxObject* pObject)
 {
     return ;
 
@@ -300,7 +302,7 @@ void wxGISToolExecuteView::AddObject(IGxObject* pObject)
 //	wxListCtrl::Refresh();
 }
 
-void wxGISToolExecuteView::OnColClick(wxListEvent& event)
+void wxGxToolExecuteView::OnColClick(wxListEvent& event)
 {
     //event.Skip();
 	//int col = event.GetColumn();
@@ -309,12 +311,12 @@ void wxGISToolExecuteView::OnColClick(wxListEvent& event)
     m_currentSortCol = event.GetColumn();
 	m_bSortAsc = !m_bSortAsc;
 
-    SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
-	SortItems(MyCompareFunction, (long)&sortdata);
+    SORTTASKDATA sortdata = {m_bSortAsc, m_currentSortCol};
+	SortItems(TasksCompareFunction, (long)&sortdata);
 	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 }
 
-void wxGISToolExecuteView::OnContextMenu(wxContextMenuEvent& event)
+void wxGxToolExecuteView::OnContextMenu(wxContextMenuEvent& event)
 {
     //event.Skip();
     wxPoint point = event.GetPosition();
@@ -332,7 +334,7 @@ void wxGISToolExecuteView::OnContextMenu(wxContextMenuEvent& event)
     ShowContextMenu(point);
 }
 
-void wxGISToolExecuteView::OnSelected(wxListEvent& event)
+void wxGxToolExecuteView::OnSelected(wxListEvent& event)
 {
 	//event.Skip();
     m_pSelection->Clear(NOTFIRESELID);
@@ -349,19 +351,9 @@ void wxGISToolExecuteView::OnSelected(wxListEvent& event)
 		nCount++;
         m_pSelection->Select(pItemData->pObject, true, NOTFIRESELID);
     }
-	if(	m_pNewMenu )
-	{
-		if(nCount > 0)
-			m_pNewMenu->Update(m_pSelection);
-		else
-		{
-			m_pSelection->SetInitiator(TREECTRLID);
-			m_pNewMenu->Update(m_pSelection);
-		}
-	}
 }
 
-bool wxGISToolExecuteView::Show(bool show)
+bool wxGxToolExecuteView::Show(bool show)
 {
     bool res = wxListCtrl::Show(show);
     if(show)
@@ -380,7 +372,7 @@ bool wxGISToolExecuteView::Show(bool show)
 }
 
 
-void wxGISToolExecuteView::OnDeselected(wxListEvent& event)
+void wxGxToolExecuteView::OnDeselected(wxListEvent& event)
 {
 	//event.Skip();
     if(GetSelectedItemCount() == 0)
@@ -391,19 +383,9 @@ void wxGISToolExecuteView::OnDeselected(wxListEvent& event)
 		return;
 
 	m_pSelection->Unselect(pItemData->pObject, NOTFIRESELID);
-	if(	m_pNewMenu )
-	{
-		if(GetSelectedItemCount() > 0)
-			m_pNewMenu->Update(m_pSelection);
-		else
-		{
-			m_pSelection->SetInitiator(TREECTRLID);
-			m_pNewMenu->Update(m_pSelection);
-		}
-	}
 }
 
-void wxGISToolExecuteView::ShowContextMenu(const wxPoint& pos)
+void wxGxToolExecuteView::ShowContextMenu(const wxPoint& pos)
 {
 	long item = -1;
     item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
@@ -449,7 +431,7 @@ void wxGISToolExecuteView::ShowContextMenu(const wxPoint& pos)
 	}
 }
 
-void wxGISToolExecuteView::SetColumnImage(int col, int image)
+void wxGxToolExecuteView::SetColumnImage(int col, int image)
 {
     wxListItem item;
     item.SetMask(wxLIST_MASK_IMAGE);
@@ -463,7 +445,7 @@ void wxGISToolExecuteView::SetColumnImage(int col, int image)
     SetColumn(col, item);
 }
 
-void wxGISToolExecuteView::OnActivated(wxListEvent& event)
+void wxGxToolExecuteView::OnActivated(wxListEvent& event)
 {
 	//event.Skip();
 	LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
@@ -484,18 +466,17 @@ void wxGISToolExecuteView::OnActivated(wxListEvent& event)
 	}
 }
 
-void wxGISToolExecuteView::OnObjectAdded(IGxObject* pObj)
+void wxGxToolExecuteView::OnObjectAdded(IGxObject* pObj)
 {
 	if(pObj->GetParent() == m_pParentGxObject)
     {
 		AddObject(pObj);
-        SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
-	    SortItems(MyCompareFunction, (long)&sortdata);
-	    //SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+        SORTTASKDATA sortdata = {m_bSortAsc, m_currentSortCol};
+	    SortItems(TasksCompareFunction, (long)&sortdata);
     }
 }
 
-void wxGISToolExecuteView::OnObjectDeleted(IGxObject* pObj)
+void wxGxToolExecuteView::OnObjectDeleted(IGxObject* pObj)
 {
 	for(long i = 0; i < GetItemCount(); i++)
 	{
@@ -512,56 +493,17 @@ void wxGISToolExecuteView::OnObjectDeleted(IGxObject* pObj)
 	}
 }
 
-void wxGISToolExecuteView::OnObjectChanged(IGxObject* pObj)
+void wxGxToolExecuteView::OnObjectChanged(IGxObject* pObj)
 {
-//	if(pObj == m_pParentObject)
-//	{
-//		IweObjectContainer* pweObjectContainer = dynamic_cast<IweObjectContainer*>(pObj);
-//		if(pweObjectContainer != NULL)
-//			if(GetItemCount() > 0 && !pweObjectContainer->HasChildren())
-//				DeleteAllItems();
-//	}
-//	for(long i = 0; i < GetItemCount(); i++)
-//	{
-//		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
-//		if(pItemData == NULL)
-//			continue;
-//		if(pItemData->pObject != pObj)
-//			continue;
-//////////////////////////////////////////////////////////////////////
-//		IweObjectUI* pObjUI =  dynamic_cast<IweObjectUI*>(pObj);
-//		wxIcon icon_small, icon_large;
-//		if(pObjUI != NULL)
-//		{
-//			icon_small = pObjUI->GetSmallImage();
-//			icon_large = pObjUI->GetLargeImage();
-//		}
-//
-//		if(icon_small.IsOk())
-//			m_pSmallImgList.Replace(pItemData->image_index, icon_small);
-//		if(icon_large.IsOk())
-//			m_pLargeImgList.Replace(pItemData->image_index, icon_large);
-//
-//		wxString name = pObj->GetName();
-//		wxString type = pObj->GetCategory();
-//
-//		SetItem(i, 0, name);
-//		SetItem(i, 1, type);
-//
-//		Refresh();
-//
-//////////////////////////////////////////////////////////////////////
-//		return;
-//	}
 }
 
-void wxGISToolExecuteView::OnObjectRefreshed(IGxObject* pObj)
+void wxGxToolExecuteView::OnObjectRefreshed(IGxObject* pObj)
 {
     if(m_pParentGxObject == pObj)
         OnRefreshAll();
 }
 
-void wxGISToolExecuteView::OnRefreshAll(void)
+void wxGxToolExecuteView::OnRefreshAll(void)
 {
     ResetContents();
 	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(m_pParentGxObject);
@@ -573,12 +515,12 @@ void wxGISToolExecuteView::OnRefreshAll(void)
 		AddObject(pArr->at(i));
 	}
 
-    SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
-	SortItems(MyCompareFunction, (long)&sortdata);
+    SORTTASKDATA sortdata = {m_bSortAsc, m_currentSortCol};
+	SortItems(TasksCompareFunction, (long)&sortdata);
 	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 }
 
-void wxGISToolExecuteView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
+void wxGxToolExecuteView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 {
 	if(nInitiator == GetId())
 		return;
@@ -600,12 +542,12 @@ void wxGISToolExecuteView::OnSelectionChanged(IGxSelection* Selection, long nIni
 		AddObject(pArr->at(i));
 	}
 
-    SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
-	SortItems(MyCompareFunction, (long)&sortdata);
+    SORTTASKDATA sortdata = {m_bSortAsc, m_currentSortCol};
+	SortItems(TasksCompareFunction, (long)&sortdata);
 	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 }
 
-bool wxGISToolExecuteView::Applies(IGxSelection* Selection)
+bool wxGxToolExecuteView::Applies(IGxSelection* Selection)
 {
 	if(Selection == NULL)
 		return false;
@@ -619,92 +561,36 @@ bool wxGISToolExecuteView::Applies(IGxSelection* Selection)
 	return false;
 }
 
-void wxGISToolExecuteView::ResetContents(void)
+void wxGxToolExecuteView::ResetContents(void)
 {
 	for(long i = 0; i < GetItemCount(); i++)
 		delete (LPITEMDATA)GetItemData(i);
 	DeleteAllItems();
 }
 
-void wxGISToolExecuteView::SelectAll(void)
+void wxGxToolExecuteView::SelectAll(void)
 {
 	for(long item = 0; item < GetItemCount(); item++)
         SetItemState(item, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
-*/
-//////////////////////////////////////////////////////////////////////////////
-// wxGxToolExecuteView
-//////////////////////////////////////////////////////////////////////////////
-/*
-IMPLEMENT_DYNAMIC_CLASS(wxGxToolExecuteView, wxGISToolExecuteView)
 
-wxGxToolExecuteView::wxGxToolExecuteView(void)
+void wxGxToolExecuteView::OnChar(wxKeyEvent& event)
 {
-}
-
-wxGxToolExecuteView::wxGxToolExecuteView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxGISToolExecuteView(parent, id, pos, size)
-{
-	m_sViewName = wxString(_("Tool Execute View"));
-}
-
-wxGxToolExecuteView::~wxGxToolExecuteView(void)
-{
-}
-
-bool wxGxToolExecuteView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
-{
-	m_sViewName = wxString(_("Tool Execute View"));
-    wxGISToolExecuteView::Create(parent, id, pos, size, style, name);
-    return true;
-}
-
-bool wxGxTableView::Activate(IGxApplication* application, wxXmlNode* pConf)
-{
-	wxGxView::Activate(application, pConf);
-
-    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
-	m_pSelection = pGxCatalogUI->GetSelection();
-	return true;
-}
-
-void wxGxTableView::Deactivate(void)
-{
-	wxGxView::Deactivate();
-}
-
-bool wxGxTableView::Applies(IGxSelection* Selection)
-{
-	if(Selection == NULL)
-		return false;
-
-	for(size_t i = 0; i < Selection->GetCount(); i++)
-	{
-	    wxGxToolExecute* pGxToolExecute = dynamic_cast<wxGxToolExecute*>( Selection->GetSelectedObjects(i) );
-	    if(pGxToolExecute)
-		    return true;
+	if(event.GetModifiers() & wxMOD_ALT)
+		return;
+	if(event.GetModifiers() & wxMOD_CONTROL)
+		return;
+	if(event.GetModifiers() & wxMOD_SHIFT)
+		return;
+    switch(event.GetKeyCode())
+    {
+    case WXK_DELETE:
+    case WXK_NUMPAD_DELETE:
+        if(m_pDeleteCmd)
+            m_pDeleteCmd->OnClick();
+        break;
+    default:
+        break;
     }
-	return false;
 }
-
-void wxGxTableView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
-{
-	if(nInitiator == GetId())
-		return;
-
-	if(m_pSelection->GetCount() == 0)
-		return;
-	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();	
-	if(m_pParentGxObject == pGxObj)
-		return;
-
-	wxGxToolExecute* pGxToolExecute = dynamic_cast<wxGxToolExecute*>(pGxObj);
-	if(!pGxToolExecute)
-		return;
-
-    //fill data
-
-	m_pParentGxObject = pGxObj;
-//	wxWindow::Refresh();
-}
-*/
 

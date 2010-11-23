@@ -1067,7 +1067,7 @@ bool wxGxObjectDialog::DoSaveObject(wxGISEnumSaveObjectResults Result)
     return true;
 }
 
-WINDOWARRAY* wxGxObjectDialog::GetChildWindows(void)
+const WINDOWARRAY* wxGxObjectDialog::GetChildWindows(void)
 {
 	return &m_WindowArray;
 }
