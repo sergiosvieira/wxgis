@@ -106,7 +106,7 @@ bool wxGISCartoMainCmd::GetEnabled(void)
 {
 	if(!m_pMapView)
 	{
-		WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
+		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
 		if(pWinArr)
 		{
 			for(size_t i = 0; i < pWinArr->size(); i++)
@@ -299,7 +299,7 @@ bool wxGISCartoMainTool::GetEnabled(void)
 {
 	if(!m_pMapView)
 	{
-		WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
+		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
 		if(pWinArr)
 		{
 			for(size_t i = 0; i < pWinArr->size(); i++)

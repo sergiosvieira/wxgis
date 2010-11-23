@@ -30,9 +30,10 @@
 /** \class wxGISToolExecuteView gxtoolexecview.h
     \brief The tasks execution view class.
 */
-/*
 #define TOOLEXECVIEWSTYLE wxLC_REPORT | wxBORDER_NONE | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE | wxLC_VRULES | wxLC_HRULES
+#define TOOLEXECUTECTRLID WXGISHIGHEST + 1
 
+/*
 class WXDLLIMPEXP_GIS_GPU wxGISToolExecuteView :
 	public wxListCtrl,
 	public IGxSelectionEvents,
@@ -134,3 +135,86 @@ private:
 };
 */
 
+/** \class wxGxToolExecuteView gxtoolexecview.h
+    \brief The tasks execution gxcatalog view class.
+*/
+
+typedef struct _sorttaskdata
+{
+    bool bSortAsc;
+    short currentSortCol;
+} SORTTASKDATA, *LPSORTTASKDATA;
+
+class WXDLLIMPEXP_GIS_GPU wxGxToolExecuteView :
+	public wxListCtrl,
+	public wxGxView,
+	public IGxSelectionEvents,
+	public IGxCatalogEvents,
+    public IGxContentsView
+{
+    DECLARE_DYNAMIC_CLASS(wxGxToolExecuteView)
+public:
+    wxGxToolExecuteView(void);
+	wxGxToolExecuteView(wxWindow* parent, wxWindowID id = TOOLEXECUTECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = TOOLEXECVIEWSTYLE);
+	virtual ~wxGxToolExecuteView(void);
+	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
+	virtual void AddObject(IGxObject* pObject);
+	virtual void ResetContents(void);
+    virtual IGxObject* GetParentGxObject(void){return m_pParentGxObject;};
+    virtual bool Show(bool show = true);
+//IGxView
+    virtual bool Create(wxWindow* parent, wxWindowID id = TOOLEXECUTECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = TOOLEXECVIEWSTYLE, const wxString& name = wxT("ToolExecuteView"));
+	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
+	virtual void Deactivate(void);
+	virtual bool Applies(IGxSelection* Selection);
+    virtual void BeginRename(IGxObject* pGxObject = NULL){};
+//IGxSelectionEvents
+	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
+//IGxCatalogEvents
+	virtual void OnObjectAdded(IGxObject* object);
+	virtual void OnObjectChanged(IGxObject* object);
+	virtual void OnObjectDeleted(IGxObject* object);
+	virtual void OnObjectRefreshed(IGxObject* object);
+	virtual void OnRefreshAll(void);
+// IGxContentsView
+    virtual void SelectAll(void);
+    virtual void SetStyle(wxGISEnumContentsViewStyle style){};
+    virtual wxGISEnumContentsViewStyle GetStyle(void){return enumGISCVReport;};
+    virtual bool CanSetStyle(void){return false;};
+//events
+	virtual void OnColClick(wxListEvent& event);
+    virtual void OnContextMenu(wxContextMenuEvent& event);
+	virtual void ShowContextMenu(const wxPoint& pos);
+	virtual void SetColumnImage(int col, int image);
+    virtual void OnActivated(wxListEvent& event);
+	virtual void OnSelected(wxListEvent& event);
+	virtual void OnDeselected(wxListEvent& event);
+    virtual void OnChar(wxKeyEvent& event);
+
+	typedef struct _itemdata
+	{
+		IGxObject* pObject;
+		int iImageIndex;
+	} ITEMDATA, *LPITEMDATA;
+	typedef struct _icondata
+	{
+		wxIcon oIcon;
+		int iImageIndex;
+        bool bLarge;
+	} ICONDATA;
+
+protected:
+	bool m_bSortAsc;
+	short m_currentSortCol;
+	wxGISEnumContentsViewStyle m_current_style;
+	wxImageList m_ImageList;
+	IConnectionPointContainer* m_pConnectionPointCatalog;
+	long m_ConnectionPointCatalogCookie;
+	IGxSelection* m_pSelection;
+    wxGxCatalogUI* m_pCatalog;
+    ICommand* m_pDeleteCmd;
+	IGxObject* m_pParentGxObject;
+    std::vector<ICONDATA> m_IconsArray;
+
+    DECLARE_EVENT_TABLE()
+};

@@ -175,7 +175,7 @@ void wxGxApplication::ShowApplicationWindow(wxWindow* pWnd, bool bShow)
 	ShowPane(pWnd, bShow);
 }
 
-WINDOWARRAY* wxGxApplication::GetChildWindows(void)
+const WINDOWARRAY* wxGxApplication::GetChildWindows(void)
 {
 	return &m_WindowArray;
 }

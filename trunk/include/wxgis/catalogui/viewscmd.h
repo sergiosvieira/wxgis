@@ -48,6 +48,6 @@ public:
     virtual void OnDropDownCommand(int nID);
 private:
 	IApplication* m_pApp;
-    wxGxTabView* m_pTabView;
+    std::vector<wxWindow*> m_apContentsWin;
     wxWindow* m_pTreeView;
 };

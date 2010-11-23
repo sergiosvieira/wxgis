@@ -33,7 +33,7 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogViewsCmd, wxObject)
 
-wxGISCatalogViewsCmd::wxGISCatalogViewsCmd(void) : m_pTabView(NULL), m_pTreeView(NULL)
+wxGISCatalogViewsCmd::wxGISCatalogViewsCmd(void) : m_pTreeView(NULL)
 {
 }
 
@@ -103,7 +103,7 @@ bool wxGISCatalogViewsCmd::GetEnabled(void)
 {
 	if(!m_pTreeView)
 	{
-		WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
+		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
 		if(pWinArr)
 		{
 			for(size_t i = 0; i < pWinArr->size(); i++)
@@ -118,19 +118,16 @@ bool wxGISCatalogViewsCmd::GetEnabled(void)
 		}
 	}
 
-	if(!m_pTabView)
+	if(m_apContentsWin.empty())
 	{
-		WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
+		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
 		if(pWinArr)
 		{
 			for(size_t i = 0; i < pWinArr->size(); i++)
 			{
-				wxGxTabView* pTabView = dynamic_cast<wxGxTabView*>(pWinArr->at(i));
-				if(pTabView)
-				{
-					m_pTabView = pTabView;
-					break;
-				}
+				IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(pWinArr->at(i));
+                if(pGxContentsView)
+                    m_apContentsWin.push_back(pWinArr->at(i));
 			}
 		}
 	}
@@ -140,11 +137,10 @@ bool wxGISCatalogViewsCmd::GetEnabled(void)
 		case 2:
             return m_pTreeView;
 		case 0:
-		case 1://TODO: Change m_pContentsView to IGxContentsView
-            {
-                IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_pTabView->GetCurrentWnd());
-			    return pGxContentsView;
-            }
+		case 1:
+            for(size_t i = 0; i < m_apContentsWin.size(); i++)
+                if(m_apContentsWin[i]->IsShown())
+                    return true;
  		default:
 			return false;
 	}
@@ -186,26 +182,36 @@ void wxGISCatalogViewsCmd::OnClick(void)
 	switch(m_subtype)
 	{
 		case 0:
+            for(size_t i = 0; i < m_apContentsWin.size(); i++)
 			{
-                IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_pTabView->GetCurrentWnd());
-                if(pGxContentsView)
+                if(m_apContentsWin[i]->IsShown())
                 {
-                    if(pGxContentsView->CanSetStyle())
+                    IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_apContentsWin[i]);
+                    if(pGxContentsView)
                     {
-                        int nStyle = pGxContentsView->GetStyle() + 1;
-                        if(nStyle > enumGISCVList)
-                            nStyle = enumGISCVReport;
-                        pGxContentsView->SetStyle((wxGISEnumContentsViewStyle)(nStyle));
+                        if(pGxContentsView->CanSetStyle())
+                        {
+                            int nStyle = pGxContentsView->GetStyle() + 1;
+                            if(nStyle > enumGISCVList)
+                                nStyle = enumGISCVReport;
+                            pGxContentsView->SetStyle((wxGISEnumContentsViewStyle)(nStyle));
+                        }
                     }
                 }
             }
 			break;
 		case 1:
-            {
-                IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_pTabView->GetCurrentWnd());
-                if(pGxContentsView)
-                    pGxContentsView->SelectAll();
-                //m_pContentsView->SetFocus();
+            for(size_t i = 0; i < m_apContentsWin.size(); i++)
+			{
+                if(m_apContentsWin[i]->IsShown())
+                {
+                    IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_apContentsWin[i]);
+                    if(pGxContentsView)
+                    {
+                        pGxContentsView->SelectAll();
+                        m_apContentsWin[i]->SetFocus();
+                    }
+                }
             }
 			break;
 		case 2:
@@ -255,11 +261,17 @@ wxMenu* wxGISCatalogViewsCmd::GetDropDownMenu(void)
                 pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVSmall, _("Smal Icons"));
                 pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVReport, _("Details"));
                 //check
-                IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_pTabView->GetCurrentWnd());
-                if(pGxContentsView)
-                {
-                    wxGISEnumContentsViewStyle nStyle = pGxContentsView->GetStyle();
-                    pMenu->Check(ID_MENUCMD + (int)nStyle, true);
+                for(size_t i = 0; i < m_apContentsWin.size(); i++)
+			    {
+                    if(m_apContentsWin[i]->IsShown())
+                    {
+                        IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_apContentsWin[i]);
+                        if(pGxContentsView)
+                        {
+                            wxGISEnumContentsViewStyle nStyle = pGxContentsView->GetStyle();
+                            pMenu->Check(ID_MENUCMD + (int)nStyle, true);
+                        }
+                    }
                 }
                 return pMenu;
             }
@@ -275,9 +287,15 @@ void wxGISCatalogViewsCmd::OnDropDownCommand(int nID)
 {
     if(GetEnabled())
     {
-        IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_pTabView->GetCurrentWnd());
-        if(pGxContentsView)
-            pGxContentsView->SetStyle((wxGISEnumContentsViewStyle)(nID - ID_MENUCMD));
+        for(size_t i = 0; i < m_apContentsWin.size(); i++)
+	    {
+            if(m_apContentsWin[i]->IsShown())
+            {
+                IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_apContentsWin[i]);
+                if(pGxContentsView)
+                    pGxContentsView->SetStyle((wxGISEnumContentsViewStyle)(nID - ID_MENUCMD));
+            }
+        }
     }
 }
 

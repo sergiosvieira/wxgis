@@ -371,7 +371,11 @@ void wxGxToolExecute::Refresh(void)
 
 wxString wxGxToolExecute::GetName(void)
 {
-    return wxString::Format(_("Executed list [%d]"), m_nRunningTasks);
+    if(m_nRunningTasks)
+        return wxString::Format(_("Executed list [%d]"), m_nRunningTasks);
+    else
+        return wxString(_("Executed list"));
+
 }
 
 /////////////////////////////////////////////////////////////////////////
