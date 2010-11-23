@@ -27,6 +27,7 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxRemoteServers, wxObject)
 wxGxRemoteServers::wxGxRemoteServers(void) : m_bIsChildrenLoaded(false)
 {
     m_bEnabled = true;
+	wxSocketBase::Initialize();
 }
 
 wxGxRemoteServers::~wxGxRemoteServers(void)
@@ -76,16 +77,17 @@ wxXmlNode* wxGxRemoteServers::GetProperties(void)
         {
 		    wxXmlNode* pConn = pGxRemoteServer->GetProperties();
             if(pConn)
-                pConn->SetParent(pConsNode);
+				pConsNode->InsertChild(pConn, NULL);
+                //pConn->SetParent(pConsNode);
         }
     }
-    wxXmlNode* pPluginsNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("factories"));
-	for(size_t i = 0; i < m_NetConnFactArray.size(); i++)
+    wxXmlNode* pFactoriesNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("factories"));
+	for(size_t i = 0; i < m_apNetConnFact.size(); i++)
 	{
-		wxXmlNode* pXmlNode = m_NetConnFactArray[i]->GetProperties();
+		wxXmlNode* pXmlNode = m_apNetConnFact[i]->GetProperties();
 		if(pXmlNode)
-			pXmlNode->SetParent(pPluginsNode);
-			//pPluginsNode->InsertChild(pXmlNode, NULL);
+			//pXmlNode->SetParent(pFactoriesNode);
+			pFactoriesNode->InsertChild(pXmlNode, NULL);
 	}
 #endif  
     return pNode;
@@ -122,10 +124,19 @@ void wxGxRemoteServers::LoadChildren(wxXmlNode* pConf)
 	wxXmlNode* pChild = pConf->GetChildren();
 	while(pChild)
 	{
-		wxGxRemoteServer* pServerConn = new wxGxRemoteServer(pChild);
-		IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
-		if(!AddChild(pGxObj))
-			wxDELETE(pGxObj);
+		//create and test conn
+		wxString sClassName = pChild->GetPropVal(wxT("class"), NONAME);
+		if(!sClassName.IsEmpty())
+		{
+			INetConnection *pConn = dynamic_cast<INetConnection *>(wxCreateDynamicObject(sClassName));
+			if(pConn && pConn->SetProperties(pChild))
+			{
+				wxGxRemoteServer* pServerConn = new wxGxRemoteServer(pConn);
+				IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
+				if(!AddChild(pGxObj))
+					wxDELETE(pGxObj);
+			}
+		}
 		pChild = pChild->GetNext();
 	}
 
@@ -151,8 +162,8 @@ void wxGxRemoteServers::LoadFactories(wxXmlNode* pConf)
 	    if(pNetConnFactory)
 	    {
 			pNetConnFactory->SetProperties(pChild);
-			m_NetConnFactArray.push_back(pNetConnFactory);
-			wxLogMessage(_("wxGxRemoteServers: Network connectio factory %s loaded"), pNetConnFactory->GetName().c_str());
+			m_apNetConnFact.push_back(pNetConnFactory);
+			wxLogMessage(_("wxGxRemoteServers: Network connection factory %s loaded"), pNetConnFactory->GetName().c_str());
         }
 		pChild = pChild->GetNext();
 	}
@@ -160,11 +171,8 @@ void wxGxRemoteServers::LoadFactories(wxXmlNode* pConf)
 
 void wxGxRemoteServers::UnLoadFactories()
 {
-	for(size_t i = 0; i < m_NetConnFactArray.size(); i++)
-		wxDELETE(m_NetConnFactArray[i]);
+	for(size_t i = 0; i < m_apNetConnFact.size(); i++)
+		wxDELETE(m_apNetConnFact[i]);
 }
 
-void wxGxRemoteServers::CreateConnection(void)
-{
-}
 

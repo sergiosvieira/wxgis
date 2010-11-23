@@ -20,21 +20,19 @@
  ****************************************************************************/
 #include "wxgis/remoteserver/gxremoteserver.h"
 
-wxGxRemoteServer::wxGxRemoteServer(wxXmlNode* pConf) : m_bIsChildrenLoaded(false), m_pProperties(NULL), m_bIsConnected(false)
+wxGxRemoteServer::wxGxRemoteServer(INetConnection* pNetConn) : m_bIsChildrenLoaded(false)
 {
-    m_pProperties = new wxXmlNode(*pConf);
-    m_sName = m_pProperties->GetPropVal(wxT("name"), NONAME);
-    m_sClassName = m_pProperties->GetPropVal(wxT("class"), NONAME);
-    //create connection object ?
+	m_pNetConn = pNetConn;
 }
 
 wxGxRemoteServer::~wxGxRemoteServer(void)
 {
-    wxDELETE(m_pProperties);
+    wxDELETE(m_pNetConn);
 }
 
 void wxGxRemoteServer::Detach(void)
 {
+	Disconnect();
 }
 
 void wxGxRemoteServer::Refresh(void)
@@ -54,20 +52,29 @@ bool wxGxRemoteServer::DeleteChild(IGxObject* pChild)
 
 wxXmlNode* wxGxRemoteServer::GetProperties(void)
 {
-    return m_pProperties;
+	if(m_pNetConn)
+		return m_pNetConn->GetProperties();
+    return NULL;
 }
 
 bool wxGxRemoteServer::Connect(void)
 {
-    //1. create plugin
-    //2. set m_pProperties
-    //3. run
+ 	if(m_pNetConn)
+		return m_pNetConn->Connect();
     return false;
 }
 
 bool wxGxRemoteServer::Disconnect(void)
 {
+ 	if(m_pNetConn && m_pNetConn->IsConnected())
+		return m_pNetConn->Disconnect();
     return false;
 }
 
+wxString wxGxRemoteServer::GetName(void)
+{
+ 	if(m_pNetConn)
+		return m_pNetConn->GetName();
+	return NONAME;
+}
 

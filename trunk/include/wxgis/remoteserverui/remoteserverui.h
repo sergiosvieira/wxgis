@@ -22,3 +22,32 @@
 #pragma once
 
 #include "wxgis/remoteserver/remoteserver.h"
+
+/** \class INetConnFactoryUI remoteserverui.h
+    \brief The network connection factory UI interface class.
+*/
+class INetConnFactoryUI
+{
+public:
+    virtual ~INetConnFactoryUI(void){};
+	virtual wxWindow* GetPropertyPage(wxWindow* pParent) = 0;
+};
+
+/** \class INetConnFactoryUI remoteserverui.h
+    \brief The network connection factory UI interface class.
+*/
+class wxNetPropertyPage :
+	public wxPanel
+{
+public:
+	wxNetPropertyPage(INetConnFactoryUI* pFactory, wxWindow* pParent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCLIP_CHILDREN | wxNO_BORDER | wxTAB_TRAVERSAL) : wxPanel(pParent, id, pos, size, style)
+	{
+		m_pFactory = pFactory;
+	}
+	virtual ~wxNetPropertyPage(void){};
+	virtual INetConnection* OnSave(void) = 0;
+	virtual wxString GetLastError(void){return m_sErrorMsg;};
+protected:
+	INetConnFactoryUI* m_pFactory;
+	wxString m_sErrorMsg;
+};

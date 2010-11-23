@@ -28,11 +28,11 @@ class WXDLLIMPEXP_GIS_RS wxGxRemoteServer :
 	public IGxObjectContainer
 {
 public:
-	wxGxRemoteServer(wxXmlNode* pConf);
+	wxGxRemoteServer(INetConnection* pNetConn);
 	virtual ~wxGxRemoteServer(void);
 	//IGxObject
 	virtual void Detach(void);
-	virtual wxString GetName(void){return m_sName;};
+	virtual wxString GetName(void);
     virtual wxString GetBaseName(void){return GetName();};
 	virtual wxString GetCategory(void){return wxString(_("Remote Server"));};
 	virtual void Refresh(void);
@@ -45,9 +45,6 @@ public:
     virtual bool Connect(void);
     virtual bool Disconnect(void);
 protected:
-    wxXmlNode* m_pProperties;
-    wxString m_sName;
-    wxString m_sClassName;
+    INetConnection* m_pNetConn;
 	bool m_bIsChildrenLoaded;
-	bool m_bIsConnected;
 };

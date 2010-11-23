@@ -48,7 +48,6 @@ public:
     virtual void Init(wxXmlNode* pConfigNode);
     virtual wxXmlNode* GetProperties(void);
 	//wxGxRemoteServers
-    virtual void CreateConnection(void);
 protected:
 	//wxGxRemoteServers
 	virtual void LoadChildren(wxXmlNode* pConf);
@@ -56,6 +55,6 @@ protected:
 	virtual void LoadFactories(wxXmlNode* pConf);
 	virtual void UnLoadFactories(void);
 protected:
-    NETCONNFACTORYARRAY m_NetConnFactArray;
+    NETCONNFACTORYARRAY m_apNetConnFact;
 	bool m_bIsChildrenLoaded;
 };

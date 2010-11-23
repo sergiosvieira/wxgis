@@ -20,6 +20,7 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/catalogui/catalogui.h"
+#include "wxgis/remoteserverui/remoteserverui.h"
 #include "wxgis/remoteserver/gxremoteservers.h"
 
 /** \class wxGxRemoteServersUI gxremoteserversui.h
@@ -41,6 +42,7 @@ public:
 	//wxGxRemoteServersUI
 	virtual void LoadChildren(wxXmlNode* pConf);
 	virtual void EmptyChildren(void);
+    virtual void CreateConnection(wxWindow* pParent, bool bSearch = false);
 protected:
 	wxIcon m_RemServ16, m_RemServ48;
 	wxIcon m_RemServDsbld16, m_RemServDsbld48;

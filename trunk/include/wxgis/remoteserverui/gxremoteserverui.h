@@ -29,16 +29,19 @@
 */
 class WXDLLIMPEXP_GIS_RSU wxGxRemoteServerUI :
 	public wxGxRemoteServer,
-	public IGxObjectUI
+	public IGxObjectUI,
+	public IGxObjectWizard
 {
 public:
-	wxGxRemoteServerUI(wxXmlNode* pConf, wxIcon SmallIcon = wxNullIcon, wxIcon LargeIcon = wxNullIcon, wxIcon SmallDsblIcon = wxNullIcon, wxIcon LargeDsblIcon = wxNullIcon);
+	wxGxRemoteServerUI(INetConnection* pNetConn, wxIcon SmallIcon = wxNullIcon, wxIcon LargeIcon = wxNullIcon, wxIcon SmallDsblIcon = wxNullIcon, wxIcon LargeDsblIcon = wxNullIcon);
 	virtual ~wxGxRemoteServerUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
 	virtual wxString ContextMenu(void){return wxString(wxT("wxGxRemoteServerUI.ContextMenu"));};
 	virtual wxString NewMenu(void){return wxEmptyString;};
+    //IGxObjectWizard
+    virtual bool Invoke(wxWindow* pParentWnd);
 protected:
     wxIcon m_SmallIcon, m_LargeIcon;
     wxIcon m_SmallDsblIcon, m_LargeDsblIcon;

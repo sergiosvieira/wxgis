@@ -20,6 +20,8 @@
  ****************************************************************************/
 #include "wxgis/remoteserverui/remoteservercmd.h"
 #include "wxgis/remoteserverui/serversearchdlg.h"
+#include "wxgis/remoteserverui/gxremoteserversui.h"
+#include "wxgis/catalogui/gxcatalogui.h"
 
 #include "../../art/remoteserver_16.xpm"
 #include "../../art/remoteservers_16.xpm"
@@ -87,9 +89,19 @@ bool wxGISRemoteCmd::GetEnabled(void)
 	switch(m_subtype)
 	{
 		case 0://search server
-			return true;
 		case 1://connect server
-			return true;
+			{
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
+                wxGxRemoteServersUI* pGxRemoteServersUI = dynamic_cast<wxGxRemoteServersUI*>(pSel->GetLastSelectedObject());
+                if(pGxRemoteServersUI)
+                    return true;
+			}		
+			return false;
+			}
 		default:
 			return false;
 	}
@@ -126,11 +138,35 @@ void wxGISRemoteCmd::OnClick(void)
 	{
 		case 0:	
 			{
-			wxGISSearchServerDlg dlg(true, dynamic_cast<wxWindow*>(m_pApp));
-			dlg.ShowModal();
+				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+				if(pGxApp)
+				{
+					wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+					IGxSelection* pSel = pGxCatalogUI->GetSelection();
+					wxGxRemoteServersUI* pGxRemoteServersUI = dynamic_cast<wxGxRemoteServersUI*>(pSel->GetLastSelectedObject());
+					if(pGxRemoteServersUI)
+					{
+						wxWindow* pParentWnd = dynamic_cast<wxWindow*>(pGxApp);
+						return pGxRemoteServersUI->CreateConnection(pParentWnd, true);
+					}
+				}
 			}
 			return;
 		case 1:	
+			{
+				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+				if(pGxApp)
+				{
+					wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+					IGxSelection* pSel = pGxCatalogUI->GetSelection();
+					wxGxRemoteServersUI* pGxRemoteServersUI = dynamic_cast<wxGxRemoteServersUI*>(pSel->GetLastSelectedObject());
+					if(pGxRemoteServersUI)
+					{
+						wxWindow* pParentWnd = dynamic_cast<wxWindow*>(pGxApp);
+						return pGxRemoteServersUI->CreateConnection(pParentWnd, false);
+					}
+				}
+			}
 			return;
 		default:
 			return;

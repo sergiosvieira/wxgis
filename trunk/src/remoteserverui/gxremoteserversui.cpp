@@ -20,7 +20,9 @@
  ****************************************************************************/
 #include "wxgis/remoteserverui/gxremoteserversui.h"
 #include "wxgis/remoteserverui/gxremoteserverui.h"
+#include "wxgis/remoteserverui/createnetworkconndlg.h"
 #include "wxgis/catalogui/gxcatalogui.h"
+
 
 #include "../../art/remoteservers_16.xpm"
 #include "../../art/remoteservers_48.xpm"
@@ -78,12 +80,48 @@ void wxGxRemoteServersUI::LoadChildren(wxXmlNode* pConf)
 	wxXmlNode* pChild = pConf->GetChildren();
 	while(pChild)
 	{
-		wxGxRemoteServerUI* pServerConn = new wxGxRemoteServerUI(pChild, m_RemServ16, m_RemServ48, m_RemServDsbld16, m_RemServDsbld48);
-		IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
-		if(!AddChild(pGxObj))
-			wxDELETE(pGxObj);
+		//create and test conn
+		wxString sClassName = pChild->GetPropVal(wxT("class"), NONAME);
+		if(!sClassName.IsEmpty())
+		{
+			INetConnection *pConn = dynamic_cast<INetConnection *>(wxCreateDynamicObject(sClassName));
+			if(pConn && pConn->SetProperties(pChild))
+			{
+				wxGxRemoteServerUI* pServerConn = new wxGxRemoteServerUI(pConn, m_RemServ16, m_RemServ48, m_RemServDsbld16, m_RemServDsbld48);
+				IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
+				if(!AddChild(pGxObj))
+					wxDELETE(pGxObj);
+			}
+		}
 		pChild = pChild->GetNext();
 	}
 	m_bIsChildrenLoaded = true;
 }
 
+void wxGxRemoteServersUI::CreateConnection(wxWindow* pParent, bool bSearch)
+{
+	INetConnection* pConn(NULL);
+	if(bSearch)
+	{
+	}
+	else
+	{
+		wxGISCreateNetworkConnDlg dlg(m_apNetConnFact, pParent);
+		if(dlg.ShowModal() == wxID_SAVE)
+			pConn = dlg.GetConnection();
+	}
+	if(pConn)
+	{
+		wxGxRemoteServerUI* pServerConn = new wxGxRemoteServerUI(pConn, m_RemServ16, m_RemServ48, m_RemServDsbld16, m_RemServDsbld48);
+		IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
+		if(!AddChild(pGxObj))
+		{
+			wxDELETE(pGxObj);
+		}
+		else
+		{
+			m_pCatalog->ObjectAdded(pGxObj);
+			m_pCatalog->ObjectChanged(this);
+		}
+	}
+}
