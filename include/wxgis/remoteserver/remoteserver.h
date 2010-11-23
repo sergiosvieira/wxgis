@@ -22,12 +22,14 @@
 #pragma once
 
 #include "wxgis/catalog/catalog.h"
+#include "wxgis/networking/networking.h"
 
 class INetSearchCallback
 {
+public:
     virtual ~INetSearchCallback(void){};
 	//pure virtual
-	virtual void AddHost(wxString sName, wxString sPlugin, wxString sHost, wxString sBanner, wxXmlNode* pUserData) = 0;
+	virtual void AddServer(wxXmlNode* pServerData) = 0;
 };
 
 /** \class INetConnFactory remoteserver.h
@@ -41,10 +43,11 @@ public:
 	virtual bool StartServerSearch() = 0;
 	virtual bool StopServerSearch() = 0;
 	virtual bool CanStopServerSearch() = 0;
+	virtual bool IsServerSearching() = 0;
 	virtual void SetCallback(INetSearchCallback* pCallback) = 0;
 	virtual INetSearchCallback* GetCallback(void) = 0;
 	virtual wxString GetName(void) = 0;
-    //INetConnection* GetConnection() = 0;
+    virtual INetConnection* GetConnection(wxXmlNode* pProp) = 0;
     /** \fn wxXmlNode* GetProperties(void)
      *  \brief Get Properties of Factory.
      *  \return The properties of the Factory.
@@ -60,6 +63,8 @@ public:
      */	  
 	virtual void SetProperties(const wxXmlNode* pProp) = 0;
 
+	//virtual char GetID(void) = 0;
+	//virtual void SetID(char nID) = 0;
 };
 
 typedef std::vector<INetConnFactory*> NETCONNFACTORYARRAY;

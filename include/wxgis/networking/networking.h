@@ -106,6 +106,7 @@ public:
 
 class INetConnection
 {
+public:
     virtual ~INetConnection(void){};
 	//pure virtual
     /** \fn wxXmlNode* GetProperties(void)
@@ -119,11 +120,15 @@ class INetConnection
      *  \brief Set Properties of plugin.
      *  \param pProp The properties of the plugin
 	 *
-	 *  Executed while LoadPlugins (after flugin created). 
+	 *  Executed while LoadChildren (after connection class created). 
      */	  
-	virtual void SetProperties(wxXmlNode* pProp) = 0;
-	//virtual wxString GetName(void) = 0;
+	virtual bool SetProperties(const wxXmlNode* pProp) = 0;
+	virtual wxString GetName(void) = 0;
+	virtual bool Connect(void) = 0;
+	virtual bool Disconnect(void) = 0;
+	virtual bool IsConnected(void) = 0;
 	//messages quere
+	//pop put msg
 };
 
 //typedef std::vector<INetConnection*> NETCONNARRAY;

@@ -42,48 +42,44 @@
     \brief The dialog to search remote servers.
 */
 
-class wxGISSearchServerDlg : public wxDialog 
+class wxGISSearchServerDlg : 
+	public wxDialog,
+	public INetSearchCallback
 {
 public:
   enum
   {
 		ID_SEARCHBT = wxID_HIGHEST + 1,
-		//ID_STOPBT,
+		ID_STOPBT,
 		ID_ACCEPT
   };
 public:
-	wxGISSearchServerDlg(bool bStandAlone, wxWindow* parent, size_t port = 1976, wxWindowID id = wxID_ANY, const wxString& title = _("Search Server"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 400,300 ), long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
+	wxGISSearchServerDlg(INetConnFactory* pFactory, wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Search Server"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 400,300 ), long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
 	~wxGISSearchServerDlg();
-	void AddHost(wxString sPort, wxString sName, wxString sHost, wxString sIP, wxString sBanner);
-public:
-	typedef struct _hostdata
-	{
-		wxString sPort;
-		wxString sIP;
-	}HOSTDATA;
+	virtual wxXmlNode* GetConnectionProperties(){return m_pConnProps;};
+	virtual INetConnection* GetConnection();
+	//INetSearchCallback
+	virtual void AddServer(wxXmlNode* pServerData);
 protected:
+	virtual void CreateControls(bool bShowGauge);
 	void OnSearch( wxCommandEvent& event );
 	void OnSearchUI( wxUpdateUIEvent& event );
-	//void OnStop( wxCommandEvent& event );
-	//void OnStopUI( wxUpdateUIEvent& event );
+	void OnStop( wxCommandEvent& event );
+	void OnStopUI( wxUpdateUIEvent& event );
 	void OnAccept( wxCommandEvent& event );
 	void OnAcceptUI( wxUpdateUIEvent& event );
 	void OnClose(wxCloseEvent& event);
 protected:
 	wxListCtrl* m_listCtrl;
 	wxButton* m_button_search;
-	//wxButton* m_button_stop;
+	wxButton* m_button_stop;
 	wxButton* m_button_accept;
-	//wxGauge* m_gauge;
-	
+	wxGauge* m_gauge;	
 private:
 	wxString m_ipaddress;
 	wxImageList m_ImageList;
-	//bool m_bContinueSearch;
-	size_t m_port;
-	//wxClientUDPNotifier* m_pClientUDPNotifier;
-	std::vector<HOSTDATA> m_Hosts;
-	bool m_bIsStandAlone;
-	
+	INetConnFactory* m_pFactory;
+	wxXmlNode* m_pConnProps;
+
 	DECLARE_EVENT_TABLE()		
 };

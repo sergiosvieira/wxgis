@@ -21,7 +21,7 @@
 
 #include "wxgis/remoteserverui/gxremoteserverui.h"
 
-wxGxRemoteServerUI::wxGxRemoteServerUI(wxXmlNode* pConf, wxIcon SmallIcon, wxIcon LargeIcon, wxIcon SmallDsblIcon, wxIcon LargeDsblIcon) : wxGxRemoteServer(pConf)
+wxGxRemoteServerUI::wxGxRemoteServerUI(INetConnection* pNetConn, wxIcon SmallIcon, wxIcon LargeIcon, wxIcon SmallDsblIcon, wxIcon LargeDsblIcon) : wxGxRemoteServer(pNetConn)
 {
     m_SmallIcon = SmallIcon;
     m_LargeIcon = LargeIcon;
@@ -35,7 +35,7 @@ wxGxRemoteServerUI::~wxGxRemoteServerUI(void)
 
 wxIcon wxGxRemoteServerUI::GetLargeImage(void)
 {
-    if(m_bIsConnected)
+    if(m_pNetConn && m_pNetConn->IsConnected())
         return m_LargeIcon;
     else
         return m_LargeDsblIcon;
@@ -43,8 +43,21 @@ wxIcon wxGxRemoteServerUI::GetLargeImage(void)
 
 wxIcon wxGxRemoteServerUI::GetSmallImage(void)
 {
-    if(m_bIsConnected)
+    if(m_pNetConn && m_pNetConn->IsConnected())
         return m_SmallIcon;
     else
         return m_SmallDsblIcon;
+}
+
+bool wxGxRemoteServerUI::Invoke(wxWindow* pParentWnd)
+{
+    if(m_pNetConn && !m_pNetConn->IsConnected())
+	{
+		if(m_pNetConn->Connect())
+		{
+			m_pCatalog->ObjectChanged(this);
+			return true;
+		}
+	}
+	return false;
 }
