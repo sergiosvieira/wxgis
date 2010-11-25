@@ -86,6 +86,21 @@ enum wxGISEnumTaskStateType
     enumGISTaskError
 };
 
+class IGxTask
+{
+public:
+    virtual ~IGxTask(void){};
+    //virtual wxString GetName(void) = 0;
+    virtual wxGISEnumTaskStateType GetState(void) = 0;
+    virtual wxDateTime GetStart() = 0;
+    virtual wxDateTime GetFinish() = 0;
+    virtual double GetDonePercent() = 0;
+    virtual wxString GetLastMessage() = 0;
+    virtual bool Start() = 0;
+    virtual bool Stop() = 0;
+    virtual bool Pause() = 0;
+};
+
 class IGPDomain
 {
 public:
