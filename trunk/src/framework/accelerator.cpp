@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/framework/accelerator.h"
-#include <wx/tokenzr.h>
+#include "wx/tokenzr.h"
 
 wxGISAcceleratorTable::wxGISAcceleratorTable(IApplication* pApp, IGISConfig* pConf) : bHasChanges(true)
 {
