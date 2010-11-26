@@ -109,7 +109,7 @@ void *wxClientUDPNotifier::Entry()
 				}
 			}
 		}
-		wxYieldIfNeeded();
+		//wxYieldIfNeeded();
 	}
 	return NULL;
 }
