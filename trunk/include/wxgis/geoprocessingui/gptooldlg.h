@@ -23,7 +23,7 @@
 #include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/geoprocessingui/gpcontrols.h"
-#include "wxgis/geoprocessing/gptoolmngr.h"
+#include "wxgis/geoprocessingui/gptoolbox.h"
 
 #include <wx/intl.h>
 
@@ -47,7 +47,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISGPToolDlg
 ///////////////////////////////////////////////////////////////////////////////
-class wxGISGPToolDlg : public wxFrame //Dialog
+class WXDLLIMPEXP_GIS_GPU wxGISGPToolDlg : public wxFrame //Dialog
 {
 private:
 
@@ -63,7 +63,7 @@ protected:
     wxHtmlWindow* m_htmlWin;
 
 public:
-    wxGISGPToolDlg( IGPTool* pTool, wxGISGPToolManager* pToolManager, wxXmlNode* pPropNode = NULL, wxWindow* parent = NULL, wxWindowID id = wxID_ANY, const wxString& title = _("Tool name"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 480,600 ), long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX|wxRESIZE_BORDER|wxSYSTEM_MENU|wxFRAME_FLOAT_ON_PARENT /*wxSTAY_ON_TOP|wxDIALOG_NO_PARENT|wxCLIP_CHILDREN*/ );
+    wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPTool* pTool, IGPCallBack* pCallBack = NULL, bool bSync = false, wxXmlNode* pPropNode = NULL, wxWindow* parent = NULL, wxWindowID id = wxID_ANY, const wxString& title = _("Tool name"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 480,600 ), long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX|wxRESIZE_BORDER|wxSYSTEM_MENU|wxFRAME_FLOAT_ON_PARENT /*wxSTAY_ON_TOP|wxDIALOG_NO_PARENT|wxCLIP_CHILDREN*/ );
     ~wxGISGPToolDlg();
     void m_splitterOnIdle( wxIdleEvent& )
     {
@@ -84,7 +84,9 @@ protected:
     IGPTool* m_pTool;
     wxXmlNode* m_pPropNode;
     std::vector<wxGISDTBase*> m_pControlsArray;
-    wxGISGPToolManager* m_pToolManager;
+    wxGxRootToolbox* m_pGxRootToolbox;
+    IGPCallBack* m_pCallBack;
+    bool m_bSync;
 
     DECLARE_EVENT_TABLE()
 };

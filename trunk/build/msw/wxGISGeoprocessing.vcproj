@@ -182,6 +182,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\src\geoprocessing\gpcreateovrtool.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\geoprocessing\gpdomain.cpp"
 				>
 			</File>
@@ -217,6 +221,10 @@
 			>
 			<File
 				RelativePath="..\..\include\wxgis\geoprocessing\geoprocessing.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geoprocessing\gpcreateovrtool.h"
 				>
 			</File>
 			<File

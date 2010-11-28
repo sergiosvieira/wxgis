@@ -19,13 +19,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#include "wxgis/geoprocessingui/gptasksview.h"
-//#include "wxgis/geoprocessingui/gptooldlg.h"
+#include "wxgis/geoprocessingui/gptaskexecdlg.h"
 #include "wxgis/framework/progressor.h"
-//#include "wxgis/framework/tooltip.h"
-
-//#include "../../art/tool_16.xpm"
-//#include "../../art/expand_16.xpm"
 
 #include "../../art/process_stop.xpm"
 #include "../../art/state.xpm"
@@ -40,13 +35,15 @@ BEGIN_EVENT_TABLE(wxGxTaskExecDlg, wxDialog)
     //EVT_BUTTON(ID_UPDATEMESSAGES, wxGxTaskExecDlg::OnUpdateMessages)
 END_EVENT_TABLE()
 
-wxGxTaskExecDlg::wxGxTaskExecDlg(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxDialog(parent, id, pTool->GetDisplayName(), pos, size, style), m_bExpand(false), m_nTaskThreadId(-1), m_pToolDialogPropNode(NULL), m_nState(enumGISMessageUnk)
+wxGxTaskExecDlg::wxGxTaskExecDlg(wxGISGPToolManager* pToolManager, IGPCallBack* pCallBack, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxDialog(parent, id, title, pos, size, style), m_bExpand(false), m_nState(enumGISMessageUnk), m_nTaskID(wxNOT_FOUND)//wxGISGPToolManager* pMngr, IGPTool* pTool, , m_pToolDialogPropNode(NULL), m_nTaskThreadId(-1)
 {
     m_ImageList.Create(16, 16);
 	m_ImageList.Add(wxBitmap(state_xpm));
 
-    m_pMngr = pMngr;
-    m_pTool = pTool;
+    m_pToolManager = pToolManager;
+    m_pCallBack = pCallBack;
+
+    //m_pTool = pTool;
 
     m_bMainSizer = new wxBoxSizer( wxVERTICAL );
  	wxFlexGridSizer* fgSizer1 = new wxFlexGridSizer( 1, 4, 0, 0 );
@@ -57,12 +54,12 @@ wxGxTaskExecDlg::wxGxTaskExecDlg(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWi
     m_pStateBitmap = new wxStaticBitmap( this, wxID_ANY, m_ImageList.GetIcon(4), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( m_pStateBitmap, 0, wxALL, 5 );
 
-    wxStaticText * title = new wxStaticText(this, wxID_ANY, pTool->GetDisplayName());
+    wxStaticText * soTitle = new wxStaticText(this, wxID_ANY, title);
     wxFont titleFont = this->GetFont();
     titleFont.SetWeight(wxFONTWEIGHT_BOLD);
-    title->SetFont(titleFont);
-    title->Wrap( -1 );
-	fgSizer1->Add( title, 1, wxALL | wxEXPAND, 5 );
+    soTitle->SetFont(titleFont);
+    soTitle->Wrap( -1 );
+	fgSizer1->Add( soTitle, 1, wxALL | wxEXPAND, 5 );
 
 
     m_ExpandBitmap = wxBitmap(m_ImageList.GetIcon(4));
@@ -220,10 +217,19 @@ void wxGxTaskExecDlg::FillHtmlWindow()
 //    FillHtmlWindow();
 //}
 //
-//void wxGxTaskExecDlg::OnFinish(bool bHasErrors, IGPTool* pTool)
-//{
+void wxGxTaskExecDlg::OnFinish(bool bHasErrors, IGPTool* pTool)
+{
+    m_bpCloseButton->Enable(true);
+    if(m_pCallBack)
+        m_pCallBack->OnFinish(bHasErrors, pTool);
+    if(m_pCheckBox->IsChecked())
+    {
+        Show(false);
+        //destroy
+        Destroy();
+    }
+
 //    //m_nState = bHasErrors == true ? enumGISMessageErr : enumGISMessageOK;
-//    //m_bpCloseButton->Enable(true);
 //
 //    //m_sHead = wxString::Format(_("Tool %s"), pTool->GetDisplayName().c_str());
 //    //if(m_nState == enumGISMessageErr)
@@ -261,7 +267,8 @@ void wxGxTaskExecDlg::FillHtmlWindow()
 //    //    //refresh;
 //    //    Refresh();
 //    //}
-//}
+
+}
 //
 //void wxGxTaskExecDlg::OnShowBallon(wxCommandEvent & event)
 //{
@@ -302,7 +309,7 @@ void wxGxTaskExecDlg::OnCancel(wxCommandEvent & event)
 //
 void wxGxTaskExecDlg::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType)
 {
-    wxCriticalSectionLocker locker(m_CritSec);
+    //wxCriticalSectionLocker locker(m_CritSec);
     if(nType == enumGISMessageTitle)
     {
         m_Text->SetLabel(sMessage);

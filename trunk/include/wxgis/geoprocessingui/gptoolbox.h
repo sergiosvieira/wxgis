@@ -21,6 +21,7 @@
 #pragma once
 
 #include "wxgis/catalogui/catalogui.h"
+#include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/geoprocessing/gptoolmngr.h"
 #include "wxgis/core/config.h"
 
@@ -72,6 +73,7 @@ protected:
 class WXDLLIMPEXP_GIS_GPU wxGxRootToolbox :
 	public wxGxToolbox,
     public IGxRootObjectProperties,
+    public IToolManagerUI,
     public wxObject
 {
    DECLARE_DYNAMIC_CLASS(wxGxRootToolbox)
@@ -88,6 +90,9 @@ public:
 	//wxGxRootToolbox
 	virtual void LoadChildren(void);
 	virtual wxGISGPToolManager* GetGPToolManager(void);
+	virtual void OnExecuteTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync);
+    //IToolManagerUI
+    virtual bool OnPrepareTool(wxWindow* pParentWnd, wxString sToolName, wxString sInputPath, IGPCallBack* pCallBack, bool bSync);
 protected:
 	wxString m_sPath;
 	bool m_bIsChildrenLoaded;
@@ -163,6 +168,8 @@ public:
 	//IGxObjectSort
     virtual bool IsAlwaysTop(void){return true;};
 	virtual bool IsSortEnabled(void){return false;};
+    // IToolManagerUI
+    virtual bool OnConfigTool(wxString sToolName, wxWindow *pParentWnd = NULL/*, callback???*/){return true;};
 protected:
     wxGxRootToolbox* m_pRootToolbox;
 };

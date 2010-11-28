@@ -191,7 +191,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\geoprocessingui\gptasksview.cpp"
+				RelativePath="..\..\src\geoprocessingui\gptaskexecdlg.cpp"
 				>
 			</File>
 			<File
@@ -229,7 +229,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wxgis\geoprocessingui\gptasksview.h"
+				RelativePath="..\..\include\wxgis\geoprocessingui\gptaskexecdlg.h"
 				>
 			</File>
 			<File
