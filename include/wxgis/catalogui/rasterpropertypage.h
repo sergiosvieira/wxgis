@@ -23,11 +23,13 @@
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalog/gxdataset.h"
 #include "wxgis/datasource/rasterdataset.h"
+#include "wxgis/geoprocessing/geoprocessing.h"
 
 #include "wx/propgrid/propgrid.h"
 
 class WXDLLIMPEXP_GIS_CLU wxGISRasterPropertyPage : 
-    public wxPanel
+    public wxPanel,
+    public IGPCallBack
 {
     DECLARE_DYNAMIC_CLASS(wxGISRasterPropertyPage)
 	enum
@@ -37,9 +39,9 @@ class WXDLLIMPEXP_GIS_CLU wxGISRasterPropertyPage :
 
 public:
     wxGISRasterPropertyPage(void);
-    wxGISRasterPropertyPage(wxGxRasterDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Raster"));
+    wxGISRasterPropertyPage(wxGxRasterDataset* pGxDataset, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Raster"));
 	~wxGISRasterPropertyPage();
-    virtual bool Create(wxGxRasterDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Raster"));
+    virtual bool Create(wxGxRasterDataset* pGxDataset, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Raster"));
     virtual wxString GetPageName(void){return wxString(_("Raster"));};
     wxPGId AppendProperty(wxPGProperty* pProp);
     wxPGId AppendProperty(wxPGId pid, wxPGProperty* pProp);
@@ -47,9 +49,12 @@ public:
     void FillGrid(void);
     //events
     void OnPropertyGridButtonClick ( wxCommandEvent& );
+    //IGPCallBack
+    virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL);
 protected:
     wxGISRasterDataset* m_pDataset;
     wxGxRasterDataset* m_pGxDataset;
+    IGxCatalog* m_pCatalog;
     wxPropertyGrid* m_pg;
 
     DECLARE_EVENT_TABLE()

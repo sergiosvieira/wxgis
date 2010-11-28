@@ -193,12 +193,17 @@ wxGISGPToolManager::~wxGISGPToolManager(void)
 
 IGPTool* wxGISGPToolManager::GetTool(wxString sToolName, IGxCatalog* pCatalog)
 {
-    if(m_ToolsMap[sToolName].pTool)
-	    return m_ToolsMap[sToolName].pTool;
+    std::map<wxString, TOOLINFO>::const_iterator it = m_ToolsMap.find(sToolName);
+    if(it != m_ToolsMap.end())
+	    return it->second.pTool;
 	wxObject *pObj = wxCreateDynamicObject(m_ToolsMap[sToolName].sClassName);
     IGPTool* pTool = dynamic_cast<IGPTool*>(pObj);
     if(!pTool)
+    {
+        TOOLINFO inf = {wxEmptyString, 0, NULL};
+        m_ToolsMap[sToolName] = inf;
         return NULL;
+    }
     pTool->SetCatalog(pCatalog);
     m_ToolsMap[sToolName].pTool = pTool;
 	return pTool;

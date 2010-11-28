@@ -22,7 +22,6 @@
 
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/geoprocessing/gptoolmngr.h"
-//#include "wxgis/catalogui/gxview.h"
 
 #include "wx/wxhtml.h"
 #include "wx/imaglist.h"
@@ -33,8 +32,8 @@
 
 class WXDLLIMPEXP_GIS_GPU wxGxTaskExecDlg :
 	public wxDialog,
-    public ITrackCancel/*,
-    public IGPCallBack*/
+    public ITrackCancel,
+    public IGPCallBack
 {
  //   enum
 	//{
@@ -42,8 +41,9 @@ class WXDLLIMPEXP_GIS_GPU wxGxTaskExecDlg :
  //       ID_UPDATEMESSAGES
 	//};
 public:
-	wxGxTaskExecDlg(wxGISGPToolManager* pMngr, IGPTool* pTool, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);//wxTAB_TRAVERSAL|wxBORDER_RAISED );
-    ~wxGxTaskExecDlg(void);
+	wxGxTaskExecDlg(wxGISGPToolManager* pToolManager, IGPCallBack* pCallBack, wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);//wxTAB_TRAVERSAL|wxBORDER_RAISED );wxGISGPToolManager* pMngr, IGPTool* pTool, 
+    virtual ~wxGxTaskExecDlg(void);
+    virtual void SetTaskID(int nTaskID){m_nTaskID = nTaskID;};
     //virtual void SetTaskThreadId(long nId);
     //virtual void SetToolDialog(wxWindow* pWindow, wxXmlNode* pNode);
     virtual void FillHtmlWindow();
@@ -53,7 +53,7 @@ public:
     //virtual void OnShowBallon(wxCommandEvent & event);
     //virtual void OnUpdateMessages(wxCommandEvent & event);
     //IGPCallBack
-    //virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL);
+    virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL);
     //ITrackCancel
 	virtual void PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType);
     typedef struct _message{
@@ -69,22 +69,24 @@ protected:
     wxBitmap m_ExpandBitmapBW, m_ExpandBitmap, m_ExpandBitmapBWRotated, m_ExpandBitmapRotated;
     wxBitmapButton* m_bpExpandButton;
     wxStaticText * m_Text;
-    long m_nTaskThreadId;
-    wxGISGPToolManager* m_pMngr;
     wxStaticBitmap* m_pStateBitmap;
     wxCheckBox* m_pCheckBox;
     wxBitmapButton* m_bpCloseButton;
     std::vector<MESSAGE> m_MessageArray;
-    wxCriticalSection m_CritSec;
 
-    IGPTool* m_pTool;
-    wxXmlNode* m_pToolDialogPropNode;
-    wxWindow* m_pToolDialogWindow;
+    //long m_nTaskThreadId;
+    //wxCriticalSection m_CritSec;
+    //IGPTool* m_pTool;
+    //wxXmlNode* m_pToolDialogPropNode;
+    //wxWindow* m_pToolDialogWindow;
 
     wxString m_sHead;
     wxString m_sNote;
     wxIcon m_Icon;
 
+    int m_nTaskID;
+    IGPCallBack* m_pCallBack;
+    wxGISGPToolManager* m_pToolManager;
 
     DECLARE_EVENT_TABLE();
 };

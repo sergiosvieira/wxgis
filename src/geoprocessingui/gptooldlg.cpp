@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessingui/gptooldlg.h"
-#include "wxgis/geoprocessingui/gptasksview.h"
+//#include "wxgis/geoprocessingui/gptasksview.h"
 #include "wxgis/framework/application.h"
 
 #include "../../art/tool_16.xpm"
@@ -36,11 +36,17 @@ BEGIN_EVENT_TABLE(wxGISGPToolDlg, wxFrame)
 	EVT_UPDATE_UI(wxID_OK, wxGISGPToolDlg::OnOkUI)
 END_EVENT_TABLE()
 
-wxGISGPToolDlg::wxGISGPToolDlg( IGPTool* pTool, wxGISGPToolManager* pToolManager, wxXmlNode* pPropNode, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style ), m_pToolManager(NULL)
+wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync, wxXmlNode* pPropNode, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
+    IApplication* pApp = ::GetApplication();
+    pApp->RegisterChildWindow(this);
+
     m_pTool = pTool;
     m_pPropNode = pPropNode;
-    m_pToolManager = pToolManager;
+    m_pGxRootToolbox = pGxRootToolbox;
+    m_pCallBack = pCallBack;
+    m_bSync = bSync;
+
 
 #ifdef __WXMSW__
 	SetIcon( wxIcon(tool_16_xpm) );
@@ -159,8 +165,6 @@ wxGISGPToolDlg::wxGISGPToolDlg( IGPTool* pTool, wxGISGPToolManager* pToolManager
     DlgSize.x = m_DataWidth;
     SetSize(DlgSize);
 
-    IApplication* pApp = ::GetApplication();
-    pApp->RegisterChildWindow(this);
     SerializeFramePos(false);
 }
 
@@ -198,8 +202,6 @@ void wxGISGPToolDlg::OnHelpUI(wxUpdateUIEvent& event)
 void wxGISGPToolDlg::OnOk(wxCommandEvent& event)
 {
     //event.Skip();
-    if(!m_pToolManager)
-        return;
 
     //wxGxTaskExecDlg dlg(pGPToolManager, pTool, pParentWnd, wxID_ANY);
     //dlg.ShowModal();
@@ -246,16 +248,21 @@ void wxGISGPToolDlg::OnOk(wxCommandEvent& event)
     ////to prevent destroy tool in this dialog (the tool should destroy in panel)
     //m_pTool = NULL;
 
-    //pApp->UnRegisterChildWindow(this);
-    //this->GetParent()->SetFocus();
-    //this->Destroy();
+    IApplication* pApp = ::GetApplication();
+    pApp->UnRegisterChildWindow(this);
+
+    this->GetParent()->SetFocus();
+    this->Destroy();
+
+    //begin execution
+    m_pGxRootToolbox->OnExecuteTool(this->GetParent(), m_pTool, m_pCallBack, m_bSync);
 }
 
 void wxGISGPToolDlg::OnCancel(wxCommandEvent& event)
 {
     IApplication* pApp = ::GetApplication();
     pApp->UnRegisterChildWindow(this);
-    //store properties
+
     this->GetParent()->SetFocus();
     this->Destroy();
 }

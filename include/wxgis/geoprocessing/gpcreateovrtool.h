@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
- * Purpose:  export geoprocessing tools.
+ * Purpose:  create overviews tools.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010 Bishop
@@ -21,21 +21,25 @@
 
 #pragma once
 
+#pragma once
+
 #include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/geoprocessing/gptool.h"
-#include "wxgis/geoprocessing/gpvector.h"
 
-/** \class wxGISGPExportTool gpexporttool.h
-    \brief The geoprocessing tool export vector data to various formats.
+/** \class wxGISGPOrthoCorrectTool gporthocorrecttool.h
+    \brief The geoprocessing tool create ortho corrected rasters.
+
+    The input rasters should have RPC
 */
-class WXDLLIMPEXP_GIS_GP wxGISGPExportTool : 
+
+class WXDLLIMPEXP_GIS_GP wxGISGPCreateOverviewsTool : 
     public wxGISGPTool
 {
-   DECLARE_DYNAMIC_CLASS(wxGISGPExportTool)
+   DECLARE_DYNAMIC_CLASS(wxGISGPCreateOverviewsTool)
 
 public:
-    wxGISGPExportTool(void);
-    ~wxGISGPExportTool(void);
+    wxGISGPCreateOverviewsTool(void);
+    ~wxGISGPCreateOverviewsTool(void);
     //IGPTool
     virtual wxString GetDisplayName(void);
     virtual wxString GetName(void);
@@ -43,5 +47,4 @@ public:
     virtual bool Execute(ITrackCancel* pTrackCancel);
     virtual bool Validate(void);
     virtual GPParameters* GetParameterInfo(void);
-    virtual bool OnExport(wxGISFeatureDataset* pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel);
 };

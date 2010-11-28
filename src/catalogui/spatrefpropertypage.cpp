@@ -77,6 +77,7 @@ bool wxGISSpatialReferencePropertyPage::Create(OGRSpatialReference* poSRS, wxWin
         //}
         else
             FillUndefined();
+        //OSRDestroySpatialReference(poSRS);
     }
     else
     {

@@ -28,5 +28,25 @@
 #define TOOLVIEWCTRLID	1015
 #define TASKSVIEWCTRLID	1016
 
+/** \class IToolManagerUI
+ *  \brief A base class (virtual) for config and run tool from UI.
+ */
+
+class IToolManagerUI
+{
+public:
+    virtual ~IToolManagerUI(void){};
+    /** \fn bool OnPrepareTool(wxWindow* pParentwnd, wxString sToolName, wxString sInputPath, IGPCallBack* pCallBack, bool bSync)
+     *  \brief Show tool config dialog, execute tool and return result via callback.
+     *  \param pParentWnd The Parent wxWindow created dialogs
+     *  \param sToolName The tool name (internal short name)
+     *  \param sInputPath The input path for tool (shows in config dialog)
+     *  \param pCallBack The callback executed on tool execution ends
+     *  \param bSync If bSync parameter is true, shows Execution dialog, and interface blocked. If bSync parameter is false, created GxTask Object and inserted to wxGxToolExecuteView.
+     *  \return false on error.
+     */	
+    virtual bool OnPrepareTool(wxWindow* pParentWnd, wxString sToolName, wxString sInputPath, IGPCallBack* pCallBack, bool bSync) = 0;
+};
+
 
 
