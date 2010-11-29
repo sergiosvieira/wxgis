@@ -20,6 +20,107 @@
  ****************************************************************************/
 #include "wxgis/networking/tcpnetwork.h"
 
+// ----------------------------------------------------------------------------
+// wxClientTCPReader
+// ----------------------------------------------------------------------------
+void *wxClientTCPReader::Entry()
+{
+	if(m_pSock == NULL)
+		return (ExitCode)-1;
+
+	while(!TestDestroy())
+	{
+		//WaitForRead
+		if(m_pSock->WaitForRead(0, 100))
+		{
+			m_pSock->ReadMsg(&buff, BUFF); 
+			if(m_pSock->Error())
+			{
+				wxThread::Sleep(10);
+				continue;
+			}
+			size_t nSize = m_pSock->LastCount();
+			wxNetMessage msg(buff, nSize);
+			if(msg.IsOk())
+			{
+				//add message to queure
+			}
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------
+// wxClientTCPWriter
+// ----------------------------------------------------------------------------
+void *wxClientTCPWriter::Entry()
+{
+	if(m_pSock == NULL)
+		return (ExitCode)-1;
+
+	while(!TestDestroy())
+	{
+		//WaitForRead
+		if(m_pSock->WaitForWrite(0, 100))
+		{
+			m_pSock->WriteMsg(&buff, BUFF); 
+
+		if(m_pSock->WaitForWrite(0, 10))
+		{
+			m_critsect_msgqueue.Enter();
+			if(m_msgqueue.size() != 0)
+			{      
+				wxString msg = m_msgqueue.front();
+				m_msgqueue.pop(); 
+				wxUint8 sys_type = CURROS;
+				m_pSock->WriteMsg(&sys_type, sizeof(wxUint8));
+				m_pSock->WriteMsg(msg.c_str(), (msg.Len() + 1) * sizeof(wxChar));
+			}
+			m_critsect_msgqueue.Leave();
+		}
+
+			if(m_pSock->Error())
+			{
+				wxThread::Sleep(10);
+				continue;
+			}
+			size_t nSize = m_pSock->LastCount();
+			wxNetMessage msg(buff, nSize);
+			if(msg.IsOk())
+			{
+				//add message to queure
+			}
+		}
+	}
+}
+
+
+// ----------------------------------------------------------------------------
+// wxClientTCPWaitlost
+// ----------------------------------------------------------------------------
+void *wxClientTCPWaitlost::Entry()
+{
+	if(m_pSock == NULL)
+		return (ExitCode)-1;
+
+	while(!TestDestroy())
+	{
+		if(m_pSock->WaitForLost(0, 100)/* || m_pSock->Error()*/)
+		{
+			break;
+		}
+	}
+	//send parent notify to delete me...
+	wxString data = wxString::Format(WEMESSAGE, NETVER, NETBYE, wxT(""), HIGH_PRIORITY, wxT("<bye/>"));
+
+	wxUint8 sys_type = CURROS;
+	m_pSock->WriteMsg(&sys_type, sizeof(wxUint8));
+	m_pSock->WriteMsg(data.c_str(), (data.Len() + 1) * sizeof(wxChar));
+	
+	wxLogMessage(_("TCPNetworkClientPlugin: Disconnected..."));
+	m_pParent->OnThreadExited();
+    return NULL;
+}
+
 //#include "wxgissrv/framework/message.h"
 //
 //// ----------------------------------------------------------------------------

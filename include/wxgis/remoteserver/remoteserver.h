@@ -68,3 +68,33 @@ public:
 };
 
 typedef std::vector<INetConnFactory*> NETCONNFACTORYARRAY;
+
+/** \class INetClientConnection networking.h
+    \brief The network connection interface class.
+
+	This class describes the network connection. Used in server connection list.
+*/
+class INetClientConnection : public INetConnection
+{
+public:
+    virtual ~INetConnection(void){};
+	//pure virtual
+    /** \fn wxXmlNode* GetProperties(void)
+     *  \brief Get Properties of plugin.
+     *  \return The properties of the plugin
+	 *
+	 *  It should be the new wxXmlNode (not a copy of setted properties)
+     */	 	
+	virtual wxXmlNode* GetProperties(void) = 0;
+    /** \fn void SetProperties(wxXmlNode* pProp)
+     *  \brief Set Properties of plugin.
+     *  \param pProp The properties of the plugin
+	 *
+	 *  Executed while LoadChildren (after connection class created). 
+     */	  
+	virtual bool SetProperties(const wxXmlNode* pProp) = 0;
+	virtual wxString GetName(void) = 0;
+	virtual bool Connect(void) = 0;
+};
+
+//typedef std::vector<INetConnection*> NETCONNARRAY;
