@@ -55,7 +55,7 @@ public:
 	//events
 	void OnSearchBtnClick( wxCommandEvent& event );
 	//wxNetPropertyPage
-	virtual INetConnection* OnSave(void);	
+	virtual INetClientConnection* OnSave(void);	
 
 private:
     wxString m_sPort;

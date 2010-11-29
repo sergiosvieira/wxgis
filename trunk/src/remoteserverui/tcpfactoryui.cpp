@@ -136,7 +136,7 @@ void wxGISTCPClientPanel::OnSearchBtnClick( wxCommandEvent& event )
 	event.Skip();
 }
 
-INetConnection* wxGISTCPClientPanel::OnSave(void)
+INetClientConnection* wxGISTCPClientPanel::OnSave(void)
 {
 	m_sErrorMsg.Clear();
 	if(!TransferDataFromWindow())

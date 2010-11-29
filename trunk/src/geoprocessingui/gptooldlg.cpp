@@ -269,6 +269,7 @@ void wxGISGPToolDlg::OnCancel(wxCommandEvent& event)
 
 void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
 {
+    //TODO: Fix tools state
     event.Enable(false);
     //internal control validate
     for(size_t i = 0; i < m_pControlsArray.size(); i++)

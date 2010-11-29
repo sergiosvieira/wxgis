@@ -57,7 +57,7 @@ public:
 	wxGISSearchServerDlg(INetConnFactory* pFactory, wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Search Server"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 400,300 ), long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
 	~wxGISSearchServerDlg();
 	virtual wxXmlNode* GetConnectionProperties(){return m_pConnProps;};
-	virtual INetConnection* GetConnection();
+	virtual INetClientConnection* GetConnection();
 	//INetSearchCallback
 	virtual void AddServer(wxXmlNode* pServerData);
 protected:

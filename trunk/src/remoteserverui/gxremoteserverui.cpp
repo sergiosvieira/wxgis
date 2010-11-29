@@ -21,7 +21,7 @@
 
 #include "wxgis/remoteserverui/gxremoteserverui.h"
 
-wxGxRemoteServerUI::wxGxRemoteServerUI(INetConnection* pNetConn, wxIcon SmallIcon, wxIcon LargeIcon, wxIcon SmallDsblIcon, wxIcon LargeDsblIcon) : wxGxRemoteServer(pNetConn)
+wxGxRemoteServerUI::wxGxRemoteServerUI(INetClientConnection* pNetConn, wxIcon SmallIcon, wxIcon LargeIcon, wxIcon SmallDsblIcon, wxIcon LargeDsblIcon) : wxGxRemoteServer(pNetConn)
 {
     m_SmallIcon = SmallIcon;
     m_LargeIcon = LargeIcon;

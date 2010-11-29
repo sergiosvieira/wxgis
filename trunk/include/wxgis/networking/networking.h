@@ -101,6 +101,8 @@ public:
     virtual bool IsOk(void) = 0;
     virtual const wxGISMessageDirection GetDirection(void) = 0;
     virtual void SetDirection(wxGISMessageDirection nDirection) = 0;
+    virtual const unsigned char* GetData(void) = 0;
+    virtual const size_t GetDataLen(void) = 0;
 };
 
 
@@ -111,7 +113,7 @@ typedef struct _msg
 	bool operator< (const _msg& x) const { return pMsg->GetPriority() < x.pMsg->GetPriority(); }
 } WXGISMSG;
 
-typedef std::priority_queue< MSG, std::deque<MSG> > WXGISMSGQUEUE;
+typedef std::priority_queue< WXGISMSG, std::deque<WXGISMSG> > WXGISMSGQUEUE;
 
 /** \class INetConnection networking.h
     \brief The network connection interface class.
@@ -119,16 +121,61 @@ typedef std::priority_queue< MSG, std::deque<MSG> > WXGISMSGQUEUE;
 class INetConnection
 {
 public:
-    virtual ~INetConnection(void){};
+    virtual ~INetConnection(void)
+    {
+        //clean OutMsgQueue
+        while( m_OutMsgQueue.size() > 0 )
+        {
+		    WXGISMSG Msg = m_OutMsgQueue.top();
+		    m_OutMsgQueue.pop();  
+            wxDELETE(Msg.pMsg);
+        }
+        //clean InMsgQueue
+        while( m_InMsgQueue.size() > 0 )
+        {
+		    WXGISMSG Msg = m_InMsgQueue.top();
+		    m_InMsgQueue.pop();  
+            wxDELETE(Msg.pMsg);
+        }
+    };
 	virtual bool Disconnect(void) = 0;
 	virtual bool IsConnected(void) = 0;
 	virtual const char GetUserID(void){return m_nUserID;};
-	virtual GetMessage;
-	virtual PutMessage;
+	virtual WXGISMSG GetInMessage(void)
+    {
+        WXGISMSG Msg = {NULL, -1};
+        if(m_InMsgQueue.size() > 0)
+        {
+            wxCriticalSectionLocker locker(m_CriticalSection);
+            Msg = m_InMsgQueue.top();
+            m_InMsgQueue.pop();
+        }
+        return Msg;
+    };
+	virtual void PutInMessage(WXGISMSG msg)
+    {
+        wxCriticalSectionLocker locker(m_CriticalSection);
+        m_InMsgQueue.push(msg);
+    }
+	virtual WXGISMSG GetOutMessage(void)
+    {
+        WXGISMSG Msg = {NULL, -1};
+        if(m_OutMsgQueue.size() > 0)
+        {
+            wxCriticalSectionLocker locker(m_CriticalSection);
+            Msg = m_OutMsgQueue.top();
+            m_InMsgQueue.pop();
+        }
+        return Msg;
+    };
+	virtual void PutOutMessage(WXGISMSG msg)
+    {
+        wxCriticalSectionLocker locker(m_CriticalSection);
+        m_OutMsgQueue.push(msg);
+    };
 protected:
-	char m_nUserID;	
-	//messages quere
-	WXGISMSGQUEUE m_MsgQuere;
-	//pop put msg
+	char m_nUserID;	//user ID for server, and -1 for client	
+	WXGISMSGQUEUE m_OutMsgQueue, m_InMsgQueue;//messages quere
+    wxCriticalSection m_CriticalSection;
 };
 

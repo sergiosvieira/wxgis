@@ -191,7 +191,7 @@ void wxGISSearchServerDlg::OnAcceptUI( wxUpdateUIEvent& event )
 	event.Enable(m_listCtrl->GetSelectedItemCount() == 1);
 }
 
-INetConnection* wxGISSearchServerDlg::GetConnection()
+INetClientConnection* wxGISSearchServerDlg::GetConnection()
 {
 	if(m_pFactory)
 		return m_pFactory->GetConnection(m_pConnProps);

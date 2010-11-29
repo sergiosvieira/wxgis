@@ -3,7 +3,7 @@
  * Purpose:  TCP network server class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2008-2010  Bishop
+*   Copyright (C) 2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,10 +19,17 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/networking/tcpnetwork.h"
+#include "wxgis/networking/message.h"
 
 // ----------------------------------------------------------------------------
 // wxClientTCPReader
 // ----------------------------------------------------------------------------
+wxClientTCPReader::wxClientTCPReader(INetConnection* pNetConnection, wxSocketBase* pSock)
+{
+    m_pNetConnection = pNetConnection;
+    m_pSock = pSock;
+}
+
 void *wxClientTCPReader::Entry()
 {
 	if(m_pSock == NULL)
@@ -33,6 +40,7 @@ void *wxClientTCPReader::Entry()
 		//WaitForRead
 		if(m_pSock->WaitForRead(0, 100))
 		{
+            unsigned char buff[BUFF] = {0};
 			m_pSock->ReadMsg(&buff, BUFF); 
 			if(m_pSock->Error())
 			{
@@ -40,18 +48,36 @@ void *wxClientTCPReader::Entry()
 				continue;
 			}
 			size_t nSize = m_pSock->LastCount();
-			wxNetMessage msg(buff, nSize);
-			if(msg.IsOk())
+			wxNetMessage* pMsg = new wxNetMessage(buff, nSize);
+			if(pMsg->IsOk())
 			{
 				//add message to queure
+                if(m_pNetConnection)
+                {
+                    WXGISMSG msg = {pMsg, m_pNetConnection->GetUserID()};
+                    m_pNetConnection->PutInMessage(msg);
+                }
 			}
+            else
+                wxDELETE(pMsg);
 		}
 	}
 }
 
+void wxClientTCPReader::OnExit()
+{
+}
+
+
 // ----------------------------------------------------------------------------
 // wxClientTCPWriter
 // ----------------------------------------------------------------------------
+wxClientTCPWriter::wxClientTCPWriter(INetConnection* pNetConnection, wxSocketBase* pSock)
+{
+    m_pNetConnection = pNetConnection;
+    m_pSock = pSock;
+}
+
 void *wxClientTCPWriter::Entry()
 {
 	if(m_pSock == NULL)
@@ -59,44 +85,42 @@ void *wxClientTCPWriter::Entry()
 
 	while(!TestDestroy())
 	{
-		//WaitForRead
-		if(m_pSock->WaitForWrite(0, 100))
-		{
-			m_pSock->WriteMsg(&buff, BUFF); 
+        if(m_pNetConnection)
+        {
+            //WaitForWrite
+            if(m_pSock->WaitForWrite(0, 100))
+            {
+                m_pSock->Discard();
 
-		if(m_pSock->WaitForWrite(0, 10))
-		{
-			m_critsect_msgqueue.Enter();
-			if(m_msgqueue.size() != 0)
-			{      
-				wxString msg = m_msgqueue.front();
-				m_msgqueue.pop(); 
-				wxUint8 sys_type = CURROS;
-				m_pSock->WriteMsg(&sys_type, sizeof(wxUint8));
-				m_pSock->WriteMsg(msg.c_str(), (msg.Len() + 1) * sizeof(wxChar));
-			}
-			m_critsect_msgqueue.Leave();
-		}
-
-			if(m_pSock->Error())
-			{
-				wxThread::Sleep(10);
-				continue;
-			}
-			size_t nSize = m_pSock->LastCount();
-			wxNetMessage msg(buff, nSize);
-			if(msg.IsOk())
-			{
-				//add message to queure
-			}
+                WXGISMSG msg = m_pNetConnection->GetOutMessage();
+                m_pSock->WriteMsg( msg.pMsg->GetData(), msg.pMsg->GetDataLen() ); 
+                
+                if(m_pSock->Error() || m_pSock->LastCount() != msg.pMsg->GetDataLen())
+                {
+                    m_pNetConnection->PutOutMessage(msg);
+                }
+                else
+                {
+                    wxDELETE(msg.pMsg);
+                }
+            }
 		}
 	}
 }
 
+void wxClientTCPWriter::OnExit()
+{
+}
 
 // ----------------------------------------------------------------------------
 // wxClientTCPWaitlost
 // ----------------------------------------------------------------------------
+wxClientTCPWaitlost::wxClientTCPWaitlost(INetConnection* pNetConnection, wxSocketBase* pSock)
+{
+    m_pNetConnection = pNetConnection;
+    m_pSock = pSock;
+}
+
 void *wxClientTCPWaitlost::Entry()
 {
 	if(m_pSock == NULL)
@@ -106,20 +130,28 @@ void *wxClientTCPWaitlost::Entry()
 	{
 		if(m_pSock->WaitForLost(0, 100)/* || m_pSock->Error()*/)
 		{
-			break;
+			return NULL;
 		}
 	}
-	//send parent notify to delete me...
-	wxString data = wxString::Format(WEMESSAGE, NETVER, NETBYE, wxT(""), HIGH_PRIORITY, wxT("<bye/>"));
 
-	wxUint8 sys_type = CURROS;
-	m_pSock->WriteMsg(&sys_type, sizeof(wxUint8));
-	m_pSock->WriteMsg(data.c_str(), (data.Len() + 1) * sizeof(wxChar));
-	
-	wxLogMessage(_("TCPNetworkClientPlugin: Disconnected..."));
-	m_pParent->OnThreadExited();
+    if(m_pNetConnection)
+        m_pNetConnection->Disconnect();
+
+	//send parent notify to delete me...
+	//wxString data = wxString::Format(WEMESSAGE, NETVER, NETBYE, wxT(""), HIGH_PRIORITY, wxT("<bye/>"));
+
+	//wxUint8 sys_type = CURROS;
+	//m_pSock->WriteMsg(&sys_type, sizeof(wxUint8));
+	//m_pSock->WriteMsg(data.c_str(), (data.Len() + 1) * sizeof(wxChar));
+    //m_pParent->OnThreadExited();
+
     return NULL;
 }
+
+void wxClientTCPWaitlost::OnExit()
+{
+}
+
 
 //#include "wxgissrv/framework/message.h"
 //

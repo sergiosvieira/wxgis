@@ -32,43 +32,6 @@ public:
 	virtual void AddServer(wxXmlNode* pServerData) = 0;
 };
 
-/** \class INetConnFactory remoteserver.h
-    \brief The network connection factory interface class.
-*/
-class INetConnFactory
-{
-public:
-    virtual ~INetConnFactory(void){};
-	//pure virtual
-	virtual bool StartServerSearch() = 0;
-	virtual bool StopServerSearch() = 0;
-	virtual bool CanStopServerSearch() = 0;
-	virtual bool IsServerSearching() = 0;
-	virtual void SetCallback(INetSearchCallback* pCallback) = 0;
-	virtual INetSearchCallback* GetCallback(void) = 0;
-	virtual wxString GetName(void) = 0;
-    virtual INetConnection* GetConnection(wxXmlNode* pProp) = 0;
-    /** \fn wxXmlNode* GetProperties(void)
-     *  \brief Get Properties of Factory.
-     *  \return The properties of the Factory.
-	 *
-	 *  It should be the new wxXmlNode (not a pointer to other xml data)
-     */	 	
-	virtual wxXmlNode* GetProperties(void) = 0;
-    /** \fn void SetProperties(wxXmlNode* pProp)
-     *  \brief Set Properties of plugin.
-     *  \param pProp The properties of the plugin
-	 *
-	 *  Executed while LoadPlugins (after flugin created). 
-     */	  
-	virtual void SetProperties(const wxXmlNode* pProp) = 0;
-
-	//virtual char GetID(void) = 0;
-	//virtual void SetID(char nID) = 0;
-};
-
-typedef std::vector<INetConnFactory*> NETCONNFACTORYARRAY;
-
 /** \class INetClientConnection networking.h
     \brief The network connection interface class.
 
@@ -77,7 +40,7 @@ typedef std::vector<INetConnFactory*> NETCONNFACTORYARRAY;
 class INetClientConnection : public INetConnection
 {
 public:
-    virtual ~INetConnection(void){};
+    virtual ~INetClientConnection(void){};
 	//pure virtual
     /** \fn wxXmlNode* GetProperties(void)
      *  \brief Get Properties of plugin.
@@ -98,3 +61,40 @@ public:
 };
 
 //typedef std::vector<INetConnection*> NETCONNARRAY;
+
+/** \class INetConnFactory remoteserver.h
+    \brief The network connection factory interface class.
+*/
+class INetConnFactory
+{
+public:
+    virtual ~INetConnFactory(void){};
+	//pure virtual
+	virtual bool StartServerSearch() = 0;
+	virtual bool StopServerSearch() = 0;
+	virtual bool CanStopServerSearch() = 0;
+	virtual bool IsServerSearching() = 0;
+	virtual void SetCallback(INetSearchCallback* pCallback) = 0;
+	virtual INetSearchCallback* GetCallback(void) = 0;
+	virtual wxString GetName(void) = 0;
+    virtual INetClientConnection* GetConnection(wxXmlNode* pProp) = 0;
+    /** \fn wxXmlNode* GetProperties(void)
+     *  \brief Get Properties of Factory.
+     *  \return The properties of the Factory.
+	 *
+	 *  It should be the new wxXmlNode (not a pointer to other xml data)
+     */	 	
+	virtual wxXmlNode* GetProperties(void) = 0;
+    /** \fn void SetProperties(wxXmlNode* pProp)
+     *  \brief Set Properties of plugin.
+     *  \param pProp The properties of the plugin
+	 *
+	 *  Executed while LoadPlugins (after flugin created). 
+     */	  
+	virtual void SetProperties(const wxXmlNode* pProp) = 0;
+
+	//virtual char GetID(void) = 0;
+	//virtual void SetID(char nID) = 0;
+};
+
+typedef std::vector<INetConnFactory*> NETCONNFACTORYARRAY;

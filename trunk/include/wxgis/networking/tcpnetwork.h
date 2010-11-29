@@ -3,7 +3,7 @@
  * Purpose:  TCP network server class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2008-2010  Bishop
+*   Copyright (C) 2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -28,10 +28,12 @@
 class wxClientTCPReader : public wxThread
 {
 public:
+    wxClientTCPReader(INetConnection* pNetConnection, wxSocketBase* pSock);
     virtual void *Entry();
     virtual void OnExit();
 protected:
-	wxSocketBase* m_pSock
+	wxSocketBase* m_pSock;
+    INetConnection* m_pNetConnection;
 };
 
 /** \class wxClientTCPWriter tcpnetwork.h
@@ -40,10 +42,12 @@ protected:
 class wxClientTCPWriter : public wxThread
 {
 public:
+    wxClientTCPWriter(INetConnection* pNetConnection, wxSocketBase* pSock);
     virtual void *Entry();
     virtual void OnExit();
 protected:
-	wxSocketBase* m_pSock
+	wxSocketBase* m_pSock;
+    INetConnection* m_pNetConnection;
 };
 
 /** \class wxClientTCPWaitlost tcpnetwork.h
@@ -52,10 +56,12 @@ protected:
 class wxClientTCPWaitlost : public wxThread
 {
 public:
+    wxClientTCPWaitlost(INetConnection* pNetConnection, wxSocketBase* pSock);
     virtual void *Entry();
     virtual void OnExit();
 protected:
-	wxSocketBase* m_pSock
+	wxSocketBase* m_pSock;
+    INetConnection* m_pNetConnection;
 };
 
 //read, write & waitlost threads

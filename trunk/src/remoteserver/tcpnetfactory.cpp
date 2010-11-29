@@ -78,7 +78,7 @@ void *wxClientUDPNotifier::Entry()
 			}
 			if(msg.GetState() == enumGISMsgStOk)
 			{
-				wxXmlNode* pRootNode = msg.GetRoot();
+				const wxXmlNode* pRootNode = msg.GetRoot();
 				wxXmlNode* pChild = pRootNode->GetChildren();
 				while(pChild)
 				{
@@ -200,9 +200,9 @@ void wxClientTCPNetFactory::SetProperties(const wxXmlNode* pProp)
 	m_sAddr = pProp->GetPropVal(wxT("addr"), wxT(""));
 }
 
-INetConnection* wxClientTCPNetFactory::GetConnection(wxXmlNode* pProp)
+INetClientConnection* wxClientTCPNetFactory::GetConnection(wxXmlNode* pProp)
 {
-	INetConnection* pConn = new wxClientTCPNetConnection();
+	INetClientConnection* pConn = new wxClientTCPNetConnection();
 	if(pConn->SetProperties(pProp))
 	{
 		wxDELETE(pProp);

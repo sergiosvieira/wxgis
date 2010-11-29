@@ -73,7 +73,7 @@ public:
     virtual void SetState(wxGISMessageState nState);
     virtual const wxXmlNode* GetRoot(void);
     virtual const unsigned char* GetData(void);
-    virtual size_t GetDataLen(void);
+    virtual const size_t GetDataLen(void);
 protected:
 	virtual wxString StrFromBuff(unsigned char* pBuff, size_t nBuffByteSize, size_t nValSize);
 	virtual bool LoadXMLFromStr(wxString sData);

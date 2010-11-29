@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/networking/message.h"
+
 #include <wx/stream.h>
 #include <wx/sstream.h>
 
@@ -117,7 +118,7 @@ wxNetMessage::~wxNetMessage(void)
     wxDELETE(m_pXmlDocument);
 }
 
-short wxNetMessage::GetPriority(void)
+const short wxNetMessage::GetPriority(void)
 {
     return m_nPriority;
 }
@@ -160,7 +161,7 @@ bool wxNetMessage::IsOk(void)
     return m_pXmlDocument->IsOk() && m_bIsOk;
 }
 
-wxGISMessageDirection wxNetMessage::GetDirection(void)
+const wxGISMessageDirection wxNetMessage::GetDirection(void)
 {
     return m_nDirection;
 }
@@ -170,7 +171,7 @@ void wxNetMessage::SetDirection(wxGISMessageDirection nDirection)
     m_nDirection = nDirection;
 }
 
-wxXmlNode* wxNetMessage::GetRoot(void)
+const wxXmlNode* wxNetMessage::GetRoot(void)
 {
 	if(!m_pXmlDocument)
 		if(!LoadXMLFromStr(m_sData))
@@ -198,7 +199,7 @@ const unsigned char* wxNetMessage::GetData(void)
     return (const unsigned char*)m_cData;
 }
 
-size_t wxNetMessage::GetDataLen(void)
+const size_t wxNetMessage::GetDataLen(void)
 {
 	if(m_sData.IsEmpty())
 		if(SavedXMLToStr(m_sData))
@@ -206,7 +207,7 @@ size_t wxNetMessage::GetDataLen(void)
 	return (m_sData.Len() + 1) * sizeof(wxChar) + sizeof(wxUint8);
 }
 
-wxGISMessageState wxNetMessage::GetState(void)
+const wxGISMessageState wxNetMessage::GetState(void)
 {
     return m_nState;
 }

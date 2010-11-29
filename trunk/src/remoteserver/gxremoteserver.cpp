@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "wxgis/remoteserver/gxremoteserver.h"
 
-wxGxRemoteServer::wxGxRemoteServer(INetConnection* pNetConn) : m_bIsChildrenLoaded(false)
+wxGxRemoteServer::wxGxRemoteServer(INetClientConnection* pNetConn) : m_bIsChildrenLoaded(false)
 {
 	m_pNetConn = pNetConn;
 }
