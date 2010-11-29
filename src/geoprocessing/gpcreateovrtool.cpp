@@ -96,25 +96,35 @@ GPParameters* wxGISGPCreateOverviewsTool::GetParameterInfo(void)
         pParam2->SetValue(_("Nearest"));
 
         m_pParamArr.push_back(pParam2);
+
+        //levels
     }
     return &m_pParamArr;
 }
 
 bool wxGISGPCreateOverviewsTool::Validate(void)
 {
-    if(!m_pParamArr[1]->GetAltered())
-    {
-        if(m_pParamArr[0]->GetIsValid())
-        {
-            //generate temp name
-            wxString sPath = m_pParamArr[0]->GetValue();
-            wxFileName Name(sPath);
-            Name.SetName(Name.GetName() + wxT("_ortho"));
-            m_pParamArr[1]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
-            m_pParamArr[1]->SetAltered(true);//??
-        }
-    }
 
+    //autogen levels
+         //       int nSize = MIN(pwxGISRasterDataset->GetHeight(), pwxGISRasterDataset->GetWidth());
+         //   int anOverviewList[25] = {0};
+         //   int nLevel(1);
+         //   int nLevelCount(0);
+         //   while(1)
+         //   {
+         //       nSize /= 2;
+         //       if(nSize < 20)
+         //           break;
+         //       nLevel *= 2;
+         //       if(nLevel != 2)
+         //       {
+         //           anOverviewList[nLevelCount] = nLevel;
+         //           nLevelCount++;
+         //       }
+         //   }
+	        ////int anOverviewList[8] = { 4, 8, 16, 32, 64, 128, 256, 512 };
+
+    //return m_pParamArr[0]->GetIsValid();
     return true;
 }
 

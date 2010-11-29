@@ -60,7 +60,7 @@ public:
 	virtual INetSearchCallback* GetCallback(void){return m_pCallback;};
 	virtual wxXmlNode* GetProperties(void);
 	virtual void SetProperties(const wxXmlNode* pProp);
-	INetConnection* GetConnection(wxXmlNode* pProp);
+	INetClientConnection* GetConnection(wxXmlNode* pProp);
 	//virtual char GetID(void){return m_nID;};
 	//virtual void SetID(char nID){m_nID = nID;};
 	//wxClientTCPNetFactory
@@ -79,7 +79,7 @@ protected:
 */
 class WXDLLIMPEXP_GIS_RS wxClientTCPNetConnection : 
 	public wxObject,
-	public INetConnection
+	public INetClientConnection
 {
     DECLARE_DYNAMIC_CLASS(wxClientTCPNetConnection)
 public:

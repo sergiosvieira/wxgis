@@ -84,7 +84,7 @@ void wxGxRemoteServersUI::LoadChildren(wxXmlNode* pConf)
 		wxString sClassName = pChild->GetPropVal(wxT("class"), NONAME);
 		if(!sClassName.IsEmpty())
 		{
-			INetConnection *pConn = dynamic_cast<INetConnection *>(wxCreateDynamicObject(sClassName));
+			INetClientConnection *pConn = dynamic_cast<INetClientConnection*>(wxCreateDynamicObject(sClassName));
 			if(pConn && pConn->SetProperties(pChild))
 			{
 				wxGxRemoteServerUI* pServerConn = new wxGxRemoteServerUI(pConn, m_RemServ16, m_RemServ48, m_RemServDsbld16, m_RemServDsbld48);
@@ -100,7 +100,7 @@ void wxGxRemoteServersUI::LoadChildren(wxXmlNode* pConf)
 
 void wxGxRemoteServersUI::CreateConnection(wxWindow* pParent, bool bSearch)
 {
-	INetConnection* pConn(NULL);
+	INetClientConnection* pConn(NULL);
 	if(bSearch)
 	{
 	}

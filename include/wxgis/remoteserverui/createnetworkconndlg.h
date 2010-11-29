@@ -45,10 +45,10 @@ class wxGISCreateNetworkConnDlg : public wxDialog
 public:
 	wxGISCreateNetworkConnDlg( NETCONNFACTORYARRAY& apNetConn, wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Create connection"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 350, 450 ), long style = wxCAPTION | wxCLOSE_BOX | wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxCLIP_CHILDREN );
 	~wxGISCreateNetworkConnDlg();
-	INetConnection* GetConnection(void){return m_pConnObj;};
+	INetClientConnection* GetConnection(void){return m_pConnObj;};
 protected:
 	void OnSaveBtnClick( wxCommandEvent& event );
-	INetConnection* m_pConnObj;
+	INetClientConnection* m_pConnObj;
 
 private:
 	wxBoxSizer* bSizer;

@@ -28,7 +28,7 @@ class WXDLLIMPEXP_GIS_RS wxGxRemoteServer :
 	public IGxObjectContainer
 {
 public:
-	wxGxRemoteServer(INetConnection* pNetConn);
+	wxGxRemoteServer(INetClientConnection* pNetConn);
 	virtual ~wxGxRemoteServer(void);
 	//IGxObject
 	virtual void Detach(void);
@@ -45,6 +45,6 @@ public:
     virtual bool Connect(void);
     virtual bool Disconnect(void);
 protected:
-    INetConnection* m_pNetConn;
+    INetClientConnection* m_pNetConn;
 	bool m_bIsChildrenLoaded;
 };

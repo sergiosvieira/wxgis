@@ -184,6 +184,8 @@ void wxGxRootToolbox::Init(wxXmlNode* pConfigNode)
 	m_pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, false);
 #endif
     m_pPropNode = new wxXmlNode(*pConfigNode);
+
+    LoadChildren();
 }
 
 void wxGxRootToolbox::LoadChildren(void)

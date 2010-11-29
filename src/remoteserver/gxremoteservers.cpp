@@ -128,7 +128,7 @@ void wxGxRemoteServers::LoadChildren(wxXmlNode* pConf)
 		wxString sClassName = pChild->GetPropVal(wxT("class"), NONAME);
 		if(!sClassName.IsEmpty())
 		{
-			INetConnection *pConn = dynamic_cast<INetConnection *>(wxCreateDynamicObject(sClassName));
+			INetClientConnection *pConn = dynamic_cast<INetClientConnection*>(wxCreateDynamicObject(sClassName));
 			if(pConn && pConn->SetProperties(pChild))
 			{
 				wxGxRemoteServer* pServerConn = new wxGxRemoteServer(pConn);

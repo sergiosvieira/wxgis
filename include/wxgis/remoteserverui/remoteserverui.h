@@ -45,7 +45,7 @@ public:
 		m_pFactory = pFactory;
 	}
 	virtual ~wxNetPropertyPage(void){};
-	virtual INetConnection* OnSave(void) = 0;
+	virtual INetClientConnection* OnSave(void) = 0;
 	virtual wxString GetLastError(void){return m_sErrorMsg;};
 protected:
 	INetConnFactoryUI* m_pFactory;
