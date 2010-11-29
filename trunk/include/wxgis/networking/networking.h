@@ -24,6 +24,8 @@
 
 #include "wx/socket.h"
 
+#include <queue>
+
 #define WIN 0
 #define LIN 1
 
@@ -75,7 +77,6 @@ enum wxGISCommandState
     enumGISCmdStStop
 };
 
-
 enum wxGISUserType
 {
     enumGISUserUnk,
@@ -83,52 +84,51 @@ enum wxGISUserType
     enumGISUserPass
 };
 
-//#define ANONIM 0
-//#define PASS 1
-
 #define FILETRANSFERBUFFSIZE 10240 
 #define MSGBUFFSIZE 15000
 #define SIMPLEMSGBUFFSIZE 1024
 
+/** \class INetMessage networking.h
+    \brief The network message interface class.
+*/
 class INetMessage
 {
 public:
     virtual ~INetMessage(void){};
 	//pure virtual
-    virtual short GetPriority(void) = 0;
+    virtual const short GetPriority(void) = 0;
     virtual void SetPriority(short nPriority) = 0;
-    //virtual bool operator< (const INetMessage& msg) const = 0;
-    //virtual INetMessage& operator= (const INetMessage& oSource) = 0;
     virtual bool IsOk(void) = 0;
-    virtual wxGISMessageDirection GetDirection(void) = 0;
+    virtual const wxGISMessageDirection GetDirection(void) = 0;
     virtual void SetDirection(wxGISMessageDirection nDirection) = 0;
 };
 
+
+typedef struct _msg
+{
+	INetMessage* pMsg;
+	char nUserID;
+	bool operator< (const _msg& x) const { return pMsg->GetPriority() < x.pMsg->GetPriority(); }
+} WXGISMSG;
+
+typedef std::priority_queue< MSG, std::deque<MSG> > WXGISMSGQUEUE;
+
+/** \class INetConnection networking.h
+    \brief The network connection interface class.
+*/
 class INetConnection
 {
 public:
     virtual ~INetConnection(void){};
-	//pure virtual
-    /** \fn wxXmlNode* GetProperties(void)
-     *  \brief Get Properties of plugin.
-     *  \return The properties of the plugin
-	 *
-	 *  It should be the new wxXmlNode (not a copy of setted properties)
-     */	 	
-	virtual wxXmlNode* GetProperties(void) = 0;
-    /** \fn void SetProperties(wxXmlNode* pProp)
-     *  \brief Set Properties of plugin.
-     *  \param pProp The properties of the plugin
-	 *
-	 *  Executed while LoadChildren (after connection class created). 
-     */	  
-	virtual bool SetProperties(const wxXmlNode* pProp) = 0;
-	virtual wxString GetName(void) = 0;
-	virtual bool Connect(void) = 0;
 	virtual bool Disconnect(void) = 0;
 	virtual bool IsConnected(void) = 0;
+	virtual const char GetUserID(void){return m_nUserID;};
+	virtual GetMessage;
+	virtual PutMessage;
+protected:
+	char m_nUserID;	
 	//messages quere
+	WXGISMSGQUEUE m_MsgQuere;
 	//pop put msg
 };
 
-//typedef std::vector<INetConnection*> NETCONNARRAY;

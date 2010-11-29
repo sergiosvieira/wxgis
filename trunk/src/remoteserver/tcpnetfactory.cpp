@@ -64,7 +64,7 @@ void *wxClientUDPNotifier::Entry()
 			m_socket->RecvFrom(BroadCastAddress, &buff, BUFF); 
 			if(m_socket->Error())
 			{
-				wxYieldIfNeeded();
+				//wxYieldIfNeeded();
 				wxThread::Sleep(10);
 				continue;
 			}
@@ -72,7 +72,7 @@ void *wxClientUDPNotifier::Entry()
 			wxNetMessage msg(buff, nSize);
 			if(!msg.IsOk())
 			{
-				wxYieldIfNeeded();
+				//wxYieldIfNeeded();
 				wxThread::Sleep(10);
 				continue;
 			}

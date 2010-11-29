@@ -62,16 +62,16 @@ public:
      *  \brief A destructor.
      */
 	virtual ~wxNetMessage(void);
-    virtual short GetPriority(void);
+    virtual const short GetPriority(void);
     virtual void SetPriority(short nPriority);
 ////    //virtual bool operator< (const INetMessage& msg) const;
 ////    //virtual INetMessage& operator= (const INetMessage& oSource);
     virtual bool IsOk(void);
-    virtual wxGISMessageDirection GetDirection(void);
+    virtual const wxGISMessageDirection GetDirection(void);
     virtual void SetDirection(wxGISMessageDirection nDirection);
-    virtual wxGISMessageState GetState(void);
+    virtual const wxGISMessageState GetState(void);
     virtual void SetState(wxGISMessageState nState);
-    virtual wxXmlNode* GetRoot(void);
+    virtual const wxXmlNode* GetRoot(void);
     virtual const unsigned char* GetData(void);
     virtual size_t GetDataLen(void);
 protected:

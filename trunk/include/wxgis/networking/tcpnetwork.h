@@ -22,6 +22,42 @@
 
 #include "wxgis/networking/networking.h"
 
+/** \class wxClientTCPReader tcpnetwork.h
+ *  \brief The tcp network connection reader thread.
+ */
+class wxClientTCPReader : public wxThread
+{
+public:
+    virtual void *Entry();
+    virtual void OnExit();
+protected:
+	wxSocketBase* m_pSock
+};
+
+/** \class wxClientTCPWriter tcpnetwork.h
+ *  \brief The tcp network connection writer thread.
+ */
+class wxClientTCPWriter : public wxThread
+{
+public:
+    virtual void *Entry();
+    virtual void OnExit();
+protected:
+	wxSocketBase* m_pSock
+};
+
+/** \class wxClientTCPWaitlost tcpnetwork.h
+ *  \brief The tcp network connection waitloast thread.
+ */
+class wxClientTCPWaitlost : public wxThread
+{
+public:
+    virtual void *Entry();
+    virtual void OnExit();
+protected:
+	wxSocketBase* m_pSock
+};
+
 //read, write & waitlost threads
 
 //
