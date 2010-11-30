@@ -139,7 +139,7 @@ public:
         }
     };
 	virtual bool Disconnect(void) = 0;
-	virtual bool IsConnected(void) = 0;
+	virtual bool IsConnected(void){return m_bIsConnected;};
 	virtual const char GetUserID(void){return m_nUserID;};
 	virtual WXGISMSG GetInMessage(void)
     {
@@ -177,5 +177,6 @@ protected:
 	char m_nUserID;	//user ID for server, and -1 for client	
 	WXGISMSGQUEUE m_OutMsgQueue, m_InMsgQueue;//messages quere
     wxCriticalSection m_CriticalSection;
+	bool m_bIsConnected;
 };
 

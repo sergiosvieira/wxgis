@@ -90,7 +90,6 @@ public:
 	virtual bool SetProperties(const wxXmlNode* pProp);
 	virtual bool Connect(void);
 	virtual bool Disconnect(void);
-	virtual bool IsConnected(void);
 	virtual wxString GetName(void){return m_sConnName;};
 protected:
 	wxString m_sConnName;
@@ -98,4 +97,8 @@ protected:
 	wxString m_sCryptPass;
 	wxString m_sIP;
 	wxString m_sPort;
+	wxSocketClient* m_pSock;
+	wxClientTCPReader* m_pClientTCPReader;
+	wxClientTCPWriter* m_pClientTCPWriter;
+	wxClientTCPWaitlost* m_pClientTCPWaitlost;
 };
