@@ -220,6 +220,9 @@ IMPLEMENT_DYNAMIC_CLASS(wxClientTCPNetConnection, wxObject)
 
 wxClientTCPNetConnection::wxClientTCPNetConnection(void)
 {
+	m_bIsConnected = false;
+	m_nUserID = -1;
+	m_pSock = NULL;
 }
 
 wxClientTCPNetConnection::~wxClientTCPNetConnection(void)
@@ -245,17 +248,77 @@ bool wxClientTCPNetConnection::SetProperties(const wxXmlNode* pProp)
 
 bool wxClientTCPNetConnection::Connect(void)
 {
+	if(m_bIsConnected)
+		return true;
+
+	//start conn
+	wxIPV4address addr;
+	addr.Hostname(m_sIP);
+	addr.Service(wxAtoi(m_sPort));
+	
+	// Create the socket
+	m_pSock = new wxSocketClient(wxSOCKET_WAITALL);
+
+	//
+	wxLogMessage(_("wxClientTCPNetFactory: Start connection..."));
+	//start reader thread
+	m_pClientTCPReader = new wxClientTCPReader(this, m_pSock);
+    if ( m_pClientTCPReader->Create() != wxTHREAD_NO_ERROR )
+    {
+		wxLogError(_("wxClientTCPNetFactory: Can't create TCPReader Thread!"));
+		return false;
+    }
+	if(m_pClientTCPReader->Run() != wxTHREAD_NO_ERROR )
+    {
+		wxLogError(_("wxClientTCPNetFactory: Can't run TCPReader Thread!"));
+		return false;
+    }
+    
+	//start writer thread
+	m_pClientTCPWriter = new wxClientTCPWriter(this, m_pSock);
+    if ( m_pClientTCPWriter->Create() != wxTHREAD_NO_ERROR )
+    {
+		wxLogError(_("wxClientTCPNetFactory: Can't create TCPWriter Thread!"));
+		return false;
+    }
+	if(m_pClientTCPWriter->Run() != wxTHREAD_NO_ERROR )
+    {
+		wxLogError(_("wxClientTCPNetFactory: Can't run TCPWriter Thread!"));
+		return false;
+    }
+
+	wxLogMessage(_("wxClientTCPNetConnection: Trying to connect (timeout = 5 sec) ..."));
+	pSock->Connect(addr, false);
+	pSock->WaitOnConnect(5);
+	if(pSock->IsConnected())
+	{
+		//start waitlost thread
+		m_pClientTCPWaitlost = wxClientTCPWaitlost(this, m_pSock);
+		if ( m_pClientTCPWaitlost->Create() != wxTHREAD_NO_ERROR )
+		{
+			wxLogError(_("wxClientTCPNetFactory: Can't create TCPWaitlost Thread!"));
+			return false;
+		}
+		if(m_pClientTCPWaitlost->Run() != wxTHREAD_NO_ERROR )
+		{
+			wxLogError(_("wxClientTCPNetFactory: Can't run TCPWaitlost Thread!"));
+			return false;
+		}		
+	}
+
+	//if connection is accepted
+
 	return true;
 }
 
 bool wxClientTCPNetConnection::Disconnect(void)
 {
+	if(!m_bIsConnected)
+		return true;
+
+	m_bIsConnected = false;
 	return true;
 }
 
-bool wxClientTCPNetConnection::IsConnected(void)
-{
-	return false;
-}
 
 
