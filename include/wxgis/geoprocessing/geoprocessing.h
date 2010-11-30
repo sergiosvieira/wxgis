@@ -188,3 +188,5 @@ public:
     virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL) = 0;
 };
 
+
+

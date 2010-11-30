@@ -21,6 +21,7 @@
 #pragma once
 
 #include "wxgis/remoteserver/remoteserver.h"
+#include "wxgis/networking/tcpnetwork.h"
 
 class wxClientTCPNetFactory;
 

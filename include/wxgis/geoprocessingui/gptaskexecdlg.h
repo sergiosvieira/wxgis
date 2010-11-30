@@ -43,7 +43,7 @@ class WXDLLIMPEXP_GIS_GPU wxGxTaskExecDlg :
 public:
 	wxGxTaskExecDlg(wxGISGPToolManager* pToolManager, IGPCallBack* pCallBack, wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);//wxTAB_TRAVERSAL|wxBORDER_RAISED );wxGISGPToolManager* pMngr, IGPTool* pTool, 
     virtual ~wxGxTaskExecDlg(void);
-    virtual void SetTaskID(int nTaskID){m_nTaskID = nTaskID;};
+    virtual void SetTaskID(int nTaskID);
     //virtual void SetTaskThreadId(long nId);
     //virtual void SetToolDialog(wxWindow* pWindow, wxXmlNode* pNode);
     virtual void FillHtmlWindow();

@@ -288,12 +288,12 @@ bool wxClientTCPNetConnection::Connect(void)
     }
 
 	wxLogMessage(_("wxClientTCPNetConnection: Trying to connect (timeout = 5 sec) ..."));
-	pSock->Connect(addr, false);
-	pSock->WaitOnConnect(5);
-	if(pSock->IsConnected())
+	m_pSock->Connect(addr, false);
+	m_pSock->WaitOnConnect(5);
+	if(m_pSock->IsConnected())
 	{
 		//start waitlost thread
-		m_pClientTCPWaitlost = wxClientTCPWaitlost(this, m_pSock);
+		m_pClientTCPWaitlost = new wxClientTCPWaitlost(this, m_pSock);
 		if ( m_pClientTCPWaitlost->Create() != wxTHREAD_NO_ERROR )
 		{
 			wxLogError(_("wxClientTCPNetFactory: Can't create TCPWaitlost Thread!"));
@@ -303,10 +303,12 @@ bool wxClientTCPNetConnection::Connect(void)
 		{
 			wxLogError(_("wxClientTCPNetFactory: Can't run TCPWaitlost Thread!"));
 			return false;
-		}		
-	}
+		}
+        
+        wxLogMessage(_("wxClientTCPNetFactory: Connected"));
+        //send auth?
 
-	//if connection is accepted
+	}
 
 	return true;
 }
@@ -315,6 +317,15 @@ bool wxClientTCPNetConnection::Disconnect(void)
 {
 	if(!m_bIsConnected)
 		return true;
+
+    m_pClientTCPReader->Delete();
+    m_pClientTCPReader = NULL;
+    m_pClientTCPWriter->Delete();
+    m_pClientTCPWriter = NULL;
+    m_pClientTCPWaitlost->Delete();
+    m_pClientTCPWaitlost = NULL;
+
+    CleanMsgQueueres();
 
 	m_bIsConnected = false;
 	return true;
