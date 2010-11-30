@@ -195,7 +195,11 @@ IGPTool* wxGISGPToolManager::GetTool(wxString sToolName, IGxCatalog* pCatalog)
 {
     std::map<wxString, TOOLINFO>::const_iterator it = m_ToolsMap.find(sToolName);
     if(it != m_ToolsMap.end())
+    {
+        if(!it->second.pTool->GetCatalog())
+            it->second.pTool->SetCatalog(pCatalog);
 	    return it->second.pTool;
+    }
 	wxObject *pObj = wxCreateDynamicObject(m_ToolsMap[sToolName].sClassName);
     IGPTool* pTool = dynamic_cast<IGPTool*>(pObj);
     if(!pTool)
@@ -209,7 +213,7 @@ IGPTool* wxGISGPToolManager::GetTool(wxString sToolName, IGxCatalog* pCatalog)
 	return pTool;
 }
 
-bool wxGISGPToolManager::OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel, IGPCallBack* pCallBack)
+int wxGISGPToolManager::OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel, IGPCallBack* pCallBack)
 {
     if(!pTool)
         return false;
@@ -218,33 +222,57 @@ bool wxGISGPToolManager::OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel, I
     m_ToolsMap[sToolName].nCount++;
 
     wxString sToolParams = pTool->GetAsString();
-    wxString sCommand = wxT("wxGISGeoprocess.exe -n ") + sToolName + wxT(" -p ") + sToolParams;
+    wxString sCommand = wxT("wxGISGeoprocess.exe -n ") + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");//"calc.exe");//
 
-    EXECDDATA data = {new wxGPProcess(this, pTrackCancel), pTool, sCommand, enumGISTaskQuered, pTrackCancel, pCallBack};
+    WXGISEXECDDATA data = {new wxGPProcess(this, pTrackCancel), pTool, sCommand, enumGISTaskQuered, pTrackCancel, pCallBack};
     m_ProcessArray.push_back(data);
+    int nTaskID = m_ProcessArray.size() - 1;
 
     if(m_nRunningTasks < m_nMaxTasks)
-        return ExecTask(data);
+        ExecTask(data);
 
-    return true;
+    return nTaskID;
 }
 
-bool wxGISGPToolManager::ExecTask(EXECDDATA data)
+bool wxGISGPToolManager::ExecTask(WXGISEXECDDATA data)
 {
-    long nRes = wxExecute(data.sCommand, wxEXEC_ASYNC, data.pGPProcess);
-    if(nRes != 0)
+    wxDateTime begin = wxDateTime::Now();
+    if(data.pTrackCancel)
+    {
+        data.pTrackCancel->PutMessage(wxString::Format(_("Executing (%s)"), data.pTool->GetName().c_str()), -1, enumGISMessageInfo);
+        //add some tool info
+        GPParameters* pParams = data.pTool->GetParameterInfo();
+        if(pParams)
+        {
+            data.pTrackCancel->PutMessage(wxString(_("Parameters:")), -1, enumGISMessageInfo);
+            for(size_t i = 0; i < pParams->size(); i++)
+            {
+                IGPParameter* pParam = pParams->operator[](i);
+                if(!pParam)
+                    continue;
+                wxString sParamName = pParam->GetName();
+                wxString sParamValue = pParam->GetValue();
+                data.pTrackCancel->PutMessage(wxString::Format(wxT("%s = %s"), sParamName.c_str(), sParamValue.c_str()), -1, enumGISMessageNorm);
+            }
+        }
+        data.pTrackCancel->PutMessage(wxString::Format(_("Start Time: %s"), begin.Format().c_str()), -1, enumGISMessageInfo);
+    }
+
+    long nPID = wxExecute(data.sCommand, wxEXEC_ASYNC, data.pGPProcess);
+    if(nPID <= 0)
     {
         data.nState = enumGISTaskError;
         if(data.pTrackCancel)
             data.pTrackCancel->PutMessage(_("Error start task!"), -1, enumGISMessageErr);
-        if(data.pCallBack)
-            data.pCallBack->OnFinish(true, data.pTool);
+        //if(data.pCallBack)
+        //    data.pCallBack->OnFinish(true, data.pTool);
         return false;
     }
 
     data.nState = enumGISTaskWork;
     data.pGPProcess->OnStartExecution();
     m_nRunningTasks++;
+
     return true;
 }
 
@@ -256,6 +284,21 @@ void wxGISGPToolManager::OnFinish(wxGPProcess* pGPProcess, bool bHasErrors)
             break;
     if(m_ProcessArray[nIndex].pCallBack)
         m_ProcessArray[nIndex].pCallBack->OnFinish(bHasErrors, m_ProcessArray[nIndex].pTool);
+
+    wxDateTime end = wxDateTime::Now();
+    if(m_ProcessArray[nIndex].pTrackCancel)
+    {
+        if(!bHasErrors)
+        {
+            m_ProcessArray[nIndex].pTrackCancel->PutMessage(wxString::Format(_("Executed (%s) successfully"), m_ProcessArray[nIndex].pTool->GetName().c_str()), -1, enumGISMessageInfo);
+            m_ProcessArray[nIndex].pTrackCancel->PutMessage(_("Done"), -1, enumGISMessageTitle);
+        }
+        else
+        {
+            m_ProcessArray[nIndex].pTrackCancel->PutMessage(wxString::Format(_("An error occured while executing %s. Failed to execute (%s)."), m_ProcessArray[nIndex].pTool->GetName().c_str(), m_ProcessArray[nIndex].pTool->GetName().c_str()), -1, enumGISMessageErr);
+            m_ProcessArray[nIndex].pTrackCancel->PutMessage(_("Error!"), -1, enumGISMessageTitle);
+        }
+    }
 
     //remove from array
     m_ProcessArray.erase(m_ProcessArray.begin() + nIndex);
@@ -287,3 +330,8 @@ wxString wxGISGPToolManager::GetPopularTool(size_t nIndex)
     std::advance(i, nIndex);
     return i->second;
 }
+
+//WXGISEXECDDATA wxGISGPToolManager::GetTask(size_t nIndex)
+//{
+//    return m_ProcessArray[nIndex];
+//}

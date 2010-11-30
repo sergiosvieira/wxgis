@@ -95,6 +95,8 @@ bool parse_commandline_parameters( int argc, char** argv )
 
     // Either we are using the defaults or the provided parameters were valid.
 
+    //while (getchar() != 'q'); test
+
     return true;
 
 } 

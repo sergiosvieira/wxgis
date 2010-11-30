@@ -192,6 +192,7 @@ public:
     virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void){return GetName();};
 	virtual wxString GetCategory(void){return wxString(_("Tool"));};
+    virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
@@ -199,14 +200,11 @@ public:
 	virtual wxString NewMenu(void){return wxEmptyString;};
     //IGxObjectWizard
     virtual bool Invoke(wxWindow* pParentWnd);
-	//wxGxTool
-	virtual bool IsOk(void){return m_bIsOk;};
 protected:
 	//wxString m_sPath;
 	wxString m_sName, m_sInternalName;
     wxXmlNode* m_pDataNode;
     wxGxRootToolbox* m_pRootToolbox;
-    bool m_bIsOk;
     wxIcon m_LargeToolIcon, m_SmallToolIcon;
 };
 

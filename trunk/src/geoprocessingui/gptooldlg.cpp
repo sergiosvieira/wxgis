@@ -251,11 +251,12 @@ void wxGISGPToolDlg::OnOk(wxCommandEvent& event)
     IApplication* pApp = ::GetApplication();
     pApp->UnRegisterChildWindow(this);
 
-    this->GetParent()->SetFocus();
+    wxWindow* pParentWnd = this->GetParent();
+    pParentWnd->SetFocus();
     this->Destroy();
 
     //begin execution
-    m_pGxRootToolbox->OnExecuteTool(this->GetParent(), m_pTool, m_pCallBack, m_bSync);
+    m_pGxRootToolbox->OnExecuteTool(pParentWnd, m_pTool, m_pCallBack, m_bSync);
 }
 
 void wxGISGPToolDlg::OnCancel(wxCommandEvent& event)
@@ -274,11 +275,8 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
     //internal control validate
     for(size_t i = 0; i < m_pControlsArray.size(); i++)
     {
-        if(m_pControlsArray[i] == NULL)
-            continue;
-        //if(!m_pControlsArray[i]->Validate())
-        //    return;
-        m_pControlsArray[i]->Validate();
+        if(m_pControlsArray[i])
+            m_pControlsArray[i]->Validate();
     }
 
     //tool validate
@@ -298,7 +296,7 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
             nNonValid++;
         if(pParam->GetHasBeenValidated())
             continue;
-        if(m_pControlsArray[i] != NULL)
+        if(m_pControlsArray[i])
         {
             if(bIsValid)
                 m_pControlsArray[i]->Validate();

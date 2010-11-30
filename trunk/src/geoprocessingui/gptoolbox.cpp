@@ -138,14 +138,9 @@ void wxGxToolbox::LoadChildrenFromXml(wxXmlNode* pNode)
         else if(pChild->GetName().IsSameAs(wxT("tool"), false))
         {
             wxGxTool* pTool = new wxGxTool(m_pRootToolbox, pChild, m_LargeToolIcon, m_SmallToolIcon);
-            if(pTool->IsOk())
-            {
-                IGxObject* pGxObj = static_cast<IGxObject*>(pTool);
-                if(!AddChild(pGxObj))
-                    wxDELETE(pGxObj);
-            }
-            else
-                wxDELETE(pTool);
+            IGxObject* pGxObj = static_cast<IGxObject*>(pTool);
+            if(!AddChild(pGxObj))
+                wxDELETE(pGxObj);
         }
         pChild = pChild->GetNext();
     }
@@ -271,7 +266,7 @@ void wxGxRootToolbox::OnExecuteTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCal
 {
     if(bSync)
     {
-        wxGxTaskExecDlg dlg(m_pToolMngr, pCallBack, pParentWnd);
+        wxGxTaskExecDlg dlg(m_pToolMngr, pCallBack, pParentWnd, wxID_ANY, pTool->GetDisplayName());
         int nTaskID = m_pToolMngr->OnExecute(pTool, static_cast<ITrackCancel*>(&dlg), static_cast<IGPCallBack*>(&dlg));
         dlg.SetTaskID(nTaskID);
         dlg.ShowModal();
@@ -361,14 +356,9 @@ void wxGxFavoritesToolbox::LoadChildren(void)
             for(size_t i = 0; i < nCount; i++)
             {
                 wxGxTool* pTool = new wxGxTool(m_pRootToolbox, pGPToolManager->GetPopularTool(i), m_LargeToolIcon, m_SmallToolIcon);
-                if(pTool->IsOk())
-                {
-                    IGxObject* pGxObj = static_cast<IGxObject*>(pTool);
-                    if(!AddChild(pGxObj))
-                        wxDELETE(pGxObj);
-                }
-                else
-                    wxDELETE(pTool);
+                IGxObject* pGxObj = static_cast<IGxObject*>(pTool);
+                if(!AddChild(pGxObj))
+                    wxDELETE(pGxObj);
            }
         }
     }
@@ -426,39 +416,22 @@ wxString wxGxToolExecute::GetName(void)
 // wxGxTool
 /////////////////////////////////////////////////////////////////////////
 
-wxGxTool::wxGxTool(wxGxRootToolbox* pRootToolbox, wxXmlNode* pDataNode, wxIcon LargeToolIcon, wxIcon SmallToolIcon) : m_bIsOk(true)
+wxGxTool::wxGxTool(wxGxRootToolbox* pRootToolbox, wxXmlNode* pDataNode, wxIcon LargeToolIcon, wxIcon SmallToolIcon)
 {
     m_pDataNode = pDataNode;
     m_pRootToolbox = pRootToolbox;
     if(m_pDataNode && m_pRootToolbox)
-    {
         m_sInternalName = m_pDataNode->GetPropVal(wxT("name"), NONAME);
-        wxGISGPToolManager* pGPToolManager = m_pRootToolbox->GetGPToolManager();
-        IGPTool* pTool = pGPToolManager->GetTool(m_sInternalName, m_pCatalog);
-        if(pTool)
-        {
-            m_sName = pTool->GetDisplayName();
-        }
-        else
-            m_bIsOk = false;
-    }
+
     m_LargeToolIcon = LargeToolIcon;
     m_SmallToolIcon = SmallToolIcon;
 }
 
-wxGxTool::wxGxTool(wxGxRootToolbox* pRootToolbox, wxString sInternalName, wxIcon LargeToolIcon, wxIcon SmallToolIcon) : m_bIsOk(true)
+wxGxTool::wxGxTool(wxGxRootToolbox* pRootToolbox, wxString sInternalName, wxIcon LargeToolIcon, wxIcon SmallToolIcon)
 {
     m_pDataNode = NULL;
     m_pRootToolbox = pRootToolbox;
     m_sInternalName = sInternalName;
-    wxGISGPToolManager* pGPToolManager = m_pRootToolbox->GetGPToolManager();
-    IGPTool* pTool = pGPToolManager->GetTool(m_sInternalName, m_pCatalog);
-    if(pTool)
-    {
-        m_sName = pTool->GetDisplayName();
-    }
-    else
-        m_bIsOk = false;
 
     m_LargeToolIcon = LargeToolIcon;
     m_SmallToolIcon = SmallToolIcon;
@@ -490,4 +463,19 @@ bool wxGxTool::Invoke(wxWindow* pParentWnd)
     //callback create/destroy gxtask
     m_pRootToolbox->OnPrepareTool(pParentWnd, m_sInternalName, wxEmptyString, NULL/*???*/, false);
     return false;
+}
+
+bool wxGxTool::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
+{
+    if(!IGxObject::Attach(pParent, pCatalog))
+        return false;
+    wxGISGPToolManager* pGPToolManager = m_pRootToolbox->GetGPToolManager();
+    IGPTool* pTool = pGPToolManager->GetTool(m_sInternalName, m_pCatalog);
+    if(pTool)
+    {
+        m_sName = pTool->GetDisplayName();
+        return true;
+    }
+    else
+        return false;
 }

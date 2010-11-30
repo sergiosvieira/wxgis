@@ -130,12 +130,11 @@ void *wxClientTCPWaitlost::Entry()
 	{
 		if(m_pSock->WaitForLost(0, 100)/* || m_pSock->Error()*/)
 		{
-			return NULL;
+            if(m_pNetConnection)
+                m_pNetConnection->Disconnect();
 		}
 	}
 
-    if(m_pNetConnection)
-        m_pNetConnection->Disconnect();
 
 	//send parent notify to delete me...
 	//wxString data = wxString::Format(WEMESSAGE, NETVER, NETBYE, wxT(""), HIGH_PRIORITY, wxT("<bye/>"));

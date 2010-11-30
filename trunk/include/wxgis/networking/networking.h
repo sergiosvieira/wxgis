@@ -123,20 +123,7 @@ class INetConnection
 public:
     virtual ~INetConnection(void)
     {
-        //clean OutMsgQueue
-        while( m_OutMsgQueue.size() > 0 )
-        {
-		    WXGISMSG Msg = m_OutMsgQueue.top();
-		    m_OutMsgQueue.pop();  
-            wxDELETE(Msg.pMsg);
-        }
-        //clean InMsgQueue
-        while( m_InMsgQueue.size() > 0 )
-        {
-		    WXGISMSG Msg = m_InMsgQueue.top();
-		    m_InMsgQueue.pop();  
-            wxDELETE(Msg.pMsg);
-        }
+        CleanMsgQueueres();
     };
 	virtual bool Disconnect(void) = 0;
 	virtual bool IsConnected(void){return m_bIsConnected;};
@@ -172,6 +159,23 @@ public:
     {
         wxCriticalSectionLocker locker(m_CriticalSection);
         m_OutMsgQueue.push(msg);
+    };
+    virtual void CleanMsgQueueres(void)
+    {
+        //clean OutMsgQueue
+        while( m_OutMsgQueue.size() > 0 )
+        {
+		    WXGISMSG Msg = m_OutMsgQueue.top();
+		    m_OutMsgQueue.pop();  
+            wxDELETE(Msg.pMsg);
+        }
+        //clean InMsgQueue
+        while( m_InMsgQueue.size() > 0 )
+        {
+		    WXGISMSG Msg = m_InMsgQueue.top();
+		    m_InMsgQueue.pop();  
+            wxDELETE(Msg.pMsg);
+        }
     };
 protected:
 	char m_nUserID;	//user ID for server, and -1 for client	

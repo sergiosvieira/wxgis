@@ -26,6 +26,7 @@
 #include "wx/thread.h"
 #include "wx/process.h"
 
+
 class WXDLLIMPEXP_GIS_GP wxGISGPToolManager;
 
 ///** \class wxGISGPTaskThread gptoolmngr.h
@@ -59,6 +60,16 @@ protected:
     ITrackCancel* m_pTrackCancel;
 };
 
+typedef struct _wxgisexecddata
+{
+    wxGPProcess* pGPProcess;
+    IGPTool* pTool;
+    wxString sCommand;
+    wxGISEnumTaskStateType nState;
+    ITrackCancel* pTrackCancel;
+    IGPCallBack* pCallBack;
+} WXGISEXECDDATA;
+
 /** \class wxGISGPToolManager gptoolmngr.h
  *  \brief A Geoprocessing tools manager.
  *
@@ -68,28 +79,20 @@ class WXDLLIMPEXP_GIS_GP wxGISGPToolManager
 {
 public:
 	friend class wxGPProcess;
-    typedef struct _execddata
-    {
-        wxGPProcess* pGPProcess;
-        IGPTool* pTool;
-        wxString sCommand;
-        wxGISEnumTaskStateType nState;
-        ITrackCancel* pTrackCancel;
-        IGPCallBack* pCallBack;
-    } EXECDDATA;
 public:
     wxGISGPToolManager(wxXmlNode* pToolsNode);
     virtual ~wxGISGPToolManager(void);
     virtual IGPTool* GetTool(wxString sToolName, IGxCatalog* pCatalog = NULL);
-    virtual bool OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel = NULL, IGPCallBack* pCallBack = NULL);
+    virtual int OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel = NULL, IGPCallBack* pCallBack = NULL);
     virtual size_t GetToolCount();
     virtual wxString GetPopularTool(size_t nIndex);
     //virtual void StartProcess(size_t nIndex);
     //virtual void CancelProcess(size_t nIndex);
     //virtual void PauseProcess(size_t nIndex);
+    //virtual WXGISEXECDDATA GetTask(size_t nIndex);
 protected:
     virtual void OnFinish(wxGPProcess* pGPProcess, bool bHasErrors);
-    virtual bool ExecTask(EXECDDATA data);
+    virtual bool ExecTask(WXGISEXECDDATA data);
 public:
     typedef struct _toolinfo
     {
@@ -102,7 +105,7 @@ protected:
     wxXmlNode* m_pToolsNode;
     std::map<wxString, TOOLINFO> m_ToolsMap;
     std::multimap<int, wxString> m_ToolsPopularMap;
-    std::vector<EXECDDATA> m_ProcessArray;
+    std::vector<WXGISEXECDDATA> m_ProcessArray;
     short m_nMaxTasks, m_nRunningTasks;
 };
 

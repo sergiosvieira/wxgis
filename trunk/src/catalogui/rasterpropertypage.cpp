@@ -539,7 +539,7 @@ void wxGISRasterPropertyPage::OnPropertyGridButtonClick ( wxCommandEvent& )
     else if(sName.Cmp(OVR_TXT) == 0)//create ovr tool
         sToolName = wxString(wxT("create_ovr"));
 
-    pToolManagerUI->OnPrepareTool(this, sToolName, m_pDataset->GetPath(), static_cast<IGPCallBack*>(this), true);
+    pToolManagerUI->OnPrepareTool(this, sToolName, m_pGxDataset->GetFullName(), static_cast<IGPCallBack*>(this), true);
 }
 
 void wxGISRasterPropertyPage::OnFinish(bool bHasErrors, IGPTool* pTool)

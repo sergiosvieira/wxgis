@@ -278,6 +278,13 @@ void wxGxTaskExecDlg::OnFinish(bool bHasErrors, IGPTool* pTool)
 //
 void wxGxTaskExecDlg::OnCancel(wxCommandEvent & event)
 {
+    //if exec
+    //cancel m_nTaskID
+    //else close dialog
+    Show(false);
+    //destroy
+    this->Destroy();
+
     //if(m_nState != enumGISMessageUnk)
     //{
     //    if(m_nState == enumGISMessageErr)
@@ -310,11 +317,39 @@ void wxGxTaskExecDlg::OnCancel(wxCommandEvent & event)
 void wxGxTaskExecDlg::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType)
 {
     //wxCriticalSectionLocker locker(m_CritSec);
-    if(nType == enumGISMessageTitle)
+
+//    //if(m_nState == enumGISMessageErr)
+//    //{
+//    //    m_Icon = m_ImageList.GetIcon(2);
+//    //    m_pStateBitmap->SetIcon(m_Icon);
+//    //    m_sNote = wxString(_("Completed with errors!"));
+//    //}
+//    //else
+//    //{
+//    //    m_Icon = m_ImageList.GetIcon(1);
+//    //    m_pStateBitmap->SetIcon(m_Icon);
+//    //    wxDELETE(pTool);
+//    //    m_sNote = wxString(_("Completed successfully!"));
+//    //}
+    switch(nType)
     {
+    case enumGISMessageTitle:
         m_Text->SetLabel(sMessage);
         return;
+    case enumGISMessageErr:
+        m_Text->SetLabel(sMessage);
+        m_Icon = m_ImageList.GetIcon(2);
+        m_pStateBitmap->SetIcon(m_Icon);
+        break;
+    case enumGISMessageQuestion:
+    case enumGISMessageInfo:
+    case enumGISMessageWarning:
+    case enumGISMessageNorm:
+    case enumGISMessageUnk:
+    default:
+        break;
     }
+
 
     MESSAGE msg = {nType, sMessage};
     if(nIndex == -1 || m_MessageArray.size() < nIndex)
@@ -328,6 +363,17 @@ void wxGxTaskExecDlg::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMess
     //wxCommandEvent event(wxEVT_COMMAND_BUTTON_CLICKED, ID_UPDATEMESSAGES);
     //::wxPostEvent(this, event);
 }
+
+void wxGxTaskExecDlg::SetTaskID(int nTaskID)
+{
+    m_nTaskID = nTaskID;
+    //if(m_pToolManager)
+    //{
+    //    WXGISEXECDDATA data = m_pToolManager->GetTask(m_nTaskID);
+    //    SetLabel(data.pTool->GetDisplayName());
+    //}
+}
+
 
 //void wxGxTaskPanel::OnKeyDown(wxKeyEvent & event)
 //{

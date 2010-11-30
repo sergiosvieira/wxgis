@@ -25,7 +25,7 @@
 /** \class wxClientTCPReader tcpnetwork.h
  *  \brief The tcp network connection reader thread.
  */
-class wxClientTCPReader : public wxThread
+class WXDLLIMPEXP_GIS_NET wxClientTCPReader : public wxThread
 {
 public:
     wxClientTCPReader(INetConnection* pNetConnection, wxSocketBase* pSock);
@@ -39,7 +39,7 @@ protected:
 /** \class wxClientTCPWriter tcpnetwork.h
  *  \brief The tcp network connection writer thread.
  */
-class wxClientTCPWriter : public wxThread
+class WXDLLIMPEXP_GIS_NET wxClientTCPWriter : public wxThread
 {
 public:
     wxClientTCPWriter(INetConnection* pNetConnection, wxSocketBase* pSock);
@@ -53,7 +53,7 @@ protected:
 /** \class wxClientTCPWaitlost tcpnetwork.h
  *  \brief The tcp network connection waitloast thread.
  */
-class wxClientTCPWaitlost : public wxThread
+class WXDLLIMPEXP_GIS_NET wxClientTCPWaitlost : public wxThread
 {
 public:
     wxClientTCPWaitlost(INetConnection* pNetConnection, wxSocketBase* pSock);
