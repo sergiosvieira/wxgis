@@ -125,25 +125,27 @@ public:
     {
         CleanMsgQueueres();
     };
+	virtual bool Connect(void) = 0;
 	virtual bool Disconnect(void) = 0;
 	virtual bool IsConnected(void){return m_bIsConnected;};
 	virtual const char GetUserID(void){return m_nUserID;};
-	virtual WXGISMSG GetInMessage(void)
-    {
-        WXGISMSG Msg = {NULL, -1};
-        if(m_InMsgQueue.size() > 0)
-        {
-            wxCriticalSectionLocker locker(m_CriticalSection);
-            Msg = m_InMsgQueue.top();
-            m_InMsgQueue.pop();
-        }
-        return Msg;
-    };
-	virtual void PutInMessage(WXGISMSG msg)
-    {
-        wxCriticalSectionLocker locker(m_CriticalSection);
-        m_InMsgQueue.push(msg);
-    }
+	virtual void SetUserID(const char nUserID){m_nUserID = nUserID;};
+	virtual WXGISMSG GetInMessage(void) = 0;
+    //{
+    //    WXGISMSG Msg = {NULL, -1};
+    //    if(m_InMsgQueue.size() > 0)
+    //    {
+    //        wxCriticalSectionLocker locker(m_CriticalSection);
+    //        Msg = m_InMsgQueue.top();
+    //        m_InMsgQueue.pop();
+    //    }
+    //    return Msg;
+    //};
+	virtual void PutInMessage(WXGISMSG msg) = 0;
+    //{
+    //    wxCriticalSectionLocker locker(m_CriticalSection);
+    //    m_InMsgQueue.push(msg);
+    //}
 	virtual WXGISMSG GetOutMessage(void)
     {
         WXGISMSG Msg = {NULL, -1};
@@ -169,17 +171,17 @@ public:
 		    m_OutMsgQueue.pop();  
             wxDELETE(Msg.pMsg);
         }
-        //clean InMsgQueue
-        while( m_InMsgQueue.size() > 0 )
-        {
-		    WXGISMSG Msg = m_InMsgQueue.top();
-		    m_InMsgQueue.pop();  
-            wxDELETE(Msg.pMsg);
-        }
+      //  //clean InMsgQueue
+      //  while( m_InMsgQueue.size() > 0 )
+      //  {
+		    //WXGISMSG Msg = m_InMsgQueue.top();
+		    //m_InMsgQueue.pop();  
+      //      wxDELETE(Msg.pMsg);
+      //  }
     };
 protected:
 	char m_nUserID;	//user ID for server, and -1 for client	
-	WXGISMSGQUEUE m_OutMsgQueue, m_InMsgQueue;//messages quere
+	WXGISMSGQUEUE m_OutMsgQueue;//, m_InMsgQueuemessages quere
     wxCriticalSection m_CriticalSection;
 	bool m_bIsConnected;
 };

@@ -165,17 +165,10 @@ bool wxClientTCPNetFactory::StartServerSearch()
 	}
 	//create & strart notify thread
 	m_pClientUDPNotifier = new wxClientUDPNotifier(this);
-    if ( m_pClientUDPNotifier->Create() != wxTHREAD_NO_ERROR )
-    {
-		wxLogError(_("wxClientTCPNetFactory: Can't create Notifier Thread!"));
+	if(!CreateAndRunThread(m_pClientUDPNotifier, wxT("wxClientTCPNetFactory"), wxT("Notifier")))
 		return false;
-    }
-	if(m_pClientUDPNotifier->Run() != wxTHREAD_NO_ERROR )
-    {
-		wxLogError(_("wxClientTCPNetFactory: Can't run Notifier Thread!"));
-		return false;
-    }
-    wxLogMessage(_("wxClientTCPNetFactory: Wait Notifier Thread 0x%lx started (priority = %u)"), m_pClientUDPNotifier->GetId(), m_pClientUDPNotifier->GetPriority());
+    wxLogMessage(_("%s: Wait %s Thread 0x%lx started (priority = %u)"), wxT("wxClientTCPNetFactory"), wxT("Notifier"), m_pClientUDPNotifier->GetId(), m_pClientUDPNotifier->GetPriority());
+
 	//send broadcast
 	m_pClientUDPNotifier->SendBroadcastMsg();
 	return true;
@@ -263,29 +256,13 @@ bool wxClientTCPNetConnection::Connect(void)
 	wxLogMessage(_("wxClientTCPNetFactory: Start connection..."));
 	//start reader thread
 	m_pClientTCPReader = new wxClientTCPReader(this, m_pSock);
-    if ( m_pClientTCPReader->Create() != wxTHREAD_NO_ERROR )
-    {
-		wxLogError(_("wxClientTCPNetFactory: Can't create TCPReader Thread!"));
-		return false;
-    }
-	if(m_pClientTCPReader->Run() != wxTHREAD_NO_ERROR )
-    {
-		wxLogError(_("wxClientTCPNetFactory: Can't run TCPReader Thread!"));
-		return false;
-    }
+	if(!CreateAndRunThread(m_pClientTCPReader, wxT("wxClientTCPNetFactory"), wxT("TCPReader")))
+		return false; 
     
 	//start writer thread
 	m_pClientTCPWriter = new wxClientTCPWriter(this, m_pSock);
-    if ( m_pClientTCPWriter->Create() != wxTHREAD_NO_ERROR )
-    {
-		wxLogError(_("wxClientTCPNetFactory: Can't create TCPWriter Thread!"));
-		return false;
-    }
-	if(m_pClientTCPWriter->Run() != wxTHREAD_NO_ERROR )
-    {
-		wxLogError(_("wxClientTCPNetFactory: Can't run TCPWriter Thread!"));
-		return false;
-    }
+	if(!CreateAndRunThread(m_pClientTCPWriter, wxT("wxClientTCPNetFactory"), wxT("TCPWriter")))
+		return false; 
 
 	wxLogMessage(_("wxClientTCPNetConnection: Trying to connect (timeout = 5 sec) ..."));
 	m_pSock->Connect(addr, false);
@@ -294,20 +271,10 @@ bool wxClientTCPNetConnection::Connect(void)
 	{
 		//start waitlost thread
 		m_pClientTCPWaitlost = new wxClientTCPWaitlost(this, m_pSock);
-		if ( m_pClientTCPWaitlost->Create() != wxTHREAD_NO_ERROR )
-		{
-			wxLogError(_("wxClientTCPNetFactory: Can't create TCPWaitlost Thread!"));
-			return false;
-		}
-		if(m_pClientTCPWaitlost->Run() != wxTHREAD_NO_ERROR )
-		{
-			wxLogError(_("wxClientTCPNetFactory: Can't run TCPWaitlost Thread!"));
-			return false;
-		}
-        
+		if(!CreateAndRunThread(m_pClientTCPWaitlost, wxT("wxClientTCPNetFactory"), wxT("TCPWaitlost")))
+			return false; 
         wxLogMessage(_("wxClientTCPNetFactory: Connected"));
         //send auth?
-
 	}
 
 	return true;

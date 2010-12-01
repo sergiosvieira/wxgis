@@ -3,7 +3,7 @@
  * Purpose:  core header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -106,3 +106,21 @@ enum wxGISEnumMessageType
     enumGISMessageOK
 };
 
+static bool CreateAndRunThread(wxThread* pThread, wxString sClassName = wxEmptyString, wxString sThreadName = wxEmptyString)
+{
+	if(!pThread)
+		return false;
+	if(sClassName.IsEmpty())
+		sClassName = wxString(_("wxGISCore"));
+    if ( pThread->Create() != wxTHREAD_NO_ERROR )
+    {
+		wxLogError(_("%s: Can't create %s Thread!"), sClassName, sThreadName);
+		return false;
+    }
+	if(pThread->Run() != wxTHREAD_NO_ERROR )
+    {
+		wxLogError(_("%s: Can't run %s Thread!"), sClassName, sThreadName);
+		return false;
+    }
+	return true;
+}

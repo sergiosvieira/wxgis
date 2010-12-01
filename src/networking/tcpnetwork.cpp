@@ -22,15 +22,15 @@
 #include "wxgis/networking/message.h"
 
 // ----------------------------------------------------------------------------
-// wxClientTCPReader
+// wxNetTCPReader
 // ----------------------------------------------------------------------------
-wxClientTCPReader::wxClientTCPReader(INetConnection* pNetConnection, wxSocketBase* pSock)
+wxNetTCPReader::wxNetTCPReader(INetConnection* pNetConnection, wxSocketBase* pSock)
 {
     m_pNetConnection = pNetConnection;
     m_pSock = pSock;
 }
 
-void *wxClientTCPReader::Entry()
+void *wxNetTCPReader::Entry()
 {
 	if(m_pSock == NULL)
 		return (ExitCode)-1;
@@ -64,21 +64,21 @@ void *wxClientTCPReader::Entry()
 	}
 }
 
-void wxClientTCPReader::OnExit()
+void wxNetTCPReader::OnExit()
 {
 }
 
 
 // ----------------------------------------------------------------------------
-// wxClientTCPWriter
+// wxNetTCPWriter
 // ----------------------------------------------------------------------------
-wxClientTCPWriter::wxClientTCPWriter(INetConnection* pNetConnection, wxSocketBase* pSock)
+wxNetTCPWriter::wxNetTCPWriter(INetConnection* pNetConnection, wxSocketBase* pSock)
 {
     m_pNetConnection = pNetConnection;
     m_pSock = pSock;
 }
 
-void *wxClientTCPWriter::Entry()
+void *wxNetTCPWriter::Entry()
 {
 	if(m_pSock == NULL)
 		return (ExitCode)-1;
@@ -108,20 +108,20 @@ void *wxClientTCPWriter::Entry()
 	}
 }
 
-void wxClientTCPWriter::OnExit()
+void wxNetTCPWriter::OnExit()
 {
 }
 
 // ----------------------------------------------------------------------------
-// wxClientTCPWaitlost
+// wxNetTCPWaitlost
 // ----------------------------------------------------------------------------
-wxClientTCPWaitlost::wxClientTCPWaitlost(INetConnection* pNetConnection, wxSocketBase* pSock)
+wxNetTCPWaitlost::wxNetTCPWaitlost(INetConnection* pNetConnection, wxSocketBase* pSock)
 {
     m_pNetConnection = pNetConnection;
     m_pSock = pSock;
 }
 
-void *wxClientTCPWaitlost::Entry()
+void *wxNetTCPWaitlost::Entry()
 {
 	if(m_pSock == NULL)
 		return (ExitCode)-1;
@@ -147,7 +147,7 @@ void *wxClientTCPWaitlost::Entry()
     return NULL;
 }
 
-void wxClientTCPWaitlost::OnExit()
+void wxNetTCPWaitlost::OnExit()
 {
 }
 

@@ -99,7 +99,7 @@ protected:
 	wxString m_sIP;
 	wxString m_sPort;
 	wxSocketClient* m_pSock;
-	wxClientTCPReader* m_pClientTCPReader;
-	wxClientTCPWriter* m_pClientTCPWriter;
-	wxClientTCPWaitlost* m_pClientTCPWaitlost;
+	wxNetTCPReader* m_pClientTCPReader;
+	wxNetTCPWriter* m_pClientTCPWriter;
+	wxNetTCPWaitlost* m_pClientTCPWaitlost;
 };
