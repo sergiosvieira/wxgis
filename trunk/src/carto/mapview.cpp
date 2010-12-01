@@ -285,16 +285,8 @@ void wxGISMapView::OnDraw(wxDC& dc)
 
 		//start draw thread
 		m_pThread = new wxDrawingThread(this, m_Layers);
-		if ( !m_pThread || m_pThread->Create() != wxTHREAD_NO_ERROR )
-		{
-			wxLogError(wxString(_("wxGISMapView: Can't create wxDrawingThread!")));
+		if(!CreateAndRunThread(m_pThread, wxT("wxGISMapView"), wxT("wxDrawingThread")))
 			return;
-		}
-        if( !m_pThread || m_pThread->Run() != wxTHREAD_NO_ERROR )
-		{
-			wxLogError(wxString(_("wxGISMapView: Can't run wxDrawingThread!")));
-			return;
-		}
 
 		//wxScrolledWindow::SetFocus();
 

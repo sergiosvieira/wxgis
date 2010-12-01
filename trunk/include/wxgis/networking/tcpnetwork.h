@@ -22,13 +22,13 @@
 
 #include "wxgis/networking/networking.h"
 
-/** \class wxClientTCPReader tcpnetwork.h
+/** \class wxNetTCPReader tcpnetwork.h
  *  \brief The tcp network connection reader thread.
  */
-class WXDLLIMPEXP_GIS_NET wxClientTCPReader : public wxThread
+class WXDLLIMPEXP_GIS_NET wxNetTCPReader : public wxThread
 {
 public:
-    wxClientTCPReader(INetConnection* pNetConnection, wxSocketBase* pSock);
+    wxNetTCPReader(INetConnection* pNetConnection, wxSocketBase* pSock);
     virtual void *Entry();
     virtual void OnExit();
 protected:
@@ -39,10 +39,10 @@ protected:
 /** \class wxClientTCPWriter tcpnetwork.h
  *  \brief The tcp network connection writer thread.
  */
-class WXDLLIMPEXP_GIS_NET wxClientTCPWriter : public wxThread
+class WXDLLIMPEXP_GIS_NET wxNetTCPWriter : public wxThread
 {
 public:
-    wxClientTCPWriter(INetConnection* pNetConnection, wxSocketBase* pSock);
+    wxNetTCPWriter(INetConnection* pNetConnection, wxSocketBase* pSock);
     virtual void *Entry();
     virtual void OnExit();
 protected:
@@ -53,10 +53,10 @@ protected:
 /** \class wxClientTCPWaitlost tcpnetwork.h
  *  \brief The tcp network connection waitloast thread.
  */
-class WXDLLIMPEXP_GIS_NET wxClientTCPWaitlost : public wxThread
+class WXDLLIMPEXP_GIS_NET wxNetTCPWaitlost : public wxThread
 {
 public:
-    wxClientTCPWaitlost(INetConnection* pNetConnection, wxSocketBase* pSock);
+    wxNetTCPWaitlost(INetConnection* pNetConnection, wxSocketBase* pSock);
     virtual void *Entry();
     virtual void OnExit();
 protected:

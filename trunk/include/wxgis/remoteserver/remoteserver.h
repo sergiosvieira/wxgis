@@ -57,7 +57,6 @@ public:
      */	  
 	virtual bool SetProperties(const wxXmlNode* pProp) = 0;
 	virtual wxString GetName(void) = 0;
-	virtual bool Connect(void) = 0;
 };
 
 //typedef std::vector<INetConnection*> NETCONNARRAY;
