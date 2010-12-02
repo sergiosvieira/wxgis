@@ -41,9 +41,9 @@ public:
 	virtual bool AreChildrenViewable(void){return true;};
 	virtual bool HasChildren(void){/*LoadChildren();*/ return m_Children.size() > 0 ? true : false;};
     //wxGxRemoteServer
-    virtual wxXmlNode* GetProperties(void);
     virtual bool Connect(void);
     virtual bool Disconnect(void);
+    virtual wxXmlNode* GetProperties(void);
 protected:
     INetClientConnection* m_pNetConn;
 	bool m_bIsChildrenLoaded;

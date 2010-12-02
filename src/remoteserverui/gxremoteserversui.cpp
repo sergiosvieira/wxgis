@@ -90,7 +90,13 @@ void wxGxRemoteServersUI::LoadChildren(wxXmlNode* pConf)
 				wxGxRemoteServerUI* pServerConn = new wxGxRemoteServerUI(pConn, m_RemServ16, m_RemServ48, m_RemServDsbld16, m_RemServDsbld48);
 				IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
 				if(!AddChild(pGxObj))
+				{
 					wxDELETE(pGxObj);
+				}
+				else//set callback
+				{
+					pConn->SetCallback(static_cast<INetCallback*>(pServerConn));
+				}
 			}
 		}
 		pChild = pChild->GetNext();
@@ -120,6 +126,7 @@ void wxGxRemoteServersUI::CreateConnection(wxWindow* pParent, bool bSearch)
 		}
 		else
 		{
+			pConn->SetCallback(static_cast<INetCallback*>(pServerConn));
 			m_pCatalog->ObjectAdded(pGxObj);
 			m_pCatalog->ObjectChanged(this);
 		}

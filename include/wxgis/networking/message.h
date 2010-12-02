@@ -56,7 +56,7 @@ public:
 	 *	\param nSize input buffer size
      */    
     wxNetMessage(unsigned char* pBuff, size_t nSize);
-    wxNetMessage(wxString sMsgData, long nID);
+    wxNetMessage(wxString sMsgData);
 //    wxNetMessage(long nID, wxGISMessageState nState = enumGISMsgStUnk, short nPriority = enumGISPriorityNormal, wxString sMessage = wxEmptyString, wxString sModuleSrc = wxEmptyString, wxString sModuleDst = wxEmptyString);
     /** \fn virtual ~wxNetMessage(void)
      *  \brief A destructor.
@@ -80,7 +80,6 @@ protected:
 	virtual bool SavedXMLToStr(wxString sData);
 protected:
 	wxXmlDocument *m_pXmlDocument;
-	long m_nID;
 	bool m_bIsOk;
 	short m_nPriority;
 	wxGISMessageDirection m_nDirection;

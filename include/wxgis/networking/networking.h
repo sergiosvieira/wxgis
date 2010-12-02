@@ -23,6 +23,7 @@
 #include "wxgis/base.h"
 
 #include "wx/socket.h"
+#include "wx/xml/xml.h"
 
 #include <queue>
 
@@ -40,8 +41,8 @@ enum wxGISMessagePriority
 	enumGISPriorityLowest   = 0, 
 	enumGISPriorityLow      = 25,
 	enumGISPriorityNormal   = 50,
-	enumGISPriorityHight    = 75,
-    enumGISPriorityHightest = 100
+	enumGISPriorityHigh     = 75,
+    enumGISPriorityHighest  = 100
 };
 
 enum wxGISMessageDirection
@@ -130,7 +131,7 @@ public:
 	virtual bool IsConnected(void){return m_bIsConnected;};
 	virtual const char GetUserID(void){return m_nUserID;};
 	virtual void SetUserID(const char nUserID){m_nUserID = nUserID;};
-	virtual WXGISMSG GetInMessage(void) = 0;
+	//virtual WXGISMSG GetInMessage(void) = 0;
     //{
     //    WXGISMSG Msg = {NULL, -1};
     //    if(m_InMsgQueue.size() > 0)
@@ -153,7 +154,7 @@ public:
         {
             wxCriticalSectionLocker locker(m_CriticalSection);
             Msg = m_OutMsgQueue.top();
-            m_InMsgQueue.pop();
+            m_OutMsgQueue.pop();
         }
         return Msg;
     };

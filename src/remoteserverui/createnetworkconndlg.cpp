@@ -39,7 +39,8 @@ wxGISCreateNetworkConnDlg::wxGISCreateNetworkConnDlg( NETCONNFACTORYARRAY& apNet
 	{
 		wxString sName = apNetConn[i]->GetName();
 		INetConnFactoryUI* pConnFactUI = dynamic_cast<INetConnFactoryUI*>(apNetConn[i]);
-		m_choicebook->AddPage(pConnFactUI->GetPropertyPage(m_choicebook), sName);
+        if(pConnFactUI)
+            m_choicebook->AddPage(pConnFactUI->GetPropertyPage(m_choicebook), sName);
 	}
 	
 	bSizer->Add( m_choicebook, 1, wxEXPAND|wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );

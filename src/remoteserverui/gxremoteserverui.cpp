@@ -53,11 +53,23 @@ bool wxGxRemoteServerUI::Invoke(wxWindow* pParentWnd)
 {
     if(m_pNetConn && !m_pNetConn->IsConnected())
 	{
-		if(m_pNetConn->Connect())
-		{
-			m_pCatalog->ObjectChanged(this);
-			return true;
-		}
+		return m_pNetConn->Connect();
 	}
 	return false;
+}
+
+void wxGxRemoteServerUI::OnConnect(void)
+{
+	m_pCatalog->ObjectChanged(this);
+}
+
+void wxGxRemoteServerUI::OnDisconnect(void)
+{
+	m_pCatalog->ObjectChanged(this);
+}
+
+void wxGxRemoteServerUI::PutInMessage(WXGISMSG msg)
+{
+	//any messages goes here
+	//translate messages
 }

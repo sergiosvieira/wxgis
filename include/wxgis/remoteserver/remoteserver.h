@@ -24,12 +24,28 @@
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/networking/networking.h"
 
+/** \class INetSearchCallback networking.h
+    \brief The callback class to add found servers.
+*/
 class INetSearchCallback
 {
 public:
     virtual ~INetSearchCallback(void){};
 	//pure virtual
 	virtual void AddServer(wxXmlNode* pServerData) = 0;
+};
+
+/** \class INetCallback networking.h
+    \brief The network callback class.
+*/
+class INetCallback
+{
+public:
+    virtual ~INetCallback(void){};
+	//pure virtual
+    virtual void OnConnect(void) = 0;
+    virtual void OnDisconnect(void) = 0;
+    virtual void PutInMessage(WXGISMSG msg) = 0;
 };
 
 /** \class INetClientConnection networking.h
@@ -49,13 +65,15 @@ public:
 	 *  It should be the new wxXmlNode (not a copy of setted properties)
      */	 	
 	virtual wxXmlNode* GetProperties(void) = 0;
-    /** \fn void SetProperties(wxXmlNode* pProp)
+    /** \fn void SetProperties(wxXmlNode* pProp, INetCallback* pNetCallback)
      *  \brief Set Properties of plugin.
      *  \param pProp The properties of the plugin
+     *  \param pNetCallback The callback pointer
 	 *
 	 *  Executed while LoadChildren (after connection class created). 
      */	  
 	virtual bool SetProperties(const wxXmlNode* pProp) = 0;
+	virtual void SetCallback(INetCallback* pNetCallback) = 0;
 	virtual wxString GetName(void) = 0;
 };
 
