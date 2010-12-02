@@ -47,6 +47,8 @@ wxClientUDPNotifier::wxClientUDPNotifier(wxClientTCPNetFactory* pFactory) : wxTh
 	m_socket->SetOption(SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval)); 
 	//m_socket->SetOption(SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval)); 
 	//m_socket->SetOption(SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)); 
+	m_socket->SetNotify(wxSOCKET_INPUT_FLAG | wxSOCKET_OUTPUT_FLAG | wxSOCKET_LOST_FLAG);
+    m_socket->Notify(false);
 }
 
 void *wxClientUDPNotifier::Entry()
@@ -116,8 +118,7 @@ void *wxClientUDPNotifier::Entry()
 
 void wxClientUDPNotifier::OnExit()
 {
-	if(m_socket)
-		m_socket->Destroy();
+    wxDELETE(m_socket);
 }
 
 void wxClientUDPNotifier::SendBroadcastMsg(void)
@@ -127,8 +128,8 @@ void wxClientUDPNotifier::SendBroadcastMsg(void)
 	BroadCastAddress.Service(m_pFactory->GetAdvPort()); // port on which we listen for the answers 
 
 	// Create the socket 
-	wxString sMsg = wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStHello, enumGISPriorityHightest);
-	wxNetMessage msg(sMsg, wxID_ANY);
+	wxString sMsg = wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStHello, enumGISPriorityHighest);
+	wxNetMessage msg(sMsg);
     if(msg.IsOk())
     {
 		m_socket->Discard();
@@ -216,6 +217,10 @@ wxClientTCPNetConnection::wxClientTCPNetConnection(void)
 	m_bIsConnected = false;
 	m_nUserID = -1;
 	m_pSock = NULL;
+    m_pClientTCPReader = NULL;
+    m_pClientTCPWriter = NULL;
+    m_pClientTCPWaitlost = NULL;
+	m_pCallBack = NULL;
 }
 
 wxClientTCPNetConnection::~wxClientTCPNetConnection(void)
@@ -251,16 +256,18 @@ bool wxClientTCPNetConnection::Connect(void)
 	
 	// Create the socket
 	m_pSock = new wxSocketClient(wxSOCKET_WAITALL);
+	m_pSock->SetNotify(wxSOCKET_INPUT_FLAG | wxSOCKET_OUTPUT_FLAG | wxSOCKET_LOST_FLAG);
+    m_pSock->Notify(false);
 
 	//
 	wxLogMessage(_("wxClientTCPNetFactory: Start connection..."));
 	//start reader thread
-	m_pClientTCPReader = new wxClientTCPReader(this, m_pSock);
+	m_pClientTCPReader = new wxNetTCPReader(this, m_pSock);
 	if(!CreateAndRunThread(m_pClientTCPReader, wxT("wxClientTCPNetFactory"), wxT("TCPReader")))
 		return false; 
     
 	//start writer thread
-	m_pClientTCPWriter = new wxClientTCPWriter(this, m_pSock);
+	m_pClientTCPWriter = new wxNetTCPWriter(this, m_pSock);
 	if(!CreateAndRunThread(m_pClientTCPWriter, wxT("wxClientTCPNetFactory"), wxT("TCPWriter")))
 		return false; 
 
@@ -270,13 +277,26 @@ bool wxClientTCPNetConnection::Connect(void)
 	if(m_pSock->IsConnected())
 	{
 		//start waitlost thread
-		m_pClientTCPWaitlost = new wxClientTCPWaitlost(this, m_pSock);
+		m_pClientTCPWaitlost = new wxNetTCPWaitlost(this, m_pSock);
 		if(!CreateAndRunThread(m_pClientTCPWaitlost, wxT("wxClientTCPNetFactory"), wxT("TCPWaitlost")))
 			return false; 
         wxLogMessage(_("wxClientTCPNetFactory: Connected"));
-        //send auth?
-	}
 
+        //send auth
+		wxString sAuth = wxString::Format(wxT("<auth user=\"%s\" pass=\"%s\" />"), m_sUserName.c_str(), m_sCryptPass.c_str());
+		wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStCmd, enumGISPriorityHigh, sAuth.c_str());
+		wxNetMessage* pMsg = new wxNetMessage(sMsg);
+		if(pMsg->IsOk())
+		{
+			WXGISMSG msg = {pMsg, -1};
+			PutOutMessage(msg);
+		}
+		//end send auth
+
+		m_bIsConnected = true;
+		if(m_pCallBack)
+			m_pCallBack->OnConnect();
+	}
 	return true;
 }
 
@@ -285,18 +305,32 @@ bool wxClientTCPNetConnection::Disconnect(void)
 	if(!m_bIsConnected)
 		return true;
 
-    m_pClientTCPReader->Delete();
+	m_bIsConnected = false;
+	m_pSock->Close();
+
+	if(m_pClientTCPReader)
+        m_pClientTCPReader->Delete();
     m_pClientTCPReader = NULL;
-    m_pClientTCPWriter->Delete();
+    if(m_pClientTCPWriter)
+        m_pClientTCPWriter->Delete();
     m_pClientTCPWriter = NULL;
-    m_pClientTCPWaitlost->Delete();
+    //if(m_pClientTCPWaitlost)	//auto exit
+    //    m_pClientTCPWaitlost->Delete();
     m_pClientTCPWaitlost = NULL;
 
     CleanMsgQueueres();
 
-	m_bIsConnected = false;
+	wxDELETE(m_pSock);
+
+	if(m_pCallBack)
+		m_pCallBack->OnDisconnect();
+
 	return true;
 }
 
-
+void wxClientTCPNetConnection::PutInMessage(WXGISMSG msg)
+{
+	if(m_pCallBack)
+		m_pCallBack->PutInMessage(msg);
+}
 

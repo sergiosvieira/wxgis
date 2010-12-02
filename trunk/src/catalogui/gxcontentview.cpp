@@ -696,38 +696,64 @@ void wxGxContentView::OnObjectChanged(IGxObject* pObj)
 	//		if(GetItemCount() > 0 && !pObjectContainer->HasChildren())
 	//			DeleteAllItems();
 	//}
-//	for(long i = 0; i < GetItemCount(); i++)
-//	{
-//		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
-//		if(pItemData == NULL)
-//			continue;
-//		if(pItemData->pObject != pObj)
-//			continue;
-//////////////////////////////////////////////////////////////////////
-//		IweObjectUI* pObjUI =  dynamic_cast<IweObjectUI*>(pObj);
-//		wxIcon icon_small, icon_large;
-//		if(pObjUI != NULL)
-//		{
-//			icon_small = pObjUI->GetSmallImage();
-//			icon_large = pObjUI->GetLargeImage();
-//		}
-//
-//		if(icon_small.IsOk())
-//			m_pSmallImgList.Replace(pItemData->image_index, icon_small);
-//		if(icon_large.IsOk())
-//			m_pLargeImgList.Replace(pItemData->image_index, icon_large);
-//
-//		wxString name = pObj->GetName();
-//		wxString type = pObj->GetCategory();
-//
-//		SetItem(i, 0, name);
-//		SetItem(i, 1, type);
-//
-//		Refresh();
-//
-//////////////////////////////////////////////////////////////////////
-//		return;
-//	}
+	for(long i = 0; i < GetItemCount(); i++)
+	{
+		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
+		if(pItemData == NULL)
+			continue;
+		if(pItemData->pObject != pObj)
+			continue;
+	
+		IGxObjectUI* pObjUI =  dynamic_cast<IGxObjectUI*>(pItemData->pObject);
+		wxIcon icon_small, icon_large;
+		if(pObjUI != NULL)
+		{
+			icon_small = pObjUI->GetSmallImage();
+			icon_large = pObjUI->GetLargeImage();
+		}
+
+		int pos(0);
+		if(icon_small.IsOk())
+		{
+			for(size_t i = 0; i < m_IconsArray.size(); i++)
+			{
+				if(m_IconsArray[i].bLarge)
+					continue;
+				if(m_IconsArray[i].oIcon.IsSameAs(icon_small))
+				{
+					pos = m_IconsArray[i].iImageIndex;
+					break;
+				}
+			}
+			if(pos == 0)
+			{
+				pos = m_ImageListSmall.Add(icon_small);
+				ICONDATA myicondata = {icon_small, pos, false};
+				m_IconsArray.push_back(myicondata);
+
+				pos = m_ImageListLarge.Add(icon_large);
+				ICONDATA myicondata1 = {icon_large, pos, true};
+				m_IconsArray.push_back(myicondata1);
+			}
+		}
+		else
+			pos = 2;//m_ImageListSmall.Add(m_ImageListSmall.GetIcon(2));//0 col img, 1 - col img
+
+		pItemData->iImageIndex = pos;
+
+		wxString sName;
+		if(m_pCatalog->GetShowExt())
+			sName = pItemData->pObject->GetName();
+		else
+			sName = pItemData->pObject->GetBaseName();
+
+		wxString sType = pItemData->pObject->GetCategory();
+
+		SetItem(i, 0, sName, pos);
+		SetItem(i, 1, sType);
+
+		wxListCtrl::Refresh();
+	}
 }
 
 void wxGxContentView::OnObjectRefreshed(IGxObject* pObj)

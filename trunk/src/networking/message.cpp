@@ -101,9 +101,8 @@ wxNetMessage::wxNetMessage(void) : m_bIsOk(false), m_pXmlDocument(NULL)
 //    m_bIsOk = true;
 //}
 //
-wxNetMessage::wxNetMessage(wxString sMsgData, long nID) : m_bIsOk(false), m_pXmlDocument(NULL)
+wxNetMessage::wxNetMessage(wxString sMsgData) : m_bIsOk(false), m_pXmlDocument(NULL)
 {
-    m_nID = nID;
 	m_sData = sMsgData;
 
 	//load xml

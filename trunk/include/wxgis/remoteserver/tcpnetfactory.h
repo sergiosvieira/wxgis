@@ -87,11 +87,15 @@ public:
 	wxClientTCPNetConnection(void);
 	~wxClientTCPNetConnection(void);
 	//INetConnection
-	virtual wxXmlNode* GetProperties(void);
-	virtual bool SetProperties(const wxXmlNode* pProp);
 	virtual bool Connect(void);
 	virtual bool Disconnect(void);
 	virtual wxString GetName(void){return m_sConnName;};
+	//virtual WXGISMSG GetInMessage(void) = 0;
+    virtual void PutInMessage(WXGISMSG msg);
+	//INetClientConnection
+	virtual wxXmlNode* GetProperties(void);
+	virtual bool SetProperties(const wxXmlNode* pProp);
+	virtual void SetCallback(INetCallback* pNetCallback){m_pCallBack = pNetCallback;};
 protected:
 	wxString m_sConnName;
 	wxString m_sUserName;
@@ -102,4 +106,6 @@ protected:
 	wxNetTCPReader* m_pClientTCPReader;
 	wxNetTCPWriter* m_pClientTCPWriter;
 	wxNetTCPWaitlost* m_pClientTCPWaitlost;
+	INetCallback* m_pCallBack;
+
 };
