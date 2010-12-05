@@ -46,4 +46,5 @@ public:
 protected:
 	wxIcon m_RemServ16, m_RemServ48;
 	wxIcon m_RemServDsbld16, m_RemServDsbld48;
+	wxIcon m_RemServAuth16, m_RemServAuth48;
 };

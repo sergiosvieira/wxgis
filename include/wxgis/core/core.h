@@ -124,3 +124,74 @@ static bool CreateAndRunThread(wxThread* pThread, wxString sClassName = wxEmptyS
     }
 	return true;
 }
+
+
+//static unsigned int GetValue(wxChar hex)
+//{ 
+//    if( (hex > 47) & (hex < 57) ) 
+//        return hex - 48; 
+//    else 
+//        return hex - 88; 
+//} 
+//
+//static wxString HexToChar(wxString sHex) 
+//{ 
+//    wxString sRes;
+//    for(size_t i = 0; i < sHex.Len() / 2; i++) 
+//        sRes += GetValue(sHex[i * 2]) * 16 + GetValue(sHex[i * 2 + 1]); 
+//    return sRes;
+//} 
+
+//void str_to_hex(char *str, char *buf) 
+//{ 
+//const wxChar hex[16] = "0123456789abcdef";
+//char *p, *t; 
+//t = buf; 
+//for(p = str; *p; ++p) { 
+//*(t++) = hex[(unsigned)*p >> 4]; 
+//*(t++) = hex[(unsigned)*p & 15]; 
+//*(t++) = ' '; 
+//} 
+
+
+static wxString Encode(wxString sInput, wxString sPass)
+{
+    wxString sRes;
+    size_t pos(0);
+    for(size_t i = 0; i < sInput.Len(); i++)
+    {
+        if(pos == sPass.Len())
+            pos = 0;
+        wxChar Symbol = sInput[i] ^ sPass[pos];
+        sRes += wxString::Format(wxT("%02x"), Symbol);
+        pos++;
+    }
+    return sRes;
+}
+
+static wxChar xtod(wxChar c)
+{
+    if (c >= '0' && c <= '9') 
+        return c - '0';
+    if (c >= 'A' && c <= 'F') 
+        return c - 'A' + 10;
+    if (c >= 'a' && c <= 'f') 
+        return c - 'a' + 10;
+    return 0;        // not Hex digit
+}
+
+static wxString Decode(wxString sInput, wxString sPass)
+{
+    wxString sRes;
+    size_t pos(0);
+    for(size_t i = 0; i < sInput.Len(); i += 2)
+    {
+        if(pos == sPass.Len())
+            pos = 0;
+        wxChar Symbol = xtod(sInput[i]) * 16 + xtod(sInput[i + 1]); 
+        Symbol = Symbol ^ sPass[pos];
+        sRes += Symbol;
+        pos++;
+    }
+    return sRes;
+}

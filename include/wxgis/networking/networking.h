@@ -104,6 +104,9 @@ public:
     virtual void SetDirection(wxGISMessageDirection nDirection) = 0;
     virtual const unsigned char* GetData(void) = 0;
     virtual const size_t GetDataLen(void) = 0;
+    virtual const wxGISMessageState GetState(void) = 0;
+    virtual void SetState(wxGISMessageState nState) = 0;
+    virtual const wxXmlNode* GetRoot(void) = 0;
 };
 
 

@@ -150,7 +150,8 @@ INetClientConnection* wxGISTCPClientPanel::OnSave(void)
 	pConnNode->AddProperty(wxT("name"), m_sName);
 	pConnNode->AddProperty(wxT("ip"), m_IPAddress);
 	pConnNode->AddProperty(wxT("user"), m_UserName);
-	pConnNode->AddProperty(wxT("pass"), m_Password);//TODO: Crypt Passwd
+    wxString sCryptPass = Encode(m_Password, CONFIG_DIR);//Crypt Passwd //wxString sTestPass = Decode(sCryptPass, CONFIG_DIR);    
+	pConnNode->AddProperty(wxT("pass"), sCryptPass);
 	
 	return m_pFactory->GetConnection(pConnNode);
 }
