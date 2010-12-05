@@ -229,7 +229,16 @@ wxClientTCPNetConnection::~wxClientTCPNetConnection(void)
 
 wxXmlNode* wxClientTCPNetConnection::GetProperties(void)
 {
-    return NULL;
+    wxXmlNode* pNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("connection"));
+    pNode->AddProperty(wxT("name"), m_sConnName);
+    pNode->AddProperty(wxT("user"), m_sUserName);    
+    pNode->AddProperty(wxT("pass"), m_sCryptPass);    
+    pNode->AddProperty(wxT("ip"), m_sIP);    
+    pNode->AddProperty(wxT("port"), m_sPort);    
+    wxClassInfo* pInfo = GetClassInfo();
+    if(pInfo)
+        pNode->AddProperty(wxT("class"), pInfo->GetClassName());
+    return pNode;
 }
 
 bool wxClientTCPNetConnection::SetProperties(const wxXmlNode* pProp)

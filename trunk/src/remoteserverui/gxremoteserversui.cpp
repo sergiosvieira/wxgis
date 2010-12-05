@@ -26,6 +26,8 @@
 
 #include "../../art/remoteservers_16.xpm"
 #include "../../art/remoteservers_48.xpm"
+#include "../../art/remoteserverauth_16.xpm"
+#include "../../art/remoteserverauth_48.xpm"
 #include "../../art/remoteserver_16.xpm"
 #include "../../art/remoteserver_48.xpm"
 
@@ -35,6 +37,8 @@ wxGxRemoteServersUI::wxGxRemoteServersUI(void) : wxGxRemoteServers()
 {
     m_RemServ16 = wxIcon(remoteserver_16_xpm);
     m_RemServ48 = wxIcon(remoteserver_48_xpm);
+    m_RemServAuth16 = wxIcon(remoteserverauth_16_xpm);
+    m_RemServAuth48 = wxIcon(remoteserverauth_48_xpm);
     wxBitmap RemServDsbld16 = wxBitmap(remoteserver_16_xpm).ConvertToImage().ConvertToGreyscale();
     wxBitmap RemServDsbld48 = wxBitmap(remoteserver_48_xpm).ConvertToImage().ConvertToGreyscale();
     m_RemServDsbld16.CopyFromBitmap(RemServDsbld16);
@@ -87,7 +91,7 @@ void wxGxRemoteServersUI::LoadChildren(wxXmlNode* pConf)
 			INetClientConnection *pConn = dynamic_cast<INetClientConnection*>(wxCreateDynamicObject(sClassName));
 			if(pConn && pConn->SetProperties(pChild))
 			{
-				wxGxRemoteServerUI* pServerConn = new wxGxRemoteServerUI(pConn, m_RemServ16, m_RemServ48, m_RemServDsbld16, m_RemServDsbld48);
+				wxGxRemoteServerUI* pServerConn = new wxGxRemoteServerUI(pConn, m_RemServ16, m_RemServ48, m_RemServDsbld16, m_RemServDsbld48, m_RemServAuth16, m_RemServAuth48);
 				IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
 				if(!AddChild(pGxObj))
 				{
@@ -118,7 +122,7 @@ void wxGxRemoteServersUI::CreateConnection(wxWindow* pParent, bool bSearch)
 	}
 	if(pConn)
 	{
-		wxGxRemoteServerUI* pServerConn = new wxGxRemoteServerUI(pConn, m_RemServ16, m_RemServ48, m_RemServDsbld16, m_RemServDsbld48);
+		wxGxRemoteServerUI* pServerConn = new wxGxRemoteServerUI(pConn, m_RemServ16, m_RemServ48, m_RemServDsbld16, m_RemServDsbld48, m_RemServAuth16, m_RemServAuth48);
 		IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
 		if(!AddChild(pGxObj))
 		{
