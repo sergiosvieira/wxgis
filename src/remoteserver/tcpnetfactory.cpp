@@ -273,7 +273,6 @@ bool wxClientTCPNetConnection::Connect(void)
 	
 	// Create the socket
 	m_pSock = new wxSocketClient(wxSOCKET_WAITALL);
-	m_pSock->SetNotify(wxSOCKET_INPUT_FLAG | wxSOCKET_OUTPUT_FLAG | wxSOCKET_LOST_FLAG);
     m_pSock->Notify(false);
 
 	//
@@ -293,24 +292,13 @@ bool wxClientTCPNetConnection::Connect(void)
 	m_pSock->WaitOnConnect(5);
 	if(m_pSock->IsConnected())
 	{
+		m_bIsConnected = true;
 		//start waitlost thread
 		m_pClientTCPWaitlost = new wxNetTCPWaitlost(this, m_pSock);
 		if(!CreateAndRunThread(m_pClientTCPWaitlost, wxT("wxClientTCPNetFactory"), wxT("TCPWaitlost")))
 			return false; 
+
         wxLogMessage(_("wxClientTCPNetFactory: Connected"));
-
-  //      //send auth
-		//wxString sAuth = wxString::Format(wxT("<auth user=\"%s\" pass=\"%s\" />"), wxNetMessage::FormatXmlString(m_sUserName).c_str(), m_sCryptPass.c_str());
-		//wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStCmd, enumGISPriorityHigh, sAuth.c_str());
-		//wxNetMessage* pMsg = new wxNetMessage(sMsg);
-		//if(pMsg->IsOk())
-		//{
-		//	WXGISMSG msg = {pMsg, -1};
-		//	PutOutMessage(msg);
-		//}
-		////end send auth
-
-		m_bIsConnected = true;
 		if(m_pCallBack)
 			m_pCallBack->OnConnect();
 	}
@@ -339,6 +327,7 @@ bool wxClientTCPNetConnection::Disconnect(void)
 
 	wxDELETE(m_pSock);
 
+    wxLogMessage(_("wxClientTCPNetFactory: Disconnected"));
 	if(m_pCallBack)
 		m_pCallBack->OnDisconnect();
 

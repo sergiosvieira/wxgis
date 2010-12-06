@@ -75,6 +75,8 @@ public:
 	virtual bool SetProperties(const wxXmlNode* pProp) = 0;
 	virtual void SetCallback(INetCallback* pNetCallback) = 0;
 	virtual wxString GetName(void) = 0;
+    virtual wxString GetUser(void) = 0;
+    virtual wxString GetCryptPasswd(void) = 0;
 };
 
 //typedef std::vector<INetConnection*> NETCONNARRAY;

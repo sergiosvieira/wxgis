@@ -43,8 +43,11 @@ void *wxNetTCPReader::Entry()
 			continue;
 		}
 
+//        Yield();
+//		wxThread::Sleep(150);         
+        wxYieldIfNeeded();
 		//WaitForRead
-		if(m_pSock->WaitForRead(0, 100))
+		if(m_pSock->WaitForRead(0, 1500))
 		{
             unsigned char buff[BUFF] = {0};
 			m_pSock->ReadMsg(&buff, BUFF); 
@@ -97,10 +100,13 @@ void *wxNetTCPWriter::Entry()
 
         if(m_pNetConnection)
         {
+//        Yield();
+//		wxThread::Sleep(150);
+            wxYieldIfNeeded();
             //WaitForWrite
-            if(m_pSock->WaitForWrite(0, 100))
+            if(m_pSock->WaitForWrite(0, 1500))
             {
-                m_pSock->Discard();
+                //m_pSock->Discard();
 
                 WXGISMSG msg = m_pNetConnection->GetOutMessage();
                 if(msg.pMsg)
@@ -161,7 +167,10 @@ void *wxNetTCPWaitlost::Entry()
 				continue;
 			}
 		}
-		if(m_pSock->WaitForLost(0, 100))
+        wxYieldIfNeeded();
+//        Yield();
+//		wxThread::Sleep(150);
+		if(m_pSock->WaitForLost(0, 1500))
 		{
             bLostConn = true;
 	        break;

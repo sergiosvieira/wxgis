@@ -96,6 +96,8 @@ public:
 	virtual wxXmlNode* GetProperties(void);
 	virtual bool SetProperties(const wxXmlNode* pProp);
 	virtual void SetCallback(INetCallback* pNetCallback){m_pCallBack = pNetCallback;};
+    virtual wxString GetUser(void){return m_sUserName;};
+    virtual wxString GetCryptPasswd(void){return m_sCryptPass;};
 protected:
 	wxString m_sConnName;
 	wxString m_sUserName;
