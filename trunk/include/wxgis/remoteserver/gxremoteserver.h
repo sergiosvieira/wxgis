@@ -20,12 +20,16 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/remoteserver/remoteserver.h"
+#include "wxgis/networking/processor.h"
 
 /** \class wxGxRemoteServer gxremoteserver.h
     \brief A Remote Server GxObject.
 */
 class WXDLLIMPEXP_GIS_RS wxGxRemoteServer :
-	public IGxObjectContainer
+	public IGxObjectContainer,
+	public INetCallback,
+	public wxGISNetMessageProcessor,
+	public INetMessageReceiver
 {
 public:
 	wxGxRemoteServer(INetClientConnection* pNetConn);
@@ -44,7 +48,15 @@ public:
     virtual bool Connect(void);
     virtual bool Disconnect(void);
     virtual wxXmlNode* GetProperties(void);
+	//INetCallback
+	virtual void OnConnect(void);
+	virtual void OnDisconnect(void);
+	virtual void PutInMessage(WXGISMSG msg);
+	//INetMessageReceiver
+    virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode);
 protected:
     INetClientConnection* m_pNetConn;
 	bool m_bIsChildrenLoaded;
+    bool m_bAuth;
+    wxMsgInThread *m_pMsgInThread;
 };

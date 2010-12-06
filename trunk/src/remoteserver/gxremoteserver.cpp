@@ -19,8 +19,13 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/remoteserver/gxremoteserver.h"
+#include "wxgis/networking/message.h"
 
-wxGxRemoteServer::wxGxRemoteServer(INetClientConnection* pNetConn) : m_bIsChildrenLoaded(false)
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+// wxGxRemoteServer
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+wxGxRemoteServer::wxGxRemoteServer(INetClientConnection* pNetConn) : m_bIsChildrenLoaded(false), m_bAuth(false)
 {
 	m_pNetConn = pNetConn;
 }
@@ -78,3 +83,63 @@ wxString wxGxRemoteServer::GetName(void)
 	return NONAME;
 }
 
+
+void wxGxRemoteServer::OnConnect(void)
+{
+	AddMessageReceiver(wxT("auth"), static_cast<INetMessageReceiver*>(this));
+	AddMessageReceiver(wxT("srv_info"), static_cast<INetMessageReceiver*>(this));
+
+	OnStartMessageThread();
+	m_pCatalog->ObjectChanged(this);
+}
+
+void wxGxRemoteServer::OnDisconnect(void)
+{
+	OnStopMessageThread();
+	ClearMessageReceiver();
+	m_pCatalog->ObjectChanged(this);
+}
+
+void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
+{
+    wxString sName = pChildNode->GetName();
+    if(sName.CmpNoCase(wxT("auth")) == 0)
+    {
+		if(msg.pMsg->GetState() == enumGISMsgStOk)
+		{
+			m_bAuth = true;
+			m_pCatalog->ObjectChanged(this);
+		}
+		return;
+    }
+
+	if(sName.CmpNoCase(wxT("srv_info")) == 0)
+	{
+		wxString sUserName(wxT("test"));
+		wxString sCryptPass(wxT("test"));
+        //send auth
+		wxString sAuth = wxString::Format(wxT("<auth user=\"%s\" pass=\"%s\" />"), wxNetMessage::FormatXmlString(sUserName).c_str(), sCryptPass.c_str());
+		wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStCmd, enumGISPriorityHigh, sAuth.c_str());
+		wxNetMessage* pMsg = new wxNetMessage(sMsg);
+		if(pMsg->IsOk())
+		{
+			WXGISMSG msg = {pMsg, -1};
+			if(m_pNetConn)
+				m_pNetConn->PutOutMessage(msg);
+		}
+		//end send auth
+		return;
+	}
+ //   else
+ //   {
+	////any messages goes here
+	////translate messages
+ //   }
+}
+
+void wxGxRemoteServer::PutInMessage(WXGISMSG msg)
+{
+	//proceed message in separate thread
+	wxCriticalSectionLocker locker(m_CriticalSection);
+    m_MsgQueue.push(msg);
+}

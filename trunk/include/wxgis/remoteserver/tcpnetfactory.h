@@ -54,8 +54,8 @@ public:
 	//INetConnFactory
 	virtual wxString GetName(void){return wxString(_("TCP/IP Network"));};
 	virtual bool StartServerSearch();
-	virtual bool StopServerSearch(){return false;};
-	virtual bool CanStopServerSearch(){return false;};
+	virtual bool StopServerSearch();
+	virtual bool CanStopServerSearch(){return true;};
 	virtual bool IsServerSearching(){return false;};
 	virtual void SetCallback(INetSearchCallback* pCallback){m_pCallback = pCallback;};
 	virtual INetSearchCallback* GetCallback(void){return m_pCallback;};

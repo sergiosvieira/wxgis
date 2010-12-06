@@ -114,45 +114,16 @@ static bool CreateAndRunThread(wxThread* pThread, wxString sClassName = wxEmptyS
 		sClassName = wxString(_("wxGISCore"));
     if ( pThread->Create() != wxTHREAD_NO_ERROR )
     {
-		wxLogError(_("%s: Can't create %s Thread!"), sClassName, sThreadName);
+		wxLogError(_("%s: Can't create %s Thread!"), sClassName.c_str(), sThreadName.c_str());
 		return false;
     }
 	if(pThread->Run() != wxTHREAD_NO_ERROR )
     {
-		wxLogError(_("%s: Can't run %s Thread!"), sClassName, sThreadName);
+		wxLogError(_("%s: Can't run %s Thread!"), sClassName.c_str(), sThreadName.c_str());
 		return false;
     }
 	return true;
 }
-
-
-//static unsigned int GetValue(wxChar hex)
-//{ 
-//    if( (hex > 47) & (hex < 57) ) 
-//        return hex - 48; 
-//    else 
-//        return hex - 88; 
-//} 
-//
-//static wxString HexToChar(wxString sHex) 
-//{ 
-//    wxString sRes;
-//    for(size_t i = 0; i < sHex.Len() / 2; i++) 
-//        sRes += GetValue(sHex[i * 2]) * 16 + GetValue(sHex[i * 2 + 1]); 
-//    return sRes;
-//} 
-
-//void str_to_hex(char *str, char *buf) 
-//{ 
-//const wxChar hex[16] = "0123456789abcdef";
-//char *p, *t; 
-//t = buf; 
-//for(p = str; *p; ++p) { 
-//*(t++) = hex[(unsigned)*p >> 4]; 
-//*(t++) = hex[(unsigned)*p & 15]; 
-//*(t++) = ' '; 
-//} 
-
 
 static wxString Encode(wxString sInput, wxString sPass)
 {
