@@ -74,6 +74,15 @@ public:
     virtual const wxXmlNode* GetRoot(void);
     virtual const unsigned char* GetData(void);
     virtual const size_t GetDataLen(void);
+	static wxString FormatXmlString(wxString sInputString)
+	{
+		sInputString.Replace(wxT("&"), wxT("&amp;"));
+		sInputString.Replace(wxT("\""), wxT("&quot;"));
+		sInputString.Replace(wxT("'"), wxT("&apos;"));
+		sInputString.Replace(wxT(">"), wxT("&gt;"));
+		sInputString.Replace(wxT("<"), wxT("&lt;"));
+		return sInputString;
+	};
 protected:
 	virtual wxString StrFromBuff(unsigned char* pBuff, size_t nBuffByteSize, size_t nValSize);
 	virtual bool LoadXMLFromStr(wxString sData);

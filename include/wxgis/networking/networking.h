@@ -113,8 +113,8 @@ public:
 typedef struct _msg
 {
 	INetMessage* pMsg;
-	char nUserID;
-	bool operator< (const _msg& x) const { return pMsg->GetPriority() < x.pMsg->GetPriority(); }
+	long nUserID;
+	bool operator< (const struct _msg& x) const { return pMsg->GetPriority() < x.pMsg->GetPriority(); }
 } WXGISMSG;
 
 typedef std::priority_queue< WXGISMSG, std::deque<WXGISMSG> > WXGISMSGQUEUE;
@@ -132,8 +132,8 @@ public:
 	virtual bool Connect(void) = 0;
 	virtual bool Disconnect(void) = 0;
 	virtual bool IsConnected(void){return m_bIsConnected;};
-	virtual const char GetUserID(void){return m_nUserID;};
-	virtual void SetUserID(const char nUserID){m_nUserID = nUserID;};
+	virtual const long GetUserID(void){return m_nUserID;};
+	virtual void SetUserID(const long nUserID){m_nUserID = nUserID;};
 	//virtual WXGISMSG GetInMessage(void) = 0;
     //{
     //    WXGISMSG Msg = {NULL, -1};
@@ -184,9 +184,32 @@ public:
       //  }
     };
 protected:
-	char m_nUserID;	//user ID for server, and -1 for client	
+	long m_nUserID;	//user ID for server, and -1 for client	
 	WXGISMSGQUEUE m_OutMsgQueue;//, m_InMsgQueuemessages quere
     wxCriticalSection m_CriticalSection;
 	bool m_bIsConnected;
 };
 
+/** \class INetMessageReceiver networking.h
+    \brief A network message class.
+*/
+class INetMessageReceiver
+{
+public:
+	virtual ~INetMessageReceiver(void){};
+    virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode) = 0;
+};
+
+/** \class INetMessageProcessor networking.h
+    \brief A network message class.
+*/
+class INetMessageProcessor
+{
+public:
+	virtual ~INetMessageProcessor(void){};
+    virtual WXGISMSG GetInMessage(void) = 0;
+    virtual void ProcessMessage(WXGISMSG msg) = 0;
+	virtual void ClearMessageQueue(void) = 0;
+	virtual void AddMessageReceiver(wxString sName, INetMessageReceiver* pNetMessageReceiver) = 0;
+	virtual void ClearMessageReceiver(void) = 0;
+};

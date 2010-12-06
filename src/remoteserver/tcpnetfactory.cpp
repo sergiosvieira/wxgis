@@ -61,7 +61,7 @@ void *wxClientUDPNotifier::Entry()
 		wxIPV4address BroadCastAddress; // For broadcast sending 
 		BroadCastAddress.Service(m_pFactory->GetAdvPort() + 2);
 		//WaitForRead
-		if(m_socket->WaitForRead(0, 100))
+		if(m_socket->WaitForRead(0, 500))
 		{
 			m_socket->RecvFrom(BroadCastAddress, &buff, BUFF); 
 			if(m_socket->Error())
@@ -174,6 +174,14 @@ bool wxClientTCPNetFactory::StartServerSearch()
 	m_pClientUDPNotifier->SendBroadcastMsg();
 	return true;
 }
+
+bool wxClientTCPNetFactory::StopServerSearch()
+{
+	if(m_pClientUDPNotifier)
+		m_pClientUDPNotifier->Delete();
+	return true;
+};
+
 
 wxXmlNode* wxClientTCPNetFactory::GetProperties(void)
 {
@@ -291,16 +299,16 @@ bool wxClientTCPNetConnection::Connect(void)
 			return false; 
         wxLogMessage(_("wxClientTCPNetFactory: Connected"));
 
-        //send auth
-		wxString sAuth = wxString::Format(wxT("<auth user=\"%s\" pass=\"%s\" />"), m_sUserName.c_str(), m_sCryptPass.c_str());
-		wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStCmd, enumGISPriorityHigh, sAuth.c_str());
-		wxNetMessage* pMsg = new wxNetMessage(sMsg);
-		if(pMsg->IsOk())
-		{
-			WXGISMSG msg = {pMsg, -1};
-			PutOutMessage(msg);
-		}
-		//end send auth
+  //      //send auth
+		//wxString sAuth = wxString::Format(wxT("<auth user=\"%s\" pass=\"%s\" />"), wxNetMessage::FormatXmlString(m_sUserName).c_str(), m_sCryptPass.c_str());
+		//wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStCmd, enumGISPriorityHigh, sAuth.c_str());
+		//wxNetMessage* pMsg = new wxNetMessage(sMsg);
+		//if(pMsg->IsOk())
+		//{
+		//	WXGISMSG msg = {pMsg, -1};
+		//	PutOutMessage(msg);
+		//}
+		////end send auth
 
 		m_bIsConnected = true;
 		if(m_pCallBack)

@@ -30,8 +30,7 @@
 class WXDLLIMPEXP_GIS_RSU wxGxRemoteServerUI :
 	public wxGxRemoteServer,
 	public IGxObjectUI,
-	public IGxObjectWizard,
-	public INetCallback
+	public IGxObjectWizard
 {
 public:
 	wxGxRemoteServerUI(INetClientConnection* pNetConn, wxIcon SmallIcon = wxNullIcon, wxIcon LargeIcon = wxNullIcon, wxIcon SmallDsblIcon = wxNullIcon, wxIcon LargeDsblIcon = wxNullIcon, wxIcon SmallAuthIcon = wxNullIcon, wxIcon LargeAuthIcon = wxNullIcon);
@@ -43,13 +42,8 @@ public:
 	virtual wxString NewMenu(void){return wxEmptyString;};
     //IGxObjectWizard
     virtual bool Invoke(wxWindow* pParentWnd);
-	//INetCallback
-	virtual void OnConnect(void);
-	virtual void OnDisconnect(void);
-	virtual void PutInMessage(WXGISMSG msg);
 protected:
     wxIcon m_SmallIcon, m_LargeIcon;
     wxIcon m_SmallDsblIcon, m_LargeDsblIcon;
     wxIcon m_SmallAuthIcon, m_LargeAuthIcon;
-    bool m_bAuth;
 };

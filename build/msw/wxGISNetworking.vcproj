@@ -176,6 +176,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\networking\processor.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\networking\tcpnetwork.cpp"
 				>
 			</File>
@@ -191,6 +195,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\networking\networking.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\networking\processor.h"
 				>
 			</File>
 			<File

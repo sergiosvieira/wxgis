@@ -49,18 +49,21 @@ void *wxNetTCPReader::Entry()
             unsigned char buff[BUFF] = {0};
 			m_pSock->ReadMsg(&buff, BUFF); 
 			size_t nSize = m_pSock->LastCount();
-			wxNetMessage* pMsg = new wxNetMessage(buff, nSize);
-			if(pMsg->IsOk())
+			if(nSize > 0)
 			{
-				//add message to queure
-                if(m_pNetConnection)
-                {
-                    WXGISMSG msg = {pMsg, m_pNetConnection->GetUserID()};
-                    m_pNetConnection->PutInMessage(msg);
-                }
+				wxNetMessage* pMsg = new wxNetMessage(buff, nSize);
+				if(pMsg->IsOk())
+				{
+					//add message to queure
+					if(m_pNetConnection)
+					{
+						WXGISMSG msg = {pMsg, m_pNetConnection->GetUserID()};
+						m_pNetConnection->PutInMessage(msg);
+					}
+				}
+				else
+					wxDELETE(pMsg);
 			}
-            else
-                wxDELETE(pMsg);
 		}
 	}
 	return NULL;
