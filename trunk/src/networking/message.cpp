@@ -44,7 +44,6 @@ wxNetMessage::wxNetMessage(unsigned char* pBuff, size_t nSize) : m_bIsOk(false),
 
 
 	//load xml
-	wxLogDebug(m_sData);
 	if(!LoadXMLFromStr(m_sData))
 		return;
 

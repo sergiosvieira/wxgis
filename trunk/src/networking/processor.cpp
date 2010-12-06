@@ -142,8 +142,10 @@ void *wxMsgInThread::Entry()
 		{      
 			m_pParent->ProcessMessage(msg);
 			msg = m_pParent->GetInMessage();
-		}		
-		wxThread::Sleep(50);
+		}
+        wxYieldIfNeeded();
+  //      Yield();
+		//wxThread::Sleep(150);
 	}
     return NULL;
 }

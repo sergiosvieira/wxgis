@@ -87,7 +87,7 @@ wxString wxGxRemoteServer::GetName(void)
 void wxGxRemoteServer::OnConnect(void)
 {
 	AddMessageReceiver(wxT("auth"), static_cast<INetMessageReceiver*>(this));
-	AddMessageReceiver(wxT("srv_info"), static_cast<INetMessageReceiver*>(this));
+	AddMessageReceiver(wxT("info"), static_cast<INetMessageReceiver*>(this));
 
 	OnStartMessageThread();
 	m_pCatalog->ObjectChanged(this);
@@ -113,22 +113,45 @@ void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 		return;
     }
 
-	if(sName.CmpNoCase(wxT("srv_info")) == 0)
+	if(sName.CmpNoCase(wxT("info")) == 0)
 	{
-		wxString sUserName(wxT("test"));
-		wxString sCryptPass(wxT("test"));
-        //send auth
-		wxString sAuth = wxString::Format(wxT("<auth user=\"%s\" pass=\"%s\" />"), wxNetMessage::FormatXmlString(sUserName).c_str(), sCryptPass.c_str());
-		wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStCmd, enumGISPriorityHigh, sAuth.c_str());
-		wxNetMessage* pMsg = new wxNetMessage(sMsg);
-		if(pMsg->IsOk())
-		{
-			WXGISMSG msg = {pMsg, -1};
-			if(m_pNetConn)
-				m_pNetConn->PutOutMessage(msg);
-		}
-		//end send auth
-		return;
+        if(msg.pMsg->GetState() == enumGISMsgStNote)
+        {
+            wxString sText = pChildNode->GetPropVal(wxT("text"), wxT(""));
+            if(!sText.IsEmpty())
+                wxLogMessage(wxT("wxGxRemoteServer: %s"), sText.c_str());
+            return;
+        }
+        if(msg.pMsg->GetState() == enumGISMsgStErr)
+        {
+            wxString sText = pChildNode->GetPropVal(wxT("text"), wxT(""));
+            if(!sText.IsEmpty())
+                wxLogError(wxT("wxGxRemoteServer: %s"), sText.c_str());
+            return;
+        }
+
+        if(msg.pMsg->GetState() == enumGISMsgStOk)
+        {
+            //log text
+            wxString sServer = pChildNode->GetPropVal(wxT("name"), wxT(""));
+            wxString sBanner = pChildNode->GetPropVal(wxT("banner"), wxT(""));
+            wxLogMessage(wxT("wxGxRemoteServer: Connected to server - %s; %s"), sServer.c_str(), sBanner.c_str());
+            
+            if(m_pNetConn)
+            {
+                wxString sUserName = m_pNetConn->GetUser();
+                wxString sCryptPass = m_pNetConn->GetCryptPasswd();
+		        wxString sAuth = wxString::Format(wxT("<auth user=\"%s\" pass=\"%s\" />"), wxNetMessage::FormatXmlString(sUserName).c_str(), sCryptPass.c_str());
+		        wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStCmd, enumGISPriorityHigh, sAuth.c_str());
+		        wxNetMessage* pMsg = new wxNetMessage(sMsg);
+		        if(pMsg->IsOk())
+		        {
+			        WXGISMSG msg = {pMsg, -1};
+			        m_pNetConn->PutOutMessage(msg);
+		        }
+            }
+		    return;
+        }
 	}
  //   else
  //   {
