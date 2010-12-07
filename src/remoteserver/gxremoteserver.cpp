@@ -28,6 +28,7 @@
 wxGxRemoteServer::wxGxRemoteServer(INetClientConnection* pNetConn) : m_bIsChildrenLoaded(false), m_bAuth(false)
 {
 	m_pNetConn = pNetConn;
+
 }
 
 wxGxRemoteServer::~wxGxRemoteServer(void)
@@ -35,9 +36,25 @@ wxGxRemoteServer::~wxGxRemoteServer(void)
     wxDELETE(m_pNetConn);
 }
 
+bool wxGxRemoteServer::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
+{
+	if(!IGxObject::Attach(pParent, pCatalog))
+		return false;
+	AddMessageReceiver(wxT("auth"), static_cast<INetMessageReceiver*>(this));
+	AddMessageReceiver(wxT("info"), static_cast<INetMessageReceiver*>(this));
+	AddMessageReceiver(wxT("bye"), static_cast<INetMessageReceiver*>(this));
+
+	OnStartMessageThread();
+	return true;
+}
+
+
 void wxGxRemoteServer::Detach(void)
 {
 	Disconnect();
+	OnStopMessageThread();
+	ClearMessageReceiver();
+	IGxObject::Detach();
 }
 
 void wxGxRemoteServer::Refresh(void)
@@ -86,22 +103,22 @@ wxString wxGxRemoteServer::GetName(void)
 
 void wxGxRemoteServer::OnConnect(void)
 {
-	AddMessageReceiver(wxT("auth"), static_cast<INetMessageReceiver*>(this));
-	AddMessageReceiver(wxT("info"), static_cast<INetMessageReceiver*>(this));
-
-	OnStartMessageThread();
 	m_pCatalog->ObjectChanged(this);
 }
 
 void wxGxRemoteServer::OnDisconnect(void)
 {
-	OnStopMessageThread();
-	ClearMessageReceiver();
 	m_pCatalog->ObjectChanged(this);
 }
 
 void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 {
+	if(msg.pMsg->GetState() == enumGISMsgStBye)
+	{
+		if(m_pNetConn)
+			m_pNetConn->Disconnect();
+	}
+
     wxString sName = pChildNode->GetName();
     if(sName.CmpNoCase(wxT("auth")) == 0)
     {

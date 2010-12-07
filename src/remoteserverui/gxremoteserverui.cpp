@@ -63,9 +63,19 @@ wxIcon wxGxRemoteServerUI::GetSmallImage(void)
 
 bool wxGxRemoteServerUI::Invoke(wxWindow* pParentWnd)
 {
+	return Connect();
+}
+
+bool wxGxRemoteServerUI::Connect(void)
+{
     if(m_pNetConn && !m_pNetConn->IsConnected())
 	{
-		return m_pNetConn->Connect();
+		if(m_pNetConn->Connect())
+			return true;
+		wxMessageBox(_("Connection error!"), _("Error"), wxICON_ERROR | wxOK );
+		return false;
 	}
+	wxMessageBox(_("Connection object is broken!"), _("Error"), wxICON_ERROR | wxOK );
 	return false;
 }
+

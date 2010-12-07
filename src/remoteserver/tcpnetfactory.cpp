@@ -42,12 +42,11 @@ wxClientUDPNotifier::wxClientUDPNotifier(wxClientTCPNetFactory* pFactory) : wxTh
 		return;
 	}
 
-	m_socket = new wxDatagramSocket(LocalAddress, wxSOCKET_REUSEADDR | wxSOCKET_NOWAIT); 
+	m_socket = new wxDatagramSocket(LocalAddress, wxSOCKET_REUSEADDR | wxSOCKET_NOWAIT | wxSOCKET_BLOCK); 
 	const int optval = 1; 
 	m_socket->SetOption(SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval)); 
 	//m_socket->SetOption(SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval)); 
 	//m_socket->SetOption(SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)); 
-	m_socket->SetNotify(wxSOCKET_INPUT_FLAG | wxSOCKET_OUTPUT_FLAG | wxSOCKET_LOST_FLAG);
     m_socket->Notify(false);
 }
 
@@ -55,22 +54,23 @@ void *wxClientUDPNotifier::Entry()
 {
 	unsigned char buff[BUFF] = {0};
 
+	m_socket->SetTimeout(1);
+	wxIPV4address BroadCastAddress; // For broadcast sending 
+	BroadCastAddress.Service(m_pFactory->GetAdvPort() + 2);
+
 	//start loop
 	while(!TestDestroy())
 	{
-		wxIPV4address BroadCastAddress; // For broadcast sending 
-		BroadCastAddress.Service(m_pFactory->GetAdvPort() + 2);
-		//WaitForRead
-		if(m_socket->WaitForRead(0, 500))
+		m_socket->RecvFrom(BroadCastAddress, &buff, BUFF); 
+		if(m_socket->Error())
 		{
-			m_socket->RecvFrom(BroadCastAddress, &buff, BUFF); 
-			if(m_socket->Error())
-			{
-				//wxYieldIfNeeded();
-				wxThread::Sleep(10);
-				continue;
-			}
-			size_t nSize = m_socket->LastCount();
+			//wxYieldIfNeeded();
+			wxThread::Sleep(10);
+			continue;
+		}
+		size_t nSize = m_socket->LastCount();
+		if(nSize > 0)
+		{
 			wxNetMessage msg(buff, nSize);
 			if(!msg.IsOk())
 			{
@@ -84,7 +84,7 @@ void *wxClientUDPNotifier::Entry()
 				wxXmlNode* pChild = pRootNode->GetChildren();
 				while(pChild)
 				{
-					if(pChild->GetName().CmpNoCase(wxT("srv_info")) == 0)
+					if(pChild->GetName().CmpNoCase(wxT("info")) == 0)
 					{
 						INetSearchCallback* pCallback = m_pFactory->GetCallback();
 						if(pCallback)
@@ -227,7 +227,7 @@ wxClientTCPNetConnection::wxClientTCPNetConnection(void)
 	m_pSock = NULL;
     m_pClientTCPReader = NULL;
     m_pClientTCPWriter = NULL;
-    m_pClientTCPWaitlost = NULL;
+//    m_pClientTCPWaitlost = NULL;
 	m_pCallBack = NULL;
 }
 
@@ -272,37 +272,39 @@ bool wxClientTCPNetConnection::Connect(void)
 	addr.Service(wxAtoi(m_sPort));
 	
 	// Create the socket
-	m_pSock = new wxSocketClient(wxSOCKET_WAITALL);
+	m_pSock = new wxSocketClient(wxSOCKET_WAITALL | wxSOCKET_BLOCK);
     m_pSock->Notify(false);
-
-	//
-	wxLogMessage(_("wxClientTCPNetFactory: Start connection..."));
-	//start reader thread
-	m_pClientTCPReader = new wxNetTCPReader(this, m_pSock);
-	if(!CreateAndRunThread(m_pClientTCPReader, wxT("wxClientTCPNetFactory"), wxT("TCPReader")))
-		return false; 
-    
-	//start writer thread
-	m_pClientTCPWriter = new wxNetTCPWriter(this, m_pSock);
-	if(!CreateAndRunThread(m_pClientTCPWriter, wxT("wxClientTCPNetFactory"), wxT("TCPWriter")))
-		return false; 
+	m_pSock->SetTimeout(5);
 
 	wxLogMessage(_("wxClientTCPNetConnection: Trying to connect (timeout = 5 sec) ..."));
-	m_pSock->Connect(addr, false);
-	m_pSock->WaitOnConnect(5);
+	m_pSock->Connect(addr, true);
 	if(m_pSock->IsConnected())
 	{
+		m_pSock->SetTimeout(1);
 		m_bIsConnected = true;
-		//start waitlost thread
-		m_pClientTCPWaitlost = new wxNetTCPWaitlost(this, m_pSock);
-		if(!CreateAndRunThread(m_pClientTCPWaitlost, wxT("wxClientTCPNetFactory"), wxT("TCPWaitlost")))
+		//
+		//start reader thread
+		m_pClientTCPReader = new wxNetTCPReader(this, m_pSock);
+		if(!CreateAndRunThread(m_pClientTCPReader, wxT("wxClientTCPNetFactory"), wxT("TCPReader")))
 			return false; 
+	    
+		//start writer thread
+		m_pClientTCPWriter = new wxNetTCPWriter(this, m_pSock);
+		if(!CreateAndRunThread(m_pClientTCPWriter, wxT("wxClientTCPNetFactory"), wxT("TCPWriter")))
+			return false; 
+
+		//start waitlost thread
+		//m_pClientTCPWaitlost = new wxNetTCPWaitlost(this, m_pSock);
+		//if(!CreateAndRunThread(m_pClientTCPWaitlost, wxT("wxClientTCPNetFactory"), wxT("TCPWaitlost")))
+		//	return false; 
 
         wxLogMessage(_("wxClientTCPNetFactory: Connected"));
 		if(m_pCallBack)
 			m_pCallBack->OnConnect();
+		return true;
 	}
-	return true;
+	wxDELETE(m_pSock);
+	return false;
 }
 
 bool wxClientTCPNetConnection::Disconnect(void)
@@ -310,24 +312,33 @@ bool wxClientTCPNetConnection::Disconnect(void)
 	if(!m_bIsConnected)
 		return true;
 
-	m_bIsConnected = false;
-	m_pSock->Close();
+	wxNetMessage MsgOut(wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStBye, enumGISPriorityHighest, wxT("<bye/>")));
+	if(MsgOut.IsOk())
+	{
+		m_pSock->SetTimeout(1);
+        m_pSock->WriteMsg( MsgOut.GetData(), MsgOut.GetDataLen() ); 
+	}
 
-	if(m_pClientTCPReader)
-        m_pClientTCPReader->Delete();
+	m_bIsConnected = false;
+
+    if(m_pClientTCPReader)
+		m_pClientTCPReader->Delete();
     m_pClientTCPReader = NULL;
     if(m_pClientTCPWriter)
-        m_pClientTCPWriter->Delete();
+		m_pClientTCPWriter->Delete();
     m_pClientTCPWriter = NULL;
+
+//	m_pSock->Destroy();
+//	m_pSock->Close();
     //if(m_pClientTCPWaitlost)	//auto exit
     //    m_pClientTCPWaitlost->Delete();
-    m_pClientTCPWaitlost = NULL;
+//    m_pClientTCPWaitlost = NULL;
+	wxDELETE(m_pSock);
 
     CleanMsgQueueres();
 
-	wxDELETE(m_pSock);
 
-    wxLogMessage(_("wxClientTCPNetFactory: Disconnected"));
+    wxLogMessage(_("wxClientTCPNetFactory: Server %s disconnected"), m_sIP.c_str());
 	if(m_pCallBack)
 		m_pCallBack->OnDisconnect();
 

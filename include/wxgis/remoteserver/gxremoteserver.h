@@ -35,6 +35,7 @@ public:
 	wxGxRemoteServer(INetClientConnection* pNetConn);
 	virtual ~wxGxRemoteServer(void);
 	//IGxObject
+	virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog);
 	virtual void Detach(void);
 	virtual wxString GetName(void);
     virtual wxString GetBaseName(void){return GetName();};
