@@ -42,6 +42,8 @@ public:
 	virtual wxString NewMenu(void){return wxEmptyString;};
     //IGxObjectWizard
     virtual bool Invoke(wxWindow* pParentWnd);
+    //wxGxRemoteServer
+    virtual bool Connect(void);
 protected:
     wxIcon m_SmallIcon, m_LargeIcon;
     wxIcon m_SmallDsblIcon, m_LargeDsblIcon;

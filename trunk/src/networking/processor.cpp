@@ -85,7 +85,7 @@ void wxGISNetMessageProcessor::ClearMessageReceiver()
 
 void wxGISNetMessageProcessor::ClearMessageQueue(void)
 {
-    wxCriticalSectionLocker locker(m_CriticalSection);
+    //wxCriticalSectionLocker locker(m_CriticalSection);
     while( m_MsgQueue.size() > 0 )
     {
 	    WXGISMSG Msg = m_MsgQueue.top();
@@ -143,9 +143,9 @@ void *wxMsgInThread::Entry()
 			m_pParent->ProcessMessage(msg);
 			msg = m_pParent->GetInMessage();
 		}
-        wxYieldIfNeeded();
-  //      Yield();
-		//wxThread::Sleep(150);
+        //wxYieldIfNeeded();
+        //Yield();
+		wxThread::Sleep(150);
 	}
     return NULL;
 }

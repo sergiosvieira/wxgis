@@ -50,16 +50,16 @@ protected:
     INetConnection* m_pNetConnection;
 };
 
-/** \class wxClientTCPWaitlost tcpnetwork.h
- *  \brief The tcp network connection waitloast thread.
- */
-class WXDLLIMPEXP_GIS_NET wxNetTCPWaitlost : public wxThread
-{
-public:
-    wxNetTCPWaitlost(INetConnection* pNetConnection, wxSocketBase* pSock);
-    virtual void *Entry();
-    virtual void OnExit();
-protected:
-	wxSocketBase* m_pSock;
-    INetConnection* m_pNetConnection;
-};
+///** \class wxClientTCPWaitlost tcpnetwork.h
+// *  \brief The tcp network connection waitloast thread.
+// */
+//class WXDLLIMPEXP_GIS_NET wxNetTCPWaitlost : public wxThread
+//{
+//public:
+//    wxNetTCPWaitlost(INetConnection* pNetConnection, wxSocketBase* pSock);
+//    virtual void *Entry();
+//    virtual void OnExit();
+//protected:
+//	wxSocketBase* m_pSock;
+//    INetConnection* m_pNetConnection;
+//};

@@ -24,7 +24,7 @@
 // ----------------------------------------------------------------------------
 // wxNetTCPReader
 // ----------------------------------------------------------------------------
-wxNetTCPReader::wxNetTCPReader(INetConnection* pNetConnection, wxSocketBase* pSock)
+wxNetTCPReader::wxNetTCPReader(INetConnection* pNetConnection, wxSocketBase* pSock) : wxThread()
 {
     m_pNetConnection = pNetConnection;
     m_pSock = pSock;
@@ -32,41 +32,26 @@ wxNetTCPReader::wxNetTCPReader(INetConnection* pNetConnection, wxSocketBase* pSo
 
 void *wxNetTCPReader::Entry()
 {
-	if(m_pSock == NULL)
+	if(!m_pSock || !m_pNetConnection)
 		return (ExitCode)-1;
 
+    unsigned char buff[BUFF] = {0};
 	while(!TestDestroy())
 	{
-		if(m_pSock->Error())
-		{
-			wxThread::Sleep(10);
-			continue;
-		}
-
-//        Yield();
-//		wxThread::Sleep(150);         
-        wxYieldIfNeeded();
 		//WaitForRead
-		if(m_pSock->WaitForRead(0, 1500))
+		m_pSock->ReadMsg(&buff, BUFF); 
+		size_t nSize = m_pSock->LastCount();
+		if(!m_pSock->Error() && nSize > 0)
 		{
-            unsigned char buff[BUFF] = {0};
-			m_pSock->ReadMsg(&buff, BUFF); 
-			size_t nSize = m_pSock->LastCount();
-			if(nSize > 0)
+			wxNetMessage* pMsg = new wxNetMessage(buff, nSize);
+			if(pMsg->IsOk())
 			{
-				wxNetMessage* pMsg = new wxNetMessage(buff, nSize);
-				if(pMsg->IsOk())
-				{
-					//add message to queure
-					if(m_pNetConnection)
-					{
-						WXGISMSG msg = {pMsg, m_pNetConnection->GetUserID()};
-						m_pNetConnection->PutInMessage(msg);
-					}
-				}
-				else
-					wxDELETE(pMsg);
+				//add message to queure
+				WXGISMSG msg = {pMsg, m_pNetConnection->GetUserID()};
+				m_pNetConnection->PutInMessage(msg);
 			}
+			else
+				wxDELETE(pMsg);
 		}
 	}
 	return NULL;
@@ -79,7 +64,7 @@ void wxNetTCPReader::OnExit()
 // ----------------------------------------------------------------------------
 // wxNetTCPWriter
 // ----------------------------------------------------------------------------
-wxNetTCPWriter::wxNetTCPWriter(INetConnection* pNetConnection, wxSocketBase* pSock)
+wxNetTCPWriter::wxNetTCPWriter(INetConnection* pNetConnection, wxSocketBase* pSock) : wxThread()
 {
     m_pNetConnection = pNetConnection;
     m_pSock = pSock;
@@ -87,45 +72,28 @@ wxNetTCPWriter::wxNetTCPWriter(INetConnection* pNetConnection, wxSocketBase* pSo
 
 void *wxNetTCPWriter::Entry()
 {
-	if(m_pSock == NULL)
+	if(!m_pSock || !m_pNetConnection)
 		return (ExitCode)-1;
 
 	while(!TestDestroy())
 	{
-		if(m_pSock->Error())
-		{
-			wxThread::Sleep(10);
-			continue;
-		}
-
-        if(m_pNetConnection)
+        //WaitForWrite
+        WXGISMSG msg = m_pNetConnection->GetOutMessage();
+        if(msg.pMsg)
         {
-//        Yield();
-//		wxThread::Sleep(150);
-            wxYieldIfNeeded();
-            //WaitForWrite
-            if(m_pSock->WaitForWrite(0, 1500))
+            m_pSock->WriteMsg( msg.pMsg->GetData(), msg.pMsg->GetDataLen() ); 
+            
+            if( m_pSock->LastCount() != msg.pMsg->GetDataLen() || m_pSock->Error())
             {
-                //m_pSock->Discard();
-
-                WXGISMSG msg = m_pNetConnection->GetOutMessage();
-                if(msg.pMsg)
-                {
-                    m_pSock->WriteMsg( msg.pMsg->GetData(), msg.pMsg->GetDataLen() ); 
-                    
-                    if(m_pSock->Error() || m_pSock->LastCount() != msg.pMsg->GetDataLen())
-                    {
-                        m_pNetConnection->PutOutMessage(msg);
-                    }
-                    else
-                    {
-                        wxDELETE(msg.pMsg);
-                    }
-                }
-                else
-                    wxThread::Sleep(100);
+                m_pNetConnection->PutOutMessage(msg);
             }
-		}
+            else
+            {
+                wxDELETE(msg.pMsg);
+            }
+        }
+        else
+            wxThread::Sleep(100);
 	}
 	return NULL;
 }
@@ -134,239 +102,78 @@ void wxNetTCPWriter::OnExit()
 {
 }
 
-// ----------------------------------------------------------------------------
-// wxNetTCPWaitlost
-// ----------------------------------------------------------------------------
-wxNetTCPWaitlost::wxNetTCPWaitlost(INetConnection* pNetConnection, wxSocketBase* pSock)
-{
-    m_pNetConnection = pNetConnection;
-    m_pSock = pSock;
-}
-
-void *wxNetTCPWaitlost::Entry()
-{
-	if(m_pSock == NULL)
-		return (ExitCode)-1;
-
-    bool bLostConn = false;
-	while(!TestDestroy())
-	{
-		if(!m_pNetConnection->IsConnected())
-			break;
-		if(m_pSock->Error())
-		{
-			wxSocketError err = m_pSock->LastError();
-			if(wxSOCKET_WOULDBLOCK == err)
-			{
-	            bLostConn = true;
-		        break;
-			}
-			else
-			{
-				wxThread::Sleep(10);
-				continue;
-			}
-		}
-        wxYieldIfNeeded();
-//        Yield();
-//		wxThread::Sleep(150);
-		if(m_pSock->WaitForLost(0, 1500))
-		{
-            bLostConn = true;
-	        break;
-		}
-	}
-
-    if(bLostConn && m_pNetConnection)
-        m_pNetConnection->Disconnect();
-
-    return NULL;
-}
-
-void wxNetTCPWaitlost::OnExit()
-{
-}
-
-
-//#include "wxgissrv/framework/message.h"
-//
 //// ----------------------------------------------------------------------------
-//// wxTCPConnectThread
+//// wxNetTCPWaitlost
 //// ----------------------------------------------------------------------------
-//
-//wxTCPConnectThread::wxTCPConnectThread(wxTCPNetworkPlugin* pParent) : wxThread(), m_pServer(NULL), m_pParent(NULL)
+//wxNetTCPWaitlost::wxNetTCPWaitlost(INetConnection* pNetConnection, wxSocketBase* pSock)
 //{
-//    m_pParent = pParent;
-//	// Create the address - defaults to localhost:0 initially
-//	wxIPV4address ip_addr;
-//	ip_addr.Service(m_pParent->GetPort());
-//	bool bIsAddrSet = false;
-//    wxString sAddr = m_pParent->GetAddres();
-//    if(sAddr.IsEmpty())
-//		bIsAddrSet = ip_addr.AnyAddress();
-//	else
-//		bIsAddrSet = ip_addr.Hostname(sAddr);
-//	if(!bIsAddrSet)
-//	{
-//		wxLogError(_("wxTCPNetworkPlugin: Invalid address - %s"), sAddr.c_str());
-//		return;
-//	}
-//
-//	// Create the socket
-//	m_pServer = new wxSocketServer( ip_addr, wxSOCKET_WAITALL | wxSOCKET_BLOCK );
-//	
-//	// We use Ok() here to see if the server is really listening
-//	if (!m_pServer->Ok())
-//	{
-//		wxLogError(_("wxTCPNetworkPlugin: Could not listen at the specified port! Port number - %d"), m_pParent->GetPort());
-//		return;
-//	}
+//    m_pNetConnection = pNetConnection;
+//    m_pSock = pSock;
 //}
 //
-//void wxTCPConnectThread::OnExit()
+//void *wxNetTCPWaitlost::Entry()
 //{
-//	m_pParent = NULL;
-//	wxDELETE(m_pServer);
-//}
-//
-//void *wxTCPConnectThread::Entry()
-//{
-//	if(m_pServer == NULL || m_pParent == NULL)
+//	if(m_pSock == NULL)
 //		return (ExitCode)-1;
 //
+//    bool bLostConn = false;
 //	while(!TestDestroy())
 //	{
-//		if(m_pServer->WaitForAccept(2))
+//  //      Yield();
+//		//wxThread::Sleep(5000);
+//		//if(!m_pNetConnection->IsConnected())
+//		//	break;
+////		if(!m_pSock->IsData())
+////			int x = 0;
+////		if(m_pSock->Error())
+////		{
+////			wxSocketError err = m_pSock->LastError();
+////			if(err != wxSOCKET_TIMEDOUT)
+////				int x = 0;
+//////			if(wxSOCKET_WOULDBLOCK == err)
+//////			{
+//////	            bLostConn = true;
+//////		        break;
+//////			}
+//////			else
+//////			{
+//////				wxThread::Sleep(10);
+//////				continue;
+//////			}
+////		}
+//
+//////        wxYieldIfNeeded();
+//		if(m_pSock->WaitForLost(1, 250))
 //		{
-//			wxSocketBase* pNewSocket = m_pServer->Accept(true);
-//			if (pNewSocket)
-//			{
-//				if(m_pParent->CanAcceptConnection())
-//				{
-//					pNewSocket->SetFlags(wxSOCKET_WAITALL);
-//					wxIPV4address cliend_addr;
-//					pNewSocket->GetPeer(cliend_addr);
-//					wxLogMessage(_("wxTCPNetworkPlugin: New client connection accepted. Address - %s"), cliend_addr.IPAddress().c_str());
-//
-//                    wxNetMessage Msg(-1, enumGISMsgStOk, enumGISPriorityHightest, _("Connection accepted"));
-//                    wxXmlNode* pRootNode = Msg.GetRoot();
-//                    wxXmlNode* pNode = new wxXmlNode(pRootNode, wxXML_ELEMENT_NODE, wxT("server"));
-//                    pNode->AddProperty(wxT("name"), m_pParent->GetServerName().c_str());
-//                    wxString sData = Msg.GetData();
-//
-//					//wxString servername = wxString::Format(wxT("<server name=\"%s\"/>"), m_pParent->m_servername.c_str());
-//					//wxString data = wxString::Format(WEMESSAGE, NETVER, NETOK, _("Connection accepted"), HIGH_PRIORITY, servername.c_str());
-//					
-//					wxUint8 nSysType = CURROS;
-//					pNewSocket->WriteMsg(&nSysType, sizeof(wxUint8));
-//					pNewSocket->WriteMsg(sData.c_str(), (sData.Len() + 1) * sizeof(wxChar));
-//
-//                    if(!m_pParent->AddConnection(pNewSocket))
-//                        wxDELETE(pNewSocket);
-//				}
-//				else
-//				{
-//					wxLogMessage(_("wxTCPNetworkPlugin: To many connections! Connection is not established"));
-//                    wxNetMessage Msg(-1, enumGISMsgStRefuse, enumGISPriorityHightest, _("To many connections! Connection refused"));
-//                    wxString sData = Msg.GetData();
-//
-//					wxUint8 nSysType = CURROS;
-//					pNewSocket->WriteMsg(&nSysType, sizeof(wxUint8));
-//					pNewSocket->WriteMsg(sData.c_str(), (sData.Len() + 1) * sizeof(wxChar));
-//                    wxDELETE(pNewSocket);
-//
-//		//			//<?xml version="1.0" encoding="UTF-8"?><weMsg version="1" state="REFUSE" message="To many connections"></weMsg>
-//		//			wxString data = wxString::Format(WEMESSAGE, NETVER, NETREFUSE, _("To many connections!"), HIGH_PRIORITY, wxT(""));
-//		////			sock->SetFlags(wxSOCKET_WAITALL);
-//		////			sock->WriteMsg(data.GetData(), sizeof(data));
-//		//			wxUint8 sys_type = CURROS;
-//		//			pNewSocket->WriteMsg(&sys_type, sizeof(wxUint8));
-//		//			pNewSocket->WriteMsg(data.c_str(), (data.Len() + 1) * sizeof(wxChar));
-//		//			pNewSocket->Close();
-//		//			pNewSocket = NULL;
-//				}
-//			}
-//			else
-//				wxLogError(_("wxTCPNetworkPlugin: Couldn't accept a new connection"));
+//            bLostConn = true;
+//	        break;
 //		}
-//		wxThread::Sleep(10);
+//		if(m_pSock->Error())
+//		{
+//			wxSocketError err = m_pSock->LastError();
+//			if(err != wxSOCKET_TIMEDOUT)
+//				int x = 0;
+//			if(wxSOCKET_WOULDBLOCK == err)
+//			{
+//	            bLostConn = true;
+//		        break;
+//			}
+//////			else
+//////			{
+//////				wxThread::Sleep(10);
+//////				continue;
+//////			}
+//		}
+//		Yield();
 //	}
+//
+//    if(bLostConn && m_pNetConnection)
+//        m_pNetConnection->Disconnect();
+//
 //    return NULL;
 //}
 //
-//
-//// ----------------------------------------------------------------------------
-//// wxTCPNetworkPlugin
-//// ----------------------------------------------------------------------------
-//
-//IMPLEMENT_DYNAMIC_CLASS(wxTCPNetworkPlugin, wxObject)
-//
-//wxTCPNetworkPlugin::wxTCPNetworkPlugin(void) : m_nPort(1976), m_pWaitThread(NULL)
+//void wxNetTCPWaitlost::OnExit()
 //{
 //}
-//
-//wxTCPNetworkPlugin::~wxTCPNetworkPlugin(void)
-//{
-//}
-//
-//bool wxTCPNetworkPlugin::Start(IServerApplication* pApp, wxXmlNode* pConfig)
-//{
-//    m_pConfig = pConfig;
-//    m_pApp = pApp;
-//
-//	m_sAddr = pConfig->GetPropVal(wxT("addr"), wxT(""));
-//	m_nPort = wxAtoi(pConfig->GetPropVal(wxT("port"), wxT("1976")));
-//
-//	//Start Connect Thread
-//	m_pWaitThread = new wxTCPConnectThread(this);
-//    if ( m_pWaitThread->Create() != wxTHREAD_NO_ERROR )
-//    {
-//		wxLogError(_("wxTCPNetworkPlugin: Can't create Wait Connect Thread!"));
-//		return false;
-//    }
-//	if(m_pWaitThread->Run() != wxTHREAD_NO_ERROR )
-//    {
-//		wxLogError(_("wxTCPNetworkPlugin: Can't run Wait Connect Thread!"));
-//		return false;
-//    }
-//    wxLogMessage(_("wxTCPNetworkPlugin: Wait Connect Thread 0x%lx started (priority = %u)."), m_pWaitThread->GetId(), m_pWaitThread->GetPriority());
-//
-//    wxLogMessage(_("wxTCPNetworkPlugin: Plugin is started..."));
-//
-//	return true;
-//
-//}
-//
-//bool wxTCPNetworkPlugin::Stop(void)
-//{
-//	m_pWaitThread->Delete();
-//
-//	wxLogMessage(_("wxTCPNetworkPlugin: Plugin is shutdown..."));
-//	return true;
-//}
-//
-//bool wxTCPNetworkPlugin::AddConnection(wxSocketBase* pNewSocket)
-//{
-//    long nUserID = m_pApp->GetUserID();
-//    //1. Create lost thread
-//
-//    //2. create write / read thread
-//					//weTCPWaitLostThread* pNewLostThread = new weTCPWaitLostThread(m_pParent, pNewSocket);
-//					////Start weTCPWaitLostThread
-//					//if(pNewLostThread->Create() != wxTHREAD_NO_ERROR)
-//					//{
-//					//	wxLogError(_("TCPNetworkServerPlugin: Can't create weTCPWaitLostThread thread!"));
-//					//	pNewSocket->Close();
-//					//}
-//					//if(pNewLostThread->Run() != wxTHREAD_NO_ERROR)
-//					//{
-//					//	wxLogError(_("TCPNetworkServerPlugin: Can't run weTCPWaitLostThread thread!"));
-//					//	pNewSocket->Close();
-//					//}
-//    return true;
-//}
-//
-//void wxTCPNetworkPlugin::RemoveConnection(long nID)
-//{
-//    m_pApp->RemoveUserID(nID);
-//}
+
