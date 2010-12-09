@@ -28,7 +28,7 @@
 wxGxRemoteServer::wxGxRemoteServer(INetClientConnection* pNetConn) : m_bIsChildrenLoaded(false), m_bAuth(false)
 {
 	m_pNetConn = pNetConn;
-
+	m_nChildCount = 0;
 }
 
 wxGxRemoteServer::~wxGxRemoteServer(void)
@@ -42,9 +42,7 @@ bool wxGxRemoteServer::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
 		return false;
 	AddMessageReceiver(wxT("auth"), static_cast<INetMessageReceiver*>(this));
 	AddMessageReceiver(wxT("info"), static_cast<INetMessageReceiver*>(this));
-	AddMessageReceiver(wxT("bye"), static_cast<INetMessageReceiver*>(this));
 
-	OnStartMessageThread();
 	return true;
 }
 
@@ -52,7 +50,6 @@ bool wxGxRemoteServer::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
 void wxGxRemoteServer::Detach(void)
 {
 	Disconnect();
-	OnStopMessageThread();
 	ClearMessageReceiver();
 	IGxObject::Detach();
 }
@@ -93,6 +90,12 @@ bool wxGxRemoteServer::Disconnect(void)
     return false;
 }
 
+bool wxGxRemoteServer::IsConnected(void)
+{
+ 	if(m_pNetConn)
+		return m_pNetConn->IsConnected();
+}
+
 wxString wxGxRemoteServer::GetName(void)
 {
  	if(m_pNetConn)
@@ -103,63 +106,69 @@ wxString wxGxRemoteServer::GetName(void)
 
 void wxGxRemoteServer::OnConnect(void)
 {
+	OnStartMessageThread();
 	m_pCatalog->ObjectChanged(this);
 }
 
 void wxGxRemoteServer::OnDisconnect(void)
 {
+	OnStopMessageThread();
+	EmptyChildren();
+	m_bAuth = false;
+	m_nChildCount = 0;
 	m_pCatalog->ObjectChanged(this);
 }
 
 void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 {
-	if(msg.pMsg->GetState() == enumGISMsgStBye)
+	if(msg.pMsg->GetState() == enumGISMsgStAlive)
 	{
-		if(m_pNetConn)
-			m_pNetConn->Disconnect();
+        wxNetMessage* pMsg = new wxNetMessage(wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStOk, enumGISPriorityHighest, wxT("bye")));
+        if(pMsg->IsOk())
+        {
+	        WXGISMSG msg = {pMsg, -1};
+	        m_pNetConn->PutOutMessage(msg);
+        }
 	}
 
-    wxString sName = pChildNode->GetName();
+    wxString sName = msg.pMsg->GetDestination();
     if(sName.CmpNoCase(wxT("auth")) == 0)
     {
 		if(msg.pMsg->GetState() == enumGISMsgStOk)
 		{
 			m_bAuth = true;
 			m_pCatalog->ObjectChanged(this);
+
+			//request children
+		    wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStGet, enumGISPriorityNormal, wxT("root"), wxT("<children/>"));
+	        wxNetMessage* pMsg = new wxNetMessage(sMsg);
+	        if(pMsg->IsOk())
+	        {
+		        WXGISMSG msg = {pMsg, -1};
+		        m_pNetConn->PutOutMessage(msg);
+	        }
 		}
 		return;
     }
 
 	if(sName.CmpNoCase(wxT("info")) == 0)
 	{
-        if(msg.pMsg->GetState() == enumGISMsgStNote)
-        {
-            wxString sText = pChildNode->GetPropVal(wxT("text"), wxT(""));
-            if(!sText.IsEmpty())
-                wxLogMessage(wxT("wxGxRemoteServer: %s"), sText.c_str());
-            return;
-        }
-        if(msg.pMsg->GetState() == enumGISMsgStErr)
-        {
-            wxString sText = pChildNode->GetPropVal(wxT("text"), wxT(""));
-            if(!sText.IsEmpty())
-                wxLogError(wxT("wxGxRemoteServer: %s"), sText.c_str());
-            return;
-        }
-
         if(msg.pMsg->GetState() == enumGISMsgStOk)
         {
             //log text
-            wxString sServer = pChildNode->GetPropVal(wxT("name"), wxT(""));
-            wxString sBanner = pChildNode->GetPropVal(wxT("banner"), wxT(""));
-            wxLogMessage(wxT("wxGxRemoteServer: Connected to server - %s; %s"), sServer.c_str(), sBanner.c_str());
-            
+			if(pChildNode)
+			{
+				wxString sServer = pChildNode->GetPropVal(wxT("name"), wxT(""));
+				wxString sBanner = pChildNode->GetPropVal(wxT("banner"), wxT(""));
+				wxLogMessage(wxT("wxGxRemoteServer: Connected to server - %s; %s"), sServer.c_str(), sBanner.c_str());
+			}
+
             if(m_pNetConn)
             {
                 wxString sUserName = m_pNetConn->GetUser();
                 wxString sCryptPass = m_pNetConn->GetCryptPasswd();
 		        wxString sAuth = wxString::Format(wxT("<auth user=\"%s\" pass=\"%s\" />"), wxNetMessage::FormatXmlString(sUserName).c_str(), sCryptPass.c_str());
-		        wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStCmd, enumGISPriorityHigh, sAuth.c_str());
+		        wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStCmd, enumGISPriorityHigh, wxT("auth"), sAuth.c_str());
 		        wxNetMessage* pMsg = new wxNetMessage(sMsg);
 		        if(pMsg->IsOk())
 		        {
@@ -170,11 +179,6 @@ void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 		    return;
         }
 	}
- //   else
- //   {
-	////any messages goes here
-	////translate messages
- //   }
 }
 
 void wxGxRemoteServer::PutInMessage(WXGISMSG msg)
@@ -182,4 +186,15 @@ void wxGxRemoteServer::PutInMessage(WXGISMSG msg)
 	//proceed message in separate thread
 	wxCriticalSectionLocker locker(m_CriticalSection);
     m_MsgQueue.push(msg);
+}
+
+void wxGxRemoteServer::EmptyChildren(void)
+{
+	for(size_t i = 0; i < m_Children.size(); i++)
+	{
+		m_Children[i]->Detach();
+		delete m_Children[i];
+	}
+	m_Children.clear();
+	m_bIsChildrenLoaded = false;
 }

@@ -1,6 +1,6 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Remote)
- * Purpose:  remote server UI header.
+ * Project:  wxGIS (GIS Catalog)
+ * Purpose:  PosGISDataset class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010 Bishop
@@ -18,36 +18,24 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-
 #pragma once
 
-#include "wxgis/remoteserver/remoteserver.h"
+#include "wxgis/datasource/datasource.h"
 
-/** \class INetConnFactoryUI remoteserverui.h
-    \brief The network connection factory UI interface class.
+/** \class wxGISPostGISDataset postgisdataset.h
+    \brief The PostGIS Dataset class.
 */
-class INetConnFactoryUI
+class WXDLLIMPEXP_GIS_DS wxGISPostGISDataset :
+	public wxGISDataset
 {
 public:
-    virtual ~INetConnFactoryUI(void){};
-	virtual wxWindow* GetPropertyPage(wxWindow* pParent) = 0;
-};
-
-/** \class INetConnFactoryUI remoteserverui.h
-    \brief The network connection factory UI interface class.
-*/
-class wxNetPropertyPage :
-	public wxPanel
-{
-public:
-	wxNetPropertyPage(INetConnFactoryUI* pFactory, wxWindow* pParent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCLIP_CHILDREN | wxNO_BORDER | wxTAB_TRAVERSAL) : wxPanel(pParent, id, pos, size, style)
-	{
-		m_pFactory = pFactory;
-	}
-	virtual ~wxNetPropertyPage(void){};
-	virtual INetClientConnection* OnSave(void) = 0;
-	virtual wxString GetLastError(void){return m_sErrorMsg;};
+	wxGISPostGISDataset(wxString sPath, wxGISEnumVectorDatasetType nType);
+	virtual ~wxGISPostGISDataset(void);
+//wxGISDataset
+ //   virtual size_t GetSubsetsCount(void);
+ //   virtual wxGISDataset* GetSubset(size_t nIndex);
+ //   virtual wxString GetName(void);
+	//virtual OGRSpatialReference* GetSpatialReference(void);
 protected:
-	INetConnFactoryUI* m_pFactory;
-	wxString m_sErrorMsg;
+	OGRDataSource *m_poDS;
 };

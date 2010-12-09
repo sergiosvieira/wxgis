@@ -45,41 +45,60 @@ WXGISMSG wxGISNetMessageProcessor::GetInMessage(void)
 
 void wxGISNetMessageProcessor::ProcessMessage(WXGISMSG msg)
 {
-    const wxXmlNode* pRoot = msg.pMsg->GetRoot();
-    if(!pRoot)
-        wxDELETE(msg.pMsg);
-    wxXmlNode* pChild = pRoot->GetChildren();
-    if(!pChild)
-    {
-        wxString sMessage = pRoot->GetNodeContent();
-        //log contents and exit
-        wxLogMessage(_("wxGISNetMessageProcessor: %s"), sMessage.c_str());
-    }
-	else
+	wxString sDst = msg.pMsg->GetDestination();
+	//TODO: Hash of sDst
+	const wxXmlNode* pRoot = msg.pMsg->GetRoot();
+	if(!pRoot)
 	{
-		while(pChild)
-		{
-			wxString sReceiverName = pChild->GetName();
-			std::map<wxString, INetMessageReceiver*>::const_iterator it = m_MessageReceiverMap.find(sReceiverName);
-			if(it != m_MessageReceiverMap.end())
-				if(it->second)
-					it->second->ProcessMessage(msg, pChild);
-			pChild = pChild->GetNext();
-		}
+		wxDELETE(msg.pMsg);
+		return;
 	}
+	wxXmlNode* pChild = pRoot->GetChildren();
+	if(sDst.CmpNoCase(wxT("info")) == 0)
+	{
+		wxString sMessage;
+	    if(!pChild)
+	        sMessage = pRoot->GetNodeContent();
+		else
+			sMessage = pChild->GetPropVal(wxT("text"), wxT(""));
+        //log contents and exit
+
+        if(msg.pMsg->GetState() == enumGISMsgStNote)
+			wxLogMessage(_("wxGISNetMessageProcessor: %s"), sMessage.c_str());			
+        if(msg.pMsg->GetState() == enumGISMsgStErr)
+			wxLogError(_("wxGISNetMessageProcessor: %s"), sMessage.c_str());			
+	}
+
+	//TODO: check for * and look for dst in children
+	for(size_t i = 0; i < m_MessageReceiverArray.size(); i++)
+	{
+		if(sDst.CmpNoCase(m_MessageReceiverArray[i].first) == 0)
+			m_MessageReceiverArray[i].second->ProcessMessage(msg, pChild);
+	}
+
+	//	while(pChild)
+	//	{
+	//		wxString sReceiverName = pChild->GetName();
+	//		std::map<wxString, INetMessageReceiver*>::const_iterator it = m_MessageReceiverMap.find(sReceiverName);
+	//		if(it != m_MessageReceiverMap.end())
+	//			if(it->second)
+	//				it->second->ProcessMessage(msg, pChild);
+	//		pChild = pChild->GetNext();
+	//	}
 
     wxDELETE(msg.pMsg);
 }
 
 void wxGISNetMessageProcessor::AddMessageReceiver(wxString sName, INetMessageReceiver* pNetMessageReceiver)
 {
+	//TODO: Hash of sName
 	if(pNetMessageReceiver)//the receiver can register several names
-		m_MessageReceiverMap[sName] = pNetMessageReceiver;
+		m_MessageReceiverArray.push_back( std::make_pair(sName, pNetMessageReceiver) );
 }
 
 void wxGISNetMessageProcessor::ClearMessageReceiver()
 {
-	m_MessageReceiverMap.clear();
+	m_MessageReceiverArray.clear();
 }
 
 

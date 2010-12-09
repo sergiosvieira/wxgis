@@ -63,6 +63,7 @@ enum wxGISMessageState
     enumGISMsgStCmd,
     enumGISMsgStHello,
     enumGISMsgStBye,
+	enumGISMsgStAlive,
     enumGISMsgStSnd,
     enumGISMsgStRcv
 };
@@ -106,7 +107,9 @@ public:
     virtual const size_t GetDataLen(void) = 0;
     virtual const wxGISMessageState GetState(void) = 0;
     virtual void SetState(wxGISMessageState nState) = 0;
-    virtual const wxXmlNode* GetRoot(void) = 0;
+	virtual void SetDestination(wxString sDst) = 0;
+	virtual const wxString GetDestination(void) = 0;
+    virtual wxXmlNode* GetRoot(void) = 0;
 };
 
 

@@ -48,7 +48,8 @@ enum wxGISEnumVectorDatasetType
 	enumVecMapinfoTab = 2,
     enumVecMapinfoMif = 3,
     enumVecKML = 4,
-    enumVecDXF = 5
+    enumVecDXF = 5,
+	emumVecPostGIS = 6
 };
 
 enum wxGISEnumRasterDatasetType
@@ -72,7 +73,6 @@ enum wxGISEnumPrjFileType
 	enumESRIPrjFile = 1,
 	enumSPRfile = 2
 };
-
 
 enum wxGISEnumContainerType
 {
@@ -99,19 +99,21 @@ public:
         m_sPath.Replace(wxT("\\"), wxT("/"));
     };
 	virtual ~wxGISDataset(void){ };
-	virtual wxGISEnumDatasetType GetType(void) = 0;
+	virtual wxGISEnumDatasetType GetType(void){return m_nType;};
     virtual int GetSubType(void){return m_nSubType;};
     virtual void SetSubType(int nSubType){m_nSubType = nSubType;};
 	virtual wxString GetPath(void){return m_sPath;};
     virtual size_t GetSubsetsCount(void){return 0;};
     virtual wxGISDataset* GetSubset(size_t nIndex){return NULL;};
     virtual wxString GetName(void){return wxEmptyString;};
-	virtual void Close(void) = 0;
-	virtual OGRSpatialReference* GetSpatialReference(void) = 0;
+	virtual void Close(void){};
+	virtual OGRSpatialReference* GetSpatialReference(void){return NULL;};
 protected:
 	wxString m_sPath;
     wxCriticalSection m_CritSect;
     int m_nSubType;
+	wxGISEnumDatasetType m_nType;
+	bool m_bIsOpened;
 };
 
 class wxGISFeatureSet

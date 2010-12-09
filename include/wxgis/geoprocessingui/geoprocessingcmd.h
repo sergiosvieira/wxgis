@@ -53,4 +53,5 @@ private:
 	IApplication* m_pApp;
     wxString m_sLastError;
     wxWindow* m_pToolboxView;
+	wxIcon m_IconGPMenu, m_IconToolview;
 };

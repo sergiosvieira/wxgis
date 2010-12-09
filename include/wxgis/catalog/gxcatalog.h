@@ -3,7 +3,7 @@
  * Purpose:  wxGxCatalog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -23,10 +23,9 @@
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/catalog/gxdiscconnections.h"
 
-// ----------------------------------------------------------------------------
-// wxGxCatalog
-// ----------------------------------------------------------------------------
-//#define DISCCONNCAT wxT("wxGxDiscConnection")
+/** \class wxGxCatalog gxcatalog.h
+    \brief The Gx Catalog class.
+*/
 
 class WXDLLIMPEXP_GIS_CLT wxGxCatalog :
 	public IGxObjectContainer,

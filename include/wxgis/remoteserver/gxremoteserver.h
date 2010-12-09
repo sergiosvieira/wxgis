@@ -48,6 +48,7 @@ public:
     //wxGxRemoteServer
     virtual bool Connect(void);
     virtual bool Disconnect(void);
+    virtual bool IsConnected(void);
     virtual wxXmlNode* GetProperties(void);
 	//INetCallback
 	virtual void OnConnect(void);
@@ -55,9 +56,22 @@ public:
 	virtual void PutInMessage(WXGISMSG msg);
 	//INetMessageReceiver
     virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode);
+	//wxGxRemoteServer
+	virtual void EmptyChildren(void);
 protected:
     INetClientConnection* m_pNetConn;
 	bool m_bIsChildrenLoaded;
     bool m_bAuth;
     wxMsgInThread *m_pMsgInThread;
+	int m_nChildCount;
+};
+
+/** \class IRxObjectClient gxremoteserver.h
+    \brief The interface class for Remote GxObjects (RxObjects).
+*/
+class IRxObjectClient
+{
+public:
+	virtual ~IRxObjectClient(void){};
+	virtual bool Init(wxGxRemoteServer *pGxRemoteServer, wxXmlNode* pProperties) = 0;
 };

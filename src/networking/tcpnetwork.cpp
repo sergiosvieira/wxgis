@@ -39,19 +39,27 @@ void *wxNetTCPReader::Entry()
 	while(!TestDestroy())
 	{
 		//WaitForRead
-		m_pSock->ReadMsg(&buff, BUFF); 
-		size_t nSize = m_pSock->LastCount();
-		if(!m_pSock->Error() && nSize > 0)
+		if(m_pSock->IsConnected())
 		{
-			wxNetMessage* pMsg = new wxNetMessage(buff, nSize);
-			if(pMsg->IsOk())
+			m_pSock->ReadMsg(&buff, BUFF); 
+			if(m_pSock->Error())
 			{
-				//add message to queure
-				WXGISMSG msg = {pMsg, m_pNetConnection->GetUserID()};
-				m_pNetConnection->PutInMessage(msg);
+				wxThread::Sleep(50);
+				//continue;
 			}
-			else
-				wxDELETE(pMsg);
+			size_t nSize = m_pSock->LastCount();
+			if(!m_pSock->Error() && nSize > 0)
+			{
+				wxNetMessage* pMsg = new wxNetMessage(buff, nSize);
+				if(pMsg->IsOk())
+				{
+					//add message to queure
+					WXGISMSG msg = {pMsg, m_pNetConnection->GetUserID()};
+					m_pNetConnection->PutInMessage(msg);
+				}
+				else
+					wxDELETE(pMsg);
+			}
 		}
 	}
 	return NULL;
@@ -81,16 +89,20 @@ void *wxNetTCPWriter::Entry()
         WXGISMSG msg = m_pNetConnection->GetOutMessage();
         if(msg.pMsg)
         {
-            m_pSock->WriteMsg( msg.pMsg->GetData(), msg.pMsg->GetDataLen() ); 
+			if(m_pSock->IsConnected())
+			{
+				m_pSock->WriteMsg( msg.pMsg->GetData(), msg.pMsg->GetDataLen() ); 
             
-            if( m_pSock->LastCount() != msg.pMsg->GetDataLen() || m_pSock->Error())
-            {
-                m_pNetConnection->PutOutMessage(msg);
-            }
-            else
-            {
-                wxDELETE(msg.pMsg);
-            }
+				if( m_pSock->LastCount() != msg.pMsg->GetDataLen() || m_pSock->Error())
+				{
+					m_pNetConnection->PutOutMessage(msg);
+					wxThread::Sleep(50);
+				}
+				else
+				{
+					wxDELETE(msg.pMsg);
+				}
+			}
         }
         else
             wxThread::Sleep(100);
@@ -102,47 +114,52 @@ void wxNetTCPWriter::OnExit()
 {
 }
 
-//// ----------------------------------------------------------------------------
-//// wxNetTCPWaitlost
-//// ----------------------------------------------------------------------------
-//wxNetTCPWaitlost::wxNetTCPWaitlost(INetConnection* pNetConnection, wxSocketBase* pSock)
-//{
-//    m_pNetConnection = pNetConnection;
-//    m_pSock = pSock;
-//}
-//
-//void *wxNetTCPWaitlost::Entry()
-//{
-//	if(m_pSock == NULL)
-//		return (ExitCode)-1;
-//
-//    bool bLostConn = false;
-//	while(!TestDestroy())
-//	{
-//  //      Yield();
-//		//wxThread::Sleep(5000);
-//		//if(!m_pNetConnection->IsConnected())
-//		//	break;
-////		if(!m_pSock->IsData())
-////			int x = 0;
-////		if(m_pSock->Error())
-////		{
-////			wxSocketError err = m_pSock->LastError();
-////			if(err != wxSOCKET_TIMEDOUT)
-////				int x = 0;
-//////			if(wxSOCKET_WOULDBLOCK == err)
-//////			{
-//////	            bLostConn = true;
-//////		        break;
-//////			}
-//////			else
-//////			{
-//////				wxThread::Sleep(10);
-//////				continue;
-//////			}
-////		}
-//
-//////        wxYieldIfNeeded();
+// ----------------------------------------------------------------------------
+// wxNetTCPWaitlost
+// ----------------------------------------------------------------------------
+wxNetTCPWaitlost::wxNetTCPWaitlost(INetConnection* pNetConnection, wxSocketBase* pSock)
+{
+    m_pNetConnection = pNetConnection;
+    m_pSock = pSock;
+}
+
+void *wxNetTCPWaitlost::Entry()
+{
+	if(m_pSock == NULL)
+		return (ExitCode)-1;
+
+    bool bLostConn = false;
+	while(!TestDestroy())
+	{
+		if(m_pSock->IsDisconnected())
+		{
+            bLostConn = true;
+	        break;
+		}
+  //      Yield();
+		wxThread::Sleep(1000);
+		//if(!m_pNetConnection->IsConnected())
+		//	break;
+//		if(!m_pSock->IsData())
+//			int x = 0;
+//		if(m_pSock->Error())
+//		{
+//			wxSocketError err = m_pSock->LastError();
+//			if(err != wxSOCKET_TIMEDOUT)
+//				int x = 0;
+////			if(wxSOCKET_WOULDBLOCK == err)
+////			{
+////	            bLostConn = true;
+////		        break;
+////			}
+////			else
+////			{
+////				wxThread::Sleep(10);
+////				continue;
+////			}
+//		}
+
+////        wxYieldIfNeeded();
 //		if(m_pSock->WaitForLost(1, 250))
 //		{
 //            bLostConn = true;
@@ -165,15 +182,15 @@ void wxNetTCPWriter::OnExit()
 //////			}
 //		}
 //		Yield();
-//	}
-//
-//    if(bLostConn && m_pNetConnection)
-//        m_pNetConnection->Disconnect();
-//
-//    return NULL;
-//}
-//
-//void wxNetTCPWaitlost::OnExit()
-//{
-//}
+	}
+
+    if(bLostConn && m_pNetConnection)
+        m_pNetConnection->Disconnect();
+
+    return NULL;
+}
+
+void wxNetTCPWaitlost::OnExit()
+{
+}
 

@@ -33,7 +33,7 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogViewsCmd, wxObject)
 
-wxGISCatalogViewsCmd::wxGISCatalogViewsCmd(void) : m_pTreeView(NULL)
+wxGISCatalogViewsCmd::wxGISCatalogViewsCmd(void) : m_pTreeView(NULL), m_IconViews(views_xpm), m_IconSelAll(select_all_xpm), m_IconTreeView(treeview_xpm)
 {
 }
 
@@ -46,11 +46,11 @@ wxIcon wxGISCatalogViewsCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
-			return wxIcon(views_xpm);
+			return m_IconViews;
 		case 1:
-			return wxIcon(select_all_xpm);
+			return m_IconSelAll;
 		case 2:
-			return wxIcon(treeview_xpm);
+			return m_IconTreeView;
 		default:
 			return wxNullIcon;
 	}

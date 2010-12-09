@@ -3,7 +3,7 @@
  * Purpose:  FeatureDataset class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -77,9 +77,7 @@ protected:
 	OGRDataSource *m_poDS;
 	OGREnvelope* m_psExtent;
 	OGRLayer* m_poLayer;
-	bool m_bIsOpened;
     bool m_bOLCStringsAsUTF8;
-    wxGISEnumDatasetType m_nType;
     wxFontEncoding m_Encoding;
     std::map<long, OGRFeature*> m_FeaturesMap;
     std::map<long, OGRFeature*>::iterator m_IT;
@@ -89,7 +87,6 @@ protected:
     bool m_bIsGeometryLoaded;
     wxGISGeometrySet *m_pGeometrySet;
     CPLQuadTree* m_pQuadTree;
-    wxCriticalSection m_CritSect;
 };
 
 ////---------------------------------------

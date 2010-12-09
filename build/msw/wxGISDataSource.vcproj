@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\datasource\postgisdataset.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\datasource\rasterdataset.cpp"
 				>
 			</File>
@@ -218,6 +222,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\datasource\featuredataset.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\datasource\postgisdataset.h"
 				>
 			</File>
 			<File
