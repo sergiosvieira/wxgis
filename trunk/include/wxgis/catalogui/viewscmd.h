@@ -50,4 +50,5 @@ private:
 	IApplication* m_pApp;
     std::vector<wxWindow*> m_apContentsWin;
     wxWindow* m_pTreeView;
+	wxIcon m_IconViews, m_IconSelAll, m_IconTreeView;
 };

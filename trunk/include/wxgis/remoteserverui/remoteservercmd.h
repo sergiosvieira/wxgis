@@ -21,6 +21,10 @@
 #pragma once
 #include "wxgis/framework/framework.h"
 
+/** \class wxGISRemoteCmd remoteservercmd.h
+    \brief The Remote Server GxObject commands (in context menu and/or toolbar).
+*/
+
 class wxGISRemoteCmd :
     public ICommand
 {
@@ -42,4 +46,5 @@ public:
 	virtual unsigned char GetCount(void);
 private:
 	IApplication* m_pApp;
+	wxIcon m_IconRemServs, m_IconRemServ, m_IconRemServDiscon;
 };

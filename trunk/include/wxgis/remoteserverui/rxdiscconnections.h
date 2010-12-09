@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
- * Purpose:  remote server UI header.
+ * Purpose:  wxRxDiscConnections class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010 Bishop
@@ -18,36 +18,28 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-
 #pragma once
 
-#include "wxgis/remoteserver/remoteserver.h"
+#include "wxgis/remoteserver/gxremoteserver.h"
+#include "wxgis/catalogui/gxdiscconnectionsui.h"
+#include "wxgis/networking/processor.h"
 
-/** \class INetConnFactoryUI remoteserverui.h
-    \brief The network connection factory UI interface class.
+/** \class wxRxDiscConnections rxdiscconnections.h
+    \brief A Disc Connections RxRootObject.
 */
-class INetConnFactoryUI
+class WXDLLIMPEXP_GIS_RSU wxRxDiscConnections :
+    public wxGxDiscConnectionsUI,
+	public INetMessageReceiver,
+	public IRxObjectClient
 {
+   DECLARE_DYNAMIC_CLASS(wxRxDiscConnections)
 public:
-    virtual ~INetConnFactoryUI(void){};
-	virtual wxWindow* GetPropertyPage(wxWindow* pParent) = 0;
-};
-
-/** \class INetConnFactoryUI remoteserverui.h
-    \brief The network connection factory UI interface class.
-*/
-class wxNetPropertyPage :
-	public wxPanel
-{
-public:
-	wxNetPropertyPage(INetConnFactoryUI* pFactory, wxWindow* pParent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCLIP_CHILDREN | wxNO_BORDER | wxTAB_TRAVERSAL) : wxPanel(pParent, id, pos, size, style)
-	{
-		m_pFactory = pFactory;
-	}
-	virtual ~wxNetPropertyPage(void){};
-	virtual INetClientConnection* OnSave(void) = 0;
-	virtual wxString GetLastError(void){return m_sErrorMsg;};
+	wxRxDiscConnections(void);
+	virtual ~wxRxDiscConnections(void);
+	//IRxObjectClient
+	virtual bool Init(wxGxRemoteServer *pGxRemoteServer, wxXmlNode* pProperties);
+	//INetMessageReceiver
+    virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode);
 protected:
-	INetConnFactoryUI* m_pFactory;
-	wxString m_sErrorMsg;
+    wxGxRemoteServer* m_pGxRemoteServer;
 };

@@ -35,7 +35,6 @@ public:
 	wxGISRasterDataset(wxString sPath, wxGISEnumRasterDatasetType nType);
 	virtual ~wxGISRasterDataset(void);
     // wxGISDataset
-	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
 	virtual OGRSpatialReference* GetSpatialReference(void);
     virtual wxString GetName(void);
     // wxGISRasterDataset
@@ -58,11 +57,9 @@ protected:
 	GDALDataset  *m_poDataset;
 	GDALDataset  *m_poMainDataset;
 	OGRSpatialReference* m_pSpaRef;
-	bool m_bIsOpened;
     bool m_bHasOverviews;
     bool m_bHasStats;
 	int m_nXSize;
 	int m_nYSize;
 	int m_nBandCount;
-    wxCriticalSection m_CritSect;
 };

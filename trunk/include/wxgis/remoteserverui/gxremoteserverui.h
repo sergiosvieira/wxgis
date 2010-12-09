@@ -44,6 +44,9 @@ public:
     virtual bool Invoke(wxWindow* pParentWnd);
     //wxGxRemoteServer
     virtual bool Connect(void);
+	virtual void EmptyChildren(void);
+    virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode);
+	virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog);
 protected:
     wxIcon m_SmallIcon, m_LargeIcon;
     wxIcon m_SmallDsblIcon, m_LargeDsblIcon;

@@ -57,7 +57,7 @@ public:
 protected:
     WXGISMSGQUEUE m_MsgQueue;
     wxCriticalSection m_CriticalSection;
-	std::map<wxString, INetMessageReceiver*> m_MessageReceiverMap;
+	std::vector<std::pair<wxString, INetMessageReceiver*>> m_MessageReceiverArray;
     wxMsgInThread *m_pMsgInThread;
 };
 

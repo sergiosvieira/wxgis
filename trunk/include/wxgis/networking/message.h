@@ -26,16 +26,8 @@
 
 #define BUFF 1000
 
-#define WXNETMESSAGE1 wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg ver=\"%d\" st=\"%d\" prio=\"%u\">%s</msg>")
-#define WXNETMESSAGE2 wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg ver=\"%d\" st=\"%d\" prio=\"%u\"/>")
-
-//#define WEMESSAGE wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg ver=\"%d\" st=\"%d\" message=\"%s\" priority=\"%u\">%s</msg>")
-//
-//
-//// ----------------------------------------------------------------------------
-//// wxNetMessage
-//// ----------------------------------------------------------------------------
-//
+#define WXNETMESSAGE1 wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg ver=\"%d\" st=\"%d\" prio=\"%u\" dst=\"%s\">%s</msg>")
+#define WXNETMESSAGE2 wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg ver=\"%d\" st=\"%d\" prio=\"%u\" dst=\"%s\"/>")
 
 /** \class wxNetMessage message.h
     \brief A network message class.
@@ -46,10 +38,6 @@
 class WXDLLIMPEXP_GIS_NET wxNetMessage : public INetMessage
 {
 public:
-    /** \fn wxNetMessage(void)
-     *  \brief A default constructor.
-     */    
-	wxNetMessage(void);
     /** \fn wxNetMessage(unsigned char* pBuff, size_t nSize)
      *  \brief A constructor.
 	 *	\param pBuff input buffer
@@ -57,7 +45,10 @@ public:
      */    
     wxNetMessage(unsigned char* pBuff, size_t nSize);
     wxNetMessage(wxString sMsgData);
-//    wxNetMessage(long nID, wxGISMessageState nState = enumGISMsgStUnk, short nPriority = enumGISPriorityNormal, wxString sMessage = wxEmptyString, wxString sModuleSrc = wxEmptyString, wxString sModuleDst = wxEmptyString);
+    /** \fn wxNetMessage(void)
+     *  \brief A default constructor.
+     */    
+    wxNetMessage(wxGISMessageState nState = enumGISMsgStUnk, short nPriority = enumGISPriorityNormal, wxString sDst = wxEmptyString);
     /** \fn virtual ~wxNetMessage(void)
      *  \brief A destructor.
      */
@@ -71,7 +62,9 @@ public:
     virtual void SetDirection(wxGISMessageDirection nDirection);
     virtual const wxGISMessageState GetState(void);
     virtual void SetState(wxGISMessageState nState);
-    virtual const wxXmlNode* GetRoot(void);
+	virtual void SetDestination(wxString sDst);
+	virtual const wxString GetDestination(void);
+    virtual wxXmlNode* GetRoot(void);
     virtual const unsigned char* GetData(void);
     virtual const size_t GetDataLen(void);
 	static wxString FormatXmlString(wxString sInputString)
@@ -81,18 +74,20 @@ public:
 		sInputString.Replace(wxT("'"), wxT("&apos;"));
 		sInputString.Replace(wxT(">"), wxT("&gt;"));
 		sInputString.Replace(wxT("<"), wxT("&lt;"));
+		sInputString.Replace(wxT("/"), wxT("&frasl;"));
 		return sInputString;
 	};
 protected:
 	virtual wxString StrFromBuff(unsigned char* pBuff, size_t nBuffByteSize, size_t nValSize);
 	virtual bool LoadXMLFromStr(wxString sData);
-	virtual bool SavedXMLToStr(wxString sData);
+	virtual bool SavedXMLToStr(wxString *p_sData);
 protected:
 	wxXmlDocument *m_pXmlDocument;
 	bool m_bIsOk;
 	short m_nPriority;
 	wxGISMessageDirection m_nDirection;
 	wxGISMessageState m_nState;
+	wxString m_sDst;
 	//wxString m_sMessage;
 	wxString m_sData;
     unsigned char m_cData[BUFF];

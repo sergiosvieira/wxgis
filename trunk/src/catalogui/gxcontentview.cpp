@@ -689,13 +689,20 @@ void wxGxContentView::OnObjectDeleted(IGxObject* pObj)
 
 void wxGxContentView::OnObjectChanged(IGxObject* pObj)
 {
-	//if(pObj == m_pParentGxObject)
-	//{
-	//	IGxObjectContainer* pObjectContainer = dynamic_cast<IGxObjectContainer*>(pObj);
-	//	if(pObjectContainer != NULL)
-	//		if(GetItemCount() > 0 && !pObjectContainer->HasChildren())
-	//			DeleteAllItems();
-	//}
+	if(pObj == m_pParentGxObject)
+	{
+		IGxObjectContainer* pObjectContainer = dynamic_cast<IGxObjectContainer*>(pObj);
+		if(pObjectContainer != NULL)
+		{
+			if(GetItemCount() > 0 && !pObjectContainer->HasChildren())
+				ResetContents();
+			else if(GetItemCount() == 0 && pObjectContainer->HasChildren())
+			{
+				OnRefreshAll();
+				return;
+			}
+		}
+	}
 	for(long i = 0; i < GetItemCount(); i++)
 	{
 		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);

@@ -34,7 +34,7 @@
 IMPLEMENT_DYNAMIC_CLASS(wxGISCommonCmd, wxObject)
 
 
-wxGISCommonCmd::wxGISCommonCmd(void) : ICommand()
+wxGISCommonCmd::wxGISCommonCmd(void) : ICommand(), m_IconMain(mainframe_xpm), m_IconOpt(options_xpm)
 {
 }
 
@@ -47,9 +47,9 @@ wxIcon wxGISCommonCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 1:
-			return wxIcon(mainframe_xpm);
+			return m_IconMain;
 		case 5:	
-			return wxIcon(options_xpm);
+			return m_IconOpt;
 		case 0:	
 		case 2:	
 		case 3:	

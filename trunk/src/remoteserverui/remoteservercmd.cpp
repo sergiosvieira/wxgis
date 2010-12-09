@@ -21,19 +21,23 @@
 #include "wxgis/remoteserverui/remoteservercmd.h"
 #include "wxgis/remoteserverui/serversearchdlg.h"
 #include "wxgis/remoteserverui/gxremoteserversui.h"
+#include "wxgis/remoteserverui/gxremoteserverui.h"
 #include "wxgis/catalogui/gxcatalogui.h"
 
 #include "../../art/remoteserver_16.xpm"
 #include "../../art/remoteservers_16.xpm"
+#include "../../art/remoteserver_discon.xpm"
 
 
 //	0	Search Servers
-//	1	Connect Server
+//	1	Server connection
+//	2	Connect
+//	3	Disconnect
 
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISRemoteCmd, wxObject)
 
-wxGISRemoteCmd::wxGISRemoteCmd(void)
+wxGISRemoteCmd::wxGISRemoteCmd(void) : m_IconRemServs(remoteservers_16_xpm), m_IconRemServ(remoteserver_16_xpm), m_IconRemServDiscon(remoteserver_discon_xpm)
 {
 }
 
@@ -46,9 +50,13 @@ wxIcon wxGISRemoteCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
-			return wxIcon(remoteservers_16_xpm);
+			return m_IconRemServs;
 		case 1:
-			return wxIcon(remoteserver_16_xpm);
+			return m_IconRemServ;
+		case 2:
+			return m_IconRemServ;
+		case 3:
+			return m_IconRemServDiscon;
 		default:
 			return wxNullIcon;
 	}
@@ -61,7 +69,11 @@ wxString wxGISRemoteCmd::GetCaption(void)
 		case 0:	
 			return wxString(_("&Search servers"));
 		case 1:	
-			return wxString(_("&Connect to server"));
+			return wxString(_("Server c&onnection"));
+		case 2:	
+			return wxString(_("&Connect"));
+		case 3:	
+			return wxString(_("&Disconnect"));
 		default:
 			return wxEmptyString;
 	}
@@ -73,6 +85,8 @@ wxString wxGISRemoteCmd::GetCategory(void)
 	{
 		case 0:	
 		case 1:	
+		case 2:	
+		case 3:	
 			return wxString(_("Remote Server"));
 		default:
 			return wxString(_("[No category]"));
@@ -86,10 +100,11 @@ bool wxGISRemoteCmd::GetChecked(void)
 
 bool wxGISRemoteCmd::GetEnabled(void)
 {
+	bool bConn(false);
 	switch(m_subtype)
 	{
 		case 0://search server
-		case 1://connect server
+		case 1://server connection
 			{
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
@@ -99,6 +114,23 @@ bool wxGISRemoteCmd::GetEnabled(void)
                 wxGxRemoteServersUI* pGxRemoteServersUI = dynamic_cast<wxGxRemoteServersUI*>(pSel->GetLastSelectedObject());
                 if(pGxRemoteServersUI)
                     return true;
+			}		
+			return false;
+			}
+		case 2://connect
+		case 3://disconnect
+			{
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
+                wxGxRemoteServerUI* pGxRemoteServerUI = dynamic_cast<wxGxRemoteServerUI*>(pSel->GetLastSelectedObject());
+                if(pGxRemoteServerUI)
+					if(m_subtype == 2)
+						return  !pGxRemoteServerUI->IsConnected();
+					else
+						return  pGxRemoteServerUI->IsConnected();
 			}		
 			return false;
 			}
@@ -112,7 +144,9 @@ wxGISEnumCommandKind wxGISRemoteCmd::GetKind(void)
 	switch(m_subtype)
 	{
 		case 0://search server
-		case 1://connect server
+		case 1://server connection
+		case 2://connect
+		case 3://disconnect
 			return enumGISCommandNormal;
 		default:
 			return enumGISCommandNormal;
@@ -126,7 +160,11 @@ wxString wxGISRemoteCmd::GetMessage(void)
 		case 0:	
 			return wxString(_("Search for remote server"));
 		case 1:	
+			return wxString(_("Create connection to remote server"));
+		case 2:	
 			return wxString(_("Connect to remote server"));
+		case 3:	
+			return wxString(_("Disconnect from remote server"));
 		default:
 			return wxEmptyString;
 	}
@@ -168,6 +206,23 @@ void wxGISRemoteCmd::OnClick(void)
 				}
 			}
 			return;
+		case 2:	//connect
+		case 3:	//disconnect
+			{
+				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+				if(pGxApp)
+				{
+					wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+					IGxSelection* pSel = pGxCatalogUI->GetSelection();
+					wxGxRemoteServerUI* pGxRemoteServerUI = dynamic_cast<wxGxRemoteServerUI*>(pSel->GetLastSelectedObject());
+					if(pGxRemoteServerUI)
+						if(m_subtype == 2)
+							pGxRemoteServerUI->Connect();
+						else
+							pGxRemoteServerUI->Disconnect();
+				}
+			}
+			return;
 		default:
 			return;
 	}
@@ -186,7 +241,11 @@ wxString wxGISRemoteCmd::GetTooltip(void)
 		case 0:	
 			return wxString(_("Search servers"));
 		case 1:	
+			return wxString(_("Create connection to server"));
+		case 2:	
 			return wxString(_("Connect to server"));
+		case 3:	
+			return wxString(_("Disconnect from server"));
 		default:
 			return wxEmptyString;
 	}
@@ -194,6 +253,6 @@ wxString wxGISRemoteCmd::GetTooltip(void)
 
 unsigned char wxGISRemoteCmd::GetCount(void)
 {
-	return 2;
+	return 4;
 }
 

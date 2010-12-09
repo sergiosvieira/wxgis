@@ -69,7 +69,7 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogMainCmd, wxObject)
 
-wxGISCatalogMainCmd::wxGISCatalogMainCmd(void)
+wxGISCatalogMainCmd::wxGISCatalogMainCmd(void) : m_IconFolderUp(folder_up_xpm), m_IconFolderConn(folder_conn_new_xpm), m_IconFolderConnDel(folder_conn_del_xpm), m_IconDel(delete_xpm), m_IconGoPrev(go_previous_xpm), m_IconGoNext(go_next_xpm), m_IconFolderNew(folder_new_xpm), m_IconEdit(edit_xpm), m_IconViewRefresh(view_refresh_xpm), m_IconProps(properties_xpm)
 {
 }
 
@@ -82,25 +82,25 @@ wxIcon wxGISCatalogMainCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
-			return wxIcon(folder_up_xpm);
+			return m_IconFolderUp;
 		case 1:
-			return wxIcon(folder_conn_new_xpm);
+			return m_IconFolderConn;
 		case 2:
-			return wxIcon(folder_conn_del_xpm);
+			return m_IconFolderConnDel;
 		case 4:
-			return wxIcon(delete_xpm);
+			return m_IconDel;
 		case 5:
-			return wxIcon(go_previous_xpm);
+			return m_IconGoPrev;
 		case 6:
-			return wxIcon(go_next_xpm);
+			return m_IconGoNext;
 		case 7:
-			return wxIcon(folder_new_xpm);
+			return m_IconFolderNew;
 		case 8:	
-			return wxIcon(edit_xpm);
+			return m_IconEdit;
 		case 9:
-			return wxIcon(view_refresh_xpm);
+			return m_IconViewRefresh;
 		case 10:
-			return wxIcon(properties_xpm);
+			return m_IconProps;
 		case 3:
 		default:
 			return wxNullIcon;

@@ -53,4 +53,6 @@ public:
     virtual void OnDropDownCommand(int nID);
 private:
 	IApplication* m_pApp;
+	wxIcon m_IconFolderUp, m_IconFolderConn, m_IconFolderConnDel, m_IconDel, m_IconGoPrev, m_IconGoNext, m_IconFolderNew, m_IconEdit, m_IconViewRefresh, m_IconProps;
+
 };

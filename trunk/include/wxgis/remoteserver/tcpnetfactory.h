@@ -107,7 +107,7 @@ protected:
 	wxSocketClient* m_pSock;
 	wxNetTCPReader* m_pClientTCPReader;
 	wxNetTCPWriter* m_pClientTCPWriter;
-//	wxNetTCPWaitlost* m_pClientTCPWaitlost;
+	wxNetTCPWaitlost* m_pClientTCPWaitlost;
 	INetCallback* m_pCallBack;
 
 };

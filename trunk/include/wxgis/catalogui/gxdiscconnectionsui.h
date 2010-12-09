@@ -23,7 +23,7 @@
 #include "wxgis/catalog/gxdiscconnections.h"
 
 /** \class wxGxDiscConnectionsUI gxdiscconnectionsui.h
-    \brief A Disc Connections GxRootObject.
+    \brief The Disc Connections GxRootObject.
 */
 class WXDLLIMPEXP_GIS_CLU wxGxDiscConnectionsUI :
     public wxGxDiscConnections,

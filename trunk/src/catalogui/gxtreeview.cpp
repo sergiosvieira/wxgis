@@ -271,7 +271,11 @@ void wxGxTreeViewBase::OnObjectChanged(IGxObject* object)
 				{
 					bool bItemHasChildren = pGxObjectContainer->HasChildren();
 					if(ItemHasChildren(TreeItemId) && !bItemHasChildren)
-						DeleteChildren(TreeItemId);
+					{
+						//DeleteChildren(TreeItemId);
+						CollapseAndReset(TreeItemId);
+						pData->m_bExpandedOnce = false;
+					}
 					SetItemHasChildren(TreeItemId, bItemHasChildren && pGxObjectContainer->AreChildrenViewable());
 				}
 				wxTreeCtrl::Refresh();
