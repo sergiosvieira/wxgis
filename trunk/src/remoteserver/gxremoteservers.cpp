@@ -134,7 +134,13 @@ void wxGxRemoteServers::LoadChildren(wxXmlNode* pConf)
 				wxGxRemoteServer* pServerConn = new wxGxRemoteServer(pConn);
 				IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
 				if(!AddChild(pGxObj))
+				{
 					wxDELETE(pGxObj);
+				}
+				else //set callback
+				{
+					pConn->SetCallback(static_cast<INetCallback*>(pServerConn));
+				}
 			}
 		}
 		pChild = pChild->GetNext();

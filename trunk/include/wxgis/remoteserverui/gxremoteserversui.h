@@ -44,7 +44,5 @@ public:
 	virtual void EmptyChildren(void);
     virtual void CreateConnection(wxWindow* pParent, bool bSearch = false);
 protected:
-	wxIcon m_RemServ16, m_RemServ48;
-	wxIcon m_RemServDsbld16, m_RemServDsbld48;
-	wxIcon m_RemServAuth16, m_RemServAuth48;
+	wxIcon m_RemServs16, m_RemServs48;
 };

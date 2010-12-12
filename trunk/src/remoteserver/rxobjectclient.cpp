@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
- * Purpose:  wxRxDiscConnections class.
+ * Purpose:  wxRxObject class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010 Bishop
@@ -18,15 +18,32 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#include "wxgis/remoteserverui/rxdiscconnections.h"
 
-IMPLEMENT_DYNAMIC_CLASS(wxRxDiscConnections, wxGxDiscConnectionsUI)
+#include "wxgis/remoteserver/rxobjectclient.h"
 
-wxRxDiscConnections::wxRxDiscConnections(void) : wxGxDiscConnectionsUI()
+wxRxObject::wxRxObject() : m_pGxRemoteServer(NULL)
 {
 }
 
-wxRxDiscConnections::~wxRxDiscConnections(void)
+wxRxObject::~wxRxObject()
 {
 }
 
+bool wxRxObject::Init(wxGxRemoteServer* pGxRemoteServer, wxXmlNode* pProperties)
+{
+	if(!pProperties && !pGxRemoteServer)
+		return false;
+	m_pGxRemoteServer = pGxRemoteServer;
+	if(!pProperties->HasProp(wxT("dst"))) //set dst from xml
+	{
+		m_sDst = pProperties->GetPropVal(wxT("dst"), ERR);
+		INetMessageProcessor* pNetMessageProcessor = dynamic_cast<INetMessageProcessor*>(m_pGxRemoteServer);
+		if(pNetMessageProcessor)
+			pNetMessageProcessor->AddMessageReceiver(m_sDst, static_cast<INetMessageReceiver*>(this));
+	}
+	return true;
+}
+
+void wxRxObject::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
+{
+}

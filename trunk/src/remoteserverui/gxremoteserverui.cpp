@@ -21,15 +21,22 @@
 
 #include "wxgis/remoteserverui/gxremoteserverui.h"
 #include "wxgis/catalogui/gxcatalogui.h"
+#include "../../art/remoteserverauth_16.xpm"
+#include "../../art/remoteserverauth_48.xpm"
+#include "../../art/remoteserver_16.xpm"
+#include "../../art/remoteserver_48.xpm"
 
-wxGxRemoteServerUI::wxGxRemoteServerUI(INetClientConnection* pNetConn, wxIcon SmallIcon, wxIcon LargeIcon, wxIcon SmallDsblIcon, wxIcon LargeDsblIcon, wxIcon SmallAuthIcon, wxIcon LargeAuthIcon) : wxGxRemoteServer(pNetConn)
+
+wxGxRemoteServerUI::wxGxRemoteServerUI(INetClientConnection* pNetConn) : wxGxRemoteServer(pNetConn)
 {
-    m_SmallIcon = SmallIcon;
-    m_LargeIcon = LargeIcon;
-    m_SmallDsblIcon = SmallDsblIcon;
-    m_LargeDsblIcon = LargeDsblIcon;
-    m_SmallAuthIcon = SmallAuthIcon;
-    m_LargeAuthIcon = LargeAuthIcon;
+    m_SmallIcon = wxIcon(remoteserver_16_xpm);
+    m_LargeIcon = wxIcon(remoteserver_48_xpm);
+    m_SmallAuthIcon = wxIcon(remoteserverauth_16_xpm);
+    m_LargeAuthIcon = wxIcon(remoteserverauth_48_xpm);
+    wxBitmap RemServDsbld16 = wxBitmap(remoteserver_16_xpm).ConvertToImage().ConvertToGreyscale();
+    wxBitmap RemServDsbld48 = wxBitmap(remoteserver_48_xpm).ConvertToImage().ConvertToGreyscale();
+    m_SmallDsblIcon.CopyFromBitmap(RemServDsbld16);
+    m_LargeDsblIcon.CopyFromBitmap(RemServDsbld48);
 }
 
 wxGxRemoteServerUI::~wxGxRemoteServerUI(void)

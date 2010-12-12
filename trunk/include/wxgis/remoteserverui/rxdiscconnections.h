@@ -20,7 +20,7 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/remoteserver/gxremoteserver.h"
+#include "wxgis/remoteserver/rxobjectclient.h"
 #include "wxgis/catalogui/gxdiscconnectionsui.h"
 #include "wxgis/networking/processor.h"
 
@@ -29,17 +29,10 @@
 */
 class WXDLLIMPEXP_GIS_RSU wxRxDiscConnections :
     public wxGxDiscConnectionsUI,
-	public INetMessageReceiver,
-	public IRxObjectClient
+	public wxRxObject
 {
    DECLARE_DYNAMIC_CLASS(wxRxDiscConnections)
 public:
 	wxRxDiscConnections(void);
 	virtual ~wxRxDiscConnections(void);
-	//IRxObjectClient
-	virtual bool Init(wxGxRemoteServer *pGxRemoteServer, wxXmlNode* pProperties);
-	//INetMessageReceiver
-    virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode);
-protected:
-    wxGxRemoteServer* m_pGxRemoteServer;
 };

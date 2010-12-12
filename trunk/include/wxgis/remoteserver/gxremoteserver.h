@@ -58,6 +58,7 @@ public:
     virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode);
 	//wxGxRemoteServer
 	virtual void EmptyChildren(void);
+	virtual void PutOutMessage(WXGISMSG msg);
 protected:
     INetClientConnection* m_pNetConn;
 	bool m_bIsChildrenLoaded;
