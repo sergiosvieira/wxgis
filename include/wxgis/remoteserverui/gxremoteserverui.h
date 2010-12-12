@@ -33,7 +33,7 @@ class WXDLLIMPEXP_GIS_RSU wxGxRemoteServerUI :
 	public IGxObjectWizard
 {
 public:
-	wxGxRemoteServerUI(INetClientConnection* pNetConn, wxIcon SmallIcon = wxNullIcon, wxIcon LargeIcon = wxNullIcon, wxIcon SmallDsblIcon = wxNullIcon, wxIcon LargeDsblIcon = wxNullIcon, wxIcon SmallAuthIcon = wxNullIcon, wxIcon LargeAuthIcon = wxNullIcon);
+	wxGxRemoteServerUI(INetClientConnection* pNetConn);
 	virtual ~wxGxRemoteServerUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);

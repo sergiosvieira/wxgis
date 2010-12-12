@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
- * Purpose:  wxRxDiscConnections class.
+ * Purpose:  wxRxObject class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010 Bishop
@@ -18,15 +18,38 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#include "wxgis/remoteserverui/rxdiscconnections.h"
+#pragma once
 
-IMPLEMENT_DYNAMIC_CLASS(wxRxDiscConnections, wxGxDiscConnectionsUI)
+#include "wxgis/remoteserver/gxremoteserver.h"
 
-wxRxDiscConnections::wxRxDiscConnections(void) : wxGxDiscConnectionsUI()
+/** \class wxRxObject gxremoteserver.h
+    \brief The base class for Remote GxObjects (RxObjects).
+*/
+class WXDLLIMPEXP_GIS_RS wxRxObject : 
+	public IRxObjectClient,
+	public INetMessageReceiver
 {
-}
+public:
+	wxRxObject(void);
+	virtual ~wxRxObject(void);
+	//IRxObjectClient
+	virtual bool Init(wxGxRemoteServer *pGxRemoteServer, wxXmlNode* pProperties);
+	//INetMessageReceiver
+    virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode);
+protected:
+    wxGxRemoteServer* m_pGxRemoteServer;
+	wxString m_sDst;
+};
 
-wxRxDiscConnections::~wxRxDiscConnections(void)
+/** \class wxRxObjectContainer gxremoteserver.h
+    \brief The base class for Remote GxObjectContainers (RxObjectContainers).
+*/
+class WXDLLIMPEXP_GIS_RS wxRxObjectContainer : 
+	public wxRxObjectContainer
 {
-}
-
+public:
+	wxRxObjectContainer(void);
+	virtual ~wxRxObjectContainer(void);
+	//
+	bool LoadChildren(void);
+};

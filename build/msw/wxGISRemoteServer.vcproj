@@ -180,6 +180,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\remoteserver\rxobjectclient.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\remoteserver\tcpnetfactory.cpp"
 				>
 			</File>
@@ -199,6 +203,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\remoteserver\remoteserver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\remoteserver\rxobjectclient.h"
 				>
 			</File>
 			<File

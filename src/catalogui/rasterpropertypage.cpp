@@ -203,7 +203,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
     if(bHasOvr)
         pyrprop = m_pg->Append( new wxStringProperty(OVR_TXT, wxPG_LABEL, _("Present (click to rebuild)")) );
     else
-        wxPGId pyrprop = m_pg->Append( new wxStringProperty(OVR_TXT, wxPG_LABEL, _("Absent (click to build)")) );
+        pyrprop = m_pg->Append( new wxStringProperty(OVR_TXT, wxPG_LABEL, _("Absent (click to build)")) );
     m_pg->SetPropertyEditor(pyrprop, wxPG_EDITOR(TextCtrlAndButton));
 
     //Statistics

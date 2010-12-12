@@ -42,6 +42,7 @@ bool wxGxRemoteServer::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
 		return false;
 	AddMessageReceiver(wxT("auth"), static_cast<INetMessageReceiver*>(this));
 	AddMessageReceiver(wxT("info"), static_cast<INetMessageReceiver*>(this));
+	AddMessageReceiver(wxT("bye"), static_cast<INetMessageReceiver*>(this));
 
 	return true;
 }
@@ -94,6 +95,7 @@ bool wxGxRemoteServer::IsConnected(void)
 {
  	if(m_pNetConn)
 		return m_pNetConn->IsConnected();
+	return false;
 }
 
 wxString wxGxRemoteServer::GetName(void)
@@ -123,7 +125,7 @@ void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 {
 	if(msg.pMsg->GetState() == enumGISMsgStAlive)
 	{
-        wxNetMessage* pMsg = new wxNetMessage(wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStOk, enumGISPriorityHighest, wxT("bye")));
+        wxNetMessage* pMsg = new wxNetMessage(wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStAlive, enumGISPriorityHighest, wxT("bye")));
         if(pMsg->IsOk())
         {
 	        WXGISMSG msg = {pMsg, -1};
@@ -186,6 +188,12 @@ void wxGxRemoteServer::PutInMessage(WXGISMSG msg)
 	//proceed message in separate thread
 	wxCriticalSectionLocker locker(m_CriticalSection);
     m_MsgQueue.push(msg);
+}
+
+void wxGxRemoteServer::PutOutMessage(WXGISMSG msg)
+{
+	if(m_pNetConn)
+		m_pNetConn->PutOutMessage(msg);
 }
 
 void wxGxRemoteServer::EmptyChildren(void)

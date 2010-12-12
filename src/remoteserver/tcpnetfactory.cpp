@@ -324,9 +324,6 @@ bool wxClientTCPNetConnection::Disconnect(void)
 	m_bIsConnected = false;
 	m_pSock->Close();
 
-    CleanMsgQueueres();
-	if(m_pCallBack)
-		m_pCallBack->OnDisconnect();
 
     if(m_pClientTCPReader)
 		m_pClientTCPReader->Delete();
@@ -337,6 +334,10 @@ bool wxClientTCPNetConnection::Disconnect(void)
     //if(m_pClientTCPWaitlost)	//auto exit
     //    m_pClientTCPWaitlost->Delete();
     m_pClientTCPWaitlost = NULL;
+
+    CleanMsgQueueres();
+	if(m_pCallBack)
+		m_pCallBack->OnDisconnect();
 
 //	m_pSock->Destroy();
 
