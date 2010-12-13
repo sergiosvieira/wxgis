@@ -27,29 +27,58 @@
 */
 class WXDLLIMPEXP_GIS_RS wxRxObject : 
 	public IRxObjectClient,
-	public INetMessageReceiver
+	public INetMessageReceiver,
+	public IGxObject
 {
 public:
 	wxRxObject(void);
 	virtual ~wxRxObject(void);
+	//IGxObject
+	virtual wxString GetCategory(void){return wxString(_("Remote item"));};
+	virtual void Detach(void);
+	virtual wxString GetName(void){return m_sName;};
+    virtual wxString GetBaseName(void){return GetName();};
 	//IRxObjectClient
 	virtual bool Init(wxGxRemoteServer *pGxRemoteServer, wxXmlNode* pProperties);
 	//INetMessageReceiver
-    virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode);
+    virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode) = 0;
 protected:
     wxGxRemoteServer* m_pGxRemoteServer;
-	wxString m_sDst;
+	wxString m_sDst, m_sName;
 };
 
 /** \class wxRxObjectContainer gxremoteserver.h
     \brief The base class for Remote GxObjectContainers (RxObjectContainers).
 */
 class WXDLLIMPEXP_GIS_RS wxRxObjectContainer : 
-	public wxRxObjectContainer
+	public IRxObjectClient,
+	public INetMessageReceiver,
+	public IGxObjectContainer
 {
 public:
 	wxRxObjectContainer(void);
 	virtual ~wxRxObjectContainer(void);
-	//
-	bool LoadChildren(void);
+	//IGxObject
+	virtual void Detach(void);
+	virtual wxString GetName(void){return m_sName;};
+    virtual wxString GetBaseName(void){return GetName();};
+	virtual wxString GetCategory(void){return wxString(_("Remote container"));};
+	virtual void Refresh(void);
+	//IGxObjectContainer
+	virtual bool DeleteChild(IGxObject* pChild);
+	virtual bool AreChildrenViewable(void){return true;};
+	virtual bool HasChildren(void){LoadChildren(); return m_Children.size() > 0 ? true : false;};
+	//IRxObjectClient
+	virtual bool Init(wxGxRemoteServer *pGxRemoteServer, wxXmlNode* pProperties);
+	//INetMessageReceiver
+    virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode);
+	//wxRxMonitoringDatabases
+	virtual void EmptyChildren(void);
+	virtual bool LoadChildren(void);
+protected:
+    wxGxRemoteServer* m_pGxRemoteServer;
+	wxString m_sDst, m_sName;
+	bool m_bIsChildrenLoaded;
+	int m_nChildCount;
+	wxArrayString m_sDstArray;
 };
