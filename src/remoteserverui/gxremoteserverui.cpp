@@ -84,7 +84,8 @@ bool wxGxRemoteServerUI::Connect(void)
 		wxMessageBox(_("Connection error! The server is not available."), _("Error"), wxICON_ERROR | wxOK );
 		return false;
 	}
-	wxMessageBox(_("Connection object is broken!"), _("Error"), wxICON_ERROR | wxOK );
+	else if(!m_pNetConn)
+		wxMessageBox(_("Connection object is broken!"), _("Error"), wxICON_ERROR | wxOK );
 	return false;
 }
 
@@ -146,6 +147,7 @@ void wxGxRemoteServerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 					}
 					pChildNode = pChildNode->GetNext();
 				}
+				m_bIsChildrenLoaded = m_nChildCount == m_Children.size();
 				m_pCatalog->ObjectChanged(this);
 			}
 		}

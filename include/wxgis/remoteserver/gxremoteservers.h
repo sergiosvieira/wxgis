@@ -37,7 +37,7 @@ public:
 	virtual void Detach(void);
 	virtual wxString GetName(void){return wxString(_("Remote Servers"));};
     virtual wxString GetBaseName(void){return GetName();};
-    virtual wxString GetFullName(void){return wxEmptyString;};
+//    virtual wxString GetFullName(void){return wxEmptyString;};
 	virtual wxString GetCategory(void){return wxString(_("Remote Servers"));};
 	virtual void Refresh(void);
 	//IGxObjectContainer

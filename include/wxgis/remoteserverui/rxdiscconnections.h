@@ -29,7 +29,7 @@
 */
 class WXDLLIMPEXP_GIS_RSU wxRxDiscConnections :
     public wxGxDiscConnectionsUI,
-	public wxRxObject
+	public wxRxObjectContainer
 {
    DECLARE_DYNAMIC_CLASS(wxRxDiscConnections)
 public:
