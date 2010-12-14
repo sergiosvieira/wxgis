@@ -40,9 +40,6 @@ bool wxGxRemoteServer::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
 {
 	if(!IGxObject::Attach(pParent, pCatalog))
 		return false;
-	AddMessageReceiver(wxT("auth"), static_cast<INetMessageReceiver*>(this));
-	AddMessageReceiver(wxT("info"), static_cast<INetMessageReceiver*>(this));
-	AddMessageReceiver(wxT("bye"), static_cast<INetMessageReceiver*>(this));
 
 	return true;
 }
@@ -50,13 +47,15 @@ bool wxGxRemoteServer::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
 
 void wxGxRemoteServer::Detach(void)
 {
-	Disconnect();
-	ClearMessageReceiver();
+	if(IsConnected())
+		Disconnect();
 	IGxObject::Detach();
 }
 
 void wxGxRemoteServer::Refresh(void)
 {
+	EmptyChildren();
+	LoadChildren();
 }
  
 bool wxGxRemoteServer::DeleteChild(IGxObject* pChild)
@@ -108,6 +107,10 @@ wxString wxGxRemoteServer::GetName(void)
 
 void wxGxRemoteServer::OnConnect(void)
 {
+	AddMessageReceiver(wxT("auth"), static_cast<INetMessageReceiver*>(this));
+	AddMessageReceiver(wxT("info"), static_cast<INetMessageReceiver*>(this));
+	AddMessageReceiver(wxT("bye"), static_cast<INetMessageReceiver*>(this));
+
 	OnStartMessageThread();
 	m_pCatalog->ObjectChanged(this);
 }
@@ -141,14 +144,7 @@ void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 			m_bAuth = true;
 			m_pCatalog->ObjectChanged(this);
 
-			//request children
-		    wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStGet, enumGISPriorityNormal, wxT("root"), wxT("<children/>"));
-	        wxNetMessage* pMsg = new wxNetMessage(sMsg);
-	        if(pMsg->IsOk())
-	        {
-		        WXGISMSG msg = {pMsg, -1};
-		        m_pNetConn->PutOutMessage(msg);
-	        }
+			LoadChildren();
 		}
 		return;
     }
@@ -205,4 +201,17 @@ void wxGxRemoteServer::EmptyChildren(void)
 	}
 	m_Children.clear();
 	m_bIsChildrenLoaded = false;
+	m_pCatalog->ObjectChanged(this);
+}
+
+void wxGxRemoteServer::LoadChildren()
+{
+	//request children
+    wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStGet, enumGISPriorityNormal, wxT("root"), wxT("<children/>"));
+    wxNetMessage* pMsg = new wxNetMessage(sMsg);
+    if(pMsg->IsOk())
+    {
+        WXGISMSG msg = {pMsg, -1};
+        m_pNetConn->PutOutMessage(msg);
+    }
 }

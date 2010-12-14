@@ -50,6 +50,7 @@ public:
     virtual void ProcessMessage(WXGISMSG msg);
 	virtual void ClearMessageQueue(void);
 	virtual void AddMessageReceiver(wxString sName, INetMessageReceiver* pNetMessageReceiver);
+	virtual void DelMessageReceiver(wxString sName, INetMessageReceiver* pNetMessageReceiver);
 	virtual void ClearMessageReceiver(void);
 	//
 	virtual bool OnStartMessageThread(void);

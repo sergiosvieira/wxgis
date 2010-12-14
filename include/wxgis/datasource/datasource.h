@@ -76,10 +76,11 @@ enum wxGISEnumPrjFileType
 
 enum wxGISEnumContainerType
 {
-    enumContAny = 0,
+    enumContUnknown = 0,
 	enumContFolder = 1,
 	enumContGDBFolder = 2,
-    enumCondDataset = 3
+    enumCondDataset = 3,
+	enumContGDB = 4
 };
 
 typedef struct _Limits

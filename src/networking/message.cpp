@@ -47,7 +47,7 @@ wxNetMessage::wxNetMessage(unsigned char* pBuff, size_t nSize) : m_bIsOk(false),
 	if(!LoadXMLFromStr(m_sData))
 		return;
 
-    m_bIsOk = !m_sData.IsEmpty();
+    m_bIsOk = true;
 }
 
 wxString wxNetMessage::StrFromBuff(unsigned char* pBuff, size_t nBuffByteSize, size_t nValSize)
@@ -248,6 +248,7 @@ bool wxNetMessage::LoadXMLFromStr(wxString sData)
 	//m_sMessage = pRoot->GetPropVal(wxT("message"), wxT(""));
 	m_nPriority = wxAtoi(pRoot->GetPropVal(wxT("prio"), wxT("0")));
 	m_sDst = pRoot->GetPropVal(wxT("dst"), wxT("*"));
+	return true;
 }
 
 bool wxNetMessage::SavedXMLToStr(wxString *p_sData)

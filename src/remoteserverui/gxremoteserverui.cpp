@@ -69,9 +69,17 @@ wxIcon wxGxRemoteServerUI::GetSmallImage(void)
         return m_SmallDsblIcon;
 }
 
+#include "wxgis/datasource/postgisdataset.h"
+
 bool wxGxRemoteServerUI::Invoke(wxWindow* pParentWnd)
 {
 	return Connect();
+	//PG:host='localhost' dbname='<raster_database>' user='<user>' password='<password>'
+	//PG:"dbname='databasename' host='addr' port='5432' user='x' password='y'"
+	//wxGISPostGISDataset PGDSet(wxT("PG:host='127.0.0.1' dbname='monitoring_db' port='5432' user='bishop' password='xxx'"));
+	//wxString sName = PGDSet.GetName();
+	//size_t i = PGDSet.GetSubsetsCount();
+	//return false;
 }
 
 bool wxGxRemoteServerUI::Connect(void)
@@ -96,7 +104,6 @@ void wxGxRemoteServerUI::EmptyChildren(void)
         wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pCatalog);
         if(pCatalog)
         {
-
             IGxSelection* pSel = pCatalog->GetSelection();
             if(pSel)
                 pSel->Unselect(m_Children[i], IGxSelection::INIT_ALL);
@@ -106,6 +113,7 @@ void wxGxRemoteServerUI::EmptyChildren(void)
 	}
 	m_Children.clear();
 	m_bIsChildrenLoaded = false;
+	m_pCatalog->ObjectChanged(this);
 }
 
 void wxGxRemoteServerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
@@ -156,11 +164,9 @@ void wxGxRemoteServerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 
 }
 
-bool wxGxRemoteServerUI::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
+void wxGxRemoteServerUI::OnConnect(void)
 {
-	if(!wxGxRemoteServer::Attach(pParent, pCatalog))
-		return false;
 	AddMessageReceiver(wxT("root"), static_cast<INetMessageReceiver*>(this));
-
-	return true;
+	wxGxRemoteServer::OnConnect();
 }
+

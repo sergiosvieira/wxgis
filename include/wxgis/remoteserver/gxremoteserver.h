@@ -57,6 +57,7 @@ public:
 	//INetMessageReceiver
     virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode);
 	//wxGxRemoteServer
+	virtual void LoadChildren(void);
 	virtual void EmptyChildren(void);
 	virtual void PutOutMessage(WXGISMSG msg);
 protected:

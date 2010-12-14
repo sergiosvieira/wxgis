@@ -51,6 +51,9 @@ bool wxRxObject::Init(wxGxRemoteServer* pGxRemoteServer, wxXmlNode* pProperties)
 
 void wxRxObject::Detach(void)
 {
+	INetMessageProcessor* pNetMessageProcessor = dynamic_cast<INetMessageProcessor*>(m_pGxRemoteServer);
+	if(pNetMessageProcessor)
+		pNetMessageProcessor->DelMessageReceiver(m_sDst, static_cast<INetMessageReceiver*>(this));
 	IGxObject::Detach();
 }
 
@@ -148,6 +151,9 @@ void wxRxObjectContainer::Refresh(void)
 
 void wxRxObjectContainer::Detach(void)
 {
+	INetMessageProcessor* pNetMessageProcessor = dynamic_cast<INetMessageProcessor*>(m_pGxRemoteServer);
+	if(pNetMessageProcessor)
+		pNetMessageProcessor->DelMessageReceiver(m_sDst, static_cast<INetMessageReceiver*>(this));
 	EmptyChildren();
 	IGxObject::Detach();
 }

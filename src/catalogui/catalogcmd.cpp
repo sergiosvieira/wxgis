@@ -274,7 +274,7 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
                         IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(pSel->GetSelectedObjects(0));
                         if(pCont)
                         {
-                            return pCont->CanCreate(enumGISContainer, enumContAny);
+                            return pCont->CanCreate(enumGISContainer, enumContUnknown);
                         }
                     }
                 }

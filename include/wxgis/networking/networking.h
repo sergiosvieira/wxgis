@@ -214,5 +214,6 @@ public:
     virtual void ProcessMessage(WXGISMSG msg) = 0;
 	virtual void ClearMessageQueue(void) = 0;
 	virtual void AddMessageReceiver(wxString sName, INetMessageReceiver* pNetMessageReceiver) = 0;
+	virtual void DelMessageReceiver(wxString sName, INetMessageReceiver* pNetMessageReceiver) = 0;
 	virtual void ClearMessageReceiver(void) = 0;
 };
