@@ -29,13 +29,16 @@ class WXDLLIMPEXP_GIS_DS wxGISPostGISDataset :
 	public wxGISDataset
 {
 public:
-	wxGISPostGISDataset(wxString sPath, wxGISEnumVectorDatasetType nType);
+	wxGISPostGISDataset(wxString sPath);
 	virtual ~wxGISPostGISDataset(void);
-//wxGISDataset
- //   virtual size_t GetSubsetsCount(void);
- //   virtual wxGISDataset* GetSubset(size_t nIndex);
- //   virtual wxString GetName(void);
-	//virtual OGRSpatialReference* GetSpatialReference(void);
+	//wxGISDataset
+    virtual size_t GetSubsetsCount(void);
+    virtual wxGISDataset* GetSubset(size_t nIndex);
+    virtual wxString GetName(void);
+	virtual void Close(void);
+	//wxGISPostGISDataset
+	virtual OGRDataSource* GetDataSource(void);
+	virtual bool Open(void);
 protected:
 	OGRDataSource *m_poDS;
 };

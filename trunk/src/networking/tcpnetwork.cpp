@@ -45,7 +45,7 @@ void *wxNetTCPReader::Entry()
 			if(m_pSock->Error())
 			{
 				wxThread::Sleep(50);
-				//continue;
+				continue;
 			}
 			size_t nSize = m_pSock->LastCount();
 			if(!m_pSock->Error() && nSize > 0)
@@ -61,6 +61,8 @@ void *wxNetTCPReader::Entry()
 					wxDELETE(pMsg);
 			}
 		}
+		else
+			wxThread::Sleep(100);
 	}
 	return NULL;
 }
@@ -136,52 +138,7 @@ void *wxNetTCPWaitlost::Entry()
             bLostConn = true;
 	        break;
 		}
-  //      Yield();
-		wxThread::Sleep(1000);
-		//if(!m_pNetConnection->IsConnected())
-		//	break;
-//		if(!m_pSock->IsData())
-//			int x = 0;
-//		if(m_pSock->Error())
-//		{
-//			wxSocketError err = m_pSock->LastError();
-//			if(err != wxSOCKET_TIMEDOUT)
-//				int x = 0;
-////			if(wxSOCKET_WOULDBLOCK == err)
-////			{
-////	            bLostConn = true;
-////		        break;
-////			}
-////			else
-////			{
-////				wxThread::Sleep(10);
-////				continue;
-////			}
-//		}
-
-////        wxYieldIfNeeded();
-//		if(m_pSock->WaitForLost(1, 250))
-//		{
-//            bLostConn = true;
-//	        break;
-//		}
-//		if(m_pSock->Error())
-//		{
-//			wxSocketError err = m_pSock->LastError();
-//			if(err != wxSOCKET_TIMEDOUT)
-//				int x = 0;
-//			if(wxSOCKET_WOULDBLOCK == err)
-//			{
-//	            bLostConn = true;
-//		        break;
-//			}
-//////			else
-//////			{
-//////				wxThread::Sleep(10);
-//////				continue;
-//////			}
-//		}
-//		Yield();
+		wxThread::Sleep(100);
 	}
 
     if(bLostConn && m_pNetConnection)

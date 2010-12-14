@@ -69,6 +69,7 @@ void wxGISNetMessageProcessor::ProcessMessage(WXGISMSG msg)
 			wxLogError(_("wxGISNetMessageProcessor: %s"), sMessage.c_str());			
 	}
 
+    wxCriticalSectionLocker locker(m_CriticalSection);
 	//TODO: check for * and look for dst in children
 	for(size_t i = 0; i < m_MessageReceiverArray.size(); i++)
 	{
@@ -91,20 +92,35 @@ void wxGISNetMessageProcessor::ProcessMessage(WXGISMSG msg)
 
 void wxGISNetMessageProcessor::AddMessageReceiver(wxString sName, INetMessageReceiver* pNetMessageReceiver)
 {
+    wxCriticalSectionLocker locker(m_CriticalSection);
 	//TODO: Hash of sName
 	if(pNetMessageReceiver)//the receiver can register several names
 		m_MessageReceiverArray.push_back( std::make_pair(sName, pNetMessageReceiver) );
 }
 
+void wxGISNetMessageProcessor::DelMessageReceiver(wxString sName, INetMessageReceiver* pNetMessageReceiver)
+{
+    wxCriticalSectionLocker locker(m_CriticalSection);
+	for(size_t i = 0; i < m_MessageReceiverArray.size(); i++)
+	{
+		if(sName.CmpNoCase(m_MessageReceiverArray[i].first) == 0 && m_MessageReceiverArray[i].second == pNetMessageReceiver)
+		{
+			m_MessageReceiverArray.erase(m_MessageReceiverArray.begin() + i);
+			return;
+		}
+	}
+}
+
 void wxGISNetMessageProcessor::ClearMessageReceiver()
 {
+    wxCriticalSectionLocker locker(m_CriticalSection);
 	m_MessageReceiverArray.clear();
 }
 
 
 void wxGISNetMessageProcessor::ClearMessageQueue(void)
 {
-    //wxCriticalSectionLocker locker(m_CriticalSection);
+    wxCriticalSectionLocker locker(m_CriticalSection);
     while( m_MsgQueue.size() > 0 )
     {
 	    WXGISMSG Msg = m_MsgQueue.top();
@@ -126,6 +142,8 @@ bool wxGISNetMessageProcessor::OnStartMessageThread(void)
 
 void wxGISNetMessageProcessor::OnStopMessageThread(void)
 {
+	//clear message receiver 
+	ClearMessageReceiver();
 	//clear messages 
 	ClearMessageQueue();
 
@@ -159,12 +177,13 @@ void *wxMsgInThread::Entry()
 		WXGISMSG msg = m_pParent->GetInMessage();
 		while(msg.pMsg)    
 		{      
+			wxYieldIfNeeded();
 			m_pParent->ProcessMessage(msg);
 			msg = m_pParent->GetInMessage();
 		}
         //wxYieldIfNeeded();
         //Yield();
-		wxThread::Sleep(150);
+		wxThread::Sleep(100);
 	}
     return NULL;
 }

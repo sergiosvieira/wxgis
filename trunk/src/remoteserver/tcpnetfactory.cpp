@@ -75,7 +75,7 @@ void *wxClientUDPNotifier::Entry()
 			if(!msg.IsOk())
 			{
 				//wxYieldIfNeeded();
-				wxThread::Sleep(10);
+				wxThread::Sleep(50);
 				continue;
 			}
 			if(msg.GetState() == enumGISMsgStOk)

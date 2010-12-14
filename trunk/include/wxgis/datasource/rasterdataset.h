@@ -37,10 +37,10 @@ public:
     // wxGISDataset
 	virtual OGRSpatialReference* GetSpatialReference(void);
     virtual wxString GetName(void);
+	virtual void Close(void);
     // wxGISRasterDataset
 	virtual bool Open(void);
 	virtual bool Rename(wxString sNewName);
-	virtual void Close(void);
 	virtual const OGREnvelope* GetEnvelope(void);
 	virtual GDALDataset* GetRaster(void){return m_poDataset;};
 	virtual GDALDataset* GetMainRaster(void){return m_poMainDataset;};

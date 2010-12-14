@@ -134,21 +134,10 @@ static wxString Encode(wxString sInput, wxString sPass)
         if(pos == sPass.Len())
             pos = 0;
         wxChar Symbol = sInput[i] ^ sPass[pos];
-        sRes += wxString::Format(wxT("%02x"), Symbol);
+		sRes += wxDecToHex(Symbol);
         pos++;
     }
     return sRes;
-}
-
-static wxChar xtod(wxChar c)
-{
-    if (c >= '0' && c <= '9') 
-        return c - '0';
-    if (c >= 'A' && c <= 'F') 
-        return c - 'A' + 10;
-    if (c >= 'a' && c <= 'f') 
-        return c - 'a' + 10;
-    return 0;        // not Hex digit
 }
 
 static wxString Decode(wxString sInput, wxString sPass)
@@ -159,7 +148,9 @@ static wxString Decode(wxString sInput, wxString sPass)
     {
         if(pos == sPass.Len())
             pos = 0;
-        wxChar Symbol = xtod(sInput[i]) * 16 + xtod(sInput[i + 1]); 
+		wxString sHex = sInput[i];
+		sHex += sInput[i + 1]; 
+		wxChar Symbol = wxHexToDec(sHex);
         Symbol = Symbol ^ sPass[pos];
         sRes += Symbol;
         pos++;
