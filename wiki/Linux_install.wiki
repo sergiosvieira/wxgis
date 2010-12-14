@@ -24,5 +24,5 @@ sudo make install_app
 }}}
   
 Before your run:
-  * Install wxGISGDAL
+  * Install wxGISGDAL (http://code.google.com/p/wxgisgdal/downloads/list)
   * Look carefully install paths in Makefile, ./build/make/makefie ./build/make/`*`.mak and fix them if needed
