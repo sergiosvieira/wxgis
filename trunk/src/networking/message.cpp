@@ -229,6 +229,7 @@ void wxNetMessage::SetDestination(wxString sDst)
 
 bool wxNetMessage::LoadXMLFromStr(wxString sData)
 {
+    sData = sData.Prepend(wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
 	wxStringInputStream Stream(sData);
     
 	wxASSERT(m_pXmlDocument == NULL);
