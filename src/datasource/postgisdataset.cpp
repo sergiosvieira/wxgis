@@ -20,11 +20,17 @@
  ****************************************************************************/
 #include "wxgis/datasource/postgisdataset.h"
 
-wxGISPostGISDataset::wxGISPostGISDataset(wxString sPath) : wxGISDataset(sPath), m_poDS(NULL)
+wxGISPostGISDataset::wxGISPostGISDataset(wxString sName, wxString sCryptPass, wxString sPGPort, wxString sPGAddres, wxString sDBName) : m_poDS(NULL)
 {
+    m_RefCount = 0;
 	m_bIsOpened = false;
 	m_nType = enumGISContainer;
 	m_nSubType = enumContGDB;
+    m_sName = sName;
+    m_sCryptPass = sCryptPass;
+    m_sPGPort = sPGPort;
+    m_sPGAddres = sPGAddres;
+    m_sDBName = sDBName;
 }
 
 wxGISPostGISDataset::~wxGISPostGISDataset(void)
@@ -63,6 +69,8 @@ wxGISDataset* wxGISPostGISDataset::GetSubset(size_t nIndex)
      //   if(poLayer)
      //   {
      //       m_poDS->Reference();
+        //check the layer type
+        //virtual const char * 	GetGeometryColumn ()
      //       wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, wxEmptyString, (wxGISEnumVectorDatasetType)m_nSubType);
      //       pDataSet->SetEncoding(m_Encoding);
      //       pDataSet->Reference();
@@ -80,11 +88,14 @@ bool wxGISPostGISDataset::Open()
 	wxCriticalSectionLocker locker(m_CritSect);
 	CPLSetConfigOption("PG_LIST_ALL_TABLES", "YES");
 
+    //wxT("PG:host='127.0.0.1' dbname='db' port='5432' user='bishop' password='xxx'")
+    m_sPath = wxString::Format(wxT("PG:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), m_sName.c_str(), Decrypt(m_sCryptPass, CONFIG_DIR);));
     m_poDS = OGRSFDriverRegistrar::Open( wgWX2MB(m_sPath), FALSE );
+    m_sPath.Clear();
 	if( m_poDS == NULL )
 	{
 		const char* err = CPLGetLastErrorMsg();
-		wxString sErr = wxString::Format(_("wxGISPostGISDataset: Open failed! Path '%s'. OGR error: %s"), m_sPath.c_str(), wgMB2WX(err));
+		wxString sErr = wxString::Format(_("wxGISPostGISDataset: Open failed! Host '%s', Database name '%s', Port='%s'. OGR error: %s"), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), wgMB2WX(err));
 		wxLogError(sErr);
 		return false;
 	}
@@ -106,15 +117,7 @@ bool wxGISPostGISDataset::Open()
 
 wxString wxGISPostGISDataset::GetName(void)
 {
-    if( !m_bIsOpened )
-        if( !Open() )
-            return wxEmptyString;
-	if(	m_poDS )
-    {
-		wxString sOut = wgMB2WX(m_poDS->GetName());
-		return sOut;
-	}
-    return wxEmptyString;
+    return m_sDBName;
 }
 
 OGRDataSource* wxGISPostGISDataset::GetDataSource(void)

@@ -29,7 +29,7 @@ class WXDLLIMPEXP_GIS_DS wxGISPostGISDataset :
 	public wxGISDataset
 {
 public:
-	wxGISPostGISDataset(wxString sPath);
+	wxGISPostGISDataset(wxString sName, wxString sCryptPass, wxString sPGPort = wxT("5432"), wxString sPGAddres = wxT("localhost"), wxString sDBName = wxT("postgres"));
 	virtual ~wxGISPostGISDataset(void);
 	//wxGISDataset
     virtual size_t GetSubsetsCount(void);
@@ -41,4 +41,5 @@ public:
 	virtual bool Open(void);
 protected:
 	OGRDataSource *m_poDS;
+    wxString m_sName, m_sCryptPass, m_sPGPort, m_sPGAddres, m_sDBName;
 };

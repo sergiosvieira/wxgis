@@ -26,8 +26,8 @@
 
 #define BUFF 1000
 
-#define WXNETMESSAGE1 wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg ver=\"%d\" st=\"%d\" prio=\"%u\" dst=\"%s\">%s</msg>")
-#define WXNETMESSAGE2 wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg ver=\"%d\" st=\"%d\" prio=\"%u\" dst=\"%s\"/>")
+#define WXNETMESSAGE1 wxT("<msg ver=\"%d\" st=\"%d\" prio=\"%u\" dst=\"%s\">%s</msg>")
+#define WXNETMESSAGE2 wxT("<msg ver=\"%d\" st=\"%d\" prio=\"%u\" dst=\"%s\"/>")
 
 /** \class wxNetMessage message.h
     \brief A network message class.
