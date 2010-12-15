@@ -206,6 +206,10 @@
 				RelativePath="..\..\src\datasource\sysop.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\src\datasource\table.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -238,6 +242,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\datasource\sysop.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\datasource\table.h"
 				>
 			</File>
 		</Filter>

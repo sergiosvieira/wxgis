@@ -19,8 +19,10 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/datasource/postgisdataset.h"
+#include "wxgis/core/core.h"
+#include "wxgis/datasource/table.h"
 
-wxGISPostGISDataset::wxGISPostGISDataset(wxString sName, wxString sCryptPass, wxString sPGPort, wxString sPGAddres, wxString sDBName) : m_poDS(NULL)
+wxGISPostGISDataset::wxGISPostGISDataset(wxString sName, wxString sCryptPass, wxString sPGPort, wxString sPGAddres, wxString sDBName, wxString sCursor) : wxGISDataset(wxEmptyString), m_poDS(NULL)
 {
     m_RefCount = 0;
 	m_bIsOpened = false;
@@ -31,6 +33,7 @@ wxGISPostGISDataset::wxGISPostGISDataset(wxString sName, wxString sCryptPass, wx
     m_sPGPort = sPGPort;
     m_sPGAddres = sPGAddres;
     m_sDBName = sDBName;
+	m_sCursor = sCursor;
 }
 
 wxGISPostGISDataset::~wxGISPostGISDataset(void)
@@ -65,17 +68,25 @@ wxGISDataset* wxGISPostGISDataset::GetSubset(size_t nIndex)
 
     if(m_poDS)
     {
-	    //OGRLayer* poLayer = m_poDS->GetLayer(nIndex);
-     //   if(poLayer)
-     //   {
-     //       m_poDS->Reference();
-        //check the layer type
-        //virtual const char * 	GetGeometryColumn ()
-     //       wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, wxEmptyString, (wxGISEnumVectorDatasetType)m_nSubType);
-     //       pDataSet->SetEncoding(m_Encoding);
-     //       pDataSet->Reference();
-     //       return static_cast<wxGISDataset*>(pDataSet);
-     //   }
+	    OGRLayer* poLayer = m_poDS->GetLayer(nIndex);
+        if(poLayer)
+        {
+            m_poDS->Reference();
+			wxGISDataset* pDataset(NULL);
+			//check the layer type
+			if(strlen(poLayer->GetGeometryColumn()))
+			{
+				wxGISTable* pTable = new wxGISTable(m_poDS, poLayer, wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_sCursor.c_str(), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), m_sName.c_str(), Decode(m_sCryptPass, CONFIG_DIR)), enumTablePostgres);
+				pTable->SetEncoding(wxFONTENCODING_UTF8);
+				pTable->Reference();
+				pDataset = static_cast<wxGISDataset*>(pTable);
+			}
+			else
+			{
+   //         wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, wxEmptyString, (wxGISEnumVectorDatasetType)m_nSubType);
+			}
+	        return pDataset;
+        }
     }
     return NULL;
 }
@@ -87,9 +98,10 @@ bool wxGISPostGISDataset::Open()
 
 	wxCriticalSectionLocker locker(m_CritSect);
 	CPLSetConfigOption("PG_LIST_ALL_TABLES", "YES");
+	CPLSetConfigOption("PGCLIENTENCODING", "UTF-8");
 
     //wxT("PG:host='127.0.0.1' dbname='db' port='5432' user='bishop' password='xxx'")
-    m_sPath = wxString::Format(wxT("PG:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), m_sName.c_str(), Decrypt(m_sCryptPass, CONFIG_DIR);));
+	m_sPath = wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_sCursor.c_str(), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), m_sName.c_str(), Decode(m_sCryptPass, CONFIG_DIR));
     m_poDS = OGRSFDriverRegistrar::Open( wgWX2MB(m_sPath), FALSE );
     m_sPath.Clear();
 	if( m_poDS == NULL )
@@ -100,17 +112,6 @@ bool wxGISPostGISDataset::Open()
 		return false;
 	}
 
-    int nLayerCount = m_poDS->GetLayerCount();
- ////   if(nLayerCount == 1)
- ////   {
-	////    m_poLayer = m_poDS->GetLayer(iLayer);
-	////    if(m_poLayer)
-	////    {
-	////	    m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
-	////    }
- ////   }
- ////   else
- ////       m_nType = enumGISContainer;
 	m_bIsOpened = true;
 	return true;
 }

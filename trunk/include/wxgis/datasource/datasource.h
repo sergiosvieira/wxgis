@@ -65,7 +65,8 @@ enum wxGISEnumRasterDatasetType
 enum wxGISEnumTableDatasetType
 {
 	enumTableUnknown = 0,
-    enumTableDBF = 1
+    enumTableDBF = 1,
+	enumTablePostgres = 2
 };
 
 enum wxGISEnumPrjFileType
