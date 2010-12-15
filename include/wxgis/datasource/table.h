@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  PosGISDataset class.
+ * Purpose:  Table class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010 Bishop
@@ -21,25 +21,41 @@
 #pragma once
 
 #include "wxgis/datasource/datasource.h"
+#define MAXSTRINGSTORE 1000000
 
-/** \class wxGISPostGISDataset postgisdataset.h
-    \brief The PostGIS Dataset class.
-*/
-class WXDLLIMPEXP_GIS_DS wxGISPostGISDataset :
-	public wxGISDataset
+class WXDLLIMPEXP_GIS_DS wxGISTable : public wxGISDataset
 {
 public:
-	wxGISPostGISDataset(wxString sName, wxString sCryptPass, wxString sPGPort = wxT("5432"), wxString sPGAddres = wxT("localhost"), wxString sDBName = wxT("postgres"), wxString sCursor = wxT("PG"));
-	virtual ~wxGISPostGISDataset(void);
+	wxGISTable(OGRDataSource *poDS, OGRLayer* poLayer, wxString sPath, wxGISEnumTableDatasetType nType);
+	virtual ~wxGISTable(void);
 	//wxGISDataset
-    virtual size_t GetSubsetsCount(void);
-    virtual wxGISDataset* GetSubset(size_t nIndex);
     virtual wxString GetName(void);
 	virtual void Close(void);
-	//wxGISPostGISDataset
-	virtual OGRDataSource* GetDataSource(void);
+	//wxGISTable
 	virtual bool Open(void);
+    virtual wxFontEncoding GetEncoding(void){return m_Encoding;};
+    virtual void SetEncoding(wxFontEncoding Encoding){m_Encoding = Encoding;};
+	virtual wxString GetAsString(long row, int col);
+	virtual OGRFeature* operator [](long nIndex);
+	virtual OGRFeature* GetAt(long nIndex);
+	virtual OGRErr CreateFeature(OGRFeature* poFeature);
+	virtual void Unload(void);
+	virtual void PreLoad(void);
+	virtual OGRFeatureDefn* GetDefiniton(void);
+	virtual void Reset(void);
+	virtual OGRFeature* Next(void);
+	virtual size_t GetSize(void);
 protected:
 	OGRDataSource *m_poDS;
-    wxString m_sName, m_sCryptPass, m_sPGPort, m_sPGAddres, m_sDBName, m_sCursor;
+	OGRLayer* m_poLayer;
+    wxFontEncoding m_Encoding;
+	bool m_bOLCStringsAsUTF8, m_bIsOpened, m_bIsDataLoaded;
+	bool m_bHasFID;
+	wxString m_sTableName;
+	int m_nSize;
+    std::map<long, OGRFeature*> m_FeaturesMap;
+    std::map<long, OGRFeature*>::iterator m_IT;
+    wxArrayString m_FeatureStringData;
+	short m_FieldCount;
+
 };

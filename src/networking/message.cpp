@@ -229,7 +229,8 @@ void wxNetMessage::SetDestination(wxString sDst)
 
 bool wxNetMessage::LoadXMLFromStr(wxString sData)
 {
-    sData = sData.Prepend(wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+	//if(sData[1] != '?')
+	//    sData = sData.Prepend(wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
 	wxStringInputStream Stream(sData);
     
 	wxASSERT(m_pXmlDocument == NULL);
@@ -254,6 +255,8 @@ bool wxNetMessage::LoadXMLFromStr(wxString sData)
 
 bool wxNetMessage::SavedXMLToStr(wxString *p_sData)
 {
+	//if(p_sData->operator [](1) != '?')
+	//	*p_sData = p_sData->Prepend(wxT("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
 	wxStringOutputStream Stream(p_sData);
 	if(m_pXmlDocument)
 		return m_pXmlDocument->Save(Stream, wxXML_NO_INDENTATION);
