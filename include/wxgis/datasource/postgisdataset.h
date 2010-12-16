@@ -37,6 +37,7 @@ public:
     virtual wxString GetName(void);
 	virtual void Close(void);
 	//wxGISPostGISDataset
+    virtual wxGISDataset* GetSubset(wxString sTablename);
 	virtual OGRDataSource* GetDataSource(void);
 	virtual bool Open(void);
 protected:
