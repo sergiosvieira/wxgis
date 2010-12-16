@@ -131,3 +131,34 @@ OGRDataSource* wxGISPostGISDataset::GetDataSource(void)
     return m_poDS;
 }
 
+wxGISDataset* wxGISPostGISDataset::GetSubset(wxString sTablename)
+{
+    if( !m_bIsOpened )
+        if( !Open() )
+            return 0;
+
+    if(m_poDS)
+    {
+	    OGRLayer* poLayer = m_poDS->GetLayerByName(wgWX2MB(sTablename));
+        if(poLayer)
+        {
+            m_poDS->Reference();
+			wxGISDataset* pDataset(NULL);
+			//check the layer type
+			if(strlen(poLayer->GetGeometryColumn()))
+			{
+				wxGISTable* pTable = new wxGISTable(m_poDS, poLayer, wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_sCursor.c_str(), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), m_sName.c_str(), Decode(m_sCryptPass, CONFIG_DIR)), enumTablePostgres);
+				pTable->SetEncoding(wxFONTENCODING_UTF8);
+				pTable->Reference();
+				pDataset = static_cast<wxGISDataset*>(pTable);
+			}
+			else
+			{
+   //         wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, wxEmptyString, (wxGISEnumVectorDatasetType)m_nSubType);
+			}
+	        return pDataset;
+        }
+    }
+    return NULL;
+}
+
