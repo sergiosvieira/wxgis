@@ -274,49 +274,7 @@ void wxGxContentView::AddObject(IGxObject* pObject)
 		icon_large = pObjUI->GetLargeImage();
 	}
 
-	int pos(0);
-	if(icon_small.IsOk())
-    {
-        for(size_t i = 0; i < m_IconsArray.size(); i++)
-        {
-            if(m_IconsArray[i].bLarge)
-                continue;
-            if(m_IconsArray[i].oIcon.IsSameAs(icon_small))
-            {
-                pos = m_IconsArray[i].iImageIndex;
-                break;
-            }
-        }
-        if(pos == 0)
-        {
-            pos = m_ImageListSmall.Add(icon_small);
-            ICONDATA myicondata = {icon_small, pos, false};
-            m_IconsArray.push_back(myicondata);
-
-            pos = m_ImageListLarge.Add(icon_large);
-            ICONDATA myicondata1 = {icon_large, pos, true};
-            m_IconsArray.push_back(myicondata1);
-        }
-    }
-	else
-		pos = 2;//m_ImageListSmall.Add(m_ImageListSmall.GetIcon(2));//0 col img, 1 - col img
-
-	//if(icon_large.IsOk())
- //   {
- //       for(size_t i = 0; i < m_IconsArray.size(); i++)
- //       {
- //           if(!m_IconsArray[i].bLarge)
- //               continue;
- //           if(m_IconsArray[i].oIcon.IsSameAs(icon_large))
- //           {
- //               pos = m_IconsArray[i].iImageIndex;
- //               break;
- //           }
- //       }
- //   }
-	//else
-	//	pos = 2;//m_ImageListLarge.Add(m_ImageListLarge.GetIcon(2));
-
+	int pos = GetIconPos(icon_small, icon_large);
 
 	LPITEMDATA pData = new _itemdata;
 	pData->pObject = pObject;
@@ -683,13 +641,14 @@ void wxGxContentView::OnObjectDeleted(IGxObject* pObj)
 		//delete pItemData;
 		DeleteItem(i);
 		//Refresh();
-		return;
+        wxListCtrl::Refresh();
+        return;
 	}
 }
 
 void wxGxContentView::OnObjectChanged(IGxObject* pObj)
 {
-	if(pObj == m_pParentGxObject)
+    if(pObj == m_pParentGxObject)
 	{
 		IGxObjectContainer* pObjectContainer = dynamic_cast<IGxObjectContainer*>(pObj);
 		if(pObjectContainer != NULL)
@@ -719,33 +678,7 @@ void wxGxContentView::OnObjectChanged(IGxObject* pObj)
 			icon_large = pObjUI->GetLargeImage();
 		}
 
-		int pos(0);
-		if(icon_small.IsOk())
-		{
-			for(size_t i = 0; i < m_IconsArray.size(); i++)
-			{
-				if(m_IconsArray[i].bLarge)
-					continue;
-				if(m_IconsArray[i].oIcon.IsSameAs(icon_small))
-				{
-					pos = m_IconsArray[i].iImageIndex;
-					break;
-				}
-			}
-			if(pos == 0)
-			{
-				pos = m_ImageListSmall.Add(icon_small);
-				ICONDATA myicondata = {icon_small, pos, false};
-				m_IconsArray.push_back(myicondata);
-
-				pos = m_ImageListLarge.Add(icon_large);
-				ICONDATA myicondata1 = {icon_large, pos, true};
-				m_IconsArray.push_back(myicondata1);
-			}
-		}
-		else
-			pos = 2;//m_ImageListSmall.Add(m_ImageListSmall.GetIcon(2));//0 col img, 1 - col img
-
+        int pos = GetIconPos(icon_small, icon_large);
 		pItemData->iImageIndex = pos;
 
 		wxString sName;
@@ -759,8 +692,8 @@ void wxGxContentView::OnObjectChanged(IGxObject* pObj)
 		SetItem(i, 0, sName, pos);
 		SetItem(i, 1, sType);
 
-		wxListCtrl::Refresh();
 	}
+	wxListCtrl::Refresh();
 }
 
 void wxGxContentView::OnObjectRefreshed(IGxObject* pObj)
@@ -784,6 +717,8 @@ void wxGxContentView::OnRefreshAll(void)
     SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
 	SortItems(MyCompareFunction, (long)&sortdata);
 	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+
+    wxListCtrl::Refresh();
 }
 
 void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
@@ -910,4 +845,41 @@ void wxGxContentView::BeginRename(IGxObject* pGxObject)
     if ( nItem == -1 )
         return;
     EditLabel(nItem);
+}
+
+int wxGxContentView::GetIconPos(wxIcon icon_small, wxIcon icon_large)
+{
+    wxCriticalSectionLocker locker(m_CritSect);
+	int pos(0);
+	if(icon_small.IsOk())
+	{
+		for(size_t i = 0; i < m_IconsArray.size(); i++)
+		{
+			if(m_IconsArray[i].bLarge)
+				continue;
+			if(m_IconsArray[i].oIcon.IsSameAs(icon_small))
+			{
+				pos = m_IconsArray[i].iImageIndex;
+				break;
+			}
+		}
+		if(pos == 0)
+		{
+			pos = m_ImageListSmall.Add(icon_small);
+			ICONDATA myicondata = {icon_small, pos, false};
+			m_IconsArray.push_back(myicondata);
+
+            wxIcon temp_large_icon(document_48_xpm);
+            if(!icon_large.IsOk())
+                icon_large = temp_large_icon;
+
+            pos = m_ImageListLarge.Add(icon_large);
+			ICONDATA myicondata1 = {icon_large, pos, true};
+			m_IconsArray.push_back(myicondata1);
+		}
+	}
+	else
+		pos = 2;//0 col img, 1 - col img
+
+    return pos;
 }

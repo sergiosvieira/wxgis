@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
- * Purpose:  wxGxRemoteServerUI class.
+ * Purpose:  RxObjectUI classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010 Bishop
@@ -20,39 +20,26 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/remoteserverui/remoteserverui.h"
-#include "wxgis/remoteserver/gxremoteserver.h"
-#include "wxgis/catalogui/catalogui.h"
+#include "wxgis/remoteserverui/gxremoteserverui.h"
+#include "wxgis/remoteserver/rxobjectclient.h"
 #include "wxgis/catalogui/gxpending.h"
+#include "wxgis/catalogui/gxcatalogui.h"
 
-/** \class wxGxRemoteServerUI gxremoteserverui.h
-    \brief A Remote Server UI GxObject.
+/** \class wxRxObjectContainer gxremoteserver.h
+    \brief The base class for Remote GxObjectContainers (RxObjectContainers).
 */
-class WXDLLIMPEXP_GIS_RSU wxGxRemoteServerUI :
-	public wxGxRemoteServer,
-	public IGxObjectUI,
-	public IGxObjectWizard
+class WXDLLIMPEXP_GIS_RSU wxRxObjectContainerUI : 
+	public wxRxObjectContainer
 {
 public:
-	wxGxRemoteServerUI(INetClientConnection* pNetConn);
-	virtual ~wxGxRemoteServerUI(void);
-	//IGxObjectUI
-	virtual wxIcon GetLargeImage(void);
-	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxRemoteServerUI.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxEmptyString;};
-    //IGxObjectWizard
-    virtual bool Invoke(wxWindow* pParentWnd);
-    //wxGxRemoteServer
-    virtual bool Connect(void);
-	virtual void EmptyChildren(void);
+	wxRxObjectContainerUI(void);
+	virtual ~wxRxObjectContainerUI(void);
+	//INetMessageReceiver
     virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode);
-	virtual void OnConnect(void);
-	virtual void LoadChildren(void);
-    bool DeleteChild(IGxObject* pChild);
+	//wxRxMonitoringDatabases
+	virtual bool LoadChildren(void);
+    //wxRxObjectContainer
+    virtual bool DeleteChild(IGxObject* pChild);
 protected:
-    wxIcon m_SmallIcon, m_LargeIcon;
-    wxIcon m_SmallDsblIcon, m_LargeDsblIcon;
-    wxIcon m_SmallAuthIcon, m_LargeAuthIcon;
     wxGxPendingUI* m_pGxPendingUI;
 };

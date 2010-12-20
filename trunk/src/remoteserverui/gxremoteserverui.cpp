@@ -21,13 +21,14 @@
 
 #include "wxgis/remoteserverui/gxremoteserverui.h"
 #include "wxgis/catalogui/gxcatalogui.h"
+
 #include "../../art/remoteserverauth_16.xpm"
 #include "../../art/remoteserverauth_48.xpm"
 #include "../../art/remoteserver_16.xpm"
 #include "../../art/remoteserver_48.xpm"
 
 
-wxGxRemoteServerUI::wxGxRemoteServerUI(INetClientConnection* pNetConn) : wxGxRemoteServer(pNetConn)
+wxGxRemoteServerUI::wxGxRemoteServerUI(INetClientConnection* pNetConn) : wxGxRemoteServer(pNetConn), m_pGxPendingUI(NULL)
 {
     m_SmallIcon = wxIcon(remoteserver_16_xpm);
     m_LargeIcon = wxIcon(remoteserver_48_xpm);
@@ -69,17 +70,15 @@ wxIcon wxGxRemoteServerUI::GetSmallImage(void)
         return m_SmallDsblIcon;
 }
 
-#include "wxgis/datasource/postgisdataset.h"
-
 bool wxGxRemoteServerUI::Invoke(wxWindow* pParentWnd)
 {
+    if(!m_pGxPendingUI)
+    {
+        m_pGxPendingUI = new wxGxPendingUI();
+        if(!AddChild(m_pGxPendingUI))
+            wxDELETE(m_pGxPendingUI);
+    }
 	return Connect();
-	//PG:host='localhost' dbname='<raster_database>' user='<user>' password='<password>'
-	//PG:"dbname='databasename' host='addr' port='5432' user='x' password='y'"
-	//wxGISPostGISDataset PGDSet(wxT("PG:host='127.0.0.1' dbname='monitoring_db' port='5432' user='bishop' password='xxx'"));
-	//wxString sName = PGDSet.GetName();
-	//size_t i = PGDSet.GetSubsetsCount();
-	//return false;
 }
 
 bool wxGxRemoteServerUI::Connect(void)
@@ -116,6 +115,20 @@ void wxGxRemoteServerUI::EmptyChildren(void)
 	m_pCatalog->ObjectChanged(this);
 }
 
+void wxGxRemoteServerUI::LoadChildren()
+{
+	if(m_bIsChildrenLoaded)
+		return;
+    if(!m_pGxPendingUI)
+    {
+        m_pGxPendingUI = new wxGxPendingUI();
+        if(!AddChild(m_pGxPendingUI))
+            wxDELETE(m_pGxPendingUI);
+    }
+    wxGxRemoteServer::LoadChildren();
+}
+
+
 void wxGxRemoteServerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 {
 	wxGxRemoteServer::ProcessMessage(msg, pChildNode);
@@ -132,6 +145,15 @@ void wxGxRemoteServerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 		}
 		return;
 	}
+    if(sName.CmpNoCase(wxT("auth")) == 0)
+    {
+		if(msg.pMsg->GetState() == enumGISMsgStRefuse)
+		{
+            wxMessageBox(_("The login is failed!"), _("Warning"), wxOK | wxCENTRE | wxICON_WARNING);
+		}
+		return;
+    }
+
     if(sName.CmpNoCase(wxT("root")) == 0)
     {
 		if(pChildNode)
@@ -150,11 +172,25 @@ void wxGxRemoteServerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 						IRxObjectClient* pRxObjectCli = dynamic_cast<IRxObjectClient*>(pObj);
 						if(pRxObjectCli)
 							pRxObjectCli->Init(this, pChildNode);
-						if(!AddChild(pObj))
-							wxDELETE(pObj);
+					    if(!AddChild(pObj))
+                        {
+						    wxDELETE(pObj);
+                        }
+                        else
+                        {
+                            m_pCatalog->ObjectAdded(pObj);
+                            //remove pending
+                            if(m_pGxPendingUI)
+                                if(DeleteChild(static_cast<IGxObject*>(m_pGxPendingUI)))
+                                    m_pGxPendingUI = NULL;
+                        }
 					}
 					pChildNode = pChildNode->GetNext();
 				}
+                //remove pending
+		        DeleteChild(static_cast<IGxObject*>(m_pGxPendingUI));
+                m_pGxPendingUI = NULL;
+
 				m_bIsChildrenLoaded = m_nChildCount == m_Children.size();
 				m_pCatalog->ObjectChanged(this);
 			}
@@ -170,3 +206,20 @@ void wxGxRemoteServerUI::OnConnect(void)
 	wxGxRemoteServer::OnConnect();
 }
 
+bool wxGxRemoteServerUI::DeleteChild(IGxObject* pChild)
+{
+    wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pCatalog);
+    if(pCatalog)
+    {
+        IGxSelection* pSel = pCatalog->GetSelection();
+        if(pSel)
+            pSel->Unselect(pChild, IGxSelection::INIT_ALL);
+    }
+	bool bHasChildren = m_Children.size() > 0 ? true : false;
+    m_pCatalog->ObjectDeleted(pChild);
+	if(!IGxObjectContainer::DeleteChild(pChild))
+		return false;
+	if(bHasChildren != m_Children.size() > 0 ? true : false)
+		m_pCatalog->ObjectChanged(this);
+	return true;
+}

@@ -24,12 +24,19 @@
 #include "wxgis/framework/application.h"
 
 #include "../../art/mainframe.xpm"
+#include "../../art/process_working_16.xpm"
+#include "../../art/process_working_48.xpm"
 
 wxGxCatalogUI::wxGxCatalogUI() : wxGxCatalog()
 {
 	m_pSelection = new wxGxSelection();
 
     m_bOpenLastPath = true;
+
+	m_ImageListSmall.Create(16, 16);
+	m_ImageListLarge.Create(48, 48);
+    m_ImageListSmall.Add(wxBitmap(process_working_16_xpm));
+    m_ImageListLarge.Add(wxBitmap(process_working_48_xpm));
 }
 
 wxGxCatalogUI::~wxGxCatalogUI()
@@ -51,7 +58,6 @@ void wxGxCatalogUI::Detach(void)
 	wxDELETE(m_pSelection);
     wxGxCatalog::Detach();
 }
-
 
 void wxGxCatalogUI::EditProperties(wxWindow *parent)
 {
@@ -114,6 +120,8 @@ void wxGxCatalogUI::Init(void)
 
 void wxGxCatalogUI::ObjectDeleted(IGxObject* pObject)
 {
+    if(!pObject)
+        return;
     m_pSelection->RemoveDo(pObject->GetFullName());
 
     wxGxCatalog::ObjectDeleted(pObject);

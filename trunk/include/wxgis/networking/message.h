@@ -24,7 +24,7 @@
 
 #define WXNETVER 2
 
-#define BUFF 1000
+#define BUFF 2000
 
 #define WXNETMESSAGE1 wxT("<msg ver=\"%d\" st=\"%d\" prio=\"%u\" dst=\"%s\">%s</msg>")
 #define WXNETMESSAGE2 wxT("<msg ver=\"%d\" st=\"%d\" prio=\"%u\" dst=\"%s\"/>")
@@ -74,7 +74,7 @@ public:
 		sInputString.Replace(wxT("'"), wxT("&apos;"));
 		sInputString.Replace(wxT(">"), wxT("&gt;"));
 		sInputString.Replace(wxT("<"), wxT("&lt;"));
-		sInputString.Replace(wxT("/"), wxT("&frasl;"));
+		//sInputString.Replace(wxT("/"), wxT("&frasl;"));
 		return sInputString;
 	};
 protected:

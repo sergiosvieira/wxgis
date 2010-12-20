@@ -78,7 +78,7 @@ wxXmlNode* wxGxRemoteServer::GetProperties(void)
 
 bool wxGxRemoteServer::Connect(void)
 {
- 	if(m_pNetConn)
+ 	if(m_pNetConn && !m_pNetConn->IsConnected())
 		return m_pNetConn->Connect();
     return false;
 }
@@ -121,6 +121,7 @@ void wxGxRemoteServer::OnDisconnect(void)
 	EmptyChildren();
 	m_bAuth = false;
 	m_nChildCount = 0;
+	m_bIsChildrenLoaded = false;
 	m_pCatalog->ObjectChanged(this);
 }
 
@@ -166,7 +167,7 @@ void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
                 wxString sUserName = m_pNetConn->GetUser();
                 wxString sCryptPass = m_pNetConn->GetCryptPasswd();
 		        wxString sAuth = wxString::Format(wxT("<auth user=\"%s\" pass=\"%s\" />"), wxNetMessage::FormatXmlString(sUserName).c_str(), sCryptPass.c_str());
-		        wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStCmd, enumGISPriorityHigh, wxT("auth"), sAuth.c_str());
+		        wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStHello, enumGISPriorityHigh, wxT("auth"), sAuth.c_str());
 		        wxNetMessage* pMsg = new wxNetMessage(sMsg);
 		        if(pMsg->IsOk())
 		        {
@@ -206,7 +207,10 @@ void wxGxRemoteServer::EmptyChildren(void)
 
 void wxGxRemoteServer::LoadChildren()
 {
-	//request children
+	if(m_bIsChildrenLoaded)
+		return;
+    Connect();
+    //request children
     wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStGet, enumGISPriorityNormal, wxT("root"), wxT("<children/>"));
     wxNetMessage* pMsg = new wxNetMessage(sMsg);
     if(pMsg->IsOk())

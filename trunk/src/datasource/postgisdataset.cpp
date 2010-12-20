@@ -74,7 +74,7 @@ wxGISDataset* wxGISPostGISDataset::GetSubset(size_t nIndex)
             m_poDS->Reference();
 			wxGISDataset* pDataset(NULL);
 			//check the layer type
-			if(strlen(poLayer->GetGeometryColumn()))
+			if(CPLStrnlen(poLayer->GetGeometryColumn(), 100))
 			{
 				wxGISTable* pTable = new wxGISTable(m_poDS, poLayer, wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_sCursor.c_str(), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), m_sName.c_str(), Decode(m_sCryptPass, CONFIG_DIR)), enumTablePostgres);
 				pTable->SetEncoding(wxFONTENCODING_UTF8);
@@ -145,7 +145,7 @@ wxGISDataset* wxGISPostGISDataset::GetSubset(wxString sTablename)
             m_poDS->Reference();
 			wxGISDataset* pDataset(NULL);
 			//check the layer type
-			if(strlen(poLayer->GetGeometryColumn()))
+			if(CPLStrnlen(poLayer->GetGeometryColumn(), 100))
 			{
    //         wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, wxEmptyString, (wxGISEnumVectorDatasetType)m_nSubType);
 			}

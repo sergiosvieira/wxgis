@@ -45,6 +45,9 @@ public:
 	virtual void Reset(void);
 	virtual OGRFeature* Next(void);
 	virtual size_t GetSize(void);
+    virtual OGRErr SetFilter(wxGISQueryFilter* pQFilter);
+    //virtual OGRErr SetIgnoredFields(wxArrayString &saIgnoredFields);
+    virtual wxCriticalSection* GetCriticalSection(void){return &m_CritSect;};
 protected:
 	OGRDataSource *m_poDS;
 	OGRLayer* m_poLayer;
@@ -57,5 +60,5 @@ protected:
     std::map<long, OGRFeature*>::iterator m_IT;
     wxArrayString m_FeatureStringData;
 	short m_FieldCount;
-
+    wxCriticalSection m_CritSect;
 };

@@ -97,7 +97,8 @@ public:
 		int iImageIndex;
         bool bLarge;
 	} ICONDATA;
-
+protected:
+    int GetIconPos(wxIcon icon_small, wxIcon icon_large);
 protected:
 	bool m_bSortAsc;
 	short m_currentSortCol;
@@ -112,6 +113,7 @@ protected:
 	IGxObject* m_pParentGxObject;
 	bool m_bDragging;
     std::vector<ICONDATA> m_IconsArray;
+    wxCriticalSection m_CritSect;
 
     DECLARE_EVENT_TABLE()
 };
