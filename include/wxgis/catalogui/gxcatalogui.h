@@ -52,10 +52,18 @@ public:
     virtual void SetOpenLastPath(bool bOpenLast) {m_bOpenLastPath = bOpenLast;};
     virtual bool GetOpenLastPath(void){return m_bOpenLastPath;};
 	virtual IGxSelection* GetSelection(void){return m_pSelection;};
+    virtual wxImageList* GetPendingImageList(bool bIsLarge)
+    { 
+        if(bIsLarge)  
+            return &m_ImageListLarge;
+        else
+            return &m_ImageListSmall;
+    }
 	//wxGxCatalog
 	virtual void EmptyChildren(void);
 	virtual void Init(void);
 protected:
 	bool m_bOpenLastPath;
 	IGxSelection* m_pSelection;
+    wxImageList m_ImageListSmall, m_ImageListLarge;
 };

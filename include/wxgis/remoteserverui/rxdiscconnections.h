@@ -20,7 +20,7 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/remoteserver/rxobjectclient.h"
+#include "wxgis/remoteserverui/rxobjectclientui.h"
 #include "wxgis/catalogui/gxdiscconnectionsui.h"
 #include "wxgis/networking/processor.h"
 
@@ -29,7 +29,7 @@
 */
 class WXDLLIMPEXP_GIS_RSU wxRxDiscConnections :
     public wxGxDiscConnectionsUI,
-	public wxRxObjectContainer
+	public wxRxObjectContainerUI
 {
    DECLARE_DYNAMIC_CLASS(wxRxDiscConnections)
 public:

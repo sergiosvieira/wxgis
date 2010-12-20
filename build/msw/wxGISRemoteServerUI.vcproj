@@ -192,6 +192,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\remoteserverui\rxobjectclientui.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\remoteserverui\serversearchdlg.cpp"
 				>
 			</File>
@@ -227,6 +231,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\remoteserverui\rxdiscconnections.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\remoteserverui\rxobjectclientui.h"
 				>
 			</File>
 			<File

@@ -164,9 +164,9 @@ void wxGISVectorPropertyPage::FillGrid(void)
         //           oExt.MinX, oExt.MinY, oExt.MaxX, oExt.MaxY);
         //}    
 
-            if( strlen(poLayer->GetFIDColumn()) > 0 )
+            if( CPLStrnlen(poLayer->GetFIDColumn(), 100) > 0 )
                 AppendProperty(new wxStringProperty(_("FID Column"), wxPG_LABEL, wgMB2WX( poLayer->GetFIDColumn() ))); 
-            if( strlen(poLayer->GetGeometryColumn()) > 0 )
+            if( CPLStrnlen(poLayer->GetGeometryColumn(), 100) > 0 )
                 AppendProperty(new wxStringProperty(_("Geometry Column"), wxPG_LABEL, wgMB2WX( poLayer->GetGeometryColumn() ))); 
 
             OGRFeatureDefn *poDefn = m_pDataset->GetDefiniton();

@@ -116,8 +116,11 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
                 pszWKT = CPLStrdup(papszLines[0]);
                 for(int i = 1; papszLines[i] != NULL; i++ )
                 {
-                    pszWKT = (char *)CPLRealloc(pszWKT, strlen(pszWKT) + strlen( papszLines[i]) + 1 );
-                    strcat( pszWKT, papszLines[i] );
+                    int npapszLinesSize = CPLStrnlen(papszLines[i], 1000);
+                    int npszWKTSize = CPLStrnlen(pszWKT, 8000);
+                    int nDestSize = npszWKTSize + npapszLinesSize + 1;
+                    pszWKT = (char *)CPLRealloc(pszWKT, npszWKTSize + npapszLinesSize + 1 );
+                    CPLStrlcat( pszWKT, papszLines[i], nDestSize );
                 }
                 pszWKT2 = pszWKT;
                 err = m_OGRSpatialReference.importFromWkt( &pszWKT2 );//.importFromWkt(papszLines);

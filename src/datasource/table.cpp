@@ -23,10 +23,13 @@
 
 wxGISTable::wxGISTable(OGRDataSource *poDS, OGRLayer* poLayer, wxString sPath, wxGISEnumTableDatasetType nType) : wxGISDataset(sPath)
 {
+
 	m_poDS = poDS;
 	m_poLayer = poLayer;
+        
     m_nType = enumGISTableDataset;
-    m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
+    if(m_poLayer)
+        m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
     m_nSubType = (int)nType;
 	m_bIsOpened = true;
 	m_bIsDataLoaded = false;
@@ -97,7 +100,7 @@ bool wxGISTable::Open(void)
 	if(m_poLayer)
 	{
 		m_bIsOpened = true;
-		m_bHasFID = strlen(m_poLayer->GetFIDColumn()) > 0;
+		m_bHasFID = CPLStrnlen(m_poLayer->GetFIDColumn(), 100) > 0;
 		return true;
 	}
 	return false;
@@ -215,6 +218,7 @@ void wxGISTable::Unload(void)
             OGRFeature::DestroyFeature(m_IT->second);
         m_FeaturesMap.clear();
     }
+    m_FeatureStringData.clear();
     m_bIsDataLoaded = false;
 }
 
@@ -327,27 +331,36 @@ wxString wxGISTable::GetAsString(long row, int col)
 		case OFTDate:
 			{
 				int year, mon, day, hour, min, sec, flag;
-				pFeature->GetFieldAsDateTime(col, &year, &mon, &day, &hour, &min, &sec, &flag);
-				wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
-				sOut = dt.Format(_("%d-%m-%Y"));//wxString::Format(_("%.2u-%.2u-%.4u"), day, mon, year );
+				if(pFeature->GetFieldAsDateTime(col, &year, &mon, &day, &hour, &min, &sec, &flag) == TRUE)
+                {
+				    wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
+                    if(dt.IsValid())
+    				    sOut = dt.Format(_("%d-%m-%Y"));//wxString::Format(_("%.2u-%.2u-%.4u"), day, mon, year );
+                }
                 if(sOut == wxEmptyString)
                     sOut = wxT("NULL");
 			}
 		case OFTTime:
 			{
 				int year, mon, day, hour, min, sec, flag;
-				pFeature->GetFieldAsDateTime(col, &year, &mon, &day, &hour, &min, &sec, &flag);
-				wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
-				sOut = dt.Format(_("%H:%M:%S"));//wxString::Format(_("%.2u:%.2u:%.2u"), hour, min, sec);
+				if(pFeature->GetFieldAsDateTime(col, &year, &mon, &day, &hour, &min, &sec, &flag) == TRUE)
+                {
+				    wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
+                    if(dt.IsValid())
+    				    sOut = dt.Format(_("%H:%M:%S"));//wxString::Format(_("%.2u:%.2u:%.2u"), hour, min, sec);
+                }
                 if(sOut == wxEmptyString)
                     sOut = wxT("NULL");
 			}
 		case OFTDateTime:
 			{
 				int year, mon, day, hour, min, sec, flag;
-				pFeature->GetFieldAsDateTime(col, &year, &mon, &day, &hour, &min, &sec, &flag);
-				wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
-				sOut = dt.Format(_("%d-%m-%Y %H:%M:%S"));//wxString::Format(_("%.2u-%.2u-%.4u %.2u:%.2u:%.2u"), day, mon, year, hour, min, sec);
+				if(pFeature->GetFieldAsDateTime(col, &year, &mon, &day, &hour, &min, &sec, &flag) == TRUE)
+                {
+				    wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
+                    if(dt.IsValid())
+                        sOut = dt.Format(_("%d-%m-%Y %H:%M:%S"));//wxString::Format(_("%.2u-%.2u-%.4u %.2u:%.2u:%.2u"), day, mon, year, hour, min, sec);
+                }
                 if(sOut == wxEmptyString)
                     sOut = wxT("NULL");
 			}
@@ -388,3 +401,50 @@ wxString wxGISTable::GetAsString(long row, int col)
 	}
 	return wxEmptyString;
 }
+
+OGRErr wxGISTable::SetFilter(wxGISQueryFilter* pQFilter)
+{
+    if(!m_bIsOpened)
+        if(!Open())
+            return OGRERR_FAILURE;
+    if(	m_poLayer )
+    {
+        OGRErr eErr = m_poLayer->SetAttributeFilter(wgWX2MB(pQFilter->GetWhereClause()));
+        if(eErr != OGRERR_NONE)
+            return eErr;
+
+        m_nSize = -1;
+        Unload();
+        return eErr;
+    }
+    return OGRERR_FAILURE;
+}
+
+//OGRErr wxGISTable::SetIgnoredFields(wxArrayString &saIgnoredFields)
+//{
+//    if(!m_bIsOpened)
+//        if(!Open())
+//            return OGRERR_FAILURE;
+//    if(	m_poLayer )
+//    {
+//        bool bOLCIgnoreFields = m_poLayer->TestCapability(OLCIgnoreFields);
+//        if(!bOLCIgnoreFields)
+//            return OGRERR_UNSUPPORTED_OPERATION;
+//
+//        char **papszIgnoredFields = NULL;
+//        for(size_t i = 0; i < saIgnoredFields.GetCount(); i++)
+//            papszIgnoredFields = CSLAddString( papszIgnoredFields, wgWX2MB(saIgnoredFields[i]) );
+//
+//        OGRErr eErr = m_poLayer->SetIgnoredFields(papszIgnoredFields);
+//        CSLDestroy( papszIgnoredFields );
+//
+//        if(eErr != OGRERR_NONE)
+//            return eErr;
+//        	
+//        m_FieldCount = -1;
+//        Unload();
+//        return eErr;
+//    }
+//    return OGRERR_FAILURE;
+//}
+

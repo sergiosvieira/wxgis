@@ -28,10 +28,18 @@ wxNetMessage::wxNetMessage(unsigned char* pBuff, size_t nSize) : m_bIsOk(false),
 {
 	wxUint8 sys_type = (wxUint8)pBuff[0];
 	pBuff += sizeof(wxUint8);
+    nSize -= sizeof(wxUint8);
 	
 	if(sys_type == CURROS)
 	{
-		m_sData = wxString((const wxChar*)pBuff, nSize);
+        //m_sData.Alloc(nSize);
+        //wxChar* pStrBuff = m_sData.GetWriteBuf(nSize);
+        //memcpy(pStrBuff, pBuff, nSize - sizeof(wxUint8));
+        //m_sData.UngetWriteBuf(nSize);
+
+        //for(size_t i = 0; i < nSize; i++)
+        //    m_sData += (wxChar)pBuff[i];
+		m_sData = wxString((const wxChar*)pBuff, nSize / sizeof(wxChar));
 	}
 	else if(sys_type == WIN)
 	{
@@ -52,9 +60,11 @@ wxNetMessage::wxNetMessage(unsigned char* pBuff, size_t nSize) : m_bIsOk(false),
 
 wxString wxNetMessage::StrFromBuff(unsigned char* pBuff, size_t nBuffByteSize, size_t nValSize)
 {
+    wxString sData;
 	size_t nRealCount = nBuffByteSize / nValSize + 1;
+    sData.Alloc(nRealCount);
 
-	wxChar* pchar = new wxChar[nRealCount];
+	wxChar* pchar = m_sData.GetWriteBuf(nRealCount);//new wxChar[nRealCount];
 
 	for(int i = 0; i < nRealCount; i++)
 	{
@@ -62,7 +72,8 @@ wxString wxNetMessage::StrFromBuff(unsigned char* pBuff, size_t nBuffByteSize, s
 		pBuff += nValSize;
 	}
 	pchar[nRealCount] = 0;
-	return wxString(pchar, nRealCount);
+    sData.UngetWriteBuf(nRealCount);
+	return sData;//wxString(pchar, nRealCount);
 }
 
 wxNetMessage::wxNetMessage(wxGISMessageState nState, short nPriority, wxString sDst) : m_bIsOk(false), m_pXmlDocument(NULL)

@@ -269,6 +269,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\catalogui\gxpending.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\catalogui\gxpropertypages.cpp"
 				>
 			</File>
@@ -416,6 +420,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalogui\gxobjdialog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxpending.h"
 				>
 			</File>
 			<File

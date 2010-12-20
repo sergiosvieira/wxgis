@@ -41,7 +41,7 @@ public:
 	//IRxObjectClient
 	virtual bool Init(wxGxRemoteServer *pGxRemoteServer, wxXmlNode* pProperties);
 	//INetMessageReceiver
-    virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode) = 0;
+    virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode);
 protected:
     wxGxRemoteServer* m_pGxRemoteServer;
 	wxString m_sDst, m_sName;

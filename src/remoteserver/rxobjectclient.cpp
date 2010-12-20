@@ -39,7 +39,7 @@ bool wxRxObject::Init(wxGxRemoteServer* pGxRemoteServer, wxXmlNode* pProperties)
 	if(!pProperties && !pGxRemoteServer)
 		return false;
 	m_pGxRemoteServer = pGxRemoteServer;
-	if(!pProperties->HasProp(wxT("dst"))) //set dst from xml
+	if(pProperties->HasProp(wxT("dst"))) //set dst from xml
 	{
 		m_sDst = pProperties->GetPropVal(wxT("dst"), ERR);
 		INetMessageProcessor* pNetMessageProcessor = dynamic_cast<INetMessageProcessor*>(m_pGxRemoteServer);
@@ -56,6 +56,11 @@ void wxRxObject::Detach(void)
 		pNetMessageProcessor->DelMessageReceiver(m_sDst, static_cast<INetMessageReceiver*>(this));
 	IGxObject::Detach();
 }
+
+void wxRxObject::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
+{
+}
+
 
 //------------------------------------------------------------
 // wxRxObjectContainer

@@ -278,7 +278,7 @@ void wxGxTreeViewBase::OnObjectChanged(IGxObject* object)
 					}
 					SetItemHasChildren(TreeItemId, bItemHasChildren && pGxObjectContainer->AreChildrenViewable());
 				}
-				wxTreeCtrl::Refresh();
+				//wxTreeCtrl::Refresh();
 			}
 		}
 	}
@@ -319,7 +319,7 @@ void wxGxTreeViewBase::OnObjectRefreshed(IGxObject* object)
 			    if(pGxObjectContainer && pGxObjectContainer->HasChildren() && !ItemHasChildren(TreeItemId))
                 {
                     SetItemHasChildren(TreeItemId);
-                    wxTreeCtrl::Refresh();
+                    //wxTreeCtrl::Refresh();
                 }
             }
 		}
