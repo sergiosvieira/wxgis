@@ -40,6 +40,7 @@ public:
     virtual wxGISDataset* GetSubset(wxString sTablename);
 	virtual OGRDataSource* GetDataSource(void);
 	virtual bool Open(void);
+	virtual wxGISDataset* ExecuteSQL(wxString sStatement);
 protected:
 	OGRDataSource *m_poDS;
     wxString m_sName, m_sCryptPass, m_sPGPort, m_sPGAddres, m_sDBName, m_sCursor;
