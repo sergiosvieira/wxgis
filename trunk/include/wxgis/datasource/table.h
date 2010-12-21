@@ -26,13 +26,12 @@
 class WXDLLIMPEXP_GIS_DS wxGISTable : public wxGISDataset
 {
 public:
-	wxGISTable(OGRDataSource *poDS, OGRLayer* poLayer, wxString sPath, wxGISEnumTableDatasetType nType);
+	wxGISTable(OGRLayer* poLayer, wxString sPath, wxGISEnumTableDatasetType nType);
 	virtual ~wxGISTable(void);
 	//wxGISDataset
-    virtual wxString GetName(void);
+    virtual wxString GetName(void){return m_sTableName;};
 	virtual void Close(void);
 	//wxGISTable
-	virtual bool Open(void);
     virtual wxFontEncoding GetEncoding(void){return m_Encoding;};
     virtual void SetEncoding(wxFontEncoding Encoding){m_Encoding = Encoding;};
 	virtual wxString GetAsString(long row, int col);
@@ -49,10 +48,9 @@ public:
     //virtual OGRErr SetIgnoredFields(wxArrayString &saIgnoredFields);
     virtual wxCriticalSection* GetCriticalSection(void){return &m_CritSect;};
 protected:
-	OGRDataSource *m_poDS;
 	OGRLayer* m_poLayer;
     wxFontEncoding m_Encoding;
-	bool m_bOLCStringsAsUTF8, m_bIsOpened, m_bIsDataLoaded;
+	bool m_bOLCStringsAsUTF8, m_bIsDataLoaded;
 	bool m_bHasFID;
 	wxString m_sTableName;
 	int m_nSize;
