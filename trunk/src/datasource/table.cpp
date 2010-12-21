@@ -294,6 +294,7 @@ wxString wxGISTable::GetAsString(long row, int col)
                 if(sOut == wxEmptyString)
                     sOut = wxT("NULL");
 			}
+            break;
 		case OFTTime:
 			{
 				int year, mon, day, hour, min, sec, flag;
@@ -306,6 +307,7 @@ wxString wxGISTable::GetAsString(long row, int col)
                 if(sOut == wxEmptyString)
                     sOut = wxT("NULL");
 			}
+            break;
 		case OFTDateTime:
 			{
 				int year, mon, day, hour, min, sec, flag;
@@ -318,10 +320,12 @@ wxString wxGISTable::GetAsString(long row, int col)
                 if(sOut == wxEmptyString)
                     sOut = wxT("NULL");
 			}
+            break;
 		case OFTReal:
 			sOut = wxString::Format(_("%.6f"), pFeature->GetFieldAsDouble(col));
             if(sOut == wxEmptyString)
                 sOut = wxT("NULL");
+            break;
 		default:
             if(m_bOLCStringsAsUTF8 || m_Encoding == wxFONTENCODING_DEFAULT)
             {
@@ -339,6 +343,7 @@ wxString wxGISTable::GetAsString(long row, int col)
                     sOut = wxT(" ");
             }
 		}
+
         OGRFeature::DestroyFeature(pFeature);
 
         if(pos < MAXSTRINGSTORE)
