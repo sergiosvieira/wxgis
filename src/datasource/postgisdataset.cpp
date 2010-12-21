@@ -76,7 +76,7 @@ wxGISDataset* wxGISPostGISDataset::GetSubset(size_t nIndex)
 			//check the layer type
 			if(CPLStrnlen(poLayer->GetGeometryColumn(), 100))
 			{
-				wxGISTable* pTable = new wxGISTable(m_poDS, poLayer, wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_sCursor.c_str(), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), m_sName.c_str(), Decode(m_sCryptPass, CONFIG_DIR)), enumTablePostgres);
+				wxGISTable* pTable = new wxGISTable(m_poDS, poLayer, wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_sCursor.c_str(), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), m_sName.c_str(), Decode(m_sCryptPass, CONFIG_DIR)), enumTablePostgres);//TODO: Think about it
 				pTable->SetEncoding(wxFONTENCODING_UTF8);
 				pTable->Reference();
 				pDataset = static_cast<wxGISDataset*>(pTable);
@@ -162,3 +162,22 @@ wxGISDataset* wxGISPostGISDataset::GetSubset(wxString sTablename)
     return NULL;
 }
 
+wxGISDataset* wxGISPostGISDataset::ExecuteSQL(wxString sStatement)
+{
+    if( !m_bIsOpened )
+        if( !Open() )
+            return NULL;
+	wxGISDataset* pDataset(NULL);
+    if(m_poDS)
+	{
+		OGRLayer * poLayer = m_poDS->ExecuteSQL(wgWX2MB(sStatement), NULL, NULL);
+		if(	poLayer )
+		{
+			wxGISTable* pTable = new wxGISTable(m_poDS, poLayer, sStatement, enumTablePostgres);
+			pTable->SetEncoding(wxFONTENCODING_UTF8);
+			pTable->Reference();
+			pDataset = static_cast<wxGISDataset*>(pTable);
+		}
+	}
+	return pDataset;
+}

@@ -51,8 +51,6 @@ void wxGISTable::Close(void)
 	m_bHasFID = false;
  	m_FieldCount = -1;
 	m_nSize = -1;
-   if(m_poDS && m_poDS->Dereference() <= 0)
-        OGRDataSource::DestroyDataSource( m_poDS );
 	m_poDS = NULL;
 	m_poLayer = NULL;
 }
@@ -88,14 +86,8 @@ bool wxGISTable::Open(void)
 	if(m_bIsOpened)
 		return true;
 
-    m_poDS = OGRSFDriverRegistrar::Open( wgWX2MB(m_sPath), FALSE );
 	if( m_poDS == NULL )
-	{
-		const char* err = CPLGetLastErrorMsg();
-		wxString sErr = wxString::Format(_("wxGISTable: Open failed! Path '%s'. OGR error: %s"), m_sPath.c_str(), wgMB2WX(err));
-		wxLogError(sErr);
 		return false;
-	}
 	m_poLayer = m_poDS->GetLayerByName(wgWX2MB(m_sTableName));
 	if(m_poLayer)
 	{
