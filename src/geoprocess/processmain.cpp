@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#include "wxgis/geoprocess/main.h"
+#include "wxgis/geoprocess/processmain.h"
 #include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/core/config.h"
 

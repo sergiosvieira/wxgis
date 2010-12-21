@@ -89,6 +89,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="copy from debug to lib"
+				CommandLine="copy $(TargetPath) ..\..\lib\"
 			/>
 		</Configuration>
 		<Configuration

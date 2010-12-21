@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  PosGISDataset class.
+ * Purpose:  PostresDataSource class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010 Bishop
@@ -22,15 +22,15 @@
 
 #include "wxgis/datasource/datasource.h"
 
-/** \class wxGISPostGISDataset postgisdataset.h
-    \brief The PostGIS Dataset class.
+/** \class wxGISPostgresDataSource postgisdataset.h
+    \brief The PostGIS DataSource class.
 */
-class WXDLLIMPEXP_GIS_DS wxGISPostGISDataset :
+class WXDLLIMPEXP_GIS_DS wxGISPostgresDataSource :
 	public wxGISDataset
 {
 public:
-	wxGISPostGISDataset(wxString sName, wxString sCryptPass, wxString sPGPort = wxT("5432"), wxString sPGAddres = wxT("localhost"), wxString sDBName = wxT("postgres"), wxString sCursor = wxT("PG"));
-	virtual ~wxGISPostGISDataset(void);
+	wxGISPostgresDataSource(wxString sName, wxString sCryptPass, wxString sPGPort = wxT("5432"), wxString sPGAddres = wxT("localhost"), wxString sDBName = wxT("postgres"), wxString sCursor = wxT("PG"));
+	virtual ~wxGISPostgresDataSource(void);
 	//wxGISDataset
     virtual size_t GetSubsetsCount(void);
     virtual wxGISDataset* GetSubset(size_t nIndex);
@@ -40,7 +40,7 @@ public:
     virtual wxGISDataset* GetSubset(wxString sTablename);
 	virtual OGRDataSource* GetDataSource(void);
 	virtual bool Open(void);
-	virtual wxGISDataset* ExecuteSQL(wxString sStatement);
+	virtual wxGISDataset* ExecuteSQL(wxString sStatement, wxGISSpatialFilter* pSpatialFilter = NULL, wxString sDialect = wxEmptyString);
 protected:
 	OGRDataSource *m_poDS;
     wxString m_sName, m_sCryptPass, m_sPGPort, m_sPGAddres, m_sDBName, m_sCursor;

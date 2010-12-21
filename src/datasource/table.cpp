@@ -21,51 +21,16 @@
 
 #include "wxgis/datasource/table.h"
 
-wxGISTable::wxGISTable(OGRDataSource *poDS, OGRLayer* poLayer, wxString sPath, wxGISEnumTableDatasetType nType) : wxGISDataset(sPath)
+wxGISTable::wxGISTable(OGRLayer* poLayer, wxString sPath, wxGISEnumTableDatasetType nType) : wxGISDataset(sPath)
 {
 
-	m_poDS = poDS;
 	m_poLayer = poLayer;
         
     m_nType = enumGISTableDataset;
     if(m_poLayer)
-        m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
-    m_nSubType = (int)nType;
-	m_bIsOpened = true;
-	m_bIsDataLoaded = false;
-	m_FieldCount = -1;
-	m_nSize = -1;
-	m_sTableName = GetName();
-	m_FeatureStringData.Alloc(10000);
-	m_Encoding = wxFONTENCODING_DEFAULT;
-}
-wxGISTable::~wxGISTable(void)
-{
-	Close();
-}
-
-void wxGISTable::Close(void)
-{
-	Unload();
-	m_bIsOpened = false;
-	m_bHasFID = false;
- 	m_FieldCount = -1;
-	m_nSize = -1;
-	m_poDS = NULL;
-	m_poLayer = NULL;
-}
-
-wxString wxGISTable::GetName(void)
-{
-	if(!m_sTableName.IsEmpty())
-		return m_sTableName;
-
-	if(!m_bIsOpened)
-		if(!Open())
-            return wxEmptyString;
-	if(	m_poLayer )
     {
-        wxString sOut;
+        m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
+        m_bHasFID = CPLStrnlen(m_poLayer->GetFIDColumn(), 100) > 0;
         if(m_bOLCStringsAsUTF8 || m_Encoding == wxFONTENCODING_DEFAULT)
             m_sTableName = wgMB2WX(m_poLayer->GetLayerDefn()->GetName());
         else
@@ -75,36 +40,34 @@ wxString wxGISTable::GetName(void)
             if(m_sTableName.IsEmpty())
                 m_sTableName = wgMB2WX(m_poLayer->GetLayerDefn()->GetName());
         }
-        return m_sTableName;
+	    m_bIsOpened = true;
     }
-    return wxEmptyString;
+    m_nSubType = (int)nType;
+	m_bIsDataLoaded = false;
+	m_FieldCount = -1;
+	m_nSize = -1;
+	m_FeatureStringData.Alloc(10000);
+	m_Encoding = wxFONTENCODING_DEFAULT;
 }
 
-bool wxGISTable::Open(void)
+wxGISTable::~wxGISTable(void)
 {
-	wxCriticalSectionLocker locker(m_CritSect);
-	if(m_bIsOpened)
-		return true;
+	Close();
+}
 
-	if( m_poDS == NULL )
-		return false;
-	m_poLayer = m_poDS->GetLayerByName(wgWX2MB(m_sTableName));
-	if(m_poLayer)
-	{
-		m_bIsOpened = true;
-		m_bHasFID = CPLStrnlen(m_poLayer->GetFIDColumn(), 100) > 0;
-		return true;
-	}
-	return false;
+void wxGISTable::Close(void)
+{
+	Unload();
+	m_bHasFID = false;
+ 	m_FieldCount = -1;
+	m_nSize = -1;
+	m_poLayer = NULL;
 }
 
 size_t wxGISTable::GetSize(void)
 {
 	if(m_nSize != -1)
 		return m_nSize;
-    if(!m_bIsOpened)
-        if(!Open())
-            return NULL;
     if(	m_poLayer )
     {
     	bool bOLCFastFeatureCount = m_poLayer->TestCapability(OLCFastFeatureCount);
@@ -127,6 +90,9 @@ size_t wxGISTable::GetSize(void)
 
 OGRFeature* wxGISTable::Next(void)
 {
+    if(!m_poLayer)
+        return NULL;
+
     wxCriticalSectionLocker locker(m_CritSect);
     if(m_FeaturesMap.empty() || m_FeaturesMap.size() < GetSize())
         return m_poLayer->GetNextFeature();
@@ -138,10 +104,14 @@ OGRFeature* wxGISTable::Next(void)
         m_IT++;
         return pFeature;
     }
+    return NULL;
 }
 
 void wxGISTable::Reset(void)
 {
+    if(!m_poLayer)
+        return;
+
     wxCriticalSectionLocker locker(m_CritSect);
     bool bOLCFastSetNextByIndex= m_poLayer->TestCapability(OLCFastSetNextByIndex);
     if(bOLCFastSetNextByIndex)
@@ -152,9 +122,6 @@ void wxGISTable::Reset(void)
 
 OGRFeatureDefn* wxGISTable::GetDefiniton(void)
 {
-    if(!m_bIsOpened)
-        if(!Open())
-            return NULL;
     if(	m_poLayer )
         return m_poLayer->GetLayerDefn();
     return NULL;
@@ -162,13 +129,7 @@ OGRFeatureDefn* wxGISTable::GetDefiniton(void)
 
 void wxGISTable::PreLoad(void)
 {
-    if(m_bIsDataLoaded)
-        return;
-
-    if(!m_bIsOpened)
-        if(!Open())
-            return;
-    if(	m_poLayer && !m_poLayer->TestCapability(OLCFastSetNextByIndex))
+    if(	m_poLayer && !m_poLayer->TestCapability(OLCFastSetNextByIndex) )
     {
         m_poLayer->ResetReading();
         long counter = 1;
@@ -181,6 +142,7 @@ void wxGISTable::PreLoad(void)
                 OGRFeature::DestroyFeature(poFeature);
                 continue;
             }
+
             long nFID;
             if(!m_bHasFID)
 			{
@@ -216,9 +178,8 @@ void wxGISTable::Unload(void)
 
 OGRErr wxGISTable::CreateFeature(OGRFeature* poFeature)
 {
-    if(!m_bIsOpened)
-        if(!Open())
-            return OGRERR_FAILURE;
+    if(!m_poLayer)
+        return OGRERR_FAILURE;
     wxCriticalSectionLocker locker(m_CritSect);
     OGRErr eErr = m_poLayer->CreateFeature(poFeature);
     if(eErr == OGRERR_NONE)
@@ -248,6 +209,7 @@ OGRFeature* wxGISTable::GetAt(long nIndex)
 {
 	wxASSERT(nIndex >= 0);
 	wxASSERT(nIndex < GetSize());
+	wxASSERT(m_poLayer != NULL);
 
 	bool bOLCFastSetNextByIndex = m_poLayer->TestCapability(OLCFastSetNextByIndex);
     if(bOLCFastSetNextByIndex)
@@ -396,9 +358,6 @@ wxString wxGISTable::GetAsString(long row, int col)
 
 OGRErr wxGISTable::SetFilter(wxGISQueryFilter* pQFilter)
 {
-    if(!m_bIsOpened)
-        if(!Open())
-            return OGRERR_FAILURE;
     if(	m_poLayer )
     {
         OGRErr eErr = m_poLayer->SetAttributeFilter(wgWX2MB(pQFilter->GetWhereClause()));
@@ -414,9 +373,6 @@ OGRErr wxGISTable::SetFilter(wxGISQueryFilter* pQFilter)
 
 //OGRErr wxGISTable::SetIgnoredFields(wxArrayString &saIgnoredFields)
 //{
-//    if(!m_bIsOpened)
-//        if(!Open())
-//            return OGRERR_FAILURE;
 //    if(	m_poLayer )
 //    {
 //        bool bOLCIgnoreFields = m_poLayer->TestCapability(OLCIgnoreFields);

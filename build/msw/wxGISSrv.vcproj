@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="wxGISGeoprocess"
-	ProjectGUID="{4C6FCBB1-C5F0-46FD-AEED-FB7233951682}"
-	RootNamespace="wxGISGeoprocess"
+	Name="wxGISSrv"
+	ProjectGUID="{799F8005-7E26-435D-A02E-E2E35505CCC1}"
+	RootNamespace="wxGISSrv"
 	>
 	<Platforms>
 		<Platform
@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include;&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\frmts&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;"
+				AdditionalIncludeDirectories="&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;&quot;$(WXGIS)\include&quot;;..\..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;__WXMSW__;__WXDEBUG__;WXUSINGDLL;NOPCH"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -59,8 +59,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxbase28ud_xml.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISCored.lib wxGISDatasourced.lib wxGISCatalogd.lib"
-				AdditionalLibraryDirectories="..\..\lib;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(WXGISGDAL)\lib&quot;"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxbase28ud_xml.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISServerFrameworkd.lib"
+				OutputFile="$(OutDir)\wxGISServer.exe"
+				AdditionalLibraryDirectories="$(WXGISGDAL)\lib;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(WXGIS)\lib&quot;;..\..\lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -88,7 +89,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -172,7 +172,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\geoprocess\processmain.cpp"
+				RelativePath="..\..\src\srv_app\main.cpp"
 				>
 			</File>
 		</Filter>
@@ -182,11 +182,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\include\wxgis\geoprocess\geoprocess.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\geoprocess\processmain.h"
+				RelativePath="..\..\include\wxgissrv\srv_app\main.h"
 				>
 			</File>
 		</Filter>

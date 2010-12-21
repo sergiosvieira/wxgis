@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="wxGISGeoprocess"
-	ProjectGUID="{4C6FCBB1-C5F0-46FD-AEED-FB7233951682}"
-	RootNamespace="wxGISGeoprocess"
+	Name="wxGISServerNetworking"
+	ProjectGUID="{E4DC62B1-D524-4DD2-8C1F-BD64D2659D08}"
+	RootNamespace="wxGISServerNetworking"
 	>
 	<Platforms>
 		<Platform
@@ -18,7 +18,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="..\$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="1"
 			>
 			<Tool
@@ -39,8 +39,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include;&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\frmts&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;__WXMSW__;__WXDEBUG__;WXUSINGDLL;NOPCH"
+				AdditionalIncludeDirectories="&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;&quot;$(WXGIS)\include&quot;;..\..\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_NET"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -59,10 +59,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxbase28ud_xml.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISCored.lib wxGISDatasourced.lib wxGISCatalogd.lib"
-				AdditionalLibraryDirectories="..\..\lib;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(WXGISGDAL)\lib&quot;"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxbase28ud_xml.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxGISNetworkingd.lib"
+				OutputFile="$(OutDir)\$(ProjectName)d.dll"
+				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(WXGIS)\lib&quot;;..\..\lib"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				ImportLibrary="..\..\lib\$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -88,7 +89,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
+				Description="copy from debug to lib"
+				CommandLine="copy $(TargetPath) ..\..\lib\"
 			/>
 		</Configuration>
 		<Configuration
@@ -172,7 +174,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\geoprocess\processmain.cpp"
+				RelativePath="..\..\src\srv_networking\tcpnetworkplugin.cpp"
 				>
 			</File>
 		</Filter>
@@ -182,11 +184,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\include\wxgis\geoprocess\geoprocess.h"
+				RelativePath="..\..\include\wxgissrv\srv_networking\networking.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wxgis\geoprocess\processmain.h"
+				RelativePath="..\..\include\wxgissrv\srv_networking\tcpnetworkplugin.h"
 				>
 			</File>
 		</Filter>
