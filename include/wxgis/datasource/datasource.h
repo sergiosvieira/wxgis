@@ -66,7 +66,8 @@ enum wxGISEnumTableDatasetType
 {
 	enumTableUnknown = 0,
     enumTableDBF = 1,
-	enumTablePostgres = 2
+	enumTablePostgres = 2,
+    enumTableQueryResult = 3
 };
 
 enum wxGISEnumPrjFileType

@@ -71,7 +71,7 @@ size_t wxGISTable::GetSize(void)
     if(	m_poLayer )
     {
     	bool bOLCFastFeatureCount = m_poLayer->TestCapability(OLCFastFeatureCount);
-        if(bOLCFastFeatureCount)
+        if(bOLCFastFeatureCount && m_nSubType != enumTableQueryResult)
 		{
 			m_nSize = m_poLayer->GetFeatureCount(true);
             return m_nSize;
@@ -129,7 +129,7 @@ OGRFeatureDefn* wxGISTable::GetDefiniton(void)
 
 void wxGISTable::PreLoad(void)
 {
-    if(	m_poLayer && !m_poLayer->TestCapability(OLCFastSetNextByIndex) )
+    if(	m_poLayer )
     {
         m_poLayer->ResetReading();
         long counter = 1;
@@ -375,6 +375,32 @@ OGRErr wxGISTable::SetFilter(wxGISQueryFilter* pQFilter)
     }
     return OGRERR_FAILURE;
 }
+
+OGRErr wxGISTable::DeleteFeature(long nFID)
+{
+    if(	m_poLayer && m_nSubType != enumTableQueryResult)
+    {
+        OGRErr eErr = m_poLayer->DeleteFeature(nFID);
+        if(eErr != OGRERR_NONE)
+            return eErr;
+
+        m_nSize = -1;
+        Unload();
+        return eErr;
+    }
+    return OGRERR_FAILURE;
+}
+
+OGRErr wxGISTable::SetFeature(OGRFeature *poFeature)
+{
+    if(	m_poLayer && m_nSubType != enumTableQueryResult && poFeature)
+    {
+        OGRErr eErr = m_poLayer->SetFeature(poFeature);
+        return eErr;
+    }
+    return OGRERR_FAILURE;
+}
+
 
 //OGRErr wxGISTable::SetIgnoredFields(wxArrayString &saIgnoredFields)
 //{

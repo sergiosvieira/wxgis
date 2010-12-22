@@ -125,6 +125,9 @@ static bool CreateAndRunThread(wxThread* pThread, wxString sClassName = wxEmptyS
 	return true;
 }
 
+#define hibyte(a) ((a>>8) & 0xFF)
+#define lobyte(a) ((a) & 0xFF)
+
 static wxString Encode(wxString sInput, wxString sPass)
 {
     wxString sRes;
@@ -134,7 +137,10 @@ static wxString Encode(wxString sInput, wxString sPass)
         if(pos == sPass.Len())
             pos = 0;
         wxChar Symbol = sInput[i] ^ sPass[pos];
-		sRes += wxDecToHex(Symbol);
+        char SymbolHi = hibyte(Symbol);
+        char SymbolLo = lobyte(Symbol);//(Symbol >> 4) & 0xff;
+		sRes += wxDecToHex(SymbolHi);
+		sRes += wxDecToHex(SymbolLo);
         pos++;
     }
     return sRes;
@@ -144,13 +150,17 @@ static wxString Decode(wxString sInput, wxString sPass)
 {
     wxString sRes;
     size_t pos(0);
-    for(size_t i = 0; i < sInput.Len(); i += 2)
+    for(size_t i = 0; i < sInput.Len(); i += 4)
     {
         if(pos == sPass.Len())
             pos = 0;
 		wxString sHex = sInput[i];
 		sHex += sInput[i + 1]; 
-		wxChar Symbol = wxHexToDec(sHex);
+        char SymbolHi = wxHexToDec(sHex);
+        sHex = sInput[i + 2];
+		sHex += sInput[i + 3];
+        char SymbolLo = wxHexToDec(sHex);
+        wxChar Symbol = (SymbolHi << 8) + SymbolLo;
         Symbol = Symbol ^ sPass[pos];
         sRes += Symbol;
         pos++;
