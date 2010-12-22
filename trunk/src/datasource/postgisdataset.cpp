@@ -102,7 +102,6 @@ wxGISDataset* wxGISPostgresDataSource::GetSubset(wxString sTablename)
 	    OGRLayer* poLayer = m_poDS->GetLayerByName(wgWX2MB(sTablename));
         if(poLayer)
         {
-            m_poDS->Reference();
 			wxGISDataset* pDataset(NULL);
 			//check the layer type
 			if(CPLStrnlen(poLayer->GetGeometryColumn(), 100))
@@ -173,7 +172,7 @@ wxGISDataset* wxGISPostgresDataSource::ExecuteSQL(wxString sStatement, wxGISSpat
 		OGRLayer * poLayer = m_poDS->ExecuteSQL(wgWX2MB(sStatement), NULL, wgWX2MB(sDialect));//TODO: implement spatial Filter
 		if(	poLayer )
 		{
-			wxGISTable* pTable = new wxGISTable(poLayer, sStatement, enumTablePostgres);
+			wxGISTable* pTable = new wxGISTable(poLayer, sStatement, enumTableQueryResult);
 			pTable->SetEncoding(wxFONTENCODING_UTF8);
 			pTable->Reference();
 			pDataset = static_cast<wxGISDataset*>(pTable);

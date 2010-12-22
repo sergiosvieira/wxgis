@@ -38,7 +38,9 @@ public:
 	virtual OGRFeature* operator [](long nIndex);
 	virtual OGRFeature* GetAt(long nIndex);
 	virtual OGRErr CreateFeature(OGRFeature* poFeature);
-	virtual void Unload(void);
+	virtual OGRErr DeleteFeature(long nFID);
+    virtual OGRErr SetFeature (OGRFeature *poFeature);
+    virtual void Unload(void);
 	virtual void PreLoad(void);
 	virtual OGRFeatureDefn* GetDefiniton(void);
 	virtual void Reset(void);
