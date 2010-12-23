@@ -49,7 +49,9 @@ public:
     virtual OGRErr SetFilter(wxGISQueryFilter* pQFilter);
     //virtual OGRErr SetIgnoredFields(wxArrayString &saIgnoredFields);
     virtual wxCriticalSection* GetCriticalSection(void){return &m_CritSect;};
+	virtual void SetDataSource(OGRDataSource* pDS){m_pDS = pDS;};
 protected:
+	OGRDataSource* m_pDS;
 	OGRLayer* m_poLayer;
     wxFontEncoding m_Encoding;
 	bool m_bOLCStringsAsUTF8, m_bIsDataLoaded;

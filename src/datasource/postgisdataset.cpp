@@ -175,6 +175,7 @@ wxGISDataset* wxGISPostgresDataSource::ExecuteSQL(wxString sStatement, wxGISSpat
 			wxGISTable* pTable = new wxGISTable(poLayer, sStatement, enumTableQueryResult);
 			pTable->SetEncoding(wxFONTENCODING_UTF8);
 			pTable->Reference();
+			pTable->SetDataSource(m_poDS);
 			pDataset = static_cast<wxGISDataset*>(pTable);
 		}
 	}
