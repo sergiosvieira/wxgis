@@ -21,7 +21,7 @@
 
 #include "wxgis/datasource/table.h"
 
-wxGISTable::wxGISTable(OGRLayer* poLayer, wxString sPath, wxGISEnumTableDatasetType nType) : wxGISDataset(sPath)
+wxGISTable::wxGISTable(OGRLayer* poLayer, wxString sPath, wxGISEnumTableDatasetType nType) : wxGISDataset(sPath), m_pDS(NULL)
 {
 
 	m_poLayer = poLayer;
@@ -58,6 +58,8 @@ wxGISTable::~wxGISTable(void)
 void wxGISTable::Close(void)
 {
 	Unload();
+	if(m_nSubType == enumTableQueryResult && m_pDS)
+		m_pDS->ReleaseResultSet(m_poLayer);
 	m_bHasFID = false;
  	m_FieldCount = -1;
 	m_nSize = -1;
