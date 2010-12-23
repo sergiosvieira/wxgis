@@ -328,7 +328,9 @@ wxString wxGISGPToolManager::GetPopularTool(size_t nIndex)
 {
     std::multimap<int, wxString>::iterator i = m_ToolsPopularMap.begin();
     std::advance(i, nIndex);
-    return i->second;
+    if(i != m_ToolsPopularMap.end())
+        return i->second;
+    return wxEmptyString;
 }
 
 //WXGISEXECDDATA wxGISGPToolManager::GetTask(size_t nIndex)
