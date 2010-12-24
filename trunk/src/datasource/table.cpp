@@ -259,6 +259,108 @@ OGRFeature* wxGISTable::operator [](long nIndex)
 	return GetAt(nIndex);
 }
 
+wxString wxGISTable::GetAsString(OGRFeature* pFeature, int nField, wxFontEncoding Encoding)
+{
+    if(!pFeature)
+		return wxEmptyString;
+	OGRFieldDefn* pDef = pFeature->GetFieldDefnRef(nField);
+    wxString sOut;
+	switch(pDef->GetType())
+	{
+	case OFTDate:
+		{
+			int year, mon, day, hour, min, sec, flag;
+			if(pFeature->GetFieldAsDateTime(nField, &year, &mon, &day, &hour, &min, &sec, &flag) == TRUE)
+            {
+			    wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
+                if(dt.IsValid())
+				    sOut = dt.Format(_("%d-%m-%Y"));//wxString::Format(_("%.2u-%.2u-%.4u"), day, mon, year );
+            }
+            if(sOut == wxEmptyString)
+                sOut = wxT("NULL");
+		}
+        break;
+	case OFTTime:
+		{
+			int year, mon, day, hour, min, sec, flag;
+			if(pFeature->GetFieldAsDateTime(nField, &year, &mon, &day, &hour, &min, &sec, &flag) == TRUE)
+            {
+			    wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
+                if(dt.IsValid())
+				    sOut = dt.Format(_("%H:%M:%S"));//wxString::Format(_("%.2u:%.2u:%.2u"), hour, min, sec);
+            }
+            if(sOut == wxEmptyString)
+                sOut = wxT("NULL");
+		}
+        break;
+	case OFTDateTime:
+		{
+			int year, mon, day, hour, min, sec, flag;
+			if(pFeature->GetFieldAsDateTime(nField, &year, &mon, &day, &hour, &min, &sec, &flag) == TRUE)
+            {
+			    wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
+                if(dt.IsValid())
+                    sOut = dt.Format(_("%d-%m-%Y %H:%M:%S"));//wxString::Format(_("%.2u-%.2u-%.4u %.2u:%.2u:%.2u"), day, mon, year, hour, min, sec);
+            }
+            if(sOut == wxEmptyString)
+                sOut = wxT("NULL");
+		}
+        break;
+	case OFTReal:
+		sOut = wxString::Format(wxT("%.12f"), pFeature->GetFieldAsDouble(nField));
+        if(sOut == wxEmptyString)
+            sOut = wxT("NULL");
+        break;
+	case OFTRealList:
+		{
+			int nCount(0);
+			const double* pDblLst = pFeature->GetFieldAsDoubleList(nField, &nCount);
+			for(size_t i = 0; i < nCount; i++)
+			{
+				sOut += wxString::Format(wxT("%.12f|"), pDblLst[i]);
+			}
+		}
+		break;
+	case OFTIntegerList:
+		{
+			int nCount(0);
+			const int* pIntLst = pFeature->GetFieldAsIntegerList(nField, &nCount);
+			for(size_t i = 0; i < nCount; i++)
+			{
+				sOut += wxString::Format(wxT("%.d|"), pIntLst[i]);
+			}
+		}
+		break;
+	case OFTStringList:
+		{
+			char** papszLinkList = pFeature->GetFieldAsStringList(nField);
+			for(int i = 0; papszLinkList[i] != NULL; i++ )
+			{
+				sOut += wgMB2WX(papszLinkList[i]);
+				sOut += wxString(wxT("|"));
+			}
+		}
+		break;
+	default:
+        if(Encoding == wxFONTENCODING_DEFAULT)
+        {
+            sOut = wgMB2WX(pFeature->GetFieldAsString(nField));
+            if(sOut == wxEmptyString)
+                sOut = wxT(" ");
+        }
+        else
+        {
+            wxCSConv conv(Encoding);
+            sOut = conv.cMB2WX(pFeature->GetFieldAsString(nField));
+            if(sOut.IsEmpty())
+                sOut = wgMB2WX(pFeature->GetFieldAsString(nField));
+            if(sOut == wxEmptyString)
+                sOut = wxT(" ");
+        }
+	}
+	return sOut;
+}
+
 wxString wxGISTable::GetAsString(long row, int col)
 {
 	if(GetSize() <= row)
@@ -278,76 +380,10 @@ wxString wxGISTable::GetAsString(long row, int col)
                 return m_FeatureStringData[pos];
 
 		OGRFeature* pFeature = GetAt(row);
-        if(!pFeature)
-    		return wxEmptyString;
-		OGRFieldDefn* pDef = pFeature->GetFieldDefnRef(col);
-        wxString sOut(wxT(" "));
-		switch(pDef->GetType())
-		{
-		case OFTDate:
-			{
-				int year, mon, day, hour, min, sec, flag;
-				if(pFeature->GetFieldAsDateTime(col, &year, &mon, &day, &hour, &min, &sec, &flag) == TRUE)
-                {
-				    wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
-                    if(dt.IsValid())
-    				    sOut = dt.Format(_("%d-%m-%Y"));//wxString::Format(_("%.2u-%.2u-%.4u"), day, mon, year );
-                }
-                if(sOut == wxEmptyString)
-                    sOut = wxT("NULL");
-			}
-            break;
-		case OFTTime:
-			{
-				int year, mon, day, hour, min, sec, flag;
-				if(pFeature->GetFieldAsDateTime(col, &year, &mon, &day, &hour, &min, &sec, &flag) == TRUE)
-                {
-				    wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
-                    if(dt.IsValid())
-    				    sOut = dt.Format(_("%H:%M:%S"));//wxString::Format(_("%.2u:%.2u:%.2u"), hour, min, sec);
-                }
-                if(sOut == wxEmptyString)
-                    sOut = wxT("NULL");
-			}
-            break;
-		case OFTDateTime:
-			{
-				int year, mon, day, hour, min, sec, flag;
-				if(pFeature->GetFieldAsDateTime(col, &year, &mon, &day, &hour, &min, &sec, &flag) == TRUE)
-                {
-				    wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
-                    if(dt.IsValid())
-                        sOut = dt.Format(_("%d-%m-%Y %H:%M:%S"));//wxString::Format(_("%.2u-%.2u-%.4u %.2u:%.2u:%.2u"), day, mon, year, hour, min, sec);
-                }
-                if(sOut == wxEmptyString)
-                    sOut = wxT("NULL");
-			}
-            break;
-		case OFTReal:
-			sOut = wxString::Format(_("%.6f"), pFeature->GetFieldAsDouble(col));
-            if(sOut == wxEmptyString)
-                sOut = wxT("NULL");
-            break;
-		default:
-            if(m_bOLCStringsAsUTF8 || m_Encoding == wxFONTENCODING_DEFAULT)
-            {
-                sOut = wgMB2WX(pFeature->GetFieldAsString(col));
-                if(sOut == wxEmptyString)
-                    sOut = wxT(" ");
-            }
-            else
-            {
-                wxCSConv conv(m_Encoding);
-                sOut = conv.cMB2WX(pFeature->GetFieldAsString(col));
-                if(sOut.IsEmpty())
-                    sOut = wgMB2WX(pFeature->GetFieldAsString(col));
-                if(sOut == wxEmptyString)
-                    sOut = wxT(" ");
-            }
-		}
-
+		wxString sOut = GetAsString(pFeature, col, m_Encoding);
         OGRFeature::DestroyFeature(pFeature);
-
+		if(sOut.IsEmpty())
+			return wxEmptyString;
         if(pos < MAXSTRINGSTORE)
         {
             if(m_FeatureStringData.GetCount() <= pos)

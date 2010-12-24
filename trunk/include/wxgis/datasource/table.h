@@ -35,6 +35,7 @@ public:
     virtual wxFontEncoding GetEncoding(void){return m_Encoding;};
     virtual void SetEncoding(wxFontEncoding Encoding){m_Encoding = Encoding;};
 	virtual wxString GetAsString(long row, int col);
+	static wxString GetAsString(OGRFeature* pFeature, int nField, wxFontEncoding Encoding);
 	virtual OGRFeature* operator [](long nIndex);
 	virtual OGRFeature* GetAt(long nIndex);
 	virtual OGRErr CreateFeature(OGRFeature* poFeature);
