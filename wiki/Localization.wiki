@@ -19,6 +19,7 @@ The current locale, sets in xml config file in section "loc" like this:
 <loc locale="en" path="d:\work\Projects\wxGIS\build\debug\locale"/>
 }}}
 You can manually change it.
+If you delete all contents of locale directory you get the pure english application. The locale directory should not been deleted!
 
 P.S. The configs structure describes in [Configs] page
 
