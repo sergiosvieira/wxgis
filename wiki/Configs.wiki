@@ -8,4 +8,32 @@ The wxGIS have several config like the MS Windows registry (the HKLM and HKCU).
 
 = Details =
 
+The HKLM is read onle common config for all users of target PC. The HKLM fills from the config subdirectory which places in target directory there wxGIS installed.
+The config subdirectory includes several xml config files.
+
+The HKCU includes configs for curretn user. The config files created in user home.
+
+
+*The config files structure*
+----
+root->config<p>
+<p>wxCatalog.xml
+<p>wxGISCatalog.xml
+<p>wxGISContDialog.xml
+<p>wxGISObjDialog.xml
+----
+user_home->wxGIS<p>
+<p>\wxCatalog\hkcu_config.xml
+<p>\wxGISCatalog\hkcu_config.xml
+<p>\wxGISContDialog\hkcu_config.xml
+<p>\wxGISObjDialog\hkcu_config.xml
+----
+app_data->wxGIS<p>
+<p>\wxCatalog\hklm_config.xml
+<p>\wxGISCatalog\hklm_config.xml
+<p>\wxGISContDialog\hklm_config.xml
+<p>\wxGISObjDialog\hklm_config.xml
+----
+*The config file structure*
+
 TODO
