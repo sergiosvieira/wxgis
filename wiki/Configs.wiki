@@ -1,0 +1,11 @@
+#summary The wxGIS config structure.
+#labels Featured,Phase-Design
+
+= Introduction =
+
+The wxGIS have several config like the MS Windows registry (the HKLM and HKCU).
+
+
+= Details =
+
+TODO
