@@ -18,6 +18,7 @@ The current locale, sets in xml config file in section "loc" like this:
 {{{
 <loc locale="en" path="d:\work\Projects\wxGIS\build\debug\locale"/>
 }}}
+You can manually change it.
 
 P.S. The configs structure describes in [Configs] page
 
