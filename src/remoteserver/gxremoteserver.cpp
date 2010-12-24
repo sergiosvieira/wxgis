@@ -122,7 +122,6 @@ void wxGxRemoteServer::OnDisconnect(void)
 	m_bAuth = false;
 	m_nChildCount = 0;
 	m_bIsChildrenLoaded = false;
-	m_pCatalog->ObjectChanged(this);
 }
 
 void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)

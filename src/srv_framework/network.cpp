@@ -222,7 +222,7 @@ void wxGISNetworkService::ProcessOutMessage(WXGISMSG msg)
 	if(msg.nUserID == wxNOT_FOUND)
 	{
 		for(ConnIT it = m_NetworkConnectionMap.begin(); it != m_NetworkConnectionMap.end(); ++it)
-			if(it->second != NULL && !it->second->IsConnected())
+			if(it->second != NULL && it->second->IsConnected())
 				it->second->PutOutMessage(msg);
 	}
 	else

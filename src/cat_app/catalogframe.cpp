@@ -21,6 +21,11 @@
 #include "wxgis/cat_app/catalogframe.h"
 #include "wxgis/cat_app/gisaboutdlg.h"
 
+#include "../../art/mainframe.xpm"
+#include "../../art/mainframe_x.xpm"
+
+#include <wx/datetime.h>
+
 //-----------------------------------------------------------
 // wxGISCatalogFrame
 //-----------------------------------------------------------
@@ -33,7 +38,11 @@ END_EVENT_TABLE()
 wxGISCatalogFrame::wxGISCatalogFrame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxGxApplication(parent, id, title, pos, size, style)
 {
 	//set app main icon
-	SetIcon(wxIcon(mainframe_xpm));
+    wxDateTime now = wxDateTime::Now();
+    if((now.GetMonth() == wxDateTime::Month::Dec && now.GetDay() > 15) || (now.GetMonth() == wxDateTime::Month::Jan && now.GetDay() < 15))
+        SetIcon(wxIcon(mainframe_x_xpm));
+    else
+        SetIcon(wxIcon(mainframe_xpm));
 }
 
 wxGISCatalogFrame::~wxGISCatalogFrame(void)

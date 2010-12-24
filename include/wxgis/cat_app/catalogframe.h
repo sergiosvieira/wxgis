@@ -24,8 +24,6 @@
 #include "wxgis/framework/framework.h"
 #include "wxgis/catalogui/gxapplication.h"
 
-#include "../../art/mainframe.xpm"
-
 #include "wx/aui/aui.h"
 #include "wx/generic/logg.h"
 #include "wx/artprov.h"
