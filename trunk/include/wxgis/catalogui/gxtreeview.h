@@ -84,10 +84,6 @@ public:
 	virtual void OnRefreshAll(void);
 //wxTreeCtrl
     virtual int OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2);
-//events
-	virtual void OnItemExpanding(wxTreeEvent& event);
-	virtual void OnItemRightClick(wxTreeEvent& event);
-    virtual void OnChar(wxKeyEvent& event);
 
 	typedef std::map<IGxObject*, wxTreeItemId> WETREEMAP;
 	typedef struct _icondata
@@ -95,7 +91,13 @@ public:
 		wxIcon oIcon;
 		int iImageIndex;
 	} ICONDATA;
-
+protected:
+//events
+	virtual void OnItemExpanding(wxTreeEvent& event);
+	virtual void OnItemRightClick(wxTreeEvent& event);
+    virtual void OnChar(wxKeyEvent& event);
+    //
+    virtual void UpdateGxSelection(void);
 protected:
 	wxImageList m_TreeImageList;
 	WETREEMAP m_TreeMap;

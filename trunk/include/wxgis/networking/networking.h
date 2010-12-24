@@ -156,9 +156,9 @@ public:
 	virtual WXGISMSG GetOutMessage(void)
     {
         WXGISMSG Msg = {NULL, -1};
+        wxCriticalSectionLocker locker(m_CriticalSection);
         if(m_OutMsgQueue.size() > 0)
         {
-            wxCriticalSectionLocker locker(m_CriticalSection);
             Msg = m_OutMsgQueue.top();
             m_OutMsgQueue.pop();
         }
@@ -172,6 +172,7 @@ public:
     virtual void CleanMsgQueueres(void)
     {
         //clean OutMsgQueue
+        wxCriticalSectionLocker locker(m_CriticalSection);
         while( m_OutMsgQueue.size() > 0 )
         {
 		    WXGISMSG Msg = m_OutMsgQueue.top();

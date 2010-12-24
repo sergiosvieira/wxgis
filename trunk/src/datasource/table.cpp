@@ -403,7 +403,11 @@ OGRErr wxGISTable::SetFilter(wxGISQueryFilter* pQFilter)
 {
     if(	m_poLayer )
     {
-        OGRErr eErr = m_poLayer->SetAttributeFilter(wgWX2MB(pQFilter->GetWhereClause()));
+        OGRErr eErr;
+        if(pQFilter)
+            eErr = m_poLayer->SetAttributeFilter(wgWX2MB(pQFilter->GetWhereClause()));
+        else
+            eErr = m_poLayer->SetAttributeFilter(NULL);
         if(eErr != OGRERR_NONE)
             return eErr;
 

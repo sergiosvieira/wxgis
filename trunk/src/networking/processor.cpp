@@ -177,7 +177,7 @@ void *wxMsgInThread::Entry()
 		WXGISMSG msg = m_pParent->GetInMessage();
 		while(msg.pMsg)    
 		{      
-			wxYieldIfNeeded();
+			//wxYieldIfNeeded();
 			m_pParent->ProcessMessage(msg);
 			msg = m_pParent->GetInMessage();
 		}
