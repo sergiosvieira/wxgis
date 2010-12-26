@@ -102,7 +102,7 @@ void *wxNetTCPWriter::Entry()
 				}
 				else
 				{
-					wxDELETE(msg.pMsg);
+					wsDELETE(msg.pMsg);
 				}
 			}
         }

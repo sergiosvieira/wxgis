@@ -246,7 +246,7 @@ void wxGxContainerDialog::OnInit()
 	m_pConfig = new wxGISAppConfig(CONTDLG_NAME, CONFIG_DIR);
 #endif
 
-    m_pTree->Activate(this, NULL);//!!!!
+    m_pTree->Activate(this, NULL);//TODO !!!!
 	bMainSizer->Insert(1, m_pTree, 1, wxALL|wxEXPAND, 8 );
 
     if(m_bShowExportFormats)

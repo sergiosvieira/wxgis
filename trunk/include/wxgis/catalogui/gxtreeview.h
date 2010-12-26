@@ -118,22 +118,29 @@ protected:
 //////////////////////////////////////////////////////////////////////////////
 
 class WXDLLIMPEXP_GIS_CLU wxGxTreeView :
-	public wxGxTreeViewBase
+	public wxGxTreeViewBase,
+    public IGxViewDropTarget
 {
     DECLARE_DYNAMIC_CLASS(wxGxTreeView)
 public:
     wxGxTreeView(void);
 	wxGxTreeView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxBORDER_NONE | wxTR_EDIT_LABELS /*| wxTR_MULTIPLE| wxTR_HIDE_ROOT | wxTR_LINES_AT_ROOT*/);
 	virtual ~wxGxTreeView(void);
-//
+//IGxDropTarget
+    virtual wxDragResult OnDragOver(wxCoord x, wxCoord y, wxDragResult def);
+    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames);
+    virtual void OnLeave();
+//events
     virtual void OnBeginLabelEdit(wxTreeEvent& event);
     virtual void OnEndLabelEdit(wxTreeEvent& event);
     virtual void OnSelChanged(wxTreeEvent& event);
 	virtual void OnItemRightClick(wxTreeEvent& event);
 	virtual void OnBeginDrag(wxTreeEvent& event);
 	virtual void OnActivated(wxTreeEvent& event);
-
+//wxGxTreeView
     virtual void BeginRename(IGxObject* pGxObject = NULL);
+protected:
+    wxTreeItemId m_HighLightItemId;
 
     DECLARE_EVENT_TABLE()
 };

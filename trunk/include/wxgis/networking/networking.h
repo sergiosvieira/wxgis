@@ -20,7 +20,7 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/base.h"
+#include "wxgis/core/core.h"
 
 #include "wx/socket.h"
 #include "wx/xml/xml.h"
@@ -93,7 +93,7 @@ enum wxGISUserType
 /** \class INetMessage networking.h
     \brief The network message interface class.
 */
-class INetMessage
+class INetMessage : public IPointer
 {
 public:
     virtual ~INetMessage(void){};
@@ -167,6 +167,7 @@ public:
 	virtual void PutOutMessage(WXGISMSG msg)
     {
         wxCriticalSectionLocker locker(m_CriticalSection);
+        msg.pMsg->Reference();
         m_OutMsgQueue.push(msg);
     };
     virtual void CleanMsgQueueres(void)
@@ -177,7 +178,7 @@ public:
         {
 		    WXGISMSG Msg = m_OutMsgQueue.top();
 		    m_OutMsgQueue.pop();  
-            wxDELETE(Msg.pMsg);
+            wsDELETE(Msg.pMsg);
         }
       //  //clean InMsgQueue
       //  while( m_InMsgQueue.size() > 0 )

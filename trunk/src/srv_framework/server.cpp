@@ -114,19 +114,15 @@ void wxGISServer::Stop(void)
 
 void wxGISServer::PutInMessage(WXGISMSG msg)
 {
-	wxCriticalSectionLocker locker(m_CriticalSection);
     m_MsgQueue.push(msg);
 }
 
 void wxGISServer::PutOutMessage(WXGISMSG msg)
 {
-	if(msg.pMsg->IsOk())
-	{
-		if(m_pNetService)
-			m_pNetService->PutOutMessage(msg);
-	}
+	if(msg.pMsg->IsOk() && m_pNetService)
+		m_pNetService->PutOutMessage(msg);
 	else
-		wxDELETE(msg.pMsg);
+		wsDELETE(msg.pMsg);
 }
 
 IGISConfig* wxGISServer::GetConfig(void)

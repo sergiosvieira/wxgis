@@ -122,7 +122,7 @@ void wxGISTable::Reset(void)
         m_IT = m_FeaturesMap.begin();
 }
 
-OGRFeatureDefn* wxGISTable::GetDefiniton(void)
+OGRFeatureDefn* wxGISTable::GetDefinition(void)
 {
     if(	m_poLayer )
         return m_poLayer->GetLayerDefn();

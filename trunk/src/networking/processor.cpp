@@ -50,7 +50,7 @@ void wxGISNetMessageProcessor::ProcessMessage(WXGISMSG msg)
 	const wxXmlNode* pRoot = msg.pMsg->GetRoot();
 	if(!pRoot)
 	{
-		wxDELETE(msg.pMsg);
+		wsDELETE(msg.pMsg);
 		return;
 	}
 	wxXmlNode* pChild = pRoot->GetChildren();
@@ -87,7 +87,7 @@ void wxGISNetMessageProcessor::ProcessMessage(WXGISMSG msg)
 	//		pChild = pChild->GetNext();
 	//	}
 
-    wxDELETE(msg.pMsg);
+    wsDELETE(msg.pMsg);
 }
 
 void wxGISNetMessageProcessor::AddMessageReceiver(wxString sName, INetMessageReceiver* pNetMessageReceiver)
@@ -125,7 +125,7 @@ void wxGISNetMessageProcessor::ClearMessageQueue(void)
     {
 	    WXGISMSG Msg = m_MsgQueue.top();
 	    m_MsgQueue.pop();  
-        wxDELETE(Msg.pMsg);
+        wsDELETE(Msg.pMsg);
     }
 }
 

@@ -205,6 +205,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\catalogui\gxcatdroptarget.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\catalogui\gxcontdialog.cpp"
 				>
 			</File>
@@ -356,6 +360,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalogui\gxcatalogui.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxcatdroptarget.h"
 				>
 			</File>
 			<File
