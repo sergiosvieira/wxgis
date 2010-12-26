@@ -43,7 +43,7 @@ public:
     virtual OGRErr SetFeature (OGRFeature *poFeature);
     virtual void Unload(void);
 	virtual void PreLoad(void);
-	virtual OGRFeatureDefn* GetDefiniton(void);
+	virtual OGRFeatureDefn* GetDefinition(void);
 	virtual void Reset(void);
 	virtual OGRFeature* Next(void);
 	virtual size_t GetSize(void);

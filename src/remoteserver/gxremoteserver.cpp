@@ -183,6 +183,7 @@ void wxGxRemoteServer::PutInMessage(WXGISMSG msg)
 {
 	//proceed message in separate thread
 	wxCriticalSectionLocker locker(m_CriticalSection);
+    msg.pMsg->Reference();
     m_MsgQueue.push(msg);
 }
 

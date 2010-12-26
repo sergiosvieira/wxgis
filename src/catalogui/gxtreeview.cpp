@@ -19,13 +19,12 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxtreeview.h"
+#include "wxgis/catalogui/gxcatdroptarget.h"
 #include "wxgis/framework/framework.h"
 
 #include "../../art/document_16.xpm"
 
-#include "wx/dnd.h"
-#include "wx/dataobj.h"
-
+#define DNDSCROLL 10 
 //////////////////////////////////////////////////////////////////////////////
 // wxGxTreeViewBase
 //////////////////////////////////////////////////////////////////////////////
@@ -472,6 +471,7 @@ wxGxTreeView::wxGxTreeView(void) : wxGxTreeViewBase()
 
 wxGxTreeView::wxGxTreeView(wxWindow* parent, wxWindowID id, long style) : wxGxTreeViewBase(parent, id, wxDefaultPosition, wxDefaultSize, style)
 {
+    SetDropTarget(new wxGISCatalogDropTarget(static_cast<IGxViewDropTarget*>(this)));
 }
 
 wxGxTreeView::~wxGxTreeView(void)
@@ -590,7 +590,7 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
 		return;
     SelectItem(item);
 
-    wxFileDataObject my_data;
+    wxFileDataObject *pMyData = new wxFileDataObject();
 
     wxArrayTreeItemIds treearray;
     size_t count = GetSelections(treearray);
@@ -605,11 +605,12 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
             continue;
         IGxDataset* pDSet = dynamic_cast<IGxDataset*>(pData->m_pObject);
         if(pDSet)
-            my_data.AddFile(pDSet->GetPath());
+            pMyData->AddFile(pDSet->GetPath());
     }
     wxDropSource dragSource( this );
-	dragSource.SetData( my_data );
-	wxDragResult result = dragSource.DoDragDrop( TRUE );
+	dragSource.SetData( *pMyData );
+	wxDragResult result = dragSource.DoDragDrop( TRUE );  
+    wxDELETE(pMyData)
 }
 
 void wxGxTreeView::OnActivated(wxTreeEvent& event)
@@ -649,3 +650,60 @@ void wxGxTreeView::BeginRename(IGxObject* pGxObject)
 	}
     EditLabel(GetSelection());
 }
+
+wxDragResult wxGxTreeView::OnDragOver(wxCoord x, wxCoord y, wxDragResult def)
+{
+    if(m_HighLightItemId.IsOk())
+        SetItemDropHighlight(m_HighLightItemId, false);
+    wxPoint pt(x, y);
+    int flag = wxTREE_HITTEST_ONITEMINDENT;
+    wxTreeItemId ItemId = wxTreeCtrl::HitTest(pt, flag);
+    if(ItemId.IsOk())
+    {
+        wxSize sz = GetClientSize();
+        if(DNDSCROLL > y)//scroll up
+            ScrollLines(-1);
+        else if((sz.GetHeight() - DNDSCROLL) < y)//scroll down
+            ScrollLines(1);
+
+        SetItemDropHighlight(ItemId);
+        m_HighLightItemId = ItemId;
+
+	    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(ItemId);
+	    if(pData == NULL)
+		    return wxDragNone;
+        //check drop capability
+        IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pData->m_pObject);
+        if(pTarget == NULL)
+		    return wxDragNone;
+        return pTarget->CanDrop(def);
+    }
+    return def;
+}
+
+bool wxGxTreeView::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
+{
+    wxPoint pt(x, y);
+    int flag = wxTREE_HITTEST_ONITEMINDENT;
+    wxTreeItemId ItemId = wxTreeCtrl::HitTest(pt, flag);
+    if(ItemId.IsOk())
+    {
+        SetItemDropHighlight(ItemId, false);
+
+	    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(ItemId);
+	    if(pData == NULL)
+		    return wxDragNone;
+        IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pData->m_pObject);
+        if(pTarget == NULL)
+		    return false;
+        return pTarget->Drop(filenames);
+    }
+    return false;
+}
+
+void wxGxTreeView::OnLeave()
+{
+    if(m_HighLightItemId.IsOk())
+        SetItemDropHighlight(m_HighLightItemId, false);
+}
+

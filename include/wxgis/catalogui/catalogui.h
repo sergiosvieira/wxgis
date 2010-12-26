@@ -24,6 +24,9 @@
 #include "wxgis/base.h"
 #include "wxgis/catalog/catalog.h"
 
+#include "wx/dnd.h"
+#include "wx/dataobj.h"
+
 #define TREECTRLID	1005 //wxGxCatalog tree
 #define LISTCTRLID	1006 //wxGxCatalog contents view
 #define TABLECTRLID	1007 //wxGxCatalog table view
@@ -128,6 +131,11 @@ enum wxGISEnumContentsViewStyle
 	enumGISCVList
 };
 
+/** \class IGxContentsView catalogui.h
+    \brief The IGxContentsView interface class.
+
+    The GxViews which should support Style Changing like switch between report view to list view mast derived from this class.
+*/
 class IGxContentsView
 {
 public:
@@ -136,4 +144,31 @@ public:
     virtual bool CanSetStyle(void) = 0;
 	virtual void SetStyle(wxGISEnumContentsViewStyle style) = 0;
     virtual wxGISEnumContentsViewStyle GetStyle(void) = 0;
+};
+
+/** \class IGxViewDropTarget catalogui.h
+    \brief A DropTarget interface class.
+
+    The GxViews which should support drag'n'drop capability mast derived from this class.
+*/
+class IGxViewDropTarget
+{
+public:
+	virtual ~IGxViewDropTarget(void){};
+    virtual wxDragResult OnDragOver(wxCoord x, wxCoord y, wxDragResult def) = 0;
+    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames) = 0;
+    virtual void OnLeave() = 0;
+};
+
+/** \class IGxDropTarget catalogui.h
+    \brief A DropTarget interface class.
+
+    The GxObject which should support drag'n'drop capability mast derived from this class.
+*/
+class IGxDropTarget
+{
+public:
+	virtual ~IGxDropTarget(void){};
+    virtual wxDragResult CanDrop(wxDragResult def) = 0;
+    virtual bool Drop(const wxArrayString& filenames) = 0;
 };

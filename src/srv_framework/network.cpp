@@ -175,13 +175,14 @@ void wxGISNetworkService::DelConnection(long nConnID)
 
 void wxGISNetworkService::PutInMessage(WXGISMSG msg)
 {
+    msg.pMsg->Reference();
 	//check permissions
     if(msg.pMsg->GetState() == enumGISMsgStCmd)
     {
 	    AUTHRESPOND respond = GetAuth(msg.nUserID);
 	    if(!respond.bIsValid)
         {
-            wxDELETE(msg.pMsg);
+            wsDELETE(msg.pMsg);
             return;
         }
     }
@@ -201,7 +202,7 @@ void wxGISNetworkService::ClearMessageQueue(void)
     {
 	    WXGISMSG Msg = m_MsgQueue.top();
 	    m_MsgQueue.pop();  
-        wxDELETE(Msg.pMsg);
+        wsDELETE(Msg.pMsg);
     }
 }
 
@@ -230,7 +231,7 @@ void wxGISNetworkService::ProcessOutMessage(WXGISMSG msg)
 		if(m_NetworkConnectionMap[msg.nUserID])
 			m_NetworkConnectionMap[msg.nUserID]->PutOutMessage(msg);
 		else 
-			wxDELETE(msg.pMsg);
+			wsDELETE(msg.pMsg);
 	}
 }
 
