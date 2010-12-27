@@ -57,7 +57,7 @@ public:
 	virtual void OnStopMessageThread(void);
 protected:
     WXGISMSGQUEUE m_MsgQueue;
-    wxCriticalSection m_CriticalSection;
+    wxCriticalSection m_CriticalSection, m_CriticalSectionRcv;
 	std::vector<std::pair<wxString, INetMessageReceiver*>> m_MessageReceiverArray;
     wxMsgInThread *m_pMsgInThread;
 };

@@ -69,7 +69,7 @@ void wxGISNetMessageProcessor::ProcessMessage(WXGISMSG msg)
 			wxLogError(_("wxGISNetMessageProcessor: %s"), sMessage.c_str());			
 	}
 
-    wxCriticalSectionLocker locker(m_CriticalSection);
+    wxCriticalSectionLocker locker(m_CriticalSectionRcv);
 	//TODO: check for * and look for dst in children
 	for(size_t i = 0; i < m_MessageReceiverArray.size(); i++)
 	{
@@ -92,7 +92,7 @@ void wxGISNetMessageProcessor::ProcessMessage(WXGISMSG msg)
 
 void wxGISNetMessageProcessor::AddMessageReceiver(wxString sName, INetMessageReceiver* pNetMessageReceiver)
 {
-    wxCriticalSectionLocker locker(m_CriticalSection);
+    wxCriticalSectionLocker locker(m_CriticalSectionRcv);
 	//TODO: Hash of sName
 	if(pNetMessageReceiver)//the receiver can register several names
 		m_MessageReceiverArray.push_back( std::make_pair(sName, pNetMessageReceiver) );
@@ -100,7 +100,7 @@ void wxGISNetMessageProcessor::AddMessageReceiver(wxString sName, INetMessageRec
 
 void wxGISNetMessageProcessor::DelMessageReceiver(wxString sName, INetMessageReceiver* pNetMessageReceiver)
 {
-    wxCriticalSectionLocker locker(m_CriticalSection);
+    wxCriticalSectionLocker locker(m_CriticalSectionRcv);
 	for(size_t i = 0; i < m_MessageReceiverArray.size(); i++)
 	{
 		if(sName.CmpNoCase(m_MessageReceiverArray[i].first) == 0 && m_MessageReceiverArray[i].second == pNetMessageReceiver)
@@ -113,7 +113,7 @@ void wxGISNetMessageProcessor::DelMessageReceiver(wxString sName, INetMessageRec
 
 void wxGISNetMessageProcessor::ClearMessageReceiver()
 {
-    wxCriticalSectionLocker locker(m_CriticalSection);
+    wxCriticalSectionLocker locker(m_CriticalSectionRcv);
 	m_MessageReceiverArray.clear();
 }
 
