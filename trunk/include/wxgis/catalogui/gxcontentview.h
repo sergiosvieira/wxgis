@@ -113,6 +113,7 @@ protected:
 	bool m_bDragging;
     std::vector<ICONDATA> m_IconsArray;
     wxCriticalSection m_CritSect;
+    wxCriticalSection m_CritSectCont;
 
     DECLARE_EVENT_TABLE()
 };

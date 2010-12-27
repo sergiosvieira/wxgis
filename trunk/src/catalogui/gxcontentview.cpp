@@ -266,7 +266,8 @@ void wxGxContentView::AddObject(IGxObject* pObject)
 {
 	if(pObject == NULL)
 		return;
-	IGxObjectUI* pObjUI =  dynamic_cast<IGxObjectUI*>(pObject);
+
+    IGxObjectUI* pObjUI =  dynamic_cast<IGxObjectUI*>(pObject);
 	wxIcon icon_small, icon_large;
 	if(pObjUI != NULL)
 	{
@@ -630,6 +631,7 @@ void wxGxContentView::OnObjectAdded(IGxObject* pObj)
 
 void wxGxContentView::OnObjectDeleted(IGxObject* pObj)
 {
+    wxCriticalSectionLocker locker(m_CritSectCont);
 	for(long i = 0; i < GetItemCount(); i++)
 	{
 		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
@@ -662,6 +664,7 @@ void wxGxContentView::OnObjectChanged(IGxObject* pObj)
 			}
 		}
 	}
+    wxCriticalSectionLocker locker(m_CritSectCont);
 	for(long i = 0; i < GetItemCount(); i++)
 	{
 		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
@@ -764,6 +767,7 @@ bool wxGxContentView::Applies(IGxSelection* Selection)
 
 void wxGxContentView::ResetContents(void)
 {
+    wxCriticalSectionLocker locker(m_CritSectCont);
 	for(long i = 0; i < GetItemCount(); i++)
 		delete (LPITEMDATA)GetItemData(i);
 	DeleteAllItems();
@@ -801,6 +805,7 @@ void wxGxContentView::OnBeginDrag(wxListEvent& event)
 
 void wxGxContentView::SelectAll(void)
 {
+    wxCriticalSectionLocker locker(m_CritSectCont);
 	for(long item = 0; item < GetItemCount(); item++)
         SetItemState(item, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
