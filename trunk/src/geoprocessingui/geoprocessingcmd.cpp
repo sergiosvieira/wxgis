@@ -23,7 +23,7 @@
 #include "wxgis/geoprocessingui/gptoolboxview.h"
 #include "wxgis/datasource/sysop.h"
 
-#include "../../art/gp_menu_16.xpm"
+#include "../../art/export.xpm"
 #include "../../art/toolview.xpm"
 
 #include "wxgis/catalog/catalog.h"
@@ -43,7 +43,7 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISGeoprocessingCmd, wxObject)
 
-wxGISGeoprocessingCmd::wxGISGeoprocessingCmd(void) : m_pToolboxView(NULL), m_IconGPMenu(gp_menu_16_xpm), m_IconToolview(toolview_xpm)
+wxGISGeoprocessingCmd::wxGISGeoprocessingCmd(void) : m_pToolboxView(NULL), m_IconGPMenu(export_xpm), m_IconToolview(toolview_xpm)
 {
 }
 

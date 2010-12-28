@@ -108,7 +108,6 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 		{
 		case enumESRIPrjFile:
 			err = m_OGRSpatialReference.importFromESRI(papszLines);
-		    CSLDestroy( papszLines );
 			break;
 		case enumSPRfile:
             {
@@ -124,13 +123,13 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
                 }
                 pszWKT2 = pszWKT;
                 err = m_OGRSpatialReference.importFromWkt( &pszWKT2 );//.importFromWkt(papszLines);
-		        CSLDestroy( papszLines );
                 CPLFree( pszWKT );
             }
 			break;
 		default:
 			break;
 		}
+        CSLDestroy( papszLines );
 	}
     if(err != OGRERR_NONE)
     	return NULL;
