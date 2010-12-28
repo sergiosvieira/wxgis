@@ -66,7 +66,7 @@ protected:
     \brief A text file GxObject.
 */
 class WXDLLIMPEXP_GIS_CLU wxGxTextFileUI :
-    public wxGxFileUI
+    public wxGxTextFile
 {
 public:
 	wxGxTextFileUI(wxString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);

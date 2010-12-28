@@ -96,7 +96,7 @@ bool wxGxPrjFileUI::Invoke(wxWindow* pParentWnd)
 //class wxGxTextFileUI
 //--------------------------------------------------------------
 
-wxGxTextFileUI::wxGxTextFileUI(wxString Path, wxString Name, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxFileUI(Path, Name)
+wxGxTextFileUI::wxGxTextFileUI(wxString Path, wxString Name, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxTextFile(Path, Name)
 {
     m_oLargeIcon = LargeIcon;
     m_oSmallIcon = SmallIcon;

@@ -119,6 +119,10 @@ void wxGxRemoteServerUI::LoadChildren()
 {
 	if(m_bIsChildrenLoaded)
 		return;
+	if(!m_pNetConn)
+		return;
+	if(!m_pNetConn->IsConnected())
+		return;
     if(!m_pGxPendingUI)
     {
         m_pGxPendingUI = new wxGxPendingUI();
