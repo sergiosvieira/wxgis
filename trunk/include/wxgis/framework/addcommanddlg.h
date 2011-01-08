@@ -43,7 +43,7 @@ class WXDLLIMPEXP_GIS_FRW wxGISAddCommandDlg : public wxDialog
 {
 	enum
 	{
-		ID_LSTBX = wxID_HIGHEST + 20,
+		ID_LSTBX = wxID_HIGHEST + 2051,
 		ID_LSTCTRL,
 		ID_ONSETKEYCODE,
 		MENUID = ID_PLUGINCMD + 1200

@@ -235,28 +235,20 @@ wxGISGPToolManager* wxGxRootToolbox::GetGPToolManager(void)
     return m_pToolMngr;
 }
 
-bool wxGxRootToolbox::OnPrepareTool(wxWindow* pParentWnd, wxString sToolName, wxString sInputPath, IGPCallBack* pCallBack, bool bSync)
+IGPTool* wxGxRootToolbox::GetGPTool(wxString sToolName)
 {
-    //get tool
-    if(!m_pToolMngr)
-        return false;
-    IGPTool* pTool = m_pToolMngr->GetTool(sToolName, m_pCatalog);
+    return m_pToolMngr->GetTool(sToolName, m_pCatalog);
+}
+
+bool wxGxRootToolbox::OnPrepareTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync)
+{
     if(!pTool)
     {
-        wxMessageBox(wxString::Format(_("Error get tool (internal name '%s')!"), sToolName.c_str()), _("Error"), wxICON_ERROR | wxOK );
+        wxMessageBox(_("Wrong input tool!"), _("Error"), wxICON_ERROR | wxOK );
         return false;
     }
-    if(!sInputPath.IsEmpty())
-    {
-        GPParameters* pParams = pTool->GetParameterInfo();
-        if(pParams->size() == 0)
-            return false;
-        IGPParameter* pParam = pParams->operator[](0);
-        //TODO: check is input
-        pParam->SetValue(wxVariant(sInputPath));
-    }
     //create tool config dialog
-    wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(this, pTool, pCallBack, bSync, GetProperties(), pParentWnd);
+    wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(this, pTool, pCallBack, bSync, pParentWnd);
     pDlg->Show(true);
 
     return true;
@@ -453,16 +445,21 @@ wxIcon wxGxTool::GetSmallImage(void)
 
 bool wxGxTool::Invoke(wxWindow* pParentWnd)
 {
-    //wxGISGPToolManager* pGPToolManager = m_pRootToolbox->GetGPToolManager();
-    //IGPTool* pTool = pGPToolManager->GetTool(m_sInternalName, m_pCatalog);
-    //if(pTool)
-    //{
-    //    wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(pTool, m_pRootToolbox->GetProperties(), pParentWnd, wxID_ANY, pTool->GetDisplayName());
-    //    pDlg->Show(true);//dlg.ShowModal();
-    //}
     //callback create/destroy gxtask
-    m_pRootToolbox->OnPrepareTool(pParentWnd, m_sInternalName, wxEmptyString, NULL/*???*/, false);
-    return false;
+    //m_pRootToolbox->OnPrepareTool(pParentWnd, m_sInternalName, wxEmptyString, NULL/*???*/, false);
+    //return false;
+
+	IGPTool* pTool = m_pRootToolbox->GetGPTool(m_sInternalName);
+	if(!pTool)
+	{
+        //error msg
+		wxMessageBox(wxString::Format(_("Error find %s tool!\nCannnot continue."), m_sInternalName.c_str()), _("Error"), wxICON_ERROR | wxOK );
+        return false; 
+	}
+	//TODO: Callback to view?
+	m_pRootToolbox->OnPrepareTool(pParentWnd, pTool, NULL, false);
+    return true;
+
 }
 
 bool wxGxTool::Attach(IGxObject* pParent, IGxCatalog* pCatalog)

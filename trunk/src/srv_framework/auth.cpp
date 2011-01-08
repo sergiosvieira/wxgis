@@ -4,7 +4,7 @@
  *           It adds plug-ins of different types of authenticate (file, LDAP, OS etc.)
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2008-2010 Bishop
+*   Copyright (C) 2008-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -95,7 +95,8 @@ void wxGISAuthService::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 			AUTHRESPOND respond = it->second->GetAuth(sLogin, sCryptPass);
 			if(respond.bIsValid)
 			{
-				m_pApp->SetAuth(respond, msg.nUserID);
+				respond.nUserID = msg.nUserID;
+				m_pApp->SetAuth(respond);
 				wxString sMsg = wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStOk, enumGISPriorityHigh, wxT("auth"));
 				wxNetMessage* pMsg = new wxNetMessage(sMsg);
 				WXGISMSG outmsg = {pMsg, msg.nUserID};

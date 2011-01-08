@@ -186,6 +186,10 @@
 				RelativePath="..\..\src\core\config.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\src\core\process.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -198,6 +202,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\core\core.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\core\process.h"
 				>
 			</File>
 		</Filter>

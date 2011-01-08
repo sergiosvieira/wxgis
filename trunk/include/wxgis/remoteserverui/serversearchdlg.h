@@ -49,7 +49,7 @@ class wxGISSearchServerDlg :
 public:
   enum
   {
-		ID_SEARCHBT = wxID_HIGHEST + 1,
+		ID_SEARCHBT = wxID_HIGHEST + 4511,
 		ID_STOPBT,
 		ID_ACCEPT
   };

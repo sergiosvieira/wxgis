@@ -120,7 +120,7 @@ class wxGISDTChoice : public wxGISDTBase
 {
     enum
 	{
-		ID_CHOICESTR = wxID_HIGHEST + 36
+		ID_CHOICESTR = wxID_HIGHEST + 3600
 	};
 public:
 	wxGISDTChoice( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );

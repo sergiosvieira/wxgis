@@ -78,9 +78,15 @@ bool wxGxPendingUI::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
 void wxGxPendingUI::Detach(void)
 {
     // stop update thread
+	OnStopPending();
+    IGxObject::Detach();
+}
+
+void wxGxPendingUI::OnStopPending(void)
+{
     if(m_pThread)
         m_pThread->Delete();
-    IGxObject::Detach();
+	m_pThread = NULL;
 }
 
 wxIcon wxGxPendingUI::GetLargeImage(void)

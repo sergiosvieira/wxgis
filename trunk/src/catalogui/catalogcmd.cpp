@@ -146,13 +146,13 @@ wxString wxGISCatalogMainCmd::GetCategory(void)
 		case 1:	
 		case 2:	
 		case 3:	
-		case 4:	
 		case 5:	
 		case 6:	
 		case 9:	
 			return wxString(_("Catalog"));
 		case 7:	
 			return wxString(_("New"));
+		case 4:	
 		case 8:	
 			return wxString(_("Edit"));
 		case 10:	

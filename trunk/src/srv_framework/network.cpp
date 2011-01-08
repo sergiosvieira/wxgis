@@ -4,7 +4,7 @@
  *           It adds plug-ins of different types of network connections (TCP, Jabber etc.)
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2008-2010 Bishop
+*   Copyright (C) 2008-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -235,10 +235,10 @@ void wxGISNetworkService::ProcessOutMessage(WXGISMSG msg)
 	}
 }
 
-void wxGISNetworkService::SetAuth(AUTHRESPOND stUserInfo, long nID)
+void wxGISNetworkService::SetAuth(AUTHRESPOND stUserInfo)
 {
-	if(m_NetworkConnectionMap[nID])
-		m_NetworkConnectionMap[nID]->SetAuth(stUserInfo);
+	if(m_NetworkConnectionMap[stUserInfo.nUserID])
+		m_NetworkConnectionMap[stUserInfo.nUserID]->SetAuth(stUserInfo);
 }
 
 AUTHRESPOND wxGISNetworkService::GetAuth(long nID)

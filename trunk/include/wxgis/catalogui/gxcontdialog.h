@@ -90,7 +90,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxContainerDialog :
 {
 enum
 {
-    ID_CREATE = wxID_HIGHEST + 40
+    ID_CREATE = wxID_HIGHEST + 4001
 };
 public:
 	wxGxContainerDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,338 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );

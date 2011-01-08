@@ -3,7 +3,7 @@
  * Purpose:  wxGIS Server Framework header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2008-2010 Bishop
+*   Copyright (C) 2008-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ typedef struct _userinfo
 typedef struct _authrespond
 {
 	bool bIsValid;
+	long nUserID;
 	USERINFO info;
 }AUTHRESPOND;
 
@@ -49,7 +50,7 @@ public:
 	virtual IGISConfig* GetConfig(void) = 0;
     virtual void PutInMessage(WXGISMSG msg) = 0;//message to server
     virtual void PutOutMessage(WXGISMSG msg) = 0;//message from server & server plugins
-	virtual void SetAuth(AUTHRESPOND stUserInfo, long nID) = 0;
+	virtual void SetAuth(AUTHRESPOND stUserInfo) = 0;
 	virtual AUTHRESPOND GetAuth(long nID) = 0;
 };
 

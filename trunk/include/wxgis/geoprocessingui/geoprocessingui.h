@@ -35,17 +35,29 @@
 class IToolManagerUI
 {
 public:
-    virtual ~IToolManagerUI(void){};
-    /** \fn bool OnPrepareTool(wxWindow* pParentwnd, wxString sToolName, wxString sInputPath, IGPCallBack* pCallBack, bool bSync)
-     *  \brief Show tool config dialog, execute tool and return result via callback.
+    virtual ~IToolManagerUI(void){};    
+/** \fn IGPTool* GetGPTool(wxString sToolName)
+     *  \brief Return tool by name.
+     *  \param sToolName Tool name
+     *  \return IGPTool pointer or NULL.
+     */		
+	virtual IGPTool* GetGPTool(wxString sToolName) = 0;
+/** \fn void OnExecuteTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync)
+     *  \brief Execute passed preconfig tool
      *  \param pParentWnd The Parent wxWindow created dialogs
-     *  \param sToolName The tool name (internal short name)
-     *  \param sInputPath The input path for tool (shows in config dialog)
+     *  \param pTool The preconfigured tool to execute
      *  \param pCallBack The callback executed on tool execution ends
      *  \param bSync If bSync parameter is true, shows Execution dialog, and interface blocked. If bSync parameter is false, created GxTask Object and inserted to wxGxToolExecuteView.
-     *  \return false on error.
-     */	
-    virtual bool OnPrepareTool(wxWindow* pParentWnd, wxString sToolName, wxString sInputPath, IGPCallBack* pCallBack, bool bSync) = 0;
+     */		
+	virtual void OnExecuteTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync) = 0;
+/** \fn bool OnPrepareTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync)
+     *  \brief Execute passed preconfig tool
+     *  \param pParentWnd The Parent wxWindow created dialogs
+     *  \param pTool The tool to configure
+     *  \param pCallBack The callback executed on tool execution ends
+     *  \param bSync If bSync parameter is true, shows Execution dialog, and interface blocked. If bSync parameter is false, created GxTask Object and inserted to wxGxToolExecuteView.
+     */		
+	virtual bool OnPrepareTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync) = 0;
 };
 
 

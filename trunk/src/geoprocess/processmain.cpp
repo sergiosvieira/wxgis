@@ -26,7 +26,8 @@
 #include "wx/defs.h"
 #include "wx/cmdline.h"
 #include "wx/string.h"
-
+#include "wx/wfstream.h"
+#include "wx/txtstrm.h"
 
 int main(int argc, char **argv)
 {
@@ -44,7 +45,7 @@ int main(int argc, char **argv)
     // Parse command line arguments
     success = parse_commandline_parameters( argc, argv );
 
-    return success;
+	return success == true ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 bool parse_commandline_parameters( int argc, char** argv )
@@ -80,15 +81,35 @@ bool parse_commandline_parameters( int argc, char** argv )
 
     if(my_parser.Found( wxT( "n" ) ) && my_parser.Found( wxT( "p" ) ) )
     {
-        wxGISAppConfig* pConfig;
-#ifdef WXGISPORTABLE
-        pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, true);
-#else
-	    pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, false);
-#endif
-        wxXmlNode* pToolsChild = pConfig->GetConfigNode(wxT("tools"), false, true);
+		//create output stream
+		wxFFileOutputStream OutStream(stdout);
+		wxTextOutputStream OutTxtStream(OutStream);
+		OutTxtStream.WriteString(wxString(wxT("INFO: Run execution\r\n")));
+		fflush(stdout);
+		for(size_t i = 0; i < 100; i++)
+		{
+			OutTxtStream.WriteString(wxString::Format(wxT("DONE: %d%%\r"), i + 1));
+			fflush(stdout);
+			if(i == 50)
+			{
+				wxString sErrMsg(wxT("Test error"));
+				OutTxtStream.WriteString(wxString::Format(wxT("ERR: %s occured\r\n"), sErrMsg.c_str()));
+				fflush(stdout);
+			}
+			wxSleep(1);
+		}
+		OutTxtStream.WriteString(wxString(wxT("INFO: Finish\r\n")));
+
+//        wxGISAppConfig* pConfig;
+//#ifdef WXGISPORTABLE
+//        pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, true);
+//#else
+//	    pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, false);
+//#endif
+//        wxXmlNode* pToolsChild = pConfig->GetConfigNode(wxT("tools"), false, true);
         //wxGISGPToolManager* pGISGPToolManager(pToolsChild,
         //pGISGPToolManager->GetTool
+		return true;
     }
 
 	my_parser.Usage();

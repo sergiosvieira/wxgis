@@ -49,7 +49,7 @@ class wxGISCatalogGeneralPropertyPage :
     DECLARE_DYNAMIC_CLASS(wxGISCatalogGeneralPropertyPage)
 	enum
 	{
-		ID_ROOTLISTCTRL = wxID_HIGHEST + 45,
+		ID_ROOTLISTCTRL = wxID_HIGHEST + 4505,
 		ID_FACTORYLISTCTRL
 	};
 

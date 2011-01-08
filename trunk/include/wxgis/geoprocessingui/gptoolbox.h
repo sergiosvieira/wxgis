@@ -90,9 +90,10 @@ public:
 	//wxGxRootToolbox
 	virtual void LoadChildren(void);
 	virtual wxGISGPToolManager* GetGPToolManager(void);
-	virtual void OnExecuteTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync);
     //IToolManagerUI
-    virtual bool OnPrepareTool(wxWindow* pParentWnd, wxString sToolName, wxString sInputPath, IGPCallBack* pCallBack, bool bSync);
+	virtual IGPTool* GetGPTool(wxString sToolName);
+	virtual void OnExecuteTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync);
+    virtual bool OnPrepareTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync);
 protected:
 	wxString m_sPath;
 	bool m_bIsChildrenLoaded;

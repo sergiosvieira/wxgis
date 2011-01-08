@@ -145,9 +145,7 @@ void wxGxCatalogUI::DisconnectFolder(wxString sPath, bool bSelect)
 {
     if(m_pGxDiscConnections)
     {
-        IGxObject* pDeletedObj = m_pGxDiscConnections->DisconnectFolder(sPath);
-        if(pDeletedObj && bSelect)
-            m_pSelection->Select(pDeletedObj, false, IGxSelection::INIT_ALL);
+        m_pGxDiscConnections->DisconnectFolder(sPath);
     }
 }
 

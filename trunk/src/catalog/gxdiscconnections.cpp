@@ -195,7 +195,7 @@ IGxObject* wxGxDiscConnections::ConnectFolder(wxString sPath)
 	return pReturnObj;
 }
 
-IGxObject* wxGxDiscConnections::DisconnectFolder(wxString sPath)
+void wxGxDiscConnections::DisconnectFolder(wxString sPath)
 {
     for(size_t i = 0; i < m_Children.size(); i++)
     {
@@ -206,11 +206,9 @@ IGxObject* wxGxDiscConnections::DisconnectFolder(wxString sPath)
             {
                 IGxObject* pOut = dynamic_cast<IGxObject*>(pConn);
                 DeleteChild(pOut);
-                return pOut;
             }
         }
     }
-    return NULL;
 }
 
 

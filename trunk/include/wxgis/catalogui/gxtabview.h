@@ -48,7 +48,7 @@ class wxGxTab :
 
     enum
 	{
-		ID_WNDCHOICE = wxID_HIGHEST + 35
+		ID_WNDCHOICE = wxID_HIGHEST + 3500
 	};
 
 public:
@@ -98,7 +98,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxTabView :
 
     enum
 	{
-		ID_SELCHANGED = wxID_HIGHEST + 30
+		ID_SELCHANGED = wxID_HIGHEST + 3000
 	};
 public:
 	wxGxTabView(wxWindow* parent, wxWindowID id = TABCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);

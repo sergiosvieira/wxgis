@@ -77,15 +77,6 @@ enum wxGISEnumGPParameterDataType
 	enumGISGPParamDTPathArray
 };
 
-enum wxGISEnumTaskStateType
-{
-    enumGISTaskWork = 1,
-    enumGISTaskDone,
-    enumGISTaskQuered,
-    enumGISTaskPaused,
-    enumGISTaskError
-};
-
 class IGxTask
 {
 public:

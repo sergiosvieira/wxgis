@@ -52,7 +52,7 @@ public:
 	virtual void LoadChildren(void);
 	virtual void EmptyChildren(void);
     virtual IGxObject* ConnectFolder(wxString sPath);
-    virtual IGxObject* DisconnectFolder(wxString sPath);
+    virtual void DisconnectFolder(wxString sPath);
 
     typedef struct _conn_data{
         wxString sName, sPath;

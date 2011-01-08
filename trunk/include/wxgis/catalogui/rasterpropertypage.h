@@ -34,7 +34,7 @@ class WXDLLIMPEXP_GIS_CLU wxGISRasterPropertyPage :
     DECLARE_DYNAMIC_CLASS(wxGISRasterPropertyPage)
 	enum
 	{
-		ID_PPCTRL = wxID_HIGHEST + 45
+		ID_PPCTRL = wxID_HIGHEST + 4504
 	};
 
 public:
