@@ -70,7 +70,7 @@ class wxGISToolBarPanel : public wxPanel
 	enum
 	{
 		//ID_CHKLSTBX = wxID_HIGHEST + 30,
-		ID_TREECTRL = wxID_HIGHEST + 30,
+		ID_TREECTRL = wxID_HIGHEST + 3010,
 		ID_BUTTONSLST,
 		ID_ONSETKEYCODE,
 		ID_CREATECB,
@@ -126,7 +126,7 @@ protected:
 	wxMenu* m_pContextMenu;
 	bool m_bToolsFocus, m_bCmdFocus;
 	//int m_nContextMenuPos, m_nMenubarPos, m_nToolbarPos;
-	wxTreeItemId m_nMenubarId, m_nContextMenuesId, m_nToolBarsId;
+	wxTreeItemId m_nMenubarId, m_nContextMenuesId, m_nNewMenuesId, m_nToolBarsId;
 
     DECLARE_EVENT_TABLE()
 };
@@ -138,7 +138,7 @@ class wxGISCommandPanel : public wxPanel
 {
 	enum
 	{
-		ID_LSTBX = wxID_HIGHEST + 25,
+		ID_LSTBX = wxID_HIGHEST + 2501,
 		ID_LSTCTRL,
 		ID_ONSETKEYCODE
 	};

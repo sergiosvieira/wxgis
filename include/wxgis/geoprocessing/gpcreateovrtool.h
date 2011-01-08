@@ -26,10 +26,8 @@
 #include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/geoprocessing/gptool.h"
 
-/** \class wxGISGPOrthoCorrectTool gporthocorrecttool.h
-    \brief The geoprocessing tool create ortho corrected rasters.
-
-    The input rasters should have RPC
+/** \class wxGISGPCreateOverviewsTool gpcreateovrtool.h
+    \brief The geoprocessing tool create raster overviews
 */
 
 class WXDLLIMPEXP_GIS_GP wxGISGPCreateOverviewsTool : 

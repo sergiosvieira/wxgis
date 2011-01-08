@@ -4,7 +4,7 @@
  *           It adds plug-ins of different types of network connections (TCP, Jabber etc.)
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2008-2010 Bishop
+*   Copyright (C) 2008-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ public:
     virtual void PutOutMessage(WXGISMSG msg);//message to clients
     virtual WXGISMSG GetOutMessage(void);
 	virtual void ProcessOutMessage(WXGISMSG msg);
-	virtual void SetAuth(AUTHRESPOND sUserInfo, long nID);
+	virtual void SetAuth(AUTHRESPOND sUserInfo);
 	virtual AUTHRESPOND GetAuth(long nID);
 protected:
 	virtual void ClearMessageQueue(void);

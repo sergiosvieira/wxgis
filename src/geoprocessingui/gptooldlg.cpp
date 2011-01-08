@@ -36,13 +36,13 @@ BEGIN_EVENT_TABLE(wxGISGPToolDlg, wxFrame)
 	EVT_UPDATE_UI(wxID_OK, wxGISGPToolDlg::OnOkUI)
 END_EVENT_TABLE()
 
-wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync, wxXmlNode* pPropNode, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
     IApplication* pApp = ::GetApplication();
     pApp->RegisterChildWindow(this);
 
     m_pTool = pTool;
-    m_pPropNode = pPropNode;
+	m_pPropNode = pGxRootToolbox->GetProperties();
     m_pGxRootToolbox = pGxRootToolbox;
     m_pCallBack = pCallBack;
     m_bSync = bSync;

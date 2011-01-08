@@ -61,6 +61,7 @@ public:
 	virtual wxString NewMenu(void){return wxEmptyString;};
     //
     virtual void OnUpdate(void);
+    virtual void OnStopPending(void);
 protected:
     wxImageList *m_pImageListSmall, *m_pImageListLarge;
     short m_nCurrentImage;

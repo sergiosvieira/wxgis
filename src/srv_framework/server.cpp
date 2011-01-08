@@ -3,7 +3,7 @@
  * Purpose:  wxGISServer class. Main server class
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2008-2010 Bishop
+*   Copyright (C) 2008-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -130,10 +130,10 @@ IGISConfig* wxGISServer::GetConfig(void)
     return m_pConfig;
 }
 
-void wxGISServer::SetAuth(AUTHRESPOND stUserInfo, long nID)
+void wxGISServer::SetAuth(AUTHRESPOND stUserInfo)
 {
 	if(m_pNetService)
-		m_pNetService->SetAuth(stUserInfo, nID);
+		m_pNetService->SetAuth(stUserInfo);
 }
 
 AUTHRESPOND wxGISServer::GetAuth(long nID)
@@ -168,7 +168,7 @@ bool wxGISServer::SetupLog(wxString sLogPath, wxString sNamePrefix)
 	if(!wxGISWorkPlugin::SetupLog(sLogPath, wxT("srv")))
 		return false;
 
-	wxString sCPLLogPath = sLogPath + wxFileName::GetPathSeparator() + wxString(wxT("gdal_log_cat.txt"));
+	wxString sCPLLogPath = sLogPath + wxFileName::GetPathSeparator() + wxString(wxT("gdal_log_srv.txt"));
 	CPLSetConfigOption("CPL_LOG", wgWX2MB(sCPLLogPath.c_str()) );
     return true;
 }

@@ -3,7 +3,7 @@
  * Purpose:  core header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 #pragma once
 
 #include "wxgis/base.h"
+
+#include "wx/process.h"
 
 #define wgDELETE(p,func) if(p != NULL) {p->func; delete p; p = NULL;}
 #define wsDELETE(p) if(p != NULL) {p->Release(); p = NULL;}
@@ -167,3 +169,57 @@ static wxString Decode(wxString sInput, wxString sPass)
     }
     return sRes;
 }
+
+/** \enum wxGISEnumTaskStateType core.h
+ *  \brief The process task state.
+ */
+enum wxGISEnumTaskStateType
+{
+    enumGISTaskWork = 1,
+    enumGISTaskDone,
+    enumGISTaskQuered,
+    enumGISTaskPaused,
+    enumGISTaskError
+};
+
+/** \class IStreamReader core.h
+ *  \brief The stream reader receives data from reader thread.
+ */
+class IStreamReader
+{
+public:
+	virtual ~IStreamReader(void){};
+	virtual void ProcessInput(wxString sInputData) = 0;
+};
+
+/** \class IProcess core.h
+ *  \brief The process interface class.
+ */
+class IProcess : public wxProcess
+{
+public:
+	IProcess(wxString sCommand) : wxProcess(wxPROCESS_REDIRECT)
+	{
+		m_sCommand = sCommand;
+		m_nState = enumGISTaskPaused;
+	}
+	virtual ~IProcess(void){};
+    virtual void OnStart(long nPID) = 0;
+    virtual void OnCancel(void) = 0;
+	virtual void SetState(wxGISEnumTaskStateType nState){m_nState = nState;};
+	virtual wxGISEnumTaskStateType GetState(void){return m_nState;};
+	virtual wxString GetCommand(void){return m_sCommand;};
+protected:
+    wxGISEnumTaskStateType m_nState;
+    wxString m_sCommand;
+};
+
+/** \class IProcessParent core.h
+ *  \brief The wxGISProcess parent interface class.
+ */
+class IProcessParent
+{
+public:
+	virtual ~IProcessParent(void){};
+    virtual void OnFinish(IProcess* pProcess, bool bHasErrors) = 0;
+};

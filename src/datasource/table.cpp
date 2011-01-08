@@ -3,7 +3,7 @@
  * Purpose:  Table class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -426,8 +426,15 @@ OGRErr wxGISTable::DeleteFeature(long nFID)
         if(eErr != OGRERR_NONE)
             return eErr;
 
-        m_nSize = -1;
-        Unload();
+        //m_nSize = -1;
+        //Unload();
+		//May be erase m_FeaturesMap[nFID]
+		m_nSize--;
+		if(!m_FeaturesMap.empty())
+		{
+			OGRFeature::DestroyFeature(m_FeaturesMap[nFID]);
+			m_FeaturesMap[nFID] = NULL;
+		}
         return eErr;
     }
     return OGRERR_FAILURE;
@@ -438,6 +445,29 @@ OGRErr wxGISTable::SetFeature(OGRFeature *poFeature)
     if(	m_poLayer && m_nSubType != enumTableQueryResult && poFeature)
     {
         OGRErr eErr = m_poLayer->SetFeature(poFeature);
+        if(eErr != OGRERR_NONE)
+            return eErr;
+		if(!m_FeaturesMap.empty())
+		{
+			//std::map<long, OGRFeature*>::iterator pos = std::find(m_FeaturesMap.begin(), m_FeaturesMap.end(), poFeature);
+			//if(pos != m_FeaturesMap.end())
+			//{
+			//	OGRFeature::DestroyFeature(pos->second);
+			//	pos->second = NULL;
+			//}
+
+
+	        for(std::map<long, OGRFeature*>::iterator IT = m_FeaturesMap.begin(); IT != m_FeaturesMap.end(); ++IT)
+			{
+				if(IT->second == poFeature)
+				{
+					OGRFeature::DestroyFeature(IT->second);
+					IT->second = NULL;
+				}
+			}
+
+			m_FeaturesMap[poFeature->GetFID()] = poFeature;
+		}
         return eErr;
     }
     return OGRERR_FAILURE;
@@ -469,3 +499,12 @@ OGRErr wxGISTable::SetFeature(OGRFeature *poFeature)
 //    return OGRERR_FAILURE;
 //}
 
+OGRFeature* wxGISTable::GetFeature(long nFID)
+{
+	if(m_FeaturesMap[nFID])
+		return m_FeaturesMap[nFID];
+	else if(m_poLayer)
+		return m_poLayer->GetFeature(nFID);
+	else
+		return NULL;
+}

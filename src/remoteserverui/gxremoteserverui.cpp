@@ -139,7 +139,7 @@ void wxGxRemoteServerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
     wxString sName = msg.pMsg->GetDestination();
 	if(sName.CmpNoCase(wxT("info")) == 0)
 	{
-        if(msg.pMsg->GetState() == enumGISMsgStRefuse)
+        if(msg.pMsg->GetState() == enumGISMsgStRefuse || msg.pMsg->GetState() ==  enumGISMsgStErr)
         {
 			if(pChildNode)
 			{
@@ -166,6 +166,8 @@ void wxGxRemoteServerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 				m_nChildCount = wxAtoi(pChildNode->GetPropVal(wxT("count"), wxT("0")));
 			else if(pChildNode->GetName().CmpNoCase(wxT("child")) == 0)
 			{
+				if(m_pGxPendingUI)
+					m_pGxPendingUI->OnStopPending();
 				//load server root items
 				while(pChildNode)
 				{
@@ -196,7 +198,7 @@ void wxGxRemoteServerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
                 m_pGxPendingUI = NULL;
 
 				m_bIsChildrenLoaded = m_nChildCount == m_Children.size();
-				m_pCatalog->ObjectChanged(this);
+				//m_pCatalog->ObjectChanged(this);
 			}
 		}
 		return;

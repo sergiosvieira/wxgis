@@ -368,7 +368,7 @@ IGxObject* wxGxCatalog::SearchChild(wxString sPath)
 void wxGxCatalog::DisconnectFolder(wxString sPath, bool bSelect)
 {
     if(m_pGxDiscConnections)
-        IGxObject* pDeletedObj = m_pGxDiscConnections->DisconnectFolder(sPath);
+        m_pGxDiscConnections->DisconnectFolder(sPath);
 }
 
 wxString wxGxCatalog::ConstructFullName(IGxObject* pObject)

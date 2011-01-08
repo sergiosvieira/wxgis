@@ -46,9 +46,12 @@ void wxRxObjectContainerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 		}
 		if(pChildNode->GetName().CmpNoCase(wxT("child")) == 0)
 		{
+            if(m_pGxPendingUI)
+				m_pGxPendingUI->OnStopPending();
 			//load items
 			while(pChildNode)
 			{
+
 				wxString sDst = pChildNode->GetPropVal(wxT("dst"), ERR);
 				bool bAdd(true);
 				for(size_t i = 0; i < m_sDstArray.GetCount(); i++)
@@ -74,18 +77,19 @@ void wxRxObjectContainerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
                     else
                     {
                         m_pCatalog->ObjectAdded(pObj);
-                        //remove pending
-                        if(m_pGxPendingUI)
-                            if(DeleteChild(static_cast<IGxObject*>(m_pGxPendingUI)))
-                                m_pGxPendingUI = NULL;
                     }
 					m_sDstArray.Add(sDst);
 				}
 				pChildNode = pChildNode->GetNext();
 			}
 
+            //remove pending
+            if(m_pGxPendingUI)
+                if(DeleteChild(static_cast<IGxObject*>(m_pGxPendingUI)))
+                    m_pGxPendingUI = NULL;
+
 			m_bIsChildrenLoaded = m_nChildCount == m_Children.size();
-		    m_pCatalog->ObjectChanged(this);
+		    //m_pCatalog->ObjectChanged(this);
 		}
 	}
 }

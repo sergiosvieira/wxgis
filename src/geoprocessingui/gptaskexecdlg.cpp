@@ -280,6 +280,9 @@ void wxGxTaskExecDlg::OnCancel(wxCommandEvent & event)
 {
     //if exec
     //cancel m_nTaskID
+    if(m_pToolManager)
+		m_pToolManager->CancelProcess(m_nTaskID);
+
     //else close dialog
     Show(false);
     //destroy

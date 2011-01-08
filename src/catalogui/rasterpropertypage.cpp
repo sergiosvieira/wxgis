@@ -539,7 +539,24 @@ void wxGISRasterPropertyPage::OnPropertyGridButtonClick ( wxCommandEvent& )
     else if(sName.Cmp(OVR_TXT) == 0)//create ovr tool
         sToolName = wxString(wxT("create_ovr"));
 
-    pToolManagerUI->OnPrepareTool(this, sToolName, m_pGxDataset->GetFullName(), static_cast<IGPCallBack*>(this), true);
+	IGPTool* pTool = pToolManagerUI->GetGPTool(sToolName);
+	if(!pTool)
+	{
+        //error msg
+		wxMessageBox(wxString::Format(_("Error find %s tool!\nCannnot continue."), sToolName.c_str()), _("Error"), wxICON_ERROR | wxOK );
+        return; 
+	}
+    GPParameters* pParams = pTool->GetParameterInfo();
+    if(pParams->size() == 0)
+	{
+        //error msg
+		wxMessageBox(wxString::Format(_("Wrong tool (%s)!\nCannnot continue."), sToolName.c_str()), _("Error"), wxICON_ERROR | wxOK );
+        return; 
+	}
+    IGPParameter* pParam = pParams->operator[](0);
+    pParam->SetValue(wxVariant(m_pGxDataset->GetFullName()));
+
+	pToolManagerUI->OnPrepareTool(this, pTool, static_cast<IGPCallBack*>(this), true);
 }
 
 void wxGISRasterPropertyPage::OnFinish(bool bHasErrors, IGPTool* pTool)

@@ -45,7 +45,7 @@ class wxGISTCPClientPanel : public wxNetPropertyPage
 public:
   enum
   {
-		ID_SEARCHBT = wxID_HIGHEST + 1,
+		ID_SEARCHBT = wxID_HIGHEST + 4501,
   };
 public:
 	wxGISTCPClientPanel(wxClientTCPNetFactoryUI* pFactory, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 280, 160 ) );

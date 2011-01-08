@@ -3,7 +3,7 @@
  * Purpose:  tools manager.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,50 +22,32 @@
 #pragma once
 
 #include "wxgis/geoprocessing/geoprocessing.h"
-
-#include "wx/thread.h"
-#include "wx/process.h"
-
+#include "wxgis/core/process.h"
 
 class WXDLLIMPEXP_GIS_GP wxGISGPToolManager;
 
-///** \class wxGISGPTaskThread gptoolmngr.h
-// *  \brief A Geoprocessing tools execution thread.
-// */
-//class wxGISGPTaskThread : public wxThread
-//{
-//public:
-//	wxGISGPTaskThread(wxGISGPToolManager* pMngr, IGPTool* pTool, ITrackCancel* pTrackCancel);
-//    virtual void *Entry();
-//    virtual void OnExit();
-//private:
-//    ITrackCancel* m_pTrackCancel;
-//    wxGISGPToolManager* m_pMngr;
-//    IGPTool* m_pTool;
-//};
-
 /** \class wxGPProcess gptoolmngr.h
- *  \brief A Geoprocess callback.
+ *  \brief A Geoprocess class.
  */
-class wxGPProcess : public wxProcess
+class wxGPProcess : 
+	public wxGISProcess
 {
 public:
-    wxGPProcess(wxGISGPToolManager* pToolManager, ITrackCancel* pTrackCancel);
+    wxGPProcess(wxString sCommand, IProcessParent* pParent, ITrackCancel* pTrackCancel);
     virtual ~wxGPProcess(void);
-    virtual void OnTerminate(int pid, int status);
-    virtual void OnStartExecution(void);
-    virtual void OnCancelExecution(void);
+	//IStreamReader
+	virtual void ProcessInput(wxString sInputData);
 protected:
-    wxGISGPToolManager* m_pToolManager;
     ITrackCancel* m_pTrackCancel;
+	IProgressor* m_pProgressor;
+	//wxTextOutputStream* m_pOutTxtStream;
+	wxDateTime m_dtEstEnd;
 };
 
 typedef struct _wxgisexecddata
 {
-    wxGPProcess* pGPProcess;
+    IProcess* pProcess;
     IGPTool* pTool;
-    wxString sCommand;
-    wxGISEnumTaskStateType nState;
     ITrackCancel* pTrackCancel;
     IGPCallBack* pCallBack;
 } WXGISEXECDDATA;
@@ -75,10 +57,8 @@ typedef struct _wxgisexecddata
  *
  *  Hold the geoprocessing tools list, execute tools, track tool execution statistics
  */
-class WXDLLIMPEXP_GIS_GP wxGISGPToolManager
+class WXDLLIMPEXP_GIS_GP wxGISGPToolManager : public IProcessParent
 {
-public:
-	friend class wxGPProcess;
 public:
     wxGISGPToolManager(wxXmlNode* pToolsNode);
     virtual ~wxGISGPToolManager(void);
@@ -86,13 +66,15 @@ public:
     virtual int OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel = NULL, IGPCallBack* pCallBack = NULL);
     virtual size_t GetToolCount();
     virtual wxString GetPopularTool(size_t nIndex);
-    //virtual void StartProcess(size_t nIndex);
-    //virtual void CancelProcess(size_t nIndex);
+    virtual wxGISEnumTaskStateType GetProcessState(size_t nIndex);
+    virtual void StartProcess(size_t nIndex);
+    virtual void CancelProcess(size_t nIndex);
     //virtual void PauseProcess(size_t nIndex);
     //virtual WXGISEXECDDATA GetTask(size_t nIndex);
+	//IProcessParent
+    virtual void OnFinish(IProcess* pProcess, bool bHasErrors);
 protected:
-    virtual void OnFinish(wxGPProcess* pGPProcess, bool bHasErrors);
-    virtual bool ExecTask(WXGISEXECDDATA data);
+    virtual bool ExecTask(WXGISEXECDDATA &data);
 public:
     typedef struct _toolinfo
     {

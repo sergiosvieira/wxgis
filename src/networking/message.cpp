@@ -250,7 +250,7 @@ bool wxNetMessage::LoadXMLFromStr(wxString sData)
 		return false;
 	
 	wxXmlNode *pRoot = m_pXmlDocument->GetRoot();
-	if(pRoot && pRoot->GetName() != wxT("msg"))
+	if(pRoot && pRoot->GetName() != wxString(wxT("msg")))
 		return false;
 
     if(wxAtoi(pRoot->GetPropVal(wxT("ver"), wxT("1"))) > WXNETVER)

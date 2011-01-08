@@ -97,7 +97,7 @@ class WXDLLIMPEXP_GIS_CRT wxGISTableView :
 {
 enum
 {
-    ID_FIRST = wxID_HIGHEST + 40,
+    ID_FIRST = wxID_HIGHEST + 4001,
     ID_PREV,
     ID_NEXT,
     ID_LAST,

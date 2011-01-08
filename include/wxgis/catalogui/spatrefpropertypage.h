@@ -30,7 +30,7 @@ class WXDLLIMPEXP_GIS_CLU wxGISSpatialReferencePropertyPage :
     DECLARE_DYNAMIC_CLASS(wxGISSpatialReferencePropertyPage)
 	enum
 	{
-		ID_PPCTRL = wxID_HIGHEST + 45
+		ID_PPCTRL = wxID_HIGHEST + 4503
 	};
 
 public:
