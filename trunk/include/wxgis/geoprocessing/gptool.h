@@ -23,7 +23,9 @@
 
 #include "wxgis/geoprocessing/geoprocessing.h"
 
-#define SEPARATOR wxT("|")
+#define GPTOOLSEPARATOR wxT("|")
+
+int CPL_STDCALL ExecToolProgress( double dfComplete, const char *pszMessage, void *pData);
 
 /** \class wxGISGPTool gptool.h
     \brief The base class for geoprocessing tools.
@@ -48,7 +50,7 @@ public:
     virtual void SetCatalog(IGxCatalog* pCatalog);
     virtual IGxCatalog* GetCatalog(void);
 	virtual wxString GetAsString(void);
-	virtual void SetFromString(wxString sParams);
+	virtual bool SetFromString(wxString sParams);
     //TODO: export/import tool to XML for server execution
 protected:
     GPParameters m_pParamArr;

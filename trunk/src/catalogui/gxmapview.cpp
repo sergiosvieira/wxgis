@@ -284,7 +284,7 @@ void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileNam
                 pNode->AddProperty(wxT("ovr_compress"), wxT("NONE"));
                 pNode->AddProperty(wxT("ovr_resample"), wxT("NONE"));//wxT("GAUSS"));
             }
-            CPLSetConfigOption( "COMPRESS_OVERVIEW", wgWX2MB(sCompress) );//LZW "DEFLATE"
+            CPLSetConfigOption( "COMPRESS_OVERVIEW", wgWX2MB(sCompress) );//LZW "DEFLATE" NONE
             if(bAskCreateOvr)
             {
                 //show ask dialog

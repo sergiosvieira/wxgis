@@ -108,6 +108,85 @@ enum wxGISEnumMessageType
     enumGISMessageOK
 };
 
+/** \class IProgressor core.h
+    \brief A progressor interface class.
+
+    This is base class for progressors.
+*/
+class IProgressor 
+{
+public:
+    /** \fn virtual ~IProgressor(void)
+     *  \brief A destructor.
+     */
+	virtual ~IProgressor(void){};
+	//pure virtual
+    /** \fn bool Show(bool bShow)
+     *  \brief Show/hide progressor.
+     *  \param bShow The indicator to show (true) or hide (false) progressor
+     *  \return The success of function execution
+     */	
+    virtual bool Show(bool bShow) = 0;
+    //
+    /** \fn virtual void SetRange(int range)
+     *  \brief Set progressor range.
+     *  \param range The progressor value range
+     */	
+    virtual void SetRange(int range) = 0;
+    /** \fn int GetRange(void)
+     *  \brief Set progressor range.
+     *  \return The current progressor range
+     */	
+    virtual int GetRange(void) = 0;
+    /** \fn void SetValue(int value)
+     *  \brief Set progressor position.
+     *  \param value The progressor current value
+     */	    
+    virtual void SetValue(int value) = 0;
+    /** \fn int GetValue(void)
+     *  \brief Get progressor position.
+     *  \return The current progressor position
+     */	   
+    virtual int GetValue(void) = 0;
+    //
+    /** \fn void Play(void)
+     *  \brief Start undefined progressor state.
+     */	 	
+    virtual void Play(void) = 0;
+    /** \fn void Stop(void)
+     *  \brief Stop undefined progressor state.
+     */		
+    virtual void Stop(void) = 0;
+};
+
+/** \class ITrackCancel core.h
+    \brief A TrackCancel interface class.
+
+    This is base class for TrackCancel classes. 
+    The TrackCancel provide ability to stop by ESC, Cancel and etc. execution of some process or function
+*/
+class ITrackCancel
+{
+public:
+    /** \fn ITrackCancel(void)
+     *  \brief A constructor.
+     */	
+    ITrackCancel(void) : m_bIsCanceled(false), m_pProgressor(NULL){};
+    /** \fn virtual ~ITrackCancel(void)
+     *  \brief A destructor.
+     */
+    virtual ~ITrackCancel(void){};
+	virtual void Cancel(void){m_bIsCanceled = true;};
+	virtual bool Continue(void){return !m_bIsCanceled;};
+	virtual void Reset(void){m_bIsCanceled = false;};
+	virtual IProgressor* GetProgressor(void){return m_pProgressor;};
+	virtual void SetProgressor(IProgressor* pProgressor){m_pProgressor = pProgressor; };
+	virtual void PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType){};
+protected:
+	bool m_bIsCanceled;
+	IProgressor* m_pProgressor;
+};
+
 static bool CreateAndRunThread(wxThread* pThread, wxString sClassName = wxEmptyString, wxString sThreadName = wxEmptyString)
 {
 	if(!pThread)

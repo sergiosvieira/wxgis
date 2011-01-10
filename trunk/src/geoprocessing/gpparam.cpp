@@ -167,7 +167,32 @@ wxString wxGISGPParameter::GetAsString(void)
 	return m_Value.MakeString();
 }
 
-void wxGISGPParameter::SetFromString(wxString sParam)
+bool wxGISGPParameter::SetFromString(wxString sParam)
 {
+    switch(m_DataType)
+    {
+    case enumGISGPParamDTBool:
+        m_Value = wxVariant((bool)wxAtoi(sParam));
+        break;        
+	case enumGISGPParamDTInteger:
+        m_Value = wxVariant(wxAtoi(sParam));
+        break;        
+	case enumGISGPParamDTDouble:
+        m_Value = wxVariant(wxAtof(sParam));
+        break;        
+	case enumGISGPParamDTString:
+	case enumGISGPParamDTPath:
+        m_Value = wxVariant(sParam);
+        break;        
+    case enumGISGPParamDTStringList:
+	case enumGISGPParamDTPathArray:
+        //TODO: enumGISGPParamDTPathArray & enumGISGPParamDTStringList parce
+        break;        
+    case enumGISGPParamDTUnknown:
+    default:
+        m_Value = wxVariant(sParam);
+        break;        
+    }
+    return true;
 }
 

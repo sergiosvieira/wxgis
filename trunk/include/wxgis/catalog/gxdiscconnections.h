@@ -21,6 +21,9 @@
 #pragma once
 #include "wxgis/catalog/catalog.h"
 
+#define CONNDIR wxT("connections")
+#define CONNCONF wxT("conn.xml")
+
 /** \class wxGxDiscConnections gxdiscconnections.h
     \brief A Disc Connections GxRootObject.
 */
@@ -53,6 +56,7 @@ public:
 	virtual void EmptyChildren(void);
     virtual IGxObject* ConnectFolder(wxString sPath);
     virtual void DisconnectFolder(wxString sPath);
+    virtual void StoreConnections(void);
 
     typedef struct _conn_data{
         wxString sName, sPath;
@@ -60,4 +64,6 @@ public:
 protected:
     std::vector<CONN_DATA> m_aConnections;
 	bool m_bIsChildrenLoaded;
+    wxString m_sUserConfig;
+    wxString m_sUserConfigDir;
 };

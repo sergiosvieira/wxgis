@@ -23,6 +23,20 @@
 
 #include "wx/tokenzr.h"
 
+int CPL_STDCALL ExecToolProgress( double dfComplete, const char *pszMessage, void *pData)
+{
+    ITrackCancel* pTrackCancel = (ITrackCancel*)pData;
+    if( pszMessage != NULL )
+        pTrackCancel->PutMessage(wgMB2WX(pszMessage), -1, enumGISMessageInfo);
+
+    IProgressor* pProgressor = pTrackCancel->GetProgressor();
+    if(pProgressor)
+        pProgressor->SetValue((int) (dfComplete*100));
+
+    return pTrackCancel->Continue() == true ? 1 : 0;
+}
+
+
 wxGISGPTool::wxGISGPTool(void) : m_pCatalog(NULL)
 {
 }
@@ -52,25 +66,32 @@ wxString wxGISGPTool::GetAsString(void)
         if(pParam)
         {
             sOutParam += pParam->GetAsString();
-            sOutParam += SEPARATOR;
+            sOutParam += GPTOOLSEPARATOR;
         }
     }
     return sOutParam;
 }
 
-void wxGISGPTool::SetFromString(wxString sParams)
+bool wxGISGPTool::SetFromString(wxString sParams)
 {
-	wxStringTokenizer tkz(sParams, wxString(SEPARATOR), false );
+    GetParameterInfo();
+	wxStringTokenizer tkz(sParams, wxString(GPTOOLSEPARATOR), wxTOKEN_RET_EMPTY );
     size_t counter(0);
 	while ( tkz.HasMoreTokens() )
 	{
 		wxString token = tkz.GetNextToken();
-		token.Replace(SEPARATOR, wxT(""));
+		//token.Replace(GPTOOLSEPARATOR, wxT(""));
         if(counter >= m_pParamArr.size())
-            return;
+            return false;
         IGPParameter* pParam = m_pParamArr[counter];
         if(pParam)
-            pParam->SetFromString(token);
+        {
+            if(!pParam->SetFromString(token))
+                return false;
+            else
+                pParam->SetAltered(true);
+        }
         counter++;
 	}
+    return true;
 }

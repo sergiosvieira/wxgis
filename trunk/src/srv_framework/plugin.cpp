@@ -202,7 +202,7 @@ bool wxGISWorkPlugin::SetupLoc(wxString sLoc, wxString sLocPath)
 		// Initialize the catalogs we'll be using
 		//load multicat from locale
 		wxArrayString trans_arr;
-		wxDir::GetAllFiles(sLocPath, &trans_arr, wxT("*_srv.mo"));
+		wxDir::GetAllFiles(sLocPath, &trans_arr, wxT("*.mo"));//_srv because using _cat dll's!
 
 		for(size_t i = 0; i < trans_arr.size(); i++)
 		{

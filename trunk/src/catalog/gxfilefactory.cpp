@@ -114,11 +114,11 @@ void wxGxFileFactory::Serialize(wxXmlNode* pConfig, bool bStore)
     {
         m_bIsEnabled = wxAtoi(pConfig->GetPropVal(wxT("is_enabled"), wxT("1")));
         wxString sExts = pConfig->GetPropVal(wxT("extensions"), wxT("txt|log|nfo|"));
-	    wxStringTokenizer tkz(sExts, wxString(wxT("|")), false );
+	    wxStringTokenizer tkz(sExts, wxString(wxT("|")), wxTOKEN_RET_EMPTY );
 	    while ( tkz.HasMoreTokens() )
 	    {
 		    wxString token = tkz.GetNextToken();
-		    token.Replace(wxT("|"), wxT(""));	
+		    //token.Replace(wxT("|"), wxT(""));	
 		    token.MakeLower();
             m_ExtArray.Add(token);
 	    }
