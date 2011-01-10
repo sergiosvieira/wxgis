@@ -44,22 +44,27 @@ protected:
 };
 
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISGPStringDomain
-///////////////////////////////////////////////////////////////////////////////
-
+/** \class wxGISGPStringDomain gpdomain.h
+    \brief The domain storing strings
+*/
 class WXDLLIMPEXP_GIS_GP wxGISGPStringDomain : public IGPDomain
 {
 public:
     wxGISGPStringDomain (void);
     virtual ~wxGISGPStringDomain (void);
-	virtual void AddString(wxString soStr);
+	virtual void AddString(wxString soStr, wxString soInternalStr = wxEmptyString);
     virtual size_t GetStringCount(void);
-    virtual wxString GetString(size_t dIndex);
+    virtual wxString GetInternalString(size_t dIndex);
+    virtual wxString GetExternalString(size_t dIndex);
+    virtual wxString GetInternalString(wxString soInternalStr);
+    virtual wxString GetExternalString(wxString soStr);
     virtual wxArrayString GetArrayString() const;
     virtual void SetSelString(size_t nIndex);
     virtual size_t GetSelString(void);
 protected:
 	wxArrayString m_asoData;
-    size_t m_nSelFilterIndex;
+	wxArrayString m_asoInternalData;
+    size_t m_nSelIndex;
 };
+
+

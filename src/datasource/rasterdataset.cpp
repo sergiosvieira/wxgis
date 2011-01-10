@@ -34,8 +34,6 @@ wxGISRasterDataset::wxGISRasterDataset(wxString sPath, wxGISEnumRasterDatasetTyp
 
 wxGISRasterDataset::~wxGISRasterDataset(void)
 {
-	OSRDestroySpatialReference( m_pSpaRef );
-	wxDELETE(m_psExtent);
 	Close();
 }
 
@@ -43,6 +41,8 @@ void wxGISRasterDataset::Close(void)
 {
 	if(m_bIsOpened)
     {
+	    OSRDestroySpatialReference( m_pSpaRef );
+	    wxDELETE(m_psExtent);
         if(m_poMainDataset)
 		{
             GDALDereferenceDataset(m_poMainDataset);

@@ -117,6 +117,7 @@ IGxObject* wxGxDiscConnectionsUI::ConnectFolder(wxString sPath)
         if(AddChild(pGxObject))
         {
 		    m_pCatalog->ObjectAdded(pGxObject);
+            StoreConnections();
             return pGxObject;
         }
         else

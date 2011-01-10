@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-06 23:45+0300\n"
-"PO-Revision-Date: 2010-09-06 23:45+0300\n"
+"POT-Creation-Date: 2011-01-09 01:00+0300\n"
+"PO-Revision-Date: 2011-01-09 01:00+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -17,53 +17,15 @@ msgstr ""
 "X-Poedit-SearchPath-0: D:\\work\\Projects\\wxGIS\\src\\cat_app\n"
 "X-Poedit-SearchPath-1: D:\\work\\Projects\\wxGIS\\include\\wxgis\\cat_app\n"
 
-#: D:\work\Projects\wxGIS\src\cat_app/catalogapp.cpp:61
-msgid "wxGISCatalogApp: Failed to get log folder"
-msgstr "wxGISCatalogApp: Ошибка получения папки с логами"
-
-#: D:\work\Projects\wxGIS\src\cat_app/catalogapp.cpp:72
-#, c-format
-msgid "wxGISCatalogApp: Failed to open log file %s"
-msgstr "wxGISCatalogApp: Ошибка открытия файла логов %s"
-
-#: D:\work\Projects\wxGIS\src\cat_app/catalogapp.cpp:84
-#, c-format
-msgid "HOST '%s': OS desc - %s, free memory - %u Mb"
-msgstr "Имя ПК '%s': Описание ОС - %s, свободно памяти - %u Mb"
-
-#: D:\work\Projects\wxGIS\src\cat_app/catalogapp.cpp:85
-#, c-format
-msgid "wxGISCatalogApp: %s %s is initializing..."
-msgstr "wxGISCatalogApp: %s %s иннициализируется..."
-
-#: D:\work\Projects\wxGIS\src\cat_app/catalogapp.cpp:86
-#, c-format
-msgid "wxGISCatalogApp: Log file: %s"
-msgstr "wxGISCatalogApp: Лог-файл: %s"
-
-#: D:\work\Projects\wxGIS\src\cat_app/catalogapp.cpp:87
-msgid "wxGISCatalogApp: Initialize locale"
-msgstr "wxGISCatalogApp: Иннициализация локали"
-
-#: D:\work\Projects\wxGIS\src\cat_app/catalogapp.cpp:99
-#, c-format
-msgid "wxGISCatalogApp: Language is set to %s"
-msgstr "wxGISCatalogApp: Язык: %s"
-
-#: D:\work\Projects\wxGIS\src\cat_app/catalogapp.cpp:157
-#, c-format
-msgid "wxGISCatalogApp: System folder is absent! Lookup path '%s'"
-msgstr "wxGISCatalogApp: Отсутствует системная папка! Путь поиска '%s'"
-
-#: D:\work\Projects\wxGIS\src\cat_app/catalogapp.cpp:178
-msgid "wxGISCatalogApp: Start main frame"
-msgstr "wxGISCatalogApp: Загрузка главного фрейма"
-
-#: D:\work\Projects\wxGIS\src\cat_app/catalogapp.cpp:187
+#: D:\work\Projects\wxGIS\src\cat_app/catalogapp.cpp:48
 msgid "wxGIS Catalog"
 msgstr "Каталог wxGIS"
 
-#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:70
+#: D:\work\Projects\wxGIS\src\cat_app/catalogapp.cpp:83
+msgid "wxGISCatalogApp: Start main frame"
+msgstr "wxGISCatalogApp: Загрузка главного фрейма"
+
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:71
 #, c-format
 msgid ""
 "\n"
@@ -74,7 +36,7 @@ msgstr ""
 "wxGIS [%s]\n"
 "Версия: %s"
 
-#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:92
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:93
 #, c-format
 msgid ""
 "wxGIS [%s]\n"
@@ -89,11 +51,11 @@ msgstr ""
 "\n"
 "(c) 2009-2010 Дмитрий Барышников (Bishop)"
 
-#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:93
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:94
 msgid "About application"
 msgstr "О программе"
 
-#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:96
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:97
 #, c-format
 msgid ""
 "HOST '%s'\n"
@@ -122,11 +84,11 @@ msgstr ""
 "PROJ %s\n"
 "%s"
 
-#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:97
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:98
 msgid "About system"
 msgstr "О системе"
 
-#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:99
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:100
 msgid ""
 "Thanks GIS-LAB team for help in translating the interface, testing and searching for errors.\n"
 "Special thanks to Maxim Dubinin"
@@ -134,11 +96,11 @@ msgstr ""
 "Спасибо команде ГИС-LAB за помощь в переводе интерфейса, тестировании и поиске ошибок.\n"
 "Отдельное спасибо Максиму Дубинину"
 
-#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:99
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:100
 msgid "Thanks"
 msgstr "Благодарности"
 
-#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:100
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:101
 msgid ""
 "This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n"
 "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
@@ -152,11 +114,11 @@ msgstr ""
 "См. GNU General Public License для более подробной информации. \n"
 "Вы должны были получить копию GNU General Public License вместе с этой программой. Если нет, см. <http://www.gnu.org/licenses/>"
 
-#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:100
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:101
 msgid "License"
 msgstr "Лицензия"
 
-#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:105
+#: D:\work\Projects\wxGIS\src\cat_app/gisaboutdlg.cpp:106
 msgid "Close"
 msgstr "Закрыть"
 
@@ -164,3 +126,26 @@ msgstr "Закрыть"
 msgid "About"
 msgstr "О программе"
 
+#~ msgid "wxGISCatalogApp: Failed to get log folder"
+#~ msgstr "wxGISCatalogApp: Ошибка получения папки с логами"
+
+#~ msgid "wxGISCatalogApp: Failed to open log file %s"
+#~ msgstr "wxGISCatalogApp: Ошибка открытия файла логов %s"
+
+#~ msgid "HOST '%s': OS desc - %s, free memory - %u Mb"
+#~ msgstr "Имя ПК '%s': Описание ОС - %s, свободно памяти - %u Mb"
+
+#~ msgid "wxGISCatalogApp: %s %s is initializing..."
+#~ msgstr "wxGISCatalogApp: %s %s иннициализируется..."
+
+#~ msgid "wxGISCatalogApp: Log file: %s"
+#~ msgstr "wxGISCatalogApp: Лог-файл: %s"
+
+#~ msgid "wxGISCatalogApp: Initialize locale"
+#~ msgstr "wxGISCatalogApp: Иннициализация локали"
+
+#~ msgid "wxGISCatalogApp: Language is set to %s"
+#~ msgstr "wxGISCatalogApp: Язык: %s"
+
+#~ msgid "wxGISCatalogApp: System folder is absent! Lookup path '%s'"
+#~ msgstr "wxGISCatalogApp: Отсутствует системная папка! Путь поиска '%s'"

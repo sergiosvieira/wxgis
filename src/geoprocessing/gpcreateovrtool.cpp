@@ -74,7 +74,7 @@ GPParameters* wxGISGPCreateOverviewsTool::GetParameterInfo(void)
 
         m_pParamArr.push_back(pParam1);
 
-        //elevation interpolation type
+        //overviews interpolation type
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
         pParam2->SetName(wxT("interpol_type"));
         pParam2->SetDisplayName(_("Pixel interpolation"));
@@ -84,20 +84,49 @@ GPParameters* wxGISGPCreateOverviewsTool::GetParameterInfo(void)
 
         wxGISGPStringDomain* pDomain2 = new wxGISGPStringDomain();
         //"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE"
-        pDomain2->AddString(_("Nearest"));
-        pDomain2->AddString(_("Gauss"));
-        pDomain2->AddString(_("Cubic"));
-        pDomain2->AddString(_("Average"));
-        pDomain2->AddString(_("Mode"));
-        pDomain2->AddString(_("Average magphase"));
-        pDomain2->AddString(_("None"));
+        pDomain2->AddString(_("Nearest"), wxT("NEAREST"));
+        pDomain2->AddString(_("Gauss"), wxT("GAUSS"));
+        pDomain2->AddString(_("Cubic"), wxT("CUBIC"));
+        pDomain2->AddString(_("Average"), wxT("AVERAGE"));
+        pDomain2->AddString(_("Mode"), wxT("MODE"));
+        pDomain2->AddString(_("Average magphase"), wxT("AVERAGE_MAGPHASE"));//averages complex data in mag/phase space
+        pDomain2->AddString(_("None"), wxT("NONE"));
         pParam2->SetDomain(pDomain2);
 
-        pParam2->SetValue(_("Nearest"));
+        pParam2->SetValue(wxT("NEAREST"));
 
         m_pParamArr.push_back(pParam2);
 
+        //compression
+        wxGISGPParameter* pParam3 = new wxGISGPParameter();
+        pParam3->SetName(wxT("compression"));
+        pParam3->SetDisplayName(_("Overview compression"));
+        pParam3->SetParameterType(enumGISGPParameterTypeOptional);
+        pParam3->SetDataType(enumGISGPParamDTStringList);
+        pParam3->SetDirection(enumGISGPParameterDirectionInput);
+
+        wxGISGPStringDomain* pDomain3 = new wxGISGPStringDomain();
+        //"NONE", "LZW", "DEFLATE"
+        pDomain3->AddString(_("ZIP"), wxT("DEFLATE"));
+        pDomain3->AddString(_("JPEG"), wxT("JPEG"));
+        pDomain3->AddString(_("PACKBITS"), wxT("PACKBITS"));
+        pDomain3->AddString(_("LZW"), wxT("LZW"));
+        pDomain3->AddString(_("None"), wxT("NONE"));
+        pParam3->SetDomain(pDomain3);
+
+        pParam3->SetValue(wxT("NONE"));
+
+        m_pParamArr.push_back(pParam3);
+
         //levels
+
+        //PHOTOMETRIC_OVERVIEW {RGB,YCBCR,MINISBLACK,MINISWHITE,CMYK,CIELAB,ICCLAB,ITULAB}
+        //INTERLEAVE_OVERVIEW {PIXEL|BAND}.
+        //JPEG_QUALITY_OVERVIEW
+        //PREDICTOR_OVERVIEW 1|2|3 - 1.8!
+        //BIGTIFF_OVERVIEW {IF_NEEDED|IF_SAFER|YES|NO}
+
+        //USE_RRD {YES|NO}
     }
     return &m_pParamArr;
 }
@@ -125,6 +154,11 @@ bool wxGISGPCreateOverviewsTool::Validate(void)
 	        ////int anOverviewList[8] = { 4, 8, 16, 32, 64, 128, 256, 512 };
 
     //return m_pParamArr[0]->GetIsValid();
+   
+    //PHOTOMETRIC_OVERVIEW {RGB,YCBCR,MINISBLACK,MINISWHITE,CMYK,CIELAB,ICCLAB,ITULAB}    
+    //INTERLEAVE_OVERVIEW {PIXEL|BAND}
+    //JPEG_QUALITY_OVERVIEW
+
     return true;
 }
 
@@ -183,155 +217,34 @@ bool wxGISGPCreateOverviewsTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
 
-    //GDALDriver* poDriver = (GDALDriver*)GDALGetDriverByName( wgWX2MB(sDriver) );
-    //GDALRasterBand * poGDALRasterBand = poGDALDataset->GetRasterBand(1);
+    wxString sInterpolation = m_pParamArr[1]->GetValue();
+    wxString sCompress = m_pParamArr[2]->GetValue();
+    //CPLSetConfigOption( "COMPRESS_OVERVIEW", wgWX2MB(sCompress) );//LZW "DEFLATE" NONE
 
-    //if(!poGDALRasterBand)
+    //if(pwxGISRasterDataset->GetSubType() == enumRasterImg)
     //{
-    //    //add messages to pTrackCancel
-    //    if(pTrackCancel)
-    //        pTrackCancel->PutMessage(_("The raster has no bands"), -1, enumGISMessageErr);
-    //    wsDELETE(pSrcDataSet);
-    //    return false;
+    //    CPLSetConfigOption( "USE_RRD", "YES" );
+    //    CPLSetConfigOption( "HFA_USE_RRD", "YES" );
     //}
-    //GDALDataType eDT = poGDALRasterBand->GetRasterDataType();
+    //else
+    //    CPLSetConfigOption( "USE_RRD", "NO" );
 
-    //wxString soChoice = m_pParamArr[5]->GetValue();
-    //if(soChoice == wxString(_("Cubic")))
-    //    CPLSetConfigOption( "GDAL_RPCDEMINTERPOLATION", "CUBIC" ); //BILINEAR
+    //CPLErr eErr = pDSet->BuildOverviews( wgWX2MB(sResampleMethod), nLevelCount, anOverviewList, 0, NULL, OvrProgress, (void*)&Data );
 
-
-    //CPLString osDSTSRSOpt = "DST_SRS=";
-    //osDSTSRSOpt += poGDALDataset->GetProjectionRef();
-
-    //const char *apszOptions[6] = { osDSTSRSOpt.c_str(), "METHOD=RPC", NULL, NULL, NULL, NULL};//, NULL  osSRCSRSOpt.c_str(),
-    //wxString soDEMPath = m_pParamArr[2]->GetValue();
-
-    //CPLString soCPLDemPath;
-    //if(pGxObjectContainer)
-    //{
-    //    IGxDataset* pGxDemObj = dynamic_cast<IGxDataset*>(pGxObjectContainer->SearchChild(soDEMPath));
-    //    if(pGxDemObj)
-    //    {
-    //        soCPLDemPath = CPLString((const char *)wgWX2MB(pGxDemObj->GetPath()));
-    //    }
-    //}
-
-    //CPLString osDEMFileOpt = "RPC_DEM=";
-    //osDEMFileOpt += soCPLDemPath;
-    //apszOptions[2] = osDEMFileOpt.c_str();
-
-    //wxString soHeight = m_pParamArr[3]->GetValue();
-    //CPLString osHeightOpt = "RPC_HEIGHT=";
-    //osHeightOpt += wgWX2MB(soHeight);
-    //apszOptions[3] = osHeightOpt.c_str();
-
-    //wxString soHeightScale = m_pParamArr[4]->GetValue();
-    //CPLString osHeightScaleOpt = "RPC_HEIGHT_SCALE=";
-    //osHeightScaleOpt += wgWX2MB(soHeightScale);
-    //apszOptions[4] = osHeightScaleOpt.c_str();
-
-    //void *hTransformArg = GDALCreateGenImgProjTransformer2( poGDALDataset, NULL, (char **)apszOptions );
-    //if(!hTransformArg)
-    //{
-    //    const char* pszErr = CPLGetLastErrorMsg();
-    //    if(pTrackCancel)
-    //        pTrackCancel->PutMessage(wxString::Format(_("Error CreateGenImgProjTransformer. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
-    //    wsDELETE(pSrcDataSet);
-    //    return false;
-    //}
-
-    //double adfDstGeoTransform[6] = {0,0,0,0,0,0};
-    //int nPixels=0, nLines=0;
-
-    //CPLErr eErr = GDALSuggestedWarpOutput( poGDALDataset, GDALGenImgProjTransform, hTransformArg, adfDstGeoTransform, &nPixels, &nLines );
     //if(eErr != CE_None)
     //{
     //    const char* pszErr = CPLGetLastErrorMsg();
-    //    if(pTrackCancel)
-    //        pTrackCancel->PutMessage(wxString::Format(_("Error determining output raster size. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
-    //    wsDELETE(pSrcDataSet);
-    //    return false;
+    //    wxLogError(_("BuildOverviews failed! GDAL error: %s"), wgMB2WX(pszErr));
+    //    wxMessageBox(_("Build Overviews failed!"), _("Error"), wxICON_ERROR | wxOK );
     //}
-
-
-    //GDALDestroyGenImgProjTransformer( hTransformArg );
-
-    //// Create the output file.
-    //GDALDataset * poOutputGDALDataset = poDriver->Create( wgWX2MB(sDstPath), nPixels, nLines, poGDALDataset->GetRasterCount(), eDT, NULL );
-    //if(poOutputGDALDataset == NULL)
-    //{
-    //    const char* pszErr = CPLGetLastErrorMsg();
-    //    if(pTrackCancel)
-    //        pTrackCancel->PutMessage(wxString::Format(_("Error creating output raster. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
-    //    wsDELETE(pSrcDataSet);
-    //    return false;
-    //}
-
-    //poOutputGDALDataset->SetProjection(poGDALDataset->GetProjectionRef());
-    //poOutputGDALDataset->SetGeoTransform( adfDstGeoTransform );
-
-    //// Copy the color table, if required.
-    //GDALColorTableH hCT;
-
-    //hCT = GDALGetRasterColorTable( GDALGetRasterBand(poGDALDataset,1) );
-    //if( hCT != NULL )
-    //    GDALSetRasterColorTable( GDALGetRasterBand(poOutputGDALDataset,1), hCT );
-
-
-    //// Setup warp options.
-
-    //GDALWarpOptions *psWarpOptions = GDALCreateWarpOptions();
-
-    //psWarpOptions->hSrcDS = poGDALDataset;
-    //psWarpOptions->hDstDS = poOutputGDALDataset;
-
-    //psWarpOptions->pfnProgress = OvrProgress;
-    //psWarpOptions->pProgressArg = (void*)pTrackCancel;
-
-    //// Establish reprojection transformer.
-
-    //psWarpOptions->pTransformerArg = GDALCreateGenImgProjTransformer2( poGDALDataset, poOutputGDALDataset, (char **)apszOptions );
-    //psWarpOptions->pfnTransformer = GDALGenImgProjTransform;
-    //
-    ////TODO: Add to config memory limit in % of free memory
-    //double dfMemLim = wxGetFreeMemory().ToDouble() / wxThread::GetCPUCount();
-    //if(dfMemLim > 135000000) //128Mb in bytes
-    //{
-    //    psWarpOptions->dfWarpMemoryLimit = dfMemLim;
-    //    wxLogDebug(wxT("wxGISGPOrthoCorrectTool: The dfWarpMemoryLimit set to %f Mb"), dfMemLim / 1048576);
-    //}
-
-    //psWarpOptions->papszWarpOptions = CSLSetNameValue(psWarpOptions->papszWarpOptions, "SOURCE_EXTRA", "5" );
-    //psWarpOptions->papszWarpOptions = CSLSetNameValue(psWarpOptions->papszWarpOptions, "SAMPLE_STEPS", "101" );
-    //psWarpOptions->eResampleAlg = GRA_Bilinear;
-
-    //// Initialize and execute the warp operation.
-
-    //GDALWarpOperation oOperation;
-
-    //oOperation.Initialize( psWarpOptions );
-    //eErr = oOperation.ChunkAndWarpImage( 0, 0, nPixels, nLines );//ChunkAndWarpMulti( 0, 0, nPixels, nLines );//
-    //if(eErr != CE_None)
-    //{
-    //    const char* pszErr = CPLGetLastErrorMsg();
-    //    if(pTrackCancel)
-    //    {
-    //        wxString sErr = wgMB2WX(pszErr);
-    //        pTrackCancel->PutMessage(wxString::Format(_("OrthoCorrect failed! GDAL error: %s"), sErr.c_str()), -1, enumGISMessageErr);
-    //    }
-    //    GDALClose(poOutputGDALDataset);
-    //    wsDELETE(pSrcDataSet);
-    //    return false;
-    //}
-
-    //GDALDestroyGenImgProjTransformer( psWarpOptions->pTransformerArg );
-    //GDALDestroyWarpOptions( psWarpOptions );
+    //else
+    //    pwxGISRasterDataset->SetHasOverviews(true);
+            
 
     //GDALClose(poOutputGDALDataset);
     //wsDELETE(pSrcDataSet);
 
-    //if(pGxObjectContainer)
+    //if(pGxObjectContainer)-catalog
     //{
     //    IGxObject* pParentLoc = pGxObjectContainer->SearchChild(sPath);
     //    if(pParentLoc)
@@ -341,3 +254,4 @@ bool wxGISGPCreateOverviewsTool::Execute(ITrackCancel* pTrackCancel)
     return true;
 }
 
+//TODO: PostExecute

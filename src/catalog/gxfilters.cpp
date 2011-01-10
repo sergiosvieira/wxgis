@@ -389,7 +389,7 @@ bool wxGxFolderFilter::CanChooseObject( IGxObject* pObject )
 		return false;
     if(pObject->GetCategory() == wxString(_("Folder")))
         return true;
-    if(pObject->GetCategory() == wxString(_("Folder Connection")))
+    if(pObject->GetCategory() == wxString(_("Folder connection")))
         return true;
     return false;
 }

@@ -193,14 +193,14 @@ void wxGxToolExecuteView::Serialize(wxXmlNode* pRootNode, bool bStore)
 		m_currentSortCol = wxAtoi(pRootNode->GetPropVal(wxT("sort_col"), wxT("0")));
         //load col width
         wxString sCol = pRootNode->GetPropVal(wxT("cols_width"), wxT(""));
-	    wxStringTokenizer tkz(sCol, wxString(wxT("|")), false );
+	    wxStringTokenizer tkz(sCol, wxString(wxT("|")), wxTOKEN_RET_EMPTY );
         int col_counter(0);
 	    while ( tkz.HasMoreTokens() )
 	    {
             if(col_counter >= GetColumnCount())
                 break;
 		    wxString token = tkz.GetNextToken();
-		    token.Replace(wxT("|"), wxT(""));	
+		    //token.Replace(wxT("|"), wxT(""));	
 		    int nWidth = wxAtoi(token);
             SetColumnWidth(col_counter, nWidth); 
             col_counter++;

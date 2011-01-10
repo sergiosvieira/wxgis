@@ -23,6 +23,7 @@
 
 #include "wx/volume.h"
 #include "wx/dir.h"
+#include "wx/stdpaths.h"
 
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxDiscConnections, wxObject)
@@ -30,6 +31,11 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxDiscConnections, wxObject)
 wxGxDiscConnections::wxGxDiscConnections(void) : m_bIsChildrenLoaded(false)
 {
     m_bEnabled = true;
+    //get config path
+    wxStandardPaths stp;
+    m_sUserConfigDir = stp.GetUserConfigDir() + wxFileName::GetPathSeparator() + wxString(CONFIG_DIR) + wxFileName::GetPathSeparator() + wxString(CONNDIR);
+    m_sUserConfig = m_sUserConfigDir + wxFileName::GetPathSeparator() + wxString(CONNCONF);
+
 }
 
 wxGxDiscConnections::~wxGxDiscConnections(void)
@@ -50,13 +56,29 @@ void wxGxDiscConnections::Refresh(void)
  
 void wxGxDiscConnections::Init(wxXmlNode* pConfigNode)
 {
-	short bScanOnce = wxAtoi(pConfigNode->GetPropVal(wxT("scan_once"), wxT("0")));
-	if(bScanOnce == 0)
-	{
+    wxXmlDocument doc;
+    if (doc.Load(m_sUserConfig))
+    {
+        wxXmlNode* pConnectionsNode = doc.GetRoot();
+		wxXmlNode* pDiscConn = pConnectionsNode->GetChildren();
+		while(pDiscConn)
+		{
+			wxString sName = pDiscConn->GetPropVal(wxT("name"), NONAME);
+			wxString sPath = pDiscConn->GetPropVal(wxT("path"), ERR);
+			if(sPath != ERR)
+			{
+                CONN_DATA data = {sName, sPath};
+                m_aConnections.push_back(data);
+			}
+			pDiscConn = pDiscConn->GetNext();
+		}
+    }
+    else
+    {
         wxLogMessage(_("wxGxDiscConnections: Start scan folder connections"));
         wxArrayString arr;
 #ifdef __WXMSW__
-		arr = wxFSVolumeBase::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE | wxFS_VOL_REMOTE);
+		arr = wxFSVolumeBase::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE/* | wxFS_VOL_REMOTE*/);
 #else
         //linux paths
         wxStandardPaths stp;
@@ -70,21 +92,6 @@ void wxGxDiscConnections::Init(wxXmlNode* pConfigNode)
             m_aConnections.push_back(data);
 		}
 	}
-	else
-	{
-		wxXmlNode* pDiscConn = pConfigNode->GetChildren();
-		while(pDiscConn)
-		{
-			wxString sName = pDiscConn->GetPropVal(wxT("name"), NONAME);
-			wxString sPath = pDiscConn->GetPropVal(wxT("path"), ERR);
-			if(sPath != ERR)
-			{
-                CONN_DATA data = {sName, sPath};
-                m_aConnections.push_back(data);
-			}
-			pDiscConn = pDiscConn->GetNext();
-		}
-	}
 }
 
 wxXmlNode* wxGxDiscConnections::GetProperties(void)
@@ -94,28 +101,8 @@ wxXmlNode* wxGxDiscConnections::GetProperties(void)
     if(pInfo)
         pNode->AddProperty(wxT("name"), pInfo->GetClassName());
     pNode->AddProperty(wxT("is_enabled"), m_bEnabled == true ? wxT("1") : wxT("0"));    
-	pNode->AddProperty(wxT("scan_once"), wxT("1"));
-#ifndef WXGISPORTABLE
-	for(size_t i = 0; i < m_Children.size(); i++)
-	{
-        wxGxDiscConnection* pwxGxDiscConnection = dynamic_cast<wxGxDiscConnection*>(m_Children[i]);
-        if(pwxGxDiscConnection)
-        {
-		    wxXmlNode* pDiscConn = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("DiscConnection"));
-		    pDiscConn->AddProperty(wxT("name"), pwxGxDiscConnection->GetName());
-		    pDiscConn->AddProperty(wxT("path"), pwxGxDiscConnection->GetPath());
-        }
-    }
-    if(m_Children.empty() && !m_aConnections.empty())
-    {
-        for(size_t i = 0; i < m_aConnections.size(); i++)
-        {
-		    wxXmlNode* pDiscConn = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("DiscConnection"));
-		    pDiscConn->AddProperty(wxT("name"), m_aConnections[i].sName);
-		    pDiscConn->AddProperty(wxT("path"), m_aConnections[i].sPath);
-        }
-    }
-#endif  
+    StoreConnections();
+
     return pNode;
 }
 
@@ -182,7 +169,8 @@ IGxObject* wxGxDiscConnections::ConnectFolder(wxString sPath)
         IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
         if(AddChild(pGxObject))
         {
-		    m_pCatalog->ObjectAdded(pGxObject);
+		    m_pCatalog->ObjectAdded(pGxObject);            
+            StoreConnections();
             return pGxObject;
         }
         else
@@ -209,6 +197,38 @@ void wxGxDiscConnections::DisconnectFolder(wxString sPath)
             }
         }
     }
+    StoreConnections();
 }
 
+void wxGxDiscConnections::StoreConnections(void)
+{
+#ifndef WXGISPORTABLE
+    if(!wxDirExists(m_sUserConfigDir))
+        wxFileName::Mkdir(m_sUserConfigDir, 0750, wxPATH_MKDIR_FULL);
+
+    wxXmlDocument doc;
+    wxXmlNode* pRootNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("DiscConnections"));
+    doc.SetRoot(pRootNode);
+    for(size_t i = 0; i < m_Children.size(); i++)
+    {
+        wxGxDiscConnection* pwxGxDiscConnection = dynamic_cast<wxGxDiscConnection*>(m_Children[i]);
+        if(pwxGxDiscConnection)
+        {
+	        wxXmlNode* pDiscConn = new wxXmlNode(pRootNode, wxXML_ELEMENT_NODE, wxT("DiscConnection"));
+	        pDiscConn->AddProperty(wxT("name"), pwxGxDiscConnection->GetName());
+	        pDiscConn->AddProperty(wxT("path"), pwxGxDiscConnection->GetPath());
+        }
+    }
+    if(m_Children.empty() && !m_aConnections.empty())
+    {
+        for(size_t i = 0; i < m_aConnections.size(); i++)
+        {
+	        wxXmlNode* pDiscConn = new wxXmlNode(pRootNode, wxXML_ELEMENT_NODE, wxT("DiscConnection"));
+	        pDiscConn->AddProperty(wxT("name"), m_aConnections[i].sName);
+	        pDiscConn->AddProperty(wxT("path"), m_aConnections[i].sPath);
+        }
+    }
+    doc.Save(m_sUserConfig);
+#endif  
+}
 

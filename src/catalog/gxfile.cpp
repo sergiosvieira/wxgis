@@ -154,7 +154,7 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 	else
 	{
 		const char* err = CPLGetLastErrorMsg();
-		wxString sErr = wxString::Format(_("wxGxPrjFile: GDAL error #%d: %s"), err, wgMB2WX(err));
+		wxString sErr = wxString::Format(_("wxGxPrjFile: GDAL error: %s"), wgMB2WX(err));
 		wxLogError(sErr);
 	}
 	return NULL;

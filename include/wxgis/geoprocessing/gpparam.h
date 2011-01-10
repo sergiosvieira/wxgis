@@ -58,7 +58,7 @@ public:
     virtual wxGISEnumGPMessageType GetMessageType(void);
     virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString);
 	virtual wxString GetAsString(void);
-    virtual void SetFromString(wxString sParam);
+    virtual bool SetFromString(wxString sParam);
 protected:
     bool m_bAltered;
     bool m_bHasBeenValidated;

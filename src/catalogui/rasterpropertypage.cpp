@@ -37,7 +37,7 @@ wxGISRasterPropertyPage::wxGISRasterPropertyPage(void) : m_pDataset(NULL)
 {
 }
 
-wxGISRasterPropertyPage::wxGISRasterPropertyPage(wxGxRasterDataset* pGxDataset, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+wxGISRasterPropertyPage::wxGISRasterPropertyPage(wxGxRasterDataset* pGxDataset, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name) : m_pDataset(NULL)
 {
     Create(pGxDataset, pCatalog, parent, id, pos, size, style, name);
 }
@@ -508,6 +508,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
                 
                 char *pszXMLText = CPLSerializeXMLTree( pRAT->Serialize() );
                 m_pg->AppendIn(pbandid, new wxLongStringProperty(_("Raster Attribute Table"), wxPG_LABEL, wgMB2WX(pszXMLText)));
+                CPLFree( pszXMLText );
             }
         }
     }

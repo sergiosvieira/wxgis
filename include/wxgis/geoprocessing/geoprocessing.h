@@ -139,7 +139,7 @@ public:
      *  \brief Serialize parameter from string.
      *  \param sParam The string representation of parameter
      */	
-    virtual void SetFromString(wxString sParam) = 0;
+    virtual bool SetFromString(wxString sParam) = 0;
 };
 
 /** \typedef GPParameters
@@ -166,7 +166,7 @@ public:
      *  \brief Serialize tool parameters to string.
      *  \param sParams The string representation of tool parameters
      */	
-    virtual void SetFromString(wxString sParams) = 0;
+    virtual bool SetFromString(wxString sParams) = 0;
     virtual void SetCatalog(IGxCatalog* pCatalog) = 0;
     virtual IGxCatalog* GetCatalog(void) = 0;
     //virtual GetToolType(void) = 0;

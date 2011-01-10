@@ -498,7 +498,10 @@ wxGISDTChoice::wxGISDTChoice( IGPParameter* pParam, IGxCatalog* pCatalog, wxWind
     if(m_pParam->GetValue().GetString().IsEmpty())
         m_choice->SetSelection( 0 );
     else
-        m_choice->SetStringSelection( m_pParam->GetValue() );
+    {
+        wxString sData = poGPStringDomain->GetInternalString(m_pParam->GetValue());
+        m_choice->SetStringSelection( sData );
+    }
 
 	bPathSizer->Add( m_choice, 1, wxALL|wxEXPAND, 5 );
 
@@ -534,9 +537,14 @@ void wxGISDTChoice::Update(void)
 
 void wxGISDTChoice::OnChoice(wxCommandEvent& event)
 {
-    m_pParam->SetValue(m_choice->GetStringSelection());
+    int nPos = m_choice->GetCurrentSelection();
+    wxString sData;
     wxGISGPStringDomain* poGPStringDomain = dynamic_cast<wxGISGPStringDomain*>(m_pParam->GetDomain());
     if(poGPStringDomain)
-        poGPStringDomain->SetSelString(m_choice->GetCurrentSelection());
+    {
+        sData = poGPStringDomain->GetInternalString(nPos);
+        poGPStringDomain->SetSelString(nPos);
+    }
+    m_pParam->SetValue(sData);
     m_pParam->SetAltered(true);
 }

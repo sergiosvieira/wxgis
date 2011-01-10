@@ -61,10 +61,10 @@ void wxGPProcess::ProcessInput(wxString sInputData)
 		{
 			int nHours = (double)nMinutes / 60;
 			nMinutes = nMinutes % 60;
-			sTxt = wxString::Format(_("Remains %d hours %d minutes"), nHours, nMinutes);
+			sTxt = wxString::Format(_("Remains %d hour(s) %d minute(s)"), nHours, nMinutes);
 		}
 		else
-			sTxt = wxString::Format(_("Remains %d minutes"), nMinutes);
+			sTxt = wxString::Format(_("Remains %d minute(s)"), nMinutes);
 		if(m_pTrackCancel)
 			m_pTrackCancel->PutMessage(sTxt, -1, enumGISMessageTitle);
 		return;
@@ -79,6 +79,12 @@ void wxGPProcess::ProcessInput(wxString sInputData)
 	{
 		if(m_pTrackCancel)
 			m_pTrackCancel->PutMessage(sRest, -1, enumGISMessageErr);
+		return;
+	}
+	if( sInputData.StartsWith(wxT("WARN: "), &sRest) )
+	{
+		if(m_pTrackCancel)
+			m_pTrackCancel->PutMessage(sRest, -1, enumGISMessageWarning);
 		return;
 	}
 }

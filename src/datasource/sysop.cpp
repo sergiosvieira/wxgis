@@ -49,11 +49,13 @@ bool RenameFile(wxString sOldPath, wxString sNewPath)
 
 wxString ClearExt(wxString sPath)
 {
-    wxString sResPath = sPath;
-    int pos = sPath.Find('.', true);
-    if(pos != wxNOT_FOUND)
-        sResPath = sPath.Left(pos);
-    return sResPath;
+    wxStripExtension(sPath);
+    return sPath;
+    //wxString sResPath = sPath;
+    //int pos = sPath.Find('.', true);
+    //if(pos != wxNOT_FOUND)
+    //    sResPath = sPath.Left(pos);
+    //return sResPath;
 }
 
 

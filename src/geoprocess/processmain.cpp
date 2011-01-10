@@ -21,13 +21,12 @@
 
 #include "wxgis/geoprocess/processmain.h"
 #include "wxgis/geoprocessing/geoprocessing.h"
+#include "wxgis/geoprocessing/gptoolmngr.h"
 #include "wxgis/core/config.h"
+#include "wxgis/catalog/gxcatalog.h"
 
 #include "wx/defs.h"
 #include "wx/cmdline.h"
-#include "wx/string.h"
-#include "wx/wfstream.h"
-#include "wx/txtstrm.h"
 
 int main(int argc, char **argv)
 {
@@ -79,45 +78,118 @@ bool parse_commandline_parameters( int argc, char** argv )
 	}
 
 
-    if(my_parser.Found( wxT( "n" ) ) && my_parser.Found( wxT( "p" ) ) )
+    wxString sToolName, sToolParameters;
+    if(my_parser.Found( wxT( "n" ), &sToolName ) && my_parser.Found( wxT( "p" ), &sToolParameters ) )
     {
-		//create output stream
-		wxFFileOutputStream OutStream(stdout);
-		wxTextOutputStream OutTxtStream(OutStream);
-		OutTxtStream.WriteString(wxString(wxT("INFO: Run execution\r\n")));
-		fflush(stdout);
-		for(size_t i = 0; i < 100; i++)
-		{
-			OutTxtStream.WriteString(wxString::Format(wxT("DONE: %d%%\r"), i + 1));
-			fflush(stdout);
-			if(i == 50)
-			{
-				wxString sErrMsg(wxT("Test error"));
-				OutTxtStream.WriteString(wxString::Format(wxT("ERR: %s occured\r\n"), sErrMsg.c_str()));
-				fflush(stdout);
-			}
-			wxSleep(1);
-		}
-		OutTxtStream.WriteString(wxString(wxT("INFO: Finish\r\n")));
-
-//        wxGISAppConfig* pConfig;
-//#ifdef WXGISPORTABLE
-//        pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, true);
-//#else
-//	    pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, false);
-//#endif
-//        wxXmlNode* pToolsChild = pConfig->GetConfigNode(wxT("tools"), false, true);
-        //wxGISGPToolManager* pGISGPToolManager(pToolsChild,
-        //pGISGPToolManager->GetTool
-		return true;
+        wxGPTaskExecutor executor;
+        return executor.OnExecute(sToolName, sToolParameters);
     }
 
 	my_parser.Usage();
 
     // Either we are using the defaults or the provided parameters were valid.
 
-    //while (getchar() != 'q'); test
-
     return true;
 
 } 
+
+//////////////////////////////////////////////////////////////////////////////
+// wxGPTaskExecutor
+//////////////////////////////////////////////////////////////////////////////
+
+wxGPTaskExecutor::wxGPTaskExecutor() : ITrackCancel()
+{
+    SetProgressor(this);
+}
+
+wxGPTaskExecutor::~wxGPTaskExecutor()
+{
+}
+
+bool wxGPTaskExecutor::OnExecute(wxString sToolName, wxString sToolParameters)
+{
+	//create output stream
+    m_StdOutFile.Attach(stdout);
+	wxFFileOutputStream OutStream(m_StdOutFile);
+	m_pOutTxtStream = new wxTextOutputStream(OutStream);
+
+    wxGISAppConfig* pConfig;
+#ifdef WXGISPORTABLE
+    pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, true);
+#else
+    pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, false);
+#endif
+    wxXmlNode* pToolsChild = pConfig->GetConfigNode(wxT("tools"), false, true);
+    if(!pToolsChild)
+    {
+        PutMessage(wxString(_("Get wxGISToolbox config failed!")), -1, enumGISMessageErr);
+        return false;
+    }
+
+    //PutMessage(wxString::Format(_("tool - %s params - %s"), sToolName.c_str(), sToolParameters.c_str()), -1, enumGISMessageInfo);
+
+
+    wxGxCatalog GxCatalog;
+    GxCatalog.Init();
+
+    wxGISGPToolManager GISGPToolManager(pToolsChild);
+    IGPTool* pTool = GISGPToolManager.GetTool(sToolName, &GxCatalog);
+    if(!pTool)
+    {
+        PutMessage(wxString::Format(_("Get Geoprocessing tool %s failed!"), sToolName.c_str()), -1, enumGISMessageErr);
+        return false;
+    }
+
+    if(!pTool->SetFromString(sToolParameters))
+    {
+        PutMessage(wxString::Format(_("Set Geoprocessing tool %s parameters failed!"), sToolName.c_str()), -1, enumGISMessageErr);
+        return false;
+    }
+
+    if(!pTool->Validate())
+    {
+        PutMessage(wxString::Format(_("Geoprocessing tool %s validation failed!"), sToolName.c_str()), -1, enumGISMessageErr);
+        return false;
+    }
+
+    bool bResult = pTool->Execute(this);
+
+    wxDELETE(m_pOutTxtStream)
+    return bResult;
+}
+
+void wxGPTaskExecutor::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType)
+{
+    wxString sOut;
+
+    switch(nType)
+    {
+    case enumGISMessageErr:
+        sOut.Append(wxT("ERR: "));
+        break;
+    case enumGISMessageWarning:
+        sOut.Append(wxT("WARN: "));
+        break;
+    case enumGISMessageQuestion:
+    case enumGISMessageUnk:
+    case enumGISMessageNorm:
+    case enumGISMessageInfo:
+    case enumGISMessageTitle:
+    case enumGISMessageOK:
+        sOut.Append(wxT("INFO: "));
+        break;
+    default:
+        break;
+    }
+    sOut.Append(sMessage);
+    sOut.Append(wxT("\r\n"));
+    m_pOutTxtStream->WriteString(sOut);
+	m_StdOutFile.Flush();
+}
+
+void wxGPTaskExecutor::SetValue(int value)
+{
+    m_nValue = value;
+    m_pOutTxtStream->WriteString(wxString::Format(wxT("DONE: %d%%\r"), value));
+	m_StdOutFile.Flush();
+}

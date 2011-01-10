@@ -73,7 +73,8 @@ bool wxGxTableDataset::Delete(void)
 void wxGxTableDataset::Detach(void)
 {
 	IGxObject::Detach();
-    wsDELETE(m_pwxGISDataset);
+    if(m_pwxGISDataset)
+        m_pwxGISDataset->Release();
 }
 
 wxString wxGxTableDataset::GetBaseName(void)
@@ -393,7 +394,8 @@ wxString wxGxRasterDataset::GetCategory(void)
 void wxGxRasterDataset::Detach(void)
 {
 	IGxObject::Detach();
-    wsDELETE(m_pwxGISDataset);
+    if(m_pwxGISDataset)
+        m_pwxGISDataset->Release();
 }
 
 wxGISDataset* wxGxRasterDataset::GetDataset(void)

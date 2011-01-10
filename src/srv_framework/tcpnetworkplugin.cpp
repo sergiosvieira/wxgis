@@ -150,16 +150,8 @@ bool wxTCPNetworkPlugin::Start(IServerApplication* pApp, wxXmlNode* pConfig)
 
 	//Start Connect Thread
 	m_pWaitThread = new wxTCPConnectThread(this);
-    if ( m_pWaitThread->Create() != wxTHREAD_NO_ERROR )
-    {
-		wxLogError(_("wxTCPNetworkPlugin: Can't create Wait Connect Thread!"));
+	if(!CreateAndRunThread(m_pWaitThread, wxT("wxTCPNetworkPlugin"), _("Wait Connect")))
 		return false;
-    }
-	if(m_pWaitThread->Run() != wxTHREAD_NO_ERROR )
-    {
-		wxLogError(_("wxTCPNetworkPlugin: Can't run Wait Connect Thread!"));
-		return false;
-    }
     wxLogMessage(_("wxTCPNetworkPlugin: Wait Connect Thread 0x%lx started (priority = %u)."), m_pWaitThread->GetId(), m_pWaitThread->GetPriority());
 
     wxLogMessage(_("wxTCPNetworkPlugin: Plugin is started..."));

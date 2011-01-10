@@ -338,11 +338,11 @@ int wxGISAcceleratorTable::GetKeyCode(wxString sKeyCode)
 WXDWORD wxGISAcceleratorTable::GetFlags(wxString sFlags)
 {
 	WXDWORD Flags(0);
-	wxStringTokenizer tkz(sFlags, wxString(wxT("|")), false );
+	wxStringTokenizer tkz(sFlags, wxString(wxT("|")), wxTOKEN_RET_EMPTY );
 	while ( tkz.HasMoreTokens() )
 	{
 		wxString token = tkz.GetNextToken();
-		token.Replace(wxT("|"), wxT(""));	
+		//token.Replace(wxT("|"), wxT(""));	
 		token.MakeUpper();
 		// process token here
 		if(token == wxString(wxT("NORMAL")))

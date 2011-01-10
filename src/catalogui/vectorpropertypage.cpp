@@ -30,7 +30,7 @@ wxGISVectorPropertyPage::wxGISVectorPropertyPage(void) : m_pDataset(NULL)
 {
 }
 
-wxGISVectorPropertyPage::wxGISVectorPropertyPage(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+wxGISVectorPropertyPage::wxGISVectorPropertyPage(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name) : m_pDataset(NULL)
 {
     Create(pGxDataset, parent, id, pos, size, style, name);
 }
@@ -176,8 +176,9 @@ void wxGISVectorPropertyPage::FillGrid(void)
                 for( int iAttr = 0; iAttr < poDefn->GetFieldCount(); iAttr++ )
                 {
                     OGRFieldDefn    *poField = poDefn->GetFieldDefn( iAttr );
-                    wxPGId pfielid = AppendProperty(pfieldsid, new wxStringProperty(_("Name"), wxPG_LABEL, wxString::Format(wxT("%s (%s)"), wgMB2WX(poField->GetNameRef()), wgMB2WX(poField->GetFieldTypeName( poField->GetType() ))) ));  
-                    AppendProperty(pfielid, new wxStringProperty(_("Type"), wxPG_LABEL, wgMB2WX(poField->GetFieldTypeName( poField->GetType() ))) );  
+                    wxString sFieldTypeName = wgMB2WX( poField->GetFieldTypeName( poField->GetType() ) );
+                    wxPGId pfielid = AppendProperty(pfieldsid, new wxStringProperty(_("Name"), wxPG_LABEL, wxString::Format(wxT("%s (%s)"), wgMB2WX(poField->GetNameRef()), sFieldTypeName.c_str()) ));  
+                    AppendProperty(pfielid, new wxStringProperty(_("Type"), wxPG_LABEL, sFieldTypeName ) );  
                     AppendProperty(pfielid, new wxIntProperty(_("Width"), wxPG_LABEL, poField->GetWidth()) );  
                     AppendProperty(pfielid, new wxIntProperty(_("Precision"), wxPG_LABEL, poField->GetPrecision()) ); 
                     OGRJustification Just = poField->GetJustify();
@@ -185,10 +186,10 @@ void wxGISVectorPropertyPage::FillGrid(void)
                     switch(Just)
                     {
                     case OJLeft:
-                        sJust = _("Left");
+                        sJust = wxString(_("Left"));
                         break;
                     case OJRight:
-                        sJust = _("Right");
+                        sJust = wxString(_("Right"));
                         break;
                     }
                     AppendProperty(pfielid, new wxStringProperty(_("Justify"), wxPG_LABEL, sJust) ); 
