@@ -170,27 +170,6 @@ bool wxGISGPOrthoCorrectTool::Validate(void)
     return true;
 }
 
-int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pData)
-{
-    bool bCancel = false;
-    ITrackCancel* pTrackCancel = (ITrackCancel*)pData;
-
-    if(pTrackCancel)
-    {
-        if( pszMessage )
-        {
-            wxString soMsg(wgMB2WX(pszMessage));
-            if(!soMsg.IsEmpty())
-                pTrackCancel->PutMessage( wgMB2WX(pszMessage), -1, enumGISMessageNorm );
-        }
-        IProgressor* pRogress = pTrackCancel->GetProgressor();
-        if( pRogress )
-            pRogress->SetValue((int) (dfComplete * 100));
-        bCancel = !pTrackCancel->Continue();
-    }
-    return !bCancel;
-}
-
 bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
 {
     if(!Validate())
@@ -382,7 +361,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     //    (int *) CPLMalloc(sizeof(int) * psWarpOptions->nBandCount );
     //psWarpOptions->panDstBands[0] = 1;
 
-    psWarpOptions->pfnProgress = OvrProgress;
+    psWarpOptions->pfnProgress = ExecToolProgress;
     psWarpOptions->pProgressArg = (void*)pTrackCancel;
 
     // Establish reprojection transformer.

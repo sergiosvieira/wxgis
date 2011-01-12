@@ -189,13 +189,13 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 
     wxXmlNode* pChildNode = pRoot->GetChildren();
 
-    wxStringTokenizer tkz(sPath.Lower(), wxString(wxT("/")), false );
+    wxStringTokenizer tkz(sPath.Lower(), wxString(wxT("/")), wxTOKEN_RET_EMPTY );
 	wxString token, sChildName;
 	while ( tkz.HasMoreTokens() )
 	{
         token = tkz.GetNextToken();
-		if(tkz.HasMoreTokens())
-			token = token.RemoveLast();
+		//if(tkz.HasMoreTokens())
+		//	token = token.RemoveLast();
         token.MakeLower();
         while(pChildNode)
         {
@@ -245,14 +245,14 @@ wxXmlNode* wxGISConfig::CreateConfigNode(wxGISEnumConfigKey Key, wxString sPath,
 
 	wxXmlNode* pChildNode = pRoot->GetChildren();
 
-	wxStringTokenizer tkz(sPath, wxString(wxT("/")), false );
+	wxStringTokenizer tkz(sPath, wxString(wxT("/")), wxTOKEN_RET_EMPTY );
 	wxString token, sChildName;
 	bool bCreate(true);
 	while ( tkz.HasMoreTokens() )
 	{
         token = tkz.GetNextToken();
- 		if(tkz.HasMoreTokens())
-			token = token.RemoveLast();
+ 		//if(tkz.HasMoreTokens())
+			//token = token.RemoveLast();
         token.MakeLower();
 		bCreate = true;
         while(pChildNode)

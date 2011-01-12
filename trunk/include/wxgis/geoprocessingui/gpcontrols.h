@@ -3,7 +3,7 @@
  * Purpose:  controls classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -40,11 +40,9 @@
 
 #include  "wx/imaglist.h"
 
-/////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISDTBase
-///////////////////////////////////////////////////////////////////////////////
+/** \class wxGISDTBase gpcontrols.h
+    \brief The base class for tool dialog controls.
+*/
 class wxGISDTBase : public wxPanel
 {
 public:
@@ -62,9 +60,9 @@ protected:
 	wxImageList m_ImageList;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISTextCtrl
-///////////////////////////////////////////////////////////////////////////////
+/** \class wxGISTextCtrl gpcontrols.h
+    \brief The tool dialog control for text value representation.
+*/
 class wxGISTextCtrl : public wxTextCtrl
 {
 public:
@@ -77,9 +75,9 @@ protected:
     DECLARE_EVENT_TABLE()
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISDTPath
-///////////////////////////////////////////////////////////////////////////////
+/** \class wxGISDTPath gpcontrols.h
+    \brief The tool dialog control for catalog path value representation.
+*/
 class wxGISDTPath : public wxGISDTBase
 {
 public:
@@ -97,9 +95,9 @@ protected:
     DECLARE_EVENT_TABLE()
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISDTDigit
-///////////////////////////////////////////////////////////////////////////////
+/** \class wxGISDTDigit gpcontrols.h
+    \brief The tool dialog control for digit value representation.
+*/
 class wxGISDTDigit : public wxGISDTBase
 {
 public:
@@ -113,9 +111,9 @@ protected:
     IGxCatalog* m_pCatalog;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISDTChoice
-///////////////////////////////////////////////////////////////////////////////
+/** \class wxGISDTChoice gpcontrols.h
+    \brief The tool dialog control for choice value representation.
+*/
 class wxGISDTChoice : public wxGISDTBase
 {
     enum
@@ -131,5 +129,27 @@ public:
     virtual void OnChoice(wxCommandEvent& event);
 protected:
 	wxChoice* m_choice;
+DECLARE_EVENT_TABLE()
+};
+
+/** \class wxGISDTBool gpcontrols.h
+    \brief The tool dialog control for bool value representation.
+*/
+class wxGISDTBool : public wxGISDTBase
+{
+    enum
+	{
+		ID_CHECK = wxID_HIGHEST + 3606
+	};
+public:
+	wxGISDTBool( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+	virtual ~wxGISDTBool();
+//events
+    virtual bool Validate(void);
+    virtual void Update(void);
+    virtual void OnClick( wxCommandEvent& event );
+protected:
+    wxCheckBox* m_pCheckBox;
+    IGxCatalog* m_pCatalog;
 DECLARE_EVENT_TABLE()
 };

@@ -3,7 +3,7 @@
  * Purpose:  wxGISRasterPropertyPage class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -521,6 +521,15 @@ void wxGISRasterPropertyPage::OnPropertyGridButtonClick ( wxCommandEvent& )
     wxPGProperty* prop = m_pg->GetSelectedProperty();
     if (!prop )
         return;
+    wxString sName = m_pg->GetPropertyName(prop);        
+    wxString sToolName;
+    if(sName.Cmp(STAT_TXT) == 0)//comp stats tool
+        sToolName = wxString(wxT("comp_stats"));
+    else if(sName.Cmp(OVR_TXT) == 0)//create ovr tool
+        sToolName = wxString(wxT("create_ovr"));
+    else
+        return;
+
     //create/get tool mngr
     IGxObjectContainer* pRootContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
     if(!pRootContainer)
@@ -533,12 +542,6 @@ void wxGISRasterPropertyPage::OnPropertyGridButtonClick ( wxCommandEvent& )
         return; 
     }
 
-    wxString sName = m_pg->GetPropertyName(prop);        
-    wxString sToolName;
-    if(sName.Cmp(STAT_TXT) == 0)//calc stats tool
-        sToolName = wxString(wxT("calc_stats"));
-    else if(sName.Cmp(OVR_TXT) == 0)//create ovr tool
-        sToolName = wxString(wxT("create_ovr"));
 
 	IGPTool* pTool = pToolManagerUI->GetGPTool(sToolName);
 	if(!pTool)

@@ -3,7 +3,7 @@
  * Purpose:  controls classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -546,5 +546,64 @@ void wxGISDTChoice::OnChoice(wxCommandEvent& event)
         poGPStringDomain->SetSelString(nPos);
     }
     m_pParam->SetValue(sData);
+    m_pParam->SetAltered(true);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISDTBool
+///////////////////////////////////////////////////////////////////////////////
+BEGIN_EVENT_TABLE(wxGISDTBool, wxGISDTBase)
+	EVT_CHOICE(ID_CHECK, wxGISDTBool::OnClick)
+END_EVENT_TABLE()
+
+wxGISDTBool::wxGISDTBool( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxGISDTBase( pParam, parent, id, pos, size, style )
+{
+    m_pCatalog = pCatalog;
+	wxFlexGridSizer* fgSizer1;
+	fgSizer1 = new wxFlexGridSizer( 2, 2, 0, 0 );
+	fgSizer1->AddGrowableCol( 1 );
+	fgSizer1->SetFlexibleDirection( wxBOTH );
+	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+
+    m_StateBitmap = new wxStaticBitmap( this, wxID_ANY, m_pParam->GetParameterType() == enumGISGPParameterTypeRequired ? m_ImageList.GetIcon(4) : wxNullBitmap , wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer1->Add( m_StateBitmap, 0, wxALL, 5 );
+
+    m_pCheckBox = new wxCheckBox( this, ID_CHECK, m_pParam->GetParameterType() == enumGISGPParameterTypeOptional ? m_pParam->GetDisplayName() + _(" (optional)") : m_pParam->GetDisplayName(), wxDefaultPosition, wxDefaultSize );
+    m_pCheckBox->SetValue(pParam->GetValue());
+	fgSizer1->Add( m_pCheckBox, 1, wxALL|wxEXPAND, 5 );
+
+	m_bitmap = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer1->Add( m_bitmap, 0, wxALL, 5 );
+
+	this->SetSizer( fgSizer1 );
+	this->Layout();
+}
+
+wxGISDTBool::~wxGISDTBool()
+{
+}
+
+bool wxGISDTBool::Validate(void)
+{
+    if(m_pParam->GetHasBeenValidated())
+        return true;
+
+    m_pParam->SetIsValid(true);
+    m_pParam->SetMessage(wxGISEnumGPMessageOk);
+    m_pParam->SetAltered(true);
+    return true;
+}
+
+void wxGISDTBool::Update(void)
+{
+    m_pCheckBox->SetValue(m_pParam->GetValue());
+    SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
+    //Validate();
+}
+
+void wxGISDTBool::OnClick(wxCommandEvent& event)
+{ 
+    event.Skip(); 
+    m_pParam->SetValue(m_pCheckBox->GetValue());
     m_pParam->SetAltered(true);
 }

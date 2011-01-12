@@ -99,7 +99,7 @@ public:
 	wxGISDataset(wxString sPath) : IPointer()
     {
         m_sPath = sPath;
-        m_sPath.Replace(wxT("\\"), wxT("/"));
+        //m_sPath.Replace(wxT("\\"), wxT("/"));    //bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
     };
 	virtual ~wxGISDataset(void){ };
 	virtual wxGISEnumDatasetType GetType(void){return m_nType;};

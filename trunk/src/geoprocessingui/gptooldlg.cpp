@@ -3,7 +3,7 @@
  * Purpose:  tool dialog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -109,7 +109,15 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPTool* pTool, 
                     m_pControlsArray.push_back(poChoice);
                 }
                 break;
+            case enumGISGPParamDTBool:
+                {
+                    wxGISDTBool* poCheck = new wxGISDTBool(pParam, m_pTool->GetCatalog(), m_tools);
+                    bSizer4->Add( poCheck, 0, wxEXPAND, 5 );
+                    m_pControlsArray.push_back(poCheck);
+                }
+                break;
             default:
+                m_pControlsArray.push_back(NULL);
                 break;
             }
         }
@@ -296,7 +304,7 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
             nNonValid++;
         if(pParam->GetHasBeenValidated())
             continue;
-        if(m_pControlsArray[i])
+        if(i < m_pControlsArray.size() && m_pControlsArray[i])
         {
             if(bIsValid)
                 m_pControlsArray[i]->Validate();
