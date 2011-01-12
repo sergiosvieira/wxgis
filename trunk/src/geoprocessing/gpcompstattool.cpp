@@ -130,7 +130,7 @@ bool wxGISGPCompStatTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("Source object is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
-    wxGISRasterDataset* pSrcDataSet = dynamic_cast<wxGISRasterDataset*>(pGxDataset->GetDataset());
+    wxGISRasterDataset* pSrcDataSet = dynamic_cast<wxGISRasterDataset*>(pGxDataset->GetDataset(false));
     if(!pSrcDataSet)
     {
         //add messages to pTrackCancel
@@ -153,13 +153,25 @@ bool wxGISGPCompStatTool::Execute(ITrackCancel* pTrackCancel)
 
     for(int nBand = 0; nBand < poGDALDataset->GetRasterCount(); nBand++ )
     {
-        double      dfMin, dfMax, dfMean, dfStdDev;
+        double      dfMin(0), dfMax(255), dfMean(127), dfStdDev(2);
         CPLErr      eErr;
 
         if(pTrackCancel)
             pTrackCancel->PutMessage(wxString::Format(_("Proceed band %d"), nBand + 1), -1, enumGISMessageInfo);
         GDALRasterBand* pBand = poGDALDataset->GetRasterBand(nBand + 1);
-        eErr = pBand->ComputeStatistics(bApproxOK, NULL, NULL, NULL, NULL, ExecToolProgress, (void*)pTrackCancel);   
+        eErr = pBand->ComputeStatistics(bApproxOK, &dfMin, &dfMax, &dfMean, &dfStdDev, ExecToolProgress, (void*)pTrackCancel);   
+	    if(eErr != CE_None)
+	    {
+            if(pTrackCancel)
+            {
+                const char* pszErr = CPLGetLastErrorMsg();
+                pTrackCancel->PutMessage(wxString::Format(_("ComputeStatistics failed! GDAL error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
+            }
+            wsDELETE(pSrcDataSet);
+            return false;
+        }
+        pTrackCancel->PutMessage(wxString::Format(_("Band %d: min - %.2f, max - %.2f, mean - %.2f, StdDev - %.2f"), nBand + 1, dfMin, dfMax, dfMean, dfStdDev), -1, enumGISMessageNorm);
+        eErr = pBand->SetStatistics(dfMin, dfMax, dfMean, dfStdDev);   
 	    if(eErr != CE_None)
 	    {
             if(pTrackCancel)

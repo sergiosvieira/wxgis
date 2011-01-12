@@ -3,7 +3,7 @@
  * Purpose:  datasource header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -111,12 +111,15 @@ public:
     virtual wxString GetName(void){return wxEmptyString;};
 	virtual void Close(void){};
 	virtual OGRSpatialReference* GetSpatialReference(void){return NULL;};
+	virtual bool IsOpened(void){return m_bIsOpened;};
+	virtual bool IsReadOnly(void){return m_bIsReadOnly;};
 protected:
 	wxString m_sPath;
     wxCriticalSection m_CritSect;
     int m_nSubType;
 	wxGISEnumDatasetType m_nType;
 	bool m_bIsOpened;
+	bool m_bIsReadOnly;
 };
 
 class wxGISFeatureSet

@@ -139,7 +139,7 @@ class wxGISDTBool : public wxGISDTBase
 {
     enum
 	{
-		ID_CHECK = wxID_HIGHEST + 3606
+		ID_CHECKBOOL = wxID_HIGHEST + 3606
 	};
 public:
 	wxGISDTBool( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );

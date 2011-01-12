@@ -3,7 +3,7 @@
  * Purpose:  wxGISVectorPropertyPage class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ bool wxGISVectorPropertyPage::Create(wxGxFeatureDataset* pGxDataset, wxWindow* p
 
     m_pGxDataset = pGxDataset;
 
-    m_pDataset = dynamic_cast<wxGISFeatureDataset*>(m_pGxDataset->GetDataset());
+    m_pDataset = dynamic_cast<wxGISFeatureDataset*>(m_pGxDataset->GetDataset(true));
     if(!m_pDataset)
         return false;
 

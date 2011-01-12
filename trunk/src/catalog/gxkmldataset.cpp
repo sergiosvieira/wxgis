@@ -3,7 +3,7 @@
  * Purpose:  wxGxKMLDataset class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -191,7 +191,7 @@ bool wxGxKMLDataset::DeleteChild(IGxObject* pChild)
 	return true;
 }
 
-wxGISDataset* wxGxKMLDataset::GetDataset(void)
+wxGISDataset* wxGxKMLDataset::GetDataset(bool bReadOnly)
 {
     LoadChildren();
 	if(m_pwxGISDataset == NULL)
@@ -227,7 +227,7 @@ wxString wxGxKMLSubDataset::GetCategory(void)
 	return wxString(_("KML Feature class"));
 }
 
-wxGISDataset* wxGxKMLSubDataset::GetDataset(void)
+wxGISDataset* wxGxKMLSubDataset::GetDataset(bool bReadOnly)
 {
 	if(m_pwxGISDataset == NULL)
         return NULL;

@@ -56,22 +56,11 @@ void wxGPProcess::ProcessInput(wxString sInputData)
 		    long dMSec = double(Elapsed.GetMilliseconds().ToDouble() * nPercentR) / nPercent;	
 		    wxTimeSpan Remains = wxTimeSpan(0,0,0,dMSec);
 		    m_dtEstEnd = m_dtBeg + Remains;
-		    sTxt = wxString(_("Remains ")) + Remains.Format(_("%H hours %M min. %S sec."));
+		    sTxt = wxString(_("Remains ")) + Remains.Format(_("%H hour(s) %M min. %S sec."));
         }
 		if(m_pProgressor)
 			m_pProgressor->SetValue(nPercent);
 
-		//span = m_dtEstEnd - wxDateTime::Now();
-		//int nMinutes = span.GetMinutes();
-		//wxString sTxt = wxString(_("Remains ")) + Remains.Format(_("%H hours %M min. %S sec."));
-		//if(nMinutes > 60)
-		//{
-		//	int nHours = (double)nMinutes / 60;
-		//	nMinutes = nMinutes % 60;
-		//	sTxt = wxString::Format(_("Remains %d hour(s) %d minute(s)"), nHours, nMinutes);
-		//}
-		//else
-		//	sTxt = wxString::Format(_("Remains %d minute(s)"), nMinutes);
 		if(m_pTrackCancel)
 			m_pTrackCancel->PutMessage(sTxt, -1, enumGISMessageTitle);
 		return;

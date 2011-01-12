@@ -3,7 +3,7 @@
  * Purpose:  wxGxDatasetUI classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ void wxGxFeatureDatasetUI::EditProperties(wxWindow *parent)
     wxGISVectorPropertyPage* VectorPropertyPage = new wxGISVectorPropertyPage(this, pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(VectorPropertyPage, VectorPropertyPage->GetPageName());
 
-	wxGISDataset* pDset = GetDataset();
+	wxGISDataset* pDset = GetDataset(true);
 	if(pDset)
 	{
 		wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(pDset->GetSpatialReference(), pParentWnd);
@@ -112,9 +112,9 @@ void wxGxFeatureDatasetUI::EditProperties(wxWindow *parent)
     PropertySheetDialog.ShowModal();
 }
 
-wxGISDataset* wxGxFeatureDatasetUI::GetDataset(void)
+wxGISDataset* wxGxFeatureDatasetUI::GetDataset(bool bReadOnly)
 {
-    wxGISDataset* pOut = wxGxFeatureDataset::GetDataset();
+    wxGISDataset* pOut = wxGxFeatureDataset::GetDataset(bReadOnly);
     if(!pOut)
     {
         const char* err = CPLGetLastErrorMsg();
@@ -165,7 +165,7 @@ void wxGxRasterDatasetUI::EditProperties(wxWindow *parent)
 
     wxGISRasterPropertyPage* RasterPropertyPage = new wxGISRasterPropertyPage(this, m_pCatalog, pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(RasterPropertyPage, RasterPropertyPage->GetPageName());
-	wxGISDataset* pDset = GetDataset();
+	wxGISDataset* pDset = GetDataset(true);
 	if(pDset)
 	{
 		wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(pDset->GetSpatialReference(), pParentWnd);
@@ -187,9 +187,9 @@ bool wxGxRasterDatasetUI::Invoke(wxWindow* pParentWnd)
 }
 
 
-wxGISDataset* wxGxRasterDatasetUI::GetDataset(void)
+wxGISDataset* wxGxRasterDatasetUI::GetDataset(bool bReadOnly)
 {
-    wxGISDataset* pOut = wxGxRasterDataset::GetDataset();
+    wxGISDataset* pOut = wxGxRasterDataset::GetDataset(bReadOnly);
     if(!pOut)
     {
         const char* err = CPLGetLastErrorMsg();

@@ -552,8 +552,8 @@ void wxGISDTChoice::OnChoice(wxCommandEvent& event)
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISDTBool
 ///////////////////////////////////////////////////////////////////////////////
-BEGIN_EVENT_TABLE(wxGISDTBool, wxGISDTBase)
-	EVT_CHOICE(ID_CHECK, wxGISDTBool::OnClick)
+BEGIN_EVENT_TABLE(wxGISDTBool, wxPanel)
+	EVT_CHECKBOX(ID_CHECKBOOL, wxGISDTBool::OnClick)
 END_EVENT_TABLE()
 
 wxGISDTBool::wxGISDTBool( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxGISDTBase( pParam, parent, id, pos, size, style )
@@ -568,7 +568,7 @@ wxGISDTBool::wxGISDTBool( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* 
     m_StateBitmap = new wxStaticBitmap( this, wxID_ANY, m_pParam->GetParameterType() == enumGISGPParameterTypeRequired ? m_ImageList.GetIcon(4) : wxNullBitmap , wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( m_StateBitmap, 0, wxALL, 5 );
 
-    m_pCheckBox = new wxCheckBox( this, ID_CHECK, m_pParam->GetParameterType() == enumGISGPParameterTypeOptional ? m_pParam->GetDisplayName() + _(" (optional)") : m_pParam->GetDisplayName(), wxDefaultPosition, wxDefaultSize );
+    m_pCheckBox = new wxCheckBox( this, ID_CHECKBOOL, m_pParam->GetParameterType() == enumGISGPParameterTypeOptional ? m_pParam->GetDisplayName() + _(" (optional)") : m_pParam->GetDisplayName(), wxDefaultPosition, wxDefaultSize );
     m_pCheckBox->SetValue(pParam->GetValue());
 	fgSizer1->Add( m_pCheckBox, 1, wxALL|wxEXPAND, 5 );
 

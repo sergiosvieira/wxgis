@@ -3,7 +3,7 @@
  * Purpose:  RasterDataset class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 wxGISRasterDataset::wxGISRasterDataset(wxString sPath, wxGISEnumRasterDatasetType nType) : wxGISDataset(sPath), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false), m_bHasStats(false), m_poMainDataset(NULL), m_poDataset(NULL), m_nBandCount(0)
 {
 	m_bIsOpened = false;
+    m_bIsReadOnly = true;
     m_nSubType = (int)nType;
 	m_nType = enumGISRasterDataset;
 }
@@ -42,7 +43,11 @@ void wxGISRasterDataset::Close(void)
 	if(m_bIsOpened)
     {
 	    OSRDestroySpatialReference( m_pSpaRef );
+        m_pSpaRef = NULL;
 	    wxDELETE(m_psExtent);
+        m_bHasOverviews = false;
+        m_bHasStats = false;
+        m_nBandCount = 0;
         if(m_poMainDataset)
 		{
             GDALDereferenceDataset(m_poMainDataset);
@@ -56,6 +61,7 @@ void wxGISRasterDataset::Close(void)
 			m_poDataset = NULL;
 		}
 		m_bIsOpened = false;
+        m_bIsReadOnly = true;
     }
 }
 
@@ -161,7 +167,7 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
 	return false;
 }
 
-bool wxGISRasterDataset::Open(void)
+bool wxGISRasterDataset::Open(bool bReadOnly)
 {
 	if(m_bIsOpened)
 		return true;
@@ -169,12 +175,12 @@ bool wxGISRasterDataset::Open(void)
 	wxCriticalSectionLocker locker(m_CritSect);
 
 
-    m_poDataset = (GDALDataset *) GDALOpenShared( wgWX2MB(m_sPath), GA_ReadOnly );
+    m_poDataset = (GDALDataset *) GDALOpenShared( wgWX2MB(m_sPath), bReadOnly == true ? GA_ReadOnly : GA_Update );
     //bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
 	if( m_poDataset == NULL )
     {
         m_sPath.Replace(wxT("\\"), wxT("/"));
-        m_poDataset = (GDALDataset *) GDALOpenShared( wgWX2MB(m_sPath), GA_ReadOnly );
+        m_poDataset = (GDALDataset *) GDALOpenShared( wgWX2MB(m_sPath), bReadOnly == true ? GA_ReadOnly : GA_Update );
     }
 
     //m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath), GA_ReadOnly );
@@ -300,13 +306,14 @@ bool wxGISRasterDataset::Open(void)
 	}
 
 	m_bIsOpened = true;
+    m_bIsReadOnly = bReadOnly;
 	return true;
 }
 
 OGRSpatialReference* wxGISRasterDataset::GetSpatialReference(void)
 {
 	if(!m_bIsOpened)
-		if(!Open())
+		if(!Open(true))
 			return NULL;
 	if(m_pSpaRef)
 		return m_pSpaRef;

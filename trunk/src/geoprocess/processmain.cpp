@@ -166,6 +166,8 @@ bool wxGPTaskExecutor::OnExecute(wxString sToolName, wxString sToolParameters)
 
     bool bResult = pTool->Execute(this);
 
+    GxCatalog.Detach();
+
     wxDELETE(m_pOutTxtStream)
     return bResult;
 }
