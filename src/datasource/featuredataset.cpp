@@ -406,6 +406,13 @@ bool wxGISFeatureDataset::Open(int iLayer)
 	wxCriticalSectionLocker locker(m_CritSect);
 
     m_poDS = OGRSFDriverRegistrar::Open( wgWX2MB(m_sPath), FALSE );
+    //bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
+	if( m_poDS == NULL )
+	{
+        m_sPath.Replace(wxT("\\"), wxT("/"));
+        m_poDS = OGRSFDriverRegistrar::Open( wgWX2MB(m_sPath), FALSE );
+    }
+
 	if( m_poDS == NULL )
 	{
 		const char* err = CPLGetLastErrorMsg();

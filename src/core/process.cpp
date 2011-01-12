@@ -39,10 +39,13 @@ void *wxStreamReaderThread::Entry()
   //  if(!m_pInTxtStream)
 		//return (ExitCode)-1;
 	wxTextInputStream InputStr(m_InStream);
-	while(!TestDestroy() && m_InStream.IsOk() && !m_InStream.Eof())
+	while(!TestDestroy())
     {
-		wxString line = InputStr.ReadLine();
-		m_pReader->ProcessInput(line);
+        if(m_InStream.IsOk() && !m_InStream.Eof())
+        {
+		    wxString line = InputStr.ReadLine();
+		    m_pReader->ProcessInput(line);
+        }
 		wxThread::Sleep(100);
     }
 	return NULL;

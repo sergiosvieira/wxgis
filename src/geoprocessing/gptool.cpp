@@ -25,15 +25,23 @@
 
 int CPL_STDCALL ExecToolProgress( double dfComplete, const char *pszMessage, void *pData)
 {
+    bool bCancel = false;
     ITrackCancel* pTrackCancel = (ITrackCancel*)pData;
-    if( pszMessage != NULL )
-        pTrackCancel->PutMessage(wgMB2WX(pszMessage), -1, enumGISMessageInfo);
 
-    IProgressor* pProgressor = pTrackCancel->GetProgressor();
-    if(pProgressor)
-        pProgressor->SetValue((int) (dfComplete*100));
-
-    return pTrackCancel->Continue() == true ? 1 : 0;
+    if(pTrackCancel)
+    {
+        if( pszMessage )
+        {
+            wxString soMsg(wgMB2WX(pszMessage));
+            if(!soMsg.IsEmpty())
+                pTrackCancel->PutMessage( wgMB2WX(pszMessage), -1, enumGISMessageNorm );
+        }
+        IProgressor* pRogress = pTrackCancel->GetProgressor();
+        if( pRogress )
+            pRogress->SetValue((int) (dfComplete * 100));
+        bCancel = !pTrackCancel->Continue();
+    }
+    return !bCancel;
 }
 
 

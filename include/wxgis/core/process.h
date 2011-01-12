@@ -52,13 +52,13 @@ class WXDLLIMPEXP_GIS_CORE wxGISProcess :
 public:
     wxGISProcess(wxString sCommand, IProcessParent* pParent);
     virtual ~wxGISProcess(void);
+    // IProcess
     virtual void OnTerminate(int pid, int status);
     virtual void OnStart(long nPID);
     virtual void OnCancel(void);
 	//IStreamReader
 	virtual void ProcessInput(wxString sInputData);
 protected:
-	wxDateTime m_dtBeg;
     IProcessParent* m_pParent;
 	wxStreamReaderThread* m_pReadThread;
 };

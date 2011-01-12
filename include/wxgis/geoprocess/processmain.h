@@ -57,4 +57,5 @@ protected:
     int m_nValue;
     wxTextOutputStream* m_pOutTxtStream;
     wxFFile m_StdOutFile;
+    wxString m_sPrevMsg;
 };

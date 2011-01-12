@@ -99,11 +99,23 @@ bool parse_commandline_parameters( int argc, char** argv )
 
 wxGPTaskExecutor::wxGPTaskExecutor() : ITrackCancel()
 {
+    //TODO: Config support
+	//GDAL
+    CPLSetConfigOption( "GDAL_CACHEMAX", "128" );
+
+	OGRRegisterAll();
+	GDALAllRegister();
+	//END GDAL
+
     SetProgressor(this);
 }
 
 wxGPTaskExecutor::~wxGPTaskExecutor()
 {
+	//GDAL
+	GDALDestroyDriverManager();
+	OGRCleanupAll();
+	//END GDAL
 }
 
 bool wxGPTaskExecutor::OnExecute(wxString sToolName, wxString sToolParameters)
@@ -160,6 +172,8 @@ bool wxGPTaskExecutor::OnExecute(wxString sToolName, wxString sToolParameters)
 
 void wxGPTaskExecutor::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType)
 {
+    if(m_sPrevMsg == sMessage)
+        return;
     wxString sOut;
 
     switch(nType)
@@ -185,10 +199,13 @@ void wxGPTaskExecutor::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMes
     sOut.Append(wxT("\r\n"));
     m_pOutTxtStream->WriteString(sOut);
 	m_StdOutFile.Flush();
+    m_sPrevMsg = sMessage;
 }
 
 void wxGPTaskExecutor::SetValue(int value)
 {
+    if(m_nValue == value)
+        return;
     m_nValue = value;
     m_pOutTxtStream->WriteString(wxString::Format(wxT("DONE: %d%%\r"), value));
 	m_StdOutFile.Flush();

@@ -47,24 +47,31 @@ void wxGPProcess::ProcessInput(wxString sInputData)
 	if( sInputData.StartsWith(wxT("DONE: "), &sRest) )
 	{
 		int nPercent = wxAtoi(sRest.Trim().Truncate(sRest.Len() - 1));
-		wxTimeSpan span = wxDateTime::Now() - m_dtBeg;//time left
-		double fMSec = span.GetMilliseconds().ToDouble() * 100 / nPercent;	
-		span = wxTimeSpan(0,0,0,fMSec);
-		m_dtEstEnd = m_dtBeg + span;
+		wxTimeSpan Elapsed = wxDateTime::Now() - m_dtBeg;//time left
+        wxString sTxt;
+        if(nPercent)
+        {
+            double nPercentR = 100 - nPercent;
+            //wxTimeSpan Remains = Elapsed * (nPercentR / nPercent);
+		    long dMSec = double(Elapsed.GetMilliseconds().ToDouble() * nPercentR) / nPercent;	
+		    wxTimeSpan Remains = wxTimeSpan(0,0,0,dMSec);
+		    m_dtEstEnd = m_dtBeg + Remains;
+		    sTxt = wxString(_("Remains ")) + Remains.Format(_("%H hours %M min. %S sec."));
+        }
 		if(m_pProgressor)
 			m_pProgressor->SetValue(nPercent);
 
-		span = m_dtEstEnd - wxDateTime::Now();
-		int nMinutes = span.GetMinutes();
-		wxString sTxt;
-		if(nMinutes > 60)
-		{
-			int nHours = (double)nMinutes / 60;
-			nMinutes = nMinutes % 60;
-			sTxt = wxString::Format(_("Remains %d hour(s) %d minute(s)"), nHours, nMinutes);
-		}
-		else
-			sTxt = wxString::Format(_("Remains %d minute(s)"), nMinutes);
+		//span = m_dtEstEnd - wxDateTime::Now();
+		//int nMinutes = span.GetMinutes();
+		//wxString sTxt = wxString(_("Remains ")) + Remains.Format(_("%H hours %M min. %S sec."));
+		//if(nMinutes > 60)
+		//{
+		//	int nHours = (double)nMinutes / 60;
+		//	nMinutes = nMinutes % 60;
+		//	sTxt = wxString::Format(_("Remains %d hour(s) %d minute(s)"), nHours, nMinutes);
+		//}
+		//else
+		//	sTxt = wxString::Format(_("Remains %d minute(s)"), nMinutes);
 		if(m_pTrackCancel)
 			m_pTrackCancel->PutMessage(sTxt, -1, enumGISMessageTitle);
 		return;
@@ -133,6 +140,8 @@ wxGISGPToolManager::~wxGISGPToolManager(void)
     wxGISConfig::DeleteNodeChildren(m_pToolsNode);
     for(std::map<wxString, TOOLINFO>::const_iterator pos = m_ToolsMap.begin(); pos != m_ToolsMap.end(); ++pos)
     {
+        if(pos->second.sClassName.IsEmpty())
+            continue;
         wxXmlNode* pNewNode = new wxXmlNode(m_pToolsNode, wxXML_ELEMENT_NODE, wxString(wxT("tool")));
 		pNewNode->AddProperty(wxT("object"), pos->second.sClassName);
 		pNewNode->AddProperty(wxT("name"), pos->first);
@@ -151,8 +160,10 @@ wxGISGPToolManager::~wxGISGPToolManager(void)
 
 IGPTool* wxGISGPToolManager::GetTool(wxString sToolName, IGxCatalog* pCatalog)
 {
+    if(sToolName.IsEmpty())
+        return NULL;
     std::map<wxString, TOOLINFO>::const_iterator it = m_ToolsMap.find(sToolName);
-    if(it != m_ToolsMap.end())
+    if(it != m_ToolsMap.end() && it->second.pTool)
     {
         if(!it->second.pTool->GetCatalog())
             it->second.pTool->SetCatalog(pCatalog);
@@ -256,6 +267,9 @@ void wxGISGPToolManager::OnFinish(IProcess* pProcess, bool bHasErrors)
             m_ProcessArray[nIndex].pTrackCancel->PutMessage(wxString::Format(_("An error occured while executing %s. Failed to execute (%s)."), m_ProcessArray[nIndex].pTool->GetName().c_str(), m_ProcessArray[nIndex].pTool->GetName().c_str()), -1, enumGISMessageErr);
             m_ProcessArray[nIndex].pTrackCancel->PutMessage(_("Error!"), -1, enumGISMessageTitle);
         }
+        
+        wxTimeSpan span = end - m_ProcessArray[nIndex].pProcess->GetStart();
+        m_ProcessArray[nIndex].pTrackCancel->PutMessage(wxString::Format(_("End Time: %s (Elapsed Time: %s)"), end.Format().c_str(), span.Format(_("%H hours %M min. %S sec.")).c_str()), -1, enumGISMessageInfo);
     }
 
     //remove from array

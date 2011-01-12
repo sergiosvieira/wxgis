@@ -288,7 +288,9 @@ public:
 	virtual void SetState(wxGISEnumTaskStateType nState){m_nState = nState;};
 	virtual wxGISEnumTaskStateType GetState(void){return m_nState;};
 	virtual wxString GetCommand(void){return m_sCommand;};
+    virtual wxDateTime GetStart(void){return m_dtBeg;};
 protected:
+	wxDateTime m_dtBeg;
     wxGISEnumTaskStateType m_nState;
     wxString m_sCommand;
 };

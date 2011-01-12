@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
- * Purpose:  create overviews tools.
+ * Purpose:  compute raster statistics tools.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -23,18 +23,18 @@
 #include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/geoprocessing/gptool.h"
 
-/** \class wxGISGPCreateOverviewsTool gpcreateovrtool.h
-    \brief The geoprocessing tool create raster overviews
+/** \class wxGISGPCreateStatTool gpcompstattool.h
+    \brief The geoprocessing tool create raster statistics
 */
 
-class WXDLLIMPEXP_GIS_GP wxGISGPCreateOverviewsTool : 
+class WXDLLIMPEXP_GIS_GP wxGISGPCompStatTool : 
     public wxGISGPTool
 {
-   DECLARE_DYNAMIC_CLASS(wxGISGPCreateOverviewsTool)
+   DECLARE_DYNAMIC_CLASS(wxGISGPCompStatTool)
 
 public:
-    wxGISGPCreateOverviewsTool(void);
-    ~wxGISGPCreateOverviewsTool(void);
+    wxGISGPCompStatTool(void);
+    ~wxGISGPCompStatTool(void);
     //IGPTool
     virtual wxString GetDisplayName(void);
     virtual wxString GetName(void);
