@@ -45,7 +45,7 @@ public:
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
 	//IGxDataset
-	virtual wxGISDataset* GetDataset(void);
+	virtual wxGISDataset* GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISTableDataset;};
     virtual int GetSubType(void){return m_type;};
     virtual wxString GetPath(void){return m_sPath;};
@@ -80,7 +80,7 @@ public:
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
 	//IGxDataset
-	virtual wxGISDataset* GetDataset(void);
+	virtual wxGISDataset* GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
     virtual int GetSubType(void){return (int)m_type;};
     virtual wxString GetPath(void){return m_sPath;};
@@ -115,7 +115,7 @@ public:
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
 	//IGxDataset
-	virtual wxGISDataset* GetDataset(void);
+	virtual wxGISDataset* GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
     virtual int GetSubType(void){return (int)m_type;};
     virtual wxString GetPath(void){return m_sPath;};

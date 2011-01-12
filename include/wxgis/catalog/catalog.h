@@ -3,7 +3,7 @@
  * Purpose:  Catalog main header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -214,7 +214,7 @@ class IGxDataset
 {
 public:
 	virtual ~IGxDataset(void){};
-	virtual wxGISDataset* GetDataset(void) = 0;
+	virtual wxGISDataset* GetDataset(bool bReadOnly) = 0;
 	virtual wxGISEnumDatasetType GetType(void) = 0;
 	virtual int GetSubType(void) = 0;
     virtual wxString GetPath(void) = 0;

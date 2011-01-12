@@ -3,7 +3,7 @@
  * Purpose:  Geoprocessing Main Commands class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -264,7 +264,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
                         wxString sPath = dlg.GetPath();
                         wxString sName = dlg.GetName();
 
-                        wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(DatasetArray[0]->GetDataset());
+                        wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(DatasetArray[0]->GetDataset(true));
                         if(!pDSet)
                         {
                             wxMessageBox(wxString(_("The dataset is empty")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
@@ -498,7 +498,7 @@ EXIT:
                             if(nSubType == nNewSubType)
                                 continue;
 
-                            wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(DatasetArray[i]->GetDataset());
+                            wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(DatasetArray[i]->GetDataset(true));
                             if(!pDSet)
                             {
                                 ProgressDlg.SetText1(wxString::Format(_("The %d dataset is empty"), i));

@@ -54,7 +54,7 @@ bool wxGISRasterPropertyPage::Create(wxGxRasterDataset* pGxDataset, IGxCatalog* 
     m_pGxDataset = pGxDataset;
     m_pCatalog = pCatalog;
 
-    m_pDataset = dynamic_cast<wxGISRasterDataset*>(m_pGxDataset->GetDataset());
+    m_pDataset = dynamic_cast<wxGISRasterDataset*>(m_pGxDataset->GetDataset(true));
     if(!m_pDataset)
         return false;
 
@@ -118,6 +118,8 @@ void wxGISRasterPropertyPage::FillGrid(void)
     //reset grid
     m_pg->Clear();
 
+    m_pDataset->Open(true);
+
     wxString sTmp;
     //fill propertygrid
     wxPGId pid = AppendProperty( new wxPropertyCategory(_("Data Source")) );
@@ -173,6 +175,11 @@ void wxGISRasterPropertyPage::FillGrid(void)
         GDALDriver* pDrv = poGDALDataset->GetDriver();
 	    sTmp = sTmp.Format(wxT("%s(%s)"), wgMB2WX(pDrv->GetMetadataItem( GDAL_DMD_LONGNAME )), wgMB2WX(pDrv->GetDescription()) );
         AppendProperty(pid, new wxStringProperty(_("Driver"), wxPG_LABEL, sTmp) );  
+//char **papszMetadata = poDriver->GetMetadata();
+//    if( CSLFetchBoolean( papszMetadata, GDAL_DCAP_CREATE, FALSE ) )
+//        printf( "Driver %s supports Create() method.\n", pszFormat );
+//    if( CSLFetchBoolean( papszMetadata, GDAL_DCAP_CREATECOPY, FALSE ) )
+//        printf( "Driver %s supports CreateCopy() method.\n", pszFormat );
     }
 
 
@@ -561,6 +568,7 @@ void wxGISRasterPropertyPage::OnPropertyGridButtonClick ( wxCommandEvent& )
     pParam->SetValue(wxVariant(m_pGxDataset->GetFullName()));
 
 	pToolManagerUI->OnPrepareTool(this, pTool, static_cast<IGPCallBack*>(this), true);
+    m_pDataset->Close();
 }
 
 void wxGISRasterPropertyPage::OnFinish(bool bHasErrors, IGPTool* pTool)

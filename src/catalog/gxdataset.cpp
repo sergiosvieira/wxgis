@@ -3,7 +3,7 @@
  * Purpose:  wxGxDataset class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ wxGxTableDataset::~wxGxTableDataset(void)
 
 bool wxGxTableDataset::Delete(void)
 {
-    wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset());
+    wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset(true));
     if(!pDSet)
         return false;
 
@@ -74,7 +74,9 @@ void wxGxTableDataset::Detach(void)
 {
 	IGxObject::Detach();
     if(m_pwxGISDataset)
-        m_pwxGISDataset->Release();
+        if(m_pwxGISDataset->Release() == 0)
+            m_pwxGISDataset = NULL;
+
 }
 
 wxString wxGxTableDataset::GetBaseName(void)
@@ -86,7 +88,7 @@ wxString wxGxTableDataset::GetBaseName(void)
 
 bool wxGxTableDataset::Rename(wxString NewName)
 {
-    wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset());
+    wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset(true));
     if(!pDSet)
         return false;
 	if(pDSet->Rename(NewName))
@@ -108,7 +110,7 @@ bool wxGxTableDataset::Rename(wxString NewName)
 	}	
 }
 
-wxGISDataset* wxGxTableDataset::GetDataset(void)
+wxGISDataset* wxGxTableDataset::GetDataset(bool bReadOnly)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
@@ -198,7 +200,7 @@ bool wxGxFeatureDataset::Delete(void)
 
 bool wxGxFeatureDataset::Rename(wxString NewName)
 {
-    wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset());
+    wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset(true));
     if(!pDSet)
         return false;
 	if(pDSet->Rename(NewName))
@@ -220,7 +222,7 @@ bool wxGxFeatureDataset::Rename(wxString NewName)
 	}	
 }
 
-wxGISDataset* wxGxFeatureDataset::GetDataset(void)
+wxGISDataset* wxGxFeatureDataset::GetDataset(bool bReadOnly)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
@@ -359,7 +361,7 @@ wxString wxGxRasterDataset::GetBaseName(void)
 
 bool wxGxRasterDataset::Rename(wxString NewName)
 {
-    wxGISRasterDataset* pDSet = dynamic_cast<wxGISRasterDataset*>(GetDataset());
+    wxGISRasterDataset* pDSet = dynamic_cast<wxGISRasterDataset*>(GetDataset(true));
     if(!pDSet)
         return false;
 	if(pDSet->Rename(NewName))
@@ -395,16 +397,18 @@ void wxGxRasterDataset::Detach(void)
 {
 	IGxObject::Detach();
     if(m_pwxGISDataset)
-        m_pwxGISDataset->Release();
+        if(m_pwxGISDataset->Release() == 0)
+            m_pwxGISDataset = NULL;
+
 }
 
-wxGISDataset* wxGxRasterDataset::GetDataset(void)
+wxGISDataset* wxGxRasterDataset::GetDataset(bool bReadOnly)
 {
 	if(m_pwxGISDataset == NULL)
 	{	
         wxGISRasterDataset* pwxGISRasterDataset = new wxGISRasterDataset(m_sPath, m_type);
 
-        if(!pwxGISRasterDataset->Open())
+        if(!pwxGISRasterDataset->Open(bReadOnly))
         {
 		    const char* err = CPLGetLastErrorMsg();
 		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));

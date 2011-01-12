@@ -3,7 +3,7 @@
  * Purpose:  wxGxKMLDataset class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ public:
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
 	//IGxDataset
-    virtual wxGISDataset* GetDataset(void);
+    virtual wxGISDataset* GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISContainer;};
     virtual void SetPathEncoding(wxMBConv* pPathEncoding){m_pPathEncoding = pPathEncoding;};
     virtual wxMBConv* GetPathEncoding(void){return m_pPathEncoding;};
@@ -83,7 +83,7 @@ public:
     virtual wxString GetBaseName(void){return GetName();};
 	virtual wxString GetCategory(void);
 	//IGxDataset
-	virtual wxGISDataset* GetDataset(void);
+	virtual wxGISDataset* GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
     virtual void SetPathEncoding(wxMBConv* pPathEncoding){m_pPathEncoding = pPathEncoding;};
     virtual wxMBConv* GetPathEncoding(void){return m_pPathEncoding;};
