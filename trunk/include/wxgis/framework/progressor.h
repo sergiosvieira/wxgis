@@ -23,12 +23,14 @@
 #include "wxgis/framework/framework.h"
 #include "wx/gauge.h"
 
-#define PTIMER_ID 1013
-
 class WXDLLIMPEXP_GIS_FRW wxGISProgressor : 
 	public wxControl,
 	public IProgressor
 {
+    enum
+    {
+        PTIMER_ID = 1013
+    };
 public:
 	wxGISProgressor(wxWindow * parent, wxWindowID id = wxID_ANY, int range = 100, const wxPoint & pos = wxDefaultPosition, const wxSize & size = wxDefaultSize, long style = /*wxNO_BORDER*/wxSTATIC_BORDER, const wxString name = wxT("GISProgressor"));
 	virtual ~wxGISProgressor(void);

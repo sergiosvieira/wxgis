@@ -790,12 +790,8 @@ void wxGxContentView::OnBeginDrag(wxListEvent& event)
             continue;
         if(!pItemData->pObject)
             continue;
-        IGxDataset* pDSet = dynamic_cast<IGxDataset*>(pItemData->pObject);
-        if(pDSet)
-        {
-            my_data.AddFile(pDSet->GetPath());
-            nCount++;
-        }
+        my_data.AddFile(pItemData->pObject->GetInternalName());
+        nCount++;
     }
     if(nCount == 0)
         return;

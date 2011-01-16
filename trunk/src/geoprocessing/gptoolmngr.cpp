@@ -40,8 +40,17 @@ wxGPProcess::~wxGPProcess(void)
 {
 }
 
+void wxGPProcess::OnTerminate(int pid, int status)
+{
+    wxGISProcess::OnTerminate(pid, status);
+	if(m_pProgressor)
+		m_pProgressor->SetValue(100);
+}
+
 void wxGPProcess::ProcessInput(wxString sInputData)
 {
+	if(m_nState != enumGISTaskWork)
+        return;
 //INFO, DONE, ERR, ??
 	wxString sRest;
 	if( sInputData.StartsWith(wxT("DONE: "), &sRest) )
@@ -93,6 +102,11 @@ wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode) : m_nRunningTasks(
 {
     m_pToolsNode = pToolsNode;
     m_nMaxTasks = wxAtoi(m_pToolsNode->GetPropVal(wxT("max_tasks"), wxString::Format(wxT("%d"), wxThread::GetCPUCount())));
+#ifdef __WXMSW__
+    m_sGeoprocessPath = m_pToolsNode->GetPropVal(wxT("gp_exec"), wxString(wxT("wxGISGeoprocess.exe")));
+#else
+    m_sGeoprocessPath = m_pToolsNode->GetPropVal(wxT("gp_exec"), wxString(wxT("wxGISGeoprocess")));
+#endif
     wxXmlNode *pChild = m_pToolsNode->GetChildren();
     while (pChild)
     {
@@ -124,6 +138,9 @@ wxGISGPToolManager::~wxGISGPToolManager(void)
     if(m_pToolsNode->HasProp(wxT("max_tasks")))
         m_pToolsNode->DeleteProperty(wxT("max_tasks"));
     m_pToolsNode->AddProperty(wxT("max_tasks"), wxString::Format(wxT("%d"), m_nMaxTasks));
+    if(m_pToolsNode->HasProp(wxT("gp_exec")))
+        m_pToolsNode->DeleteProperty(wxT("gp_exec"));
+    m_pToolsNode->AddProperty(wxT("gp_exec"), m_sGeoprocessPath);
 
     //read tasks
     wxGISConfig::DeleteNodeChildren(m_pToolsNode);
@@ -139,7 +156,7 @@ wxGISGPToolManager::~wxGISGPToolManager(void)
 
     //kill all processes
     for(size_t i = 0; i < m_ProcessArray.size(); i++)
-        m_ProcessArray[i].pProcess->OnCancel();
+        CancelProcess(i);
 
     //delete all existed tools
     for(std::map<wxString, TOOLINFO>::iterator pos = m_ToolsMap.begin(); pos != m_ToolsMap.end(); ++pos)
@@ -180,7 +197,7 @@ int wxGISGPToolManager::OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel, IG
     m_ToolsMap[sToolName].nCount++;
 
     wxString sToolParams = pTool->GetAsString();
-    wxString sCommand = wxT("wxGISGeoprocess.exe -n ") + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");//TODO: read path to wxGISGeoprocess from config
+    wxString sCommand = wxString::Format(wxT("%s -n "), m_sGeoprocessPath.c_str()) + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");
 
     WXGISEXECDDATA data = {new wxGPProcess(sCommand, static_cast<IProcessParent*>(this), pTrackCancel), pTool, pTrackCancel, pCallBack};
     m_ProcessArray.push_back(data);
@@ -321,4 +338,18 @@ void wxGISGPToolManager::CancelProcess(size_t nIndex)
 	wxASSERT(nIndex >= 0);
 	wxASSERT(nIndex < m_ProcessArray.size());
 	m_ProcessArray[nIndex].pProcess->OnCancel();
+}
+
+wxDateTime wxGISGPToolManager::GetProcessStart(size_t nIndex)
+{
+	wxASSERT(nIndex >= 0);
+	wxASSERT(nIndex < m_ProcessArray.size());
+	return m_ProcessArray[nIndex].pProcess->GetStart();
+}
+
+wxDateTime wxGISGPToolManager::GetProcessFinish(size_t nIndex)
+{
+	wxASSERT(nIndex >= 0);
+	wxASSERT(nIndex < m_ProcessArray.size());
+	return m_ProcessArray[nIndex].pProcess->GetFinish();
 }

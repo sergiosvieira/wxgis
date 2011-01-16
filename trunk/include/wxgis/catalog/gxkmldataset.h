@@ -39,6 +39,7 @@ public:
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void);
 	virtual wxString GetCategory(void);
+    virtual wxString GetInternalName(void){return m_sPath;};
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
@@ -50,7 +51,6 @@ public:
     virtual void SetPathEncoding(wxMBConv* pPathEncoding){m_pPathEncoding = pPathEncoding;};
     virtual wxMBConv* GetPathEncoding(void){return m_pPathEncoding;};
     virtual int GetSubType(void){return (int)m_type;};
-    virtual wxString GetPath(void){return m_sPath;};
 	//IGxObjectContainer
 	virtual bool DeleteChild(IGxObject* pChild);
 	virtual bool AreChildrenViewable(void){return true;};
@@ -81,6 +81,7 @@ public:
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void){return GetName();};
+    virtual wxString GetInternalName(void){return wxEmptyString;};
 	virtual wxString GetCategory(void);
 	//IGxDataset
 	virtual wxGISDataset* GetDataset(bool bReadOnly);
@@ -88,7 +89,6 @@ public:
     virtual void SetPathEncoding(wxMBConv* pPathEncoding){m_pPathEncoding = pPathEncoding;};
     virtual wxMBConv* GetPathEncoding(void){return m_pPathEncoding;};
     virtual int GetSubType(void){return (int)m_type;};
-    virtual wxString GetPath(void){return wxEmptyString;};
 protected:
 	wxString m_sName;
     wxFontEncoding m_Encoding;

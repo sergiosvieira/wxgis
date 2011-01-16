@@ -23,12 +23,14 @@
 #include "wxgis/framework/animation.h"
 #include "wxgis/framework/progressor.h"
 
-#define TIMER_ID 1011
-
 class WXDLLIMPEXP_GIS_FRW wxGISStatusBar :
 	public wxStatusBar,
 	public IStatusBar
 {
+    enum
+    {
+        TIMER_ID = 1011
+    };
 public:
 	wxGISStatusBar(wxWindow *parent, wxWindowID id, long style = wxST_SIZEGRIP, const wxString& name = wxT("statusBar"), WXDWORD panesstyle = enumGISStatusMain | enumGISStatusProgress | enumGISStatusAnimation | enumGISStatusPosition | enumGISStatusClock);
 	virtual ~wxGISStatusBar(void);

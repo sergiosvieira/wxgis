@@ -3,7 +3,7 @@
  * Purpose:  wxGxObjectDialog filters of GxObjects to show.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -52,8 +52,9 @@ wxGISEnumSaveObjectResults wxGxObjectFilter::CanSaveObject( IGxObject* pLocation
 	if(!pContainer)
 		return enumGISSaveObjectDeny;
 	wxGxFolder* pGxFolder = dynamic_cast<wxGxFolder*>(pLocation);
+    if(pGxFolder)
 	{
-		if(wxFileName::IsDirWritable(pGxFolder->GetPath()) || wxFileName::IsFileWritable(pGxFolder->GetPath()))
+		if(wxFileName::IsDirWritable(pGxFolder->GetInternalName())/* || wxFileName::IsFileWritable(pGxFolder->GetInternalName())*/)
 		{
 			if(pGxFolder->SearchChild(pLocation->GetFullName() + wxFileName::GetPathSeparator() + sName) == NULL)
 				return enumGISSaveObjectAccept;
@@ -125,7 +126,7 @@ wxGISEnumSaveObjectResults wxGxPrjFileFilter::CanSaveObject( IGxObject* pLocatio
 		return enumGISSaveObjectDeny;
 	wxGxFolder* pGxFolder = dynamic_cast<wxGxFolder*>(pLocation);
 	{
-		if(wxFileName::IsDirWritable(pGxFolder->GetPath()))
+		if(wxFileName::IsDirWritable(pGxFolder->GetInternalName()))
 		{
 			if(pGxFolder->SearchChild(pLocation->GetFullName() + wxFileName::GetPathSeparator() + sName) == NULL)
 				return enumGISSaveObjectAccept;
@@ -136,7 +137,7 @@ wxGISEnumSaveObjectResults wxGxPrjFileFilter::CanSaveObject( IGxObject* pLocatio
 	
 	wxGxSpatialReferencesFolder* pGxSpatialReferencesFolder = dynamic_cast<wxGxSpatialReferencesFolder*>(pLocation);
 	{
-		if(wxFileName::IsFileWritable(pGxSpatialReferencesFolder->GetPath()))
+		if(wxFileName::IsFileWritable(pGxSpatialReferencesFolder->GetInternalName()))
 		{
 			if(pGxSpatialReferencesFolder->SearchChild(pLocation->GetFullName() + wxFileName::GetPathSeparator() + sName) == NULL)
 				return enumGISSaveObjectAccept;
@@ -636,7 +637,7 @@ bool wxGxTextFilter::CanChooseObject( IGxObject* pObject )
 	wxGxTextFile* poGxTextFile = dynamic_cast<wxGxTextFile*>(pObject);
 	if(!poGxTextFile)
 		return false;
-    if(poGxTextFile->GetPath().Lower().Find(m_soExt) != wxNOT_FOUND)
+    if(poGxTextFile->GetInternalName().Lower().Find(m_soExt) != wxNOT_FOUND)
 		return true;
 	return false;
 }
@@ -649,7 +650,7 @@ bool wxGxTextFilter::CanDisplayObject( IGxObject* pObject )
 	wxGxTextFile* poGxTextFile = dynamic_cast<wxGxTextFile*>(pObject);
 	if(!poGxTextFile)
 		return false;
-    if(poGxTextFile->GetPath().Lower().Find(m_soExt) != wxNOT_FOUND)
+    if(poGxTextFile->GetInternalName().Lower().Find(m_soExt) != wxNOT_FOUND)
 		return true;
 	return false;
 }

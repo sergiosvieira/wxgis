@@ -275,10 +275,10 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     CPLString soCPLDemPath;
     if(pGxObjectContainer)
     {
-        IGxDataset* pGxDemObj = dynamic_cast<IGxDataset*>(pGxObjectContainer->SearchChild(soDEMPath));
+        IGxObject* pGxDemObj = pGxObjectContainer->SearchChild(soDEMPath);
         if(pGxDemObj)
         {
-            soCPLDemPath = CPLString((const char *)wgWX2MB(pGxDemObj->GetPath()));
+            soCPLDemPath = CPLString((const char *)wgWX2MB(pGxDemObj->GetInternalName()));
         }
     }
 

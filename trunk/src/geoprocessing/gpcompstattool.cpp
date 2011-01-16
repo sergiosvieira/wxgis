@@ -130,7 +130,7 @@ bool wxGISGPCompStatTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("Source object is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
-    wxGISRasterDataset* pSrcDataSet = dynamic_cast<wxGISRasterDataset*>(pGxDataset->GetDataset(false));
+    wxGISRasterDataset* pSrcDataSet = dynamic_cast<wxGISRasterDataset*>(pGxDataset->GetDataset(true));
     if(!pSrcDataSet)
     {
         //add messages to pTrackCancel
@@ -171,17 +171,17 @@ bool wxGISGPCompStatTool::Execute(ITrackCancel* pTrackCancel)
             return false;
         }
         pTrackCancel->PutMessage(wxString::Format(_("Band %d: min - %.2f, max - %.2f, mean - %.2f, StdDev - %.2f"), nBand + 1, dfMin, dfMax, dfMean, dfStdDev), -1, enumGISMessageNorm);
-        eErr = pBand->SetStatistics(dfMin, dfMax, dfMean, dfStdDev);   
-	    if(eErr != CE_None)
-	    {
-            if(pTrackCancel)
-            {
-                const char* pszErr = CPLGetLastErrorMsg();
-                pTrackCancel->PutMessage(wxString::Format(_("ComputeStatistics failed! GDAL error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
-            }
-            wsDELETE(pSrcDataSet);
-            return false;
-        }
+     //   eErr = pBand->SetStatistics(dfMin, dfMax, dfMean, dfStdDev);   
+	    //if(eErr != CE_None)
+	    //{
+     //       if(pTrackCancel)
+     //       {
+     //           const char* pszErr = CPLGetLastErrorMsg();
+     //           pTrackCancel->PutMessage(wxString::Format(_("ComputeStatistics failed! GDAL error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
+     //       }
+     //       wsDELETE(pSrcDataSet);
+     //       return false;
+     //   }
     }
 
     pSrcDataSet->SetHasStatistics(true);

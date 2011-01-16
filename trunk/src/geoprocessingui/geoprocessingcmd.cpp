@@ -261,7 +261,8 @@ void wxGISGeoprocessingCmd::OnClick(void)
                         wxString sDriver = pFilter->GetDriver();
                         wxString sExt = pFilter->GetExt();
                         int nNewSubType = pFilter->GetSubType();
-                        wxString sPath = dlg.GetPath();
+                        wxString sPath = dlg.GetInternalPath();
+                        wxString sCatalogPath = dlg.GetPath();
                         wxString sName = dlg.GetName();
 
                         wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(DatasetArray[0]->GetDataset(true));
@@ -437,7 +438,7 @@ EXIT:
                             IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(pGxApp->GetCatalog());
                             if(pCont)
                             {
-                                IGxObject* pParentLoc = pCont->SearchChild(sPath);
+                                IGxObject* pParentLoc = pCont->SearchChild(sCatalogPath);
                                 if(pParentLoc)
                                     pParentLoc->Refresh();
                             }
@@ -470,7 +471,8 @@ EXIT:
                         wxString sDriver = pFilter->GetDriver();
                         wxString sExt = pFilter->GetExt();
                         int nNewSubType = pFilter->GetSubType();
-                        wxString sPath = dlg.GetPath();
+                        wxString sPath = dlg.GetInternalPath();
+                        wxString sCatalogPath = dlg.GetPath();
 
                         //create multiexport dialog
                         wxGISProgressDlg ProgressDlg(NULL/*pWnd*/);
@@ -672,7 +674,7 @@ EXIT:
                             IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(pGxApp->GetCatalog());
                             if(pCont)
                             {
-                                IGxObject* pParentLoc = pCont->SearchChild(sPath);
+                                IGxObject* pParentLoc = pCont->SearchChild(sCatalogPath);
                                 if(pParentLoc)
                                     pParentLoc->Refresh();
                             }

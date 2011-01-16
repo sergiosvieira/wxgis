@@ -114,7 +114,7 @@ void wxGxDiscConnections::EmptyChildren(void)
         wxGxDiscConnection* pwxGxDiscConnection = dynamic_cast<wxGxDiscConnection*>(m_Children[i]);
         if(pwxGxDiscConnection)
         {
-            CONN_DATA data = {pwxGxDiscConnection->GetName(), pwxGxDiscConnection->GetPath()};
+            CONN_DATA data = {pwxGxDiscConnection->GetName(), pwxGxDiscConnection->GetInternalName()};
             m_aConnections.push_back(data);
         }
 		m_Children[i]->Detach();
@@ -159,7 +159,7 @@ IGxObject* wxGxDiscConnections::ConnectFolder(wxString sPath)
     {
         wxGxDiscConnection* pConn = dynamic_cast<wxGxDiscConnection*>(m_Children[i]);
         if(pConn)
-            if(pConn->GetPath().CmpNoCase(sPath) == 0)
+            if(pConn->GetInternalName().CmpNoCase(sPath) == 0)
                 return dynamic_cast<IGxObject*>(pConn);
     }
 
@@ -190,7 +190,7 @@ void wxGxDiscConnections::DisconnectFolder(wxString sPath)
         wxGxDiscConnection* pConn = dynamic_cast<wxGxDiscConnection*>(m_Children[i]);
         if(pConn)
         {
-            if(pConn->GetPath() == sPath)
+            if(pConn->GetInternalName() == sPath)
             {
                 IGxObject* pOut = dynamic_cast<IGxObject*>(pConn);
                 DeleteChild(pOut);
@@ -216,7 +216,7 @@ void wxGxDiscConnections::StoreConnections(void)
         {
 	        wxXmlNode* pDiscConn = new wxXmlNode(pRootNode, wxXML_ELEMENT_NODE, wxT("DiscConnection"));
 	        pDiscConn->AddProperty(wxT("name"), pwxGxDiscConnection->GetName());
-	        pDiscConn->AddProperty(wxT("path"), pwxGxDiscConnection->GetPath());
+	        pDiscConn->AddProperty(wxT("path"), pwxGxDiscConnection->GetInternalName());
         }
     }
     if(m_Children.empty() && !m_aConnections.empty())

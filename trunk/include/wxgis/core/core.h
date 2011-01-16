@@ -254,7 +254,8 @@ static wxString Decode(wxString sInput, wxString sPass)
  */
 enum wxGISEnumTaskStateType
 {
-    enumGISTaskWork = 1,
+    enumGISTaskUnk = 0,
+    enumGISTaskWork,
     enumGISTaskDone,
     enumGISTaskQuered,
     enumGISTaskPaused,
@@ -289,8 +290,10 @@ public:
 	virtual wxGISEnumTaskStateType GetState(void){return m_nState;};
 	virtual wxString GetCommand(void){return m_sCommand;};
     virtual wxDateTime GetStart(void){return m_dtBeg;};
+    virtual wxDateTime GetFinish(void){return m_dtEstEnd;};
 protected:
 	wxDateTime m_dtBeg;
+	wxDateTime m_dtEstEnd;
     wxGISEnumTaskStateType m_nState;
     wxString m_sCommand;
 };

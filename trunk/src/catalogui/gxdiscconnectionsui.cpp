@@ -65,7 +65,7 @@ void wxGxDiscConnectionsUI::EmptyChildren(void)
         wxGxDiscConnectionUI* pwxGxDiscConnection = dynamic_cast<wxGxDiscConnectionUI*>(m_Children[i]);
         if(pwxGxDiscConnection)
         {
-            CONN_DATA data = {pwxGxDiscConnection->GetName(), pwxGxDiscConnection->GetPath()};
+            CONN_DATA data = {pwxGxDiscConnection->GetName(), pwxGxDiscConnection->GetInternalName()};
             m_aConnections.push_back(data);
         }
         wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pCatalog);
@@ -106,7 +106,7 @@ IGxObject* wxGxDiscConnectionsUI::ConnectFolder(wxString sPath)
     {
         wxGxDiscConnectionUI* pConn = dynamic_cast<wxGxDiscConnectionUI*>(m_Children[i]);
         if(pConn)
-            if(pConn->GetPath().CmpNoCase(sPath) == 0)
+            if(pConn->GetInternalName().CmpNoCase(sPath) == 0)
                 return dynamic_cast<IGxObject*>(pConn);
     }
 

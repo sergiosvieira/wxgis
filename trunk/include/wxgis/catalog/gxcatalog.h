@@ -3,7 +3,7 @@
  * Purpose:  wxGxCatalog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ public:
 	virtual wxString GetName(void){return wxString(_("Catalog"));};
     virtual wxString GetBaseName(void){return GetName();};
 	virtual wxString GetFullName(void){return wxEmptyString;}//wxString(_("Catalog"));};
+    virtual wxString GetInternalName(void){return wxEmptyString;};
 	virtual wxString GetCategory(void){return wxString(wxT("Root"));};
 	virtual IGxObject* GetParent(void){return NULL;};
 	virtual void Refresh(void);

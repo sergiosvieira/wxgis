@@ -104,6 +104,8 @@ void wxGISProcess::OnCancel(void)
 		//wxString sStopCmd(wxT("STOP"));
 		//OutStr.WriteString(sStopCmd);
 
+	    m_nState = enumGISTaskPaused;
+
 		wxKillError eErr = Kill(m_pid, wxSIGKILL);// wxSIGINT wxSIGTERM
  
 		if(m_pReadThread)

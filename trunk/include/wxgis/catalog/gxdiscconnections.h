@@ -3,7 +3,7 @@
  * Purpose:  wxGxDiscConnections class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ public:
 	virtual wxString GetName(void){return wxString(_("Folder connections"));};
     virtual wxString GetBaseName(void){return GetName();};
     virtual wxString GetFullName(void){return wxEmptyString;};
-    virtual wxString GetPath(void){return wxEmptyString;};
+    virtual wxString GetInternalName(void){return wxEmptyString;};
 	virtual wxString GetCategory(void){return wxString(_("Folder connections"));};
 	virtual void Refresh(void);
 	//IGxObjectContainer
