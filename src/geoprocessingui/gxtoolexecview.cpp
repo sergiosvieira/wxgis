@@ -260,13 +260,17 @@ void wxGxToolExecuteView::AddObject(IGxObject* pObject)
         };
 
 	    long ListItemID = InsertItem(0, pObject->GetName(), nIcon);
-        SetItem(ListItemID, 1, pGxTask->GetStart().Format(_("%d-%m-%Y %H:%M:%S")));
-        SetItem(ListItemID, 2, pGxTask->GetFinish().Format(_("%d-%m-%Y %H:%M:%S")));
+        wxDateTime dts = pGxTask->GetStart();
+        if(dts.IsValid())
+            SetItem(ListItemID, 1, dts.Format(_("%d-%m-%Y %H:%M:%S")));
+        wxDateTime dtf = pGxTask->GetFinish();
+        if(dtf.IsValid())
+            SetItem(ListItemID, 2, pGxTask->GetFinish().Format(_("%d-%m-%Y %H:%M:%S")));
         SetItem(ListItemID, 3, wxString::Format(_("%.1f%%"), pGxTask->GetDonePercent()));
         SetItem(ListItemID, 4, pGxTask->GetLastMessage());
 
         SetItemBackgroundColour(ListItemID, color);
-        SetItemPtrData(ListItemID, (wxUIntPtr) pGxTask);
+        SetItemData(ListItemID, (long)pObject);
 
     	wxListCtrl::Refresh();
 	}
@@ -501,8 +505,12 @@ void wxGxToolExecuteView::OnObjectChanged(IGxObject* pObj)
         };
 
         SetItem(nItem, 0, pObj->GetName(), nIcon);
-        SetItem(nItem, 1, pGxTask->GetStart().Format(_("%d-%m-%Y %H:%M:%S")));
-        SetItem(nItem, 2, pGxTask->GetFinish().Format(_("%d-%m-%Y %H:%M:%S")));
+        wxDateTime dtb = pGxTask->GetStart();
+        if(dtb.IsValid())
+            SetItem(nItem, 1, dtb.Format(_("%d-%m-%Y %H:%M:%S")));
+        wxDateTime dtf = pGxTask->GetFinish();
+        if(dtf.IsValid())
+            SetItem(nItem, 2, dtf.Format(_("%d-%m-%Y %H:%M:%S")));
         SetItem(nItem, 3, wxString::Format(_("%.1f%%"), pGxTask->GetDonePercent()));
         SetItem(nItem, 4, pGxTask->GetLastMessage());
 
@@ -544,8 +552,8 @@ void wxGxToolExecuteView::OnSelectionChanged(IGxSelection* Selection, long nInit
 	if(nInitiator == GetId())
 		return;
 	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
-	if(m_pParentGxObject == pGxObj)
-		return;
+	//if(m_pParentGxObject == pGxObj)
+	//	return;
 
 	//reset
 	ResetContents();

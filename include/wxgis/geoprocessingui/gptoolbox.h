@@ -42,6 +42,7 @@ public:
 	virtual void Detach(void);
 	virtual wxString GetName(void);
     virtual wxString GetBaseName(void){return GetName();};
+    virtual wxString GetInternalName(void){return wxEmptyString;};
 	virtual wxString GetCategory(void){return wxString(_("Toolbox"));};
 	virtual void Refresh(void);
 	//IGxObjectUI
@@ -118,6 +119,7 @@ public:
 	virtual void Detach(void);
 	virtual wxString GetName(void);
     virtual wxString GetBaseName(void){return GetName();};
+    virtual wxString GetInternalName(void){return wxEmptyString;};
 	virtual wxString GetCategory(void){return wxString(_("Toolbox"));};
 	virtual void Refresh(void);
 	//IGxObjectUI
@@ -147,9 +149,9 @@ protected:
  */
 
 class WXDLLIMPEXP_GIS_GPU wxGxToolExecute :
-	public IGxObject,
 	public IGxObjectUI,
     public IGxObjectSort,
+	public IGxObjectContainer,
     public wxGISGPToolManager
 {
 public:
@@ -159,6 +161,7 @@ public:
 	virtual void Detach(void);
 	virtual wxString GetName(void);
     virtual wxString GetBaseName(void){return GetName();};
+    virtual wxString GetInternalName(void){return wxEmptyString;};
 	virtual wxString GetCategory(void){return wxString(_("Toolbox"));};
 	virtual void Refresh(void);
 	//IGxObjectUI
@@ -169,10 +172,18 @@ public:
 	//IGxObjectSort
     virtual bool IsAlwaysTop(void){return true;};
 	virtual bool IsSortEnabled(void){return false;};
-    // IToolManagerUI
-    virtual bool OnConfigTool(wxString sToolName, wxWindow *pParentWnd = NULL/*, callback???*/){return true;};
+	//IGxObjectContainer
+	virtual bool DeleteChild(IGxObject* pChild);
+	virtual bool AreChildrenViewable(void){return false;};
+	virtual bool HasChildren(void){return m_Children.size() > 0 ? true : false;};
+    // wxGISGPToolManager
+    virtual int OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel = NULL, IGPCallBack* pCallBack = NULL);
+    virtual void StartProcess(size_t nIndex);
+    //virtual void CancelProcess(size_t nIndex);
+    virtual void OnFinish(IProcess* pProcess, bool bHasErrors);
 protected:
     wxGxRootToolbox* m_pRootToolbox;
+    wxIcon m_LargeToolIcon, m_SmallToolIcon;
 };
 
 
@@ -192,6 +203,7 @@ public:
 	//IGxObject
     virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void){return GetName();};
+    virtual wxString GetInternalName(void){return wxEmptyString;};
 	virtual wxString GetCategory(void){return wxString(_("Tool"));};
     virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog);
 	//IGxObjectUI

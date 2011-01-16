@@ -99,6 +99,7 @@ public:
 		else
 			return wxEmptyString;
 	};
+	virtual wxString GetInternalName(void) = 0;
 	virtual wxString GetCategory(void) = 0;
 	virtual IGxObject* GetParent(void){return m_pParent;};
 	virtual void Refresh(void){};
@@ -217,7 +218,6 @@ public:
 	virtual wxGISDataset* GetDataset(bool bReadOnly) = 0;
 	virtual wxGISEnumDatasetType GetType(void) = 0;
 	virtual int GetSubType(void) = 0;
-    virtual wxString GetPath(void) = 0;
 };
 
 class IGxFile

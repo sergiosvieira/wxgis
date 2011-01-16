@@ -135,7 +135,7 @@ bool wxGISGPCreateOverviewsTool::Validate(void)
 {
 
     //autogen levels
-         //       int nSize = MIN(pwxGISRasterDataset->GetHeight(), pwxGISRasterDataset->GetWidth());
+         //   int nSize = MIN(pwxGISRasterDataset->GetHeight(), pwxGISRasterDataset->GetWidth());
          //   int anOverviewList[25] = {0};
          //   int nLevel(1);
          //   int nLevelCount(0);
@@ -217,39 +217,49 @@ bool wxGISGPCreateOverviewsTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
 
-    wxString sInterpolation = m_pParamArr[1]->GetValue();
+    wxString sResampleMethod = m_pParamArr[1]->GetValue();
     wxString sCompress = m_pParamArr[2]->GetValue();
-    //CPLSetConfigOption( "COMPRESS_OVERVIEW", wgWX2MB(sCompress) );//LZW "DEFLATE" NONE
+    CPLSetConfigOption( "COMPRESS_OVERVIEW", wgWX2MB(sCompress) );
 
-    //if(pwxGISRasterDataset->GetSubType() == enumRasterImg)
-    //{
-    //    CPLSetConfigOption( "USE_RRD", "YES" );
-    //    CPLSetConfigOption( "HFA_USE_RRD", "YES" );
-    //}
-    //else
-    //    CPLSetConfigOption( "USE_RRD", "NO" );
+    if(pSrcDataSet->GetSubType() == enumRasterImg)//TODO: test on AG 10
+    {
+        CPLSetConfigOption( "USE_RRD", "YES" );
+        CPLSetConfigOption( "HFA_USE_RRD", "YES" );
+    }
+    else
+        CPLSetConfigOption( "USE_RRD", "NO" );
 
-    //CPLErr eErr = pDSet->BuildOverviews( wgWX2MB(sResampleMethod), nLevelCount, anOverviewList, 0, NULL, ExecToolProgress, (void*)&Data );
+    int nSize = MIN(pSrcDataSet->GetHeight(), pSrcDataSet->GetWidth());
+    int anOverviewList[25] = {0};
+    int nLevel(1);
+    int nLevelCount(0);
+    while(1)
+    {
+        nSize /= 2;
+        if(nSize < 20)
+            break;
+        nLevel *= 2;
+        if(nLevel != 2)
+        {
+            anOverviewList[nLevelCount] = nLevel;
+            nLevelCount++;
+        }
+    }
 
-    //if(eErr != CE_None)
-    //{
-    //    const char* pszErr = CPLGetLastErrorMsg();
-    //    wxLogError(_("BuildOverviews failed! GDAL error: %s"), wgMB2WX(pszErr));
-    //    wxMessageBox(_("Build Overviews failed!"), _("Error"), wxICON_ERROR | wxOK );
-    //}
-    //else
-    //    pwxGISRasterDataset->SetHasOverviews(true);
-            
+    CPLErr eErr = poGDALDataset->BuildOverviews( wgWX2MB(sResampleMethod), nLevelCount, anOverviewList, 0, NULL, ExecToolProgress, (void*)pTrackCancel );
+    if(eErr != CE_None)
+    {
+        if(pTrackCancel)
+        {
+            const char* pszErr = CPLGetLastErrorMsg();
+            pTrackCancel->PutMessage(wxString::Format(_("BuildOverviews failed! GDAL error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
+        }
+        wsDELETE(pSrcDataSet);
+        return false;
+    }
 
-    //GDALClose(poOutputGDALDataset);
-    //wsDELETE(pSrcDataSet);
-
-    //if(pGxObjectContainer)-catalog
-    //{
-    //    IGxObject* pParentLoc = pGxObjectContainer->SearchChild(sPath);
-    //    if(pParentLoc)
-    //        pParentLoc->Refresh();
-    //}
+    pSrcDataSet->SetHasOverviews(true);
+    wsDELETE(pSrcDataSet);
 
     return true;
 }

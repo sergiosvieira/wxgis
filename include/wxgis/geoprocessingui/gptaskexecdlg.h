@@ -3,7 +3,7 @@
  * Purpose:  wxGxTaskExecDlg class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,44 +22,45 @@
 
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/geoprocessing/gptoolmngr.h"
+#include "wxgis/framework/progressor.h"
 
 #include "wx/wxhtml.h"
 #include "wx/imaglist.h"
 
-//////////////////////////////////////////////////////////////////
-// wxGxTaskExecDlg
-//////////////////////////////////////////////////////////////////
+typedef struct _taskmessage
+{
+    wxGISEnumMessageType nType;
+    wxString sMessage;
+}TASKMESSAGE;
+
+typedef std::vector<TASKMESSAGE> TaskMessageArray;
+
+/** \class wxGxTaskExecDlg gptaskexecdlg.h
+ *  \brief The dialog showing execution process
+ */
 
 class WXDLLIMPEXP_GIS_GPU wxGxTaskExecDlg :
 	public wxDialog,
     public ITrackCancel,
     public IGPCallBack
 {
- //   enum
-	//{
-	//	ID_SHOW_BALLOON = wxID_HIGHEST + 30,
- //       ID_UPDATEMESSAGES
-	//};
+    enum
+	{
+		ID_CANCEL_PROCESS = wxID_HIGHEST + 30
+	};
 public:
-	wxGxTaskExecDlg(wxGISGPToolManager* pToolManager, IGPCallBack* pCallBack, wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);//wxTAB_TRAVERSAL|wxBORDER_RAISED );wxGISGPToolManager* pMngr, IGPTool* pTool, 
+	wxGxTaskExecDlg(wxGISGPToolManager* pToolManager, IGPCallBack* pCallBack, wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
     virtual ~wxGxTaskExecDlg(void);
     virtual void SetTaskID(int nTaskID);
-    //virtual void SetTaskThreadId(long nId);
-    //virtual void SetToolDialog(wxWindow* pWindow, wxXmlNode* pNode);
     virtual void FillHtmlWindow();
     //events
     virtual void OnExpand(wxCommandEvent & event);
     virtual void OnCancel(wxCommandEvent & event);
-    //virtual void OnShowBallon(wxCommandEvent & event);
-    //virtual void OnUpdateMessages(wxCommandEvent & event);
+    virtual void OnCancelTask(wxCommandEvent & event);
     //IGPCallBack
     virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL);
     //ITrackCancel
 	virtual void PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType);
-    typedef struct _message{
-        wxGISEnumMessageType nType;
-        wxString sMessage;
-    }MESSAGE;
 protected:
     wxImageList m_ImageList;
     bool m_bExpand;
@@ -70,15 +71,9 @@ protected:
     wxBitmapButton* m_bpExpandButton;
     wxStaticText * m_Text;
     wxStaticBitmap* m_pStateBitmap;
-    wxCheckBox* m_pCheckBox;
+    //wxCheckBox* m_pCheckBox;
     wxBitmapButton* m_bpCloseButton;
-    std::vector<MESSAGE> m_MessageArray;
-
-    //long m_nTaskThreadId;
-    //wxCriticalSection m_CritSec;
-    //IGPTool* m_pTool;
-    //wxXmlNode* m_pToolDialogPropNode;
-    //wxWindow* m_pToolDialogWindow;
+    TaskMessageArray m_MessageArray;
 
     wxString m_sHead;
     wxString m_sNote;
@@ -91,29 +86,84 @@ protected:
     DECLARE_EVENT_TABLE();
 };
 
-////////////////////////////////////////////////////////////////////
-//// wxGxTasksView
-////////////////////////////////////////////////////////////////////
-//
-//class WXDLLIMPEXP_GIS_GPU wxGxTasksView :
-//	public wxScrolledWindow,
-//	public wxGxView
-//{
-//    DECLARE_DYNAMIC_CLASS(wxGxTasksView)
-//public:
-//    wxGxTasksView(void);
-//	wxGxTasksView(wxWindow* parent, wxWindowID id = TASKSVIEWCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL|wxBORDER_SUNKEN|wxVSCROLL );
-//	virtual ~wxGxTasksView(void);
-//	virtual void AddPanel(wxGxTaskPanel* pGxTaskPanel);
-//	virtual void InsertPanel(wxGxTaskPanel* pGxTaskPanel, long nPos = 0);
-//    virtual void RemovePanel(wxGxTaskPanel* pGxTaskPanel);
-////    virtual void Refresh(void){Refresh();};
-////IGxView
-//    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("ToolView"));
-//	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
-//	virtual void Deactivate(void);
-//protected:
-//    wxBoxSizer* m_bMainSizer;
-//
-//DECLARE_EVENT_TABLE()
-//};
+class WXDLLIMPEXP_GIS_GPU wxGxTaskObject;
+/** \class wxGxTaskObjectExecDlg gptaskexecdlg.h
+ *  \brief The GxObject showing execution process
+ */
+
+class wxGxTaskObjectExecDlg : 
+    public wxGxTaskExecDlg
+{
+public:
+	wxGxTaskObjectExecDlg(wxGxTaskObject* pGxTaskObject, wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+    virtual ~wxGxTaskObjectExecDlg(void);
+    //events
+    virtual void OnCancel(wxCommandEvent & event);
+    virtual void OnCancelTask(wxCommandEvent & event);
+protected:
+    wxGxTaskObject* m_pGxTaskObject;
+};
+
+/** \class wxGxTaskObject gptaskexecdlg.h
+ *  \brief The GxObject showing execution process
+ */
+class WXDLLIMPEXP_GIS_GPU wxGxTaskObject :
+    public IGxObject,
+	public IGxObjectUI,
+    public IGxTask,
+    public IGxObjectWizard,
+    public ITrackCancel,
+    public IGPCallBack,
+    public IProgressor
+{
+public:
+	wxGxTaskObject(wxGISGPToolManager* pToolManager, wxString sName, IGPCallBack* pCallBack = NULL, wxIcon LargeToolIcon = wxNullIcon, wxIcon SmallToolIcon = wxNullIcon);
+    virtual ~wxGxTaskObject(void);
+	//IGxObject
+    virtual wxString GetName(void){return m_sName;};
+    virtual wxString GetBaseName(void){return GetName();};
+    virtual wxString GetInternalName(void){return wxEmptyString;};
+	virtual wxString GetCategory(void){return wxString(_("Task"));};
+	virtual void Detach(void);
+	//IGxObjectUI
+	virtual wxIcon GetLargeImage(void);
+	virtual wxIcon GetSmallImage(void);
+	virtual wxString ContextMenu(void){return wxString(wxT("wxGxTaskObject.ContextMenu"));};
+	virtual wxString NewMenu(void){return wxEmptyString;};
+    //IGxObjectWizard
+    virtual bool Invoke(wxWindow* pParentWnd);
+    //IProgressor
+    virtual void SetValue(int value);
+    virtual bool Show(bool bShow){return true;};
+    virtual void SetRange(int range){};
+    virtual int GetRange(void){return 100;};
+    virtual int GetValue(void){return m_nDonePercent;};
+    virtual void Play(void){};
+    virtual void Stop(void){};
+//IGxTask
+    virtual wxGISEnumTaskStateType GetState(void);
+    virtual wxDateTime GetStart();
+    virtual wxDateTime GetFinish();
+    virtual double GetDonePercent(){return m_nDonePercent;};
+    virtual wxString GetLastMessage();
+    virtual bool StartTask();
+    virtual bool StopTask();
+    virtual bool PauseTask();
+    //wxGxTaskObject
+    virtual int GetTaskID(void){return m_nTaskID;};
+    virtual void SetTaskID(int nTaskID);
+    //IGPCallBack
+    virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL);
+    //ITrackCancel
+	virtual void PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType);
+protected:
+    wxGxTaskObjectExecDlg *m_pTaskExecDlg;
+    wxString m_sName;
+    int m_nDonePercent;
+    wxIcon m_LargeToolIcon, m_SmallToolIcon;
+    TaskMessageArray m_MessageArray;
+    int m_nTaskID;
+    IGPCallBack* m_pCallBack;
+    wxGISGPToolManager* m_pToolManager;
+};
+

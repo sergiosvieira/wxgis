@@ -439,7 +439,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 				wxGxDiscConnection* pDiscConnection = dynamic_cast<wxGxDiscConnection*>(pGxObject);
 				if(pDiscConnection)
 				{
-					wxString sPath = pDiscConnection->GetPath();
+					wxString sPath = pDiscConnection->GetInternalName();
 					pGxApp->GetCatalog()->DisconnectFolder(sPath);
 				}
 			}

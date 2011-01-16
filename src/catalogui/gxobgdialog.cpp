@@ -3,7 +3,7 @@
  * Purpose:  wxGxObjectDialog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -958,9 +958,25 @@ void wxGxObjectDialog::SerializeFramePos(bool bSave)
 void wxGxObjectDialog::OnOKUI(wxUpdateUIEvent& event)
 {
     if(m_NameTextCtrl->GetValue().IsEmpty())
+    {
         event.Enable(false);
-    else
-        event.Enable(true);
+        return;
+    }
+    if(m_bIsSaveDlg)
+    {
+        IGxObjectFilter* pFilter = GetCurrentFilter();
+        if(pFilter)
+        {
+            wxGISEnumSaveObjectResults Result = pFilter->CanSaveObject(GetLocation(), GetNameWithExt());
+
+            if(enumGISSaveObjectDeny == Result)
+            {
+                event.Enable(false);
+                return;
+            }
+        }
+    }
+    event.Enable(true);
 }
 
 wxString wxGxObjectDialog::GetNameWithExt(void)
@@ -1018,6 +1034,16 @@ wxString wxGxObjectDialog::GetPath(void)
     if(pObj)
     {
         return pObj->GetFullName();
+    }
+    return wxEmptyString;
+}
+
+wxString wxGxObjectDialog::GetInternalPath(void)
+{
+    IGxObject* pObj = GetLocation();
+    if(pObj)
+    {
+        return pObj->GetInternalName();
     }
     return wxEmptyString;
 }

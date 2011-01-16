@@ -247,11 +247,11 @@ void wxGxTab::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	{
 		//get first apply window
 		wxGxView* pCurrView = dynamic_cast<wxGxView*>(m_pCurrentWnd);
-		if(pCurrView && pCurrView->GetViewName() != wxString(_("NoView")))
-		{
-			if(pCurrView->Applies(Selection))
-				goto END;
-		}
+		//if(pCurrView && pCurrView->GetViewName() != wxString(_("NoView")))
+		//{
+		//	if(pCurrView->Applies(Selection))
+		//		goto END;
+		//}
 		for(size_t i = 0; i < m_pWindows.size(); i++)
 		{
 			wxWindow* pWnd = m_pWindows[i];

@@ -3,7 +3,7 @@
  * Purpose:  wxGxFolder class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ public:
 	virtual void Detach(void);
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void);
-	virtual wxString GetPath(void){return m_sPath;};
+	virtual wxString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void){return wxString(_("Folder"));};
 	virtual void Refresh(void);
 	//IGxObjectEdit

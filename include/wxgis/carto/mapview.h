@@ -26,8 +26,6 @@
 #include <wx/scrolwin.h>
 #include <wx/tipwin.h>
 
-#define TIMER_ID 1013
-
 class wxGISMapView;
 
 //wxDrawingThread
@@ -73,6 +71,10 @@ class WXDLLIMPEXP_GIS_CRT wxGISMapView :
 	public wxGISMap
 {
     DECLARE_CLASS(wxGxMapView)
+    enum
+    {
+        TIMER_ID = 1013
+    };
 public:
 	friend class ExtenStack;
 public:

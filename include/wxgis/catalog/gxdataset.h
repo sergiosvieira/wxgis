@@ -3,7 +3,7 @@
  * Purpose:  wxGxDataset class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ public:
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 	virtual wxString GetBaseName(void);
+    virtual wxString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void){return wxString(_("Table"));};
 	virtual void Detach(void);
 	//IGxObjectEdit
@@ -48,7 +49,6 @@ public:
 	virtual wxGISDataset* GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISTableDataset;};
     virtual int GetSubType(void){return m_type;};
-    virtual wxString GetPath(void){return m_sPath;};
 protected:
 	wxString m_sName, m_sPath;
 	wxGISDataset* m_pwxGISDataset;
@@ -71,6 +71,7 @@ public:
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 	virtual wxString GetBaseName(void);
+    virtual wxString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void);
 	virtual void Detach(void);
 	//IGxObjectUI
@@ -83,7 +84,6 @@ public:
 	virtual wxGISDataset* GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
     virtual int GetSubType(void){return (int)m_type;};
-    virtual wxString GetPath(void){return m_sPath;};
 protected:
 	wxString m_sName, m_sPath;
     wxFontEncoding m_Encoding;
@@ -107,6 +107,7 @@ public:
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 	virtual wxString GetBaseName(void);
+    virtual wxString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void);
 	virtual void Detach(void);
 	//IGxObjectEdit
@@ -118,7 +119,6 @@ public:
 	virtual wxGISDataset* GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
     virtual int GetSubType(void){return (int)m_type;};
-    virtual wxString GetPath(void){return m_sPath;};
 protected:
 	wxString m_sName, m_sPath;
     wxGISEnumRasterDatasetType m_type;

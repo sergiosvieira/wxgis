@@ -388,6 +388,16 @@ wxString wxGxContainerDialog::GetPath(void)
     return wxEmptyString;
 }
 
+wxString wxGxContainerDialog::GetInternalPath(void)
+{
+    IGxObject* pObj = GetLocation();
+    if(pObj)
+    {
+        return pObj->GetInternalName();
+    }
+    return wxEmptyString;
+}
+
 void wxGxContainerDialog::OnOKUI(wxUpdateUIEvent& event)
 {
     IGxObject* pObj = GetLocation();

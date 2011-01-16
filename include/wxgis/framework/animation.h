@@ -23,12 +23,14 @@
 #include "wxgis/framework/framework.h"
 #include "wx/imaglist.h"
 
-#define ATIMER_ID 1012
-
 class WXDLLIMPEXP_GIS_FRW wxGISAnimation :
 	public wxControl,
 	public IProgressor
 {
+    enum
+    {
+        ATIMER_ID = 1012
+    };
 public:
 	wxGISAnimation(wxWindow * parent, wxWindowID id = wxID_ANY,
 		const wxBitmap & bitmap = wxNullBitmap, const int bitmap_size = 16,

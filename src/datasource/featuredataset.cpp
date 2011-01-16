@@ -98,7 +98,14 @@ wxGISFeatureDataset* CreateVectorLayer(wxString sPath, wxString sName, wxString 
     {
         for(size_t i = 0; i < poFields->GetFieldCount(); i++)
         {
-	        if( poLayerDest->CreateField( poFields->GetFieldDefn(i) ) != OGRERR_NONE )
+            OGRFieldDefn *pField = poFields->GetFieldDefn(i);
+            if(nSubType == enumVecKML)
+            {
+                wxString sFieldName = wgMB2WX(pField->GetNameRef());
+                pField->SetName(sFieldName.mb_str(wxConvUTF8));
+            }
+
+	        if( poLayerDest->CreateField( pField ) != OGRERR_NONE )
 	        {
                 wxLogError(_("Creation of output layer '%s' failed"), sName.c_str());
                 return NULL;

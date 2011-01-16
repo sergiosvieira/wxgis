@@ -87,9 +87,9 @@ public:
     virtual wxDateTime GetFinish() = 0;
     virtual double GetDonePercent() = 0;
     virtual wxString GetLastMessage() = 0;
-    virtual bool Start() = 0;
-    virtual bool Stop() = 0;
-    virtual bool Pause() = 0;
+    virtual bool StartTask() = 0;
+    virtual bool StopTask() = 0;
+    virtual bool PauseTask() = 0;
 };
 
 class IGPDomain

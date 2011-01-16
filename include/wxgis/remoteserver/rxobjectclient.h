@@ -3,7 +3,7 @@
  * Purpose:  wxRxObject class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ public:
 	virtual void Detach(void);
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void){return GetName();};
+    virtual wxString GetInternalName(void){return wxEmptyString;};
 	//IRxObjectClient
 	virtual bool Init(wxGxRemoteServer *pGxRemoteServer, wxXmlNode* pProperties);
 	//INetMessageReceiver
@@ -62,6 +63,7 @@ public:
 	virtual void Detach(void);
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void){return GetName();};
+    virtual wxString GetInternalName(void){return wxEmptyString;};
 	virtual wxString GetCategory(void){return wxString(_("Remote container"));};
 	virtual void Refresh(void);
 	//IGxObjectContainer

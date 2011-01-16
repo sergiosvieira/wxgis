@@ -3,7 +3,7 @@
  * Purpose:  wxGxPendingUI class. Show pending item in tree or content view
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ public:
 	//IGxObject
 	virtual wxString GetName(void){return wxString(_("Waiting..."));};
     virtual wxString GetBaseName(void){return GetName();};
+    virtual wxString GetInternalName(void){return wxEmptyString;};
 	virtual wxString GetCategory(void){return wxString(_("Waiting..."));};
 	virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog);
     virtual void Detach(void);

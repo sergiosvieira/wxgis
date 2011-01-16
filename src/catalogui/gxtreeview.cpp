@@ -3,7 +3,7 @@
  * Purpose:  wxGxTreeView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -324,7 +324,7 @@ void wxGxTreeViewBase::OnObjectRefreshed(IGxObject* object)
 			if(pData->m_bExpandedOnce)
 			{
                 //store current sel
-                Unselect();
+                //Unselect();
 				DeleteChildren(TreeItemId);
 				pData->m_bExpandedOnce = false;
 				Expand(TreeItemId);
@@ -603,9 +603,7 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
             continue;
         if(!pData->m_pObject)
             continue;
-        IGxDataset* pDSet = dynamic_cast<IGxDataset*>(pData->m_pObject);
-        if(pDSet)
-            pMyData->AddFile(pDSet->GetPath());
+        pMyData->AddFile(pData->m_pObject->GetInternalName());
     }
     wxDropSource dragSource( this );
 	dragSource.SetData( *pMyData );

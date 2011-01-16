@@ -3,7 +3,7 @@
  * Purpose:  wxGxFile classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -33,10 +33,10 @@ class WXDLLIMPEXP_GIS_CLT wxGxFile :
 public:
 	wxGxFile(wxString Path, wxString Name);
 	virtual ~wxGxFile(void);
-    virtual wxString GetPath(void){return m_sPath;};
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void);
+    virtual wxString GetInternalName(void){return m_sPath;};
 protected:
 	wxString m_sName, m_sPath;
 };

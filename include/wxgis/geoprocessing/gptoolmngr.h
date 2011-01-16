@@ -35,13 +35,13 @@ class wxGPProcess :
 public:
     wxGPProcess(wxString sCommand, IProcessParent* pParent, ITrackCancel* pTrackCancel);
     virtual ~wxGPProcess(void);
+    virtual void OnTerminate(int pid, int status);
 	//IStreamReader
 	virtual void ProcessInput(wxString sInputData);
 protected:
     ITrackCancel* m_pTrackCancel;
 	IProgressor* m_pProgressor;
 	//wxTextOutputStream* m_pOutTxtStream;
-	wxDateTime m_dtEstEnd;
 };
 
 typedef struct _wxgisexecddata
@@ -73,6 +73,8 @@ public:
     //virtual WXGISEXECDDATA GetTask(size_t nIndex);
 	//IProcessParent
     virtual void OnFinish(IProcess* pProcess, bool bHasErrors);
+    virtual wxDateTime GetProcessStart(size_t nIndex);
+    virtual wxDateTime GetProcessFinish(size_t nIndex);
 protected:
     virtual bool ExecTask(WXGISEXECDDATA &data);
 public:
@@ -89,5 +91,6 @@ protected:
     std::multimap<int, wxString> m_ToolsPopularMap;
     std::vector<WXGISEXECDDATA> m_ProcessArray;
     short m_nMaxTasks, m_nRunningTasks;
+    wxString m_sGeoprocessPath;
 };
 

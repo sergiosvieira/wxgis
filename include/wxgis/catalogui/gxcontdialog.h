@@ -3,7 +3,7 @@
  * Purpose:  wxGxContainerDialog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -151,6 +151,7 @@ public:
 //    virtual wxString GetName(void);
 //    virtual wxString GetFullPath(void);
     virtual wxString GetPath(void);
+    virtual wxString GetInternalPath(void);
     virtual IGxObject* GetLocation(void);
     virtual IGxObjectFilter* GetCurrentFilter(void);
 protected:
