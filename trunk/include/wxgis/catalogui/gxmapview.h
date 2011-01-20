@@ -35,7 +35,7 @@ public:
 	wxGxMapView(wxWindow* parent, wxWindowID id = MAPCTRLID, const wxPoint& pos = wxDefaultPosition,
 						 const wxSize& size = wxDefaultSize);
 	virtual ~wxGxMapView(void);
-    virtual void CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileName);
+    virtual void CheckOverviews(wxGISDatasetSPtr pwxGISDataset, wxString soFileName);
     //events
 	void OnMouseMove(wxMouseEvent& event);
 	void OnMouseDown(wxMouseEvent& event);

@@ -44,7 +44,7 @@ public:
 	virtual void ShowPane(const wxString& sName, bool bShow = true);
 	virtual bool IsPaneShown(const wxString& sName);
     //IGxApplication
-	virtual IGxCatalog* GetCatalog(void);
+	virtual IGxCatalog* const GetCatalog(void);
 	//wxGISApplication
 	virtual void RemoveCommandBar(IGISCommandBar* pBar);
 	virtual bool AddCommandBar(IGISCommandBar* pBar);
@@ -55,7 +55,7 @@ public:
 	virtual void ShowStatusBar(bool bShow);
 	virtual void ShowApplicationWindow(wxWindow* pWnd, bool bShow = true);
 	virtual bool IsApplicationWindowShown(wxWindow* pWnd);
-	virtual const WINDOWARRAY* GetChildWindows(void);
+	virtual const WINDOWARRAY* const GetChildWindows(void);
 	virtual void RegisterChildWindow(wxWindow* pWnd);
 	virtual void UnRegisterChildWindow(wxWindow* pWnd);
     virtual wxString GetAppName(void){return wxString(wxT("wxGISCatalog"));};

@@ -57,7 +57,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxKMLSubDatasetUI :
 	public IGxObjectUI
 {
 public:
-	wxGxKMLSubDatasetUI(wxString sName, wxGISDataset* pwxGISDataset, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxKMLSubDatasetUI(wxString sName, wxGISDatasetSPtr pwxGISDataset, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxKMLSubDatasetUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);

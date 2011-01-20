@@ -33,7 +33,7 @@ wxGxKMLDataset::wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorData
 	m_sName = Name;
 	m_sPath = Path;
 
-	m_pwxGISDataset = NULL;
+	//m_pwxGISDataset = NULL;
 
     m_Encoding = wxFONTENCODING_UTF8;
     m_pPathEncoding = wxConvCurrent;
@@ -44,7 +44,7 @@ wxGxKMLDataset::wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorData
 
 wxGxKMLDataset::~wxGxKMLDataset(void)
 {
-    wsDELETE(m_pwxGISDataset);
+    //wsDELETE(m_pwxGISDataset);
 }
 
 void wxGxKMLDataset::SetEncoding(wxFontEncoding Encoding)
@@ -75,13 +75,13 @@ bool wxGxKMLDataset::Delete(void)
     if(m_pwxGISDataset)
     {
         EmptyChildren();
-        wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(m_pwxGISDataset);
+        wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset);
         if(pDSet)
             bRet = pDSet->Delete();
     }
     else
     {
-        wxGISFeatureDataset* pwxGISFeatureDataset = new wxGISFeatureDataset(m_sPath, m_type);
+        wxGISFeatureDatasetSPtr pwxGISFeatureDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_type);
         bRet = pwxGISFeatureDataset->Delete();
     }
 
@@ -151,7 +151,7 @@ void wxGxKMLDataset::LoadChildren(void)
 
 	if(m_pwxGISDataset == NULL)
 	{
-        wxGISFeatureDataset* pwxGISFeatureDataset = new wxGISFeatureDataset(m_sPath, m_type);
+        wxGISFeatureDatasetSPtr pwxGISFeatureDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_type);
 
         if(!pwxGISFeatureDataset->Open())
         {
@@ -159,18 +159,18 @@ void wxGxKMLDataset::LoadChildren(void)
 		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
             wxLogError(sErr);
 
-            wxDELETE(pwxGISFeatureDataset);
+            //wxDELETE(pwxGISFeatureDataset);
 			return;
         }
 
-		m_pwxGISDataset = static_cast<wxGISDataset*>(pwxGISFeatureDataset);
+        m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(pwxGISFeatureDataset);
         m_pwxGISDataset->SetSubType(m_type);
-        m_pwxGISDataset->Reference();
+        //m_pwxGISDataset->Reference();
 	}
 
     for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); i++)
     {
-        wxGISFeatureDataset* pwxGISFeatureSuDataset = dynamic_cast<wxGISFeatureDataset*>(m_pwxGISDataset->GetSubset(i));//wxGISDataset* pSubSet
+        wxGISFeatureDatasetSPtr pwxGISFeatureSuDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset->GetSubset(i));
         pwxGISFeatureSuDataset->SetSubType(m_type);
         wxGxKMLSubDataset* pGxSubDataset = new wxGxKMLSubDataset(pwxGISFeatureSuDataset->GetName(), pwxGISFeatureSuDataset, m_type);
 		bool ret_code = AddChild(pGxSubDataset);
@@ -191,13 +191,13 @@ bool wxGxKMLDataset::DeleteChild(IGxObject* pChild)
 	return true;
 }
 
-wxGISDataset* wxGxKMLDataset::GetDataset(bool bReadOnly)
+wxGISDatasetSPtr wxGxKMLDataset::GetDataset(bool bReadOnly)
 {
     LoadChildren();
 	if(m_pwxGISDataset == NULL)
-        return NULL;
+        return wxGISDatasetSPtr();
 
-	m_pwxGISDataset->Reference();
+	//m_pwxGISDataset->Reference();
 	return m_pwxGISDataset;
 }
 
@@ -205,7 +205,7 @@ wxGISDataset* wxGxKMLDataset::GetDataset(bool bReadOnly)
 //class wxGxKMLSubDataset
 //--------------------------------------------------------------
 
-wxGxKMLSubDataset::wxGxKMLSubDataset(wxString sName, wxGISDataset* pwxGISDataset, wxGISEnumVectorDatasetType nType)
+wxGxKMLSubDataset::wxGxKMLSubDataset(wxString sName, wxGISDatasetSPtr pwxGISDataset, wxGISEnumVectorDatasetType nType)
 {
 	m_type = nType;
 
@@ -219,7 +219,7 @@ wxGxKMLSubDataset::wxGxKMLSubDataset(wxString sName, wxGISDataset* pwxGISDataset
 
 wxGxKMLSubDataset::~wxGxKMLSubDataset(void)
 {
-    wsDELETE(m_pwxGISDataset);
+    //wsDELETE(m_pwxGISDataset);
 }
 
 wxString wxGxKMLSubDataset::GetCategory(void)
@@ -227,10 +227,10 @@ wxString wxGxKMLSubDataset::GetCategory(void)
 	return wxString(_("KML Feature class"));
 }
 
-wxGISDataset* wxGxKMLSubDataset::GetDataset(bool bReadOnly)
+wxGISDatasetSPtr wxGxKMLSubDataset::GetDataset(bool bReadOnly)
 {
 	if(m_pwxGISDataset == NULL)
-        return NULL;
+        return wxGISDatasetSPtr();
 
   //  if(!m_pwxGISDataset->Open())
   //  {
@@ -245,7 +245,7 @@ wxGISDataset* wxGxKMLSubDataset::GetDataset(bool bReadOnly)
 	//m_pwxGISDataset->Reference();
 
     //for outer pointer
-	m_pwxGISDataset->Reference();
+	//m_pwxGISDataset->Reference();
 	return m_pwxGISDataset;
 }
 

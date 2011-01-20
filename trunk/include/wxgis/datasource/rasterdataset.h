@@ -63,3 +63,5 @@ protected:
 	int m_nYSize;
 	int m_nBandCount;
 };
+
+DEFINE_SHARED_PTR(wxGISRasterDataset);

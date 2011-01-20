@@ -168,7 +168,7 @@ public:
      */	
     virtual bool SetFromString(wxString sParams) = 0;
     virtual void SetCatalog(IGxCatalog* pCatalog) = 0;
-    virtual IGxCatalog* GetCatalog(void) = 0;
+    virtual IGxCatalog* const GetCatalog(void) = 0;
     //virtual GetToolType(void) = 0;
 };
 

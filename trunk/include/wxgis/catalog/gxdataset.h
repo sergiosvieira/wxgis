@@ -46,12 +46,12 @@ public:
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
 	//IGxDataset
-	virtual wxGISDataset* GetDataset(bool bReadOnly);
+	virtual wxGISDatasetSPtr GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISTableDataset;};
     virtual int GetSubType(void){return m_type;};
 protected:
 	wxString m_sName, m_sPath;
-	wxGISDataset* m_pwxGISDataset;
+	wxGISDatasetSPtr m_pwxGISDataset;
 	wxGISEnumTableDatasetType m_type;
     wxMBConv* m_pPathEncoding;
 };
@@ -81,13 +81,13 @@ public:
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
 	//IGxDataset
-	virtual wxGISDataset* GetDataset(bool bReadOnly);
+	virtual wxGISDatasetSPtr GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
     virtual int GetSubType(void){return (int)m_type;};
 protected:
 	wxString m_sName, m_sPath;
     wxFontEncoding m_Encoding;
-	wxGISDataset* m_pwxGISDataset;
+	wxGISDatasetSPtr m_pwxGISDataset;
 	wxGISEnumVectorDatasetType m_type;
     wxMBConv* m_pPathEncoding;
 };
@@ -116,11 +116,11 @@ public:
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
 	//IGxDataset
-	virtual wxGISDataset* GetDataset(bool bReadOnly);
+	virtual wxGISDatasetSPtr GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
     virtual int GetSubType(void){return (int)m_type;};
 protected:
 	wxString m_sName, m_sPath;
     wxGISEnumRasterDatasetType m_type;
-	wxGISDataset* m_pwxGISDataset;
+	wxGISDatasetSPtr m_pwxGISDataset;
 };

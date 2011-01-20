@@ -24,7 +24,7 @@
 
 wxGISPostgresDataSource::wxGISPostgresDataSource(wxString sName, wxString sCryptPass, wxString sPGPort, wxString sPGAddres, wxString sDBName, wxString sCursor) : wxGISDataset(wxEmptyString), m_poDS(NULL)
 {
-    m_RefCount = 0;
+    //m_RefCount = 0;
 	m_bIsOpened = false;
 	m_nType = enumGISContainer;
 	m_nSubType = enumContGDB;
@@ -60,11 +60,11 @@ size_t wxGISPostgresDataSource::GetSubsetsCount(void)
     return 0;
 }
 
-wxGISDataset* wxGISPostgresDataSource::GetSubset(size_t nIndex)
+wxGISDatasetSPtr wxGISPostgresDataSource::GetSubset(size_t nIndex)
 {
     if( !m_bIsOpened )
         if( !Open() )
-            return 0;
+            return wxGISDatasetSPtr();
 
     if(m_poDS)
     {
@@ -72,14 +72,14 @@ wxGISDataset* wxGISPostgresDataSource::GetSubset(size_t nIndex)
         if(poLayer)
         {
             m_poDS->Reference();
-			wxGISDataset* pDataset(NULL);
+			wxGISDatasetSPtr pDataset;
 			//check the layer type
 			if(CPLStrnlen(poLayer->GetGeometryColumn(), 100))
 			{
-				wxGISTable* pTable = new wxGISTable(poLayer, wxEmptyString, enumTablePostgres);//TODO: Think about it
+                wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(poLayer, wxEmptyString, enumTablePostgres);//TODO: Think about it
 				pTable->SetEncoding(wxFONTENCODING_UTF8);
-				pTable->Reference();
-				pDataset = static_cast<wxGISDataset*>(pTable);
+				//pTable->Reference();
+                pDataset = boost::static_pointer_cast<wxGISDataset>(pTable);
 			}
 			else
 			{
@@ -88,21 +88,21 @@ wxGISDataset* wxGISPostgresDataSource::GetSubset(size_t nIndex)
 	        return pDataset;
         }
     }
-    return NULL;
+    return wxGISDatasetSPtr();
 }
 
-wxGISDataset* wxGISPostgresDataSource::GetSubset(wxString sTablename)
+wxGISDatasetSPtr wxGISPostgresDataSource::GetSubset(wxString sTablename)
 {
     if( !m_bIsOpened )
         if( !Open() )
-            return 0;
+            return wxGISDatasetSPtr();
 
     if(m_poDS)
     {
 	    OGRLayer* poLayer = m_poDS->GetLayerByName(wgWX2MB(sTablename));
         if(poLayer)
         {
-			wxGISDataset* pDataset(NULL);
+			wxGISDatasetSPtr pDataset;
 			//check the layer type
 			if(CPLStrnlen(poLayer->GetGeometryColumn(), 100))
 			{
@@ -110,15 +110,15 @@ wxGISDataset* wxGISPostgresDataSource::GetSubset(wxString sTablename)
 			}
 			else
 			{
-				wxGISTable* pTable = new wxGISTable(poLayer, wxEmptyString, enumTablePostgres);
+                wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(poLayer, wxEmptyString, enumTablePostgres);
 				pTable->SetEncoding(wxFONTENCODING_UTF8);
-				pTable->Reference();
-				pDataset = static_cast<wxGISDataset*>(pTable);
+				//pTable->Reference();
+                pDataset = boost::static_pointer_cast<wxGISDataset>(pTable);
 			}
 	        return pDataset;
         }
     }
-    return NULL;
+    return wxGISDatasetSPtr();
 }
 
 bool wxGISPostgresDataSource::Open()
@@ -161,22 +161,22 @@ OGRDataSource* wxGISPostgresDataSource::GetDataSource(void)
     return m_poDS;
 }
 
-wxGISDataset* wxGISPostgresDataSource::ExecuteSQL(wxString sStatement, wxGISSpatialFilter* pSpatialFilter, wxString sDialect)
+wxGISDatasetSPtr wxGISPostgresDataSource::ExecuteSQL(wxString sStatement, wxGISSpatialFilter* pSpatialFilter, wxString sDialect)
 {
     if( !m_bIsOpened )
         if( !Open() )
-            return NULL;
-	wxGISDataset* pDataset(NULL);
+            return wxGISDatasetSPtr();
+	wxGISDatasetSPtr pDataset;
     if(m_poDS)
 	{
 		OGRLayer * poLayer = m_poDS->ExecuteSQL(wgWX2MB(sStatement), NULL, wgWX2MB(sDialect));//TODO: implement spatial Filter
 		if(	poLayer )
 		{
-			wxGISTable* pTable = new wxGISTable(poLayer, sStatement, enumTableQueryResult);
+            wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(poLayer, sStatement, enumTableQueryResult);
 			pTable->SetEncoding(wxFONTENCODING_UTF8);
-			pTable->Reference();
+			//pTable->Reference();
 			pTable->SetDataSource(m_poDS);
-			pDataset = static_cast<wxGISDataset*>(pTable);
+            pDataset = boost::static_pointer_cast<wxGISDataset>(pTable);
 		}
 	}
 	return pDataset;

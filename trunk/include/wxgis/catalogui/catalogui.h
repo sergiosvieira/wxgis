@@ -41,7 +41,7 @@ class IGxApplication
 {
 public:
 	virtual ~IGxApplication(void){};
-	virtual IGxCatalog* GetCatalog(void) = 0;
+	virtual IGxCatalog* const GetCatalog(void) = 0;
 };
 
 

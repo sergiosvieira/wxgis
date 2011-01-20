@@ -23,9 +23,10 @@
 #include "wxgis/datasource/datasource.h"
 
 class wxGISFeatureDataset;
+DEFINE_SHARED_PTR(wxGISFeatureDataset);
 
 void WXDLLIMPEXP_GIS_DS GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
-wxGISFeatureDataset WXDLLIMPEXP_GIS_DS *CreateVectorLayer(wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *poFields, OGRSpatialReference *poSpatialRef = NULL, OGRwkbGeometryType eGType = wkbUnknown, char ** papszDataSourceOptions = NULL, char ** papszLayerOptions = NULL, wxMBConv* pPathEncoding = wxConvCurrent); 
+wxGISFeatureDatasetSPtr WXDLLIMPEXP_GIS_DS CreateVectorLayer(wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *poFields, OGRSpatialReference *poSpatialRef = NULL, OGRwkbGeometryType eGType = wkbUnknown, char ** papszDataSourceOptions = NULL, char ** papszLayerOptions = NULL, wxMBConv* pPathEncoding = wxConvCurrent); 
 
 //---------------------------------------
 // wxGISFeatureDataset
@@ -41,7 +42,7 @@ public:
 //wxGISDataset
 	virtual wxGISEnumDatasetType GetType(void){return m_nType;};
     virtual size_t GetSubsetsCount(void);
-    virtual wxGISDataset* GetSubset(size_t nIndex);
+    virtual wxGISDatasetSPtr GetSubset(size_t nIndex);
     virtual wxString GetName(void);
 	virtual OGRSpatialReference* GetSpatialReference(void);
 	virtual void Close(void);
@@ -88,6 +89,8 @@ protected:
     wxGISGeometrySet *m_pGeometrySet;
     CPLQuadTree* m_pQuadTree;
 };
+
+
 
 ////---------------------------------------
 //// wxGISShapeFeatureDataset

@@ -37,7 +37,7 @@ wxGISSimpleRenderer::~wxGISSimpleRenderer(void)
 	wxDELETE(m_pMarkerSymbol);
 }
 
-bool wxGISSimpleRenderer::CanRender(wxGISDataset* pDataset)
+bool wxGISSimpleRenderer::CanRender(wxGISDatasetSPtr pDataset)
 {
 	return pDataset->GetType() == enumGISFeatureDataset ? true : false;
 }

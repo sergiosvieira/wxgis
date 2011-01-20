@@ -48,7 +48,7 @@ public:
     virtual bool Validate(void) = 0;
     virtual GPParameters* GetParameterInfo(void) = 0;
     virtual void SetCatalog(IGxCatalog* pCatalog);
-    virtual IGxCatalog* GetCatalog(void);
+    virtual IGxCatalog* const GetCatalog(void);
 	virtual wxString GetAsString(void);
 	virtual bool SetFromString(wxString sParams);
     //TODO: export/import tool to XML for server execution

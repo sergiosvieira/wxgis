@@ -30,7 +30,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxCatalogUI :
 	public IGxObjectEditUI
 {
 public:
-	wxGxCatalogUI(void);
+	wxGxCatalogUI(bool bFast = false);
 	virtual ~wxGxCatalogUI(void);
     //IGxObject
 	virtual void Detach(void);
@@ -61,9 +61,9 @@ public:
     }
 	//wxGxCatalog
 	virtual void EmptyChildren(void);
-	virtual void Init(void);
+	virtual void Init(IGxCatalog* pExtCat = NULL);
 protected:
-	bool m_bOpenLastPath;
+	bool m_bOpenLastPath, m_bHasInternal;
 	IGxSelection* m_pSelection;
     wxImageList m_ImageListSmall, m_ImageListLarge;
 };

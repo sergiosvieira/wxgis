@@ -35,18 +35,18 @@ wxGxTableDataset::wxGxTableDataset(wxString Path, wxString Name, wxGISEnumTableD
 	m_sName = Name;
 	m_sPath = Path;
 
-	m_pwxGISDataset = NULL;
+	//m_pwxGISDataset = NULL;
     m_pPathEncoding = wxConvCurrent;
 }
 
 wxGxTableDataset::~wxGxTableDataset(void)
 {
-    wsDELETE(m_pwxGISDataset);
+    //wsDELETE(m_pwxGISDataset);
 }
 
 bool wxGxTableDataset::Delete(void)
 {
-    wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset(true));
+    wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(GetDataset(true));
     if(!pDSet)
         return false;
 
@@ -54,7 +54,7 @@ bool wxGxTableDataset::Delete(void)
     bool bRet = pDSet->Delete();
     if(bRet)
 	{
-        wsDELETE(pDSet);
+        //wsDELETE(pDSet);
 
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer == NULL)
@@ -73,9 +73,9 @@ bool wxGxTableDataset::Delete(void)
 void wxGxTableDataset::Detach(void)
 {
 	IGxObject::Detach();
-    if(m_pwxGISDataset)
-        if(m_pwxGISDataset->Release() == 0)
-            m_pwxGISDataset = NULL;
+    //if(m_pwxGISDataset)
+    //    if(m_pwxGISDataset->Release() == 0)
+    //        m_pwxGISDataset = NULL;
 
 }
 
@@ -88,7 +88,7 @@ wxString wxGxTableDataset::GetBaseName(void)
 
 bool wxGxTableDataset::Rename(wxString NewName)
 {
-    wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset(true));
+    wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(GetDataset(true));
     if(!pDSet)
         return false;
 	if(pDSet->Rename(NewName))
@@ -110,16 +110,16 @@ bool wxGxTableDataset::Rename(wxString NewName)
 	}	
 }
 
-wxGISDataset* wxGxTableDataset::GetDataset(bool bReadOnly)
+wxGISDatasetSPtr wxGxTableDataset::GetDataset(bool bReadOnly)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
-		m_pwxGISDataset = new wxGISFeatureDataset(m_sPath, enumVecUnknown);
+        m_pwxGISDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, enumVecUnknown);
 		//for storing internal pointer
-		m_pwxGISDataset->Reference();
+		//m_pwxGISDataset->Reference();
 	}
 	//for outer pointer
-	m_pwxGISDataset->Reference();
+	//m_pwxGISDataset->Reference();
 	return m_pwxGISDataset;
 }
 
@@ -135,14 +135,14 @@ wxGxFeatureDataset::wxGxFeatureDataset(wxString Path, wxString Name, wxGISEnumVe
 	m_sName = Name;
 	m_sPath = Path;
 
-	m_pwxGISDataset = NULL;
+	//m_pwxGISDataset = NULL;
 
     m_pPathEncoding = wxConvCurrent;
 }
 
 wxGxFeatureDataset::~wxGxFeatureDataset(void)
 {
-    wsDELETE(m_pwxGISDataset);
+    //wsDELETE(m_pwxGISDataset);
 }
 
 wxString wxGxFeatureDataset::GetCategory(void)
@@ -153,7 +153,7 @@ wxString wxGxFeatureDataset::GetCategory(void)
 void wxGxFeatureDataset::Detach(void)
 {
 	IGxObject::Detach();
-	wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(m_pwxGISDataset);
+    wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset);
 	if(pDSet)
 		pDSet->Close();
 }
@@ -167,15 +167,15 @@ wxString wxGxFeatureDataset::GetBaseName(void)
 
 bool wxGxFeatureDataset::Delete(void)
 {
-    wxGISFeatureDataset* pDSet;
+    wxGISFeatureDatasetSPtr pDSet;
  	if(m_pwxGISDataset == NULL)
     {
-        pDSet = new wxGISFeatureDataset(m_sPath, m_type);
-        m_pwxGISDataset = static_cast<wxGISDataset*>(pDSet);
+        pDSet = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_type);
+        m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(pDSet);
     }
     else
     {
-        pDSet = dynamic_cast<wxGISFeatureDataset*>(m_pwxGISDataset);
+        pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset);
     }
     
     if(!pDSet)
@@ -200,7 +200,7 @@ bool wxGxFeatureDataset::Delete(void)
 
 bool wxGxFeatureDataset::Rename(wxString NewName)
 {
-    wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(GetDataset(true));
+    wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(GetDataset(true));
     if(!pDSet)
         return false;
 	if(pDSet->Rename(NewName))
@@ -222,11 +222,11 @@ bool wxGxFeatureDataset::Rename(wxString NewName)
 	}	
 }
 
-wxGISDataset* wxGxFeatureDataset::GetDataset(bool bReadOnly)
+wxGISDatasetSPtr wxGxFeatureDataset::GetDataset(bool bReadOnly)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
-        wxGISFeatureDataset* pwxGISFeatureDataset = new wxGISFeatureDataset(m_sPath, m_type);
+        wxGISFeatureDatasetSPtr pwxGISFeatureDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_type);
 
         if(!pwxGISFeatureDataset->Open())
         {
@@ -234,8 +234,8 @@ wxGISDataset* wxGxFeatureDataset::GetDataset(bool bReadOnly)
 		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
             wxLogError(sErr);
 
-            wxDELETE(pwxGISFeatureDataset);
-			return NULL;
+            //wxDELETE(pwxGISFeatureDataset);
+			return wxGISDatasetSPtr();
         }
 
        // //Spatial Index
@@ -290,13 +290,13 @@ wxGISDataset* wxGxFeatureDataset::GetDataset(bool bReadOnly)
 	      //  }
        // }
 
-		m_pwxGISDataset = static_cast<wxGISDataset*>(pwxGISFeatureDataset);
+        m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(pwxGISFeatureDataset);
         m_pwxGISDataset->SetSubType(m_type);
 		//for storing internal pointer
-		m_pwxGISDataset->Reference();
+		//m_pwxGISDataset->Reference();
 	}
 	//for outer pointer
-	m_pwxGISDataset->Reference();
+	//m_pwxGISDataset->Reference();
 	return m_pwxGISDataset;
 }
 
@@ -312,25 +312,25 @@ wxGxRasterDataset::wxGxRasterDataset(wxString Path, wxString Name, wxGISEnumRast
 	m_sName = Name;
 	m_sPath = Path;
 
-	m_pwxGISDataset = NULL;
+	//m_pwxGISDataset = NULL;
 }
 
 wxGxRasterDataset::~wxGxRasterDataset(void)
 {
-	wsDELETE(m_pwxGISDataset);
+	//wsDELETE(m_pwxGISDataset);
 }
 
 bool wxGxRasterDataset::Delete(void)
 {
-    wxGISRasterDataset* pDSet;
+    wxGISRasterDatasetSPtr pDSet;
  	if(m_pwxGISDataset == NULL)
     {
-        pDSet = new wxGISRasterDataset(m_sPath, m_type);
-        m_pwxGISDataset = static_cast<wxGISDataset*>(pDSet);
+        pDSet = boost::make_shared<wxGISRasterDataset>(m_sPath, m_type);
+        m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(pDSet);
     }
     else
     {
-        pDSet = dynamic_cast<wxGISRasterDataset*>(m_pwxGISDataset);
+        pDSet = boost::dynamic_pointer_cast<wxGISRasterDataset>(m_pwxGISDataset);
     }
     
     if(!pDSet)
@@ -361,7 +361,7 @@ wxString wxGxRasterDataset::GetBaseName(void)
 
 bool wxGxRasterDataset::Rename(wxString NewName)
 {
-    wxGISRasterDataset* pDSet = dynamic_cast<wxGISRasterDataset*>(GetDataset(true));
+    wxGISRasterDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISRasterDataset>(GetDataset(true));
     if(!pDSet)
         return false;
 	if(pDSet->Rename(NewName))
@@ -396,17 +396,17 @@ wxString wxGxRasterDataset::GetCategory(void)
 void wxGxRasterDataset::Detach(void)
 {
 	IGxObject::Detach();
-    if(m_pwxGISDataset)
-        if(m_pwxGISDataset->Release() == 0)
-            m_pwxGISDataset = NULL;
+    //if(m_pwxGISDataset)
+    //    if(m_pwxGISDataset->Release() == 0)
+    //        m_pwxGISDataset = NULL;
 
 }
 
-wxGISDataset* wxGxRasterDataset::GetDataset(bool bReadOnly)
+wxGISDatasetSPtr wxGxRasterDataset::GetDataset(bool bReadOnly)
 {
 	if(m_pwxGISDataset == NULL)
 	{	
-        wxGISRasterDataset* pwxGISRasterDataset = new wxGISRasterDataset(m_sPath, m_type);
+        wxGISRasterDatasetSPtr pwxGISRasterDataset = boost::make_shared<wxGISRasterDataset>(m_sPath, m_type);
 
         if(!pwxGISRasterDataset->Open(bReadOnly))
         {
@@ -414,15 +414,14 @@ wxGISDataset* wxGxRasterDataset::GetDataset(bool bReadOnly)
 		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
             wxLogError(sErr);
 
-            wxDELETE(pwxGISRasterDataset);
-			return NULL;
+			return wxGISDatasetSPtr();
         }
         
-        m_pwxGISDataset = static_cast<wxGISDataset*>(pwxGISRasterDataset);
+        m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(pwxGISRasterDataset);
 		//for storing internal pointer
-		m_pwxGISDataset->Reference();
+		//m_pwxGISDataset->Reference();
 	}
 	//for outer pointer
-	m_pwxGISDataset->Reference();
+	//m_pwxGISDataset->Reference();
 	return m_pwxGISDataset;
 }

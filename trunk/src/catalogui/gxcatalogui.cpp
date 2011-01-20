@@ -27,14 +27,17 @@
 #include "../../art/process_working_16.xpm"
 #include "../../art/process_working_48.xpm"
 
-wxGxCatalogUI::wxGxCatalogUI() : wxGxCatalog()
+wxGxCatalogUI::wxGxCatalogUI(bool bFast) : wxGxCatalog()
 {
 	m_pSelection = new wxGxSelection();
 
     m_bOpenLastPath = true;
+    m_bHasInternal = false;
 
 	m_ImageListSmall.Create(16, 16);
 	m_ImageListLarge.Create(48, 48);
+    if(bFast)
+        return;
     m_ImageListSmall.Add(wxBitmap(process_working_16_xpm));
     m_ImageListLarge.Add(wxBitmap(process_working_48_xpm));
 }
@@ -45,18 +48,28 @@ wxGxCatalogUI::~wxGxCatalogUI()
 
 void wxGxCatalogUI::Detach(void)
 {
-    wxXmlNode* pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog")));
-	if(!pNode)
-        pNode = m_pConf->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog")), true);
-	if(pNode)
+    if(!m_bHasInternal)
     {
-	    if(pNode->HasProp(wxT("open_last_path")))
-		    pNode->DeleteProperty(wxT("open_last_path"));
-	    pNode->AddProperty(wxT("open_last_path"), wxString::Format(wxT("%u"), m_bOpenLastPath));
-    }
+        wxXmlNode* pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog")));
+	    if(!pNode)
+            pNode = m_pConf->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog")), true);
+	    if(pNode)
+        {
+	        if(pNode->HasProp(wxT("open_last_path")))
+		        pNode->DeleteProperty(wxT("open_last_path"));
+	        pNode->AddProperty(wxT("open_last_path"), wxString::Format(wxT("%u"), m_bOpenLastPath));
+        }
 
-	wxDELETE(m_pSelection);
-    wxGxCatalog::Detach();
+	    wxDELETE(m_pSelection);
+        wxGxCatalog::Detach();
+    }
+    else
+    {
+	    wxDELETE(m_pSelection);
+	    EmptyChildren();
+    	EmptyDisabledChildren();
+    	wxDELETE(m_pConf);
+    }
 }
 
 void wxGxCatalogUI::EditProperties(wxWindow *parent)
@@ -86,36 +99,64 @@ void wxGxCatalogUI::EmptyChildren(void)
 	m_bIsChildrenLoaded = false;
 }
 
-void wxGxCatalogUI::Init(void)
+void wxGxCatalogUI::Init(IGxCatalog* pExtCat)//TODO: include root items list
 {
 	if(m_bIsChildrenLoaded)
 		return;
 
-#ifdef WXGISPORTABLE
-	m_pConf = new wxGISConfig(wxString(wxT("wxCatalogUI")), CONFIG_DIR, true);
-#else
-	m_pConf = new wxGISConfig(wxString(wxT("wxCatalogUI")), CONFIG_DIR);
-#endif
+    #ifdef WXGISPORTABLE
+	    m_pConf = new wxGISConfig(wxString(wxT("wxCatalogUI")), CONFIG_DIR, true);
+    #else
+	    m_pConf = new wxGISConfig(wxString(wxT("wxCatalogUI")), CONFIG_DIR);
+    #endif
 
-	//loads current user and when local machine items
-	wxXmlNode* pObjectFactoriesNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/objectfactories")));
-	LoadObjectFactories(pObjectFactoriesNode);
-	pObjectFactoriesNode = m_pConf->GetConfigNode(enumGISHKLM, wxString(wxT("catalog/objectfactories")));
-	LoadObjectFactories(pObjectFactoriesNode);
+    if(pExtCat)
+    {
+        m_bHasInternal = true;
+        GxObjectFactoryArray* poObjFactArr = pExtCat->GetObjectFactories();
+        if(poObjFactArr)
+            for(size_t i = 0; i < poObjFactArr->size(); i++)
+                m_ObjectFactoriesArray.push_back(poObjFactArr->at(i));
 
-	//loads current user and when local machine items
-	wxXmlNode* pRootItemsNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/rootitems")));
-	LoadChildren(pRootItemsNode);
-	pRootItemsNode = m_pConf->GetConfigNode(enumGISHKLM, wxString(wxT("catalog/rootitems")));
-	LoadChildren(pRootItemsNode);
+         
+	    //loads current user and when local machine items
 
-	wxXmlNode* pConfXmlNode = m_pConf->GetConfigNode(wxString(wxT("catalog")), false, true);
-	if(!pConfXmlNode)
-		return;
+        //IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pExtCat);
+        //GxObjectArray* pGxObjectArray = pGxObjectContainer->GetChildren();
+        //if(pGxObjectArray)
+        //    for(size_t i = 0; i < pGxObjectArray->size(); i++)
+        //        m_Children.push_back(pGxObjectArray->at(i));
 
-	m_bShowHidden = wxAtoi(pConfXmlNode->GetPropVal(wxT("show_hidden"), wxT("0")));
-	m_bShowExt = wxAtoi(pConfXmlNode->GetPropVal(wxT("show_ext"), wxT("1")));
-	m_bOpenLastPath = wxAtoi(pConfXmlNode->GetPropVal(wxT("open_last_path"), wxT("1")));
+	    wxXmlNode* pRootItemsNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/rootitems")));
+	    LoadChildren(pRootItemsNode);
+	    pRootItemsNode = m_pConf->GetConfigNode(enumGISHKLM, wxString(wxT("catalog/rootitems")));
+	    LoadChildren(pRootItemsNode);
+
+	    m_bShowHidden = pExtCat->GetShowHidden();
+	    m_bShowExt = pExtCat->GetShowExt();
+    }
+    else
+    {
+	    //loads current user and when local machine items
+	    wxXmlNode* pObjectFactoriesNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/objectfactories")));
+	    LoadObjectFactories(pObjectFactoriesNode);
+	    pObjectFactoriesNode = m_pConf->GetConfigNode(enumGISHKLM, wxString(wxT("catalog/objectfactories")));
+	    LoadObjectFactories(pObjectFactoriesNode);
+
+	    //loads current user and when local machine items
+	    wxXmlNode* pRootItemsNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/rootitems")));
+	    LoadChildren(pRootItemsNode);
+	    pRootItemsNode = m_pConf->GetConfigNode(enumGISHKLM, wxString(wxT("catalog/rootitems")));
+	    LoadChildren(pRootItemsNode);
+
+	    wxXmlNode* pConfXmlNode = m_pConf->GetConfigNode(wxString(wxT("catalog")), false, true);
+	    if(!pConfXmlNode)
+		    return;
+
+	    m_bShowHidden = wxAtoi(pConfXmlNode->GetPropVal(wxT("show_hidden"), wxT("0")));
+	    m_bShowExt = wxAtoi(pConfXmlNode->GetPropVal(wxT("show_ext"), wxT("1")));
+	    m_bOpenLastPath = wxAtoi(pConfXmlNode->GetPropVal(wxT("open_last_path"), wxT("1")));
+    }
 }
 
 void wxGxCatalogUI::ObjectDeleted(IGxObject* pObject)

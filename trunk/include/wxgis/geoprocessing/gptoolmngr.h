@@ -50,7 +50,6 @@ typedef struct _wxgisexecddata
     IGPTool* pTool;
     ITrackCancel* pTrackCancel;
     IGPCallBack* pCallBack;
-	int nPrio;
 } WXGISEXECDDATA;
 
 /** \class wxGISGPToolManager gptoolmngr.h
@@ -81,6 +80,7 @@ public:
 	virtual int GetPriorityTaskIndex();
 protected:
     virtual bool ExecTask(WXGISEXECDDATA &data);
+    virtual void AddPriority(int nIndex, int nPriority);
 public:
     typedef struct _toolinfo
     {
@@ -89,11 +89,18 @@ public:
         IGPTool* pTool;
     } TOOLINFO;
 
+    typedef struct _taskprioinfo
+    {
+        int nIndex;
+        int nPriority;
+    } TASKPRIOINFO;
+
 protected:
     wxXmlNode* m_pToolsNode;
     std::map<wxString, TOOLINFO> m_ToolsMap;
     std::multimap<int, wxString> m_ToolsPopularMap;
     std::vector<WXGISEXECDDATA> m_ProcessArray;
+    std::vector<TASKPRIOINFO> m_aPriorityArray;
     short m_nMaxTasks, m_nRunningTasks;
     wxString m_sGeoprocessPath;
 };

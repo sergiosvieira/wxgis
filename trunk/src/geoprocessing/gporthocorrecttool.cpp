@@ -206,7 +206,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("Source object is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
-    wxGISRasterDataset* pSrcDataSet = dynamic_cast<wxGISRasterDataset*>(pGxDataset->GetDataset(true));
+    wxGISRasterDatasetSPtr pSrcDataSet = boost::dynamic_pointer_cast<wxGISRasterDataset>(pGxDataset->GetDataset(true));
     if(!pSrcDataSet)
     {
         //add messages to pTrackCancel
@@ -228,7 +228,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         if(pTrackCancel)
             pTrackCancel->PutMessage(_("Error getting selected destination filter"), -1, enumGISMessageErr);
 
-        wsDELETE(pSrcDataSet);
+        //wsDELETE(pSrcDataSet);
         return false;
     }
 
@@ -242,7 +242,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         //add messages to pTrackCancel
         if(pTrackCancel)
             pTrackCancel->PutMessage(_("Error getting raster"), -1, enumGISMessageErr);
-        wsDELETE(pSrcDataSet);
+        //wsDELETE(pSrcDataSet);
         return false;
     }
 
@@ -254,7 +254,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         //add messages to pTrackCancel
         if(pTrackCancel)
             pTrackCancel->PutMessage(_("The raster has no bands"), -1, enumGISMessageErr);
-        wsDELETE(pSrcDataSet);
+        //wsDELETE(pSrcDataSet);
         return false;
     }
     GDALDataType eDT = poGDALRasterBand->GetRasterDataType();
@@ -304,7 +304,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
             pTrackCancel->PutMessage(wxString::Format(_("Error CreateGenImgProjTransformer. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
-        wsDELETE(pSrcDataSet);
+        //wsDELETE(pSrcDataSet);
         return false;
     }
 
@@ -317,7 +317,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
             pTrackCancel->PutMessage(wxString::Format(_("Error determining output raster size. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
-        wsDELETE(pSrcDataSet);
+        //wsDELETE(pSrcDataSet);
         return false;
     }
 
@@ -331,7 +331,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
             pTrackCancel->PutMessage(wxString::Format(_("Error creating output raster. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
-        wsDELETE(pSrcDataSet);
+        //wsDELETE(pSrcDataSet);
         return false;
     }
 
@@ -396,7 +396,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(wxString::Format(_("OrthoCorrect failed! GDAL error: %s"), sErr.c_str()), -1, enumGISMessageErr);
         }
         GDALClose(poOutputGDALDataset);
-        wsDELETE(pSrcDataSet);
+        //wsDELETE(pSrcDataSet);
         return false;
     }
 
@@ -404,7 +404,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     GDALDestroyWarpOptions( psWarpOptions );
 
     GDALClose(poOutputGDALDataset);
-    wsDELETE(pSrcDataSet);
+    //wsDELETE(pSrcDataSet);
 
     if(pGxObjectContainer)
     {

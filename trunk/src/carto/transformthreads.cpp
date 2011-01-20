@@ -26,7 +26,7 @@
 
 
 
-wxGISFeatureTransformThread::wxGISFeatureTransformThread(wxGISFeatureDataset* pwxGISFeatureDataset, OGRCoordinateTransformation *poCT, bool bTransform, OGRPolygon* pRgn1, OGRPolygon* pRgn2, wxCriticalSection* pCritSect, OGREnvelope* pFullEnv, wxGISGeometrySet* pOGRGeometrySet, size_t &nCounter, ITrackCancel* pTrackCancel) : wxThread(wxTHREAD_JOINABLE), m_nCounter(nCounter)
+wxGISFeatureTransformThread::wxGISFeatureTransformThread(wxGISFeatureDatasetSPtr pwxGISFeatureDataset, OGRCoordinateTransformation *poCT, bool bTransform, OGRPolygon* pRgn1, OGRPolygon* pRgn2, wxCriticalSection* pCritSect, OGREnvelope* pFullEnv, wxGISGeometrySet* pOGRGeometrySet, size_t &nCounter, ITrackCancel* pTrackCancel) : wxThread(wxTHREAD_JOINABLE), m_nCounter(nCounter)
 {
     m_pwxGISFeatureDataset = pwxGISFeatureDataset;
     m_poCT = poCT;

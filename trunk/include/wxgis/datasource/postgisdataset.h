@@ -33,14 +33,14 @@ public:
 	virtual ~wxGISPostgresDataSource(void);
 	//wxGISDataset
     virtual size_t GetSubsetsCount(void);
-    virtual wxGISDataset* GetSubset(size_t nIndex);
+    virtual wxGISDatasetSPtr GetSubset(size_t nIndex);
     virtual wxString GetName(void);
 	virtual void Close(void);
 	//wxGISPostGISDataset
-    virtual wxGISDataset* GetSubset(wxString sTablename);
+    virtual wxGISDatasetSPtr GetSubset(wxString sTablename);
 	virtual OGRDataSource* GetDataSource(void);
 	virtual bool Open(void);
-	virtual wxGISDataset* ExecuteSQL(wxString sStatement, wxGISSpatialFilter* pSpatialFilter = NULL, wxString sDialect = wxEmptyString);
+	virtual wxGISDatasetSPtr ExecuteSQL(wxString sStatement, wxGISSpatialFilter* pSpatialFilter = NULL, wxString sDialect = wxEmptyString);
 protected:
 	OGRDataSource *m_poDS;
     wxString m_sName, m_sCryptPass, m_sPGPort, m_sPGAddres, m_sDBName, m_sCursor;

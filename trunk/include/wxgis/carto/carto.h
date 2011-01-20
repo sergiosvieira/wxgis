@@ -76,7 +76,7 @@ class IRenderer
 {
 public:
 	virtual ~IRenderer(void){};
-	virtual bool CanRender(wxGISDataset* pDataset) = 0;	
+	virtual bool CanRender(wxGISDatasetSPtr pDataset) = 0;	
 };
 
 class IFeatureRenderer : public IRenderer
@@ -90,5 +90,5 @@ class IRasterRenderer : public IRenderer
 {
 public:
 	virtual ~IRasterRenderer(void){};
-	virtual void Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel) = 0;
+	virtual void Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel) = 0;
 };

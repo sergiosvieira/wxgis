@@ -28,16 +28,9 @@
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
-//#include <wx/combo.h>
 #include <wx/treectrl.h>
-//#include <wx/combobox.h>
-//#include <wx/bitmap.h>
-//#include <wx/image.h>
-//#include <wx/icon.h>
 #include <wx/toolbar.h>
 #include <wx/sizer.h>
-//#include <wx/listctrl.h>
-//#include <wx/textctrl.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 
@@ -97,7 +90,7 @@ public:
 	~wxGxContainerDialog();	
 
 //IGxApplication
-    virtual IGxCatalog* GetCatalog(void){return static_cast<IGxCatalog*>(m_pCatalog);};
+    virtual IGxCatalog* const GetCatalog(void){return static_cast<IGxCatalog*>(m_pCatalog);};
 //IApplication
     virtual ICommand* GetCommand(long CmdID){return NULL;};
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType){return NULL;};
@@ -113,7 +106,7 @@ public:
     virtual void ShowStatusBar(bool bShow){};
     virtual bool IsStatusBarShown(void){return false;};
     virtual void ShowToolBarMenu(void){};
-	virtual const WINDOWARRAY* GetChildWindows(void){return NULL;};
+	virtual const WINDOWARRAY* const GetChildWindows(void){return NULL;};
     virtual void RegisterChildWindow(wxWindow* pWnd){};
     virtual void UnRegisterChildWindow(wxWindow* pWnd){};
     virtual void Customize(void){};

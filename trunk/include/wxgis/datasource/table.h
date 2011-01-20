@@ -66,3 +66,5 @@ protected:
 	short m_FieldCount;
     wxCriticalSection m_CritSect;
 };
+
+DEFINE_SHARED_PTR(wxGISTable);

@@ -34,14 +34,14 @@ wxGISRasterRGBRenderer::~wxGISRasterRGBRenderer(void)
 {
 }
 
-bool wxGISRasterRGBRenderer::CanRender(wxGISDataset* pDataset)
+bool wxGISRasterRGBRenderer::CanRender(wxGISDatasetSPtr pDataset)
 {
 	return pDataset->GetType() == enumGISRasterDataset ? true : false;
 }
 
-void wxGISRasterRGBRenderer::Draw(wxGISDataset* pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel)
+void wxGISRasterRGBRenderer::Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel)
 {
-	wxGISRasterDataset* pRaster = dynamic_cast<wxGISRasterDataset*>(pRasterDataset);
+    wxGISRasterDatasetSPtr pRaster = boost::dynamic_pointer_cast<wxGISRasterDataset>(pRasterDataset);
 	if(!pRaster)
 		return;
     pRaster->Open(true);

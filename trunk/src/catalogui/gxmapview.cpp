@@ -123,13 +123,13 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 		return;
 
 //    wxBusyCursor wait;
-	wxGISDataset* pwxGISDataset = pGxDataset->GetDataset(true);
+	wxGISDatasetSPtr pwxGISDataset = pGxDataset->GetDataset(true);
 	if(pwxGISDataset == NULL)
 		return;
 
     m_pParentGxObject = pGxObj;
     //the pOGRLayer will live while IGxObject live. IGxObject( from IGxSelection ) store IwxGISDataset, and destroy it then catalog destroyed
-    pwxGISDataset->Dereference();
+    //pwxGISDataset->Dereference();
 
 	wxGISEnumDatasetType type = pwxGISDataset->GetType();
     std::vector<wxGISLayer*> pwxGISLayers;
@@ -147,8 +147,8 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	case enumGISContainer:
         for(size_t i = 0; i < pwxGISDataset->GetSubsetsCount(); i++)
         {
-            wxGISDataset* pwxGISSubDataset = pwxGISDataset->GetSubset(i);
-            pwxGISSubDataset->Dereference();
+            wxGISDatasetSPtr pwxGISSubDataset = pwxGISDataset->GetSubset(i);
+            //pwxGISSubDataset->Dereference();
             if(!pwxGISSubDataset)
                 continue;
             wxGISEnumDatasetType subtype = pwxGISSubDataset->GetType();
@@ -251,9 +251,9 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
     return bKeyState == true ? 0 : 1;
 }
 
-void wxGxMapView::CheckOverviews(wxGISDataset* pwxGISDataset, wxString soFileName)
+void wxGxMapView::CheckOverviews(wxGISDatasetSPtr pwxGISDataset, wxString soFileName)
 {
- 	wxGISRasterDataset *pwxGISRasterDataset = dynamic_cast<wxGISRasterDataset*>(pwxGISDataset);
+    wxGISRasterDatasetSPtr pwxGISRasterDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(pwxGISDataset);
     if(!pwxGISRasterDataset)
         return;
    //pyramids

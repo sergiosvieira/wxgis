@@ -46,7 +46,7 @@ public:
     wxPGId AppendMetadataProperty(wxString sMeta);
     void FillGrid(void);
 protected:
-    wxGISFeatureDataset* m_pDataset;
+    wxGISFeatureDatasetSPtr m_pDataset;
     wxGxFeatureDataset* m_pGxDataset;
     wxPropertyGrid* m_pg;
 
