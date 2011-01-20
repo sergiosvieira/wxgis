@@ -336,17 +336,10 @@ wxIcon wxGxTaskObject::GetSmallImage(void)
 
 bool wxGxTaskObject::Invoke(wxWindow* pParentWnd)
 {
-    //if(GetState() == enumGISTaskError)//show tool dlg
-    //else
-    //{
-        m_pTaskExecDlg = new wxGxTaskObjectExecDlg(this, pParentWnd, wxID_ANY, m_sName);
-        m_pTaskExecDlg->SetIcon(m_SmallToolIcon);
-        SetValue(m_nDonePercent);
-        for(size_t i = 0; i < m_MessageArray.size(); i++)
-            m_pTaskExecDlg->PutMessage(m_MessageArray[i].sMessage, i, m_MessageArray[i].nType);
-        m_pTaskExecDlg->ShowModal();
-        wxDELETE(m_pTaskExecDlg);
-    //}
+    if(GetState() == enumGISTaskError)//show tool dlg
+		ShowToolConfig(pParentWnd);
+    else
+		ShowProcess(pParentWnd);
     return true;
 }
 
@@ -431,3 +424,18 @@ void wxGxTaskObject::SetTaskID(int nTaskID)
     m_nTaskID = nTaskID;
 }
 
+void wxGxTaskObject::ShowProcess(wxWindow* pParentWnd)
+{
+    m_pTaskExecDlg = new wxGxTaskObjectExecDlg(this, pParentWnd, wxID_ANY, m_sName);
+    m_pTaskExecDlg->SetIcon(m_SmallToolIcon);
+    SetValue(m_nDonePercent);
+    for(size_t i = 0; i < m_MessageArray.size(); i++)
+        m_pTaskExecDlg->PutMessage(m_MessageArray[i].sMessage, i, m_MessageArray[i].nType);
+    m_pTaskExecDlg->ShowModal();
+    wxDELETE(m_pTaskExecDlg);
+}
+
+void wxGxTaskObject::ShowToolConfig(wxWindow* pParentWnd)
+{
+//	m_pToolManager->OnPrepareTool(pParentWnd, pTool, m_pCallBack, false);
+}

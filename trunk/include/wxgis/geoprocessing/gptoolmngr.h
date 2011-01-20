@@ -50,6 +50,7 @@ typedef struct _wxgisexecddata
     IGPTool* pTool;
     ITrackCancel* pTrackCancel;
     IGPCallBack* pCallBack;
+	int nPrio;
 } WXGISEXECDDATA;
 
 /** \class wxGISGPToolManager gptoolmngr.h
@@ -75,6 +76,9 @@ public:
     virtual void OnFinish(IProcess* pProcess, bool bHasErrors);
     virtual wxDateTime GetProcessStart(size_t nIndex);
     virtual wxDateTime GetProcessFinish(size_t nIndex);
+    virtual int GetProcessPriority(size_t nIndex);
+    virtual void SetProcessPriority(size_t nIndex, int nPriority);
+	virtual int GetPriorityTaskIndex();
 protected:
     virtual bool ExecTask(WXGISEXECDDATA &data);
 public:

@@ -210,6 +210,10 @@
 				RelativePath="..\..\src\geoprocessingui\gxtoolexecview.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\src\geoprocessingui\taskcmd.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -246,6 +250,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\geoprocessingui\gxtoolexecview.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geoprocessingui\taskcmd.h"
 				>
 			</File>
 		</Filter>

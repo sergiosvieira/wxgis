@@ -152,6 +152,8 @@ public:
     //wxGxTaskObject
     virtual int GetTaskID(void){return m_nTaskID;};
     virtual void SetTaskID(int nTaskID);
+	virtual void ShowProcess(wxWindow* pParentWnd);
+	virtual void ShowToolConfig(wxWindow* pParentWnd);
     //IGPCallBack
     virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL);
     //ITrackCancel

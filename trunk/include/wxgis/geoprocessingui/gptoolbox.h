@@ -181,6 +181,10 @@ public:
     virtual void StartProcess(size_t nIndex);
     //virtual void CancelProcess(size_t nIndex);
     virtual void OnFinish(IProcess* pProcess, bool bHasErrors);
+    virtual bool OnPrepareTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync)
+	{
+		return m_pRootToolbox->OnPrepareTool(pParentWnd, pTool, pCallBack, bSync);
+	}
 protected:
     wxGxRootToolbox* m_pRootToolbox;
     wxIcon m_LargeToolIcon, m_SmallToolIcon;
