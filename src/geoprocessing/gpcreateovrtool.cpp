@@ -198,7 +198,7 @@ bool wxGISGPCreateOverviewsTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("Source object is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
-    wxGISRasterDataset* pSrcDataSet = dynamic_cast<wxGISRasterDataset*>(pGxDataset->GetDataset(true));
+    wxGISRasterDatasetSPtr pSrcDataSet = boost::dynamic_pointer_cast<wxGISRasterDataset>(pGxDataset->GetDataset(true));
     if(!pSrcDataSet)
     {
         //add messages to pTrackCancel
@@ -213,7 +213,7 @@ bool wxGISGPCreateOverviewsTool::Execute(ITrackCancel* pTrackCancel)
         //add messages to pTrackCancel
         if(pTrackCancel)
             pTrackCancel->PutMessage(_("Error getting raster"), -1, enumGISMessageErr);
-        wsDELETE(pSrcDataSet);
+        //wsDELETE(pSrcDataSet);
         return false;
     }
 
@@ -254,12 +254,12 @@ bool wxGISGPCreateOverviewsTool::Execute(ITrackCancel* pTrackCancel)
             const char* pszErr = CPLGetLastErrorMsg();
             pTrackCancel->PutMessage(wxString::Format(_("BuildOverviews failed! GDAL error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
         }
-        wsDELETE(pSrcDataSet);
+        //wsDELETE(pSrcDataSet);
         return false;
     }
 
     pSrcDataSet->SetHasOverviews(true);
-    wsDELETE(pSrcDataSet);
+    //wsDELETE(pSrcDataSet);
 
     return true;
 }

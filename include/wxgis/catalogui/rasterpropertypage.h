@@ -52,7 +52,7 @@ public:
     //IGPCallBack
     virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL);
 protected:
-    wxGISRasterDataset* m_pDataset;
+    wxGISRasterDatasetSPtr m_pDataset;
     wxGxRasterDataset* m_pGxDataset;
     IGxCatalog* m_pCatalog;
     wxPropertyGrid* m_pg;

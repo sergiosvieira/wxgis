@@ -81,7 +81,7 @@ void wxGxKMLDatasetUI::LoadChildren(void)
 
 	if(m_pwxGISDataset == NULL)
 	{
-        wxGISFeatureDataset* pwxGISFeatureDataset = new wxGISFeatureDataset(m_sPath, m_type);
+        wxGISFeatureDatasetSPtr pwxGISFeatureDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_type);
 
         if(!pwxGISFeatureDataset->Open())
         {
@@ -89,20 +89,20 @@ void wxGxKMLDatasetUI::LoadChildren(void)
 		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
 		    wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
 
-            wxDELETE(pwxGISFeatureDataset);
+            //wxDELETE(pwxGISFeatureDataset);
 			return;
         }
 
-		m_pwxGISDataset = static_cast<wxGISDataset*>(pwxGISFeatureDataset);
+        m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(pwxGISFeatureDataset);
         m_pwxGISDataset->SetSubType(m_type);
-        m_pwxGISDataset->Reference();
+        //m_pwxGISDataset->Reference();
 	}
 
     for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); i++)
     {
-        wxGISFeatureDataset* pwxGISFeatureSuDataset = dynamic_cast<wxGISFeatureDataset*>(m_pwxGISDataset->GetSubset(i));//wxGISDataset* pSubSet
+        wxGISFeatureDatasetSPtr pwxGISFeatureSuDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset->GetSubset(i));
         pwxGISFeatureSuDataset->SetSubType(m_type);
-        wxGxKMLSubDatasetUI* pGxSubDataset = new wxGxKMLSubDatasetUI(pwxGISFeatureSuDataset->GetName(), pwxGISFeatureSuDataset, m_type, m_LargeSubIcon, m_SmallSubIcon);
+        wxGxKMLSubDatasetUI* pGxSubDataset = new wxGxKMLSubDatasetUI(pwxGISFeatureSuDataset->GetName(), boost::static_pointer_cast<wxGISDataset>(pwxGISFeatureSuDataset), m_type, m_LargeSubIcon, m_SmallSubIcon);
 		bool ret_code = AddChild(pGxSubDataset);
 		if(!ret_code)
 			wxDELETE(pGxSubDataset);
@@ -114,7 +114,7 @@ void wxGxKMLDatasetUI::LoadChildren(void)
 //class wxGxKMLSubDatasetUI
 //--------------------------------------------------------------
 
-wxGxKMLSubDatasetUI::wxGxKMLSubDatasetUI(wxString sName, wxGISDataset* pwxGISDataset, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxKMLSubDataset(sName, pwxGISDataset, nType)
+wxGxKMLSubDatasetUI::wxGxKMLSubDatasetUI(wxString sName, wxGISDatasetSPtr pwxGISDataset, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxKMLSubDataset(sName, pwxGISDataset, nType)
 {
     m_LargeIcon = LargeIcon;
     m_SmallIcon = SmallIcon;

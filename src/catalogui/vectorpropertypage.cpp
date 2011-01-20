@@ -26,18 +26,18 @@ IMPLEMENT_DYNAMIC_CLASS(wxGISVectorPropertyPage, wxPanel)
 BEGIN_EVENT_TABLE(wxGISVectorPropertyPage, wxPanel)
 END_EVENT_TABLE()
 
-wxGISVectorPropertyPage::wxGISVectorPropertyPage(void) : m_pDataset(NULL)
+wxGISVectorPropertyPage::wxGISVectorPropertyPage(void)
 {
 }
 
-wxGISVectorPropertyPage::wxGISVectorPropertyPage(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name) : m_pDataset(NULL)
+wxGISVectorPropertyPage::wxGISVectorPropertyPage(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     Create(pGxDataset, parent, id, pos, size, style, name);
 }
 
 wxGISVectorPropertyPage::~wxGISVectorPropertyPage()
 {
-    wsDELETE(m_pDataset);
+    //wsDELETE(m_pDataset);
 }
 
 bool wxGISVectorPropertyPage::Create(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
@@ -46,7 +46,7 @@ bool wxGISVectorPropertyPage::Create(wxGxFeatureDataset* pGxDataset, wxWindow* p
 
     m_pGxDataset = pGxDataset;
 
-    m_pDataset = dynamic_cast<wxGISFeatureDataset*>(m_pGxDataset->GetDataset(true));
+    m_pDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pGxDataset->GetDataset(true));
     if(!m_pDataset)
         return false;
 

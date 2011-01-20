@@ -375,12 +375,13 @@ BEGIN_EVENT_TABLE(wxGxObjectDialog, wxDialog)
     EVT_UPDATE_UI(wxID_OK, wxGxObjectDialog::OnOKUI)
 END_EVENT_TABLE()
 
-wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pDropDownCommand(NULL), m_bAllowMultiSelect(false), m_bOverwritePrompt(false), m_nDefaultFilter(0), m_pConfig(NULL), m_pwxGxContentView(NULL), m_PopupCtrl(NULL), m_bAllFilters(true), m_bOwnFilter(true), m_pExternalCatalog(NULL)
+wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, IGxCatalog* pExternalCatalog, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pDropDownCommand(NULL), m_bAllowMultiSelect(false), m_bOverwritePrompt(false), m_nDefaultFilter(0), m_pConfig(NULL), m_pwxGxContentView(NULL), m_PopupCtrl(NULL), m_bAllFilters(true), m_bOwnFilter(true)
 {
 	this->SetSizeHints( wxSize( 400,300 ), wxDefaultSize );
 
-    m_pCatalog = new wxGxCatalogUI();
-	m_pCatalog->Init();
+    m_pExternalCatalog = pExternalCatalog; 
+    m_pCatalog = new wxGxCatalogUI(true);
+	m_pCatalog->Init(m_pExternalCatalog);
 
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
 
@@ -508,9 +509,11 @@ wxGxObjectDialog::~wxGxObjectDialog()
 
     wxDELETE(m_pwxGxContentView);
     
-    m_pCatalog->Detach();
-    wxDELETE(m_pCatalog);
-
+    if(m_pCatalog)
+    {
+        m_pCatalog->Detach();
+        delete m_pCatalog;
+    }
     wxDELETE(m_pConfig);
 }
 
@@ -661,7 +664,7 @@ void wxGxObjectDialog::OnInit()
 	if(!m_bAllowMultiSelect)
 		nStyle |= wxLC_SINGLE_SEL;
    	m_pwxGxContentView = new wxGxDialogContentView(this, LISTCTRLID, wxDefaultPosition, wxDefaultSize, nStyle);
-    m_pwxGxContentView->SetExternalCatalog(m_pExternalCatalog);
+    //m_pwxGxContentView->SetExternalCatalog(m_pExternalCatalog);
     wxXmlNode* pContentViewConf = m_pConfig->GetConfigNode(wxString(wxT("frame/views/contentsview")), true, true);
 
     m_pwxGxContentView->Activate(this, pContentViewConf);
@@ -1093,7 +1096,7 @@ bool wxGxObjectDialog::DoSaveObject(wxGISEnumSaveObjectResults Result)
     return true;
 }
 
-const WINDOWARRAY* wxGxObjectDialog::GetChildWindows(void)
+const WINDOWARRAY* const wxGxObjectDialog::GetChildWindows(void)
 {
 	return &m_WindowArray;
 }

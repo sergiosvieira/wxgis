@@ -24,6 +24,10 @@
 
 #include "wx/process.h"
 
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
+#include <boost/make_shared.hpp>
+
 #define wgDELETE(p,func) if(p != NULL) {p->func; delete p; p = NULL;}
 #define wsDELETE(p) if(p != NULL) {p->Release(); p = NULL;}
 #define wgWX2MB(x)  wxConvCurrent->cWX2MB(x)
@@ -307,3 +311,6 @@ public:
 	virtual ~IProcessParent(void){};
     virtual void OnFinish(IProcess* pProcess, bool bHasErrors) = 0;
 };
+
+#define DEFINE_SHARED_PTR(x) typedef boost::shared_ptr<x> x##SPtr
+#define DEFINE_WEAK_PTR(x) typedef boost::weak_ptr<x> x##SPtr

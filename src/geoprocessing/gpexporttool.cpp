@@ -171,7 +171,7 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("The source object is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
-    wxGISFeatureDataset* pSrcDataSet = dynamic_cast<wxGISFeatureDataset*>(pGxDataset->GetDataset(true));
+    wxGISFeatureDatasetSPtr pSrcDataSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pGxDataset->GetDataset(true));
     if(!pSrcDataSet)
     {
         //add messages to pTrackCancel
@@ -185,7 +185,7 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
     {
         if(pTrackCancel)
             pTrackCancel->PutMessage(_("Error reading dataset definition"), -1, enumGISMessageErr);
-        wsDELETE(pSrcDataSet);
+        //wsDELETE(pSrcDataSet);
         return false;
     }
     
@@ -222,7 +222,7 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
         if(pTrackCancel)
             pTrackCancel->PutMessage(_("The input spatial reference is not defined!"), -1, enumGISMessageErr);
 
-        wsDELETE(pSrcDataSet);
+        //wsDELETE(pSrcDataSet);
         wxDELETE(pNewSpaRef);
     }
 
@@ -328,7 +328,7 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
             bHasErrors = true;
     }
 
-    wsDELETE(pSrcDataSet);
+    //wsDELETE(pSrcDataSet);
     wxDELETE(pNewSpaRef);
 
     IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
@@ -342,9 +342,9 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
     return !bHasErrors;
 }
 
-bool wxGISGPExportTool::OnExport(wxGISFeatureDataset* pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel)
+bool wxGISGPExportTool::OnExport(wxGISFeatureDatasetSPtr pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel)
 {
-    wxGISFeatureDataset* pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
+    wxGISFeatureDatasetSPtr pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
     if(!pNewDSet)
     {
         if(pTrackCancel)
@@ -361,10 +361,10 @@ bool wxGISGPExportTool::OnExport(wxGISFeatureDataset* pDSet, wxString sPath, wxS
     {
         if(pTrackCancel)
             pTrackCancel->PutMessage(_("Error copying data to new dataset"), -1, enumGISMessageErr);
-        wsDELETE(pNewDSet);
+        //wsDELETE(pNewDSet);
         return false; 
     }
 
-    wsDELETE(pNewDSet);
+    //wsDELETE(pNewDSet);
     return true;
 }

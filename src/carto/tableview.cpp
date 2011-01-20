@@ -29,9 +29,9 @@
 // wxGISTable
 //------------------------------------------------------------------
 
-wxGISTable::wxGISTable(wxGISDataset* pwxGISDataset) : m_pwxGISDataset(NULL)
+wxGISTable::wxGISTable(wxGISDatasetSPtr pwxGISDataset)/* : m_pwxGISDataset(NULL)*/
 {
-	m_pwxGISDataset = dynamic_cast<wxGISFeatureDataset*>(pwxGISDataset);
+    m_pwxGISDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pwxGISDataset);
     //m_pwxGISDataset->Reference();
 	OGRLayer* pLayer = m_pwxGISDataset->GetLayerRef(0);
     if(pLayer)
@@ -51,7 +51,7 @@ wxGISTable::wxGISTable(wxGISDataset* pwxGISDataset) : m_pwxGISDataset(NULL)
 
 wxGISTable::~wxGISTable()
 {
-	wsDELETE(m_pwxGISDataset);
+	//wsDELETE(m_pwxGISDataset);
 }
 
 int wxGISTable::GetNumberCols()

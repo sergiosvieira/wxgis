@@ -222,10 +222,11 @@ void wxGISGeoprocessingCmd::OnClick(void)
                     if(pGxParentObj)
                         sStartLoc = pGxParentObj->GetFullName();
 
-                    wxGxObjectDialog dlg(pWnd, wxID_ANY, _("Select output"));
-                    IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+                    IGxCatalog *pExtCat = NULL;
                     if(pGxApp)
-                        dlg.SetExternalCatalog(pGxApp->GetCatalog());
+                        pExtCat = pGxApp->GetCatalog();
+                    wxGxObjectDialog dlg(pWnd, pExtCat, wxID_ANY, _("Select output"));
+                    IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
                     dlg.SetName(sName);
 				    dlg.SetAllowMultiSelect(false);
 				    dlg.SetAllFilters(false);
@@ -265,7 +266,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
                         wxString sCatalogPath = dlg.GetPath();
                         wxString sName = dlg.GetName();
 
-                        wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(DatasetArray[0]->GetDataset(true));
+                        wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(DatasetArray[0]->GetDataset(true));
                         if(!pDSet)
                         {
                             wxMessageBox(wxString(_("The dataset is empty")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
@@ -278,7 +279,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
                         {
                             wxMessageBox(wxString(_("Error reading dataset definition")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
                             wxLogError(_("Error reading dataset definition"));
-                            wsDELETE(pDSet);
+                            //wsDELETE(pDSet);
                             return;
                         }
 
@@ -428,7 +429,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
                             }
                         }
 EXIT:
-                        wsDELETE(pDSet);
+                        //wsDELETE(pDSet);
                         wxDELETE(pNewSpaRef);
 
                         //add new IGxObject's
@@ -500,7 +501,7 @@ EXIT:
                             if(nSubType == nNewSubType)
                                 continue;
 
-                            wxGISFeatureDataset* pDSet = dynamic_cast<wxGISFeatureDataset*>(DatasetArray[i]->GetDataset(true));
+                            wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(DatasetArray[i]->GetDataset(true));
                             if(!pDSet)
                             {
                                 ProgressDlg.SetText1(wxString::Format(_("The %d dataset is empty"), i));
@@ -511,7 +512,7 @@ EXIT:
                             if(!pDef)
                             {
                                 ProgressDlg.SetText1(wxString::Format(_("Error reading %d dataset definition"), i));
-                                wsDELETE(pDSet);
+                                //wsDELETE(pDSet);
                                 continue;
                             }
 
@@ -526,7 +527,7 @@ EXIT:
                             if(!pSrcSpaRef && pNewSpaRef)
                             {
                                 ProgressDlg.SetText1(wxString(_("Input spatial reference is not defined")));
-                                wsDELETE(pDSet);
+                                //wsDELETE(pDSet);
                                 wxDELETE(pNewSpaRef);
                                 continue;
                             }
@@ -661,7 +662,7 @@ EXIT:
                                     wxLogError(m_sLastError);
                                 }
                             }
-                            wsDELETE(pDSet);
+                            //wsDELETE(pDSet);
                             wxDELETE(pNewSpaRef);
                         }
                         //ProgressDlg.Show(false);
@@ -715,9 +716,9 @@ unsigned char wxGISGeoprocessingCmd::GetCount(void)
 	return 2;
 }
 
-bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType)
+bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDatasetSPtr pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType)
 {
-    wxGISFeatureDataset* pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
+    wxGISFeatureDatasetSPtr pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
     if(!pNewDSet)
     {
         m_sLastError = wxString(_("Error creating new dataset"));
@@ -742,11 +743,11 @@ bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath,
     if(!CopyRows(pDSet, pNewDSet, NULL, &TrackCancel))
     {
         m_sLastError = wxString(_("Error copying data to a new dataset"));
-        wsDELETE(pNewDSet);
+        //wsDELETE(pNewDSet);
         return false;
     }
 
-    wsDELETE(pNewDSet);
+    //wsDELETE(pNewDSet);
 
     ////add new IGxObject
     //IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
@@ -772,9 +773,9 @@ bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath,
     return true;
 }
 
-bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel)
+bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDatasetSPtr pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel)
 {
-    wxGISFeatureDataset* pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
+    wxGISFeatureDatasetSPtr pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
     if(!pNewDSet)
     {
         m_sLastError = wxString(_("Error creating new dataset"));
@@ -785,11 +786,11 @@ bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDataset* pDSet, wxString sPath,
     if(!CopyRows(pDSet, pNewDSet, NULL, pTrackCancel))
     {
         m_sLastError = wxString(_("Error copying data to a new dataset"));
-        wsDELETE(pNewDSet);
+        //wsDELETE(pNewDSet);
         return false;
     }
 
-    wsDELETE(pNewDSet);
+    //wsDELETE(pNewDSet);
 
     return true;
 }

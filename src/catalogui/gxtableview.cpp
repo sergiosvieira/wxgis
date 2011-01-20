@@ -112,7 +112,7 @@ void wxGxTableView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 		return;
 
     wxBusyCursor wait;
-	wxGISDataset* pwxGISDataset = pGxDataset->GetDataset(true);
+	wxGISDatasetSPtr pwxGISDataset = pGxDataset->GetDataset(true);
 	if(pwxGISDataset == NULL)
 		return;
 

@@ -44,16 +44,16 @@
 //	pBounds->maxy = Env.MaxY;
 //}
 
-wxGISFeatureLayer::wxGISFeatureLayer(wxGISDataset* pwxGISDataset) : wxGISLayer(), m_pwxGISFeatureDataset(NULL), m_pFeatureRenderer(NULL), m_pSpatialReference(NULL)
+wxGISFeatureLayer::wxGISFeatureLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer(), /*m_pwxGISFeatureDataset(NULL), */m_pFeatureRenderer(NULL), m_pSpatialReference(NULL)
 {
     m_pQuadTree = NULL;
     m_bIsGeometryLoaded = false;
     m_pOGRGeometrySet = NULL;
 
-	m_pwxGISFeatureDataset = dynamic_cast<wxGISFeatureDataset*>(pwxGISDataset);
+    m_pwxGISFeatureDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pwxGISDataset);
 	if(m_pwxGISFeatureDataset)
 	{
-		m_pwxGISFeatureDataset->Reference();
+		//m_pwxGISFeatureDataset->Reference();
 		m_pFeatureRenderer = new wxGISSimpleRenderer();
 //        m_pSpatialReference = ;
 		//pre load features
@@ -70,7 +70,7 @@ wxGISFeatureLayer::~wxGISFeatureLayer(void)
     UnloadGeometry();
 
     wsDELETE(m_pOGRGeometrySet);
-	wsDELETE(m_pwxGISFeatureDataset);
+	//wsDELETE(m_pwxGISFeatureDataset);
     wxDELETE(m_pSpatialReference);
 }
 

@@ -42,7 +42,6 @@
 #include <wx/dialog.h>
 
 #include "wxgis/core/config.h"
-//#include "wxgis/catalog/catalog.h"
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/gxcontentview.h"
@@ -180,10 +179,10 @@ protected:
 	wxButton* m_CancelButton;
 
 public:
-	wxGxObjectDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,338 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+	wxGxObjectDialog( wxWindow* parent, IGxCatalog* pExternalCatalog = NULL, wxWindowID id = wxID_ANY, const wxString& title = _("Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,338 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 	~wxGxObjectDialog();
 //IGxApplication
-    virtual IGxCatalog* GetCatalog(void){return static_cast<IGxCatalog*>(m_pCatalog);};
+    virtual IGxCatalog* const GetCatalog(void){return static_cast<IGxCatalog*>(m_pCatalog);};
 //IApplication
 	virtual ICommand* GetCommand(long CmdID);
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
@@ -199,7 +198,7 @@ public:
     virtual void ShowStatusBar(bool bShow){};
     virtual bool IsStatusBarShown(void){return false;};
     virtual void ShowToolBarMenu(void){};
-	virtual const WINDOWARRAY* GetChildWindows(void);
+	virtual const WINDOWARRAY* const GetChildWindows(void);
     virtual void RegisterChildWindow(wxWindow* pWnd);
     virtual void UnRegisterChildWindow(wxWindow* pWnd);
     virtual void Customize(void){};
@@ -251,8 +250,6 @@ protected:
 	virtual void OnInit();
     virtual void SerializeFramePos(bool bSave);
     virtual bool DoSaveObject(wxGISEnumSaveObjectResults Result);
-public:
-    virtual void SetExternalCatalog(IGxCatalog* pCatalog = NULL){m_pExternalCatalog = pCatalog;};
 protected:
  	COMMANDARRAY m_CommandArray;
   	wxGxCatalogUI* m_pCatalog;

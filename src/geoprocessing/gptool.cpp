@@ -60,7 +60,7 @@ void wxGISGPTool::SetCatalog(IGxCatalog* pCatalog)
     m_pCatalog = pCatalog;
 }
 
-IGxCatalog* wxGISGPTool::GetCatalog(void)
+IGxCatalog* const wxGISGPTool::GetCatalog(void)
 {
     return m_pCatalog;
 }

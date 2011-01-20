@@ -47,7 +47,7 @@ class WXDLLIMPEXP_GIS_CRT wxGISTable :
 	public wxGridTableBase
 {
 public:
-    wxGISTable(wxGISDataset* pwxGISDataset);
+    wxGISTable(wxGISDatasetSPtr pwxGISDataset);
     ~wxGISTable();
 
 	//overrides
@@ -59,7 +59,7 @@ public:
     virtual wxString GetColLabelValue(int col);
 	virtual wxString GetRowLabelValue(int row);
 private:
-	wxGISFeatureDataset* m_pwxGISDataset;
+	wxGISFeatureDatasetSPtr m_pwxGISDataset;
 	OGRFeatureDefn* m_pOGRFeatureDefn;
 	wxString m_sFIDKeyName;
 	int nCols;          // columns from dataSet

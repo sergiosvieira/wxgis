@@ -31,7 +31,7 @@ public:
 	wxGISSimpleRenderer(void);
 	~wxGISSimpleRenderer(void);
 //IFeatureRenderer
-	virtual bool CanRender(wxGISDataset* pDataset);
+	virtual bool CanRender(wxGISDatasetSPtr pDataset);
 	virtual void Draw(wxGISGeometrySet* pSet, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel);
 	virtual void DrawGeometry(OGRGeometry *poGeometry, IDisplay* pDisplay);
 protected:

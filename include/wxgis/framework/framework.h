@@ -226,7 +226,7 @@ public:
 	virtual void ShowToolBarMenu(void) = 0;
 	virtual void ShowApplicationWindow(wxWindow* pWnd, bool bShow = true) = 0;
 	virtual bool IsApplicationWindowShown(wxWindow* pWnd) = 0;
-	virtual const WINDOWARRAY* GetChildWindows(void) = 0;
+	virtual const WINDOWARRAY* const GetChildWindows(void) = 0;
 	virtual void RegisterChildWindow(wxWindow* pWnd) = 0;
 	virtual void UnRegisterChildWindow(wxWindow* pWnd) = 0;
 	virtual wxString GetAppName(void) = 0;

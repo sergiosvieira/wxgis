@@ -46,7 +46,7 @@ public:
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
 	//IGxDataset
-    virtual wxGISDataset* GetDataset(bool bReadOnly);
+    virtual wxGISDatasetSPtr GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISContainer;};
     virtual void SetPathEncoding(wxMBConv* pPathEncoding){m_pPathEncoding = pPathEncoding;};
     virtual wxMBConv* GetPathEncoding(void){return m_pPathEncoding;};
@@ -61,7 +61,7 @@ public:
 protected:
 	wxString m_sName, m_sPath;
     wxFontEncoding m_Encoding;
-	wxGISDataset* m_pwxGISDataset;
+	wxGISDatasetSPtr m_pwxGISDataset;
 	wxGISEnumVectorDatasetType m_type;
     wxMBConv* m_pPathEncoding;
     bool m_bIsChildrenLoaded;
@@ -75,7 +75,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxKMLSubDataset :
 	public IGxDataset
 {
 public:
-	wxGxKMLSubDataset(wxString sName, wxGISDataset* pwxGISDataset, wxGISEnumVectorDatasetType nType);
+	wxGxKMLSubDataset(wxString sName, wxGISDatasetSPtr pwxGISDataset, wxGISEnumVectorDatasetType nType);
 	virtual ~wxGxKMLSubDataset(void);
     virtual void SetEncoding(wxFontEncoding Encoding);
 	//IGxObject
@@ -84,7 +84,7 @@ public:
     virtual wxString GetInternalName(void){return wxEmptyString;};
 	virtual wxString GetCategory(void);
 	//IGxDataset
-	virtual wxGISDataset* GetDataset(bool bReadOnly);
+	virtual wxGISDatasetSPtr GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
     virtual void SetPathEncoding(wxMBConv* pPathEncoding){m_pPathEncoding = pPathEncoding;};
     virtual wxMBConv* GetPathEncoding(void){return m_pPathEncoding;};
@@ -92,7 +92,7 @@ public:
 protected:
 	wxString m_sName;
     wxFontEncoding m_Encoding;
-	wxGISDataset* m_pwxGISDataset;
+	wxGISDatasetSPtr m_pwxGISDataset;
 	wxGISEnumVectorDatasetType m_type;
     wxMBConv* m_pPathEncoding;
 };

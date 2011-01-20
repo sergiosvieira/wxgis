@@ -27,7 +27,7 @@ class WXDLLIMPEXP_GIS_CRT wxGISRasterLayer :
 	public wxGISLayer
 {
 public:
-	wxGISRasterLayer(wxGISDataset* pwxGISDataset);
+	wxGISRasterLayer(wxGISDatasetSPtr pwxGISDataset);
 	virtual ~wxGISRasterLayer(void);
 //IwxGISLayer
 	virtual void Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisplay, ITrackCancel* pTrackCancel);
@@ -39,7 +39,7 @@ public:
 	virtual IRasterRenderer* GetRenderer(void){return m_pRasterRenderer;};
 	virtual void SetRenderer(IRasterRenderer* pRasterRenderer){m_pRasterRenderer = pRasterRenderer;};
 protected:
-	wxGISRasterDataset* m_pwxGISRasterDataset;
+	wxGISRasterDatasetSPtr m_pwxGISRasterDataset;
 	IRasterRenderer* m_pRasterRenderer;
 	OGREnvelope m_pPreviousDisplayEnv;
 };

@@ -43,5 +43,5 @@ public:
     virtual bool Execute(ITrackCancel* pTrackCancel);
     virtual bool Validate(void);
     virtual GPParameters* GetParameterInfo(void);
-    virtual bool OnExport(wxGISFeatureDataset* pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel);
+    virtual bool OnExport(wxGISFeatureDatasetSPtr pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel);
 };

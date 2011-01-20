@@ -30,7 +30,7 @@ class WXDLLIMPEXP_GIS_CRT wxGISFeatureLayer :
 	public wxGISLayer
 {
 public:
-	wxGISFeatureLayer(wxGISDataset* pwxGISDataset);
+	wxGISFeatureLayer(wxGISDatasetSPtr pwxGISDataset);
 	virtual ~wxGISFeatureLayer(void);
 //IwxGISLayer
 	virtual void Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisplay, ITrackCancel* pTrackCancel);
@@ -47,7 +47,7 @@ protected:
     virtual void LoadGeometry(void);
     virtual void UnloadGeometry(void);
 protected:
-	wxGISFeatureDataset* m_pwxGISFeatureDataset;
+	wxGISFeatureDatasetSPtr m_pwxGISFeatureDataset;
 	IFeatureRenderer* m_pFeatureRenderer;
     OGREnvelope m_FullEnv;
 	OGREnvelope m_PreviousDisplayEnv;

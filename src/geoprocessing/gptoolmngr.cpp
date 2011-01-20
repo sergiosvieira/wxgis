@@ -199,9 +199,10 @@ int wxGISGPToolManager::OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel, IG
     wxString sToolParams = pTool->GetAsString();
     wxString sCommand = wxString::Format(wxT("%s -n "), m_sGeoprocessPath.c_str()) + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");
 
-    WXGISEXECDDATA data = {new wxGPProcess(sCommand, static_cast<IProcessParent*>(this), pTrackCancel), pTool, pTrackCancel, pCallBack, m_ProcessArray.size()};
+    WXGISEXECDDATA data = {new wxGPProcess(sCommand, static_cast<IProcessParent*>(this), pTrackCancel), pTool, pTrackCancel, pCallBack};
     m_ProcessArray.push_back(data);
     int nTaskID = m_ProcessArray.size() - 1;
+    AddPriority(nTaskID, nTaskID);
 
     if(m_nRunningTasks < m_nMaxTasks)
         ExecTask(m_ProcessArray[nTaskID]);
@@ -351,9 +352,10 @@ wxDateTime wxGISGPToolManager::GetProcessFinish(size_t nIndex)
 
 int wxGISGPToolManager::GetProcessPriority(size_t nIndex)
 {
-	wxASSERT(nIndex >= 0);
-	wxASSERT(nIndex < m_ProcessArray.size());
-	return m_ProcessArray[nIndex].nPrio;
+    for(size_t i = 0; i < m_aPriorityArray.size(); i++)
+        if(m_aPriorityArray[i].nIndex == nIndex)
+            return m_aPriorityArray[i].nPriority;
+	return m_ProcessArray.size();
 }
 
 void wxGISGPToolManager::SetProcessPriority(size_t nIndex, int nPriority)
@@ -361,26 +363,50 @@ void wxGISGPToolManager::SetProcessPriority(size_t nIndex, int nPriority)
 	wxASSERT(nIndex >= 0);
 	wxASSERT(nIndex < m_ProcessArray.size());
 
-	typedef std::pair<int, int> Priority;//index, priority
-	std::vector<Priority> PriorityArray;
-	//1. create priority array
-    for(size_t nIndex = 0; nIndex < m_ProcessArray.size(); nIndex++)
-	{
-		for(size_t j = 0; j < PriorityArray.size(); j++)
-		{
-			//PriorityArray[j]
-		}
-		PriorityArray.push_back(std::make_pair(m_ProcessArray[nIndex].nPrio, nIndex));
-	}
-	//2. set new priority
+    for(size_t i = 0; i < m_aPriorityArray.size(); i++)
+    {
+        if(m_aPriorityArray[i].nIndex == nIndex)
+        {
+            m_aPriorityArray.erase(m_aPriorityArray.begin() + i);
+            return AddPriority(nIndex, nPriority);
+        }
+    }
 }
 
 int wxGISGPToolManager::GetPriorityTaskIndex()
 {
 	int nPriorityIndex = m_ProcessArray.size(); 
-    for(size_t nIndex = 0; nIndex < m_ProcessArray.size(); nIndex++)
-        if(m_ProcessArray[nIndex].pProcess->GetState() == enumGISTaskQuered)
-			if(nPriorityIndex > nIndex)
-				nPriorityIndex = nIndex;
+    for(size_t nIndex = 0; nIndex < m_aPriorityArray.size(); nIndex++)
+    {
+        if(m_ProcessArray[m_aPriorityArray[nIndex].nIndex].pProcess->GetState() == enumGISTaskQuered)
+        {
+            nPriorityIndex = nIndex;
+            break;
+        }
+    }
 	return nPriorityIndex;
+}
+
+void wxGISGPToolManager::AddPriority(int nIndex, int nPriority)
+{
+    TASKPRIOINFO info = {nIndex, nPriority};
+    bool bIncrease = false;
+	for(size_t j = 0; j < m_aPriorityArray.size(); j++)
+	{
+		if(m_aPriorityArray[j].nPriority >= nPriority)
+        {
+            m_aPriorityArray.insert(m_aPriorityArray.begin() + j, info);
+            bIncrease = true;
+            continue;
+        }
+        if(bIncrease)
+        {
+            if(m_aPriorityArray[j].nPriority - m_aPriorityArray[j - 1].nPriority < 2)
+                m_aPriorityArray[j].nPriority++;
+            else
+                return;;
+        }
+	}
+    if(bIncrease)
+        m_aPriorityArray.push_back(info);
 }

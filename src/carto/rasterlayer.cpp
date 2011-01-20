@@ -21,12 +21,12 @@
 #include "wxgis/carto/rasterlayer.h"
 #include "wxgis/carto/rasterrenderer.h"
 
-wxGISRasterLayer::wxGISRasterLayer(wxGISDataset* pwxGISDataset) : wxGISLayer(), m_pwxGISRasterDataset(NULL), m_pRasterRenderer(NULL)
+wxGISRasterLayer::wxGISRasterLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer(), /*m_pwxGISRasterDataset(NULL), */m_pRasterRenderer(NULL)
 {
-	m_pwxGISRasterDataset = dynamic_cast<wxGISRasterDataset*>(pwxGISDataset);
+    m_pwxGISRasterDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(pwxGISDataset);
 	if(m_pwxGISRasterDataset)
 	{
-		m_pwxGISRasterDataset->Reference();
+		//m_pwxGISRasterDataset->Reference();
 		//check number of bands
 		m_pRasterRenderer = new wxGISRasterRGBRenderer();
 	}
@@ -35,7 +35,7 @@ wxGISRasterLayer::wxGISRasterLayer(wxGISDataset* pwxGISDataset) : wxGISLayer(), 
 wxGISRasterLayer::~wxGISRasterLayer(void)
 {
 	wxDELETE(m_pRasterRenderer);
-	wsDELETE(m_pwxGISRasterDataset);
+	//wsDELETE(m_pwxGISRasterDataset);
 }
 
 void wxGISRasterLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisplay, ITrackCancel* pTrackCancel)

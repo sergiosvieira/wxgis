@@ -21,7 +21,7 @@
 
 #include "wxgis/geoprocessing/gpvector.h"
 
-bool CopyRows(wxGISFeatureDataset* pSrcDataSet, wxGISFeatureDataset* pDstDataSet, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel)
+bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstDataSet, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel)
 {
     OGRSpatialReference* pSrsSRS = pSrcDataSet->GetSpatialReference();
     OGRSpatialReference* pDstSRS = pDstDataSet->GetSpatialReference();

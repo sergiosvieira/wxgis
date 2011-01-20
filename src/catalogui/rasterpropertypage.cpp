@@ -33,18 +33,18 @@ BEGIN_EVENT_TABLE(wxGISRasterPropertyPage, wxPanel)
     EVT_BUTTON( ID_PPCTRL, wxGISRasterPropertyPage::OnPropertyGridButtonClick )
 END_EVENT_TABLE()
 
-wxGISRasterPropertyPage::wxGISRasterPropertyPage(void) : m_pDataset(NULL)
+wxGISRasterPropertyPage::wxGISRasterPropertyPage(void)/* : m_pDataset(NULL)*/
 {
 }
 
-wxGISRasterPropertyPage::wxGISRasterPropertyPage(wxGxRasterDataset* pGxDataset, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name) : m_pDataset(NULL)
+wxGISRasterPropertyPage::wxGISRasterPropertyPage(wxGxRasterDataset* pGxDataset, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)/* : m_pDataset(NULL)*/
 {
     Create(pGxDataset, pCatalog, parent, id, pos, size, style, name);
 }
 
 wxGISRasterPropertyPage::~wxGISRasterPropertyPage()
 {
-    wsDELETE(m_pDataset);
+    //wsDELETE(m_pDataset);
 }
 
 bool wxGISRasterPropertyPage::Create(wxGxRasterDataset* pGxDataset, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
@@ -54,7 +54,7 @@ bool wxGISRasterPropertyPage::Create(wxGxRasterDataset* pGxDataset, IGxCatalog* 
     m_pGxDataset = pGxDataset;
     m_pCatalog = pCatalog;
 
-    m_pDataset = dynamic_cast<wxGISRasterDataset*>(m_pGxDataset->GetDataset(true));
+    m_pDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(m_pGxDataset->GetDataset(true));
     if(!m_pDataset)
         return false;
 

@@ -24,4 +24,4 @@
 #include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/datasource/featuredataset.h"
 
-bool WXDLLIMPEXP_GIS_GP CopyRows(wxGISFeatureDataset* pSrcDataSet, wxGISFeatureDataset* pDstDataSet, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL); 
+bool WXDLLIMPEXP_GIS_GP CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstDataSet, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL); 

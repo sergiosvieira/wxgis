@@ -91,12 +91,15 @@ typedef struct _Limits
 }
 LIMITS, *LPLIMITS;
 
+class wxGISDataset;
+DEFINE_SHARED_PTR(wxGISDataset);
+
 //this class should be in wxGISGeodatabase
-class wxGISDataset :
-	public IPointer
+class wxGISDataset/* :
+	public IPointer*/
 {
 public:
-	wxGISDataset(wxString sPath) : IPointer()
+	wxGISDataset(wxString sPath)/* : IPointer()*/
     {
         m_sPath = sPath;
         //m_sPath.Replace(wxT("\\"), wxT("/"));    //bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
@@ -107,7 +110,7 @@ public:
     virtual void SetSubType(int nSubType){m_nSubType = nSubType;};
 	virtual wxString GetPath(void){return m_sPath;};
     virtual size_t GetSubsetsCount(void){return 0;};
-    virtual wxGISDataset* GetSubset(size_t nIndex){return NULL;};
+    virtual wxGISDatasetSPtr GetSubset(size_t nIndex){return wxGISDatasetSPtr();};
     virtual wxString GetName(void){return wxEmptyString;};
 	virtual void Close(void){};
 	virtual OGRSpatialReference* GetSpatialReference(void){return NULL;};

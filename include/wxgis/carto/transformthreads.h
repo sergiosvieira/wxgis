@@ -28,7 +28,7 @@
 class wxGISFeatureTransformThread : public wxThread
 {
 public:
-	wxGISFeatureTransformThread(wxGISFeatureDataset* pwxGISFeatureDataset, OGRCoordinateTransformation *poCT, bool bTransform, OGRPolygon* pRgn1, OGRPolygon* pRgn2, wxCriticalSection* pCritSect, OGREnvelope* pFullEnv, wxGISGeometrySet* pOGRGeometrySet, size_t &nCounter, ITrackCancel* pTrackCancel = NULL);
+	wxGISFeatureTransformThread(wxGISFeatureDatasetSPtr pwxGISFeatureDataset, OGRCoordinateTransformation *poCT, bool bTransform, OGRPolygon* pRgn1, OGRPolygon* pRgn2, wxCriticalSection* pCritSect, OGREnvelope* pFullEnv, wxGISGeometrySet* pOGRGeometrySet, size_t &nCounter, ITrackCancel* pTrackCancel = NULL);
     virtual void *Entry();
     virtual void OnExit();
 protected:
@@ -38,7 +38,7 @@ protected:
 protected:
     OGRPolygon *m_pRgn1, *m_pRgn2;
     ITrackCancel *m_pTrackCancel;
-    wxGISFeatureDataset *m_pwxGISFeatureDataset;
+    wxGISFeatureDatasetSPtr m_pwxGISFeatureDataset;
     OGRCoordinateTransformation *m_poCT;
     bool m_bTransform;
     wxCriticalSection *m_pCritSect;

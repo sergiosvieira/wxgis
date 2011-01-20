@@ -39,7 +39,7 @@ wxGxApplication::~wxGxApplication(void)
 	wxDELETE(m_pCatalog);
 }
 
-IGxCatalog* wxGxApplication::GetCatalog(void)
+IGxCatalog* const wxGxApplication::GetCatalog(void)
 {
 	return m_pCatalog;
 }
@@ -175,7 +175,7 @@ void wxGxApplication::ShowApplicationWindow(wxWindow* pWnd, bool bShow)
 	ShowPane(pWnd, bShow);
 }
 
-const WINDOWARRAY* wxGxApplication::GetChildWindows(void)
+const WINDOWARRAY* const wxGxApplication::GetChildWindows(void)
 {
 	return &m_WindowArray;
 }

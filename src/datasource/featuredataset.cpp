@@ -50,7 +50,7 @@ void GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds)
 	pBounds->maxy = Env.MaxY;
 }
 
-wxGISFeatureDataset* CreateVectorLayer(wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *poFields, OGRSpatialReference *poSpatialRef, OGRwkbGeometryType eGType, char ** papszDataSourceOptions, char ** papszLayerOptions, wxMBConv* pPathEncoding)
+wxGISFeatureDatasetSPtr CreateVectorLayer(wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *poFields, OGRSpatialReference *poSpatialRef, OGRwkbGeometryType eGType, char ** papszDataSourceOptions, char ** papszLayerOptions, wxMBConv* pPathEncoding)
 {
     CPLErrorReset();
     poFields->Reference();
@@ -58,7 +58,7 @@ wxGISFeatureDataset* CreateVectorLayer(wxString sPath, wxString sName, wxString 
     if(poDriver == NULL)
     {
         wxLogError(_("The driver '%s' is not available"), sDriver.c_str());
-        return NULL;
+        return wxGISFeatureDatasetSPtr();
     }
 
     wxGISEnumVectorDatasetType nSubType = enumVecUnknown;
@@ -80,7 +80,7 @@ wxGISFeatureDataset* CreateVectorLayer(wxString sPath, wxString sName, wxString 
     if(poDS == NULL)
     {
         wxLogError(_("Creation of output file '%s' failed"), sName.c_str());
-        return NULL;
+        return wxGISFeatureDatasetSPtr();
     }
 
     sName.Replace(wxT("."), wxT("_"));
@@ -91,7 +91,7 @@ wxGISFeatureDataset* CreateVectorLayer(wxString sPath, wxString sName, wxString 
     if(poLayerDest == NULL)
     {
         wxLogError(_("Creation of output layer '%s' failed"), sName.c_str());
-        return NULL;
+        return wxGISFeatureDatasetSPtr();
     }
 
     if(nSubType != enumVecDXF)
@@ -108,13 +108,13 @@ wxGISFeatureDataset* CreateVectorLayer(wxString sPath, wxString sName, wxString 
 	        if( poLayerDest->CreateField( pField ) != OGRERR_NONE )
 	        {
                 wxLogError(_("Creation of output layer '%s' failed"), sName.c_str());
-                return NULL;
+                return wxGISFeatureDatasetSPtr();
             }
         }
     }
     poFields->Release();
 
-    wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(poDS, poLayerDest, sFullPath, nSubType);
+    wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>(poDS, poLayerDest, sFullPath, nSubType);
     return pDataSet;
 }
 
@@ -198,24 +198,24 @@ size_t wxGISFeatureDataset::GetSubsetsCount(void)
     return 0;
 }
 
-wxGISDataset* wxGISFeatureDataset::GetSubset(size_t nIndex)
+wxGISDatasetSPtr wxGISFeatureDataset::GetSubset(size_t nIndex)
 {
     if(!m_bIsOpened)
         if(!Open(0))
-            return NULL;
+            return wxGISDatasetSPtr();
     if(m_poDS)
     {
 	    OGRLayer* poLayer = m_poDS->GetLayer(nIndex);
         if(poLayer)
         {
             m_poDS->Reference();
-            wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, wxEmptyString, (wxGISEnumVectorDatasetType)m_nSubType);
+            wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>(m_poDS, poLayer, wxEmptyString, (wxGISEnumVectorDatasetType)m_nSubType);
             pDataSet->SetEncoding(m_Encoding);
-            pDataSet->Reference();
-            return static_cast<wxGISDataset*>(pDataSet);
+            //pDataSet->Reference();
+            return boost::static_pointer_cast<wxGISDataset>(pDataSet);
         }
     }
-    return NULL;
+    return wxGISDatasetSPtr();
 }
 
 OGRLayer* wxGISFeatureDataset::GetLayerRef(int iLayer)
