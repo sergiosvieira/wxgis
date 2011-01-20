@@ -199,7 +199,7 @@ int wxGISGPToolManager::OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel, IG
     wxString sToolParams = pTool->GetAsString();
     wxString sCommand = wxString::Format(wxT("%s -n "), m_sGeoprocessPath.c_str()) + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");
 
-    WXGISEXECDDATA data = {new wxGPProcess(sCommand, static_cast<IProcessParent*>(this), pTrackCancel), pTool, pTrackCancel, pCallBack};
+    WXGISEXECDDATA data = {new wxGPProcess(sCommand, static_cast<IProcessParent*>(this), pTrackCancel), pTool, pTrackCancel, pCallBack, m_ProcessArray.size()};
     m_ProcessArray.push_back(data);
     int nTaskID = m_ProcessArray.size() - 1;
 
@@ -286,14 +286,9 @@ void wxGISGPToolManager::OnFinish(IProcess* pProcess, bool bHasErrors)
     //run not running tasks
     if(m_nRunningTasks < m_nMaxTasks)
     {
-        for(nIndex = 0; nIndex < m_ProcessArray.size(); nIndex++)
-        {
-            if(m_ProcessArray[nIndex].pProcess->GetState() == enumGISTaskQuered)
-            {
-                ExecTask(m_ProcessArray[nIndex]);
-                break;
-            }
-        }
+		nIndex = GetPriorityTaskIndex();
+		if(nIndex >= 0 && nIndex < m_ProcessArray.size())
+			ExecTask(m_ProcessArray[nIndex]);
     }
 }
 
@@ -352,4 +347,40 @@ wxDateTime wxGISGPToolManager::GetProcessFinish(size_t nIndex)
 	wxASSERT(nIndex >= 0);
 	wxASSERT(nIndex < m_ProcessArray.size());
 	return m_ProcessArray[nIndex].pProcess->GetFinish();
+}
+
+int wxGISGPToolManager::GetProcessPriority(size_t nIndex)
+{
+	wxASSERT(nIndex >= 0);
+	wxASSERT(nIndex < m_ProcessArray.size());
+	return m_ProcessArray[nIndex].nPrio;
+}
+
+void wxGISGPToolManager::SetProcessPriority(size_t nIndex, int nPriority)
+{
+	wxASSERT(nIndex >= 0);
+	wxASSERT(nIndex < m_ProcessArray.size());
+
+	typedef std::pair<int, int> Priority;//index, priority
+	std::vector<Priority> PriorityArray;
+	//1. create priority array
+    for(size_t nIndex = 0; nIndex < m_ProcessArray.size(); nIndex++)
+	{
+		for(size_t j = 0; j < PriorityArray.size(); j++)
+		{
+			//PriorityArray[j]
+		}
+		PriorityArray.push_back(std::make_pair(m_ProcessArray[nIndex].nPrio, nIndex));
+	}
+	//2. set new priority
+}
+
+int wxGISGPToolManager::GetPriorityTaskIndex()
+{
+	int nPriorityIndex = m_ProcessArray.size(); 
+    for(size_t nIndex = 0; nIndex < m_ProcessArray.size(); nIndex++)
+        if(m_ProcessArray[nIndex].pProcess->GetState() == enumGISTaskQuered)
+			if(nPriorityIndex > nIndex)
+				nPriorityIndex = nIndex;
+	return nPriorityIndex;
 }

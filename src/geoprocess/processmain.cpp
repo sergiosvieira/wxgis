@@ -30,7 +30,25 @@
 
 int main(int argc, char **argv)
 {
-    wxApp::CheckBuildOptions(WX_BUILD_OPTIONS_SIGNATURE, "program");
+#if wxUSE_UNICODE
+    wxChar **wxArgv = new wxChar *[argc + 1];
+
+    {
+        int n;
+
+        for (n = 0; n < argc; n++ )
+        {
+            wxMB2WXbuf warg = wxConvertMB2WX(argv[n]);
+            wxArgv[n] = wxStrdup(warg);
+        }
+
+        wxArgv[n] = NULL;
+    }
+#else
+    #define wxArgv argv
+#endif // wxUSE_UNICODE
+	
+	wxApp::CheckBuildOptions(WX_BUILD_OPTIONS_SIGNATURE, "program");
 
     wxInitializer initializer;
     if ( !initializer )
@@ -41,14 +59,6 @@ int main(int argc, char **argv)
 
 	bool success( false );
 
-    // Parse command line arguments
-    success = parse_commandline_parameters( argc, argv );
-
-	return success == true ? EXIT_SUCCESS : EXIT_FAILURE;
-}
-
-bool parse_commandline_parameters( int argc, char** argv )
-{
     // Create the commandline parser
     static const wxCmdLineEntryDesc my_cmdline_desc[] =
     {
@@ -59,33 +69,46 @@ bool parse_commandline_parameters( int argc, char** argv )
 		{ wxCMD_LINE_NONE }
     };
 
-    wxCmdLineParser my_parser( my_cmdline_desc, argc, argv );
-    my_parser.SetLogo(wxString::Format(_("The wxGISGeoprocess (%s)\nAuthor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010"), APP_VER));
+    wxCmdLineParser my_parser( my_cmdline_desc, argc, wxArgv );
+    my_parser.SetLogo(wxString::Format(_("The wxGISGeoprocess (%s)\nAuthor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010-2011"), APP_VER));
 
+    // Parse command line arguments
+    success = parse_commandline_parameters(my_parser);
+
+	return success == true ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+
+bool parse_commandline_parameters( wxCmdLineParser& parser )
+{
     // Parse the parameters
-    int my_parse_success = my_parser.Parse( );
+    int my_parse_success = parser.Parse( );
     // Print help if the specify /? or if a syntax error occured.
     if( my_parse_success != 0 )
     {
         return false;
     }
 
-	if( my_parser.Found( wxT( "v" ) ) )
+	if( parser.Found( wxT( "v" ) ) )
 	{
-	    wxString out = wxString::Format(_("The wxGISGeoprocess (%s)\nAuthor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010\n"), APP_VER);
+	    wxString out = wxString::Format(_("The wxGISGeoprocess (%s)\nAuthor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010-2011\n"), APP_VER);
 	    wxFprintf(stdout, out);
 		return true;
 	}
 
 
     wxString sToolName, sToolParameters;
-    if(my_parser.Found( wxT( "n" ), &sToolName ) && my_parser.Found( wxT( "p" ), &sToolParameters ) )
+    if(parser.Found( wxT( "n" ), &sToolName ) && parser.Found( wxT( "p" ), &sToolParameters ) )
     {
+		//wxString input_str(input_data);
+		wxString str(sToolParameters.mb_str(), wxConvUTF8);//wc_str(*wxConvCurrent)
+
+		//sToolParameters = wxString(sToolParameters.ToUTF8());
+
         wxGPTaskExecutor executor;
         return executor.OnExecute(sToolName, sToolParameters);
     }
 
-	my_parser.Usage();
+	parser.Usage();
 
     // Either we are using the defaults or the provided parameters were valid.
 

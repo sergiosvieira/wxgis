@@ -27,7 +27,7 @@
 #include "wx/txtstrm.h"
 #include "wx/ffile.h"
 
-bool parse_commandline_parameters( int argc, char** argv );
+bool parse_commandline_parameters( wxCmdLineParser& parser );
 int main(int argc, char** argv);
 
 /** \class wxGPTaskExecutor processmain.h

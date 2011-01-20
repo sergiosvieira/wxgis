@@ -21,6 +21,8 @@
 
 #include "wxgis/geoprocessingui/gxtoolexecview.h"
 #include "wxgis/geoprocessingui/gptoolbox.h"
+#include "wxgis/geoprocessingui/gptaskexecdlg.h"
+
 #include "wx/tokenzr.h"
 
 #include "../../art/small_arrow.xpm"
@@ -105,11 +107,12 @@ bool wxGxToolExecuteView::Create(wxWindow* parent, wxWindowID id, const wxPoint&
 
     wxListCtrl::Create(parent, TOOLEXECUTECTRLID, pos, size, TOOLEXECVIEWSTYLE);
     
-    InsertColumn(0, _("Tool name"), wxLIST_FORMAT_LEFT, 150);    //toolname
-    InsertColumn(1, _("Start"), wxLIST_FORMAT_LEFT, 100);        //begin
-    InsertColumn(2, _("Finish"), wxLIST_FORMAT_LEFT, 100);       //end
-    InsertColumn(3, _("Done %"), wxLIST_FORMAT_CENTER, 50);      //percent
-    InsertColumn(4, _("Last message"), wxLIST_FORMAT_LEFT, 350); //current message
+	InsertColumn(0, _("Priority"), wxLIST_FORMAT_LEFT, 60);      //priority
+    InsertColumn(1, _("Tool name"), wxLIST_FORMAT_LEFT, 150);    //toolname
+    InsertColumn(2, _("Start"), wxLIST_FORMAT_LEFT, 100);        //begin
+    InsertColumn(3, _("Finish"), wxLIST_FORMAT_LEFT, 100);       //end
+    InsertColumn(4, _("Done %"), wxLIST_FORMAT_CENTER, 50);      //percent
+    InsertColumn(5, _("Last message"), wxLIST_FORMAT_LEFT, 350); //current message
 
 	m_ImageList.Create(16, 16);
 
@@ -216,17 +219,18 @@ void wxGxToolExecuteView::AddObject(IGxObject* pObject)
 {
 	if(pObject == NULL)
 		return;
-	IGxTask* pGxTask =  dynamic_cast<IGxTask*>(pObject);
+	wxGxTaskObject* pGxTask =  dynamic_cast<wxGxTaskObject*>(pObject);
 	if(pGxTask != NULL)
 	{
 #ifdef __WXGTK__
-        if(GetColumnCount() < 5)
+        if(GetColumnCount() < 6)
         {
-        InsertColumn(0, _("Tool name"), wxLIST_FORMAT_LEFT, 150);    //toolname
-        InsertColumn(1, _("Start"), wxLIST_FORMAT_LEFT, 100);        //begin
-        InsertColumn(2, _("Finish"), wxLIST_FORMAT_LEFT, 100);       //end
-        InsertColumn(3, _("Done %"), wxLIST_FORMAT_CENTER, 50);      //percent
-        InsertColumn(4, _("Last message"), wxLIST_FORMAT_LEFT, 350); //current message
+		InsertColumn(0, _("Tool name"), wxLIST_FORMAT_LEFT, 150);    //priority
+        InsertColumn(1, _("Tool name"), wxLIST_FORMAT_LEFT, 150);    //toolname
+        InsertColumn(2, _("Start"), wxLIST_FORMAT_LEFT, 100);        //begin
+        InsertColumn(3, _("Finish"), wxLIST_FORMAT_LEFT, 100);       //end
+        InsertColumn(4, _("Done %"), wxLIST_FORMAT_CENTER, 50);      //percent
+        InsertColumn(5, _("Last message"), wxLIST_FORMAT_LEFT, 350); //current message
         }
 #endif
         // enumGISTaskWork = 1,    enumGISTaskDone = 2,    enumGISTaskQuered = 3,     enumGISTaskPaused = 4,     enumGISTaskError = 5
@@ -259,15 +263,16 @@ void wxGxToolExecuteView::AddObject(IGxObject* pObject)
             break;
         };
 
-	    long ListItemID = InsertItem(0, pObject->GetName(), nIcon);
+		long ListItemID = InsertItem(0, wxString::Format(wxT("%d"), pGxTask->GetTaskID() + 1), nIcon);
+	    SetItem(ListItemID, 1, pObject->GetName());
         wxDateTime dts = pGxTask->GetStart();
         if(dts.IsValid())
-            SetItem(ListItemID, 1, dts.Format(_("%d-%m-%Y %H:%M:%S")));
+            SetItem(ListItemID, 2, dts.Format(_("%d-%m-%Y %H:%M:%S")));
         wxDateTime dtf = pGxTask->GetFinish();
         if(dtf.IsValid())
-            SetItem(ListItemID, 2, pGxTask->GetFinish().Format(_("%d-%m-%Y %H:%M:%S")));
-        SetItem(ListItemID, 3, wxString::Format(_("%.1f%%"), pGxTask->GetDonePercent()));
-        SetItem(ListItemID, 4, pGxTask->GetLastMessage());
+            SetItem(ListItemID, 3, pGxTask->GetFinish().Format(_("%d-%m-%Y %H:%M:%S")));
+        SetItem(ListItemID, 4, wxString::Format(_("%.1f%%"), pGxTask->GetDonePercent()));
+        SetItem(ListItemID, 5, pGxTask->GetLastMessage());
 
         SetItemBackgroundColour(ListItemID, color);
         SetItemData(ListItemID, (long)pObject);
@@ -473,7 +478,7 @@ void wxGxToolExecuteView::OnObjectChanged(IGxObject* pObj)
     if(nItem == wxNOT_FOUND)
         return;
 
-    IGxTask* pGxTask =  dynamic_cast<IGxTask*>(pObj);
+    wxGxTaskObject* pGxTask =  dynamic_cast<wxGxTaskObject*>(pObj);
     if(pGxTask != NULL)
     {
         // enumGISTaskWork = 1,    enumGISTaskDone = 2,    enumGISTaskQuered = 3,     enumGISTaskPaused = 4,     enumGISTaskError = 5
@@ -504,15 +509,17 @@ void wxGxToolExecuteView::OnObjectChanged(IGxObject* pObj)
             break;
         };
 
-        SetItem(nItem, 0, pObj->GetName(), nIcon);
+		SetItem(nItem, 0, wxString::Format(wxT("%d"), pGxTask->GetTaskID() + 1), nIcon);
+
+        SetItem(nItem, 1, pObj->GetName());
         wxDateTime dtb = pGxTask->GetStart();
         if(dtb.IsValid())
-            SetItem(nItem, 1, dtb.Format(_("%d-%m-%Y %H:%M:%S")));
+            SetItem(nItem, 2, dtb.Format(_("%d-%m-%Y %H:%M:%S")));
         wxDateTime dtf = pGxTask->GetFinish();
         if(dtf.IsValid())
-            SetItem(nItem, 2, dtf.Format(_("%d-%m-%Y %H:%M:%S")));
-        SetItem(nItem, 3, wxString::Format(_("%.1f%%"), pGxTask->GetDonePercent()));
-        SetItem(nItem, 4, pGxTask->GetLastMessage());
+            SetItem(nItem, 3, dtf.Format(_("%d-%m-%Y %H:%M:%S")));
+        SetItem(nItem, 4, wxString::Format(_("%.1f%%"), pGxTask->GetDonePercent()));
+        SetItem(nItem, 5, pGxTask->GetLastMessage());
 
         SetItemBackgroundColour(nItem, color);
 
