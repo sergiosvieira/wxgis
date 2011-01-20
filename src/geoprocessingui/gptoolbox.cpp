@@ -435,11 +435,18 @@ int wxGxToolExecute::OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel, IGPCa
 		nTaskID = wxGISGPToolManager::OnExecute(pTool, static_cast<ITrackCancel*>(pGxTaskObject), static_cast<IGPCallBack*>(pGxTaskObject));
 		pGxTaskObject->SetTaskID(nTaskID);
 		//add gxobj
-		if(!AddChild(static_cast<IGxObject*>(pGxTaskObject)))
+        IGxObject* pGxObjec = static_cast<IGxObject*>(pGxTaskObject);
+		if(!AddChild(pGxObjec))
 		{
 			wxDELETE(pGxTaskObject)
 			return wxNOT_FOUND;
 		}
+        else
+        {
+            if(m_pCatalog)
+                m_pCatalog->ObjectAdded(pGxObjec);
+        }
+
 		if(m_pCatalog)
 			m_pCatalog->ObjectChanged(this);
 	}
@@ -449,12 +456,16 @@ int wxGxToolExecute::OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel, IGPCa
 void wxGxToolExecute::StartProcess(size_t nIndex)
 {
     wxGISGPToolManager::StartProcess(nIndex);
+
+    if(!m_pCatalog)
+        return;
     for(size_t i = 0; i < m_Children.size(); i++)
     {
         wxGxTaskObject* pGxTaskObject = dynamic_cast<wxGxTaskObject*>(m_Children[i]);
         if(pGxTaskObject && pGxTaskObject->GetTaskID() == nIndex && m_pCatalog)
             m_pCatalog->ObjectChanged(m_Children[i]);
     }
+    m_pCatalog->ObjectChanged(this);
 }
 
 void wxGxToolExecute::OnFinish(IProcess* pProcess, bool bHasErrors)
@@ -464,12 +475,17 @@ void wxGxToolExecute::OnFinish(IProcess* pProcess, bool bHasErrors)
     for(nIndex = 0; nIndex < m_ProcessArray.size(); nIndex++)
         if(pProcess == m_ProcessArray[nIndex].pProcess)
             break;
+
+    if(!m_pCatalog)
+        return;
+
     for(size_t i = 0; i < m_Children.size(); i++)
     {
         wxGxTaskObject* pGxTaskObject = dynamic_cast<wxGxTaskObject*>(m_Children[i]);
         if(pGxTaskObject && pGxTaskObject->GetTaskID() == nIndex && m_pCatalog)
             m_pCatalog->ObjectChanged(m_Children[i]);
     }
+    m_pCatalog->ObjectChanged(this);
 }
 
 bool wxGxToolExecute::DeleteChild(IGxObject* pChild)

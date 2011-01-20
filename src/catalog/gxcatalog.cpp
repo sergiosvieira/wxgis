@@ -115,7 +115,7 @@ void wxGxCatalog::EmptyDisabledChildren(void)
 	for(size_t i = 0; i < m_aRootItems.size(); i++)
 	{
 		m_aRootItems[i]->Detach();
-		wxDELETE( m_aRootItems[i] );
+		delete m_aRootItems[i];
 	}
 	m_aRootItems.clear();
 }

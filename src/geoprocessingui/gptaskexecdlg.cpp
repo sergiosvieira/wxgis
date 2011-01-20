@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessingui/gptaskexecdlg.h"
+#include "wxgis/geoprocessingui/gptoolbox.h"
 
 #include "../../art/process_stop.xpm"
 #include "../../art/state.xpm"
@@ -437,5 +438,14 @@ void wxGxTaskObject::ShowProcess(wxWindow* pParentWnd)
 
 void wxGxTaskObject::ShowToolConfig(wxWindow* pParentWnd)
 {
-//	m_pToolManager->OnPrepareTool(pParentWnd, pTool, m_pCallBack, false);
+    wxGxToolExecute* pToolManager = dynamic_cast<wxGxToolExecute*>(m_pToolManager);
+    if(pToolManager)
+        pToolManager->OnPrepareTool(pParentWnd, m_pToolManager->GetProcessTool(m_nTaskID), m_pCallBack, false);
+}
+
+int wxGxTaskObject::GetPriority(void)
+{
+    if(m_pToolManager)
+        return m_pToolManager->GetProcessPriority(m_nTaskID);
+    return wxNOT_FOUND;
 }

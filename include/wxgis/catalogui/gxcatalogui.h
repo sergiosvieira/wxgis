@@ -60,10 +60,10 @@ public:
             return &m_ImageListSmall;
     }
 	//wxGxCatalog
-	virtual void EmptyChildren(void);
 	virtual void Init(IGxCatalog* pExtCat = NULL);
 protected:
 	bool m_bOpenLastPath, m_bHasInternal;
 	IGxSelection* m_pSelection;
     wxImageList m_ImageListSmall, m_ImageListLarge;
+    IGxCatalog* m_pExtCat;
 };

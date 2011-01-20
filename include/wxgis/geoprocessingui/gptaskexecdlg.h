@@ -149,6 +149,7 @@ public:
     virtual bool StartTask();
     virtual bool StopTask();
     virtual bool PauseTask();
+    virtual int GetPriority(void);
     //wxGxTaskObject
     virtual int GetTaskID(void){return m_nTaskID;};
     virtual void SetTaskID(int nTaskID);

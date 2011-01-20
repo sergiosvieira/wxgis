@@ -22,11 +22,13 @@
 
 #include "wxgis/catalogui/catalogui.h"
 
+#define DNDSCROLL 10 
+
 /** \class wxGISCatalogDropTarget gxcatdroptarget.h
     \brief A DropTarget for catalog items.
 */
 
-class wxGISCatalogDropTarget : public wxFileDropTarget
+class WXDLLIMPEXP_GIS_CLU wxGISCatalogDropTarget : public wxFileDropTarget
 {
 public:
     wxGISCatalogDropTarget(IGxViewDropTarget *pOwner);

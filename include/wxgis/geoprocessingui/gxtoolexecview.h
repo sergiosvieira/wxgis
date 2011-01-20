@@ -48,7 +48,8 @@ class WXDLLIMPEXP_GIS_GPU wxGxToolExecuteView :
 	public wxGxView,
 	public IGxSelectionEvents,
 	public IGxCatalogEvents,
-    public IGxContentsView
+    public IGxContentsView,
+    public IGxViewDropTarget
 {
     DECLARE_DYNAMIC_CLASS(wxGxToolExecuteView)
 public:
@@ -80,6 +81,10 @@ public:
     virtual void SetStyle(wxGISEnumContentsViewStyle style){};
     virtual wxGISEnumContentsViewStyle GetStyle(void){return enumGISCVReport;};
     virtual bool CanSetStyle(void){return false;};
+//IGxDropTarget
+    virtual wxDragResult OnDragOver(wxCoord x, wxCoord y, wxDragResult def);
+    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames);
+    virtual void OnLeave();
 //events
 	virtual void OnColClick(wxListEvent& event);
     virtual void OnContextMenu(wxContextMenuEvent& event);
@@ -89,7 +94,9 @@ public:
 	virtual void OnSelected(wxListEvent& event);
 	virtual void OnDeselected(wxListEvent& event);
     virtual void OnChar(wxKeyEvent& event);
-
+    virtual void OnBeginDrag(wxListEvent& event);
+protected:
+    virtual void FillDataArray(wxArrayString &saDataArr);
 protected:
 	bool m_bSortAsc, m_bHideDone;
 	short m_currentSortCol;
@@ -100,6 +107,7 @@ protected:
     wxGxCatalogUI* m_pCatalog;
     ICommand* m_pDeleteCmd;
 	IGxObject* m_pParentGxObject;
+    long m_HighLightItem;
 
     DECLARE_EVENT_TABLE()
 };

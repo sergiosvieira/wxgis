@@ -83,6 +83,7 @@ public:
     virtual ~IGxTask(void){};
     //virtual wxString GetName(void) = 0;
     virtual wxGISEnumTaskStateType GetState(void) = 0;
+    virtual int GetPriority(void) = 0;
     virtual wxDateTime GetStart() = 0;
     virtual wxDateTime GetFinish() = 0;
     virtual double GetDonePercent() = 0;
