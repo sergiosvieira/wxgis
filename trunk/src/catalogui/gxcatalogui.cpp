@@ -65,6 +65,15 @@ void wxGxCatalogUI::Detach(void)
     }
     else
     {
+	    wxXmlNode* pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/rootitems")));
+	    if(pNode)
+            wxGISConfig::DeleteNodeChildren(pNode);
+
+        SerializePlugins(pNode, true);
+
+        for(size_t i = 0; i < m_ObjectFactoriesArray.size(); i++)
+            m_ObjectFactoriesArray[i]->PutCatalogRef(m_pExtCat);
+
 	    wxDELETE(m_pSelection);
 	    EmptyChildren();
     	EmptyDisabledChildren();
@@ -80,30 +89,12 @@ void wxGxCatalogUI::EditProperties(wxWindow *parent)
         pApp->OnAppOptions();
 }
 
-void wxGxCatalogUI::EmptyChildren(void)
-{
-	for(size_t i = 0; i < m_Children.size(); i++)
-	{
-        wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pCatalog);
-        if(pCatalog)
-        {
-
-            IGxSelection* pSel = pCatalog->GetSelection();
-            if(pSel)
-                pSel->Unselect(m_Children[i], IGxSelection::INIT_ALL);
-        }
-		m_Children[i]->Detach();
-		delete m_Children[i];
-	}
-	m_Children.clear();
-	m_bIsChildrenLoaded = false;
-}
-
 void wxGxCatalogUI::Init(IGxCatalog* pExtCat)//TODO: include root items list
 {
 	if(m_bIsChildrenLoaded)
 		return;
 
+    m_pExtCat = pExtCat;
     #ifdef WXGISPORTABLE
 	    m_pConf = new wxGISConfig(wxString(wxT("wxCatalogUI")), CONFIG_DIR, true);
     #else
@@ -115,8 +106,13 @@ void wxGxCatalogUI::Init(IGxCatalog* pExtCat)//TODO: include root items list
         m_bHasInternal = true;
         GxObjectFactoryArray* poObjFactArr = pExtCat->GetObjectFactories();
         if(poObjFactArr)
+        {
             for(size_t i = 0; i < poObjFactArr->size(); i++)
+            {
                 m_ObjectFactoriesArray.push_back(poObjFactArr->at(i));
+                poObjFactArr->at(i)->PutCatalogRef(this);
+            }
+        }
 
          
 	    //loads current user and when local machine items

@@ -112,12 +112,13 @@ BEGIN_EVENT_TABLE(wxGxContainerDialog, wxDialog)
     EVT_UPDATE_UI(ID_CREATE, wxGxContainerDialog::OnCreateUI)
 END_EVENT_TABLE()
 
-wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pTree(NULL), m_pConfig(NULL), m_bShowCreateButton(false), m_bAllFilters(true), m_nDefaultFilter(0), m_bShowExportFormats(false)/*m_bAllowMultiSelect(false)*/
+wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExternalCatalog, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pTree(NULL), m_pConfig(NULL), m_bShowCreateButton(false), m_bAllFilters(true), m_nDefaultFilter(0), m_bShowExportFormats(false)/*m_bAllowMultiSelect(false)*/
 {
 	this->SetSizeHints( wxSize( 400,300 ), wxDefaultSize );
 
-    m_pCatalog = new wxGxCatalogUI();
-	m_pCatalog->Init();
+    m_pExternalCatalog = pExternalCatalog; 
+    m_pCatalog = new wxGxCatalogUI(true);
+	m_pCatalog->Init(m_pExternalCatalog);
 
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
 
@@ -171,7 +172,7 @@ wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, wxWindowID id, const
     wxGISCatalogMainCmd* pwxGISCatalogMainCmd = new wxGISCatalogMainCmd();
     pwxGISCatalogMainCmd->OnCreate(static_cast<IApplication*>(this));
     pwxGISCatalogMainCmd->SetSubType(7);//create folder
-    m_pCreateCmd = static_cast<ICommand*>(pwxGISCatalogMainCmd);
+    m_pCreateCmd = ICommandSPtr(static_cast<ICommand*>(pwxGISCatalogMainCmd));
 }
 
 wxGxContainerDialog::~wxGxContainerDialog()

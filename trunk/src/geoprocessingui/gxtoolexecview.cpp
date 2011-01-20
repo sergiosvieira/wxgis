@@ -22,6 +22,7 @@
 #include "wxgis/geoprocessingui/gxtoolexecview.h"
 #include "wxgis/geoprocessingui/gptoolbox.h"
 #include "wxgis/geoprocessingui/gptaskexecdlg.h"
+#include "wxgis/catalogui/gxcatdroptarget.h"
 
 #include "wx/tokenzr.h"
 
@@ -36,6 +37,7 @@
 IMPLEMENT_DYNAMIC_CLASS(wxGxToolExecuteView, wxListCtrl)
 
 BEGIN_EVENT_TABLE(wxGxToolExecuteView, wxListCtrl)
+    EVT_LIST_BEGIN_DRAG(TOOLEXECUTECTRLID, wxGxToolExecuteView::OnBeginDrag)
     EVT_LIST_ITEM_SELECTED(TOOLEXECUTECTRLID, wxGxToolExecuteView::OnSelected)
     EVT_LIST_ITEM_DESELECTED(TOOLEXECUTECTRLID, wxGxToolExecuteView::OnDeselected)
     EVT_LIST_ITEM_ACTIVATED(TOOLEXECUTECTRLID, wxGxToolExecuteView::OnActivated)
@@ -94,6 +96,8 @@ wxGxToolExecuteView::~wxGxToolExecuteView(void)
 
 bool wxGxToolExecuteView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
+    SetDropTarget(new wxGISCatalogDropTarget(static_cast<IGxViewDropTarget*>(this)));
+    m_HighLightItem = wxNOT_FOUND;
     m_bSortAsc = true;
     m_bHideDone = false;
     m_pConnectionPointCatalog = NULL;
@@ -263,7 +267,7 @@ void wxGxToolExecuteView::AddObject(IGxObject* pObject)
             break;
         };
 
-		long ListItemID = InsertItem(0, wxString::Format(wxT("%d"), pGxTask->GetTaskID() + 1), nIcon);
+		long ListItemID = InsertItem(0, wxString::Format(wxT("%d"), pGxTask->GetPriority() + 1), nIcon);
 	    SetItem(ListItemID, 1, pObject->GetName());
         wxDateTime dts = pGxTask->GetStart();
         if(dts.IsValid())
@@ -509,7 +513,7 @@ void wxGxToolExecuteView::OnObjectChanged(IGxObject* pObj)
             break;
         };
 
-		SetItem(nItem, 0, wxString::Format(wxT("%d"), pGxTask->GetTaskID() + 1), nIcon);
+		SetItem(nItem, 0, wxString::Format(wxT("%d"), pGxTask->GetPriority() + 1), nIcon);
 
         SetItem(nItem, 1, pObj->GetName());
         wxDateTime dtb = pGxTask->GetStart();
@@ -630,4 +634,101 @@ void wxGxToolExecuteView::HideDone(bool bHide)
 {
     m_bHideDone = bHide;
     OnRefreshAll();
+}
+
+void wxGxToolExecuteView::OnBeginDrag(wxListEvent& event)
+{
+    long nItem = -1;
+	wxArrayString saArr;
+	FillDataArray(saArr);
+	if(saArr.GetCount() > 0)
+	{
+		wxFileDataObject *pMyData = new wxFileDataObject();
+		for(size_t i = 0; i < saArr.GetCount(); i++)
+			pMyData->AddFile(saArr[i]);
+
+	    wxDropSource dragSource( this );
+		dragSource.SetData( *pMyData );
+		wxDragResult result = dragSource.DoDragDrop( TRUE );  
+		wxDELETE(pMyData)
+	}
+}
+
+wxDragResult wxGxToolExecuteView::OnDragOver(wxCoord x, wxCoord y, wxDragResult def)
+{    
+    SetItemState(m_HighLightItem, 0, wxLIST_STATE_DROPHILITED);
+    wxPoint pt(x, y);
+	unsigned long nFlags(0);
+	long nItemId = HitTest(pt, (int &)nFlags);
+	if(nItemId != wxNOT_FOUND && (nFlags & wxLIST_HITTEST_ONITEM))
+	{ 
+        wxSize sz = GetClientSize();
+        if(DNDSCROLL > y)//scroll up
+            ScrollLines(-1);
+        else if((sz.GetHeight() - DNDSCROLL) < y)//scroll down
+            ScrollLines(1);
+
+        SetItemState(m_HighLightItem, wxLIST_STATE_DROPHILITED, wxLIST_STATE_DROPHILITED);
+        m_HighLightItem = nItemId;
+
+        return def;
+    }
+    return wxDragNone;
+}
+
+bool wxGxToolExecuteView::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
+{
+ //   wxPoint pt(x, y);
+	//unsigned long nFlags(0);
+	//long nItemId = HitTest(pt, (int &)nFlags);
+	//if(nItemId != wxNOT_FOUND && (nFlags & wxLIST_HITTEST_ONITEM))
+	//{ 
+ //       SetItemState(m_HighLightItem, 0, wxLIST_STATE_DROPHILITED);
+ //       m_HighLightItem = nItemId;
+ //       SetItemState(m_HighLightItem, wxLIST_STATE_DROPHILITED, wxLIST_STATE_DROPHILITED);
+
+ //       LPITEM_DATA pdata = (LPITEM_DATA)wxListView::GetItemData(nItemId);
+ //       pdata->bChanged = !pdata->bChanged;
+ //       pdata->nCheckState = !pdata->nCheckState;
+ //       bool bCheck = pdata->nCheckState;
+ //       SetItemImage(nItemId, bCheck == true ? 1 : 0, bCheck == true ? 1 : 0);
+	//}
+
+
+    //int flag = wxTREE_HITTEST_ONITEMINDENT;
+    //wxTreeItemId ItemId = wxTreeCtrl::HitTest(pt, flag);
+    //if(ItemId.IsOk())
+    //{
+    //    SetItemDropHighlight(ItemId, false);
+
+	   // wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(ItemId);
+	   // if(pData == NULL)
+		  //  return wxDragNone;
+    //    IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pData->m_pObject);
+    //    if(pTarget == NULL)
+		  //  return false;
+    //    return pTarget->Drop(filenames);
+    //}
+    return false;
+}
+
+void wxGxToolExecuteView::OnLeave()
+{
+    SetItemState(m_HighLightItem, 0, wxLIST_STATE_DROPHILITED);
+}
+
+void wxGxToolExecuteView::FillDataArray(wxArrayString &saDataArr)
+{
+	int nItem(-1);
+    for ( ;; )
+    {
+        nItem = GetNextItem(nItem, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+        if ( nItem == -1 )
+            break;
+        IGxObject* pObject = (IGxObject*)GetItemData(nItem);
+        wxGxTaskObject* pGxTask =  dynamic_cast<wxGxTaskObject*>(pObject);
+	    if(pGxTask == NULL)
+            continue;
+        saDataArr.Add(wxString::Format(wxT("TaskID: %d"), pGxTask->GetTaskID()));
+    }	
 }

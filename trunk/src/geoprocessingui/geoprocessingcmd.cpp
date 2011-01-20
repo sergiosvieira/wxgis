@@ -450,7 +450,10 @@ EXIT:
                 //3. if not single GxObject progress in special dialog
                 else
                 {
-                    wxGxContainerDialog dlg(pWnd, wxID_ANY, _("Select output"));
+                    IGxCatalog *pExtCat = NULL;
+                    if(pGxApp)
+                        pExtCat = pGxApp->GetCatalog();
+                    wxGxContainerDialog dlg(pWnd, pExtCat, wxID_ANY, _("Select output"));
 				    dlg.SetAllFilters(false);
                     dlg.ShowExportFormats(true);
                     dlg.AddFilter(new wxGxKMLFilter(), true);

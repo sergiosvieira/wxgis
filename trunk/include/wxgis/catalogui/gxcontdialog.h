@@ -86,7 +86,7 @@ enum
     ID_CREATE = wxID_HIGHEST + 4001
 };
 public:
-	wxGxContainerDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,338 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+	wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExternalCatalog = NULL, wxWindowID id = wxID_ANY, const wxString& title = _("Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,338 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 	~wxGxContainerDialog();	
 
 //IGxApplication
@@ -166,6 +166,7 @@ protected:
 //    virtual bool DoSaveObject(wxGISEnumSaveObjectResults Result);
 protected:
   	wxGxCatalogUI* m_pCatalog;
+  	IGxCatalog* m_pExternalCatalog;
     wxGISAppConfig* m_pConfig;
     wxTreeContainerView* m_pTree;
 	wxString m_sOkBtLabel;
@@ -175,7 +176,8 @@ protected:
 	size_t m_nDefaultFilter;
     GxObjectArray m_ObjectArray;
     int m_nRetCode;
-    ICommand* m_pCreateCmd;
+    DEFINE_SHARED_PTR(ICommand);
+    ICommandSPtr m_pCreateCmd;
 // 	COMMANDARRAY m_CommandArray;
 //    wxGxDialogContentView* m_pwxGxContentView;
 //    wxTreeViewComboPopup* m_PopupCtrl;

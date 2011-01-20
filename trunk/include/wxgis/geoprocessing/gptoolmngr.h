@@ -76,6 +76,7 @@ public:
     virtual wxDateTime GetProcessStart(size_t nIndex);
     virtual wxDateTime GetProcessFinish(size_t nIndex);
     virtual int GetProcessPriority(size_t nIndex);
+    virtual IGPTool* GetProcessTool(size_t nIndex);
     virtual void SetProcessPriority(size_t nIndex, int nPriority);
 	virtual int GetPriorityTaskIndex();
 protected:

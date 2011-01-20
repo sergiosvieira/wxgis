@@ -156,8 +156,10 @@ wxGISGPToolManager::~wxGISGPToolManager(void)
 
     //kill all processes
     for(size_t i = 0; i < m_ProcessArray.size(); i++)
+    {
         CancelProcess(i);
-
+        wxDELETE(m_ProcessArray[i].pProcess)
+    }
     //delete all existed tools
     for(std::map<wxString, TOOLINFO>::iterator pos = m_ToolsMap.begin(); pos != m_ToolsMap.end(); ++pos)
         wxDELETE(pos->second.pTool);
@@ -407,6 +409,13 @@ void wxGISGPToolManager::AddPriority(int nIndex, int nPriority)
                 return;;
         }
 	}
-    if(bIncrease)
+    if(!bIncrease)
         m_aPriorityArray.push_back(info);
+}
+
+IGPTool* wxGISGPToolManager::GetProcessTool(size_t nIndex)
+{
+	wxASSERT(nIndex >= 0);
+	wxASSERT(nIndex < m_ProcessArray.size());
+	return m_ProcessArray[nIndex].pTool;
 }
