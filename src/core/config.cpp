@@ -187,6 +187,9 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
     if(!pRoot)
         return NULL;
 
+	if(sPath.IsEmpty())
+		return pRoot;
+
     wxXmlNode* pChildNode = pRoot->GetChildren();
 
     wxStringTokenizer tkz(sPath.Lower(), wxString(wxT("/")), wxTOKEN_RET_EMPTY );
@@ -196,7 +199,7 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
         token = tkz.GetNextToken();
 		//if(tkz.HasMoreTokens())
 		//	token = token.RemoveLast();
-        token.MakeLower();
+        //token.MakeLower();
         while(pChildNode)
         {
 			sChildName = pChildNode->GetName();

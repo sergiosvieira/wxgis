@@ -395,7 +395,7 @@ void wxGISGPToolManager::AddPriority(int nIndex, int nPriority)
     bool bIncrease = false;
 	for(size_t j = 0; j < m_aPriorityArray.size(); j++)
 	{
-		if(m_aPriorityArray[j].nPriority >= nPriority)
+		if(!bIncrease && m_aPriorityArray[j].nPriority >= nPriority)
         {
             m_aPriorityArray.insert(m_aPriorityArray.begin() + j, info);
             bIncrease = true;
@@ -403,7 +403,7 @@ void wxGISGPToolManager::AddPriority(int nIndex, int nPriority)
         }
         if(bIncrease)
         {
-            if(m_aPriorityArray[j].nPriority - m_aPriorityArray[j - 1].nPriority < 2)
+            if(m_aPriorityArray[j].nPriority - m_aPriorityArray[j - 1].nPriority < 1)
                 m_aPriorityArray[j].nPriority++;
             else
                 return;;

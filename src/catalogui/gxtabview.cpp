@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxtabview.h"
 #include "wxgis/catalogui/gxapplication.h"
+#include "wxgis/catalogui/gxcatdroptarget.h"
 
 //-------------------------------------------------------------------
 // wxGxTab
@@ -32,6 +33,8 @@ END_EVENT_TABLE()
 
 wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style), m_bShowChoices(false), m_pCurrentWnd(NULL)
 {
+    SetDropTarget(new wxGISCatalogDropTarget(static_cast<IGxViewDropTarget*>(this)));
+
 	m_sName = wxGetTranslation( pTabDesc->GetPropVal(wxT("name"), NONAME) );
 	m_bShowChoices = pTabDesc->GetPropVal(wxT("show_choices"), wxT("f")) == wxT("f") ? false : true;
     m_pApp = dynamic_cast<IApplication*>(application);
@@ -130,19 +133,6 @@ wxGxTab::~wxGxTab(void)
         m_pApp->UnRegisterChildWindow(poWnd);
         m_pWindows.pop_back();
     }
-
-
-	//for(size_t i = 0; i < m_pWindows.size(); i++)
-	//{
-	//	wxGxView* pView = dynamic_cast<wxGxView*>(m_pWindows[i]);
-	//	if(pView != NULL)
- //       {
-	//		pView->Deactivate();
-            //m_pApp->UnRegisterChildWindow(m_pWindows[i]);
- //       }
-	//	//wxDELETE(m_pWindows[i]);//destroy in registerwindows array
- //       m_pWindows[i]->Destroy();
-	//}
 }
 
 wxString wxGxTab::GetName(void)
@@ -326,6 +316,31 @@ void wxGxTab::Deactivate(void)
         //    m_pWindows[i]->Destroy();
 	}
 }
+
+wxDragResult wxGxTab::OnDragOver(wxCoord x, wxCoord y, wxDragResult def)
+{
+	IGxViewDropTarget* pGxViewDropTarget = dynamic_cast<IGxViewDropTarget*>(m_pCurrentWnd);
+	if(!pGxViewDropTarget)
+		return wxDragNone;
+	return pGxViewDropTarget->OnDragOver(x, y, def);
+}
+
+bool wxGxTab::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
+{
+	IGxViewDropTarget* pGxViewDropTarget = dynamic_cast<IGxViewDropTarget*>(m_pCurrentWnd);
+	if(!pGxViewDropTarget)
+		return wxDragNone;
+	return pGxViewDropTarget->OnDropFiles(x, y, filenames);
+}
+
+void wxGxTab::OnLeave()
+{
+	IGxViewDropTarget* pGxViewDropTarget = dynamic_cast<IGxViewDropTarget*>(m_pCurrentWnd);
+	if(!pGxViewDropTarget)
+		return;
+	return pGxViewDropTarget->OnLeave();
+}
+
 
 //-------------------------------------------------------------------
 // wxGxTabView
