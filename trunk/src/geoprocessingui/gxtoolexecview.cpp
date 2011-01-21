@@ -63,17 +63,22 @@ int wxCALLBACK TasksCompareFunction(long item1, long item2, long sortData)
     switch(psortdata->currentSortCol)
     {
     case 0:
-    case 4:
-        nRes = pObject1->GetName().CmpNoCase(pObject2->GetName()); 
+        nRes = (pTask1->GetPriority() > pTask2->GetPriority()) == true ? 1 : -1; 
         break;
     case 1:
-        nRes = (pTask1->GetStart() > pTask2->GetStart()) == true ? 1 : -1;
+        nRes = pObject1->GetName().CmpNoCase(pObject2->GetName()); 
         break;
     case 2:
-        nRes = (pTask1->GetFinish() > pTask2->GetFinish()) == true ? 1 : -1;
+        nRes = (pTask1->GetStart() > pTask2->GetStart()) == true ? 1 : -1;
         break;
     case 3:
+        nRes = (pTask1->GetFinish() > pTask2->GetFinish()) == true ? 1 : -1;
+        break;
+    case 4:
         nRes = (pTask1->GetDonePercent() > pTask2->GetDonePercent()) == true ? 1 : -1;
+        break;
+    case 5:
+        nRes = pTask1->GetLastMessage().CmpNoCase(pTask2->GetLastMessage()); 
         break;
     };
    return nRes * (psortdata->bSortAsc == 0 ? -1 : 1);
@@ -96,7 +101,7 @@ wxGxToolExecuteView::~wxGxToolExecuteView(void)
 
 bool wxGxToolExecuteView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
-    SetDropTarget(new wxGISCatalogDropTarget(static_cast<IGxViewDropTarget*>(this)));
+    //SetDropTarget(new wxGISCatalogDropTarget(static_cast<IGxViewDropTarget*>(this)));
     m_HighLightItem = wxNOT_FOUND;
     m_bSortAsc = true;
     m_bHideDone = false;
@@ -668,8 +673,8 @@ wxDragResult wxGxToolExecuteView::OnDragOver(wxCoord x, wxCoord y, wxDragResult 
         else if((sz.GetHeight() - DNDSCROLL) < y)//scroll down
             ScrollLines(1);
 
-        SetItemState(m_HighLightItem, wxLIST_STATE_DROPHILITED, wxLIST_STATE_DROPHILITED);
         m_HighLightItem = nItemId;
+        SetItemState(m_HighLightItem, wxLIST_STATE_DROPHILITED, wxLIST_STATE_DROPHILITED);
 
         return def;
     }
@@ -678,37 +683,42 @@ wxDragResult wxGxToolExecuteView::OnDragOver(wxCoord x, wxCoord y, wxDragResult 
 
 bool wxGxToolExecuteView::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 {
- //   wxPoint pt(x, y);
-	//unsigned long nFlags(0);
-	//long nItemId = HitTest(pt, (int &)nFlags);
-	//if(nItemId != wxNOT_FOUND && (nFlags & wxLIST_HITTEST_ONITEM))
-	//{ 
- //       SetItemState(m_HighLightItem, 0, wxLIST_STATE_DROPHILITED);
- //       m_HighLightItem = nItemId;
- //       SetItemState(m_HighLightItem, wxLIST_STATE_DROPHILITED, wxLIST_STATE_DROPHILITED);
+	SetItemState(m_HighLightItem, 0, wxLIST_STATE_DROPHILITED);
+    wxPoint pt(x, y);
+	unsigned long nFlags(0);
+	long nItemId = HitTest(pt, (int &)nFlags);
+	if(nItemId != wxNOT_FOUND && (nFlags & wxLIST_HITTEST_ONITEM))
+	{
+		IGxObject* pObject = (IGxObject*)GetItemData(nItemId);
+        wxGxTaskObject* pGxTask =  dynamic_cast<wxGxTaskObject*>(pObject);
+	    if(pGxTask == NULL)
+            return false;
 
- //       LPITEM_DATA pdata = (LPITEM_DATA)wxListView::GetItemData(nItemId);
- //       pdata->bChanged = !pdata->bChanged;
- //       pdata->nCheckState = !pdata->nCheckState;
- //       bool bCheck = pdata->nCheckState;
- //       SetItemImage(nItemId, bCheck == true ? 1 : 0, bCheck == true ? 1 : 0);
-	//}
+		long nNewPriority = pGxTask->GetPriority();
 
-
-    //int flag = wxTREE_HITTEST_ONITEMINDENT;
-    //wxTreeItemId ItemId = wxTreeCtrl::HitTest(pt, flag);
-    //if(ItemId.IsOk())
-    //{
-    //    SetItemDropHighlight(ItemId, false);
-
-	   // wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(ItemId);
-	   // if(pData == NULL)
-		  //  return wxDragNone;
-    //    IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pData->m_pObject);
-    //    if(pTarget == NULL)
-		  //  return false;
-    //    return pTarget->Drop(filenames);
-    //}
+		for(size_t i = 0; i < filenames.GetCount(); i++)
+		{
+			wxString sItem = filenames[i];
+			wxString sRest;
+			if( sItem.StartsWith(wxT("TaskID: "), &sRest) )
+			{
+				int nTaskID = wxAtoi(sRest);
+				for(size_t j = 0; j < GetItemCount(); j++ )
+				{
+					IGxObject* pObject = (IGxObject*)GetItemData(j);
+					wxGxTaskObject* pGxTaskNew =  dynamic_cast<wxGxTaskObject*>(pObject);
+					if(pGxTaskNew == NULL)
+						continue;
+					if(pGxTaskNew->GetTaskID() == nTaskID)
+					{
+						pGxTaskNew->SetPriority(nNewPriority);
+						nNewPriority++;
+					}
+				}
+			}
+		}
+		return true;
+	}
     return false;
 }
 

@@ -42,7 +42,8 @@
 //-------------------------------------------------------------------
 class wxGxTab : 
 	public wxPanel,
-	public IGxSelectionEvents
+	public IGxSelectionEvents,
+    public IGxViewDropTarget
 {
     DECLARE_CLASS(wxGxTab)
 
@@ -63,6 +64,10 @@ public:
 	virtual void Deactivate(void);
 //IGxSelectionEvents
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
+//IGxDropTarget
+    virtual wxDragResult OnDragOver(wxCoord x, wxCoord y, wxDragResult def);
+    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames);
+    virtual void OnLeave();
 //events
 	void OnChoice(wxCommandEvent& event);
 

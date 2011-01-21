@@ -449,3 +449,12 @@ int wxGxTaskObject::GetPriority(void)
         return m_pToolManager->GetProcessPriority(m_nTaskID);
     return wxNOT_FOUND;
 }
+
+void wxGxTaskObject::SetPriority(int nNewPriority)
+{
+    if(m_pToolManager)
+	{
+		m_pToolManager->SetProcessPriority(m_nTaskID, nNewPriority);
+		m_pCatalog->ObjectRefreshed(m_pParent);
+	}
+}

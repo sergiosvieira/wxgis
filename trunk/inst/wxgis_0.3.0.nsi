@@ -92,23 +92,16 @@ SetCompressor lzma
 ; Install Pages
 
 	!insertmacro MUI_PAGE_WELCOME
-
-	!insertmacro MUI_PAGE_LICENSE $(myLicenseData)	
-	
-	!insertmacro MUI_PAGE_README $(myVerData)
-	
+	!insertmacro MUI_PAGE_LICENSE $(myLicenseData)		
+	!insertmacro MUI_PAGE_README $(myVerData)	
 	!insertmacro MUI_PAGE_COMPONENTS
-
 	!insertmacro MUI_PAGE_DIRECTORY
-
-	!insertmacro MUI_PAGE_INSTFILES
-  
+	!insertmacro MUI_PAGE_INSTFILES  
 	!insertmacro MUI_PAGE_FINISH 
 ; --------------------------------
 ; Uninstall Pages
 
-	!insertmacro MUI_UNPAGE_CONFIRM
-  
+	!insertmacro MUI_UNPAGE_CONFIRM  
 	!insertmacro MUI_UNPAGE_INSTFILES  
 
 ; --------------------------------	
@@ -207,6 +200,8 @@ Section !$(CommonName) SecCommon
   File "${WXGIS_DIR}\build\release\wxmsw28u_aui_vc_custom.dll"  
   File "${WXGIS_DIR}\build\release\wxmsw28u_core_vc_custom.dll"  
   File "${WXGIS_DIR}\build\release\wxmsw28u_html_vc_custom.dll"  
+  ;wxPropertyGrid
+  File "${WXGIS_DIR}\build\release\wxcode_msw28ud_propgrid.dll"  
   ;gdal libs
   File "${WXGIS_DIR}\build\release\wxgiscpl.dll"
   File "${WXGIS_DIR}\build\release\wxgisogr.dll"
@@ -217,7 +212,11 @@ Section !$(CommonName) SecCommon
   File "${WXGIS_DIR}\build\release\geos_c.dll"
   ;curl lib
   File "${WXGIS_DIR}\build\release\libcurl.dll"
-   
+  ;potgres libs
+  File "${WXGIS_DIR}\build\release\libiconv-2.dll"
+  File "${WXGIS_DIR}\build\release\libintl-8.dll"
+  File "${WXGIS_DIR}\build\release\libpq.dll"
+  
   ;sys dir
   SetOutPath "$INSTDIR\sys\gdal"
   File /r "${WXGIS_DIR}\build\release\sys\gdal\*.*"
@@ -284,14 +283,14 @@ SectionGroup /e "!wxGIS" SecwxGIS
 		File "${WXGIS_DIR}\build\release\wxGISDisplay.dll"		
 		File "${WXGIS_DIR}\build\release\wxGISFramework.dll"		
 		File "${WXGIS_DIR}\build\release\wxGISGeometry.dll"		
-    
+    ;configurator
     File "${WXGIS_DIR}\build\release\wxGISConf.exe"
     
     ;write xml config
     
     ;wxCatalog/catalog/rootitems  <rootitem name=$\"wxGxSpatialReferencesFolder$\" path=$\"/vsizip/$INSTDIR/sys/cs.zip/cs$\" is_enabled=$\"1$\"/>
     ; -a wxCatalog/catalog/rootitems/rootitem -p /vsizip/$INSTDIR/sys/cs.zip/cs -n wxGxSpatialReferencesFolder -e 1
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxCatalog/catalog/rootitems/rootitem -p /vsizip/$INSTDIR/sys/cs.zip/cs -n wxGxSpatialReferencesFolder -e 1'
+    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxCatalog/catalog/rootitems/rootitem -p /vsizip/$INSTDIR/sys/cs.zip/cs -n wxGxSpatialReferencesFolderUI -e 1'
     ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxCatalog/catalog/rootitems/rootitem -n wxGxDiscConnectionsUI -e 1'
         
     ;wxGISCatalog  <loc path=$\"$INSTDIR\locale$\"/>                          -p wxGISCatalog/loc $INSTDIR\locale     set path always HKLM
@@ -348,6 +347,8 @@ SectionGroup /e "!wxGIS" SecwxGIS
     ;wxGISCatalog/Frame/Menues/Menu  <Item type=$\"cmd$\" cmd_name=$\"wxGISGeoprocessingCmd$\" subtype=$\"1$\" name=$\"Show/Hide &amp;Toolbox pane$\"/>
     ;-a wxGISCatalog/Frame/Menues/Menu -i -1 -t cmd -o wxGISGeoprocessingCmd -s 1
     ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/Frame/Menues/Menu -i -1 -t cmd -o wxGISGeoprocessingCmd -s 1'    
+    
+    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxToolboxes/tools -x gp_exec=$INSTDIR\bin\wxGISGeoprocess.exe'
 			
 	SectionEnd	
   
@@ -364,6 +365,8 @@ SectionGroup /e "!wxGIS" SecwxGIS
 		
     ;add to xml config
     ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/libs/lib -p $INSTDIR\bin\wxGISRemoteServerUI.dll -n wxGISRemoteServerUI' 
+    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxCatalog/catalog/rootitems/rootitem -n wxGxRemoteServersUI -e 1'
+    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxCatalog/catalog/rootitems/rootitem#name=wxGxRemoteServersUI/factories/factory -n wxClientTCPNetFactoryUI'
     
     <Command name="wxGISRemoteCmd"/>
     <Command name="wxGISRemoteDBCmd"/>    
