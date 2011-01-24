@@ -190,7 +190,9 @@ Section !$(CommonName) SecCommon
   
   ;system libs
   SetOutPath "$INSTDIR\bin\Microsoft.VC80.CRT"
-  File /r "${WXGIS_DIR}\build\release\Microsoft.VC80.CRT\*.*"  
+  File /r "${WXGIS_DIR}\build\release\Microsoft.VC80.CRT\*.*"
+  SetOutPath "$INSTDIR\bin\Microsoft.VC90.CRT"
+  File /r "${WXGIS_DIR}\build\release\Microsoft.VC90.CRT\*.*"  
   ;wxWidgets libs
   SetOutPath "$INSTDIR\bin"
   File "${WXGIS_DIR}\build\release\wxbase28u_net_vc_custom.dll"  
@@ -201,7 +203,7 @@ Section !$(CommonName) SecCommon
   File "${WXGIS_DIR}\build\release\wxmsw28u_core_vc_custom.dll"  
   File "${WXGIS_DIR}\build\release\wxmsw28u_html_vc_custom.dll"  
   ;wxPropertyGrid
-  File "${WXGIS_DIR}\build\release\wxcode_msw28ud_propgrid.dll"  
+  File "${WXGIS_DIR}\build\release\wxcode_msw28u_propgrid.dll"  
   ;gdal libs
   File "${WXGIS_DIR}\build\release\wxgiscpl.dll"
   File "${WXGIS_DIR}\build\release\wxgisogr.dll"
@@ -212,9 +214,11 @@ Section !$(CommonName) SecCommon
   File "${WXGIS_DIR}\build\release\geos_c.dll"
   ;curl lib
   File "${WXGIS_DIR}\build\release\libcurl.dll"
-  ;potgres libs
+  ;postgres libs
   File "${WXGIS_DIR}\build\release\libiconv-2.dll"
   File "${WXGIS_DIR}\build\release\libintl-8.dll"
+  File "${WXGIS_DIR}\build\release\libeay32.dll"
+  File "${WXGIS_DIR}\build\release\ssleay32.dll"
   File "${WXGIS_DIR}\build\release\libpq.dll"
   
   ;sys dir
@@ -228,10 +232,7 @@ Section !$(CommonName) SecCommon
   File /r "${WXGIS_DIR}\build\release\log\*.*"
   ;conf dir
   SetOutPath "$INSTDIR\bin\config"
-  File /oname=wxCatalog.xml "${WXGIS_DIR}\build\release\config\wxCatalog_nsi.xml"
-  File /oname=wxGISCatalog.xml "${WXGIS_DIR}\build\release\config\wxGISCatalog_nsi.xml"
-  File "${WXGIS_DIR}\build\release\config\wxGISContDialog.xml"
-  File "${WXGIS_DIR}\build\release\config\wxGISObjDialog.xml"  
+  File /r "${WXGIS_DIR}\build\release\config\*.xml"
   
   ;locale dir
   SetOutPath "$INSTDIR\locale"
@@ -283,24 +284,29 @@ SectionGroup /e "!wxGIS" SecwxGIS
 		File "${WXGIS_DIR}\build\release\wxGISDisplay.dll"		
 		File "${WXGIS_DIR}\build\release\wxGISFramework.dll"		
 		File "${WXGIS_DIR}\build\release\wxGISGeometry.dll"		
-    ;configurator
-    File "${WXGIS_DIR}\build\release\wxGISConf.exe"
-    
-    ;write xml config
-    
-    ;wxCatalog/catalog/rootitems  <rootitem name=$\"wxGxSpatialReferencesFolder$\" path=$\"/vsizip/$INSTDIR/sys/cs.zip/cs$\" is_enabled=$\"1$\"/>
-    ; -a wxCatalog/catalog/rootitems/rootitem -p /vsizip/$INSTDIR/sys/cs.zip/cs -n wxGxSpatialReferencesFolder -e 1
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxCatalog/catalog/rootitems/rootitem -p /vsizip/$INSTDIR/sys/cs.zip/cs -n wxGxSpatialReferencesFolderUI -e 1'
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxCatalog/catalog/rootitems/rootitem -n wxGxDiscConnectionsUI -e 1'
-        
-    ;wxGISCatalog  <loc path=$\"$INSTDIR\locale$\"/>                          -p wxGISCatalog/loc $INSTDIR\locale     set path always HKLM
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/loc -p $INSTDIR\locale'
-    
-    ;wxGISCatalog  <log path=$\"$INSTDIR\log$\"/>                               -p wxGISCatalog/log $INSTDIR\log
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/log -p $INSTDIR\log'
-    
-    ;wxGISCatalog  <sys path=$\"$INSTDIR\sys$\"/>                              -p wxGISCatalog/sys $INSTDIR\sys
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/sys -p $INSTDIR\sys'
+		;configurator
+		File "${WXGIS_DIR}\build\release\wxGISConf.exe"
+		
+		;write xml config
+		
+		;wxCatalog/catalog/rootitems  <rootitem name=$\"wxGxSpatialReferencesFolder$\" path=$\"/vsizip/$INSTDIR/sys/cs.zip/cs$\" is_enabled=$\"1$\"/>
+		; -a wxCatalog/catalog/rootitems/rootitem -p /vsizip/$INSTDIR/sys/cs.zip/cs -n wxGxSpatialReferencesFolder -e 1
+		DetailPrint "wxGISConf.exe -a wxCatalogUI/catalog/rootitems/rootitem#name=wxGxSpatialReferencesFolderUI -p /vsizip/$INSTDIR/sys/cs.zip/cs"
+		nsExec::Exec '"$INSTDIR\bin\wxGISConf.exe" -a wxCatalogUI/catalog/rootitems/rootitem#name=wxGxSpatialReferencesFolderUI -p "/vsizip/$INSTDIR/sys/cs.zip/cs"'  
+		DetailPrint "wxGISConf.exe -a wxCatalog/catalog/rootitems/rootitem#name=wxGxSpatialReferencesFolderUI -p /vsizip/$INSTDIR/sys/cs.zip/cs"
+		nsExec::Exec '"$INSTDIR\bin\wxGISConf.exe" -a wxCatalog/catalog/rootitems/rootitem#name=wxGxSpatialReferencesFolder -p "/vsizip/$INSTDIR/sys/cs.zip/cs"'		
+			
+		;wxGISCatalog  <loc path=$\"$INSTDIR\locale$\"/>                          -p wxGISCatalog/loc $INSTDIR\locale     set path always HKLM
+		DetailPrint "wxGISConf.exe -a wxGISCatalog/loc -p $INSTDIR\locale"
+		nsExec::Exec '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/loc -p "$INSTDIR\locale"'
+		
+		;wxGISCatalog  <log path=$\"$INSTDIR\log$\"/>                               -p wxGISCatalog/log $INSTDIR\log
+		DetailPrint "wxGISConf.exe -a wxGISCatalog/log -p $INSTDIR\log"
+		nsExec::Exec '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/log -p "$INSTDIR\log"'
+		
+		;wxGISCatalog  <sys path=$\"$INSTDIR\sys$\"/>                              -p wxGISCatalog/sys $INSTDIR\sys
+		DetailPrint "wxGISConf.exe -a wxGISCatalog/sys -p $INSTDIR\sys"
+		nsExec::Exec '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/sys -p "$INSTDIR\sys"'
 
 	SectionEnd
   
@@ -311,48 +317,19 @@ SectionGroup /e "!wxGIS" SecwxGIS
 		SetDetailsPrint listonly
 
 		SetOutPath "$INSTDIR\bin"
-    File "${WXGIS_DIR}\build\release\wxGISGeoprocess.exe"
+		File "${WXGIS_DIR}\build\release\wxGISGeoprocess.exe"
 		File "${WXGIS_DIR}\build\release\wxGISGeoprocessing.dll"
 		File "${WXGIS_DIR}\build\release\wxGISGeoprocessingUI.dll"
 		
-    ;add to xml config    
-    ;wxCatalog/catalog/rootitems <rootitem name=$\"wxGxRootToolbox$\" is_enabled=$\"1$\"/>		
-    ; -a wxCatalog/catalog/rootitems/rootitem -n wxGxRootToolbox -e 1
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxCatalog/catalog/rootitems/rootitem -n wxGxRootToolboxUI -e 1'
-    		
-    ;wxGISCatalog/libs <lib path=$\"$INSTDIR\bin\wxGISGeoprocessingUI.dll$\" name=$\"wxGISGeoprocessingUI$\"/>
-    ;-a wxGISCatalog/libs/lib -p $INSTDIR\bin\wxGISGeoprocessingUI.dll -n wxGISGeoprocessingUI
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/libs/lib -p $INSTDIR\bin\wxGISGeoprocessingUI.dll -n wxGISGeoprocessingUI'    
-        
-    ;wxGISCatalog/Commands  <Command name=$\"wxGISGeoprocessingCmd$\"/>
-    ;-a wxGISCatalog/Commands/Command -n wxGISGeoprocessingCmd
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/Commands/Command -n wxGISGeoprocessingCmd'
-    
-    ;wxGISCatalog/Frame/Views  <ToolboxView class=$\"wxGxToolboxView$\" name=$\"ToolboxView$\"/>
-    ;-a wxGISCatalog/Frame/Views /ToolboxView -c wxGxToolboxView -n ToolboxView
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/Frame/Views/ToolboxView -c wxGxToolboxView -n ToolboxView'
-    
-    ;wxGISCatalog/Frame/ToolBars/ToolBar  <Item type=$\"sep$\"/>
-    ;-a wxGISCatalog/Frame/ToolBars/ToolBar -n Application.Standard -i -1 -t sep
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/Frame/ToolBars/ToolBar -n Application.Standard -i -1 -t sep'
-    
-    ;wxGISCatalog/Frame/ToolBars/ToolBar  <Item type=$\"cmd$\" cmd_name=$\"wxGISGeoprocessingCmd$\" subtype=$\"1$\" name=$\"Show/Hide &amp;Toolbox pane$\"/>
-    ;-a wxGISCatalog/Frame/ToolBars/ToolBar -n Application.Standard -i -1 -t cmd -o wxGISGeoprocessingCmd -s 1
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/Frame/ToolBars/ToolBar -n Application.Standard -i -1 -t cmd -o wxGISGeoprocessingCmd -s 1'
-
-    ;wxGISCatalog/Frame/Menues/Menu  <Item type=$\"sep$\"/>
-    ;-a wxGISCatalog/Frame/Menues/Menu -i -1 -t sep
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/Frame/Menues/Menu -i -1 -t sep'
-    
-    ;wxGISCatalog/Frame/Menues/Menu  <Item type=$\"cmd$\" cmd_name=$\"wxGISGeoprocessingCmd$\" subtype=$\"1$\" name=$\"Show/Hide &amp;Toolbox pane$\"/>
-    ;-a wxGISCatalog/Frame/Menues/Menu -i -1 -t cmd -o wxGISGeoprocessingCmd -s 1
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/Frame/Menues/Menu -i -1 -t cmd -o wxGISGeoprocessingCmd -s 1'    
-    
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxToolboxes/tools -x gp_exec=$INSTDIR\bin\wxGISGeoprocess.exe'
+		;add to xml config 
+		DetailPrint "wxGISConf.exe -a wxGISCatalog/libs/lib -p $INSTDIR\bin\wxGISGeoprocessingUI.dll -n wxGISGeoprocessingUI"	
+		nsExec::Exec '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/libs/lib -p "$INSTDIR\bin\wxGISGeoprocessingUI.dll" -n wxGISGeoprocessingUI'
+		DetailPrint "wxGISConf.exe -a wxGISToolbox/tools -x gp_exec=$INSTDIR\bin\wxGISGeoprocess.exe"    
+		nsExec::Exec '"$INSTDIR\bin\wxGISConf.exe" -a wxGISToolbox/tools -x "gp_exec=$INSTDIR\bin\wxGISGeoprocess.exe"'
 			
 	SectionEnd	
   
-	Section "Remote Client" SecRemoteCli
+	Section /o "Remote Client" SecRemoteCli
 	
 		SetDetailsPrint textonly
 		DetailPrint "Installing Remote Client files..."
@@ -363,31 +340,29 @@ SectionGroup /e "!wxGIS" SecwxGIS
 		File "${WXGIS_DIR}\build\release\wxGISRemoteServer.dll"
 		File "${WXGIS_DIR}\build\release\wxGISRemoteServerUI.dll"
 		
-    ;add to xml config
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/libs/lib -p $INSTDIR\bin\wxGISRemoteServerUI.dll -n wxGISRemoteServerUI' 
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxCatalog/catalog/rootitems/rootitem -n wxGxRemoteServersUI -e 1'
-    ExecWait '"$INSTDIR\bin\wxGISConf.exe" -a wxCatalog/catalog/rootitems/rootitem#name=wxGxRemoteServersUI/factories/factory -n wxClientTCPNetFactoryUI'
-    
-    <Command name="wxGISRemoteCmd"/>
-    <Command name="wxGISRemoteDBCmd"/>    
-    
+		;add to xml config
+		DetailPrint "wxGISConf.exe -a wxGISCatalog/libs/lib -p $INSTDIR\bin\wxGISRemoteServerUI.dll -n wxGISRemoteServerUI"
+		nsExec::Exec '"$INSTDIR\bin\wxGISConf.exe" -a wxGISCatalog/libs/lib -p "$INSTDIR\bin\wxGISRemoteServerUI.dll" -n wxGISRemoteServerUI' 
+
 	SectionEnd	  
   
-	Section "Remote Server" SecRemoteSrv
-	
-		SetDetailsPrint textonly
-		DetailPrint "Installing Remote Server files..."
-		SetDetailsPrint listonly
-
-		SetOutPath "$INSTDIR\bin"
-		File "${WXGIS_DIR}\build\release\wxGISServer.exe"
-		File "${WXGIS_DIR}\build\release\wxGISServerAuth.dll"
-		File "${WXGIS_DIR}\build\release\wxGISServerFramework.dll"
-		File "${WXGIS_DIR}\build\release\wxGISServerNetworking.dll"		
-    
-    ;add to xml config
-    
-	SectionEnd	    
+;	Section "Remote Server" SecRemoteSrv
+;	
+;		SetDetailsPrint textonly
+;		DetailPrint "Installing Remote Server files..."
+;		SetDetailsPrint listonly
+;
+;		SetOutPath "$INSTDIR\bin"
+;		File "${WXGIS_DIR}\build\release\wxGISServer.exe"
+;		File "${WXGIS_DIR}\build\release\wxGISServerAuth.dll"
+;		File "${WXGIS_DIR}\build\release\wxGISServerFramework.dll"
+;		File "${WXGIS_DIR}\build\release\wxGISServerNetworking.dll"		
+;   
+;		;add to xml config
+;		nsExec::Exec '"$INSTDIR\bin\wxGISConf.exe" -a wxGISServer/loc -p "$INSTDIR\locale"'
+;		nsExec::Exec '"$INSTDIR\bin\wxGISConf.exe" -a wxGISServer/log -p "$INSTDIR\log"'
+;		nsExec::Exec '"$INSTDIR\bin\wxGISConf.exe" -a wxGISServer/sys -p "$INSTDIR\sys"'   
+;	SectionEnd	    
 SectionGroupEnd
 
 SectionGroup /e $(SCutName) SecMisc
@@ -490,9 +465,6 @@ Function .onInit
 	ReadRegStr $0 HKLM Software\wxgis ""
 	
 	IfFileExists $0\Uninstall.exe 0 wxgis_notinstalled
-	;remove HKLM settings
-	  SetShellVarContext all
-	  RMDir /r "$APPDATA\wxGIS"
 		MessageBox MB_YESNO $(UninstQuiestion) IDYES wxgis_installed
 		Abort "Отменено пользователем"
 wxgis_installed:

@@ -24,7 +24,7 @@
 //#include "wxgis/framework/application.h"
 #include "wxgis/framework/commandbar.h"
 
-#define NEWMENUNAME _("Application.NewMenu")
+#define NEWMENUNAME wxT("Application.NewMenu")
 
 //----------------------------------------------------------------------
 // wxGISNewMenu

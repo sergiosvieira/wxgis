@@ -89,7 +89,7 @@ bool wxGISTaskCmd::GetEnabled(void)
 {
     switch(m_subtype)
 	{
-		case 0:
+		case 0: //Show task config dialog
 		{
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
@@ -105,7 +105,7 @@ bool wxGISTaskCmd::GetEnabled(void)
 			}
 			return false;
         }
-		case 1:
+		case 1: //Show task execution dialog
 		{
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
@@ -115,7 +115,7 @@ bool wxGISTaskCmd::GetEnabled(void)
                 for(size_t i = 0; i < pSel->GetCount(); i++)
                 {
                     IGxTask* pGxTask = dynamic_cast<IGxTask*>(pSel->GetSelectedObjects(i));
-                    if(pGxTask && (pGxTask->GetState() == enumGISTaskWork || pGxTask->GetState() == enumGISTaskDone))
+                    if(pGxTask && (pGxTask->GetState() == enumGISTaskWork || pGxTask->GetState() == enumGISTaskDone || pGxTask->GetState() == enumGISTaskError))
                         return true;
                 }
 			}

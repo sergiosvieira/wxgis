@@ -95,10 +95,10 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			CharacterSet="2"
+			OutputDirectory="..\$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)Cli"
+			ConfigurationType="2"
+			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -118,6 +118,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(BOOST_ROOT)&quot;;&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;__WXMSW__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_RS"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -134,9 +136,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				GenerateDebugInformation="true"
+				AdditionalDependencies="wxbase28u.lib wxbase28u_net.lib wxbase28u_xml.lib wxzlib.lib wxregexu.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpl.lib wxgisogr.lib wxgisgdal.lib wxGISCore.lib wxGISDataSource.lib wxGISCatalog.lib wxGISNetworking.lib"
+				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(WXGISGDAL)\lib&quot;;..\..\lib"
+				GenerateDebugInformation="false"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				ImportLibrary="..\..\lib\$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -162,6 +167,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="copy from release to lib"
+				CommandLine="copy $(TargetPath) ..\..\lib\"
 			/>
 		</Configuration>
 	</Configurations>

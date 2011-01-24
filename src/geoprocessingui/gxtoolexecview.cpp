@@ -716,6 +716,10 @@ bool wxGxToolExecuteView::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString&
 					}
 				}
 			}
+            else
+            {
+                wxMessageBox(_("Unsupported data!"), _("Error"), wxICON_ERROR | wxOK );
+            }
 		}
 		return true;
 	}

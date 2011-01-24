@@ -28,6 +28,7 @@
 #define VIEWSTR _("&View")
 #define HELPSTR _("&Help")
 #define WINDOWSSTR _("&Windows")
+#define TOOLSSTR _("&Tools")
 
 class WXDLLIMPEXP_GIS_FRW wxGISMenuBar :
 	public wxMenuBar

@@ -44,7 +44,7 @@ public:
     //
 	static void DeleteNodeChildren(wxXmlNode* pNode);
 
-	virtual void Clean(void);
+	virtual void Clean(bool bInstall = false);
 	typedef struct wxxmlconfnode
 	{
 		wxXmlNode* pXmlNode;

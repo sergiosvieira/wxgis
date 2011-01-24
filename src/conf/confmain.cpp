@@ -68,7 +68,6 @@ int main(int argc, char **argv)
 		{ wxCMD_LINE_OPTION, wxT( "p" ), wxT("path"), _( "The XMLNode path attribute" ), wxCMD_LINE_VAL_STRING },
 		{ wxCMD_LINE_OPTION, wxT( "e" ), wxT("is_enabled"), _( "The XMLNode is_enabled attribute. is_enabled choice: 1 for enabled or 0 for disabled" ), wxCMD_LINE_VAL_NUMBER },
 		{ wxCMD_LINE_OPTION, wxT( "c" ), wxT("class"), _( "The XMLNode class attribute" ), wxCMD_LINE_VAL_STRING },
-		{ wxCMD_LINE_OPTION, wxT( "i" ), wxT("index"), _( "The XMLNode index attribute. Index choice: 0 the first node, -1 - the last node" ), wxCMD_LINE_VAL_NUMBER },
 		{ wxCMD_LINE_OPTION, wxT( "t" ), wxT("type"), _( "The XMLNode type attribute. Type choice: sep, cmd, menu" ), wxCMD_LINE_VAL_STRING },
 		{ wxCMD_LINE_OPTION, wxT( "s" ), wxT("sub_type"), _( "The XMLNode sub_type attribute" ), wxCMD_LINE_VAL_NUMBER },
 		{ wxCMD_LINE_OPTION, wxT( "o" ), wxT("cmd_name"), _( "The XMLNode cmd_name attribute" ), wxCMD_LINE_VAL_STRING },
@@ -81,7 +80,19 @@ int main(int argc, char **argv)
     // Parse command line arguments
     success = parse_commandline_parameters( my_parser );
 
-	return success == true ? EXIT_SUCCESS : EXIT_FAILURE;
+#if wxUSE_UNICODE
+    {
+        for ( int n = 0; n < argc; n++ )
+            free(wxArgv[n]);
+
+        delete [] wxArgv;
+    }
+#endif // wxUSE_UNICODE
+
+    wxUnusedVar(argc);
+    wxUnusedVar(argv);	
+    
+    return success == true ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 bool parse_commandline_parameters( wxCmdLineParser& parser )
@@ -105,7 +116,7 @@ bool parse_commandline_parameters( wxCmdLineParser& parser )
 	if( parser.Found( wxT( "a" ), &sPathInConfig) )
 	{
 		wxString sName, sPath, sClass, sType, sCmdName, sAttributes;
-		long nIsEnabled, nIndex(-1), nSubType;
+		long nIsEnabled, nSubType;//, nIndex(-1)
 
 		bool bNameSet = parser.Found( wxT( "n" ), &sName );
 		bool bPathSet = parser.Found( wxT( "p" ), &sPath );
@@ -114,7 +125,7 @@ bool parse_commandline_parameters( wxCmdLineParser& parser )
 		bool bCmdNameSet = parser.Found( wxT( "o" ), &sCmdName );
 
 		bool bIsEnabledSet = parser.Found( wxT( "e" ), &nIsEnabled );
-		bool bIndexSet = parser.Found( wxT( "i" ), &nIndex );
+		//bool bIndexSet = parser.Found( wxT( "i" ), &nIndex );
 		bool bSubtypeSet = parser.Found( wxT( "s" ), &nSubType );
 		bool bAttributesSet = parser.Found( wxT( "x" ), &sAttributes );
 
@@ -124,74 +135,26 @@ bool parse_commandline_parameters( wxCmdLineParser& parser )
 		if(!pNode)
 			return false;
 
-		//check duplicates
-		wxXmlNode* pNewNode(NULL);
 		if(bNameSet)
-		{
-			wxXmlNode* pChildNode = pNode->GetChildren();
-			while(pChildNode)
-			{
-				if(pChildNode->GetName().CmpNoCase(aTokens.Last()) == 0 && pChildNode->GetPropVal(wxT("name"), NONAME).CmpNoCase(sName) == 0)
-				{
-					pNewNode = pChildNode;
-					break;
-				}
-				pChildNode = pChildNode->GetNext();
-			}
-		}
-		else if(bClassSet)
-		{
-			wxXmlNode* pChildNode = pNode->GetChildren();
-			while(pChildNode)
-			{
-				if(pChildNode->GetName().CmpNoCase(aTokens.Last()) == 0 && pChildNode->GetPropVal(wxT("class"), NONAME).CmpNoCase(sName) == 0)
-				{
-					pNewNode = pChildNode;
-					break;
-				}
-				pChildNode = pChildNode->GetNext();
-			}
-		}
-		else
-		{
-			if(nIndex == -1)
-				pNewNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, aTokens.Last());
-			else
-			{
-				wxXmlNode* pChildNode = pNode->GetChildren();
-				long nCounter(0);
-				while(pChildNode)
-				{
-					if(nCounter == nIndex)
-					{
-						pNewNode = new wxXmlNode(wxXML_ELEMENT_NODE, aTokens.Last());
-						pNode->InsertChild(pNewNode, pChildNode);
-						break;
-					}
-					pChildNode = pChildNode->GetNext();
-				}
-			}
-		}
-
+			AddProperty(pNode, wxT("name"), sName);
 		if(bNameSet)
-			AddProperty(pNewNode, wxT("name"), sName);
-		if(bNameSet)
-			AddProperty(pNewNode, wxT("name"), sName);
+			AddProperty(pNode, wxT("name"), sName);
 		if(bPathSet)
-			AddProperty(pNewNode, wxT("path"), sPath);
+			AddProperty(pNode, wxT("path"), sPath);
 		if(bClassSet)
-			AddProperty(pNewNode, wxT("class"), sClass);
+			AddProperty(pNode, wxT("class"), sClass);
 		if(bTypeSet)
-			AddProperty(pNewNode, wxT("type"), sType);
+			AddProperty(pNode, wxT("type"), sType);
 		if(bCmdNameSet)
-			AddProperty(pNewNode, wxT("cmd_name"), sCmdName);
+			AddProperty(pNode, wxT("cmd_name"), sCmdName);
 		if(bIsEnabledSet)
-			AddProperty(pNewNode, wxT("is_enabled"), nIsEnabled);
+			AddProperty(pNode, wxT("is_enabled"), nIsEnabled);
 		if(bSubtypeSet)
-			AddProperty(pNewNode, wxT("sub_type"), nSubType);
+			AddProperty(pNode, wxT("sub_type"), nSubType);
 		if(bAttributesSet)
-			AddProperties(pNewNode, sAttributes);
+			AddProperties(pNode, sAttributes);
 
+        pConfig->Clean(true);
 		return true;
 	}
 
@@ -233,6 +196,7 @@ void AddProperties(wxXmlNode* pNode, wxString sAttributes)
 		if((nPos = token.Find(wxT("="))) != wxNOT_FOUND)
 		{
 			wxString sAttrName = token.Left(nPos);
+            nPos++;
 			wxString sAttrValue = token.Right(token.Len() - nPos);
 			if(sAttrName.IsEmpty())
 				continue;
@@ -251,49 +215,71 @@ wxXmlNode* GetConfigNode(wxArrayString& aTokens, wxGISAppConfigSPtr& pConfig)
 		return NULL;
 
 	wxXmlNode* pChildNode = pRootNode->GetChildren();
-	for (size_t i = 1; i < aTokens.GetCount() - 1; i++ )
+    wxXmlNode* pParentNode = pRootNode;
+	wxString sPath, sAttrCmp, sAttrName, sAttrValue;
+	for (size_t i = 1; i < aTokens.GetCount(); i++ )
 	{
         wxString token = aTokens[i];
 		//search # in name
 		int nPos = wxNOT_FOUND;
-		wxString sPath, sAttrCmp, sAttrName, sAttrValue;
 		if(( nPos = token.Find(wxT("#"))) != wxNOT_FOUND)
 		{
-			sAttrCmp = token.Right(token.Len() - nPos);
 			sPath = token.Left(nPos);
+            nPos++;
+			sAttrCmp = token.Right(token.Len() - nPos);
+            aTokens[i] = sPath;
 		}
+        else
+            sPath = token;
 
 		if(( nPos = sAttrCmp.Find(wxT("="))) != wxNOT_FOUND)
 		{
-			sAttrValue = sAttrCmp.Right(sAttrCmp.Len() - nPos);
 			sAttrName = sAttrCmp.Left(nPos);
+            nPos++;
+			sAttrValue = sAttrCmp.Right(sAttrCmp.Len() - nPos);
 		}
+
+        if(pChildNode == NULL)
+        {
+            pChildNode = new wxXmlNode(pParentNode, wxXML_ELEMENT_NODE, sPath);
+            if(!sAttrName.IsEmpty() && !sAttrValue.IsEmpty())
+                pChildNode->AddAttribute(sAttrName, sAttrValue);
+            pParentNode = pChildNode;
+            continue;
+        }
 
         while(pChildNode)
         {
 			wxString sChildName = pChildNode->GetName();
-            if(token == sChildName.MakeLower())
+            if(sPath.CmpNoCase(sChildName) == 0)
 			{
 				if(sAttrName.IsEmpty() && sAttrValue.IsEmpty())
 				{
-					if(i < aTokens.GetCount() - 1)
-						pChildNode = pChildNode->GetChildren();
+                    if(i < aTokens.GetCount() - 1)
+                    {
+                        pParentNode = pChildNode;
+                        pChildNode = pChildNode->GetChildren();
+                    }
 					break;
 				}
 				else
 				{
-					if(pChildNode->GetPropVal(sAttrName, wxT("")).CmpNoCase(sAttrValue) == 0 && i < aTokens.GetCount() - 1)
-						pChildNode = pChildNode->GetChildren();
-					break;
+					if(pChildNode->GetPropVal(sAttrName, wxT("")).CmpNoCase(sAttrValue) == 0)
+					    break;
 				}
 			}
             pChildNode = pChildNode->GetNext();
         }
     }
-
-	if(pChildNode->GetName().CmpNoCase(aTokens[aTokens.GetCount() - 1]) == 0)
+    if(pChildNode == NULL)
     {
-        return pChildNode;
+        pChildNode = new wxXmlNode(pParentNode, wxXML_ELEMENT_NODE, sPath);
+        if(!sAttrName.IsEmpty() && !sAttrValue.IsEmpty())
+            pChildNode->AddAttribute(sAttrName, sAttrValue);
     }
-	return NULL;
+
+	//if(pChildNode->GetName().CmpNoCase(aTokens[aTokens.GetCount() - 1]) == 0)
+    return pChildNode;
+    //return NULL;
 }
+
