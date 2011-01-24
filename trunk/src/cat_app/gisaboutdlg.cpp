@@ -90,7 +90,7 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
 
 	m_AuiNotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE );
 
-    wxString sAboutApp = wxString::Format(_("wxGIS [%s]\n\nVersion: %s\n\n(c) 2009-2010 Dmitry Barishnikov (Bishop)"), pApp->GetAppName(), pApp->GetAppVersionString());
+    wxString sAboutApp = wxString::Format(_("wxGIS [%s]\n\nVersion: %s\n\n(c) 2009-2011 Dmitry Barishnikov (Bishop)"), pApp->GetAppName(), pApp->GetAppVersionString());
 	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutApp, m_AuiNotebook), _("About application"));
 
     long dFreeMem =  (long)(wxGetFreeMemory().ToLong() / 1048576);

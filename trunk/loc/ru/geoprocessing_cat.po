@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-12 18:18+0300\n"
-"PO-Revision-Date: 2011-01-12 18:21+0300\n"
+"POT-Creation-Date: 2011-01-25 00:39+0300\n"
+"PO-Revision-Date: 2011-01-25 00:45+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -86,6 +86,11 @@ msgstr "Обработка канала %d"
 msgid "ComputeStatistics failed! GDAL error: %s"
 msgstr "ComputeStatistics завершилось неудачно! Ошибка GDAL: %s"
 
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcompstattool.cpp:173
+#, c-format
+msgid "Band %d: min - %.2f, max - %.2f, mean - %.2f, StdDev - %.2f"
+msgstr "Канал %d: мин. - %.2f, макс. - %.2f, ср. - %.2f, стд. откл. - %.2f"
+
 #: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:46
 msgid "Create overviews"
 msgstr "Создать пирамиды"
@@ -144,6 +149,11 @@ msgstr "PACKBITS"
 #: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:113
 msgid "LZW"
 msgstr "LZW"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:255
+#, c-format
+msgid "BuildOverviews failed! GDAL error: %s"
+msgstr "BuildOverviews завершилось неудачно! Ошибка GDAL: %s"
 
 #: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:46
 msgid "Export vector file (single)"
@@ -276,55 +286,58 @@ msgstr "Ошибка создания выходного растра. Ошиб�
 msgid "OrthoCorrect failed! GDAL error: %s"
 msgstr "OrthoCorrect завершилось неудачно! Ошибка GDAL: %s"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:59
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:69
 msgid "Remains "
 msgstr "Осталось "
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:59
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:272
-msgid "%H hours %M min. %S sec."
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:69
+msgid "%H hour(s) %M min. %S sec."
 msgstr "%H час. %M мин. %S сек."
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:213
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:223
 #, c-format
 msgid "Executing (%s)"
 msgstr "Выполнение (%s)"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:218
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:228
 msgid "Parameters:"
 msgstr "Параметры:"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:229
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:239
 #, c-format
 msgid "Start Time: %s"
 msgstr "Начало: %s"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:237
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:247
 msgid "Error start task!"
 msgstr "Ошибка запуска задачи!"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:262
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:272
 #, c-format
 msgid "Executed (%s) successfully"
 msgstr "Выполнение (%s) успешно завершено"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:263
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:273
 msgid "Done"
 msgstr "Завершено"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:267
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:277
 #, c-format
 msgid "An error occured while executing %s. Failed to execute (%s)."
 msgstr "Ошибка в процессе выполнения %s. Невозможно выполнить (%s)."
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:268
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:278
 msgid "Error!"
 msgstr "Ошибка!"
 
-#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:272
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:282
 #, c-format
 msgid "End Time: %s (Elapsed Time: %s)"
 msgstr "Окончание: %s (Заняло: %s)"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:282
+msgid "%H hours %M min. %S sec."
+msgstr "%H час. %M мин. %S сек."
 
 #: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:38
 #, c-format

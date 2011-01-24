@@ -67,12 +67,13 @@ wxGISConfig::~wxGISConfig(void)
 	Clean();
 }
 
-void wxGISConfig::Clean(void)
+void wxGISConfig::Clean(bool bInstall)
 {
+    wxGISEnumConfigKey CmpKey = bInstall == true ? enumGISHKLM : enumGISHKCU;
 	for(size_t i = 0; i < m_configs_arr.size(); i++)
 	{
         //Store only user settings. Common settings should be changed during install process
-        if(m_configs_arr[i].Key == enumGISHKCU)
+        if(m_configs_arr[i].Key == CmpKey)
             m_configs_arr[i].pXmlDoc->Save(m_configs_arr[i].xml_path);
 		wxDELETE(m_configs_arr[i].pXmlDoc);
 	}

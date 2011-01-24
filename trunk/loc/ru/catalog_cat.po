@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-09 01:12+0300\n"
-"PO-Revision-Date: 2011-01-09 01:12+0300\n"
+"POT-Creation-Date: 2011-01-25 00:39+0300\n"
+"PO-Revision-Date: 2011-01-25 00:39+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -19,11 +19,11 @@ msgstr ""
 
 #: D:\work\Projects\wxGIS\src\catalog/gxarchfolder.cpp:125
 #: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:67
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:105
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:193
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:217
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:348
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:378
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:108
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:196
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:220
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:351
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:381
 #: D:\work\Projects\wxGIS\src\catalog/gxfile.cpp:72
 #: D:\work\Projects\wxGIS\src\catalog/gxfile.cpp:188
 #: D:\work\Projects\wxGIS\src\catalog/gxfolder.cpp:113
@@ -62,26 +62,26 @@ msgstr "wxGxCatalog: Инициализация корневого элемен�
 msgid "wxGxCatalog: Error initializing Root Object %s"
 msgstr "wxGxCatalog: Ошибка инициализации корневого элемента %s"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:147
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:150
 msgid "Feature class"
 msgstr "Класс пространственных объектов"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:231
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:408
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:234
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:414
 #: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:159
 #, c-format
 msgid "Open failed! GDAL error: %s"
 msgstr "Ошибка открытия! Ошибка GDAL: %s"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:389
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:392
 msgid "Raster"
 msgstr "Растр"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxdiscconnections.cpp:56
+#: D:\work\Projects\wxGIS\src\catalog/gxdiscconnections.cpp:78
 msgid "wxGxDiscConnections: Start scan folder connections"
 msgstr "wxGxDiscConnections: Начало сканирования подключений к папкам"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxdiscconnections.cpp:161
+#: D:\work\Projects\wxGIS\src\catalog/gxdiscconnections.cpp:148
 #, c-format
 msgid "wxGxDiscConnections: Add folder connection [%s]"
 msgstr "wxGxDiscConnections: Добавление подключенния к папке [%s]"
@@ -91,74 +91,74 @@ msgstr "wxGxDiscConnections: Добавление подключенния к п
 msgid "wxGxPrjFile: GDAL error: %s"
 msgstr "wxGxPrjFile: Ошибка GDAL: %s"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:70
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:71
 msgid "Any items (*.*)"
 msgstr "Все типы (*.*)"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:153
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:154
 msgid "Coordinate Systems (*.prj, *.spr)"
 msgstr "Системы координат (*.prj, *.spr)"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:203
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:204
 msgid "Raster (*.img, *.tif, etc.)"
 msgstr "Растровые форматы (*.img, *.tif, etc.)"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:205
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:206
 msgid "Vector (*.shp, *.tab, etc.)"
 msgstr "Векторные форматы  (*.shp, *.tab, etc.)"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:252
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:253
 msgid "ESRI Shapefile (*.shp)"
 msgstr "Шейп-файл ESRI (*.shp)"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:286
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:287
 msgid "MapInfo File (*.tab)"
 msgstr "Файл MapInfo (*.tab)"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:288
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:289
 msgid "MapInfo File (*.mid/*.mif)"
 msgstr "Файл MapInfo (*.mid/*.mif)"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:323
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:324
 msgid "KML file (*.kml)"
 msgstr "Файл KML (*.kml)"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:355
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:356
 msgid "AutoCAD DXF file (*.dxf)"
 msgstr "Файл AutoCAD DXF (*.dxf)"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:390
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:409
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:418
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:391
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:410
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:419
 msgid "Folder"
 msgstr "Папка"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:392
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:411
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:393
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:412
 msgid "Folder connection"
 msgstr "Подключение"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:404
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:405
 msgid "Folder connections"
 msgstr "Подключения"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:474
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:475
 msgid "GeoTIFF (*.tif, *.tiff)"
 msgstr "GeoTIFF (*.tif, *.tiff)"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:506
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:507
 msgid "Erdas IMAGINE image (*.img)"
 msgstr "Изображение Erdas IMAGINE (*.img)"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:538
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:539
 msgid "Windows Device Independent Bitmap (*.bmp)"
 msgstr "Изображение BMP (*.bmp)"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:570
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:571
 msgid "JPEG image (*.jpeg, *.jfif, *.jpg, *.jpe)"
 msgstr "Изображение JPEG (*.jpeg, *.jfif, *.jpg, *.jpe)"
 
-#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:602
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:603
 msgid "Portable Network Graphics (*.png)"
 msgstr "Изображение PNG (*.png)"
 
@@ -187,7 +187,7 @@ msgstr "Архивная папка"
 msgid "Catalog"
 msgstr "Каталог"
 
-#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxdataset.h:40
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxdataset.h:41
 msgid "Table"
 msgstr "Таблица"
 

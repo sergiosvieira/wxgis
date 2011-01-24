@@ -32,10 +32,8 @@
 #include "wxgis/datasource/datasource.h"
 #include "wxgis/datasource/datacontainer.h"
 
-#include <wx/dirdlg.h>
-#include <wx/file.h>
-
 #include "wxgis/catalogui/gxobjdialog.h"
+#include "wxgis/catalogui/gxfolderui.h"
 #include "wxgis/catalog/gxfilters.h"
 #include "wxgis/catalog/gxfile.h"
 #include "wxgis/carto/mapview.h"
@@ -53,6 +51,12 @@
 #include "../../art/go-next.xpm"
 #include "../../art/properties.xpm"
 
+#include "../../art/folder_16.xpm"
+#include "../../art/folder_48.xpm"
+
+#include <wx/dirdlg.h>
+#include <wx/file.h>
+
 
 //	0	Up One Level
 //	1	Connect Folder
@@ -69,8 +73,20 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogMainCmd, wxObject)
 
-wxGISCatalogMainCmd::wxGISCatalogMainCmd(void) : m_IconFolderUp(folder_up_xpm), m_IconFolderConn(folder_conn_new_xpm), m_IconFolderConnDel(folder_conn_del_xpm), m_IconDel(delete_xpm), m_IconGoPrev(go_previous_xpm), m_IconGoNext(go_next_xpm), m_IconFolderNew(folder_new_xpm), m_IconEdit(edit_xpm), m_IconViewRefresh(view_refresh_xpm), m_IconProps(properties_xpm)
+wxGISCatalogMainCmd::wxGISCatalogMainCmd(void)
 {
+    m_IconFolderUp = wxIcon(folder_up_xpm);
+    m_IconFolderConn = wxIcon(folder_conn_new_xpm);
+    m_IconFolderConnDel = wxIcon(folder_conn_del_xpm);
+    m_IconDel = wxIcon(delete_xpm);
+    m_IconGoPrev = wxIcon(go_previous_xpm);
+    m_IconGoNext = wxIcon(go_next_xpm);
+    m_IconFolderNew = wxIcon(folder_new_xpm);
+    m_IconEdit = wxIcon(edit_xpm);
+    m_IconViewRefresh = wxIcon(view_refresh_xpm);
+    m_IconProps = wxIcon(properties_xpm);
+    m_LargeFolderIcon = wxIcon(folder_48_xpm);
+    m_SmallFolderIcon = wxIcon(folder_16_xpm);
 }
 
 wxGISCatalogMainCmd::~wxGISCatalogMainCmd(void)
@@ -592,7 +608,7 @@ void wxGISCatalogMainCmd::OnClick(void)
                                 return;
                             }
                             //create GxObject
-                            wxGxFolder* pFolder = new wxGxFolder(sFolderPath, wxString(_("New folder")));
+                            wxGxFolderUI* pFolder = new wxGxFolderUI(sFolderPath, wxString(_("New folder")), m_LargeFolderIcon, m_SmallFolderIcon);
                             IGxObject* pGxFolder = static_cast<IGxObject*>(pFolder);
                             IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pObj);
                             pObjCont->AddChild(pGxFolder);

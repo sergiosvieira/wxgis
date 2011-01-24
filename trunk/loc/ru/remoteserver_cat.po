@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-09 01:00+0300\n"
-"PO-Revision-Date: 2011-01-09 02:19+0300\n"
+"POT-Creation-Date: 2011-01-25 00:39+0300\n"
+"PO-Revision-Date: 2011-01-25 00:39+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: Bishop <polimax@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -47,12 +47,12 @@ msgstr "wxClientTCPNetFactory: Подключено"
 msgid "wxClientTCPNetFactory: Server %s disconnected"
 msgstr "wxClientTCPNetFactory: Сервер %s отключился"
 
-#: D:\work\Projects\wxGIS\include\wxgis\remoteserver/gxremoteserver.h:42
+#: D:\work\Projects\wxGIS\include\wxgis\remoteserver/gxremoteserver.h:43
 msgid "Remote Server"
 msgstr "Удаленный Сервер"
 
 #: D:\work\Projects\wxGIS\include\wxgis\remoteserver/gxremoteservers.h:38
-#: D:\work\Projects\wxGIS\include\wxgis\remoteserver/gxremoteservers.h:41
+#: D:\work\Projects\wxGIS\include\wxgis\remoteserver/gxremoteservers.h:42
 msgid "Remote Servers"
 msgstr "Удаленные Серверы"
 
@@ -60,7 +60,7 @@ msgstr "Удаленные Серверы"
 msgid "Remote item"
 msgstr "Удаленный элемент"
 
-#: D:\work\Projects\wxGIS\include\wxgis\remoteserver/rxobjectclient.h:65
+#: D:\work\Projects\wxGIS\include\wxgis\remoteserver/rxobjectclient.h:67
 msgid "Remote container"
 msgstr "Удаленный контейнер"
 

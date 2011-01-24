@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-09 01:00+0300\n"
-"PO-Revision-Date: 2011-01-09 02:02+0300\n"
+"POT-Creation-Date: 2011-01-25 00:39+0300\n"
+"PO-Revision-Date: 2011-01-25 00:39+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -28,32 +28,32 @@ msgid "Creation of output file '%s' failed"
 msgstr "Не удалось создать выходной файл '%s'"
 
 #: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:93
-#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:103
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:110
 #, c-format
 msgid "Creation of output layer '%s' failed"
 msgstr "Не удалось создать выходной слой '%s'"
 
-#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:412
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:426
 #, c-format
 msgid "wxGISFeatureDataset: Open failed! Path '%s'. OGR error: %s"
 msgstr "wxGISFeatureDataset: Невозможно открыть! Путь '%s'.Ошибка OGR: %s"
 
-#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:684
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:698
 #: D:\work\Projects\wxGIS\src\datasource/table.cpp:277
 msgid "%d-%m-%Y"
 msgstr "%d-%m-%Y"
 
-#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:693
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:707
 #: D:\work\Projects\wxGIS\src\datasource/table.cpp:290
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
-#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:702
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:716
 #: D:\work\Projects\wxGIS\src\datasource/table.cpp:303
 msgid "%d-%m-%Y %H:%M:%S"
 msgstr "%d-%m-%Y %H:%M:%S"
 
-#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:707
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:721
 #, c-format
 msgid "%.6f"
 msgstr "%.6f"
@@ -63,12 +63,12 @@ msgstr "%.6f"
 msgid "wxGISPostGISDataset: Open failed! Host '%s', Database name '%s', Port='%s'. OGR error: %s"
 msgstr "wxGISPostGISDataset: Невозможно открыть! Хост '%s', Имя базы данных '%s', Порт='%s'. Ошибка OGR: %s"
 
-#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:185
+#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:191
 #, c-format
 msgid "wxGISRasterDataset: Open failed! Path '%s'. GDAL error: %s"
 msgstr "wxGISRasterDataset: Невозможно открыть! Путь '%s'. Ошибка GDAL: %s"
 
-#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:234
+#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:240
 #, c-format
 msgid "wxGISRasterDataset: Open failed! Path '%s'. Raster has no bands"
 msgstr "wxGISRasterDataset: Невозможно открыть! Путь '%s'. Нет каналов в растре"

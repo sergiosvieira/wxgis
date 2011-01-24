@@ -75,6 +75,18 @@ int main(int argc, char **argv)
     // Parse command line arguments
     success = parse_commandline_parameters(my_parser);
 
+#if wxUSE_UNICODE
+    {
+        for ( int n = 0; n < argc; n++ )
+            free(wxArgv[n]);
+
+        delete [] wxArgv;
+    }
+#endif // wxUSE_UNICODE
+
+    wxUnusedVar(argc);
+    wxUnusedVar(argv);	
+
 	return success == true ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 

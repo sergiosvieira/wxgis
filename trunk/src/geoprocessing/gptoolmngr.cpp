@@ -45,6 +45,7 @@ void wxGPProcess::OnTerminate(int pid, int status)
     wxGISProcess::OnTerminate(pid, status);
 	if(m_pProgressor)
 		m_pProgressor->SetValue(100);
+    m_dtEstEnd = wxDateTime::Now();
 }
 
 void wxGPProcess::ProcessInput(wxString sInputData)
