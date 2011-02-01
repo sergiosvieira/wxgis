@@ -49,7 +49,7 @@ public:
 	virtual OGRFeature* Next(void);
 	virtual size_t GetSize(void);
     virtual OGRErr SetFilter(wxGISQueryFilter* pQFilter);
-    //virtual OGRErr SetIgnoredFields(wxArrayString &saIgnoredFields);
+    virtual OGRErr SetIgnoredFields(wxArrayString &saIgnoredFields);
     virtual wxCriticalSection* GetCriticalSection(void){return &m_CritSect;};
 	virtual void SetDataSource(OGRDataSource* pDS){m_pDS = pDS;};
 protected:

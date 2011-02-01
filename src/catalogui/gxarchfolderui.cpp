@@ -58,7 +58,7 @@ void wxGxArchiveUI::LoadChildren(void)
     wxBusyCursor wait;
 
     wxString sArchPath = m_sType + m_sPath;//wxT("/vsizip/") + wxT("/");
-    CPLString soArchPath(wgWX2MB(sArchPath));
+    CPLString soArchPath(sArchPath.mb_str(wxConvUTF8));
     char **papszFileList = VSIReadDir(soArchPath);
 
     if( CSLCount(papszFileList) == 0 )
@@ -147,7 +147,7 @@ void wxGxArchiveFolderUI::LoadChildren(void)
     wxBusyCursor wait;
 
     wxString sArchPath = m_sPath;
-    CPLString soArchPath(wgWX2MB(sArchPath));
+    CPLString soArchPath(sArchPath.mb_str(wxConvUTF8));//wgWX2MB(sArchPath));
     char **papszFileList = VSIReadDir(soArchPath);
 
     if( CSLCount(papszFileList) == 0 )

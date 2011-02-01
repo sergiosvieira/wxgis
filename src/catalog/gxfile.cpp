@@ -102,7 +102,7 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 	OGRErr err = OGRERR_NONE;
 	if(m_OGRSpatialReference.Validate() != OGRERR_NONE)
 	{
-		char **papszLines = CSLLoad( wgWX2MB(m_sPath) );
+		char **papszLines = CSLLoad( m_sPath.mb_str(wxConvUTF8) );
 
 		switch(m_Type)
 		{

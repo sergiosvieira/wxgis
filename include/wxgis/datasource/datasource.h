@@ -59,7 +59,8 @@ enum wxGISEnumRasterDatasetType
 	enumRasterTiff = 2,
 	enumRasterImg = 3,
 	enumRasterJpeg = 4,
-	enumRasterPng = 5
+	enumRasterPng = 5,
+    enumRasterGif = 6
 };
 
 enum wxGISEnumTableDatasetType

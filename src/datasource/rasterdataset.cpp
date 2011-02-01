@@ -22,7 +22,7 @@
 #include "wxgis/datasource/sysop.h"
 #include "wx/filename.h"
 
-#include "vrt/vrtwarpedoverview.h"
+//#include "vrt/vrtwarpedoverview.h"
 #include "gdal_rat.h"
 
 wxGISRasterDataset::wxGISRasterDataset(wxString sPath, wxGISEnumRasterDatasetType nType) : wxGISDataset(sPath), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false), m_bHasStats(false), m_poMainDataset(NULL), m_poDataset(NULL), m_nBandCount(0)
@@ -175,12 +175,12 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
 	wxCriticalSectionLocker locker(m_CritSect);
 
 
-    m_poDataset = (GDALDataset *) GDALOpenShared( wgWX2MB(m_sPath), bReadOnly == true ? GA_ReadOnly : GA_Update );
+    m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath.mb_str(wxConvUTF8), bReadOnly == true ? GA_ReadOnly : GA_Update );
     //bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
 	if( m_poDataset == NULL )
     {
         m_sPath.Replace(wxT("\\"), wxT("/"));
-        m_poDataset = (GDALDataset *) GDALOpenShared( wgWX2MB(m_sPath), bReadOnly == true ? GA_ReadOnly : GA_Update );
+        m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath.mb_str(wxConvUTF8), bReadOnly == true ? GA_ReadOnly : GA_Update );
     }
 
     //m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath), GA_ReadOnly );

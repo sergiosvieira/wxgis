@@ -102,6 +102,24 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 			pGxObj = GetGxDataset(path, name, enumRasterImg);
 			goto REMOVE;
 		}
+		if(ext == wxString(wxT("gif")))
+		{
+            wxString sRemCand = sPath + wxT(".prj");
+            remove_candidates.push_back(sRemCand);
+
+            //name conv cp866 if zip
+            wxString name;
+            if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
+            {
+                wxString str(FName.GetFullName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
+                name = str;
+            }
+            else
+                name = FName.GetFullName();
+
+			pGxObj = GetGxDataset(path, name, enumRasterGif);
+			goto REMOVE;
+		}
 		if(ext == wxString(wxT("tif")) || ext == wxString(wxT("tiff")))
 		{
             wxString sRemCand = sPath + wxT(".prj");

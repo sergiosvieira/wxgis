@@ -29,7 +29,7 @@
 
 wxGISSpatialReferenceValidator::wxGISSpatialReferenceValidator(void) : m_bIsOK(false)
 {
-    m_sPath = wgMB2WX(CPLGetConfigOption("wxGxSpatialReferencesFolder",""));
+    m_sPath = wxString(CPLGetConfigOption("wxGxSpatialReferencesFolder",""), wxConvUTF8);
     if(!m_sPath.IsEmpty())
     {
         m_bIsOK = LoadData(m_sPath + wxT("/") + LIMITS_NAME);
@@ -66,7 +66,7 @@ wxGISSpatialReferenceValidator::~wxGISSpatialReferenceValidator(void)
 
 bool wxGISSpatialReferenceValidator::LoadData(wxString sPath)
 {
-    FILE *fp = VSIFOpenL( wgWX2MB(sPath), "rb");
+    FILE *fp = VSIFOpenL( sPath.mb_str(wxConvUTF8), "rb");
 	if( fp == NULL )
         return false;
 

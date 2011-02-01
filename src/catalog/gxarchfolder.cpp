@@ -49,7 +49,7 @@ void wxGxArchive::LoadChildren(void)
 		return;
 
     wxString sArchPath = m_sType + m_sPath;//wxT("/vsizip/") + wxT("/");
-    CPLString soArchPath(wgWX2MB(sArchPath));
+    CPLString soArchPath(sArchPath.mb_str(wxConvUTF8));
     char **papszFileList = VSIReadDir(soArchPath);
 
     if( CSLCount(papszFileList) == 0 )
@@ -63,7 +63,6 @@ void wxGxArchive::LoadChildren(void)
         for(int i = 0; papszFileList[i] != NULL; i++ )
 		{
             wxString sFileName(papszFileList[i], wxCSConv(wxT("cp-866")));
-//			wxString sFileName = wgMB2WX(papszFileList[i]);
             VSIStatBufL BufL;
 
             CPLString soArchPathF = soArchPath;
@@ -173,7 +172,7 @@ void wxGxArchiveFolder::LoadChildren(void)
     //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
 
     wxString sArchPath = m_sPath;
-    CPLString soArchPath(wgWX2MB(sArchPath));
+    CPLString soArchPath(sArchPath.mb_str(wxConvUTF8));
     char **papszFileList = VSIReadDir(soArchPath);
 
     if( CSLCount(papszFileList) == 0 )

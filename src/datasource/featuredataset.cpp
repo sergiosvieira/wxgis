@@ -76,7 +76,7 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(wxString sPath, wxString sName, wxStri
         nSubType = enumVecESRIShapefile;
 
     wxString sFullPath = sPath + wxFileName::GetPathSeparator() + sName + wxT(".") + sExt;
-    OGRDataSource *poDS = poDriver->CreateDataSource( wgWX2MB(sFullPath), papszDataSourceOptions );
+    OGRDataSource *poDS = poDriver->CreateDataSource( sFullPath.mb_str(wxConvUTF8), papszDataSourceOptions );
     if(poDS == NULL)
     {
         wxLogError(_("Creation of output file '%s' failed"), sName.c_str());
@@ -87,7 +87,7 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(wxString sPath, wxString sName, wxStri
     sName.Replace(wxT(" "), wxT("_"));
     sName.Truncate(27);
 
-	OGRLayer *poLayerDest = poDS->CreateLayer( sName.mb_str(wxConvUTF8)/*wgWX2MB(sName)*/, poSpatialRef, eGType, papszLayerOptions );
+	OGRLayer *poLayerDest = poDS->CreateLayer( sName.mb_str(wxConvUTF8), poSpatialRef, eGType, papszLayerOptions );
     if(poLayerDest == NULL)
     {
         wxLogError(_("Creation of output layer '%s' failed"), sName.c_str());
@@ -412,12 +412,12 @@ bool wxGISFeatureDataset::Open(int iLayer)
 
 	wxCriticalSectionLocker locker(m_CritSect);
 
-    m_poDS = OGRSFDriverRegistrar::Open( wgWX2MB(m_sPath), FALSE );
+    m_poDS = OGRSFDriverRegistrar::Open( m_sPath.mb_str(wxConvUTF8), FALSE );
     //bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
 	if( m_poDS == NULL )
 	{
         m_sPath.Replace(wxT("\\"), wxT("/"));
-        m_poDS = OGRSFDriverRegistrar::Open( wgWX2MB(m_sPath), FALSE );
+        m_poDS = OGRSFDriverRegistrar::Open( m_sPath.mb_str(wxConvUTF8), FALSE );
     }
 
 	if( m_poDS == NULL )
@@ -552,6 +552,7 @@ OGRDataSource* wxGISFeatureDataset::GetDataSource(void)
 
 OGREnvelope* wxGISFeatureDataset::GetEnvelope(void)
 {
+	wxCriticalSectionLocker locker(m_CritSect);
     if(m_psExtent)
         return m_psExtent;
     if(!m_bIsOpened)
@@ -620,6 +621,7 @@ OGREnvelope* wxGISFeatureDataset::GetEnvelope(void)
 
 OGRFeature* wxGISFeatureDataset::GetAt(long nIndex) //const    0 based
 {
+	wxCriticalSectionLocker locker(m_CritSect);
 	wxASSERT(nIndex >= 0);
 	wxASSERT(nIndex < GetSize());
 	bool bOLCFastSetNextByIndex = m_poLayer->TestCapability(OLCFastSetNextByIndex);
@@ -667,6 +669,7 @@ OGRFeature* wxGISFeatureDataset::operator [](long nIndex) //const    same as Get
 
 wxString wxGISFeatureDataset::GetAsString(long row, int col)
 {
+	wxCriticalSectionLocker locker(m_CritSect);
 	if(GetSize() <= row)
 		return wxEmptyString;
 	else
@@ -949,6 +952,7 @@ size_t wxGISFeatureDataset::GetSize(void)
 
 void wxGISFeatureDataset::LoadGeometry(void)
 {
+	wxCriticalSectionLocker locker(m_CritSect);
     if(m_bIsGeometryLoaded)
         return;
 
@@ -1052,6 +1056,7 @@ void wxGISFeatureDataset::LoadGeometry(void)
 
 void wxGISFeatureDataset::UnloadGeometry(void)
 {
+	wxCriticalSectionLocker locker(m_CritSect);
     if(!m_bIsGeometryLoaded)
         return;
     DeleteQuadTree();
