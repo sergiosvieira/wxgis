@@ -25,7 +25,7 @@
 
 bool DeleteDir(wxString sPath)
 {
-    int result = VSIRmdir(wgWX2MB(sPath));
+    int result = VSIRmdir(sPath.mb_str(wxConvUTF8));
     if (result == -1)
         return false;
     return true;
@@ -33,7 +33,7 @@ bool DeleteDir(wxString sPath)
 
 bool DeleteFile(wxString sPath)
 {
-    int result = VSIUnlink(wgWX2MB(sPath));
+    int result = VSIUnlink(sPath.mb_str(wxConvUTF8));
     if (result == -1)
         return false;
     return true;
@@ -41,7 +41,7 @@ bool DeleteFile(wxString sPath)
 
 bool RenameFile(wxString sOldPath, wxString sNewPath)
 {
-    int result = VSIRename(wgWX2MB(sOldPath), wgWX2MB(sNewPath));
+    int result = VSIRename(sOldPath.mb_str(wxConvUTF8), sNewPath.mb_str(wxConvUTF8));
     if (result == -1)
         return false;
     return true;
@@ -72,7 +72,7 @@ wxString CheckUniqName(wxString sPath, wxString sName, wxString sExt, int nCount
 wxFontEncoding GetEncodingFromCpg(wxString sPath)
 {
     sPath += wxT(".cpg");
-    char **papszLines = CSLLoad( wgWX2MB(sPath));
+    char **papszLines = CSLLoad( sPath.mb_str(wxConvUTF8));
     if(papszLines == NULL)
         return wxFONTENCODING_DEFAULT;
 

@@ -125,7 +125,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
     wxPGId pid = AppendProperty( new wxPropertyCategory(_("Data Source")) );
     AppendProperty( new wxStringProperty(_("Raster"), wxPG_LABEL, m_pGxDataset->GetName()) );  
 
-    CPLString soPath(wgWX2MB(m_pDataset->GetPath()));
+    CPLString soPath(m_pDataset->GetPath().mb_str(wxConvUTF8));
 
     VSIStatBufL BufL;
     wxULongLong nSize(0);
@@ -155,7 +155,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
             wxPGId pfilesid = AppendProperty(pid, new wxPropertyCategory(_("Files")) );  
             for(int i = 1; papszFileList[i] != NULL; i++ )
 		    {
-			    wxString sFileName = wgMB2WX(papszFileList[i]);
+			    wxString sFileName(papszFileList[i], wxConvUTF8);
                 wxFileName FName(sFileName);
                 //nSize += FName.GetSize();
                 ret = VSIStatL(papszFileList[i], &BufL);

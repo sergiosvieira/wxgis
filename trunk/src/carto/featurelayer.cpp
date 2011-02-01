@@ -303,7 +303,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
 
     m_pwxGISFeatureDataset->Reset();
     //strart multithreaded transform
-    int CPUCount = wxThread::GetCPUCount();
+    int CPUCount = 1;//wxThread::GetCPUCount();
     std::vector<wxGISFeatureTransformThread*> threadarray;
     wxCriticalSection CritSect;
     size_t nCounter(0);

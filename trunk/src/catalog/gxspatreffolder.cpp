@@ -61,7 +61,7 @@ void wxGxSpatialReferencesFolder::Init(wxXmlNode* pConfigNode)
     else
         m_sPath.Replace(wxT("\\"), wxT("/"));
     wxLogMessage(_("wxGxSpatialReferencesFolder: The path is set to '%s'"), m_sPath.c_str());
-    CPLSetConfigOption("wxGxSpatialReferencesFolder", wgWX2MB(m_sPath));
+    CPLSetConfigOption("wxGxSpatialReferencesFolder", m_sPath.mb_str(wxConvUTF8));
 }
 
 wxXmlNode* wxGxSpatialReferencesFolder::GetProperties(void)
@@ -108,7 +108,7 @@ void wxGxSpatialReferencesFolder::LoadChildren(void)
     //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
     //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
 
-    char **papszFileList = VSIReadDir(wgWX2MB(m_sPath));
+    char **papszFileList = VSIReadDir(m_sPath.mb_str(wxConvUTF8));
 
     if( CSLCount(papszFileList) == 0 )
     {
@@ -120,12 +120,12 @@ void wxGxSpatialReferencesFolder::LoadChildren(void)
        	//wxArrayString FileNames;
         for(int i = 0; papszFileList[i] != NULL; i++ )
 		{
-			wxString sFileName = wgMB2WX(papszFileList[i]);
+			wxString sFileName(papszFileList[i], wxConvUTF8);
             //if(i > 0)
             //    wxLogDebug( wxT("       %s"), sFileName.c_str() );
             VSIStatBufL BufL;
 			wxString sFolderPath = m_sPath + wxT("/") + sFileName;
-            int ret = VSIStatL(wgWX2MB(sFolderPath), &BufL);
+            int ret = VSIStatL(sFolderPath.mb_str(wxConvUTF8), &BufL);
             if(ret == 0)
             {
                 //int x = 0;
@@ -179,7 +179,7 @@ void wxGxPrjFolder::LoadChildren(void)
     //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
 
     wxString sArchPath = m_sPath;
-    char **papszFileList = VSIReadDir(wgWX2MB(sArchPath));
+    char **papszFileList = VSIReadDir(sArchPath.mb_str(wxConvUTF8));
 
     if( CSLCount(papszFileList) == 0 )
     {
@@ -191,12 +191,12 @@ void wxGxPrjFolder::LoadChildren(void)
        	//wxArrayString FileNames;
         for(int i = 0; papszFileList[i] != NULL; i++ )
 		{
-			wxString sFileName = wgMB2WX(papszFileList[i]);
+			wxString sFileName(papszFileList[i], wxConvUTF8);
             //if(i > 0)
             //    wxLogDebug( wxT("       %s"), sFileName.c_str() );
             VSIStatBufL BufL;
 			wxString sFolderPath = sArchPath + wxT("/") + sFileName;
-            int ret = VSIStatL(wgWX2MB(sFolderPath), &BufL);
+            int ret = VSIStatL(sFolderPath.mb_str(wxConvUTF8), &BufL);
             if(ret == 0)
             {
                 //int x = 0;

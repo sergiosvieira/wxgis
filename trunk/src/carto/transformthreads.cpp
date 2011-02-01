@@ -47,8 +47,9 @@ wxGISFeatureTransformThread::wxGISFeatureTransformThread(wxGISFeatureDatasetSPtr
 
 void *wxGISFeatureTransformThread::Entry()
 {
+    int nFeatureCount = m_pwxGISFeatureDataset->GetSize();
     
-    size_t nStep = m_pwxGISFeatureDataset->GetSize() < 10 ? 1 : m_pwxGISFeatureDataset->GetSize() / 10;
+    size_t nStep = nFeatureCount < 10 ? 1 : nFeatureCount / 10;
 
     OGREnvelope* pEnv = m_pwxGISFeatureDataset->GetEnvelope();
 

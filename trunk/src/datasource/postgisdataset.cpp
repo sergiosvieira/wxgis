@@ -99,7 +99,7 @@ wxGISDatasetSPtr wxGISPostgresDataSource::GetSubset(wxString sTablename)
 
     if(m_poDS)
     {
-	    OGRLayer* poLayer = m_poDS->GetLayerByName(wgWX2MB(sTablename));
+	    OGRLayer* poLayer = m_poDS->GetLayerByName(sTablename.mb_str(wxConvUTF8));
         if(poLayer)
         {
 			wxGISDatasetSPtr pDataset;
@@ -132,7 +132,7 @@ bool wxGISPostgresDataSource::Open()
 
     //wxT("PG:host='127.0.0.1' dbname='db' port='5432' user='bishop' password='xxx'")
 	m_sPath = wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_sCursor.c_str(), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), m_sName.c_str(), Decode(m_sCryptPass, CONFIG_DIR));
-    m_poDS = OGRSFDriverRegistrar::Open( wgWX2MB(m_sPath), FALSE );
+    m_poDS = OGRSFDriverRegistrar::Open( m_sPath.mb_str(wxConvUTF8), FALSE );
     m_sPath.Clear();
 	if( m_poDS == NULL )
 	{

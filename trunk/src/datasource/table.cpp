@@ -473,31 +473,30 @@ OGRErr wxGISTable::SetFeature(OGRFeature *poFeature)
     return OGRERR_FAILURE;
 }
 
+OGRErr wxGISTable::SetIgnoredFields(wxArrayString &saIgnoredFields)
+{
+    if(	m_poLayer )
+    {
+        bool bOLCIgnoreFields = m_poLayer->TestCapability(OLCIgnoreFields);
+        if(!bOLCIgnoreFields)
+            return OGRERR_UNSUPPORTED_OPERATION;
 
-//OGRErr wxGISTable::SetIgnoredFields(wxArrayString &saIgnoredFields)
-//{
-//    if(	m_poLayer )
-//    {
-//        bool bOLCIgnoreFields = m_poLayer->TestCapability(OLCIgnoreFields);
-//        if(!bOLCIgnoreFields)
-//            return OGRERR_UNSUPPORTED_OPERATION;
-//
-//        char **papszIgnoredFields = NULL;
-//        for(size_t i = 0; i < saIgnoredFields.GetCount(); i++)
-//            papszIgnoredFields = CSLAddString( papszIgnoredFields, wgWX2MB(saIgnoredFields[i]) );
-//
-//        OGRErr eErr = m_poLayer->SetIgnoredFields(papszIgnoredFields);
-//        CSLDestroy( papszIgnoredFields );
-//
-//        if(eErr != OGRERR_NONE)
-//            return eErr;
-//        	
-//        m_FieldCount = -1;
-//        Unload();
-//        return eErr;
-//    }
-//    return OGRERR_FAILURE;
-//}
+        char **papszIgnoredFields = NULL;
+        for(size_t i = 0; i < saIgnoredFields.GetCount(); i++)
+            papszIgnoredFields = CSLAddString( papszIgnoredFields, wgWX2MB(saIgnoredFields[i]) );
+
+        OGRErr eErr = m_poLayer->SetIgnoredFields((const char**)papszIgnoredFields);
+        CSLDestroy( papszIgnoredFields );
+
+        if(eErr != OGRERR_NONE)
+            return eErr;
+        	
+        m_FieldCount = -1;
+        Unload();
+        return eErr;
+    }
+    return OGRERR_FAILURE;
+}
 
 OGRFeature* wxGISTable::GetFeature(long nFID)
 {

@@ -115,7 +115,7 @@ void wxGISVectorPropertyPage::FillGrid(void)
     wxPGId pid = AppendProperty( new wxPropertyCategory(_("Data Source")) );
     AppendProperty( new wxStringProperty(_("Vector"), wxPG_LABEL, m_pGxDataset->GetName()) );  
 
-    CPLString soPath(wgWX2MB(m_pDataset->GetPath()));
+    CPLString soPath(m_pDataset->GetPath().mb_str(wxConvUTF8));
 
     VSIStatBufL BufL;
     wxULongLong nSize(0);
@@ -136,12 +136,12 @@ void wxGISVectorPropertyPage::FillGrid(void)
         OGRSFDriver* pDrv = pDataSource->GetDriver();
         if(pDrv)
         {
-            wxPGId pdriversid = AppendProperty(pid, new wxStringProperty(_("Driver"), wxPG_LABEL, wgMB2WX(pDrv->GetName()) ));  
+            wxPGId pdriversid = AppendProperty(pid, new wxStringProperty(_("Driver"), wxPG_LABEL, wxString(pDrv->GetName(), wxConvUTF8) ));  
             //TestCapability
             AppendProperty(pdriversid, new wxStringProperty(_("Create DataSource"), wxPG_LABEL, pDrv->TestCapability(ODrCCreateDataSource) == TRUE ? _("true") : _("false")) );  
             AppendProperty(pdriversid, new wxStringProperty(_("Delete DataSource"), wxPG_LABEL, pDrv->TestCapability(ODrCDeleteDataSource) == TRUE ? _("true") : _("false")) );  
         }
-        wxPGId pdssid = AppendProperty(pid, new wxStringProperty(_("DataSource"), wxPG_LABEL, wgMB2WX(pDataSource->GetName()) ));  
+        wxPGId pdssid = AppendProperty(pid, new wxStringProperty(_("DataSource"), wxPG_LABEL, wxString(pDataSource->GetName(), wxConvUTF8) ));  
         AppendProperty(pdssid, new wxIntProperty(_("Layer Count"), wxPG_LABEL, pDataSource->GetLayerCount()) );  
         AppendProperty(pdssid, new wxStringProperty(_("Create DataSource"), wxPG_LABEL, pDataSource->TestCapability(ODsCCreateLayer) == TRUE ? _("true") : _("false")) );  
     }
