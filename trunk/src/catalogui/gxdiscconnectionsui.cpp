@@ -3,7 +3,7 @@
  * Purpose:  wxGxDiscConnectionsUI class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -106,13 +106,16 @@ IGxObject* wxGxDiscConnectionsUI::ConnectFolder(wxString sPath)
     {
         wxGxDiscConnectionUI* pConn = dynamic_cast<wxGxDiscConnectionUI*>(m_Children[i]);
         if(pConn)
-            if(pConn->GetInternalName().CmpNoCase(sPath) == 0)
+        {
+            wxString sConnPath(pConn->GetInternalName(), wxConvUTF8);
+            if(sConnPath.CmpNoCase(sPath) == 0)
                 return dynamic_cast<IGxObject*>(pConn);
+        }
     }
 
     if(wxDir::Exists(sPath)) 	//check if path is valid
 	{
-	    wxGxDiscConnectionUI* pwxGxDiscConnection = new wxGxDiscConnectionUI(sPath, sPath, m_Conn16, m_Conn48, m_ConnDsbld16, m_ConnDsbld48);
+	    wxGxDiscConnectionUI* pwxGxDiscConnection = new wxGxDiscConnectionUI(CPLString(sPath.mb_str(wxConvUTF8)), sPath, m_Conn16, m_Conn48, m_ConnDsbld16, m_ConnDsbld48);
         IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
         if(AddChild(pGxObject))
         {

@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxdiscconnectionui.h"
 
-wxGxDiscConnectionUI::wxGxDiscConnectionUI(wxString Path, wxString Name, wxIcon SmallIco, wxIcon LargeIco, wxIcon SmallIcoDsbl, wxIcon LargeIcoDsbl) : wxGxDiscConnection(Path, Name)
+wxGxDiscConnectionUI::wxGxDiscConnectionUI(CPLString Path, wxString Name, wxIcon SmallIco, wxIcon LargeIco, wxIcon SmallIcoDsbl, wxIcon LargeIcoDsbl) : wxGxDiscConnection(Path, Name)
 {
 	m_Conn16 = SmallIco;
 	m_Conn48 = LargeIco;
@@ -34,7 +34,7 @@ wxGxDiscConnectionUI::~wxGxDiscConnectionUI(void)
 
 wxIcon wxGxDiscConnectionUI::GetLargeImage(void)
 {
-	bool bIsOk = wxFileName::IsDirReadable(m_sPath);
+    bool bIsOk = wxIsReadable(wxString(m_sPath, wxConvUTF8));
 	if(bIsOk)
 		return m_Conn48;
 	else
@@ -43,7 +43,7 @@ wxIcon wxGxDiscConnectionUI::GetLargeImage(void)
 
 wxIcon wxGxDiscConnectionUI::GetSmallImage(void)
 {
-	bool bIsOk = wxFileName::IsDirReadable(m_sPath);
+    bool bIsOk = wxIsReadable(wxString(m_sPath, wxConvUTF8));
 	if(bIsOk)
 		return m_Conn16;
 	else

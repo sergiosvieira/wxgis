@@ -31,14 +31,15 @@ class WXDLLIMPEXP_GIS_CLT wxGxFile :
     public IGxObjectEdit
 {
 public:
-	wxGxFile(wxString Path, wxString Name);
+	wxGxFile(CSLString Path, wxString Name);
 	virtual ~wxGxFile(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void);
-    virtual wxString GetInternalName(void){return m_sPath;};
+    virtual CPLString GetInternalName(void){return m_sPath;};
 protected:
-	wxString m_sName, m_sPath;
+	wxString m_sName;
+    CSLString m_sPath;
 };
 
 /** \class wxGxPrjFile gxfileui.h

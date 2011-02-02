@@ -3,7 +3,7 @@
  * Purpose:  wxGxArchive classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -27,9 +27,8 @@
 // wxGxArchive
 /////////////////////////////////////////////////////////////////////////
 
-wxGxArchive::wxGxArchive(wxString Path, wxString Name, wxString sType) : wxGxFolder(Path, Name)
+wxGxArchive::wxGxArchive(CPLString Path, wxString Name) : wxGxArchiveFolder(Path, Name)
 {
-    m_sType = sType;
 }
 
 wxGxArchive::~wxGxArchive(void)
@@ -43,73 +42,18 @@ wxString wxGxArchive::GetBaseName(void)
     return FileName.GetName();
 }
 
-void wxGxArchive::LoadChildren(void)
-{
-	if(m_bIsChildrenLoaded)
-		return;
-
-    wxString sArchPath = m_sType + m_sPath;//wxT("/vsizip/") + wxT("/");
-    CPLString soArchPath(sArchPath.mb_str(wxConvUTF8));
-    char **papszFileList = VSIReadDir(soArchPath);
-
-    if( CSLCount(papszFileList) == 0 )
-    {
-        wxLogMessage(wxT( "wxGxArchive: no files or directories" ));
-    }
-    else
-    {
-        //wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
-       	//wxArrayString FileNames;
-        for(int i = 0; papszFileList[i] != NULL; i++ )
-		{
-            wxString sFileName(papszFileList[i], wxCSConv(wxT("cp-866")));
-            VSIStatBufL BufL;
-
-            CPLString soArchPathF = soArchPath;
-            soArchPathF += "/";
-            soArchPathF += papszFileList[i];
-
-			wxString sFolderPath = wgMB2WX(soArchPathF);//sArchPath + wxT("/") + sFileName;
-
-            //int ret = VSIStatL(wgWX2MB(sFolderPath), &BufL);
-            int ret = VSIStatL(soArchPathF/*(const char*) sFolderPath.mb_str(*m_pMBConv)*/, &BufL);
-            if(ret == 0)
-            {
-                //int x = 0;
-                if(VSI_ISDIR(BufL.st_mode))
-                {
-					wxGxArchiveFolder* pFolder = new wxGxArchiveFolder(sFolderPath, sFileName);
-					IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
-					bool ret_code = AddChild(pGxObj);
-                }
-                else
-                {
-                    m_FileNames.Add(sFolderPath);
-                }
-            }
-		}
-    }
-    CSLDestroy( papszFileList );
-
-	//load names
-	GxObjectArray Array;
-	if(m_pCatalog->GetChildren(sArchPath, &m_FileNames, &Array))
-	{
-		for(size_t i = 0; i < Array.size(); i++)
-		{
-            //IGxDataset* pDSet = dynamic_cast<IGxDataset*>(Array[i]);
-            //if(pDSet)
-            //    pDSet->SetPathEncoding(m_pMBConv);
-			bool ret_code = AddChild(Array[i]);
-			if(!ret_code)
-				wxDELETE(Array[i]);
-		}
-	}
-	m_bIsChildrenLoaded = true;
-}
-
 bool wxGxArchive::Delete(void)
 {
+    int nCount = 0;
+    for(size_t i = 1; i < m_sPath.length(); i++)
+    {
+        nCount++;
+        if(m_sPath[i] == '/')
+            break;
+    }
+
+    m_sPath.erase(0, nCount + 1);
+
 	EmptyChildren();
     if(DeleteFile(m_sPath))
 	{
@@ -121,24 +65,37 @@ bool wxGxArchive::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
     }
 }
 
 bool wxGxArchive::Rename(wxString NewName)
 {
-	//TODO: Fix it!
-/*	NewName = ClearExt(NewName);
-	wxFileName PathName(m_sPath);
+    CPLString szType("/");
+    int nCount = 0;
+    for(size_t i = 1; i < m_sPath.length(); i++)
+    {
+        nCount++;
+        szType += m_sPath[i];
+        if(m_sPath[i] == '/')
+            break;
+    }
+
+    m_sPath.erase(0, nCount + 1);
+
+    NewName = ClearExt(NewName);
+	wxFileName PathName(wxString(m_sPath, wxConvUTF8));
 	PathName.SetName(NewName);
 
-	wxString m_sNewPath = PathName.GetFullPath();
+	wxString sNewPath = PathName.GetFullPath();
 
 	EmptyChildren();
-    if(RenameFile(m_sPath, m_sNewPath))
+    CPLString szNewPath = sNewPath.mb_str(wxConvUTF8);
+    if(RenameFile(m_sPath, szNewPath))
 	{
-		m_sPath = m_sNewPath;
+		m_sPath = szType;
+        m_sPath += szNewPath;
 		m_sName = NewName;
 		m_pCatalog->ObjectChanged(this);
 		Refresh();
@@ -147,9 +104,9 @@ bool wxGxArchive::Rename(wxString NewName)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
-    }*/	
+    }
 	return false;
 }
 
@@ -157,7 +114,7 @@ bool wxGxArchive::Rename(wxString NewName)
 // wxGxArchiveFolder
 /////////////////////////////////////////////////////////////////////////
 
-wxGxArchiveFolder::wxGxArchiveFolder(wxString Path, wxString Name) : wxGxFolder(Path, Name)
+wxGxArchiveFolder::wxGxArchiveFolder(CPLString Path, wxString Name) : wxGxFolder(Path, Name)
 {
 }
 
@@ -169,190 +126,54 @@ void wxGxArchiveFolder::LoadChildren(void)
 {
 	if(m_bIsChildrenLoaded)
 		return;
+    char **papszItems = CPLReadDir(m_sPath);
+    if(papszItems == NULL)
+        return;
 
-    //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
-    //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
-
-    wxString sArchPath = m_sPath;
-    CPLString soArchPath(sArchPath.mb_str(wxConvUTF8));
-    char **papszFileList = VSIReadDir(soArchPath);
-
-    if( CSLCount(papszFileList) == 0 )
+    char **papszFileList = NULL;
+    //remove unused items
+    for(int i = CSLCount(papszItems) - 1; i >= 0; i-- )
     {
-        wxLogMessage(wxT( "wxGxArchive: no files or directories" ));
-    }
-    else
-    {
-        //wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
-       	//wxArrayString FileNames;
-        for(int i = 0; papszFileList[i] != NULL; i++ )
-		{
-            wxString sFileName(papszFileList[i], wxCSConv(wxT("cp-866")));
-
-            VSIStatBufL BufL;
-            CPLString soArchPathF = soArchPath;
-            soArchPathF += "/";
-            soArchPathF += papszFileList[i];
-
-			wxString sFolderPath = wgMB2WX(soArchPathF);//sArchPath + wxT("/") + sFileName;
-
-            int ret = VSIStatL(soArchPathF, &BufL);
-            if(ret == 0)
+        if( EQUAL(papszItems[i],".") || EQUAL(papszItems[i],"..") )
+            continue;
+        CPLString szFileName = CPLFormFilename(m_sPath, papszItems[i], NULL);
+        VSIStatBufL BufL;
+        int ret = VSIStatL(szFileName, &BufL);
+        if(ret == 0)
+        {
+            if(VSI_ISDIR(BufL.st_mode))
             {
-                //int x = 0;
-                if(VSI_ISDIR(BufL.st_mode))
-                {
-					wxGxArchiveFolder* pFolder = new wxGxArchiveFolder(sFolderPath, sFileName);
-					IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
-					bool ret_code = AddChild(pGxObj);
-                }
-                else
-                {
-                    m_FileNames.Add(sFolderPath);
-                }
+                wxString sFileName(papszItems[i], wxCSConv(wxT("cp-866")));
+				IGxObject* pGxObj = GetArchiveFolder(szFileName, sFileName);
+				AddChild(pGxObj);
             }
-		}
+            else
+            {
+                papszFileList = CSLAddString( papszFileList, szFileName );
+            }
+        }
     }
-    CSLDestroy( papszFileList );
+    CSLDestroy( papszItems );
 
-	//load names
-	GxObjectArray Array;
-	if(m_pCatalog->GetChildren(sArchPath, &m_FileNames, &Array))
+    //load names
+	GxObjectArray Array;	
+	if(m_pCatalog && m_pCatalog->GetChildren(m_sPath, papszFileList, Array))
 	{
 		for(size_t i = 0; i < Array.size(); i++)
 		{
-            //IGxDataset* pDSet = dynamic_cast<IGxDataset*>(Array[i]);
-            //if(pDSet)
-            //    pDSet->SetPathEncoding(m_pMBConv);
 			bool ret_code = AddChild(Array[i]);
 			if(!ret_code)
 				wxDELETE(Array[i]);
 		}
 	}
+    CSLDestroy( papszFileList );
+    
 	m_bIsChildrenLoaded = true;
 }
 
-
-    //std::auto_ptr<wxInputStream> in_stream(new wxFFileInputStream(m_sPath));
-
-    //if (in_stream->IsOk())
-    //{
-    //    wxString sExt = m_sPath;
-    //    // look for a filter handler, e.g. for '.gz'
-    //    const wxFilterClassFactory *fcf = wxFilterClassFactory::Find(m_sPath, wxSTREAM_FILEEXT);
-    //    if (fcf)
-    //    {
-    //        in_stream.reset(fcf->NewStream(in_stream.release()));
-    //        // pop the extension, so if it was '.tar.gz' it is now just '.tar'
-    //        sExt = fcf->PopExtension(m_sPath);
-    //    }
-
-    //    // look for a archive handler, e.g. for '.zip' or '.tar'
-    //    const wxArchiveClassFactory *acf = wxArchiveClassFactory::Find(sExt, wxSTREAM_FILEEXT);
-    //    wxString sProtocol = acf->GetProtocol();
-    //    if (acf)
-    //    {
-    //        std::auto_ptr<wxArchiveInputStream> arc(acf->NewStream(in_stream.release()));
-    //        std::auto_ptr<wxArchiveEntry> entry;
-
-    //        // list the contents of the archive
-    //       	wxArrayString FileNames;
-    //        wxString sParentPath = wxString::Format(wxT("/vsi%s/"), sProtocol.c_str()) + m_sPath;
-
-    //        while ((entry.reset(arc->GetNextEntry())), entry.get() != NULL)
-    //        {
-    //            int x;
-    //            if(entry->IsDir())
-    //                x = 0;
-    //            else
-    //            {
-    //                wxString tmp = entry->GetName();
-    //                tmp.Replace(wxT("\\"), wxT("/"));
-    //                wxString sFileName = sParentPath + wxFileName::GetPathSeparator() + tmp;//entry->GetName();
-    //                sFileName.Replace(wxT("\\"), wxT("/"));
-    //                FileNames.Add(sFileName);
-    //                //x = 1;
-    //            }
-    //            //wxLogDebug(wxT("wxGxArchiveFolder:%s"), entry->GetName().c_str());
-    //        ////    wxFileName dirname( name, wxEmptyString );
-    //        ////    x = 1;
-    //            //std::wcout << entry->GetName().c_str() << "\n";
-    //        }
-	   //     GxObjectArray Array;
-    //
-    //        //wxString name, ext;
-    //        //wxFileName::SplitPath(m_sPath, NULL, NULL, &name, &ext);
-
-	   //     if(m_pCatalog->GetChildren(sParentPath, &FileNames, &Array))
-	   //     {
-		  //      for(size_t i = 0; i < Array.size(); i++)
-		  //      {
-			 //       bool ret_code = AddChild(Array[i]);
-			 //       if(!ret_code)
-				//        wxDELETE(Array[i]);
-		  //      }
-	   //     }
-	   //     m_bIsChildrenLoaded = true;
-    //    }
-    //    else
-    //    {
-    //        wxLogError(_("wxGxArchiveFolder: can't handle '%s'"), m_sPath.c_str());
-    //    }
-    //}
-
-
-    ////auto_ptr<wxArchiveClassFactory> factory(wxArchiveClassFactory::Find(m_sPath, wxSTREAM_FILEEXT));
-    ////if (factory.get())
-    ////{
-    ////    auto_ptr<wxArchiveInputStream> inarc(factory->NewStream(new wxFFileInputStream(m_sPath)));
-    ////    std::auto_ptr<wxArchiveEntry> entry;
-    ////    while (entry.reset(arch.GetNextEntry()), entry.get() != NULL)
-    ////    {
-    ////        // access meta-data
-    ////        wxString name = entry->GetName();
-    ////        // read 'archive' to access the entry's data
-    ////        int x;
-    ////        if(entry->IsDir())
-    ////            x = 0;
-    ////        else
-    ////            x = 1;
-    ////    ////    wxFileName dirname( name, wxEmptyString );
-    ////    ////    x = 1;
-    ////    }
-    ////}
-
-
-
-//    wxFileSystem fs;
-//    wxString filename;
-//    wxFileSystem::AddHandler(new wxArchiveFSHandler);
-////    wxFileName dirname( wxT("D:\\work\\Projects\\wxGIS\\build\\debug\\sys\\cs.zip#zip:"), wxEmptyString );
-//    //wxString sFileName = wxFileSystem::FileNameToURL(dirname);
-//    //wxString wildcard = sFileName;//wxT("");//document.template.dat#zip:*.txt
-//    wxString wildcard = wxT("D:\\work\\Projects\\wxGIS\\build\\debug\\sys\\cs.zip#zip:cs/*");//dirname.GetFullName();
-//    if(wxFileSystem::HasHandlerForPath(wildcard))//sFileName
-//    {
-//        for(filename = fs.FindFirst(wildcard, 0); !filename.IsEmpty(); filename = fs.FindNext())
-//        {
-//            wxFileName sname( filename, wxEmptyString );
-//            int x;
-//            if(sname.IsDir())
-//                x = 0;
-//            else
-//                x = 1;
-//        }
-//    }
-
-    //wxFileSystem::AddHandler(new wxArchiveFSHandler);
-    //wxFileName dirname( wxT("D:\\work\\Projects\\wxGIS\\build\\debug\\sys\\cs.zip"), wxEmptyString );
-    //wxString sFileName = wxFileSystem::FileNameToURL(dirname);
-    //if(wxFileSystem::HasHandlerForPath(sFileName))
-    //{
-    //    wxDir dir(sFileName);
-    //    int x;
-    //    if ( !dir.IsOpened() )
-    //        x = 0;
-    //    else
-    //        x = 1;
-    //}
+IGxObject* wxGxArchiveFolder::GetArchiveFolder(CPLString szPath, wxString soName)
+{
+	wxGxArchiveFolder* pFolder = new wxGxArchiveFolder(szPath, soName);
+	return static_cast<IGxObject*>(pFolder);
+}
 

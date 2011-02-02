@@ -20,10 +20,3 @@
  ****************************************************************************/
 
 #include "wxgis/datasource/datacontainer.h"
-
-bool CreateFolder(wxString sPath)
-{
-    if( VSIMkdir( sPath.mb_str(), 0777 ) != 0 )
-        return false;
-    return true;
-}

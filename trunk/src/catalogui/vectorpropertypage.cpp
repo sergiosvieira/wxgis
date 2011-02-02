@@ -117,14 +117,14 @@ void wxGISVectorPropertyPage::FillGrid(void)
 
     CPLString soPath(m_pDataset->GetPath());
 
-    VSIStatBufL BufL;
-    wxULongLong nSize(0);
-    int ret = VSIStatL(soPath, &BufL);
-    if(ret == 0)
-    {
-        nSize += BufL.st_size;
-    }
-    //wxULongLong nSize = wxFileName::GetSize(m_pDataset->GetPath());
+    //TODO: Files
+    //VSIStatBufL BufL;
+    //wxULongLong nSize(0);
+    //int ret = VSIStatL(soPath, &BufL);
+    //if(ret == 0)
+    //{
+    //    nSize += BufL.st_size;
+    //}
 
     //folder
 	wxString sPath(CPLGetPath(soPath), wxConvLocal);

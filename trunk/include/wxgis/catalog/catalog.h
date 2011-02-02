@@ -36,32 +36,27 @@ enum wxGISEnumSaveObjectResults
 };
 
 class IGxObject;
-DEFINE_SHARED_PTR(IGxObject);
-DEFINE_WEAK_PTR(IGxObject);
-
-typedef std::vector<IGxObjectSPtr> GxObjectArray;
+typedef std::vector<IGxObject*> GxObjectArray;
 
 class IGxObjectFactory;
-DEFINE_SHARED_PTR(IGxObjectFactory);
-typedef std::vector<IGxObjectFactorySPtr> GxObjectFactoryArray;
+typedef std::vector<IGxObjectFactory*> GxObjectFactoryArray;
 
 class IGxCatalog
 {
 public:
-	IGxCatalog(void) : m_pConf(NULL){};
 	virtual ~IGxCatalog(void){};
-	virtual wxString ConstructFullName(const IGxObject* pObject) = 0;
-	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray) = 0;
+	virtual wxString ConstructFullName(IGxObject* pObject) = 0;
+	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray) = 0;
 	virtual GxObjectArray* const GetDisabledRootItems(void){return &m_aRootItems;};
     virtual GxObjectFactoryArray* const GetObjectFactories(void){return &m_ObjectFactoriesArray;};
-	virtual void ObjectAdded(IGxObjectWPtr pObject) = 0;
-	virtual void ObjectChanged(IGxObjectWPtr pObject) = 0;
-	virtual void ObjectDeleted(IGxObjectWPtr pObject) = 0;
-	virtual void ObjectRefreshed(IGxObjectWPtr pObject) = 0;
-	virtual IGxObjectSPtr ConnectFolder(wxString sPath, bool bSelect = true) = 0;
-	virtual void DisconnectFolder(CPLString sPath, bool bSelect = true) = 0;
+	virtual void ObjectAdded(IGxObject* const pObject) = 0;
+	virtual void ObjectChanged(IGxObject* const pObject) = 0;
+	virtual void ObjectDeleted(IGxObject* const pObject) = 0;
+	virtual void ObjectRefreshed(IGxObject* const pObject) = 0;
+	virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true) = 0;
+	virtual void DisconnectFolder(CPLString sPath) = 0;
     virtual IGISConfig* const GetConfig(void){return m_pConf;};
-    virtual void EnableRootItem(IGxObjectSPtr pRootItem, bool bEnable) = 0;
+    virtual void EnableRootItem(IGxObject* pRootItem, bool bEnable) = 0;
 	virtual bool GetShowHidden(void){return m_bShowHidden;};
 	virtual bool GetShowExt(void){return m_bShowExt;};
 	virtual void SetShowHidden(bool bShowHidden){m_bShowHidden = bShowHidden;};
@@ -72,14 +67,12 @@ protected:
     GxObjectFactoryArray m_ObjectFactoriesArray;
 	bool m_bShowHidden, m_bShowExt;
 };
-DEFINE_SHARED_PTR(IGxCatalog);
-DEFINE_WEAK_PTR(IGxCatalog);
 
 class IGxObject
 {
 public:
 	virtual ~IGxObject(void){};
-	virtual bool Attach(IGxObjectWPtr pParent, IGxCatalogWPtr pCatalog)
+	virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog)
 	{
 		m_pParent = pParent;
 		m_pCatalog = pCatalog;
@@ -101,11 +94,11 @@ public:
 	};
 	virtual CPLString GetInternalName(void) = 0;
 	virtual wxString GetCategory(void) = 0;
-	virtual IGxObjectWPtr GetParent(void){return m_pParent;};
+	virtual IGxObject* const GetParent(void){return m_pParent;};
 	virtual void Refresh(void){};
 protected:
-	IGxObjectWPtr m_pParent;
-	IGxCatalogWPtr m_pCatalog;
+	IGxObject* m_pParent;
+	IGxCatalog* m_pCatalog;
 };
 
 /** \class IGxObjectEdit catalog.h
@@ -121,15 +114,12 @@ public:
 	virtual bool CanRename(void){return false;};
 };
 
-class IGxObjectContainer;
-DEFINE_SHARED_PTR(IGxObjectContainer);
-
 class IGxObjectContainer :
 	public IGxObject
 {
 public:
 	virtual ~IGxObjectContainer(void){};
-	virtual bool AddChild(IGxObjectSPtr pChild)
+	virtual bool AddChild(IGxObject* pChild)
 	{
 		if(pChild == NULL)
 			return false;
@@ -138,7 +128,7 @@ public:
 		m_Children.push_back(pChild);
 		return true;
 	};
-	virtual bool DeleteChild(IGxObjectSPtr pChild)
+	virtual bool DeleteChild(IGxObject* pChild)
 	{
 		if(pChild == NULL)
 			return false;
@@ -146,6 +136,7 @@ public:
 		if(pos != m_Children.end())
 		{
 			pChild->Detach();
+            delete pChild;
 			m_Children.erase(pos);
 		}
 		return true;
@@ -153,11 +144,11 @@ public:
 	virtual bool AreChildrenViewable(void) = 0;
 	virtual bool HasChildren(void) = 0;
 	virtual GxObjectArray* const GetChildren(void){return &m_Children;};
-	virtual IGxObjectSPtr SearchChild(wxString sPath)
+	virtual IGxObject* SearchChild(wxString sPath)
 	{
 		wxString sTestPath = sPath;
 		if(GetFullName().CmpNoCase(sPath) == 0)//GetName
-			return boost::dynamic_pointer_cast<IGxObject>(this);
+			return this;
 		for(size_t i = 0; i < m_Children.size(); i++)
 		{
 			wxString sTestedPath = m_Children[i]->GetFullName();
@@ -166,16 +157,16 @@ public:
             bool bHavePart = sPath.MakeLower().Find(sTestedPath.MakeLower()) != wxNOT_FOUND;
 			if(bHavePart )
 			{
-				IGxObjectContainerSPtr pContainer = boost::dynamic_pointer_cast<IGxObjectContainer>(m_Children[i]);
+				IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(m_Children[i]);
 				if(pContainer && pContainer->HasChildren())
 				{
-					IGxObjectSPtr pFoundChild = pContainer->SearchChild(sPath);
+					IGxObject* pFoundChild = pContainer->SearchChild(sPath);
 					if(pFoundChild)
 						return pFoundChild;
 				}
 			}
 		}
-		return IGxObjectSPtr();
+		return NULL;
 	}
     virtual bool CanCreate(long nDataType, long DataSubtype){return false;}; 
 protected:
@@ -188,8 +179,8 @@ public:
 	IGxObjectFactory(void) : m_bIsEnabled(true){};
 	virtual ~IGxObjectFactory(void){};
     //pure virtual
-	virtual bool GetChildren(CPLString sParentDir, char** pFileNames, GxObjectArray &ObjArray) = 0;
-    virtual void Serialize(wxXmlNode* pConfig, bool bStore) = 0;
+	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray) = 0;
+    virtual void Serialize(wxXmlNode* const pConfig, bool bStore) = 0;
     virtual wxString GetClassName(void) = 0;
     virtual wxString GetName(void) = 0;
     //
@@ -197,7 +188,7 @@ public:
     virtual void SetEnabled(bool bIsEnabled){m_bIsEnabled = bIsEnabled;};
 	virtual void PutCatalogRef(IGxCatalog* pCatalog){m_pCatalog = pCatalog;};
 protected:
-	IGxCatalogWPtr m_pCatalog;
+	IGxCatalog* m_pCatalog;
     bool m_bIsEnabled;
 };
 
@@ -205,13 +196,12 @@ class IGxCatalogEvents
 {
 public:
 	virtual ~IGxCatalogEvents(void){};
-	virtual void OnObjectAdded(IGxObjectWPtr object) = 0;
-	virtual void OnObjectChanged(IGxObjectWPtr object) = 0;
-	virtual void OnObjectDeleted(IGxObjectWPtr object) = 0;
-	virtual void OnObjectRefreshed(IGxObjectWPtr object) = 0;
+	virtual void OnObjectAdded(IGxObject* object) = 0;
+	virtual void OnObjectChanged(IGxObject* object) = 0;
+	virtual void OnObjectDeleted(IGxObject* object) = 0;
+	virtual void OnObjectRefreshed(IGxObject* object) = 0;
 	virtual void OnRefreshAll(void) = 0;
 };
-
 
 class IGxDataset
 {
@@ -237,8 +227,8 @@ class IGxRootObjectProperties
 {
 public:
 	virtual ~IGxRootObjectProperties(void){};
-	virtual void Init(wxXmlNode* pConfigNode) = 0;
-	virtual wxXmlNode* const GetProperties(void) = 0;
+	virtual void Init(wxXmlNode* const pConfigNode) = 0;
+	virtual wxXmlNode* GetProperties(void) = 0;
     virtual bool GetEnabled(void){return m_bEnabled;};
     virtual void SetEnabled(bool bEnabled){m_bEnabled = bEnabled;};
 protected:
@@ -257,9 +247,9 @@ class IGxObjectFilter
 {
 public:
 	virtual ~IGxObjectFilter(void){};
-	virtual bool CanChooseObject( IGxObjectWPtr pObject ) = 0;//, esriDoubleClickResult* result
-	virtual bool CanDisplayObject( IGxObjectWPtr pObject ) = 0;
-	virtual wxGISEnumSaveObjectResults CanSaveObject( IGxObjectWPtr pLocation, wxString sName ) = 0;
+	virtual bool CanChooseObject( IGxObject* pObject ) = 0;//, esriDoubleClickResult* result
+	virtual bool CanDisplayObject( IGxObject* pObject ) = 0;
+	//virtual wxGISEnumSaveObjectResults CanSaveObject( IGxObjectWPtr pLocation, wxString sName ) = 0;
 	virtual wxString GetName(void) = 0;
     virtual wxString GetExt(void) = 0;
     virtual wxString GetDriver(void) = 0;
@@ -276,19 +266,19 @@ typedef std::vector<IGxObjectFilter*> OBJECTFILTERS, *LPOBJECTFILTERS;
 //	virtual GxObjectFactoryArray* GetEnabledGxObjectFactories() = 0;
 //};
 
-static wxString GetConvName(wxString sPath, wxFileName &FName)
-{
-    //name conv cp866 if zip
-    wxString name;
-    if(sPath.Find(wxT("/vsizip/")) != wxNOT_FOUND)
-    {
-        wxString str(FName.GetFullName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
-        name = str;
-    }
-    else
-        name = FName.GetFullName();
-	return name;
-}
+//static wxString GetConvName(wxString sPath, wxFileName &FName)
+//{
+//    //name conv cp866 if zip
+//    wxString name;
+//    if(sPath.Find(wxT("/vsizip/")) != wxNOT_FOUND)
+//    {
+//        wxString str(FName.GetFullName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
+//        name = str;
+//    }
+//    else
+//        name = FName.GetFullName();
+//	return name;
+//}
 
 
 

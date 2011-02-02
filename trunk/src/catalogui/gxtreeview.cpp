@@ -602,7 +602,7 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
             continue;
         if(!pData->m_pObject)
             continue;
-        pMyData->AddFile(pData->m_pObject->GetInternalName());
+        pMyData->AddFile(pData->m_pObject->GetFullName());
     }
     wxDropSource dragSource( this );
 	dragSource.SetData( *pMyData );

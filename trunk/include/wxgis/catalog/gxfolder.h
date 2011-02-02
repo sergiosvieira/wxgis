@@ -33,7 +33,7 @@ public:
 	virtual void Detach(void);
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void);
-	virtual wxString GetInternalName(void){return m_sPath;};
+	virtual CPLString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void){return wxString(_("Folder"));};
 	virtual void Refresh(void);
 	//IGxObjectEdit
@@ -52,6 +52,5 @@ public:
 protected:
 	wxString m_sName;
 	CPLString m_sPath;
-	wxArrayString m_FileNames;
 	bool m_bIsChildrenLoaded;
 };

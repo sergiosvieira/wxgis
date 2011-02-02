@@ -162,6 +162,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
                 {
                     nSize += BufL.st_size;
                 }
+                //TODO: conv file name to zip coding
 			    wxString sFileName(CPLGetFilename(papszFileList[i]), wxConvLocal);
 
                 AppendProperty(pfilesid, new wxStringProperty(_("File"), wxPG_LABEL, sFileName) );  

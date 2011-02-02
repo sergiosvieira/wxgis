@@ -3,7 +3,7 @@
  * Purpose:  wxGxDiscConnections class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ void wxGxDiscConnections::Refresh(void)
     m_pCatalog->ObjectRefreshed(this);
 }
  
-void wxGxDiscConnections::Init(wxXmlNode* pConfigNode)
+void wxGxDiscConnections::Init(wxXmlNode* const pConfigNode)
 {
     wxXmlDocument doc;
     if (doc.Load(m_sUserConfig))
@@ -67,7 +67,7 @@ void wxGxDiscConnections::Init(wxXmlNode* pConfigNode)
 			wxString sPath = pDiscConn->GetPropVal(wxT("path"), ERR);
 			if(sPath != ERR)
 			{
-                CONN_DATA data = {sName, sPath};
+                CONN_DATA data = {sName, sPath.mb_str(wxConvUTF8)};
                 m_aConnections.push_back(data);
 			}
 			pDiscConn = pDiscConn->GetNext();
@@ -78,8 +78,8 @@ void wxGxDiscConnections::Init(wxXmlNode* pConfigNode)
         wxLogMessage(_("wxGxDiscConnections: Start scan folder connections"));
         wxArrayString arr;
 #ifdef __WXMSW__
-		arr = wxFSVolumeBase::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE/* | wxFS_VOL_REMOTE*/);
-#else
+		arr = wxFSVolumeBase::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE);//| wxFS_VOL_REMOTE
+#else 
         //linux paths
         wxStandardPaths stp;
         arr.Add(wxT("/"));
@@ -88,7 +88,7 @@ void wxGxDiscConnections::Init(wxXmlNode* pConfigNode)
 #endif
         for(size_t i = 0; i < arr.size(); i++)
 		{
-            CONN_DATA data = {arr[i], arr[i]};
+            CONN_DATA data = {arr[i], arr[i].mb_str(wxConvUTF8)};
             m_aConnections.push_back(data);
 		}
 	}
@@ -159,13 +159,16 @@ IGxObject* wxGxDiscConnections::ConnectFolder(wxString sPath)
     {
         wxGxDiscConnection* pConn = dynamic_cast<wxGxDiscConnection*>(m_Children[i]);
         if(pConn)
-            if(pConn->GetInternalName().CmpNoCase(sPath) == 0)
+        {
+            wxString sConnPath(pConn->GetInternalName(), wxConvUTF8);
+            if(sConnPath.CmpNoCase(sPath) == 0)
                 return dynamic_cast<IGxObject*>(pConn);
+        }
     }
 
     if(wxDir::Exists(sPath)) 	//check if path is valid
 	{
-	    wxGxDiscConnection* pwxGxDiscConnection = new wxGxDiscConnection(sPath, sPath);
+	    wxGxDiscConnection* pwxGxDiscConnection = new wxGxDiscConnection(CPLString(sPath.mb_str(wxConvUTF8)), sPath);
         IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
         if(AddChild(pGxObject))
         {
@@ -183,7 +186,7 @@ IGxObject* wxGxDiscConnections::ConnectFolder(wxString sPath)
 	return pReturnObj;
 }
 
-void wxGxDiscConnections::DisconnectFolder(wxString sPath)
+void wxGxDiscConnections::DisconnectFolder(CPLString sPath)
 {
     for(size_t i = 0; i < m_Children.size(); i++)
     {
@@ -216,7 +219,7 @@ void wxGxDiscConnections::StoreConnections(void)
         {
 	        wxXmlNode* pDiscConn = new wxXmlNode(pRootNode, wxXML_ELEMENT_NODE, wxT("DiscConnection"));
 	        pDiscConn->AddProperty(wxT("name"), pwxGxDiscConnection->GetName());
-	        pDiscConn->AddProperty(wxT("path"), pwxGxDiscConnection->GetInternalName());
+	        pDiscConn->AddProperty(wxT("path"), wxString(pwxGxDiscConnection->GetInternalName(), wxConvUTF8));
         }
     }
     if(m_Children.empty() && !m_aConnections.empty())
@@ -225,7 +228,7 @@ void wxGxDiscConnections::StoreConnections(void)
         {
 	        wxXmlNode* pDiscConn = new wxXmlNode(pRootNode, wxXML_ELEMENT_NODE, wxT("DiscConnection"));
 	        pDiscConn->AddProperty(wxT("name"), m_aConnections[i].sName);
-	        pDiscConn->AddProperty(wxT("path"), m_aConnections[i].sPath);
+	        pDiscConn->AddProperty(wxT("path"), wxString(m_aConnections[i].sPath, wxConvUTF8));
         }
     }
     doc.Save(m_sUserConfig);

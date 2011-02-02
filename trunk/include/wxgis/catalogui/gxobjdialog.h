@@ -231,7 +231,7 @@ public:
     virtual wxString GetNameWithExt(void);
     virtual wxString GetFullPath(void);
     virtual wxString GetPath(void);
-    virtual wxString GetInternalPath(void);
+    virtual CPLString GetInternalPath(void);
     virtual IGxObject* GetLocation(void);
     virtual IGxObjectFilter* GetCurrentFilter(void);
     virtual size_t GetCurrentFilterId(void);

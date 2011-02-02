@@ -44,7 +44,7 @@ public:
  	//IGxCatalog
 	virtual void ObjectDeleted(IGxObject* pObject);
 	virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true);
-	virtual void DisconnectFolder(wxString sPath, bool bSelect = true);
+	virtual void DisconnectFolder(CPLString sPath);
     //wxGxCatalogUI
     virtual void Undo(int nPos = -1);
     virtual void Redo(int nPos = -1);

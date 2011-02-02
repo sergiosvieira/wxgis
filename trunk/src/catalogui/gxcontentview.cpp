@@ -790,7 +790,7 @@ void wxGxContentView::OnBeginDrag(wxListEvent& event)
             continue;
         if(!pItemData->pObject)
             continue;
-        my_data.AddFile(pItemData->pObject->GetInternalName());
+        my_data.AddFile(pItemData->pObject->GetFullName());
         nCount++;
     }
     if(nCount == 0)
@@ -839,10 +839,12 @@ void wxGxContentView::BeginRename(IGxObject* pGxObject)
         {
             SetItemState(i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
             m_pSelection->Select(pGxObject, true, NOTFIRESELID);
-            break;
+            goto EDIT;
         }
     }
+    return;
 
+EDIT:
     int nItem = GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
     if ( nItem == -1 )
         return;

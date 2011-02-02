@@ -3,7 +3,7 @@
  * Purpose:  wxGxArchiveUI classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxArchiveUI :
     public IGxObjectEditUI
 {
 public:
-	wxGxArchiveUI(wxString Path, wxString Name, wxString sType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxArchiveUI(CPLString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxArchiveUI(void);
     //IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
@@ -43,7 +43,7 @@ public:
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
     //wxGxArchive
-    void LoadChildren(void);
+    virtual IGxObject* GetArchiveFolder(CPLString szPath, wxString soName);
 protected:
     wxIcon m_oLargeIcon, m_oSmallIcon;
 };
@@ -58,7 +58,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxArchiveFolderUI :
     public IGxObjectEditUI
 {
 public:
-	wxGxArchiveFolderUI(wxString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxArchiveFolderUI(CPLString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxArchiveFolderUI(void);
     //IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
@@ -66,7 +66,7 @@ public:
 	virtual wxString ContextMenu(void){return wxString(wxT("wxGxArchiveFolder.ContextMenu"));};
 	virtual wxString NewMenu(void){return wxString(wxT("wxGxArchiveFolder.NewMenu"));};
     //wxGxArchiveFolder
-    void LoadChildren(void);
+    virtual IGxObject* GetArchiveFolder(CPLString szPath, wxString soName);
 protected:
     wxIcon m_oLargeIcon, m_oSmallIcon;
 };

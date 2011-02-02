@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  system operations.
+ * Purpose:  wxGxArchiveFactory class. Create new GxFolder objects
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,14 +20,21 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/datasource/datasource.h"
+#include "wxgis/catalog/catalog.h"
 
-bool WXDLLIMPEXP_GIS_DS DeleteDir(CPLString sPath);
-bool WXDLLIMPEXP_GIS_DS CreateDir(CPLString sPath, long mode = 0777); 
-bool WXDLLIMPEXP_GIS_DS DeleteFile(CPLString sPath);
-bool WXDLLIMPEXP_GIS_DS RenameFile(CPLString sOldPath, CPLString sNewPath);
-wxString WXDLLIMPEXP_GIS_DS CheckUniqName(wxString sPath, wxString sName, wxString sExt, int nCounter);
-wxFontEncoding WXDLLIMPEXP_GIS_DS GetEncodingFromCpg(CPLString sPath);
-wxString WXDLLIMPEXP_GIS_DS ClearExt(wxString sPath);
-bool WXDLLIMPEXP_GIS_DS IsFileHidden(CPLString sPath);
 
+class WXDLLIMPEXP_GIS_CLT wxGxArchiveFactory :
+	public IGxObjectFactory,
+	public wxObject
+{
+	DECLARE_DYNAMIC_CLASS(wxGxArchiveFactory)
+public:
+	wxGxArchiveFactory(void);
+	virtual ~wxGxArchiveFactory(void);
+	//IGxObjectFactory
+	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray);
+    virtual void Serialize(wxXmlNode* const pConfig, bool bStore);
+    virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
+    virtual wxString GetName(void){return wxString(_("Archives"));};
+    virtual IGxObject* GetGxObject(CPLString szPath, wxString soName);
+};

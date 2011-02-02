@@ -31,7 +31,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxFolderUI :
 	public IGxObjectEditUI
 {
 public:
-	wxGxFolderUI(wxString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxFolderUI(CPLString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxFolderUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);

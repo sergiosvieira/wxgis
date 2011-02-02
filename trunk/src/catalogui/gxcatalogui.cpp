@@ -89,7 +89,7 @@ void wxGxCatalogUI::EditProperties(wxWindow *parent)
         pApp->OnAppOptions();
 }
 
-void wxGxCatalogUI::Init(IGxCatalog* pExtCat)//TODO: include root items list
+void wxGxCatalogUI::Init(IGxCatalog* pExtCat)
 {
 	if(m_bIsChildrenLoaded)
 		return;
@@ -178,12 +178,10 @@ IGxObject* wxGxCatalogUI::ConnectFolder(wxString sPath, bool bSelect)
     return NULL;
 }
 
-void wxGxCatalogUI::DisconnectFolder(wxString sPath, bool bSelect)
+void wxGxCatalogUI::DisconnectFolder(CPLString sPath)
 {
     if(m_pGxDiscConnections)
-    {
         m_pGxDiscConnections->DisconnectFolder(sPath);
-    }
 }
 
 void wxGxCatalogUI::SetLocation(wxString sPath)

@@ -338,6 +338,6 @@ const OGREnvelope* wxGISRasterDataset::GetEnvelope(void)
 
 wxString wxGISRasterDataset::GetName(void)
 {
-	return wxString(CPLGetFilename(m_sPath), wxConvLocal);
+	return wxString(CPLGetFilename(m_sPath), wxConvUTF8);
 }
 

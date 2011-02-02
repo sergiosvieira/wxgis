@@ -29,7 +29,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxDiscConnection :
 	public wxGxFolder
 {
 public:
-	wxGxDiscConnection(wxString Path, wxString Name);
+	wxGxDiscConnection(CPLString Path, wxString Name);
 	virtual ~wxGxDiscConnection(void);
 	//IGxObject
 	virtual wxString GetCategory(void){return wxString(_("Folder connection"));};
