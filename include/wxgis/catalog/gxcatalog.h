@@ -41,36 +41,34 @@ public:
 	virtual wxString GetName(void){return wxString(_("Catalog"));};
     virtual wxString GetBaseName(void){return GetName();};
 	virtual wxString GetFullName(void){return wxEmptyString;}//wxString(_("Catalog"));};
-    virtual wxString GetInternalName(void){return wxEmptyString;};
+    virtual CPLString GetInternalName(void){return CPLString();};
 	virtual wxString GetCategory(void){return wxString(wxT("Root"));};
-	virtual IGxObject* GetParent(void){return NULL;};
+	virtual IGxObject* const GetParent(void){return NULL;};
 	virtual void Refresh(void);
 	//IGxObjectContainer
-	virtual bool AddChild(IGxObject* pChild);
-	virtual bool DeleteChild(IGxObject* pChild);
 	virtual bool AreChildrenViewable(void){return true;};
 	virtual bool HasChildren(void){return true;};
-	virtual GxObjectArray* GetChildren(void){return &m_Children;};
+	virtual GxObjectArray* const GetChildren(void){return &m_Children;};
     virtual IGxObject* SearchChild(wxString sPath);
 	//IGxCatalog
 	virtual wxString ConstructFullName(IGxObject* pObject);
-	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray);
-	virtual void ObjectAdded(IGxObject* pObject);
-	virtual void ObjectChanged(IGxObject* pObject);
-	virtual void ObjectDeleted(IGxObject* pObject);
-	virtual void ObjectRefreshed(IGxObject* pObject);
+	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray);
+	virtual void ObjectAdded(IGxObject* const pObject);
+	virtual void ObjectChanged(IGxObject* const pObject);
+	virtual void ObjectDeleted(IGxObject* const pObject);
+	virtual void ObjectRefreshed(IGxObject* const pObject);
 	virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true);
-	virtual void DisconnectFolder(wxString sPath, bool bSelect = true);
+	virtual void DisconnectFolder(CPLString sPath);
 	//IConnectionPointContainer
 	virtual long Advise(wxObject* pObject);
 	//wxGxCatalog
-	virtual void LoadChildren(wxXmlNode* pNode);
+	virtual void LoadChildren(wxXmlNode* const pNode);
 	virtual void EmptyChildren(void);
 	virtual void EmptyDisabledChildren(void);
 	virtual void LoadObjectFactories(wxXmlNode* pNode);
 	virtual void EmptyObjectFactories(void);
 	virtual void Init(void);
-    virtual void SerializePlugins(wxXmlNode* pNode, bool bStore = false);
+    virtual void SerializePlugins(wxXmlNode* const pNode, bool bStore = false);
 	virtual void EnableRootItem(IGxObject* pRootItem, bool bEnable);
 
 protected:

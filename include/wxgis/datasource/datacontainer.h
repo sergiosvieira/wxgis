@@ -23,4 +23,3 @@
 
 #include "wxgis/datasource/datasource.h"
 
-bool WXDLLIMPEXP_GIS_DS CreateFolder(wxString sPath); 

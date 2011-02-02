@@ -55,6 +55,7 @@ public:
 	//virtual wxXmlNode* GetXmlConfig(wxString sApp, bool bUser) = 0;
 };
 
+
 class IConnectionPointContainer
 {
 public:
@@ -70,12 +71,10 @@ public:
 	{
 		if(nCookie < 0 || m_pPointsArray.size() <= nCookie)
 			return;
-		//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
 		m_pPointsArray[nCookie] = NULL;
 	}
 protected:
 	std::vector<wxObject*> m_pPointsArray;
-	//wxCriticalSection m_PointsArrayCriticalSection;
 };
 
 class IPointer
@@ -314,3 +313,74 @@ public:
 
 #define DEFINE_SHARED_PTR(x) typedef boost::shared_ptr<x> x##SPtr
 #define DEFINE_WEAK_PTR(x) typedef boost::weak_ptr<x> x##SPtr
+
+static wxString DoubleToString(double Val, bool IsLon)
+{
+	wxString znak;
+	if(Val < 0)
+	{
+		if(IsLon) znak = _(" W");
+		else znak = _(" S");
+	}
+	else
+	{
+		if(IsLon) znak = _(" E");
+		else znak = _(" N");
+	}
+	Val = fabs(Val);
+	int grad = floor(Val);
+	int min = floor((Val - grad) * 60);
+	int sec = floor((Val - grad - (double) min / 60) * 3600);
+	wxString str;
+	if(IsLon)
+		str.Printf(wxT("%.3d-%.2d-%.2d%s"), grad, min, sec, znak.c_str());
+	else
+		str.Printf(wxT("%.2d-%.2d-%.2d%s"), grad, min, sec, znak.c_str());
+	return str;
+};
+
+static double StringToDouble(wxString Val, wxString asterisk)
+{
+	wxString buff;
+	unsigned char counter = 0;
+	int grad, min, sec;
+	for(size_t i = 0; i < Val.Len(); i++)
+	{
+		wxChar ch = Val[i];
+		if(ch == '-' || ch == ' ')
+		{
+			switch(counter)
+			{
+				case 0:
+				grad = wxAtoi(buff.c_str());
+				break;
+				case 1:
+				min = wxAtoi(buff.c_str());
+				break;
+				case 2:
+				sec = wxAtoi(buff.c_str());
+				break;
+			}
+		}
+	}
+	int mul = -1;
+	if(buff == _(" E") || buff == _(" N"))
+		mul = 1;
+	return ((double) grad + (double)min / 60 + (double)sec / 3600) * mul;
+};
+
+static wxString NumberScale(double fScaleRatio)
+{
+	wxString str = wxString::Format(wxT("%.2f"), fScaleRatio);
+	int pos = str.Find(wxT("."));
+	if(pos == wxNOT_FOUND)
+		pos = str.Len();
+	wxString res = str.Right(str.Len() - pos);
+	for(size_t i = 1; i < pos + 1; i++)
+	{
+		res.Prepend(str[pos - i]);
+		if((i % 3) == 0)
+			res.Prepend(wxT(" "));
+	}
+	return res;
+};

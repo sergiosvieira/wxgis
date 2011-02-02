@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxFolderFactory class. Create new GxFolder objects
+ * Purpose:  wxGxArchiveFactory class. Create new GxFolder objects
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,41 +18,51 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#include "wxgis/catalog/gxfolderfactory.h"
-#include "wxgis/catalog/gxfolder.h"
+#include "wxgis/catalog/gxarchivefactory.h"
+#include "wxgis/catalog/gxarchfolder.h"
 
 #include "wx/filename.h"
 #include "wx/dir.h"
 
-IMPLEMENT_DYNAMIC_CLASS(wxGxFolderFactory, wxObject)
+IMPLEMENT_DYNAMIC_CLASS(wxGxArchiveFactory, wxObject)
 
-wxGxFolderFactory::wxGxFolderFactory(void)
+wxGxArchiveFactory::wxGxArchiveFactory(void)
 {
 }
 
-wxGxFolderFactory::~wxGxFolderFactory(void)
+wxGxArchiveFactory::~wxGxArchiveFactory(void)
 {
 }
 
-bool wxGxFolderFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray)
+bool wxGxArchiveFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray)
 {
     for(int i = CSLCount(pFileNames) - 1; i >= 0; i-- )
     {
+        if( EQUALN(pFileNames[i],"/vsi",4) )
+            continue;
+        
         wxString path(pFileNames[i], wxConvUTF8);
-		if(wxFileName::DirExists(path))
-		{
+
+        CPLString szExt = CPLGetExtension(pFileNames[i]);
+        if(EQUAL(szExt, "zip"))
+        {
+            CPLString pArchiveName("/vsizip/");
+            pArchiveName += pFileNames[i];
+
             wxFileName FName(path);
             wxString sName = FName.GetFullName();
-			IGxObject* pGxObj = GetGxObject(pFileNames[i], sName);
-			ObjArray.push_back(pGxObj);
+
+            IGxObject* pGxObj = GetGxObject(pArchiveName, sName);
+            ObjArray.push_back(pGxObj);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-		}
+            continue;
+        }
     }
 	return true;
 }
 
 
-void wxGxFolderFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
+void wxGxArchiveFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
 {
     if(bStore)
     {
@@ -69,8 +79,8 @@ void wxGxFolderFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
     }
 }
 
-IGxObject* wxGxFolderFactory::GetGxObject(CPLString szPath, wxString soName)
+IGxObject* wxGxArchiveFactory::GetGxObject(CPLString szPath, wxString soName)
 {
-	wxGxFolder* pFolder = new wxGxFolder(szPath, soName);
+	wxGxArchive* pFolder = new wxGxArchive(szPath, soName);
 	return static_cast<IGxObject*>(pFolder);
 }

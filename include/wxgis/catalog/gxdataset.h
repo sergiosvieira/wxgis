@@ -37,7 +37,7 @@ public:
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 	virtual wxString GetBaseName(void);
-    virtual wxString GetInternalName(void){return m_sPath;};
+    virtual CPLString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void){return wxString(_("Table"));};
 	virtual void Detach(void);
 	//IGxObjectEdit
@@ -53,7 +53,6 @@ protected:
 	wxString m_sName, m_sPath;
 	wxGISDatasetSPtr m_pwxGISDataset;
 	wxGISEnumTableDatasetType m_type;
-    wxMBConv* m_pPathEncoding;
 };
 
 /** \class wxGxFeatureDataset gxdataset.h
@@ -89,7 +88,6 @@ protected:
     wxFontEncoding m_Encoding;
 	wxGISDatasetSPtr m_pwxGISDataset;
 	wxGISEnumVectorDatasetType m_type;
-    wxMBConv* m_pPathEncoding;
 };
 
 /** \class wxGxRasterDataset gxdataset.h
@@ -107,7 +105,7 @@ public:
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 	virtual wxString GetBaseName(void);
-    virtual wxString GetInternalName(void){return m_sPath;};
+    virtual CPLString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void);
 	virtual void Detach(void);
 	//IGxObjectEdit

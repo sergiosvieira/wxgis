@@ -51,7 +51,7 @@ public:
 	//IGxObject
 	virtual wxString GetName(void){return wxString(_("Waiting..."));};
     virtual wxString GetBaseName(void){return GetName();};
-    virtual wxString GetInternalName(void){return wxEmptyString;};
+    virtual CPLString GetInternalName(void){return CPLString();};
 	virtual wxString GetCategory(void){return wxString(_("Waiting..."));};
 	virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog);
     virtual void Detach(void);

@@ -347,7 +347,7 @@ void wxGxDialogContentView::OnObjectDeleted(IGxObject* object)
         wxGxDiscConnectionUI* pDiscConnection = dynamic_cast<wxGxDiscConnectionUI*>(object);
         if(pDiscConnection)
         {
-            m_pExternalCatalog->DisconnectFolder(object->GetFullName(), false);
+            m_pExternalCatalog->DisconnectFolder(object->GetInternalName());
             return;
         }
         IGxObject* pParent = object->GetParent();
@@ -1041,7 +1041,7 @@ wxString wxGxObjectDialog::GetPath(void)
     return wxEmptyString;
 }
 
-wxString wxGxObjectDialog::GetInternalPath(void)
+CPLString wxGxObjectDialog::GetInternalPath(void)
 {
     IGxObject* pObj = GetLocation();
     if(pObj)

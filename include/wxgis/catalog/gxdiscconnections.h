@@ -41,7 +41,7 @@ public:
 	virtual wxString GetName(void){return wxString(_("Folder connections"));};
     virtual wxString GetBaseName(void){return GetName();};
     virtual wxString GetFullName(void){return wxEmptyString;};
-    virtual wxString GetInternalName(void){return wxEmptyString;};
+    virtual CPLString GetInternalName(void){return CPLString();};
 	virtual wxString GetCategory(void){return wxString(_("Folder connections"));};
 	virtual void Refresh(void);
 	//IGxObjectContainer
@@ -49,17 +49,18 @@ public:
 	virtual bool AreChildrenViewable(void){return true;};
 	virtual bool HasChildren(void){LoadChildren(); return m_Children.size() > 0 ? true : false;};
     //IGxRootObjectProperties
-    virtual void Init(wxXmlNode* pConfigNode);
+    virtual void Init(wxXmlNode* const pConfigNode);
     virtual wxXmlNode* GetProperties(void);
 	//wxGxDiscConnections
 	virtual void LoadChildren(void);
 	virtual void EmptyChildren(void);
     virtual IGxObject* ConnectFolder(wxString sPath);
-    virtual void DisconnectFolder(wxString sPath);
+    virtual void DisconnectFolder(CPLString sPath);
     virtual void StoreConnections(void);
 
     typedef struct _conn_data{
-        wxString sName, sPath;
+        wxString sName;
+        CPLString sPath;
     }CONN_DATA;
 protected:
     std::vector<CONN_DATA> m_aConnections;

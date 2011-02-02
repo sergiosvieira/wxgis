@@ -76,14 +76,14 @@ wxGISDatasetSPtr wxGISPostgresDataSource::GetSubset(size_t nIndex)
 			//check the layer type
 			if(CPLStrnlen(poLayer->GetGeometryColumn(), 100))
 			{
-                wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(poLayer, wxEmptyString, enumTablePostgres);//TODO: Think about it
+                wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(poLayer, "", enumTablePostgres);//TODO: Think about it
 				pTable->SetEncoding(wxFONTENCODING_UTF8);
 				//pTable->Reference();
                 pDataset = boost::static_pointer_cast<wxGISDataset>(pTable);
 			}
 			else
 			{
-   //         wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, wxEmptyString, (wxGISEnumVectorDatasetType)m_nSubType);
+   //         wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, "", (wxGISEnumVectorDatasetType)m_nSubType);
 			}
 	        return pDataset;
         }
@@ -106,11 +106,11 @@ wxGISDatasetSPtr wxGISPostgresDataSource::GetSubset(wxString sTablename)
 			//check the layer type
 			if(CPLStrnlen(poLayer->GetGeometryColumn(), 100))
 			{
-   //         wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, wxEmptyString, (wxGISEnumVectorDatasetType)m_nSubType);
+   //         wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, "", (wxGISEnumVectorDatasetType)m_nSubType);
 			}
 			else
 			{
-                wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(poLayer, wxEmptyString, enumTablePostgres);
+                wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(poLayer, "", enumTablePostgres);
 				pTable->SetEncoding(wxFONTENCODING_UTF8);
 				//pTable->Reference();
                 pDataset = boost::static_pointer_cast<wxGISDataset>(pTable);
@@ -170,10 +170,11 @@ wxGISDatasetSPtr wxGISPostgresDataSource::ExecuteSQL(wxString sStatement, wxGISS
 	wxGISDatasetSPtr pDataset;
     if(m_poDS)
 	{
-		OGRLayer * poLayer = m_poDS->ExecuteSQL(wgWX2MB(sStatement), NULL, wgWX2MB(sDialect));//TODO: implement spatial Filter
+        CPLString szStatement = sStatement.mb_str();
+		OGRLayer * poLayer = m_poDS->ExecuteSQL(szStatement, NULL, wgWX2MB(sDialect));//TODO: implement spatial Filter
 		if(	poLayer )
 		{
-            wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(poLayer, sStatement, enumTableQueryResult);
+            wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(poLayer, szStatement, enumTableQueryResult);
 			pTable->SetEncoding(wxFONTENCODING_UTF8);
 			//pTable->Reference();
 			pTable->SetDataSource(m_poDS);

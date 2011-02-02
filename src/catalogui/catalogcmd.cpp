@@ -3,7 +3,7 @@
  * Purpose:  Catalog Main Commands class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -31,12 +31,13 @@
 
 #include "wxgis/datasource/datasource.h"
 #include "wxgis/datasource/datacontainer.h"
+#include "wxgis/datasource/sysop.h"
 
-#include "wxgis/catalogui/gxobjdialog.h"
+//#include "wxgis/catalogui/gxobjdialog.h"
 #include "wxgis/catalogui/gxfolderui.h"
-#include "wxgis/catalog/gxfilters.h"
-#include "wxgis/catalog/gxfile.h"
-#include "wxgis/carto/mapview.h"
+//#include "wxgis/catalog/gxfilters.h"
+//#include "wxgis/catalog/gxfile.h"
+//#include "wxgis/carto/mapview.h"
 
 #include "../../art/delete.xpm"
 #include "../../art/edit.xpm"
@@ -455,7 +456,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 				wxGxDiscConnection* pDiscConnection = dynamic_cast<wxGxDiscConnection*>(pGxObject);
 				if(pDiscConnection)
 				{
-					wxString sPath = pDiscConnection->GetInternalName();
+					CPLString sPath = pDiscConnection->GetInternalName();
 					pGxApp->GetCatalog()->DisconnectFolder(sPath);
 				}
 			}
@@ -601,8 +602,9 @@ void wxGISCatalogMainCmd::OnClick(void)
                         {
                             //create folder
                             IGxObject* pObj = pSel->GetSelectedObjects(0);
-                            wxString sFolderPath = pObj->GetFullName() + wxFileName::GetPathSeparator() + wxString(_("New folder"));
-                            if(!CreateFolder(sFolderPath))
+                            CPLString sFolderPath = CPLFormFilename(pObj->GetInternalName(), wxString(_("New folder")).mb_str(wxConvUTF8), NULL);
+                            //CPLString sFolderPath = pObj->GetInternalName() + wxFileName::GetPathSeparator().mb_str(wxConvUTF8) + wxString(_("New folder")).mb_str(wxConvUTF8);
+                            if(!CreateDir(sFolderPath))
                             {
                                 wxMessageBox(_("Create folder error!"), _("Error"), wxICON_ERROR | wxOK );
                                 return;

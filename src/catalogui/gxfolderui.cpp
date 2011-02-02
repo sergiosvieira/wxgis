@@ -22,7 +22,7 @@
 #include "wxgis/catalogui/gxcatalogui.h"
 
 
-wxGxFolderUI::wxGxFolderUI(wxString Path, wxString Name, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxFolder(Path, Name)
+wxGxFolderUI::wxGxFolderUI(CPLString Path, wxString Name, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxFolder(Path, Name)
 {
     m_oLargeIcon = LargeIcon;
     m_oSmallIcon = SmallIcon;

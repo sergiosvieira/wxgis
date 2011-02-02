@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  system operations.
+ * Purpose:  wxGxArchiveFactoryUI class. Create new GxFolderUI objects
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,16 +18,30 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#pragma once
+#include "wxgis/catalogui/gxarchivefactoryui.h"
+#include "wxgis/catalogui/gxarchfolderui.h"
 
-#include "wxgis/datasource/datasource.h"
+#include "wx/filename.h"
+#include "wx/dir.h"
 
-bool WXDLLIMPEXP_GIS_DS DeleteDir(CPLString sPath);
-bool WXDLLIMPEXP_GIS_DS CreateDir(CPLString sPath, long mode = 0777); 
-bool WXDLLIMPEXP_GIS_DS DeleteFile(CPLString sPath);
-bool WXDLLIMPEXP_GIS_DS RenameFile(CPLString sOldPath, CPLString sNewPath);
-wxString WXDLLIMPEXP_GIS_DS CheckUniqName(wxString sPath, wxString sName, wxString sExt, int nCounter);
-wxFontEncoding WXDLLIMPEXP_GIS_DS GetEncodingFromCpg(CPLString sPath);
-wxString WXDLLIMPEXP_GIS_DS ClearExt(wxString sPath);
-bool WXDLLIMPEXP_GIS_DS IsFileHidden(CPLString sPath);
+#include "../../art/folder_arch_16.xpm"
+#include "../../art/folder_arch_48.xpm"
 
+
+IMPLEMENT_DYNAMIC_CLASS(wxGxArchiveFactoryUI, wxGxArchiveFactory)
+
+wxGxArchiveFactoryUI::wxGxArchiveFactoryUI(void)
+{
+    m_oLargeAFolderIcon = wxIcon(folder_arch_48_xpm);
+    m_oSmallAFolderIcon = wxIcon(folder_arch_16_xpm);
+}
+
+wxGxArchiveFactoryUI::~wxGxArchiveFactoryUI(void)
+{
+}
+
+IGxObject* wxGxArchiveFactoryUI::GetGxObject(CPLString szPath, wxString soName)
+{
+	wxGxArchiveUI* pFolder = new wxGxArchiveUI(szPath, soName, m_oLargeAFolderIcon, m_oSmallAFolderIcon);
+	return static_cast<IGxObject*>(pFolder);
+}

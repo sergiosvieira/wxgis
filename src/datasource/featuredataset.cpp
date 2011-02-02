@@ -52,70 +52,71 @@ void GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds)
 
 wxGISFeatureDatasetSPtr CreateVectorLayer(wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *poFields, OGRSpatialReference *poSpatialRef, OGRwkbGeometryType eGType, char ** papszDataSourceOptions, char ** papszLayerOptions, wxMBConv* pPathEncoding)
 {
-    CPLErrorReset();
-    poFields->Reference();
-    OGRSFDriver *poDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName( wgWX2MB(sDriver) );
-    if(poDriver == NULL)
-    {
-        wxLogError(_("The driver '%s' is not available"), sDriver.c_str());
+    //TODO: Fix it!
+ //   CPLErrorReset();
+ //   poFields->Reference();
+ //   OGRSFDriver *poDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName( wgWX2MB(sDriver) );
+ //   if(poDriver == NULL)
+ //   {
+ //       wxLogError(_("The driver '%s' is not available"), sDriver.c_str());
         return wxGISFeatureDatasetSPtr();
-    }
+ //   }
 
-    wxGISEnumVectorDatasetType nSubType = enumVecUnknown;
-    if(sDriver == wxString(wxT("KML")))
-        nSubType = enumVecKML;
-    else if(sDriver == wxString(wxT("DXF")))
-        nSubType = enumVecDXF;
-    //else if(sDriver == wxString(wxT("DXF")))
-    //    nSubType = enumVecDXF;
-    else if(sDriver == wxString(wxT("MapInfo File")) && sExt == wxString(wxT("tab")))
-        nSubType = enumVecMapinfoTab;
-    else if(sDriver == wxString(wxT("MapInfo File")) && sExt == wxString(wxT("mif")))
-        nSubType = enumVecMapinfoMif;
-    else if(sDriver == wxString(wxT("ESRI Shapefile")))
-        nSubType = enumVecESRIShapefile;
+ //   wxGISEnumVectorDatasetType nSubType = enumVecUnknown;
+ //   if(sDriver == wxString(wxT("KML")))
+ //       nSubType = enumVecKML;
+ //   else if(sDriver == wxString(wxT("DXF")))
+ //       nSubType = enumVecDXF;
+ //   //else if(sDriver == wxString(wxT("DXF")))
+ //   //    nSubType = enumVecDXF;
+ //   else if(sDriver == wxString(wxT("MapInfo File")) && sExt == wxString(wxT("tab")))
+ //       nSubType = enumVecMapinfoTab;
+ //   else if(sDriver == wxString(wxT("MapInfo File")) && sExt == wxString(wxT("mif")))
+ //       nSubType = enumVecMapinfoMif;
+ //   else if(sDriver == wxString(wxT("ESRI Shapefile")))
+ //       nSubType = enumVecESRIShapefile;
 
-    wxString sFullPath = sPath + wxFileName::GetPathSeparator() + sName + wxT(".") + sExt;
-    OGRDataSource *poDS = poDriver->CreateDataSource( sFullPath.mb_str(), papszDataSourceOptions );
-    if(poDS == NULL)
-    {
-        wxLogError(_("Creation of output file '%s' failed"), sName.c_str());
-        return wxGISFeatureDatasetSPtr();
-    }
+ //   wxString sFullPath = sPath + wxFileName::GetPathSeparator() + sName + wxT(".") + sExt;
+ //   OGRDataSource *poDS = poDriver->CreateDataSource( sFullPath.mb_str(), papszDataSourceOptions );
+ //   if(poDS == NULL)
+ //   {
+ //       wxLogError(_("Creation of output file '%s' failed"), sName.c_str());
+ //       return wxGISFeatureDatasetSPtr();
+ //   }
 
-    sName.Replace(wxT("."), wxT("_"));
-    sName.Replace(wxT(" "), wxT("_"));
-    sName.Truncate(27);
+ //   sName.Replace(wxT("."), wxT("_"));
+ //   sName.Replace(wxT(" "), wxT("_"));
+ //   sName.Truncate(27);
 
-	OGRLayer *poLayerDest = poDS->CreateLayer( sName.mb_str(), poSpatialRef, eGType, papszLayerOptions );
-    if(poLayerDest == NULL)
-    {
-        wxLogError(_("Creation of output layer '%s' failed"), sName.c_str());
-        return wxGISFeatureDatasetSPtr();
-    }
+	//OGRLayer *poLayerDest = poDS->CreateLayer( sName.mb_str(), poSpatialRef, eGType, papszLayerOptions );
+ //   if(poLayerDest == NULL)
+ //   {
+ //       wxLogError(_("Creation of output layer '%s' failed"), sName.c_str());
+ //       return wxGISFeatureDatasetSPtr();
+ //   }
 
-    if(nSubType != enumVecDXF)
-    {
-        for(size_t i = 0; i < poFields->GetFieldCount(); i++)
-        {
-            OGRFieldDefn *pField = poFields->GetFieldDefn(i);
-            if(nSubType == enumVecKML)
-            {
-                wxString sFieldName = wgMB2WX(pField->GetNameRef());
-                pField->SetName(sFieldName.mb_str(wxConvUTF8));
-            }
+ //   if(nSubType != enumVecDXF)
+ //   {
+ //       for(size_t i = 0; i < poFields->GetFieldCount(); i++)
+ //       {
+ //           OGRFieldDefn *pField = poFields->GetFieldDefn(i);
+ //           if(nSubType == enumVecKML)
+ //           {
+ //               wxString sFieldName = wgMB2WX(pField->GetNameRef());
+ //               pField->SetName(sFieldName.mb_str(wxConvUTF8));
+ //           }
 
-	        if( poLayerDest->CreateField( pField ) != OGRERR_NONE )
-	        {
-                wxLogError(_("Creation of output layer '%s' failed"), sName.c_str());
-                return wxGISFeatureDatasetSPtr();
-            }
-        }
-    }
-    poFields->Release();
+	//        if( poLayerDest->CreateField( pField ) != OGRERR_NONE )
+	//        {
+ //               wxLogError(_("Creation of output layer '%s' failed"), sName.c_str());
+ //               return wxGISFeatureDatasetSPtr();
+ //           }
+ //       }
+ //   }
+ //   poFields->Release();
 
-    wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>(poDS, poLayerDest, sFullPath, nSubType);
-    return pDataSet;
+ //   wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>(poDS, poLayerDest, sFullPath, nSubType);
+ //   return pDataSet;
 }
 
 //---------------------------------------
@@ -209,7 +210,7 @@ wxGISDatasetSPtr wxGISFeatureDataset::GetSubset(size_t nIndex)
         if(poLayer)
         {
             m_poDS->Reference();
-            wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>(m_poDS, poLayer, wxEmptyString, (wxGISEnumVectorDatasetType)m_nSubType);
+            wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>(m_poDS, poLayer, "", (wxGISEnumVectorDatasetType)m_nSubType);
             pDataSet->SetEncoding(m_Encoding);
             //pDataSet->Reference();
             return boost::static_pointer_cast<wxGISDataset>(pDataSet);

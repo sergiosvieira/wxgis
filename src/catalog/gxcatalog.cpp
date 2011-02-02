@@ -3,7 +3,7 @@
  * Purpose:  wxGxCatalog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@
 // ----------------------------------------------------------------------------
 
 
-wxGxCatalog::wxGxCatalog(void) : IGxCatalog(), m_bIsChildrenLoaded(false), m_pGxDiscConnections(NULL)
+wxGxCatalog::wxGxCatalog(void) : m_bIsChildrenLoaded(false), m_pGxDiscConnections(NULL)
 {
-	m_pCatalog = NULL;
+	m_pCatalog = this;
 	m_pParent = NULL;
 
     m_bShowHidden = false;
@@ -87,29 +87,6 @@ void wxGxCatalog::Refresh(void)
 		m_pCatalog->ObjectRefreshed(this);
 }
 
-bool wxGxCatalog::AddChild(IGxObject* pChild)
-{
-	if(pChild == NULL)
-		return false;
-	pChild->Attach(this, this);
-	m_Children.push_back(pChild);
-	return true;
-}
-
-bool wxGxCatalog::DeleteChild(IGxObject* pChild)
-{
-	if(pChild == NULL)
-		return false;
-	GxObjectArray::iterator pos = std::find(m_Children.begin(), m_Children.end(), pChild);
-	if(pos != m_Children.end())
-	{
-		pChild->Detach();
-		delete pChild;
-		m_Children.erase(pos);
-	}
-	return true;
-}
-
 void wxGxCatalog::EmptyDisabledChildren(void)
 {
 	for(size_t i = 0; i < m_aRootItems.size(); i++)
@@ -164,7 +141,7 @@ void wxGxCatalog::Init(void)
 	LoadChildren(pRootItemsNode);
 }
 
-void wxGxCatalog::LoadObjectFactories(wxXmlNode* pNode)
+void wxGxCatalog::LoadObjectFactories(wxXmlNode* const pNode)
 {
 	if(pNode == NULL)
 		return;
@@ -201,7 +178,7 @@ void wxGxCatalog::LoadObjectFactories(wxXmlNode* pNode)
 	}
 }
 
-void wxGxCatalog::LoadChildren(wxXmlNode* pNode)
+void wxGxCatalog::LoadChildren(wxXmlNode* const pNode)
 {
 	if(!pNode)
 		return;
@@ -271,12 +248,12 @@ void wxGxCatalog::LoadChildren(wxXmlNode* pNode)
 	m_bIsChildrenLoaded = true;
 }
 
-bool wxGxCatalog::GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray)
+bool wxGxCatalog::GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray)
 {
 	for(size_t i = 0; i < m_ObjectFactoriesArray.size(); i++)
 	{
         if(m_ObjectFactoriesArray[i]->GetEnabled())
-			if(!m_ObjectFactoriesArray[i]->GetChildren(sParentDir, pFileNames, pObjArray))
+			if(!m_ObjectFactoriesArray[i]->GetChildren(sParentDir, pFileNames, ObjArray))
 				return false;
 	}
 	return true;
@@ -294,7 +271,6 @@ void wxGxCatalog::ObjectDeleted(IGxObject* pObject)
 
 void  wxGxCatalog::ObjectAdded(IGxObject* pObject)
 {
-	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
 		IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
@@ -305,7 +281,6 @@ void  wxGxCatalog::ObjectAdded(IGxObject* pObject)
 
 void  wxGxCatalog::ObjectChanged(IGxObject* pObject)
 {
-	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
 		IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
@@ -316,7 +291,6 @@ void  wxGxCatalog::ObjectChanged(IGxObject* pObject)
 
 void  wxGxCatalog::ObjectRefreshed(IGxObject* pObject)
 {
-	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
 		IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
@@ -365,7 +339,7 @@ IGxObject* wxGxCatalog::SearchChild(wxString sPath)
 }
 
 
-void wxGxCatalog::DisconnectFolder(wxString sPath, bool bSelect)
+void wxGxCatalog::DisconnectFolder(CPLString sPath)
 {
     if(m_pGxDiscConnections)
         m_pGxDiscConnections->DisconnectFolder(sPath);
@@ -391,7 +365,7 @@ wxString wxGxCatalog::ConstructFullName(IGxObject* pObject)
 	}
 }
 
-void wxGxCatalog::SerializePlugins(wxXmlNode* pNode, bool bStore)
+void wxGxCatalog::SerializePlugins(wxXmlNode* const pNode, bool bStore)
 {
 	if(bStore)
 	{

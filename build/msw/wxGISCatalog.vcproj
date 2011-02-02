@@ -191,11 +191,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\catalog\gxcatalog.cpp"
+				RelativePath="..\..\src\catalog\gxarchivefactory.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\catalog\gxdataset.cpp"
+				RelativePath="..\..\src\catalog\gxcatalog.cpp"
 				>
 			</File>
 			<File
@@ -207,47 +207,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\catalog\gxfile.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\catalog\gxfilefactory.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\catalog\gxfilters.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\catalog\gxfolder.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\catalog\gxfolderfactory.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\catalog\gxkmldataset.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\catalog\gxmapinfofactory.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\catalog\gxmlfactory.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\catalog\gxrasterfactory.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\catalog\gxshapefactory.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\catalog\gxspatreffolder.cpp"
 				>
 			</File>
 		</Filter>
@@ -265,11 +229,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wxgis\catalog\gxcatalog.h"
+				RelativePath="..\..\include\wxgis\catalog\gxarchivefactory.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wxgis\catalog\gxdataset.h"
+				RelativePath="..\..\include\wxgis\catalog\gxcatalog.h"
 				>
 			</File>
 			<File
@@ -281,47 +245,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wxgis\catalog\gxfile.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\catalog\gxfilefactory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\catalog\gxfilters.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\include\wxgis\catalog\gxfolder.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalog\gxfolderfactory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\catalog\gxkmldataset.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\catalog\gxmapinfofactory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\catalog\gxmlfactory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\catalog\gxrasterfactory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\catalog\gxshapefactory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\catalog\gxspatreffolder.h"
 				>
 			</File>
 		</Filter>

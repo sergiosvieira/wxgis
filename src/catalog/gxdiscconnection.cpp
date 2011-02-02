@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalog/gxdiscconnection.h"
 
-wxGxDiscConnection::wxGxDiscConnection(wxString Path, wxString Name) : wxGxFolder(Path, Name)
+wxGxDiscConnection::wxGxDiscConnection(CPLString Path, wxString Name) : wxGxFolder(Path, Name)
 {
 }
 

@@ -25,8 +25,16 @@
 
 bool DeleteDir(CPLString sPath)
 {
-    int result = VSIRmdir(sPath);
+    int result = CPLUnlinkTree(sPath);
+    //int result = VSIRmdir(sPath);
     if (result == -1)
+        return false;
+    return true;
+}
+
+bool CreateDir(CPLString sPath, long mode )
+{
+    if( VSIMkdir( sPath, mode ) != 0 )
         return false;
     return true;
 }
@@ -220,9 +228,10 @@ wxFontEncoding GetEncodingFromCpg(CPLString sPath)
 bool IsFileHidden(CPLString sPath)
 {
 #ifdef __WXMSW__
-	DWORD dwAttrs = GetFileAttributes(sPath); 
-    if (dwAttrs == INVALID_FILE_ATTRIBUTES)
-		return GetFileAttributes(sPath) & FILE_ATTRIBUTE_HIDDEN;
+    wxString sTestPath(sPath, wxConvUTF8);
+	DWORD dwAttrs = GetFileAttributes(sTestPath); 
+    if (dwAttrs != INVALID_FILE_ATTRIBUTES)
+		return dwAttrs & FILE_ATTRIBUTE_HIDDEN;
 #endif
-	return sPath[0] == '.';
+	return EQUALN(CPLGetFilename(sPath), ".", 1);
 }

@@ -63,19 +63,27 @@ void wxGxFolder::LoadChildren(void)
 {
 	if(m_bIsChildrenLoaded)
 		return;
-	wxDir dir(m_sPath);
-	if(dir.IsOpened())
-	{
-		WXDWORD style = wxDIR_FILES | wxDIR_DIRS;
-        if(m_pCatalog->GetShowHidden())
-			style |= wxDIR_HIDDEN;
+    char **papszItems = CPLReadDir(m_sPath);
+    if(papszItems == NULL)
+        return;
 
-		dir.Traverse(*this, wxEmptyString, style );
-	}
+    char **papszFileList = NULL;
+    //remove unused items
+    for(int i = CSLCount(papszItems) - 1; i >= 0; i-- )
+    {
+        if( EQUAL(papszItems[i],".") || EQUAL(papszItems[i],"..") )
+            continue;
+        CPLString szFileName = CPLFormFilename(m_sPath, papszItems[i], NULL);
+        if(m_pCatalog && !m_pCatalog->GetShowHidden() && IsFileHidden(szFileName))
+            continue;
+        papszFileList = CSLAddString( papszFileList, szFileName );
 
-	//load names
+    }
+    CSLDestroy( papszItems );
+
+    //load names
 	GxObjectArray Array;	
-	if(m_pCatalog->GetChildren(m_sPath, &m_FileNames, &Array))
+	if(m_pCatalog && m_pCatalog->GetChildren(m_sPath, papszFileList, Array))
 	{
 		for(size_t i = 0; i < Array.size(); i++)
 		{
@@ -84,42 +92,14 @@ void wxGxFolder::LoadChildren(void)
 				wxDELETE(Array[i]);
 		}
 	}
+    CSLDestroy( papszFileList );
 	m_bIsChildrenLoaded = true;
 }
 
 bool wxGxFolder::Delete(void)
 {
-	//TODO: Fix it!
-
-/*    LoadChildren();
-    //delete all items that can be deleted
-    while(m_Children.size() > 0)
-    {
-        IGxObjectEdit* pEditObj = dynamic_cast<IGxObjectEdit*>(m_Children[0]);
-        if(pEditObj)
-            if(!pEditObj->Delete())
-                return false;
-    }
-    //delete all files
-	wxDir* pDir = new wxDir(m_sPath);
-	if(pDir->IsOpened())
-	{
-        m_FileNames.Clear();
-	    WXDWORD style = wxDIR_FILES | wxDIR_HIDDEN;
-        pDir->Traverse(*this, wxEmptyString, style );
-        for(size_t i = 0; i < m_FileNames.size(); i++)
-        {
-            if(!DeleteFile(m_FileNames[i]))
-            {
-                const char* err = CPLGetLastErrorMsg();
-                wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_FileNames[i].c_str());
-            }
-        }
-    }
-    wxDELETE(pDir);
-    //delete all dirs
-
-	if(DeleteDir(m_sPath))//recursive del wil be in >= 2.9.0
+    EmptyChildren();
+	if(DeleteDir(m_sPath))
 	{
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer)
@@ -128,25 +108,23 @@ bool wxGxFolder::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
-    }*/
+        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
+    }
 	return false;	
 }
 
 bool wxGxFolder::Rename(wxString NewName)
 {
-	//TODO: Fix it!
-
-/*
-	wxFileName PathName(m_sPath);
+	wxFileName PathName(wxString(m_sPath, wxConvUTF8));
 	PathName.SetName(NewName);
 
-	wxString m_sNewPath = PathName.GetFullPath();
+	wxString sNewPath = PathName.GetFullPath();
 
 	EmptyChildren();
-    if(RenameFile(m_sPath, m_sNewPath))
+    CPLString szNewPath = sNewPath.mb_str(wxConvUTF8);
+    if(RenameFile(m_sPath, szNewPath))
 	{
-		m_sPath = m_sNewPath;
+		m_sPath = szNewPath;
 		m_sName = NewName;
 		m_pCatalog->ObjectChanged(this);
 		Refresh();
@@ -155,9 +133,9 @@ bool wxGxFolder::Rename(wxString NewName)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
-    }	*/
+    }
 	return false;
 }
 
@@ -174,5 +152,5 @@ bool wxGxFolder::DeleteChild(IGxObject* pChild)
 
 bool wxGxFolder::CanCreate(long nDataType, long DataSubtype)
 {
-	return wxIsWritable(wgMB2WX(m_sPath));
+	return wxIsWritable(wxString(m_sPath, wxConvUTF8));
 }
