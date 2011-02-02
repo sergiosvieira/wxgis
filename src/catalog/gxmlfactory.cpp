@@ -48,16 +48,7 @@ bool wxGxMLFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames, 
         FName.ClearExt();
 
         //name conv cp866 if zip
-        wxString name;
-        if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
-        {
-            wxString str(FName.GetName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
-            name = str;
-        }
-        else
-            name = FName.GetName();
-
-
+        wxString name = GetConvName(path, FName);
 		IGxObject* pGxObj = NULL;
 		if(ext == wxString(wxT("kml")))
 		{
@@ -108,7 +99,7 @@ void wxGxMLFactory::Serialize(wxXmlNode* pConfig, bool bStore)
     }
 }
 
-IGxObject* wxGxMLFactory::GetGxDataset(wxString path, wxString name, wxGISEnumVectorDatasetType type)
+IGxObject* wxGxMLFactory::GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type)
 {
     if(type == enumVecKML)
     {

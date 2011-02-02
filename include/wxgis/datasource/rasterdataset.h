@@ -32,7 +32,7 @@ class WXDLLIMPEXP_GIS_DS wxGISRasterDataset :
 	public wxGISDataset
 {
 public:
-	wxGISRasterDataset(wxString sPath, wxGISEnumRasterDatasetType nType);
+	wxGISRasterDataset(CPLString sPath, wxGISEnumRasterDatasetType nType);
 	virtual ~wxGISRasterDataset(void);
     // wxGISDataset
 	virtual OGRSpatialReference* GetSpatialReference(void);

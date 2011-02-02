@@ -34,7 +34,7 @@ public:
 	wxGxMapInfoFactoryUI(void);
 	virtual ~wxGxMapInfoFactoryUI(void);
     //wxGxMapInfoFactory
-    virtual IGxObject* GetGxDataset(wxString path, wxString name, wxGISEnumVectorDatasetType type);
+    virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type);
 protected:
     wxIcon m_LargeTabIcon, m_SmallTabIcon;
     wxIcon m_LargeMifIcon, m_SmallMifIcon;

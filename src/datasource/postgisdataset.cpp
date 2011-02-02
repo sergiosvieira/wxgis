@@ -22,7 +22,7 @@
 #include "wxgis/core/core.h"
 #include "wxgis/datasource/table.h"
 
-wxGISPostgresDataSource::wxGISPostgresDataSource(wxString sName, wxString sCryptPass, wxString sPGPort, wxString sPGAddres, wxString sDBName, wxString sCursor) : wxGISDataset(wxEmptyString), m_poDS(NULL)
+wxGISPostgresDataSource::wxGISPostgresDataSource(wxString sName, wxString sCryptPass, wxString sPGPort, wxString sPGAddres, wxString sDBName, wxString sCursor) : wxGISDataset(""), m_poDS(NULL)
 {
     //m_RefCount = 0;
 	m_bIsOpened = false;
@@ -131,8 +131,9 @@ bool wxGISPostgresDataSource::Open()
 	CPLSetConfigOption("PGCLIENTENCODING", "UTF-8");
 
     //wxT("PG:host='127.0.0.1' dbname='db' port='5432' user='bishop' password='xxx'")
-	m_sPath = wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_sCursor.c_str(), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), m_sName.c_str(), Decode(m_sCryptPass, CONFIG_DIR));
-    m_poDS = OGRSFDriverRegistrar::Open( m_sPath.mb_str(wxConvUTF8), FALSE );
+	wxString Path = wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_sCursor.c_str(), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), m_sName.c_str(), Decode(m_sCryptPass, CONFIG_DIR));
+	m_sPath = CPLString(Path.mb_str(wxConvUTF8));
+    m_poDS = OGRSFDriverRegistrar::Open( m_sPath, FALSE );
     m_sPath.Clear();
 	if( m_poDS == NULL )
 	{

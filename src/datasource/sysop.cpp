@@ -23,25 +23,25 @@
 
 #include "wx/filename.h"
 
-bool DeleteDir(wxString sPath)
+bool DeleteDir(CPLString sPath)
 {
-    int result = VSIRmdir(sPath.mb_str(wxConvUTF8));
+    int result = VSIRmdir(sPath);
     if (result == -1)
         return false;
     return true;
 }
 
-bool DeleteFile(wxString sPath)
+bool DeleteFile(CPLString sPath)
 {
-    int result = VSIUnlink(sPath.mb_str(wxConvUTF8));
+    int result = VSIUnlink(sPath);
     if (result == -1)
         return false;
     return true;
 }
 
-bool RenameFile(wxString sOldPath, wxString sNewPath)
+bool RenameFile(CPLString sOldPath, CPLString sNewPath)
 {
-    int result = VSIRename(sOldPath.mb_str(wxConvUTF8), sNewPath.mb_str(wxConvUTF8));
+    int result = VSIRename(sOldPath, sNewPath);
     if (result == -1)
         return false;
     return true;
@@ -51,13 +51,7 @@ wxString ClearExt(wxString sPath)
 {
     wxStripExtension(sPath);
     return sPath;
-    //wxString sResPath = sPath;
-    //int pos = sPath.Find('.', true);
-    //if(pos != wxNOT_FOUND)
-    //    sResPath = sPath.Left(pos);
-    //return sResPath;
 }
-
 
 wxString CheckUniqName(wxString sPath, wxString sName, wxString sExt, int nCounter)
 {
@@ -69,18 +63,23 @@ wxString CheckUniqName(wxString sPath, wxString sName, wxString sExt, int nCount
         return sResultName;
 }
 
-wxFontEncoding GetEncodingFromCpg(wxString sPath)
+wxFontEncoding GetEncodingFromCpg(CPLString sPath)
 {
-    sPath += wxT(".cpg");
-    char **papszLines = CSLLoad( sPath.mb_str(wxConvUTF8));
+	const char* szCPGPath = CPLResetExtension(sPath, "cpg");
+    char **papszLines = CSLLoad( szCPGPath);
     if(papszLines == NULL)
         return wxFONTENCODING_DEFAULT;
 
     char *pszWKT = CPLStrdup(papszLines[0]);
     if(CPLStrnlen(pszWKT, 10) <= 0)
+	{
+		CSLDestroy( papszLines );
         return wxFONTENCODING_DEFAULT;
+	}
 
     wxString sCP = wgMB2WX(pszWKT);
+	
+	CSLDestroy( papszLines );
     int pos;
     if((pos = sCP.Find('\n')) != wxNOT_FOUND)
         sCP = sCP.Left(pos);
@@ -216,4 +215,14 @@ wxFontEncoding GetEncodingFromCpg(wxString sPath)
     default: return wxFONTENCODING_DEFAULT;
     }
     return wxFONTENCODING_DEFAULT;
+}
+
+bool IsFileHidden(CPLString sPath)
+{
+#ifdef __WXMSW__
+	DWORD dwAttrs = GetFileAttributes(sPath); 
+    if (dwAttrs == INVALID_FILE_ATTRIBUTES)
+		return GetFileAttributes(sPath) & FILE_ATTRIBUTE_HIDDEN;
+#endif
+	return sPath[0] == '.';
 }

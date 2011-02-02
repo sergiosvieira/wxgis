@@ -76,8 +76,10 @@ void wxGxSpatialReferencesFolderUI::LoadChildren(void)
     wxBusyCursor wait;
     //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
     //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
+    wxString sArchPath = m_sPath;
+    CPLString soArchPath(sArchPath.mb_str(wxConvUTF8));//wgWX2MB(sArchPath));
 
-    char **papszFileList = VSIReadDir(m_sPath.mb_str(wxConvUTF8));//(wgWX2MB(m_sPath));
+    char **papszFileList = VSIReadDir(m_sPath.mb_str(wxConvUTF8));
 
     if( CSLCount(papszFileList) == 0 )
     {
@@ -89,14 +91,20 @@ void wxGxSpatialReferencesFolderUI::LoadChildren(void)
        	//wxArrayString FileNames;
         for(int i = 0; papszFileList[i] != NULL; i++ )
 		{
-			wxString sFileName(papszFileList[i], wxConvUTF8);
+            wxString sFileName(papszFileList[i], wxCSConv(wxT("cp-866")));
+			//wxString sFileName = wgMB2WX(papszFileList[i]);
             //if(i > 0)
             //    wxLogDebug( wxT("       %s"), sFileName.c_str() );
             VSIStatBufL BufL;
-			wxString sFolderPath = m_sPath + wxT("/") + sFileName;
-            int ret = VSIStatL(sFolderPath.mb_str(wxConvUTF8)/*(wgWX2MB(sFolderPath)*/, &BufL);//(m_sPath.mb_str(wxConvUTF8));//
+
+			CPLString soArchPathF = soArchPath;
+            soArchPathF += "/";
+            soArchPathF += papszFileList[i];
+
+            int ret = VSIStatL(soArchPathF, &BufL);
             if(ret == 0)
             {
+				wxString sFolderPath(soArchPathF, wxConvLocal);
                 //int x = 0;
                 if(VSI_ISDIR(BufL.st_mode))
                 {
@@ -157,10 +165,9 @@ void wxGxPrjFolderUI::LoadChildren(void)
 		return;
 
     wxBusyCursor wait;
-    //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
-    //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
-
     wxString sArchPath = m_sPath;
+    CPLString soArchPath(sArchPath.mb_str(wxConvUTF8));//wgWX2MB(sArchPath));
+
     char **papszFileList = VSIReadDir(sArchPath.mb_str(wxConvUTF8));//(wgWX2MB(sArchPath));
 
     if( CSLCount(papszFileList) == 0 )
@@ -169,18 +176,20 @@ void wxGxPrjFolderUI::LoadChildren(void)
     }
     else
     {
-        //wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
-       	//wxArrayString FileNames;
         for(int i = 0; papszFileList[i] != NULL; i++ )
 		{
-			wxString sFileName(papszFileList[i], wxConvUTF8);
-            //if(i > 0)
-            //    wxLogDebug( wxT("       %s"), sFileName.c_str() );
-            VSIStatBufL BufL;
-			wxString sFolderPath = sArchPath + wxT("/") + sFileName;
-            int ret = VSIStatL(sFolderPath.mb_str(wxConvUTF8), &BufL);//wgWX2MB(sFolderPath)
+            wxString sFileName(papszFileList[i], wxCSConv(wxT("cp-866")));
+
+			VSIStatBufL BufL;
+
+			CPLString soArchPathF = soArchPath;
+            soArchPathF += "/";
+            soArchPathF += papszFileList[i];
+
+            int ret = VSIStatL(soArchPathF, &BufL);
             if(ret == 0)
             {
+				wxString sFolderPath(soArchPathF, wxConvLocal);
                 //int x = 0;
                 if(VSI_ISDIR(BufL.st_mode))
                 {

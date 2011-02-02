@@ -21,7 +21,7 @@
 #include "wxgis/catalog/gxfolder.h"
 #include "wxgis/datasource/sysop.h"
 
-wxGxFolder::wxGxFolder(wxString Path, wxString Name) : m_bIsChildrenLoaded(false)
+wxGxFolder::wxGxFolder(CPLString Path, wxString Name) : m_bIsChildrenLoaded(false)
 {
 	m_sName = Name;
 	m_sPath = Path;
@@ -89,7 +89,9 @@ void wxGxFolder::LoadChildren(void)
 
 bool wxGxFolder::Delete(void)
 {
-    LoadChildren();
+	//TODO: Fix it!
+
+/*    LoadChildren();
     //delete all items that can be deleted
     while(m_Children.size() > 0)
     {
@@ -127,12 +129,15 @@ bool wxGxFolder::Delete(void)
     {
         const char* err = CPLGetLastErrorMsg();
         wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
-    }
+    }*/
 	return false;	
 }
 
 bool wxGxFolder::Rename(wxString NewName)
 {
+	//TODO: Fix it!
+
+/*
 	wxFileName PathName(m_sPath);
 	PathName.SetName(NewName);
 
@@ -152,19 +157,8 @@ bool wxGxFolder::Rename(wxString NewName)
         const char* err = CPLGetLastErrorMsg();
         wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;
-    }	
-}
-
-wxDirTraverseResult wxGxFolder::OnFile(const wxString& filename)
-{
-	m_FileNames.Add(filename);
-	return wxDIR_CONTINUE;
-}
-
-wxDirTraverseResult wxGxFolder::OnDir(const wxString& dirname)
-{
-	m_FileNames.Add(dirname);
-	return wxDIR_IGNORE;
+    }	*/
+	return false;
 }
 
 bool wxGxFolder::DeleteChild(IGxObject* pChild)
@@ -180,7 +174,5 @@ bool wxGxFolder::DeleteChild(IGxObject* pChild)
 
 bool wxGxFolder::CanCreate(long nDataType, long DataSubtype)
 {
-    if(!wxFileName::IsDirWritable(m_sPath))
-        return false;
-    return true;
+	return wxIsWritable(wgMB2WX(m_sPath));
 }

@@ -46,16 +46,10 @@ bool wxGxFileFactoryUI::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 		if(wxFileName::DirExists(path))
 			continue;
 
-		wxString name, ext;
-		wxFileName::SplitPath(path, NULL, NULL, &name, &ext);
-		ext.MakeLower();
-
-        //name conv cp866 if zip
-        if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
-        {
-            wxString str(name.mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
-            name = str;
-        }
+        wxFileName FName(path);
+        wxString ext = FName.GetExt().MakeLower();
+        FName.ClearExt();
+        wxString name = GetConvName(path, FName);//name conv cp866 if zip
 
 		IGxObject* pGxObj = NULL;
 		if(ext == wxString(wxT("spr")))

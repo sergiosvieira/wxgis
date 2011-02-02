@@ -24,11 +24,10 @@
 
 class WXDLLIMPEXP_GIS_CLT wxGxFolder :
 	public IGxObjectContainer,
-	public IGxObjectEdit,
-	public wxDirTraverser
+	public IGxObjectEdit
 {
 public:
-	wxGxFolder(wxString Path, wxString Name);
+	wxGxFolder(CPLString Path, wxString Name);
 	virtual ~wxGxFolder(void);
 	//IGxObject
 	virtual void Detach(void);
@@ -50,11 +49,9 @@ public:
 	//wxGxFolder
 	virtual void LoadChildren(void);
 	virtual void EmptyChildren(void);
-	//wxDirTraverser
-	virtual wxDirTraverseResult OnFile(const wxString& filename);
-	virtual wxDirTraverseResult OnDir(const wxString& dirname);
 protected:
-	wxString m_sName, m_sPath;
+	wxString m_sName;
+	CPLString m_sPath;
 	wxArrayString m_FileNames;
 	bool m_bIsChildrenLoaded;
 };

@@ -76,7 +76,7 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(wxString sPath, wxString sName, wxStri
         nSubType = enumVecESRIShapefile;
 
     wxString sFullPath = sPath + wxFileName::GetPathSeparator() + sName + wxT(".") + sExt;
-    OGRDataSource *poDS = poDriver->CreateDataSource( sFullPath.mb_str(wxConvUTF8), papszDataSourceOptions );
+    OGRDataSource *poDS = poDriver->CreateDataSource( sFullPath.mb_str(), papszDataSourceOptions );
     if(poDS == NULL)
     {
         wxLogError(_("Creation of output file '%s' failed"), sName.c_str());
@@ -87,7 +87,7 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(wxString sPath, wxString sName, wxStri
     sName.Replace(wxT(" "), wxT("_"));
     sName.Truncate(27);
 
-	OGRLayer *poLayerDest = poDS->CreateLayer( sName.mb_str(wxConvUTF8), poSpatialRef, eGType, papszLayerOptions );
+	OGRLayer *poLayerDest = poDS->CreateLayer( sName.mb_str(), poSpatialRef, eGType, papszLayerOptions );
     if(poLayerDest == NULL)
     {
         wxLogError(_("Creation of output layer '%s' failed"), sName.c_str());
@@ -121,7 +121,7 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(wxString sPath, wxString sName, wxStri
 //---------------------------------------
 // wxGISFeatureDataset
 //---------------------------------------
-wxGISFeatureDataset::wxGISFeatureDataset(OGRDataSource *poDS, OGRLayer* poLayer, wxString sPath, wxGISEnumVectorDatasetType nType) : wxGISDataset(sPath), m_poDS(NULL), m_psExtent(NULL), m_poLayer(NULL), m_bIsGeometryLoaded(false), m_pQuadTree(NULL), m_FieldCount(-1)
+wxGISFeatureDataset::wxGISFeatureDataset(OGRDataSource *poDS, OGRLayer* poLayer, CPLString sPath, wxGISEnumVectorDatasetType nType) : wxGISDataset(sPath), m_poDS(NULL), m_psExtent(NULL), m_poLayer(NULL), m_bIsGeometryLoaded(false), m_pQuadTree(NULL), m_FieldCount(-1)
 {
 	m_bIsOpened = false;
 	m_poDS = poDS;
@@ -146,7 +146,7 @@ wxGISFeatureDataset::wxGISFeatureDataset(OGRDataSource *poDS, OGRLayer* poLayer,
     m_pGeometrySet->Reference();
 }
 
-wxGISFeatureDataset::wxGISFeatureDataset(wxString sPath, wxGISEnumVectorDatasetType nType) : wxGISDataset(sPath), m_poDS(NULL), m_psExtent(NULL), m_poLayer(NULL), m_bIsGeometryLoaded(false), m_pQuadTree(NULL), m_FieldCount(-1)
+wxGISFeatureDataset::wxGISFeatureDataset(CPLString sPath, wxGISEnumVectorDatasetType nType) : wxGISDataset(sPath), m_poDS(NULL), m_psExtent(NULL), m_poLayer(NULL), m_bIsGeometryLoaded(false), m_pQuadTree(NULL), m_FieldCount(-1)
 {
 	m_bIsOpened = false;
     m_pGeometrySet = new wxGISGeometrySet(true);
@@ -237,76 +237,52 @@ OGRLayer* wxGISFeatureDataset::GetLayerRef(int iLayer)
 
 bool wxGISFeatureDataset::Delete(int iLayer)
 {
-	wxCriticalSectionLocker locker(m_CritSect);
+	//TODO: Fix it!
+/*	wxCriticalSectionLocker locker(m_CritSect);
     if(m_poDS && m_poDS->Dereference() <= 0)
     {
         OGRDataSource::DestroyDataSource( m_poDS );
         m_poDS = NULL;
     }
-	//if( m_poDS == NULL )
- //      m_poDS = OGRSFDriverRegistrar::Open( (const char*) m_sPath.mb_str(*m_pPathEncoding), TRUE );
-	//if( m_poDS == NULL )
- //   {
- //       //try to delete on file basis
- //       int ret = VSIUnlink((const char*) m_sPath.mb_str(*m_pPathEncoding));
- //       if(ret == 0)
-	//	    return true;
- //       return false;
- //   }
- //   OGRErr err = m_poDS->DeleteLayer(iLayer);
- //   if(err == OGRERR_NONE)
- //       return true;
- //   //try to kill file
- //   if(m_poDS && m_poDS->Dereference() <= 0)
- //   {
- //       OGRDataSource::DestroyDataSource( m_poDS );
- //       m_poDS = NULL;
- //   }
-	//if( m_poDS == NULL )
- //   {
- //       //try to delete on file basis
- //       int ret = VSIUnlink((const char*) m_sPath.mb_str(*m_pPathEncoding));
- //       if(ret == 0)
-	//	    return true;
- //       return false;
- //   }
 
-    wxFileName FName( m_sPath );
-    wxString sExt = FName.GetExt();
-    sExt.Prepend(wxT("."));
-    FName.ClearExt();
-    wxString sPath = FName.GetFullPath();
+	CPLString soExt = CPLGetExtension( m_sPath );
+	CPLString sPath = CPLResetExtension( m_sPath );
+    ////wxFileName FName( m_sPath );
+    ////wxString sExt = FName.GetExt();
+    ////sExt.Prepend(wxT("."));
+    ////FName.ClearExt();
+    ////wxString sPath = FName.GetFullPath();
     switch(m_nSubType)
     {
     case enumVecESRIShapefile:
         if(!DeleteFile(m_sPath))
             return false;
-        DeleteFile(sPath + wxT(".shx"));
-        DeleteFile(sPath + wxT(".dbf"));
-        DeleteFile(sPath + wxT(".prj"));
-        DeleteFile(sPath + wxT(".qix"));
-        DeleteFile(sPath + wxT(".sbn"));
-        DeleteFile(sPath + wxT(".sbx"));
-        DeleteFile(sPath + wxT(".cpg"));
-        DeleteFile(sPath + sExt + wxT(".xml"));
+        DeleteFile(CPLResetExtension(m_sPath, "shx"));
+        DeleteFile(CPLResetExtension(m_sPath, "dbf"));
+        DeleteFile(CPLResetExtension(m_sPath, "prj"));
+        DeleteFile(CPLResetExtension(m_sPath, "qix"));
+        DeleteFile(CPLResetExtension(m_sPath, "sbn"));
+        DeleteFile(CPLResetExtension(m_sPath, "sbx"));
+        DeleteFile(CPLResetExtension(m_sPath, "cpg"));
+        DeleteFile(CPLResetExtension(m_sPath, sExt + ".xml");
         return true;
     case enumVecMapinfoTab:
         if(!DeleteFile(m_sPath))
             return false;
-        DeleteFile(sPath + wxT(".dat"));
-        DeleteFile(sPath + wxT(".id"));
-        DeleteFile(sPath + wxT(".ind"));
-        DeleteFile(sPath + wxT(".map"));
-        DeleteFile(sPath + wxT(".cpg"));
-        DeleteFile(sPath + sExt + wxT(".metadata.xml"));
-        DeleteFile(sPath + sExt + wxT(".xml"));
+        DeleteFile(CPLResetExtension(m_sPath, "dat"));
+        DeleteFile(CPLResetExtension(m_sPath, "id"));
+        DeleteFile(CPLResetExtension(m_sPath, "ind"));
+        DeleteFile(CPLResetExtension(m_sPath, "map"));
+        DeleteFile(CPLResetExtension(m_sPath, "cpg"));
+        DeleteFile(CPLResetExtension(m_sPath, sExt + ".metadata.xml"));
+        DeleteFile(CPLResetExtension(m_sPath, sExt + ".xml"));
         return true;
     case enumVecMapinfoMif:
         if(!DeleteFile(m_sPath))
             return false;
-        DeleteFile(sPath + wxT(".mid"));
-        DeleteFile(sPath + sExt + wxT(".metadata.xml"));
-        DeleteFile(sPath + sExt + wxT(".xml"));
+        DeleteFile(CPLResetExtension(m_sPath, "mid"));
+        DeleteFile(CPLResetExtension(m_sPath, sExt + ".metadata.xml"));
+        DeleteFile(CPLResetExtension(m_sPath, sExt + ".xml"));
         return true;
     case enumVecKML:
         if(enumGISContainer)
@@ -324,18 +300,20 @@ bool wxGISFeatureDataset::Delete(int iLayer)
     case enumVecUnknown:
         if(!DeleteFile(m_sPath))
             return false;
-        DeleteFile(sPath + wxT(".cpg"));
+        DeleteFile(CPLResetExtension(m_sPath, "cpg"));
         return true;
     default: return false;
-    }
+    }*/
 	return false;
 }
 
 bool wxGISFeatureDataset::Rename(wxString sNewName)
 {
-	wxCriticalSectionLocker locker(m_CritSect);
+//TODO: Fix it!
+	/*	wxCriticalSectionLocker locker(m_CritSect);
 	Close();
 	sNewName = ClearExt(sNewName);
+
     wxFileName FName( m_sPath );
     wxString sExt = FName.GetExt();
     sExt.Prepend(wxT("."));
@@ -401,7 +379,7 @@ bool wxGISFeatureDataset::Rename(wxString sNewName)
 		m_sPath = sNewPath + sExt;
         return true;
     default: return false;
-    }
+    }*/
 	return false;
 }
 
@@ -412,12 +390,12 @@ bool wxGISFeatureDataset::Open(int iLayer)
 
 	wxCriticalSectionLocker locker(m_CritSect);
 
-    m_poDS = OGRSFDriverRegistrar::Open( m_sPath.mb_str(wxConvUTF8), FALSE );
+    m_poDS = OGRSFDriverRegistrar::Open( m_sPath, FALSE );
     //bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
 	if( m_poDS == NULL )
 	{
-        m_sPath.Replace(wxT("\\"), wxT("/"));
-        m_poDS = OGRSFDriverRegistrar::Open( m_sPath.mb_str(wxConvUTF8), FALSE );
+		m_sPath.replace( m_sPath.begin(), m_sPath.end(), '\\', '/' );
+        m_poDS = OGRSFDriverRegistrar::Open( m_sPath, FALSE );
     }
 
 	if( m_poDS == NULL )
@@ -428,9 +406,7 @@ bool wxGISFeatureDataset::Open(int iLayer)
 		return false;
 	}
 
-    wxString sPath = ClearExt(m_sPath);
-
-    wxFontEncoding FEnc = GetEncodingFromCpg(sPath);
+    wxFontEncoding FEnc = GetEncodingFromCpg(m_sPath);
     if(FEnc != wxFONTENCODING_DEFAULT)
         m_Encoding = FEnc;
 
@@ -1194,36 +1170,3 @@ OGRErr wxGISFeatureDataset::SetFilter(wxGISQueryFilter* pQFilter)
     }
     return OGRERR_FAILURE;
 }
-
-
-////---------------------------------------
-//// wxGISShapeFeatureDataset
-////---------------------------------------
-//
-//wxGISShapeFeatureDataset::wxGISShapeFeatureDataset(wxString sPath, wxMBConv* pPathEncoding, wxFontEncoding Encoding) : wxGISFeatureDataset(sPath, pPathEncoding, Encoding)
-//{
-//}
-//
-//wxGISShapeFeatureDataset::~wxGISShapeFeatureDataset(void)
-//{
-//}
-//
-//bool wxGISShapeFeatureDataset::Open(int iLayer)
-//{
-//    bool bRes = wxGISFeatureDataset::Open(iLayer);
-//    if(!bRes)
-//        return bRes;
-//    OGRShapeLayer* pShapeLayer = dynamic_cast<OGRShapeLayer*>(m_poLayer);
-//    if(!pShapeLayer)
-//        return false;
-//    m_bHasSpatialIndex = pShapeLayer->CheckForQIX();
-//    return true;
-//}
-//
-//OGRErr wxGISShapeFeatureDataset::CreateSpatialIndex(void)
-//{
-//    OGRShapeLayer* pShapeLayer = dynamic_cast<OGRShapeLayer*>(m_poLayer);
-//    if(!pShapeLayer)
-//        return CE_Failure;
-//    return pShapeLayer->CreateSpatialIndex(0);
-//}

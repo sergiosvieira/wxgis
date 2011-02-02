@@ -77,11 +77,11 @@ void wxGxArchiveUI::LoadChildren(void)
             soArchPathF += "/";
             soArchPathF += papszFileList[i];
 
-			wxString sFolderPath = wgMB2WX(soArchPathF);//sArchPath + wxT("/") + sFileName;
-
             int ret = VSIStatL(soArchPathF, &BufL);
             if(ret == 0)
             {
+				wxString sFolderPath(soArchPathF, wxConvLocal);// = wgMB2WXsArchPath + wxT("/") + sFileName;
+
                 if(VSI_ISDIR(BufL.st_mode))
                 {
 					wxGxArchiveFolderUI* pFolder = new wxGxArchiveFolderUI(sFolderPath, sFileName);
@@ -165,11 +165,12 @@ void wxGxArchiveFolderUI::LoadChildren(void)
             soArchPathF += "/";
             soArchPathF += papszFileList[i];
 
-			wxString sFolderPath = wgMB2WX(soArchPathF);
 
             int ret = VSIStatL(soArchPathF, &BufL);
             if(ret == 0)
             {
+				wxString sFolderPath(soArchPathF, wxConvLocal);
+
                 if(VSI_ISDIR(BufL.st_mode))
                 {
 					wxGxArchiveFolderUI* pFolder = new wxGxArchiveFolderUI(sFolderPath, sFileName);

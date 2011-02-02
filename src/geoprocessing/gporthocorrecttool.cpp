@@ -278,7 +278,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         IGxObject* pGxDemObj = pGxObjectContainer->SearchChild(soDEMPath);
         if(pGxDemObj)
         {
-            soCPLDemPath = CPLString((const char *)pGxDemObj->GetInternalName().mb_str(wxConvUTF8));
+            soCPLDemPath = CPLString((const char *)pGxDemObj->GetInternalName().mb_str());
         }
     }
 
@@ -325,7 +325,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     GDALDestroyGenImgProjTransformer( hTransformArg );
 
     // Create the output file.
-    GDALDataset * poOutputGDALDataset = poDriver->Create( sDstPath.mb_str(wxConvUTF8), nPixels, nLines, poGDALDataset->GetRasterCount(), eDT, NULL );
+    GDALDataset * poOutputGDALDataset = poDriver->Create( sDstPath.mb_str(), nPixels, nLines, poGDALDataset->GetRasterCount(), eDT, NULL );
     if(poOutputGDALDataset == NULL)
     {
         const char* pszErr = CPLGetLastErrorMsg();

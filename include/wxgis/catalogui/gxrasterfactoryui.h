@@ -34,7 +34,7 @@ public:
 	wxGxRasterFactoryUI(void);
 	virtual ~wxGxRasterFactoryUI(void);
     //wxGxRasterFactory
-    virtual IGxObject* GetGxDataset(wxString path, wxString name, wxGISEnumRasterDatasetType type);
+    virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumRasterDatasetType type);
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
 };

@@ -41,7 +41,7 @@ wxGxShapeFactoryUI::~wxGxShapeFactoryUI(void)
 {
 }
 
-IGxObject* wxGxShapeFactoryUI::GetGxDataset(wxString path, wxString name, wxGISEnumDatasetType type)
+IGxObject* wxGxShapeFactoryUI::GetGxDataset(CPLString path, wxString name, wxGISEnumDatasetType type)
 {
     switch(type)
     {

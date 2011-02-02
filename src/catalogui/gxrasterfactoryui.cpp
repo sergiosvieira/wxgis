@@ -37,7 +37,7 @@ wxGxRasterFactoryUI::~wxGxRasterFactoryUI(void)
 {
 }
 
-IGxObject* wxGxRasterFactoryUI::GetGxDataset(wxString path, wxString name, wxGISEnumRasterDatasetType type)
+IGxObject* wxGxRasterFactoryUI::GetGxDataset(CPLString path, wxString name, wxGISEnumRasterDatasetType type)
 {
     wxGxRasterDatasetUI* pDataset = new wxGxRasterDatasetUI(path, name, type, m_LargeIcon, m_SmallIcon);
     return static_cast<IGxObject*>(pDataset);

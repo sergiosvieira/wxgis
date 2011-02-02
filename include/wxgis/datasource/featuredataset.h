@@ -36,8 +36,8 @@ class WXDLLIMPEXP_GIS_DS wxGISFeatureDataset :
 	public wxGISDataset
 {
 public:
-	wxGISFeatureDataset(wxString sPath, wxGISEnumVectorDatasetType nType);
-	wxGISFeatureDataset(OGRDataSource *poDS, OGRLayer* poLayer, wxString sPath, wxGISEnumVectorDatasetType nType);
+	wxGISFeatureDataset(CPLString sPath, wxGISEnumVectorDatasetType nType);
+	wxGISFeatureDataset(OGRDataSource *poDS, OGRLayer* poLayer, CPLString sPath, wxGISEnumVectorDatasetType nType);
 	virtual ~wxGISFeatureDataset(void);
 //wxGISDataset
 	virtual wxGISEnumDatasetType GetType(void){return m_nType;};
@@ -89,35 +89,3 @@ protected:
     wxGISGeometrySet *m_pGeometrySet;
     CPLQuadTree* m_pQuadTree;
 };
-
-
-
-////---------------------------------------
-//// wxGISShapeFeatureDataset
-////---------------------------------------
-//
-//class WXDLLIMPEXP_GIS_CRT wxGISShapeFeatureDataset :
-//	public wxGISFeatureDataset
-//{
-//public:
-//	wxGISShapeFeatureDataset(wxString sPath, wxMBConv* pPathEncoding = wxConvCurrent, wxFontEncoding Encoding = wxFONTENCODING_DEFAULT);
-//	virtual ~wxGISShapeFeatureDataset(void);
-////wxGISFeatureDataset
-//	virtual bool Open(int iLayer = 0);
-//    virtual OGRErr CreateSpatialIndex(void);
-//};
-//
-////---------------------------------------
-//// wxGISFeatureCursor
-////---------------------------------------
-//
-//class WXDLLIMPEXP_GIS_CRT wxGISFeatureCursor :
-//    public IFeatureCursor
-//{
-//public:
-//    wxGISFeatureCursor(wxGISFeatureDataset* pSet){m_pSet = pSet;};
-//    virtual ~wxGISFeatureCursor(void){};
-//    virtual OGRFeature* NextFeature(void){return m_pSet->Next();};
-//protected:
-//    wxGISFeatureDataset* m_pSet;
-//};

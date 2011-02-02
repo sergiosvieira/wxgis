@@ -22,9 +22,10 @@
 
 #include "wxgis/datasource/datasource.h"
 
-bool WXDLLIMPEXP_GIS_DS DeleteFile(wxString sPath);
-bool WXDLLIMPEXP_GIS_DS DeleteDir(wxString sPath);
-bool WXDLLIMPEXP_GIS_DS RenameFile(wxString sOldPath, wxString sNewPath);
+bool WXDLLIMPEXP_GIS_DS DeleteFile(CPLString sPath);
+bool WXDLLIMPEXP_GIS_DS DeleteDir(CPLString sPath);
+bool WXDLLIMPEXP_GIS_DS RenameFile(CPLString sOldPath, CPLString sNewPath);
 wxString WXDLLIMPEXP_GIS_DS CheckUniqName(wxString sPath, wxString sName, wxString sExt, int nCounter);
-wxFontEncoding WXDLLIMPEXP_GIS_DS GetEncodingFromCpg(wxString sPath);
+wxFontEncoding WXDLLIMPEXP_GIS_DS GetEncodingFromCpg(CPLString sPath);
 wxString WXDLLIMPEXP_GIS_DS ClearExt(wxString sPath);
+bool WXDLLIMPEXP_GIS_DS IsFileHidden(CPLString sPath);

@@ -23,7 +23,7 @@
 
 bool CreateFolder(wxString sPath)
 {
-    if( VSIMkdir( sPath.mb_str(wxConvUTF8), 0777 ) != 0 )
+    if( VSIMkdir( sPath.mb_str(), 0777 ) != 0 )
         return false;
     return true;
 }

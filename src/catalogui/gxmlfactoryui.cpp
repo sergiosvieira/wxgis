@@ -42,7 +42,7 @@ wxGxMLFactoryUI::~wxGxMLFactoryUI(void)
 {
 }
 
-IGxObject* wxGxMLFactoryUI::GetGxDataset(wxString path, wxString name, wxGISEnumVectorDatasetType type)
+IGxObject* wxGxMLFactoryUI::GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type)
 {
     switch(type)
     {

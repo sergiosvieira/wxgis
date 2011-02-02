@@ -44,5 +44,5 @@ public:
 		int bHasTab, bHasMap, bHasInd, bHasID, bHasDat, bHasMif, bHasMid;
 	}DATA;
     //wxGxMapInfoFactory
-    virtual IGxObject* GetGxDataset(wxString path, wxString name, wxGISEnumVectorDatasetType type);
+    virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type);
 };
