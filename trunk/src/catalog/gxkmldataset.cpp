@@ -26,17 +26,14 @@
 //class wxGxKMLDataset
 //--------------------------------------------------------------
 
-wxGxKMLDataset::wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type)
+wxGxKMLDataset::wxGxKMLDataset(CPLString Path, wxString Name, wxGISEnumVectorDatasetType Type)
 {
 	m_type = Type;
 
 	m_sName = Name;
 	m_sPath = Path;
 
-	//m_pwxGISDataset = NULL;
-
     m_Encoding = wxFONTENCODING_UTF8;
-    m_pPathEncoding = wxConvCurrent;
 
     m_bIsChildrenLoaded = false;
 
@@ -44,7 +41,6 @@ wxGxKMLDataset::wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorData
 
 wxGxKMLDataset::~wxGxKMLDataset(void)
 {
-    //wsDELETE(m_pwxGISDataset);
 }
 
 void wxGxKMLDataset::SetEncoding(wxFontEncoding Encoding)
@@ -110,7 +106,8 @@ bool wxGxKMLDataset::Delete(void)
 
 bool wxGxKMLDataset::Rename(wxString NewName)
 {
-	NewName = ClearExt(NewName);
+//TODO: Fix it!
+	/*NewName = ClearExt(NewName);
 	wxFileName PathName(m_sPath);
 	PathName.SetName(NewName);
 
@@ -130,7 +127,8 @@ bool wxGxKMLDataset::Rename(wxString NewName)
         const char* err = CPLGetLastErrorMsg();
         wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;
-    }
+    }*/
+	return false;
 }
 
 void wxGxKMLDataset::EmptyChildren(void)

@@ -26,7 +26,7 @@
 class WXDLLIMPEXP_GIS_DS wxGISTable : public wxGISDataset
 {
 public:
-	wxGISTable(OGRLayer* poLayer, wxString sPath, wxGISEnumTableDatasetType nType);
+	wxGISTable(OGRLayer* poLayer, CPLString sPath, wxGISEnumTableDatasetType nType);
 	virtual ~wxGISTable(void);
 	//wxGISDataset
     virtual wxString GetName(void){return m_sTableName;};

@@ -39,5 +39,5 @@ public:
 	virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
     virtual wxString GetName(void){return wxString(_("Markup Languages files"));};
     //wxGxMLFactory
-    virtual IGxObject* GetGxDataset(wxString path, wxString name, wxGISEnumVectorDatasetType type);
+    virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type);
 };

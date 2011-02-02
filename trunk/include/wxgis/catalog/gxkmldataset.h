@@ -31,7 +31,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxKMLDataset :
 	public IGxDataset
 {
 public:
-	wxGxKMLDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type);
+	wxGxKMLDataset(CPLString Path, wxString Name, wxGISEnumVectorDatasetType Type);
 	virtual ~wxGxKMLDataset(void);
     virtual void SetEncoding(wxFontEncoding Encoding);
 	//IGxObject
@@ -39,7 +39,7 @@ public:
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void);
 	virtual wxString GetCategory(void);
-    virtual wxString GetInternalName(void){return m_sPath;};
+    virtual wxString GetInternalName(void){return wgMB2WX(m_sPath);};
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
@@ -48,8 +48,6 @@ public:
 	//IGxDataset
     virtual wxGISDatasetSPtr GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISContainer;};
-    virtual void SetPathEncoding(wxMBConv* pPathEncoding){m_pPathEncoding = pPathEncoding;};
-    virtual wxMBConv* GetPathEncoding(void){return m_pPathEncoding;};
     virtual int GetSubType(void){return (int)m_type;};
 	//IGxObjectContainer
 	virtual bool DeleteChild(IGxObject* pChild);
@@ -59,11 +57,11 @@ public:
 	virtual void LoadChildren(void);
 	virtual void EmptyChildren(void);
 protected:
-	wxString m_sName, m_sPath;
+	wxString m_sName;
+	CPLString m_sPath;
     wxFontEncoding m_Encoding;
 	wxGISDatasetSPtr m_pwxGISDataset;
 	wxGISEnumVectorDatasetType m_type;
-    wxMBConv* m_pPathEncoding;
     bool m_bIsChildrenLoaded;
 };
 

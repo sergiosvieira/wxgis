@@ -48,15 +48,7 @@ bool wxGxShapeFactory::GetChildren(wxString sParentDir, wxArrayString* pFileName
         FName.ClearExt();
 
         //name conv cp866 if zip
-        wxString name;
-        if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
-        {
-            wxString str(FName.GetName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
-            name = str;
-        }
-        else
-            name = FName.GetName();
-
+        wxString name = GetConvName(path, FName);
 
 		if(data_map[name].bHasShp != 1)
 			data_map[name].bHasShp = (ext == wxT("shp")) ? 1 : 0;
@@ -137,7 +129,7 @@ void wxGxShapeFactory::Serialize(wxXmlNode* pConfig, bool bStore)
     }
 }
 
-IGxObject* wxGxShapeFactory::GetGxDataset(wxString path, wxString name, wxGISEnumDatasetType type)
+IGxObject* wxGxShapeFactory::GetGxDataset(CPLString path, wxString name, wxGISEnumDatasetType type)
 {
     switch(type)
     {

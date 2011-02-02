@@ -76,7 +76,8 @@ bool wxGxPrjFile::Delete(void)
 
 bool wxGxPrjFile::Rename(wxString NewName)
 {
-	NewName = ClearExt(NewName);
+//TODO: Fix it!
+/*	NewName = ClearExt(NewName);
 	wxFileName PathName(m_sPath);
 	PathName.SetName(NewName);
 
@@ -94,7 +95,8 @@ bool wxGxPrjFile::Rename(wxString NewName)
         const char* err = CPLGetLastErrorMsg();
         wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;
-    }	
+    }	*/
+	return false;
 }
 
 OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
@@ -192,7 +194,8 @@ bool wxGxTextFile::Delete(void)
 
 bool wxGxTextFile::Rename(wxString NewName)
 {
-	NewName = ClearExt(NewName);
+	//TODO: Fix it!
+/*	NewName = ClearExt(NewName);
 	wxFileName PathName(m_sPath);
 	PathName.SetName(NewName);
 
@@ -211,5 +214,7 @@ bool wxGxTextFile::Rename(wxString NewName)
         wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;
     }	
+*/
+	return false;
 }
 

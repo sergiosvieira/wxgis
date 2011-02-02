@@ -128,7 +128,8 @@ bool wxGxArchive::Delete(void)
 
 bool wxGxArchive::Rename(wxString NewName)
 {
-	NewName = ClearExt(NewName);
+	//TODO: Fix it!
+/*	NewName = ClearExt(NewName);
 	wxFileName PathName(m_sPath);
 	PathName.SetName(NewName);
 
@@ -148,7 +149,8 @@ bool wxGxArchive::Rename(wxString NewName)
         const char* err = CPLGetLastErrorMsg();
         wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
 		return false;
-    }	
+    }*/	
+	return false;
 }
 
 /////////////////////////////////////////////////////////////////////////

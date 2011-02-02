@@ -25,7 +25,7 @@
 //#include "vrt/vrtwarpedoverview.h"
 #include "gdal_rat.h"
 
-wxGISRasterDataset::wxGISRasterDataset(wxString sPath, wxGISEnumRasterDatasetType nType) : wxGISDataset(sPath), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false), m_bHasStats(false), m_poMainDataset(NULL), m_poDataset(NULL), m_nBandCount(0)
+wxGISRasterDataset::wxGISRasterDataset(CPLString sPath, wxGISEnumRasterDatasetType nType) : wxGISDataset(sPath), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false), m_bHasStats(false), m_poMainDataset(NULL), m_poDataset(NULL), m_nBandCount(0)
 {
 	m_bIsOpened = false;
     m_bIsReadOnly = true;
@@ -67,14 +67,15 @@ void wxGISRasterDataset::Close(void)
 
 bool wxGISRasterDataset::Delete(void)
 {
-	wxCriticalSectionLocker locker(m_CritSect);
+	//TODO: Fix it!
+/*	wxCriticalSectionLocker locker(m_CritSect);
     //GDALDriver* pDrv = NULL;
     //close everything
 
 	Close();
 	// else
    // {
-   //    m_poDataset = (GDALDataset *) GDALOpen( (const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/, GA_ReadOnly );
+   //    m_poDataset = (GDALDataset *) GDALOpen( (const char*) m_sPath.mb_str(*m_pPathEncoding), GA_ReadOnly );
    //    if( m_poDataset == NULL )
    //        return false;
    //    pDrv = m_poDataset->GetDriver();
@@ -82,7 +83,7 @@ bool wxGISRasterDataset::Delete(void)
    //}
    // if(pDrv)
    // {
-   //     CPLErr eErr = pDrv->Delete((const char*) m_sPath.mb_str(*m_pPathEncoding)/*wgWX2MB(m_sPath.c_str())*/);
+   //     CPLErr eErr = pDrv->Delete((const char*) m_sPath.mb_str(*m_pPathEncoding));
    //     if(eErr != CE_Fatal)
    //         return true;
    // }
@@ -119,13 +120,14 @@ bool wxGISRasterDataset::Delete(void)
         return true;
     case enumRasterUnknown:
     default: return false;
-    }
+    }*/
 	return false;
 }
 
 bool wxGISRasterDataset::Rename(wxString sNewName)
 {
-	wxCriticalSectionLocker locker(m_CritSect);
+	//TODO: Fix it!
+/*	wxCriticalSectionLocker locker(m_CritSect);
 	Close();
 	sNewName = ClearExt(sNewName);
     wxFileName FName( m_sPath );
@@ -163,7 +165,7 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
         return true;
     case enumRasterUnknown:
     default: return false;
-    }
+    }*/
 	return false;
 }
 
@@ -175,13 +177,15 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
 	wxCriticalSectionLocker locker(m_CritSect);
 
 
-    m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath.mb_str(wxConvUTF8), bReadOnly == true ? GA_ReadOnly : GA_Update );
+    m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath, bReadOnly == true ? GA_ReadOnly : GA_Update );//m_sPath.mb_str(wxConvUTF8)
     //bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
-	if( m_poDataset == NULL )
-    {
-        m_sPath.Replace(wxT("\\"), wxT("/"));
-        m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath.mb_str(wxConvUTF8), bReadOnly == true ? GA_ReadOnly : GA_Update );
-    }
+	
+	//TODO: Fix it!
+	//if( m_poDataset == NULL )
+ //   {
+ //       m_sPath.Replace(wxT("\\"), wxT("/"));
+ //       m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath, bReadOnly == true ? GA_ReadOnly : GA_Update );
+ //   }
 
     //m_poDataset = (GDALDataset *) GDALOpen( wgWX2MB(m_sPath), GA_ReadOnly );
 	if( m_poDataset == NULL )
@@ -334,7 +338,6 @@ const OGREnvelope* wxGISRasterDataset::GetEnvelope(void)
 
 wxString wxGISRasterDataset::GetName(void)
 {
-    wxFileName FName(m_sPath);
-    return FName.GetFullName();
+	return wxString(CPLGetFilename(m_sPath), wxConvLocal);
 }
 

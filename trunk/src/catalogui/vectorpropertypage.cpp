@@ -115,7 +115,7 @@ void wxGISVectorPropertyPage::FillGrid(void)
     wxPGId pid = AppendProperty( new wxPropertyCategory(_("Data Source")) );
     AppendProperty( new wxStringProperty(_("Vector"), wxPG_LABEL, m_pGxDataset->GetName()) );  
 
-    CPLString soPath(m_pDataset->GetPath().mb_str(wxConvUTF8));
+    CPLString soPath(m_pDataset->GetPath());
 
     VSIStatBufL BufL;
     wxULongLong nSize(0);
@@ -127,8 +127,8 @@ void wxGISVectorPropertyPage::FillGrid(void)
     //wxULongLong nSize = wxFileName::GetSize(m_pDataset->GetPath());
 
     //folder
-    wxFileName FName(m_pDataset->GetPath());
-    AppendProperty( new wxStringProperty(_("Folder"), wxPG_LABEL, FName.GetPath()) );  
+	wxString sPath(CPLGetPath(soPath), wxConvLocal);
+    AppendProperty( new wxStringProperty(_("Folder"), wxPG_LABEL, sPath) );  
 
     OGRDataSource *pDataSource = m_pDataset->GetDataSource();
     if(pDataSource)

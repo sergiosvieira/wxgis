@@ -42,9 +42,9 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 			continue;
 
         wxFileName FName(path);
-		wxString ext = FName.GetExt();
-		ext.MakeLower();
-        wxString sPath = sParentDir+ wxFileName::GetPathSeparator() + FName.GetName();//FName.GetFullPath();
+		wxString ext = FName.GetExt().MakeLower();
+        wxString sPath = sParentDir + wxFileName::GetPathSeparator() + FName.GetName();//FName.GetFullPath();
+        wxString name = GetConvName(path, FName);
 		
 		IGxObject* pGxObj = NULL;
 		//prj files
@@ -52,16 +52,6 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 		{
             wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
-
-            //name conv cp866 if zip
-            wxString name;
-            if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
-            {
-                wxString str(FName.GetFullName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
-                name = str;
-            }
-            else
-                name = FName.GetFullName();
 
 			pGxObj = GetGxDataset(path, name, enumRasterBmp);
 			goto REMOVE;
@@ -71,16 +61,6 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
 
-            //name conv cp866 if zip
-            wxString name;
-            if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
-            {
-                wxString str(FName.GetFullName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
-                name = str;
-            }
-            else
-                name = FName.GetFullName();
-
 			pGxObj = GetGxDataset(path, name, enumRasterJpeg);
 			goto REMOVE;
 		}
@@ -88,16 +68,6 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 		{
             wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
-
-            //name conv cp866 if zip
-            wxString name;
-            if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
-            {
-                wxString str(FName.GetFullName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
-                name = str;
-            }
-            else
-                name = FName.GetFullName();
 
 			pGxObj = GetGxDataset(path, name, enumRasterImg);
 			goto REMOVE;
@@ -107,16 +77,6 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
 
-            //name conv cp866 if zip
-            wxString name;
-            if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
-            {
-                wxString str(FName.GetFullName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
-                name = str;
-            }
-            else
-                name = FName.GetFullName();
-
 			pGxObj = GetGxDataset(path, name, enumRasterGif);
 			goto REMOVE;
 		}
@@ -124,16 +84,6 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 		{
             wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
-
-            //name conv cp866 if zip
-            wxString name;
-            if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
-            {
-                wxString str(FName.GetFullName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
-                name = str;
-            }
-            else
-                name = FName.GetFullName();
 
 			pGxObj = GetGxDataset(path, name, enumRasterTiff);
 			goto REMOVE;
@@ -143,16 +93,6 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
             wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
 
-            //name conv cp866 if zip
-            wxString name;
-            if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
-            {
-                wxString str(FName.GetFullName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
-                name = str;
-            }
-            else
-                name = FName.GetFullName();
-
             pGxObj = GetGxDataset(path, name, enumRasterPng);
 			goto REMOVE;
 		}
@@ -160,16 +100,6 @@ bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNam
 		{
             wxString sRemCand = sPath + wxT(".prj");
             remove_candidates.push_back(sRemCand);
-
-            //name conv cp866 if zip
-            wxString name;
-            if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
-            {
-                wxString str(FName.GetFullName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
-                name = str;
-            }
-            else
-                name = FName.GetFullName();
 
 			pGxObj = GetGxDataset(path, name, enumRasterUnknown);
 			goto REMOVE;
@@ -216,7 +146,6 @@ REMOVE:
 	return true;
 }
 
-
 void wxGxRasterFactory::Serialize(wxXmlNode* pConfig, bool bStore)
 {
     if(bStore)
@@ -234,7 +163,7 @@ void wxGxRasterFactory::Serialize(wxXmlNode* pConfig, bool bStore)
     }
 }
 
-IGxObject* wxGxRasterFactory::GetGxDataset(wxString path, wxString name, wxGISEnumRasterDatasetType type)
+IGxObject* wxGxRasterFactory::GetGxDataset(CPLString path, wxString name, wxGISEnumRasterDatasetType type)
 {
     wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, type);
     return static_cast<IGxObject*>(pDataset);

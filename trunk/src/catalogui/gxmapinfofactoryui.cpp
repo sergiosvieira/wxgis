@@ -41,7 +41,7 @@ wxGxMapInfoFactoryUI::~wxGxMapInfoFactoryUI(void)
 {
 }
 
-IGxObject* wxGxMapInfoFactoryUI::GetGxDataset(wxString path, wxString name, wxGISEnumVectorDatasetType type)
+IGxObject* wxGxMapInfoFactoryUI::GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type)
 {
     wxGxFeatureDatasetUI* pDataset = NULL;
     switch(type)

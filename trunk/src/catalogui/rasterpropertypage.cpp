@@ -125,7 +125,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
     wxPGId pid = AppendProperty( new wxPropertyCategory(_("Data Source")) );
     AppendProperty( new wxStringProperty(_("Raster"), wxPG_LABEL, m_pGxDataset->GetName()) );  
 
-    CPLString soPath(m_pDataset->GetPath().mb_str(wxConvUTF8));
+    CPLString soPath(m_pDataset->GetPath());
 
     VSIStatBufL BufL;
     wxULongLong nSize(0);
@@ -137,8 +137,10 @@ void wxGISRasterPropertyPage::FillGrid(void)
     //wxULongLong nSize = wxFileName::GetSize(m_pDataset->GetPath());
 
     //folder
-    wxFileName FName(m_pDataset->GetPath());
-    AppendProperty( new wxStringProperty(_("Folder"), wxPG_LABEL, FName.GetPath()) );  
+	//convert from internal representation UTF8 to wxConvCurrent
+
+	wxString sPath(CPLGetPath(soPath), wxConvLocal);
+    AppendProperty( new wxStringProperty(_("Folder"), wxPG_LABEL, sPath) );  
     //file list
     GDALDataset* poGDALDataset = m_pDataset->GetMainRaster();
     if(!poGDALDataset)
@@ -155,16 +157,14 @@ void wxGISRasterPropertyPage::FillGrid(void)
             wxPGId pfilesid = AppendProperty(pid, new wxPropertyCategory(_("Files")) );  
             for(int i = 1; papszFileList[i] != NULL; i++ )
 		    {
-			    wxString sFileName(papszFileList[i], wxConvUTF8);
-                wxFileName FName(sFileName);
-                //nSize += FName.GetSize();
                 ret = VSIStatL(papszFileList[i], &BufL);
                 if(ret == 0)
                 {
                     nSize += BufL.st_size;
                 }
+			    wxString sFileName(CPLGetFilename(papszFileList[i]), wxConvLocal);
 
-                AppendProperty(pfilesid, new wxStringProperty(_("File"), wxPG_LABEL, FName.GetFullName()) );  
+                AppendProperty(pfilesid, new wxStringProperty(_("File"), wxPG_LABEL, sFileName) );  
 		    }
         }
         CSLDestroy( papszFileList );

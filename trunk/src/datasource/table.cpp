@@ -21,7 +21,7 @@
 
 #include "wxgis/datasource/table.h"
 
-wxGISTable::wxGISTable(OGRLayer* poLayer, wxString sPath, wxGISEnumTableDatasetType nType) : wxGISDataset(sPath), m_pDS(NULL)
+wxGISTable::wxGISTable(OGRLayer* poLayer, CPLString sPath, wxGISEnumTableDatasetType nType) : wxGISDataset(sPath), m_pDS(NULL)
 {
 
 	m_poLayer = poLayer;
@@ -31,23 +31,23 @@ wxGISTable::wxGISTable(OGRLayer* poLayer, wxString sPath, wxGISEnumTableDatasetT
     {
         m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
         m_bHasFID = CPLStrnlen(m_poLayer->GetFIDColumn(), 100) > 0;
-        if(m_bOLCStringsAsUTF8 || m_Encoding == wxFONTENCODING_DEFAULT)
+        //if(m_bOLCStringsAsUTF8 || m_Encoding == wxFONTENCODING_DEFAULT)
             m_sTableName = wgMB2WX(m_poLayer->GetLayerDefn()->GetName());
-        else
-        {
-            wxCSConv conv(m_Encoding);
-            m_sTableName = conv.cMB2WX(m_poLayer->GetLayerDefn()->GetName());
-            if(m_sTableName.IsEmpty())
-                m_sTableName = wgMB2WX(m_poLayer->GetLayerDefn()->GetName());
-        }
+        //else
+        //{
+        //    wxCSConv conv(m_Encoding);
+        //    m_sTableName = conv.cMB2WX(m_poLayer->GetLayerDefn()->GetName());
+        //    if(m_sTableName.IsEmpty())
+        //        m_sTableName = wgMB2WX(m_poLayer->GetLayerDefn()->GetName());
+        //}
 	    m_bIsOpened = true;
     }
+	m_Encoding = wxFONTENCODING_DEFAULT;
     m_nSubType = (int)nType;
 	m_bIsDataLoaded = false;
 	m_FieldCount = -1;
 	m_nSize = -1;
 	m_FeatureStringData.Alloc(10000);
-	m_Encoding = wxFONTENCODING_DEFAULT;
 }
 
 wxGISTable::~wxGISTable(void)

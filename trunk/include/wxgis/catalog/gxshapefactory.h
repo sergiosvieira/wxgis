@@ -39,7 +39,7 @@ public:
 	virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
     virtual wxString GetName(void){return wxString(_("Shapefiles"));};
     //wxGxShapeFactory
-    virtual IGxObject* GetGxDataset(wxString path, wxString name, wxGISEnumDatasetType type);
+    virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumDatasetType type);
 
 	typedef struct _data{
 		wxString path;

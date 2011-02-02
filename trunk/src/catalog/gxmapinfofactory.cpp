@@ -46,16 +46,7 @@ bool wxGxMapInfoFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNa
         wxFileName FName(path);
         wxString ext = FName.GetExt().MakeLower();
         FName.ClearExt();
-        //name conv cp866 if zip
-        wxString name;
-        if(path.Find(wxT("/vsizip/")) != wxNOT_FOUND)
-        {
-            wxString str(FName.GetName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
-            name = str;
-        }
-        else
-            name = FName.GetName();
-
+        wxString name = GetConvName(path, FName);
 
 		if(data_map[name].bHasTab != 1)
 			data_map[name].bHasTab = (ext == wxT("tab")) ? 1 : 0;
@@ -161,7 +152,7 @@ void wxGxMapInfoFactory::Serialize(wxXmlNode* pConfig, bool bStore)
     }
 }
 
-IGxObject* wxGxMapInfoFactory::GetGxDataset(wxString path, wxString name, wxGISEnumVectorDatasetType type)
+IGxObject* wxGxMapInfoFactory::GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type)
 {
 	wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, type);
     return static_cast<IGxObject*>(pDataset);

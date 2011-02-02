@@ -34,7 +34,7 @@ public:
 	wxGxMLFactoryUI(void);
 	virtual ~wxGxMLFactoryUI(void);
 	//wxGxMLFactory
-    virtual IGxObject* GetGxDataset(wxString path, wxString name, wxGISEnumVectorDatasetType type);
+    virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type);
 protected:
     wxIcon m_LargeDXFIcon, m_SmallDXFIcon;
     wxIcon m_LargeKMLIcon, m_SmallKMLIcon;

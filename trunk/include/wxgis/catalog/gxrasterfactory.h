@@ -39,5 +39,5 @@ public:
     virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
     virtual wxString GetName(void){return wxString(_("Raster files"));};
     //wxGxRasterFactory
-    virtual IGxObject* GetGxDataset(wxString path, wxString name, wxGISEnumRasterDatasetType type);
+    virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumRasterDatasetType type);
 };
