@@ -253,6 +253,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\catalogui\gxspatreffolderui.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\catalogui\gxtabview.cpp"
 				>
 			</File>
@@ -348,6 +352,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalogui\gxselection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxspatreffolderui.h"
 				>
 			</File>
 			<File
