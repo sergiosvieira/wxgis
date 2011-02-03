@@ -3,7 +3,7 @@
  * Purpose:  wxGxSpatialReferencesFolder class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,11 +26,26 @@
 #define GEOGCSSTR _("Geographic Coordinate Systems")
 #define PROJCSSTR _("Projected Coordinate Systems")
 
+/** \class wxGxPrjFolder gxspatreffolder.h
+    \brief A projections folder root GxObject.
+*/
+class WXDLLIMPEXP_GIS_CLT wxGxPrjFolder :
+	public wxGxArchiveFolder
+{
+public:
+	wxGxPrjFolder(CPLString Path, wxString Name);
+	virtual ~wxGxPrjFolder(void);
+	//IGxObject
+	virtual wxString GetCategory(void){return wxString(_("Coordinate Systems Folder"));};
+    //wxGxArchiveFolder
+    virtual IGxObject* GetArchiveFolder(CPLString szPath, wxString soName);
+};
+
 /** \class wxGxSpatialReferencesFolder gxspatreffolder.h
     \brief A spatial reference root GxObject.
 */
 class WXDLLIMPEXP_GIS_CLT wxGxSpatialReferencesFolder :
-	public IGxObjectContainer,
+	public wxGxPrjFolder,
     public IGxRootObjectProperties,
     public wxObject
 {
@@ -39,39 +54,14 @@ public:
 	wxGxSpatialReferencesFolder(void);//wxString Path, wxString Name, bool bShowHidden
 	virtual ~wxGxSpatialReferencesFolder(void);
 	//IGxObject
-	virtual void Detach(void);
 	virtual wxString GetName(void){return wxString(_("Coordinate Systems"));};
     virtual wxString GetBaseName(void){return GetName();};
-	virtual wxString GetInternalName(void){return m_sPath;};
+	virtual CPLString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void){return wxString(_("Coordinate Systems Folder"));};
-	virtual void Refresh(void);
-	//IGxObjectContainer
-	virtual bool DeleteChild(IGxObject* pChild);
-	virtual bool AreChildrenViewable(void){return true;};
-	virtual bool HasChildren(void){LoadChildren(); return m_Children.size() > 0 ? true : false;};
     //IGxRootObjectProperties
-    virtual void Init(wxXmlNode* pConfigNode);
+    virtual void Init(wxXmlNode* const pConfigNode);
     virtual wxXmlNode* GetProperties(void);
-	//wxGxSpatialReferencesFolder
-	virtual void LoadChildren(void);
-	virtual void EmptyChildren(void);
 protected:
-	wxString m_sPath;
-	wxArrayString m_FileNames;
-	bool m_bIsChildrenLoaded;
+	wxString m_sInternalPath;
 };
 
-/** \class wxGxPrjFolder gxspatreffolder.h
-    \brief A projections folder root GxObject.
-*/
-class WXDLLIMPEXP_GIS_CLT wxGxPrjFolder :
-	public wxGxArchiveFolder
-{
-public:
-	wxGxPrjFolder(wxString Path, wxString Name);
-	virtual ~wxGxPrjFolder(void);
-	//IGxObject
-	virtual wxString GetCategory(void){return wxString(_("Coordinate Systems Folder"));};
-	//wxGxFolder
-	virtual void LoadChildren(void);
-};

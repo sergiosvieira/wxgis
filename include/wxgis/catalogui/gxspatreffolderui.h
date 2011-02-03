@@ -3,7 +3,7 @@
  * Purpose:  wxGxSpatialReferencesFolderUI classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -41,9 +41,9 @@ public:
 	virtual wxIcon GetSmallImage(void);
 	virtual wxString ContextMenu(void){return wxString(wxT("wxGxSpatialReferencesFolder.ContextMenu"));};
 	virtual wxString NewMenu(void){return wxString(wxT("wxGxSpatialReferencesFolder.NewMenu"));};
-	//wxGxSpatialReferencesFolder
-	virtual void LoadChildren(void);
-	virtual void EmptyChildren(void);
+    //wxGxArchiveFolder
+    virtual IGxObject* GetArchiveFolder(CPLString szPath, wxString soName);
+    virtual void EmptyChildren(void);
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
 };
@@ -55,15 +55,15 @@ class WXDLLIMPEXP_GIS_CLU wxGxPrjFolderUI :
 	public wxGxArchiveFolderUI
 {
 public:
-	wxGxPrjFolderUI(wxString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxPrjFolderUI(CPLString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxPrjFolderUI(void);
 	//IGxObject
 	virtual wxString GetCategory(void){return wxString(_("Coordinate Systems Folder"));};
     //IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	//wxGxFolder
-	virtual void LoadChildren(void);
+    //wxGxArchiveFolder
+    virtual IGxObject* GetArchiveFolder(CPLString szPath, wxString soName);
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
 };

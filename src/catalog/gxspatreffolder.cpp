@@ -3,7 +3,7 @@
  * Purpose:  wxGxSpatialReferencesFolder class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 /////////////////////////////////////////////////////////////////////////
 IMPLEMENT_DYNAMIC_CLASS(wxGxSpatialReferencesFolder, wxObject)
 
-wxGxSpatialReferencesFolder::wxGxSpatialReferencesFolder(void) : m_bIsChildrenLoaded(false)
+wxGxSpatialReferencesFolder::wxGxSpatialReferencesFolder(void) : wxGxPrjFolder(CPLString(), GetName())
 {
 }
 
@@ -35,33 +35,22 @@ wxGxSpatialReferencesFolder::~wxGxSpatialReferencesFolder(void)
 {
 }
 
-void wxGxSpatialReferencesFolder::Detach(void)
+void wxGxSpatialReferencesFolder::Init(wxXmlNode* const pConfigNode)
 {
-	EmptyChildren();
-}
-
-void wxGxSpatialReferencesFolder::Refresh(void)
-{
-	EmptyChildren();
-	LoadChildren();
-    m_pCatalog->ObjectRefreshed(this);
-}
- 
-void wxGxSpatialReferencesFolder::Init(wxXmlNode* pConfigNode)
-{
-    m_sPath = pConfigNode->GetPropVal(wxT("path"), NON);
-    if(m_sPath.IsEmpty() || m_sPath == wxString(NON))
+    m_sInternalPath = pConfigNode->GetPropVal(wxT("path"), NON);
+    if(m_sInternalPath.IsEmpty() || m_sInternalPath == wxString(NON))
     {
-        ///vsizip/c:/wxGIS/sys/cs.zip/cs
+        //example /vsizip/c:/wxGIS/sys/cs.zip/cs
         wxStandardPaths stp;
         wxString sExeDirPath = wxPathOnly(stp.GetExecutablePath());
-        m_sPath = wxT("/vsizip/") + sExeDirPath + wxT("/sys/cs.zip/cs");
-        m_sPath.Replace(wxT("\\"), wxT("/"));
+        m_sInternalPath = wxT("/vsizip/") + sExeDirPath + wxT("/sys/cs.zip/cs");
     }
-    else
-        m_sPath.Replace(wxT("\\"), wxT("/"));
+
+    m_sInternalPath.Replace(wxT("\\"), wxT("/"));
     wxLogMessage(_("wxGxSpatialReferencesFolder: The path is set to '%s'"), m_sPath.c_str());
-    CPLSetConfigOption("wxGxSpatialReferencesFolder", m_sPath.mb_str());
+    CPLSetConfigOption("wxGxSpatialReferencesFolder", m_sInternalPath.mb_str(wxConvUTF8));
+
+    m_sPath = CPLString(m_sInternalPath.mb_str(wxConvUTF8));
 }
 
 wxXmlNode* wxGxSpatialReferencesFolder::GetProperties(void)
@@ -74,95 +63,74 @@ wxXmlNode* wxGxSpatialReferencesFolder::GetProperties(void)
 #ifndef WXGISPORTABLE
     if(pNode->HasProp(wxT("path")))
         pNode->DeleteProperty(wxT("path"));
-    pNode->AddProperty(wxT("path"), m_sPath);
+    pNode->AddProperty(wxT("path"), m_sInternalPath);
 #endif  
     return pNode;
 }
 
-void wxGxSpatialReferencesFolder::EmptyChildren(void)
-{
-	for(size_t i = 0; i < m_Children.size(); i++)
-	{
-		m_Children[i]->Detach();
-		wxDELETE(m_Children[i]);
-	}
-	m_Children.clear();
-	m_bIsChildrenLoaded = false;
-}
-
-bool wxGxSpatialReferencesFolder::DeleteChild(IGxObject* pChild)
-{
-	bool bHasChildren = m_Children.size() > 0 ? true : false;
-	if(!IGxObjectContainer::DeleteChild(pChild))
-		return false;
-	if(bHasChildren != m_Children.size() > 0 ? true : false)
-		m_pCatalog->ObjectChanged(this);
-	return true;
-}
-
-void wxGxSpatialReferencesFolder::LoadChildren(void)
-{
-	if(m_bIsChildrenLoaded)
-		return;	
-
-    //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
-    //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
-
-    char **papszFileList = VSIReadDir(m_sPath.mb_str(wxConvUTF8));
-
-    if( CSLCount(papszFileList) == 0 )
-    {
-        wxLogMessage(wxT( "wxGxSpatialReferencesFolder: no files or directories" ));
-    }
-    else
-    {
-        //wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
-       	//wxArrayString FileNames;
-        for(int i = 0; papszFileList[i] != NULL; i++ )
-		{
-			wxString sFileName(papszFileList[i], wxConvUTF8);
-            //if(i > 0)
-            //    wxLogDebug( wxT("       %s"), sFileName.c_str() );
-            VSIStatBufL BufL;
-			wxString sFolderPath = m_sPath + wxT("/") + sFileName;
-            int ret = VSIStatL(sFolderPath.mb_str(wxConvUTF8), &BufL);
-            if(ret == 0)
-            {
-                //int x = 0;
-                if(VSI_ISDIR(BufL.st_mode))
-                {
-					wxGxPrjFolder* pFolder = new wxGxPrjFolder(sFolderPath, wxGetTranslation(sFileName));
-					IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
-					bool ret_code = AddChild(pGxObj);
-                }
-                else
-                {
-                    m_FileNames.Add(sFolderPath);
-                }
-            }
-		}
-    }
-    CSLDestroy( papszFileList );
-
-	//load names
-	GxObjectArray Array;	
-	if(m_pCatalog->GetChildren(m_sPath, &m_FileNames, &Array))
-	{
-		for(size_t i = 0; i < Array.size(); i++)
-		{
-			bool ret_code = AddChild(Array[i]);
-			if(!ret_code)
-				wxDELETE(Array[i]);
-		}
-	}
-	m_bIsChildrenLoaded = true;
-}
+//void wxGxSpatialReferencesFolder::LoadChildren(void)
+//{
+//	if(m_bIsChildrenLoaded)
+//		return;	
+//
+//    //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
+//    //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
+//
+//    char **papszFileList = VSIReadDir(m_sPath.mb_str(wxConvUTF8));
+//
+//    if( CSLCount(papszFileList) == 0 )
+//    {
+//        wxLogMessage(wxT( "wxGxSpatialReferencesFolder: no files or directories" ));
+//    }
+//    else
+//    {
+//        //wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
+//       	//wxArrayString FileNames;
+//        for(int i = 0; papszFileList[i] != NULL; i++ )
+//		{
+//			wxString sFileName(papszFileList[i], wxConvUTF8);
+//            //if(i > 0)
+//            //    wxLogDebug( wxT("       %s"), sFileName.c_str() );
+//            VSIStatBufL BufL;
+//			wxString sFolderPath = m_sPath + wxT("/") + sFileName;
+//            int ret = VSIStatL(sFolderPath.mb_str(wxConvUTF8), &BufL);
+//            if(ret == 0)
+//            {
+//                //int x = 0;
+//                if(VSI_ISDIR(BufL.st_mode))
+//                {
+//					wxGxPrjFolder* pFolder = new wxGxPrjFolder(sFolderPath, wxGetTranslation(sFileName));
+//					IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
+//					bool ret_code = AddChild(pGxObj);
+//                }
+//                else
+//                {
+//                    m_FileNames.Add(sFolderPath);
+//                }
+//            }
+//		}
+//    }
+//    CSLDestroy( papszFileList );
+//
+//	//load names
+//	GxObjectArray Array;	
+//	if(m_pCatalog->GetChildren(m_sPath, &m_FileNames, &Array))
+//	{
+//		for(size_t i = 0; i < Array.size(); i++)
+//		{
+//			bool ret_code = AddChild(Array[i]);
+//			if(!ret_code)
+//				wxDELETE(Array[i]);
+//		}
+//	}
+//	m_bIsChildrenLoaded = true;
+//}
 
 /////////////////////////////////////////////////////////////////////////
 // wxGxPrjFolder
 /////////////////////////////////////////////////////////////////////////
 
-wxGxPrjFolder::wxGxPrjFolder(wxString Path, wxString Name) : wxGxArchiveFolder(Path, Name)
+wxGxPrjFolder::wxGxPrjFolder(CPLString Path, wxString Name) : wxGxArchiveFolder(Path, Name)
 {
 }
 
@@ -170,61 +138,8 @@ wxGxPrjFolder::~wxGxPrjFolder(void)
 {
 }
 
-void wxGxPrjFolder::LoadChildren(void)
+IGxObject* wxGxPrjFolder::GetArchiveFolder(CPLString szPath, wxString soName)
 {
-	if(m_bIsChildrenLoaded)
-		return;
-
-    //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
-    //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
-
-    wxString sArchPath = m_sPath;
-    char **papszFileList = VSIReadDir(sArchPath.mb_str(wxConvUTF8));
-
-    if( CSLCount(papszFileList) == 0 )
-    {
-        wxLogMessage(wxT( "wxGxPrjFolder: no files or directories" ));
-    }
-    else
-    {
-        //wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
-       	//wxArrayString FileNames;
-        for(int i = 0; papszFileList[i] != NULL; i++ )
-		{
-			wxString sFileName(papszFileList[i], wxConvUTF8);
-            //if(i > 0)
-            //    wxLogDebug( wxT("       %s"), sFileName.c_str() );
-            VSIStatBufL BufL;
-			wxString sFolderPath = sArchPath + wxT("/") + sFileName;
-            int ret = VSIStatL(sFolderPath.mb_str(wxConvUTF8), &BufL);
-            if(ret == 0)
-            {
-                //int x = 0;
-                if(VSI_ISDIR(BufL.st_mode))
-                {
-					wxGxPrjFolder* pFolder = new wxGxPrjFolder(sFolderPath, sFileName);
-					IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
-					bool ret_code = AddChild(pGxObj);
-                }
-                else
-                {
-                    m_FileNames.Add(sFolderPath);
-                }
-            }
-		}
-    }
-    CSLDestroy( papszFileList );
-
-	//load names
-	GxObjectArray Array;	
-	if(m_pCatalog->GetChildren(sArchPath, &m_FileNames, &Array))
-	{
-		for(size_t i = 0; i < Array.size(); i++)
-		{
-			bool ret_code = AddChild(Array[i]);
-			if(!ret_code)
-				wxDELETE(Array[i]);
-		}
-	}
-	m_bIsChildrenLoaded = true;
+	wxGxPrjFolder* pFolder = new wxGxPrjFolder(szPath, soName);
+	return static_cast<IGxObject*>(pFolder);
 }

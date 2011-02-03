@@ -136,7 +136,10 @@ void wxGxArchiveFolder::LoadChildren(void)
     {
         if( EQUAL(papszItems[i],".") || EQUAL(papszItems[i],"..") )
             continue;
-        CPLString szFileName = CPLFormFilename(m_sPath, papszItems[i], NULL);
+        CPLString szFileName = m_sPath;
+        szFileName += "/";
+        szFileName += papszItems[i];
+
         VSIStatBufL BufL;
         int ret = VSIStatL(szFileName, &BufL);
         if(ret == 0)
