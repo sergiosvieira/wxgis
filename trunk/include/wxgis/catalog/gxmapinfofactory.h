@@ -35,14 +35,10 @@ public:
 	wxGxMapInfoFactory(void);
 	virtual ~wxGxMapInfoFactory(void);
 	//IGxObjectFactory
-	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray);
-    virtual void Serialize(wxXmlNode* pConfig, bool bStore);
+	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray);
+    virtual void Serialize(wxXmlNode* const pConfig, bool bStore);
 	virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
     virtual wxString GetName(void){return wxString(_("Mapinfo files"));};
-    typedef struct _data{
-		wxString path;
-		int bHasTab, bHasMap, bHasInd, bHasID, bHasDat, bHasMif, bHasMid;
-	}DATA;
     //wxGxMapInfoFactory
     virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type);
 };

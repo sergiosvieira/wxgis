@@ -26,8 +26,10 @@ BEGIN_EVENT_TABLE( wxGISProgressDlg, wxDialog )
 END_EVENT_TABLE()
 
 
-wxGISProgressDlg::wxGISProgressDlg( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pProgressBar1(NULL), m_pProgressBar2(NULL)
+wxGISProgressDlg::wxGISProgressDlg( ITrackCancel* pTrackCancel, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pProgressBar1(NULL), m_pProgressBar2(NULL)
 {
+    m_pTrackCancel = pTrackCancel;
+
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
 	wxBoxSizer* bSizer1;
@@ -38,6 +40,7 @@ wxGISProgressDlg::wxGISProgressDlg( wxWindow* parent, wxWindowID id, const wxStr
 	bSizer1->Add( m_staticText1, 1, wxALL|wxEXPAND, 5 );
 
     wxGISProgressor* pProgressBar1 = new wxGISProgressor(this, wxID_ANY);
+    pProgressBar1->SetYield(true);
 	bSizer1->Add( pProgressBar1, 1, wxALL|wxEXPAND, 5 );
     m_pProgressBar1 = static_cast<IProgressor*>(pProgressBar1);
 
@@ -49,6 +52,7 @@ wxGISProgressDlg::wxGISProgressDlg( wxWindow* parent, wxWindowID id, const wxStr
 	bSizer1->Add( m_staticText2, 1, wxALL|wxEXPAND, 5 );
 	
     wxGISProgressor* pProgressBar2 = new wxGISProgressor(this, wxID_ANY);
+    pProgressBar2->SetYield(true);
 	bSizer1->Add( pProgressBar2, 1, wxALL|wxEXPAND, 5 );
     m_pProgressBar2 = static_cast<IProgressor*>(pProgressBar2);
 

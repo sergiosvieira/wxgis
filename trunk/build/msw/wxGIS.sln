@@ -57,6 +57,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISConf", "wxGISConf.vcproj", "{BA356BBD-E53B-4303-B947-61B1DCA3841B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISCarto", "wxGISCarto.vcproj", "{E749616F-3D5F-4A58-98F0-456D1BE60A1C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISCartoUI", "wxGISCartoUI.vcproj", "{AB500EE5-7B38-41E2-9121-45743B1A6CC7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISGeoprocess", "wxGISGeoprocess.vcproj", "{4C6FCBB1-C5F0-46FD-AEED-FB7233951682}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISGeoprocessing", "wxGISGeoprocessing.vcproj", "{B0A2AC6B-A7FF-407E-BAD6-B157ABB85E06}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISGeoprocessingUI", "wxGISGeoprocessingUI.vcproj", "{39A6EC6E-FFEE-4934-A6BF-B5303EC1B74C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -99,6 +109,26 @@ Global
 		{BA356BBD-E53B-4303-B947-61B1DCA3841B}.Debug|Win32.Build.0 = Debug|Win32
 		{BA356BBD-E53B-4303-B947-61B1DCA3841B}.Release|Win32.ActiveCfg = Release|Win32
 		{BA356BBD-E53B-4303-B947-61B1DCA3841B}.Release|Win32.Build.0 = Release|Win32
+		{E749616F-3D5F-4A58-98F0-456D1BE60A1C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E749616F-3D5F-4A58-98F0-456D1BE60A1C}.Debug|Win32.Build.0 = Debug|Win32
+		{E749616F-3D5F-4A58-98F0-456D1BE60A1C}.Release|Win32.ActiveCfg = Release|Win32
+		{E749616F-3D5F-4A58-98F0-456D1BE60A1C}.Release|Win32.Build.0 = Release|Win32
+		{AB500EE5-7B38-41E2-9121-45743B1A6CC7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AB500EE5-7B38-41E2-9121-45743B1A6CC7}.Debug|Win32.Build.0 = Debug|Win32
+		{AB500EE5-7B38-41E2-9121-45743B1A6CC7}.Release|Win32.ActiveCfg = Release|Win32
+		{AB500EE5-7B38-41E2-9121-45743B1A6CC7}.Release|Win32.Build.0 = Release|Win32
+		{4C6FCBB1-C5F0-46FD-AEED-FB7233951682}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4C6FCBB1-C5F0-46FD-AEED-FB7233951682}.Debug|Win32.Build.0 = Debug|Win32
+		{4C6FCBB1-C5F0-46FD-AEED-FB7233951682}.Release|Win32.ActiveCfg = Release|Win32
+		{4C6FCBB1-C5F0-46FD-AEED-FB7233951682}.Release|Win32.Build.0 = Release|Win32
+		{B0A2AC6B-A7FF-407E-BAD6-B157ABB85E06}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B0A2AC6B-A7FF-407E-BAD6-B157ABB85E06}.Debug|Win32.Build.0 = Debug|Win32
+		{B0A2AC6B-A7FF-407E-BAD6-B157ABB85E06}.Release|Win32.ActiveCfg = Release|Win32
+		{B0A2AC6B-A7FF-407E-BAD6-B157ABB85E06}.Release|Win32.Build.0 = Release|Win32
+		{39A6EC6E-FFEE-4934-A6BF-B5303EC1B74C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{39A6EC6E-FFEE-4934-A6BF-B5303EC1B74C}.Debug|Win32.Build.0 = Debug|Win32
+		{39A6EC6E-FFEE-4934-A6BF-B5303EC1B74C}.Release|Win32.ActiveCfg = Release|Win32
+		{39A6EC6E-FFEE-4934-A6BF-B5303EC1B74C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

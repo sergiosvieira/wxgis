@@ -31,15 +31,24 @@ class WXDLLIMPEXP_GIS_CLT wxGxFile :
     public IGxObjectEdit
 {
 public:
-	wxGxFile(CSLString Path, wxString Name);
+	wxGxFile(CPLString Path, wxString Name);
 	virtual ~wxGxFile(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void);
     virtual CPLString GetInternalName(void){return m_sPath;};
+	//IGxObjectEdit
+	virtual bool Delete(void);
+	virtual bool CanDelete(void){return true;};
+	virtual bool Rename(wxString NewName);
+	virtual bool CanRename(void){return true;};
+	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel);
+	virtual bool CanCopy(CPLString szDestPath){return true;};
+	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
+	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
 protected:
 	wxString m_sName;
-    CSLString m_sPath;
+    CPLString m_sPath;
 };
 
 /** \class wxGxPrjFile gxfileui.h
@@ -49,15 +58,10 @@ class WXDLLIMPEXP_GIS_CLT wxGxPrjFile :
     public wxGxFile
 {
 public:
-	wxGxPrjFile(wxString Path, wxString Name, wxGISEnumPrjFileType nType);
+	wxGxPrjFile(CPLString Path, wxString Name, wxGISEnumPrjFileType nType);
 	virtual ~wxGxPrjFile(void);
 	//IGxObject
 	virtual wxString GetCategory(void){return wxString(_("Coordinate System"));};
-	//IGxObjectEdit
-	virtual bool Delete(void);
-	virtual bool CanDelete(void){return true;};
-	virtual bool Rename(wxString NewName);
-	virtual bool CanRename(void){return true;};
 	//wxGxPrjFile
 	virtual OGRSpatialReference* GetSpatialReference(void);
 protected:
@@ -72,13 +76,8 @@ class WXDLLIMPEXP_GIS_CLT wxGxTextFile :
     public wxGxFile
 {
 public:
-	wxGxTextFile(wxString Path, wxString Name);
+	wxGxTextFile(CPLString Path, wxString Name);
 	virtual ~wxGxTextFile(void);
 	//IGxObject
 	virtual wxString GetCategory(void){return wxString(_("Text file"));};
-	//IGxObjectEdit
-	virtual bool Delete(void);
-	virtual bool CanDelete(void){return true;};
-	virtual bool Rename(wxString NewName);
-	virtual bool CanRename(void){return true;};
 };

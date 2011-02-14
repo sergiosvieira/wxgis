@@ -3,7 +3,7 @@
  * Purpose:  wxGxFileUI classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@
 //class wxGxFileUI
 //--------------------------------------------------------------
 
-wxGxFileUI::wxGxFileUI(wxString Path, wxString Name) : wxGxFile(Path, Name)
+wxGxFileUI::wxGxFileUI(CPLString Path, wxString Name) : wxGxFile(Path, Name)
 {
 }
 
@@ -47,7 +47,7 @@ wxGxFileUI::~wxGxFileUI(void)
 //class wxGxPrjFileUI
 //--------------------------------------------------------------
 
-wxGxPrjFileUI::wxGxPrjFileUI(wxString Path, wxString Name, wxGISEnumPrjFileType nType, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxPrjFile(Path, Name, nType)
+wxGxPrjFileUI::wxGxPrjFileUI(CPLString Path, wxString Name, wxGISEnumPrjFileType nType, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxPrjFile(Path, Name, nType)
 {
     m_oLargeIcon = LargeIcon;
     m_oSmallIcon = SmallIcon;
@@ -96,7 +96,7 @@ bool wxGxPrjFileUI::Invoke(wxWindow* pParentWnd)
 //class wxGxTextFileUI
 //--------------------------------------------------------------
 
-wxGxTextFileUI::wxGxTextFileUI(wxString Path, wxString Name, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxTextFile(Path, Name)
+wxGxTextFileUI::wxGxTextFileUI(CPLString Path, wxString Name, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxTextFile(Path, Name)
 {
     m_oLargeIcon = LargeIcon;
     m_oSmallIcon = SmallIcon;

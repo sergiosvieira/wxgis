@@ -212,7 +212,7 @@ void wxTreeViewComboPopup::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParen
         }
     }
 	else
-		pos = 0;//m_ImageListSmall.Add(m_ImageListSmall.GetIcon(2));//0 col img, 1 - col img
+		pos = 0;//0 col img, 1 - col img
 
 	wxGxTreeItemData* pData = new wxGxTreeItemData(pGxObject, pos, false);
 
@@ -986,8 +986,6 @@ wxString wxGxObjectDialog::GetNameWithExt(void)
 {
     wxString sName = GetName();
 
-    //if(m_pCatalog->GetShowExt())
-    //{
     IGxObjectFilter* pFilter = GetCurrentFilter();
     if(pFilter)
     {
@@ -996,7 +994,6 @@ wxString wxGxObjectDialog::GetNameWithExt(void)
         if(!sExt.IsEmpty())
             sName += wxT(".") + sExt;
     }
-    //}
     return sName;
 }
 
@@ -1048,7 +1045,7 @@ CPLString wxGxObjectDialog::GetInternalPath(void)
     {
         return pObj->GetInternalName();
     }
-    return wxEmptyString;
+    return CPLString();
 }
 
 IGxObject* wxGxObjectDialog::GetLocation(void)

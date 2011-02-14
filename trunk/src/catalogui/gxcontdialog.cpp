@@ -262,10 +262,6 @@ void wxGxContainerDialog::OnInit()
     }
 
     
- //   long nStyle = wxLC_REPORT | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxBORDER_THEME;
-	//if(!m_bAllowMultiSelect)
-	//	nStyle |= wxLC_SINGLE_SEL;
-
 	for(size_t i = 0; i < m_FilterArray.size(); i++)
 		m_WildcardCombo->AppendString(m_FilterArray[i]->GetName());
 	if(m_FilterArray.size() > 1 && m_bAllFilters)
@@ -389,14 +385,14 @@ wxString wxGxContainerDialog::GetPath(void)
     return wxEmptyString;
 }
 
-wxString wxGxContainerDialog::GetInternalPath(void)
+CPLString wxGxContainerDialog::GetInternalPath(void)
 {
     IGxObject* pObj = GetLocation();
     if(pObj)
     {
         return pObj->GetInternalName();
     }
-    return wxEmptyString;
+    return CPLString();
 }
 
 void wxGxContainerDialog::OnOKUI(wxUpdateUIEvent& event)

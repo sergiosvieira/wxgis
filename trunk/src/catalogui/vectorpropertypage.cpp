@@ -30,17 +30,16 @@ wxGISVectorPropertyPage::wxGISVectorPropertyPage(void)
 {
 }
 
-wxGISVectorPropertyPage::wxGISVectorPropertyPage(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+wxGISVectorPropertyPage::wxGISVectorPropertyPage(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     Create(pGxDataset, parent, id, pos, size, style, name);
 }
 
 wxGISVectorPropertyPage::~wxGISVectorPropertyPage()
 {
-    //wsDELETE(m_pDataset);
 }
 
-bool wxGISVectorPropertyPage::Create(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+bool wxGISVectorPropertyPage::Create(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     wxPanel::Create(parent, id, pos, size, style, name);
 
@@ -113,22 +112,45 @@ void wxGISVectorPropertyPage::FillGrid(void)
     wxString sTmp;
     //fill propertygrid
     wxPGId pid = AppendProperty( new wxPropertyCategory(_("Data Source")) );
-    AppendProperty( new wxStringProperty(_("Vector"), wxPG_LABEL, m_pGxDataset->GetName()) );  
+    AppendProperty( new wxStringProperty(_("Vector"), wxPG_LABEL, m_pDataset->GetName()) );  
 
     CPLString soPath(m_pDataset->GetPath());
 
-    //TODO: Files
-    //VSIStatBufL BufL;
-    //wxULongLong nSize(0);
-    //int ret = VSIStatL(soPath, &BufL);
-    //if(ret == 0)
-    //{
-    //    nSize += BufL.st_size;
-    //}
-
     //folder
-	wxString sPath(CPLGetPath(soPath), wxConvLocal);
+	wxString sPath(CPLGetPath(soPath), wxConvUTF8);
     AppendProperty( new wxStringProperty(_("Folder"), wxPG_LABEL, sPath) );  
+    
+    VSIStatBufL BufL;
+    wxULongLong nSize(0);
+    int ret = VSIStatL(soPath, &BufL);
+    if(ret == 0)
+    {
+        nSize += BufL.st_size;
+    }
+
+    char** papszFileList = m_pDataset->GetFileList();
+    if( !papszFileList || CSLCount(papszFileList) == 0 )
+    {
+        AppendProperty( new wxStringProperty(_("Files"), wxPG_LABEL, _("None associated")) );  
+    }
+    else
+    {
+        wxPGId pfilesid = AppendProperty(pid, new wxPropertyCategory(_("Files")) );  
+        for(int i = 0; papszFileList[i] != NULL; i++ )
+	    {
+            ret = VSIStatL(papszFileList[i], &BufL);
+            if(ret == 0)
+            {
+                nSize += BufL.st_size;
+            }
+		    wxString sFileName = GetConvName(papszFileList[i]);
+            AppendProperty(pfilesid, new wxStringProperty(_("File"), wxPG_LABEL, sFileName) );  
+	    }
+    }
+    CSLDestroy( papszFileList );
+    
+    //size    
+    AppendProperty(pid, new wxStringProperty(_("Total size"), wxPG_LABEL, wxFileName::GetHumanReadableSize(nSize)) );
 
     OGRDataSource *pDataSource = m_pDataset->GetDataSource();
     if(pDataSource)
@@ -146,81 +168,86 @@ void wxGISVectorPropertyPage::FillGrid(void)
         AppendProperty(pdssid, new wxStringProperty(_("Create DataSource"), wxPG_LABEL, pDataSource->TestCapability(ODsCCreateLayer) == TRUE ? _("true") : _("false")) );  
     }
 
-
     if(pDataSource)
     {
         AppendProperty( new wxPropertyCategory(_("Vector Information")) );
-        for( int iLayer = 0; iLayer < pDataSource->GetLayerCount(); iLayer++ )
+        if(m_pGxDataset->GetType() == enumGISContainer)
         {
-            OGRLayer *poLayer = pDataSource->GetLayer(iLayer);
-            //AppendProperty(new wxStringProperty(_("Name"), wxPG_LABEL, wgMB2WX(poLayer->GetName())));  
-            AppendProperty(new wxStringProperty(_("Geometry type"), wxPG_LABEL, wgMB2WX(OGRGeometryTypeToName( m_pDataset->GetGeometryType() ))));  
-            AppendProperty(new wxIntProperty(_("Feature count"), wxPG_LABEL, m_pDataset->GetSize() ));  
-
-        //OGREnvelope oExt;
-        //if (poLayer->GetExtent(&oExt, TRUE) == OGRERR_NONE)
-        //{
-        //    printf("Extent: (%f, %f) - (%f, %f)\n", 
-        //           oExt.MinX, oExt.MinY, oExt.MaxX, oExt.MaxY);
-        //}    
-
-            if( CPLStrnlen(poLayer->GetFIDColumn(), 100) > 0 )
-                AppendProperty(new wxStringProperty(_("FID Column"), wxPG_LABEL, wgMB2WX( poLayer->GetFIDColumn() ))); 
-            if( CPLStrnlen(poLayer->GetGeometryColumn(), 100) > 0 )
-                AppendProperty(new wxStringProperty(_("Geometry Column"), wxPG_LABEL, wgMB2WX( poLayer->GetGeometryColumn() ))); 
-
-            OGRFeatureDefn *poDefn = m_pDataset->GetDefiniton();
-            if(poDefn)
+            for( int iLayer = 0; iLayer < pDataSource->GetLayerCount(); iLayer++ )
             {
-                wxPGId pfieldsid = AppendProperty( new wxPropertyCategory(_("Fields")) );
-                for( int iAttr = 0; iAttr < poDefn->GetFieldCount(); iAttr++ )
-                {
-                    OGRFieldDefn    *poField = poDefn->GetFieldDefn( iAttr );
-                    wxString sFieldTypeName = wgMB2WX( poField->GetFieldTypeName( poField->GetType() ) );
-                    wxPGId pfielid = AppendProperty(pfieldsid, new wxStringProperty(_("Name"), wxPG_LABEL, wxString::Format(wxT("%s (%s)"), wgMB2WX(poField->GetNameRef()), sFieldTypeName.c_str()) ));  
-                    AppendProperty(pfielid, new wxStringProperty(_("Type"), wxPG_LABEL, sFieldTypeName ) );  
-                    AppendProperty(pfielid, new wxIntProperty(_("Width"), wxPG_LABEL, poField->GetWidth()) );  
-                    AppendProperty(pfielid, new wxIntProperty(_("Precision"), wxPG_LABEL, poField->GetPrecision()) ); 
-                    OGRJustification Just = poField->GetJustify();
-                    wxString sJust(_("Undefined"));
-                    switch(Just)
-                    {
-                    case OJLeft:
-                        sJust = wxString(_("Left"));
-                        break;
-                    case OJRight:
-                        sJust = wxString(_("Right"));
-                        break;
-                    }
-                    AppendProperty(pfielid, new wxStringProperty(_("Justify"), wxPG_LABEL, sJust) ); 
-                    m_pg->Collapse(pfielid);
-
-                }
+                OGRLayer *poLayer = pDataSource->GetLayer(iLayer);
+                FillLayerDef(poLayer, iLayer);
             }
-            //TestCapability 
-            wxPGId pcapid = AppendProperty( new wxPropertyCategory(_("Layer Capability")) );
-            AppendProperty(pcapid, new wxStringProperty(_("Random Read"), wxPG_LABEL, poLayer->TestCapability(OLCRandomRead) == TRUE ? _("true") : _("false")) );  
-            AppendProperty(pcapid, new wxStringProperty(_("Sequential Write"), wxPG_LABEL, poLayer->TestCapability(OLCSequentialWrite) == TRUE ? _("true") : _("false")) );  
-            AppendProperty(pcapid, new wxStringProperty(_("Random Write"), wxPG_LABEL, poLayer->TestCapability(OLCRandomWrite) == TRUE ? _("true") : _("false")) );  
-            AppendProperty(pcapid, new wxStringProperty(_("Fast Spatial Filter"), wxPG_LABEL, poLayer->TestCapability(OLCFastSpatialFilter) == TRUE ? _("true") : _("false")) );  
-            AppendProperty(pcapid, new wxStringProperty(_("Fast Feature Count"), wxPG_LABEL, poLayer->TestCapability(OLCFastFeatureCount) == TRUE ? _("true") : _("false")) );  
-            AppendProperty(pcapid, new wxStringProperty(_("Fast Get Extent"), wxPG_LABEL, poLayer->TestCapability(OLCFastGetExtent) == TRUE ? _("true") : _("false")) );  
-            AppendProperty(pcapid, new wxStringProperty(_("Fast Set Next By Index"), wxPG_LABEL, poLayer->TestCapability(OLCFastSetNextByIndex) == TRUE ? _("true") : _("false")) );  
-            AppendProperty(pcapid, new wxStringProperty(_("Create Field"), wxPG_LABEL, poLayer->TestCapability(OLCCreateField) == TRUE ? _("true") : _("false")) );  
-            AppendProperty(pcapid, new wxStringProperty(_("Delete Feature"), wxPG_LABEL, poLayer->TestCapability(OLCDeleteFeature) == TRUE ? _("true") : _("false")) );  
-            AppendProperty(pcapid, new wxStringProperty(_("Strings As UTF8"), wxPG_LABEL, poLayer->TestCapability(OLCStringsAsUTF8) == TRUE ? _("true") : _("false")) );  
-            AppendProperty(pcapid, new wxStringProperty(_("Transactions"), wxPG_LABEL, poLayer->TestCapability(OLCTransactions) == TRUE ? _("true") : _("false")) );  
-            //AppendProperty(pcapid, new wxStringProperty(_("Ignore Fields"), wxPG_LABEL, poLayer->TestCapability(OLCIgnoreFields) == TRUE ? _("true") : _("false")) );  
-       }
+        }
+        else
+        {
+            OGRLayer *poLayer = m_pDataset->GetLayerRef();
+            FillLayerDef(poLayer, 0);
+        }
     }
-
-    AppendProperty( new wxPropertyCategory(_("Extent")));
-    const OGREnvelope* pEnv = m_pDataset->GetEnvelope();
-    AppendProperty( new wxFloatProperty(_("Top"), wxPG_LABEL, pEnv->MaxY));
-    AppendProperty( new wxFloatProperty(_("Left"), wxPG_LABEL, pEnv->MinX));
-    AppendProperty( new wxFloatProperty(_("Right"), wxPG_LABEL, pEnv->MaxX));
-    AppendProperty( new wxFloatProperty(_("Bottom"), wxPG_LABEL, pEnv->MinY));
-
 }
 
+void wxGISVectorPropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer)
+{
+    wxPGId playid = AppendProperty( new wxPropertyCategory(wxString::Format(_("Layer #%d"), iLayer + 1) ));
+    AppendProperty(playid, new wxStringProperty(_("Name"), wxPG_LABEL, wxString(poLayer->GetName(), wxConvUTF8)));  //GetConvName
+    AppendProperty(playid, new wxStringProperty(_("Geometry type"), wxPG_LABEL, wgMB2WX(OGRGeometryTypeToName( m_pDataset->GetGeometryType() ))));  
+    AppendProperty(playid, new wxIntProperty(_("Feature count"), wxPG_LABEL, m_pDataset->GetSize() ));  
 
+    if( CPLStrnlen(poLayer->GetFIDColumn(), 100) > 0 )
+        AppendProperty(playid, new wxStringProperty(_("FID Column"), wxPG_LABEL, wgMB2WX( poLayer->GetFIDColumn() ))); 
+    if( CPLStrnlen(poLayer->GetGeometryColumn(), 100) > 0 )
+        AppendProperty(playid, new wxStringProperty(_("Geometry Column"), wxPG_LABEL, wgMB2WX( poLayer->GetGeometryColumn() ))); 
+
+    OGRFeatureDefn *poDefn = poLayer->GetLayerDefn();
+    if(poDefn)
+    {
+        wxPGId pfieldsid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Fields"), iLayer + 1)) );
+        for( int iAttr = 0; iAttr < poDefn->GetFieldCount(); iAttr++ )
+        {
+            OGRFieldDefn    *poField = poDefn->GetFieldDefn( iAttr );
+            wxString sFieldTypeName = wgMB2WX( poField->GetFieldTypeName( poField->GetType() ) );
+            wxPGId pfielid = AppendProperty(pfieldsid, new wxStringProperty(_("Name"), wxPG_LABEL, wxString::Format(wxT("%s (%s)"), wgMB2WX(poField->GetNameRef()), sFieldTypeName.c_str()) ));  
+            AppendProperty(pfielid, new wxStringProperty(_("Type"), wxPG_LABEL, sFieldTypeName ) );  
+            AppendProperty(pfielid, new wxIntProperty(_("Width"), wxPG_LABEL, poField->GetWidth()) );  
+            AppendProperty(pfielid, new wxIntProperty(_("Precision"), wxPG_LABEL, poField->GetPrecision()) ); 
+            OGRJustification Just = poField->GetJustify();
+            wxString sJust(_("Undefined"));
+            switch(Just)
+            {
+            case OJLeft:
+                sJust = wxString(_("Left"));
+                break;
+            case OJRight:
+                sJust = wxString(_("Right"));
+                break;
+            }
+            AppendProperty(pfielid, new wxStringProperty(_("Justify"), wxPG_LABEL, sJust) ); 
+            m_pg->Collapse(pfielid);
+
+        }
+    }
+    //TestCapability 
+    wxPGId pcapid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Capability"), iLayer + 1)) );
+    AppendProperty(pcapid, new wxStringProperty(_("Random Read"), wxPG_LABEL, poLayer->TestCapability(OLCRandomRead) == TRUE ? _("true") : _("false")) );  
+    AppendProperty(pcapid, new wxStringProperty(_("Sequential Write"), wxPG_LABEL, poLayer->TestCapability(OLCSequentialWrite) == TRUE ? _("true") : _("false")) );  
+    AppendProperty(pcapid, new wxStringProperty(_("Random Write"), wxPG_LABEL, poLayer->TestCapability(OLCRandomWrite) == TRUE ? _("true") : _("false")) );  
+    AppendProperty(pcapid, new wxStringProperty(_("Fast Spatial Filter"), wxPG_LABEL, poLayer->TestCapability(OLCFastSpatialFilter) == TRUE ? _("true") : _("false")) );  
+    AppendProperty(pcapid, new wxStringProperty(_("Fast Feature Count"), wxPG_LABEL, poLayer->TestCapability(OLCFastFeatureCount) == TRUE ? _("true") : _("false")) );  
+    AppendProperty(pcapid, new wxStringProperty(_("Fast Get Extent"), wxPG_LABEL, poLayer->TestCapability(OLCFastGetExtent) == TRUE ? _("true") : _("false")) );  
+    AppendProperty(pcapid, new wxStringProperty(_("Fast Set Next By Index"), wxPG_LABEL, poLayer->TestCapability(OLCFastSetNextByIndex) == TRUE ? _("true") : _("false")) );  
+    AppendProperty(pcapid, new wxStringProperty(_("Create Field"), wxPG_LABEL, poLayer->TestCapability(OLCCreateField) == TRUE ? _("true") : _("false")) );  
+    AppendProperty(pcapid, new wxStringProperty(_("Delete Feature"), wxPG_LABEL, poLayer->TestCapability(OLCDeleteFeature) == TRUE ? _("true") : _("false")) );  
+    AppendProperty(pcapid, new wxStringProperty(_("Strings As UTF8"), wxPG_LABEL, poLayer->TestCapability(OLCStringsAsUTF8) == TRUE ? _("true") : _("false")) );  
+    AppendProperty(pcapid, new wxStringProperty(_("Transactions"), wxPG_LABEL, poLayer->TestCapability(OLCTransactions) == TRUE ? _("true") : _("false")) );  
+    AppendProperty(pcapid, new wxStringProperty(_("Ignore Fields"), wxPG_LABEL, poLayer->TestCapability(OLCIgnoreFields) == TRUE ? _("true") : _("false")) ); 
+    OGREnvelope Extent;
+    if(poLayer->GetExtent(&Extent, true) == OGRERR_NONE)
+    {
+        wxPGId penvid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Extent"), iLayer + 1)));
+        AppendProperty(penvid, new wxFloatProperty(_("Top"), wxPG_LABEL, Extent.MaxY));
+        AppendProperty(penvid, new wxFloatProperty(_("Left"), wxPG_LABEL, Extent.MinX));
+        AppendProperty(penvid, new wxFloatProperty(_("Right"), wxPG_LABEL, Extent.MaxX));
+        AppendProperty(penvid, new wxFloatProperty(_("Bottom"), wxPG_LABEL, Extent.MinY));
+    }
+}

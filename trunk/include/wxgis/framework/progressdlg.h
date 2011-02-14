@@ -55,7 +55,7 @@ protected:
 	wxButton* m_sdbSizer1Cancel;
 
 public:
-	wxGISProgressDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Progress..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 376,185 ), long style = wxDEFAULT_DIALOG_STYLE );
+	wxGISProgressDlg( ITrackCancel* pTrackCancel, wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Progress..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 376,185 ), long style = wxDEFAULT_DIALOG_STYLE );
 	~wxGISProgressDlg();
     virtual void SetText1(wxString sNewText);
     virtual void SetText2(wxString sNewText);

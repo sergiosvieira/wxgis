@@ -63,6 +63,8 @@ void wxGxFolder::LoadChildren(void)
 {
 	if(m_bIsChildrenLoaded)
 		return;
+
+    EmptyChildren();
     char **papszItems = CPLReadDir(m_sPath);
     if(papszItems == NULL)
         return;

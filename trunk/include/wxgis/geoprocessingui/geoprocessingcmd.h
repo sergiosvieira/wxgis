@@ -44,12 +44,11 @@ public:
 	virtual bool OnCreate(IApplication* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
+//protected:
+//    //wxGISGeoprocessingCmd
+//    bool OnExport(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType);
+//    bool OnExport(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel);
 protected:
-    //wxGISGeoprocessingCmd
-    bool OnExport(wxGISFeatureDatasetSPtr pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType);
-    bool OnExport(wxGISFeatureDatasetSPtr pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel);
-    wxString CheckUniqName(wxString sPath, wxString sName, wxString sExt, int nCounter = 0);
-private:
 	IApplication* m_pApp;
     wxString m_sLastError;
     wxWindow* m_pToolboxView;

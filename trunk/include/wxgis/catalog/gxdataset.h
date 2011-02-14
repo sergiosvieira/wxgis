@@ -32,7 +32,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxTableDataset :
 	public IGxDataset
 {
 public:
-	wxGxTableDataset(wxString Path, wxString Name, wxGISEnumTableDatasetType nType);
+	wxGxTableDataset(CPLString Path, wxString Name, wxGISEnumTableDatasetType nType);
 	virtual ~wxGxTableDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
@@ -45,12 +45,17 @@ public:
 	virtual bool CanDelete(void){return true;};
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
+	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel);
+	virtual bool CanCopy(CPLString szDestPath){return true;};
+	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
+	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
 	//IGxDataset
 	virtual wxGISDatasetSPtr GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISTableDataset;};
     virtual int GetSubType(void){return m_type;};
 protected:
-	wxString m_sName, m_sPath;
+	wxString m_sName;
+    CPLString m_sPath;
 	wxGISDatasetSPtr m_pwxGISDataset;
 	wxGISEnumTableDatasetType m_type;
 };
@@ -65,12 +70,12 @@ class WXDLLIMPEXP_GIS_CLT wxGxFeatureDataset :
 	public IGxDataset
 {
 public:
-	wxGxFeatureDataset(wxString Path, wxString Name, wxGISEnumVectorDatasetType nType);
+	wxGxFeatureDataset(CPLString Path, wxString Name, wxGISEnumVectorDatasetType nType);
 	virtual ~wxGxFeatureDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
 	virtual wxString GetBaseName(void);
-    virtual wxString GetInternalName(void){return m_sPath;};
+    virtual CPLString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void);
 	virtual void Detach(void);
 	//IGxObjectUI
@@ -79,12 +84,17 @@ public:
 	virtual bool CanDelete(void){return true;};
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
+	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel);
+	virtual bool CanCopy(CPLString szDestPath){return true;};
+	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
+	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
 	//IGxDataset
 	virtual wxGISDatasetSPtr GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
     virtual int GetSubType(void){return (int)m_type;};
 protected:
-	wxString m_sName, m_sPath;
+	wxString m_sName;
+    CPLString m_sPath;
     wxFontEncoding m_Encoding;
 	wxGISDatasetSPtr m_pwxGISDataset;
 	wxGISEnumVectorDatasetType m_type;
@@ -100,7 +110,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxRasterDataset :
 	public IGxDataset
 {
 public:
-	wxGxRasterDataset(wxString Path, wxString Name, wxGISEnumRasterDatasetType nType);
+	wxGxRasterDataset(CPLString Path, wxString Name, wxGISEnumRasterDatasetType nType);
 	virtual ~wxGxRasterDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
@@ -113,12 +123,17 @@ public:
 	virtual bool CanDelete(void){return true;};
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
+	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel);
+	virtual bool CanCopy(CPLString szDestPath){return true;};
+	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
+	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
 	//IGxDataset
 	virtual wxGISDatasetSPtr GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
     virtual int GetSubType(void){return (int)m_type;};
 protected:
-	wxString m_sName, m_sPath;
+	wxString m_sName;
+    CPLString m_sPath;
     wxGISEnumRasterDatasetType m_type;
 	wxGISDatasetSPtr m_pwxGISDataset;
 };

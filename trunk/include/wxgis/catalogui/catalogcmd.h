@@ -56,4 +56,5 @@ private:
 	wxIcon m_IconFolderUp, m_IconFolderConn, m_IconFolderConnDel, m_IconDel, m_IconGoPrev, m_IconGoNext;
     wxIcon m_IconFolderNew, m_IconEdit, m_IconViewRefresh, m_IconProps;
     wxIcon m_LargeFolderIcon, m_SmallFolderIcon;
+    wxIcon m_CopyIcon, m_CutIcon, m_PasteIcon;
 };

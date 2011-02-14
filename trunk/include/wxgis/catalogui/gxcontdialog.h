@@ -136,15 +136,8 @@ public:
 	virtual void AddShowFilter(IGxObjectFilter* pFilter);
 	virtual void RemoveAllShowFilters(void);
     virtual GxObjectArray* GetSelectedObjects(void){return &m_ObjectArray;}
-//	virtual void SetName(wxString sName);
-//	virtual void SetAllowMultiSelect(bool bAllowMultiSelect);
-//	virtual void SetOverwritePrompt(bool bOverwritePrompt);
-//	virtual int ShowModalOpen();
-//	virtual int ShowModalSave();
-//    virtual wxString GetName(void);
-//    virtual wxString GetFullPath(void);
     virtual wxString GetPath(void);
-    virtual wxString GetInternalPath(void);
+    virtual CPLString GetInternalPath(void);
     virtual IGxObject* GetLocation(void);
     virtual IGxObjectFilter* GetCurrentFilter(void);
 protected:
@@ -154,16 +147,9 @@ protected:
     virtual void OnOKUI(wxUpdateUIEvent& event);
     virtual void OnCreate(wxCommandEvent& event);
     virtual void OnCreateUI(wxUpdateUIEvent& event);
-//    virtual void OnCommand(wxCommandEvent& event);
-//	virtual void OnCommandUI(wxUpdateUIEvent& event);
-//	virtual void OnDropDownCommand(wxCommandEvent& event);
-//	virtual void OnToolDropDown(wxAuiToolBarEvent& event);
-	//virtual void OnItemSelected(wxListEvent& event);
-//    virtual void OnCommand(ICommand* pCmd);
 //wxGxContainerDialog
 	virtual void OnInit();
     virtual void SerializeFramePos(bool bSave);
-//    virtual bool DoSaveObject(wxGISEnumSaveObjectResults Result);
 protected:
   	wxGxCatalogUI* m_pCatalog;
   	IGxCatalog* m_pExternalCatalog;
@@ -178,14 +164,6 @@ protected:
     int m_nRetCode;
     DEFINE_SHARED_PTR(ICommand);
     ICommandSPtr m_pCreateCmd;
-// 	COMMANDARRAY m_CommandArray;
-//    wxGxDialogContentView* m_pwxGxContentView;
-//    wxTreeViewComboPopup* m_PopupCtrl;
-//    IDropDownCommand* m_pDropDownCommand;
-//	wxString m_sName;
-//	bool m_bAllowMultiSelect, m_bOverwritePrompt, m_bAllFilters;
-//    bool m_bIsSaveDlg;
-//   	WINDOWARRAY m_WindowArray;
 
 protected:
 	wxBoxSizer* bMainSizer;
@@ -195,17 +173,8 @@ protected:
 	wxComboBox* m_WildcardCombo;
 	wxButton* m_CancelButton;
 	wxButton* m_CreateButton;
-//	wxStaticText* m_staticText2;
-//	wxComboCtrl* m_TreeCombo;
-//	//wxToolBar* m_toolBar;
-//	wxAuiToolBar* m_toolBar;
-//	//wxListCtrl* m_listCtrl;
-//	wxFlexGridSizer* fgCeilSizer;
-//	wxStaticText* m_staticText4;
-//	wxTextCtrl* m_NameTextCtrl;
 	wxButton* m_OkButton;
-//	wxStaticText* m_staticText6;
-//
+
     DECLARE_EVENT_TABLE()
 };
 

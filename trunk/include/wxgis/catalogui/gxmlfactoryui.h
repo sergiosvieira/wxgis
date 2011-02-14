@@ -3,7 +3,7 @@
  * Purpose:  wxGxMLFactoryUI class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -38,4 +38,7 @@ public:
 protected:
     wxIcon m_LargeDXFIcon, m_SmallDXFIcon;
     wxIcon m_LargeKMLIcon, m_SmallKMLIcon;
+    wxIcon m_LargeKMZIcon, m_SmallKMZIcon;
+    wxIcon m_LargeGMLIcon, m_SmallGMLIcon;
+    wxIcon m_LargeSubKMLIcon, m_SmallSubKMLIcon;
 };

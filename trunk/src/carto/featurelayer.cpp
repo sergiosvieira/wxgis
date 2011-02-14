@@ -70,7 +70,6 @@ wxGISFeatureLayer::~wxGISFeatureLayer(void)
     UnloadGeometry();
 
     wsDELETE(m_pOGRGeometrySet);
-	//wsDELETE(m_pwxGISFeatureDataset);
     wxDELETE(m_pSpatialReference);
 }
 
@@ -207,86 +206,92 @@ void wxGISFeatureLayer::LoadGeometry(void)
     bool bTransform(false);
     OGRPolygon* pRgn1 = NULL;
     OGRPolygon* pRgn2 = NULL;
+    OGRCoordinateTransformation *poCT = NULL;
 
 	OGRSpatialReference* pDatasetSpaRef = m_pwxGISFeatureDataset->GetSpatialReference();
     //get cut poly
-	if(m_pSpatialReference && pDatasetSpaRef)
+    if( pDatasetSpaRef )
     {
-        if(!m_pSpatialReference->IsSame(pDatasetSpaRef))
+	    if(m_pSpatialReference && pDatasetSpaRef)
         {
-            //get envelope
-            wxGISSpatialReferenceValidator GISSpaRefValidator;
-            wxString sProjName;
-            if(m_pSpatialReference->IsProjected())
-                sProjName = wgMB2WX(m_pSpatialReference->GetAttrValue("PROJCS"));
-            else
-                sProjName = wgMB2WX(m_pSpatialReference->GetAttrValue("GEOGCS"));
-            if(GISSpaRefValidator.IsLimitsSet(sProjName))
+            if(!m_pSpatialReference->IsSame(pDatasetSpaRef))
             {
-                LIMITS lims = GISSpaRefValidator.GetLimits(sProjName);
-                if(lims.minx > lims.maxx)
-                {
-                    OGRLinearRing ring1;
-                    ring1.addPoint(lims.minx,lims.miny);
-                    ring1.addPoint(lims.minx,lims.maxy);
-                    ring1.addPoint(180.0,lims.maxy);
-                    ring1.addPoint(180.0,lims.miny);
-                    ring1.closeRings();
-
-                    pRgn1 = new OGRPolygon();
-                    pRgn1->addRing(&ring1);
-                    pRgn1->flattenTo2D();
-
-                    OGRLinearRing ring2;
-                    ring2.addPoint(-180.0,lims.miny);
-                    ring2.addPoint(-180.0,lims.maxy);
-                    ring2.addPoint(lims.maxx,lims.maxy);
-                    ring2.addPoint(lims.maxx,lims.miny);
-                    ring2.closeRings();
-
-                    pRgn2 = new OGRPolygon();
-                    pRgn2->addRing(&ring2);
-                    pRgn2->flattenTo2D();
-                }
+                //get envelope
+                wxGISSpatialReferenceValidator GISSpaRefValidator;
+                wxString sProjName;
+                if(m_pSpatialReference->IsProjected())
+                    sProjName = wgMB2WX(m_pSpatialReference->GetAttrValue("PROJCS"));
                 else
+                    sProjName = wgMB2WX(m_pSpatialReference->GetAttrValue("GEOGCS"));
+                if(GISSpaRefValidator.IsLimitsSet(sProjName))
                 {
-                    OGRLinearRing ring;
-                    ring.addPoint(lims.minx,lims.miny);
-                    ring.addPoint(lims.minx,lims.maxy);
-                    ring.addPoint(lims.maxx,lims.maxy);
-                    ring.addPoint(lims.maxx,lims.miny);
-                    ring.closeRings();
+                    LIMITS lims = GISSpaRefValidator.GetLimits(sProjName);
+                    if(lims.minx > lims.maxx)
+                    {
+                        OGRLinearRing ring1;
+                        ring1.addPoint(lims.minx,lims.miny);
+                        ring1.addPoint(lims.minx,lims.maxy);
+                        ring1.addPoint(180.0,lims.maxy);
+                        ring1.addPoint(180.0,lims.miny);
+                        ring1.closeRings();
 
-                    pRgn1 = new OGRPolygon();
-                    pRgn1->addRing(&ring);
-                    pRgn1->flattenTo2D();
-                }
-                //WGS84
-                OGRSpatialReference* pWGSSpaRef = new OGRSpatialReference(SRS_WKT_WGS84);
+                        pRgn1 = new OGRPolygon();
+                        pRgn1->addRing(&ring1);
+                        pRgn1->flattenTo2D();
 
-                if(pRgn1 != NULL)
-                {
-                    pRgn1->assignSpatialReference(pWGSSpaRef);
-                    pRgn1->segmentize(STEP);
-                }
-                if(pRgn2 != NULL)
-                {
-                    pRgn2->assignSpatialReference(pWGSSpaRef);
-                    pRgn2->segmentize(STEP);
-                }
-                pWGSSpaRef->Dereference();
+                        OGRLinearRing ring2;
+                        ring2.addPoint(-180.0,lims.miny);
+                        ring2.addPoint(-180.0,lims.maxy);
+                        ring2.addPoint(lims.maxx,lims.maxy);
+                        ring2.addPoint(lims.maxx,lims.miny);
+                        ring2.closeRings();
 
-                if(!pDatasetSpaRef->IsSame(pWGSSpaRef))
-                {
-                    if(pRgn1->transformTo(pDatasetSpaRef) != OGRERR_NONE)
-                        wxDELETE(pRgn1);
-                    if(pRgn2->transformTo(pDatasetSpaRef) != OGRERR_NONE)
-                        wxDELETE(pRgn2);
+                        pRgn2 = new OGRPolygon();
+                        pRgn2->addRing(&ring2);
+                        pRgn2->flattenTo2D();
+                    }
+                    else
+                    {
+                        OGRLinearRing ring;
+                        ring.addPoint(lims.minx,lims.miny);
+                        ring.addPoint(lims.minx,lims.maxy);
+                        ring.addPoint(lims.maxx,lims.maxy);
+                        ring.addPoint(lims.maxx,lims.miny);
+                        ring.closeRings();
+
+                        pRgn1 = new OGRPolygon();
+                        pRgn1->addRing(&ring);
+                        pRgn1->flattenTo2D();
+                    }
+                    //WGS84
+                    OGRSpatialReference* pWGSSpaRef = new OGRSpatialReference(SRS_WKT_WGS84);
+
+                    if(pRgn1 != NULL)
+                    {
+                        pRgn1->assignSpatialReference(pWGSSpaRef);
+                        pRgn1->segmentize(STEP);
+                    }
+                    if(pRgn2 != NULL)
+                    {
+                        pRgn2->assignSpatialReference(pWGSSpaRef);
+                        pRgn2->segmentize(STEP);
+                    }
+                    pWGSSpaRef->Dereference();
+
+                    if(!pDatasetSpaRef->IsSame(pWGSSpaRef))
+                    {
+                        if(pRgn1->transformTo(pDatasetSpaRef) != OGRERR_NONE)
+                            wxDELETE(pRgn1);
+                        if(pRgn2->transformTo(pDatasetSpaRef) != OGRERR_NONE)
+                            wxDELETE(pRgn2);
+                    }
                 }
+                //create cut poly
+                bTransform = true;
             }
-            //create cut poly
-            bTransform = true;
         }
+
+        poCT = OGRCreateCoordinateTransformation( pDatasetSpaRef, m_pSpatialReference );
     }
 
     IApplication* pApp = ::GetApplication();
@@ -298,12 +303,8 @@ void wxGISFeatureLayer::LoadGeometry(void)
         pProgressor->SetRange(m_pwxGISFeatureDataset->GetSize() * 2);
     }
 
-
-    OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pDatasetSpaRef, m_pSpatialReference );
-
-    m_pwxGISFeatureDataset->Reset();
     //strart multithreaded transform
-    int CPUCount = 1;//wxThread::GetCPUCount();
+    int CPUCount = wxThread::GetCPUCount();//1;//
     std::vector<wxGISFeatureTransformThread*> threadarray;
     wxCriticalSection CritSect;
     size_t nCounter(0);
@@ -323,6 +324,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
     ITrackCancel TrackCancel;
     TrackCancel.SetProgressor(pProgressor);
 
+    m_pwxGISFeatureDataset->Reset();
     for(int i = 0; i < CPUCount; i++)
     {
         wxGISFeatureTransformThread *thread = new wxGISFeatureTransformThread(m_pwxGISFeatureDataset, poCT, bTransform, pRgn1, pRgn2, &CritSect, &m_FullEnv, m_pOGRGeometrySet, nCounter, &TrackCancel);
@@ -340,7 +342,8 @@ void wxGISFeatureLayer::LoadGeometry(void)
     wxLogDebug(wxT("The long running function took %ldms to execute"), sw.Time());
 #endif
 
-    OCTDestroyCoordinateTransformation(poCT);
+    if(poCT)
+        OCTDestroyCoordinateTransformation(poCT);
     wxDELETE(pRgn1);
     wxDELETE(pRgn2);
 
@@ -388,7 +391,7 @@ void wxGISFeatureLayer::UnloadGeometry(void)
     if(!m_bIsGeometryLoaded)
         return;
     DeleteQuadTree();
-    m_pOGRGeometrySet->Clear();
+    //m_pOGRGeometrySet->Clear();
     m_bIsGeometryLoaded = false;
 }
 

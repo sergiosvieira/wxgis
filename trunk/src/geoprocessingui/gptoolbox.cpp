@@ -172,7 +172,7 @@ void wxGxRootToolbox::Detach(void)
     wxDELETE(m_pConfig);
 }
 
-void wxGxRootToolbox::Init(wxXmlNode* pConfigNode)
+void wxGxRootToolbox::Init(wxXmlNode* const pConfigNode)
 {
 #ifdef WXGISPORTABLE
     m_pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, true);

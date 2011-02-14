@@ -42,7 +42,7 @@ public:
 	virtual void Detach(void);
 	virtual wxString GetName(void);
     virtual wxString GetBaseName(void){return GetName();};
-    virtual wxString GetInternalName(void){return wxEmptyString;};
+    virtual CPLString GetInternalName(void){return CPLString();};
 	virtual wxString GetCategory(void){return wxString(_("Toolbox"));};
 	virtual void Refresh(void);
 	//IGxObjectUI
@@ -86,7 +86,7 @@ public:
 	virtual wxString GetName(void){return wxString(_("Toolboxes"));};
     virtual wxString GetBaseName(void){return GetName();};
     //IGxRootObjectProperties
-    virtual void Init(wxXmlNode* pConfigNode);
+    virtual void Init(wxXmlNode* const pConfigNode);
     virtual wxXmlNode* GetProperties(void);
 	//wxGxRootToolbox
 	virtual void LoadChildren(void);
@@ -119,7 +119,7 @@ public:
 	virtual void Detach(void);
 	virtual wxString GetName(void);
     virtual wxString GetBaseName(void){return GetName();};
-    virtual wxString GetInternalName(void){return wxEmptyString;};
+    virtual CPLString GetInternalName(void){return CPLString();};
 	virtual wxString GetCategory(void){return wxString(_("Toolbox"));};
 	virtual void Refresh(void);
 	//IGxObjectUI
@@ -161,7 +161,7 @@ public:
 	virtual void Detach(void);
 	virtual wxString GetName(void);
     virtual wxString GetBaseName(void){return GetName();};
-    virtual wxString GetInternalName(void){return wxEmptyString;};
+    virtual CPLString GetInternalName(void){return CPLString();};
 	virtual wxString GetCategory(void){return wxString(_("Toolbox"));};
 	virtual void Refresh(void);
 	//IGxObjectUI
@@ -207,7 +207,7 @@ public:
 	//IGxObject
     virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void){return GetName();};
-    virtual wxString GetInternalName(void){return wxEmptyString;};
+    virtual CPLString GetInternalName(void){return CPLString();};
 	virtual wxString GetCategory(void){return wxString(_("Tool"));};
     virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog);
 	//IGxObjectUI

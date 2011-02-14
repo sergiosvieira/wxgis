@@ -170,5 +170,5 @@ class IGxDropTarget
 public:
 	virtual ~IGxDropTarget(void){};
     virtual wxDragResult CanDrop(wxDragResult def) = 0;
-    virtual bool Drop(const wxArrayString& filenames) = 0;
+    virtual bool Drop(const wxArrayString& filenames, bool bMove) = 0;
 };

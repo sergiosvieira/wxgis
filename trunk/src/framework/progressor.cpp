@@ -27,26 +27,16 @@ BEGIN_EVENT_TABLE(wxGISProgressor, wxControl)
     EVT_TIMER( PTIMER_ID, wxGISProgressor::OnTimer )
 END_EVENT_TABLE()
 
-wxGISProgressor::wxGISProgressor(wxWindow * parent, wxWindowID id, int range, const wxPoint & pos, const wxSize & size, long style, const wxString name) : wxControl(parent, id, pos, size, style, wxDefaultValidator, name), m_nRange(range), m_nValue(0), m_bPulse(false), m_timer(this, PTIMER_ID), m_bYield(true)
+wxGISProgressor::wxGISProgressor(wxWindow * parent, wxWindowID id, int range, const wxPoint & pos, const wxSize & size, long style, const wxString name) : wxControl(parent, id, pos, size, style, wxDefaultValidator, name), m_nValue(0), m_bPulse(false), m_timer(this, PTIMER_ID), m_bYield(true)
 {
-	//m_nImgPos = 0;
-	//m_ImageList.Create(bitmap_size, bitmap_size);
-	//m_ImageList.Add(bitmap);
-
-	//Play();
-
-	//	m_BackgroundBitmap = bitmap;
-	//	m_Timer = new wxTimer(this, ID_PAINTING_TEST_CTRL_TIMER);
-	//	m_Timer->Start(500);
-	//Create(parent, id, bitmap, bitmap_size, pos, size, style, name);
+    if(range <= 0)
+        m_nRange = 100;
+    else
+        m_nRange = range;
 }
 
 wxGISProgressor::~wxGISProgressor()
 {
-	//if(m_Timer)
-	//{
-	//	wxDELETE(m_Timer);
-	//}
 }
 
 void wxGISProgressor::OnSize(wxSizeEvent & event)
@@ -108,7 +98,10 @@ void wxGISProgressor::OnEraseBackground(wxEraseEvent & event)
 
 void wxGISProgressor::SetRange(int range)
 {
-    m_nRange = range;
+    if(range <= 0)
+        m_nRange = 100;
+    else
+        m_nRange = range;
     m_nValue = 0;
 }
 

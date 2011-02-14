@@ -112,6 +112,10 @@ public:
 	virtual bool CanDelete(void){return false;};
 	virtual bool Rename(wxString NewName){return false;};
 	virtual bool CanRename(void){return false;};
+	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel){return false;};
+	virtual bool CanCopy(CPLString szDestPath){return false;};
+	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel){return false;};
+	virtual bool CanMove(CPLString szDestPath){return false;};
 };
 
 class IGxObjectContainer :
@@ -249,7 +253,7 @@ public:
 	virtual ~IGxObjectFilter(void){};
 	virtual bool CanChooseObject( IGxObject* pObject ) = 0;//, esriDoubleClickResult* result
 	virtual bool CanDisplayObject( IGxObject* pObject ) = 0;
-	//virtual wxGISEnumSaveObjectResults CanSaveObject( IGxObjectWPtr pLocation, wxString sName ) = 0;
+	virtual wxGISEnumSaveObjectResults CanSaveObject( IGxObject* pLocation, wxString sName ) = 0;
 	virtual wxString GetName(void) = 0;
     virtual wxString GetExt(void) = 0;
     virtual wxString GetDriver(void) = 0;
@@ -266,19 +270,16 @@ typedef std::vector<IGxObjectFilter*> OBJECTFILTERS, *LPOBJECTFILTERS;
 //	virtual GxObjectFactoryArray* GetEnabledGxObjectFactories() = 0;
 //};
 
-//static wxString GetConvName(wxString sPath, wxFileName &FName)
-//{
-//    //name conv cp866 if zip
-//    wxString name;
-//    if(sPath.Find(wxT("/vsizip/")) != wxNOT_FOUND)
-//    {
-//        wxString str(FName.GetFullName().mb_str(*wxConvCurrent), wxCSConv(wxT("cp-866")));
-//        name = str;
-//    }
-//    else
-//        name = FName.GetFullName();
-//	return name;
-//}
+static wxString GetConvName(CPLString szPath)
+{
+    //name conv cp866 if zip
+    wxString name;
+    if( EQUALN(szPath,"/vsizip/",8) )
+        name = wxString(CPLGetFilename(szPath), wxCSConv(wxT("cp-866")));
+    else
+        name = wxString(CPLGetFilename(szPath), wxConvUTF8);
+	return name;
+}
 
 
 

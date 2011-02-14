@@ -45,14 +45,28 @@ void wxGxSelection::Select( IGxObject* pObject,  bool appendToExistingSelection,
     if(m_SelectionMap[nInitiator] == NULL)
         m_SelectionMap[nInitiator] = new GxObjectArray;
 
-    if(m_SelectionMap[nInitiator]->size() > 0 && m_SelectionMap[nInitiator]->at(m_SelectionMap[nInitiator]->size() - 1) == pObject)
+    //check for duplicates
+    for(size_t i = 0; i < m_SelectionMap[nInitiator]->size(); i++)
     {
-        m_CritSect.Leave();
-	    //not fire event id NOTFIRESELID
-	    if(nInitiator != NOTFIRESELID)
-            goto END;
-        return;
+        if(m_SelectionMap[nInitiator]->at(i) == pObject)
+        {
+            m_CritSect.Leave();
+	        //not fire event id NOTFIRESELID
+	        if(nInitiator != NOTFIRESELID)
+                goto END;
+            return;
+        }
     }
+
+
+    //if(m_SelectionMap[nInitiator]->size() > 0 && m_SelectionMap[nInitiator]->at(m_SelectionMap[nInitiator]->size() - 1) == pObject)
+    //{
+    //    m_CritSect.Leave();
+	   // //not fire event id NOTFIRESELID
+	   // if(nInitiator != NOTFIRESELID)
+    //        goto END;
+    //    return;
+    //}
     m_currentInitiator = nInitiator;
 
     m_CritSect.Leave();
@@ -98,6 +112,10 @@ void wxGxSelection::Select( IGxObject* pObject)
 
 	if(m_SelectionMap[INIT_ALL] == NULL)
 		m_SelectionMap[INIT_ALL] = new GxObjectArray;
+    //check for duplicates
+    for(size_t i = 0; i < m_SelectionMap[INIT_ALL]->size(); i++)
+        if(m_SelectionMap[INIT_ALL]->at(i) == pObject)
+            return;
 	m_SelectionMap[INIT_ALL]->push_back(pObject);
     m_CritSect.Leave();
 

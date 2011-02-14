@@ -3,7 +3,7 @@
  * Purpose:  wxGxFileFactory class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -31,10 +31,12 @@ public:
 	wxGxFileFactory(void);
 	virtual ~wxGxFileFactory(void);
 	//IGxObjectFactory
-	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray);
-    virtual void Serialize(wxXmlNode* pConfig, bool bStore);
+	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray);
+    virtual void Serialize(wxXmlNode* const pConfig, bool bStore);
     virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
     virtual wxString GetName(void){return wxString(_("Files"));};
+    //wxGxFileFactory
+    virtual IGxObject* GetGxObject(CPLString path, wxString name);
 protected:
     wxArrayString m_ExtArray;
 };

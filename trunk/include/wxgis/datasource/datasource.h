@@ -43,23 +43,27 @@ enum wxGISEnumDatasetType
 enum wxGISEnumVectorDatasetType
 {
 	enumVecUnknown = 0,
-	enumVecESRIShapefile = 1,
-	enumVecMapinfoTab = 2,
-    enumVecMapinfoMif = 3,
-    enumVecKML = 4,
-    enumVecDXF = 5,
-	emumVecPostGIS = 6
+	enumVecESRIShapefile,
+	enumVecMapinfoTab,
+    enumVecMapinfoMif,
+    enumVecKML,
+    enumVecKMZ,
+    enumVecDXF,
+	emumVecPostGIS,
+	enumVecGML,
+    emumVecMAX
 };
 
 enum wxGISEnumRasterDatasetType
 {
 	enumRasterUnknown = 0,
-	enumRasterBmp = 1,
-	enumRasterTiff = 2,
-	enumRasterImg = 3,
-	enumRasterJpeg = 4,
-	enumRasterPng = 5,
-    enumRasterGif = 6
+	enumRasterBmp,
+	enumRasterTiff,
+	enumRasterImg,
+	enumRasterJpeg,
+	enumRasterPng,
+    enumRasterGif,
+    enumRasterMAX
 };
 
 enum wxGISEnumTableDatasetType
@@ -231,3 +235,5 @@ protected:
 	OGREnvelope m_Env;
 };
 
+//GDAL SmartPointers
+DEFINE_SHARED_PTR(OGRSpatialReference);

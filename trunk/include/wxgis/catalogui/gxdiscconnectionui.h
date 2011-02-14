@@ -29,7 +29,8 @@
 class WXDLLIMPEXP_GIS_CLU wxGxDiscConnectionUI :
 	public wxGxDiscConnection,
     public IGxObjectUI,
-    public IGxObjectEditUI
+    public IGxObjectEditUI,
+    public IGxDropTarget
 {
 public:
 	wxGxDiscConnectionUI(CPLString Path, wxString Name, wxIcon SmallIco, wxIcon LargeIco, wxIcon SmallIcoDsbl, wxIcon LargeIcoDsbl);
@@ -41,6 +42,9 @@ public:
 	virtual wxString NewMenu(void){return wxString(wxT("wxGxDiscConnection.NewMenu"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
+    //IGxDropTarget
+    virtual wxDragResult CanDrop(wxDragResult def);
+    virtual bool Drop(const wxArrayString& filenames, bool bMove);
 protected:
 	wxIcon m_Conn16, m_Conn48;
 	wxIcon m_ConnDsbld16, m_ConnDsbld48;

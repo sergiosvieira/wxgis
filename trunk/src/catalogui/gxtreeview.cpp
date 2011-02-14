@@ -285,16 +285,13 @@ void wxGxTreeViewBase::OnObjectChanged(IGxObject* object)
 
 void wxGxTreeViewBase::UpdateGxSelection(void)
 {
-    wxArrayTreeItemIds treearray;
-    size_t count = GetSelections(treearray);
+    wxTreeItemId TreeItemId = GetSelection();
     m_pSelection->Clear(GetId());
-    for(size_t i = 0; i < count; i++)
+    if(TreeItemId.IsOk())
     {
-	    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(treearray[i]);
-	    if(pData != NULL)
-	    {
-		    m_pSelection->Select(pData->m_pObject, true, GetId());
-	    }
+        wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(TreeItemId);
+        if(pData != NULL)
+	        m_pSelection->Select(pData->m_pObject, true, GetId());
     }
 	if(	m_pNewMenu )
 		m_pNewMenu->Update(m_pSelection);
@@ -323,7 +320,18 @@ void wxGxTreeViewBase::OnObjectRefreshed(IGxObject* object)
 			if(pData->m_bExpandedOnce)
 			{
                 //store current sel
-                //Unselect();
+                //UnselectAll();
+                wxTreeItemIdValue id;
+                wxTreeItemId ChildItemID = GetFirstChild(TreeItemId, id);
+                while(ChildItemID.IsOk())
+                {
+                    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(ChildItemID);
+                    if(pData)
+                        pData->m_pObject = NULL;
+
+                    ChildItemID = GetNextChild(TreeItemId, id);
+                }
+
 				DeleteChildren(TreeItemId);
 				pData->m_bExpandedOnce = false;
 				Expand(TreeItemId);
@@ -589,12 +597,13 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
 		return;
     SelectItem(item);
 
-    wxFileDataObject *pMyData = new wxFileDataObject();
+    wxFileDataObject my_data;
 
     wxArrayTreeItemIds treearray;
     size_t count = GetSelections(treearray);
     if(count == 0)
         return;
+    IGxObject* pParentGxObject(NULL);
     for(size_t i = 0; i < count; i++)
     {
 	    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(treearray[i]);
@@ -602,12 +611,16 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
             continue;
         if(!pData->m_pObject)
             continue;
-        pMyData->AddFile(pData->m_pObject->GetFullName());
+        pParentGxObject = pData->m_pObject->GetParent();
+        wxString sSystemPath(pData->m_pObject->GetInternalName(), wxConvUTF8);
+        my_data.AddFile(sSystemPath);
     }
     wxDropSource dragSource( this );
-	dragSource.SetData( *pMyData );
+	dragSource.SetData( my_data );
 	wxDragResult result = dragSource.DoDragDrop( TRUE );  
-    wxDELETE(pMyData)
+    if(result == wxDragMove)
+        if(pParentGxObject)
+            pParentGxObject->Refresh();
 }
 
 void wxGxTreeView::OnActivated(wxTreeEvent& event)
@@ -680,6 +693,8 @@ wxDragResult wxGxTreeView::OnDragOver(wxCoord x, wxCoord y, wxDragResult def)
 
 bool wxGxTreeView::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 {
+    bool bMove = !wxGetKeyState(WXK_CONTROL);
+
     wxPoint pt(x, y);
     int flag = wxTREE_HITTEST_ONITEMINDENT;
     wxTreeItemId ItemId = wxTreeCtrl::HitTest(pt, flag);
@@ -693,7 +708,7 @@ bool wxGxTreeView::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filena
         IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pData->m_pObject);
         if(pTarget == NULL)
 		    return false;
-        return pTarget->Drop(filenames);
+        return pTarget->Drop(filenames, bMove);
     }
     return false;
 }

@@ -71,7 +71,7 @@ wxString wxGISGeoprocessingCmd::GetCaption(void)
 		case 0:
 			return wxString(_("&Export"));
 		case 1:
-			return wxString(_("Show/Hide &Tasks pane"));
+			return wxString(_("Show/Hide &Toolbox pane"));
 		default:
 		return wxEmptyString;
 	}
@@ -166,7 +166,7 @@ wxString wxGISGeoprocessingCmd::GetMessage(void)
 		case 0:
 			return wxString(_("Export item to another format"));
 		case 1:
-			return wxString(_("Show/Hide tasks pane"));
+			return wxString(_("Show/Hide toolbox pane"));
 		default:
 			return wxEmptyString;
 	}
@@ -233,15 +233,17 @@ void wxGISGeoprocessingCmd::OnClick(void)
 
                     wxGISEnumVectorDatasetType nSubType = (wxGISEnumVectorDatasetType)DatasetArray[0]->GetSubType();
                     if(nSubType != enumVecKML)
-                        dlg.AddFilter(new wxGxKMLFilter(), true);
+                        dlg.AddFilter(new wxGxFeatureFileFilter(enumVecKML), true);
+                    if(nSubType != enumVecKMZ)
+                        dlg.AddFilter(new wxGxFeatureFileFilter(enumVecKMZ), true);
                     if(nSubType != enumVecESRIShapefile)
-                        dlg.AddFilter(new wxGxShapeFileFilter(), false);
+                        dlg.AddFilter(new wxGxFeatureFileFilter(enumVecESRIShapefile), false);
                     if(nSubType != enumVecMapinfoTab)
-                        dlg.AddFilter(new wxGxMapInfoFilter(true), false);
-                    if(nSubType != enumVecMapinfoTab)
-                        dlg.AddFilter(new wxGxMapInfoFilter(false), false);
+                        dlg.AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoTab), false);
+                    if(nSubType != enumVecMapinfoMif)
+                        dlg.AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoMif), false);
                     if(nSubType != enumVecDXF)
-                        dlg.AddFilter(new wxGxDXFFilter(), false);
+                        dlg.AddFilter(new wxGxFeatureFileFilter(enumVecDXF), false);
 
 				    dlg.SetButtonCaption(_("Export"));
 				    //dlg.SetStartingLocation(_("Coordinate Systems"));
@@ -259,10 +261,8 @@ void wxGISGeoprocessingCmd::OnClick(void)
                             wxLogError(_("Null IGxObjectFilter returned"));
                             return;
                         }
-                        wxString sDriver = pFilter->GetDriver();
-                        wxString sExt = pFilter->GetExt();
-                        int nNewSubType = pFilter->GetSubType();
-                        wxString sPath = dlg.GetInternalPath();
+
+                        CPLString sPath = dlg.GetInternalPath();
                         wxString sCatalogPath = dlg.GetPath();
                         wxString sName = dlg.GetName();
 
@@ -274,163 +274,11 @@ void wxGISGeoprocessingCmd::OnClick(void)
                             return;
                         }
 
-                        OGRFeatureDefn *pDef = pDSet->GetDefiniton();
-                        if(!pDef)
-                        {
-                            wxMessageBox(wxString(_("Error reading dataset definition")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
-                            wxLogError(_("Error reading dataset definition"));
-                            //wsDELETE(pDSet);
-                            return;
-                        }
-
-                        OGRSpatialReference* pSrcSpaRef = pDSet->GetSpatialReference();
-                        OGRSpatialReference* pNewSpaRef(NULL);
-                        if(nNewSubType == enumVecKML)
-                            pNewSpaRef = new OGRSpatialReference(SRS_WKT_WGS84);
-                        else
-                            if(pSrcSpaRef)
-                                pNewSpaRef = pSrcSpaRef->Clone();
-
-                         //check multi geometry
-                        OGRwkbGeometryType nGeomType = pDSet->GetGeometryType();
-                        bool bIsMultigeom = nNewSubType == enumVecESRIShapefile && (wkbFlatten(nGeomType) == wkbUnknown || wkbFlatten(nGeomType) == wkbGeometryCollection);
-
-
-                        if(!pSrcSpaRef && pNewSpaRef)
-                        {
-                            wxMessageBox(wxString(_("Input spatial reference is not defined")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
-                            wxLogError(_("Input spatial reference is not defined"));
-                            goto EXIT;
-                        }
-
-                        if(bIsMultigeom)
-                        {
-                            wxGISQueryFilter Filter(wxString(wxT("OGR_GEOMETRY='POINT'")));
-                            if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
-                            {
-                                int nCount = pDSet->GetSize();
-                                if(nCount > 0)
-                                {
-                                    wxString sNewName = sName + wxString(_("_point"));
-                                    OGRFeatureDefn *pNewDef = pDef->Clone();
-                                    pNewDef->SetGeomType( wkbPoint );
-                                    //check overwrite for sNewName
-                                    if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
-                                    {
-                                        wxLogError(m_sLastError);
-                                        wxString sQuestion = m_sLastError + wxString(_("/nContinue?"));
-                                        if(wxMessageBox(sQuestion, wxString(_("Question")), wxCENTRE | wxICON_QUESTION | wxYES_NO, pWnd) == wxNO)
-                                            goto EXIT;
-                                    }
-                                }
-                            }
-                            Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='POLYGON'")));
-                            if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
-                            {
-                                int nCount = pDSet->GetSize();
-                                if(nCount > 0)
-                                {
-                                    wxString sNewName = sName + wxString(_("_polygon"));
-                                    OGRFeatureDefn *pNewDef = pDef->Clone();
-                                    pNewDef->SetGeomType( wkbPolygon );
-                                    //check overwrite for sNewName
-                                    if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
-                                    {
-                                        wxLogError(m_sLastError);
-                                        wxString sQuestion = m_sLastError + wxString(_("/nContinue?"));
-                                        if(wxMessageBox(sQuestion, wxString(_("Question")), wxCENTRE | wxICON_QUESTION | wxYES_NO, pWnd) == wxNO)
-                                            goto EXIT;
-                                    }
-                                }
-                            }
-                            Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='LINESTRING'")));
-                            if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
-                            {
-                                int nCount = pDSet->GetSize();
-                                if(nCount > 0)
-                                {
-                                    wxString sNewName = sName + wxString(_("_line"));
-                                    OGRFeatureDefn *pNewDef = pDef->Clone();
-                                    pNewDef->SetGeomType( wkbLineString );
-                                    //check overwrite for sNewName
-                                    if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
-                                    {
-                                        wxLogError(m_sLastError);
-                                        wxString sQuestion = m_sLastError + wxString(_("/nContinue?"));
-                                        if(wxMessageBox(sQuestion, wxString(_("Question")), wxCENTRE | wxICON_QUESTION | wxYES_NO, pWnd) == wxNO)
-                                            goto EXIT;
-                                    }
-                                }
-                            }
-                            Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTIPOINT'")));
-                            if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
-                            {
-                                int nCount = pDSet->GetSize();
-                                if(nCount > 0)
-                                {
-                                    wxString sNewName = sName + wxString(_("_mpoint"));
-                                    OGRFeatureDefn *pNewDef = pDef->Clone();
-                                    pNewDef->SetGeomType( wkbMultiPoint );
-                                    //check overwrite for sNewName
-                                    if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
-                                    {
-                                        wxLogError(m_sLastError);
-                                        wxString sQuestion = m_sLastError + wxString(_("/nContinue?"));
-                                        if(wxMessageBox(sQuestion, wxString(_("Question")), wxCENTRE | wxICON_QUESTION | wxYES_NO, pWnd) == wxNO)
-                                            goto EXIT;
-                                    }
-                                }
-                            }
-                            Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTILINESTRING'")));
-                            if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
-                            {
-                                int nCount = pDSet->GetSize();
-                                if(nCount > 0)
-                                {
-                                    wxString sNewName = sName + wxString(_("_mline"));
-                                    OGRFeatureDefn *pNewDef = pDef->Clone();
-                                    pNewDef->SetGeomType( wkbMultiLineString );
-                                    //check overwrite for sNewName
-                                    if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
-                                    {
-                                        wxLogError(m_sLastError);
-                                        wxString sQuestion = m_sLastError + wxString(_("/nContinue?"));
-                                        if(wxMessageBox(sQuestion, wxString(_("Question")), wxCENTRE | wxICON_QUESTION | wxYES_NO, pWnd) == wxNO)
-                                            goto EXIT;
-                                    }
-                                }
-                            }
-                            Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTIPOLYGON'")));
-                            if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
-                            {
-                                int nCount = pDSet->GetSize();
-                                if(nCount > 0)
-                                {
-                                    wxString sNewName = sName + wxString(_("_mpolygon"));
-                                    OGRFeatureDefn *pNewDef = pDef->Clone();
-                                    pNewDef->SetGeomType( wkbMultiPolygon );
-                                    //check overwrite for sNewName
-                                    if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
-                                    {
-                                        wxLogError(m_sLastError);
-                                        wxString sQuestion = m_sLastError + wxString(_("/nContinue?"));
-                                        if(wxMessageBox(sQuestion, wxString(_("Question")), wxCENTRE | wxICON_QUESTION | wxYES_NO, pWnd) == wxNO)
-                                            goto EXIT;
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if(!OnExport(pDSet, sPath, sName, sExt, sDriver, pDef->Clone(), pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
-                            {
-                                wxMessageBox(m_sLastError, wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
-                                wxLogError(m_sLastError);
-                            }
-                        }
-EXIT:
-                        //wsDELETE(pDSet);
-                        wxDELETE(pNewSpaRef);
+                        ITrackCancel TrackCancel;
+                        IStatusBar* pStatusBar = m_pApp->GetStatusBar();                            
+                        TrackCancel.SetProgressor(pStatusBar->GetProgressor());
+                        if( !ExportFormat(pDSet, sPath, sName, pFilter, NULL, &TrackCancel) )
+                            wxMessageBox(wxString(_("While exporting some error occured!")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
 
                         //add new IGxObject's
                         IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
@@ -444,7 +292,6 @@ EXIT:
                                     pParentLoc->Refresh();
                             }
                         }
-                        return;
                     }
                 }
                 //3. if not single GxObject progress in special dialog
@@ -456,11 +303,12 @@ EXIT:
                     wxGxContainerDialog dlg(pWnd, pExtCat, wxID_ANY, _("Select output"));
 				    dlg.SetAllFilters(false);
                     dlg.ShowExportFormats(true);
-                    dlg.AddFilter(new wxGxKMLFilter(), true);
-                    dlg.AddFilter(new wxGxShapeFileFilter(), false);
-                    dlg.AddFilter(new wxGxMapInfoFilter(true), false);
-                    dlg.AddFilter(new wxGxMapInfoFilter(false), false);
-                    dlg.AddFilter(new wxGxDXFFilter(), false);
+                    dlg.AddFilter(new wxGxFeatureFileFilter(enumVecKML), true);
+                    dlg.AddFilter(new wxGxFeatureFileFilter(enumVecKMZ), true);
+                    dlg.AddFilter(new wxGxFeatureFileFilter(enumVecESRIShapefile), false);
+                    dlg.AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoTab), false);
+                    dlg.AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoMif), false);
+                    dlg.AddFilter(new wxGxFeatureFileFilter(enumVecDXF), false);
 
                     dlg.AddShowFilter(new wxGxFolderFilter());
                     dlg.ShowCreateButton(true);
@@ -469,24 +317,23 @@ EXIT:
                         IGxObjectFilter* pFilter = dlg.GetCurrentFilter();
                         if(!pFilter)
                         {
+                            wxMessageBox(wxString(_("Null IGxObjectFilter returned")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
                             wxLogError(_("Null IGxObjectFilter returned"));
                             return;
                         }
-                        wxString sDriver = pFilter->GetDriver();
-                        wxString sExt = pFilter->GetExt();
-                        int nNewSubType = pFilter->GetSubType();
-                        wxString sPath = dlg.GetInternalPath();
+
+                        CPLString sPath = dlg.GetInternalPath();
                         wxString sCatalogPath = dlg.GetPath();
 
                         //create multiexport dialog
-                        wxGISProgressDlg ProgressDlg(NULL/*pWnd*/);
+                        ITrackCancel TrackCancel;
+                        wxGISProgressDlg ProgressDlg(&TrackCancel, NULL/*pWnd*/);
                         wxWindowDisabler disableAll(&ProgressDlg);
                         ProgressDlg.Show(true);
 //                        ProgressDlg.ShowModal(); test purpose
                         IProgressor* pProgr1 = ProgressDlg.GetProgressor1();
                         pProgr1->SetRange(DatasetArray.size());
 
-                        ITrackCancel TrackCancel;
                         TrackCancel.SetProgressor(ProgressDlg.GetProgressor2());
 
                         for(size_t i = 0; i < DatasetArray.size(); i++)
@@ -500,8 +347,8 @@ EXIT:
                             sName = ClearExt(sName);
 
                             wxGISEnumVectorDatasetType nSubType = (wxGISEnumVectorDatasetType)DatasetArray[i]->GetSubType();
-                            //if types is same scip exporting
-                            if(nSubType == nNewSubType)
+                            //if types is same skip exporting
+                            if(nSubType == pFilter->GetSubType())
                                 continue;
 
                             wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(DatasetArray[i]->GetDataset(true));
@@ -511,165 +358,14 @@ EXIT:
                                 continue;
                             }
 
-                            OGRFeatureDefn *pDef = pDSet->GetDefiniton();
-                            if(!pDef)
+                            if( !ExportFormat(pDSet, sPath, sName, pFilter, NULL, &TrackCancel) )
                             {
-                                ProgressDlg.SetText1(wxString::Format(_("Error reading %d dataset definition"), i));
-                                //wsDELETE(pDSet);
-                                continue;
-                            }
-
-                            OGRSpatialReference* pSrcSpaRef = pDSet->GetSpatialReference();
-                            OGRSpatialReference* pNewSpaRef(NULL);
-                            if(nNewSubType == enumVecKML)
-                                pNewSpaRef = new OGRSpatialReference(SRS_WKT_WGS84);
-                            else
-                                if(pSrcSpaRef)
-                                    pNewSpaRef = pSrcSpaRef->Clone();
-
-                            if(!pSrcSpaRef && pNewSpaRef)
-                            {
-                                ProgressDlg.SetText1(wxString(_("Input spatial reference is not defined")));
-                                //wsDELETE(pDSet);
-                                wxDELETE(pNewSpaRef);
-                                continue;
-                            }
-
-                            //check multi geometry
-                            OGRwkbGeometryType nGeomType = pDSet->GetGeometryType();
-                            bool bIsMultigeom = nNewSubType == enumVecESRIShapefile && (wkbFlatten(nGeomType) == wkbUnknown || wkbFlatten(nGeomType) == wkbGeometryCollection);
-                            if(bIsMultigeom)
-                            {
-                                wxGISQueryFilter Filter(wxString(wxT("OGR_GEOMETRY='POINT'")));
-                                if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
-                                {
-                                    int nCount = pDSet->GetSize();
-                                    if(nCount > 0)
-                                    {
-                                        wxString sNewName = sName + wxString(_("_point"));
-                                        OGRFeatureDefn *pNewDef = pDef->Clone();
-                                        pNewDef->SetGeomType( wkbPoint );
-                                        ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
-                                        //check overwrite for sNewName
-                                        sNewName = CheckUniqName(sPath, sNewName, sExt);
-                                        if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType, &TrackCancel))
-                                        {
-                                            wxLogError(m_sLastError);
-                                            ProgressDlg.SetText1(m_sLastError);
-                                        }
-                                    }
-                                }
-                                Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='POLYGON'")));
-                                if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
-                                {
-                                    int nCount = pDSet->GetSize();
-                                    if(nCount > 0)
-                                    {
-                                        wxString sNewName = sName + wxString(_("_polygon"));
-                                        OGRFeatureDefn *pNewDef = pDef->Clone();
-                                        pNewDef->SetGeomType( wkbPolygon );
-                                        ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
-                                        //check overwrite for sNewName
-                                        sNewName = CheckUniqName(sPath, sNewName, sExt);
-                                        if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
-                                        {
-                                            wxLogError(m_sLastError);
-                                            ProgressDlg.SetText1(m_sLastError);
-                                        }
-                                    }
-                                }
-                                Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='LINESTRING'")));
-                                if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
-                                {
-                                    int nCount = pDSet->GetSize();
-                                    if(nCount > 0)
-                                    {
-                                        wxString sNewName = sName + wxString(_("_line"));
-                                        OGRFeatureDefn *pNewDef = pDef->Clone();
-                                        pNewDef->SetGeomType( wkbLineString );
-                                        ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
-                                        //check overwrite for sNewName
-                                        sNewName = CheckUniqName(sPath, sNewName, sExt);
-                                        if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
-                                        {
-                                            wxLogError(m_sLastError);
-                                            ProgressDlg.SetText1(m_sLastError);
-                                        }
-                                    }
-                                }
-                                Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTIPOINT'")));
-                                if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
-                                {
-                                    int nCount = pDSet->GetSize();
-                                    if(nCount > 0)
-                                    {
-                                        wxString sNewName = sName + wxString(_("_mpoint"));
-                                        OGRFeatureDefn *pNewDef = pDef->Clone();
-                                        pNewDef->SetGeomType( wkbMultiPoint );
-                                        ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
-                                        //check overwrite for sNewName
-                                        sNewName = CheckUniqName(sPath, sNewName, sExt);
-                                        if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
-                                        {
-                                            wxLogError(m_sLastError);
-                                            ProgressDlg.SetText1(m_sLastError);
-                                        }
-                                    }
-                                }
-                                Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTILINESTRING'")));
-                                if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
-                                {
-                                    int nCount = pDSet->GetSize();
-                                    if(nCount > 0)
-                                    {
-                                        wxString sNewName = sName + wxString(_("_mline"));
-                                        OGRFeatureDefn *pNewDef = pDef->Clone();
-                                        pNewDef->SetGeomType( wkbMultiLineString );
-                                        ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
-                                        //check overwrite for sNewName
-                                        sNewName = CheckUniqName(sPath, sNewName, sExt);
-                                        if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
-                                        {
-                                            wxLogError(m_sLastError);
-                                            ProgressDlg.SetText1(m_sLastError);
-                                        }
-                                    }
-                                }
-                                Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTIPOLYGON'")));
-                                if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
-                                {
-                                    int nCount = pDSet->GetSize();
-                                    if(nCount > 0)
-                                    {
-                                        wxString sNewName = sName + wxString(_("_mpolygon"));
-                                        OGRFeatureDefn *pNewDef = pDef->Clone();
-                                        pNewDef->SetGeomType( wkbMultiPolygon );
-                                        ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
-                                        //check overwrite for sNewName
-                                        sNewName = CheckUniqName(sPath, sNewName, sExt);
-                                        if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
-                                        {
-                                            wxLogError(m_sLastError);
-                                            ProgressDlg.SetText1(m_sLastError);
-                                        }
-                                    }
-                                }
+                                const char* err = CPLGetLastErrorMsg();
+                                ProgressDlg.SetText1(wgMB2WX(err));
                             }
                             else
-                            {
-                                ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sName + wxT(".") + sExt).c_str()));
-                                sName = CheckUniqName(sPath, sName, sExt);
-                                if(!OnExport(pDSet, sPath, sName, sExt, sDriver, pDef->Clone(), pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType, &TrackCancel))
-                                {
-                                    ProgressDlg.SetText1(m_sLastError);
-                                    wxLogError(m_sLastError);
-                                }
-                            }
-                            //wsDELETE(pDSet);
-                            wxDELETE(pNewSpaRef);
+                                ProgressDlg.SetText1(wxString::Format(_("Export successful (%s.%s)!"), sName.c_str(), pFilter->GetExt().c_str()));
                         }
-                        //ProgressDlg.Show(false);
-                        //pWnd->Raise();//SetFocus();
 
                         //add new IGxObject's
                         IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
@@ -683,9 +379,9 @@ EXIT:
                                     pParentLoc->Refresh();
                             }
                         }
-                        return;
                     }
                 }
+                return;
 			}
 			break;
 		case 1:
@@ -708,7 +404,7 @@ wxString wxGISGeoprocessingCmd::GetTooltip(void)
 		case 0:
 			return wxString(_("Export item"));
 		case 1:
-			return wxString(_("Show/Hide Tasks pane"));
+			return wxString(_("Show/Hide Toolbox pane"));
 		default:
 			return wxEmptyString;
 	}
@@ -719,91 +415,374 @@ unsigned char wxGISGeoprocessingCmd::GetCount(void)
 	return 2;
 }
 
-bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDatasetSPtr pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType)
-{
-    wxGISFeatureDatasetSPtr pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
-    if(!pNewDSet)
-    {
-        m_sLastError = wxString(_("Error creating new dataset"));
-        return false;
-    }
+//bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType)
+//{
+//    wxGISFeatureDatasetSPtr pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
+//    if(!pNewDSet)
+//    {
+//        m_sLastError = wxString(_("Error creating new dataset"));
+//        return false;
+//    }
+//
+//    IStatusBar* pStatusBar = m_pApp->GetStatusBar();
+//    ITrackCancel TrackCancel;
+//    IProgressor* pProgressor;
+//    if(pStatusBar)
+//    {
+//        pProgressor = pStatusBar->GetProgressor();
+//        if(pProgressor)
+//        {
+//            TrackCancel.SetProgressor(pProgressor);
+//            pProgressor->Show(true);
+//        }
+//        pStatusBar->SetMessage(wxString::Format(_("Exporting %s to %s"), pDSet->GetName().c_str(), sName.c_str()));
+//    }
+//
+//    //copy data
+//    if(!CopyRows(pDSet, pNewDSet, NULL, &TrackCancel))
+//    {
+//        m_sLastError = wxString(_("Error copying data to a new dataset"));
+//        return false;
+//    }
+//
+//
+//    ////add new IGxObject
+//    //IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+//    //if(pGxApp)
+//    //{
+//    //    IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(pGxApp->GetCatalog());
+//    //    if(pCont)
+//    //    {
+//    //        IGxObjectContainer* pParentLoc = dynamic_cast<IGxObjectContainer*>(pCont->SearchChild(sPath));
+//    //        if(pParentLoc)
+//    //        {
+//    //            wxString sFullPath = sPath + wxFileName::GetPathSeparator() + sName + wxT(".") + sExt;
+//    //            IGxObject* pNewGxObj = static_cast<IGxObject*>(new wxGxShapefileDataset(sFullPath, sName, (wxGISEnumVectorDatasetType)nNewSubType));
+//    //            if(pParentLoc->AddChild(pNewGxObj))
+//    //                pGxApp->GetCatalog()->ObjectAdded(pNewGxObj);
+//    //        }
+//    //    }
+//    //}
+//    if(pStatusBar)
+//        pStatusBar->SetMessage(_("Done"));
+//    if(pProgressor)
+//        pProgressor->Show(false);
+//    return true;
+//}
+//
+//bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel)
+//{
+//    wxGISFeatureDatasetSPtr pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
+//    if(!pNewDSet)
+//    {
+//        m_sLastError = wxString(_("Error creating new dataset"));
+//        return false;
+//    }
+//
+//    //copy data
+//    if(!CopyRows(pDSet, pNewDSet, NULL, pTrackCancel))
+//    {
+//        m_sLastError = wxString(_("Error copying data to a new dataset"));
+//        return false;
+//    }
+//    return true;
+//}
 
-    IStatusBar* pStatusBar = m_pApp->GetStatusBar();
-    ITrackCancel TrackCancel;
-    IProgressor* pProgressor;
-    if(pStatusBar)
-    {
-        pProgressor = pStatusBar->GetProgressor();
-        if(pProgressor)
-        {
-            TrackCancel.SetProgressor(pProgressor);
-            pProgressor->Show(true);
-        }
-        pStatusBar->SetMessage(wxString::Format(_("Exporting %s to %s"), pDSet->GetName().c_str(), sName.c_str()));
-    }
+//                        OGRSpatialReference* pSrcSpaRef = pDSet->GetSpatialReference();
+//                        OGRSpatialReference* pNewSpaRef(NULL);
+//                        if(nNewSubType == enumVecKML)
+//                            pNewSpaRef = new OGRSpatialReference(SRS_WKT_WGS84);
+//                        else
+//                            if(pSrcSpaRef)
+//                                pNewSpaRef = pSrcSpaRef->Clone();
+//
+//                         //check multi geometry
+//                        OGRwkbGeometryType nGeomType = pDSet->GetGeometryType();
+//                        bool bIsMultigeom = nNewSubType == enumVecESRIShapefile && (wkbFlatten(nGeomType) == wkbUnknown || wkbFlatten(nGeomType) == wkbGeometryCollection);
+//
+//
+//                        if(!pSrcSpaRef && pNewSpaRef)
+//                        {
+//                            wxMessageBox(wxString(_("Input spatial reference is not defined")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
+//                            wxLogError(_("Input spatial reference is not defined"));
+//                            goto EXIT;
+//                        }
+//
+//                        if(bIsMultigeom)
+//                        {
+//                            wxGISQueryFilter Filter(wxString(wxT("OGR_GEOMETRY='POINT'")));
+//                            if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
+//                            {
+//                                int nCount = pDSet->GetSize();
+//                                if(nCount > 0)
+//                                {
+//                                    wxString sNewName = sName + wxString(_("_point"));
+//                                    OGRFeatureDefn *pNewDef = pDef->Clone();
+//                                    pNewDef->SetGeomType( wkbPoint );
+//                                    //check overwrite for sNewName
+//                                    if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
+//                                    {
+//                                        wxLogError(m_sLastError);
+//                                        wxString sQuestion = m_sLastError + wxString(_("/nContinue?"));
+//                                        if(wxMessageBox(sQuestion, wxString(_("Question")), wxCENTRE | wxICON_QUESTION | wxYES_NO, pWnd) == wxNO)
+//                                            goto EXIT;
+//                                    }
+//                                }
+//                            }
+//                            Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='POLYGON'")));
+//                            if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
+//                            {
+//                                int nCount = pDSet->GetSize();
+//                                if(nCount > 0)
+//                                {
+//                                    wxString sNewName = sName + wxString(_("_polygon"));
+//                                    OGRFeatureDefn *pNewDef = pDef->Clone();
+//                                    pNewDef->SetGeomType( wkbPolygon );
+//                                    //check overwrite for sNewName
+//                                    if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
+//                                    {
+//                                        wxLogError(m_sLastError);
+//                                        wxString sQuestion = m_sLastError + wxString(_("/nContinue?"));
+//                                        if(wxMessageBox(sQuestion, wxString(_("Question")), wxCENTRE | wxICON_QUESTION | wxYES_NO, pWnd) == wxNO)
+//                                            goto EXIT;
+//                                    }
+//                                }
+//                            }
+//                            Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='LINESTRING'")));
+//                            if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
+//                            {
+//                                int nCount = pDSet->GetSize();
+//                                if(nCount > 0)
+//                                {
+//                                    wxString sNewName = sName + wxString(_("_line"));
+//                                    OGRFeatureDefn *pNewDef = pDef->Clone();
+//                                    pNewDef->SetGeomType( wkbLineString );
+//                                    //check overwrite for sNewName
+//                                    if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
+//                                    {
+//                                        wxLogError(m_sLastError);
+//                                        wxString sQuestion = m_sLastError + wxString(_("/nContinue?"));
+//                                        if(wxMessageBox(sQuestion, wxString(_("Question")), wxCENTRE | wxICON_QUESTION | wxYES_NO, pWnd) == wxNO)
+//                                            goto EXIT;
+//                                    }
+//                                }
+//                            }
+//                            Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTIPOINT'")));
+//                            if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
+//                            {
+//                                int nCount = pDSet->GetSize();
+//                                if(nCount > 0)
+//                                {
+//                                    wxString sNewName = sName + wxString(_("_mpoint"));
+//                                    OGRFeatureDefn *pNewDef = pDef->Clone();
+//                                    pNewDef->SetGeomType( wkbMultiPoint );
+//                                    //check overwrite for sNewName
+//                                    if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
+//                                    {
+//                                        wxLogError(m_sLastError);
+//                                        wxString sQuestion = m_sLastError + wxString(_("/nContinue?"));
+//                                        if(wxMessageBox(sQuestion, wxString(_("Question")), wxCENTRE | wxICON_QUESTION | wxYES_NO, pWnd) == wxNO)
+//                                            goto EXIT;
+//                                    }
+//                                }
+//                            }
+//                            Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTILINESTRING'")));
+//                            if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
+//                            {
+//                                int nCount = pDSet->GetSize();
+//                                if(nCount > 0)
+//                                {
+//                                    wxString sNewName = sName + wxString(_("_mline"));
+//                                    OGRFeatureDefn *pNewDef = pDef->Clone();
+//                                    pNewDef->SetGeomType( wkbMultiLineString );
+//                                    //check overwrite for sNewName
+//                                    if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
+//                                    {
+//                                        wxLogError(m_sLastError);
+//                                        wxString sQuestion = m_sLastError + wxString(_("/nContinue?"));
+//                                        if(wxMessageBox(sQuestion, wxString(_("Question")), wxCENTRE | wxICON_QUESTION | wxYES_NO, pWnd) == wxNO)
+//                                            goto EXIT;
+//                                    }
+//                                }
+//                            }
+//                            Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTIPOLYGON'")));
+//                            if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
+//                            {
+//                                int nCount = pDSet->GetSize();
+//                                if(nCount > 0)
+//                                {
+//                                    wxString sNewName = sName + wxString(_("_mpolygon"));
+//                                    OGRFeatureDefn *pNewDef = pDef->Clone();
+//                                    pNewDef->SetGeomType( wkbMultiPolygon );
+//                                    //check overwrite for sNewName
+//                                    if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
+//                                    {
+//                                        wxLogError(m_sLastError);
+//                                        wxString sQuestion = m_sLastError + wxString(_("/nContinue?"));
+//                                        if(wxMessageBox(sQuestion, wxString(_("Question")), wxCENTRE | wxICON_QUESTION | wxYES_NO, pWnd) == wxNO)
+//                                            goto EXIT;
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        else
+//                        {
+//                            if(!OnExport(pDSet, sPath, sName, sExt, sDriver, pDef->Clone(), pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
+//                            {
+//                                wxMessageBox(m_sLastError, wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
+//                                wxLogError(m_sLastError);
+//                            }
+//                        }
+//EXIT:
+////                        wxDELETE(pNewSpaRef);
 
-    //copy data
-    if(!CopyRows(pDSet, pNewDSet, NULL, &TrackCancel))
-    {
-        m_sLastError = wxString(_("Error copying data to a new dataset"));
-        //wsDELETE(pNewDSet);
-        return false;
-    }
+                        //    OGRSpatialReference* pSrcSpaRef = pDSet->GetSpatialReference();
+                        //    OGRSpatialReference* pNewSpaRef(NULL);
+                        //    if(nNewSubType == enumVecKML)
+                        //        pNewSpaRef = new OGRSpatialReference(SRS_WKT_WGS84);
+                        //    else
+                        //        if(pSrcSpaRef)
+                        //            pNewSpaRef = pSrcSpaRef->Clone();
 
-    //wsDELETE(pNewDSet);
+                        //    if(!pSrcSpaRef && pNewSpaRef)
+                        //    {
+                        //        ProgressDlg.SetText1(wxString(_("Input spatial reference is not defined")));
+                        //        wxDELETE(pNewSpaRef);
+                        //        continue;
+                        //    }
 
-    ////add new IGxObject
-    //IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-    //if(pGxApp)
-    //{
-    //    IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(pGxApp->GetCatalog());
-    //    if(pCont)
-    //    {
-    //        IGxObjectContainer* pParentLoc = dynamic_cast<IGxObjectContainer*>(pCont->SearchChild(sPath));
-    //        if(pParentLoc)
-    //        {
-    //            wxString sFullPath = sPath + wxFileName::GetPathSeparator() + sName + wxT(".") + sExt;
-    //            IGxObject* pNewGxObj = static_cast<IGxObject*>(new wxGxShapefileDataset(sFullPath, sName, (wxGISEnumVectorDatasetType)nNewSubType));
-    //            if(pParentLoc->AddChild(pNewGxObj))
-    //                pGxApp->GetCatalog()->ObjectAdded(pNewGxObj);
-    //        }
-    //    }
-    //}
-    if(pStatusBar)
-        pStatusBar->SetMessage(_("Done"));
-    if(pProgressor)
-        pProgressor->Show(false);
-    return true;
-}
-
-bool wxGISGeoprocessingCmd::OnExport(wxGISFeatureDatasetSPtr pDSet, wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel)
-{
-    wxGISFeatureDatasetSPtr pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
-    if(!pNewDSet)
-    {
-        m_sLastError = wxString(_("Error creating new dataset"));
-        return false;
-    }
-
-    //copy data
-    if(!CopyRows(pDSet, pNewDSet, NULL, pTrackCancel))
-    {
-        m_sLastError = wxString(_("Error copying data to a new dataset"));
-        //wsDELETE(pNewDSet);
-        return false;
-    }
-
-    //wsDELETE(pNewDSet);
-
-    return true;
-}
-
-wxString wxGISGeoprocessingCmd::CheckUniqName(wxString sPath, wxString sName, wxString sExt, int nCounter)
-{
-    wxString sResultName = sName + (nCounter > 0 ? wxString::Format(wxT("_%d"), nCounter) : wxString(wxEmptyString));
-    wxString sBaseName = sPath + wxFileName::GetPathSeparator() + sResultName + wxT(".") + sExt;
-    if(wxFileName::FileExists(sBaseName))
-        return CheckUniqName(sPath, sName, sExt, nCounter + 1);
-    else
-        return sResultName;
-}
+                        //    //check multi geometry
+                        //    OGRwkbGeometryType nGeomType = pDSet->GetGeometryType();
+                        //    bool bIsMultigeom = nNewSubType == enumVecESRIShapefile && (wkbFlatten(nGeomType) == wkbUnknown || wkbFlatten(nGeomType) == wkbGeometryCollection);
+                        //    if(bIsMultigeom)
+                        //    {
+                        //        wxGISQueryFilter Filter(wxString(wxT("OGR_GEOMETRY='POINT'")));
+                        //        if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
+                        //        {
+                        //            int nCount = pDSet->GetSize();
+                        //            if(nCount > 0)
+                        //            {
+                        //                wxString sNewName = sName + wxString(_("_point"));
+                        //                OGRFeatureDefn *pNewDef = pDef->Clone();
+                        //                pNewDef->SetGeomType( wkbPoint );
+                        //                ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
+                        //                //check overwrite for sNewName
+                        //                sNewName = CheckUniqName(sPath, sNewName, sExt);
+                        //                if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType, &TrackCancel))
+                        //                {
+                        //                    wxLogError(m_sLastError);
+                        //                    ProgressDlg.SetText1(m_sLastError);
+                        //                }
+                        //            }
+                        //        }
+                        //        Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='POLYGON'")));
+                        //        if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
+                        //        {
+                        //            int nCount = pDSet->GetSize();
+                        //            if(nCount > 0)
+                        //            {
+                        //                wxString sNewName = sName + wxString(_("_polygon"));
+                        //                OGRFeatureDefn *pNewDef = pDef->Clone();
+                        //                pNewDef->SetGeomType( wkbPolygon );
+                        //                ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
+                        //                //check overwrite for sNewName
+                        //                sNewName = CheckUniqName(sPath, sNewName, sExt);
+                        //                if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
+                        //                {
+                        //                    wxLogError(m_sLastError);
+                        //                    ProgressDlg.SetText1(m_sLastError);
+                        //                }
+                        //            }
+                        //        }
+                        //        Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='LINESTRING'")));
+                        //        if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
+                        //        {
+                        //            int nCount = pDSet->GetSize();
+                        //            if(nCount > 0)
+                        //            {
+                        //                wxString sNewName = sName + wxString(_("_line"));
+                        //                OGRFeatureDefn *pNewDef = pDef->Clone();
+                        //                pNewDef->SetGeomType( wkbLineString );
+                        //                ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
+                        //                //check overwrite for sNewName
+                        //                sNewName = CheckUniqName(sPath, sNewName, sExt);
+                        //                if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
+                        //                {
+                        //                    wxLogError(m_sLastError);
+                        //                    ProgressDlg.SetText1(m_sLastError);
+                        //                }
+                        //            }
+                        //        }
+                        //        Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTIPOINT'")));
+                        //        if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
+                        //        {
+                        //            int nCount = pDSet->GetSize();
+                        //            if(nCount > 0)
+                        //            {
+                        //                wxString sNewName = sName + wxString(_("_mpoint"));
+                        //                OGRFeatureDefn *pNewDef = pDef->Clone();
+                        //                pNewDef->SetGeomType( wkbMultiPoint );
+                        //                ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
+                        //                //check overwrite for sNewName
+                        //                sNewName = CheckUniqName(sPath, sNewName, sExt);
+                        //                if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
+                        //                {
+                        //                    wxLogError(m_sLastError);
+                        //                    ProgressDlg.SetText1(m_sLastError);
+                        //                }
+                        //            }
+                        //        }
+                        //        Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTILINESTRING'")));
+                        //        if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
+                        //        {
+                        //            int nCount = pDSet->GetSize();
+                        //            if(nCount > 0)
+                        //            {
+                        //                wxString sNewName = sName + wxString(_("_mline"));
+                        //                OGRFeatureDefn *pNewDef = pDef->Clone();
+                        //                pNewDef->SetGeomType( wkbMultiLineString );
+                        //                ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
+                        //                //check overwrite for sNewName
+                        //                sNewName = CheckUniqName(sPath, sNewName, sExt);
+                        //                if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
+                        //                {
+                        //                    wxLogError(m_sLastError);
+                        //                    ProgressDlg.SetText1(m_sLastError);
+                        //                }
+                        //            }
+                        //        }
+                        //        Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTIPOLYGON'")));
+                        //        if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
+                        //        {
+                        //            int nCount = pDSet->GetSize();
+                        //            if(nCount > 0)
+                        //            {
+                        //                wxString sNewName = sName + wxString(_("_mpolygon"));
+                        //                OGRFeatureDefn *pNewDef = pDef->Clone();
+                        //                pNewDef->SetGeomType( wkbMultiPolygon );
+                        //                ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sNewName + wxT(".") + sExt).c_str()));
+                        //                //check overwrite for sNewName
+                        //                sNewName = CheckUniqName(sPath, sNewName, sExt);
+                        //                if(!OnExport(pDSet, sPath, sNewName, sExt, sDriver, pNewDef, pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType))
+                        //                {
+                        //                    wxLogError(m_sLastError);
+                        //                    ProgressDlg.SetText1(m_sLastError);
+                        //                }
+                        //            }
+                        //        }
+                        //    }
+                        //    else
+                        //    {
+                        //        ProgressDlg.SetText1(wxString::Format(_("Exporting %s to %s"), sName.c_str(), wxString(sName + wxT(".") + sExt).c_str()));
+                        //        sName = CheckUniqName(sPath, sName, sExt);
+                        //        if(!OnExport(pDSet, sPath, sName, sExt, sDriver, pDef->Clone(), pNewSpaRef, (wxGISEnumVectorDatasetType)nNewSubType, &TrackCancel))
+                        //        {
+                        //            ProgressDlg.SetText1(m_sLastError);
+                        //            wxLogError(m_sLastError);
+                        //        }
+                        //    }
+                        //    //wsDELETE(pDSet);
+                        //    wxDELETE(pNewSpaRef);
+                        //}
+                        ////ProgressDlg.Show(false);
+                        ////pWnd->Raise();//SetFocus();

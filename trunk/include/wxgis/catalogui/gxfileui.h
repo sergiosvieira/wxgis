@@ -3,7 +3,7 @@
  * Purpose:  wxGxFileUI classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxFileUI :
     public IGxObjectEditUI
 {
 public:
-	wxGxFileUI(wxString Path, wxString Name);
+	wxGxFileUI(CPLString Path, wxString Name);
 	virtual ~wxGxFileUI(void);
 };
 
@@ -46,7 +46,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxPrjFileUI :
     public IGxObjectWizard
 {
 public:
-	wxGxPrjFileUI(wxString Path, wxString Name, wxGISEnumPrjFileType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxPrjFileUI(CPLString Path, wxString Name, wxGISEnumPrjFileType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxPrjFileUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
@@ -69,7 +69,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxTextFileUI :
     public wxGxTextFile
 {
 public:
-	wxGxTextFileUI(wxString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxTextFileUI(CPLString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxTextFileUI(void);
 	//IGxObject
 	virtual wxString GetCategory(void){return wxString(_("Text file"));};

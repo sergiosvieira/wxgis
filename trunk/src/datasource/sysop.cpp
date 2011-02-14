@@ -61,16 +61,6 @@ wxString ClearExt(wxString sPath)
     return sPath;
 }
 
-wxString CheckUniqName(wxString sPath, wxString sName, wxString sExt, int nCounter)
-{
-    wxString sResultName = sName + (nCounter > 0 ? wxString::Format(wxT("_%d"), nCounter) : wxString(wxEmptyString));
-    wxString sBaseName = sPath + wxFileName::GetPathSeparator() + sResultName + wxT(".") + sExt;
-    if(wxFileName::FileExists(sBaseName))
-        return CheckUniqName(sPath, sName, sExt, nCounter + 1);
-    else
-        return sResultName;
-}
-
 wxFontEncoding GetEncodingFromCpg(CPLString sPath)
 {
 	const char* szCPGPath = CPLResetExtension(sPath, "cpg");
@@ -235,3 +225,231 @@ bool IsFileHidden(CPLString sPath)
 #endif
 	return EQUALN(CPLGetFilename(sPath), ".", 1);
 }
+
+wxString CheckUniqName(CPLString sPath, wxString sName, wxString sExt, int nCounter)
+{
+    wxString sResultName = sName + (nCounter > 0 ? wxString::Format(wxT("_%d"), nCounter) : wxEmptyString);
+    CPLString szBaseName = (char*)CPLFormFilename(sPath, sResultName.mb_str(wxConvUTF8), sExt.mb_str(wxConvUTF8));
+    if(CPLCheckForFile((char*)szBaseName.c_str(), NULL))
+        return CheckUniqName(sPath, sName, sExt, nCounter + 1);
+    else
+        return sResultName;
+}
+
+CPLString CheckUniqPath(CPLString sPath, int nCounter)
+{
+    CPLString sResultName;
+    if(nCounter > 0)
+    {
+        CPLString szAdd;
+        szAdd.Printf("_copy(%d)", nCounter);
+        CPLString szTmpName = CPLString(CPLGetBasename(sPath)) + szAdd;
+        sResultName = CPLString(CPLFormFilename(CPLGetPath(sPath), szTmpName, CPLGetExtension(sPath)));
+    }
+    else
+        sResultName = sPath;
+
+    if(CPLCheckForFile((char*)sResultName.c_str(), NULL))
+        return CheckUniqPath(sPath, nCounter + 1);
+    else
+        return sResultName;
+}
+
+
+CPLString Transliterate(const char* str)
+{
+    CPLString sOut;
+    for (; *str != 0; str++)
+    {
+        switch (str[0])
+        {
+        case 'à': sOut += "a"; break;
+        case 'á': sOut += "b"; break;
+        case 'â': sOut += "v"; break;
+        case 'ã': sOut += "g"; break;
+        case 'ä': sOut += "d"; break;
+        case 'å': sOut += "e"; break;
+        case '¸': sOut += "ye"; break;
+        case 'æ': sOut += "zh"; break;
+        case 'ç': sOut += "z"; break;
+        case 'è': sOut += "i"; break;
+        case 'é': sOut += "y"; break;
+        case 'ê': sOut += "k"; break;
+        case 'ë': sOut += "l"; break;
+        case 'ì': sOut += "m"; break;
+        case 'í': sOut += "n"; break;
+        case 'î': sOut += "o"; break;
+        case 'ï': sOut += "p"; break;
+        case 'ð': sOut += "r"; break;
+        case 'ñ': sOut += "s"; break;
+        case 'ò': sOut += "t"; break;
+        case 'ó': sOut += "u"; break;
+        case 'ô': sOut += "f"; break;
+        case 'õ': sOut += "ch"; break;
+        case 'ö': sOut += "z"; break;
+        case '÷': sOut += "ch"; break;
+        case 'ø': sOut += "sh"; break;
+        case 'ù': sOut += "ch"; break;
+        case 'ú': sOut += "''"; break;
+        case 'û': sOut += "y"; break;
+        case 'ü': sOut += "''"; break;
+        case 'ý': sOut += "e"; break;
+        case 'þ': sOut += "yu"; break;
+        case 'ÿ': sOut += "ya"; break;
+        case 'À': sOut += "A"; break;
+        case 'Á': sOut += "B"; break;
+        case 'Â': sOut += "V"; break;
+        case 'Ã': sOut += "G"; break;
+        case 'Ä': sOut += "D"; break;
+        case 'Å': sOut += "E"; break;
+        case '¨': sOut += "Ye"; break;
+        case 'Æ': sOut += "Zh"; break;
+        case 'Ç': sOut += "Z"; break;
+        case 'È': sOut += "I"; break;
+        case 'É': sOut += "Y"; break;
+        case 'Ê': sOut += "K"; break;
+        case 'Ë': sOut += "L"; break;
+        case 'Ì': sOut += "M"; break;
+        case 'Í': sOut += "N"; break;
+        case 'Î': sOut += "O"; break;
+        case 'Ï': sOut += "P"; break;
+        case 'Ð': sOut += "R"; break;
+        case 'Ñ': sOut += "S"; break;
+        case 'Ò': sOut += "T"; break;
+        case 'Ó': sOut += "U"; break;
+        case 'Ô': sOut += "F"; break;
+        case 'Õ': sOut += "Ch"; break;
+        case 'Ö': sOut += "Z"; break;
+        case '×': sOut += "Ch"; break;
+        case 'Ø': sOut += "Sh"; break;
+        case 'Ù': sOut += "Ch"; break;
+        case 'Ú': sOut += "''"; break;
+        case 'Û': sOut += "Y"; break;
+        case 'Ü': sOut += "''"; break;
+        case 'Ý': sOut += "E"; break;
+        case 'Þ': sOut += "Yu"; break;
+        case 'ß': sOut += "Ya"; break;
+        default: { char Temp[2] = { str[0], 0} ; sOut += &Temp[0]; }
+        }
+    }
+    return sOut;
+}
+
+bool CopyFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCancel)
+{
+    if(EQUAL(sDestPath, sSrcPath))
+        return true;
+
+    size_t nBufferSize = 1048576;//1024 * 1024;
+
+    IProgressor* pProgr(NULL);
+    if(pTrackCancel)
+        pProgr = pTrackCancel->GetProgressor();
+    if(pProgr)
+    {
+        VSIStatBufL sStatBuf;
+        int ret = VSIStatL(sSrcPath, &sStatBuf);
+        if(ret == 0)
+            pProgr->SetRange(sStatBuf.st_size / nBufferSize);
+        else
+            pProgr->SetRange(100);
+    }
+
+    VSILFILE *fpOld, *fpNew;
+    GByte *pabyBuffer;
+    size_t nBytesRead;
+    int nRet = 0;
+
+    CPLErrorReset();
+
+/* -------------------------------------------------------------------- */
+/*      Open old and new file.                                          */
+/* -------------------------------------------------------------------- */
+    fpOld = VSIFOpenL( sSrcPath, "rb" );
+    if( fpOld == NULL )
+    {
+        wxString sErr(_("Error open source file! OGR error: "));
+        CPLString sFullErr(sErr.mb_str());
+        sFullErr += CPLGetLastErrorMsg();
+        CPLError( CE_Failure, CPLE_FileIO, sFullErr);
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+        return false;
+    }
+
+    fpNew = VSIFOpenL( sDestPath, "wb" );
+    if( fpNew == NULL )
+    {
+        VSIFCloseL( fpOld );
+
+        wxString sErr(_("Error create destination file! OGR error: "));
+        CPLString sFullErr(sErr.mb_str());
+        sFullErr += CPLGetLastErrorMsg();
+        CPLError( CE_Failure, CPLE_FileIO, sFullErr);
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+        return false;
+    }
+
+/* -------------------------------------------------------------------- */
+/*      Prepare buffer.                                                 */
+/* -------------------------------------------------------------------- */
+    pabyBuffer = (GByte *) CPLMalloc(nBufferSize);
+
+/* -------------------------------------------------------------------- */
+/*      Copy file over till we run out of stuff.                        */
+/* -------------------------------------------------------------------- */
+    int nCounter(0);
+    do {
+        if(pProgr)
+            pProgr->SetValue(nCounter);
+
+        nBytesRead = VSIFReadL( pabyBuffer, 1, nBufferSize, fpOld );
+        if( nBytesRead < 0 )
+            nRet = -1;
+
+        if( nRet == 0
+            && VSIFWriteL( pabyBuffer, 1, nBytesRead, fpNew ) < nBytesRead )
+            nRet = -1;
+        nCounter++;
+    } while( nRet == 0 && nBytesRead == nBufferSize );
+
+/* -------------------------------------------------------------------- */
+/*      Cleanup                                                         */
+/* -------------------------------------------------------------------- */
+    VSIFCloseL( fpNew );
+    VSIFCloseL( fpOld );
+
+    CPLFree( pabyBuffer );
+
+    return nRet == 0;
+}
+
+bool MoveFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCancel)
+{
+    if(EQUAL(sDestPath, sSrcPath))
+        return true;
+
+    if(EQUAL(CPLGetPath(sDestPath), CPLGetPath(sSrcPath)))
+    {
+        //if in same directory - make copy
+        return RenameFile(sSrcPath, sDestPath);
+    }
+#ifdef __WXMSW__
+    else if(!EQUALN(sDestPath,"/vsi",4) && EQUALN(sDestPath, sSrcPath, 3))
+    {
+        //if in same disc - copy/rename
+        return RenameFile(sSrcPath, sDestPath);
+    }
+#endif
+    else
+    {
+        //if in different discs - copy/move
+        if(CopyFile(sDestPath, sSrcPath, pTrackCancel))
+            return DeleteFile(sSrcPath);
+    }
+    return false;
+}
+
+
+

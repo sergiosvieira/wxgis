@@ -28,7 +28,8 @@
 class WXDLLIMPEXP_GIS_CLU wxGxFolderUI :
     public wxGxFolder,
 	public IGxObjectUI,
-	public IGxObjectEditUI
+	public IGxObjectEditUI,
+    public IGxDropTarget
 {
 public:
 	wxGxFolderUI(CPLString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
@@ -40,6 +41,9 @@ public:
 	virtual wxString NewMenu(void){return wxString(wxT("wxGxFolder.NewMenu"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
+    //IGxDropTarget
+    virtual wxDragResult CanDrop(wxDragResult def);
+    virtual bool Drop(const wxArrayString& filenames, bool bMove);
 	//wxGxFolder
 	virtual void EmptyChildren(void);
 protected:
