@@ -218,11 +218,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wxgis\cat_app\resource.h"
+				RelativePath=".\resource.h"
 				>
 			</File>
 			<File
-				RelativePath=".\resource.h"
+				RelativePath="..\..\include\wxgis\cat_app\resource.h"
 				>
 			</File>
 		</Filter>
@@ -232,11 +232,11 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\img\archive.ico"
+				RelativePath="..\..\art\archive.ico"
 				>
 			</File>
 			<File
-				RelativePath="..\..\art\archive.ico"
+				RelativePath="..\img\archive.ico"
 				>
 			</File>
 			<File

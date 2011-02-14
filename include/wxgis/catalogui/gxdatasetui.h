@@ -33,7 +33,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxTableDatasetUI :
 	public IGxObjectEditUI
 {
 public:
-	wxGxTableDatasetUI(wxString Path, wxString Name, wxGISEnumTableDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxTableDatasetUI(CPLString Path, wxString Name, wxGISEnumTableDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxTableDatasetUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
@@ -57,7 +57,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxFeatureDatasetUI :
     public IGxObjectWizard
 {
 public:
-	wxGxFeatureDatasetUI(wxString Path, wxString Name, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxFeatureDatasetUI(CPLString Path, wxString Name, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxFeatureDatasetUI(void);
     //wxGxFeatureDataset
     virtual wxGISDatasetSPtr GetDataset(bool bReadOnly);
@@ -85,7 +85,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxRasterDatasetUI :
     public IGxObjectWizard
 {
 public:
-	wxGxRasterDatasetUI(wxString Path, wxString Name, wxGISEnumRasterDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxRasterDatasetUI(CPLString Path, wxString Name, wxGISEnumRasterDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxRasterDatasetUI(void);
     //wxGxRasterDataset
     virtual wxGISDatasetSPtr GetDataset(bool bReadOnly);

@@ -3,7 +3,7 @@
  * Purpose:  wxGxFile classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 //class wxGxFile
 //--------------------------------------------------------------
 
-wxGxFile::wxGxFile(wxString Path, wxString Name)
+wxGxFile::wxGxFile(CPLString Path, wxString Name)
 {
 	m_sName = Name;
 	m_sPath = Path;
@@ -44,22 +44,9 @@ wxString wxGxFile::GetBaseName(void)
     return FileName.GetName();
 }
 
-//--------------------------------------------------------------
-//class wxGxPrjFile
-//--------------------------------------------------------------
-
-wxGxPrjFile::wxGxPrjFile(wxString Path, wxString Name, wxGISEnumPrjFileType nType) : wxGxFile(Path, Name)
+bool wxGxFile::Delete(void)
 {
-    m_Type = nType;
-}
-
-wxGxPrjFile::~wxGxPrjFile(void)
-{
-}
-
-bool wxGxPrjFile::Delete(void)
-{
-    if(DeleteFile(m_sPath/*, m_pPathEncoding*/))
+    if(DeleteFile(m_sPath))
 	{
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer == NULL)
@@ -69,23 +56,22 @@ bool wxGxPrjFile::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
     }
 }
 
-bool wxGxPrjFile::Rename(wxString NewName)
+bool wxGxFile::Rename(wxString NewName)
 {
-//TODO: Fix it!
-/*	NewName = ClearExt(NewName);
-	wxFileName PathName(m_sPath);
+    NewName = ClearExt(NewName);
+	wxFileName PathName(wxString(m_sPath, wxConvUTF8));
 	PathName.SetName(NewName);
 
-	wxString m_sNewPath = PathName.GetFullPath();
-
-    if(RenameFile(m_sPath, m_sNewPath))
+	wxString sNewPath = PathName.GetFullPath();
+    CPLString szNewPath = sNewPath.mb_str(wxConvUTF8);
+    if(RenameFile(m_sPath, szNewPath))
 	{
-		m_sPath = m_sNewPath;
+        m_sPath = szNewPath;
 		m_sName = NewName;
 		m_pCatalog->ObjectChanged(this);
 		return true;
@@ -93,10 +79,55 @@ bool wxGxPrjFile::Rename(wxString NewName)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
-    }	*/
+    }
 	return false;
+}
+
+bool wxGxFile::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
+{
+    if(pTrackCancel)
+        pTrackCancel->PutMessage(wxString(_("Copy file ")) + m_sName, -1, enumGISMessageInfo);
+
+    CPLString szNewDestFileName(CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL));
+    szNewDestFileName = CheckUniqPath(szNewDestFileName);
+    if(!CopyFile(szNewDestFileName, m_sPath, pTrackCancel))
+        return false;
+    
+    m_sPath = szNewDestFileName;
+    m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
+
+    return true;
+}
+
+bool wxGxFile::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
+{
+    if(pTrackCancel)
+        pTrackCancel->PutMessage(wxString(_("Move file ")) + m_sName, -1, enumGISMessageInfo);
+
+    CPLString szNewDestFileName(CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL));
+    szNewDestFileName = CheckUniqPath(szNewDestFileName);
+    if(!MoveFile(szNewDestFileName, m_sPath, pTrackCancel))
+        return false;
+    
+    m_sPath = szNewDestFileName;
+    m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
+
+    return true;
+}
+
+//--------------------------------------------------------------
+//class wxGxPrjFile
+//--------------------------------------------------------------
+
+wxGxPrjFile::wxGxPrjFile(CPLString Path, wxString Name, wxGISEnumPrjFileType nType) : wxGxFile(Path, Name)
+{
+    m_Type = nType;
+}
+
+wxGxPrjFile::~wxGxPrjFile(void)
+{
 }
 
 OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
@@ -104,7 +135,7 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 	OGRErr err = OGRERR_NONE;
 	if(m_OGRSpatialReference.Validate() != OGRERR_NONE)
 	{
-		char **papszLines = CSLLoad( m_sPath.mb_str(wxConvUTF8) );
+		char **papszLines = CSLLoad( m_sPath );
 
 		switch(m_Type)
 		{
@@ -166,7 +197,7 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 //class wxGxTextFile
 //--------------------------------------------------------------
 
-wxGxTextFile::wxGxTextFile(wxString Path, wxString Name) : wxGxFile(Path, Name)
+wxGxTextFile::wxGxTextFile(CPLString Path, wxString Name) : wxGxFile(Path, Name)
 {
 }
 
@@ -174,47 +205,4 @@ wxGxTextFile::~wxGxTextFile(void)
 {
 }
 
-bool wxGxTextFile::Delete(void)
-{
-
-    if(DeleteFile(m_sPath/*, m_pPathEncoding*/))
-	{
-		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
-		if(pGxObjectContainer == NULL)
-			return false;
-		return pGxObjectContainer->DeleteChild(this);
-	}
-	else
-    {
-        const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
-		return false;
-    }
-}
-
-bool wxGxTextFile::Rename(wxString NewName)
-{
-	//TODO: Fix it!
-/*	NewName = ClearExt(NewName);
-	wxFileName PathName(m_sPath);
-	PathName.SetName(NewName);
-
-	wxString m_sNewPath = PathName.GetFullPath();
-
-    if(RenameFile(m_sPath, m_sNewPath))
-	{
-		m_sPath = m_sNewPath;
-		m_sName = NewName;
-		m_pCatalog->ObjectChanged(this);
-		return true;
-	}
-	else
-    {
-        const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
-		return false;
-    }	
-*/
-	return false;
-}
 

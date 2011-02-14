@@ -39,7 +39,7 @@ public:
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void);
 	virtual wxString GetCategory(void);
-    virtual wxString GetInternalName(void){return wgMB2WX(m_sPath);};
+    virtual CPLString GetInternalName(void){return m_sPath;};
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
@@ -73,24 +73,22 @@ class WXDLLIMPEXP_GIS_CLT wxGxKMLSubDataset :
 	public IGxDataset
 {
 public:
-	wxGxKMLSubDataset(wxString sName, wxGISDatasetSPtr pwxGISDataset, wxGISEnumVectorDatasetType nType);
+	wxGxKMLSubDataset(CPLString Path, wxString sName, wxGISDatasetSPtr pwxGISDataset, wxGISEnumVectorDatasetType nType);
 	virtual ~wxGxKMLSubDataset(void);
     virtual void SetEncoding(wxFontEncoding Encoding);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void){return GetName();};
-    virtual wxString GetInternalName(void){return wxEmptyString;};
+    virtual CPLString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void);
 	//IGxDataset
 	virtual wxGISDatasetSPtr GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
-    virtual void SetPathEncoding(wxMBConv* pPathEncoding){m_pPathEncoding = pPathEncoding;};
-    virtual wxMBConv* GetPathEncoding(void){return m_pPathEncoding;};
     virtual int GetSubType(void){return (int)m_type;};
 protected:
 	wxString m_sName;
+	CPLString m_sPath;
     wxFontEncoding m_Encoding;
 	wxGISDatasetSPtr m_pwxGISDataset;
 	wxGISEnumVectorDatasetType m_type;
-    wxMBConv* m_pPathEncoding;
 };

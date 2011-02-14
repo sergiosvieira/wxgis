@@ -34,15 +34,10 @@ public:
 	wxGxShapeFactory(void);
 	virtual ~wxGxShapeFactory(void);
 	//IGxObjectFactory
-	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray);
-    virtual void Serialize(wxXmlNode* pConfig, bool bStore);
+	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray);
+    virtual void Serialize(wxXmlNode* const pConfig, bool bStore);
 	virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
     virtual wxString GetName(void){return wxString(_("Shapefiles"));};
     //wxGxShapeFactory
     virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumDatasetType type);
-
-	typedef struct _data{
-		wxString path;
-		int bHasShp, bHasDbf, bHasPrj;
-	}DATA;
 };

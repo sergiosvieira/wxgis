@@ -26,7 +26,7 @@ class wxGISFeatureDataset;
 DEFINE_SHARED_PTR(wxGISFeatureDataset);
 
 void WXDLLIMPEXP_GIS_DS GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
-wxGISFeatureDatasetSPtr WXDLLIMPEXP_GIS_DS CreateVectorLayer(wxString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *poFields, OGRSpatialReference *poSpatialRef = NULL, OGRwkbGeometryType eGType = wkbUnknown, char ** papszDataSourceOptions = NULL, char ** papszLayerOptions = NULL, wxMBConv* pPathEncoding = wxConvCurrent); 
+wxGISFeatureDatasetSPtr WXDLLIMPEXP_GIS_DS CreateVectorLayer(CPLString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *poFields, OGRSpatialReference *poSpatialRef = NULL, OGRwkbGeometryType eGType = wkbUnknown, char ** papszDataSourceOptions = NULL, char ** papszLayerOptions = NULL); 
 
 //---------------------------------------
 // wxGISFeatureDataset
@@ -50,6 +50,8 @@ public:
 	virtual bool Open(int iLayer = 0);
 	virtual bool Delete(int iLayer = 0);
 	virtual bool Rename(wxString sNewName);
+	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel);
+	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
 	virtual OGREnvelope* GetEnvelope(void);
     virtual OGRwkbGeometryType GetGeometryType(void);
     virtual OGRFeatureDefn* GetDefiniton(void);
@@ -69,6 +71,7 @@ public:
     virtual OGRErr CreateFeature(OGRFeature* poFeature);
     virtual wxFontEncoding GetEncoding(void){return m_Encoding;};
     virtual void SetEncoding(wxFontEncoding Encoding){m_Encoding = Encoding;};
+    virtual char **GetFileList();
 protected:
     virtual void CreateQuadTree(OGREnvelope* pEnv);
     virtual void DeleteQuadTree(void);

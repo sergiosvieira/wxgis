@@ -41,6 +41,8 @@ public:
     // wxGISRasterDataset
 	virtual bool Open(bool bReadOnly);
 	virtual bool Rename(wxString sNewName);
+	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancle);
+	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancle);
 	virtual const OGREnvelope* GetEnvelope(void);
 	virtual GDALDataset* GetRaster(void){return m_poDataset;};
 	virtual GDALDataset* GetMainRaster(void){return m_poMainDataset;};

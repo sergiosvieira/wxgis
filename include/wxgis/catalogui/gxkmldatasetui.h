@@ -3,7 +3,7 @@
  * Purpose:  wxGxKMLDatasetUI classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxKMLDatasetUI :
 	public IGxObjectEditUI
 {
 public:
-	wxGxKMLDatasetUI(wxString Path, wxString Name, wxGISEnumVectorDatasetType Type, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxKMLDatasetUI(CPLString Path, wxString Name, wxGISEnumVectorDatasetType Type, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon, wxIcon SubLargeIcon = wxNullIcon, wxIcon SubSmallIcon = wxNullIcon);
 	virtual ~wxGxKMLDatasetUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
@@ -54,16 +54,19 @@ protected:
 */
 class WXDLLIMPEXP_GIS_CLU wxGxKMLSubDatasetUI :
 	public wxGxKMLSubDataset,
-	public IGxObjectUI
+	public IGxObjectUI,
+	public IGxObjectEditUI
 {
 public:
-	wxGxKMLSubDatasetUI(wxString sName, wxGISDatasetSPtr pwxGISDataset, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxKMLSubDatasetUI(CPLString Path, wxString sName, wxGISDatasetSPtr pwxGISDataset, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxKMLSubDatasetUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
 	virtual wxString ContextMenu(void){return wxString(wxT("wxGxKMLSubDataset.ContextMenu"));};
 	virtual wxString NewMenu(void){return wxEmptyString;};
+	//IGxObjectEditUI
+	virtual void EditProperties(wxWindow *parent);
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
 };

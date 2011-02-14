@@ -55,9 +55,13 @@
 #include "../../art/folder_16.xpm"
 #include "../../art/folder_48.xpm"
 
+#include "../../art/edit_copy.xpm"
+#include "../../art/edit_cut.xpm"
+#include "../../art/edit_paste.xpm"
+
 #include <wx/dirdlg.h>
 #include <wx/file.h>
-
+#include <wx/clipbrd.h>
 
 //	0	Up One Level
 //	1	Connect Folder
@@ -70,7 +74,10 @@
 //	8	Rename
 //	9	Refresh
 //  10  Properties
-//  11  ?
+//  11  Copy
+//  12  Cut
+//  13  Paste
+//  14  ?
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogMainCmd, wxObject)
 
@@ -88,6 +95,9 @@ wxGISCatalogMainCmd::wxGISCatalogMainCmd(void)
     m_IconProps = wxIcon(properties_xpm);
     m_LargeFolderIcon = wxIcon(folder_48_xpm);
     m_SmallFolderIcon = wxIcon(folder_16_xpm);
+    m_CopyIcon = wxIcon(edit_copy_xpm);
+    m_CutIcon = wxIcon(edit_cut_xpm);
+    m_PasteIcon = wxIcon(edit_paste_xpm);
 }
 
 wxGISCatalogMainCmd::~wxGISCatalogMainCmd(void)
@@ -118,6 +128,12 @@ wxIcon wxGISCatalogMainCmd::GetBitmap(void)
 			return m_IconViewRefresh;
 		case 10:
 			return m_IconProps;
+		case 11:
+			return m_CopyIcon;
+		case 12:
+			return m_CutIcon;
+		case 13:
+			return m_PasteIcon;
 		case 3:
 		default:
 			return wxNullIcon;
@@ -150,6 +166,12 @@ wxString wxGISCatalogMainCmd::GetCaption(void)
 			return wxString(_("Refresh"));
 		case 10:	
 			return wxString(_("Properties"));
+		case 11:	
+			return wxString(_("Copy"));
+		case 12:	
+			return wxString(_("Cut"));
+		case 13:	
+			return wxString(_("Paste"));
 		default:
 			return wxEmptyString;
 	}
@@ -171,6 +193,9 @@ wxString wxGISCatalogMainCmd::GetCategory(void)
 			return wxString(_("New"));
 		case 4:	
 		case 8:	
+		case 11:	
+		case 12:	
+		case 13:	
 			return wxString(_("Edit"));
 		case 10:	
 			return wxString(_("Miscellaneous"));
@@ -336,12 +361,43 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			{
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pSel->GetLastSelectedObject());
-                if(pGxObjectEdit)
+                IGxObjectEditUI* pGxObjectEditUI = dynamic_cast<IGxObjectEditUI*>(pSel->GetLastSelectedObject());
+                if(pGxObjectEditUI)
                     return true;
             }
 			return false;
 		}
+        case 11://Copy
+        {
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
+                IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pSel->GetLastSelectedObject());
+                if(pGxObjectEdit)
+                    return pGxObjectEdit->CanCopy("");
+            }
+			return false;
+        }
+        case 12://Cut
+        {
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
+                IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pSel->GetLastSelectedObject());
+                if(pGxObjectEdit)
+                    return pGxObjectEdit->CanMove("");
+            }
+			return false;
+        }
+        case 13://Paste
+        {
+            wxClipboardLocker lockClip;
+            return wxTheClipboard->IsSupported(wxDF_FILENAME) & wxTheClipboard->IsSupported(wxDF_TEXT);// | wxDF_BITMAP | wxDF_TIFF | wxDF_DIB | wxDF_UNICODETEXT | wxDF_HTML
+        }
 		default:
 			return false;
 	}
@@ -366,6 +422,9 @@ wxGISEnumCommandKind wxGISCatalogMainCmd::GetKind(void)
 		case 8://Rename
 		case 9://Refresh
 		case 10://Properties
+		case 11://copy
+		case 12://cut
+		case 13://paste
 		default:
 			return enumGISCommandNormal;
 	}
@@ -397,6 +456,12 @@ wxString wxGISCatalogMainCmd::GetMessage(void)
 			return wxString(_("Refresh item"));
 		case 10:	
 			return wxString(_("Item properties"));
+		case 11:	
+			return wxString(_("Copy item(s)"));
+		case 12:	
+			return wxString(_("Cut item(s)"));
+		case 13:	
+			return wxString(_("Paste item(s)"));
 		default:
 			return wxEmptyString;
 	}
@@ -588,6 +653,121 @@ void wxGISCatalogMainCmd::OnClick(void)
 			}
     		break;
 		}
+        case 11://copy
+		{
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
+                if(!pSel)
+                    return;
+                wxDataObjectComposite* pComp = new wxDataObjectComposite();
+                pComp->Add(new wxTextDataObject(wxT("COPY")));
+                //! Create simple file data object
+                wxFileDataObject* fdo = new wxFileDataObject();
+                for(size_t i = 0; i < pSel->GetCount(); i++)
+                {
+                    IGxObject* pGxObject = pSel->GetSelectedObjects(i);
+                    IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject);
+                    if(pGxObjectEdit && pGxObjectEdit->CanCopy(""))
+                    {
+                        wxString sSystemPath(pGxObject->GetInternalName(), wxConvUTF8);
+                        fdo->AddFile(sSystemPath);
+                    }
+                }
+
+                pComp->Add(fdo);
+
+                //! Lock clipboard
+                wxClipboardLocker locker;
+                if(!locker)
+                    wxMessageBox(_("Can't open clipboard"), _("Error"), wxOK | wxICON_ERROR);
+                else
+                {
+                    //! Put data to clipboard
+                    if(!wxTheClipboard->AddData(pComp))
+                        wxMessageBox(_("Can't copy file(s) to the clipboard"), _("Error"), wxOK | wxICON_ERROR);
+                }
+            }
+    		break;
+		}
+        case 12://cut
+		{
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
+                if(!pSel)
+                    return;
+                wxDataObjectComposite* pComp = new wxDataObjectComposite();
+                pComp->Add(new wxTextDataObject(wxT("MOVE")));
+                //! Create simple file data object
+                wxFileDataObject* fdo = new wxFileDataObject();
+                for(size_t i = 0; i < pSel->GetCount(); i++)
+                {
+                    IGxObject* pGxObject = pSel->GetSelectedObjects(i);
+                    IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject);
+                    if(pGxObjectEdit && pGxObjectEdit->CanMove(""))
+                    {
+                        wxString sSystemPath(pGxObject->GetInternalName(), wxConvUTF8);
+                        fdo->AddFile(sSystemPath);
+                    }
+                }
+
+                pComp->Add(fdo);
+
+                //! Lock clipboard
+                wxClipboardLocker locker;
+                if(!locker)
+                    wxMessageBox(_("Can't open clipboard"), _("Error"), wxOK | wxICON_ERROR);
+                else
+                {
+                    //! Put data to clipboard
+                    if(!wxTheClipboard->AddData(pComp))
+                        wxMessageBox(_("Can't move file(s) to the clipboard"), _("Error"), wxOK | wxICON_ERROR);
+                }
+            }
+    		break;
+		}
+        case 13://paste
+		{
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pGxCatalogUI->GetSelection();
+                if(!pSel)
+                    return;
+                IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pSel->GetSelectedObjects(0));
+                if(!pTarget)
+                    return;
+
+                wxClipboardLocker locker;
+                if(!locker)
+                    wxMessageBox(_("Can't open clipboard"), _("Error"), wxOK | wxICON_ERROR);
+                else
+                {
+                    wxTextDataObject data;
+                    wxTheClipboard->GetData( data );
+                    bool bMove(false);
+                    if(data.GetText() == wxString(wxT("MOVE")))
+                        bMove = true;
+                    else if(data.GetText() == wxString(wxT("COPY")))
+                        bMove = false;
+                    else
+                        return;
+
+                    wxFileDataObject filedata;
+                    wxTheClipboard->GetData( filedata );
+                    wxArrayString filenames = filedata.GetFilenames();
+
+                    pTarget->Drop(filenames, bMove);
+                }
+            }
+    		break;
+		}
         case 7:
             {
 			    IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
@@ -687,6 +867,12 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 			return wxString(_("Refresh selected item"));
 		case 10:	
 			return wxString(_("Show properties of selected item"));
+		case 11:	
+			return wxString(_("Copy selected item(s)"));
+		case 12:	
+			return wxString(_("Cut selected item(s)"));
+		case 13:	
+			return wxString(_("Paste selected item(s)"));
 		default:
 			return wxEmptyString;
 	}
@@ -694,17 +880,13 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 
 unsigned char wxGISCatalogMainCmd::GetCount(void)
 {
-	return 11;
+	return 14;
 }
 
 IToolBarControl* wxGISCatalogMainCmd::GetControl(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
-		case 1:	
-		case 2:	
-			return NULL;
 		case 3:	
 			//if(!m_pGxLocationComboBox)
 			{
@@ -712,12 +894,6 @@ IToolBarControl* wxGISCatalogMainCmd::GetControl(void)
 				wxGxLocationComboBox* pGxLocationComboBox = new wxGxLocationComboBox(dynamic_cast<wxWindow*>(m_pApp), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 400, 22 ), PathArray);
 				return static_cast<IToolBarControl*>(pGxLocationComboBox);
 			}
-		case 4:	
-		case 5:	
-		case 6:	
-		case 7:	
-		case 8:	
-		case 9:	
 		default:
 			return NULL;
 	}
@@ -727,19 +903,8 @@ wxString wxGISCatalogMainCmd::GetToolLabel(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
-		case 1:	
-		case 2:	
-			return wxEmptyString;
 		case 3:	
 			return wxString(_("Path:   "));
-		case 4:	
-		case 5:	
-		case 6:	
-		case 7:	
-		case 8:	
-		case 9:	
-		case 10:	
 		default:
 			return wxEmptyString;
 	}
@@ -749,19 +914,8 @@ bool wxGISCatalogMainCmd::HasToolLabel(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
-		case 1:	
-		case 2:	
-			return false;
 		case 3:	
 			return true;
-		case 4:	
-		case 5:	
-		case 6:	
-		case 7:	
-		case 8:	
-		case 9:	
-		case 10:	
 		default:
 			return false;
 	}
@@ -771,11 +925,6 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
-		case 1:	
-		case 2:	
-		case 3:	
-		case 4:	
 		case 5:
         {
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
@@ -820,10 +969,6 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
             }
             return NULL;
         }            
-		case 7:	
-		case 8:	
-		case 9:	
-		case 10:	
 		default:
 			return NULL;
 	}

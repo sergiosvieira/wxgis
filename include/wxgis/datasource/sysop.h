@@ -26,8 +26,14 @@ bool WXDLLIMPEXP_GIS_DS DeleteDir(CPLString sPath);
 bool WXDLLIMPEXP_GIS_DS CreateDir(CPLString sPath, long mode = 0777); 
 bool WXDLLIMPEXP_GIS_DS DeleteFile(CPLString sPath);
 bool WXDLLIMPEXP_GIS_DS RenameFile(CPLString sOldPath, CPLString sNewPath);
-wxString WXDLLIMPEXP_GIS_DS CheckUniqName(wxString sPath, wxString sName, wxString sExt, int nCounter);
+bool WXDLLIMPEXP_GIS_DS CopyFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCancel);
+bool WXDLLIMPEXP_GIS_DS MoveFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCancel);
 wxFontEncoding WXDLLIMPEXP_GIS_DS GetEncodingFromCpg(CPLString sPath);
 wxString WXDLLIMPEXP_GIS_DS ClearExt(wxString sPath);
 bool WXDLLIMPEXP_GIS_DS IsFileHidden(CPLString sPath);
+wxString  WXDLLIMPEXP_GIS_DS CheckUniqName(CPLString sPath, wxString sName, wxString sExt, int nCounter = 0);
+CPLString WXDLLIMPEXP_GIS_DS CheckUniqPath(CPLString sPath, int nCounter = 0);
+CPLString WXDLLIMPEXP_GIS_DS Transliterate(const char* str);
+
+
 

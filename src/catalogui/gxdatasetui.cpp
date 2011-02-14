@@ -37,7 +37,7 @@
 //class wxGxTableDatasetUI
 //--------------------------------------------------------------
 
-wxGxTableDatasetUI::wxGxTableDatasetUI(wxString Path, wxString Name, wxGISEnumTableDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxTableDataset(Path, Name, nType)
+wxGxTableDatasetUI::wxGxTableDatasetUI(CPLString Path, wxString Name, wxGISEnumTableDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxTableDataset(Path, Name, nType)
 {
     m_LargeIcon = LargeIcon;
     m_SmallIcon = SmallIcon;
@@ -65,7 +65,7 @@ void wxGxTableDatasetUI::EditProperties(wxWindow *parent)
 //class wxGxFeatureDatasetUI
 //--------------------------------------------------------------
 
-wxGxFeatureDatasetUI::wxGxFeatureDatasetUI(wxString Path, wxString Name, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxFeatureDataset(Path, Name, nType)
+wxGxFeatureDatasetUI::wxGxFeatureDatasetUI(CPLString Path, wxString Name, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxFeatureDataset(Path, Name, nType)
 {
     m_LargeIcon = LargeIcon;
     m_SmallIcon = SmallIcon;
@@ -134,7 +134,7 @@ bool wxGxFeatureDatasetUI::Invoke(wxWindow* pParentWnd)
 //class wxGxRasterDatasetUI
 //--------------------------------------------------------------
 
-wxGxRasterDatasetUI::wxGxRasterDatasetUI(wxString Path, wxString Name, wxGISEnumRasterDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxRasterDataset(Path, Name, nType)
+wxGxRasterDatasetUI::wxGxRasterDatasetUI(CPLString Path, wxString Name, wxGISEnumRasterDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxRasterDataset(Path, Name, nType)
 {
     m_LargeIcon = LargeIcon;
     m_SmallIcon = SmallIcon;

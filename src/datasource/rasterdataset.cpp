@@ -341,3 +341,48 @@ wxString wxGISRasterDataset::GetName(void)
 	return wxString(CPLGetFilename(m_sPath), wxConvUTF8);
 }
 
+bool wxGISRasterDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancle)
+{
+    //TODO
+	//wxCriticalSectionLocker locker(m_CritSect);
+ //   Close();
+
+ //   char** papszFileList = GetFileList();
+ //   papszFileList = CSLAddString( papszFileList, m_sPath );
+ //   if(!papszFileList)
+ //       return false;
+
+ //   for(int i = 0; papszFileList[i] != NULL; ++i )
+ //   {
+ //       const char* szNewDestFileName = CPLFormFilename(szDestPath, CPLGetFilename(papszFileList[i]), NULL);
+ //       if(!CopyFile(szNewDestFileName, papszFileList[i], pTrackCancle))
+ //           return false;
+ //   }
+ //   
+ //   m_sPath = CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL);
+
+	return true;
+}
+
+bool wxGISRasterDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancle)
+{
+    //TODO
+	//wxCriticalSectionLocker locker(m_CritSect);
+ //   Close();
+
+ //   char** papszFileList = GetFileList();
+ //   papszFileList = CSLAddString( papszFileList, m_sPath );
+ //   if(!papszFileList)
+ //       return false;
+
+ //   for(int i = 0; papszFileList[i] != NULL; ++i )
+ //   {
+ //       const char* szNewDestFileName = CPLFormFilename(szDestPath, CPLGetFilename(papszFileList[i]), NULL);
+ //       if(!MoveFile(szNewDestFileName, papszFileList[i], pTrackCancle))
+ //           return false;
+ //   }
+
+ //   m_sPath = CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL);
+
+    return true;
+}

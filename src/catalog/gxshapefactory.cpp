@@ -32,87 +32,66 @@ wxGxShapeFactory::~wxGxShapeFactory(void)
 {
 }
 
-bool wxGxShapeFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray)
+bool wxGxShapeFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray)
 {
-	std::map<wxString, DATA> data_map;
+    for(int i = CSLCount(pFileNames) - 1; i >= 0; i-- )
+    {
+        IGxObject* pGxObj = NULL;
+        CPLString szExt = CPLGetExtension(pFileNames[i]);
+        CPLString szPath;
 
-	for(size_t i = 0; i < pFileNames->GetCount(); i++)
-	{
-		wxString path = pFileNames->Item(i);
-		//test is dir
-		if(wxFileName::DirExists(path))
-			continue;
+        if(EQUAL(szExt, "shp"))
+        {
+            bool bHasDbf(false), bHasPrj(false);
+            szPath = (char*)CPLResetExtension(pFileNames[i], "dbf");
+            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                bHasDbf = true;
+            szPath = (char*)CPLResetExtension(pFileNames[i], "prj");
+            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                bHasPrj = true;
+            if(bHasDbf && bHasPrj)
+                pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumGISFeatureDataset);
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        }
+        else if(EQUAL(szExt, "dbf"))
+        {
+            bool bHasShp(false);
+            szPath = (char*)CPLResetExtension(pFileNames[i], "shp");
+            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                bHasShp = true;
+            if(!bHasShp)
+                pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumGISTableDataset);
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        }
+        else if(EQUAL(szExt, "prj"))
+        {
+            bool bHasShp(false);
+            szPath = (char*)CPLResetExtension(pFileNames[i], "shp");
+            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                bHasShp = true;
+            if(bHasShp)
+                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        }
+        else if(EQUAL(szExt, "sbn"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "sbx"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "shx"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "cpg"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "qix"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "osf"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 
-        wxFileName FName(path);
-        wxString ext = FName.GetExt().MakeLower();
-        FName.ClearExt();
-
-        //name conv cp866 if zip
-        wxString name = GetConvName(path, FName);
-
-		if(data_map[name].bHasShp != 1)
-			data_map[name].bHasShp = (ext == wxT("shp")) ? 1 : 0;
-		if(data_map[name].bHasDbf != 1)
-			data_map[name].bHasDbf = (ext == wxT("dbf")) ? 1 : 0;
-		if(data_map[name].bHasPrj != 1)
-			data_map[name].bHasPrj = (ext == wxT("prj")) ? 1 : 0;
-		if(data_map[name].path.IsEmpty() && (data_map[name].bHasShp || data_map[name].bHasDbf || data_map[name].bHasPrj))
-			data_map[name].path = sParentDir+ wxFileName::GetPathSeparator() + FName.GetName();
-		if(data_map[name].path.IsEmpty())
-			data_map.erase(name);
-
-		if(path.Find(wxT(".shp")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".dbf")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".prj")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".sbn")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".sbx")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".shx")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".cpg")) != wxNOT_FOUND)
-			goto REMOVE;
-		continue;
-REMOVE:
-		pFileNames->RemoveAt(i);
-		i--;
-	}
-
-	for(std::map<wxString, DATA>::const_iterator CI = data_map.begin(); CI != data_map.end(); ++CI)
-	{
-		IGxObject* pGxObj = NULL;
-
-		if(CI->second.bHasShp)
-		{
-			wxString name = CI->first + wxT(".shp");
-			wxString path = CI->second.path + wxT(".shp");
-			//create shp
-			pGxObj = GetGxDataset(path, name, enumGISFeatureDataset);
-		}
-		if(CI->second.bHasDbf && !CI->second.bHasShp)
-		{
-			wxString name = CI->first + wxT(".dbf");
-			wxString path = CI->second.path + wxT(".dbf");
-
-			//create dbf
-			pGxObj = GetGxDataset(path, name, enumGISTableDataset);
-		}
-		if(CI->second.bHasPrj && !CI->second.bHasShp)
-		{
-			//CI->first + wxT(".prj");
-            pFileNames->push_back(CI->second.path + wxT(".prj"));
-			//create prj
-		}
 		if(pGxObj != NULL)
-			pObjArray->push_back(pGxObj);
-	}
+			ObjArray.push_back(pGxObj);
+    }
 	return true;
 }
 
-void wxGxShapeFactory::Serialize(wxXmlNode* pConfig, bool bStore)
+void wxGxShapeFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
 {
     if(bStore)
     {

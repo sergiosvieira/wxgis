@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxcontentview.h"
 #include "wxgis/catalog/gxdiscconnection.h"
+#include "wxgis/catalogui/gxcatdroptarget.h"
 
 #include "../../art/document_16.xpm"
 #include "../../art/document_48.xpm"
@@ -101,11 +102,14 @@ int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
 
 wxGxContentView::wxGxContentView(void)
 {
+    m_HighLightItem = wxNOT_FOUND;
 }
 
 wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
 wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(enumGISCVList), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(-1), m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL), m_bDragging(false), m_pDeleteCmd(NULL)
 {
+    m_HighLightItem = wxNOT_FOUND;
+
 	InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150);
 	InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
 
@@ -790,7 +794,8 @@ void wxGxContentView::OnBeginDrag(wxListEvent& event)
             continue;
         if(!pItemData->pObject)
             continue;
-        my_data.AddFile(pItemData->pObject->GetFullName());
+        wxString sSystemPath(pItemData->pObject->GetInternalName(), wxConvUTF8);
+        my_data.AddFile(sSystemPath);
         nCount++;
     }
     if(nCount == 0)
@@ -798,7 +803,9 @@ void wxGxContentView::OnBeginDrag(wxListEvent& event)
 
     wxDropSource dragSource( this );
 	dragSource.SetData( my_data );
-	wxDragResult result = dragSource.DoDragDrop( TRUE );
+	wxDragResult result = dragSource.DoDragDrop( wxDrag_AllowMove );
+    if(result == wxDragMove)
+        m_pParentGxObject->Refresh();
 }
 
 void wxGxContentView::SelectAll(void)
@@ -826,7 +833,6 @@ void wxGxContentView::OnChar(wxKeyEvent& event)
         break;
     }
 }
-
 
 void wxGxContentView::BeginRename(IGxObject* pGxObject)
 {
@@ -886,4 +892,49 @@ int wxGxContentView::GetIconPos(wxIcon icon_small, wxIcon icon_large)
 		pos = 2;//0 col img, 1 - col img
 
     return pos;
+}
+
+wxDragResult wxGxContentView::OnDragOver(wxCoord x, wxCoord y, wxDragResult def)
+{    
+    SetItemState(m_HighLightItem, 0, wxLIST_STATE_DROPHILITED);
+    wxPoint pt(x, y);
+	unsigned long nFlags(0);
+	long nItemId = HitTest(pt, (int &)nFlags);
+	if(nItemId != wxNOT_FOUND && (nFlags & wxLIST_HITTEST_ONITEM))
+	{ 
+        wxSize sz = GetClientSize();
+        if(DNDSCROLL > y)//scroll up
+            ScrollLines(-1);
+        else if((sz.GetHeight() - DNDSCROLL) < y)//scroll down
+            ScrollLines(1);
+
+        m_HighLightItem = nItemId;
+        SetItemState(m_HighLightItem, wxLIST_STATE_DROPHILITED, wxLIST_STATE_DROPHILITED);
+
+    }
+    return def;
+}
+
+bool wxGxContentView::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
+{
+    bool bMove = !wxGetKeyState(WXK_CONTROL);
+
+    //SetItemState(m_HighLightItem, 0, wxLIST_STATE_DROPHILITED);
+    //SetItemState(m_HighLightItem, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+    wxPoint pt(x, y);
+	unsigned long nFlags(0);
+	long nItemId = HitTest(pt, (int &)nFlags);
+    IGxObject* pObject = m_pParentGxObject;
+	if(nItemId != wxNOT_FOUND && (nFlags & wxLIST_HITTEST_ONITEM))
+		pObject = (IGxObject*)GetItemData(nItemId);
+
+    IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pObject);
+    if(pTarget == NULL)
+	    return false;
+    return pTarget->Drop(filenames, bMove);
+}
+
+void wxGxContentView::OnLeave()
+{
+    SetItemState(m_HighLightItem, 0, wxLIST_STATE_DROPHILITED);
 }

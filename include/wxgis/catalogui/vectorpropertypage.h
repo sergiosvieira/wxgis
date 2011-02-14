@@ -21,7 +21,6 @@
 #pragma once
 
 #include "wxgis/catalogui/catalogui.h"
-#include "wxgis/catalog/gxdataset.h"
 #include "wxgis/datasource/featuredataset.h"
 
 #include "wx/propgrid/propgrid.h"
@@ -37,17 +36,18 @@ class WXDLLIMPEXP_GIS_CLU wxGISVectorPropertyPage :
 
 public:
     wxGISVectorPropertyPage(void);
-    wxGISVectorPropertyPage(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Vector"));
+    wxGISVectorPropertyPage(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Vector"));
 	~wxGISVectorPropertyPage();
-    virtual bool Create(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Vector"));
+    virtual bool Create(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Vector"));
     virtual wxString GetPageName(void){return wxString(_("Vector"));};
     wxPGId AppendProperty(wxPGProperty* pProp);
     wxPGId AppendProperty(wxPGId pid, wxPGProperty* pProp);
     wxPGId AppendMetadataProperty(wxString sMeta);
     void FillGrid(void);
+    void FillLayerDef(OGRLayer *poLayer, int iLayer);
 protected:
     wxGISFeatureDatasetSPtr m_pDataset;
-    wxGxFeatureDataset* m_pGxDataset;
+    IGxDataset* m_pGxDataset;
     wxPropertyGrid* m_pg;
 
     DECLARE_EVENT_TABLE()

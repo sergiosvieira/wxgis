@@ -62,7 +62,14 @@ wxString wxGxKMLDataset::GetBaseName(void)
 
 wxString wxGxKMLDataset::GetCategory(void)
 {
-	return wxString(_("KML Dataset"));
+    switch(m_type)
+    {
+    case enumVecKML:
+    case enumVecKMZ:
+        return wxString(_("KML Dataset"));
+    case enumVecGML:
+        return wxString(_("GML Dataset"));
+    }
 }
 
 bool wxGxKMLDataset::Delete(void)
@@ -98,7 +105,7 @@ bool wxGxKMLDataset::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
     }
     return false;
@@ -106,17 +113,17 @@ bool wxGxKMLDataset::Delete(void)
 
 bool wxGxKMLDataset::Rename(wxString NewName)
 {
-//TODO: Fix it!
-	/*NewName = ClearExt(NewName);
-	wxFileName PathName(m_sPath);
+    NewName = ClearExt(NewName);
+	wxFileName PathName(wxString(m_sPath, wxConvUTF8));
 	PathName.SetName(NewName);
 
-	wxString m_sNewPath = PathName.GetFullPath();
+	wxString sNewPath = PathName.GetFullPath();
 
 	EmptyChildren();
-    if(RenameFile(m_sPath, m_sNewPath))
+    CPLString szNewPath = sNewPath.mb_str(wxConvUTF8);
+    if(RenameFile(m_sPath, szNewPath))
 	{
-		m_sPath = m_sNewPath;
+        m_sPath = szNewPath;
 		m_sName = NewName;
 		m_pCatalog->ObjectChanged(this);
 		Refresh();
@@ -125,9 +132,9 @@ bool wxGxKMLDataset::Rename(wxString NewName)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), m_sPath.c_str());
+        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
-    }*/
+    }
 	return false;
 }
 
@@ -157,20 +164,20 @@ void wxGxKMLDataset::LoadChildren(void)
 		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
             wxLogError(sErr);
 
-            //wxDELETE(pwxGISFeatureDataset);
 			return;
         }
 
         m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(pwxGISFeatureDataset);
         m_pwxGISDataset->SetSubType(m_type);
-        //m_pwxGISDataset->Reference();
+        pwxGISFeatureDataset->SetEncoding(m_Encoding);
 	}
 
     for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); i++)
     {
         wxGISFeatureDatasetSPtr pwxGISFeatureSuDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset->GetSubset(i));
         pwxGISFeatureSuDataset->SetSubType(m_type);
-        wxGxKMLSubDataset* pGxSubDataset = new wxGxKMLSubDataset(pwxGISFeatureSuDataset->GetName(), pwxGISFeatureSuDataset, m_type);
+        pwxGISFeatureSuDataset->SetEncoding(m_Encoding);
+        wxGxKMLSubDataset* pGxSubDataset = new wxGxKMLSubDataset(m_sPath, pwxGISFeatureSuDataset->GetName(), pwxGISFeatureSuDataset, m_type);
 		bool ret_code = AddChild(pGxSubDataset);
 		if(!ret_code)
 			wxDELETE(pGxSubDataset);
@@ -195,7 +202,6 @@ wxGISDatasetSPtr wxGxKMLDataset::GetDataset(bool bReadOnly)
 	if(m_pwxGISDataset == NULL)
         return wxGISDatasetSPtr();
 
-	//m_pwxGISDataset->Reference();
 	return m_pwxGISDataset;
 }
 
@@ -203,7 +209,7 @@ wxGISDatasetSPtr wxGxKMLDataset::GetDataset(bool bReadOnly)
 //class wxGxKMLSubDataset
 //--------------------------------------------------------------
 
-wxGxKMLSubDataset::wxGxKMLSubDataset(wxString sName, wxGISDatasetSPtr pwxGISDataset, wxGISEnumVectorDatasetType nType)
+wxGxKMLSubDataset::wxGxKMLSubDataset(CPLString Path, wxString sName, wxGISDatasetSPtr pwxGISDataset, wxGISEnumVectorDatasetType nType)
 {
 	m_type = nType;
 
@@ -212,12 +218,13 @@ wxGxKMLSubDataset::wxGxKMLSubDataset(wxString sName, wxGISDatasetSPtr pwxGISData
 	m_pwxGISDataset = pwxGISDataset;
 
     m_Encoding = wxFONTENCODING_UTF8;
-    m_pPathEncoding = wxConvCurrent;
+
+    m_sPath = Path + "|layername=";
+    m_sPath += sName.mb_str(wxConvUTF8);
 }
 
 wxGxKMLSubDataset::~wxGxKMLSubDataset(void)
 {
-    //wsDELETE(m_pwxGISDataset);
 }
 
 wxString wxGxKMLSubDataset::GetCategory(void)
@@ -227,8 +234,8 @@ wxString wxGxKMLSubDataset::GetCategory(void)
 
 wxGISDatasetSPtr wxGxKMLSubDataset::GetDataset(bool bReadOnly)
 {
-	if(m_pwxGISDataset == NULL)
-        return wxGISDatasetSPtr();
+	//if(m_pwxGISDataset == NULL)
+ //       return wxGISDatasetSPtr();
 
   //  if(!m_pwxGISDataset->Open())
   //  {

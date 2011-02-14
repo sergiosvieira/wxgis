@@ -3,7 +3,7 @@
  * Purpose:  wxGxFileFactoryUI class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -30,8 +30,8 @@ class wxGxFileFactoryUI :
 public:
 	wxGxFileFactoryUI(void);
 	virtual ~wxGxFileFactoryUI(void);
-	//IGxObjectFactory
-	virtual bool GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray);
+    //wxGxFileFactory
+    virtual IGxObject* GetGxObject(CPLString path, wxString name);
 protected:
     wxIcon m_LargePRJIcon, m_SmallPRJIcon;
 };

@@ -29,18 +29,20 @@
 // wxGISTable
 //------------------------------------------------------------------
 
-wxGISTable::wxGISTable(wxGISDatasetSPtr pwxGISDataset)/* : m_pwxGISDataset(NULL)*/
+wxGISTable::wxGISTable(wxGISDatasetSPtr pwxGISDataset)
 {
     m_pwxGISDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pwxGISDataset);
-    //m_pwxGISDataset->Reference();
-	OGRLayer* pLayer = m_pwxGISDataset->GetLayerRef(0);
-    if(pLayer)
+    if(m_pwxGISDataset)
     {
-	    m_sFIDKeyName = wgMB2WX(pLayer->GetFIDColumn());
+	    OGRLayer* pLayer = m_pwxGISDataset->GetLayerRef(0);
+        if(pLayer)
+        {
+	        m_sFIDKeyName = wgMB2WX(pLayer->GetFIDColumn());
 
-	    m_pOGRFeatureDefn = pLayer->GetLayerDefn();
-	    nCols = m_pOGRFeatureDefn->GetFieldCount();
-	    nRows = m_pwxGISDataset->GetSize();
+	        m_pOGRFeatureDefn = pLayer->GetLayerDefn();
+	        nCols = m_pOGRFeatureDefn->GetFieldCount();
+	        nRows = m_pwxGISDataset->GetSize();
+        }
     }
     else
     {

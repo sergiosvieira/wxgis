@@ -17,7 +17,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="..\$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)Cli"
+			IntermediateDirectory="$(ConfigurationName)CliUI"
 			ConfigurationType="2"
 			CharacterSet="1"
 			>
@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxmsw28ud_html.lib wxcode_msw28ud_propgrid.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISCatalogd.lib wxGISFrameworkd.lib wxGISCored.lib"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxmsw28ud_html.lib wxcode_msw28ud_propgrid.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISCatalogd.lib wxGISFrameworkd.lib wxGISCored.lib wxGISCartod.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="0"
 				AdditionalLibraryDirectories="&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(WXPROPGRID)\lib\vc_dll&quot;;..\..\lib"
@@ -213,7 +213,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\catalogui\gxcontdialog.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\catalogui\gxcontentview.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\catalogui\gxdatasetui.cpp"
 				>
 			</File>
 			<File
@@ -225,6 +233,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\catalogui\gxfilefactoryui.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\catalogui\gxfileui.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\catalogui\gxfolderfactoryui.cpp"
 				>
 			</File>
@@ -233,7 +249,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\catalogui\gxkmldatasetui.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\catalogui\gxlocationcombobox.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\catalogui\gxmapinfofactoryui.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\catalogui\gxmapview.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\catalogui\gxmlfactoryui.cpp"
 				>
 			</File>
 			<File
@@ -241,7 +273,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\catalogui\gxobgdialog.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\catalogui\gxpending.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\catalogui\gxprjfactoryui.cpp"
 				>
 			</File>
 			<File
@@ -253,7 +293,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\catalogui\gxshapefactoryui.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\catalogui\gxspatreffolderui.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\catalogui\gxtableview.cpp"
 				>
 			</File>
 			<File
@@ -270,6 +318,18 @@
 			</File>
 			<File
 				RelativePath="..\..\src\catalogui\newmenu.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\catalogui\rasterpropertypage.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\catalogui\spatrefpropertypage.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\catalogui\vectorpropertypage.cpp"
 				>
 			</File>
 			<File
@@ -315,7 +375,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxcontdialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wxgis\catalogui\gxcontentview.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxdatasetui.h"
 				>
 			</File>
 			<File
@@ -327,6 +395,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxfilefactoryui.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxfileui.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wxgis\catalogui\gxfolderfactoryui.h"
 				>
 			</File>
@@ -335,7 +411,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxkmldatasetui.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wxgis\catalogui\gxlocationcombobox.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxmapinfofactoryui.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxmapview.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxmlfactoryui.h"
 				>
 			</File>
 			<File
@@ -343,7 +435,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxobjdialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wxgis\catalogui\gxpending.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxprjfactoryui.h"
 				>
 			</File>
 			<File
@@ -355,7 +455,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxshapefactoryui.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wxgis\catalogui\gxspatreffolderui.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\gxtableview.h"
 				>
 			</File>
 			<File
@@ -372,6 +480,18 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalogui\newmenu.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\rasterpropertypage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\spatrefpropertypage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\vectorpropertypage.h"
 				>
 			</File>
 			<File

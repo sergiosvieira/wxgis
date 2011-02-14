@@ -51,7 +51,7 @@ void *wxGISFeatureTransformThread::Entry()
     
     size_t nStep = nFeatureCount < 10 ? 1 : nFeatureCount / 10;
 
-    OGREnvelope* pEnv = m_pwxGISFeatureDataset->GetEnvelope();
+    m_pFullEnv->Merge(*m_pwxGISFeatureDataset->GetEnvelope());
 
  	OGRFeature* poFeature;
     while((poFeature = m_pwxGISFeatureDataset->Next()) != NULL)	
@@ -72,7 +72,7 @@ void *wxGISFeatureTransformThread::Entry()
         OGREnvelope GEnv;
         pGeom->getEnvelope(&GEnv);
         
-        if(!pEnv->Contains(GEnv))
+        if(!m_pFullEnv->Contains(GEnv))
         {
             OGRFeature::DestroyFeature(poFeature);
             continue;
@@ -147,11 +147,11 @@ void *wxGISFeatureTransformThread::Entry()
             }
         }
 
-        OGREnvelope Env;
-        pFeatureGeom->getEnvelope(&Env);
+        //OGREnvelope Env;
+        //pFeatureGeom->getEnvelope(&Env);
         m_pCritSect->Enter();
 
-        m_pFullEnv->Merge(Env);
+        //m_pFullEnv->Merge(Env);
 	    m_pOGRGeometrySet->AddGeometry(pFeatureGeom, nOID);
 
         m_nCounter++;

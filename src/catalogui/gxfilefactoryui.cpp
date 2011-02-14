@@ -3,7 +3,7 @@
  * Purpose:  wxGxFileFactoryUI class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -37,53 +37,8 @@ wxGxFileFactoryUI::~wxGxFileFactoryUI(void)
 {
 }
 
-bool wxGxFileFactoryUI::GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray)
+IGxObject* wxGxFileFactoryUI::GetGxObject(CPLString path, wxString name)
 {
-	for(size_t i = 0; i < pFileNames->GetCount(); i++)
-	{
-		wxString path = pFileNames->Item(i);
-		//test is dir
-		if(wxFileName::DirExists(path))
-			continue;
-
-        wxFileName FName(path);
-        wxString ext = FName.GetExt().MakeLower();
-        FName.ClearExt();
-        wxString name = GetConvName(path, FName);//name conv cp866 if zip
-
-		IGxObject* pGxObj = NULL;
-		if(ext == wxString(wxT("spr")))
-		{ 
-            name += wxT(".") + ext;
-			wxGxPrjFileUI* pFile = new wxGxPrjFileUI(path, name, enumSPRfile, m_LargePRJIcon, m_SmallPRJIcon);
-			pGxObj = dynamic_cast<IGxObject*>(pFile);
-			goto REMOVE;
-		}
-		if(ext == wxString(wxT("prj")))
-		{
-			name += wxT(".") + ext;
-			wxGxPrjFileUI* pFile = new wxGxPrjFileUI(path, name, enumESRIPrjFile, m_LargePRJIcon, m_SmallPRJIcon);
-			pGxObj = dynamic_cast<IGxObject*>(pFile);
-			goto REMOVE;
-		}
-        //add extensions from config
-        for(size_t j = 0; j < m_ExtArray.size(); j++)
-        {
-            if(m_ExtArray[j] == ext)
-            {
-			    name += wxT(".") + ext;
-			    wxGxTextFileUI* pFile = new wxGxTextFileUI(path, name);
-			    pGxObj = dynamic_cast<IGxObject*>(pFile);
-			    goto REMOVE;
-            }
-        }
-		continue;
-REMOVE:
-		pFileNames->RemoveAt(i);
-		i--;
-		if(pGxObj != NULL)
-			pObjArray->push_back(pGxObj);
-	}
-
-	return true;
+    wxGxTextFileUI* pFile = new wxGxTextFileUI(path, name);
+    return dynamic_cast<IGxObject*>(pFile);
 }

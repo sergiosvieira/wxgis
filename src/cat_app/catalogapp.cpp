@@ -74,6 +74,7 @@ bool wxGISCatalogApp::OnInit()
 
     //some default GDAL
     CPLSetConfigOption( "GDAL_CACHEMAX", "128" );
+    //CPLSetConfigOption ( "LIBKML_USE_DOC.KML", "no" );
     //GDAL_MAX_DATASET_POOL_SIZE
     //OGR_ARC_STEPSIZE
 

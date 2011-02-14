@@ -122,7 +122,7 @@ public:
 	//IGxObject
     virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void){return GetName();};
-    virtual wxString GetInternalName(void){return wxEmptyString;};
+    virtual CPLString GetInternalName(void){return CPLString();};
 	virtual wxString GetCategory(void){return wxString(_("Task"));};
 	virtual void Detach(void);
 	//IGxObjectUI

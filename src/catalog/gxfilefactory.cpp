@@ -3,7 +3,7 @@
  * Purpose:  wxGxFileFactory class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -33,58 +33,29 @@ wxGxFileFactory::~wxGxFileFactory(void)
 {
 }
 
-bool wxGxFileFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray)
+bool wxGxFileFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray)
 {
-	for(size_t i = 0; i < pFileNames->GetCount(); i++)
-	{
-		wxString path = pFileNames->Item(i);
-		//test is dir
-		if(wxFileName::DirExists(path))
-			continue;
-
-        wxFileName FName(path);
-        wxString ext = FName.GetExt().MakeLower();
-        FName.ClearExt();
-        wxString name = GetConvName(path, FName);
-
-		IGxObject* pGxObj = NULL;
-		if(ext == wxString(wxT("spr")))
-		{ 
-            name += wxT(".") + ext;
-			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumSPRfile);
-			pGxObj = dynamic_cast<IGxObject*>(pFile);
-			goto REMOVE;
-		}
-		if(ext == wxString(wxT("prj")))
-		{
-			name += wxT(".") + ext;
-			wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumESRIPrjFile);
-			pGxObj = dynamic_cast<IGxObject*>(pFile);
-			goto REMOVE;
-		}
-        //add extensions from config
+    for(int i = CSLCount(pFileNames) - 1; i >= 0; i-- )
+    {
+        CPLString szExt = CPLGetExtension(pFileNames[i]);
+        wxString sExt(szExt, wxConvUTF8);
         for(size_t j = 0; j < m_ExtArray.size(); j++)
         {
-            if(m_ExtArray[j] == ext)
+            if(m_ExtArray[j].CmpNoCase(sExt) == 0)
             {
-			    name += wxT(".") + ext;
-			    wxGxTextFile* pFile = new wxGxTextFile(path, name);
-			    pGxObj = dynamic_cast<IGxObject*>(pFile);
-			    goto REMOVE;
+                IGxObject* pGxObj = GetGxObject(pFileNames[i], GetConvName(pFileNames[i]));
+                ObjArray.push_back(pGxObj);
+
+                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+
+			    return true;
             }
         }
-		continue;
-REMOVE:
-		pFileNames->RemoveAt(i);
-		i--;
-		if(pGxObj != NULL)
-			pObjArray->push_back(pGxObj);
-	}
-
+    }
 	return true;
 }
 
-void wxGxFileFactory::Serialize(wxXmlNode* pConfig, bool bStore)
+void wxGxFileFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
 {
     if(bStore)
     {
@@ -112,9 +83,14 @@ void wxGxFileFactory::Serialize(wxXmlNode* pConfig, bool bStore)
 	    while ( tkz.HasMoreTokens() )
 	    {
 		    wxString token = tkz.GetNextToken();
-		    //token.Replace(wxT("|"), wxT(""));	
 		    token.MakeLower();
             m_ExtArray.Add(token);
 	    }
     }
+}
+
+IGxObject* wxGxFileFactory::GetGxObject(CPLString path, wxString name)
+{
+    wxGxTextFile* pFile = new wxGxTextFile(path, name);
+    return dynamic_cast<IGxObject*>(pFile);
 }

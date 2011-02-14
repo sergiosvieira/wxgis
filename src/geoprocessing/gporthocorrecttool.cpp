@@ -71,7 +71,7 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         pParam1->SetDirection(enumGISGPParameterDirectionInput);
 
         wxGISGPGxObjectDomain* pDomain1 = new wxGISGPGxObjectDomain();
-        pDomain1->AddFilter(new wxGxTiffFilter());
+        pDomain1->AddFilter(new wxGxRasterFilter(enumRasterTiff));
         pParam1->SetDomain(pDomain1);
 
         m_pParamArr.push_back(pParam1);
@@ -85,11 +85,12 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         pParam2->SetDirection(enumGISGPParameterDirectionOutput);
 
         wxGISGPGxObjectDomain* pDomain2 = new wxGISGPGxObjectDomain();
-        pDomain2->AddFilter(new wxGxTiffFilter());
-        pDomain2->AddFilter(new wxGxImgFilter());
-        pDomain2->AddFilter(new wxGxBmpFilter());
-        pDomain2->AddFilter(new wxGxJpegFilter());
-        pDomain2->AddFilter(new wxGxPngFilter());
+        pDomain2->AddFilter(new wxGxRasterFilter(enumRasterTiff));
+        pDomain2->AddFilter(new wxGxRasterFilter(enumRasterImg));
+        pDomain2->AddFilter(new wxGxRasterFilter(enumRasterBmp));
+        pDomain2->AddFilter(new wxGxRasterFilter(enumRasterJpeg));
+        pDomain2->AddFilter(new wxGxRasterFilter(enumRasterPng));
+        pDomain2->AddFilter(new wxGxRasterFilter(enumRasterGif));
         pParam2->SetDomain(pDomain2);
 
         //pParam2->AddParameterDependency(wxT("src_path"));
@@ -278,7 +279,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         IGxObject* pGxDemObj = pGxObjectContainer->SearchChild(soDEMPath);
         if(pGxDemObj)
         {
-            soCPLDemPath = CPLString((const char *)pGxDemObj->GetInternalName().mb_str());
+            soCPLDemPath = pGxDemObj->GetInternalName();
         }
     }
 

@@ -25,3 +25,5 @@
 #include "wxgis/datasource/featuredataset.h"
 
 bool WXDLLIMPEXP_GIS_GP CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstDataSet, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL); 
+bool WXDLLIMPEXP_GIS_GP ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGxObjectFilter* pFilter, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
+bool WXDLLIMPEXP_GIS_GP ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGxObjectFilter* pFilter, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);

@@ -51,18 +51,13 @@ wxGISEnumSaveObjectResults wxGxObjectFilter::CanSaveObject( IGxObject* pLocation
 	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pLocation);
 	if(!pContainer)
 		return enumGISSaveObjectDeny;
-	wxGxFolder* pGxFolder = dynamic_cast<wxGxFolder*>(pLocation);
-    if(pGxFolder)
+	if(pContainer->CanCreate(GetType(), GetSubType()))
 	{
-		if(wxFileName::IsDirWritable(pGxFolder->GetInternalName())/* || wxFileName::IsFileWritable(pGxFolder->GetInternalName())*/)
-		{
-			if(pGxFolder->SearchChild(pLocation->GetFullName() + wxFileName::GetPathSeparator() + sName) == NULL)
-				return enumGISSaveObjectAccept;
-			else
-				return enumGISSaveObjectExists;
-		}
-	}
-	
+		if(pContainer->SearchChild(pLocation->GetFullName() + wxFileName::GetPathSeparator() + sName) == NULL)
+			return enumGISSaveObjectAccept;
+		else
+			return enumGISSaveObjectExists;
+	}	
 	return enumGISSaveObjectDeny;
 }
 
@@ -84,6 +79,11 @@ wxString wxGxObjectFilter::GetDriver(void)
 int wxGxObjectFilter::GetSubType(void)
 {
     return 0;
+}
+
+wxGISEnumDatasetType wxGxObjectFilter::GetType(void)
+{
+    return enumGISAny;
 }
 
 //------------------------------------------------------------
@@ -117,36 +117,6 @@ bool wxGxPrjFileFilter::CanDisplayObject( IGxObject* pObject )
 		return true;
 	else
 		return false;
-}
-
-wxGISEnumSaveObjectResults wxGxPrjFileFilter::CanSaveObject( IGxObject* pLocation, wxString sName )
-{
-	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pLocation);
-	if(!pContainer)
-		return enumGISSaveObjectDeny;
-	wxGxFolder* pGxFolder = dynamic_cast<wxGxFolder*>(pLocation);
-	{
-		if(wxFileName::IsDirWritable(pGxFolder->GetInternalName()))
-		{
-			if(pGxFolder->SearchChild(pLocation->GetFullName() + wxFileName::GetPathSeparator() + sName) == NULL)
-				return enumGISSaveObjectAccept;
-			else
-				return enumGISSaveObjectExists;
-		}
-	}
-	
-	wxGxSpatialReferencesFolder* pGxSpatialReferencesFolder = dynamic_cast<wxGxSpatialReferencesFolder*>(pLocation);
-	{
-		if(wxFileName::IsFileWritable(pGxSpatialReferencesFolder->GetInternalName()))
-		{
-			if(pGxSpatialReferencesFolder->SearchChild(pLocation->GetFullName() + wxFileName::GetPathSeparator() + sName) == NULL)
-				return enumGISSaveObjectAccept;
-			else
-				return enumGISSaveObjectExists;
-		}
-	}
-
-	return enumGISSaveObjectDeny;
 }
 
 wxString wxGxPrjFileFilter::GetName(void)
@@ -208,32 +178,32 @@ wxString wxGxDatasetFilter::GetName(void)
     return wxEmptyString;
 }
 
-
 //------------------------------------------------------------
-// wxGxShapeFileFilter
+// wxGxFeatureFileFilter
 //------------------------------------------------------------
 
-wxGxShapeFileFilter::wxGxShapeFileFilter(void)
+wxGxFeatureFileFilter::wxGxFeatureFileFilter(wxGISEnumVectorDatasetType nSubType)
+{
+    m_nSubType = nSubType;
+}
+
+wxGxFeatureFileFilter::~wxGxFeatureFileFilter(void)
 {
 }
 
-wxGxShapeFileFilter::~wxGxShapeFileFilter(void)
-{
-}
-
-bool wxGxShapeFileFilter::CanChooseObject( IGxObject* pObject )
+bool wxGxFeatureFileFilter::CanChooseObject( IGxObject* pObject )
 {
 	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
 	if(!pGxDataset)
 		return false;
-    if(pGxDataset->GetType() != enumGISFeatureDataset)
+    if(pGxDataset->GetType() != GetType())
 		return false;
     if(pGxDataset->GetSubType() != GetSubType())
 		return false;
     return true;
 }
 
-bool wxGxShapeFileFilter::CanDisplayObject( IGxObject* pObject )
+bool wxGxFeatureFileFilter::CanDisplayObject( IGxObject* pObject )
 {
 	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
 	if(pContainer)
@@ -241,134 +211,74 @@ bool wxGxShapeFileFilter::CanDisplayObject( IGxObject* pObject )
 	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
 	if(!pGxDataset)
 		return false;
-    if(pGxDataset->GetType() != enumGISFeatureDataset)
+    if(pGxDataset->GetType() != GetType())
 		return false;
     if(pGxDataset->GetSubType() != GetSubType())
 		return false;
     return true;
 }
 
-wxString wxGxShapeFileFilter::GetName(void)
+wxString wxGxFeatureFileFilter::GetName(void)
 {
-	return wxString(_("ESRI Shapefile (*.shp)"));
-}
-
-wxString wxGxShapeFileFilter::GetExt(void)
-{
-	return wxString(wxT("shp"));
-}
-
-wxString wxGxShapeFileFilter::GetDriver(void)
-{
-	return wxString(wxT("ESRI Shapefile"));
-}
-
-int wxGxShapeFileFilter::GetSubType(void)
-{
-    return enumVecESRIShapefile;
-}
-
-//------------------------------------------------------------
-// wxGxMapInfoFilter
-//------------------------------------------------------------
-
-wxGxMapInfoFilter::wxGxMapInfoFilter(bool bIsTab)
-{
-    m_bIsTab = bIsTab;
-}
-
-wxGxMapInfoFilter::~wxGxMapInfoFilter(void)
-{
-}
-
-wxString wxGxMapInfoFilter::GetName(void)
-{
-    if(m_bIsTab)
+    switch(m_nSubType)
+    {
+    case enumVecESRIShapefile:
+        return wxString(_("ESRI Shapefile (*.shp)"));
+    case enumVecMapinfoTab:
         return wxString(_("MapInfo File (*.tab)"));
-    else
+    case enumVecMapinfoMif:
         return wxString(_("MapInfo File (*.mid/*.mif)"));
+    case enumVecKML:
+ 	    return wxString(_("KML file (*.kml)"));
+    case enumVecKMZ:
+ 	    return wxString(_("KML file (*.kmz)"));
+    case enumVecDXF:
+	    return wxString(_("AutoCAD DXF file (*.dxf)"));
+	//case emumVecPostGIS:
+    }
 }
 
-wxString wxGxMapInfoFilter::GetExt(void)
+wxString wxGxFeatureFileFilter::GetExt(void)
 {
-    if(m_bIsTab)
+    switch(m_nSubType)
+    {
+    case enumVecESRIShapefile:
+	    return wxString(wxT("shp"));
+    case enumVecMapinfoTab:
 	    return wxString(wxT("tab"));
-    else
+    case enumVecMapinfoMif:
         return wxString(wxT("mif"));
+    case enumVecKML:
+        return wxString(wxT("kml"));
+    case enumVecKMZ:
+        return wxString(wxT("kmz"));
+    case enumVecDXF:
+        return wxString(wxT("dxf"));
+	//case emumVecPostGIS:
+    }
 }
 
-wxString wxGxMapInfoFilter::GetDriver(void)
+wxString wxGxFeatureFileFilter::GetDriver(void)
 {
-	return wxString(wxT("MapInfo File"));
+    switch(m_nSubType)
+    {
+    case enumVecESRIShapefile:
+	    return wxString(wxT("ESRI Shapefile"));
+    case enumVecMapinfoTab:
+    case enumVecMapinfoMif:
+	    return wxString(wxT("MapInfo File"));
+    case enumVecKML:
+    case enumVecKMZ:
+	    return wxString(wxT("LIBKML"));
+    case enumVecDXF:
+	    return wxString(wxT("DXF"));
+	//case emumVecPostGIS:
+    }
 }
 
-int wxGxMapInfoFilter::GetSubType(void)
+int wxGxFeatureFileFilter::GetSubType(void)
 {
-    return enumVecMapinfoTab;
-}
-
-//------------------------------------------------------------
-// wxGxKMLFilter
-//------------------------------------------------------------
-
-wxGxKMLFilter::wxGxKMLFilter(void)
-{
-}
-
-wxGxKMLFilter::~wxGxKMLFilter(void)
-{
-}
-
-wxString wxGxKMLFilter::GetName(void)
-{
-	return wxString(_("KML file (*.kml)"));
-}
-
-wxString wxGxKMLFilter::GetExt(void)
-{
-	return wxString(wxT("kml"));
-}
-
-wxString wxGxKMLFilter::GetDriver(void)
-{
-	return wxString(wxT("KML"));
-}
-
-int wxGxKMLFilter::GetSubType(void)
-{
-    return enumVecKML;
-}
-
-//------------------------------------------------------------
-// wxGxDXFFilter
-//------------------------------------------------------------
-
-wxGxDXFFilter::wxGxDXFFilter(void)
-{
-}
-
-wxGxDXFFilter::~wxGxDXFFilter(void)
-{
-}
-
-wxString wxGxDXFFilter::GetName(void)
-{
-	return wxString(_("AutoCAD DXF file (*.dxf)"));
-}
-
-wxString wxGxDXFFilter::GetExt(void)
-{
-	return wxString(wxT("dxf"));
-}
-
-wxString wxGxDXFFilter::GetDriver(void)
-{
-	return wxString(wxT("DXF"));
-}
-
-int wxGxDXFFilter::GetSubType(void)
-{
-    return enumVecDXF;
+    return m_nSubType;
 }
 
 //------------------------------------------------------------
@@ -423,8 +333,9 @@ wxString wxGxFolderFilter::GetName(void)
 // wxGxRasterFilter
 //------------------------------------------------------------
 
-wxGxRasterFilter::wxGxRasterFilter(void)
+wxGxRasterFilter::wxGxRasterFilter(wxGISEnumRasterDatasetType nSubType)
 {
+    m_nSubType = nSubType;
 }
 
 wxGxRasterFilter::~wxGxRasterFilter(void)
@@ -436,7 +347,7 @@ bool wxGxRasterFilter::CanChooseObject( IGxObject* pObject )
 	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
 	if(!pGxDataset)
 		return false;
-    if(pGxDataset->GetType() != enumGISRasterDataset)
+    if(pGxDataset->GetType() != GetType())
 		return false;
     if(pGxDataset->GetSubType() != GetSubType())
 		return false;
@@ -451,172 +362,75 @@ bool wxGxRasterFilter::CanDisplayObject( IGxObject* pObject )
 	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
 	if(!pGxDataset)
 		return false;
-    if(pGxDataset->GetType() != enumGISRasterDataset)
+    if(pGxDataset->GetType() != GetType())
 		return false;
     if(pGxDataset->GetSubType() != GetSubType())
 		return false;
     return true;
 }
 
-//------------------------------------------------------------
-// wxGxTiffFilter
-//------------------------------------------------------------
-
-wxGxTiffFilter::wxGxTiffFilter(void)
+wxString wxGxRasterFilter::GetName(void)
 {
+    switch(m_nSubType)
+    {
+    case enumRasterBmp:
+	    return wxString(_("Windows Device Independent Bitmap (*.bmp)"));
+    case enumRasterTiff:
+	    return wxString(_("GeoTIFF (*.tif, *.tiff)"));
+    case enumRasterJpeg:
+	    return wxString(_("JPEG image (*.jpeg, *.jfif, *.jpg, *.jpe)"));
+    case enumRasterImg:
+	    return wxString(_("Erdas IMAGINE image (*.img)"));
+    case enumRasterPng:
+	    return wxString(_("Portable Network Graphics (*.png)"));
+    case enumRasterGif:
+	    return wxString(_("Graphics Interchange Format (.gif)"));
+    }
 }
 
-wxGxTiffFilter::~wxGxTiffFilter(void)
+wxString wxGxRasterFilter::GetExt(void)
 {
+    switch(m_nSubType)
+    {
+    case enumRasterBmp:
+	    return wxString(wxT("bmp"));
+    case enumRasterTiff:
+	    return wxString(wxT("tif"));
+    case enumRasterJpeg:
+	    return wxString(wxT("jpg"));
+    case enumRasterImg:
+	    return wxString(wxT("img"));
+    case enumRasterPng:
+	    return wxString(wxT("png"));
+    case enumRasterGif:
+	    return wxString(wxT("gif"));
+    }
 }
 
-wxString wxGxTiffFilter::GetName(void)
+wxString wxGxRasterFilter::GetDriver(void)
 {
-	return wxString(_("GeoTIFF (*.tif, *.tiff)"));
+    switch(m_nSubType)
+    {
+    case enumRasterBmp:
+        return wxString(wxT("BMP"));
+    case enumRasterTiff:
+	    return wxString(wxT("GTiff"));
+    case enumRasterJpeg:
+	    return wxString(wxT("JPEG"));
+    case enumRasterImg:
+	    return wxString(wxT("HFA"));
+    case enumRasterPng:
+	    return wxString(wxT("PNG"));
+    case enumRasterGif:
+	    return wxString(wxT("GIF"));
+    }
 }
 
-wxString wxGxTiffFilter::GetExt(void)
+int wxGxRasterFilter::GetSubType(void)
 {
-	return wxString(wxT("tif"));
+    return m_nSubType;
 }
 
-wxString wxGxTiffFilter::GetDriver(void)
-{
-	return wxString(wxT("GTiff"));
-}
-
-int wxGxTiffFilter::GetSubType(void)
-{
-    return enumRasterTiff;
-}
-
-//------------------------------------------------------------
-// wxGxImgFilter
-//------------------------------------------------------------
-
-wxGxImgFilter::wxGxImgFilter(void)
-{
-}
-
-wxGxImgFilter::~wxGxImgFilter(void)
-{
-}
-
-wxString wxGxImgFilter::GetName(void)
-{
-	return wxString(_("Erdas IMAGINE image (*.img)"));
-}
-
-wxString wxGxImgFilter::GetExt(void)
-{
-	return wxString(wxT("img"));
-}
-
-wxString wxGxImgFilter::GetDriver(void)
-{
-	return wxString(wxT("HFA"));
-}
-
-int wxGxImgFilter::GetSubType(void)
-{
-    return enumRasterImg;
-}
-
-//------------------------------------------------------------
-// wxGxBmpFilter
-//------------------------------------------------------------
-
-wxGxBmpFilter::wxGxBmpFilter(void)
-{
-}
-
-wxGxBmpFilter::~wxGxBmpFilter(void)
-{
-}
-
-wxString wxGxBmpFilter::GetName(void)
-{
-	return wxString(_("Windows Device Independent Bitmap (*.bmp)"));
-}
-
-wxString wxGxBmpFilter::GetExt(void)
-{
-	return wxString(wxT("bmp"));
-}
-
-wxString wxGxBmpFilter::GetDriver(void)
-{
-	return wxString(wxT("BMP"));
-}
-
-int wxGxBmpFilter::GetSubType(void)
-{
-    return enumRasterBmp;
-}
-
-//------------------------------------------------------------
-// wxGxJpegFilter
-//------------------------------------------------------------
-
-wxGxJpegFilter::wxGxJpegFilter(void)
-{
-}
-
-wxGxJpegFilter::~wxGxJpegFilter(void)
-{
-}
-
-wxString wxGxJpegFilter::GetName(void)
-{
-	return wxString(_("JPEG image (*.jpeg, *.jfif, *.jpg, *.jpe)"));
-}
-
-wxString wxGxJpegFilter::GetExt(void)
-{
-	return wxString(wxT("jpg"));
-}
-
-wxString wxGxJpegFilter::GetDriver(void)
-{
-	return wxString(wxT("JPEG"));
-}
-
-int wxGxJpegFilter::GetSubType(void)
-{
-    return enumRasterJpeg;
-}
-
-//------------------------------------------------------------
-// wxGxPngFilter
-//------------------------------------------------------------
-
-wxGxPngFilter::wxGxPngFilter(void)
-{
-}
-
-wxGxPngFilter::~wxGxPngFilter(void)
-{
-}
-
-wxString wxGxPngFilter::GetName(void)
-{
-	return wxString(_("Portable Network Graphics (*.png)"));
-}
-
-wxString wxGxPngFilter::GetExt(void)
-{
-	return wxString(wxT("png"));
-}
-
-wxString wxGxPngFilter::GetDriver(void)
-{
-	return wxString(wxT("PNG"));
-}
-
-int wxGxPngFilter::GetSubType(void)
-{
-    return enumRasterPng;
-}
 
 //------------------------------------------------------------
 // wxGxTextFilter
@@ -636,8 +450,8 @@ bool wxGxTextFilter::CanChooseObject( IGxObject* pObject )
 {
 	wxGxTextFile* poGxTextFile = dynamic_cast<wxGxTextFile*>(pObject);
 	if(!poGxTextFile)
-		return false;
-    if(poGxTextFile->GetInternalName().Lower().Find(m_soExt) != wxNOT_FOUND)
+		return false;    
+    if(EQUAL(CPLGetExtension(poGxTextFile->GetInternalName()), m_soExt.mb_str()))
 		return true;
 	return false;
 }
@@ -650,7 +464,7 @@ bool wxGxTextFilter::CanDisplayObject( IGxObject* pObject )
 	wxGxTextFile* poGxTextFile = dynamic_cast<wxGxTextFile*>(pObject);
 	if(!poGxTextFile)
 		return false;
-    if(poGxTextFile->GetInternalName().Lower().Find(m_soExt) != wxNOT_FOUND)
+    if(EQUAL(CPLGetExtension(poGxTextFile->GetInternalName()), m_soExt.mb_str()))
 		return true;
 	return false;
 }
