@@ -21,9 +21,9 @@
 
 #include "wxgis/geoprocessing/gpprojecttool.h"
 //#include "wxgis/geoprocessing/gptoolmngr.h"
-//#include "wxgis/geoprocessing/gpdomain.h"
-//#include "wxgis/geoprocessing/gpparam.h"
-//#include "wxgis/catalog/gxfilters.h"
+#include "wxgis/geoprocessing/gpdomain.h"
+#include "wxgis/geoprocessing/gpparam.h"
+#include "wxgis/catalog/gxfilters.h"
 
 /////////////////////////////////////////////////////////////////////////
 // wxGISGPExportTool
@@ -58,46 +58,46 @@ wxString wxGISGPProjectVectorTool::GetCategory(void)
 
 GPParameters* wxGISGPProjectVectorTool::GetParameterInfo(void)
 {
-    //if(m_pParamArr.empty())
-    //{
-    //    //src path
-    //    wxGISGPParameter* pParam1 = new wxGISGPParameter();
-    //    pParam1->SetName(wxT("src_path"));
-    //    pParam1->SetDisplayName(_("Source feature class"));
-    //    pParam1->SetParameterType(enumGISGPParameterTypeRequired);
-    //    pParam1->SetDataType(enumGISGPParamDTPath);
-    //    pParam1->SetDirection(enumGISGPParameterDirectionInput);
+    if(m_pParamArr.empty())
+    {
+        //src path
+        wxGISGPParameter* pParam1 = new wxGISGPParameter();
+        pParam1->SetName(wxT("src_path"));
+        pParam1->SetDisplayName(_("Source feature class"));
+        pParam1->SetParameterType(enumGISGPParameterTypeRequired);
+        pParam1->SetDataType(enumGISGPParamDTPath);
+        pParam1->SetDirection(enumGISGPParameterDirectionInput);
 
-    //    wxGISGPGxObjectDomain* pDomain1 = new wxGISGPGxObjectDomain();
-    //    pDomain1->AddFilter(new wxGxDatasetFilter(enumGISFeatureDataset));
-    //    pParam1->SetDomain(pDomain1);
+        wxGISGPGxObjectDomain* pDomain1 = new wxGISGPGxObjectDomain();
+        pDomain1->AddFilter(new wxGxDatasetFilter(enumGISFeatureDataset));
+        pParam1->SetDomain(pDomain1);
 
-    //    m_pParamArr.push_back(pParam1);
+        m_pParamArr.push_back(pParam1);
 
-    //    //SQL statement
+        //proj
+        wxGISGPParameter* pParam2 = new wxGISGPParameter();
+        pParam2->SetName(wxT("proj"));
+        pParam2->SetDisplayName(_("Spatial reference"));
+        pParam2->SetParameterType(enumGISGPParameterTypeRequired);
+        pParam2->SetDataType(enumGISGPParamDTSpatRef);
+        pParam2->SetDirection(enumGISGPParameterDirectionInput);
 
-    //    //dst path
-    //    wxGISGPParameter* pParam2 = new wxGISGPParameter();
-    //    pParam2->SetName(wxT("dst_path"));
-    //    pParam2->SetDisplayName(_("Destination feature class"));
-    //    pParam2->SetParameterType(enumGISGPParameterTypeRequired);
-    //    pParam2->SetDataType(enumGISGPParamDTPath);
-    //    pParam2->SetDirection(enumGISGPParameterDirectionOutput);
+        m_pParamArr.push_back(pParam2);
 
-    //    wxGISGPGxObjectDomain* pDomain2 = new wxGISGPGxObjectDomain();
-    //    pDomain2->AddFilter(new wxGxFeatureFileFilter(enumVecESRIShapefile));
-    //    pDomain2->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoTab));
-    //    pDomain2->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoMif));
-    //    pDomain2->AddFilter(new wxGxFeatureFileFilter(enumVecKML));
-    //    pDomain2->AddFilter(new wxGxFeatureFileFilter(enumVecKMZ));
-    //    pDomain2->AddFilter(new wxGxFeatureFileFilter(enumVecDXF));
-    //    pParam2->SetDomain(pDomain2);
+        //dst path
+        wxGISGPParameter* pParam3 = new wxGISGPParameter();
+        pParam3->SetName(wxT("dst_path"));
+        pParam3->SetDisplayName(_("Destination feature class"));
+        pParam3->SetParameterType(enumGISGPParameterTypeRequired);
+        pParam3->SetDataType(enumGISGPParamDTPath);
+        pParam3->SetDirection(enumGISGPParameterDirectionOutput);
 
-    //    //pParam2->AddParameterDependency(wxT("src_path"));
+        wxGISGPGxObjectDomain* pDomain3 = new wxGISGPGxObjectDomain();
+        pDomain3->AddFilter(new wxGxDatasetFilter(enumGISFeatureDataset));
+        pParam3->SetDomain(pDomain3);
 
-    //    m_pParamArr.push_back(pParam2);
-
-    //}
+        m_pParamArr.push_back(pParam3);
+    }
     return &m_pParamArr;
 }
 

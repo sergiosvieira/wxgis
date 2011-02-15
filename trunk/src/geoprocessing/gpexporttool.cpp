@@ -74,7 +74,7 @@ GPParameters* wxGISGPExportTool::GetParameterInfo(void)
 
         m_pParamArr.push_back(pParam1);
 
-        //SQL statement
+        //TODO: SQL statement
 
         //dst path
         wxGISGPParameter* pParam2 = new wxGISGPParameter();

@@ -180,6 +180,7 @@ bool wxGISGPParameter::SetFromString(wxString sParam)
 	case enumGISGPParamDTDouble:
         m_Value = wxVariant(wxAtof(sParam));
         break;        
+	case enumGISGPParamDTSpatRef:
 	case enumGISGPParamDTString:
 	case enumGISGPParamDTPath:
         m_Value = wxVariant(sParam);
