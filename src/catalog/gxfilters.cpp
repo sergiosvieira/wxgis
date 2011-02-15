@@ -198,6 +198,8 @@ bool wxGxFeatureFileFilter::CanChooseObject( IGxObject* pObject )
 		return false;
     if(pGxDataset->GetType() != GetType())
 		return false;
+    if(GetSubType() == enumVecUnknown)
+        return true;
     if(pGxDataset->GetSubType() != GetSubType())
 		return false;
     return true;
@@ -213,6 +215,8 @@ bool wxGxFeatureFileFilter::CanDisplayObject( IGxObject* pObject )
 		return false;
     if(pGxDataset->GetType() != GetType())
 		return false;
+    if(GetSubType() == enumVecUnknown)
+        return true;
     if(pGxDataset->GetSubType() != GetSubType())
 		return false;
     return true;
@@ -235,6 +239,8 @@ wxString wxGxFeatureFileFilter::GetName(void)
     case enumVecDXF:
 	    return wxString(_("AutoCAD DXF file (*.dxf)"));
 	//case emumVecPostGIS:
+    default:
+	    return wxString(_("Any feature classes (*.*)"));
     }
 }
 
@@ -255,6 +261,8 @@ wxString wxGxFeatureFileFilter::GetExt(void)
     case enumVecDXF:
         return wxString(wxT("dxf"));
 	//case emumVecPostGIS:
+    default:
+        return wxEmptyString;
     }
 }
 
@@ -273,6 +281,8 @@ wxString wxGxFeatureFileFilter::GetDriver(void)
     case enumVecDXF:
 	    return wxString(wxT("DXF"));
 	//case emumVecPostGIS:
+    default:
+        return wxEmptyString;
     }
 }
 

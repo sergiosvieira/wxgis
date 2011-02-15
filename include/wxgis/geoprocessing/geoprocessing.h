@@ -73,6 +73,8 @@ enum wxGISEnumGPParameterDataType
 	enumGISGPParamDTString,
     enumGISGPParamDTStringList,
 
+	enumGISGPParamDTSpatRef,
+
 	enumGISGPParamDTPath,
 	enumGISGPParamDTPathArray
 };

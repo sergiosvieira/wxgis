@@ -338,7 +338,12 @@ const OGREnvelope* wxGISRasterDataset::GetEnvelope(void)
 
 wxString wxGISRasterDataset::GetName(void)
 {
-	return wxString(CPLGetFilename(m_sPath), wxConvUTF8);
+    wxString sOut;
+    if(EQUALN(m_sPath, "/vsizip", 7))
+        sOut = wxString(CPLGetFilename(m_sPath), wxCSConv(wxT("cp-866")));
+    else
+        sOut = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
+	return sOut;
 }
 
 bool wxGISRasterDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancle)

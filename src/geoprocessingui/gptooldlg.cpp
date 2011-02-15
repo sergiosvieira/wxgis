@@ -93,6 +93,13 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPTool* pTool, 
                     m_pControlsArray.push_back(pPath);
                 }
                 break;
+            case enumGISGPParamDTSpatRef:
+                {
+                    wxGISDTSpatRef* pSpatRef = new wxGISDTSpatRef(pParam, m_pTool->GetCatalog(), m_tools);
+                    bSizer4->Add( pSpatRef, 0, wxEXPAND, 5 );
+                    m_pControlsArray.push_back(pSpatRef);
+                }
+                break;
             case enumGISGPParamDTString:
             case enumGISGPParamDTInteger:
             case enumGISGPParamDTDouble:

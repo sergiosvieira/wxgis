@@ -513,27 +513,35 @@ wxString wxGISFeatureDataset::GetName(void)
     wxString sOut;
 	if(	m_poLayer )
     {
-        if(m_bOLCStringsAsUTF8 || m_Encoding == wxFONTENCODING_DEFAULT)
-            sOut = wgMB2WX(m_poLayer->GetLayerDefn()->GetName());
+        if(EQUALN(m_sPath, "/vsizip", 7))
+            sOut = wxString(m_poLayer->GetLayerDefn()->GetName(), wxCSConv(wxT("cp-866")));//wgMB2WX
         else
-        {
-            wxCSConv conv(m_Encoding);
-            sOut = conv.cMB2WX(m_poLayer->GetLayerDefn()->GetName());
-            if(sOut.IsEmpty())
-                sOut = wgMB2WX(m_poLayer->GetLayerDefn()->GetName());
-        }
+            sOut = wxString(m_poLayer->GetLayerDefn()->GetName(), wxConvUTF8);//wgMB2WX
+        //if(m_bOLCStringsAsUTF8 || m_Encoding == wxFONTENCODING_DEFAULT)
+        //    sOut = wxString(m_poLayer->GetLayerDefn()->GetName(), wxConvUTF8);//wgMB2WX
+        //else
+        //{
+        //    wxCSConv conv(m_Encoding);
+        //    sOut = conv.cMB2WX(m_poLayer->GetLayerDefn()->GetName());
+        //    if(sOut.IsEmpty())
+        //        sOut = wgMB2WX(m_poLayer->GetLayerDefn()->GetName());
+        //}
     }
     else
     {
-        if(m_Encoding == wxFONTENCODING_DEFAULT)
-            sOut = wgMB2WX(CPLGetBasename(m_sPath));
+        if(EQUALN(m_sPath, "/vsizip", 7))
+            sOut = wxString(CPLGetBasename(m_sPath), wxCSConv(wxT("cp-866")));
         else
-        {
-            wxCSConv conv(m_Encoding);
-            sOut = conv.cMB2WX(CPLGetBasename(m_sPath));
-            if(sOut.IsEmpty())
-                sOut = wgMB2WX(CPLGetBasename(m_sPath));
-        }
+            sOut = wxString(CPLGetBasename(m_sPath), wxConvUTF8);
+       //if(m_Encoding == wxFONTENCODING_DEFAULT)
+        //    sOut = wgMB2WX(CPLGetBasename(m_sPath));
+        //else
+        //{
+        //    wxCSConv conv(m_Encoding);
+        //    sOut = conv.cMB2WX(CPLGetBasename(m_sPath));
+        //    if(sOut.IsEmpty())
+        //        sOut = wgMB2WX(CPLGetBasename(m_sPath));
+        //}
     }
     return sOut;
 }
@@ -946,7 +954,7 @@ void wxGISFeatureDataset::DeleteQuadTree(void)
 size_t wxGISFeatureDataset::GetSize(void)
 {
 	wxCriticalSectionLocker locker(m_CritSect);
-    if(m_bIsGeometryLoaded)
+    if(m_bIsGeometryLoaded && m_pGeometrySet)
         return m_pGeometrySet->GetSize();
     if(!m_bIsOpened)
         if(!Open(0))
@@ -958,7 +966,7 @@ size_t wxGISFeatureDataset::GetSize(void)
             return m_poLayer->GetFeatureCount(true);
         //load all features
         LoadGeometry();
-        if(m_bIsGeometryLoaded)
+        if(m_bIsGeometryLoaded && m_pGeometrySet)
             return m_pGeometrySet->GetSize();
         else
             return m_poLayer->GetFeatureCount(true);
@@ -1122,7 +1130,8 @@ void wxGISFeatureDataset::Reset(void)
             LoadGeometry();
         m_IT = m_FeaturesMap.begin();
     }
-    m_pGeometrySet->Reset();
+    if(m_pGeometrySet)
+        m_pGeometrySet->Reset();
 }
 
 OGRErr wxGISFeatureDataset::CreateFeature(OGRFeature* poFeature)

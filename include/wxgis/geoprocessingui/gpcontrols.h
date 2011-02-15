@@ -153,3 +153,23 @@ protected:
     IGxCatalog* m_pCatalog;
 DECLARE_EVENT_TABLE()
 };
+
+/** \class wxGISDTSpatRef gpcontrols.h
+    \brief The tool dialog control for spatial reference value representation.
+*/
+class wxGISDTSpatRef : public wxGISDTBase
+{
+public:
+	wxGISDTSpatRef( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+	virtual ~wxGISDTSpatRef();
+//events
+    virtual void OnOpen(wxCommandEvent& event);
+    virtual bool Validate(void);
+    virtual void Update(void);
+protected:
+    wxGISTextCtrl* m_PathTextCtrl;
+	wxBitmapButton* m_bpButton;
+    IGxCatalog* m_pCatalog;
+
+    DECLARE_EVENT_TABLE()
+};
