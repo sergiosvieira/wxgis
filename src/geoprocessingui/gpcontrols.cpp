@@ -21,13 +21,15 @@
 #include "wxgis/geoprocessingui/gpcontrols.h"
 #include "wxgis/geoprocessing/gpdomain.h"
 #include "wxgis/catalogui/gxobjdialog.h"
+#include "wxgis/catalogui/gxfileui.h"
+#include "wxgis/framework/messagedlg.h"
+
 #include "wx/dnd.h"
 #include "wx/valgen.h"
 
 #include "../../art/state.xpm"
 #include "../../art/open.xpm"
 
-#include "wxgis/framework/messagedlg.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISDTBase
@@ -359,9 +361,6 @@ bool wxGISDTPath::Validate(void)
                return true;
            }
         }
-
-        //int ret = VSIStatL((const char*) sFolderPath.mb_str(*m_pMBConv), &BufL);
-        //if(ret == 0)
     }
     return true;
 }
@@ -642,7 +641,18 @@ wxGISDTSpatRef::wxGISDTSpatRef( IGPParameter* pParam, IGxCatalog* pCatalog, wxWi
 	wxBoxSizer* bPathSizer;
 	bPathSizer = new wxBoxSizer( wxHORIZONTAL );
 
-    m_PathTextCtrl = new wxGISTextCtrl( this, wxID_ANY, pParam->GetValue(), wxDefaultPosition, wxSize(100,100)/*wxDefaultSize*/, wxTE_READONLY | wxTE_MULTILINE | wxTE_BESTWRAP | wxTE_AUTO_SCROLL | wxTE_NO_VSCROLL );
+    CPLString szWKT(pParam->GetValue().MakeString().mb_str());
+    OGRSpatialReference SpaRef;
+    wxString sWKT;
+    const char* szpWKT = szWKT.c_str();
+    if(SpaRef.importFromWkt((char**)&szpWKT) == OGRERR_NONE)
+    {
+        char *pszWKT;
+        SpaRef.exportToPrettyWkt( &pszWKT );
+        sWKT = wxString(pszWKT, *wxConvCurrent);
+        OGRFree( pszWKT );
+    }
+    m_PathTextCtrl = new wxTextCtrl( this, wxID_ANY, sWKT, wxDefaultPosition, wxSize(100,100)/*wxDefaultSize*/, wxTE_READONLY | wxTE_MULTILINE | wxTE_AUTO_SCROLL );/// | wxTE_BESTWRAP | wxTE_NO_VSCROLL
     //m_PathTextCtrl->SetDropTarget(new wxFileDropTarget());
 	bPathSizer->Add( m_PathTextCtrl, 1, wxALL|wxEXPAND, 5 );
 
@@ -660,136 +670,81 @@ wxGISDTSpatRef::~wxGISDTSpatRef()
 
 void wxGISDTSpatRef::OnOpen(wxCommandEvent& event)
 {
-    //wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParam->GetDomain());
-
-    //if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
-    //{
-    //    wxGxObjectDialog dlg(this, m_pCatalog, wxID_ANY, _("Select input object"));
-    //    dlg.SetAllowMultiSelect(false);
-    //    dlg.SetAllFilters(false);
-    //    dlg.SetOwnsFilter(false);
-    //    if(pDomain)
-    //    {
-    //        for(size_t i = 0; i < pDomain->GetFilterCount(); i++)
-    //        {
-    //            if(i == pDomain->GetSelFilter())
-    //                dlg.AddFilter(pDomain->GetFilter(i), true);
-    //            else
-    //                dlg.AddFilter(pDomain->GetFilter(i), false);
-    //        }
-    //    }
-    //    dlg.SetOverwritePrompt(false);
-    //    if(dlg.ShowModalOpen() == wxID_OK)
-    //    {
-    //        wxString sPath = dlg.GetFullPath();
-    //        //sPath.Replace(wxT("\\\\"), wxT("\\"));
-    //        //m_PathTextCtrl->ChangeValue( sPath );
-    //        m_pParam->SetValue(wxVariant(sPath, wxT("path")));
-    //        m_pParam->SetAltered(true);
-    //        pDomain->SetSelFilter(dlg.GetCurrentFilterId());
-    //    }
-    //}
-    //else
-    //{
-    //    wxGxObjectDialog dlg(this, m_pCatalog, wxID_ANY, _("Select output object"));
-    //    dlg.SetAllowMultiSelect(false);
-    //    dlg.SetAllFilters(false);
-    //    dlg.SetOwnsFilter(false);
-    //    if(pDomain)
-    //    {
-    //        for(size_t i = 0; i < pDomain->GetFilterCount(); i++)
-    //        {
-    //            if(i == pDomain->GetSelFilter())
-    //                dlg.AddFilter(pDomain->GetFilter(i), true);
-    //            else
-    //                dlg.AddFilter(pDomain->GetFilter(i), false);
-    //        }
-    //    }
-    //    dlg.SetOverwritePrompt(false);
-    //    if(dlg.ShowModalSave() == wxID_OK)
-    //    {
-    //        wxString sPath = dlg.GetFullPath();
-    //        //sPath.Replace(wxT("\\\\"), wxT("\\"));
-    //        //m_PathTextCtrl->ChangeValue( sPath );
-    //        m_pParam->SetValue(wxVariant(sPath, wxT("path")));
-    //        m_pParam->SetAltered(true);
-    //        pDomain->SetSelFilter(dlg.GetCurrentFilterId());
-    //    }
-    //}
+    wxGxObjectDialog dlg(this, m_pCatalog, wxID_ANY, _("Select Spatial Reference"));
+    dlg.SetAllowMultiSelect(false);
+    dlg.SetAllFilters(false);
+    dlg.SetOwnsFilter(false);
+    dlg.SetStartingLocation(_("Coordinate Systems"));
+    if(dlg.ShowModalOpen() == wxID_OK)
+    {
+        GxObjectArray* pSelObj = dlg.GetSelectedObjects();
+        if(pSelObj->size() < 1)
+            return;
+        wxGxPrjFileUI* pGxPrjFileUI = dynamic_cast<wxGxPrjFileUI*>(pSelObj->operator[](0));
+        if(pGxPrjFileUI)
+        {
+            OGRSpatialReference* pOGRSpatialReference = pGxPrjFileUI->GetSpatialReference();                
+            char *pszWKT;
+            pOGRSpatialReference->exportToWkt( &pszWKT );
+            m_pParam->SetValue(wxVariant(wxString(pszWKT, *wxConvCurrent), wxT("SRS")));
+            OGRFree( pszWKT );
+            pOGRSpatialReference->exportToPrettyWkt( &pszWKT );
+            m_PathTextCtrl->ChangeValue(wxString(pszWKT, *wxConvCurrent));
+            OGRFree( pszWKT );
+            
+            m_pParam->SetIsValid(true);
+            m_pParam->SetAltered(true);
+            m_pParam->SetMessage(wxGISEnumGPMessageNone);
+        }
+    }
 }
 
 //validate
 bool wxGISDTSpatRef::Validate(void)
 {
-    //if(m_pParam->GetHasBeenValidated())
-    //    return true;
+    if(m_pParam->GetHasBeenValidated())
+        return true;
 
-    //wxString sPath = m_pParam->GetValue();
-    //if(sPath.IsEmpty())
-    //{
-    //    m_pParam->SetAltered(false);
-    //    if(m_pParam->GetParameterType() != enumGISGPParameterTypeRequired)
-    //    {
-    //        m_pParam->SetIsValid(true);
-    //        m_pParam->SetMessage(wxGISEnumGPMessageNone);
-    //        return true;
-    //    }
-    //    else
-    //    {
-    //        m_pParam->SetIsValid(false);
-    //        m_pParam->SetMessage(wxGISEnumGPMessageRequired, _("The value is required"));
-    //        return false;
-    //    }
-    //}
-    //if(m_pCatalog)
-    //{
-    //    IGxObjectContainer* pGxContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
-    //    IGxObject* pGxObj = pGxContainer->SearchChild(sPath);
-    //    if(pGxObj)
-    //    {
-    //       if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
-    //       {
-    //           if(m_pParam->GetMessageType() == wxGISEnumGPMessageError)
-    //               return false;
-    //           m_pParam->SetIsValid(true);
-    //           m_pParam->SetMessage(wxGISEnumGPMessageOk);
-    //       }
-    //       else
-    //       {
-    //           if(m_pParam->GetMessageType() == wxGISEnumGPMessageError)
-    //               return false;
-    //           m_pParam->SetIsValid(true);
-    //           m_pParam->SetMessage(wxGISEnumGPMessageWarning, _("The output object exists and will be overwritten!"));
-    //       }
-    //       return true;
-    //    }
-    //    else
-    //    {
-    //       if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
-    //       {
-    //            m_pParam->SetIsValid(false);
-    //            m_pParam->SetMessage(wxGISEnumGPMessageError, _("The input object doesn't exist"));
-    //            return false;
-    //       }
-    //       else
-    //       {
-    //           if(m_pParam->GetMessageType() == wxGISEnumGPMessageError)
-    //               return false;
+    if(!m_pParam->GetAltered())
+        return true;
 
-    //           m_pParam->SetIsValid(true);
-    //           m_pParam->SetMessage(wxGISEnumGPMessageOk);
-    //           return true;
-    //       }
-    //    }
-
-    //    //int ret = VSIStatL((const char*) sFolderPath.mb_str(*m_pMBConv), &BufL);
-    //    //if(ret == 0)
-    //}
+    CPLString szWKT(m_pParam->GetValue().MakeString().mb_str());
+    OGRSpatialReference SpaRef;
+    wxString sWKT;
+    const char* szpWKT = szWKT.c_str();
+    if( SpaRef.importFromWkt((char**)&szpWKT) == OGRERR_NONE )
+    {
+        m_pParam->SetIsValid(true);
+        m_pParam->SetMessage(wxGISEnumGPMessageOk);
+        return true;
+    }
+    else
+    {
+        m_pParam->SetIsValid(false);
+        m_pParam->SetMessage(wxGISEnumGPMessageError, _("Unsupported Spatial reference"));
+        return false;
+    }
     return true;
 }
 
 void wxGISDTSpatRef::Update(void)
 {
-    //m_PathTextCtrl->ChangeValue( m_pParam->GetValue() );
-    //SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
+    wxString sWKT = m_pParam->GetValue().MakeString();
+    if(sWKT.IsEmpty())
+        return;
+    CPLString szWKT(sWKT.mb_str());
+    OGRSpatialReference SpaRef;
+    
+    sWKT.Empty();
+    const char* szpWKT = szWKT.c_str();
+    if(SpaRef.importFromWkt((char**)&szpWKT) == OGRERR_NONE)
+    {
+        char *pszWKT;
+        SpaRef.exportToPrettyWkt( &pszWKT );
+        sWKT = wxString(pszWKT, *wxConvCurrent);
+        OGRFree( pszWKT );
+    }
+    m_PathTextCtrl->ChangeValue( sWKT );
+    SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
 }
+

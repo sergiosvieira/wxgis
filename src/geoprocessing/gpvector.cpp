@@ -3,7 +3,7 @@
  * Purpose:  main dataset functions.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 
 #include "wxgis/geoprocessing/gpvector.h"
 #include "wxgis/datasource/sysop.h"
+#include "wxgis/geometry/algorithm.h"
+#include "wxgis/datasource/spvalidator.h"
 
 bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstDataSet, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel)
 {
@@ -318,4 +320,394 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
             return false;
     }
     return true;
+}
+
+bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, OGRSpatialReference* pNewSpaRef, ITrackCancel* pTrackCancel)
+{
+    CPLErrorReset();
+
+    if(pTrackCancel)
+        pTrackCancel->PutMessage(wxString::Format(_("Projecting %s"), pDSet->GetName().c_str()), -1, enumGISMessageTitle);
+
+    OGRSpatialReference* pSrcSpaRef = pDSet->GetSpatialReference();
+    if(!pSrcSpaRef)
+    {
+        wxString sErr(_("Input spatial reference is not defined! OGR error: "));
+        CPLString sFullErr(sErr.mb_str());
+        sFullErr += CPLGetLastErrorMsg();
+        CPLError( CE_Failure, CPLE_AppDefined, sFullErr );
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+        return false;
+    }
+    if(!pNewSpaRef)
+    {
+        wxString sErr(_("Output spatial reference is not defined! OGR error: "));
+        CPLString sFullErr(sErr.mb_str());
+        sFullErr += CPLGetLastErrorMsg();
+        CPLError( CE_Failure, CPLE_AppDefined, sFullErr );
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+        return false;
+    }
+
+    OGRFeatureDefn *pDef = pDSet->GetDefiniton();
+    if(!pDef)
+    {
+        wxString sErr(_("Error read dataset definition"));
+        CPLError( CE_Failure, CPLE_AppDefined, sErr.mb_str() );
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
+        return false;
+    }
+
+    OGRSFDriver *pDriver = pDSet->GetDataSource()->GetDriver();
+    if(!pDriver)
+    {
+        wxString sErr(_("Error get dataset driver"));
+        CPLError( CE_Failure, CPLE_AppDefined, sErr.mb_str() );
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
+        return false;
+    }
+
+    CPLString szDriverName(pDriver->GetName());
+    wxGISFeatureDatasetSPtr pNewDSet = CreateVectorLayer(CPLGetPath(sPath), wxString(CPLGetBasename(sPath), wxConvUTF8), wxString(CPLGetExtension(sPath), wxConvUTF8), wxString(szDriverName, *wxConvCurrent), pDef, pNewSpaRef);
+    if(!pNewDSet)
+    {
+        wxString sErr(_("Error creating new dataset! OGR error: "));
+        CPLString sFullErr(sErr.mb_str());
+        sFullErr += CPLGetLastErrorMsg();
+        CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+        return false;
+    }
+
+    OGRCoordinateTransformation *poCT(NULL);
+    if(pSrcSpaRef->IsSame(pNewSpaRef))
+    {
+        wxString sErr(_("The Spatial references are same! Nothing project"));
+        CPLError( CE_Failure, CPLE_AppDefined, sErr.mb_str() );
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
+        return false;
+    }
+
+    poCT = OGRCreateCoordinateTransformation( pSrcSpaRef, pNewSpaRef );
+
+    //get limits
+    OGRPolygon* pRgn1 = NULL;
+    OGRPolygon* pRgn2 = NULL;
+
+    wxGISSpatialReferenceValidator GISSpaRefValidator;
+    wxString sProjName;
+    if(pNewSpaRef->IsProjected())
+        sProjName = wgMB2WX(pNewSpaRef->GetAttrValue("PROJCS"));
+    else
+        sProjName = wgMB2WX(pNewSpaRef->GetAttrValue("GEOGCS"));
+    if(GISSpaRefValidator.IsLimitsSet(sProjName))
+    {
+        LIMITS lims = GISSpaRefValidator.GetLimits(sProjName);
+        if(lims.minx > lims.maxx)
+        {
+            OGRLinearRing ring1;
+            ring1.addPoint(lims.minx,lims.miny);
+            ring1.addPoint(lims.minx,lims.maxy);
+            ring1.addPoint(180.0,lims.maxy);
+            ring1.addPoint(180.0,lims.miny);
+            ring1.closeRings();
+
+            pRgn1 = new OGRPolygon();
+            pRgn1->addRing(&ring1);
+            pRgn1->flattenTo2D();
+
+            OGRLinearRing ring2;
+            ring2.addPoint(-180.0,lims.miny);
+            ring2.addPoint(-180.0,lims.maxy);
+            ring2.addPoint(lims.maxx,lims.maxy);
+            ring2.addPoint(lims.maxx,lims.miny);
+            ring2.closeRings();
+
+            pRgn2 = new OGRPolygon();
+            pRgn2->addRing(&ring2);
+            pRgn2->flattenTo2D();
+        }
+        else
+        {
+            OGRLinearRing ring;
+            ring.addPoint(lims.minx,lims.miny);
+            ring.addPoint(lims.minx,lims.maxy);
+            ring.addPoint(lims.maxx,lims.maxy);
+            ring.addPoint(lims.maxx,lims.miny);
+            ring.closeRings();
+
+            pRgn1 = new OGRPolygon();
+            pRgn1->addRing(&ring);
+            pRgn1->flattenTo2D();
+        }
+        //WGS84
+        OGRSpatialReference* pWGSSpaRef = new OGRSpatialReference(SRS_WKT_WGS84);
+
+        if(pRgn1 != NULL)
+        {
+            pRgn1->assignSpatialReference(pWGSSpaRef);
+            pRgn1->segmentize(SEGSTEP);
+        }
+        if(pRgn2 != NULL)
+        {
+            pRgn2->assignSpatialReference(pWGSSpaRef);
+            pRgn2->segmentize(SEGSTEP);
+        }
+        pWGSSpaRef->Dereference();
+
+        if(!pSrcSpaRef->IsSame(pWGSSpaRef))
+        {
+            if(pRgn1->transformTo(pSrcSpaRef) != OGRERR_NONE)
+                wxDELETE(pRgn1);
+            if(pRgn2->transformTo(pSrcSpaRef) != OGRERR_NONE)
+                wxDELETE(pRgn2);
+        }
+    }
+
+    OGREnvelope *pRgnEnv1(NULL), *pRgnEnv2(NULL);
+    if(pRgn1)
+    {
+        pRgnEnv1 = new OGREnvelope();
+        pRgn1->getEnvelope(pRgnEnv1);
+    }
+    if(pRgn2)
+    {
+        pRgnEnv2 = new OGREnvelope();
+        pRgn2->getEnvelope(pRgnEnv2);
+    }
+
+
+    //progress & messages
+    IProgressor* pProgressor(NULL);
+    if(pTrackCancel)
+    {
+       pProgressor = pTrackCancel->GetProgressor();
+       pTrackCancel->PutMessage(wxString(_("Start projecting")), -1, enumGISMessageNorm);
+    }
+
+    int nCounter(0);
+    size_t nStep = pDSet->GetSize() < 10 ? 1 : pDSet->GetSize() / 10;
+    if(pProgressor)
+        pProgressor->SetRange(pDSet->GetSize());
+
+    pDSet->Reset();
+    OGRFeature* pFeature;
+    while((pFeature = pDSet->Next()) != NULL)
+    {
+        if(pTrackCancel && !pTrackCancel->Continue())
+        {
+            OGRFeature::DestroyFeature(pFeature);
+
+            wxString sErr(_("Interrupted by user"));
+            CPLString sFullErr(sErr.mb_str());
+            CPLError( CE_Warning, CPLE_AppDefined, sFullErr );
+
+            if(pTrackCancel)
+                pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            return false;
+        }
+
+        OGRGeometry *pGeom = pFeature->GetGeometryRef()->clone();
+        if(pGeom)
+        {
+            if(pRgn1 == NULL && pRgn2 == NULL)
+            {
+                if(pGeom->transform( poCT ) != OGRERR_NONE)
+                {
+                    pTrackCancel->PutMessage(wxString::Format(_("Error project feature #%d"), pFeature->GetFID()), -1, enumGISMessageWarning);
+                    OGRFeature::DestroyFeature(pFeature);
+                    wxDELETE(pGeom);
+                    continue;
+                }
+                else
+                    pFeature->SetGeometryDirectly(pGeom);
+            }
+            else
+            {
+                OGRGeometry* pCutGeom = CheckRgnAndTransform(pGeom, pRgn1, pRgn2, pRgnEnv1, pRgnEnv2, poCT);
+                if(pCutGeom)
+                    pFeature->SetGeometryDirectly(pCutGeom);
+                else
+                {
+                    pTrackCancel->PutMessage(wxString::Format(_("Error project feature #%d"), pFeature->GetFID()), -1, enumGISMessageWarning);
+                    OGRFeature::DestroyFeature(pFeature);
+                    wxDELETE(pGeom);
+                    continue;
+                }
+            }
+        }
+
+        OGRErr eErr = pNewDSet->CreateFeature(pFeature);
+        if(eErr != OGRERR_NONE)
+        {
+            wxString sErr(_("Error create feature! OGR error: "));
+            CPLString sFullErr(sErr.mb_str());
+            sFullErr += CPLGetLastErrorMsg();
+            CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
+            if(pTrackCancel)
+                pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+        }
+        nCounter++;
+        if(pProgressor && nCounter % nStep == 0)
+            pProgressor->SetValue(nCounter);
+    }
+
+    if(poCT)
+        OCTDestroyCoordinateTransformation(poCT);
+
+    wxDELETE(pRgnEnv1);
+    wxDELETE(pRgnEnv2);
+    wxDELETE(pRgn1);
+    wxDELETE(pRgn2);
+
+    return true;
+}
+
+OGRGeometry* CheckRgnAndTransform(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn1, OGRPolygon* pRgn2, OGREnvelope* pRgnEnv1, OGREnvelope* pRgnEnv2, OGRCoordinateTransformation *poCT)
+{
+    if(!pFeatureGeom)
+        return NULL;
+    if(!poCT)
+        return NULL;
+
+    OGREnvelope FeatureEnv;
+    OGRGeometry *pGeom(NULL), *pGeom1(NULL), *pGeom2(NULL);
+
+    pFeatureGeom->getEnvelope(&FeatureEnv);
+
+    if(pRgnEnv1 && FeatureEnv.Intersects(*pRgnEnv1))
+    {
+        if(pRgnEnv1->Contains(FeatureEnv) )
+        {
+            pGeom = pFeatureGeom->clone();
+            goto PROCEED;
+        }
+        else if(pFeatureGeom->Within(pRgn1))
+        {
+            pGeom = pFeatureGeom->clone();
+            goto PROCEED;
+        }
+        else
+            pGeom1 = Intersection(pFeatureGeom, pRgn1, pRgnEnv1);
+    }
+    if(pRgnEnv2 && FeatureEnv.Intersects(*pRgnEnv2))
+    {
+        if(pRgnEnv2->Contains(FeatureEnv) )
+        {
+            pGeom = pFeatureGeom->clone();
+            goto PROCEED;
+        }
+        else if(pFeatureGeom->Within(pRgn2))
+        {
+            pGeom = pFeatureGeom->clone();
+            goto PROCEED;
+        }
+        else
+            pGeom2= Intersection(pFeatureGeom, pRgn2, pRgnEnv2);
+    }
+
+    if(pGeom1 && !pGeom2)
+        pGeom = pGeom1; 
+    else if(pGeom2 && !pGeom1)
+        pGeom = pGeom2;
+    else if(pGeom1 && pGeom2)
+    {
+        OGRGeometryCollection* pGeometryCollection = new OGRGeometryCollection();
+        pGeometryCollection->addGeometryDirectly(pGeom1);
+        pGeometryCollection->addGeometryDirectly(pGeom2);
+        pGeom = pGeometryCollection; 
+    }
+
+
+PROCEED:
+    if(!pGeom)
+        return NULL;
+
+    if(pGeom->getSpatialReference() == NULL)
+        pGeom->assignSpatialReference(pFeatureGeom->getSpatialReference());
+
+    if(pGeom->transform( poCT ) != OGRERR_NONE)
+    {
+        wxDELETE(pGeom);
+        return NULL;
+    }  
+    return pGeom;
+}
+
+OGRGeometry* Intersection(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn, OGREnvelope* pRgnEnv)
+{
+    if(!pFeatureGeom || !pRgnEnv)
+        return NULL;
+
+    OGREnvelope FeatureEnv;
+    pFeatureGeom->getEnvelope(&FeatureEnv);
+
+    OGRwkbGeometryType gType = wkbFlatten(pFeatureGeom->getGeometryType());
+    switch(gType)
+    {
+    case wkbPoint:
+        if(pRgnEnv && pRgnEnv->Contains(FeatureEnv) )
+            return pFeatureGeom->clone();
+        return NULL;
+    case wkbLineString:
+        if(pRgnEnv && pRgnEnv->Contains(FeatureEnv) )
+            return pFeatureGeom->clone();
+#ifdef FAST_BISHOP_INTERSECTION
+        {
+            wxGISAlgorithm alg;
+            return alg.FastLineIntersection(pFeatureGeom, pRgn);
+        }
+#else
+        return pFeatureGeom->Intersection(pRgn);
+#endif
+    case wkbPolygon:
+        if(pRgnEnv && pRgnEnv->Contains(FeatureEnv) )
+            return pFeatureGeom->clone();
+#ifdef FAST_BISHOP_INTERSECTION
+        {
+            wxGISAlgorithm alg;
+            return alg.FastPolyIntersection(pFeatureGeom, pRgn);
+        }
+#else
+        return pFeatureGeom->Intersection(pRgn);
+#endif
+    case wkbLinearRing:
+        if(pRgnEnv && pRgnEnv->Contains(FeatureEnv) )
+            return pFeatureGeom->clone();
+        return pFeatureGeom->Intersection(pRgn);
+    case wkbMultiPoint:
+    case wkbMultiLineString:
+    case wkbMultiPolygon:
+    case wkbGeometryCollection:
+        {
+        	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pFeatureGeom;
+            OGRGeometryCollection* pNewOGRGeometryCollection = new OGRGeometryCollection();
+            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+            {
+                OGRGeometry* pGeom = (OGRGeometry*)pOGRGeometryCollection->getGeometryRef(i);
+                pGeom->assignSpatialReference(pFeatureGeom->getSpatialReference());
+                OGRGeometry* pNewGeom = Intersection(pGeom, pRgn, pRgnEnv);
+                if(pNewGeom)
+                    pNewOGRGeometryCollection->addGeometryDirectly(pNewGeom);
+            }
+            if(pNewOGRGeometryCollection->getNumGeometries() == 0)
+            {
+                wxDELETE(pNewOGRGeometryCollection);
+                return NULL;
+            }
+            else
+                return pNewOGRGeometryCollection;
+        }
+        break;
+    case wkbUnknown:
+    case wkbNone:
+        break;
+    }
+    return NULL;
 }

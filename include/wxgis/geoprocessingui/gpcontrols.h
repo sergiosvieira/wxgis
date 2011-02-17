@@ -167,7 +167,7 @@ public:
     virtual bool Validate(void);
     virtual void Update(void);
 protected:
-    wxGISTextCtrl* m_PathTextCtrl;
+    wxTextCtrl* m_PathTextCtrl;
 	wxBitmapButton* m_bpButton;
     IGxCatalog* m_pCatalog;
 

@@ -73,8 +73,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISRemoteServer", "wxGISR
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISRemoteServerUI", "wxGISRemoteServerUI.vcproj", "{CDC27198-828F-45B3-BC3D-3CD22176FC61}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISRemoteDBClient", "..\..\..\wxGISRemoteDB\build\msw\wxGISRemoteDBClient.vcproj", "{DA49F9A1-13D3-4CBB-B37D-B9784BD8414A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -149,10 +147,6 @@ Global
 		{CDC27198-828F-45B3-BC3D-3CD22176FC61}.Debug|Win32.Build.0 = Debug|Win32
 		{CDC27198-828F-45B3-BC3D-3CD22176FC61}.Release|Win32.ActiveCfg = Release|Win32
 		{CDC27198-828F-45B3-BC3D-3CD22176FC61}.Release|Win32.Build.0 = Release|Win32
-		{DA49F9A1-13D3-4CBB-B37D-B9784BD8414A}.Debug|Win32.ActiveCfg = Debug|Win32
-		{DA49F9A1-13D3-4CBB-B37D-B9784BD8414A}.Debug|Win32.Build.0 = Debug|Win32
-		{DA49F9A1-13D3-4CBB-B37D-B9784BD8414A}.Release|Win32.ActiveCfg = Release|Win32
-		{DA49F9A1-13D3-4CBB-B37D-B9784BD8414A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

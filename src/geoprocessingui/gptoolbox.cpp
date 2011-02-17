@@ -249,7 +249,7 @@ bool wxGxRootToolbox::OnPrepareTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCal
         return false;
     }
     //create tool config dialog
-    wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(this, pTool, pCallBack, bSync, pParentWnd);
+    wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(this, pTool, pCallBack, bSync, pParentWnd, wxID_ANY, pTool->GetDisplayName());
     pDlg->Show(true);
 
     return true;
