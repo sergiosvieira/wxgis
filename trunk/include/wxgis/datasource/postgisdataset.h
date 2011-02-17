@@ -45,3 +45,6 @@ protected:
 	OGRDataSource *m_poDS;
     wxString m_sName, m_sCryptPass, m_sPGPort, m_sPGAddres, m_sDBName, m_sCursor;
 };
+
+DEFINE_SHARED_PTR(wxGISPostgresDataSource);
+

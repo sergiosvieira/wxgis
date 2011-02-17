@@ -74,12 +74,11 @@ bool wxGISNetworkService::Start(IServerApplication* pApp, wxXmlNode* pConfig)
     m_pConfig = pConfig;
     m_pApp = pApp;
 
-    wxSocketBase::Initialize();
-
 	if(pConfig == NULL || pConfig->GetName() != wxT("network"))
 		return false;
 
 	//Start out thread
+	wxLogDebug(wxT("Start out thread"));
 	m_pMsgOutThread = new wxMsgOutThread(this);
 	if(!CreateAndRunThread(m_pMsgOutThread, wxT("wxGISNetworkService"), wxT("Out messages")))
 		return false;
@@ -220,6 +219,8 @@ WXGISMSG wxGISNetworkService::GetOutMessage(void)
 
 void wxGISNetworkService::ProcessOutMessage(WXGISMSG msg)
 {
+	if(!msg.pMsg)
+		return;
 	if(msg.nUserID == wxNOT_FOUND)
 	{
 		for(ConnIT it = m_NetworkConnectionMap.begin(); it != m_NetworkConnectionMap.end(); ++it)
@@ -252,6 +253,8 @@ AUTHRESPOND wxGISNetworkService::GetAuth(long nID)
 
 void wxGISNetworkService::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 {
+	if(!msg.pMsg)
+		return;
 	if(msg.pMsg->GetState() == enumGISMsgStBye)
 	{
 		if(m_NetworkConnectionMap[msg.nUserID])

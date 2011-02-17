@@ -43,6 +43,7 @@ bool wxGISServer::Start(wxString sAppName, wxString sConfigDir, int argc, char**
 	if(!wxGISWorkPlugin::Start(sAppName, sConfigDir, argc, argv))
 		return false;
 
+	wxLogDebug(wxT("OnStartMessageThread"));
     bool bResult = OnStartMessageThread();
     if(!bResult)
         return bResult;
@@ -54,6 +55,7 @@ bool wxGISServer::Start(wxString sAppName, wxString sConfigDir, int argc, char**
 	GDALAllRegister();
 	//END GDAL
 
+	wxLogDebug(wxT("Start workers service"));
     //3. Start workers service
 	//3a. Create catalog
 	m_pCatalogService = new wxRxCatalog();
@@ -61,6 +63,7 @@ bool wxGISServer::Start(wxString sAppName, wxString sConfigDir, int argc, char**
     if(!bResult)
         return bResult;
 
+	wxLogDebug(wxT("Start Auth service"));
 	//4. Start Auth service
     wxXmlNode* pAuthNode = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("auth")));
     if(pAuthNode == NULL)
@@ -73,14 +76,18 @@ bool wxGISServer::Start(wxString sAppName, wxString sConfigDir, int argc, char**
     wxXmlNode* pNetworkNode = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("network")));
     if(pNetworkNode == NULL)
         pNetworkNode = m_pConfig->CreateConfigNode(enumGISHKLM, wxString(wxT("network")));
+	wxLogDebug(wxT("Start network service"));
     //5. Start network service
     m_pNetService = new wxGISNetworkService();
     bResult = m_pNetService->Start(this, pNetworkNode);
     if(!bResult)
+	{
+		wxLogError(_("Start network service failed!"));
         return bResult;
-
+	}
     m_pGlobalApp = this;
 
+	wxLogDebug(wxT("Started..."));
 	return true;
 }
 

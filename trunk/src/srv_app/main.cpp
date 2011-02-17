@@ -3,7 +3,7 @@
  * Purpose:  Main application class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "wxgissrv/srv_app/main.h"
-#include "wxgissrv/srv_framework/server.h"
+#include "wxgissrv/srv_app/service.h"
 
 //---------------------------------------------
 // main
@@ -38,12 +38,21 @@ int main(int argc, char **argv)
         return -1;
     }
 
+#ifdef __WXMSW__
+	wxLogDebug(wxT("wxSocketBase::Initialize"));
+    wxSocketBase::Initialize();
+#endif
+
 	bool success( false );
 
     // Parse command line arguments
     success = parse_commandline_parameters( argc, argv );
 
-    return success;
+#ifdef __WXMSW__
+    wxSocketBase::Shutdown();
+#endif
+
+	return success == true ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 
@@ -56,6 +65,9 @@ bool parse_commandline_parameters( int argc, char** argv )
             wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
         { wxCMD_LINE_SWITCH, wxT( "v" ), wxT( "version" ), _( "The version of this program" ) },
 		{ wxCMD_LINE_SWITCH, wxT( "r" ), wxT("run"), _( "Run the monitoring server in standalone mode. Press 'q' to quit." ) },
+		{ wxCMD_LINE_SWITCH, wxT( "i" ), wxT("install"), _( "Install monitoring server as service" ) },
+		{ wxCMD_LINE_SWITCH, wxT( "u" ), wxT("uninstall"), _( "Uninstall monitoring server service" ) },
+		{ wxCMD_LINE_SWITCH, wxT( "s" ), wxT("start"), _( "Start monitoring server service" ) },
 		//{ wxCMD_LINE_OPTION, wxT( "i" ), wxT("index"), _( "Index the locations set in DB with max count of nodes" ), wxCMD_LINE_VAL_NUMBER },
 		//{ wxCMD_LINE_SWITCH, wxT( "u" ), wxT("update"), _( "Update the locations set in config file (add/remove paths & etc.)" ) },
   //      { wxCMD_LINE_SWITCH, wxT( "l" ), wxT("list"), _( "list path's" ) },
@@ -66,6 +78,10 @@ bool parse_commandline_parameters( int argc, char** argv )
 
     wxCmdLineParser my_parser( my_cmdline_desc, argc, argv );
     my_parser.SetLogo(wxString::Format(_("The wxMonitoring server utility (%s)\nAuthor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010"), APP_VER));
+
+	//print params to log
+	for(size_t i = 0; i < my_parser.GetParamCount(); i++)
+		wxLogDebug(my_parser.GetParam());
 
     // Parse the parameters
     int my_parse_success = my_parser.Parse( );
@@ -97,233 +113,44 @@ bool parse_commandline_parameters( int argc, char** argv )
 		Server.Stop();
 		return true;
 	}
-    
-//	//
-//	//1 get config
-//	wxXmlDocument config_doc;
-//	if (!config_doc.Load(sConfigPath))
-//	{
-//		wxLogError(_("Config load error! Path: %s"), sConfigPath.c_str());
-//		return false;
-//	}
-//	// start processing the XML file
-//	if (config_doc.GetRoot()->GetName() != wxT("wxSphinxIndexer"))
-//	{
-//		wxLogError(_("Config format not supported! Config file: %s"), sConfigPath.c_str());
-//		return false;
-//	}
-//
-//	wxString sDBPath, sLogPath, sLoc;
-//	wxXmlNode *pIndexPaths(0);
-//	wxXmlNode *child = config_doc.GetRoot()->GetChildren();
-//	wxXmlNode *pLib(0);
-//	wxXmlNode *pIndexerConf(0);
-//	wxXmlNode *pFactoriesConf(0);
-//	while (child)
-//	{
-//	//2 get DB path from config
-//		if (child->GetName() == wxT("db"))
-//			sDBPath = child->GetPropVal(wxT("path"), wxT(""));
-//		if (child->GetName() == wxT("log"))
-//			sLogPath = child->GetPropVal(wxT("path"), wxT(""));
-//        if (child->GetName() == wxT("loc"))
-//            sLoc = child->GetPropVal(wxT("locale"), wxT("en"));
-//	//3 get index path from config
-//		if (child->GetName() == wxT("updater"))
-//			pIndexPaths = child;
-//	//4 get libs
-//		if (child->GetName() == wxT("lib"))
-//			pLib = child;
-//	//5 get libs
-//		if (child->GetName() == wxT("indexer"))
-//			pIndexerConf = child;
-//	//6 get factories
-//		if (child->GetName() == wxT("factories"))
-//			pFactoriesConf = child;
-//
-//		child = child->GetNext();
-//	}
-//
-////	setlocale (LC_ALL, "");
-////    bindtextdomain (PACKAGE, LOCALEDIR);
-////    textdomain (PACKAGE);
-//	// locale we'll be using
-//	wxLocale locale;
-//	//wxString sLocale(wxT("ru"));
-//	//init locale
-//	int iLocale(0);
-//	const wxLanguageInfo* loc_info = wxLocale::FindLanguageInfo(sLoc);
-//	if(loc_info != NULL)
-//		iLocale = loc_info->Language;
-//
-//    // don't use wxLOCALE_LOAD_DEFAULT flag so that Init() doesn't return
-//	// false just because it failed to load wxstd catalog
-//    if ( !locale.Init(iLocale, wxLOCALE_CONV_ENCODING) )
-//    {
-//        wxLogError(_T("This language is not supported by the system."));
-//		return false;
-//    }
-//	//locale.Init(wxLANGUAGE_DEFAULT);
-//    #ifdef __LINUX__
-//	{
-//		locale.AddCatalog(_T("fileutils"));
-//	}
-//	#endif
-//
-//	//3. wxLog setup
-//	wxFFile LogFile;
-//	if(!sLogPath.IsEmpty())
-//	{
-//		wxDir dir(sLogPath);
-//		if (dir.IsOpened())
-//		{
-//			wxDateTime dt(wxDateTime::Now());
-//			wxString logfilename = sLogPath + wxFileName::GetPathSeparator() +
-//				wxString::Format(wxT("wxSphinxLog_%.4d%.2d%.2d.log"),dt.GetYear(), dt.GetMonth() + 1, dt.GetDay());
-//
-//			if(!bQuiet)
-//				wxLogMessage(_("Log file: %s"), logfilename.c_str());
-//
-//			if(!LogFile.Open(logfilename.GetData(), wxT("a+")))
-//				wxLogError(_("Filed to open log file"));
-//
-//			delete wxLog::SetActiveTarget(new wxLogStderr(LogFile.fp()));
-//		}
-//	}
-//
-//	wxLogMessage(_("The language set to %s"), loc_info->Description.c_str());
-//
-//	//4 open/create DB
-//	wxSQLite3Database db;
-//	db.Open(sDBPath + wxFileName::GetPathSeparator() + INDEXDB);
-//	if(!db.IsOpen())
-//	{
-//        wxLogError(_("Filed to open DB"));
-//		return false;
-//	}
-//
-//	//5 load libs
-//	wxSphinxPluginManager mngr(pLib);
-//    wxSphinxFactories Factories(pFactoriesConf);
-//
-//	if( my_parser.Found( wxT( "l" ) ) )
-//	{
-//		wxSphinxUpdater updater(bQuiet, pIndexPaths, &db, &Factories);
-//		updater.List(false);
-//		return true;
-//	}
-//
-//	if( my_parser.Found( wxT( "L" ) ) )
-//	{
-//		wxSphinxUpdater updater(bQuiet, pIndexPaths, &db, &Factories);
-//		updater.List(true);
-//		return true;
-//	}
-//
-//    long nMaxCount;
-//	if( my_parser.Found( wxT( "i" ), &nMaxCount ) )
-//	{
-//		//do work
-//		wxSphinxIndexer indexer(bQuiet, pIndexerConf, &db, &Factories);
-//		return indexer.Start(nMaxCount);
-//	}
-//
-//	if( my_parser.Found( wxT( "u" ) ) )
-//	{
-//		//do work
-//		wxSphinxUpdater updater(bQuiet, pIndexPaths, &db, &Factories);
-//		return updater.Start();
-//	}
-//	long nIndex;
-//	if( my_parser.Found( wxT( "d" ), &nIndex ))
-//	{
-//		//do work
-//		wxSphinxIndexer indexer(bQuiet, pIndexerConf, &db, &Factories);
-//		return indexer.ShowDetails(nIndex);
-//    }
+
+	if( my_parser.Found( wxT( "i" ) ) )
+	{
+		wxGISService Service(wxT("wxGISMonitoring"));
+		Service.Install();
+		return true;
+	}
+
+ 	if( my_parser.Found( wxT( "u" ) ) )
+	{
+		wxGISService Service(wxT("wxGISMonitoring"));
+		Service.Uninstall();
+		return true;
+	}
+   
+ 	if( my_parser.Found( wxT( "h" ) ) )
+	{
+		my_parser.Usage();
+		return true;
+	}
+
+ 	if( my_parser.Found( wxT( "s" ) ) )
+	{
+		wxFprintf(stdout, wxString(_("Starting service...")));
+
+		wxGISService Service(wxT("wxGISMonitoring"));
+		Service.StartService();
+
+		// When we get here, the service has been stopped
+		if( Service.GetExitCode() == EXIT_SUCCESS)
+			return true;
+
+		return false;
+	}
+
 	my_parser.Usage();
 
     // Either we are using the defaults or the provided parameters were valid.
 
     return true;
-
 } 
-
-
-
-// end parse_commandline_parameters
-
-    //static const wxCmdLineEntryDesc cmdLineDesc[] =
-    //{
-    //    { wxCMD_LINE_SWITCH, _T("h"), _T("help"), _T("show this help message"),
-    //        wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
-    //    { wxCMD_LINE_SWITCH, _T("q"), _T("quiet"), _T("be quiet (don't log fcp)") },
-    //    { wxCMD_LINE_OPTION, _T("o"), _T("fcphost"), _T("use given fcp host"),
-    //        wxCMD_LINE_VAL_STRING },
-    //    { wxCMD_LINE_OPTION, _T("p"), _T("fcpport"), _T("use given fcp port"),
-    //        wxCMD_LINE_VAL_NUMBER },
-    //    { wxCMD_LINE_OPTION, _T("t"), _T("fcptimeout"), _T("set connection timeout for fcp"),
-    //        wxCMD_LINE_VAL_NUMBER },
-    //    { wxCMD_LINE_NONE }
-    //};
-
-	//wxCmdLineParser parser(cmdLineDesc, argc, wxArgv);
- //   switch ( parser.Parse(true) )
- //       {
- //       case -1:
- //           return 0;  // Help was shown, go away.
- //           break;
-
- //       case 0:
- //           // everything is ok; proceed
- //           break;
-
- //       default:
- //           wxLogFatalError(_T("Syntax error detected, aborting."));
- //           break;
- //   }
-
- //   wxString host;
- //   if ( !parser.Found(_T("o"), &host) )
- //   {
- //       if ( !wxGetEnv(_T(FCP_HOST_ENV_NAME), &host) )
- //       {
- //           host = _T(DEFAULT_FCP_HOST);
- //       }
- //   }
-//
-//    long port;
-//    if ( !parser.Found(_T("p"), &port) )
-//    {
-//        wxString sport;
-//        if ( wxGetEnv(_T(FCP_PORT_ENV_NAME), &sport) )
-//        {
-//            if ( !sport.ToLong(&port) )
-//            {
-//                wxLogFatalError(_T("not a valid number"));
-//            }
-//        }
-//        else
-//        {
-//            port = DEFAULT_FCP_PORT;
-//        }
-//    }
-//
-//    long timeout;
-//    if ( !parser.Found(_T("t"), &timeout) )
-//    {
-//        wxString stimeout;
-//        if ( wxGetEnv(_T(FCP_TIMEOUT_ENV_NAME), &stimeout) )
-//        {
-//            if ( !stimeout.ToLong(&timeout) )
-//            {
-//                wxLogFatalError(_T("not a valid number"));
-//            }
-//        }
-//        else
-//        {
-//            timeout = DEFAULT_FCP_TIMEOUT;
-//        }
-//    }
-//
-
