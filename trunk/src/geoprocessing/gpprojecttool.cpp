@@ -25,6 +25,8 @@
 #include "wxgis/geoprocessing/gpparam.h"
 #include "wxgis/catalog/gxfilters.h"
 
+#include "wx/filename.h"
+
 /////////////////////////////////////////////////////////////////////////
 // wxGISGPExportTool
 /////////////////////////////////////////////////////////////////////////
@@ -103,102 +105,105 @@ GPParameters* wxGISGPProjectVectorTool::GetParameterInfo(void)
 
 bool wxGISGPProjectVectorTool::Validate(void)
 {
-    //if(!m_pParamArr[1]->GetAltered())
-    //{
-    //    if(m_pParamArr[0]->GetIsValid())
-    //    {
-    //        //generate temp name
-    //        wxString sPath = m_pParamArr[0]->GetValue();
-    //        m_pParamArr[1]->SetValue(wxVariant(sPath, wxT("path")));
-    //        m_pParamArr[1]->SetAltered(true);//??
-    //    }
-    //}
+    if(!m_pParamArr[2]->GetAltered())
+    {
+        if(m_pParamArr[0]->GetIsValid())
+        {
+            //generate temp name
+            wxFileName Name(m_pParamArr[0]->GetValue());
+            Name.SetName(Name.GetName() + wxT("_reproject"));
+            m_pParamArr[2]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
+            m_pParamArr[2]->SetAltered(true);//??
+        }
+    }
 
-    ////check if input & output types is same!
-    //if(m_pParamArr[0]->GetIsValid())
-    //{
-    //    if(!m_pParamArr[1]->GetHasBeenValidated())
-    //    {
-    //        //TODO: Maybe IGxDataset in future?
-    //        //IGxDataset* pDset1 = m_pCatalog->SearchChild()
-    //        wxFileName Name1(m_pParamArr[0]->GetValue());
-    //        wxFileName Name2(m_pParamArr[1]->GetValue());
-    //        if(Name1.GetExt() == Name2.GetExt())
-    //        {
-    //            m_pParamArr[1]->SetIsValid(false);
-    //            m_pParamArr[1]->SetMessage(wxGISEnumGPMessageError, _("Cannot export to the same format"));
-    //            return false;
-    //        }
-    //    }
-    //}
+    //check if input & output types is same!
+    if(m_pParamArr[0]->GetIsValid())
+    {
+        if(!m_pParamArr[2]->GetHasBeenValidated())
+        {
+            wxFileName Name1(m_pParamArr[0]->GetValue());
+            wxFileName Name2(m_pParamArr[2]->GetValue());
+            if(Name1.GetExt() != Name2.GetExt())
+            {
+                m_pParamArr[2]->SetIsValid(false);
+                m_pParamArr[2]->SetMessage(wxGISEnumGPMessageError, _("Cannot project to the different format"));
+                return false;
+            }
+        }
+    }
     return true;
 }
 
 bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
 {
-    //if(!Validate())
-    //{
-    //    //add messages to pTrackCancel
-    //    if(pTrackCancel)
-    //        pTrackCancel->PutMessage(_("Unexpected error occurred"), -1, enumGISMessageErr);
-    //    return false;
-    //}
+    if(!Validate())
+    {
+        //add messages to pTrackCancel
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("Unexpected error occurred"), -1, enumGISMessageErr);
+        return false;
+    }
 
-    //IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
-    //if(!pGxObjectContainer)
-    //{
-    //    //add messages to pTrackCancel
-    //    if(pTrackCancel)
-    //        pTrackCancel->PutMessage(_("Error getting catalog object"), -1, enumGISMessageErr);
-    //    return false;
-    //}
+    IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
+    if(!pGxObjectContainer)
+    {
+        //add messages to pTrackCancel
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("Error getting catalog object"), -1, enumGISMessageErr);
+        return false;
+    }
 
-    //wxString sSrcPath = m_pParamArr[0]->GetValue();
-    //IGxObject* pGxObject = pGxObjectContainer->SearchChild(sSrcPath);
-    //if(!pGxObject)
-    //{
-    //    //add messages to pTrackCancel
-    //    if(pTrackCancel)
-    //        pTrackCancel->PutMessage(_("Error get source object"), -1, enumGISMessageErr);
-    //    return false;
-    //}
-    //IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pGxObject);
-    //if(!pGxDataset)
-    //{
-    //    //add messages to pTrackCancel
-    //    if(pTrackCancel)
-    //        pTrackCancel->PutMessage(_("The source object is of incompatible type"), -1, enumGISMessageErr);
-    //    return false;
-    //}
-    //wxGISFeatureDatasetSPtr pSrcDataSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pGxDataset->GetDataset(true));
-    //if(!pSrcDataSet)
-    //{
-    //    //add messages to pTrackCancel
-    //    if(pTrackCancel)
-    //        pTrackCancel->PutMessage(_("The source dataset is of incompatible type"), -1, enumGISMessageErr);
-    //    return false;
-    //}
-    //
-    //OGRFeatureDefn *pDef = pSrcDataSet->GetDefiniton();
-    //if(!pDef)
-    //{
-    //    if(pTrackCancel)
-    //        pTrackCancel->PutMessage(_("Error reading dataset definition"), -1, enumGISMessageErr);
-    //    //wsDELETE(pSrcDataSet);
-    //    return false;
-    //}
-    //
-    //wxString sDstPath = m_pParamArr[1]->GetValue();
-    //wxFileName sDstFileName(sDstPath);
-    //wxString sPath = sDstFileName.GetPath();
-    //IGxObject* pGxDstObject = pGxObjectContainer->SearchChild(sPath);
-    //if(!pGxDstObject)
-    //{
-    //    //add messages to pTrackCancel
-    //    if(pTrackCancel)
-    //        pTrackCancel->PutMessage(_("Error get destination object"), -1, enumGISMessageErr);
-    //    return false;
-    //}
+    //get source
+    wxString sSrcPath = m_pParamArr[0]->GetValue();
+    IGxObject* pGxObject = pGxObjectContainer->SearchChild(sSrcPath);
+    if(!pGxObject)
+    {
+        //add messages to pTrackCancel
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("Error get source object"), -1, enumGISMessageErr);
+        return false;
+    }
+    IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pGxObject);
+    if(!pGxDataset)
+    {
+        //add messages to pTrackCancel
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("The source object is of incompatible type"), -1, enumGISMessageErr);
+        return false;
+    }
+    wxGISFeatureDatasetSPtr pSrcDataSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pGxDataset->GetDataset(true));
+    if(!pSrcDataSet)
+    {
+        //add messages to pTrackCancel
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("The source dataset is of incompatible type"), -1, enumGISMessageErr);
+        return false;
+    }
+    
+    OGRFeatureDefn *pDef = pSrcDataSet->GetDefiniton();
+    if(!pDef)
+    {
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("Error reading dataset definition"), -1, enumGISMessageErr);
+        //wsDELETE(pSrcDataSet);
+        return false;
+    }
+
+    //get spatial reference
+    
+    //get destination
+    wxString sDstPath = m_pParamArr[2]->GetValue();
+    wxFileName sDstFileName(sDstPath);
+    wxString sPath = sDstFileName.GetPath();
+    IGxObject* pGxDstObject = pGxObjectContainer->SearchChild(sPath);
+    if(!pGxDstObject)
+    {
+        //add messages to pTrackCancel
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("Error get destination object"), -1, enumGISMessageErr);
+        return false;
+    }
 
     //CPLString szPath = pGxDstObject->GetInternalName();
     //wxString sName = sDstFileName.GetName();
