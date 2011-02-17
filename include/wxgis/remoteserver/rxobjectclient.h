@@ -38,7 +38,7 @@ public:
 	virtual void Detach(void);
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void){return GetName();};
-    virtual wxString GetInternalName(void){return wxEmptyString;};
+    virtual CPLString GetInternalName(void){return CPLString();};
 	//IRxObjectClient
 	virtual bool Init(wxGxRemoteServer *pGxRemoteServer, wxXmlNode* pProperties);
 	//INetMessageReceiver
@@ -63,7 +63,7 @@ public:
 	virtual void Detach(void);
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void){return GetName();};
-    virtual wxString GetInternalName(void){return wxEmptyString;};
+    virtual CPLString GetInternalName(void){return CPLString();};
 	virtual wxString GetCategory(void){return wxString(_("Remote container"));};
 	virtual void Refresh(void);
 	//IGxObjectContainer

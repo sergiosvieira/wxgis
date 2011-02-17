@@ -37,8 +37,7 @@ public:
 	virtual void Detach(void);
 	virtual wxString GetName(void){return wxString(_("Remote Servers"));};
     virtual wxString GetBaseName(void){return GetName();};
-    virtual wxString GetInternalName(void){return wxEmptyString;};
-//    virtual wxString GetFullName(void){return wxEmptyString;};
+    virtual CPLString GetInternalName(void){return CPLString();};
 	virtual wxString GetCategory(void){return wxString(_("Remote Servers"));};
 	virtual void Refresh(void);
 	//IGxObjectContainer
@@ -46,7 +45,7 @@ public:
 	virtual bool AreChildrenViewable(void){return true;};
 	virtual bool HasChildren(void){return m_Children.size() > 0 ? true : false;};
     //IGxRootObjectProperties
-    virtual void Init(wxXmlNode* pConfigNode);
+    virtual void Init(wxXmlNode* const pConfigNode);
     virtual wxXmlNode* GetProperties(void);
 	//wxGxRemoteServers
 protected:

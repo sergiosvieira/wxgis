@@ -70,7 +70,7 @@ public:
 	//IGxObject
 	virtual wxString GetName(void) = 0;
     virtual wxString GetBaseName(void){return GetName();};
-    virtual wxString GetPath(void){return wxEmptyString;};
+    virtual CPLString GetInternalName(void){return CPLString();};
 	virtual wxString GetCategory(void) = 0;
 	virtual void Detach(void);
 	//IRxObjectServer
