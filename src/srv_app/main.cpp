@@ -101,7 +101,7 @@ bool parse_commandline_parameters( int argc, char** argv )
 	if( my_parser.Found( wxT( "r" ) ) )
 	{
         wxGISServer Server;
-		if(!Server.Start())
+		if(!Server.Start(wxT("wxGISServer"), CONFIG_DIR, my_parser))
 		{
             Server.Stop();
 			return false;

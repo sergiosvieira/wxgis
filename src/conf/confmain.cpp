@@ -72,6 +72,7 @@ int main(int argc, char **argv)
 		{ wxCMD_LINE_OPTION, wxT( "s" ), wxT("sub_type"), _( "The XMLNode sub_type attribute" ), wxCMD_LINE_VAL_NUMBER },
 		{ wxCMD_LINE_OPTION, wxT( "o" ), wxT("cmd_name"), _( "The XMLNode cmd_name attribute" ), wxCMD_LINE_VAL_STRING },
 		{ wxCMD_LINE_OPTION, wxT( "x" ), wxT("attributes"), _( "The XMLNode attributes <attr_name>=<attr_value> separated by comma" ), wxCMD_LINE_VAL_STRING },
+		{ wxCMD_LINE_OPTION, wxT( "enc" ), wxT("encode"), _( "encode password" ), wxCMD_LINE_VAL_STRING },
 		{ wxCMD_LINE_NONE }
     };
 
@@ -109,6 +110,14 @@ bool parse_commandline_parameters( wxCmdLineParser& parser )
 	{
 	    wxString out = wxString::Format(_("The wxGISConf (%s)\nAuthor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2011\n"), APP_VER);
 	    wxFprintf(stdout, out);
+		return true;
+	}
+	wxString sPass;
+	if( parser.Found( wxT( "enc" ), &sPass) )
+	{
+		wxString sCryptPasswd = Encode(sPass, CONFIG_DIR);
+		sCryptPasswd.Append(wxT("\n"));
+	    wxFprintf(stdout, sCryptPasswd);
 		return true;
 	}
 

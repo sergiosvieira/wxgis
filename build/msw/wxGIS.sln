@@ -53,8 +53,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISDataSource", "wxGISDat
 		{D7C200AC-A29B-4894-B222-1C77030545BE} = {D7C200AC-A29B-4894-B222-1C77030545BE}
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1A570546-6791-4B94-8A1E-FE3ACDA27E11}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISConf", "wxGISConf.vcproj", "{BA356BBD-E53B-4303-B947-61B1DCA3841B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISCarto", "wxGISCarto.vcproj", "{E749616F-3D5F-4A58-98F0-456D1BE60A1C}"
@@ -72,6 +70,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISRemoteServer", "wxGISRemoteServer.vcproj", "{797A29D8-295E-45B6-862D-F1B65C7955F8}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISRemoteServerUI", "wxGISRemoteServerUI.vcproj", "{CDC27198-828F-45B3-BC3D-3CD22176FC61}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISRemoteDBClient", "..\..\..\wxGISRemoteDB\build\msw\wxGISRemoteDBClient.vcproj", "{DA49F9A1-13D3-4CBB-B37D-B9784BD8414A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -147,6 +147,10 @@ Global
 		{CDC27198-828F-45B3-BC3D-3CD22176FC61}.Debug|Win32.Build.0 = Debug|Win32
 		{CDC27198-828F-45B3-BC3D-3CD22176FC61}.Release|Win32.ActiveCfg = Release|Win32
 		{CDC27198-828F-45B3-BC3D-3CD22176FC61}.Release|Win32.Build.0 = Release|Win32
+		{DA49F9A1-13D3-4CBB-B37D-B9784BD8414A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DA49F9A1-13D3-4CBB-B37D-B9784BD8414A}.Debug|Win32.Build.0 = Debug|Win32
+		{DA49F9A1-13D3-4CBB-B37D-B9784BD8414A}.Release|Win32.ActiveCfg = Release|Win32
+		{DA49F9A1-13D3-4CBB-B37D-B9784BD8414A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

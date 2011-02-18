@@ -33,6 +33,8 @@ wxGxCatalog::wxGxCatalog(void) : m_bIsChildrenLoaded(false), m_pGxDiscConnection
 
     m_bShowHidden = false;
     m_bShowExt = true;
+
+	m_pConf = NULL;
 }
 
 wxGxCatalog::~wxGxCatalog(void)
@@ -41,37 +43,40 @@ wxGxCatalog::~wxGxCatalog(void)
 
 void wxGxCatalog::Detach(void)
 {
-    wxXmlNode* pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog")));
-	if(!pNode)
-        pNode = m_pConf->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog")), true);
-	if(pNode)
-    {
-	    if(pNode->HasProp(wxT("show_hidden")))
-		    pNode->DeleteProperty(wxT("show_hidden"));
-	    pNode->AddProperty(wxT("show_hidden"), wxString::Format(wxT("%u"), m_bShowHidden));
-	    if(pNode->HasProp(wxT("show_ext")))
-		    pNode->DeleteProperty(wxT("show_ext"));
-	    pNode->AddProperty(wxT("show_ext"), wxString::Format(wxT("%u"), m_bShowExt));
-    }
+	if(m_pConf)
+	{
+		wxXmlNode* pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog")));
+		if(!pNode)
+			pNode = m_pConf->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog")), true);
+		if(pNode)
+		{
+			if(pNode->HasProp(wxT("show_hidden")))
+				pNode->DeleteProperty(wxT("show_hidden"));
+			pNode->AddProperty(wxT("show_hidden"), wxString::Format(wxT("%u"), m_bShowHidden));
+			if(pNode->HasProp(wxT("show_ext")))
+				pNode->DeleteProperty(wxT("show_ext"));
+			pNode->AddProperty(wxT("show_ext"), wxString::Format(wxT("%u"), m_bShowExt));
+		}
 
-	pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/rootitems")));
-	if(pNode)
-        wxGISConfig::DeleteNodeChildren(pNode);
+		pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/rootitems")));
+		if(pNode)
+			wxGISConfig::DeleteNodeChildren(pNode);
 
-    SerializePlugins(pNode, true);
+		SerializePlugins(pNode, true);
 
-    pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/objectfactories")));
-	if(!pNode)
-        pNode = m_pConf->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog/objectfactories")), true);
-	if(pNode)
-    {
-        wxGISConfig::DeleteNodeChildren(pNode);
-        for(size_t i = m_ObjectFactoriesArray.size(); i > 0; i--)
-        {
-            wxXmlNode* pFactoryNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("objectfactory"));
-            m_ObjectFactoriesArray[i - 1]->Serialize(pFactoryNode, true);
-        }
-    }
+		pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/objectfactories")));
+		if(!pNode)
+			pNode = m_pConf->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog/objectfactories")), true);
+		if(pNode)
+		{
+			wxGISConfig::DeleteNodeChildren(pNode);
+			for(size_t i = m_ObjectFactoriesArray.size(); i > 0; i--)
+			{
+				wxXmlNode* pFactoryNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("objectfactory"));
+				m_ObjectFactoriesArray[i - 1]->Serialize(pFactoryNode, true);
+			}
+		}
+	}
 
 	EmptyObjectFactories();
 	EmptyChildren();

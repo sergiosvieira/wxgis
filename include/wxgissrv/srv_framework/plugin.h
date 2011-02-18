@@ -38,7 +38,8 @@
 
 /** \code The usage example of plugin
     wxGISWorkPlugin Server;
-	if(!Server.Start(wxT("Test"), wxT("Folder"), 0, NULL))
+	wxCmdLineParser parser;
+	if(!Server.Start(wxT("Test"), wxT("Folder"), parser))
 	{
         Server.Stop();
 		return false;
@@ -52,7 +53,7 @@ class WXDLLIMPEXP_GIS_FRW wxGISWorkPlugin
 public:
 	wxGISWorkPlugin(void);
 	virtual ~wxGISWorkPlugin(void);
-	virtual bool Start(wxString sAppName, wxString sConfigDir = CONFIG_DIR, int argc = 0, char** argv = NULL);
+	virtual bool Start(wxString sAppName, wxString sConfigDir, wxCmdLineParser& parser);
 	virtual void Stop();
     typedef std::map<wxString, wxDynamicLibrary*> LIBMAP;
 protected:

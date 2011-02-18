@@ -39,7 +39,7 @@ class WXDLLIMPEXP_GIS_FRW wxGISServer :
 public:
     wxGISServer(void);
     virtual ~wxGISServer(void);
-    virtual bool Start(wxString sAppName = wxT("wxGISServer"), wxString sConfigDir = CONFIG_DIR, int argc = 0, char** argv = NULL);
+    virtual bool Start(wxString sAppName, wxString sConfigDir, wxCmdLineParser& parser);
     virtual void Stop(void);
     // IServerApplication
     virtual IGISConfig* GetConfig(void);

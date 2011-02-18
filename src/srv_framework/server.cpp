@@ -38,9 +38,9 @@ wxGISServer::~wxGISServer(void)
 {
 }
 
-bool wxGISServer::Start(wxString sAppName, wxString sConfigDir, int argc, char** argv)
+bool wxGISServer::Start(wxString sAppName, wxString sConfigDir, wxCmdLineParser& parser)
 {
-	if(!wxGISWorkPlugin::Start(sAppName, sConfigDir, argc, argv))
+	if(!wxGISWorkPlugin::Start(sAppName, sConfigDir, parser))
 		return false;
 
 	wxLogDebug(wxT("OnStartMessageThread"));
