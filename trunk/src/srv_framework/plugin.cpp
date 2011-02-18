@@ -29,7 +29,7 @@ wxGISWorkPlugin::~wxGISWorkPlugin(void)
 {
 }
 
-bool wxGISWorkPlugin::Start(wxString sAppName, wxString sConfigDir, int argc, char** argv)
+bool wxGISWorkPlugin::Start(wxString sAppName, wxString sConfigDir, wxCmdLineParser& parser)
 {
 	m_pConfig = new wxGISAppConfig(sAppName, sConfigDir);
 

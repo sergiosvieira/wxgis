@@ -20,6 +20,8 @@
  ****************************************************************************/
 #include "wxgissrv/srv_app/service.h"
 
+#include "wx/cmdline.h"
+
 #ifdef __WXMSW__ //Win
 
 // static variables
@@ -288,7 +290,8 @@ bool wxGISNTService::Initialize()
 // When this function returns the service has stopped.
 void wxGISNTService::Run()
 {
-	if(!m_Server.Start())
+	wxCmdLineParser parser;
+	if(!m_Server.Start(wxT("wxGISServer"), CONFIG_DIR, parser)) 
 	{
         m_Server.Stop();
 		return;

@@ -111,11 +111,6 @@ bool parse_commandline_parameters( wxCmdLineParser& parser )
     wxString sToolName, sToolParameters;
     if(parser.Found( wxT( "n" ), &sToolName ) && parser.Found( wxT( "p" ), &sToolParameters ) )
     {
-		//wxString input_str(input_data);
-		wxString str(sToolParameters.mb_str(), wxConvUTF8);//wc_str(*wxConvCurrent)
-
-		//sToolParameters = wxString(sToolParameters.ToUTF8());
-
         wxGPTaskExecutor executor;
         return executor.OnExecute(sToolName, sToolParameters);
     }
