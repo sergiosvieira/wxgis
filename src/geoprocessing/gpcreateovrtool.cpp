@@ -221,7 +221,7 @@ bool wxGISGPCreateOverviewsTool::Execute(ITrackCancel* pTrackCancel)
     wxString sCompress = m_pParamArr[2]->GetValue();
     CPLSetConfigOption( "COMPRESS_OVERVIEW", wgWX2MB(sCompress) );
 
-    if(pSrcDataSet->GetSubType() == enumRasterImg)//TODO: test on AG 10
+    if(pSrcDataSet->GetSubType() == enumRasterImg)
     {
         CPLSetConfigOption( "USE_RRD", "YES" );
         CPLSetConfigOption( "HFA_USE_RRD", "YES" );

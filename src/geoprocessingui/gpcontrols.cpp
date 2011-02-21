@@ -123,7 +123,7 @@ void wxGISTextCtrl::OnKillFocus(wxFocusEvent& event)
         {
             bValid = false;
             wxGISGPGxObjectDomain* poDomain = dynamic_cast<wxGISGPGxObjectDomain*>(pParam->GetDomain());
-            IGxObjectFilter* poFilter = poDomain->GetFilter(poDomain->GetSelFilter());
+            IGxObjectFilter* poFilter = poDomain->GetFilter(poDomain->GetSel());
             wxFileName oName(sData);
             if(poFilter)
             {
@@ -133,14 +133,14 @@ void wxGISTextCtrl::OnKillFocus(wxFocusEvent& event)
                     break;
                 }
             }
-            for(size_t i = 0; i < poDomain->GetFilterCount(); i++)
+            for(size_t i = 0; i < poDomain->GetCount(); i++)
             {
                 poFilter = poDomain->GetFilter(i);
                 if(poFilter)
                 {
                     if(oName.GetExt().CmpNoCase(poFilter->GetExt()) == 0 || poFilter->GetExt() == wxEmptyString)
                     {
-                        poDomain->SetSelFilter(i);
+                        poDomain->SetSel(i);
                         bValid = true;
                         break;
                     }
@@ -241,6 +241,8 @@ wxGISDTPath::~wxGISDTPath()
 void wxGISDTPath::OnOpen(wxCommandEvent& event)
 {
     wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParam->GetDomain());
+    wxFileName Name(m_pParam->GetValue().MakeString());
+
 
     if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
     {
@@ -248,11 +250,12 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
         dlg.SetAllowMultiSelect(false);
         dlg.SetAllFilters(false);
         dlg.SetOwnsFilter(false);
+        dlg.SetName( Name.GetFullName() );
         if(pDomain)
         {
-            for(size_t i = 0; i < pDomain->GetFilterCount(); i++)
+            for(size_t i = 0; i < pDomain->GetCount(); i++)
             {
-                if(i == pDomain->GetSelFilter())
+                if(i == pDomain->GetSel())
                     dlg.AddFilter(pDomain->GetFilter(i), true);
                 else
                     dlg.AddFilter(pDomain->GetFilter(i), false);
@@ -266,7 +269,7 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
             //m_PathTextCtrl->ChangeValue( sPath );
             m_pParam->SetValue(wxVariant(sPath, wxT("path")));
             m_pParam->SetAltered(true);
-            pDomain->SetSelFilter(dlg.GetCurrentFilterId());
+            pDomain->SetSel(dlg.GetCurrentFilterId());
         }
     }
     else
@@ -275,11 +278,12 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
         dlg.SetAllowMultiSelect(false);
         dlg.SetAllFilters(false);
         dlg.SetOwnsFilter(false);
+        dlg.SetName( Name.GetFullName() );
         if(pDomain)
         {
-            for(size_t i = 0; i < pDomain->GetFilterCount(); i++)
+            for(size_t i = 0; i < pDomain->GetCount(); i++)
             {
-                if(i == pDomain->GetSelFilter())
+                if(i == pDomain->GetSel())
                     dlg.AddFilter(pDomain->GetFilter(i), true);
                 else
                     dlg.AddFilter(pDomain->GetFilter(i), false);
@@ -293,7 +297,7 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
             //m_PathTextCtrl->ChangeValue( sPath );
             m_pParam->SetValue(wxVariant(sPath, wxT("path")));
             m_pParam->SetAltered(true);
-            pDomain->SetSelFilter(dlg.GetCurrentFilterId());
+            pDomain->SetSel(dlg.GetCurrentFilterId());
         }
     }
 }
@@ -546,7 +550,7 @@ void wxGISDTChoice::OnChoice(wxCommandEvent& event)
     if(poGPStringDomain)
     {
         sData = poGPStringDomain->GetInternalString(nPos);
-        poGPStringDomain->SetSelString(nPos);
+        poGPStringDomain->SetSel(nPos);
     }
     m_pParam->SetValue(sData);
     m_pParam->SetAltered(true);

@@ -55,6 +55,8 @@ public:
     virtual int GetDoPos(void){return m_Pos;};
     virtual wxString GetDoPath(size_t nIndex);
     //virtual wxArrayString* GetDoArray(void){return &m_DoArray;};
+    virtual void LockChanges(){m_CritSect.Enter();};
+    virtual void UnLockChanges(){m_CritSect.Leave();};
     //IConnectionPointContainer
 	virtual long Advise(wxObject* pObject);
 protected:

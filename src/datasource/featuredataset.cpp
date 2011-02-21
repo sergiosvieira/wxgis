@@ -1178,7 +1178,8 @@ OGRErr wxGISFeatureDataset::CreateFeature(OGRFeature* poFeature)
                 pGeom = poFeature->GetGeometryRef()->clone();
         }
 
-        m_pGeometrySet->AddGeometry(pGeom, nFID);
+        if(m_pGeometrySet)
+            m_pGeometrySet->AddGeometry(pGeom, nFID);
   //      if(bOLCFastGetExtent)
   //          CPLQuadTreeInsert(m_pQuadTree, (void*)pGeom);
   //      else

@@ -42,22 +42,22 @@ void wxGISGPGxObjectDomain::AddFilter(IGxObjectFilter* pFilter)
 
 IGxObjectFilter* wxGISGPGxObjectDomain::GetFilter(size_t nIndex)
 {
-    if(nIndex >= GetFilterCount())
+    if(nIndex >= GetCount())
         return NULL;
     return m_FilterArray[nIndex];
 }
 
-size_t wxGISGPGxObjectDomain::GetFilterCount(void)
+size_t wxGISGPGxObjectDomain::GetCount(void)
 {
     return m_FilterArray.size();
 }
 
- void wxGISGPGxObjectDomain::SetSelFilter(size_t nIndex)
+ void wxGISGPGxObjectDomain::SetSel(size_t nIndex)
  {
      m_nSelFilterIndex = nIndex;
  }
 
- size_t wxGISGPGxObjectDomain::GetSelFilter(void)
+ size_t wxGISGPGxObjectDomain::GetSel(void)
  {
      return m_nSelFilterIndex;
  }
@@ -82,7 +82,7 @@ void wxGISGPStringDomain::AddString(wxString soStr, wxString soInternalStr)
     m_asoInternalData.Add(soInternalStr);
 }
 
-size_t wxGISGPStringDomain::GetStringCount(void)
+size_t wxGISGPStringDomain::GetCount(void)
 {
     return m_asoData.GetCount();
 }
@@ -102,12 +102,12 @@ wxArrayString wxGISGPStringDomain::GetArrayString() const
     return m_asoData;
 }
 
-void wxGISGPStringDomain::SetSelString(size_t nIndex)
+void wxGISGPStringDomain::SetSel(size_t nIndex)
 {
      m_nSelIndex = nIndex;
 }
 
-size_t wxGISGPStringDomain::GetSelString(void)
+size_t wxGISGPStringDomain::GetSel(void)
 {
      return m_nSelIndex;
 }

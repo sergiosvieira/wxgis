@@ -41,8 +41,8 @@ public:
     // wxGISRasterDataset
 	virtual bool Open(bool bReadOnly);
 	virtual bool Rename(wxString sNewName);
-	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancle);
-	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancle);
+	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel);
+	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
 	virtual const OGREnvelope* GetEnvelope(void);
 	virtual GDALDataset* GetRaster(void){return m_poDataset;};
 	virtual GDALDataset* GetMainRaster(void){return m_poMainDataset;};
@@ -54,6 +54,7 @@ public:
     virtual int GetHeight(void){return m_nYSize;};
     virtual int GetBandCount(void){return m_nBandCount;};
     virtual bool Delete(void);
+    char **GetFileList();
 protected:
 	OGREnvelope* m_psExtent;
 	GDALDataset  *m_poDataset;

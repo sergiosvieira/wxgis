@@ -445,8 +445,10 @@ bool MoveFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCance
     else
     {
         //if in different discs - copy/move
-        if(CopyFile(sDestPath, sSrcPath, pTrackCancel))
-            return DeleteFile(sSrcPath);
+        bool bRes = CopyFile(sDestPath, sSrcPath, pTrackCancel);
+        if(bRes)
+            DeleteFile(sSrcPath);
+        return bRes;
     }
     return false;
 }

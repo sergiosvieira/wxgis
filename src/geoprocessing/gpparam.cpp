@@ -164,7 +164,10 @@ void wxGISGPParameter::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
 
 wxString wxGISGPParameter::GetAsString(void)
 {
-	return m_Value.MakeString();
+    wxString sStrPar = m_Value.MakeString();
+    if(m_pDomain)
+        sStrPar += wxString::Format(wxT("~%d"), m_pDomain->GetSel());
+    return sStrPar;
 }
 
 bool wxGISGPParameter::SetFromString(wxString sParam)
@@ -183,7 +186,20 @@ bool wxGISGPParameter::SetFromString(wxString sParam)
 	case enumGISGPParamDTSpatRef:
 	case enumGISGPParamDTString:
 	case enumGISGPParamDTPath:
-        m_Value = wxVariant(sParam);
+        if(m_pDomain)
+        {
+            wxString sVal = wxVariant(sParam);
+            int pos = sVal.Find('~', true);
+            if(pos != wxNOT_FOUND)
+            {
+                m_Value = sVal.Left(pos);
+                pos++;
+                int nSel = wxAtoi(sVal.Right(sVal.Len() - pos));
+                m_pDomain->SetSel(nSel);
+            }
+        }
+        else
+            m_Value = wxVariant(sParam);
         break;        
     case enumGISGPParamDTStringList:
 	case enumGISGPParamDTPathArray:

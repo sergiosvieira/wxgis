@@ -198,6 +198,8 @@ bool wxGPTaskExecutor::OnExecute(wxString sToolName, wxString sToolParameters)
 
     GxCatalog.Detach();
 
+    OutStream.Close();
+    wxSleep(1);
     wxDELETE(m_pOutTxtStream)
     return bResult;
 }

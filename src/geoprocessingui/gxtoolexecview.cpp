@@ -86,11 +86,13 @@ int wxCALLBACK TasksCompareFunction(long item1, long item2, long sortData)
 
 wxGxToolExecuteView::wxGxToolExecuteView(void)
 {
+    m_pXmlConf = NULL;
 }
 
 wxGxToolExecuteView::wxGxToolExecuteView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
-wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(-1), m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL), m_bHideDone(false)
+m_bSortAsc(true), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(-1), m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL), m_bHideDone(false)//wxListCtrl(parent, id, pos, size, style), 
 {
+    m_pXmlConf = NULL;
     Create(parent, id, pos, size, style);
 }
 

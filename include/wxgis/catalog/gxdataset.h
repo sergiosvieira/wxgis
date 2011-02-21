@@ -46,7 +46,7 @@ public:
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
 	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel);
-	virtual bool CanCopy(CPLString szDestPath){return true;};
+    virtual bool CanCopy(CPLString szDestPath){return true;};//EQUALN(m_sPath, "/vsi", 4) ? false : true
 	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
 	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
 	//IGxDataset

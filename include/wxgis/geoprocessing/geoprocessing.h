@@ -102,6 +102,9 @@ class IGPDomain
 {
 public:
     virtual ~IGPDomain(void){};
+    virtual size_t GetCount(void) = 0;
+    virtual void SetSel(size_t nIndex) = 0;
+    virtual size_t GetSel(void) = 0;
 };
 
 /** \class IGPParameter

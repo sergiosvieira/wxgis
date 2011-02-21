@@ -145,3 +145,4 @@ protected:
     wxString m_soName;
     wxString m_soExt;
 };
+

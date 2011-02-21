@@ -20,14 +20,12 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessingui/gptoolboxview.h"
+#include "wxgis/geoprocessingui/gptoolbox.h"
+#include "wxgis/catalogui/gxcatdroptarget.h"
 
 //-------------------------------------------------------------------
 // wxGxToolboxView
 //-------------------------------------------------------------------
-
-//BEGIN_EVENT_TABLE(wxGxToolboxView, wxAuiNotebook)
-//	EVT_AUINOTEBOOK_PAGE_CHANGED(TOOLVIEWCTRLID, wxGxToolboxView::OnAUINotebookPageChanged)
-//END_EVENT_TABLE()
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxToolboxView, wxAuiNotebook)
 
@@ -54,66 +52,84 @@ bool wxGxToolboxView::Activate(IGxApplication* application, wxXmlNode* pConf)
 {
 	if(!application || !pConf)
 		return false;
-	wxGxView::Activate(application, pConf);
+	if(!wxGxView::Activate(application, pConf))
+		return false;
 
     m_pApp = dynamic_cast<IApplication*>(application);
-	//wxXmlNode* pChild = m_pXmlConf->GetChildren();
-	//wxUint8 count(0);
-	//while(pChild)
-	//{
-	//	wxGxTab* pGxTab = new wxGxTab(application, pChild, this);
-	//	//wxWindow* pWnd = pGxTab->GetWindow(0);
-	//	//if(pWnd == NULL)
-	//	//	pWnd = new wxWindow(this, wxID_ANY);
-	//	m_Tabs.push_back(pGxTab);
 
-    //add tasks vindow
-    //m_pGxTasksView = new wxGxTasksView(this);    
-    //AddPage(m_pGxTasksView, m_pGxTasksView->GetViewName(), count == 0 ? true : false, m_pGxTasksView->GetViewIcon());
-    //m_pApp->RegisterChildWindow(m_pGxTasksView);
-    //count++;
+    //get config xml
+    wxXmlNode *pTaskExecConf(NULL), *pToolboxTreeConf(NULL);
+    wxXmlNode* pChildConf = pConf->GetChildren();
+    while(pChildConf)
+    {
+        if(pChildConf->GetName() == wxString(wxT("wxGxToolExecuteView")))
+            pTaskExecConf = pChildConf;
+        if(pChildConf->GetName() == wxString(wxT("wxGxToolboxTreeView")))
+            pToolboxTreeConf = pChildConf;
 
-    //add tree tools window
+        pChildConf = pChildConf->GetNext();
+    }
+    if(!pTaskExecConf)
+    {
+        pTaskExecConf = new wxXmlNode(wxXML_ELEMENT_NODE, wxString(wxT("wxGxToolExecuteView")));
+        pConf->AddChild(pTaskExecConf);
+    }
+    if(!pToolboxTreeConf)
+    {
+        pToolboxTreeConf = new wxXmlNode(wxXML_ELEMENT_NODE, wxString(wxT("wxGxToolboxTreeView")));
+        pConf->AddChild(pToolboxTreeConf);
+    }
 
-	//AddPage(static_cast<wxWindow*>(pGxTab), pGxTab->GetName(), count == 0 ? true : false/*, m_ImageListSmall.GetBitmap(9)*/);
-	//	
-	//	count++;
+    m_pGxToolboxView = new wxGxToolboxTreeView(this, TREECTRLID);
+    AddPage(m_pGxToolboxView, m_pGxToolboxView->GetViewName(), true, m_pGxToolboxView->GetViewIcon());
+    m_pGxToolboxView->Activate(application, pToolboxTreeConf);
+    m_pApp->RegisterChildWindow(m_pGxToolboxView);
 
-	//	pChild = pChild->GetNext();
-	//}
 
-	//m_pSelection = application->GetCatalog()->GetSelection();
-	//m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( m_pSelection );
-	//if(m_pConnectionPointSelection != NULL)
-	//	m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
+    wxGxToolExecute* pGxToolExecute(NULL);
+	IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+	if(pGxApp)
+    {
+        IGxObjectContainer* pRootContainer = dynamic_cast<IGxObjectContainer*>(pGxApp->GetCatalog());
+        if(pRootContainer)
+        {
+            IGxObjectContainer* pGxToolboxes = dynamic_cast<IGxObjectContainer*>(pRootContainer->SearchChild(wxString(_("Toolboxes"))));
+            if(pGxToolboxes)
+            {
+                GxObjectArray* pArr = pGxToolboxes->GetChildren();
+                if(pArr)
+                {
+                    for(size_t i = 0; i < pArr->size(); ++i)
+                    {
+                        pGxToolExecute = dynamic_cast<wxGxToolExecute*>(pArr->operator[](i));
+                        if(pGxToolExecute)
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+    if(pGxToolExecute)
+    {        
+        m_pGxToolExecuteView = new wxGxToolExecuteView(this, TOOLEXECUTECTRLID);
+        AddPage(m_pGxToolExecuteView, m_pGxToolExecuteView->GetViewName(), false, m_pGxToolExecuteView->GetViewIcon());
+        m_pGxToolExecuteView->Activate(application, pTaskExecConf);
+        m_pGxToolExecuteView->SetGxToolExecute(pGxToolExecute);
+        m_pApp->RegisterChildWindow(m_pGxToolExecuteView);
+    }
 
 	return true;
 }
 
 void wxGxToolboxView::Deactivate(void)
 {
-    //m_pGxTasksView->Deactivate();
-    //m_pApp->UnRegisterChildWindow(m_pGxTasksView);
-    //while(GetPageCount() > 0)
-    //    RemovePage(0); //will delete in app destructor
+    m_pGxToolExecuteView->Deactivate();
+    m_pApp->UnRegisterChildWindow(m_pGxToolExecuteView);
 
-	//if(m_ConnectionPointSelectionCookie != -1)
-	//	m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
+    m_pGxToolboxView->Deactivate();
+    m_pApp->UnRegisterChildWindow(m_pGxToolboxView);
 }
-
-//void wxGxToolboxView::OnAUINotebookPageChanged(wxAuiNotebookEvent& event)
-//{
-//	//update view while changing focus of tabs
-//	event.Skip();
-//	//int nSelTab = event.GetSelection();
-// //   if(nSelTab < 0)
-// //       return;
-//	//wxASSERT(nSelTab >= 0 && nSelTab < m_Tabs.size());
-//
-//	//wxGxTab* pCurrTab = m_Tabs[nSelTab];
-//	//if(pCurrTab != NULL && m_pSelection != NULL)
-//	//	pCurrTab->OnSelectionChanged(m_pSelection, IGxSelection::INIT_ALL);
-//}
 
 wxWindow* wxGxToolboxView::GetCurrentWnd(void)
 {
@@ -124,4 +140,77 @@ wxWindow* wxGxToolboxView::GetCurrentWnd(void)
 	//if(pCurrTab)
 	//	return pCurrTab->GetCurrentWindow();
 	return NULL;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// wxGxToolsExecView
+////////////////////////////////////////////////////////////////////////////////////////////
+
+IMPLEMENT_DYNAMIC_CLASS(wxGxToolboxTreeView, wxGxTreeView)
+
+wxGxToolboxTreeView::wxGxToolboxTreeView(void) : wxGxTreeView()
+{
+}
+
+wxGxToolboxTreeView::wxGxToolboxTreeView(wxWindow* parent, wxWindowID id, long style) : wxGxTreeView(parent, id, style)
+{
+    SetDropTarget(new wxGISCatalogDropTarget(static_cast<IGxViewDropTarget*>(this)));
+    m_sViewName = wxString(_("Toolboxes"));
+}
+
+wxGxToolboxTreeView::~wxGxToolboxTreeView(void)
+{
+}
+
+bool wxGxToolboxTreeView::Activate(IGxApplication* application, wxXmlNode* pConf)
+{
+	if(!wxGxView::Activate(application, pConf))
+		return false;
+
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
+    IApplication* pApp = dynamic_cast<IApplication*>(application);
+    if(pApp)
+    {
+		//delete
+        m_pDeleteCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
+		//new
+		m_pNewMenu = dynamic_cast<wxGISNewMenu*>(pApp->GetCommandBar(NEWMENUNAME));
+    }
+
+    IGxObject* pGxToolboxes = m_pCatalog->SearchChild(wxString(_("Toolboxes")));
+    AddRoot(dynamic_cast<IGxObject*>(pGxToolboxes));
+
+	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( application->GetCatalog() );
+	if(m_pConnectionPointCatalog != NULL)
+		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
+
+	m_pSelection = m_pCatalog->GetSelection();
+	//m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( m_pSelection );
+	//if(m_pConnectionPointSelection != NULL)
+	//	m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
+
+	return true;
+};
+
+void wxGxToolboxTreeView::UpdateGxSelection(void)
+{
+    wxTreeItemId TreeItemId = GetSelection();
+    m_pSelection->Clear(GetId());
+    //if(TreeItemId.IsOk())
+    //{
+    //    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(TreeItemId);
+    //    if(pData != NULL)
+	   //     m_pSelection->Select(pData->m_pObject, true, GetId());
+    //}
+	if(	m_pNewMenu )
+		m_pNewMenu->Update(m_pSelection);
+}
+
+void wxGxToolboxTreeView::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
+{
+    wxGxToolExecute* pGxToolExecute = dynamic_cast<wxGxToolExecute*>(pGxObject);
+    if(pGxToolExecute)
+        return;
+    wxGxTreeView::AddTreeItem(pGxObject, hParent);
 }

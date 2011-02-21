@@ -85,12 +85,7 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         pParam2->SetDirection(enumGISGPParameterDirectionOutput);
 
         wxGISGPGxObjectDomain* pDomain2 = new wxGISGPGxObjectDomain();
-        pDomain2->AddFilter(new wxGxRasterFilter(enumRasterTiff));
-        pDomain2->AddFilter(new wxGxRasterFilter(enumRasterImg));
-        pDomain2->AddFilter(new wxGxRasterFilter(enumRasterBmp));
-        pDomain2->AddFilter(new wxGxRasterFilter(enumRasterJpeg));
-        pDomain2->AddFilter(new wxGxRasterFilter(enumRasterPng));
-        pDomain2->AddFilter(new wxGxRasterFilter(enumRasterGif));
+        AddAllRasterFilters(pDomain2);
         pParam2->SetDomain(pDomain2);
 
         //pParam2->AddParameterDependency(wxT("src_path"));
@@ -222,7 +217,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     wxString sName = sDstFileName.GetName();
 
     wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[1]->GetDomain());
-    IGxObjectFilter* pFilter = pDomain->GetFilter(pDomain->GetSelFilter());
+    IGxObjectFilter* pFilter = pDomain->GetFilter(pDomain->GetSel());
     if(!pFilter)
     {
         //add messages to pTrackCancel

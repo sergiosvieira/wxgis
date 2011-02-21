@@ -85,12 +85,7 @@ GPParameters* wxGISGPExportTool::GetParameterInfo(void)
         pParam2->SetDirection(enumGISGPParameterDirectionOutput);
 
         wxGISGPGxObjectDomain* pDomain2 = new wxGISGPGxObjectDomain();
-        pDomain2->AddFilter(new wxGxFeatureFileFilter(enumVecESRIShapefile));
-        pDomain2->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoTab));
-        pDomain2->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoMif));
-        pDomain2->AddFilter(new wxGxFeatureFileFilter(enumVecKML));
-        pDomain2->AddFilter(new wxGxFeatureFileFilter(enumVecKMZ));
-        pDomain2->AddFilter(new wxGxFeatureFileFilter(enumVecDXF));
+        AddAllVectorFilters(pDomain2);
         pParam2->SetDomain(pDomain2);
 
         //pParam2->AddParameterDependency(wxT("src_path"));
@@ -206,7 +201,7 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
     wxString sName = sDstFileName.GetName();
     
     wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[1]->GetDomain());
-    IGxObjectFilter* pFilter = pDomain->GetFilter(pDomain->GetSelFilter());
+    IGxObjectFilter* pFilter = pDomain->GetFilter(pDomain->GetSel());
     if(!pFilter)
     {
         //add messages to pTrackCancel
@@ -215,7 +210,7 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
         
-    bool bHasErrors = ExportFormat(pSrcDataSet, szPath, sName, pFilter, NULL, pTrackCancel);
+    bool bRes = ExportFormat(pSrcDataSet, szPath, sName, pFilter, NULL, pTrackCancel);
 
     IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
     if(pCont)
@@ -225,7 +220,7 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
             pParentLoc->Refresh();
     }
 
-    return !bHasErrors;
+    return bRes;
 }
 
 //bool wxGISGPExportTool::OnExport(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel)
