@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-25 00:39+0300\n"
-"PO-Revision-Date: 2011-01-25 00:39+0300\n"
+"POT-Creation-Date: 2011-02-21 22:11+0300\n"
+"PO-Revision-Date: 2011-02-21 22:11+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -111,16 +111,16 @@ msgstr "Сдвинуть"
 msgid "Information"
 msgstr "Информация"
 
-#: D:\work\Projects\wxGIS\src\carto/featurelayer.cpp:201
+#: D:\work\Projects\wxGIS\src\carto/featurelayer.cpp:200
 #, c-format
 msgid "wxGISFeatureLayer: Open failed! GDAL error: %s"
 msgstr "wxGISFeatureLayer: Ошибка открытия! Ошибка GDAL: %s"
 
-#: D:\work\Projects\wxGIS\src\carto/featurelayer.cpp:203
+#: D:\work\Projects\wxGIS\src\carto/featurelayer.cpp:202
 msgid "Error"
 msgstr "Ошибка"
 
-#: D:\work\Projects\wxGIS\src\carto/featurelayer.cpp:382
+#: D:\work\Projects\wxGIS\src\carto/featurelayer.cpp:385
 msgid "Done"
 msgstr "Сделано"
 
@@ -140,11 +140,11 @@ msgstr "AdviseRead не удалось! Ошибка GDAL: %s"
 msgid "RasterIO failed! GDAL error: %s"
 msgstr "RasterIO не удалось! Ошибка GDAL: %s"
 
-#: D:\work\Projects\wxGIS\src\carto/tableview.cpp:90
+#: D:\work\Projects\wxGIS\src\carto/tableview.cpp:92
 msgid " [*]"
 msgstr " [*]"
 
-#: D:\work\Projects\wxGIS\src\carto/tableview.cpp:227
+#: D:\work\Projects\wxGIS\src\carto/tableview.cpp:229
 msgid "Record:"
 msgstr "Запись:"
 

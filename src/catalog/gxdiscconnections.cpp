@@ -205,7 +205,7 @@ void wxGxDiscConnections::DisconnectFolder(CPLString sPath)
 
 void wxGxDiscConnections::StoreConnections(void)
 {
-#ifndef WXGISPORTABLE
+//#ifndef WXGISPORTABLE
     if(!wxDirExists(m_sUserConfigDir))
         wxFileName::Mkdir(m_sUserConfigDir, 0750, wxPATH_MKDIR_FULL);
 
@@ -232,6 +232,6 @@ void wxGxDiscConnections::StoreConnections(void)
         }
     }
     doc.Save(m_sUserConfig);
-#endif  
+//#endif  
 }
 

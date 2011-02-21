@@ -166,7 +166,7 @@ wxString wxGISGeoprocessingCmd::GetMessage(void)
 		case 0:
 			return wxString(_("Export item to another format"));
 		case 1:
-			return wxString(_("Show/Hide toolbox pane"));
+			return wxString(_("Show/Hide Toolbox pane"));
 		default:
 			return wxEmptyString;
 	}

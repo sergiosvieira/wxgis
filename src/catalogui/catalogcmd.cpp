@@ -223,7 +223,7 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
 				if(pSel->GetCount() == 0)
 					return false;
-                pSel->LockChanges();
+                wxMilliSleep(10);//TODO: Fix this derty hack
 				IGxObject* pGxObject = pSel->GetSelectedObjects(0);
                 if(!pGxObject)
                 {
@@ -231,7 +231,6 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 					return false;
                 }
 				IGxObject* pParentGxObject = pGxObject->GetParent();
-                pSel->UnLockChanges();
 				if(!pParentGxObject)
 					return false;
 			}

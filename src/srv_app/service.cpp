@@ -102,7 +102,7 @@ bool wxGISNTService::Install()
 		wxString sFilePath = stp.GetExecutablePath();
 
 		// Create the service
-		SC_HANDLE hService = ::CreateService(hSCM, m_sServiceName, wxT("wxGIS Monitoring"), SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS, SERVICE_AUTO_START/*SERVICE_DEMAND_START*/, SERVICE_ERROR_NORMAL, sFilePath + wxT(" -s"), NULL, NULL, NULL, NULL, NULL);
+		SC_HANDLE hService = ::CreateService(hSCM, m_sServiceName, wxT("wxGIS Server"), SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS, SERVICE_AUTO_START/*SERVICE_DEMAND_START*/, SERVICE_ERROR_NORMAL, sFilePath + wxT(" -s"), NULL, NULL, NULL, NULL, NULL);
 
 		if (!hService)
 		{

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-25 00:39+0300\n"
-"PO-Revision-Date: 2011-01-25 00:39+0300\n"
+"POT-Creation-Date: 2011-02-21 22:11+0300\n"
+"PO-Revision-Date: 2011-02-21 22:11+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: Bishop <polimax@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -57,30 +57,30 @@ msgstr "wxRxCatalog: Инициализация корневого элемен�
 msgid "wxRxCatalog: Error initializing Root Object %s"
 msgstr "wxRxCatalog: Ошибка инициализации корневого элемента %s"
 
-#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:87
+#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:86
 #, c-format
 msgid "wxGISNetworkService: %s Queue thread 0x%lx started"
 msgstr "wxGISNetworkService: Поток %s 0x%lx запущен"
 
-#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:103
+#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:102
 #, c-format
 msgid "wxGISNetworkService: Plugin %s initialize"
 msgstr "wxGISNetworkService: Инициализация модуля %s"
 
-#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:106
+#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:105
 #, c-format
 msgid "wxGISNetworkService: Error initializing plugin %s"
 msgstr "wxGISNetworkService: Ошибка инициализации модуля %s"
 
-#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:115
+#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:114
 msgid "wxGISNetworkService: Service started"
 msgstr "wxGISNetworkService: Служба запущена"
 
-#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:136
+#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:135
 msgid "wxGISNetworkService: Service stopped"
 msgstr "wxGISNetworkService: Служба остановлена"
 
-#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:168
+#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:167
 #, c-format
 msgid "Peer #%d disconected (%d peers is stil connected)"
 msgstr "Клиент №%d отключился (%d клиентов подключено)"
@@ -132,6 +132,10 @@ msgstr "wxGISWorkPlugin: Инициализация локали"
 #, c-format
 msgid "wxGISWorkPlugin: Language set to %s"
 msgstr "wxGISWorkPlugin: Язык: %s"
+
+#: D:\work\Projects\wxGIS\src\srv_framework/server.cpp:85
+msgid "Start network service failed!"
+msgstr "Не удалось запустить сетевой сервис!"
 
 #: D:\work\Projects\wxGIS\src\srv_framework/tcpnetworkplugin.cpp:42
 #, c-format

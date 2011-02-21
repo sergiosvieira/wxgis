@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-25 00:39+0300\n"
-"PO-Revision-Date: 2011-01-25 00:49+0300\n"
+"POT-Creation-Date: 2011-02-21 22:11+0300\n"
+"PO-Revision-Date: 2011-02-21 22:11+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: Bishop <polimax@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -58,21 +58,21 @@ msgstr ""
 "Автор: Bishop (Барышников Дмитрий), polimax@mail.ru\n"
 "Copyright (c) 2010-2011\n"
 
-#: D:\work\Projects\wxGIS\src\geoprocess/processmain.cpp:172
+#: D:\work\Projects\wxGIS\src\geoprocess/processmain.cpp:167
 msgid "Get wxGISToolbox config failed!"
 msgstr "Получение файла настроек wxGISToolbox завершилось неудачно!"
 
-#: D:\work\Projects\wxGIS\src\geoprocess/processmain.cpp:186
+#: D:\work\Projects\wxGIS\src\geoprocess/processmain.cpp:181
 #, c-format
 msgid "Get Geoprocessing tool %s failed!"
 msgstr "Получение инструмента геообработки (%s) завершилась неудачно!"
 
-#: D:\work\Projects\wxGIS\src\geoprocess/processmain.cpp:192
+#: D:\work\Projects\wxGIS\src\geoprocess/processmain.cpp:187
 #, c-format
 msgid "Set Geoprocessing tool %s parameters failed!"
 msgstr "Установка параметров инструмента геообработки (%s) завершилась неудачно!"
 
-#: D:\work\Projects\wxGIS\src\geoprocess/processmain.cpp:198
+#: D:\work\Projects\wxGIS\src\geoprocess/processmain.cpp:193
 #, c-format
 msgid "Geoprocessing tool %s validation failed!"
 msgstr "Валидация параметров инструмента геообработки (%s) завершилась неудачно!"

@@ -373,6 +373,22 @@ void wxGISDTPath::Update(void)
 {
     m_PathTextCtrl->ChangeValue( m_pParam->GetValue() );
     SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
+
+    wxGISGPGxObjectDomain* poDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParam->GetDomain());
+    IGxObjectFilter* poFilter = poDomain->GetFilter(poDomain->GetSel());
+    wxFileName oName(m_pParam->GetValue());
+    for(size_t i = 0; i < poDomain->GetCount(); i++)
+    {
+        poFilter = poDomain->GetFilter(i);
+        if(poFilter)
+        {
+            if(oName.GetExt().CmpNoCase(poFilter->GetExt()) == 0 || poFilter->GetExt() == wxEmptyString)
+            {
+                poDomain->SetSel(i);
+                break;
+            }
+        }
+    }
     //Validate();
 }
 

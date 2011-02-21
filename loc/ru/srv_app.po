@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-25 00:39+0300\n"
-"PO-Revision-Date: 2011-01-25 00:39+0300\n"
+"POT-Creation-Date: 2011-02-21 22:11+0300\n"
+"PO-Revision-Date: 2011-02-21 22:55+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: Bishop <polimax@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -20,41 +20,84 @@ msgstr ""
 msgid "Failed to initialize the wxWidgets library, aborting."
 msgstr "Ошибка инициализации библиотеки wxWidgets, остановка."
 
-#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:55
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:64
 msgid "Show this help message"
 msgstr "Показать эту справку"
 
-#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:57
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:66
 msgid "The version of this program"
 msgstr "Версия этой программы"
 
-#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:58
-msgid "Run the monitoring server in standalone mode. Press 'q' to quit."
-msgstr "Запуск сервера мониторинга в обычном режиме. Нажмите 'q' для выхода."
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:67
+msgid "Run the wxGIS Server in standalone mode. Press 'q' to quit."
+msgstr "Запуск Сервера wxGIS в обычном режиме. Нажмите 'q' для выхода."
 
 #: D:\work\Projects\wxGIS\src\srv_app/main.cpp:68
-#, c-format
-msgid ""
-"The wxMonitoring server utility (%s)\n"
-"Author: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\n"
-"Copyright (c) 2010"
-msgstr ""
-"Инструмент мониторинга wxMonitoring (%s)\n"
-"Автор: Bishop (Барышников Дмитрий), polimax@mail.ru\n"
-"Copyright (c) 2010"
+msgid "Install wxGIS Server as service"
+msgstr "Установить Сервер wxGIS в качестве службы(демона)"
+
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:69
+msgid "Uninstall wxGIS Server service"
+msgstr "Удалить службу(демона) Сервера wxGIS"
+
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:70
+msgid "Start wxGIS Server service"
+msgstr "Запуск службы(демона) Сервера wxGIS"
 
 #: D:\work\Projects\wxGIS\src\srv_app/main.cpp:80
 #, c-format
 msgid ""
-"The wxMonitoring server utility (%s)\n"
+"The wxGIS Server (%s)\n"
 "Author: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\n"
-"Copyright (c) 2010\n"
+"Copyright (c) 2010-2011"
 msgstr ""
-"Инструмент мониторинга wxMonitoring (%s)\n"
+"Сервер wxGIS (%s)\n"
 "Автор: Bishop (Барышников Дмитрий), polimax@mail.ru\n"
-"Copyright (c) 2010\n"
+"Copyright (c) 2010-2011"
 
-#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:94
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:96
+#, c-format
+msgid ""
+"The wxGIS Server (%s)\n"
+"Author: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\n"
+"Copyright (c) 2010-2011\n"
+msgstr ""
+"Сервер wxGIS (%s)\n"
+"Автор: Bishop (Барышников Дмитрий), polimax@mail.ru\n"
+"Copyright (c) 2010-2011\n"
+
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:110
 msgid "Press 'q' to quit.\n"
 msgstr "Нажмите 'q' для выхода.\n"
+
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:139
+msgid "Starting service..."
+msgstr "Запуск сервиса..."
+
+#: D:\work\Projects\wxGIS\src\srv_app/service.cpp:88
+#, c-format
+msgid "%s is already installed\n"
+msgstr "%s уже установлен\n"
+
+#: D:\work\Projects\wxGIS\src\srv_app/service.cpp:97
+#: D:\work\Projects\wxGIS\src\srv_app/service.cpp:110
+#: D:\work\Projects\wxGIS\src\srv_app/service.cpp:123
+#, c-format
+msgid "%s is not installed\n"
+msgstr "%s не установлен\n"
+
+#: D:\work\Projects\wxGIS\src\srv_app/service.cpp:140
+#, c-format
+msgid "%s installed\n"
+msgstr "Установлен %s\n"
+
+#: D:\work\Projects\wxGIS\src\srv_app/service.cpp:151
+#, c-format
+msgid "Could not remove %s. Error %d\n"
+msgstr "%s не может быть удален. Ошибка %d\n"
+
+#: D:\work\Projects\wxGIS\src\srv_app/service.cpp:178
+#, c-format
+msgid "%s removed. (You must delete the file (%s) yourself.)\n"
+msgstr "Удален %s. (Вы должны удалить файл (%s) сами.)\n"
 

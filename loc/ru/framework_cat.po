@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-25 00:39+0300\n"
-"PO-Revision-Date: 2011-01-25 00:47+0300\n"
+"POT-Creation-Date: 2011-02-21 22:11+0300\n"
+"PO-Revision-Date: 2011-02-21 22:11+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -37,7 +37,7 @@ msgstr "ОК"
 
 #: D:\work\Projects\wxGIS\src\framework/addcommanddlg.cpp:80
 #: D:\work\Projects\wxGIS\src\framework/createcbdlg.cpp:92
-#: D:\work\Projects\wxGIS\src\framework/progressdlg.cpp:61
+#: D:\work\Projects\wxGIS\src\framework/progressdlg.cpp:65
 msgid "Cancel"
 msgstr "Отмена"
 

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-25 00:39+0300\n"
-"PO-Revision-Date: 2011-01-25 00:40+0300\n"
+"POT-Creation-Date: 2011-02-21 22:11+0300\n"
+"PO-Revision-Date: 2011-02-21 22:11+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "wxGIS Catalog"
 msgstr "Каталог wxGIS"
 
-#: D:\work\Projects\wxGIS\src\cat_app/catalogapp.cpp:83
+#: D:\work\Projects\wxGIS\src\cat_app/catalogapp.cpp:84
 msgid "wxGISCatalogApp: Start main frame"
 msgstr "wxGISCatalogApp: Загрузка главного фрейма"
 
