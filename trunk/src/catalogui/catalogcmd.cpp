@@ -223,10 +223,15 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
 				if(pSel->GetCount() == 0)
 					return false;
+                pSel->LockChanges();
 				IGxObject* pGxObject = pSel->GetSelectedObjects(0);
                 if(!pGxObject)
+                {
+                    pSel->UnLockChanges();
 					return false;
+                }
 				IGxObject* pParentGxObject = pGxObject->GetParent();
+                pSel->UnLockChanges();
 				if(!pParentGxObject)
 					return false;
 			}

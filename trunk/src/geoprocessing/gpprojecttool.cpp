@@ -95,7 +95,10 @@ GPParameters* wxGISGPProjectVectorTool::GetParameterInfo(void)
         pParam3->SetDirection(enumGISGPParameterDirectionOutput);
 
         wxGISGPGxObjectDomain* pDomain3 = new wxGISGPGxObjectDomain();
-        pDomain3->AddFilter(new wxGxDatasetFilter(enumGISFeatureDataset));
+//        pDomain3->AddFilter(new wxGxDatasetFilter(enumGISFeatureDataset));
+        pDomain3->AddFilter(new wxGxFeatureFileFilter(enumVecESRIShapefile));
+        pDomain3->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoTab));
+        pDomain3->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoMif));
         pParam3->SetDomain(pDomain3);
 
         m_pParamArr.push_back(pParam3);
@@ -118,20 +121,20 @@ bool wxGISGPProjectVectorTool::Validate(void)
     }
 
     //check if input & output types is same!
-    if(m_pParamArr[0]->GetIsValid())
-    {
-        if(!m_pParamArr[2]->GetHasBeenValidated())
-        {
-            wxFileName Name1(m_pParamArr[0]->GetValue());
-            wxFileName Name2(m_pParamArr[2]->GetValue());
-            if(Name1.GetExt() != Name2.GetExt())
-            {
-                m_pParamArr[2]->SetIsValid(false);
-                m_pParamArr[2]->SetMessage(wxGISEnumGPMessageError, _("Cannot project to the different format"));
-                return false;
-            }
-        }
-    }
+    //if(m_pParamArr[0]->GetIsValid())
+    //{
+    //    if(!m_pParamArr[2]->GetHasBeenValidated())
+    //    {
+    //        wxFileName Name1(m_pParamArr[0]->GetValue());
+    //        wxFileName Name2(m_pParamArr[2]->GetValue());
+    //        if(Name1.GetExt() != Name2.GetExt())
+    //        {
+    //            m_pParamArr[2]->SetIsValid(false);
+    //            m_pParamArr[2]->SetMessage(wxGISEnumGPMessageError, _("Cannot project to the different format"));
+    //            return false;
+    //        }
+    //    }
+    //}
     return true;
 }
 
@@ -191,7 +194,25 @@ bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
     }
 
     //get spatial reference
+    wxString sWKT = m_pParamArr[1]->GetValue().MakeString();
+    if(sWKT.IsEmpty())
+    {
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("Unsupported Spatial Reference"), -1, enumGISMessageErr);
+        return false;
+    }
+
+    CPLString szWKT(sWKT.mb_str());
+    OGRSpatialReference NewSpaRef;
     
+    const char* szpWKT = szWKT.c_str();
+    if(NewSpaRef.importFromWkt((char**)&szpWKT) != OGRERR_NONE)
+    {
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("Unsupported Spatial Reference"), -1, enumGISMessageErr);
+        return false;
+    }
+
     //get destination
     wxString sDstPath = m_pParamArr[2]->GetValue();
     wxFileName sDstFileName(sDstPath);
@@ -204,6 +225,22 @@ bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("Error get destination object"), -1, enumGISMessageErr);
         return false;
     }
+    CPLString szDestPath = pGxDstObject->GetInternalName();
+//    szDestPath = CPLFormFilename(szDestPath, sDstFileName.GetFullName().mb_str(), NULL);
+    wxString sName = sDstFileName.GetName();
+
+    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[2]->GetDomain());
+    IGxObjectFilter* pFilter = pDomain->GetFilter(pDomain->GetSel());
+    if(!pFilter)
+    {
+        //add messages to pTrackCancel
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("Error getting selected destination filter"), -1, enumGISMessageErr);
+        return false;
+    }
+
+
+    bool bRes = Project(pSrcDataSet, szDestPath, sName, pFilter, &NewSpaRef, pTrackCancel);
 
     //CPLString szPath = pGxDstObject->GetInternalName();
     //wxString sName = sDstFileName.GetName();
@@ -220,14 +257,12 @@ bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
     //    
     //bool bHasErrors = ExportFormat(pSrcDataSet, szPath, sName, pFilter, NULL, pTrackCancel);
 
-    //IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
-    //if(pCont)
-    //{
-    //    IGxObject* pParentLoc = pCont->SearchChild(sPath);
-    //    if(pParentLoc)
-    //        pParentLoc->Refresh();
-    //}
+    IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
+    if(pCont)
+    {
+        if(pGxDstObject)
+            pGxDstObject->Refresh();
+    }
 
-    //return !bHasErrors;
-    return false;
+    return bRes;
 }

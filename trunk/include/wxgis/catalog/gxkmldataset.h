@@ -45,7 +45,11 @@ public:
 	virtual bool CanDelete(void){return true;};
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
-	//IGxDataset
+	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel);
+	virtual bool CanCopy(CPLString szDestPath){return true;};
+	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
+	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
+    //IGxDataset
     virtual wxGISDatasetSPtr GetDataset(bool bReadOnly);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISContainer;};
     virtual int GetSubType(void){return (int)m_type;};

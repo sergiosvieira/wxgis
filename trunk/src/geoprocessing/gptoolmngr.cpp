@@ -200,6 +200,7 @@ int wxGISGPToolManager::OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel, IG
     m_ToolsMap[sToolName].nCount++;
 
     wxString sToolParams = pTool->GetAsString();
+    sToolParams.Replace(wxT("\""), wxT("\\\""));
     wxString sCommand = wxString::Format(wxT("%s -n "), m_sGeoprocessPath.c_str()) + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");
 
     WXGISEXECDDATA data = {new wxGPProcess(sCommand, static_cast<IProcessParent*>(this), pTrackCancel), pTool, pTrackCancel, pCallBack};

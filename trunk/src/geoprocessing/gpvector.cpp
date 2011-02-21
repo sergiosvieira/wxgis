@@ -322,12 +322,32 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
     return true;
 }
 
-bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, OGRSpatialReference* pNewSpaRef, ITrackCancel* pTrackCancel)
+bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGxObjectFilter* pFilter, OGRSpatialReference* pNewSpaRef, ITrackCancel* pTrackCancel)
 {
     CPLErrorReset();
 
+    if(!pFilter || !pDSet)
+        return false;
+
+    int nNewSubType = pFilter->GetSubType();
+    //check multi geometry
+    OGRwkbGeometryType nGeomType = pDSet->GetGeometryType();
+    bool bIsMultigeom = nNewSubType == enumVecESRIShapefile && (wkbFlatten(nGeomType) == wkbUnknown || wkbFlatten(nGeomType) == wkbGeometryCollection);
+    if(bIsMultigeom && nNewSubType == enumVecESRIShapefile)
+    {
+        wxString sErr(_("Input feature class has multi geometry but output doesn't support it!"));
+        CPLString sFullErr(sErr.mb_str());
+        CPLError( CE_Failure, CPLE_AppDefined, sFullErr );
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+        return false;
+    }
+
+    wxString sDriver = pFilter->GetDriver();
+    wxString sExt = pFilter->GetExt();
+
     if(pTrackCancel)
-        pTrackCancel->PutMessage(wxString::Format(_("Projecting %s"), pDSet->GetName().c_str()), -1, enumGISMessageTitle);
+        pTrackCancel->PutMessage(wxString::Format(_("Projecting %s to %s"), pDSet->GetName().c_str(), sName.c_str()), -1, enumGISMessageTitle);
 
     OGRSpatialReference* pSrcSpaRef = pDSet->GetSpatialReference();
     if(!pSrcSpaRef)
@@ -340,6 +360,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, OGRSpatialReference
             pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
         return false;
     }
+
     if(!pNewSpaRef)
     {
         wxString sErr(_("Output spatial reference is not defined! OGR error: "));
@@ -361,18 +382,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, OGRSpatialReference
         return false;
     }
 
-    OGRSFDriver *pDriver = pDSet->GetDataSource()->GetDriver();
-    if(!pDriver)
-    {
-        wxString sErr(_("Error get dataset driver"));
-        CPLError( CE_Failure, CPLE_AppDefined, sErr.mb_str() );
-        if(pTrackCancel)
-            pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
-        return false;
-    }
-
-    CPLString szDriverName(pDriver->GetName());
-    wxGISFeatureDatasetSPtr pNewDSet = CreateVectorLayer(CPLGetPath(sPath), wxString(CPLGetBasename(sPath), wxConvUTF8), wxString(CPLGetExtension(sPath), wxConvUTF8), wxString(szDriverName, *wxConvCurrent), pDef, pNewSpaRef);
+    wxGISFeatureDatasetSPtr pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
     if(!pNewDSet)
     {
         wxString sErr(_("Error creating new dataset! OGR error: "));
@@ -395,6 +405,16 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, OGRSpatialReference
     }
 
     poCT = OGRCreateCoordinateTransformation( pSrcSpaRef, pNewSpaRef );
+    if(!poCT)
+    {
+        wxString sErr(_("The unknown transformation! OGR Error: "));
+        CPLString sFullErr(sErr.mb_str());
+        sFullErr += CPLGetLastErrorMsg();
+        CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+        return false;
+    }
 
     //get limits
     OGRPolygon* pRgn1 = NULL;
@@ -543,6 +563,59 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, OGRSpatialReference
             }
         }
 
+        //////////////////////
+        //wxFontEncoding OutputEncoding = pDstDataSet->GetEncoding();
+
+        //OGRFeatureDefn *pFeatureDefn = pFeature->GetDefnRef();
+        //if(!pFeatureDefn)
+        //{
+        //    OGRFeature::DestroyFeature(pFeature);
+        //    wxDELETE(pGeom);
+        //    continue;
+        //}
+        //
+        //CPLErrorReset();
+        //wxString sACText;
+
+        //for(size_t i = 0; i < pFeatureDefn->GetFieldCount(); i++)
+        //{
+        //    OGRFieldDefn *pFieldDefn = pFeatureDefn->GetFieldDefn(i);
+        //    if(pFieldDefn)
+        //    {
+        //        OGRFieldType nType = pFieldDefn->GetType();
+        //        if(OFTString == nType)
+        //        {
+        //            wxString sFieldString;
+        //            if(CPLIsUTF8(pFeature->GetFieldAsString(i), -1))
+        //            {
+        //                sFieldString = wxString::FromUTF8(pFeature->GetFieldAsString(i));
+        //            }
+        //            else
+        //            {
+        //                sFieldString = wxString(wgMB2WX(pFeature->GetFieldAsString(i)));
+        //            }
+        //            //wxCSConv inconv(OutputEncoding);
+        //            //CPLString cplstr(pFeature->GetFieldAsString(i));
+        //            //wxString sFieldString(cplstr.
+        //            ////wxString sFieldString(wgMB2WX(pFeature->GetFieldAsString(i)));
+        //            //wxCSConv outconv(OutputEncoding);
+        //            //pFeature->SetField(i, sFieldString.mb_str(outconv));   
+
+        //            if(OutputEncoding == wxFONTENCODING_DEFAULT)
+        //                pFeature->SetField(i, wgWX2MB(sFieldString));
+        //            else            
+        //            {                
+        //                wxCSConv outconv(OutputEncoding);
+        //                pFeature->SetField(i, sFieldString.mb_str(outconv));
+        //            }
+        //            if(pDstDataSet->GetSubType() == enumVecDXF)
+        //                sACText += sFieldString + wxT("\n");
+        //        }
+        //        //TODO: OFTStringList 
+        //    }
+        //}
+        ////////////////
+
         OGRErr eErr = pNewDSet->CreateFeature(pFeature);
         if(eErr != OGRERR_NONE)
         {
@@ -682,8 +755,68 @@ OGRGeometry* Intersection(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn, OGREnvelo
             return pFeatureGeom->clone();
         return pFeatureGeom->Intersection(pRgn);
     case wkbMultiPoint:
+        {
+        	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pFeatureGeom;
+            OGRGeometryCollection* pNewOGRGeometryCollection = new OGRMultiPoint();
+            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+            {
+                OGRGeometry* pGeom = (OGRGeometry*)pOGRGeometryCollection->getGeometryRef(i);
+                pGeom->assignSpatialReference(pFeatureGeom->getSpatialReference());
+                OGRGeometry* pNewGeom = Intersection(pGeom, pRgn, pRgnEnv);
+                if(pNewGeom)
+                    pNewOGRGeometryCollection->addGeometryDirectly(pNewGeom);
+            }
+            if(pNewOGRGeometryCollection->getNumGeometries() == 0)
+            {
+                wxDELETE(pNewOGRGeometryCollection);
+                return NULL;
+            }
+            else
+                return pNewOGRGeometryCollection;
+        }
+        break;
     case wkbMultiLineString:
+        {
+        	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pFeatureGeom;
+            OGRGeometryCollection* pNewOGRGeometryCollection = new OGRMultiLineString();
+            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+            {
+                OGRGeometry* pGeom = (OGRGeometry*)pOGRGeometryCollection->getGeometryRef(i);
+                pGeom->assignSpatialReference(pFeatureGeom->getSpatialReference());
+                OGRGeometry* pNewGeom = Intersection(pGeom, pRgn, pRgnEnv);
+                if(pNewGeom)
+                    pNewOGRGeometryCollection->addGeometryDirectly(pNewGeom);
+            }
+            if(pNewOGRGeometryCollection->getNumGeometries() == 0)
+            {
+                wxDELETE(pNewOGRGeometryCollection);
+                return NULL;
+            }
+            else
+                return pNewOGRGeometryCollection;
+        }
+        break;
     case wkbMultiPolygon:
+        {
+        	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pFeatureGeom;
+            OGRGeometryCollection* pNewOGRGeometryCollection = new OGRMultiPolygon();
+            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+            {
+                OGRGeometry* pGeom = (OGRGeometry*)pOGRGeometryCollection->getGeometryRef(i);
+                pGeom->assignSpatialReference(pFeatureGeom->getSpatialReference());
+                OGRGeometry* pNewGeom = Intersection(pGeom, pRgn, pRgnEnv);
+                if(pNewGeom)
+                    pNewOGRGeometryCollection->addGeometryDirectly(pNewGeom);
+            }
+            if(pNewOGRGeometryCollection->getNumGeometries() == 0)
+            {
+                wxDELETE(pNewOGRGeometryCollection);
+                return NULL;
+            }
+            else
+                return pNewOGRGeometryCollection;
+        }
+        break;
     case wkbGeometryCollection:
         {
         	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pFeatureGeom;

@@ -31,118 +31,99 @@ wxGxRasterFactory::~wxGxRasterFactory(void)
 {
 }
 
-bool wxGxRasterFactory::GetChildren(wxString sParentDir, wxArrayString* pFileNames, GxObjectArray* pObjArray)
+bool wxGxRasterFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray)
 {
-    std::vector<wxString> remove_candidates;
-	for(size_t i = 0; i < pFileNames->GetCount(); i++)
-	{
-		wxString path = pFileNames->Item(i);
-		//test is dir
-		if(wxFileName::DirExists(path))
-			continue;
+    for(int i = CSLCount(pFileNames) - 1; i >= 0; i-- )
+    {
+        IGxObject* pGxObj = NULL;
+        CPLString szExt = CPLGetExtension(pFileNames[i]);
+        CPLString szPath;
 
-        wxFileName FName(path);
-		wxString ext = FName.GetExt().MakeLower();
-        wxString sPath = sParentDir + wxFileName::GetPathSeparator() + FName.GetName();//FName.GetFullPath();
-        wxString name = GetConvName(path, FName);
-		
-		IGxObject* pGxObj = NULL;
-		//prj files
-		if(ext == wxString(wxT("bmp")))
+
+		if(EQUAL(szExt, "bmp"))
 		{
-            wxString sRemCand = sPath + wxT(".prj");
-            remove_candidates.push_back(sRemCand);
-
-			pGxObj = GetGxDataset(path, name, enumRasterBmp);
-			goto REMOVE;
+			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterBmp);
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 		}
-		if(ext == wxString(wxT("jpg")) || ext == wxString(wxT("jpeg")))
+		else if(EQUAL(szExt, "jpg") || EQUAL(szExt, "jpeg"))
 		{
-            wxString sRemCand = sPath + wxT(".prj");
-            remove_candidates.push_back(sRemCand);
-
-			pGxObj = GetGxDataset(path, name, enumRasterJpeg);
-			goto REMOVE;
+			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterJpeg);
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 		}
-		if(ext == wxString(wxT("img")))
+		else if(EQUAL(szExt, "img"))
 		{
-            wxString sRemCand = sPath + wxT(".prj");
-            remove_candidates.push_back(sRemCand);
-
-			pGxObj = GetGxDataset(path, name, enumRasterImg);
-			goto REMOVE;
+			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterImg);
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 		}
-		if(ext == wxString(wxT("gif")))
+		else if(EQUAL(szExt, "gif"))
 		{
-            wxString sRemCand = sPath + wxT(".prj");
-            remove_candidates.push_back(sRemCand);
-
-			pGxObj = GetGxDataset(path, name, enumRasterGif);
-			goto REMOVE;
+			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterGif);
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 		}
-		if(ext == wxString(wxT("tif")) || ext == wxString(wxT("tiff")))
+		else if(EQUAL(szExt, "tif") || EQUAL(szExt, "tiff"))
 		{
-            wxString sRemCand = sPath + wxT(".prj");
-            remove_candidates.push_back(sRemCand);
-
-			pGxObj = GetGxDataset(path, name, enumRasterTiff);
-			goto REMOVE;
+			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterTiff);
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 		}
-        if( ext == wxString(wxT("png")) )
+		else if(EQUAL(szExt, "png"))
 		{
-            wxString sRemCand = sPath + wxT(".prj");
-            remove_candidates.push_back(sRemCand);
-
-            pGxObj = GetGxDataset(path, name, enumRasterPng);
-			goto REMOVE;
+			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterPng);
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 		}
-		if(ext == wxString(wxT("til"))  || ext == wxString(wxT("jp2")))
-		{
-            wxString sRemCand = sPath + wxT(".prj");
-            remove_candidates.push_back(sRemCand);
 
-			pGxObj = GetGxDataset(path, name, enumRasterUnknown);
-			goto REMOVE;
-		}		
-        //TODO: add other raster file extensions
-
-		path.MakeLower();
-		if(path.Find(wxT(".aux")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".rrd")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".ovr")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".w")) != wxNOT_FOUND)//TODO: add other world file extensions
-			goto REMOVE;
-		if(path.Find(wxT(".wld")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".bpw")) != wxNOT_FOUND)
-			goto REMOVE;
-		if(path.Find(wxT(".bmpw")) != wxNOT_FOUND)
-			goto REMOVE;
-		continue;
-REMOVE:
-		pFileNames->RemoveAt(i);
-		i--;
-		if(pGxObj != NULL)
-			pObjArray->push_back(pGxObj);
-	}
-
-	for(size_t i = 0; i < pFileNames->GetCount(); i++)
-	{
-        wxString path = pFileNames->Item(i);
-        for(size_t j = 0; j < remove_candidates.size(); j++)
+        else if(EQUAL(szExt, "prj"))
         {
-            if(remove_candidates[j].CmpNoCase(path) == 0)
-            {
-                pFileNames->RemoveAt(i);
-                i--;
-                break;
-            }
+            szPath = (char*)CPLResetExtension(pFileNames[i], "bmp");
+            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+            szPath = (char*)CPLResetExtension(pFileNames[i], "jpg");
+            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+            szPath = (char*)CPLResetExtension(pFileNames[i], "jpeg");
+            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+            szPath = (char*)CPLResetExtension(pFileNames[i], "img");
+            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+            szPath = (char*)CPLResetExtension(pFileNames[i], "gif");
+            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+            szPath = (char*)CPLResetExtension(pFileNames[i], "tif");
+            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+            szPath = (char*)CPLResetExtension(pFileNames[i], "tiff");
+            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+            szPath = (char*)CPLResetExtension(pFileNames[i], "png");
+            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
-    }
+        else if(EQUAL(szExt, "aux"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "rrd"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "ovr"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "w"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "wld"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "bpw"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "bmpw"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "gifw"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "jpgw"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "jpegw"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "pngw"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 
+		if(pGxObj != NULL)
+			ObjArray.push_back(pGxObj);
+    }
 	return true;
 }
 

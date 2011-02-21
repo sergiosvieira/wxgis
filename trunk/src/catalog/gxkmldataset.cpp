@@ -205,6 +205,80 @@ wxGISDatasetSPtr wxGxKMLDataset::GetDataset(bool bReadOnly)
 	return m_pwxGISDataset;
 }
 
+bool wxGxKMLDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
+{
+    if(pTrackCancel)
+        pTrackCancel->PutMessage(wxString(_("Copy table dataset ")) + m_sName, -1, enumGISMessageInfo);
+
+    wxGISFeatureDatasetSPtr pDSet;
+ 	if(m_pwxGISDataset == NULL)
+    {
+        pDSet = boost::make_shared<wxGISFeatureDataset>(m_sPath, enumVecUnknown);
+        m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(pDSet);
+    }
+    else
+    {
+        pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset);
+    }
+    
+    if(!pDSet)
+    {
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wxString::Format(_("Copy table dataset %s failed!"), m_sName.c_str()), -1, enumGISMessageErr);
+        return false;
+    }
+
+    bool bRet = pDSet->Copy(szDestPath, pTrackCancel);
+    if(!bRet)
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxLogError(_("Copy failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
+		return false;	
+    }
+
+    m_sPath = pDSet->GetPath();
+    m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
+
+    return true;
+}
+
+bool wxGxKMLDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
+{
+    if(pTrackCancel)
+        pTrackCancel->PutMessage(wxString(_("Move table dataset ")) + m_sName, -1, enumGISMessageInfo);
+
+    wxGISFeatureDatasetSPtr pDSet;
+ 	if(m_pwxGISDataset == NULL)
+    {
+        pDSet = boost::make_shared<wxGISFeatureDataset>(m_sPath, enumVecUnknown);
+        m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(pDSet);
+    }
+    else
+    {
+        pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset);
+    }
+    
+    if(!pDSet)
+    {
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wxString::Format(_("Move table dataset %s failed!"), m_sName.c_str()), -1, enumGISMessageErr);
+        return false;
+    }
+
+    bool bRet = pDSet->Move(szDestPath, pTrackCancel);
+    if(!bRet)
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxLogError(_("Move failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
+		return false;	
+    }
+
+    m_sPath = pDSet->GetPath();
+    m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
+
+    return true;
+}
+
 //--------------------------------------------------------------
 //class wxGxKMLSubDataset
 //--------------------------------------------------------------

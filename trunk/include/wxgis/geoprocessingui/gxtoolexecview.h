@@ -62,6 +62,7 @@ public:
     virtual IGxObject* GetParentGxObject(void){return m_pParentGxObject;};
     virtual bool Show(bool show = true);
     virtual void HideDone(bool bHide = true);
+    virtual void SetGxToolExecute(IGxObject* pObject){m_pParentGxObject = pObject;};
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id = TOOLEXECUTECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = TOOLEXECVIEWSTYLE, const wxString& name = wxT("ToolExecuteView"));
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);

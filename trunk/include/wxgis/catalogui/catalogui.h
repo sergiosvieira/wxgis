@@ -99,6 +99,8 @@ public:
     virtual size_t GetDoSize() = 0;
     virtual int GetDoPos(void) = 0;
     virtual wxString GetDoPath(size_t nIndex) = 0;
+    virtual void LockChanges() = 0;
+    virtual void UnLockChanges() = 0;
 };
 
 class IGxSelectionEvents

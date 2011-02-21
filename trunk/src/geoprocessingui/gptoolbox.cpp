@@ -362,7 +362,7 @@ void wxGxFavoritesToolbox::LoadChildren(void)
 
 wxString wxGxFavoritesToolbox::GetName(void)
 {
-    return wxString(_("Favorites"));
+    return wxString(_("Recent"));
 }
 
 /////////////////////////////////////////////////////////////////////////

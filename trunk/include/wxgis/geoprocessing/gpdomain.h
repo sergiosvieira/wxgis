@@ -23,6 +23,7 @@
 
 #include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/catalog/catalog.h"
+#include "wxgis/catalog/gxfilters.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISGPGxObjectDomain
@@ -35,9 +36,9 @@ public:
     virtual ~wxGISGPGxObjectDomain (void);
 	virtual void AddFilter(IGxObjectFilter* pFilter);
     virtual IGxObjectFilter* GetFilter(size_t nIndex);
-    virtual size_t GetFilterCount(void);
-    virtual void SetSelFilter(size_t nIndex);
-    virtual size_t GetSelFilter(void);
+    virtual size_t GetCount(void);
+    virtual void SetSel(size_t nIndex);
+    virtual size_t GetSel(void);
 protected:
 	OBJECTFILTERS m_FilterArray;
     size_t m_nSelFilterIndex;
@@ -53,18 +54,37 @@ public:
     wxGISGPStringDomain (void);
     virtual ~wxGISGPStringDomain (void);
 	virtual void AddString(wxString soStr, wxString soInternalStr = wxEmptyString);
-    virtual size_t GetStringCount(void);
+    virtual size_t GetCount(void);
     virtual wxString GetInternalString(size_t dIndex);
     virtual wxString GetExternalString(size_t dIndex);
     virtual wxString GetInternalString(wxString soInternalStr);
     virtual wxString GetExternalString(wxString soStr);
     virtual wxArrayString GetArrayString() const;
-    virtual void SetSelString(size_t nIndex);
-    virtual size_t GetSelString(void);
+    virtual void SetSel(size_t nIndex);
+    virtual size_t GetSel(void);
 protected:
 	wxArrayString m_asoData;
 	wxArrayString m_asoInternalData;
     size_t m_nSelIndex;
 };
 
+inline void WXDLLIMPEXP_GIS_GP AddAllVectorFilters(wxGISGPGxObjectDomain* pDomain)
+{
+    pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecESRIShapefile));
+    pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoTab));
+    pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoMif));
+    pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecKML));
+    pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecKMZ));
+    pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecDXF));
+    pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecGML));
+}
 
+inline void WXDLLIMPEXP_GIS_GP AddAllRasterFilters(wxGISGPGxObjectDomain* pDomain)
+{
+    pDomain->AddFilter(new wxGxRasterFilter(enumRasterTiff));
+    pDomain->AddFilter(new wxGxRasterFilter(enumRasterImg));
+    pDomain->AddFilter(new wxGxRasterFilter(enumRasterBmp));
+    pDomain->AddFilter(new wxGxRasterFilter(enumRasterJpeg));
+    pDomain->AddFilter(new wxGxRasterFilter(enumRasterPng));
+    pDomain->AddFilter(new wxGxRasterFilter(enumRasterGif));
+}
