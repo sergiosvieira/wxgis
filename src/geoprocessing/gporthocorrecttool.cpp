@@ -214,6 +214,16 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     wxString sDstPath = m_pParamArr[1]->GetValue();
     wxFileName sDstFileName(sDstPath);
     wxString sPath = sDstFileName.GetPath();
+    IGxObject* pGxDstObject = pGxObjectContainer->SearchChild(sPath);
+    if(!pGxDstObject)
+    {
+        //add messages to pTrackCancel
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("Error get destination object"), -1, enumGISMessageErr);
+        return false;
+    }
+
+    CPLString szPath = pGxDstObject->GetInternalName();
     wxString sName = sDstFileName.GetName();
 
     wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[1]->GetDomain());
@@ -223,8 +233,6 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         //add messages to pTrackCancel
         if(pTrackCancel)
             pTrackCancel->PutMessage(_("Error getting selected destination filter"), -1, enumGISMessageErr);
-
-        //wsDELETE(pSrcDataSet);
         return false;
     }
 
@@ -238,11 +246,10 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         //add messages to pTrackCancel
         if(pTrackCancel)
             pTrackCancel->PutMessage(_("Error getting raster"), -1, enumGISMessageErr);
-        //wsDELETE(pSrcDataSet);
         return false;
     }
 
-    GDALDriver* poDriver = (GDALDriver*)GDALGetDriverByName( wgWX2MB(sDriver) );
+	GDALDriver* poDriver = (GDALDriver*)GDALGetDriverByName( sDriver.mb_str() );
     GDALRasterBand * poGDALRasterBand = poGDALDataset->GetRasterBand(1);
 
     if(!poGDALRasterBand)
@@ -250,7 +257,6 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         //add messages to pTrackCancel
         if(pTrackCancel)
             pTrackCancel->PutMessage(_("The raster has no bands"), -1, enumGISMessageErr);
-        //wsDELETE(pSrcDataSet);
         return false;
     }
     GDALDataType eDT = poGDALRasterBand->GetRasterDataType();
@@ -300,7 +306,6 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
             pTrackCancel->PutMessage(wxString::Format(_("Error CreateGenImgProjTransformer. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
-        //wsDELETE(pSrcDataSet);
         return false;
     }
 
@@ -313,7 +318,6 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
             pTrackCancel->PutMessage(wxString::Format(_("Error determining output raster size. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
-        //wsDELETE(pSrcDataSet);
         return false;
     }
 
@@ -321,13 +325,13 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     GDALDestroyGenImgProjTransformer( hTransformArg );
 
     // Create the output file.
-    GDALDataset * poOutputGDALDataset = poDriver->Create( sDstPath.mb_str(), nPixels, nLines, poGDALDataset->GetRasterCount(), eDT, NULL );
+	CPLString sFullPath = CPLFormFilename(szPath, sName.mb_str(wxConvUTF8), sExt.mb_str(wxConvUTF8));
+    GDALDataset * poOutputGDALDataset = poDriver->Create( sFullPath, nPixels, nLines, poGDALDataset->GetRasterCount(), eDT, NULL );
     if(poOutputGDALDataset == NULL)
     {
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
             pTrackCancel->PutMessage(wxString::Format(_("Error creating output raster. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
-        //wsDELETE(pSrcDataSet);
         return false;
     }
 

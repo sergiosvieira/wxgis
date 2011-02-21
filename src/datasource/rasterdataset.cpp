@@ -120,6 +120,9 @@ char **wxGISRasterDataset::GetFileList()
     szPath = m_sPath + CPLString(".ovr.aux.xml");
     if(CPLCheckForFile((char*)szPath.c_str(), NULL))
         papszFileList = CSLAddString( papszFileList, szPath );
+    szPath = m_sPath + CPLString(".rrd");
+    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+        papszFileList = CSLAddString( papszFileList, szPath );
     szPath = (char*)CPLResetExtension(m_sPath, "xml");
     if(CPLCheckForFile((char*)szPath.c_str(), NULL))
         papszFileList = CSLAddString( papszFileList, szPath );
