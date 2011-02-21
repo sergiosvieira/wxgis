@@ -141,7 +141,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28u.lib wxbase28u_net.lib wxmsw28u_core.lib wxbase28u_xml.lib wxmsw28u_aui.lib wxmsw28u_adv.lib wxmsw28u_html.lib wxzlib.lib wxregexu.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpl.lib wxgisogr.lib wxgisgdal.lib wxGISCore.lib wxGISFramework.lib wxGISDisplay.lib wxGISGeometry.lib"
+				AdditionalDependencies="wxbase28u.lib wxbase28u_net.lib wxmsw28u_core.lib wxbase28u_xml.lib wxmsw28u_aui.lib wxmsw28u_adv.lib wxmsw28u_html.lib wxzlib.lib wxregexu.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpl.lib wxgisogr.lib wxgisgdal.lib wxGISCore.lib wxGISFramework.lib wxGISDisplay.lib wxGISGeometry.lib wxGISDatasource.lib"
 				LinkIncremental="0"
 				AdditionalLibraryDirectories="&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib"
 				GenerateDebugInformation="false"

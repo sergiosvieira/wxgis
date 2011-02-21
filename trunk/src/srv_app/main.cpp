@@ -64,10 +64,10 @@ bool parse_commandline_parameters( int argc, char** argv )
         { wxCMD_LINE_SWITCH, wxT( "h" ), wxT( "help" ), _( "Show this help message" ),
             wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
         { wxCMD_LINE_SWITCH, wxT( "v" ), wxT( "version" ), _( "The version of this program" ) },
-		{ wxCMD_LINE_SWITCH, wxT( "r" ), wxT("run"), _( "Run the monitoring server in standalone mode. Press 'q' to quit." ) },
-		{ wxCMD_LINE_SWITCH, wxT( "i" ), wxT("install"), _( "Install monitoring server as service" ) },
-		{ wxCMD_LINE_SWITCH, wxT( "u" ), wxT("uninstall"), _( "Uninstall monitoring server service" ) },
-		{ wxCMD_LINE_SWITCH, wxT( "s" ), wxT("start"), _( "Start monitoring server service" ) },
+		{ wxCMD_LINE_SWITCH, wxT( "r" ), wxT("run"), _( "Run the wxGIS Server in standalone mode. Press 'q' to quit." ) },
+		{ wxCMD_LINE_SWITCH, wxT( "i" ), wxT("install"), _( "Install wxGIS Server as service" ) },
+		{ wxCMD_LINE_SWITCH, wxT( "u" ), wxT("uninstall"), _( "Uninstall wxGIS Server service" ) },
+		{ wxCMD_LINE_SWITCH, wxT( "s" ), wxT("start"), _( "Start wxGIS Server service" ) },
 		//{ wxCMD_LINE_OPTION, wxT( "i" ), wxT("index"), _( "Index the locations set in DB with max count of nodes" ), wxCMD_LINE_VAL_NUMBER },
 		//{ wxCMD_LINE_SWITCH, wxT( "u" ), wxT("update"), _( "Update the locations set in config file (add/remove paths & etc.)" ) },
   //      { wxCMD_LINE_SWITCH, wxT( "l" ), wxT("list"), _( "list path's" ) },
@@ -77,7 +77,7 @@ bool parse_commandline_parameters( int argc, char** argv )
     };
 
     wxCmdLineParser my_parser( my_cmdline_desc, argc, argv );
-    my_parser.SetLogo(wxString::Format(_("The wxMonitoring server utility (%s)\nAuthor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010"), APP_VER));
+    my_parser.SetLogo(wxString::Format(_("The wxGIS Server (%s)\nAuthor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010-2011"), APP_VER));
 
 	//print params to log
 	for(size_t i = 0; i < my_parser.GetParamCount(); i++)
@@ -93,7 +93,7 @@ bool parse_commandline_parameters( int argc, char** argv )
 
 	if( my_parser.Found( wxT( "v" ) ) )
 	{
-	    wxString out = wxString::Format(_("The wxMonitoring server utility (%s)\nAuthor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010\n"), APP_VER);
+	    wxString out = wxString::Format(_("The wxGIS Server (%s)\nAuthor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010-2011\n"), APP_VER);
 	    wxFprintf(stdout, out);
 		return true;
 	}
@@ -116,14 +116,14 @@ bool parse_commandline_parameters( int argc, char** argv )
 
 	if( my_parser.Found( wxT( "i" ) ) )
 	{
-		wxGISService Service(wxT("wxGISMonitoring"));
+		wxGISService Service(wxT("wxGISServer"));
 		Service.Install();
 		return true;
 	}
 
  	if( my_parser.Found( wxT( "u" ) ) )
 	{
-		wxGISService Service(wxT("wxGISMonitoring"));
+		wxGISService Service(wxT("wxGISServer"));
 		Service.Uninstall();
 		return true;
 	}
@@ -138,7 +138,7 @@ bool parse_commandline_parameters( int argc, char** argv )
 	{
 		wxFprintf(stdout, wxString(_("Starting service...")));
 
-		wxGISService Service(wxT("wxGISMonitoring"));
+		wxGISService Service(wxT("wxGISServer"));
 		Service.StartService();
 
 		// When we get here, the service has been stopped

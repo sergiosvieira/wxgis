@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-25 00:39+0300\n"
-"PO-Revision-Date: 2011-01-25 00:39+0300\n"
+"POT-Creation-Date: 2011-02-21 22:38+0300\n"
+"PO-Revision-Date: 2011-02-21 22:39+0300\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -19,56 +19,57 @@ msgstr ""
 
 #: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:60
 #, c-format
-msgid "The driver '%s' is not available"
-msgstr "Драйвер '%s' не доступен"
+msgid "The driver '%s' is not available! OGR error: "
+msgstr "Драйвер '%s' не доступен! Ошибка OGR: "
 
-#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:82
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:87
+#: D:\work\Projects\wxGIS\src\datasource/sysop.cpp:385
 #, c-format
-msgid "Creation of output file '%s' failed"
-msgstr "Не удалось создать выходной файл '%s'"
+msgid "Error create the output file '%s'! OGR error: "
+msgstr "Не возможно создать выходной файл! Ошибка OGR: "
 
-#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:93
 #: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:110
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:130
 #, c-format
-msgid "Creation of output layer '%s' failed"
-msgstr "Не удалось создать выходной слой '%s'"
+msgid "Error create the output layer '%s'! OGR error: "
+msgstr "Не удалось создать выходной слой '%s'! Ошибка OGR: "
 
-#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:426
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:433
 #, c-format
 msgid "wxGISFeatureDataset: Open failed! Path '%s'. OGR error: %s"
 msgstr "wxGISFeatureDataset: Невозможно открыть! Путь '%s'.Ошибка OGR: %s"
 
-#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:698
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:723
 #: D:\work\Projects\wxGIS\src\datasource/table.cpp:277
 msgid "%d-%m-%Y"
 msgstr "%d-%m-%Y"
 
-#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:707
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:732
 #: D:\work\Projects\wxGIS\src\datasource/table.cpp:290
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
-#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:716
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:743
 #: D:\work\Projects\wxGIS\src\datasource/table.cpp:303
 msgid "%d-%m-%Y %H:%M:%S"
 msgstr "%d-%m-%Y %H:%M:%S"
 
-#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:721
+#: D:\work\Projects\wxGIS\src\datasource/featuredataset.cpp:749
 #, c-format
 msgid "%.6f"
 msgstr "%.6f"
 
-#: D:\work\Projects\wxGIS\src\datasource/postgisdataset.cpp:140
+#: D:\work\Projects\wxGIS\src\datasource/postgisdataset.cpp:141
 #, c-format
 msgid "wxGISPostGISDataset: Open failed! Host '%s', Database name '%s', Port='%s'. OGR error: %s"
 msgstr "wxGISPostGISDataset: Невозможно открыть! Хост '%s', Имя базы данных '%s', Порт='%s'. Ошибка OGR: %s"
 
-#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:191
+#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:257
 #, c-format
 msgid "wxGISRasterDataset: Open failed! Path '%s'. GDAL error: %s"
 msgstr "wxGISRasterDataset: Невозможно открыть! Путь '%s'. Ошибка GDAL: %s"
 
-#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:240
+#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:306
 #, c-format
 msgid "wxGISRasterDataset: Open failed! Path '%s'. Raster has no bands"
 msgstr "wxGISRasterDataset: Невозможно открыть! Путь '%s'. Нет каналов в растре"
@@ -83,3 +84,12 @@ msgstr "Невозможно создать  буфер размером %d дл
 msgid "Failed to read %d bytes from xml file."
 msgstr "Невозможно прочитать %d байт xml файла."
 
+#: D:\work\Projects\wxGIS\src\datasource/sysop.cpp:371
+msgid "Error open input file! OGR error: "
+msgstr "Не возможно открыть входной файл! Ошибка OGR:"
+
+#~ msgid "Error create destination file! OGR error: "
+#~ msgstr "Не возможно создать выходной файл! Ошибка OGR:"
+
+#~ msgid "Creation of output file '%s' failed"
+#~ msgstr "Не удалось создать выходной файл '%s'"

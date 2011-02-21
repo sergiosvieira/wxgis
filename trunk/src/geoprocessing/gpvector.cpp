@@ -38,7 +38,7 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
     if(pTrackCancel)
     {
        pProgressor = pTrackCancel->GetProgressor();
-       pTrackCancel->PutMessage(wxString::Format(_("Start CopyRows from '%s' to '%s'"), pSrcDataSet->GetPath().c_str(), pDstDataSet->GetPath().c_str()), -1, enumGISMessageNorm);
+       pTrackCancel->PutMessage(wxString::Format(_("Start CopyRows from '%s' to '%s'"), wxString(pSrcDataSet->GetPath(), wxConvUTF8).c_str(), wxString(pDstDataSet->GetPath(), wxConvUTF8).c_str()), -1, enumGISMessageNorm);
     }
     int nCounter(0);
     size_t nStep = pSrcDataSet->GetSize() < 10 ? 1 : pSrcDataSet->GetSize() / 10;
@@ -332,7 +332,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
     int nNewSubType = pFilter->GetSubType();
     //check multi geometry
     OGRwkbGeometryType nGeomType = pDSet->GetGeometryType();
-    bool bIsMultigeom = nNewSubType == enumVecESRIShapefile && (wkbFlatten(nGeomType) == wkbUnknown || wkbFlatten(nGeomType) == wkbGeometryCollection);
+    bool bIsMultigeom = (wkbFlatten(nGeomType) == wkbUnknown || wkbFlatten(nGeomType) == wkbGeometryCollection);
     if(bIsMultigeom && nNewSubType == enumVecESRIShapefile)
     {
         wxString sErr(_("Input feature class has multi geometry but output doesn't support it!"));
@@ -483,9 +483,9 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
 
         if(!pSrcSpaRef->IsSame(pWGSSpaRef))
         {
-            if(pRgn1->transformTo(pSrcSpaRef) != OGRERR_NONE)
+            if(pRgn1 && pRgn1->transformTo(pSrcSpaRef) != OGRERR_NONE)
                 wxDELETE(pRgn1);
-            if(pRgn2->transformTo(pSrcSpaRef) != OGRERR_NONE)
+            if(pRgn2 && pRgn2->transformTo(pSrcSpaRef) != OGRERR_NONE)
                 wxDELETE(pRgn2);
         }
     }

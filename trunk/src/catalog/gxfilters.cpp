@@ -394,7 +394,7 @@ wxString wxGxRasterFilter::GetName(void)
     case enumRasterPng:
 	    return wxString(_("Portable Network Graphics (*.png)"));
     case enumRasterGif:
-	    return wxString(_("Graphics Interchange Format (.gif)"));
+	    return wxString(_("Graphics Interchange Format (*.gif)"));
     }
 }
 

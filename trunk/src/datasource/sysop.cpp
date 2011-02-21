@@ -368,7 +368,7 @@ bool CopyFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCance
     fpOld = VSIFOpenL( sSrcPath, "rb" );
     if( fpOld == NULL )
     {
-        wxString sErr(_("Error open source file! OGR error: "));
+        wxString sErr(_("Error open input file! OGR error: "));
         CPLString sFullErr(sErr.mb_str());
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_FileIO, sFullErr);
@@ -382,7 +382,7 @@ bool CopyFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCance
     {
         VSIFCloseL( fpOld );
 
-        wxString sErr(_("Error create destination file! OGR error: "));
+        wxString sErr(_("Error create the output file '%s'! OGR error: "));
         CPLString sFullErr(sErr.mb_str());
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_FileIO, sFullErr);
