@@ -97,7 +97,9 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
     sName.Truncate(27);
     CPLString szName;
     if(nSubType == enumVecKMZ)
-        szName = Transliterate(CPLString(sName.mb_str()).c_str());//CPLString(sName.mb_str(wxConvUTF8));//wxCSConv(wxT("cp-866"))));
+		szName = Transliterate(CPLString(sName.mb_str()).c_str());
+	else if(nSubType == enumVecKML)
+		szName = CPLString(sName.mb_str(wxConvUTF8));//wxCSConv(wxT("cp-866"))));
     else
         szName = CPLString(sName.mb_str());
 
