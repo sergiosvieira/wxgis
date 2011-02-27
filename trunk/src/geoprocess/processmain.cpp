@@ -175,7 +175,7 @@ bool wxGPTaskExecutor::OnExecute(wxString sToolName, wxString sToolParameters)
     GxCatalog.Init();
 
     wxGISGPToolManager GISGPToolManager(pToolsChild);
-    IGPTool* pTool = GISGPToolManager.GetTool(sToolName, &GxCatalog);
+    IGPToolSPtr pTool = GISGPToolManager.GetTool(sToolName, &GxCatalog);
     if(!pTool)
     {
         PutMessage(wxString::Format(_("Get Geoprocessing tool %s failed!"), sToolName.c_str()), -1, enumGISMessageErr);

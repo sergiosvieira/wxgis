@@ -92,9 +92,9 @@ public:
 	virtual void LoadChildren(void);
 	virtual wxGISGPToolManager* GetGPToolManager(void);
     //IToolManagerUI
-	virtual IGPTool* GetGPTool(wxString sToolName);
-	virtual void OnExecuteTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync);
-    virtual bool OnPrepareTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync);
+	virtual IGPToolSPtr GetGPTool(wxString sToolName);
+	virtual void OnExecuteTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync);
+    virtual bool OnPrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync);
 protected:
 	wxString m_sPath;
 	bool m_bIsChildrenLoaded;
@@ -177,11 +177,11 @@ public:
 	virtual bool AreChildrenViewable(void){return false;};
 	virtual bool HasChildren(void){return m_Children.size() > 0 ? true : false;};
     // wxGISGPToolManager
-    virtual int OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel = NULL, IGPCallBack* pCallBack = NULL);
+    virtual int OnExecute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel = NULL, IGPCallBack* pCallBack = NULL);
     virtual void StartProcess(size_t nIndex);
     //virtual void CancelProcess(size_t nIndex);
     virtual void OnFinish(IProcess* pProcess, bool bHasErrors);
-    virtual bool OnPrepareTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync)
+    virtual bool OnPrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync)
 	{
 		return m_pRootToolbox->OnPrepareTool(pParentWnd, pTool, pCallBack, bSync);
 	}

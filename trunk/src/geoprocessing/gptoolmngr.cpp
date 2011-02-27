@@ -122,11 +122,11 @@ wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode) : m_nRunningTasks(
         wxString sCmdName = pChild->GetPropVal(wxT("name"), NONAME);
 
 	    wxObject *pObj = wxCreateDynamicObject(sName);
-	    IGPTool *pTool = dynamic_cast<IGPTool*>(pObj);
-	    if(pTool)
+        IGPToolSPtr pRetTool(dynamic_cast<IGPTool*>(pObj));
+	    if(pRetTool)
 	    {
-            sCmdName = pTool->GetName();
-			TOOLINFO info = {sName, nCount, pTool};
+            sCmdName = pRetTool->GetName();
+			TOOLINFO info = {sName, nCount, pRetTool};
 			m_ToolsMap[sCmdName] = info;
 			m_ToolsPopularMap.insert(std::make_pair(nCount, sCmdName));
         }
@@ -160,38 +160,49 @@ wxGISGPToolManager::~wxGISGPToolManager(void)
     {
         CancelProcess(i);
         wxDELETE(m_ProcessArray[i].pProcess)
+//        wxDELETE(m_ProcessArray[i].pTool)
     }
     //delete all existed tools
-    for(std::map<wxString, TOOLINFO>::iterator pos = m_ToolsMap.begin(); pos != m_ToolsMap.end(); ++pos)
-        wxDELETE(pos->second.pTool);
+    //for(std::map<wxString, TOOLINFO>::iterator pos = m_ToolsMap.begin(); pos != m_ToolsMap.end(); ++pos)
+    //    wxDELETE(pos->second.pTool);
 
 }
 
-IGPTool* wxGISGPToolManager::GetTool(wxString sToolName, IGxCatalog* pCatalog)
+IGPToolSPtr wxGISGPToolManager::GetTool(wxString sToolName, IGxCatalog* pCatalog)
 {
     if(sToolName.IsEmpty())
-        return NULL;
+        return IGPToolSPtr();
+    wxObject *pObj = wxCreateDynamicObject(m_ToolsMap[sToolName].sClassName);
+    IGPToolSPtr pRetTool(dynamic_cast<IGPTool*>(pObj));
+
     std::map<wxString, TOOLINFO>::const_iterator it = m_ToolsMap.find(sToolName);
     if(it != m_ToolsMap.end() && it->second.pTool)
     {
         if(!it->second.pTool->GetCatalog())
             it->second.pTool->SetCatalog(pCatalog);
-	    return it->second.pTool;
+
+        if(pRetTool)
+        {
+            pRetTool->Copy(it->second.pTool.get());
+            m_ToolsMap[sToolName].pTool = pRetTool;
+            return pRetTool;
+        }
+        else
+            return IGPToolSPtr();
     }
-	wxObject *pObj = wxCreateDynamicObject(m_ToolsMap[sToolName].sClassName);
-    IGPTool* pTool = dynamic_cast<IGPTool*>(pObj);
-    if(!pTool)
+
+    if(!pRetTool)
     {
-        TOOLINFO inf = {wxEmptyString, 0, NULL};
+        TOOLINFO inf = {wxEmptyString, 0, IGPToolSPtr()};
         m_ToolsMap[sToolName] = inf;
-        return NULL;
+        return IGPToolSPtr();
     }
-    pTool->SetCatalog(pCatalog);
-    m_ToolsMap[sToolName].pTool = pTool;
-	return pTool;
+    pRetTool->SetCatalog(pCatalog);
+    m_ToolsMap[sToolName].pTool = pRetTool;
+	return pRetTool;
 }
 
-int wxGISGPToolManager::OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel, IGPCallBack* pCallBack)
+int wxGISGPToolManager::OnExecute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel, IGPCallBack* pCallBack)
 {
     if(!pTool)
         return false;
@@ -203,6 +214,7 @@ int wxGISGPToolManager::OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel, IG
     sToolParams.Replace(wxT("\""), wxT("\\\""));
     wxString sCommand = wxString::Format(wxT("%s -n "), m_sGeoprocessPath.c_str()) + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");
 
+    //TODO: should copy tool
     WXGISEXECDDATA data = {new wxGPProcess(sCommand, static_cast<IProcessParent*>(this), pTrackCancel), pTool, pTrackCancel, pCallBack};
     m_ProcessArray.push_back(data);
     int nTaskID = m_ProcessArray.size() - 1;
@@ -291,9 +303,9 @@ void wxGISGPToolManager::OnFinish(IProcess* pProcess, bool bHasErrors)
     //run not running tasks
     if(m_nRunningTasks < m_nMaxTasks)
     {
-		nIndex = GetPriorityTaskIndex();
-		if(nIndex >= 0 && nIndex < m_ProcessArray.size())
-			ExecTask(m_ProcessArray[nIndex]);
+		size_t nPrioIndex = GetPriorityTaskIndex();
+		if(nPrioIndex >= 0 && nPrioIndex < m_ProcessArray.size())
+			ExecTask(m_ProcessArray[nPrioIndex]);
     }
 }
 
@@ -338,6 +350,16 @@ void wxGISGPToolManager::CancelProcess(size_t nIndex)
 	wxASSERT(nIndex >= 0);
 	wxASSERT(nIndex < m_ProcessArray.size());
 	m_ProcessArray[nIndex].pProcess->OnCancel();
+
+    m_nRunningTasks--;
+
+    //run not running tasks
+    if(m_nRunningTasks < m_nMaxTasks)
+    {
+		size_t nPrioIndex = GetPriorityTaskIndex();
+		if(nPrioIndex >= 0 && nPrioIndex < m_ProcessArray.size())
+			ExecTask(m_ProcessArray[nPrioIndex]);
+    }
 }
 
 wxDateTime wxGISGPToolManager::GetProcessStart(size_t nIndex)
@@ -382,9 +404,9 @@ int wxGISGPToolManager::GetPriorityTaskIndex()
 	int nPriorityIndex = m_ProcessArray.size(); 
     for(size_t nIndex = 0; nIndex < m_aPriorityArray.size(); nIndex++)
     {
-        if(m_ProcessArray[m_aPriorityArray[nIndex].nIndex].pProcess->GetState() == enumGISTaskQuered)
+        if(m_ProcessArray[m_aPriorityArray[nIndex].nIndex].pProcess && m_ProcessArray[m_aPriorityArray[nIndex].nIndex].pProcess->GetState() == enumGISTaskQuered)
         {
-            nPriorityIndex = nIndex;
+            nPriorityIndex = m_aPriorityArray[nIndex].nIndex;
             break;
         }
     }
@@ -415,7 +437,7 @@ void wxGISGPToolManager::AddPriority(int nIndex, int nPriority)
         m_aPriorityArray.push_back(info);
 }
 
-IGPTool* wxGISGPToolManager::GetProcessTool(size_t nIndex)
+IGPToolSPtr wxGISGPToolManager::GetProcessTool(size_t nIndex)
 {
 	wxASSERT(nIndex >= 0);
 	wxASSERT(nIndex < m_ProcessArray.size());

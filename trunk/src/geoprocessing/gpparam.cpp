@@ -203,7 +203,20 @@ bool wxGISGPParameter::SetFromString(wxString sParam)
         break;        
     case enumGISGPParamDTStringList:
 	case enumGISGPParamDTPathArray:
-        //TODO: enumGISGPParamDTPathArray & enumGISGPParamDTStringList parce
+        if(m_pDomain)
+        {
+            wxString sVal = wxVariant(sParam);
+            int pos = sVal.Find('~', true);
+            if(pos != wxNOT_FOUND)
+            {
+                m_Value = sVal.Left(pos);
+                pos++;
+                int nSel = wxAtoi(sVal.Right(sVal.Len() - pos));
+                m_pDomain->SetSel(nSel);
+            }
+        }
+        else
+            m_Value = wxVariant(sParam);
         break;        
     case enumGISGPParamDTUnknown:
     default:

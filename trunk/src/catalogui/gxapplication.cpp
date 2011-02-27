@@ -182,22 +182,17 @@ const WINDOWARRAY* const wxGxApplication::GetChildWindows(void)
 
 void wxGxApplication::RegisterChildWindow(wxWindow* pWnd)
 {
-	for(size_t i = 0; i < m_WindowArray.size(); i++)
-		if(m_WindowArray[i] == pWnd)
-			return;
+    WINDOWARRAY::iterator pos = std::find(m_WindowArray.begin(), m_WindowArray.end(), pWnd);
+	if(pos != m_WindowArray.end())
+        return;
 	m_WindowArray.push_back(pWnd);
 }
 
 void wxGxApplication::UnRegisterChildWindow(wxWindow* pWnd)
 {
-	for(size_t i = 0; i < m_WindowArray.size(); i++)
-    {
-		if(m_WindowArray[i] == pWnd)
-        {
-			m_WindowArray.erase(m_WindowArray.begin() + i);
-            return;
-        }
-    }
+    WINDOWARRAY::iterator pos = std::find(m_WindowArray.begin(), m_WindowArray.end(), pWnd);
+	if(pos != m_WindowArray.end())
+		m_WindowArray.erase(pos);
 }
 
 bool wxGxApplication::Create(IGISConfig* pConfig)

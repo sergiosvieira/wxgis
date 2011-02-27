@@ -177,7 +177,7 @@ void wxGxTaskExecDlg::FillHtmlWindow()
     m_pHtmlWindow->Scroll(-1, 5000);
 }
 
-void wxGxTaskExecDlg::OnFinish(bool bHasErrors, IGPTool* pTool)
+void wxGxTaskExecDlg::OnFinish(bool bHasErrors, IGPToolSPtr pTool)
 {
     if(m_pCallBack)
         m_pCallBack->OnFinish(bHasErrors, pTool);
@@ -370,8 +370,10 @@ wxDateTime wxGxTaskObject::GetFinish()
 
 wxString wxGxTaskObject::GetLastMessage()
 {
-    if(m_MessageArray.size())
-    return m_MessageArray[m_MessageArray.size() - 1].sMessage;
+    if(m_MessageArray.size())    
+        return m_MessageArray[m_MessageArray.size() - 1].sMessage;
+    else
+        return wxEmptyString;
 }
 
 bool wxGxTaskObject::StartTask()
@@ -399,7 +401,7 @@ bool wxGxTaskObject::PauseTask()
     //return true;
 }
 
-void wxGxTaskObject::OnFinish(bool bHasErrors, IGPTool* pTool)
+void wxGxTaskObject::OnFinish(bool bHasErrors, IGPToolSPtr pTool)
 {
     if(m_pCallBack)
         m_pCallBack->OnFinish(bHasErrors, pTool);

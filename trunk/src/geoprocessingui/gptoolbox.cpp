@@ -236,12 +236,12 @@ wxGISGPToolManager* wxGxRootToolbox::GetGPToolManager(void)
     return m_pToolMngr;
 }
 
-IGPTool* wxGxRootToolbox::GetGPTool(wxString sToolName)
+IGPToolSPtr wxGxRootToolbox::GetGPTool(wxString sToolName)
 {
     return m_pToolMngr->GetTool(sToolName, m_pCatalog);
 }
 
-bool wxGxRootToolbox::OnPrepareTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync)
+bool wxGxRootToolbox::OnPrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync)
 {
     if(!pTool)
     {
@@ -255,7 +255,7 @@ bool wxGxRootToolbox::OnPrepareTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCal
     return true;
 }
 
-void wxGxRootToolbox::OnExecuteTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync)
+void wxGxRootToolbox::OnExecuteTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync)
 {
     if(bSync)
     {
@@ -421,7 +421,7 @@ wxString wxGxToolExecute::GetName(void)
 
 }
 
-int wxGxToolExecute::OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel, IGPCallBack* pCallBack)
+int wxGxToolExecute::OnExecute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel, IGPCallBack* pCallBack)
 {
 	int nTaskID = wxNOT_FOUND;
 	if(pTrackCancel)
@@ -543,7 +543,7 @@ bool wxGxTool::Invoke(wxWindow* pParentWnd)
     //m_pRootToolbox->OnPrepareTool(pParentWnd, m_sInternalName, wxEmptyString, NULL/*???*/, false);
     //return false;
 
-	IGPTool* pTool = m_pRootToolbox->GetGPTool(m_sInternalName);
+	IGPToolSPtr pTool = m_pRootToolbox->GetGPTool(m_sInternalName);
 	if(!pTool)
 	{
         //error msg
@@ -561,10 +561,11 @@ bool wxGxTool::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
     if(!IGxObject::Attach(pParent, pCatalog))
         return false;
     wxGISGPToolManager* pGPToolManager = m_pRootToolbox->GetGPToolManager();
-    IGPTool* pTool = pGPToolManager->GetTool(m_sInternalName, m_pCatalog);
+    IGPToolSPtr pTool = pGPToolManager->GetTool(m_sInternalName, m_pCatalog);
     if(pTool)
     {
         m_sName = pTool->GetDisplayName();
+//        wxDELETE(pTool);
         return true;
     }
     else

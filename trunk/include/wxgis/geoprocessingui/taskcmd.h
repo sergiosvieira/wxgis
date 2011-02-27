@@ -45,5 +45,6 @@ public:
 	virtual unsigned char GetCount(void);
 protected:
 	IApplication* m_pApp;
+    wxImageList m_ImageList;
 //	wxIcon m_IconGPMenu, m_IconToolview;
 };

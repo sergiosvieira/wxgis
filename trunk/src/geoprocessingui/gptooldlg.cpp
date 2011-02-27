@@ -36,7 +36,7 @@ BEGIN_EVENT_TABLE(wxGISGPToolDlg, wxFrame)
 	EVT_UPDATE_UI(wxID_OK, wxGISGPToolDlg::OnOkUI)
 END_EVENT_TABLE()
 
-wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
     IApplication* pApp = ::GetApplication();
     pApp->RegisterChildWindow(this);

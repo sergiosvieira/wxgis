@@ -49,6 +49,17 @@ wxGISGPTool::wxGISGPTool(void) : m_pCatalog(NULL)
 {
 }
 
+void wxGISGPTool::Copy(IGPTool* pTool)
+{
+    if(pTool)
+    {
+        m_pCatalog = pTool->GetCatalog();
+        SetFromString(pTool->GetAsString());
+    }
+    else
+        m_pCatalog = NULL;
+}
+
 wxGISGPTool::~wxGISGPTool(void)
 {
     for(size_t i = 0; i < m_pParamArr.size(); i++)

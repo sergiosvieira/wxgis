@@ -50,7 +50,7 @@ public:
     //events
     void OnPropertyGridButtonClick ( wxCommandEvent& );
     //IGPCallBack
-    virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL);
+    virtual void OnFinish(bool bHasErrors = false, IGPToolSPtr pTool = IGPToolSPtr());
 protected:
     wxGISRasterDatasetSPtr m_pDataset;
     wxGxRasterDataset* m_pGxDataset;
