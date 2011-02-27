@@ -179,13 +179,16 @@ public:
     virtual void SetCatalog(IGxCatalog* pCatalog) = 0;
     virtual IGxCatalog* const GetCatalog(void) = 0;
     //virtual GetToolType(void) = 0;
+    virtual void Copy(IGPTool* pTool) = 0;
 };
+
+DEFINE_SHARED_PTR(IGPTool);
 
 class IGPCallBack
 {
 public:
     virtual ~IGPCallBack(void){};
-    virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL) = 0;
+    virtual void OnFinish(bool bHasErrors = false, IGPToolSPtr pTool = IGPToolSPtr()) = 0;
 };
 
 

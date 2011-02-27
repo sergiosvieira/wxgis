@@ -551,7 +551,7 @@ void wxGISRasterPropertyPage::OnPropertyGridButtonClick ( wxCommandEvent& )
     }
 
 
-	IGPTool* pTool = pToolManagerUI->GetGPTool(sToolName);
+	IGPToolSPtr pTool = pToolManagerUI->GetGPTool(sToolName);
 	if(!pTool)
 	{
         //error msg
@@ -572,7 +572,7 @@ void wxGISRasterPropertyPage::OnPropertyGridButtonClick ( wxCommandEvent& )
     m_pDataset->Close();
 }
 
-void wxGISRasterPropertyPage::OnFinish(bool bHasErrors, IGPTool* pTool)
+void wxGISRasterPropertyPage::OnFinish(bool bHasErrors, IGPToolSPtr pTool)
 {
     if(!bHasErrors)
         FillGrid();

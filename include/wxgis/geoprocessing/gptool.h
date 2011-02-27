@@ -51,6 +51,7 @@ public:
     virtual IGxCatalog* const GetCatalog(void);
 	virtual wxString GetAsString(void);
 	virtual bool SetFromString(wxString sParams);
+    virtual void Copy(IGPTool* pTool);
     //TODO: export/import tool to XML for server execution
 protected:
     GPParameters m_pParamArr;

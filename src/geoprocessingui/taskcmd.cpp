@@ -23,14 +23,21 @@
 #include "wxgis/geoprocessingui/gptaskexecdlg.h"
 #include "wxgis/catalogui/gxcatalogui.h"
 
+#include "../../art/state.xpm"
+
 //	0	Show task config dialog
 //  1   Show task execution dialog
-//  2   ?
+//  2   Start
+//  3   Stop
+//  4   Show exec process
+//  5   ?
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISTaskCmd, wxObject)
 
 wxGISTaskCmd::wxGISTaskCmd(void)
 {
+    m_ImageList.Create(16, 16);
+	m_ImageList.Add(wxBitmap(state_xpm));
 }
 
 wxGISTaskCmd::~wxGISTaskCmd(void)
@@ -41,8 +48,13 @@ wxIcon wxGISTaskCmd::GetBitmap(void)
 {
 	switch(m_subtype)
 	{
-		case 0:
+		case 2:
+            return m_ImageList.GetIcon(4);
+		case 3:
+            return m_ImageList.GetIcon(7);
 		case 1:
+            return m_ImageList.GetIcon(0);
+		case 0:
 		default:
 			return wxNullIcon;
 	}
@@ -56,6 +68,10 @@ wxString wxGISTaskCmd::GetCaption(void)
 			return wxString(_("Show tool dialog"));
 		case 1:
 			return wxString(_("Show execution dialog"));
+		case 2:
+			return wxString(_("Start"));
+		case 3:
+			return wxString(_("Stop"));
 		default:
 		return wxEmptyString;
 	}
@@ -67,6 +83,8 @@ wxString wxGISTaskCmd::GetCategory(void)
 	{
 		case 0:
 		case 1:
+		case 2:
+		case 3:
 			return wxString(_("Geoprocessing"));
 		default:
 			return wxString(_("[No category]"));
@@ -79,6 +97,8 @@ bool wxGISTaskCmd::GetChecked(void)
 	{
 		case 1:
 		case 0:
+		case 2:
+		case 3:
 		default:
 	        return false;
 	}
@@ -121,6 +141,38 @@ bool wxGISTaskCmd::GetEnabled(void)
 			}
 			return false;
         }
+		case 2: //Start task
+		{
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+                wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pCatalog->GetSelection();
+                for(size_t i = 0; i < pSel->GetCount(); i++)
+                {
+                    IGxTask* pGxTask = dynamic_cast<IGxTask*>(pSel->GetSelectedObjects(i));
+                    if(pGxTask && (pGxTask->GetState() == enumGISTaskPaused))
+                        return true;
+                }
+			}
+			return false;
+        }
+		case 3: //Stop task
+		{
+			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			if(pGxApp)
+			{
+                wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				IGxSelection* pSel = pCatalog->GetSelection();
+                for(size_t i = 0; i < pSel->GetCount(); i++)
+                {
+                    IGxTask* pGxTask = dynamic_cast<IGxTask*>(pSel->GetSelectedObjects(i));
+                    if(pGxTask && (pGxTask->GetState() == enumGISTaskWork))
+                        return true;
+                }
+			}
+			return false;
+        }
 		default:
 			return false;
 	}
@@ -132,6 +184,8 @@ wxGISEnumCommandKind wxGISTaskCmd::GetKind(void)
 	{
 		case 0:
 		case 1:
+		case 2:
+		case 3:
 		default:
 			return enumGISCommandNormal;
 	}
@@ -145,6 +199,10 @@ wxString wxGISTaskCmd::GetMessage(void)
 			return wxString(_("Show tool config dialog"));
 		case 1:
 			return wxString(_("Show task execution dialog"));
+		case 2:
+			return wxString(_("Start task"));
+		case 3:
+			return wxString(_("Stop task"));
 		default:
 			return wxEmptyString;
 	}
@@ -186,6 +244,38 @@ void wxGISTaskCmd::OnClick(void)
 				}
 			}
 			break;
+		case 2:
+			{
+				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+				if(pGxApp)
+				{
+					wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+					IGxSelection* pSel = pCatalog->GetSelection();
+					for(size_t i = 0; i < pSel->GetCount(); i++)
+					{
+						wxGxTaskObject* pGxTask = dynamic_cast<wxGxTaskObject*>(pSel->GetSelectedObjects(i));
+						if(pGxTask)
+							pGxTask->StartTask();
+					}
+				}
+			}
+			break;
+		case 3:
+			{
+				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+				if(pGxApp)
+				{
+					wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+					IGxSelection* pSel = pCatalog->GetSelection();
+					for(size_t i = 0; i < pSel->GetCount(); i++)
+					{
+						wxGxTaskObject* pGxTask = dynamic_cast<wxGxTaskObject*>(pSel->GetSelectedObjects(i));
+						if(pGxTask)
+							pGxTask->StopTask();
+					}
+				}
+			}
+			break;
 		default:
 			return;
 	}
@@ -205,6 +295,10 @@ wxString wxGISTaskCmd::GetTooltip(void)
 			return wxString(_("Show tool config dialog"));
 		case 1:
 			return wxString(_("Show task execution dialog"));
+		case 2:
+			return wxString(_("Start task"));
+		case 3:
+			return wxString(_("Stop task"));
 		default:
 			return wxEmptyString;
 	}
@@ -212,5 +306,5 @@ wxString wxGISTaskCmd::GetTooltip(void)
 
 unsigned char wxGISTaskCmd::GetCount(void)
 {
-	return 2;
+	return 4;
 }

@@ -283,7 +283,9 @@ void wxGxToolExecuteView::AddObject(IGxObject* pObject)
         if(dtf.IsValid())
             SetItem(ListItemID, 3, pGxTask->GetFinish().Format(_("%d-%m-%Y %H:%M:%S")));
         SetItem(ListItemID, 4, wxString::Format(_("%.1f%%"), pGxTask->GetDonePercent()));
-        SetItem(ListItemID, 5, pGxTask->GetLastMessage());
+        wxString sLastMsg = pGxTask->GetLastMessage();
+        if(!sLastMsg.IsEmpty())
+            SetItem(ListItemID, 5, sLastMsg);
 
         SetItemBackgroundColour(ListItemID, color);
         SetItemData(ListItemID, (long)pObject);

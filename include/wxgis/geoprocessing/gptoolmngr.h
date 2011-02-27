@@ -47,7 +47,7 @@ protected:
 typedef struct _wxgisexecddata
 {
     IProcess* pProcess;
-    IGPTool* pTool;
+    IGPToolSPtr pTool;
     ITrackCancel* pTrackCancel;
     IGPCallBack* pCallBack;
 } WXGISEXECDDATA;
@@ -62,8 +62,8 @@ class WXDLLIMPEXP_GIS_GP wxGISGPToolManager : public IProcessParent
 public:
     wxGISGPToolManager(wxXmlNode* pToolsNode);
     virtual ~wxGISGPToolManager(void);
-    virtual IGPTool* GetTool(wxString sToolName, IGxCatalog* pCatalog = NULL);
-    virtual int OnExecute(IGPTool* pTool, ITrackCancel* pTrackCancel = NULL, IGPCallBack* pCallBack = NULL);
+    virtual IGPToolSPtr GetTool(wxString sToolName, IGxCatalog* pCatalog = NULL);
+    virtual int OnExecute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel = NULL, IGPCallBack* pCallBack = NULL);
     virtual size_t GetToolCount();
     virtual wxString GetPopularTool(size_t nIndex);
     virtual wxGISEnumTaskStateType GetProcessState(size_t nIndex);
@@ -76,7 +76,7 @@ public:
     virtual wxDateTime GetProcessStart(size_t nIndex);
     virtual wxDateTime GetProcessFinish(size_t nIndex);
     virtual int GetProcessPriority(size_t nIndex);
-    virtual IGPTool* GetProcessTool(size_t nIndex);
+    virtual IGPToolSPtr GetProcessTool(size_t nIndex);
     virtual void SetProcessPriority(size_t nIndex, int nPriority);
 	virtual int GetPriorityTaskIndex();
 protected:
@@ -87,7 +87,7 @@ public:
     {
         wxString sClassName;
         int nCount;
-        IGPTool* pTool;
+        IGPToolSPtr pTool;
     } TOOLINFO;
 
     typedef struct _taskprioinfo

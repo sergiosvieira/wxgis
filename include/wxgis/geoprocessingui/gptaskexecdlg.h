@@ -58,7 +58,7 @@ public:
     virtual void OnCancel(wxCommandEvent & event);
     virtual void OnCancelTask(wxCommandEvent & event);
     //IGPCallBack
-    virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL);
+    virtual void OnFinish(bool bHasErrors = false, IGPToolSPtr pTool = IGPToolSPtr());
     //ITrackCancel
 	virtual void PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType);
 protected:
@@ -157,7 +157,7 @@ public:
 	virtual void ShowProcess(wxWindow* pParentWnd);
 	virtual void ShowToolConfig(wxWindow* pParentWnd);
     //IGPCallBack
-    virtual void OnFinish(bool bHasErrors = false, IGPTool* pTool = NULL);
+    virtual void OnFinish(bool bHasErrors = false, IGPToolSPtr pTool = IGPToolSPtr());
     //ITrackCancel
 	virtual void PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType);
 protected:
