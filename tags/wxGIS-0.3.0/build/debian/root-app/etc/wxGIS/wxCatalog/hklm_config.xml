@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wxCatalog>
+  <catalog show_hidden="0" show_ext="1">
+  	<rootitems>
+  		<rootitem name="wxGxDiscConnection"/>
+	    	<rootitem name="wxGxSpatialReferencesFolder" is_enabled="1" path="/vsizip//usr/share/wxgis/sys/cs.zip/cs"/>
+		<rootitem name="wxGxRootToolbox" path="" is_enabled="1"/>
+  	</rootitems>
+  	<objectfactories>
+  		<objectfactory factory_name="wxGxShapeFactory" is_enabled="1"/>
+        <objectfactory factory_name="wxGxMapInfoFactory" is_enabled="1"/>
+        <objectfactory factory_name="wxGxMLFactory" is_enabled="1"/>		
+  		<objectfactory factory_name="wxGxFolderFactory" is_enabled="1"/>
+  		<objectfactory factory_name="wxGxRasterFactory" is_enabled="1"/>
+		<objectfactory factory_name="wxGxFileFactory" is_enabled="1" extensions="txt|log|nfo|asc|" />
+  	</objectfactories>
+  </catalog>
+</wxCatalog>
+
+
+

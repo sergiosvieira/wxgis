@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Release" />
+	<File name="../../include/wxgis/datasource/datasource.h" open="0" top="0" tabpos="1">
+		<Cursor position="1170" topLine="19" />
+	</File>
+	<File name="../../src/datasource/featuredataset.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="21928" topLine="645" />
+	</File>
+	<File name="../../src/datasource/rasterdataset.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="1230" topLine="12" />
+	</File>
+</CodeBlocks_layout_file>

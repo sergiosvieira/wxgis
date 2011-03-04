@@ -1,0 +1,1205 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wxGIS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-02-21 22:11+0300\n"
+"PO-Revision-Date: 2011-02-21 22:27+0300\n"
+"Last-Translator: Bishop <polimax@mail.ru>\n"
+"Language-Team: gis-lab <sim@gis-lab.info>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-Basepath: c:\\temp\\wxgis\\src\\\n"
+"X-Poedit-Language: Russian\n"
+"X-Poedit-Country: RUSSIAN FEDERATION\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-SearchPath-0: D:\\work\\Projects\\wxGIS\\src\\catalogui\n"
+"X-Poedit-SearchPath-1: D:\\work\\Projects\\wxGIS\\include\\wxgis\\catalogui\n"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:148
+msgid "&Up One Level"
+msgstr "&Вверх на один уровень"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:150
+msgid "&Connect folder"
+msgstr "&Связь с папкой"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:152
+msgid "&Disconnect folder"
+msgstr "&Отсоединить папку"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:154
+msgid "Location"
+msgstr "Расположение"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:156
+msgid "Delete"
+msgstr "Удалить"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:158
+msgid "Back"
+msgstr "Назад"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:160
+msgid "Forward"
+msgstr "Вперед"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:162
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:457
+msgid "Create folder"
+msgstr "Создать папку"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:164
+msgid "Rename"
+msgstr "Переименовать"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:166
+msgid "Refresh"
+msgstr "Обновить"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:168
+#: D:\work\Projects\wxGIS\src\catalogui/gxdatasetui.cpp:91
+#: D:\work\Projects\wxGIS\src\catalogui/gxdatasetui.cpp:160
+#: D:\work\Projects\wxGIS\src\catalogui/gxfileui.cpp:73
+msgid "Properties"
+msgstr "Свойства"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:170
+msgid "Copy"
+msgstr "Копировать"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:172
+msgid "Cut"
+msgstr "Вырезать"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:174
+msgid "Paste"
+msgstr "Вставить"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:191
+msgid "Catalog"
+msgstr "Каталог"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:193
+msgid "New"
+msgstr "Новый"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:199
+msgid "Edit"
+msgstr "Редактировать"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:201
+msgid "Miscellaneous"
+msgstr "Прочее"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:203
+msgid "[No category]"
+msgstr "[Без категории]"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:443
+msgid "Select parent element"
+msgstr "Выбрать родительский элемент"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:445
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:832
+msgid "Connect folder"
+msgstr "Связь с папкой"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:447
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:834
+msgid "Disconnect folder"
+msgstr "Отсоединить папку"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:449
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:836
+msgid "Set or get location"
+msgstr "Получить или установить местоположение"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:451
+msgid "Delete item"
+msgstr "Удалить элемент"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:453
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:851
+msgid "Go to previous location"
+msgstr "Перейти к предыдущему расположению"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:455
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:865
+msgid "Go to next location"
+msgstr "Перейти к следующему расположению"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:459
+msgid "Rename item"
+msgstr "Переименовать элемент"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:461
+msgid "Refresh item"
+msgstr "Обновить элемент"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:463
+msgid "Item properties"
+msgstr "Свойства элемента"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:465
+msgid "Copy item(s)"
+msgstr "Копировать элемент(ы)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:467
+msgid "Cut item(s)"
+msgstr "Вырезать элемент(ы)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:469
+msgid "Paste item(s)"
+msgstr "Вставить элемент(ы)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:506
+msgid "Choose a folder to connect"
+msgstr "Выбрать папку для связи"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:582
+msgid "Delete confirm"
+msgstr "Подтверждение удаления"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:583
+#, c-format
+msgid "Do you really want to delete %d item(s)"
+msgstr "Вы действительно хотите удалить %d элемент(ов)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:584
+msgid ""
+"The result of operation cannot be undone!\n"
+"The deleted items will remove from disk and will not put to the recycled bin."
+msgstr ""
+"Результат операции не может быть отменен!\n"
+"Удаляемые элемнты полностью стираются с диска и не попадают в корзину."
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:608
+#, c-format
+msgid ""
+"Cannot delete '%s'\n"
+"Continue?"
+msgstr ""
+"Невозможно удалить '%s'\n"
+"Продолжить?"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:608
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:690
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:695
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:729
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:734
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:754
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:794
+#: D:\work\Projects\wxGIS\src\catalogui/gxcontentview.cpp:620
+#: D:\work\Projects\wxGIS\src\catalogui/gxdatasetui.cpp:122
+#: D:\work\Projects\wxGIS\src\catalogui/gxdatasetui.cpp:197
+msgid "Error"
+msgstr "Ошибка"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:690
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:729
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:754
+msgid "Can't open clipboard"
+msgstr "Не могу открыть буфер обмена"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:695
+msgid "Can't copy file(s) to the clipboard"
+msgstr "Не могу скопировать файл(ы) в буфер обмена"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:734
+msgid "Can't move file(s) to the clipboard"
+msgstr "Не могу переместить файл(ы) в буфер обмена"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:790
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:798
+msgid "New folder"
+msgstr "Новая папка"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:794
+msgid "Create folder error!"
+msgstr "Ошибка создания папки!"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:830
+msgid "Up One Level"
+msgstr "Вверх на один уровень"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:838
+msgid "Delete selected item"
+msgstr "Удалить выбранный элемент"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:868
+msgid "Create new folder"
+msgstr "Создать новую папку"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:870
+msgid "Rename selected item"
+msgstr "Переименовать выбранные элементы"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:872
+msgid "Refresh selected item"
+msgstr "Обновить выбранный элемент"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:874
+msgid "Show properties of selected item"
+msgstr "Показать свойства выбранного элемента"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:876
+msgid "Copy selected item(s)"
+msgstr "Копировать выбранный(е) элемент(ы)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:878
+msgid "Cut selected item(s)"
+msgstr "Вырезать выбранный(е) элемент(ы)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:880
+msgid "Paste selected item(s)"
+msgstr "Вставить выбранный(е) элемент(ы)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:912
+msgid "Path:   "
+msgstr "Путь:"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:66
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:680
+msgid "Command Name"
+msgstr "Имя команды"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:67
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:681
+msgid "Description"
+msgstr "Описание"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:68
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:682
+msgid "KeyCode"
+msgstr "Значение быстрой клавиши"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:75
+msgid "Create toolbar/menu"
+msgstr "Создать панель/меню"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:78
+msgid "Delete toolbar/menu"
+msgstr "Удалить панель/меню"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:81
+msgid "Add button"
+msgstr "Добавить кнопку"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:84
+msgid "Remove button"
+msgstr "Удалить кнопку"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:87
+msgid "Move up"
+msgstr "Переместить вверх"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:89
+msgid "Move down"
+msgstr "Переместить вниз"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:101
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:690
+msgid "Set keycode"
+msgstr "Установить клавишу"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:113
+msgid "Menubar"
+msgstr "Меню"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:115
+msgid "Context Menus"
+msgstr "Контекстные меню"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:117
+msgid "New Menus"
+msgstr "Новые меню"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:119
+msgid "ToolBars"
+msgstr "Панели инструментов"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:128
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:379
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:530
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:575
+msgid " menu"
+msgstr " меню"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:145
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:398
+msgid " new menu"
+msgstr " новое меню"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:151
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:404
+msgid " context menu"
+msgstr " контекстное меню"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:159
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:435
+msgid " toolbar"
+msgstr " панель"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:812
+msgid "ToolBars & Menues"
+msgstr "Панели & Меню"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:813
+msgid "Commands"
+msgstr "Команды"
+
+#: D:\work\Projects\wxGIS\src\catalogui/customizedlg.cpp:818
+msgid "Close"
+msgstr "Закрыть"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxapplication.cpp:214
+msgid "wxGxApplication: Start. Creating main application frame..."
+msgstr "wxGxApplication: Создание основного окна приложения..."
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxapplication.cpp:225
+msgid "wxGxApplication: Error finding <views> XML Node"
+msgstr "wxGxApplication: Ошибка поиска узла XML <views>"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxapplication.cpp:238
+msgid "Tree Pane"
+msgstr "Панель дерева"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxapplication.cpp:273
+#, c-format
+msgid "wxGxApplication: View class %s initialise"
+msgstr "wxGxApplication: Класс вида %s проинициализирован"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxapplication.cpp:277
+#, c-format
+msgid "wxGxApplication: Error activation IGxView class (%s)"
+msgstr "wxGxApplication: Ошибка активирования IGxView класса (%s)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxapplication.cpp:284
+#, c-format
+msgid "wxGxApplication: Error creating view %s"
+msgstr "wxGxApplication: Ошибка создания вида %s"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxapplication.cpp:322
+msgid "wxGxApplication: Creation complete"
+msgstr "wxGxApplication: Создание завершено"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxcontdialog.cpp:135
+msgid "Select export format"
+msgstr "Выбор формата экспорта"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxcontdialog.cpp:140
+msgid "Combo!"
+msgstr "Combo!"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxcontdialog.cpp:153
+msgid "Create container"
+msgstr "Создать контейнер"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxcontdialog.cpp:160
+msgid "Select"
+msgstr "Выбрать"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxcontdialog.cpp:164
+msgid "Cancel"
+msgstr "Отмена"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxcontdialog.cpp:268
+msgid "All listed filters"
+msgstr "Все фильтры"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxcontdialog.cpp:270
+msgid "All items"
+msgstr "Все элементы"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxcontentview.cpp:113
+#: D:\work\Projects\wxGIS\src\catalogui/gxcontentview.cpp:159
+#: D:\work\Projects\wxGIS\src\catalogui/gxcontentview.cpp:299
+msgid "Name"
+msgstr "Имя"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxcontentview.cpp:114
+#: D:\work\Projects\wxGIS\src\catalogui/gxcontentview.cpp:160
+#: D:\work\Projects\wxGIS\src\catalogui/gxcontentview.cpp:300
+msgid "Type"
+msgstr "Тип"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxcontentview.cpp:620
+msgid "Rename error!"
+msgstr "Ошибка переименования!"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxdatasetui.cpp:121
+#: D:\work\Projects\wxGIS\src\catalogui/gxdatasetui.cpp:196
+#, c-format
+msgid "Open failed! GDAL error: %s"
+msgstr "Невозможно открыть! Ошибка GDAL: %s"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxdiscconnectionsui.cpp:95
+#, c-format
+msgid "wxGxDiscConnections: Add folder connection [%s]"
+msgstr "wxGxDiscConnections: Добавление подключенния к папке [%s]"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxmapview.cpp:51
+#: D:\work\Projects\wxGIS\src\catalogui/gxmapview.cpp:61
+msgid "Geography View"
+msgstr "Вид географии"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxmapview.cpp:196
+#, c-format
+msgid "X: %.4f  Y: %.4f"
+msgstr "X: %.4f  Y: %.4f"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxmapview.cpp:242
+msgid "Building overviews"
+msgstr "Создание пирамид"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxmapview.cpp:291
+#, c-format
+msgid "Create pyramids for %s (%d x %d)"
+msgstr "Создать пирамиды для %s (%d x %d)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxmapview.cpp:291
+msgid "This raster datasource does not have pyramids. Pyramids allow rapid display at different resolutions."
+msgstr "Этот растровый набор данных без пирамид. Пирамиды позволяют быстрее показывать растры на разных разрешениях."
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxmapview.cpp:291
+msgid ""
+"Pyramids building may take few moments.\n"
+"Would you like to create pyramids?"
+msgstr ""
+"Построение пирамид может занять некоторое время.\n"
+"Вы хотите создать пирамиды?"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxmapview.cpp:328
+#, c-format
+msgid "Creating pyramids for : %s (%d bands)"
+msgstr "Создание пирамид для : %s (%d каналов)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxmapview.cpp:351
+msgid "Done"
+msgstr "Завершено"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxmapview.cpp:356
+#, c-format
+msgid "BuildOverviews failed! GDAL error: %s"
+msgstr "Ошибка BuildOverviews! Ошибка GDAL: %s"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxmapview.cpp:357
+msgid "Build Overviews failed!"
+msgstr "Не удалось создать пирамиды!"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxnoview.cpp:50
+#: D:\work\Projects\wxGIS\src\catalogui/gxnoview.cpp:63
+msgid "NoView"
+msgstr "Пустой вид"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxnoview.cpp:104
+msgid "Selection cannot be viewed"
+msgstr "Невозможно просмотреть выбранное"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxobgdialog.cpp:390
+msgid "Look in:"
+msgstr "Смотреть в:"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxobgdialog.cpp:469
+msgid "Name:"
+msgstr "Имя:"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxobgdialog.cpp:476
+msgid "Activate"
+msgstr "Активировать"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxobgdialog.cpp:480
+msgid "Show of type:"
+msgstr "Показывать тип:"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxobgdialog.cpp:630
+msgid "Open"
+msgstr "Открыть"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxobgdialog.cpp:645
+msgid "Save"
+msgstr "Сохранить"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxobgdialog.cpp:859
+msgid "Cannot choose item(s)"
+msgstr "Элемент(ы) не может быть выбран!"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxobgdialog.cpp:1060
+msgid "Cannot save item!"
+msgstr "Элемент не может быть сохранен!"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxobgdialog.cpp:1065
+msgid "Item exists! Overwrite?"
+msgstr "Элемент существует! Перезаписать?"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxobgdialog.cpp:1065
+msgid "Question"
+msgstr "Вопрос"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxobgdialog.cpp:1076
+#: D:\work\Projects\wxGIS\src\catalogui/gxobgdialog.cpp:1082
+#: D:\work\Projects\wxGIS\src\catalogui/gxobgdialog.cpp:1088
+msgid "Cannot delete item!"
+msgstr "Невозможно удалить элемент!"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxpropertypages.cpp:52
+msgid "What top level entries do you want the Catalog to contain?"
+msgstr "Какие корневые элементы должны содержаться в Каталоге?"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxpropertypages.cpp:89
+msgid "Which types of data do you want the Catalog to show?"
+msgstr "Какие типы данных должны отображаться?"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxpropertypages.cpp:116
+msgid "Hide file extensions"
+msgstr "Скрыть расширения файлов"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxpropertypages.cpp:121
+msgid "Return to last location when wxGISCatalog start up"
+msgstr "Переходить к последнему пути когда запускается Каталог "
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxpropertypages.cpp:126
+msgid "Show hidden items"
+msgstr "Показать скрытые элементы"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxtableview.cpp:33
+#: D:\work\Projects\wxGIS\src\catalogui/gxtableview.cpp:43
+msgid "Table View"
+msgstr "Вид Таблицы"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxtabview.cpp:65
+#, c-format
+msgid "wxGxTab: View class %s in '%s' tab initialise"
+msgstr "wxGxTab: Класс вида %s во вкладке '%s' проинициализирован"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxtabview.cpp:69
+#, c-format
+msgid "wxGxTab: Error creating view %s"
+msgstr "wxGxTab: Ошибка создания вида %s"
+
+#: D:\work\Projects\wxGIS\src\catalogui/gxtabview.cpp:106
+msgid "Preview: "
+msgstr "Просмотр:"
+
+#: D:\work\Projects\wxGIS\src\catalogui/newmenu.cpp:56
+msgid "[Menus]"
+msgstr "[Меню]"
+
+#: D:\work\Projects\wxGIS\src\catalogui/newmenu.cpp:71
+#: D:\work\Projects\wxGIS\src\catalogui/newmenu.cpp:91
+msgid "New menu"
+msgstr "Новое меню"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:27
+msgid "Statistics"
+msgstr "Статистика"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:28
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:399
+msgid "Overviews"
+msgstr "Пирамиды"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:96
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:87
+msgid "Item"
+msgstr "Элемент"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:125
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:114
+msgid "Data Source"
+msgstr "Источник данных"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:126
+msgid "Raster"
+msgstr "Растр"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:143
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:121
+msgid "Folder"
+msgstr "Папка"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:153
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:157
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:134
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:138
+msgid "Files"
+msgstr "Файлы"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:153
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:134
+msgid "None associated"
+msgstr "Нет связанных"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:168
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:147
+msgid "File"
+msgstr "Файл"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:174
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:153
+msgid "Total size"
+msgstr "Полный размер"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:178
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:161
+msgid "Driver"
+msgstr "Драйвер"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:187
+msgid "Raster Information"
+msgstr "Информация о растре"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:192
+msgid "Columns and Rows"
+msgstr "Столбцы и строки"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:195
+msgid "Number of bands"
+msgstr "Количество каналов"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:203
+msgid "Cell size (X, Y)"
+msgstr "Размер ячейки (X, Y)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:204
+msgid "GeoTransform"
+msgstr "Коэффициенты трансформирования"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:212
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:221
+msgid "Present (click to rebuild)"
+msgstr "Имеется (щелкните для перестроения)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:214
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:223
+msgid "Absent (click to build)"
+msgstr "Отсутсвует (шелкните для построения)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:226
+msgid "Extent"
+msgstr "Охват"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:228
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:248
+msgid "Top"
+msgstr "Верх"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:229
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:219
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:249
+msgid "Left"
+msgstr "Лево"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:230
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:222
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:250
+msgid "Right"
+msgstr "Право"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:231
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:251
+msgid "Bottom"
+msgstr "Низ"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:239
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:482
+msgid "Metadata"
+msgstr "Метаданные"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:253
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:492
+msgid "Image Structure Metadata"
+msgstr "Метаданные структуры изображения"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:267
+msgid "Subdatasets"
+msgstr "Поднаборы данных"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:281
+msgid "Geolocation"
+msgstr "Расположение"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:295
+msgid "RPC Metadata"
+msgstr "Метакданные RPC"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:308
+msgid "GCP data"
+msgstr "Данные контрольных точек (GCP)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:330
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:335
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:338
+msgid "GCP Projection"
+msgstr "Проекция контрольных точек (GCP)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:338
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:97
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:193
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:215
+msgid "Undefined"
+msgstr "Неопределено"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:346
+#, c-format
+msgid "Id='%s', Info='%s', (%.6g,%.6g) -> (%.6g,%.6g,%.6g)"
+msgstr "Идентификатор='%s', Информация='%s', (%.6g,%.6g) -> (%.6g,%.6g,%.6g)"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:354
+msgid "Statistics details"
+msgstr "Детализация статистики"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:358
+#, c-format
+msgid "Band %d"
+msgstr "Канал %d"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:370
+msgid "Block"
+msgstr "Блок"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:372
+msgid "ColorInterp"
+msgstr "Цветовое представление"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:381
+msgid "Min"
+msgstr "Мин."
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:382
+msgid "Max"
+msgstr "Макс."
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:383
+msgid "Mean"
+msgstr "Сред."
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:384
+msgid "Std Dev"
+msgstr "Ст. откл."
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:393
+msgid "NoData Value"
+msgstr "Значение Нет данных"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:399
+msgid "arbitrary"
+msgstr "произвольное"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:413
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:453
+#, c-format
+msgid "Overview %d"
+msgstr "Пирамидный слой %d"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:444
+msgid "Mask Flags"
+msgstr "Флаги маски"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:448
+msgid "Overviews of mask band"
+msgstr "Пирамиды маскирующего слоя"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:461
+msgid "Unit Type"
+msgstr "Тип единиц"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:467
+msgid "Categories"
+msgstr "Категории"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:474
+msgid "Scale"
+msgstr "Масштаб"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:477
+msgid "Offset"
+msgstr "Смещение"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:501
+msgid "Color Table"
+msgstr "Цветовая таблица "
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:501
+#, c-format
+msgid "%s with %d entries"
+msgstr "%s с %d элементами"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:508
+#, c-format
+msgid "%3d"
+msgstr "%3d"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:508
+#, c-format
+msgid "%d,%d,%d,%d"
+msgstr "%d,%d,%d,%d"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:518
+msgid "Raster Attribute Table"
+msgstr "Таблица атрибутов растра"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:545
+msgid "Toolboxes"
+msgstr "Наборы инструментов"
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:549
+msgid ""
+"Error find IToolManagerUI interface!\n"
+"The wxGxRootToolbox Catalog root item\n"
+"is not loaded or not inherited from IToolManagerUI interface.\n"
+"Cannnot continue."
+msgstr ""
+"Невозможно обнаружить интерфейс IToolManagerUI!\n"
+"Корневой элемент wxGxRootToolbox\n"
+"не загружен или не унаследован от интерфейса IToolManagerUI.\n"
+"Невозможно продолжить."
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:558
+#, c-format
+msgid ""
+"Error find %s tool!\n"
+"Cannnot continue."
+msgstr ""
+"Ошибка поиска инструмента %s!\n"
+"Невозможно продолжить."
+
+#: D:\work\Projects\wxGIS\src\catalogui/rasterpropertypage.cpp:565
+#, c-format
+msgid ""
+"Wrong tool (%s)!\n"
+"Cannnot continue."
+msgstr ""
+"Неверный инструмент (%s)!\n"
+"Невозможно продолжить."
+
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:54
+msgid "Coordinate System"
+msgstr "Система координат"
+
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:61
+msgid "Geographic Coordinate System"
+msgstr "Географическая система координат"
+
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:113
+msgid "Projection"
+msgstr "Проекция"
+
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:116
+msgid "Parameters"
+msgstr "Параметры"
+
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:149
+msgid "Linear unit"
+msgstr "Линейные единицы"
+
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:153
+msgid "Meters per unit"
+msgstr "Метров на единицу"
+
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:167
+msgid "Datum"
+msgstr "Датум"
+
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:170
+msgid "Spheroid"
+msgstr "Сфероид"
+
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:173
+msgid "Semimajor Axis"
+msgstr "Большая полуось"
+
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:174
+msgid "Semiminor Axis"
+msgstr "Малая полуось"
+
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:175
+msgid "Inverse Flattering"
+msgstr "Сжатие"
+
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:176
+msgid "Angular unit"
+msgstr "Угловые единицы"
+
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:181
+msgid "Radians per unit"
+msgstr "Радиан на единицу"
+
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:183
+msgid "Prime Meridian"
+msgstr "Основной меридиан"
+
+#: D:\work\Projects\wxGIS\src\catalogui/spatrefpropertypage.cpp:188
+msgid "Longitude"
+msgstr "Долгота"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:115
+msgid "Vector"
+msgstr "Вектор"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:163
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:168
+msgid "Create DataSource"
+msgstr "Создать источник данных"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:163
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:164
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:168
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:232
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:233
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:234
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:235
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:236
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:237
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:238
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:239
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:240
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:241
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:242
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:243
+msgid "true"
+msgstr "да"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:163
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:164
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:168
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:232
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:233
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:234
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:235
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:236
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:237
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:238
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:239
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:240
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:241
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:242
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:243
+msgid "false"
+msgstr "нет"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:164
+msgid "Delete DataSource"
+msgstr "Удалить источник данных"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:166
+msgid "DataSource"
+msgstr "Источник данных"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:167
+msgid "Layer Count"
+msgstr "Количество слоев"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:173
+msgid "Vector Information"
+msgstr "Информация о векторе"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:192
+#, c-format
+msgid "Layer #%d"
+msgstr "Слой №%d"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:194
+msgid "Geometry type"
+msgstr "Тип геометрии"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:195
+msgid "Feature count"
+msgstr "Количество записей"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:198
+msgid "FID Column"
+msgstr "Поле FID"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:200
+msgid "Geometry Column"
+msgstr "Поле геометрии"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:205
+#, c-format
+msgid "Layer #%d Fields"
+msgstr "Поля слоя №%d"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:212
+msgid "Width"
+msgstr "Ширина"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:213
+msgid "Precision"
+msgstr "Точность"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:225
+msgid "Justify"
+msgstr "Выравнивание"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:231
+#, c-format
+msgid "Layer #%d Capability"
+msgstr "возможности слоя №%d"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:232
+msgid "Random Read"
+msgstr "Случайное чтение"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:233
+msgid "Sequential Write"
+msgstr "Последовательная запись"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:234
+msgid "Random Write"
+msgstr "Случайная запись"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:235
+msgid "Fast Spatial Filter"
+msgstr "Быстрый пространственный фильтр"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:236
+msgid "Fast Feature Count"
+msgstr "Быстрый подстчет записей"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:237
+msgid "Fast Get Extent"
+msgstr "Быстрое определение охвата"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:238
+msgid "Fast Set Next By Index"
+msgstr "Быстрый курсор на запись"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:239
+msgid "Create Field"
+msgstr "Создать поле"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:240
+msgid "Delete Feature"
+msgstr "Удалить элемент"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:241
+msgid "Strings As UTF8"
+msgstr "Строки в кодировке UTF-8"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:242
+msgid "Transactions"
+msgstr "Транзакции"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:243
+msgid "Ignore Fields"
+msgstr "Игнорировать поля"
+
+#: D:\work\Projects\wxGIS\src\catalogui/vectorpropertypage.cpp:247
+#, c-format
+msgid "Layer #%d Extent"
+msgstr "Охват слоя №%d"
+
+#: D:\work\Projects\wxGIS\src\catalogui/viewscmd.cpp:64
+#: D:\work\Projects\wxGIS\src\catalogui/viewscmd.cpp:80
+msgid "View"
+msgstr "Вид"
+
+#: D:\work\Projects\wxGIS\src\catalogui/viewscmd.cpp:66
+#: D:\work\Projects\wxGIS\src\catalogui/viewscmd.cpp:237
+msgid "Select All"
+msgstr "Выбрать все"
+
+#: D:\work\Projects\wxGIS\src\catalogui/viewscmd.cpp:68
+#: D:\work\Projects\wxGIS\src\catalogui/viewscmd.cpp:174
+#: D:\work\Projects\wxGIS\src\catalogui/viewscmd.cpp:239
+msgid "Show/Hide Tree pane"
+msgstr "Показать/скрыть дерево"
+
+#: D:\work\Projects\wxGIS\src\catalogui/viewscmd.cpp:170
+#: D:\work\Projects\wxGIS\src\catalogui/viewscmd.cpp:235
+msgid "Select view"
+msgstr "Выбрать вид"
+
+#: D:\work\Projects\wxGIS\src\catalogui/viewscmd.cpp:172
+msgid "Select All objects"
+msgstr "Выбрать все объекты"
+
+#: D:\work\Projects\wxGIS\src\catalogui/viewscmd.cpp:259
+msgid "List"
+msgstr "Список"
+
+#: D:\work\Projects\wxGIS\src\catalogui/viewscmd.cpp:260
+msgid "Icons"
+msgstr "Иконки"
+
+#: D:\work\Projects\wxGIS\src\catalogui/viewscmd.cpp:261
+msgid "Smal Icons"
+msgstr "Маленькие иконки"
+
+#: D:\work\Projects\wxGIS\src\catalogui/viewscmd.cpp:262
+msgid "Details"
+msgstr "Подробности"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalogui/customizedlg.h:186
+msgid "Customize"
+msgstr "Настроить"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalogui/gxfileui.h:75
+msgid "Text file"
+msgstr "Текстовый файл"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalogui/gxpending.h:52
+#: D:\work\Projects\wxGIS\include\wxgis\catalogui/gxpending.h:55
+msgid "Waiting..."
+msgstr "Ожидание..."
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalogui/gxpropertypages.h:61
+msgid "General"
+msgstr "Главное"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalogui/gxspatreffolderui.h:61
+msgid "Coordinate Systems Folder"
+msgstr "Папка систем координат"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalogui/gxtabview.h:38
+msgid "Preview"
+msgstr "Просмотр"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalogui/spatrefpropertypage.h:41
+msgid "Spatial Reference"
+msgstr "Пространственная привязка"
+
+#~ msgid "Fields"
+#~ msgstr "Поля"
+
+#~ msgid "Application.NewMenu"
+#~ msgstr "Application.НовоеМеню"
+
+#~ msgid "Folder Connection"
+#~ msgstr "Связь с папкой"
+
+#~ msgid "Test change proj"
+#~ msgstr "Test change proj"
+
+#~ msgid "Test GxDialog"
+#~ msgstr "Проверить GxDialog"
+
+#~ msgid "Confirm"
+#~ msgstr "Подтвердить"
+
+#~ msgid "wxGxApplication: This is not inherited IGxView class (%s.%s)"
+#~ msgstr "wxGxApplication: Это не наследуемый IGxView класс (%s.%s)"
+
+#~ msgid "wxGxApplication: Error initializing ViewsFactory %s"
+#~ msgstr "wxGxApplication: Ошибка иннициализации ViewsFactory %s"
+
+#~ msgid "wxGxTab: This is not inherited IGxView class (%s.%s)"
+#~ msgstr "wxGxTab: Это не наследуемый класс IGxView (%s.%s)"
+
+#~ msgid "wxGxTab: Error initializing ViewsFactory %s"
+#~ msgstr "wxGxTab: Ошибка иннициализации ViewsFactory %s"
+
+#~ msgid "--- Context menues ---"
+#~ msgstr "--- Контекстные меню ---"
+
+#~ msgid "The item(s) cannot be choosen!"
+#~ msgstr "Элемент(ы) не может быть выбран!"
+
+#~ msgid "The item cannot be save!"
+#~ msgstr "Элемент не должен быть сохранен!"
+
+#~ msgid "The item cannot be deleted!"
+#~ msgstr "Элемент не может быть удален!"
