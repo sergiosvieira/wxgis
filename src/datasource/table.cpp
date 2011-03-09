@@ -201,8 +201,6 @@ OGRErr wxGISTable::CreateFeature(OGRFeature* poFeature)
 
         if(!bOLCFastSetNextByIndex)
 			m_FeaturesMap[nFID] = poFeature;
-		else
-            OGRFeature::DestroyFeature(poFeature);
     }
     return eErr;
 }

@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessing/gpparam.h"
+#include "wxgis/geoprocessing/gpdomain.h"
 
 wxGISGPParameter::wxGISGPParameter()
 {
@@ -165,8 +166,8 @@ void wxGISGPParameter::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
 wxString wxGISGPParameter::GetAsString(void)
 {
     wxString sStrPar = m_Value.MakeString();
-    if(m_pDomain)
-        sStrPar += wxString::Format(wxT("~%d"), m_pDomain->GetSel());
+    //if(m_pDomain)
+    //    sStrPar += wxString::Format(wxT("~%d"), m_pDomain->GetSel());
     return sStrPar;
 }
 
@@ -183,40 +184,73 @@ bool wxGISGPParameter::SetFromString(wxString sParam)
 	case enumGISGPParamDTDouble:
         m_Value = wxVariant(wxAtof(sParam));
         break;        
-	case enumGISGPParamDTSpatRef:
 	case enumGISGPParamDTString:
+        m_Value = wxVariant(sParam);
+        break;        
+	case enumGISGPParamDTSpatRef:
 	case enumGISGPParamDTPath:
+        m_Value = wxVariant(sParam);
         if(m_pDomain)
         {
             wxString sVal = wxVariant(sParam);
-            int pos = sVal.Find('~', true);
-            if(pos != wxNOT_FOUND)
+            if(!sVal.IsEmpty())
             {
-                m_Value = sVal.Left(pos);
-                pos++;
-                int nSel = wxAtoi(sVal.Right(sVal.Len() - pos));
-                m_pDomain->SetSel(nSel);
+                wxGISGPGxObjectDomain* poDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pDomain);
+                wxFileName oName(sVal);
+                for(size_t i = 0; i < poDomain->GetCount(); i++)
+                {
+                    IGxObjectFilter* poFilter = poDomain->GetFilter(i);
+                    if(poFilter)
+                    {
+                        if(oName.GetExt().CmpNoCase(poFilter->GetExt()) == 0 || poFilter->GetExt() == wxEmptyString)
+                        {
+                            poDomain->SetSel(i);
+                            break;
+                        }
+                    }
+                }
             }
         }
-        else
-            m_Value = wxVariant(sParam);
         break;        
     case enumGISGPParamDTStringList:
-	case enumGISGPParamDTPathArray:
+        m_Value = wxVariant(sParam);
         if(m_pDomain)
         {
             wxString sVal = wxVariant(sParam);
-            int pos = sVal.Find('~', true);
-            if(pos != wxNOT_FOUND)
+            wxGISGPStringDomain* poDomain = dynamic_cast<wxGISGPStringDomain*>(m_pDomain);
+            for(size_t i = 0; i < poDomain->GetCount(); i++)
             {
-                m_Value = sVal.Left(pos);
-                pos++;
-                int nSel = wxAtoi(sVal.Right(sVal.Len() - pos));
-                m_pDomain->SetSel(nSel);
+                if(poDomain->GetInternalString(i) == sVal)
+                {
+                    poDomain->SetSel(i);
+                    break;
+                }
             }
         }
-        else
-            m_Value = wxVariant(sParam);
+        break;        
+	case enumGISGPParamDTPathArray:
+        m_Value = wxVariant(sParam);
+        if(m_pDomain)
+        {
+            wxString sVal = wxVariant(sParam);
+            if(!sVal.IsEmpty())
+            {
+                wxGISGPGxObjectDomain* poDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pDomain);
+                wxFileName oName(sVal);
+                for(size_t i = 0; i < poDomain->GetCount(); i++)
+                {
+                    IGxObjectFilter* poFilter = poDomain->GetFilter(i);
+                    if(poFilter)
+                    {
+                        if(oName.GetExt().CmpNoCase(poFilter->GetExt()) == 0 || poFilter->GetExt() == wxEmptyString)
+                        {
+                            poDomain->SetSel(i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         break;        
     case enumGISGPParamDTUnknown:
     default:

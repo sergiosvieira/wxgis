@@ -395,6 +395,8 @@ wxString wxGxRasterFilter::GetName(void)
 	    return wxString(_("Portable Network Graphics (*.png)"));
     case enumRasterGif:
 	    return wxString(_("Graphics Interchange Format (*.gif)"));
+    case enumRasterTil:
+	    return wxString(_("EarthWatch raster (*.til)"));
     }
 }
 
@@ -414,6 +416,8 @@ wxString wxGxRasterFilter::GetExt(void)
 	    return wxString(wxT("png"));
     case enumRasterGif:
 	    return wxString(wxT("gif"));
+    case enumRasterTil:
+	    return wxString(wxT("til"));
     }
 }
 
@@ -433,6 +437,8 @@ wxString wxGxRasterFilter::GetDriver(void)
 	    return wxString(wxT("PNG"));
     case enumRasterGif:
 	    return wxString(wxT("GIF"));
+    case enumRasterTil:
+	    return wxString(wxT("TIL"));
     }
 }
 
@@ -450,6 +456,7 @@ wxGxTextFilter::wxGxTextFilter(wxString soName, wxString soExt)
 {
     m_soName = soName;
     m_soExt = soExt;
+    m_soExtCmp = soExt.Right(soExt.Len() - 1);
 }
 
 wxGxTextFilter::~wxGxTextFilter(void)
@@ -461,7 +468,7 @@ bool wxGxTextFilter::CanChooseObject( IGxObject* pObject )
 	wxGxTextFile* poGxTextFile = dynamic_cast<wxGxTextFile*>(pObject);
 	if(!poGxTextFile)
 		return false;    
-    if(EQUAL(CPLGetExtension(poGxTextFile->GetInternalName()), m_soExt.mb_str()))
+    if(EQUAL(CPLGetExtension(poGxTextFile->GetInternalName()), m_soExtCmp.mb_str()))
 		return true;
 	return false;
 }
@@ -474,7 +481,7 @@ bool wxGxTextFilter::CanDisplayObject( IGxObject* pObject )
 	wxGxTextFile* poGxTextFile = dynamic_cast<wxGxTextFile*>(pObject);
 	if(!poGxTextFile)
 		return false;
-    if(EQUAL(CPLGetExtension(poGxTextFile->GetInternalName()), m_soExt.mb_str()))
+    if(EQUAL(CPLGetExtension(poGxTextFile->GetInternalName()), m_soExtCmp.mb_str()))
 		return true;
 	return false;
 }

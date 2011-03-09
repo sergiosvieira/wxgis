@@ -143,6 +143,6 @@ public:
     virtual wxString GetExt(void);
 protected:
     wxString m_soName;
-    wxString m_soExt;
+    wxString m_soExt, m_soExtCmp;
 };
 

@@ -21,6 +21,9 @@
 #include "wxgis/remoteserver/gxremoteservers.h"
 #include "wxgis/remoteserver/gxremoteserver.h"
 
+#include "wx/volume.h"
+#include "wx/dir.h"
+#include "wx/stdpaths.h"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxRemoteServers, wxObject)
 
@@ -28,6 +31,9 @@ wxGxRemoteServers::wxGxRemoteServers(void) : m_bIsChildrenLoaded(false)
 {
     m_bEnabled = true;
 	wxSocketBase::Initialize();
+    wxStandardPaths stp;
+    m_sUserConfigDir = stp.GetUserConfigDir() + wxFileName::GetPathSeparator() + wxString(CONFIG_DIR) + wxFileName::GetPathSeparator() + wxString(CONNDIR);
+    m_sUserConfig = m_sUserConfigDir + wxFileName::GetPathSeparator() + wxString(RCONNCONF);
 }
 
 wxGxRemoteServers::~wxGxRemoteServers(void)
@@ -47,18 +53,16 @@ void wxGxRemoteServers::Refresh(void)
  
 void wxGxRemoteServers::Init(wxXmlNode* pConfigNode)
 {
-	wxXmlNode *pFactories(NULL), *pConnections(NULL);
+	wxXmlNode *pFactories(NULL);
 	wxXmlNode* pChild = pConfigNode->GetChildren();
 	while(pChild)
 	{
 		if(pChild->GetName().CmpNoCase(wxT("factories")) == 0)
 			pFactories = pChild;
-		else if(pChild->GetName().CmpNoCase(wxT("connections")) == 0)
-			pConnections = pChild;
 		pChild = pChild->GetNext();
 	}
-	LoadFactories(pFactories);
-	LoadChildren(pConnections);
+    LoadFactories(pFactories);
+	LoadChildren();
 }
 
 wxXmlNode* wxGxRemoteServers::GetProperties(void)
@@ -69,18 +73,6 @@ wxXmlNode* wxGxRemoteServers::GetProperties(void)
         pNode->AddProperty(wxT("name"), pInfo->GetClassName());
     pNode->AddProperty(wxT("is_enabled"), m_bEnabled == true ? wxT("1") : wxT("0"));    
 #ifndef WXGISPORTABLE
-    wxXmlNode* pConsNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("connections"));
-	for(size_t i = 0; i < m_Children.size(); i++)
-	{
-        wxGxRemoteServer* pGxRemoteServer = dynamic_cast<wxGxRemoteServer*>(m_Children[i]);
-        if(pGxRemoteServer)
-        {
-		    wxXmlNode* pConn = pGxRemoteServer->GetProperties();
-            if(pConn)
-				pConsNode->InsertChild(pConn, NULL);
-                //pConn->SetParent(pConsNode);
-        }
-    }
     wxXmlNode* pFactoriesNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("factories"));
 	for(size_t i = 0; i < m_apNetConnFact.size(); i++)
 	{
@@ -90,6 +82,9 @@ wxXmlNode* wxGxRemoteServers::GetProperties(void)
 			pFactoriesNode->InsertChild(pXmlNode, NULL);
 	}
 #endif  
+        
+    StoreConnections();
+
     return pNode;
 }
 
@@ -115,36 +110,40 @@ bool wxGxRemoteServers::DeleteChild(IGxObject* pChild)
 	return true;
 }
 
-void wxGxRemoteServers::LoadChildren(wxXmlNode* pConf)
+void wxGxRemoteServers::LoadChildren()
 {
-    if(!pConf)
-        return;
 	if(m_bIsChildrenLoaded)
 		return;	
-	wxXmlNode* pChild = pConf->GetChildren();
-	while(pChild)
-	{
-		//create and test conn
-		wxString sClassName = pChild->GetPropVal(wxT("class"), ERR);
-		if(!sClassName.IsEmpty())
+
+    wxXmlDocument doc;
+    if (doc.Load(m_sUserConfig))
+    {
+        wxXmlNode* pConnectionsNode = doc.GetRoot();
+		wxXmlNode* pConnNode = pConnectionsNode->GetChildren();
+		while(pConnNode)
 		{
-			INetClientConnection *pConn = dynamic_cast<INetClientConnection*>(wxCreateDynamicObject(sClassName));
-			if(pConn && pConn->SetProperties(pChild))
-			{
-				wxGxRemoteServer* pServerConn = new wxGxRemoteServer(pConn);
-				IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
-				if(!AddChild(pGxObj))
-				{
-					wxDELETE(pGxObj);
-				}
-				else //set callback
-				{
-					pConn->SetCallback(static_cast<INetCallback*>(pServerConn));
-				}
-			}
+		    wxString sClassName = pConnNode->GetPropVal(wxT("class"), ERR);
+		    if(!sClassName.IsEmpty())
+		    {
+			    INetClientConnection *pConn = dynamic_cast<INetClientConnection*>(wxCreateDynamicObject(sClassName));
+			    if(pConn && pConn->SetProperties(pConnNode))
+			    {
+				    wxGxRemoteServer* pServerConn = new wxGxRemoteServer(pConn);
+				    IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
+				    if(!AddChild(pGxObj))
+				    {
+					    wxDELETE(pGxObj);
+				    }
+				    else //set callback
+				    {
+					    pConn->SetCallback(static_cast<INetCallback*>(pServerConn));
+				    }
+			    }
+		    }
+
+			pConnNode = pConnNode->GetNext();
 		}
-		pChild = pChild->GetNext();
-	}
+    }
 
 	m_bIsChildrenLoaded = true;
 }
@@ -181,4 +180,29 @@ void wxGxRemoteServers::UnLoadFactories()
 		wxDELETE(m_apNetConnFact[i]);
 }
 
+void wxGxRemoteServers::StoreConnections(void)
+{
+    if(!wxDirExists(m_sUserConfigDir))
+        wxFileName::Mkdir(m_sUserConfigDir, 0750, wxPATH_MKDIR_FULL);
+
+
+ //   wxXmlNode* pConsNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("connections"));
+
+
+    wxXmlDocument doc;
+    wxXmlNode* pRootNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("RemoteConnections"));
+    doc.SetRoot(pRootNode);
+	for(size_t i = 0; i < m_Children.size(); i++)
+	{
+        wxGxRemoteServer* pGxRemoteServer = dynamic_cast<wxGxRemoteServer*>(m_Children[i]);
+        if(pGxRemoteServer)
+        {
+		    wxXmlNode* pConn = pGxRemoteServer->GetProperties();
+            if(pConn)
+				pRootNode->InsertChild(pConn, NULL);
+                //pConn->SetParent(pConsNode);
+        }
+    }
+    doc.Save(m_sUserConfig);
+}
 

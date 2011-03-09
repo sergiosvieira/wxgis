@@ -1093,7 +1093,8 @@ void wxGISFeatureDataset::UnloadGeometry(void)
     if(!m_bIsGeometryLoaded)
         return;
     DeleteQuadTree();
-    m_pGeometrySet->Clear();
+    if(m_pGeometrySet)
+        m_pGeometrySet->Clear();
 
     if(!m_FeaturesMap.empty())
     {

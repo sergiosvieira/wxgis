@@ -57,4 +57,3 @@ protected:
 	wxRxCatalog* m_pCatalogService;//catalog of server objects
 };
 
-

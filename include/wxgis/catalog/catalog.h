@@ -25,7 +25,7 @@
 #include "wx/filename.h"
 
 #define NOTFIRESELID    1010
-
+#define CONNDIR wxT("connections")
 
 enum wxGISEnumSaveObjectResults
 {

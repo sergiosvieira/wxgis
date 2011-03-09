@@ -21,7 +21,6 @@
 #pragma once
 #include "wxgis/catalog/catalog.h"
 
-#define CONNDIR wxT("connections")
 #define CONNCONF wxT("conn.xml")
 
 /** \class wxGxDiscConnections gxdiscconnections.h

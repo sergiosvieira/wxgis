@@ -179,4 +179,3 @@ bool wxGISServer::SetupLog(wxString sLogPath, wxString sNamePrefix)
 	CPLSetConfigOption("CPL_LOG", wgWX2MB(sCPLLogPath.c_str()) );
     return true;
 }
-

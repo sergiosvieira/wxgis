@@ -99,9 +99,8 @@ bool wxGISGPTool::SetFromString(wxString sParams)
 	while ( tkz.HasMoreTokens() )
 	{
 		wxString token = tkz.GetNextToken();
-		//token.Replace(GPTOOLSEPARATOR, wxT(""));
         if(counter >= m_pParamArr.size())
-            return false;
+           return false;
         IGPParameter* pParam = m_pParamArr[counter];
         if(pParam)
         {

@@ -72,6 +72,7 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
 
         wxGISGPGxObjectDomain* pDomain1 = new wxGISGPGxObjectDomain();
         pDomain1->AddFilter(new wxGxRasterFilter(enumRasterTiff));
+        pDomain1->AddFilter(new wxGxRasterFilter(enumRasterTil));
         pParam1->SetDomain(pDomain1);
 
         m_pParamArr.push_back(pParam1);
