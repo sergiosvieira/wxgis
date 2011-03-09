@@ -127,7 +127,7 @@ PERFORMRESULT wxGISCurl::Get(wxString sURL)
 		result.sHead = wxString((const char*)headstruct.memory, wxConvLocal, headstruct.size);
         //charset
         int posb = result.sHead.Find(wxT("charset="));
-        wxString soSet(wxT("default"));
+        wxString soSet;//(wxT("default"));
         if( posb != wxNOT_FOUND)
         {
             soSet = result.sHead.Mid(posb + 8, 50);
@@ -194,7 +194,7 @@ PERFORMRESULT wxGISCurl::Post(wxString sURL, wxString sPostData)
 		result.sHead = wxString((const char*)headstruct.memory, wxConvLocal, headstruct.size);
         //charset
         int posb = result.sHead.Find(wxT("charset="));
-        wxString soSet(wxT("default"));
+        wxString soSet;//(wxT("default"));
         if( posb != wxNOT_FOUND)
         {
             soSet = result.sHead.Mid(posb + 8, 50);
@@ -207,7 +207,7 @@ PERFORMRESULT wxGISCurl::Post(wxString sURL, wxString sPostData)
         if(conv.IsOk())
             result.sBody = wxString((const char*)bodystruct.memory, conv, bodystruct.size);
         else
-            result.sBody = wxString((const char*)bodystruct.memory, *wxConvCurrent, bodystruct.size);
+            result.sBody = wxString((const char*)bodystruct.memory, wxConvLocal, bodystruct.size);
 		result.iSize = headstruct.size + bodystruct.size;
 		headstruct.size = 0;
 		bodystruct.size = 0;

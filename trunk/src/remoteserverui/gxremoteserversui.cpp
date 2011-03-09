@@ -65,34 +65,41 @@ void wxGxRemoteServersUI::EmptyChildren(void)
 	m_bIsChildrenLoaded = false;
 }
 
-void wxGxRemoteServersUI::LoadChildren(wxXmlNode* pConf)
+void wxGxRemoteServersUI::LoadChildren()
 {
-	if(!pConf || m_bIsChildrenLoaded)
+	if(m_bIsChildrenLoaded)
 		return;	
-	wxXmlNode* pChild = pConf->GetChildren();
-	while(pChild)
-	{
-		//create and test conn
-		wxString sClassName = pChild->GetPropVal(wxT("class"), NONAME);
-		if(!sClassName.IsEmpty())
+
+    wxXmlDocument doc;
+    if (doc.Load(m_sUserConfig))
+    {
+        wxXmlNode* pConnectionsNode = doc.GetRoot();
+		wxXmlNode* pConnNode = pConnectionsNode->GetChildren();
+		while(pConnNode)
 		{
-			INetClientConnection *pConn = dynamic_cast<INetClientConnection*>(wxCreateDynamicObject(sClassName));
-			if(pConn && pConn->SetProperties(pChild))
-			{
-				wxGxRemoteServerUI* pServerConn = new wxGxRemoteServerUI(pConn);
-				IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
-				if(!AddChild(pGxObj))
-				{
-					wxDELETE(pGxObj);
-				}
-				else//set callback
-				{
-					pConn->SetCallback(static_cast<INetCallback*>(pServerConn));
-				}
-			}
+		    wxString sClassName = pConnNode->GetPropVal(wxT("class"), ERR);
+		    if(!sClassName.IsEmpty())
+		    {
+			    INetClientConnection *pConn = dynamic_cast<INetClientConnection*>(wxCreateDynamicObject(sClassName));
+			    if(pConn && pConn->SetProperties(pConnNode))
+			    {
+				    wxGxRemoteServerUI* pServerConn = new wxGxRemoteServerUI(pConn);
+				    IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);
+				    if(!AddChild(pGxObj))
+				    {
+					    wxDELETE(pGxObj);
+				    }
+				    else //set callback
+				    {
+					    pConn->SetCallback(static_cast<INetCallback*>(pServerConn));
+				    }
+			    }
+		    }
+
+			pConnNode = pConnNode->GetNext();
 		}
-		pChild = pChild->GetNext();
-	}
+    }
+
 	m_bIsChildrenLoaded = true;
 }
 

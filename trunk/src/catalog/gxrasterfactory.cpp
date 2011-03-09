@@ -70,6 +70,11 @@ bool wxGxRasterFactory::GetChildren(CPLString sParentDir, char** &pFileNames, Gx
 			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterPng);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 		}
+		else if(EQUAL(szExt, "til"))
+		{
+			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterTil);
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+		}
 
         else if(EQUAL(szExt, "prj"))
         {

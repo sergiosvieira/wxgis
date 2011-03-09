@@ -47,8 +47,6 @@ bool wxGxFileFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxOb
                 ObjArray.push_back(pGxObj);
 
                 pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-
-			    return true;
             }
         }
     }

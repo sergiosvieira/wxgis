@@ -24,6 +24,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISRemoteDBServer", "..\.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxSatCat", "..\..\..\wxGISRemoteDB\build\msw\wxSatCat.vcproj", "{B6684EE2-460C-41D3-BBE4-E551CA9ACD73}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxgisogr", "..\..\..\wxGISGDAL\build\msw\wxgisogr.vcproj", "{B55CF983-A77B-4F74-B1D4-CFB98CC149D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -66,6 +68,9 @@ Global
 		{B6684EE2-460C-41D3-BBE4-E551CA9ACD73}.Debug|Win32.Build.0 = Debug|Win32
 		{B6684EE2-460C-41D3-BBE4-E551CA9ACD73}.Release|Win32.ActiveCfg = Release|Win32
 		{B6684EE2-460C-41D3-BBE4-E551CA9ACD73}.Release|Win32.Build.0 = Release|Win32
+		{B55CF983-A77B-4F74-B1D4-CFB98CC149D2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B55CF983-A77B-4F74-B1D4-CFB98CC149D2}.Release|Win32.ActiveCfg = Release|Win32
+		{B55CF983-A77B-4F74-B1D4-CFB98CC149D2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

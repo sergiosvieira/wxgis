@@ -62,9 +62,9 @@ int main(int argc, char **argv)
     // Create the commandline parser
     static const wxCmdLineEntryDesc my_cmdline_desc[] =
     {
-        { wxCMD_LINE_SWITCH, wxT( "h" ), wxT( "help" ), _( "Show this help message" ), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
-        { wxCMD_LINE_SWITCH, wxT( "v" ), wxT( "version" ), _( "The version of this program" ) },
-		{ wxCMD_LINE_OPTION, wxT( "n" ), wxT("name"), _( "The tool name" ), wxCMD_LINE_VAL_STRING },
+        { wxCMD_LINE_SWITCH, wxT( "h" ), wxT("help" ),      _( "Show this help message" ), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
+        { wxCMD_LINE_SWITCH, wxT( "v" ), wxT("version" ),   _( "The version of this program" ) },
+		{ wxCMD_LINE_OPTION, wxT( "n" ), wxT("name"),       _( "The tool name" ), wxCMD_LINE_VAL_STRING },
 		{ wxCMD_LINE_OPTION, wxT( "p" ), wxT("parameters"), _( "The tool parameters" ), wxCMD_LINE_VAL_STRING },
 		{ wxCMD_LINE_NONE }
     };
@@ -112,7 +112,10 @@ bool parse_commandline_parameters( wxCmdLineParser& parser )
     if(parser.Found( wxT( "n" ), &sToolName ) && parser.Found( wxT( "p" ), &sToolParameters ) )
     {
         wxGPTaskExecutor executor;
-        return executor.OnExecute(sToolName, sToolParameters);
+        sToolParameters = sToolParameters.Trim(true).Trim(false);
+        if(sToolParameters[0] == '"')
+            sToolParameters = sToolParameters.Mid(1, sToolParameters.Len() - 2);
+        return executor.OnExecute(sToolName.Trim(true).Trim(false), sToolParameters);
     }
 
 	parser.Usage();
@@ -169,12 +172,14 @@ bool wxGPTaskExecutor::OnExecute(wxString sToolName, wxString sToolParameters)
     }
 
     //PutMessage(wxString::Format(_("tool - %s params - %s"), sToolName.c_str(), sToolParameters.c_str()), -1, enumGISMessageInfo);
+    //PutMessage(wxString::Format(_("tool - %s"), sToolName.c_str()), -1, enumGISMessageInfo);
+    //PutMessage(wxString::Format(_("params - %s"), sToolParameters.c_str()), -1, enumGISMessageInfo);
 
 
     wxGxCatalog GxCatalog;
     GxCatalog.Init();
 
-    wxGISGPToolManager GISGPToolManager(pToolsChild);
+    wxGISGPToolManager GISGPToolManager(pToolsChild);   
     IGPToolSPtr pTool = GISGPToolManager.GetTool(sToolName, &GxCatalog);
     if(!pTool)
     {
@@ -241,6 +246,6 @@ void wxGPTaskExecutor::SetValue(int value)
     if(m_nValue == value)
         return;
     m_nValue = value;
-    m_pOutTxtStream->WriteString(wxString::Format(wxT("DONE: %d%%\r"), value));
+    m_pOutTxtStream->WriteString(wxString::Format(wxT("DONE: %d%%\r\n"), value));
 	m_StdOutFile.Flush();
 }

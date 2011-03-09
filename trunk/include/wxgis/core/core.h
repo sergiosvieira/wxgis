@@ -265,40 +265,43 @@ enum wxGISEnumTaskStateType
     enumGISTaskError
 };
 
-/** \class IStreamReader core.h
- *  \brief The stream reader receives data from reader thread.
- */
-class IStreamReader
-{
-public:
-	virtual ~IStreamReader(void){};
-	virtual void ProcessInput(wxString sInputData) = 0;
-};
+///** \class IStreamReader core.h
+// *  \brief The stream reader receives data from reader thread.
+// */
+//class IStreamReader
+//{
+//public:
+//	virtual ~IStreamReader(void){};
+//	virtual void ProcessInput(wxString sInputData) = 0;
+//};
 
 /** \class IProcess core.h
  *  \brief The process interface class.
  */
-class IProcess : public wxProcess
+class IProcess
 {
 public:
-	IProcess(wxString sCommand) : wxProcess(wxPROCESS_REDIRECT)
+	IProcess(wxString sCommand, wxArrayString saParams)
 	{
 		m_sCommand = sCommand;
+        m_saParams = saParams;
 		m_nState = enumGISTaskPaused;
 	}
 	virtual ~IProcess(void){};
-    virtual void OnStart(long nPID) = 0;
+    virtual void OnStart(void) = 0;
     virtual void OnCancel(void) = 0;
 	virtual void SetState(wxGISEnumTaskStateType nState){m_nState = nState;};
 	virtual wxGISEnumTaskStateType GetState(void){return m_nState;};
 	virtual wxString GetCommand(void){return m_sCommand;};
-    virtual wxDateTime GetStart(void){return m_dtBeg;};
-    virtual wxDateTime GetFinish(void){return m_dtEstEnd;};
+	virtual wxArrayString GetParameters(void){return m_saParams;};
+    virtual wxDateTime GetBeginTime(void){return m_dtBeg;};
+    virtual wxDateTime GetEndTime(void){return m_dtEstEnd;};
 protected:
 	wxDateTime m_dtBeg;
 	wxDateTime m_dtEstEnd;
     wxGISEnumTaskStateType m_nState;
     wxString m_sCommand;
+    wxArrayString m_saParams;
 };
 
 /** \class IProcessParent core.h
@@ -309,10 +312,11 @@ class IProcessParent
 public:
 	virtual ~IProcessParent(void){};
     virtual void OnFinish(IProcess* pProcess, bool bHasErrors) = 0;
+//    virtual void ProcessInput(wxString sInputData){};
 };
 
 #define DEFINE_SHARED_PTR(x) typedef boost::shared_ptr<x> x##SPtr
-#define DEFINE_WEAK_PTR(x) typedef boost::weak_ptr<x> x##SPtr
+#define DEFINE_WEAK_PTR(x) typedef boost::weak_ptr<x> x##WPtr
 
 static wxString DoubleToString(double Val, bool IsLon)
 {

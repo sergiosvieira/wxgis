@@ -59,6 +59,7 @@ enum wxGISEnumRasterDatasetType
 	enumRasterUnknown = 0,
 	enumRasterBmp,
 	enumRasterTiff,
+	enumRasterTil,
 	enumRasterImg,
 	enumRasterJpeg,
 	enumRasterPng,

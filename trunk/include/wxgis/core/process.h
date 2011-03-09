@@ -25,40 +25,61 @@
 #include "wx/txtstrm.h"
 #include "wx/thread.h"
 
+#include <boost/process.hpp> 
 
+namespace bp = ::boost::process;
 
-/** \class wxStreamReaderThread process.h
- *  \brief The stream reader thread for process callback.
- */
-class WXDLLIMPEXP_GIS_CORE wxStreamReaderThread : public wxThread
-{
-public:
-    wxStreamReaderThread(IStreamReader* pReader, wxInputStream& InStream);
-	virtual ~wxStreamReaderThread(void);
-    virtual void *Entry();
-    virtual void OnExit();
-protected:
-	IStreamReader* m_pReader;
-	wxInputStream& m_InStream;
-};
+class wxProcessWaitThread;
 
 /** \class wxGISProcess process.h
  *  \brief The process class which stores the application execution data.
  */
 class WXDLLIMPEXP_GIS_CORE wxGISProcess : 
-	public IProcess,
-	public IStreamReader
+	public IProcess
 {
 public:
-    wxGISProcess(wxString sCommand, IProcessParent* pParent);
+    wxGISProcess(wxString sCommand, wxArrayString saParams, IProcessParent* pParent);
     virtual ~wxGISProcess(void);
     // IProcess
-    virtual void OnTerminate(int pid, int status);
-    virtual void OnStart(long nPID);
+    virtual void OnStart(void);
     virtual void OnCancel(void);
+    virtual void OnTerminate(int status);
 	//IStreamReader
 	virtual void ProcessInput(wxString sInputData);
-protected:
+protected:    
     IProcessParent* m_pParent;
-	wxStreamReaderThread* m_pReadThread;
+    wxProcessWaitThread* m_pProcessWaitThread;
+};
+
+///** \class wxStreamReaderThread process.h
+// *  \brief The stream reader thread for process callback.
+// */
+//class wxStreamReaderThread : public wxThread
+//{
+//public:
+//    wxStreamReaderThread(wxGISProcess* pProc, bp::pistream &InputStream);
+//	virtual ~wxStreamReaderThread(void);
+//    virtual void *Entry();
+//    virtual void OnExit();
+//protected:
+//	wxGISProcess* m_pProc;
+//    bp::pistream &m_InputStream;
+//	//IStreamReader* m_pReader;
+//	//wxInputStream& m_InStream;
+//};
+
+/** \class wxProcessWaitThread process.h
+ *  \brief The end of the process wait thread for process callback.
+ */
+class wxProcessWaitThread : public wxThread
+{
+public:
+    wxProcessWaitThread(wxGISProcess* pProc);
+	virtual ~wxProcessWaitThread(void);
+    virtual void *Entry();
+    virtual void OnExit();
+    virtual void Terminate(void);
+protected:
+	wxGISProcess* m_pProc;
+    bp::child *m_pChild;
 };

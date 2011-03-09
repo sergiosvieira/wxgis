@@ -21,6 +21,8 @@
 #pragma once
 #include "wxgis/remoteserver/remoteserver.h"
 
+#define RCONNCONF wxT("rconn.xml")
+
 /** \class wxGxRemoteServers gxremoteservers.h
     \brief A Remote Servers GxRootObject.
 */
@@ -50,11 +52,15 @@ public:
 	//wxGxRemoteServers
 protected:
 	//wxGxRemoteServers
-	virtual void LoadChildren(wxXmlNode* pConf);
+	virtual void LoadChildren();
 	virtual void EmptyChildren(void);
 	virtual void LoadFactories(wxXmlNode* pConf);
 	virtual void UnLoadFactories(void);
+    virtual void StoreConnections(void);
+
 protected:
     NETCONNFACTORYARRAY m_apNetConnFact;
 	bool m_bIsChildrenLoaded;
+    wxString m_sUserConfig;
+    wxString m_sUserConfigDir;
 };

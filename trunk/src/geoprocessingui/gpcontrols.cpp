@@ -120,8 +120,10 @@ void wxGISTextCtrl::OnKillFocus(wxFocusEvent& event)
         bValid = !pParam->GetValue().IsNull();
         break;
     case enumGISGPParamDTPath:
+        if(sData.IsEmpty())
+            break;
+        else
         {
-            bValid = false;
             wxGISGPGxObjectDomain* poDomain = dynamic_cast<wxGISGPGxObjectDomain*>(pParam->GetDomain());
             IGxObjectFilter* poFilter = poDomain->GetFilter(poDomain->GetSel());
             wxFileName oName(sData);
@@ -377,6 +379,9 @@ void wxGISDTPath::Update(void)
     wxGISGPGxObjectDomain* poDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParam->GetDomain());
     IGxObjectFilter* poFilter = poDomain->GetFilter(poDomain->GetSel());
     wxFileName oName(m_pParam->GetValue());
+    if(!oName.IsOk())
+        return;
+
     for(size_t i = 0; i < poDomain->GetCount(); i++)
     {
         poFilter = poDomain->GetFilter(i);

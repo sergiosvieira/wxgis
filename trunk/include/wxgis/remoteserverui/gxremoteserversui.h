@@ -40,7 +40,7 @@ public:
 	virtual wxString ContextMenu(void){return wxString(wxT("wxGxRemoteServersUI.ContextMenu"));};
 	virtual wxString NewMenu(void){return wxString(wxT("wxGxRemoteServersUI.NewMenu"));};
 	//wxGxRemoteServersUI
-	virtual void LoadChildren(wxXmlNode* pConf);
+	virtual void LoadChildren();
 	virtual void EmptyChildren(void);
     virtual void CreateConnection(wxWindow* pParent, bool bSearch = false);
 protected:
