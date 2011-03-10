@@ -131,9 +131,11 @@ void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
         wxNetMessage* pMsg = new wxNetMessage(wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStAlive, enumGISPriorityHighest, wxT("bye")));
         if(pMsg->IsOk())
         {
-	        WXGISMSG msg = {pMsg, -1};
+	        WXGISMSG msg = {INetMessageSPtr(static_cast<INetMessage*>(pMsg)), wxNOT_FOUND};
 	        m_pNetConn->PutOutMessage(msg);
         }
+        else
+            wxDELETE(pMsg)
 	}
 
     wxString sName = msg.pMsg->GetDestination();
@@ -170,9 +172,11 @@ void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 		        wxNetMessage* pMsg = new wxNetMessage(sMsg);
 		        if(pMsg->IsOk())
 		        {
-			        WXGISMSG msg = {pMsg, -1};
+			        WXGISMSG msg = {INetMessageSPtr(static_cast<INetMessage*>(pMsg)), wxNOT_FOUND};
 			        m_pNetConn->PutOutMessage(msg);
 		        }
+                else
+                    wxDELETE(pMsg)
             }
 		    return;
         }
@@ -183,7 +187,6 @@ void wxGxRemoteServer::PutInMessage(WXGISMSG msg)
 {
 	//proceed message in separate thread
 	wxCriticalSectionLocker locker(m_CriticalSection);
-    msg.pMsg->Reference();
     m_MsgQueue.push(msg);
 }
 
@@ -215,7 +218,9 @@ void wxGxRemoteServer::LoadChildren()
     wxNetMessage* pMsg = new wxNetMessage(sMsg);
     if(pMsg->IsOk())
     {
-        WXGISMSG msg = {pMsg, -1};
+        WXGISMSG msg = {INetMessageSPtr(static_cast<INetMessage*>(pMsg)), wxNOT_FOUND};
         m_pNetConn->PutOutMessage(msg);
     }
+    else
+        wxDELETE(pMsg)
 }

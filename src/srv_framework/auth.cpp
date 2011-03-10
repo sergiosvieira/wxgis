@@ -99,7 +99,7 @@ void wxGISAuthService::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 				m_pApp->SetAuth(respond);
 				wxString sMsg = wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStOk, enumGISPriorityHigh, wxT("auth"));
 				wxNetMessage* pMsg = new wxNetMessage(sMsg);
-				WXGISMSG outmsg = {pMsg, msg.nUserID};
+				WXGISMSG outmsg = {INetMessageSPtr(static_cast<INetMessage*>(pMsg)), msg.nUserID};
 				m_pApp->PutOutMessage(outmsg);
 				return;
 			}
@@ -108,7 +108,7 @@ void wxGISAuthService::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 	}
 	wxString sMsg = wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStRefuse, enumGISPriorityHigh, wxT("auth"));
 	wxNetMessage* pMsg = new wxNetMessage(sMsg);
-	WXGISMSG outmsg = {pMsg, msg.nUserID};
+	WXGISMSG outmsg = {INetMessageSPtr(static_cast<INetMessage*>(pMsg)), msg.nUserID};
 	m_pApp->PutOutMessage(outmsg);
 }
 

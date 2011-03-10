@@ -24,7 +24,7 @@
 
 #define WXNETVER 2
 
-#define BUFF 5000
+#define BUFF 250000
 
 #define WXNETMESSAGE1 wxT("<msg ver=\"%d\" st=\"%d\" prio=\"%u\" dst=\"%s\">%s</msg>")
 #define WXNETMESSAGE2 wxT("<msg ver=\"%d\" st=\"%d\" prio=\"%u\" dst=\"%s\"/>")

@@ -128,8 +128,6 @@ void wxGISServer::PutOutMessage(WXGISMSG msg)
 {
 	if(msg.pMsg->IsOk() && m_pNetService)
 		m_pNetService->PutOutMessage(msg);
-	else
-		wsDELETE(msg.pMsg);
 }
 
 IGISConfig* wxGISServer::GetConfig(void)
