@@ -101,7 +101,7 @@ void wxRxCatalog::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 						//sent children count
 						wxString sBeginMsg = wxString::Format(wxT("<children count=\"%d\"/>"), m_Children.size()); 
 						wxNetMessage* pMsg = new wxNetMessage(wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStRefuse, enumGISPriorityNormal + 10, GetName(), sBeginMsg.c_str()));
-						WXGISMSG outmsg = {pMsg, msg.nUserID};
+						WXGISMSG outmsg = {INetMessageSPtr(static_cast<INetMessage*>(pMsg)), msg.nUserID};
 						m_pApp->PutOutMessage(outmsg);
 						if(m_Children.size() == 0)
 							break;
@@ -122,13 +122,13 @@ void wxRxCatalog::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 							}
 						}
 						//send it
-						outmsg.pMsg = pMsg;
+						outmsg.pMsg = INetMessageSPtr(static_cast<INetMessage*>(pMsg));
 						m_pApp->PutOutMessage(outmsg);
 					}
 					else
 					{
 						wxNetMessage* pMsg = new wxNetMessage(wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStRefuse, enumGISPriorityNormal + 10, GetName(), wxString(wxT("<children count=\"0\"/>")).c_str()));
-						WXGISMSG outmsg = {pMsg, msg.nUserID};
+						WXGISMSG outmsg = {INetMessageSPtr(static_cast<INetMessage*>(pMsg)), msg.nUserID};
 						m_pApp->PutOutMessage(outmsg);
 					}
 				}
@@ -137,7 +137,7 @@ void wxRxCatalog::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 		case enumGISMsgStCmd:
 			{
 				wxNetMessage* pMsg = new wxNetMessage(wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStRefuse, enumGISPriorityNormal + 10, GetName()));
-				WXGISMSG outmsg = {pMsg, msg.nUserID};
+				WXGISMSG outmsg = {INetMessageSPtr(static_cast<INetMessage*>(pMsg)), msg.nUserID};
 				m_pApp->PutOutMessage(outmsg);
 		}
 			break;

@@ -140,11 +140,13 @@ bool wxRxObjectContainer::LoadChildren()
     wxNetMessage* pMsg = new wxNetMessage(sMsg);
     if(pMsg->IsOk())
     {
-        WXGISMSG msg = {pMsg, -1};
+        WXGISMSG msg = {INetMessageSPtr(static_cast<INetMessage*>(pMsg)), wxNOT_FOUND};
         m_pGxRemoteServer->PutOutMessage(msg);
 		//add pending icon or item
 		return true;
     }
+    else
+        wxDELETE(pMsg)
 	return false;
 }
 

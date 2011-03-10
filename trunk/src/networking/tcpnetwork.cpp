@@ -54,7 +54,7 @@ void *wxNetTCPReader::Entry()
 				if(pMsg->IsOk())
 				{
 					//add message to queure
-					WXGISMSG msg = {pMsg, m_pNetConnection->GetUserID()};
+					WXGISMSG msg = {INetMessageSPtr(static_cast<INetMessage*>(pMsg)), m_pNetConnection->GetUserID()};
 					m_pNetConnection->PutInMessage(msg);
 				}
 				else
@@ -99,10 +99,6 @@ void *wxNetTCPWriter::Entry()
 				{
 					m_pNetConnection->PutOutMessage(msg);
 					wxThread::Sleep(50);
-				}
-				else
-				{
-					wsDELETE(msg.pMsg);
 				}
 			}
         }

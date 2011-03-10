@@ -317,6 +317,7 @@ public:
 
 #define DEFINE_SHARED_PTR(x) typedef boost::shared_ptr<x> x##SPtr
 #define DEFINE_WEAK_PTR(x) typedef boost::weak_ptr<x> x##WPtr
+static void wxNotDeleter(void*);
 
 static wxString DoubleToString(double Val, bool IsLon)
 {

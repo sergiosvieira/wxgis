@@ -217,7 +217,7 @@ void *wxServerTCPWaitLost::Entry()
 		if(span.GetMinutes() > 10)
 		{
 			wxNetMessage *pMsgOut = new wxNetMessage(wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStBye, enumGISPriorityHighest, wxT("bye")));
-			WXGISMSG msg = {pMsgOut, m_pConnection->GetUserID()};
+			WXGISMSG msg = {INetMessageSPtr(static_cast<INetMessage*>(pMsgOut)), m_pConnection->GetUserID()};
 			m_pConnection->PutInMessage(msg);
 			wxThread::Sleep(50);
 		}
@@ -297,7 +297,7 @@ bool wxServerTCPNetConnection::Connect(void)
     wxString sServData = wxString::Format(wxT("<info name=\"%s\" banner=\"%s\" />"), wxNetMessage::FormatXmlString(m_pGISNetworkService->GetServerName()).c_str(), wxNetMessage::FormatXmlString(wxGetOsDescription()).c_str());
     wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStOk, enumGISPriorityHighest, wxT("info"), sServData.c_str());
     wxNetMessage *pMsgOut = new wxNetMessage(sMsg);
-    WXGISMSG msg = {pMsgOut, m_nUserID};
+    WXGISMSG msg = {INetMessageSPtr(static_cast<INetMessage*>(pMsgOut)), m_nUserID};
     PutOutMessage(msg);
 	
 	return true;

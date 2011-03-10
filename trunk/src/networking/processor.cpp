@@ -34,7 +34,7 @@ wxGISNetMessageProcessor::~wxGISNetMessageProcessor()
 WXGISMSG wxGISNetMessageProcessor::GetInMessage(void)
 {
     wxCriticalSectionLocker locker(m_CriticalSection);
-	WXGISMSG Msg = {NULL, wxNOT_FOUND};
+	WXGISMSG Msg = {INetMessageSPtr(), wxNOT_FOUND};
 	if(m_MsgQueue.size() > 0)
 	{
 		Msg = m_MsgQueue.top();
@@ -50,7 +50,6 @@ void wxGISNetMessageProcessor::ProcessMessage(WXGISMSG msg)
 	const wxXmlNode* pRoot = msg.pMsg->GetRoot();
 	if(!pRoot)
 	{
-		wsDELETE(msg.pMsg);
 		return;
 	}
 	wxXmlNode* pChild = pRoot->GetChildren();
@@ -86,8 +85,6 @@ void wxGISNetMessageProcessor::ProcessMessage(WXGISMSG msg)
 	//				it->second->ProcessMessage(msg, pChild);
 	//		pChild = pChild->GetNext();
 	//	}
-
-    wsDELETE(msg.pMsg);
 }
 
 void wxGISNetMessageProcessor::AddMessageReceiver(wxString sName, INetMessageReceiver* pNetMessageReceiver)
@@ -125,7 +122,6 @@ void wxGISNetMessageProcessor::ClearMessageQueue(void)
     {
 	    WXGISMSG Msg = m_MsgQueue.top();
 	    m_MsgQueue.pop();  
-        wsDELETE(Msg.pMsg);
     }
 }
 

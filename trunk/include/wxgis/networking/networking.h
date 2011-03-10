@@ -86,14 +86,14 @@ enum wxGISUserType
     enumGISUserPass
 };
 
-#define FILETRANSFERBUFFSIZE 10240 
+#define FILETRANSFERBUFFSIZE 10240
 #define MSGBUFFSIZE 15000
 #define SIMPLEMSGBUFFSIZE 1024
 
 /** \class INetMessage networking.h
     \brief The network message interface class.
 */
-class INetMessage : public IPointer
+class INetMessage
 {
 public:
     virtual ~INetMessage(void){};
@@ -112,10 +112,11 @@ public:
     virtual wxXmlNode* GetRoot(void) = 0;
 };
 
+DEFINE_SHARED_PTR(INetMessage);
 
 typedef struct _msg
 {
-	INetMessage* pMsg;
+	INetMessageSPtr pMsg;
 	long nUserID;
 	bool operator< (const struct _msg& x) const { return pMsg->GetPriority() < x.pMsg->GetPriority(); }
 } WXGISMSG;
@@ -155,7 +156,7 @@ public:
     //}
 	virtual WXGISMSG GetOutMessage(void)
     {
-        WXGISMSG Msg = {NULL, -1};
+        WXGISMSG Msg = {INetMessageSPtr(), wxNOT_FOUND};
         wxCriticalSectionLocker locker(m_CriticalSection);
         if(m_OutMsgQueue.size() > 0)
         {
@@ -167,7 +168,6 @@ public:
 	virtual void PutOutMessage(WXGISMSG msg)
     {
         wxCriticalSectionLocker locker(m_CriticalSection);
-        msg.pMsg->Reference();
         m_OutMsgQueue.push(msg);
     };
     virtual void CleanMsgQueueres(void)
@@ -178,7 +178,6 @@ public:
         {
 		    WXGISMSG Msg = m_OutMsgQueue.top();
 		    m_OutMsgQueue.pop();  
-            wsDELETE(Msg.pMsg);
         }
       //  //clean InMsgQueue
       //  while( m_InMsgQueue.size() > 0 )
