@@ -207,7 +207,7 @@
 #define PI 3.1415926535897932384626433832795
 #define PIDEG 0.017453292519943295769236907684886
 
-#define APP_VER wxT("0.3.0") //global for all apps
+#define APP_VER wxT("0.3.1") //global for all apps
 
 #ifndef _DEBUG
    #define WXGISPORTABLE
