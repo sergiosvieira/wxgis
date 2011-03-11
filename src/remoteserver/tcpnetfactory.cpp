@@ -255,7 +255,7 @@ bool wxClientTCPNetConnection::SetProperties(const wxXmlNode* pProp)
 	m_sConnName = pProp->GetPropVal(wxT("name"), wxT("New connection"));
 	m_sUserName = pProp->GetPropVal(wxT("user"), wxT("user"));
 	m_sCryptPass = pProp->GetPropVal(wxT("pass"), wxT("passsword"));
-	m_sIP = pProp->GetPropVal(wxT("ip"), wxT("0.0.0.0"));
+	m_sIP = pProp->GetPropVal(wxT("ip"), wxT("127.0.0.1"));
 	m_sPort = pProp->GetPropVal(wxT("port"), wxT("1976"));
 	return true;
 }

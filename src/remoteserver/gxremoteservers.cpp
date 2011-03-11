@@ -72,7 +72,7 @@ wxXmlNode* wxGxRemoteServers::GetProperties(void)
     if(pInfo)
         pNode->AddProperty(wxT("name"), pInfo->GetClassName());
     pNode->AddProperty(wxT("is_enabled"), m_bEnabled == true ? wxT("1") : wxT("0"));    
-#ifndef WXGISPORTABLE
+//#ifndef WXGISPORTABLE
     wxXmlNode* pFactoriesNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("factories"));
 	for(size_t i = 0; i < m_apNetConnFact.size(); i++)
 	{
@@ -81,7 +81,7 @@ wxXmlNode* wxGxRemoteServers::GetProperties(void)
 			//pXmlNode->SetParent(pFactoriesNode);
 			pFactoriesNode->InsertChild(pXmlNode, NULL);
 	}
-#endif  
+//#endif  
         
     StoreConnections();
 
@@ -170,6 +170,10 @@ void wxGxRemoteServers::LoadFactories(wxXmlNode* pConf)
 			m_apNetConnFact.push_back(pNetConnFactory);
 			wxLogMessage(_("wxGxRemoteServers: Network connection factory %s loaded"), pNetConnFactory->GetName().c_str());
         }
+		else
+		{
+			wxLogError(_("wxGxRemoteServers: Network connection factory %s load failed!"), sName.c_str());
+		}
 		pChild = pChild->GetNext();
 	}
 }

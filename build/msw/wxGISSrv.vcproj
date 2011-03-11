@@ -135,6 +135,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wxbase28u.lib wxbase28u_net.lib wxbase28u_xml.lib wxzlib.lib wxregexu.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpl.lib wxgisogr.lib wxgisgdal.lib wxGISServerFramework.lib"
+				OutputFile="$(OutDir)\wxGISServer.exe"
 				AdditionalLibraryDirectories="$(WXGISGDAL)\lib;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(WXGIS)\lib&quot;;..\..\lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
