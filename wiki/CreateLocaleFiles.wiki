@@ -26,7 +26,7 @@ Set paths. At least you have to add one path to directory in src folder and one 
 Save catalog in loc/your_locale (eg. English - loc/en, Russian - /loc/ru etc.) and with name ended *_cat.po (see picture). The wxGISCatalog search it's locale files using this mask.
 <p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/cat_save_dlg.png</p>
 
-The main window should be shown and filled with text string to translate at next step.
+The main window should be shown and filled with text string to translate at next step. *IMPORTANT! During translation you should check the number of formating characters (eg. %s %d %.2f etc.). You shouldn't remove this characters! But you can put them at any place of string (example of changing position of formating characters: "error no %d in %s, value %f" -> "%d error of %f in %s")*
 <p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/main_wnd.png</p>
 
 To control translation you can create a project in catalogs manager. In translation project should be shown all translations and theirs state. If you update sources you’ll see changes in catalog manager.
