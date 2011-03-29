@@ -1,16 +1,16 @@
+#summary This page describes creating locale files for wxGIS.
 #labels Phase-Design
-#this page describes creating locale files for wxGIS.
 
 = Introduction =
 
-The 0.3 version of wxGIS introduce new and more simple mecanism of changing application localization (see Localization page). This page describe the locale files create process.
+The 0.3 version of wxGIS introduce new and more simple mecanism of changing application localization (see [Localization] page). This page describe the locale files create process.
 
 
 = Details =
 
 To create locale files you need:
-# Download and install poEdit (http://www.poedit.net/download.php)
-# Download sources (http://code.google.com/p/wxgis/source/checkout), there are several tags for diferent versions of wxGIS (see http://wxgis.googlecode.com/svn/tags/)
+  # Download and install poEdit (http://www.poedit.net/download.php)
+  # Download sources (http://code.google.com/p/wxgis/source/checkout), there are several tags for diferent versions of wxGIS (see http://wxgis.googlecode.com/svn/tags/)
 
 Add your content here.  Format your content with:
   * Text in *bold* or _italic_
