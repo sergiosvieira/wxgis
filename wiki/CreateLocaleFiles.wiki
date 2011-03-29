@@ -8,11 +8,20 @@ The 0.3 version of wxGIS introduce new and more simple mecanism of changing appl
 
 = Details =
 
-To create locale files you need:
+To create locale files from the begining you need:
   # Download and install poEdit (http://www.poedit.net/download.php)
   # Download sources (http://code.google.com/p/wxgis/source/checkout), there are several tags for diferent versions of wxGIS (see http://wxgis.googlecode.com/svn/tags/)
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+The next step is creating catalog for each part of wxGIS (recomended).
+To do it ypu should ran poEdit and click File->New catalog...
+<p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/create_cat.png</p>
+
+Set your name and email
+<p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/settings_dlg.png</p>
+
+Set paths. At least you have to add one path to directory in src folder and one to directory in include/wxgis folder (see picture).
+<p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/settings1_dlg.png</p>
+
+
+Also you can get locale files from other language and copy them to your language folder (for example, from ...wxGIS\loc\ru to ...wxGIS\loc\en).
+Than you can set new paths to that files in catalog config for each catalog and rewrite locale strings.
