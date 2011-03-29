@@ -8,12 +8,12 @@ The 0.3 version of wxGIS introduce new and more simple mecanism of changing appl
 
 = Details =
 
-To create locale files from the begining you need:
+From the begining to create locale files you need:
   # Download and install poEdit (http://www.poedit.net/download.php)
-  # Download sources (http://code.google.com/p/wxgis/source/checkout), there are several tags for diferent versions of wxGIS (see http://wxgis.googlecode.com/svn/tags/)
+  # Download sources (http://code.google.com/p/wxgis/source/checkout), there are several tags for diferent versions of wxGIS (see http://wxgis.googlecode.com/svn/tags/). For Microsoft Windows I recomend TortoiseSVN, for Ubuntu - RabbitSVN.
 
-The next step is creating catalog for each part of wxGIS (recomended).
-To do it ypu should ran poEdit and click File->New catalog...
+The next step is creating catalog for each part of wxGIS (recomended) but you can combine all tranclations in one big file.
+To do it you should run poEdit and click File->New catalog...
 <p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/create_cat.png</p>
 
 Set your name and email
@@ -22,6 +22,25 @@ Set your name and email
 Set paths. At least you have to add one path to directory in src folder and one to directory in include/wxgis folder (see picture).
 <p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/settings1_dlg.png</p>
 
+Save catalog in loc/your_locale (eg. English - loc/en, Russian - /loc/ru etc.) and with name ended *_cat.po (see picture). The wxGISCatalog search it's locale files using this mask.
+<p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/cat_save_dlg.png</p>
 
-Also you can get locale files from other language and copy them to your language folder (for example, from ...wxGIS\loc\ru to ...wxGIS\loc\en).
-Than you can set new paths to that files in catalog config for each catalog and rewrite locale strings.
+The next step the main window should be shown and filled text string to translate.
+<p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/main_wnd.png</p>
+
+To control translation you can create catalog set in catalog manager. In catalog set should be shown all translations and theirs state. If you update sorces you'l see changes in catalog manager.
+<p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/manager.png</p>
+
+To create catalog set push first button in catalog manager and fill dialog.
+<p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/edit_project.png</p>
+
+After the translation you can test the result on your wxGISCatalog. To do it:
+- create in folder there wxGISCatalog.exe is situated subfolder locale (if it's not present)
+- create subfolder with your locale in locale folder (eg. locale/en).
+- copy all *.mo files to this folder.
+- follow instructions of [Localization] page. 
+
+*Also you can get locale files from other language and copy them to your language folder* (for example, from ...wxGIS\loc\ru to ...wxGIS\loc\en).
+Than you can create catalog set as it was written upper and set new paths to that files in each catalog configs and rewrite locale strings to your language.
+
+Please send me your translations to put them into the distro of wxGIS!
