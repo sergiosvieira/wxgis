@@ -51,7 +51,7 @@ void wxGxDiscConnections::Refresh(void)
 {
 	EmptyChildren();
 	LoadChildren();
-    m_pCatalog->ObjectRefreshed(this);
+    m_pCatalog->ObjectRefreshed(GetID());
 }
  
 void wxGxDiscConnections::Init(wxXmlNode* const pConfigNode)
@@ -127,11 +127,12 @@ void wxGxDiscConnections::EmptyChildren(void)
 bool wxGxDiscConnections::DeleteChild(IGxObject* pChild)
 {
 	bool bHasChildren = m_Children.size() > 0 ? true : false;
-    m_pCatalog->ObjectDeleted(pChild);
+    long nChildID = pChild->GetID();
 	if(!IGxObjectContainer::DeleteChild(pChild))
 		return false;
+    m_pCatalog->ObjectDeleted(nChildID);
 	if(bHasChildren != m_Children.size() > 0 ? true : false)
-		m_pCatalog->ObjectChanged(this);
+		m_pCatalog->ObjectChanged(GetID());
 	return true;
 }
 
@@ -172,7 +173,7 @@ IGxObject* wxGxDiscConnections::ConnectFolder(wxString sPath)
         IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
         if(AddChild(pGxObject))
         {
-		    m_pCatalog->ObjectAdded(pGxObject);            
+		    m_pCatalog->ObjectAdded(pGxObject->GetID());            
             StoreConnections();
             return pGxObject;
         }

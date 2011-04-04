@@ -44,10 +44,12 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxMapView, wxGISMapView)
 
 wxGxMapView::wxGxMapView(void)
 {
+    m_nParentGxObjectID = wxNOT_FOUND;
 }
 
 wxGxMapView::wxGxMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxGISMapView(parent, id, pos, size), m_pStatusBar(NULL)
 {
+    m_nParentGxObjectID = wxNOT_FOUND;
 	m_sViewName = wxString(_("Geography View"));
 }
 
@@ -94,7 +96,8 @@ bool wxGxMapView::Applies(IGxSelection* Selection)
 
 	for(size_t i = 0; i < Selection->GetCount(); i++)
 	{
-		IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>( Selection->GetSelectedObjects(i) );
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(Selection->GetSelectedObjectID(i));
+		IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>( pGxObject.get() );
 		if(pGxDataset != NULL)
 		{
 			wxGISEnumDatasetType type = pGxDataset->GetType();
@@ -114,11 +117,12 @@ bool wxGxMapView::Applies(IGxSelection* Selection)
 
 void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 {
-    IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
-	if(m_pParentGxObject == pGxObj)
+    long nLastSelID = Selection->GetLastSelectedObjectID();
+	if(m_nParentGxObjectID == nLastSelID)
 		return;
     	
-	IGxDataset* pGxDataset =  dynamic_cast<IGxDataset*>(pGxObj);
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nLastSelID);
+	IGxDataset* pGxDataset =  dynamic_cast<IGxDataset*>(pGxObject.get());
 	if(pGxDataset == NULL)
 		return;
 

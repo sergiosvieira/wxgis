@@ -223,16 +223,12 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
 				if(pSel->GetCount() == 0)
 					return false;
-				long nObjectID = pSel->GetSelectedObjectID(0);
-				if(nObjectID != wxNOT_FOUND)
-				{
-					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(nObjectID);
-					if(!pGxObject)
-						return false;
-					IGxObject* pParentGxObject = pGxObject->GetParent();
-					if(!pParentGxObject)
-						return false;
-				}
+				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
+				if(!pGxObject)
+					return false;
+				IGxObject* pParentGxObject = pGxObject->GetParent();
+				if(!pParentGxObject)
+					return false;
 			}
 			return true;
 		}
@@ -249,8 +245,7 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 				if(pSel->GetCount() == 0)
 					return false;
 
-				long nObjectID = pSel->GetSelectedObjectID(0);
-				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(nObjectID);
+				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
 				if(dynamic_cast<wxGxDiscConnection*>(pGxObject.get()))
 					return true;
 			}
@@ -267,8 +262,7 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
                 for(size_t i = 0; i < pSel->GetCount(); i++)
                 {
-					long nObjectID = pSel->GetSelectedObjectID(0);
-					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(nObjectID);
+					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
 					IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
 					if(pGxObjectEdit && pGxObjectEdit->CanDelete())
 						return true;
@@ -320,8 +314,7 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
                     IGxSelection* pSel = pGxCatalogUI->GetSelection();
                     if(pSel)
                     {
-						long nObjectID = pSel->GetSelectedObjectID(0);
-						IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(nObjectID);
+						IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(0));
                         IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
                         if(pCont)
                             return pCont->CanCreate(enumGISContainer, enumContUnknown);
@@ -340,7 +333,7 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
                 size_t nCounter(0);
                 for(size_t i = 0; i < pSel->GetCount(); i++)
                 {
-					IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
+					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
                     if(pGxObjectEdit && pGxObjectEdit->CanRename())
                         nCounter++;
@@ -658,7 +651,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 			{
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetLastSelectedObjectID(i));
+				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetLastSelectedObjectID());
                 IGxObjectEditUI* pGxObjectEdit = dynamic_cast<IGxObjectEditUI*>(pGxObject.get());
                 if(pGxObjectEdit)
                     pGxObjectEdit->EditProperties(dynamic_cast<wxWindow*>(m_pApp));
@@ -807,12 +800,12 @@ void wxGISCatalogMainCmd::OnClick(void)
                             IGxObject* pGxFolder = static_cast<IGxObject*>(pFolder);
                             IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
                             pObjCont->AddChild(pGxFolder);
-                            pCatalog->ObjectAdded(pGxFolder);
+                            pCatalog->ObjectAdded(pGxFolder->GetID());
                             //begin rename GxObject
                             wxWindow* pFocusWnd = wxWindow::FindFocus();
                             IGxView* pGxView = dynamic_cast<IGxView*>(pFocusWnd);
                             if(pGxView)
-                                pGxView->BeginRename(pGxFolder);
+                                pGxView->BeginRename(pGxFolder->GetID());
                         }
                     }
                 }

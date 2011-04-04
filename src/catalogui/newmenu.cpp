@@ -127,7 +127,8 @@ void wxGISNewMenu::Update(IGxSelection* Selection)
 
     m_delitems.clear();
 
-    IGxObjectUI* pGxObjUI = dynamic_cast<IGxObjectUI*>(Selection->GetLastSelectedObject());
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(Selection->GetLastSelectedObjectID());
+    IGxObjectUI* pGxObjUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
     if(pGxObjUI)
     {
         wxMenu* pCmdMenu = dynamic_cast<wxMenu*>(m_pApp->GetCommandBar( pGxObjUI->NewMenu() ));

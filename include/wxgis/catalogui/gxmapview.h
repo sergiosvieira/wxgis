@@ -51,7 +51,7 @@ public:
 private:
 	IGxSelection* m_pSelection;
     wxGxCatalogUI* m_pCatalog;
-	IGxObject* m_pParentGxObject;
+	long m_nParentGxObjectID;
 	IStatusBar* m_pStatusBar;
 	IApplication* m_pApp;
 

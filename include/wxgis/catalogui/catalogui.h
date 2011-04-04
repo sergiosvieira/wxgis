@@ -123,7 +123,7 @@ public:
 	virtual wxString GetViewName(void) = 0;
 	virtual wxIcon GetViewIcon(void) = 0;
 	virtual void SetViewIcon(wxIcon Icon) = 0;
-    virtual void BeginRename(IGxObject* pGxObject = NULL) = 0;
+    virtual void BeginRename(long nObjectID = wxNOT_FOUND) = 0;
 };
 
 enum wxGISEnumContentsViewStyle

@@ -103,11 +103,12 @@ void wxGxTableView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 
 	if(m_pSelection->GetCount() == 0)
 		return;
-	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();	
-	if(m_pParentGxObject == pGxObj)
+    long nSelID = m_pSelection->GetLastSelectedObjectID();
+	if(m_nParentGxObjectID == nSelID)
 		return;
 
-	IGxDataset* pGxDataset =  dynamic_cast<IGxDataset*>(pGxObj);
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nSelID);
+	IGxDataset* pGxDataset =  dynamic_cast<IGxDataset*>(pGxObject.get());
 	if(pGxDataset == NULL)
 		return;
 

@@ -73,7 +73,7 @@ bool wxGxFile::Rename(wxString NewName)
 	{
         m_sPath = szNewPath;
 		m_sName = NewName;
-		m_pCatalog->ObjectChanged(this);
+		m_pCatalog->ObjectChanged(GetID());
 		return true;
 	}
 	else

@@ -115,7 +115,7 @@ void wxRxObjectContainer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 				pChildNode = pChildNode->GetNext();
 			}
 			m_bIsChildrenLoaded = m_nChildCount == m_Children.size();
-			m_pCatalog->ObjectChanged(this);
+			m_pCatalog->ObjectChanged(GetID());
 		}
 	}
 }
@@ -168,11 +168,12 @@ void wxRxObjectContainer::Detach(void)
 bool wxRxObjectContainer::DeleteChild(IGxObject* pChild)
 {
 	bool bHasChildren = m_Children.size() > 0 ? true : false;
-    m_pCatalog->ObjectDeleted(pChild);
+    long nChildID = pChild->GetID();
 	if(!IGxObjectContainer::DeleteChild(pChild))
 		return false;
+    m_pCatalog->ObjectDeleted(nChildID);
 	if(bHasChildren != m_Children.size() > 0 ? true : false)
-		m_pCatalog->ObjectChanged(this);
+		m_pCatalog->ObjectChanged(GetID());
 	return true;
 }
 

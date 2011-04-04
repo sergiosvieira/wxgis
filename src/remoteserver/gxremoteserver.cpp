@@ -61,11 +61,12 @@ void wxGxRemoteServer::Refresh(void)
 bool wxGxRemoteServer::DeleteChild(IGxObject* pChild)
 {
 	bool bHasChildren = m_Children.size() > 0 ? true : false;
-    m_pCatalog->ObjectDeleted(pChild);
+    long nChildID = pChild->GetID();
 	if(!IGxObjectContainer::DeleteChild(pChild))
 		return false;
+    m_pCatalog->ObjectDeleted(nChildID);
 	if(bHasChildren != m_Children.size() > 0 ? true : false)
-		m_pCatalog->ObjectChanged(this);
+		m_pCatalog->ObjectChanged(GetID());
 	return true;
 }
 
@@ -112,7 +113,7 @@ void wxGxRemoteServer::OnConnect(void)
 	AddMessageReceiver(wxT("bye"), static_cast<INetMessageReceiver*>(this));
 
 	OnStartMessageThread();
-	m_pCatalog->ObjectChanged(this);
+	m_pCatalog->ObjectChanged(GetID());
 }
 
 void wxGxRemoteServer::OnDisconnect(void)
@@ -144,7 +145,7 @@ void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 		if(msg.pMsg->GetState() == enumGISMsgStOk)
 		{
 			m_bAuth = true;
-			m_pCatalog->ObjectChanged(this);
+			m_pCatalog->ObjectChanged(GetID());
 
 			LoadChildren();
 		}
@@ -205,7 +206,7 @@ void wxGxRemoteServer::EmptyChildren(void)
 	}
 	m_Children.clear();
 	m_bIsChildrenLoaded = false;
-	m_pCatalog->ObjectChanged(this);
+	m_pCatalog->ObjectChanged(GetID());
 }
 
 void wxGxRemoteServer::LoadChildren()

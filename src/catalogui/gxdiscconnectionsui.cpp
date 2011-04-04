@@ -112,7 +112,7 @@ IGxObject* wxGxDiscConnectionsUI::ConnectFolder(wxString sPath)
         IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
         if(AddChild(pGxObject))
         {
-		    m_pCatalog->ObjectAdded(pGxObject);
+		    m_pCatalog->ObjectAdded(pGxObject->GetID());
             StoreConnections();
             return pGxObject;
         }

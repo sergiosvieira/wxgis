@@ -155,13 +155,10 @@ void wxGxCatalogUI::Init(IGxCatalog* pExtCat)
     }
 }
 
-void wxGxCatalogUI::ObjectDeleted(IGxObject* pObject)
+void wxGxCatalogUI::ObjectDeleted(long nObjectID)
 {
-    if(!pObject)
-        return;
-    m_pSelection->RemoveDo(pObject->GetFullName());
-
-    wxGxCatalog::ObjectDeleted(pObject);
+    m_pSelection->RemoveDo(nObjectID);
+    wxGxCatalog::ObjectDeleted(nObjectID);
 }
 
 IGxObject* wxGxCatalogUI::ConnectFolder(wxString sPath, bool bSelect)
@@ -171,7 +168,7 @@ IGxObject* wxGxCatalogUI::ConnectFolder(wxString sPath, bool bSelect)
         IGxObject* pAddedObj = m_pGxDiscConnections->ConnectFolder(sPath);
         if(pAddedObj && bSelect)
         {
-            m_pSelection->Select(pAddedObj, false, IGxSelection::INIT_ALL);
+            m_pSelection->Select(pAddedObj->GetID(), false, IGxSelection::INIT_ALL);
             return pAddedObj;
         }
     }
@@ -188,7 +185,7 @@ void wxGxCatalogUI::SetLocation(wxString sPath)
 {
     IGxObject* pObj = SearchChild(sPath);
 	if(pObj)
-		m_pSelection->Select(pObj, false, IGxSelection::INIT_ALL);
+		m_pSelection->Select(pObj->GetID(), false, IGxSelection::INIT_ALL);
 	else
 		ConnectFolder(sPath);
 }
@@ -200,7 +197,7 @@ void wxGxCatalogUI::Undo(int nPos)
         long nID = m_pSelection->Undo(nPos);
         if(nID != wxNOT_FOUND && GxObjectMap[nID] != NULL)
 		{
-			m_pSelection->Select(GxObjectMap[nID], false, IGxSelection::INIT_ALL);
+			m_pSelection->Select(nID, false, IGxSelection::INIT_ALL);
 		}
     }
 }
@@ -212,7 +209,7 @@ void wxGxCatalogUI::Redo(int nPos)
         long nID = m_pSelection->Redo(nPos);
         if(nID != wxNOT_FOUND && GxObjectMap[nID] != NULL)
 		{
-			m_pSelection->Select(GxObjectMap[nID], false, IGxSelection::INIT_ALL);
+			m_pSelection->Select(nID, false, IGxSelection::INIT_ALL);
 		}
     }
 }

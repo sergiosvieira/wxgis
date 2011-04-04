@@ -53,10 +53,10 @@ public:
 	//IGxCatalog
 	virtual wxString ConstructFullName(IGxObject* pObject);
 	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray);
-	virtual void ObjectAdded(IGxObject* const pObject);
-	virtual void ObjectChanged(IGxObject* const pObject);
-	virtual void ObjectDeleted(IGxObject* const pObject);
-	virtual void ObjectRefreshed(IGxObject* const pObject);
+	virtual void ObjectAdded(long nObjectID);
+	virtual void ObjectChanged(long nObjectID);
+	virtual void ObjectDeleted(long nObjectID);
+	virtual void ObjectRefreshed(long nObjectID);
 	virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true);
 	virtual void DisconnectFolder(CPLString sPath);
 	virtual void RegisterObject(IGxObject* pObj);

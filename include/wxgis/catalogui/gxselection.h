@@ -49,7 +49,7 @@ public:
 	virtual bool CanUndo();
     virtual long Redo(int nPos = -1);
     virtual long Undo(int nPos = -1);
-	virtual void RemoveDo(wxString sPath);
+	virtual void RemoveDo(long nObjectID);
     virtual void Reset();
     virtual size_t GetDoSize();
     virtual int GetDoPos(void){return m_nPos;};

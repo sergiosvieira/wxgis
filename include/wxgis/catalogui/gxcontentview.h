@@ -3,7 +3,7 @@
  * Purpose:  wxGxContentView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ typedef struct _sortdata
 {
     bool bSortAsc;
     short currentSortCol;
+    wxGxCatalogUI* pCatalog;
 } SORTDATA, *LPSORTDATA;
 
 
@@ -60,14 +61,14 @@ public:
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 	virtual bool Applies(IGxSelection* Selection);
-    virtual void BeginRename(IGxObject* pGxObject = NULL);
+    virtual void BeginRename(long nObjectID = wxNOT_FOUND);
 //IGxSelectionEvents
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 //IGxCatalogEvents
-	virtual void OnObjectAdded(IGxObject* object);
-	virtual void OnObjectChanged(IGxObject* object);
-	virtual void OnObjectDeleted(IGxObject* object);
-	virtual void OnObjectRefreshed(IGxObject* object);
+	virtual void OnObjectAdded(long nObjectID);
+	virtual void OnObjectChanged(long nObjectID);
+	virtual void OnObjectDeleted(long nObjectID);
+	virtual void OnObjectRefreshed(long nObjectID);
 	virtual void OnRefreshAll(void);
 // IGxContentsView
 	virtual void SetStyle(wxGISEnumContentsViewStyle style);
@@ -92,7 +93,7 @@ public:
 
 	typedef struct _itemdata
 	{
-		IGxObject* pObject;
+		long nObjectID;
 		int iImageIndex;
 	} ITEMDATA, *LPITEMDATA;
 	typedef struct _icondata
@@ -114,7 +115,7 @@ protected:
     wxGxCatalogUI* m_pCatalog;
     ICommand* m_pDeleteCmd;
 	wxGISNewMenu* m_pNewMenu;
-	IGxObject* m_pParentGxObject;
+	long m_nParentGxObjectID;
 	bool m_bDragging;
     std::vector<ICONDATA> m_IconsArray;
     wxCriticalSection m_CritSect;

@@ -3,7 +3,7 @@
  * Purpose:  Catalog Main Commands class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2010,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -111,7 +111,8 @@ bool wxGISRemoteCmd::GetEnabled(void)
 			{
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                wxGxRemoteServersUI* pGxRemoteServersUI = dynamic_cast<wxGxRemoteServersUI*>(pSel->GetLastSelectedObject());
+                IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetLastSelectedObjectID());
+                wxGxRemoteServersUI* pGxRemoteServersUI = dynamic_cast<wxGxRemoteServersUI*>(pGxObject.get());
                 if(pGxRemoteServersUI)
                     return true;
 			}		
@@ -125,7 +126,8 @@ bool wxGISRemoteCmd::GetEnabled(void)
 			{
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                wxGxRemoteServerUI* pGxRemoteServerUI = dynamic_cast<wxGxRemoteServerUI*>(pSel->GetLastSelectedObject());
+                IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetLastSelectedObjectID());
+                wxGxRemoteServerUI* pGxRemoteServerUI = dynamic_cast<wxGxRemoteServerUI*>(pGxObject.get());
                 if(pGxRemoteServerUI)
 					if(m_subtype == 2)
 						return  !pGxRemoteServerUI->IsConnected();
@@ -181,7 +183,8 @@ void wxGISRemoteCmd::OnClick(void)
 				{
 					wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 					IGxSelection* pSel = pGxCatalogUI->GetSelection();
-					wxGxRemoteServersUI* pGxRemoteServersUI = dynamic_cast<wxGxRemoteServersUI*>(pSel->GetLastSelectedObject());
+                    IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetLastSelectedObjectID());
+					wxGxRemoteServersUI* pGxRemoteServersUI = dynamic_cast<wxGxRemoteServersUI*>(pGxObject.get());
 					if(pGxRemoteServersUI)
 					{
 						wxWindow* pParentWnd = dynamic_cast<wxWindow*>(pGxApp);
@@ -197,7 +200,8 @@ void wxGISRemoteCmd::OnClick(void)
 				{
 					wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 					IGxSelection* pSel = pGxCatalogUI->GetSelection();
-					wxGxRemoteServersUI* pGxRemoteServersUI = dynamic_cast<wxGxRemoteServersUI*>(pSel->GetLastSelectedObject());
+                    IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetLastSelectedObjectID());
+					wxGxRemoteServersUI* pGxRemoteServersUI = dynamic_cast<wxGxRemoteServersUI*>(pGxObject.get());
 					if(pGxRemoteServersUI)
 					{
 						wxWindow* pParentWnd = dynamic_cast<wxWindow*>(pGxApp);
@@ -214,7 +218,8 @@ void wxGISRemoteCmd::OnClick(void)
 				{
 					wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 					IGxSelection* pSel = pGxCatalogUI->GetSelection();
-					wxGxRemoteServerUI* pGxRemoteServerUI = dynamic_cast<wxGxRemoteServerUI*>(pSel->GetLastSelectedObject());
+                    IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetLastSelectedObjectID());
+					wxGxRemoteServerUI* pGxRemoteServerUI = dynamic_cast<wxGxRemoteServerUI*>(pGxObject.get());
 					if(pGxRemoteServerUI)
 						if(m_subtype == 2)
 							pGxRemoteServerUI->Connect();

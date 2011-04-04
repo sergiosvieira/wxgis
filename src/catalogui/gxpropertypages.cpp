@@ -159,7 +159,7 @@ void wxGISCatalogGeneralPropertyPage::Apply(void)
 
     if(bHaveChanges)
     {
-        IGxObject* pGxObj =  m_pCatalog->GetSelection()->GetLastSelectedObject();
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_pCatalog->GetSelection()->GetLastSelectedObjectID());
         if(pGxObj)
             pGxObj->Refresh();
     }

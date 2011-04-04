@@ -3,7 +3,7 @@
  * Purpose:  wxGxContainerDialog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009 Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -370,37 +370,37 @@ IGxObjectFilter* wxGxContainerDialog::GetCurrentFilter(void)
     return m_FilterArray[m_nDefaultFilter];
 }
 
-IGxObject* wxGxContainerDialog::GetLocation(void)
+long wxGxContainerDialog::GetLocation(void)
 {
-    return m_pCatalog->GetSelection()->GetLastSelectedObject();
+    return m_pCatalog->GetSelection()->GetLastSelectedObjectID();
 }
 
 wxString wxGxContainerDialog::GetPath(void)
 {
-    IGxObject* pObj = GetLocation();
-    if(pObj)
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(GetLocation());
+    if(pGxObject)
     {
-        return pObj->GetFullName();
+        return pGxObject->GetFullName();
     }
     return wxEmptyString;
 }
 
 CPLString wxGxContainerDialog::GetInternalPath(void)
 {
-    IGxObject* pObj = GetLocation();
-    if(pObj)
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(GetLocation());
+    if(pGxObject)
     {
-        return pObj->GetInternalName();
+        return pGxObject->GetInternalName();
     }
     return CPLString();
 }
 
 void wxGxContainerDialog::OnOKUI(wxUpdateUIEvent& event)
 {
-    IGxObject* pObj = GetLocation();
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(GetLocation());
     bool bEnable = false;
     if(m_pTree) 
-        bEnable = m_pTree->CanChooseObject(pObj);
+        bEnable = m_pTree->CanChooseObject(pGxObject.get());
     event.Enable(bEnable);
 }
 

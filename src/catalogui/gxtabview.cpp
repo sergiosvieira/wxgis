@@ -161,10 +161,7 @@ void wxGxTab::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	//select in tree ctrl
 	if(nInitiator != TREECTRLID && nInitiator != LISTCTRLID)
 	{
-		IGxObject* pGxObj = Selection->GetLastSelectedObject();
-		if(pGxObj == NULL)
-			return;
-		Selection->Select(pGxObj , false, GetId());
+		Selection->Select(Selection->GetLastSelectedObjectID() , false, GetId());
 		return;
 	}
 

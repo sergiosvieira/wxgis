@@ -3,7 +3,7 @@
  * Purpose:  wxGxContentView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -50,12 +50,15 @@ int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
 	wxGxContentView::LPITEMDATA pItem1 = (wxGxContentView::LPITEMDATA)item1;
  	wxGxContentView::LPITEMDATA pItem2 = (wxGxContentView::LPITEMDATA)item2;
     LPSORTDATA psortdata = (LPSORTDATA)sortData;
+    IGxObjectSPtr pGxObject1 = psortdata->pCatalog->GetRegisterObject(pItem1->nObjectID);
+    IGxObjectSPtr pGxObject2 = psortdata->pCatalog->GetRegisterObject(pItem2->nObjectID);
+
     if(psortdata->currentSortCol == 0)
-        return GxObjectCompareFunction(pItem1->pObject, pItem2->pObject, psortdata->bSortAsc);
+        return GxObjectCompareFunction(pGxObject1.get(), pGxObject2.get(), psortdata->bSortAsc);
     else
     {
-	    IGxObjectSort* pGxObjectSort1 = dynamic_cast<IGxObjectSort*>(pItem1->pObject);
-        IGxObjectSort* pGxObjectSort2 = dynamic_cast<IGxObjectSort*>(pItem2->pObject);
+	    IGxObjectSort* pGxObjectSort1 = dynamic_cast<IGxObjectSort*>(pGxObject1.get());
+        IGxObjectSort* pGxObjectSort2 = dynamic_cast<IGxObjectSort*>(pGxObject2.get());
         if(pGxObjectSort1 && !pGxObjectSort2)
 		    return psortdata->bSortAsc == 0 ? 1 : -1;
         if(!pGxObjectSort1 && pGxObjectSort2)
@@ -81,10 +84,10 @@ int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
      //   if(!bDiscConnection1 && bDiscConnection2)
 		   // return psortdata->bSortAsc == 0 ? -1 : 1;
 
-	    bool bContainerDst1 = dynamic_cast<IGxDataset*>(pItem1->pObject);
-        bool bContainerDst2 = dynamic_cast<IGxDataset*>(pItem2->pObject);
-	    bool bContainer1 = dynamic_cast<IGxObjectContainer*>(pItem1->pObject);
-        bool bContainer2 = dynamic_cast<IGxObjectContainer*>(pItem2->pObject);
+	    bool bContainerDst1 = dynamic_cast<IGxDataset*>(pGxObject1.get());
+        bool bContainerDst2 = dynamic_cast<IGxDataset*>(pGxObject2.get());
+	    bool bContainer1 = dynamic_cast<IGxObjectContainer*>(pGxObject1.get());
+        bool bContainer2 = dynamic_cast<IGxObjectContainer*>(pGxObject2.get());
         if(bContainer1 && !bContainerDst1 && bContainerDst2)
 	        return psortdata->bSortAsc == 0 ? 1 : -1;
         if(bContainer2 && !bContainerDst2 && bContainerDst1)
@@ -94,10 +97,9 @@ int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
         if(!bContainer1 && bContainer2)
 	        return psortdata->bSortAsc == 0 ? -1 : 1;
 
-	    return pItem1->pObject->GetCategory().CmpNoCase(pItem2->pObject->GetCategory()) * (psortdata->bSortAsc == 0 ? -1 : 1);
+	    return pGxObject1->GetCategory().CmpNoCase(pGxObject2->GetCategory()) * (psortdata->bSortAsc == 0 ? -1 : 1);
     }
     return 0;
-//        return GxObjectCompareFunction(pItem1->pObject, pItem2->pObject, psortdata->bSortAsc);
 }
 
 wxGxContentView::wxGxContentView(void)
@@ -106,7 +108,7 @@ wxGxContentView::wxGxContentView(void)
 }
 
 wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
-wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(enumGISCVList), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(-1), m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL), m_bDragging(false), m_pDeleteCmd(NULL)
+wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(enumGISCVList), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(-1), m_nParentGxObjectID(wxNOT_FOUND), m_currentSortCol(0), m_pSelection(NULL), m_bDragging(false), m_pDeleteCmd(NULL)
 {
     m_HighLightItem = wxNOT_FOUND;
 
@@ -148,7 +150,7 @@ bool wxGxContentView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos
     m_current_style = enumGISCVList;
     m_pConnectionPointCatalog = NULL;
     m_ConnectionPointCatalogCookie = -1;
-    m_pParentGxObject = NULL;
+    m_nParentGxObjectID = wxNOT_FOUND;
     m_currentSortCol = 0;
     m_pSelection = NULL;
     m_bDragging = false;
@@ -282,7 +284,7 @@ void wxGxContentView::AddObject(IGxObject* pObject)
 	int pos = GetIconPos(icon_small, icon_large);
 
 	LPITEMDATA pData = new _itemdata;
-	pData->pObject = pObject;
+	pData->nObjectID = pObject->GetID();
 	pData->iImageIndex = pos;
 
     wxString sName;
@@ -310,13 +312,10 @@ void wxGxContentView::AddObject(IGxObject* pObject)
 void wxGxContentView::OnColClick(wxListEvent& event)
 {
     //event.Skip();
-	//int col = event.GetColumn();
-	//if(col != 0)
-	//   return;
     m_currentSortCol = event.GetColumn();
 	m_bSortAsc = !m_bSortAsc;
 
-    SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
+    SORTDATA sortdata = {m_bSortAsc, m_currentSortCol, m_pCatalog};
 	SortItems(MyCompareFunction, (long)&sortdata);
 	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 }
@@ -354,7 +353,7 @@ void wxGxContentView::OnSelected(wxListEvent& event)
 	    if(pItemData == NULL)
             continue;
 		nCount++;
-        m_pSelection->Select(pItemData->pObject, true, NOTFIRESELID);
+        m_pSelection->Select(pItemData->nObjectID, true, NOTFIRESELID);
     }
 	if(	m_pNewMenu )
 	{
@@ -391,13 +390,13 @@ void wxGxContentView::OnDeselected(wxListEvent& event)
 {
 	//event.Skip();
     if(GetSelectedItemCount() == 0)
-        m_pSelection->Select(m_pParentGxObject, false, NOTFIRESELID);
+        m_pSelection->Select(m_nParentGxObjectID, false, NOTFIRESELID);
 
 	LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
 	if(pItemData == NULL)
 		return;
 
-	m_pSelection->Unselect(pItemData->pObject, NOTFIRESELID);
+	m_pSelection->Unselect(pItemData->nObjectID, NOTFIRESELID);
 	if(	m_pNewMenu )
 	{
 		if(GetSelectedItemCount() > 0)
@@ -416,7 +415,9 @@ void wxGxContentView::ShowContextMenu(const wxPoint& pos)
     item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if(item == -1)
 	{
-		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(m_pParentGxObject);
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_nParentGxObjectID);
+
+		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
         if(pGxObjectUI)
         {
             wxString psContextMenu = pGxObjectUI->ContextMenu();
@@ -437,9 +438,10 @@ void wxGxContentView::ShowContextMenu(const wxPoint& pos)
 	if(pItemData != NULL)
 	{
         bool bAdd = true;
-        m_pSelection->Select(pItemData->pObject, bAdd, NOTFIRESELID);
+        m_pSelection->Select(pItemData->nObjectID, bAdd, NOTFIRESELID);
 
-		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pItemData->pObject);
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pItemData->nObjectID);
+		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
 		if(pGxObjectUI != NULL)
 		{
             wxString psContextMenu = pGxObjectUI->ContextMenu();
@@ -477,17 +479,16 @@ void wxGxContentView::OnActivated(wxListEvent& event)
 	if(pItemData == NULL)
 		return;
 
-	IGxObjectWizard* pGxObjectWizard = dynamic_cast<IGxObjectWizard*>(pItemData->pObject);
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pItemData->nObjectID);
+	IGxObjectWizard* pGxObjectWizard = dynamic_cast<IGxObjectWizard*>(pGxObject.get());
 	if(pGxObjectWizard != NULL)
 		if(!pGxObjectWizard->Invoke(this))
 			return;
 
 	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pItemData->pObject);
-	if(pGxObjectContainer != NULL )//&& pGxObjectContainer->HasChildren() )
+	if( pGxObjectContainer != NULL )
 	{
-    //  m_pApplication->GetCatalog()->SetLocation(pItemData->pObject->GetFullName());
-		m_pSelection->Select(pItemData->pObject, false, GetId());
-	//	m_pCatalog->OnSelectObject(pItemData->pObject);
+		m_pSelection->Select(pItemData->nObjectID, false, GetId());
 	}
 }
 
@@ -536,43 +537,6 @@ void wxGxContentView::SetStyle(wxGISEnumContentsViewStyle style)
 #endif
 }
 
-//void wxGxContentView::UpdateSelection(void)
-//{
-//	//m_critsect_sel.Enter();
-//	//m_Selection.clear();
-//	//long item = -1;
-// //   while(1)
-// //   {
-// //       item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-//	//	if(item == -1)
-//	//		break;
-//	//	LPITEMDATA pData = (LPITEMDATA)GetItemData(item);
-//	//	if(pData != NULL && pData->pObject != NULL)
-//	//		m_Selection.push_back(pData->pObject);
-// //   }
-//
-//	//if(m_Selection.size() == 0)
-//	//	m_Selection.push_back(m_pParentObject);
-//	//m_critsect_sel.Leave();
-//}
-
-//void wxGxContentView::RenameSelection(void)
-//{
-//	if(m_Selection.size() == 0)
-//		return;
-//	long item;// = m_ListMap[m_Selection[0]];
-//	for(long i = 0; i < GetItemCount(); i++)
-//	{
-//		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
-//		if(pItemData == NULL)
-//			continue;
-//		if(pItemData->pObject != m_Selection[0])
-//			continue;
-//		EditLabel(i);
-//		return;
-//	}
-//}
-
 void wxGxContentView::OnBeginLabelEdit(wxListEvent& event)
 {
 	LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
@@ -581,7 +545,9 @@ void wxGxContentView::OnBeginLabelEdit(wxListEvent& event)
 		event.Veto();
 		return;
 	}
-	IGxObjectEdit* pObjEdit =  dynamic_cast<IGxObjectEdit*>(pItemData->pObject);
+    
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pItemData->nObjectID);
+	IGxObjectEdit* pObjEdit =  dynamic_cast<IGxObjectEdit*>(pGxObject.get());
 	if(pObjEdit == NULL)
 	{
 		event.Veto();
@@ -608,7 +574,9 @@ void wxGxContentView::OnEndLabelEdit(wxListEvent& event)
 			event.Veto();
 			return;
 		}
-		IGxObjectEdit* pObjEdit =  dynamic_cast<IGxObjectEdit*>(pItemData->pObject);
+        
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pItemData->nObjectID);
+		IGxObjectEdit* pObjEdit =  dynamic_cast<IGxObjectEdit*>(pGxObject.get());
 		if(pObjEdit == NULL)
 		{
 			event.Veto();
@@ -622,18 +590,19 @@ void wxGxContentView::OnEndLabelEdit(wxListEvent& event)
 	}
 }
 
-void wxGxContentView::OnObjectAdded(IGxObject* pObj)
+void wxGxContentView::OnObjectAdded(long nObjectID)
 {
-	if(pObj->GetParent() == m_pParentGxObject)
+	if(nObjectID == m_nParentGxObjectID)
     {
-		AddObject(pObj);
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
+		AddObject(pGxObject.get());
         SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
 	    SortItems(MyCompareFunction, (long)&sortdata);
 	    //SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
     }
 }
 
-void wxGxContentView::OnObjectDeleted(IGxObject* pObj)
+void wxGxContentView::OnObjectDeleted(long nObjectID)
 {
     //wxCriticalSectionLocker locker(m_CritSectCont);
 	for(long i = 0; i < GetItemCount(); i++)
@@ -641,7 +610,7 @@ void wxGxContentView::OnObjectDeleted(IGxObject* pObj)
 		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
 		if(pItemData == NULL)
 			continue;
-		if(pItemData->pObject != pObj)
+		if(pItemData->nObjectID != nObjectID)
 			continue;
         SetItemData(i, NULL);
 		//delete pItemData;
@@ -652,11 +621,12 @@ void wxGxContentView::OnObjectDeleted(IGxObject* pObj)
 	}
 }
 
-void wxGxContentView::OnObjectChanged(IGxObject* pObj)
+void wxGxContentView::OnObjectChanged(long nObjectID)
 {
-    if(pObj == m_pParentGxObject)
+    if(nObjectID == m_nParentGxObjectID)
 	{
-		IGxObjectContainer* pObjectContainer = dynamic_cast<IGxObjectContainer*>(pObj);
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
+		IGxObjectContainer* pObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 		if(pObjectContainer != NULL)
 		{
 			if(GetItemCount() > 0 && !pObjectContainer->HasChildren())
@@ -669,16 +639,16 @@ void wxGxContentView::OnObjectChanged(IGxObject* pObj)
 		}
 	}
 
-    //wxCriticalSectionLocker locker(m_CritSectCont);
 	for(long i = 0; i < GetItemCount(); i++)
 	{
 		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
 		if(pItemData == NULL)
 			continue;
-		if(pItemData->pObject != pObj)
+		if(pItemData->nObjectID != nObjectID)
 			continue;
 	
-		IGxObjectUI* pObjUI =  dynamic_cast<IGxObjectUI*>(pItemData->pObject);
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
+		IGxObjectUI* pObjUI =  dynamic_cast<IGxObjectUI*>(pGxObject.get());
 		wxIcon icon_small, icon_large;
 		if(pObjUI != NULL)
 		{
@@ -706,16 +676,17 @@ void wxGxContentView::OnObjectChanged(IGxObject* pObj)
 	wxListCtrl::Refresh();
 }
 
-void wxGxContentView::OnObjectRefreshed(IGxObject* pObj)
+void wxGxContentView::OnObjectRefreshed(long nObjectID)
 {
-    if(m_pParentGxObject == pObj)
+    if(m_nParentGxObjectID == nObjectID)
         OnRefreshAll();
 }
 
 void wxGxContentView::OnRefreshAll(void)
 {
     ResetContents();
-	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(m_pParentGxObject);
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_nParentGxObjectID);
+	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 	if(pObjContainer == NULL || !pObjContainer->HasChildren())
 		return;
 	GxObjectArray* pArr = pObjContainer->GetChildren();
@@ -735,15 +706,16 @@ void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiato
 {
 	if(nInitiator == GetId())
 		return;
-	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
-	if(m_pParentGxObject == pGxObj)
+    
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_pSelection->GetLastSelectedObjectID());
+	if(!pGxObject || m_nParentGxObjectID == pGxObject->GetID())
 		return;
 
 	//reset
 	ResetContents();
-	m_pParentGxObject = pGxObj;
+	m_nParentGxObjectID = pGxObject->GetID();
 
-	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(pGxObj);
+	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 	if(pObjContainer == NULL || !pObjContainer->HasChildren())
 		return;
 
@@ -765,7 +737,8 @@ bool wxGxContentView::Applies(IGxSelection* Selection)
 
 	for(size_t i = 0; i < Selection->GetCount(); i++)
 	{
-		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>( Selection->GetSelectedObjects(i) );
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(Selection->GetSelectedObjectID(i));
+		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>( pGxObject.get() );
 		if(pGxObjectContainer != NULL)
 			return true;
 	}
@@ -792,9 +765,10 @@ void wxGxContentView::OnBeginDrag(wxListEvent& event)
         LPITEMDATA pItemData = (LPITEMDATA)GetItemData(nItem);
 	    if(pItemData == NULL)
             continue;
-        if(!pItemData->pObject)
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pItemData->nObjectID);
+        if(!pGxObject)
             continue;
-        wxString sSystemPath(pItemData->pObject->GetInternalName(), wxConvUTF8);
+        wxString sSystemPath(pGxObject->GetInternalName(), wxConvUTF8);
         my_data.AddFile(sSystemPath);
         nCount++;
     }
@@ -834,17 +808,17 @@ void wxGxContentView::OnChar(wxKeyEvent& event)
     }
 }
 
-void wxGxContentView::BeginRename(IGxObject* pGxObject)
+void wxGxContentView::BeginRename(long nObjectID)
 {
 	for(long i = 0; i < GetItemCount(); i++)
 	{
 		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
 		if(pItemData == NULL)
 			continue;
-		if(pItemData->pObject == pGxObject)
+		if(pItemData->nObjectID == nObjectID)
         {
             SetItemState(i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-            m_pSelection->Select(pGxObject, true, NOTFIRESELID);
+            m_pSelection->Select(nObjectID, true, NOTFIRESELID);
             goto EDIT;
         }
     }
@@ -924,11 +898,15 @@ bool wxGxContentView::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& fil
     wxPoint pt(x, y);
 	unsigned long nFlags(0);
 	long nItemId = HitTest(pt, (int &)nFlags);
-    IGxObject* pObject = m_pParentGxObject;
+    long nObjectID(m_nParentGxObjectID);
 	if(nItemId != wxNOT_FOUND && (nFlags & wxLIST_HITTEST_ONITEM))
-		pObject = (IGxObject*)GetItemData(nItemId);
+    {
+        LPITEMDATA pItemData = (LPITEMDATA)GetItemData(nItemId);
+        nObjectID = pItemData->nObjectID;
+    }
 
-    IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pObject);
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
+    IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pGxObject.get());
     if(pTarget == NULL)
 	    return false;
     return pTarget->Drop(filenames, bMove);

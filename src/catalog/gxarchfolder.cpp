@@ -97,7 +97,7 @@ bool wxGxArchive::Rename(wxString NewName)
 		m_sPath = szType;
         m_sPath += szNewPath;
 		m_sName = NewName;
-		m_pCatalog->ObjectChanged(this);
+		m_pCatalog->ObjectChanged(GetID());
 		Refresh();
 		return true;
 	}
