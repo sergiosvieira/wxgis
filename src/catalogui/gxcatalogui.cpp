@@ -197,9 +197,11 @@ void wxGxCatalogUI::Undo(int nPos)
 {
     if(m_pSelection->CanUndo())
     {
-        wxString sPath = m_pSelection->Undo(nPos);
-        if(!sPath.IsEmpty())
-            SetLocation(sPath);
+        long nID = m_pSelection->Undo(nPos);
+        if(nID != wxNOT_FOUND && GxObjectMap[nID] != NULL)
+		{
+			m_pSelection->Select(GxObjectMap[nID], false, IGxSelection::INIT_ALL);
+		}
     }
 }
 
@@ -207,9 +209,11 @@ void wxGxCatalogUI::Redo(int nPos)
 {
     if(m_pSelection->CanRedo())
     {
-        wxString sPath = m_pSelection->Redo(nPos);
-        if(!sPath.IsEmpty())
-           SetLocation(sPath);
+        long nID = m_pSelection->Redo(nPos);
+        if(nID != wxNOT_FOUND && GxObjectMap[nID] != NULL)
+		{
+			m_pSelection->Select(GxObjectMap[nID], false, IGxSelection::INIT_ALL);
+		}
     }
 }
 
@@ -222,3 +226,5 @@ wxIcon wxGxCatalogUI::GetSmallImage(void)
 {
     return wxIcon(mainframe_xpm);
 }
+
+

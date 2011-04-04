@@ -68,13 +68,6 @@ void wxGxDiscConnectionsUI::EmptyChildren(void)
             CONN_DATA data = {pwxGxDiscConnection->GetName(), pwxGxDiscConnection->GetInternalName()};
             m_aConnections.push_back(data);
         }
-        wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pCatalog);
-        if(pCatalog)
-        {
-            IGxSelection* pSel = pCatalog->GetSelection();
-            if(pSel)
-                pSel->Unselect(m_Children[i], IGxSelection::INIT_ALL);
-        }
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
 	}

@@ -38,8 +38,6 @@ public:
     virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode);
 	//wxRxMonitoringDatabases
 	virtual bool LoadChildren(void);
-    //wxRxObjectContainer
-    virtual bool DeleteChild(IGxObject* pChild);
 protected:
     wxGxPendingUI* m_pGxPendingUI;
 };

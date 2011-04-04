@@ -3,7 +3,7 @@
  * Purpose:  wxGxSelection class. Selection of IGxObjects in tree or list views
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,14 +20,12 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxselection.h"
 
-wxGxSelection::wxGxSelection(void) : m_Pos(-1), m_bDoOp(false), m_currentInitiator(-1)
+wxGxSelection::wxGxSelection(void) : m_nPos(wxNOT_FOUND), m_bDoOp(false), m_currentInitiator(wxNOT_FOUND)
 {
 }
 
 wxGxSelection::~wxGxSelection(void)
 {
-	for(std::map<long, GxObjectArray*>::iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
-		wxDELETE(CI->second);
 }
 
 long wxGxSelection::Advise(wxObject* pObject)
@@ -38,35 +36,20 @@ long wxGxSelection::Advise(wxObject* pObject)
 	return IConnectionPointContainer::Advise(pObject);
 }
 
-void wxGxSelection::Select( IGxObject* pObject,  bool appendToExistingSelection, long nInitiator)
+void wxGxSelection::Select( long nObjectID,  bool appendToExistingSelection, long nInitiator )
 {
-    //test if already selected
     m_CritSect.Enter();
-    if(m_SelectionMap[nInitiator] == NULL)
-        m_SelectionMap[nInitiator] = new GxObjectArray;
 
     //check for duplicates
-    for(size_t i = 0; i < m_SelectionMap[nInitiator]->size(); i++)
-    {
-        if(m_SelectionMap[nInitiator]->at(i) == pObject)
-        {
-            m_CritSect.Leave();
-	        //not fire event id NOTFIRESELID
-	        if(nInitiator != NOTFIRESELID)
-                goto END;
-            return;
-        }
-    }
-
-
-    //if(m_SelectionMap[nInitiator]->size() > 0 && m_SelectionMap[nInitiator]->at(m_SelectionMap[nInitiator]->size() - 1) == pObject)
-    //{
-    //    m_CritSect.Leave();
-	   // //not fire event id NOTFIRESELID
-	   // if(nInitiator != NOTFIRESELID)
-    //        goto END;
-    //    return;
-    //}
+	int nIndex = m_SelectionMap[nInitiator].Index(nObjectID);
+	if(nIndex != wxNOT_FOUND)
+	{
+        m_CritSect.Leave();
+        //not fire event id NOTFIRESELID
+        if(nInitiator != NOTFIRESELID)
+            goto END;
+        return;
+	}
     m_currentInitiator = nInitiator;
 
     m_CritSect.Leave();
@@ -75,9 +58,7 @@ void wxGxSelection::Select( IGxObject* pObject,  bool appendToExistingSelection,
 	    Clear(nInitiator);
 
 	m_CritSect.Enter();
-    if(m_SelectionMap[nInitiator] == NULL)
-	    m_SelectionMap[nInitiator] = new GxObjectArray;
-    m_SelectionMap[nInitiator]->push_back(pObject);
+	m_SelectionMap[nInitiator].Add( nObjectID );
     m_CritSect.Leave();
 
 	//not fire event id NOTFIRESELID
@@ -85,10 +66,9 @@ void wxGxSelection::Select( IGxObject* pObject,  bool appendToExistingSelection,
 		return;
 
     //
-    Do(pObject);
+    Do( nObjectID );
 
 	//fire event
-	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
 END:
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
@@ -104,23 +84,20 @@ void wxGxSelection::SetInitiator(long nInitiator)
 	m_currentInitiator = nInitiator;
 }
 
-void wxGxSelection::Select( IGxObject* pObject)
+void wxGxSelection::Select( long nObjectID )
 {
     m_CritSect.Enter();
 	m_currentInitiator = INIT_ALL;
 	Clear(INIT_ALL);
 
-	if(m_SelectionMap[INIT_ALL] == NULL)
-		m_SelectionMap[INIT_ALL] = new GxObjectArray;
     //check for duplicates
-    for(size_t i = 0; i < m_SelectionMap[INIT_ALL]->size(); i++)
-        if(m_SelectionMap[INIT_ALL]->at(i) == pObject)
-            return;
-	m_SelectionMap[INIT_ALL]->push_back(pObject);
+	int nIndex = m_SelectionMap[INIT_ALL].Index(nObjectID);
+	if(nIndex != wxNOT_FOUND)
+        return;
+	m_SelectionMap[INIT_ALL].Add(nObjectID);
     m_CritSect.Leave();
 
 	//fire event
-	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
 		IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pPointsArray[i]);
@@ -129,65 +106,25 @@ void wxGxSelection::Select( IGxObject* pObject)
 	}
 }
 
-void wxGxSelection::Unselect(IGxObject* pObject, long nInitiator)
+void wxGxSelection::Unselect( long nObjectID, long nInitiator )
 {
-	if(pObject == NULL)
-		return;
-
-    GxObjectArray::iterator pos;
-
-    m_CritSect.Enter();
+    wxCriticalSectionLocker locker(m_CritSect);
 	if(nInitiator == INIT_ALL)
 	{
-		for(std::map<long, GxObjectArray*>::const_iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
+		for(std::map<long, wxSelLongArray>::const_iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
 		{
-			GxObjectArray::iterator pos = std::find(CI->second->begin(), CI->second->end(), pObject);
-			if(pos != CI->second->end())
-				CI->second->erase(pos);
+			int nIndex = CI->second.Index(nObjectID);
+			if(nIndex != wxNOT_FOUND)
+				CI->second.Remove(nIndex);
 		}
 	}
+	else
+	{
 
-    if(m_SelectionMap[nInitiator] == NULL)
-    {
-        m_CritSect.Leave();
-		return;
-    }
-
-	pos = std::find(m_SelectionMap[nInitiator]->begin(), m_SelectionMap[nInitiator]->end(), pObject);
-	if(pos != m_SelectionMap[nInitiator]->end())
-		m_SelectionMap[nInitiator]->erase(pos);
-    m_CritSect.Leave();
-
-
-    wxCriticalSectionLocker locker(m_DoCritSect);
-    for(size_t i = 0; i < m_DoArray.GetCount(); i++)
-    {
-        if(m_DoArray[i] == pObject->GetFullName())
-        {
-            m_DoArray.RemoveAt(i);
-            i--;
-        }
-    }
-    		//while((pos = std::find(m_DoArray.begin(), m_DoArray.end(), pObject)) != m_DoArray.end())
-  //      {
-  //          if(m_Pos > m_DoArray.begin() - pos)
-  //              m_Pos--;
-		//	m_DoArray.erase(pos);
-  //      }
-
-
-	////not fire event id NOTFIRESELID
-	//if(nInitiator == NOTFIRESELID)
-	//	return;
-
-	////fire event
-	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
-	//for(size_t i = 0; i < m_pPointsArray.size(); i++)
-	//{
-	//	IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pPointsArray[i]);
-	//	if(pGxSelectionEvents != NULL)
-	//		pGxSelectionEvents->OnSelectionChanged(this, nInitiator);
-	//}
+		int nIndex = m_SelectionMap[nInitiator].Index(nObjectID);
+		if(nIndex != wxNOT_FOUND)
+			m_SelectionMap[nInitiator].Remove(nIndex);
+	}
 }
 
 void wxGxSelection::Clear(long nInitiator)
@@ -196,119 +133,89 @@ void wxGxSelection::Clear(long nInitiator)
 	if(nInitiator == INIT_ALL)
 	{
 		for(std::map<long, GxObjectArray*>::const_iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
-            if(CI->second)
-                CI->second->clear();
-		return;
+			CI->second.Clear();
 	}
-	if(m_SelectionMap[nInitiator] != NULL)
-		m_SelectionMap[nInitiator]->clear();
-	//fire event
-	//wxCriticalSectionLocker locker(m_PointsArrayCriticalSection);
-	//for(size_t i = 0; i < m_pPointsArray.size(); i++)
-	//{
-	//	IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pPointsArray[i]);
-	//	if(pGxSelectionEvents != NULL)
-	//		pGxSelectionEvents->OnSelectionChanged(this, nInitiator);
-	//}
+	else
+	{
+		m_SelectionMap[nInitiator].Clear();
+	}
 }
 
 size_t wxGxSelection::GetCount(void)
 {
-    wxCriticalSectionLocker locker(m_CritSect);
-	if(m_currentInitiator == INIT_NONE || m_SelectionMap[m_currentInitiator] == NULL)
+	if(m_currentInitiator == INIT_NONE)
 		return 0;
 	else
-		return m_SelectionMap[m_currentInitiator]->size();
+		return GetCount(m_currentInitiator);
 }
 
 size_t wxGxSelection::GetCount(long nInitiator)
 {
     wxCriticalSectionLocker locker(m_CritSect);
-	if(m_SelectionMap[nInitiator] == NULL)
-		return 0;
-	else
-		return m_SelectionMap[nInitiator]->size();
+	return m_SelectionMap[nInitiator].GetCount();
 }
 
-
-IGxObject* wxGxSelection::GetLastSelectedObject(void)
+long wxGxSelection::GetLastSelectedObjectID(void)
 {
     wxCriticalSectionLocker locker(m_CritSect);
-	if(m_currentInitiator == INIT_NONE || m_SelectionMap[m_currentInitiator] == NULL)
-		return NULL;
-    if(m_SelectionMap[m_currentInitiator]->size() == 0)
-		return NULL;
-
-    return m_SelectionMap[m_currentInitiator]->at(m_SelectionMap[m_currentInitiator]->size() - 1);
+	if(m_currentInitiator == INIT_NONE || m_SelectionMap[nInitiator].GetCount() == 0)
+		return wxNOT_FOUND;
+    return m_SelectionMap[m_currentInitiator].Last();
 }
 
-IGxObject* wxGxSelection::GetSelectedObjects(size_t nIndex)
+long wxGxSelection::GetSelectedObjectID(size_t nIndex)
 {
     wxCriticalSectionLocker locker(m_CritSect);
-	if(m_currentInitiator == INIT_NONE || m_SelectionMap[m_currentInitiator] == NULL)
-		return NULL;
+	if(m_currentInitiator == INIT_NONE)
+		return wxNOT_FOUND;   
 
-    if(!m_SelectionMap[m_currentInitiator])
-        return NULL;
-
-    if(m_SelectionMap[m_currentInitiator]->size() == 0)
-        return NULL;
-
-    if(m_SelectionMap[m_currentInitiator]->size() - 1 >= nIndex)
-        return m_SelectionMap[m_currentInitiator]->at(nIndex);
-
-    return NULL;
+    return GetSelectedObject(m_currentInitiator);
 }
 
-IGxObject* wxGxSelection::GetSelectedObjects(long nInitiator, size_t nIndex)
+long wxGxSelection::GetSelectedObjectID(long nInitiator, size_t nIndex)
 {
-   wxCriticalSectionLocker locker(m_CritSect);
-   if(m_SelectionMap[nInitiator])
-   {
-        if(m_SelectionMap[m_currentInitiator]->size() == 0)
-            return NULL;
-        if(m_SelectionMap[nInitiator]->size() - 1 >= nIndex)
-            return m_SelectionMap[nInitiator]->at(nIndex);
-   }
-    else
-        return NULL;
+	wxCriticalSectionLocker locker(m_CritSect);
+	if(m_SelectionMap[m_currentInitiator].GetCount() == 0)
+		return wxNOT_FOUND;
+	if(m_SelectionMap[nInitiator].GetCount() - 1 >= nIndex)
+		return m_SelectionMap[nInitiator].Item(nIndex);
+	return wxNOT_FOUND;
 }
 
-void wxGxSelection::Do(IGxObject* pObject)
+void wxGxSelection::Do( long nObjectID )
 {
     wxCriticalSectionLocker locker(m_DoCritSect);
-    if(m_pPrevObject == pObject)
+    if( m_pPrevID == nObjectID )
         return;
 
-    m_pPrevObject = pObject;
+    m_pPrevID = nObjectID;
 
-    if(m_bDoOp || pObject == NULL)
+    if(m_bDoOp)
     {
         m_bDoOp = false;
         return;
     }
 
-    if(!m_DoArray.IsEmpty())
-        if(m_DoArray.Last() == pObject->GetFullName())
+    if( !m_DoArray.IsEmpty() )
+        if( m_DoArray.Last() == nObjectID )
             return;
-    m_Pos++;
-    if(m_Pos == m_DoArray.GetCount())
-        m_DoArray.Add(pObject->GetFullName());
-    else if(m_Pos > m_DoArray.GetCount())
+    m_nPos++;
+    if(m_nPos == m_DoArray.GetCount())
+        m_DoArray.Add( nObjectID );
+    else if(m_nPos > m_DoArray.GetCount())
     {
-        m_DoArray.Add(pObject->GetFullName());
-        m_Pos = m_DoArray.GetCount() - 1;
+        m_DoArray.Add( nObjectID );
+        m_nPos = m_DoArray.GetCount() - 1;
     }
     else
     {
-	    m_DoArray[m_Pos] = pObject->GetFullName();
-        size_t nCount = m_DoArray.GetCount() - (m_Pos + 1);
+	    m_DoArray[m_nPos] = nObjectID;
+        size_t nCount = m_DoArray.GetCount() - (m_nPos + 1);
         if(nCount == 0)
             nCount = 1;
-        if(m_Pos + 1 < m_DoArray.GetCount() && nCount > 0)
-            m_DoArray.RemoveAt(m_Pos + 1, nCount);
+        if(m_nPos + 1 < m_DoArray.GetCount() && nCount > 0)
+            m_DoArray.RemoveAt(m_nPos + 1, nCount);
     }
-    //Select(pObject);
 }
 
 bool wxGxSelection::CanRedo()
@@ -316,7 +223,7 @@ bool wxGxSelection::CanRedo()
     wxCriticalSectionLocker locker(m_DoCritSect);
     if(m_DoArray.IsEmpty())
 	    return false;
-    return m_Pos < m_DoArray.GetCount() - 1;
+    return m_nPos < m_DoArray.GetCount() - 1;
 }
 
 bool wxGxSelection::CanUndo()
@@ -324,49 +231,43 @@ bool wxGxSelection::CanUndo()
     wxCriticalSectionLocker locker(m_DoCritSect);
     if(m_DoArray.IsEmpty())
 	    return false;
-    return m_Pos > 0;
+    return m_nPos > 0;
 }
 
-wxString wxGxSelection::Redo(int nPos)
+long wxGxSelection::Redo(int nPos)
 {
     wxCriticalSectionLocker locker(m_DoCritSect);
     if(nPos == -1)
-        m_Pos++;
+        m_nPos++;
     else
-        m_Pos = nPos;
-    if(m_Pos < m_DoArray.size())
+        m_nPos = nPos;
+    if(m_nPos < m_DoArray.GetCount())
     {
         m_bDoOp = true;
-        return m_DoArray[m_Pos];
-	    //IGxObject* pObject = m_DoArray[m_Pos];
-	    //Select(pObject);
-  //      m_bDoOp = false;
+        return m_DoArray[m_nPos];
     }
-    return wxEmptyString;
+    return wxNOT_FOUND;
 }
 
-wxString wxGxSelection::Undo(int nPos)
+long wxGxSelection::Undo(int nPos)
 {
     wxCriticalSectionLocker locker(m_DoCritSect);
     if(nPos == -1)
-        m_Pos--;
+        m_nPos--;
     else
-        m_Pos = nPos;
-    if(m_Pos > -1)
+        m_nPos = nPos;
+    if(m_nPos > -1)
     {
         m_bDoOp = true;
-        return m_DoArray[m_Pos];
-	    //IGxObject* pObject = m_DoArray[m_Pos];
-	    //Select(pObject);
-  //      m_bDoOp = false;
+        return m_DoArray[m_nPos];
     }
-    return wxEmptyString;
+    return wxNOT_FOUND;
 }
 
-void wxGxSelection::RemoveDo(wxString sPath)
+void wxGxSelection::RemoveDo(long nObjectID)
 {
     wxCriticalSectionLocker locker(m_DoCritSect);
-    for(size_t i = 0; i < m_DoArray.size(); i++)
+    for(size_t i = 0; i < m_DoArray.GetCount(); i++)
     {
         //clean from doubles
         if(i > 0 && m_DoArray[i - 1] == m_DoArray[i])
@@ -374,7 +275,7 @@ void wxGxSelection::RemoveDo(wxString sPath)
             m_DoArray.RemoveAt(i);
             i--;
         }
-        if(m_DoArray[i] == sPath)
+        if(m_DoArray[i] == nObjectID)
         {
             m_DoArray.RemoveAt(i);
             i--;
@@ -387,7 +288,7 @@ void wxGxSelection::Reset()
     wxCriticalSectionLocker locker(m_DoCritSect);
     m_DoArray.Clear();
     m_bDoOp = false;
-    m_Pos = -1;
+    m_nPos = -1;
 }
 
 size_t wxGxSelection::GetDoSize()
@@ -396,10 +297,10 @@ size_t wxGxSelection::GetDoSize()
     return m_DoArray.GetCount();
 }
 
-wxString wxGxSelection::GetDoPath(size_t nIndex)
+long wxGxSelection::GetDoID(size_t nIndex)
 {
     wxCriticalSectionLocker locker(m_DoCritSect);
     if(nIndex > m_DoArray.GetCount() - 1)
-        return wxEmptyString;
+        return wxNOT_FOUND;
     return m_DoArray[nIndex];
 }

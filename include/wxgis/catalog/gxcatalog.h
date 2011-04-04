@@ -59,6 +59,9 @@ public:
 	virtual void ObjectRefreshed(IGxObject* const pObject);
 	virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true);
 	virtual void DisconnectFolder(CPLString sPath);
+	virtual void RegisterObject(IGxObject* pObj);
+	virtual void UnRegisterObject(long nID);
+	virtual IGxObjectSPtr GetRegisterObject(long nID);
 	//IConnectionPointContainer
 	virtual long Advise(wxObject* pObject);
 	//wxGxCatalog
@@ -70,11 +73,12 @@ public:
 	virtual void Init(void);
     virtual void SerializePlugins(wxXmlNode* const pNode, bool bStore = false);
 	virtual void EnableRootItem(IGxObject* pRootItem, bool bEnable);
-
 protected:
 	bool m_bIsChildrenLoaded;
 	wxArrayString m_CatalogRootItemArray;
     wxGxDiscConnections* m_pGxDiscConnections;
+	long m_nGlobalID;
+	wxCriticalSection m_RegCritSect;
 };
 
 //WXDLL_ENTRY_FUNCTION();

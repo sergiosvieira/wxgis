@@ -26,7 +26,7 @@
 // ----------------------------------------------------------------------------
 
 
-wxGxCatalog::wxGxCatalog(void) : m_bIsChildrenLoaded(false), m_pGxDiscConnections(NULL)
+wxGxCatalog::wxGxCatalog(void) : m_bIsChildrenLoaded(false), m_pGxDiscConnections(NULL), m_nGlobalID(0)
 {
 	m_pCatalog = this;
 	m_pParent = NULL;
@@ -430,4 +430,28 @@ void wxGxCatalog::EnableRootItem(IGxObject* pRootItem, bool bEnable)
         }
         m_aRootItems.push_back(pRootItem);
     }
+}
+
+void wxGxCatalog::RegisterObject(IGxObject* pObj)
+{
+	wxCriticalSectionLocker locker(m_RegCritSect);
+	pObj->SetID(m_nGlobalID);
+	GxObjectMap[m_nGlobalID] = pObj;
+	m_nGlobalID++;
+}
+
+void wxGxCatalog::UnRegisterObject(long nID)
+{
+	wxCriticalSectionLocker locker(m_RegCritSect);
+	GxObjectMap[nID] = NULL;
+}
+
+IGxObjectSPtr wxGxCatalog::GetRegisterObject(long nID)
+{
+	if(GxObjectMap[nID] != NULL)
+	{
+		GxObjectMap[nID]->Lock();
+		return IGxObjectSPtr(GxObjectMap[nID], GxObjectDeleter);
+	}
+	return IGxObjectSPtr();
 }

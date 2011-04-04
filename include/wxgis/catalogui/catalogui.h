@@ -3,7 +3,7 @@
  * Purpose:  wxCatalogUI main header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -70,6 +70,8 @@ public:
 	virtual void EditProperties(wxWindow *parent){};
 };
 
+WX_DEFINE_ARRAY_INT(long, wxSelLongArray);
+
 class IGxSelection
 {
 public:
@@ -79,28 +81,27 @@ public:
 		INIT_NONE = -1
 	} Initiator;
 	virtual ~IGxSelection(void){};
-	virtual void Select( IGxObject* pObject,  bool appendToExistingSelection, long nInitiator ) = 0;
-	virtual void Select( IGxObject* pObject) = 0;
-	virtual void Unselect(IGxObject* pObject, long nInitiator) = 0;
+	virtual void Select( long nObjectID,  bool appendToExistingSelection, long nInitiator ) = 0;
+	virtual void Select( long nObjectID ) = 0;
+	virtual void Unselect( long nObjectID, long nInitiator) = 0;
 	virtual void Clear(long nInitiator) = 0;
 	virtual size_t GetCount(void) = 0;
 	virtual size_t GetCount(long nInitiator) = 0;
-	virtual IGxObject* GetSelectedObjects(size_t nIndex) = 0;
-	virtual IGxObject* GetSelectedObjects(long nInitiator, size_t nIndex) = 0;
-	virtual IGxObject* GetLastSelectedObject(void) = 0;
+	virtual long GetSelectedObjectID(size_t nIndex) = 0;
+	virtual long GetSelectedObjectID(long nInitiator, size_t nIndex) = 0;
+	virtual long GetLastSelectedObjectID(void) = 0;
 	virtual void SetInitiator(long nInitiator) = 0;
-    virtual void Do(IGxObject* pObject) = 0;
+    virtual void Do( long nObjectID ) = 0;
     virtual bool CanRedo() = 0;
 	virtual bool CanUndo() = 0;
 	virtual void RemoveDo(wxString sPath) = 0;
-    virtual wxString Redo(int nPos = -1) = 0;
-    virtual wxString Undo(int nPos = -1) = 0;
+    virtual long Redo(int nPos = -1) = 0;
+    virtual long Undo(int nPos = -1) = 0;
     virtual void Reset() = 0;
     virtual size_t GetDoSize() = 0;
     virtual int GetDoPos(void) = 0;
-    virtual wxString GetDoPath(size_t nIndex) = 0;
-    virtual void LockChanges() = 0;
-    virtual void UnLockChanges() = 0;
+    virtual long GetDoID(size_t nIndex) = 0;
+    virtual wxSelLongArray GetDoArray(void) = 0;
 };
 
 class IGxSelectionEvents
