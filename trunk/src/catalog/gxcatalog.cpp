@@ -89,7 +89,7 @@ void wxGxCatalog::Refresh(void)
 	for(size_t i = 0; i < m_Children.size(); i++)
 		m_Children[i]->Refresh();
 	if(m_pCatalog)
-		m_pCatalog->ObjectRefreshed(this);
+		m_pCatalog->ObjectRefreshed(GetID());
 }
 
 void wxGxCatalog::EmptyDisabledChildren(void)
@@ -264,43 +264,43 @@ bool wxGxCatalog::GetChildren(CPLString sParentDir, char** &pFileNames, GxObject
 	return true;
 }
 
-void wxGxCatalog::ObjectDeleted(IGxObject* pObject)
+void wxGxCatalog::ObjectDeleted(long nObjectID)
 {
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
 		IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
 		if(pGxCatalogEvents != NULL)
-			pGxCatalogEvents->OnObjectDeleted(pObject);
+			pGxCatalogEvents->OnObjectDeleted(nObjectID);
 	}
 }
 
-void  wxGxCatalog::ObjectAdded(IGxObject* pObject)
+void  wxGxCatalog::ObjectAdded(long nObjectID)
 {
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
 		IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
 		if(pGxCatalogEvents != NULL)
-			pGxCatalogEvents->OnObjectAdded(pObject);
+			pGxCatalogEvents->OnObjectAdded(nObjectID);
 	}
 }
 
-void  wxGxCatalog::ObjectChanged(IGxObject* pObject)
+void  wxGxCatalog::ObjectChanged(long nObjectID)
 {
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
 		IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
 		if(pGxCatalogEvents != NULL)
-			pGxCatalogEvents->OnObjectChanged(pObject);
+			pGxCatalogEvents->OnObjectChanged(nObjectID);
 	}
 }
 
-void  wxGxCatalog::ObjectRefreshed(IGxObject* pObject)
+void  wxGxCatalog::ObjectRefreshed(long nObjectID)
 {
 	for(size_t i = 0; i < m_pPointsArray.size(); i++)
 	{
 		IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
 		if(pGxCatalogEvents != NULL)
-			pGxCatalogEvents->OnObjectRefreshed(pObject);
+			pGxCatalogEvents->OnObjectRefreshed(nObjectID);
 	}
 }
 
@@ -415,7 +415,7 @@ void wxGxCatalog::EnableRootItem(IGxObject* pRootItem, bool bEnable)
             }
         }
         m_Children.push_back(pRootItem);
-        ObjectAdded(pRootItem);
+        ObjectAdded(pRootItem->GetID());
     }
     else        //disable
     {
@@ -424,7 +424,7 @@ void wxGxCatalog::EnableRootItem(IGxObject* pRootItem, bool bEnable)
             if(m_Children[i] == pRootItem)
             {
                 m_Children.erase(m_Children.begin() + i);
-                ObjectDeleted(pRootItem);
+                ObjectDeleted(pRootItem->GetID());
                 break;
             }
         }

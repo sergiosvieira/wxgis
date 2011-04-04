@@ -57,7 +57,7 @@ void wxTreeViewComboPopup::Init()
 void wxTreeViewComboPopup::OnPopup()
 {
    m_bClicked = false;
-   SelectItem(m_TreeMap[m_pSelection->GetLastSelectedObject()]);
+   SelectItem(m_TreeMap[m_pSelection->GetLastSelectedObjectID()]);
    //CaptureMouse();
 }
 
@@ -78,7 +78,7 @@ wxString wxTreeViewComboPopup::GetStringValue() const
 {
     if( m_bClicked == false )
     {
-        IGxObject* pGxObject = m_pSelection->GetLastSelectedObject();
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_pSelection->GetLastSelectedObjectID()));
         if(pGxObject)
             return pGxObject->GetName();
         return wxEmptyString;
@@ -140,18 +140,19 @@ void wxTreeViewComboPopup::OnSelectionChanged(IGxSelection* Selection, long nIni
 	if(nInitiator == GetId())
 		return;
 
-    IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
-	wxTreeItemId ItemId = m_TreeMap[pGxObj];
+    long nSelID = m_pSelection->GetLastSelectedObjectID();
+	wxTreeItemId ItemId = m_TreeMap[nSelID];
 	if(ItemId.IsOk())
 	{
 		SelectItem(ItemId);
 	}
 	else
 	{
-		IGxObject* pParentGxObj = pGxObj->GetParent();
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nSelID);
+		IGxObject* pParentGxObj = pGxObject->GetParent();
 		while(pParentGxObj)
 		{
-			wxTreeItemId ItemId = m_TreeMap[pParentGxObj];
+			wxTreeItemId ItemId = m_TreeMap[pParentGxObj->GetID()];
 			if(ItemId.IsOk())
 			{
 				Expand(ItemId);

@@ -318,7 +318,7 @@ void wxGxTaskObject::SetValue(int value)
         }
     }
     if(m_pCatalog)
-        m_pCatalog->ObjectChanged(this);
+        m_pCatalog->ObjectChanged(GetID());
 }
 
 void wxGxTaskObject::Detach(void)
@@ -381,7 +381,7 @@ bool wxGxTaskObject::StartTask()
     if(m_pToolManager)
         m_pToolManager->StartProcess(m_nTaskID);
     if(m_pCatalog)
-        m_pCatalog->ObjectChanged(this);
+        m_pCatalog->ObjectChanged(GetID());
     return true;
 }
 
@@ -390,7 +390,7 @@ bool wxGxTaskObject::StopTask()
     if(m_pToolManager)
         m_pToolManager->CancelProcess(m_nTaskID);
     if(m_pCatalog)
-        m_pCatalog->ObjectChanged(this);
+        m_pCatalog->ObjectChanged(GetID());
     return true;
 }
 
@@ -406,7 +406,7 @@ void wxGxTaskObject::OnFinish(bool bHasErrors, IGPToolSPtr pTool)
     if(m_pCallBack)
         m_pCallBack->OnFinish(bHasErrors, pTool);
     if(m_pCatalog)
-        m_pCatalog->ObjectChanged(this);
+        m_pCatalog->ObjectChanged(GetID());
 }
 
 void wxGxTaskObject::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType)
@@ -419,7 +419,7 @@ void wxGxTaskObject::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessa
     if(m_pTaskExecDlg)
         m_pTaskExecDlg->PutMessage(sMessage, nIndex, nType);
     if(m_pCatalog)
-        m_pCatalog->ObjectChanged(this);
+        m_pCatalog->ObjectChanged(GetID());
 }
 
 void wxGxTaskObject::SetTaskID(int nTaskID)
@@ -457,6 +457,6 @@ void wxGxTaskObject::SetPriority(int nNewPriority)
     if(m_pToolManager)
 	{
 		m_pToolManager->SetProcessPriority(m_nTaskID, nNewPriority);
-		m_pCatalog->ObjectRefreshed(m_pParent);
+		m_pCatalog->ObjectRefreshed(m_pParent->GetID());
 	}
 }

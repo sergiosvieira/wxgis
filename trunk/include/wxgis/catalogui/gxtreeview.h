@@ -3,7 +3,7 @@
  * Purpose:  wxGxTreeView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -36,9 +36,9 @@
 class wxGxTreeItemData : public wxTreeItemData
 {
 public:
-	wxGxTreeItemData(IGxObject* pObject, int smallimage_index, bool bExpandedOnce)
+	wxGxTreeItemData(long nObjectID, int smallimage_index, bool bExpandedOnce)
 	{
-		m_pObject = pObject;
+		m_nObjectID = nObjectID;
 		m_smallimage_index = smallimage_index;
 		m_bExpandedOnce = bExpandedOnce;
 	}
@@ -48,7 +48,7 @@ public:
 		m_pObject = NULL;
 	}
 
-	IGxObject* m_pObject;
+	long m_nObjectID;
 	int m_smallimage_index;
 	bool m_bExpandedOnce;
 };
@@ -77,15 +77,15 @@ public:
 //IGxSelectionEvents
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 //IGxCatalogEvents
-	virtual void OnObjectAdded(IGxObject* object);
-	virtual void OnObjectChanged(IGxObject* object);
-	virtual void OnObjectDeleted(IGxObject* object);
-	virtual void OnObjectRefreshed(IGxObject* object);
+	virtual void OnObjectAdded(long nObjectID);
+	virtual void OnObjectChanged(long nObjectID);
+	virtual void OnObjectDeleted(long nObjectID);
+	virtual void OnObjectRefreshed(long nObjectID);
 	virtual void OnRefreshAll(void);
 //wxTreeCtrl
     virtual int OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2);
 
-	typedef std::map<IGxObject*, wxTreeItemId> WETREEMAP;
+	typedef std::map<long, wxTreeItemId> WETREEMAP;
 	typedef struct _icondata
 	{
 		wxIcon oIcon;
@@ -138,7 +138,7 @@ public:
 	virtual void OnBeginDrag(wxTreeEvent& event);
 	virtual void OnActivated(wxTreeEvent& event);
 //wxGxTreeView
-    virtual void BeginRename(IGxObject* pGxObject = NULL);
+    virtual void BeginRename(long nObjectID = wxNOT_FOUND);
 protected:
     wxTreeItemId m_HighLightItemId;
 

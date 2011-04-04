@@ -97,7 +97,7 @@ bool wxGxTableDataset::Rename(wxString NewName)
 	    wxString sNewPath = PathName.GetFullPath();
 		m_sPath = CPLString(sNewPath.mb_str(wxConvUTF8));
 		m_sName = NewName;
-		m_pCatalog->ObjectChanged(this);
+		m_pCatalog->ObjectChanged(GetID());
 		return true;
 	}
 	else
@@ -268,7 +268,7 @@ bool wxGxFeatureDataset::Rename(wxString NewName)
 	    wxString sNewPath = PathName.GetFullPath();
 		m_sPath = CPLString(sNewPath.mb_str(wxConvUTF8));
 		m_sName = NewName;
-		m_pCatalog->ObjectChanged(this);
+		m_pCatalog->ObjectChanged(GetID());
 		return true;
 	}
 	else
@@ -491,7 +491,7 @@ bool wxGxRasterDataset::Rename(wxString NewName)
 	    wxString sNewPath = PathName.GetFullPath();
 		m_sPath = CPLString(sNewPath.mb_str(wxConvUTF8));
 		m_sName = NewName;
-		m_pCatalog->ObjectChanged(this);
+		m_pCatalog->ObjectChanged(GetID());
 		return true;
 	}
 	else

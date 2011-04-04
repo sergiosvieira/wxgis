@@ -329,8 +329,8 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
 
     if(pSel->GetCount(TREECTRLID) > 0)
 	{
-        IGxObject* pObj = pSel->GetSelectedObjects(TREECTRLID, 0);
-        if(pObj && pObj != dynamic_cast<IGxObject*>(m_pCatalog))
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(TREECTRLID, 0));
+        if(pObj && pGxObject.get() != dynamic_cast<IGxObject*>(m_pCatalog))
         {
 		    wxString sLastPath = pObj->GetFullName();
 		    if(sLastPath.IsEmpty())

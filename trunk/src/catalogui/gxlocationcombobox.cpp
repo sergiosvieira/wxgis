@@ -3,7 +3,7 @@
  * Purpose:  wxGxLocationComboBox class
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ BEGIN_EVENT_TABLE(wxGxLocationComboBox, wxComboBox)
 	EVT_COMBOBOX(wxID_ANY, wxGxLocationComboBox::OnTextEnter)
 END_EVENT_TABLE()
 
-wxGxLocationComboBox::wxGxLocationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name) : wxComboBox(parent, id, value, pos, size, choices, style, validator, name), m_pApp(NULL)
+wxGxLocationComboBox::wxGxLocationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name) : wxComboBox(parent, id, value, pos, size, choices, style, validator, name), m_pApp(NULL), m_pGxCatalogUI(NULL)
 {
 }
 
@@ -56,12 +56,12 @@ void wxGxLocationComboBox::OnSelectionChanged(IGxSelection* Selection, long nIni
 {
 	if(nInitiator != TREECTRLID)
 		return;
-    IGxObject* pGxObj = Selection->GetLastSelectedObject();	
-    if(!pGxObj)
+    IGxObjectSPtr pGxObject = m_pGxCatalogUI->GetRegisterObject(Selection->GetLastSelectedObjectID());
+    if(!pGxObject)
         return;
-	wxString sPath = pGxObj->GetFullName();
+	wxString sPath = pGxObject->GetFullName();
 	if(sPath.IsEmpty())
-		sPath = pGxObj->GetName();
+		sPath = pGxObject->GetName();
 	SetValue(sPath);
     wxFrame* pFrame = dynamic_cast<wxFrame*>(m_pApp);
     if(pFrame)
@@ -74,7 +74,7 @@ void wxGxLocationComboBox::Activate(IApplication* pApp)
 {
 	m_pApp = pApp;
 	wxGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(pApp);
-    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+    m_pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 	m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( pGxCatalogUI->GetSelection() );
 	if(m_pConnectionPointSelection != NULL)
 		m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);

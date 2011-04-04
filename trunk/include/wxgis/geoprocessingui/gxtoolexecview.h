@@ -107,7 +107,7 @@ protected:
 	IGxSelection* m_pSelection;
     wxGxCatalogUI* m_pCatalog;
     ICommand* m_pDeleteCmd;
-	IGxObject* m_pParentGxObject;
+	long m_nParentGxObjectID;
     long m_HighLightItem;
 
     DECLARE_EVENT_TABLE()

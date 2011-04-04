@@ -138,7 +138,6 @@ public:
     virtual GxObjectArray* GetSelectedObjects(void){return &m_ObjectArray;}
     virtual wxString GetPath(void);
     virtual CPLString GetInternalPath(void);
-    virtual IGxObject* GetLocation(void);
     virtual IGxObjectFilter* GetCurrentFilter(void);
 protected:
 // events
@@ -148,6 +147,7 @@ protected:
     virtual void OnCreate(wxCommandEvent& event);
     virtual void OnCreateUI(wxUpdateUIEvent& event);
 //wxGxContainerDialog
+    virtual long GetLocation(void);
 	virtual void OnInit();
     virtual void SerializeFramePos(bool bSave);
 protected:

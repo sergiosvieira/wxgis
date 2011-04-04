@@ -76,7 +76,7 @@ void wxRxObjectContainerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
                     }
                     else
                     {
-                        m_pCatalog->ObjectAdded(pObj);
+                        m_pCatalog->ObjectAdded(pObj->GetID());
                     }
 					m_sDstArray.Add(sDst);
 				}

@@ -75,21 +75,16 @@ void wxGxTreeViewBase::AddRoot(IGxObject* pGxObject)
 	if(icon.IsOk())
 		pos = m_TreeImageList.Add(icon);
 
-	wxGxTreeItemData* pData = new wxGxTreeItemData(pGxObject, pos, false);
+	wxGxTreeItemData* pData = new wxGxTreeItemData(pGxObject->GetID(), pos, false);
 
 	wxTreeItemId wxTreeItemIdRoot = wxTreeCtrl::AddRoot(pGxObject->GetName(), pos, -1, pData);
-	m_TreeMap[pGxObject] = wxTreeItemIdRoot;
+	m_TreeMap[pGxObject->GetID()] = wxTreeItemIdRoot;
 
 	wxTreeCtrl::SetItemHasChildren(wxTreeItemIdRoot);
 	wxTreeCtrl::Expand(wxTreeItemIdRoot);
 
 	wxTreeCtrl::SortChildren(wxTreeItemIdRoot);
 	wxTreeCtrl::Refresh();
-
-	//IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pGxObject);
-	//if(pContainer != NULL)
-	//	if(pContainer->AreChildrenViewable())
-	//		SetItemHasChildren(NewTreeItem);
 }
 
 void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
@@ -122,7 +117,7 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
 	else
 		pos = 0;//m_ImageListSmall.Add(m_ImageListSmall.GetIcon(2));//0 col img, 1 - col img
 
-	wxGxTreeItemData* pData = new wxGxTreeItemData(pGxObject, pos, false);
+	wxGxTreeItemData* pData = new wxGxTreeItemData(pGxObject->GetID(), pos, false);
 
     wxString sName;
     if(m_pCatalog->GetShowExt())
@@ -132,7 +127,7 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
 
 
 	wxTreeItemId NewTreeItem = AppendItem(hParent, sName, pos, -1, pData);
-	m_TreeMap[pGxObject] = NewTreeItem;
+	m_TreeMap[pGxObject->GetID()] = NewTreeItem;
 
 	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pGxObject);
 	if(pContainer != NULL)
@@ -187,11 +182,12 @@ void wxGxTreeViewBase::OnSelectionChanged(IGxSelection* Selection, long nInitiat
 	if(nInitiator == GetId())
 		return;
 
-	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
+    long nSelID = m_pSelection->GetLastSelectedObjectID();
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nSelID);
     if(pGxObj == NULL)
         return;
 
-	wxTreeItemId ItemId = m_TreeMap[pGxObj];
+	wxTreeItemId ItemId = m_TreeMap[nSelID];
 	if(ItemId.IsOk())
 	{
 		wxTreeCtrl::SelectItem(ItemId/*, false*/);
@@ -199,10 +195,10 @@ void wxGxTreeViewBase::OnSelectionChanged(IGxSelection* Selection, long nInitiat
 	}
 	else
 	{
-		IGxObject* pParentGxObj = pGxObj->GetParent();
+		IGxObject* pParentGxObj = pGxObject->GetParent();
 		while(pParentGxObj)
 		{
-			wxTreeItemId ItemId = m_TreeMap[pParentGxObj];
+			wxTreeItemId ItemId = m_TreeMap[pParentGxObj->GetID()];
 			if(ItemId.IsOk())
 			{
                 wxTreeCtrl::SetItemHasChildren(ItemId);
@@ -216,12 +212,13 @@ void wxGxTreeViewBase::OnSelectionChanged(IGxSelection* Selection, long nInitiat
 	}
 }
 
-void wxGxTreeViewBase::OnObjectAdded(IGxObject* object)
+void wxGxTreeViewBase::OnObjectAdded(long nObjectID)
 {
 	if(object == NULL)
 		return;
-	IGxObject* pParentObject = object->GetParent();
-	wxTreeItemId TreeItemId = m_TreeMap[pParentObject];
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_pSelection->GetSelectedObjectID(nObjectID));
+    IGxObject* pParentObject = pGxObject->GetParent();
+	wxTreeItemId TreeItemId = m_TreeMap[pParentObject->GetID()];
 	if(TreeItemId.IsOk())
 	{
 		wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(TreeItemId);
@@ -229,7 +226,7 @@ void wxGxTreeViewBase::OnObjectAdded(IGxObject* object)
 		{
 			if(pData->m_bExpandedOnce)
             {
-				AddTreeItem(object,TreeItemId);
+				AddTreeItem(pGxObject.get(), TreeItemId);
                 SortChildren(TreeItemId);
             }
 			else
@@ -238,19 +235,20 @@ void wxGxTreeViewBase::OnObjectAdded(IGxObject* object)
 	}
 }
 
-void wxGxTreeViewBase::OnObjectChanged(IGxObject* object)
+void wxGxTreeViewBase::OnObjectChanged(long nObjectID)
 {
 	if(object == NULL)
 		return;
 
-	wxTreeItemId TreeItemId = m_TreeMap[object];
+	wxTreeItemId TreeItemId = m_TreeMap[nObjectID];
 	if(TreeItemId.IsOk())
 	{
 		wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(TreeItemId);
 		if(pData != NULL)
 		{
-			IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pData->m_pObject);
-			IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pData->m_pObject);
+            IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID));
+			IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
+			IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 			if(pGxObjectUI != NULL)
 			{
 				wxString sName = pData->m_pObject->GetName();
@@ -291,27 +289,25 @@ void wxGxTreeViewBase::UpdateGxSelection(void)
     {
         wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(TreeItemId);
         if(pData != NULL)
-	        m_pSelection->Select(pData->m_pObject, true, GetId());
+	        m_pSelection->Select(pData->m_nObjectID, true, GetId());
     }
 	if(	m_pNewMenu )
 		m_pNewMenu->Update(m_pSelection);
 }
 
-void wxGxTreeViewBase::OnObjectDeleted(IGxObject* object)
+void wxGxTreeViewBase::OnObjectDeleted(long nObjectID)
 {
-	if(object == NULL)
-		return;
-	wxTreeItemId TreeItemId = m_TreeMap[object];
+	wxTreeItemId TreeItemId = m_TreeMap[nObjectID];
 	if(TreeItemId.IsOk())
 		Delete(TreeItemId);
-	m_TreeMap.erase(object);
+	m_TreeMap.erase(nObjectID);
 }
 
-void wxGxTreeViewBase::OnObjectRefreshed(IGxObject* object)
+void wxGxTreeViewBase::OnObjectRefreshed(long nObjectID)
 {
 	if(object == NULL)
 		return;
-	wxTreeItemId TreeItemId = m_TreeMap[object];
+	wxTreeItemId TreeItemId = m_TreeMap[nObjectID];
 	if(TreeItemId.IsOk())
 	{
 		wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(TreeItemId);
@@ -319,31 +315,17 @@ void wxGxTreeViewBase::OnObjectRefreshed(IGxObject* object)
 		{
 			if(pData->m_bExpandedOnce)
 			{
-                //store current sel
-                //UnselectAll();
-                wxTreeItemIdValue id;
-                wxTreeItemId ChildItemID = GetFirstChild(TreeItemId, id);
-                while(ChildItemID.IsOk())
-                {
-                    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(ChildItemID);
-                    if(pData)
-                        pData->m_pObject = NULL;
-
-                    ChildItemID = GetNextChild(TreeItemId, id);
-                }
-
 				DeleteChildren(TreeItemId);
 				pData->m_bExpandedOnce = false;
 				Expand(TreeItemId);
-                //restore current sel
 			}
             else
             {
-			    IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(object);
+                IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID));
+			    IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 			    if(pGxObjectContainer && pGxObjectContainer->HasChildren() && !ItemHasChildren(TreeItemId))
                 {
                     SetItemHasChildren(TreeItemId);
-                    //wxTreeCtrl::Refresh();
                 }
             }
 		}
@@ -360,9 +342,11 @@ int wxGxTreeViewBase::OnCompareItems(const wxTreeItemId& item1, const wxTreeItem
 {
     wxGxTreeItemData* pData1 = (wxGxTreeItemData*)GetItemData(item1);
     wxGxTreeItemData* pData2 = (wxGxTreeItemData*)GetItemData(item2);
-    if(pData1 != NULL && pData1 != NULL)
+    IGxObjectSPtr pGxObject1 = m_pCatalog->GetRegisterObject(pData1->nObjectID));
+    IGxObjectSPtr pGxObject2 = m_pCatalog->GetRegisterObject(pData2->nObjectID));
+    if(pGxObject1 != NULL && pGxObject2 != NULL)
     {
-        return GxObjectCompareFunction(pData1->m_pObject, pData2->m_pObject, 1);
+        return GxObjectCompareFunction(pGxObject1.get(), pGxObject2.get(), 1);
     }
     return 0;
 }
@@ -376,7 +360,8 @@ void wxGxTreeViewBase::OnItemRightClick(wxTreeEvent& event)
 	wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(item);
 	if(pData != NULL)
 	{
-        IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pData->m_pObject);
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID));
+        IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
         if(pGxObjectUI)
         {
             wxString psContextMenu = pGxObjectUI->ContextMenu();
@@ -403,7 +388,8 @@ void wxGxTreeViewBase::OnItemExpanding(wxTreeEvent& event)
 	wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(item);
 	if(pData != NULL)
 	{
-		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pData->m_pObject);
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID));
+		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 		if(pGxObjectContainer != NULL)
 		{
 			if(pGxObjectContainer->HasChildren() && pGxObjectContainer->AreChildrenViewable())
@@ -496,7 +482,9 @@ void wxGxTreeView::OnBeginLabelEdit(wxTreeEvent& event)
 		event.Veto();
 		return;
 	}
-	IGxObjectEdit* pObjEdit =  dynamic_cast<IGxObjectEdit*>(pData->m_pObject);
+     
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID));
+	IGxObjectEdit* pObjEdit =  dynamic_cast<IGxObjectEdit*>(pGxObject.get());
 	if(pObjEdit == NULL)
 	{
 		event.Veto();
@@ -530,7 +518,9 @@ void wxGxTreeView::OnEndLabelEdit(wxTreeEvent& event)
 			event.Veto();
 			return;
 		}
-		IGxObjectEdit* pObjEdit =  dynamic_cast<IGxObjectEdit*>(pData->m_pObject);
+        
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID));
+		IGxObjectEdit* pObjEdit =  dynamic_cast<IGxObjectEdit*>(pGxObject.get());
 		if(pObjEdit == NULL)
 		{
 			event.Veto();
@@ -609,10 +599,10 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
 	    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(treearray[i]);
 	    if(pData == NULL)
             continue;
-        if(!pData->m_pObject)
-            continue;
-        pParentGxObject = pData->m_pObject->GetParent();
-        wxString sSystemPath(pData->m_pObject->GetInternalName(), wxConvUTF8);
+
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID));
+        pParentGxObject = pGxObject->GetParent();
+        wxString sSystemPath(pGxObject->GetInternalName(), wxConvUTF8);
         my_data.AddFile(sSystemPath);
     }
     wxDropSource dragSource( this );
@@ -636,27 +626,28 @@ void wxGxTreeView::OnActivated(wxTreeEvent& event)
 	if(pData == NULL)
 		return;
 
-	IGxObjectWizard* pGxObjectWizard = dynamic_cast<IGxObjectWizard*>(pData->m_pObject);
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID));
+	IGxObjectWizard* pGxObjectWizard = dynamic_cast<IGxObjectWizard*>(pGxObject.get());
 	if(pGxObjectWizard != NULL)
 		if(!pGxObjectWizard->Invoke(this))
 			return;
 
 }
 
-void wxGxTreeView::BeginRename(IGxObject* pGxObject)
+void wxGxTreeView::BeginRename(long nObjectID)
 {
-	wxTreeItemId ItemId = m_TreeMap[pGxObject];
+	wxTreeItemId ItemId = m_TreeMap[nObjectID];
 	if(!ItemId.IsOk())
     {
         wxTreeCtrl::SetItemHasChildren(GetSelection());
         wxTreeCtrl::Expand(GetSelection());  
-        ItemId = m_TreeMap[pGxObject];
+        ItemId = m_TreeMap[nObjectID];
     }
 	if(ItemId.IsOk())
 	{
 		wxTreeCtrl::SelectItem(ItemId/*, false*/);
 		SetFocus();
-        m_pSelection->Select(pGxObject, true, GetId());
+        m_pSelection->Select(nObjectID, true, GetId());
 	}
     EditLabel(GetSelection());
 }
@@ -683,7 +674,9 @@ wxDragResult wxGxTreeView::OnDragOver(wxCoord x, wxCoord y, wxDragResult def)
 	    if(pData == NULL)
 		    return wxDragNone;
         //check drop capability
-        IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pData->m_pObject);
+        
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID));
+        IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pGxObject.get());
         if(pTarget == NULL)
 		    return wxDragNone;
         return pTarget->CanDrop(def);
@@ -705,7 +698,8 @@ bool wxGxTreeView::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filena
 	    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(ItemId);
 	    if(pData == NULL)
 		    return wxDragNone;
-        IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pData->m_pObject);
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID));
+        IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pGxObject.get());
         if(pTarget == NULL)
 		    return false;
         return pTarget->Drop(filenames, bMove);

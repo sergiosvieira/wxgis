@@ -109,7 +109,7 @@ bool wxGxToolExecuteView::Create(wxWindow* parent, wxWindowID id, const wxPoint&
     m_bHideDone = false;
     m_pConnectionPointCatalog = NULL;
     m_ConnectionPointCatalogCookie = -1;
-    m_pParentGxObject = NULL;
+    m_nParentGxObjectID = wxNOT_FOUND;
     m_currentSortCol = 0;
     m_pSelection = NULL;
     
@@ -364,13 +364,13 @@ void wxGxToolExecuteView::OnDeselected(wxListEvent& event)
 {
 	//event.Skip();
     if(GetSelectedItemCount() == 0)
-        m_pSelection->Select(m_pParentGxObject, false, NOTFIRESELID);
+        m_pSelection->Select(m_pParentGxObject->GetID(), false, NOTFIRESELID);
 
 	IGxObject* pObject = (IGxObject*)event.GetData();
 	if(pObject == NULL)
 		return;
 
-	m_pSelection->Unselect(pObject, NOTFIRESELID);
+	m_pSelection->Unselect(pObject->GetID(), NOTFIRESELID);
 }
 
 void wxGxToolExecuteView::ShowContextMenu(const wxPoint& pos)
@@ -571,15 +571,17 @@ void wxGxToolExecuteView::OnSelectionChanged(IGxSelection* Selection, long nInit
 {
 	if(nInitiator == GetId())
 		return;
-	IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
+    long nSelID = Selection->GetLastSelectedObjectID();
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nSelID);
+	//IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
 	//if(m_pParentGxObject == pGxObj)
 	//	return;
 
 	//reset
 	ResetContents();
-	m_pParentGxObject = pGxObj;
+	m_nParentGxObjectID = nSelID;
 
-	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(pGxObj);
+	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 	if(pObjContainer == NULL || !pObjContainer->HasChildren())
 		return;
 
@@ -601,7 +603,8 @@ bool wxGxToolExecuteView::Applies(IGxSelection* Selection)
 
 	for(size_t i = 0; i < Selection->GetCount(); i++)
 	{
-		wxGxToolExecute* pGxToolExecute = dynamic_cast<wxGxToolExecute*>( Selection->GetSelectedObjects(i) );
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(Selection->GetSelectedObjectID(i));
+		wxGxToolExecute* pGxToolExecute = dynamic_cast<wxGxToolExecute*>( pGxObject.get() );
 		if(pGxToolExecute != NULL)
 			return true;
 	}

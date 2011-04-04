@@ -79,7 +79,7 @@ void wxGxToolbox::Refresh(void)
 {
 	EmptyChildren();
 	LoadChildren();
-    m_pCatalog->ObjectRefreshed(this);
+    m_pCatalog->ObjectRefreshed(GetID());
 }
 
 void wxGxToolbox::EmptyChildren(void)
@@ -99,7 +99,7 @@ bool wxGxToolbox::DeleteChild(IGxObject* pChild)
 	if(!IGxObjectContainer::DeleteChild(pChild))
 		return false;
 	if(bHasChildren != m_Children.size() > 0 ? true : false)
-		m_pCatalog->ObjectChanged(this);
+		m_pCatalog->ObjectChanged(GetID());
 	return true;
 }
 
@@ -298,7 +298,7 @@ void wxGxFavoritesToolbox::Refresh(void)
 {
 	EmptyChildren();
 	LoadChildren();
-    m_pCatalog->ObjectRefreshed(this);
+    m_pCatalog->ObjectRefreshed(GetID());
 }
 
 void wxGxFavoritesToolbox::EmptyChildren(void)
@@ -388,7 +388,7 @@ void wxGxToolExecute::Detach(void)
 
 void wxGxToolExecute::Refresh(void)
 {
-    m_pCatalog->ObjectRefreshed(this);
+    m_pCatalog->ObjectRefreshed(GetID());
 }
 
 wxString wxGxToolExecute::GetName(void)
@@ -414,8 +414,8 @@ int wxGxToolExecute::OnExecute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel, IG
 		nTaskID = wxGISGPToolManager::OnExecute(pTool, static_cast<ITrackCancel*>(pGxTaskObject), static_cast<IGPCallBack*>(pGxTaskObject));
 		pGxTaskObject->SetTaskID(nTaskID);
 		//add gxobj
-        IGxObject* pGxObjec = static_cast<IGxObject*>(pGxTaskObject);
-		if(!AddChild(pGxObjec))
+        IGxObject* pGxObject = static_cast<IGxObject*>(pGxTaskObject);
+		if(!AddChild(pGxObject))
 		{
 			wxDELETE(pGxTaskObject)
 			return wxNOT_FOUND;
@@ -423,11 +423,11 @@ int wxGxToolExecute::OnExecute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel, IG
         else
         {
             if(m_pCatalog)
-                m_pCatalog->ObjectAdded(pGxObjec);
+                m_pCatalog->ObjectAdded(pGxObject->GetID());
         }
 
 		if(m_pCatalog)
-			m_pCatalog->ObjectChanged(this);
+			m_pCatalog->ObjectChanged(GetID());
 	}
 	return nTaskID;
 }
@@ -442,9 +442,9 @@ void wxGxToolExecute::StartProcess(size_t nIndex)
     {
         wxGxTaskObject* pGxTaskObject = dynamic_cast<wxGxTaskObject*>(m_Children[i]);
         if(pGxTaskObject && pGxTaskObject->GetTaskID() == nIndex && m_pCatalog)
-            m_pCatalog->ObjectChanged(m_Children[i]);
+            m_pCatalog->ObjectChanged(m_Children[i]->GetID());
     }
-    m_pCatalog->ObjectChanged(this);
+    m_pCatalog->ObjectChanged(GetID());
 }
 
 void wxGxToolExecute::OnFinish(IProcess* pProcess, bool bHasErrors)
@@ -462,9 +462,9 @@ void wxGxToolExecute::OnFinish(IProcess* pProcess, bool bHasErrors)
     {
         wxGxTaskObject* pGxTaskObject = dynamic_cast<wxGxTaskObject*>(m_Children[i]);
         if(pGxTaskObject && pGxTaskObject->GetTaskID() == nIndex && m_pCatalog)
-            m_pCatalog->ObjectChanged(m_Children[i]);
+            m_pCatalog->ObjectChanged(m_Children[i]->GetID());
     }
-    m_pCatalog->ObjectChanged(this);
+    m_pCatalog->ObjectChanged(GetID());
 }
 
 bool wxGxToolExecute::DeleteChild(IGxObject* pChild)
@@ -473,7 +473,7 @@ bool wxGxToolExecute::DeleteChild(IGxObject* pChild)
 	if(!IGxObjectContainer::DeleteChild(pChild))
 		return false;
 	if(bHasChildren != m_Children.size() > 0 ? true : false)
-		m_pCatalog->ObjectChanged(this);
+		m_pCatalog->ObjectChanged(GetID());
 	return true;
 }
 

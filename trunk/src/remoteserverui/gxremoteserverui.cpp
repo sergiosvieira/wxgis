@@ -105,7 +105,7 @@ void wxGxRemoteServerUI::EmptyChildren(void)
 	}
 	m_Children.clear();
 	m_bIsChildrenLoaded = false;
-	m_pCatalog->ObjectChanged(this);
+	m_pCatalog->ObjectChanged(GetID());
 }
 
 void wxGxRemoteServerUI::LoadChildren()
@@ -177,7 +177,7 @@ void wxGxRemoteServerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
                         }
                         else
                         {
-                            m_pCatalog->ObjectAdded(pObj);
+                            m_pCatalog->ObjectAdded(pObj->GetID());
                             //remove pending
                             if(m_pGxPendingUI)
                                 if(DeleteChild(static_cast<IGxObject*>(m_pGxPendingUI)))
@@ -208,10 +208,11 @@ void wxGxRemoteServerUI::OnConnect(void)
 bool wxGxRemoteServerUI::DeleteChild(IGxObject* pChild)
 {
 	bool bHasChildren = m_Children.size() > 0 ? true : false;
-    m_pCatalog->ObjectDeleted(pChild);
+    long nChildID = pChild->GetID();
 	if(!IGxObjectContainer::DeleteChild(pChild))
 		return false;
+    m_pCatalog->ObjectDeleted(nChildID);
 	if(bHasChildren != m_Children.size() > 0 ? true : false)
-		m_pCatalog->ObjectChanged(this);
+		m_pCatalog->ObjectChanged(GetID());
 	return true;
 }

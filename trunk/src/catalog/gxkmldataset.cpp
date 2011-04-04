@@ -125,7 +125,7 @@ bool wxGxKMLDataset::Rename(wxString NewName)
 	{
         m_sPath = szNewPath;
 		m_sName = NewName;
-		m_pCatalog->ObjectChanged(this);
+		m_pCatalog->ObjectChanged(GetID());
 		Refresh();
 		return true;
 	}
@@ -188,11 +188,12 @@ void wxGxKMLDataset::LoadChildren(void)
 bool wxGxKMLDataset::DeleteChild(IGxObject* pChild)
 {
 	bool bHasChildren = m_Children.size() > 0 ? true : false;
-    m_pCatalog->ObjectDeleted(pChild);
+    long nChildID = pChild->GetID();
 	if(!IGxObjectContainer::DeleteChild(pChild))
 		return false;
+    m_pCatalog->ObjectDeleted(nChildID);
 	if(bHasChildren != m_Children.size() > 0 ? true : false)
-		m_pCatalog->ObjectChanged(this);
+		m_pCatalog->ObjectChanged(GetID());
 	return true;
 }
 

@@ -50,10 +50,10 @@ public:
 	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray) = 0;
 	virtual GxObjectArray* const GetDisabledRootItems(void){return &m_aRootItems;};
     virtual GxObjectFactoryArray* const GetObjectFactories(void){return &m_ObjectFactoriesArray;};
-	virtual void ObjectAdded(IGxObject* const pObject) = 0;
-	virtual void ObjectChanged(IGxObject* const pObject) = 0;
-	virtual void ObjectDeleted(IGxObject* const pObject) = 0;
-	virtual void ObjectRefreshed(IGxObject* const pObject) = 0;
+	virtual void ObjectAdded(long nObjectID) = 0;
+	virtual void ObjectChanged(long nObjectID) = 0;
+	virtual void ObjectDeleted(long nObjectID) = 0;
+	virtual void ObjectRefreshed(long nObjectID) = 0;
 	virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true) = 0;
 	virtual void DisconnectFolder(CPLString sPath) = 0;
     virtual IGISConfig* const GetConfig(void){return m_pConf;};
@@ -226,10 +226,10 @@ class IGxCatalogEvents
 {
 public:
 	virtual ~IGxCatalogEvents(void){};
-	virtual void OnObjectAdded(IGxObject* object) = 0;
-	virtual void OnObjectChanged(IGxObject* object) = 0;
-	virtual void OnObjectDeleted(IGxObject* object) = 0;
-	virtual void OnObjectRefreshed(IGxObject* object) = 0;
+	virtual void OnObjectAdded(long nObjectID) = 0;
+	virtual void OnObjectChanged(long nObjectID) = 0;
+	virtual void OnObjectDeleted(long nObjectID) = 0;
+	virtual void OnObjectRefreshed(long nObjectID) = 0;
 	virtual void OnRefreshAll(void) = 0;
 };
 

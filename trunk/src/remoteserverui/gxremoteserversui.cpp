@@ -119,8 +119,8 @@ void wxGxRemoteServersUI::CreateConnection(wxWindow* pParent, bool bSearch)
 		else
 		{
 			pConn->SetCallback(static_cast<INetCallback*>(pServerConn));
-			m_pCatalog->ObjectAdded(pGxObj);
-			m_pCatalog->ObjectChanged(this);
+			m_pCatalog->ObjectAdded(pGxObj->GetID());
+			m_pCatalog->ObjectChanged(GetID());
 		}
 	}
 }

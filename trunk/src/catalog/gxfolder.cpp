@@ -45,7 +45,7 @@ void wxGxFolder::Refresh(void)
 {
 	EmptyChildren();
 	LoadChildren();
-    m_pCatalog->ObjectRefreshed(this);
+    m_pCatalog->ObjectRefreshed(GetID());
 }
 
 void wxGxFolder::EmptyChildren(void)
@@ -128,7 +128,7 @@ bool wxGxFolder::Rename(wxString NewName)
 	{
 		m_sPath = szNewPath;
 		m_sName = NewName;
-		m_pCatalog->ObjectChanged(this);
+		m_pCatalog->ObjectChanged(GetID());
 		Refresh();
 		return true;
 	}
@@ -144,11 +144,12 @@ bool wxGxFolder::Rename(wxString NewName)
 bool wxGxFolder::DeleteChild(IGxObject* pChild)
 {
 	bool bHasChildren = m_Children.size() > 0 ? true : false;
-    m_pCatalog->ObjectDeleted(pChild);
+    long nChildID = pChild->GetID();
 	if(!IGxObjectContainer::DeleteChild(pChild))
 		return false;
+    m_pCatalog->ObjectDeleted(nChildID);
 	if(bHasChildren != m_Children.size() > 0 ? true : false)
-		m_pCatalog->ObjectChanged(this);
+		m_pCatalog->ObjectChanged(GetID());
 	return true;		
 }
 

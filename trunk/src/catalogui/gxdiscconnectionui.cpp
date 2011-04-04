@@ -113,7 +113,7 @@ bool wxGxDiscConnectionUI::Drop(const wxArrayString& filenames, bool bMove)
                     }
                     else
                     {
-                        m_pCatalog->ObjectAdded(Array[i]);
+                        m_pCatalog->ObjectAdded(Array[i]->GetID());
                     }
                 }
             }
@@ -128,7 +128,7 @@ bool wxGxDiscConnectionUI::Drop(const wxArrayString& filenames, bool bMove)
                     }
                     else
                     {
-                        m_pCatalog->ObjectAdded(Array[i]);
+                        m_pCatalog->ObjectAdded(Array[i]->GetID());
                     }
                 }
             }

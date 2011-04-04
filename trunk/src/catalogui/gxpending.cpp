@@ -111,6 +111,6 @@ void wxGxPendingUI::OnUpdate(void)
     if(m_nCurrentImage >= m_pImageListSmall->GetImageCount())
         m_nCurrentImage = 0;
     if(m_pCatalog)
-        m_pCatalog->ObjectChanged(this);
+        m_pCatalog->ObjectChanged(GetID());
 }
 
