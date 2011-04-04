@@ -100,13 +100,6 @@ void wxGxRemoteServerUI::EmptyChildren(void)
 {
 	for(size_t i = 0; i < m_Children.size(); i++)
 	{
-        wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pCatalog);
-        if(pCatalog)
-        {
-            IGxSelection* pSel = pCatalog->GetSelection();
-            if(pSel)
-                pSel->Unselect(m_Children[i], IGxSelection::INIT_ALL);
-        }
 		m_Children[i]->Detach();
 		delete m_Children[i];
 	}
@@ -214,13 +207,6 @@ void wxGxRemoteServerUI::OnConnect(void)
 
 bool wxGxRemoteServerUI::DeleteChild(IGxObject* pChild)
 {
-    wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pCatalog);
-    if(pCatalog)
-    {
-        IGxSelection* pSel = pCatalog->GetSelection();
-        if(pSel)
-            pSel->Unselect(pChild, IGxSelection::INIT_ALL);
-    }
 	bool bHasChildren = m_Children.size() > 0 ? true : false;
     m_pCatalog->ObjectDeleted(pChild);
 	if(!IGxObjectContainer::DeleteChild(pChild))

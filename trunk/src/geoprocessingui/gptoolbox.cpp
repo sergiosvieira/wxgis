@@ -86,13 +86,6 @@ void wxGxToolbox::EmptyChildren(void)
 {
 	for(size_t i = 0; i < m_Children.size(); i++)
 	{
-        wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pCatalog);
-        if(pCatalog)
-        {
-            IGxSelection* pSel = pCatalog->GetSelection();
-            if(pSel)
-                pSel->Unselect(m_Children[i], IGxSelection::INIT_ALL);
-        }
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
 	}
@@ -312,13 +305,6 @@ void wxGxFavoritesToolbox::EmptyChildren(void)
 {
 	for(size_t i = 0; i < m_Children.size(); i++)
 	{
-        wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pCatalog);
-        if(pCatalog)
-        {
-            IGxSelection* pSel = pCatalog->GetSelection();
-            if(pSel)
-                pSel->Unselect(m_Children[i], IGxSelection::INIT_ALL);
-        }
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
 	}
@@ -394,13 +380,6 @@ void wxGxToolExecute::Detach(void)
 {
 	for(size_t i = 0; i < m_Children.size(); i++)
 	{
-        wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pCatalog);
-        if(pCatalog)
-        {
-            IGxSelection* pSel = pCatalog->GetSelection();
-            if(pSel)
-                pSel->Unselect(m_Children[i], IGxSelection::INIT_ALL);
-        }
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
 	}

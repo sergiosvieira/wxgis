@@ -3,7 +3,7 @@
  * Purpose:  wxGxSelection class. Selection of IGxObjects in tree or list views
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -34,38 +34,37 @@ public:
 	wxGxSelection(void);
 	virtual ~wxGxSelection(void);
 	//IGxSelection
-	virtual void Select( IGxObject* pObject,  bool appendToExistingSelection, long nInitiator);
-    virtual void Select( IGxObject* pObject);
-	virtual void Unselect(IGxObject* pObject, long nInitiator);
+	virtual void Select( long nObjectID,  bool appendToExistingSelection, long nInitiator );
+    virtual void Select( long nObjectID );
+	virtual void Unselect( long nObjectID, long nInitiator );
 	virtual void Clear(long nInitiator);
     virtual size_t GetCount(void);
     virtual size_t GetCount(long nInitiator);
-	virtual IGxObject* GetSelectedObjects(size_t nIndex);
-	virtual IGxObject* GetSelectedObjects(long nInitiator, size_t nIndex);
-    virtual IGxObject* GetLastSelectedObject(void);
+	virtual long GetSelectedObjectID(size_t nIndex);
+	virtual long GetSelectedObjectID(long nInitiator, size_t nIndex);
+    virtual long GetLastSelectedObjectID(void);
 	virtual void SetInitiator(long nInitiator);
-    virtual void Do(IGxObject* pObject);
+    virtual void Do( long nObjectID );
     virtual bool CanRedo();
 	virtual bool CanUndo();
-    virtual wxString Redo(int nPos = -1);
-    virtual wxString Undo(int nPos = -1);
+    virtual long Redo(int nPos = -1);
+    virtual long Undo(int nPos = -1);
 	virtual void RemoveDo(wxString sPath);
     virtual void Reset();
     virtual size_t GetDoSize();
-    virtual int GetDoPos(void){return m_Pos;};
-    virtual wxString GetDoPath(size_t nIndex);
-    //virtual wxArrayString* GetDoArray(void){return &m_DoArray;};
-    virtual void LockChanges(){m_CritSect.Enter();};
-    virtual void UnLockChanges(){m_CritSect.Leave();};
+    virtual int GetDoPos(void){return m_nPos;};
+    virtual long GetDoID(size_t nIndex);
+    virtual wxSelLongArray GetDoArray(void){return m_DoArray;};
     //IConnectionPointContainer
 	virtual long Advise(wxObject* pObject);
 protected:
-    wxArrayString m_DoArray;
-	int m_Pos;
+	wxSelLongArray m_DoArray;
+	int m_nPos;
     bool m_bDoOp;
-    IGxObject* m_pPrevObject;
+
+    long m_pPrevID;
     wxCriticalSection m_DoCritSect, m_CritSect;
 
-	std::map<long, GxObjectArray*> m_SelectionMap;
+	std::map<long, wxSelLongArray> m_SelectionMap;
 	long m_currentInitiator;
 };

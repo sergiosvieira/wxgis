@@ -107,14 +107,3 @@ bool wxRxObjectContainerUI::LoadChildren()
 	return wxRxObjectContainer::LoadChildren();
 }
 
-bool wxRxObjectContainerUI::DeleteChild(IGxObject* pChild)
-{
-    wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pCatalog);
-    if(pCatalog)
-    {
-        IGxSelection* pSel = pCatalog->GetSelection();
-        if(pSel)
-            pSel->Unselect(pChild, IGxSelection::INIT_ALL);
-    }	
-	return wxRxObjectContainer::DeleteChild(pChild);
-}

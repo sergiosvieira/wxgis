@@ -37,6 +37,7 @@ enum wxGISEnumSaveObjectResults
 
 class IGxObject;
 typedef std::vector<IGxObject*> GxObjectArray;
+DEFINE_SHARED_PTR(IGxObject);
 
 class IGxObjectFactory;
 typedef std::vector<IGxObjectFactory*> GxObjectFactoryArray;
@@ -61,11 +62,17 @@ public:
 	virtual bool GetShowExt(void){return m_bShowExt;};
 	virtual void SetShowHidden(bool bShowHidden){m_bShowHidden = bShowHidden;};
 	virtual void SetShowExt(bool bShowExt){m_bShowExt = bShowExt;};
+	//register / unregister pointer and uniq ID
+	virtual void RegisterObject(IGxObject* pObj) = 0;
+	virtual void UnRegisterObject(long nID) = 0;
+	//get smart pointer by ID
+	virtual IGxObjectSPtr GetRegisterObject(long nID) = 0;
 protected:
     IGISConfig* m_pConf;
     GxObjectArray m_aRootItems;
     GxObjectFactoryArray m_ObjectFactoriesArray;
 	bool m_bShowHidden, m_bShowExt;
+	std::map<long, IGxObject*> GxObjectMap; //map of registered IGxObject pointers
 };
 
 class IGxObject
@@ -76,10 +83,15 @@ public:
 	{
 		m_pParent = pParent;
 		m_pCatalog = pCatalog;
+		if(m_pCatalog)
+			m_pCatalog->RegisterObject(this);
 		return true;
 	};
 	virtual void Detach(void)
 	{
+		wxCriticalSectionLocker locker(m_DestructCritSect);
+		if(m_pCatalog)
+			m_pCatalog->UnRegisterObject(m_nID);
 		m_pParent = NULL;
 		m_pCatalog = NULL;
 	};
@@ -96,11 +108,25 @@ public:
 	virtual wxString GetCategory(void) = 0;
 	virtual IGxObject* const GetParent(void){return m_pParent;};
 	virtual void Refresh(void){};
+public:
+	//uniq ID for selection
+	virtual long GetID(void){return m_nID;};
+	virtual void SetID(long nID){m_nID = nID;};
+	//lock and unlock delete/move cupubility
+	virtual void Lock(void){m_DestructCritSect.Enter();};
+	virtual void Unlock(void){m_DestructCritSect.Leave();};
 protected:
 	IGxObject* m_pParent;
 	IGxCatalog* m_pCatalog;
+protected:
+	long m_nID;
+	wxCriticalSection m_DestructCritSect;
 };
 
+static void GxObjectDeleter(IGxObject *ptr)
+{
+	ptr->Unlock();
+}
 /** \class IGxObjectEdit catalog.h
     \brief A GxObject edit interface.
 */
