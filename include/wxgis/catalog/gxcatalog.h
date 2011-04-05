@@ -36,7 +36,7 @@ public:
 	wxGxCatalog(void);
 	virtual ~wxGxCatalog(void);
 	//IGxObject
-	virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog){m_pParent = NULL;	m_pCatalog = NULL; return true;};
+	virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog);
 	virtual void Detach(void);
 	virtual wxString GetName(void){return wxString(_("Catalog"));};
     virtual wxString GetBaseName(void){return GetName();};

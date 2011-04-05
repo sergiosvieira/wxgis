@@ -42,7 +42,7 @@ public:
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
  	//IGxCatalog
-	virtual void ObjectDeleted(IGxObject* pObject);
+	virtual void ObjectDeleted(long nObjectID);
 	virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true);
 	virtual void DisconnectFolder(CPLString sPath);
     //wxGxCatalogUI

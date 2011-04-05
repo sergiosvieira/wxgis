@@ -22,6 +22,7 @@
 #pragma once
 #include "wxgis/catalogui/gxview.h"
 #include "wxgis/carto/tableview.h"
+#include "wxgis/catalogui/gxcatalogui.h"
 
 class WXDLLIMPEXP_GIS_CLU wxGxTableView :
 	public wxGISTableView, 
@@ -42,5 +43,6 @@ public:
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 private:
 	IGxSelection* m_pSelection;
-	IGxObject* m_pParentGxObject;
+	long m_nParentGxObjectID;
+	wxGxCatalogUI* m_pCatalog;
 };

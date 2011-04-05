@@ -19,7 +19,6 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxtableview.h"
-#include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/datasource/featuredataset.h"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxTableView, wxGISTableView)
@@ -30,6 +29,7 @@ wxGxTableView::wxGxTableView(void)
 
 wxGxTableView::wxGxTableView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxGISTableView(parent, id, pos, size)
 {
+	m_nParentGxObjectID = wxNOT_FOUND;
 	m_sViewName = wxString(_("Table View"));
 	SetReadOnly(true);
 }
@@ -40,6 +40,7 @@ wxGxTableView::~wxGxTableView(void)
 
 bool wxGxTableView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
+	m_nParentGxObjectID = wxNOT_FOUND;
 	m_sViewName = wxString(_("Table View"));
     wxGISTableView::Create(parent, TABLECTRLID, pos, size, style, name);
 	SetReadOnly(true);
@@ -55,8 +56,8 @@ bool wxGxTableView::Activate(IGxApplication* application, wxXmlNode* pConf)
 	//if(m_pConnectionPointCatalog != NULL)
 	//	m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
-    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
-	m_pSelection = pGxCatalogUI->GetSelection();
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
+	m_pSelection = m_pCatalog->GetSelection();
 	return true;
 }
 
@@ -78,7 +79,8 @@ bool wxGxTableView::Applies(IGxSelection* Selection)
 
 	for(size_t i = 0; i < Selection->GetCount(); i++)
 	{
-		IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>( Selection->GetSelectedObjects(i) );
+		IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject( Selection->GetSelectedObjectID(i) );
+		IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>( pGxObject.get() );
 		if(pGxDataset != NULL)
 		{			
 			wxGISEnumDatasetType type = pGxDataset->GetType();
@@ -158,6 +160,6 @@ void wxGxTableView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	//SortItems(MyCompareFunction, m_bSortAsc);
  //   SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 
-	m_pParentGxObject = pGxObj;
+	m_nParentGxObjectID = nSelID;
 	wxWindow::Refresh();
 }

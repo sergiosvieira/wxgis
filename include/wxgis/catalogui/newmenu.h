@@ -19,9 +19,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-#include "wxgis/catalogui/catalogui.h"
+#include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/framework/framework.h"
-//#include "wxgis/framework/application.h"
 #include "wxgis/framework/commandbar.h"
 
 #define NEWMENUNAME wxT("Application.NewMenu")
@@ -65,6 +64,7 @@ public:
 protected:
     std::vector<wxMenuItem*> m_delitems;
 	IApplication* m_pApp;
+	wxGxCatalogUI* m_pCatalog;
 	IConnectionPointContainer* m_pConnectionPointSelection;
 	long m_ConnectionPointSelectionCookie;
 };

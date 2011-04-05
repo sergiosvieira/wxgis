@@ -94,7 +94,7 @@ public:
     virtual void Do( long nObjectID ) = 0;
     virtual bool CanRedo() = 0;
 	virtual bool CanUndo() = 0;
-	virtual void RemoveDo(wxString sPath) = 0;
+	virtual void RemoveDo(long nObjectID) = 0;
     virtual long Redo(int nPos = -1) = 0;
     virtual long Undo(int nPos = -1) = 0;
     virtual void Reset() = 0;

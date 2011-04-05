@@ -35,14 +35,24 @@ wxGxCatalog::wxGxCatalog(void) : m_bIsChildrenLoaded(false), m_pGxDiscConnection
     m_bShowExt = true;
 
 	m_pConf = NULL;
+
+	RegisterObject(this); 
 }
 
 wxGxCatalog::~wxGxCatalog(void)
 {
 }
 
+bool wxGxCatalog::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
+{
+	m_pParent = NULL;	
+	m_pCatalog = this; 
+	return true;
+}
+
 void wxGxCatalog::Detach(void)
 {
+	m_pCatalog->UnRegisterObject(m_nID);
 	if(m_pConf)
 	{
 		wxXmlNode* pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog")));

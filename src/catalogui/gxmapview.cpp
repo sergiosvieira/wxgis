@@ -131,7 +131,7 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	if(pwxGISDataset == NULL)
 		return;
 
-    m_pParentGxObject = pGxObj;
+    m_nParentGxObjectID = pGxObject->GetID();
     //the pOGRLayer will live while IGxObject live. IGxObject( from IGxSelection ) store IwxGISDataset, and destroy it then catalog destroyed
     //pwxGISDataset->Dereference();
 
@@ -144,7 +144,7 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
         pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISDataset->GetName());
 		break;
 	case enumGISRasterDataset:
-        CheckOverviews(pwxGISDataset, pGxObj->GetName());
+        CheckOverviews(pwxGISDataset, pGxObject->GetName());
 		pwxGISLayers.push_back(new wxGISRasterLayer(pwxGISDataset));
         pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISDataset->GetName());
 		break;
@@ -163,7 +163,7 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
                 pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISSubDataset->GetName());
 		        break;
 	        case enumGISRasterDataset:
-                CheckOverviews(pwxGISSubDataset, pGxObj->GetName());
+                CheckOverviews(pwxGISSubDataset, pGxObject->GetName());
 		        pwxGISLayers.push_back(new wxGISRasterLayer(pwxGISSubDataset));
                 pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISSubDataset->GetName());
 		        break;

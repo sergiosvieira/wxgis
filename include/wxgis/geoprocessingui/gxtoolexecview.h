@@ -59,10 +59,10 @@ public:
 	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
 	virtual void AddObject(IGxObject* pObject);
 	virtual void ResetContents(void);
-    virtual IGxObject* GetParentGxObject(void){return m_pParentGxObject;};
+    virtual IGxObject* const GetParentGxObject(void);
     virtual bool Show(bool show = true);
     virtual void HideDone(bool bHide = true);
-    virtual void SetGxToolExecute(IGxObject* pObject){m_pParentGxObject = pObject;};
+	virtual void SetGxToolExecute(IGxObject* pObject){m_nParentGxObjectID = pObject->GetID();};
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id = TOOLEXECUTECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = TOOLEXECVIEWSTYLE, const wxString& name = wxT("ToolExecuteView"));
 	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
@@ -72,10 +72,10 @@ public:
 //IGxSelectionEvents
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 //IGxCatalogEvents
-	virtual void OnObjectAdded(IGxObject* object);
-	virtual void OnObjectChanged(IGxObject* object);
-	virtual void OnObjectDeleted(IGxObject* object);
-	virtual void OnObjectRefreshed(IGxObject* object);
+	virtual void OnObjectAdded(long nObjectID);
+	virtual void OnObjectChanged(long nObjectID);
+	virtual void OnObjectDeleted(long nObjectID);
+	virtual void OnObjectRefreshed(long nObjectID);
 	virtual void OnRefreshAll(void);
 // IGxContentsView
     virtual void SelectAll(void);

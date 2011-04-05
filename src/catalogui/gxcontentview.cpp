@@ -260,7 +260,7 @@ void wxGxContentView::Serialize(wxXmlNode* pRootNode, bool bStore)
 		SetColumnWidth(0, nw);
 		SetColumnWidth(1, tw);
 
-        SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
+        SORTDATA sortdata = {m_bSortAsc, m_currentSortCol, m_pCatalog};
 		SortItems(MyCompareFunction, (long)&sortdata);
 		SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 
@@ -485,7 +485,7 @@ void wxGxContentView::OnActivated(wxListEvent& event)
 		if(!pGxObjectWizard->Invoke(this))
 			return;
 
-	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pItemData->pObject);
+	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 	if( pGxObjectContainer != NULL )
 	{
 		m_pSelection->Select(pItemData->nObjectID, false, GetId());
@@ -596,7 +596,7 @@ void wxGxContentView::OnObjectAdded(long nObjectID)
     {
         IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
 		AddObject(pGxObject.get());
-        SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
+        SORTDATA sortdata = {m_bSortAsc, m_currentSortCol, m_pCatalog};
 	    SortItems(MyCompareFunction, (long)&sortdata);
 	    //SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
     }
@@ -661,11 +661,11 @@ void wxGxContentView::OnObjectChanged(long nObjectID)
 
 		wxString sName;
 		if(m_pCatalog->GetShowExt())
-			sName = pItemData->pObject->GetName();
+			sName = pGxObject->GetName();
 		else
-			sName = pItemData->pObject->GetBaseName();
+			sName = pGxObject->GetBaseName();
 
-		wxString sType = pItemData->pObject->GetCategory();
+		wxString sType = pGxObject->GetCategory();
 
 		if(i < GetItemCount())
 		{
@@ -695,7 +695,7 @@ void wxGxContentView::OnRefreshAll(void)
 		AddObject(pArr->at(i));
 	}
 
-    SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
+    SORTDATA sortdata = {m_bSortAsc, m_currentSortCol, m_pCatalog};
 	SortItems(MyCompareFunction, (long)&sortdata);
 	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 
@@ -725,7 +725,7 @@ void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiato
 		AddObject(pArr->at(i));
 	}
 
-    SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
+    SORTDATA sortdata = {m_bSortAsc, m_currentSortCol, m_pCatalog};
 	SortItems(MyCompareFunction, (long)&sortdata);
 	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 }
@@ -779,7 +779,11 @@ void wxGxContentView::OnBeginDrag(wxListEvent& event)
 	dragSource.SetData( my_data );
 	wxDragResult result = dragSource.DoDragDrop( wxDrag_AllowMove );
     if(result == wxDragMove)
-        m_pParentGxObject->Refresh();
+	{
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_nParentGxObjectID);
+        if(pGxObject)
+			pGxObject->Refresh();
+	}
 }
 
 void wxGxContentView::SelectAll(void)
@@ -916,3 +920,9 @@ void wxGxContentView::OnLeave()
 {
     SetItemState(m_HighLightItem, 0, wxLIST_STATE_DROPHILITED);
 }
+
+IGxObject* const wxGxContentView::GetParentGxObject(void)
+{
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_nParentGxObjectID);
+	return pGxObject.get();
+};

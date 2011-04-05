@@ -87,12 +87,14 @@ int wxCALLBACK TasksCompareFunction(long item1, long item2, long sortData)
 wxGxToolExecuteView::wxGxToolExecuteView(void)
 {
     m_pXmlConf = NULL;
+	m_nParentGxObjectID = wxNOT_FOUND;
 }
 
 wxGxToolExecuteView::wxGxToolExecuteView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
-m_bSortAsc(true), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(-1), m_pParentGxObject(NULL), m_currentSortCol(0), m_pSelection(NULL), m_bHideDone(false)//wxListCtrl(parent, id, pos, size, style), 
+m_bSortAsc(true), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(-1), m_currentSortCol(0), m_pSelection(NULL), m_bHideDone(false)//wxListCtrl(parent, id, pos, size, style), 
 {
     m_pXmlConf = NULL;
+	m_nParentGxObjectID = wxNOT_FOUND;
     Create(parent, id, pos, size, style);
 }
 
@@ -337,7 +339,7 @@ void wxGxToolExecuteView::OnSelected(wxListEvent& event)
 	    if(pObject == NULL)
             continue;
 		nCount++;
-        m_pSelection->Select(pObject, true, NOTFIRESELID);
+        m_pSelection->Select(pObject->GetID(), true, NOTFIRESELID);
     }
 }
 
@@ -364,7 +366,7 @@ void wxGxToolExecuteView::OnDeselected(wxListEvent& event)
 {
 	//event.Skip();
     if(GetSelectedItemCount() == 0)
-        m_pSelection->Select(m_pParentGxObject->GetID(), false, NOTFIRESELID);
+        m_pSelection->Select(m_nParentGxObjectID, false, NOTFIRESELID);
 
 	IGxObject* pObject = (IGxObject*)event.GetData();
 	if(pObject == NULL)
@@ -379,7 +381,8 @@ void wxGxToolExecuteView::ShowContextMenu(const wxPoint& pos)
     item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if(item == -1)
 	{
-		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(m_pParentGxObject);
+		IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_nParentGxObjectID);
+		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
         if(pGxObjectUI)
         {
             wxString psContextMenu = pGxObjectUI->ContextMenu();
@@ -400,7 +403,7 @@ void wxGxToolExecuteView::ShowContextMenu(const wxPoint& pos)
 	if(pObject != NULL)
 	{
         bool bAdd = true;
-        m_pSelection->Select(pObject, bAdd, NOTFIRESELID);
+		m_pSelection->Select(pObject->GetID(), bAdd, NOTFIRESELID);
 
 		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pObject);
 		if(pGxObjectUI != NULL)
@@ -445,26 +448,31 @@ void wxGxToolExecuteView::OnActivated(wxListEvent& event)
 		pGxObjectWizard->Invoke(this);
 }
 
-void wxGxToolExecuteView::OnObjectAdded(IGxObject* pObj)
+void wxGxToolExecuteView::OnObjectAdded(long nObjectID)
 {
-	if(pObj->GetParent() == m_pParentGxObject)
-    {
-		AddObject(pObj);
-        SORTTASKDATA sortdata = {m_bSortAsc, m_currentSortCol};
-	    SortItems(TasksCompareFunction, (long)&sortdata);
-    }
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
+	if(pGxObject)
+	{
+		if(pGxObject->GetParent()->GetID() == m_nParentGxObjectID)
+		{
+			AddObject(pGxObject.get());
+			SORTTASKDATA sortdata = {m_bSortAsc, m_currentSortCol};
+			SortItems(TasksCompareFunction, (long)&sortdata);
+		}
+	}
 }
 
-void wxGxToolExecuteView::OnObjectDeleted(IGxObject* pObj)
+void wxGxToolExecuteView::OnObjectDeleted(long nObjectID)
 {
 	for(long i = 0; i < GetItemCount(); i++)
 	{
 		IGxObject* pObject = (IGxObject*)GetItemData(i);
 		if(pObject == NULL)
 			continue;
-		if(pObject != pObj)
+		IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
+		if(pObject != pGxObject.get())
 			continue;
-        SetItemData(i, NULL);
+		
 		//delete pItemData;
 		DeleteItem(i);
 		//Refresh();
@@ -472,17 +480,15 @@ void wxGxToolExecuteView::OnObjectDeleted(IGxObject* pObj)
 	}
 }
 
-void wxGxToolExecuteView::OnObjectChanged(IGxObject* pObj)
+void wxGxToolExecuteView::OnObjectChanged(long nObjectID)
 {
-    if(!pObj)
-        return;
-
+	IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
     //find item
     int nItem = wxNOT_FOUND;
     for(size_t i = 0; i < GetItemCount(); i++)
     {
         IGxObject* pObject = (IGxObject*)GetItemData(i);
-        if(pObject == pObj)
+		if(pObject != pGxObject.get())
         {
             nItem = i;
             break;
@@ -491,7 +497,7 @@ void wxGxToolExecuteView::OnObjectChanged(IGxObject* pObj)
     if(nItem == wxNOT_FOUND)
         return;
 
-    wxGxTaskObject* pGxTask =  dynamic_cast<wxGxTaskObject*>(pObj);
+    wxGxTaskObject* pGxTask =  dynamic_cast<wxGxTaskObject*>(pGxObject.get());
     if(pGxTask != NULL)
     {
         // enumGISTaskWork = 1,    enumGISTaskDone = 2,    enumGISTaskQuered = 3,     enumGISTaskPaused = 4,     enumGISTaskError = 5
@@ -524,7 +530,7 @@ void wxGxToolExecuteView::OnObjectChanged(IGxObject* pObj)
 
 		SetItem(nItem, 0, wxString::Format(wxT("%d"), pGxTask->GetPriority() + 1), nIcon);
 
-        SetItem(nItem, 1, pObj->GetName());
+        SetItem(nItem, 1, pGxObject->GetName());
         wxDateTime dtb = pGxTask->GetStart();
         if(dtb.IsValid())
             SetItem(nItem, 2, dtb.Format(_("%d-%m-%Y %H:%M:%S")));
@@ -540,20 +546,23 @@ void wxGxToolExecuteView::OnObjectChanged(IGxObject* pObj)
     }
 }
 
-void wxGxToolExecuteView::OnObjectRefreshed(IGxObject* pObj)
+void wxGxToolExecuteView::OnObjectRefreshed(long nObjectID)
 {
-    if(m_pParentGxObject == pObj)
+    if(m_nParentGxObjectID == nObjectID)
         OnRefreshAll();
-    if(pObj->GetParent() == m_pParentGxObject)
+
+	IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
+    if(pGxObject && pGxObject->GetParent()->GetID() == m_nParentGxObjectID)
     {
-	    OnObjectChanged(pObj);
+	    OnObjectChanged(nObjectID);
     }
 }
 
 void wxGxToolExecuteView::OnRefreshAll(void)
 {
     ResetContents();
-	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(m_pParentGxObject);
+	IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_nParentGxObjectID);
+	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 	if(pObjContainer == NULL || !pObjContainer->HasChildren())
 		return;
 	GxObjectArray* pArr = pObjContainer->GetChildren();
@@ -753,3 +762,10 @@ void wxGxToolExecuteView::FillDataArray(wxArrayString &saDataArr)
         saDataArr.Add(wxString::Format(wxT("TaskID: %d"), pGxTask->GetTaskID()));
     }	
 }
+
+
+IGxObject* const wxGxToolExecuteView::GetParentGxObject(void)
+{
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_nParentGxObjectID);
+	return pGxObject.get();
+};

@@ -132,7 +132,7 @@ void wxGxSelection::Clear(long nInitiator)
     wxCriticalSectionLocker locker(m_CritSect);
 	if(nInitiator == INIT_ALL)
 	{
-		for(std::map<long, wxSelLongArray>::const_iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
+		for(std::map<long, wxSelLongArray>::iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
 			CI->second.Clear();
 	}
 	else
@@ -169,7 +169,7 @@ long wxGxSelection::GetSelectedObjectID(size_t nIndex)
 	if(m_currentInitiator == INIT_NONE)
 		return wxNOT_FOUND;   
 
-    return GetSelectedObjectID(m_currentInitiator);
+    return GetSelectedObjectID(m_currentInitiator, nIndex);
 }
 
 long wxGxSelection::GetSelectedObjectID(long nInitiator, size_t nIndex)

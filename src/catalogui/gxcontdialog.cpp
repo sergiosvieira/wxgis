@@ -419,7 +419,8 @@ void wxGxContainerDialog::OnOK(wxCommandEvent& event)
         IGxSelection* pSel = m_pCatalog->GetSelection();
         for(size_t i = 0; i < pSel->GetCount(); i++)
         {
-            m_ObjectArray.push_back(pSel->GetSelectedObjects(i));
+			IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
+            m_ObjectArray.push_back(pGxObject.get());
         }
 
         wxString sLastPath = GetPath();

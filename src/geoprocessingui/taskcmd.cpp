@@ -118,7 +118,7 @@ bool wxGISTaskCmd::GetEnabled(void)
 				IGxSelection* pSel = pCatalog->GetSelection();
                 for(size_t i = 0; i < pSel->GetCount(); i++)
                 {
-                    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
+                    IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject.get());
                     if(pGxTask && pGxTask->GetState() != enumGISTaskWork)
                         return true;
@@ -135,7 +135,7 @@ bool wxGISTaskCmd::GetEnabled(void)
 				IGxSelection* pSel = pCatalog->GetSelection();
                 for(size_t i = 0; i < pSel->GetCount(); i++)
                 {
-                    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
+                    IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject.get());
                     if(pGxTask && (pGxTask->GetState() == enumGISTaskWork || pGxTask->GetState() == enumGISTaskDone || pGxTask->GetState() == enumGISTaskError))
                         return true;
@@ -152,7 +152,7 @@ bool wxGISTaskCmd::GetEnabled(void)
 				IGxSelection* pSel = pCatalog->GetSelection();
                 for(size_t i = 0; i < pSel->GetCount(); i++)
                 {                                        
-                    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
+                    IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject.get());
                     if(pGxTask && (pGxTask->GetState() == enumGISTaskPaused))
                         return true;
@@ -169,7 +169,7 @@ bool wxGISTaskCmd::GetEnabled(void)
 				IGxSelection* pSel = pCatalog->GetSelection();
                 for(size_t i = 0; i < pSel->GetCount(); i++)
                 {
-                    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
+                    IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject.get());
                     if(pGxTask && (pGxTask->GetState() == enumGISTaskWork))
                         return true;
@@ -225,7 +225,7 @@ void wxGISTaskCmd::OnClick(void)
 					IGxSelection* pSel = pCatalog->GetSelection();
 					for(size_t i = 0; i < pSel->GetCount(); i++)
 					{
-                        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
+                        IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
 						wxGxTaskObject* pGxTask = dynamic_cast<wxGxTaskObject*>(pGxObject.get());
 						if(pGxTask)
 							pGxTask->ShowToolConfig(dynamic_cast<wxWindow*>(m_pApp));
@@ -242,7 +242,7 @@ void wxGISTaskCmd::OnClick(void)
 					IGxSelection* pSel = pCatalog->GetSelection();
 					for(size_t i = 0; i < pSel->GetCount(); i++)
 					{
-                        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
+                        IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
 						wxGxTaskObject* pGxTask = dynamic_cast<wxGxTaskObject*>(pGxObject.get());
 						if(pGxTask)
 							pGxTask->ShowProcess(dynamic_cast<wxWindow*>(m_pApp));
@@ -259,7 +259,7 @@ void wxGISTaskCmd::OnClick(void)
 					IGxSelection* pSel = pCatalog->GetSelection();
 					for(size_t i = 0; i < pSel->GetCount(); i++)
 					{
-                        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
+                        IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
 						wxGxTaskObject* pGxTask = dynamic_cast<wxGxTaskObject*>(pGxObject.get());
 						if(pGxTask)
 							pGxTask->StartTask();
@@ -276,7 +276,7 @@ void wxGISTaskCmd::OnClick(void)
 					IGxSelection* pSel = pCatalog->GetSelection();
 					for(size_t i = 0; i < pSel->GetCount(); i++)
 					{
-                        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
+                        IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
 						wxGxTaskObject* pGxTask = dynamic_cast<wxGxTaskObject*>(pGxObject.get());
 						if(pGxTask)
 							pGxTask->StopTask();

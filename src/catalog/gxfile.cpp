@@ -46,6 +46,7 @@ wxString wxGxFile::GetBaseName(void)
 
 bool wxGxFile::Delete(void)
 {
+	wxCriticalSectionLocker locker(m_DestructCritSect);
     if(DeleteFile(m_sPath))
 	{
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
