@@ -38,4 +38,5 @@ public:
 protected:
     wxIcon m_LargeTabIcon, m_SmallTabIcon;
     wxIcon m_LargeMifIcon, m_SmallMifIcon;
+    wxIcon m_LargeTabTIcon, m_SmallTabTIcon;
 };

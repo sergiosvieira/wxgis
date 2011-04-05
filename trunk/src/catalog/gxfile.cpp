@@ -64,9 +64,8 @@ bool wxGxFile::Delete(void)
 
 bool wxGxFile::Rename(wxString NewName)
 {
-    NewName = ClearExt(NewName);
 	wxFileName PathName(wxString(m_sPath, wxConvUTF8));
-	PathName.SetName(NewName);
+	PathName.SetName(ClearExt(NewName));
 
 	wxString sNewPath = PathName.GetFullPath();
     CPLString szNewPath = sNewPath.mb_str(wxConvUTF8);

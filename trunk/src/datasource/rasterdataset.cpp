@@ -158,7 +158,7 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
     Close();
 
 	wxFileName PathName(wxString(m_sPath, wxConvUTF8));
-	PathName.SetName(sNewName);
+	PathName.SetName(ClearExt(sNewName));
 
 	wxString sNewPath = PathName.GetFullPath();
 
@@ -168,7 +168,6 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
     if( !RenameFile(m_sPath, szNewPath) )
         return false;
 
-	m_sPath = szNewPath;
     CPLString szOldPathAdd, szNewPathAdd;
 
     szOldPathAdd = m_sPath + CPLString("w");
@@ -231,6 +230,7 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
     default: 
         break;
     }
+	m_sPath = szNewPath;
 	return true;
 }
 

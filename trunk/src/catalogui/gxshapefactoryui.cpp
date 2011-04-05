@@ -23,8 +23,8 @@
 
 #include "../../art/shp_dset_16.xpm"
 #include "../../art/shp_dset_48.xpm"
-#include "../../art/dbf_dset_16.xpm"
-#include "../../art/dbf_dset_48.xpm"
+#include "../../art/table_dbf_16.xpm"
+#include "../../art/table_dbf_48.xpm"
 
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxShapeFactoryUI, wxGxShapeFactory)
@@ -33,8 +33,8 @@ wxGxShapeFactoryUI::wxGxShapeFactoryUI(void) : wxGxShapeFactory()
 {
     m_SmallSHPIcon = wxIcon(shp_dset_16_xpm);
     m_LargeSHPIcon = wxIcon(shp_dset_48_xpm);
-    m_SmallDXFIcon = wxIcon(dbf_dset_16_xpm);
-    m_LargeDXFIcon = wxIcon(dbf_dset_48_xpm);
+    m_SmallDXFIcon = wxIcon(table_dbf_16_xpm);
+    m_LargeDXFIcon = wxIcon(table_dbf_48_xpm);
 }
 
 wxGxShapeFactoryUI::~wxGxShapeFactoryUI(void)

@@ -947,11 +947,19 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
 
                 for(size_t i = nPos > 7 ? nPos - 7 : 0; i < nPos; i++)
                 {
-					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(pSel->GetDoID(i)));
-                    wxString sPath = pGxObject->GetFullName();
-
-                    if(!sPath.IsEmpty())
-                        pMenu->Append(ID_MENUCMD + i, sPath);
+					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetDoID(i));//pSel->GetSelectedObjectID(
+                    if(pGxObject)
+                    {
+                        wxString sPath = pGxObject->GetFullName();
+                        if(!sPath.IsEmpty())
+                            pMenu->Append(ID_MENUCMD + i, sPath);
+                        else
+                        {
+                            sPath = pGxObject->GetName();
+                            if(!sPath.IsEmpty())
+                                pMenu->Append(ID_MENUCMD + i, sPath);
+                        }
+                    }
                 }
                 return pMenu;                
             }
@@ -972,10 +980,19 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
                 {
                     if(i > nPos + 7)
                         break;
-					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(pSel->GetDoID(i)));
-                    wxString sPath = pGxObject->GetFullName();
-                    if(!sPath.IsEmpty())
-                        pMenu->Append(ID_MENUCMD + i, sPath);
+					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetDoID(i));//pSel->GetSelectedObjectID(
+                    if(pGxObject)
+                    {
+                        wxString sPath = pGxObject->GetFullName();
+                        if(!sPath.IsEmpty())
+                            pMenu->Append(ID_MENUCMD + i, sPath);
+                        else
+                        {
+                            sPath = pGxObject->GetName();
+                            if(!sPath.IsEmpty())
+                                pMenu->Append(ID_MENUCMD + i, sPath);
+                        }
+                    }
                 }
                 return pMenu;                
             }
