@@ -113,9 +113,8 @@ bool wxGxKMLDataset::Delete(void)
 
 bool wxGxKMLDataset::Rename(wxString NewName)
 {
-    NewName = ClearExt(NewName);
 	wxFileName PathName(wxString(m_sPath, wxConvUTF8));
-	PathName.SetName(NewName);
+	PathName.SetName(ClearExt(NewName));
 
 	wxString sNewPath = PathName.GetFullPath();
 

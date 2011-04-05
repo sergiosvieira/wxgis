@@ -57,6 +57,8 @@ bool wxGxMapInfoFactory::GetChildren(CPLString sParentDir, char** &pFileNames, G
                 bHasMap = true;
             if(bHasMap && bHasMap && bHasID && bHasDat)
                 pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumVecMapinfoTab);
+            else if(bHasDat)
+                pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumVecUnknown);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
         else if(EQUAL(szExt, "mif"))
@@ -105,6 +107,8 @@ void wxGxMapInfoFactory::Serialize(wxXmlNode* pConfig, bool bStore)
 
 IGxObject* wxGxMapInfoFactory::GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type)
 {
+    if(enumVecUnknown)
+        return static_cast<IGxObject*>(new wxGxTableDataset(path, name, enumTableMI));
 	wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, type);
     return static_cast<IGxObject*>(pDataset);
 }

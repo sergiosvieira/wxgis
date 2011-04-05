@@ -26,6 +26,8 @@
 #include "../../art/mi_dset_48.xpm"
 #include "../../art/md_dset_16.xpm"
 #include "../../art/md_dset_48.xpm"
+#include "../../art/table_tab_16.xpm"
+#include "../../art/table_tab_48.xpm"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxMapInfoFactoryUI, wxGxMapInfoFactory)
 
@@ -35,6 +37,8 @@ wxGxMapInfoFactoryUI::wxGxMapInfoFactoryUI(void) : wxGxMapInfoFactory()
     m_LargeTabIcon = wxIcon(mi_dset_48_xpm);
     m_SmallMifIcon = wxIcon(md_dset_16_xpm);
     m_LargeMifIcon = wxIcon(md_dset_48_xpm);
+    m_SmallTabTIcon = wxIcon(table_tab_16_xpm);
+    m_LargeTabTIcon = wxIcon(table_tab_48_xpm);
 }
 
 wxGxMapInfoFactoryUI::~wxGxMapInfoFactoryUI(void)
@@ -52,6 +56,8 @@ IGxObject* wxGxMapInfoFactoryUI::GetGxDataset(CPLString path, wxString name, wxG
     case enumVecMapinfoMif:
 	    pDataset = new wxGxFeatureDatasetUI(path, name, type, m_LargeMifIcon, m_SmallMifIcon);
         break;
+    case enumVecUnknown:
+	    return static_cast<IGxObject*>(new wxGxTableDatasetUI(path, name, enumTableMI, m_LargeTabTIcon, m_SmallTabTIcon));
     default:
         return NULL;
     }

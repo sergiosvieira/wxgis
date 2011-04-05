@@ -359,7 +359,7 @@ bool wxGISFeatureDataset::Rename(wxString sNewName)
 	wxCriticalSectionLocker locker(m_CritSect);
 
 	wxFileName PathName(wxString(m_sPath, wxConvUTF8));
-	PathName.SetName(sNewName);
+	PathName.SetName(ClearExt(sNewName));
 
 	wxString sNewPath = PathName.GetFullPath();
 
@@ -368,7 +368,7 @@ bool wxGISFeatureDataset::Rename(wxString sNewName)
 
     if( !RenameFile(m_sPath, szNewPath) )
         return false;
-	m_sPath = szNewPath;
+    //RenameFile(m_sPath + ".metadata.xml", szNewPath + ".metadata.xml");
     RenameFile(CPLResetExtension(m_sPath, "cpg"), CPLResetExtension(szNewPath, "cpg"));
     RenameFile(CPLResetExtension(m_sPath, "osf"), CPLResetExtension(szNewPath, "osf"));
 
@@ -406,6 +406,7 @@ bool wxGISFeatureDataset::Rename(wxString sNewName)
     default: 
         return false;
     }
+	m_sPath = szNewPath;
 	return true;
 }
 
@@ -956,8 +957,8 @@ void wxGISFeatureDataset::DeleteQuadTree(void)
 size_t wxGISFeatureDataset::GetSize(void)
 {
 	wxCriticalSectionLocker locker(m_CritSect);
-    if(m_bIsGeometryLoaded && m_pGeometrySet)
-        return m_pGeometrySet->GetSize();
+    //if(m_bIsGeometryLoaded && m_pGeometrySet)
+    //    return m_pGeometrySet->GetSize();
     if(!m_bIsOpened)
         if(!Open(0))
             return NULL;

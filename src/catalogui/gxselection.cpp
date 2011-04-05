@@ -120,7 +120,6 @@ void wxGxSelection::Unselect( long nObjectID, long nInitiator )
 	}
 	else
 	{
-
 		int nIndex = m_SelectionMap[nInitiator].Index(nObjectID);
 		if(nIndex != wxNOT_FOUND)
 			m_SelectionMap[nInitiator].Remove(nIndex);

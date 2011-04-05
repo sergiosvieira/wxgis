@@ -445,6 +445,7 @@ void wxGxContentView::ShowContextMenu(const wxPoint& pos)
 		if(pGxObjectUI != NULL)
 		{
             wxString psContextMenu = pGxObjectUI->ContextMenu();
+            pGxObject.reset();
             IApplication* pApp = dynamic_cast<IApplication*>(m_pApplication);
             if(pApp)
             {
@@ -592,13 +593,16 @@ void wxGxContentView::OnEndLabelEdit(wxListEvent& event)
 
 void wxGxContentView::OnObjectAdded(long nObjectID)
 {
-	if(nObjectID == m_nParentGxObjectID)
-    {
-        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
-		AddObject(pGxObject.get());
-        SORTDATA sortdata = {m_bSortAsc, m_currentSortCol, m_pCatalog};
-	    SortItems(MyCompareFunction, (long)&sortdata);
-	    //SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
+    if(pGxObject)
+    {        
+	    if(pGxObject->GetParent()->GetID() == m_nParentGxObjectID)
+        {
+		    AddObject(pGxObject.get());
+            SORTDATA sortdata = {m_bSortAsc, m_currentSortCol, m_pCatalog};
+	        SortItems(MyCompareFunction, (long)&sortdata);
+	        //SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+        }
     }
 }
 

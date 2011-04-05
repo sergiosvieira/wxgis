@@ -125,7 +125,8 @@ protected:
 
 static void GxObjectDeleter(IGxObject *ptr)
 {
-	ptr->Unlock();
+    if(ptr)
+        ptr->Unlock();
 }
 /** \class IGxObjectEdit catalog.h
     \brief A GxObject edit interface.
