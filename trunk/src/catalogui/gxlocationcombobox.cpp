@@ -75,7 +75,7 @@ void wxGxLocationComboBox::Activate(IApplication* pApp)
 	m_pApp = pApp;
 	wxGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(pApp);
     m_pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-	m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( pGxCatalogUI->GetSelection() );
+	m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( m_pGxCatalogUI->GetSelection() );
 	if(m_pConnectionPointSelection != NULL)
 		m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
 }

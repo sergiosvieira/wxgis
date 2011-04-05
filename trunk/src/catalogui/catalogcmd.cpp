@@ -546,7 +546,7 @@ void wxGISCatalogMainCmd::OnClick(void)
                     pSelObj = pGxObject.get();
                 }
                 if(pGxView)
-                    pGxView->BeginRename(pSelObj);
+                    pGxView->BeginRename(pSelObj->GetID());
             }			
 			break;
         case 4:
@@ -601,6 +601,7 @@ void wxGISCatalogMainCmd::OnClick(void)
                     IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
                     if(pGxObjectEdit && pGxObjectEdit->CanDelete())
                     {
+						pGxObject.reset();
                         if(!pGxObjectEdit->Delete())
                         {
                             wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);

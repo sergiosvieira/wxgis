@@ -128,8 +128,8 @@ public:
 // events
     virtual void OnActivated(wxListEvent& event);
 //IGxCatalogEvents
-	virtual void OnObjectAdded(IGxObject* object);
-	virtual void OnObjectDeleted(IGxObject* object);
+	virtual void OnObjectAdded(long nObjectID);
+	virtual void OnObjectDeleted(long nObjectID);
 //
 	virtual void SetFilters(LPOBJECTFILTERS pFiltersArray){m_pFiltersArray = pFiltersArray;};
 	virtual void SetCurrentFilter(size_t nFilterIndex);

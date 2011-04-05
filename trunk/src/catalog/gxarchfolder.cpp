@@ -44,7 +44,8 @@ wxString wxGxArchive::GetBaseName(void)
 
 bool wxGxArchive::Delete(void)
 {
-    int nCount = 0;
+	wxCriticalSectionLocker locker(m_DestructCritSect);
+	int nCount = 0;
     for(size_t i = 1; i < m_sPath.length(); i++)
     {
         nCount++;

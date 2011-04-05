@@ -45,7 +45,6 @@ public:
 
 	~wxGxTreeItemData(void)
 	{
-		m_pObject = NULL;
 	}
 
 	long m_nObjectID;

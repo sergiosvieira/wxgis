@@ -53,7 +53,7 @@ public:
 	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
 	virtual void AddObject(IGxObject* pObject);
 	virtual void ResetContents(void);
-    virtual IGxObject* GetParentGxObject(void){return m_pParentGxObject;};
+    virtual IGxObject* const GetParentGxObject(void);
     virtual void SelectAll(void);
     virtual bool Show(bool show = true);
 //IGxView

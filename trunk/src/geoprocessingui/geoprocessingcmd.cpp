@@ -133,7 +133,7 @@ bool wxGISGeoprocessingCmd::GetEnabled(void)
 				IGxSelection* pSel = pCatalog->GetSelection();
                 for(size_t i = 0; i < pSel->GetCount(); i++)
                 {
-                    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
+                    IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxDataset* pDSet = dynamic_cast<IGxDataset*>(pGxObject.get());
                     if(pDSet)
                         return true;
@@ -188,7 +188,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
 					IGxSelection* pSel = pCatalog->GetSelection();
                     for(size_t i = 0; i < pSel->GetCount(); i++)
                     {
-                        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
+                        IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
                         IGxDataset* pGxDSet = dynamic_cast<IGxDataset*>(pGxObject.get());
                         IGxObjectContainer* pObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxDSet);
                         if(pObjectContainer)

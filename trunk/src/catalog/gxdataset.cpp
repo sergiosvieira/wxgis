@@ -42,7 +42,8 @@ wxGxTableDataset::~wxGxTableDataset(void)
 
 bool wxGxTableDataset::Delete(void)
 {
-    wxGISFeatureDatasetSPtr pDSet;
+	wxCriticalSectionLocker locker(m_DestructCritSect);
+	wxGISFeatureDatasetSPtr pDSet;
  	if(m_pwxGISDataset == NULL)
     {
         pDSet = boost::make_shared<wxGISFeatureDataset>(m_sPath, enumVecUnknown);
@@ -226,6 +227,7 @@ wxString wxGxFeatureDataset::GetBaseName(void)
 
 bool wxGxFeatureDataset::Delete(void)
 {
+	wxCriticalSectionLocker locker(m_DestructCritSect);
     wxGISFeatureDatasetSPtr pDSet;
  	if(m_pwxGISDataset == NULL)
     {
@@ -443,6 +445,7 @@ wxGxRasterDataset::~wxGxRasterDataset(void)
 
 bool wxGxRasterDataset::Delete(void)
 {
+	wxCriticalSectionLocker locker(m_DestructCritSect);
     wxGISRasterDatasetSPtr pDSet;
  	if(m_pwxGISDataset == NULL)
     {

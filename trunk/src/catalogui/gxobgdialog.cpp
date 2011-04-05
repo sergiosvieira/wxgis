@@ -78,7 +78,7 @@ wxString wxTreeViewComboPopup::GetStringValue() const
 {
     if( m_bClicked == false )
     {
-        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_pSelection->GetLastSelectedObjectID()));
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_pSelection->GetLastSelectedObjectID());
         if(pGxObject)
             return pGxObject->GetName();
         return wxEmptyString;
@@ -126,7 +126,7 @@ void wxTreeViewComboPopup::OnMouseClick(wxMouseEvent& event)
 	    if(pData != NULL)
 	    {
             SelectItem(ItemId);
-		    m_pSelection->Select(pData->m_pObject, false, GetId());
+		    m_pSelection->Select(pData->m_nObjectID, false, GetId());
             m_PrewItemId = ItemId;
 	    }
     }
@@ -176,7 +176,7 @@ void wxTreeViewComboPopup::OnDblClick(wxTreeEvent& event)
 	wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(ItemId);
 	if(pData != NULL)
 	{
-		m_pSelection->Select(pData->m_pObject, false, GetId());
+		m_pSelection->Select(pData->m_nObjectID, false, GetId());
 	}
     wxComboPopup::Dismiss();
 }
@@ -215,7 +215,7 @@ void wxTreeViewComboPopup::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParen
 	else
 		pos = 0;//0 col img, 1 - col img
 
-	wxGxTreeItemData* pData = new wxGxTreeItemData(pGxObject, pos, false);
+	wxGxTreeItemData* pData = new wxGxTreeItemData(pGxObject->GetID(), pos, false);
 
     wxString sName;
     if(m_pCatalog->GetShowExt())
@@ -225,7 +225,7 @@ void wxTreeViewComboPopup::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParen
 
 
 	wxTreeItemId NewTreeItem = AppendItem(hParent, sName, pos, -1, pData);
-	m_TreeMap[pGxObject] = NewTreeItem;
+	m_TreeMap[pGxObject->GetID()] = NewTreeItem;
 
 	if(pContainer->AreChildrenViewable())
 		SetItemHasChildren(NewTreeItem);
@@ -284,10 +284,11 @@ void wxGxDialogContentView::OnActivated(wxListEvent& event)
 	//	if(!pGxObjectWizard->Invoke(this))
 	//		return;
 
-	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pItemData->pObject);
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pItemData->nObjectID);
+	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 	if(pGxObjectContainer != NULL )
 	{
-		m_pSelection->Select(pItemData->pObject, false, IGxSelection::INIT_ALL);//GetId()
+		m_pSelection->Select(pItemData->nObjectID, false, IGxSelection::INIT_ALL);//GetId()
 		return;
 	}
 
@@ -319,18 +320,19 @@ void wxGxDialogContentView::AddObject(IGxObject* pObject)
 	}
 }
 
-void wxGxDialogContentView::OnObjectAdded(IGxObject* object)
+void wxGxDialogContentView::OnObjectAdded(long nObjectID)
 {
-    wxGxContentView::OnObjectAdded(object);
+    wxGxContentView::OnObjectAdded(nObjectID);
     if(m_pExternalCatalog)
     {
-        wxGxDiscConnectionUI* pDiscConnection = dynamic_cast<wxGxDiscConnectionUI*>(object);
+		IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
+        wxGxDiscConnectionUI* pDiscConnection = dynamic_cast<wxGxDiscConnectionUI*>(pGxObject.get());
         if(pDiscConnection)
         {
-            m_pExternalCatalog->ConnectFolder(object->GetFullName(), false);
+            m_pExternalCatalog->ConnectFolder(pGxObject->GetFullName(), false);
             return;
         }
-        IGxObject* pParent = object->GetParent();
+        IGxObject* pParent = pGxObject->GetParent();
         if(pParent)
         {
             IGxObjectContainer* pObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pExternalCatalog);
@@ -340,18 +342,19 @@ void wxGxDialogContentView::OnObjectAdded(IGxObject* object)
     }
 }
 
-void wxGxDialogContentView::OnObjectDeleted(IGxObject* object)
+void wxGxDialogContentView::OnObjectDeleted(long nObjectID)
 {
-    wxGxContentView::OnObjectDeleted(object);
+    wxGxContentView::OnObjectDeleted(nObjectID);
     if(m_pExternalCatalog)
     {
-        wxGxDiscConnectionUI* pDiscConnection = dynamic_cast<wxGxDiscConnectionUI*>(object);
+		IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
+        wxGxDiscConnectionUI* pDiscConnection = dynamic_cast<wxGxDiscConnectionUI*>(pGxObject.get());
         if(pDiscConnection)
         {
-            m_pExternalCatalog->DisconnectFolder(object->GetInternalName());
+            m_pExternalCatalog->DisconnectFolder(pGxObject->GetInternalName());
             return;
         }
-        IGxObject* pParent = object->GetParent();
+        IGxObject* pParent = pGxObject->GetParent();
         if(pParent)
         {
             IGxObjectContainer* pObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pExternalCatalog);
@@ -717,10 +720,11 @@ void wxGxObjectDialog::OnItemSelected(wxListEvent& event)
 	if(pItemData == NULL)
 		return;
 
-	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pItemData->pObject);
+	IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pItemData->nObjectID);
+	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pGxObject.get());
     if(!pGxDataset)
     {
-    	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pItemData->pObject);
+    	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
         if(pGxObjectContainer)
             return;
     }
@@ -775,11 +779,12 @@ void wxGxObjectDialog::OnOK(wxCommandEvent& event)
             IGxSelection* pSel = m_pwxGxContentView->GetSelectedObjects();
             if(!pSel)
                 return;
-            IGxObject* pGxObj = pSel->GetSelectedObjects(0);
-            IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObj);
+			long nSelID = pSel->GetSelectedObjectID(0);
+			IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nSelID);
+            IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
             if(pObjCont)
             {
-                m_pCatalog->GetSelection()->Select(pGxObj, false, IGxSelection::INIT_ALL);
+                m_pCatalog->GetSelection()->Select(nSelID, false, IGxSelection::INIT_ALL);
                 return;
             }
 
@@ -803,17 +808,19 @@ void wxGxObjectDialog::OnOK(wxCommandEvent& event)
         {
             IGxSelection* pSel = m_pwxGxContentView->GetSelectedObjects();
 
-            IGxObject* pGxObj = pSel->GetSelectedObjects(0);
-            IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObj);
+ 			long nSelID = pSel->GetSelectedObjectID(0);
+ 			IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nSelID);
+            IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
             if(pObjCont)
             {
-                m_pCatalog->GetSelection()->Select(pGxObj, false, IGxSelection::INIT_ALL);
+                m_pCatalog->GetSelection()->Select(nSelID, false, IGxSelection::INIT_ALL);
                 return;
             }
 
             for(size_t i = 0; i < pSel->GetCount(); i++)
             {
-                m_ObjectArray.push_back(pSel->GetSelectedObjects(i));
+				IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
+                m_ObjectArray.push_back(pGxObject.get());
             }
             for(size_t i = 0; i < m_ObjectArray.size(); i++)
             {
@@ -824,7 +831,7 @@ void wxGxObjectDialog::OnOK(wxCommandEvent& event)
                         IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(m_ObjectArray[i]);
                         if(pObjCont)
                         {
-                            m_pCatalog->GetSelection()->Select(m_ObjectArray[i], false, IGxSelection::INIT_ALL);
+                            m_pCatalog->GetSelection()->Select(m_ObjectArray[i]->GetID(), false, IGxSelection::INIT_ALL);
                             return;
                         }
                         m_ObjectArray.erase(m_ObjectArray.begin() + i);
@@ -846,7 +853,7 @@ void wxGxObjectDialog::OnOK(wxCommandEvent& event)
                             IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(m_ObjectArray[i]);
                             if(pObjCont)
                             {
-                                m_pCatalog->GetSelection()->Select(m_ObjectArray[i], false, IGxSelection::INIT_ALL);
+                                m_pCatalog->GetSelection()->Select(m_ObjectArray[i]->GetID(), false, IGxSelection::INIT_ALL);
                                 return;
                             }
                             m_ObjectArray.erase(m_ObjectArray.begin() + i);
@@ -866,20 +873,24 @@ void wxGxObjectDialog::OnOK(wxCommandEvent& event)
         if(ItemId.IsOk())
         {
             wxGxTreeItemData* pData = (wxGxTreeItemData*)m_PopupCtrl->GetItemData(ItemId);
-            if(pData != NULL && pData->m_pObject)
+            if(pData != NULL)
             {
-                wxString sLastPath = pData->m_pObject->GetFullName();
-                wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
-                if(pLastLocationNode)
-                {
-                    if(pLastLocationNode->HasProp(wxT("path")))
-                        pLastLocationNode->DeleteProperty(wxT("path"));
-                }
-                else
-                {
-                    pLastLocationNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("lastpath")), true);
-                }
-                pLastLocationNode->AddProperty(wxT("path"), sLastPath);
+		        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID);
+				if(pGxObject)
+				{
+					wxString sLastPath = pGxObject->GetFullName();
+					wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
+					if(pLastLocationNode)
+					{
+						if(pLastLocationNode->HasProp(wxT("path")))
+							pLastLocationNode->DeleteProperty(wxT("path"));
+					}
+					else
+					{
+						pLastLocationNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("lastpath")), true);
+					}
+					pLastLocationNode->AddProperty(wxT("path"), sLastPath);
+				}
             }
         }
 

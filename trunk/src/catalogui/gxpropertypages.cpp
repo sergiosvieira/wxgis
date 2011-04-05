@@ -160,8 +160,8 @@ void wxGISCatalogGeneralPropertyPage::Apply(void)
     if(bHaveChanges)
     {
         IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_pCatalog->GetSelection()->GetLastSelectedObjectID());
-        if(pGxObj)
-            pGxObj->Refresh();
+        if(pGxObject)
+            pGxObject->Refresh();
     }
 
     //update root items

@@ -30,6 +30,7 @@ wxGxDiscConnection::~wxGxDiscConnection(void)
 
 bool wxGxDiscConnection::Delete(void)
 {
+	wxCriticalSectionLocker locker(m_DestructCritSect);
 	return true;
 }
 

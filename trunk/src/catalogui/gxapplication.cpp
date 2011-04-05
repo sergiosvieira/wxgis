@@ -197,6 +197,9 @@ void wxGxApplication::UnRegisterChildWindow(wxWindow* pWnd)
 
 bool wxGxApplication::Create(IGISConfig* pConfig)
 {
+	m_pCatalog = new wxGxCatalogUI();
+	m_pCatalog->Init();
+
     m_pNewMenu = new wxGISNewMenu();
     m_pNewMenu->OnCreate(this);
     m_pNewMenu->Reference();
@@ -209,9 +212,6 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
 	wxLogMessage(_("wxGxApplication: Start. Creating main application frame..."));
 
 	m_mgr.SetManagedWindow(this);
-
-	m_pCatalog = new wxGxCatalogUI();
-	m_pCatalog->Init();
 
 	wxXmlNode* pViewsNode = m_pConfig->GetConfigNode(wxString(wxT("frame/views")), true, true);
 
@@ -330,11 +330,11 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
     if(pSel->GetCount(TREECTRLID) > 0)
 	{
         IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(TREECTRLID, 0));
-        if(pObj && pGxObject.get() != dynamic_cast<IGxObject*>(m_pCatalog))
+        if(pGxObject && pGxObject.get() != dynamic_cast<IGxObject*>(m_pCatalog))
         {
-		    wxString sLastPath = pObj->GetFullName();
+		    wxString sLastPath = pGxObject->GetFullName();
 		    if(sLastPath.IsEmpty())
-			    sLastPath = pObj->GetName();
+			    sLastPath = pGxObject->GetName();
 
 		    wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
 		    if(pLastLocationNode)

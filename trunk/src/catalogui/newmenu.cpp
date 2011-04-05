@@ -27,8 +27,10 @@
 // wxGISNewMenu
 //----------------------------------------------------------------------
 
-wxGISNewMenu::wxGISNewMenu(const wxString& sName, const wxString& sCaption, wxGISEnumCommandBars type, const wxString& title, long style) : wxGISMenu(sName, sCaption, type, title, style), m_ConnectionPointSelectionCookie(-1)
+wxGISNewMenu::wxGISNewMenu(const wxString& sName, const wxString& sCaption, wxGISEnumCommandBars type, const wxString& title, long style) : wxGISMenu(sName, sCaption, type, title, style)
 {
+	m_pCatalog = NULL;
+	m_ConnectionPointSelectionCookie = wxNOT_FOUND;
 }
 
 wxGISNewMenu::~wxGISNewMenu(void)
@@ -83,6 +85,13 @@ void wxGISNewMenu::OnClick(void)
 bool wxGISNewMenu::OnCreate(IApplication* pApp)
 {
 	m_pApp = pApp;
+
+	IGxApplication* pGxApplication = dynamic_cast<IGxApplication*>(m_pApp);
+	if(pGxApplication)
+		m_pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApplication->GetCatalog());
+	else
+		return false;
+
     return true;
 }
 
