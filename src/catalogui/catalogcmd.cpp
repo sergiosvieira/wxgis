@@ -846,10 +846,13 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
                 IGxSelection* pSel = pGxCatalogUI->GetSelection();
                 int nPos = pSel->GetDoPos();
-				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(pSel->GetDoID(nPos - 1)));
-                wxString sPath = pGxObject->GetFullName();
-                if(!sPath.IsEmpty())
-                    return sPath;
+				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetDoID(nPos - 1));
+                if(pGxObject)
+                {
+                    wxString sPath = pGxObject->GetFullName();
+                    if(!sPath.IsEmpty())
+                        return sPath;
+                }
             }
 			return wxString(_("Go to previous location"));
         }
@@ -861,10 +864,13 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
                 IGxSelection* pSel = pGxCatalogUI->GetSelection();
                 int nPos = pSel->GetDoPos();
-				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(pSel->GetDoID(nPos + 1 == pSel->GetDoSize() ? nPos : nPos + 1)));
-                wxString sPath = pGxObject->GetFullName();
-                if(!sPath.IsEmpty())
-                    return sPath;
+				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetDoID(nPos + 1 == pSel->GetDoSize() ? nPos : nPos + 1));
+                if(pGxObject)
+                {
+                    wxString sPath = pGxObject->GetFullName();
+                    if(!sPath.IsEmpty())
+                        return sPath;
+                }
             }
 			return wxString(_("Go to next location"));//
         }

@@ -197,9 +197,6 @@ void wxGxApplication::UnRegisterChildWindow(wxWindow* pWnd)
 
 bool wxGxApplication::Create(IGISConfig* pConfig)
 {
-	m_pCatalog = new wxGxCatalogUI();
-	m_pCatalog->Init();
-
     m_pNewMenu = new wxGISNewMenu();
     m_pNewMenu->OnCreate(this);
     m_pNewMenu->Reference();
@@ -208,6 +205,10 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
     m_CommandArray.push_back(m_pNewMenu);
 
     wxGISApplication::Create(pConfig);
+
+	wxLogMessage(_("wxGxApplication: Create and init catalog"));
+	m_pCatalog = new wxGxCatalogUI();
+	m_pCatalog->Init();
 
 	wxLogMessage(_("wxGxApplication: Start. Creating main application frame..."));
 
