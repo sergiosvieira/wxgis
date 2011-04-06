@@ -85,13 +85,6 @@ void wxGISNewMenu::OnClick(void)
 bool wxGISNewMenu::OnCreate(IApplication* pApp)
 {
 	m_pApp = pApp;
-
-	IGxApplication* pGxApplication = dynamic_cast<IGxApplication*>(m_pApp);
-	if(pGxApplication)
-		m_pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApplication->GetCatalog());
-	else
-		return false;
-
     return true;
 }
 
@@ -128,6 +121,13 @@ unsigned char wxGISNewMenu::GetCount(void)
 void wxGISNewMenu::Update(IGxSelection* Selection)
 //void wxGISNewMenu::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 {
+	if(!m_pCatalog)
+    {
+        IGxApplication* pGxApplication = dynamic_cast<IGxApplication*>(m_pApp);
+        if(pGxApplication)
+            m_pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApplication->GetCatalog());
+    }
+
     for(size_t i = 0; i < m_delitems.size(); i++)
     {
         wxMenuItem* pItem = Remove(m_delitems[i]);

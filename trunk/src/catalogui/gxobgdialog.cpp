@@ -23,6 +23,7 @@
 #include "wxgis/catalogui/catalogcmd.h"
 #include "wxgis/catalogui/viewscmd.h"
 #include "wxgis/catalogui/gxdiscconnectionui.h"
+#include "wxgis/framework/application.h"
 
 #include <wx/valgen.h>
 
@@ -412,49 +413,91 @@ wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, IGxCatalog* pExternalCatal
 	m_toolBar->SetToolBitmapSize( wxSize( 16,16 ) );
 	m_toolBar->SetArtProvider(new wxGxToolBarArt());
 
-//	0	Up One Level
-//	1	Connect Folder
-//	2	Disconnect Folder
-//	3	Location
-//  4   Delete Item
-//  5   Back
-//  6   Forward
-//  7   Create Folder
-
-    int IDs[8] = {5,0,-1,1,2,-1,4,7};
-    for(size_t i = 0; i < 8; i++)
+    wxGISApplication* pApp = dynamic_cast<wxGISApplication*>(GetApplication());
+    if(pApp)
     {
-        if(IDs[i] == -1)
+    //	0	Up One Level
+    //	1	Connect Folder
+    //	2	Disconnect Folder
+    //	3	Location
+    //  4   Delete Item
+    //  5   Back
+    //  6   Forward
+    //  7   Create Folder
+
+        int IDs[8] = {5,0,-1,1,2,-1,4,7};
+        ICommand *pCmd(NULL);
+        wxGISCatalogMainCmd* pwxGISCatalogMainCmd(NULL);
+        for(size_t i = 0; i < 8; i++)
         {
-            m_toolBar->AddSeparator();
-            continue;
+            if(IDs[i] == -1)
+            {
+                m_toolBar->AddSeparator();
+                continue;
+            }
+            pCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), IDs[i]);
+            if(!pCmd)
+                continue;
+            pwxGISCatalogMainCmd = new wxGISCatalogMainCmd();
+            pwxGISCatalogMainCmd->OnCreate(static_cast<IApplication*>(this));
+            pwxGISCatalogMainCmd->SetSubType(IDs[i]);
+            pwxGISCatalogMainCmd->SetID(pCmd->GetID());
+
+            //pwxGISCatalogMainCmd->SetID(ID_PLUGINCMD + i + 1);
+            m_CommandArray.push_back(pwxGISCatalogMainCmd);
+            wxGISEnumCommandKind kind = pwxGISCatalogMainCmd->GetKind();
+            if(pwxGISCatalogMainCmd->GetKind() == enumGISCommandDropDown)
+                kind = enumGISCommandNormal;
+		    m_toolBar->AddTool( pwxGISCatalogMainCmd->GetID(), pwxGISCatalogMainCmd->GetCaption(), pwxGISCatalogMainCmd->GetBitmap(), wxNullBitmap, (wxItemKind)kind, pwxGISCatalogMainCmd->GetTooltip(), pwxGISCatalogMainCmd->GetMessage(), NULL );
+		    if(pwxGISCatalogMainCmd->GetKind() == enumGISCommandDropDown)
+			    m_toolBar->SetToolDropDown(pwxGISCatalogMainCmd->GetID(), true);
         }
-        wxGISCatalogMainCmd* pwxGISCatalogMainCmd = new wxGISCatalogMainCmd();
-        pwxGISCatalogMainCmd->OnCreate(static_cast<IApplication*>(this));
-        pwxGISCatalogMainCmd->SetID(ID_PLUGINCMD + i + 1);
-        pwxGISCatalogMainCmd->SetSubType(IDs[i]);
-        m_CommandArray.push_back(pwxGISCatalogMainCmd);
-        wxGISEnumCommandKind kind = pwxGISCatalogMainCmd->GetKind();
-        if(pwxGISCatalogMainCmd->GetKind() == enumGISCommandDropDown)
-            kind = enumGISCommandNormal;
-		m_toolBar->AddTool( pwxGISCatalogMainCmd->GetID(), pwxGISCatalogMainCmd->GetCaption(), pwxGISCatalogMainCmd->GetBitmap(), wxNullBitmap, (wxItemKind)kind, pwxGISCatalogMainCmd->GetTooltip(), pwxGISCatalogMainCmd->GetMessage(), NULL );
-		if(pwxGISCatalogMainCmd->GetKind() == enumGISCommandDropDown)
-			m_toolBar->SetToolDropDown(pwxGISCatalogMainCmd->GetID(), true);
+
+        pCmd = pApp->GetCommand(wxT("wxGISCatalogViewsCmd"), 0);
+        if(pCmd)
+        {
+            wxGISCatalogViewsCmd* pwxGISCatalogViewsCmd = new wxGISCatalogViewsCmd();
+            pwxGISCatalogViewsCmd->OnCreate(static_cast<IApplication*>(this));
+            pwxGISCatalogViewsCmd->SetSubType(0);
+            pwxGISCatalogViewsCmd->SetID(pCmd->GetID());
+            //pwxGISCatalogViewsCmd->SetID(ID_PLUGINCMD + 9);
+            m_CommandArray.push_back(pwxGISCatalogViewsCmd);
+            wxGISEnumCommandKind kind = pwxGISCatalogViewsCmd->GetKind();
+            if(pwxGISCatalogViewsCmd->GetKind() == enumGISCommandDropDown)
+                kind = enumGISCommandNormal;
+	        m_toolBar->AddTool( pwxGISCatalogViewsCmd->GetID(), pwxGISCatalogViewsCmd->GetCaption(), pwxGISCatalogViewsCmd->GetBitmap(), wxNullBitmap, (wxItemKind)kind, pwxGISCatalogViewsCmd->GetTooltip(), pwxGISCatalogViewsCmd->GetMessage(), NULL );
+	        if(pwxGISCatalogViewsCmd->GetKind() == enumGISCommandDropDown)
+		        m_toolBar->SetToolDropDown(pwxGISCatalogViewsCmd->GetID(), true);
+        }
+
+	    m_toolBar->Realize();
+
+        //rename
+        pCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 8);
+        if(pCmd)
+        {
+            pwxGISCatalogMainCmd = new wxGISCatalogMainCmd();
+            pwxGISCatalogMainCmd->OnCreate(static_cast<IApplication*>(this));
+            pwxGISCatalogMainCmd->SetID(pCmd->GetID());
+            pwxGISCatalogMainCmd->SetSubType(8);
+            m_CommandArray.push_back(pwxGISCatalogMainCmd);
+        }
+
+        //refresh
+        pCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 9);
+        if(pCmd)
+        {
+            pwxGISCatalogMainCmd = new wxGISCatalogMainCmd();
+            pwxGISCatalogMainCmd->OnCreate(static_cast<IApplication*>(this));
+            pwxGISCatalogMainCmd->SetID(pCmd->GetID());
+            pwxGISCatalogMainCmd->SetSubType(9);
+            m_CommandArray.push_back(pwxGISCatalogMainCmd);
+        }
+
+        //load accelerators
+        if(pApp->GetGISAcceleratorTable())
+            SetAcceleratorTable(pApp->GetGISAcceleratorTable()->GetAcceleratorTable());
     }
-
-    wxGISCatalogViewsCmd* pwxGISCatalogViewsCmd = new wxGISCatalogViewsCmd();
-    pwxGISCatalogViewsCmd->OnCreate(static_cast<IApplication*>(this));
-    pwxGISCatalogViewsCmd->SetID(ID_PLUGINCMD + 9);
-    pwxGISCatalogViewsCmd->SetSubType(0);
-    m_CommandArray.push_back(pwxGISCatalogViewsCmd);
-    wxGISEnumCommandKind kind = pwxGISCatalogViewsCmd->GetKind();
-    if(pwxGISCatalogViewsCmd->GetKind() == enumGISCommandDropDown)
-        kind = enumGISCommandNormal;
-	m_toolBar->AddTool( pwxGISCatalogViewsCmd->GetID(), pwxGISCatalogViewsCmd->GetCaption(), pwxGISCatalogViewsCmd->GetBitmap(), wxNullBitmap, (wxItemKind)kind, pwxGISCatalogViewsCmd->GetTooltip(), pwxGISCatalogViewsCmd->GetMessage(), NULL );
-	if(pwxGISCatalogViewsCmd->GetKind() == enumGISCommandDropDown)
-		m_toolBar->SetToolDropDown(pwxGISCatalogViewsCmd->GetID(), true);
-
-	m_toolBar->Realize();
 
 	bHeaderSizer->Add( m_toolBar, 0, wxALIGN_CENTER_VERTICAL, 5 );
 

@@ -302,7 +302,7 @@ static wxString GetConvName(CPLString szPath)
     //name conv cp866 if zip
     wxString name;
     if( EQUALN(szPath,"/vsizip/",8) )
-        name = wxString(CPLGetFilename(szPath), wxCSConv(wxT("cp-866")));
+        name = wxString(CPLGetFilename(szPath), wxCSConv(wxT("cp-866")));//TODO: conv name get from config
     else
         name = wxString(CPLGetFilename(szPath), wxConvUTF8);
 	return name;
