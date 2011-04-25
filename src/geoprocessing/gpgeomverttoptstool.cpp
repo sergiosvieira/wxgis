@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
- * Purpose:  export geoprocessing tools.
+ * Purpose:  convert geometry vertices to points
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
@@ -18,47 +18,44 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-
-#include "wxgis/geoprocessing/gpprojecttool.h"
-//#include "wxgis/geoprocessing/gptoolmngr.h"
+#include "wxgis/geoprocessing/gpgeomverttoptstool.h"
+#include "wxgis/geoprocessing/gptoolmngr.h"
 #include "wxgis/geoprocessing/gpdomain.h"
 #include "wxgis/geoprocessing/gpparam.h"
 #include "wxgis/catalog/gxfilters.h"
-
-#include "wx/filename.h"
 
 /////////////////////////////////////////////////////////////////////////
 // wxGISGPExportTool
 /////////////////////////////////////////////////////////////////////////
 
-IMPLEMENT_DYNAMIC_CLASS(wxGISGPProjectVectorTool, wxGISGPTool)
+IMPLEMENT_DYNAMIC_CLASS(wxGISGPGeomVerticesToPointsTool, wxGISGPTool)
 
-wxGISGPProjectVectorTool::wxGISGPProjectVectorTool(void) : wxGISGPTool()
+wxGISGPGeomVerticesToPointsTool::wxGISGPGeomVerticesToPointsTool(void) : wxGISGPTool()
 {
 }
 
-wxGISGPProjectVectorTool::~wxGISGPProjectVectorTool(void)
+wxGISGPGeomVerticesToPointsTool::~wxGISGPGeomVerticesToPointsTool(void)
 {
     for(size_t i = 0; i < m_pParamArr.size(); i++)
         wxDELETE(m_pParamArr[i]);
 }
 
-wxString wxGISGPProjectVectorTool::GetDisplayName(void)
+wxString wxGISGPGeomVerticesToPointsTool::GetDisplayName(void)
 {
-    return wxString(_("Project vector file (single)"));
+    return wxString(_("Geometry Vertices To Points"));
 }
 
-wxString wxGISGPProjectVectorTool::GetName(void)
+wxString wxGISGPGeomVerticesToPointsTool::GetName(void)
 {
-    return wxString(wxT("vproj_single"));
+    return wxString(wxT("gvert_to_pts"));
 }
 
-wxString wxGISGPProjectVectorTool::GetCategory(void)
+wxString wxGISGPGeomVerticesToPointsTool::GetCategory(void)
 {
-    return wxString(_("Projections and Transformations/Vector"));
+    return wxString(_("Conversion Tools/Vector"));
 }
 
-GPParameters* wxGISGPProjectVectorTool::GetParameterInfo(void)
+GPParameters* wxGISGPGeomVerticesToPointsTool::GetParameterInfo(void)
 {
     if(m_pParamArr.empty())
     {
@@ -76,69 +73,43 @@ GPParameters* wxGISGPProjectVectorTool::GetParameterInfo(void)
 
         m_pParamArr.push_back(pParam1);
 
-        //proj
+        //dst path
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
-        pParam2->SetName(wxT("proj"));
-        pParam2->SetDisplayName(_("Spatial reference"));
+        pParam2->SetName(wxT("dst_path"));
+        pParam2->SetDisplayName(_("Destination feature class"));
         pParam2->SetParameterType(enumGISGPParameterTypeRequired);
-        pParam2->SetDataType(enumGISGPParamDTSpatRef);
-        pParam2->SetDirection(enumGISGPParameterDirectionInput);
+        pParam2->SetDataType(enumGISGPParamDTPath);
+        pParam2->SetDirection(enumGISGPParameterDirectionOutput);
+
+        wxGISGPGxObjectDomain* pDomain2 = new wxGISGPGxObjectDomain();
+        AddAllVectorFilters(pDomain2);
+        pParam2->SetDomain(pDomain2);
 
         m_pParamArr.push_back(pParam2);
 
-        //dst path
-        wxGISGPParameter* pParam3 = new wxGISGPParameter();
-        pParam3->SetName(wxT("dst_path"));
-        pParam3->SetDisplayName(_("Destination feature class"));
-        pParam3->SetParameterType(enumGISGPParameterTypeRequired);
-        pParam3->SetDataType(enumGISGPParamDTPath);
-        pParam3->SetDirection(enumGISGPParameterDirectionOutput);
-
-        wxGISGPGxObjectDomain* pDomain3 = new wxGISGPGxObjectDomain();
-//        pDomain3->AddFilter(new wxGxDatasetFilter(enumGISFeatureDataset));
-        pDomain3->AddFilter(new wxGxFeatureFileFilter(enumVecESRIShapefile));
-        pDomain3->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoTab));
-        pDomain3->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoMif));
-        pParam3->SetDomain(pDomain3);
-
-        m_pParamArr.push_back(pParam3);
     }
     return &m_pParamArr;
 }
 
-bool wxGISGPProjectVectorTool::Validate(void)
+bool wxGISGPGeomVerticesToPointsTool::Validate(void)
 {
-    if(!m_pParamArr[2]->GetAltered())
+    if(!m_pParamArr[1]->GetAltered())
     {
         if(m_pParamArr[0]->GetIsValid())
         {
             //generate temp name
-            wxFileName Name(m_pParamArr[0]->GetValue());
-            Name.SetName(Name.GetName() + wxT("_reproject"));
-            m_pParamArr[2]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
-            m_pParamArr[2]->SetAltered(true);//??
+            wxString sPath = m_pParamArr[0]->GetValue();
+            wxFileName Name(sPath);
+            Name.SetName(Name.GetName() + wxT("_gvert_to_pts"));
+            m_pParamArr[1]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
+            m_pParamArr[1]->SetAltered(true);//??
         }
     }
 
-    //check if input & output types is same!
-    //if(m_pParamArr[0]->GetIsValid())
-    //{
-    //    if(!m_pParamArr[2]->GetHasBeenValidated())
-    //    {
-    //        wxFileName Name1(m_pParamArr[0]->GetValue());
-    //        wxFileName Name2(m_pParamArr[2]->GetValue());
-    //        if(Name1.GetExt() != Name2.GetExt())
-    //        {
-    //            m_pParamArr[2]->SetIsValid(false);
-    //            m_pParamArr[2]->SetMessage(wxGISEnumGPMessageError, _("Cannot project to the different format"));
-    //            return false;
-    //        }
-    //    }
-    //}
     return true;
 }
 
-bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
+bool wxGISGPGeomVerticesToPointsTool::Execute(ITrackCancel* pTrackCancel)
 {
     if(!Validate())
     {
@@ -157,7 +128,6 @@ bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
 
-    //get source
     wxString sSrcPath = m_pParamArr[0]->GetValue();
     IGxObject* pGxObject = pGxObjectContainer->SearchChild(sSrcPath);
     if(!pGxObject)
@@ -192,29 +162,8 @@ bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
         //wsDELETE(pSrcDataSet);
         return false;
     }
-
-    //get spatial reference
-    wxString sWKT = m_pParamArr[1]->GetValue().MakeString();
-    if(sWKT.IsEmpty())
-    {
-        if(pTrackCancel)
-            pTrackCancel->PutMessage(_("Unsupported Spatial Reference"), -1, enumGISMessageErr);
-        return false;
-    }
-
-    CPLString szWKT(sWKT.mb_str());
-    OGRSpatialReference NewSpaRef;
     
-    const char* szpWKT = szWKT.c_str();
-    if(NewSpaRef.importFromWkt((char**)&szpWKT) != OGRERR_NONE)
-    {
-        if(pTrackCancel)
-            pTrackCancel->PutMessage(_("Unsupported Spatial Reference"), -1, enumGISMessageErr);
-        return false;
-    }
-
-    //get destination
-    wxString sDstPath = m_pParamArr[2]->GetValue();
+    wxString sDstPath = m_pParamArr[1]->GetValue();
     wxFileName sDstFileName(sDstPath);
     wxString sPath = sDstFileName.GetPath();
     IGxObject* pGxDstObject = pGxObjectContainer->SearchChild(sPath);
@@ -225,11 +174,11 @@ bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("Error get destination object"), -1, enumGISMessageErr);
         return false;
     }
-    CPLString szDestPath = pGxDstObject->GetInternalName();
-//    szDestPath = CPLFormFilename(szDestPath, sDstFileName.GetFullName().mb_str(), NULL);
-    wxString sName = sDstFileName.GetName();
 
-    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[2]->GetDomain());
+    CPLString szPath = pGxDstObject->GetInternalName();
+    wxString sName = sDstFileName.GetName();
+    
+    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[1]->GetDomain());
     IGxObjectFilter* pFilter = pDomain->GetFilter(pDomain->GetSel());
     if(!pFilter)
     {
@@ -238,30 +187,15 @@ bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("Error getting selected destination filter"), -1, enumGISMessageErr);
         return false;
     }
-
-
-    bool bRes = Project(pSrcDataSet, szDestPath, sName, pFilter, &NewSpaRef, pTrackCancel);
-
-    //CPLString szPath = pGxDstObject->GetInternalName();
-    //wxString sName = sDstFileName.GetName();
-    //
-    //wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[1]->GetDomain());
-    //IGxObjectFilter* pFilter = pDomain->GetFilter(pDomain->GetSelFilter());
-    //if(!pFilter)
-    //{
-    //    //add messages to pTrackCancel
-    //    if(pTrackCancel)
-    //        pTrackCancel->PutMessage(_("Error getting selected destination filter"), -1, enumGISMessageErr);
-    //    return false;
-    //}
-    //    
-    //bool bHasErrors = ExportFormat(pSrcDataSet, szPath, sName, pFilter, NULL, pTrackCancel);
+        
+    bool bRes = GeometryVerticesToPoints(pSrcDataSet, szPath, sName, pFilter, NULL, pTrackCancel);
 
     IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
     if(pCont)
     {
-        if(pGxDstObject)
-            pGxDstObject->Refresh();
+        IGxObject* pParentLoc = pCont->SearchChild(sPath);
+        if(pParentLoc)
+            pParentLoc->Refresh();
     }
 
     return bRes;

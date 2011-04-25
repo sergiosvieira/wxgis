@@ -56,8 +56,10 @@ IGxObject* wxGxMapInfoFactoryUI::GetGxDataset(CPLString path, wxString name, wxG
     case enumVecMapinfoMif:
 	    pDataset = new wxGxFeatureDatasetUI(path, name, type, m_LargeMifIcon, m_SmallMifIcon);
         break;
-    case enumVecUnknown:
-	    return static_cast<IGxObject*>(new wxGxTableDatasetUI(path, name, enumTableMI, m_LargeTabTIcon, m_SmallTabTIcon));
+    case emumVecMAX + 1:
+	    return static_cast<IGxObject*>(new wxGxTableDatasetUI(path, name, enumTableMapinfoTab, m_LargeTabTIcon, m_SmallTabTIcon));
+    case emumVecMAX + 2:
+	    return static_cast<IGxObject*>(new wxGxTableDatasetUI(path, name, enumTableMapinfoMif, m_LargeTabTIcon, m_SmallTabTIcon));
     default:
         return NULL;
     }

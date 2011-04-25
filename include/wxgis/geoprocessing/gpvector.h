@@ -30,3 +30,5 @@ bool WXDLLIMPEXP_GIS_GP ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sP
 bool WXDLLIMPEXP_GIS_GP Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGxObjectFilter* pFilter, OGRSpatialReference* pNewSpaRef, ITrackCancel* pTrackCancel);
 OGRGeometry WXDLLIMPEXP_GIS_GP *Intersection(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn, OGREnvelope* pRgnEnv);
 OGRGeometry WXDLLIMPEXP_GIS_GP *CheckRgnAndTransform(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn1, OGRPolygon* pRgn2, OGREnvelope* pRgnEnv1, OGREnvelope* pRgnEnv2, OGRCoordinateTransformation *poCT);
+bool WXDLLIMPEXP_GIS_GP GeometryVerticesToPoints(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGxObjectFilter* pFilter, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
+bool GeometryVerticesToPointsDataset(long nGeomFID, OGRGeometry* pGeom, wxGISFeatureDatasetSPtr pDSet, OGRCoordinateTransformation *poCT, long &nFidCounter, ITrackCancel* pTrackCancel);

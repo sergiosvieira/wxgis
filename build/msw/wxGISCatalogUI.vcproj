@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="9,00"
 	Name="wxGISCatalogUI"
 	ProjectGUID="{6AB7B074-C3FB-4234-80E4-327ACFEB2476}"
 	RootNamespace="wxGISCatalogUI"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -17,7 +18,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="..\$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)CliUI"
+			IntermediateDirectory="$(ProjectName)$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
 			>
@@ -65,6 +66,8 @@
 				AdditionalLibraryDirectories="&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(WXPROPGRID)\lib\vc_dll&quot;;..\..\lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="..\..\lib\$(TargetName).lib"
 				TargetMachine="1"
 			/>
@@ -85,9 +88,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -145,6 +145,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="..\..\lib\$(TargetName).lib"
 				TargetMachine="1"
 			/>
@@ -165,9 +167,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

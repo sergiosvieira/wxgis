@@ -453,5 +453,17 @@ bool MoveFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCance
     return false;
 }
 
+CPLString GetExtension(CPLString sPath, CPLString sName)
+{
+	if(sName.empty())
+		return CPLGetExtension(sPath);
+	size_t found = sPath.rfind(sName);
+	if(found != std::string::npos)
+	{
+		found += sName.length() + 1;
+		return sPath.substr(found);
+	}
+	return CPLGetExtension(sPath);
+}
 
 

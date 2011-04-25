@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="9,00"
 	Name="wxGISCat"
 	ProjectGUID="{796A3AA1-6A22-4CB8-A6DA-EF2D43C1C54D}"
 	RootNamespace="wxGISCat"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -17,7 +18,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="..\$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)Cli"
+			IntermediateDirectory="$(ProjectName)$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="1"
 			>
@@ -46,7 +47,7 @@
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -69,6 +70,8 @@
 				HeapReserveSize="0"
 				StackReserveSize="0"
 				LargeAddressAware="0"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -88,9 +91,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -150,6 +150,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary=""
 				TargetMachine="1"
 			/>
@@ -170,9 +172,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -218,11 +217,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\resource.h"
+				RelativePath="..\..\include\wxgis\cat_app\resource.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wxgis\cat_app\resource.h"
+				RelativePath=".\resource.h"
 				>
 			</File>
 		</Filter>
@@ -232,11 +231,11 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\..\art\archive.ico"
+				RelativePath="..\img\archive.ico"
 				>
 			</File>
 			<File
-				RelativePath="..\img\archive.ico"
+				RelativePath="..\..\art\archive.ico"
 				>
 			</File>
 			<File

@@ -20,34 +20,22 @@
  ****************************************************************************/
 
 #include "wxgis/datasource/table.h"
+#include "wxgis/datasource/sysop.h"
 
-wxGISTable::wxGISTable(OGRLayer* poLayer, CPLString sPath, wxGISEnumTableDatasetType nType) : wxGISDataset(sPath), m_pDS(NULL)
+wxGISTable::wxGISTable(CPLString sPath, wxGISEnumTableDatasetType nSubType, OGRLayer* poLayer, OGRDataSource* poDS) : wxGISDataset(sPath)
 {
-
-	m_poLayer = poLayer;
-        
+	m_poDS = poDS;
+	m_poLayer = poLayer;        
     m_nType = enumGISTableDataset;
-    if(m_poLayer)
-    {
-        m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
-        m_bHasFID = CPLStrnlen(m_poLayer->GetFIDColumn(), 100) > 0;
-        //if(m_bOLCStringsAsUTF8 || m_Encoding == wxFONTENCODING_DEFAULT)
-            m_sTableName = wgMB2WX(m_poLayer->GetLayerDefn()->GetName());
-        //else
-        //{
-        //    wxCSConv conv(m_Encoding);
-        //    m_sTableName = conv.cMB2WX(m_poLayer->GetLayerDefn()->GetName());
-        //    if(m_sTableName.IsEmpty())
-        //        m_sTableName = wgMB2WX(m_poLayer->GetLayerDefn()->GetName());
-        //}
-	    m_bIsOpened = true;
-    }
+    m_nSubType = (int)nSubType;
+	//
 	m_Encoding = wxFONTENCODING_DEFAULT;
-    m_nSubType = (int)nType;
 	m_bIsDataLoaded = false;
-	m_FieldCount = -1;
-	m_nSize = -1;
-	m_FeatureStringData.Alloc(10000);
+    m_bIsOpened = false;
+
+	m_nFeatureCount = wxNOT_FOUND;
+
+	//m_FeatureStringData.Alloc(10000);
 }
 
 wxGISTable::~wxGISTable(void)
@@ -55,84 +43,94 @@ wxGISTable::~wxGISTable(void)
 	Close();
 }
 
-void wxGISTable::Close(void)
+bool wxGISTable::Open(int iLayer, int bUpdate, ITrackCancel* pTrackCancel)
 {
-	Unload();
-	if(m_nSubType == enumTableQueryResult && m_pDS)
-		m_pDS->ReleaseResultSet(m_poLayer);
-	m_bHasFID = false;
- 	m_FieldCount = -1;
-	m_nSize = -1;
-	m_poLayer = NULL;
-}
+	if(m_bIsOpened)
+		return true;
 
-size_t wxGISTable::GetSize(void)
-{
-	if(m_nSize != -1)
-		return m_nSize;
-    if(	m_poLayer )
-    {
-    	bool bOLCFastFeatureCount = m_poLayer->TestCapability(OLCFastFeatureCount);
-        if(bOLCFastFeatureCount && m_nSubType != enumTableQueryResult)
+	m_bIsReadOnly = bUpdate == FALSE;
+
+    if(!m_poLayer)
+	{
+		wxCriticalSectionLocker locker(m_CritSect);
+		if(enumTableQueryResult)
+			bUpdate = FALSE;
+
+		m_poDS = OGRSFDriverRegistrar::Open( m_sPath, bUpdate );
+		//bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
+		if( m_poDS == NULL )
 		{
-			m_nSize = m_poLayer->GetFeatureCount(true);
-            return m_nSize;
+			m_sPath.replace( m_sPath.begin(), m_sPath.end(), '\\', '/' );
+			m_poDS = OGRSFDriverRegistrar::Open( m_sPath, FALSE );
 		}
-        //load all features
 
-		PreLoad();
-        if(m_bIsDataLoaded)
-			m_nSize = m_FeaturesMap.size();
-        else
-            m_nSize = m_poLayer->GetFeatureCount(true);
-		return m_nSize;
-    }
-    return 0;
-}
+		if( m_poDS == NULL )
+		{
+			const char* err = CPLGetLastErrorMsg();
+			wxString sErr = wxString::Format(_("wxGISTable: Open failed! Path '%s'. OGR error: %s"), wxString(m_sPath, wxConvUTF8).c_str(), wxString(err, wxConvLocal).c_str());
+			wxLogError(sErr);
+			return false;
+		}
 
-OGRFeature* wxGISTable::Next(void)
-{
-    if(!m_poLayer)
-        return NULL;
+		wxFontEncoding FEnc = GetEncodingFromCpg(m_sPath);
+		if(FEnc != wxFONTENCODING_DEFAULT)
+			m_Encoding = FEnc;
 
-    wxCriticalSectionLocker locker(m_CritSect);
-    if(m_FeaturesMap.empty() || m_FeaturesMap.size() < GetSize())
-        return m_poLayer->GetNextFeature();
-    else
+		int nLayerCount = m_poDS->GetLayerCount();
+		if(nLayerCount == 1)
+		{
+			m_poLayer = m_poDS->GetLayer(iLayer);
+
+			if(m_poLayer)
+			{
+				m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
+			}
+		}
+		else
+			m_nType = enumGISContainer;
+	}
+
+    if(m_poLayer)
     {
-        if(m_IT == m_FeaturesMap.end())
-            return NULL;
-        OGRFeature* pFeature = m_IT->second->Clone();
-        m_IT++;
-        return pFeature;
+        m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
+        m_bHasFID = CPLStrnlen(m_poLayer->GetFIDColumn(), 100) > 0;
+        m_sTableName = wxString(m_poLayer->GetLayerDefn()->GetName(), wxConvLocal);
     }
-    return NULL;
+
+	m_bIsOpened = true;
+
+	//UnloadFeatures();
+	LoadFeatures(pTrackCancel);
+
+	return true;	
+
 }
 
-void wxGISTable::Reset(void)
+void wxGISTable::LoadFeatures(ITrackCancel* pTrackCancel)
 {
-    if(!m_poLayer)
-        return;
+	wxCriticalSectionLocker locker(m_CritSect);
+	if( !m_bIsOpened || !m_poLayer )
+		return;
 
-    wxCriticalSectionLocker locker(m_CritSect);
-    bool bOLCFastSetNextByIndex= m_poLayer->TestCapability(OLCFastSetNextByIndex);
-    if(bOLCFastSetNextByIndex)
-        m_poLayer->ResetReading();
-    else
-        m_IT = m_FeaturesMap.begin();
-}
+	IProgressor* pProgress(NULL);
+	if(pTrackCancel)
+	{
+		pTrackCancel->PutMessage(wxString(_("PreLoad Features of ")) + m_sTableName, -1, enumGISMessageInfo);
+		pProgress = pTrackCancel->GetProgressor();
+		if(pProgress)
+		{
+			pProgress->Show(true);
+			pProgress->Play();
+		}
+	}
+	bool bOLCFastFeatureCount = m_poLayer->TestCapability(OLCFastFeatureCount);
+	if(m_nSubType == enumTableQueryResult)
+		bOLCFastFeatureCount = false;
+	bool bOLCRandomRead = m_poLayer->TestCapability(OLCRandomRead);
 
-OGRFeatureDefn* wxGISTable::GetDefinition(void)
-{
-    if(	m_poLayer )
-        return m_poLayer->GetLayerDefn();
-    return NULL;
-}
-
-void wxGISTable::PreLoad(void)
-{
-    if(	m_poLayer )
-    {
+	//check FIDs and bOLCRandomRead 
+	if(!m_bHasFID || !bOLCFastFeatureCount || !bOLCRandomRead)
+	{
         m_poLayer->ResetReading();
         long counter = 1;
 
@@ -155,40 +153,122 @@ void wxGISTable::PreLoad(void)
                 nFID = poFeature->GetFID();
 
             //store features in array for speed
-            m_FeaturesMap[nFID] = poFeature;
-            //store field as string in array
+			m_FeaturesMap[nFID] = OGRFeatureSPtr(poFeature, OGRFeatureDeleter);
 			counter++;
+
+			if(!pTrackCancel->Continue())
+				return;
 		}
 		m_bIsDataLoaded = true;
+		//m_bHasFID = true;
+		m_nFeatureCount = m_FeaturesMap.size();
     }
+
+	if(pProgress)
+		pProgress->Stop();
 }
 
-void wxGISTable::Unload(void)
+void wxGISTable::UnloadFeatures(void)
 {
 	wxCriticalSectionLocker locker(m_CritSect);
-    if(!m_bIsDataLoaded)
-        return;
-    if(!m_FeaturesMap.empty())
-    {
-        for(m_IT = m_FeaturesMap.begin(); m_IT != m_FeaturesMap.end(); ++m_IT)
-            OGRFeature::DestroyFeature(m_IT->second);
+    //if(!m_FeaturesMap.empty())
+    //{
+    //    for(m_IT = m_FeaturesMap.begin(); m_IT != m_FeaturesMap.end(); ++m_IT)
+    //        OGRFeature::DestroyFeature(m_IT->second);
         m_FeaturesMap.clear();
-    }
-    m_FeatureStringData.clear();
+    //}
     m_bIsDataLoaded = false;
+	m_nFeatureCount = wxNOT_FOUND;
 }
 
-OGRErr wxGISTable::CreateFeature(OGRFeature* poFeature)
+void wxGISTable::Close(void)
+{
+	UnloadFeatures();
+
+	m_bHasFID = false;
+	m_poLayer = NULL;
+    if(m_poDS)
+	{
+		if(m_nSubType == enumTableQueryResult)
+			m_poDS->ReleaseResultSet(m_poLayer);
+		if( m_poDS->Dereference() <= 0)
+			OGRDataSource::DestroyDataSource( m_poDS );
+	}
+	m_poDS = NULL;
+}
+
+size_t wxGISTable::GetFeatureCount(ITrackCancel* pTrackCancel)
+{
+	if(m_nFeatureCount != wxNOT_FOUND)
+		return m_nFeatureCount;
+    if(	m_poLayer )
+    {
+		LoadFeatures(pTrackCancel);
+        if(!m_bIsDataLoaded)
+            m_nFeatureCount = m_poLayer->GetFeatureCount(true);
+		if(m_nFeatureCount == -1)
+			m_nFeatureCount = 0;
+
+		return m_nFeatureCount;
+    }
+    return 0;
+}
+
+OGRFeatureSPtr wxGISTable::Next(void)
+{
+    if(!m_poLayer)
+        return OGRFeatureSPtr();
+
+ 	//bool bOLCRandomRead = m_poLayer->TestCapability(OLCRandomRead);
+ 
+	wxCriticalSectionLocker locker(m_CritSect);
+    if(m_bIsDataLoaded)
+    {
+        if(m_IT == m_FeaturesMap.end())
+            return OGRFeatureSPtr();
+        OGRFeatureSPtr pFeature = m_IT->second;
+        m_IT++;
+        return pFeature;
+    }
+    else
+        return OGRFeatureSPtr(m_poLayer->GetNextFeature(), OGRFeatureDeleter);
+
+    return OGRFeatureSPtr();
+}
+
+void wxGISTable::Reset(void)
+{
+    if(!m_poLayer)
+        return;
+
+    //bool bOLCFastSetNextByIndex = m_poLayer->TestCapability(OLCFastSetNextByIndex);
+
+    wxCriticalSectionLocker locker(m_CritSect);
+    if(m_bIsDataLoaded)
+        m_IT = m_FeaturesMap.begin();
+    else
+        m_poLayer->ResetReading();
+}
+
+OGRFeatureDefn* wxGISTable::GetDefinition(void)
+{
+    if(	m_poLayer )
+        return m_poLayer->GetLayerDefn();
+    return NULL;
+}
+
+OGRErr wxGISTable::StoreFeature(OGRFeatureSPtr poFeature)
 {
     if(!m_poLayer)
         return OGRERR_FAILURE;
+
     wxCriticalSectionLocker locker(m_CritSect);
-    OGRErr eErr = m_poLayer->CreateFeature(poFeature);
+    OGRErr eErr = m_poLayer->CreateFeature(poFeature.get());
     if(eErr == OGRERR_NONE)
     {
-		m_nSize++;
+		m_nFeatureCount++;
 
-        bool bOLCFastSetNextByIndex = m_poLayer->TestCapability(OLCFastSetNextByIndex);
+        //bool bOLCFastSetNextByIndex = m_poLayer->TestCapability(OLCFastSetNextByIndex);
 
 		long nFID;
         if(m_bHasFID)
@@ -199,68 +279,55 @@ OGRErr wxGISTable::CreateFeature(OGRFeature* poFeature)
 			poFeature->SetFID(nFID);
 		}
 
-        if(!bOLCFastSetNextByIndex)
-			m_FeaturesMap[nFID] = poFeature;
+		m_FeaturesMap[nFID] = poFeature;
     }
     return eErr;
 }
 
-OGRFeature* wxGISTable::GetAt(long nIndex)
+OGRFeatureSPtr wxGISTable::CreateFeature(void)
 {
-	wxASSERT(nIndex >= 0);
-	wxASSERT(nIndex < GetSize());
-	wxASSERT(m_poLayer != NULL);
-
-	bool bOLCFastSetNextByIndex = m_poLayer->TestCapability(OLCFastSetNextByIndex);
-    if(bOLCFastSetNextByIndex)
-    {
-        m_poLayer->SetNextByIndex(nIndex);
-        OGRFeature* pFeature = m_poLayer->GetNextFeature();
-        return pFeature;
-    }
-	else
-	{
-		if(m_FeaturesMap.empty())
-			PreLoad();
-
-		wxCriticalSectionLocker locker(m_CritSect);
-        if(m_FeaturesMap.size() - 1 < nIndex)
-        {
-            m_poLayer->SetNextByIndex(nIndex);
-            OGRFeature* pFeature = m_poLayer->GetNextFeature();
-            if(!pFeature)
-                return NULL;
-
-			long nFID;
-			if(m_bHasFID)
-				nFID = pFeature->GetFID();
-			else
-			{
-				nFID = m_poLayer->GetFeatureCount(false);
-				pFeature->SetFID(nFID);
-			}
-
-            m_FeaturesMap[nFID] = pFeature;
-            return pFeature->Clone();
-        }
-        std::map<long, OGRFeature*>::iterator it = m_FeaturesMap.begin();
-        std::advance( it, nIndex );
-        if(it == m_FeaturesMap.end())
-			return NULL;
-        return it->second->Clone();
-    }
-    return NULL;
+    if(!m_poLayer)
+        return OGRFeatureSPtr();
+	OGRFeature* poFeature = OGRFeature::CreateFeature( m_poLayer->GetLayerDefn() );
+	return OGRFeatureSPtr(poFeature, OGRFeatureDeleter);
 }
 
-OGRFeature* wxGISTable::operator [](long nIndex)
+OGRFeatureSPtr wxGISTable::GetAt(long nIndex)
+{
+	wxASSERT(nIndex >= 0);
+	wxASSERT(nIndex < GetFeatureCount());
+	
+	if(!m_poLayer)
+		return OGRFeatureSPtr();
+
+	//bool bOLCFastSetNextByIndex = m_poLayer->TestCapability(OLCFastSetNextByIndex);
+    if(m_bIsDataLoaded)
+	{
+		wxCriticalSectionLocker locker(m_CritSect);
+        std::map<long, OGRFeatureSPtr>::iterator it = m_FeaturesMap.begin();
+        std::advance( it, nIndex );
+        if(it == m_FeaturesMap.end())
+			return OGRFeatureSPtr();
+        return it->second;
+    }
+	else
+    {
+        m_poLayer->SetNextByIndex(nIndex);
+        return OGRFeatureSPtr(m_poLayer->GetNextFeature(), OGRFeatureDeleter);
+    }
+    return OGRFeatureSPtr();
+}
+
+OGRFeatureSPtr wxGISTable::operator [](long nIndex)
 {
 	return GetAt(nIndex);
 }
 
-wxString wxGISTable::GetAsString(OGRFeature* pFeature, int nField, wxFontEncoding Encoding)
+wxString wxGISTable::GetAsString(OGRFeatureSPtr pFeature, int nField, wxFontEncoding Encoding)
 {
     if(!pFeature)
 		return wxEmptyString;
+
 	OGRFieldDefn* pDef = pFeature->GetFieldDefnRef(nField);
     wxString sOut;
 	switch(pDef->GetType())
@@ -275,7 +342,7 @@ wxString wxGISTable::GetAsString(OGRFeature* pFeature, int nField, wxFontEncodin
 				    sOut = dt.Format(_("%d-%m-%Y"));//wxString::Format(_("%.2u-%.2u-%.4u"), day, mon, year );
             }
             if(sOut == wxEmptyString)
-                sOut = wxT("NULL");
+                sOut = wxT("<NULL>");
 		}
         break;
 	case OFTTime:
@@ -288,7 +355,7 @@ wxString wxGISTable::GetAsString(OGRFeature* pFeature, int nField, wxFontEncodin
 				    sOut = dt.Format(_("%H:%M:%S"));//wxString::Format(_("%.2u:%.2u:%.2u"), hour, min, sec);
             }
             if(sOut == wxEmptyString)
-                sOut = wxT("NULL");
+                sOut = wxT("<NULL>");
 		}
         break;
 	case OFTDateTime:
@@ -301,13 +368,13 @@ wxString wxGISTable::GetAsString(OGRFeature* pFeature, int nField, wxFontEncodin
                     sOut = dt.Format(_("%d-%m-%Y %H:%M:%S"));//wxString::Format(_("%.2u-%.2u-%.4u %.2u:%.2u:%.2u"), day, mon, year, hour, min, sec);
             }
             if(sOut == wxEmptyString)
-                sOut = wxT("NULL");
+                sOut = wxT("<NULL>");
 		}
         break;
 	case OFTReal:
 		sOut = wxString::Format(wxT("%.12f"), pFeature->GetFieldAsDouble(nField));
         if(sOut == wxEmptyString)
-            sOut = wxT("NULL");
+            sOut = wxT("<NULL>");
         break;
 	case OFTRealList:
 		{
@@ -342,18 +409,17 @@ wxString wxGISTable::GetAsString(OGRFeature* pFeature, int nField, wxFontEncodin
 	default:
         if(Encoding == wxFONTENCODING_DEFAULT)
         {
-            sOut = wgMB2WX(pFeature->GetFieldAsString(nField));
-            if(sOut == wxEmptyString)
-                sOut = wxT(" ");
+            sOut = wxString(pFeature->GetFieldAsString(nField), wxConvLocal);
+            //if(sOut == wxEmptyString)
+            //    sOut = wxT(" ");
         }
         else
         {
-            wxCSConv conv(Encoding);
-            sOut = conv.cMB2WX(pFeature->GetFieldAsString(nField));
+            sOut = wxString(pFeature->GetFieldAsString(nField), wxCSConv(Encoding));
             if(sOut.IsEmpty())
-                sOut = wgMB2WX(pFeature->GetFieldAsString(nField));
-            if(sOut == wxEmptyString)
-                sOut = wxT(" ");
+                sOut = wxString(pFeature->GetFieldAsString(nField), wxConvLocal);
+            //if(sOut == wxEmptyString)
+            //    sOut = wxT(" ");
         }
 	}
 	return sOut;
@@ -361,40 +427,32 @@ wxString wxGISTable::GetAsString(OGRFeature* pFeature, int nField, wxFontEncodin
 
 wxString wxGISTable::GetAsString(long row, int col)
 {
-	if(GetSize() <= row)
+	wxASSERT(GetFeatureCount() >= row);
+	if(!m_poLayer)
 		return wxEmptyString;
-	else
-	{
-        //wxCriticalSectionLocker locker(m_CritSect);
-        if(m_FieldCount == -1)
-        {
-            OGRFeatureDefn *pFDef = m_poLayer->GetLayerDefn();
-            m_FieldCount = pFDef->GetFieldCount();
-        }
 
-        long pos = row * m_FieldCount + col;
-        if(m_FeatureStringData.GetCount() > pos)
-            if(m_FeatureStringData[pos] != wxEmptyString)
-                return m_FeatureStringData[pos];
+    //OGRFeatureDefn *pFDef = m_poLayer->GetLayerDefn();
+    //int nFieldCount = pFDef->GetFieldCount();
 
-		OGRFeature* pFeature = GetAt(row);
-		wxString sOut = GetAsString(pFeature, col, m_Encoding);
-        OGRFeature::DestroyFeature(pFeature);
-		if(sOut.IsEmpty())
-			return wxEmptyString;
-        if(pos < MAXSTRINGSTORE)
-        {
-            if(m_FeatureStringData.GetCount() <= pos)
-            {
-                m_FeatureStringData.Add(wxEmptyString, pos - m_FeatureStringData.GetCount());
-                m_FeatureStringData.Add(sOut);
-            }
-            else
-                m_FeatureStringData[pos] = sOut;
-        }
-		return sOut;
-	}
-	return wxEmptyString;
+    //long pos = row * nFieldCount + col;
+    //if(m_FeatureStringData.GetCount() > pos)
+    //    if(m_FeatureStringData[pos] != wxEmptyString)
+    //        return m_FeatureStringData[pos];
+
+	wxString sOut = GetAsString(GetAt(row), col, m_Encoding);
+	//if(sOut.IsEmpty())
+	//	return wxEmptyString;
+ //   if(pos < MAXSTRINGSTORE)
+ //   {
+ //       if(m_FeatureStringData.GetCount() <= pos)
+ //       {
+ //           m_FeatureStringData.Add(wxEmptyString, pos - m_FeatureStringData.GetCount());
+ //           m_FeatureStringData.Add(sOut);
+ //       }
+ //       else
+ //           m_FeatureStringData[pos] = sOut;
+ //   }
+	return sOut;
 }
 
 OGRErr wxGISTable::SetFilter(wxGISQueryFilter* pQFilter)
@@ -409,66 +467,57 @@ OGRErr wxGISTable::SetFilter(wxGISQueryFilter* pQFilter)
         if(eErr != OGRERR_NONE)
             return eErr;
 
-        m_nSize = -1;
-        Unload();
+        UnloadFeatures();
+		LoadFeatures(NULL);
+		Reset();
         return eErr;
     }
     return OGRERR_FAILURE;
+}
+
+bool wxGISTable::CanDeleteFeature(void)
+{
+	return m_poLayer && m_nSubType != enumTableQueryResult && m_poLayer->TestCapability(OLCDeleteFeature);
 }
 
 OGRErr wxGISTable::DeleteFeature(long nFID)
 {
-    if(	m_poLayer && m_nSubType != enumTableQueryResult)
-    {
-        OGRErr eErr = m_poLayer->DeleteFeature(nFID);
-        if(eErr != OGRERR_NONE)
-            return eErr;
+	if(!CanDeleteFeature())
+		return OGRERR_UNSUPPORTED_OPERATION;
 
-        //m_nSize = -1;
-        //Unload();
-		//May be erase m_FeaturesMap[nFID]
-		m_nSize--;
-		if(!m_FeaturesMap.empty())
-		{
-			OGRFeature::DestroyFeature(m_FeaturesMap[nFID]);
-			m_FeaturesMap[nFID] = NULL;
-		}
+	OGRErr eErr = m_poLayer->DeleteFeature(nFID);
+    if(eErr != OGRERR_NONE)
         return eErr;
-    }
-    return OGRERR_FAILURE;
+
+	m_nFeatureCount--;
+	if(m_FeaturesMap[nFID] != NULL)
+		m_FeaturesMap[nFID].reset();
+    return eErr;
 }
 
-OGRErr wxGISTable::SetFeature(OGRFeature *poFeature)
+OGRErr wxGISTable::SetFeature(OGRFeatureSPtr poFeature)
 {
-    if(	m_poLayer && m_nSubType != enumTableQueryResult && poFeature)
-    {
-        OGRErr eErr = m_poLayer->SetFeature(poFeature);
-        if(eErr != OGRERR_NONE)
-            return eErr;
-		if(!m_FeaturesMap.empty())
-		{
-			//std::map<long, OGRFeature*>::iterator pos = std::find(m_FeaturesMap.begin(), m_FeaturesMap.end(), poFeature);
-			//if(pos != m_FeaturesMap.end())
-			//{
-			//	OGRFeature::DestroyFeature(pos->second);
-			//	pos->second = NULL;
-			//}
+	if(!m_poLayer || m_nSubType == enumTableQueryResult || !poFeature)
+		return OGRERR_FAILURE;
 
-
-	        for(std::map<long, OGRFeature*>::iterator IT = m_FeaturesMap.begin(); IT != m_FeaturesMap.end(); ++IT)
-			{
-				if(IT->second == poFeature)
-				{
-					OGRFeature::DestroyFeature(IT->second);
-					IT->second = NULL;
-				}
-			}
-
-			m_FeaturesMap[poFeature->GetFID()] = poFeature;
-		}
+	OGRErr eErr = m_poLayer->SetFeature(poFeature.get());
+    if(eErr != OGRERR_NONE)
         return eErr;
-    }
-    return OGRERR_FAILURE;
+    if(m_bIsDataLoaded)
+	{
+		//std::map<long, OGRFeatureSPtr>::iterator pos = std::find(m_FeaturesMap.begin(), m_FeaturesMap.end(), poFeature);
+		//if(pos != m_FeaturesMap.end())
+		//	pos->second = OGRFeatureSPtr();
+
+        for(std::map<long, OGRFeatureSPtr>::iterator IT = m_FeaturesMap.begin(); IT != m_FeaturesMap.end(); ++IT)
+		{
+			if(IT->second == poFeature)
+				IT->second = OGRFeatureSPtr();
+		}
+
+		m_FeaturesMap[poFeature->GetFID()] = poFeature;
+	}
+    return eErr;
 }
 
 OGRErr wxGISTable::SetIgnoredFields(wxArrayString &saIgnoredFields)
@@ -489,19 +538,179 @@ OGRErr wxGISTable::SetIgnoredFields(wxArrayString &saIgnoredFields)
         if(eErr != OGRERR_NONE)
             return eErr;
         	
-        m_FieldCount = -1;
-        Unload();
+        UnloadFeatures();
+		LoadFeatures(NULL);
         return eErr;
     }
     return OGRERR_FAILURE;
 }
 
-OGRFeature* wxGISTable::GetFeature(long nFID)
+OGRFeatureSPtr wxGISTable::GetFeature(long nFID)
 {
 	if(m_FeaturesMap[nFID])
 		return m_FeaturesMap[nFID];
 	else if(m_poLayer)
-		return m_poLayer->GetFeature(nFID);
-	else
-		return NULL;
+	{
+		OGRFeature* pFeature = m_poLayer->GetFeature(nFID);
+		if(pFeature)
+		{
+			m_FeaturesMap[nFID] = OGRFeatureSPtr(pFeature, OGRFeatureDeleter);
+			return m_FeaturesMap[nFID];
+		}
+	}
+	return OGRFeatureSPtr();
+}
+
+bool wxGISTable::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
+{
+	wxCriticalSectionLocker locker(m_CritSect);
+    Close();
+
+    char** papszFileList = GetFileList();
+    papszFileList = CSLAddString( papszFileList, m_sPath );
+    if(!papszFileList)
+        return false;
+
+    CPLString szCopyFileName;
+
+    for(int i = 0; papszFileList[i] != NULL; ++i )
+    {
+        CPLString szNewDestFileName(CPLFormFilename(szDestPath, CPLGetFilename(papszFileList[i]), NULL));
+        szNewDestFileName = CheckUniqPath(szNewDestFileName);
+        szCopyFileName = szNewDestFileName;
+        if(!CopyFile(szNewDestFileName, papszFileList[i], pTrackCancel))
+            return false;
+    }
+    
+    m_sPath = szCopyFileName;
+
+	return true;
+}
+
+bool wxGISTable::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
+{
+	wxCriticalSectionLocker locker(m_CritSect);
+    Close();
+
+    char** papszFileList = GetFileList();
+    papszFileList = CSLAddString( papszFileList, m_sPath );
+    if(!papszFileList)
+        return false;
+
+    for(int i = 0; papszFileList[i] != NULL; ++i )
+    {
+        const char* szNewDestFileName = CPLFormFilename(szDestPath, CPLGetFilename(papszFileList[i]), NULL);
+        if(!MoveFile(szNewDestFileName, papszFileList[i], pTrackCancel))
+            return false;
+    }
+
+    m_sPath = CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL);
+
+    return true;
+}
+
+bool wxGISTable::Delete(int iLayer, ITrackCancel* pTrackCancel)
+{
+	wxCriticalSectionLocker locker(m_CritSect);
+    Close();
+    
+    if(!DeleteFile(m_sPath))
+        return false;
+	
+    char** papszFileList = GetFileList();
+    if(papszFileList)
+    {
+		IProgressor* pProgressor(NULL);
+		if(pTrackCancel)
+		{
+			pProgressor = pTrackCancel->GetProgressor();
+			if(pProgressor)
+				pProgressor->SetRange(CSLCount(papszFileList));
+		}
+        for(int i = 0; papszFileList[i] != NULL; ++i )
+		{
+			DeleteFile(papszFileList[i]);
+			if(pProgressor)
+				pProgressor->SetValue(i);
+		}
+        CSLDestroy( papszFileList );
+    }
+	return true;
+}
+
+char **wxGISTable::GetFileList()
+{
+    char **papszFileList = NULL;
+    CPLString szPath;
+    //papszFileList = CSLAddString( papszFileList, osIMDFile );
+    switch(m_nSubType)
+    {
+    case enumTableMapinfoTab:
+        szPath = (char*)CPLResetExtension(m_sPath, "dat");
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+        szPath = (char*)CPLResetExtension(m_sPath, "id");
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+        szPath = (char*)CPLResetExtension(m_sPath, "ind");
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+        szPath = (char*)CPLResetExtension(m_sPath, "map");
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+        szPath = (char*)CPLResetExtension(m_sPath, "tab.xml");
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+        szPath = (char*)CPLResetExtension(m_sPath, "tab.metadata.xml");
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+        break;
+	case enumTableMapinfoMif:
+        szPath = (char*)CPLResetExtension(m_sPath, "mid");
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+        szPath = (char*)CPLResetExtension(m_sPath, "mif.metadata.xml");
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+        szPath = (char*)CPLResetExtension(m_sPath, "mif.xml");
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+        break;
+	case enumTablePostgres:
+	case enumTableQueryResult:
+	case enumTableDBF:
+    default: 
+        break;
+    }
+
+    szPath = (char*)CPLResetExtension(m_sPath, "cpg");
+    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+        papszFileList = CSLAddString( papszFileList, szPath );
+
+    return papszFileList;
+}
+
+bool wxGISTable::Rename(wxString sNewName)
+{
+	wxCriticalSectionLocker locker(m_CritSect);
+    CPLString szDirPath = CPLGetPath(m_sPath);
+    CPLString szName = CPLGetFilename(m_sPath);
+	CPLString szNewName = wgWX2MB(ClearExt(sNewName));
+
+	Close();
+
+    char** papszFileList = GetFileList();
+    papszFileList = CSLAddString( papszFileList, m_sPath );
+    if(!papszFileList)
+        return false;
+
+    for(int i = 0; papszFileList[i] != NULL; ++i )
+    {		
+        CPLString szNewPath(CPLFormFilename(szDirPath, szNewName, GetExtension(papszFileList[i], szName)));
+        if(!RenameFile(papszFileList[i], szNewPath))
+            return false;
+    }
+    
+	m_sPath = CPLString(CPLFormFilename(szDirPath, szNewName, CPLGetExtension(m_sPath)));
+	return true;
 }

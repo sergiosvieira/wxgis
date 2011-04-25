@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISSrv", "wxGISSrv.vcproj", "{799F8005-7E26-435D-A02E-E2E35505CCC1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{1F120670-6A41-427F-9C6D-D262461428AC} = {1F120670-6A41-427F-9C6D-D262461428AC}

@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
- * Purpose:  export geoprocessing tools.
+ * Purpose:  convert geometry vertices to points
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -25,17 +25,17 @@
 #include "wxgis/geoprocessing/gptool.h"
 #include "wxgis/geoprocessing/gpvector.h"
 
-/** \class wxGISGPExportTool gpexporttool.h
-    \brief The geoprocessing tool export vector data to various formats.
+/** \class wxGISGPGeomVerticesToPointsTool gpgeomverttoptstool.h
+    \brief The geoprocessing tool converts geometry vertices to points.
 */
-class WXDLLIMPEXP_GIS_GP wxGISGPExportTool : 
+class WXDLLIMPEXP_GIS_GP wxGISGPGeomVerticesToPointsTool : 
     public wxGISGPTool
 {
-   DECLARE_DYNAMIC_CLASS(wxGISGPExportTool)
+   DECLARE_DYNAMIC_CLASS(wxGISGPGeomVerticesToPointsTool)
 
 public:
-    wxGISGPExportTool(void);
-    ~wxGISGPExportTool(void);
+    wxGISGPGeomVerticesToPointsTool(void);
+    ~wxGISGPGeomVerticesToPointsTool(void);
     //IGPTool
     virtual wxString GetDisplayName(void);
     virtual wxString GetName(void);
@@ -43,5 +43,4 @@ public:
     virtual bool Execute(ITrackCancel* pTrackCancel);
     virtual bool Validate(void);
     virtual GPParameters* GetParameterInfo(void);
-    //virtual bool OnExport(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel);
 };

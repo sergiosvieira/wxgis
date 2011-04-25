@@ -2,10 +2,10 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="wxGISCore"
-	ProjectGUID="{D7C200AC-A29B-4894-B222-1C77030545BE}"
-	RootNamespace="wxGISCore"
-	TargetFrameworkVersion="131072"
+	Name="wxGISMap"
+	ProjectGUID="{E21E4448-784A-4DB6-9A4C-D24034171938}"
+	RootNamespace="wxGISMap"
+	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
@@ -19,7 +19,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="..\$(ConfigurationName)"
 			IntermediateDirectory="$(ProjectName)$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
 			>
 			<Tool
@@ -40,13 +40,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(WXGISGDAL)\port&quot;;&quot;$(BOOST_ROOT)&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CORE;BOOST_ALL_NO_LIB"
+				AdditionalIncludeDirectories="&quot;$(BOOST_ROOT)&quot;;&quot;$(PROJ)\src&quot;;&quot;$(GEOS)\capi&quot;;&quot;$(GEOS)\source\headers&quot;;&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;__WXMSW__;__WXDEBUG__;WXUSINGDLL;NOPCH"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -60,15 +59,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib"
-				OutputFile="$(OutDir)\$(ProjectName)d.dll"
-				LinkIncremental="0"
-				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;;$(WXGISGDAL)\lib"
+				AdditionalLibraryDirectories="&quot;$(PROJ)\wxGIS\lib&quot;;&quot;$(GEOS)\lib&quot;;..\..\lib;&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="..\..\lib\$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -91,16 +86,14 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="copy from debug to lib"
-				CommandLine="copy $(TargetPath) ..\..\lib\"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)Cli"
-			ConfigurationType="2"
-			CharacterSet="1"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -120,11 +113,11 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(WXGISGDAL)\port&quot;;&quot;$(BOOST_ROOT)&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;__WXMSW__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CORE;BOOST_ALL_NO_LIB"
+				Optimization="2"
+				EnableIntrinsicFunctions="true"
 				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -138,14 +131,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28u.lib wxbase28u_net.lib wxmsw28u_core.lib wxbase28u_xml.lib wxmsw28u_aui.lib wxmsw28u_adv.lib wxzlib.lib wxregexu.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib"
-				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;"
-				GenerateDebugInformation="false"
+				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				ImportLibrary="..\..\lib\$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -168,8 +156,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="copy from release to lib"
-				CommandLine="copy $(TargetPath) ..\..\lib\"
 			/>
 		</Configuration>
 	</Configurations>
@@ -177,39 +163,27 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
+			Name="Файлы исходного кода"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\core\config.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\core\process.cpp"
+				RelativePath="..\..\src\map_app\mapapp.cpp"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Header Files"
+			Name="Заголовочные файлы"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\include\wxgis\core\config.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\core\core.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\core\process.h"
+				RelativePath="..\..\include\wxgis\map_app\mapapp.h"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Resource Files"
+			Name="Файлы ресурсов"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>

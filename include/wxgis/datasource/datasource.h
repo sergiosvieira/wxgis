@@ -73,7 +73,8 @@ enum wxGISEnumTableDatasetType
     enumTableDBF,
 	enumTablePostgres,
     enumTableQueryResult,
-    enumTableMI,
+    enumTableMapinfoTab,
+    enumTableMapinfoMif,
     emumTableMAX
 };
 
@@ -240,3 +241,9 @@ protected:
 
 //GDAL SmartPointers
 DEFINE_SHARED_PTR(OGRSpatialReference);
+DEFINE_SHARED_PTR(OGRFeature);
+
+static void OGRFeatureDeleter( OGRFeature* pFeature)
+{
+	OGRFeature::DestroyFeature(pFeature);
+}

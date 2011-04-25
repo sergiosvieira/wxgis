@@ -222,7 +222,7 @@ int wxGISGPToolManager::OnExecute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel,
 
     wxString sToolParams = pTool->GetAsString();
     sToolParams.Replace(wxT("\""), wxT("\\\""));
-    //wxString sCommand = wxString::Format(wxT("%s -n "), m_sGeoprocessPath.c_str()) + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");
+//    wxString sCommand = wxString::Format(wxT("%s -n "), m_sGeoprocessPath.c_str()) + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");
     wxFileName FName(m_sGeoprocessPath);
     wxArrayString saParams;
     saParams.Add(FName.GetName());

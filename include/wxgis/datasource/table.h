@@ -26,7 +26,7 @@
 class WXDLLIMPEXP_GIS_DS wxGISTable : public wxGISDataset
 {
 public:
-	wxGISTable(OGRLayer* poLayer, CPLString sPath, wxGISEnumTableDatasetType nType);
+	wxGISTable(CPLString sPath, wxGISEnumTableDatasetType nSubType, OGRLayer* poLayer = NULL, OGRDataSource* poDS = NULL);
 	virtual ~wxGISTable(void);
 	//wxGISDataset
     virtual wxString GetName(void){return m_sTableName;};
@@ -35,36 +35,43 @@ public:
     virtual wxFontEncoding GetEncoding(void){return m_Encoding;};
     virtual void SetEncoding(wxFontEncoding Encoding){m_Encoding = Encoding;};
 	virtual wxString GetAsString(long row, int col);
-	static wxString GetAsString(OGRFeature* pFeature, int nField, wxFontEncoding Encoding);
-	virtual OGRFeature* operator [](long nIndex);
-	virtual OGRFeature* GetAt(long nIndex);
-	virtual OGRFeature* GetFeature(long nFID);
-	virtual OGRErr CreateFeature(OGRFeature* poFeature);
+	static wxString GetAsString(OGRFeatureSPtr pFeature, int nField, wxFontEncoding Encoding);
+	virtual OGRFeatureSPtr Next(void);
+	virtual OGRFeatureSPtr operator [](long nIndex);
+	virtual OGRFeatureSPtr GetAt(long nIndex);
+	virtual OGRFeatureSPtr GetFeature(long nFID);
+	virtual OGRErr StoreFeature(OGRFeatureSPtr poFeature);
+	virtual OGRFeatureSPtr CreateFeature(void);
+	virtual bool CanDeleteFeature(void);
 	virtual OGRErr DeleteFeature(long nFID);
-    virtual OGRErr SetFeature (OGRFeature *poFeature);
-    virtual void Unload(void);
-	virtual void PreLoad(void);
+    virtual OGRErr SetFeature(OGRFeatureSPtr poFeature);
 	virtual OGRFeatureDefn* GetDefinition(void);
 	virtual void Reset(void);
-	virtual OGRFeature* Next(void);
-	virtual size_t GetSize(void);
     virtual OGRErr SetFilter(wxGISQueryFilter* pQFilter);
     virtual OGRErr SetIgnoredFields(wxArrayString &saIgnoredFields);
-    virtual wxCriticalSection* GetCriticalSection(void){return &m_CritSect;};
-	virtual void SetDataSource(OGRDataSource* pDS){m_pDS = pDS;};
+	virtual size_t GetFeatureCount(ITrackCancel* pTrackCancel = NULL);
+	virtual bool Open(int iLayer = 0, int bUpdate = 0, ITrackCancel* pTrackCancel = NULL);
+	virtual bool Delete(int iLayer = 0, ITrackCancel* pTrackCancel = NULL);
+	virtual bool Rename(wxString sNewName);
+	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel = NULL);
+	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel = NULL);
+	virtual char **GetFileList();
 protected:
-	OGRDataSource* m_pDS;
+	virtual void LoadFeatures(ITrackCancel* pTrackCancel = NULL);
+    virtual void UnloadFeatures(void);
+protected:
+	OGRDataSource* m_poDS;
 	OGRLayer* m_poLayer;
+	wxString m_sTableName;
+
     wxFontEncoding m_Encoding;
 	bool m_bOLCStringsAsUTF8, m_bIsDataLoaded;
 	bool m_bHasFID;
-	wxString m_sTableName;
-	int m_nSize;
-    std::map<long, OGRFeature*> m_FeaturesMap;
-    std::map<long, OGRFeature*>::iterator m_IT;
-    wxArrayString m_FeatureStringData;
-	short m_FieldCount;
-    wxCriticalSection m_CritSect;
+	long m_nFeatureCount;
+    std::map<long, OGRFeatureSPtr> m_FeaturesMap;
+    std::map<long, OGRFeatureSPtr>::iterator m_IT;
+	//short m_FieldCount;
+    //wxArrayString m_FeatureStringData;
 };
 
 DEFINE_SHARED_PTR(wxGISTable);
