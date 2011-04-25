@@ -34,6 +34,6 @@ bool WXDLLIMPEXP_GIS_DS IsFileHidden(CPLString sPath);
 wxString  WXDLLIMPEXP_GIS_DS CheckUniqName(CPLString sPath, wxString sName, wxString sExt, int nCounter = 0);
 CPLString WXDLLIMPEXP_GIS_DS CheckUniqPath(CPLString sPath, int nCounter = 0);
 CPLString WXDLLIMPEXP_GIS_DS Transliterate(const char* str);
-
+CPLString WXDLLIMPEXP_GIS_DS GetExtension(CPLString sPath, CPLString sName = "");
 
 

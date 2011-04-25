@@ -219,7 +219,7 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
     else
         pNewSpaRef = pSrcSpaRef->Clone();
 
-    OGRFeatureDefn *pDef = pDSet->GetDefiniton();
+    OGRFeatureDefn *pDef = pDSet->GetDefinition();
     if(!pDef)
     {
         wxString sErr(_("Error read dataset definition"));
@@ -372,7 +372,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         return false;
     }
 
-    OGRFeatureDefn *pDef = pDSet->GetDefiniton();
+    OGRFeatureDefn *pDef = pDSet->GetDefinition();
     if(!pDef)
     {
         wxString sErr(_("Error read dataset definition"));
@@ -843,4 +843,211 @@ OGRGeometry* Intersection(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn, OGREnvelo
         break;
     }
     return NULL;
+}
+
+bool GeometryVerticesToPoints(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGxObjectFilter* pFilter, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel)
+{
+    if(!pFilter || !pDSet)
+        return false;
+
+    wxString sDriver = pFilter->GetDriver();
+    wxString sExt = pFilter->GetExt();
+    int nNewSubType = pFilter->GetSubType();
+
+    if(pTrackCancel)
+        pTrackCancel->PutMessage(wxString::Format(_("Convert geometry vertices to point. Source dataset %s. Destination datase %s"), pDSet->GetName().c_str(), sName.c_str()), -1, enumGISMessageTitle);
+
+    OGRSpatialReference* pSrcSpaRef = pDSet->GetSpatialReference();
+    if(!pSrcSpaRef)
+    {
+        wxString sErr(_("Input spatial reference is not defined! OGR error: "));
+        CPLString sFullErr(sErr.mb_str());
+        sFullErr += CPLGetLastErrorMsg();
+        CPLError( CE_Failure, CPLE_AppDefined, sFullErr );
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+        return false;
+    }
+
+    OGRSpatialReference* pNewSpaRef(NULL);
+    if(nNewSubType == enumVecKML || nNewSubType == enumVecKMZ)
+        pNewSpaRef = new OGRSpatialReference(SRS_WKT_WGS84);
+    else
+        pNewSpaRef = pSrcSpaRef->Clone();
+
+    //OGRFeatureDefn *pDef = pDSet->GetDefiniton();
+    //if(!pDef)
+    //{
+    //    wxString sErr(_("Error read dataset definition"));
+    //    CPLError( CE_Failure, CPLE_AppDefined, sErr.mb_str() );
+    //    if(pTrackCancel)
+    //        pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
+    //    return false;
+    //}
+
+    OGRFeatureDefn *pNewDef = new OGRFeatureDefn("vertices");
+	pNewDef->AddFieldDefn( new OGRFieldDefn("ogc_fid", OFTInteger) );
+	pNewDef->AddFieldDefn( new OGRFieldDefn("geom_id", OFTInteger) );
+	pNewDef->AddFieldDefn( new OGRFieldDefn("distance", OFTReal ) );
+	pNewDef->AddFieldDefn( new OGRFieldDefn("lat", OFTReal ) );
+	pNewDef->AddFieldDefn( new OGRFieldDefn("lon", OFTReal ) );
+	pNewDef->AddFieldDefn( new OGRFieldDefn("elevation", OFTReal ) );
+    pNewDef->SetGeomType( wkbPoint25D );
+
+
+    wxGISFeatureDatasetSPtr pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pNewDef, pNewSpaRef);
+    if(!pNewDSet)
+    {
+        wxString sErr(_("Error creating new dataset! OGR error: "));
+        CPLString sFullErr(sErr.mb_str());
+        sFullErr += CPLGetLastErrorMsg();
+        CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+        return false;
+    }
+
+    OGRCoordinateTransformation *poCT(NULL);
+    if(!pSrcSpaRef->IsSame(pNewSpaRef))
+    {
+		poCT = OGRCreateCoordinateTransformation( pSrcSpaRef, pNewSpaRef );
+		if(!poCT)
+		{
+			wxString sErr(_("The unknown transformation! OGR Error: "));
+			CPLString sFullErr(sErr.mb_str());
+			sFullErr += CPLGetLastErrorMsg();
+			CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
+			if(pTrackCancel)
+				pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+			return false;
+		}
+	}
+
+	int nCounter(0);
+	long nFidCounter(0);
+ 	OGRFeature* poFeature;
+	pDSet->Reset();
+    while((poFeature = pDSet->Next()) != NULL)	
+    {
+		nCounter++;
+
+        if(pTrackCancel)
+        {
+			if(!pTrackCancel->Continue())
+			{ 
+				OGRFeature::DestroyFeature(poFeature);
+				return false;
+			}
+			pTrackCancel->PutMessage(wxString::Format(_("Proceed No. %d Geometry"), nCounter), -1, enumGISMessageNorm);
+        }
+
+
+        OGRGeometry* pGeom = poFeature->StealGeometry();//GetGeometryRef();   
+        if(!pGeom)
+        {
+            OGRFeature::DestroyFeature(poFeature);
+            continue;
+        }
+
+		if(!GeometryVerticesToPointsDataset(poFeature->GetFID(), pGeom, pNewDSet, poCT, nFidCounter, pTrackCancel))
+		{
+			if(pTrackCancel)
+				pTrackCancel->PutMessage(wxString(_("Unsupported geometry type")), -1, enumGISMessageWarning);
+		}
+		else
+		{
+			if(pTrackCancel)
+				pTrackCancel->PutMessage(wxString::Format(_("Geometry No. %d added"), nCounter), -1, enumGISMessageInfo);
+		}
+        OGRFeature::DestroyFeature(poFeature);
+		wxDELETE(pGeom)
+	}
+
+    if(poCT)
+        OCTDestroyCoordinateTransformation(poCT);
+	else
+		wxDELETE(pNewSpaRef);
+	return true;
+}
+
+bool GeometryVerticesToPointsDataset(long nGeomFID, OGRGeometry* pGeom, wxGISFeatureDatasetSPtr pDSet, OGRCoordinateTransformation *poCT, long &nFidCounter, ITrackCancel* pTrackCancel)
+{
+    //progress & messages
+    IProgressor* pProgressor(NULL);
+    if(pTrackCancel)
+		pProgressor = pTrackCancel->GetProgressor();
+
+	OGRwkbGeometryType nType = pGeom->getGeometryType();
+	switch(nType)
+	{
+	case wkbLineString:
+	case wkbLineString25D:
+		{
+			OGRLineString* pLineString = (OGRLineString*)pGeom;
+			int nCount = pLineString->getNumPoints();
+			if(pProgressor)
+				pProgressor->SetRange(nCount);
+
+			OGRPoint* pPrevPt(NULL);
+			double dDist(0);
+
+			for(size_t i = 0; i < nCount; i++)
+			{
+				OGRPoint Point;
+				pLineString->getPoint(i, &Point);
+				double dX = Point.getX();
+				double dY = Point.getY();
+				double dZ = Point.getZ();
+				if(poCT)
+					poCT->Transform(1, &dX, &dY, &dZ);
+
+				OGRFeatureDefn* pFDefn =  pDSet->GetDefinition();
+				OGRFeature* pFeature = OGRFeature::CreateFeature( pFDefn );
+				if(pFeature)
+				{
+					pFeature->SetField(0, nFidCounter); //geom_id
+					nFidCounter++;
+					pFeature->SetField(1, nGeomFID); //geom_id
+					
+					OGRPoint* pPt = new OGRPoint(dX, dY, dZ);
+					pPt->assignSpatialReference(pDSet->GetSpatialReference());
+					pPt->setCoordinateDimension(pLineString->getCoordinateDimension());
+
+					if(pPrevPt)
+						dDist += pPrevPt->Distance(pPt);
+					pFeature->SetField(2, dDist); //distance
+					pFeature->SetField(3, dY); //lat
+					pFeature->SetField(4, dX); //lon
+					pFeature->SetField(5, dZ); //elevation
+
+					pFeature->SetGeometryDirectly( (OGRGeometry*)pPt );
+
+					pPrevPt = pPt;
+
+					if(pDSet->CreateFeature(pFeature) != OGRERR_NONE)
+						if(pTrackCancel)
+							pTrackCancel->PutMessage(wxString::Format(_("Faild add point No. %d"), i), -1, enumGISMessageWarning);
+				}
+
+				if(pProgressor)
+					pProgressor->SetValue(i);
+				if(pTrackCancel && !pTrackCancel->Continue())
+					return false;
+			}
+
+			return true;
+		}
+		break;
+	case wkbPoint:
+	case wkbPoint25D:
+	case wkbMultiPoint:
+	case wkbMultiPoint25D:
+	case wkbMultiLineString:
+	case wkbMultiLineString25D:
+	case wkbGeometryCollection:
+	case wkbGeometryCollection25D:
+	default://wkbUnknown wkbPolygon wkbMultiPolygon wkbNone wkbLinearRing wkbPolygon25D wkbMultiPolygon25D
+		return false;
+	}
+	return true;
 }

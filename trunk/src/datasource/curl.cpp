@@ -116,6 +116,8 @@ PERFORMRESULT wxGISCurl::Get(wxString sURL)
 	result.iSize = 0;
 	curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
 	curl_easy_setopt(curl, CURLOPT_URL, sURL.mb_str());
+	//curl_easy_setopt(curl, CURLOPT_CAINFO, "curl-ca-bundle.crt");
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 	res = curl_easy_perform(curl);
 
 	//second try
@@ -156,6 +158,8 @@ bool wxGISCurl::GetFile(wxString sURL, wxString sPath)
 		return true/*false*/;
 	curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
 	curl_easy_setopt(curl, CURLOPT_URL, wgWX2MB(sURL));
+	//curl_easy_setopt(curl, CURLOPT_CAINFO, "curl-ca-bundle.crt");
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 	res = curl_easy_perform(curl);
 	if(res == CURLE_COULDNT_RESOLVE_HOST)
 		res = curl_easy_perform(curl);
@@ -186,6 +190,8 @@ PERFORMRESULT wxGISCurl::Post(wxString sURL, wxString sPostData)
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS , tmp_str);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
 	curl_easy_setopt(curl, CURLOPT_URL, wgWX2MB(sURL));
+	//curl_easy_setopt(curl, CURLOPT_CAINFO, "curl-ca-bundle.crt");
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 	res = curl_easy_perform(curl);
 	if(res == CURLE_COULDNT_RESOLVE_HOST)
 		res = curl_easy_perform(curl);

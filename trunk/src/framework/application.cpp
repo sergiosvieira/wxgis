@@ -43,9 +43,9 @@ BEGIN_EVENT_TABLE(wxGISApplication, wxFrame)
     EVT_SIZE(wxGISApplication::OnSize)
 	EVT_RIGHT_DOWN(wxGISApplication::OnRightDown)
     EVT_AUITOOLBAR_RIGHT_CLICK(wxID_ANY, wxGISApplication::OnAuiRightDown)
-	EVT_MENU_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 260, wxGISApplication::OnCommand)
-	EVT_MENU_RANGE(ID_MENUCMD, ID_MENUCMD + 128, wxGISApplication::OnDropDownCommand)
-	EVT_UPDATE_UI_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 260, wxGISApplication::OnCommandUI)
+	EVT_MENU_RANGE(ID_PLUGINCMD, ID_TOOLBARCMDMAX, wxGISApplication::OnCommand)
+	EVT_MENU_RANGE(ID_MENUCMD, ID_MENUCMDMAX, wxGISApplication::OnDropDownCommand)
+	EVT_UPDATE_UI_RANGE(ID_PLUGINCMD, ID_PLUGINCMDMAX, wxGISApplication::OnCommandUI)
     EVT_AUITOOLBAR_TOOL_DROPDOWN(wxID_ANY, wxGISApplication::OnToolDropDown)
     EVT_CLOSE(wxGISApplication::OnClose)
 END_EVENT_TABLE()
@@ -151,7 +151,14 @@ void wxGISApplication::OnSize(wxSizeEvent& event)
 
 void wxGISApplication::OnCommand(wxCommandEvent& event)
 {
-	Command(GetCommand(event.GetId()));
+	if(event.GetId() >= ID_PLUGINCMD && event.GetId() <= ID_PLUGINCMDMAX)
+		Command(GetCommand(event.GetId()));
+	else if(event.GetId() >= ID_TOOLBARCMD && event.GetId() <= ID_TOOLBARCMDMAX)
+	{
+		wxGISToolBarMenu* pToolBarMenu = dynamic_cast<wxGISToolBarMenu*>(GetCommandBar(TOOLBARMENUNAME));
+		if(pToolBarMenu)
+			pToolBarMenu->OnCommand(event);
+	}
 }
 
 void wxGISApplication::OnDropDownCommand(wxCommandEvent& event)
@@ -185,13 +192,19 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 	ICommand* pCmd = GetCommand(event.GetId());
 	if(pCmd)
 	{
+        wxString sAcc = m_pGISAcceleratorTable->GetText(event.GetId());
         event.Enable(pCmd->GetEnabled());
+
 		if(pCmd->GetKind() == enumGISCommandCheck)
+		{
+			//wxMenuItem *pItem = pMenu->FindItem(event.GetId());
+			//if(pItem != NULL)
+   //             pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
+
             //if(event.GetChecked() != pCmd->GetChecked())
                 event.Check(pCmd->GetChecked());
+		}
         //if(event.GetEnabled() != pCmd->GetEnabled())
-
-        wxString sAcc = m_pGISAcceleratorTable->GetText(event.GetId());
         //if(pCmd->GetKind() == enumGISCommandNormal)
         //{
         //    if(sAcc.IsEmpty())
@@ -232,14 +245,11 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
                         if(pItem->IsSubMenu())
                             break;
 
-                        if(pItem->GetKind() != enumGISCommandCheck)
-                        {
 						wxIcon Bmp = pCmd->GetBitmap();
 						//if(Bmp.IsOk())
 							pItem->SetBitmap(Bmp);//double text??
-                            pItem->SetItemLabel(wxT(" ")); // derty hack
-                            pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
-                        }
+						pItem->SetItemLabel(wxT(" ")); // derty hack
+						pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
 					}
 				}
 				break;
@@ -266,20 +276,17 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 					{
                         if(pItem->IsSubMenu())
                             break;
-                        if(pItem->GetKind() == enumGISCommandCheck)
-							break;
-
 						wxIcon Bmp = pCmd->GetBitmap();
 						//if(Bmp.IsOk())
 							pItem->SetBitmap(Bmp);//double text??
-                        pItem->SetItemLabel(wxT(" ")); // derty hack
+						pItem->SetItemLabel(wxT(" ")); // derty hack
 #ifdef __WXGTK__
-                        if(sAcc.IsEmpty())
-                            pItem->SetItemLabel(pCmd->GetCaption());
-                        else
-                            pItem->SetItemLabel(pCmd->GetCaption() + wxT("          ") + sAcc);
+						if(sAcc.IsEmpty())
+							pItem->SetItemLabel(pCmd->GetCaption());
+						else
+							pItem->SetItemLabel(pCmd->GetCaption() + wxT("          ") + sAcc);
 #else
-                        pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
+						pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
 #endif
                     }
 				}

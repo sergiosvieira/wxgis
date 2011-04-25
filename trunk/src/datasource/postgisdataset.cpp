@@ -76,7 +76,8 @@ wxGISDatasetSPtr wxGISPostgresDataSource::GetSubset(size_t nIndex)
 			//check the layer type
 			if(CPLStrnlen(poLayer->GetGeometryColumn(), 100))
 			{
-                wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(poLayer, "", enumTablePostgres);//TODO: Think about it
+				m_poDS->Reference();
+                wxGISTableSPtr pTable = boost::make_shared<wxGISTable>("", enumTablePostgres, poLayer, m_poDS);//TODO: Think about it
 				pTable->SetEncoding(wxFONTENCODING_UTF8);
 				//pTable->Reference();
                 pDataset = boost::static_pointer_cast<wxGISDataset>(pTable);
@@ -110,7 +111,8 @@ wxGISDatasetSPtr wxGISPostgresDataSource::GetSubset(wxString sTablename)
 			}
 			else
 			{
-                wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(poLayer, "", enumTablePostgres);
+				m_poDS->Reference();
+                wxGISTableSPtr pTable = boost::make_shared<wxGISTable>("", enumTablePostgres, poLayer, m_poDS);
 				pTable->SetEncoding(wxFONTENCODING_UTF8);
 				//pTable->Reference();
                 pDataset = boost::static_pointer_cast<wxGISDataset>(pTable);
@@ -174,10 +176,9 @@ wxGISDatasetSPtr wxGISPostgresDataSource::ExecuteSQL(wxString sStatement, wxGISS
 		OGRLayer * poLayer = m_poDS->ExecuteSQL(szStatement, NULL, wgWX2MB(sDialect));//TODO: implement spatial Filter
 		if(	poLayer )
 		{
-            wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(poLayer, szStatement, enumTableQueryResult);
+			m_poDS->Reference();
+            wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(szStatement, enumTableQueryResult, poLayer, m_poDS);
 			pTable->SetEncoding(wxFONTENCODING_UTF8);
-			//pTable->Reference();
-			pTable->SetDataSource(m_poDS);
             pDataset = boost::static_pointer_cast<wxGISDataset>(pTable);
 		}
 	}

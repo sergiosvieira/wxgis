@@ -335,7 +335,10 @@ void wxGISFeatureLayer::LoadGeometry(void)
 
     for(size_t i = 0; i < threadarray.size(); i++)
     {
-        wgDELETE(threadarray[i], Wait());
+		if(threadarray[i]->IsAlive())
+			wgDELETE(threadarray[i], Wait())
+		else
+			wxDELETE(threadarray[i])
     }
 
 #ifdef __WXDEBUG__

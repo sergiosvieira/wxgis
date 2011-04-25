@@ -54,7 +54,7 @@ public:
 	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
 	virtual OGREnvelope* GetEnvelope(void);
     virtual OGRwkbGeometryType GetGeometryType(void);
-    virtual OGRFeatureDefn* GetDefiniton(void);
+    virtual OGRFeatureDefn* GetDefinition(void);
     virtual OGRDataSource* GetDataSource(void);
     virtual OGRErr SetFilter(wxGISQueryFilter* pQFilter = NULL);
 	//virtual void SetSpatialFilter(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);

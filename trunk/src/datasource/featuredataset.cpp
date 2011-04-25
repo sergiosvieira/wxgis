@@ -1201,13 +1201,13 @@ OGRErr wxGISFeatureDataset::CreateFeature(OGRFeature* poFeature)
 
 OGRwkbGeometryType wxGISFeatureDataset::GetGeometryType(void)
 {
-    OGRFeatureDefn *pDef = GetDefiniton();
+    OGRFeatureDefn *pDef = GetDefinition();
     if(pDef)
         return pDef->GetGeomType();
     return wkbUnknown;
 }
 
-OGRFeatureDefn* wxGISFeatureDataset::GetDefiniton(void)
+OGRFeatureDefn* wxGISFeatureDataset::GetDefinition(void)
 {
     if(!m_bIsOpened)
         if(!Open(0))

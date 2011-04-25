@@ -23,7 +23,7 @@
 
 
 BEGIN_EVENT_TABLE(wxGISToolBarMenu, wxMenu)
-	EVT_MENU_RANGE(ID_PLUGINCMD + 261, ID_PLUGINCMD + 300, wxGISToolBarMenu::OnCommand)
+	EVT_MENU_RANGE(ID_TOOLBARCMD, ID_TOOLBARCMDMAX, wxGISToolBarMenu::OnCommand)
 END_EVENT_TABLE()
 
 wxGISToolBarMenu::wxGISToolBarMenu(const wxString& sName, const wxString& sCaption, wxGISEnumCommandBars type, const wxString& title, long style) : wxGISMenu(sName, sCaption, type, title, style)
@@ -53,7 +53,7 @@ void wxGISToolBarMenu::Update(void)
 			wxWindow* pWnd = dynamic_cast<wxWindow*>(pCmdBar);
 			bool bIsShown = pWnd->IsShown();
 			//sort!!!
-			wxMenuItem* pItem = Prepend(ID_PLUGINCMD + i + 261, pCmdBar->GetCaption(), wxT(""), wxITEM_CHECK);
+			wxMenuItem* pItem = Prepend(ID_TOOLBARCMD + i, pCmdBar->GetCaption(), wxT(""), wxITEM_CHECK);
 			pItem->Check(bIsShown);
 			m_delitems.push_back(pItem);
 		}
@@ -66,7 +66,7 @@ void wxGISToolBarMenu::Update(void)
 
 void wxGISToolBarMenu::OnCommand(wxCommandEvent& event)
 {
-	int pos = event.GetId() - (ID_PLUGINCMD + 261);
+	int pos = event.GetId() - (ID_TOOLBARCMD);
 	COMMANDBARARRAY* pCommandBars = m_pApp->GetCommandBars();
 	wxWindow* pWnd = dynamic_cast<wxWindow*>(pCommandBars->at(pos));
 	m_pApp->ShowApplicationWindow(pWnd, !pWnd->IsShown());

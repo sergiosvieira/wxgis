@@ -24,7 +24,7 @@
 
 #define TOOLBARMENUNAME wxT("Application.ToolbarsMenu")
 
-class wxGISToolBarMenu :
+class WXDLLIMPEXP_GIS_FRW wxGISToolBarMenu :
 	public wxGISMenu,
 	public ICommand
 {
