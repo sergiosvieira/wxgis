@@ -64,14 +64,16 @@ public:
 class WXDLLIMPEXP_GIS_CLT wxGxDatasetFilter : public wxGxObjectFilter
 {
 public:
-	wxGxDatasetFilter(wxGISEnumDatasetType nType);
+	wxGxDatasetFilter(wxGISEnumDatasetType nType, int nSubType = wxNOT_FOUND);
 	virtual ~wxGxDatasetFilter(void);
 	virtual bool CanChooseObject( IGxObject* pObject );
 	virtual bool CanDisplayObject( IGxObject* pObject );
 	virtual wxString GetName(void);
     virtual wxGISEnumDatasetType GetType(void){return m_nType;};
+    virtual int GetSubType(void){return m_nSubType;};
 protected:
     wxGISEnumDatasetType m_nType;
+	int m_nSubType;
 };
 
 //------------------------------------------------------------
@@ -144,5 +146,26 @@ public:
 protected:
     wxString m_soName;
     wxString m_soExt, m_soExtCmp;
+};
+
+
+//------------------------------------------------------------
+// wxGxTableFilter
+//------------------------------------------------------------
+
+class WXDLLIMPEXP_GIS_CLT wxGxTableFilter : public wxGxObjectFilter
+{
+public:
+	wxGxTableFilter(wxGISEnumTableDatasetType nSubType);
+	virtual ~wxGxTableFilter(void);
+	virtual bool CanChooseObject( IGxObject* pObject );
+	virtual bool CanDisplayObject( IGxObject* pObject );
+	virtual wxString GetName(void);
+    virtual wxString GetExt(void);
+    virtual wxString GetDriver(void);
+    virtual int GetSubType(void);
+    virtual wxGISEnumDatasetType GetType(void){return enumGISTableDataset;};
+protected:
+    wxGISEnumTableDatasetType m_nSubType;
 };
 

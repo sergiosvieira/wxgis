@@ -64,6 +64,7 @@ protected:
 
     long m_pPrevID;
     wxCriticalSection m_DoCritSect, m_CritSect;
+	//wxMutex m_Mutex;
 
 	std::map<long, wxSelLongArray> m_SelectionMap;
 	long m_currentInitiator;

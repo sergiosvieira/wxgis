@@ -21,15 +21,15 @@
 #pragma once
 
 #include "wxgis/datasource/datasource.h"
-#define MAXSTRINGSTORE 1000000
+//#define MAXSTRINGSTORE 1000000
 
 class WXDLLIMPEXP_GIS_DS wxGISTable : public wxGISDataset
 {
 public:
-	wxGISTable(CPLString sPath, wxGISEnumTableDatasetType nSubType, OGRLayer* poLayer = NULL, OGRDataSource* poDS = NULL);
+	wxGISTable(CPLString sPath, int nSubType, OGRLayer* poLayer = NULL, OGRDataSource* poDS = NULL);
 	virtual ~wxGISTable(void);
 	//wxGISDataset
-    virtual wxString GetName(void){return m_sTableName;};
+    virtual wxString GetName(void);
 	virtual void Close(void);
 	//wxGISTable
     virtual wxFontEncoding GetEncoding(void){return m_Encoding;};
@@ -45,7 +45,7 @@ public:
 	virtual bool CanDeleteFeature(void);
 	virtual OGRErr DeleteFeature(long nFID);
     virtual OGRErr SetFeature(OGRFeatureSPtr poFeature);
-	virtual OGRFeatureDefn* GetDefinition(void);
+	virtual OGRFeatureDefn* const GetDefinition(void);
 	virtual void Reset(void);
     virtual OGRErr SetFilter(wxGISQueryFilter* pQFilter);
     virtual OGRErr SetIgnoredFields(wxArrayString &saIgnoredFields);

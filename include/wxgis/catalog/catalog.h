@@ -238,7 +238,7 @@ class IGxDataset
 {
 public:
 	virtual ~IGxDataset(void){};
-	virtual wxGISDatasetSPtr GetDataset(bool bReadOnly) = 0;
+	virtual wxGISDatasetSPtr GetDataset(void) = 0;
 	virtual wxGISEnumDatasetType GetType(void) = 0;
 	virtual int GetSubType(void) = 0;
 };

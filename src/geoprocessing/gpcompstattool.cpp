@@ -130,7 +130,8 @@ bool wxGISGPCompStatTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("Source object is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
-    wxGISRasterDatasetSPtr pSrcDataSet = boost::dynamic_pointer_cast<wxGISRasterDataset>(pGxDataset->GetDataset(true));
+    wxGISRasterDatasetSPtr pSrcDataSet = boost::dynamic_pointer_cast<wxGISRasterDataset>(pGxDataset->GetDataset());
+
     if(!pSrcDataSet)
     {
         //add messages to pTrackCancel
@@ -138,6 +139,9 @@ bool wxGISGPCompStatTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("Source dataset is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
+
+	if(!pSrcDataSet->Open(true))
+		return false;
 
     GDALDataset* poGDALDataset = pSrcDataSet->GetRaster();
     if(!poGDALDataset)

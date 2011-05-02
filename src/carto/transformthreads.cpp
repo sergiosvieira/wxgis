@@ -47,39 +47,30 @@ wxGISFeatureTransformThread::wxGISFeatureTransformThread(wxGISFeatureDatasetSPtr
 
 void *wxGISFeatureTransformThread::Entry()
 {
-    int nFeatureCount = m_pwxGISFeatureDataset->GetSize();
+	int nFeatureCount = m_pwxGISFeatureDataset->GetFeatureCount();
     
     size_t nStep = nFeatureCount < 10 ? 1 : nFeatureCount / 10;
 
     m_pFullEnv->Merge(*m_pwxGISFeatureDataset->GetEnvelope());
 
- 	OGRFeature* poFeature;
+ 	OGRFeatureSPtr poFeature;
     while((poFeature = m_pwxGISFeatureDataset->Next()) != NULL)	
     {
         if(m_pTrackCancel && !m_pTrackCancel->Continue())
-        {
-            OGRFeature::DestroyFeature(poFeature);
             return NULL;
-        }
 
         OGRGeometry* pGeom = poFeature->StealGeometry();//GetGeometryRef();   
         if(!pGeom)
-        {
-            OGRFeature::DestroyFeature(poFeature);
             continue;
-        }
 
         OGREnvelope GEnv;
         pGeom->getEnvelope(&GEnv);
         
         if(!m_pFullEnv->Contains(GEnv))
-        {
-            OGRFeature::DestroyFeature(poFeature);
             continue;
-        }
-        OGRGeometry* pFeatureGeom = pGeom;//->clone();
+
+		OGRGeometry* pFeatureGeom = pGeom;//->clone();
         long nOID = poFeature->GetFID();
-        OGRFeature::DestroyFeature(poFeature);
 
         if(m_bTransform)
         {

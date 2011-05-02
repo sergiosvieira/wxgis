@@ -35,7 +35,7 @@ public:
 	wxGISRasterDataset(CPLString sPath, wxGISEnumRasterDatasetType nType);
 	virtual ~wxGISRasterDataset(void);
     // wxGISDataset
-	virtual OGRSpatialReference* GetSpatialReference(void);
+	virtual const OGRSpatialReferenceSPtr GetSpatialReference(void);
     virtual wxString GetName(void);
 	virtual void Close(void);
     // wxGISRasterDataset
@@ -59,7 +59,7 @@ protected:
 	OGREnvelope* m_psExtent;
 	GDALDataset  *m_poDataset;
 	GDALDataset  *m_poMainDataset;
-	OGRSpatialReference* m_pSpaRef;
+	OGRSpatialReferenceSPtr m_pSpaRef;
     bool m_bHasOverviews;
     bool m_bHasStats;
 	int m_nXSize;

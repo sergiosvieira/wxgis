@@ -75,6 +75,7 @@ enum wxGISEnumTableDatasetType
     enumTableQueryResult,
     enumTableMapinfoTab,
     enumTableMapinfoMif,
+    enumTableCSV,
     emumTableMAX
 };
 
@@ -92,6 +93,17 @@ enum wxGISEnumContainerType
     enumCondDataset = 3,
 	enumContGDB = 4
 };
+
+
+//GDAL SmartPointers
+DEFINE_SHARED_PTR(OGRSpatialReference);
+DEFINE_SHARED_PTR(OGRFeature);
+DEFINE_SHARED_PTR(OGREnvelope);
+
+static void OGRFeatureDeleter( OGRFeature* pFeature)
+{
+	OGRFeature::DestroyFeature(pFeature);
+}
 
 typedef struct _Limits
 {
@@ -118,7 +130,7 @@ public:
     virtual wxGISDatasetSPtr GetSubset(size_t nIndex){return wxGISDatasetSPtr();};
     virtual wxString GetName(void){return wxEmptyString;};
 	virtual void Close(void){};
-	virtual OGRSpatialReference* GetSpatialReference(void){return NULL;};
+	virtual const OGRSpatialReferenceSPtr GetSpatialReference(void){return OGRSpatialReferenceSPtr();};
 	virtual bool IsOpened(void){return m_bIsOpened;};
 	virtual bool IsReadOnly(void){return m_bIsReadOnly;};
 protected:
@@ -239,11 +251,3 @@ protected:
 	OGREnvelope m_Env;
 };
 
-//GDAL SmartPointers
-DEFINE_SHARED_PTR(OGRSpatialReference);
-DEFINE_SHARED_PTR(OGRFeature);
-
-static void OGRFeatureDeleter( OGRFeature* pFeature)
-{
-	OGRFeature::DestroyFeature(pFeature);
-}

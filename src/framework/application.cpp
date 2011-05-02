@@ -924,7 +924,7 @@ bool wxGISApplication::SetupLog(wxString sLogPath)
 	wxLogMessage(wxT("####################################################################"));
 	wxLogMessage(wxT("##                    %s                    ##"),wxNow().c_str());
 	wxLogMessage(wxT("####################################################################"));
-	long dFreeMem =  (long)(wxGetFreeMemory().ToLong() / 1048576);
+	long dFreeMem =  wxMemorySize(wxGetFreeMemory() / 1048576).ToLong();
 	wxLogMessage(_("HOST '%s': OS desc - %s, free memory - %u Mb"), wxGetFullHostName().c_str(), wxGetOsDescription().c_str(), dFreeMem);
 	wxLogMessage(_("wxGISApplication: %s %s is initializing..."), GetAppName(), GetAppVersionString());
 	wxLogMessage(_("wxGISApplication: Log file: %s"), logfilename.c_str());

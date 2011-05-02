@@ -167,7 +167,7 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("The source object is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
-    wxGISFeatureDatasetSPtr pSrcDataSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pGxDataset->GetDataset(true));
+    wxGISFeatureDatasetSPtr pSrcDataSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pGxDataset->GetDataset());
     if(!pSrcDataSet)
     {
         //add messages to pTrackCancel
@@ -175,6 +175,9 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("The source dataset is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
+	if(!pSrcDataSet->IsOpened())
+		if(!pSrcDataSet->Open());
+			return false;
     
     OGRFeatureDefn *pDef = pSrcDataSet->GetDefinition();
     if(!pDef)

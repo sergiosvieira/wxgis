@@ -97,7 +97,7 @@ void wxGxFeatureDatasetUI::EditProperties(wxWindow *parent)
     wxGISVectorPropertyPage* VectorPropertyPage = new wxGISVectorPropertyPage(this, pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(VectorPropertyPage, VectorPropertyPage->GetPageName());
 
-	wxGISDatasetSPtr pDset = GetDataset(true);
+	wxGISDatasetSPtr pDset = GetDataset();
 	if(pDset)
 	{
 		wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(pDset->GetSpatialReference(), pParentWnd);
@@ -112,9 +112,9 @@ void wxGxFeatureDatasetUI::EditProperties(wxWindow *parent)
     PropertySheetDialog.ShowModal();
 }
 
-wxGISDatasetSPtr wxGxFeatureDatasetUI::GetDataset(bool bReadOnly)
+wxGISDatasetSPtr wxGxFeatureDatasetUI::GetDataset(void)
 {
-    wxGISDatasetSPtr pOut = wxGxFeatureDataset::GetDataset(bReadOnly);
+    wxGISDatasetSPtr pOut = wxGxFeatureDataset::GetDataset();
     if(!pOut)
     {
         const char* err = CPLGetLastErrorMsg();
@@ -165,7 +165,7 @@ void wxGxRasterDatasetUI::EditProperties(wxWindow *parent)
 
     wxGISRasterPropertyPage* RasterPropertyPage = new wxGISRasterPropertyPage(this, m_pCatalog, pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(RasterPropertyPage, RasterPropertyPage->GetPageName());
-	wxGISDatasetSPtr pDset = GetDataset(true);
+	wxGISDatasetSPtr pDset = GetDataset();
 	if(pDset)
 	{
 		wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(pDset->GetSpatialReference(), pParentWnd);
@@ -187,9 +187,9 @@ bool wxGxRasterDatasetUI::Invoke(wxWindow* pParentWnd)
 }
 
 
-wxGISDatasetSPtr wxGxRasterDatasetUI::GetDataset(bool bReadOnly)
+wxGISDatasetSPtr wxGxRasterDatasetUI::GetDataset(void)
 {
-    wxGISDatasetSPtr pOut = wxGxRasterDataset::GetDataset(bReadOnly);
+    wxGISDatasetSPtr pOut = wxGxRasterDataset::GetDataset();
     if(!pOut)
     {
         const char* err = CPLGetLastErrorMsg();

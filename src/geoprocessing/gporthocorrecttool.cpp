@@ -203,7 +203,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("Source object is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
-    wxGISRasterDatasetSPtr pSrcDataSet = boost::dynamic_pointer_cast<wxGISRasterDataset>(pGxDataset->GetDataset(true));
+    wxGISRasterDatasetSPtr pSrcDataSet = boost::dynamic_pointer_cast<wxGISRasterDataset>(pGxDataset->GetDataset());
     if(!pSrcDataSet)
     {
         //add messages to pTrackCancel
@@ -211,6 +211,9 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("Source dataset is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
+	if(!pSrcDataSet->IsOpened())
+		if(!pSrcDataSet->Open(true));
+			return false;
 
     wxString sDstPath = m_pParamArr[1]->GetValue();
     wxFileName sDstFileName(sDstPath);
@@ -371,7 +374,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     psWarpOptions->pfnTransformer = GDALGenImgProjTransform;
     
     //TODO: Add to config memory limit in % of free memory
-    double dfMemLim = wxGetFreeMemory().ToDouble() / wxThread::GetCPUCount();
+    double dfMemLim = wxMemorySize(wxGetFreeMemory() / wxThread::GetCPUCount()).ToDouble();
     if(dfMemLim > 135000000) //128Mb in bytes
     {
         psWarpOptions->dfWarpMemoryLimit = dfMemLim;

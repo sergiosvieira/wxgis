@@ -22,16 +22,17 @@
 #include "wxgis/datasource/table.h"
 #include "wxgis/datasource/sysop.h"
 
-wxGISTable::wxGISTable(CPLString sPath, wxGISEnumTableDatasetType nSubType, OGRLayer* poLayer, OGRDataSource* poDS) : wxGISDataset(sPath)
+wxGISTable::wxGISTable(CPLString sPath, int nSubType, OGRLayer* poLayer, OGRDataSource* poDS) : wxGISDataset(sPath)
 {
 	m_poDS = poDS;
 	m_poLayer = poLayer;        
     m_nType = enumGISTableDataset;
-    m_nSubType = (int)nSubType;
+    m_nSubType = nSubType;
 	//
 	m_Encoding = wxFONTENCODING_DEFAULT;
 	m_bIsDataLoaded = false;
     m_bIsOpened = false;
+	m_bHasFID = false;
 
 	m_nFeatureCount = wxNOT_FOUND;
 
@@ -53,7 +54,7 @@ bool wxGISTable::Open(int iLayer, int bUpdate, ITrackCancel* pTrackCancel)
     if(!m_poLayer)
 	{
 		wxCriticalSectionLocker locker(m_CritSect);
-		if(enumTableQueryResult)
+		if(m_nSubType == enumTableQueryResult)
 			bUpdate = FALSE;
 
 		m_poDS = OGRSFDriverRegistrar::Open( m_sPath, bUpdate );
@@ -78,14 +79,7 @@ bool wxGISTable::Open(int iLayer, int bUpdate, ITrackCancel* pTrackCancel)
 
 		int nLayerCount = m_poDS->GetLayerCount();
 		if(nLayerCount == 1)
-		{
 			m_poLayer = m_poDS->GetLayer(iLayer);
-
-			if(m_poLayer)
-			{
-				m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
-			}
-		}
 		else
 			m_nType = enumGISContainer;
 	}
@@ -94,7 +88,7 @@ bool wxGISTable::Open(int iLayer, int bUpdate, ITrackCancel* pTrackCancel)
     {
         m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
         m_bHasFID = CPLStrnlen(m_poLayer->GetFIDColumn(), 100) > 0;
-        m_sTableName = wxString(m_poLayer->GetLayerDefn()->GetName(), wxConvLocal);
+        m_sTableName = wxString(m_poLayer->GetLayerDefn()->GetName(), wxConvLocal);//TODO: check encodings
     }
 
 	m_bIsOpened = true;
@@ -102,8 +96,30 @@ bool wxGISTable::Open(int iLayer, int bUpdate, ITrackCancel* pTrackCancel)
 	//UnloadFeatures();
 	LoadFeatures(pTrackCancel);
 
-	return true;	
+	return true;
+}
 
+wxString wxGISTable::GetName(void)
+{
+	if(!m_sTableName.IsEmpty())
+		return m_sTableName;
+	if( !m_bIsOpened || !m_poLayer )
+		return wxEmptyString;
+
+    wxString sOut;
+    if(EQUALN(m_sPath, "/vsizip", 7))
+        sOut = wxString(m_poLayer->GetLayerDefn()->GetName(), wxCSConv(wxT("cp-866")));
+    else
+        sOut = wxString(m_poLayer->GetLayerDefn()->GetName(), wxConvUTF8);//TODO: check encodings
+	if(sOut.IsEmpty())
+	{
+		if(EQUALN(m_sPath, "/vsizip", 7))
+            sOut = wxString(CPLGetBasename(m_sPath), wxCSConv(wxT("cp-866")));
+        else
+            sOut = wxString(CPLGetBasename(m_sPath), wxConvUTF8);//TODO: check encodings
+	}
+	m_sTableName = sOut;
+    return m_sTableName;
 }
 
 void wxGISTable::LoadFeatures(ITrackCancel* pTrackCancel)
@@ -156,7 +172,7 @@ void wxGISTable::LoadFeatures(ITrackCancel* pTrackCancel)
 			m_FeaturesMap[nFID] = OGRFeatureSPtr(poFeature, OGRFeatureDeleter);
 			counter++;
 
-			if(!pTrackCancel->Continue())
+			if(pTrackCancel && !pTrackCancel->Continue())
 				return;
 		}
 		m_bIsDataLoaded = true;
@@ -206,7 +222,7 @@ size_t wxGISTable::GetFeatureCount(ITrackCancel* pTrackCancel)
 		LoadFeatures(pTrackCancel);
         if(!m_bIsDataLoaded)
             m_nFeatureCount = m_poLayer->GetFeatureCount(true);
-		if(m_nFeatureCount == -1)
+		if(m_nFeatureCount == wxNOT_FOUND)
 			m_nFeatureCount = 0;
 
 		return m_nFeatureCount;
@@ -250,7 +266,7 @@ void wxGISTable::Reset(void)
         m_poLayer->ResetReading();
 }
 
-OGRFeatureDefn* wxGISTable::GetDefinition(void)
+OGRFeatureDefn* const wxGISTable::GetDefinition(void)
 {
     if(	m_poLayer )
         return m_poLayer->GetLayerDefn();
@@ -275,7 +291,7 @@ OGRErr wxGISTable::StoreFeature(OGRFeatureSPtr poFeature)
             nFID = poFeature->GetFID();
         else
 		{
-            nFID = m_poLayer->GetFeatureCount(false);
+            nFID = m_nFeatureCount;
 			poFeature->SetFID(nFID);
 		}
 
@@ -695,7 +711,7 @@ bool wxGISTable::Rename(wxString sNewName)
 	wxCriticalSectionLocker locker(m_CritSect);
     CPLString szDirPath = CPLGetPath(m_sPath);
     CPLString szName = CPLGetFilename(m_sPath);
-	CPLString szNewName = wgWX2MB(ClearExt(sNewName));
+	CPLString szNewName = ClearExt(sNewName).mb_str();
 
 	Close();
 

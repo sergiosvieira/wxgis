@@ -708,13 +708,13 @@ void wxGISDTSpatRef::OnOpen(wxCommandEvent& event)
         wxGxPrjFileUI* pGxPrjFileUI = dynamic_cast<wxGxPrjFileUI*>(pSelObj->operator[](0));
         if(pGxPrjFileUI)
         {
-            OGRSpatialReference* pOGRSpatialReference = pGxPrjFileUI->GetSpatialReference();                
+            OGRSpatialReferenceSPtr pOGRSpatialReference = pGxPrjFileUI->GetSpatialReference();                
             char *pszWKT;
             pOGRSpatialReference->exportToWkt( &pszWKT );
             m_pParam->SetValue(wxVariant(wxString(pszWKT, *wxConvCurrent), wxT("SRS")));
             OGRFree( pszWKT );
             pOGRSpatialReference->exportToPrettyWkt( &pszWKT );
-            m_PathTextCtrl->ChangeValue(wxString(pszWKT, *wxConvCurrent));
+            m_PathTextCtrl->ChangeValue(wxString(pszWKT, wxConvLocal));
             OGRFree( pszWKT );
             
             m_pParam->SetIsValid(true);
@@ -772,4 +772,4 @@ void wxGISDTSpatRef::Update(void)
     m_PathTextCtrl->ChangeValue( sWKT );
     SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
 }
-
+

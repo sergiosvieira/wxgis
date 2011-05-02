@@ -3,7 +3,7 @@
  * Purpose:  wxGISTableView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,48 +26,50 @@
 #include "wx/renderer.h"
 
 //------------------------------------------------------------------
-// wxGISTable
+// wxGISGridTable
 //------------------------------------------------------------------
 
-wxGISTable::wxGISTable(wxGISDatasetSPtr pwxGISDataset)
+wxGISGridTable::wxGISGridTable(wxGISDatasetSPtr pwxGISDataset)
 {
-    m_pwxGISDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pwxGISDataset);
+    m_pwxGISDataset = boost::dynamic_pointer_cast<wxGISTable>(pwxGISDataset);
     if(m_pwxGISDataset)
     {
-	    OGRLayer* pLayer = m_pwxGISDataset->GetLayerRef(0);
-        if(pLayer)
-        {
-	        m_sFIDKeyName = wgMB2WX(pLayer->GetFIDColumn());
+		if(!m_pwxGISDataset->IsOpened())
+			m_pwxGISDataset->Open();
 
-	        m_pOGRFeatureDefn = pLayer->GetLayerDefn();
-	        nCols = m_pOGRFeatureDefn->GetFieldCount();
-	        nRows = m_pwxGISDataset->GetSize();
-        }
+		m_pOGRFeatureDefn = m_pwxGISDataset->GetDefinition();
+	    m_nCols = m_pOGRFeatureDefn->GetFieldCount();
+		m_nRows = m_pwxGISDataset->GetFeatureCount();
+	    //OGRLayer* pLayer = m_pwxGISDataset->GetLayerRef(0);
+     //   if(pLayer)
+     //   {
+	    //    m_sFIDKeyName = wgMB2WX(pLayer->GetFIDColumn());
+     //   }
     }
     else
     {
-        nCols = 0;
-        nRows = 0;
+        m_nCols = 0;
+        m_nRows = 0;
     }
 }
 
-wxGISTable::~wxGISTable()
+wxGISGridTable::~wxGISGridTable()
 {
 	//wsDELETE(m_pwxGISDataset);
 }
 
-int wxGISTable::GetNumberCols()
+int wxGISGridTable::GetNumberCols()
 {
-	return nCols;
+	return m_nCols;
 }
 
 
-int wxGISTable::GetNumberRows()
+int wxGISGridTable::GetNumberRows()
 {
-    return nRows;
+    return m_nRows;
 }
 
-wxString wxGISTable::GetValue(int row, int col)
+wxString wxGISGridTable::GetValue(int row, int col)
 {
 	if(GetNumberCols() <= col || GetNumberRows() <= row)
 		return wxEmptyString;
@@ -77,24 +79,24 @@ wxString wxGISTable::GetValue(int row, int col)
 	return m_pwxGISDataset->GetAsString(row, col);
 }
 
-void wxGISTable::SetValue(int row, int col, const wxString &value)
+void wxGISGridTable::SetValue(int row, int col, const wxString &value)
 {
 }
 
-wxString wxGISTable::GetColLabelValue(int col)
+wxString wxGISGridTable::GetColLabelValue(int col)
 {
     wxString label;
 	OGRFieldDefn* pOGRFieldDefn = m_pOGRFeatureDefn->GetFieldDefn(col);
 	label = wgMB2WX(pOGRFieldDefn->GetNameRef());
-	if(!m_sFIDKeyName.IsEmpty())
-	{
-		if(label == m_sFIDKeyName);
-			label += _(" [*]");
-	}
+	//if(!m_sFIDKeyName.IsEmpty())
+	//{
+	//	if(label == m_sFIDKeyName);
+	//		label += _(" [*]");
+	//}
     return label;
 }
 
-wxString wxGISTable::GetRowLabelValue(int row)
+wxString wxGISGridTable::GetRowLabelValue(int row)
 {
 	return wxEmptyString;
 }

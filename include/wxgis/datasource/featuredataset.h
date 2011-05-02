@@ -20,75 +20,52 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/datasource/datasource.h"
-
-class wxGISFeatureDataset;
-DEFINE_SHARED_PTR(wxGISFeatureDataset);
+#include "wxgis/datasource/table.h"
 
 void WXDLLIMPEXP_GIS_DS GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
-wxGISFeatureDatasetSPtr WXDLLIMPEXP_GIS_DS CreateVectorLayer(CPLString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *poFields, OGRSpatialReference *poSpatialRef = NULL, OGRwkbGeometryType eGType = wkbUnknown, char ** papszDataSourceOptions = NULL, char ** papszLayerOptions = NULL); 
 
 //---------------------------------------
 // wxGISFeatureDataset
 //---------------------------------------
 
 class WXDLLIMPEXP_GIS_DS wxGISFeatureDataset :
-	public wxGISDataset
+	public wxGISTable
 {
 public:
-	wxGISFeatureDataset(CPLString sPath, wxGISEnumVectorDatasetType nType);
-	wxGISFeatureDataset(OGRDataSource *poDS, OGRLayer* poLayer, CPLString sPath, wxGISEnumVectorDatasetType nType);
+	wxGISFeatureDataset(CPLString sPath, int nSubType, OGRLayer* poLayer = NULL, OGRDataSource* poDS = NULL);
 	virtual ~wxGISFeatureDataset(void);
-//wxGISDataset
-	virtual wxGISEnumDatasetType GetType(void){return m_nType;};
+//wxGISTable
     virtual size_t GetSubsetsCount(void);
     virtual wxGISDatasetSPtr GetSubset(size_t nIndex);
-    virtual wxString GetName(void);
-	virtual OGRSpatialReference* GetSpatialReference(void);
+	virtual const OGRSpatialReferenceSPtr GetSpatialReference(void);
 	virtual void Close(void);
 //wxGISFeatureDataset
-	virtual bool Open(int iLayer = 0);
-	virtual bool Delete(int iLayer = 0);
-	virtual bool Rename(wxString sNewName);
-	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel);
-	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
-	virtual OGREnvelope* GetEnvelope(void);
-    virtual OGRwkbGeometryType GetGeometryType(void);
-    virtual OGRFeatureDefn* GetDefinition(void);
-    virtual OGRDataSource* GetDataSource(void);
+	virtual bool Open(int iLayer = 0, int bUpdate = 0, ITrackCancel* pTrackCancel = NULL);
+	virtual const OGREnvelopeSPtr GetEnvelope(void);
+    virtual const OGRwkbGeometryType GetGeometryType(void);
     virtual OGRErr SetFilter(wxGISQueryFilter* pQFilter = NULL);
-	//virtual void SetSpatialFilter(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);
-	virtual OGRFeature* GetAt(long nIndex);
-	virtual OGRFeature* operator [](long nIndex);
-	virtual wxString GetAsString(long row, int col);
-	//virtual wxGISFeatureSet* GetFeatureSet(IQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
+//	//virtual void SetSpatialFilter(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);
+//	//virtual wxGISFeatureSet* GetFeatureSet(IQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
 	virtual wxGISGeometrySet* GetGeometrySet(wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
     virtual wxGISGeometrySet* GetGeometries(void);
-	virtual size_t GetSize(void);
-	virtual OGRLayer* GetLayerRef(int iLayer = 0);
-    virtual OGRFeature* Next(void);
-    virtual void Reset(void);
-    virtual OGRErr CreateFeature(OGRFeature* poFeature);
-    virtual wxFontEncoding GetEncoding(void){return m_Encoding;};
-    virtual void SetEncoding(wxFontEncoding Encoding){m_Encoding = Encoding;};
+//    virtual OGRErr CreateFeature(OGRFeature* poFeature);
     virtual char **GetFileList();
+	//
+    virtual OGRDataSource* GetDataSource(void);
+	virtual OGRLayer* GetLayerRef(int iLayer = 0);
 protected:
-    virtual void CreateQuadTree(OGREnvelope* pEnv);
+    virtual void CreateQuadTree(const OGREnvelopeSPtr pEnv);
     virtual void DeleteQuadTree(void);
     virtual void LoadGeometry(void);
     virtual void UnloadGeometry(void);
 protected:
-	OGRDataSource *m_poDS;
-	OGREnvelope* m_psExtent;
-	OGRLayer* m_poLayer;
-    bool m_bOLCStringsAsUTF8;
-    wxFontEncoding m_Encoding;
-    std::map<long, OGRFeature*> m_FeaturesMap;
-    std::map<long, OGRFeature*>::iterator m_IT;
-    int m_FieldCount;
-    wxArrayString m_FeatureStringData;
-    //
+	OGREnvelopeSPtr m_psExtent;
+	OGRSpatialReferenceSPtr m_pSpatialReference;
+
     bool m_bIsGeometryLoaded;
     wxGISGeometrySet *m_pGeometrySet;
     CPLQuadTree* m_pQuadTree;
+//    wxArrayString m_FeatureStringData;
 };
+
+DEFINE_SHARED_PTR(wxGISFeatureDataset);

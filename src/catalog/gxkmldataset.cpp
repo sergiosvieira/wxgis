@@ -196,7 +196,7 @@ bool wxGxKMLDataset::DeleteChild(IGxObject* pChild)
 	return true;
 }
 
-wxGISDatasetSPtr wxGxKMLDataset::GetDataset(bool bReadOnly)
+wxGISDatasetSPtr wxGxKMLDataset::GetDataset(void)
 {
     LoadChildren();
 	if(m_pwxGISDataset == NULL)
@@ -306,7 +306,7 @@ wxString wxGxKMLSubDataset::GetCategory(void)
 	return wxString(_("KML Feature class"));
 }
 
-wxGISDatasetSPtr wxGxKMLSubDataset::GetDataset(bool bReadOnly)
+wxGISDatasetSPtr wxGxKMLSubDataset::GetDataset(void)
 {
 	//if(m_pwxGISDataset == NULL)
  //       return wxGISDatasetSPtr();

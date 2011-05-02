@@ -27,7 +27,7 @@ wxGISSpatialReferencePropertyPage::wxGISSpatialReferencePropertyPage(void)
 {
 }
 
-wxGISSpatialReferencePropertyPage::wxGISSpatialReferencePropertyPage(OGRSpatialReference* poSRS, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+wxGISSpatialReferencePropertyPage::wxGISSpatialReferencePropertyPage(OGRSpatialReferenceSPtr poSRS, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     Create(poSRS, parent, id, pos, size, style, name);
 }
@@ -36,7 +36,7 @@ wxGISSpatialReferencePropertyPage::~wxGISSpatialReferencePropertyPage()
 {
 }
 
-bool wxGISSpatialReferencePropertyPage::Create(OGRSpatialReference* poSRS, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+bool wxGISSpatialReferencePropertyPage::Create(OGRSpatialReferenceSPtr poSRS, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     wxPanel::Create(parent, id, pos, size, style, name);
 
@@ -59,10 +59,8 @@ bool wxGISSpatialReferencePropertyPage::Create(OGRSpatialReference* poSRS, wxWin
         {
             FillProjected(poSRS);
             AppendProperty( new wxPropertyCategory(_("Geographic Coordinate System")) );
-            OGRSpatialReference* poGeogCS = poSRS->CloneGeogCS();
+            OGRSpatialReferenceSPtr poGeogCS = OGRSpatialReferenceSPtr(poSRS->CloneGeogCS());
             FillGeographic(poGeogCS);
-
-            OSRDestroySpatialReference(poGeogCS);
         }
         else if(poSRS->IsGeographic())
         {
@@ -97,7 +95,7 @@ void wxGISSpatialReferencePropertyPage::FillUndefined(void)
     m_pg->Append( new wxStringProperty(_("Name"), wxPG_LABEL, _("Undefined")) );
 }
 
-void wxGISSpatialReferencePropertyPage::FillProjected(OGRSpatialReference *poSRS)
+void wxGISSpatialReferencePropertyPage::FillProjected(OGRSpatialReferenceSPtr poSRS)
 {
     const char *pszName = poSRS->GetAttrValue("PROJCS");
     //make bold!  wxPG_BOLD_MODIFIED
@@ -154,7 +152,7 @@ void wxGISSpatialReferencePropertyPage::FillProjected(OGRSpatialReference *poSRS
 
 }
 
-void wxGISSpatialReferencePropertyPage::FillGeographic(OGRSpatialReference *poSRS)
+void wxGISSpatialReferencePropertyPage::FillGeographic(OGRSpatialReferenceSPtr poSRS)
 {
     const char *pszName = poSRS->GetAttrValue("GEOGCS");
     AppendProperty( new wxStringProperty(_("Name"), wxPG_LABEL, wgMB2WX(pszName)) );
@@ -188,12 +186,12 @@ void wxGISSpatialReferencePropertyPage::FillGeographic(OGRSpatialReference *poSR
     AppendProperty(pid, new wxFloatProperty(_("Longitude"), wxPG_LABEL, fMerLon));
 }
 
-void wxGISSpatialReferencePropertyPage::FillLoclal(OGRSpatialReference *poSRS)
+void wxGISSpatialReferencePropertyPage::FillLoclal(OGRSpatialReferenceSPtr poSRS)
 {
     AppendProperty(new wxStringProperty(_("Name"), wxPG_LABEL, _("Undefined")));
 }
 
-void wxGISSpatialReferencePropertyPage::AppendProjParam(wxPGId pid, const char *pszName, OGRSpatialReference *poSRS)
+void wxGISSpatialReferencePropertyPage::AppendProjParam(wxPGId pid, const char *pszName, OGRSpatialReferenceSPtr poSRS)
 {
     if(poSRS->FindProjParm(pszName) != wxNOT_FOUND)
     {

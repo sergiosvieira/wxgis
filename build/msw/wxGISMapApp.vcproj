@@ -2,10 +2,10 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="wxGISCat"
-	ProjectGUID="{796A3AA1-6A22-4CB8-A6DA-EF2D43C1C54D}"
-	RootNamespace="wxGISCat"
-	TargetFrameworkVersion="131072"
+	Name="wxGISMapApp"
+	ProjectGUID="{E21E4448-784A-4DB6-9A4C-D24034171938}"
+	RootNamespace="wxGISMap"
+	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
@@ -45,9 +45,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -61,15 +59,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxmsw28ud_html.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib proj4d.lib geosd.lib wxGISCatalogUId.lib wxGISFrameworkd.lib wxGISCored.lib"
-				OutputFile="$(OutDir)\$(ProjectName)alog.exe"
-				LinkIncremental="0"
 				AdditionalLibraryDirectories="&quot;$(PROJ)\wxGIS\lib&quot;;&quot;$(GEOS)\lib&quot;;..\..\lib;&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				HeapReserveSize="0"
-				StackReserveSize="0"
-				LargeAddressAware="0"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
@@ -98,10 +90,10 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)Cli"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="1"
+			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -121,15 +113,12 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="&quot;$(BOOST_ROOT)&quot;;&quot;$(PROJ)\src&quot;;&quot;$(GEOS)\capi&quot;;&quot;$(GEOS)\source\headers&quot;;&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;__WXMSW__;WXUSINGDLL;NOPCH"
-				StringPooling="true"
-				ExceptionHandling="1"
+				Optimization="2"
+				EnableIntrinsicFunctions="true"
 				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -142,17 +131,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28u.lib wxbase28u_net.lib wxmsw28u_core.lib wxbase28u_xml.lib wxmsw28u_aui.lib wxmsw28u_adv.lib wxmsw28u_html.lib wxzlib.lib wxregexu.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpl.lib wxgisogr.lib wxgisgdal.lib proj4.lib geos.lib wxGISCatalogUI.lib wxGISCore.lib wxGISFramework.lib"
-				OutputFile="$(OutDir)\$(ProjectName)alog.exe"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(PROJ)\wxGIS\lib&quot;;&quot;$(GEOS)\lib&quot;;..\..\lib;&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;"
-				GenerateDebugInformation="false"
-				SubSystem="2"
+				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				ImportLibrary=""
 				TargetMachine="1"
 			/>
 			<Tool
@@ -182,66 +163,38 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
+			Name="Файлы исходного кода"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\cat_app\catalogapp.cpp"
+				RelativePath="..\..\src\app\gisaboutdlg.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\cat_app\catalogframe.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\cat_app\gisaboutdlg.cpp"
+				RelativePath="..\..\src\map_app\mapapp.cpp"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Header Files"
+			Name="Заголовочные файлы"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\include\wxgis\cat_app\catalogapp.h"
+				RelativePath="..\..\include\wxgis\app\gisaboutdlg.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wxgis\cat_app\catalogframe.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\cat_app\gisaboutdlg.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\cat_app\resource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\resource.h"
+				RelativePath="..\..\include\wxgis\map_app\mapapp.h"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Resource Files"
+			Name="Файлы ресурсов"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-			<File
-				RelativePath="..\img\archive.ico"
-				>
-			</File>
-			<File
-				RelativePath="..\..\art\archive.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\wxGISCat.rc"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>

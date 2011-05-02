@@ -186,6 +186,28 @@
 #    define WXDLLIMPEXP_DATA_GIS_NET(type) type
 #endif
 
+#ifdef WXMAKINGDLL_GIS_MAPU
+#    define WXDLLIMPEXP_GIS_MAPU WXEXPORT
+#    define WXDLLIMPEXP_DATA_GIS_MAPU(type) WXEXPORT type
+#elif defined(WXUSINGDLL)
+#    define WXDLLIMPEXP_GIS_MAPU WXIMPORT
+#    define WXDLLIMPEXP_DATA_GIS_MAPU(type) WXIMPORT type
+#else /* not making nor using DLL */
+#    define WXDLLIMPEXP_GIS_MAPU
+#    define WXDLLIMPEXP_DATA_GIS_MAPU(type) type
+#endif
+
+#ifdef WXMAKINGDLL_GIS_MAP
+#    define WXDLLIMPEXP_GIS_MAP WXEXPORT
+#    define WXDLLIMPEXP_DATA_GIS_MAP(type) WXEXPORT type
+#elif defined(WXUSINGDLL)
+#    define WXDLLIMPEXP_GIS_MAP WXIMPORT
+#    define WXDLLIMPEXP_DATA_GIS_MAP(type) WXIMPORT type
+#else /* not making nor using DLL */
+#    define WXDLLIMPEXP_GIS_MAP
+#    define WXDLLIMPEXP_DATA_GIS_MAP(type) type
+#endif
+
 //#define WXDLLEXPORT WXMAKINGDLL_GIS
 //#define WXDLLEXPORT_DATA WXDLLIMPEXP_DATA_GIS
 
@@ -201,13 +223,13 @@
 #define NON wxT("~non~")
 #define ERR wxT("~err~")
 #define NONAME _("no name")
-#define DELTA 0.00001
 #define CACHE_SIZE 3000
 #define ZOOM_FACTOR 0.25
+#define DELTA (FLT_EPSILON * 16)
 #define PI 3.1415926535897932384626433832795
 #define PIDEG 0.017453292519943295769236907684886
 
-#define APP_VER wxT("0.3.1") //global for all apps
+#define APP_VER wxT("0.3.2") //global for all apps
 
 #ifndef _DEBUG
    #define WXGISPORTABLE

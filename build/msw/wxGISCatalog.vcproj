@@ -198,6 +198,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\catalog\gxcsvfactory.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\catalog\gxdataset.cpp"
 				>
 			</File>
@@ -277,6 +281,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalog\gxcatalog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalog\gxcsvfactory.h"
 				>
 			</File>
 			<File
