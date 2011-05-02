@@ -213,6 +213,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\geoprocessing\gpsumtabletool.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\geoprocessing\gptable.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\geoprocessing\gptool.cpp"
 				>
 			</File>
@@ -264,6 +272,14 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\geoprocessing\gpprojecttool.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geoprocessing\gpsumtabletool.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\geoprocessing\gptable.h"
 				>
 			</File>
 			<File

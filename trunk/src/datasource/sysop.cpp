@@ -64,6 +64,9 @@ wxString ClearExt(wxString sPath)
 wxFontEncoding GetEncodingFromCpg(CPLString sPath)
 {
 	const char* szCPGPath = CPLResetExtension(sPath, "cpg");
+    if(!CPLCheckForFile((char*)szCPGPath, NULL))
+        return wxFONTENCODING_DEFAULT;
+
     char **papszLines = CSLLoad( szCPGPath);
     if(papszLines == NULL)
         return wxFONTENCODING_DEFAULT;

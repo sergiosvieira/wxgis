@@ -115,7 +115,7 @@ void wxGxTableView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 		return;
 
     wxBusyCursor wait;
-	wxGISDatasetSPtr pwxGISDataset = pGxDataset->GetDataset(true);
+	wxGISDatasetSPtr pwxGISDataset = pGxDataset->GetDataset();
 	if(pwxGISDataset == NULL)
 		return;
 
@@ -143,8 +143,9 @@ void wxGxTableView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	//if(pOGRLayer == NULL)
 	//	return;
 
-	wxGISTable* pTable = new wxGISTable(pwxGISDataset);
+	wxGISGridTable* pTable = new wxGISGridTable(pwxGISDataset);
 	wxGISTableView::SetTable(pTable, true);
+
 	////reset 
 	//ResetContents();
 
@@ -159,7 +160,7 @@ void wxGxTableView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 
 	//SortItems(MyCompareFunction, m_bSortAsc);
  //   SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
-
 	m_nParentGxObjectID = nSelID;
+
 	wxWindow::Refresh();
 }

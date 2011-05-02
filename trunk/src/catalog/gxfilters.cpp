@@ -134,10 +134,12 @@ wxString wxGxPrjFileFilter::GetExt(void)
 // wxGxDatasetFilter
 //------------------------------------------------------------
 
-wxGxDatasetFilter::wxGxDatasetFilter(wxGISEnumDatasetType nType)
+wxGxDatasetFilter::wxGxDatasetFilter(wxGISEnumDatasetType nType, int nSubType)
 {
     m_nType = nType;
+	m_nSubType = nSubType;
 }
+
 
 wxGxDatasetFilter::~wxGxDatasetFilter(void)
 {
@@ -150,6 +152,9 @@ bool wxGxDatasetFilter::CanChooseObject( IGxObject* pObject )
 		return false;
     if(pGxDataset->GetType() != m_nType)
 		return false;
+	if(m_nSubType != wxNOT_FOUND)
+		if(pGxDataset->GetSubType() != GetSubType())
+			return false;
     return true;
 }
 
@@ -163,6 +168,9 @@ bool wxGxDatasetFilter::CanDisplayObject( IGxObject* pObject )
 		return false;
     if(pGxDataset->GetType() != m_nType)
 		return false;
+	if(m_nSubType != wxNOT_FOUND)
+		if(pGxDataset->GetSubType() != GetSubType())
+			return false;
     return true;
 }
 
@@ -174,6 +182,8 @@ wxString wxGxDatasetFilter::GetName(void)
         return wxString(_("Raster (*.img, *.tif, etc.)"));
     case enumGISFeatureDataset:
         return wxString(_("Vector (*.shp, *.tab, etc.)"));
+    case enumGISTableDataset:
+        return wxString(_("Table (*.dbf, *.tab, *.csv, etc.)"));
     }
     return wxEmptyString;
 }
@@ -496,3 +506,108 @@ wxString wxGxTextFilter::GetExt(void)
 	return m_soExt;
 }
 
+//------------------------------------------------------------
+// wxGxTableFilter
+//------------------------------------------------------------
+
+wxGxTableFilter::wxGxTableFilter(wxGISEnumTableDatasetType nSubType)
+{
+    m_nSubType = nSubType;
+}
+
+wxGxTableFilter::~wxGxTableFilter(void)
+{
+}
+
+bool wxGxTableFilter::CanChooseObject( IGxObject* pObject )
+{
+	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
+	if(!pGxDataset)
+		return false;
+    if(pGxDataset->GetType() != GetType())
+		return false;
+    if(GetSubType() == enumTableUnknown)
+        return true;
+    if(pGxDataset->GetSubType() != GetSubType())
+		return false;
+    return true;
+}
+
+bool wxGxTableFilter::CanDisplayObject( IGxObject* pObject )
+{
+	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
+	if(pContainer)
+		return true;
+	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
+	if(!pGxDataset)
+		return false;
+    if(pGxDataset->GetType() != GetType())
+		return false;
+    if(GetSubType() == enumTableUnknown)
+        return true;
+    if(pGxDataset->GetSubType() != GetSubType())
+		return false;
+    return true;
+}
+
+wxString wxGxTableFilter::GetName(void)
+{
+    switch(m_nSubType)
+    {
+    case enumTableDBF:
+        return wxString(_("dBase file (*.dbf)"));
+    case enumTableMapinfoTab:
+        return wxString(_("MapInfo table File (*.tab)"));
+    case enumTableMapinfoMif:
+        return wxString(_("MapInfo table File (*.mif)"));
+    case enumTableCSV:
+ 	    return wxString(_("Comma Separated Values (*.csv)"));
+    case enumTablePostgres:
+ 	    return wxString(_("Database table"));
+    default:
+	    return wxString(_("Any feature classes (*.*)"));
+    }
+}
+
+wxString wxGxTableFilter::GetExt(void)
+{
+    switch(m_nSubType)
+    {
+    case enumTableDBF:
+	    return wxString(wxT("dbf"));
+    case enumTableMapinfoTab:
+	    return wxString(wxT("tab"));
+    case enumTableMapinfoMif:
+        return wxString(wxT("mif"));
+    case enumTableCSV:
+        return wxString(wxT("csv"));
+    case enumTablePostgres:
+        return wxEmptyString;
+    default:
+        return wxEmptyString;
+    }
+}
+
+wxString wxGxTableFilter::GetDriver(void)
+{
+    switch(m_nSubType)
+    {
+    case enumTableDBF:
+	    return wxString(wxT("ESRI Shapefile"));
+    case enumTableMapinfoTab:
+    case enumTableMapinfoMif:
+	    return wxString(wxT("MapInfo File"));
+    case enumTableCSV:
+	    return wxString(wxT("CSV"));
+    case enumTablePostgres:
+	    return wxString(wxT("PostgreSQL"));
+	//case emumVecPostGIS:
+    default:
+        return wxEmptyString;
+    }
+}
+
+int wxGxTableFilter::GetSubType(void)
+{
+    return m_nSubType;
+}

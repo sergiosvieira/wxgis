@@ -560,6 +560,7 @@ void wxGxToolExecuteView::OnObjectRefreshed(long nObjectID)
 
 void wxGxToolExecuteView::OnRefreshAll(void)
 {
+	wxBusyCursor wait;
     ResetContents();
 	IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_nParentGxObjectID);
 	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(pGxObject.get());
@@ -586,6 +587,7 @@ void wxGxToolExecuteView::OnSelectionChanged(IGxSelection* Selection, long nInit
 	//if(m_pParentGxObject == pGxObj)
 	//	return;
 
+	wxBusyCursor wait;
 	//reset
 	ResetContents();
 	m_nParentGxObjectID = nSelID;

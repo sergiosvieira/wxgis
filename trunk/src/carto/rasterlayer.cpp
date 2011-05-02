@@ -47,13 +47,13 @@ void wxGISRasterLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDispl
     OGREnvelope Env = pDisplayTransformation->GetVisibleBounds();
     const OGREnvelope* LayerEnv = m_pwxGISRasterDataset->GetEnvelope();
     OGRSpatialReference* pEnvSpaRef = pDisplayTransformation->GetSpatialReference();
-    OGRSpatialReference* pLayerSpaRef = m_pwxGISRasterDataset->GetSpatialReference();
+    const OGRSpatialReferenceSPtr pLayerSpaRef = m_pwxGISRasterDataset->GetSpatialReference();
 
     if(pLayerSpaRef && pEnvSpaRef)
     {
         if(!pLayerSpaRef->IsSame(pEnvSpaRef))
         {
-            OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pEnvSpaRef, pLayerSpaRef );
+            OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pEnvSpaRef, pLayerSpaRef.get() );
             poCT->Transform(1, &Env.MaxX, &Env.MaxY);
             poCT->Transform(1, &Env.MinX, &Env.MinY);
             OCTDestroyCoordinateTransformation(poCT);
@@ -86,7 +86,7 @@ void wxGISRasterLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDispl
 OGRSpatialReference* wxGISRasterLayer::GetSpatialReference(void)
 {
 	if(IsValid())
-		return m_pwxGISRasterDataset->GetSpatialReference();
+		return m_pwxGISRasterDataset->GetSpatialReference()->Clone();
 	return NULL;
 }
 

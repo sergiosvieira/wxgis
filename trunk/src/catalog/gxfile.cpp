@@ -124,23 +124,24 @@ bool wxGxFile::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
 wxGxPrjFile::wxGxPrjFile(CPLString Path, wxString Name, wxGISEnumPrjFileType nType) : wxGxFile(Path, Name)
 {
     m_Type = nType;
+	m_pOGRSpatialReference = boost::make_shared<OGRSpatialReference>();
 }
 
 wxGxPrjFile::~wxGxPrjFile(void)
 {
 }
 
-OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
+OGRSpatialReferenceSPtr wxGxPrjFile::GetSpatialReference(void)
 {
 	OGRErr err = OGRERR_NONE;
-	if(m_OGRSpatialReference.Validate() != OGRERR_NONE)
+	if(m_pOGRSpatialReference->Validate() != OGRERR_NONE)
 	{
 		char **papszLines = CSLLoad( m_sPath );
 
 		switch(m_Type)
 		{
 		case enumESRIPrjFile:
-			err = m_OGRSpatialReference.importFromESRI(papszLines);
+			err = m_pOGRSpatialReference->importFromESRI(papszLines);
 			break;
 		case enumSPRfile:
             {
@@ -155,7 +156,7 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
                     CPLStrlcat( pszWKT, papszLines[i], nDestSize );
                 }
                 pszWKT2 = pszWKT;
-                err = m_OGRSpatialReference.importFromWkt( &pszWKT2 );//.importFromWkt(papszLines);
+                err = m_pOGRSpatialReference->importFromWkt( &pszWKT2 );//.importFromWkt(papszLines);
                 CPLFree( pszWKT );
             }
 			break;
@@ -165,7 +166,7 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
         CSLDestroy( papszLines );
 	}
     if(err != OGRERR_NONE)
-    	return NULL;
+    	return OGRSpatialReferenceSPtr();
 
     //err = m_OGRSpatialReference.importFromProj4("+proj=bonne +a=6371000 +es=0 +lon_0=0 +lat_1=60 +units=m +no_defs");
     //0x04e3c368 "+proj=bonne +ellps=sphere +lon_0=0 +lat_1=60 +units=m +no_defs "
@@ -182,7 +183,7 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 		//char *pszProj4Defn = NULL;
 		//m_OGRSpatialReference.exportToProj4( &pszProj4Defn );
   //      CPLFree( pszProj4Defn );
-		return &m_OGRSpatialReference;
+		return m_pOGRSpatialReference;
 	}
 	else
 	{
@@ -190,7 +191,7 @@ OGRSpatialReference* wxGxPrjFile::GetSpatialReference(void)
 		wxString sErr = wxString::Format(_("wxGxPrjFile: GDAL error: %s"), wgMB2WX(err));
 		wxLogError(sErr);
 	}
-	return NULL;
+	return OGRSpatialReferenceSPtr();
 }
 
 //--------------------------------------------------------------

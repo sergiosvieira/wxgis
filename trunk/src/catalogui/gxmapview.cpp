@@ -127,7 +127,7 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 		return;
 
 //    wxBusyCursor wait;
-	wxGISDatasetSPtr pwxGISDataset = pGxDataset->GetDataset(true);
+	wxGISDatasetSPtr pwxGISDataset = pGxDataset->GetDataset();
 	if(pwxGISDataset == NULL)
 		return;
 

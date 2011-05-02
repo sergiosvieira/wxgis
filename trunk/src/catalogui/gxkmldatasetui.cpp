@@ -69,7 +69,7 @@ void wxGxKMLDatasetUI::EditProperties(wxWindow *parent)
     wxGISVectorPropertyPage* VectorPropertyPage = new wxGISVectorPropertyPage(this, pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(VectorPropertyPage, VectorPropertyPage->GetPageName());
 
-	wxGISDatasetSPtr pDset = GetDataset(true);
+	wxGISDatasetSPtr pDset = GetDataset();
 	if(pDset)
 	{
 		wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(pDset->GetSpatialReference(), pParentWnd);
@@ -167,7 +167,7 @@ void wxGxKMLSubDatasetUI::EditProperties(wxWindow *parent)
     wxGISVectorPropertyPage* VectorPropertyPage = new wxGISVectorPropertyPage(this, pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(VectorPropertyPage, VectorPropertyPage->GetPageName());
 
-	wxGISDatasetSPtr pDset = GetDataset(true);
+	wxGISDatasetSPtr pDset = GetDataset();
 	if(pDset)
 	{
 		wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(pDset->GetSpatialReference(), pParentWnd);

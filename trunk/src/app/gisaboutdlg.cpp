@@ -1,9 +1,9 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  About Dialog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#include "wxgis/cat_app/gisaboutdlg.h"
-#include "wxgis/catalog/catalog.h"
+#include "wxgis/app/gisaboutdlg.h"
+#include "wxgis/datasource/datasource.h"
 
 #include "../../art/logo.xpm"
 
@@ -93,7 +93,7 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
     wxString sAboutApp = wxString::Format(_("wxGIS [%s]\n\nVersion: %s\n\n(c) 2009-2011 Dmitry Barishnikov (Bishop)"), pApp->GetAppName(), pApp->GetAppVersionString());
 	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutApp, m_AuiNotebook), _("About application"));
 
-    long dFreeMem =  (long)(wxGetFreeMemory().ToLong() / 1048576);
+    long dFreeMem =  wxMemorySize(wxGetFreeMemory() / 1048576).ToLong();
     wxString sAboutSys = wxString::Format(_("HOST '%s'\n\nOS desc - %s\n\nFree memory - %u Mb\n\nLibs:\n\nGDAL %s\nGEOS %s\nPROJ %s\n%s"), wxGetFullHostName().c_str(), wxGetOsDescription().c_str(), dFreeMem, sGDALStr.c_str(), sGEOSStr.c_str(), sPrjStr.c_str(), sWXStr.c_str() );
     m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutSys, m_AuiNotebook), _("About system"));
 

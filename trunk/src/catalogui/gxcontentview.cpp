@@ -566,29 +566,31 @@ void wxGxContentView::OnEndLabelEdit(wxListEvent& event)
     if ( event.GetLabel().Len() == 0 )
     {
         event.Veto();
+		return;
     }
-	else
+
+	LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
+	if(pItemData == NULL)
 	{
-		LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
-		if(pItemData == NULL)
-		{
-			event.Veto();
-			return;
-		}
-        
-        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pItemData->nObjectID);
-		IGxObjectEdit* pObjEdit =  dynamic_cast<IGxObjectEdit*>(pGxObject.get());
-		if(pObjEdit == NULL)
-		{
-			event.Veto();
-			return;
-		}
-		if(!pObjEdit->Rename(event.GetLabel()))
-		{
-			event.Veto();
-			wxMessageBox(_("Rename error!"), _("Error"), wxICON_ERROR | wxOK );
-		}
+		event.Veto();
+		return;
 	}
+    
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pItemData->nObjectID);
+	IGxObjectEdit* pObjEdit =  dynamic_cast<IGxObjectEdit*>(pGxObject.get());
+	if(pObjEdit == NULL)
+	{
+		event.Veto();
+		return;
+	}
+	if(!pObjEdit->Rename(event.GetLabel()))
+	{
+		event.Veto();
+		wxMessageBox(_("Rename error!"), _("Error"), wxICON_ERROR | wxOK );
+		return;
+	}
+
+	m_pCatalog->ObjectChanged(pGxObject->GetID());
 }
 
 void wxGxContentView::OnObjectAdded(long nObjectID)
@@ -633,6 +635,7 @@ void wxGxContentView::OnObjectChanged(long nObjectID)
 		IGxObjectContainer* pObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 		if(pObjectContainer != NULL)
 		{
+			wxBusyCursor wait;
 			if(GetItemCount() > 0 && !pObjectContainer->HasChildren())
 				ResetContents();
 			else if(GetItemCount() == 0 && pObjectContainer->HasChildren())
@@ -691,6 +694,7 @@ void wxGxContentView::OnRefreshAll(void)
     ResetContents();
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_nParentGxObjectID);
 	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(pGxObject.get());
+	wxBusyCursor wait;
 	if(pObjContainer == NULL || !pObjContainer->HasChildren())
 		return;
 	GxObjectArray* pArr = pObjContainer->GetChildren();
@@ -715,6 +719,7 @@ void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiato
 	if(!pGxObject || m_nParentGxObjectID == pGxObject->GetID())
 		return;
 
+	wxBusyCursor wait;
 	//reset
 	ResetContents();
 	m_nParentGxObjectID = pGxObject->GetID();

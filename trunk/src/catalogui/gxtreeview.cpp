@@ -260,6 +260,7 @@ void wxGxTreeViewBase::OnObjectChanged(long nObjectID)
 				SetItemText(TreeItemId, sName);
 				if(pGxObjectContainer != NULL)
 				{
+					wxBusyCursor wait;
 					bool bItemHasChildren = pGxObjectContainer->HasChildren();
 					if(ItemHasChildren(TreeItemId) && !bItemHasChildren)
 					{
@@ -316,6 +317,7 @@ void wxGxTreeViewBase::OnObjectRefreshed(long nObjectID)
             {
                 IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
 			    IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
+				wxBusyCursor wait;
 			    if(pGxObjectContainer && pGxObjectContainer->HasChildren() && !ItemHasChildren(TreeItemId))
                 {
                     SetItemHasChildren(TreeItemId);
@@ -385,6 +387,7 @@ void wxGxTreeViewBase::OnItemExpanding(wxTreeEvent& event)
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 		if(pGxObjectContainer != NULL)
 		{
+			wxBusyCursor wait;
 			if(pGxObjectContainer->HasChildren() && pGxObjectContainer->AreChildrenViewable())
 			{
 				if(pData->m_bExpandedOnce == false)
@@ -496,35 +499,38 @@ void wxGxTreeView::OnEndLabelEdit(wxTreeEvent& event)
     {
         //wxMessageDialog(this, _("Label is too short. Please make it longer!"), _("Warning"), wxOK | wxICON_EXCLAMATION);
         event.Veto();
+		return;
     }
-	else
+
+	wxTreeItemId item = event.GetItem();
+	if(!item.IsOk())
 	{
-		wxTreeItemId item = event.GetItem();
-		if(!item.IsOk())
-		{
-			event.Veto();
-			return;
-		}
-		wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(event.GetItem());
-		if(pData == NULL)
-		{
-			event.Veto();
-			return;
-		}
-        
-        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID);
-		IGxObjectEdit* pObjEdit =  dynamic_cast<IGxObjectEdit*>(pGxObject.get());
-		if(pObjEdit == NULL)
-		{
-			event.Veto();
-			return;
-		}
-		if(!pObjEdit->Rename(event.GetLabel()))
-		{
-			event.Veto();
-			wxMessageBox(_("Rename error!"), _("Error"), wxICON_ERROR | wxOK );
-		}
+		event.Veto();
+		return;
 	}
+	wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(event.GetItem());
+	if(pData == NULL)
+	{
+		event.Veto();
+		return;
+	}
+    
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID);
+	IGxObjectEdit* pObjEdit =  dynamic_cast<IGxObjectEdit*>(pGxObject.get());
+	if(pObjEdit == NULL)
+	{
+		event.Veto();
+		return;
+	}
+
+	if(!pObjEdit->Rename(event.GetLabel()))
+	{
+		event.Veto();
+		wxMessageBox(_("Rename error!"), _("Error"), wxICON_ERROR | wxOK );
+		return;
+	}
+
+	m_pCatalog->ObjectChanged(pGxObject->GetID());
 }
 
 void wxGxTreeView::OnSelChanged(wxTreeEvent& event)

@@ -3,7 +3,7 @@
  * Purpose:  Main frame class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/cat_app/catalogframe.h"
-#include "wxgis/cat_app/gisaboutdlg.h"
+#include "wxgis/app/gisaboutdlg.h"
 
 #include "../../art/mainframe.xpm"
 #include "../../art/mainframe_x.xpm"

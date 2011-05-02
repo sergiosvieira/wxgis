@@ -1,9 +1,9 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  wxGISConfig class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009 Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -55,8 +55,8 @@ wxGISConfig::wxGISConfig(wxString sAppName, wxString sConfigDir, bool bPortable)
         if(m_sSysConfigDir.Find(sExeAppName) != wxNOT_FOUND)
             m_sSysConfigDir.Replace(sExeAppName + wxFileName::GetPathSeparator(), wxString(wxT("")));
 
-	    if(!wxDirExists(m_sUserConfigDir))
-		    wxFileName::Mkdir(m_sUserConfigDir, 0755, wxPATH_MKDIR_FULL);
+	    //if(!wxDirExists(m_sUserConfigDir))
+		   // wxFileName::Mkdir(m_sUserConfigDir, 0755, wxPATH_MKDIR_FULL);
 //	    if(!wxDirExists(m_sSysConfigDir))
 //		    wxFileName::Mkdir(m_sSysConfigDir, 0775, wxPATH_MKDIR_FULL);
     }
@@ -113,8 +113,8 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 		{
 		case enumGISHKLM:
 		{
-			wxString sys_dir = m_sSysConfigDir + wxFileName::GetPathSeparator() + sRootNodeName;
-			wxString sys_path = sys_dir + wxFileName::GetPathSeparator() + HKLM_CONFIG_NAME;
+			wxString sys_dir = m_sSysConfigDir;// + wxFileName::GetPathSeparator() + sRootNodeName;
+			wxString sys_path = sys_dir + wxFileName::GetPathSeparator() + sRootNodeName + wxT(".xml");// + HKLM_CONFIG_NAME;
 
 			if(!wxDirExists(sys_dir))
 				wxFileName::Mkdir(sys_dir, 0755, wxPATH_MKDIR_FULL);
@@ -124,8 +124,8 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 		}
 		case enumGISHKCU:
 		{
-			wxString user_dir = m_sUserConfigDir + wxFileName::GetPathSeparator() + sRootNodeName;
-			wxString user_path = user_dir + wxFileName::GetPathSeparator() + HKCU_CONFIG_NAME;
+			wxString user_dir = m_sUserConfigDir;// + wxFileName::GetPathSeparator() + sRootNodeName;
+			wxString user_path = user_dir + wxFileName::GetPathSeparator() + sRootNodeName + wxT(".xml");// + HKCU_CONFIG_NAME;
 
 			if(!wxDirExists(user_dir))
 				wxFileName::Mkdir(user_dir, 0755, wxPATH_MKDIR_FULL);
@@ -153,11 +153,11 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 			//get hklm confic if hkcu is not available
 			if(Key == enumGISHKCU)
             {
-                wxString sys_dir = m_sSysConfigDir + wxFileName::GetPathSeparator() + sRootNodeName;
-                wxString sys_path = sys_dir + wxFileName::GetPathSeparator() + HKLM_CONFIG_NAME;
+                wxString sys_dir = m_sSysConfigDir;// + wxFileName::GetPathSeparator() + sRootNodeName;
+                wxString sys_path = sys_dir + wxFileName::GetPathSeparator() + sRootNodeName + wxT(".xml");// + HKCU_CONFIG_NAME;
                 pDoc = new wxXmlDocument(sys_path);
                 if(pDoc && !pDoc->IsOk())
-                    wxDELETE(pDoc);
+                    wxDELETE(pDoc)
 			}
 
 			//last chance
@@ -167,7 +167,7 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
                 if(wxFileName::FileExists(sXMLPath))
                     pDoc = new wxXmlDocument(sXMLPath);
                 if(pDoc && !pDoc->IsOk())
-                    wxDELETE(pDoc);
+                    wxDELETE(pDoc)
 			}
 
 			if(!pDoc)

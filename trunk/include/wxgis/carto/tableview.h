@@ -3,7 +3,7 @@
  * Purpose:  wxGISTableView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -37,18 +37,18 @@
 #include <wx/panel.h>
 
 #include "wxgis/carto/carto.h"
-#include "wxgis/datasource/featuredataset.h"
+#include "wxgis/datasource/table.h"
 
 //------------------------------------------------------------------
 // wxGISTable
 //------------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CRT wxGISTable :
+class WXDLLIMPEXP_GIS_CRT wxGISGridTable :
 	public wxGridTableBase
 {
 public:
-    wxGISTable(wxGISDatasetSPtr pwxGISDataset);
-    ~wxGISTable();
+    wxGISGridTable(wxGISDatasetSPtr pwxGISDataset);
+    ~wxGISGridTable();
 
 	//overrides
     virtual int GetNumberRows();
@@ -59,11 +59,11 @@ public:
     virtual wxString GetColLabelValue(int col);
 	virtual wxString GetRowLabelValue(int row);
 private:
-	wxGISFeatureDatasetSPtr m_pwxGISDataset;
+	wxGISTableSPtr m_pwxGISDataset;
 	OGRFeatureDefn* m_pOGRFeatureDefn;
-	wxString m_sFIDKeyName;
-	int nCols;          // columns from dataSet
-    int nRows;          // rows initially returned by dataSet
+	//wxString m_sFIDKeyName;
+	int m_nCols;          // columns from dataSet
+    int m_nRows;          // rows initially returned by dataSet
 };
 
 //------------------------------------------------------------------

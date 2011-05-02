@@ -63,10 +63,10 @@ public:
 	//IGxObject
 	virtual wxString GetCategory(void){return wxString(_("Coordinate System"));};
 	//wxGxPrjFile
-	virtual OGRSpatialReference* GetSpatialReference(void);
+	virtual OGRSpatialReferenceSPtr GetSpatialReference(void);
 protected:
     wxGISEnumPrjFileType m_Type;
-	OGRSpatialReference m_OGRSpatialReference;
+	OGRSpatialReferenceSPtr m_pOGRSpatialReference;
 };
 
 /** \class wxGxTextFile gxfileui.h

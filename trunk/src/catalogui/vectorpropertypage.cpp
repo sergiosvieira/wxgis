@@ -45,9 +45,12 @@ bool wxGISVectorPropertyPage::Create(IGxDataset* pGxDataset, wxWindow* parent, w
 
     m_pGxDataset = pGxDataset;
 
-    m_pDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pGxDataset->GetDataset(true));
+    m_pDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pGxDataset->GetDataset());
     if(!m_pDataset)
         return false;
+	if(!m_pDataset->IsOpened())
+		if(!m_pDataset->Open())
+			return false;
 
 	wxBoxSizer* bMainSizer;
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
@@ -192,7 +195,7 @@ void wxGISVectorPropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer)
     wxPGId playid = AppendProperty( new wxPropertyCategory(wxString::Format(_("Layer #%d"), iLayer + 1) ));
     AppendProperty(playid, new wxStringProperty(_("Name"), wxPG_LABEL, wxString(poLayer->GetName(), wxConvUTF8)));  //GetConvName
     AppendProperty(playid, new wxStringProperty(_("Geometry type"), wxPG_LABEL, wgMB2WX(OGRGeometryTypeToName( m_pDataset->GetGeometryType() ))));  
-    AppendProperty(playid, new wxIntProperty(_("Feature count"), wxPG_LABEL, m_pDataset->GetSize() ));  
+	AppendProperty(playid, new wxIntProperty(_("Feature count"), wxPG_LABEL, m_pDataset->GetFeatureCount() ));  
 
     if( CPLStrnlen(poLayer->GetFIDColumn(), 100) > 0 )
         AppendProperty(playid, new wxStringProperty(_("FID Column"), wxPG_LABEL, wgMB2WX( poLayer->GetFIDColumn() ))); 

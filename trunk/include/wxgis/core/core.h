@@ -389,3 +389,11 @@ static wxString NumberScale(double fScaleRatio)
 	}
 	return res;
 };
+
+//std::numeric_limits<double>::epsilon() * 20
+//FLT_EPSILON
+inline bool IsDoubleEquil( double a, double b, double epsilon = 16 * DBL_EPSILON )
+{
+  const double diff = a - b;
+  return diff > -epsilon && diff <= epsilon;
+}

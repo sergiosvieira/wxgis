@@ -25,7 +25,7 @@
 //#include "vrt/vrtwarpedoverview.h"
 #include "gdal_rat.h"
 
-wxGISRasterDataset::wxGISRasterDataset(CPLString sPath, wxGISEnumRasterDatasetType nType) : wxGISDataset(sPath), m_pSpaRef(NULL), m_psExtent(NULL), m_bHasOverviews(false), m_bHasStats(false), m_poMainDataset(NULL), m_poDataset(NULL), m_nBandCount(0)
+wxGISRasterDataset::wxGISRasterDataset(CPLString sPath, wxGISEnumRasterDatasetType nType) : wxGISDataset(sPath), m_psExtent(NULL), m_bHasOverviews(false), m_bHasStats(false), m_poMainDataset(NULL), m_poDataset(NULL), m_nBandCount(0)
 {
 	m_bIsOpened = false;
     m_bIsReadOnly = true;
@@ -42,8 +42,7 @@ void wxGISRasterDataset::Close(void)
 {
 	if(m_bIsOpened)
     {
-	    OSRDestroySpatialReference( m_pSpaRef );
-        m_pSpaRef = NULL;
+		m_pSpaRef.reset();
 	    wxDELETE(m_psExtent);
         m_bHasOverviews = false;
         m_bHasStats = false;
@@ -376,19 +375,20 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
 	return true;
 }
 
-OGRSpatialReference* wxGISRasterDataset::GetSpatialReference(void)
+const OGRSpatialReferenceSPtr wxGISRasterDataset::GetSpatialReference(void)
 {
 	if(!m_bIsOpened)
 		if(!Open(true))
-			return NULL;
+			return OGRSpatialReferenceSPtr();
 	if(m_pSpaRef)
 		return m_pSpaRef;
 	if(	m_poDataset )
 	{
-		m_pSpaRef = new OGRSpatialReference(m_poDataset->GetProjectionRef());
+		m_pSpaRef = boost::make_shared<OGRSpatialReference>(m_poDataset->GetProjectionRef());
+		//m_pSpaRef = OGRSpatialReferenceSPtr(new OGRSpatialReference(m_poDataset->GetProjectionRef()));
 		return m_pSpaRef;
 	}
-	return NULL;
+	return OGRSpatialReferenceSPtr();
 }
 
 const OGREnvelope* wxGISRasterDataset::GetEnvelope(void)

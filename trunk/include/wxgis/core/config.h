@@ -1,9 +1,9 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  wxGISConfig class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009 Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
 
-#define HKCU_CONFIG_NAME wxT("hkcu_config.xml")
-#define HKLM_CONFIG_NAME wxT("hklm_config.xml")
+//#define HKCU_CONFIG_NAME wxT("hkcu_config.xml")
+//#define HKLM_CONFIG_NAME wxT("hklm_config.xml")
 
 //---------------------------------------------------------------
 // wxGISConfig

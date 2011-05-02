@@ -55,8 +55,19 @@ bool wxGxArchiveFactory::GetChildren(CPLString sParentDir, char** &pFileNames, G
             IGxObject* pGxObj = GetGxObject(pArchiveName, sName);
             ObjArray.push_back(pGxObj);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            continue;
         }
+		//else if(EQUAL(szExt, "gz"))
+  //      {
+  //          CPLString pArchiveName("/vsigzip/");
+  //          pArchiveName += pFileNames[i];
+
+  //          wxFileName FName(path);
+  //          wxString sName = FName.GetFullName();
+
+  //          IGxObject* pGxObj = GetGxObject(pArchiveName, sName);
+  //          ObjArray.push_back(pGxObj);
+  //          pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+  //      }
     }
 	return true;
 }

@@ -50,10 +50,10 @@ void wxGISRasterRGBRenderer::Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDraw
         return;
 
     OGRSpatialReference* pDisplaySpatialReference = pDisplayTransformation->GetSpatialReference();
-	OGRSpatialReference* pRasterSpatialReference = pRaster->GetSpatialReference();
+	const OGRSpatialReferenceSPtr pRasterSpatialReference = pRaster->GetSpatialReference();
 	bool IsSpaRefSame(true);
 	if(pDisplaySpatialReference && pRasterSpatialReference)
-		IsSpaRefSame = pDisplaySpatialReference->IsSame(pRasterSpatialReference);
+		IsSpaRefSame = pDisplaySpatialReference->IsSame(pRasterSpatialReference.get());
 	
     //OGREnvelope VisibleBounds = pDisplayTransformation->GetVisibleBounds();
     RECTARARRAY* pInvalidrectArray = pDisplay->GetInvalidRect();
@@ -82,7 +82,7 @@ void wxGISRasterRGBRenderer::Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDraw
 	OGREnvelope RasterEnvelope;
 	if(!IsSpaRefSame)
 	{
-		RasterEnvelope = TransformEnvelope(pRasterExtent, pRasterSpatialReference, pDisplaySpatialReference);
+		RasterEnvelope = TransformEnvelope(pRasterExtent, pRasterSpatialReference.get(), pDisplaySpatialReference);
 	}
 	else
 	{

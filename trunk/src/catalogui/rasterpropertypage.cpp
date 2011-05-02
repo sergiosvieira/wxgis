@@ -54,7 +54,7 @@ bool wxGISRasterPropertyPage::Create(wxGxRasterDataset* pGxDataset, IGxCatalog* 
     m_pGxDataset = pGxDataset;
     m_pCatalog = pCatalog;
 
-    m_pDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(m_pGxDataset->GetDataset(true));
+    m_pDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(m_pGxDataset->GetDataset());
     if(!m_pDataset)
         return false;
 
@@ -306,21 +306,19 @@ void wxGISRasterPropertyPage::FillGrid(void)
         if( poGDALDataset->GetGCPCount() > 0 )
         {
             AppendProperty( new wxPropertyCategory(_("GCP data")) );
-            OGRSpatialReference* poSRS = NULL;
+            OGRSpatialReferenceSPtr poSRS;
             char* pszGCPProjection = (char*)poGDALDataset->GetGCPProjection();
             if (pszGCPProjection)
             {
-                poSRS = new OGRSpatialReference();
+				poSRS = boost::make_shared<OGRSpatialReference>();
                 if( poSRS->importFromWkt(&pszGCPProjection ) == CE_None )
-                {
-                    OSRDestroySpatialReference(poSRS);
-                    poSRS = NULL;
-                }
+					poSRS.reset();
             }
             else
             {
                 poSRS = m_pDataset->GetSpatialReference();
             }
+
             if(poSRS)
             {
                 const char *pszName;
@@ -336,8 +334,6 @@ void wxGISRasterPropertyPage::FillGrid(void)
                 }
                 else
                     AppendProperty( new wxStringProperty(_("GCP Projection"), wxPG_LABEL, _("Undefined")) );
-
-                OSRDestroySpatialReference(poSRS);
             }
 
             for(size_t i = 0; i < poGDALDataset->GetGCPCount(); i++ )

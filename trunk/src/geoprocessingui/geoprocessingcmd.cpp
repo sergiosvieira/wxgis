@@ -193,6 +193,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
                         IGxObjectContainer* pObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxDSet);
                         if(pObjectContainer)
                         {
+							wxBusyCursor wait;
                             if(!pObjectContainer->HasChildren())
                                 continue;
                             GxObjectArray* pArr = pObjectContainer->GetChildren();
@@ -268,13 +269,19 @@ void wxGISGeoprocessingCmd::OnClick(void)
                         wxString sCatalogPath = dlg.GetPath();
                         wxString sName = dlg.GetName();
 
-                        wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(DatasetArray[0]->GetDataset(true));
+                        wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(DatasetArray[0]->GetDataset());
                         if(!pDSet)
                         {
                             wxMessageBox(wxString(_("The dataset is empty")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
                             wxLogError(_("Null wxGISDataset returned"));
                             return;
                         }
+
+						if(pDSet->IsOpened() && pDSet->IsReadOnly())
+							pDSet->Close();
+						if(!pDSet->IsOpened())
+							if(!pDSet->Open());
+								return;
 
                         ITrackCancel TrackCancel;
                         IStatusBar* pStatusBar = m_pApp->GetStatusBar();                            
@@ -353,12 +360,16 @@ void wxGISGeoprocessingCmd::OnClick(void)
                             if(nSubType == pFilter->GetSubType())
                                 continue;
 
-                            wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(DatasetArray[i]->GetDataset(true));
+                            wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(DatasetArray[i]->GetDataset());
                             if(!pDSet)
                             {
                                 ProgressDlg.SetText1(wxString::Format(_("The %d dataset is empty"), i));
                                 continue;
                             }
+							if(!pDSet->IsOpened())
+								if(!pDSet->Open());
+									return;
+
 
                             if( !ExportFormat(pDSet, sPath, sName, pFilter, NULL, &TrackCancel) )
                             {

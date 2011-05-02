@@ -59,7 +59,7 @@ wxGISFeatureLayer::wxGISFeatureLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLaye
 		//pre load features
 //        LoadFeatures();
         m_pOGRGeometrySet = new wxGISGeometrySet(true);
-		SetSpatialReference(m_pwxGISFeatureDataset->GetSpatialReference());
+		SetSpatialReference(m_pwxGISFeatureDataset->GetSpatialReference().get());
 	}
 }
 
@@ -208,13 +208,13 @@ void wxGISFeatureLayer::LoadGeometry(void)
     OGRPolygon* pRgn2 = NULL;
     OGRCoordinateTransformation *poCT = NULL;
 
-	OGRSpatialReference* pDatasetSpaRef = m_pwxGISFeatureDataset->GetSpatialReference();
+	const OGRSpatialReferenceSPtr pDatasetSpaRef = m_pwxGISFeatureDataset->GetSpatialReference();
     //get cut poly
     if( pDatasetSpaRef )
     {
 	    if(m_pSpatialReference && pDatasetSpaRef)
         {
-            if(!m_pSpatialReference->IsSame(pDatasetSpaRef))
+            if(!m_pSpatialReference->IsSame(pDatasetSpaRef.get()))
             {
                 //get envelope
                 wxGISSpatialReferenceValidator GISSpaRefValidator;
@@ -280,9 +280,9 @@ void wxGISFeatureLayer::LoadGeometry(void)
 
                     if(!pDatasetSpaRef->IsSame(pWGSSpaRef))
                     {
-                        if(pRgn1->transformTo(pDatasetSpaRef) != OGRERR_NONE)
+                        if(pRgn1->transformTo(pDatasetSpaRef.get()) != OGRERR_NONE)
                             wxDELETE(pRgn1);
-                        if(pRgn2->transformTo(pDatasetSpaRef) != OGRERR_NONE)
+                        if(pRgn2->transformTo(pDatasetSpaRef.get()) != OGRERR_NONE)
                             wxDELETE(pRgn2);
                     }
                 }
@@ -291,7 +291,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
             }
         }
 
-        poCT = OGRCreateCoordinateTransformation( pDatasetSpaRef, m_pSpatialReference );
+        poCT = OGRCreateCoordinateTransformation( pDatasetSpaRef.get(), m_pSpatialReference );
     }
 
     IApplication* pApp = ::GetApplication();
@@ -300,7 +300,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
     if(pProgressor)
     {
         pProgressor->Show(true);
-        pProgressor->SetRange(m_pwxGISFeatureDataset->GetSize() * 2);
+        pProgressor->SetRange(m_pwxGISFeatureDataset->GetFeatureCount() * 2);
     }
 
     //strart multithreaded transform
@@ -350,12 +350,12 @@ void wxGISFeatureLayer::LoadGeometry(void)
     wxDELETE(pRgn1);
     wxDELETE(pRgn2);
 
-    if(fabs(m_FullEnv.MinX - m_FullEnv.MaxX) < DELTA)
+    if(IsDoubleEquil(m_FullEnv.MinX, m_FullEnv.MaxX))
     {
         m_FullEnv.MaxX += 1;
         m_FullEnv.MinX -= 1;
     }
-    if(fabs(m_FullEnv.MinY - m_FullEnv.MaxY) < DELTA)
+    if(IsDoubleEquil(m_FullEnv.MinY, m_FullEnv.MaxY))
     {
         m_FullEnv.MaxY += 1;
         m_FullEnv.MinY -= 1;
@@ -363,7 +363,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
 
     CreateQuadTree(&m_FullEnv);
 
-    size_t nStep = m_pwxGISFeatureDataset->GetSize() < 10 ? 1 : m_pwxGISFeatureDataset->GetSize() / 10;
+	size_t nStep = m_pwxGISFeatureDataset->GetFeatureCount() < 10 ? 1 : m_pwxGISFeatureDataset->GetFeatureCount() / 10;
 
     m_pOGRGeometrySet->Reset();
     OGRGeometry* pOutGeom;
