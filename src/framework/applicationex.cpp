@@ -1,6 +1,6 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Map)
- * Purpose:  wxMxApplication code.
+ * Project:  wxGIS
+ * Purpose:  wxGISApplicationEx class. Add AUI managed frames & etc.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
@@ -18,34 +18,27 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+#pragma once
 
-#include "wxgis/mapui/mxapplication.h"
-#include "wxgis/catalogui/customizedlg.h"
+#include "wxgis/framework/applicationex.h"
+#include "wxgis/framework/customizedlg.h"
 #include "wxgis/framework/toolbarmenu.h"
 
 //-----------------------------------------------
-// wxMxApplication
+// wxGISApplicationEx
 //-----------------------------------------------
-IMPLEMENT_CLASS(wxMxApplication, wxGISApplication)
+IMPLEMENT_CLASS(wxGISApplicationEx, wxGISApplication)
 
-wxMxApplication::wxMxApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxGISApplication(parent, id, title, pos, size, style)
+wxGISApplicationEx::wxGISApplicationEx(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxGISApplication(parent, id, title, pos, size, style)
 {
-	//, m_pCatalog(NULL), m_pTreeView(NULL), m_pTabView(NULL)
 }
 
-wxMxApplication::~wxMxApplication(void)
+wxGISApplicationEx::~wxGISApplicationEx(void)
 {
     m_mgr.UnInit();
- //   m_pCatalog->Detach();
-	//wxDELETE(m_pCatalog);
 }
 
-//IGxCatalog* const wxGxApplication::GetCatalog(void)
-//{
-//	return m_pCatalog;
-//}
-
-void wxMxApplication::SerializeMxFramePos(bool bSave)
+void wxGISApplicationEx::SerializeFramePosEx(bool bSave)
 {
 	wxXmlNode *pPerspectiveXmlNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/perspective")));
 	if(bSave)
@@ -69,7 +62,7 @@ void wxMxApplication::SerializeMxFramePos(bool bSave)
 	}
 }
 
-void wxMxApplication::Customize(void)
+void wxGISApplicationEx::Customize(void)
 {
 	wxGISCustomizeDlg dialog(this);
 	if(dialog.ShowModal() == wxID_OK )
@@ -82,7 +75,7 @@ void wxMxApplication::Customize(void)
 	}
 }
 
-void wxMxApplication::RemoveCommandBar(IGISCommandBar* pBar)
+void wxGISApplicationEx::RemoveCommandBar(IGISCommandBar* pBar)
 {
 	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
 	{
@@ -109,29 +102,29 @@ void wxMxApplication::RemoveCommandBar(IGISCommandBar* pBar)
 	}
 }
 
-void wxMxApplication::ShowPane(wxWindow* pWnd, bool bShow)
+void wxGISApplicationEx::ShowPane(wxWindow* pWnd, bool bShow)
 {
 	m_mgr.GetPane(pWnd).Show(bShow);
 	m_mgr.Update();
 }
 
-void wxMxApplication::ShowPane(const wxString& sName, bool bShow)
+void wxGISApplicationEx::ShowPane(const wxString& sName, bool bShow)
 {
 	m_mgr.GetPane(sName).Show(bShow);
 	m_mgr.Update();
 }
 
-bool wxMxApplication::IsPaneShown(const wxString& sName)
+bool wxGISApplicationEx::IsPaneShown(const wxString& sName)
 {
 	return m_mgr.GetPane(sName).IsShown();
 }
 
-bool wxMxApplication::IsApplicationWindowShown(wxWindow* pWnd)
+bool wxGISApplicationEx::IsApplicationWindowShown(wxWindow* pWnd)
 {
 	return m_mgr.GetPane(pWnd).IsShown();
 }
 
-bool wxMxApplication::AddCommandBar(IGISCommandBar* pBar)
+bool wxGISApplicationEx::AddCommandBar(IGISCommandBar* pBar)
 {
 	if(!pBar)
 		return false;
@@ -159,23 +152,23 @@ bool wxMxApplication::AddCommandBar(IGISCommandBar* pBar)
 	return true;
 }
 
-void wxMxApplication::ShowStatusBar(bool bShow)
+void wxGISApplicationEx::ShowStatusBar(bool bShow)
 {
 	wxGISApplication::ShowStatusBar(bShow);
 	m_mgr.Update();
 }
 
-void wxMxApplication::ShowApplicationWindow(wxWindow* pWnd, bool bShow)
+void wxGISApplicationEx::ShowApplicationWindow(wxWindow* pWnd, bool bShow)
 {
 	ShowPane(pWnd, bShow);
 }
 
-const WINDOWARRAY* const wxMxApplication::GetChildWindows(void)
+const WINDOWARRAY* const wxGISApplicationEx::GetChildWindows(void)
 {
 	return &m_WindowArray;
 }
 
-void wxMxApplication::RegisterChildWindow(wxWindow* pWnd)
+void wxGISApplicationEx::RegisterChildWindow(wxWindow* pWnd)
 {
     WINDOWARRAY::iterator pos = std::find(m_WindowArray.begin(), m_WindowArray.end(), pWnd);
 	if(pos != m_WindowArray.end())
@@ -183,37 +176,33 @@ void wxMxApplication::RegisterChildWindow(wxWindow* pWnd)
 	m_WindowArray.push_back(pWnd);
 }
 
-void wxMxApplication::UnRegisterChildWindow(wxWindow* pWnd)
+void wxGISApplicationEx::UnRegisterChildWindow(wxWindow* pWnd)
 {
     WINDOWARRAY::iterator pos = std::find(m_WindowArray.begin(), m_WindowArray.end(), pWnd);
 	if(pos != m_WindowArray.end())
 		m_WindowArray.erase(pos);
 }
 
-bool wxMxApplication::Create(IGISConfig* pConfig)
+bool wxGISApplicationEx::Create(IGISConfig* pConfig)
 {
     wxGISApplication::Create(pConfig);
 
-	//wxLogMessage(_("wxMxApplication: Create and init catalog"));
-	//m_pCatalog = new wxGxCatalogUI();
-	//m_pCatalog->Init();
-
-	wxLogMessage(_("wxMxApplication: Start. Creating main application frame..."));
+	wxLogMessage(_("wxGISApplicationEx: Start. Creating main application frame..."));
 
 	m_mgr.SetManagedWindow(this);
 
-	wxXmlNode* pViewsNode = m_pConfig->GetConfigNode(wxString(wxT("frame/views")), true, true);
+	//wxXmlNode* pViewsNode = m_pConfig->GetConfigNode(wxString(wxT("frame/views")), true, true);
 
-	if(!pViewsNode)
-	{
-		wxLogError(_("wxMxApplication: Error finding <views> XML Node"));
-		return false;
-	}
+	//if(!pViewsNode)
+	//{
+	//	wxLogError(_("wxGISApplicationEx: Error finding <views> XML Node"));
+	//	return false;
+	//}
 
-    int nPaneCount(0);
-    wxXmlNode* pViewsChildNode = pViewsNode->GetChildren();
-    while(pViewsChildNode)
-    {
+ //   int nPaneCount(0);
+ //   wxXmlNode* pViewsChildNode = pViewsNode->GetChildren();
+ //   while(pViewsChildNode)
+ //   {
       //  if(pViewsChildNode->GetName().CmpNoCase(wxT("treeview")) == 0)
       //  {
 	     //   m_pTreeView = new wxGxTreeView(this, TREECTRLID);
@@ -270,8 +259,8 @@ bool wxMxApplication::Create(IGISConfig* pConfig)
 		    //}
       //  }
 
-        pViewsChildNode = pViewsChildNode->GetNext();
-    }
+    //    pViewsChildNode = pViewsChildNode->GetNext();
+    //}
 	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
 	{
 		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
@@ -285,59 +274,20 @@ bool wxMxApplication::Create(IGISConfig* pConfig)
 		}
 	}
 
-	SerializeMxFramePos(false);
+	SerializeFramePosEx(false);
 
-    //m_pNewMenu->Init();
 	m_mgr.Update();
 
-	//wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
-	//IGxObject* pObj = dynamic_cast<IGxObject*>(m_pCatalog);
-	//wxString sLastPath;
-	//if(pLastLocationNode)
-	//	sLastPath = pLastLocationNode->GetPropVal(wxT("path"), pObj->GetName());
-	//else
-	//	sLastPath = pObj->GetName();
-
- //   if(m_pCatalog->GetOpenLastPath())
- //       m_pCatalog->SetLocation(sLastPath);
- //   else
- //       m_pCatalog->SetLocation(wxT(""));
-
-	wxLogMessage(_("wxMxApplication: Creation complete"));
+	wxLogMessage(_("wxGISApplicationEx: Creation complete"));
 
     return true;
 }
 
-void wxMxApplication::OnClose(wxCloseEvent& event)
+void wxGISApplicationEx::OnClose(wxCloseEvent& event)
 {
     event.Skip();
 
-    //IGxSelection* pSel = m_pCatalog->GetSelection();
-
- //   if(pSel->GetCount(TREECTRLID) > 0)
-	//{
- //       IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(TREECTRLID, 0));
- //       if(pGxObject && pGxObject.get() != dynamic_cast<IGxObject*>(m_pCatalog))
- //       {
-	//	    wxString sLastPath = pGxObject->GetFullName();
-	//	    if(sLastPath.IsEmpty())
-	//		    sLastPath = pGxObject->GetName();
-
-	//	    wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
-	//	    if(pLastLocationNode)
-	//	    {
-	//		    if(pLastLocationNode->HasProp(wxT("path")))
-	//			    pLastLocationNode->DeleteProperty(wxT("path"));
-	//	    }
-	//	    else
-	//	    {
-	//		    pLastLocationNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("lastpath")), true);
-	//	    }
-	//	    pLastLocationNode->AddProperty(wxT("path"), sLastPath);
- //       }
-	//}
-
-	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
+ 	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
 	{
 		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
 		{
@@ -349,17 +299,12 @@ void wxMxApplication::OnClose(wxCloseEvent& event)
 
     for(size_t i = 0; i < m_WindowArray.size(); i++)
     {
-        IGxView* pGxView = dynamic_cast<IGxView*>(m_WindowArray[i]);
-        if(pGxView)
-            pGxView->Deactivate();
+        IView* pView = dynamic_cast<IView*>(m_WindowArray[i]);
+        if(pView)
+            pView->Deactivate();
     }
 
     wxGISApplication::OnClose(event);
-
-    //for(size_t i = 0; i < m_WindowArray.size(); i++)
-    //    if(m_WindowArray[i])
-    //        if(!m_WindowArray[i]->Destroy())
-    //            wxDELETE(m_WindowArray[i]);
 
     while (!m_WindowArray.empty())
     {
@@ -372,10 +317,10 @@ void wxMxApplication::OnClose(wxCloseEvent& event)
         m_WindowArray.pop_back();
     }
 
- 	SerializeMxFramePos(true);
+ 	SerializeFramePosEx(true);
 }
 
-bool wxMxApplication::SetupSys(wxString sSysPath)
+bool wxGISApplicationEx::SetupSys(wxString sSysPath)
 {
     if(!wxGISApplication::SetupSys(sSysPath))
         return false;
@@ -383,14 +328,14 @@ bool wxMxApplication::SetupSys(wxString sSysPath)
     return true;
 }
 
-void wxMxApplication::SetDebugMode(bool bDebugMode)
+void wxGISApplicationEx::SetDebugMode(bool bDebugMode)
 {
 	CPLSetConfigOption("CPL_DEBUG", bDebugMode == true ? "ON" : "OFF");
 	CPLSetConfigOption("CPL_TIMESTAMP", "ON");
 	CPLSetConfigOption("CPL_LOG_ERRORS", bDebugMode == true ? "ON" : "OFF");
 }
 
-bool wxMxApplication::SetupLog(wxString sLogPath)
+bool wxGISApplicationEx::SetupLog(wxString sLogPath)
 {
     if(!wxGISApplication::SetupLog(sLogPath))
         return false;

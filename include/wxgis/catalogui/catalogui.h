@@ -111,18 +111,11 @@ public:
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator) = 0;
 };
 
-class IGxView
+class IGxView : public IView
 {
 public:
 	virtual ~IGxView(void){};
-    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("view")) = 0;
-	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf) = 0;
-	virtual void Deactivate(void) = 0;
 	virtual bool Applies(IGxSelection* Selection) = 0;
-	virtual void Refresh(void) = 0;
-	virtual wxString GetViewName(void) = 0;
-	virtual wxIcon GetViewIcon(void) = 0;
-	virtual void SetViewIcon(wxIcon Icon) = 0;
     virtual void BeginRename(long nObjectID = wxNOT_FOUND) = 0;
 };
 
@@ -147,20 +140,6 @@ public:
     virtual bool CanSetStyle(void) = 0;
 	virtual void SetStyle(wxGISEnumContentsViewStyle style) = 0;
     virtual wxGISEnumContentsViewStyle GetStyle(void) = 0;
-};
-
-/** \class IGxViewDropTarget catalogui.h
-    \brief A DropTarget interface class.
-
-    The GxViews which should support drag'n'drop capability mast derived from this class.
-*/
-class IGxViewDropTarget
-{
-public:
-	virtual ~IGxViewDropTarget(void){};
-    virtual wxDragResult OnDragOver(wxCoord x, wxCoord y, wxDragResult def) = 0;
-    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames) = 0;
-    virtual void OnLeave() = 0;
 };
 
 /** \class IGxDropTarget catalogui.h

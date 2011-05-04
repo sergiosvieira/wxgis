@@ -1,6 +1,6 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Map)
- * Purpose:  wxMxApplication code.
+ * Project:  wxGIS
+ * Purpose:  wxGISApplicationEx class. Add AUI managed frames & etc.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
@@ -20,29 +20,25 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/mapui/mapui.h"
 #include "wxgis/framework/application.h"
 
 #include "wx/aui/aui.h"
 #include "wx/artprov.h"
 
-/** \class wxMxApplication mxapplication.h
- *   \brief A map application framework class.
+/** \class wxGISApplicationEx applicationex.h
+ *   \brief An application framework class with aui mngr.
  */
-class WXDLLIMPEXP_GIS_MAPU wxMxApplication :
-	public wxGISApplication/*,
-    public IGxApplication*/
+class WXDLLIMPEXP_GIS_FRW wxGISApplicationEx :
+	public wxGISApplication
 {
-    DECLARE_CLASS(wxMxApplication)
+    DECLARE_CLASS(wxGISApplicationEx)
 public:	
-	wxMxApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER);
-	virtual ~wxMxApplication(void);
+	wxGISApplicationEx(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER);
+	virtual ~wxGISApplicationEx(void);
 	virtual wxAuiManager* GetAuiManager(void){return &m_mgr;};
 	virtual void ShowPane(wxWindow* pWnd, bool bShow = true);
 	virtual void ShowPane(const wxString& sName, bool bShow = true);
 	virtual bool IsPaneShown(const wxString& sName);
- //   //IMxApplication
-	//virtual IGxCatalog* const GetCatalog(void);
 	//wxGISApplication
 	virtual void RemoveCommandBar(IGISCommandBar* pBar);
 	virtual bool AddCommandBar(IGISCommandBar* pBar);
@@ -63,13 +59,8 @@ public:
     virtual void SetDebugMode(bool bDebugMode);
     virtual bool SetupLog(wxString sLogPath);
 protected:
-    //wxMxApplication
-	virtual void SerializeMxFramePos(bool bSave = false);
+	virtual void SerializeFramePosEx(bool bSave = false);
 protected:
 	wxAuiManager m_mgr;
-	//wxGxTreeView* m_pTreeView;
-	//wxGxTabView* m_pTabView;
-	//wxGxCatalogUI* m_pCatalog;
 	WINDOWARRAY m_WindowArray;
-    //wxGISNewMenu* m_pNewMenu;
 };
