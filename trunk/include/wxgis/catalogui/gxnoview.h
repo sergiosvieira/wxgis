@@ -3,7 +3,7 @@
  * Purpose:  wxGxNoView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ public:
     void OnSize(wxSizeEvent& WXUNUSED(evt));
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxNO_BORDER, const wxString& name = wxT("NoView"));
-	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(IApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 private:
 	unsigned char R,G,B;

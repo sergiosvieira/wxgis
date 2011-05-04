@@ -3,7 +3,7 @@
  * Purpose:  wxGxObjectDialog class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@ public:
 	virtual ~wxGxDialogContentView();
 
 //IGxView
-	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(IApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 // events
     virtual void OnActivated(wxListEvent& event);

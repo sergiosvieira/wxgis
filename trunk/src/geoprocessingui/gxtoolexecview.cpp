@@ -146,19 +146,17 @@ bool wxGxToolExecuteView::Create(wxWindow* parent, wxWindowID id, const wxPoint&
     return true;
 }
 
-bool wxGxToolExecuteView::Activate(IGxApplication* application, wxXmlNode* pConf)
+bool wxGxToolExecuteView::Activate(IApplication* application, wxXmlNode* pConf)
 {
-	wxGxView::Activate(application, pConf);
+	if(!wxGxView::Activate(application, pConf))
+		return false;
+
 	Serialize(m_pXmlConf, false);
 
-    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pApplication->GetCatalog());
 
-    IApplication* pApp = dynamic_cast<IApplication*>(application);
-    if(pApp)
-    {
-		//delete
-        m_pDeleteCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
-    }
+	//delete
+    m_pDeleteCmd = application->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
 
 	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pCatalog );
 	if(m_pConnectionPointCatalog != NULL)

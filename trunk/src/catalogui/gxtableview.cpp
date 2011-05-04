@@ -47,16 +47,17 @@ bool wxGxTableView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
     return true;
 }
 
-bool wxGxTableView::Activate(IGxApplication* application, wxXmlNode* pConf)
+bool wxGxTableView::Activate(IApplication* application, wxXmlNode* pConf)
 {
-	wxGxView::Activate(application, pConf);
+	if(!wxGxView::Activate(application, pConf))
+		return false;
 	//Serialize(m_pXmlConf, false);
 
 	//m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pCatalog );
 	//if(m_pConnectionPointCatalog != NULL)
 	//	m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
-    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pApplication->GetCatalog());
 	m_pSelection = m_pCatalog->GetSelection();
 	return true;
 }

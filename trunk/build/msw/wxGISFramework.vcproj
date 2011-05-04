@@ -224,6 +224,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\framework\droptarget.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\framework\keycodedlg.cpp"
 				>
 			</File>
@@ -307,6 +311,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\framework\customizedlg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\framework\droptarget.h"
 				>
 			</File>
 			<File

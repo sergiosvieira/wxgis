@@ -3,7 +3,7 @@
  * Purpose:  wxGxView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -36,9 +36,11 @@ wxGxView::~wxGxView(void)
 {
 }
 
-bool wxGxView::Activate(IGxApplication* application, wxXmlNode* pConf)
+bool wxGxView::Activate(IApplication* application, wxXmlNode* pConf)
 { 
-	m_pApplication = application; 
+	m_pApplication = dynamic_cast<IGxApplication*>(application); 
+	if(!m_pApplication)
+		return false;
 	//m_pCatalog = m_pApplication->GetCatalog(); 
 	m_pXmlConf = pConf;
 	return true; 
