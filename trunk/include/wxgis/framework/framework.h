@@ -3,7 +3,7 @@
  * Purpose:  framework header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,6 +22,11 @@
 #pragma once
 
 #include "wxgis/core/core.h"
+
+#include "wx/dnd.h"
+#include "wx/dataobj.h"
+
+#include "cpl_string.h"
 
 /** \enum wxGISPluginIDs
     \brief A plugin command or menu command ID enumerator.
@@ -399,4 +404,36 @@ public:
      *  \brief Executed when OK is pressed
      */
     virtual void Apply(void) = 0;
+};
+
+/** \class IViewDropTarget framework.h
+    \brief A DropTarget interface class.
+
+    The Views which should support drag'n'drop capability mast derived from this class.
+*/
+class IViewDropTarget
+{
+public:
+	virtual ~IViewDropTarget(void){};
+    virtual wxDragResult OnDragOver(wxCoord x, wxCoord y, wxDragResult def) = 0;
+    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames) = 0;
+    virtual void OnLeave() = 0;
+};
+
+/** \class IView framework.h
+    \brief A View interface class.
+
+    Any additional view mast derived from this class. 
+*/
+class IView
+{
+public:
+	virtual ~IView(void){};
+    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("view")) = 0;
+	virtual bool Activate(IApplication* application, wxXmlNode* pConf) = 0;
+	virtual void Deactivate(void) = 0;
+	virtual void Refresh(void) = 0;
+	virtual wxString GetViewName(void) = 0;
+	virtual wxIcon GetViewIcon(void) = 0;
+	virtual void SetViewIcon(wxIcon Icon) = 0;
 };

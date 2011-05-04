@@ -40,13 +40,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(BOOST_ROOT)&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
+				AdditionalIncludeDirectories="&quot;$(BOOST_ROOT)&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include;&quot;$(WXGISGDAL)\port&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_FRW"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -60,10 +60,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxmsw28ud_html.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxGISCored.lib"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxmsw28ud_html.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxGISCored.lib wxgiscpld.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="0"
-				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib"
+				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib;&quot;$(WXGISGDAL)\lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
@@ -200,6 +200,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\framework\applicationex.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\framework\checklist.cpp"
 				>
 			</File>
@@ -213,6 +217,10 @@
 			</File>
 			<File
 				RelativePath="..\..\src\framework\createcbdlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\framework\customizedlg.cpp"
 				>
 			</File>
 			<File
@@ -278,6 +286,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\wxgis\framework\applicationex.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wxgis\framework\checklist.h"
 				>
 			</File>
@@ -291,6 +303,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\framework\createcbdlg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\framework\customizedlg.h"
 				>
 			</File>
 			<File

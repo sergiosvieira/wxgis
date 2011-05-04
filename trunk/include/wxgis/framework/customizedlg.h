@@ -3,7 +3,7 @@
  * Purpose:  customize dialog class. Customize menues & toolbars
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,10 +19,12 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-#include "wxgis/catalogui/gxapplication.h"
 
-//#include "wxgis/catalogui/catalogui.h"
+#include "wxgis/framework/applicationex.h"
+
 //#include "wxgis/framework/framework.h"
+//#include "wxgis/catalogui/gxapplication.h"
+//#include "wxgis/catalogui/catalogui.h"
 
 #include "wx/intl.h"
 
@@ -81,7 +83,7 @@ class wxGISToolBarPanel : public wxPanel
 		ID_MOVECONTROLDOWN
 	};
 public:
-	wxGISToolBarPanel(wxGxApplication* pGxApp, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,400 ), long style = wxTAB_TRAVERSAL );
+	wxGISToolBarPanel(wxGISApplicationEx* pApp, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,400 ), long style = wxTAB_TRAVERSAL );
 	~wxGISToolBarPanel();
 	void SplitterOnIdle( wxIdleEvent& )
 	{
@@ -121,7 +123,7 @@ protected:
 	wxButton* m_rembutton;
 	wxButton* m_moveup;
 	wxButton* m_movedown;
-	wxGxApplication* m_pGxApp;
+	wxGISApplicationEx* m_pApp;
 	wxImageList m_ImageList, m_TreeImageList;
 	wxMenu* m_pContextMenu;
 	bool m_bToolsFocus, m_bCmdFocus;
@@ -152,13 +154,13 @@ protected:
 	wxSplitterWindow* m_splitter2;
 	wxListBox* m_listBox1;
 	wxListCtrl* m_listCtrl3;
-	wxGxApplication* m_pGxApp;
+	wxGISApplicationEx* m_pApp;
 	wxImageList m_ImageList;
 	wxMenu* m_pContextMenu;
 	int m_CurSelection;
 
 public:
-	wxGISCommandPanel( wxGxApplication* pGxApp, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,400 ), long style = wxTAB_TRAVERSAL );
+	wxGISCommandPanel( wxGISApplicationEx* pApp, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,400 ), long style = wxTAB_TRAVERSAL );
 	~wxGISCommandPanel();
 	void m_splitter2OnIdle( wxIdleEvent& )
 	{
@@ -180,7 +182,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISCustomizeDlg
 ///////////////////////////////////////////////////////////////////////////////
-class wxGISCustomizeDlg : public wxDialog
+class WXDLLIMPEXP_GIS_FRW wxGISCustomizeDlg : public wxDialog
 {
 public:
 	wxGISCustomizeDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Customize"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,400 ), long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
@@ -190,6 +192,6 @@ protected:
 	wxStdDialogButtonSizer* m_sdbSizer;
 	wxButton* m_sdbSizerOK;
 	//wxButton* m_sdbSizerCancel;
-	wxGxApplication* m_pGxApp;
+	wxGISApplicationEx* m_pApp;
 };
 
