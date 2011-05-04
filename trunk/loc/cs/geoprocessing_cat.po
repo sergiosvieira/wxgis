@@ -1,0 +1,468 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wxGIS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-02-21 22:11+0300\n"
+"PO-Revision-Date: 2011-04-15 21:17+0100\n"
+"Last-Translator: Jan Helebrant <jhelebrant@seznam.cz>\n"
+"Language-Team: Juhele <www.juhele.webnode.cz>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-Basepath: c:\\temp\\wxgis\\src\\\n"
+"X-Poedit-Language: Czech\n"
+"X-Poedit-Country: CZECH REPUBLIC\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-SearchPath-0: D:\\work\\Projects\\wxGIS\\src\\geoprocessing\n"
+"X-Poedit-SearchPath-1: D:\\work\\Projects\\wxGIS\\include\\wxgis\\geoprocessing\n"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcompstattool.cpp:47
+msgid "Compute statistics"
+msgstr "Vypočítat statistiky"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcompstattool.cpp:57
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:56
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:58
+msgid "Data Management Tools/Raster"
+msgstr "Nástroje správy dat/Rastr"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcompstattool.cpp:67
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:66
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:68
+msgid "Source raster"
+msgstr "Zdrojový rastr"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcompstattool.cpp:81
+msgid "Compute statistics based on overviews or a subset of all tiles"
+msgstr "Vypočítat statistiky založené na přehledech nebo subsadě všech dlaždic"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcompstattool.cpp:103
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:171
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:140
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:175
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpprojecttool.cpp:147
+msgid "Unexpected error occurred"
+msgstr "Vyskytla se neočekávaná chyba"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcompstattool.cpp:112
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:180
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:149
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:184
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpprojecttool.cpp:156
+msgid "Error getting catalog object"
+msgstr "Chyba při získávání objektu katalogu"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcompstattool.cpp:122
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:190
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:194
+msgid "Error getting source object"
+msgstr "Chyba při získávání zdrojového objektu"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcompstattool.cpp:130
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:198
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:202
+msgid "Source object is of incompatible type"
+msgstr "Zdrojový objekt je nekompatibilního typu"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcompstattool.cpp:138
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:206
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:210
+msgid "Source dataset is of incompatible type"
+msgstr "Zdrojový dataset je nekompatibilního typu"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcompstattool.cpp:147
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:215
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:248
+msgid "Error getting raster"
+msgstr "Chyba získávání rastru"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcompstattool.cpp:160
+#, c-format
+msgid "Proceed band %d"
+msgstr "Zpracování kanálu %d"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcompstattool.cpp:168
+#, c-format
+msgid "ComputeStatistics failed! GDAL error: %s"
+msgstr "Výpočet statistik selhal! Chyba GDAL: %s"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcompstattool.cpp:173
+#, c-format
+msgid "Band %d: min - %.2f, max - %.2f, mean - %.2f, StdDev - %.2f"
+msgstr "Kanál %d: min - %.2f, max - %.2f, střed - %.2f, SMODCH - %.2f"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:46
+msgid "Create overviews"
+msgstr "Vytvořit přehledy"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:80
+msgid "Pixel interpolation"
+msgstr "Interpolace pixelů"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:87
+msgid "Nearest"
+msgstr "Nejbližší"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:88
+msgid "Gauss"
+msgstr "Gauss"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:89
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:141
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:265
+msgid "Cubic"
+msgstr "Kubický"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:90
+msgid "Average"
+msgstr "Průměr"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:91
+msgid "Mode"
+msgstr "Režim"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:92
+msgid "Average magphase"
+msgstr "Průměrná magphase"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:93
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:114
+msgid "None"
+msgstr "Nic"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:103
+msgid "Overview compression"
+msgstr "Komprese přehledu"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:110
+msgid "ZIP"
+msgstr "ZIP"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:111
+msgid "JPEG"
+msgstr "JPEG"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:112
+msgid "PACKBITS"
+msgstr "PACKBITS"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:113
+msgid "LZW"
+msgstr "LZW"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpcreateovrtool.cpp:255
+#, c-format
+msgid "BuildOverviews failed! GDAL error: %s"
+msgstr "BuildOverviews selhalo! Chyba GDAL: %s"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:46
+msgid "Export vector file (single)"
+msgstr "Exportovat vektorový soubor (jeden)"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:56
+msgid "Conversion Tools/Vector"
+msgstr "Převodní nástroje/Vektor"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:66
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpprojecttool.cpp:68
+msgid "Source feature class"
+msgstr "Zdrojová třída prvků"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:82
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpprojecttool.cpp:92
+msgid "Destination feature class"
+msgstr "Cílová třída prvků"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:126
+msgid "Cannot export to the same format"
+msgstr "Nemohu exportovat do stejného formátu"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:159
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpprojecttool.cpp:167
+msgid "Error get source object"
+msgstr "Chyba získání zdrojového objektu"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:167
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpprojecttool.cpp:175
+msgid "The source object is of incompatible type"
+msgstr "Zdrojový objekt je nekompatibilního typu"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:175
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpprojecttool.cpp:183
+msgid "The source dataset is of incompatible type"
+msgstr "Zdrojový dataset je nekompatibilního typu"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:183
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpprojecttool.cpp:191
+msgid "Error reading dataset definition"
+msgstr "Chyba čtení definice datasetu"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:196
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:222
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpprojecttool.cpp:225
+msgid "Error get destination object"
+msgstr "Chyba získání cílového objektu"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpexporttool.cpp:209
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:235
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpprojecttool.cpp:238
+msgid "Error getting selected destination filter"
+msgstr "Chyba získání vybraného cílového filtru"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:48
+msgid "Create Ortho-Corrected Raster"
+msgstr "Vytvořit ortho-korigovaný rastr"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:82
+msgid "Destination raster"
+msgstr "Cílový rastr"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:98
+msgid "DEM raster"
+msgstr "DEM rastr"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:112
+msgid "Constant elevation value or base value to the DEM"
+msgstr "Konstantní nadmořská výška nebo základní hodnota DEM"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:123
+msgid "Scaling factor to convert elevation values"
+msgstr "Škálovací faktor pro převedení hodnot nadmořské výšky"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:134
+msgid "Elevation values interpolation"
+msgstr "Interpolace hodnot nadmořské výšky"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:140
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:144
+msgid "Bilinear"
+msgstr "Bilineární"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:259
+msgid "The raster has no bands"
+msgstr "Rastr nemá kanály"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:308
+#, c-format
+msgid "Error CreateGenImgProjTransformer. GDAL Error: %s"
+msgstr "Chyba CreateGenImgProjTransformer. Chyba GDAL: %s"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:320
+#, c-format
+msgid "Error determining output raster size. GDAL Error: %s"
+msgstr "Chyba určení velikosti výstupního rastru. Chyba GDAL: %s"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:334
+#, c-format
+msgid "Error creating output raster. GDAL Error: %s"
+msgstr "Chyba vytváření velikosti výstupního rastru. Chyba GDAL: %s"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gporthocorrecttool.cpp:396
+#, c-format
+msgid "OrthoCorrect failed! GDAL error: %s"
+msgstr "Ortho-korekce selhala! Chyba GDAL: %s"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpprojecttool.cpp:48
+msgid "Project vector file (single)"
+msgstr "Promítnout vektorový soubor (jeden)"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpprojecttool.cpp:58
+msgid "Projections and Transformations/Vector"
+msgstr "Projekce a Transformace/Vektor"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpprojecttool.cpp:82
+msgid "Spatial reference"
+msgstr "Souřadnicový systém"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpprojecttool.cpp:201
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpprojecttool.cpp:212
+msgid "Unsupported Spatial Reference"
+msgstr "Nepodporovaný souřadnicový systém"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:69
+msgid "Remains "
+msgstr "Zbývá"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:69
+msgid "%H hour(s) %M min. %S sec."
+msgstr "%H hodin %M min. %S sek."
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:224
+#, c-format
+msgid "Executing (%s)"
+msgstr "Spouštím (%s)"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:229
+msgid "Parameters:"
+msgstr "Parametry:"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:240
+#, c-format
+msgid "Start Time: %s"
+msgstr "Zahájeno: %s"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:248
+msgid "Error start task!"
+msgstr "Chyba spuštění úlohy!"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:273
+#, c-format
+msgid "Executed (%s) successfully"
+msgstr "Spuštěno (%s) úspěšně"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:274
+msgid "Done"
+msgstr "Hotovo"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:278
+#, c-format
+msgid "An error occured while executing %s. Failed to execute (%s)."
+msgstr "Během spouštění %s došlo k chybě. Selhalo spuštění (%s)."
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:279
+msgid "Error!"
+msgstr "Chyba!"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:283
+#, c-format
+msgid "End Time: %s (Elapsed Time: %s)"
+msgstr "Ukončeno: %s (Uplynulý čas: %s)"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gptoolmngr.cpp:283
+msgid "%H hours %M min. %S sec."
+msgstr "%H hodin %M min. %S sek."
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:41
+#, c-format
+msgid "Start CopyRows from '%s' to '%s'"
+msgstr "Zahájit kopírování řádků z '%s' do '%s'"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:56
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:527
+msgid "Interrupted by user"
+msgstr "Přerušeno uživatelem"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:141
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:622
+msgid "Error create feature! OGR error: "
+msgstr "Chyba vytváření prvku! Chyba OGR: "
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:170
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:388
+msgid "Error creating new dataset! OGR error: "
+msgstr "Chyba vytváření nového datasetu! Chyba OGR: "
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:182
+msgid "Error copying data to a new dataset! OGR error: "
+msgstr "Chyba kopírování dat do nového datasetu! Chyba OGR: "
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:203
+#, c-format
+msgid "Exporting %s to %s"
+msgstr "Exportuji %s do %s"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:207
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:355
+msgid "Input spatial reference is not defined! OGR error: "
+msgstr "Vstupní souřadnicový systém není definován! Chyba OGR: "
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:225
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:378
+msgid "Error read dataset definition"
+msgstr "Chyba čtení definice datasetu"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:244
+msgid "_point"
+msgstr "_bod"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:257
+msgid "_polygon"
+msgstr "_polygon"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:270
+msgid "_line"
+msgstr "_linie"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:283
+msgid "_mpoint"
+msgstr "_polybod"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:296
+msgid "_mline"
+msgstr "_polylinie"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:309
+msgid "_mpolygon"
+msgstr "_polypolygon"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:338
+msgid "Input feature class has multi geometry but output doesn't support it!"
+msgstr "Vstupní třída prvků má multigeometrii ale výstupní ji nepodporuje!"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:350
+#, c-format
+msgid "Projecting %s to %s"
+msgstr "Promítám %s do %s"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:366
+msgid "Output spatial reference is not defined! OGR error: "
+msgstr "Výstupní souřadnicový systém není definován! Chyba OGR: "
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:400
+msgid "The Spatial references are same! Nothing project"
+msgstr "Souřadnicové systémy jsou totožné! Nic k projekci"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:410
+msgid "The unknown transformation! OGR Error: "
+msgstr "Neznámá transformace! Chyba OGR: "
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:511
+msgid "Start projecting"
+msgstr "Zahájit promítání"
+
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:543
+#: D:\work\Projects\wxGIS\src\geoprocessing/gpvector.cpp:558
+#, c-format
+msgid "Error project feature #%d"
+msgstr "Chyba projekce prvku #%d"
+
+#: D:\work\Projects\wxGIS\include\wxgis\geoprocessing/geoprocessing.h:27
+msgid "Conversion Tools"
+msgstr "Převodní nástroje"
+
+#: D:\work\Projects\wxGIS\include\wxgis\geoprocessing/geoprocessing.h:28
+msgid "Vector"
+msgstr "Vektor"
+
+#: D:\work\Projects\wxGIS\include\wxgis\geoprocessing/geoprocessing.h:29
+msgid "Data Management Tools"
+msgstr "Nástroje správy dat"
+
+#: D:\work\Projects\wxGIS\include\wxgis\geoprocessing/geoprocessing.h:30
+msgid "Raster"
+msgstr "Rastr"
+
+#~ msgid "Remains %d hours %d minutes"
+#~ msgstr "Осталось %d час(ов) %d минут(а)"
+
+#~ msgid "wxGISGPToolManager: The tool %s execution took %s (%s)"
+#~ msgstr "wxGISGPToolManager: Выполнение задачи %s заняло %s (%s)"
+
+#~ msgid "success"
+#~ msgstr "успешно"
+
+#~ msgid "error"
+#~ msgstr "ошибка"
+
+#~ msgid "wxGISGPToolManager: Cannot create task (%s) thread"
+#~ msgstr "wxGISGPToolManager: Невозможно создать поток задачи (%s)"
+
+#~ msgid "Cannot create task (%s) thread"
+#~ msgstr "Невозможно создать поток задачи (%s)"
+
+#~ msgid "wxGISGPToolManager: Cannot run task (%s) thread"
+#~ msgstr "wxGISGPToolManager: Невозможно запустить поток задачи (%s)"
+
+#~ msgid "Cannot run task (%s) thread"
+#~ msgstr "Невозможно запустить поток задачи (%s)"
