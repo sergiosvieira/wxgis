@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxtabview.h"
 #include "wxgis/catalogui/gxapplication.h"
-#include "wxgis/catalogui/gxcatdroptarget.h"
+#include "wxgis/framework/droptarget.h"
 
 //-------------------------------------------------------------------
 // wxGxTab
@@ -33,7 +33,7 @@ END_EVENT_TABLE()
 
 wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style), m_bShowChoices(false), m_pCurrentWnd(NULL)
 {
-    SetDropTarget(new wxGISCatalogDropTarget(static_cast<IGxViewDropTarget*>(this)));
+    SetDropTarget(new wxGISDropTarget(static_cast<IViewDropTarget*>(this)));
 
 	m_sName = wxGetTranslation( pTabDesc->GetPropVal(wxT("name"), NONAME) );
 	m_bShowChoices = pTabDesc->GetPropVal(wxT("show_choices"), wxT("f")) == wxT("f") ? false : true;
@@ -56,7 +56,7 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 			pWnd->Hide();
 			m_pApp->RegisterChildWindow(pWnd);
 
-			pGxView->Activate(application, pChild);
+			pGxView->Activate(m_pApp, pChild);
 			if(m_pWindows.size() <= nPriority)
 			for(size_t i = 0; i < nPriority + 1; i++)
 				m_pWindows.push_back(NULL);
@@ -316,26 +316,26 @@ void wxGxTab::Deactivate(void)
 
 wxDragResult wxGxTab::OnDragOver(wxCoord x, wxCoord y, wxDragResult def)
 {
-	IGxViewDropTarget* pGxViewDropTarget = dynamic_cast<IGxViewDropTarget*>(m_pCurrentWnd);
-	if(!pGxViewDropTarget)
+	IViewDropTarget* pViewDropTarget = dynamic_cast<IViewDropTarget*>(m_pCurrentWnd);
+	if(!pViewDropTarget)
 		return wxDragNone;
-	return pGxViewDropTarget->OnDragOver(x, y, def);
+	return pViewDropTarget->OnDragOver(x, y, def);
 }
 
 bool wxGxTab::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 {
-	IGxViewDropTarget* pGxViewDropTarget = dynamic_cast<IGxViewDropTarget*>(m_pCurrentWnd);
-	if(!pGxViewDropTarget)
+	IViewDropTarget* pViewDropTarget = dynamic_cast<IViewDropTarget*>(m_pCurrentWnd);
+	if(!pViewDropTarget)
 		return wxDragNone;
-	return pGxViewDropTarget->OnDropFiles(x, y, filenames);
+	return pViewDropTarget->OnDropFiles(x, y, filenames);
 }
 
 void wxGxTab::OnLeave()
 {
-	IGxViewDropTarget* pGxViewDropTarget = dynamic_cast<IGxViewDropTarget*>(m_pCurrentWnd);
-	if(!pGxViewDropTarget)
+	IViewDropTarget* pViewDropTarget = dynamic_cast<IViewDropTarget*>(m_pCurrentWnd);
+	if(!pViewDropTarget)
 		return;
-	return pGxViewDropTarget->OnLeave();
+	return pViewDropTarget->OnLeave();
 }
 
 
@@ -363,17 +363,16 @@ bool wxGxTabView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, co
     return wxAuiNotebook::Create(parent, TABCTRLID, pos, size, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE);
 }
 
-bool wxGxTabView::Activate(IGxApplication* application, wxXmlNode* pConf)
+bool wxGxTabView::Activate(IApplication* application, wxXmlNode* pConf)
 {
-	if(!application || !pConf)
+	if(!wxGxView::Activate(application, pConf))
 		return false;
-	wxGxView::Activate(application, pConf);
 
 	wxXmlNode* pChild = m_pXmlConf->GetChildren();
 	wxUint8 count(0);
 	while(pChild)
 	{
-		wxGxTab* pGxTab = new wxGxTab(application, pChild, this);
+		wxGxTab* pGxTab = new wxGxTab(m_pApplication, pChild, this);
 		//wxWindow* pWnd = pGxTab->GetWindow(0);
 		//if(pWnd == NULL)
 		//	pWnd = new wxWindow(this, wxID_ANY);
@@ -386,7 +385,7 @@ bool wxGxTabView::Activate(IGxApplication* application, wxXmlNode* pConf)
 		pChild = pChild->GetNext();
 	}
 
-    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
+    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(m_pApplication->GetCatalog());
 	m_pSelection = pGxCatalogUI->GetSelection();
 	m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( m_pSelection );
 	if(m_pConnectionPointSelection != NULL)

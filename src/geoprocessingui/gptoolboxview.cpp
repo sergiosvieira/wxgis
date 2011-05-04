@@ -48,14 +48,15 @@ bool wxGxToolboxView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos
     return wxAuiNotebook::Create(parent, id, pos, size, wxAUI_NB_BOTTOM | wxNO_BORDER | wxAUI_NB_TAB_MOVE);
 }
 
-bool wxGxToolboxView::Activate(IGxApplication* application, wxXmlNode* pConf)
+bool wxGxToolboxView::Activate(IApplication* application, wxXmlNode* pConf)
 {
-	if(!application || !pConf)
+    IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(application);
+	if(!pGxApp)
 		return false;
 	if(!wxGxView::Activate(application, pConf))
 		return false;
 
-    m_pApp = dynamic_cast<IApplication*>(application);
+    m_pApp = application;
 
     //get config xml
     wxXmlNode *pTaskExecConf(NULL), *pToolboxTreeConf(NULL);
@@ -163,25 +164,21 @@ wxGxToolboxTreeView::~wxGxToolboxTreeView(void)
 {
 }
 
-bool wxGxToolboxTreeView::Activate(IGxApplication* application, wxXmlNode* pConf)
+bool wxGxToolboxTreeView::Activate(IApplication* application, wxXmlNode* pConf)
 {
 	if(!wxGxView::Activate(application, pConf))
 		return false;
 
-    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
-    IApplication* pApp = dynamic_cast<IApplication*>(application);
-    if(pApp)
-    {
-		//delete
-        m_pDeleteCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
-		//new
-		m_pNewMenu = dynamic_cast<wxGISNewMenu*>(pApp->GetCommandBar(NEWMENUNAME));
-    }
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pApplication->GetCatalog());
+	//delete
+    m_pDeleteCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
+	//new
+	m_pNewMenu = dynamic_cast<wxGISNewMenu*>(application->GetCommandBar(NEWMENUNAME));
 
     IGxObject* pGxToolboxes = m_pCatalog->SearchChild(wxString(_("Toolboxes")));
     AddRoot(dynamic_cast<IGxObject*>(pGxToolboxes));
 
-	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( application->GetCatalog() );
+	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pApplication->GetCatalog() );
 	if(m_pConnectionPointCatalog != NULL)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 

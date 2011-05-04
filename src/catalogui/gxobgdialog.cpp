@@ -253,7 +253,7 @@ wxGxDialogContentView::~wxGxDialogContentView(void)
 {
 }
 
-bool wxGxDialogContentView::Activate(IGxApplication* application, wxXmlNode* pConf)
+bool wxGxDialogContentView::Activate(IApplication* application, wxXmlNode* pConf)
 {
 	if(!wxGxContentView::Activate(application, pConf))
         return false;

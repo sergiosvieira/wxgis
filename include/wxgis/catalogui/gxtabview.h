@@ -43,7 +43,7 @@
 class wxGxTab : 
 	public wxPanel,
 	public IGxSelectionEvents,
-    public IGxViewDropTarget
+    public IViewDropTarget
 {
     DECLARE_CLASS(wxGxTab)
 
@@ -112,7 +112,7 @@ public:
 	virtual wxWindow* GetCurrentWnd(void);
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id = TABCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("TabView"));
-	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(IApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 //IGxSelectionEvents
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);

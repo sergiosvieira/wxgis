@@ -19,8 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxtreeview.h"
-#include "wxgis/catalogui/gxcatdroptarget.h"
-#include "wxgis/framework/framework.h"
+#include "wxgis/framework/droptarget.h"
 
 #include "../../art/document_16.xpm"
 
@@ -138,24 +137,20 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
 	wxTreeCtrl::Refresh();
 }
 
-bool wxGxTreeViewBase::Activate(IGxApplication* application, wxXmlNode* pConf)
+bool wxGxTreeViewBase::Activate(IApplication* application, wxXmlNode* pConf)
 {
 	if(!wxGxView::Activate(application, pConf))
 		return false;
 
-    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
-    IApplication* pApp = dynamic_cast<IApplication*>(application);
-    if(pApp)
-    {
-		//delete
-        m_pDeleteCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
-		//new
-		m_pNewMenu = dynamic_cast<wxGISNewMenu*>(pApp->GetCommandBar(NEWMENUNAME));
-    }
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pApplication->GetCatalog());
+	//delete
+    m_pDeleteCmd = application->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
+	//new
+	m_pNewMenu = dynamic_cast<wxGISNewMenu*>(application->GetCommandBar(NEWMENUNAME));
 
     AddRoot(dynamic_cast<IGxObject*>(m_pCatalog));
 
-	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( application->GetCatalog() );
+	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pApplication->GetCatalog() );
 	if(m_pConnectionPointCatalog != NULL)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
@@ -460,7 +455,7 @@ wxGxTreeView::wxGxTreeView(void) : wxGxTreeViewBase()
 
 wxGxTreeView::wxGxTreeView(wxWindow* parent, wxWindowID id, long style) : wxGxTreeViewBase(parent, id, wxDefaultPosition, wxDefaultSize, style)
 {
-    SetDropTarget(new wxGISCatalogDropTarget(static_cast<IGxViewDropTarget*>(this)));
+    SetDropTarget(new wxGISDropTarget(static_cast<IViewDropTarget*>(this)));
 }
 
 wxGxTreeView::~wxGxTreeView(void)

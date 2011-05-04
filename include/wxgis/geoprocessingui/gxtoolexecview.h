@@ -49,7 +49,7 @@ class WXDLLIMPEXP_GIS_GPU wxGxToolExecuteView :
 	public IGxSelectionEvents,
 	public IGxCatalogEvents,
     public IGxContentsView,
-    public IGxViewDropTarget
+    public IViewDropTarget
 {
     DECLARE_DYNAMIC_CLASS(wxGxToolExecuteView)
 public:
@@ -65,7 +65,7 @@ public:
 	virtual void SetGxToolExecute(IGxObject* pObject){m_nParentGxObjectID = pObject->GetID();};
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id = TOOLEXECUTECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = TOOLEXECVIEWSTYLE, const wxString& name = wxT("ToolExecuteView"));
-	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(IApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 	virtual bool Applies(IGxSelection* Selection);
     virtual void BeginRename(IGxObject* pGxObject = NULL){};

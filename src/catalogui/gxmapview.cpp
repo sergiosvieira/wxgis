@@ -64,15 +64,16 @@ bool wxGxMapView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, co
     return wxGISMapView::Create(parent, MAPCTRLID, pos, size, style, name);
 }
 
-bool wxGxMapView::Activate(IGxApplication* application, wxXmlNode* pConf)
+bool wxGxMapView::Activate(IApplication* application, wxXmlNode* pConf)
 {
-	wxGxView::Activate(application, pConf);
+	if(!wxGxView::Activate(application, pConf))
+		return false;
 	//Serialize(m_pXmlConf, false);
 
-    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pApplication->GetCatalog());
     m_pSelection = m_pCatalog->GetSelection();
 
-    m_pApp = dynamic_cast<IApplication*>(application);
+    m_pApp = application;
     if(!m_pApp)
         return false;
 	m_pStatusBar = m_pApp->GetStatusBar();

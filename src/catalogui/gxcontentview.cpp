@@ -20,14 +20,11 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxcontentview.h"
 #include "wxgis/catalog/gxdiscconnection.h"
-#include "wxgis/catalogui/gxcatdroptarget.h"
+#include "wxgis/framework/droptarget.h"
 
 #include "../../art/document_16.xpm"
 #include "../../art/document_48.xpm"
 #include "../../art/small_arrow.xpm"
-
-#include "wx/dnd.h"
-#include "wx/dataobj.h"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxContentView, wxListCtrl)
 
@@ -187,22 +184,19 @@ bool wxGxContentView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos
     return true;
 }
 
-bool wxGxContentView::Activate(IGxApplication* application, wxXmlNode* pConf)
+bool wxGxContentView::Activate(IApplication* application, wxXmlNode* pConf)
 {
-	wxGxView::Activate(application, pConf);
+	if(!wxGxView::Activate(application, pConf))
+		return false;
+
 	Serialize(m_pXmlConf, false);
 
-    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pApplication->GetCatalog());
 
-    IApplication* pApp = dynamic_cast<IApplication*>(application);
-    if(pApp)
-    {
-		//delete
-        m_pDeleteCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
-		//new 
-		m_pNewMenu = dynamic_cast<wxGISNewMenu*>(pApp->GetCommandBar(NEWMENUNAME));
-
-    }
+	//delete
+    m_pDeleteCmd = application->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
+	//new 
+	m_pNewMenu = dynamic_cast<wxGISNewMenu*>(application->GetCommandBar(NEWMENUNAME));
 
 	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pCatalog );
 	if(m_pConnectionPointCatalog != NULL)

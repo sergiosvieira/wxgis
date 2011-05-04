@@ -3,7 +3,7 @@
  * Purpose:  wxGxNoView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -28,9 +28,11 @@ BEGIN_EVENT_TABLE(wxGxNoView, wxControl)
     EVT_ERASE_BACKGROUND(wxGxNoView::OnEraseBackground)
 END_EVENT_TABLE()
 
-bool wxGxNoView::Activate(IGxApplication* application, wxXmlNode* pConf)
+bool wxGxNoView::Activate(IApplication* application, wxXmlNode* pConf)
 {
-	wxGxView::Activate(application, pConf);
+	if(!wxGxView::Activate(application, pConf))
+		return false;
+
 	Serialize(m_pXmlConf, false);
 	return true;
 }

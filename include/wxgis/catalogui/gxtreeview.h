@@ -71,7 +71,7 @@ public:
 	virtual void AddRoot(IGxObject* pGxObject);
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTR_HAS_BUTTONS, const wxString& name = wxT("TreeView"));
-	virtual bool Activate(IGxApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(IApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 //IGxSelectionEvents
 	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
@@ -118,7 +118,7 @@ protected:
 
 class WXDLLIMPEXP_GIS_CLU wxGxTreeView :
 	public wxGxTreeViewBase,
-    public IGxViewDropTarget
+    public IViewDropTarget
 {
     DECLARE_DYNAMIC_CLASS(wxGxTreeView)
 public:
