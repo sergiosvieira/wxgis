@@ -191,7 +191,7 @@ bool wxGxContentView::Activate(IApplication* application, wxXmlNode* pConf)
 
 	Serialize(m_pXmlConf, false);
 
-    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pApplication->GetCatalog());
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pGxApplication->GetCatalog());
 
 	//delete
     m_pDeleteCmd = application->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
@@ -415,7 +415,7 @@ void wxGxContentView::ShowContextMenu(const wxPoint& pos)
         if(pGxObjectUI)
         {
             wxString psContextMenu = pGxObjectUI->ContextMenu();
-            IApplication* pApp = dynamic_cast<IApplication*>(m_pApplication);
+            IApplication* pApp = dynamic_cast<IApplication*>(m_pGxApplication);
             if(pApp)
             {
                 wxMenu* pMenu = dynamic_cast<wxMenu*>(pApp->GetCommandBar(psContextMenu));
@@ -440,7 +440,7 @@ void wxGxContentView::ShowContextMenu(const wxPoint& pos)
 		{
             wxString psContextMenu = pGxObjectUI->ContextMenu();
             pGxObject.reset();
-            IApplication* pApp = dynamic_cast<IApplication*>(m_pApplication);
+            IApplication* pApp = dynamic_cast<IApplication*>(m_pGxApplication);
             if(pApp)
             {
                 wxMenu* pMenu = dynamic_cast<wxMenu*>(pApp->GetCommandBar(psContextMenu));

@@ -177,6 +177,10 @@
 				RelativePath="..\..\src\map_app\mapapp.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\src\map_app\mapframe.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Заголовочные файлы"
@@ -191,12 +195,28 @@
 				RelativePath="..\..\include\wxgis\map_app\mapapp.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\include\wxgis\map_app\mapframe.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\map_app\resource.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Файлы ресурсов"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath=".\map.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\wxGISMapApp.rc"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

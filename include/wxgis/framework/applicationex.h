@@ -52,7 +52,7 @@ public:
 	virtual const WINDOWARRAY* const GetChildWindows(void);
 	virtual void RegisterChildWindow(wxWindow* pWnd);
 	virtual void UnRegisterChildWindow(wxWindow* pWnd);
-    virtual wxString GetAppName(void){return wxString(wxT("wxGISMap"));};
+    virtual wxString GetAppName(void) = 0;
     virtual wxString GetAppVersionString(void){return wxString(APP_VER);};
     virtual bool Create(IGISConfig* pConfig);
     virtual bool SetupSys(wxString sSysPath);

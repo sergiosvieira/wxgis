@@ -22,7 +22,7 @@
 #include "wxgis/geoprocessingui/gxtoolexecview.h"
 #include "wxgis/geoprocessingui/gptoolbox.h"
 #include "wxgis/geoprocessingui/gptaskexecdlg.h"
-#include "wxgis/catalogui/gxcatdroptarget.h"
+#include "wxgis/framework/droptarget.h"
 
 #include "wx/tokenzr.h"
 
@@ -153,7 +153,7 @@ bool wxGxToolExecuteView::Activate(IApplication* application, wxXmlNode* pConf)
 
 	Serialize(m_pXmlConf, false);
 
-    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pApplication->GetCatalog());
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pGxApplication->GetCatalog());
 
 	//delete
     m_pDeleteCmd = application->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
@@ -384,7 +384,7 @@ void wxGxToolExecuteView::ShowContextMenu(const wxPoint& pos)
         if(pGxObjectUI)
         {
             wxString psContextMenu = pGxObjectUI->ContextMenu();
-            IApplication* pApp = dynamic_cast<IApplication*>(m_pApplication);
+            IApplication* pApp = dynamic_cast<IApplication*>(m_pGxApplication);
             if(pApp)
             {
                 wxMenu* pMenu = dynamic_cast<wxMenu*>(pApp->GetCommandBar(psContextMenu));
@@ -407,7 +407,7 @@ void wxGxToolExecuteView::ShowContextMenu(const wxPoint& pos)
 		if(pGxObjectUI != NULL)
 		{
             wxString psContextMenu = pGxObjectUI->ContextMenu();
-            IApplication* pApp = dynamic_cast<IApplication*>(m_pApplication);
+            IApplication* pApp = dynamic_cast<IApplication*>(m_pGxApplication);
             if(pApp)
             {
                 wxMenu* pMenu = dynamic_cast<wxMenu*>(pApp->GetCommandBar(psContextMenu));

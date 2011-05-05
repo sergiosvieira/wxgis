@@ -142,7 +142,7 @@ bool wxGxTreeViewBase::Activate(IApplication* application, wxXmlNode* pConf)
 	if(!wxGxView::Activate(application, pConf))
 		return false;
 
-    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pApplication->GetCatalog());
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pGxApplication->GetCatalog());
 	//delete
     m_pDeleteCmd = application->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
 	//new
@@ -150,7 +150,7 @@ bool wxGxTreeViewBase::Activate(IApplication* application, wxXmlNode* pConf)
 
     AddRoot(dynamic_cast<IGxObject*>(m_pCatalog));
 
-	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pApplication->GetCatalog() );
+	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pGxApplication->GetCatalog() );
 	if(m_pConnectionPointCatalog != NULL)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
@@ -325,7 +325,7 @@ void wxGxTreeViewBase::OnObjectRefreshed(long nObjectID)
 void wxGxTreeViewBase::OnRefreshAll(void)
 {
 	DeleteAllItems();
-	AddRoot(dynamic_cast<IGxObject*>(m_pApplication->GetCatalog()));
+	AddRoot(dynamic_cast<IGxObject*>(m_pGxApplication->GetCatalog()));
 }
 
 int wxGxTreeViewBase::OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2)
@@ -355,7 +355,7 @@ void wxGxTreeViewBase::OnItemRightClick(wxTreeEvent& event)
         if(pGxObjectUI)
         {
             wxString psContextMenu = pGxObjectUI->ContextMenu();
-            IApplication* pApp = dynamic_cast<IApplication*>(m_pApplication);
+            IApplication* pApp = dynamic_cast<IApplication*>(m_pGxApplication);
             if(pApp)
             {
                 wxMenu* pMenu = dynamic_cast<wxMenu*>(pApp->GetCommandBar(psContextMenu));
