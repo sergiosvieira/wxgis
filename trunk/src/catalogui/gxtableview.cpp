@@ -57,7 +57,7 @@ bool wxGxTableView::Activate(IApplication* application, wxXmlNode* pConf)
 	//if(m_pConnectionPointCatalog != NULL)
 	//	m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
-    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pApplication->GetCatalog());
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pGxApplication->GetCatalog());
 	m_pSelection = m_pCatalog->GetSelection();
 	return true;
 }

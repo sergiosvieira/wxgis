@@ -21,7 +21,7 @@
 
 #include "wxgis/geoprocessingui/gptoolboxview.h"
 #include "wxgis/geoprocessingui/gptoolbox.h"
-#include "wxgis/catalogui/gxcatdroptarget.h"
+#include "wxgis/framework/droptarget.h"
 
 //-------------------------------------------------------------------
 // wxGxToolboxView
@@ -50,9 +50,6 @@ bool wxGxToolboxView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos
 
 bool wxGxToolboxView::Activate(IApplication* application, wxXmlNode* pConf)
 {
-    IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(application);
-	if(!pGxApp)
-		return false;
 	if(!wxGxView::Activate(application, pConf))
 		return false;
 
@@ -88,24 +85,20 @@ bool wxGxToolboxView::Activate(IApplication* application, wxXmlNode* pConf)
 
 
     wxGxToolExecute* pGxToolExecute(NULL);
-	IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-	if(pGxApp)
+    IGxObjectContainer* pRootContainer = dynamic_cast<IGxObjectContainer*>(m_pGxApplication->GetCatalog());
+    if(pRootContainer)
     {
-        IGxObjectContainer* pRootContainer = dynamic_cast<IGxObjectContainer*>(pGxApp->GetCatalog());
-        if(pRootContainer)
+        IGxObjectContainer* pGxToolboxes = dynamic_cast<IGxObjectContainer*>(pRootContainer->SearchChild(wxString(_("Toolboxes"))));
+        if(pGxToolboxes)
         {
-            IGxObjectContainer* pGxToolboxes = dynamic_cast<IGxObjectContainer*>(pRootContainer->SearchChild(wxString(_("Toolboxes"))));
-            if(pGxToolboxes)
+            GxObjectArray* pArr = pGxToolboxes->GetChildren();
+            if(pArr)
             {
-                GxObjectArray* pArr = pGxToolboxes->GetChildren();
-                if(pArr)
+                for(size_t i = 0; i < pArr->size(); ++i)
                 {
-                    for(size_t i = 0; i < pArr->size(); ++i)
-                    {
-                        pGxToolExecute = dynamic_cast<wxGxToolExecute*>(pArr->operator[](i));
-                        if(pGxToolExecute)
-                            break;
-                    }
+                    pGxToolExecute = dynamic_cast<wxGxToolExecute*>(pArr->operator[](i));
+                    if(pGxToolExecute)
+                        break;
                 }
             }
         }
@@ -156,7 +149,7 @@ wxGxToolboxTreeView::wxGxToolboxTreeView(void) : wxGxTreeView()
 
 wxGxToolboxTreeView::wxGxToolboxTreeView(wxWindow* parent, wxWindowID id, long style) : wxGxTreeView(parent, id, style)
 {
-    SetDropTarget(new wxGISCatalogDropTarget(static_cast<IGxViewDropTarget*>(this)));
+    SetDropTarget(new wxGISDropTarget(static_cast<IViewDropTarget*>(this)));
     m_sViewName = wxString(_("Toolboxes"));
 }
 
@@ -169,16 +162,16 @@ bool wxGxToolboxTreeView::Activate(IApplication* application, wxXmlNode* pConf)
 	if(!wxGxView::Activate(application, pConf))
 		return false;
 
-    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pApplication->GetCatalog());
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pGxApplication->GetCatalog());
 	//delete
-    m_pDeleteCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
+    m_pDeleteCmd = application->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
 	//new
 	m_pNewMenu = dynamic_cast<wxGISNewMenu*>(application->GetCommandBar(NEWMENUNAME));
 
     IGxObject* pGxToolboxes = m_pCatalog->SearchChild(wxString(_("Toolboxes")));
     AddRoot(dynamic_cast<IGxObject*>(pGxToolboxes));
 
-	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pApplication->GetCatalog() );
+	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pGxApplication->GetCatalog() );
 	if(m_pConnectionPointCatalog != NULL)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 

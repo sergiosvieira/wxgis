@@ -33,7 +33,6 @@ wxGxApplication::wxGxApplication(wxWindow* parent, wxWindowID id, const wxString
 
 wxGxApplication::~wxGxApplication(void)
 {
-	wxGISApplicationEx::~wxGISApplicationEx();
     m_pCatalog->Detach();
 	wxDELETE(m_pCatalog);
 }

@@ -37,8 +37,6 @@
 // wxGISCatalogFrame
 //-----------------------------------------------------------
 
-class wxGISCatalogApp;
-
 class wxGISCatalogFrame :
 	public wxGxApplication
 {

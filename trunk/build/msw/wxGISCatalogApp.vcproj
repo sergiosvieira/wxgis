@@ -217,10 +217,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\resource.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\include\wxgis\cat_app\resource.h"
 				>
 			</File>
@@ -232,10 +228,6 @@
 			>
 			<File
 				RelativePath="..\..\art\archive.ico"
-				>
-			</File>
-			<File
-				RelativePath="..\img\archive.ico"
 				>
 			</File>
 			<File

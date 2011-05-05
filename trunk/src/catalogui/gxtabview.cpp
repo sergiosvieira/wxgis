@@ -372,7 +372,7 @@ bool wxGxTabView::Activate(IApplication* application, wxXmlNode* pConf)
 	wxUint8 count(0);
 	while(pChild)
 	{
-		wxGxTab* pGxTab = new wxGxTab(m_pApplication, pChild, this);
+		wxGxTab* pGxTab = new wxGxTab(m_pGxApplication, pChild, this);
 		//wxWindow* pWnd = pGxTab->GetWindow(0);
 		//if(pWnd == NULL)
 		//	pWnd = new wxWindow(this, wxID_ANY);
@@ -385,7 +385,7 @@ bool wxGxTabView::Activate(IApplication* application, wxXmlNode* pConf)
 		pChild = pChild->GetNext();
 	}
 
-    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(m_pApplication->GetCatalog());
+    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(m_pGxApplication->GetCatalog());
 	m_pSelection = pGxCatalogUI->GetSelection();
 	m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( m_pSelection );
 	if(m_pConnectionPointSelection != NULL)

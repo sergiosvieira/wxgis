@@ -44,7 +44,7 @@ public:
 protected:
 	wxString m_sViewName;
 	//IGxCatalog* m_pCatalog;
-	IGxApplication* m_pApplication;
+	IGxApplication* m_pGxApplication;
 	wxXmlNode* m_pXmlConf;
     wxIcon m_Icon;
 };

@@ -38,8 +38,8 @@ wxGxView::~wxGxView(void)
 
 bool wxGxView::Activate(IApplication* application, wxXmlNode* pConf)
 { 
-	m_pApplication = dynamic_cast<IGxApplication*>(application); 
-	if(!m_pApplication)
+	m_pGxApplication = dynamic_cast<IGxApplication*>(application); 
+	if(!m_pGxApplication)
 		return false;
 	//m_pCatalog = m_pApplication->GetCatalog(); 
 	m_pXmlConf = pConf;
@@ -48,7 +48,7 @@ bool wxGxView::Activate(IApplication* application, wxXmlNode* pConf)
 
 void wxGxView::Deactivate(void)
 {
-	m_pApplication = NULL;
+	m_pGxApplication = NULL;
 	//m_pCatalog = NULL;
 	m_pXmlConf = NULL;
 }

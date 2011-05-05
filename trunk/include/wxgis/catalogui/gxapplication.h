@@ -46,7 +46,6 @@ public:
     virtual void OnClose(wxCloseEvent& event);
 	//IApplication
     virtual wxString GetAppName(void){return wxString(wxT("wxGISCatalog"));};
-    virtual wxString GetAppVersionString(void){return wxString(APP_VER);};
     virtual bool Create(IGISConfig* pConfig);
 protected:
 	wxGxTreeView* m_pTreeView;

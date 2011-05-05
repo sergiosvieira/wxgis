@@ -1,8 +1,8 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by wxGISCat.rc
+// Used by wxGISMapApp.rc
 //
-#define archive                         101
+#define IDI_MAINFRAMEMAP                       101
 
 // Next default values for new objects
 // 

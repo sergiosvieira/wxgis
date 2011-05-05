@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Map)
- * Purpose:  wxMapUI main header.
+ * Purpose:  Main frame class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
@@ -19,17 +19,32 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#pragma once
+#include "wxgis/map_app/mapframe.h"
+#include "wxgis/app/gisaboutdlg.h"
 
-#include "wxgis/base.h"
+#include "../../art/mainframemap.xpm"
 
-/** \class IMxApplication mapui.h
-    \brief A IMxApplication interface class.
+//-----------------------------------------------------------
+// wxGISMapFrame
+//-----------------------------------------------------------
 
-    This is base class for map applicaton frame.    
-*/
-class IMxApplication
+
+BEGIN_EVENT_TABLE(wxGISMapFrame, wxMxApplication)
+END_EVENT_TABLE()
+
+
+wxGISMapFrame::wxGISMapFrame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxMxApplication(parent, id, title, pos, size, style)
 {
-public:
-	virtual ~IMxApplication(void){};
-};
+	//set app main icon
+    SetIcon(wxIcon(mainframemap_xpm));
+}
+
+wxGISMapFrame::~wxGISMapFrame(void)
+{
+}
+
+void wxGISMapFrame::OnAppAbout(void)
+{
+    wxGISAboutDialog oDialog(this);
+    oDialog.ShowModal();
+}
