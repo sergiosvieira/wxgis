@@ -21,8 +21,8 @@
 #include "wxgis/cat_app/catalogframe.h"
 #include "wxgis/app/gisaboutdlg.h"
 
-#include "../../art/mainframe.xpm"
-#include "../../art/mainframe_x.xpm"
+#include "../../art/mainframecat.xpm"
+#include "../../art/mainframecat_x.xpm"
 
 #include <wx/datetime.h>
 
@@ -40,9 +40,9 @@ wxGISCatalogFrame::wxGISCatalogFrame(wxWindow* parent, wxWindowID id, const wxSt
 	//set app main icon
     wxDateTime now = wxDateTime::Now();
     if((now.GetMonth() == wxDateTime::Month::Dec && now.GetDay() > 15) || (now.GetMonth() == wxDateTime::Month::Jan && now.GetDay() < 15))
-        SetIcon(wxIcon(mainframe_x_xpm));
+        SetIcon(wxICON(mainframecat_x));
     else
-        SetIcon(wxIcon(mainframe_xpm));
+        SetIcon(wxICON(mainframecat));
 }
 
 wxGISCatalogFrame::~wxGISCatalogFrame(void)
