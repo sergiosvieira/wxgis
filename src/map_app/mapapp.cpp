@@ -19,10 +19,12 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/map_app/mapapp.h"
+#include "wxgis/map_app/mapframe.h"
 //#include "wxgis/catalog/catalog.h"
-//#include "wxgis/cat_app/catalogframe.h"
 
 #include <locale.h>
+
+#include "gdal.h"
 #include "ogrsf_frmts/ogrsf_frmts.h"
 #include "ogr_api.h"
 
