@@ -24,6 +24,7 @@
 #include "wxgis/geoprocessing/gpdomain.h"
 #include "wxgis/geoprocessing/gpparam.h"
 #include "wxgis/catalog/gxfilters.h"
+#include "wxgis/catalog/catop.h"
 
 #include "wx/filename.h"
 
@@ -184,7 +185,7 @@ bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
 	if(!pSrcDataSet->IsOpened())
-		if(!pSrcDataSet->Open());
+		if(!pSrcDataSet->Open())
 			return false;
     
     OGRFeatureDefn *pDef = pSrcDataSet->GetDefinition();
@@ -218,6 +219,11 @@ bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
 
     //get destination
     wxString sDstPath = m_pParamArr[2]->GetValue();
+
+	//check overwrite & do it!
+	if(!OverWriteGxObject(pGxObjectContainer->SearchChild(sDstPath), pTrackCancel))
+		return false;
+
     wxFileName sDstFileName(sDstPath);
     wxString sPath = sDstFileName.GetPath();
     IGxObject* pGxDstObject = pGxObjectContainer->SearchChild(sPath);
@@ -233,7 +239,7 @@ bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
     wxString sName = sDstFileName.GetName();
 
     wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[2]->GetDomain());
-    IGxObjectFilter* pFilter = pDomain->GetFilter(pDomain->GetSel());
+	IGxObjectFilter* pFilter = pDomain->GetFilter(m_pParamArr[2]->GetSelDomainValue());
     if(!pFilter)
     {
         //add messages to pTrackCancel

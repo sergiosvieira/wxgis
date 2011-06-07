@@ -3,7 +3,7 @@
  * Purpose:  geoprocessing tool parameters domains.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,51 +22,118 @@
 #include "wxgis/geoprocessing/gpdomain.h"
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISGPValueDomain
+///////////////////////////////////////////////////////////////////////////////
+
+wxGISGPValueDomain::wxGISGPValueDomain(void)
+{
+}
+
+wxGISGPValueDomain::~wxGISGPValueDomain(void)
+{
+}
+
+void wxGISGPValueDomain::AddValue(const wxVariant& Element, wxString soNameStr)
+{
+	m_asoData.push_back(Element);
+	m_asoNames.Add(soNameStr);
+}
+
+size_t wxGISGPValueDomain::GetCount(void)
+{
+	return m_asoData.size(); 
+}
+
+wxVariant wxGISGPValueDomain::GetValue(size_t nIndex)
+{ 
+	wxASSERT(nIndex < m_asoData.size());
+	return m_asoData[nIndex]; 
+}
+
+wxString wxGISGPValueDomain::GetName(size_t nIndex)
+{ 
+	return m_asoNames[nIndex]; 
+}
+
+wxVariant wxGISGPValueDomain::GetValueByName(wxString soNameStr)
+{
+	int nPos = m_asoNames.Index(soNameStr);
+	wxVariant result;
+	if(nPos != wxNOT_FOUND)
+		result = m_asoData[nPos];
+	return result;
+}
+
+int wxGISGPValueDomain::GetPosByName(wxString sName)
+{
+	return m_asoNames.Index(sName);
+}
+
+int wxGISGPValueDomain::GetPosByValue(wxVariant oVal)
+{
+	int nPos = wxNOT_FOUND;
+	for(size_t i = 0; i < m_asoData.size(); ++i)
+	{
+		if(m_asoData[i] == oVal)
+		{
+			nPos = i;
+			break;
+		}
+	}
+	return nPos;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISGPGxObjectDomain
 ///////////////////////////////////////////////////////////////////////////////
 
-wxGISGPGxObjectDomain::wxGISGPGxObjectDomain(void) : m_nSelFilterIndex(0)
+wxGISGPGxObjectDomain::wxGISGPGxObjectDomain(void) : wxGISGPValueDomain()
 {
 }
 
 wxGISGPGxObjectDomain::~wxGISGPGxObjectDomain(void)
 {
-    for(size_t i = 0; i < m_FilterArray.size(); i++)
-        wxDELETE(m_FilterArray[i]);
+    for(size_t i = 0; i < m_asoData.size(); ++i)
+	{
+		IGxObjectFilter* pFil = (IGxObjectFilter*)m_asoData[i].GetVoidPtr();
+		wxDELETE(pFil);
+	}
 }
 
 void wxGISGPGxObjectDomain::AddFilter(IGxObjectFilter* pFilter)
 {
-    m_FilterArray.push_back(pFilter);
+	AddValue(wxVariant((void*)pFilter), pFilter->GetName());
 }
 
 IGxObjectFilter* wxGISGPGxObjectDomain::GetFilter(size_t nIndex)
 {
-    if(nIndex >= GetCount())
-        return NULL;
-    return m_FilterArray[nIndex];
+	return (IGxObjectFilter*)GetValue(nIndex).GetVoidPtr();
 }
 
-size_t wxGISGPGxObjectDomain::GetCount(void)
+int wxGISGPGxObjectDomain::GetPosByValue(wxVariant oVal)
 {
-    return m_FilterArray.size();
+    if(!oVal.IsNull())
+    {
+		wxFileName oName(oVal.GetString());
+        for(size_t i = 0; i < m_asoData.size(); ++i)
+        {
+            IGxObjectFilter* poFilter = GetFilter(i);
+            if(poFilter)
+            {
+                if(oName.GetExt().CmpNoCase(poFilter->GetExt()) == 0 || poFilter->GetExt() == wxEmptyString)
+                {
+                    return i;
+                }
+            }
+        }
+    }
+	return wxNOT_FOUND;
 }
-
- void wxGISGPGxObjectDomain::SetSel(size_t nIndex)
- {
-     m_nSelFilterIndex = nIndex;
- }
-
- size_t wxGISGPGxObjectDomain::GetSel(void)
- {
-     return m_nSelFilterIndex;
- }
-
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISGPStringDomain
 ///////////////////////////////////////////////////////////////////////////////
 
-wxGISGPStringDomain::wxGISGPStringDomain(void) : m_nSelIndex(0)
+wxGISGPStringDomain::wxGISGPStringDomain(void) : wxGISGPValueDomain()
 {
 }
 
@@ -74,57 +141,17 @@ wxGISGPStringDomain::~wxGISGPStringDomain(void)
 {
 }
 
-void wxGISGPStringDomain::AddString(wxString soStr, wxString soInternalStr)
+void wxGISGPStringDomain::AddString(wxString soStr, wxString soName)
 {
-    m_asoData.Add(soStr);
-    if(soInternalStr.IsEmpty())
-        soInternalStr = soStr;
-    m_asoInternalData.Add(soInternalStr);
+	if(soName.IsEmpty())
+		AddValue(wxVariant(soStr), soStr);
+	else
+		AddValue(wxVariant(soStr), soName);
 }
 
-size_t wxGISGPStringDomain::GetCount(void)
+wxString wxGISGPStringDomain::GetString(size_t nIndex)
 {
-    return m_asoData.GetCount();
+	return GetValue(nIndex).GetString();
 }
 
-wxString wxGISGPStringDomain::GetExternalString(size_t dIndex)
-{
-    return m_asoData[dIndex];
-}
-
-wxString wxGISGPStringDomain::GetInternalString(size_t dIndex)
-{
-    return m_asoInternalData[dIndex];
-}
-
-wxArrayString wxGISGPStringDomain::GetArrayString() const
-{
-    return m_asoData;
-}
-
-void wxGISGPStringDomain::SetSel(size_t nIndex)
-{
-     m_nSelIndex = nIndex;
-}
-
-size_t wxGISGPStringDomain::GetSel(void)
-{
-     return m_nSelIndex;
-}
-
-wxString wxGISGPStringDomain::GetInternalString(wxString soInternalStr)
-{
-    int nPos = m_asoInternalData.Index(soInternalStr);
-    if(nPos == wxNOT_FOUND)
-        return wxEmptyString;
-    return m_asoData[nPos];
-}
-
-wxString wxGISGPStringDomain::GetExternalString(wxString soStr)
-{
-    int nPos = m_asoData.Index(soStr);
-    if(nPos == wxNOT_FOUND)
-        return wxEmptyString;
-    return m_asoInternalData[nPos];
-}
 

@@ -49,12 +49,13 @@ public:
     virtual void SetValue(int value);
     virtual int GetValue(void){return m_nValue;};
     virtual bool Show(bool bShow){return true;};
-    virtual void SetRange(int range){};
-    virtual int GetRange(void){return 100;};
+    virtual void SetRange(int range){m_nRange = range;};
+    virtual int GetRange(void){return m_nRange;};
     virtual void Play(void){};
     virtual void Stop(void){};
 protected:
     int m_nValue;
+    int m_nRange;
     wxTextOutputStream* m_pOutTxtStream;
     wxFFile m_StdOutFile;
     wxString m_sPrevMsg;

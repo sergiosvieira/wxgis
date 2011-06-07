@@ -1,6 +1,6 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Toolbox)
- * Purpose:  main table analysis functions.
+ * Project:  wxGIS
+ * Purpose:  raster operations.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
@@ -19,27 +19,33 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#pragma once
+#include "wxgis/datasource/rasterop.h"
 
-#include "wxgis/geoprocessing/geoprocessing.h"
-#include "wxgis/datasource/table.h"
+#define OVR_MAX_LEVEL_SIZE 256
 
-enum wxGISFieldMergeOperator
+int GetOverviewLevels(wxGISRasterDatasetSPtr pwxGISRasterDataset, int* anOverviewList)
 {
-	enumGISFMONone,
-	enumGISFMOMergeBase,
-	enumGISFMOMean,
-	enumGISFMOMin,
-	enumGISFMOMax,
-	enumGISFMOSum
-};
-
-typedef struct _FieldMergeData
-{
-	//CPLString sFieldName;
-	int nFieldPos;
-	wxGISFieldMergeOperator nOp;
-} FIELDMERGEDATA;
-
-wxGISTableSPtr WXDLLIMPEXP_GIS_GP CreateTable(CPLString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *poFields, wxGISEnumTableDatasetType nType = enumTableUnknown, char ** papszDataSourceOptions = NULL, char ** papszLayerOptions = NULL);
-bool WXDLLIMPEXP_GIS_GP MeanValByColumn(wxGISTableSPtr pDSet, CPLString sPath, wxString sName, std::vector<FIELDMERGEDATA> &FieldMergeData, IGxObjectFilter* pFilter, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel);
+	int nSize = std::min(pwxGISRasterDataset->GetHeight(), pwxGISRasterDataset->GetWidth());
+	int nLevel(1);
+	int nLevelCount(0);
+	while(1)
+	{
+		nSize /= 2;
+		if(nSize < OVR_MAX_LEVEL_SIZE)
+		{
+			if(nLevelCount == 0)
+			{
+				anOverviewList[nLevelCount] = nLevel;
+				nLevelCount++;
+			}
+			break;
+		}
+		nLevel *= 2;
+		if(nLevel != 2)
+		{
+			anOverviewList[nLevelCount] = nLevel;
+			nLevelCount++;
+		}
+	}
+	return nLevelCount;
+}

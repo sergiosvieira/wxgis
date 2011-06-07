@@ -42,4 +42,6 @@ public:
     virtual bool Execute(ITrackCancel* pTrackCancel);
     virtual bool Validate(void);
     virtual GPParameters* GetParameterInfo(void);
+protected:
+	wxString m_sInputPath;
 };

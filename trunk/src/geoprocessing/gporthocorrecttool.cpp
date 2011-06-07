@@ -24,6 +24,7 @@
 #include "wxgis/geoprocessing/gpdomain.h"
 #include "wxgis/geoprocessing/gpparam.h"
 #include "wxgis/catalog/gxfilters.h"
+#include "wxgis/catalog/catop.h"
 #include "wxgis/datasource/rasterdataset.h"
 #include "wxgis/framework/application.h"
 
@@ -134,7 +135,7 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         pParam6->SetName(wxT("elev_interpol"));
         pParam6->SetDisplayName(_("Elevation values interpolation"));
         pParam6->SetParameterType(enumGISGPParameterTypeOptional);
-        pParam6->SetDataType(enumGISGPParamDTStringList);
+        pParam6->SetDataType(enumGISGPParamDTStringChoice);
         pParam6->SetDirection(enumGISGPParameterDirectionInput);
 
         wxGISGPStringDomain* pDomain6 = new wxGISGPStringDomain();
@@ -212,10 +213,15 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
 	if(!pSrcDataSet->IsOpened())
-		if(!pSrcDataSet->Open(true));
+		if(!pSrcDataSet->Open(true))
 			return false;
 
     wxString sDstPath = m_pParamArr[1]->GetValue();
+
+	//check overwrite & do it!
+	if(!OverWriteGxObject(pGxObjectContainer->SearchChild(sDstPath), pTrackCancel))
+		return false;
+
     wxFileName sDstFileName(sDstPath);
     wxString sPath = sDstFileName.GetPath();
     IGxObject* pGxDstObject = pGxObjectContainer->SearchChild(sPath);
@@ -231,7 +237,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     wxString sName = sDstFileName.GetName();
 
     wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[1]->GetDomain());
-    IGxObjectFilter* pFilter = pDomain->GetFilter(pDomain->GetSel());
+	IGxObjectFilter* pFilter = pDomain->GetFilter(m_pParamArr[1]->GetSelDomainValue());
     if(!pFilter)
     {
         //add messages to pTrackCancel

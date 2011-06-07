@@ -24,6 +24,7 @@
 #include "wxgis/framework/framework.h"
 #include "wxgis/framework/messagedlg.h"
 #include "wxgis/framework/application.h"
+#include "wxgis/datasource/rasterop.h"
 
 #include "wx/msgdlg.h"
 
@@ -312,23 +313,8 @@ void wxGxMapView::CheckOverviews(wxGISDatasetSPtr pwxGISDataset, wxString soFile
 
         if(bCreateOverviews)
         {
-            int nSize = MIN(pwxGISRasterDataset->GetHeight(), pwxGISRasterDataset->GetWidth());
             int anOverviewList[25] = {0};
-            int nLevel(1);
-            int nLevelCount(0);
-            while(1)
-            {
-                nSize /= 2;
-                if(nSize < 20)
-                    break;
-                nLevel *= 2;
-                if(nLevel != 2)
-                {
-                    anOverviewList[nLevelCount] = nLevel;
-                    nLevelCount++;
-                }
-            }
-	        //int anOverviewList[8] = { 4, 8, 16, 32, 64, 128, 256, 512 };
+            int nLevelCount = GetOverviewLevels(pwxGISRasterDataset, anOverviewList);
 
             wxString sProgressMsg = wxString::Format(_("Creating pyramids for : %s (%d bands)"), soFileName.c_str(), pwxGISRasterDataset->GetRaster()->GetRasterCount());
             IStatusBar* pStatusBar = m_pApp->GetStatusBar();

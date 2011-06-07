@@ -90,19 +90,20 @@ void *wxProcessWaitThread::Entry()
 
     //"wxGISGeoprocess.exe -n create_ovr -p "My geodata\tsk_exe\08MAY01083427-S2AS_R1C1-005728810020_01_P001.TIF|GAUSS|JPEG|""
 
-#if defined(BOOST_POSIX_API) 
+//#if defined(BOOST_POSIX_API) 
     bp::context ctx; 
-#elif defined(BOOST_WINDOWS_API) 
-    bp::win32_context ctx; 
-    STARTUPINFOA si; 
-    ::ZeroMemory(&si, sizeof(si)); 
-    si.cb = sizeof(si); 
-    si.dwFlags |= STARTF_USESHOWWINDOW;
-    si.wShowWindow = SW_HIDE;//SW_SHOW;//
-    ctx.startupinfo = &si;
-#else 
-#  error "Unsupported platform." 
-#endif
+//#elif defined(BOOST_WINDOWS_API) 
+//    bp::win32_context ctx; 
+//    STARTUPINFOA si; 
+//    ::ZeroMemory(&si, sizeof(si)); 
+//    si.cb = sizeof(si); 
+ //   si.dwFlags |= STARTF_USESHOWWINDOW;
+ //   si.wShowWindow = SW_HIDE;//SW_SHOW;//
+	//si.dwX = si.dwY = 5000;
+//    ctx.startupinfo = &si;
+//#else 
+//#  error "Unsupported platform." 
+//#endif
 
     ctx.environment = bp::self::get_environment(); 
     ctx.stdout_behavior = bp::capture_stream(); 

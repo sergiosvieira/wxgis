@@ -83,7 +83,7 @@ wxGISTableSPtr CreateTable(CPLString sPath, wxString sName, wxString sExt, wxStr
     return pDataSet;
 }
 
-bool MeanValByColumn(wxGISTableSPtr pDSet, CPLString sPath, wxString sName, IGxObjectFilter* pFilter, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel)
+bool MeanValByColumn(wxGISTableSPtr pDSet, CPLString sPath, wxString sName, std::vector<FIELDMERGEDATA> &FieldMergeData, IGxObjectFilter* pFilter, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel)
 {
     if(!pFilter || !pDSet)
         return false;
@@ -95,12 +95,17 @@ bool MeanValByColumn(wxGISTableSPtr pDSet, CPLString sPath, wxString sName, IGxO
     if(pTrackCancel)
         pTrackCancel->PutMessage(wxString::Format(_("Calculate mean values for columns. Source dataset %s. Destination dataset %s"), pDSet->GetName().c_str(), sName.c_str()), -1, enumGISMessageTitle);
 
+	OGRFeatureDefn* const pDef = pDSet->GetDefinition();
     OGRFeatureDefn *pNewDef = new OGRFeatureDefn("mean_vals");
-	pNewDef->AddFieldDefn( new OGRFieldDefn("date_time", OFTDate) );
-	pNewDef->AddFieldDefn( new OGRFieldDefn("TMean", OFTReal) );
-	pNewDef->AddFieldDefn( new OGRFieldDefn("TMax", OFTReal ) );
-	pNewDef->AddFieldDefn( new OGRFieldDefn("TMin", OFTReal ) );
-	pNewDef->AddFieldDefn( new OGRFieldDefn("RRR", OFTReal ) );
+
+	int nBaseField = 0;
+	for(size_t i = 0; i < FieldMergeData.size(); ++i)
+	{
+		OGRFieldDefn* pFldDefn = pDef->GetFieldDefn( FieldMergeData[i].nFieldPos );
+		pNewDef->AddFieldDefn( new OGRFieldDefn(pFldDefn) );
+		if(FieldMergeData[i].nOp == enumGISFMOMergeBase)
+			nBaseField = FieldMergeData[i].nFieldPos;
+	}
 
 	const char *apszOptions[3] = { "CREATE_CSVT=YES", "SEPARATOR=SEMICOLON", NULL};
     wxGISTableSPtr pNewDSet = CreateTable(sPath, sName, sExt, sDriver, pNewDef, (wxGISEnumTableDatasetType)nNewSubType, NULL, (char **)apszOptions);
@@ -115,42 +120,15 @@ bool MeanValByColumn(wxGISTableSPtr pDSet, CPLString sPath, wxString sName, IGxO
         return false;
     }
 
- //   //OGRFeatureDefn *pDef = pDSet->GetDefiniton();
- //   //if(!pDef)
- //   //{
- //   //    wxString sErr(_("Error read dataset definition"));
- //   //    CPLError( CE_Failure, CPLE_AppDefined, sErr.mb_str() );
- //   //    if(pTrackCancel)
- //   //        pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
- //   //    return false;
- //   //}
-
-	//OGRFeatureSPtr poFeature = pNewDSet->CreateFeature();
-	//OGRFeatureDefn *pNewDefmmm = poFeature->GetDefnRef();
-	//int nC = pNewDefmmm->GetFieldCount();
-	//int nD = pNewDefmmm->GetFieldIndex("TMean");
-	//poFeature->SetFID(1);
-	//poFeature->SetField(1, 0.5);
-	//poFeature->SetField(2, 0.75);
-	//poFeature->SetField(3, 1.5);
-	//OGRErr eErr = pNewDSet->StoreFeature(poFeature);
-
-	//int nCounter(0);
-	//long nFidCounter(0);
 	struct Val
 	{
-		double sum; 
+		wxVariant sum; 
 		int count;
-	};
-	struct Vals
-	{
-		struct Val mean_temp;
-		double min_temp;
-		double max_temp;
-		double max_rrr;
+		OGRFieldType nType;
 	};
 
-	std::map<wxDateTime,Vals> maped_data;
+	std::map<CPLString, std::vector<Val>*> mapped_data;
+
  	OGRFeatureSPtr poFeature;
 	pDSet->Reset();
     while((poFeature = pDSet->Next()) != NULL)	
@@ -158,73 +136,275 @@ bool MeanValByColumn(wxGISTableSPtr pDSet, CPLString sPath, wxString sName, IGxO
         if(pTrackCancel && !pTrackCancel->Continue())
 			return false;
 
-		double dT = poFeature->GetFieldAsDouble(1);
-		double dTMin = poFeature->GetFieldAsDouble(13);
-		double dTMax = poFeature->GetFieldAsDouble(14);
-		double dRRR = poFeature->GetFieldAsDouble(22);
-		CPLString sDate = poFeature->GetFieldAsString(0);
-		wxDateTime dt;
-		dt.ParseFormat(wxString(sDate, wxConvLocal), wxT("%d.%m.%Y"));// %H:%M
-		if(!dt.IsValid())
-		    continue;
+		CPLString szBase = poFeature->GetFieldAsString(nBaseField);
+		bool bCreated = false;
+		if(mapped_data[szBase] == NULL)
+		{
+			mapped_data[szBase] = new std::vector<Val>;
+			bCreated = true;
+		}
+		for(size_t i = 0; i < FieldMergeData.size(); ++i)
+		{
+			OGRFieldDefn* pFldDefn = pDef->GetFieldDefn( FieldMergeData[i].nFieldPos );
+			wxVariant Val;
+			if(bCreated)
+			{
+				wxVariant DefVal;
+				switch(pFldDefn->GetType())
+				{
+				case OFTInteger:
+					DefVal = wxVariant(0);
+					break;
+				case OFTReal:
+					DefVal = wxVariant(0.0);
+					break;
+				case OFTString:
+				case OFTWideString:
+				case OFTDate:			//TODO: FIX IT
+				case OFTTime:			//TODO: FIX IT
+				case OFTDateTime:		//TODO: FIX IT
+					DefVal = wxVariant(wxT(""));
+					break;
+				case OFTIntegerList:
+				case OFTRealList:
+				case OFTStringList:
+				case OFTWideStringList:
+				case OFTBinary:
+				default:
+					DefVal = wxVariant();
+					break;
+				}
+				struct Val in_v = {DefVal, 0, pFldDefn->GetType()};
+				mapped_data[szBase]->push_back(in_v);
+			}
+			switch(pFldDefn->GetType())
+			{
+			case OFTInteger:
+				Val = wxVariant(poFeature->GetFieldAsInteger(FieldMergeData[i].nFieldPos));
+				break;
+			case OFTReal:
+				Val = wxVariant(poFeature->GetFieldAsDouble(FieldMergeData[i].nFieldPos));
+				break;
+			case OFTString:
+			case OFTWideString:
+			case OFTDate:			//TODO: FIX IT
+			case OFTTime:			//TODO: FIX IT
+			case OFTDateTime:		//TODO: FIX IT
+				Val = wxVariant(wxString(poFeature->GetFieldAsString(FieldMergeData[i].nFieldPos), wxConvLocal));
+				break;
+			case OFTIntegerList:
+			case OFTRealList:
+			case OFTStringList:
+			case OFTWideStringList:
+			case OFTBinary:
+				break;
+			}
+			switch(FieldMergeData[i].nOp)
+			{
+			case enumGISFMOMin:
+				switch(pFldDefn->GetType())
+				{
+				case OFTInteger:
+					if(Val.GetInteger() != 0 && (mapped_data[szBase]->operator [](i).sum.GetInteger() == 0 || mapped_data[szBase]->operator [](i).sum.GetInteger() > Val.GetInteger()))
+						mapped_data[szBase]->operator [](i).sum = Val;
+					break;
+				case OFTReal:
+					if(Val.GetDouble() != 0 && (mapped_data[szBase]->operator [](i).sum.GetDouble() == 0 || mapped_data[szBase]->operator [](i).sum.GetDouble() > Val.GetDouble()))
+						mapped_data[szBase]->operator [](i).sum = Val;
+					break;
+				case OFTString:
+				case OFTWideString:
+				case OFTDate:			//TODO: FIX IT
+				case OFTTime:			//TODO: FIX IT
+				case OFTDateTime:		//TODO: FIX IT
+				case OFTIntegerList:
+				case OFTRealList:
+				case OFTStringList:
+				case OFTWideStringList:
+				case OFTBinary:
+					break;
+				}
+				break;
+			case enumGISFMOMax:
+				switch(pFldDefn->GetType())
+				{
+				case OFTInteger:
+					if(Val.GetInteger() != 0 && (mapped_data[szBase]->operator [](i).sum.GetInteger() == 0 || mapped_data[szBase]->operator [](i).sum.GetInteger() < Val.GetInteger()))
+						mapped_data[szBase]->operator [](i).sum = Val;
+					break;
+				case OFTReal:
+					if(Val.GetDouble() != 0 && (mapped_data[szBase]->operator [](i).sum.GetDouble() == 0 || mapped_data[szBase]->operator [](i).sum.GetDouble() < Val.GetDouble()))
+						mapped_data[szBase]->operator [](i).sum = Val;
+					break;
+				case OFTString:
+				case OFTWideString:
+				case OFTDate:			//TODO: FIX IT
+				case OFTTime:			//TODO: FIX IT
+				case OFTDateTime:		//TODO: FIX IT
+				case OFTIntegerList:
+				case OFTRealList:
+				case OFTStringList:
+				case OFTWideStringList:
+				case OFTBinary:
+					break;
+				}
+				break;
+			case enumGISFMOMean:
+				switch(pFldDefn->GetType())
+				{
+				case OFTInteger:
+					mapped_data[szBase]->operator [](i).sum = (mapped_data[szBase]->operator [](i).sum.GetInteger() + Val.GetInteger());
+					break;
+				case OFTReal:
+					mapped_data[szBase]->operator [](i).sum = (mapped_data[szBase]->operator [](i).sum.GetDouble() + Val.GetDouble());
+					break;
+				case OFTString:
+				case OFTWideString:
+				case OFTDate:			//TODO: FIX IT
+				case OFTTime:			//TODO: FIX IT
+				case OFTDateTime:		//TODO: FIX IT
+					mapped_data[szBase]->operator [](i).sum = (mapped_data[szBase]->operator [](i).sum.MakeString() + wxT(" ") + Val.MakeString());
+					break;
+				case OFTIntegerList:
+				case OFTRealList:
+				case OFTStringList:
+				case OFTWideStringList:
+				case OFTBinary:
+					break;
+				}
+				mapped_data[szBase]->operator [](i).count++;
+				break;
+			case enumGISFMOSum:
+				switch(pFldDefn->GetType())
+				{
+				case OFTInteger:
+					mapped_data[szBase]->operator [](i).sum = (mapped_data[szBase]->operator [](i).sum.GetInteger() + Val.GetInteger());
+					break;
+				case OFTReal:
+					mapped_data[szBase]->operator [](i).sum = (mapped_data[szBase]->operator [](i).sum.GetDouble() + Val.GetDouble());
+					break;
+				case OFTString:
+				case OFTWideString:
+				case OFTDate:			//TODO: FIX IT
+				case OFTTime:			//TODO: FIX IT
+				case OFTDateTime:		//TODO: FIX IT
+					mapped_data[szBase]->operator [](i).sum = (mapped_data[szBase]->operator [](i).sum.MakeString() + wxT(" ") + Val.MakeString());
+					break;
+				case OFTIntegerList:
+				case OFTRealList:
+				case OFTStringList:
+				case OFTWideStringList:
+				case OFTBinary:
+					break;
+				}
+				break;
+			case enumGISFMOMergeBase:
+				mapped_data[szBase]->operator [](i).sum = Val;
+				break;
+			}
+		}
+		//double dT = poFeature->GetFieldAsDouble(1);
+		//double dTMin = poFeature->GetFieldAsDouble(13);
+		//double dTMax = poFeature->GetFieldAsDouble(14);
+		//double dRRR = poFeature->GetFieldAsDouble(22);
+		//CPLString sDate = poFeature->GetFieldAsString(0);
+		//wxDateTime dt;
+		//dt.ParseFormat(wxString(sDate, wxConvLocal), wxT("%d.%m.%Y"));// %H:%M
+		//if(!dt.IsValid())
+		//    continue;
 
-		maped_data[dt].mean_temp.sum += dT;
-		maped_data[dt].mean_temp.count++;
-		if(dTMin != 0 && (maped_data[dt].min_temp == 0 || maped_data[dt].min_temp > dTMin))
-			maped_data[dt].min_temp = dTMin;
-		if(dTMax != 0 && (maped_data[dt].max_temp == 0 || maped_data[dt].max_temp < dTMin))
-			maped_data[dt].max_temp = dTMax;
-		if(dRRR != 0 && (maped_data[dt].max_rrr == 0 || maped_data[dt].max_rrr < dRRR))
-			maped_data[dt].max_rrr = dRRR;
+		//maped_data[dt].mean_temp.sum += dT;
+		//maped_data[dt].mean_temp.count++;
+		//if(dTMin != 0 && (maped_data[dt].min_temp == 0 || maped_data[dt].min_temp > dTMin))
+		//	maped_data[dt].min_temp = dTMin;
+		//if(dTMax != 0 && (maped_data[dt].max_temp == 0 || maped_data[dt].max_temp < dTMin))
+		//	maped_data[dt].max_temp = dTMax;
+		//if(dRRR != 0 && (maped_data[dt].max_rrr == 0 || maped_data[dt].max_rrr < dRRR))
+		//	maped_data[dt].max_rrr = dRRR;
 		
 
-		//int year, mon, day, hour, min, sec, flag;
-		//if(poFeature->GetFieldAsDateTime(0, &year, &mon, &day, &hour, &min, &sec, &flag) == TRUE)
-  //      {
-		//    wxDateTime dt(day, wxDateTime::Month(mon - 1), year, hour, min, sec);
-  //          if(!dt.IsValid())
-		//	    continue;
-		//	dt.SetHour(0);
-		//	dt.SetMinute(0);
-		//	dt.SetSecond(0);
-		//	//dt.SetMillisecond(0);
-		//	//maped_data[dt].Vals[0].sum += 1;
-		//	//maped_data[dt].Vals[0].count += 1;
-  //      }
-		//else continue;
-
-	//	if(!GeometryVerticesToPointsDataset(poFeature->GetFID(), pGeom, pNewDSet, poCT, nFidCounter, pTrackCancel))
-	//	{
-	//		if(pTrackCancel)
-	//			pTrackCancel->PutMessage(wxString(_("Unsupported geometry type")), -1, enumGISMessageWarning);
-	//	}
-	//	else
-	//	{
-	//		if(pTrackCancel)
-	//			pTrackCancel->PutMessage(wxString::Format(_("Geometry No. %d added"), nCounter), -1, enumGISMessageInfo);
-	//	}
 	}
 
 	IProgressor* pProgress(NULL);
     if(pTrackCancel)
 		pProgress = pTrackCancel->GetProgressor();
 	if(pProgress)
-		pProgress->SetRange(maped_data.size());
+		pProgress->SetRange(mapped_data.size());
+
 	int nCounter(0);
-	for(std::map<wxDateTime,Vals>::iterator it = maped_data.begin(); it != maped_data.end(); ++it)
+	for(std::map<CPLString, std::vector<Val>*>::iterator it = mapped_data.begin(); it != mapped_data.end(); ++it)
 	{
 		if(pProgress)
 			pProgress->SetValue(nCounter);
 
 		OGRFeatureSPtr poFeature = pNewDSet->CreateFeature();
-		poFeature->SetField(0, it->first.GetYear(), it->first.GetMonth() + 1, it->first.GetDay());
-		poFeature->SetField(1, double(it->second.mean_temp.sum) / it->second.mean_temp.count);
-		poFeature->SetField(2, it->second.max_temp);
-		poFeature->SetField(3, it->second.min_temp);
-		poFeature->SetField(4, it->second.max_rrr);
+		for(size_t i = 0; i < it->second->size(); ++i)
+		{
+			wxVariant Val =  it->second->operator [](i).sum;
+			switch(FieldMergeData[i].nOp)
+			{
+			case enumGISFMOMean:
+				switch(it->second->operator [](i).nType)
+				{
+				case OFTInteger:
+					Val = (Val.GetInteger() / it->second->operator [](i).count);
+					break;
+				case OFTReal:
+					Val = (Val.GetDouble() / it->second->operator [](i).count);
+					break;
+				case OFTString:
+				case OFTWideString:
+				case OFTDate:			//TODO: FIX IT
+				case OFTTime:			//TODO: FIX IT
+				case OFTDateTime:		//TODO: FIX IT
+				case OFTIntegerList:
+				case OFTRealList:
+				case OFTStringList:
+				case OFTWideStringList:
+				case OFTBinary:
+					break;
+				}
+				break;
+			case enumGISFMOSum:
+			case enumGISFMOMin:
+			case enumGISFMOMax:
+			default:
+				break;
+			}
+
+			switch(it->second->operator [](i).nType)
+			{
+			case OFTInteger:
+				poFeature->SetField(i,Val.GetInteger());
+				break;
+			case OFTReal:
+				poFeature->SetField(i,Val.GetDouble());
+				break;
+			case OFTString:
+			case OFTWideString:
+			case OFTDate:			//TODO: FIX IT
+			case OFTTime:			//TODO: FIX IT
+			case OFTDateTime:		//TODO: FIX IT
+				poFeature->SetField(i,Val.MakeString().mb_str());
+				break;
+			case OFTIntegerList:
+			case OFTRealList:
+			case OFTStringList:
+			case OFTWideStringList:
+			case OFTBinary:
+				break;
+			}
+		//poFeature->SetField(0, it->first.GetYear(), it->first.GetMonth() + 1, it->first.GetDay());
+		//poFeature->SetField(1, double(it->second.mean_temp.sum) / it->second.mean_temp.count);
+		//poFeature->SetField(2, it->second.max_temp);
+		//poFeature->SetField(3, it->second.min_temp);
+		//poFeature->SetField(4, it->second.max_rrr);
+		}
 		OGRErr eErr = pNewDSet->StoreFeature(poFeature);
 
 		nCounter++;
+
+		wxDELETE(it->second);
 	}
 
 	return true;

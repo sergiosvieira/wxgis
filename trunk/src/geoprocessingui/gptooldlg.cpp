@@ -109,18 +109,36 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
                     m_pControlsArray.push_back(poDigit);
                 }
                 break;
-            case enumGISGPParamDTStringList:
+            case enumGISGPParamDTStringChoice:
+            case enumGISGPParamDTIntegerChoice:
+            case enumGISGPParamDTDoubleChoice:
                 {
                     wxGISDTChoice* poChoice = new wxGISDTChoice(pParam, m_pTool->GetCatalog(), m_tools);
                     bSizer4->Add( poChoice, 0, wxEXPAND, 5 );
                     m_pControlsArray.push_back(poChoice);
                 }
                 break;
-            case enumGISGPParamDTBool:
+		   case enumGISGPParamDTStringList:
+		   case enumGISGPParamDTIntegerList:
+		   case enumGISGPParamDTDoubleList:
+                {
+                    wxGISDTList* poList = new wxGISDTList(pParam, m_pTool->GetCatalog(), m_tools);
+                    bSizer4->Add( poList, 0, wxEXPAND, 5 );
+                    m_pControlsArray.push_back(poList);
+                }
+                break;
+           case enumGISGPParamDTBool:
                 {
                     wxGISDTBool* poCheck = new wxGISDTBool(pParam, m_pTool->GetCatalog(), m_tools);
                     bSizer4->Add( poCheck, 0, wxEXPAND, 5 );
                     m_pControlsArray.push_back(poCheck);
+                }
+                break;
+            case enumGISGPParamDTParamArray:
+                {
+                    wxGISDTMultiParam* poMultiParam = new wxGISDTMultiParam(pParam, m_pTool->GetCatalog(), m_tools);
+                    bSizer4->Add( poMultiParam, 0, wxEXPAND, 5 );
+                    m_pControlsArray.push_back(poMultiParam);
                 }
                 break;
             default:
@@ -287,6 +305,7 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
 {
     //TODO: Fix tools state
     event.Enable(false);
+	wxBusyCursor wait;
     //internal control validate
     for(size_t i = 0; i < m_pControlsArray.size(); i++)
     {

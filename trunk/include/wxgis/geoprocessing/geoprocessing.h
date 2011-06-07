@@ -73,12 +73,22 @@ enum wxGISEnumGPParameterDataType
 	enumGISGPParamDTInteger,
 	enumGISGPParamDTDouble,
 	enumGISGPParamDTString,
+	enumGISGPParamDTStringChoice,
+	enumGISGPParamDTIntegerChoice,
+	enumGISGPParamDTDoubleChoice,
     enumGISGPParamDTStringList,
+	enumGISGPParamDTIntegerList,
+	enumGISGPParamDTDoubleList,
 
 	enumGISGPParamDTSpatRef,
+	enumGISGPParamDTQuery,
 
 	enumGISGPParamDTPath,
-	enumGISGPParamDTPathArray
+	enumGISGPParamDTPathArray,
+
+	enumGISGPParamDTParamArray, /**< The array of IGPParameter's*/
+
+	enumGISGPParamMax
 };
 
 class IGxTask
@@ -103,8 +113,14 @@ class IGPDomain
 public:
     virtual ~IGPDomain(void){};
     virtual size_t GetCount(void) = 0;
-    virtual void SetSel(size_t nIndex) = 0;
-    virtual size_t GetSel(void) = 0;
+	virtual wxString GetName(size_t nIndex) = 0;
+	virtual wxVariant GetValue(size_t nIndex) = 0;
+	virtual int GetPosByName(wxString sName) = 0;
+	virtual int GetPosByValue(wxVariant oVal) = 0;
+    virtual wxVariant GetValueByName(wxString soNameStr) = 0;
+protected:
+	wxArrayString m_asoNames;
+	std::vector<wxVariant> m_asoData;
 };
 
 /** \class IGPParameter
@@ -136,6 +152,8 @@ public:
     virtual void SetValue(wxVariant Val) = 0;
     virtual IGPDomain* GetDomain(void) = 0;
     virtual void SetDomain(IGPDomain* pDomain) = 0;
+	virtual int GetSelDomainValue(void) = 0;
+	virtual void SetSelDomainValue(int nNewSelection) = 0;
     virtual wxString GetMessage(void) = 0;
     virtual wxGISEnumGPMessageType GetMessageType(void) = 0;
     virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString) = 0;

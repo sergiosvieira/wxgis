@@ -48,8 +48,7 @@
 #include "../../art/folder_up.xpm"
 
 #include "../../art/view-refresh.xpm"
-#include "../../art/go-previous.xpm"
-#include "../../art/go-next.xpm"
+#include "../../art/go.xpm"
 #include "../../art/properties.xpm"
 
 #include "../../art/folder_16.xpm"
@@ -87,8 +86,14 @@ wxGISCatalogMainCmd::wxGISCatalogMainCmd(void)
     m_IconFolderConn = wxIcon(folder_conn_new_xpm);
     m_IconFolderConnDel = wxIcon(folder_conn_del_xpm);
     m_IconDel = wxIcon(delete_xpm);
-    m_IconGoPrev = wxIcon(go_previous_xpm);
-    m_IconGoNext = wxIcon(go_next_xpm);
+	//
+	wxBitmap oGoOrigin(go_xpm);
+    wxImage oGoPrevious = oGoOrigin.ConvertToImage();
+    oGoPrevious = oGoPrevious.Mirror(true);
+
+    m_IconGoPrev.CopyFromBitmap(wxBitmap(oGoPrevious));
+    m_IconGoNext = wxIcon(go_xpm);
+	//
     m_IconFolderNew = wxIcon(folder_new_xpm);
     m_IconEdit = wxIcon(edit_xpm);
     m_IconViewRefresh = wxIcon(view_refresh_xpm);

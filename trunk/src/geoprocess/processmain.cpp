@@ -243,9 +243,10 @@ void wxGPTaskExecutor::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMes
 
 void wxGPTaskExecutor::SetValue(int value)
 {
-    if(m_nValue == value)
+	int nPercent = value / m_nRange * 100;
+    if(m_nValue == nPercent)
         return;
-    m_nValue = value;
-    m_pOutTxtStream->WriteString(wxString::Format(wxT("DONE: %d%%\r\n"), value));
+    m_nValue = nPercent;
+    m_pOutTxtStream->WriteString(wxString::Format(wxT("DONE: %d%%\r\n"), nPercent));
 	m_StdOutFile.Flush();
 }
