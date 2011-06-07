@@ -187,6 +187,10 @@
 				RelativePath="..\..\src\cartoui\rasterdatasetcmd.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\src\cartoui\sqlquerydialog.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -199,6 +203,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\cartoui\rasterdatasetcmd.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\cartoui\sqlquerydialog.h"
 				>
 			</File>
 		</Filter>

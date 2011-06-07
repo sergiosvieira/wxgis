@@ -202,7 +202,7 @@ protected:
 };
 
 /** \class wxGISDTList gpcontrols.h
-    \brief The tool dialog control for list of values.
+    \brief The tool dialog control the list of values.
 */
 class wxGISDTList : public wxGISDTBase
 {
@@ -216,6 +216,26 @@ public:
 	virtual wxString GetValue();
 protected:
     wxGISTextCtrl* m_TextCtrl;
+	wxBitmapButton* m_bpButton;
+    IGxCatalog* m_pCatalog;
+
+    DECLARE_EVENT_TABLE()
+};
+
+/** \class wxGISSQLQueryCtrl gpcontrols.h
+    \brief The tool dialog control SQL query representation.
+*/
+class wxGISSQLQueryCtrl : public wxGISDTBase
+{
+public:
+	wxGISSQLQueryCtrl( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+	virtual ~wxGISSQLQueryCtrl();
+//events
+    virtual void OnOpen(wxCommandEvent& event);
+    virtual bool Validate(void);
+    virtual void Update(void);
+protected:
+    wxGISTextCtrl* m_QueryTextCtrl;
 	wxBitmapButton* m_bpButton;
     IGxCatalog* m_pCatalog;
 
