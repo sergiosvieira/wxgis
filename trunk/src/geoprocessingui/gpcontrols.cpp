@@ -1177,3 +1177,207 @@ wxString wxGISDTList::GetValue()
 	}
 	return sOutput;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISSQLQueryCtrl
+///////////////////////////////////////////////////////////////////////////////
+
+BEGIN_EVENT_TABLE(wxGISSQLQueryCtrl, wxPanel)
+	EVT_BUTTON(wxID_OPEN, wxGISSQLQueryCtrl::OnOpen)
+END_EVENT_TABLE()
+
+wxGISSQLQueryCtrl::wxGISSQLQueryCtrl( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxGISDTBase( pParam, parent, id, pos, size, style )
+{
+    m_pCatalog = pCatalog;
+	wxFlexGridSizer* fgSizer1;
+	fgSizer1 = new wxFlexGridSizer( 2, 2, 0, 0 );
+	fgSizer1->AddGrowableCol( 1 );
+	fgSizer1->SetFlexibleDirection( wxBOTH );
+	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+
+    m_StateBitmap = new wxStaticBitmap( this, wxID_ANY, m_pParam->GetParameterType() == enumGISGPParameterTypeRequired ? m_ImageList.GetIcon(4) : wxNullBitmap , wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer1->Add( m_StateBitmap, 0, wxALL, 5 );
+
+    m_sParamDisplayName = new wxStaticText( this, wxID_ANY, m_pParam->GetParameterType() == enumGISGPParameterTypeOptional ? m_pParam->GetDisplayName() + _(" (optional)") : m_pParam->GetDisplayName(), wxDefaultPosition, wxDefaultSize, 0 );
+	m_sParamDisplayName->Wrap( -1 );
+	fgSizer1->Add( m_sParamDisplayName, 1, wxALL|wxEXPAND, 5 );
+
+	m_bitmap = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer1->Add( m_bitmap, 0, wxALL, 5 );
+
+	wxBoxSizer* bPathSizer;
+	bPathSizer = new wxBoxSizer( wxHORIZONTAL );
+
+    m_QueryTextCtrl = new wxGISTextCtrl( this, wxID_ANY, pParam->GetValue(), wxDefaultPosition, wxDefaultSize, wxTE_BESTWRAP );
+    //m_QueryTextCtrl->SetDropTarget(new wxFileDropTarget());
+	bPathSizer->Add( m_PathTextCtrl, 1, wxALL|wxEXPAND, 5 );
+
+	m_bpButton = new wxBitmapButton( this, wxID_OPEN, wxBitmap(open_xpm), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	bPathSizer->Add( m_bpButton, 0, wxALL, 5 );
+	fgSizer1->Add( bPathSizer, 0, wxALL|wxEXPAND, 5 );
+
+	this->SetSizer( fgSizer1 );
+	this->Layout();
+}
+
+wxGISSQLQueryCtrl::~wxGISSQLQueryCtrl()
+{
+}
+
+void wxGISSQLQueryCtrl::OnOpen(wxCommandEvent& event)
+{
+   // wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParam->GetDomain());
+   // wxFileName Name(m_pParam->GetValue().MakeString());
+
+
+   // if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
+   // {
+   //     wxGxObjectDialog dlg(this, m_pCatalog, wxID_ANY, _("Select input object"));
+   //     dlg.SetAllowMultiSelect(false);
+   //     dlg.SetAllFilters(false);
+   //     dlg.SetOwnsFilter(false);
+   //     dlg.SetName( Name.GetFullName() );
+   //     if(pDomain)
+   //     {
+   //         for(size_t i = 0; i < pDomain->GetCount(); i++)
+   //         {
+			//	if(i == m_pParam->GetSelDomainValue())
+   //                 dlg.AddFilter(pDomain->GetFilter(i), true);
+   //             else
+   //                 dlg.AddFilter(pDomain->GetFilter(i), false);
+   //         }
+   //     }
+   //     dlg.SetOverwritePrompt(false);
+   //     if(dlg.ShowModalOpen() == wxID_OK)
+   //     {
+   //         wxString sPath = dlg.GetFullPath();
+   //         //sPath.Replace(wxT("\\\\"), wxT("\\"));
+   //         //m_PathTextCtrl->ChangeValue( sPath );
+   //         m_pParam->SetAltered(true);
+			//m_pParam->SetSelDomainValue(dlg.GetCurrentFilterId());
+   //         m_pParam->SetValue(wxVariant(sPath, wxT("path")));
+   //     }
+   // }
+   // else
+   // {
+   //     wxGxObjectDialog dlg(this, m_pCatalog, wxID_ANY, _("Select output object"));
+   //     dlg.SetAllowMultiSelect(false);
+   //     dlg.SetAllFilters(false);
+   //     dlg.SetOwnsFilter(false);
+   //     dlg.SetName( Name.GetFullName() );
+   //     if(pDomain)
+   //     {
+   //         for(size_t i = 0; i < pDomain->GetCount(); i++)
+   //         {
+			//	if(i == m_pParam->GetSelDomainValue())
+   //                 dlg.AddFilter(pDomain->GetFilter(i), true);
+   //             else
+   //                 dlg.AddFilter(pDomain->GetFilter(i), false);
+   //         }
+   //     }
+   //     dlg.SetOverwritePrompt(false);
+   //     if(dlg.ShowModalSave() == wxID_OK)
+   //     {
+   //         wxString sPath = dlg.GetFullPath();
+   //         m_pParam->SetAltered(true);
+			//m_pParam->SetSelDomainValue(dlg.GetCurrentFilterId());
+   //         m_pParam->SetValue(wxVariant(sPath, wxT("path")));
+   //     }
+   // }
+}
+
+//validate
+bool wxGISSQLQueryCtrl::Validate(void)
+{
+    //if(m_pParam->GetHasBeenValidated())
+    //    return true;
+
+    //wxString sPath = m_pParam->GetValue();
+    //if(sPath.IsEmpty())
+    //{
+    //    m_pParam->SetAltered(false);
+    //    if(m_pParam->GetParameterType() != enumGISGPParameterTypeRequired)
+    //    {
+    //        m_pParam->SetIsValid(true);
+    //        m_pParam->SetMessage(wxGISEnumGPMessageNone);
+    //        return true;
+    //    }
+    //    else
+    //    {
+    //        m_pParam->SetIsValid(false);
+    //        m_pParam->SetMessage(wxGISEnumGPMessageRequired, _("The value is required"));
+    //        return false;
+    //    }
+    //}
+    //if(m_pCatalog)
+    //{
+    //    IGxObjectContainer* pGxContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
+    //    IGxObject* pGxObj = pGxContainer->SearchChild(sPath);
+    //    if(pGxObj)
+    //    {
+    //       if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
+    //       {
+    //           if(m_pParam->GetMessageType() == wxGISEnumGPMessageError)
+    //               return false;
+    //           m_pParam->SetIsValid(true);
+    //           m_pParam->SetMessage(wxGISEnumGPMessageOk);
+    //       }
+    //       else
+    //       {
+    //           if(m_pParam->GetMessageType() == wxGISEnumGPMessageError)
+    //               return false;
+    //           m_pParam->SetIsValid(true);
+    //           m_pParam->SetMessage(wxGISEnumGPMessageWarning, _("The output object exists and will be overwritten!"));
+    //       }
+    //       return true;
+    //    }
+    //    else
+    //    {
+    //       if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
+    //       {
+    //            m_pParam->SetIsValid(false);
+    //            m_pParam->SetMessage(wxGISEnumGPMessageError, _("The input object doesn't exist"));
+    //            return false;
+    //       }
+    //       else
+    //       {
+    //           if(m_pParam->GetMessageType() == wxGISEnumGPMessageError)
+    //               return false;
+
+    //           m_pParam->SetIsValid(true);
+    //           m_pParam->SetMessage(wxGISEnumGPMessageOk);
+    //           return true;
+    //       }
+    //    }
+    //}
+    return true;
+}
+
+void wxGISSQLQueryCtrl::Update(void)
+{
+ //   m_PathTextCtrl->ChangeValue( m_pParam->GetValue() );
+ //   SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
+
+ //   wxGISGPGxObjectDomain* poDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParam->GetDomain());
+	//if(poDomain && poDomain->GetCount() > 0)
+	//{
+	//	IGxObjectFilter* poFilter = poDomain->GetFilter(m_pParam->GetSelDomainValue());
+	//	wxFileName oName(m_pParam->GetValue());
+	//	if(!oName.IsOk())
+	//		return;
+
+	//	for(size_t i = 0; i < poDomain->GetCount(); i++)
+	//	{
+	//		poFilter = poDomain->GetFilter(i);
+	//		if(poFilter)
+	//		{
+	//			if(oName.GetExt().CmpNoCase(poFilter->GetExt()) == 0 || poFilter->GetExt() == wxEmptyString)
+	//			{
+	//				m_pParam->SetSelDomainValue(i);
+	//				break;
+	//			}
+	//		}
+	//	}
+ //   //Validate();
+	//}
+}
