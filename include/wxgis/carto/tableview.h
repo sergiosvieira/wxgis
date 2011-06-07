@@ -39,6 +39,9 @@
 #include "wxgis/carto/carto.h"
 #include "wxgis/datasource/table.h"
 
+#define GRID_ROW_SIZE 15
+#define GRID_COL_SIZE 20
+
 //------------------------------------------------------------------
 // wxGISTable
 //------------------------------------------------------------------
@@ -70,7 +73,7 @@ private:
 // wxGridCtrl
 //------------------------------------------------------------------
 
-class wxGridCtrl:
+class WXDLLIMPEXP_GIS_CRT wxGridCtrl:
 	public wxGrid
 {
 	DECLARE_DYNAMIC_CLASS(wxGridCtrl)
@@ -81,7 +84,7 @@ protected:
 public:
 	wxGridCtrl();
 	virtual ~wxGridCtrl(void);
-	wxGridCtrl(wxWindow* parent, const long& id);
+	wxGridCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxWANTS_CHARS, const wxString& name = wxPanelNameStr);
 
     DECLARE_EVENT_TABLE();
 };

@@ -78,7 +78,7 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
 	        m_pTreeView = new wxGxTreeView(this, TREECTRLID);
 	        if(m_pTreeView->Activate(this, pViewsChildNode))
 	        {
-		        m_mgr.AddPane(m_pTreeView, wxAuiPaneInfo().Name(wxT("tree_window")).Caption(_("Tree Pane")).BestSize(wxSize(280,128)).MinSize(wxSize(200,64)).Left().Layer(1/*2*/).Position(1).CloseButton(true));
+		        m_mgr.AddPane(m_pTreeView, wxAuiPaneInfo().Name(wxT("tree_window")).Caption(_("Tree Pane")).BestSize(wxSize(280,128)).MinSize(wxSize(200,64)).Left().Layer(1/*2*/).Position(1).CloseButton(true));//.MinimizeButton(true).MaximizeButton(true)
 		        RegisterChildWindow(m_pTreeView);
 	        }
 	        else

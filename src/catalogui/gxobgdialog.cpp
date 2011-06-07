@@ -1122,28 +1122,28 @@ bool wxGxObjectDialog::DoSaveObject(wxGISEnumSaveObjectResults Result)
             return false;
         else if(nRes == wxNO)
             m_nRetCode = wxID_CANCEL;
-        else
-        {
-            IGxObjectEdit* pObjEd = dynamic_cast<IGxObjectEdit*>(m_pCatalog->SearchChild(GetFullPath()));
-            //Delete item
-            if(!pObjEd)
-            {
-                wxMessageBox(_("Cannot delete item!"), _("Error"), wxICON_ERROR | wxOK, this);
-                return false;
-            }
+    //    else
+    //    {
+    //        IGxObjectEdit* pObjEd = dynamic_cast<IGxObjectEdit*>(m_pCatalog->SearchChild(GetFullPath()));
+    //        //Delete item
+    //        if(!pObjEd)
+    //        {
+    //            wxMessageBox(_("Cannot delete item!"), _("Error"), wxICON_ERROR | wxOK, this);
+    //            return false;
+    //        }
 
-            if(!pObjEd->CanDelete())
-            {
-                wxMessageBox(_("Cannot delete item!"), _("Error"), wxICON_ERROR | wxOK, this);
-                return false;
-            }
+    //        if(!pObjEd->CanDelete())
+    //        {
+    //            wxMessageBox(_("Cannot delete item!"), _("Error"), wxICON_ERROR | wxOK, this);
+    //            return false;
+    //        }
 
-            if(!pObjEd->Delete())
-            {
-                wxMessageBox(_("Cannot delete item!"), _("Error"), wxICON_ERROR | wxOK, this);
-                return false;
-            }
-        }
+    //        if(!pObjEd->Delete())
+    //        {
+    //            wxMessageBox(_("Cannot delete item!"), _("Error"), wxICON_ERROR | wxOK, this);
+    //            return false;
+    //        }
+    //    }
     }
     return true;
 }

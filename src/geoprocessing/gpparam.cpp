@@ -22,12 +22,17 @@
 #include "wxgis/geoprocessing/gpparam.h"
 #include "wxgis/geoprocessing/gpdomain.h"
 
+#include <wx/tokenzr.h>
+
+#define MULTI_PARAM_SEPARATOR wxString(wxT("#"))
+
 wxGISGPParameter::wxGISGPParameter()
 {
     m_bAltered = false;
     m_bHasBeenValidated = false;
     m_bIsValid = false;
     m_pDomain = NULL;
+	m_nSelection = 0;
     m_nMsgType = wxGISEnumGPMessageUnknown;
     m_sMessage = wxEmptyString;
 }
@@ -163,94 +168,79 @@ void wxGISGPParameter::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
     m_nMsgType = nType;
 }
 
+int wxGISGPParameter::GetSelDomainValue(void)
+{
+	return m_nSelection;
+}
+
+void wxGISGPParameter::SetSelDomainValue(int nNewSelection)
+{
+    m_bHasBeenValidated = false;
+	m_nSelection = nNewSelection;
+	if(m_pDomain)
+	{
+		switch(m_DataType)
+		{
+		case enumGISGPParamDTBool:
+		case enumGISGPParamDTInteger:
+		case enumGISGPParamDTDouble:
+		case enumGISGPParamDTString:
+		case enumGISGPParamDTSpatRef:
+		case enumGISGPParamDTQuery:
+			m_Value = m_pDomain->GetValue(nNewSelection);
+			break;
+		case enumGISGPParamDTStringList:
+		case enumGISGPParamDTPathArray:
+		case enumGISGPParamDTPath:
+			//TODO: change m_Value ext to filters
+			break;        
+		case enumGISGPParamDTUnknown:
+		default:
+			break;        
+		}
+	}
+}
+
 wxString wxGISGPParameter::GetAsString(void)
 {
     wxString sStrPar = m_Value.MakeString();
-    //if(m_pDomain)
-    //    sStrPar += wxString::Format(wxT("~%d"), m_pDomain->GetSel());
     return sStrPar;
 }
 
 bool wxGISGPParameter::SetFromString(wxString sParam)
 {
+	wxVariant oDomStr;
+	if(m_pDomain)
+	{
+		int nPos = m_pDomain->GetPosByValue(wxVariant(sParam));
+		if(nPos != wxNOT_FOUND)
+			SetSelDomainValue(nPos);
+	}
+
     switch(m_DataType)
     {
     case enumGISGPParamDTBool:
         m_Value = wxVariant((bool)wxAtoi(sParam));
         break;        
 	case enumGISGPParamDTInteger:
-        m_Value = wxVariant(wxAtoi(sParam));
+		m_Value = wxVariant(wxAtoi(sParam));
         break;        
 	case enumGISGPParamDTDouble:
-        m_Value = wxVariant(wxAtof(sParam));
+		m_Value = wxVariant(wxAtof(sParam));
         break;        
 	case enumGISGPParamDTString:
-        m_Value = wxVariant(sParam);
-        break;        
 	case enumGISGPParamDTSpatRef:
 	case enumGISGPParamDTPath:
+	case enumGISGPParamDTPathArray:
+    case enumGISGPParamDTStringChoice:
+	case enumGISGPParamDTIntegerChoice:
+	case enumGISGPParamDTDoubleChoice:
         m_Value = wxVariant(sParam);
-        if(m_pDomain)
-        {
-            wxString sVal = wxVariant(sParam);
-            if(!sVal.IsEmpty())
-            {
-                wxGISGPGxObjectDomain* poDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pDomain);
-                wxFileName oName(sVal);
-                for(size_t i = 0; i < poDomain->GetCount(); i++)
-                {
-                    IGxObjectFilter* poFilter = poDomain->GetFilter(i);
-                    if(poFilter)
-                    {
-                        if(oName.GetExt().CmpNoCase(poFilter->GetExt()) == 0 || poFilter->GetExt() == wxEmptyString)
-                        {
-                            poDomain->SetSel(i);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
         break;        
     case enumGISGPParamDTStringList:
-        m_Value = wxVariant(sParam);
-        if(m_pDomain)
-        {
-            wxString sVal = wxVariant(sParam);
-            wxGISGPStringDomain* poDomain = dynamic_cast<wxGISGPStringDomain*>(m_pDomain);
-            for(size_t i = 0; i < poDomain->GetCount(); i++)
-            {
-                if(poDomain->GetInternalString(i) == sVal)
-                {
-                    poDomain->SetSel(i);
-                    break;
-                }
-            }
-        }
-        break;        
-	case enumGISGPParamDTPathArray:
-        m_Value = wxVariant(sParam);
-        if(m_pDomain)
-        {
-            wxString sVal = wxVariant(sParam);
-            if(!sVal.IsEmpty())
-            {
-                wxGISGPGxObjectDomain* poDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pDomain);
-                wxFileName oName(sVal);
-                for(size_t i = 0; i < poDomain->GetCount(); i++)
-                {
-                    IGxObjectFilter* poFilter = poDomain->GetFilter(i);
-                    if(poFilter)
-                    {
-                        if(oName.GetExt().CmpNoCase(poFilter->GetExt()) == 0 || poFilter->GetExt() == wxEmptyString)
-                        {
-                            poDomain->SetSel(i);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+	case enumGISGPParamDTIntegerList:
+	case enumGISGPParamDTDoubleList:
+		m_Value = wxStringTokenize(sParam, wxT(";"), wxTOKEN_RET_EMPTY);
         break;        
     case enumGISGPParamDTUnknown:
     default:
@@ -260,3 +250,127 @@ bool wxGISGPParameter::SetFromString(wxString sParam)
     return true;
 }
 
+//--------------------------------------------------------------------------------
+// wxGISGPMultiParameter
+//--------------------------------------------------------------------------------
+
+wxGISGPMultiParameter::wxGISGPMultiParameter() : wxGISGPParameter()
+{
+}
+
+wxGISGPMultiParameter::~wxGISGPMultiParameter(void)
+{
+	Clear();
+}
+
+void wxGISGPMultiParameter::AddColumn(wxString sName)
+{
+	size_t nRowCount = GetRowCount();
+	m_saColumnNames.Add(sName);
+	size_t nColCount = GetColumnCount();
+	for(size_t i = 0; i < nRowCount; ++i)
+	{
+		size_t nPos = i + nColCount;
+		m_paParameters.insert(m_paParameters.begin() + nPos, NULL);
+	}
+}
+
+void wxGISGPMultiParameter::RemoveColumn(size_t nIndex)
+{
+	size_t nOldColCount = GetColumnCount();
+	size_t nRowCount = GetRowCount() - 1;
+	for(size_t i = nRowCount; i >= 0; --i)
+	{
+		size_t nPos = i * nOldColCount + nIndex;
+		m_paParameters.erase(m_paParameters.begin() + nPos);
+	}
+	m_saColumnNames.RemoveAt(nIndex);
+}
+
+size_t wxGISGPMultiParameter::GetColumnCount(void)
+{
+	return m_saColumnNames.GetCount();
+}
+
+size_t wxGISGPMultiParameter::GetRowCount(void)
+{
+	if(GetColumnCount() == 0)
+		return 0;
+	return m_paParameters.size() / GetColumnCount();
+}
+
+void wxGISGPMultiParameter::AddParameter(size_t nColIndex, size_t nRowIndex, IGPParameter* pParam)
+{
+	wxCHECK(pParam); 
+	long nPos = nRowIndex * GetColumnCount() + nColIndex;
+	if(m_paParameters.size() <= nPos)
+	{
+		while(m_paParameters.size() <= nPos)
+			m_paParameters.push_back(NULL);
+	}
+	m_paParameters[nPos] = pParam;
+}
+
+wxGISEnumGPParameterDataType wxGISGPMultiParameter::GetDataType(void)
+{
+	return enumGISGPParamDTParamArray;
+}
+
+wxString wxGISGPMultiParameter::GetAsString(void)
+{
+	wxString sOutputStr;
+	for(size_t i = 0; i < m_paParameters.size(); ++i)
+		sOutputStr += m_paParameters[i]->GetAsString() + MULTI_PARAM_SEPARATOR;
+	return sOutputStr;
+}
+
+bool wxGISGPMultiParameter::SetFromString(wxString sParam)
+{
+	wxArrayString saParams = wxStringTokenize(sParam, MULTI_PARAM_SEPARATOR, wxTOKEN_RET_EMPTY);
+	for(size_t i = 0 ; i < saParams.GetCount(); ++i)
+	{
+		wxGISGPParameter* pParam = new wxGISGPParameter();
+		if(pParam->SetFromString(saParams[i]))
+			m_paParameters.push_back(pParam);
+		else
+		{
+			wxDELETE(pParam)
+			return false;
+		}
+	}
+	return true;
+}
+
+wxString wxGISGPMultiParameter::GetColumnName(size_t nIndex)
+{
+	wxASSERT_MSG(nIndex < m_saColumnNames.size(), wxT("Column name index is greate than column count!"));
+	return m_saColumnNames[nIndex];
+}
+
+bool wxGISGPMultiParameter::GetIsValid(void)
+{
+	for(size_t i = 0; i < m_paParameters.size(); ++i)
+		if(!m_paParameters[i]->GetIsValid())
+			return false;
+	return true;
+}
+
+void wxGISGPMultiParameter::SetIsValid(bool bIsValid)
+{
+	for(size_t i = 0; i < m_paParameters.size(); ++i)
+		m_paParameters[i]->SetIsValid(bIsValid);
+}
+
+IGPParameter* wxGISGPMultiParameter::GetParameter(size_t nCol, size_t nRow)
+{
+	long nPos = nRow * GetColumnCount() + nCol;
+	return m_paParameters[nPos];
+}
+
+void wxGISGPMultiParameter::Clear()
+{
+	for(size_t i = 0; i < m_paParameters.size(); ++i)
+		wxDELETE(m_paParameters[i])
+		m_paParameters.clear();
+	//m_saColumnNames.Clear();
+}

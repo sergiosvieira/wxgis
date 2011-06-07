@@ -1,6 +1,6 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Toolbox)
- * Purpose:  main table analysis functions.
+ * Project:  wxGIS (GIS Catalog)
+ * Purpose:  catalog operations.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
@@ -19,27 +19,28 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#pragma once
+#include "wxgis/catalog/catop.h"
 
-#include "wxgis/geoprocessing/geoprocessing.h"
-#include "wxgis/datasource/table.h"
-
-enum wxGISFieldMergeOperator
+bool OverWriteGxObject(IGxObject* pGxObject, ITrackCancel* pTrackCancel)
 {
-	enumGISFMONone,
-	enumGISFMOMergeBase,
-	enumGISFMOMean,
-	enumGISFMOMin,
-	enumGISFMOMax,
-	enumGISFMOSum
-};
-
-typedef struct _FieldMergeData
-{
-	//CPLString sFieldName;
-	int nFieldPos;
-	wxGISFieldMergeOperator nOp;
-} FIELDMERGEDATA;
-
-wxGISTableSPtr WXDLLIMPEXP_GIS_GP CreateTable(CPLString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *poFields, wxGISEnumTableDatasetType nType = enumTableUnknown, char ** papszDataSourceOptions = NULL, char ** papszLayerOptions = NULL);
-bool WXDLLIMPEXP_GIS_GP MeanValByColumn(wxGISTableSPtr pDSet, CPLString sPath, wxString sName, std::vector<FIELDMERGEDATA> &FieldMergeData, IGxObjectFilter* pFilter, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel);
+    IGxObjectEdit* pGxDstObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject);
+    if(pGxDstObjectEdit)
+    {
+        //add messages to pTrackCancel
+		if(pTrackCancel)
+			pTrackCancel->PutMessage(_("Overwrite destination object"), -1, enumGISMessageInfo);
+		if(!pGxDstObjectEdit->CanDelete() || !pGxDstObjectEdit->Delete())
+		{
+			if(pTrackCancel)
+				pTrackCancel->PutMessage(_("Failed overwrite destination object"), -1, enumGISMessageErr);
+			return false;
+		}
+    }
+	else
+	{
+		if(pTrackCancel)
+			pTrackCancel->PutMessage(_("Cannot delete item!"), -1, enumGISMessageErr);
+        return false;
+	}
+	return true;
+}

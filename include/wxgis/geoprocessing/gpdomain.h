@@ -3,7 +3,7 @@
  * Purpose:  geoprocessing tool parameters domains.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -25,47 +25,36 @@
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/catalog/gxfilters.h"
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISGPGxObjectDomain
-///////////////////////////////////////////////////////////////////////////////
+/** \class wxGISGPValueDomain gpdomain.h
+    \brief The domain storing variant values
+*/
+class WXDLLIMPEXP_GIS_GP wxGISGPValueDomain : public IGPDomain
+{
+public:
+	wxGISGPValueDomain(void);
+	virtual ~wxGISGPValueDomain (void);
+	virtual void AddValue(const wxVariant& Element, wxString soNameStr);
+	virtual size_t GetCount(void);
+	virtual wxVariant GetValue(size_t nIndex);
+	virtual wxString GetName(size_t nIndex);
+	//
+    virtual wxVariant GetValueByName(wxString soNameStr);
+	virtual int GetPosByName(wxString sName);
+	virtual int GetPosByValue(wxVariant oVal);
+};
 
-class WXDLLIMPEXP_GIS_GP wxGISGPGxObjectDomain : public IGPDomain
+/** \class wxGISGPGxObjectDomain gpdomain.h
+    \brief The domain storing GxObjectFilters
+*/
+
+class WXDLLIMPEXP_GIS_GP wxGISGPGxObjectDomain : public wxGISGPValueDomain
 {
 public:
     wxGISGPGxObjectDomain (void);
     virtual ~wxGISGPGxObjectDomain (void);
-	virtual void AddFilter(IGxObjectFilter* pFilter);
     virtual IGxObjectFilter* GetFilter(size_t nIndex);
-    virtual size_t GetCount(void);
-    virtual void SetSel(size_t nIndex);
-    virtual size_t GetSel(void);
-protected:
-	OBJECTFILTERS m_FilterArray;
-    size_t m_nSelFilterIndex;
-};
-
-
-/** \class wxGISGPStringDomain gpdomain.h
-    \brief The domain storing strings
-*/
-class WXDLLIMPEXP_GIS_GP wxGISGPStringDomain : public IGPDomain
-{
-public:
-    wxGISGPStringDomain (void);
-    virtual ~wxGISGPStringDomain (void);
-	virtual void AddString(wxString soStr, wxString soInternalStr = wxEmptyString);
-    virtual size_t GetCount(void);
-    virtual wxString GetInternalString(size_t dIndex);
-    virtual wxString GetExternalString(size_t dIndex);
-    virtual wxString GetInternalString(wxString soInternalStr);
-    virtual wxString GetExternalString(wxString soStr);
-    virtual wxArrayString GetArrayString() const;
-    virtual void SetSel(size_t nIndex);
-    virtual size_t GetSel(void);
-protected:
-	wxArrayString m_asoData;
-	wxArrayString m_asoInternalData;
-    size_t m_nSelIndex;
+	virtual void AddFilter(IGxObjectFilter* pFilter);
+	virtual int GetPosByValue(wxVariant oVal);
 };
 
 inline void WXDLLIMPEXP_GIS_GP AddAllVectorFilters(wxGISGPGxObjectDomain* pDomain)
@@ -88,3 +77,17 @@ inline void WXDLLIMPEXP_GIS_GP AddAllRasterFilters(wxGISGPGxObjectDomain* pDomai
     pDomain->AddFilter(new wxGxRasterFilter(enumRasterPng));
     pDomain->AddFilter(new wxGxRasterFilter(enumRasterGif));
 }
+
+/** \class wxGISGPStringDomain gpdomain.h
+    \brief The domain storing strings
+*/
+class WXDLLIMPEXP_GIS_GP wxGISGPStringDomain : public wxGISGPValueDomain
+{
+public:
+    wxGISGPStringDomain (void);
+    virtual ~wxGISGPStringDomain (void);
+	virtual void AddString(wxString soStr, wxString soNameStr = wxEmptyString);
+    virtual wxString GetString(size_t nIndex);
+};
+
+

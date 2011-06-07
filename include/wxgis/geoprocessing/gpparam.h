@@ -59,6 +59,8 @@ public:
     virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString);
 	virtual wxString GetAsString(void);
     virtual bool SetFromString(wxString sParam);
+	virtual int GetSelDomainValue(void);
+	virtual void SetSelDomainValue(int nNewSelection);
 protected:
     bool m_bAltered;
     bool m_bHasBeenValidated;
@@ -72,5 +74,35 @@ protected:
     IGPDomain* m_pDomain;
     wxString m_sMessage;
     wxGISEnumGPMessageType m_nMsgType;
+	int m_nSelection;
     //wxArrayString m_ParamDepStr;
+};
+
+/** \class wxGISGPMultiParameter gpparam.h
+ *  \brief A Geoprocessing tools multiparameter class.
+ *
+ *  This class store parameters in array. In tool dialog it show the grid filled with parmeter data.
+ */
+class wxGISGPMultiParameter : public wxGISGPParameter
+{
+public:
+	wxGISGPMultiParameter(void);
+    virtual ~wxGISGPMultiParameter(void);
+	virtual void AddColumn(wxString sName);
+	virtual void RemoveColumn(size_t nIndex);
+	virtual size_t GetColumnCount(void);
+	virtual wxString GetColumnName(size_t nIndex);
+	virtual size_t GetRowCount(void);
+	virtual void AddParameter(size_t nColIndex, size_t nRowIndex, IGPParameter* pParam);
+    virtual bool GetIsValid(void);
+    virtual void SetIsValid(bool bIsValid);
+	virtual void Clear();
+    //wxGISGPParameter
+    virtual wxGISEnumGPParameterDataType GetDataType(void);
+	virtual wxString GetAsString(void);
+    virtual bool SetFromString(wxString sParam);
+	virtual IGPParameter* GetParameter(size_t nCol, size_t nRow);
+protected:
+	GPParameters m_paParameters;
+	wxArrayString m_saColumnNames;
 };

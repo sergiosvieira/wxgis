@@ -116,8 +116,8 @@ wxGridCtrl::wxGridCtrl()
 {
 }
 
-wxGridCtrl::wxGridCtrl(wxWindow* parent, const long& id) :
-    wxGrid(parent,id,wxDefaultPosition,wxDefaultSize)
+wxGridCtrl::wxGridCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name) :
+    wxGrid(parent, id, pos, size, style, name)
 {
 }
 
@@ -209,12 +209,12 @@ bool wxGISTableView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 	// Columns
 	m_grid->EnableDragColMove( false );
 	m_grid->EnableDragColSize( true );
-	m_grid->SetColLabelSize( 20 );
+	m_grid->SetColLabelSize( GRID_COL_SIZE );
 	m_grid->SetColLabelAlignment( wxALIGN_CENTRE, wxALIGN_CENTRE );
 
 	// Rows
 	m_grid->EnableDragRowSize( true );
-	m_grid->SetRowLabelSize( 15 );
+	m_grid->SetRowLabelSize( GRID_ROW_SIZE );
 	m_grid->SetRowLabelAlignment( wxALIGN_CENTRE, wxALIGN_CENTRE );
 
 	// Label Appearance

@@ -22,6 +22,7 @@
 
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/geoprocessing/geoprocessing.h"
+#include "wxgis/carto/tableview.h"
 
 #include <wx/intl.h>
 #include <wx/bitmap.h>
@@ -37,6 +38,7 @@
 #include <wx/choice.h>
 #include <wx/sizer.h>
 #include <wx/panel.h>
+#include <wx/grid.h>
 
 #include  "wx/imaglist.h"
 
@@ -118,7 +120,7 @@ class wxGISDTChoice : public wxGISDTBase
 {
     enum
 	{
-		ID_CHOICESTR = wxID_HIGHEST + 3600
+		ID_CHOICESTR = wxID_HIGHEST + 3605
 	};
 public:
 	wxGISDTChoice( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
@@ -168,6 +170,52 @@ public:
     virtual void Update(void);
 protected:
     wxTextCtrl* m_PathTextCtrl;
+	wxBitmapButton* m_bpButton;
+    IGxCatalog* m_pCatalog;
+
+    DECLARE_EVENT_TABLE()
+};
+
+/** \class wxGISDTMultiParam gpcontrols.h
+    \brief The tool dialog control for multiple parameters.
+
+	The multiple parameters stores in grid.
+*/
+class wxGISDTMultiParam : public wxGISDTBase
+{
+	enum
+	{
+		ID_PPCTRL = wxID_HIGHEST + 3607
+	};
+public:
+	wxGISDTMultiParam( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+	virtual ~wxGISDTMultiParam();
+//events
+    virtual bool Validate(void);
+    virtual void Update(void);
+	virtual void OnCellChange(wxGridEvent &event);
+protected:
+	wxGrid* m_pg;
+    IGxCatalog* m_pCatalog;
+
+    DECLARE_EVENT_TABLE()
+};
+
+/** \class wxGISDTList gpcontrols.h
+    \brief The tool dialog control for list of values.
+*/
+class wxGISDTList : public wxGISDTBase
+{
+public:
+	wxGISDTList( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+	virtual ~wxGISDTList();
+//events
+    virtual void OnAdd(wxCommandEvent& event);
+    virtual bool Validate(void);
+    virtual void Update(void);
+	virtual wxString GetValue();
+protected:
+    wxGISTextCtrl* m_TextCtrl;
 	wxBitmapButton* m_bpButton;
     IGxCatalog* m_pCatalog;
 

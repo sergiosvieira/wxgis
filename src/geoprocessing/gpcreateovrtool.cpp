@@ -23,7 +23,7 @@
 #include "wxgis/geoprocessing/gpdomain.h"
 #include "wxgis/geoprocessing/gpparam.h"
 #include "wxgis/catalog/gxfilters.h"
-#include "wxgis/datasource/rasterdataset.h"
+#include "wxgis/datasource/rasterop.h"
 
 /////////////////////////////////////////////////////////////////////////
 // wxGISGPOrthoCorrectTool
@@ -79,7 +79,7 @@ GPParameters* wxGISGPCreateOverviewsTool::GetParameterInfo(void)
         pParam2->SetName(wxT("interpol_type"));
         pParam2->SetDisplayName(_("Pixel interpolation"));
         pParam2->SetParameterType(enumGISGPParameterTypeOptional);
-        pParam2->SetDataType(enumGISGPParamDTStringList);
+        pParam2->SetDataType(enumGISGPParamDTStringChoice);
         pParam2->SetDirection(enumGISGPParameterDirectionInput);
 
         wxGISGPStringDomain* pDomain2 = new wxGISGPStringDomain();
@@ -102,7 +102,7 @@ GPParameters* wxGISGPCreateOverviewsTool::GetParameterInfo(void)
         pParam3->SetName(wxT("compression"));
         pParam3->SetDisplayName(_("Overview compression"));
         pParam3->SetParameterType(enumGISGPParameterTypeOptional);
-        pParam3->SetDataType(enumGISGPParamDTStringList);
+        pParam3->SetDataType(enumGISGPParamDTStringChoice);
         pParam3->SetDirection(enumGISGPParameterDirectionInput);
 
         wxGISGPStringDomain* pDomain3 = new wxGISGPStringDomain();
@@ -119,6 +119,14 @@ GPParameters* wxGISGPCreateOverviewsTool::GetParameterInfo(void)
         m_pParamArr.push_back(pParam3);
 
         //levels
+        wxGISGPParameter* pParam4 = new wxGISGPParameter();
+        pParam4->SetName(wxT("ovr_levels"));
+        pParam4->SetDisplayName(_("Overview levels"));
+        pParam4->SetParameterType(enumGISGPParameterTypeRequired);
+        pParam4->SetDataType(enumGISGPParamDTIntegerList);
+        pParam4->SetDirection(enumGISGPParameterDirectionInput);
+
+        m_pParamArr.push_back(pParam4);
 
         //PHOTOMETRIC_OVERVIEW {RGB,YCBCR,MINISBLACK,MINISWHITE,CMYK,CIELAB,ICCLAB,ITULAB}
         //INTERLEAVE_OVERVIEW {PIXEL|BAND}.
@@ -133,33 +141,81 @@ GPParameters* wxGISGPCreateOverviewsTool::GetParameterInfo(void)
 
 bool wxGISGPCreateOverviewsTool::Validate(void)
 {
+    wxString sPath = m_pParamArr[0]->GetValue();
+	if(sPath.CmpNoCase(m_sInputPath) != 0)
+    {
+        if(m_pParamArr[0]->GetIsValid())
+        {
+			//fill fields list
+			IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
+			if(!pGxObjectContainer)
+			{
+				m_pParamArr[0]->SetIsValid(false);
+				m_pParamArr[0]->SetMessage(wxGISEnumGPMessageError, _("The GxCatalog is undefined type (not inherited from IGxObjectContainer)"));
+				return false;
+			}
+			IGxObject* pGxObject = pGxObjectContainer->SearchChild(sPath);
+			if(!pGxObject)
+			{
+				m_pParamArr[0]->SetIsValid(false);
+				m_pParamArr[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("There is no GxObject for path %s"), sPath.c_str()));
+				return false;
+			}
+			IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pGxObject);
+			if(!pGxDataset)
+			{
+				m_pParamArr[0]->SetIsValid(false);
+				m_pParamArr[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("The input path is not GxDataset (Path %s)"), sPath.c_str()));
+				return false;
+			}
+           	wxGISRasterDatasetSPtr pSrcRaster = boost::dynamic_pointer_cast<wxGISRasterDataset>(pGxDataset->GetDataset());
+			if(!pSrcRaster)
+			{
+				m_pParamArr[0]->SetIsValid(false);
+				m_pParamArr[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("The input path is not RasterDataset (Path %s)"), sPath.c_str()));
+				return false;
+			}
+			if(!pSrcRaster->IsOpened())
+			{
+				if(!pSrcRaster->Open(true))
+				{
+					m_pParamArr[0]->SetIsValid(false);
+					m_pParamArr[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("Failed open input path: %s)"), sPath.c_str()));
+					return false;
+				}
+			}
 
-    //autogen levels
-         //   int nSize = MIN(pwxGISRasterDataset->GetHeight(), pwxGISRasterDataset->GetWidth());
-         //   int anOverviewList[25] = {0};
-         //   int nLevel(1);
-         //   int nLevelCount(0);
-         //   while(1)
-         //   {
-         //       nSize /= 2;
-         //       if(nSize < 20)
-         //           break;
-         //       nLevel *= 2;
-         //       if(nLevel != 2)
-         //       {
-         //           anOverviewList[nLevelCount] = nLevel;
-         //           nLevelCount++;
-         //       }
-         //   }
-	        ////int anOverviewList[8] = { 4, 8, 16, 32, 64, 128, 256, 512 };
+            int anOverviewList[25] = {0};
+            int nLevelCount = GetOverviewLevels(pSrcRaster, anOverviewList);
+			wxArrayString saLevels;
+			for(size_t i = 0; i < nLevelCount; ++i)
+				saLevels.Add(wxString::Format(wxT("%d"), anOverviewList[i]));
 
-    //return m_pParamArr[0]->GetIsValid();
+			m_pParamArr[3]->SetValue(saLevels);
+			m_pParamArr[3]->SetAltered(true);
+
+			m_sInputPath = sPath;
+		}
+    }
+    if(m_pParamArr[3]->GetAltered())
+    {
+		if(m_pParamArr[3]->GetValue().GetArrayString().GetCount() <= 0)
+		{
+            m_pParamArr[3]->SetIsValid(false);
+			m_pParamArr[3]->SetMessage(wxGISEnumGPMessageError, wxString(_("The levels list is empty")));
+            return false;
+		}
+		else
+		{
+            m_pParamArr[3]->SetIsValid(true);
+			m_pParamArr[3]->SetMessage(wxGISEnumGPMessageOk);
+		}
+	}
+    return true;
    
     //PHOTOMETRIC_OVERVIEW {RGB,YCBCR,MINISBLACK,MINISWHITE,CMYK,CIELAB,ICCLAB,ITULAB}    
     //INTERLEAVE_OVERVIEW {PIXEL|BAND}
     //JPEG_QUALITY_OVERVIEW
-
-    return true;
 }
 
 bool wxGISGPCreateOverviewsTool::Execute(ITrackCancel* pTrackCancel)
@@ -207,7 +263,7 @@ bool wxGISGPCreateOverviewsTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
 	if(!pSrcDataSet->IsOpened())
-		if(!pSrcDataSet->Open(true));
+		if(!pSrcDataSet->Open(true))
 			return false;
 
     GDALDataset* poGDALDataset = pSrcDataSet->GetRaster();
@@ -216,7 +272,6 @@ bool wxGISGPCreateOverviewsTool::Execute(ITrackCancel* pTrackCancel)
         //add messages to pTrackCancel
         if(pTrackCancel)
             pTrackCancel->PutMessage(_("Error getting raster"), -1, enumGISMessageErr);
-        //wsDELETE(pSrcDataSet);
         return false;
     }
 
@@ -232,22 +287,14 @@ bool wxGISGPCreateOverviewsTool::Execute(ITrackCancel* pTrackCancel)
     else
         CPLSetConfigOption( "USE_RRD", "NO" );
 
-    int nSize = MIN(pSrcDataSet->GetHeight(), pSrcDataSet->GetWidth());
+	wxArrayString saLevels = m_pParamArr[3]->GetValue().GetArrayString();
     int anOverviewList[25] = {0};
-    int nLevel(1);
-    int nLevelCount(0);
-    while(1)
-    {
-        nSize /= 2;
-        if(nSize < 20)
-            break;
-        nLevel *= 2;
-        if(nLevel != 2)
-        {
-            anOverviewList[nLevelCount] = nLevel;
-            nLevelCount++;
-        }
-    }
+    int nLevelCount = saLevels.GetCount();
+	for(size_t i = 0; i < saLevels.GetCount(); ++i)
+	{
+		int nLevel = wxAtoi(saLevels[i]);
+		anOverviewList[i] = nLevel;
+	}
 
     CPLErr eErr = poGDALDataset->BuildOverviews( wgWX2MB(sResampleMethod), nLevelCount, anOverviewList, 0, NULL, ExecToolProgress, (void*)pTrackCancel );
     if(eErr != CE_None)
@@ -257,12 +304,10 @@ bool wxGISGPCreateOverviewsTool::Execute(ITrackCancel* pTrackCancel)
             const char* pszErr = CPLGetLastErrorMsg();
             pTrackCancel->PutMessage(wxString::Format(_("BuildOverviews failed! GDAL error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
         }
-        //wsDELETE(pSrcDataSet);
         return false;
     }
 
     pSrcDataSet->SetHasOverviews(true);
-    //wsDELETE(pSrcDataSet);
 
     return true;
 }
