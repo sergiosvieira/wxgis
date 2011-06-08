@@ -75,23 +75,31 @@ GPParameters* wxGISGPExportTool::GetParameterInfo(void)
 
         m_pParamArr.push_back(pParam1);
 
-        //TODO: SQL statement
+        //SQL statement
+        wxGISGPParameter* pParam2 = new wxGISGPParameter();
+        pParam2->SetName(wxT("sql_statement"));
+        pParam2->SetDisplayName(_("SQL statement"));
+        pParam2->SetParameterType(enumGISGPParameterTypeOptional);
+        pParam2->SetDataType(enumGISGPParamDTQuery);
+        pParam2->SetDirection(enumGISGPParameterDirectionInput);
+
+        m_pParamArr.push_back(pParam2);
 
         //dst path
-        wxGISGPParameter* pParam2 = new wxGISGPParameter();
-        pParam2->SetName(wxT("dst_path"));
-        pParam2->SetDisplayName(_("Destination feature class"));
-        pParam2->SetParameterType(enumGISGPParameterTypeRequired);
-        pParam2->SetDataType(enumGISGPParamDTPath);
-        pParam2->SetDirection(enumGISGPParameterDirectionOutput);
+        wxGISGPParameter* pParam3 = new wxGISGPParameter();
+        pParam3->SetName(wxT("dst_path"));
+        pParam3->SetDisplayName(_("Destination feature class"));
+        pParam3->SetParameterType(enumGISGPParameterTypeRequired);
+        pParam3->SetDataType(enumGISGPParamDTPath);
+        pParam3->SetDirection(enumGISGPParameterDirectionOutput);
 
-        wxGISGPGxObjectDomain* pDomain2 = new wxGISGPGxObjectDomain();
-        AddAllVectorFilters(pDomain2);
-        pParam2->SetDomain(pDomain2);
+        wxGISGPGxObjectDomain* pDomain3 = new wxGISGPGxObjectDomain();
+        AddAllVectorFilters(pDomain3);
+        pParam3->SetDomain(pDomain3);
 
         //pParam2->AddParameterDependency(wxT("src_path"));
 
-        m_pParamArr.push_back(pParam2);
+        m_pParamArr.push_back(pParam3);
 
     }
     return &m_pParamArr;

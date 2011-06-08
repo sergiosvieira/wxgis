@@ -141,6 +141,13 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
                     m_pControlsArray.push_back(poMultiParam);
                 }
                 break;
+            case enumGISGPParamDTQuery:
+                {
+					wxGISSQLQueryCtrl* poSQLQueryParam = new wxGISSQLQueryCtrl(pParam, m_pTool->GetCatalog(), m_tools);
+                    bSizer4->Add( poSQLQueryParam, 0, wxEXPAND, 5 );
+                    m_pControlsArray.push_back(poSQLQueryParam);
+                }
+                break;
             default:
                 m_pControlsArray.push_back(NULL);
                 break;

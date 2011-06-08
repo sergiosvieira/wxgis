@@ -40,7 +40,7 @@
 /** \class wxGISSQLQueryDialog sqlquerydialog.h
     \brief The SQL Query construct dialog.
 */
-class wxGISSQLQueryDialog : public wxDialog 
+class WXDLLIMPEXP_GIS_CTU wxGISSQLQueryDialog : public wxDialog 
 {
 private:
 
