@@ -24,6 +24,7 @@
 #include "wxgis/catalogui/gxobjdialog.h"
 #include "wxgis/catalogui/gxfileui.h"
 #include "wxgis/framework/messagedlg.h"
+#include "wxgis/cartoui/sqlquerydialog.h"
 
 #include "wx/dnd.h"
 #include "wx/valgen.h"
@@ -34,6 +35,7 @@
 #include "../../art/state.xpm"
 #include "../../art/open.xpm"
 #include "../../art/add_to_list.xpm"
+#include "../../art/querysql.xpm"
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1210,9 +1212,9 @@ wxGISSQLQueryCtrl::wxGISSQLQueryCtrl( IGPParameter* pParam, IGxCatalog* pCatalog
 
     m_QueryTextCtrl = new wxGISTextCtrl( this, wxID_ANY, pParam->GetValue(), wxDefaultPosition, wxDefaultSize, wxTE_BESTWRAP );
     //m_QueryTextCtrl->SetDropTarget(new wxFileDropTarget());
-	bPathSizer->Add( m_PathTextCtrl, 1, wxALL|wxEXPAND, 5 );
+	bPathSizer->Add( m_QueryTextCtrl, 1, wxALL|wxEXPAND, 5 );
 
-	m_bpButton = new wxBitmapButton( this, wxID_OPEN, wxBitmap(open_xpm), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	m_bpButton = new wxBitmapButton( this, wxID_OPEN, wxBitmap(querysql_xpm), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	bPathSizer->Add( m_bpButton, 0, wxALL, 5 );
 	fgSizer1->Add( bPathSizer, 0, wxALL|wxEXPAND, 5 );
 
@@ -1226,6 +1228,8 @@ wxGISSQLQueryCtrl::~wxGISSQLQueryCtrl()
 
 void wxGISSQLQueryCtrl::OnOpen(wxCommandEvent& event)
 {
+	wxGISSQLQueryDialog dlg(this);
+	dlg.ShowModal();
    // wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParam->GetDomain());
    // wxFileName Name(m_pParam->GetValue().MakeString());
 

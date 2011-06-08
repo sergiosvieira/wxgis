@@ -126,7 +126,7 @@ wxGISSQLQueryDialog::wxGISSQLQueryDialog( wxWindow* parent, wxWindowID id, const
 	
 	gSizer3->Add( m_UnderLineButton, 0, wxALL, 5 );
 	
-	m_button28 = new wxButton( this, wxID_ANY, _("()"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button28 = new wxButton( this, wxID_ANY, _("( )"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_button28->SetMinSize( wxSize( 40,-1 ) );
 	
 	gSizer3->Add( m_button28, 0, wxALL, 5 );

@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(BOOST_ROOT)&quot;;&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CRT"
+				PreprocessorDefinitions="WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CTU"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
