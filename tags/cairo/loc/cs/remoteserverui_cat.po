@@ -1,0 +1,183 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wxGIS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-02-21 22:11+0300\n"
+"PO-Revision-Date: 2011-04-16 00:33+0100\n"
+"Last-Translator: Jan Helebrant <jhelebrant@seznam.cz>\n"
+"Language-Team: Juhele <www.juhele.webnode.cz>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-Language: Czech\n"
+"X-Poedit-Country: CZECH REPUBLIC\n"
+"X-Poedit-SearchPath-0: D:\\work\\Projects\\wxGIS\\include\\wxgis\\remoteserverui\n"
+"X-Poedit-SearchPath-1: D:\\work\\Projects\\wxGIS\\src\\remoteserverui\n"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/createnetworkconndlg.cpp:83
+#, c-format
+msgid ""
+"%s\n"
+"Create network connection failed!"
+msgstr ""
+"%s\n"
+"Selhalo vytvoření síťového připojení!"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/createnetworkconndlg.cpp:83
+#: D:\work\Projects\wxGIS\src\remoteserverui/gxremoteserverui.cpp:91
+#: D:\work\Projects\wxGIS\src\remoteserverui/gxremoteserverui.cpp:95
+#: D:\work\Projects\wxGIS\src\remoteserverui/gxremoteserverui.cpp:147
+msgid "Error"
+msgstr "Chyba"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/createnetworkconndlg.cpp:84
+msgid "wxGISCreateNetworkConnDlg: Create network connection failed!"
+msgstr "wxGISCreateNetworkConnDlg: Selhalo vytvoření síťového připojení!"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/gxremoteserverui.cpp:91
+msgid "Connection error! The server is not available."
+msgstr "Chyba připojení! Server není dostupný."
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/gxremoteserverui.cpp:95
+msgid "Connection object is broken!"
+msgstr "Objekt připojení je poškozen!"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/gxremoteserverui.cpp:156
+msgid "The login is failed!"
+msgstr "Přihlášení selhalo!"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/gxremoteserverui.cpp:156
+msgid "Warning"
+msgstr "Varování"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/remoteservercmd.cpp:70
+msgid "&Search servers"
+msgstr "&Hledat servery"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/remoteservercmd.cpp:72
+msgid "Server c&onnection"
+msgstr "Připojení k &serveru"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/remoteservercmd.cpp:74
+msgid "&Connect"
+msgstr "&Připojit"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/remoteservercmd.cpp:76
+msgid "&Disconnect"
+msgstr "&Odpojit"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/remoteservercmd.cpp:90
+msgid "Remote Server"
+msgstr "Vzdálený server"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/remoteservercmd.cpp:92
+msgid "[No category]"
+msgstr "[bez kategorie]"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/remoteservercmd.cpp:161
+msgid "Search for remote server"
+msgstr "Hledat vzdálený server"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/remoteservercmd.cpp:163
+msgid "Create connection to remote server"
+msgstr "Vytvořit připojení ke vzdálenému serveru"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/remoteservercmd.cpp:165
+msgid "Connect to remote server"
+msgstr "Připojit ke vzdálenému serveru"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/remoteservercmd.cpp:167
+msgid "Disconnect from remote server"
+msgstr "Odpojit od vzdáleného serveru"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/remoteservercmd.cpp:242
+msgid "Search servers"
+msgstr "Hledat servery"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/remoteservercmd.cpp:244
+msgid "Create connection to server"
+msgstr "Vytvořit připojení k serveru"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/remoteservercmd.cpp:246
+msgid "Connect to server"
+msgstr "Připojit k serveru"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/remoteservercmd.cpp:248
+msgid "Disconnect from server"
+msgstr "Odpojit od serveru"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/serversearchdlg.cpp:78
+msgid "Server name"
+msgstr "Název serveru"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/serversearchdlg.cpp:79
+msgid "Host"
+msgstr "Počítač"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/serversearchdlg.cpp:80
+msgid "Banner"
+msgstr "Banner"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/serversearchdlg.cpp:81
+msgid "Factory"
+msgstr "Továrna"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/serversearchdlg.cpp:88
+#: D:\work\Projects\wxGIS\src\remoteserverui/tcpfactoryui.cpp:83
+msgid "Search"
+msgstr "Hledat"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/serversearchdlg.cpp:91
+msgid "Stop"
+msgstr "Zastavit"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/serversearchdlg.cpp:94
+msgid "Add server"
+msgstr "Přidat server"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/serversearchdlg.cpp:94
+msgid "Accept"
+msgstr "Přijmout"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/tcpfactoryui.cpp:45
+msgid "New connection"
+msgstr "Nové připojení"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/tcpfactoryui.cpp:59
+msgid "Connection name"
+msgstr "Název připojení"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/tcpfactoryui.cpp:66
+msgid "Address"
+msgstr "Adresa"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/tcpfactoryui.cpp:73
+msgid "Port"
+msgstr "Port"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/tcpfactoryui.cpp:87
+msgid "Authentication"
+msgstr "Autentizace"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/tcpfactoryui.cpp:94
+msgid "User"
+msgstr "Uživatel"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/tcpfactoryui.cpp:101
+msgid "Password"
+msgstr "Heslo"
+
+#: D:\work\Projects\wxGIS\src\remoteserverui/tcpfactoryui.cpp:144
+msgid "Some input values are not correct!"
+msgstr "Některé vstupní hodnoty nejsou správné!"
+
+#: D:\work\Projects\wxGIS\include\wxgis\remoteserverui/createnetworkconndlg.h:46
+msgid "Create connection"
+msgstr "Vytvořit připojení"
+
+#: D:\work\Projects\wxGIS\include\wxgis\remoteserverui/serversearchdlg.h:57
+msgid "Search Server"
+msgstr "Hledat server"
+
