@@ -64,6 +64,7 @@ public:
 	virtual bool IsStatusBarShown(void);
 	virtual void ShowToolBarMenu(void);
 	virtual wxString GetAppName(void) = 0;
+	virtual wxIcon GetAppIcon(void) = 0;
 	virtual void OnMouseDown(wxMouseEvent& event);
 	virtual void OnMouseUp(wxMouseEvent& event);
 	virtual void OnMouseDoubleClick(wxMouseEvent& event);

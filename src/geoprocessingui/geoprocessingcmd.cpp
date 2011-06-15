@@ -367,7 +367,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
                                 continue;
                             }
 							if(!pDSet->IsOpened())
-								if(!pDSet->Open());
+								if(!pDSet->Open())
 									return;
 
 

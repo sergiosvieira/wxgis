@@ -23,6 +23,7 @@
 
 #include "wxgis/base.h"
 #include "wxgis/catalog/catalog.h"
+#include "wxgis/framework/framework.h"
 
 #include "wx/dnd.h"
 #include "wx/dataobj.h"

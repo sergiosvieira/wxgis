@@ -22,7 +22,7 @@
 #pragma once
 #include "wxgis/catalogui/gxview.h"
 #include "wxgis/catalogui/gxcatalogui.h"
-#include "wxgis/carto/mapview.h"
+#include "wxgis/cartoui/mapview.h"
 
 class WXDLLIMPEXP_GIS_CLU wxGxMapView :
 	public wxGISMapView,

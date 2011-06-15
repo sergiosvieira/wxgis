@@ -3,7 +3,7 @@
  * Purpose:  wxGISTableView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@
 // wxGISTable
 //------------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CRT wxGISGridTable :
+class WXDLLIMPEXP_GIS_CTU wxGISGridTable :
 	public wxGridTableBase
 {
 public:
@@ -73,7 +73,7 @@ private:
 // wxGridCtrl
 //------------------------------------------------------------------
 
-class WXDLLIMPEXP_GIS_CRT wxGridCtrl:
+class WXDLLIMPEXP_GIS_CTU wxGridCtrl:
 	public wxGrid
 {
 	DECLARE_DYNAMIC_CLASS(wxGridCtrl)
@@ -95,7 +95,7 @@ public:
     #define WXGISBITBUTTONSIZE 24
 #endif
 
-class WXDLLIMPEXP_GIS_CRT wxGISTableView :
+class WXDLLIMPEXP_GIS_CTU wxGISTableView :
 	public wxPanel
 {
 enum

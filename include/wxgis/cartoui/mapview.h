@@ -1,9 +1,9 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  wxGISMapView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,11 +20,23 @@
  ****************************************************************************/
 #pragma once
 
+#include "wxgis/cartoui/cartoui.h"
 #include "wxgis/carto/map.h"
 #include "wxgis/framework/animation.h"
 
 #include <wx/scrolwin.h>
 #include <wx/tipwin.h>
+
+///** \enum wxGISEnumMouseState
+//    \brief A mouse state.
+//*/
+//enum wxGISEnumMouseState
+//{
+//	enumGISMouseNone = 0x0000, 
+//	enumGISMouseLeftDown = 0x0001,
+//	enumGISMouseRightDown = 0x0002,
+//	enumGISMouseWheel = 0x0004
+//};
 
 class wxGISMapView;
 
@@ -43,10 +55,10 @@ private:
 	wxGISMapView* m_pView;
 };
 
-class WXDLLIMPEXP_GIS_CRT wxGISMapView;
+class WXDLLIMPEXP_GIS_CTU wxGISMapView;
 
 //ExtenStack
-class WXDLLIMPEXP_GIS_CRT ExtenStack
+class WXDLLIMPEXP_GIS_CTU ExtenStack
 {
 public:
 	ExtenStack(wxGISMapView* pView);
@@ -66,11 +78,11 @@ protected:
 };
 
 //wxGISMapView
-class WXDLLIMPEXP_GIS_CRT wxGISMapView :
+class WXDLLIMPEXP_GIS_CTU wxGISMapView :
 	public wxScrolledWindow,
 	public wxGISMap
 {
-    DECLARE_CLASS(wxGxMapView)
+    DECLARE_CLASS(wxGISMapView)
     enum
     {
         TIMER_ID = 1013

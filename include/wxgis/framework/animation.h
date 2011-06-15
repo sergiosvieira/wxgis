@@ -50,10 +50,12 @@ public:
     virtual int GetRange(){return 0;};
     virtual void SetValue(int value){};
     virtual int GetValue(){return 0;};
+	virtual void SetYield(bool bYield = false);
 protected:
 	wxImageList m_ImageList;
 	int m_nImgPos;
 	wxTimer m_timer;
+    bool m_bYield;
 
 	DECLARE_EVENT_TABLE()
 };

@@ -53,6 +53,7 @@ public:
     virtual int GetRange(void){return m_nRange;};
     virtual void Play(void){};
     virtual void Stop(void){};
+	virtual void SetYield(bool bYield = false){};
 protected:
     int m_nValue;
     int m_nRange;

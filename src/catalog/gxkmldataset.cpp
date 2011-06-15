@@ -69,7 +69,9 @@ wxString wxGxKMLDataset::GetCategory(void)
         return wxString(_("KML Dataset"));
     case enumVecGML:
         return wxString(_("GML Dataset"));
-    }
+ 	default:
+		return wxEmptyString;
+   }
 }
 
 bool wxGxKMLDataset::Delete(void)

@@ -3,7 +3,7 @@
  * Purpose:  wxGISSimpleRenderer class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,43 +19,101 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/carto/simplerenderer.h"
-#include "wxgis/display/simplefillsymbol.h"
-#include "wxgis/display/simplelinesymbol.h"
-#include "wxgis/display/simplemarkersymbol.h"
+
+//#include "wxgis/display/simplefillsymbol.h"
+//#include "wxgis/display/simplelinesymbol.h"
+//#include "wxgis/display/simplemarkersymbol.h"
 
 wxGISSimpleRenderer::wxGISSimpleRenderer(void)
 {
-	m_pFillSymbol = new wxSimpleFillSymbol();
-    m_pLineSymbol = new wxSimpleLineSymbol();
-	m_pMarkerSymbol = new wxSimpleMarkerSymbol();
+	//m_pFillSymbol = new wxSimpleFillSymbol();
+ //   m_pLineSymbol = new wxSimpleLineSymbol();
+	//m_pMarkerSymbol = new wxSimpleMarkerSymbol();
+	m_stLineColour.dRed = 0.0;
+	m_stLineColour.dGreen = 0.0;
+	m_stLineColour.dBlue = 0.0;
+	m_stLineColour.dAlpha = 1.0;
+	m_stPointColour = m_stLineColour;
+	//m_stFillColour = m_stLineColour;
+	int random_number1 = (rand() % 50); 
+	int random_number2 = (rand() % 50); 
+	int random_number3 = (rand() % 50); 
+	m_stFillColour.dRed = double(205 + random_number1) / 255;
+	m_stFillColour.dGreen = double(205 + random_number2) / 255;
+	m_stFillColour.dBlue = double(205 + random_number3) / 255;
+	//m_stFillColour.dRed = 0.0;
+	//m_stFillColour.dGreen = 0.0;
+	//m_stFillColour.dBlue = 0.7;
+	m_stFillColour.dAlpha = 1.0;
 }
 
 wxGISSimpleRenderer::~wxGISSimpleRenderer(void)
 {
-	wxDELETE(m_pFillSymbol);
-	wxDELETE(m_pLineSymbol);
-	wxDELETE(m_pMarkerSymbol);
+	//wxDELETE(m_pFillSymbol);
+	//wxDELETE(m_pLineSymbol);
+	//wxDELETE(m_pMarkerSymbol);
 }
 
 bool wxGISSimpleRenderer::CanRender(wxGISDatasetSPtr pDataset)
 {
-	return pDataset->GetType() == enumGISFeatureDataset ? true : false;
+	bool bRet = pDataset->GetType() == enumGISFeatureDataset ? true : false;
+	if(bRet)
+		m_pDataset = pDataset;
+	return bRet;
 }
 
-void wxGISSimpleRenderer::Draw(wxGISGeometrySet* pSet, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel)
+void wxGISSimpleRenderer::Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisplay, ITrackCancel *pTrackCancel)
 {
-	if(pSet == NULL)
+	if(NULL == pCursor)
 		return;
 
-    OGRGeometry *poGeom;
-    int nCounter = 0;
-    pSet->Reset();
-    while((poGeom = pSet->Next()) != NULL)	
+	//set colors and etc.
+	pDisplay->SetFillColor(m_stFillColour);
+	pDisplay->SetLineColor(m_stLineColour);
+	pDisplay->SetPointColor(m_stPointColour);
+	//pDisplay->SetLineCap(CAIRO_LINE_CAP_ROUND);
+
+	pCursor->Reset();
+	wxGISQuadTreeItem* pItem;
+    while((pItem = pCursor->Next()) != NULL)	
     {
 		switch(DrawPhase)
 		{
 		case wxGISDPGeography:
-			DrawGeometry(poGeom, pDisplay);
+			{
+				OGRGeometry* pGeom = pItem->GetGeometry();
+				if(!pGeom)
+					break;
+				OGRwkbGeometryType type = wkbFlatten(pGeom->getGeometryType());
+				switch(type)
+				{
+				case wkbPoint:
+				case wkbMultiPoint:
+					pDisplay->SetLineCap(CAIRO_LINE_CAP_ROUND);
+					pDisplay->SetLineWidth(0.5);
+					pDisplay->SetPointRadius(3);
+					break;
+				case wkbLineString:
+				case wkbLinearRing:
+				case wkbMultiLineString:
+					pDisplay->SetLineCap(CAIRO_LINE_CAP_BUTT);
+					pDisplay->SetLineWidth(0.5);
+					break;
+				case wkbMultiPolygon:
+				case wkbPolygon:
+					pDisplay->SetLineCap(CAIRO_LINE_CAP_BUTT);
+					pDisplay->SetLineWidth(0.5);
+					break;
+				case wkbGeometryCollection:
+					break;
+				default:
+				case wkbUnknown:
+				case wkbNone:
+					break;
+				}
+
+				pDisplay->DrawGeometry(pGeom);
+			}
 			break;
 		case wxGISDPAnnotation:
 			break;
@@ -65,103 +123,9 @@ void wxGISSimpleRenderer::Draw(wxGISGeometrySet* pSet, wxGISEnumDrawPhase DrawPh
 			break;
 		}
 
-        if(nCounter > 20000)
-        {
-            pDisplay->OnUpdate();
-            nCounter = 0;
-        }
-        nCounter++;
-
 		if(pTrackCancel && !pTrackCancel->Continue())
 			break;
 	}
 }
 
-void wxGISSimpleRenderer::DrawGeometry(OGRGeometry *poGeometry, IDisplay* pDisplay)
-{
-    if(!poGeometry)
-        return;
-	IDisplayTransformation* pDisplayTransformation = pDisplay->GetDisplayTransformation();
-    if(!pDisplayTransformation)
-        return;
-
-	OGRwkbGeometryType type = wkbFlatten(poGeometry->getGeometryType());
-	switch(type)
-	{
-	case wkbPoint:
-		m_pMarkerSymbol->Draw(poGeometry, pDisplay);
-		break;
-	case wkbLineString:
-	case wkbLinearRing:
-		{
-			//check if line is too small
-			double m_World2DC = pDisplayTransformation->GetRatio();
-			OGREnvelope sEnvelope;
-			poGeometry->getEnvelope(&sEnvelope);
-			double EnvWidth = sEnvelope.MaxX - sEnvelope.MinX;
-			double EnvHeight = sEnvelope.MaxY - sEnvelope.MinY;
-			if(	m_World2DC * EnvWidth <= MINPOLYDRAWAREA && m_World2DC * EnvHeight <= MINPOLYDRAWAREA )
-			{
-				if(	m_World2DC * EnvWidth >= MINPOLYAREA && m_World2DC * EnvHeight >= MINPOLYAREA )
-					m_pMarkerSymbol->Draw(poGeometry, pDisplay);
-				return;
-			}
-			m_pLineSymbol->Draw(poGeometry, pDisplay);
-		}
-		break;
-	case wkbPolygon:
-		{
-			//check if poly is too small
-			double m_World2DC = pDisplayTransformation->GetRatio();
-			OGREnvelope sEnvelope;
-			poGeometry->getEnvelope(&sEnvelope);
-			double EnvWidth = sEnvelope.MaxX - sEnvelope.MinX;
-			double EnvHeight = sEnvelope.MaxY - sEnvelope.MinY;
-			if(	m_World2DC * EnvWidth <= MINPOLYDRAWAREA && m_World2DC * EnvHeight <= MINPOLYDRAWAREA )
-			{
-				if(	m_World2DC * EnvWidth >= MINPOLYAREA && m_World2DC * EnvHeight >= MINPOLYAREA )
-					m_pMarkerSymbol->Draw(poGeometry, pDisplay);
-				return;
-			}
-			m_pFillSymbol->Draw(poGeometry, pDisplay);
-		}
-		break;
-	case wkbMultiPolygon:
-#ifndef RENDERPOLYPOLY
-		//1. type drawing
-		//break;
-#else
-		{
-			//check if poly is too small
-			double m_World2DC = pDisplayTransformation->GetRatio();
-			OGREnvelope sEnvelope;
-			poGeometry->getEnvelope(&sEnvelope);
-			double EnvWidth = sEnvelope.MaxX - sEnvelope.MinX;
-			double EnvHeight = sEnvelope.MaxY - sEnvelope.MinY;
-			if(	m_World2DC * EnvWidth <= MINPOLYAREA && m_World2DC * EnvHeight <= MINPOLYAREA )
-			{
-				m_pMarkerSymbol->Draw(poGeometry, pDisplay);
-				return;
-			}
-		}
-		m_pFillSymbol->Draw(poGeometry, pDisplay);
-		break;
-#endif
-	case wkbMultiPoint:
-		//break;
-	case wkbMultiLineString:
-		//break;
-	case wkbGeometryCollection:
-		{
-		OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)poGeometry;
-		for(int i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
-			DrawGeometry(pOGRGeometryCollection->getGeometryRef(i), pDisplay);
-		}
-		break;
-	default:
-	case wkbUnknown:
-	case wkbNone:
-		break;
-	}   
-}
 

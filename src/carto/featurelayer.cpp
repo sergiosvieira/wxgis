@@ -1,9 +1,9 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  FeatureLayer header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,150 +20,151 @@
  ****************************************************************************/
 #include "wxgis/carto/featurelayer.h"
 #include "wxgis/carto/simplerenderer.h"
-#include "wxgis/datasource/spvalidator.h"
-#include "wxgis/framework/application.h"
-#include "wxgis/carto/transformthreads.h"
-#include <wx/stopwatch.h>
+#include "wxgis/geometry/algorithm.h"
+//#include "wxgis/datasource/spvalidator.h"
+//#include "wxgis/framework/application.h"
+//#include "wxgis/carto/transformthreads.h"
+//#include <wx/stopwatch.h>
 
 #define STEP 3.0
+#define NOCACHEVAL 1000
 
-//void GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds)
-//{
-//	OGRGeometry* pGeometry = (OGRGeometry*)hFeature;
-//	if(!pGeometry)
-//		return;
-//
-//    OGREnvelope Env;
-//	pGeometry->getEnvelope(&Env);
-//    if(Env.MinX == Env.MaxX) Env.MaxX += 0.0001;
-//    if(Env.MinY == Env.MaxY) Env.MaxY += 0.0001;
-//
-//	pBounds->minx = Env.MinX;
-//	pBounds->maxx = Env.MaxX;
-//	pBounds->miny = Env.MinY;
-//	pBounds->maxy = Env.MaxY;
-//}
-
-wxGISFeatureLayer::wxGISFeatureLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer(), /*m_pwxGISFeatureDataset(NULL), */m_pFeatureRenderer(NULL), m_pSpatialReference(NULL)
+wxGISFeatureLayer::wxGISFeatureLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer()//, m_pFeatureRenderer(NULL)
 {
-    m_pQuadTree = NULL;
-    m_bIsGeometryLoaded = false;
-    m_pOGRGeometrySet = NULL;
-
     m_pwxGISFeatureDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pwxGISDataset);
 	if(m_pwxGISFeatureDataset)
 	{
-		//m_pwxGISFeatureDataset->Reference();
-		m_pFeatureRenderer = new wxGISSimpleRenderer();
-//        m_pSpatialReference = ;
-		//pre load features
-//        LoadFeatures();
-        m_pOGRGeometrySet = new wxGISGeometrySet(true);
-		SetSpatialReference(m_pwxGISFeatureDataset->GetSpatialReference().get());
+		m_pSpatialReference = m_pwxGISFeatureDataset->GetSpatialReference();
+		m_FullEnvelope = m_pwxGISFeatureDataset->GetEnvelope();
+		m_PreviousEnvelope = m_FullEnvelope;
+
+		m_pFeatureRenderer = boost::static_pointer_cast<IFeatureRenderer>(boost::make_shared<wxGISSimpleRenderer>());
 	}
 }
 
 wxGISFeatureLayer::~wxGISFeatureLayer(void)
 {
-	wxDELETE(m_pFeatureRenderer);
-
-    UnloadGeometry();
-
-    wsDELETE(m_pOGRGeometrySet);
-    wxDELETE(m_pSpatialReference);
 }
 
-void wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisplay, ITrackCancel* pTrackCancel)
+bool wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisplay, ITrackCancel *pTrackCancel)
 {
-	IDisplayTransformation* pDisplayTransformation = pDisplay->GetDisplayTransformation();
-	if(!pDisplayTransformation)
-		return;
+	//TODO: Move to display
+    //RECTARARRAY* pInvalidrectArray = pDisplay->GetInvalidRect();
+    //OGREnvelope Envs[10];
+    //size_t EnvCount = pInvalidrectArray->size();
+    //if(EnvCount > 10)
+    //    EnvCount = 10;
 
-    RECTARARRAY* pInvalidrectArray = pDisplay->GetInvalidRect();
-    OGREnvelope Envs[10];
-    size_t EnvCount = pInvalidrectArray->size();
-    if(EnvCount > 10)
-        EnvCount = 10;
+    //if(EnvCount == 0)
+    //{
+     //   Envs[0] = pDisplayTransformation->GetVisibleBounds();
+    //    EnvCount = 1;
+    //}
+    //else
+    //{
+    //    for(size_t i = 0; i < EnvCount; i++)
+    //    {
+    //        wxRect Rect = pInvalidrectArray->operator[](i);
+    //        Rect.Inflate(1,1);
+    //        Envs[i] = pDisplayTransformation->TransformRect(Rect);
+    //    }
+    //}
 
-    if(EnvCount == 0)
-    {
-        Envs[0] = pDisplayTransformation->GetVisibleBounds();
-        EnvCount = 1;
-    }
-    else
-    {
-        for(size_t i = 0; i < EnvCount; i++)
-        {
-            wxRect Rect = pInvalidrectArray->operator[](i);
-            Rect.Inflate(1,1);
-            Envs[i] = pDisplayTransformation->TransformRect(Rect);
-        }
-    }
-
-    for(size_t i = 0; i < EnvCount; i++)
-    {
+    //for(size_t i = 0; i < EnvCount; i++)
+    //{
 	    //1. get envelope
-	    OGREnvelope Env = Envs[i];//pDisplayTransformation->GetVisibleBounds();
-	    bool bSetFilter(false);
-	    if(fabs(m_PreviousDisplayEnv.MaxX - Env.MaxX) > DELTA || fabs(m_PreviousDisplayEnv.MaxY - Env.MaxY) > DELTA || fabs(m_PreviousDisplayEnv.MinX - Env.MinX) > DELTA || fabs(m_PreviousDisplayEnv.MinY - Env.MinY) > DELTA)
-		    bSetFilter = m_FullEnv.Contains(Env);//m_FullEnv.Intersects(Env);
+	    //OGREnvelope Env = Envs[i];//pDisplayTransformation->GetVisibleBounds();
+	    //bool bSetFilter(false);
+		//Check if get all features
+	    //if(IsDoubleEquil(m_PreviousDisplayEnv.MaxX, Env.MaxX) || IsDoubleEquil(m_PreviousDisplayEnv.MaxY, Env.MaxY) || IsDoubleEquil(m_PreviousDisplayEnv.MinX, Env.MinX) || IsDoubleEquil(m_PreviousDisplayEnv.MinY, Env.MinY))
+		   // bSetFilter = m_FullEnv.Contains(Env);//m_FullEnv.Intersects(Env);
 
 	    //2. set spatial filter
-	    pDisplay->StartDrawing(GetCacheID());
-	    if(m_pFeatureRenderer && m_pFeatureRenderer->CanRender(m_pwxGISFeatureDataset))
-	    {
+	    //pDisplay->StartDrawing(GetCacheID());
+	    //if(m_pFeatureRenderer && m_pFeatureRenderer->CanRender(m_pwxGISFeatureDataset))
+	    //{
 		    //3. get features set
-		    if(bSetFilter)
-		    {
-                if(!m_pQuadTree)
-                    continue;
+		    //if(bSetFilter)
+		    //{
+			 //   int count(0);
+			 //   CPLRectObj Rect = {Env.MinX, Env.MinY, Env.MaxX, Env.MaxY};
+				//wxGISQuadTreeCursorSPtr pCursor = m_pQuadTree->Search(&Rect);
+				//wxGISQuadTreeItem* pItem;
+				//while((pItem = pCursor->Next()) != NULL)
 
-			    int count(0);
-			    CPLRectObj Rect = {Env.MinX, Env.MinY, Env.MaxX, Env.MaxY};
-			    OGRGeometry** pGeometryArr = (OGRGeometry**)CPLQuadTreeSearch(m_pQuadTree, &Rect, &count);
-		        wxGISGeometrySet GISGeometrySet(false);
 
-			    for(size_t i = 0; i < count; i++)
-			    {
-				    if(pTrackCancel && !pTrackCancel->Continue())
-					    break;
+			    //OGRGeometry** pGeometryArr = (OGRGeometry**)CPLQuadTreeSearch(m_pQuadTree, &Rect, &count);
+		     //   wxGISGeometrySet GISGeometrySet(false);
 
-                    long nID = m_pOGRGeometrySet->operator[](pGeometryArr[i]);
-                    OGRGeometry* pGeom = pGeometryArr[i];
-                    GISGeometrySet.AddGeometry(pGeom, nID);
-                    if(GISGeometrySet.GetSize() == 20000)
-                    {
-                        m_pFeatureRenderer->Draw(&GISGeometrySet, DrawPhase, pDisplay, pTrackCancel);
-                        GISGeometrySet.Clear();
-                        pDisplay->OnUpdate();
+			    //for(size_t i = 0; i < count; i++)
+			    //{
+				   // if(pTrackCancel && !pTrackCancel->Continue())
+					  //  break;
 
-                        if(pTrackCancel && !pTrackCancel->Continue())
-                            break;
-                    }
-			    }
-		        m_pFeatureRenderer->Draw(&GISGeometrySet, DrawPhase, pDisplay, pTrackCancel);
-			    wxDELETEA( pGeometryArr );
-		    }
-		    else
-                m_pFeatureRenderer->Draw(m_pOGRGeometrySet, DrawPhase, pDisplay, pTrackCancel);
+                    //long nID = m_pOGRGeometrySet->operator[](pGeometryArr[i]);
+                    //OGRGeometry* pGeom = pGeometryArr[i];
+                    //GISGeometrySet.AddGeometry(pGeom, nID);
+                    //if(GISGeometrySet.GetSize() == 20000)
+                    //{
+                        //m_pFeatureRenderer->Draw(pCursor, DrawPhase, pDisplay, pTrackCancel);
+                        //GISGeometrySet.Clear();
+                        //pDisplay->OnUpdate();
 
+                        //if(pTrackCancel && !pTrackCancel->Continue())
+                        //    break;
+                    //}
+			    //}
+		     ////   m_pFeatureRenderer->Draw(&GISGeometrySet, DrawPhase, pDisplay, pTrackCancel);
+			    ////wxDELETEA( pGeometryArr );
+		 ////   }
+		 ////   else
+			////{
+   ////             m_pFeatureRenderer->Draw(m_pOGRGeometrySet, DrawPhase, pDisplay, pTrackCancel);
+			////}
 
 		    //4. send it to renderer
-		    m_PreviousDisplayEnv = Env;
-	    }
-    }
+		    //m_PreviousDisplayEnv = Env;
+	    //}
+    //}
 	//5. clear a spatial filter
-	pDisplay->FinishDrawing();
+	//pDisplay->FinishDrawing();
+
+	if(m_pFeatureRenderer->CanRender(m_pwxGISFeatureDataset))
+	{
+	    bool bSetFilter(false);
+		//Check if get all features
+		OGREnvelope Env = pDisplay->GetBounds();
+		if(!IsDoubleEquil(m_PreviousEnvelope.MaxX, Env.MaxX) || !IsDoubleEquil(m_PreviousEnvelope.MaxY, Env.MaxY) || !IsDoubleEquil(m_PreviousEnvelope.MinX, Env.MinX) || !IsDoubleEquil(m_PreviousEnvelope.MinY, Env.MinY))
+			bSetFilter = m_FullEnvelope.Contains(Env);
+
+		//store envelope
+		m_PreviousEnvelope = Env;
+
+	    //Get features set
+		wxGISQuadTreeCursorSPtr pCursor;
+	    if(bSetFilter)
+	    {
+			const CPLRectObj Rect = {Env.MinX, Env.MinY, Env.MaxX, Env.MaxY};
+			pCursor = m_pwxGISFeatureDataset->SearchGeometry(&Rect);
+		}
+		else
+		{
+			pCursor = m_pwxGISFeatureDataset->SearchGeometry();
+		}
+		m_pFeatureRenderer->Draw(pCursor, DrawPhase, pDisplay, pTrackCancel);
+	}
+
+	return true;
 }
 
-OGRSpatialReference* wxGISFeatureLayer::GetSpatialReference(void)
+OGRSpatialReferenceSPtr wxGISFeatureLayer::GetSpatialReference(void)
 {
 	return m_pSpatialReference;
 }
 
-const OGREnvelope* wxGISFeatureLayer::GetEnvelope(void)
+OGREnvelope wxGISFeatureLayer::GetEnvelope(void)
 {
-	return &m_FullEnv;
+	return m_FullEnvelope;
 }
 
 bool wxGISFeatureLayer::IsValid(void)
@@ -171,25 +172,95 @@ bool wxGISFeatureLayer::IsValid(void)
 	return m_pwxGISFeatureDataset == NULL ? false : true;
 }
 
-void wxGISFeatureLayer::CreateQuadTree(OGREnvelope* pEnv)
+bool wxGISFeatureLayer::IsCacheNeeded(void)
 {
-    DeleteQuadTree();
-    CPLRectObj Rect = {pEnv->MinX, pEnv->MinY, pEnv->MaxX, pEnv->MaxY};
-    m_pQuadTree = CPLQuadTreeCreate(&Rect, GetGeometryBoundsFunc);
+	//count number of features or points and if count < 1000 set NoCache
+	if(m_pwxGISFeatureDataset)
+	{
+		long nPointCount(0);
+		OGRFeatureSPtr pFeature;
+		m_pwxGISFeatureDataset->Reset();
+		while(pFeature = m_pwxGISFeatureDataset->Next())
+			nPointCount += GetPointsInGeometry(pFeature->GetGeometryRef());
+		if(nPointCount > NOCACHEVAL)
+			return true;
+	}
+	return false;
 }
 
-void wxGISFeatureLayer::DeleteQuadTree(void)
+long wxGISFeatureLayer::GetPointsInGeometry(OGRGeometry* pGeom)
 {
-	if(m_pQuadTree)
-    {
-		CPLQuadTreeDestroy(m_pQuadTree);
-        m_pQuadTree = NULL;
-    }
+	wxCHECK(pGeom, 0);
+	OGRwkbGeometryType type = wkbFlatten(pGeom->getGeometryType());
+	switch(type)
+	{
+	case wkbPoint:
+		return 1;
+	case wkbPolygon:
+		{
+			OGRPolygon* pPoly = (OGRPolygon*)pGeom;
+			OGRLinearRing* pRing = pPoly->getExteriorRing();
+			long nPointCount(0);
+			if(pPoly)
+			{
+				nPointCount = GetPointsInGeometry(pRing);
+				for(int i = 0; i < pPoly->getNumInteriorRings(); ++i)
+				{
+					pRing = pPoly->getInteriorRing(i);
+					nPointCount += GetPointsInGeometry(pRing);
+				}
+			}
+			return nPointCount;
+		}
+	case wkbLineString:
+		{
+			long nPointCount(0);
+			OGRLineString* pLineString = (OGRLineString*)pGeom;
+			if(pLineString)
+				nPointCount += pLineString->getNumPoints();
+			return nPointCount;
+		}
+	case wkbLinearRing:
+		{
+			long nPointCount(0);
+			OGRLinearRing* pLineString = (OGRLinearRing*)pGeom;
+			if(pLineString)
+				nPointCount += pLineString->getNumPoints();
+			return nPointCount;
+		}
+	case wkbMultiPoint:
+	case wkbMultiPolygon:
+	case wkbMultiLineString:
+	case wkbGeometryCollection:
+		{
+			long nPointCount(0);
+			OGRGeometryCollection* pGeometryCollection = (OGRGeometryCollection*)pGeom;
+			for(int i = 0; i < pGeometryCollection->getNumGeometries(); ++i)
+				nPointCount += GetPointsInGeometry(pGeometryCollection->getGeometryRef(i));
+			return nPointCount;
+		}
+	case wkbUnknown:
+	case wkbNone:
+	default:
+		return false;
+	}
 }
+
+void wxGISFeatureLayer::SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference)
+{
+    if(NULL == pSpatialReference)
+        return;
+    if(m_pSpatialReference && m_pSpatialReference->IsSame(pSpatialReference.get()))
+        return;
+    m_pSpatialReference = pSpatialReference;
+	//project and load to quadtree    
+	LoadGeometry();
+}
+
 
 void wxGISFeatureLayer::LoadGeometry(void)
 {
-    if(!IsValid() && m_bIsGeometryLoaded)
+/*    if(!IsValid() && m_bIsGeometryLoaded)
         return;
     UnloadGeometry();
     m_FullEnv.MinX = m_FullEnv.MaxX = m_FullEnv.MinY = m_FullEnv.MaxY = 0;
@@ -387,49 +458,6 @@ void wxGISFeatureLayer::LoadGeometry(void)
         pProgressor->Show(false);
     pStatusBar->SetMessage(_("Done"));
     m_bIsGeometryLoaded = true;
+	*/
 }
-
-void wxGISFeatureLayer::UnloadGeometry(void)
-{
-    if(!m_bIsGeometryLoaded)
-        return;
-    DeleteQuadTree();
-    //m_pOGRGeometrySet->Clear();
-    m_bIsGeometryLoaded = false;
-}
-
-void wxGISFeatureLayer::SetSpatialReference(OGRSpatialReference* pSpatialReference)
-{
-    if(NULL == pSpatialReference)
-        return;
-    if(m_pSpatialReference && m_pSpatialReference->IsSame(pSpatialReference))
-        return;
-    wxDELETE(m_pSpatialReference);
-    m_pSpatialReference = pSpatialReference->Clone();
-    LoadGeometry();
-}
-
-
-	//while(nIndex + 1 > m_OGRFeatureArray.size()) //m_pOGRLayer->GetFeatureCount()**
-	//{
-	//	size_t count(0);
-	//	OGRFeature *poFeature;
-	//	while( (count < CACHE_SIZE) && (poFeature = m_poLayer->GetNextFeature()) != NULL )
-	//	{
-	//		AddFeature(poFeature);
-	//		count++;
-	//	}
-	//}
-	//return m_OGRFeatureArray[nIndex];
-
-	//if(m_OGRFeatureArray.size() < GetSize())
-	//{
-	//	OGRFeature* poFeature;
-	//	while((poFeature = m_poLayer->GetNextFeature()) != NULL )
-	//	{
-	//		if(pTrackCancel && !pTrackCancel->Continue())
-	//			return NULL;
-	//		AddFeature(poFeature);
-	//	}
-	//}
 

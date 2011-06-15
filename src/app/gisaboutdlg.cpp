@@ -27,6 +27,7 @@
 #include "wx/version.h"
 #include "geos_c.h"
 #include "proj_api.h"
+#include "cairo.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISSimpleTextPanel
@@ -86,7 +87,8 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
     wxString sGEOSStr = wgMB2WX(GEOSversion());
     wxString sPrjStr = wgMB2WX(pj_get_release());
     wxString sGDALStr = wgMB2WX(GDAL_RELEASE_NAME);
-    wxString sWXStr = wxVERSION_STRING;
+    wxString sWXStr = wxVERSION_STRING;	
+    wxString sCAIROStr = wgMB2WX(cairo_version_string());
 
 	m_AuiNotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE );
 
@@ -94,7 +96,7 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
 	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutApp, m_AuiNotebook), _("About application"));
 
     long dFreeMem =  wxMemorySize(wxGetFreeMemory() / 1048576).ToLong();
-    wxString sAboutSys = wxString::Format(_("HOST '%s'\n\nOS desc - %s\n\nFree memory - %u Mb\n\nLibs:\n\nGDAL %s\nGEOS %s\nPROJ %s\n%s"), wxGetFullHostName().c_str(), wxGetOsDescription().c_str(), dFreeMem, sGDALStr.c_str(), sGEOSStr.c_str(), sPrjStr.c_str(), sWXStr.c_str() );
+    wxString sAboutSys = wxString::Format(_("HOST '%s'\n\nOS desc - %s\n\nFree memory - %u Mb\n\nLibs:\n\nGDAL %s\nGEOS %s\nPROJ %s\n%s\nCAIRO %s"), wxGetFullHostName().c_str(), wxGetOsDescription().c_str(), dFreeMem, sGDALStr.c_str(), sGEOSStr.c_str(), sPrjStr.c_str(), sWXStr.c_str(), sCAIROStr.c_str() );
     m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutSys, m_AuiNotebook), _("About system"));
 
 	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(_("Thanks GIS-LAB team for help in translating the interface, testing and searching for errors.\nSpecial thanks to Maxim Dubinin"), m_AuiNotebook), _("Thanks"));

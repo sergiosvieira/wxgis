@@ -3,7 +3,7 @@
  * Purpose:  wxGISTableView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,7 +18,8 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#include "wxgis/carto/tableview.h"
+#include "wxgis/cartoui/tableview.h"
+
 #include "../../art/full_arrow.xpm"
 #include "../../art/arrow.xpm"
 #include "../../art/small_arrow.xpm"

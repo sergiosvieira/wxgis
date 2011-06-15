@@ -23,7 +23,7 @@
 #include "wxgis/core/config.h"
 #include "wxgis/framework/application.h"
 
-#include "../../art/mainframe.xpm"
+#include "../../art/mainframecat.xpm"
 #include "../../art/process_working_16.xpm"
 #include "../../art/process_working_48.xpm"
 
@@ -221,7 +221,7 @@ wxIcon wxGxCatalogUI::GetLargeImage(void)
 
 wxIcon wxGxCatalogUI::GetSmallImage(void)
 {
-    return wxIcon(mainframe_xpm);
+    return wxIcon(mainframecat_xpm);
 }
 
 

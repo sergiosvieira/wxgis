@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(BOOST_ROOT)&quot;;&quot;$(PROJ)\src&quot;;&quot;$(GEOS)\capi&quot;;&quot;$(GEOS)\source\headers&quot;;&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
+				AdditionalIncludeDirectories="&quot;$(BOOST_ROOT)&quot;;&quot;$(PROJ)\src&quot;;&quot;$(GEOS)\capi&quot;;&quot;$(GEOS)\include&quot;;&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include;&quot;$(CAIRO)\src&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;__WXMSW__;__WXDEBUG__;WXUSINGDLL;NOPCH"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -61,10 +61,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxmsw28ud_html.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib proj4d.lib geosd.lib wxGISCatalogUId.lib wxGISFrameworkd.lib wxGISCored.lib"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxmsw28ud_html.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib proj4d.lib geos_c.lib wxGISCatalogUId.lib wxGISFrameworkd.lib wxGISCored.lib cairo.lib"
 				OutputFile="$(OutDir)\wxGISCatalog.exe"
 				LinkIncremental="0"
-				AdditionalLibraryDirectories="&quot;$(PROJ)\wxGIS\lib&quot;;&quot;$(GEOS)\lib&quot;;..\..\lib;&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;"
+				AdditionalLibraryDirectories="&quot;$(PROJ)\wxGIS\lib&quot;;&quot;$(GEOS)\lib&quot;;..\..\lib;&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(CAIRO)\lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				HeapReserveSize="0"

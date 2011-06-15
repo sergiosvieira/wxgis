@@ -44,7 +44,7 @@ wxGISMapApp::~wxGISMapApp(void)
 
 bool wxGISMapApp::OnInit()
 {
-	wxGISMapFrame* frame = new wxGISMapFrame(NULL, wxID_ANY, _("wxGIS Catalog"), wxDefaultPosition, wxSize(800, 480) );
+	wxGISMapFrame* frame = new wxGISMapFrame(NULL, wxID_ANY, _("wxGIS Map"), wxDefaultPosition, wxSize(800, 480) );
 #ifdef WXGISPORTABLE
     m_pConfig = new wxGISAppConfig(frame->GetAppName(), CONFIG_DIR, true);
 #else

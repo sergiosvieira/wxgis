@@ -146,9 +146,9 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
         pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISDataset->GetName());
 		break;
 	case enumGISRasterDataset:
-        CheckOverviews(pwxGISDataset, pGxObject->GetName());
-		pwxGISLayers.push_back(new wxGISRasterLayer(pwxGISDataset));
-        pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISDataset->GetName());
+  //      CheckOverviews(pwxGISDataset, pGxObject->GetName());
+		//pwxGISLayers.push_back(new wxGISRasterLayer(pwxGISDataset));
+  //      pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISDataset->GetName());
 		break;
 	case enumGISContainer:
         for(size_t i = 0; i < pwxGISDataset->GetSubsetsCount(); i++)
@@ -165,9 +165,9 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
                 pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISSubDataset->GetName());
 		        break;
 	        case enumGISRasterDataset:
-                CheckOverviews(pwxGISSubDataset, pGxObject->GetName());
-		        pwxGISLayers.push_back(new wxGISRasterLayer(pwxGISSubDataset));
-                pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISSubDataset->GetName());
+          //      CheckOverviews(pwxGISSubDataset, pGxObject->GetName());
+		        //pwxGISLayers.push_back(new wxGISRasterLayer(pwxGISSubDataset));
+          //      pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISSubDataset->GetName());
 		        break;
             }
         }
@@ -259,7 +259,7 @@ int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pD
 
 void wxGxMapView::CheckOverviews(wxGISDatasetSPtr pwxGISDataset, wxString soFileName)
 {
-    wxGISRasterDatasetSPtr pwxGISRasterDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(pwxGISDataset);
+/*    wxGISRasterDatasetSPtr pwxGISRasterDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(pwxGISDataset);
     if(!pwxGISRasterDataset)
         return;
    //pyramids
@@ -351,4 +351,5 @@ void wxGxMapView::CheckOverviews(wxGISDatasetSPtr pwxGISDataset, wxString soFile
                 pwxGISRasterDataset->SetHasOverviews(true);
         }
     }
+	*/
 }

@@ -44,17 +44,6 @@ enum wxGISPluginIDs
     ID_MENUCMDMAX = ID_TOOLBARCMDMAX + 255
 };	
 
-/** \enum wxGISEnumMouseState
-    \brief A mouse state.
-*/
-enum wxGISEnumMouseState
-{
-	enumGISMouseNone = 0x0000, 
-	enumGISMouseLeftDown = 0x0001,
-	enumGISMouseRightDown = 0x0002,
-	enumGISMouseWheel = 0x0004
-};
-
 /** \enum wxGISEnumStatusBarPanes
     \brief A statusbar panes.
 
@@ -228,6 +217,7 @@ public:
 	virtual void RemoveCommandBar(IGISCommandBar* pBar) = 0;
 	virtual bool AddCommandBar(IGISCommandBar* pBar) = 0;
 	virtual void Customize(void) = 0;
+	virtual wxIcon GetAppIcon(void) = 0;
 	virtual ICommand* GetCommand(long CmdID) = 0;
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType) = 0;
 	virtual void ShowStatusBar(bool bShow) = 0;

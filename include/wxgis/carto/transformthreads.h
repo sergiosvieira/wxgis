@@ -21,6 +21,8 @@
 #pragma once
 
 #include "wxgis/carto/carto.h"
+
+/*
 #include "wxgis/datasource/featuredataset.h"
 #include "wxgis/framework/application.h"
 #include "wxgis/geometry/geometry.h"
@@ -49,3 +51,4 @@ protected:
     IProgressor *m_pProgressor;
     double m_fSegSize;
 };
+*/

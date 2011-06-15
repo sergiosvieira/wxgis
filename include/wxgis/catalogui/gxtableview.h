@@ -21,7 +21,7 @@
 
 #pragma once
 #include "wxgis/catalogui/gxview.h"
-#include "wxgis/carto/tableview.h"
+#include "wxgis/cartoui/tableview.h"
 #include "wxgis/catalogui/gxcatalogui.h"
 
 class WXDLLIMPEXP_GIS_CLU wxGxTableView :

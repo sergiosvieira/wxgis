@@ -3,7 +3,7 @@
  * Purpose:  wxGISSpatialReferenceValidator class. Return SpatialReference limits
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
  ****************************************************************************/
 
 #include "wxgis/datasource/spvalidator.h"
+
+/*
 #include "wxgis/core/config.h"
 
 #include <wx/mstream.h>
@@ -143,3 +145,4 @@ bool wxGISSpatialReferenceValidator::IsLimitsSet(wxString sProj)
         return true;
     return false;
 }
+*/

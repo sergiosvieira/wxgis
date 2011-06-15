@@ -1,9 +1,9 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  wxGISMapView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,9 +18,10 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#include "wxgis/carto/mapview.h"
+#include "wxgis/cartoui/mapview.h"
 //#include "wxgis/display/screendisplay.h"
 #include "wxgis/display/screendisplayplus.h"
+
 #include "wx/sysopt.h"
 
 #define WAITTIME 650
@@ -41,6 +42,7 @@ wxDrawingThread::wxDrawingThread(wxGISMapView* pView, std::vector<wxGISLayer*>& 
 
 void *wxDrawingThread::Entry()
 {
+/*
 #ifdef __WXGTK__
     wxMutexGuiEnter();
 #endif
@@ -84,7 +86,7 @@ void *wxDrawingThread::Entry()
 #ifdef __WXGTK__
     wxMutexGuiLeave();
 #endif
-
+*/
 	return NULL;
 }
 void wxDrawingThread::OnExit()
@@ -236,14 +238,15 @@ bool wxGISMapView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, c
 	//pGISScreenDisplay->SetDC(&CDC);
 	pDisplayTransformation->SetPPI(CDC.GetPPI());
 
-	m_MouseState = enumGISMouseNone;
-	m_MapToolState = enumGISMapNone;
+	//m_MouseState = enumGISMouseNone;
+	//m_MapToolState = enumGISMapNone;
 
     return wxScrolledWindow::Create(parent, id, pos, size, style | wxHSCROLL | wxVSCROLL );
 }
 
 void wxGISMapView::OnDraw(wxDC& dc)
 {
+	/*
 #ifdef __WXGTK__
     if(m_MapToolState & enumGISMapPanning)
     {
@@ -316,8 +319,7 @@ void wxGISMapView::OnDraw(wxDC& dc)
 		//	}
 		//}
 		//pGISScreenDisplay->SetDerty(false);
-		//pGISScreenDisplay->OnDraw(CDC/*dc*/);
-
+		//pGISScreenDisplay->OnDraw(CDC);//dc
 		return;
 	}
 
@@ -350,6 +352,7 @@ void wxGISMapView::OnDraw(wxDC& dc)
 
 	pGISScreenDisplay->OnDraw(dc);
 	//}
+*/
 }
 
 void wxGISMapView::OnSize(wxSizeEvent & event)
@@ -369,12 +372,12 @@ void wxGISMapView::OnSize(wxSizeEvent & event)
 	{
 		wxRect rc = GetClientRect();
 		pGISScreenDisplay->OnStretchDraw(CDC, rc.width, rc.height);
-		m_MouseState |= enumGISMouseLeftDown;
+		//m_MouseState |= enumGISMouseLeftDown;
 		m_timer.Start(300);
 	}
 	else
 	{
-		m_MouseState &= ~enumGISMouseLeftDown;//enumGISMouseNone;
+		//m_MouseState &= ~enumGISMouseLeftDown;//enumGISMouseNone;
 		//set map init envelope
 		pDisplayTransformation->SetDeviceFrame(GetClientRect());
 		pGISScreenDisplay->SetDerty(true);
@@ -392,7 +395,7 @@ void wxGISMapView::OnEraseBackground(wxEraseEvent & event)
 
 void wxGISMapView::AddLayer(wxGISLayer* pLayer)
 {
-    if(!pLayer)
+/*    if(!pLayer)
         return;
 	wxGISMap::AddLayer(pLayer);
     //set spatial reference for display transformation
@@ -404,10 +407,14 @@ void wxGISMapView::AddLayer(wxGISLayer* pLayer)
         pLayer->SetSpatialReference(m_pSpatialReference);
     }
 
-	const OGREnvelope* pEnv = pLayer->GetEnvelope();
+	const OGREnvelopeSPtr pEnv = pLayer->GetEnvelope();
 	if(pEnv == NULL)
 		return;
-    OGREnvelope Env = *pEnv;
+    OGREnvelope Env;
+	Env.MaxX = pEnv->MaxX;
+	Env.MaxY = pEnv->MaxY;
+	Env.MinX = pEnv->MinX;
+	Env.MinY = pEnv->MinY;
 
     //increase 10%
     double fDeltaX = (pEnv->MaxX - pEnv->MinX) / 20;
@@ -441,6 +448,7 @@ void wxGISMapView::AddLayer(wxGISLayer* pLayer)
 		else
 			pLayer->SetCacheID(pGISScreenDisplay->GetLastCacheID());
 	}
+	*/
 }
 
 void wxGISMapView::ClearLayers(void)
@@ -457,7 +465,7 @@ void wxGISMapView::ClearLayers(void)
 	//reset views stack
 	m_pExtenStack->Reset();
 
-	wxGISMap::ClearLayers();
+	wxGISMap::Clear();
 }
 
 void wxGISMapView::OnKeyDown(wxKeyEvent & event)
@@ -512,13 +520,13 @@ void wxGISMapView::OnMouseWheel(wxMouseEvent& event)
 	IDisplayTransformation* pDisplayTransformation = pGISScreenDisplay->GetDisplayTransformation();
 	if(pDisplayTransformation)
 	{
-		if(!(m_MouseState & enumGISMouseWheel))
-		{
-			m_virtualrc = GetClientRect();
-			m_virtualbounds = pDisplayTransformation->GetBounds();
+		//if(!(m_MouseState & enumGISMouseWheel))
+		//{
+		//	m_virtualrc = GetClientRect();
+		//	m_virtualbounds = pDisplayTransformation->GetBounds();
 
-			m_MouseState |= enumGISMouseWheel;
-		}
+		//	m_MouseState |= enumGISMouseWheel;
+		//}
 		int direction = event.GetWheelRotation();
 		int delta = event.GetWheelDelta();
 		int factor = direction / delta;
@@ -628,15 +636,15 @@ void wxGISMapView::OnTimer( wxTimerEvent& event )
 	wxMouseState state = wxGetMouseState();
 	IDisplayTransformation* pDisplayTransformation = pGISScreenDisplay->GetDisplayTransformation();
 
-	if(!state.LeftDown() && (m_MouseState & enumGISMouseLeftDown))
-	{
-		m_MouseState &= ~enumGISMouseLeftDown;
-		//set map init envelope
-		pDisplayTransformation->SetDeviceFrame(GetClientRect());
-	}
-	else if(m_MouseState & enumGISMouseWheel)
-	{
-		m_MouseState &= ~enumGISMouseWheel;
+	//if(!state.LeftDown() && (m_MouseState & enumGISMouseLeftDown))
+	//{
+	//	m_MouseState &= ~enumGISMouseLeftDown;
+	//	//set map init envelope
+	//	pDisplayTransformation->SetDeviceFrame(GetClientRect());
+	//}
+	//else if(m_MouseState & enumGISMouseWheel)
+	//{
+	//	m_MouseState &= ~enumGISMouseWheel;
 		//set new map envelope
 		//OGREnvelope virtualbounds;// = pDisplayTransformation->GetBounds();
 		//wxRect rc = GetClientRect();
@@ -664,11 +672,11 @@ void wxGISMapView::OnTimer( wxTimerEvent& event )
 		//delete [] pPoints;
 //		pDisplayTransformation->SetBounds(m_virtualbounds);
 
-		m_timer.Stop();
-		m_pExtenStack->Do(m_virtualbounds);
-		return;
-	}
-	else
+	//	m_timer.Stop();
+	//	m_pExtenStack->Do(m_virtualbounds);
+	//	return;
+	//}
+	//else
 		return;
 
 	pGISScreenDisplay->SetDerty(true);
@@ -683,7 +691,7 @@ void wxGISMapView::OnTimer( wxTimerEvent& event )
 
 void wxGISMapView::SetFullExtent(void)
 {
-	SetExtent(GetFullExtent());
+//	SetExtent(GetFullExtent());
 }
 
 void wxGISMapView::SetExtent(OGREnvelope Env)
@@ -753,7 +761,7 @@ void wxGISMapView::PanStop(wxPoint MouseLocation)
 
 void wxGISMapView::SetSpatialReference(OGRSpatialReference* pSpatialReference)
 {
-	if(NULL == pSpatialReference)
+/*	if(NULL == pSpatialReference)
 		return;
 
     wxGISMap::SetSpatialReference(pSpatialReference);
@@ -764,6 +772,7 @@ void wxGISMapView::SetSpatialReference(OGRSpatialReference* pSpatialReference)
 	pGISScreenDisplay->SetDerty(true);
 
 	Refresh(false);
+*/
 }
 
 

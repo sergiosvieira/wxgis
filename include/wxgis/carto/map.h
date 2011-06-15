@@ -1,9 +1,9 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  wxGISMap class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,24 +22,53 @@
 
 #include "wxgis/carto/carto.h"
 
+/** \class wxGISMap map.h
+    \brief The Map class - array of layers.
+
+    This class stores array of layers.
+*/
 class WXDLLIMPEXP_GIS_CRT wxGISMap
 {
 public:
 	wxGISMap(void);
 	virtual ~wxGISMap(void);
-    virtual bool Create(void);
 	virtual void SetName(wxString sName){m_sMapName = sName;};
 	virtual wxString GetName(void){return m_sMapName;};
-	virtual void AddLayer(wxGISLayer* pLayer);
-	virtual void ClearLayers(void);
-	virtual size_t GetLayerCount(void){return m_Layers.size();};
+	virtual bool AddLayer(wxGISLayerSPtr pLayer);
+	virtual void Clear(void);
+	virtual size_t GetLayerCount(void){return m_paLayers.size();};
 	virtual wxString GetDescription(void){return m_sDescription;};
 	virtual void SetDescription(wxString sDescription){m_sDescription = sDescription;};
 	virtual OGREnvelope GetFullExtent(void);
-	virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference);
-	virtual OGRSpatialReference* GetSpatialReference(void);
+	virtual void SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference);
+	virtual OGRSpatialReferenceSPtr GetSpatialReference(void);
 protected:
 	wxString m_sMapName, m_sDescription;
-	std::vector<wxGISLayer*> m_Layers;
-	OGRSpatialReference* m_pSpatialReference;
+	std::vector<wxGISLayerSPtr> m_paLayers;
+	OGRSpatialReferenceSPtr m_pSpatialReference;
+	OGREnvelope m_FullExtent;
+};
+
+/** \class wxGISExtentStack map.h
+    \brief The class keep history of map bounds changes.
+*/
+class WXDLLIMPEXP_GIS_CRT wxGISExtentStack : public wxGISMap
+{
+public:
+	wxGISExtentStack(void);
+	virtual ~wxGISExtentStack(void);
+	virtual bool CanRedo(void);
+	virtual bool CanUndo(void);
+	virtual void Redo(void);
+	virtual void Undo(void);
+	virtual void Clear(void);
+	virtual size_t GetSize(void);
+	virtual void Do(OGREnvelope &Env);
+	virtual OGREnvelope GetCurrentExtent(void);
+protected:
+	virtual void SetExtent(OGREnvelope &Env);
+protected:
+	std::vector<OGREnvelope> m_staEnvelope;
+	int m_nPos;
+	OGREnvelope m_CurrentExtent;
 };

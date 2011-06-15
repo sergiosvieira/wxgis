@@ -407,6 +407,8 @@ wxString wxGxRasterFilter::GetName(void)
 	    return wxString(_("Graphics Interchange Format (*.gif)"));
     case enumRasterTil:
 	    return wxString(_("EarthWatch raster (*.til)"));
+	default:
+		return wxEmptyString;
     }
 }
 
@@ -428,7 +430,9 @@ wxString wxGxRasterFilter::GetExt(void)
 	    return wxString(wxT("gif"));
     case enumRasterTil:
 	    return wxString(wxT("til"));
-    }
+ 	default:
+		return wxEmptyString;
+   }
 }
 
 wxString wxGxRasterFilter::GetDriver(void)
@@ -449,6 +453,8 @@ wxString wxGxRasterFilter::GetDriver(void)
 	    return wxString(wxT("GIF"));
     case enumRasterTil:
 	    return wxString(wxT("TIL"));
+	default:
+		return wxEmptyString;
     }
 }
 

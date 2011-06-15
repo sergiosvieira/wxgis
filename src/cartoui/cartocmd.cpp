@@ -3,7 +3,7 @@
  * Purpose:  Carto Main Commands class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,11 +18,12 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#include "wxgis/carto/cartocmd.h"
+#include "wxgis/cartoui/cartocmd.h"
+#include "wxgis/display/rubberband.h"
+//#include "wxgis/display/simplefillsymbol.h"
+
 #include "../../art/geography16.xpm"
 #include "../../art/cursors_16.xpm"
-#include "wxgis/display/rubberband.h"
-#include "wxgis/display/simplefillsymbol.h"
 
 //	0	Full Extent
 //	1	Prev Extent
@@ -111,7 +112,7 @@ bool wxGISCartoMainCmd::GetEnabled(void)
 		{
 			for(size_t i = 0; i < pWinArr->size(); i++)
 			{
-				wxGISMapView* pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
+				wxGISMapViewEx* pMapView = dynamic_cast<wxGISMapViewEx*>(pWinArr->at(i));
 				if(pMapView)
 				{
 					m_pMapView = pMapView;
@@ -128,9 +129,9 @@ bool wxGISCartoMainCmd::GetEnabled(void)
 		case 0:
 			return m_pMapView->IsShown();
 		case 1:
-			return m_pMapView->IsShown() && m_pMapView->GetExtenStack()->CanUndo();
+			return m_pMapView->IsShown() && m_pMapView->CanUndo();
 		case 2:
-			return m_pMapView->IsShown() && m_pMapView->GetExtenStack()->CanRedo();
+			return m_pMapView->IsShown() && m_pMapView->CanRedo();
 		default:
 			return false;
 	}
@@ -169,12 +170,11 @@ void wxGISCartoMainCmd::OnClick(void)
 	switch(m_subtype)
 	{
 		case 0:
-			m_pMapView->SetFullExtent();
-			break;
+			return m_pMapView->SetFullExtent();
 		case 1:
-			return m_pMapView->GetExtenStack()->Undo();
+			return m_pMapView->Undo();
 		case 2:
-			return m_pMapView->GetExtenStack()->Redo();
+			return m_pMapView->Redo();
 		default:
 			break;
 	}
@@ -280,19 +280,6 @@ wxString wxGISCartoMainTool::GetCategory(void)
 bool wxGISCartoMainTool::GetChecked(void)
 {
 	return m_bCheck;
-	//switch(m_subtype)
-	//{
-	//	case 0:
-	//		return false;
-	//	case 1:
-	//		return false;
-	//	case 2:
-	//		return false;
-	//	case 3:
-	//		return false;
-	//	default:
-	//		return false;
-	//}
 }
 
 bool wxGISCartoMainTool::GetEnabled(void)
@@ -304,7 +291,7 @@ bool wxGISCartoMainTool::GetEnabled(void)
 		{
 			for(size_t i = 0; i < pWinArr->size(); i++)
 			{
-				wxGISMapView* pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
+				wxGISMapViewEx* pMapView = dynamic_cast<wxGISMapViewEx*>(pWinArr->at(i));
 				if(pMapView)
 				{
 					m_pMapView = pMapView;
@@ -454,85 +441,56 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 	{
 		case 0:	//z_in
 		{
-			wxGISRubberEnvelope RubberEnvelope;
-			wxPen Pen(wxColour(0, 0, 255, 100), 2);
-			Pen.SetCap(wxCAP_BUTT);
-			wxBrush Brush(wxColour(0, 0, 255, 20));
-			wxSimpleFillSymbol Symbol(Pen, Brush);
-			OGRGeometry* pGeom = RubberEnvelope.TrackNew(event.GetX(), event.GetY(), m_pMapView, m_pMapView->GetCachedDisplay(), &Symbol);
-			if(pGeom)
+			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(0, 0, 255), 2), m_pMapView, m_pMapView->GetDisplay());
+			OGREnvelope Env = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
+			if(IsDoubleEquil(Env.MaxX, Env.MinX) || IsDoubleEquil(Env.MaxY, Env.MinY))
 			{
-				OGREnvelope Env;
-				pGeom->getEnvelope(&Env);
-				if(Env.MaxX == Env.MinX || Env.MaxY == Env.MinY)
-				{
-					OGREnvelope CurrentEnv = m_pMapView->GetCachedDisplay()->GetDisplayTransformation()->GetBounds();
-					double widthdiv4 = (CurrentEnv.MaxX - CurrentEnv.MinX) / 4;
-					double heightdiv4 = (CurrentEnv.MaxY - CurrentEnv.MinY) / 4;
+				OGREnvelope CurrentEnv = m_pMapView->GetCurrentExtent();
+				double widthdiv4 = (CurrentEnv.MaxX - CurrentEnv.MinX) / 4;
+				double heightdiv4 = (CurrentEnv.MaxY - CurrentEnv.MinY) / 4;
 
-					Env.MinX -= widthdiv4;
-					Env.MinY -= heightdiv4;
-					Env.MaxX += widthdiv4;
-					Env.MaxY += heightdiv4;
-				}
-
-                double sc = m_pMapView->GetCachedDisplay()->GetDisplayTransformation()->GetScaleRatio();
-                if(sc > 1)
-                    m_pMapView->SetExtent(Env);
+				Env.MinX -= widthdiv4;
+				Env.MinY -= heightdiv4;
+				Env.MaxX += widthdiv4;
+				Env.MaxY += heightdiv4;
 			}
-			wxDELETE(pGeom);
-			break;
+
+			if(m_pMapView->GetScaleRatio(Env, wxClientDC(m_pMapView)) > 1.0)
+                m_pMapView->Do(Env);
 		}
+		break;
 		case 1:	//z_out
 		{
-			wxGISRubberEnvelope RubberEnvelope;
-			wxPen Pen(wxColour(0, 0, 255, 100), 2);
-			Pen.SetCap(wxCAP_BUTT);
-			wxBrush Brush(wxColour(0, 0, 255, 20));
-			wxSimpleFillSymbol Symbol(Pen, Brush);
-			OGRGeometry* pGeom = RubberEnvelope.TrackNew(event.GetX(), event.GetY(), m_pMapView, m_pMapView->GetCachedDisplay(), &Symbol);
-			if(pGeom)
-			{
-				OGREnvelope Env;
-				pGeom->getEnvelope(&Env);
-				OGREnvelope CurrentEnv = m_pMapView->GetCachedDisplay()->GetDisplayTransformation()->GetBounds();
-				OGREnvelope NewEnv;
-				NewEnv.MinX = CurrentEnv.MinX + CurrentEnv.MinX - Env.MinX;
-				NewEnv.MinY = CurrentEnv.MinY + CurrentEnv.MinY - Env.MinY;
-				NewEnv.MaxX = CurrentEnv.MaxX + CurrentEnv.MaxX - Env.MaxX;
-				NewEnv.MaxY = CurrentEnv.MaxY + CurrentEnv.MaxY - Env.MaxY;
-				m_pMapView->SetExtent(NewEnv);
-			}
-			wxDELETE(pGeom);
-			break;
+			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(0, 0, 255), 2), m_pMapView, m_pMapView->GetDisplay());
+			OGREnvelope Env = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
+			OGREnvelope CurrentEnv = m_pMapView->GetCurrentExtent();
+			OGREnvelope NewEnv;
+			NewEnv.MinX = CurrentEnv.MinX + CurrentEnv.MinX - Env.MinX;
+			NewEnv.MinY = CurrentEnv.MinY + CurrentEnv.MinY - Env.MinY;
+			NewEnv.MaxX = CurrentEnv.MaxX + CurrentEnv.MaxX - Env.MaxX;
+			NewEnv.MaxY = CurrentEnv.MaxY + CurrentEnv.MaxY - Env.MaxY;
+            m_pMapView->Do(NewEnv);
 		}
+		break;
 		case 2:	//pan
 		{
 		    wxImageList oCursorList(16, 16);
 		    oCursorList.Add(wxBitmap(cursors_16_xpm));
-			wxImage CursorImage = oCursorList.GetBitmap(4).ConvertToImage();//m_ImageList.GetBitmap(11).ConvertToImage();
+			wxImage CursorImage = oCursorList.GetBitmap(4).ConvertToImage();
+			//m_ImageList.GetBitmap(11).ConvertToImage();
 			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 7);
 			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 7);
 			m_pMapView->SetCursor(wxCursor(CursorImage));
 			m_pMapView->PanStart(event.GetPosition());
-			break;
 		}
+		break;
 		case 3:	//inf
 		{
-			wxGISRubberEnvelope RubberEnvelope;
-			wxPen Pen(wxColour(0, 0, 255, 100), 2);
-			Pen.SetCap(wxCAP_BUTT);
-			wxBrush Brush(wxColour(0, 0, 255, 20));
-			wxSimpleFillSymbol Symbol(Pen, Brush);
-			OGRGeometry* pGeom = RubberEnvelope.TrackNew(event.GetX(), event.GetY(), m_pMapView, m_pMapView->GetCachedDisplay(), &Symbol);
+			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(0, 0, 255), 2), m_pMapView, m_pMapView->GetDisplay());
+			OGREnvelope Env = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
 			m_pMapView->Refresh(false);
-			if(pGeom)
-			{
-				//
-			}
-			wxDELETE(pGeom);
-			break;
 		}
+		break;
 		default:
 			break;
 	}

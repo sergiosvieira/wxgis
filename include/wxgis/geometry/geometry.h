@@ -23,3 +23,12 @@
 
 #include "wxgis/base.h"
 #include "wxgis/datasource/datasource.h"
+
+enum wxGISEnumPointPosition
+{
+	enumGISPtPosLeft	= 0x0001, 
+	enumGISPtPosRight	= 0x0002,
+	enumGISPtPosBottom	= 0x0004,
+	enumGISPtPosTop		= 0x0008
+};
+

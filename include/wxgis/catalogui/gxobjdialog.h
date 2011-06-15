@@ -192,6 +192,7 @@ public:
     virtual IGISConfig* GetConfig(void){return m_pConfig;};
     virtual void OnAppAbout(void){};
     virtual void OnAppOptions(void){};
+	virtual wxIcon GetAppIcon(void){return wxNullIcon;};
     virtual IGISCommandBar* GetCommandBar(wxString sName){return NULL;};
     virtual void RemoveCommandBar(IGISCommandBar* pBar){};
     virtual bool AddCommandBar(IGISCommandBar* pBar){return false;};

@@ -3,7 +3,7 @@
  * Purpose:  wxGISVectorPropertyPage class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ public:
     wxPGId AppendProperty(wxPGId pid, wxPGProperty* pProp);
     wxPGId AppendMetadataProperty(wxString sMeta);
     void FillGrid(void);
-    void FillLayerDef(OGRLayer *poLayer, int iLayer);
+    void FillLayerDef(OGRLayer *poLayer, int iLayer, CPLString soPath);
 protected:
     wxGISFeatureDatasetSPtr m_pDataset;
     IGxDataset* m_pGxDataset;

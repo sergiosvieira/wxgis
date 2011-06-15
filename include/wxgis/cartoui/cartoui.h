@@ -22,3 +22,14 @@
 #pragma once
 
 #include "wxgis/carto/carto.h"
+
+enum wxGISEnumMapToolState
+{
+	enumGISMapNone		= 0x0000, 
+	enumGISMapPanning	= 0x0001,
+	enumGISMapZooming	= 0x0002,
+	enumGISMapRotating	= 0x0004,
+	enumGISMapDrawing	= 0x0008,
+	enumGISMapWheeling	= 0x0010,
+	enumGISMapWheelingStop	= 0x0020
+};

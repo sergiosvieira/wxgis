@@ -20,7 +20,7 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/framework/framework.h"
-#include "wxgis/carto/mapview.h"
+#include "wxgis/cartoui/mapviewex.h"
 
 //--------------------------------------------------
 // wxGISCartoMainCmd
@@ -48,7 +48,7 @@ public:
 private:
 	IApplication* m_pApp;
 	wxImageList m_ImageList;
-	wxGISMapView* m_pMapView;
+	wxGISMapViewEx* m_pMapView;
 };
 
 //--------------------------------------------------
@@ -84,6 +84,6 @@ public:
 private:
 	IApplication* m_pApp;
 	wxImageList m_ImageList;
-	wxGISMapView* m_pMapView;
+	wxGISMapViewEx* m_pMapView;
 	bool m_bCheck;
 };

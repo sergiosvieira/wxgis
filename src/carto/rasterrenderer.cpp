@@ -21,7 +21,7 @@
 #include "wxgis/carto/rasterrenderer.h"
 #include "wxgis/datasource/rasterdataset.h"
 #include "wxgis/display/screendisplay.h"
-
+/*
 //-----------------------------------
 // wxGISRasterRGBRenderer
 //-----------------------------------
@@ -190,8 +190,8 @@ void wxGISRasterRGBRenderer::Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDraw
 			    int nImgHeight = ceil(rImgHeight) + 1;
                 
 			    //read in buffer
-                int nMinX = int/*floor*/(rMinX);
-                int nMinY = int/*floor*/(rMinY);
+                int nMinX = int(rMinX);//floor
+                int nMinY = int(rMinY);//floor
 			    if(nMinX < 0) nMinX = 0;
 			    if(nMinY < 0) nMinY = 0;
 
@@ -248,7 +248,7 @@ void wxGISRasterRGBRenderer::Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDraw
 			        return;
 		        }
 		        //scale pTempData to data using interpolation methods
-		        pDisplay->DrawBitmap(Scale(data, nWidthOut, nHeightOut, rImgWidthOut/*rImgWidth*/, rImgHeightOut/*rImgHeight*/, nWidth, nHeight, rMinX - nMinX, rMinY - nMinY, enumGISQualityBilinear, pTrackCancel), nDCXOrig, nDCYOrig); //enumGISQualityNearest
+		        pDisplay->DrawBitmap(Scale(data, nWidthOut, nHeightOut, rImgWidthOut, rImgHeightOut, nWidth, nHeight, rMinX - nMinX, rMinY - nMinY, enumGISQualityBilinear, pTrackCancel), nDCXOrig, nDCYOrig); //enumGISQualityNearest
 
                 wxDELETEA(data);
 		    }
@@ -402,7 +402,7 @@ void wxGISRasterRGBRenderer::Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDraw
 //		bands[1] = 1;
 //		bands[2] = 1;
 //
-//		CPLErr err = m_poDataset->RasterIO(GF_Read, 0, 0, nImgWidth, nImgHeight, data, nWidth, nHeight, GDT_Byte, nBandCount, NULL/*bands*/, sizeof(unsigned char) * nBandCount, 0, sizeof(unsigned char));
+//		CPLErr err = m_poDataset->RasterIO(GF_Read, 0, 0, nImgWidth, nImgHeight, data, nWidth, nHeight, GDT_Byte, nBandCount, NULL, sizeof(unsigned char) * nBandCount, 0, sizeof(unsigned char));//bands
 //		if(err != CE_None)
 //			return wxImage();
 //
@@ -483,4 +483,4 @@ wxImage wxGISRasterRGBRenderer::Scale(unsigned char* pData, int nOrigX, int nOri
     }
     return ResultImage;
 }
-
+*/

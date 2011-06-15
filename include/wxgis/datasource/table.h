@@ -1,5 +1,5 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  Table class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
@@ -20,9 +20,17 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/datasource/datasource.h"
+#include "wxgis/datasource/cursor.h"
+#include "wxgis/datasource/filter.h"
+
 //#define MAXSTRINGSTORE 1000000
 
+
+/** \class wxGISTable table.h
+    \brief A GIS Table class.
+
+    This class support basic operations on datasource. No spatial daya avaliable, but the OGRFeature is main part of this class, so it's posible to get some spatial information (not recommendet).
+*/
 class WXDLLIMPEXP_GIS_DS wxGISTable : public wxGISDataset
 {
 public:
@@ -34,11 +42,11 @@ public:
 	//wxGISTable
     virtual wxFontEncoding GetEncoding(void){return m_Encoding;};
     virtual void SetEncoding(wxFontEncoding Encoding){m_Encoding = Encoding;};
-	virtual wxString GetAsString(long row, int col);
+	virtual wxString GetAsString(size_t row, int col);
 	static wxString GetAsString(OGRFeatureSPtr pFeature, int nField, wxFontEncoding Encoding);
 	virtual OGRFeatureSPtr Next(void);
-	virtual OGRFeatureSPtr operator [](long nIndex);
-	virtual OGRFeatureSPtr GetAt(long nIndex);
+	virtual OGRFeatureSPtr operator [](size_t nIndex);
+	virtual OGRFeatureSPtr GetAt(size_t nIndex);
 	virtual OGRFeatureSPtr GetFeature(long nFID);
 	virtual OGRErr StoreFeature(OGRFeatureSPtr poFeature);
 	virtual OGRFeatureSPtr CreateFeature(void);
@@ -48,6 +56,7 @@ public:
 	virtual OGRFeatureDefn* const GetDefinition(void);
 	virtual void Reset(void);
     virtual OGRErr SetFilter(wxGISQueryFilter* pQFilter);
+	virtual wxFeatureCursorSPtr Search(wxGISQueryFilter* pQFilter, bool bOnlyFirst = false);
     virtual OGRErr SetIgnoredFields(wxArrayString &saIgnoredFields);
 	virtual size_t GetFeatureCount(ITrackCancel* pTrackCancel = NULL);
 	virtual bool Open(int iLayer = 0, int bUpdate = 0, ITrackCancel* pTrackCancel = NULL);
@@ -56,6 +65,7 @@ public:
 	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel = NULL);
 	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel = NULL);
 	virtual char **GetFileList();
+	virtual OGRDataSource* const GetDataSource(void){return m_poDS;};
 protected:
 	virtual void LoadFeatures(ITrackCancel* pTrackCancel = NULL);
     virtual void UnloadFeatures(void);
@@ -68,8 +78,11 @@ protected:
 	bool m_bOLCStringsAsUTF8, m_bIsDataLoaded;
 	bool m_bHasFID;
 	long m_nFeatureCount;
+	long m_nFIDCounter;
     std::map<long, OGRFeatureSPtr> m_FeaturesMap;
     std::map<long, OGRFeatureSPtr>::iterator m_IT;
+
+	wxString m_sCurrentFilter;
 	//short m_FieldCount;
     //wxArrayString m_FeatureStringData;
 };

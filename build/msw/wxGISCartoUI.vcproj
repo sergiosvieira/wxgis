@@ -40,13 +40,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(BOOST_ROOT)&quot;;&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
+				AdditionalIncludeDirectories="&quot;$(BOOST_ROOT)&quot;;&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include;&quot;$(CAIRO)\src&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CTU"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -60,10 +59,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxmsw28ud_html.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISCartod.lib"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxmsw28ud_html.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISDisplayd.lib wxGISCartod.lib wxGISDataSourced.lib cairo.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="0"
-				AdditionalLibraryDirectories="&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib"
+				AdditionalLibraryDirectories="&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib;&quot;$(CAIRO)\lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
@@ -125,7 +124,7 @@
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -184,11 +183,27 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\src\cartoui\cartocmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\cartoui\mapview.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\cartoui\mapviewex.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\cartoui\rasterdatasetcmd.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\cartoui\sqlquerydialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\cartoui\tableview.cpp"
 				>
 			</File>
 		</Filter>
@@ -198,7 +213,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\include\wxgis\cartoui\cartocmd.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wxgis\cartoui\cartoui.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\cartoui\mapview.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\cartoui\mapviewex.h"
 				>
 			</File>
 			<File
@@ -207,6 +234,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\cartoui\sqlquerydialog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\cartoui\tableview.h"
 				>
 			</File>
 		</Filter>

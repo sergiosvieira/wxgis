@@ -22,7 +22,7 @@
 
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/geoprocessing/geoprocessing.h"
-#include "wxgis/carto/tableview.h"
+#include "wxgis/cartoui/tableview.h"
 
 #include <wx/intl.h>
 #include <wx/bitmap.h>

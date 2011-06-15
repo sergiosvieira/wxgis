@@ -1,5 +1,5 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  Table class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
@@ -33,6 +33,7 @@ wxGISTable::wxGISTable(CPLString sPath, int nSubType, OGRLayer* poLayer, OGRData
 	m_bIsDataLoaded = false;
     m_bIsOpened = false;
 	m_bHasFID = false;
+	m_nFeatureCount = 0;
 
 	m_nFeatureCount = wxNOT_FOUND;
 
@@ -88,8 +89,20 @@ bool wxGISTable::Open(int iLayer, int bUpdate, ITrackCancel* pTrackCancel)
     {
         m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
         m_bHasFID = CPLStrnlen(m_poLayer->GetFIDColumn(), 100) > 0;
-        m_sTableName = wxString(m_poLayer->GetLayerDefn()->GetName(), wxConvLocal);//TODO: check encodings
-    }
+		wxString sOut;
+		if(EQUALN(m_sPath, "/vsizip", 7))
+			sOut = wxString(m_poLayer->GetLayerDefn()->GetName(), wxCSConv(wxT("cp-866")));
+		else
+			sOut = wxString(m_poLayer->GetLayerDefn()->GetName(), wxConvUTF8);
+		if(sOut.IsEmpty())
+		{
+			if(EQUALN(m_sPath, "/vsizip", 7))
+				sOut = wxString(CPLGetBasename(m_sPath), wxCSConv(wxT("cp-866")));
+			else
+				sOut = wxString(CPLGetBasename(m_sPath), wxConvUTF8);
+		}
+		m_sTableName = sOut;
+	}
 
 	m_bIsOpened = true;
 
@@ -110,13 +123,13 @@ wxString wxGISTable::GetName(void)
     if(EQUALN(m_sPath, "/vsizip", 7))
         sOut = wxString(m_poLayer->GetLayerDefn()->GetName(), wxCSConv(wxT("cp-866")));
     else
-        sOut = wxString(m_poLayer->GetLayerDefn()->GetName(), wxConvUTF8);//TODO: check encodings
+        sOut = wxString(m_poLayer->GetLayerDefn()->GetName(), wxConvUTF8);
 	if(sOut.IsEmpty())
 	{
 		if(EQUALN(m_sPath, "/vsizip", 7))
             sOut = wxString(CPLGetBasename(m_sPath), wxCSConv(wxT("cp-866")));
         else
-            sOut = wxString(CPLGetBasename(m_sPath), wxConvUTF8);//TODO: check encodings
+            sOut = wxString(CPLGetBasename(m_sPath), wxConvUTF8);
 	}
 	m_sTableName = sOut;
     return m_sTableName;
@@ -145,7 +158,7 @@ void wxGISTable::LoadFeatures(ITrackCancel* pTrackCancel)
 	bool bOLCRandomRead = m_poLayer->TestCapability(OLCRandomRead);
 
 	//check FIDs and bOLCRandomRead 
-	if(!m_bHasFID || !bOLCFastFeatureCount || !bOLCRandomRead)
+	if(/*!m_bHasFID || */!bOLCFastFeatureCount || !bOLCRandomRead)
 	{
         m_poLayer->ResetReading();
         long counter = 1;
@@ -160,7 +173,7 @@ void wxGISTable::LoadFeatures(ITrackCancel* pTrackCancel)
             }
 
             long nFID;
-            if(!m_bHasFID)
+            if(poFeature && !m_bHasFID)
 			{
                 nFID = counter;
 				poFeature->SetFID(nFID);
@@ -247,7 +260,12 @@ OGRFeatureSPtr wxGISTable::Next(void)
         return pFeature;
     }
     else
-        return OGRFeatureSPtr(m_poLayer->GetNextFeature(), OGRFeatureDeleter);
+	{
+		OGRFeatureSPtr pFeature( m_poLayer->GetNextFeature(), OGRFeatureDeleter );
+		if(pFeature && !m_bHasFID)
+			pFeature->SetFID(++m_nFeatureCount);
+        return pFeature;
+	}
 
     return OGRFeatureSPtr();
 }
@@ -258,6 +276,7 @@ void wxGISTable::Reset(void)
         return;
 
     //bool bOLCFastSetNextByIndex = m_poLayer->TestCapability(OLCFastSetNextByIndex);
+	m_nFIDCounter = 0;
 
     wxCriticalSectionLocker locker(m_CritSect);
     if(m_bIsDataLoaded)
@@ -305,10 +324,13 @@ OGRFeatureSPtr wxGISTable::CreateFeature(void)
     if(!m_poLayer)
         return OGRFeatureSPtr();
 	OGRFeature* poFeature = OGRFeature::CreateFeature( m_poLayer->GetLayerDefn() );
-	return OGRFeatureSPtr(poFeature, OGRFeatureDeleter);
+	OGRFeatureSPtr pFeature( poFeature, OGRFeatureDeleter );
+	if(pFeature && !m_bHasFID)
+		pFeature->SetFID(GetFeatureCount());
+	return pFeature;
 }
 
-OGRFeatureSPtr wxGISTable::GetAt(long nIndex)
+OGRFeatureSPtr wxGISTable::GetAt(size_t nIndex)
 {
 	wxASSERT(nIndex >= 0);
 	wxASSERT(nIndex < GetFeatureCount());
@@ -329,12 +351,15 @@ OGRFeatureSPtr wxGISTable::GetAt(long nIndex)
 	else
     {
         m_poLayer->SetNextByIndex(nIndex);
-        return OGRFeatureSPtr(m_poLayer->GetNextFeature(), OGRFeatureDeleter);
+		OGRFeatureSPtr pFeature( m_poLayer->GetNextFeature(), OGRFeatureDeleter );
+		if(pFeature && !m_bHasFID)
+			pFeature->SetFID(++m_nFeatureCount);
+        return pFeature;
     }
     return OGRFeatureSPtr();
 }
 
-OGRFeatureSPtr wxGISTable::operator [](long nIndex)
+OGRFeatureSPtr wxGISTable::operator [](size_t nIndex)
 {
 	return GetAt(nIndex);
 }
@@ -441,7 +466,7 @@ wxString wxGISTable::GetAsString(OGRFeatureSPtr pFeature, int nField, wxFontEnco
 	return sOut;
 }
 
-wxString wxGISTable::GetAsString(long row, int col)
+wxString wxGISTable::GetAsString(size_t row, int col)
 {
 	wxASSERT(GetFeatureCount() >= row);
 	if(!m_poLayer)
@@ -473,22 +498,79 @@ wxString wxGISTable::GetAsString(long row, int col)
 
 OGRErr wxGISTable::SetFilter(wxGISQueryFilter* pQFilter)
 {
-    if(	m_poLayer )
-    {
-        OGRErr eErr;
-        if(pQFilter)
-            eErr = m_poLayer->SetAttributeFilter(wgWX2MB(pQFilter->GetWhereClause()));
-        else
-            eErr = m_poLayer->SetAttributeFilter(NULL);
-        if(eErr != OGRERR_NONE)
-            return eErr;
+    if(	!m_poLayer )
+		return OGRERR_FAILURE;
 
-        UnloadFeatures();
-		LoadFeatures(NULL);
-		Reset();
+	OGRErr eErr;
+	wxString sNewFilter;
+    if(pQFilter)
+	{
+        eErr = m_poLayer->SetAttributeFilter(pQFilter->GetWhereClause().mb_str());
+		sNewFilter = pQFilter->GetWhereClause();
+	}
+    else
+        eErr = m_poLayer->SetAttributeFilter(NULL);
+
+    if(eErr != OGRERR_NONE)
         return eErr;
-    }
-    return OGRERR_FAILURE;
+
+	m_sCurrentFilter = sNewFilter;
+    UnloadFeatures();
+	LoadFeatures(NULL);
+	Reset();
+    return eErr;
+}
+
+wxFeatureCursorSPtr wxGISTable::Search(wxGISQueryFilter* pQFilter, bool bOnlyFirst)
+{
+    if(	!m_poLayer )
+		return wxFeatureCursorSPtr();
+
+	OGRErr eErr;
+    if(pQFilter)
+	{
+		wxString sFilter = pQFilter->GetWhereClause();
+		if(!m_sCurrentFilter.IsEmpty() && !sFilter.IsEmpty())
+		{
+			//combain two clauses
+			sFilter.Prepend(wxT("(") + m_sCurrentFilter + wxT(") AND ("));
+			sFilter.Append(wxT(")"));
+		}
+        eErr = m_poLayer->SetAttributeFilter(sFilter.mb_str());
+		if(eErr != OGRERR_NONE)
+			return wxFeatureCursorSPtr();
+		//create and fill cursor
+		m_poLayer->ResetReading();
+		OGRFeature* poFeature = NULL;
+		wxFeatureCursorSPtr pCursor = boost::make_shared<wxFeatureCursor>();
+		while((poFeature = m_poLayer->GetNextFeature()) != NULL )
+		{
+			pCursor->Add(OGRFeatureSPtr(poFeature, OGRFeatureDeleter));
+			if(bOnlyFirst)
+				break;
+		}
+		pCursor->Reset();
+		return pCursor;
+	}
+    else
+	{
+        eErr = m_poLayer->SetAttributeFilter(NULL);
+		if(eErr != OGRERR_NONE)
+			return wxFeatureCursorSPtr();
+		Reset();
+		//create and fill cursor
+		OGRFeatureSPtr pFeature;
+		wxFeatureCursorSPtr pCursor = boost::make_shared<wxFeatureCursor>();
+		while((pFeature = Next()) != NULL)
+		{
+			pCursor->Add(pFeature);
+			if(bOnlyFirst)
+				break;
+		}
+		pCursor->Reset();
+		return pCursor;
+	}
+	return wxFeatureCursorSPtr();
 }
 
 bool wxGISTable::CanDeleteFeature(void)

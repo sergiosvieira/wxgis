@@ -21,6 +21,7 @@
 #pragma once
 
 #include "wxgis/mapui/mapui.h"
+#include "wxgis/mapui/mxmapview.h"
 #include "wxgis/framework/applicationex.h"
 
 #include "wx/aui/aui.h"
@@ -40,4 +41,8 @@ public:
 	//IApplication
     virtual wxString GetAppName(void){return wxString(wxT("wxGISMap"));};
     virtual bool Create(IGISConfig* pConfig);
+	virtual wxIcon GetAppIcon(void){return m_pAppIcon;};
+protected:
+	wxIcon m_pAppIcon;
+	wxMxMapView* m_pMapView;
 };

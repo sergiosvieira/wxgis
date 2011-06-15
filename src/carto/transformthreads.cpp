@@ -21,7 +21,7 @@
 //#define FAST_BISHOP_INTERSECTION
 
 #include "wxgis/carto/transformthreads.h"
-
+/*
 #include "wxgis/geometry/algorithm.h"
 
 
@@ -300,3 +300,4 @@ OGRGeometry* wxGISFeatureTransformThread::Intersection(OGRGeometry* pFeatureGeom
     }
     return NULL;
 }
+*/

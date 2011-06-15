@@ -179,21 +179,35 @@ void wxGISVectorPropertyPage::FillGrid(void)
             for( int iLayer = 0; iLayer < pDataSource->GetLayerCount(); iLayer++ )
             {
                 OGRLayer *poLayer = pDataSource->GetLayer(iLayer);
-                FillLayerDef(poLayer, iLayer);
+                FillLayerDef(poLayer, iLayer, soPath);
             }
         }
         else
         {
             OGRLayer *poLayer = m_pDataset->GetLayerRef();
-            FillLayerDef(poLayer, 0);
+            FillLayerDef(poLayer, 0, soPath);
         }
     }
 }
 
-void wxGISVectorPropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer)
+void wxGISVectorPropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer, CPLString soPath)
 {
     wxPGId playid = AppendProperty( new wxPropertyCategory(wxString::Format(_("Layer #%d"), iLayer + 1) ));
-    AppendProperty(playid, new wxStringProperty(_("Name"), wxPG_LABEL, wxString(poLayer->GetName(), wxConvUTF8)));  //GetConvName
+
+    wxString sOut;
+    if(EQUALN(soPath, "/vsizip", 7))
+        sOut = wxString(poLayer->GetName(), wxCSConv(wxT("cp-866")));
+    else
+        sOut = wxString(poLayer->GetName(), wxConvUTF8);
+	if(sOut.IsEmpty())
+	{
+		if(EQUALN(soPath, "/vsizip", 7))
+            sOut = wxString(CPLGetBasename(soPath), wxCSConv(wxT("cp-866")));
+        else
+            sOut = wxString(CPLGetBasename(soPath), wxConvUTF8);
+	}
+    AppendProperty(playid, new wxStringProperty(_("Name"), wxPG_LABEL, sOut));  //GetConvName
+
     AppendProperty(playid, new wxStringProperty(_("Geometry type"), wxPG_LABEL, wgMB2WX(OGRGeometryTypeToName( m_pDataset->GetGeometryType() ))));  
 	AppendProperty(playid, new wxIntProperty(_("Feature count"), wxPG_LABEL, m_pDataset->GetFeatureCount() ));  
 

@@ -160,6 +160,12 @@ public:
      *  \brief Stop undefined progressor state.
      */		
     virtual void Stop(void) = 0;
+    /** \fn void SetYield(bool bYield = false)
+     *  \brief SetYield Yields control to pending messages in the windowing system.
+
+	    This can be useful, for example, when a time-consuming process writes to a text window. Without an occasional yield, the text window will not be updated properly, and other processes will not respond.
+     */		
+	virtual void SetYield(bool bYield = false) = 0;
 };
 
 /** \class ITrackCancel core.h
@@ -190,7 +196,7 @@ protected:
 	IProgressor* m_pProgressor;
 };
 
-static bool CreateAndRunThread(wxThread* pThread, wxString sClassName = wxEmptyString, wxString sThreadName = wxEmptyString)
+static bool CreateAndRunThread(wxThread* pThread, wxString sClassName = wxEmptyString, wxString sThreadName = wxEmptyString, int nPriority = WXTHREAD_DEFAULT_PRIORITY)
 {
 	if(!pThread)
 		return false;
@@ -201,6 +207,7 @@ static bool CreateAndRunThread(wxThread* pThread, wxString sClassName = wxEmptyS
 		wxLogError(_("%s: Can't create %s Thread!"), sClassName.c_str(), sThreadName.c_str());
 		return false;
     }
+	pThread->SetPriority(nPriority);
 	if(pThread->Run() != wxTHREAD_NO_ERROR )
     {
 		wxLogError(_("%s: Can't run %s Thread!"), sClassName.c_str(), sThreadName.c_str());

@@ -3,7 +3,7 @@
  * Purpose:  base header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -224,7 +224,6 @@
 #define ERR wxT("~err~")
 #define NONAME _("no name")
 #define CACHE_SIZE 3000
-#define ZOOM_FACTOR 0.25
 #define DELTA (FLT_EPSILON * 16)
 #define PI 3.1415926535897932384626433832795
 #define PIDEG 0.017453292519943295769236907684886

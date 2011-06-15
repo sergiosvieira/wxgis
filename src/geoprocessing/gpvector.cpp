@@ -324,7 +324,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
     if(!pFilter || !pDSet)
         return false;
 
-    int nNewSubType = pFilter->GetSubType();
+/*    int nNewSubType = pFilter->GetSubType();
     //check multi geometry
     OGRwkbGeometryType nGeomType = pDSet->GetGeometryType();
     bool bIsMultigeom = (wkbFlatten(nGeomType) == wkbUnknown || wkbFlatten(nGeomType) == wkbGeometryCollection);
@@ -629,7 +629,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
     wxDELETE(pRgnEnv2);
     wxDELETE(pRgn1);
     wxDELETE(pRgn2);
-
+*/
     return true;
 }
 

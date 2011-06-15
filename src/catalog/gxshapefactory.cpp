@@ -42,14 +42,14 @@ bool wxGxShapeFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxO
 
         if(EQUAL(szExt, "shp"))
         {
-            bool bHasDbf(false), bHasPrj(false);
+            bool bHasDbf(false)/*, bHasPrj(false)*/;
             szPath = (char*)CPLResetExtension(pFileNames[i], "dbf");
             if(CPLCheckForFile((char*)szPath.c_str(), NULL))
                 bHasDbf = true;
-            szPath = (char*)CPLResetExtension(pFileNames[i], "prj");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                bHasPrj = true;
-            if(bHasDbf && bHasPrj)
+            //szPath = (char*)CPLResetExtension(pFileNames[i], "prj");
+            //if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            //    bHasPrj = true;
+            if(bHasDbf/* && bHasPrj*/)
                 pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumGISFeatureDataset);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }

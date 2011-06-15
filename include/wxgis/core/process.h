@@ -25,7 +25,7 @@
 #include "wx/txtstrm.h"
 #include "wx/thread.h"
 
-#include <boost/process.hpp> 
+#include "wxgis/core/process.hpp" 
 
 namespace bp = ::boost::process;
 

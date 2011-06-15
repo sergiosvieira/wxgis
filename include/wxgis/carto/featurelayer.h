@@ -1,9 +1,9 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  FeatureLayer header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -23,38 +23,37 @@
 #include "wxgis/carto/carto.h"
 #include "wxgis/datasource/featuredataset.h"
 
-//void GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
-
-
+/** \class wxGISFeatureLayer featurelayer.h
+    \brief The class represent vector datasource in map.
+*/
 class WXDLLIMPEXP_GIS_CRT wxGISFeatureLayer :
 	public wxGISLayer
 {
 public:
 	wxGISFeatureLayer(wxGISDatasetSPtr pwxGISDataset);
 	virtual ~wxGISFeatureLayer(void);
-//IwxGISLayer
-	virtual void Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisplay, ITrackCancel* pTrackCancel);
-	virtual OGRSpatialReference* GetSpatialReference(void);
-	virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference);
-	virtual const OGREnvelope* GetEnvelope(void);
+//wxGISLayer
+	virtual OGRSpatialReferenceSPtr GetSpatialReference(void);
+	virtual void SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference);
+	virtual bool Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisplay, ITrackCancel *pTrackCancel = NULL);
+	virtual OGREnvelope GetEnvelope(void);
 	virtual bool IsValid(void);
+	virtual bool IsCacheNeeded(void);
 //wxGISFeatureLayer
-	virtual IFeatureRenderer* GetRenderer(void){return m_pFeatureRenderer;};
-	virtual void SetRenderer(IFeatureRenderer* pFeatureRenderer){m_pFeatureRenderer = pFeatureRenderer;};
+	virtual IFeatureRendererSPtr GetRenderer(void){return m_pFeatureRenderer;};
+	virtual void SetRenderer(IFeatureRendererSPtr pFeatureRenderer){m_pFeatureRenderer = pFeatureRenderer;};
 protected:
-    virtual void CreateQuadTree(OGREnvelope* pEnv);
-    virtual void DeleteQuadTree(void);
     virtual void LoadGeometry(void);
-    virtual void UnloadGeometry(void);
+	virtual long GetPointsInGeometry(OGRGeometry* pGeom);
 protected:
 	wxGISFeatureDatasetSPtr m_pwxGISFeatureDataset;
-	IFeatureRenderer* m_pFeatureRenderer;
-    OGREnvelope m_FullEnv;
-	OGREnvelope m_PreviousDisplayEnv;
-    OGRSpatialReference* m_pSpatialReference;
+    OGRSpatialReferenceSPtr m_pSpatialReference;
 
-//	wxGISFeatureSet m_OGRFeatureArray;
-    wxGISGeometrySet *m_pOGRGeometrySet;
-	CPLQuadTree* m_pQuadTree;
-    bool m_bIsGeometryLoaded;
+    OGREnvelope m_FullEnvelope;
+	OGREnvelope m_PreviousEnvelope;
+
+	wxGISQuadTreeSPtr m_pQuadTree;
+	IFeatureRendererSPtr m_pFeatureRenderer;
 };
+
+DEFINE_SHARED_PTR(wxGISFeatureLayer);

@@ -35,8 +35,9 @@ END_EVENT_TABLE()
 
 wxGISMapFrame::wxGISMapFrame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxMxApplication(parent, id, title, pos, size, style)
 {
+	m_pAppIcon = wxIcon(mainframemap_xpm);
 	//set app main icon
-    SetIcon(wxICON(mainframemap));//wxIcon(mainframemap_xpm));
+    SetIcon(wxICON(mainframemap));
 }
 
 wxGISMapFrame::~wxGISMapFrame(void)

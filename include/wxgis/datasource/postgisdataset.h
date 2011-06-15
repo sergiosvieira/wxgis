@@ -20,7 +20,7 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/datasource/datasource.h"
+#include "wxgis/datasource/filter.h"
 
 /** \class wxGISPostgresDataSource postgisdataset.h
     \brief The PostGIS DataSource class.

@@ -40,9 +40,15 @@ wxGISCatalogFrame::wxGISCatalogFrame(wxWindow* parent, wxWindowID id, const wxSt
 	//set app main icon
     wxDateTime now = wxDateTime::Now();
     if((now.GetMonth() == wxDateTime::Month::Dec && now.GetDay() > 15) || (now.GetMonth() == wxDateTime::Month::Jan && now.GetDay() < 15))
-        SetIcon(wxICON(mainframecat_x));
+	{
+        m_pAppIcon = wxIcon(mainframecat_x_xpm);
+		SetIcon(wxICON(mainframecat_x));
+	}
     else
-        SetIcon(wxICON(mainframecat));
+	{
+        m_pAppIcon = wxIcon(mainframecat_xpm);
+		SetIcon(wxICON(mainframecat));
+	}
 }
 
 wxGISCatalogFrame::~wxGISCatalogFrame(void)

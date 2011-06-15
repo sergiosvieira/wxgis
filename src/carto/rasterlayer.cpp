@@ -19,9 +19,10 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/carto/rasterlayer.h"
+/*
 #include "wxgis/carto/rasterrenderer.h"
 
-wxGISRasterLayer::wxGISRasterLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer(), /*m_pwxGISRasterDataset(NULL), */m_pRasterRenderer(NULL)
+wxGISRasterLayer::wxGISRasterLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer(), m_pRasterRenderer(NULL)
 {
     m_pwxGISRasterDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(pwxGISDataset);
 	if(m_pwxGISRasterDataset)
@@ -38,7 +39,7 @@ wxGISRasterLayer::~wxGISRasterLayer(void)
 	//wsDELETE(m_pwxGISRasterDataset);
 }
 
-void wxGISRasterLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisplay, ITrackCancel* pTrackCancel)
+bool wxGISRasterLayer::Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisplay, ITrackCancel* pTrackCancel)
 {
 	IDisplayTransformation* pDisplayTransformation = pDisplay->GetDisplayTransformation();
 	if(!pDisplayTransformation)
@@ -101,3 +102,5 @@ bool wxGISRasterLayer::IsValid(void)
 {
 	return m_pwxGISRasterDataset == NULL ? false : true;
 }
+*/
+	//перепроецирования растра делать поблочно для его текущего уровня пирамид. После смены уровня оставлять запомненым в массиве - подумать об использовании in memory raster для этих целей.

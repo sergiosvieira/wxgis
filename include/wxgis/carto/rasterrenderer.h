@@ -22,6 +22,7 @@
 
 #include "wxgis/carto/carto.h"
 
+/*
 //wxGISRasterRGBRenderer
 class wxGISRasterRGBRenderer :
 	public IRasterRenderer
@@ -36,3 +37,4 @@ public:
 	virtual OGREnvelope TransformEnvelope(const OGREnvelope* pEnvelope, OGRSpatialReference* pSrsSpatialReference, OGRSpatialReference* pDstSpatialReference);
     virtual wxImage Scale(unsigned char* pData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel);
 };
+*/

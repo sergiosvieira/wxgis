@@ -140,6 +140,7 @@ public:
     virtual int GetValue(void){return m_nDonePercent;};
     virtual void Play(void){};
     virtual void Stop(void){};
+	virtual void SetYield(bool bYield = false){};
 //IGxTask
     virtual wxGISEnumTaskStateType GetState(void);
     virtual wxDateTime GetStart();

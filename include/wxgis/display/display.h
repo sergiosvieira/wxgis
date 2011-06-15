@@ -3,7 +3,7 @@
  * Purpose:  display header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -23,12 +23,18 @@
 
 #include "wxgis/base.h"
 #include "wxgis/datasource/datasource.h"
-#include "wx/image.h"
 
-#define wxUSE_GRAPHICS_CONTEXT 1
+#include "wx/image.h"
 
 #define MINPOLYAREA 0.25
 #define MINPOLYDRAWAREA 2.2
+#define ZOOM_FACTOR 0.4
+
+#define ENVMAX_X 179
+#define ENVMAX_Y 85
+#define ENVMIN_X -179
+#define ENVMIN_Y -85
+
 
 enum wxGISEnumDrawPhase
 {

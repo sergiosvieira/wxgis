@@ -21,7 +21,7 @@
 #include "wxgis/catalogui/newmenu.h"
 #include "wxgis/catalogui/gxapplication.h"
 
-#include "../../art/mainframe.xpm"
+//#include "../../art/mainframe.xpm"
 
 //----------------------------------------------------------------------
 // wxGISNewMenu

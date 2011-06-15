@@ -1,9 +1,9 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  FeatureDataset class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,13 +21,13 @@
 #pragma once
 
 #include "wxgis/datasource/table.h"
+#include "wxgis/datasource/quadtree.h"
 
-void WXDLLIMPEXP_GIS_DS GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
+/** \class wxGISFeatureDataset featuredataset.h
+    \brief The GIS FeatureDataset class.
 
-//---------------------------------------
-// wxGISFeatureDataset
-//---------------------------------------
-
+    This class stores geographic data.
+*/
 class WXDLLIMPEXP_GIS_DS wxGISFeatureDataset :
 	public wxGISTable
 {
@@ -41,30 +41,32 @@ public:
 	virtual void Close(void);
 //wxGISFeatureDataset
 	virtual bool Open(int iLayer = 0, int bUpdate = 0, ITrackCancel* pTrackCancel = NULL);
-	virtual const OGREnvelopeSPtr GetEnvelope(void);
+	virtual OGREnvelope GetEnvelope(void);
     virtual const OGRwkbGeometryType GetGeometryType(void);
-    virtual OGRErr SetFilter(wxGISQueryFilter* pQFilter = NULL);
+ 	virtual wxGISQuadTreeCursorSPtr SearchGeometry(const CPLRectObj* pAoi = 0);
+    virtual OGRErr SetFilter(wxGISQueryFilter* pQFilter);
+	virtual wxFeatureCursorSPtr Search(wxGISQueryFilter* pQFilter, bool bOnlyFirst = false);
+
 //	//virtual void SetSpatialFilter(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);
 //	//virtual wxGISFeatureSet* GetFeatureSet(IQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
-	virtual wxGISGeometrySet* GetGeometrySet(wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
-    virtual wxGISGeometrySet* GetGeometries(void);
+	//virtual wxGISGeometrySet* GetGeometrySet(wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
+    //virtual wxGISGeometrySet* GetGeometries(void);
 //    virtual OGRErr CreateFeature(OGRFeature* poFeature);
+
     virtual char **GetFileList();
 	//
-    virtual OGRDataSource* GetDataSource(void);
-	virtual OGRLayer* GetLayerRef(int iLayer = 0);
+	virtual OGRLayer* const GetLayerRef(int iLayer = 0);
 protected:
-    virtual void CreateQuadTree(const OGREnvelopeSPtr pEnv);
-    virtual void DeleteQuadTree(void);
-    virtual void LoadGeometry(void);
-    virtual void UnloadGeometry(void);
+    virtual void LoadGeometry(ITrackCancel* pTrackCancel = NULL);
+    //virtual void UnloadGeometry(void);
 protected:
-	OGREnvelopeSPtr m_psExtent;
+	OGREnvelope m_stExtent;
 	OGRSpatialReferenceSPtr m_pSpatialReference;
-
     bool m_bIsGeometryLoaded;
-    wxGISGeometrySet *m_pGeometrySet;
-    CPLQuadTree* m_pQuadTree;
+
+	wxGISQuadTreeSPtr m_pQuadTree;
+
+    //wxGISGeometrySet *m_pGeometrySet;
 //    wxArrayString m_FeatureStringData;
 };
 
