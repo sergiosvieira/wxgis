@@ -42,6 +42,9 @@
 */
 class WXDLLIMPEXP_GIS_CTU wxGISSQLQueryDialog : public wxDialog 
 {
+public:
+	wxGISSQLQueryDialog( wxWindow* parent, wxWindowID id = ID_WXGISSQLQUERYDIALOG, const wxString& title = _("Select by attributes"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 477,590 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+	virtual ~wxGISSQLQueryDialog();
 private:
 
 protected:
@@ -107,11 +110,7 @@ protected:
 	wxButton* m_sdbSizerOK;
 	wxButton* m_sdbSizerApply;
 	wxButton* m_sdbSizerCancel;
-
-public:
-	
-	wxGISSQLQueryDialog( wxWindow* parent, wxWindowID id = ID_WXGISSQLQUERYDIALOG, const wxString& title = _("Select by attributes"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 477,590 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
-	~wxGISSQLQueryDialog();
-	
+protected:
+	bool m_bDocSet;
 };
 

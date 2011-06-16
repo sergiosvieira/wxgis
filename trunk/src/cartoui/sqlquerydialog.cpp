@@ -21,32 +21,37 @@
 
 #include "wxgis/cartoui/sqlquerydialog.h"
 
-wxGISSQLQueryDialog::wxGISSQLQueryDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+wxGISSQLQueryDialog::wxGISSQLQueryDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_bDocSet(false)
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
+
+	if(m_bDocSet)
+	{
 	
-	fgSizer1 = new wxFlexGridSizer( 2, 2, 0, 0 );
-	fgSizer1->AddGrowableCol( 1 );
-	fgSizer1->SetFlexibleDirection( wxHORIZONTAL );
-	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+		fgSizer1 = new wxFlexGridSizer( 2, 2, 0, 0 );
+		fgSizer1->AddGrowableCol( 1 );
+		fgSizer1->SetFlexibleDirection( wxHORIZONTAL );
+		fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+		
+		m_staticText1 = new wxStaticText( this, wxID_ANY, _("Layer:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+		m_staticText1->Wrap( -1 );
+		fgSizer1->Add( m_staticText1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+		
+		m_SelLayerComboBox = new wxComboBox( this, ID_M_SELLAYERCOMBOBOX, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
+		fgSizer1->Add( m_SelLayerComboBox, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+		
+		m_staticText2 = new wxStaticText( this, wxID_ANY, _("Method:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+		m_staticText2->Wrap( -1 );
+		fgSizer1->Add( m_staticText2, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+		
+		m_MethodSelComboBox = new wxComboBox( this, ID_M_METHODSELCOMBOBOX, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
+		fgSizer1->Add( m_MethodSelComboBox, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticText1 = new wxStaticText( this, wxID_ANY, _("Layer:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-	m_staticText1->Wrap( -1 );
-	fgSizer1->Add( m_staticText1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_SelLayerComboBox = new wxComboBox( this, ID_M_SELLAYERCOMBOBOX, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
-	fgSizer1->Add( m_SelLayerComboBox, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_staticText2 = new wxStaticText( this, wxID_ANY, _("Method:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-	m_staticText2->Wrap( -1 );
-	fgSizer1->Add( m_staticText2, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-	
-	m_MethodSelComboBox = new wxComboBox( this, ID_M_METHODSELCOMBOBOX, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
-	fgSizer1->Add( m_MethodSelComboBox, 0, wxALL|wxEXPAND, 5 );
-	
-	bMainSizer->Add( fgSizer1, 0, wxEXPAND, 5 );
+		bMainSizer->Add( fgSizer1, 0, wxEXPAND, 5 );
+	}
+
 	
 	wxBoxSizer* bSizer12;
 	bSizer12 = new wxBoxSizer( wxHORIZONTAL );
@@ -206,6 +211,8 @@ wxGISSQLQueryDialog::wxGISSQLQueryDialog( wxWindow* parent, wxWindowID id, const
 	m_sdbSizer->AddButton( m_sdbSizerCancel );
 	m_sdbSizer->Realize();
 	bMainSizer->Add( m_sdbSizer, 0, wxEXPAND|wxALL, 5 );
+
+    SetMinSize(wxSize(320,520));
 	
 	this->SetSizer( bMainSizer );
 	this->Layout();
