@@ -32,6 +32,10 @@
 #include "cpl_quad_tree.h"
 #include "cpl_string.h"
 
+/** \enum wxGISEnumDatasetType
+    \brief The dataset types 
+*/
+
 enum wxGISEnumDatasetType
 {
     enumGISAny = 0,
@@ -41,6 +45,9 @@ enum wxGISEnumDatasetType
 	enumGISContainer = 4
 };
 
+/** \enum wxGISEnumVectorDatasetType
+    \brief The vector datasource types 
+*/
 enum wxGISEnumVectorDatasetType
 {
 	enumVecUnknown = 0,
@@ -55,6 +62,9 @@ enum wxGISEnumVectorDatasetType
     emumVecMAX
 };
 
+/** \enum wxGISEnumRasterDatasetType
+    \brief The raster datasource types 
+*/
 enum wxGISEnumRasterDatasetType
 {
 	enumRasterUnknown = 0,
@@ -68,6 +78,9 @@ enum wxGISEnumRasterDatasetType
     enumRasterMAX
 };
 
+/** \enum wxGISEnumTableDatasetType
+    \brief The table datasource types 
+*/
 enum wxGISEnumTableDatasetType
 {
 	enumTableUnknown = 0,
@@ -80,18 +93,24 @@ enum wxGISEnumTableDatasetType
     emumTableMAX
 };
 
+/** \enum wxGISEnumPrjFileType
+    \brief The projection file types 
+*/
 enum wxGISEnumPrjFileType
 {
 	enumESRIPrjFile = 1,
 	enumSPRfile = 2
 };
 
+/** \enum wxGISEnumContainerType
+    \brief The container types 
+*/
 enum wxGISEnumContainerType
 {
     enumContUnknown = 0,
 	enumContFolder = 1,
 	enumContGDBFolder = 2,
-    enumCondDataset = 3,
+    enumContDataset = 3,
 	enumContGDB = 4
 };
 

@@ -82,6 +82,9 @@ void wxGISDisplayEx::Clear()
 	m_CurrentBounds.MinY = ENVMIN_Y;
 	m_CurrentBounds.MaxY = ENVMAX_Y;
 
+	m_CurrentBoundsX8 = m_CurrentBounds;
+	IncreaseEnvelope(&m_CurrentBoundsX8, 8);
+
 	m_nLastCacheID = 0;
 	m_nCurrentLayer = 0;
 	m_dAngleRad = 0;
@@ -335,6 +338,8 @@ wxRect wxGISDisplayEx::GetDeviceFrame(void)
 void wxGISDisplayEx::SetBounds(OGREnvelope& Bounds)
 {
 	m_CurrentBounds = Bounds;
+	m_CurrentBoundsX8 = m_CurrentBounds;
+	IncreaseEnvelope(&m_CurrentBoundsX8, 8);
 //	m_pCutGeom = EnvelopeToGeometry(m_CurrentBounds);
 	SetDerty(true);
 	//compute current transform matrix
@@ -368,6 +373,8 @@ void wxGISDisplayEx::InitTransformMatrix(void)
 
 //	cairo_matrix_init (m_pMatrix, 1, 0, 0, 1, m_dCacheCenterX, m_dCacheCenterY); 
 	cairo_matrix_init (m_pMatrix, dScale, m_dAngleRad, m_dAngleRad, -dScale, dCenterX, dCenterY); 
+
+	//cairo_matrix_rotate(m_pMatrix, 45.0 * M_PI / 180.0);
 	//set matrix to all caches
 	for(size_t i = 0; i < m_saLayerCaches.size(); ++i)
 		cairo_set_matrix (m_saLayerCaches[i].pCairoContext, m_pMatrix);
@@ -519,43 +526,18 @@ bool wxGISDisplayEx::DrawLine(const OGRLineString* pLine)
 {
 	if(NULL == pLine)
 		return false;
-	if(pLine->getNumPoints() < 2)
+	int nPointCount = pLine->getNumPoints();
+	if(nPointCount < 2)
 		return false;
-    OGRRawPoint* pOGRRawPoints = new OGRRawPoint[pLine->getNumPoints()];
+    OGRRawPoint* pOGRRawPoints = new OGRRawPoint[nPointCount * 3];
 	pLine->getPoints(pOGRRawPoints);
+
+	ClipGeometryByEnvelope(pOGRRawPoints, &nPointCount, m_CurrentBoundsX8);
+
 	cairo_move_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, pOGRRawPoints[0].x, pOGRRawPoints[0].y);
 
-	for(int i = 1; i < pLine->getNumPoints(); ++i)
+	for(int i = 1; i < nPointCount; ++i)
 	{
-		int nCodeA = GetPositionCode(m_CurrentBounds, pOGRRawPoints[i - 1]);
-		int nCodeB = GetPositionCode(m_CurrentBounds, pOGRRawPoints[i]);
-		if (nCodeA > 0 && nCodeB > 0)
-        {
-            if(nCodeA != nCodeB)
-            {
-                OGRRawPoint pt = GetPointOnEnvelope(m_CurrentBounds, pOGRRawPoints[i - 1], pOGRRawPoints[i], nCodeA);
-				cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, pt.x, pt.y);	
-
-                pt = GetPointOnEnvelope(m_CurrentBounds, pOGRRawPoints[i - 1], pOGRRawPoints[i], nCodeB);
-				cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, pt.x, pt.y);	
-            }
-        }
-        
-   //     //curve enter envelope
-        if(!nCodeB && nCodeA > 0)
-        {
-            OGRRawPoint pt = GetPointOnEnvelope(m_CurrentBounds, pOGRRawPoints[i - 1], pOGRRawPoints[i], nCodeA);
-			cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, pt.x, pt.y);	
-        }
-        //curve exit envelope
-        if(!nCodeA && nCodeB > 0)
-        {
-
-            //add point on intesection a ---|--- b
-            OGRRawPoint pt = GetPointOnEnvelope(m_CurrentBounds, pOGRRawPoints[i - 1], pOGRRawPoints[i], nCodeB);
-			cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, pt.x, pt.y);
-        }
-
         cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, pOGRRawPoints[i].x, pOGRRawPoints[i].y);	
 	}
 	wxDELETEA(pOGRRawPoints);

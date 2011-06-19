@@ -24,11 +24,16 @@
 #include "wxgis/base.h"
 #include "wxgis/datasource/datasource.h"
 
+/** \enum wxGISEnumPointPosition
+    \brief The point position enumerator
+
+	This enumerator used in Sutherland-Hodgman Polygon Clipping 
+*/
 enum wxGISEnumPointPosition
 {
-	enumGISPtPosLeft	= 0x0001, 
-	enumGISPtPosRight	= 0x0002,
-	enumGISPtPosBottom	= 0x0004,
-	enumGISPtPosTop		= 0x0008
+	enumGISPtPosLeft = 0, 
+	enumGISPtPosRight,
+	enumGISPtPosBottom,
+	enumGISPtPosTop
 };
 

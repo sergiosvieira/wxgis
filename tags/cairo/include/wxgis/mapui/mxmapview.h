@@ -25,6 +25,10 @@
 #include "wxgis/cartoui/mapviewex.h"
 #include "wxgis/framework/framework.h"
 
+
+/** \class wxMxMapView mxmapview.h
+    \brief This is the map view class in MxApplication.
+*/
 class WXDLLIMPEXP_GIS_MAPU wxMxMapView :
 	public wxGISMapViewEx
 {

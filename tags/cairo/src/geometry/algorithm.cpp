@@ -21,6 +21,57 @@
 
 #include "wxgis/geometry/algorithm.h"
 
+//Sutherland-Hodgman Polygon Clipping
+//Adopted from (C) 2005 by Gavin Macaulay QGIS Project
+
+void ClipGeometryByEnvelope(OGRRawPoint* pOGRRawPoints, int *pnPointCount, const OGREnvelope &Env)
+{
+	bool shapeOpen = false;
+	OGRRawPoint* pTmpOGRRawPoints = new OGRRawPoint[*pnPointCount];
+	int nTmpPtCount(0);
+	TrimFeatureToBoundary( pOGRRawPoints, *pnPointCount, &pTmpOGRRawPoints, &nTmpPtCount, enumGISPtPosRight, Env, shapeOpen );
+
+	*pnPointCount = 0;
+	TrimFeatureToBoundary( pTmpOGRRawPoints, nTmpPtCount, &pOGRRawPoints, pnPointCount, enumGISPtPosTop, Env, shapeOpen );
+
+	nTmpPtCount = 0;
+	TrimFeatureToBoundary( pOGRRawPoints, *pnPointCount, &pTmpOGRRawPoints, &nTmpPtCount, enumGISPtPosLeft, Env, shapeOpen );
+
+	*pnPointCount = 0;
+	TrimFeatureToBoundary(  pTmpOGRRawPoints, nTmpPtCount, &pOGRRawPoints, pnPointCount, enumGISPtPosBottom, Env, shapeOpen );
+
+	wxDELETEA(pTmpOGRRawPoints);
+}
+
+void WXDLLIMPEXP_GIS_GEOM IncreaseEnvelope(OGREnvelope *pEnv, int nSize)
+{
+	double dWidth = (pEnv->MaxX - pEnv->MinX) * nSize / 2;
+	double dHeight = (pEnv->MaxY - pEnv->MinY) * nSize / 2;
+	pEnv->MinX -= dWidth;
+	pEnv->MinY -= dHeight;
+	pEnv->MaxX += dWidth;
+	pEnv->MaxY += dHeight;
+}
+
+OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSPtr pSpaRef)
+{
+	if(!Env.IsInit())
+		return OGRGeometrySPtr();
+	OGRLinearRing ring;
+	ring.addPoint(Env.MinX, Env.MinY);
+	ring.addPoint(Env.MinX, Env.MaxY);
+	ring.addPoint(Env.MaxX, Env.MaxY);
+	ring.addPoint(Env.MaxX, Env.MinY);
+    ring.closeRings();
+
+    OGRPolygon* pRgn = new OGRPolygon();
+    pRgn->addRing(&ring);
+    pRgn->flattenTo2D();
+	if(pSpaRef)
+		pRgn->assignSpatialReference(pSpaRef->Clone());
+	return OGRGeometrySPtr(static_cast<OGRGeometry*>(pRgn));
+}
+
 //#define LEFT  1  /* двоичное 0001 */
 //#define RIGHT 2  /* двоичное 0010 */
 //#define BOT   4  /* двоичное 0100 */
@@ -780,26 +831,9 @@
 //
 //    //return poOGRProduct;
 
+//
 
-OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSPtr pSpaRef)
-{
-	if(!Env.IsInit())
-		return OGRGeometrySPtr();
-	OGRLinearRing ring;
-	ring.addPoint(Env.MinX, Env.MinY);
-	ring.addPoint(Env.MinX, Env.MaxY);
-	ring.addPoint(Env.MaxX, Env.MaxY);
-	ring.addPoint(Env.MaxX, Env.MinY);
-    ring.closeRings();
-
-    OGRPolygon* pRgn = new OGRPolygon();
-    pRgn->addRing(&ring);
-    pRgn->flattenTo2D();
-	if(pSpaRef)
-		pRgn->assignSpatialReference(pSpaRef->Clone());
-	return OGRGeometrySPtr(static_cast<OGRGeometry*>(pRgn));
-}
-
+//
 //#define poscode(r, p) \
 //	((((p).x < (r).MinX) ? LEFT : 0)  +  /* +1 если точка левее прямоугольника */ \
 //	 (((p).x > (r).MaxX) ? RIGHT : 0) +  /* +2 если точка правее прямоугольника */\
@@ -823,30 +857,30 @@ OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSP
 //        return GetPointOnEnvelope(Env, Pt1, Pt2, code_b);
 //	return OGRRawPoint();
 //}
-
-
-OGRRawPoint GetPointOnEnvelope(OGREnvelope &Env, OGRRawPoint &Pt1, OGRRawPoint &Pt2, int code)
-{
-	OGRRawPoint c;
-    if (code & enumGISPtPosLeft) 
-	{
-        c.y += (Pt1.y - Pt2.y) * (Env.MinX - c.x) / (Pt1.x - Pt2.x);
-        c.x = Env.MinX;
-    } 
-	else if (code & enumGISPtPosRight) 
-	{
-        c.y += (Pt1.y - Pt2.y) * (Env.MaxX - c.x) / (Pt1.x - Pt2.x);
-        c.x = Env.MaxX;
-    }
-    if (code & enumGISPtPosBottom) 
-	{
-        c.x += (Pt1.x - Pt2.x) * (Env.MinY - c.y) / (Pt1.y - Pt2.y);
-        c.y = Env.MinY;
-    } 
-	else if (code & enumGISPtPosTop) 
-	{
-        c.x += (Pt1.x - Pt2.x) * (Env.MaxY - c.y) / (Pt1.y - Pt2.y);
-        c.y = Env.MaxY;
-    }
-	return c;
-}
+//
+//
+//OGRRawPoint GetPointOnEnvelope(OGREnvelope &Env, OGRRawPoint &Pt1, OGRRawPoint &Pt2, int code)
+//{
+//	OGRRawPoint c;
+//    if (code & enumGISPtPosLeft) 
+//	{
+//        c.y += (Pt1.y - Pt2.y) * (Env.MinX - c.x) / (Pt1.x - Pt2.x);
+//        c.x = Env.MinX;
+//    } 
+//	else if (code & enumGISPtPosRight) 
+//	{
+//        c.y += (Pt1.y - Pt2.y) * (Env.MaxX - c.x) / (Pt1.x - Pt2.x);
+//        c.x = Env.MaxX;
+//    }
+//    if (code & enumGISPtPosBottom) 
+//	{
+//        c.x += (Pt1.x - Pt2.x) * (Env.MinY - c.y) / (Pt1.y - Pt2.y);
+//        c.y = Env.MinY;
+//    } 
+//	else if (code & enumGISPtPosTop) 
+//	{
+//        c.x += (Pt1.x - Pt2.x) * (Env.MaxY - c.y) / (Pt1.y - Pt2.y);
+//        c.y = Env.MaxY;
+//    }
+//	return c;
+//}
