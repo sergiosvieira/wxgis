@@ -66,7 +66,7 @@ bool wxMxMapView::Activate(IApplication* application, wxXmlNode* pConf)
 	m_pStatusBar = m_pApp->GetStatusBar();
 
 	m_pTrackCancel = new ITrackCancel();
-	if(!m_pStatusBar)
+	if(m_pStatusBar)
 		m_pTrackCancel->SetProgressor(m_pStatusBar->GetAnimation());
 	SetTrackCancel(m_pTrackCancel);
 

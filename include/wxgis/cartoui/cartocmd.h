@@ -22,10 +22,9 @@
 #include "wxgis/framework/framework.h"
 #include "wxgis/cartoui/mapviewex.h"
 
-//--------------------------------------------------
-// wxGISCartoMainCmd
-//--------------------------------------------------
-
+/** \class wxGISCartoMainCmd cartocmd.h
+    \brief The carto main commands.
+*/
 class wxGISCartoMainCmd :
 	public ICommand
 {
@@ -51,10 +50,9 @@ private:
 	wxGISMapViewEx* m_pMapView;
 };
 
-//--------------------------------------------------
-// wxGISCartoMainTool
-//--------------------------------------------------
-
+/** \class wxGISCartoMainTool cartocmd.h
+    \brief The carto main tool.
+*/
 class wxGISCartoMainTool :
 	public ITool
 {
@@ -84,6 +82,47 @@ public:
 private:
 	IApplication* m_pApp;
 	wxImageList m_ImageList;
+	wxGISMapViewEx* m_pMapView;
+	bool m_bCheck;
+};
+
+/** \class wxGISCartoFrameTool cartocmd.h
+    \brief The carto frame tools and commands.
+*/
+class wxGISCartoFrameTool :
+	public ITool,
+	public IToolControl
+{
+	DECLARE_DYNAMIC_CLASS(wxGISCartoFrameTool)
+public:
+	wxGISCartoFrameTool(void);
+	virtual ~wxGISCartoFrameTool(void);
+	//ICommand
+	virtual wxIcon GetBitmap(void);
+	virtual wxString GetCaption(void);
+	virtual wxString GetCategory(void);
+	virtual bool GetChecked(void);
+	virtual bool GetEnabled(void);
+	virtual wxString GetMessage(void);
+	virtual wxGISEnumCommandKind GetKind(void);
+	virtual void OnClick(void);
+	virtual bool OnCreate(IApplication* pApp);
+	virtual wxString GetTooltip(void);
+	virtual unsigned char GetCount(void);
+	//ITool
+	virtual wxCursor GetCursor(void);
+	virtual void SetChecked(bool bCheck);
+	virtual void OnMouseDown(wxMouseEvent& event);
+	virtual void OnMouseUp(wxMouseEvent& event);
+	virtual void OnMouseDoubleClick(wxMouseEvent& event);
+	virtual void OnMouseMove(wxMouseEvent& event);
+	//IToolControl
+	virtual IToolBarControl* GetControl(void);
+	virtual wxString GetToolLabel(void);
+	virtual bool HasToolLabel(void);
+private:
+	IApplication* m_pApp;
+	//wxImageList m_ImageList;
 	wxGISMapViewEx* m_pMapView;
 	bool m_bCheck;
 };

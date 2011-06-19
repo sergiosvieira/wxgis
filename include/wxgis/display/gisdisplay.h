@@ -120,7 +120,7 @@ protected:
 	size_t m_nLastCacheID, m_nCurrentLayer;
 	int m_nMax_X, m_nMax_Y;
 	wxRect m_oDeviceFrameRect;
-	OGREnvelope m_CurrentBounds;
+	OGREnvelope m_CurrentBounds, m_CurrentBoundsX8;
 	//wxSize m_ppi;
 	double m_dAngleRad;
 	cairo_matrix_t* m_pMatrix;

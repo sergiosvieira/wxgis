@@ -494,7 +494,7 @@ void wxGISMapViewEx::SetFullExtent(void)
 
 void wxGISMapViewEx::PanStart(wxPoint MouseLocation)
 {
-	CancelDrawThread();
+	//CancelDrawThread();
 	m_StartMouseLocation = MouseLocation;
     m_nDrawingState = enumGISMapPanning;
 	CaptureMouse();
