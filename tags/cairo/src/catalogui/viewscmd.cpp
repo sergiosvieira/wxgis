@@ -3,7 +3,7 @@
  * Purpose:  Catalog Views Commands class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogViewsCmd, wxObject)
 
-wxGISCatalogViewsCmd::wxGISCatalogViewsCmd(void) : m_pTreeView(NULL), m_IconViews(views_xpm), m_IconSelAll(select_all_xpm), m_IconTreeView(treeview_xpm)
+wxGISCatalogViewsCmd::wxGISCatalogViewsCmd(void) : m_pTreeView(NULL)
 {
 }
 
@@ -46,10 +46,16 @@ wxIcon wxGISCatalogViewsCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
+			if(!m_IconViews.IsOk())
+				m_IconViews = wxIcon(views_xpm);
 			return m_IconViews;
 		case 1:
+			if(!m_IconSelAll.IsOk())
+				m_IconSelAll = wxIcon(select_all_xpm);
 			return m_IconSelAll;
 		case 2:
+			if(!m_IconTreeView.IsOk())
+				m_IconTreeView = wxIcon(treeview_xpm);
 			return m_IconTreeView;
 		default:
 			return wxNullIcon;

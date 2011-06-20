@@ -43,7 +43,7 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISGeoprocessingCmd, wxObject)
 
-wxGISGeoprocessingCmd::wxGISGeoprocessingCmd(void) : m_pToolboxView(NULL), m_IconGPMenu(export_xpm), m_IconToolview(toolview_xpm)
+wxGISGeoprocessingCmd::wxGISGeoprocessingCmd(void) : m_pToolboxView(NULL)
 {
 }
 
@@ -56,8 +56,12 @@ wxIcon wxGISGeoprocessingCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
+			if(!m_IconGPMenu.IsOk())
+				m_IconGPMenu = wxIcon(export_xpm);
 			return m_IconGPMenu;
 		case 1:
+			if(!m_IconToolview.IsOk())
+				m_IconToolview = wxIcon(toolview_xpm);
 			return m_IconToolview;
 		default:
 			return wxNullIcon;
