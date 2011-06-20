@@ -22,8 +22,23 @@
 #include "wxgis/display/rubberband.h"
 //#include "wxgis/display/simplefillsymbol.h"
 
-#include "../../art/geography16.xpm"
-#include "../../art/cursors_16.xpm"
+#include "../../art/fullext.xpm"
+#include "../../art/prevext.xpm"
+#include "../../art/nextext.xpm"
+#include "../../art/zoomin.xpm"
+#include "../../art/zoomout.xpm"
+#include "../../art/info.xpm"
+#include "../../art/pan1_cur.xpm"
+#include "../../art/pan2_cur.xpm"
+#include "../../art/cancel_map_rotate.xpm"
+#include "../../art/get_info_cur.xpm"
+#include "../../art/map_rotate.xpm"
+#include "../../art/rotate_cur.xpm"
+#include "../../art/zoom_in_cur.xpm"
+#include "../../art/zoom_out_cur.xpm"
+
+//#include "../../art/geography16.xpm"
+//#include "../../art/cursors_16.xpm"
 
 //	0	Full Extent
 //	1	Prev Extent
@@ -39,8 +54,6 @@ IMPLEMENT_DYNAMIC_CLASS(wxGISCartoMainCmd, wxObject)
 
 wxGISCartoMainCmd::wxGISCartoMainCmd(void) : m_pMapView(NULL)
 {
-	m_ImageList.Create(16, 16);
-	m_ImageList.Add(wxBitmap(geography16_xpm));
 }
 
 wxGISCartoMainCmd::~wxGISCartoMainCmd(void)
@@ -52,11 +65,17 @@ wxIcon wxGISCartoMainCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
-			return m_ImageList.GetIcon(9);
+			if(!m_IconFullExt.IsOk())
+				m_IconFullExt = wxIcon(fullext_xpm);
+			return m_IconFullExt;
 		case 1:
-			return m_ImageList.GetIcon(6);
+			if(!m_IconPrevExt.IsOk())
+				m_IconPrevExt = wxIcon(prevext_xpm);
+			return m_IconPrevExt;
 		case 2:
-			return m_ImageList.GetIcon(7);
+			if(!m_IconNextExt.IsOk())
+				m_IconNextExt = wxIcon(nextext_xpm);
+			return m_IconNextExt;
 		default:
 			return wxNullIcon;
 	}
@@ -221,8 +240,6 @@ IMPLEMENT_DYNAMIC_CLASS(wxGISCartoMainTool, wxObject)
 
 wxGISCartoMainTool::wxGISCartoMainTool(void) : m_pMapView(NULL), m_bCheck(false)
 {
-	m_ImageList.Create(16, 16);
-	m_ImageList.Add(wxBitmap(geography16_xpm));
 }
 
 wxGISCartoMainTool::~wxGISCartoMainTool(void)
@@ -234,13 +251,21 @@ wxIcon wxGISCartoMainTool::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
-			return m_ImageList.GetIcon(5);
+			if(!m_IconZoomIn.IsOk())
+				m_IconZoomIn = wxIcon(zoomin_xpm);
+			return m_IconZoomIn;
 		case 1:
-			return m_ImageList.GetIcon(4);
+			if(!m_IconZoomOut.IsOk())
+				m_IconZoomOut = wxIcon(zoomout_xpm);
+			return m_IconZoomOut;
 		case 2:
-			return m_ImageList.GetIcon(1);
+			if(!m_IconPan.IsOk())
+				m_IconPan = wxIcon(pan1_cur_xpm);
+			return m_IconPan;
 		case 3:
-			return m_ImageList.GetIcon(10);
+			if(!m_IconInfo.IsOk())
+				m_IconInfo = wxIcon(info_xpm);
+			return m_IconInfo;
 		default:
 			return wxNullIcon;
 	}
@@ -390,38 +415,44 @@ unsigned char wxGISCartoMainTool::GetCount(void)
 
 wxCursor wxGISCartoMainTool::GetCursor(void)
 {
-    wxImageList oCursorList(16, 16);
-    oCursorList.Add(wxBitmap(cursors_16_xpm));
 	switch(m_subtype)
 	{
 		case 0:	//z_in
-		{
-			wxImage CursorImage = oCursorList.GetBitmap(0).ConvertToImage();//m_ImageList.GetBitmap(13).ConvertToImage();
-			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 6);
-			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 6);
-			return wxCursor(CursorImage);
-		}
+			if(!m_CurZoomIn.IsOk())
+			{
+				wxImage CursorImage = wxBitmap(zoom_in_cur_xpm).ConvertToImage();
+				CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 6);
+				CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 6);
+				m_CurZoomIn = wxCursor(CursorImage);
+			}
+			return m_CurZoomIn;
 		case 1:	//z_out
-		{
-			wxImage CursorImage = oCursorList.GetBitmap(1).ConvertToImage();//m_ImageList.GetBitmap(14).ConvertToImage();
-			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 6);
-			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 6);
-			return wxCursor(CursorImage);
-		}
+			if(!m_CurZoomIn.IsOk())
+			{
+				wxImage CursorImage = wxBitmap(zoom_out_cur_xpm).ConvertToImage();
+				CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 6);
+				CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 6);
+				m_CurZoomOut = wxCursor(CursorImage);
+			}
+			return m_CurZoomOut;
 		case 2:	//pan
-		{
-			wxImage CursorImage = oCursorList.GetBitmap(3).ConvertToImage();//m_ImageList.GetBitmap(1).ConvertToImage();
-			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 7);
-			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 7);
-			return wxCursor(CursorImage);//wxCURSOR_HAND
-		}
+			if(!m_CurPan1.IsOk())
+			{
+				wxImage CursorImage = wxBitmap(pan1_cur_xpm).ConvertToImage();
+				CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 7);
+				CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 7);
+				m_CurPan1 = wxCursor(CursorImage);
+			}
+			return m_CurPan1;
 		case 3:	//inf
-		{
-			wxImage CursorImage = oCursorList.GetBitmap(2).ConvertToImage();//m_ImageList.GetBitmap(12).ConvertToImage();
-			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 0);
-			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 0);
-			return wxCursor(CursorImage);//*wxSTANDARD_CURSOR
-		}
+			if(!m_CurInfo.IsOk())
+			{
+				wxImage CursorImage = wxBitmap(get_info_cur_xpm).ConvertToImage();
+				CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 0);
+				CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 0);
+				m_CurInfo = wxCursor(CursorImage);
+			}
+			return m_CurInfo;
 		default:
 			return wxNullCursor;
 	}
@@ -473,17 +504,16 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 		}
 		break;
 		case 2:	//pan
-		{
-		    wxImageList oCursorList(16, 16);
-		    oCursorList.Add(wxBitmap(cursors_16_xpm));
-			wxImage CursorImage = oCursorList.GetBitmap(4).ConvertToImage();
-			//m_ImageList.GetBitmap(11).ConvertToImage();
-			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 7);
-			CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 7);
-			m_pMapView->SetCursor(wxCursor(CursorImage));
+			if(!m_CurPan2.IsOk())
+			{
+				wxImage CursorImage = wxBitmap(pan2_cur_xpm).ConvertToImage();
+				CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 7);
+				CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 7);
+				m_CurPan2 = wxCursor(CursorImage);
+			}
+			m_pMapView->SetCursor(m_CurPan2);
 			m_pMapView->PanStart(event.GetPosition());
-		}
-		break;
+			break;
 		case 3:	//inf
 		{
 			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(0, 0, 255), 2), m_pMapView, m_pMapView->GetDisplay());
@@ -555,8 +585,6 @@ IMPLEMENT_DYNAMIC_CLASS(wxGISCartoFrameTool, wxObject)
 
 wxGISCartoFrameTool::wxGISCartoFrameTool(void) : m_pMapView(NULL), m_bCheck(false)
 {
-	//m_ImageList.Create(16, 16);
-	//m_ImageList.Add(wxBitmap(geography16_xpm));
 }
 
 wxGISCartoFrameTool::~wxGISCartoFrameTool(void)
@@ -568,7 +596,13 @@ wxIcon wxGISCartoFrameTool::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
+			if(!m_IconRotate.IsOk())
+				m_IconRotate = wxIcon(map_rotate_xpm);
+			return m_IconRotate;
 		case 1:
+			if(!m_IconCancelRotate.IsOk())
+				m_IconCancelRotate = wxIcon(cancel_map_rotate_xpm);
+			return m_IconCancelRotate;
 		case 2:
 		default:
 			return wxNullIcon;
@@ -633,6 +667,7 @@ bool wxGISCartoFrameTool::GetEnabled(void)
 	{
 		case 0:
 		case 1:
+			//check if angle == 0
 		case 2:
 			return m_pMapView->IsShown();
 		default:
@@ -713,34 +748,20 @@ unsigned char wxGISCartoFrameTool::GetCount(void)
 
 wxCursor wxGISCartoFrameTool::GetCursor(void)
 {
- //   wxImageList oCursorList(16, 16);
- //   oCursorList.Add(wxBitmap(cursors_16_xpm));
-	//switch(m_subtype)
-	//{
-	//	case 0:	//z_in
-	//	{
-	//		wxImage CursorImage = oCursorList.GetBitmap(0).ConvertToImage();//m_ImageList.GetBitmap(13).ConvertToImage();
-	//		CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 6);
-	//		CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 6);
-	//		return wxCursor(CursorImage);
-	//	}
-	//	case 1:	//z_out
-	//	{
-	//		wxImage CursorImage = oCursorList.GetBitmap(1).ConvertToImage();//m_ImageList.GetBitmap(14).ConvertToImage();
-	//		CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 6);
-	//		CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 6);
-	//		return wxCursor(CursorImage);
-	//	}
-	//	case 2:	//pan
-	//	{
-	//		wxImage CursorImage = oCursorList.GetBitmap(3).ConvertToImage();//m_ImageList.GetBitmap(1).ConvertToImage();
-	//		CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 7);
-	//		CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 7);
-	//		return wxCursor(CursorImage);//wxCURSOR_HAND
-	//	}
-	//	default:
-	//		return wxNullCursor;
-	//}
+	switch(m_subtype)
+	{
+		case 0:	//rotate
+			if(!m_CurRotate.IsOk())
+			{
+				wxImage CursorImage = wxBitmap(rotate_cur_xpm).ConvertToImage();
+				CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 7);
+				CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 7);
+				m_CurRotate = wxCursor(CursorImage);
+			}
+			return m_CurRotate;
+		default:
+			return wxNullCursor;
+	}
 }
 
 void wxGISCartoFrameTool::SetChecked(bool bCheck)
@@ -862,12 +883,12 @@ IToolBarControl* wxGISCartoFrameTool::GetControl(void)
 	switch(m_subtype)
 	{
 		case 2:	
-			////if(!m_pGxLocationComboBox)
-			//{
-			//	wxArrayString PathArray;
-			//	wxGxLocationComboBox* pGxLocationComboBox = new wxGxLocationComboBox(dynamic_cast<wxWindow*>(m_pApp), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 400, 22 ), PathArray);
-			//	return static_cast<IToolBarControl*>(pGxLocationComboBox);
-			//}
+			//if(!m_pGxLocationComboBox)
+			{
+				wxArrayString ValuesArray;
+				wxGISRotationComboBox* pRotationComboBox = new wxGISRotationComboBox(dynamic_cast<wxWindow*>(m_pApp), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 65, 22 ), ValuesArray);
+				return static_cast<IToolBarControl*>(pRotationComboBox);
+			}
 		default:
 			return NULL;
 	}
@@ -894,3 +915,48 @@ bool wxGISCartoFrameTool::HasToolLabel(void)
 			return false;
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// wxGISRotationComboBox
+////////////////////////////////////////////////////////////////////////////////////////////
+
+BEGIN_EVENT_TABLE(wxGISRotationComboBox, wxComboBox)
+	EVT_TEXT_ENTER(wxID_ANY, wxGISRotationComboBox::OnTextEnter)
+	EVT_COMBOBOX(wxID_ANY, wxGISRotationComboBox::OnTextEnter)
+END_EVENT_TABLE()
+
+wxGISRotationComboBox::wxGISRotationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name) : wxComboBox(parent, id, value, pos, size, choices, style, validator, name), m_pApp(NULL)
+{
+}
+
+wxGISRotationComboBox::~wxGISRotationComboBox(void)
+{
+}
+
+void wxGISRotationComboBox::OnTextEnter(wxCommandEvent& event)
+{
+	//wxGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(m_pApp);
+	//if(pGxApp)
+	//{
+	//	wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+	//	if(pCatalog)
+	//	{
+	//		pCatalog->SetLocation(GetValue());
+	//		for(size_t i = 0; i < m_ValuesArr.size(); i++)
+	//			if(m_ValuesArr[i] == GetValue())
+	//				return;
+	//		Append(GetValue());
+	//		m_ValuesArr.push_back(GetValue());
+	//	}
+	//}
+}
+
+void wxGISRotationComboBox::Activate(IApplication* pApp)
+{
+	m_pApp = pApp;
+}
+
+void wxGISRotationComboBox::Deactivate(void)
+{
+}
+

@@ -82,27 +82,6 @@ IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogMainCmd, wxObject)
 
 wxGISCatalogMainCmd::wxGISCatalogMainCmd(void)
 {
-    m_IconFolderUp = wxIcon(folder_up_xpm);
-    m_IconFolderConn = wxIcon(folder_conn_new_xpm);
-    m_IconFolderConnDel = wxIcon(folder_conn_del_xpm);
-    m_IconDel = wxIcon(delete_xpm);
-	//
-	wxBitmap oGoOrigin(go_xpm);
-    wxImage oGoPrevious = oGoOrigin.ConvertToImage();
-    oGoPrevious = oGoPrevious.Mirror(true);
-
-    m_IconGoPrev.CopyFromBitmap(wxBitmap(oGoPrevious));
-    m_IconGoNext = wxIcon(go_xpm);
-	//
-    m_IconFolderNew = wxIcon(folder_new_xpm);
-    m_IconEdit = wxIcon(edit_xpm);
-    m_IconViewRefresh = wxIcon(view_refresh_xpm);
-    m_IconProps = wxIcon(properties_xpm);
-    m_LargeFolderIcon = wxIcon(folder_48_xpm);
-    m_SmallFolderIcon = wxIcon(folder_16_xpm);
-    m_CopyIcon = wxIcon(edit_copy_xpm);
-    m_CutIcon = wxIcon(edit_cut_xpm);
-    m_PasteIcon = wxIcon(edit_paste_xpm);
 }
 
 wxGISCatalogMainCmd::~wxGISCatalogMainCmd(void)
@@ -114,30 +93,62 @@ wxIcon wxGISCatalogMainCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
+			if(!m_IconFolderUp.IsOk())
+				m_IconFolderUp = wxIcon(folder_up_xpm);
 			return m_IconFolderUp;
 		case 1:
+			if(!m_IconFolderConn.IsOk())
+				m_IconFolderConn = wxIcon(folder_conn_new_xpm);
 			return m_IconFolderConn;
 		case 2:
+			if(!m_IconFolderConnDel.IsOk())
+				m_IconFolderConnDel = wxIcon(folder_conn_del_xpm);
 			return m_IconFolderConnDel;
 		case 4:
+			if(!m_IconDel.IsOk())
+				m_IconDel = wxIcon(delete_xpm);
 			return m_IconDel;
 		case 5:
+			if(!m_IconGoPrev.IsOk())
+			{
+				wxBitmap oGoOrigin(go_xpm);
+				wxImage oGoPrevious = oGoOrigin.ConvertToImage();
+				oGoPrevious = oGoPrevious.Mirror(true);
+
+				m_IconGoPrev.CopyFromBitmap(wxBitmap(oGoPrevious));
+			}
 			return m_IconGoPrev;
 		case 6:
+			if(!m_IconGoNext.IsOk())
+				m_IconGoNext = wxIcon(go_xpm);
 			return m_IconGoNext;
 		case 7:
+			if(!m_IconFolderNew.IsOk())
+				m_IconFolderNew = wxIcon(folder_new_xpm);
 			return m_IconFolderNew;
 		case 8:	
+			if(!m_IconEdit.IsOk())
+				m_IconEdit = wxIcon(edit_xpm);
 			return m_IconEdit;
 		case 9:
+			if(!m_IconViewRefresh.IsOk())
+				m_IconViewRefresh = wxIcon(view_refresh_xpm);
 			return m_IconViewRefresh;
 		case 10:
+			if(!m_IconProps.IsOk())
+				m_IconProps = wxIcon(properties_xpm);
 			return m_IconProps;
 		case 11:
+			if(!m_CopyIcon.IsOk())
+				m_CopyIcon = wxIcon(edit_copy_xpm);
 			return m_CopyIcon;
 		case 12:
+			if(!m_CutIcon.IsOk())
+				m_CutIcon = wxIcon(edit_cut_xpm);
 			return m_CutIcon;
 		case 13:
+			if(!m_PasteIcon.IsOk())
+				m_PasteIcon = wxIcon(edit_paste_xpm);
 			return m_PasteIcon;
 		case 3:
 		default:
@@ -802,6 +813,11 @@ void wxGISCatalogMainCmd::OnClick(void)
                                 return;
                             }
                             //create GxObject
+							if(!m_LargeFolderIcon.IsOk())
+								m_LargeFolderIcon = wxIcon(folder_48_xpm);
+							if(!m_SmallFolderIcon.IsOk())
+								m_SmallFolderIcon = wxIcon(folder_16_xpm);
+
                             wxGxFolderUI* pFolder = new wxGxFolderUI(sFolderPath, wxString(_("New folder")), m_LargeFolderIcon, m_SmallFolderIcon);
                             IGxObject* pGxFolder = static_cast<IGxObject*>(pFolder);
                             IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());

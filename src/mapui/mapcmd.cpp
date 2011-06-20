@@ -29,7 +29,6 @@ IMPLEMENT_DYNAMIC_CLASS(wxGISMapMainCmd, wxObject)
 
 wxGISMapMainCmd::wxGISMapMainCmd(void)
 {
-    m_IconAddLayer = wxIcon(add_layer_xpm);
 }
 
 wxGISMapMainCmd::~wxGISMapMainCmd(void)
@@ -41,6 +40,8 @@ wxIcon wxGISMapMainCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
+			if(!m_IconAddLayer.IsOk())
+				m_IconAddLayer = wxIcon(add_layer_xpm);
 			return m_IconAddLayer;
 		default:
 			return wxNullIcon;
