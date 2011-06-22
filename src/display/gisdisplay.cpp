@@ -243,6 +243,40 @@ void wxGISDisplayEx::PanningDraw(wxCoord x, wxCoord y, wxDC* pDC)
     cairo_surface_destroy (surface);
 }
 
+void wxGISDisplayEx::RotatingDraw(double dAngle, wxDC* pDC)
+{
+	wxCriticalSectionLocker locker(m_CritSect);
+
+	cairo_set_source_rgb(m_cr_tmp, m_stBackGroudnColour.dRed, m_stBackGroudnColour.dGreen, m_stBackGroudnColour.dBlue);
+	cairo_paint(m_cr_tmp);
+
+	//int w = cairo_image_surface_get_width (cairo_get_target(m_cr_tmp));
+	//int h = cairo_image_surface_get_height (cairo_get_target(m_cr_tmp));
+	//cairo_translate (m_cr_tmp, 0.5 * m_oDeviceFrameRect.GetWidth(), 0.5 * m_oDeviceFrameRect.GetHeight());
+	cairo_translate (m_cr_tmp, m_dFrameCenterX, m_dFrameCenterY);
+	cairo_rotate (m_cr_tmp, dAngle);
+	//cairo_translate (m_cr_tmp, -0.5 * m_oDeviceFrameRect.GetWidth(), -0.5 * m_oDeviceFrameRect.GetHeight());
+	cairo_translate (m_cr_tmp, -m_dFrameCenterX, -m_dFrameCenterY);
+	cairo_set_source_surface (m_cr_tmp, m_saLayerCaches[m_saLayerCaches.size() - 1].pCairoSurface, -m_dOrigin_X, -m_dOrigin_Y);
+
+	cairo_paint (m_cr_tmp);
+
+	cairo_surface_t *surface;
+    cairo_t *cr;
+
+	cr = CreateContext(pDC);
+	surface = cairo_get_target(cr);
+
+	cairo_set_source_surface (cr, m_surface_tmp, 0, 0);
+	cairo_paint (cr);
+
+    cairo_destroy (cr);
+    cairo_surface_destroy (surface);
+
+	cairo_matrix_t mat = {1, 0, 0, 1, 0, 0};
+	cairo_set_matrix (m_cr_tmp, &mat);
+}
+
 size_t wxGISDisplayEx::AddCache(void)
 {
 	wxCriticalSectionLocker locker(m_CritSect);
@@ -366,20 +400,27 @@ void wxGISDisplayEx::InitTransformMatrix(void)
 	double dScaleY = fabs(m_dFrameCenterY / dWorldCenterY);
 	double dScale = std::min(dScaleX, dScaleY);
 
-	double dCenterX = m_dCacheCenterX - (dWorldCenterX + m_CurrentBounds.MinX) * dScale;
-	double dCenterY = m_dCacheCenterY + (dWorldCenterY + m_CurrentBounds.MinY) * dScale;
-	m_dFrameXShift = m_dFrameCenterX - (dWorldCenterX + m_CurrentBounds.MinX) * dScale;
-	m_dFrameYShift = m_dFrameCenterY + (dWorldCenterY + m_CurrentBounds.MinY) * dScale;
+	double dWorldDeltaX = dWorldCenterX + m_CurrentBounds.MinX;
+	double dWorldDeltaY = dWorldCenterY + m_CurrentBounds.MinY;
+
+	double dWorldDeltaXSt = dScale *dWorldDeltaX  + m_dAngleRad * dWorldDeltaY;
+	double dWorldDeltaYSt = m_dAngleRad * dWorldDeltaX + dScale * dWorldDeltaY;
+
+	double dCenterX = m_dCacheCenterX - dWorldDeltaXSt;//(dWorldCenterX + m_CurrentBounds.MinX) * dScale;//
+	double dCenterY = m_dCacheCenterY + dWorldDeltaYSt;//(dWorldCenterY + m_CurrentBounds.MinY) * dScale;//
+	m_dFrameXShift = m_dFrameCenterX - dWorldDeltaXSt;//(dWorldCenterX + m_CurrentBounds.MinX) * dScale;//
+	m_dFrameYShift = m_dFrameCenterY + dWorldDeltaYSt;//(dWorldCenterY + m_CurrentBounds.MinY) * dScale;//
 
 //	cairo_matrix_init (m_pMatrix, 1, 0, 0, 1, m_dCacheCenterX, m_dCacheCenterY); 
-	cairo_matrix_init (m_pMatrix, dScale, m_dAngleRad, m_dAngleRad, -dScale, dCenterX, dCenterY); 
-
+	cairo_matrix_init (m_pMatrix, dScale, 0.0, 0.0, -dScale, dCenterX, dCenterY); 
+	//rotate
 	//cairo_matrix_rotate(m_pMatrix, 45.0 * M_PI / 180.0);
+	if(!IsDoubleEquil(m_dAngleRad, 0.0))
+		cairo_matrix_rotate(m_pMatrix, -m_dAngleRad);
+
 	//set matrix to all caches
 	for(size_t i = 0; i < m_saLayerCaches.size(); ++i)
 		cairo_set_matrix (m_saLayerCaches[i].pCairoContext, m_pMatrix);
-	////rotate
-	//cairo_matrix_rotate(m_pMatrix, m_dAngleRad);
 }
 
 void wxGISDisplayEx::DC2World(double* pdX, double* pdY)
@@ -502,12 +543,18 @@ void wxGISDisplayEx::SetLineCap(cairo_line_cap_t line_cap)
 
 void wxGISDisplayEx::SetLineWidth(double dWidth)
 {
-	m_dLineWidth = dWidth / m_pMatrix->xx;
+	double x_new = (m_pMatrix->xx + m_pMatrix->xy) * dWidth;
+	double y_new = (m_pMatrix->yx + m_pMatrix->yy) * dWidth;
+	double dScale = (fabs(x_new) + fabs(y_new)) /*/ 4*/;
+	m_dLineWidth = dWidth / dScale;
 }
 
 void wxGISDisplayEx::SetPointRadius(double dRadius)
 {
-	m_dPointRadius = dRadius / m_pMatrix->xx;
+	double x_new = (m_pMatrix->xx + m_pMatrix->xy) * dRadius;
+	double y_new = (m_pMatrix->yx + m_pMatrix->yy) * dRadius;
+	double dScale = (fabs(x_new) + fabs(y_new)) / 2;
+	m_dPointRadius = dRadius / dScale;
 }
 
 void wxGISDisplayEx::SetFillRule(cairo_fill_rule_t fill_rule)
@@ -687,19 +734,50 @@ m_dLineWidth);
 
 double wxGISDisplayEx::GetRatio(void)
 {
-	return m_pMatrix->xx;
+	double x_new = m_pMatrix->xx + m_pMatrix->xy;
+	double y_new = m_pMatrix->yx + m_pMatrix->yy;
+	double dScale = (fabs(x_new) + fabs(y_new)) / 2;
+	return dScale;
 }
 
 OGREnvelope wxGISDisplayEx::TransformRect(wxRect &rect)
 {
 	OGREnvelope out;
 	double dX1 = rect.GetLeft(), dX2 = rect.GetRight(), dY2 = rect.GetTop(), dY1 = rect.GetBottom(); 
-	DC2World(&dX1, &dY1);
-	DC2World(&dX2, &dY2);
-	out.MinX = dX1;
-	out.MinY = dY1;
-	out.MaxX = dX2;
-	out.MaxY = dY2;
-	return out;
+	if(IsDoubleEquil(m_dAngleRad, 0.0))
+	{
+		DC2World(&dX1, &dY1);
+		DC2World(&dX2, &dY2);
+		out.MinX = dX1;
+		out.MinY = dY1;
+		out.MaxX = dX2;
+		out.MaxY = dY2;
+		return out;
+	}
+	else
+	{
+		double dTmpX1 = dX1, dTmpX2 = dX2, dTmpY1 = dY1, dTmpY2 = dY2;
+		DC2World(&dTmpX1, &dTmpY1);
+		DC2World(&dX1, &dTmpY2);
+		DC2World(&dTmpX2, &dY1);
+		DC2World(&dX2, &dY2);
+		out.MinX = std::max(std::min(dX1, dTmpX1), std::min(dX2, dTmpX2));
+		out.MinY = std::max(std::min(dY1, dTmpY1), std::min(dY2, dTmpY2));
+		out.MaxX = std::min(std::max(dX1, dTmpX1), std::max(dX2, dTmpX2));
+		out.MaxY = std::min(std::max(dY1, dTmpY1), std::max(dY2, dTmpY2));
+		return out;
+	}
+}
+
+void wxGISDisplayEx::SetRotate(double dAngleRad)
+{
+	m_dAngleRad = dAngleRad;
+	//cairo_matrix_rotate(m_pMatrix, m_dAngleRad);
+	//m_pMatrix->xy = m_dAngleRad;
+	//m_pMatrix->yx = m_dAngleRad;
+	//SetBounds(TransformRect(m_oDeviceFrameRect));
+	SetDerty(true);
+	//compute current transform matrix
+	InitTransformMatrix();
 }
 

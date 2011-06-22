@@ -73,10 +73,15 @@ public:
 	virtual void SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference);
 	virtual void SetExtent(OGREnvelope &Env);
 	virtual void SetFullExtent(void);
+	//
 	virtual double GetScaleRatio(OGREnvelope &Bounds, wxDC &dc);
 	virtual void PanStart(wxPoint MouseLocation);
 	virtual void PanMoveTo(wxPoint MouseLocation);
 	virtual void PanStop(wxPoint MouseLocation);
+	virtual void RotateStart(wxPoint MouseLocation);
+	virtual void RotateBy(wxPoint MouseLocation);
+	virtual void RotateStop(wxPoint MouseLocation);
+	virtual void SetRotate(double dAngleRad);
 protected:
 	//events
 	virtual void OnPaint(wxPaintEvent & event);
@@ -94,6 +99,7 @@ protected:
 	//misc
 	virtual void DrawToolTip(wxClientDC &dc, wxString &sText);
 	virtual OGREnvelope CreateEnvelopeFromZoomFactor(double dZoom);
+	virtual void UpdateFrameCenter(void);
 protected:
 	wxGISDisplayEx *m_pGISDisplay;
 	wxTimer m_timer;
@@ -103,6 +109,8 @@ protected:
 	WXDWORD m_nDrawingState;
 	double m_nFactor;
 	wxPoint m_StartMouseLocation;
+	wxPoint m_FrameCenter;
+	double m_dOriginAngle;
 
 	wxCriticalSection m_CritSect;
 	DECLARE_EVENT_TABLE()

@@ -171,8 +171,8 @@ void wxGISApplication::Command(ICommand* pCmd)
 {
     if(!pCmd)
         return;
-	ITool* pTool = dynamic_cast<ITool*>(pCmd);
-	if(pTool)
+	ITool* pTool(NULL);
+	if(pCmd->GetKind() == enumGISCommandCheck && (pTool = dynamic_cast<ITool*>(pCmd)) != NULL)
 	{
 		//uncheck
 		if(m_CurrentTool)
