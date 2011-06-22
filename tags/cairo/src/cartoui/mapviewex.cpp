@@ -112,6 +112,8 @@ bool wxGISMapViewEx::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 	SetFullExtent();
 	//END DEBUG
 
+	UpdateFrameCenter();
+
 	return true; 
 }
 
@@ -194,6 +196,7 @@ void wxGISMapViewEx::OnSize(wxSizeEvent & event)
 		//if(!m_timer.IsRunning())
 			m_timer.Start(TM_ZOOMING);
 	}
+	UpdateFrameCenter();
 }
 
 void wxGISMapViewEx::OnEraseBackground(wxEraseEvent & event)
@@ -530,4 +533,70 @@ void wxGISMapViewEx::PanStop(wxPoint MouseLocation)
 		if(Env.IsInit())//set new bounds
 			Do(Env);
 	}
+}
+
+void wxGISMapViewEx::RotateStart(wxPoint MouseLocation)
+{
+	m_StartMouseLocation = MouseLocation;
+	//compute angle
+	double dX = m_FrameCenter.x - MouseLocation.x;
+	double dY = m_FrameCenter.y - MouseLocation.y;
+	m_dOriginAngle = atan2(dY, dX);
+
+    m_nDrawingState = enumGISMapRotating;
+	CaptureMouse();
+}
+
+void wxGISMapViewEx::RotateBy(wxPoint MouseLocation)
+{
+	if(m_nDrawingState == enumGISMapRotating)
+	{
+		if(m_pGISDisplay)
+		{
+			//compute angle
+			double dX = m_FrameCenter.x - MouseLocation.x;
+			double dY = m_FrameCenter.y - MouseLocation.y;
+			double dAngle = atan2(dY, dX);
+			dAngle -= m_dOriginAngle;
+			if(dAngle < 0) 
+				dAngle += 2 * M_PI;
+
+			wxClientDC CDC(this);
+			m_pGISDisplay->RotatingDraw(dAngle, &CDC);
+			DrawToolTip(CDC, wxString::Format(wxT("%.4f"), 360 - dAngle * DEGPI));
+		}
+	}
+}
+
+void wxGISMapViewEx::RotateStop(wxPoint MouseLocation)
+{
+    ReleaseMouse();
+	if(m_pGISDisplay)
+	{
+		//compute angle
+		double dX = m_FrameCenter.x - MouseLocation.x;
+		double dY = m_FrameCenter.y - MouseLocation.y;
+		double dAngle = atan2(dY, dX);
+		dAngle -= m_dOriginAngle;
+		//if(dAngle < 0) 
+		//	dAngle += 2 * M_PI;
+
+		m_pGISDisplay->SetRotate(m_pGISDisplay->GetRotate() + dAngle);
+	}
+	m_nDrawingState = enumGISMapDrawing;
+	Refresh(false);
+}
+
+void wxGISMapViewEx::SetRotate(double dAngleRad)
+{
+	if(m_pGISDisplay)
+		m_pGISDisplay->SetRotate(dAngleRad);
+	Refresh(false);
+}
+
+void wxGISMapViewEx::UpdateFrameCenter(void)
+{
+	wxRect rc = GetClientRect();
+	m_FrameCenter.x = rc.x + rc.width / 2;
+	m_FrameCenter.y = rc.y + rc.height / 2;
 }

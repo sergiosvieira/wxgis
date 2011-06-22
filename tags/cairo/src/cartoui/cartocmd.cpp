@@ -712,6 +712,7 @@ void wxGISCartoFrameTool::OnClick(void)
 		case 0:
 			break;
 		case 1:
+			m_pMapView->SetRotate(0);
 			break;
 		case 2:
 			break;
@@ -774,103 +775,42 @@ void wxGISCartoFrameTool::SetChecked(bool bCheck)
 void wxGISCartoFrameTool::OnMouseDown(wxMouseEvent& event)
 {
     event.Skip();
-	//switch(m_subtype)
-	//{
-	//	case 0:	//z_in
-	//	{
-	//		wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(0, 0, 255), 2), m_pMapView, m_pMapView->GetDisplay());
-	//		OGREnvelope Env = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
-	//		if(IsDoubleEquil(Env.MaxX, Env.MinX) || IsDoubleEquil(Env.MaxY, Env.MinY))
-	//		{
-	//			OGREnvelope CurrentEnv = m_pMapView->GetCurrentExtent();
-	//			double widthdiv4 = (CurrentEnv.MaxX - CurrentEnv.MinX) / 4;
-	//			double heightdiv4 = (CurrentEnv.MaxY - CurrentEnv.MinY) / 4;
-
-	//			Env.MinX -= widthdiv4;
-	//			Env.MinY -= heightdiv4;
-	//			Env.MaxX += widthdiv4;
-	//			Env.MaxY += heightdiv4;
-	//		}
-
-	//		if(m_pMapView->GetScaleRatio(Env, wxClientDC(m_pMapView)) > 1.0)
- //               m_pMapView->Do(Env);
-	//	}
-	//	break;
-	//	case 1:	//z_out
-	//	{
-	//		wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(0, 0, 255), 2), m_pMapView, m_pMapView->GetDisplay());
-	//		OGREnvelope Env = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
-	//		OGREnvelope CurrentEnv = m_pMapView->GetCurrentExtent();
-	//		OGREnvelope NewEnv;
-	//		NewEnv.MinX = CurrentEnv.MinX + CurrentEnv.MinX - Env.MinX;
-	//		NewEnv.MinY = CurrentEnv.MinY + CurrentEnv.MinY - Env.MinY;
-	//		NewEnv.MaxX = CurrentEnv.MaxX + CurrentEnv.MaxX - Env.MaxX;
-	//		NewEnv.MaxY = CurrentEnv.MaxY + CurrentEnv.MaxY - Env.MaxY;
- //           m_pMapView->Do(NewEnv);
-	//	}
-	//	break;
-	//	case 2:	//pan
-	//	{
-	//	    wxImageList oCursorList(16, 16);
-	//	    oCursorList.Add(wxBitmap(cursors_16_xpm));
-	//		wxImage CursorImage = oCursorList.GetBitmap(4).ConvertToImage();
-	//		//m_ImageList.GetBitmap(11).ConvertToImage();
-	//		CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 7);
-	//		CursorImage.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 7);
-	//		m_pMapView->SetCursor(wxCursor(CursorImage));
-	//		m_pMapView->PanStart(event.GetPosition());
-	//	}
-	//	break;
-	//	case 3:	//inf
-	//	{
-	//		wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(0, 0, 255), 2), m_pMapView, m_pMapView->GetDisplay());
-	//		OGREnvelope Env = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
-	//		m_pMapView->Refresh(false);
-	//	}
-	//	break;
-	//	default:
-	//		break;
-	//}
+	switch(m_subtype)
+	{
+		case 0:	//rotate
+			m_pMapView->RotateStart(event.GetPosition());
+			break;
+		default:
+			break;
+	}
 }
 
 void wxGISCartoFrameTool::OnMouseUp(wxMouseEvent& event)
 {
-////    event.Skip();
-	//switch(m_subtype)
-	//{
-	//	case 0:	//z_in
-	//		break;
-	//	case 1:	//z_out
-	//		break;
-	//	case 2:	//pan
-	//		m_pMapView->PanStop(event.GetPosition());
-	//		m_pMapView->SetCursor(GetCursor());
-	//		break;
-	//	case 3:	//inf
-	//		break;
-	//	default:
-	//		break;
-	//}
+//    event.Skip();
+	switch(m_subtype)
+	{
+		case 0:	//rotate
+			m_pMapView->RotateStop(event.GetPosition());
+			m_pMapView->SetCursor(GetCursor());
+			break;
+		default:
+			break;
+	}
 }
 
 void wxGISCartoFrameTool::OnMouseMove(wxMouseEvent& event)
 {
- //   //event.Skip();
-	//switch(m_subtype)
-	//{
-	//	case 0:	//z_in
-	//		break;
-	//	case 1:	//z_out
-	//		break;
-	//	case 2:	//pan
-	//		if(event.Dragging())
-	//			m_pMapView->PanMoveTo(event.GetPosition());
-	//		break;
-	//	case 3:	//inf
-	//		break;
-	//	default:
-	//		break;
-	//}
+    //event.Skip();
+	switch(m_subtype)
+	{
+		case 0:	//rotate
+			if(event.Dragging())
+				m_pMapView->RotateBy(event.GetPosition());
+			break;
+		default:
+			break;
+	}
 }
 
 void wxGISCartoFrameTool::OnMouseDoubleClick(wxMouseEvent& event)

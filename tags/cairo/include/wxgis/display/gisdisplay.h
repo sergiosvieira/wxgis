@@ -71,6 +71,8 @@ public:
 	virtual OGREnvelope GetBounds(void);
 	//misc
 	virtual double GetRatio(void);
+	virtual void SetRotate(double dAngleRad);
+	virtual double GetRotate(void){return m_dAngleRad;};
 	virtual void DC2World(double* pdX, double* pdY);
 	virtual void World2DC(double* pdX, double* pdY);
 	virtual void DC2WorldDist(double* pdX, double* pdY);
@@ -91,6 +93,7 @@ public:
 	virtual void ZoomingDraw(wxRect &rc, wxDC* pDC);
 	virtual void WheelingDraw(double dZoom, wxDC* pDC);
 	virtual void PanningDraw(wxCoord x, wxCoord y, wxDC* pDC);
+	virtual void RotatingDraw(double dAngle, wxDC* pDC);
 	virtual OGREnvelope TransformRect(wxRect &rect);
 	//Testing
 	virtual void TestDraw(void);

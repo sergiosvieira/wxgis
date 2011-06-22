@@ -168,27 +168,12 @@ void wxGISRubberEnvelope::OnMouseMove(wxMouseEvent& event)
 
 void wxGISRubberEnvelope::OnMouseUp(wxMouseEvent& event)
 {
-	//IDisplayTransformation* pDT = m_pCachedDisplay->GetDisplayTransformation();
-	//wxPoint Points[2];
-	//Points[0] = wxPoint(m_StartX, m_StartY);
-	//Points[1] = wxPoint(event.GetX(), event.GetY());
-	//OGRRawPoint* pOGRPoints = pDT->TransformCoordDC2World(Points, 2);
-	//OGRLineString* pLine = new OGRLineString();
-	//pLine-
-	//pLine->setPoints(2, pOGRPoints);
-	//m_pRetGeom = static_cast<OGRGeometry*>(pLine);
-	//delete [] pOGRPoints;
-
-	double dX1 = m_StartX;
-	double dY1 = m_StartY;
-	double dX2 = event.GetX();
-	double dY2 = event.GetY();
-	m_pDisp->DC2World(&dX1, &dY1);
-	m_pDisp->DC2World(&dX2, &dY2);
-	m_RetEnv.MaxX = std::max(dX1, dX2);
-	m_RetEnv.MinX = std::min(dX1, dX2);
-	m_RetEnv.MaxY = std::max(dY1, dY2);
-	m_RetEnv.MinY = std::min(dY1, dY2);
+	double dX1 = std::min(m_StartX, event.GetX());
+	double dY1 = std::max(m_StartY, event.GetY());
+	double dX2 = std::max(m_StartX, event.GetX());
+	double dY2 = std::min(m_StartY, event.GetY());
+	wxRect rc(wxPoint(dX1, dY1), wxPoint(dX2, dY2));
+	m_RetEnv = m_pDisp->TransformRect(rc);
 	OnUnlock();
     m_PrevRect.width = -1;
     m_PrevRect.height = -1;
