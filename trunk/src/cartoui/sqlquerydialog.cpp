@@ -56,8 +56,9 @@ wxGISSQLQueryDialog::wxGISSQLQueryDialog( wxWindow* parent, wxWindowID id, const
 	wxBoxSizer* bSizer12;
 	bSizer12 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer12->Add( m_textCtrl8, 1, wxALL|wxEXPAND, 5 );
+	wxArrayString FieldsArray;
+	m_FieldsList = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, FieldsArray, wxLC_SINGLE_SEL | wxLC_SORT_ASCENDING );
+	bSizer12->Add( m_FieldsList, 1, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer13;
 	bSizer13 = new wxBoxSizer( wxVERTICAL );
@@ -161,11 +162,13 @@ wxGISSQLQueryDialog::wxGISSQLQueryDialog( wxWindow* parent, wxWindowID id, const
 	wxBoxSizer* bSizer15;
 	bSizer15 = new wxBoxSizer( wxVERTICAL );
 	
-	m_textCtrl9 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer15->Add( m_textCtrl9, 1, wxALL|wxEXPAND, 5 );
+	m_UniqValues = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer15->Add( m_UniqValues, 1, wxALL|wxEXPAND, 5 );
+	m_UniqValues->Disable();
 	
-	m_button33 = new wxButton( this, wxID_ANY, _("MyButton"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer15->Add( m_button33, 0, wxALL, 5 );
+	m_getuniqvalsbutton = new wxButton( this, wxID_ANY, _("Get values"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer15->Add( m_getuniqvalsbutton, 0, wxALL, 5 );
+	m_getuniqvalsbutton->Disable();
 	
 	bSizer14->Add( bSizer15, 1, wxEXPAND, 5 );
 	
@@ -222,4 +225,25 @@ wxGISSQLQueryDialog::wxGISSQLQueryDialog( wxWindow* parent, wxWindowID id, const
 
 wxGISSQLQueryDialog::~wxGISSQLQueryDialog()
 {
+}
+
+void wxGISSQLQueryDialog::SetDataset( wxGISTableSPtr pDataset )
+{
+	m_pDataset = pDataset;
+	wxArrayString FieldsArray;
+	if(m_pDataset)
+	{
+		OGRFeatureDefn* pFeatureDefn = m_pDataset->GetDefinition();
+		if(pFeatureDefn)
+		{
+			for(size_t i = 0; i < pFeatureDefn->GetFieldCount(); ++i)
+			{
+				OGRFieldDefn *pFieldDefn = pFeatureDefn->GetFieldDefn(i);
+				if(pFieldDefn->GetType() == OFTBinary || pFieldDefn->GetType() >= OFTMaxType)
+					continue;
+				FieldsArray.Add(wxString(pFieldDefn->GetNameRef(), wxConvLocal));
+			}
+		}
+	}
+	m_FieldsList->Set(FieldsArray);
 }

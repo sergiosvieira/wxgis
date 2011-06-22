@@ -21,21 +21,24 @@
 #pragma once
 
 #include "wxgis/cartoui/cartoui.h"
+#include "wxgis/datasource/table.h"
 
-#include <wx/intl.h>
+#include "wx/intl.h"
 
-#include <wx/string.h>
-#include <wx/stattext.h>
-#include <wx/gdicmn.h>
-#include <wx/font.h>
-#include <wx/colour.h>
-#include <wx/settings.h>
-#include <wx/combobox.h>
-#include <wx/sizer.h>
-#include <wx/textctrl.h>
-#include <wx/button.h>
-#include <wx/statline.h>
-#include <wx/dialog.h>
+#include "wx/string.h"
+#include "wx/stattext.h"
+#include "wx/gdicmn.h"
+#include "wx/font.h"
+#include "wx/colour.h"
+#include "wx/settings.h"
+#include "wx/combobox.h"
+#include "wx/sizer.h"
+#include "wx/textctrl.h"
+#include "wx/button.h"
+#include "wx/statline.h"
+#include "wx/dialog.h"
+#include "wx/listbox.h"
+#include "wx/listctrl.h"
 
 /** \class wxGISSQLQueryDialog sqlquerydialog.h
     \brief The SQL Query construct dialog.
@@ -45,6 +48,8 @@ class WXDLLIMPEXP_GIS_CTU wxGISSQLQueryDialog : public wxDialog
 public:
 	wxGISSQLQueryDialog( wxWindow* parent, wxWindowID id = ID_WXGISSQLQUERYDIALOG, const wxString& title = _("Select by attributes"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 477,590 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 	virtual ~wxGISSQLQueryDialog();
+	//
+	virtual void SetDataset( wxGISTableSPtr pDataset );
 private:
 
 protected:
@@ -76,7 +81,7 @@ protected:
 	wxComboBox* m_SelLayerComboBox;
 	wxStaticText* m_staticText2;
 	wxComboBox* m_MethodSelComboBox;
-	wxTextCtrl* m_textCtrl8;
+	wxListBox* m_FieldsList;
 	wxButton* m_button15;
 	wxButton* m_button16;
 	wxButton* m_button17;
@@ -95,8 +100,8 @@ protected:
 	wxButton* m_PercentButton;
 	wxButton* m_IsButton;
 	wxButton* m_button32;
-	wxTextCtrl* m_textCtrl9;
-	wxButton* m_button33;
+	wxTextCtrl* m_UniqValues;
+	wxButton* m_getuniqvalsbutton;
 	wxStaticText* m_SelectStaticText;
 	wxTextCtrl* m_textCtrl10;
 	wxBoxSizer* bButtonsSizer;
@@ -112,5 +117,6 @@ protected:
 	wxButton* m_sdbSizerCancel;
 protected:
 	bool m_bDocSet;
+	wxGISTableSPtr m_pDataset;
 };
 
