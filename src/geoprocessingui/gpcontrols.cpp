@@ -58,6 +58,11 @@ IGPParameter* wxGISDTBase::GetParameter(void)
     return m_pParam;
 }
 
+void AddDependentParameter(wxString sParamInternalName, IGPParameter* pParam)
+{
+	m_ParameterMap[sParamInternalName] = pParam;
+}
+
 void wxGISDTBase::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
 {
     switch(nType)

@@ -112,13 +112,14 @@ void wxGISGPParameter::SetDirection(wxGISEnumGPParameterDirection nDirection)
     m_Direction = nDirection;
 }
 
-wxArrayString* wxGISGPParameter::GetParameterDependencies(void)
+wxArrayString wxGISGPParameter::GetParameterDependencies(void)
 {
-    return NULL;
+    return m_ParamDepStr;
 }
 
 void wxGISGPParameter::AddParameterDependency(wxString sDependency)
 {
+	m_ParamDepStr.Add(sDependency);
 }
 
 wxGISEnumGPParameterType wxGISGPParameter::GetParameterType(void)

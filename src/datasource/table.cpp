@@ -199,6 +199,7 @@ void wxGISTable::UnloadFeatures(void)
 
 void wxGISTable::Close(void)
 {
+	wxGISDataset::Close();
 	UnloadFeatures();
 
 	m_bHasFID = false;
