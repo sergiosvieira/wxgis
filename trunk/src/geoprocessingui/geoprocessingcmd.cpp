@@ -280,7 +280,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
 						if(pDSet->IsOpened() && pDSet->IsReadOnly())
 							pDSet->Close();
 						if(!pDSet->IsOpened())
-							if(!pDSet->Open());
+							if(!pDSet->Open())
 								return;
 
                         ITrackCancel TrackCancel;
@@ -367,7 +367,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
                                 continue;
                             }
 							if(!pDSet->IsOpened())
-								if(!pDSet->Open());
+								if(!pDSet->Open())
 									return;
 
 

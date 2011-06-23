@@ -23,7 +23,7 @@
 #include "wxgis/core/config.h"
 #include "wxgis/framework/application.h"
 
-#include "../../art/mainframe.xpm"
+#include "../../art/mainframecat.xpm"
 #include "../../art/process_working_16.xpm"
 #include "../../art/process_working_48.xpm"
 

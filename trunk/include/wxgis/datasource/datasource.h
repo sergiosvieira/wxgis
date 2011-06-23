@@ -129,7 +129,7 @@ public:
     virtual size_t GetSubsetsCount(void){return 0;};
     virtual wxGISDatasetSPtr GetSubset(size_t nIndex){return wxGISDatasetSPtr();};
     virtual wxString GetName(void){return wxEmptyString;};
-	virtual void Close(void){};
+	virtual void Close(void){m_bIsOpened = false;};
 	virtual const OGRSpatialReferenceSPtr GetSpatialReference(void){return OGRSpatialReferenceSPtr();};
 	virtual bool IsOpened(void){return m_bIsOpened;};
 	virtual bool IsReadOnly(void){return m_bIsReadOnly;};

@@ -1103,6 +1103,7 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
         return wxGISFeatureDatasetSPtr();
     }
 
+	CPLString szNameField, szDescField;
     if(nSubType != enumVecDXF)
     {
         for(size_t i = 0; i < poFields->GetFieldCount(); ++i)
@@ -1112,6 +1113,14 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
             {
                 wxString sFieldName = wgMB2WX(pField->GetNameRef());
                 pField->SetName(sFieldName.mb_str(wxConvUTF8));
+				OGRFieldType nType = pField->GetType();
+				if(OFTString == nType)
+				{
+					if(szNameField.empty())
+						szNameField = pField->GetNameRef();
+					if(szDescField.empty())
+						szDescField = pField->GetNameRef();
+				}
             }
 
 	        if( poLayerDest->CreateField( pField ) != OGRERR_NONE )
@@ -1124,7 +1133,17 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
             }
         }
     }
-    poFields->Release();
+
+    if(nSubType == enumVecKML || nSubType == enumVecKMZ)
+	{
+		if(!szNameField.empty())
+			CPLSetConfigOption( "LIBKML_NAME_FIELD", szNameField );
+		if(!szDescField.empty())
+			CPLSetConfigOption( "LIBKML_DESCRIPTION_FIELD", szDescField );
+		//CPLSetConfigOption( "LIBKML_TIMESTAMP_FIELD", "YES" );
+	}
+
+	poFields->Release();
 
     wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>(sFullPath, nSubType, poLayerDest, poDS);
     return pDataSet;

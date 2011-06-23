@@ -97,6 +97,8 @@ wxGISDatasetSPtr wxGISFeatureDataset::GetSubset(size_t nIndex)
 			CPLString szPath;
 			szPath.Printf("%s#%d", m_sPath.c_str(), nIndex);
 			wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>(szPath, m_nSubType, poLayer, m_poDS);
+			if(!pDataSet->Open())
+				return wxGISDatasetSPtr();
             pDataSet->SetEncoding(m_Encoding);
             return boost::static_pointer_cast<wxGISDataset>(pDataSet);
         }
