@@ -25,6 +25,7 @@
 #include "wxgis/catalogui/gxfileui.h"
 #include "wxgis/framework/messagedlg.h"
 #include "wxgis/cartoui/sqlquerydialog.h"
+#include "wxgis/catalog/gxcatalog.h"
 
 #include "wx/dnd.h"
 #include "wx/valgen.h"
@@ -58,9 +59,11 @@ IGPParameter* wxGISDTBase::GetParameter(void)
     return m_pParam;
 }
 
-void AddDependentParameter(wxString sParamInternalName, IGPParameter* pParam)
+void wxGISDTBase::AddDependentParameter(IGPParameter* pParam)
 {
-	m_ParameterMap[sParamInternalName] = pParam;
+	if(!pParam)
+		return;
+	m_paParameters.push_back(pParam);
 }
 
 void wxGISDTBase::SetMessage(wxGISEnumGPMessageType nType, wxString sMsg)
@@ -1233,8 +1236,41 @@ wxGISSQLQueryCtrl::~wxGISSQLQueryCtrl()
 
 void wxGISSQLQueryCtrl::OnOpen(wxCommandEvent& event)
 {
-	wxGISSQLQueryDialog dlg(this);
-	dlg.ShowModal();
+	//get table dataset
+	wxGISTableSPtr pDataSet;
+	if(m_paParameters.size() > 0)
+	{
+		IGxCatalog* pCat = ::GetCatalog();
+		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pCat);
+		if(!pGxObjectContainer)
+			goto OPEN;
+
+		wxString sSrcPath = m_paParameters[0]->GetValue();
+		IGxObject* pGxObject = pGxObjectContainer->SearchChild(sSrcPath);
+		if(!pGxObject)
+			goto OPEN;
+
+		IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pGxObject);
+		if(!pGxDataset)
+			goto OPEN;
+
+		pDataSet = boost::dynamic_pointer_cast<wxGISTable>(pGxDataset->GetDataset());
+		if(!pDataSet)
+			goto OPEN;
+		
+		if(!pDataSet->IsOpened())
+			pDataSet->Open();
+	}
+
+OPEN:
+	wxGISSQLQueryDialog dlg(this, enumGISDBOK | enumGISDBCancel);
+	dlg.SetDataset(pDataSet);
+	if(dlg.ShowModal() == wxID_OK)
+	{
+        wxString sExpression = dlg.GetExpression();
+        m_pParam->SetAltered(true);
+        m_pParam->SetValue(wxVariant(sExpression, wxT("expression")));
+	}
    // wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParam->GetDomain());
    // wxFileName Name(m_pParam->GetValue().MakeString());
 

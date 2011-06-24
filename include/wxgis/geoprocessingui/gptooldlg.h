@@ -80,6 +80,8 @@ public:
 //wxTopLevelWindow
     //virtual bool ShouldPreventAppExit();
 protected:
+	virtual void AddDependentParameterToControl(wxGISDTBase* Control, wxArrayString &saDependencies);
+protected:
     int m_DataWidth, m_HtmlWidth;
     IGPToolSPtr m_pTool;
     wxXmlNode* m_pPropNode;

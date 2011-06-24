@@ -21,10 +21,15 @@
 #include "wxgis/catalog/gxcatalog.h"
 #include "wxgis/core/config.h"
 
+static IGxCatalog* m_pGlobalCat(NULL);
+extern WXDLLIMPEXP_GIS_CLT IGxCatalog* GetCatalog()
+{
+    return m_pGlobalCat;
+}
+
 // ----------------------------------------------------------------------------
 // wxGxCatalog
 // ----------------------------------------------------------------------------
-
 
 wxGxCatalog::wxGxCatalog(void) : m_bIsChildrenLoaded(false), m_pGxDiscConnections(NULL), m_nGlobalID(0)
 {
@@ -37,6 +42,9 @@ wxGxCatalog::wxGxCatalog(void) : m_bIsChildrenLoaded(false), m_pGxDiscConnection
 	m_pConf = NULL;
 
 	RegisterObject(this); 
+
+	if(!m_pGlobalCat)
+		m_pGlobalCat = this;
 }
 
 wxGxCatalog::~wxGxCatalog(void)

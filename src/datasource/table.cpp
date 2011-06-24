@@ -731,3 +731,24 @@ bool wxGISTable::Rename(wxString sNewName)
 	m_sPath = CPLString(CPLFormFilename(szDirPath, szNewName, CPLGetExtension(m_sPath)));
 	return true;
 }
+
+wxGISDatasetSPtr wxGISTable::ExecuteSQL(wxString sStatement, wxGISSpatialFilter* pSpatialFilter, wxString sDialect)
+{
+    if( !m_bIsOpened )
+        if( !Open() )
+            return wxGISDatasetSPtr();
+	wxGISDatasetSPtr pDataset;
+    if(m_poDS)
+	{
+        CPLString szStatement = sStatement.mb_str();
+		OGRLayer * poLayer = m_poDS->ExecuteSQL(szStatement, NULL, sDialect.mb_str());//TODO: implement spatial Filter
+		if(	poLayer )
+		{
+			m_poDS->Reference();
+            wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(szStatement, enumTableQueryResult, poLayer, m_poDS);
+			pTable->SetEncoding(wxFONTENCODING_UTF8);
+            pDataset = boost::static_pointer_cast<wxGISDataset>(pTable);
+		}
+	}
+	return pDataset;
+}

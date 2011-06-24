@@ -23,6 +23,8 @@
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/catalog/gxdiscconnections.h"
 
+WXDLLIMPEXP_GIS_CLT IGxCatalog* GetCatalog(void);
+
 /** \class wxGxCatalog gxcatalog.h
     \brief The Gx Catalog class.
 */
