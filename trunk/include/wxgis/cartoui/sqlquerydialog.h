@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGISRasterDatasetCmd main header.
+ * Purpose:  class wxGISSQLQueryDialog show SQL expression form.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
@@ -46,11 +46,15 @@
 class WXDLLIMPEXP_GIS_CTU wxGISSQLQueryDialog : public wxDialog 
 {
 public:
-	wxGISSQLQueryDialog( wxWindow* parent, wxWindowID id = ID_WXGISSQLQUERYDIALOG, const wxString& title = _("Select by attributes"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 477,590 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+	wxGISSQLQueryDialog( wxWindow* parent, WXDWORD nButtons = enumGISDBOK | enumGISDBCancel | enumGISDBApply, wxWindowID id = ID_WXGISSQLQUERYDIALOG, const wxString& title = _("Select by attributes"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 477,590 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 	virtual ~wxGISSQLQueryDialog();
 	//
 	virtual void SetDataset( wxGISTableSPtr pDataset );
-private:
+	virtual wxString GetExpression(void);
+protected:
+// events
+    virtual void OnGetUniqValues(wxCommandEvent& event);
+    virtual void OnGetUniqValuesUI(wxUpdateUIEvent& event);
 
 protected:
 	enum
@@ -73,8 +77,10 @@ protected:
 		ID_M_HELPBUTTON,
 		ID_M_LOADBUTTON,
 		ID_M_SAVEBUTTON,
+		ID_GETUNIQVALUESBT
 	};
 	
+protected:
 	wxBoxSizer* bMainSizer;
 	wxFlexGridSizer* fgSizer1;
 	wxStaticText* m_staticText1;
@@ -100,10 +106,10 @@ protected:
 	wxButton* m_PercentButton;
 	wxButton* m_IsButton;
 	wxButton* m_button32;
-	wxTextCtrl* m_UniqValues;
+	wxListBox* m_UniqValues;
 	wxButton* m_getuniqvalsbutton;
 	wxStaticText* m_SelectStaticText;
-	wxTextCtrl* m_textCtrl10;
+	wxTextCtrl* m_Expression;
 	wxBoxSizer* bButtonsSizer;
 	wxButton* m_ClearButton;
 	wxButton* m_CheckButton;
@@ -118,5 +124,7 @@ protected:
 protected:
 	bool m_bDocSet;
 	wxGISTableSPtr m_pDataset;
+
+    DECLARE_EVENT_TABLE()
 };
 

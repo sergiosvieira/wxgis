@@ -82,6 +82,7 @@ GPParameters* wxGISGPExportTool::GetParameterInfo(void)
         pParam2->SetParameterType(enumGISGPParameterTypeOptional);
         pParam2->SetDataType(enumGISGPParamDTQuery);
         pParam2->SetDirection(enumGISGPParameterDirectionInput);
+		pParam2->AddParameterDependency(wxString(wxT("src_path")));
 
         m_pParamArr.push_back(pParam2);
 

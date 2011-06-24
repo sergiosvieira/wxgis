@@ -144,7 +144,7 @@ public:
     virtual void SetDataType(wxGISEnumGPParameterDataType nType) = 0;
     virtual wxGISEnumGPParameterDirection GetDirection(void) = 0;
     virtual void SetDirection(wxGISEnumGPParameterDirection nDirection) = 0;
-    virtual wxArrayString* GetParameterDependencies(void) = 0;
+    virtual wxArrayString GetParameterDependencies(void) = 0;
     virtual void AddParameterDependency(wxString sDependency) = 0;
     virtual wxGISEnumGPParameterType GetParameterType(void) = 0;
     virtual void SetParameterType(wxGISEnumGPParameterType nType) = 0;

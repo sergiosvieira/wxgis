@@ -54,14 +54,14 @@ public:
     virtual bool Validate(void) = 0;
     virtual void Update(void) = 0;
     virtual IGPParameter* GetParameter(void);
-	virtual void AddDependentParameter(wxString sParamInternalName, IGPParameter* pParam);
+	virtual void AddDependentParameter(IGPParameter* pParam);
 protected:
 	wxStaticBitmap* m_StateBitmap;
 	wxStaticText* m_sParamDisplayName;
 	wxStaticBitmap* m_bitmap;
     IGPParameter* m_pParam;
 	wxImageList m_ImageList;
-	std::map<wxString, IGPParameter*> m_ParameterMap; 
+	GPParameters m_paParameters; 
 };
 
 /** \class wxGISTextCtrl gpcontrols.h

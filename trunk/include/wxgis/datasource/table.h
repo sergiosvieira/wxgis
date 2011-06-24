@@ -56,6 +56,7 @@ public:
 	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel = NULL);
 	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel = NULL);
 	virtual char **GetFileList();
+	virtual wxGISDatasetSPtr ExecuteSQL(wxString sStatement, wxGISSpatialFilter* pSpatialFilter = NULL, wxString sDialect = wxEmptyString);
 protected:
 	virtual void LoadFeatures(ITrackCancel* pTrackCancel = NULL);
     virtual void UnloadFeatures(void);

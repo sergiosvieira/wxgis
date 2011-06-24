@@ -76,7 +76,7 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
     GPParameters* pParams = m_pTool->GetParameterInfo();
     if(pParams)
     {
-        for(size_t i = 0; i < pParams->size(); i++)
+        for(size_t i = 0; i < pParams->size(); ++i)
         {
             IGPParameter* pParam = pParams->operator[](i);
             if(!pParam)
@@ -84,6 +84,7 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
                 m_pControlsArray.push_back(NULL);
                 continue;
             }
+
             switch(pParam->GetDataType())
             {
             case enumGISGPParamDTPath:
@@ -152,6 +153,8 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
                 m_pControlsArray.push_back(NULL);
                 break;
             }
+
+			AddDependentParameterToControl(m_pControlsArray[m_pControlsArray.size() - 1], pParam->GetParameterDependencies());
         }
     }
 
@@ -403,6 +406,29 @@ void wxGISGPToolDlg::SerializeFramePos(bool bSave)
 		else
 		{
 			Maximize();
+		}
+	}
+}
+
+void wxGISGPToolDlg::AddDependentParameterToControl(wxGISDTBase* Control, wxArrayString &saDependencies)
+{
+	if(!Control)
+		return;
+    GPParameters* pParams = m_pTool->GetParameterInfo();
+    if(pParams)
+    {
+		if(saDependencies.GetCount() > 0)
+		{
+			for(size_t i = 0; i < saDependencies.GetCount(); ++i)
+			{
+				for(size_t j = 0; j < pParams->size(); ++j)
+				{
+					if(pParams->operator [](j)->GetName().CmpNoCase(saDependencies[i]) == 0)
+					{
+						Control->AddDependentParameter(	pParams->operator [](j) );		
+					}
+				}
+			}
 		}
 	}
 }

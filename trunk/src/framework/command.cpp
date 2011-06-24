@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "wxgis/framework/command.h"
 
-#include "../../art/mainframe.xpm"
+//#include "../../art/mainframe.xpm"
 #include "../../art/options.xpm"
 
 //	0	Exit
@@ -34,7 +34,7 @@
 IMPLEMENT_DYNAMIC_CLASS(wxGISCommonCmd, wxObject)
 
 
-wxGISCommonCmd::wxGISCommonCmd(void) : ICommand(), m_IconMain(mainframe_xpm), m_IconOpt(options_xpm)
+wxGISCommonCmd::wxGISCommonCmd(void) : ICommand(), /*m_IconMain(mainframe_xpm), */m_IconOpt(options_xpm)
 {
 }
 

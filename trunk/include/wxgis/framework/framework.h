@@ -55,6 +55,20 @@ enum wxGISEnumMouseState
 	enumGISMouseWheel = 0x0004
 };
 
+/** \enum wxGISEnumDialogButtons
+    \brief A dialog buttons.
+*/
+enum wxGISEnumDialogButtons
+{
+	enumGISDBNone	= 0x0000, 
+	enumGISDBOK		= 0x0001,
+	enumGISDBCancel	= 0x0002,
+	enumGISDBApply	= 0x0004,
+	enumGISDBHelp	= 0x0008,
+	enumGISDBYes	= 0x0010,
+	enumGISDBNo		= 0x0020
+};
+
 /** \enum wxGISEnumStatusBarPanes
     \brief A statusbar panes.
 
