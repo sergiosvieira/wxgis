@@ -49,6 +49,8 @@ wxGISDisplayEx::wxGISDisplayEx(void)
 	m_dCacheCenterY = double(m_nMax_Y) / 2;
 
 	m_pMatrix = new cairo_matrix_t;
+	m_pDisplayMatrix = new cairo_matrix_t;
+	m_pDisplayMatrixNoRotate = new cairo_matrix_t;
 
 	m_surface_tmp = cairo_image_surface_create (CAIRO_FORMAT_RGB24, m_oDeviceFrameRect.GetWidth(), m_oDeviceFrameRect.GetHeight());
 	m_cr_tmp = cairo_create (m_surface_tmp);
@@ -64,6 +66,8 @@ wxGISDisplayEx::~wxGISDisplayEx(void)
 		cairo_surface_destroy(m_saLayerCaches[i].pCairoSurface);		
 	}
 	wxDELETE(m_pMatrix);
+	wxDELETE(m_pDisplayMatrix);
+	wxDELETE(m_pDisplayMatrixNoRotate);
     cairo_destroy (m_cr_tmp);
     cairo_surface_destroy (m_surface_tmp);
 }
@@ -89,6 +93,8 @@ void wxGISDisplayEx::Clear()
 	m_nCurrentLayer = 0;
 	m_dAngleRad = 0;
 	cairo_matrix_init(m_pMatrix, 1, 0, 0, 1, 0, 0);
+	cairo_matrix_init(m_pDisplayMatrix, 1, 0, 0, 1, 0, 0);
+	cairo_matrix_init(m_pDisplayMatrixNoRotate, 1, 0, 0, 1, 0, 0);
 
 	m_stFillColour.dRed = m_stFillColour.dGreen = m_stFillColour.dBlue = 1;
 	m_stFillColour.dAlpha = 1;
@@ -250,12 +256,19 @@ void wxGISDisplayEx::RotatingDraw(double dAngle, wxDC* pDC)
 	cairo_set_source_rgb(m_cr_tmp, m_stBackGroudnColour.dRed, m_stBackGroudnColour.dGreen, m_stBackGroudnColour.dBlue);
 	cairo_paint(m_cr_tmp);
 
-	//int w = cairo_image_surface_get_width (cairo_get_target(m_cr_tmp));
-	//int h = cairo_image_surface_get_height (cairo_get_target(m_cr_tmp));
+	int w = cairo_image_surface_get_width (cairo_get_target(m_cr_tmp));
+	int h = cairo_image_surface_get_height (cairo_get_target(m_cr_tmp));
 	//cairo_translate (m_cr_tmp, 0.5 * m_oDeviceFrameRect.GetWidth(), 0.5 * m_oDeviceFrameRect.GetHeight());
+
+	//double dWorldCenterX = m_CurrentBounds.MinX + double(m_CurrentBounds.MaxX - m_CurrentBounds.MinX) / 2;
+	//double dWorldCenterY = m_CurrentBounds.MinY + double(m_CurrentBounds.MaxY - m_CurrentBounds.MinY) / 2;
+	//World2DC(&dWorldCenterX, &dWorldCenterY);
+
+	//cairo_translate (m_cr_tmp, dWorldCenterX, dWorldCenterY);
 	cairo_translate (m_cr_tmp, m_dFrameCenterX, m_dFrameCenterY);
 	cairo_rotate (m_cr_tmp, dAngle);
 	//cairo_translate (m_cr_tmp, -0.5 * m_oDeviceFrameRect.GetWidth(), -0.5 * m_oDeviceFrameRect.GetHeight());
+	//cairo_translate (m_cr_tmp, -dWorldCenterX, -dWorldCenterY);
 	cairo_translate (m_cr_tmp, -m_dFrameCenterX, -m_dFrameCenterY);
 	cairo_set_source_surface (m_cr_tmp, m_saLayerCaches[m_saLayerCaches.size() - 1].pCairoSurface, -m_dOrigin_X, -m_dOrigin_Y);
 
@@ -400,11 +413,26 @@ void wxGISDisplayEx::InitTransformMatrix(void)
 	double dScaleY = fabs(m_dFrameCenterY / dWorldCenterY);
 	double dScale = std::min(dScaleX, dScaleY);
 
+	//if(!IsDoubleEquil(dScale, dScaleX))
+	//{
+	//	double dDeltaX = fabs(dWorldCenterX - m_dFrameCenterX / dScale);
+	//	m_CurrentBounds.MinX -= dDeltaX;
+	//	m_CurrentBounds.MaxX += dDeltaX;
+	//	dWorldCenterX = double(m_CurrentBounds.MaxX - m_CurrentBounds.MinX) / 2;
+	//}
+	//if(!IsDoubleEquil(dScale, dScaleY))
+	//{
+	//	double dDeltaY = fabs(dWorldCenterY - m_dFrameCenterY / dScale);
+	//	m_CurrentBounds.MinY -= dDeltaY;
+	//	m_CurrentBounds.MaxY += dDeltaY;
+	//	dWorldCenterY = double(m_CurrentBounds.MaxY - m_CurrentBounds.MinY) / 2;
+	//}
+
 	double dWorldDeltaX = dWorldCenterX + m_CurrentBounds.MinX;
 	double dWorldDeltaY = dWorldCenterY + m_CurrentBounds.MinY;
 
-	double dWorldDeltaXSt = dScale *dWorldDeltaX  + m_dAngleRad * dWorldDeltaY;
-	double dWorldDeltaYSt = m_dAngleRad * dWorldDeltaX + dScale * dWorldDeltaY;
+	double dWorldDeltaXSt = dScale * dWorldDeltaX;// + m_dAngleRad * dWorldDeltaY;
+	double dWorldDeltaYSt = dScale * dWorldDeltaY;//m_dAngleRad * dWorldDeltaX + 
 
 	double dCenterX = m_dCacheCenterX - dWorldDeltaXSt;//(dWorldCenterX + m_CurrentBounds.MinX) * dScale;//
 	double dCenterY = m_dCacheCenterY + dWorldDeltaYSt;//(dWorldCenterY + m_CurrentBounds.MinY) * dScale;//
@@ -412,11 +440,30 @@ void wxGISDisplayEx::InitTransformMatrix(void)
 	m_dFrameYShift = m_dFrameCenterY + dWorldDeltaYSt;//(dWorldCenterY + m_CurrentBounds.MinY) * dScale;//
 
 //	cairo_matrix_init (m_pMatrix, 1, 0, 0, 1, m_dCacheCenterX, m_dCacheCenterY); 
-	cairo_matrix_init (m_pMatrix, dScale, 0.0, 0.0, -dScale, dCenterX, dCenterY); 
+	//cairo_matrix_init (m_pMatrix, dScale, 0.0, 0.0, -dScale, dCenterX, dCenterY); 
+	cairo_matrix_init_translate (m_pMatrix, m_dCacheCenterX, m_dCacheCenterY); 
 	//rotate
 	//cairo_matrix_rotate(m_pMatrix, 45.0 * M_PI / 180.0);
 	if(!IsDoubleEquil(m_dAngleRad, 0.0))
-		cairo_matrix_rotate(m_pMatrix, -m_dAngleRad);
+	//{
+		//cairo_matrix_translate(m_pMatrix, dWorldDeltaXSt, dWorldDeltaYSt);
+		cairo_matrix_rotate(m_pMatrix, m_dAngleRad);
+		//cairo_matrix_translate(m_pMatrix, -dWorldDeltaXSt, dWorldDeltaYSt);
+	//}
+	//else
+	cairo_matrix_translate(m_pMatrix, -dWorldDeltaXSt, dWorldDeltaYSt);
+
+	cairo_matrix_scale(m_pMatrix, dScale, -dScale);
+
+	cairo_matrix_init_translate (m_pDisplayMatrix, m_dFrameCenterX, m_dFrameCenterY); 
+	if(!IsDoubleEquil(m_dAngleRad, 0.0))
+		cairo_matrix_rotate(m_pDisplayMatrix, m_dAngleRad);
+	cairo_matrix_translate(m_pDisplayMatrix, -dWorldDeltaXSt, dWorldDeltaYSt);
+	cairo_matrix_scale(m_pDisplayMatrix, dScale, -dScale);
+
+	cairo_matrix_init_translate (m_pDisplayMatrixNoRotate, m_dFrameCenterX, m_dFrameCenterY); 
+	cairo_matrix_translate(m_pDisplayMatrixNoRotate, -dWorldDeltaXSt, dWorldDeltaYSt);
+	cairo_matrix_scale(m_pDisplayMatrixNoRotate, dScale, -dScale);
 
 	//set matrix to all caches
 	for(size_t i = 0; i < m_saLayerCaches.size(); ++i)
@@ -425,21 +472,24 @@ void wxGISDisplayEx::InitTransformMatrix(void)
 
 void wxGISDisplayEx::DC2World(double* pdX, double* pdY)
 {
-	cairo_matrix_t InvertMatix = {m_pMatrix->xx, m_pMatrix->yx, m_pMatrix->xy, m_pMatrix->yy, m_dFrameXShift, m_dFrameYShift};//set center of real window not cache
-	cairo_matrix_invert(&InvertMatix);
-	cairo_matrix_transform_point(&InvertMatix, pdX, pdY);
+	//cairo_matrix_t InvertMatrix = {m_pMatrix->xx, m_pMatrix->yx, m_pMatrix->xy, m_pMatrix->yy, m_dFrameXShift, m_dFrameYShift};//set center of real window not cache
+	cairo_matrix_t InvertMatrix = {m_pDisplayMatrix->xx, m_pDisplayMatrix->yx, m_pDisplayMatrix->xy, m_pDisplayMatrix->yy, m_pDisplayMatrix->x0, m_pDisplayMatrix->y0};//set center of real window not cache
+	cairo_matrix_invert(&InvertMatrix);
+	cairo_matrix_transform_point(&InvertMatrix, pdX, pdY);
 	//cairo_device_to_user (m_saLayerCaches[m_nCurrentLayer].pCairoContext, pdX, pdY);
 }
 
 void wxGISDisplayEx::World2DC(double* pdX, double* pdY)
 {
-	cairo_matrix_t Matix = {m_pMatrix->xx, m_pMatrix->yx, m_pMatrix->xy, m_pMatrix->yy, m_dFrameXShift, m_dFrameYShift};//set center of real window not cache
-	cairo_matrix_transform_point(&Matix, pdX, pdY);
+	//cairo_matrix_t Matrix = {m_pMatrix->xx, m_pMatrix->yx, m_pMatrix->xy, m_pMatrix->yy, m_dFrameXShift, m_dFrameYShift};//set center of real window not cache
+	cairo_matrix_t Matrix = {m_pDisplayMatrix->xx, m_pDisplayMatrix->yx, m_pDisplayMatrix->xy, m_pDisplayMatrix->yy, m_pDisplayMatrix->x0, m_pDisplayMatrix->y0};//set center of real window not cache
+	cairo_matrix_transform_point(&Matrix, pdX, pdY);
 	//cairo_user_to_device (m_saLayerCaches[m_nCurrentLayer].pCairoContext, pdX, pdY);
 }
 
 void wxGISDisplayEx::DC2WorldDist(double* pdX, double* pdY)
 {
+	//cairo_matrix_transform_distance
 	cairo_device_to_user_distance (m_saLayerCaches[m_nCurrentLayer].pCairoContext, pdX, pdY);
 }
 
@@ -641,7 +691,9 @@ bool wxGISDisplayEx::CheckDrawAsPoint(const OGRGeometry* pGeometry, bool bCheckE
 
 	double EnvWidth = Envelope.MaxX - Envelope.MinX;
 	double EnvHeight = Envelope.MaxY - Envelope.MinY;
-	cairo_user_to_device_distance(m_saLayerCaches[m_nCurrentLayer].pCairoContext, &EnvWidth, &EnvHeight);
+
+	World2DCDist(&EnvWidth, &EnvHeight);
+	//cairo_user_to_device_distance(m_saLayerCaches[m_nCurrentLayer].pCairoContext, );
 	EnvWidth = fabs(EnvWidth);
 	EnvHeight = fabs(EnvHeight);
 	if(	EnvWidth <= MINPOLYDRAWAREA && EnvHeight <= MINPOLYDRAWAREA )
@@ -744,7 +796,7 @@ OGREnvelope wxGISDisplayEx::TransformRect(wxRect &rect)
 {
 	OGREnvelope out;
 	double dX1 = rect.GetLeft(), dX2 = rect.GetRight(), dY2 = rect.GetTop(), dY1 = rect.GetBottom(); 
-	if(IsDoubleEquil(m_dAngleRad, 0.0))
+	if(IsDoubleEquil(m_dAngleRad, 0.0))//1)//
 	{
 		DC2World(&dX1, &dY1);
 		DC2World(&dX2, &dY2);
@@ -752,21 +804,31 @@ OGREnvelope wxGISDisplayEx::TransformRect(wxRect &rect)
 		out.MinY = dY1;
 		out.MaxX = dX2;
 		out.MaxY = dY2;
-		return out;
 	}
 	else
 	{
-		double dTmpX1 = dX1, dTmpX2 = dX2, dTmpY1 = dY1, dTmpY2 = dY2;
-		DC2World(&dTmpX1, &dTmpY1);
-		DC2World(&dX1, &dTmpY2);
-		DC2World(&dTmpX2, &dY1);
-		DC2World(&dX2, &dY2);
-		out.MinX = std::max(std::min(dX1, dTmpX1), std::min(dX2, dTmpX2));
-		out.MinY = std::max(std::min(dY1, dTmpY1), std::min(dY2, dTmpY2));
-		out.MaxX = std::min(std::max(dX1, dTmpX1), std::max(dX2, dTmpX2));
-		out.MaxY = std::min(std::max(dY1, dTmpY1), std::max(dY2, dTmpY2));
-		return out;
+		cairo_matrix_t InvertMatrix = {m_pDisplayMatrixNoRotate->xx, m_pDisplayMatrixNoRotate->yx, m_pDisplayMatrixNoRotate->xy, m_pDisplayMatrixNoRotate->yy, m_pDisplayMatrixNoRotate->x0, m_pDisplayMatrixNoRotate->y0};
+		cairo_matrix_invert(&InvertMatrix);
+		//cairo_matrix_rotate(&InvertMatrix, -m_dAngleRad);
+		cairo_matrix_transform_point(&InvertMatrix, &dX1, &dY1);
+		cairo_matrix_transform_point(&InvertMatrix, &dX2, &dY2);
+		out.MinX = dX1;
+		out.MinY = dY1;
+		out.MaxX = dX2;
+		out.MaxY = dY2;
+
+
+		//double dTmpX1 = dX1, dTmpX2 = dX2, dTmpY1 = dY1, dTmpY2 = dY2;
+		//DC2World(&dTmpX1, &dTmpY1);
+		//DC2World(&dX1, &dTmpY2);
+		//DC2World(&dTmpX2, &dY1);
+		//DC2World(&dX2, &dY2);
+		//out.MinX = std::max(std::min(dX1, dTmpX1), std::min(dX2, dTmpX2));
+		//out.MinY = std::max(std::min(dY1, dTmpY1), std::min(dY2, dTmpY2));
+		//out.MaxX = std::min(std::max(dX1, dTmpX1), std::max(dX2, dTmpX2));
+		//out.MaxY = std::min(std::max(dY1, dTmpY1), std::max(dY2, dTmpY2));
 	}
+	return out;
 }
 
 void wxGISDisplayEx::SetRotate(double dAngleRad)
@@ -779,5 +841,20 @@ void wxGISDisplayEx::SetRotate(double dAngleRad)
 	SetDerty(true);
 	//compute current transform matrix
 	InitTransformMatrix();
-}
 
+	//if rotation set
+	//if(!IsDoubleEquil(m_dAngleRad, 0.0))
+	//{
+	//	for(size_t i = 0; i < m_saLayerCaches.size(); ++i)
+	//	{
+	//		cairo_translate (m_saLayerCaches[i].pCairoContext, m_dFrameCenterX, m_dFrameCenterY);
+	//		cairo_rotate (m_saLayerCaches[i].pCairoContext, -m_dAngleRad);
+	//		cairo_translate (m_saLayerCaches[i].pCairoContext, -m_dFrameCenterX, -m_dFrameCenterY);
+	//	}
+	//}
+	//else
+	//{
+	//	for(size_t i = 0; i < m_saLayerCaches.size(); ++i)
+	//		cairo_set_matrix (m_saLayerCaches[i].pCairoContext, m_pMatrix);
+	//}
+}

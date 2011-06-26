@@ -22,6 +22,31 @@
 #include "wxgis/framework/framework.h"
 #include "wxgis/cartoui/mapviewex.h"
 
+/** \class wxGISRotationComboBox cartocmd.h
+    \brief The frame angle rotation input combobox.
+*/
+class wxGISRotationComboBox : 
+	public wxComboBox,
+	public IToolBarControl
+{
+public:
+	wxGISRotationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style = 0, const wxValidator& validator = wxDefaultValidator, const wxString& name = wxT("LocationComboBox"));
+	virtual ~wxGISRotationComboBox(void);
+	virtual void UpdateAngle(void);
+	virtual void SetMapView(wxGISMapViewEx* pMapView){m_pMapView = pMapView;};
+	//events
+	void OnTextEnter(wxCommandEvent& event);
+	//IToolBarControl
+	virtual void Activate(IApplication* pApp);
+	virtual void Deactivate(void);
+protected:
+	wxGISMapViewEx* m_pMapView;
+	//IApplication* m_pApp;
+	//std::vector<wxString> m_ValuesArr;
+
+    DECLARE_EVENT_TABLE()
+};
+
 /** \class wxGISCartoMainCmd cartocmd.h
     \brief The carto main commands.
 */
@@ -126,28 +151,7 @@ private:
 	wxIcon m_IconRotate, m_IconCancelRotate;
 	wxCursor m_CurRotate;
 	wxGISMapViewEx* m_pMapView;
-	//wxGISRotationComboBox* m_pRotationComboBox;
+	wxGISRotationComboBox* m_pRotationComboBox;
 	bool m_bCheck;
 };
 
-/** \class wxGISRotationComboBox cartocmd.h
-    \brief The frame angle rotation input combobox.
-*/
-class wxGISRotationComboBox : 
-	public wxComboBox,
-	public IToolBarControl
-{
-public:
-	wxGISRotationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style = 0, const wxValidator& validator = wxDefaultValidator, const wxString& name = wxT("LocationComboBox"));
-	virtual ~wxGISRotationComboBox(void);
-	//events
-	void OnTextEnter(wxCommandEvent& event);
-	//IToolBarControl
-	virtual void Activate(IApplication* pApp);
-	virtual void Deactivate(void);
-protected:
-	IApplication* m_pApp;
-	//std::vector<wxString> m_ValuesArr;
-
-    DECLARE_EVENT_TABLE()
-};

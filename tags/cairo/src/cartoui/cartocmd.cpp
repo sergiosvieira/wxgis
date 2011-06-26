@@ -583,7 +583,7 @@ void wxGISCartoMainTool::OnMouseDoubleClick(wxMouseEvent& event)
 IMPLEMENT_DYNAMIC_CLASS(wxGISCartoFrameTool, wxObject)
 
 
-wxGISCartoFrameTool::wxGISCartoFrameTool(void) : m_pMapView(NULL), m_bCheck(false)
+wxGISCartoFrameTool::wxGISCartoFrameTool(void) : m_pMapView(NULL), m_bCheck(false), m_pRotationComboBox(NULL)
 {
 }
 
@@ -659,9 +659,18 @@ bool wxGISCartoFrameTool::GetEnabled(void)
 				}
 			}
 		}
+		if(m_pRotationComboBox)
+			m_pRotationComboBox->SetMapView(m_pMapView);
 	}
 	if(!m_pMapView)
         return false;
+
+	if(!m_pRotationComboBox && m_pApp)
+	{
+		IToolControl* pToolCtrl = dynamic_cast<IToolControl*>(m_pApp->GetCommand(wxString(wxT("wxGISCartoFrameTool")), 2));
+		if(pToolCtrl)
+			m_pRotationComboBox = dynamic_cast<wxGISRotationComboBox*>(pToolCtrl->GetControl());
+	}
 
 	switch(m_subtype)
 	{
@@ -669,7 +678,9 @@ bool wxGISCartoFrameTool::GetEnabled(void)
 		case 1:
 			//check if angle == 0
 		case 2:
-			return m_pMapView->IsShown();
+			if(m_pMapView)
+				return m_pMapView->IsShown();
+			return false;
 		default:
 			return false;
 	}
@@ -712,7 +723,12 @@ void wxGISCartoFrameTool::OnClick(void)
 		case 0:
 			break;
 		case 1:
-			m_pMapView->SetRotate(0);
+			if(m_pMapView)
+			{
+				m_pMapView->SetRotate(0);
+				if(m_pRotationComboBox)
+					m_pRotationComboBox->UpdateAngle();
+			}
 			break;
 		case 2:
 			break;
@@ -724,6 +740,7 @@ void wxGISCartoFrameTool::OnClick(void)
 bool wxGISCartoFrameTool::OnCreate(IApplication* pApp)
 {
 	m_pApp = pApp;
+
 	return true;
 }
 
@@ -806,7 +823,15 @@ void wxGISCartoFrameTool::OnMouseMove(wxMouseEvent& event)
 	{
 		case 0:	//rotate
 			if(event.Dragging())
+			{
 				m_pMapView->RotateBy(event.GetPosition());
+				if(m_pRotationComboBox)
+					m_pRotationComboBox->UpdateAngle();
+			}
+			break;
+		case 2:
+			if(m_pRotationComboBox)
+				m_pRotationComboBox->UpdateAngle();
 			break;
 		default:
 			break;
@@ -823,12 +848,12 @@ IToolBarControl* wxGISCartoFrameTool::GetControl(void)
 	switch(m_subtype)
 	{
 		case 2:	
-			//if(!m_pGxLocationComboBox)
+			if(!m_pRotationComboBox)
 			{
 				wxArrayString ValuesArray;
-				wxGISRotationComboBox* pRotationComboBox = new wxGISRotationComboBox(dynamic_cast<wxWindow*>(m_pApp), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 65, 22 ), ValuesArray);
-				return static_cast<IToolBarControl*>(pRotationComboBox);
+				m_pRotationComboBox = new wxGISRotationComboBox(dynamic_cast<wxWindow*>(m_pApp), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 65, 22 ), ValuesArray);
 			}
+			return static_cast<IToolBarControl*>(m_pRotationComboBox);
 		default:
 			return NULL;
 	}
@@ -865,8 +890,10 @@ BEGIN_EVENT_TABLE(wxGISRotationComboBox, wxComboBox)
 	EVT_COMBOBOX(wxID_ANY, wxGISRotationComboBox::OnTextEnter)
 END_EVENT_TABLE()
 
-wxGISRotationComboBox::wxGISRotationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name) : wxComboBox(parent, id, value, pos, size, choices, style, validator, name), m_pApp(NULL)
+wxGISRotationComboBox::wxGISRotationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name) : wxComboBox(parent, id, value, pos, size, choices, style, validator, name)//, m_pApp(NULL)
 {
+	m_pMapView = NULL;
+	SetValue(wxT("0.00"));
 }
 
 wxGISRotationComboBox::~wxGISRotationComboBox(void)
@@ -875,28 +902,36 @@ wxGISRotationComboBox::~wxGISRotationComboBox(void)
 
 void wxGISRotationComboBox::OnTextEnter(wxCommandEvent& event)
 {
-	//wxGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(m_pApp);
-	//if(pGxApp)
-	//{
-	//	wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-	//	if(pCatalog)
-	//	{
-	//		pCatalog->SetLocation(GetValue());
-	//		for(size_t i = 0; i < m_ValuesArr.size(); i++)
-	//			if(m_ValuesArr[i] == GetValue())
-	//				return;
-	//		Append(GetValue());
-	//		m_ValuesArr.push_back(GetValue());
-	//	}
-	//}
+	if(m_pMapView)
+	{
+		wxString sVal = GetValue();
+		double dAngleGrad = wxAtof(sVal);
+		wxString sFloatVal = wxString::Format(wxT("%.2f"), dAngleGrad);
+		double dAngleRad = dAngleGrad * PIDEG;
+		m_pMapView->SetRotate(-dAngleRad);
+		//check uniq
+		if(FindString(sFloatVal) == wxNOT_FOUND)
+			AppendString(sFloatVal);
+		SetStringSelection(sFloatVal);
+	}
 }
 
 void wxGISRotationComboBox::Activate(IApplication* pApp)
 {
-	m_pApp = pApp;
+	//m_pApp = pApp;
 }
 
 void wxGISRotationComboBox::Deactivate(void)
 {
+}
+
+void wxGISRotationComboBox::UpdateAngle(void)
+{
+	if(m_pMapView)
+	{
+		double dRotate = m_pMapView->GetCurrentRotate();
+		wxString sVal = wxString::Format(wxT("%.2f"), dRotate * DEGPI);
+		SetValue(sVal);
+	}
 }
 

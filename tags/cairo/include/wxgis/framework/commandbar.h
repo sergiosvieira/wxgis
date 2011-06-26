@@ -110,6 +110,7 @@ public:
 	virtual void AddMenu(wxMenu* pMenu, wxString sName);
 	virtual void Activate(IApplication* pApp);
 	virtual void Deactivate(void);
+	virtual void UpdateControls(void);
 protected: // handlers
     void OnMotion(wxMouseEvent& evt);
 protected: 

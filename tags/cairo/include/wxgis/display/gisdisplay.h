@@ -126,7 +126,7 @@ protected:
 	OGREnvelope m_CurrentBounds, m_CurrentBoundsX8;
 	//wxSize m_ppi;
 	double m_dAngleRad;
-	cairo_matrix_t* m_pMatrix;
+	cairo_matrix_t *m_pMatrix, *m_pDisplayMatrix, *m_pDisplayMatrixNoRotate;
 	double m_dOrigin_X, m_dOrigin_Y;
 	double m_dFrameCenterX, m_dFrameCenterY;
 	double m_dCacheCenterX, m_dCacheCenterY;

@@ -294,7 +294,10 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
             case enumGISCBToolbar:
 				{
 					wxAuiToolBar* pToolbar = dynamic_cast<wxAuiToolBar*>(m_CommandBarArray[i]);
-					wxAuiToolBarItem* pTool =pToolbar->FindTool(event.GetId());
+					wxGISToolBar* pGISToolBar = dynamic_cast<wxGISToolBar*>(m_CommandBarArray[i]);
+					if(pGISToolBar)
+						pGISToolBar->UpdateControls();
+					wxAuiToolBarItem* pTool = pToolbar->FindTool(event.GetId());
 					if(pTool != NULL)
 					{
                         if(pTool->GetBitmap().IsOk())
