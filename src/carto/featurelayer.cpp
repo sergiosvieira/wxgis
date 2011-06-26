@@ -144,6 +144,8 @@ bool wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisp
 		wxGISQuadTreeCursorSPtr pCursor;
 	    if(bSetFilter)
 	    {
+			//IncreaseEnvelope(&Env, 1.5);
+			//TODO: use angle
 			const CPLRectObj Rect = {Env.MinX, Env.MinY, Env.MaxX, Env.MaxY};
 			pCursor = m_pwxGISFeatureDataset->SearchGeometry(&Rect);
 		}

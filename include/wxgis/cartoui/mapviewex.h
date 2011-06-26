@@ -73,6 +73,7 @@ public:
 	virtual void SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference);
 	virtual void SetExtent(OGREnvelope &Env);
 	virtual void SetFullExtent(void);
+	virtual OGREnvelope GetFullExtent(void);
 	//
 	virtual double GetScaleRatio(OGREnvelope &Bounds, wxDC &dc);
 	virtual void PanStart(wxPoint MouseLocation);
@@ -82,6 +83,7 @@ public:
 	virtual void RotateBy(wxPoint MouseLocation);
 	virtual void RotateStop(wxPoint MouseLocation);
 	virtual void SetRotate(double dAngleRad);
+	virtual double GetCurrentRotate(void);
 protected:
 	//events
 	virtual void OnPaint(wxPaintEvent & event);
@@ -111,6 +113,7 @@ protected:
 	wxPoint m_StartMouseLocation;
 	wxPoint m_FrameCenter;
 	double m_dOriginAngle;
+	double m_dCurrentAngle;
 
 	wxCriticalSection m_CritSect;
 	DECLARE_EVENT_TABLE()
