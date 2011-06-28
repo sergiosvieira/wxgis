@@ -1,0 +1,426 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wxGIS 0.3.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-06-12 13:24+0100\n"
+"PO-Revision-Date: 2011-06-12 14:48+0100\n"
+"Last-Translator: Jan Helebrant <jhelebrant@seznam.cz>\n"
+"Language-Team: Juhele <jan.helebrant@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-Basepath: .C:\\Documents and Settings\\Honza\\Plocha\\Qt Linguist\\WXGIS\\src\\loc\n"
+"X-Poedit-Language: Czech\n"
+"X-Poedit-Country: CZECH REPUBLIC\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-SearchPath-0: C:\\Documents and Settings\\Honza\\Plocha\\Qt Linguist\\WXGIS\\src\\include\\wxgis\n"
+"X-Poedit-SearchPath-1: C:\\Documents and Settings\\Honza\\Plocha\\Qt Linguist\\WXGIS\\src\\src\\catalog\n"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/catop.cpp:31
+msgid "Overwrite destination object"
+msgstr "Přepsat cílový objekt"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/catop.cpp:35
+msgid "Failed overwrite destination object"
+msgstr "Přepsání cílového objektu selhalo"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/catop.cpp:42
+msgid "Cannot delete item!"
+msgstr "Nemohu smazat položku!"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxarchfolder.cpp:69
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:72
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:262
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:291
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:486
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:521
+#: Linguist\WXGIS\src\src\catalog/gxfile.cpp:60
+#: Linguist\WXGIS\src\src\catalog/gxfolder.cpp:113
+#: Linguist\WXGIS\src\src\catalog/gxkmldataset.cpp:108
+#, c-format
+msgid "Delete failed! GDAL error: %s, file '%s'"
+msgstr "Smazání selhalo! Chyba GDAL: %s, soubor  '%s'"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxarchfolder.cpp:108
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:113
+#: Linguist\WXGIS\src\src\catalog/gxfile.cpp:82
+#: Linguist\WXGIS\src\src\catalog/gxfolder.cpp:138
+#: Linguist\WXGIS\src\src\catalog/gxkmldataset.cpp:134
+#, c-format
+msgid "Rename failed! GDAL error: %s, file '%s'"
+msgstr "Přejmenování selhalo! Chyba GDAL: %s, soubor  '%s'"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxcatalog.cpp:187
+#, c-format
+msgid "wxGxCatalog: ObjectFactory %s initialize"
+msgstr "wxGxCatalog: ObjectFactory %s spouštím"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxcatalog.cpp:190
+#, c-format
+msgid "wxGxCatalog: Error initializing ObjectFactory %s"
+msgstr "wxGxCatalog: Chyba spouštění ObjectFactory %s"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxcatalog.cpp:243
+#, c-format
+msgid "wxGxCatalog: Root Object %s initialize"
+msgstr "wxGxCatalog: Root Object %s spouštím"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxcatalog.cpp:259
+#, c-format
+msgid "wxGxCatalog: Error initializing Root Object %s"
+msgstr "wxGxCatalog: Chyba spouštění Root Object %s"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:130
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:371
+#: Linguist\WXGIS\src\src\catalog/gxkmldataset.cpp:211
+msgid "Copy table dataset "
+msgstr "Kopírovat tabulkový dataset"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:146
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:387
+#: Linguist\WXGIS\src\src\catalog/gxkmldataset.cpp:227
+#, c-format
+msgid "Copy table dataset %s failed!"
+msgstr "Kopírování vektorového datasetu %s selhalo!"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:154
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:395
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:588
+#: Linguist\WXGIS\src\src\catalog/gxkmldataset.cpp:235
+#, c-format
+msgid "Copy failed! GDAL error: %s, file '%s'"
+msgstr "Kopírování selhalo! Chyba GDAL: %s, soubor  '%s'"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:167
+#: Linguist\WXGIS\src\src\catalog/gxkmldataset.cpp:248
+msgid "Move table dataset "
+msgstr "Přesunout tabulkový dataset"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:183
+#: Linguist\WXGIS\src\src\catalog/gxkmldataset.cpp:264
+#, c-format
+msgid "Move table dataset %s failed!"
+msgstr "Přesunutí tabulkového datasetu %s selhalo!"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:191
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:432
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:625
+#: Linguist\WXGIS\src\src\catalog/gxkmldataset.cpp:272
+#, c-format
+msgid "Move failed! GDAL error: %s, file '%s'"
+msgstr "Přesunutí selhalo! Chyba GDAL: %s, soubor  '%s'"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:219
+msgid "Feature class"
+msgstr "Třída prvků"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:305
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:550
+#: Linguist\WXGIS\src\src\catalog/gxkmldataset.cpp:163
+#, c-format
+msgid "Open failed! GDAL error: %s"
+msgstr "Otevření selhalo! Chyba GDAL: %s"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:408
+msgid "Move feature dataset "
+msgstr "Přesunout vektorový dataset"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:424
+#, c-format
+msgid "Move feature dataset %s failed!"
+msgstr "Přesunutí vektorového datasetu %s selhalo!"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:532
+msgid "Raster"
+msgstr "Rastr"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:564
+msgid "Copy raster dataset "
+msgstr "Kopírovat rastrový dataset"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:580
+#, c-format
+msgid "Copy raster dataset %s failed!"
+msgstr "Kopírování rastrového datasetu %s selhalo!"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:601
+msgid "Move raster dataset "
+msgstr "Přesunout rastrový dataset"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdataset.cpp:617
+#, c-format
+msgid "Move raster dataset %s failed!"
+msgstr "Přesunutí rastrového datasetu %s selhalo!"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdiscconnections.cpp:78
+msgid "wxGxDiscConnections: Start scan folder connections"
+msgstr "wxGxDiscConnections: Zahájit sken připojení složek"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxdiscconnections.cpp:149
+#, c-format
+msgid "wxGxDiscConnections: Add folder connection [%s]"
+msgstr "wxGxDiscConnections: Přidat připojení složky [%s]"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfile.cpp:91
+msgid "Copy file "
+msgstr "Kopírovat soubor"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfile.cpp:107
+msgid "Move file "
+msgstr "Přesunout soubor"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfile.cpp:191
+#, c-format
+msgid "wxGxPrjFile: GDAL error: %s"
+msgstr "wxGxPrjFile: Chyba GDAL: %s"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:66
+msgid "Any items (*.*)"
+msgstr "Jakékoliv položky (*.*)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:124
+msgid "Coordinate Systems (*.prj, *.spr)"
+msgstr "Souřadnicové systémy (*.prj, *.spr)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:182
+msgid "Raster (*.img, *.tif, etc.)"
+msgstr "Rastr (*.img, *.tif, etc.)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:184
+msgid "Vector (*.shp, *.tab, etc.)"
+msgstr "Vektor (*.shp, *.tab, etc.)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:186
+msgid "Table (*.dbf, *.tab, *.csv, etc.)"
+msgstr "Tabulka (*.dbf, *.tab, *.csv, etc.)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:240
+msgid "ESRI Shapefile (*.shp)"
+msgstr "ESRI Shapefile (*.shp)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:242
+msgid "MapInfo File (*.tab)"
+msgstr "MapInfo soubor (*.tab)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:244
+msgid "MapInfo File (*.mid/*.mif)"
+msgstr "MapInfo soubor (*.mid/*.mif)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:246
+msgid "KML file (*.kml)"
+msgstr "KML soubor (*.kml)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:248
+msgid "KML file (*.kmz)"
+msgstr "KML soubor (*.kmz)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:250
+msgid "AutoCAD DXF file (*.dxf)"
+msgstr "AutoCAD DXF soubor (*.dxf)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:253
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:568
+msgid "Any feature classes (*.*)"
+msgstr "Jakékoliv třídy prvků (*.*)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:321
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:340
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:349
+msgid "Folder"
+msgstr "Složka"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:323
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:342
+msgid "Folder connection"
+msgstr "Připojení složky"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:335
+msgid "Folder connections"
+msgstr "Připojení složek"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:397
+msgid "Windows Device Independent Bitmap (*.bmp)"
+msgstr "Windows Device Independent Bitmap (*.bmp)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:399
+msgid "GeoTIFF (*.tif, *.tiff)"
+msgstr "GeoTIFF (*.tif, *.tiff)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:401
+msgid "JPEG image (*.jpeg, *.jfif, *.jpg, *.jpe)"
+msgstr "JPEG obrázek (*.jpeg, *.jfif, *.jpg, *.jpe)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:403
+msgid "Erdas IMAGINE image (*.img)"
+msgstr "Erdas IMAGINE obrázek (*.img)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:405
+msgid "Portable Network Graphics (*.png)"
+msgstr "Portable Network Graphics (*.png)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:407
+msgid "Graphics Interchange Format (*.gif)"
+msgstr "Graphics Interchange Format (*.gif)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:409
+msgid "EarthWatch raster (*.til)"
+msgstr "EarthWatch rastr (*.til)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:558
+msgid "dBase file (*.dbf)"
+msgstr "dBase soubor (*.dbf)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:560
+msgid "MapInfo table File (*.tab)"
+msgstr "MapInfo soubor tabulky (*.tab)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:562
+msgid "MapInfo table File (*.mif)"
+msgstr "MapInfo soubor tabulky (*.mif)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:564
+msgid "Comma Separated Values (*.csv)"
+msgstr "Hodnoty oddělené čárkou (*.csv)"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxfilters.cpp:566
+msgid "Database table"
+msgstr "Databázová tabulka"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxkmldataset.cpp:69
+msgid "KML Dataset"
+msgstr "KML Dataset"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxkmldataset.cpp:71
+msgid "GML Dataset"
+msgstr "GML Dataset"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxkmldataset.cpp:306
+msgid "KML Feature class"
+msgstr "KML Třída prvků"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\catalog/gxspatreffolder.cpp:50
+#, c-format
+msgid "wxGxSpatialReferencesFolder: The path is set to '%s'"
+msgstr "wxGxSpatialReferencesFolder: Cesta je nastavena na '%s'"
+

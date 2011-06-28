@@ -1,0 +1,98 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wxGIS 0.3.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-06-13 20:43+0100\n"
+"PO-Revision-Date: 2011-06-13 20:43+0100\n"
+"Last-Translator: Jan Helebrant <jhelebrant@seznam.cz>\n"
+"Language-Team: Juhele <jan.helebrant@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-Basepath: .C:\\Documents and Settings\\Honza\\Plocha\\Qt Linguist\\WXGIS\\src\\loc\n"
+"X-Poedit-Language: Czech\n"
+"X-Poedit-Country: CZECH REPUBLIC\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-SearchPath-0: C:\\Documents and Settings\\Honza\\Plocha\\Qt Linguist\\WXGIS\\src\\include\\wxgis\n"
+"X-Poedit-SearchPath-1: C:\\Documents and Settings\\Honza\\Plocha\\Qt Linguist\\WXGIS\\src\\src\\datasource\n"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\datasource/postgisdataset.cpp:143
+#, c-format
+msgid "wxGISPostGISDataset: Open failed! Host '%s', Database name '%s', Port='%s'. OGR error: %s"
+msgstr "wxGISPostGISDataset: Otevření selhalo! Hostitel '%s', Název databáze '%s', Port='%s'. OGR chyba: %s"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\datasource/rasterdataset.cpp:256
+#, c-format
+msgid "wxGISRasterDataset: Open failed! Path '%s'. GDAL error: %s"
+msgstr "wxGISRasterDataset: Otevření selhalo! Cesta '%s'. GDAL chyba: %s"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\datasource/rasterdataset.cpp:305
+#, c-format
+msgid "wxGISRasterDataset: Open failed! Path '%s'. Raster has no bands"
+msgstr "wxGISRasterDataset: Otevření selhalo! Cesta '%s'. Rastr nemá pásma"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\datasource/spvalidator.cpp:83
+#, c-format
+msgid "Failed to allocate %d byte buffer to hold xml file."
+msgstr "Selhalo přidělení %d bajtů bufferu k podržení xml souboru."
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\datasource/spvalidator.cpp:91
+#, c-format
+msgid "Failed to read %d bytes from xml file."
+msgstr "Selhalo načtení %d bajtů z xml souboru."
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\datasource/sysop.cpp:374
+msgid "Error open input file! OGR error: "
+msgstr "Chyba otvírání vstupního souboru! OGR chyba: "
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\datasource/sysop.cpp:388
+#, c-format
+msgid "Error create the output file '%s'! OGR error: "
+msgstr "Chyba vytváření výstupního souboru '%s'! OGR chyba: "
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\datasource/table.cpp:71
+#, c-format
+msgid "wxGISTable: Open failed! Path '%s'. OGR error: %s"
+msgstr "wxGISTable: Otevření selhalo! Cesta '%s'. OGR chyba: %s"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\datasource/table.cpp:134
+msgid "PreLoad Features of "
+msgstr "Přednačíst vlastnosti"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\datasource/table.cpp:358
+msgid "%d-%m-%Y"
+msgstr "%d-%m-%Y"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\datasource/table.cpp:371
+msgid "%H:%M:%S"
+msgstr "%H:%M:%S"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\datasource/table.cpp:384
+msgid "%d-%m-%Y %H:%M:%S"
+msgstr "%d-%m-%Y %H:%M:%S"
+
