@@ -1,0 +1,129 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wxGIS 0.3.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-06-13 20:21+0100\n"
+"PO-Revision-Date: 2011-06-13 20:22+0100\n"
+"Last-Translator: Jan Helebrant <jhelebrant@seznam.cz>\n"
+"Language-Team: Juhele <jan.helebrant@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-Basepath: .C:\\Documents and Settings\\Honza\\Plocha\\Qt Linguist\\WXGIS\\src\\loc\n"
+"X-Poedit-Language: Czech\n"
+"X-Poedit-Country: CZECH REPUBLIC\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-SearchPath-0: C:\\Documents and Settings\\Honza\\Plocha\\Qt Linguist\\WXGIS\\src\\src\\conf\n"
+"X-Poedit-SearchPath-1: C:\\Documents and Settings\\Honza\\Plocha\\Qt Linguist\\WXGIS\\src\\include\\wxgis\n"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:54
+msgid "Failed to initialize the wxWidgets library, aborting."
+msgstr "Spuštění knihovny wxWidgets selhalo, přerušuji."
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:63
+msgid "Show this help message"
+msgstr "Zobrazí tuto zprávu nápovědy"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:64
+msgid "The version of this program"
+msgstr "Verze tohoto programu"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:65
+msgid "Add data to path in XML Config."
+msgstr "Přidat data do cesty v XML konfigu."
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:66
+msgid "Delete data from XML Config"
+msgstr "Smazat data z XML konfigu."
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:67
+msgid "The XMLNode name attribute"
+msgstr "Atribut názvu XMLNode"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:68
+msgid "The XMLNode path attribute"
+msgstr "Atribut cesty XMLNode"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:69
+msgid "The XMLNode is_enabled attribute. is_enabled choice: 1 for enabled or 0 for disabled"
+msgstr "Atribut XMLNode is_enabled. Volba is_enabled: 1 pro zapnut nebo 0 pro vypnut"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:70
+msgid "The XMLNode class attribute"
+msgstr "Atribut třídy XMLNode"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:71
+msgid "The XMLNode type attribute. Type choice: sep, cmd, menu"
+msgstr "Atribut typu XMLNode. Volby typu: sep, cmd, menu"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:72
+msgid "The XMLNode sub_type attribute"
+msgstr "Atribut podtypu XMLNode"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:73
+msgid "The XMLNode cmd_name attribute"
+msgstr "Atribut XMLNode cmd_name"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:74
+msgid "The XMLNode attributes <attr_name>=<attr_value> separated by comma"
+msgstr "Atributy XMLNode <attr_name>=<attr_value> oddělené čárkou"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:75
+msgid "encode password"
+msgstr "zakódovat heslo"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:80
+#, c-format
+msgid ""
+"The wxGISConf (%s)\n"
+"Author: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\n"
+"Copyright (c) 2011"
+msgstr ""
+"The wxGISConf (%s)\n"
+"Autor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\n"
+"Copyright (c) 2011"
+
+#: C:\Documents
+#: and Settings\Honza\Plocha\Qt
+#: Linguist\WXGIS\src\src\conf/confmain.cpp:111
+#, c-format
+msgid ""
+"The wxGISConf (%s)\n"
+"Author: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\n"
+"Copyright (c) 2011\n"
+msgstr ""
+"The wxGISConf (%s)\n"
+"Autor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\n"
+"Copyright (c) 2011\n"
+
