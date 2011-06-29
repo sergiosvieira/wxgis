@@ -19,8 +19,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/display/gisdisplay.h"
+#include "wxgis/display/displaytransformation.h"
 #include "wxgis/geometry/algorithm.h"
-
 
 wxGISDisplayEx::wxGISDisplayEx(void)
 {
@@ -85,6 +85,10 @@ void wxGISDisplayEx::Clear()
 	m_CurrentBounds.MaxX = ENVMAX_X;
 	m_CurrentBounds.MinY = ENVMIN_Y;
 	m_CurrentBounds.MaxY = ENVMAX_Y;
+
+	m_CurrentBoundsRotated = m_CurrentBounds;
+	m_dRotatedBoundsCenterX = m_CurrentBoundsRotated.MinX + (m_CurrentBoundsRotated.MaxX - m_CurrentBoundsRotated.MinX) / 2;
+	m_dRotatedBoundsCenterY = m_CurrentBoundsRotated.MinY + (m_CurrentBoundsRotated.MaxY - m_CurrentBoundsRotated.MinY) / 2;
 
 	m_CurrentBoundsX8 = m_CurrentBounds;
 	IncreaseEnvelope(&m_CurrentBoundsX8, 8);
@@ -384,10 +388,17 @@ wxRect wxGISDisplayEx::GetDeviceFrame(void)
 
 void wxGISDisplayEx::SetBounds(OGREnvelope& Bounds)
 {
+	//update bounds to frame ratio
 	m_CurrentBounds = Bounds;
-	m_CurrentBoundsX8 = m_CurrentBounds;
+	m_dRotatedBoundsCenterX = Bounds.MinX + (Bounds.MaxX - Bounds.MinX) / 2;
+	m_dRotatedBoundsCenterY = Bounds.MinY + (Bounds.MaxY - Bounds.MinY) / 2;
+	m_CurrentBoundsRotated = m_CurrentBounds;
+	if(!IsDoubleEquil(m_dAngleRad, 0.0))
+		RotateEnvelope(&m_CurrentBoundsRotated, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);
+	//SetEnvelopeRatio(&m_CurrentBoundsRotated, double(m_oDeviceFrameRect.GetWidth()) / m_oDeviceFrameRect.GetHeight());
+	m_CurrentBoundsX8 = m_CurrentBoundsRotated;
 	IncreaseEnvelope(&m_CurrentBoundsX8, 8);
-//	m_pCutGeom = EnvelopeToGeometry(m_CurrentBounds);
+
 	SetDerty(true);
 	//compute current transform matrix
 	InitTransformMatrix();
@@ -395,7 +406,7 @@ void wxGISDisplayEx::SetBounds(OGREnvelope& Bounds)
 
 OGREnvelope wxGISDisplayEx::GetBounds(void)
 {
-	return m_CurrentBounds;
+	return m_CurrentBoundsRotated;//m_CurrentBounds;
 }
 
 void wxGISDisplayEx::InitTransformMatrix(void)
@@ -659,7 +670,12 @@ bool wxGISDisplayEx::DrawPolygon(const OGRPolygon* pPolygon)
 	const OGRLinearRing *pRing = pPolygon->getExteriorRing();
 	OGREnvelope Env;
 	pRing->getEnvelope(&Env);
-	if((!Env.Contains(m_CurrentBounds) || m_CurrentBounds.Contains(Env) ) && !Env.Intersects(m_CurrentBounds) )
+
+	if(!IsDoubleEquil(m_dAngleRad, 0.0))
+		RotateEnvelope(&Env, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);
+
+	bool bDraw = Env.Contains(m_CurrentBoundsRotated) || m_CurrentBoundsRotated.Contains(Env) || Env.Intersects(m_CurrentBoundsRotated);
+	if( !bDraw )
 		return false;
 
 	DrawRing( pRing );
@@ -684,9 +700,13 @@ bool wxGISDisplayEx::DrawPolygon(const OGRPolygon* pPolygon)
 bool wxGISDisplayEx::CheckDrawAsPoint(const OGRGeometry* pGeometry, bool bCheckEnvelope)
 {
 	//double m_World2DC = GetRatio();
-	OGREnvelope Envelope;
+	OGREnvelope Envelope, TestEnv;
 	pGeometry->getEnvelope(&Envelope);
-	if(bCheckEnvelope && !m_CurrentBounds.Intersects(Envelope))
+	TestEnv = Envelope;
+	if(!IsDoubleEquil(m_dAngleRad, 0.0))
+		RotateEnvelope(&TestEnv, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);
+		//RotateEnvelope(&Envelope, m_dAngleRad);
+	if(bCheckEnvelope && !m_CurrentBoundsRotated.Intersects(TestEnv))
 		return true;
 
 	double EnvWidth = Envelope.MaxX - Envelope.MinX;
@@ -795,66 +815,55 @@ double wxGISDisplayEx::GetRatio(void)
 OGREnvelope wxGISDisplayEx::TransformRect(wxRect &rect)
 {
 	OGREnvelope out;
-	double dX1 = rect.GetLeft(), dX2 = rect.GetRight(), dY2 = rect.GetTop(), dY1 = rect.GetBottom(); 
+	double dX1, dX2, dY2, dY1; 
 	if(IsDoubleEquil(m_dAngleRad, 0.0))//1)//
 	{
+		dX1 = rect.GetLeft();
+		dX2 = rect.GetRight();
+		dY2 = rect.GetTop();
+		dY1 = rect.GetBottom(); 
+
 		DC2World(&dX1, &dY1);
 		DC2World(&dX2, &dY2);
-		out.MinX = dX1;
-		out.MinY = dY1;
-		out.MaxX = dX2;
-		out.MaxY = dY2;
 	}
 	else
 	{
+		double dWHalf = double(rect.width) / 2;
+		double dHHalf = double(rect.height) / 2;
+		double dXCenter = rect.x + dWHalf, dYCenter = rect.y + dHHalf; 
+		DC2World(&dXCenter, &dYCenter);
+
 		cairo_matrix_t InvertMatrix = {m_pDisplayMatrixNoRotate->xx, m_pDisplayMatrixNoRotate->yx, m_pDisplayMatrixNoRotate->xy, m_pDisplayMatrixNoRotate->yy, m_pDisplayMatrixNoRotate->x0, m_pDisplayMatrixNoRotate->y0};
 		cairo_matrix_invert(&InvertMatrix);
-		//cairo_matrix_rotate(&InvertMatrix, -m_dAngleRad);
-		cairo_matrix_transform_point(&InvertMatrix, &dX1, &dY1);
-		cairo_matrix_transform_point(&InvertMatrix, &dX2, &dY2);
-		out.MinX = dX1;
-		out.MinY = dY1;
-		out.MaxX = dX2;
-		out.MaxY = dY2;
 
+		cairo_matrix_transform_distance(&InvertMatrix, &dWHalf, &dHHalf);
 
-		//double dTmpX1 = dX1, dTmpX2 = dX2, dTmpY1 = dY1, dTmpY2 = dY2;
-		//DC2World(&dTmpX1, &dTmpY1);
-		//DC2World(&dX1, &dTmpY2);
-		//DC2World(&dTmpX2, &dY1);
-		//DC2World(&dX2, &dY2);
-		//out.MinX = std::max(std::min(dX1, dTmpX1), std::min(dX2, dTmpX2));
-		//out.MinY = std::max(std::min(dY1, dTmpY1), std::min(dY2, dTmpY2));
-		//out.MaxX = std::min(std::max(dX1, dTmpX1), std::max(dX2, dTmpX2));
-		//out.MaxY = std::min(std::max(dY1, dTmpY1), std::max(dY2, dTmpY2));
+		dX1 = dXCenter - dWHalf;
+		dX2 = dXCenter + dWHalf;
+		dY1 = dYCenter - dHHalf;
+		dY2 = dYCenter + dHHalf;
 	}
+	out.MinX = std::min(dX1, dX2);
+	out.MinY = std::min(dY1, dY2);
+	out.MaxX = std::max(dX1, dX2);
+	out.MaxY = std::max(dY1, dY2);
 	return out;
 }
 
 void wxGISDisplayEx::SetRotate(double dAngleRad)
 {
 	m_dAngleRad = dAngleRad;
-	//cairo_matrix_rotate(m_pMatrix, m_dAngleRad);
-	//m_pMatrix->xy = m_dAngleRad;
-	//m_pMatrix->yx = m_dAngleRad;
-	//SetBounds(TransformRect(m_oDeviceFrameRect));
-	SetDerty(true);
+//for rotate panning & zooming
+	m_CurrentBoundsRotated = m_CurrentBounds;
+	m_dRotatedBoundsCenterX = m_CurrentBoundsRotated.MinX + (m_CurrentBoundsRotated.MaxX - m_CurrentBoundsRotated.MinX) / 2;
+	m_dRotatedBoundsCenterY = m_CurrentBoundsRotated.MinY + (m_CurrentBoundsRotated.MaxY - m_CurrentBoundsRotated.MinY) / 2;
+	if(!IsDoubleEquil(m_dAngleRad, 0.0))
+		RotateEnvelope(&m_CurrentBoundsRotated, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);
+	m_CurrentBoundsX8 = m_CurrentBoundsRotated;
+	IncreaseEnvelope(&m_CurrentBoundsX8, 8);
+
 	//compute current transform matrix
 	InitTransformMatrix();
 
-	//if rotation set
-	//if(!IsDoubleEquil(m_dAngleRad, 0.0))
-	//{
-	//	for(size_t i = 0; i < m_saLayerCaches.size(); ++i)
-	//	{
-	//		cairo_translate (m_saLayerCaches[i].pCairoContext, m_dFrameCenterX, m_dFrameCenterY);
-	//		cairo_rotate (m_saLayerCaches[i].pCairoContext, -m_dAngleRad);
-	//		cairo_translate (m_saLayerCaches[i].pCairoContext, -m_dFrameCenterX, -m_dFrameCenterY);
-	//	}
-	//}
-	//else
-	//{
-	//	for(size_t i = 0; i < m_saLayerCaches.size(); ++i)
-	//		cairo_set_matrix (m_saLayerCaches[i].pCairoContext, m_pMatrix);
-	//}
+	SetDerty(true);
 }

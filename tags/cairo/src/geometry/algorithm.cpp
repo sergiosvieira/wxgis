@@ -43,16 +43,6 @@ void ClipGeometryByEnvelope(OGRRawPoint* pOGRRawPoints, int *pnPointCount, const
 	wxDELETEA(pTmpOGRRawPoints);
 }
 
-void WXDLLIMPEXP_GIS_GEOM IncreaseEnvelope(OGREnvelope *pEnv, double dSize)
-{
-	double dWidth = (pEnv->MaxX - pEnv->MinX) * dSize / 2;
-	double dHeight = (pEnv->MaxY - pEnv->MinY) * dSize / 2;
-	pEnv->MinX -= dWidth;
-	pEnv->MinY -= dHeight;
-	pEnv->MaxX += dWidth;
-	pEnv->MaxY += dHeight;
-}
-
 OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSPtr pSpaRef)
 {
 	if(!Env.IsInit())

@@ -84,15 +84,17 @@ void wxGISMap::Clear(void)
 
 OGREnvelope wxGISMap::GetFullExtent(void)
 {
-	OGREnvelope OutputEnv;
+	OGREnvelope OutputEnv = m_FullExtent;
     //increase 10%
-    double fDeltaX = (m_FullExtent.MaxX - m_FullExtent.MinX) / 20;
-    double fDeltaY = (m_FullExtent.MaxY - m_FullExtent.MinY) / 20;
-    double fDelta = std::max(fDeltaX, fDeltaY);
-    OutputEnv.MaxX = m_FullExtent.MaxX + fDelta;
-    OutputEnv.MinX = m_FullExtent.MinX - fDelta;
-    OutputEnv.MaxY = m_FullExtent.MaxY + fDelta;
-    OutputEnv.MinY = m_FullExtent.MinY - fDelta;
+	IncreaseEnvelope(&OutputEnv, 0.1);
+
+    //double fDeltaX = (m_FullExtent.MaxX - m_FullExtent.MinX) / 20;
+    //double fDeltaY = (m_FullExtent.MaxY - m_FullExtent.MinY) / 20;
+    //double fDelta = std::max(fDeltaX, fDeltaY);
+    //OutputEnv.MaxX = m_FullExtent.MaxX + fDelta;
+    //OutputEnv.MinX = m_FullExtent.MinX - fDelta;
+    //OutputEnv.MaxY = m_FullExtent.MaxY + fDelta;
+    //OutputEnv.MinY = m_FullExtent.MinY - fDelta;
 	return OutputEnv;
 }
 

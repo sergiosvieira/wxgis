@@ -21,6 +21,7 @@
 #include "wxgis/carto/featurelayer.h"
 #include "wxgis/carto/simplerenderer.h"
 #include "wxgis/geometry/algorithm.h"
+#include "wxgis/display/displaytransformation.h"
 //#include "wxgis/datasource/spvalidator.h"
 //#include "wxgis/framework/application.h"
 //#include "wxgis/carto/transformthreads.h"
@@ -135,7 +136,18 @@ bool wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisp
 		//Check if get all features
 		OGREnvelope Env = pDisplay->GetBounds();
 		if(!IsDoubleEquil(m_PreviousEnvelope.MaxX, Env.MaxX) || !IsDoubleEquil(m_PreviousEnvelope.MaxY, Env.MaxY) || !IsDoubleEquil(m_PreviousEnvelope.MinX, Env.MinX) || !IsDoubleEquil(m_PreviousEnvelope.MinY, Env.MinY))
-			bSetFilter = m_FullEnvelope.Contains(Env);
+		{
+			OGREnvelope TempFullEnv = m_FullEnvelope;
+			//use angle
+			if(!IsDoubleEquil(pDisplay->GetRotate(), 0.0))
+			{
+				double dCenterX = Env.MinX + (Env.MaxX - Env.MinX) / 2;
+				double dCenterY = Env.MinY + (Env.MaxY - Env.MinY) / 2;
+
+				RotateEnvelope(&TempFullEnv, pDisplay->GetRotate(), dCenterX, dCenterY);
+			}
+			bSetFilter = TempFullEnv.Contains(Env);
+		}
 
 		//store envelope
 		m_PreviousEnvelope = Env;
@@ -144,8 +156,6 @@ bool wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisp
 		wxGISQuadTreeCursorSPtr pCursor;
 	    if(bSetFilter)
 	    {
-			//IncreaseEnvelope(&Env, 1.5);
-			//TODO: use angle
 			const CPLRectObj Rect = {Env.MinX, Env.MinY, Env.MaxX, Env.MaxY};
 			pCursor = m_pwxGISFeatureDataset->SearchGeometry(&Rect);
 		}

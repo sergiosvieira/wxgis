@@ -92,7 +92,7 @@
  */	
 
 OGRGeometrySPtr WXDLLIMPEXP_GIS_GEOM EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSPtr pSpaRef = OGRSpatialReferenceSPtr());
-void WXDLLIMPEXP_GIS_GEOM IncreaseEnvelope(OGREnvelope *pEnv, double dSize);
+
 //Sutherland-Hodgman Polygon Clipping
 inline bool IsInsideEnvelope(const OGRRawPoint &pt, wxGISEnumPointPosition nPos, const OGREnvelope &Env)
 {

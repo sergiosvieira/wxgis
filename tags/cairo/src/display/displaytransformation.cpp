@@ -3,7 +3,7 @@
  * Purpose:  display transformation. Transform from world to screen coordinates and vice versa
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,6 +20,76 @@
  ****************************************************************************/
 #include "wxgis/display/displaytransformation.h"
 
+#include <cairo.h>
+
+#ifdef __WXMSW__
+	#include <cairo-win32.h>
+#endif
+
+#ifdef __WXGTK__
+	#include <gdk/gdk.h>
+	#include <gtk/gtk.h>
+#endif
+
+void WXDLLIMPEXP_GIS_DSP IncreaseEnvelope(OGREnvelope *pEnv, double dSize)
+{
+	double dWidth = (pEnv->MaxX - pEnv->MinX) * dSize / 2;
+	double dHeight = (pEnv->MaxY - pEnv->MinY) * dSize / 2;
+	pEnv->MinX -= dWidth;
+	pEnv->MinY -= dHeight;
+	pEnv->MaxX += dWidth;
+	pEnv->MaxY += dHeight;
+}
+
+void WXDLLIMPEXP_GIS_DSP RotateEnvelope(OGREnvelope *pEnv, double dAngle, double dX, double dY)
+{
+	cairo_matrix_t Matrix;
+	cairo_matrix_init_translate(&Matrix, dX, dY);
+	cairo_matrix_rotate(&Matrix, dAngle);
+	cairo_matrix_translate(&Matrix, -dX, -dY);
+	//cairo_matrix_init_rotate(&Matrix, dAngle);
+	double X1 = pEnv->MinX;
+	double Y1 = pEnv->MaxY;
+	double X2 = pEnv->MaxX;
+	double Y2 = pEnv->MaxY;
+	double X3 = pEnv->MaxX;
+	double Y3 = pEnv->MinY;
+	double X4 = pEnv->MinX;
+	double Y4 = pEnv->MinY;
+
+	cairo_matrix_transform_point(&Matrix, &X1, &Y1);
+	cairo_matrix_transform_point(&Matrix, &X2, &Y2);
+	cairo_matrix_transform_point(&Matrix, &X3, &Y3);
+	cairo_matrix_transform_point(&Matrix, &X4, &Y4);
+
+	pEnv->MinX = std::min(std::min(X1, X2), std::min(X3, X4));
+	pEnv->MinY = std::min(std::min(Y1, Y2), std::min(Y3, Y4));
+	pEnv->MaxX = std::max(std::max(X1, X2), std::max(X3, X4));
+	pEnv->MaxY = std::max(std::max(Y1, Y2), std::max(Y3, Y4));
+}
+
+void WXDLLIMPEXP_GIS_DSP SetEnvelopeRatio(OGREnvelope *pEnv, double dRatio)
+{
+	double dWidth = (pEnv->MaxX - pEnv->MinX) / 2;
+	double dHeight = (pEnv->MaxY - pEnv->MinY) / 2;
+	double dCenterX = pEnv->MinX + dWidth;
+	double dCenterY = pEnv->MinY + dHeight;
+
+	if(dRatio < 1)	//increase width
+	{
+		dWidth = dHeight * dRatio;
+		pEnv->MaxX = dCenterX + dWidth;
+		pEnv->MinX = dCenterX - dWidth;
+	}
+	else					//increase height
+	{
+		dHeight = dWidth / dRatio;
+		pEnv->MaxY = dCenterY + dHeight;
+		pEnv->MinY = dCenterY - dHeight;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 wxGISDisplayTransformation::wxGISDisplayTransformation(void) : m_pSpatialReference(NULL)
 {
 	m_DeviceFrameRect.x = 0;

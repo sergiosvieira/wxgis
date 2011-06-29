@@ -893,6 +893,15 @@ END_EVENT_TABLE()
 wxGISRotationComboBox::wxGISRotationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name) : wxComboBox(parent, id, value, pos, size, choices, style, validator, name)//, m_pApp(NULL)
 {
 	m_pMapView = NULL;
+	AppendString(wxT("0.00"));
+	AppendString(wxT("45.00"));
+	AppendString(wxT("90.00"));
+	AppendString(wxT("135.00"));
+	AppendString(wxT("180.00"));
+	AppendString(wxT("225.00"));
+	AppendString(wxT("270.00"));
+	AppendString(wxT("315.00"));
+
 	SetValue(wxT("0.00"));
 }
 

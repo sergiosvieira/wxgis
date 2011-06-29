@@ -468,13 +468,8 @@ OGREnvelope wxGISMapViewEx::CreateEnvelopeFromZoomFactor(double dZoom)
 	dLR_Y = dCenterY + dDCYDelta;
 
 	//get bounds for virtual frame
-	m_pGISDisplay->DC2World(&dUL_X, &dUL_Y);
-	m_pGISDisplay->DC2World(&dLR_X, &dLR_Y);
-
-	Env.MaxX = dLR_X;
-	Env.MinX = dUL_X;
-	Env.MaxY = dUL_Y;
-	Env.MinY = dLR_Y;
+	wxRect new_rc(wxPoint(dUL_X, dUL_Y), wxPoint(dLR_X, dLR_Y));
+	Env = m_pGISDisplay->TransformRect(new_rc);
 
 	return Env;
 }
@@ -618,42 +613,15 @@ void wxGISMapViewEx::UpdateFrameCenter(void)
 OGREnvelope wxGISMapViewEx::GetFullExtent(void)
 {
 	OGREnvelope OutputEnv;
-//	if(!IsDoubleEquil(m_dCurrentAngle, 0.0))
-//	{
-//		double X1 = m_FullExtent.MinX;
-//		double Y1 = m_FullExtent.MaxY;
-//		double X2 = m_FullExtent.MaxX;
-//		double Y2 = m_FullExtent.MaxY;
-//		double X3 = m_FullExtent.MaxX;
-//		double Y3 = m_FullExtent.MinY;
-//		double X4 = m_FullExtent.MinX;
-//		double Y4 = m_FullExtent.MinY;
-////x_new = xx * x + xy * y + x0;
-////y_new = yx * x + yy * y + y0;
-//		X1 = X1 + m_dCurrentAngle * Y1;
-//		Y1 = m_dCurrentAngle * X1 + Y1;
-//		X2 = X2 + m_dCurrentAngle * Y2;
-//		Y2 = m_dCurrentAngle * X2 + Y2;
-//		X3 = X3 + m_dCurrentAngle * Y3;
-//		Y3 = m_dCurrentAngle * X3 + Y3;
-//		X4 = X4 + m_dCurrentAngle * Y4;
-//		Y4 = m_dCurrentAngle * X4 + Y4;
-//
-//		OGREnvelope TempEnv;
-//		TempEnv.MinX = std::min(std::min(X1, X2), std::min(X3, X4));
-//		TempEnv.MinY = std::min(std::min(Y1, Y2), std::min(Y3, Y4));
-//		TempEnv.MaxX = std::max(std::max(X1, X2), std::max(X3, X4));
-//		TempEnv.MaxY = std::max(std::max(Y1, Y2), std::max(Y3, Y4));
-//
-//		//double fDeltaX = (TempEnv.MaxX - TempEnv.MinX) / 20;
-//		//double fDeltaY = (TempEnv.MaxY - TempEnv.MinY) / 20;
-//		double fDelta = 0;//std::max(fDeltaX, fDeltaY);
-//		OutputEnv.MaxX = TempEnv.MaxX + fDelta;
-//		OutputEnv.MinX = TempEnv.MinX - fDelta;
-//		OutputEnv.MaxY = TempEnv.MaxY + fDelta;
-//		OutputEnv.MinY = TempEnv.MinY - fDelta;
-//	}
-//	else
+	if(!IsDoubleEquil(m_dCurrentAngle, 0.0))
+	{
+		OutputEnv = m_FullExtent;
+		double dCenterX = m_FullExtent.MinX + (m_FullExtent.MaxX - m_FullExtent.MinX) / 2;
+		double dCenterY = m_FullExtent.MinY + (m_FullExtent.MaxY - m_FullExtent.MinY) / 2;
+		RotateEnvelope(&OutputEnv, m_dCurrentAngle, dCenterX, dCenterY);
+		IncreaseEnvelope(&OutputEnv, 0.1);
+	}
+	else
 		OutputEnv = wxGISMap::GetFullExtent();
 	return OutputEnv;
 }
