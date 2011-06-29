@@ -3,7 +3,7 @@
  * Purpose:  display transformation. Transform from world to screen coordinates and vice versa
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,6 +21,11 @@
 #pragma once
 
 #include "wxgis/display/display.h"
+
+void WXDLLIMPEXP_GIS_DSP IncreaseEnvelope(OGREnvelope *pEnv, double dSize);
+void WXDLLIMPEXP_GIS_DSP RotateEnvelope(OGREnvelope *pEnv, double dAngle, double dX, double dY);
+void WXDLLIMPEXP_GIS_DSP SetEnvelopeRatio(OGREnvelope *pEnv, double dRatio);
+
 
 //DisplayTransformation – This object defines how real-world coordinates are mapped to a output device. Three rectangles define the transformation. 
 //The Bounds specifies the full extent in real-world coordinates. The VisibleBounds specifies what extent is currently visible. 

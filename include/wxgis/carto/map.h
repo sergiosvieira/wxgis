@@ -21,6 +21,7 @@
 #pragma once
 
 #include "wxgis/carto/carto.h"
+#include "wxgis/display/displaytransformation.h"
 
 /** \class wxGISMap map.h
     \brief The Map class - array of layers.
