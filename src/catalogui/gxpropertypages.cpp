@@ -33,7 +33,7 @@ wxGISCatalogGeneralPropertyPage::~wxGISCatalogGeneralPropertyPage()
 {
 }
 
-bool wxGISCatalogGeneralPropertyPage::Create(IApplication* application, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+bool wxGISCatalogGeneralPropertyPage::Create(IFrameApplication* application, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     wxPanel::Create(parent, id, pos, size, style, name);
 
@@ -56,7 +56,7 @@ bool wxGISCatalogGeneralPropertyPage::Create(IApplication* application, wxWindow
 	//m_pRootItems->InsertColumn(0, wxT("..."), wxLIST_FORMAT_LEFT, 250);
     //fill code
     GxObjectArray* pRootItems = pGxObjectContainer->GetChildren();
-    for(size_t i = 0; i < pRootItems->size(); i++)
+    for(size_t i = 0; i < pRootItems->size(); ++i)
     {
         IGxObject* pGxObj = pRootItems->operator[](i);
         wxString sName = pGxObj->GetName();
@@ -64,7 +64,7 @@ bool wxGISCatalogGeneralPropertyPage::Create(IApplication* application, wxWindow
         m_pRootItems->SetItemData(nPos, (long)pGxObj);
     }
     pRootItems = m_pCatalog->GetDisabledRootItems();
-    for(size_t i = 0; i < pRootItems->size(); i++)
+    for(size_t i = 0; i < pRootItems->size(); ++i)
     {
         IGxObject* pGxObj = pRootItems->operator[](i);
         wxString sName = pGxObj->GetName();
@@ -93,7 +93,7 @@ bool wxGISCatalogGeneralPropertyPage::Create(IApplication* application, wxWindow
     m_pFactoryItems = new wxGISCheckList( this, ID_FACTORYLISTCTRL);
     //fill code
     GxObjectFactoryArray* pFactories = m_pCatalog->GetObjectFactories();
-    for(size_t i = 0; i < pFactories->size(); i++)
+    for(size_t i = 0; i < pFactories->size(); ++i)
     {
         IGxObjectFactory* pGxObjectFactory = pFactories->operator[](i);
         wxString sName = pGxObjectFactory->GetName();
@@ -146,14 +146,14 @@ void wxGISCatalogGeneralPropertyPage::Apply(void)
     m_pCatalog->SetOpenLastPath(bOpenLast);
 
     //update object factories
-    for(size_t i = 0; i < m_pFactoryItems->GetItemCount(); i++)
+    for(size_t i = 0; i < m_pFactoryItems->GetItemCount(); ++i)
     {
         if(m_pFactoryItems->IsItemChanged(i))
         {
             if(!bHaveChanges)
                 bHaveChanges = true;
             IGxObjectFactory* pGxObjectFactory = (IGxObjectFactory*)m_pFactoryItems->GetItemData(i);
-            pGxObjectFactory->SetEnabled(m_pFactoryItems->GetItemCheckState(i));
+            pGxObjectFactory->SetEnabled(m_pFactoryItems->GetItemCheckState(i) != 0);
         }
     }
 
@@ -165,12 +165,12 @@ void wxGISCatalogGeneralPropertyPage::Apply(void)
     }
 
     //update root items
-    for(size_t i = 0; i < m_pRootItems->GetItemCount(); i++)
+    for(size_t i = 0; i < m_pRootItems->GetItemCount(); ++i)
     {
         if(m_pRootItems->IsItemChanged(i))
         {
             IGxObject* pGxObject = (IGxObject*)m_pRootItems->GetItemData(i);
-            bool bChecked = m_pRootItems->GetItemCheckState(i);
+            bool bChecked = m_pRootItems->GetItemCheckState(i) != 0;
             m_pCatalog->EnableRootItem(pGxObject, bChecked);
         }
     }

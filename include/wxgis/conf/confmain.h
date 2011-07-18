@@ -28,6 +28,6 @@ DEFINE_SHARED_PTR(wxGISAppConfig);
 bool parse_commandline_parameters( wxCmdLineParser& parser );
 int main(int argc, char** argv);
 wxXmlNode* GetConfigNode(wxArrayString& aTokens, wxGISAppConfigSPtr& pConfig);
-void AddProperty(wxXmlNode* pNode, wxString sParamName, wxString sParamValue);
-void AddProperty(wxXmlNode* pNode, wxString sParamName, long nParamValue);
+void AddAttribute(wxXmlNode* pNode, wxString sParamName, wxString sParamValue);
+void AddAttribute(wxXmlNode* pNode, wxString sParamName, long nParamValue);
 void AddProperties(wxXmlNode* pNode, wxString sAttributes);

@@ -33,8 +33,6 @@ wxGISTable::wxGISTable(CPLString sPath, int nSubType, OGRLayer* poLayer, OGRData
 	m_bIsDataLoaded = false;
     m_bIsOpened = false;
 	m_bHasFID = false;
-	m_nFeatureCount = 0;
-
 	m_nFeatureCount = wxNOT_FOUND;
 
 	//m_FeatureStringData.Alloc(10000);
@@ -71,6 +69,8 @@ bool wxGISTable::Open(int iLayer, int bUpdate, ITrackCancel* pTrackCancel)
 			const char* err = CPLGetLastErrorMsg();
 			wxString sErr = wxString::Format(_("wxGISTable: Open failed! Path '%s'. OGR error: %s"), wxString(m_sPath, wxConvUTF8).c_str(), wxString(err, wxConvLocal).c_str());
 			wxLogError(sErr);
+			if(pTrackCancel)
+				pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
 			return false;
 		}
 
@@ -87,7 +87,7 @@ bool wxGISTable::Open(int iLayer, int bUpdate, ITrackCancel* pTrackCancel)
 
     if(m_poLayer)
     {
-        m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8);
+        m_bOLCStringsAsUTF8 = m_poLayer->TestCapability(OLCStringsAsUTF8) != 0;
         m_bHasFID = CPLStrnlen(m_poLayer->GetFIDColumn(), 100) > 0;
 		wxString sOut;
 		if(EQUALN(m_sPath, "/vsizip", 7))
@@ -144,18 +144,24 @@ void wxGISTable::LoadFeatures(ITrackCancel* pTrackCancel)
 	IProgressor* pProgress(NULL);
 	if(pTrackCancel)
 	{
+		pTrackCancel->Reset();
 		pTrackCancel->PutMessage(wxString(_("PreLoad Features of ")) + m_sTableName, -1, enumGISMessageInfo);
 		pProgress = pTrackCancel->GetProgressor();
 		if(pProgress)
-		{
 			pProgress->Show(true);
-			pProgress->Play();
-		}
 	}
-	bool bOLCFastFeatureCount = m_poLayer->TestCapability(OLCFastFeatureCount);
+	bool bOLCFastFeatureCount = m_poLayer->TestCapability(OLCFastFeatureCount) != 0;
+	if(pProgress)
+	{
+		if(bOLCFastFeatureCount)
+			pProgress->SetRange(m_poLayer->GetFeatureCount());
+		else
+			pProgress->Play();
+	}
+
 	if(m_nSubType == enumTableQueryResult)
 		bOLCFastFeatureCount = false;
-	bool bOLCRandomRead = m_poLayer->TestCapability(OLCRandomRead);
+	bool bOLCRandomRead = m_poLayer->TestCapability(OLCRandomRead) != 0;
 
 	//check FIDs and bOLCRandomRead 
 	if(/*!m_bHasFID || */!bOLCFastFeatureCount || !bOLCRandomRead)
@@ -166,6 +172,14 @@ void wxGISTable::LoadFeatures(ITrackCancel* pTrackCancel)
 		OGRFeature *poFeature;
 		while((poFeature = m_poLayer->GetNextFeature()) != NULL )
 		{
+			if(pProgress)
+			{
+				if(bOLCFastFeatureCount)
+					pProgress->SetValue(counter);
+				else
+					pProgress->Play();
+			}
+
             if(!poFeature->GetDefnRef())
             {
                 OGRFeature::DestroyFeature(poFeature);
@@ -186,7 +200,11 @@ void wxGISTable::LoadFeatures(ITrackCancel* pTrackCancel)
 			counter++;
 
 			if(pTrackCancel && !pTrackCancel->Continue())
+			{
+				if(pProgress)
+					pProgress->Show(false);
 				return;
+			}
 		}
 		m_bIsDataLoaded = true;
 		//m_bHasFID = true;
@@ -194,7 +212,10 @@ void wxGISTable::LoadFeatures(ITrackCancel* pTrackCancel)
     }
 
 	if(pProgress)
+	{
 		pProgress->Stop();
+		pProgress->Show(false);
+	}
 }
 
 void wxGISTable::UnloadFeatures(void)
@@ -262,8 +283,8 @@ OGRFeatureSPtr wxGISTable::Next(void)
     else
 	{
 		OGRFeatureSPtr pFeature( m_poLayer->GetNextFeature(), OGRFeatureDeleter );
-		if(pFeature && !m_bHasFID)
-			pFeature->SetFID(++m_nFeatureCount);
+		//if(pFeature && !m_bHasFID)
+		//	pFeature->SetFID(++m_nFeatureCount);
         return pFeature;
 	}
 
@@ -421,7 +442,7 @@ wxString wxGISTable::GetAsString(OGRFeatureSPtr pFeature, int nField, wxFontEnco
 		{
 			int nCount(0);
 			const double* pDblLst = pFeature->GetFieldAsDoubleList(nField, &nCount);
-			for(size_t i = 0; i < nCount; i++)
+			for(size_t i = 0; i < nCount; ++i)
 			{
 				sOut += wxString::Format(wxT("%.12f|"), pDblLst[i]);
 			}
@@ -431,7 +452,7 @@ wxString wxGISTable::GetAsString(OGRFeatureSPtr pFeature, int nField, wxFontEnco
 		{
 			int nCount(0);
 			const int* pIntLst = pFeature->GetFieldAsIntegerList(nField, &nCount);
-			for(size_t i = 0; i < nCount; i++)
+			for(size_t i = 0; i < nCount; ++i)
 			{
 				sOut += wxString::Format(wxT("%.d|"), pIntLst[i]);
 			}
@@ -440,7 +461,7 @@ wxString wxGISTable::GetAsString(OGRFeatureSPtr pFeature, int nField, wxFontEnco
 	case OFTStringList:
 		{
 			char** papszLinkList = pFeature->GetFieldAsStringList(nField);
-			for(int i = 0; papszLinkList[i] != NULL; i++ )
+			for(int i = 0; papszLinkList[i] != NULL; ++i )
 			{
 				sOut += wgMB2WX(papszLinkList[i]);
 				sOut += wxString(wxT("|"));
@@ -622,12 +643,12 @@ OGRErr wxGISTable::SetIgnoredFields(wxArrayString &saIgnoredFields)
 {
     if(	m_poLayer )
     {
-        bool bOLCIgnoreFields = m_poLayer->TestCapability(OLCIgnoreFields);
+        bool bOLCIgnoreFields = m_poLayer->TestCapability(OLCIgnoreFields) != 0;
         if(!bOLCIgnoreFields)
             return OGRERR_UNSUPPORTED_OPERATION;
 
         char **papszIgnoredFields = NULL;
-        for(size_t i = 0; i < saIgnoredFields.GetCount(); i++)
+        for(size_t i = 0; i < saIgnoredFields.GetCount(); ++i)
             papszIgnoredFields = CSLAddString( papszIgnoredFields, wgWX2MB(saIgnoredFields[i]) );
 
         OGRErr eErr = m_poLayer->SetIgnoredFields((const char**)papszIgnoredFields);

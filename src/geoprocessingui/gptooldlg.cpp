@@ -21,7 +21,8 @@
 
 #include "wxgis/geoprocessingui/gptooldlg.h"
 //#include "wxgis/geoprocessingui/gptasksview.h"
-#include "wxgis/framework/application.h"
+//#include "wxgis/framework/application.h"
+#include "wxgis/core/globalfn.h"
 
 #include "../../art/tool_16.xpm"
 
@@ -38,11 +39,11 @@ END_EVENT_TABLE()
 
 wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
-    IApplication* pApp = ::GetApplication();
+    IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(GetApplication());
     pApp->RegisterChildWindow(this);
 
     m_pTool = pTool;
-	m_pPropNode = pGxRootToolbox->GetProperties();
+	m_pPropNode = pGxRootToolbox->GetAttributes();
     m_pGxRootToolbox = pGxRootToolbox;
     m_pCallBack = pCallBack;
     m_bSync = bSync;
@@ -76,7 +77,7 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
     GPParameters* pParams = m_pTool->GetParameterInfo();
     if(pParams)
     {
-        for(size_t i = 0; i < pParams->size(); i++)
+        for(size_t i = 0; i < pParams->size(); ++i)
         {
             IGPParameter* pParam = pParams->operator[](i);
             if(!pParam)
@@ -255,7 +256,7 @@ void wxGISGPToolDlg::OnOk(wxCommandEvent& event)
     //WINDOWARRAY* pWndArr = pApp->GetChildWindows();
     //if(pWndArr)
     //{
-    //    for(size_t i = 0; i < pWndArr->size(); i++)
+    //    for(size_t i = 0; i < pWndArr->size(); ++i)
     //    {
     //        wxWindow* pWnd = pWndArr->operator[](i);
     //        if(!pWnd)
@@ -288,7 +289,7 @@ void wxGISGPToolDlg::OnOk(wxCommandEvent& event)
     ////to prevent destroy tool in this dialog (the tool should destroy in panel)
     //m_pTool = NULL;
 
-    IApplication* pApp = ::GetApplication();
+    IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(GetApplication());
     pApp->UnRegisterChildWindow(this);
 
     wxWindow* pParentWnd = this->GetParent();
@@ -301,7 +302,7 @@ void wxGISGPToolDlg::OnOk(wxCommandEvent& event)
 
 void wxGISGPToolDlg::OnCancel(wxCommandEvent& event)
 {
-    IApplication* pApp = ::GetApplication();
+    IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(GetApplication());
     pApp->UnRegisterChildWindow(this);
 
     this->GetParent()->SetFocus();
@@ -314,7 +315,7 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
     event.Enable(false);
 	wxBusyCursor wait;
     //internal control validate
-    for(size_t i = 0; i < m_pControlsArray.size(); i++)
+    for(size_t i = 0; i < m_pControlsArray.size(); ++i)
     {
         if(m_pControlsArray[i])
             m_pControlsArray[i]->Validate();
@@ -328,7 +329,7 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
     if(!pParams)
         return;
     //update controls state
-    for(size_t i = 0; i < pParams->size(); i++)
+    for(size_t i = 0; i < pParams->size(); ++i)
     {
         IGPParameter* pParam = pParams->operator[](i);
         if(!pParam)
@@ -359,9 +360,9 @@ void wxGISGPToolDlg::SerializeFramePos(bool bSave)
 
 		if( IsMaximized() )
 		{
-			if(m_pPropNode->HasProp(wxT("maxi")))
-				m_pPropNode->DeleteProperty(wxT("maxi"));
-			m_pPropNode->AddProperty(wxT("maxi"), wxT("1"));
+			if(m_pPropNode->HasAttribute(wxT("maxi")))
+				m_pPropNode->DeleteAttribute(wxT("maxi"));
+			m_pPropNode->AddAttribute(wxT("maxi"), wxT("1"));
 		}
 		else
 		{
@@ -369,33 +370,33 @@ void wxGISGPToolDlg::SerializeFramePos(bool bSave)
 			GetClientSize(&w, &h);
 			GetPosition(&x, &y);
 
-			if(m_pPropNode->HasProp(wxT("Height")))
-				m_pPropNode->DeleteProperty(wxT("Height"));
-			m_pPropNode->AddProperty(wxT("Height"), wxString::Format(wxT("%u"), h));
-			if(m_pPropNode->HasProp(wxT("Width")))
-				m_pPropNode->DeleteProperty(wxT("Width"));
-			m_pPropNode->AddProperty(wxT("Width"), wxString::Format(wxT("%u"), w));
-			if(m_pPropNode->HasProp(wxT("YPos")))
-				m_pPropNode->DeleteProperty(wxT("YPos"));
-			m_pPropNode->AddProperty(wxT("YPos"), wxString::Format(wxT("%d"), y));
-			if(m_pPropNode->HasProp(wxT("XPos")))
-				m_pPropNode->DeleteProperty(wxT("XPos"));
-			m_pPropNode->AddProperty(wxT("XPos"), wxString::Format(wxT("%d"), x));
-			if(m_pPropNode->HasProp(wxT("maxi")))
-				m_pPropNode->DeleteProperty(wxT("maxi"));
-			m_pPropNode->AddProperty(wxT("maxi"), wxT("0"));
+			if(m_pPropNode->HasAttribute(wxT("Height")))
+				m_pPropNode->DeleteAttribute(wxT("Height"));
+			m_pPropNode->AddAttribute(wxT("Height"), wxString::Format(wxT("%u"), h));
+			if(m_pPropNode->HasAttribute(wxT("Width")))
+				m_pPropNode->DeleteAttribute(wxT("Width"));
+			m_pPropNode->AddAttribute(wxT("Width"), wxString::Format(wxT("%u"), w));
+			if(m_pPropNode->HasAttribute(wxT("YPos")))
+				m_pPropNode->DeleteAttribute(wxT("YPos"));
+			m_pPropNode->AddAttribute(wxT("YPos"), wxString::Format(wxT("%d"), y));
+			if(m_pPropNode->HasAttribute(wxT("XPos")))
+				m_pPropNode->DeleteAttribute(wxT("XPos"));
+			m_pPropNode->AddAttribute(wxT("XPos"), wxString::Format(wxT("%d"), x));
+			if(m_pPropNode->HasAttribute(wxT("maxi")))
+				m_pPropNode->DeleteAttribute(wxT("maxi"));
+			m_pPropNode->AddAttribute(wxT("maxi"), wxT("0"));
 		}
 	}
 	else
 	{
 		//load
-		bool bMaxi = wxAtoi(m_pPropNode->GetPropVal(wxT("maxi"), wxT("0")));
+		bool bMaxi = wxAtoi(m_pPropNode->GetAttribute(wxT("maxi"), wxT("0"))) != 0;
 		if(!bMaxi)
 		{
-			int x = wxAtoi(m_pPropNode->GetPropVal(wxT("XPos"), wxT("50")));
-			int y = wxAtoi(m_pPropNode->GetPropVal(wxT("YPos"), wxT("50")));
-			int w = wxAtoi(m_pPropNode->GetPropVal(wxT("Width"), wxT("850")));
-			int h = wxAtoi(m_pPropNode->GetPropVal(wxT("Height"), wxT("530")));
+			int x = wxAtoi(m_pPropNode->GetAttribute(wxT("XPos"), wxT("50")));
+			int y = wxAtoi(m_pPropNode->GetAttribute(wxT("YPos"), wxT("50")));
+			int w = wxAtoi(m_pPropNode->GetAttribute(wxT("Width"), wxT("850")));
+			int h = wxAtoi(m_pPropNode->GetAttribute(wxT("Height"), wxT("530")));
 
 			Move(x, y);
 			SetClientSize(w, h);

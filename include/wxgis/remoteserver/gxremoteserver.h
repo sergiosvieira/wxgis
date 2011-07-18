@@ -50,7 +50,7 @@ public:
     virtual bool Connect(void);
     virtual bool Disconnect(void);
     virtual bool IsConnected(void);
-    virtual wxXmlNode* GetProperties(void);
+    virtual wxXmlNode* GetAttributes(void);
 	//INetCallback
 	virtual void OnConnect(void);
 	virtual void OnDisconnect(void);

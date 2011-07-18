@@ -73,6 +73,7 @@ bool wxGxPendingUI::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
 	m_pThread = new wxPendingUpdateThread(this);
 	if(!CreateAndRunThread(m_pThread, wxT("wxPendingUpdateThread"), wxT("PendingUpdate")))
 		return false;
+	return true;
 }
 
 void wxGxPendingUI::Detach(void)

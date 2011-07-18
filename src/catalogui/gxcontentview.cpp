@@ -40,6 +40,11 @@ BEGIN_EVENT_TABLE(wxGxContentView, wxListCtrl)
     EVT_LIST_COL_CLICK(LISTCTRLID, wxGxContentView::OnColClick)
     EVT_CONTEXT_MENU(wxGxContentView::OnContextMenu)
     EVT_CHAR(wxGxContentView::OnChar)
+	EVT_GXOBJECT_REFRESHED(wxGxContentView::OnObjectRefreshed)
+	EVT_GXOBJECT_ADDED(wxGxContentView::OnObjectAdded)
+	EVT_GXOBJECT_DELETED(wxGxContentView::OnObjectDeleted)
+	EVT_GXOBJECT_CHANGED(wxGxContentView::OnObjectChanged)
+	EVT_GXSELECTION_CHANGED(wxGxContentView::OnSelectionChanged)
 END_EVENT_TABLE()
 
 int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
@@ -81,10 +86,10 @@ int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
      //   if(!bDiscConnection1 && bDiscConnection2)
 		   // return psortdata->bSortAsc == 0 ? -1 : 1;
 
-	    bool bContainerDst1 = dynamic_cast<IGxDataset*>(pGxObject1.get());
-        bool bContainerDst2 = dynamic_cast<IGxDataset*>(pGxObject2.get());
-	    bool bContainer1 = dynamic_cast<IGxObjectContainer*>(pGxObject1.get());
-        bool bContainer2 = dynamic_cast<IGxObjectContainer*>(pGxObject2.get());
+	    bool bContainerDst1 = dynamic_cast<IGxDataset*>(pGxObject1.get()) != NULL;
+        bool bContainerDst2 = dynamic_cast<IGxDataset*>(pGxObject2.get()) != NULL;
+	    bool bContainer1 = dynamic_cast<IGxObjectContainer*>(pGxObject1.get()) != NULL;
+        bool bContainer2 = dynamic_cast<IGxObjectContainer*>(pGxObject2.get()) != NULL;
         if(bContainer1 && !bContainerDst1 && bContainerDst2)
 	        return psortdata->bSortAsc == 0 ? 1 : -1;
         if(bContainer2 && !bContainerDst2 && bContainerDst1)
@@ -184,7 +189,7 @@ bool wxGxContentView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos
     return true;
 }
 
-bool wxGxContentView::Activate(IApplication* application, wxXmlNode* pConf)
+bool wxGxContentView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 {
 	if(!wxGxView::Activate(application, pConf))
 		return false;
@@ -198,7 +203,7 @@ bool wxGxContentView::Activate(IApplication* application, wxXmlNode* pConf)
 	//new 
 	m_pNewMenu = dynamic_cast<wxGISNewMenu*>(application->GetCommandBar(NEWMENUNAME));
 
-	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pCatalog );
+	m_pConnectionPointCatalog = dynamic_cast<wxGISConnectionPointContainer*>( m_pCatalog );
 	if(m_pConnectionPointCatalog != NULL)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
@@ -224,31 +229,31 @@ void wxGxContentView::Serialize(wxXmlNode* pRootNode, bool bStore)
 
 	if(bStore)
 	{
-        if(pRootNode->HasProp(wxT("style")))
-            pRootNode->DeleteProperty(wxT("style"));
-        pRootNode->AddProperty(wxT("style"), wxString::Format(wxT("%d"), m_current_style));
-        if(pRootNode->HasProp(wxT("sort")))
-            pRootNode->DeleteProperty(wxT("sort"));
-        pRootNode->AddProperty(wxT("sort"), wxString::Format(wxT("%d"), m_bSortAsc));
-        if(pRootNode->HasProp(wxT("sort_col")))
-            pRootNode->DeleteProperty(wxT("sort_col"));
-        pRootNode->AddProperty(wxT("sort_col"), wxString::Format(wxT("%d"), m_currentSortCol));
-        if(pRootNode->HasProp(wxT("name_width")))
-            pRootNode->DeleteProperty(wxT("name_width"));
-        pRootNode->AddProperty(wxT("name_width"), wxString::Format(wxT("%d"), GetColumnWidth(0)));
-        if(pRootNode->HasProp(wxT("type_width")))
-            pRootNode->DeleteProperty(wxT("type_width"));
-        pRootNode->AddProperty(wxT("type_width"), wxString::Format(wxT("%d"), GetColumnWidth(1)));
+        if(pRootNode->HasAttribute(wxT("style")))
+            pRootNode->DeleteAttribute(wxT("style"));
+        pRootNode->AddAttribute(wxT("style"), wxString::Format(wxT("%d"), m_current_style));
+        if(pRootNode->HasAttribute(wxT("sort")))
+            pRootNode->DeleteAttribute(wxT("sort"));
+        pRootNode->AddAttribute(wxT("sort"), wxString::Format(wxT("%d"), m_bSortAsc));
+        if(pRootNode->HasAttribute(wxT("sort_col")))
+            pRootNode->DeleteAttribute(wxT("sort_col"));
+        pRootNode->AddAttribute(wxT("sort_col"), wxString::Format(wxT("%d"), m_currentSortCol));
+        if(pRootNode->HasAttribute(wxT("name_width")))
+            pRootNode->DeleteAttribute(wxT("name_width"));
+        pRootNode->AddAttribute(wxT("name_width"), wxString::Format(wxT("%d"), GetColumnWidth(0)));
+        if(pRootNode->HasAttribute(wxT("type_width")))
+            pRootNode->DeleteAttribute(wxT("type_width"));
+        pRootNode->AddAttribute(wxT("type_width"), wxString::Format(wxT("%d"), GetColumnWidth(1)));
 	}
 	else
 	{
-		m_bSortAsc = wxAtoi(pRootNode->GetPropVal(wxT("sort"), wxT("1")));
-		m_currentSortCol = wxAtoi(pRootNode->GetPropVal(wxT("sort_col"), wxT("0")));
-		wxGISEnumContentsViewStyle style = (wxGISEnumContentsViewStyle)wxAtoi(pRootNode->GetPropVal(wxT("style"), wxT("0")));
-		int nw = wxAtoi(pRootNode->GetPropVal(wxT("name_width"), wxT("150")));
+		m_bSortAsc = wxAtoi(pRootNode->GetAttribute(wxT("sort"), wxT("1"))) == 1;
+		m_currentSortCol = wxAtoi(pRootNode->GetAttribute(wxT("sort_col"), wxT("0")));
+		wxGISEnumContentsViewStyle style = (wxGISEnumContentsViewStyle)wxAtoi(pRootNode->GetAttribute(wxT("style"), wxT("0")));
+		int nw = wxAtoi(pRootNode->GetAttribute(wxT("name_width"), wxT("150")));
 		if(nw == 0)
 			nw = 150;
-		int tw = wxAtoi(pRootNode->GetPropVal(wxT("type_width"), wxT("250")));
+		int tw = wxAtoi(pRootNode->GetAttribute(wxT("type_width"), wxT("250")));
 		if(tw == 0)
 			tw = 250;
 		SetColumnWidth(0, nw);
@@ -415,7 +420,7 @@ void wxGxContentView::ShowContextMenu(const wxPoint& pos)
         if(pGxObjectUI)
         {
             wxString psContextMenu = pGxObjectUI->ContextMenu();
-            IApplication* pApp = dynamic_cast<IApplication*>(m_pGxApplication);
+            IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(m_pGxApplication);
             if(pApp)
             {
                 wxMenu* pMenu = dynamic_cast<wxMenu*>(pApp->GetCommandBar(psContextMenu));
@@ -440,7 +445,7 @@ void wxGxContentView::ShowContextMenu(const wxPoint& pos)
 		{
             wxString psContextMenu = pGxObjectUI->ContextMenu();
             pGxObject.reset();
-            IApplication* pApp = dynamic_cast<IApplication*>(m_pGxApplication);
+            IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(m_pGxApplication);
             if(pApp)
             {
                 wxMenu* pMenu = dynamic_cast<wxMenu*>(pApp->GetCommandBar(psContextMenu));
@@ -460,7 +465,7 @@ void wxGxContentView::SetColumnImage(int col, int image)
 
     //reset image
     item.SetImage(-1);
-    for(size_t i = 0; i < GetColumnCount(); i++)
+    for(size_t i = 0; i < GetColumnCount(); ++i)
         SetColumn(i, item);
 
     item.SetImage(image);
@@ -587,9 +592,9 @@ void wxGxContentView::OnEndLabelEdit(wxListEvent& event)
 	m_pCatalog->ObjectChanged(pGxObject->GetID());
 }
 
-void wxGxContentView::OnObjectAdded(long nObjectID)
+void wxGxContentView::OnObjectAdded(wxGxCatalogEvent& event)
 {
-    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(event.GetObjectID());
     if(pGxObject)
     {        
 	    if(pGxObject->GetParent()->GetID() == m_nParentGxObjectID)
@@ -602,15 +607,15 @@ void wxGxContentView::OnObjectAdded(long nObjectID)
     }
 }
 
-void wxGxContentView::OnObjectDeleted(long nObjectID)
+void wxGxContentView::OnObjectDeleted(wxGxCatalogEvent& event)
 {
     //wxCriticalSectionLocker locker(m_CritSectCont);
-	for(long i = 0; i < GetItemCount(); i++)
+	for(long i = 0; i < GetItemCount(); ++i)
 	{
 		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
 		if(pItemData == NULL)
 			continue;
-		if(pItemData->nObjectID != nObjectID)
+		if(pItemData->nObjectID != event.GetObjectID())
 			continue;
         SetItemData(i, NULL);
 		//delete pItemData;
@@ -621,11 +626,11 @@ void wxGxContentView::OnObjectDeleted(long nObjectID)
 	}
 }
 
-void wxGxContentView::OnObjectChanged(long nObjectID)
+void wxGxContentView::OnObjectChanged(wxGxCatalogEvent& event)
 {
-    if(nObjectID == m_nParentGxObjectID)
+    if(event.GetObjectID() == m_nParentGxObjectID)
 	{
-        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(event.GetObjectID());
 		IGxObjectContainer* pObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 		if(pObjectContainer != NULL)
 		{
@@ -634,21 +639,21 @@ void wxGxContentView::OnObjectChanged(long nObjectID)
 				ResetContents();
 			else if(GetItemCount() == 0 && pObjectContainer->HasChildren())
 			{
-				OnRefreshAll();
+				RefreshAll();
 				return;
 			}
 		}
 	}
 
-	for(long i = 0; i < GetItemCount(); i++)
+	for(long i = 0; i < GetItemCount(); ++i)
 	{
 		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
 		if(pItemData == NULL)
 			continue;
-		if(pItemData->nObjectID != nObjectID)
+		if(pItemData->nObjectID != event.GetObjectID())
 			continue;
 	
-        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(event.GetObjectID());
 		IGxObjectUI* pObjUI =  dynamic_cast<IGxObjectUI*>(pGxObject.get());
 		wxIcon icon_small, icon_large;
 		if(pObjUI != NULL)
@@ -677,13 +682,13 @@ void wxGxContentView::OnObjectChanged(long nObjectID)
 	wxListCtrl::Refresh();
 }
 
-void wxGxContentView::OnObjectRefreshed(long nObjectID)
+void wxGxContentView::OnObjectRefreshed(wxGxCatalogEvent& event)
 {
-    if(m_nParentGxObjectID == nObjectID)
-        OnRefreshAll();
+    if(m_nParentGxObjectID == event.GetObjectID())
+        RefreshAll();
 }
 
-void wxGxContentView::OnRefreshAll(void)
+void wxGxContentView::RefreshAll(void)
 {
     ResetContents();
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_nParentGxObjectID);
@@ -692,7 +697,7 @@ void wxGxContentView::OnRefreshAll(void)
 	if(pObjContainer == NULL || !pObjContainer->HasChildren())
 		return;
 	GxObjectArray* pArr = pObjContainer->GetChildren();
-	for(size_t i = 0; i < pArr->size(); i++)
+	for(size_t i = 0; i < pArr->size(); ++i)
 	{
 		AddObject(pArr->at(i));
 	}
@@ -704,9 +709,9 @@ void wxGxContentView::OnRefreshAll(void)
     wxListCtrl::Refresh();
 }
 
-void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
+void wxGxContentView::OnSelectionChanged(wxGxSelectionEvent& event)
 {
-	if(nInitiator == GetId())
+	if(event.GetInitiator() == GetId())
 		return;
     
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_pSelection->GetLastSelectedObjectID());
@@ -723,7 +728,7 @@ void wxGxContentView::OnSelectionChanged(IGxSelection* Selection, long nInitiato
 		return;
 
 	GxObjectArray* pArr = pObjContainer->GetChildren();
-	for(size_t i = 0; i < pArr->size(); i++)
+	for(size_t i = 0; i < pArr->size(); ++i)
 	{
 		AddObject(pArr->at(i));
 	}
@@ -738,7 +743,7 @@ bool wxGxContentView::Applies(IGxSelection* Selection)
 	if(Selection == NULL)
 		return false;
 
-	for(size_t i = 0; i < Selection->GetCount(); i++)
+	for(size_t i = 0; i < Selection->GetCount(); ++i)
 	{
         IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(Selection->GetSelectedObjectID(i));
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>( pGxObject.get() );
@@ -750,7 +755,7 @@ bool wxGxContentView::Applies(IGxSelection* Selection)
 
 void wxGxContentView::ResetContents(void)
 {
-	for(long i = 0; i < GetItemCount(); i++)
+	for(long i = 0; i < GetItemCount(); ++i)
 		delete (LPITEMDATA)GetItemData(i);
 	DeleteAllItems();
 }
@@ -817,7 +822,7 @@ void wxGxContentView::OnChar(wxKeyEvent& event)
 
 void wxGxContentView::BeginRename(long nObjectID)
 {
-	for(long i = 0; i < GetItemCount(); i++)
+	for(long i = 0; i < GetItemCount(); ++i)
 	{
 		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
 		if(pItemData == NULL)
@@ -844,7 +849,7 @@ int wxGxContentView::GetIconPos(wxIcon icon_small, wxIcon icon_large)
 	int pos(0);
 	if(icon_small.IsOk())
 	{
-		for(size_t i = 0; i < m_IconsArray.size(); i++)
+		for(size_t i = 0; i < m_IconsArray.size(); ++i)
 		{
 			if(m_IconsArray[i].bLarge)
 				continue;

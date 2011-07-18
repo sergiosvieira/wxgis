@@ -159,7 +159,7 @@ void wxGISMapMainCmd::OnClick(void)
 	}
 }
 
-bool wxGISMapMainCmd::OnCreate(IApplication* pApp)
+bool wxGISMapMainCmd::OnCreate(IFrameApplication* pApp)
 {
 	m_pApp = pApp;
 	return true;

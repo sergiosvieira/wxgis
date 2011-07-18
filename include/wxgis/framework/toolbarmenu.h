@@ -45,7 +45,7 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IApplication* pApp);
+	virtual bool OnCreate(IFrameApplication* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
     //wxGISToolBarMenu

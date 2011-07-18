@@ -20,7 +20,7 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/framework/framework.h"
-#include "wxgis/cartoui/mapviewex.h"
+#include "wxgis/cartoui/mapview.h"
 
 /** \class wxGISRotationComboBox cartocmd.h
     \brief The frame angle rotation input combobox.
@@ -33,16 +33,14 @@ public:
 	wxGISRotationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style = 0, const wxValidator& validator = wxDefaultValidator, const wxString& name = wxT("LocationComboBox"));
 	virtual ~wxGISRotationComboBox(void);
 	virtual void UpdateAngle(void);
-	virtual void SetMapView(wxGISMapViewEx* pMapView){m_pMapView = pMapView;};
+	virtual void SetMapView(wxGISMapView* pMapView){m_pMapView = pMapView;};
 	//events
 	void OnTextEnter(wxCommandEvent& event);
 	//IToolBarControl
-	virtual void Activate(IApplication* pApp);
+	virtual void Activate(IFrameApplication* pApp);
 	virtual void Deactivate(void);
 protected:
-	wxGISMapViewEx* m_pMapView;
-	//IApplication* m_pApp;
-	//std::vector<wxString> m_ValuesArr;
+	wxGISMapView* m_pMapView;
 
     DECLARE_EVENT_TABLE()
 };
@@ -66,13 +64,13 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IApplication* pApp);
+	virtual bool OnCreate(IFrameApplication* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
 private:
-	IApplication* m_pApp;
+	IFrameApplication* m_pApp;
 	wxIcon m_IconFullExt, m_IconNextExt, m_IconPrevExt;
-	wxGISMapViewEx* m_pMapView;
+	wxGISMapView* m_pMapView;
 };
 
 /** \class wxGISCartoMainTool cartocmd.h
@@ -94,7 +92,7 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IApplication* pApp);
+	virtual bool OnCreate(IFrameApplication* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
 	//ITool
@@ -105,10 +103,10 @@ public:
 	virtual void OnMouseDoubleClick(wxMouseEvent& event);
 	virtual void OnMouseMove(wxMouseEvent& event);
 private:
-	IApplication* m_pApp;
+	IFrameApplication* m_pApp;
 	wxIcon m_IconZoomIn, m_IconZoomOut, m_IconPan, m_IconInfo;
 	wxCursor m_CurZoomIn, m_CurZoomOut, m_CurPan1, m_CurPan2, m_CurInfo;
-	wxGISMapViewEx* m_pMapView;
+	wxGISMapView* m_pMapView;
 	bool m_bCheck;
 };
 
@@ -132,7 +130,7 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IApplication* pApp);
+	virtual bool OnCreate(IFrameApplication* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
 	//ITool
@@ -147,10 +145,10 @@ public:
 	virtual wxString GetToolLabel(void);
 	virtual bool HasToolLabel(void);
 private:
-	IApplication* m_pApp;
+	IFrameApplication* m_pApp;
 	wxIcon m_IconRotate, m_IconCancelRotate;
 	wxCursor m_CurRotate;
-	wxGISMapViewEx* m_pMapView;
+	wxGISMapView* m_pMapView;
 	wxGISRotationComboBox* m_pRotationComboBox;
 	bool m_bCheck;
 };

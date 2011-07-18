@@ -40,6 +40,8 @@ wxGISFeatureLayer::wxGISFeatureLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLaye
 		m_PreviousEnvelope = m_FullEnvelope;
 
 		m_pFeatureRenderer = boost::static_pointer_cast<IFeatureRenderer>(boost::make_shared<wxGISSimpleRenderer>());
+
+		SetName(m_pwxGISFeatureDataset->GetName());
 	}
 }
 
@@ -47,7 +49,7 @@ wxGISFeatureLayer::~wxGISFeatureLayer(void)
 {
 }
 
-bool wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisplay, ITrackCancel *pTrackCancel)
+bool wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel)
 {
 	//TODO: Move to display
     //RECTARARRAY* pInvalidrectArray = pDisplay->GetInvalidRect();
@@ -63,7 +65,7 @@ bool wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisp
     //}
     //else
     //{
-    //    for(size_t i = 0; i < EnvCount; i++)
+    //    for(size_t i = 0; i < EnvCount; ++i)
     //    {
     //        wxRect Rect = pInvalidrectArray->operator[](i);
     //        Rect.Inflate(1,1);
@@ -71,7 +73,7 @@ bool wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisp
     //    }
     //}
 
-    //for(size_t i = 0; i < EnvCount; i++)
+    //for(size_t i = 0; i < EnvCount; ++i)
     //{
 	    //1. get envelope
 	    //OGREnvelope Env = Envs[i];//pDisplayTransformation->GetVisibleBounds();
@@ -97,7 +99,7 @@ bool wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisp
 			    //OGRGeometry** pGeometryArr = (OGRGeometry**)CPLQuadTreeSearch(m_pQuadTree, &Rect, &count);
 		     //   wxGISGeometrySet GISGeometrySet(false);
 
-			    //for(size_t i = 0; i < count; i++)
+			    //for(size_t i = 0; i < count; ++i)
 			    //{
 				   // if(pTrackCancel && !pTrackCancel->Continue())
 					  //  break;
@@ -146,7 +148,7 @@ bool wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisp
 
 				RotateEnvelope(&TempFullEnv, pDisplay->GetRotate(), dCenterX, dCenterY);
 			}
-			bSetFilter = TempFullEnv.Contains(Env);
+			bSetFilter = TempFullEnv.Contains(Env) != 0;
 		}
 
 		//store envelope
@@ -193,9 +195,11 @@ bool wxGISFeatureLayer::IsCacheNeeded(void)
 		OGRFeatureSPtr pFeature;
 		m_pwxGISFeatureDataset->Reset();
 		while(pFeature = m_pwxGISFeatureDataset->Next())
+		{
 			nPointCount += GetPointsInGeometry(pFeature->GetGeometryRef());
-		if(nPointCount > NOCACHEVAL)
-			return true;
+			if(nPointCount > NOCACHEVAL)
+				return true;
+		}
 	}
 	return false;
 }
@@ -408,7 +412,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
     TrackCancel.SetProgressor(pProgressor);
 
     m_pwxGISFeatureDataset->Reset();
-    for(int i = 0; i < CPUCount; i++)
+    for(int i = 0; i < CPUCount; ++i)
     {
         wxGISFeatureTransformThread *thread = new wxGISFeatureTransformThread(m_pwxGISFeatureDataset, poCT, bTransform, pRgn1, pRgn2, &CritSect, &m_FullEnv, m_pOGRGeometrySet, nCounter, &TrackCancel);
         thread->Create();
@@ -416,12 +420,12 @@ void wxGISFeatureLayer::LoadGeometry(void)
         threadarray.push_back(thread);
     }
 
-    for(size_t i = 0; i < threadarray.size(); i++)
+    for(size_t i = 0; i < threadarray.size(); ++i)
     {
 		if(threadarray[i]->IsAlive())
 			wgDELETE(threadarray[i], Wait())
 		else
-			wxDELETE(threadarray[i])
+			wxDELETE(threadarray[i]);
     }
 
 #ifdef __WXDEBUG__

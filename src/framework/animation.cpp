@@ -93,7 +93,7 @@ void wxGISAnimation::OnPaint(wxPaintEvent & event)
 //	}
 //	wxPen linePen(*wxBLACK, 2, wxSOLID);
 //	dc.SetPen(linePen);
-//	for(i = 0; i < 12; i++)
+//	for(i = 0; i < 12; ++i)
 //	{
 //		angle = 2.0*3.1415926/12.0*(double)i;
 //		dc.DrawLine(cx+radius*cos(angle), cy+radius*sin(angle),

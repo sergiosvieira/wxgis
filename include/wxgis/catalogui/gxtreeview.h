@@ -23,6 +23,8 @@
 #include "wxgis/catalogui/gxview.h"
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/newmenu.h"
+#include "wxgis/catalog/gxevent.h"
+#include "wxgis/catalogui/gxeventui.h"
 
 #include "wx/treectrl.h"
 #include "wx/imaglist.h"
@@ -58,9 +60,7 @@ public:
 
 class WXDLLIMPEXP_GIS_CLU wxGxTreeViewBase :
 	public wxTreeCtrl,
-	public wxGxView,
-	public IGxSelectionEvents,
-	public IGxCatalogEvents
+	public wxGxView
 {
     DECLARE_DYNAMIC_CLASS(wxGxTreeViewBase)
 public:
@@ -69,18 +69,11 @@ public:
 	virtual ~wxGxTreeViewBase(void);
 	virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent);
 	virtual void AddRoot(IGxObject* pGxObject);
+	virtual void RefreshAll(void);
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTR_HAS_BUTTONS, const wxString& name = wxT("TreeView"));
-	virtual bool Activate(IApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
-//IGxSelectionEvents
-	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
-//IGxCatalogEvents
-	virtual void OnObjectAdded(long nObjectID);
-	virtual void OnObjectChanged(long nObjectID);
-	virtual void OnObjectDeleted(long nObjectID);
-	virtual void OnObjectRefreshed(long nObjectID);
-	virtual void OnRefreshAll(void);
 //wxTreeCtrl
     virtual int OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2);
 
@@ -95,12 +88,17 @@ protected:
 	virtual void OnItemExpanding(wxTreeEvent& event);
 	virtual void OnItemRightClick(wxTreeEvent& event);
     virtual void OnChar(wxKeyEvent& event);
+	virtual void OnObjectRefreshed(wxGxCatalogEvent& event);
+	virtual void OnObjectAdded(wxGxCatalogEvent& event);
+	virtual void OnObjectChanged(wxGxCatalogEvent& event);
+	virtual void OnObjectDeleted(wxGxCatalogEvent& event);
+	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
     //
     virtual void UpdateGxSelection(void);
 protected:
 	wxImageList m_TreeImageList;
 	WETREEMAP m_TreeMap;
-	IConnectionPointContainer* m_pConnectionPointCatalog, *m_pConnectionPointSelection;
+	wxGISConnectionPointContainer* m_pConnectionPointCatalog, *m_pConnectionPointSelection;
 	long m_ConnectionPointCatalogCookie, m_ConnectionPointSelectionCookie;
 	IGxSelection* m_pSelection;
     wxGxCatalogUI* m_pCatalog;

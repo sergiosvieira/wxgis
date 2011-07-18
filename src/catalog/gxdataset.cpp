@@ -115,11 +115,22 @@ bool wxGxTableDataset::Rename(wxString NewName)
 	}	
 }
 
-wxGISDatasetSPtr wxGxTableDataset::GetDataset(void)
+wxGISDatasetSPtr wxGxTableDataset::GetDataset(ITrackCancel* pTrackCancel)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
-        m_pwxGISDataset = boost::make_shared<wxGISTable>(m_sPath, m_type);
+        wxGISTableSPtr pwxGISTable = boost::make_shared<wxGISTable>(m_sPath, m_type);
+
+        if(!pwxGISTable->Open(0, 0, pTrackCancel))
+        {
+		    const char* err = CPLGetLastErrorMsg();
+		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
+            wxLogError(sErr);
+			if(pTrackCancel)
+				pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
+			return wxGISDatasetSPtr();
+        }
+        m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(pwxGISTable);
 	}
 	return m_pwxGISDataset;
 }
@@ -293,17 +304,19 @@ bool wxGxFeatureDataset::Rename(wxString NewName)
 	}	
 }
 
-wxGISDatasetSPtr wxGxFeatureDataset::GetDataset()
+wxGISDatasetSPtr wxGxFeatureDataset::GetDataset(ITrackCancel* pTrackCancel)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
         wxGISFeatureDatasetSPtr pwxGISFeatureDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_type);
 
-        if(!pwxGISFeatureDataset->Open())
+        if(!pwxGISFeatureDataset->Open(0, 0, pTrackCancel))
         {
 		    const char* err = CPLGetLastErrorMsg();
 		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
             wxLogError(sErr);
+			if(pTrackCancel)
+				pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
 			return wxGISDatasetSPtr();
         }
 
@@ -320,11 +333,11 @@ wxGISDatasetSPtr wxGxFeatureDataset::GetDataset()
        //     {
        //         wxXmlNode* pNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/vector")));
        //         if(pNode)
-       //             bAskSpaInd = wxAtoi(pNode->GetPropVal(wxT("create_tree"), wxT("1")));
+       //             bAskSpaInd = wxAtoi(pNode->GetAttribute(wxT("create_tree"), wxT("1")));
        //         else
        //         {
        //             pNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog/vector")), true);
-       //             pNode->AddProperty(wxT("create_tree"), wxT("1"));
+       //             pNode->AddAttribute(wxT("create_tree"), wxT("1"));
        //         }
        //         if(bAskSpaInd)
        //         {
@@ -336,8 +349,8 @@ wxGISDatasetSPtr wxGxFeatureDataset::GetDataset()
        //             }
        //             if(!dlg.GetShowInFuture())
        //             {
-       //                 pNode->DeleteProperty(wxT("create_tree"));
-       //                 pNode->AddProperty(wxT("create_tree"), wxT("0"));
+       //                 pNode->DeleteAttribute(wxT("create_tree"));
+       //                 pNode->AddAttribute(wxT("create_tree"), wxT("0"));
        //             }
        //         }
        //     }
@@ -538,7 +551,7 @@ void wxGxRasterDataset::Detach(void)
 	IGxObject::Detach();
 }
 
-wxGISDatasetSPtr wxGxRasterDataset::GetDataset(void)
+wxGISDatasetSPtr wxGxRasterDataset::GetDataset(ITrackCancel* pTrackCancel)
 {
 	if(m_pwxGISDataset == NULL)
 	{	

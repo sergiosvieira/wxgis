@@ -42,7 +42,7 @@ public:
 	virtual void SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference) = 0;
 	virtual OGREnvelope GetEnvelope(void) = 0;
 	virtual bool IsValid(void) = 0;
-	virtual bool Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisplay, ITrackCancel *pTrackCancel = NULL) = 0;
+	virtual bool Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL) = 0;
 	//
 	virtual void SetMaximumScale(double dMaxScale){m_dMaxScale = dMaxScale;};
 	virtual double GetMaximumScale(void){return m_dMaxScale;};
@@ -76,7 +76,7 @@ class IFeatureRenderer : public IRenderer
 {
 public:
 	virtual ~IFeatureRenderer(void){};
-	virtual void Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisplay, ITrackCancel *pTrackCancel = NULL) = 0;
+	virtual void Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL) = 0;
 };
 DEFINE_SHARED_PTR(IFeatureRenderer);
 

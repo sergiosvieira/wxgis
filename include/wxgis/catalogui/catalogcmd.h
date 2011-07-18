@@ -41,7 +41,7 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IApplication* pApp);
+	virtual bool OnCreate(IFrameApplication* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
 	//IToolControl
@@ -52,7 +52,7 @@ public:
    	virtual wxMenu* GetDropDownMenu(void);
     virtual void OnDropDownCommand(int nID);
 private:
-	IApplication* m_pApp;
+	IFrameApplication* m_pApp;
 	wxIcon m_IconFolderUp, m_IconFolderConn, m_IconFolderConnDel, m_IconDel, m_IconGoPrev, m_IconGoNext;
     wxIcon m_IconFolderNew, m_IconEdit, m_IconViewRefresh, m_IconProps;
     wxIcon m_LargeFolderIcon, m_SmallFolderIcon;

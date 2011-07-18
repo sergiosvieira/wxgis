@@ -40,14 +40,14 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IApplication* pApp);
+	virtual bool OnCreate(IFrameApplication* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
     //IDropDownCommand
    	virtual wxMenu* GetDropDownMenu(void);
     virtual void OnDropDownCommand(int nID);
 private:
-	IApplication* m_pApp;
+	IFrameApplication* m_pApp;
     std::vector<wxWindow*> m_apContentsWin;
     wxWindow* m_pTreeView;
 	wxIcon m_IconViews, m_IconSelAll, m_IconTreeView;

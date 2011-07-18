@@ -49,7 +49,7 @@ public:
 	virtual bool HasChildren(void){LoadChildren(); return m_Children.size() > 0 ? true : false;};
     //IGxRootObjectProperties
     virtual void Init(wxXmlNode* const pConfigNode);
-    virtual wxXmlNode* GetProperties(void);
+    virtual wxXmlNode* GetAttributes(void);
 	//wxGxDiscConnections
 	virtual void LoadChildren(void);
 	virtual void EmptyChildren(void);

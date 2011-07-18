@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/display/simplefillsymbol.h"
 
+/*
 wxSimpleFillSymbol::wxSimpleFillSymbol(void)
 {
 	srand ( time(NULL) );
@@ -133,7 +134,7 @@ void wxSimpleFillSymbol::DrawPolygon(OGRPolygon* pPoly, IDisplay* pwxGISDisplay)
 		//	pRing = pPoly->getInteriorRing(iPart);
 		//	OGRLineString *pLStrInt = (OGRLineString*)pRing;
 		//	nPointCount = pLStrInt->getNumPoints();
-		//	jPoint += (nN[iPart + 1] = nPointCount > 2 ? nPointCount/* + 1*/ : 0);
+		//	jPoint += (nN[iPart + 1] = nPointCount > 2 ? nPointCount : 0);
 		//}
 
 		//wxPoint *pFullPoints = new wxPoint[jPoint];
@@ -221,7 +222,7 @@ void wxSimpleFillSymbol::DrawPolyPolygon(OGRMultiPolygon* pPoly, IDisplay* pwxGI
 
     long nNumPolys(0);
 	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pPoly;
-	for(int i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+	for(int i = 0; i < pOGRGeometryCollection->getNumGeometries(); ++i)
 	{
 		OGRPolygon* pPolygon = (OGRPolygon*)pOGRGeometryCollection->getGeometryRef(i);
 		nNumPolys += pPolygon->getNumInteriorRings() + 1;
@@ -230,7 +231,7 @@ void wxSimpleFillSymbol::DrawPolyPolygon(OGRMultiPolygon* pPoly, IDisplay* pwxGI
 	int *nN = new int[nNumPolys];
 	long counter(0);
 	long point_count(0);
-	for(int i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+	for(int i = 0; i < pOGRGeometryCollection->getNumGeometries(); ++i)
 	{
 		OGRPolygon* pPolygon = (OGRPolygon*)pOGRGeometryCollection->getGeometryRef(i);
 		OGRLinearRing *pRing = pPolygon->getExteriorRing();
@@ -253,7 +254,7 @@ void wxSimpleFillSymbol::DrawPolyPolygon(OGRMultiPolygon* pPoly, IDisplay* pwxGI
 
 	counter = 0;
 	long pos = 0;
-	for(int i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+	for(int i = 0; i < pOGRGeometryCollection->getNumGeometries(); ++i)
 	{
 		OGRPolygon* pPolygon = (OGRPolygon*)pOGRGeometryCollection->getGeometryRef(i);
 		OGRLinearRing *pRing = pPolygon->getExteriorRing();
@@ -283,3 +284,4 @@ void wxSimpleFillSymbol::DrawPolyPolygon(OGRMultiPolygon* pPoly, IDisplay* pwxGI
 	wxDELETEA(pFullPoints);
 	wxDELETEA(nN);
 }
+*/

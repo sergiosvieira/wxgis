@@ -108,24 +108,24 @@ void wxGPProcess::ProcessInput(wxString sInputData)
 wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode) : m_nRunningTasks(0)
 {
     m_pToolsNode = pToolsNode;
-    m_nMaxTasks = wxAtoi(m_pToolsNode->GetPropVal(wxT("max_tasks"), wxString::Format(wxT("%d"), wxThread::GetCPUCount())));
+    m_nMaxTasks = wxAtoi(m_pToolsNode->GetAttribute(wxT("max_tasks"), wxString::Format(wxT("%d"), wxThread::GetCPUCount())));
 #ifdef __WXMSW__
-    m_sGeoprocessPath = m_pToolsNode->GetPropVal(wxT("gp_exec"), wxString(wxT("wxGISGeoprocess.exe")));
+    m_sGeoprocessPath = m_pToolsNode->GetAttribute(wxT("gp_exec"), wxString(wxT("wxGISGeoprocess.exe")));
 #else
-    m_sGeoprocessPath = m_pToolsNode->GetPropVal(wxT("gp_exec"), wxString(wxT("wxGISGeoprocess")));
+    m_sGeoprocessPath = m_pToolsNode->GetAttribute(wxT("gp_exec"), wxString(wxT("wxGISGeoprocess")));
 #endif
     wxXmlNode *pChild = m_pToolsNode->GetChildren();
     while (pChild)
     {
-        wxString sName = pChild->GetPropVal(wxT("object"), NONAME);
+        wxString sName = pChild->GetAttribute(wxT("object"), NONAME);
         if(sName.IsEmpty() || sName.CmpNoCase(NONAME) == 0)
         {
             pChild = pChild->GetNext();
             continue;
         }
 
-        int nCount = wxAtoi(pChild->GetPropVal(wxT("count"), wxT("0")));
-        wxString sCmdName = pChild->GetPropVal(wxT("name"), NONAME);
+        int nCount = wxAtoi(pChild->GetAttribute(wxT("count"), wxT("0")));
+        wxString sCmdName = pChild->GetAttribute(wxT("name"), NONAME);
 
 	    wxObject *pObj = wxCreateDynamicObject(sName);
         IGPToolSPtr pRetTool(dynamic_cast<IGPTool*>(pObj));
@@ -144,12 +144,12 @@ wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode) : m_nRunningTasks(
 
 wxGISGPToolManager::~wxGISGPToolManager(void)
 {
-    if(m_pToolsNode->HasProp(wxT("max_tasks")))
-        m_pToolsNode->DeleteProperty(wxT("max_tasks"));
-    m_pToolsNode->AddProperty(wxT("max_tasks"), wxString::Format(wxT("%d"), m_nMaxTasks));
-    if(m_pToolsNode->HasProp(wxT("gp_exec")))
-        m_pToolsNode->DeleteProperty(wxT("gp_exec"));
-    m_pToolsNode->AddProperty(wxT("gp_exec"), m_sGeoprocessPath);
+    if(m_pToolsNode->HasAttribute(wxT("max_tasks")))
+        m_pToolsNode->DeleteAttribute(wxT("max_tasks"));
+    m_pToolsNode->AddAttribute(wxT("max_tasks"), wxString::Format(wxT("%d"), m_nMaxTasks));
+    if(m_pToolsNode->HasAttribute(wxT("gp_exec")))
+        m_pToolsNode->DeleteAttribute(wxT("gp_exec"));
+    m_pToolsNode->AddAttribute(wxT("gp_exec"), m_sGeoprocessPath);
 
     //read tasks
     wxGISConfig::DeleteNodeChildren(m_pToolsNode);
@@ -158,17 +158,17 @@ wxGISGPToolManager::~wxGISGPToolManager(void)
         if(pos->second.sClassName.IsEmpty())
             continue;
         wxXmlNode* pNewNode = new wxXmlNode(m_pToolsNode, wxXML_ELEMENT_NODE, wxString(wxT("tool")));
-		pNewNode->AddProperty(wxT("object"), pos->second.sClassName);
-		pNewNode->AddProperty(wxT("name"), pos->first);
-		pNewNode->AddProperty(wxT("count"), wxString::Format(wxT("%d"), pos->second.nCount));
+		pNewNode->AddAttribute(wxT("object"), pos->second.sClassName);
+		pNewNode->AddAttribute(wxT("name"), pos->first);
+		pNewNode->AddAttribute(wxT("count"), wxString::Format(wxT("%d"), pos->second.nCount));
     }
 
     //kill all processes
-    for(size_t i = 0; i < m_ProcessArray.size(); i++)
+    for(size_t i = 0; i < m_ProcessArray.size(); ++i)
     {
         CancelProcess(i);
-        wxDELETE(m_ProcessArray[i].pProcess)
-//        wxDELETE(m_ProcessArray[i].pTool)
+        wxDELETE(m_ProcessArray[i].pProcess);
+//        wxDELETE(m_ProcessArray[i].pTool);
     }
     //delete all existed tools
     //for(std::map<wxString, TOOLINFO>::iterator pos = m_ToolsMap.begin(); pos != m_ToolsMap.end(); ++pos)
@@ -257,7 +257,7 @@ bool wxGISGPToolManager::ExecTask(WXGISEXECDDATA &data)
         if(pParams)
         {
             data.pTrackCancel->PutMessage(wxString(_("Parameters:")), -1, enumGISMessageInfo);
-            for(size_t i = 0; i < pParams->size(); i++)
+            for(size_t i = 0; i < pParams->size(); ++i)
             {
                 IGPParameter* pParam = pParams->operator[](i);
                 if(!pParam)
@@ -397,7 +397,7 @@ wxDateTime wxGISGPToolManager::GetProcessFinish(size_t nIndex)
 
 int wxGISGPToolManager::GetProcessPriority(size_t nIndex)
 {
-    for(size_t i = 0; i < m_aPriorityArray.size(); i++)
+    for(size_t i = 0; i < m_aPriorityArray.size(); ++i)
         if(m_aPriorityArray[i].nIndex == nIndex)
             return m_aPriorityArray[i].nPriority;
 	return m_ProcessArray.size();
@@ -408,7 +408,7 @@ void wxGISGPToolManager::SetProcessPriority(size_t nIndex, int nPriority)
 	wxASSERT(nIndex >= 0);
 	wxASSERT(nIndex < m_ProcessArray.size());
 
-    for(size_t i = 0; i < m_aPriorityArray.size(); i++)
+    for(size_t i = 0; i < m_aPriorityArray.size(); ++i)
     {
         if(m_aPriorityArray[i].nIndex == nIndex)
         {

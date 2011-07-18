@@ -55,7 +55,7 @@ bool wxGISVectorPropertyPage::Create(IGxDataset* pGxDataset, wxWindow* parent, w
 	wxBoxSizer* bMainSizer;
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
 
-    m_pg = new wxPropertyGrid(this, ID_PPCTRL, wxDefaultPosition, wxDefaultSize, wxPG_DEFAULT_STYLE | wxPG_TOOLTIPS | wxPG_THEME_BORDER | wxPG_SPLITTER_AUTO_CENTER);
+    m_pg = new wxPropertyGrid(this, ID_PPCTRL, wxDefaultPosition, wxDefaultSize, wxPG_DEFAULT_STYLE | wxPG_TOOLTIPS | wxPG_SPLITTER_AUTO_CENTER);
     m_pg->SetColumnProportion(0, 30);
     m_pg->SetColumnProportion(1, 70);
 
@@ -69,21 +69,21 @@ bool wxGISVectorPropertyPage::Create(IGxDataset* pGxDataset, wxWindow* parent, w
     return true;
 }
 
-wxPGId wxGISVectorPropertyPage::AppendProperty(wxPGProperty* pProp)
+wxPGProperty* wxGISVectorPropertyPage::AppendProperty(wxPGProperty* pProp)
 {
     wxPGProperty* pNewProp = m_pg->Append(pProp);
-    pNewProp->SetFlag(wxPG_PROP_READONLY);
+    pNewProp->ChangeFlag(wxPG_PROP_READONLY, 1);
     return pNewProp;
 }
 
-wxPGId wxGISVectorPropertyPage::AppendProperty(wxPGId pid, wxPGProperty* pProp)
+wxPGProperty* wxGISVectorPropertyPage::AppendProperty(wxPGProperty* pid, wxPGProperty* pProp)
 {
     wxPGProperty* pNewProp = m_pg->AppendIn(pid, pProp);
-    pNewProp->SetFlag(wxPG_PROP_READONLY);
+    pNewProp->ChangeFlag(wxPG_PROP_READONLY, 1);
     return pNewProp;
 }
 
-wxPGId wxGISVectorPropertyPage::AppendMetadataProperty(wxString sMeta)
+wxPGProperty* wxGISVectorPropertyPage::AppendMetadataProperty(wxString sMeta)
 {
     int nPos = sMeta.Find('=');
     if(nPos == wxNOT_FOUND)
@@ -94,7 +94,7 @@ wxPGId wxGISVectorPropertyPage::AppendMetadataProperty(wxString sMeta)
         wxString sVal = sMeta.Right(sMeta.Len() - nPos - 1);
         //clean
         wxString sCleanVal;
-        for(size_t i = 0; i < sVal.Len(); i++)
+        for(size_t i = 0; i < sVal.Len(); ++i)
         {
             char c = sVal[i];
             if(sVal[i] > 31 && sVal[i] != 127)
@@ -114,7 +114,7 @@ void wxGISVectorPropertyPage::FillGrid(void)
 
     wxString sTmp;
     //fill propertygrid
-    wxPGId pid = AppendProperty( new wxPropertyCategory(_("Data Source")) );
+    wxPGProperty* pid = AppendProperty( new wxPropertyCategory(_("Data Source")) );
     AppendProperty( new wxStringProperty(_("Vector"), wxPG_LABEL, m_pDataset->GetName()) );  
 
     CPLString soPath(m_pDataset->GetPath());
@@ -138,8 +138,8 @@ void wxGISVectorPropertyPage::FillGrid(void)
     }
     else
     {
-        wxPGId pfilesid = AppendProperty(pid, new wxPropertyCategory(_("Files")) );  
-        for(int i = 0; papszFileList[i] != NULL; i++ )
+        wxPGProperty* pfilesid = AppendProperty(pid, new wxPropertyCategory(_("Files")) );  
+        for(int i = 0; papszFileList[i] != NULL; ++i )
 	    {
             ret = VSIStatL(papszFileList[i], &BufL);
             if(ret == 0)
@@ -161,12 +161,12 @@ void wxGISVectorPropertyPage::FillGrid(void)
         OGRSFDriver* pDrv = pDataSource->GetDriver();
         if(pDrv)
         {
-            wxPGId pdriversid = AppendProperty(pid, new wxStringProperty(_("Driver"), wxPG_LABEL, wxString(pDrv->GetName(), wxConvUTF8) ));  
+            wxPGProperty* pdriversid = AppendProperty(pid, new wxStringProperty(_("Driver"), wxPG_LABEL, wxString(pDrv->GetName(), wxConvUTF8) ));  
             //TestCapability
             AppendProperty(pdriversid, new wxStringProperty(_("Create DataSource"), wxPG_LABEL, pDrv->TestCapability(ODrCCreateDataSource) == TRUE ? _("true") : _("false")) );  
             AppendProperty(pdriversid, new wxStringProperty(_("Delete DataSource"), wxPG_LABEL, pDrv->TestCapability(ODrCDeleteDataSource) == TRUE ? _("true") : _("false")) );  
         }
-        wxPGId pdssid = AppendProperty(pid, new wxStringProperty(_("DataSource"), wxPG_LABEL, wxString(pDataSource->GetName(), wxConvUTF8) ));  
+        wxPGProperty* pdssid = AppendProperty(pid, new wxStringProperty(_("DataSource"), wxPG_LABEL, wxString(pDataSource->GetName(), wxConvUTF8) ));  
         AppendProperty(pdssid, new wxIntProperty(_("Layer Count"), wxPG_LABEL, pDataSource->GetLayerCount()) );  
         AppendProperty(pdssid, new wxStringProperty(_("Create DataSource"), wxPG_LABEL, pDataSource->TestCapability(ODsCCreateLayer) == TRUE ? _("true") : _("false")) );  
     }
@@ -192,7 +192,7 @@ void wxGISVectorPropertyPage::FillGrid(void)
 
 void wxGISVectorPropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer, CPLString soPath)
 {
-    wxPGId playid = AppendProperty( new wxPropertyCategory(wxString::Format(_("Layer #%d"), iLayer + 1) ));
+    wxPGProperty* playid = AppendProperty( new wxPropertyCategory(wxString::Format(_("Layer #%d"), iLayer + 1) ));
 
     wxString sOut;
     if(EQUALN(soPath, "/vsizip", 7))
@@ -219,12 +219,12 @@ void wxGISVectorPropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer, CPLStr
     OGRFeatureDefn *poDefn = poLayer->GetLayerDefn();
     if(poDefn)
     {
-        wxPGId pfieldsid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Fields"), iLayer + 1)) );
+        wxPGProperty* pfieldsid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Fields"), iLayer + 1)) );
         for( int iAttr = 0; iAttr < poDefn->GetFieldCount(); iAttr++ )
         {
             OGRFieldDefn    *poField = poDefn->GetFieldDefn( iAttr );
             wxString sFieldTypeName = wgMB2WX( poField->GetFieldTypeName( poField->GetType() ) );
-            wxPGId pfielid = AppendProperty(pfieldsid, new wxStringProperty(_("Name"), wxPG_LABEL, wxString::Format(wxT("%s (%s)"), wgMB2WX(poField->GetNameRef()), sFieldTypeName.c_str()) ));  
+            wxPGProperty* pfielid = AppendProperty(pfieldsid, new wxStringProperty(_("Name"), wxPG_LABEL, wxString::Format(wxT("%s (%s)"), wgMB2WX(poField->GetNameRef()), sFieldTypeName.c_str()) ));  
             AppendProperty(pfielid, new wxStringProperty(_("Type"), wxPG_LABEL, sFieldTypeName ) );  
             AppendProperty(pfielid, new wxIntProperty(_("Width"), wxPG_LABEL, poField->GetWidth()) );  
             AppendProperty(pfielid, new wxIntProperty(_("Precision"), wxPG_LABEL, poField->GetPrecision()) ); 
@@ -245,7 +245,7 @@ void wxGISVectorPropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer, CPLStr
         }
     }
     //TestCapability 
-    wxPGId pcapid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Capability"), iLayer + 1)) );
+    wxPGProperty* pcapid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Capability"), iLayer + 1)) );
     AppendProperty(pcapid, new wxStringProperty(_("Random Read"), wxPG_LABEL, poLayer->TestCapability(OLCRandomRead) == TRUE ? _("true") : _("false")) );  
     AppendProperty(pcapid, new wxStringProperty(_("Sequential Write"), wxPG_LABEL, poLayer->TestCapability(OLCSequentialWrite) == TRUE ? _("true") : _("false")) );  
     AppendProperty(pcapid, new wxStringProperty(_("Random Write"), wxPG_LABEL, poLayer->TestCapability(OLCRandomWrite) == TRUE ? _("true") : _("false")) );  
@@ -261,7 +261,7 @@ void wxGISVectorPropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer, CPLStr
     OGREnvelope Extent;
     if(poLayer->GetExtent(&Extent, true) == OGRERR_NONE)
     {
-        wxPGId penvid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Extent"), iLayer + 1)));
+        wxPGProperty* penvid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Extent"), iLayer + 1)));
         AppendProperty(penvid, new wxFloatProperty(_("Top"), wxPG_LABEL, Extent.MaxY));
         AppendProperty(penvid, new wxFloatProperty(_("Left"), wxPG_LABEL, Extent.MinX));
         AppendProperty(penvid, new wxFloatProperty(_("Right"), wxPG_LABEL, Extent.MaxX));

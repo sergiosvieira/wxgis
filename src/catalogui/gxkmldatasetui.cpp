@@ -86,7 +86,7 @@ void wxGxKMLDatasetUI::EditProperties(wxWindow *parent)
 
 void wxGxKMLDatasetUI::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		wxDELETE( m_Children[i] );
@@ -118,7 +118,7 @@ void wxGxKMLDatasetUI::LoadChildren(void)
         pwxGISFeatureDataset->SetEncoding(m_Encoding);
 	}
 
-    for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); i++)
+    for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); ++i)
     {
         wxGISFeatureDatasetSPtr pwxGISFeatureSubDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset->GetSubset(i));
         pwxGISFeatureSubDataset->SetSubType(m_type);

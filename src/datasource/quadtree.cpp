@@ -45,7 +45,7 @@ wxGISQuadTree::~wxGISQuadTree(void)
         m_pQuadTree = NULL;
     }
 	for(std::list<wxGISQuadTreeItem*>::iterator it = m_QuadTreeItemList.begin(); it != m_QuadTreeItemList.end(); ++it)
-		wxDELETE(*it)
+		wxDELETE(*it);
 }
 
 void wxGISQuadTree::AddItem(OGRGeometry* pGeom, long nOID, bool bOwnGeometry)
@@ -68,7 +68,7 @@ wxGISQuadTreeCursorSPtr wxGISQuadTree::Search(const CPLRectObj* pAoi)
 		pInputEnv.MinY = pAoi->miny;
 
 		if(!IsDoubleEquil(m_Envelope.MaxX, pInputEnv.MaxX) || !IsDoubleEquil(m_Envelope.MaxY, pInputEnv.MaxY) || !IsDoubleEquil(m_Envelope.MinX, pInputEnv.MinX) || !IsDoubleEquil(m_Envelope.MinY, pInputEnv.MinY))
-			bContains = m_Envelope.Contains(pInputEnv);
+			bContains = m_Envelope.Contains(pInputEnv) != 0;
 	}
 
 	wxCriticalSectionLocker locker(m_CritSect);

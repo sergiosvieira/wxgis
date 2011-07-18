@@ -22,7 +22,6 @@
 
 #include <wx/tokenzr.h>
 
-
 //---------------------------------------------------------------
 // wxGISConfig
 //---------------------------------------------------------------
@@ -47,7 +46,7 @@ wxGISConfig::wxGISConfig(wxString sAppName, wxString sConfigDir, bool bPortable)
     else
     {
         wxString sExeAppName = wxFileNameFromPath(stp.GetExecutablePath());
-        wxStripExtension(sExeAppName);
+		wxFileName::StripExtension(sExeAppName);
         //sExeAppName = sAppName;
 
         m_sUserConfigDir = stp.GetUserConfigDir() + wxFileName::GetPathSeparator() + sConfigDir;
@@ -70,7 +69,7 @@ wxGISConfig::~wxGISConfig(void)
 void wxGISConfig::Clean(bool bInstall)
 {
     wxGISEnumConfigKey CmpKey = bInstall == true ? enumGISHKLM : enumGISHKCU;
-	for(size_t i = 0; i < m_configs_arr.size(); i++)
+	for(size_t i = 0; i < m_configs_arr.size(); ++i)
 	{
         //Store only user settings. Common settings should be changed during install process
         if(m_configs_arr[i].Key == CmpKey)
@@ -83,7 +82,7 @@ void wxGISConfig::Clean(bool bInstall)
 wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
 {
     //search cached configs nodes
-    for(size_t i = 0; i < m_confignodes_arr.size(); i++)
+    for(size_t i = 0; i < m_confignodes_arr.size(); ++i)
 	{
         if(m_confignodes_arr[i].sXmlPath.CmpNoCase(sPath) == 0 && m_confignodes_arr[i].Key == Key)
 		{
@@ -97,7 +96,7 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
     wxXmlDocument* pDoc(NULL);
 
     //search cached configs
-	for(size_t i = 0; i < m_configs_arr.size(); i++)
+	for(size_t i = 0; i < m_configs_arr.size(); ++i)
 	{
 		if(m_configs_arr[i].sRootNodeName.CmpNoCase(sRootNodeName) == 0 && m_configs_arr[i].Key == Key)
 		{
@@ -157,7 +156,7 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
                 wxString sys_path = sys_dir + wxFileName::GetPathSeparator() + sRootNodeName + wxT(".xml");// + HKCU_CONFIG_NAME;
                 pDoc = new wxXmlDocument(sys_path);
                 if(pDoc && !pDoc->IsOk())
-                    wxDELETE(pDoc)
+                    wxDELETE(pDoc);
 			}
 
 			//last chance
@@ -167,7 +166,7 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, wxString sPath)
                 if(wxFileName::FileExists(sXMLPath))
                     pDoc = new wxXmlDocument(sXMLPath);
                 if(pDoc && !pDoc->IsOk())
-                    wxDELETE(pDoc)
+                    wxDELETE(pDoc);
 			}
 
 			if(!pDoc)
@@ -230,7 +229,7 @@ wxXmlNode* wxGISConfig::CreateConfigNode(wxGISEnumConfigKey Key, wxString sPath,
 
     wxXmlDocument* pDoc(NULL);
 
-	for(size_t i = 0; i < m_configs_arr.size(); i++)
+	for(size_t i = 0; i < m_configs_arr.size(); ++i)
 	{
 		if(m_configs_arr[i].sRootNodeName == sRootNodeName && m_configs_arr[i].Key == Key)
 		{
@@ -363,7 +362,7 @@ wxString wxGISAppConfig::GetLocale(void)
     }
     if(!pNode)
         return sDefaultOut;
-    return pNode->GetPropVal(wxT("locale"), sDefaultOut);
+    return pNode->GetAttribute(wxT("locale"), sDefaultOut);
 }
 
 wxString wxGISAppConfig::GetLocaleDir(void)
@@ -373,7 +372,7 @@ wxString wxGISAppConfig::GetLocaleDir(void)
     wxString sDefaultOut = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("locale");
     if(!pNode || m_bPortable)
         return sDefaultOut;
-    return pNode->GetPropVal(wxT("path"), sDefaultOut);
+    return pNode->GetAttribute(wxT("path"), sDefaultOut);
 }
 
 wxString wxGISAppConfig::GetLogDir(void)
@@ -384,7 +383,7 @@ wxString wxGISAppConfig::GetLogDir(void)
     wxString sDefaultOut = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("log");
     if(!pNode)
         return sDefaultOut;
-    return pNode->GetPropVal(wxT("path"), sDefaultOut);
+    return pNode->GetAttribute(wxT("path"), sDefaultOut);
 }
 
 
@@ -395,7 +394,7 @@ wxString wxGISAppConfig::GetSysDir(void)
     wxString sDefaultOut = m_sExeDirPath + wxFileName::GetPathSeparator() + wxT("sys");
     if(!pNode || m_bPortable)
         return sDefaultOut;
-    return pNode->GetPropVal(wxT("path"), sDefaultOut);
+    return pNode->GetAttribute(wxT("path"), sDefaultOut);
 }
 
 bool wxGISAppConfig::GetDebugMode(void)
@@ -405,7 +404,7 @@ bool wxGISAppConfig::GetDebugMode(void)
     bool bDefaultOut = false;
     if(!pNode)
         return bDefaultOut;
-    return wxString(wxT("on")) == pNode->GetPropVal(wxT("mode"), wxT("on")) ? true : false;
+    return wxString(wxT("on")) == pNode->GetAttribute(wxT("mode"), wxT("on")) ? true : false;
 }
 
 void wxGISAppConfig::SetLocale(wxString sLocale)
@@ -418,9 +417,9 @@ void wxGISAppConfig::SetLocale(wxString sLocale)
 		if(!pNode)
 			return;
 	}
-	if(pNode->HasProp(wxT("locale")))
-		pNode->DeleteProperty(wxT("locale"));
-	pNode->AddProperty(wxT("locale"), sLocale);
+	if(pNode->HasAttribute(wxT("locale")))
+		pNode->DeleteAttribute(wxT("locale"));
+	pNode->AddAttribute(wxT("locale"), sLocale);
 
 }
 
@@ -436,9 +435,9 @@ void wxGISAppConfig::SetLocaleDir(wxString sLocaleDir)
 		if(!pNode)
 			return;
 	}
-	if(pNode->HasProp(wxT("path")))
-		pNode->DeleteProperty(wxT("path"));
-	pNode->AddProperty(wxT("path"), sLocaleDir);
+	if(pNode->HasAttribute(wxT("path")))
+		pNode->DeleteAttribute(wxT("path"));
+	pNode->AddAttribute(wxT("path"), sLocaleDir);
 }
 
 void wxGISAppConfig::SetSysDir(wxString sSysDir)
@@ -453,9 +452,9 @@ void wxGISAppConfig::SetSysDir(wxString sSysDir)
 		if(!pNode)
 			return;
 	}
-	if(pNode->HasProp(wxT("path")))
-		pNode->DeleteProperty(wxT("path"));
-	pNode->AddProperty(wxT("path"), sSysDir);
+	if(pNode->HasAttribute(wxT("path")))
+		pNode->DeleteAttribute(wxT("path"));
+	pNode->AddAttribute(wxT("path"), sSysDir);
 }
 
 void wxGISAppConfig::SetLogDir(wxString sLogDir)
@@ -470,9 +469,9 @@ void wxGISAppConfig::SetLogDir(wxString sLogDir)
 		if(!pNode)
 			return;
 	}
-	if(pNode->HasProp(wxT("path")))
-		pNode->DeleteProperty(wxT("path"));
-	pNode->AddProperty(wxT("path"), sLogDir);
+	if(pNode->HasAttribute(wxT("path")))
+		pNode->DeleteAttribute(wxT("path"));
+	pNode->AddAttribute(wxT("path"), sLogDir);
 }
 
 void wxGISAppConfig::SetDebugMode(bool bDebug)
@@ -485,8 +484,8 @@ void wxGISAppConfig::SetDebugMode(bool bDebug)
 		if(!pNode)
 			return;
 	}
-	if(pNode->HasProp(wxT("mode")))
-		pNode->DeleteProperty(wxT("mode"));
-	pNode->AddProperty(wxT("mode"), bDebug == true ? wxT("on") : wxT("off"));
+	if(pNode->HasAttribute(wxT("mode")))
+		pNode->DeleteAttribute(wxT("mode"));
+	pNode->AddAttribute(wxT("mode"), bDebug == true ? wxT("on") : wxT("off"));
 }
 

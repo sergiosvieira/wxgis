@@ -62,10 +62,10 @@ int main(int argc, char **argv)
     // Create the commandline parser
     static const wxCmdLineEntryDesc my_cmdline_desc[] =
     {
-        { wxCMD_LINE_SWITCH, wxT( "h" ), wxT("help" ),      _( "Show this help message" ), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
-        { wxCMD_LINE_SWITCH, wxT( "v" ), wxT("version" ),   _( "The version of this program" ) },
-		{ wxCMD_LINE_OPTION, wxT( "n" ), wxT("name"),       _( "The tool name" ), wxCMD_LINE_VAL_STRING },
-		{ wxCMD_LINE_OPTION, wxT( "p" ), wxT("parameters"), _( "The tool parameters" ), wxCMD_LINE_VAL_STRING },
+        { wxCMD_LINE_SWITCH, "h", "help",       _( "Show this help message" ), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
+        { wxCMD_LINE_SWITCH, "v", "version",    _( "The version of this program" ) },
+		{ wxCMD_LINE_OPTION, "n", "name",       _( "The tool name" ), wxCMD_LINE_VAL_STRING },
+		{ wxCMD_LINE_OPTION, "p", "parameters", _( "The tool parameters" ), wxCMD_LINE_VAL_STRING },
 		{ wxCMD_LINE_NONE }
     };
 
@@ -205,7 +205,7 @@ bool wxGPTaskExecutor::OnExecute(wxString sToolName, wxString sToolParameters)
 
     OutStream.Close();
     wxSleep(1);
-    wxDELETE(m_pOutTxtStream)
+    wxDELETE(m_pOutTxtStream);
     return bResult;
 }
 

@@ -48,6 +48,7 @@ protected:
 	std::vector<wxGISLayerSPtr> m_paLayers;
 	OGRSpatialReferenceSPtr m_pSpatialReference;
 	OGREnvelope m_FullExtent;
+	bool m_bFullExtIsInit;
 };
 
 /** \class wxGISExtentStack map.h

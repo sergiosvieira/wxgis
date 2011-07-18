@@ -43,9 +43,9 @@ public:
     void FillProjected(OGRSpatialReferenceSPtr poSRS);
     void FillGeographic(OGRSpatialReferenceSPtr poSRS);
     void FillLoclal(OGRSpatialReferenceSPtr poSRS);
-    void AppendProjParam(wxPGId pid, const char *pszName, OGRSpatialReferenceSPtr poSRS);
-    wxPGId AppendProperty(wxPGProperty* pProp);
-    wxPGId AppendProperty(wxPGId pid, wxPGProperty* pProp);
+    void AppendProjParam(wxPGProperty* pid, const char *pszName, OGRSpatialReferenceSPtr poSRS);
+    wxPGProperty* AppendProperty(wxPGProperty* pProp);
+    wxPGProperty* AppendProperty(wxPGProperty* pid, wxPGProperty* pProp);
 protected:
     wxPropertyGrid* m_pg;
 };

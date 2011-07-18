@@ -87,7 +87,7 @@ public:
     virtual wxString GetBaseName(void){return GetName();};
     //IGxRootObjectProperties
     virtual void Init(wxXmlNode* const pConfigNode);
-    virtual wxXmlNode* GetProperties(void);
+    virtual wxXmlNode* GetAttributes(void);
 	//wxGxRootToolbox
 	virtual void LoadChildren(void);
 	virtual wxGISGPToolManager* GetGPToolManager(void);

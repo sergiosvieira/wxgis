@@ -192,7 +192,7 @@ OGREnvelope wxGISFeatureDataset::GetEnvelope(void)
     if(!m_poLayer )
 		return OGREnvelope();
 
-	bool bOLCFastGetExtent = m_poLayer->TestCapability(OLCFastGetExtent);
+	bool bOLCFastGetExtent = m_poLayer->TestCapability(OLCFastGetExtent) != 0;
     if(bOLCFastGetExtent)
     {
         if(m_poLayer->GetExtent(&m_stExtent, true) == OGRERR_NONE)
@@ -246,6 +246,7 @@ void wxGISFeatureDataset::LoadGeometry(ITrackCancel* pTrackCancel)
 	IProgressor* pProgress(NULL);
 	if(pTrackCancel)
 	{
+		pTrackCancel->Reset();
 		pTrackCancel->PutMessage(wxString(_("PreLoad Geometry of ")) + m_sTableName, -1, enumGISMessageInfo);
 		pProgress = pTrackCancel->GetProgressor();
 		if(pProgress)
@@ -269,39 +270,41 @@ void wxGISFeatureDataset::LoadGeometry(ITrackCancel* pTrackCancel)
             }
 			m_pQuadTree = boost::make_shared<wxGISQuadTree>(m_stExtent);
 			if(pProgress)
-				pProgress->SetRange(GetFeatureCount(pTrackCancel));
+				pProgress->SetRange(GetFeatureCount());
 		}
     }
 	else
 	{
 		if(pProgress)
-			pProgress->SetRange(GetFeatureCount(pTrackCancel) * 2);
+			pProgress->SetRange(GetFeatureCount() * 2);
 	}
 
 	long nCounter(0);
 	Reset();
 
 	OGRFeatureSPtr poFeature;
+	long nFID(0);
 	while((poFeature = Next()) != NULL )
 	{
 		if(pProgress)
 		{
-			pProgress->SetRange(nCounter);
+			pProgress->SetValue(nCounter);
 			nCounter++;
 		}
-        OGRGeometry* pGeom;
-		if(m_bIsDataLoaded)
-			pGeom = poFeature->GetGeometryRef();
-		else
-		{
-			OGRGeometry* pTmpGeom = poFeature->GetGeometryRef();
-			if(pTmpGeom)
-				pGeom = pTmpGeom->clone();
-		}
+        OGRGeometry* pGeom = poFeature->GetGeometryRef();
+        if(poFeature && !m_bHasFID)
+			poFeature->SetFID(++nFID);
+        else
+            nFID = poFeature->GetFID();
+
+        //store features in array for speed
+		if(!m_bIsDataLoaded)
+			m_FeaturesMap[nFID] = poFeature;
+
         if(bOLCFastGetExtent)
 		{
 			if(pGeom && m_pQuadTree)
-				m_pQuadTree->AddItem(pGeom, poFeature->GetFID(), !m_bIsDataLoaded);
+				m_pQuadTree->AddItem(pGeom, poFeature->GetFID());
 		}
         else
         {
@@ -312,7 +315,16 @@ void wxGISFeatureDataset::LoadGeometry(ITrackCancel* pTrackCancel)
                 m_stExtent.Merge(Env);
             }
         }
+		if(pTrackCancel && !pTrackCancel->Continue())
+		{
+			if(pProgress)
+				pProgress->Show(false);
+			return;
+		}
 	}
+
+	m_bIsDataLoaded = true;
+	m_nFeatureCount = m_FeaturesMap.size();
 
     if(IsDoubleEquil(m_stExtent.MinX, m_stExtent.MaxX))
     {
@@ -333,22 +345,24 @@ void wxGISFeatureDataset::LoadGeometry(ITrackCancel* pTrackCancel)
 		{
 			if(pProgress)
 			{
-				pProgress->SetRange(nCounter);
+				pProgress->SetValue(nCounter);
 				nCounter++;
 			}
-			OGRGeometry* pGeom;
-			if(m_bIsDataLoaded)
-				pGeom = poFeature->GetGeometryRef();
-			else
-			{
-				OGRGeometry* pTmpGeom = poFeature->GetGeometryRef();
-				if(pTmpGeom)
-					pGeom = pTmpGeom->clone();
-			}
+			OGRGeometry* pGeom = poFeature->GetGeometryRef();
 			if(pGeom && m_pQuadTree)
-				m_pQuadTree->AddItem(pGeom, poFeature->GetFID(), !m_bIsDataLoaded);
+				m_pQuadTree->AddItem(pGeom, poFeature->GetFID());
+
+			if(pTrackCancel && !pTrackCancel->Continue())
+			{
+				if(pProgress)
+					pProgress->Show(false);
+				return;
+			}
 		}
     }
+	if(pProgress)
+		pProgress->Show(false);
+
     m_bIsGeometryLoaded = true;
 }
 
@@ -381,7 +395,6 @@ OGRErr wxGISFeatureDataset::SetFilter(wxGISQueryFilter* pQFilter)
     if(	!m_poLayer )
 		return OGRERR_FAILURE;
 
-	OGRErr eErr;
 	wxGISSpatialFilter* pSpaFil = dynamic_cast<wxGISSpatialFilter*>(pQFilter);
 	if(pSpaFil)
 	{
@@ -596,7 +609,7 @@ OGRLayer* const wxGISFeatureDataset::GetLayerRef(int iLayer)
 //			    CPLRectObj Rect = {Env.MinX, Env.MinY, Env.MaxX, Env.MaxY};
 //			    OGRFeature** pFeatureArr = (OGRFeature**)CPLQuadTreeSearch(m_pQuadTree, &Rect, &count);
 //                pGISFeatureSet = new wxGISFeatureSet(m_FeaturesMap.size());
-//			    for(int i = 0; i < count; i++)
+//			    for(int i = 0; i < count; ++i)
 //			    {
 //				    if(pTrackCancel && !pTrackCancel->Continue())
 //					    break;

@@ -21,9 +21,8 @@
 
 #include "wxgis/framework/tooltip.h"
 #include "wxgis/framework/application.h"
+#include "wxgis/core/globalfn.h"
 
-//#include "../../art/close_16.xpm"
-//#include "../../art/close_bw_16.xpm"
 #include "../../art/process_stop.xpm"
 
 #define FRAMENAME wxT("baloontip")
@@ -122,7 +121,7 @@ wxGISBaloonTip::wxGISBaloonTip(wxString sTitle, wxIcon Icon, wxString sMessage) 
         Move( iX, iY );
     }
 
-    IApplication* pApp = ::GetApplication();
+    IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(GetApplication());
     pApp->RegisterChildWindow(this);
 }
  
@@ -163,7 +162,7 @@ void wxGISBaloonTip::ShowBaloon(unsigned int iTimeout)
 
 void wxGISBaloonTip::Close(void)
 {
-    IApplication* pApp = ::GetApplication();
+    IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(GetApplication());
     pApp->UnRegisterChildWindow(this);
     Destroy();
 }

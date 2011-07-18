@@ -86,7 +86,7 @@ OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSP
 //
 //wxWAList::~wxWAList(void)
 //{
-//    for(size_t i = 0; i < m_ItemsArr.size(); i++)
+//    for(size_t i = 0; i < m_ItemsArr.size(); ++i)
 //    {
 //        wxDELETE(m_ItemsArr[i]);
 //    }
@@ -127,7 +127,7 @@ OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSP
 //
 //wxWAListItem* wxWAList::RemovePoint(wxWAListItem* pItem)
 //{
-//    for(size_t i = 0; i < m_ItemsArr.size(); i++)
+//    for(size_t i = 0; i < m_ItemsArr.size(); ++i)
 //    {
 //        if(m_ItemsArr[i] == pItem)
 //        {
@@ -218,7 +218,7 @@ OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSP
 //
 //wxWAListItem* wxClipWindow::AddPoint(OGRRawPoint Point, VERTEXTYPE Type)
 //{
-//    for(size_t i = 0; i < m_ItemsArr.size() - 1; i++)
+//    for(size_t i = 0; i < m_ItemsArr.size() - 1; ++i)
 //    {
 //        //1 MinX - x - MaxX MinY
 //        if(m_ItemsArr[i]->m_Point.y == Point.y)
@@ -283,7 +283,7 @@ OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSP
 //
 //    int pos = 0;    
 //    OGRGeometryCollection* pNewOGRGeometryCollection = new OGRGeometryCollection();
-//    for(size_t i = 0; i < nPointCount - 1; i++)
+//    for(size_t i = 0; i < nPointCount - 1; ++i)
 //    {
 //	    int code_a = vcode(&Env, &pPoints[i]);
 //	    int code_b = vcode(&Env, &pPoints[i + 1]);
@@ -462,7 +462,7 @@ OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSP
 //    }
 //
 //    int nCount = pPoly->getNumInteriorRings();
-//    for(size_t i = 0; i < nCount; i++)
+//    for(size_t i = 0; i < nCount; ++i)
 //    {        
 //        pOGRLineString = pPoly->getInteriorRing(i);
 //        //change for holes!!!
@@ -477,7 +477,7 @@ OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSP
 //                pNewPoly->addRingDirectly((OGRLinearRing*)pIntRingGeom);
 //            if(pNewOGRGeometryCollection)
 //            {
-//                for(size_t i = 0; i < pNewOGRGeometryCollection->getNumGeometries(); i++)
+//                for(size_t i = 0; i < pNewOGRGeometryCollection->getNumGeometries(); ++i)
 //                {
 //                    OGRGeometry* pPolyGeom = pNewOGRGeometryCollection->getGeometryRef(i);
 //                    if(pPolyGeom->Contains(pIntRingGeom))
@@ -498,7 +498,7 @@ OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSP
 //                    pNewPoly->addRingDirectly((OGRLinearRing*)pOGRGeometryCollection->getGeometryRef(0));
 //                if(pNewOGRGeometryCollection)
 //                {
-//                    for(size_t i = 0; i < pNewOGRGeometryCollection->getNumGeometries(); i++)
+//                    for(size_t i = 0; i < pNewOGRGeometryCollection->getNumGeometries(); ++i)
 //                    {
 //                        OGRGeometry* pPolyGeom = pNewOGRGeometryCollection->getGeometryRef(i);
 //                        if(pPolyGeom->Contains(pOGRGeometryCollection->getGeometryRef(0)))
@@ -536,7 +536,7 @@ OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSP
 //
 //    pOGRLineString->getPoints(pPoints, pZValues);
 //
-//    for(size_t i = 0; i < nPointCount - 1; i++)
+//    for(size_t i = 0; i < nPointCount - 1; ++i)
 //    {
 //	    int code_a = vcode(pEnv, &pPoints[i]);
 //	    int code_b = vcode(pEnv, &pPoints[i + 1]);

@@ -22,7 +22,8 @@
 #include "wxgis/geoprocessingui/gptooldlg.h"
 #include "wxgis/geoprocessingui/gptaskexecdlg.h"
 #include "wxgis/catalogui/gxcatalogui.h"
-#include "wxgis/framework/application.h"
+//#include "wxgis/framework/application.h"
+#include "wxgis/core/globalfn.h"
 
 #include <wx/stdpaths.h>
 
@@ -49,7 +50,7 @@ wxGxToolbox::wxGxToolbox(wxGxRootToolbox* pRootToolbox, wxXmlNode* pDataNode, wx
     m_pRootToolbox = pRootToolbox;
     m_pDataNode = pDataNode;
     if(m_pDataNode)
-        m_sName = wxGetTranslation( m_pDataNode->GetPropVal(wxT("name"), NONAME) );
+        m_sName = wxGetTranslation( m_pDataNode->GetAttribute(wxT("name"), NONAME) );
     m_LargeToolboxIcon = LargeToolboxIcon;
     m_SmallToolboxIcon = SmallToolboxIcon;
     m_LargeToolIcon = LargeToolIcon;
@@ -84,7 +85,7 @@ void wxGxToolbox::Refresh(void)
 
 void wxGxToolbox::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
@@ -202,10 +203,10 @@ void wxGxRootToolbox::LoadChildren(void)
     }
 
     //Add favorites
-    bool bShowFavorites = wxAtoi(pToolboxesChild->GetPropVal(wxT("show_favorites"), wxT("1")));
+    bool bShowFavorites = wxAtoi(pToolboxesChild->GetAttribute(wxT("show_favorites"), wxT("1"))) == 1;
     if(bShowFavorites)
     {
-        short nMax = wxAtoi(pToolboxesChild->GetPropVal(wxT("max_favorites"), wxT("10")));
+        short nMax = wxAtoi(pToolboxesChild->GetAttribute(wxT("max_favorites"), wxT("10")));
         wxGxFavoritesToolbox* pToolbox = new wxGxFavoritesToolbox(m_pRootToolbox, nMax, m_LargeToolIcon, m_SmallToolIcon);
         IGxObject* pGxObj = static_cast<IGxObject*>(pToolbox);
         if(!AddChild(pGxObj))
@@ -216,11 +217,11 @@ void wxGxRootToolbox::LoadChildren(void)
 	m_bIsChildrenLoaded = true;
 }
 
-wxXmlNode* wxGxRootToolbox::GetProperties(void)
+wxXmlNode* wxGxRootToolbox::GetAttributes(void)
 {
-    if(m_pPropNode->HasProp(wxT("is_enabled")))
-        m_pPropNode->DeleteProperty(wxT("is_enabled"));
-    m_pPropNode->AddProperty(wxT("is_enabled"), m_bEnabled == true ? wxT("1") : wxT("0"));    
+    if(m_pPropNode->HasAttribute(wxT("is_enabled")))
+        m_pPropNode->DeleteAttribute(wxT("is_enabled"));
+    m_pPropNode->AddAttribute(wxT("is_enabled"), m_bEnabled == true ? wxT("1") : wxT("0"));    
     return m_pPropNode;
 }
 
@@ -303,7 +304,7 @@ void wxGxFavoritesToolbox::Refresh(void)
 
 void wxGxFavoritesToolbox::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
@@ -333,7 +334,7 @@ void wxGxFavoritesToolbox::LoadChildren(void)
         if(pGPToolManager)
         {
             int nCount = MIN(pGPToolManager->GetToolCount(), m_nMaxCount);
-            for(size_t i = 0; i < nCount; i++)
+            for(size_t i = 0; i < nCount; ++i)
             {
                 wxGxTool* pTool = new wxGxTool(m_pRootToolbox, pGPToolManager->GetPopularTool(i), m_LargeToolIcon, m_SmallToolIcon);
                 IGxObject* pGxObj = static_cast<IGxObject*>(pTool);
@@ -378,7 +379,7 @@ wxIcon wxGxToolExecute::GetSmallImage(void)
 
 void wxGxToolExecute::Detach(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
@@ -417,7 +418,7 @@ int wxGxToolExecute::OnExecute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel, IG
         IGxObject* pGxObject = static_cast<IGxObject*>(pGxTaskObject);
 		if(!AddChild(pGxObject))
 		{
-			wxDELETE(pGxTaskObject)
+			wxDELETE(pGxTaskObject);
 			return wxNOT_FOUND;
 		}
         else
@@ -438,7 +439,7 @@ void wxGxToolExecute::StartProcess(size_t nIndex)
 
     if(!m_pCatalog)
         return;
-    for(size_t i = 0; i < m_Children.size(); i++)
+    for(size_t i = 0; i < m_Children.size(); ++i)
     {
         wxGxTaskObject* pGxTaskObject = dynamic_cast<wxGxTaskObject*>(m_Children[i]);
         if(pGxTaskObject && pGxTaskObject->GetTaskID() == nIndex && m_pCatalog)
@@ -458,7 +459,7 @@ void wxGxToolExecute::OnFinish(IProcess* pProcess, bool bHasErrors)
     if(!m_pCatalog)
         return;
 
-    for(size_t i = 0; i < m_Children.size(); i++)
+    for(size_t i = 0; i < m_Children.size(); ++i)
     {
         wxGxTaskObject* pGxTaskObject = dynamic_cast<wxGxTaskObject*>(m_Children[i]);
         if(pGxTaskObject && pGxTaskObject->GetTaskID() == nIndex && m_pCatalog)
@@ -486,7 +487,7 @@ wxGxTool::wxGxTool(wxGxRootToolbox* pRootToolbox, wxXmlNode* pDataNode, wxIcon L
     m_pDataNode = pDataNode;
     m_pRootToolbox = pRootToolbox;
     if(m_pDataNode && m_pRootToolbox)
-        m_sInternalName = m_pDataNode->GetPropVal(wxT("name"), NONAME);
+        m_sInternalName = m_pDataNode->GetAttribute(wxT("name"), NONAME);
 
     m_LargeToolIcon = LargeToolIcon;
     m_SmallToolIcon = SmallToolIcon;

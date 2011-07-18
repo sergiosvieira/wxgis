@@ -141,7 +141,7 @@ void wxGxTaskExecDlg::OnExpand(wxCommandEvent & event)
 void wxGxTaskExecDlg::FillHtmlWindow()
 {
     wxString sText(wxT("<html><body>"));
-    for(size_t i = 0 ; i < m_MessageArray.size(); i++)
+    for(size_t i = 0 ; i < m_MessageArray.size(); ++i)
     {
         switch(m_MessageArray[i].nType)
         {
@@ -432,7 +432,7 @@ void wxGxTaskObject::ShowProcess(wxWindow* pParentWnd)
     m_pTaskExecDlg = new wxGxTaskObjectExecDlg(this, pParentWnd, wxID_ANY, m_sName);
     m_pTaskExecDlg->SetIcon(m_SmallToolIcon);
     SetValue(m_nDonePercent);
-    for(size_t i = 0; i < m_MessageArray.size(); i++)
+    for(size_t i = 0; i < m_MessageArray.size(); ++i)
         m_pTaskExecDlg->PutMessage(m_MessageArray[i].sMessage, i, m_MessageArray[i].nType);
     m_pTaskExecDlg->ShowModal();
     wxDELETE(m_pTaskExecDlg);

@@ -112,9 +112,9 @@ void wxGxFeatureDatasetUI::EditProperties(wxWindow *parent)
     PropertySheetDialog.ShowModal();
 }
 
-wxGISDatasetSPtr wxGxFeatureDatasetUI::GetDataset(void)
+wxGISDatasetSPtr wxGxFeatureDatasetUI::GetDataset(ITrackCancel* pTrackCancel)
 {
-    wxGISDatasetSPtr pOut = wxGxFeatureDataset::GetDataset();
+    wxGISDatasetSPtr pOut = wxGxFeatureDataset::GetDataset(pTrackCancel);
     if(!pOut)
     {
         const char* err = CPLGetLastErrorMsg();
@@ -187,9 +187,9 @@ bool wxGxRasterDatasetUI::Invoke(wxWindow* pParentWnd)
 }
 
 
-wxGISDatasetSPtr wxGxRasterDatasetUI::GetDataset(void)
+wxGISDatasetSPtr wxGxRasterDatasetUI::GetDataset(ITrackCancel* pTrackCancel)
 {
-    wxGISDatasetSPtr pOut = wxGxRasterDataset::GetDataset();
+    wxGISDatasetSPtr pOut = wxGxRasterDataset::GetDataset(pTrackCancel);
     if(!pOut)
     {
         const char* err = CPLGetLastErrorMsg();

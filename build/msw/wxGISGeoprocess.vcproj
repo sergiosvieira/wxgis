@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxbase28ud_xml.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISCored.lib wxGISDatasourced.lib wxGISCatalogd.lib wxGISGeoprocessingd.lib"
+				AdditionalDependencies="wxbase29ud.lib wxbase29ud_net.lib wxbase29ud_xml.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISCored.lib wxGISDatasourced.lib wxGISCatalogd.lib wxGISGeoprocessingd.lib"
 				AdditionalLibraryDirectories="..\..\lib;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(WXGISGDAL)\lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"

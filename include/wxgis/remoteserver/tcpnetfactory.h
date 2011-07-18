@@ -59,8 +59,8 @@ public:
 	virtual bool IsServerSearching(){return false;};
 	virtual void SetCallback(INetSearchCallback* pCallback){m_pCallback = pCallback;};
 	virtual INetSearchCallback* GetCallback(void){return m_pCallback;};
-	virtual wxXmlNode* GetProperties(void);
-	virtual void SetProperties(const wxXmlNode* pProp);
+	virtual wxXmlNode* GetAttributes(void);
+	virtual void SetAttributes(const wxXmlNode* pProp);
 	INetClientConnection* GetConnection(wxXmlNode* pProp);
 	//virtual char GetID(void){return m_nID;};
 	//virtual void SetID(char nID){m_nID = nID;};
@@ -93,8 +93,8 @@ public:
 	//virtual WXGISMSG GetInMessage(void) = 0;
     virtual void PutInMessage(WXGISMSG msg);
 	//INetClientConnection
-	virtual wxXmlNode* GetProperties(void);
-	virtual bool SetProperties(const wxXmlNode* pProp);
+	virtual wxXmlNode* GetAttributes(void);
+	virtual bool SetAttributes(const wxXmlNode* pProp);
 	virtual void SetCallback(INetCallback* pNetCallback){m_pCallBack = pNetCallback;};
     virtual wxString GetUser(void){return m_sUserName;};
     virtual wxString GetCryptPasswd(void){return m_sCryptPass;};

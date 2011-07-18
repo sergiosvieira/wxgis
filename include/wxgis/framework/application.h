@@ -35,11 +35,9 @@
 #include "wx/intl.h"
 
 
-WXDLLIMPEXP_GIS_FRW IApplication* GetApplication();//{return m_pGlobalApp;};
-
 class WXDLLIMPEXP_GIS_FRW wxGISApplication :
 	public wxFrame,
-	public IApplication
+	public IFrameApplication
 {
     DECLARE_CLASS(wxGISApplication)
 public:
@@ -52,7 +50,7 @@ public:
 	virtual COMMANDARRAY* GetCommands(void);
 	virtual wxGISMenuBar* GetMenuBar(void);
 	virtual wxGISAcceleratorTable* GetGISAcceleratorTable(void);
-//IApplication
+//IFrameApplication
 	virtual ICommand* GetCommand(long CmdID);
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
 	virtual IStatusBar* GetStatusBar(void);

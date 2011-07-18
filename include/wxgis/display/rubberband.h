@@ -28,7 +28,7 @@ class WXDLLIMPEXP_GIS_DSP wxGISRubberBand :
 	public wxEvtHandler
 {
 public:
-	wxGISRubberBand(wxPen &oPen, wxWindow *pWnd, wxGISDisplayEx *pDisp);
+	wxGISRubberBand(wxPen &oPen, wxWindow *pWnd, wxGISDisplay *pDisp);
 	virtual ~wxGISRubberBand(void);
 	virtual OGREnvelope TrackNew(wxCoord x, wxCoord y);
 	virtual void OnUnlock(void);
@@ -49,7 +49,7 @@ protected:
 	wxCoord m_StartXScr;
 	wxCoord m_StartYScr;
 	wxWindow *m_pWnd;
-	wxGISDisplayEx *m_pDisp;
+	wxGISDisplay *m_pDisp;
 	wxPen m_oPen;
 
     wxRect m_PrevRect;
@@ -65,7 +65,7 @@ class WXDLLIMPEXP_GIS_DSP wxGISRubberEnvelope :
 	public wxGISRubberBand
 {
 public:
-	wxGISRubberEnvelope(wxPen &oPen, wxWindow *pWnd, wxGISDisplayEx *pDisp);
+	wxGISRubberEnvelope(wxPen &oPen, wxWindow *pWnd, wxGISDisplay *pDisp);
 	virtual ~wxGISRubberEnvelope(void);
 	virtual void OnMouseMove(wxMouseEvent& event);
 	virtual void OnMouseUp(wxMouseEvent& event);

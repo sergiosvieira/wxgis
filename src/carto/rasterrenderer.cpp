@@ -69,7 +69,7 @@ void wxGISRasterRGBRenderer::Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDraw
     }
     else
     {
-        for(size_t i = 0; i < EnvCount; i++)
+        for(size_t i = 0; i < EnvCount; ++i)
         {
             wxRect Rect = pInvalidrectArray->operator[](i);   
             Rect.Inflate(1,1);
@@ -89,7 +89,7 @@ void wxGISRasterRGBRenderer::Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDraw
 		RasterEnvelope = *pRasterExtent;
 	}
 
-    for(size_t i = 0; i < EnvCount; i++)
+    for(size_t i = 0; i < EnvCount; ++i)
     {
 	    //1. get envelope
 	    OGREnvelope VisibleBounds = Envs[i];//pDisplayTransformation->GetVisibleBounds();
@@ -462,7 +462,7 @@ wxImage wxGISRasterRGBRenderer::Scale(unsigned char* pData, int nOrigX, int nOri
     std::vector<wxRasterDrawThread*> threadarray;
     int nPartSize = nDestY / CPUCount;
     int nBegY(0), nEndY;
-    for(int i = 0; i < CPUCount; i++)
+    for(int i = 0; i < CPUCount; ++i)
     {        
         if(i == CPUCount - 1)
             nEndY = nDestY;
@@ -477,7 +477,7 @@ wxImage wxGISRasterRGBRenderer::Scale(unsigned char* pData, int nOrigX, int nOri
         nBegY = nEndY;
     }
 
-    for(size_t i = 0; i < threadarray.size(); i++)
+    for(size_t i = 0; i < threadarray.size(); ++i)
     {
         wgDELETE(threadarray[i], Wait());
     }

@@ -27,6 +27,7 @@
 wxGISMap::wxGISMap(void)
 {
 	m_sMapName = wxString(_("new map"));
+	m_bFullExtIsInit = false;
 }
 
 wxGISMap::~wxGISMap(void)
@@ -67,7 +68,15 @@ bool wxGISMap::AddLayer(wxGISLayerSPtr pLayer)
 	OGREnvelope Env = pLayer->GetEnvelope();
 	if(!Env.IsInit())
 		return false;
-    m_FullExtent.Merge(Env);
+
+	if(m_bFullExtIsInit)
+		m_FullExtent.Merge(Env);
+	else
+	{
+		m_FullExtent = Env;
+		m_bFullExtIsInit = true;
+	}
+
 	m_paLayers.push_back(pLayer);
 	return true;
 }
@@ -80,6 +89,7 @@ void wxGISMap::Clear(void)
 	m_FullExtent.MinX = ENVMIN_X;
 	m_FullExtent.MaxY = ENVMAX_Y;
 	m_FullExtent.MinY = ENVMIN_Y;
+	m_bFullExtIsInit = false;
 }
 
 OGREnvelope wxGISMap::GetFullExtent(void)
@@ -87,14 +97,6 @@ OGREnvelope wxGISMap::GetFullExtent(void)
 	OGREnvelope OutputEnv = m_FullExtent;
     //increase 10%
 	IncreaseEnvelope(&OutputEnv, 0.1);
-
-    //double fDeltaX = (m_FullExtent.MaxX - m_FullExtent.MinX) / 20;
-    //double fDeltaY = (m_FullExtent.MaxY - m_FullExtent.MinY) / 20;
-    //double fDelta = std::max(fDeltaX, fDeltaY);
-    //OutputEnv.MaxX = m_FullExtent.MaxX + fDelta;
-    //OutputEnv.MinX = m_FullExtent.MinX - fDelta;
-    //OutputEnv.MaxY = m_FullExtent.MaxY + fDelta;
-    //OutputEnv.MinY = m_FullExtent.MinY - fDelta;
 	return OutputEnv;
 }
 
@@ -104,7 +106,7 @@ void wxGISMap::SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference)
 		return;
 	if(m_pSpatialReference && m_pSpatialReference->IsSame(pSpatialReference.get()))
 		return;
-	for(size_t i = 0; i < m_paLayers.size(); i++)
+	for(size_t i = 0; i < m_paLayers.size(); ++i)
 		m_paLayers[i]->SetSpatialReference(pSpatialReference);
 	m_pSpatialReference = pSpatialReference;
 }

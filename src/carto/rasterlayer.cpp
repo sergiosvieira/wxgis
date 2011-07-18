@@ -30,6 +30,8 @@ wxGISRasterLayer::wxGISRasterLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer(
 		//m_pwxGISRasterDataset->Reference();
 		//check number of bands
 		m_pRasterRenderer = new wxGISRasterRGBRenderer();
+
+		SetName(m_pwxGISRasterDataset->GetName());
 	}
 }
 

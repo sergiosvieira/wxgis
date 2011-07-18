@@ -276,7 +276,7 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			{
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
 					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
 					IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
@@ -347,7 +347,7 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
                 size_t nCounter(0);
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
 					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
@@ -585,7 +585,7 @@ void wxGISCatalogMainCmd::OnClick(void)
                     {
                         pNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("catalog")));
                         if(pNode)
-                            bAskToDelete = wxAtoi(pNode->GetPropVal(wxT("ask_delete"), wxT("1")));
+                            bAskToDelete = wxAtoi(pNode->GetAttribute(wxT("ask_delete"), wxT("1"))) == 1;
                         else
                             pNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog")), true);
                     }
@@ -606,12 +606,12 @@ void wxGISCatalogMainCmd::OnClick(void)
 
                     if(!dlg.GetShowInFuture())
                     {
-                        pNode->DeleteProperty(wxT("ask_delete"));
-                        pNode->AddProperty(wxT("ask_delete"), wxT("0"));
+                        pNode->DeleteAttribute(wxT("ask_delete"));
+                        pNode->AddAttribute(wxT("ask_delete"), wxT("0"));
                     }
                 }
 
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
 					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
@@ -653,7 +653,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 			{
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
 					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     pGxObject->Refresh();
@@ -688,7 +688,7 @@ void wxGISCatalogMainCmd::OnClick(void)
                 pComp->Add(new wxTextDataObject(wxT("COPY")));
                 //! Create simple file data object
                 wxFileDataObject* fdo = new wxFileDataObject();
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
 					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
@@ -727,7 +727,7 @@ void wxGISCatalogMainCmd::OnClick(void)
                 pComp->Add(new wxTextDataObject(wxT("MOVE")));
                 //! Create simple file data object
                 wxFileDataObject* fdo = new wxFileDataObject();
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
 					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
@@ -839,7 +839,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 	}
 }
 
-bool wxGISCatalogMainCmd::OnCreate(IApplication* pApp)
+bool wxGISCatalogMainCmd::OnCreate(IFrameApplication* pApp)
 {
 	m_pApp = pApp;
 	return true;
@@ -972,7 +972,7 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
 
                 wxMenu* pMenu = new wxMenu();
 
-                for(size_t i = nPos > 7 ? nPos - 7 : 0; i < nPos; i++)
+                for(size_t i = nPos > 7 ? nPos - 7 : 0; i < nPos; ++i)
                 {
 					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetDoID(i));//pSel->GetSelectedObjectID(
                     if(pGxObject)
@@ -1003,7 +1003,7 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
 
                 wxMenu* pMenu = new wxMenu();
 
-                for(size_t i = nPos + 1; i < pSel->GetDoSize(); i++)
+                for(size_t i = nPos + 1; i < pSel->GetDoSize(); ++i)
                 {
                     if(i > nPos + 7)
                         break;
@@ -1061,7 +1061,7 @@ void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
     //                    return;
     //                if(pArr->size() < 0)
     //                     return;
-				////	for(size_t i = 0; i < pArr->size(); i++)
+				////	for(size_t i = 0; i < pArr->size(); ++i)
 				////	{
 				////		wxGxPrjFile* pGxPrjFile = dynamic_cast<wxGxPrjFile*>(pArr->at(i));
 				////		if(!pGxPrjFile)
@@ -1170,7 +1170,7 @@ void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
 				//	WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
 				//	if(pWinArr)
 				//	{
-				//		for(size_t i = 0; i < pWinArr->size(); i++)
+				//		for(size_t i = 0; i < pWinArr->size(); ++i)
 				//		{
 				//			pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
 				//			if(pMapView)
@@ -1211,7 +1211,7 @@ void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
 
     //    //            wxString sDirPath;
 
-    //    //            for(size_t i = 2213; i < 2214; i++)
+    //    //            for(size_t i = 2213; i < 2214; ++i)
     //    //            {
     //    //                OGRSpatialReference SpaRef;
     //    //                OGRErr err = SpaRef.importFromEPSG(i);

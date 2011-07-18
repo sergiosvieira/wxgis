@@ -48,7 +48,7 @@ bool wxGxToolboxView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos
     return wxAuiNotebook::Create(parent, id, pos, size, wxAUI_NB_BOTTOM | wxNO_BORDER | wxAUI_NB_TAB_MOVE);
 }
 
-bool wxGxToolboxView::Activate(IApplication* application, wxXmlNode* pConf)
+bool wxGxToolboxView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 {
 	if(!wxGxView::Activate(application, pConf))
 		return false;
@@ -157,7 +157,7 @@ wxGxToolboxTreeView::~wxGxToolboxTreeView(void)
 {
 }
 
-bool wxGxToolboxTreeView::Activate(IApplication* application, wxXmlNode* pConf)
+bool wxGxToolboxTreeView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 {
 	if(!wxGxView::Activate(application, pConf))
 		return false;
@@ -171,12 +171,12 @@ bool wxGxToolboxTreeView::Activate(IApplication* application, wxXmlNode* pConf)
     IGxObject* pGxToolboxes = m_pCatalog->SearchChild(wxString(_("Toolboxes")));
     AddRoot(dynamic_cast<IGxObject*>(pGxToolboxes));
 
-	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pGxApplication->GetCatalog() );
+	m_pConnectionPointCatalog = dynamic_cast<wxGISConnectionPointContainer*>( m_pGxApplication->GetCatalog() );
 	if(m_pConnectionPointCatalog != NULL)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
 	m_pSelection = m_pCatalog->GetSelection();
-	//m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( m_pSelection );
+	//m_pConnectionPointSelection = dynamic_cast<wxGISConnectionPointContainer*>( m_pSelection );
 	//if(m_pConnectionPointSelection != NULL)
 	//	m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
 

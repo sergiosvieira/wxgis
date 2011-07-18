@@ -241,7 +241,7 @@ void wxGISRemoteCmd::OnClick(void)
 	}
 }
 
-bool wxGISRemoteCmd::OnCreate(IApplication* pApp)
+bool wxGISRemoteCmd::OnCreate(IFrameApplication* pApp)
 {
 	m_pApp = pApp;
 	return true;

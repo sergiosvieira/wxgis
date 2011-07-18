@@ -79,7 +79,7 @@ protected:
 class WXDLLIMPEXP_GIS_CLU wxGxContainerDialog : 
     public wxDialog,
     public IGxApplication,
-    public IApplication
+    public IFrameApplication
 {
 enum
 {
@@ -91,7 +91,7 @@ public:
 
 //IGxApplication
     virtual IGxCatalog* const GetCatalog(void){return static_cast<IGxCatalog*>(m_pCatalog);};
-//IApplication
+//IFrameApplication
     virtual ICommand* GetCommand(long CmdID){return NULL;};
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType){return NULL;};
     virtual wxString GetAppName(void){return wxString(CONTDLG_NAME);};

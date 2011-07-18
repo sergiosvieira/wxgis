@@ -348,7 +348,7 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
 		m_psExtent->MaxY = -1000000000;
 		m_psExtent->MinX = 1000000000;
 		m_psExtent->MinY = 1000000000;
-		for(int i = 0; i < 4; i++)
+		for(int i = 0; i < 4; ++i)
 		{
 			double rX, rY;
 			GDALApplyGeoTransform( adfGeoTransform, inX[i], inY[i], &rX, &rY );

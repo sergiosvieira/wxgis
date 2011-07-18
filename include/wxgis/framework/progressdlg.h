@@ -35,10 +35,10 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISProgressDlg
-///////////////////////////////////////////////////////////////////////////////
 
+/** \class wxGISProgressDlg progressdlg.h
+    \brief The dialog showing progress and some buttons.
+*/
 class WXDLLIMPEXP_GIS_FRW wxGISProgressDlg : public wxDialog 
 {
 private:

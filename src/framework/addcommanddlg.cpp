@@ -48,7 +48,7 @@ wxGISAddCommandDlg::wxGISAddCommandDlg( wxGISApplication* pGxApp, wxWindow* pare
 	COMMANDARRAY* pArr = m_pGxApp->GetCommands();
 	if(pArr)
 	{
-		for(size_t i = 0; i < pArr->size(); i++)
+		for(size_t i = 0; i < pArr->size(); ++i)
 		{
 			wxString sCat = pArr->at(i)->GetCategory();
 			if(m_CategoryMap[sCat] == NULL)
@@ -112,7 +112,7 @@ void wxGISAddCommandDlg::OnListboxSelect(wxCommandEvent& event)
 	{
 		m_ListCtrl->DeleteAllItems();
 		m_ImageList.RemoveAll();
-		for(size_t i = 0; i < pArr->size(); i++)
+		for(size_t i = 0; i < pArr->size(); ++i)
 		{
 			wxString sName = wxStripMenuCodes(pArr->at(i)->GetCaption());
 			wxString sMessage = pArr->at(i)->GetMessage();

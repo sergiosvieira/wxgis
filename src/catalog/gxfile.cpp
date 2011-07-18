@@ -147,7 +147,7 @@ OGRSpatialReferenceSPtr wxGxPrjFile::GetSpatialReference(void)
             {
                 char *pszWKT, *pszWKT2;
                 pszWKT = CPLStrdup(papszLines[0]);
-                for(int i = 1; papszLines[i] != NULL; i++ )
+                for(int i = 1; papszLines[i] != NULL; ++i )
                 {
                     int npapszLinesSize = CPLStrnlen(papszLines[i], 1000);
                     int npszWKTSize = CPLStrnlen(pszWKT, 8000);

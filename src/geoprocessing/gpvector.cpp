@@ -84,7 +84,7 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
         CPLErrorReset();
         wxString sACText;
 
-        for(size_t i = 0; i < pFeatureDefn->GetFieldCount(); i++)
+        for(size_t i = 0; i < pFeatureDefn->GetFieldCount(); ++i)
         {
             OGRFieldDefn *pFieldDefn = pFeatureDefn->GetFieldDefn(i);
             if(pFieldDefn)
@@ -568,7 +568,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         //CPLErrorReset();
         //wxString sACText;
 
-        //for(size_t i = 0; i < pFeatureDefn->GetFieldCount(); i++)
+        //for(size_t i = 0; i < pFeatureDefn->GetFieldCount(); ++i)
         //{
         //    OGRFieldDefn *pFieldDefn = pFeatureDefn->GetFieldDefn(i);
         //    if(pFieldDefn)
@@ -749,7 +749,7 @@ OGRGeometry* Intersection(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn, OGREnvelo
         {
         	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pFeatureGeom;
             OGRGeometryCollection* pNewOGRGeometryCollection = new OGRMultiPoint();
-            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); ++i)
             {
                 OGRGeometry* pGeom = (OGRGeometry*)pOGRGeometryCollection->getGeometryRef(i);
                 pGeom->assignSpatialReference(pFeatureGeom->getSpatialReference());
@@ -770,7 +770,7 @@ OGRGeometry* Intersection(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn, OGREnvelo
         {
         	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pFeatureGeom;
             OGRGeometryCollection* pNewOGRGeometryCollection = new OGRMultiLineString();
-            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); ++i)
             {
                 OGRGeometry* pGeom = (OGRGeometry*)pOGRGeometryCollection->getGeometryRef(i);
                 pGeom->assignSpatialReference(pFeatureGeom->getSpatialReference());
@@ -791,7 +791,7 @@ OGRGeometry* Intersection(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn, OGREnvelo
         {
         	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pFeatureGeom;
             OGRGeometryCollection* pNewOGRGeometryCollection = new OGRMultiPolygon();
-            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); ++i)
             {
                 OGRGeometry* pGeom = (OGRGeometry*)pOGRGeometryCollection->getGeometryRef(i);
                 pGeom->assignSpatialReference(pFeatureGeom->getSpatialReference());
@@ -812,7 +812,7 @@ OGRGeometry* Intersection(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn, OGREnvelo
         {
         	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pFeatureGeom;
             OGRGeometryCollection* pNewOGRGeometryCollection = new OGRGeometryCollection();
-            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); ++i)
             {
                 OGRGeometry* pGeom = (OGRGeometry*)pOGRGeometryCollection->getGeometryRef(i);
                 pGeom->assignSpatialReference(pFeatureGeom->getSpatialReference());
@@ -944,7 +944,7 @@ bool GeometryVerticesToPoints(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wx
 			if(pTrackCancel)
 				pTrackCancel->PutMessage(wxString::Format(_("Geometry No. %d added"), nCounter), -1, enumGISMessageInfo);
 		}
-		wxDELETE(pGeom)
+		wxDELETE(pGeom);
 	}
 
     if(poCT)
@@ -975,7 +975,7 @@ bool GeometryVerticesToPointsDataset(long nGeomFID, OGRGeometry* pGeom, wxGISFea
 			OGRPoint* pPrevPt(NULL);
 			double dDist(0);
 
-			for(size_t i = 0; i < nCount; i++)
+			for(size_t i = 0; i < nCount; ++i)
 			{
 				OGRPoint Point;
 				pLineString->getPoint(i, &Point);

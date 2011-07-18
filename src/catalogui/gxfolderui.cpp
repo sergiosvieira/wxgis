@@ -49,7 +49,7 @@ void wxGxFolderUI::EditProperties(wxWindow *parent)
 
 void wxGxFolderUI::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		wxDELETE( m_Children[i] );

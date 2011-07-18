@@ -60,7 +60,7 @@ wxIcon wxGxDiscConnectionsUI::GetSmallImage(void)
 void wxGxDiscConnectionsUI::EmptyChildren(void)
 {
     m_aConnections.clear();
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
         wxGxDiscConnectionUI* pwxGxDiscConnection = dynamic_cast<wxGxDiscConnectionUI*>(m_Children[i]);
         if(pwxGxDiscConnection)
@@ -80,7 +80,7 @@ void wxGxDiscConnectionsUI::LoadChildren(void)
 	if(m_bIsChildrenLoaded)
 		return;	
 
-    for(size_t i = 0; i < m_aConnections.size(); i++)
+    for(size_t i = 0; i < m_aConnections.size(); ++i)
     {
         wxGxDiscConnectionUI* pwxGxDiscConnection = new wxGxDiscConnectionUI(m_aConnections[i].sPath, m_aConnections[i].sName, m_Conn16, m_Conn48, m_ConnDsbld16, m_ConnDsbld48);
         IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
@@ -95,7 +95,7 @@ IGxObject* wxGxDiscConnectionsUI::ConnectFolder(wxString sPath)
 {
     IGxObject* pReturnObj(NULL);
 
-    for(size_t i = 0; i < m_Children.size(); i++)
+    for(size_t i = 0; i < m_Children.size(); ++i)
     {
         wxGxDiscConnectionUI* pConn = dynamic_cast<wxGxDiscConnectionUI*>(m_Children[i]);
         if(pConn)

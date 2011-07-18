@@ -59,7 +59,7 @@ void wxGISNetMessageProcessor::ProcessMessage(WXGISMSG msg)
 	    if(!pChild)
 	        sMessage = pRoot->GetNodeContent();
 		else
-			sMessage = pChild->GetPropVal(wxT("text"), wxT(""));
+			sMessage = pChild->GetAttribute(wxT("text"), wxT(""));
         //log contents and exit
 
         if(msg.pMsg->GetState() == enumGISMsgStNote)
@@ -70,7 +70,7 @@ void wxGISNetMessageProcessor::ProcessMessage(WXGISMSG msg)
 
     wxCriticalSectionLocker locker(m_CriticalSectionRcv);
 	//TODO: check for * and look for dst in children
-	for(size_t i = 0; i < m_MessageReceiverArray.size(); i++)
+	for(size_t i = 0; i < m_MessageReceiverArray.size(); ++i)
 	{
 		if(sDst.CmpNoCase(m_MessageReceiverArray[i].first) == 0)
 			m_MessageReceiverArray[i].second->ProcessMessage(msg, pChild);
@@ -98,7 +98,7 @@ void wxGISNetMessageProcessor::AddMessageReceiver(wxString sName, INetMessageRec
 void wxGISNetMessageProcessor::DelMessageReceiver(wxString sName, INetMessageReceiver* pNetMessageReceiver)
 {
     wxCriticalSectionLocker locker(m_CriticalSectionRcv);
-	for(size_t i = 0; i < m_MessageReceiverArray.size(); i++)
+	for(size_t i = 0; i < m_MessageReceiverArray.size(); ++i)
 	{
 		if(sName.CmpNoCase(m_MessageReceiverArray[i].first) == 0 && m_MessageReceiverArray[i].second == pNetMessageReceiver)
 		{

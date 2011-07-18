@@ -21,7 +21,7 @@
 
 #include "wxgis/mapui/mxmapview.h"
 
-BEGIN_EVENT_TABLE(wxMxMapView, wxGISMapViewEx)
+BEGIN_EVENT_TABLE(wxMxMapView, wxGISMapView)
 	EVT_LEFT_DOWN(wxMxMapView::OnMouseDown)
 	EVT_MIDDLE_DOWN(wxMxMapView::OnMouseDown)
 	EVT_RIGHT_DOWN(wxMxMapView::OnMouseDown)
@@ -34,14 +34,14 @@ BEGIN_EVENT_TABLE(wxMxMapView, wxGISMapViewEx)
 	EVT_MOTION(wxMxMapView::OnMouseMove)
 END_EVENT_TABLE()
 
-IMPLEMENT_DYNAMIC_CLASS(wxMxMapView, wxGISMapViewEx)
+IMPLEMENT_DYNAMIC_CLASS(wxMxMapView, wxGISMapView)
 
 wxMxMapView::wxMxMapView(void)
 {
 	m_pTrackCancel = NULL;
 }
 
-wxMxMapView::wxMxMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxGISMapViewEx(parent, id, pos, size), m_pStatusBar(NULL)
+wxMxMapView::wxMxMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxGISMapView(parent, id, pos, size), m_pStatusBar(NULL)
 {
 	m_pTrackCancel = NULL;
 }
@@ -53,10 +53,10 @@ wxMxMapView::~wxMxMapView(void)
 bool wxMxMapView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     m_pStatusBar = NULL;
-    return wxGISMapViewEx::Create(parent, id, pos, size, style, name);
+    return wxGISMapView::Create(parent, id, pos, size, style, name);
 }
 
-bool wxMxMapView::Activate(IApplication* application, wxXmlNode* pConf)
+bool wxMxMapView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 {
 	//Serialize(m_pXmlConf, false);
 

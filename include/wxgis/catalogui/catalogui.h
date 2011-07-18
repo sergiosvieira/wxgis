@@ -105,13 +105,6 @@ public:
     virtual wxSelLongArray GetDoArray(void) = 0;
 };
 
-class IGxSelectionEvents
-{
-public:
-	virtual ~IGxSelectionEvents(void){};
-	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator) = 0;
-};
-
 class IGxView : public IView
 {
 public:

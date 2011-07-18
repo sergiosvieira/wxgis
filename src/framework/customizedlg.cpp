@@ -122,7 +122,7 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGISApplicationEx* pApp, wxWindow* parent,
 
 	wxGISMenuBar* pwxGISMenuBar = m_pApp->GetMenuBar();
 	COMMANDBARARRAY* pMenuBarArray = pwxGISMenuBar->GetMenuBarArray();
-	for(size_t i = 0; i < pMenuBarArray->size(); i++)
+	for(size_t i = 0; i < pMenuBarArray->size(); ++i)
 	{
 		IGISCommandBar* pBar = pMenuBarArray->at(i);
 		wxString sCaption = pBar->GetCaption();
@@ -133,7 +133,7 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGISApplicationEx* pApp, wxWindow* parent,
 	}
 
 	COMMANDBARARRAY* pMenuArray = m_pApp->GetCommandBars();
-	for(size_t i = 0; i < pMenuArray->size(); i++)
+	for(size_t i = 0; i < pMenuArray->size(); ++i)
 	{
 		IGISCommandBar* pBar = pMenuArray->at(i);
 		if(pBar->GetType() == enumGISCBContextmenu)
@@ -195,7 +195,7 @@ void wxGISToolBarPanel::LoadCommands(void)
 			return;
 		IGISCommandBar* pBar = pData->m_pBar;
 
-		for(size_t i = 0; i < pBar->GetCommandCount(); i++)
+		for(size_t i = 0; i < pBar->GetCommandCount(); ++i)
 		{
 			ICommand* pCommand = pBar->GetCommand(i);
 			wxString sName = wxStripMenuCodes(pCommand->GetCaption());
@@ -250,7 +250,7 @@ void wxGISToolBarPanel::SetKeyCode(int pos)
         }
 		if(cmd != wxID_ANY)
 		{
-			for(size_t i = 0; i < m_buttonslist->GetItemCount(); i++)
+			for(size_t i = 0; i < m_buttonslist->GetItemCount(); ++i)
 			{
 				long CahgedCmdID = m_buttonslist->GetItemData(i);
 				if(CahgedCmdID == cmd)
@@ -478,7 +478,7 @@ void wxGISToolBarPanel::OnAddButton(wxCommandEvent& event)
 		IGISCommandBar* pBar = pData->m_pBar;
 		wxWindow* pWnd = dynamic_cast<wxWindow*>(pBar);
 
-		for(size_t i = 0; i < dlg.m_IDArray.size(); i++)
+		for(size_t i = 0; i < dlg.m_IDArray.size(); ++i)
 		{
 			pBar->AddCommand(m_pApp->GetCommand(dlg.m_IDArray[i]));
 			if(pWnd)
@@ -661,7 +661,7 @@ wxGISCommandPanel::wxGISCommandPanel( wxGISApplicationEx* pApp, wxWindow* parent
 	COMMANDARRAY* pArr = m_pApp->GetCommands();
 	if(pArr)
 	{
-		for(size_t i = 0; i < pArr->size(); i++)
+		for(size_t i = 0; i < pArr->size(); ++i)
 		{
 			wxString sCat = pArr->at(i)->GetCategory();
 			if(m_CategoryMap[sCat] == NULL)
@@ -724,7 +724,7 @@ void wxGISCommandPanel::OnListboxSelect(wxCommandEvent& event)
 	{
 		m_listCtrl3->DeleteAllItems();
 		m_ImageList.RemoveAll();
-		for(size_t i = 0; i < pArr->size(); i++)
+		for(size_t i = 0; i < pArr->size(); ++i)
 		{
 			wxString sName = wxStripMenuCodes(pArr->at(i)->GetCaption());
 			wxString sMessage = pArr->at(i)->GetMessage();
@@ -783,7 +783,7 @@ void wxGISCommandPanel::SetKeyCode(int pos)
         }
 		if(cmd != wxID_ANY)
 		{
-			for(size_t i = 0; i < m_listCtrl3->GetItemCount(); i++)
+			for(size_t i = 0; i < m_listCtrl3->GetItemCount(); ++i)
 			{
 				long CahgedCmdID = m_listCtrl3->GetItemData(i);
 				if(CahgedCmdID == cmd)

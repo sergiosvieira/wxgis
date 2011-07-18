@@ -30,7 +30,7 @@
 class WXDLLIMPEXP_GIS_CLT wxGxCatalog :
 	public IGxObjectContainer,
 	public IGxCatalog,
-	public IConnectionPointContainer
+	public wxGISConnectionPointContainer
 {
 public:
 	wxGxCatalog(void);
@@ -62,8 +62,6 @@ public:
 	virtual void RegisterObject(IGxObject* pObj);
 	virtual void UnRegisterObject(long nID);
 	virtual IGxObjectSPtr GetRegisterObject(long nID);
-	//IConnectionPointContainer
-	virtual long Advise(wxObject* pObject);
 	//wxGxCatalog
 	virtual void LoadChildren(wxXmlNode* const pNode);
 	virtual void EmptyChildren(void);

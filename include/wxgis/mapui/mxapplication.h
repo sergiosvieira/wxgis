@@ -38,7 +38,7 @@ class WXDLLIMPEXP_GIS_MAPU wxMxApplication :
 public:	
 	wxMxApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER);
 	virtual ~wxMxApplication(void);
-	//IApplication
+	//IFrameApplication
     virtual wxString GetAppName(void){return wxString(wxT("wxGISMap"));};
     virtual bool Create(IGISConfig* pConfig);
 	virtual wxIcon GetAppIcon(void){return m_pAppIcon;};

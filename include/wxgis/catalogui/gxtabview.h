@@ -21,6 +21,7 @@
 #pragma once
 #include "wxgis/catalogui/gxview.h"
 #include "wxgis/catalog/catalog.h"
+#include "wxgis/catalogui/gxeventui.h"
 
 #include <wx/aui/aui.h>
 #include <wx/artprov.h>
@@ -42,7 +43,6 @@
 //-------------------------------------------------------------------
 class wxGxTab : 
 	public wxPanel,
-	public IGxSelectionEvents,
     public IViewDropTarget
 {
     DECLARE_CLASS(wxGxTab)
@@ -62,15 +62,13 @@ public:
 	virtual bool Show(bool bShow);
 	//virtual wxWindow* GetWindowByName(wxString sName);
 	virtual void Deactivate(void);
-//IGxSelectionEvents
-	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 //IGxDropTarget
     virtual wxDragResult OnDragOver(wxCoord x, wxCoord y, wxDragResult def);
     virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames);
     virtual void OnLeave();
 //events
 	void OnChoice(wxCommandEvent& event);
-
+	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
 private:
 	std::vector<wxWindow*> m_pWindows;
 	wxString m_sName;
@@ -85,7 +83,7 @@ private:
 	wxWindow* m_pCurrentWnd;
 
 	IGxSelection* m_pSelection;
-    IApplication* m_pApp;
+    IFrameApplication* m_pApp;
 
 
 DECLARE_EVENT_TABLE()
@@ -97,31 +95,23 @@ DECLARE_EVENT_TABLE()
 
 class WXDLLIMPEXP_GIS_CLU wxGxTabView : 
 	public wxAuiNotebook,
-	public wxGxView,
-	public IGxSelectionEvents
+	public wxGxView
 {
     DECLARE_CLASS(wxGxTabView)
-
-    enum
-	{
-		ID_SELCHANGED = wxID_HIGHEST + 3000
-	};
 public:
 	wxGxTabView(wxWindow* parent, wxWindowID id = TABCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 	virtual ~wxGxTabView(void);
 	virtual wxWindow* GetCurrentWnd(void);
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id = TABCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("TabView"));
-	virtual bool Activate(IApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
-//IGxSelectionEvents
-	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
-//Events
+//events
 	void OnAUINotebookPageChanged(wxAuiNotebookEvent& event);
-    virtual void OnSelChanged(wxCommandEvent & event);
+	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
 protected:
 	std::vector<wxGxTab*> m_Tabs;
-	IConnectionPointContainer *m_pConnectionPointSelection;
+	wxGISConnectionPointContainer *m_pConnectionPointSelection;
 	long m_ConnectionPointSelectionCookie;
 	IGxSelection* m_pSelection;
 

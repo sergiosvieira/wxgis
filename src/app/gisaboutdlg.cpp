@@ -55,7 +55,7 @@ wxGISSimpleTextPanel::~wxGISSimpleTextPanel()
 
 wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-    IApplication* pApp = dynamic_cast<IApplication*>(parent);
+    IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(parent);
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 
     wxColour BackColor( 255, 255, 255 );

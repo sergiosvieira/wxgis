@@ -48,11 +48,11 @@ typedef struct _rgba{
 	It use some caches (memory rgba rasters) and output DC to draw.
 */
 
-class WXDLLIMPEXP_GIS_DSP wxGISDisplayEx
+class WXDLLIMPEXP_GIS_DSP wxGISDisplay
 {
 public:
-	wxGISDisplayEx(void);
-	virtual ~wxGISDisplayEx(void);
+	wxGISDisplay(void);
+	virtual ~wxGISDisplay(void);
 	//
 	virtual size_t AddCache(void);
 	virtual void Clear();
@@ -136,6 +136,7 @@ protected:
 	bool m_bZeroCacheSet;
 	double m_dPointRadius;
 	double m_dLineWidth;
+	double m_dFrameRatio;
 
 	//temp cairo for output double buffering
 	cairo_surface_t *m_surface_tmp;

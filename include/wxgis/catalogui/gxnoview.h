@@ -37,7 +37,7 @@ public:
     void OnSize(wxSizeEvent& WXUNUSED(evt));
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxNO_BORDER, const wxString& name = wxT("NoView"));
-	virtual bool Activate(IApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 private:
 	unsigned char R,G,B;

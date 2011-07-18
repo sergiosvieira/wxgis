@@ -116,7 +116,7 @@ bool wxGISTaskCmd::GetEnabled(void)
 			{
                 wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 				IGxSelection* pSel = pCatalog->GetSelection();
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
                     IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject.get());
@@ -133,7 +133,7 @@ bool wxGISTaskCmd::GetEnabled(void)
 			{
                 wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 				IGxSelection* pSel = pCatalog->GetSelection();
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
                     IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject.get());
@@ -150,7 +150,7 @@ bool wxGISTaskCmd::GetEnabled(void)
 			{
                 wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 				IGxSelection* pSel = pCatalog->GetSelection();
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {                                        
                     IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject.get());
@@ -167,7 +167,7 @@ bool wxGISTaskCmd::GetEnabled(void)
 			{
                 wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 				IGxSelection* pSel = pCatalog->GetSelection();
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
                     IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject.get());
@@ -223,7 +223,7 @@ void wxGISTaskCmd::OnClick(void)
 				{
 					wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 					IGxSelection* pSel = pCatalog->GetSelection();
-					for(size_t i = 0; i < pSel->GetCount(); i++)
+					for(size_t i = 0; i < pSel->GetCount(); ++i)
 					{
                         IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
 						wxGxTaskObject* pGxTask = dynamic_cast<wxGxTaskObject*>(pGxObject.get());
@@ -240,7 +240,7 @@ void wxGISTaskCmd::OnClick(void)
 				{
 					wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 					IGxSelection* pSel = pCatalog->GetSelection();
-					for(size_t i = 0; i < pSel->GetCount(); i++)
+					for(size_t i = 0; i < pSel->GetCount(); ++i)
 					{
                         IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
 						wxGxTaskObject* pGxTask = dynamic_cast<wxGxTaskObject*>(pGxObject.get());
@@ -257,7 +257,7 @@ void wxGISTaskCmd::OnClick(void)
 				{
 					wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 					IGxSelection* pSel = pCatalog->GetSelection();
-					for(size_t i = 0; i < pSel->GetCount(); i++)
+					for(size_t i = 0; i < pSel->GetCount(); ++i)
 					{
                         IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
 						wxGxTaskObject* pGxTask = dynamic_cast<wxGxTaskObject*>(pGxObject.get());
@@ -274,7 +274,7 @@ void wxGISTaskCmd::OnClick(void)
 				{
 					wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 					IGxSelection* pSel = pCatalog->GetSelection();
-					for(size_t i = 0; i < pSel->GetCount(); i++)
+					for(size_t i = 0; i < pSel->GetCount(); ++i)
 					{
                         IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
 						wxGxTaskObject* pGxTask = dynamic_cast<wxGxTaskObject*>(pGxObject.get());
@@ -289,7 +289,7 @@ void wxGISTaskCmd::OnClick(void)
 	}
 }
 
-bool wxGISTaskCmd::OnCreate(IApplication* pApp)
+bool wxGISTaskCmd::OnCreate(IFrameApplication* pApp)
 {
 	m_pApp = pApp;
 	return true;
