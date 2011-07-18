@@ -35,7 +35,7 @@ wxGISCreateNetworkConnDlg::wxGISCreateNetworkConnDlg( NETCONNFACTORYARRAY& apNet
 	
 	m_choicebook = new wxChoicebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT|wxCLIP_CHILDREN );
 	m_choicebook->SetMinSize( wxSize( 300,300 ) );
-	for(size_t i = 0; i < apNetConn.size(); i++)
+	for(size_t i = 0; i < apNetConn.size(); ++i)
 	{
 		wxString sName = apNetConn[i]->GetName();
 		INetConnFactoryUI* pConnFactUI = dynamic_cast<INetConnFactoryUI*>(apNetConn[i]);

@@ -20,7 +20,7 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/display/display.h"
-
+/*
 class WXDLLIMPEXP_GIS_DSP wxSimpleLineSymbol :
 	public ISymbol
 {
@@ -33,3 +33,4 @@ public:
 	//ISymbol
 	virtual void Draw(OGRGeometry* pGeometry, IDisplay* pwxGISDisplay);
 };
+*/

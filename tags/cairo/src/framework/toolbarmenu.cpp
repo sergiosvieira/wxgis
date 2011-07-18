@@ -38,14 +38,14 @@ void wxGISToolBarMenu::Update(void)
 {
 
 	//cleare contents
-	for(size_t i = 0; i < m_delitems.size(); i++)
+	for(size_t i = 0; i < m_delitems.size(); ++i)
 		Destroy(m_delitems[i]);
 	m_delitems.clear();
 
 
 	COMMANDBARARRAY* pCommandBars = m_pApp->GetCommandBars();
 
-	for(size_t i = 0; i < pCommandBars->size(); i++)
+	for(size_t i = 0; i < pCommandBars->size(); ++i)
 	{
 		IGISCommandBar* pCmdBar = pCommandBars->at(i);
 		if(pCmdBar->GetType() == enumGISCBToolbar)
@@ -111,7 +111,7 @@ void wxGISToolBarMenu::OnClick(void)
 {
 }
 
-bool wxGISToolBarMenu::OnCreate(IApplication* pApp)
+bool wxGISToolBarMenu::OnCreate(IFrameApplication* pApp)
 {
 	m_pApp = dynamic_cast<wxGISApplication*>(pApp);
 	return true;

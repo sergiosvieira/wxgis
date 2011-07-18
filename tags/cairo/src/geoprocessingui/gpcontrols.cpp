@@ -151,7 +151,7 @@ void wxGISTextCtrl::OnKillFocus(wxFocusEvent& event)
                     break;
                 }
             }
-            for(size_t i = 0; i < poDomain->GetCount(); i++)
+            for(size_t i = 0; i < poDomain->GetCount(); ++i)
             {
                 poFilter = poDomain->GetFilter(i);
                 if(poFilter)
@@ -277,7 +277,7 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
         dlg.SetName( Name.GetFullName() );
         if(pDomain)
         {
-            for(size_t i = 0; i < pDomain->GetCount(); i++)
+            for(size_t i = 0; i < pDomain->GetCount(); ++i)
             {
 				if(i == m_pParam->GetSelDomainValue())
                     dlg.AddFilter(pDomain->GetFilter(i), true);
@@ -305,7 +305,7 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
         dlg.SetName( Name.GetFullName() );
         if(pDomain)
         {
-            for(size_t i = 0; i < pDomain->GetCount(); i++)
+            for(size_t i = 0; i < pDomain->GetCount(); ++i)
             {
 				if(i == m_pParam->GetSelDomainValue())
                     dlg.AddFilter(pDomain->GetFilter(i), true);
@@ -404,7 +404,7 @@ void wxGISDTPath::Update(void)
 		if(!oName.IsOk())
 			return;
 
-		for(size_t i = 0; i < poDomain->GetCount(); i++)
+		for(size_t i = 0; i < poDomain->GetCount(); ++i)
 		{
 			poFilter = poDomain->GetFilter(i);
 			if(poFilter)
@@ -706,7 +706,7 @@ wxGISDTSpatRef::wxGISDTSpatRef( IGPParameter* pParam, IGxCatalog* pCatalog, wxWi
         sWKT = wxString(pszWKT, *wxConvCurrent);
         OGRFree( pszWKT );
     }
-    m_PathTextCtrl = new wxTextCtrl( this, wxID_ANY, sWKT, wxDefaultPosition, wxSize(100,100)/*wxDefaultSize*/, wxTE_READONLY | wxTE_MULTILINE | wxTE_AUTO_SCROLL );/// | wxTE_BESTWRAP | wxTE_NO_VSCROLL
+    m_PathTextCtrl = new wxTextCtrl( this, wxID_ANY, sWKT, wxDefaultPosition, wxSize(100,100)/*wxDefaultSize*/, wxTE_READONLY | wxTE_MULTILINE );/// | wxTE_BESTWRAP | wxTE_NO_VSCROLL
     //m_PathTextCtrl->SetDropTarget(new wxFileDropTarget());
 	bPathSizer->Add( m_PathTextCtrl, 1, wxALL|wxEXPAND, 5 );
 
@@ -807,7 +807,7 @@ void wxGISDTSpatRef::Update(void)
 ///////////////////////////////////////////////////////////////////////////////
 
 BEGIN_EVENT_TABLE(wxGISDTMultiParam, wxPanel)
-EVT_GRID_CELL_CHANGE(wxGISDTMultiParam::OnCellChange)
+	EVT_GRID_CELL_CHANGED(wxGISDTMultiParam::OnCellChange)
 END_EVENT_TABLE()
 
 wxGISDTMultiParam::wxGISDTMultiParam( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxGISDTBase( pParam, parent, id, pos, size, style )
@@ -1095,7 +1095,7 @@ void wxGISDTList::OnAdd(wxCommandEvent& event)
    //     dlg.SetName( Name.GetFullName() );
    //     if(pDomain)
    //     {
-   //         for(size_t i = 0; i < pDomain->GetCount(); i++)
+   //         for(size_t i = 0; i < pDomain->GetCount(); ++i)
    //         {
 			//	if(i == m_pParam->GetSelDomainValue())
    //                 dlg.AddFilter(pDomain->GetFilter(i), true);
@@ -1123,7 +1123,7 @@ void wxGISDTList::OnAdd(wxCommandEvent& event)
    //     dlg.SetName( Name.GetFullName() );
    //     if(pDomain)
    //     {
-   //         for(size_t i = 0; i < pDomain->GetCount(); i++)
+   //         for(size_t i = 0; i < pDomain->GetCount(); ++i)
    //         {
 			//	if(i == m_pParam->GetSelDomainValue())
    //                 dlg.AddFilter(pDomain->GetFilter(i), true);
@@ -1243,7 +1243,7 @@ void wxGISSQLQueryCtrl::OnOpen(wxCommandEvent& event)
    //     dlg.SetName( Name.GetFullName() );
    //     if(pDomain)
    //     {
-   //         for(size_t i = 0; i < pDomain->GetCount(); i++)
+   //         for(size_t i = 0; i < pDomain->GetCount(); ++i)
    //         {
 			//	if(i == m_pParam->GetSelDomainValue())
    //                 dlg.AddFilter(pDomain->GetFilter(i), true);
@@ -1271,7 +1271,7 @@ void wxGISSQLQueryCtrl::OnOpen(wxCommandEvent& event)
    //     dlg.SetName( Name.GetFullName() );
    //     if(pDomain)
    //     {
-   //         for(size_t i = 0; i < pDomain->GetCount(); i++)
+   //         for(size_t i = 0; i < pDomain->GetCount(); ++i)
    //         {
 			//	if(i == m_pParam->GetSelDomainValue())
    //                 dlg.AddFilter(pDomain->GetFilter(i), true);
@@ -1370,7 +1370,7 @@ void wxGISSQLQueryCtrl::Update(void)
 	//	if(!oName.IsOk())
 	//		return;
 
-	//	for(size_t i = 0; i < poDomain->GetCount(); i++)
+	//	for(size_t i = 0; i < poDomain->GetCount(); ++i)
 	//	{
 	//		poFilter = poDomain->GetFilter(i);
 	//		if(poFilter)

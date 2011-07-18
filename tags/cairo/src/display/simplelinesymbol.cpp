@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/display/simplelinesymbol.h"
 
+/*
 wxSimpleLineSymbol::wxSimpleLineSymbol(void)
 {
 	srand ( time(NULL) );
@@ -98,9 +99,10 @@ void wxSimpleLineSymbol::DrawPolyLine(OGRMultiLineString* pLine, IDisplay* pwxGI
         return;
 
     OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pLine;
-	for(int i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+	for(int i = 0; i < pOGRGeometryCollection->getNumGeometries(); ++i)
 	{
 		OGRLineString* pLineString = (OGRLineString*)pOGRGeometryCollection->getGeometryRef(i);
 		DrawLine(pLineString, pwxGISDisplay);
 	}
 }
+*/

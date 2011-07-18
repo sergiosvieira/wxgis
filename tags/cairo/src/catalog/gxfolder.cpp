@@ -50,7 +50,7 @@ void wxGxFolder::Refresh(void)
 
 void wxGxFolder::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		wxDELETE( m_Children[i] );
@@ -87,7 +87,7 @@ void wxGxFolder::LoadChildren(void)
 	GxObjectArray Array;	
 	if(m_pCatalog && m_pCatalog->GetChildren(m_sPath, papszFileList, Array))
 	{
-		for(size_t i = 0; i < Array.size(); i++)
+		for(size_t i = 0; i < Array.size(); ++i)
 		{
 			bool ret_code = AddChild(Array[i]);
 			if(!ret_code)

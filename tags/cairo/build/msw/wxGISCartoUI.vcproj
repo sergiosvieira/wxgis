@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxmsw28ud_html.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISDisplayd.lib wxGISCartod.lib wxGISDataSourced.lib cairo.lib"
+				AdditionalDependencies="wxbase29ud.lib wxbase29ud_net.lib wxmsw29ud_core.lib wxbase29ud_xml.lib wxmsw29ud_aui.lib wxmsw29ud_adv.lib wxmsw29ud_html.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISDisplayd.lib wxGISCartod.lib wxGISDataSourced.lib cairo.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="0"
 				AdditionalLibraryDirectories="&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib;&quot;$(CAIRO)\lib&quot;"
@@ -191,10 +191,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\cartoui\mapviewex.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\cartoui\rasterdatasetcmd.cpp"
 				>
 			</File>
@@ -222,10 +218,6 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\cartoui\mapview.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\wxgis\cartoui\mapviewex.h"
 				>
 			</File>
 			<File

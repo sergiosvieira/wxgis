@@ -50,7 +50,7 @@ public:
 	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
 	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
     //IGxDataset
-    virtual wxGISDatasetSPtr GetDataset(void);
+    virtual wxGISDatasetSPtr GetDataset(ITrackCancel* pTrackCancel = NULL);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISContainer;};
     virtual int GetSubType(void){return (int)m_type;};
 	//IGxObjectContainer
@@ -86,7 +86,7 @@ public:
     virtual CPLString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void);
 	//IGxDataset
-	virtual wxGISDatasetSPtr GetDataset(void);
+	virtual wxGISDatasetSPtr GetDataset(ITrackCancel* pTrackCancel = NULL);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
     virtual int GetSubType(void){return (int)m_type;};
 protected:

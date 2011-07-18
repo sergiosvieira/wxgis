@@ -39,7 +39,7 @@ public:
 	virtual ~wxGISQuadTreeItem(void)
 	{
 		if(m_bOwnGeometry) 
-			wxDELETE(m_pGeom)
+			wxDELETE(m_pGeom);
 	}
 	virtual void FillBounds(CPLRectObj* pBounds)
 	{

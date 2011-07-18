@@ -36,7 +36,7 @@
 */
 enum wxGISPluginIDs
 {
-	ID_PLUGINCMD = wxID_HIGHEST + 1,
+	ID_PLUGINCMD = wxID_HIGHEST + 2001,
 	ID_PLUGINCMDMAX = ID_PLUGINCMD + 255,
 	ID_TOOLBARCMD = ID_PLUGINCMDMAX + 1,
 	ID_TOOLBARCMDMAX = ID_TOOLBARCMD + 255,
@@ -156,7 +156,7 @@ protected:
 };
 
 class ICommand;
-class IApplication;
+class IFrameApplication;
 
 /** \class IGISCommandBar framework.h
     \brief A IGISCommandBar interface class.
@@ -183,7 +183,7 @@ public:
 	virtual void MoveCommandRight(size_t nIndex) = 0;
 	virtual size_t GetCommandCount(void) = 0;
 	virtual ICommand* GetCommand(size_t nIndex) = 0;
-	virtual void Serialize(IApplication* pApp, wxXmlNode* pNode, bool bStore = false) = 0;
+	virtual void Serialize(IFrameApplication* pApp, wxXmlNode* pNode, bool bStore = false) = 0;
 };
 
 /** \def vector<IGISCommandBar*> COMMANDBARARRAY
@@ -196,23 +196,21 @@ typedef std::vector<IGISCommandBar*> COMMANDBARARRAY;
 */
 typedef std::vector<wxWindow*> WINDOWARRAY;
 
-/** \class IApplication framework.h
-    \brief A IApplication interface class.
+/** \class IFrameApplication framework.h
+    \brief A IFrameApplication interface class.
 
-    This is base class for applicaton.    
+    This is base class for framed applicaton.    
 */
-class IApplication
+class IFrameApplication :
+	public IApplication
 {
 public:
-    /** \fn virtual ~IApplication(void)
+    /** \fn virtual ~IFrameApplication(void)
      *  \brief A destructor.
      */
-    virtual ~IApplication(void) {};
+    virtual ~IFrameApplication(void) {};
 	//pure virtual
-	virtual void OnAppAbout(void) = 0;
-    virtual void OnAppOptions(void) = 0;
 	virtual IStatusBar* GetStatusBar(void) = 0;
-	virtual IGISConfig* GetConfig(void) = 0;
 	virtual IGISCommandBar* GetCommandBar(wxString sName) = 0;
 	virtual void RemoveCommandBar(IGISCommandBar* pBar) = 0;
 	virtual bool AddCommandBar(IGISCommandBar* pBar) = 0;
@@ -228,13 +226,6 @@ public:
 	virtual const WINDOWARRAY* const GetChildWindows(void) = 0;
 	virtual void RegisterChildWindow(wxWindow* pWnd) = 0;
 	virtual void UnRegisterChildWindow(wxWindow* pWnd) = 0;
-	virtual wxString GetAppName(void) = 0;
-	virtual wxString GetAppVersionString(void) = 0;
-    virtual bool Create(IGISConfig* pConfig) = 0;
-    virtual bool SetupLog(wxString sLogPath) = 0;
-    virtual bool SetupLoc(wxString sLoc, wxString sLocPath) = 0;
-    virtual bool SetupSys(wxString sSysPath) = 0;
-    virtual void SetDebugMode(bool bDebugMode) = 0;
     //events
 	virtual void OnMouseDown(wxMouseEvent& event) = 0;
 	virtual void OnMouseUp(wxMouseEvent& event) = 0;
@@ -268,7 +259,7 @@ public:
 	virtual wxString GetMessage(void) = 0;
 	virtual wxGISEnumCommandKind GetKind(void) = 0;
 	virtual void OnClick(void) = 0;
-	virtual bool OnCreate(IApplication* pApp) = 0;
+	virtual bool OnCreate(IFrameApplication* pApp) = 0;
 	virtual wxString GetTooltip(void) = 0;
 	virtual unsigned char GetCount(void) = 0;
 	virtual void SetID(long nID){m_CommandID = nID;};
@@ -293,7 +284,7 @@ public:
      *  \brief A destructor.
      */
     virtual ~IToolBarControl(void) {};
-	virtual void Activate(IApplication* pApp) = 0;
+	virtual void Activate(IFrameApplication* pApp) = 0;
 	virtual void Deactivate(void) = 0;
 };
 
@@ -371,7 +362,7 @@ public:
      *  \brief A destructor.
      */
     virtual ~IPropertyPage(void) {};
-    /** \fn virtual bool Create(IApplication* application, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+    /** \fn virtual bool Create(IFrameApplication* application, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
      *  \brief A Create function.
      *  \param application The main app pointer
      *  \param parent The parent window pointer
@@ -384,7 +375,7 @@ public:
      *  
      *  The PropertyPage is two step creating.
      */
-    virtual bool Create(IApplication* application, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("panel")) = 0;
+    virtual bool Create(IFrameApplication* application, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("panel")) = 0;
     /** \fn virtual wxString GetName(void)
      *  \brief Get the property page name.
      *  \return The property page name
@@ -420,7 +411,7 @@ class IView
 public:
 	virtual ~IView(void){};
     virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("view")) = 0;
-	virtual bool Activate(IApplication* application, wxXmlNode* pConf) = 0;
+	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf) = 0;
 	virtual void Deactivate(void) = 0;
 	virtual void Refresh(void) = 0;
 	virtual wxString GetViewName(void) = 0;

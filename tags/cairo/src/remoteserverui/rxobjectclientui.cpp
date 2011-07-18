@@ -37,8 +37,8 @@ void wxRxObjectContainerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 {
 	if(pChildNode)
 	{
-		if(pChildNode->GetName().CmpNoCase(wxT("children")) == 0 && pChildNode->HasProp(wxT("count")))
-			m_nChildCount = wxAtoi(pChildNode->GetPropVal(wxT("count"), wxT("0")));
+		if(pChildNode->GetName().CmpNoCase(wxT("children")) == 0 && pChildNode->HasAttribute(wxT("count")))
+			m_nChildCount = wxAtoi(pChildNode->GetAttribute(wxT("count"), wxT("0")));
 		if(m_nChildCount == 0)
 		{
 			m_bIsChildrenLoaded = true;
@@ -52,9 +52,9 @@ void wxRxObjectContainerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 			while(pChildNode)
 			{
 
-				wxString sDst = pChildNode->GetPropVal(wxT("dst"), ERR);
+				wxString sDst = pChildNode->GetAttribute(wxT("dst"), ERR);
 				bool bAdd(true);
-				for(size_t i = 0; i < m_sDstArray.GetCount(); i++)
+				for(size_t i = 0; i < m_sDstArray.GetCount(); ++i)
 				{
 					if(sDst == m_sDstArray[i])
 					{
@@ -63,7 +63,7 @@ void wxRxObjectContainerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 					}
 				}
 
-				wxString sClassName = pChildNode->GetPropVal(wxT("class"), ERR);
+				wxString sClassName = pChildNode->GetAttribute(wxT("class"), ERR);
 				if(!sClassName.IsEmpty() && bAdd)
 				{
 					IGxObject *pObj = dynamic_cast<IGxObject*>(wxCreateDynamicObject(sClassName));

@@ -40,9 +40,9 @@ public:
 	~wxGISVectorPropertyPage();
     virtual bool Create(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Vector"));
     virtual wxString GetPageName(void){return wxString(_("Vector"));};
-    wxPGId AppendProperty(wxPGProperty* pProp);
-    wxPGId AppendProperty(wxPGId pid, wxPGProperty* pProp);
-    wxPGId AppendMetadataProperty(wxString sMeta);
+    wxPGProperty* AppendProperty(wxPGProperty* pProp);
+    wxPGProperty* AppendProperty(wxPGProperty* pid, wxPGProperty* pProp);
+    wxPGProperty* AppendMetadataProperty(wxString sMeta);
     void FillGrid(void);
     void FillLayerDef(OGRLayer *poLayer, int iLayer, CPLString soPath);
 protected:

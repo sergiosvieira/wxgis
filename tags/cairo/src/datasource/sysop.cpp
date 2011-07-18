@@ -57,7 +57,7 @@ bool RenameFile(CPLString sOldPath, CPLString sNewPath)
 
 wxString ClearExt(wxString sPath)
 {
-    wxStripExtension(sPath);
+	wxFileName::StripExtension(sPath);
     return sPath;
 }
 

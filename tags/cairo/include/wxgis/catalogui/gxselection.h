@@ -27,7 +27,7 @@
 // ----------------------------------------------------------------------------
 
 class WXDLLIMPEXP_GIS_CLU wxGxSelection :
-	public IConnectionPointContainer,
+	public wxGISConnectionPointContainer,
 	public IGxSelection
 {
 public:
@@ -55,8 +55,6 @@ public:
     virtual int GetDoPos(void){return m_nPos;};
     virtual long GetDoID(size_t nIndex);
     virtual wxSelLongArray GetDoArray(void){return m_DoArray;};
-    //IConnectionPointContainer
-	virtual long Advise(wxObject* pObject);
 protected:
 	wxSelLongArray m_DoArray;
 	int m_nPos;

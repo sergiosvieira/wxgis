@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxmsw28ud_html.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib proj4d.lib geos_c.lib wxGISMapUId.lib wxGISFrameworkd.lib wxGISCored.lib wxGISCartoUId.lib cairo.lib"
+				AdditionalDependencies="wxbase29ud.lib wxbase29ud_net.lib wxmsw29ud_core.lib wxbase29ud_xml.lib wxmsw29ud_aui.lib wxmsw29ud_adv.lib wxmsw29ud_html.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib proj4d.lib geos_c.lib wxGISMapUId.lib wxGISFrameworkd.lib wxGISCored.lib wxGISCartoUId.lib cairo.lib"
 				OutputFile="$(OutDir)\wxGISMap.exe"
 				AdditionalLibraryDirectories="&quot;$(PROJ)\wxGIS\lib&quot;;&quot;$(GEOS)\lib&quot;;..\..\lib;&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(CAIRO)\lib&quot;"
 				GenerateDebugInformation="true"

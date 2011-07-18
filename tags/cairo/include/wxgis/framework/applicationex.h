@@ -44,7 +44,7 @@ public:
 	virtual bool AddCommandBar(IGISCommandBar* pBar);
     //events 
     virtual void OnClose(wxCloseEvent& event);
-	//IApplication
+	//IFrameApplication
 	virtual void Customize(void);
 	virtual void ShowStatusBar(bool bShow);
 	virtual void ShowApplicationWindow(wxWindow* pWnd, bool bShow = true);

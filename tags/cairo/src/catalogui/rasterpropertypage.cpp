@@ -61,7 +61,7 @@ bool wxGISRasterPropertyPage::Create(wxGxRasterDataset* pGxDataset, IGxCatalog* 
 	wxBoxSizer* bMainSizer;
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
 
-    m_pg = new wxPropertyGrid(this, ID_PPCTRL, wxDefaultPosition, wxDefaultSize, wxPG_DEFAULT_STYLE | wxPG_TOOLTIPS | wxPG_THEME_BORDER | wxPG_SPLITTER_AUTO_CENTER);
+    m_pg = new wxPropertyGrid(this, ID_PPCTRL, wxDefaultPosition, wxDefaultSize, wxPG_DEFAULT_STYLE | wxPG_TOOLTIPS | wxPG_SPLITTER_AUTO_CENTER);
     m_pg->SetColumnProportion(0, 30);
     m_pg->SetColumnProportion(1, 70);
 
@@ -75,21 +75,21 @@ bool wxGISRasterPropertyPage::Create(wxGxRasterDataset* pGxDataset, IGxCatalog* 
     return true;
 }
 
-wxPGId wxGISRasterPropertyPage::AppendProperty(wxPGProperty* pProp)
+wxPGProperty* wxGISRasterPropertyPage::AppendProperty(wxPGProperty* pProp)
 {
     wxPGProperty* pNewProp = m_pg->Append(pProp);
-    pNewProp->SetFlag(wxPG_PROP_READONLY);
+    pNewProp->ChangeFlag(wxPG_PROP_READONLY, 1);
     return pNewProp;
 }
 
-wxPGId wxGISRasterPropertyPage::AppendProperty(wxPGId pid, wxPGProperty* pProp)
+wxPGProperty* wxGISRasterPropertyPage::AppendProperty(wxPGProperty* pid, wxPGProperty* pProp)
 {
     wxPGProperty* pNewProp = m_pg->AppendIn(pid, pProp);
-    pNewProp->SetFlag(wxPG_PROP_READONLY);
+    pNewProp->ChangeFlag(wxPG_PROP_READONLY, 1);
     return pNewProp;
 }
 
-wxPGId wxGISRasterPropertyPage::AppendMetadataProperty(wxString sMeta)
+wxPGProperty* wxGISRasterPropertyPage::AppendMetadataProperty(wxString sMeta)
 {
     int nPos = sMeta.Find('=');
     if(nPos == wxNOT_FOUND)
@@ -100,7 +100,7 @@ wxPGId wxGISRasterPropertyPage::AppendMetadataProperty(wxString sMeta)
         wxString sVal = sMeta.Right(sMeta.Len() - nPos - 1);
         //clean
         wxString sCleanVal;
-        for(size_t i = 0; i < sVal.Len(); i++)
+        for(size_t i = 0; i < sVal.Len(); ++i)
         {
             char c = sVal[i];
             if(sVal[i] > 31 && sVal[i] != 127)
@@ -122,7 +122,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
 
     wxString sTmp;
     //fill propertygrid
-    wxPGId pid = AppendProperty( new wxPropertyCategory(_("Data Source")) );
+    wxPGProperty* pid = AppendProperty( new wxPropertyCategory(_("Data Source")) );
     AppendProperty( new wxStringProperty(_("Raster"), wxPG_LABEL, m_pGxDataset->GetName()) );  
 
     CPLString soPath(m_pDataset->GetPath());
@@ -154,8 +154,8 @@ void wxGISRasterPropertyPage::FillGrid(void)
         }
         else
         {
-            wxPGId pfilesid = AppendProperty(pid, new wxPropertyCategory(_("Files")) );  
-            for(int i = 1; papszFileList[i] != NULL; i++ )
+            wxPGProperty* pfilesid = AppendProperty(pid, new wxPropertyCategory(_("Files")) );  
+            for(int i = 1; papszFileList[i] != NULL; ++i )
 		    {
                 ret = VSIStatL(papszFileList[i], &BufL);
                 if(ret == 0)
@@ -207,7 +207,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
 
     //Pyramids
     bool bHasOvr = m_pDataset->HasOverviews();
-    wxPGId pyrprop;
+    wxPGProperty* pyrprop;
     if(bHasOvr)
         pyrprop = m_pg->Append( new wxStringProperty(OVR_TXT, wxPG_LABEL, _("Present (click to rebuild)")) );
     else
@@ -216,7 +216,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
 
     //Statistics
     bool bHasStats = m_pDataset->HasStatistics();
-    wxPGId pstatprop;
+    wxPGProperty* pstatprop;
     if(bHasStats)
         pstatprop = m_pg->Append( new wxStringProperty(STAT_TXT, wxPG_LABEL, _("Present (click to rebuild)")) );
     else
@@ -237,7 +237,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
         if( CSLCount(papszMetadata) > 0 )
         {
             AppendProperty( new wxPropertyCategory(_("Metadata")) );
-            for(int i = 0; papszMetadata[i] != NULL; i++ )
+            for(int i = 0; papszMetadata[i] != NULL; ++i )
             {
                 sTmp = wgMB2WX(papszMetadata[i]);
                 AppendMetadataProperty(sTmp);
@@ -251,7 +251,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
         if( CSLCount(papszMetadata) > 0 )
         {
             AppendProperty( new wxPropertyCategory(_("Image Structure Metadata")) );
-            for(int i = 0; papszMetadata[i] != NULL; i++ )
+            for(int i = 0; papszMetadata[i] != NULL; ++i )
             {
                 sTmp = wgMB2WX(papszMetadata[i]);
                 AppendMetadataProperty(sTmp);
@@ -265,7 +265,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
         if( CSLCount(papszMetadata) > 0 )
         {
             AppendProperty( new wxPropertyCategory(_("Subdatasets")) );
-            for(int i = 0; papszMetadata[i] != NULL; i++ )
+            for(int i = 0; papszMetadata[i] != NULL; ++i )
             {
                 sTmp = wgMB2WX(papszMetadata[i]);
                 AppendMetadataProperty(sTmp);
@@ -279,7 +279,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
         if( CSLCount(papszMetadata) > 0 )
         {
             AppendProperty( new wxPropertyCategory(_("Geolocation")) );
-            for(int i = 0; papszMetadata[i] != NULL; i++ )
+            for(int i = 0; papszMetadata[i] != NULL; ++i )
             {
                 sTmp = wgMB2WX(papszMetadata[i]);
                 AppendMetadataProperty(sTmp);
@@ -293,7 +293,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
         if( CSLCount(papszMetadata) > 0 )
         {
             AppendProperty( new wxPropertyCategory(_("RPC Metadata")) );
-            for(int i = 0; papszMetadata[i] != NULL; i++ )
+            for(int i = 0; papszMetadata[i] != NULL; ++i )
             {
                 sTmp = wgMB2WX(papszMetadata[i]);
                 AppendMetadataProperty(sTmp);
@@ -336,7 +336,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
                     AppendProperty( new wxStringProperty(_("GCP Projection"), wxPG_LABEL, _("Undefined")) );
             }
 
-            for(size_t i = 0; i < poGDALDataset->GetGCPCount(); i++ )
+            for(size_t i = 0; i < poGDALDataset->GetGCPCount(); ++i )
             {
                 const GDAL_GCP *psGCP = poGDALDataset->GetGCPs( ) + i;
                 AppendProperty( new wxStringProperty(wxString::Format(wxT("GCP[%03d]"), i + 1), wxPG_LABEL, wxString::Format(_("Id='%s', Info='%s', (%.6g,%.6g) -> (%.6g,%.6g,%.6g)"), wgMB2WX(psGCP->pszId), wgMB2WX(psGCP->pszInfo), psGCP->dfGCPPixel, psGCP->dfGCPLine, psGCP->dfGCPX, psGCP->dfGCPY, psGCP->dfGCPZ)) );
@@ -347,18 +347,17 @@ void wxGISRasterPropertyPage::FillGrid(void)
         /*      Loop over bands.                                                */
         /* ==================================================================== */        
      
-        wxPGId pstatid = AppendProperty( new wxPropertyCategory(_("Statistics details")) );
+        wxPGProperty* pstatid = AppendProperty( new wxPropertyCategory(_("Statistics details")) );
                
-        for(int nBand = 0; nBand < poGDALDataset->GetRasterCount(); nBand++ )
+        for(int nBand = 0; nBand < poGDALDataset->GetRasterCount(); ++nBand )
         {
-            wxPGId pbandid = AppendProperty(pstatid, new wxPropertyCategory(wxString::Format(_("Band %d"), nBand + 1)) );
+            wxPGProperty* pbandid = AppendProperty(pstatid, new wxPropertyCategory(wxString::Format(_("Band %d"), nBand + 1)) );
 
-            double      adfCMinMax[2], dfNoData;
-            int         bGotMin, bGotMax, bGotNodata, bSuccess;
+            double      dfNoData;
+            int         bGotNodata, bSuccess;
             int         nBlockXSize, nBlockYSize, nMaskFlags;
             double      dfMin, dfMax, dfMean, dfStdDev;
             GDALColorTable*	hTable;
-            CPLErr      eErr;
 
             GDALRasterBand* pBand = poGDALDataset->GetRasterBand(nBand + 1);
 
@@ -392,7 +391,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
             //Band Overviews
 		    if( pBand->GetOverviewCount() > 0 )
             {
-                wxPGId povrid = AppendProperty(pbandid, new wxStringProperty(_("Overviews"), wxPG_LABEL, pBand->HasArbitraryOverviews() == true ? _("arbitrary") : wxEmptyString ) );
+                wxPGProperty* povrid = AppendProperty(pbandid, new wxStringProperty(_("Overviews"), wxPG_LABEL, pBand->HasArbitraryOverviews() != 0 ? _("arbitrary") : wxEmptyString ) );
                 
                 for(int iOverview = 0; iOverview < pBand->GetOverviewCount(); iOverview++ )
                 {
@@ -437,11 +436,11 @@ void wxGISRasterPropertyPage::FillGrid(void)
                     sMaskStr += wxT("ALL_VALID" );
                 }
 
-                wxPGId pmfid = AppendProperty(pbandid, new wxStringProperty(_("Mask Flags"), wxPG_LABEL, sMaskStr ));
+                wxPGProperty* pmfid = AppendProperty(pbandid, new wxStringProperty(_("Mask Flags"), wxPG_LABEL, sMaskStr ));
 
                 if( pMaskBand != NULL && pMaskBand->GetOverviewCount() > 0 )
                 {
-                    wxPGId pombid = AppendProperty(pmfid, new wxPropertyCategory(_("Overviews of mask band")) );
+                    wxPGProperty* pombid = AppendProperty(pmfid, new wxPropertyCategory(_("Overviews of mask band")) );
 
                     for( int nOverview = 0; nOverview < pMaskBand->GetOverviewCount(); nOverview++ )
                     {
@@ -460,8 +459,8 @@ void wxGISRasterPropertyPage::FillGrid(void)
 		    char **papszCategories = pBand->GetCategoryNames();
             if( papszCategories != NULL )
             {
-                wxPGId pcatid = AppendProperty(pbandid, new wxIntProperty(_("Categories"), wxPG_LABEL, CSLCount(papszCategories) ) );
-                for(int  i = 0; papszCategories[i] != NULL; i++ )
+                wxPGProperty* pcatid = AppendProperty(pbandid, new wxIntProperty(_("Categories"), wxPG_LABEL, CSLCount(papszCategories) ) );
+                for(int  i = 0; papszCategories[i] != NULL; ++i )
                     AppendProperty(pcatid, new wxStringProperty(wxString::Format(wxT("%3d"), i), wxPG_LABEL, wgMB2WX(papszCategories[i]) ) );
             }
 
@@ -476,7 +475,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
             if( CSLCount(papszMetadata) > 0 )
             {
                 AppendProperty(pbandid, new wxPropertyCategory(_("Metadata") ) );
-                for( int i = 0; papszMetadata[i] != NULL; i++ )
+                for( int i = 0; papszMetadata[i] != NULL; ++i )
                 {
                     AppendMetadataProperty( wgMB2WX(papszMetadata[i]) );
                 }
@@ -486,7 +485,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
             if( CSLCount(papszMetadata) > 0 )
             {
                 AppendProperty(pbandid, new wxPropertyCategory(_("Image Structure Metadata") ) );
-                for( int i = 0; papszMetadata[i] != NULL; i++ )
+                for( int i = 0; papszMetadata[i] != NULL; ++i )
                 {
                     AppendMetadataProperty( wgMB2WX(papszMetadata[i]) );
                 }
@@ -494,9 +493,9 @@ void wxGISRasterPropertyPage::FillGrid(void)
 
 		    if( pBand->GetColorInterpretation() == GCI_PaletteIndex && (hTable = pBand->GetColorTable()) != NULL )
             {
-                wxPGId pcpid = AppendProperty(pbandid, new wxStringProperty(_("Color Table"), wxPG_LABEL, wxString::Format(_("%s with %d entries"), wgMB2WX(GDALGetPaletteInterpretationName(hTable->GetPaletteInterpretation())), hTable->GetColorEntryCount()) ));
+                wxPGProperty* pcpid = AppendProperty(pbandid, new wxStringProperty(_("Color Table"), wxPG_LABEL, wxString::Format(_("%s with %d entries"), wgMB2WX(GDALGetPaletteInterpretationName(hTable->GetPaletteInterpretation())), hTable->GetColorEntryCount()) ));
 
-			    for(int	i = 0; i < hTable->GetColorEntryCount(); i++ )
+			    for(int	i = 0; i < hTable->GetColorEntryCount(); ++i )
                 {
                     GDALColorEntry	sEntry;
 				    hTable->GetColorEntryAsRGB(i, &sEntry );
@@ -575,7 +574,7 @@ void wxGISRasterPropertyPage::OnFinish(bool bHasErrors, IGPToolSPtr pTool)
 }
 
     ////Histogram in new tab!
-    //wxPGId phistprop = m_pg->Append( new wxStringProperty(_("Histogram"), wxPG_LABEL, _("Absent (click to build)")) ); 
+    //wxPGProperty* phistprop = m_pg->Append( new wxStringProperty(_("Histogram"), wxPG_LABEL, _("Absent (click to build)")) ); 
     //m_pg->SetPropertyEditor(phistprop, wxPG_EDITOR(TextCtrlAndButton));
             ////Histogram
             //int nBucketCount, *panHistogram = NULL;

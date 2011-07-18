@@ -45,18 +45,18 @@ void wxGISApplicationEx::SerializeFramePosEx(bool bSave)
 	{
 		if(pPerspectiveXmlNode)
 		{
-			if(pPerspectiveXmlNode->HasProp(wxT("data")))
-				pPerspectiveXmlNode->DeleteProperty(wxT("data"));
+			if(pPerspectiveXmlNode->HasAttribute(wxT("data")))
+				pPerspectiveXmlNode->DeleteAttribute(wxT("data"));
 		}
 		else
 			pPerspectiveXmlNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame/perspective")), true);
-		pPerspectiveXmlNode->AddProperty(wxT("data"), m_mgr.SavePerspective());
+		pPerspectiveXmlNode->AddAttribute(wxT("data"), m_mgr.SavePerspective());
 	}
 	else
 	{
 		if(pPerspectiveXmlNode)
 		{
-			wxString wxPerspective = pPerspectiveXmlNode->GetPropVal(wxT("data"), wxT(""));
+			wxString wxPerspective = pPerspectiveXmlNode->GetAttribute(wxT("data"), wxT(""));
 			m_mgr.LoadPerspective(wxPerspective);
 		}
 	}
@@ -77,7 +77,7 @@ void wxGISApplicationEx::Customize(void)
 
 void wxGISApplicationEx::RemoveCommandBar(IGISCommandBar* pBar)
 {
-	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
+	for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
 	{
 		if(m_CommandBarArray[i] == pBar)
 		{
@@ -185,13 +185,14 @@ void wxGISApplicationEx::UnRegisterChildWindow(wxWindow* pWnd)
 
 bool wxGISApplicationEx::Create(IGISConfig* pConfig)
 {
+	m_mgr.SetManagedWindow(this);
+
     wxGISApplication::Create(pConfig);
 
 	wxLogMessage(_("wxGISApplicationEx: Start. Creating main application frame..."));
 
-	m_mgr.SetManagedWindow(this);
 
-	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
+	for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
 	{
 		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
 		{
@@ -217,7 +218,7 @@ void wxGISApplicationEx::OnClose(wxCloseEvent& event)
 {
     event.Skip();
 
- 	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
+ 	for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
 	{
 		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
 		{
@@ -227,7 +228,7 @@ void wxGISApplicationEx::OnClose(wxCloseEvent& event)
 		}
 	}
 
-    for(size_t i = 0; i < m_WindowArray.size(); i++)
+    for(size_t i = 0; i < m_WindowArray.size(); ++i)
     {
         IView* pView = dynamic_cast<IView*>(m_WindowArray[i]);
         if(pView)
@@ -239,7 +240,7 @@ void wxGISApplicationEx::OnClose(wxCloseEvent& event)
     while (!m_WindowArray.empty())
     {
         wxWindow* poWnd = m_WindowArray.back();
-        if(poWnd)
+		if( poWnd && !poWnd->IsBeingDeleted() )
         {
             if(!poWnd->Destroy())
                 delete poWnd;

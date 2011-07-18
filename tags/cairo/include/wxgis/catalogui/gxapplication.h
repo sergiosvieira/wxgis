@@ -44,7 +44,7 @@ public:
 	virtual IGxCatalog* const GetCatalog(void);
     //events 
     virtual void OnClose(wxCloseEvent& event);
-	//IApplication
+	//IFrameApplication
     virtual wxString GetAppName(void){return wxString(wxT("wxGISCatalog"));};
     virtual bool Create(IGISConfig* pConfig);
 	virtual wxIcon GetAppIcon(void){return m_pAppIcon;};

@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/display/simplemarkersymbol.h"
 
+/*
 wxSimpleMarkerSymbol::wxSimpleMarkerSymbol(void)
 {
 	m_Brush.SetColour(168, 0, 132);
@@ -71,8 +72,8 @@ void wxSimpleMarkerSymbol::Draw(OGRGeometry* pGeometry, IDisplay* pwxGISDisplay)
 			//double EnvWidth = sEnvelope.MaxX - sEnvelope.MinX;
 			//double EnvHeight = sEnvelope.MaxY - sEnvelope.MinY;
 			OGRRawPoint Point;
-			Point.x = sEnvelope.MinX/* + EnvWidth / 2*/;
-			Point.y = sEnvelope.MinY/* + EnvHeight / 2*/;
+			Point.x = sEnvelope.MinX;
+			Point.y = sEnvelope.MinY;
 			wxPoint* pPoints = pDisplayTransformation->TransformCoordWorld2DC(&Point, 1);
 			pwxGISDisplay->SetBrush(m_Brush);
 			pwxGISDisplay->SetPen(m_Pen);
@@ -86,3 +87,4 @@ void wxSimpleMarkerSymbol::Draw(OGRGeometry* pGeometry, IDisplay* pwxGISDisplay)
 		break;
 	}   
 }
+*/

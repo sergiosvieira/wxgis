@@ -180,7 +180,7 @@ public:
 		wxString sTestPath = sPath;
 		if(GetFullName().CmpNoCase(sPath) == 0)//GetName
 			return this;
-		for(size_t i = 0; i < m_Children.size(); i++)
+		for(size_t i = 0; i < m_Children.size(); ++i)
 		{
 			wxString sTestedPath = m_Children[i]->GetFullName();
 			if(sTestedPath.CmpNoCase(sPath) == 0)
@@ -223,22 +223,22 @@ protected:
     bool m_bIsEnabled;
 };
 
-class IGxCatalogEvents
-{
-public:
-	virtual ~IGxCatalogEvents(void){};
-	virtual void OnObjectAdded(long nObjectID) = 0;
-	virtual void OnObjectChanged(long nObjectID) = 0;
-	virtual void OnObjectDeleted(long nObjectID) = 0;
-	virtual void OnObjectRefreshed(long nObjectID) = 0;
-	virtual void OnRefreshAll(void) = 0;
-};
+//class IGxCatalogEvents
+//{
+//public:
+//	virtual ~IGxCatalogEvents(void){};
+//	virtual void OnObjectAdded(long nObjectID) = 0;
+//	virtual void OnObjectChanged(long nObjectID) = 0;
+//	virtual void OnObjectDeleted(long nObjectID) = 0;
+//	virtual void OnObjectRefreshed(long nObjectID) = 0;
+//	virtual void OnRefreshAll(void) = 0;
+////};
 
 class IGxDataset
 {
 public:
 	virtual ~IGxDataset(void){};
-	virtual wxGISDatasetSPtr GetDataset(void) = 0;
+	virtual wxGISDatasetSPtr GetDataset(ITrackCancel* pTrackCancel = NULL) = 0;
 	virtual wxGISEnumDatasetType GetType(void) = 0;
 	virtual int GetSubType(void) = 0;
 };
@@ -259,7 +259,7 @@ class IGxRootObjectProperties
 public:
 	virtual ~IGxRootObjectProperties(void){};
 	virtual void Init(wxXmlNode* const pConfigNode) = 0;
-	virtual wxXmlNode* GetProperties(void) = 0;
+	virtual wxXmlNode* GetAttributes(void) = 0;
     virtual bool GetEnabled(void){return m_bEnabled;};
     virtual void SetEnabled(bool bEnabled){m_bEnabled = bEnabled;};
 protected:

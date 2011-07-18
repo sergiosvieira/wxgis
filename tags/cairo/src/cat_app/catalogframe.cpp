@@ -29,11 +29,7 @@
 //-----------------------------------------------------------
 // wxGISCatalogFrame
 //-----------------------------------------------------------
-
-
-BEGIN_EVENT_TABLE(wxGISCatalogFrame, wxGxApplication)
-END_EVENT_TABLE()
-
+IMPLEMENT_CLASS(wxGISCatalogFrame, wxGxApplication)
 
 wxGISCatalogFrame::wxGISCatalogFrame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxGxApplication(parent, id, title, pos, size, style)
 {

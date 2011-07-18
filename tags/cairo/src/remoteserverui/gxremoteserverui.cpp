@@ -98,7 +98,7 @@ bool wxGxRemoteServerUI::Connect(void)
 
 void wxGxRemoteServerUI::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		delete m_Children[i];
@@ -136,7 +136,7 @@ void wxGxRemoteServerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
         {
 			if(pChildNode)
 			{
-				wxString sText = pChildNode->GetPropVal(wxT("text"), ERR);
+				wxString sText = pChildNode->GetAttribute(wxT("text"), ERR);
 				wxMessageBox(sText, wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK );
 			}
 		}
@@ -155,8 +155,8 @@ void wxGxRemoteServerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
     {
 		if(pChildNode)
 		{
-			if(pChildNode->GetName().CmpNoCase(wxT("children")) == 0 && pChildNode->HasProp(wxT("count")))
-				m_nChildCount = wxAtoi(pChildNode->GetPropVal(wxT("count"), wxT("0")));
+			if(pChildNode->GetName().CmpNoCase(wxT("children")) == 0 && pChildNode->HasAttribute(wxT("count")))
+				m_nChildCount = wxAtoi(pChildNode->GetAttribute(wxT("count"), wxT("0")));
 			else if(pChildNode->GetName().CmpNoCase(wxT("child")) == 0)
 			{
 				if(m_pGxPendingUI)
@@ -164,7 +164,7 @@ void wxGxRemoteServerUI::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 				//load server root items
 				while(pChildNode)
 				{
-					wxString sClassName = pChildNode->GetPropVal(wxT("class"), ERR);
+					wxString sClassName = pChildNode->GetAttribute(wxT("class"), ERR);
 					if(!sClassName.IsEmpty())
 					{
 						IGxObject *pObj = dynamic_cast<IGxObject*>(wxCreateDynamicObject(sClassName));

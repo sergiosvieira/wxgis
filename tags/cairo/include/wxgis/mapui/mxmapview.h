@@ -22,7 +22,7 @@
 #pragma once
 
 #include "wxgis/mapui/mapui.h"
-#include "wxgis/cartoui/mapviewex.h"
+#include "wxgis/cartoui/mapview.h"
 #include "wxgis/framework/framework.h"
 
 
@@ -30,7 +30,7 @@
     \brief This is the map view class in MxApplication.
 */
 class WXDLLIMPEXP_GIS_MAPU wxMxMapView :
-	public wxGISMapViewEx
+	public wxGISMapView
 {
     DECLARE_DYNAMIC_CLASS(wxMxMapView)
 public:
@@ -44,11 +44,11 @@ public:
 	void OnMouseUp(wxMouseEvent& event);
 	void OnMouseDoubleClick(wxMouseEvent& event);
     virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("GISMapView"));
-	virtual bool Activate(IApplication* application, wxXmlNode* pConf = NULL);
+	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf = NULL);
 	virtual void Deactivate(void);
 private:
 	IStatusBar* m_pStatusBar;
-	IApplication* m_pApp;
+	IFrameApplication* m_pApp;
 	ITrackCancel *m_pTrackCancel;
 
 	DECLARE_EVENT_TABLE()

@@ -34,7 +34,7 @@ class WXDLLIMPEXP_GIS_FRW wxGISMenuBar :
 	public wxMenuBar
 {
 public:
-	wxGISMenuBar(long style = 0, IApplication* pApp = NULL, wxXmlNode* pConf = NULL);
+	wxGISMenuBar(long style = 0, IFrameApplication* pApp = NULL, wxXmlNode* pConf = NULL);
 	virtual ~wxGISMenuBar(void);
 	virtual bool IsMenuBarMenu(wxString sMenuName);
 	virtual COMMANDBARARRAY* GetMenuBarArray(void);

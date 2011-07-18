@@ -3,7 +3,7 @@
  * Purpose:  wxGISNewMenu class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -31,8 +31,7 @@
 
 class WXDLLIMPEXP_GIS_CLU wxGISNewMenu :
 	public wxGISMenu,
-	public ICommand/*,
-	public IGxSelectionEvents*/
+	public ICommand
 {
 public:
 	wxGISNewMenu(const wxString& sName = NEWMENUNAME, const wxString& sCaption = _("New"), wxGISEnumCommandBars type = enumGISCBSubMenu, const wxString& title = wxEmptyString, long style = 0);
@@ -51,21 +50,18 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IApplication* pApp);
+	virtual bool OnCreate(IFrameApplication* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
     //wxGISMenu
 	virtual void Update(IGxSelection* Selection);
-
-	//virtual void Init(void);
- //   virtual void UnInit(void);
 	////IGxSelectionEvents
 	//virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 protected:
     std::vector<wxMenuItem*> m_delitems;
-	IApplication* m_pApp;
+	IFrameApplication* m_pApp;
 	wxGxCatalogUI* m_pCatalog;
-	IConnectionPointContainer* m_pConnectionPointSelection;
+	wxGISConnectionPointContainer* m_pConnectionPointSelection;
 	long m_ConnectionPointSelectionCookie;
 };
 

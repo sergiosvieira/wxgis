@@ -22,7 +22,7 @@
 
 #include "wxgis/base.h"
 
-#include "wx/process.h"
+#include <wx/process.h>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
@@ -55,26 +55,52 @@ public:
 	//virtual wxXmlNode* GetXmlConfig(wxString sApp, bool bUser) = 0;
 };
 
-
-class IConnectionPointContainer
+/** \class IApplication core.h
+    \brief Base class for wxGIS application.
+*/
+class IApplication
 {
 public:
-	virtual ~IConnectionPointContainer(void){};
-	virtual long Advise(wxObject* pObject)
+    /** \fn virtual ~IApplication(void)
+     *  \brief A destructor.
+     */
+    virtual ~IApplication(void) {};
+	//pure virtual
+	virtual void OnAppAbout(void) = 0;
+    virtual void OnAppOptions(void) = 0;
+	virtual IGISConfig* GetConfig(void) = 0;
+	virtual wxString GetAppName(void) = 0;
+	virtual wxString GetAppVersionString(void) = 0;
+    virtual bool Create(IGISConfig* pConfig) = 0;
+    virtual bool SetupLog(wxString sLogPath) = 0;
+    virtual bool SetupLoc(wxString sLoc, wxString sLocPath) = 0;
+    virtual bool SetupSys(wxString sSysPath) = 0;
+    virtual void SetDebugMode(bool bDebugMode) = 0;
+};
+
+
+class wxGISConnectionPointContainer
+{
+public:
+	virtual ~wxGISConnectionPointContainer(void){};
+	virtual long Advise(wxEvtHandler* pEvtHandler)
 	{
-		if(pObject == NULL)
-			return -1;
-		m_pPointsArray.push_back(pObject);
+		wxCHECK(pEvtHandler, wxNOT_FOUND);
+
+		std::vector<wxEvtHandler*>::iterator pos = std::find(m_pPointsArray.begin(), m_pPointsArray.end(), pEvtHandler);
+		if(pos != m_pPointsArray.end())
+			return pos - m_pPointsArray.begin();
+		m_pPointsArray.push_back(pEvtHandler);
 		return m_pPointsArray.size() - 1;
 	}
+
 	virtual void Unadvise(long nCookie)
 	{
-		if(nCookie < 0 || m_pPointsArray.size() <= nCookie)
-			return;
+		wxCHECK_RET(nCookie >= 0 && nCookie < m_pPointsArray.size(), "wrong cookie index");
 		m_pPointsArray[nCookie] = NULL;
 	}
 protected:
-	std::vector<wxObject*> m_pPointsArray;
+	std::vector<wxEvtHandler*> m_pPointsArray;
 };
 
 class IPointer
@@ -222,40 +248,40 @@ static bool CreateAndRunThread(wxThread* pThread, wxString sClassName = wxEmptyS
 static wxString Encode(wxString sInput, wxString sPass)
 {
     wxString sRes;
-    size_t pos(0);
-    for(size_t i = 0; i < sInput.Len(); i++)
-    {
-        if(pos == sPass.Len())
-            pos = 0;
-        wxChar Symbol = sInput[i] ^ sPass[pos];
-        char SymbolHi = hibyte(Symbol);
-        char SymbolLo = lobyte(Symbol);//(Symbol >> 4) & 0xff;
-		sRes += wxDecToHex(SymbolHi);
-		sRes += wxDecToHex(SymbolLo);
-        pos++;
-    }
+  //  size_t pos(0);
+  //  for(size_t i = 0; i < sInput.Len(); ++i)
+  //  {
+  //      if(pos == sPass.Len())
+  //          pos = 0;
+  //      wxChar Symbol = sInput[i] ^ sPass[pos];
+  //      char SymbolHi = hibyte(Symbol);
+  //      char SymbolLo = lobyte(Symbol);//(Symbol >> 4) & 0xff;
+		//sRes += wxDecToHex(SymbolHi);
+		//sRes += wxDecToHex(SymbolLo);
+  //      pos++;
+  //  }
     return sRes;
 }
 
 static wxString Decode(wxString sInput, wxString sPass)
 {
     wxString sRes;
-    size_t pos(0);
-    for(size_t i = 0; i < sInput.Len(); i += 4)
-    {
-        if(pos == sPass.Len())
-            pos = 0;
-		wxString sHex = sInput[i];
-		sHex += sInput[i + 1]; 
-        char SymbolHi = wxHexToDec(sHex);
-        sHex = sInput[i + 2];
-		sHex += sInput[i + 3];
-        char SymbolLo = wxHexToDec(sHex);
-        wxChar Symbol = (SymbolHi << 8) + SymbolLo;
-        Symbol = Symbol ^ sPass[pos];
-        sRes += Symbol;
-        pos++;
-    }
+  //  size_t pos(0);
+  //  for(size_t i = 0; i < sInput.Len(); i += 4)
+  //  {
+  //      if(pos == sPass.Len())
+  //          pos = 0;
+		//wxString sHex = sInput[i];
+		//sHex += sInput[i + 1]; 
+  //      char SymbolHi = wxHexToDec(sHex);
+  //      sHex = sInput[i + 2];
+		//sHex += sInput[i + 3];
+  //      char SymbolLo = wxHexToDec(sHex);
+  //      wxChar Symbol = (SymbolHi << 8) + SymbolLo;
+  //      Symbol = Symbol ^ sPass[pos];
+  //      sRes += Symbol;
+  //      pos++;
+  //  }
     return sRes;
 }
 
@@ -356,7 +382,7 @@ static double StringToDouble(wxString Val, wxString asterisk)
 	wxString buff;
 	unsigned char counter = 0;
 	int grad, min, sec;
-	for(size_t i = 0; i < Val.Len(); i++)
+	for(size_t i = 0; i < Val.Len(); ++i)
 	{
 		wxChar ch = Val[i];
 		if(ch == '-' || ch == ' ')
@@ -388,7 +414,7 @@ static wxString NumberScale(double fScaleRatio)
 	if(pos == wxNOT_FOUND)
 		pos = str.Len();
 	wxString res = str.Right(str.Len() - pos);
-	for(size_t i = 1; i < pos + 1; i++)
+	for(size_t i = 1; i < pos + 1; ++i)
 	{
 		res.Prepend(str[pos - i]);
 		if((i % 3) == 0)
@@ -404,3 +430,5 @@ inline bool IsDoubleEquil( double a, double b, double epsilon = 16 * DBL_EPSILON
   const double diff = a - b;
   return diff > -epsilon && diff <= epsilon;
 }
+
+

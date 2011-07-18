@@ -89,21 +89,21 @@ void *wxClientUDPNotifier::Entry()
 						INetSearchCallback* pCallback = m_pFactory->GetCallback();
 						if(pCallback)
 						{
-							wxString sPort = pChild->GetPropVal(wxT("port"), wxT("1976"));
-							wxString sName = pChild->GetPropVal(wxT("name"), NONAME);
-							wxString sBanner = pChild->GetPropVal(wxT("banner"), wxEmptyString);
+							wxString sPort = pChild->GetAttribute(wxT("port"), wxT("1976"));
+							wxString sName = pChild->GetAttribute(wxT("name"), NONAME);
+							wxString sBanner = pChild->GetAttribute(wxT("banner"), wxEmptyString);
 							wxString sHost = BroadCastAddress.Hostname();
 							wxString sIP = BroadCastAddress.IPAddress();
 							//Add to list
 							wxXmlNode* pOutNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("conn_info"));
-							pOutNode->AddProperty(wxT("port"), sPort);
-							pOutNode->AddProperty(wxT("name"), sName);
-							pOutNode->AddProperty(wxT("banner"), sBanner);
-							pOutNode->AddProperty(wxT("host"), sHost);
-							pOutNode->AddProperty(wxT("ip"), sIP);
+							pOutNode->AddAttribute(wxT("port"), sPort);
+							pOutNode->AddAttribute(wxT("name"), sName);
+							pOutNode->AddAttribute(wxT("banner"), sBanner);
+							pOutNode->AddAttribute(wxT("host"), sHost);
+							pOutNode->AddAttribute(wxT("ip"), sIP);
 							//?? factory id
-							//pOutNode->AddProperty(wxT("factory_id"), wxString::Format(wxT("%d"), m_pFactory->GetID()));
-							pOutNode->AddProperty(wxT("factory_name"), m_pFactory->GetName());
+							//pOutNode->AddAttribute(wxT("factory_id"), wxString::Format(wxT("%d"), m_pFactory->GetID()));
+							pOutNode->AddAttribute(wxT("factory_name"), m_pFactory->GetName());
 							pCallback->AddServer(pOutNode);//AddServer mast delete pOutNode
 						}
 					}
@@ -182,29 +182,29 @@ bool wxClientTCPNetFactory::StopServerSearch()
 };
 
 
-wxXmlNode* wxClientTCPNetFactory::GetProperties(void)
+wxXmlNode* wxClientTCPNetFactory::GetAttributes(void)
 {
 	wxXmlNode* pOutNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("factory"));
-	pOutNode->AddProperty(wxT("port"), wxString::Format(wxT("%d"), m_nPort));
-	pOutNode->AddProperty(wxT("adv_port"), wxString::Format(wxT("%d"), m_nAdvPort));
-	pOutNode->AddProperty(wxT("addr"), m_sAddr);
+	pOutNode->AddAttribute(wxT("port"), wxString::Format(wxT("%d"), m_nPort));
+	pOutNode->AddAttribute(wxT("adv_port"), wxString::Format(wxT("%d"), m_nAdvPort));
+	pOutNode->AddAttribute(wxT("addr"), m_sAddr);
     wxClassInfo* pInfo = GetClassInfo();
     if(pInfo)
-        pOutNode->AddProperty(wxT("name"), pInfo->GetClassName());
+        pOutNode->AddAttribute(wxT("name"), pInfo->GetClassName());
 	return pOutNode;
 }
 
-void wxClientTCPNetFactory::SetProperties(const wxXmlNode* pProp)
+void wxClientTCPNetFactory::SetAttributes(const wxXmlNode* pProp)
 {
-	m_nPort = wxAtoi(pProp->GetPropVal(wxT("port"), wxT("1976")));
-	m_nAdvPort = wxAtoi(pProp->GetPropVal(wxT("adv_port"), wxT("1977")));
-	m_sAddr = pProp->GetPropVal(wxT("addr"), wxT(""));
+	m_nPort = wxAtoi(pProp->GetAttribute(wxT("port"), wxT("1976")));
+	m_nAdvPort = wxAtoi(pProp->GetAttribute(wxT("adv_port"), wxT("1977")));
+	m_sAddr = pProp->GetAttribute(wxT("addr"), wxT(""));
 }
 
 INetClientConnection* wxClientTCPNetFactory::GetConnection(wxXmlNode* pProp)
 {
 	INetClientConnection* pConn = new wxClientTCPNetConnection();
-	if(pConn->SetProperties(pProp))
+	if(pConn->SetAttributes(pProp))
 	{
 		wxDELETE(pProp);
 		return pConn;
@@ -234,29 +234,29 @@ wxClientTCPNetConnection::~wxClientTCPNetConnection(void)
 {
 }
 
-wxXmlNode* wxClientTCPNetConnection::GetProperties(void)
+wxXmlNode* wxClientTCPNetConnection::GetAttributes(void)
 {
     wxXmlNode* pNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("connection"));
-    pNode->AddProperty(wxT("name"), m_sConnName);
-    pNode->AddProperty(wxT("user"), m_sUserName);    
-    pNode->AddProperty(wxT("pass"), m_sCryptPass);    
-    pNode->AddProperty(wxT("ip"), m_sIP);    
-    pNode->AddProperty(wxT("port"), m_sPort);    
+    pNode->AddAttribute(wxT("name"), m_sConnName);
+    pNode->AddAttribute(wxT("user"), m_sUserName);    
+    pNode->AddAttribute(wxT("pass"), m_sCryptPass);    
+    pNode->AddAttribute(wxT("ip"), m_sIP);    
+    pNode->AddAttribute(wxT("port"), m_sPort);    
     wxClassInfo* pInfo = GetClassInfo();
     if(pInfo)
-        pNode->AddProperty(wxT("class"), pInfo->GetClassName());
+        pNode->AddAttribute(wxT("class"), pInfo->GetClassName());
     return pNode;
 }
 
-bool wxClientTCPNetConnection::SetProperties(const wxXmlNode* pProp)
+bool wxClientTCPNetConnection::SetAttributes(const wxXmlNode* pProp)
 {
 	if(!pProp)
 		return false;
-	m_sConnName = pProp->GetPropVal(wxT("name"), wxT("New connection"));
-	m_sUserName = pProp->GetPropVal(wxT("user"), wxT("user"));
-	m_sCryptPass = pProp->GetPropVal(wxT("pass"), wxT("passsword"));
-	m_sIP = pProp->GetPropVal(wxT("ip"), wxT("127.0.0.1"));
-	m_sPort = pProp->GetPropVal(wxT("port"), wxT("1976"));
+	m_sConnName = pProp->GetAttribute(wxT("name"), wxT("New connection"));
+	m_sUserName = pProp->GetAttribute(wxT("user"), wxT("user"));
+	m_sCryptPass = pProp->GetAttribute(wxT("pass"), wxT("passsword"));
+	m_sIP = pProp->GetAttribute(wxT("ip"), wxT("127.0.0.1"));
+	m_sPort = pProp->GetAttribute(wxT("port"), wxT("1976"));
 	return true;
 }
 

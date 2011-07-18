@@ -35,7 +35,7 @@ public:
 //wxGISLayer
 	virtual OGRSpatialReferenceSPtr GetSpatialReference(void);
 	virtual void SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference);
-	virtual bool Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisplay, ITrackCancel *pTrackCancel = NULL);
+	virtual bool Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
 	virtual OGREnvelope GetEnvelope(void);
 	virtual bool IsValid(void);
 	virtual bool IsCacheNeeded(void);

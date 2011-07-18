@@ -129,9 +129,9 @@ bool wxGISCartoMainCmd::GetEnabled(void)
 		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
 		if(pWinArr)
 		{
-			for(size_t i = 0; i < pWinArr->size(); i++)
+			for(size_t i = 0; i < pWinArr->size(); ++i)
 			{
-				wxGISMapViewEx* pMapView = dynamic_cast<wxGISMapViewEx*>(pWinArr->at(i));
+				wxGISMapView* pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
 				if(pMapView)
 				{
 					m_pMapView = pMapView;
@@ -199,7 +199,7 @@ void wxGISCartoMainCmd::OnClick(void)
 	}
 }
 
-bool wxGISCartoMainCmd::OnCreate(IApplication* pApp)
+bool wxGISCartoMainCmd::OnCreate(IFrameApplication* pApp)
 {
 	m_pApp = pApp;
 	return true;
@@ -314,9 +314,9 @@ bool wxGISCartoMainTool::GetEnabled(void)
 		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
 		if(pWinArr)
 		{
-			for(size_t i = 0; i < pWinArr->size(); i++)
+			for(size_t i = 0; i < pWinArr->size(); ++i)
 			{
-				wxGISMapViewEx* pMapView = dynamic_cast<wxGISMapViewEx*>(pWinArr->at(i));
+				wxGISMapView* pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
 				if(pMapView)
 				{
 					m_pMapView = pMapView;
@@ -385,7 +385,7 @@ void wxGISCartoMainTool::OnClick(void)
 	}
 }
 
-bool wxGISCartoMainTool::OnCreate(IApplication* pApp)
+bool wxGISCartoMainTool::OnCreate(IFrameApplication* pApp)
 {
 	m_pApp = pApp;
 	return true;
@@ -461,7 +461,7 @@ wxCursor wxGISCartoMainTool::GetCursor(void)
 void wxGISCartoMainTool::SetChecked(bool bCheck)
 {
 	m_bCheck = bCheck;
-	if(m_bCheck)
+	if(m_bCheck && m_pMapView)
 		m_pMapView->SetCursor(GetCursor());
 }
 
@@ -649,9 +649,9 @@ bool wxGISCartoFrameTool::GetEnabled(void)
 		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
 		if(pWinArr)
 		{
-			for(size_t i = 0; i < pWinArr->size(); i++)
+			for(size_t i = 0; i < pWinArr->size(); ++i)
 			{
-				wxGISMapViewEx* pMapView = dynamic_cast<wxGISMapViewEx*>(pWinArr->at(i));
+				wxGISMapView* pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
 				if(pMapView)
 				{
 					m_pMapView = pMapView;
@@ -737,7 +737,7 @@ void wxGISCartoFrameTool::OnClick(void)
 	}
 }
 
-bool wxGISCartoFrameTool::OnCreate(IApplication* pApp)
+bool wxGISCartoFrameTool::OnCreate(IFrameApplication* pApp)
 {
 	m_pApp = pApp;
 
@@ -925,7 +925,7 @@ void wxGISRotationComboBox::OnTextEnter(wxCommandEvent& event)
 	}
 }
 
-void wxGISRotationComboBox::Activate(IApplication* pApp)
+void wxGISRotationComboBox::Activate(IFrameApplication* pApp)
 {
 	//m_pApp = pApp;
 }

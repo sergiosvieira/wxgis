@@ -127,9 +127,9 @@ void wxGISTCPClientPanel::OnSearchBtnClick( wxCommandEvent& event )
 		wxXmlNode* pProps = dlg.GetConnectionProperties();
 		if(pProps)
 		{
-			m_sPort = pProps->GetPropVal(wxT("port"), m_sPort);
-			m_sName = pProps->GetPropVal(wxT("name"), m_sName);
-			m_IPAddress = pProps->GetPropVal(wxT("ip"), m_IPAddress);
+			m_sPort = pProps->GetAttribute(wxT("port"), m_sPort);
+			m_sName = pProps->GetAttribute(wxT("name"), m_sName);
+			m_IPAddress = pProps->GetAttribute(wxT("ip"), m_IPAddress);
 		}
 		TransferDataToWindow();
 	}
@@ -146,12 +146,12 @@ INetClientConnection* wxGISTCPClientPanel::OnSave(void)
 	}
 
 	wxXmlNode* pConnNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("conn_info"));
-	pConnNode->AddProperty(wxT("port"), m_sPort);
-	pConnNode->AddProperty(wxT("name"), m_sName);
-	pConnNode->AddProperty(wxT("ip"), m_IPAddress);
-	pConnNode->AddProperty(wxT("user"), m_UserName);
+	pConnNode->AddAttribute(wxT("port"), m_sPort);
+	pConnNode->AddAttribute(wxT("name"), m_sName);
+	pConnNode->AddAttribute(wxT("ip"), m_IPAddress);
+	pConnNode->AddAttribute(wxT("user"), m_UserName);
     wxString sCryptPass = Encode(m_Password, CONFIG_DIR);//Crypt Passwd //wxString sTestPass = Decode(sCryptPass, CONFIG_DIR);    
-	pConnNode->AddProperty(wxT("pass"), sCryptPass);
+	pConnNode->AddAttribute(wxT("pass"), sCryptPass);
 	
 	return m_pFactory->GetConnection(pConnNode);
 }

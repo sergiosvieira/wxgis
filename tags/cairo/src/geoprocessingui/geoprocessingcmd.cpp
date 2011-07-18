@@ -114,7 +114,7 @@ bool wxGISGeoprocessingCmd::GetEnabled(void)
 		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
 		if(pWinArr)
 		{
-			for(size_t i = 0; i < pWinArr->size(); i++)
+			for(size_t i = 0; i < pWinArr->size(); ++i)
 			{
 				wxGxToolboxView* pwxGxToolboxView = dynamic_cast<wxGxToolboxView*>(pWinArr->at(i));
 				if(pwxGxToolboxView)
@@ -135,7 +135,7 @@ bool wxGISGeoprocessingCmd::GetEnabled(void)
 			{
                 wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 				IGxSelection* pSel = pCatalog->GetSelection();
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
                     IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxDataset* pDSet = dynamic_cast<IGxDataset*>(pGxObject.get());
@@ -146,7 +146,7 @@ bool wxGISGeoprocessingCmd::GetEnabled(void)
 			return false;
         }
 		case 1://Show/Hide Toolbox pane
-            return m_pToolboxView;
+            return m_pToolboxView != NULL;
 		default:
 			return false;
 	}
@@ -190,7 +190,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
 				{
                     wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 					IGxSelection* pSel = pCatalog->GetSelection();
-                    for(size_t i = 0; i < pSel->GetCount(); i++)
+                    for(size_t i = 0; i < pSel->GetCount(); ++i)
                     {
                         IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
                         IGxDataset* pGxDSet = dynamic_cast<IGxDataset*>(pGxObject.get());
@@ -203,7 +203,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
                             GxObjectArray* pArr = pObjectContainer->GetChildren();
                             if(pArr != NULL)
                             {
-                                for(size_t i = 0; i < pArr->size(); i++)
+                                for(size_t i = 0; i < pArr->size(); ++i)
                                 {
                                     pGxDSet = dynamic_cast<IGxDataset*>(pArr->operator[](i));
                                     if(pGxDSet)
@@ -284,7 +284,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
 						if(pDSet->IsOpened() && pDSet->IsReadOnly())
 							pDSet->Close();
 						if(!pDSet->IsOpened())
-							if(!pDSet->Open());
+							if(!pDSet->Open())
 								return;
 
                         ITrackCancel TrackCancel;
@@ -349,7 +349,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
 
                         TrackCancel.SetProgressor(ProgressDlg.GetProgressor2());
 
-                        for(size_t i = 0; i < DatasetArray.size(); i++)
+                        for(size_t i = 0; i < DatasetArray.size(); ++i)
                         {
                             pProgr1->SetValue(i);
                             if(!TrackCancel.Continue())
@@ -408,7 +408,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
 	}
 }
 
-bool wxGISGeoprocessingCmd::OnCreate(IApplication* pApp)
+bool wxGISGeoprocessingCmd::OnCreate(IFrameApplication* pApp)
 {
 	m_pApp = pApp;
 	return true;

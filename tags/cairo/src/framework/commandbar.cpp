@@ -104,12 +104,12 @@ ICommand* wxGISCommandBar::GetCommand(size_t nIndex)
 	return m_CommandArray[nIndex];
 }
 
-void wxGISCommandBar::Serialize(IApplication* pApp, wxXmlNode* pNode, bool bStore)
+void wxGISCommandBar::Serialize(IFrameApplication* pApp, wxXmlNode* pNode, bool bStore)
 {
 	if(bStore)
 	{
-		pNode->AddProperty(wxT("name"), m_sName);
-		pNode->AddProperty(wxT("caption"), m_sCaption);
+		pNode->AddAttribute(wxT("name"), m_sName);
+		pNode->AddAttribute(wxT("caption"), m_sCaption);
 		for(size_t i = m_CommandArray.size(); i > 0; i--)
 		{
 			ICommand* pCmd = m_CommandArray[i - 1];
@@ -120,7 +120,7 @@ void wxGISCommandBar::Serialize(IApplication* pApp, wxXmlNode* pNode, bool bStor
 				switch(Kind)
 				{
 				case enumGISCommandSeparator:
-					pNewNode->AddProperty(wxT("type"), wxT("sep"));
+					pNewNode->AddAttribute(wxT("type"), wxT("sep"));
 					break;
 				case enumGISCommandCheck:
 				case enumGISCommandRadio:
@@ -128,26 +128,26 @@ void wxGISCommandBar::Serialize(IApplication* pApp, wxXmlNode* pNode, bool bStor
 				case enumGISCommandControl:
 				case enumGISCommandDropDown:
 				{
-					pNewNode->AddProperty(wxT("type"), wxT("cmd"));
+					pNewNode->AddAttribute(wxT("type"), wxT("cmd"));
 					wxObject* pObj = dynamic_cast<wxObject*>(pCmd);
 					if(pObj)
 					{
 						wxClassInfo* pInfo = pObj->GetClassInfo();
 						wxString sClassName = pInfo->GetClassName();
-						pNewNode->AddProperty(wxT("cmd_name"), sClassName);
-						pNewNode->AddProperty(wxT("subtype"), wxString::Format(wxT("%u"), pCmd->GetSubType()));
-						pNewNode->AddProperty(wxT("name"), pCmd->GetCaption());
+						pNewNode->AddAttribute(wxT("cmd_name"), sClassName);
+						pNewNode->AddAttribute(wxT("subtype"), wxString::Format(wxT("%u"), pCmd->GetSubType()));
+						pNewNode->AddAttribute(wxT("name"), pCmd->GetCaption());
 					}
 					break;
 				}
 				case enumGISCommandMenu:
 				{
-					pNewNode->AddProperty(wxT("type"), wxT("menu"));
+					pNewNode->AddAttribute(wxT("type"), wxT("menu"));
 					IGISCommandBar* pCB = dynamic_cast<IGISCommandBar*>(pCmd);
 					if(pCB)
 					{
-						pNewNode->AddProperty(wxT("cmd_name"), pCB->GetName());
-						pNewNode->AddProperty(wxT("name"), pCmd->GetCaption());
+						pNewNode->AddAttribute(wxT("cmd_name"), pCB->GetName());
+						pNewNode->AddAttribute(wxT("name"), pCmd->GetCaption());
 					}
 					break;
 				}
@@ -159,17 +159,17 @@ void wxGISCommandBar::Serialize(IApplication* pApp, wxXmlNode* pNode, bool bStor
 	}
 	else
 	{
-		//m_sName = pNode->GetPropVal(wxT("name"), m_sName);
-		//m_sCaption = pNode->GetPropVal(wxT("caption"), m_sCaption);
+		//m_sName = pNode->GetAttribute(wxT("name"), m_sName);
+		//m_sCaption = pNode->GetAttribute(wxT("caption"), m_sCaption);
 		wxXmlNode *subchild = pNode->GetChildren();
 		while(subchild)
 		{
-			wxString sType = subchild->GetPropVal(wxT("type"), wxT("sep"));
+			wxString sType = subchild->GetAttribute(wxT("type"), wxT("sep"));
 			if(sType == wxT("cmd"))
 			{
-				wxString sCmdName = subchild->GetPropVal(wxT("cmd_name"), wxT("None"));
-				unsigned char nSubtype = wxAtoi(subchild->GetPropVal(wxT("subtype"), wxT("0")));
-				//wxString sName = subchild->GetPropVal(wxT("name"), NONAME);
+				wxString sCmdName = subchild->GetAttribute(wxT("cmd_name"), wxT("None"));
+				unsigned char nSubtype = wxAtoi(subchild->GetAttribute(wxT("subtype"), wxT("0")));
+				//wxString sName = subchild->GetAttribute(wxT("name"), NONAME);
 				ICommand* pSubCmd = pApp->GetCommand(sCmdName, nSubtype);
 				if(pSubCmd)
 					AddCommand(pSubCmd);
@@ -177,7 +177,7 @@ void wxGISCommandBar::Serialize(IApplication* pApp, wxXmlNode* pNode, bool bStor
 			else if(sType == wxT("menu"))
 			{
 				//the menu description must be exist in xml before using submenu
-				wxString sCmdName = subchild->GetPropVal(wxT("cmd_name"), ERR);
+				wxString sCmdName = subchild->GetAttribute(wxT("cmd_name"), ERR);
 				IGISCommandBar* pGISCommandBar = pApp->GetCommandBar(sCmdName);
 				if(pGISCommandBar)
 				{
@@ -208,7 +208,7 @@ wxGISMenu::wxGISMenu(const wxString& sName, const wxString& sCaption, wxGISEnumC
 
 wxGISMenu::~wxGISMenu(void)
 {
-	for(size_t i = 0; i < m_SubmenuArray.size(); i++)
+	for(size_t i = 0; i < m_SubmenuArray.size(); ++i)
 	{
 		Delete(m_SubmenuArray[i].pItem);
 		wsDELETE(m_SubmenuArray[i].pBar);
@@ -310,7 +310,7 @@ END_EVENT_TABLE()
 
 wxGISToolBar::wxGISToolBar(wxWindow* parent, wxWindowID id, const wxPoint& position, const wxSize& size, long style, const wxString& sName, const wxString& sCaption, wxGISEnumCommandBars type ) : wxAuiToolBar(parent, id, position, size, style), wxGISCommandBar(sName, sCaption, type), m_pStatusBar(NULL)
 {
-	IApplication* pApp = dynamic_cast<IApplication*>(parent);
+	IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(parent);
 	if(pApp)
 	{
 		m_pStatusBar = pApp->GetStatusBar();
@@ -477,7 +477,7 @@ void wxGISToolBar::RemoveCommand(size_t nIndex)
 {
 	size_t nRealIndex = nIndex;
 	//count beforehead controls and check if labels exists
-	for(size_t i = 0; i < nIndex; i++)
+	for(size_t i = 0; i < nIndex; ++i)
 	{
 		if(m_CommandArray[nIndex]->GetKind() == enumGISCommandControl)
 		{
@@ -509,7 +509,7 @@ void wxGISToolBar::MoveCommandLeft(size_t nIndex)
 {
 	wxGISCommandBar::MoveCommandLeft(nIndex);
 	wxAuiToolBar::Clear();
-	for(size_t i = 0; i < m_CommandArray.size(); i++)
+	for(size_t i = 0; i < m_CommandArray.size(); ++i)
 		ReAddCommand(m_CommandArray[i]);
 	wxAuiToolBar::Realize();
 }
@@ -518,25 +518,25 @@ void wxGISToolBar::MoveCommandRight(size_t nIndex)
 {
 	wxGISCommandBar::MoveCommandRight(nIndex);
 	wxAuiToolBar::Clear();
-	for(size_t i = 0; i < m_CommandArray.size(); i++)
+	for(size_t i = 0; i < m_CommandArray.size(); ++i)
 		ReAddCommand(m_CommandArray[i]);
 	wxAuiToolBar::Realize();
 }
 
-void wxGISToolBar::Serialize(IApplication* pApp, wxXmlNode* pNode, bool bStore)
+void wxGISToolBar::Serialize(IFrameApplication* pApp, wxXmlNode* pNode, bool bStore)
 {
 	if(bStore)
 	{
-		pNode->AddProperty(wxT("size"), wxString::Format(wxT("%u"), GetToolBitmapSize().GetWidth()));
-		pNode->AddProperty(wxT("LeftDockable"), m_bLDock == true ? wxT("t") : wxT("f"));
-		pNode->AddProperty(wxT("RightDockable"), m_bRDock == true ? wxT("t") : wxT("f"));
+		pNode->AddAttribute(wxT("size"), wxString::Format(wxT("%u"), GetToolBitmapSize().GetWidth()));
+		pNode->AddAttribute(wxT("LeftDockable"), m_bLDock == true ? wxT("t") : wxT("f"));
+		pNode->AddAttribute(wxT("RightDockable"), m_bRDock == true ? wxT("t") : wxT("f"));
 		wxGISCommandBar::Serialize(pApp, pNode, bStore);
 	}
 	else
 	{
-		m_bLDock = pNode->GetPropVal(wxT("LeftDockable"), wxT("f")) == wxT("f") ? false : true;
-		m_bRDock = pNode->GetPropVal(wxT("RightDockable"), wxT("f")) == wxT("f") ? false : true;
-		short iSize = wxAtoi(pNode->GetPropVal(wxT("size"), wxT("16")));
+		m_bLDock = pNode->GetAttribute(wxT("LeftDockable"), wxT("f")) == wxT("f") ? false : true;
+		m_bRDock = pNode->GetAttribute(wxT("RightDockable"), wxT("f")) == wxT("f") ? false : true;
+		short iSize = wxAtoi(pNode->GetAttribute(wxT("size"), wxT("16")));
 		SetToolBitmapSize(wxSize(iSize,iSize));
 
 		wxAuiToolBarItemArray prepend_items;
@@ -563,7 +563,7 @@ void wxGISToolBar::AddMenu(wxMenu* pMenu, wxString sName)
 	//m_SubmenuArray.push_back(AppendSubMenu(pMenu, sName);
 }
 
-void wxGISToolBar::Activate(IApplication* pApp)
+void wxGISToolBar::Activate(IFrameApplication* pApp)
 {
 	for(std::map<size_t, IToolBarControl*>::const_iterator IT = m_RemControlMap.begin(); IT != m_RemControlMap.end(); ++IT)
 	{

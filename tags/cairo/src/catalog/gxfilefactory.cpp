@@ -57,26 +57,26 @@ void wxGxFileFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
 {
     if(bStore)
     {
-        if(pConfig->HasProp(wxT("factory_name")))
-            pConfig->DeleteProperty(wxT("factory_name"));
-        pConfig->AddProperty(wxT("factory_name"), GetClassName());    
-        if(pConfig->HasProp(wxT("is_enabled")))
-            pConfig->DeleteProperty(wxT("is_enabled"));
-        pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
+        if(pConfig->HasAttribute(wxT("factory_name")))
+            pConfig->DeleteAttribute(wxT("factory_name"));
+        pConfig->AddAttribute(wxT("factory_name"), GetClassName());    
+        if(pConfig->HasAttribute(wxT("is_enabled")))
+            pConfig->DeleteAttribute(wxT("is_enabled"));
+        pConfig->AddAttribute(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
         wxString sExt;
         for(size_t j = 0; j < m_ExtArray.size(); j++)
         {
             sExt += m_ExtArray[j];
             sExt += wxT("|");
         }
-        if(pConfig->HasProp(wxT("extensions")))
-            pConfig->DeleteProperty(wxT("extensions"));
-        pConfig->AddProperty(wxT("extensions"), sExt);    
+        if(pConfig->HasAttribute(wxT("extensions")))
+            pConfig->DeleteAttribute(wxT("extensions"));
+        pConfig->AddAttribute(wxT("extensions"), sExt);    
     }
     else
     {
-        m_bIsEnabled = wxAtoi(pConfig->GetPropVal(wxT("is_enabled"), wxT("1")));
-        wxString sExts = pConfig->GetPropVal(wxT("extensions"), wxT("txt|log|nfo|"));
+        m_bIsEnabled = wxAtoi(pConfig->GetAttribute(wxT("is_enabled"), wxT("1"))) != 0;
+        wxString sExts = pConfig->GetAttribute(wxT("extensions"), wxT("txt|log|nfo|"));
 	    wxStringTokenizer tkz(sExts, wxString(wxT("|")), wxTOKEN_RET_EMPTY );
 	    while ( tkz.HasMoreTokens() )
 	    {

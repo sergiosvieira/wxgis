@@ -33,7 +33,7 @@ public:
 	~wxGISSimpleRenderer(void);
 //IFeatureRenderer
 	virtual bool CanRender(wxGISDatasetSPtr pDataset);
-	virtual void Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisplay, ITrackCancel *pTrackCancel = 0);
+	virtual void Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = 0);
 protected:
 	wxGISDatasetSPtr m_pDataset;
 	RGBA m_stFillColour, m_stLineColour, m_stPointColour;

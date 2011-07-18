@@ -70,10 +70,10 @@ bool wxGxRemoteServer::DeleteChild(IGxObject* pChild)
 	return true;
 }
 
-wxXmlNode* wxGxRemoteServer::GetProperties(void)
+wxXmlNode* wxGxRemoteServer::GetAttributes(void)
 {
 	if(m_pNetConn)
-		return m_pNetConn->GetProperties();
+		return m_pNetConn->GetAttributes();
     return NULL;
 }
 
@@ -136,7 +136,7 @@ void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 	        m_pNetConn->PutOutMessage(msg);
         }
         else
-            wxDELETE(pMsg)
+            wxDELETE(pMsg);
 	}
 
     wxString sName = msg.pMsg->GetDestination();
@@ -159,8 +159,8 @@ void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
             //log text
 			if(pChildNode)
 			{
-				wxString sServer = pChildNode->GetPropVal(wxT("name"), wxT(""));
-				wxString sBanner = pChildNode->GetPropVal(wxT("banner"), wxT(""));
+				wxString sServer = pChildNode->GetAttribute(wxT("name"), wxT(""));
+				wxString sBanner = pChildNode->GetAttribute(wxT("banner"), wxT(""));
 				wxLogMessage(wxT("wxGxRemoteServer: Connected to server - %s; %s"), sServer.c_str(), sBanner.c_str());
 			}
 
@@ -177,7 +177,7 @@ void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 			        m_pNetConn->PutOutMessage(msg);
 		        }
                 else
-                    wxDELETE(pMsg)
+                    wxDELETE(pMsg);
             }
 		    return;
         }
@@ -199,7 +199,7 @@ void wxGxRemoteServer::PutOutMessage(WXGISMSG msg)
 
 void wxGxRemoteServer::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		delete m_Children[i];
@@ -223,5 +223,5 @@ void wxGxRemoteServer::LoadChildren()
         m_pNetConn->PutOutMessage(msg);
     }
     else
-        wxDELETE(pMsg)
+        wxDELETE(pMsg);
 }

@@ -62,7 +62,7 @@ bool wxGISSimpleRenderer::CanRender(wxGISDatasetSPtr pDataset)
 	return bRet;
 }
 
-void wxGISSimpleRenderer::Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplayEx *pDisplay, ITrackCancel *pTrackCancel)
+void wxGISSimpleRenderer::Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel)
 {
 	if(NULL == pCursor)
 		return;

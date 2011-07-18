@@ -38,7 +38,7 @@ wxGISGPCompStatTool::wxGISGPCompStatTool(void) : wxGISGPTool()
 
 wxGISGPCompStatTool::~wxGISGPCompStatTool(void)
 {
-    for(size_t i = 0; i < m_pParamArr.size(); i++)
+    for(size_t i = 0; i < m_pParamArr.size(); ++i)
         wxDELETE(m_pParamArr[i]);
 }
 

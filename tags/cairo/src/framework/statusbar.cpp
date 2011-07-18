@@ -40,7 +40,7 @@ wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, cons
     m_NumLockPos = -1;
     m_ScrollLockPos = -1;
 
-	m_pApp = dynamic_cast<IApplication*>(parent);
+	m_pApp = dynamic_cast<IFrameApplication*>(parent);
 
 	std::vector<STATUSPANE> panes;
 	int counter(0);
@@ -121,20 +121,20 @@ wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, cons
 #ifdef __WXGTK__
 		STATUSPANE data = {48, wxSB_NORMAL};
 #else
-		STATUSPANE data = {38, wxSB_NORMAL};
+		STATUSPANE data = {28, wxSB_NORMAL};
 #endif
 		panes.push_back(data);
 		m_ClockPos = counter;
 		counter++;
 	}
-	STATUSPANE data = {1, wxSB_FLAT};
-	panes.push_back(data);
-	STATUSPANE data1 = {15, wxSB_FLAT};
-	panes.push_back(data1);
+	//STATUSPANE data = {1, wxSB_FLAT};
+	//panes.push_back(data);
+	//STATUSPANE data1 = {15, wxSB_FLAT};
+	//panes.push_back(data1);
 
 	int *STATUSBAR_Sizes = new int[panes.size()];
 	int *STATUSBAR_Styles = new int[panes.size()];
-	for(size_t i = 0; i < panes.size(); i++)
+	for(size_t i = 0; i < panes.size(); ++i)
 	{
 		STATUSBAR_Sizes[i] = panes[i].size;
 		STATUSBAR_Styles[i] = panes[i].style;
@@ -145,7 +145,6 @@ wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, cons
 	delete [] STATUSBAR_Sizes;
 	delete [] STATUSBAR_Styles;
 
-	//m_pProgressBar	= new wxGauge(this, ID_WND_PROGRESSBAR, 100);
 	//set text & start timer
 	if(panesstyle & enumGISStatusClock)
 	{

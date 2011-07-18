@@ -44,6 +44,8 @@ IGxCatalog* const wxGxApplication::GetCatalog(void)
 
 bool wxGxApplication::Create(IGISConfig* pConfig)
 {
+	m_mgr.SetManagedWindow(this);
+
     m_pNewMenu = new wxGISNewMenu();
     m_pNewMenu->OnCreate(this);
     m_pNewMenu->Reference();
@@ -59,7 +61,6 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
 
 	wxLogMessage(_("wxGxApplication: Start. Creating main application frame..."));
 
-	m_mgr.SetManagedWindow(this);
 
 	wxXmlNode* pViewsNode = m_pConfig->GetConfigNode(wxString(wxT("frame/views")), true, true);
 
@@ -97,7 +98,7 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
         }
         else
         {
- 		    wxString sClass = pViewsChildNode->GetPropVal(wxT("class"), ERR);
+ 		    wxString sClass = pViewsChildNode->GetAttribute(wxT("class"), ERR);
 
 		    wxObject *obj = wxCreateDynamicObject(sClass);
 		    IGxView *pGxView = dynamic_cast<IGxView*>(obj);
@@ -131,7 +132,7 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
 
         pViewsChildNode = pViewsChildNode->GetNext();
     }
-	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
+	for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
 	{
 		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
 		{
@@ -153,7 +154,7 @@ bool wxGxApplication::Create(IGISConfig* pConfig)
 	IGxObject* pObj = dynamic_cast<IGxObject*>(m_pCatalog);
 	wxString sLastPath;
 	if(pLastLocationNode)
-		sLastPath = pLastLocationNode->GetPropVal(wxT("path"), pObj->GetName());
+		sLastPath = pLastLocationNode->GetAttribute(wxT("path"), pObj->GetName());
 	else
 		sLastPath = pObj->GetName();
 
@@ -187,14 +188,14 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
 		    wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
 		    if(pLastLocationNode)
 		    {
-			    if(pLastLocationNode->HasProp(wxT("path")))
-				    pLastLocationNode->DeleteProperty(wxT("path"));
+			    if(pLastLocationNode->HasAttribute(wxT("path")))
+				    pLastLocationNode->DeleteAttribute(wxT("path"));
 		    }
 		    else
 		    {
 			    pLastLocationNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("lastpath")), true);
 		    }
-		    pLastLocationNode->AddProperty(wxT("path"), sLastPath);
+		    pLastLocationNode->AddAttribute(wxT("path"), sLastPath);
         }
 	}
 	wxGISApplicationEx::OnClose(event);

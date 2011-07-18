@@ -141,7 +141,7 @@ bool wxGxKMLDataset::Rename(wxString NewName)
 
 void wxGxKMLDataset::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		wxDELETE( m_Children[i] );
@@ -173,7 +173,7 @@ void wxGxKMLDataset::LoadChildren(void)
         pwxGISFeatureDataset->SetEncoding(m_Encoding);
 	}
 
-    for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); i++)
+    for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); ++i)
     {
         wxGISFeatureDatasetSPtr pwxGISFeatureSuDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset->GetSubset(i));
         pwxGISFeatureSuDataset->SetSubType(m_type);
@@ -198,7 +198,7 @@ bool wxGxKMLDataset::DeleteChild(IGxObject* pChild)
 	return true;
 }
 
-wxGISDatasetSPtr wxGxKMLDataset::GetDataset(void)
+wxGISDatasetSPtr wxGxKMLDataset::GetDataset(ITrackCancel* pTrackCancel)
 {
     LoadChildren();
 	if(m_pwxGISDataset == NULL)
@@ -308,7 +308,7 @@ wxString wxGxKMLSubDataset::GetCategory(void)
 	return wxString(_("KML Feature class"));
 }
 
-wxGISDatasetSPtr wxGxKMLSubDataset::GetDataset(void)
+wxGISDatasetSPtr wxGxKMLSubDataset::GetDataset(ITrackCancel* pTrackCancel)
 {
 	//if(m_pwxGISDataset == NULL)
  //       return wxGISDatasetSPtr();

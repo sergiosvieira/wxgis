@@ -43,9 +43,9 @@ public:
 	~wxGISRasterPropertyPage();
     virtual bool Create(wxGxRasterDataset* pGxDataset, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Raster"));
     virtual wxString GetPageName(void){return wxString(_("Raster"));};
-    wxPGId AppendProperty(wxPGProperty* pProp);
-    wxPGId AppendProperty(wxPGId pid, wxPGProperty* pProp);
-    wxPGId AppendMetadataProperty(wxString sMeta);
+    wxPGProperty* AppendProperty(wxPGProperty* pProp);
+    wxPGProperty* AppendProperty(wxPGProperty* pid, wxPGProperty* pProp);
+    wxPGProperty* AppendMetadataProperty(wxString sMeta);
     void FillGrid(void);
     //events
     void OnPropertyGridButtonClick ( wxCommandEvent& );

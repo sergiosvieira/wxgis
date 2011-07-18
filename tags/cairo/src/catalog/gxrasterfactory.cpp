@@ -136,16 +136,16 @@ void wxGxRasterFactory::Serialize(wxXmlNode* pConfig, bool bStore)
 {
     if(bStore)
     {
-        if(pConfig->HasProp(wxT("factory_name")))
-            pConfig->DeleteProperty(wxT("factory_name"));
-        pConfig->AddProperty(wxT("factory_name"), GetClassName());  
-        if(pConfig->HasProp(wxT("is_enabled")))
-            pConfig->DeleteProperty(wxT("is_enabled"));
-        pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
+        if(pConfig->HasAttribute(wxT("factory_name")))
+            pConfig->DeleteAttribute(wxT("factory_name"));
+        pConfig->AddAttribute(wxT("factory_name"), GetClassName());  
+        if(pConfig->HasAttribute(wxT("is_enabled")))
+            pConfig->DeleteAttribute(wxT("is_enabled"));
+        pConfig->AddAttribute(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
     }
     else
     {
-        m_bIsEnabled = wxAtoi(pConfig->GetPropVal(wxT("is_enabled"), wxT("1")));
+        m_bIsEnabled = wxAtoi(pConfig->GetAttribute(wxT("is_enabled"), wxT("1"))) != 0;
     }
 }
 

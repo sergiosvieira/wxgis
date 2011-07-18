@@ -85,7 +85,7 @@ void *wxProcessWaitThread::Entry()
 
     std::vector<std::string> args;
     wxArrayString saParams = m_pProc->GetParameters();
-    for(size_t i = 0; i < saParams.GetCount(); i++)
+    for(size_t i = 0; i < saParams.GetCount(); ++i)
         args.push_back(std::string(saParams[i].mb_str())); 
 
     //"wxGISGeoprocess.exe -n create_ovr -p "My geodata\tsk_exe\08MAY01083427-S2AS_R1C1-005728810020_01_P001.TIF|GAUSS|JPEG|""

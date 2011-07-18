@@ -49,7 +49,7 @@ wxIcon wxGxRemoteServersUI::GetSmallImage(void)
 
 void wxGxRemoteServersUI::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
@@ -70,11 +70,11 @@ void wxGxRemoteServersUI::LoadChildren()
 		wxXmlNode* pConnNode = pConnectionsNode->GetChildren();
 		while(pConnNode)
 		{
-		    wxString sClassName = pConnNode->GetPropVal(wxT("class"), ERR);
+		    wxString sClassName = pConnNode->GetAttribute(wxT("class"), ERR);
 		    if(!sClassName.IsEmpty())
 		    {
 			    INetClientConnection *pConn = dynamic_cast<INetClientConnection*>(wxCreateDynamicObject(sClassName));
-			    if(pConn && pConn->SetProperties(pConnNode))
+			    if(pConn && pConn->SetAttributes(pConnNode))
 			    {
 				    wxGxRemoteServerUI* pServerConn = new wxGxRemoteServerUI(pConn);
 				    IGxObject* pGxObj = static_cast<IGxObject*>(pServerConn);

@@ -36,9 +36,10 @@ wxMxApplication::~wxMxApplication(void)
 
 bool wxMxApplication::Create(IGISConfig* pConfig)
 {
+	m_mgr.SetManagedWindow(this);
+
     wxGISApplication::Create(pConfig);
 
-	m_mgr.SetManagedWindow(this);
 
 	m_pMapView = new wxMxMapView(this);
 	//if(m_pMapView->Activate(this, NULL))
@@ -52,8 +53,8 @@ bool wxMxApplication::Create(IGISConfig* pConfig)
 
     //}
     //else
-    //    wxDELETE(m_pMapView)
-	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
+    //    wxDELETE(m_pMapView);
+	for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
 	{
 		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
 		{

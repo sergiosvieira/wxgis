@@ -40,7 +40,7 @@ wxGISGPProjectVectorTool::wxGISGPProjectVectorTool(void) : wxGISGPTool()
 
 wxGISGPProjectVectorTool::~wxGISGPProjectVectorTool(void)
 {
-    for(size_t i = 0; i < m_pParamArr.size(); i++)
+    for(size_t i = 0; i < m_pParamArr.size(); ++i)
         wxDELETE(m_pParamArr[i]);
 }
 

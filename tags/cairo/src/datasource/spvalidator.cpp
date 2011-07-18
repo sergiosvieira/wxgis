@@ -109,14 +109,14 @@ bool wxGISSpatialReferenceValidator::LoadData(wxString sPath)
     wxXmlNode* pChildNode = pRootNode->GetChildren();
     while(pChildNode != NULL)
     {
-        wxString sName = pChildNode->GetPropVal(wxT("name"),wxT(""));
+        wxString sName = pChildNode->GetAttribute(wxT("name"),wxT(""));
         if(!sName.IsEmpty())
         {
             LIMITS lims;
-            lims.minx = wxAtof(pChildNode->GetPropVal(wxT("minx"),wxT("-179.99999999")));
-            lims.miny = wxAtof(pChildNode->GetPropVal(wxT("miny"),wxT("-89,99999999")));
-            lims.maxx = wxAtof(pChildNode->GetPropVal(wxT("maxx"),wxT("179.99999999")));
-            lims.maxy = wxAtof(pChildNode->GetPropVal(wxT("maxy"),wxT("89,99999999")));
+            lims.minx = wxAtof(pChildNode->GetAttribute(wxT("minx"),wxT("-179.99999999")));
+            lims.miny = wxAtof(pChildNode->GetAttribute(wxT("miny"),wxT("-89,99999999")));
+            lims.maxx = wxAtof(pChildNode->GetAttribute(wxT("maxx"),wxT("179.99999999")));
+            lims.maxy = wxAtof(pChildNode->GetAttribute(wxT("maxy"),wxT("89,99999999")));
             m_DataMap[sName] = lims;
        }
         pChildNode = pChildNode->GetNext();
@@ -132,8 +132,8 @@ wxString wxGISSpatialReferenceValidator::GetPath(wxXmlNode* pNode)
 	wxXmlNode* pChildren = pNode->GetChildren();
 	while(pChildren)
 	{
-		if( pChildren->GetPropVal(wxT("name"), NONAME) == wxString(wxT("wxGxSpatialReferencesFolder")))
-            return pChildren->GetPropVal(wxT("path"), wxT(""));
+		if( pChildren->GetAttribute(wxT("name"), NONAME) == wxString(wxT("wxGxSpatialReferencesFolder")))
+            return pChildren->GetAttribute(wxT("path"), wxT(""));
 		pChildren = pChildren->GetNext();
 	}
 	return wxEmptyString;

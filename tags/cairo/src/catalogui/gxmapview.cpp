@@ -39,6 +39,7 @@ BEGIN_EVENT_TABLE(wxGxMapView, wxGISMapView)
 	EVT_MIDDLE_DCLICK(wxGxMapView::OnMouseDoubleClick)
 	EVT_RIGHT_DCLICK(wxGxMapView::OnMouseDoubleClick)
 	EVT_MOTION(wxGxMapView::OnMouseMove)
+	EVT_GXSELECTION_CHANGED(wxGxMapView::OnSelectionChanged)
 END_EVENT_TABLE()
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxMapView, wxGISMapView)
@@ -65,7 +66,7 @@ bool wxGxMapView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, co
     return wxGISMapView::Create(parent, MAPCTRLID, pos, size, style, name);
 }
 
-bool wxGxMapView::Activate(IApplication* application, wxXmlNode* pConf)
+bool wxGxMapView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 {
 	if(!wxGxView::Activate(application, pConf))
 		return false;
@@ -78,10 +79,11 @@ bool wxGxMapView::Activate(IApplication* application, wxXmlNode* pConf)
     if(!m_pApp)
         return false;
 	m_pStatusBar = m_pApp->GetStatusBar();
-	GetTrackCancel()->SetProgressor(m_pStatusBar->GetAnimation());
-	//m_pAni = static_cast<wxGISAnimation*>(m_pStatusBar->GetAnimation());
 
-	//wxGISMapView::SetTrackCancel();
+	m_pTrackCancel = new ITrackCancel();
+	if(m_pStatusBar)
+		m_pTrackCancel->SetProgressor(m_pStatusBar->GetAnimation());
+	SetTrackCancel(m_pTrackCancel);
 	return true;
 }
 
@@ -89,6 +91,7 @@ void wxGxMapView::Deactivate(void)
 {
 	//Serialize(m_pXmlConf, true);
 	wxGxView::Deactivate();
+	wxDELETE(m_pTrackCancel);
 }
 
 bool wxGxMapView::Applies(IGxSelection* Selection)
@@ -96,7 +99,7 @@ bool wxGxMapView::Applies(IGxSelection* Selection)
 	if(Selection == NULL)
 		return false;
 
-	for(size_t i = 0; i < Selection->GetCount(); i++)
+	for(size_t i = 0; i < Selection->GetCount(); ++i)
 	{
         IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(Selection->GetSelectedObjectID(i));
 		IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>( pGxObject.get() );
@@ -117,9 +120,10 @@ bool wxGxMapView::Applies(IGxSelection* Selection)
 	return false;
 }
 
-void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
+void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 {
-    long nLastSelID = Selection->GetLastSelectedObjectID();
+	wxCHECK_RET(event.GetSelection(), "the selection pointer is NULL");
+    long nLastSelID = event.GetSelection()->GetLastSelectedObjectID();
 	if(m_nParentGxObjectID == nLastSelID)
 		return;
     	
@@ -129,41 +133,49 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 		return;
 
 //    wxBusyCursor wait;
-	wxGISDatasetSPtr pwxGISDataset = pGxDataset->GetDataset();
+	if(m_pStatusBar)
+		m_pTrackCancel->SetProgressor(m_pStatusBar->GetProgressor());
+	m_pTrackCancel->Reset();
+	wxGISDatasetSPtr pwxGISDataset = pGxDataset->GetDataset(m_pTrackCancel);
+	if(m_pStatusBar)
+		m_pTrackCancel->SetProgressor(m_pStatusBar->GetAnimation());
+
 	if(pwxGISDataset == NULL)
 		return;
 
-    m_nParentGxObjectID = pGxObject->GetID();
-    //the pOGRLayer will live while IGxObject live. IGxObject( from IGxSelection ) store IwxGISDataset, and destroy it then catalog destroyed
-    //pwxGISDataset->Dereference();
+    m_nParentGxObjectID = pGxObject->GetID();    
 
 	wxGISEnumDatasetType type = pwxGISDataset->GetType();
-    std::vector<wxGISLayer*> pwxGISLayers;
+    std::vector<wxGISLayerSPtr> paLayers;
+
 	switch(type)
 	{
 	case enumGISFeatureDataset:
-		pwxGISLayers.push_back(new wxGISFeatureLayer(pwxGISDataset));
-        pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISDataset->GetName());
+		{
+		wxGISFeatureLayerSPtr pGISFeatureLayer = boost::make_shared<wxGISFeatureLayer>(pwxGISDataset);
+		paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISFeatureLayer));
+		}
 		break;
 	case enumGISRasterDataset:
-  //      CheckOverviews(pwxGISDataset, pGxObject->GetName());
+        //CheckOverviews(pwxGISDataset, pGxObject->GetName());
 		//pwxGISLayers.push_back(new wxGISRasterLayer(pwxGISDataset));
-  //      pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISDataset->GetName());
+        //pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISDataset->GetName());
 		break;
 	case enumGISContainer:
-        for(size_t i = 0; i < pwxGISDataset->GetSubsetsCount(); i++)
+        for(size_t i = 0; i < pwxGISDataset->GetSubsetsCount(); ++i)
         {
             wxGISDatasetSPtr pwxGISSubDataset = pwxGISDataset->GetSubset(i);
-            //pwxGISSubDataset->Dereference();
             if(!pwxGISSubDataset)
                 continue;
             wxGISEnumDatasetType subtype = pwxGISSubDataset->GetType();
 	        switch(subtype)
 	        {
 	        case enumGISFeatureDataset:
-		        pwxGISLayers.push_back(new wxGISFeatureLayer(pwxGISSubDataset));
-                pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISSubDataset->GetName());
-		        break;
+				{
+				wxGISFeatureLayerSPtr pGISFeatureLayer = boost::make_shared<wxGISFeatureLayer>(pwxGISSubDataset);
+				paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISFeatureLayer));
+				}
+				break;
 	        case enumGISRasterDataset:
           //      CheckOverviews(pwxGISSubDataset, pGxObject->GetName());
 		        //pwxGISLayers.push_back(new wxGISRasterLayer(pwxGISSubDataset));
@@ -176,32 +188,25 @@ void wxGxMapView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 		break;
 	}
 
-    ClearLayers();
+    Clear();
 
-    for(size_t i = 0; i < pwxGISLayers.size(); i++)
+    for(size_t i = 0; i < paLayers.size(); ++i)
     {
-	    if(pwxGISLayers[i] && pwxGISLayers[i]->IsValid())
-		    AddLayer(pwxGISLayers[i]);
+	    if(paLayers[i] && paLayers[i]->IsValid())
+		    AddLayer(paLayers[i]);
     }
-
-#ifdef __WXGTK__
-	wxMilliSleep(200);
-#endif
 
     SetFullExtent();
 }
 
 void wxGxMapView::OnMouseMove(wxMouseEvent& event)
 {
-	IDisplayTransformation* pDisplayTransformation = pGISScreenDisplay->GetDisplayTransformation();
-	if(pDisplayTransformation)
+	if(m_pGISDisplay)
 	{
-		wxPoint* pDCPoint = new wxPoint(event.m_x, event.m_y);
-		OGRRawPoint* pGeoPoints = pDisplayTransformation->TransformCoordDC2World(pDCPoint, 1);
+		double dX(event.m_x), dY(event.m_y);
+		m_pGISDisplay->DC2World(&dX, &dY);
         int nPanePos = m_pStatusBar->GetPanePos(enumGISStatusPosition);
-		m_pStatusBar->SetMessage(wxString::Format(_("X: %.4f  Y: %.4f"), pGeoPoints->x, pGeoPoints->y), nPanePos);//_("X: %u  Y: %u")
-		delete [] pDCPoint;
-		delete [] pGeoPoints;
+		m_pStatusBar->SetMessage(wxString::Format(_("X: %.4f  Y: %.4f"), dX, dY), nPanePos);
 	}
 
 	if(m_pApp)
@@ -276,19 +281,19 @@ void wxGxMapView::CheckOverviews(wxGISDatasetSPtr pwxGISDataset, wxString soFile
             wxXmlNode* pNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/raster")));
             if(pNode)
             {
-                bAskCreateOvr = wxAtoi(pNode->GetPropVal(wxT("ask_create_ovr"), wxT("1")));
-                sCompress = pNode->GetPropVal(wxT("ovr_compress"), wxT("NONE"));
-                sResampleMethod = pNode->GetPropVal(wxT("ovr_resample"), wxT("GAUSS"));
+                bAskCreateOvr = wxAtoi(pNode->GetAttribute(wxT("ask_create_ovr"), wxT("1")));
+                sCompress = pNode->GetAttribute(wxT("ovr_compress"), wxT("NONE"));
+                sResampleMethod = pNode->GetAttribute(wxT("ovr_resample"), wxT("GAUSS"));
                 //"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE"
-                bCreateOverviews = wxAtoi(pNode->GetPropVal(wxT("create_ovr"), wxT("1")));
+                bCreateOverviews = wxAtoi(pNode->GetAttribute(wxT("create_ovr"), wxT("1")));
             }
             else
             {
                 pNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog/raster")), true);
-                pNode->AddProperty(wxT("create_ovr"), wxT("1"));
-                pNode->AddProperty(wxT("ask_create_ovr"), wxT("1"));
-                pNode->AddProperty(wxT("ovr_compress"), wxT("NONE"));
-                pNode->AddProperty(wxT("ovr_resample"), wxT("NONE"));//wxT("GAUSS"));
+                pNode->AddAttribute(wxT("create_ovr"), wxT("1"));
+                pNode->AddAttribute(wxT("ask_create_ovr"), wxT("1"));
+                pNode->AddAttribute(wxT("ovr_compress"), wxT("NONE"));
+                pNode->AddAttribute(wxT("ovr_resample"), wxT("NONE"));//wxT("GAUSS"));
             }
             CPLSetConfigOption( "COMPRESS_OVERVIEW", wgWX2MB(sCompress) );//LZW "DEFLATE" NONE
             if(bAskCreateOvr)
@@ -303,10 +308,10 @@ void wxGxMapView::CheckOverviews(wxGISDatasetSPtr pwxGISDataset, wxString soFile
 
                 if(!dlg.GetShowInFuture())
                 {
-                    pNode->DeleteProperty(wxT("ask_create_ovr"));
-                    pNode->AddProperty(wxT("ask_create_ovr"), wxT("0"));
-                    pNode->DeleteProperty(wxT("create_ovr"));
-                    pNode->AddProperty(wxT("create_ovr"), wxString::Format(wxT("%d"), bCreateOverviews));
+                    pNode->DeleteAttribute(wxT("ask_create_ovr"));
+                    pNode->AddAttribute(wxT("ask_create_ovr"), wxT("0"));
+                    pNode->DeleteAttribute(wxT("create_ovr"));
+                    pNode->AddAttribute(wxT("create_ovr"), wxString::Format(wxT("%d"), bCreateOverviews));
                 }
             }
         }

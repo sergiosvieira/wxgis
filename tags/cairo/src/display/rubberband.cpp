@@ -39,7 +39,7 @@ BEGIN_EVENT_TABLE(wxGISRubberBand, wxEvtHandler)
 	EVT_MOUSE_CAPTURE_LOST(wxGISRubberBand::OnCaptureLost)
 END_EVENT_TABLE()
 
-wxGISRubberBand::wxGISRubberBand(wxPen &oPen, wxWindow *pWnd, wxGISDisplayEx *pDisp) :  m_bLock(true)
+wxGISRubberBand::wxGISRubberBand(wxPen &oPen, wxWindow *pWnd, wxGISDisplay *pDisp) :  m_bLock(true)
 {
 	m_pWnd = pWnd;
 	m_pDisp = pDisp;
@@ -127,7 +127,7 @@ void wxGISRubberBand::OnCaptureLost(wxMouseCaptureLostEvent & event)
 // class wxGISRubberEnvelope
 //----------------------------------------------------
 
-wxGISRubberEnvelope::wxGISRubberEnvelope(wxPen &oPen, wxWindow *pWnd, wxGISDisplayEx *pDisp) : wxGISRubberBand(oPen, pWnd, pDisp)
+wxGISRubberEnvelope::wxGISRubberEnvelope(wxPen &oPen, wxWindow *pWnd, wxGISDisplay *pDisp) : wxGISRubberBand(oPen, pWnd, pDisp)
 {
 }
 
