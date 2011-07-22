@@ -41,7 +41,6 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
        pTrackCancel->PutMessage(wxString::Format(_("Start CopyRows from '%s' to '%s'"), wxString(pSrcDataSet->GetPath(), wxConvUTF8).c_str(), wxString(pDstDataSet->GetPath(), wxConvUTF8).c_str()), -1, enumGISMessageNorm);
     }
     int nCounter(0);
-	size_t nStep = pSrcDataSet->GetFeatureCount() < 10 ? 1 : pSrcDataSet->GetFeatureCount() / 10;
     if(pProgressor)
         pProgressor->SetRange(pSrcDataSet->GetFeatureCount());
 
@@ -141,7 +140,7 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
                 pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
         }
         nCounter++;
-        if(pProgressor && nCounter % nStep == 0)
+        if(pProgressor)
             pProgressor->SetValue(nCounter);
     }
 

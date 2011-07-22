@@ -48,22 +48,7 @@ wxGxCatalogUI::~wxGxCatalogUI()
 
 void wxGxCatalogUI::Detach(void)
 {
-    if(!m_bHasInternal)
-    {
-        wxXmlNode* pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog")));
-	    if(!pNode)
-            pNode = m_pConf->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog")), true);
-	    if(pNode)
-        {
-	        if(pNode->HasAttribute(wxT("open_last_path")))
-		        pNode->DeleteAttribute(wxT("open_last_path"));
-	        pNode->AddAttribute(wxT("open_last_path"), wxString::Format(wxT("%u"), m_bOpenLastPath));
-        }
-
-	    wxDELETE(m_pSelection);
-        wxGxCatalog::Detach();
-    }
-    else
+    if(m_bHasInternal)
     {
 	    wxXmlNode* pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/rootitems")));
 	    if(pNode)
@@ -78,6 +63,21 @@ void wxGxCatalogUI::Detach(void)
 	    EmptyChildren();
     	EmptyDisabledChildren();
     	wxDELETE(m_pConf);
+    }
+    else
+    {
+        wxXmlNode* pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog")));
+	    if(!pNode)
+            pNode = m_pConf->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog")), true);
+	    if(pNode)
+        {
+	        if(pNode->HasAttribute(wxT("open_last_path")))
+		        pNode->DeleteAttribute(wxT("open_last_path"));
+	        pNode->AddAttribute(wxT("open_last_path"), wxString::Format(wxT("%u"), m_bOpenLastPath));
+        }
+
+	    wxDELETE(m_pSelection);
+        wxGxCatalog::Detach();
     }
 }
 

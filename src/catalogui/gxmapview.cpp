@@ -73,7 +73,8 @@ bool wxGxMapView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 	//Serialize(m_pXmlConf, false);
 
     m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pGxApplication->GetCatalog());
-    m_pSelection = m_pCatalog->GetSelection();
+	if(m_pCatalog)
+		m_pSelection = m_pCatalog->GetSelection();
 
     m_pApp = application;
     if(!m_pApp)
@@ -90,8 +91,8 @@ bool wxGxMapView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 void wxGxMapView::Deactivate(void)
 {
 	//Serialize(m_pXmlConf, true);
-	wxGxView::Deactivate();
 	wxDELETE(m_pTrackCancel);
+	wxGxView::Deactivate();
 }
 
 bool wxGxMapView::Applies(IGxSelection* Selection)

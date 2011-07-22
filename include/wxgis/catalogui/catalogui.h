@@ -71,8 +71,6 @@ public:
 	virtual void EditProperties(wxWindow *parent){};
 };
 
-WX_DEFINE_ARRAY_INT(long, wxSelLongArray);
-
 class IGxSelection
 {
 public:
@@ -102,7 +100,7 @@ public:
     virtual size_t GetDoSize() = 0;
     virtual int GetDoPos(void) = 0;
     virtual long GetDoID(size_t nIndex) = 0;
-    virtual wxSelLongArray GetDoArray(void) = 0;
+    virtual wxArrayLong GetDoArray(void) = 0;
 };
 
 class IGxView : public IView

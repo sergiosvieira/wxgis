@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/cartoui/mapview.h"
+#include "wxgis/cartoui/mxeventui.h"
 
 #include "wxgis/datasource/featuredataset.h"
 #include "wxgis/carto/featurelayer.h"
@@ -310,10 +311,6 @@ void wxGISMapView::OnDraw(wxGISEnumDrawPhase nPhase)
 {
 	if(m_pTrackCancel)
 		m_pTrackCancel->Reset();
-	//DEBUG: Draw X and envelope
-	//m_pGISDisplay->TestDraw();
-	//return;
-
 	for(size_t i = 0; i < m_paLayers.size(); ++i)
 	{
 		if(m_pTrackCancel && !m_pTrackCancel->Continue())
@@ -595,6 +592,10 @@ void wxGISMapView::SetRotate(double dAngleRad)
 	if(m_pGISDisplay)
 		m_pGISDisplay->SetRotate(dAngleRad);
 	m_dCurrentAngle = dAngleRad;
+
+	wxMxMapViewEvent event(wxMXMAP_ROTATED, m_dCurrentAngle);
+	PostEvent(event);
+
 	Refresh(false);
 }
 

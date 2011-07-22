@@ -22,6 +22,7 @@
 #pragma once
 #include "wxgis/framework/framework.h"
 
+/*
 #define TIMER_BALOON 1014
 
 class WXDLLIMPEXP_GIS_FRW wxGISBaloonTip : public wxFrame
@@ -30,13 +31,13 @@ public:
     wxGISBaloonTip(wxString sTitle, wxIcon Icon, wxString sMessage);
     virtual ~wxGISBaloonTip() { delete timer; }
 
-    /** painting bg */
+    // painting bg
     virtual void OnPaint(wxPaintEvent& event);
-    /** timer to close window */
+    // timer to close window
     virtual void OnTimerTick(wxTimerEvent & event);
-    /** click on the baloon */
+    // click on the baloon
     virtual void OnClick(wxMouseEvent & event){ };
-    /** click esc */
+    // click esc
     virtual void OnEscape(wxKeyEvent & event)
     { 
         if(event.GetKeyCode() == WXK_SHIFT || event.GetKeyCode() == WXK_ALT || event.GetKeyCode() == WXK_CONTROL)
@@ -44,13 +45,13 @@ public:
         if(event.GetKeyCode() == WXK_ESCAPE)
             Close();
     };
-    /** click close */
+    // click close
     virtual void OnClose(wxCommandEvent & event)
     {    
         Close();
     };
 
-    /** display the baloon and run the timer */
+    // display the baloon and run the timer
     virtual void ShowBaloon(unsigned int iTimeout);
     virtual void Close(void);
 private:
@@ -59,3 +60,4 @@ private:
     DECLARE_EVENT_TABLE();
 
 };
+*/

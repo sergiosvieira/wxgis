@@ -116,7 +116,7 @@ wxString wxGISTable::GetName(void)
 {
 	if(!m_sTableName.IsEmpty())
 		return m_sTableName;
-	if( !m_bIsOpened || !m_poLayer )
+	if( !m_poLayer )
 		return wxEmptyString;
 
     wxString sOut;

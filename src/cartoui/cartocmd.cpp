@@ -583,7 +583,7 @@ void wxGISCartoMainTool::OnMouseDoubleClick(wxMouseEvent& event)
 IMPLEMENT_DYNAMIC_CLASS(wxGISCartoFrameTool, wxObject)
 
 
-wxGISCartoFrameTool::wxGISCartoFrameTool(void) : m_pMapView(NULL), m_bCheck(false), m_pRotationComboBox(NULL)
+wxGISCartoFrameTool::wxGISCartoFrameTool(void) : m_pMapView(NULL), m_bCheck(false)
 {
 }
 
@@ -659,18 +659,9 @@ bool wxGISCartoFrameTool::GetEnabled(void)
 				}
 			}
 		}
-		if(m_pRotationComboBox)
-			m_pRotationComboBox->SetMapView(m_pMapView);
 	}
 	if(!m_pMapView)
         return false;
-
-	if(!m_pRotationComboBox && m_pApp)
-	{
-		IToolControl* pToolCtrl = dynamic_cast<IToolControl*>(m_pApp->GetCommand(wxString(wxT("wxGISCartoFrameTool")), 2));
-		if(pToolCtrl)
-			m_pRotationComboBox = dynamic_cast<wxGISRotationComboBox*>(pToolCtrl->GetControl());
-	}
 
 	switch(m_subtype)
 	{
@@ -725,9 +716,7 @@ void wxGISCartoFrameTool::OnClick(void)
 		case 1:
 			if(m_pMapView)
 			{
-				m_pMapView->SetRotate(0);
-				if(m_pRotationComboBox)
-					m_pRotationComboBox->UpdateAngle();
+				m_pMapView->SetRotate(0.0);
 			}
 			break;
 		case 2:
@@ -825,13 +814,9 @@ void wxGISCartoFrameTool::OnMouseMove(wxMouseEvent& event)
 			if(event.Dragging())
 			{
 				m_pMapView->RotateBy(event.GetPosition());
-				if(m_pRotationComboBox)
-					m_pRotationComboBox->UpdateAngle();
 			}
 			break;
 		case 2:
-			if(m_pRotationComboBox)
-				m_pRotationComboBox->UpdateAngle();
 			break;
 		default:
 			break;
@@ -848,12 +833,12 @@ IToolBarControl* wxGISCartoFrameTool::GetControl(void)
 	switch(m_subtype)
 	{
 		case 2:	
-			if(!m_pRotationComboBox)
+			//if(!m_pRotationComboBox)
 			{
 				wxArrayString ValuesArray;
-				m_pRotationComboBox = new wxGISRotationComboBox(dynamic_cast<wxWindow*>(m_pApp), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 65, 22 ), ValuesArray);
+				wxGISRotationComboBox* pRotationComboBox = new wxGISRotationComboBox(dynamic_cast<wxWindow*>(m_pApp), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 65, 22 ), ValuesArray);
+				return static_cast<IToolBarControl*>(pRotationComboBox);
 			}
-			return static_cast<IToolBarControl*>(m_pRotationComboBox);
 		default:
 			return NULL;
 	}
@@ -888,9 +873,10 @@ bool wxGISCartoFrameTool::HasToolLabel(void)
 BEGIN_EVENT_TABLE(wxGISRotationComboBox, wxComboBox)
 	EVT_TEXT_ENTER(wxID_ANY, wxGISRotationComboBox::OnTextEnter)
 	EVT_COMBOBOX(wxID_ANY, wxGISRotationComboBox::OnTextEnter)
+	EVT_MXMAP_ROTATED(wxGISRotationComboBox::OnMapRotated)
 END_EVENT_TABLE()
 
-wxGISRotationComboBox::wxGISRotationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name) : wxComboBox(parent, id, value, pos, size, choices, style, validator, name)//, m_pApp(NULL)
+wxGISRotationComboBox::wxGISRotationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name) : wxComboBox(parent, id, value, pos, size, choices, style, validator, name), m_nConnectionPointMapCookie(wxNOT_FOUND)
 {
 	m_pMapView = NULL;
 	AppendString(wxT("0.00"));
@@ -925,13 +911,36 @@ void wxGISRotationComboBox::OnTextEnter(wxCommandEvent& event)
 	}
 }
 
+void wxGISRotationComboBox::OnMapRotated(wxMxMapViewEvent& event)
+{
+	UpdateAngle();
+}
+
 void wxGISRotationComboBox::Activate(IFrameApplication* pApp)
 {
-	//m_pApp = pApp;
+	const WINDOWARRAY* pWinArr = pApp->GetChildWindows();
+	if(pWinArr)
+	{
+		for(size_t i = 0; i < pWinArr->size(); ++i)
+		{
+			wxGISMapView* pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
+			if(pMapView)
+			{
+				m_pMapView = pMapView;
+				break;
+			}
+		}
+	}
+
+	m_pConnectionPointMap = dynamic_cast<wxGISConnectionPointContainer*>( m_pMapView );
+	if(m_pConnectionPointMap != NULL)
+		m_nConnectionPointMapCookie = m_pConnectionPointMap->Advise(this);
 }
 
 void wxGISRotationComboBox::Deactivate(void)
 {
+	if(m_nConnectionPointMapCookie != wxNOT_FOUND)
+		m_pConnectionPointMap->Unadvise(m_nConnectionPointMapCookie);
 }
 
 void wxGISRotationComboBox::UpdateAngle(void)

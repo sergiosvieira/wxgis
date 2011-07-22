@@ -114,6 +114,7 @@ void wxGISSearchServerDlg::CreateControls(bool bShowGauge)
 
 void wxGISSearchServerDlg::OnClose(wxCloseEvent& event)
 {
+	event.Skip();
 	wxCommandEvent ev;
 	OnStop(ev);
 	Destroy();

@@ -51,7 +51,8 @@ private:
 
 class WXDLLIMPEXP_GIS_CTU wxGISMapView :
 	public wxWindow,
-	public wxGISExtentStack
+	public wxGISExtentStack, 
+	public wxGISConnectionPointContainer
 {
     DECLARE_CLASS(wxGISMapView)
 	enum

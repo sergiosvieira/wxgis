@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\cartoui\mxeventui.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\cartoui\rasterdatasetcmd.cpp"
 				>
 			</File>
@@ -218,6 +222,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\cartoui\mapview.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\cartoui\mxeventui.h"
 				>
 			</File>
 			<File

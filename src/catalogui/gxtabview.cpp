@@ -69,7 +69,7 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 		else
 		{
 			wxLogError(_("wxGxTab: Error creating view %s"), sClass.c_str());
-		    wxDELETE(pGxView);
+		    wxDELETE(obj);
 		}
 
 		pChild = pChild->GetNext();
@@ -124,17 +124,18 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 	this->Layout();
 
     wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
-	m_pSelection = pGxCatalogUI->GetSelection();
+	if(pGxCatalogUI)
+		m_pSelection = pGxCatalogUI->GetSelection();
 }
 
 wxGxTab::~wxGxTab(void)
 {
-    while (!m_pWindows.empty())
-    {
-        wxWindow* poWnd = m_pWindows.back();
-        m_pApp->UnRegisterChildWindow(poWnd);
-        m_pWindows.pop_back();
-    }
+    //while (!m_pWindows.empty())
+    //{
+    //    wxWindow* poWnd = m_pWindows.back();
+    //    m_pApp->UnRegisterChildWindow(poWnd);
+    //    m_pWindows.pop_back();
+    //}
 }
 
 wxString wxGxTab::GetName(void)
@@ -160,7 +161,7 @@ void wxGxTab::OnSelectionChanged(wxGxSelectionEvent& event)
 
     this->Layout();
 	//select in tree ctrl
-	if(event.GetInitiator() != TREECTRLID && event.GetInitiator() != LISTCTRLID)
+	if(event.GetInitiator() != TREECTRLID && event.GetInitiator() != LISTCTRLID && event.GetInitiator() != IGxSelection::INIT_ALL)
 	{
 		event.GetSelection()->Select(event.GetSelection()->GetLastSelectedObjectID() , false, GetId());
 		return;
@@ -290,7 +291,7 @@ void wxGxTab::OnChoice(wxCommandEvent& event)
 
 bool wxGxTab::Show(bool bShow)
 {
-	if(m_pCurrentWnd)
+	if(m_pCurrentWnd && !m_pCurrentWnd->IsBeingDeleted() )
 		m_pCurrentWnd->Show(bShow);
     if(bShow)
         this->Layout();
@@ -299,18 +300,27 @@ bool wxGxTab::Show(bool bShow)
 
 void wxGxTab::Deactivate(void)
 {
+	m_pCurrentWnd->Hide();
+	m_bSizerMain->Replace(m_pCurrentWnd, m_tabwnd);
+	m_tabwnd->Show();
+	m_pCurrentWnd = m_tabwnd;
+
 	for(size_t i = 0; i < m_pWindows.size(); ++i)
 	{
 		wxGxView* pView = dynamic_cast<wxGxView*>(m_pWindows[i]);
 		if(pView != NULL)
-        {
+		{
 			pView->Deactivate();
-            //m_pApp->UnRegisterChildWindow(m_pWindows[i]);
-        }
-		//wxDELETE(m_pWindows[i]);//destroy in registerwindows array
-        //if(m_pWindows[i])
-        //    m_pWindows[i]->Destroy();
+			m_pApp->UnRegisterChildWindow(m_pWindows[i]);
+	//		if(m_pCurrentWnd == m_pWindows[i])
+	//			continue;
+			//if( !m_pWindows[i]->IsBeingDeleted() )
+			//	if( !m_pWindows[i]->Destroy() )
+			//		wxDELETE( m_pWindows[i] );
+		}
 	}
+	//m_pCurrentWnd = NULL;
+	m_pWindows.clear();
 }
 
 wxDragResult wxGxTab::OnDragOver(wxCoord x, wxCoord y, wxDragResult def)
@@ -372,9 +382,6 @@ bool wxGxTabView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 	while(pChild)
 	{
 		wxGxTab* pGxTab = new wxGxTab(m_pGxApplication, pChild, this);
-		//wxWindow* pWnd = pGxTab->GetWindow(0);
-		//if(pWnd == NULL)
-		//	pWnd = new wxWindow(this, wxID_ANY);
 		m_Tabs.push_back(pGxTab);
 
 		AddPage(static_cast<wxWindow*>(pGxTab), pGxTab->GetName(), count == 0 ? true : false/*, m_ImageListSmall.GetBitmap(9)*/);
@@ -385,7 +392,8 @@ bool wxGxTabView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 	}
 
     wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(m_pGxApplication->GetCatalog());
-	m_pSelection = pGxCatalogUI->GetSelection();
+	if(pGxCatalogUI)
+		m_pSelection = pGxCatalogUI->GetSelection();
 	m_pConnectionPointSelection = dynamic_cast<wxGISConnectionPointContainer*>( m_pSelection );
 	if(m_pConnectionPointSelection != NULL)
 		m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
@@ -402,6 +410,11 @@ void wxGxTabView::Deactivate(void)
 	{
         m_Tabs[i]->Deactivate();
 	}
+
+	while(GetPageCount()  > 0)
+		DeletePage(0);
+
+	wxGxView::Deactivate();
 }
 
 void wxGxTabView::OnSelectionChanged(wxGxSelectionEvent& event)
@@ -421,7 +434,7 @@ void wxGxTabView::OnSelectionChanged(wxGxSelectionEvent& event)
 void wxGxTabView::OnAUINotebookPageChanged(wxAuiNotebookEvent& event)
 {
 	event.Skip();
-    SetFocus();
+    //SetFocus();
 	//update view while changing focus of tabs
 	int nSelTab = event.GetSelection();
 	wxCHECK_RET(nSelTab >= 0 && nSelTab < m_Tabs.size(), "wrong tab index");

@@ -58,22 +58,15 @@ bool wxGxTableView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 		return false;
 	//Serialize(m_pXmlConf, false);
 
-	//m_pConnectionPointCatalog = dynamic_cast<wxGISConnectionPointContainer*>( m_pCatalog );
-	//if(m_pConnectionPointCatalog != NULL)
-	//	m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
-
     m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pGxApplication->GetCatalog());
-	m_pSelection = m_pCatalog->GetSelection();
+	if(m_pCatalog)
+		m_pSelection = m_pCatalog->GetSelection();
+
 	return true;
 }
 
 void wxGxTableView::Deactivate(void)
 {
-	//if(m_ConnectionPointSelectionCookie != -1)
-	//	m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
-	//if(m_ConnectionPointCatalogCookie != -1)
-	//	m_pConnectionPointCatalog->Unadvise(m_ConnectionPointCatalogCookie);
-
 	//Serialize(m_pXmlConf, true);
 	wxGxView::Deactivate();
 }

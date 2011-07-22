@@ -110,7 +110,7 @@ wxGxContentView::wxGxContentView(void)
 }
 
 wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
-wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(enumGISCVList), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(-1), m_nParentGxObjectID(wxNOT_FOUND), m_currentSortCol(0), m_pSelection(NULL), m_bDragging(false), m_pDeleteCmd(NULL)
+wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(enumGISCVList), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(wxNOT_FOUND), m_nParentGxObjectID(wxNOT_FOUND), m_currentSortCol(0), m_pSelection(NULL), m_bDragging(false), m_pDeleteCmd(NULL)
 {
     m_HighLightItem = wxNOT_FOUND;
 
@@ -207,14 +207,15 @@ bool wxGxContentView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 	if(m_pConnectionPointCatalog != NULL)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
-	m_pSelection = m_pCatalog->GetSelection();
+	if(m_pCatalog)
+		m_pSelection = m_pCatalog->GetSelection();
 
 	return true;
 }
 
 void wxGxContentView::Deactivate(void)
 {
-	if(m_ConnectionPointCatalogCookie != -1)
+	if(m_ConnectionPointCatalogCookie != wxNOT_FOUND)
 		m_pConnectionPointCatalog->Unadvise(m_ConnectionPointCatalogCookie);
 
 	Serialize(m_pXmlConf, true);
