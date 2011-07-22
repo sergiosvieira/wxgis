@@ -35,7 +35,6 @@ wxGISApplicationEx::wxGISApplicationEx(wxWindow* parent, wxWindowID id, const wx
 
 wxGISApplicationEx::~wxGISApplicationEx(void)
 {
-    m_mgr.UnInit();
 }
 
 void wxGISApplicationEx::SerializeFramePosEx(bool bSave)
@@ -235,20 +234,22 @@ void wxGISApplicationEx::OnClose(wxCloseEvent& event)
             pView->Deactivate();
     }
 
-    wxGISApplication::OnClose(event);
 
-    while (!m_WindowArray.empty())
-    {
-        wxWindow* poWnd = m_WindowArray.back();
-		if( poWnd && !poWnd->IsBeingDeleted() )
-        {
-            if(!poWnd->Destroy())
-                delete poWnd;
-        }
-        m_WindowArray.pop_back();
-    }
+	wxGISApplication::OnClose(event);
 
  	SerializeFramePosEx(true);
+    m_mgr.UnInit();
+
+  //  while (!m_WindowArray.empty())
+  //  {
+  //      wxWindow* poWnd = m_WindowArray.back();
+		//if( poWnd && !poWnd->IsBeingDeleted() )
+  //      {
+  //          if(!poWnd->Destroy())
+  //              delete poWnd;
+  //      }
+  //      m_WindowArray.pop_back();
+  //  }
 }
 
 bool wxGISApplicationEx::SetupSys(wxString sSysPath)

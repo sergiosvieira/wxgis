@@ -159,10 +159,13 @@ bool wxGxTreeViewBase::Activate(IFrameApplication* application, wxXmlNode* pConf
 	if(m_pConnectionPointCatalog != NULL)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
-	m_pSelection = m_pCatalog->GetSelection();
-	m_pConnectionPointSelection = dynamic_cast<wxGISConnectionPointContainer*>( m_pSelection );
-	if(m_pConnectionPointSelection != NULL)
-		m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
+	if(m_pCatalog)
+	{
+		m_pSelection = m_pCatalog->GetSelection();
+		m_pConnectionPointSelection = dynamic_cast<wxGISConnectionPointContainer*>( m_pSelection );
+		if(m_pConnectionPointSelection != NULL)
+			m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
+	}
 
 	return true;
 };

@@ -46,7 +46,7 @@ BEGIN_EVENT_TABLE(wxGISApplication, wxFrame)
     EVT_CLOSE(wxGISApplication::OnClose)
 END_EVENT_TABLE()
 
-wxGISApplication::wxGISApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style), m_pGISAcceleratorTable(NULL), m_pMenuBar(NULL), m_CurrentTool(NULL), m_pDropDownCommand(NULL), m_pTrackCancel(NULL), m_pszOldLocale(NULL), m_pLocale(NULL)
+wxGISApplication::wxGISApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style), m_pGISAcceleratorTable(NULL), m_pMenuBar(NULL), m_CurrentTool(NULL), m_pDropDownCommand(NULL), m_pTrackCancel(NULL), m_pszOldLocale(NULL), m_pLocale(NULL), m_pConfig(NULL)
 {
 }
 
@@ -730,12 +730,14 @@ void wxGISApplication::LoadLibs(wxXmlNode* pRootNode)
 
 void wxGISApplication::UnLoadLibs()
 {
+	if(!m_pConfig)
+		return;
+
 	wxXmlNode* pLibsNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("libs")));
 	if(pLibsNode)
 		wxGISConfig::DeleteNodeChildren(pLibsNode);
 	else
 		pLibsNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("libs")), true);
-
 
     for(LIBMAP::iterator item = m_LibMap.begin(); item != m_LibMap.end(); ++item)
 	{
@@ -747,7 +749,7 @@ void wxGISApplication::UnLoadLibs()
 
 		pNewNode->AddAttribute(wxT("name"), sName);
 
-		wxDELETE(item->second);
+		//wxDELETE(item->second);
 	}
 }
 

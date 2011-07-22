@@ -107,7 +107,7 @@ void wxGxSelection::Unselect( long nObjectID, long nInitiator )
     wxCriticalSectionLocker locker(m_CritSect);
 	if(nInitiator == INIT_ALL)
 	{
-		for(std::map<long, wxSelLongArray>::iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
+		for(std::map<long, wxArrayLong>::iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
 		{
 			int nIndex = CI->second.Index(nObjectID);
 			if(nIndex != wxNOT_FOUND)
@@ -118,7 +118,7 @@ void wxGxSelection::Unselect( long nObjectID, long nInitiator )
 	{
 		int nIndex = m_SelectionMap[nInitiator].Index(nObjectID);
 		if(nIndex != wxNOT_FOUND)
-			m_SelectionMap[nInitiator].Remove(nIndex);
+			m_SelectionMap[nInitiator].RemoveAt(nIndex);
 	}
 }
 
@@ -127,7 +127,7 @@ void wxGxSelection::Clear(long nInitiator)
     wxCriticalSectionLocker locker(m_CritSect);
 	if(nInitiator == INIT_ALL)
 	{
-		for(std::map<long, wxSelLongArray>::iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
+		for(std::map<long, wxArrayLong>::iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
 			CI->second.Clear();
 	}
 	else

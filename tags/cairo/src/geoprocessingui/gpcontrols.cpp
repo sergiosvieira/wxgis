@@ -23,7 +23,6 @@
 #include "wxgis/geoprocessing/gpparam.h"
 #include "wxgis/catalogui/gxobjdialog.h"
 #include "wxgis/catalogui/gxfileui.h"
-#include "wxgis/framework/messagedlg.h"
 #include "wxgis/cartoui/sqlquerydialog.h"
 
 #include "wx/dnd.h"

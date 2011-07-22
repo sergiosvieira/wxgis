@@ -67,9 +67,8 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
 	m_toolpanel = new wxPanel( m_splitter, wxID_ANY, wxDefaultPosition, wxSize(m_DataWidth, size.y)/*wxDefaultSize*/, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer2 = new wxBoxSizer( wxVERTICAL );
 
-    //m_tools = new wxPanel( m_toolpanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL/*|wxVSCROLL*/|wxBORDER_SUNKEN );
     wxScrolledWindow* m_tools = new wxScrolledWindow(m_toolpanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxBORDER_SUNKEN|wxVSCROLL );
-    m_tools->SetScrollbars(20, 20, 50, 50);
+    m_tools->SetScrollbars(1, 1, size.x, size.y);
 
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer( wxVERTICAL );
@@ -160,7 +159,7 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
 	m_tools->Layout();
 	bSizer4->Fit( m_tools );
 
-	bSizer2->Add( m_tools/*bSizer4*/, 1, wxEXPAND, 5 );
+	bSizer2->Add( m_tools, 1, wxEXPAND, 5 );
 
 	m_sdbSizer1 = new wxStdDialogButtonSizer();
 	m_sdbSizer1OK = new wxButton( m_toolpanel, wxID_OK, wxString(_("OK")) );
@@ -178,17 +177,7 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
 	m_toolpanel->Layout();
 	bSizer2->Fit( m_toolpanel );
 
-	//m_helppanel = new wxPanel( m_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	//wxBoxSizer* bSizer3;
-	//bSizer3 = new wxBoxSizer( wxVERTICAL );
-
-	m_htmlWin = new wxHtmlWindow( m_splitter/*m_helppanel*/, wxID_ANY, wxDefaultPosition, wxSize(m_HtmlWidth, size.y) /*wxDefaultSize*/, wxHW_SCROLLBAR_AUTO | wxBORDER_THEME  );
-	//bSizer3->Add( m_htmlWin2, 1, wxEXPAND, 5 );
-
-	//m_helppanel->SetSizer( bSizer3 );
-	//m_helppanel->Layout();
-	//bSizer3->Fit( m_helppanel );
-
+	m_htmlWin = new wxHtmlWindow( m_splitter, wxID_ANY, wxDefaultPosition, wxSize(m_HtmlWidth, size.y), wxHW_SCROLLBAR_AUTO | wxBORDER_THEME  );
 	m_splitter->SetSashGravity(1.0);
 	//m_splitter1->SplitVertically(m_commandbarlist, m_buttonslist, 100);
 

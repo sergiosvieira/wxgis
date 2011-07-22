@@ -100,6 +100,15 @@ public:
 		m_pPointsArray[nCookie] = NULL;
 	}
 protected:
+	virtual void PostEvent(wxEvent &event)
+	{
+		for(size_t i = 0; i < m_pPointsArray.size(); ++i)
+		{
+			if(m_pPointsArray[i] != NULL)
+				m_pPointsArray[i]->AddPendingEvent(event);
+		}
+	};
+protected:
 	std::vector<wxEvtHandler*> m_pPointsArray;
 };
 

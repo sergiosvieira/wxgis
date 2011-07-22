@@ -35,8 +35,8 @@
 IMPLEMENT_DYNAMIC_CLASS(wxTreeViewComboPopup, wxGxTreeViewBase)
 
 BEGIN_EVENT_TABLE(wxTreeViewComboPopup, wxGxTreeViewBase)
-    EVT_LEFT_UP(wxTreeViewComboPopup::OnMouseClick)
-    //TODO: EVT_LEFT_DOWN(wxTreeViewComboPopup::OnMouseClick)
+    //TODO: EVT_LEFT_UP(wxTreeViewComboPopup::OnMouseClick)
+    EVT_LEFT_DOWN(wxTreeViewComboPopup::OnMouseClick)
     EVT_MOTION(wxTreeViewComboPopup::OnMouseMove)
     EVT_TREE_ITEM_ACTIVATED(TREECTRLID, wxTreeViewComboPopup::OnDblClick)
 	EVT_GXSELECTION_CHANGED(wxTreeViewComboPopup::OnSelectionChanged)
@@ -1165,14 +1165,9 @@ void wxGxObjectDialog::RegisterChildWindow(wxWindow* pWnd)
 
 void wxGxObjectDialog::UnRegisterChildWindow(wxWindow* pWnd)
 {
-	for(size_t i = 0; i < m_WindowArray.size(); ++i)
-    {
-		if(m_WindowArray[i] == pWnd)
-        {
-			m_WindowArray.erase(m_WindowArray.begin() + i);
-            return;
-        }
-    }
+    WINDOWARRAY::iterator pos = std::find(m_WindowArray.begin(), m_WindowArray.end(), pWnd);
+	if(pos != m_WindowArray.end())
+		m_WindowArray.erase(pos);
 }
 
 IGxObjectFilter* wxGxObjectDialog::GetCurrentFilter(void)

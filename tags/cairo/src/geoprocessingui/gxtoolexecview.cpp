@@ -167,7 +167,8 @@ bool wxGxToolExecuteView::Activate(IFrameApplication* application, wxXmlNode* pC
 	if(m_pConnectionPointCatalog != NULL)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
-	m_pSelection = m_pCatalog->GetSelection();
+	if(m_pCatalog)
+		m_pSelection = m_pCatalog->GetSelection();
 
 	return true;
 }

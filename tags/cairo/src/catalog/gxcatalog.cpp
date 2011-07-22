@@ -54,6 +54,8 @@ bool wxGxCatalog::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
 
 void wxGxCatalog::Detach(void)
 {
+	m_pPointsArray.clear();
+
 	m_pCatalog->UnRegisterObject(m_nID);
 	if(m_pConf)
 	{
@@ -279,60 +281,35 @@ bool wxGxCatalog::GetChildren(CPLString sParentDir, char** &pFileNames, GxObject
 void wxGxCatalog::ObjectDeleted(long nObjectID)
 {
 	wxGxCatalogEvent event(wxGXOBJECT_DELETED, nObjectID);
-	for(size_t i = 0; i < m_pPointsArray.size(); ++i)
-	{
-		if(m_pPointsArray[i] != NULL)
-			m_pPointsArray[i]->AddPendingEvent(event);
-	}
+	PostEvent(event);
 }
 
 void  wxGxCatalog::ObjectAdded(long nObjectID)
 {
 	wxGxCatalogEvent event(wxGXOBJECT_ADDED, nObjectID);
-	for(size_t i = 0; i < m_pPointsArray.size(); ++i)
-	{
-		if(m_pPointsArray[i] != NULL)
-			m_pPointsArray[i]->AddPendingEvent(event);
-	}
-	//for(size_t i = 0; i < m_pPointsArray.size(); ++i)
-	//{
-	//	IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
-	//	if(pGxCatalogEvents != NULL)
-	//		pGxCatalogEvents->OnObjectAdded(nObjectID);
-	//}
+	PostEvent(event);
 }
 
 void  wxGxCatalog::ObjectChanged(long nObjectID)
 {
 	wxGxCatalogEvent event(wxGXOBJECT_CHANGED, nObjectID);
-	for(size_t i = 0; i < m_pPointsArray.size(); ++i)
-	{
-		if(m_pPointsArray[i] != NULL)
-			m_pPointsArray[i]->AddPendingEvent(event);
-	}
-	//for(size_t i = 0; i < m_pPointsArray.size(); ++i)
-	//{
-	//	IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
-	//	if(pGxCatalogEvents != NULL)
-	//		pGxCatalogEvents->OnObjectChanged(nObjectID);
-	//}
+	PostEvent(event);
 }
 
 void  wxGxCatalog::ObjectRefreshed(long nObjectID)
 {
 	wxGxCatalogEvent event(wxGXOBJECT_REFRESHED, nObjectID);
-	for(size_t i = 0; i < m_pPointsArray.size(); ++i)
-	{
-		if(m_pPointsArray[i] != NULL)
-			m_pPointsArray[i]->AddPendingEvent(event);
-	}
-	//for(size_t i = 0; i < m_pPointsArray.size(); ++i)
-	//{
-	//	IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
-	//	if(pGxCatalogEvents != NULL)
-	//		pGxCatalogEvents->OnObjectRefreshed(nObjectID);
-	//}
+	PostEvent(event);
 }
+//
+//void wxGxCatalog::PostEvent(wxGxCatalogEvent &event)
+//{
+//	for(size_t i = 0; i < m_pPointsArray.size(); ++i)
+//	{
+//		if(m_pPointsArray[i] != NULL)
+//			m_pPointsArray[i]->AddPendingEvent(event);
+//	}
+//}
 
 IGxObject* wxGxCatalog::ConnectFolder(wxString sPath, bool bSelect)
 {

@@ -38,7 +38,7 @@ class wxGxToolboxTreeView :
     DECLARE_DYNAMIC_CLASS(wxGxToolboxTreeView)
 public:
     wxGxToolboxTreeView(void);
-	wxGxToolboxTreeView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxBORDER_NONE | wxTR_EDIT_LABELS);
+	wxGxToolboxTreeView(wxWindow* parent, wxWindowID id = TOOLBOXVIEWCTRLID, long style = wxTR_HAS_BUTTONS | wxBORDER_NONE | wxTR_EDIT_LABELS);
 	virtual ~wxGxToolboxTreeView(void);
     //wxGxTreeView
 	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
@@ -61,7 +61,7 @@ public:
 	virtual ~wxGxToolboxView(void);
 	virtual wxWindow* GetCurrentWnd(void);
 //IGxView
-    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxAUI_NB_BOTTOM | wxNO_BORDER | wxAUI_NB_TAB_MOVE, const wxString& name = wxT("ToolboxView"));
+    virtual bool Create(wxWindow* parent, wxWindowID id = TOOLVIEWCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxAUI_NB_BOTTOM | wxNO_BORDER | wxAUI_NB_TAB_MOVE, const wxString& name = wxT("ToolboxView"));
 	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 protected:

@@ -54,9 +54,9 @@ public:
     virtual size_t GetDoSize();
     virtual int GetDoPos(void){return m_nPos;};
     virtual long GetDoID(size_t nIndex);
-    virtual wxSelLongArray GetDoArray(void){return m_DoArray;};
+    virtual wxArrayLong GetDoArray(void){return m_DoArray;};
 protected:
-	wxSelLongArray m_DoArray;
+	wxArrayLong m_DoArray;
 	int m_nPos;
     bool m_bDoOp;
 
@@ -64,6 +64,6 @@ protected:
     wxCriticalSection m_DoCritSect, m_CritSect;
 	//wxMutex m_Mutex;
 
-	std::map<long, wxSelLongArray> m_SelectionMap;
+	std::map<long, wxArrayLong> m_SelectionMap;
 	long m_currentInitiator;
 };

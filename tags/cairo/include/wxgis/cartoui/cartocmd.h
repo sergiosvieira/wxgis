@@ -21,6 +21,7 @@
 #pragma once
 #include "wxgis/framework/framework.h"
 #include "wxgis/cartoui/mapview.h"
+#include "wxgis/cartoui/mxeventui.h"
 
 /** \class wxGISRotationComboBox cartocmd.h
     \brief The frame angle rotation input combobox.
@@ -33,14 +34,16 @@ public:
 	wxGISRotationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style = 0, const wxValidator& validator = wxDefaultValidator, const wxString& name = wxT("LocationComboBox"));
 	virtual ~wxGISRotationComboBox(void);
 	virtual void UpdateAngle(void);
-	virtual void SetMapView(wxGISMapView* pMapView){m_pMapView = pMapView;};
 	//events
 	void OnTextEnter(wxCommandEvent& event);
+	void OnMapRotated(wxMxMapViewEvent& event);
 	//IToolBarControl
 	virtual void Activate(IFrameApplication* pApp);
 	virtual void Deactivate(void);
 protected:
 	wxGISMapView* m_pMapView;
+	wxGISConnectionPointContainer* m_pConnectionPointMap;
+	long m_nConnectionPointMapCookie;
 
     DECLARE_EVENT_TABLE()
 };
@@ -149,7 +152,6 @@ private:
 	wxIcon m_IconRotate, m_IconCancelRotate;
 	wxCursor m_CurRotate;
 	wxGISMapView* m_pMapView;
-	wxGISRotationComboBox* m_pRotationComboBox;
 	bool m_bCheck;
 };
 

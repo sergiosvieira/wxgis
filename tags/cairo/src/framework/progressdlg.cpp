@@ -3,7 +3,7 @@
  * Purpose:  wxGISProgressDlg class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,77 +19,72 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/framework/progressdlg.h"
-#include "wxgis/framework/progressor.h"
 
-BEGIN_EVENT_TABLE( wxGISProgressDlg, wxDialog )
-	EVT_BUTTON( wxID_CANCEL, wxGISProgressDlg::OnCancel )
-END_EVENT_TABLE()
-
-
-wxGISProgressDlg::wxGISProgressDlg( ITrackCancel* pTrackCancel, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pProgressBar1(NULL), m_pProgressBar2(NULL)
+wxGISProgressDlg::wxGISProgressDlg( const wxString &title, const wxString &message, int  maximum, wxWindow *  parent, int style ) : wxProgressDialog(title, message, maximum, parent, style)
 {
-    m_pTrackCancel = pTrackCancel;
-
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
-	wxBoxSizer* bSizer1;
-	bSizer1 = new wxBoxSizer( wxVERTICAL );
-	
-	m_staticText1 = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1->Wrap( -1 );
-	bSizer1->Add( m_staticText1, 1, wxALL|wxEXPAND, 5 );
-
-    wxGISProgressor* pProgressBar1 = new wxGISProgressor(this, wxID_ANY);
-    pProgressBar1->SetYield(true);
-	bSizer1->Add( pProgressBar1, 1, wxALL|wxEXPAND, 5 );
-    m_pProgressBar1 = static_cast<IProgressor*>(pProgressBar1);
-
-	//m_gauge1 = new wxGauge( this, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );
-	//bSizer1->Add( m_gauge1, 0, wxALL|wxEXPAND, 5 );
-	
-	m_staticText2 = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText2->Wrap( -1 );
-	bSizer1->Add( m_staticText2, 1, wxALL|wxEXPAND, 5 );
-	
-    wxGISProgressor* pProgressBar2 = new wxGISProgressor(this, wxID_ANY);
-    pProgressBar2->SetYield(true);
-	bSizer1->Add( pProgressBar2, 1, wxALL|wxEXPAND, 5 );
-    m_pProgressBar2 = static_cast<IProgressor*>(pProgressBar2);
-
-	//m_gauge2 = new wxGauge( this, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );
-	//bSizer1->Add( m_gauge2, 0, wxALL|wxEXPAND, 5 );
-	
-	m_sdbSizer1 = new wxStdDialogButtonSizer();
-	//m_sdbSizer1OK = new wxButton( this, wxID_OK );
-	//m_sdbSizer1->AddButton( m_sdbSizer1OK );
-	m_sdbSizer1Cancel = new wxButton( this, wxID_CANCEL, _("Cancel"));
-	m_sdbSizer1->AddButton( m_sdbSizer1Cancel );
-	m_sdbSizer1->Realize();
-	bSizer1->Add( m_sdbSizer1, 1, wxEXPAND|wxALL, 5 );
-	
-	this->SetSizer( bSizer1 );
-	this->Layout();
-	
-	this->Centre( wxBOTH );
+	m_sLastMessage = message;
+	m_nValue = 0;
+	m_pProgressor = this;
 }
 
-wxGISProgressDlg::~wxGISProgressDlg()
+wxGISProgressDlg::~wxGISProgressDlg(void)
 {
 }
 
-void wxGISProgressDlg::OnCancel( wxCommandEvent& event )
-{ 
-    //event.Skip(); 
-    if(m_pTrackCancel)
-        m_pTrackCancel->Cancel();
+bool wxGISProgressDlg::Show(bool bShow)
+{
+	return wxProgressDialog::Show(bShow);
 }
 
-void wxGISProgressDlg::SetText1(wxString sNewText)
+void wxGISProgressDlg::SetRange(int range)
 {
-    if(m_staticText1) m_staticText1->SetLabel(sNewText);
+	wxProgressDialog::SetRange(range + 1);
 }
 
-void wxGISProgressDlg::SetText2(wxString sNewText)
+int wxGISProgressDlg::GetRange(void)
 {
-    if(m_staticText2) m_staticText2->SetLabel(sNewText);
+	return wxProgressDialog::GetRange() - 1;
+}
+
+int wxGISProgressDlg::GetValue(void)
+{
+	return wxProgressDialog::GetValue();
+}
+
+void wxGISProgressDlg::Play(void)
+{
+	m_bIsCanceled = !wxProgressDialog::Pulse(m_sLastMessage);
+}
+
+void wxGISProgressDlg::Stop(void)
+{
+	m_bIsCanceled = !wxProgressDialog::Update(m_nValue, m_sLastMessage);
+}
+
+void wxGISProgressDlg::SetValue(int value)
+{
+	m_nValue = value;
+	m_bIsCanceled = !wxProgressDialog::Update(m_nValue, m_sLastMessage);
+}
+
+void wxGISProgressDlg::Cancel(void)
+{
+	m_bIsCanceled = true;
+}
+
+bool wxGISProgressDlg::Continue(void)
+{
+	return !wxProgressDialog::WasCancelled();
+}
+
+void wxGISProgressDlg::Reset(void)
+{
+	m_bIsCanceled = false;
+	wxProgressDialog::Resume();
+}
+
+void wxGISProgressDlg::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType)
+{
+	m_sLastMessage = sMessage;
+	m_bIsCanceled = !wxProgressDialog::Update(m_nValue, m_sLastMessage);
 }

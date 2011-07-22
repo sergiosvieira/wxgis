@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/framework/tooltip.h"
+/*
 #include "wxgis/framework/application.h"
 #include "wxgis/core/globalfn.h"
 
@@ -85,7 +86,7 @@ wxGISBaloonTip::wxGISBaloonTip(wxString sTitle, wxIcon Icon, wxString sMessage) 
     //title->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(wxGISBaloonTip::OnEscape), NULL, this );
     
     //mainSizer->Add(fgSizer1,1,wxEXPAND | wxBOTTOM | wxLEFT | wxRIGHT, 5);
-    mainSizer->Add(fgSizer1,0,wxEXPAND/* | wxBOTTOM */| wxLEFT | wxRIGHT, 5);
+    mainSizer->Add(fgSizer1,0,wxEXPAND| wxLEFT | wxRIGHT, 5);
  
     wxStaticText * text = new wxStaticText(this, wxID_ANY, sMessage);
     mainSizer->Add(text,1,wxEXPAND | wxBOTTOM | wxLEFT | wxRIGHT, 5);
@@ -146,13 +147,13 @@ void wxGISBaloonTip::OnPaint(wxPaintEvent& event)
     dc.DrawRoundedRectangle(0,0,iWidth,iHeight, 3);
 }
  
-/** closing frame at end of timeout */
+// closing frame at end of timeout 
 void wxGISBaloonTip::OnTimerTick(wxTimerEvent & event)
 {
     Close();
 }
  
-/** showing frame and running timer */
+// showing frame and running timer 
 void wxGISBaloonTip::ShowBaloon(unsigned int iTimeout)
 {
     Show(false);
@@ -166,3 +167,4 @@ void wxGISBaloonTip::Close(void)
     pApp->UnRegisterChildWindow(this);
     Destroy();
 }
+*/

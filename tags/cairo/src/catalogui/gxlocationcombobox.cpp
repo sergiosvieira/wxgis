@@ -27,7 +27,7 @@ BEGIN_EVENT_TABLE(wxGxLocationComboBox, wxComboBox)
 	EVT_GXSELECTION_CHANGED(wxGxLocationComboBox::OnSelectionChanged)
 END_EVENT_TABLE()
 
-wxGxLocationComboBox::wxGxLocationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name) : wxComboBox(parent, id, value, pos, size, choices, style, validator, name), m_pApp(NULL), m_pGxCatalogUI(NULL)
+wxGxLocationComboBox::wxGxLocationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name) : wxComboBox(parent, id, value, pos, size, choices, style, validator, name), m_pApp(NULL), m_pGxCatalogUI(NULL), m_pConnectionPointSelection(NULL), m_ConnectionPointSelectionCookie(wxNOT_FOUND)
 {
 }
 
@@ -76,14 +76,17 @@ void wxGxLocationComboBox::Activate(IFrameApplication* pApp)
 	m_pApp = pApp;
 	wxGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(pApp);
     m_pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-	m_pConnectionPointSelection = dynamic_cast<wxGISConnectionPointContainer*>( m_pGxCatalogUI->GetSelection() );
-	if(m_pConnectionPointSelection != NULL)
-		m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
+	if(m_pGxCatalogUI)
+	{
+		m_pConnectionPointSelection = dynamic_cast<wxGISConnectionPointContainer*>( m_pGxCatalogUI->GetSelection() );
+		if(m_pConnectionPointSelection)
+			m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
+	}
 }
 
 void wxGxLocationComboBox::Deactivate(void)
 {
-	if(m_ConnectionPointSelectionCookie != -1)
+	if(m_ConnectionPointSelectionCookie != wxNOT_FOUND)
 		m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
 }
 
