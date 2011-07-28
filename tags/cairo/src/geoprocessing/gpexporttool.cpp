@@ -107,7 +107,7 @@ GPParameters* wxGISGPExportTool::GetParameterInfo(void)
 
 bool wxGISGPExportTool::Validate(void)
 {
-    if(!m_pParamArr[1]->GetAltered())
+    if(!m_pParamArr[2]->GetAltered())
     {
         if(m_pParamArr[0]->GetIsValid())
         {
@@ -115,26 +115,23 @@ bool wxGISGPExportTool::Validate(void)
             wxString sPath = m_pParamArr[0]->GetValue();
             //wxFileName Name(sPath);
             //Name.
-            m_pParamArr[1]->SetValue(wxVariant(sPath, wxT("path")));
-            m_pParamArr[1]->SetAltered(true);//??
+            m_pParamArr[2]->SetValue(wxVariant(sPath, wxT("path")));
+            m_pParamArr[2]->SetAltered(true);//??
         }
     }
 
     //check if input & output types is same!
     if(m_pParamArr[0]->GetIsValid())
     {
-        if(!m_pParamArr[1]->GetHasBeenValidated())
+        //TODO: Maybe IGxDataset in future?
+        //IGxDataset* pDset1 = m_pCatalog->SearchChild()
+        wxFileName Name1(m_pParamArr[0]->GetValue());
+        wxFileName Name2(m_pParamArr[2]->GetValue());
+        if(Name1.GetExt() == Name2.GetExt())
         {
-            //TODO: Maybe IGxDataset in future?
-            //IGxDataset* pDset1 = m_pCatalog->SearchChild()
-            wxFileName Name1(m_pParamArr[0]->GetValue());
-            wxFileName Name2(m_pParamArr[1]->GetValue());
-            if(Name1.GetExt() == Name2.GetExt())
-            {
-                m_pParamArr[1]->SetIsValid(false);
-                m_pParamArr[1]->SetMessage(wxGISEnumGPMessageError, _("Cannot export to the same format"));
-                return false;
-            }
+            m_pParamArr[2]->SetIsValid(false);
+            m_pParamArr[2]->SetMessage(wxGISEnumGPMessageError, _("Cannot export to the same format"));
+            return false;
         }
     }
     return true;
@@ -197,7 +194,7 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
     
-    wxString sDstPath = m_pParamArr[1]->GetValue();
+    wxString sDstPath = m_pParamArr[2]->GetValue();
 
 	//check overwrite & do it!
 	if(!OverWriteGxObject(pGxObjectContainer->SearchChild(sDstPath), pTrackCancel))
@@ -217,8 +214,8 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
     CPLString szPath = pGxDstObject->GetInternalName();
     wxString sName = sDstFileName.GetName();
     
-    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[1]->GetDomain());
-	IGxObjectFilter* pFilter = pDomain->GetFilter(m_pParamArr[1]->GetSelDomainValue());
+    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[2]->GetDomain());
+	IGxObjectFilter* pFilter = pDomain->GetFilter(m_pParamArr[2]->GetSelDomainValue());
     if(!pFilter)
     {
         //add messages to pTrackCancel

@@ -22,7 +22,6 @@
 #include "wxgis/carto/featurelayer.h"
 #include "wxgis/carto/rasterlayer.h"
 #include "wxgis/framework/framework.h"
-#include "wxgis/framework/messagedlg.h"
 #include "wxgis/framework/application.h"
 #include "wxgis/datasource/rasterop.h"
 
@@ -137,12 +136,15 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 	if(m_pStatusBar)
 		m_pTrackCancel->SetProgressor(m_pStatusBar->GetProgressor());
 	m_pTrackCancel->Reset();
-	wxGISDatasetSPtr pwxGISDataset = pGxDataset->GetDataset(m_pTrackCancel);
-	if(m_pStatusBar)
-		m_pTrackCancel->SetProgressor(m_pStatusBar->GetAnimation());
-
+	wxGISDatasetSPtr pwxGISDataset = pGxDataset->GetDataset(true, m_pTrackCancel);
 	if(pwxGISDataset == NULL)
 		return;
+
+	if(!pwxGISDataset->IsCached())
+		pwxGISDataset->Cache(m_pTrackCancel);
+
+	if(m_pStatusBar)
+		m_pTrackCancel->SetProgressor(m_pStatusBar->GetAnimation());
 
     m_nParentGxObjectID = pGxObject->GetID();    
 

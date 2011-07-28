@@ -154,6 +154,8 @@ public:
 	virtual const OGRSpatialReferenceSPtr GetSpatialReference(void){return OGRSpatialReferenceSPtr();};
 	virtual bool IsOpened(void){return m_bIsOpened;};
 	virtual bool IsReadOnly(void){return m_bIsReadOnly;};
+	virtual bool IsCached(void) = 0;
+	virtual void Cache(ITrackCancel* pTrackCancel = NULL) = 0;
 protected:
 	CPLString m_sPath;
     wxCriticalSection m_CritSect;

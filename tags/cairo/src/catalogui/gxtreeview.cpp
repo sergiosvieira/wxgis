@@ -100,7 +100,7 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
 	if(pObjUI != NULL)
 		icon = pObjUI->GetSmallImage();
 
-	int pos(-1);
+	int pos(wxNOT_FOUND);
 	if(icon.IsOk())
     {
         for(size_t i = 0; i < m_IconsArray.size(); ++i)
@@ -111,7 +111,7 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
                 break;
             }
         }
-        if(pos == -1)
+        if(pos == wxNOT_FOUND)
         {
             pos = m_TreeImageList.Add(icon);
             ICONDATA myicondata = {icon, pos};
@@ -130,7 +130,7 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
         sName = pGxObject->GetBaseName();
 
 
-	wxTreeItemId NewTreeItem = AppendItem(hParent, sName, pos, -1, pData);
+	wxTreeItemId NewTreeItem = AppendItem(hParent, sName, pos, wxNOT_FOUND, pData);
 	m_TreeMap[pGxObject->GetID()] = NewTreeItem;
 
 	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pGxObject);
@@ -172,9 +172,9 @@ bool wxGxTreeViewBase::Activate(IFrameApplication* application, wxXmlNode* pConf
 
 void wxGxTreeViewBase::Deactivate(void)
 {
-	if(m_ConnectionPointSelectionCookie != -1)
+	if(m_ConnectionPointSelectionCookie != wxNOT_FOUND)
 		m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
-	if(m_ConnectionPointCatalogCookie != -1)
+	if(m_ConnectionPointCatalogCookie != wxNOT_FOUND)
 		m_pConnectionPointCatalog->Unadvise(m_ConnectionPointCatalogCookie);
 
 	wxGxView::Deactivate();
@@ -193,7 +193,11 @@ void wxGxTreeViewBase::OnSelectionChanged(wxGxSelectionEvent& event)
 	wxTreeItemId ItemId = m_TreeMap[nSelID];
 	if(ItemId.IsOk())
 	{
-		wxTreeCtrl::SelectItem(ItemId/*, false*/);
+		//granted event fireing
+		if(wxTreeCtrl::GetSelection() == ItemId)
+			UpdateGxSelection();
+		else
+			wxTreeCtrl::SelectItem(ItemId, true);
 		SetFocus();
 	}
 	else
@@ -256,6 +260,7 @@ void wxGxTreeViewBase::OnItemRightClick(wxTreeEvent& event)
         if(pGxObjectUI)
         {
             wxString psContextMenu = pGxObjectUI->ContextMenu();
+			pGxObject.reset();
             IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(m_pGxApplication);
             if(pApp)
             {

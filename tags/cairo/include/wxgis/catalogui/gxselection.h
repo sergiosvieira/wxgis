@@ -47,8 +47,8 @@ public:
     virtual void Do( long nObjectID );
     virtual bool CanRedo();
 	virtual bool CanUndo();
-    virtual long Redo(int nPos = -1);
-    virtual long Undo(int nPos = -1);
+    virtual long Redo(int nPos = wxNOT_FOUND);
+    virtual long Undo(int nPos = wxNOT_FOUND);
 	virtual void RemoveDo(long nObjectID);
     virtual void Reset();
     virtual size_t GetDoSize();

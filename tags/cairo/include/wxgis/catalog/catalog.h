@@ -238,7 +238,7 @@ class IGxDataset
 {
 public:
 	virtual ~IGxDataset(void){};
-	virtual wxGISDatasetSPtr GetDataset(ITrackCancel* pTrackCancel = NULL) = 0;
+	virtual wxGISDatasetSPtr GetDataset(bool bCached = true, ITrackCancel* pTrackCancel = NULL) = 0;
 	virtual wxGISEnumDatasetType GetType(void) = 0;
 	virtual int GetSubType(void) = 0;
 };

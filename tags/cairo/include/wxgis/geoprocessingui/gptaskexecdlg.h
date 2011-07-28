@@ -57,6 +57,7 @@ public:
     virtual void OnExpand(wxCommandEvent & event);
     virtual void OnCancel(wxCommandEvent & event);
     virtual void OnCancelTask(wxCommandEvent & event);
+	virtual void OnClose(wxCloseEvent& event);
     //IGPCallBack
     virtual void OnFinish(bool bHasErrors = false, IGPToolSPtr pTool = IGPToolSPtr());
     //ITrackCancel
@@ -100,6 +101,7 @@ public:
     //events
     virtual void OnCancel(wxCommandEvent & event);
     virtual void OnCancelTask(wxCommandEvent & event);
+	virtual void OnClose(wxCloseEvent& event);
 protected:
     wxGxTaskObject* m_pGxTaskObject;
 };

@@ -45,6 +45,7 @@ wxGxDiscConnections::~wxGxDiscConnections(void)
 void wxGxDiscConnections::Detach(void)
 {
 	EmptyChildren();
+    IGxObject::Detach();
 }
 
 void wxGxDiscConnections::Refresh(void)

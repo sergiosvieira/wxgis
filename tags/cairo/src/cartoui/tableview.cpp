@@ -148,7 +148,7 @@ void wxGridCtrl::DrawRowLabel(wxDC& dc, int row)
 void wxGridCtrl::OnLabelLeftClick(wxGridEvent& event)
 {
     event.Skip();
-    if (event.GetRow() != -1)
+    if (event.GetRow() != wxNOT_FOUND)
 	{
         SetGridCursor(event.GetRow(),0);
     }

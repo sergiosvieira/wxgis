@@ -158,7 +158,7 @@ char **wxGISFeatureDataset::GetFileList()
     return papszFileList;
 }
 
-bool wxGISFeatureDataset::Open(int iLayer, int bUpdate, ITrackCancel* pTrackCancel)
+bool wxGISFeatureDataset::Open(int iLayer, int bUpdate, bool bCache, ITrackCancel* pTrackCancel)
 {
 	if(m_bIsOpened)
 		return true;
@@ -166,9 +166,16 @@ bool wxGISFeatureDataset::Open(int iLayer, int bUpdate, ITrackCancel* pTrackCanc
 	if(!wxGISTable::Open(iLayer, bUpdate, pTrackCancel))
 		return false;
 
-	LoadGeometry(pTrackCancel);
+	if(bCache)
+		LoadGeometry(pTrackCancel);
 
 	return true;
+}
+
+void wxGISFeatureDataset::Cache(ITrackCancel* pTrackCancel)
+{
+	wxGISTable::Cache(pTrackCancel);
+	LoadGeometry(pTrackCancel);
 }
 
 const OGRSpatialReferenceSPtr wxGISFeatureDataset::GetSpatialReference(void)
@@ -418,23 +425,6 @@ wxFeatureCursorSPtr wxGISFeatureDataset::Search(wxGISQueryFilter* pQFilter, bool
 	//filter by geometry
 	//return fullfill wxFeatureCursorSPtr
 	return wxGISTable::Search(pQFilter, bOnlyFirst);
-}
-
-OGRLayer* const wxGISFeatureDataset::GetLayerRef(int iLayer)
-{
-	if(m_bIsOpened && m_poLayer)
-	{
-		m_poLayer->ResetReading();
-		return m_poLayer;
-	}
-	else
-	{
-		if(Open(iLayer))
-			return GetLayerRef(iLayer);
-		else
-			return NULL;
-	}
-	return NULL;
 }
 
 //wxGISGeometrySet* wxGISFeatureDataset::GetGeometrySet(wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel)

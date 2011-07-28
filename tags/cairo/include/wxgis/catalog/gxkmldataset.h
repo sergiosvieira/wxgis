@@ -50,9 +50,11 @@ public:
 	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
 	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
     //IGxDataset
-    virtual wxGISDatasetSPtr GetDataset(ITrackCancel* pTrackCancel = NULL);
+    virtual wxGISDatasetSPtr GetDataset(bool bCached = true, ITrackCancel* pTrackCancel = NULL);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISContainer;};
     virtual int GetSubType(void){return (int)m_type;};
+	virtual bool IsCached(void){return false;};
+	virtual void Cache(ITrackCancel* pTrackCancel = NULL){};
 	//IGxObjectContainer
 	virtual bool DeleteChild(IGxObject* pChild);
 	virtual bool AreChildrenViewable(void){return true;};
@@ -86,9 +88,11 @@ public:
     virtual CPLString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void);
 	//IGxDataset
-	virtual wxGISDatasetSPtr GetDataset(ITrackCancel* pTrackCancel = NULL);
+	virtual wxGISDatasetSPtr GetDataset(bool bCached = true, ITrackCancel* pTrackCancel = NULL);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
     virtual int GetSubType(void){return (int)m_type;};
+	virtual bool IsCached(void){return false;};
+	virtual void Cache(ITrackCancel* pTrackCancel = NULL){};
 protected:
 	wxString m_sName;
 	CPLString m_sPath;

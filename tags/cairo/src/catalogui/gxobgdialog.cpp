@@ -197,7 +197,7 @@ void wxTreeViewComboPopup::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParen
 	if(pObjUI != NULL)
 		icon = pObjUI->GetSmallImage();
 
-	int pos(-1);
+	int pos(wxNOT_FOUND);
 	if(icon.IsOk())
     {
         for(size_t i = 0; i < m_IconsArray.size(); ++i)
@@ -208,7 +208,7 @@ void wxTreeViewComboPopup::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParen
                 break;
             }
         }
-        if(pos == -1)
+        if(pos == wxNOT_FOUND)
         {
             pos = m_TreeImageList.Add(icon);
             ICONDATA myicondata = {icon, pos};
@@ -247,7 +247,7 @@ wxSize wxTreeViewComboPopup::GetAdjustedSize(int minWidth, int prefHeight, int m
 // wxGxDialogContentView
 //////////////////////////////////////////////////////////////////////////////
 
-wxGxDialogContentView::wxGxDialogContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxGxContentView(parent, id, pos, size, style), m_pConnectionPointSelection(NULL), m_ConnectionPointSelectionCookie(-1), m_nFilterIndex(0), m_pFiltersArray(NULL), m_pExternalCatalog(NULL)
+wxGxDialogContentView::wxGxDialogContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxGxContentView(parent, id, pos, size, style), m_pConnectionPointSelection(NULL), m_ConnectionPointSelectionCookie(wxNOT_FOUND), m_nFilterIndex(0), m_pFiltersArray(NULL), m_pExternalCatalog(NULL)
 {
 }
 
@@ -269,7 +269,7 @@ bool wxGxDialogContentView::Activate(IFrameApplication* application, wxXmlNode* 
 
 void wxGxDialogContentView::Deactivate(void)
 {
-	if(m_ConnectionPointSelectionCookie != -1)
+	if(m_ConnectionPointSelectionCookie != wxNOT_FOUND)
 		m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
 	wxGxContentView::Deactivate();
 }
@@ -432,7 +432,7 @@ wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, IGxCatalog* pExternalCatal
         wxGISCatalogMainCmd* pwxGISCatalogMainCmd(NULL);
         for(size_t i = 0; i < 8; ++i)
         {
-            if(IDs[i] == -1)
+            if(IDs[i] == wxNOT_FOUND)
             {
                 m_toolBar->AddSeparator();
                 continue;
@@ -775,11 +775,11 @@ void wxGxObjectDialog::OnItemSelected(wxListEvent& event)
     }
 
     wxString sTempName;
-	long item = -1;
+	long item = wxNOT_FOUND;
 	while(1)
     {
         item = m_pwxGxContentView->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-        if ( item == -1 )
+        if ( item == wxNOT_FOUND )
             break;
 		if(sTempName.IsEmpty())
 			sTempName += m_pwxGxContentView->GetItemText(item);

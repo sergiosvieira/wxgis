@@ -106,7 +106,7 @@ void *wxProcessWaitThread::Entry()
 //#endif
 
     ctx.environment = bp::self::get_environment(); 
-    ctx.stdout_behavior = bp::capture_stream(); 
+	ctx.stdout_behavior = bp::capture_stream(); 
     //wxFileName FName(wxString(exec.c_str(), wxConvUTF8));
     //ctx.work_directory = FName.GetPath().mb_str();
 

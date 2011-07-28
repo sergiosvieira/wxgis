@@ -59,7 +59,7 @@ public:
 	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
 	virtual void AddObject(IGxObject* pObject);
 	virtual void ResetContents(void);
-    virtual IGxObject* const GetParentGxObject(void);
+    virtual IGxObjectSPtr const GetParentGxObject(void);
     virtual bool Show(bool show = true);
     virtual void HideDone(bool bHide = true);
 	virtual void SetGxToolExecute(IGxObject* pObject){m_nParentGxObjectID = pObject->GetID();};

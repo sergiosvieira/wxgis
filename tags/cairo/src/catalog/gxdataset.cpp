@@ -115,13 +115,13 @@ bool wxGxTableDataset::Rename(wxString NewName)
 	}	
 }
 
-wxGISDatasetSPtr wxGxTableDataset::GetDataset(ITrackCancel* pTrackCancel)
+wxGISDatasetSPtr wxGxTableDataset::GetDataset(bool bCache, ITrackCancel* pTrackCancel)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
         wxGISTableSPtr pwxGISTable = boost::make_shared<wxGISTable>(m_sPath, m_type);
 
-        if(!pwxGISTable->Open(0, 0, pTrackCancel))
+        if(!pwxGISTable->Open(0, 0, bCache, pTrackCancel))
         {
 		    const char* err = CPLGetLastErrorMsg();
 		    wxString sErr = wxString::Format(_("%s failed! GDAL error: %s"), _("Open"), wgMB2WX(err));
@@ -282,7 +282,7 @@ bool wxGxFeatureDataset::Rename(wxString NewName)
         return false;
 	if(pDSet->IsOpened())
 		pDSet->Close();
-	if(!pDSet->Open(0))
+	if(!pDSet->Open(0, 0, false))
         return false;
 
 	if(pDSet->Rename(NewName))
@@ -304,13 +304,13 @@ bool wxGxFeatureDataset::Rename(wxString NewName)
 	}	
 }
 
-wxGISDatasetSPtr wxGxFeatureDataset::GetDataset(ITrackCancel* pTrackCancel)
+wxGISDatasetSPtr wxGxFeatureDataset::GetDataset(bool bCache, ITrackCancel* pTrackCancel)
 {
 	if(m_pwxGISDataset == NULL)
 	{		
         wxGISFeatureDatasetSPtr pwxGISFeatureDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_type);
 
-        if(!pwxGISFeatureDataset->Open(0, 0, pTrackCancel))
+        if(!pwxGISFeatureDataset->Open(0, 0, bCache, pTrackCancel))
         {
 		    const char* err = CPLGetLastErrorMsg();
 		    wxString sErr = wxString::Format(_("%s failed! GDAL error: %s"), _("Open"), wgMB2WX(err));
@@ -551,7 +551,7 @@ void wxGxRasterDataset::Detach(void)
 	IGxObject::Detach();
 }
 
-wxGISDatasetSPtr wxGxRasterDataset::GetDataset(ITrackCancel* pTrackCancel)
+wxGISDatasetSPtr wxGxRasterDataset::GetDataset(bool bCached, ITrackCancel* pTrackCancel)
 {
 	if(m_pwxGISDataset == NULL)
 	{	

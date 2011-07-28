@@ -29,16 +29,16 @@ END_EVENT_TABLE()
 
 wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, const wxString& name, WXDWORD panesstyle) : wxStatusBar(parent, id, style, name), IStatusBar(panesstyle), m_timer(this, TIMER_ID), m_pAni(NULL), m_pProgressBar(NULL)
 {
-    m_MsgPos = -1;
-    m_AniPos = -1;
-    m_ProgressPos = -1;
-    m_PositionPos = -1;
-    m_ClockPos = -1;
-    m_PagePositionPos = -1;
-    m_SizePos = -1;
-    m_CapsLockPos = -1;
-    m_NumLockPos = -1;
-    m_ScrollLockPos = -1;
+    m_MsgPos = wxNOT_FOUND;
+    m_AniPos = wxNOT_FOUND;
+    m_ProgressPos = wxNOT_FOUND;
+    m_PositionPos = wxNOT_FOUND;
+    m_ClockPos = wxNOT_FOUND;
+    m_PagePositionPos = wxNOT_FOUND;
+    m_SizePos = wxNOT_FOUND;
+    m_CapsLockPos = wxNOT_FOUND;
+    m_NumLockPos = wxNOT_FOUND;
+    m_ScrollLockPos = wxNOT_FOUND;
 
 	m_pApp = dynamic_cast<IFrameApplication*>(parent);
 
@@ -46,7 +46,7 @@ wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, cons
 	int counter(0);
 	if(panesstyle & enumGISStatusMain)
 	{
-		STATUSPANE data = {-1, wxSB_FLAT};
+		STATUSPANE data = {wxNOT_FOUND, wxSB_FLAT};
 		panes.push_back(data);
 		m_MsgPos = counter;
 		counter++;

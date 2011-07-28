@@ -51,6 +51,7 @@ void wxGxKMLDataset::SetEncoding(wxFontEncoding Encoding)
 void wxGxKMLDataset::Detach(void)
 {
     EmptyChildren();
+    IGxObject::Detach();
 }
 
 wxString wxGxKMLDataset::GetBaseName(void)
@@ -198,7 +199,7 @@ bool wxGxKMLDataset::DeleteChild(IGxObject* pChild)
 	return true;
 }
 
-wxGISDatasetSPtr wxGxKMLDataset::GetDataset(ITrackCancel* pTrackCancel)
+wxGISDatasetSPtr wxGxKMLDataset::GetDataset(bool bCached, ITrackCancel* pTrackCancel)
 {
     LoadChildren();
 	if(m_pwxGISDataset == NULL)
@@ -308,25 +309,8 @@ wxString wxGxKMLSubDataset::GetCategory(void)
 	return wxString(_("KML Feature class"));
 }
 
-wxGISDatasetSPtr wxGxKMLSubDataset::GetDataset(ITrackCancel* pTrackCancel)
+wxGISDatasetSPtr wxGxKMLSubDataset::GetDataset(bool bCached, ITrackCancel* pTrackCancel)
 {
-	//if(m_pwxGISDataset == NULL)
- //       return wxGISDatasetSPtr();
-
-  //  if(!m_pwxGISDataset->Open())
-  //  {
-	 //   const char* err = CPLGetLastErrorMsg();
-	 //   wxString sErr = wxString::Format(_("Open failed! OGR error: %s"), wgMB2WX(err));
-	 //   wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
-		//return NULL;
-  //  }
-
-  //  m_pwxGISDataset->SetSubType(m_type);
-	//for storing internal pointer
-	//m_pwxGISDataset->Reference();
-
-    //for outer pointer
-	//m_pwxGISDataset->Reference();
 	return m_pwxGISDataset;
 }
 

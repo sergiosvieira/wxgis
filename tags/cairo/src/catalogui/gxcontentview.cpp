@@ -36,6 +36,7 @@ BEGIN_EVENT_TABLE(wxGxContentView, wxListCtrl)
     EVT_LIST_ITEM_ACTIVATED(LISTCTRLID, wxGxContentView::OnActivated)
 
     EVT_LIST_BEGIN_DRAG(LISTCTRLID, wxGxContentView::OnBeginDrag)
+    //EVT_LIST_BEGIN_RDRAG(LISTCTRLID, wxGxContentView::OnBeginDrag)
 
     EVT_LIST_COL_CLICK(LISTCTRLID, wxGxContentView::OnColClick)
     EVT_CONTEXT_MENU(wxGxContentView::OnContextMenu)
@@ -151,7 +152,7 @@ bool wxGxContentView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos
     m_bSortAsc = true;
     m_current_style = enumGISCVList;
     m_pConnectionPointCatalog = NULL;
-    m_ConnectionPointCatalogCookie = -1;
+    m_ConnectionPointCatalogCookie = wxNOT_FOUND;
     m_nParentGxObjectID = wxNOT_FOUND;
     m_currentSortCol = 0;
     m_pSelection = NULL;
@@ -342,12 +343,12 @@ void wxGxContentView::OnSelected(wxListEvent& event)
 {
 	//event.Skip();
     m_pSelection->Clear(NOTFIRESELID);
-    long nItem = -1;
+    long nItem = wxNOT_FOUND;
 	size_t nCount(0);
     for ( ;; )
     {
         nItem = GetNextItem(nItem, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-        if ( nItem == -1 )
+        if ( nItem == wxNOT_FOUND )
             break;
         LPITEMDATA pItemData = (LPITEMDATA)GetItemData(nItem);
 	    if(pItemData == NULL)
@@ -373,11 +374,11 @@ bool wxGxContentView::Show(bool show)
     if(show)
     {
         //deselect all items
-        long nItem = -1;
+        long nItem = wxNOT_FOUND;
         for ( ;; )
         {
             nItem = GetNextItem(nItem, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-            if ( nItem == -1 )
+            if ( nItem == wxNOT_FOUND )
                 break;
             SetItemState(nItem, 0, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
         }
@@ -411,9 +412,9 @@ void wxGxContentView::OnDeselected(wxListEvent& event)
 
 void wxGxContentView::ShowContextMenu(const wxPoint& pos)
 {
-	long item = -1;
+	long item = wxNOT_FOUND;
     item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if(item == -1)
+	if(item == wxNOT_FOUND)
 	{
         IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_nParentGxObjectID);
 
@@ -465,7 +466,7 @@ void wxGxContentView::SetColumnImage(int col, int image)
     item.SetMask(wxLIST_MASK_IMAGE);
 
     //reset image
-    item.SetImage(-1);
+    item.SetImage(wxNOT_FOUND);
     for(size_t i = 0; i < GetColumnCount(); ++i)
         SetColumn(i, item);
 
@@ -764,12 +765,12 @@ void wxGxContentView::ResetContents(void)
 void wxGxContentView::OnBeginDrag(wxListEvent& event)
 {
     wxFileDataObject my_data;
-    long nItem = -1;
+    long nItem = wxNOT_FOUND;
     int nCount(0);
     for ( ;; )
     {
         nItem = GetNextItem(nItem, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-        if ( nItem == -1 )
+        if ( nItem == wxNOT_FOUND )
             break;
         LPITEMDATA pItemData = (LPITEMDATA)GetItemData(nItem);
 	    if(pItemData == NULL)
@@ -839,7 +840,7 @@ void wxGxContentView::BeginRename(long nObjectID)
 
 EDIT:
     int nItem = GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-    if ( nItem == -1 )
+    if ( nItem == wxNOT_FOUND )
         return;
     EditLabel(nItem);
 }

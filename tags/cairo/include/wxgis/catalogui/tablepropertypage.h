@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGISRasterPropertyPage class.
+ * Purpose:  wxGISTablePropertyPage class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,40 +21,36 @@
 #pragma once
 
 #include "wxgis/catalogui/catalogui.h"
-#include "wxgis/catalog/gxdataset.h"
-#include "wxgis/datasource/rasterdataset.h"
-#include "wxgis/geoprocessing/geoprocessing.h"
+#include "wxgis/datasource/featuredataset.h"
 
 #include "wx/propgrid/propgrid.h"
 
-class WXDLLIMPEXP_GIS_CLU wxGISRasterPropertyPage : 
-    public wxPanel,
-    public IGPCallBack
+/** \class wxGISTablePropertyPage tablepropertypage.h
+    \brief The tab of table properties.
+*/
+class WXDLLIMPEXP_GIS_CLU wxGISTablePropertyPage : 
+    public wxPanel
 {
-    DECLARE_DYNAMIC_CLASS(wxGISRasterPropertyPage)
+    DECLARE_DYNAMIC_CLASS(wxGISTablePropertyPage)
 	enum
 	{
-		ID_PPCTRL = wxID_HIGHEST + 4504
+		ID_PPCTRL = wxID_HIGHEST + 4502
 	};
 
 public:
-    wxGISRasterPropertyPage(void);
-    wxGISRasterPropertyPage(wxGxRasterDataset* pGxDataset, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Raster"));
-	~wxGISRasterPropertyPage();
-    virtual bool Create(wxGxRasterDataset* pGxDataset, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Raster"));
-    virtual wxString GetPageName(void){return wxString(_("Raster"));};
+    wxGISTablePropertyPage(void);
+    wxGISTablePropertyPage(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Table"));
+	~wxGISTablePropertyPage();
+    virtual bool Create(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Table"));
+    virtual wxString GetPageName(void){return wxString(_("Table"));};
     wxPGProperty* AppendProperty(wxPGProperty* pProp);
     wxPGProperty* AppendProperty(wxPGProperty* pid, wxPGProperty* pProp);
     wxPGProperty* AppendMetadataProperty(wxString sMeta);
     void FillGrid(void);
-    //events
-    void OnPropertyGridButtonClick ( wxCommandEvent& );
-    //IGPCallBack
-    virtual void OnFinish(bool bHasErrors = false, IGPToolSPtr pTool = IGPToolSPtr());
+    void FillLayerDef(OGRLayer *poLayer, int iLayer, CPLString soPath);
 protected:
-    wxGISRasterDatasetSPtr m_pDataset;
-    wxGxRasterDataset* m_pGxDataset;
-    IGxCatalog* m_pCatalog;
+    wxGISTableSPtr m_pDataset;
+    IGxDataset* m_pGxDataset;
     wxPropertyGrid* m_pg;
 	long m_nCounter;
 

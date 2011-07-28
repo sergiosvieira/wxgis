@@ -80,11 +80,10 @@ private:
 	wxBoxSizer* m_bSizerMain;
 
 	bool m_bShowChoices;
-	wxWindow* m_pCurrentWnd;
+	wxWindow *m_pCurrentWnd, *m_pNoWnd;
 
 	IGxSelection* m_pSelection;
     IFrameApplication* m_pApp;
-
 
 DECLARE_EVENT_TABLE()
 };
@@ -101,7 +100,6 @@ class WXDLLIMPEXP_GIS_CLU wxGxTabView :
 public:
 	wxGxTabView(wxWindow* parent, wxWindowID id = TABCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 	virtual ~wxGxTabView(void);
-	virtual wxWindow* GetCurrentWnd(void);
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id = TABCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("TabView"));
 	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);

@@ -25,6 +25,9 @@
 
 #include "wx/propgrid/propgrid.h"
 
+/** \class wxGISVectorPropertyPage vectorpropertypage.h
+    \brief The tab of vector dataset properties.
+*/
 class WXDLLIMPEXP_GIS_CLU wxGISVectorPropertyPage : 
     public wxPanel
 {
@@ -49,6 +52,7 @@ protected:
     wxGISFeatureDatasetSPtr m_pDataset;
     IGxDataset* m_pGxDataset;
     wxPropertyGrid* m_pg;
+	long m_nCounter;
 
     DECLARE_EVENT_TABLE()
 };

@@ -237,7 +237,7 @@ void wxGISToolBarPanel::SetKeyCode(int pos)
         long cmd(wxID_ANY);
 		long CmdID = m_buttonslist->GetItemData(pos);
 		wxGISAcceleratorTable *pAccTab = m_pApp->GetGISAcceleratorTable();
-        if(dlg.m_Key == -1) //remove acc
+        if(dlg.m_Key == wxNOT_FOUND) //remove acc
         {
             m_buttonslist->SetItem(pos, 2, wxEmptyString);
             pAccTab->Remove(pAccTab->GetEntry(CmdID));
@@ -770,7 +770,7 @@ void wxGISCommandPanel::SetKeyCode(int pos)
         long cmd(wxID_ANY);
 		long CmdID = m_listCtrl3->GetItemData(pos);
 		wxGISAcceleratorTable *pAccTab = m_pApp->GetGISAcceleratorTable();
-        if(dlg.m_Key == -1) //remove acc
+        if(dlg.m_Key == wxNOT_FOUND) //remove acc
         {
             m_listCtrl3->SetItem(pos, 2, wxEmptyString);
             pAccTab->Remove(pAccTab->GetEntry(CmdID));

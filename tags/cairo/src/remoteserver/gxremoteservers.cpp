@@ -44,6 +44,7 @@ void wxGxRemoteServers::Detach(void)
 {
 	EmptyChildren();
 	UnLoadFactories();
+    IGxObject::Detach();
 }
 
 void wxGxRemoteServers::Refresh(void)

@@ -59,13 +59,16 @@ public:
 	virtual wxFeatureCursorSPtr Search(wxGISQueryFilter* pQFilter, bool bOnlyFirst = false);
     virtual OGRErr SetIgnoredFields(wxArrayString &saIgnoredFields);
 	virtual size_t GetFeatureCount(ITrackCancel* pTrackCancel = NULL);
-	virtual bool Open(int iLayer = 0, int bUpdate = 0, ITrackCancel* pTrackCancel = NULL);
+	virtual bool Open(int iLayer = 0, int bUpdate = 0, bool bCache = true, ITrackCancel* pTrackCancel = NULL);
 	virtual bool Delete(int iLayer = 0, ITrackCancel* pTrackCancel = NULL);
 	virtual bool Rename(wxString sNewName);
 	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel = NULL);
 	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel = NULL);
 	virtual char **GetFileList();
 	virtual OGRDataSource* const GetDataSource(void){return m_poDS;};
+	virtual OGRLayer* const GetLayerRef(int iLayer = 0);
+	virtual bool IsCached(void){ return m_bIsDataLoaded; };
+	virtual void Cache(ITrackCancel* pTrackCancel = NULL);
 protected:
 	virtual void LoadFeatures(ITrackCancel* pTrackCancel = NULL);
     virtual void UnloadFeatures(void);

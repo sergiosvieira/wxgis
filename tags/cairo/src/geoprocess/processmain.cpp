@@ -3,7 +3,7 @@
  * Purpose:  Main application class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -140,6 +140,7 @@ wxGPTaskExecutor::wxGPTaskExecutor() : ITrackCancel()
 	GDALAllRegister();
 	//END GDAL
 
+	m_nRange = 100;
     SetProgressor(this);
 }
 
@@ -238,15 +239,21 @@ void wxGPTaskExecutor::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMes
     sOut.Append(wxT("\r\n"));
     m_pOutTxtStream->WriteString(sOut);
 	m_StdOutFile.Flush();
+	//wxFprintf(stdout, sOut);
+	//wxPrintf(sOut);
     m_sPrevMsg = sMessage;
 }
 
 void wxGPTaskExecutor::SetValue(int value)
 {
-	int nPercent = value / m_nRange * 100;
+	int nPercent = double(value) * 100 / m_nRange;
     if(m_nValue == nPercent)
         return;
     m_nValue = nPercent;
-    m_pOutTxtStream->WriteString(wxString::Format(wxT("DONE: %d%%\r\n"), nPercent));
+	wxString sOut = wxString::Format(wxT("DONE: %d%%\r\n"), nPercent);
+	//wxFprintf(stdout, sOut);
+	//wxPrintf(sOut);
+
+    m_pOutTxtStream->WriteString(sOut);
 	m_StdOutFile.Flush();
 }

@@ -60,7 +60,7 @@ public:
 	wxGxFeatureDatasetUI(CPLString Path, wxString Name, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxFeatureDatasetUI(void);
     //wxGxFeatureDataset
-    virtual wxGISDatasetSPtr GetDataset(ITrackCancel* pTrackCancel = NULL);
+    virtual wxGISDatasetSPtr GetDataset(bool bCache = true, ITrackCancel* pTrackCancel = NULL);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
@@ -88,7 +88,7 @@ public:
 	wxGxRasterDatasetUI(CPLString Path, wxString Name, wxGISEnumRasterDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxRasterDatasetUI(void);
     //wxGxRasterDataset
-    virtual wxGISDatasetSPtr GetDataset(ITrackCancel* pTrackCancel = NULL);
+    virtual wxGISDatasetSPtr GetDataset(bool bCached = true, ITrackCancel* pTrackCancel = NULL);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);

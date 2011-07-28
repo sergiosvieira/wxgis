@@ -34,6 +34,7 @@ wxGxFolder::~wxGxFolder(void)
 void wxGxFolder::Detach(void)
 {
 	EmptyChildren();
+    IGxObject::Detach();
 }
 
 wxString wxGxFolder::GetBaseName(void)

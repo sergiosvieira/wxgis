@@ -52,29 +52,18 @@ public:
     virtual ~wxGISDTBase();
     virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString);
     virtual bool Validate(void) = 0;
-    virtual void Update(void) = 0;
+    virtual void UpdateValues(void) = 0;
+    virtual void UpdateControls(void) = 0;
     virtual IGPParameter* GetParameter(void);
 protected:
 	wxStaticBitmap* m_StateBitmap;
 	wxStaticText* m_sParamDisplayName;
+	wxString m_sFullDisplayName;
 	wxStaticBitmap* m_bitmap;
     IGPParameter* m_pParam;
 	wxImageList m_ImageList;
-};
-
-/** \class wxGISTextCtrl gpcontrols.h
-    \brief The tool dialog control for text value representation.
-*/
-class wxGISTextCtrl : public wxTextCtrl
-{
-public:
-    wxGISTextCtrl(wxWindow* parent, wxWindowID id, const wxString& value = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0, const wxValidator& validator = wxDefaultValidator, const wxString& name = wxTextCtrlNameStr);
-    virtual ~wxGISTextCtrl(void);
-    virtual void OnKillFocus(wxFocusEvent& event);
-protected:
-    wxGISDTBase* m_pBaseCtrl;
-
-    DECLARE_EVENT_TABLE()
+	wxGISEnumGPMessageType m_nCurrentType;
+	wxString m_sCurrentMsg;
 };
 
 /** \class wxGISDTPath gpcontrols.h
@@ -82,15 +71,23 @@ protected:
 */
 class wxGISDTPath : public wxGISDTBase
 {
+    enum
+	{
+		ID_PATHCTRL = wxID_HIGHEST + 3603
+	};
 public:
 	wxGISDTPath( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISDTPath();
-//events
-    virtual void OnOpen(wxCommandEvent& event);
+	//wxGISDTBase
     virtual bool Validate(void);
-    virtual void Update(void);
+    virtual void UpdateValues(void);
+    virtual void UpdateControls(void);
+    //events
+    virtual void OnOpen(wxCommandEvent& event);
+	virtual void OnUpdateUI(wxUpdateUIEvent &event);
+	virtual void OnPathChange(wxCommandEvent& event);
 protected:
-    wxGISTextCtrl* m_PathTextCtrl;
+    wxTextCtrl* m_PathTextCtrl;
 	wxBitmapButton* m_bpButton;
     IGxCatalog* m_pCatalog;
 
@@ -102,15 +99,25 @@ protected:
 */
 class wxGISDTDigit : public wxGISDTBase
 {
+    enum
+	{
+		ID_DIGITCTRL = wxID_HIGHEST + 3604
+	};
 public:
 	wxGISDTDigit( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISDTDigit();
-//events
+	//wxGISDTBase
     virtual bool Validate(void);
-    virtual void Update(void);
+    virtual void UpdateValues(void);
+    virtual void UpdateControls(void);
+    //events
+	virtual void OnUpdateUI(wxUpdateUIEvent &event);
+	virtual void OnDigitChange(wxCommandEvent& event);
 protected:
-    wxGISTextCtrl* m_PathTextCtrl;
+    wxTextCtrl* m_DigitTextCtrl;
     IGxCatalog* m_pCatalog;
+
+	DECLARE_EVENT_TABLE()
 };
 
 /** \class wxGISDTChoice gpcontrols.h
@@ -125,10 +132,13 @@ class wxGISDTChoice : public wxGISDTBase
 public:
 	wxGISDTChoice( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
 	~wxGISDTChoice();
-//events
+	//wxGISDTBase
     virtual bool Validate(void);
-    virtual void Update(void);
+    virtual void UpdateValues(void);
+    virtual void UpdateControls(void);
+    //events
     virtual void OnChoice(wxCommandEvent& event);
+	virtual void OnUpdateUI(wxUpdateUIEvent &event);
 protected:
 	wxChoice* m_choice;
 DECLARE_EVENT_TABLE()
@@ -146,13 +156,19 @@ class wxGISDTBool : public wxGISDTBase
 public:
 	wxGISDTBool( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISDTBool();
-//events
+	//wxGISDTBase
     virtual bool Validate(void);
-    virtual void Update(void);
+    virtual void UpdateValues(void);
+    virtual void UpdateControls(void);
+    //events
     virtual void OnClick( wxCommandEvent& event );
+    virtual void OnSize( wxSizeEvent& event );
+	virtual void OnUpdateUI(wxUpdateUIEvent &event);
 protected:
     wxCheckBox* m_pCheckBox;
     IGxCatalog* m_pCatalog;
+	wxString m_sFullText;
+
 DECLARE_EVENT_TABLE()
 };
 
@@ -161,15 +177,23 @@ DECLARE_EVENT_TABLE()
 */
 class wxGISDTSpatRef : public wxGISDTBase
 {
+    enum
+	{
+		ID_SPATREFSTR = wxID_HIGHEST + 3607
+	};
 public:
 	wxGISDTSpatRef( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISDTSpatRef();
-//events
-    virtual void OnOpen(wxCommandEvent& event);
+	//wxGISDTBase
     virtual bool Validate(void);
-    virtual void Update(void);
+    virtual void UpdateValues(void);
+    virtual void UpdateControls(void);
+    //events
+    virtual void OnOpen(wxCommandEvent& event);
+	virtual void OnTextChange(wxCommandEvent& event);
+	virtual void OnUpdateUI(wxUpdateUIEvent &event);
 protected:
-    wxTextCtrl* m_PathTextCtrl;
+    wxTextCtrl* m_SpaRefTextCtrl;
 	wxBitmapButton* m_bpButton;
     IGxCatalog* m_pCatalog;
 
@@ -190,10 +214,13 @@ class wxGISDTMultiParam : public wxGISDTBase
 public:
 	wxGISDTMultiParam( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISDTMultiParam();
-//events
+	//wxGISDTBase
     virtual bool Validate(void);
-    virtual void Update(void);
+    virtual void UpdateValues(void);
+    virtual void UpdateControls(void);
+    //events
 	virtual void OnCellChange(wxGridEvent &event);
+	virtual void OnUpdateUI(wxUpdateUIEvent &event);
 protected:
 	wxGrid* m_pg;
     IGxCatalog* m_pCatalog;
@@ -206,16 +233,24 @@ protected:
 */
 class wxGISDTList : public wxGISDTBase
 {
+	enum
+	{
+		ID_LISTCTRL = wxID_HIGHEST + 3608
+	};
 public:
 	wxGISDTList( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISDTList();
-//events
-    virtual void OnAdd(wxCommandEvent& event);
-    virtual bool Validate(void);
-    virtual void Update(void);
 	virtual wxString GetValue();
+	//wxGISDTBase
+    virtual bool Validate(void);
+    virtual void UpdateValues(void);
+    virtual void UpdateControls(void);
+    //events
+    virtual void OnAdd(wxCommandEvent& event);
+	virtual void OnUpdateUI(wxUpdateUIEvent &event);
+	virtual void OnTextChange(wxCommandEvent& event);
 protected:
-    wxGISTextCtrl* m_TextCtrl;
+    wxTextCtrl* m_TextCtrl;
 	wxBitmapButton* m_bpButton;
     IGxCatalog* m_pCatalog;
 
@@ -227,15 +262,22 @@ protected:
 */
 class wxGISSQLQueryCtrl : public wxGISDTBase
 {
+	enum
+	{
+		ID_LISTCTRL = wxID_HIGHEST + 3608
+	};
 public:
 	wxGISSQLQueryCtrl( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISSQLQueryCtrl();
-//events
-    virtual void OnOpen(wxCommandEvent& event);
+	//wxGISDTBase
     virtual bool Validate(void);
-    virtual void Update(void);
+    virtual void UpdateValues(void);
+    virtual void UpdateControls(void);
+    //events
+    virtual void OnOpen(wxCommandEvent& event);
+	virtual void OnUpdateUI(wxUpdateUIEvent &event);
 protected:
-    wxGISTextCtrl* m_QueryTextCtrl;
+    wxTextCtrl* m_QueryTextCtrl;
 	wxBitmapButton* m_bpButton;
     IGxCatalog* m_pCatalog;
 
