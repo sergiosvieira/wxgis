@@ -43,7 +43,7 @@ wxGISTable::~wxGISTable(void)
 	Close();
 }
 
-bool wxGISTable::Open(int iLayer, int bUpdate, ITrackCancel* pTrackCancel)
+bool wxGISTable::Open(int iLayer, int bUpdate, bool bCache, ITrackCancel* pTrackCancel)
 {
 	if(m_bIsOpened)
 		return true;
@@ -106,10 +106,15 @@ bool wxGISTable::Open(int iLayer, int bUpdate, ITrackCancel* pTrackCancel)
 
 	m_bIsOpened = true;
 
-	//UnloadFeatures();
-	LoadFeatures(pTrackCancel);
+	if(bCache)
+		LoadFeatures(pTrackCancel);
 
 	return true;
+}
+
+void wxGISTable::Cache(ITrackCancel* pTrackCancel)
+{
+	LoadFeatures(pTrackCancel);
 }
 
 wxString wxGISTable::GetName(void)
@@ -832,4 +837,21 @@ bool wxGISTable::Rename(wxString sNewName)
     
 	m_sPath = CPLString(CPLFormFilename(szDirPath, szNewName, CPLGetExtension(m_sPath)));
 	return true;
+}
+
+OGRLayer* const wxGISTable::GetLayerRef(int iLayer)
+{
+	if(m_bIsOpened && m_poLayer)
+	{
+		m_poLayer->ResetReading();
+		return m_poLayer;
+	}
+	else
+	{
+		if(Open(iLayer))
+			return GetLayerRef(iLayer);
+		else
+			return NULL;
+	}
+	return NULL;
 }

@@ -96,3 +96,57 @@ bool wxGISMapApp::OnInit()
 
 	return true;
 }
+
+void wxGISMapApp::LoadLibs(wxXmlNode* pRootNode)
+{
+	wxXmlNode *child = pRootNode->GetChildren();
+	while(child)
+	{
+		wxString sPath = child->GetAttribute(wxT("path"), wxT(""));
+		if(sPath.Len() > 0)
+		{
+			//check for doubles
+			if(m_LibMap[sPath] != NULL)
+			{
+				child = child->GetNext();
+				continue;
+			}
+
+			wxDynamicLibrary* pLib = new wxDynamicLibrary(sPath);
+			if(pLib != NULL)
+			{
+				wxLogMessage(_("wxGISApplication: Library %s loaded"), sPath.c_str());
+				m_LibMap[sPath] = pLib;
+			}
+			else
+				wxLogError(_("wxGISApplication: Error loading library %s"), sPath.c_str());
+		}
+		child = child->GetNext();
+	}
+}
+
+
+void wxGISMapApp::UnLoadLibs()
+{
+	if(!m_pConfig)
+		return;
+
+	wxXmlNode* pLibsNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("libs")));
+	if(pLibsNode)
+		wxGISConfig::DeleteNodeChildren(pLibsNode);
+	else
+		pLibsNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("libs")), true);
+
+    for(LIBMAP::iterator item = m_LibMap.begin(); item != m_LibMap.end(); ++item)
+	{
+		wxXmlNode* pNewNode = new wxXmlNode(pLibsNode, wxXML_ELEMENT_NODE, wxString(wxT("lib")));
+		pNewNode->AddAttribute(wxT("path"), item->first);
+
+		wxFileName FName(item->first);
+		wxString sName = FName.GetName();
+
+		pNewNode->AddAttribute(wxT("name"), sName);
+
+		wxDELETE(item->second);
+	}
+}

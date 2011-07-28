@@ -32,6 +32,7 @@ BEGIN_EVENT_TABLE(wxGxTaskExecDlg, wxDialog)
     EVT_BUTTON(wxID_MORE, wxGxTaskExecDlg::OnExpand)
     EVT_BUTTON(ID_CANCEL_PROCESS, wxGxTaskExecDlg::OnCancelTask)
     EVT_BUTTON(wxID_CANCEL, wxGxTaskExecDlg::OnCancel)
+	EVT_CLOSE(wxGxTaskExecDlg::OnClose)
 END_EVENT_TABLE()
 
 wxGxTaskExecDlg::wxGxTaskExecDlg(wxGISGPToolManager* pToolManager, IGPCallBack* pCallBack, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxDialog(parent, id, title, pos, size, style), m_bExpand(false), m_nState(enumGISMessageUnk), m_nTaskID(wxNOT_FOUND)
@@ -252,9 +253,24 @@ void wxGxTaskExecDlg::SetTaskID(int nTaskID)
     m_nTaskID = nTaskID;
 }
 
+
+void wxGxTaskExecDlg::OnClose(wxCloseEvent& event)
+{
+	event.Skip();
+    if(m_pToolManager)
+	{
+		if(m_pToolManager->GetProcessState(m_nTaskID) == enumGISTaskWork)
+		{
+			wxMessageBox(wxString(_("You mast stop task before closing dialog!")), wxString(_("Warning")), wxCENTRE | wxICON_WARNING | wxOK );
+			event.Veto();
+		}
+	}
+}
+
 //////////////////////////////////////////////////////////////////
 // wxGxTaskObjectExecDlg
 //////////////////////////////////////////////////////////////////
+
 wxGxTaskObjectExecDlg::wxGxTaskObjectExecDlg(wxGxTaskObject* pGxTaskObject, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxGxTaskExecDlg(NULL, NULL, parent, id, title, pos, size, style)
 {
     m_pGxTaskObject = pGxTaskObject;
@@ -283,6 +299,11 @@ void wxGxTaskObjectExecDlg::OnCancelTask(wxCommandEvent & event)
 {
     if(m_pGxTaskObject)
 		m_pGxTaskObject->StopTask();
+}
+
+void wxGxTaskObjectExecDlg::OnClose(wxCloseEvent& event)
+{
+	event.Skip();
 }
 
 //////////////////////////////////////////////////////////////////
@@ -323,6 +344,7 @@ void wxGxTaskObject::SetValue(int value)
 
 void wxGxTaskObject::Detach(void)
 {
+    IGxObject::Detach();
 }
 
 wxIcon wxGxTaskObject::GetLargeImage(void)
@@ -412,7 +434,7 @@ void wxGxTaskObject::OnFinish(bool bHasErrors, IGPToolSPtr pTool)
 void wxGxTaskObject::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType)
 {
     TASKMESSAGE msg = {nType, sMessage};
-    if(nIndex == -1 || m_MessageArray.size() < nIndex)
+    if(nIndex == wxNOT_FOUND || m_MessageArray.size() < nIndex)
         m_MessageArray.push_back(msg);
     else
         m_MessageArray.insert(m_MessageArray.begin() + nIndex, msg);

@@ -52,8 +52,6 @@ wxGISApplication::wxGISApplication(wxWindow* parent, wxWindowID id, const wxStri
 
 wxGISApplication::~wxGISApplication(void)
 {
-	UnLoadLibs();
-
     if(m_pszOldLocale != NULL)
 		setlocale(LC_NUMERIC, m_pszOldLocale);
     wxDELETE(m_pLocale);
@@ -699,74 +697,12 @@ void wxGISApplication::OnToolDropDown(wxAuiToolBarEvent& event)
     }
 }
 
-void wxGISApplication::LoadLibs(wxXmlNode* pRootNode)
-{
-	wxXmlNode *child = pRootNode->GetChildren();
-	while(child)
-	{
-		wxString sPath = child->GetAttribute(wxT("path"), wxT(""));
-		if(sPath.Len() > 0)
-		{
-			//check for doubles
-			if(m_LibMap[sPath] != NULL)
-			{
-				child = child->GetNext();
-				continue;
-			}
-
-			wxDynamicLibrary* pLib = new wxDynamicLibrary(sPath);
-			if(pLib != NULL)
-			{
-				wxLogMessage(_("wxGISApplication: Library %s loaded"), sPath.c_str());
-				m_LibMap[sPath] = pLib;
-			}
-			else
-				wxLogError(_("wxGISApplication: Error loading library %s"), sPath.c_str());
-		}
-		child = child->GetNext();
-	}
-}
-
-
-void wxGISApplication::UnLoadLibs()
-{
-	if(!m_pConfig)
-		return;
-
-	wxXmlNode* pLibsNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("libs")));
-	if(pLibsNode)
-		wxGISConfig::DeleteNodeChildren(pLibsNode);
-	else
-		pLibsNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("libs")), true);
-
-    for(LIBMAP::iterator item = m_LibMap.begin(); item != m_LibMap.end(); ++item)
-	{
-		wxXmlNode* pNewNode = new wxXmlNode(pLibsNode, wxXML_ELEMENT_NODE, wxString(wxT("lib")));
-		pNewNode->AddAttribute(wxT("path"), item->first);
-
-		wxFileName FName(item->first);
-		wxString sName = FName.GetName();
-
-		pNewNode->AddAttribute(wxT("name"), sName);
-
-		//wxDELETE(item->second);
-	}
-}
-
 bool wxGISApplication::Create(IGISConfig* pConfig)
 {
 	m_pConfig = pConfig;
 
 	CreateStatusBar();
 	wxFrame::GetStatusBar()->SetStatusText(_("Ready"));
-
-    //load libs
-	wxXmlNode* pLibsNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("libs")));
-	if(pLibsNode)
-		LoadLibs(pLibsNode);
-	pLibsNode = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("libs")));
-	if(pLibsNode)
-		LoadLibs(pLibsNode);
 
 	//load commands
 	wxXmlNode* pCommandsNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("commands")));
@@ -776,7 +712,6 @@ bool wxGISApplication::Create(IGISConfig* pConfig)
 	SerializeCommandBars();
 	//load accelerators
 	m_pGISAcceleratorTable = new wxGISAcceleratorTable(this, pConfig);
-
 
     // create MenuBar
 	wxXmlNode* pMenuBarNode = m_pConfig->GetConfigNode(wxString(wxT("frame/menubar")), true, true);
@@ -985,6 +920,10 @@ bool wxGISApplication::SetupLoc(wxString sLoc, wxString sLocPath)
 	if(wxDirExists(sLocalePath))
 	{
 		wxLocale::AddCatalogLookupPathPrefix(sLocalePath);
+
+		wxString sWxLocPath = sLocalePath + wxFileName::GetPathSeparator() + sLoc + wxT(".po");
+		m_pLocale->AddCatalog(sWxLocPath);
+		
 
 		// Initialize the catalogs we'll be using
 		//load multicat from locale

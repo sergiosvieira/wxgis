@@ -332,6 +332,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\catalogui\tablepropertypage.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\catalogui\vectorpropertypage.cpp"
 				>
 			</File>
@@ -495,6 +499,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\catalogui\spatrefpropertypage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\catalogui\tablepropertypage.h"
 				>
 			</File>
 			<File

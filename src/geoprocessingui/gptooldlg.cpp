@@ -20,8 +20,6 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessingui/gptooldlg.h"
-//#include "wxgis/geoprocessingui/gptasksview.h"
-//#include "wxgis/framework/application.h"
 #include "wxgis/core/globalfn.h"
 
 #include "../../art/tool_16.xpm"
@@ -231,53 +229,6 @@ void wxGISGPToolDlg::OnHelpUI(wxUpdateUIEvent& event)
 
 void wxGISGPToolDlg::OnOk(wxCommandEvent& event)
 {
-    //event.Skip();
-
-    //wxGxTaskExecDlg dlg(pGPToolManager, pTool, pParentWnd, wxID_ANY);
-    //dlg.ShowModal();
-
-    //IApplication* pApp = ::GetApplication();
-    ////create panel - get progress with messages
-    //ITrackCancel* pTrackCancel(NULL);
-    //IGPCallBack* pCallBack(NULL);
-    //wxGxTasksView* pGxTasksView(NULL);
-
-    //WINDOWARRAY* pWndArr = pApp->GetChildWindows();
-    //if(pWndArr)
-    //{
-    //    for(size_t i = 0; i < pWndArr->size(); ++i)
-    //    {
-    //        wxWindow* pWnd = pWndArr->operator[](i);
-    //        if(!pWnd)
-    //            continue;
-    //        pGxTasksView = dynamic_cast<wxGxTasksView*>(pWnd);
-    //        if(!pGxTasksView)
-    //            continue;
-    //        break;
-    //    }
-    //}
-
-    //wxGxTaskPanel* pGxTaskPanel;
-    //if(pGxTasksView)
-    //{
-    //    pGxTaskPanel = new wxGxTaskPanel(m_pToolManager, m_pTool, pGxTasksView);
-
-    //    pTrackCancel = dynamic_cast<ITrackCancel*>(pGxTaskPanel);
-    //    pCallBack = dynamic_cast<IGPCallBack*>(pGxTaskPanel);
-
-    //    pGxTasksView->InsertPanel(pGxTaskPanel);
-    //}
-
-    ////mngr - run execute
-    ////long nThreadId = m_pToolManager->OnExecute(m_pTool, pTrackCancel, pCallBack);
-    //if(pGxTasksView)
-    //{
-    //    //pGxTaskPanel->SetTaskThreadId(nThreadId);
-    //    pGxTaskPanel->SetToolDialog(GetParent(), m_pPropNode);
-    //}
-    ////to prevent destroy tool in this dialog (the tool should destroy in panel)
-    //m_pTool = NULL;
-
     IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(GetApplication());
     pApp->UnRegisterChildWindow(this);
 
@@ -300,44 +251,67 @@ void wxGISGPToolDlg::OnCancel(wxCommandEvent& event)
 
 void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
 {
-    //TODO: Fix tools state
+	//event.Skip();
+
+	//return;
+ //   //TODO: Fix tools state
     event.Enable(false);
-	wxBusyCursor wait;
-    //internal control validate
+
+	////internal control validate
+ //   for(size_t i = 0; i < m_pControlsArray.size(); ++i)
+ //   {
+ //       if(m_pControlsArray[i])
+ //           m_pControlsArray[i]->Validate();
+ //   }
+
+    //tool validate
+    bool bIsValid = m_pTool->Validate();//validate user tool
+	if(!bIsValid)
+		return;
+
+	//update elements values set while validate user tool
     for(size_t i = 0; i < m_pControlsArray.size(); ++i)
     {
         if(m_pControlsArray[i])
-            m_pControlsArray[i]->Validate();
+            m_pControlsArray[i]->UpdateControls();
     }
 
-    //tool validate
-    bool bIsValid = m_pTool->Validate();
-
-    short nNonValid(0);
-    GPParameters* pParams = m_pTool->GetParameterInfo();
-    if(!pParams)
-        return;
-    //update controls state
-    for(size_t i = 0; i < pParams->size(); ++i)
+	//if any param not valid return
+    for(size_t i = 0; i < m_pControlsArray.size(); ++i)
     {
-        IGPParameter* pParam = pParams->operator[](i);
-        if(!pParam)
-            continue;
-        if(!pParam->GetIsValid())
-            nNonValid++;
-        if(pParam->GetHasBeenValidated())
-            continue;
-        if(i < m_pControlsArray.size() && m_pControlsArray[i])
-        {
-            if(bIsValid)
-                m_pControlsArray[i]->Validate();
-            m_pControlsArray[i]->Update();
-        }
-        pParam->SetHasBeenValidated(true);
+        if(m_pControlsArray[i])
+            if(!m_pControlsArray[i]->Validate())
+				return;
     }
-    if(nNonValid > 0)
-        return;
+
+	//set OK button enabled 
     event.Enable(true);
+
+    //short nNonValid(0);
+    //GPParameters* pParams = m_pTool->GetParameterInfo();
+    //if(!pParams)
+    //    return;
+    ////update controls state
+    //for(size_t i = 0; i < pParams->size(); ++i)
+    //{
+    //    IGPParameter* pParam = pParams->operator[](i);
+    //    if(!pParam)
+    //        continue;
+    //    if(!pParam->GetIsValid())
+    //        nNonValid++;
+    //    if(pParam->GetHasBeenValidated())
+    //        continue;
+    //    if(i < m_pControlsArray.size() && m_pControlsArray[i])
+    //    {
+    //        if(bIsValid)
+    //            m_pControlsArray[i]->Validate();
+    //        m_pControlsArray[i]->Update();
+    //    }
+    //    pParam->SetHasBeenValidated(true);
+    //}
+    //if(nNonValid > 0)
+    //    return;
+    //event.Enable(true);
 }
 
 void wxGISGPToolDlg::SerializeFramePos(bool bSave)

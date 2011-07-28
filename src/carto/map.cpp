@@ -181,7 +181,7 @@ void wxGISExtentStack::Redo()
 void wxGISExtentStack::Undo()
 {
 	m_nPos--;
-	if(m_nPos > -1)
+	if(m_nPos > wxNOT_FOUND)
 	{
 		OGREnvelope Env = m_staEnvelope[m_nPos];
 		SetExtent(Env);

@@ -60,14 +60,15 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
         }
         if( !bSame && poCT )
         {
-            OGRGeometry *pGeom = pFeature->GetGeometryRef()->clone();
+            OGRGeometry *pGeom = pFeature->GetGeometryRef();
             if(pGeom)
             {
-                OGRErr eErr = pGeom->transform(poCT);
+				OGRGeometry *pNewGeom = pGeom->clone();
+                OGRErr eErr = pNewGeom->transform(poCT);
                 if(eErr == OGRERR_NONE)
-                    pFeature->SetGeometryDirectly(pGeom);
+                    pFeature->SetGeometryDirectly(pNewGeom);
                 else
-                    wxDELETE(pGeom);
+                    wxDELETE(pNewGeom);
             }
         }
         //set encoding
@@ -198,12 +199,10 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
     const OGRSpatialReferenceSPtr pSrcSpaRef = pDSet->GetSpatialReference();
     if(!pSrcSpaRef)
     {
-        wxString sErr(_("Input spatial reference is not defined! OGR error: "));
-        CPLString sFullErr(sErr.mb_str());
-        sFullErr += CPLGetLastErrorMsg();
-        CPLError( CE_Failure, CPLE_AppDefined, sFullErr );
+        wxString sErr(_("Input spatial reference is not defined!"));
+        CPLError( CE_Failure, CPLE_AppDefined, sErr.mb_str() );
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
         return false;
     }
 
@@ -323,7 +322,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
     if(!pFilter || !pDSet)
         return false;
 
-/*    int nNewSubType = pFilter->GetSubType();
+    int nNewSubType = pFilter->GetSubType();
     //check multi geometry
     OGRwkbGeometryType nGeomType = pDSet->GetGeometryType();
     bool bIsMultigeom = (wkbFlatten(nGeomType) == wkbUnknown || wkbFlatten(nGeomType) == wkbGeometryCollection);
@@ -376,18 +375,6 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         return false;
     }
 
-    wxGISFeatureDatasetSPtr pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
-    if(!pNewDSet)
-    {
-        wxString sErr(_("Error creating new dataset! OGR error: "));
-        CPLString sFullErr(sErr.mb_str());
-        sFullErr += CPLGetLastErrorMsg();
-        CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
-        if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
-        return false;
-    }
-
     OGRCoordinateTransformation *poCT(NULL);
     if(pSrcSpaRef->IsSame(pNewSpaRef))
     {
@@ -410,7 +397,20 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         return false;
     }
 
-    //get limits
+    wxGISFeatureDatasetSPtr pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
+    if(!pNewDSet)
+    {
+        wxString sErr(_("Error creating new dataset! OGR error: "));
+        CPLString sFullErr(sErr.mb_str());
+        sFullErr += CPLGetLastErrorMsg();
+        CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+        return false;
+    }
+
+
+/*    //get limits
     OGRPolygon* pRgn1 = NULL;
     OGRPolygon* pRgn2 = NULL;
 
@@ -1102,6 +1102,7 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
         return wxGISFeatureDatasetSPtr();
     }
 
+	CPLString szNameField, szDescField;
     if(nSubType != enumVecDXF)
     {
         for(size_t i = 0; i < poFields->GetFieldCount(); ++i)
@@ -1111,6 +1112,14 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
             {
                 wxString sFieldName = wgMB2WX(pField->GetNameRef());
                 pField->SetName(sFieldName.mb_str(wxConvUTF8));
+				OGRFieldType nType = pField->GetType();
+				if(OFTString == nType)
+				{
+					if(szNameField.empty())
+						szNameField = pField->GetNameRef();
+					if(szDescField.empty())
+						szDescField = pField->GetNameRef();
+				}
             }
 
 	        if( poLayerDest->CreateField( pField ) != OGRERR_NONE )
@@ -1123,7 +1132,17 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
             }
         }
     }
-    poFields->Release();
+
+    if(nSubType == enumVecKML || nSubType == enumVecKMZ)
+	{
+		if(!szNameField.empty())
+			CPLSetConfigOption( "LIBKML_NAME_FIELD", szNameField );
+		if(!szDescField.empty())
+			CPLSetConfigOption( "LIBKML_DESCRIPTION_FIELD", szDescField );
+		//CPLSetConfigOption( "LIBKML_TIMESTAMP_FIELD", "YES" );
+	}
+
+	poFields->Release();
 
     wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>(sFullPath, nSubType, poLayerDest, poDS);
     return pDataSet;

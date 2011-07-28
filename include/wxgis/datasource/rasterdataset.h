@@ -55,6 +55,8 @@ public:
     virtual int GetBandCount(void){return m_nBandCount;};
     virtual bool Delete(void);
     char **GetFileList();
+	virtual bool IsCached(void){return false;};
+	virtual void Cache(ITrackCancel* pTrackCancel = NULL){};
 protected:
 	OGREnvelope* m_psExtent;
 	GDALDataset  *m_poDataset;

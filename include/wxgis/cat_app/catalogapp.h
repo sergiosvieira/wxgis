@@ -24,7 +24,11 @@
 #include "wxgis/base.h"
 #include "wxgis/core/config.h"
 
-#include "wx/app.h"
+#include <wx/app.h>
+#include <wx/dynload.h>
+#include <wx/dynlib.h>
+
+#include <map>
 
 class wxGISCatalogApp :
 	public wxApp
@@ -33,8 +37,14 @@ public:
 	wxGISCatalogApp(void);
 	~wxGISCatalogApp(void);
 	virtual bool OnInit();
+
+    typedef std::map<wxString, wxDynamicLibrary*> LIBMAP;
+protected:
+	virtual void LoadLibs(wxXmlNode* pRootNode);
+	virtual void UnLoadLibs(void);
 private:
 	wxGISAppConfig* m_pConfig;
+    LIBMAP m_LibMap;
 };
 
 DECLARE_APP(wxGISCatalogApp);

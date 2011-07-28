@@ -254,14 +254,11 @@ void wxGISGeoprocessingCmd::OnClick(void)
                         dlg.AddFilter(new wxGxFeatureFileFilter(enumVecDXF), false);
 
 				    dlg.SetButtonCaption(_("Export"));
-				    //dlg.SetStartingLocation(_("Coordinate Systems"));
                     dlg.SetOverwritePrompt(true);
                     if(!sStartLoc.IsEmpty())
                         dlg.SetStartingLocation(sStartLoc);
                     if(dlg.ShowModalSave() == wxID_OK)
                     {
-                        wxWindowDisabler disableAll;
-                        wxBusyInfo wait(_("Please wait, working..."));
 
                         IGxObjectFilter* pFilter = dlg.GetCurrentFilter();
                         if(!pFilter)
@@ -274,7 +271,10 @@ void wxGISGeoprocessingCmd::OnClick(void)
                         wxString sCatalogPath = dlg.GetPath();
                         wxString sName = dlg.GetName();
 
-                        wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(DatasetArray[0]->GetDataset());
+						wxString sTitle = wxString::Format(_("%s %d objects (files)"), _("Process"), DatasetArray.size());
+						wxWindow* pParentWnd = dynamic_cast<wxWindow*>(m_pApp);
+						wxGISProgressDlg ProgressDlg(sTitle, _("Begin operation..."), 100, pParentWnd, wxPD_APP_MODAL | wxPD_AUTO_HIDE | wxPD_SMOOTH | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME | wxPD_ESTIMATED_TIME | wxPD_REMAINING_TIME);						
+                        wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(DatasetArray[0]->GetDataset(true, &ProgressDlg));
                         if(!pDSet)
                         {
                             wxMessageBox(wxString(_("The dataset is empty")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
@@ -282,18 +282,29 @@ void wxGISGeoprocessingCmd::OnClick(void)
                             return;
                         }
 
-						if(pDSet->IsOpened() && pDSet->IsReadOnly())
-							pDSet->Close();
+						//create progress dialog
 						if(!pDSet->IsOpened())
-							if(!pDSet->Open())
+						{
+							if(!pDSet->Open(0, 0, true, &ProgressDlg))
+							{
+								ProgressDlg.PutMessage(_("Open dataset failed!"));
+								while(!ProgressDlg.WasCancelled())
+									wxMilliSleep(100);
 								return;
+							}
+						}
+						//ITrackCancel TrackCancel;
+      //                  IStatusBar* pStatusBar = m_pApp->GetStatusBar();                            
+      //                  TrackCancel.SetProgressor(pStatusBar->GetProgressor());
 
-                        ITrackCancel TrackCancel;
-                        IStatusBar* pStatusBar = m_pApp->GetStatusBar();                            
-                        TrackCancel.SetProgressor(pStatusBar->GetProgressor());
-                        if( !ExportFormat(pDSet, sPath, sName, pFilter, NULL, &TrackCancel) )
-                            wxMessageBox(wxString(_("While exporting some error occured!")), wxString(_("Error")), wxCENTRE | wxICON_ERROR | wxOK, pWnd);
-
+                        if( !ExportFormat(pDSet, sPath, sName, pFilter, NULL, &ProgressDlg) )//&TrackCancel
+						{
+							while(!ProgressDlg.WasCancelled())
+								wxMilliSleep(100);
+							return;
+						}
+						else
+							ProgressDlg.PutMessage(wxString::Format(_("Export successful (%s.%s)!"), sName.c_str(), pFilter->GetExt().c_str()));
                         //add new IGxObject's
                         IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
                         if(pGxApp)
@@ -361,14 +372,14 @@ void wxGISGeoprocessingCmd::OnClick(void)
                             if(nSubType == pFilter->GetSubType())
                                 continue;
 
-                            wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(DatasetArray[i]->GetDataset());
+                            wxGISFeatureDatasetSPtr pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(DatasetArray[i]->GetDataset(true, &ProgressDlg));
                             if(!pDSet)
                             {
                                 ProgressDlg.PutMessage(wxString::Format(_("The %d dataset is empty"), i + 1));
                                 continue;
                             }
 							if(!pDSet->IsOpened())
-								if(!pDSet->Open())
+								if(!pDSet->Open(0, 0, true, &ProgressDlg))
 									return;
 
 
@@ -376,6 +387,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
                             {
                                 const char* err = CPLGetLastErrorMsg();
                                 ProgressDlg.PutMessage(wgMB2WX(err));
+								wxMilliSleep(500);
                             }
                             else
                                 ProgressDlg.PutMessage(wxString::Format(_("Export successful (%s.%s)!"), sName.c_str(), pFilter->GetExt().c_str()));

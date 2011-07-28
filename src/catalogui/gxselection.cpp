@@ -232,7 +232,7 @@ bool wxGxSelection::CanUndo()
 long wxGxSelection::Redo(int nPos)
 {
     wxCriticalSectionLocker locker(m_DoCritSect);
-    if(nPos == -1)
+    if(nPos == wxNOT_FOUND)
         m_nPos++;
     else
         m_nPos = nPos;
@@ -247,11 +247,11 @@ long wxGxSelection::Redo(int nPos)
 long wxGxSelection::Undo(int nPos)
 {
     wxCriticalSectionLocker locker(m_DoCritSect);
-    if(nPos == -1)
+    if(nPos == wxNOT_FOUND)
         m_nPos--;
     else
         m_nPos = nPos;
-    if(m_nPos > -1)
+    if(m_nPos > wxNOT_FOUND)
     {
         m_bDoOp = true;
         return m_DoArray[m_nPos];
@@ -283,7 +283,7 @@ void wxGxSelection::Reset()
     wxCriticalSectionLocker locker(m_DoCritSect);
     m_DoArray.Clear();
     m_bDoOp = false;
-    m_nPos = -1;
+    m_nPos = wxNOT_FOUND;
 }
 
 size_t wxGxSelection::GetDoSize()

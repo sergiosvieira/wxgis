@@ -42,12 +42,10 @@
 #include <wx/scrolwin.h>
 
 
-///////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISGPToolDlg
-///////////////////////////////////////////////////////////////////////////////
-class WXDLLIMPEXP_GIS_GPU wxGISGPToolDlg : public wxFrame //Dialog
+/** \class wxGISGPToolDlg gptooldlg.h
+ *  \brief The tool configuration dialog
+ */
+class WXDLLIMPEXP_GIS_GPU wxGISGPToolDlg : public wxFrame
 {
 private:
 
@@ -63,7 +61,7 @@ protected:
     wxHtmlWindow* m_htmlWin;
 
 public:
-    wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pTool, IGPCallBack* pCallBack = NULL, bool bSync = false, wxWindow* parent = NULL, wxWindowID id = wxID_ANY, const wxString& title = _("Tool name"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 480,600 ), long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX|wxRESIZE_BORDER|wxSYSTEM_MENU|wxFRAME_FLOAT_ON_PARENT /*wxSTAY_ON_TOP|wxDIALOG_NO_PARENT|wxCLIP_CHILDREN*/ );
+    wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pTool, IGPCallBack* pCallBack = NULL, bool bSync = false, wxWindow* parent = NULL, wxWindowID id = wxID_ANY, const wxString& title = _("Tool name"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX|wxRESIZE_BORDER|wxSYSTEM_MENU|wxFRAME_FLOAT_ON_PARENT /*wxSTAY_ON_TOP|wxDIALOG_NO_PARENT|wxCLIP_CHILDREN*/ );
     ~wxGISGPToolDlg();
     void m_splitterOnIdle( wxIdleEvent& )
     {

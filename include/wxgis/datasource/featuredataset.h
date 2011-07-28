@@ -39,8 +39,10 @@ public:
     virtual wxGISDatasetSPtr GetSubset(size_t nIndex);
 	virtual const OGRSpatialReferenceSPtr GetSpatialReference(void);
 	virtual void Close(void);
+	virtual bool IsCached(void){ return m_bIsDataLoaded & m_bIsGeometryLoaded; };
+	virtual void Cache(ITrackCancel* pTrackCancel = NULL);
 //wxGISFeatureDataset
-	virtual bool Open(int iLayer = 0, int bUpdate = 0, ITrackCancel* pTrackCancel = NULL);
+	virtual bool Open(int iLayer = 0, int bUpdate = 0, bool bCache = true, ITrackCancel* pTrackCancel = NULL);
 	virtual OGREnvelope GetEnvelope(void);
     virtual const OGRwkbGeometryType GetGeometryType(void);
  	virtual wxGISQuadTreeCursorSPtr SearchGeometry(const CPLRectObj* pAoi = 0);
@@ -55,7 +57,6 @@ public:
 
     virtual char **GetFileList();
 	//
-	virtual OGRLayer* const GetLayerRef(int iLayer = 0);
 protected:
     virtual void LoadGeometry(ITrackCancel* pTrackCancel = NULL);
     //virtual void UnloadGeometry(void);

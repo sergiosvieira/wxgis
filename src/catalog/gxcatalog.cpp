@@ -448,8 +448,13 @@ void wxGxCatalog::UnRegisterObject(long nID)
 IGxObjectSPtr wxGxCatalog::GetRegisterObject(long nID)
 {
 	wxCriticalSectionLocker locker(m_RegCritSect);
+	if(wxNOT_FOUND == nID)
+		return IGxObjectSPtr();
+
 	if(GxObjectMap[nID] != NULL)
 	{
+		//if(GxObjectMap[nID]->GetID() != nID)
+		//	return IGxObjectSPtr();
 		GxObjectMap[nID]->Lock();
 		return IGxObjectSPtr(GxObjectMap[nID], GxObjectDeleter);
 	}

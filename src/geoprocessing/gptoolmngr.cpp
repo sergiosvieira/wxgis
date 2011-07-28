@@ -56,22 +56,23 @@ void wxGPProcess::ProcessInput(wxString sInputData)
 	wxString sRest;
 	if( sInputData.StartsWith(wxT("DONE: "), &sRest) )
 	{
-		int nPercent = wxAtoi(sRest.Trim().Truncate(sRest.Len() - 1));
+		int nPercent = wxAtoi(sRest.Trim(true).Trim(false).Truncate(sRest.Len() - 1));
 		wxTimeSpan Elapsed = wxDateTime::Now() - m_dtBeg;//time left
         wxString sTxt;
-        if(nPercent)
-        {
-            double nPercentR = 100 - nPercent;
-            //wxTimeSpan Remains = Elapsed * (nPercentR / nPercent);
-		    long dMSec = double(Elapsed.GetMilliseconds().ToDouble() * nPercentR) / nPercent;	
-		    wxTimeSpan Remains = wxTimeSpan(0,0,0,dMSec);
-		    m_dtEstEnd = m_dtBeg + Remains;
-		    sTxt = wxString(_("Remains ")) + Remains.Format(_("%H hour(s) %M min. %S sec."));
-        }
 		if(m_pProgressor)
 			m_pProgressor->SetValue(nPercent);
 
-		if(m_pTrackCancel)
+        double nPercentR = 100 - nPercent;
+		if(nPercentR >= 0)
+		{
+			//wxTimeSpan Remains = Elapsed * (nPercentR / nPercent);
+			long dMSec = double(Elapsed.GetMilliseconds().ToDouble() * nPercentR) / nPercent;	
+			wxTimeSpan Remains = wxTimeSpan(0,0,0,dMSec);
+			m_dtEstEnd = m_dtBeg + Remains;
+			sTxt = wxString(_("Remains ")) + Remains.Format(_("%H hour(s) %M min. %S sec."));
+		}
+
+		if(m_pTrackCancel && !sTxt.IsEmpty())
 			m_pTrackCancel->PutMessage(sTxt, -1, enumGISMessageTitle);
 		return;
 	}
@@ -223,7 +224,7 @@ int wxGISGPToolManager::OnExecute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel,
     wxString sToolParams = pTool->GetAsString();
     sToolParams.Replace(wxT("\""), wxT("\\\""));
     
-	wxString sCommand = wxString::Format(wxT("%s -n "), m_sGeoprocessPath.c_str()) + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");
+	//wxString sCommand = wxString::Format(wxT("%s -n "), m_sGeoprocessPath.c_str()) + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");
     
 	wxFileName FName(m_sGeoprocessPath);
     wxArrayString saParams;
@@ -271,18 +272,6 @@ bool wxGISGPToolManager::ExecTask(WXGISEXECDDATA &data)
     }
 
     data.pProcess->OnStart();
-	//long nPID = wxExecute(data.pProcess->GetCommand(), wxEXEC_ASYNC, data.pProcess);
- //   if(nPID <= 0)
- //   {
- //       data.pProcess->SetState( enumGISTaskError );
- //       if(data.pTrackCancel)
- //           data.pTrackCancel->PutMessage(_("Error start task!"), -1, enumGISMessageErr);
- //       //if(data.pCallBack)
- //       //    data.pCallBack->OnFinish(true, data.pTool);
- //       return false;
- //   }
-
- //   data.pProcess->OnStart(nPID);
     m_nRunningTasks++;
     return true;
 }
@@ -299,15 +288,15 @@ void wxGISGPToolManager::OnFinish(IProcess* pProcess, bool bHasErrors)
     wxDateTime end = wxDateTime::Now();
     if(m_ProcessArray[nIndex].pTrackCancel)
     {
-        if(!bHasErrors)
-        {
-            m_ProcessArray[nIndex].pTrackCancel->PutMessage(wxString::Format(_("Executed (%s) successfully"), m_ProcessArray[nIndex].pTool->GetName().c_str()), -1, enumGISMessageInfo);
-            m_ProcessArray[nIndex].pTrackCancel->PutMessage(_("Done"), -1, enumGISMessageTitle);
-        }
-        else
+        if(bHasErrors)
         {
             m_ProcessArray[nIndex].pTrackCancel->PutMessage(wxString::Format(_("An error occured while executing %s. Failed to execute (%s)."), m_ProcessArray[nIndex].pTool->GetName().c_str(), m_ProcessArray[nIndex].pTool->GetName().c_str()), -1, enumGISMessageErr);
             m_ProcessArray[nIndex].pTrackCancel->PutMessage(_("Error!"), -1, enumGISMessageTitle);
+        }
+        else
+        {
+            m_ProcessArray[nIndex].pTrackCancel->PutMessage(wxString::Format(_("Executed (%s) successfully"), m_ProcessArray[nIndex].pTool->GetName().c_str()), -1, enumGISMessageInfo);
+            m_ProcessArray[nIndex].pTrackCancel->PutMessage(_("Done"), -1, enumGISMessageTitle);
         }
         
         wxTimeSpan span = end - m_ProcessArray[nIndex].pProcess->GetBeginTime();
@@ -318,6 +307,8 @@ void wxGISGPToolManager::OnFinish(IProcess* pProcess, bool bHasErrors)
     //m_ProcessArray.erase(m_ProcessArray.begin() + nIndex);
     //reduce counter of runnig threads
     m_nRunningTasks--;
+	if(m_nRunningTasks < 0)
+		m_nRunningTasks = 0;
 
     //run not running tasks
     if(m_nRunningTasks < m_nMaxTasks)
@@ -371,6 +362,8 @@ void wxGISGPToolManager::CancelProcess(size_t nIndex)
 	m_ProcessArray[nIndex].pProcess->OnCancel();
 
     m_nRunningTasks--;
+	if(m_nRunningTasks < 0)
+		m_nRunningTasks = 0;
 
     //run not running tasks
     if(m_nRunningTasks < m_nMaxTasks)

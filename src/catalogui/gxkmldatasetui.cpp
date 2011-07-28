@@ -104,7 +104,7 @@ void wxGxKMLDatasetUI::LoadChildren(void)
 	{
         wxGISFeatureDatasetSPtr pwxGISFeatureDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_type);
 
-        if(!pwxGISFeatureDataset->Open())
+        if(!pwxGISFeatureDataset->Open(0,0,false))
         {
 		    const char* err = CPLGetLastErrorMsg();
 		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));

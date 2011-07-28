@@ -3,7 +3,7 @@
  * Purpose:  toolbox classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -74,6 +74,7 @@ wxIcon wxGxToolbox::GetSmallImage(void)
 void wxGxToolbox::Detach(void)
 {
 	EmptyChildren();
+    IGxObject::Detach();
 }
 
 void wxGxToolbox::Refresh(void)
@@ -164,6 +165,7 @@ void wxGxRootToolbox::Detach(void)
 {
 	EmptyChildren();
     wxDELETE(m_pConfig);
+    IGxObject::Detach();
 }
 
 void wxGxRootToolbox::Init(wxXmlNode* const pConfigNode)
@@ -293,6 +295,7 @@ wxIcon wxGxFavoritesToolbox::GetSmallImage(void)
 void wxGxFavoritesToolbox::Detach(void)
 {
 	EmptyChildren();
+    IGxObject::Detach();
 }
 
 void wxGxFavoritesToolbox::Refresh(void)
@@ -385,6 +388,7 @@ void wxGxToolExecute::Detach(void)
 		wxDELETE(m_Children[i]);
 	}
 	m_Children.clear();
+    IGxObject::Detach();
 }
 
 void wxGxToolExecute::Refresh(void)
@@ -394,7 +398,7 @@ void wxGxToolExecute::Refresh(void)
 
 wxString wxGxToolExecute::GetName(void)
 {
-    if(m_nRunningTasks)
+    if(m_nRunningTasks > 0)
         return wxString::Format(_("Executed list [%d]"), m_nRunningTasks);
     else
         return wxString(_("Executed list"));
@@ -462,7 +466,7 @@ void wxGxToolExecute::OnFinish(IProcess* pProcess, bool bHasErrors)
     for(size_t i = 0; i < m_Children.size(); ++i)
     {
         wxGxTaskObject* pGxTaskObject = dynamic_cast<wxGxTaskObject*>(m_Children[i]);
-        if(pGxTaskObject && pGxTaskObject->GetTaskID() == nIndex && m_pCatalog)
+        if(pGxTaskObject && pGxTaskObject->GetTaskID() == nIndex)
             m_pCatalog->ObjectChanged(m_Children[i]->GetID());
     }
     m_pCatalog->ObjectChanged(GetID());
@@ -530,6 +534,7 @@ bool wxGxTool::Invoke(wxWindow* pParentWnd)
 		wxMessageBox(wxString::Format(_("Error find %s tool!\nCannnot continue."), m_sInternalName.c_str()), _("Error"), wxICON_ERROR | wxOK );
         return false; 
 	}
+
 	//TODO: Callback to view?
 	m_pRootToolbox->OnPrepareTool(pParentWnd, pTool, NULL, false);
     return true;
@@ -545,7 +550,6 @@ bool wxGxTool::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
     if(pTool)
     {
         m_sName = pTool->GetDisplayName();
-//        wxDELETE(pTool);
         return true;
     }
     else

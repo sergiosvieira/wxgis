@@ -182,7 +182,7 @@ void wxGISSearchServerDlg::OnSearchUI( wxUpdateUIEvent& event )
 
 void wxGISSearchServerDlg::OnAccept( wxCommandEvent& event )
 {
-	long item = m_listCtrl->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	long item = m_listCtrl->GetNextItem(wxNOT_FOUND, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	m_pConnProps = (wxXmlNode*)m_listCtrl->GetItemData(item);
 	EndModal(ID_ACCEPT);
 }

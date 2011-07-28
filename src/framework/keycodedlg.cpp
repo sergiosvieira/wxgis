@@ -41,7 +41,7 @@ wxKeyCodeCtrl::~wxKeyCodeCtrl(void)
 void wxKeyCodeCtrl::OnChar(wxKeyEvent& event)
 {
 	wxString str;
-	m_Key = -1;
+	m_Key = wxNOT_FOUND;
 	if(event.GetModifiers() & wxMOD_ALT)
 		str += wxT("Alt+");
 	if(event.GetModifiers() & wxMOD_CONTROL)

@@ -25,8 +25,6 @@
 #include "wxgis/framework/menubar.h"
 #include "wxgis/framework/commandbar.h"
 
-#include "wx/dynload.h"
-#include "wx/dynlib.h"
 #include "wx/ffile.h"
 #include "wx/dir.h"
 #include "wx/filename.h"
@@ -73,10 +71,7 @@ public:
     virtual bool SetupSys(wxString sSysPath);
     virtual bool SetupLoc(wxString sLoc, wxString sLocPath);
 
-    typedef std::map<wxString, wxDynamicLibrary*> LIBMAP;
 protected:
-	virtual void LoadLibs(wxXmlNode* pRootNode);
-	virtual void UnLoadLibs(void);
 	virtual void LoadCommands(wxXmlNode* pRootNode);
 	virtual void LoadMenues(wxXmlNode* pRootNode);
 	virtual void LoadToolbars(wxXmlNode* pRootNode);
@@ -102,7 +97,6 @@ protected:
 	wxGISMenuBar* m_pMenuBar;
 	ITool* m_CurrentTool;
     IDropDownCommand* m_pDropDownCommand;
-    LIBMAP m_LibMap;
 	ITrackCancel* m_pTrackCancel;
     //
     wxFFile m_LogFile;

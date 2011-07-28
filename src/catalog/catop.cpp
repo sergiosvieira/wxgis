@@ -23,6 +23,8 @@
 
 bool OverWriteGxObject(IGxObject* pGxObject, ITrackCancel* pTrackCancel)
 {
+	if(!pGxObject) //the object is not exist
+		return true;
     IGxObjectEdit* pGxDstObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject);
     if(pGxDstObjectEdit)
     {
