@@ -41,17 +41,17 @@ wxGISGPGeomVerticesToPointsTool::~wxGISGPGeomVerticesToPointsTool(void)
         wxDELETE(m_pParamArr[i]);
 }
 
-wxString wxGISGPGeomVerticesToPointsTool::GetDisplayName(void)
+const wxString wxGISGPGeomVerticesToPointsTool::GetDisplayName(void)
 {
     return wxString(_("Geometry Vertices To Points"));
 }
 
-wxString wxGISGPGeomVerticesToPointsTool::GetName(void)
+const wxString wxGISGPGeomVerticesToPointsTool::GetName(void)
 {
     return wxString(wxT("gvert_to_pts"));
 }
 
-wxString wxGISGPGeomVerticesToPointsTool::GetCategory(void)
+const wxString wxGISGPGeomVerticesToPointsTool::GetCategory(void)
 {
     return wxString(_("Conversion Tools/Vector"));
 }

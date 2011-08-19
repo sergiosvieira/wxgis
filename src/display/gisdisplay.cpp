@@ -645,7 +645,7 @@ bool wxGISDisplay::DrawPoint(const OGRPoint* pPoint)
 	return DrawPoint(pPoint->getX(), pPoint->getY());
 }
 
-bool wxGISDisplay::DrawLine(const OGRLineString* pLine)
+bool wxGISDisplay::DrawLine(const OGRLineString* pLine, bool bIsRing)
 {
 	if(NULL == pLine)
 		return false;
@@ -655,7 +655,7 @@ bool wxGISDisplay::DrawLine(const OGRLineString* pLine)
     OGRRawPoint* pOGRRawPoints = new OGRRawPoint[nPointCount * 3];
 	pLine->getPoints(pOGRRawPoints);
 
-	ClipGeometryByEnvelope(pOGRRawPoints, &nPointCount, m_CurrentBoundsX8);
+	ClipGeometryByEnvelope(pOGRRawPoints, &nPointCount, m_CurrentBoundsX8, !bIsRing);
 
 	cairo_move_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, pOGRRawPoints[0].x, pOGRRawPoints[0].y);
 
@@ -671,7 +671,7 @@ bool wxGISDisplay::DrawRing(const OGRLinearRing* pRing)
 {
 	if(NULL == pRing)
 		return false;
-	DrawLine((OGRLineString*)pRing);
+	DrawLine((OGRLineString*)pRing, true);
 //	cairo_close_path(m_saLayerCaches[m_nCurrentLayer].pCairoContext);
 
 	return true;

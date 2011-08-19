@@ -44,17 +44,17 @@ wxGISGPOrthoCorrectTool::~wxGISGPOrthoCorrectTool(void)
         wxDELETE(m_pParamArr[i]);
 }
 
-wxString wxGISGPOrthoCorrectTool::GetDisplayName(void)
+const wxString wxGISGPOrthoCorrectTool::GetDisplayName(void)
 {
     return wxString(_("Create Ortho-Corrected Raster"));
 }
 
-wxString wxGISGPOrthoCorrectTool::GetName(void)
+const wxString wxGISGPOrthoCorrectTool::GetName(void)
 {
     return wxString(wxT("create_ortho"));
 }
 
-wxString wxGISGPOrthoCorrectTool::GetCategory(void)
+const wxString wxGISGPOrthoCorrectTool::GetCategory(void)
 {
     return wxString(_("Data Management Tools/Raster"));
 }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  wxGISSimpleRenderer class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
@@ -25,6 +25,9 @@
 
 //#include <cstdlib>
 
+/** \class wxGISSimpleRenderer simplerenderer.h
+    \brief The vector layer renderer
+*/
 class wxGISSimpleRenderer :
 	public IFeatureRenderer
 {

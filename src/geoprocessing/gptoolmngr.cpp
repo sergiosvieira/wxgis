@@ -22,6 +22,7 @@
 #include "wxgis/geoprocessing/gptoolmngr.h"
 #include "wxgis/geoprocessing/gpparam.h"
 #include "wxgis/core/config.h"
+#include "wxgis/core/event.h"
 
 #include "wx/datetime.h"
 
@@ -40,12 +41,12 @@ wxGPProcess::~wxGPProcess(void)
 {
 }
 
-void wxGPProcess::OnTerminate(int status)
-{
-    wxGISProcess::OnTerminate(status);
-	if(m_pProgressor)
-		m_pProgressor->SetValue(100);
-}
+//void wxGPProcess::OnTerminate(int status)
+//{
+//    wxGISProcess::OnTerminate(status);
+//	if(m_pProgressor)
+//		m_pProgressor->SetValue(100);
+//}
 
 void wxGPProcess::ProcessInput(wxString sInputData)
 {
@@ -167,7 +168,7 @@ wxGISGPToolManager::~wxGISGPToolManager(void)
     //kill all processes
     for(size_t i = 0; i < m_ProcessArray.size(); ++i)
     {
-        CancelProcess(i);
+       	m_ProcessArray[i].pProcess->Cancel();
         wxDELETE(m_ProcessArray[i].pProcess);
 //        wxDELETE(m_ProcessArray[i].pTool);
     }
@@ -213,7 +214,7 @@ IGPToolSPtr wxGISGPToolManager::GetTool(wxString sToolName, IGxCatalog* pCatalog
 	return pRetTool;
 }
 
-int wxGISGPToolManager::OnExecute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel, IGPCallBack* pCallBack)
+int wxGISGPToolManager::Execute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel)
 {
     if(!pTool)
         return false;
@@ -234,20 +235,17 @@ int wxGISGPToolManager::OnExecute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel,
     saParams.Add(wxString(wxT("-p")));
     saParams.Add(sToolParams);
 
-    WXGISEXECDDATA data = {new wxGPProcess(m_sGeoprocessPath, saParams, static_cast<IProcessParent*>(this), pTrackCancel), pTool, pTrackCancel, pCallBack};
+    WXGISEXECDDATA data = {new wxGPProcess(m_sGeoprocessPath, saParams, static_cast<IProcessParent*>(this), pTrackCancel), pTool, pTrackCancel};
     m_ProcessArray.push_back(data);
     int nTaskID = m_ProcessArray.size() - 1;
     AddPriority(nTaskID, nTaskID);
 
-    if(m_nRunningTasks < m_nMaxTasks)
-        ExecTask(m_ProcessArray[nTaskID]);
-	else
-		m_ProcessArray[nTaskID].pProcess->SetState(enumGISTaskQuered);
+	StartProcess(nTaskID);
 
     return nTaskID;
 }
 
-bool wxGISGPToolManager::ExecTask(WXGISEXECDDATA &data)
+bool wxGISGPToolManager::ExecTask(WXGISEXECDDATA &data, size_t nIndex)
 {
     wxDateTime begin = wxDateTime::Now();
     if(data.pTrackCancel)
@@ -271,8 +269,12 @@ bool wxGISGPToolManager::ExecTask(WXGISEXECDDATA &data)
         data.pTrackCancel->PutMessage(wxString::Format(_("Start Time: %s"), begin.Format().c_str()), -1, enumGISMessageInfo);
     }
 
-    data.pProcess->OnStart();
+    data.pProcess->Start();
     m_nRunningTasks++;
+
+	wxGISProcessEvent event(wxPROCESS_START, nIndex);
+	PostEvent(event);
+
     return true;
 }
 
@@ -282,8 +284,6 @@ void wxGISGPToolManager::OnFinish(IProcess* pProcess, bool bHasErrors)
     for(nIndex = 0; nIndex < m_ProcessArray.size(); nIndex++)
         if(pProcess == m_ProcessArray[nIndex].pProcess)
             break;
-    if(m_ProcessArray[nIndex].pCallBack)
-        m_ProcessArray[nIndex].pCallBack->OnFinish(bHasErrors, m_ProcessArray[nIndex].pTool);
 
     wxDateTime end = wxDateTime::Now();
     if(m_ProcessArray[nIndex].pTrackCancel)
@@ -303,6 +303,14 @@ void wxGISGPToolManager::OnFinish(IProcess* pProcess, bool bHasErrors)
         m_ProcessArray[nIndex].pTrackCancel->PutMessage(wxString::Format(_("End Time: %s (Elapsed Time: %s)"), end.Format().c_str(), span.Format(_("%H hours %M min. %S sec.")).c_str()), -1, enumGISMessageInfo);
     }
 
+	wxGISProcessEvent event(wxPROCESS_FINISH, nIndex, bHasErrors);
+	PostEvent(event);
+
+	RunNextTask();
+}
+
+void wxGISGPToolManager::RunNextTask(void)
+{
     //remove from array
     //m_ProcessArray.erase(m_ProcessArray.begin() + nIndex);
     //reduce counter of runnig threads
@@ -315,9 +323,10 @@ void wxGISGPToolManager::OnFinish(IProcess* pProcess, bool bHasErrors)
     {
 		size_t nPrioIndex = GetPriorityTaskIndex();
 		if(nPrioIndex >= 0 && nPrioIndex < m_ProcessArray.size())
-			ExecTask(m_ProcessArray[nPrioIndex]);
+			ExecTask(m_ProcessArray[nPrioIndex], nPrioIndex);
     }
 }
+
 
 size_t wxGISGPToolManager::GetToolCount()
 {
@@ -350,28 +359,25 @@ void wxGISGPToolManager::StartProcess(size_t nIndex)
 	wxASSERT(nIndex >= 0);
 	wxASSERT(nIndex < m_ProcessArray.size());
     if(m_nRunningTasks < m_nMaxTasks)
-        ExecTask(m_ProcessArray[nIndex]);
+        ExecTask(m_ProcessArray[nIndex], nIndex);
 	else
+	{
 		m_ProcessArray[nIndex].pProcess->SetState(enumGISTaskQuered);
+		wxGISProcessEvent event(wxPROCESS_STATE_CHANGED, nIndex);
+		PostEvent(event);
+	}
 }
 
 void wxGISGPToolManager::CancelProcess(size_t nIndex)
 {
 	wxASSERT(nIndex >= 0);
 	wxASSERT(nIndex < m_ProcessArray.size());
-	m_ProcessArray[nIndex].pProcess->OnCancel();
+	m_ProcessArray[nIndex].pProcess->Cancel();
 
-    m_nRunningTasks--;
-	if(m_nRunningTasks < 0)
-		m_nRunningTasks = 0;
+	wxGISProcessEvent event(wxPROCESS_CANCELED, nIndex);
+	PostEvent(event);
 
-    //run not running tasks
-    if(m_nRunningTasks < m_nMaxTasks)
-    {
-		size_t nPrioIndex = GetPriorityTaskIndex();
-		if(nPrioIndex >= 0 && nPrioIndex < m_ProcessArray.size())
-			ExecTask(m_ProcessArray[nPrioIndex]);
-    }
+	RunNextTask();
 }
 
 wxDateTime wxGISGPToolManager::GetProcessStart(size_t nIndex)

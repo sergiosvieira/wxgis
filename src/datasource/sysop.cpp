@@ -49,7 +49,7 @@ bool DeleteFile(CPLString sPath)
 
 bool RenameFile(CPLString sOldPath, CPLString sNewPath)
 {
-    int result = VSIRename(sOldPath, sNewPath);
+	int result = VSIRename(sOldPath, sNewPath);
     if (result == -1)
         return false;
     return true;
@@ -57,8 +57,7 @@ bool RenameFile(CPLString sOldPath, CPLString sNewPath)
 
 wxString ClearExt(wxString sPath)
 {
-	wxFileName::StripExtension(sPath);
-    return sPath;
+	return wxFileName::StripExtension(sPath);
 }
 
 wxFontEncoding GetEncodingFromCpg(CPLString sPath)
@@ -461,10 +460,11 @@ CPLString GetExtension(CPLString sPath, CPLString sName)
 	if(sName.empty())
 		return CPLGetExtension(sPath);
 	size_t found = sPath.rfind(sName);
-	if(found != std::string::npos)
+	if( found != std::string::npos )
 	{
 		found += sName.length() + 1;
-		return sPath.substr(found);
+		if( found < sPath.size() - 1 )
+			return sPath.substr(found);
 	}
 	return CPLGetExtension(sPath);
 }

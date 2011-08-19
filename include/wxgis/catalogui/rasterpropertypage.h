@@ -24,12 +24,13 @@
 #include "wxgis/catalog/gxdataset.h"
 #include "wxgis/datasource/rasterdataset.h"
 #include "wxgis/geoprocessing/geoprocessing.h"
+#include "wxgis/geoprocessingui/geoprocessingui.h"
+#include "wxgis/core/event.h"
 
 #include "wx/propgrid/propgrid.h"
 
 class WXDLLIMPEXP_GIS_CLU wxGISRasterPropertyPage : 
-    public wxPanel,
-    public IGPCallBack
+    public wxPanel
 {
     DECLARE_DYNAMIC_CLASS(wxGISRasterPropertyPage)
 	enum
@@ -49,14 +50,15 @@ public:
     void FillGrid(void);
     //events
     void OnPropertyGridButtonClick ( wxCommandEvent& );
-    //IGPCallBack
-    virtual void OnFinish(bool bHasErrors = false, IGPToolSPtr pTool = IGPToolSPtr());
+    void OnFinish(wxGISProcessEvent& event);
 protected:
     wxGISRasterDatasetSPtr m_pDataset;
     wxGxRasterDataset* m_pGxDataset;
     IGxCatalog* m_pCatalog;
     wxPropertyGrid* m_pg;
 	long m_nCounter;
+	long m_nCookie;
+	IToolManagerUI* m_pToolManagerUI;
 
     DECLARE_EVENT_TABLE()
 };

@@ -42,17 +42,17 @@ wxGISGPExportTool::~wxGISGPExportTool(void)
         wxDELETE(m_pParamArr[i]);
 }
 
-wxString wxGISGPExportTool::GetDisplayName(void)
+const wxString wxGISGPExportTool::GetDisplayName(void)
 {
     return wxString(_("Export vector file (single)"));
 }
 
-wxString wxGISGPExportTool::GetName(void)
+const wxString wxGISGPExportTool::GetName(void)
 {
     return wxString(wxT("vexport_single"));
 }
 
-wxString wxGISGPExportTool::GetCategory(void)
+const wxString wxGISGPExportTool::GetCategory(void)
 {
     return wxString(_("Conversion Tools/Vector"));
 }

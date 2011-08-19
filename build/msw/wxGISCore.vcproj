@@ -186,6 +186,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\core\event.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\core\globalfn.cpp"
 				>
 			</File>
@@ -205,6 +209,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\core\core.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\core\event.h"
 				>
 			</File>
 			<File

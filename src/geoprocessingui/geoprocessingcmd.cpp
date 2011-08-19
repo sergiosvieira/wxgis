@@ -304,7 +304,10 @@ void wxGISGeoprocessingCmd::OnClick(void)
 							return;
 						}
 						else
-							ProgressDlg.PutMessage(wxString::Format(_("Export successful (%s.%s)!"), sName.c_str(), pFilter->GetExt().c_str()));
+						{
+							//ProgressDlg.PutMessage(wxString::Format(_("Export successful (%s.%s)!"), sName.c_str(), pFilter->GetExt().c_str()));
+							ProgressDlg.SetValue(ProgressDlg.GetValue() + 1);
+						}
                         //add new IGxObject's
                         IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
                         if(pGxApp)
@@ -385,12 +388,15 @@ void wxGISGeoprocessingCmd::OnClick(void)
 
                             if( !ExportFormat(pDSet, sPath, sName, pFilter, NULL, &ProgressDlg) )
                             {
-                                const char* err = CPLGetLastErrorMsg();
-                                ProgressDlg.PutMessage(wgMB2WX(err));
-								wxMilliSleep(500);
+								while(!ProgressDlg.WasCancelled())
+									wxMilliSleep(100);
+								return;
                             }
                             else
-                                ProgressDlg.PutMessage(wxString::Format(_("Export successful (%s.%s)!"), sName.c_str(), pFilter->GetExt().c_str()));
+							{
+                                //ProgressDlg.PutMessage(wxString::Format(_("Export successful (%s.%s)!"), sName.c_str(), pFilter->GetExt().c_str()));
+								ProgressDlg.SetValue(ProgressDlg.GetValue() + 1);
+							}
                         }
 
                         //add new IGxObject's

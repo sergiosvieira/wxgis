@@ -24,9 +24,8 @@
 //Sutherland-Hodgman Polygon Clipping
 //Adopted from (C) 2005 by Gavin Macaulay QGIS Project
 
-void ClipGeometryByEnvelope(OGRRawPoint* pOGRRawPoints, int *pnPointCount, const OGREnvelope &Env)
+void ClipGeometryByEnvelope(OGRRawPoint* pOGRRawPoints, int *pnPointCount, const OGREnvelope &Env, bool shapeOpen)
 {
-	bool shapeOpen = false;
 	OGRRawPoint* pTmpOGRRawPoints = new OGRRawPoint[*pnPointCount];
 	int nTmpPtCount(0);
 	TrimFeatureToBoundary( pOGRRawPoints, *pnPointCount, &pTmpOGRRawPoints, &nTmpPtCount, enumGISPtPosRight, Env, shapeOpen );

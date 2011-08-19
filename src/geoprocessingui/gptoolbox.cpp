@@ -237,7 +237,19 @@ IGPToolSPtr wxGxRootToolbox::GetGPTool(wxString sToolName)
     return m_pToolMngr->GetTool(sToolName, m_pCatalog);
 }
 
-bool wxGxRootToolbox::OnPrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync)
+long wxGxRootToolbox::Advise(wxEvtHandler* pEvtHandler)
+{
+	if(m_pToolMngr)
+		return m_pToolMngr->Advise(pEvtHandler);
+	return wxNOT_FOUND;
+}
+void wxGxRootToolbox::Unadvise(long nCookie)
+{
+	if(m_pToolMngr)
+		m_pToolMngr->Unadvise(nCookie);
+}
+
+bool wxGxRootToolbox::PrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, bool bSync)
 {
     if(!pTool)
     {
@@ -245,24 +257,26 @@ bool wxGxRootToolbox::OnPrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGP
         return false;
     }
     //create tool config dialog
-    wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(this, pTool, pCallBack, bSync, pParentWnd, wxID_ANY, pTool->GetDisplayName());
+    wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(this, pTool, bSync, pParentWnd, wxID_ANY, pTool->GetDisplayName());
     pDlg->Show(true);
 
     return true;
 }
 
-void wxGxRootToolbox::OnExecuteTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync)
+void wxGxRootToolbox::ExecuteTool(wxWindow* pParentWnd, IGPToolSPtr pTool, bool bSync)
 {
     if(bSync)
     {
-        wxGxTaskExecDlg dlg(m_pToolMngr, pCallBack, pParentWnd, wxID_ANY, pTool->GetDisplayName());
-        int nTaskID = m_pToolMngr->OnExecute(pTool, static_cast<ITrackCancel*>(&dlg), static_cast<IGPCallBack*>(&dlg));
+        wxGxTaskExecDlg dlg(m_pToolMngr, pParentWnd, wxID_ANY, pTool->GetDisplayName());
+        int nTaskID = m_pToolMngr->Execute(pTool, static_cast<ITrackCancel*>(&dlg));
         dlg.SetTaskID(nTaskID);
+		long m_nCookie = m_pToolMngr->Advise(&dlg);
         dlg.ShowModal();
+		m_pToolMngr->Unadvise(m_nCookie);
     }
     else
     {
-        m_pToolMngr->OnExecute(pTool, NULL, pCallBack);
+        m_pToolMngr->Execute(pTool, NULL);
     }
 }
 
@@ -405,18 +419,18 @@ wxString wxGxToolExecute::GetName(void)
 
 }
 
-int wxGxToolExecute::OnExecute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel, IGPCallBack* pCallBack)
+int wxGxToolExecute::Execute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel)
 {
 	int nTaskID = wxNOT_FOUND;
 	if(pTrackCancel)
 	{
-		nTaskID = wxGISGPToolManager::OnExecute(pTool, pTrackCancel, pCallBack);
+		nTaskID = wxGISGPToolManager::Execute(pTool, pTrackCancel);
 	}
 	else
 	{
 		wxWindow* pWnd = dynamic_cast<wxWindow*>(GetApplication());
-		wxGxTaskObject *pGxTaskObject = new wxGxTaskObject(this, pTool->GetDisplayName(), pCallBack, m_LargeToolIcon, m_SmallToolIcon);
-		nTaskID = wxGISGPToolManager::OnExecute(pTool, static_cast<ITrackCancel*>(pGxTaskObject), static_cast<IGPCallBack*>(pGxTaskObject));
+		wxGxTaskObject *pGxTaskObject = new wxGxTaskObject(this, pTool->GetDisplayName(), m_LargeToolIcon, m_SmallToolIcon);
+		nTaskID = wxGISGPToolManager::Execute(pTool, static_cast<ITrackCancel*>(pGxTaskObject));
 		pGxTaskObject->SetTaskID(nTaskID);
 		//add gxobj
         IGxObject* pGxObject = static_cast<IGxObject*>(pGxTaskObject);
@@ -524,9 +538,6 @@ wxIcon wxGxTool::GetSmallImage(void)
 bool wxGxTool::Invoke(wxWindow* pParentWnd)
 {
     //callback create/destroy gxtask
-    //m_pRootToolbox->OnPrepareTool(pParentWnd, m_sInternalName, wxEmptyString, NULL/*???*/, false);
-    //return false;
-
 	IGPToolSPtr pTool = m_pRootToolbox->GetGPTool(m_sInternalName);
 	if(!pTool)
 	{
@@ -535,10 +546,8 @@ bool wxGxTool::Invoke(wxWindow* pParentWnd)
         return false; 
 	}
 
-	//TODO: Callback to view?
-	m_pRootToolbox->OnPrepareTool(pParentWnd, pTool, NULL, false);
+	m_pRootToolbox->PrepareTool(pParentWnd, pTool, false);
     return true;
-
 }
 
 bool wxGxTool::Attach(IGxObject* pParent, IGxCatalog* pCatalog)

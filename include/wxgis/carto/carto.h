@@ -24,6 +24,10 @@
 #include "wxgis/display/gisdisplay.h"
 #include "wxgis/datasource/quadtree.h"
 
+/** \class wxGISLayer carto.h
+    \brief The base class for map layers
+*/
+
 class wxGISLayer 
 {
 public:
@@ -65,6 +69,9 @@ protected:
 };
 DEFINE_SHARED_PTR(wxGISLayer);
 
+/** \class IRenderer carto.h
+    \brief The base class for map layer renderer
+*/
 class IRenderer
 {
 public:
@@ -72,6 +79,9 @@ public:
 	virtual bool CanRender(wxGISDatasetSPtr pDataset) = 0;	
 };
 
+/** \class IFeatureRenderer carto.h
+    \brief The base class for map vector layer renderer
+*/
 class IFeatureRenderer : public IRenderer
 {
 public:
@@ -80,10 +90,14 @@ public:
 };
 DEFINE_SHARED_PTR(IFeatureRenderer);
 
-/*class IRasterRenderer : public IRenderer
+/** \class IRasterRenderer carto.h
+    \brief The base class for map raster layer renderer
+*/
+class IRasterRenderer : public IRenderer
 {
 public:
 	virtual ~IRasterRenderer(void){};
-	virtual void Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel) = 0;
+	//virtual void Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel) = 0;
 };
-*/
+DEFINE_SHARED_PTR(IRasterRenderer);
+

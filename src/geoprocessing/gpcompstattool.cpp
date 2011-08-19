@@ -42,17 +42,17 @@ wxGISGPCompStatTool::~wxGISGPCompStatTool(void)
         wxDELETE(m_pParamArr[i]);
 }
 
-wxString wxGISGPCompStatTool::GetDisplayName(void)
+const wxString wxGISGPCompStatTool::GetDisplayName(void)
 {
     return wxString(_("Compute statistics"));
 }
 
-wxString wxGISGPCompStatTool::GetName(void)
+const wxString wxGISGPCompStatTool::GetName(void)
 {
     return wxString(wxT("comp_stats"));
 }
 
-wxString wxGISGPCompStatTool::GetCategory(void)
+const wxString wxGISGPCompStatTool::GetCategory(void)
 {
     return wxString(_("Data Management Tools/Raster"));
 }

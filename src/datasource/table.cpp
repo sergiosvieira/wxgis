@@ -703,11 +703,15 @@ bool wxGISTable::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
         szNewDestFileName = CheckUniqPath(szNewDestFileName);
         szCopyFileName = szNewDestFileName;
         if(!CopyFile(szNewDestFileName, papszFileList[i], pTrackCancel))
+		{
+			CSLDestroy( papszFileList );
             return false;
+		}
     }
     
     m_sPath = szCopyFileName;
 
+	CSLDestroy( papszFileList );
 	return true;
 }
 
@@ -721,15 +725,20 @@ bool wxGISTable::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(!papszFileList)
         return false;
 
+
     for(int i = 0; papszFileList[i] != NULL; ++i )
     {
         const char* szNewDestFileName = CPLFormFilename(szDestPath, CPLGetFilename(papszFileList[i]), NULL);
         if(!MoveFile(szNewDestFileName, papszFileList[i], pTrackCancel))
+		{
+			CSLDestroy( papszFileList );
             return false;
+		}
     }
 
     m_sPath = CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL);
 
+	CSLDestroy( papszFileList );
     return true;
 }
 
@@ -817,9 +826,10 @@ char **wxGISTable::GetFileList()
 bool wxGISTable::Rename(wxString sNewName)
 {
 	wxCriticalSectionLocker locker(m_CritSect);
+
     CPLString szDirPath = CPLGetPath(m_sPath);
-    CPLString szName = CPLGetFilename(m_sPath);
-	CPLString szNewName = ClearExt(sNewName).mb_str();
+    CPLString szName = CPLGetBasename(m_sPath);
+	CPLString szNewName = ClearExt(sNewName).mb_str(wxConvUTF8);
 
 	Close();
 
@@ -832,10 +842,15 @@ bool wxGISTable::Rename(wxString sNewName)
     {		
         CPLString szNewPath(CPLFormFilename(szDirPath, szNewName, GetExtension(papszFileList[i], szName)));
         if(!RenameFile(papszFileList[i], szNewPath))
+		{
+			CSLDestroy( papszFileList );
             return false;
+		}
     }
     
 	m_sPath = CPLString(CPLFormFilename(szDirPath, szNewName, CPLGetExtension(m_sPath)));
+
+	CSLDestroy( papszFileList );
 	return true;
 }
 

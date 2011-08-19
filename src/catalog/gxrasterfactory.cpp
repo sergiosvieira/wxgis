@@ -78,30 +78,54 @@ bool wxGxRasterFactory::GetChildren(CPLString sParentDir, char** &pFileNames, Gx
 
         else if(EQUAL(szExt, "prj"))
         {
-            szPath = (char*)CPLResetExtension(pFileNames[i], "bmp");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            szPath = (char*)CPLResetExtension(pFileNames[i], "jpg");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            szPath = (char*)CPLResetExtension(pFileNames[i], "jpeg");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            szPath = (char*)CPLResetExtension(pFileNames[i], "img");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            szPath = (char*)CPLResetExtension(pFileNames[i], "gif");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            szPath = (char*)CPLResetExtension(pFileNames[i], "tif");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            szPath = (char*)CPLResetExtension(pFileNames[i], "tiff");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            szPath = (char*)CPLResetExtension(pFileNames[i], "png");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "bmp");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "jpg");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "jpeg");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "img");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "gif");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "tif");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "tiff");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "png");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
         }
         else if(EQUAL(szExt, "aux"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );

@@ -49,7 +49,7 @@ wxGISGPTool::wxGISGPTool(void) : m_pCatalog(NULL)
 {
 }
 
-void wxGISGPTool::Copy(IGPTool* pTool)
+void wxGISGPTool::Copy(IGPTool* const pTool)
 {
     if(pTool)
     {
@@ -76,7 +76,7 @@ IGxCatalog* const wxGISGPTool::GetCatalog(void)
     return m_pCatalog;
 }
 
-wxString wxGISGPTool::GetAsString(void)
+const wxString wxGISGPTool::GetAsString(void)
 {
     wxString sOutParam;
     for(size_t i = 0; i < m_pParamArr.size(); ++i)
@@ -91,7 +91,7 @@ wxString wxGISGPTool::GetAsString(void)
     return sOutParam;
 }
 
-bool wxGISGPTool::SetFromString(wxString sParams)
+bool wxGISGPTool::SetFromString(const wxString& sParams)
 {
     GetParameterInfo();
 	wxStringTokenizer tkz(sParams, wxString(GPTOOLSEPARATOR), wxTOKEN_RET_EMPTY );

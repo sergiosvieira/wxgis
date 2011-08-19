@@ -42,17 +42,17 @@ wxGISGPMeanByColumnTool::~wxGISGPMeanByColumnTool(void)
         wxDELETE(m_pParamArr[i]);
 }
 
-wxString wxGISGPMeanByColumnTool::GetDisplayName(void)
+const wxString wxGISGPMeanByColumnTool::GetDisplayName(void)
 {
     return wxString(_("Calculate mean column data"));
 }
 
-wxString wxGISGPMeanByColumnTool::GetName(void)
+const wxString wxGISGPMeanByColumnTool::GetName(void)
 {
     return wxString(wxT("mean_by_col"));
 }
 
-wxString wxGISGPMeanByColumnTool::GetCategory(void)
+const wxString wxGISGPMeanByColumnTool::GetCategory(void)
 {
     return wxString(_("Statistics Tools/Table"));
 }

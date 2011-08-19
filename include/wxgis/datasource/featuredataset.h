@@ -26,7 +26,7 @@
 /** \class wxGISFeatureDataset featuredataset.h
     \brief The GIS FeatureDataset class.
 
-    This class stores geographic data.
+    This class stores vector geographic data.
 */
 class WXDLLIMPEXP_GIS_DS wxGISFeatureDataset :
 	public wxGISTable

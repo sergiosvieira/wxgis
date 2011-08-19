@@ -41,17 +41,17 @@ wxGISGPCreateOverviewsTool::~wxGISGPCreateOverviewsTool(void)
         wxDELETE(m_pParamArr[i]);
 }
 
-wxString wxGISGPCreateOverviewsTool::GetDisplayName(void)
+const wxString wxGISGPCreateOverviewsTool::GetDisplayName(void)
 {
     return wxString(_("Create overviews"));
 }
 
-wxString wxGISGPCreateOverviewsTool::GetName(void)
+const wxString wxGISGPCreateOverviewsTool::GetName(void)
 {
     return wxString(wxT("create_ovr"));
 }
 
-wxString wxGISGPCreateOverviewsTool::GetCategory(void)
+const wxString wxGISGPCreateOverviewsTool::GetCategory(void)
 {
     return wxString(_("Data Management Tools/Raster"));
 }

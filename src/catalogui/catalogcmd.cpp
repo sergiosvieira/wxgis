@@ -556,6 +556,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 				wxGxDiscConnection* pDiscConnection = dynamic_cast<wxGxDiscConnection*>(pGxObject.get());
 				if(pDiscConnection)
 				{
+					pGxObject.reset();
 					CPLString sPath = pDiscConnection->GetInternalName();
 					pGxApp->GetCatalog()->DisconnectFolder(sPath);
 				}
@@ -838,6 +839,8 @@ void wxGISCatalogMainCmd::OnClick(void)
                             IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
                             pObjCont->AddChild(pGxFolder);
                             pCatalog->ObjectAdded(pGxFolder->GetID());
+							//wait while added new GxObject to views
+							wxYield();
                             //begin rename GxObject
                             wxWindow* pFocusWnd = wxWindow::FindFocus();
                             IGxView* pGxView = dynamic_cast<IGxView*>(pFocusWnd);
