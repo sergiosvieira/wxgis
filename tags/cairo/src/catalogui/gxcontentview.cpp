@@ -824,25 +824,21 @@ void wxGxContentView::OnChar(wxKeyEvent& event)
 
 void wxGxContentView::BeginRename(long nObjectID)
 {
-	for(long i = 0; i < GetItemCount(); ++i)
+	long nItem;
+	for(nItem = 0; nItem < GetItemCount(); ++nItem)
 	{
-		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
+		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(nItem);
 		if(pItemData == NULL)
 			continue;
 		if(pItemData->nObjectID == nObjectID)
         {
-            SetItemState(i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+            SetItemState(nItem, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
             m_pSelection->Select(nObjectID, true, NOTFIRESELID);
-            goto EDIT;
+			break;
         }
     }
-    return;
-
-EDIT:
-    int nItem = GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-    if ( nItem == wxNOT_FOUND )
-        return;
-    EditLabel(nItem);
+	if(nItem < GetItemCount())
+		EditLabel(nItem);
 }
 
 int wxGxContentView::GetIconPos(wxIcon icon_small, wxIcon icon_large)

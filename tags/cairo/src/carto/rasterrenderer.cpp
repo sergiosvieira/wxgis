@@ -1,5 +1,5 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  RasterRGBRenderer classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
@@ -21,7 +21,7 @@
 #include "wxgis/carto/rasterrenderer.h"
 #include "wxgis/datasource/rasterdataset.h"
 #include "wxgis/display/screendisplay.h"
-/*
+
 //-----------------------------------
 // wxGISRasterRGBRenderer
 //-----------------------------------
@@ -39,6 +39,7 @@ bool wxGISRasterRGBRenderer::CanRender(wxGISDatasetSPtr pDataset)
 	return pDataset->GetType() == enumGISRasterDataset ? true : false;
 }
 
+/*
 void wxGISRasterRGBRenderer::Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel)
 {
     wxGISRasterDatasetSPtr pRaster = boost::dynamic_pointer_cast<wxGISRasterDataset>(pRasterDataset);

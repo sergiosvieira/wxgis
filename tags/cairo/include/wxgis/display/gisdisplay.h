@@ -110,7 +110,7 @@ protected:
 	virtual bool DrawPointFast(double dX, double dY);
 	virtual bool DrawPoint(const OGRPoint* pPoint);
 	virtual bool DrawPointFast(const OGRPoint* pPoint);
-	virtual bool DrawLine(const OGRLineString* pLine);
+	virtual bool DrawLine(const OGRLineString* pLine, bool bIsRing = false);
 	virtual bool DrawRing(const OGRLinearRing* pRing);
 	virtual bool DrawPolygon(const OGRPolygon* pPolygon);
 	virtual bool CheckDrawAsPoint(const OGRGeometry* pGeometry, bool bCheckEnvelope = false);

@@ -44,17 +44,17 @@ wxGISGPProjectVectorTool::~wxGISGPProjectVectorTool(void)
         wxDELETE(m_pParamArr[i]);
 }
 
-wxString wxGISGPProjectVectorTool::GetDisplayName(void)
+const wxString wxGISGPProjectVectorTool::GetDisplayName(void)
 {
     return wxString(_("Project vector file (single)"));
 }
 
-wxString wxGISGPProjectVectorTool::GetName(void)
+const wxString wxGISGPProjectVectorTool::GetName(void)
 {
     return wxString(wxT("vproj_single"));
 }
 
-wxString wxGISGPProjectVectorTool::GetCategory(void)
+const wxString wxGISGPProjectVectorTool::GetCategory(void)
 {
     return wxString(_("Projections and Transformations/Vector"));
 }

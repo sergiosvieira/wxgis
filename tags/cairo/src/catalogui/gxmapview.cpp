@@ -155,8 +155,13 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 	{
 	case enumGISFeatureDataset:
 		{
-		wxGISFeatureLayerSPtr pGISFeatureLayer = boost::make_shared<wxGISFeatureLayer>(pwxGISDataset);
-		paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISFeatureLayer));
+			wxGISFeatureDatasetSPtr pGISFeatureDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pwxGISDataset);
+			if(!pGISFeatureDataset->IsOpened())
+				pGISFeatureDataset->Open(0, 0, true, m_pTrackCancel);
+			if(!pGISFeatureDataset->IsCached())
+				pGISFeatureDataset->Cache(m_pTrackCancel);
+			wxGISFeatureLayerSPtr pGISFeatureLayer = boost::make_shared<wxGISFeatureLayer>(pwxGISDataset);
+			paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISFeatureLayer));
 		}
 		break;
 	case enumGISRasterDataset:
@@ -175,8 +180,13 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 	        {
 	        case enumGISFeatureDataset:
 				{
-				wxGISFeatureLayerSPtr pGISFeatureLayer = boost::make_shared<wxGISFeatureLayer>(pwxGISSubDataset);
-				paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISFeatureLayer));
+					wxGISFeatureDatasetSPtr pGISFeatureDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pwxGISSubDataset);
+					if(!pGISFeatureDataset->IsOpened())
+						pGISFeatureDataset->Open(0, 0, true, m_pTrackCancel);
+					if(!pGISFeatureDataset->IsCached())
+						pGISFeatureDataset->Cache(m_pTrackCancel);
+					wxGISFeatureLayerSPtr pGISFeatureLayer = boost::make_shared<wxGISFeatureLayer>(pwxGISSubDataset);
+					paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISFeatureLayer));
 				}
 				break;
 	        case enumGISRasterDataset:

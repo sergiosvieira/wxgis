@@ -20,7 +20,6 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/rasterpropertypage.h"
-#include "wxgis/geoprocessingui/geoprocessingui.h"
 
 #include "gdal_rat.h"
 
@@ -31,21 +30,28 @@ IMPLEMENT_DYNAMIC_CLASS(wxGISRasterPropertyPage, wxPanel)
 
 BEGIN_EVENT_TABLE(wxGISRasterPropertyPage, wxPanel)
     EVT_BUTTON( ID_PPCTRL, wxGISRasterPropertyPage::OnPropertyGridButtonClick )
+	EVT_PROCESS_FINISH( wxGISRasterPropertyPage::OnFinish )
 END_EVENT_TABLE()
 
 wxGISRasterPropertyPage::wxGISRasterPropertyPage(void)
 {
 	m_nCounter = 0;
+	m_nCookie = wxNOT_FOUND;
+	m_pToolManagerUI = NULL;
 }
 
 wxGISRasterPropertyPage::wxGISRasterPropertyPage(wxGxRasterDataset* pGxDataset, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
 	m_nCounter = 0;
+	m_nCookie = wxNOT_FOUND;
+	m_pToolManagerUI = NULL;
     Create(pGxDataset, pCatalog, parent, id, pos, size, style, name);
 }
 
 wxGISRasterPropertyPage::~wxGISRasterPropertyPage()
 {
+	if(m_nCookie != wxNOT_FOUND && m_pToolManagerUI)
+		m_pToolManagerUI->Unadvise(m_nCookie);
 }
 
 bool wxGISRasterPropertyPage::Create(wxGxRasterDataset* pGxDataset, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
@@ -222,11 +228,11 @@ void wxGISRasterPropertyPage::FillGrid(void)
     m_pg->SetPropertyEditor(pstatprop, wxPG_EDITOR(TextCtrlAndButton));
 
     AppendProperty( new wxPropertyCategory(_("Extent")));
-    const OGREnvelope* pEnv = m_pDataset->GetEnvelope();
-    AppendProperty( new wxFloatProperty(_("Top"), wxPG_LABEL, pEnv->MaxY));
-    AppendProperty( new wxFloatProperty(_("Left"), wxPG_LABEL, pEnv->MinX));
-    AppendProperty( new wxFloatProperty(_("Right"), wxPG_LABEL, pEnv->MaxX));
-    AppendProperty( new wxFloatProperty(_("Bottom"), wxPG_LABEL, pEnv->MinY));
+    OGREnvelope Env = m_pDataset->GetEnvelope();
+    AppendProperty( new wxFloatProperty(_("Top"), wxPG_LABEL, Env.MaxY));
+    AppendProperty( new wxFloatProperty(_("Left"), wxPG_LABEL, Env.MinX));
+    AppendProperty( new wxFloatProperty(_("Right"), wxPG_LABEL, Env.MaxX));
+    AppendProperty( new wxFloatProperty(_("Bottom"), wxPG_LABEL, Env.MinY));
 
     if(poGDALDataset)
     {
@@ -541,8 +547,8 @@ void wxGISRasterPropertyPage::OnPropertyGridButtonClick ( wxCommandEvent& )
     IGxObjectContainer* pRootContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
     if(!pRootContainer)
         return;
-    IToolManagerUI* pToolManagerUI = dynamic_cast<IToolManagerUI*>(pRootContainer->SearchChild(_("Toolboxes")));
-    if(!pToolManagerUI)
+    m_pToolManagerUI = dynamic_cast<IToolManagerUI*>(pRootContainer->SearchChild(_("Toolboxes")));
+    if(!m_pToolManagerUI)
     {
         //error msg
         wxMessageBox(_("Error find IToolManagerUI interface!\nThe wxGxRootToolbox Catalog root item\nis not loaded or not inherited from IToolManagerUI interface.\nCannnot continue."), _("Error"), wxICON_ERROR | wxOK );
@@ -550,7 +556,7 @@ void wxGISRasterPropertyPage::OnPropertyGridButtonClick ( wxCommandEvent& )
     }
 
 
-	IGPToolSPtr pTool = pToolManagerUI->GetGPTool(sToolName);
+	IGPToolSPtr pTool = m_pToolManagerUI->GetGPTool(sToolName);
 	if(!pTool)
 	{
         //error msg
@@ -567,13 +573,16 @@ void wxGISRasterPropertyPage::OnPropertyGridButtonClick ( wxCommandEvent& )
     IGPParameter* pParam = pParams->operator[](0);
     pParam->SetValue(wxVariant(m_pGxDataset->GetFullName()));
 
-	pToolManagerUI->OnPrepareTool(this, pTool, static_cast<IGPCallBack*>(this), true);
+	if(m_nCookie == wxNOT_FOUND)
+		m_nCookie = m_pToolManagerUI->Advise(this);
+
+	m_pToolManagerUI->PrepareTool(this, pTool, true);
     m_pDataset->Close();
 }
 
-void wxGISRasterPropertyPage::OnFinish(bool bHasErrors, IGPToolSPtr pTool)
+void wxGISRasterPropertyPage::OnFinish(wxGISProcessEvent& event)
 {
-    if(!bHasErrors)
+	if(!event.GetHasErrors())
 	{
 	    //reset grid
 		m_pg->Clear();

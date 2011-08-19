@@ -35,7 +35,7 @@ BEGIN_EVENT_TABLE(wxGISGPToolDlg, wxFrame)
 	EVT_UPDATE_UI(wxID_OK, wxGISGPToolDlg::OnOkUI)
 END_EVENT_TABLE()
 
-wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pTool, bool bSync, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
     IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(GetApplication());
     pApp->RegisterChildWindow(this);
@@ -43,7 +43,6 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
     m_pTool = pTool;
 	m_pPropNode = pGxRootToolbox->GetAttributes();
     m_pGxRootToolbox = pGxRootToolbox;
-    m_pCallBack = pCallBack;
     m_bSync = bSync;
 
 
@@ -237,7 +236,7 @@ void wxGISGPToolDlg::OnOk(wxCommandEvent& event)
     this->Destroy();
 
     //begin execution
-    m_pGxRootToolbox->OnExecuteTool(pParentWnd, m_pTool, m_pCallBack, m_bSync);
+    m_pGxRootToolbox->ExecuteTool(pParentWnd, m_pTool, m_bSync);
 }
 
 void wxGISGPToolDlg::OnCancel(wxCommandEvent& event)

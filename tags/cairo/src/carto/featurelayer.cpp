@@ -20,8 +20,8 @@
  ****************************************************************************/
 #include "wxgis/carto/featurelayer.h"
 #include "wxgis/carto/simplerenderer.h"
-#include "wxgis/geometry/algorithm.h"
 #include "wxgis/display/displaytransformation.h"
+//#include "wxgis/geometry/algorithm.h"
 //#include "wxgis/datasource/spvalidator.h"
 //#include "wxgis/framework/application.h"
 //#include "wxgis/carto/transformthreads.h"
@@ -30,7 +30,7 @@
 #define STEP 3.0
 #define NOCACHEVAL 1000
 
-wxGISFeatureLayer::wxGISFeatureLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer()//, m_pFeatureRenderer(NULL)
+wxGISFeatureLayer::wxGISFeatureLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer()
 {
     m_pwxGISFeatureDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pwxGISDataset);
 	if(m_pwxGISFeatureDataset)
@@ -51,87 +51,6 @@ wxGISFeatureLayer::~wxGISFeatureLayer(void)
 
 bool wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel)
 {
-	//TODO: Move to display
-    //RECTARARRAY* pInvalidrectArray = pDisplay->GetInvalidRect();
-    //OGREnvelope Envs[10];
-    //size_t EnvCount = pInvalidrectArray->size();
-    //if(EnvCount > 10)
-    //    EnvCount = 10;
-
-    //if(EnvCount == 0)
-    //{
-     //   Envs[0] = pDisplayTransformation->GetVisibleBounds();
-    //    EnvCount = 1;
-    //}
-    //else
-    //{
-    //    for(size_t i = 0; i < EnvCount; ++i)
-    //    {
-    //        wxRect Rect = pInvalidrectArray->operator[](i);
-    //        Rect.Inflate(1,1);
-    //        Envs[i] = pDisplayTransformation->TransformRect(Rect);
-    //    }
-    //}
-
-    //for(size_t i = 0; i < EnvCount; ++i)
-    //{
-	    //1. get envelope
-	    //OGREnvelope Env = Envs[i];//pDisplayTransformation->GetVisibleBounds();
-	    //bool bSetFilter(false);
-		//Check if get all features
-	    //if(IsDoubleEquil(m_PreviousDisplayEnv.MaxX, Env.MaxX) || IsDoubleEquil(m_PreviousDisplayEnv.MaxY, Env.MaxY) || IsDoubleEquil(m_PreviousDisplayEnv.MinX, Env.MinX) || IsDoubleEquil(m_PreviousDisplayEnv.MinY, Env.MinY))
-		   // bSetFilter = m_FullEnv.Contains(Env);//m_FullEnv.Intersects(Env);
-
-	    //2. set spatial filter
-	    //pDisplay->StartDrawing(GetCacheID());
-	    //if(m_pFeatureRenderer && m_pFeatureRenderer->CanRender(m_pwxGISFeatureDataset))
-	    //{
-		    //3. get features set
-		    //if(bSetFilter)
-		    //{
-			 //   int count(0);
-			 //   CPLRectObj Rect = {Env.MinX, Env.MinY, Env.MaxX, Env.MaxY};
-				//wxGISQuadTreeCursorSPtr pCursor = m_pQuadTree->Search(&Rect);
-				//wxGISQuadTreeItem* pItem;
-				//while((pItem = pCursor->Next()) != NULL)
-
-
-			    //OGRGeometry** pGeometryArr = (OGRGeometry**)CPLQuadTreeSearch(m_pQuadTree, &Rect, &count);
-		     //   wxGISGeometrySet GISGeometrySet(false);
-
-			    //for(size_t i = 0; i < count; ++i)
-			    //{
-				   // if(pTrackCancel && !pTrackCancel->Continue())
-					  //  break;
-
-                    //long nID = m_pOGRGeometrySet->operator[](pGeometryArr[i]);
-                    //OGRGeometry* pGeom = pGeometryArr[i];
-                    //GISGeometrySet.AddGeometry(pGeom, nID);
-                    //if(GISGeometrySet.GetSize() == 20000)
-                    //{
-                        //m_pFeatureRenderer->Draw(pCursor, DrawPhase, pDisplay, pTrackCancel);
-                        //GISGeometrySet.Clear();
-                        //pDisplay->OnUpdate();
-
-                        //if(pTrackCancel && !pTrackCancel->Continue())
-                        //    break;
-                    //}
-			    //}
-		     ////   m_pFeatureRenderer->Draw(&GISGeometrySet, DrawPhase, pDisplay, pTrackCancel);
-			    ////wxDELETEA( pGeometryArr );
-		 ////   }
-		 ////   else
-			////{
-   ////             m_pFeatureRenderer->Draw(m_pOGRGeometrySet, DrawPhase, pDisplay, pTrackCancel);
-			////}
-
-		    //4. send it to renderer
-		    //m_PreviousDisplayEnv = Env;
-	    //}
-    //}
-	//5. clear a spatial filter
-	//pDisplay->FinishDrawing();
-
 	if(m_pFeatureRenderer->CanRender(m_pwxGISFeatureDataset))
 	{
 	    bool bSetFilter(false);

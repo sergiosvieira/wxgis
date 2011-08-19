@@ -3,7 +3,7 @@
  * Purpose:  geoprocessing header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -178,9 +178,9 @@ class IGPTool
 {
 public:
     virtual ~IGPTool(void){};
-    virtual wxString GetDisplayName(void) = 0;
-    virtual wxString GetName(void) = 0;
-    virtual wxString GetCategory(void) = 0;
+    virtual const wxString GetDisplayName(void) = 0;
+    virtual const wxString GetName(void) = 0;
+    virtual const wxString GetCategory(void) = 0;
     virtual bool Execute(ITrackCancel* pTrackCancel) = 0;
     virtual bool Validate(void) = 0;
     virtual GPParameters* GetParameterInfo(void) = 0;
@@ -188,26 +188,19 @@ public:
      *  \brief Serialize tool parameters to string.
      *  \return The string representation of tool parameters
      */	
-    virtual wxString GetAsString(void) = 0;
+    virtual const wxString GetAsString(void) = 0;
     /** \fn void SetFromString(wxString sParams)
      *  \brief Serialize tool parameters to string.
      *  \param sParams The string representation of tool parameters
      */	
-    virtual bool SetFromString(wxString sParams) = 0;
+    virtual bool SetFromString(const wxString& sParams) = 0;
     virtual void SetCatalog(IGxCatalog* pCatalog) = 0;
     virtual IGxCatalog* const GetCatalog(void) = 0;
     //virtual GetToolType(void) = 0;
-    virtual void Copy(IGPTool* pTool) = 0;
+    virtual void Copy(IGPTool* const pTool) = 0;
 };
 
 DEFINE_SHARED_PTR(IGPTool);
-
-class IGPCallBack
-{
-public:
-    virtual ~IGPCallBack(void){};
-    virtual void OnFinish(bool bHasErrors = false, IGPToolSPtr pTool = IGPToolSPtr()) = 0;
-};
 
 
 

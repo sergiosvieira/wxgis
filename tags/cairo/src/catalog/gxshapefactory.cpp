@@ -66,11 +66,14 @@ bool wxGxShapeFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxO
         else if(EQUAL(szExt, "prj"))
         {
             bool bHasShp(false);
-            szPath = (char*)CPLResetExtension(pFileNames[i], "shp");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                bHasShp = true;
-            if(bHasShp)
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "shp");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					bHasShp = true;
+				if(bHasShp)
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
         }
         else if(EQUAL(szExt, "sbn"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );

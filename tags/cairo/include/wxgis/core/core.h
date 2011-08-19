@@ -330,8 +330,8 @@ public:
 		m_nState = enumGISTaskPaused;
 	}
 	virtual ~IProcess(void){};
-    virtual void OnStart(void) = 0;
-    virtual void OnCancel(void) = 0;
+    virtual void Start(void) = 0;
+    virtual void Cancel(void) = 0;
 	virtual void SetState(wxGISEnumTaskStateType nState){m_nState = nState;};
 	virtual wxGISEnumTaskStateType GetState(void){return m_nState;};
 	virtual wxString GetCommand(void){return m_sCommand;};
@@ -359,7 +359,6 @@ public:
 
 #define DEFINE_SHARED_PTR(x) typedef boost::shared_ptr<x> x##SPtr
 #define DEFINE_WEAK_PTR(x) typedef boost::weak_ptr<x> x##WPtr
-static void wxNotDeleter(void*);
 
 static wxString DoubleToString(double Val, bool IsLon)
 {

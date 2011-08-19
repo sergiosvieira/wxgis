@@ -36,9 +36,9 @@ public:
     wxGISGPCreateOverviewsTool(void);
     ~wxGISGPCreateOverviewsTool(void);
     //IGPTool
-    virtual wxString GetDisplayName(void);
-    virtual wxString GetName(void);
-    virtual wxString GetCategory(void);
+    virtual const wxString GetDisplayName(void);
+    virtual const wxString GetName(void);
+    virtual const wxString GetCategory(void);
     virtual bool Execute(ITrackCancel* pTrackCancel);
     virtual bool Validate(void);
     virtual GPParameters* GetParameterInfo(void);

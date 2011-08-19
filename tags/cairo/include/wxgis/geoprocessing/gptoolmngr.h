@@ -35,7 +35,7 @@ class wxGPProcess :
 public:
     wxGPProcess(wxString sCommand, wxArrayString saParams, IProcessParent* pParent, ITrackCancel* pTrackCancel);
     virtual ~wxGPProcess(void);
-    virtual void OnTerminate(int status);
+    //virtual void OnTerminate(int status);
 	virtual void ProcessInput(wxString sInputData);
 protected:
     ITrackCancel* m_pTrackCancel;
@@ -47,7 +47,6 @@ typedef struct _wxgisexecddata
     IProcess* pProcess;
     IGPToolSPtr pTool;
     ITrackCancel* pTrackCancel;
-    IGPCallBack* pCallBack;
 } WXGISEXECDDATA;
 
 /** \class wxGISGPToolManager gptoolmngr.h
@@ -55,31 +54,33 @@ typedef struct _wxgisexecddata
  *
  *  Hold the geoprocessing tools list, execute tools, track tool execution statistics
  */
-class WXDLLIMPEXP_GIS_GP wxGISGPToolManager : public IProcessParent
+class WXDLLIMPEXP_GIS_GP wxGISGPToolManager : 
+	public IProcessParent,
+	public wxGISConnectionPointContainer
 {
 public:
     wxGISGPToolManager(wxXmlNode* pToolsNode);
     virtual ~wxGISGPToolManager(void);
     virtual IGPToolSPtr GetTool(wxString sToolName, IGxCatalog* pCatalog = NULL);
-    virtual int OnExecute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel = NULL, IGPCallBack* pCallBack = NULL);
+    virtual int Execute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel = NULL);
     virtual size_t GetToolCount();
     virtual wxString GetPopularTool(size_t nIndex);
-    virtual wxGISEnumTaskStateType GetProcessState(size_t nIndex);
     virtual void StartProcess(size_t nIndex);
     virtual void CancelProcess(size_t nIndex);
-    //virtual void PauseProcess(size_t nIndex);
     //virtual WXGISEXECDDATA GetTask(size_t nIndex);
-	//IProcessParent
-    virtual void OnFinish(IProcess* pProcess, bool bHasErrors);
+    virtual wxGISEnumTaskStateType GetProcessState(size_t nIndex);
     virtual wxDateTime GetProcessStart(size_t nIndex);
     virtual wxDateTime GetProcessFinish(size_t nIndex);
     virtual int GetProcessPriority(size_t nIndex);
-    virtual IGPToolSPtr GetProcessTool(size_t nIndex);
     virtual void SetProcessPriority(size_t nIndex, int nPriority);
-	virtual int GetPriorityTaskIndex();
+    virtual IGPToolSPtr GetProcessTool(size_t nIndex);
+	//IProcessParent
+    virtual void OnFinish(IProcess* pProcess, bool bHasErrors);
 protected:
-    virtual bool ExecTask(WXGISEXECDDATA &data);
+	virtual int GetPriorityTaskIndex();
+    virtual bool ExecTask(WXGISEXECDDATA &data, size_t nIndex );
     virtual void AddPriority(int nIndex, int nPriority);
+	virtual void RunNextTask(void);
 public:
     typedef struct _toolinfo
     {

@@ -188,7 +188,7 @@ inline void TrimFeatureToBoundary(OGRRawPoint* pOGRRawPointsIn, int nPointCountI
 	}
 }
 
-void WXDLLIMPEXP_GIS_GEOM ClipGeometryByEnvelope(OGRRawPoint* pOGRRawPoints, int *pnPointCount, const OGREnvelope &Env);
+void WXDLLIMPEXP_GIS_GEOM ClipGeometryByEnvelope(OGRRawPoint* pOGRRawPoints, int *pnPointCount, const OGREnvelope &Env, bool shapeOpen);
 
 //
 //OGRRawPoint WXDLLIMPEXP_GIS_GEOM GetPointOnEnvelope(OGREnvelope &Env, OGRRawPoint &Pt1, OGRRawPoint &Pt2, int code);

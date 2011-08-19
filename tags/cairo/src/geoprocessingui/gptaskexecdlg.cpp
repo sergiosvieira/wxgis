@@ -33,15 +33,15 @@ BEGIN_EVENT_TABLE(wxGxTaskExecDlg, wxDialog)
     EVT_BUTTON(ID_CANCEL_PROCESS, wxGxTaskExecDlg::OnCancelTask)
     EVT_BUTTON(wxID_CANCEL, wxGxTaskExecDlg::OnCancel)
 	EVT_CLOSE(wxGxTaskExecDlg::OnClose)
+	EVT_PROCESS_FINISH(wxGxTaskExecDlg::OnFinish)
 END_EVENT_TABLE()
 
-wxGxTaskExecDlg::wxGxTaskExecDlg(wxGISGPToolManager* pToolManager, IGPCallBack* pCallBack, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxDialog(parent, id, title, pos, size, style), m_bExpand(false), m_nState(enumGISMessageUnk), m_nTaskID(wxNOT_FOUND)
+wxGxTaskExecDlg::wxGxTaskExecDlg(wxGISGPToolManager* pToolManager, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxDialog(parent, id, title, pos, size, style), m_bExpand(false), m_nState(enumGISMessageUnk), m_nTaskID(wxNOT_FOUND)
 {
     m_ImageList.Create(16, 16);
 	m_ImageList.Add(wxBitmap(state_xpm));
 
     m_pToolManager = pToolManager;
-    m_pCallBack = pCallBack;
 
     m_bMainSizer = new wxBoxSizer( wxVERTICAL );
  	wxFlexGridSizer* fgSizer1 = new wxFlexGridSizer( 1, 4, 0, 0 );
@@ -178,18 +178,6 @@ void wxGxTaskExecDlg::FillHtmlWindow()
     m_pHtmlWindow->Scroll(-1, 5000);
 }
 
-void wxGxTaskExecDlg::OnFinish(bool bHasErrors, IGPToolSPtr pTool)
-{
-    if(m_pCallBack)
-        m_pCallBack->OnFinish(bHasErrors, pTool);
-    //if(m_pCheckBox->IsChecked())
-    //{
-    //    Show(false);
-    //    //destroy
-    //    Destroy();
-    //}
-}
-
 void wxGxTaskExecDlg::OnCancel(wxCommandEvent & event)
 {
     //if exec
@@ -215,6 +203,19 @@ void wxGxTaskExecDlg::OnCancelTask(wxCommandEvent & event)
     this->Destroy();
 }
 
+void wxGxTaskExecDlg::OnClose(wxCloseEvent& event)
+{
+    if(m_pToolManager)
+	{
+		if(m_pToolManager->GetProcessState(m_nTaskID) == enumGISTaskWork)
+		{
+			wxMessageBox(wxString(_("You mast stop task before closing dialog!")), wxString(_("Warning")), wxCENTRE | wxICON_WARNING | wxOK );
+			event.Veto();
+			return;
+		}
+	}
+	event.Skip();
+}
 
 void wxGxTaskExecDlg::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType)
 {
@@ -253,25 +254,16 @@ void wxGxTaskExecDlg::SetTaskID(int nTaskID)
     m_nTaskID = nTaskID;
 }
 
-
-void wxGxTaskExecDlg::OnClose(wxCloseEvent& event)
+void wxGxTaskExecDlg::OnFinish(wxGISProcessEvent & event)
 {
-	event.Skip();
-    if(m_pToolManager)
-	{
-		if(m_pToolManager->GetProcessState(m_nTaskID) == enumGISTaskWork)
-		{
-			wxMessageBox(wxString(_("You mast stop task before closing dialog!")), wxString(_("Warning")), wxCENTRE | wxICON_WARNING | wxOK );
-			event.Veto();
-		}
-	}
+	m_bpCloseButton->Enable(false);
 }
 
 //////////////////////////////////////////////////////////////////
 // wxGxTaskObjectExecDlg
 //////////////////////////////////////////////////////////////////
 
-wxGxTaskObjectExecDlg::wxGxTaskObjectExecDlg(wxGxTaskObject* pGxTaskObject, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxGxTaskExecDlg(NULL, NULL, parent, id, title, pos, size, style)
+wxGxTaskObjectExecDlg::wxGxTaskObjectExecDlg(wxGxTaskObject* pGxTaskObject, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxGxTaskExecDlg(NULL, parent, id, title, pos, size, style)
 {
     m_pGxTaskObject = pGxTaskObject;
     switch(pGxTaskObject->GetState())
@@ -309,16 +301,22 @@ void wxGxTaskObjectExecDlg::OnClose(wxCloseEvent& event)
 //////////////////////////////////////////////////////////////////
 // wxGxTaskObject
 //////////////////////////////////////////////////////////////////
+BEGIN_EVENT_TABLE(wxGxTaskObject, wxEvtHandler)
+	EVT_PROCESS_START(wxGxTaskObject::OnTaskStateChanged)
+	EVT_PROCESS_FINISH(wxGxTaskObject::OnFinish)
+	EVT_PROCESS_CANCELED(wxGxTaskObject::OnTaskStateChanged)
+	EVT_PROCESS_STATE_CHANGED(wxGxTaskObject::OnTaskStateChanged)
+END_EVENT_TABLE()
 
-wxGxTaskObject::wxGxTaskObject(wxGISGPToolManager* pToolManager, wxString sName, IGPCallBack* pCallBack, wxIcon LargeToolIcon, wxIcon SmallToolIcon) : m_nDonePercent(0), m_pTaskExecDlg(NULL)
+wxGxTaskObject::wxGxTaskObject(wxGISGPToolManager* pToolManager, wxString sName, wxIcon LargeToolIcon, wxIcon SmallToolIcon) : m_nDonePercent(0), m_pTaskExecDlg(NULL)
 {
     m_sName = sName;
     m_LargeToolIcon = LargeToolIcon;
     m_SmallToolIcon = SmallToolIcon;
     m_pProgressor = this;
-    m_pCallBack = pCallBack;
     m_pCatalog = NULL;
     m_pToolManager = pToolManager;
+	m_nCookie = wxNOT_FOUND;
 }
 
 wxGxTaskObject::~wxGxTaskObject(void)
@@ -342,8 +340,22 @@ void wxGxTaskObject::SetValue(int value)
         m_pCatalog->ObjectChanged(GetID());
 }
 
+bool wxGxTaskObject::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
+{
+    bool bRes = IGxObject::Attach(pParent, pCatalog);
+	if(bRes)
+	{
+		if(m_pToolManager)
+			m_nCookie = m_pToolManager->Advise(this);
+	}
+	return bRes;
+}
+
 void wxGxTaskObject::Detach(void)
 {
+	if(m_nCookie != wxNOT_FOUND && m_pToolManager)
+		m_pToolManager->Unadvise(m_nCookie);
+
     IGxObject::Detach();
 }
 
@@ -423,12 +435,22 @@ bool wxGxTaskObject::PauseTask()
     //return true;
 }
 
-void wxGxTaskObject::OnFinish(bool bHasErrors, IGPToolSPtr pTool)
+void wxGxTaskObject::OnTaskStateChanged(wxGISProcessEvent & event)
 {
-    if(m_pCallBack)
-        m_pCallBack->OnFinish(bHasErrors, pTool);
+	if(event.GetProcessID() != m_nTaskID)
+		return;
     if(m_pCatalog)
         m_pCatalog->ObjectChanged(GetID());
+}
+
+void wxGxTaskObject::OnFinish(wxGISProcessEvent & event)
+{
+	if(event.GetProcessID() != m_nTaskID)
+		return;
+    if(m_pCatalog)
+        m_pCatalog->ObjectChanged(GetID());
+	if(m_pTaskExecDlg)
+		m_pTaskExecDlg->GetEventHandler()->ProcessEvent(event);
 }
 
 void wxGxTaskObject::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType)
@@ -464,7 +486,7 @@ void wxGxTaskObject::ShowToolConfig(wxWindow* pParentWnd)
 {
     wxGxToolExecute* pToolManager = dynamic_cast<wxGxToolExecute*>(m_pToolManager);
     if(pToolManager)
-        pToolManager->OnPrepareTool(pParentWnd, m_pToolManager->GetProcessTool(m_nTaskID), m_pCallBack, false);
+        pToolManager->PrepareTool(pParentWnd, m_pToolManager->GetProcessTool(m_nTaskID), false);
 }
 
 int wxGxTaskObject::GetPriority(void)

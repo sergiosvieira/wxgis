@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
- * Purpose:  RasterRGBRenderer classes.
+ * Purpose:  event classes special for Process events.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,23 +18,11 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#pragma once
+#include "wxgis/core/event.h"
 
-#include "wxgis/carto/carto.h"
+IMPLEMENT_DYNAMIC_CLASS(wxGISProcessEvent, wxEvent)
 
-/** \class wxGISRasterRGBRenderer rasterrenderer.h
-    \brief The raster layer renderer for RGB data
-*/
-class wxGISRasterRGBRenderer :
-	public IRasterRenderer
-{
-public:
-	wxGISRasterRGBRenderer(void);
-	~wxGISRasterRGBRenderer(void);
-//IRasterRenderer
-	virtual bool CanRender(wxGISDatasetSPtr pDataset);
-//	virtual void Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel);
-////
-//	virtual OGREnvelope TransformEnvelope(const OGREnvelope* pEnvelope, OGRSpatialReference* pSrsSpatialReference, OGRSpatialReference* pDstSpatialReference);
-//    virtual wxImage Scale(unsigned char* pData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel);
-};
+wxDEFINE_EVENT( wxPROCESS_START, wxGISProcessEvent );
+wxDEFINE_EVENT( wxPROCESS_FINISH, wxGISProcessEvent );
+wxDEFINE_EVENT( wxPROCESS_CANCELED, wxGISProcessEvent );
+wxDEFINE_EVENT( wxPROCESS_STATE_CHANGED, wxGISProcessEvent );
