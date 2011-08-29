@@ -26,7 +26,7 @@
 
 void ClipGeometryByEnvelope(OGRRawPoint* pOGRRawPoints, int *pnPointCount, const OGREnvelope &Env, bool shapeOpen)
 {
-	OGRRawPoint* pTmpOGRRawPoints = new OGRRawPoint[*pnPointCount];
+	OGRRawPoint* pTmpOGRRawPoints = new OGRRawPoint[*pnPointCount * 2];
 	int nTmpPtCount(0);
 	TrimFeatureToBoundary( pOGRRawPoints, *pnPointCount, &pTmpOGRRawPoints, &nTmpPtCount, enumGISPtPosRight, Env, shapeOpen );
 
@@ -39,7 +39,7 @@ void ClipGeometryByEnvelope(OGRRawPoint* pOGRRawPoints, int *pnPointCount, const
 	*pnPointCount = 0;
 	TrimFeatureToBoundary(  pTmpOGRRawPoints, nTmpPtCount, &pOGRRawPoints, pnPointCount, enumGISPtPosBottom, Env, shapeOpen );
 
-	wxDELETEA(pTmpOGRRawPoints);
+	delete [] pTmpOGRRawPoints;
 }
 
 OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSPtr pSpaRef)

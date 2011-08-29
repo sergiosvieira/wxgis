@@ -47,3 +47,13 @@ bool GeometryVerticesToPointsDataset(long nGeomFID, OGRGeometry* pGeom, wxGISFea
   */	
 wxGISFeatureDatasetSPtr WXDLLIMPEXP_GIS_GP CreateVectorLayer(CPLString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *poFields, OGRSpatialReference *poSpatialRef = NULL, OGRwkbGeometryType eGType = wkbUnknown, char ** papszDataSourceOptions = NULL, char ** papszLayerOptions = NULL); 
 
+/** \fn bool GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, const CPLString &osFrmt, bool bSwapXY = false, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL)
+  *  \brief Write shape coordinates to text file.
+  *  \return true if write is succeeded, false overwise
+  */	
+bool WXDLLIMPEXP_GIS_GP GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, const CPLString &osFrmt, bool bSwapXY = false, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
+CPLString WXDLLIMPEXP_GIS_GP GeometryToText(long nGeomFID, OGRGeometry* pGeom, const CPLString &osFrmt, bool bSwap = false, ITrackCancel* pTrackCancel = NULL);
+void WXDLLIMPEXP_GIS_GP PointToText(CPLString &osData, OGRPoint* pPoint, const CPLString &osFrmt, bool bSwap = false);
+void WXDLLIMPEXP_GIS_GP LineToText(CPLString &osData, OGRLineString* pLine, const CPLString &osFrmt, bool bSwap = false);
+
+

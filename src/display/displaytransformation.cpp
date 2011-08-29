@@ -31,68 +31,71 @@
 	#include <gtk/gtk.h>
 #endif
 
-void WXDLLIMPEXP_GIS_DSP IncreaseEnvelope(OGREnvelope *pEnv, double dSize)
+void WXDLLIMPEXP_GIS_DSP IncreaseEnvelope(OGREnvelope &Env, double dSize)
 {
-	double dWidth = (pEnv->MaxX - pEnv->MinX) * dSize / 2;
-	double dHeight = (pEnv->MaxY - pEnv->MinY) * dSize / 2;
-	pEnv->MinX -= dWidth;
-	pEnv->MinY -= dHeight;
-	pEnv->MaxX += dWidth;
-	pEnv->MaxY += dHeight;
+	double dRatio = dSize / 2;
+	double dWidth = (Env.MaxX - Env.MinX) * dRatio;
+	double dHeight = (Env.MaxY - Env.MinY) * dRatio;
+	Env.MinX -= dWidth;
+	Env.MinY -= dHeight;
+	Env.MaxX += dWidth;
+	Env.MaxY += dHeight;
 }
 
-void WXDLLIMPEXP_GIS_DSP RotateEnvelope(OGREnvelope *pEnv, double dAngle, double dX, double dY)
+void WXDLLIMPEXP_GIS_DSP RotateEnvelope(OGREnvelope &Env, double dAngle, double dX, double dY)
 {
 	cairo_matrix_t Matrix;
 	cairo_matrix_init_translate(&Matrix, dX, dY);
 	cairo_matrix_rotate(&Matrix, dAngle);
 	cairo_matrix_translate(&Matrix, -dX, -dY);
 	//cairo_matrix_init_rotate(&Matrix, dAngle);
-	double X1 = pEnv->MinX;
-	double Y1 = pEnv->MaxY;
-	double X2 = pEnv->MaxX;
-	double Y2 = pEnv->MaxY;
-	double X3 = pEnv->MaxX;
-	double Y3 = pEnv->MinY;
-	double X4 = pEnv->MinX;
-	double Y4 = pEnv->MinY;
+	double X1 = Env.MinX;
+	double Y1 = Env.MaxY;
+	double X2 = Env.MaxX;
+	double Y2 = Env.MaxY;
+	double X3 = Env.MaxX;
+	double Y3 = Env.MinY;
+	double X4 = Env.MinX;
+	double Y4 = Env.MinY;
 
 	cairo_matrix_transform_point(&Matrix, &X1, &Y1);
 	cairo_matrix_transform_point(&Matrix, &X2, &Y2);
 	cairo_matrix_transform_point(&Matrix, &X3, &Y3);
 	cairo_matrix_transform_point(&Matrix, &X4, &Y4);
 
-	pEnv->MinX = std::min(std::min(X1, X2), std::min(X3, X4));
-	pEnv->MinY = std::min(std::min(Y1, Y2), std::min(Y3, Y4));
-	pEnv->MaxX = std::max(std::max(X1, X2), std::max(X3, X4));
-	pEnv->MaxY = std::max(std::max(Y1, Y2), std::max(Y3, Y4));
+	Env.MinX = std::min(std::min(X1, X2), std::min(X3, X4));
+	Env.MinY = std::min(std::min(Y1, Y2), std::min(Y3, Y4));
+	Env.MaxX = std::max(std::max(X1, X2), std::max(X3, X4));
+	Env.MaxY = std::max(std::max(Y1, Y2), std::max(Y3, Y4));
 }
 
-void WXDLLIMPEXP_GIS_DSP SetEnvelopeRatio(OGREnvelope *pEnv, double dRatio)
+void WXDLLIMPEXP_GIS_DSP SetEnvelopeRatio(OGREnvelope &Env, double dRatio)
 {
-	double dWidth = (pEnv->MaxX - pEnv->MinX) / 2;
-	double dHeight = (pEnv->MaxY - pEnv->MinY) / 2;
-	double dCenterX = pEnv->MinX + dWidth;
-	double dCenterY = pEnv->MinY + dHeight;
+	double dWidth = (Env.MaxX - Env.MinX) / 2;
+	double dHeight = (Env.MaxY - Env.MinY) / 2;
+	double dCenterX = Env.MinX + dWidth;
+	double dCenterY = Env.MinY + dHeight;
 
 	double dEnvRatio = dWidth / dHeight;
 
 	if(IsDoubleEquil(dRatio, dEnvRatio))
 		return;
 
-	if(dEnvRatio < 1)	//increase width
+	//if(dEnvRatio <= 1.0 && dRatio > 1.0) || (dEnvRatio > 1.0 && dRatio < 1.0))	
+	if(dRatio > dEnvRatio) //increase width
 	{
 		dWidth = dHeight * dRatio;
-		pEnv->MaxX = dCenterX + dWidth;
-		pEnv->MinX = dCenterX - dWidth;
+		Env.MaxX = dCenterX + dWidth;
+		Env.MinX = dCenterX - dWidth;
 	}
 	else					//increase height
 	{
 		dHeight = dWidth / dRatio;
-		pEnv->MaxY = dCenterY + dHeight;
-		pEnv->MinY = dCenterY - dHeight;
+		Env.MaxY = dCenterY + dHeight;
+		Env.MinY = dCenterY - dHeight;
 	}
 }
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //wxGISDisplayTransformation::wxGISDisplayTransformation(void) : m_pSpatialReference(NULL)

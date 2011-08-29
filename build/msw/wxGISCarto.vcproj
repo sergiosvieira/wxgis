@@ -60,10 +60,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase29ud.lib wxbase29ud_net.lib wxmsw29ud_core.lib wxbase29ud_xml.lib wxmsw29ud_adv.lib wxmsw29ud_aui.lib wxmsw29ud_html.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISCored.lib wxGISFrameworkd.lib wxGISDisplayd.lib wxGISGeometryd.lib wxGISDataSourced.lib"
+				AdditionalDependencies="wxbase29ud.lib wxbase29ud_net.lib wxmsw29ud_core.lib wxbase29ud_xml.lib wxmsw29ud_adv.lib wxmsw29ud_aui.lib wxmsw29ud_html.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib cairo.lib wxGISCored.lib wxGISFrameworkd.lib wxGISDisplayd.lib wxGISGeometryd.lib wxGISDataSourced.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="0"
-				AdditionalLibraryDirectories="&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib;&quot;$(ZLIB)\lib&quot;;&quot;$(LIBPNG)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib;&quot;$(CAIRO)\lib&quot;;&quot;$(ZLIB)\lib&quot;;&quot;$(LIBPNG)\lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				HeapReserveSize="0"

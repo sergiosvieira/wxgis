@@ -28,6 +28,8 @@
 #include "wx/defs.h"
 #include "wx/cmdline.h"
 
+#include <locale.h>
+
 int main(int argc, char **argv)
 {
 #if wxUSE_UNICODE
@@ -108,14 +110,12 @@ bool parse_commandline_parameters( wxCmdLineParser& parser )
 	}
 
 
-    wxString sToolName, sToolParameters;
-    if(parser.Found( wxT( "n" ), &sToolName ) && parser.Found( wxT( "p" ), &sToolParameters ) )
+    if(parser.Found( wxT( "n" )) && parser.Found( wxT( "p" )) )
     {
         wxGPTaskExecutor executor;
-        sToolParameters = sToolParameters.Trim(true).Trim(false);
-        if(sToolParameters[0] == '"')
-            sToolParameters = sToolParameters.Mid(1, sToolParameters.Len() - 2);
-        return executor.OnExecute(sToolName.Trim(true).Trim(false), sToolParameters);
+		bool success = executor.Initialize(wxT("wxGISGeoprocess"), CONFIG_DIR, wxString(wxT("gp")), parser);
+		executor.Uninitialize();
+		return success;
     }
 
 	parser.Usage();
@@ -130,26 +130,14 @@ bool parse_commandline_parameters( wxCmdLineParser& parser )
 // wxGPTaskExecutor
 //////////////////////////////////////////////////////////////////////////////
 
-wxGPTaskExecutor::wxGPTaskExecutor() : ITrackCancel()
+wxGPTaskExecutor::wxGPTaskExecutor() : ITrackCancel(), wxGISInitializer()
 {
-    //TODO: Config support
-	//GDAL
-    CPLSetConfigOption( "GDAL_CACHEMAX", "128" );
-
-	OGRRegisterAll();
-	GDALAllRegister();
-	//END GDAL
-
 	m_nRange = 100;
     SetProgressor(this);
 }
 
 wxGPTaskExecutor::~wxGPTaskExecutor()
 {
-	//GDAL
-	GDALDestroyDriverManager();
-	OGRCleanupAll();
-	//END GDAL
 }
 
 bool wxGPTaskExecutor::OnExecute(wxString sToolName, wxString sToolParameters)
@@ -256,4 +244,37 @@ void wxGPTaskExecutor::SetValue(int value)
 
     m_pOutTxtStream->WriteString(sOut);
 	m_StdOutFile.Flush();
+}
+
+bool wxGPTaskExecutor::Initialize(const wxString &sAppName, const wxString &sConfigDir, const wxString &sLogFilePrefix, wxCmdLineParser& parser)
+{
+	//GDAL
+    CPLSetConfigOption( "GDAL_CACHEMAX", "128" );
+
+	OGRRegisterAll();
+	GDALAllRegister();
+	//END GDAL
+
+	if(!wxGISInitializer::Initialize(sAppName, sConfigDir, sLogFilePrefix, parser))
+		return false;
+
+    wxString sToolName, sToolParameters;
+    if(parser.Found( wxT( "n" ), &sToolName ) && parser.Found( wxT( "p" ), &sToolParameters ) )
+	{
+		sToolParameters = sToolParameters.Trim(true).Trim(false);
+		if(sToolParameters[0] == '"')
+			sToolParameters = sToolParameters.Mid(1, sToolParameters.Len() - 2);
+		return OnExecute(sToolName.Trim(true).Trim(false), sToolParameters);
+	}
+	return false;
+}
+
+void wxGPTaskExecutor::Uninitialize()
+{
+	//GDAL
+	GDALDestroyDriverManager();
+	OGRCleanupAll();
+	//END GDAL
+
+	wxGISInitializer::Uninitialize();
 }

@@ -91,7 +91,7 @@ void wxGISSimpleRenderer::Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPha
 				case wkbMultiPoint:
 					pDisplay->SetLineCap(CAIRO_LINE_CAP_ROUND);
 					pDisplay->SetLineWidth(0.5);
-					pDisplay->SetPointRadius(3);
+					pDisplay->SetPointRadius(1.5);
 					break;
 				case wkbLineString:
 				case wkbLinearRing:

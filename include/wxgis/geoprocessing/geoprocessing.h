@@ -170,9 +170,10 @@ public:
 };
 
 /** \typedef GPParameters
- *  \brief An parameters array.
+ *  \brief The parameters array.
  */
-typedef std::vector<IGPParameter*> GPParameters;
+//typedef std::vector<IGPParameter*> GPParameters;
+WX_DEFINE_ARRAY(IGPParameter*, GPParameters);
 
 class IGPTool
 {
@@ -183,7 +184,7 @@ public:
     virtual const wxString GetCategory(void) = 0;
     virtual bool Execute(ITrackCancel* pTrackCancel) = 0;
     virtual bool Validate(void) = 0;
-    virtual GPParameters* GetParameterInfo(void) = 0;
+    virtual GPParameters GetParameterInfo(void) = 0;
     /** \fn wxString GetAsString(void)
      *  \brief Serialize tool parameters to string.
      *  \return The string representation of tool parameters

@@ -140,9 +140,6 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 	if(pwxGISDataset == NULL)
 		return;
 
-	if(!pwxGISDataset->IsCached())
-		pwxGISDataset->Cache(m_pTrackCancel);
-
 	if(m_pStatusBar)
 		m_pTrackCancel->SetProgressor(m_pStatusBar->GetAnimation());
 
@@ -165,9 +162,18 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 		}
 		break;
 	case enumGISRasterDataset:
+		{
         //CheckOverviews(pwxGISDataset, pGxObject->GetName());
 		//pwxGISLayers.push_back(new wxGISRasterLayer(pwxGISDataset));
         //pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISDataset->GetName());
+			wxGISRasterDatasetSPtr pGISRasterDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(pwxGISDataset);
+			if(!pGISRasterDataset->IsOpened())
+				pGISRasterDataset->Open(false);
+			if(!pGISRasterDataset->IsCached())
+				pGISRasterDataset->Cache(m_pTrackCancel);
+			wxGISRasterLayerSPtr pGISRasterLayer = boost::make_shared<wxGISRasterLayer>(pwxGISDataset);
+			paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISRasterLayer));
+		}
 		break;
 	case enumGISContainer:
         for(size_t i = 0; i < pwxGISDataset->GetSubsetsCount(); ++i)
@@ -190,9 +196,18 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 				}
 				break;
 	        case enumGISRasterDataset:
+				{
           //      CheckOverviews(pwxGISSubDataset, pGxObject->GetName());
 		        //pwxGISLayers.push_back(new wxGISRasterLayer(pwxGISSubDataset));
           //      pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISSubDataset->GetName());
+					wxGISRasterDatasetSPtr pGISRasterDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(pwxGISDataset);
+					if(!pGISRasterDataset->IsOpened())
+						pGISRasterDataset->Open(false);
+					if(!pGISRasterDataset->IsCached())
+						pGISRasterDataset->Cache(m_pTrackCancel);
+					wxGISRasterLayerSPtr pGISRasterLayer = boost::make_shared<wxGISRasterLayer>(pwxGISDataset);
+					paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISRasterLayer));
+				}
 		        break;
             }
         }
@@ -248,36 +263,36 @@ void wxGxMapView::OnMouseDoubleClick(wxMouseEvent& event)
 	event.Skip();
 }
 
-typedef struct OvrProgressData
-{
-    IStatusBar* pStatusBar;
-    IProgressor* pProgressor;
-    wxString sMessage;
-} *LPOVRPROGRESSDATA;
-
-int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pData)
-{
-    LPOVRPROGRESSDATA pOvrData = (LPOVRPROGRESSDATA)pData;
-    if( pszMessage != NULL )
-        pOvrData->pStatusBar->SetMessage(wgMB2WX(pszMessage));
-    else if( pOvrData != NULL && !pOvrData->sMessage.IsEmpty() )
-        pOvrData->pStatusBar->SetMessage(pOvrData->sMessage);
-    else
-        pOvrData->pStatusBar->SetMessage(_("Building overviews"));
-
-    if(pOvrData->pProgressor)
-        pOvrData->pProgressor->SetValue((int) (dfComplete*100));
-
-    if(wxGetKeyState(WXK_SHIFT) || wxGetKeyState(WXK_ALT) || wxGetKeyState(WXK_CONTROL))
-        return 1;
-
-    bool bKeyState = wxGetKeyState(WXK_ESCAPE);
-    return bKeyState == true ? 0 : 1;
-}
-
+//typedef struct OvrProgressData
+//{
+//    IStatusBar* pStatusBar;
+//    IProgressor* pProgressor;
+//    wxString sMessage;
+//} *LPOVRPROGRESSDATA;
+//
+//int CPL_STDCALL OvrProgress( double dfComplete, const char *pszMessage, void *pData)
+//{
+//    LPOVRPROGRESSDATA pOvrData = (LPOVRPROGRESSDATA)pData;
+//    if( pszMessage != NULL )
+//        pOvrData->pStatusBar->SetMessage(wgMB2WX(pszMessage));
+//    else if( pOvrData != NULL && !pOvrData->sMessage.IsEmpty() )
+//        pOvrData->pStatusBar->SetMessage(pOvrData->sMessage);
+//    else
+//        pOvrData->pStatusBar->SetMessage(_("Building overviews"));
+//
+//    if(pOvrData->pProgressor)
+//        pOvrData->pProgressor->SetValue((int) (dfComplete*100));
+//
+//    if(wxGetKeyState(WXK_SHIFT) || wxGetKeyState(WXK_ALT) || wxGetKeyState(WXK_CONTROL))
+//        return 1;
+//
+//    bool bKeyState = wxGetKeyState(WXK_ESCAPE);
+//    return bKeyState == true ? 0 : 1;
+//}
+/*
 void wxGxMapView::CheckOverviews(wxGISDatasetSPtr pwxGISDataset, wxString soFileName)
 {
-/*    wxGISRasterDatasetSPtr pwxGISRasterDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(pwxGISDataset);
+    wxGISRasterDatasetSPtr pwxGISRasterDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(pwxGISDataset);
     if(!pwxGISRasterDataset)
         return;
    //pyramids
@@ -369,5 +384,6 @@ void wxGxMapView::CheckOverviews(wxGISDatasetSPtr pwxGISDataset, wxString soFile
                 pwxGISRasterDataset->SetHasOverviews(true);
         }
     }
-	*/
+	
 }
+*/

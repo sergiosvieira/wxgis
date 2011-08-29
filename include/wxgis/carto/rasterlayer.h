@@ -52,3 +52,4 @@ protected:
 	IRasterRendererSPtr m_pRasterRenderer;
 };
 
+DEFINE_SHARED_PTR(wxGISRasterLayer);

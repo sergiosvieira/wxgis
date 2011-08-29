@@ -56,7 +56,7 @@ public:
     virtual int GetHeight(void){return m_nYSize;};
     virtual int GetBandCount(void){return m_nBandCount;};
     virtual char **GetFileList();
-//	virtual void GetSubRaster(void);
+	virtual bool GetPixelData(void *data, int nXOff, int nYOff, int nXSize, int nYSize, int nBufXSize, int nBufYSize, GDALDataType eDT, int nBandCount, int *panBandList);
 protected:
 	OGREnvelope m_stExtent;
 	GDALDataset  *m_poDataset;

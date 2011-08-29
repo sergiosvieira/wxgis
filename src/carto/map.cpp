@@ -96,7 +96,7 @@ OGREnvelope wxGISMap::GetFullExtent(void)
 {
 	OGREnvelope OutputEnv = m_FullExtent;
     //increase 10%
-	IncreaseEnvelope(&OutputEnv, 0.1);
+	IncreaseEnvelope(OutputEnv, 0.1);
 	return OutputEnv;
 }
 

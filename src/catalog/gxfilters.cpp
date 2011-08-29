@@ -468,7 +468,7 @@ int wxGxRasterFilter::GetSubType(void)
 // wxGxTextFilter
 //------------------------------------------------------------
 
-wxGxTextFilter::wxGxTextFilter(wxString soName, wxString soExt)
+wxGxTextFilter::wxGxTextFilter(const wxString &soName, const wxString &soExt)
 {
     m_soName = soName;
     m_soExt = soExt;
@@ -484,7 +484,7 @@ bool wxGxTextFilter::CanChooseObject( IGxObject* pObject )
 	wxGxTextFile* poGxTextFile = dynamic_cast<wxGxTextFile*>(pObject);
 	if(!poGxTextFile)
 		return false;    
-    if(EQUAL(CPLGetExtension(poGxTextFile->GetInternalName()), m_soExtCmp.mb_str()))
+    if(EQUAL(CPLGetExtension(poGxTextFile->GetInternalName()), m_soExtCmp.mb_str(wxConvUTF8)))
 		return true;
 	return false;
 }
@@ -497,7 +497,7 @@ bool wxGxTextFilter::CanDisplayObject( IGxObject* pObject )
 	wxGxTextFile* poGxTextFile = dynamic_cast<wxGxTextFile*>(pObject);
 	if(!poGxTextFile)
 		return false;
-    if(EQUAL(CPLGetExtension(poGxTextFile->GetInternalName()), m_soExtCmp.mb_str()))
+    if(EQUAL(CPLGetExtension(poGxTextFile->GetInternalName()), m_soExtCmp.mb_str(wxConvUTF8)))
 		return true;
 	return false;
 }

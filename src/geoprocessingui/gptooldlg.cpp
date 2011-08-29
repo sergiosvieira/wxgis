@@ -70,85 +70,82 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer( wxVERTICAL );
 
-    GPParameters* pParams = m_pTool->GetParameterInfo();
-    if(pParams)
+    GPParameters Params = m_pTool->GetParameterInfo();
+    for(size_t i = 0; i < Params.GetCount(); ++i)
     {
-        for(size_t i = 0; i < pParams->size(); ++i)
+        IGPParameter* pParam = Params[i];
+        if(!pParam)
         {
-            IGPParameter* pParam = pParams->operator[](i);
-            if(!pParam)
+            m_pControlsArray.push_back(NULL);
+            continue;
+        }
+        switch(pParam->GetDataType())
+        {
+        case enumGISGPParamDTPath:
             {
-                m_pControlsArray.push_back(NULL);
-                continue;
+                wxGISDTPath* pPath = new wxGISDTPath(pParam, m_pTool->GetCatalog(), m_tools);
+                bSizer4->Add( pPath, 0, wxEXPAND, 5 );
+                m_pControlsArray.push_back(pPath);
             }
-            switch(pParam->GetDataType())
+            break;
+        case enumGISGPParamDTSpatRef:
             {
-            case enumGISGPParamDTPath:
-                {
-                    wxGISDTPath* pPath = new wxGISDTPath(pParam, m_pTool->GetCatalog(), m_tools);
-                    bSizer4->Add( pPath, 0, wxEXPAND, 5 );
-                    m_pControlsArray.push_back(pPath);
-                }
-                break;
-            case enumGISGPParamDTSpatRef:
-                {
-                    wxGISDTSpatRef* pSpatRef = new wxGISDTSpatRef(pParam, m_pTool->GetCatalog(), m_tools);
-                    bSizer4->Add( pSpatRef, 0, wxEXPAND, 5 );
-                    m_pControlsArray.push_back(pSpatRef);
-                }
-                break;
-            case enumGISGPParamDTString:
-            case enumGISGPParamDTInteger:
-            case enumGISGPParamDTDouble:
-                {
-                    wxGISDTDigit* poDigit = new wxGISDTDigit(pParam, m_pTool->GetCatalog(), m_tools);
-                    bSizer4->Add( poDigit, 0, wxEXPAND, 5 );
-                    m_pControlsArray.push_back(poDigit);
-                }
-                break;
-            case enumGISGPParamDTStringChoice:
-            case enumGISGPParamDTIntegerChoice:
-            case enumGISGPParamDTDoubleChoice:
-                {
-                    wxGISDTChoice* poChoice = new wxGISDTChoice(pParam, m_pTool->GetCatalog(), m_tools);
-                    bSizer4->Add( poChoice, 0, wxEXPAND, 5 );
-                    m_pControlsArray.push_back(poChoice);
-                }
-                break;
-		   case enumGISGPParamDTStringList:
-		   case enumGISGPParamDTIntegerList:
-		   case enumGISGPParamDTDoubleList:
-                {
-                    wxGISDTList* poList = new wxGISDTList(pParam, m_pTool->GetCatalog(), m_tools);
-                    bSizer4->Add( poList, 0, wxEXPAND, 5 );
-                    m_pControlsArray.push_back(poList);
-                }
-                break;
-           case enumGISGPParamDTBool:
-                {
-                    wxGISDTBool* poCheck = new wxGISDTBool(pParam, m_pTool->GetCatalog(), m_tools);
-                    bSizer4->Add( poCheck, 0, wxEXPAND, 5 );
-                    m_pControlsArray.push_back(poCheck);
-                }
-                break;
-            case enumGISGPParamDTParamArray:
-                {
-                    wxGISDTMultiParam* poMultiParam = new wxGISDTMultiParam(pParam, m_pTool->GetCatalog(), m_tools);
-                    bSizer4->Add( poMultiParam, 0, wxEXPAND, 5 );
-                    m_pControlsArray.push_back(poMultiParam);
-                }
-                break;
-            case enumGISGPParamDTQuery:
-                {
-					wxGISSQLQueryCtrl* poSQLQueryParam = new wxGISSQLQueryCtrl(pParam, m_pTool->GetCatalog(), m_tools);
-                    bSizer4->Add( poSQLQueryParam, 0, wxEXPAND, 5 );
-                    m_pControlsArray.push_back(poSQLQueryParam);
-                }
-                break;
-            default:
-                m_pControlsArray.push_back(NULL);
-                break;
+                wxGISDTSpatRef* pSpatRef = new wxGISDTSpatRef(pParam, m_pTool->GetCatalog(), m_tools);
+                bSizer4->Add( pSpatRef, 0, wxEXPAND, 5 );
+                m_pControlsArray.push_back(pSpatRef);
             }
+            break;
+        case enumGISGPParamDTString:
+        case enumGISGPParamDTInteger:
+        case enumGISGPParamDTDouble:
+            {
+                wxGISDTDigit* poDigit = new wxGISDTDigit(pParam, m_pTool->GetCatalog(), m_tools);
+                bSizer4->Add( poDigit, 0, wxEXPAND, 5 );
+                m_pControlsArray.push_back(poDigit);
+            }
+            break;
+        case enumGISGPParamDTStringChoice:
+        case enumGISGPParamDTIntegerChoice:
+        case enumGISGPParamDTDoubleChoice:
+            {
+                wxGISDTChoice* poChoice = new wxGISDTChoice(pParam, m_pTool->GetCatalog(), m_tools);
+                bSizer4->Add( poChoice, 0, wxEXPAND, 5 );
+                m_pControlsArray.push_back(poChoice);
+            }
+            break;
+	   case enumGISGPParamDTStringList:
+	   case enumGISGPParamDTIntegerList:
+	   case enumGISGPParamDTDoubleList:
+            {
+                wxGISDTList* poList = new wxGISDTList(pParam, m_pTool->GetCatalog(), m_tools);
+                bSizer4->Add( poList, 0, wxEXPAND, 5 );
+                m_pControlsArray.push_back(poList);
+            }
+            break;
+       case enumGISGPParamDTBool:
+            {
+                wxGISDTBool* poCheck = new wxGISDTBool(pParam, m_pTool->GetCatalog(), m_tools);
+                bSizer4->Add( poCheck, 0, wxEXPAND, 5 );
+                m_pControlsArray.push_back(poCheck);
+            }
+            break;
+        case enumGISGPParamDTParamArray:
+            {
+                wxGISDTMultiParam* poMultiParam = new wxGISDTMultiParam(pParam, m_pTool->GetCatalog(), m_tools);
+                bSizer4->Add( poMultiParam, 0, wxEXPAND, 5 );
+                m_pControlsArray.push_back(poMultiParam);
+            }
+            break;
+        case enumGISGPParamDTQuery:
+            {
+				wxGISSQLQueryCtrl* poSQLQueryParam = new wxGISSQLQueryCtrl(pParam, m_pTool->GetCatalog(), m_tools);
+                bSizer4->Add( poSQLQueryParam, 0, wxEXPAND, 5 );
+                m_pControlsArray.push_back(poSQLQueryParam);
+            }
+            break;
+        default:
+            m_pControlsArray.push_back(NULL);
+            break;
         }
     }
 
@@ -244,7 +241,8 @@ void wxGISGPToolDlg::OnCancel(wxCommandEvent& event)
     IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(GetApplication());
     pApp->UnRegisterChildWindow(this);
 
-    this->GetParent()->SetFocus();
+    wxWindow* pParentWnd = this->GetParent();
+    pParentWnd->SetFocus();
     this->Destroy();
 }
 

@@ -82,18 +82,19 @@ void wxGISDisplay::Clear()
 	}
 
 	//default map bounds
-	m_CurrentBounds.MinX = ENVMIN_X;
-	m_CurrentBounds.MaxX = ENVMAX_X;
-	m_CurrentBounds.MinY = ENVMIN_Y;
-	m_CurrentBounds.MaxY = ENVMAX_Y;
+	m_RealBounds.MinX = ENVMIN_X;
+	m_RealBounds.MaxX = ENVMAX_X;
+	m_RealBounds.MinY = ENVMIN_Y;
+	m_RealBounds.MaxY = ENVMAX_Y;
+	m_CurrentBounds = m_RealBounds;
 
-	SetEnvelopeRatio(&m_CurrentBounds, m_dFrameRatio);
+	SetEnvelopeRatio(m_CurrentBounds, m_dFrameRatio);
 	m_CurrentBoundsRotated = m_CurrentBounds;
 	m_dRotatedBoundsCenterX = m_CurrentBoundsRotated.MinX + (m_CurrentBoundsRotated.MaxX - m_CurrentBoundsRotated.MinX) / 2;
 	m_dRotatedBoundsCenterY = m_CurrentBoundsRotated.MinY + (m_CurrentBoundsRotated.MaxY - m_CurrentBoundsRotated.MinY) / 2;
 
 	m_CurrentBoundsX8 = m_CurrentBounds;
-	IncreaseEnvelope(&m_CurrentBoundsX8, 8);
+	IncreaseEnvelope(m_CurrentBoundsX8, 8);
 
 	m_nLastCacheID = 0;
 	m_nCurrentLayer = 0;
@@ -373,14 +374,16 @@ void wxGISDisplay::SetDeviceFrame(wxRect &rc)
 	m_oDeviceFrameRect = rc;
 	m_dFrameRatio = double(rc.width) / rc.height;
 
-	SetEnvelopeRatio(&m_CurrentBounds, m_dFrameRatio);
+	m_CurrentBounds = m_RealBounds;
+
+	SetEnvelopeRatio(m_CurrentBounds, m_dFrameRatio);
 	m_dRotatedBoundsCenterX = m_CurrentBounds.MinX + (m_CurrentBounds.MaxX - m_CurrentBounds.MinX) / 2;
 	m_dRotatedBoundsCenterY = m_CurrentBounds.MinY + (m_CurrentBounds.MaxY - m_CurrentBounds.MinY) / 2;
 	m_CurrentBoundsRotated = m_CurrentBounds;
 	if(!IsDoubleEquil(m_dAngleRad, 0.0))
-		RotateEnvelope(&m_CurrentBoundsRotated, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);	
+		RotateEnvelope(m_CurrentBoundsRotated, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);	
 	m_CurrentBoundsX8 = m_CurrentBoundsRotated;
-	IncreaseEnvelope(&m_CurrentBoundsX8, 8);
+	IncreaseEnvelope(m_CurrentBoundsX8, 8);
 	
     cairo_destroy (m_cr_tmp);
     cairo_surface_destroy (m_surface_tmp);
@@ -401,16 +404,17 @@ wxRect wxGISDisplay::GetDeviceFrame(void)
 void wxGISDisplay::SetBounds(OGREnvelope& Bounds)
 {
 	//update bounds to frame ratio
-	m_CurrentBounds = Bounds;
+	m_RealBounds = Bounds;
+	m_CurrentBounds = m_RealBounds;
 
-	SetEnvelopeRatio(&m_CurrentBounds, m_dFrameRatio);
+	SetEnvelopeRatio(m_CurrentBounds, m_dFrameRatio);
 	m_dRotatedBoundsCenterX = m_CurrentBounds.MinX + (m_CurrentBounds.MaxX - m_CurrentBounds.MinX) / 2;
 	m_dRotatedBoundsCenterY = m_CurrentBounds.MinY + (m_CurrentBounds.MaxY - m_CurrentBounds.MinY) / 2;
 	m_CurrentBoundsRotated = m_CurrentBounds;
 	if(!IsDoubleEquil(m_dAngleRad, 0.0))
-		RotateEnvelope(&m_CurrentBoundsRotated, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);	
+		RotateEnvelope(m_CurrentBoundsRotated, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);	
 	m_CurrentBoundsX8 = m_CurrentBoundsRotated;
-	IncreaseEnvelope(&m_CurrentBoundsX8, 8);
+	IncreaseEnvelope(m_CurrentBoundsX8, 8);
 
 	SetDerty(true);
 	//compute current transform matrix
@@ -619,18 +623,20 @@ void wxGISDisplay::SetLineCap(cairo_line_cap_t line_cap)
 
 void wxGISDisplay::SetLineWidth(double dWidth)
 {
-	double x_new = (m_pMatrix->xx + m_pMatrix->xy) * dWidth;
-	double y_new = (m_pMatrix->yx + m_pMatrix->yy) * dWidth;
-	double dScale = (fabs(x_new) + fabs(y_new)) /*/ 4*/;
-	m_dLineWidth = dWidth / dScale;
+	//double x_new = (m_pMatrix->xx + m_pMatrix->xy) * dWidth;
+	//double y_new = (m_pMatrix->yx + m_pMatrix->yy) * dWidth;
+	//double dScale = (fabs(x_new) + fabs(y_new)) /*/ 4*/;
+	//m_dLineWidth = dWidth / dScale;
+	m_dLineWidth = GetScaledWidth(dWidth);
 }
 
 void wxGISDisplay::SetPointRadius(double dRadius)
 {
-	double x_new = (m_pMatrix->xx + m_pMatrix->xy) * dRadius;
-	double y_new = (m_pMatrix->yx + m_pMatrix->yy) * dRadius;
-	double dScale = (fabs(x_new) + fabs(y_new)) / 2;
-	m_dPointRadius = dRadius / dScale;
+	//double x_new = (m_pMatrix->xx + m_pMatrix->xy) * dRadius;
+	//double y_new = (m_pMatrix->yx + m_pMatrix->yy) * dRadius;
+	//double dScale = (fabs(x_new) + fabs(y_new)) / 2;
+	//m_dPointRadius = dRadius / dScale;
+	m_dPointRadius = GetScaledWidth(dRadius);
 }
 
 void wxGISDisplay::SetFillRule(cairo_fill_rule_t fill_rule)
@@ -688,7 +694,7 @@ bool wxGISDisplay::DrawPolygon(const OGRPolygon* pPolygon)
 
 	if(!IsDoubleEquil(m_dAngleRad, 0.0))
 	{
-		RotateEnvelope(&Env, -m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);
+		RotateEnvelope(Env, -m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);
 		//IncreaseEnvelope(&Env, 1.1);
 	}
 
@@ -723,7 +729,7 @@ bool wxGISDisplay::CheckDrawAsPoint(const OGRGeometry* pGeometry, bool bCheckEnv
 	TestEnv = Envelope;
 	if(!IsDoubleEquil(m_dAngleRad, 0.0))
 	{
-		RotateEnvelope(&TestEnv, -m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);
+		RotateEnvelope(TestEnv, -m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);
 		//IncreaseEnvelope(&TestEnv, 1.1);
 	}
 
@@ -749,6 +755,58 @@ bool wxGISDisplay::CheckDrawAsPoint(const OGRGeometry* pGeometry, bool bCheckEnv
 	return false;
 }
 
+void wxGISDisplay::DrawRaster(cairo_surface_t *surface, OGREnvelope& Envelope)
+{
+//	srand ( time(NULL) );
+//	int random_number1 = (rand() % 50); 
+//	int random_number2 = (rand() % 50); 
+//	int random_number3 = (rand() % 50); 
+//	m_stFillColour.dRed = double(205 + random_number1) / 255;
+//	m_stFillColour.dGreen = double(205 + random_number2) / 255;
+//	m_stFillColour.dBlue = double(205 + random_number3) / 255;
+//	m_stFillColour.dAlpha = 1.0;
+//
+//	SetColor(m_stFillColour);
+//	SetLineCap(CAIRO_LINE_CAP_ROUND);
+//	SetLineWidth(1.5);
+//	//SetPointRadius(5);
+//	cairo_set_line_width(m_saLayerCaches[m_nCurrentLayer].pCairoContext, m_dPointRadius + m_dPointRadius + m_dLineWidth);
+//	//DrawPointFast(dXOrigin, dYOrigin);
+//	//cairo_stroke (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
+//
+//	//cairo_translate (m_saLayerCaches[m_nCurrentLayer].pCairoContext, dXOrigin, dYOrigin);
+//
+//
+//	cairo_rectangle (m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MinX, Envelope.MinY, Envelope.MaxX - Envelope.MinX, Envelope.MaxY - Envelope.MinY);
+//	cairo_stroke (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
+
+	cairo_pattern_t *pattern = cairo_pattern_create_for_surface (surface);
+//	cairo_pattern_set_extend (pattern, CAIRO_EXTEND_REPEAT);
+	cairo_matrix_t   matrix;
+	double nPatternScaleX = m_pMatrix->xx;//1 / 
+	double nPatternScaleY = m_pMatrix->yy;//1 / 
+	//cairo_matrix_init_translate(&matrix, -Envelope.MinX, -Envelope.MinY);
+
+	cairo_matrix_init_scale (&matrix, nPatternScaleX, nPatternScaleY);
+	cairo_matrix_translate(&matrix, -Envelope.MinX, -Envelope.MaxY);
+
+	cairo_pattern_set_matrix (pattern, &matrix);
+	cairo_pattern_set_filter (pattern, CAIRO_FILTER_FAST);
+
+	cairo_set_source (m_saLayerCaches[m_nCurrentLayer].pCairoContext, pattern);
+//
+//	cairo_fill (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
+//////cairo_surface_destroy (image);
+//
+//	////cairo_scale  (m_saLayerCaches[m_nCurrentLayer].pCairoContext, 1.0, -1.0);
+//	//cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_FAST);
+//	//cairo_set_operator (cr, CAIRO_OPERATOR_SOURCE);
+	cairo_paint (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
+//
+	cairo_pattern_destroy (pattern);
+//	cairo_move_to (m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MinX, Envelope.MinY);
+}
+
 void wxGISDisplay::DrawGeometry(OGRGeometry* poGeometry)
 {
     if(!poGeometry)
@@ -765,12 +823,11 @@ void wxGISDisplay::DrawGeometry(OGRGeometry* poGeometry)
 		if(m_dLineWidth)
 		{
 			SetColor(m_stPointColour);
-			cairo_set_line_width(m_saLayerCaches[m_nCurrentLayer].pCairoContext, 
-	m_dPointRadius + m_dPointRadius + m_dLineWidth);
+			cairo_set_line_width(m_saLayerCaches[m_nCurrentLayer].pCairoContext, m_dPointRadius + m_dPointRadius + m_dLineWidth);
 			if(!DrawPointFast((OGRPoint*)poGeometry))
 				break;
 			cairo_stroke (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
-			cairo_set_line_width(m_saLayerCaches[m_nCurrentLayer].pCairoContext, m_dPointRadius + m_dPointRadius);
+			cairo_set_line_width(m_saLayerCaches[m_nCurrentLayer].pCairoContext, m_dPointRadius +m_dPointRadius);
 		}
 		SetColor(m_stFillColour);
 		if(!DrawPointFast((OGRPoint*)poGeometry))
@@ -778,8 +835,7 @@ void wxGISDisplay::DrawGeometry(OGRGeometry* poGeometry)
 		cairo_stroke (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
 		break;
 	case wkbLineString:
-		cairo_set_line_width(m_saLayerCaches[m_nCurrentLayer].pCairoContext, 
-m_dLineWidth);
+		cairo_set_line_width(m_saLayerCaches[m_nCurrentLayer].pCairoContext, m_dLineWidth);
 		//check if line is too small
 		if(!CheckDrawAsPoint(poGeometry))
 			if(!DrawLine((OGRLineString*)poGeometry))
@@ -788,8 +844,7 @@ m_dLineWidth);
 		cairo_stroke (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
 		break;
 	case wkbLinearRing:
-		cairo_set_line_width(m_saLayerCaches[m_nCurrentLayer].pCairoContext, 
-m_dLineWidth);
+		cairo_set_line_width(m_saLayerCaches[m_nCurrentLayer].pCairoContext, m_dLineWidth);
 		//check if line is too small
 		if(!CheckDrawAsPoint(poGeometry))
 			if(!DrawRing((OGRLinearRing*)poGeometry))
@@ -798,8 +853,7 @@ m_dLineWidth);
 		cairo_stroke (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
 		break;
 	case wkbPolygon:
-		cairo_set_line_width(m_saLayerCaches[m_nCurrentLayer].pCairoContext, 
-m_dLineWidth);
+		cairo_set_line_width(m_saLayerCaches[m_nCurrentLayer].pCairoContext, m_dLineWidth);
 		//check if line is too small
 		if(!CheckDrawAsPoint(poGeometry))
 			if(!DrawPolygon((OGRPolygon*)poGeometry))
@@ -826,14 +880,6 @@ m_dLineWidth);
 		break;
 	}
 	//wxDELETE(pDrawGeom);
-}
-
-double wxGISDisplay::GetRatio(void)
-{
-	double x_new = m_pMatrix->xx + m_pMatrix->xy;
-	double y_new = m_pMatrix->yx + m_pMatrix->yy;
-	double dScale = (fabs(x_new) + fabs(y_new)) / 2;
-	return dScale;
 }
 
 OGREnvelope wxGISDisplay::TransformRect(wxRect &rect)
@@ -882,9 +928,9 @@ void wxGISDisplay::SetRotate(double dAngleRad)
 	m_dRotatedBoundsCenterX = m_CurrentBoundsRotated.MinX + (m_CurrentBoundsRotated.MaxX - m_CurrentBoundsRotated.MinX) / 2;
 	m_dRotatedBoundsCenterY = m_CurrentBoundsRotated.MinY + (m_CurrentBoundsRotated.MaxY - m_CurrentBoundsRotated.MinY) / 2;
 	if(!IsDoubleEquil(m_dAngleRad, 0.0))
-		RotateEnvelope(&m_CurrentBoundsRotated, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);
+		RotateEnvelope(m_CurrentBoundsRotated, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);
 	m_CurrentBoundsX8 = m_CurrentBoundsRotated;
-	IncreaseEnvelope(&m_CurrentBoundsX8, 8);
+	IncreaseEnvelope(m_CurrentBoundsX8, 8);
 
 	//compute current transform matrix
 	InitTransformMatrix();

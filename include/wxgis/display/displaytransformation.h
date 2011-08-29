@@ -22,9 +22,9 @@
 
 #include "wxgis/display/display.h"
 
-void WXDLLIMPEXP_GIS_DSP IncreaseEnvelope(OGREnvelope *pEnv, double dSize);
-void WXDLLIMPEXP_GIS_DSP RotateEnvelope(OGREnvelope *pEnv, double dAngle, double dX, double dY);
-void WXDLLIMPEXP_GIS_DSP SetEnvelopeRatio(OGREnvelope *pEnv, double dRatio);
+void WXDLLIMPEXP_GIS_DSP IncreaseEnvelope(OGREnvelope &Env, double dSize);
+void WXDLLIMPEXP_GIS_DSP RotateEnvelope(OGREnvelope &Env, double dAngle, double dX, double dY);
+void WXDLLIMPEXP_GIS_DSP SetEnvelopeRatio(OGREnvelope &Env, double dRatio);
 
 
 //DisplayTransformation – This object defines how real-world coordinates are mapped to a output device. Three rectangles define the transformation. 

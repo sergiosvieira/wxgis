@@ -26,7 +26,7 @@
 // wxGISConfig
 //---------------------------------------------------------------
 
-wxGISConfig::wxGISConfig(wxString sAppName, wxString sConfigDir, bool bPortable)
+wxGISConfig::wxGISConfig(const wxString &sAppName, const wxString &sConfigDir, bool bPortable)
 {
  	wxStandardPaths stp;
 	m_sAppName = sAppName;
@@ -333,7 +333,7 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxString sPath, bool bCreateInCU, bool bUn
 // wxGISAppConfig
 //---------------------------------------------------------------
 
-wxGISAppConfig::wxGISAppConfig(wxString sAppName, wxString sConfigDir, bool bPortable) : wxGISConfig(sAppName, sConfigDir, bPortable)
+wxGISAppConfig::wxGISAppConfig(const wxString &sAppName, const wxString &sConfigDir, bool bPortable) : wxGISConfig(sAppName, sConfigDir, bPortable)
 {
 }
 

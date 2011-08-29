@@ -39,14 +39,14 @@ class WXDLLIMPEXP_GIS_GP wxGISGPTool :
 {
 public:
     wxGISGPTool(void);
-    ~wxGISGPTool(void);
+    virtual ~wxGISGPTool(void);
     //IGPTool
     virtual const wxString GetDisplayName(void) = 0;
     virtual const wxString GetName(void) = 0;
     virtual const wxString GetCategory(void) = 0;
     virtual bool Execute(ITrackCancel* pTrackCancel) = 0;
     virtual bool Validate(void) = 0;
-    virtual GPParameters* GetParameterInfo(void) = 0;
+    virtual GPParameters GetParameterInfo(void) = 0;
     virtual void SetCatalog(IGxCatalog* pCatalog);
     virtual IGxCatalog* const GetCatalog(void);
 	virtual const wxString GetAsString(void);
@@ -54,6 +54,6 @@ public:
     virtual void Copy(IGPTool* const pTool);
     //TODO: export/import tool to XML for server execution
 protected:
-    GPParameters m_pParamArr;
+    GPParameters m_paParam;
     IGxCatalog* m_pCatalog;
 };

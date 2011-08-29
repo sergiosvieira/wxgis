@@ -70,7 +70,6 @@ public:
 	virtual void SetBounds(OGREnvelope &Env);
 	virtual OGREnvelope GetBounds(void);
 	//misc
-	virtual double GetRatio(void);
 	virtual void SetRotate(double dAngleRad);
 	virtual double GetRotate(void){return m_dAngleRad;};
 	virtual void DC2World(double* pdX, double* pdY);
@@ -90,6 +89,7 @@ public:
 	virtual void SetFillRule(cairo_fill_rule_t fill_rule = CAIRO_FILL_RULE_WINDING);
 	//Draw
 	virtual void DrawGeometry(OGRGeometry* poGeometry);
+	virtual void DrawRaster(cairo_surface_t *surface, OGREnvelope& Envelope);
 	virtual void ZoomingDraw(wxRect &rc, wxDC* pDC);
 	virtual void WheelingDraw(double dZoom, wxDC* pDC);
 	virtual void PanningDraw(wxCoord x, wxCoord y, wxDC* pDC);
@@ -116,6 +116,13 @@ protected:
 	virtual bool CheckDrawAsPoint(const OGRGeometry* pGeometry, bool bCheckEnvelope = false);
 	virtual cairo_t* CreateContext(wxDC* dc);
 	virtual void InitTransformMatrix(void);
+	virtual inline double GetScaledWidth(double nWidth)
+	{
+		double x_new, y_new;
+		x_new = y_new = nWidth;
+		DC2WorldDist(&x_new, &y_new);
+		return (fabs(x_new) + fabs(y_new)) / 2;
+	}
 protected:
 	std::vector<LAYERCACHEDATA> m_saLayerCaches;
 	RGBA m_stBackGroudnColour;
@@ -123,7 +130,7 @@ protected:
 	size_t m_nLastCacheID, m_nCurrentLayer;
 	int m_nMax_X, m_nMax_Y;
 	wxRect m_oDeviceFrameRect;
-	OGREnvelope m_CurrentBounds, m_CurrentBoundsRotated, m_CurrentBoundsX8;
+	OGREnvelope m_RealBounds, m_CurrentBounds, m_CurrentBoundsRotated, m_CurrentBoundsX8;
 	double m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY;
 	//wxSize m_ppi;
 	double m_dAngleRad;

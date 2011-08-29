@@ -20,7 +20,6 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/geoprocessing/gptool.h"
 
 /** \class wxGISGPCreateOverviewsTool gpcreateovrtool.h
@@ -34,14 +33,14 @@ class WXDLLIMPEXP_GIS_GP wxGISGPCreateOverviewsTool :
 
 public:
     wxGISGPCreateOverviewsTool(void);
-    ~wxGISGPCreateOverviewsTool(void);
+    virtual ~wxGISGPCreateOverviewsTool(void);
     //IGPTool
     virtual const wxString GetDisplayName(void);
     virtual const wxString GetName(void);
     virtual const wxString GetCategory(void);
     virtual bool Execute(ITrackCancel* pTrackCancel);
     virtual bool Validate(void);
-    virtual GPParameters* GetParameterInfo(void);
+    virtual GPParameters GetParameterInfo(void);
 protected:
 	wxString m_sInputPath;
 };

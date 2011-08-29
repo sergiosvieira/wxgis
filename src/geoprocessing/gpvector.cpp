@@ -1147,3 +1147,169 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
     wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>(sFullPath, nSubType, poLayerDest, poDS);
     return pDataSet;
 }
+
+bool GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, const CPLString &osFrmt, bool bSwapXY, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel)
+{
+	CPLErrorReset();
+
+    VSILFILE    *fpCoordsFile;
+
+    fpCoordsFile = VSIFOpenL( sPath, "wt" );
+    if( fpCoordsFile == NULL )
+	{
+		wxString sErr = wxString::Format(_("Error create text file! Path '%s'. OGR error: "), wxString(sPath, wxConvUTF8).c_str());
+        CPLString sFullErr(sErr.mb_str());
+        sFullErr += CPLGetLastErrorMsg();
+        CPLError( CE_Failure, CPLE_FileIO, sFullErr);
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+        return false;
+	}
+
+
+    IProgressor* pProgressor(NULL);
+    if(pTrackCancel)
+		pProgressor = pTrackCancel->GetProgressor();
+    if(pProgressor)
+        pProgressor->SetRange(pDSet->GetFeatureCount());
+
+	int nCounter(0);
+	long nFidCounter(0);
+ 	OGRFeatureSPtr poFeature;
+	pDSet->Reset();
+    while((poFeature = pDSet->Next()) != NULL)	
+    {
+        if(pTrackCancel && !pTrackCancel->Continue())
+        {
+            wxString sErr(_("Interrupted by user"));
+            CPLString sFullErr(sErr.mb_str());
+            CPLError( CE_Warning, CPLE_AppDefined, sFullErr );
+
+            if(pTrackCancel)
+                pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            return false;
+        }
+
+		nCounter++;
+        if(pProgressor)
+            pProgressor->SetValue(nCounter);
+
+
+        OGRGeometry* pGeom = poFeature->GetGeometryRef();   
+        if(!pGeom)
+            continue;
+
+		CPLString osCoordText = GeometryToText(poFeature->GetFID(), pGeom, osFrmt, bSwapXY, pTrackCancel);
+
+		if(osCoordText.size() > 0)
+		{
+			VSIFWriteL( (void *) osCoordText.c_str(), 1, osCoordText.size(), fpCoordsFile );
+			if(pTrackCancel)
+				pTrackCancel->PutMessage(wxString::Format(_("Geometry No. %d added"), nCounter), -1, enumGISMessageInfo);
+		}
+		else
+		{
+			if(pTrackCancel)
+				pTrackCancel->PutMessage(wxString(_("Unsupported geometry type")), -1, enumGISMessageWarning);
+		}
+	}
+
+    VSIFCloseL( fpCoordsFile );
+
+	return true;
+}
+
+CPLString GeometryToText(long nGeomFID, OGRGeometry* pGeom, const CPLString &osFrmt, bool bSwap, ITrackCancel* pTrackCancel)
+{
+	CPLString osOutput;
+	if(!pGeom)
+		return osOutput;
+
+	CPLString osTmp;
+	osOutput += CPLSPrintf("Geometry %d (%s)\n", nGeomFID, pGeom->getGeometryName());//CPLString().Printf
+	OGRwkbGeometryType type = wkbFlatten(pGeom->getGeometryType());
+	switch(type)
+	{
+	case wkbPoint:
+		PointToText(osOutput, (OGRPoint*)pGeom, osFrmt, bSwap);
+		break;
+	case wkbLineString:
+	case wkbLinearRing:
+		LineToText(osOutput, (OGRLineString*)pGeom, osFrmt, bSwap);
+		break;
+	case wkbPolygon:
+		{
+            int nRings(0);
+            OGRPolygon* poPoly = (OGRPolygon*)pGeom;
+            OGRLinearRing* poRing = poPoly->getExteriorRing();
+            nRings = poPoly->getNumInteriorRings();
+            if (poRing == NULL)
+                osOutput += CPLString("empty");
+            else
+            {
+				osOutput += CPLString("Exterior ring\n");
+				LineToText(osOutput, (OGRLineString*)poRing, osFrmt, bSwap);
+
+                if (nRings)
+                {
+                    osOutput += CPLSPrintf("%d inner rings\n", nRings);
+                    for(int ir = 0; ir < nRings; ++ir)
+                    {
+						osOutput += CPLSPrintf("%d inner ring\n", ir);
+						OGRLinearRing* poRing = poPoly->getInteriorRing(ir);
+						LineToText(osOutput, (OGRLineString*)poRing, osFrmt, bSwap);
+                    }
+                }
+            }
+		}
+		break;
+	case wkbMultiPolygon:
+		//break;
+	case wkbMultiPoint:
+		//break;
+	case wkbMultiLineString:
+		//break;
+	case wkbGeometryCollection:
+		{
+            OGRGeometryCollection* poColl = (OGRGeometryCollection*)pGeom;
+            osOutput += CPLSPrintf("%d geometries:\n", poColl->getNumGeometries() );
+            for (int ig = 0; ig < poColl->getNumGeometries(); ++ig)
+            {
+                OGRGeometry * poChild = (OGRGeometry*)poColl->getGeometryRef(ig);
+                GeometryToText(nGeomFID, poChild, osFrmt, bSwap, pTrackCancel);
+            }
+		}
+		break;
+	default:
+	case wkbUnknown:
+	case wkbNone:
+		break;
+	}
+	return osOutput;
+}
+
+void PointToText(CPLString &osData, OGRPoint* pPoint, const CPLString &osFrmt, bool bSwap)
+{
+	if(bSwap)
+		osData += CPLSPrintf(osFrmt, pPoint->getY(), pPoint->getX() );
+	else
+		osData += CPLSPrintf(osFrmt, pPoint->getX(), pPoint->getY() );
+}
+
+void LineToText(CPLString &osData, OGRLineString* pLine, const CPLString &osFrmt, bool bSwap)
+{
+	int nCount = pLine->getNumPoints();
+	if(nCount == 0)
+	{
+		osData += CPLString("empty\n");
+		return;
+	}
+
+    osData += CPLSPrintf("%d points\n", nCount );
+	for(size_t i = 0; i < nCount; ++i)
+	{
+		OGRPoint Pt;
+		pLine->getPoint(i, &Pt);
+		PointToText(osData, &Pt, osFrmt, bSwap);
+	}
+}
