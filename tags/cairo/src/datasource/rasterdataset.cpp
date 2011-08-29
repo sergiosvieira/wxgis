@@ -404,25 +404,26 @@ bool wxGISRasterDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     return true;
 }
 
-/*void wxGISRasterDataset::GetSubRaster(int nXOff, int nYOff, int nXSize, int nYSize)
+bool wxGISRasterDataset::GetPixelData(void *data, int nXOff, int nYOff, int nXSize, int nYSize, int nBufXSize, int nBufYSize, GDALDataType eDT, int nBandCount, int *panBandList)
 {
     CPLErrorReset();
 
-    CPLErr err = m_poDataset->AdviseRead(nXOff, nYOff, nXSize, nYSize, nWidthOut, nHeightOut, GDT_Byte, 3, bands, NULL);
+    CPLErr err = m_poDataset->AdviseRead(nXOff, nYOff, nXSize, nYSize, nBufXSize, nBufYSize, eDT, nBandCount, panBandList, NULL);
     if(err != CE_None)
     {
         const char* pszerr = CPLGetLastErrorMsg();
 		wxLogError(_("AdviseRead failed! GDAL error: %s"), wxString(pszerr, *wxConvCurrent).c_str());
-        return;
+        return false;
     }
 
-    err = m_poDataset->RasterIO(GF_Read, nXOff, nYOff, nXSize, nYSize, data, nWidthOut, nHeightOut, GDT_Byte, 3, bands, sizeof(unsigned char) * 3, 0, sizeof(unsigned char));
+	int nDataSize = GDALGetDataTypeSize(eDT) / 8;
+    err = m_poDataset->RasterIO(GF_Read, nXOff, nYOff, nXSize, nYSize, data, nBufXSize, nBufYSize, eDT, nBandCount, panBandList, nDataSize * nBandCount, 0, nDataSize);
     if(err != CE_None)
     {
         const char* pszerr = CPLGetLastErrorMsg();
         wxLogError(_("RasterIO failed! GDAL error: %s"), wxString(pszerr, *wxConvCurrent).c_str());
-        return;
+        return false;
     }
+	return true;
 }
 
-*/

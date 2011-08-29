@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
- * Purpose:  convert geometry vertices to points
+ * Purpose:  write shape cordinates to text file
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
@@ -18,8 +18,9 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#include "wxgis/geoprocessing/gpgeomverttoptstool.h"
-#include "wxgis/geoprocessing/gptoolmngr.h"
+
+#include "wxgis/geoprocessing/gpshapetotexttool.h"
+//#include "wxgis/geoprocessing/gptoolmngr.h"
 #include "wxgis/geoprocessing/gpdomain.h"
 #include "wxgis/geoprocessing/gpparam.h"
 #include "wxgis/geoprocessing/gpvector.h"
@@ -27,42 +28,42 @@
 #include "wxgis/catalog/catop.h"
 
 /////////////////////////////////////////////////////////////////////////
-// wxGISGPExportTool
+// wxGISGPShapeToTextTool
 /////////////////////////////////////////////////////////////////////////
 
-IMPLEMENT_DYNAMIC_CLASS(wxGISGPGeomVerticesToPointsTool, wxGISGPTool)
+IMPLEMENT_DYNAMIC_CLASS(wxGISGPShapeToTextTool, wxGISGPTool)
 
-wxGISGPGeomVerticesToPointsTool::wxGISGPGeomVerticesToPointsTool(void) : wxGISGPTool()
+wxGISGPShapeToTextTool::wxGISGPShapeToTextTool(void) : wxGISGPTool()
 {
 }
 
-wxGISGPGeomVerticesToPointsTool::~wxGISGPGeomVerticesToPointsTool(void)
+wxGISGPShapeToTextTool::~wxGISGPShapeToTextTool(void)
 {
 }
 
-const wxString wxGISGPGeomVerticesToPointsTool::GetDisplayName(void)
+const wxString wxGISGPShapeToTextTool::GetDisplayName(void)
 {
-    return wxString(_("Geometry Vertices To Points"));
+    return wxString(_("Write shapes coordinates to text file"));
 }
 
-const wxString wxGISGPGeomVerticesToPointsTool::GetName(void)
+const wxString wxGISGPShapeToTextTool::GetName(void)
 {
-    return wxString(wxT("gvert_to_pts"));
+    return wxString(wxT("shape_to_text"));
 }
 
-const wxString wxGISGPGeomVerticesToPointsTool::GetCategory(void)
+const wxString wxGISGPShapeToTextTool::GetCategory(void)
 {
     return wxString(_("Conversion Tools/Vector"));
 }
 
-GPParameters wxGISGPGeomVerticesToPointsTool::GetParameterInfo(void)
+GPParameters wxGISGPShapeToTextTool::GetParameterInfo(void)
 {
     if(m_paParam.IsEmpty())
     {
         //src path
         wxGISGPParameter* pParam1 = new wxGISGPParameter();
         pParam1->SetName(wxT("src_path"));
-        pParam1->SetDisplayName(_("Source feature class"));
+        pParam1->SetDisplayName(_("Source table"));
         pParam1->SetParameterType(enumGISGPParameterTypeRequired);
         pParam1->SetDataType(enumGISGPParamDTPath);
         pParam1->SetDirection(enumGISGPParameterDirectionInput);
@@ -73,42 +74,54 @@ GPParameters wxGISGPGeomVerticesToPointsTool::GetParameterInfo(void)
 
         m_paParam.Add(pParam1);
 
-        //dst path
+		//swap x y
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
-        pParam2->SetName(wxT("dst_path"));
-        pParam2->SetDisplayName(_("Destination feature class"));
-        pParam2->SetParameterType(enumGISGPParameterTypeRequired);
-        pParam2->SetDataType(enumGISGPParamDTPath);
-        pParam2->SetDirection(enumGISGPParameterDirectionOutput);
-
-        wxGISGPGxObjectDomain* pDomain2 = new wxGISGPGxObjectDomain();
-        AddAllVectorFilters(pDomain2);
-        pParam2->SetDomain(pDomain2);
+        pParam2->SetName(wxT("swap_xy"));
+        pParam2->SetDisplayName(_("Swap XY coordinates"));
+        pParam2->SetParameterType(enumGISGPParameterTypeOptional);
+        pParam2->SetDataType(enumGISGPParamDTBool);
+        pParam2->SetDirection(enumGISGPParameterDirectionInput);
+        pParam2->SetValue(false);
 
         m_paParam.Add(pParam2);
+
+		//dst path
+        wxGISGPParameter* pParam3 = new wxGISGPParameter();
+        pParam3->SetName(wxT("dst_path"));
+        pParam3->SetDisplayName(_("Destination text file"));
+        pParam3->SetParameterType(enumGISGPParameterTypeRequired);
+        pParam3->SetDataType(enumGISGPParamDTPath);
+        pParam3->SetDirection(enumGISGPParameterDirectionOutput);
+
+        wxGISGPGxObjectDomain* pDomain3 = new wxGISGPGxObjectDomain();
+		pDomain3->AddFilter(new wxGxTextFilter(wxString(_("Text file")), wxString(wxT(".txt"))));
+        pParam3->SetDomain(pDomain3);
+
+        m_paParam.Add(pParam3);
 
     }
     return m_paParam;
 }
 
-bool wxGISGPGeomVerticesToPointsTool::Validate(void)
+bool wxGISGPShapeToTextTool::Validate(void)
 {
-    if(!m_paParam[1]->GetAltered())
+    if(!m_paParam[2]->GetAltered())
     {
         if(m_paParam[0]->GetIsValid())
         {
             //generate temp name
             wxString sPath = m_paParam[0]->GetValue();
             wxFileName Name(sPath);
-            Name.SetName(Name.GetName() + wxT("_gvert_to_pts"));
-            m_paParam[1]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
-            m_paParam[1]->SetAltered(true);//??
+            Name.SetName(Name.GetName() + wxT("_shape_to_text"));
+			Name.SetExt(wxT("txt"));
+            m_paParam[2]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
+            m_paParam[2]->SetAltered(true);//??
         }
     }
     return true;
 }
 
-bool wxGISGPGeomVerticesToPointsTool::Execute(ITrackCancel* pTrackCancel)
+bool wxGISGPShapeToTextTool::Execute(ITrackCancel* pTrackCancel)
 {
     if(!Validate())
     {
@@ -118,7 +131,7 @@ bool wxGISGPGeomVerticesToPointsTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
 
-    IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
+	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
     if(!pGxObjectContainer)
     {
         //add messages to pTrackCancel
@@ -144,6 +157,7 @@ bool wxGISGPGeomVerticesToPointsTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(_("The source object is of incompatible type"), -1, enumGISMessageErr);
         return false;
     }
+
     wxGISFeatureDatasetSPtr pSrcDataSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pGxDataset->GetDataset());
     if(!pSrcDataSet)
     {
@@ -164,8 +178,10 @@ bool wxGISGPGeomVerticesToPointsTool::Execute(ITrackCancel* pTrackCancel)
         //wsDELETE(pSrcDataSet);
         return false;
     }
+
+	bool bSwapXY = m_paParam[1]->GetValue();
     
-    wxString sDstPath = m_paParam[1]->GetValue();
+    wxString sDstPath = m_paParam[2]->GetValue();
 
 	//check overwrite & do it!
 	if(!OverWriteGxObject(pGxObjectContainer->SearchChild(sDstPath), pTrackCancel))
@@ -177,22 +193,17 @@ bool wxGISGPGeomVerticesToPointsTool::Execute(ITrackCancel* pTrackCancel)
 
     CPLString szPath = pGxDstObject->GetInternalName();
     wxFileName sDstFileName(sDstPath);
-    wxString sName = sDstFileName.GetName();
-    
-    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_paParam[1]->GetDomain());
-	IGxObjectFilter* pFilter = pDomain->GetFilter(m_paParam[1]->GetSelDomainValue());
-    if(!pFilter)
-    {
-        //add messages to pTrackCancel
-        if(pTrackCancel)
-            pTrackCancel->PutMessage(_("Error getting selected destination filter"), -1, enumGISMessageErr);
-        return false;
-    }
-        
-    bool bRes = GeometryVerticesToPoints(pSrcDataSet, szPath, sName, pFilter, NULL, pTrackCancel);
+    wxString sName = sDstFileName.GetFullName();	
+
+	int nAcc = 16;
+	CPLString osDiv(",");
+	CPLString osFrm(CPLSPrintf("%%.%df%s%%.%df\n", nAcc, osDiv.c_str(), nAcc));
+    bool bRes = GeometryVerticesToTextFile(pSrcDataSet, CPLFormFilename(szPath, sName.mb_str(wxConvUTF8), NULL), osFrm, bSwapXY, NULL, pTrackCancel);
 
     if(pGxDstObject)
-        pGxDstObject->Refresh();
+		pGxDstObject->Refresh();
 
     return bRes;
+
 }
+

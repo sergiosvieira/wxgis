@@ -21,21 +21,19 @@
 #pragma once
 
 #include "wxgis/core/core.h"
+
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
 
-//#define HKCU_CONFIG_NAME wxT("hkcu_config.xml")
-//#define HKLM_CONFIG_NAME wxT("hklm_config.xml")
-
-//---------------------------------------------------------------
-// wxGISConfig
-//---------------------------------------------------------------
+/** \class wxGISConfig config.h
+    \brief The config class
+*/
 
 class WXDLLIMPEXP_GIS_CORE wxGISConfig : 
 	public IGISConfig
 {
 public:
-	wxGISConfig(wxString sAppName, wxString sConfigDir, bool bPortable = false);
+	wxGISConfig(const wxString &sAppName, const wxString &sConfigDir, bool bPortable = false);
 	virtual ~wxGISConfig(void);
 	//IGISConfig
     virtual wxXmlNode* GetConfigNode(wxGISEnumConfigKey Key, wxString sPath);
@@ -67,15 +65,17 @@ protected:
     bool m_bPortable;
 };
 
-//---------------------------------------------------------------
-// wxGISAppConfig
-//---------------------------------------------------------------
+/** \class wxGISAppConfig config.h
+    \brief The extende config class
+
+	Added methos for Get/Set Locale, System Directory and Log Directory paths, Debug mode
+*/
 
 class WXDLLIMPEXP_GIS_CORE wxGISAppConfig : 
 	public wxGISConfig
 {
 public:
-	wxGISAppConfig(wxString sAppName, wxString sConfigDir, bool bPortable = false);
+	wxGISAppConfig(const wxString &sAppName, const wxString &sConfigDir, bool bPortable = false);
 	virtual ~wxGISAppConfig(void);
 
     virtual wxString GetLocale(void);

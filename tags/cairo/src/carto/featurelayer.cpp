@@ -65,7 +65,7 @@ bool wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDispla
 				double dCenterX = Env.MinX + (Env.MaxX - Env.MinX) / 2;
 				double dCenterY = Env.MinY + (Env.MaxY - Env.MinY) / 2;
 
-				RotateEnvelope(&TempFullEnv, pDisplay->GetRotate(), dCenterX, dCenterY);
+				RotateEnvelope(TempFullEnv, pDisplay->GetRotate(), dCenterX, dCenterY);
 			}
 			bSetFilter = TempFullEnv.Contains(Env) != 0;
 		}

@@ -20,7 +20,6 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/geoprocessing/gptool.h"
 
 /** \class wxGISGPCreateStatTool gpcompstattool.h
@@ -34,12 +33,12 @@ class WXDLLIMPEXP_GIS_GP wxGISGPCompStatTool :
 
 public:
     wxGISGPCompStatTool(void);
-    ~wxGISGPCompStatTool(void);
+    virtual ~wxGISGPCompStatTool(void);
     //IGPTool
     virtual const wxString GetDisplayName(void);
     virtual const wxString GetName(void);
     virtual const wxString GetCategory(void);
     virtual bool Execute(ITrackCancel* pTrackCancel);
     virtual bool Validate(void);
-    virtual GPParameters* GetParameterInfo(void);
+    virtual GPParameters GetParameterInfo(void);
 };

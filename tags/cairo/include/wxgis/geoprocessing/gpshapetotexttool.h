@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
- * Purpose:  ortho correct geoprocessing tools.
+ * Purpose:  write shape cordinates to text file
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -23,20 +23,17 @@
 
 #include "wxgis/geoprocessing/gptool.h"
 
-/** \class wxGISGPOrthoCorrectTool gporthocorrecttool.h
-    \brief The geoprocessing tool create ortho corrected rasters.
-
-    The input rasters should have RPC
+/** \class wxGISGPShapeToTextTool gpshapetotexttool.h
+    \brief The geoprocessing tool write shape cordinates to text file
 */
-
-class WXDLLIMPEXP_GIS_GP wxGISGPOrthoCorrectTool : 
+class WXDLLIMPEXP_GIS_GP wxGISGPShapeToTextTool : 
     public wxGISGPTool
 {
-   DECLARE_DYNAMIC_CLASS(wxGISGPOrthoCorrectTool)
+   DECLARE_DYNAMIC_CLASS(wxGISGPShapeToTextTool)
 
 public:
-    wxGISGPOrthoCorrectTool(void);
-    virtual ~wxGISGPOrthoCorrectTool(void);
+    wxGISGPShapeToTextTool(void);
+    virtual ~wxGISGPShapeToTextTool(void);
     //IGPTool
     virtual const wxString GetDisplayName(void);
     virtual const wxString GetName(void);

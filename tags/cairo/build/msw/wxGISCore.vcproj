@@ -194,6 +194,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\core\init.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\core\process.cpp"
 				>
 			</File>
@@ -217,6 +221,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\core\globalfn.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\core\init.h"
 				>
 			</File>
 			<File

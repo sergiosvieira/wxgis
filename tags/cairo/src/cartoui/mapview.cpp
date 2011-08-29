@@ -620,8 +620,8 @@ OGREnvelope wxGISMapView::GetFullExtent(void)
 		OutputEnv = m_FullExtent;
 		double dCenterX = m_FullExtent.MinX + (m_FullExtent.MaxX - m_FullExtent.MinX) / 2;
 		double dCenterY = m_FullExtent.MinY + (m_FullExtent.MaxY - m_FullExtent.MinY) / 2;
-		RotateEnvelope(&OutputEnv, m_dCurrentAngle, dCenterX, dCenterY);
-		IncreaseEnvelope(&OutputEnv, 0.1);
+		RotateEnvelope(OutputEnv, m_dCurrentAngle, dCenterX, dCenterY);
+		IncreaseEnvelope(OutputEnv, 0.1);
 	}
 	else
 		OutputEnv = wxGISMap::GetFullExtent();

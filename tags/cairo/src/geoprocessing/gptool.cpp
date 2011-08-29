@@ -62,8 +62,8 @@ void wxGISGPTool::Copy(IGPTool* const pTool)
 
 wxGISGPTool::~wxGISGPTool(void)
 {
-    for(size_t i = 0; i < m_pParamArr.size(); ++i)
-        wxDELETE(m_pParamArr[i]);
+	for(size_t i = 0; i < m_paParam.GetCount(); ++i)
+        wxDELETE(m_paParam[i]);
 }
 
 void wxGISGPTool::SetCatalog(IGxCatalog* pCatalog)
@@ -79,9 +79,9 @@ IGxCatalog* const wxGISGPTool::GetCatalog(void)
 const wxString wxGISGPTool::GetAsString(void)
 {
     wxString sOutParam;
-    for(size_t i = 0; i < m_pParamArr.size(); ++i)
+    for(size_t i = 0; i < m_paParam.GetCount(); ++i)
     {
-        IGPParameter* pParam = m_pParamArr[i];
+        IGPParameter* pParam = m_paParam[i];
         if(pParam)
         {
             sOutParam += pParam->GetAsString();
@@ -99,9 +99,9 @@ bool wxGISGPTool::SetFromString(const wxString& sParams)
 	while ( tkz.HasMoreTokens() )
 	{
 		wxString token = tkz.GetNextToken();
-        if(counter >= m_pParamArr.size())
+        if(counter >= m_paParam.GetCount())
            return false;
-        IGPParameter* pParam = m_pParamArr[counter];
+        IGPParameter* pParam = m_paParam[counter];
         if(pParam)
         {
             if(!pParam->SetFromString(token))

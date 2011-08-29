@@ -225,7 +225,7 @@ int wxGISGPToolManager::Execute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel)
     wxString sToolParams = pTool->GetAsString();
     sToolParams.Replace(wxT("\""), wxT("\\\""));
     
-	//wxString sCommand = wxString::Format(wxT("%s -n "), m_sGeoprocessPath.c_str()) + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");
+//	wxString sCommand = wxString::Format(wxT("%s -n "), m_sGeoprocessPath.c_str()) + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");
     
 	wxFileName FName(m_sGeoprocessPath);
     wxArrayString saParams;
@@ -252,19 +252,16 @@ bool wxGISGPToolManager::ExecTask(WXGISEXECDDATA &data, size_t nIndex)
     {
         data.pTrackCancel->PutMessage(wxString::Format(_("Executing (%s)"), data.pTool->GetName().c_str()), -1, enumGISMessageInfo);
         //add some tool info
-        GPParameters* pParams = data.pTool->GetParameterInfo();
-        if(pParams)
+        GPParameters Params = data.pTool->GetParameterInfo();
+        data.pTrackCancel->PutMessage(wxString(_("Parameters:")), -1, enumGISMessageInfo);
+		for(size_t i = 0; i < Params.GetCount(); ++i)
         {
-            data.pTrackCancel->PutMessage(wxString(_("Parameters:")), -1, enumGISMessageInfo);
-            for(size_t i = 0; i < pParams->size(); ++i)
-            {
-                IGPParameter* pParam = pParams->operator[](i);
-                if(!pParam)
-                    continue;
-                wxString sParamName = pParam->GetName();
-                wxString sParamValue = pParam->GetValue();
-                data.pTrackCancel->PutMessage(wxString::Format(wxT("%s = %s"), sParamName.c_str(), sParamValue.c_str()), -1, enumGISMessageNorm);
-            }
+            IGPParameter* pParam = Params[i];
+            if(!pParam)
+                continue;
+            wxString sParamName = pParam->GetName();
+            wxString sParamValue = pParam->GetValue();
+            data.pTrackCancel->PutMessage(wxString::Format(wxT("%s = %s"), sParamName.c_str(), sParamValue.c_str()), -1, enumGISMessageNorm);
         }
         data.pTrackCancel->PutMessage(wxString::Format(_("Start Time: %s"), begin.Format().c_str()), -1, enumGISMessageInfo);
     }

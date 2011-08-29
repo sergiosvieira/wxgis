@@ -862,7 +862,7 @@ bool wxGISApplication::SetupLog(wxString sLogPath)
 	wxLogMessage(wxT("####################################################################"));
 	long dFreeMem =  wxMemorySize(wxGetFreeMemory() / 1048576).ToLong();
 	wxLogMessage(_("HOST '%s': OS desc - %s, free memory - %u Mb"), wxGetFullHostName().c_str(), wxGetOsDescription().c_str(), dFreeMem);
-	wxLogMessage(_("wxGISApplication: %s %s is initializing..."), GetAppName(), GetAppVersionString());
+	wxLogMessage(_("wxGISApplication: %s %s is initializing..."), GetAppName().c_str(), GetAppVersionString().c_str());
 	wxLogMessage(_("wxGISApplication: Log file: %s"), logfilename.c_str());
 
     return true;
@@ -921,7 +921,7 @@ bool wxGISApplication::SetupLoc(wxString sLoc, wxString sLocPath)
 	{
 		wxLocale::AddCatalogLookupPathPrefix(sLocalePath);
 
-		wxString sWxLocPath = sLocalePath + wxFileName::GetPathSeparator() + sLoc + wxT(".po");
+		wxString sWxLocPath = sLocalePath + wxFileName::GetPathSeparator() + sLoc + wxT(".mo");
 		m_pLocale->AddCatalog(sWxLocPath);
 		
 
