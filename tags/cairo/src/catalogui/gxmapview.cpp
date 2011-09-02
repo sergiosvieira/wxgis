@@ -71,6 +71,8 @@ bool wxGxMapView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 		return false;
 	//Serialize(m_pXmlConf, false);
 
+	m_CFormat.Create(wxString(wxT("X: dd.dddd[ ]Y: dd.dddd")));//TODO: get/store from/in config, set from property page
+
     m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pGxApplication->GetCatalog());
 	if(m_pCatalog)
 		m_pSelection = m_pCatalog->GetSelection();
@@ -234,7 +236,8 @@ void wxGxMapView::OnMouseMove(wxMouseEvent& event)
 		double dX(event.m_x), dY(event.m_y);
 		m_pGISDisplay->DC2World(&dX, &dY);
         int nPanePos = m_pStatusBar->GetPanePos(enumGISStatusPosition);
-		m_pStatusBar->SetMessage(wxString::Format(_("X: %.4f  Y: %.4f"), dX, dY), nPanePos);
+		//m_pStatusBar->SetMessage(wxString::Format(_("X: %.4f  Y: %.4f"), dX, dY), nPanePos);
+		m_pStatusBar->SetMessage(m_CFormat.Format(dX, dY), nPanePos);
 	}
 
 	if(m_pApp)
@@ -299,7 +302,9 @@ void wxGxMapView::CheckOverviews(wxGISDatasetSPtr pwxGISDataset, wxString soFile
     if(!pwxGISRasterDataset->HasOverviews())
     {
     	bool bAskCreateOvr = true;
-        IGISConfig*  pConfig = m_pCatalog->GetConfig();
+		wxGISAppConfigSPtr pConfig = GetConfig();
+		if(!pConfig)
+			return false;
 
         bool bCreateOverviews = true;
         wxString sResampleMethod(wxT("GAUSS"));

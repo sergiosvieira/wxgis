@@ -599,7 +599,10 @@ void wxGxContentView::OnObjectAdded(wxGxCatalogEvent& event)
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(event.GetObjectID());
     if(pGxObject)
     {        
-	    if(pGxObject->GetParent()->GetID() == m_nParentGxObjectID)
+		IGxObject* pParentGxObject = pGxObject->GetParent();
+		if(!pParentGxObject)
+			return;
+	    if(pParentGxObject->GetID() == m_nParentGxObjectID)
         {
 		    AddObject(pGxObject.get());
             SORTDATA sortdata = {m_bSortAsc, m_currentSortCol, m_pCatalog};

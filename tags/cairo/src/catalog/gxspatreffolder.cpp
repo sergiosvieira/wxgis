@@ -53,19 +53,9 @@ void wxGxSpatialReferencesFolder::Init(wxXmlNode* const pConfigNode)
     m_sPath = CPLString(m_sInternalPath.mb_str(wxConvUTF8));
 }
 
-wxXmlNode* wxGxSpatialReferencesFolder::GetAttributes(void)
+void wxGxSpatialReferencesFolder::Serialize(wxXmlNode* pConfigNode)
 {
-    wxXmlNode* pNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("rootitem"));
-    wxClassInfo* pInfo = GetClassInfo();
-    if(pInfo)
-        pNode->AddAttribute(wxT("name"), pInfo->GetClassName());
-    pNode->AddAttribute(wxT("is_enabled"), m_bEnabled == true ? wxT("1") : wxT("0"));    
-#ifndef WXGISPORTABLE
-    if(pNode->HasAttribute(wxT("path")))
-        pNode->DeleteAttribute(wxT("path"));
-    pNode->AddAttribute(wxT("path"), m_sInternalPath);
-#endif  
-    return pNode;
+    pConfigNode->AddAttribute(wxT("path"), m_sInternalPath);
 }
 
 //void wxGxSpatialReferencesFolder::LoadChildren(void)

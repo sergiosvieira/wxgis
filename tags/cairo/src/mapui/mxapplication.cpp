@@ -34,11 +34,11 @@ wxMxApplication::~wxMxApplication(void)
 {
 }
 
-bool wxMxApplication::Create(IGISConfig* pConfig)
+bool wxMxApplication::Create(void)
 {
 	m_mgr.SetManagedWindow(this);
 
-    wxGISApplication::Create(pConfig);
+    wxGISApplication::Create();
 
 
 	m_pMapView = new wxMxMapView(this);

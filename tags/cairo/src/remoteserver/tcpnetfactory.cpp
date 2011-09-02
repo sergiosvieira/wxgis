@@ -182,23 +182,20 @@ bool wxClientTCPNetFactory::StopServerSearch()
 };
 
 
-wxXmlNode* wxClientTCPNetFactory::GetAttributes(void)
+void wxClientTCPNetFactory::Serialize(wxXmlNode* pConfigNode, bool bSave)
 {
-	wxXmlNode* pOutNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("factory"));
-	pOutNode->AddAttribute(wxT("port"), wxString::Format(wxT("%d"), m_nPort));
-	pOutNode->AddAttribute(wxT("adv_port"), wxString::Format(wxT("%d"), m_nAdvPort));
-	pOutNode->AddAttribute(wxT("addr"), m_sAddr);
-    wxClassInfo* pInfo = GetClassInfo();
-    if(pInfo)
-        pOutNode->AddAttribute(wxT("name"), pInfo->GetClassName());
-	return pOutNode;
-}
-
-void wxClientTCPNetFactory::SetAttributes(const wxXmlNode* pProp)
-{
-	m_nPort = wxAtoi(pProp->GetAttribute(wxT("port"), wxT("1976")));
-	m_nAdvPort = wxAtoi(pProp->GetAttribute(wxT("adv_port"), wxT("1977")));
-	m_sAddr = pProp->GetAttribute(wxT("addr"), wxT(""));
+	if(bSave)
+	{
+		pConfigNode->AddAttribute(wxT("port"), wxString::Format(wxT("%d"), m_nPort));
+		pConfigNode->AddAttribute(wxT("adv_port"), wxString::Format(wxT("%d"), m_nAdvPort));
+		pConfigNode->AddAttribute(wxT("addr"), m_sAddr);
+	}
+	else
+	{
+		m_nPort = wxAtoi(pConfigNode->GetAttribute(wxT("port"), wxT("1976")));
+		m_nAdvPort = wxAtoi(pConfigNode->GetAttribute(wxT("adv_port"), wxT("1977")));
+		m_sAddr = pConfigNode->GetAttribute(wxT("addr"), wxEmptyString);
+	}
 }
 
 INetClientConnection* wxClientTCPNetFactory::GetConnection(wxXmlNode* pProp)
@@ -236,15 +233,16 @@ wxClientTCPNetConnection::~wxClientTCPNetConnection(void)
 
 wxXmlNode* wxClientTCPNetConnection::GetAttributes(void)
 {
+    wxClassInfo* pInfo = GetClassInfo();
+    if(!pInfo)
+		return NULL;
     wxXmlNode* pNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("connection"));
     pNode->AddAttribute(wxT("name"), m_sConnName);
     pNode->AddAttribute(wxT("user"), m_sUserName);    
     pNode->AddAttribute(wxT("pass"), m_sCryptPass);    
     pNode->AddAttribute(wxT("ip"), m_sIP);    
     pNode->AddAttribute(wxT("port"), m_sPort);    
-    wxClassInfo* pInfo = GetClassInfo();
-    if(pInfo)
-        pNode->AddAttribute(wxT("class"), pInfo->GetClassName());
+    pNode->AddAttribute(wxT("class"), pInfo->GetClassName());
     return pNode;
 }
 

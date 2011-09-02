@@ -125,7 +125,8 @@ protected:
 */
 class wxGISDTChoice : public wxGISDTBase
 {
-    enum
+protected:
+	enum
 	{
 		ID_CHOICESTR = wxID_HIGHEST + 3605
 	};
@@ -141,6 +142,23 @@ public:
 	virtual void OnUpdateUI(wxUpdateUIEvent &event);
 protected:
 	wxChoice* m_choice;
+	wxBoxSizer* m_bPathSizer;
+DECLARE_EVENT_TABLE()
+};
+
+/** \class wxGISDTChoiceEditable gpcontrols.h
+    \brief The tool dialog control for choice value representation. User can change choices list.
+*/
+class wxGISDTChoiceEditable : public wxGISDTChoice
+{
+public:
+	wxGISDTChoiceEditable( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
+	~wxGISDTChoiceEditable();
+    //events
+    virtual void OnEdit(wxCommandEvent& event);
+protected:
+	wxBitmapButton* m_bpButton;
+
 DECLARE_EVENT_TABLE()
 };
 

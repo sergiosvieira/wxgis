@@ -107,7 +107,7 @@ void wxGxKMLDatasetUI::LoadChildren(void)
         if(!pwxGISFeatureDataset->Open(0,0,false))
         {
 		    const char* err = CPLGetLastErrorMsg();
-		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
+		    wxString sErr = wxString::Format(_("%s failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
 		    wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
 
 			return;

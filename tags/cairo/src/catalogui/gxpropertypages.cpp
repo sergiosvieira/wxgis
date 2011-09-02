@@ -3,7 +3,7 @@
  * Purpose:  PropertyPages of Catalog.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -40,8 +40,9 @@ bool wxGISCatalogGeneralPropertyPage::Create(IFrameApplication* application, wxW
     IGxApplication* pGxApplication = dynamic_cast<IGxApplication*>(application);
     if(!pGxApplication)
         return false;
-    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApplication->GetCatalog());
-    if(!m_pCatalog)
+
+	m_pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApplication->GetCatalog());
+	if(!m_pCatalog)
         return false;
 
     IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);

@@ -307,7 +307,6 @@
 #include <vector>
 #include <queue>
 
-#define CONFIG_DIR wxT("wxGIS")
 #define DEF wxT("~def~")
 #define NON wxT("~non~")
 #define ERR wxT("~err~")

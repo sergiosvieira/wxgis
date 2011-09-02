@@ -21,6 +21,7 @@
 
 #include "wxgis/geoprocessing/gpshapetotexttool.h"
 //#include "wxgis/geoprocessing/gptoolmngr.h"
+#include "wxgis/core/config.h"
 #include "wxgis/geoprocessing/gpdomain.h"
 #include "wxgis/geoprocessing/gpparam.h"
 #include "wxgis/geoprocessing/gpvector.h"
@@ -35,6 +36,7 @@ IMPLEMENT_DYNAMIC_CLASS(wxGISGPShapeToTextTool, wxGISGPTool)
 
 wxGISGPShapeToTextTool::wxGISGPShapeToTextTool(void) : wxGISGPTool()
 {
+	m_bEmptyCoordsMask = false;
 }
 
 wxGISGPShapeToTextTool::~wxGISGPShapeToTextTool(void)
@@ -74,30 +76,80 @@ GPParameters wxGISGPShapeToTextTool::GetParameterInfo(void)
 
         m_paParam.Add(pParam1);
 
-		//swap x y
+		//mask
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
-        pParam2->SetName(wxT("swap_xy"));
-        pParam2->SetDisplayName(_("Swap XY coordinates"));
-        pParam2->SetParameterType(enumGISGPParameterTypeOptional);
-        pParam2->SetDataType(enumGISGPParamDTBool);
+        pParam2->SetName(wxT("mask"));
+        pParam2->SetDisplayName(_("Coordinates format mask to write to text file"));
+        pParam2->SetParameterType(enumGISGPParameterTypeRequired);
+        pParam2->SetDataType(enumGISGPParamDTStringChoiceEditable);
         pParam2->SetDirection(enumGISGPParameterDirectionInput);
-        pParam2->SetValue(false);
+
+        wxGISGPStringDomain* pDomain2 = new wxGISGPStringDomain();
+
+		wxGISAppConfigSPtr pConfig = GetConfig();
+		if(pConfig)
+		{
+			wxXmlNode* pToolsNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/coordinate_mask")));
+			if(pToolsNode)
+			{
+				wxXmlNode* pChild = pToolsNode->GetChildren();
+				while(pChild)
+				{
+					wxString sMask = pChild->GetAttribute(wxT("text"), wxEmptyString);
+					if(!sMask.IsEmpty())
+					{
+						m_bEmptyCoordsMask = false;
+						m_asCoordsMask.Add(sMask);
+					}
+					pChild = pChild->GetNext();
+				}
+			}
+		}
+
+		if(m_asCoordsMask.GetCount() == 0)
+		{
+			m_bEmptyCoordsMask = true;
+			m_asCoordsMask.Add(wxT("dd-mm-ss.ss [W][ ]dd-mm-ss.ss [W]"));
+            m_asCoordsMask.Add(wxT("dd°mm'ss.ss\" [W][ ]dd°mm'ss.ss\" [W]"));
+            m_asCoordsMask.Add(wxT("dd-mm-ss.ss[ ]dd-mm-ss.ss"));
+            m_asCoordsMask.Add(wxT("ddmmss[ ]ddmmss"));
+            m_asCoordsMask.Add(wxT("d.ddd[tab]d.ddd"));
+            m_asCoordsMask.Add(wxT("d.ddd[ ]d.ddd"));
+		}
+
+        for(size_t i = 0; i < m_asCoordsMask.GetCount(); ++i)
+			pDomain2->AddString(m_asCoordsMask[i], m_asCoordsMask[i]);
+
+        pParam2->SetDomain(pDomain2);
+
+        pParam2->SetValue(m_asCoordsMask[0]);
 
         m_paParam.Add(pParam2);
 
-		//dst path
+		//swap x y
         wxGISGPParameter* pParam3 = new wxGISGPParameter();
-        pParam3->SetName(wxT("dst_path"));
-        pParam3->SetDisplayName(_("Destination text file"));
-        pParam3->SetParameterType(enumGISGPParameterTypeRequired);
-        pParam3->SetDataType(enumGISGPParamDTPath);
-        pParam3->SetDirection(enumGISGPParameterDirectionOutput);
-
-        wxGISGPGxObjectDomain* pDomain3 = new wxGISGPGxObjectDomain();
-		pDomain3->AddFilter(new wxGxTextFilter(wxString(_("Text file")), wxString(wxT(".txt"))));
-        pParam3->SetDomain(pDomain3);
+        pParam3->SetName(wxT("swap_xy"));
+        pParam3->SetDisplayName(_("Swap XY coordinates"));
+        pParam3->SetParameterType(enumGISGPParameterTypeOptional);
+        pParam3->SetDataType(enumGISGPParamDTBool);
+        pParam3->SetDirection(enumGISGPParameterDirectionInput);
+        pParam3->SetValue(false);
 
         m_paParam.Add(pParam3);
+
+		//dst path
+        wxGISGPParameter* pParam4 = new wxGISGPParameter();
+        pParam4->SetName(wxT("dst_path"));
+        pParam4->SetDisplayName(_("Destination text file"));
+        pParam4->SetParameterType(enumGISGPParameterTypeRequired);
+        pParam4->SetDataType(enumGISGPParamDTPath);
+        pParam4->SetDirection(enumGISGPParameterDirectionOutput);
+
+        wxGISGPGxObjectDomain* pDomain4 = new wxGISGPGxObjectDomain();
+		pDomain4->AddFilter(new wxGxTextFilter(wxString(_("Text file")), wxString(wxT(".txt"))));
+        pParam4->SetDomain(pDomain4);
+
+        m_paParam.Add(pParam4);
 
     }
     return m_paParam;
@@ -105,7 +157,30 @@ GPParameters wxGISGPShapeToTextTool::GetParameterInfo(void)
 
 bool wxGISGPShapeToTextTool::Validate(void)
 {
-    if(!m_paParam[2]->GetAltered())
+	//store in config if not exist
+	if(m_bEmptyCoordsMask)
+	{
+		wxGISAppConfigSPtr pConfig = GetConfig();
+		if(pConfig)
+		{
+			wxXmlNode* pToolsNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/coordinate_mask")));
+			if(pToolsNode)
+				pConfig->DeleteNodeChildren(pToolsNode);
+			else
+				pToolsNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/coordinate_mask")));
+			if(pToolsNode)
+			{
+				for(size_t i = 0; i < m_asCoordsMask.GetCount(); ++i)
+				{
+					wxXmlNode *pMskNode = new wxXmlNode(pToolsNode, wxXML_ELEMENT_NODE, wxString(wxT("mask")));
+					pMskNode->AddAttribute(wxT("text"),  m_asCoordsMask[i]);
+				}
+			}
+		}
+		m_bEmptyCoordsMask = false;
+	}
+
+    if(!m_paParam[3]->GetAltered())
     {
         if(m_paParam[0]->GetIsValid())
         {
@@ -114,10 +189,30 @@ bool wxGISGPShapeToTextTool::Validate(void)
             wxFileName Name(sPath);
             Name.SetName(Name.GetName() + wxT("_shape_to_text"));
 			Name.SetExt(wxT("txt"));
-            m_paParam[2]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
-            m_paParam[2]->SetAltered(true);//??
+            m_paParam[3]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
+            m_paParam[3]->SetAltered(true);//??
         }
     }
+
+	//check domain list in m_paParam[1] and if changed store in config
+    wxGISGPStringDomain* poGPStringDomain = dynamic_cast<wxGISGPStringDomain*>(m_paParam[1]->GetDomain());
+    if(poGPStringDomain)
+	{
+		wxArrayString m_asNewCoordsMask;
+		for(size_t i = 0; i < poGPStringDomain->GetCount(); ++i)
+			m_asNewCoordsMask.Add(poGPStringDomain->GetName(i));
+		if(m_asCoordsMask != m_asNewCoordsMask)
+		{
+			m_asCoordsMask = m_asNewCoordsMask;
+			m_bEmptyCoordsMask = true;
+		}
+	}
+	//create message using 55.25 & 35.35 coord look's like
+	bool bSwap = m_paParam[2]->GetValue();
+	wxString sMask = m_paParam[1]->GetValue();
+	m_CFormat.Create(sMask, bSwap);
+	if(m_CFormat.IsOk())
+		m_paParam[1]->SetMessage(wxGISEnumGPMessageOk, m_CFormat.Format(55.25, 35.35));
     return true;
 }
 
@@ -175,13 +270,20 @@ bool wxGISGPShapeToTextTool::Execute(ITrackCancel* pTrackCancel)
     {
         if(pTrackCancel)
             pTrackCancel->PutMessage(_("Error reading dataset definition"), -1, enumGISMessageErr);
-        //wsDELETE(pSrcDataSet);
         return false;
     }
 
-	bool bSwapXY = m_paParam[1]->GetValue();
-    
-    wxString sDstPath = m_paParam[2]->GetValue();
+	bool bSwap = m_paParam[2]->GetValue();
+	wxString sMask = m_paParam[1]->GetValue();
+	m_CFormat.Create(sMask, bSwap);
+	if(!m_CFormat.IsOk())
+    {
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("Invalid format mask"), -1, enumGISMessageErr);
+        return false;
+    }
+
+    wxString sDstPath = m_paParam[3]->GetValue();
 
 	//check overwrite & do it!
 	if(!OverWriteGxObject(pGxObjectContainer->SearchChild(sDstPath), pTrackCancel))
@@ -195,10 +297,7 @@ bool wxGISGPShapeToTextTool::Execute(ITrackCancel* pTrackCancel)
     wxFileName sDstFileName(sDstPath);
     wxString sName = sDstFileName.GetFullName();	
 
-	int nAcc = 16;
-	CPLString osDiv(",");
-	CPLString osFrm(CPLSPrintf("%%.%df%s%%.%df\n", nAcc, osDiv.c_str(), nAcc));
-    bool bRes = GeometryVerticesToTextFile(pSrcDataSet, CPLFormFilename(szPath, sName.mb_str(wxConvUTF8), NULL), osFrm, bSwapXY, NULL, pTrackCancel);
+    bool bRes = GeometryVerticesToTextFile(pSrcDataSet, CPLFormFilename(szPath, sName.mb_str(wxConvUTF8), NULL), m_CFormat, NULL, pTrackCancel);
 
     if(pGxDstObject)
 		pGxDstObject->Refresh();

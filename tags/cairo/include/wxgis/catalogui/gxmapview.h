@@ -24,6 +24,7 @@
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/gxeventui.h"
 #include "wxgis/cartoui/mapview.h"
+#include "wxgis/core/format.h"
 
 class WXDLLIMPEXP_GIS_CLU wxGxMapView :
 	public wxGISMapView,
@@ -56,6 +57,8 @@ private:
 	IStatusBar* m_pStatusBar;
 	IFrameApplication* m_pApp;
 	ITrackCancel *m_pTrackCancel;
+
+	wxGISCoordinatesFormat m_CFormat;
 
 	DECLARE_EVENT_TABLE()
 };

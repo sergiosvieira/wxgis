@@ -63,14 +63,18 @@ public:
 	virtual void UnRegisterObject(long nID);
 	virtual IGxObjectSPtr GetRegisterObject(long nID);
 	//wxGxCatalog
+	virtual void EnableRootItem(IGxObject* pRootItem, bool bEnable);
+	virtual void Init(void);
+protected:
+	virtual wxString GetConfigName(void){return wxString(wxT("wxCatalog"));};
 	virtual void LoadChildren(wxXmlNode* const pNode);
+	virtual void LoadChildren(void);
+	virtual void LoadObjectFactories(wxXmlNode* pNode);
+	virtual void LoadObjectFactories(void);
 	virtual void EmptyChildren(void);
 	virtual void EmptyDisabledChildren(void);
-	virtual void LoadObjectFactories(wxXmlNode* pNode);
 	virtual void EmptyObjectFactories(void);
-	virtual void Init(void);
-    virtual void SerializePlugins(wxXmlNode* const pNode, bool bStore = false);
-	virtual void EnableRootItem(IGxObject* pRootItem, bool bEnable);
+    virtual void SerializePlugins(wxXmlNode* pNode, bool bStore = false);
 protected:
 	bool m_bIsChildrenLoaded;
 	wxArrayString m_CatalogRootItemArray;

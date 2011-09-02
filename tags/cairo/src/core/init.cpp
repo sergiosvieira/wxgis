@@ -20,70 +20,27 @@
  ****************************************************************************/
 
 #include "wxgis/core/init.h"
+#include "wxgis/core/config.h"
 
-wxGISInitializer::wxGISInitializer(void) : m_pLocale(NULL), m_pszOldLocale(NULL), m_pConfig(NULL)
+////////////////////////////////////////////////////////////////////////////////
+// wxGISAppWithLibs
+////////////////////////////////////////////////////////////////////////////////
+
+wxGISAppWithLibs::wxGISAppWithLibs(void)
 {
 }
 
-wxGISInitializer::~wxGISInitializer(void)
+wxGISAppWithLibs::~wxGISAppWithLibs(void)
 {
 }
 
-bool wxGISInitializer::Initialize(const wxString &sAppName, const wxString &sConfigDir, const wxString &sLogFilePrefix, wxCmdLineParser& parser)
-{
-	m_pConfig = new wxGISAppConfig(sAppName, sConfigDir);
 
-	wxString sLogDir = m_pConfig->GetLogDir();
-	if(!SetupLog(sLogDir, sLogFilePrefix))
-        return false;
-	wxLogMessage(_("wxGISInitializer: %s %s is initializing..."), sAppName.c_str(), wxString(APP_VER).c_str());
-
-	if(!SetupLoc(m_pConfig->GetLocale(), m_pConfig->GetLocaleDir()))
-        return false;
-
-	//setup sys dir
-	wxString sSysDir = m_pConfig->GetSysDir();
-	if(!SetupSys(sSysDir))
-        return false;
-
-	bool bDebugMode = m_pConfig->GetDebugMode();
-	SetDebugMode(bDebugMode);
-
-	//store values
-	//m_pConfig->SetLogDir(sLogDir);
-	//m_pConfig->SetLocale(sLocale);
-	//m_pConfig->SetLocaleDir(sLocaleDir);
-	//m_pConfig->SetSysDir(sSysDir);
-	//m_pConfig->SetDebugMode(bDebugMode);
-
-    //load libs
-	wxXmlNode* pLibsNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("libs")));
-	if(pLibsNode)
-		LoadLibs(pLibsNode);
-	pLibsNode = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("libs")));
-	if(pLibsNode)
-		LoadLibs(pLibsNode);
-	return true;
-}
-
-void wxGISInitializer::Uninitialize()
-{
-	UnLoadLibs();
-
-    if(m_pszOldLocale != NULL)
-		setlocale(LC_NUMERIC, m_pszOldLocale);
-    wxDELETE(m_pLocale);
-	wxDELETE(m_pszOldLocale);
-
-	wxDELETE(m_pConfig);
-}
-
-void wxGISInitializer::LoadLibs(wxXmlNode* pRootNode)
+void wxGISAppWithLibs::LoadLibs(wxXmlNode* pRootNode)
 {
 	wxXmlNode *child = pRootNode->GetChildren();
 	while(child)
 	{
-		wxString sPath = child->GetAttribute(wxT("path"), wxT(""));
+		wxString sPath = child->GetAttribute(wxT("path"), wxEmptyString);
 		if(sPath.Len() > 0)
 		{
 			//check for doubles
@@ -96,20 +53,111 @@ void wxGISInitializer::LoadLibs(wxXmlNode* pRootNode)
 			wxDynamicLibrary* pLib = new wxDynamicLibrary(sPath);
 			if(pLib != NULL)
 			{
-				wxLogMessage(_("wxGISInitializer: Library %s loaded"), sPath.c_str());
+				wxLogMessage(_("wxGISAppWithLibs: Library %s loaded"), sPath.c_str());
 				m_LibMap[sPath] = pLib;
 			}
 			else
-				wxLogError(_("wxGISInitializer: Error loading library %s"), sPath.c_str());
+				wxLogError(_("wxGISAppWithLibs: Error loading library %s"), sPath.c_str());
 		}
 		child = child->GetNext();
 	}
 }
 
-void wxGISInitializer::UnLoadLibs()
+void wxGISAppWithLibs::SerializeLibs()
+{
+	wxGISAppConfigSPtr pConfig;
+	pConfig = GetConfig();
+	if(!pConfig)
+		return;
+	wxXmlNode* pLibsNode(NULL);
+	pLibsNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/libs")));
+	if(pLibsNode)
+		pConfig->DeleteNodeChildren(pLibsNode);
+	else
+		pLibsNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/libs")));
+
+	if(!pLibsNode)
+		return;
+
+    for(LIBMAP::iterator item = m_LibMap.begin(); item != m_LibMap.end(); ++item)
+	{
+		wxXmlNode* pNewNode = new wxXmlNode(pLibsNode, wxXML_ELEMENT_NODE, wxString(wxT("lib")));
+		pNewNode->AddAttribute(wxT("path"), item->first);
+
+		wxFileName FName(item->first);
+		wxString sName = FName.GetName();
+
+		pNewNode->AddAttribute(wxT("name"), sName);
+	}
+}
+
+
+void wxGISAppWithLibs::UnLoadLibs()
 {
     for(LIBMAP::iterator item = m_LibMap.begin(); item != m_LibMap.end(); ++item)
 		wxDELETE(item->second);
+}
+////////////////////////////////////////////////////////////////////////////////
+// wxGISInitializer
+////////////////////////////////////////////////////////////////////////////////
+
+wxGISInitializer::wxGISInitializer(void) : m_pLocale(NULL), m_pszOldLocale(NULL)
+{
+}
+
+wxGISInitializer::~wxGISInitializer(void)
+{
+}
+
+bool wxGISInitializer::Initialize(const wxString &sAppName, const wxString &sLogFilePrefix, wxCmdLineParser& parser)
+{
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+        return false;
+
+	wxString sLogDir = pConfig->GetLogDir();
+	if(!SetupLog(sLogDir, sLogFilePrefix))
+        return false;
+	wxLogMessage(_("wxGISInitializer: %s %s is initializing..."), sAppName.c_str(), wxString(APP_VER).c_str());
+
+	if(!SetupLoc(pConfig->GetLocale(), pConfig->GetLocaleDir()))
+        return false;
+
+	//setup sys dir
+	wxString sSysDir = pConfig->GetSysDir();
+	if(!SetupSys(sSysDir))
+        return false;
+
+	bool bDebugMode = pConfig->GetDebugMode();
+	SetDebugMode(bDebugMode);
+
+	//store values
+	//m_pConfig->SetLogDir(sLogDir);
+	//m_pConfig->SetLocale(sLocale);
+	//m_pConfig->SetLocaleDir(sLocaleDir);
+	//m_pConfig->SetSysDir(sSysDir);
+	//m_pConfig->SetDebugMode(bDebugMode);
+
+    //load libs
+	wxXmlNode* pLibsNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/libs")));
+	if(pLibsNode)
+		LoadLibs(pLibsNode);
+	pLibsNode = pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("wxGISCommon/libs")));
+	if(pLibsNode)
+		LoadLibs(pLibsNode);
+	return true;
+}
+
+void wxGISInitializer::Uninitialize()
+{
+    if(m_pszOldLocale != NULL)
+		setlocale(LC_NUMERIC, m_pszOldLocale);
+    wxDELETE(m_pLocale);
+	wxDELETE(m_pszOldLocale);
+
+	ReleaseConfig();
+
+	UnLoadLibs();
 }
 
 bool wxGISInitializer::SetupSys(const wxString &sSysPath)

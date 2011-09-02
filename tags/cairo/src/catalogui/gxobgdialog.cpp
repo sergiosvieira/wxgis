@@ -382,13 +382,14 @@ BEGIN_EVENT_TABLE(wxGxObjectDialog, wxDialog)
     EVT_UPDATE_UI(wxID_OK, wxGxObjectDialog::OnOKUI)
 END_EVENT_TABLE()
 
-wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, IGxCatalog* pExternalCatalog, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pDropDownCommand(NULL), m_bAllowMultiSelect(false), m_bOverwritePrompt(false), m_nDefaultFilter(0), m_pConfig(NULL), m_pwxGxContentView(NULL), m_PopupCtrl(NULL), m_bAllFilters(true), m_bOwnFilter(true)
+wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, IGxCatalog* pExternalCatalog, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pDropDownCommand(NULL), m_bAllowMultiSelect(false), m_bOverwritePrompt(false), m_nDefaultFilter(0), m_pwxGxContentView(NULL), m_PopupCtrl(NULL), m_bAllFilters(true), m_bOwnFilter(true)
 {
 	this->SetSizeHints( wxSize( 400,300 ), wxDefaultSize );
 
     m_pExternalCatalog = pExternalCatalog; 
     m_pCatalog = new wxGxCatalogUI(true);
 	m_pCatalog->Init(m_pExternalCatalog);
+	m_pCatalog->SetShowExt(true);
 
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
 
@@ -563,7 +564,6 @@ wxGxObjectDialog::~wxGxObjectDialog()
         m_pCatalog->Detach();
         delete m_pCatalog;
     }
-    wxDELETE(m_pConfig);
 }
 
 void wxGxObjectDialog::OnCommand(wxCommandEvent& event)
@@ -703,27 +703,22 @@ int wxGxObjectDialog::ShowModalSave()
 
 void wxGxObjectDialog::OnInit()
 {
-#ifdef WXGISPORTABLE
-    m_pConfig = new wxGISAppConfig(OBJDLG_NAME, CONFIG_DIR, true);
-#else
-	m_pConfig = new wxGISAppConfig(OBJDLG_NAME, CONFIG_DIR);
-#endif
-
     long nStyle = wxLC_LIST | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxBORDER_THEME;
 	if(!m_bAllowMultiSelect)
 		nStyle |= wxLC_SINGLE_SEL;
    	m_pwxGxContentView = new wxGxDialogContentView(this, LISTCTRLID, wxDefaultPosition, wxDefaultSize, nStyle);
     //m_pwxGxContentView->SetExternalCatalog(m_pExternalCatalog);
-    wxXmlNode* pContentViewConf = m_pConfig->GetConfigNode(wxString(wxT("frame/views/contentsview")), true, true);
-
-    m_pwxGxContentView->Activate(this, pContentViewConf);
-    RegisterChildWindow(static_cast<wxWindow*>(m_pwxGxContentView));
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(pConfig)
+	{
+	    wxXmlNode* pContentViewConf = pConfig->GetConfigNode(enumGISHKCU, GetAppName() + wxString(wxT("/frame/views/contentsview")));
+	    m_pwxGxContentView->Activate(this, pContentViewConf);
+	}
+	RegisterChildWindow(static_cast<wxWindow*>(m_pwxGxContentView));
 
 	bMainSizer->Insert(1, m_pwxGxContentView, 1, wxALL|wxEXPAND, 5 );
-//#ifdef __WXGTK__
-    m_pwxGxContentView->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( wxGxObjectDialog::OnItemSelected ), NULL, this );
-    m_pwxGxContentView->Connect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( wxGxObjectDialog::OnItemSelected ), NULL, this );
-//#endif
+	m_pwxGxContentView->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( wxGxObjectDialog::OnItemSelected ), NULL, this );
+	m_pwxGxContentView->Connect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( wxGxObjectDialog::OnItemSelected ), NULL, this );
 
 	for(size_t i = 0; i < m_FilterArray.size(); ++i)
 		m_WildcardCombo->AppendString(m_FilterArray[i]->GetName());
@@ -738,11 +733,10 @@ void wxGxObjectDialog::OnInit()
 
 	if(m_sStartPath.IsEmpty())
 	{
-		wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
 		IGxObject* pObj = dynamic_cast<IGxObject*>(m_pCatalog);
 		wxString sLastPath;
-		if(pLastLocationNode)
-			sLastPath = pLastLocationNode->GetAttribute(wxT("path"), pObj->GetName());
+		if(pConfig)
+			sLastPath = pConfig->Read(enumGISHKCU, GetAppName() + wxString(wxT("/lastpath/path")), pObj->GetName());
 		else
 			sLastPath = pObj->GetName();
 		m_pCatalog->SetLocation(sLastPath);
@@ -921,21 +915,9 @@ void wxGxObjectDialog::OnOK(wxCommandEvent& event)
             if(pData != NULL)
             {
 		        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID);
-				if(pGxObject)
-				{
-					wxString sLastPath = pGxObject->GetFullName();
-					wxXmlNode* pLastLocationNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("lastpath")));
-					if(pLastLocationNode)
-					{
-						if(pLastLocationNode->HasAttribute(wxT("path")))
-							pLastLocationNode->DeleteAttribute(wxT("path"));
-					}
-					else
-					{
-						pLastLocationNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("lastpath")), true);
-					}
-					pLastLocationNode->AddAttribute(wxT("path"), sLastPath);
-				}
+				wxGISAppConfigSPtr pConfig = GetConfig();
+				if(pGxObject && pConfig)
+					pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/lastpath/path")), pGxObject->GetFullName());
             }
         }
 
@@ -951,20 +933,15 @@ void wxGxObjectDialog::OnOK(wxCommandEvent& event)
 
 void wxGxObjectDialog::SerializeFramePos(bool bSave)
 {
-    if(!m_pConfig)
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
         return;
-	wxXmlNode* pFrameXmlNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame")));
 
 	if(bSave)
 	{
-		if(!pFrameXmlNode)
-			pFrameXmlNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame")), true);
-
 		if( IsMaximized() )
 		{
-			if(pFrameXmlNode->HasAttribute(wxT("maxi")))
-				pFrameXmlNode->DeleteAttribute(wxT("maxi"));
-			pFrameXmlNode->AddAttribute(wxT("maxi"), wxT("1"));
+			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/maxi")), true);
 		}
 		else
 		{
@@ -972,39 +949,24 @@ void wxGxObjectDialog::SerializeFramePos(bool bSave)
 			GetClientSize(&w, &h);
 			GetPosition(&x, &y);
 
-			wxXmlAttribute* prop = pFrameXmlNode->GetAttributes();
-			while(prop)
-			{
-				wxXmlAttribute* prev_prop = prop;
-				prop = prop->GetNext();
-				wxDELETE(prev_prop);
-			}
-			wxXmlAttribute* pHProp = new wxXmlAttribute(wxT("Height"), wxString::Format(wxT("%u"), h), NULL);
-			wxXmlAttribute* pWProp = new wxXmlAttribute(wxT("Width"), wxString::Format(wxT("%u"), w), pHProp);
-			wxXmlAttribute* pYProp = new wxXmlAttribute(wxT("YPos"), wxString::Format(wxT("%d"), y), pWProp);
-			wxXmlAttribute* pXProp = new wxXmlAttribute(wxT("XPos"), wxString::Format(wxT("%d"), x), pYProp);
-			wxXmlAttribute* pMaxi = new wxXmlAttribute(wxT("maxi"), wxT("0"), pXProp);
-
-			pFrameXmlNode->SetAttributes(pMaxi);
+			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/maxi")), false);
+			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/width")), w);
+			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/height")), h);
+			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/xpos")), x);
+			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/ypos")), y);
 		}
 	}
 	else
 	{
 		//load
-		if(!pFrameXmlNode)
-			pFrameXmlNode = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame")));
-
-		if(pFrameXmlNode == NULL)
-			return;
-
-		bool bMaxi = wxAtoi(pFrameXmlNode->GetAttribute(wxT("maxi"), wxT("0"))) == 1;
+		bool bMaxi = pConfig->ReadBool(enumGISHKCU, GetAppName() + wxString(wxT("/frame/maxi")), false);
 		if(!bMaxi)
 		{
-			int x = wxAtoi(pFrameXmlNode->GetAttribute(wxT("XPos"), wxT("50")));
-			int y = wxAtoi(pFrameXmlNode->GetAttribute(wxT("YPos"), wxT("50")));
-			int w = wxAtoi(pFrameXmlNode->GetAttribute(wxT("Width"), wxT("850")));
-			int h = wxAtoi(pFrameXmlNode->GetAttribute(wxT("Height"), wxT("530")));
-
+			int x = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/xpos")), 50);
+			int y = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/ypos")), 50);
+			int w = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/width")), 450);
+			int h = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/height")), 650);
+			
 			Move(x, y);
 			SetClientSize(w, h);
 		}
@@ -1041,17 +1003,28 @@ void wxGxObjectDialog::OnOKUI(wxUpdateUIEvent& event)
 
 wxString wxGxObjectDialog::GetNameWithExt(void)
 {
-    wxString sName = GetName();
+	if(m_bIsSaveDlg)
+	{
+		wxString sName = GetName();
 
-    IGxObjectFilter* pFilter = GetCurrentFilter();
-    if(pFilter)
-    {
-        wxString sExt;
-        sExt = pFilter->GetExt();
-        if(!sExt.IsEmpty())
-            sName += wxT(".") + sExt;
-    }
-    return sName;
+		IGxObjectFilter* pFilter = GetCurrentFilter();
+		if(pFilter)
+		{
+			wxString sExt;
+			sExt = pFilter->GetExt();
+			if(!sExt.IsEmpty())
+				sName += wxT(".") + sExt;
+		}
+		return sName;
+	}
+	else
+	{
+		if(m_ObjectArray.size() > 0)
+		{
+			return m_ObjectArray[0]->GetName();
+		}
+	}
+	return wxEmptyString;
 }
 
 wxString wxGxObjectDialog::GetName(void)

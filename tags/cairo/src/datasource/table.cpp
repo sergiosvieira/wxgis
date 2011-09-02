@@ -67,7 +67,7 @@ bool wxGISTable::Open(int iLayer, int bUpdate, bool bCache, ITrackCancel* pTrack
 		if( m_poDS == NULL )
 		{
 			const char* err = CPLGetLastErrorMsg();
-			wxString sErr = wxString::Format(_("wxGISTable: Open failed! Path '%s'. OGR error: %s"), wxString(m_sPath, wxConvUTF8).c_str(), wxString(err, wxConvLocal).c_str());
+			wxString sErr = wxString::Format(_("wxGISTable: Open failed! Path '%s'. OGR error: %s"), wxString(m_sPath, wxConvUTF8).c_str(), wxString(err, wxConvUTF8).c_str());
 			wxLogError(sErr);
 			if(pTrackCancel)
 				pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
@@ -468,7 +468,7 @@ wxString wxGISTable::GetAsString(OGRFeatureSPtr pFeature, int nField, wxFontEnco
 			char** papszLinkList = pFeature->GetFieldAsStringList(nField);
 			for(int i = 0; papszLinkList[i] != NULL; ++i )
 			{
-				sOut += wgMB2WX(papszLinkList[i]);
+				sOut += wxString(papszLinkList[i], wxConvLocal);
 				sOut += wxString(wxT("|"));
 			}
 		}
@@ -654,7 +654,7 @@ OGRErr wxGISTable::SetIgnoredFields(wxArrayString &saIgnoredFields)
 
         char **papszIgnoredFields = NULL;
         for(size_t i = 0; i < saIgnoredFields.GetCount(); ++i)
-            papszIgnoredFields = CSLAddString( papszIgnoredFields, wgWX2MB(saIgnoredFields[i]) );
+            papszIgnoredFields = CSLAddString( papszIgnoredFields, saIgnoredFields[i].mb_str(wxConvLocal) );
 
         OGRErr eErr = m_poLayer->SetIgnoredFields((const char**)papszIgnoredFields);
         CSLDestroy( papszIgnoredFields );

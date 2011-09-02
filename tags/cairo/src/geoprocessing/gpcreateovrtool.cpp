@@ -275,7 +275,7 @@ bool wxGISGPCreateOverviewsTool::Execute(ITrackCancel* pTrackCancel)
 
     wxString sResampleMethod = m_paParam[1]->GetValue();
     wxString sCompress = m_paParam[2]->GetValue();
-    CPLSetConfigOption( "COMPRESS_OVERVIEW", wgWX2MB(sCompress) );
+	CPLSetConfigOption( "COMPRESS_OVERVIEW", sCompress.mb_str() );
 
     if(pSrcDataSet->GetSubType() == enumRasterImg)
     {
@@ -294,13 +294,13 @@ bool wxGISGPCreateOverviewsTool::Execute(ITrackCancel* pTrackCancel)
 		anOverviewList[i] = nLevel;
 	}
 
-    CPLErr eErr = poGDALDataset->BuildOverviews( wgWX2MB(sResampleMethod), nLevelCount, anOverviewList, 0, NULL, ExecToolProgress, (void*)pTrackCancel );
+	CPLErr eErr = poGDALDataset->BuildOverviews( sResampleMethod.mb_str(), nLevelCount, anOverviewList, 0, NULL, ExecToolProgress, (void*)pTrackCancel );
     if(eErr != CE_None)
     {
         if(pTrackCancel)
         {
             const char* pszErr = CPLGetLastErrorMsg();
-            pTrackCancel->PutMessage(wxString::Format(_("BuildOverviews failed! GDAL error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString::Format(_("BuildOverviews failed! GDAL error: %s"), wxString(pszErr, wxConvUTF8).c_str()), -1, enumGISMessageErr);
         }
         return false;
     }

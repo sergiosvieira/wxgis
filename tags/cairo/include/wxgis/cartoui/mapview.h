@@ -24,7 +24,7 @@
 #include "wxgis/carto/map.h"
 #include "wxgis/cartoui/cartoui.h"
 
-class wxGISMapView;
+class WXDLLIMPEXP_GIS_CTU wxGISMapView;
 
 /** \class wxMapDrawingThread mapview.h
     \brief A Map Drawing thread class.

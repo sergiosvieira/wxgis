@@ -21,20 +21,23 @@
 #include "wxgis/framework/accelerator.h"
 #include "wx/tokenzr.h"
 
-wxGISAcceleratorTable::wxGISAcceleratorTable(IFrameApplication* pApp, IGISConfig* pConf) : bHasChanges(true)
+wxGISAcceleratorTable::wxGISAcceleratorTable(IFrameApplication* pApp) : bHasChanges(true)
 {
 	m_AccelEntryArray.reserve(20);
-	m_pConf = pConf;
 
-	wxXmlNode* pAcceleratorsNodeCU = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("accelerators")));
-	wxXmlNode* pAcceleratorsNodeLM = m_pConf->GetConfigNode(enumGISHKLM, wxString(wxT("accelerators")));
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return;
+
+	wxXmlNode* pAcceleratorsNodeCU = pConfig->GetConfigNode(enumGISHKCU, pApp->GetAppName() + wxString(wxT("/accelerators")));
+	wxXmlNode* pAcceleratorsNodeLM = pConfig->GetConfigNode(enumGISHKLM, pApp->GetAppName() + wxString(wxT("/accelerators")));
 	//merge two tables
 	m_pApp = pApp;
 	if(!pApp)
 		return;
 
-	//merge acc tables
-	//if user delete key - it must be mark as deleted to avoid adding it fron LM table
+	//TODO: merge acc tables
+	//TODO: if user delete key - it must be mark as deleted to avoid adding it fron LM table
 
 	if(pAcceleratorsNodeCU)
 	{
@@ -161,11 +164,15 @@ wxString wxGISAcceleratorTable::GetText(int cmd)
 
 void wxGISAcceleratorTable::Store(void)
 {
-	wxXmlNode* pAcceleratorsNodeCU = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("accelerators")));
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return;
+
+	wxXmlNode* pAcceleratorsNodeCU = pConfig->GetConfigNode(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/accelerators")));
 	if(pAcceleratorsNodeCU)
-		wxGISConfig::DeleteNodeChildren(pAcceleratorsNodeCU);
+		pConfig->DeleteNodeChildren(pAcceleratorsNodeCU);
 	else
-		pAcceleratorsNodeCU = m_pConf->CreateConfigNode(enumGISHKCU, wxString(wxT("accelerators")), true);
+		pAcceleratorsNodeCU = pConfig->CreateConfigNode(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/accelerators")));
 	for(size_t i = 0; i < m_AccelEntryArray.size(); ++i)
 	{
 		ICommand* pCmd = m_pApp->GetCommand(m_AccelEntryArray[i].GetCommand());

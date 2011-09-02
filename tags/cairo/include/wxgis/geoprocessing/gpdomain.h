@@ -37,6 +37,9 @@ public:
 	virtual size_t GetCount(void);
 	virtual wxVariant GetValue(size_t nIndex);
 	virtual wxString GetName(size_t nIndex);
+    virtual void Clear(void);
+	virtual bool GetAltered(void){return m_bAltered;};
+	virtual void SetAltered(bool bAltered){m_bAltered = bAltered;};
 	//
     virtual wxVariant GetValueByName(wxString soNameStr);
 	virtual int GetPosByName(wxString sName);

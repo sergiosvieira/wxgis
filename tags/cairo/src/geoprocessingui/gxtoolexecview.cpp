@@ -455,7 +455,10 @@ void wxGxToolExecuteView::OnObjectAdded(wxGxCatalogEvent& event)
 	if(!pGxObject)
 		return;
 
-	if(pGxObject->GetParent()->GetID() == m_nParentGxObjectID)
+	IGxObject* pParentGxObject = pGxObject->GetParent();
+	if(!pParentGxObject)
+		return;
+	if(pParentGxObject->GetID() == m_nParentGxObjectID)
 	{
 		AddObject(pGxObject.get());
 		//SORTTASKDATA sortdata = {m_bSortAsc, m_currentSortCol};
@@ -552,7 +555,11 @@ void wxGxToolExecuteView::OnObjectRefreshed(wxGxCatalogEvent& event)
 	IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(event.GetObjectID());
 	if(!pGxObject)
 		return;
-    if(pGxObject->GetParent()->GetID() == m_nParentGxObjectID)
+	IGxObject* pParentGxObject = pGxObject->GetParent();
+	if(!pParentGxObject)
+		return;
+
+    if(pParentGxObject->GetID() == m_nParentGxObjectID)
     {
 	    OnObjectChanged(event);
     }

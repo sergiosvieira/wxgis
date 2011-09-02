@@ -97,20 +97,12 @@ public:
 	virtual INetSearchCallback* GetCallback(void) = 0;
 	virtual wxString GetName(void) = 0;
     virtual INetClientConnection* GetConnection(wxXmlNode* pProp) = 0;
-    /** \fn wxXmlNode* GetAttributes(void)
-     *  \brief Get Properties of Factory.
-     *  \return The properties of the Factory.
-	 *
-	 *  It should be the new wxXmlNode (not a pointer to other xml data)
+    /** \fn void Serialize(wxXmlNode* pConfigNode, bool bSave)
+     *  \brief Store Properties of Factory.
+     *  \param pConfigNode wxXmlNode to store params.
+     *  \param bSave Set or Get indicator.
      */	 	
-	virtual wxXmlNode* GetAttributes(void) = 0;
-    /** \fn void SetAttributes(wxXmlNode* pProp)
-     *  \brief Set Properties of plugin.
-     *  \param pProp The properties of the plugin
-	 *
-	 *  Executed while LoadPlugins (after flugin created). 
-     */	  
-	virtual void SetAttributes(const wxXmlNode* pProp) = 0;
+    virtual void Serialize(wxXmlNode* pConfigNode, bool bSave = true) = 0;
 
 	//virtual char GetID(void) = 0;
 	//virtual void SetID(char nID) = 0;

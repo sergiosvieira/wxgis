@@ -60,7 +60,7 @@ public:
 	virtual wxString GetCategory(void){return wxString(_("Coordinate Systems Folder"));};
     //IGxRootObjectProperties
     virtual void Init(wxXmlNode* const pConfigNode);
-    virtual wxXmlNode* GetAttributes(void);
+    virtual void Serialize(wxXmlNode* pConfigNode);
 protected:
 	wxString m_sInternalPath;
 };

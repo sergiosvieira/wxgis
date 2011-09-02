@@ -84,11 +84,11 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
 	m_staticline1 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
 	bMainSizer->Add( m_staticline1, 0, wxEXPAND|wxALL, 5 );
 
-    wxString sGEOSStr = wgMB2WX(GEOSversion());
-    wxString sPrjStr = wgMB2WX(pj_get_release());
-    wxString sGDALStr = wgMB2WX(GDAL_RELEASE_NAME);
+    wxString sGEOSStr = wxString(GEOSversion(), wxConvLocal);
+    wxString sPrjStr = wxString(pj_get_release(), wxConvLocal);
+    wxString sGDALStr = wxString(GDAL_RELEASE_NAME, wxConvLocal);
     wxString sWXStr = wxVERSION_STRING;	
-    wxString sCAIROStr = wgMB2WX(cairo_version_string());
+    wxString sCAIROStr = wxString(cairo_version_string(), wxConvLocal);
 
 	m_AuiNotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE );
 

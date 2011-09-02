@@ -25,7 +25,12 @@
 #include "wx/filename.h"
 #include "wx/tokenzr.h"
 
+int main(int argc, char **argv)
+{
+    return EXIT_SUCCESS;
 
+}
+/*
 int main(int argc, char **argv)
 {
 #if wxUSE_UNICODE
@@ -291,4 +296,4 @@ wxXmlNode* GetConfigNode(wxArrayString& aTokens, wxGISAppConfigSPtr& pConfig)
     return pChildNode;
     //return NULL;
 }
-
+*/

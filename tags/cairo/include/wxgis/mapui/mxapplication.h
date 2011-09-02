@@ -40,7 +40,7 @@ public:
 	virtual ~wxMxApplication(void);
 	//IFrameApplication
     virtual wxString GetAppName(void){return wxString(wxT("wxGISMap"));};
-    virtual bool Create(IGISConfig* pConfig);
+    virtual bool Create(void);
 	virtual wxIcon GetAppIcon(void){return m_pAppIcon;};
 protected:
 	wxIcon m_pAppIcon;

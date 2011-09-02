@@ -32,9 +32,9 @@ int CPL_STDCALL ExecToolProgress( double dfComplete, const char *pszMessage, voi
     {
         if( pszMessage )
         {
-            wxString soMsg(wgMB2WX(pszMessage));
+            wxString soMsg(pszMessage, wxConvUTF8);
             if(!soMsg.IsEmpty())
-                pTrackCancel->PutMessage( wgMB2WX(pszMessage), -1, enumGISMessageNorm );
+                pTrackCancel->PutMessage( soMsg, -1, enumGISMessageNorm );
         }
         IProgressor* pRogress = pTrackCancel->GetProgressor();
         if( pRogress )

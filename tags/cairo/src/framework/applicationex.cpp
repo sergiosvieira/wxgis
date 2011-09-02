@@ -39,25 +39,17 @@ wxGISApplicationEx::~wxGISApplicationEx(void)
 
 void wxGISApplicationEx::SerializeFramePosEx(bool bSave)
 {
-	wxXmlNode *pPerspectiveXmlNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/perspective")));
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return;
+
+	wxXmlNode *pPerspectiveXmlNode = pConfig->GetConfigNode(enumGISHKCU, GetAppName() + wxString(wxT("/frame/perspective")));
 	if(bSave)
-	{
-		if(pPerspectiveXmlNode)
-		{
-			if(pPerspectiveXmlNode->HasAttribute(wxT("data")))
-				pPerspectiveXmlNode->DeleteAttribute(wxT("data"));
-		}
-		else
-			pPerspectiveXmlNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame/perspective")), true);
-		pPerspectiveXmlNode->AddAttribute(wxT("data"), m_mgr.SavePerspective());
-	}
+		pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/perspective/data")), m_mgr.SavePerspective());
 	else
 	{
-		if(pPerspectiveXmlNode)
-		{
-			wxString wxPerspective = pPerspectiveXmlNode->GetAttribute(wxT("data"), wxT(""));
-			m_mgr.LoadPerspective(wxPerspective);
-		}
+		wxString wxPerspective = pConfig->Read(enumGISHKCU, GetAppName() + wxString(wxT("/frame/perspective/data")), wxEmptyString);
+		m_mgr.LoadPerspective(wxPerspective);
 	}
 }
 
@@ -182,11 +174,11 @@ void wxGISApplicationEx::UnRegisterChildWindow(wxWindow* pWnd)
 		m_WindowArray.erase(pos);
 }
 
-bool wxGISApplicationEx::Create(IGISConfig* pConfig)
+bool wxGISApplicationEx::Create(void)
 {
 	m_mgr.SetManagedWindow(this);
 
-    wxGISApplication::Create(pConfig);
+    wxGISApplication::Create();
 
 	wxLogMessage(_("wxGISApplicationEx: Start. Creating main application frame..."));
 
@@ -252,11 +244,12 @@ void wxGISApplicationEx::OnClose(wxCloseEvent& event)
   //  }
 }
 
-bool wxGISApplicationEx::SetupSys(wxString sSysPath)
+bool wxGISApplicationEx::SetupSys(const wxString &sSysPath)
 {
     if(!wxGISApplication::SetupSys(sSysPath))
         return false;
-    CPLSetConfigOption("GDAL_DATA", wgWX2MB( (sSysPath + wxFileName::GetPathSeparator() + wxString(wxT("gdal")) + wxFileName::GetPathSeparator()).c_str() ) );
+	wxString sGdalDataDir = sSysPath + wxFileName::GetPathSeparator() + wxString(wxT("gdal")) + wxFileName::GetPathSeparator();
+	CPLSetConfigOption("GDAL_DATA", sGdalDataDir.mb_str(wxConvUTF8) );
     return true;
 }
 
@@ -267,12 +260,12 @@ void wxGISApplicationEx::SetDebugMode(bool bDebugMode)
 	CPLSetConfigOption("CPL_LOG_ERRORS", bDebugMode == true ? "ON" : "OFF");
 }
 
-bool wxGISApplicationEx::SetupLog(wxString sLogPath)
+bool wxGISApplicationEx::SetupLog(const wxString &sLogPath)
 {
     if(!wxGISApplication::SetupLog(sLogPath))
         return false;
 	wxString sCPLLogPath = sLogPath + wxFileName::GetPathSeparator() + wxString(wxT("gdal_log_cat.txt"));
-	CPLSetConfigOption("CPL_LOG", wgWX2MB(sCPLLogPath.c_str()) );
+	CPLSetConfigOption("CPL_LOG", sCPLLogPath.mb_str(wxConvUTF8) );
     return true;
 }
 

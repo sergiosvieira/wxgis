@@ -77,7 +77,7 @@ wxFontEncoding GetEncodingFromCpg(CPLString sPath)
         return wxFONTENCODING_DEFAULT;
 	}
 
-    wxString sCP = wgMB2WX(pszWKT);
+    wxString sCP(pszWKT, wxConvLocal);
 	
 	CSLDestroy( papszLines );
     int pos;
@@ -375,7 +375,7 @@ bool CopyFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCance
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_FileIO, sFullErr);
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -389,7 +389,7 @@ bool CopyFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCance
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_FileIO, sFullErr);
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 

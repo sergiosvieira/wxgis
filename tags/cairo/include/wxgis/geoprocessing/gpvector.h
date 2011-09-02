@@ -23,6 +23,7 @@
 
 #include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/datasource/featuredataset.h"
+#include "wxgis/core/format.h"
 
 /** \fn bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstDataSet, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL); 
   *  \brief Copy rows from one format (file) to another.
@@ -51,9 +52,9 @@ wxGISFeatureDatasetSPtr WXDLLIMPEXP_GIS_GP CreateVectorLayer(CPLString sPath, wx
   *  \brief Write shape coordinates to text file.
   *  \return true if write is succeeded, false overwise
   */	
-bool WXDLLIMPEXP_GIS_GP GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, const CPLString &osFrmt, bool bSwapXY = false, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
-CPLString WXDLLIMPEXP_GIS_GP GeometryToText(long nGeomFID, OGRGeometry* pGeom, const CPLString &osFrmt, bool bSwap = false, ITrackCancel* pTrackCancel = NULL);
-void WXDLLIMPEXP_GIS_GP PointToText(CPLString &osData, OGRPoint* pPoint, const CPLString &osFrmt, bool bSwap = false);
-void WXDLLIMPEXP_GIS_GP LineToText(CPLString &osData, OGRLineString* pLine, const CPLString &osFrmt, bool bSwap = false);
+bool WXDLLIMPEXP_GIS_GP GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxGISCoordinatesFormat &oFrmt, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
+CPLString WXDLLIMPEXP_GIS_GP GeometryToText(long nGeomFID, OGRGeometry* pGeom, wxGISCoordinatesFormat &oFrmt, ITrackCancel* pTrackCancel = NULL);
+void WXDLLIMPEXP_GIS_GP PointToText(CPLString &osData, OGRPoint* pPoint, wxGISCoordinatesFormat &oFrmt);
+void WXDLLIMPEXP_GIS_GP LineToText(CPLString &osData, OGRLineString* pLine, wxGISCoordinatesFormat &oFrmt);
 
 
