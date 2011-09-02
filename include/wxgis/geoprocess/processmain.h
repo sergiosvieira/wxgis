@@ -57,7 +57,7 @@ public:
     virtual void Stop(void){};
 	virtual void SetYield(bool bYield = false){};
 	//wxGISInitializer
-	virtual bool Initialize(const wxString &sAppName, const wxString &sConfigDir, const wxString &sLogFilePrefix, wxCmdLineParser& parser);
+	virtual bool Initialize(const wxString &sAppName, const wxString &sLogFilePrefix, wxCmdLineParser& parser);
 	virtual void Uninitialize();
 protected:
     int m_nValue;

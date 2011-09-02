@@ -30,29 +30,17 @@
 
 #define wgDELETE(p,func) if(p != NULL) {p->func; delete p; p = NULL;}
 #define wsDELETE(p) if(p != NULL) {p->Release(); p = NULL;}
-#define wgWX2MB(x)  wxConvCurrent->cWX2MB(x)
-#define wgMB2WX(x)  wxConvCurrent->cMB2WX(x)
+//#define wgWX2MB(x)  wxConvCurrent->cWX2MB(x)
+//#define wgMB2WX(x)  wxConvCurrent->cMB2WX(x)
 
 enum wxGISEnumConfigKey
 {
-	enumGISHKLM = 0x0000,
-	enumGISHKCU = 0x0001,
-	enumGISHKCC = 0x0002,
-	enumGISHKCR = 0x0004
-};
-
-class IGISConfig
-{
-public:
-	virtual ~IGISConfig(void){};
-	//pure virtual
-    virtual wxXmlNode* GetConfigNode(wxGISEnumConfigKey Key, wxString sPath) = 0;
-	virtual wxXmlNode* CreateConfigNode(wxGISEnumConfigKey Key, wxString sPath, bool bUniq) = 0;
-    virtual wxXmlNode* GetConfigNode(wxString sPath, bool bCreateInCU, bool bUniq) = 0;
-
-	//virtual wxXmlNode* GetRootNodeByName(wxString sApp, bool bUser, wxString sName) = 0;
-	//virtual wxXmlNode* GetNodeByName(wxXmlNode* pRoot, wxString sName) = 0;
-	//virtual wxXmlNode* GetXmlConfig(wxString sApp, bool bUser) = 0;
+	enumGISHKLM = 0x0001,
+	enumGISHKCU = 0x0002
+	//,
+	//enumGISHKCC = 0x0004,
+	//enumGISHKCR = 0x0008,
+	//enumGISHKAny = enumGISHKLM & enumGISHKCU
 };
 
 /** \class IApplication core.h
@@ -68,13 +56,12 @@ public:
 	//pure virtual
 	virtual void OnAppAbout(void) = 0;
     virtual void OnAppOptions(void) = 0;
-	virtual IGISConfig* GetConfig(void) = 0;
 	virtual wxString GetAppName(void) = 0;
 	virtual wxString GetAppVersionString(void) = 0;
-    virtual bool Create(IGISConfig* pConfig) = 0;
-    virtual bool SetupLog(wxString sLogPath) = 0;
-    virtual bool SetupLoc(wxString sLoc, wxString sLocPath) = 0;
-    virtual bool SetupSys(wxString sSysPath) = 0;
+    virtual bool Create(void) = 0;
+    virtual bool SetupLog(const wxString &sLogPath) = 0;
+    virtual bool SetupLoc(const wxString &sLoc, const wxString &sLocPath) = 0;
+    virtual bool SetupSys(const wxString &sSysPath) = 0;
     virtual void SetDebugMode(bool bDebugMode) = 0;
 };
 
@@ -251,49 +238,6 @@ static bool CreateAndRunThread(wxThread* pThread, wxString sClassName = wxEmptyS
 	return true;
 }
 
-#define hibyte(a) ((a>>8) & 0xFF)
-#define lobyte(a) ((a) & 0xFF)
-
-static wxString Encode(wxString sInput, wxString sPass)
-{
-    wxString sRes;
-  //  size_t pos(0);
-  //  for(size_t i = 0; i < sInput.Len(); ++i)
-  //  {
-  //      if(pos == sPass.Len())
-  //          pos = 0;
-  //      wxChar Symbol = sInput[i] ^ sPass[pos];
-  //      char SymbolHi = hibyte(Symbol);
-  //      char SymbolLo = lobyte(Symbol);//(Symbol >> 4) & 0xff;
-		//sRes += wxDecToHex(SymbolHi);
-		//sRes += wxDecToHex(SymbolLo);
-  //      pos++;
-  //  }
-    return sRes;
-}
-
-static wxString Decode(wxString sInput, wxString sPass)
-{
-    wxString sRes;
-  //  size_t pos(0);
-  //  for(size_t i = 0; i < sInput.Len(); i += 4)
-  //  {
-  //      if(pos == sPass.Len())
-  //          pos = 0;
-		//wxString sHex = sInput[i];
-		//sHex += sInput[i + 1]; 
-  //      char SymbolHi = wxHexToDec(sHex);
-  //      sHex = sInput[i + 2];
-		//sHex += sInput[i + 3];
-  //      char SymbolLo = wxHexToDec(sHex);
-  //      wxChar Symbol = (SymbolHi << 8) + SymbolLo;
-  //      Symbol = Symbol ^ sPass[pos];
-  //      sRes += Symbol;
-  //      pos++;
-  //  }
-    return sRes;
-}
-
 /** \enum wxGISEnumTaskStateType core.h
  *  \brief The process task state.
  */
@@ -359,77 +303,6 @@ public:
 
 #define DEFINE_SHARED_PTR(x) typedef boost::shared_ptr<x> x##SPtr
 #define DEFINE_WEAK_PTR(x) typedef boost::weak_ptr<x> x##WPtr
-
-static wxString DoubleToString(double Val, bool IsLon)
-{
-	wxString znak;
-	if(Val < 0)
-	{
-		if(IsLon) znak = _(" W");
-		else znak = _(" S");
-	}
-	else
-	{
-		if(IsLon) znak = _(" E");
-		else znak = _(" N");
-	}
-	Val = fabs(Val);
-	int grad = floor(Val);
-	int min = floor((Val - grad) * 60);
-	int sec = floor((Val - grad - (double) min / 60) * 3600);
-	wxString str;
-	if(IsLon)
-		str.Printf(wxT("%.3d-%.2d-%.2d%s"), grad, min, sec, znak.c_str());
-	else
-		str.Printf(wxT("%.2d-%.2d-%.2d%s"), grad, min, sec, znak.c_str());
-	return str;
-};
-
-static double StringToDouble(wxString Val, wxString asterisk)
-{
-	wxString buff;
-	unsigned char counter = 0;
-	int grad, min, sec;
-	for(size_t i = 0; i < Val.Len(); ++i)
-	{
-		wxChar ch = Val[i];
-		if(ch == '-' || ch == ' ')
-		{
-			switch(counter)
-			{
-				case 0:
-				grad = wxAtoi(buff.c_str());
-				break;
-				case 1:
-				min = wxAtoi(buff.c_str());
-				break;
-				case 2:
-				sec = wxAtoi(buff.c_str());
-				break;
-			}
-		}
-	}
-	int mul = -1;
-	if(buff == _(" E") || buff == _(" N"))
-		mul = 1;
-	return ((double) grad + (double)min / 60 + (double)sec / 3600) * mul;
-};
-
-static wxString NumberScale(double fScaleRatio)
-{
-	wxString str = wxString::Format(wxT("%.2f"), fScaleRatio);
-	int pos = str.Find(wxT("."));
-	if(pos == wxNOT_FOUND)
-		pos = str.Len();
-	wxString res = str.Right(str.Len() - pos);
-	for(size_t i = 1; i < pos + 1; ++i)
-	{
-		res.Prepend(str[pos - i]);
-		if((i % 3) == 0)
-			res.Prepend(wxT(" "));
-	}
-	return res;
-};
 
 //std::numeric_limits<double>::epsilon() * 20
 //FLT_EPSILON

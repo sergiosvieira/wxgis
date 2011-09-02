@@ -32,3 +32,5 @@ extern WXDLLIMPEXP_GIS_CORE void SetApplication(IApplication* pApp)
 {
 	g_pApplication = pApp;
 }
+
+

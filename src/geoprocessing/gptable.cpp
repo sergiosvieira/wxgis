@@ -24,7 +24,7 @@ wxGISTableSPtr CreateTable(CPLString sPath, wxString sName, wxString sExt, wxStr
 {
     CPLErrorReset();
     poFields->Reference();
-    OGRSFDriver *poDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName( wgWX2MB(sDriver) );
+	OGRSFDriver *poDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName( sDriver.mb_str() );
     if(poDriver == NULL)
     {
         wxString sErr = wxString::Format(_("The driver '%s' is not available! OGR error: "), sDriver.c_str());
@@ -116,7 +116,7 @@ bool MeanValByColumn(wxGISTableSPtr pDSet, CPLString sPath, wxString sName, std:
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 

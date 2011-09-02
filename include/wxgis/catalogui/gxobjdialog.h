@@ -186,9 +186,8 @@ public:
 	virtual ICommand* GetCommand(long CmdID);
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
     virtual wxString GetAppName(void){return wxString(OBJDLG_NAME);};
-    virtual wxString GetAppVersionString(void){return wxString(wxT("0.0.0"));};
+    virtual wxString GetAppVersionString(void){return wxString(APP_VER);};
     virtual IStatusBar* GetStatusBar(void){return NULL;};
-    virtual IGISConfig* GetConfig(void){return m_pConfig;};
     virtual void OnAppAbout(void){};
     virtual void OnAppOptions(void){};
 	virtual wxIcon GetAppIcon(void){return wxNullIcon;};
@@ -208,10 +207,10 @@ public:
 	virtual void OnMouseUp(wxMouseEvent& event){};
 	virtual void OnMouseDoubleClick(wxMouseEvent& event){};
 	virtual void OnMouseMove(wxMouseEvent& event){};
-    virtual bool Create(IGISConfig* pConfig){return true;};
-    virtual bool SetupLog(wxString sLogPath){return true;};
-    virtual bool SetupLoc(wxString sLoc, wxString sLocPath){return true;};
-    virtual bool SetupSys(wxString sSysPath){return true;};
+    virtual bool Create(void){return true;};
+    virtual bool SetupLog(const wxString &sLogPath){return true;};
+    virtual bool SetupLoc(const wxString &sLoc, const wxString &sLocPath){return true;};
+    virtual bool SetupSys(const wxString &sSysPath){return true;};
     virtual void SetDebugMode(bool bDebugMode){};
 
 //wxGxObjectDialog
@@ -254,7 +253,6 @@ protected:
  	COMMANDARRAY m_CommandArray;
   	wxGxCatalogUI* m_pCatalog;
   	IGxCatalog* m_pExternalCatalog;
-    wxGISAppConfig* m_pConfig;
     wxGxDialogContentView* m_pwxGxContentView;
     wxTreeViewComboPopup* m_PopupCtrl;
     IDropDownCommand* m_pDropDownCommand;

@@ -20,9 +20,9 @@
  ****************************************************************************/
 #include "wxgis/cartoui/mapview.h"
 #include "wxgis/cartoui/mxeventui.h"
-
 #include "wxgis/datasource/featuredataset.h"
 #include "wxgis/carto/featurelayer.h"
+#include "wxgis/core/format.h"
 
 //#include <wx/dcbuffer.h>
 

@@ -27,7 +27,7 @@
 class WXDLLIMPEXP_GIS_FRW wxGISAcceleratorTable
 {
 public:
-	wxGISAcceleratorTable(IFrameApplication* pApp, IGISConfig* pConf);
+	wxGISAcceleratorTable(IFrameApplication* pApp);
 	virtual ~wxGISAcceleratorTable(void);
 	virtual int Add(wxAcceleratorEntry entry);
 	virtual void Remove(wxAcceleratorEntry entry);
@@ -43,6 +43,5 @@ private:
 	std::vector<wxAcceleratorEntry> m_AccelEntryArray;
 	bool bHasChanges;
 	wxAcceleratorTable m_ATab;
-	IGISConfig* m_pConf;
 	IFrameApplication* m_pApp;
 };

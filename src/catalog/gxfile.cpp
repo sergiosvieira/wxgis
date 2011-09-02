@@ -57,7 +57,7 @@ bool wxGxFile::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
     }
 }
@@ -79,7 +79,7 @@ bool wxGxFile::Rename(wxString NewName)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Rename"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
     }
 	return false;
@@ -188,7 +188,7 @@ OGRSpatialReferenceSPtr wxGxPrjFile::GetSpatialReference(void)
 	else
 	{
 		const char* err = CPLGetLastErrorMsg();
-		wxString sErr = wxString::Format(_("wxGxPrjFile: GDAL error: %s"), wgMB2WX(err));
+		wxString sErr = wxString::Format(_("wxGxPrjFile: GDAL error: %s"), wxString(err, wxConvUTF8).c_str());
 		wxLogError(sErr);
 	}
 	return OGRSpatialReferenceSPtr();

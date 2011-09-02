@@ -107,16 +107,24 @@ void wxGPProcess::ProcessInput(wxString sInputData)
 /// Class wxGISGPToolManager
 ///////////////////////////////////////////////////////////////////////////////
 
-wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode) : m_nRunningTasks(0)
+wxGISGPToolManager::wxGISGPToolManager(void) : m_nRunningTasks(0)
 {
-    m_pToolsNode = pToolsNode;
-    m_nMaxTasks = wxAtoi(m_pToolsNode->GetAttribute(wxT("max_tasks"), wxString::Format(wxT("%d"), wxThread::GetCPUCount())));
+	m_bIsOk = false;
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return;
+	
+    m_nMaxTasks = pConfig->ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/max_tasks")), wxThread::GetCPUCount());
 #ifdef __WXMSW__
-    m_sGeoprocessPath = m_pToolsNode->GetAttribute(wxT("gp_exec"), wxString(wxT("wxGISGeoprocess.exe")));
+    m_sGeoprocessPath = pConfig->Read(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/gp_exec")), wxString(wxT("wxGISGeoprocess.exe")));
 #else
-    m_sGeoprocessPath = m_pToolsNode->GetAttribute(wxT("gp_exec"), wxString(wxT("wxGISGeoprocess")));
+    m_sGeoprocessPath = pConfig->Read(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/gp_exec")), wxString(wxT("wxGISGeoprocess"));
 #endif
-    wxXmlNode *pChild = m_pToolsNode->GetChildren();
+	wxXmlNode *pToolsNode = pConfig->GetConfigNode(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools")));
+	if(!pToolsNode)
+		return;
+
+	wxXmlNode *pChild = pToolsNode->GetChildren();
     while (pChild)
     {
         wxString sName = pChild->GetAttribute(wxT("object"), NONAME);
@@ -142,35 +150,39 @@ wxGISGPToolManager::wxGISGPToolManager(wxXmlNode* pToolsNode) : m_nRunningTasks(
             wxLogError(_("Create %s object failed!"), sName.c_str());
         pChild = pChild->GetNext();
     }
+	m_bIsOk = true;
 }
 
 wxGISGPToolManager::~wxGISGPToolManager(void)
 {
-    if(m_pToolsNode->HasAttribute(wxT("max_tasks")))
-        m_pToolsNode->DeleteAttribute(wxT("max_tasks"));
-    m_pToolsNode->AddAttribute(wxT("max_tasks"), wxString::Format(wxT("%d"), m_nMaxTasks));
-    if(m_pToolsNode->HasAttribute(wxT("gp_exec")))
-        m_pToolsNode->DeleteAttribute(wxT("gp_exec"));
-    m_pToolsNode->AddAttribute(wxT("gp_exec"), m_sGeoprocessPath);
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(pConfig)
+	{
+		pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/max_tasks")), m_nMaxTasks);
+		pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/gp_exec")), m_sGeoprocessPath);
+	}
 
     //read tasks
-    wxGISConfig::DeleteNodeChildren(m_pToolsNode);
-    for(std::map<wxString, TOOLINFO>::const_iterator pos = m_ToolsMap.begin(); pos != m_ToolsMap.end(); ++pos)
-    {
-        if(pos->second.sClassName.IsEmpty())
-            continue;
-        wxXmlNode* pNewNode = new wxXmlNode(m_pToolsNode, wxXML_ELEMENT_NODE, wxString(wxT("tool")));
-		pNewNode->AddAttribute(wxT("object"), pos->second.sClassName);
-		pNewNode->AddAttribute(wxT("name"), pos->first);
-		pNewNode->AddAttribute(wxT("count"), wxString::Format(wxT("%d"), pos->second.nCount));
-    }
+	wxXmlNode *pToolsNode = pConfig->GetConfigNode(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools")));
+	if(pToolsNode)
+	{
+		pConfig->DeleteNodeChildren(pToolsNode);
+		for(std::map<wxString, TOOLINFO>::const_iterator pos = m_ToolsMap.begin(); pos != m_ToolsMap.end(); ++pos)
+		{
+			if(pos->second.sClassName.IsEmpty())
+				continue;
+			wxXmlNode* pNewNode = new wxXmlNode(pToolsNode, wxXML_ELEMENT_NODE, wxString(wxT("tool")));
+			pNewNode->AddAttribute(wxT("object"), pos->second.sClassName);
+			pNewNode->AddAttribute(wxT("name"), pos->first);
+			pNewNode->AddAttribute(wxT("count"), wxString::Format(wxT("%d"), pos->second.nCount));
+		}
+	}
 
     //kill all processes
     for(size_t i = 0; i < m_ProcessArray.size(); ++i)
     {
        	m_ProcessArray[i].pProcess->Cancel();
         wxDELETE(m_ProcessArray[i].pProcess);
-//        wxDELETE(m_ProcessArray[i].pTool);
     }
     //delete all existed tools
     //for(std::map<wxString, TOOLINFO>::iterator pos = m_ToolsMap.begin(); pos != m_ToolsMap.end(); ++pos)
@@ -225,7 +237,7 @@ int wxGISGPToolManager::Execute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel)
     wxString sToolParams = pTool->GetAsString();
     sToolParams.Replace(wxT("\""), wxT("\\\""));
     
-//	wxString sCommand = wxString::Format(wxT("%s -n "), m_sGeoprocessPath.c_str()) + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");
+	//wxString sCommand = wxString::Format(wxT("%s -n "), m_sGeoprocessPath.c_str()) + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");
     
 	wxFileName FName(m_sGeoprocessPath);
     wxArrayString saParams;

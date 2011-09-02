@@ -59,8 +59,9 @@ class WXDLLIMPEXP_GIS_GP wxGISGPToolManager :
 	public wxGISConnectionPointContainer
 {
 public:
-    wxGISGPToolManager(wxXmlNode* pToolsNode);
+    wxGISGPToolManager(void);
     virtual ~wxGISGPToolManager(void);
+	virtual bool IsOk(void){return m_bIsOk;};
     virtual IGPToolSPtr GetTool(wxString sToolName, IGxCatalog* pCatalog = NULL);
     virtual int Execute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel = NULL);
     virtual size_t GetToolCount();
@@ -96,12 +97,12 @@ public:
     } TASKPRIOINFO;
 
 protected:
-    wxXmlNode* m_pToolsNode;
     std::multimap<int, wxString> m_ToolsPopularMap;
     std::map<wxString, TOOLINFO> m_ToolsMap;
     std::vector<WXGISEXECDDATA> m_ProcessArray;
     std::vector<TASKPRIOINFO> m_aPriorityArray;
     short m_nMaxTasks, m_nRunningTasks;
     wxString m_sGeoprocessPath;
+	bool m_bIsOk;
 };
 

@@ -56,7 +56,6 @@ public:
 	virtual void ObjectRefreshed(long nObjectID) = 0;
 	virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true) = 0;
 	virtual void DisconnectFolder(CPLString sPath) = 0;
-    virtual IGISConfig* const GetConfig(void){return m_pConf;};
     virtual void EnableRootItem(IGxObject* pRootItem, bool bEnable) = 0;
 	virtual bool GetShowHidden(void){return m_bShowHidden;};
 	virtual bool GetShowExt(void){return m_bShowExt;};
@@ -68,7 +67,6 @@ public:
 	//get smart pointer by ID
 	virtual IGxObjectSPtr GetRegisterObject(long nID) = 0;
 protected:
-    IGISConfig* m_pConf;
     GxObjectArray m_aRootItems;
     GxObjectFactoryArray m_ObjectFactoriesArray;
 	bool m_bShowHidden, m_bShowExt;
@@ -259,7 +257,7 @@ class IGxRootObjectProperties
 public:
 	virtual ~IGxRootObjectProperties(void){};
 	virtual void Init(wxXmlNode* const pConfigNode) = 0;
-	virtual wxXmlNode* GetAttributes(void) = 0;
+	virtual void Serialize(wxXmlNode* pConfigNode) = 0;
     virtual bool GetEnabled(void){return m_bEnabled;};
     virtual void SetEnabled(bool bEnabled){m_bEnabled = bEnabled;};
 protected:

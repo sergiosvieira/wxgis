@@ -95,9 +95,8 @@ public:
     virtual ICommand* GetCommand(long CmdID){return NULL;};
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType){return NULL;};
     virtual wxString GetAppName(void){return wxString(CONTDLG_NAME);};
-    virtual wxString GetAppVersionString(void){return wxString(wxT("0.0.0"));};
+    virtual wxString GetAppVersionString(void){return wxString(APP_VER);};
     virtual IStatusBar* GetStatusBar(void){return NULL;};
-    virtual IGISConfig* GetConfig(void){return m_pConfig;};
     virtual void OnAppAbout(void){};
     virtual void OnAppOptions(void){};
 	virtual wxIcon GetAppIcon(void){return wxNullIcon;};
@@ -117,10 +116,10 @@ public:
 	virtual void OnMouseUp(wxMouseEvent& event){};
 	virtual void OnMouseDoubleClick(wxMouseEvent& event){};
 	virtual void OnMouseMove(wxMouseEvent& event){};
-    virtual bool Create(IGISConfig* pConfig){return true;};
-    virtual bool SetupLog(wxString sLogPath){return true;};
-    virtual bool SetupLoc(wxString sLoc, wxString sLocPath){return true;};
-    virtual bool SetupSys(wxString sSysPath){return true;};
+    virtual bool Create(void){return true;};
+    virtual bool SetupLog(const wxString &sLogPath){return true;};
+    virtual bool SetupLoc(const wxString &sLoc, const wxString &sLocPath){return true;};
+    virtual bool SetupSys(const wxString &sSysPath){return true;};
     virtual void SetDebugMode(bool bDebugMode){};
 
 //wxDialog
@@ -154,12 +153,12 @@ protected:
 protected:
   	wxGxCatalogUI* m_pCatalog;
   	IGxCatalog* m_pExternalCatalog;
-    wxGISAppConfig* m_pConfig;
     wxTreeContainerView* m_pTree;
 	wxString m_sOkBtLabel;
 	wxString m_sStartPath;
     bool m_bShowCreateButton, m_bAllFilters, m_bShowExportFormats;
 	OBJECTFILTERS m_FilterArray;
+	OBJECTFILTERS m_paShowFilter;
 	size_t m_nDefaultFilter;
     GxObjectArray m_ObjectArray;
     int m_nRetCode;

@@ -212,7 +212,7 @@ void wxGISTablePropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer, CPLStri
 	AppendProperty(playid, new wxIntProperty(_("Feature count"), wxPG_LABEL, m_pDataset->GetFeatureCount() ));  
 
     if( CPLStrnlen(poLayer->GetFIDColumn(), 100) > 0 )
-        AppendProperty(playid, new wxStringProperty(_("FID Column"), wxPG_LABEL, wgMB2WX( poLayer->GetFIDColumn() ))); 
+        AppendProperty(playid, new wxStringProperty(_("FID Column"), wxPG_LABEL, wxString( poLayer->GetFIDColumn(), wxConvLocal ))); 
 
     OGRFeatureDefn *poDefn = poLayer->GetLayerDefn();
     if(poDefn)
@@ -221,8 +221,8 @@ void wxGISTablePropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer, CPLStri
         for( int iAttr = 0; iAttr < poDefn->GetFieldCount(); iAttr++ )
         {
             OGRFieldDefn    *poField = poDefn->GetFieldDefn( iAttr );
-            wxString sFieldTypeName = wgMB2WX( poField->GetFieldTypeName( poField->GetType() ) );
-			wxPGProperty* pfielid = AppendProperty(pfieldsid, new wxStringProperty(_("Name"), wxString::Format(wxT("Name_%d"), iAttr), wxString::Format(wxT("%s (%s)"), wgMB2WX(poField->GetNameRef()), sFieldTypeName.c_str()) ));  
+            wxString sFieldTypeName = wxString( poField->GetFieldTypeName( poField->GetType() ), wxConvLocal );
+			wxPGProperty* pfielid = AppendProperty(pfieldsid, new wxStringProperty(_("Name"), wxString::Format(wxT("Name_%d"), iAttr), wxString::Format(wxT("%s (%s)"), wxString(poField->GetNameRef(), wxConvLocal), sFieldTypeName.c_str()) ));  
             AppendProperty(pfielid, new wxStringProperty(_("Type"), wxString::Format(wxT("Type_%d"), iAttr), sFieldTypeName ) );  
             AppendProperty(pfielid, new wxIntProperty(_("Width"), wxString::Format(wxT("Width_%d"), iAttr), poField->GetWidth()) );  
             AppendProperty(pfielid, new wxIntProperty(_("Precision"), wxString::Format(wxT("Precision_%d"), iAttr), poField->GetPrecision()) ); 

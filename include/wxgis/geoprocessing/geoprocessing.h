@@ -79,6 +79,7 @@ enum wxGISEnumGPParameterDataType
     enumGISGPParamDTStringList,
 	enumGISGPParamDTIntegerList,
 	enumGISGPParamDTDoubleList,
+	enumGISGPParamDTStringChoiceEditable,
 
 	enumGISGPParamDTSpatRef,
 	enumGISGPParamDTQuery,
@@ -118,9 +119,13 @@ public:
 	virtual int GetPosByName(wxString sName) = 0;
 	virtual int GetPosByValue(wxVariant oVal) = 0;
     virtual wxVariant GetValueByName(wxString soNameStr) = 0;
+    virtual void Clear(void) = 0;
+    virtual bool GetAltered(void) = 0;
+    virtual void SetAltered(bool bAltered) = 0;
 protected:
 	wxArrayString m_asoNames;
 	std::vector<wxVariant> m_asoData;
+	bool m_bAltered;
 };
 
 /** \class IGPParameter

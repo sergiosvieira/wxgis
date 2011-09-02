@@ -21,6 +21,12 @@
 #pragma once
 
 #include "wxgis/core/core.h"
-
+/** \fn IApplication* GetApplication()
+ *  \brief Global application getter.
+ */	
 WXDLLIMPEXP_GIS_CORE IApplication* GetApplication();
+/** \fn void SetApplication(IApplication* pApp)
+    \brief Global application setter.
+	\param pApp The application pointer.
+ */	
 WXDLLIMPEXP_GIS_CORE void SetApplication(IApplication* pApp);

@@ -586,26 +586,12 @@ void wxGISCatalogMainCmd::OnClick(void)
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
             {
-                //ask to delete?
-                bool bAskToDelete(true);
-                wxXmlNode* pNode(NULL);
-                
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
                 IGxSelection* pSel = pGxCatalogUI->GetSelection();
-
-                IGxCatalog* pCat = pGxApp->GetCatalog();
-                if(pCat)
-                {
-                    IGISConfig*  pConfig = pCat->GetConfig();
-                    if(pConfig)
-                    {
-                        pNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("catalog")));
-                        if(pNode)
-                            bAskToDelete = wxAtoi(pNode->GetAttribute(wxT("ask_delete"), wxT("1"))) == 1;
-                        else
-                            pNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog")), true);
-                    }
-                }
+                //ask to delete?
+                bool bAskToDelete(true);
+				wxGISAppConfigSPtr pConfig = GetConfig();
+				bAskToDelete = pConfig->ReadBool(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/catalog/ask_delete")), bAskToDelete);
                 if(bAskToDelete)
                 {
                     //show ask dialog
@@ -616,12 +602,8 @@ void wxGISCatalogMainCmd::OnClick(void)
 
 					int nRes = dlg.ShowModal();
                     
-
-                    if(dlg.IsCheckBoxChecked())
-                    {
-                        pNode->DeleteAttribute(wxT("ask_delete"));
-                        pNode->AddAttribute(wxT("ask_delete"), wxT("0"));
-                    }
+					if(pConfig)
+						pConfig->Write(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/catalog/ask_delete")), dlg.IsCheckBoxChecked());
 
                     if(nRes == wxID_NO)
                         return;

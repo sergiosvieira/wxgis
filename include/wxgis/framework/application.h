@@ -52,7 +52,6 @@ public:
 	virtual ICommand* GetCommand(long CmdID);
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
 	virtual IStatusBar* GetStatusBar(void);
-	virtual IGISConfig* GetConfig(void);
 	virtual IGISCommandBar* GetCommandBar(wxString sName);
 	virtual void RemoveCommandBar(IGISCommandBar* pBar);
 	virtual bool AddCommandBar(IGISCommandBar* pBar);
@@ -65,11 +64,11 @@ public:
 	virtual void OnMouseUp(wxMouseEvent& event);
 	virtual void OnMouseDoubleClick(wxMouseEvent& event);
 	virtual void OnMouseMove(wxMouseEvent& event);
-    virtual bool Create(IGISConfig* pConfig);
+    virtual bool Create(void);
     virtual void OnAppOptions(void);
-    virtual bool SetupLog(wxString sLogPath);
-    virtual bool SetupSys(wxString sSysPath);
-    virtual bool SetupLoc(wxString sLoc, wxString sLocPath);
+    virtual bool SetupLog(const wxString &sLogPath);
+    virtual bool SetupSys(const wxString &sSysPath);
+    virtual bool SetupLoc(const wxString &sLoc, const wxString &sLocPath);
 
 protected:
 	virtual void LoadCommands(wxXmlNode* pRootNode);
@@ -90,7 +89,6 @@ protected:
 	virtual void OnClose(wxCloseEvent & event);
 //
 protected:
-	IGISConfig* m_pConfig;
 	COMMANDARRAY m_CommandArray;
 	COMMANDBARARRAY m_CommandBarArray;
 	wxGISAcceleratorTable* m_pGISAcceleratorTable;

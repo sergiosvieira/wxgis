@@ -55,7 +55,7 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
             CPLError( CE_Warning, CPLE_AppDefined, sFullErr );
 
             if(pTrackCancel)
-                pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+                pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
             return false;
         }
         if( !bSame && poCT )
@@ -127,7 +127,7 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
         {
         //    //LABEL(f:"Arial, Helvetica", s:12pt, t:"Hello World!")
             wxString sStyleLabel = wxString::Format(wxT("LABEL(f:\"Arial, Helvetica\", s:12pt, t:\"%s\")"), sACText.c_str());
-            pFeature->SetStyleString(wgWX2MB(sStyleLabel));
+			pFeature->SetStyleString(sStyleLabel.mb_str(wxConvLocal));
         }
 
         OGRErr eErr = pDstDataSet->StoreFeature(pFeature);
@@ -138,7 +138,7 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
             sFullErr += CPLGetLastErrorMsg();
             CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
             if(pTrackCancel)
-                pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+                pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         }
         nCounter++;
         if(pProgressor)
@@ -167,7 +167,7 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -179,7 +179,7 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_FileIO, sFullErr );
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
     return true;
@@ -332,7 +332,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         CPLString sFullErr(sErr.mb_str());
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr );
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -350,7 +350,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr );
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -361,7 +361,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr );
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -393,7 +393,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -405,7 +405,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -855,7 +855,7 @@ bool GeometryVerticesToPoints(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wx
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr );
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -893,7 +893,7 @@ bool GeometryVerticesToPoints(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wx
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -908,7 +908,7 @@ bool GeometryVerticesToPoints(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wx
 			sFullErr += CPLGetLastErrorMsg();
 			CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
 			if(pTrackCancel)
-				pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+				pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
 			return false;
 		}
 	}
@@ -1040,7 +1040,7 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
 {
     CPLErrorReset();
     poFields->Reference();
-    OGRSFDriver *poDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName( wgWX2MB(sDriver) );
+	OGRSFDriver *poDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName( sDriver.mb_str() );
     if(poDriver == NULL)
     {
         wxString sErr = wxString::Format(_("The driver '%s' is not available! OGR error: "), sDriver.c_str());
@@ -1110,7 +1110,7 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
             OGRFieldDefn *pField = poFields->GetFieldDefn(i);
             if(nSubType == enumVecKML || nSubType == enumVecKMZ)
             {
-                wxString sFieldName = wgMB2WX(pField->GetNameRef());
+                wxString sFieldName(pField->GetNameRef(), wxConvLocal);
                 pField->SetName(sFieldName.mb_str(wxConvUTF8));
 				OGRFieldType nType = pField->GetType();
 				if(OFTString == nType)
@@ -1148,7 +1148,7 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
     return pDataSet;
 }
 
-bool GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, const CPLString &osFrmt, bool bSwapXY, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel)
+bool GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxGISCoordinatesFormat &oFrmt, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel)
 {
 	CPLErrorReset();
 
@@ -1162,7 +1162,7 @@ bool GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, 
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_FileIO, sFullErr);
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
 	}
 
@@ -1186,7 +1186,7 @@ bool GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, 
             CPLError( CE_Warning, CPLE_AppDefined, sFullErr );
 
             if(pTrackCancel)
-                pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+                pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
             return false;
         }
 
@@ -1199,7 +1199,7 @@ bool GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, 
         if(!pGeom)
             continue;
 
-		CPLString osCoordText = GeometryToText(poFeature->GetFID(), pGeom, osFrmt, bSwapXY, pTrackCancel);
+		CPLString osCoordText = GeometryToText(poFeature->GetFID(), pGeom, oFrmt, pTrackCancel);
 
 		if(osCoordText.size() > 0)
 		{
@@ -1219,7 +1219,7 @@ bool GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, 
 	return true;
 }
 
-CPLString GeometryToText(long nGeomFID, OGRGeometry* pGeom, const CPLString &osFrmt, bool bSwap, ITrackCancel* pTrackCancel)
+CPLString GeometryToText(long nGeomFID, OGRGeometry* pGeom, wxGISCoordinatesFormat &oFrmt, ITrackCancel* pTrackCancel)
 {
 	CPLString osOutput;
 	if(!pGeom)
@@ -1231,11 +1231,11 @@ CPLString GeometryToText(long nGeomFID, OGRGeometry* pGeom, const CPLString &osF
 	switch(type)
 	{
 	case wkbPoint:
-		PointToText(osOutput, (OGRPoint*)pGeom, osFrmt, bSwap);
+		PointToText(osOutput, (OGRPoint*)pGeom, oFrmt);
 		break;
 	case wkbLineString:
 	case wkbLinearRing:
-		LineToText(osOutput, (OGRLineString*)pGeom, osFrmt, bSwap);
+		LineToText(osOutput, (OGRLineString*)pGeom, oFrmt);
 		break;
 	case wkbPolygon:
 		{
@@ -1248,7 +1248,7 @@ CPLString GeometryToText(long nGeomFID, OGRGeometry* pGeom, const CPLString &osF
             else
             {
 				osOutput += CPLString("Exterior ring\n");
-				LineToText(osOutput, (OGRLineString*)poRing, osFrmt, bSwap);
+				LineToText(osOutput, (OGRLineString*)poRing, oFrmt);
 
                 if (nRings)
                 {
@@ -1257,7 +1257,7 @@ CPLString GeometryToText(long nGeomFID, OGRGeometry* pGeom, const CPLString &osF
                     {
 						osOutput += CPLSPrintf("%d inner ring\n", ir);
 						OGRLinearRing* poRing = poPoly->getInteriorRing(ir);
-						LineToText(osOutput, (OGRLineString*)poRing, osFrmt, bSwap);
+						LineToText(osOutput, (OGRLineString*)poRing, oFrmt);
                     }
                 }
             }
@@ -1276,7 +1276,7 @@ CPLString GeometryToText(long nGeomFID, OGRGeometry* pGeom, const CPLString &osF
             for (int ig = 0; ig < poColl->getNumGeometries(); ++ig)
             {
                 OGRGeometry * poChild = (OGRGeometry*)poColl->getGeometryRef(ig);
-                GeometryToText(nGeomFID, poChild, osFrmt, bSwap, pTrackCancel);
+                GeometryToText(nGeomFID, poChild, oFrmt, pTrackCancel);
             }
 		}
 		break;
@@ -1288,15 +1288,14 @@ CPLString GeometryToText(long nGeomFID, OGRGeometry* pGeom, const CPLString &osF
 	return osOutput;
 }
 
-void PointToText(CPLString &osData, OGRPoint* pPoint, const CPLString &osFrmt, bool bSwap)
+void PointToText(CPLString &osData, OGRPoint* pPoint, wxGISCoordinatesFormat &oFrmt)
 {
-	if(bSwap)
-		osData += CPLSPrintf(osFrmt, pPoint->getY(), pPoint->getX() );
-	else
-		osData += CPLSPrintf(osFrmt, pPoint->getX(), pPoint->getY() );
+	wxString sFrmt = oFrmt.Format(pPoint->getX(), pPoint->getY());
+	sFrmt += wxString(wxT("\n"));
+	osData += sFrmt.mb_str();
 }
 
-void LineToText(CPLString &osData, OGRLineString* pLine, const CPLString &osFrmt, bool bSwap)
+void LineToText(CPLString &osData, OGRLineString* pLine, wxGISCoordinatesFormat &oFrmt)
 {
 	int nCount = pLine->getNumPoints();
 	if(nCount == 0)
@@ -1310,6 +1309,6 @@ void LineToText(CPLString &osData, OGRLineString* pLine, const CPLString &osFrmt
 	{
 		OGRPoint Pt;
 		pLine->getPoint(i, &Pt);
-		PointToText(osData, &Pt, osFrmt, bSwap);
+		PointToText(osData, &Pt, oFrmt);
 	}
 }

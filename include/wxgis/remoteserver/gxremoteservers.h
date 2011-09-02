@@ -48,7 +48,7 @@ public:
 	virtual bool HasChildren(void){return m_Children.size() > 0 ? true : false;};
     //IGxRootObjectProperties
     virtual void Init(wxXmlNode* const pConfigNode);
-    virtual wxXmlNode* GetAttributes(void);
+    virtual void Serialize(wxXmlNode* pConfigNode);
 	//wxGxRemoteServers
 protected:
 	//wxGxRemoteServers

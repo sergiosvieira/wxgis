@@ -147,10 +147,9 @@ void wxGxToolbox::LoadChildrenFromXml(wxXmlNode* pNode)
 /////////////////////////////////////////////////////////////////////////
 IMPLEMENT_DYNAMIC_CLASS(wxGxRootToolbox, wxObject)
 
-wxGxRootToolbox::wxGxRootToolbox(void) : m_bIsChildrenLoaded(false), m_pConfig(NULL)
+wxGxRootToolbox::wxGxRootToolbox(void) : m_bIsChildrenLoaded(false)
 {
     m_pToolMngr = NULL;
-    m_pPropNode = NULL;
     m_LargeToolboxIcon = wxIcon(toolbox_48_xpm);
     m_SmallToolboxIcon = wxIcon(toolbox_16_xpm);
     m_LargeToolIcon = wxIcon(tool_48_xpm);
@@ -164,19 +163,11 @@ wxGxRootToolbox::~wxGxRootToolbox(void)
 void wxGxRootToolbox::Detach(void)
 {
 	EmptyChildren();
-    wxDELETE(m_pConfig);
     IGxObject::Detach();
 }
 
 void wxGxRootToolbox::Init(wxXmlNode* const pConfigNode)
 {
-#ifdef WXGISPORTABLE
-    m_pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, true);
-#else
-	m_pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, false);
-#endif
-    m_pPropNode = new wxXmlNode(*pConfigNode);
-
     LoadChildren();
 }
 
@@ -184,15 +175,14 @@ void wxGxRootToolbox::LoadChildren(void)
 {
 	if(m_bIsChildrenLoaded)
 		return;
-
-    wxXmlNode *pToolsChild(NULL), *pToolboxesChild(NULL);
-    pToolsChild = m_pConfig->GetConfigNode(wxT("tools"), false, true);
-    pToolboxesChild = m_pConfig->GetConfigNode(wxT("toolboxes"), false, true);
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return;
 
     m_pRootToolbox = this;
 
     //Add task exec
-    wxGxToolExecute* pToolExecute = new wxGxToolExecute(m_pRootToolbox, pToolsChild);
+    wxGxToolExecute* pToolExecute = new wxGxToolExecute(m_pRootToolbox);
     IGxObject* pGxObj = static_cast<IGxObject*>(pToolExecute);
 
     if( !AddChild(pGxObj) )
@@ -205,26 +195,23 @@ void wxGxRootToolbox::LoadChildren(void)
     }
 
     //Add favorites
-    bool bShowFavorites = wxAtoi(pToolboxesChild->GetAttribute(wxT("show_favorites"), wxT("1"))) == 1;
+	bool bShowFavorites = pConfig->ReadBool(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/toolboxes/show_favorites")), true);
     if(bShowFavorites)
     {
-        short nMax = wxAtoi(pToolboxesChild->GetAttribute(wxT("max_favorites"), wxT("10")));
+        short nMax = pConfig->ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/toolboxes/max_favorites")), 10);
         wxGxFavoritesToolbox* pToolbox = new wxGxFavoritesToolbox(m_pRootToolbox, nMax, m_LargeToolIcon, m_SmallToolIcon);
         IGxObject* pGxObj = static_cast<IGxObject*>(pToolbox);
         if(!AddChild(pGxObj))
             wxDELETE(pGxObj);
     }
+    wxXmlNode* pToolboxesChild = pConfig->GetConfigNode(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/toolboxes")));
     LoadChildrenFromXml(pToolboxesChild);
 
 	m_bIsChildrenLoaded = true;
 }
 
-wxXmlNode* wxGxRootToolbox::GetAttributes(void)
+void wxGxRootToolbox::Serialize(wxXmlNode* pConfigNode)
 {
-    if(m_pPropNode->HasAttribute(wxT("is_enabled")))
-        m_pPropNode->DeleteAttribute(wxT("is_enabled"));
-    m_pPropNode->AddAttribute(wxT("is_enabled"), m_bEnabled == true ? wxT("1") : wxT("0"));    
-    return m_pPropNode;
 }
 
 wxGISGPToolManager* wxGxRootToolbox::GetGPToolManager(void)
@@ -350,7 +337,7 @@ void wxGxFavoritesToolbox::LoadChildren(void)
         wxGISGPToolManager* pGPToolManager = m_pRootToolbox->GetGPToolManager();
         if(pGPToolManager)
         {
-            int nCount = MIN(pGPToolManager->GetToolCount(), m_nMaxCount);
+			int nCount = std::min(pGPToolManager->GetToolCount(), m_nMaxCount);
             for(size_t i = 0; i < nCount; ++i)
             {
                 wxGxTool* pTool = new wxGxTool(m_pRootToolbox, pGPToolManager->GetPopularTool(i), m_LargeToolIcon, m_SmallToolIcon);
@@ -373,7 +360,7 @@ wxString wxGxFavoritesToolbox::GetName(void)
 // wxGxToolExecute
 /////////////////////////////////////////////////////////////////////////
 
-wxGxToolExecute::wxGxToolExecute(wxGxRootToolbox* pRootToolbox, wxXmlNode* pToolsNode) : wxGISGPToolManager(pToolsNode)
+wxGxToolExecute::wxGxToolExecute(wxGxRootToolbox* pRootToolbox) : wxGISGPToolManager()
 {
     m_pRootToolbox = pRootToolbox;
     m_LargeToolIcon = wxIcon(toolexec_48_xpm);

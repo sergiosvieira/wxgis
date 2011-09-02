@@ -88,7 +88,7 @@ wxString wxGISGridTable::GetColLabelValue(int col)
 {
     wxString label;
 	OGRFieldDefn* pOGRFieldDefn = m_pOGRFeatureDefn->GetFieldDefn(col);
-	label = wgMB2WX(pOGRFieldDefn->GetNameRef());
+	label = wxString(pOGRFieldDefn->GetNameRef(), wxConvLocal);
 	//if(!m_sFIDKeyName.IsEmpty())
 	//{
 	//	if(label == m_sFIDKeyName);

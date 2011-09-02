@@ -178,7 +178,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
         AppendProperty(pid, new wxStringProperty(_("Total size"), wxPG_LABEL, wxFileName::GetHumanReadableSize(nSize)) );  
 
         GDALDriver* pDrv = poGDALDataset->GetDriver();
-	    sTmp = sTmp.Format(wxT("%s(%s)"), wgMB2WX(pDrv->GetMetadataItem( GDAL_DMD_LONGNAME )), wgMB2WX(pDrv->GetDescription()) );
+		sTmp = sTmp.Format(wxT("%s(%s)"), wxString(pDrv->GetMetadataItem( GDAL_DMD_LONGNAME ), wxConvLocal).c_str(), wxString(pDrv->GetDescription(), wxConvLocal).c_str() );
         AppendProperty(pid, new wxStringProperty(_("Driver"), wxPG_LABEL, sTmp) );  
 //char **papszMetadata = poDriver->GetMetadata();
 //    if( CSLFetchBoolean( papszMetadata, GDAL_DCAP_CREATE, FALSE ) )
@@ -243,7 +243,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
             AppendProperty( new wxPropertyCategory(_("Metadata")) );
             for(int i = 0; papszMetadata[i] != NULL; ++i )
             {
-                sTmp = wgMB2WX(papszMetadata[i]);
+                sTmp = wxString(papszMetadata[i], wxConvLocal);
                 AppendMetadataProperty(sTmp);
             }
         }
@@ -257,7 +257,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
             AppendProperty( new wxPropertyCategory(_("Image Structure Metadata")) );
             for(int i = 0; papszMetadata[i] != NULL; ++i )
             {
-                sTmp = wgMB2WX(papszMetadata[i]);
+                sTmp = wxString(papszMetadata[i], wxConvLocal);
                 AppendMetadataProperty(sTmp);
             }
         }
@@ -271,7 +271,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
             AppendProperty( new wxPropertyCategory(_("Subdatasets")) );
             for(int i = 0; papszMetadata[i] != NULL; ++i )
             {
-                sTmp = wgMB2WX(papszMetadata[i]);
+                sTmp = wxString(papszMetadata[i], wxConvLocal);
                 AppendMetadataProperty(sTmp);
             }
         }
@@ -285,7 +285,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
             AppendProperty( new wxPropertyCategory(_("Geolocation")) );
             for(int i = 0; papszMetadata[i] != NULL; ++i )
             {
-                sTmp = wgMB2WX(papszMetadata[i]);
+                sTmp = wxString(papszMetadata[i], wxConvLocal);
                 AppendMetadataProperty(sTmp);
             }
         }
@@ -299,7 +299,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
             AppendProperty( new wxPropertyCategory(_("RPC Metadata")) );
             for(int i = 0; papszMetadata[i] != NULL; ++i )
             {
-                sTmp = wgMB2WX(papszMetadata[i]);
+                sTmp = wxString(papszMetadata[i], wxConvLocal);
                 AppendMetadataProperty(sTmp);
             }
         }
@@ -329,12 +329,12 @@ void wxGISRasterPropertyPage::FillGrid(void)
                 if(poSRS->IsProjected())
                 {
                     pszName = poSRS->GetAttrValue("PROJCS");
-                    AppendProperty( new wxStringProperty(_("GCP Projection"), wxPG_LABEL, wgMB2WX(pszName)) );
+                    AppendProperty( new wxStringProperty(_("GCP Projection"), wxPG_LABEL, wxString(pszName, wxConvLocal)) );
                 }
                 else if(poSRS->IsGeographic())
                 {
                     pszName = poSRS->GetAttrValue("GEOGCS");
-                    AppendProperty( new wxStringProperty(_("GCP Projection"), wxPG_LABEL, wgMB2WX(pszName)) );
+                    AppendProperty( new wxStringProperty(_("GCP Projection"), wxPG_LABEL, wxString(pszName, wxConvLocal)) );
                 }
                 else
                     AppendProperty( new wxStringProperty(_("GCP Projection"), wxPG_LABEL, _("Undefined")) );
@@ -343,7 +343,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
             for(size_t i = 0; i < poGDALDataset->GetGCPCount(); ++i )
             {
                 const GDAL_GCP *psGCP = poGDALDataset->GetGCPs( ) + i;
-                AppendProperty( new wxStringProperty(wxString::Format(wxT("GCP[%03d]"), i + 1), wxPG_LABEL, wxString::Format(_("Id='%s', Info='%s', (%.6g,%.6g) -> (%.6g,%.6g,%.6g)"), wgMB2WX(psGCP->pszId), wgMB2WX(psGCP->pszInfo), psGCP->dfGCPPixel, psGCP->dfGCPLine, psGCP->dfGCPX, psGCP->dfGCPY, psGCP->dfGCPZ)) );
+                AppendProperty( new wxStringProperty(wxString::Format(wxT("GCP[%03d]"), i + 1), wxPG_LABEL, wxString::Format(_("Id='%s', Info='%s', (%.6g,%.6g) -> (%.6g,%.6g,%.6g)"), wxString(psGCP->pszId, wxConvLocal), wxString(psGCP->pszInfo, wxConvLocal), psGCP->dfGCPPixel, psGCP->dfGCPLine, psGCP->dfGCPX, psGCP->dfGCPY, psGCP->dfGCPZ)) );
             }
         }
 
@@ -367,10 +367,10 @@ void wxGISRasterPropertyPage::FillGrid(void)
 
 		    pBand->GetBlockSize(&nBlockXSize, &nBlockYSize);
 			AppendProperty( new wxStringProperty(_("Block"), wxString::Format(wxT("Block_%d"), nBand), wxString::Format(wxT("%d x %d"), nBlockXSize, nBlockYSize)));
-            AppendProperty( new wxStringProperty(_("Type"), wxString::Format(wxT("Type_%d"), nBand), wgMB2WX(GDALGetDataTypeName(pBand->GetRasterDataType())) ));
-            AppendProperty( new wxStringProperty(_("ColorInterp"), wxString::Format(wxT("ColorInterp_%d"), nBand), wgMB2WX(GDALGetColorInterpretationName(pBand->GetColorInterpretation())) ));
+            AppendProperty( new wxStringProperty(_("Type"), wxString::Format(wxT("Type_%d"), nBand), wxString(GDALGetDataTypeName(pBand->GetRasterDataType()), wxConvLocal) ));
+            AppendProperty( new wxStringProperty(_("ColorInterp"), wxString::Format(wxT("ColorInterp_%d"), nBand), wxString(GDALGetColorInterpretationName(pBand->GetColorInterpretation()), wxConvLocal) ));
 
-		    wxString sDescription = wgMB2WX(pBand->GetDescription());
+		    wxString sDescription = wxString(pBand->GetDescription(), wxConvLocal);
             if(!sDescription.IsEmpty())
                 AppendProperty( new wxStringProperty(_("Description"), wxString::Format(wxT("Description_%d"), nBand), sDescription ));
 
@@ -407,7 +407,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
                     if( pszResampling != NULL && EQUALN(pszResampling, "AVERAGE_BIT2", 12) )
                         sOvrDesc += wxT( ", *" );
                     else
-                        sOvrDesc += wgMB2WX(pszResampling);
+                        sOvrDesc += wxString(pszResampling, wxConvLocal);
 
 					wxString sPropName = wxString::Format(_("Overview %d"), iOverview + 1);
 					AppendProperty(povrid, new wxStringProperty(sPropName, wxString::Format(wxT("%s_%d"), sPropName.c_str(), nBand), sOvrDesc ));
@@ -456,7 +456,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
                 }
             }
 
-            wxString sUnitType = wgMB2WX( pBand->GetUnitType() );
+            wxString sUnitType = wxString( pBand->GetUnitType(), wxConvLocal );
 		    if( sUnitType.Len() > 0 )
             {
                 AppendProperty(pbandid, new wxStringProperty(_("Unit Type"), wxString::Format(wxT("Unit Type_%d"), nBand), sUnitType));
@@ -469,7 +469,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
                 for(int  i = 0; papszCategories[i] != NULL; ++i )
 				{
 					wxString sSubPropName = wxString::Format(wxT("%3d"), i);
-					AppendProperty(pcatid, new wxStringProperty(sSubPropName, wxString::Format(wxT("%s_%d"), sSubPropName.c_str(), nBand), wgMB2WX(papszCategories[i]) ) );
+					AppendProperty(pcatid, new wxStringProperty(sSubPropName, wxString::Format(wxT("%s_%d"), sSubPropName.c_str(), nBand), wxString(papszCategories[i], wxConvLocal) ) );
 				}
             }
 
@@ -486,7 +486,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
                 AppendProperty(pbandid, new wxPropertyCategory(_("Metadata") ) );
                 for( int i = 0; papszMetadata[i] != NULL; ++i )
                 {
-                    AppendMetadataProperty( wgMB2WX(papszMetadata[i]) );
+                    AppendMetadataProperty( wxString(papszMetadata[i], wxConvLocal) );
                 }
             }
 
@@ -496,13 +496,13 @@ void wxGISRasterPropertyPage::FillGrid(void)
                 AppendProperty(pbandid, new wxPropertyCategory(_("Image Structure Metadata") ) );
                 for( int i = 0; papszMetadata[i] != NULL; ++i )
                 {
-                    AppendMetadataProperty( wgMB2WX(papszMetadata[i]) );
+                    AppendMetadataProperty( wxString(papszMetadata[i], wxConvLocal) );
                 }
             }
 
 		    if( pBand->GetColorInterpretation() == GCI_PaletteIndex && (hTable = pBand->GetColorTable()) != NULL )
             {
-                wxPGProperty* pcpid = AppendProperty(pbandid, new wxStringProperty(_("Color Table"), wxString::Format(wxT("Color Table_%d"), nBand), wxString::Format(_("%s with %d entries"), wgMB2WX(GDALGetPaletteInterpretationName(hTable->GetPaletteInterpretation())), hTable->GetColorEntryCount()) ));
+				wxPGProperty* pcpid = AppendProperty(pbandid, new wxStringProperty(_("Color Table"), wxString::Format(wxT("Color Table_%d"), nBand), wxString::Format(_("%s with %d entries"), wxString(GDALGetPaletteInterpretationName(hTable->GetPaletteInterpretation()), wxConvLocal).c_str(), hTable->GetColorEntryCount()) ));
 
 			    for(int	i = 0; i < hTable->GetColorEntryCount(); ++i )
                 {
@@ -520,7 +520,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
 			    const GDALRasterAttributeTable* pRAT = (const GDALRasterAttributeTable*)pBand->GetDefaultRAT();
                 
                 char *pszXMLText = CPLSerializeXMLTree( pRAT->Serialize() );
-                m_pg->AppendIn(pbandid, new wxLongStringProperty(_("Raster Attribute Table"), wxString::Format(wxT("Raster Attribute Table_%d"), nBand), wgMB2WX(pszXMLText)));
+                m_pg->AppendIn(pbandid, new wxLongStringProperty(_("Raster Attribute Table"), wxString::Format(wxT("Raster Attribute Table_%d"), nBand), wxString(pszXMLText, wxConvLocal)));
                 CPLFree( pszXMLText );
             }
         }

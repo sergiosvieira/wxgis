@@ -32,6 +32,22 @@
 #include "wx/dynload.h"
 #include "wx/dynlib.h"
 
+/** \class wxGISAppWithLibs init.h
+    \brief The library loader and unloader class.
+*/
+class WXDLLIMPEXP_GIS_CORE wxGISAppWithLibs
+{
+public:
+	wxGISAppWithLibs(void);
+	virtual ~wxGISAppWithLibs(void);
+    typedef std::map<wxString, wxDynamicLibrary*> LIBMAP;
+protected:
+	virtual void LoadLibs(wxXmlNode* pRootNode);
+	virtual void SerializeLibs();
+	virtual void UnLoadLibs();
+protected:
+    LIBMAP m_LibMap;
+};
 
 /** \class wxGISInitializer init.h
     \brief The Initializer class for logs, locale, libs and etc.
@@ -51,17 +67,16 @@
 	oInitializer.Uninitialize();
 */
 
-class WXDLLIMPEXP_GIS_CORE wxGISInitializer
+
+class WXDLLIMPEXP_GIS_CORE wxGISInitializer :
+	public wxGISAppWithLibs
 {
 public:
 	wxGISInitializer(void);
 	virtual ~wxGISInitializer(void);
-	virtual bool Initialize(const wxString &sAppName, const wxString &sConfigDir, const wxString &sLogFilePrefix, wxCmdLineParser& parser);
+	virtual bool Initialize(const wxString &sAppName, const wxString &sLogFilePrefix, wxCmdLineParser& parser);
 	virtual void Uninitialize();
-    typedef std::map<wxString, wxDynamicLibrary*> LIBMAP;
 protected:
-	virtual void LoadLibs(wxXmlNode* pRootNode);
-	virtual void UnLoadLibs(void);
     virtual bool SetupSys(const wxString &sSysPath);
     virtual void SetDebugMode(bool bDebugMode);
     virtual bool SetupLog(const wxString &sLogPath, const wxString &sNamePrefix);
@@ -70,6 +85,4 @@ protected:
     wxLocale* m_pLocale; // locale we'll be using
 	char* m_pszOldLocale;
 	wxFFile m_LogFile;
-    wxGISAppConfig* m_pConfig;
-    LIBMAP m_LibMap;
 };

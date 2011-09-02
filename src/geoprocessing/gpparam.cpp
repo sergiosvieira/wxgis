@@ -204,11 +204,14 @@ void wxGISGPParameter::SetSelDomainValue(int nNewSelection)
 wxString wxGISGPParameter::GetAsString(void)
 {
     wxString sStrPar = m_Value.MakeString();
+	sStrPar.Replace(wxT("\""), wxT("\\\""));
     return sStrPar;
 }
 
 bool wxGISGPParameter::SetFromString(wxString sParam)
 {
+	sParam.Replace(wxT("\\\""), wxT("\""));
+
 	wxVariant oDomStr;
 	if(m_pDomain)
 	{

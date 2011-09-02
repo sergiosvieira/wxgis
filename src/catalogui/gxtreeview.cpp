@@ -545,7 +545,7 @@ void wxGxTreeView::OnSelChanged(wxTreeEvent& event)
 {
     //if(!event.GetOldItem())
     //    return;
-    //event.Skip();
+    event.Skip();
 
     UpdateGxSelection();
 

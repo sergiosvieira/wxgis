@@ -297,12 +297,12 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
 
     wxString soHeight = m_paParam[3]->GetValue();
     CPLString osHeightOpt = "RPC_HEIGHT=";
-    osHeightOpt += wgWX2MB(soHeight);
+    osHeightOpt += soHeight.mb_str();
     apszOptions[3] = osHeightOpt.c_str();
 
     wxString soHeightScale = m_paParam[4]->GetValue();
     CPLString osHeightScaleOpt = "RPC_HEIGHT_SCALE=";
-    osHeightScaleOpt += wgWX2MB(soHeightScale);
+	osHeightScaleOpt += soHeightScale.mb_str();
     apszOptions[4] = osHeightScaleOpt.c_str();
 
     //double dfPixErrThreshold = MIN(adfDstGeoTransform[1], adfDstGeoTransform[5]);
@@ -312,7 +312,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     {
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wxString::Format(_("Error CreateGenImgProjTransformer. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString::Format(_("Error CreateGenImgProjTransformer. GDAL Error: %s"), wxString(pszErr, wxConvUTF8).c_str()), -1, enumGISMessageErr);
         return false;
     }
 
@@ -324,7 +324,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     {
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wxString::Format(_("Error determining output raster size. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString::Format(_("Error determining output raster size. GDAL Error: %s"), wxString(pszErr, wxConvUTF8).c_str()), -1, enumGISMessageErr);
         return false;
     }
 
@@ -338,7 +338,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     {
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wxString::Format(_("Error creating output raster. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString::Format(_("Error creating output raster. GDAL Error: %s"), wxString(pszErr, wxConvUTF8).c_str()), -1, enumGISMessageErr);
         return false;
     }
 
@@ -399,8 +399,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
         {
-            wxString sErr = wgMB2WX(pszErr);
-            pTrackCancel->PutMessage(wxString::Format(_("OrthoCorrect failed! GDAL error: %s"), sErr.c_str()), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString::Format(_("OrthoCorrect failed! GDAL error: %s"), wxString(pszErr, wxConvUTF8).c_str()), -1, enumGISMessageErr);
         }
         GDALClose(poOutputGDALDataset);
         //wsDELETE(pSrcDataSet);

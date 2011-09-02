@@ -167,7 +167,7 @@ bool wxGISGPCompStatTool::Execute(ITrackCancel* pTrackCancel)
             if(pTrackCancel)
             {
                 const char* pszErr = CPLGetLastErrorMsg();
-                pTrackCancel->PutMessage(wxString::Format(_("ComputeStatistics failed! GDAL error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
+				pTrackCancel->PutMessage(wxString::Format(_("ComputeStatistics failed! GDAL error: %s"), wxString(pszErr, wxConvUTF8).c_str()), -1, enumGISMessageErr);
             }
             //wsDELETE(pSrcDataSet);
             return false;

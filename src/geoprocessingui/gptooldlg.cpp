@@ -41,7 +41,6 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
     pApp->RegisterChildWindow(this);
 
     m_pTool = pTool;
-	m_pPropNode = pGxRootToolbox->GetAttributes();
     m_pGxRootToolbox = pGxRootToolbox;
     m_bSync = bSync;
 
@@ -109,6 +108,13 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
         case enumGISGPParamDTDoubleChoice:
             {
                 wxGISDTChoice* poChoice = new wxGISDTChoice(pParam, m_pTool->GetCatalog(), m_tools);
+                bSizer4->Add( poChoice, 0, wxEXPAND, 5 );
+                m_pControlsArray.push_back(poChoice);
+            }
+            break;
+        case enumGISGPParamDTStringChoiceEditable:
+            {
+                wxGISDTChoiceEditable* poChoice = new wxGISDTChoiceEditable(pParam, m_pTool->GetCatalog(), m_tools);
                 bSizer4->Add( poChoice, 0, wxEXPAND, 5 );
                 m_pControlsArray.push_back(poChoice);
             }
@@ -313,16 +319,15 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
 
 void wxGISGPToolDlg::SerializeFramePos(bool bSave)
 {
-	if(!m_pPropNode)
-		return;
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+        return;
+
 	if(bSave)
 	{
-
 		if( IsMaximized() )
 		{
-			if(m_pPropNode->HasAttribute(wxT("maxi")))
-				m_pPropNode->DeleteAttribute(wxT("maxi"));
-			m_pPropNode->AddAttribute(wxT("maxi"), wxT("1"));
+			pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/maxi")), true);
 		}
 		else
 		{
@@ -330,34 +335,24 @@ void wxGISGPToolDlg::SerializeFramePos(bool bSave)
 			GetClientSize(&w, &h);
 			GetPosition(&x, &y);
 
-			if(m_pPropNode->HasAttribute(wxT("Height")))
-				m_pPropNode->DeleteAttribute(wxT("Height"));
-			m_pPropNode->AddAttribute(wxT("Height"), wxString::Format(wxT("%u"), h));
-			if(m_pPropNode->HasAttribute(wxT("Width")))
-				m_pPropNode->DeleteAttribute(wxT("Width"));
-			m_pPropNode->AddAttribute(wxT("Width"), wxString::Format(wxT("%u"), w));
-			if(m_pPropNode->HasAttribute(wxT("YPos")))
-				m_pPropNode->DeleteAttribute(wxT("YPos"));
-			m_pPropNode->AddAttribute(wxT("YPos"), wxString::Format(wxT("%d"), y));
-			if(m_pPropNode->HasAttribute(wxT("XPos")))
-				m_pPropNode->DeleteAttribute(wxT("XPos"));
-			m_pPropNode->AddAttribute(wxT("XPos"), wxString::Format(wxT("%d"), x));
-			if(m_pPropNode->HasAttribute(wxT("maxi")))
-				m_pPropNode->DeleteAttribute(wxT("maxi"));
-			m_pPropNode->AddAttribute(wxT("maxi"), wxT("0"));
+			pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/maxi")), false);
+			pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/width")), w);
+			pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/height")), h);
+			pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/xpos")), x);
+			pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/ypos")), y);
 		}
 	}
 	else
 	{
 		//load
-		bool bMaxi = wxAtoi(m_pPropNode->GetAttribute(wxT("maxi"), wxT("0"))) != 0;
+		bool bMaxi = pConfig->ReadBool(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/maxi")), false);
 		if(!bMaxi)
 		{
-			int x = wxAtoi(m_pPropNode->GetAttribute(wxT("XPos"), wxT("50")));
-			int y = wxAtoi(m_pPropNode->GetAttribute(wxT("YPos"), wxT("50")));
-			int w = wxAtoi(m_pPropNode->GetAttribute(wxT("Width"), wxT("850")));
-			int h = wxAtoi(m_pPropNode->GetAttribute(wxT("Height"), wxT("530")));
-
+			int x = pConfig->ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/xpos")), 50);
+			int y = pConfig->ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/ypos")), 50);
+			int w = pConfig->ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/width")), 450);
+			int h = pConfig->ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/height")), 650);
+			
 			Move(x, y);
 			SetClientSize(w, h);
 		}

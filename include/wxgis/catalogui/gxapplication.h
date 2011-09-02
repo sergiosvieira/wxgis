@@ -46,7 +46,7 @@ public:
     virtual void OnClose(wxCloseEvent& event);
 	//IFrameApplication
     virtual wxString GetAppName(void){return wxString(wxT("wxGISCatalog"));};
-    virtual bool Create(IGISConfig* pConfig);
+    virtual bool Create(void);
 	virtual wxIcon GetAppIcon(void){return m_pAppIcon;};
 protected:
 	wxGxTreeView* m_pTreeView;

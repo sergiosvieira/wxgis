@@ -36,43 +36,46 @@ wxGISMapApp::wxGISMapApp(void)
 
 wxGISMapApp::~wxGISMapApp(void)
 {
+	SerializeLibs();
+
 	GDALDestroyDriverManager();
 	OGRCleanupAll();
 
-	wxDELETE(m_pConfig);
+	ReleaseConfig();
+
+	UnLoadLibs();
 }
 
 bool wxGISMapApp::OnInit()
 {
 	wxGISMapFrame* frame = new wxGISMapFrame(NULL, wxID_ANY, _("wxGIS Map"), wxDefaultPosition, wxSize(800, 480) );
-#ifdef WXGISPORTABLE
-    m_pConfig = new wxGISAppConfig(frame->GetAppName(), CONFIG_DIR, true);
-#else
-	m_pConfig = new wxGISAppConfig(frame->GetAppName(), CONFIG_DIR, false);
-#endif
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return false;
 
 	//setup loging
-	wxString sLogDir = m_pConfig->GetLogDir();
+	wxString sLogDir = pConfig->GetLogDir();
     if(!frame->SetupLog(sLogDir))
         return false;
 
 	//setup locale
-	wxString sLocale = m_pConfig->GetLocale();
-	wxString sLocaleDir = m_pConfig->GetLocaleDir();
+	wxString sLocale = pConfig->GetLocale();
+	wxString sLocaleDir = pConfig->GetLocaleDir();
     if(!frame->SetupLoc(sLocale, sLocaleDir))
         return false;
 
    	//setup sys
-    wxString sSysDir = m_pConfig->GetSysDir();
+    wxString sSysDir = pConfig->GetSysDir();
     if(!frame->SetupSys(sSysDir))
         return false;
 
    	//setup debug
-	bool bDebugMode = m_pConfig->GetDebugMode();
+	bool bDebugMode = pConfig->GetDebugMode();
     frame->SetDebugMode(bDebugMode);
 
     //some default GDAL
-    CPLSetConfigOption( "GDAL_CACHEMAX", "128" );
+	wxString sGDALCacheMax = pConfig->Read(enumGISHKCU, wxString(wxT("wxGISCommon/GDAL/cachemax")), wxString(wxT("128")));
+	CPLSetConfigOption( "GDAL_CACHEMAX", sGDALCacheMax.mb_str() );
     //CPLSetConfigOption ( "LIBKML_USE_DOC.KML", "no" );
     //GDAL_MAX_DATASET_POOL_SIZE
     //OGR_ARC_STEPSIZE
@@ -83,70 +86,26 @@ bool wxGISMapApp::OnInit()
 	wxLogMessage(_("wxGISMapApp: Start main frame"));
 
 	//store values
-	m_pConfig->SetLogDir(sLogDir);
-	m_pConfig->SetLocale(sLocale);
-	m_pConfig->SetLocaleDir(sLocaleDir);
-	m_pConfig->SetSysDir(sSysDir);
-	m_pConfig->SetDebugMode(bDebugMode);
+	pConfig->SetLogDir(sLogDir);
+	pConfig->SetLocale(sLocale);
+	pConfig->SetLocaleDir(sLocaleDir);
+	pConfig->SetSysDir(sSysDir);
+	pConfig->SetDebugMode(bDebugMode);
+	//gdal
+	pConfig->Write(enumGISHKCU, wxString(wxT("wxGISCommon/GDAL/cachemax")), sGDALCacheMax);
 
-    if(!frame->Create(m_pConfig))
+    //load libs
+	wxXmlNode* pLibsNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/libs")));
+	if(pLibsNode)
+		LoadLibs(pLibsNode);
+	pLibsNode = pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("wxGISCommon/libs")));
+	if(pLibsNode)
+		LoadLibs(pLibsNode);
+
+    if(!frame->Create())
         return false;
     SetTopWindow(frame);
     frame->Show();
 
 	return true;
-}
-
-void wxGISMapApp::LoadLibs(wxXmlNode* pRootNode)
-{
-	wxXmlNode *child = pRootNode->GetChildren();
-	while(child)
-	{
-		wxString sPath = child->GetAttribute(wxT("path"), wxT(""));
-		if(sPath.Len() > 0)
-		{
-			//check for doubles
-			if(m_LibMap[sPath] != NULL)
-			{
-				child = child->GetNext();
-				continue;
-			}
-
-			wxDynamicLibrary* pLib = new wxDynamicLibrary(sPath);
-			if(pLib != NULL)
-			{
-				wxLogMessage(_("wxGISApplication: Library %s loaded"), sPath.c_str());
-				m_LibMap[sPath] = pLib;
-			}
-			else
-				wxLogError(_("wxGISApplication: Error loading library %s"), sPath.c_str());
-		}
-		child = child->GetNext();
-	}
-}
-
-
-void wxGISMapApp::UnLoadLibs()
-{
-	if(!m_pConfig)
-		return;
-
-	wxXmlNode* pLibsNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("libs")));
-	if(pLibsNode)
-		wxGISConfig::DeleteNodeChildren(pLibsNode);
-	else
-		pLibsNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("libs")), true);
-
-    for(LIBMAP::iterator item = m_LibMap.begin(); item != m_LibMap.end(); ++item)
-	{
-		wxXmlNode* pNewNode = new wxXmlNode(pLibsNode, wxXML_ELEMENT_NODE, wxString(wxT("lib")));
-		pNewNode->AddAttribute(wxT("path"), item->first);
-
-		wxFileName FName(item->first);
-		wxString sName = FName.GetName();
-
-		pNewNode->AddAttribute(wxT("name"), sName);
-
-		wxDELETE(item->second);
-	}
 }

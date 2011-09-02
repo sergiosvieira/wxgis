@@ -235,15 +235,11 @@ bool wxGISDTPath::Validate(void)
         {
            if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
            {
-               if(m_pParam->GetMessageType() == wxGISEnumGPMessageError)
-                   return false;
                m_pParam->SetIsValid(true);
                m_pParam->SetMessage(wxGISEnumGPMessageOk);
            }
            else
            {
-               if(m_pParam->GetMessageType() == wxGISEnumGPMessageError)
-                   return false;
                m_pParam->SetIsValid(true);
                m_pParam->SetMessage(wxGISEnumGPMessageWarning, _("The output object exists and will be overwritten!"));
            }
@@ -259,9 +255,6 @@ bool wxGISDTPath::Validate(void)
            }
            else
            {
-               if(m_pParam->GetMessageType() == wxGISEnumGPMessageError)
-                   return false;
-
                m_pParam->SetIsValid(true);
                m_pParam->SetMessage(wxGISEnumGPMessageOk);
                return true;
@@ -279,21 +272,22 @@ void wxGISDTPath::UpdateControls(void)
 		return;
 
 	m_PathTextCtrl->ChangeValue( m_pParam->GetValue() );
-    SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
+	//sent updateui event
+	wxUpdateUIEvent event(ID_PATHCTRL);
+	GetEventHandler()->ProcessEvent( event );
 }
 
 void wxGISDTPath::UpdateValues(void)
 {
-
 	wxString sData = m_PathTextCtrl->GetValue();
     switch(m_pParam->GetDataType())
     {
       case enumGISGPParamDTPath:
         m_pParam->SetValue(wxVariant(sData, wxT("path")));
+		break;
       default:
         m_pParam->SetValue(wxVariant(sData, wxT("val")));
     }
-
 
     wxGISGPGxObjectDomain* poDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParam->GetDomain());
 	if(poDomain && poDomain->GetCount() > 0)
@@ -452,7 +446,6 @@ void wxGISDTDigit::UpdateValues(void)
 
     if ( bValid )
     {
-        m_pParam->SetMessage(wxGISEnumGPMessageNone);
         switch(m_pParam->GetDataType())
         {
         case enumGISGPParamDTInteger:
@@ -508,8 +501,7 @@ wxGISDTChoice::wxGISDTChoice( IGPParameter* pParam, IGxCatalog* pCatalog, wxWind
 	m_bitmap = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( m_bitmap, 0, wxALL, 5 );
 
-	wxBoxSizer* bPathSizer;
-	bPathSizer = new wxBoxSizer( wxHORIZONTAL );
+	m_bPathSizer = new wxBoxSizer( wxHORIZONTAL );
 
 	wxArrayString Choices;
 
@@ -537,9 +529,9 @@ wxGISDTChoice::wxGISDTChoice( IGPParameter* pParam, IGxCatalog* pCatalog, wxWind
 		//}
     }
 
-	bPathSizer->Add( m_choice, 1, wxALL|wxEXPAND, 5 );
+	m_bPathSizer->Add( m_choice, 1, wxALL|wxEXPAND, 5 );
 
-	fgSizer1->Add( bPathSizer, 0, wxALL|wxEXPAND, 5 );
+	fgSizer1->Add( m_bPathSizer, 0, wxALL|wxEXPAND, 5 );
 
 	this->SetSizer( fgSizer1 );
 	this->Layout();
@@ -558,36 +550,36 @@ bool wxGISDTChoice::Validate(void)
 
 	m_pParam->SetHasBeenValidated(true);
 
-	m_pParam->SetIsValid(false);
 	bool bRetVal(false);
 
     switch(m_pParam->GetDataType())
     {
 	case enumGISGPParamDTIntegerChoice:
 		if(m_pParam->GetValue().GetType() == wxString(wxT("long")))
-		{
 			bRetVal = true;
-			m_pParam->SetIsValid(true);
-		}
         break;
     case enumGISGPParamDTDoubleChoice:
 		if(m_pParam->GetValue().GetType() == wxString(wxT("double")))
-		{
 			bRetVal = true;
-			m_pParam->SetIsValid(true);
-		}
         break;
 	case enumGISGPParamDTStringChoice:
+	case enumGISGPParamDTStringChoiceEditable:
 	default:
 		if(m_pParam->GetValue().GetType() == wxString(wxT("string")))
-		{
 			bRetVal = true;
-			m_pParam->SetIsValid(true);
-		}
-        break;
     }
 
+    m_pParam->SetIsValid(bRetVal);
+    if ( bRetVal )
+    {
+        m_pParam->SetMessage(wxGISEnumGPMessageOk);
+        //m_pParam->SetAltered(true);
+    }
+    else
+        m_pParam->SetMessage(wxGISEnumGPMessageError, _("The input data are invalid"));
+
     return bRetVal;
+
 }
 
 void wxGISDTChoice::UpdateValues(void)
@@ -605,6 +597,7 @@ void wxGISDTChoice::UpdateValues(void)
         bValid = sData.ToDouble(&dfVal);
         break;
     case enumGISGPParamDTStringChoice:
+	case enumGISGPParamDTStringChoiceEditable:
     default:
         bValid = true;
         break;
@@ -614,7 +607,6 @@ void wxGISDTChoice::UpdateValues(void)
 
     if ( bValid )
     {
-        m_pParam->SetMessage(wxGISEnumGPMessageNone);
         switch(m_pParam->GetDataType())
         {
 		case enumGISGPParamDTIntegerChoice:
@@ -624,6 +616,7 @@ void wxGISDTChoice::UpdateValues(void)
             m_pParam->SetValue(wxVariant(dfVal, wxT("double")));
             return;
 		case enumGISGPParamDTStringChoice:
+		case enumGISGPParamDTStringChoiceEditable:
 		default:
             m_pParam->SetValue(wxVariant(sData, wxT("string")));
             return;
@@ -635,12 +628,23 @@ void wxGISDTChoice::UpdateControls(void)
 {
     int nPos = m_choice->GetCurrentSelection();
 	//
-    IGPDomain* pDomain = m_pParam->GetDomain();
-    if(pDomain)
+    wxGISGPValueDomain* poGPValueDomain = dynamic_cast<wxGISGPValueDomain*>(m_pParam->GetDomain());
+    if(poGPValueDomain)
 	{
-		int nParamPos = m_pParam->GetSelDomainValue();
-		if(nPos == nParamPos)
-			return;
+		if(poGPValueDomain->GetAltered())
+		{
+			poGPValueDomain->SetAltered(false);
+			m_choice->Clear();
+			for(size_t i = 0; i < poGPValueDomain->GetCount(); ++i)
+				m_choice->Append( poGPValueDomain->GetName(i));
+			nPos = m_pParam->GetSelDomainValue();
+		}
+		else
+		{
+			int nParamPos = m_pParam->GetSelDomainValue();
+			if(nPos == nParamPos)
+				return;
+		}
 		m_choice->SetSelection( nPos );
 	}
     SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
@@ -663,6 +667,57 @@ void wxGISDTChoice::OnUpdateUI(wxUpdateUIEvent &event)
 {
 	Validate();
     SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISDTChoiceEditable
+///////////////////////////////////////////////////////////////////////////////
+BEGIN_EVENT_TABLE(wxGISDTChoiceEditable, wxGISDTChoice)
+	EVT_BUTTON(wxID_EDIT, wxGISDTChoiceEditable::OnEdit)
+END_EVENT_TABLE()
+
+wxGISDTChoiceEditable::wxGISDTChoiceEditable( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxGISDTChoice( pParam, pCatalog, parent, id, pos, size, style )
+{
+	m_bpButton = new wxBitmapButton( this, wxID_EDIT, wxBitmap(add_to_list_xpm), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	m_bPathSizer->Add( m_bpButton, 0, wxALL, 5 );
+	this->Layout();
+}
+
+wxGISDTChoiceEditable::~wxGISDTChoiceEditable()
+{
+}
+
+void wxGISDTChoiceEditable::OnEdit(wxCommandEvent& event)
+{
+	wxPGArrayStringEditorDialog dlg;
+    wxGISGPStringDomain* poGPStringDomain = dynamic_cast<wxGISGPStringDomain*>(m_pParam->GetDomain());
+    if(!poGPStringDomain)
+		return;
+	wxArrayString Choices;
+	for(size_t i = 0; i < poGPStringDomain->GetCount(); ++i)
+		Choices.Add( poGPStringDomain->GetName(i));
+
+
+    dlg.SetDialogValue( wxVariant(Choices) );
+    dlg.Create(this, _("Change value list"), _("Value list"));
+    int res = dlg.ShowModal();
+
+    if ( res == wxID_OK && dlg.IsModified() )
+    {
+        wxVariant value = dlg.GetDialogValue();
+        if ( !value.IsNull() )
+        {
+			Choices = value.GetArrayString();
+			poGPStringDomain->Clear();
+			for(size_t i = 0; i < Choices.GetCount(); ++i)
+				poGPStringDomain->AddString(Choices[i], Choices[i]);
+			poGPStringDomain->SetAltered(true);
+
+			//m_pParam->SetValue( value );
+            m_pParam->SetAltered(true);
+			UpdateControls();
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1203,7 +1258,7 @@ void wxGISDTList::OnAdd(wxCommandEvent& event)
 {
 	wxPGArrayStringEditorDialog dlg;
     dlg.SetDialogValue( m_pParam->GetValue() );
-    dlg.Create(this, _("Add value to list"), _("Value list"));
+    dlg.Create(this, _("Change value list"), _("Value list"));
     int res = dlg.ShowModal();
 
     if ( res == wxID_OK && dlg.IsModified() )
@@ -1244,7 +1299,11 @@ bool wxGISDTList::Validate(void)
 
 void wxGISDTList::UpdateControls(void)
 {
+	wxString sVal  = GetValue();
+	if(m_TextCtrl->GetValue().CmpNoCase(sVal) == 0)
+		return;
     m_TextCtrl->ChangeValue( GetValue() );
+    m_TextCtrl->SetInsertionPointEnd( );
     SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
 }
 
@@ -1256,7 +1315,7 @@ wxString wxGISDTList::GetValue()
 	wxString sOutput;
 	for(size_t i = 0; i < Arr.GetCount(); ++i)
 	{
-		sOutput.Append(Arr[i]);
+		sOutput.Append(Arr[i].Trim(true).Trim(false));
 		if(i != Arr.GetCount() - 1)
 			sOutput.Append(wxT(", "));
 	}
@@ -1265,9 +1324,9 @@ wxString wxGISDTList::GetValue()
 
 void wxGISDTList::UpdateValues(void)
 {
-	wxArrayString saValues =  wxStringTokenize(m_TextCtrl->GetValue(), wxString(wxT(",")), wxTOKEN_RET_EMPTY );
-	for(size_t i = 0; i < saValues.GetCount(); ++i)
-		saValues[i] = saValues[i].Trim(true).Trim(false);	
+	wxArrayString saValues =  wxStringTokenize(m_TextCtrl->GetValue(), wxString(wxT(",")), /*wxTOKEN_RET_EMPTY*/wxTOKEN_RET_EMPTY_ALL );
+	//for(size_t i = 0; i < saValues.GetCount(); ++i)
+	//	saValues[i] = saValues[i].Trim(true).Trim(false);	
 	
 	m_pParam->SetValue( wxVariant(saValues, wxT("list")) );
 }

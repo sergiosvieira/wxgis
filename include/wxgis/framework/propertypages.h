@@ -90,7 +90,6 @@ protected:
     wxStaticLine* m_staticline;
 
     IFrameApplication* m_pApp;
-    wxGISAppConfig* m_pGISConfig;
     wxArrayString m_aLangs;
     wxImageList m_ImageList;
 

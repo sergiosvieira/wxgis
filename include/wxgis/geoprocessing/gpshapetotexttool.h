@@ -22,6 +22,8 @@
 #pragma once
 
 #include "wxgis/geoprocessing/gptool.h"
+#include "wxgis/core/format.h"
+
 
 /** \class wxGISGPShapeToTextTool gpshapetotexttool.h
     \brief The geoprocessing tool write shape cordinates to text file
@@ -41,4 +43,9 @@ public:
     virtual bool Execute(ITrackCancel* pTrackCancel);
     virtual bool Validate(void);
     virtual GPParameters GetParameterInfo(void);
+protected:
+	wxArrayString m_asCoordsMask;
+	bool m_bEmptyCoordsMask;
+	wxGISCoordinatesFormat m_CFormat;
 };
+

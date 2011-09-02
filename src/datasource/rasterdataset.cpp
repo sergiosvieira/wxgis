@@ -211,7 +211,7 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
 	if( m_poDataset == NULL )
     {
 		const char* err = CPLGetLastErrorMsg();
-		wxString sErr = wxString::Format(_("wxGISRasterDataset: Open failed! Path '%s'. GDAL error: %s"), m_sPath.c_str(), wgMB2WX(err));
+		wxString sErr = wxString::Format(_("wxGISRasterDataset: Open failed! Path '%s'. GDAL error: %s"), m_sPath.c_str(), wxString(err, wxConvUTF8).c_str());
 		wxLogError(sErr);
 
 		return false;

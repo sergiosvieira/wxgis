@@ -59,8 +59,7 @@ public:
 	virtual bool IsServerSearching(){return false;};
 	virtual void SetCallback(INetSearchCallback* pCallback){m_pCallback = pCallback;};
 	virtual INetSearchCallback* GetCallback(void){return m_pCallback;};
-	virtual wxXmlNode* GetAttributes(void);
-	virtual void SetAttributes(const wxXmlNode* pProp);
+    virtual void Serialize(wxXmlNode* pConfigNode, bool bSave = true);
 	INetClientConnection* GetConnection(wxXmlNode* pProp);
 	//virtual char GetID(void){return m_nID;};
 	//virtual void SetID(char nID){m_nID = nID;};

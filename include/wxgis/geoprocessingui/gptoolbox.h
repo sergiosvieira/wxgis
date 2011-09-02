@@ -87,7 +87,7 @@ public:
     virtual wxString GetBaseName(void){return GetName();};
     //IGxRootObjectProperties
     virtual void Init(wxXmlNode* const pConfigNode);
-    virtual wxXmlNode* GetAttributes(void);
+    virtual void Serialize(wxXmlNode* pConfigNode);
 	//wxGxRootToolbox
 	virtual void LoadChildren(void);
 	virtual wxGISGPToolManager* GetGPToolManager(void);
@@ -100,8 +100,6 @@ public:
 protected:
 	wxString m_sPath;
 	bool m_bIsChildrenLoaded;
-    wxXmlNode* m_pPropNode;
-    wxGISAppConfig* m_pConfig;
     wxGISGPToolManager* m_pToolMngr;
 };
 
@@ -142,7 +140,7 @@ public:
 protected:
 	bool m_bIsChildrenLoaded;
     wxGxRootToolbox* m_pRootToolbox;
-    short m_nMaxCount;
+    size_t m_nMaxCount;
     wxIcon m_LargeToolIcon, m_SmallToolIcon;
 };
 
@@ -157,7 +155,7 @@ class WXDLLIMPEXP_GIS_GPU wxGxToolExecute :
     public wxGISGPToolManager
 {
 public:
-	wxGxToolExecute(wxGxRootToolbox* pRootToolbox, wxXmlNode* pToolsNode);
+	wxGxToolExecute(wxGxRootToolbox* pRootToolbox);
 	virtual ~wxGxToolExecute(void);
 	//IGxObject
 	virtual void Detach(void);

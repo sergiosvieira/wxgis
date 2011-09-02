@@ -19,11 +19,11 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxdiscconnections.h"
+#include "wxgis/core/config.h"
 #include "wxgis/catalog/gxdiscconnection.h"
 
 #include "wx/volume.h"
 #include "wx/dir.h"
-#include "wx/stdpaths.h"
 
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxDiscConnections, wxObject)
@@ -32,10 +32,12 @@ wxGxDiscConnections::wxGxDiscConnections(void) : m_bIsChildrenLoaded(false)
 {
     m_bEnabled = true;
     //get config path
-    wxStandardPaths stp;
-    m_sUserConfigDir = stp.GetUserConfigDir() + wxFileName::GetPathSeparator() + wxString(CONFIG_DIR) + wxFileName::GetPathSeparator() + wxString(CONNDIR);
-    m_sUserConfig = m_sUserConfigDir + wxFileName::GetPathSeparator() + wxString(CONNCONF);
-
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(pConfig)
+	{
+		m_sUserConfigDir = pConfig->GetLocalConfigDir() + wxFileName::GetPathSeparator() + wxString(CONNDIR);
+		m_sUserConfig = m_sUserConfigDir + wxFileName::GetPathSeparator() + wxString(CONNCONF);
+	}
 }
 
 wxGxDiscConnections::~wxGxDiscConnections(void)
@@ -95,16 +97,9 @@ void wxGxDiscConnections::Init(wxXmlNode* const pConfigNode)
 	}
 }
 
-wxXmlNode* wxGxDiscConnections::GetAttributes(void)
+void wxGxDiscConnections::Serialize(wxXmlNode* pConfigNode)
 {
-    wxXmlNode* pNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("rootitem"));
-    wxClassInfo* pInfo = GetClassInfo();
-    if(pInfo)
-        pNode->AddAttribute(wxT("name"), pInfo->GetClassName());
-    pNode->AddAttribute(wxT("is_enabled"), m_bEnabled == true ? wxT("1") : wxT("0"));    
     StoreConnections();
-
-    return pNode;
 }
 
 void wxGxDiscConnections::EmptyChildren(void)

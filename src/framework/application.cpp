@@ -21,6 +21,7 @@
 #include "wxgis/framework/application.h"
 #include "wxgis/framework/toolbarmenu.h"
 #include "wxgis/core/globalfn.h"
+#include "wxgis/core/config.h"
 
 #include "../../art/tool_16.xpm"
 #include "../../art/options.xpm"
@@ -46,7 +47,7 @@ BEGIN_EVENT_TABLE(wxGISApplication, wxFrame)
     EVT_CLOSE(wxGISApplication::OnClose)
 END_EVENT_TABLE()
 
-wxGISApplication::wxGISApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style), m_pGISAcceleratorTable(NULL), m_pMenuBar(NULL), m_CurrentTool(NULL), m_pDropDownCommand(NULL), m_pTrackCancel(NULL), m_pszOldLocale(NULL), m_pLocale(NULL), m_pConfig(NULL)
+wxGISApplication::wxGISApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style), m_pGISAcceleratorTable(NULL), m_pMenuBar(NULL), m_CurrentTool(NULL), m_pDropDownCommand(NULL), m_pTrackCancel(NULL), m_pszOldLocale(NULL), m_pLocale(NULL)
 {
 }
 
@@ -105,11 +106,6 @@ IGISCommandBar* wxGISApplication::GetCommandBar(wxString sName)
 		if(m_CommandBarArray[i]->GetName() == sName)
 			return m_CommandBarArray[i];
 	return NULL;
-}
-
-IGISConfig* wxGISApplication::GetConfig(void)
-{
-	return m_pConfig;
 }
 
 COMMANDBARARRAY* wxGISApplication::GetCommandBars(void)
@@ -321,70 +317,38 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 
 void wxGISApplication::SerializeFramePos(bool bSave)
 {
-	wxXmlNode* pFrameXmlNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame")));
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return;
 
 	if(bSave)
 	{
-		if(!pFrameXmlNode)
-			pFrameXmlNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame")), true);
-
 		if( IsMaximized() )
-		{
-			if(pFrameXmlNode->HasAttribute(wxT("maxi")))
-				pFrameXmlNode->DeleteAttribute(wxT("maxi"));
-			pFrameXmlNode->AddAttribute(wxT("maxi"), wxT("1"));
-		}
+			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/maxi")), true);
 		else
 		{
 			int x, y, w, h;
 			GetClientSize(&w, &h);
 			GetPosition(&x, &y);
-
-			wxXmlAttribute* prop = pFrameXmlNode->GetAttributes();
-			while(prop)
-			{
-				wxXmlAttribute* prev_prop = prop;
-				prop = prop->GetNext();
-				wxDELETE(prev_prop);
-			}
-			wxXmlAttribute* pHProp = new wxXmlAttribute(wxT("Height"), wxString::Format(wxT("%u"), h), NULL);
-			wxXmlAttribute* pWProp = new wxXmlAttribute(wxT("Width"), wxString::Format(wxT("%u"), w), pHProp);
-			wxXmlAttribute* pYProp = new wxXmlAttribute(wxT("YPos"), wxString::Format(wxT("%d"), y), pWProp);
-			wxXmlAttribute* pXProp = new wxXmlAttribute(wxT("XPos"), wxString::Format(wxT("%d"), x), pYProp);
-			wxXmlAttribute* pMaxi = new wxXmlAttribute(wxT("maxi"), wxT("0"), pXProp);
-
-			pFrameXmlNode->SetAttributes(pMaxi);
+			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/maxi")), false);
+			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/width")), w);
+			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/height")), h);
+			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/xpos")), x);
+			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/ypos")), y);
 		}
 		//status bar shown state
-		wxXmlNode* pStatusBarNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/statusbar")));
-		if(pStatusBarNode)
-		{
-			if(pStatusBarNode->HasAttribute(wxT("shown")))
-				pStatusBarNode->DeleteAttribute(wxT("shown"));
-		}
-		else
-		{
-			pStatusBarNode = new wxXmlNode(pFrameXmlNode, wxXML_ELEMENT_NODE, wxT("statusbar"));
-		}
-		pStatusBarNode->AddAttribute(wxT("shown"), IsStatusBarShown() == true ? wxT("t") : wxT("f"));
+		pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/statusbar/shown")), IsStatusBarShown());
 	}
 	else
 	{
 		//load
-		if(!pFrameXmlNode)
-			pFrameXmlNode = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame")));
-
-		if(pFrameXmlNode == NULL)
-			return;
-
-		bool bMaxi = wxAtoi(pFrameXmlNode->GetAttribute(wxT("maxi"), wxT("0"))) != 0;
+		bool bMaxi = pConfig->ReadBool(enumGISHKCU, GetAppName() + wxString(wxT("/frame/maxi")), false);
 		if(!bMaxi)
 		{
-			int x = wxAtoi(pFrameXmlNode->GetAttribute(wxT("XPos"), wxT("50")));
-			int y = wxAtoi(pFrameXmlNode->GetAttribute(wxT("YPos"), wxT("50")));
-			int w = wxAtoi(pFrameXmlNode->GetAttribute(wxT("Width"), wxT("850")));
-			int h = wxAtoi(pFrameXmlNode->GetAttribute(wxT("Height"), wxT("530")));
-
+			int x = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/xpos")), 50);
+			int y = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/ypos")), 50);
+			int w = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/width")), 850);
+			int h = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/height")), 530);
 			Move(x, y);
 			SetClientSize(w, h);
 		}
@@ -393,12 +357,7 @@ void wxGISApplication::SerializeFramePos(bool bSave)
 			Maximize();
 		}
 		//status bar shown state
-		wxXmlNode* pStatusBarNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/statusbar")));
-		if(pStatusBarNode)
-		{
-			bool bStatusBarShow = pStatusBarNode->GetAttribute(wxT("shown"), wxT("t")) == wxString(wxT("t")) ? true : false;
-			wxGISApplication::ShowStatusBar(bStatusBarShow);
-		}
+		wxGISApplication::ShowStatusBar(pConfig->ReadBool(enumGISHKCU, GetAppName() + wxString(wxT("/frame/statusbar/shown")), true));
 	}
 }
 
@@ -471,21 +430,24 @@ ICommand* wxGISApplication::GetCommand(wxString sCmdName, unsigned char nCmdSubT
 
 void wxGISApplication::SerializeCommandBars(bool bSave)
 {
-	wxXmlNode* pMenuesNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/menues")));
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return;
 
-	wxXmlNode* pToolbarsNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/toolbars")));
+	wxXmlNode* pMenuesNode = pConfig->GetConfigNode(enumGISHKCU, GetAppName() + wxString(wxT("/frame/menues")));
+	wxXmlNode* pToolbarsNode = pConfig->GetConfigNode(enumGISHKCU, GetAppName() + wxString(wxT("/frame/toolbars")));
 
 	if(bSave)
 	{
 		if(!pMenuesNode)
-			pMenuesNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame/menues")), true);
+			pMenuesNode = pConfig->CreateConfigNode(enumGISHKCU, GetAppName() + wxString(wxT("/frame/menues")));
 		else
-			wxGISConfig::DeleteNodeChildren(pMenuesNode);
+			pConfig->DeleteNodeChildren(pMenuesNode);
 
 		if(!pToolbarsNode)
-			pToolbarsNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame/toolbars")), true);
+			pToolbarsNode = pConfig->CreateConfigNode(enumGISHKCU, GetAppName() + wxString(wxT("/frame/toolbars")));
 		else
-			wxGISConfig::DeleteNodeChildren(pToolbarsNode);
+			pConfig->DeleteNodeChildren(pToolbarsNode);
 
 
 		for(size_t i = m_CommandBarArray.size(); i > 0; i--)
@@ -529,12 +491,12 @@ void wxGISApplication::SerializeCommandBars(bool bSave)
 		//load from current user config first & local machine config last
 		//load menues
 		LoadMenues(pMenuesNode);
-		pMenuesNode = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame/menues")));
+		pMenuesNode = pConfig->GetConfigNode(enumGISHKLM, GetAppName() + wxString(wxT("/frame/menues")));
 		LoadMenues(pMenuesNode);
 
 		//load toolbars
 		LoadToolbars(pToolbarsNode);
-		pToolbarsNode = m_pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("frame/toolbars")));
+		pToolbarsNode = pConfig->GetConfigNode(enumGISHKLM, GetAppName() + wxString(wxT("/frame/toolbars")));
 		LoadToolbars(pToolbarsNode);
 
 		////////////////
@@ -697,24 +659,26 @@ void wxGISApplication::OnToolDropDown(wxAuiToolBarEvent& event)
     }
 }
 
-bool wxGISApplication::Create(IGISConfig* pConfig)
+bool wxGISApplication::Create(void)
 {
-	m_pConfig = pConfig;
-
 	CreateStatusBar();
 	wxFrame::GetStatusBar()->SetStatusText(_("Ready"));
 
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return false;
 	//load commands
-	wxXmlNode* pCommandsNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("commands")));
+
+	wxXmlNode* pCommandsNode = pConfig->GetConfigNode(enumGISHKCU, GetAppName() + wxString(wxT("/commands")));
 	if(pCommandsNode)
 		LoadCommands(pCommandsNode);
 	//load commandbars
 	SerializeCommandBars();
 	//load accelerators
-	m_pGISAcceleratorTable = new wxGISAcceleratorTable(this, pConfig);
+	m_pGISAcceleratorTable = new wxGISAcceleratorTable(this);
 
     // create MenuBar
-	wxXmlNode* pMenuBarNode = m_pConfig->GetConfigNode(wxString(wxT("frame/menubar")), true, true);
+	wxXmlNode* pMenuBarNode = pConfig->GetConfigNode(enumGISHKCU, GetAppName() + wxString(wxT("/frame/menubar")));
 
     m_pMenuBar = new wxGISMenuBar(0, static_cast<IFrameApplication*>(this), pMenuBarNode); //wxMB_DOCKABLE
     SetMenuBar(static_cast<wxMenuBar*>(m_pMenuBar));
@@ -754,11 +718,13 @@ void wxGISApplication::OnClose(wxCloseEvent& event)
 	if(m_pGISAcceleratorTable)
 		m_pGISAcceleratorTable->Store();
 	wxDELETE(m_pGISAcceleratorTable);
-	if(m_pMenuBar)
+
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(m_pMenuBar && pConfig)
 	{
-		wxXmlNode* pMenuBarNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/menubar")));
+		wxXmlNode* pMenuBarNode = pConfig->GetConfigNode(enumGISHKCU, GetAppName() + wxString(wxT("/frame/menubar")));
 		if(!pMenuBarNode)
-			pMenuBarNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame/menubar")), true);
+			pMenuBarNode = pConfig->CreateConfigNode(enumGISHKCU, GetAppName() + wxString(wxT("/frame/menubar")));
 		m_pMenuBar->Serialize(pMenuBarNode);
 	}
 	//wxDELETE(m_pMenuBar); delete by wxApp
@@ -776,7 +742,14 @@ void wxGISApplication::OnClose(wxCloseEvent& event)
 void wxGISApplication::OnAppOptions(void)
 {
     //read the config node for property pages and its names
-    wxXmlNode *pPPXmlNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("propertypages")));
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+    {
+        wxMessageBox(_("Get config failed!"), _("Error"), wxICON_ERROR | wxOK );
+        return;
+    }
+
+    wxXmlNode *pPPXmlNode = pConfig->GetConfigNode(enumGISHKCU, GetAppName() + wxString(wxT("/propertypages")));
     if(!pPPXmlNode)
     {
         wxMessageBox(_("No Property Pages"), _("Error"), wxICON_ERROR | wxOK );
@@ -830,7 +803,7 @@ void wxGISApplication::OnAppOptions(void)
     }    
 }
 
-bool wxGISApplication::SetupLog(wxString sLogPath)
+bool wxGISApplication::SetupLog(const wxString &sLogPath)
 {
 	if(sLogPath.IsEmpty())
 	{
@@ -868,7 +841,7 @@ bool wxGISApplication::SetupLog(wxString sLogPath)
     return true;
 }
 
-bool wxGISApplication::SetupSys(wxString sSysPath)
+bool wxGISApplication::SetupSys(const wxString &sSysPath)
 {
 	//setup sys dir
 	if(!wxDirExists(sSysPath))
@@ -879,7 +852,7 @@ bool wxGISApplication::SetupSys(wxString sSysPath)
     return true;
 }
 
-bool wxGISApplication::SetupLoc(wxString sLoc, wxString sLocPath)
+bool wxGISApplication::SetupLoc(const wxString &sLoc, const wxString &sLocPath)
 {
     wxLogMessage(_("wxGISApplication: Initialize locale"));
 

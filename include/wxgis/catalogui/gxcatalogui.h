@@ -60,6 +60,8 @@ public:
             return &m_ImageListSmall;
     }
 	//wxGxCatalog
+	virtual wxString GetConfigName(void){return wxString(wxT("wxCatalogUI"));};
+	//
 	virtual void Init(IGxCatalog* pExtCat = NULL);
 protected:
 	bool m_bOpenLastPath, m_bHasInternal;
