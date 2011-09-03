@@ -94,6 +94,13 @@ void WXDLLIMPEXP_GIS_DSP SetEnvelopeRatio(OGREnvelope &Env, double dRatio)
 		Env.MaxY = dCenterY + dHeight;
 		Env.MinY = dCenterY - dHeight;
 	}
+
+	dWidth = (Env.MaxX - Env.MinX) / 2;
+	dHeight = (Env.MaxY - Env.MinY) / 2;
+	dCenterX = Env.MinX + dWidth;
+	dCenterY = Env.MinY + dHeight;
+
+	dEnvRatio = dWidth / dHeight;
 }
 
 

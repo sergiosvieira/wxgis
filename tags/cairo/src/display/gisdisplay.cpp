@@ -46,8 +46,8 @@ wxGISDisplay::wxGISDisplay(void)
 	layercachedata.pCairoContext = cairo_create (layercachedata.pCairoSurface);
 	m_saLayerCaches.push_back(layercachedata);
 
-	m_dCacheCenterX = double(m_nMax_X) / 2;
-	m_dCacheCenterY = double(m_nMax_Y) / 2;
+	m_dCacheCenterX = m_nMax_X / 2;
+	m_dCacheCenterY = m_nMax_Y / 2;
 
 	m_pMatrix = new cairo_matrix_t;
 	m_pDisplayMatrix = new cairo_matrix_t;
@@ -141,7 +141,7 @@ void wxGISDisplay::OnEraseBackground(void)
 	cairo_paint(m_saLayerCaches[0].pCairoContext);
 }
 
-void wxGISDisplay::Output(wxDC* pDC, double *x1, double *y1, double *x2, double *y2)
+void wxGISDisplay::Output(wxDC* pDC, wxGISPointsArray ClipGeometry)
 {
 	wxCriticalSectionLocker locker(m_CritSect);
 	cairo_surface_t *surface;
@@ -153,8 +153,16 @@ void wxGISDisplay::Output(wxDC* pDC, double *x1, double *y1, double *x2, double 
 	cairo_set_source_surface (cr, m_saLayerCaches[m_nCurrentLayer].pCairoSurface, -m_dOrigin_X, -m_dOrigin_Y);
 	//cairo_set_source_surface (cr, m_saLayerCaches[m_nCurrentLayer].pCairoSurface, m_dOrigin_X, m_dOrigin_Y);
 	cairo_set_operator (cr, CAIRO_OPERATOR_SOURCE);
-	if(x1 && y1 && x2 && y2)
-		cairo_clip_extents(cr, x1, y1, x2, y2);
+	if(ClipGeometry.GetCount() > 0)//x1 && y1 && x2 && y2)
+	{
+		cairo_move_to(cr, ClipGeometry[0].x, ClipGeometry[0].y);
+		for(size_t i = 1; i < ClipGeometry.GetCount(); ++i)
+			cairo_line_to(cr, ClipGeometry[i].x, ClipGeometry[i].y);
+		//close path
+		cairo_line_to(cr, ClipGeometry[0].x, ClipGeometry[0].y);
+		cairo_clip(cr);
+		cairo_new_path (cr);
+	}
 	cairo_paint (cr);
 
     cairo_destroy (cr);
@@ -239,7 +247,9 @@ void wxGISDisplay::PanningDraw(wxCoord x, wxCoord y, wxDC* pDC)
 	cairo_set_source_rgb(m_cr_tmp, m_stBackGroudnColour.dRed, m_stBackGroudnColour.dGreen, m_stBackGroudnColour.dBlue);
 	cairo_paint(m_cr_tmp);
 
-	cairo_set_source_surface (m_cr_tmp, m_saLayerCaches[m_saLayerCaches.size() - 1].pCairoSurface, -m_dOrigin_X - x, -m_dOrigin_Y - y);
+	double dNewX = m_dOrigin_X + double(x);
+	double dNewY = m_dOrigin_Y + double(y);
+	cairo_set_source_surface (m_cr_tmp, m_saLayerCaches[m_saLayerCaches.size() - 1].pCairoSurface, -dNewX, -dNewY);
 
 	cairo_paint (m_cr_tmp);
 
@@ -372,7 +382,12 @@ bool wxGISDisplay::IsDerty(void)
 void wxGISDisplay::SetDeviceFrame(wxRect &rc)
 {
 	m_oDeviceFrameRect = rc;
-	m_dFrameRatio = double(rc.width) / rc.height;
+	if(m_oDeviceFrameRect.GetWidth() % 2 != 0)
+		m_oDeviceFrameRect.SetWidth(m_oDeviceFrameRect.GetWidth() + 1);
+	if(m_oDeviceFrameRect.GetHeight() % 2 != 0)
+		m_oDeviceFrameRect.SetHeight(m_oDeviceFrameRect.GetHeight() + 1);
+
+	m_dFrameRatio = double(m_oDeviceFrameRect.GetWidth()) / m_oDeviceFrameRect.GetHeight();
 
 	m_CurrentBounds = m_RealBounds;
 
@@ -428,10 +443,10 @@ OGREnvelope wxGISDisplay::GetBounds(void)
 
 void wxGISDisplay::InitTransformMatrix(void)
 {
-	m_dFrameCenterX = double(m_oDeviceFrameRect.GetWidth()) / 2;
-	m_dFrameCenterY = double(m_oDeviceFrameRect.GetHeight()) / 2;
-	double dWorldCenterX = double(m_CurrentBounds.MaxX - m_CurrentBounds.MinX) / 2;
-	double dWorldCenterY = double(m_CurrentBounds.MaxY - m_CurrentBounds.MinY) / 2;
+	m_dFrameCenterX = m_oDeviceFrameRect.GetWidth() / 2;
+	m_dFrameCenterY = m_oDeviceFrameRect.GetHeight() / 2;
+	double dWorldCenterX = (m_CurrentBounds.MaxX - m_CurrentBounds.MinX) / 2;
+	double dWorldCenterY = (m_CurrentBounds.MaxY - m_CurrentBounds.MinY) / 2;
 
 	//origin (UL corner)
 	m_dOrigin_X = m_dCacheCenterX - m_dFrameCenterX;
@@ -440,21 +455,6 @@ void wxGISDisplay::InitTransformMatrix(void)
 	double dScaleX = fabs(m_dFrameCenterX / dWorldCenterX);
 	double dScaleY = fabs(m_dFrameCenterY / dWorldCenterY);
 	double dScale = std::min(dScaleX, dScaleY);
-
-	//if(!IsDoubleEquil(dScale, dScaleX))
-	//{
-	//	double dDeltaX = fabs(dWorldCenterX - m_dFrameCenterX / dScale);
-	//	m_CurrentBounds.MinX -= dDeltaX;
-	//	m_CurrentBounds.MaxX += dDeltaX;
-	//	dWorldCenterX = double(m_CurrentBounds.MaxX - m_CurrentBounds.MinX) / 2;
-	//}
-	//if(!IsDoubleEquil(dScale, dScaleY))
-	//{
-	//	double dDeltaY = fabs(dWorldCenterY - m_dFrameCenterY / dScale);
-	//	m_CurrentBounds.MinY -= dDeltaY;
-	//	m_CurrentBounds.MaxY += dDeltaY;
-	//	dWorldCenterY = double(m_CurrentBounds.MaxY - m_CurrentBounds.MinY) / 2;
-	//}
 
 	double dWorldDeltaX = dWorldCenterX + m_CurrentBounds.MinX;
 	double dWorldDeltaY = dWorldCenterY + m_CurrentBounds.MinY;
@@ -886,18 +886,18 @@ OGREnvelope wxGISDisplay::TransformRect(wxRect &rect)
 {
 	OGREnvelope out;
 	double dX1, dX2, dY2, dY1; 
-	if(IsDoubleEquil(m_dAngleRad, 0.0))//1)//
-	{
-		dX1 = rect.GetLeft();
-		dX2 = rect.GetRight();
-		dY2 = rect.GetTop();
-		dY1 = rect.GetBottom(); 
+	//if(IsDoubleEquil(m_dAngleRad, 0.0))//1)//
+	//{
+	//	dX1 = rect.GetLeft();
+	//	dX2 = rect.GetRight();
+	//	dY2 = rect.GetTop();
+	//	dY1 = rect.GetBottom(); 
 
-		DC2World(&dX1, &dY1);
-		DC2World(&dX2, &dY2);
-	}
-	else
-	{
+	//	DC2World(&dX1, &dY1);
+	//	DC2World(&dX2, &dY2);
+	//}
+	//else
+	//{
 		double dWHalf = double(rect.width) / 2;
 		double dHHalf = double(rect.height) / 2;
 		double dXCenter = rect.x + dWHalf, dYCenter = rect.y + dHHalf; 
@@ -912,7 +912,7 @@ OGREnvelope wxGISDisplay::TransformRect(wxRect &rect)
 		dX2 = dXCenter + dWHalf;
 		dY1 = dYCenter - dHHalf;
 		dY2 = dYCenter + dHHalf;
-	}
+	//}
 	out.MinX = std::min(dX1, dX2);
 	out.MinY = std::min(dY1, dY2);
 	out.MaxX = std::max(dX1, dX2);

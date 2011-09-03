@@ -103,6 +103,7 @@ protected:
 	virtual void DrawToolTip(wxClientDC &dc, wxString &sText);
 	virtual OGREnvelope CreateEnvelopeFromZoomFactor(double dZoom);
 	virtual void UpdateFrameCenter(void);
+	virtual void FillClipGeometry(wxRect rect, wxCoord x, wxCoord y);
 protected:
 	wxGISDisplay *m_pGISDisplay;
 	wxTimer m_timer;
@@ -117,5 +118,8 @@ protected:
 	double m_dCurrentAngle;
 
 	wxCriticalSection m_CritSect;
+
+	wxGISPointsArray m_ClipGeometry;
+
 	DECLARE_EVENT_TABLE()
 };

@@ -47,6 +47,7 @@ typedef struct _rgba{
     This class draw to virtual or real display. 
 	It use some caches (memory rgba rasters) and output DC to draw.
 */
+WX_DEFINE_ARRAY(wxRealPoint, wxGISPointsArray);
 
 class WXDLLIMPEXP_GIS_DSP wxGISDisplay
 {
@@ -78,7 +79,7 @@ public:
 	virtual void World2DCDist(double* pdX, double* pdY);
 	//
 	virtual void OnEraseBackground(void); //Fill #0 cache of background color
-	virtual void Output(wxDC* pDC, double *x1 = NULL, double *y1 = NULL, double *x2 = NULL, double *y2 = NULL);
+	virtual void Output(wxDC* pDC, wxGISPointsArray ClipGeometry);
 	//Styles
 	virtual void SetFillColor(RGBA Color){m_stFillColour = Color;};
 	virtual void SetLineColor(RGBA Color){m_stLineColour = Color;};

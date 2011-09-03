@@ -166,10 +166,11 @@ void wxGISMapView::OnPaint(wxPaintEvent & event)
 				m_nDrawingState = enumGISMapNone;
 
 			//draw contents of m_pGISDisplay
-			m_pGISDisplay->Output(&paint_dc);
+			m_pGISDisplay->Output(&paint_dc, m_ClipGeometry);
 
 			if( m_nDrawingState == enumGISMapNone )
 			{
+				m_ClipGeometry.Clear();
 				//m_pMapDrawingThread = NULL;
 				if(m_pAni)
 				{
@@ -516,17 +517,62 @@ void wxGISMapView::PanStop(wxPoint MouseLocation)
 	wxCoord x =  m_StartMouseLocation.x - MouseLocation.x;
 	wxCoord y =  m_StartMouseLocation.y - MouseLocation.y;
 
-	wxRect rect = GetClientRect();
+	wxRect rect = m_pGISDisplay->GetDeviceFrame();//GetClientRect();
 	rect.Offset(x, y);
 	m_nDrawingState = enumGISMapDrawing;
 	if(m_pGISDisplay)
 	{
 		OGREnvelope Env = m_pGISDisplay->TransformRect(rect);
 
+		//set clip geom
+		//FillClipGeometry(GetClientRect(), x, y);
+
 		m_pGISDisplay->SetDerty(true);
 		if(Env.IsInit())//set new bounds
 			Do(Env);
 	}
+}
+
+void wxGISMapView::FillClipGeometry(wxRect rect, wxCoord x, wxCoord y)
+{
+	m_ClipGeometry.Clear();
+
+	//if(x < 0 && y > 0)
+	//{//3
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetLeft(), rect.GetTop()));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetRight(), rect.GetTop()));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetRight(), rect.GetTop() - y));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetLeft() + x, rect.GetTop() - y));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetLeft() + x, rect.GetBottom()));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetLeft(), rect.GetBottom()));
+	//}
+	//else if(x < 0 && y < 0)
+	//{//4
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetLeft(), rect.GetTop()));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetLeft() + x, rect.GetTop()));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetLeft() + x, rect.GetBottom() - y));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetRight() + x, rect.GetBottom() - y));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetRight(), rect.GetBottom()));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetLeft(), rect.GetBottom()));
+	//}
+	//else if(x > 0 && y > 0)
+	//{//1
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetLeft(), rect.GetTop()));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetRight(), rect.GetTop()));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetRight(), rect.GetBottom()));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetRight() + x, rect.GetBottom()));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetRight() + x, rect.GetTop() - y));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetLeft(), rect.GetTop() - y));
+	//}
+	//else if(x > 0 && y < 0)
+	//{//2
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetLeft(), rect.GetBottom() + y));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetRight() + x, rect.GetBottom() + y));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetRight() + x, rect.GetTop()));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetRight(), rect.GetTop()));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetRight(), rect.GetBottom()));
+	//	m_ClipGeometry.Add(wxRealPoint(	rect.GetLeft(), rect.GetBottom()));
+	//}
 }
 
 void wxGISMapView::RotateStart(wxPoint MouseLocation)

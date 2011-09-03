@@ -145,19 +145,18 @@ void wxGISRubberEnvelope::OnMouseMove(wxMouseEvent& event)
 	Y = std::min(m_StartY, EvY);    
 
 	wxClientDC CDC(m_pWnd);
+	wxGISPointsArray ClipGeometry;
     if(!m_PrevRect.IsEmpty())
     {
         m_PrevRect.Inflate(2,2);
-        //m_pCachedDisplay->AddInvalidRect(m_PrevRect);
-		//m_pWnd->RefreshRect(m_PrevRect.Inflate(2,2), false);
-		double dX1 = double(m_PrevRect.GetLeft());
-		double dY1 = double(m_PrevRect.GetTop());
-		double dX2 = double(m_PrevRect.GetRight());
-		double dY2 = double(m_PrevRect.GetBottom());
-		m_pDisp->Output(&CDC, &dX1, &dY1, &dX2, &dY2);
+		ClipGeometry.Add(wxRealPoint(double(m_PrevRect.GetLeft()), double(m_PrevRect.GetTop())));//top-left
+		ClipGeometry.Add(wxRealPoint(double(m_PrevRect.GetRight()), double(m_PrevRect.GetTop())));//top-right
+		ClipGeometry.Add(wxRealPoint(double(m_PrevRect.GetRight()), double(m_PrevRect.GetBottom())));//bottom-right
+		ClipGeometry.Add(wxRealPoint(double(m_PrevRect.GetLeft()), double(m_PrevRect.GetBottom())));//bottom-left
+		m_pDisp->Output(&CDC, ClipGeometry);
     }
 	else
-		m_pDisp->Output(&CDC);
+		m_pDisp->Output(&CDC, ClipGeometry);
 
 	CDC.SetPen(m_oPen);
 	CDC.SetBrush(wxBrush(m_oPen.GetColour(), wxTRANSPARENT));
