@@ -603,7 +603,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 					int nRes = dlg.ShowModal();
                     
 					if(pConfig)
-						pConfig->Write(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/catalog/ask_delete")), dlg.IsCheckBoxChecked());
+						pConfig->Write(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/catalog/ask_delete")), !dlg.IsCheckBoxChecked());
 
                     if(nRes == wxID_NO)
                         return;

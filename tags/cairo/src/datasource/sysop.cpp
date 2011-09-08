@@ -238,25 +238,30 @@ wxString CheckUniqName(CPLString sPath, wxString sName, wxString sExt, int nCoun
         return sResultName;
 }
 
-CPLString CheckUniqPath(CPLString sPath, int nCounter)
+CPLString CheckUniqPath(CPLString sPath, CPLString sName, int nCounter)
 {
     CPLString sResultName;
     if(nCounter > 0)
     {
         CPLString szAdd;
         szAdd.Printf("_copy(%d)", nCounter);
-        CPLString szTmpName = CPLString(CPLGetBasename(sPath)) + szAdd;
-        sResultName = CPLString(CPLFormFilename(CPLGetPath(sPath), szTmpName, CPLGetExtension(sPath)));
+        CPLString szTmpName = sName + szAdd;
+        sResultName = CPLString(CPLFormFilename(CPLGetPath(sPath), szTmpName, GetExtension(sPath, sName)));
     }
     else
         sResultName = sPath;
 
     if(CPLCheckForFile((char*)sResultName.c_str(), NULL))
-        return CheckUniqPath(sPath, nCounter + 1);
+        return CheckUniqPath(sPath, sName, nCounter + 1);
     else
         return sResultName;
 }
 
+CPLString GetUniqPath(CPLString szOriginalFullPath, CPLString szNewPath, CPLString szNewName)
+{
+    CPLString szNewDestFileName(CPLFormFilename(szNewPath, szNewName, GetExtension(szOriginalFullPath, szNewName)));
+    return CheckUniqPath(szNewDestFileName, szNewName);
+}
 
 CPLString Transliterate(const char* str)
 {
@@ -468,3 +473,17 @@ CPLString GetExtension(CPLString sPath, CPLString sName)
 	}
 	return CPLGetExtension(sPath);
 }
+//
+//CPLString GetFileName(CPLString sPath, CPLString sName)
+//{
+//	if(sName.empty())
+//		return CPLGetBasename(sPath);
+//	size_t found = sPath.rfind(sName);
+//	if( found != std::string::npos )
+//	{
+//		found += sName.length() + 1;
+//		if( found < sPath.size() - 1 )
+//			return sPath.substr(found);
+//	}
+//	return CPLGetBasename(sPath);
+//}
