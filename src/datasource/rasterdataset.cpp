@@ -359,11 +359,11 @@ bool wxGISRasterDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
         return false;
 
     CPLString szCopyFileName;
+	CPLString szFileName = CPLGetBasename(m_sPath);
 
     for(int i = 0; papszFileList[i] != NULL; ++i )
     {
-        CPLString szNewDestFileName(CPLFormFilename(szDestPath, CPLGetFilename(papszFileList[i]), NULL));
-        szNewDestFileName = CheckUniqPath(szNewDestFileName);
+		CPLString szNewDestFileName = GetUniqPath(papszFileList[i], szDestPath, szFileName);
         szCopyFileName = szNewDestFileName;
         if(!CopyFile(szNewDestFileName, papszFileList[i], pTrackCancel))
 		{
@@ -388,9 +388,11 @@ bool wxGISRasterDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(!papszFileList)
         return false;
 
+	CPLString szFileName = CPLGetBasename(m_sPath);
+
     for(int i = 0; papszFileList[i] != NULL; ++i )
     {
-        const char* szNewDestFileName = CPLFormFilename(szDestPath, CPLGetFilename(papszFileList[i]), NULL);
+		CPLString szNewDestFileName = GetUniqPath(papszFileList[i], szDestPath, szFileName);
         if(!MoveFile(szNewDestFileName, papszFileList[i], pTrackCancel))
 		{
 			CSLDestroy( papszFileList );

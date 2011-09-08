@@ -90,8 +90,8 @@ bool wxGxFile::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(pTrackCancel)
         pTrackCancel->PutMessage(wxString(_("Copy file ")) + m_sName, -1, enumGISMessageInfo);
 
-    CPLString szNewDestFileName(CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL));
-    szNewDestFileName = CheckUniqPath(szNewDestFileName);
+	CPLString szFileName = CPLGetBasename(m_sPath);
+	CPLString szNewDestFileName = GetUniqPath(m_sPath, szDestPath, szFileName);
     if(!CopyFile(szNewDestFileName, m_sPath, pTrackCancel))
         return false;
     
@@ -106,8 +106,8 @@ bool wxGxFile::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(pTrackCancel)
         pTrackCancel->PutMessage(wxString(_("Move file ")) + m_sName, -1, enumGISMessageInfo);
 
-    CPLString szNewDestFileName(CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL));
-    szNewDestFileName = CheckUniqPath(szNewDestFileName);
+	CPLString szFileName = CPLGetBasename(m_sPath);
+	CPLString szNewDestFileName = GetUniqPath(m_sPath, szDestPath, szFileName);
     if(!MoveFile(szNewDestFileName, m_sPath, pTrackCancel))
         return false;
     
