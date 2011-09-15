@@ -231,7 +231,7 @@ void wxGISDisplay::WheelingDraw(double dZoom, wxDC* pDC)
 
 		cairo_set_source_surface (cr, m_saLayerCaches[m_saLayerCaches.size() - 1].pCairoSurface, -m_dOrigin_X, -m_dOrigin_Y);
 	}
-	//cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_BEST);
+	//cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_BILINEAR);//CAIRO_FILTER_BEST
 
 	//cairo_set_operator (cr, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (cr);

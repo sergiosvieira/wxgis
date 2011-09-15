@@ -30,3 +30,4 @@ WXDLLIMPEXP_GIS_CORE IApplication* GetApplication();
 	\param pApp The application pointer.
  */	
 WXDLLIMPEXP_GIS_CORE void SetApplication(IApplication* pApp);
+

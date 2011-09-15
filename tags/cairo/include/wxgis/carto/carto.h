@@ -23,6 +23,7 @@
 
 #include "wxgis/display/gisdisplay.h"
 #include "wxgis/datasource/quadtree.h"
+#include "wxgis/datasource/rasterdataset.h"
 
 /** \class wxGISLayer carto.h
     \brief The base class for map layers
@@ -90,6 +91,12 @@ public:
 };
 DEFINE_SHARED_PTR(IFeatureRenderer);
 
+typedef struct _rawpixeldata
+{
+	void* pPixelData;
+	int nWidth, nHeight;
+	OGREnvelope PixelBounds;
+}RAWPIXELDATA;
 /** \class IRasterRenderer carto.h
     \brief The base class for map raster layer renderer
 */
@@ -97,7 +104,9 @@ class IRasterRenderer : public IRenderer
 {
 public:
 	virtual ~IRasterRenderer(void){};
-	//virtual void Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel) = 0;
+	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster) = 0;
+	virtual int *GetBandsCombination(void) = 0;
+	virtual void Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL) = 0;
 };
 DEFINE_SHARED_PTR(IRasterRenderer);
 

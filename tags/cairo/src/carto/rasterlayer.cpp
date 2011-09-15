@@ -30,7 +30,9 @@ wxGISRasterLayer::wxGISRasterLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer(
 		m_pSpatialReference = m_pwxGISRasterDataset->GetSpatialReference();
 		m_FullEnvelope = m_pwxGISRasterDataset->GetEnvelope();
 
-		m_pRasterRenderer = boost::static_pointer_cast<IRasterRenderer>(boost::make_shared<wxGISRasterRGBRenderer>());
+		if(m_pwxGISRasterDataset->GetBandCount() >= 3)
+			m_pRasterRenderer = boost::static_pointer_cast<IRasterRenderer>(boost::make_shared<wxGISRasterRGBARenderer>());
+		//TODO: else RasterStretchColorRampRenderer
 
 		SetName(m_pwxGISRasterDataset->GetName());
 	}
@@ -44,38 +46,44 @@ bool wxGISRasterLayer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay
 {
 	if(m_pRasterRenderer->CanRender(m_pwxGISRasterDataset))
 	{
-	    bool bSetFilter(false);
-		//Check if get all features
+	    //bool bSetFilter(false);
+		////Check if get all features
 		OGREnvelope Env = pDisplay->GetBounds();
-		if(!IsDoubleEquil(m_PreviousEnvelope.MaxX, Env.MaxX) || !IsDoubleEquil(m_PreviousEnvelope.MaxY, Env.MaxY) || !IsDoubleEquil(m_PreviousEnvelope.MinX, Env.MinX) || !IsDoubleEquil(m_PreviousEnvelope.MinY, Env.MinY))
-		{
-			OGREnvelope TempFullEnv = m_FullEnvelope;
-			//use angle
-			if(!IsDoubleEquil(pDisplay->GetRotate(), 0.0))
-			{
-				double dCenterX = Env.MinX + (Env.MaxX - Env.MinX) / 2;
-				double dCenterY = Env.MinY + (Env.MaxY - Env.MinY) / 2;
+		//if(!IsDoubleEquil(m_PreviousEnvelope.MaxX, Env.MaxX) || !IsDoubleEquil(m_PreviousEnvelope.MaxY, Env.MaxY) || !IsDoubleEquil(m_PreviousEnvelope.MinX, Env.MinX) || !IsDoubleEquil(m_PreviousEnvelope.MinY, Env.MinY))
+		//{
+		//	OGREnvelope TempFullEnv = m_FullEnvelope;
+		//	//use angle
+		//	if(!IsDoubleEquil(pDisplay->GetRotate(), 0.0))
+		//	{
+		//		double dCenterX = Env.MinX + (Env.MaxX - Env.MinX) / 2;
+		//		double dCenterY = Env.MinY + (Env.MaxY - Env.MinY) / 2;
 
-				RotateEnvelope(TempFullEnv, pDisplay->GetRotate(), dCenterX, dCenterY);
-			}
-			bSetFilter = TempFullEnv.Contains(Env) != 0;
-		}
+		//		RotateEnvelope(TempFullEnv, pDisplay->GetRotate(), dCenterX, dCenterY);
+		//	}
+		//	bSetFilter = TempFullEnv.Contains(Env) != 0;
+		//}
 
 		//store envelope
-		m_PreviousEnvelope = Env;
+		//m_PreviousEnvelope = Env;
 
-	    //Get pixel dataset
-	    if(bSetFilter)
-	    {
-			//const CPLRectObj Rect = {Env.MinX, Env.MinY, Env.MaxX, Env.MaxY};
-			//pCursor = m_pwxGISFeatureDataset->SearchGeometry(&Rect);
-		}
-		else
-		{
-			//pCursor = m_pwxGISFeatureDataset->SearchGeometry();
-		}
-		//m_pFeatureRenderer->Draw(pCursor, DrawPhase, pDisplay, pTrackCancel);
-		GetSubRaster(Env, pDisplay, pTrackCancel);
+	 //   //Get pixel dataset
+	 //   if(bSetFilter)
+	 //   {
+		//	//const CPLRectObj Rect = {Env.MinX, Env.MinY, Env.MaxX, Env.MaxY};
+		//	//pCursor = m_pwxGISFeatureDataset->SearchGeometry(&Rect);
+		//}
+		//else
+		//{
+		//	//pCursor = m_pwxGISFeatureDataset->SearchGeometry();
+		//}
+
+		RAWPIXELDATA stPixelData;
+		stPixelData.pPixelData = NULL;
+
+		if(GetPixelData(Env, stPixelData, pDisplay, pTrackCancel))
+			m_pRasterRenderer->Draw(stPixelData, DrawPhase, pDisplay, pTrackCancel);
+		if(stPixelData.pPixelData)
+			CPLFree (stPixelData.pPixelData);
 	}
 	return true;
 
@@ -147,27 +155,24 @@ bool wxGISRasterLayer::IsValid(void)
 	return m_pwxGISRasterDataset == NULL ? false : true;
 }
 
-void wxGISRasterLayer::GetSubRaster(OGREnvelope& Envelope, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel)
+bool wxGISRasterLayer::GetPixelData(OGREnvelope& stEnvelope, RAWPIXELDATA &stPixelData, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel)
 {
 	if(!pDisplay)
-		return;
+		return false;
+
+	OGREnvelope stTempEnv = stEnvelope;
+	if(!IsDoubleEquil(pDisplay->GetRotate(), 0.0))
+	{
+		double dCenterX = stEnvelope.MinX + (stEnvelope.MaxX - stEnvelope.MinX) / 2;
+		double dCenterY = stEnvelope.MinY + (stEnvelope.MaxY - stEnvelope.MinY) / 2;
+
+		RotateEnvelope(stTempEnv, pDisplay->GetRotate(), dCenterX, dCenterY);
+	}
+
 	
 	OGREnvelope stRasterExtent = m_pwxGISRasterDataset->GetEnvelope();
-    if(!Envelope.Intersects(stRasterExtent))
-        return;
-
-	//create band combination
-	int nBandCount = m_pwxGISRasterDataset->GetBandCount();
-	int bands[4] = {1,1,1,1};
-
-	//TODO: band combination get from user
-	if(nBandCount >= 3)
-	{
-		bands[0] = 3;
-		bands[1] = 2;
-		bands[2] = 1;		
-		bands[3] = 1;	//alpha	
-	}
+    if(!stTempEnv.Intersects(stRasterExtent))
+        return false;
 
 	GDALDataset* pRaster = m_pwxGISRasterDataset->GetRaster();
 	//create inverse geo transform to get pixel data
@@ -191,9 +196,9 @@ void wxGISRasterLayer::GetSubRaster(OGREnvelope& Envelope, wxGISDisplay *pDispla
     //{
 		//intersect display & raster bounds
 	    OGREnvelope DrawBounds = stRasterExtent;
-		DrawBounds.Intersect(Envelope);
+		DrawBounds.Intersect(stTempEnv);
 		if(!DrawBounds.IsInit())
-			return;
+			return false;
 		//DrawBounds.MinX = std::max(stRasterExtent.MinX, Envelope.MinX);
 	 //   DrawBounds.MinY = std::max(stRasterExtent.MinY, Envelope.MinY);
 	 //   DrawBounds.MaxX = std::min(stRasterExtent.MaxX, Envelope.MaxX);
@@ -235,26 +240,39 @@ void wxGISRasterLayer::GetSubRaster(OGREnvelope& Envelope, wxGISDisplay *pDispla
         int nMinX = int(PixelBounds.MinX);//floor
         int nMinY = int(PixelBounds.MinY);//floor
 
-		int stride = cairo_format_stride_for_width (CAIRO_FORMAT_RGB24, nOutWidth);// * 3 CAIRO_FORMAT_ARGB32 GDT_UInt32
-		//CAIRO_FORMAT_A8 GDT_Byte
-		if(stride == -1)
-			return;//TODO: ERROR
-		void *data = malloc (stride * nOutHeight);
-		
-		//memset(data, 255, stride * nOutHeight);
-		if(!m_pwxGISRasterDataset->GetPixelData(data, nMinX, nMinY, nWidth, nHeight, nOutWidth, nOutHeight, GDT_Byte, 4, bands))
-		{
-			free(data);
-			return;
-		}
-		cairo_surface_t *surface;
-		surface = cairo_image_surface_create_for_data ((unsigned char*)data, CAIRO_FORMAT_RGB24, nOutWidth, nOutHeight, stride);
-		//
-		double dX = DrawBounds.MinX + (DrawBounds.MaxX - DrawBounds.MinX) / 2;
-		double dY = DrawBounds.MinY + (DrawBounds.MaxY - DrawBounds.MinY) / 2;
-		pDisplay->DrawRaster(surface, DrawBounds);
+		GDALDataType eDT = m_pwxGISRasterDataset->GetDataType();
+		int nDataSize = GDALGetDataTypeSize(eDT) / 8;
 
-		cairo_surface_destroy(surface);
+		void *data = CPLMalloc (nOutWidth * nOutHeight * nDataSize);
+		int *panBands = m_pRasterRenderer->GetBandsCombination(); 
+		if(!m_pwxGISRasterDataset->GetPixelData(data, nMinX, nMinY, nWidth, nHeight, nOutWidth, nOutHeight, eDT, WXSIZEOF(panBands), panBands))
+			return false;
+
+		stPixelData.pPixelData = data;
+		stPixelData.nWidth = nOutWidth;
+		stPixelData.nHeight = nOutHeight;
+		stPixelData.PixelBounds = PixelBounds;
+
+		//int stride = cairo_format_stride_for_width (CAIRO_FORMAT_RGB24, nOutWidth);// * 3 CAIRO_FORMAT_ARGB32 GDT_UInt32
+		////CAIRO_FORMAT_A8 GDT_Byte
+		//if(stride == -1)
+		//	return;//TODO: ERROR
+		//void *data = malloc (stride * nOutHeight);//TODO: CPLMalloc(
+		//
+		////memset(data, 255, stride * nOutHeight);
+		//if(!m_pwxGISRasterDataset->GetPixelData(data, nMinX, nMinY, nWidth, nHeight, nOutWidth, nOutHeight, GDT_Byte, 4, bands))
+		//{
+		//	free(data);//TODO CPLFree
+		//	return;
+		//}
+		//cairo_surface_t *surface;
+		//surface = cairo_image_surface_create_for_data ((unsigned char*)data, CAIRO_FORMAT_RGB24, nOutWidth, nOutHeight, stride);
+		////
+		//double dX = DrawBounds.MinX + (DrawBounds.MaxX - DrawBounds.MinX) / 2;
+		//double dY = DrawBounds.MinY + (DrawBounds.MaxY - DrawBounds.MinY) / 2;
+		//pDisplay->DrawRaster(surface, DrawBounds);
+
+		//cairo_surface_destroy(surface);
 
         //scale pTempData to data using interpolation methods
         //pDisplay->DrawBitmap(Scale(data, nWidthOut, nHeightOut, rImgWidthOut, rImgHeightOut, nWidth, nHeight, rMinX - nMinX, rMinY - nMinY, enumGISQualityBilinear, pTrackCancel), nDCXOrig, nDCYOrig); //enumGISQualityNearest
@@ -330,4 +348,5 @@ void wxGISRasterLayer::GetSubRaster(OGREnvelope& Envelope, wxGISDisplay *pDispla
 	//GDALCreateReprojectionTransformer
 
 			*/
+	return true;
 }
