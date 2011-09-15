@@ -25,6 +25,7 @@
 #include "wxgis/geoprocessing/geoprocessing.h"
 
 #define SASHCTRLID	1012
+#define TOOLBOXVIEWCTRLID	1014
 #define TOOLVIEWCTRLID	1015
 #define TASKSVIEWCTRLID	1016
 
@@ -42,22 +43,23 @@ public:
      *  \return IGPTool pointer or NULL.
      */		
 	virtual IGPToolSPtr GetGPTool(wxString sToolName) = 0;
-/** \fn void OnExecuteTool(wxWindow* pParentWnd, IGPTool* pTool, IGPCallBack* pCallBack, bool bSync)
+/** \fn void ExecuteTool(wxWindow* pParentWnd, IGPTool* pTool, bool bSync)
      *  \brief Execute passed preconfig tool
      *  \param pParentWnd The Parent wxWindow created dialogs
      *  \param pTool The preconfigured tool to execute
-     *  \param pCallBack The callback executed on tool execution ends
      *  \param bSync If bSync parameter is true, shows Execution dialog, and interface blocked. If bSync parameter is false, created GxTask Object and inserted to wxGxToolExecuteView.
      */		
-	virtual void OnExecuteTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync) = 0;
-/** \fn bool OnPrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync)
-     *  \brief Execute passed preconfig tool
+	virtual void ExecuteTool(wxWindow* pParentWnd, IGPToolSPtr pTool, bool bSync) = 0;
+/** \fn bool PrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, bool bSync)
+     *  \brief Show tool config dialog
      *  \param pParentWnd The Parent wxWindow created dialogs
      *  \param pTool The tool to configure
-     *  \param pCallBack The callback executed on tool execution ends
      *  \param bSync If bSync parameter is true, shows Execution dialog, and interface blocked. If bSync parameter is false, created GxTask Object and inserted to wxGxToolExecuteView.
      */		
-	virtual bool OnPrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync) = 0;
+	virtual bool PrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, bool bSync) = 0;
+	//TODO: brief advise or unadvise event receiver for process events -> to task_manager
+	virtual long Advise(wxEvtHandler* pEvtHandler) = 0;
+	virtual void Unadvise(long nCookie) = 0;
 };
 
 

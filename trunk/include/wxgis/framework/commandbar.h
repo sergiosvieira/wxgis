@@ -49,7 +49,7 @@ public:
 	virtual void MoveCommandRight(size_t nIndex);
 	virtual size_t GetCommandCount(void);
 	virtual ICommand* GetCommand(size_t nIndex);
-	virtual void Serialize(IApplication* pApp, wxXmlNode* pNode, bool bStore = false);
+	virtual void Serialize(IFrameApplication* pApp, wxXmlNode* pNode, bool bStore = false);
 protected:
 	COMMANDARRAY m_CommandArray;
 	wxString m_sName;
@@ -106,10 +106,11 @@ public:
 	virtual void RemoveCommand(size_t nIndex);
 	virtual void MoveCommandLeft(size_t nIndex);
 	virtual void MoveCommandRight(size_t nIndex);
-	virtual void Serialize(IApplication* pApp, wxXmlNode* pNode, bool bStore = false);
+	virtual void Serialize(IFrameApplication* pApp, wxXmlNode* pNode, bool bStore = false);
 	virtual void AddMenu(wxMenu* pMenu, wxString sName);
-	virtual void Activate(IApplication* pApp);
+	virtual void Activate(IFrameApplication* pApp);
 	virtual void Deactivate(void);
+	virtual void UpdateControls(void);
 protected: // handlers
     void OnMotion(wxMouseEvent& evt);
 protected: 

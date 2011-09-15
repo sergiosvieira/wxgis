@@ -22,6 +22,7 @@
 #include "wxgis/geoprocessing/gptoolmngr.h"
 #include "wxgis/geoprocessing/gpdomain.h"
 #include "wxgis/geoprocessing/gpparam.h"
+#include "wxgis/geoprocessing/gpvector.h"
 #include "wxgis/catalog/gxfilters.h"
 #include "wxgis/catalog/catop.h"
 
@@ -37,28 +38,26 @@ wxGISGPGeomVerticesToPointsTool::wxGISGPGeomVerticesToPointsTool(void) : wxGISGP
 
 wxGISGPGeomVerticesToPointsTool::~wxGISGPGeomVerticesToPointsTool(void)
 {
-    for(size_t i = 0; i < m_pParamArr.size(); i++)
-        wxDELETE(m_pParamArr[i]);
 }
 
-wxString wxGISGPGeomVerticesToPointsTool::GetDisplayName(void)
+const wxString wxGISGPGeomVerticesToPointsTool::GetDisplayName(void)
 {
     return wxString(_("Geometry Vertices To Points"));
 }
 
-wxString wxGISGPGeomVerticesToPointsTool::GetName(void)
+const wxString wxGISGPGeomVerticesToPointsTool::GetName(void)
 {
     return wxString(wxT("gvert_to_pts"));
 }
 
-wxString wxGISGPGeomVerticesToPointsTool::GetCategory(void)
+const wxString wxGISGPGeomVerticesToPointsTool::GetCategory(void)
 {
     return wxString(_("Conversion Tools/Vector"));
 }
 
-GPParameters* wxGISGPGeomVerticesToPointsTool::GetParameterInfo(void)
+GPParameters wxGISGPGeomVerticesToPointsTool::GetParameterInfo(void)
 {
-    if(m_pParamArr.empty())
+    if(m_paParam.IsEmpty())
     {
         //src path
         wxGISGPParameter* pParam1 = new wxGISGPParameter();
@@ -72,7 +71,7 @@ GPParameters* wxGISGPGeomVerticesToPointsTool::GetParameterInfo(void)
         pDomain1->AddFilter(new wxGxDatasetFilter(enumGISFeatureDataset));
         pParam1->SetDomain(pDomain1);
 
-        m_pParamArr.push_back(pParam1);
+        m_paParam.Add(pParam1);
 
         //dst path
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
@@ -86,27 +85,26 @@ GPParameters* wxGISGPGeomVerticesToPointsTool::GetParameterInfo(void)
         AddAllVectorFilters(pDomain2);
         pParam2->SetDomain(pDomain2);
 
-        m_pParamArr.push_back(pParam2);
+        m_paParam.Add(pParam2);
 
     }
-    return &m_pParamArr;
+    return m_paParam;
 }
 
 bool wxGISGPGeomVerticesToPointsTool::Validate(void)
 {
-    if(!m_pParamArr[1]->GetAltered())
+    if(!m_paParam[1]->GetAltered())
     {
-        if(m_pParamArr[0]->GetIsValid())
+        if(m_paParam[0]->GetIsValid())
         {
             //generate temp name
-            wxString sPath = m_pParamArr[0]->GetValue();
+            wxString sPath = m_paParam[0]->GetValue();
             wxFileName Name(sPath);
             Name.SetName(Name.GetName() + wxT("_gvert_to_pts"));
-            m_pParamArr[1]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
-            m_pParamArr[1]->SetAltered(true);//??
+            m_paParam[1]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
+            m_paParam[1]->SetAltered(true);//??
         }
     }
-
     return true;
 }
 
@@ -129,7 +127,7 @@ bool wxGISGPGeomVerticesToPointsTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
 
-    wxString sSrcPath = m_pParamArr[0]->GetValue();
+    wxString sSrcPath = m_paParam[0]->GetValue();
     IGxObject* pGxObject = pGxObjectContainer->SearchChild(sSrcPath);
     if(!pGxObject)
     {
@@ -167,28 +165,22 @@ bool wxGISGPGeomVerticesToPointsTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
     
-    wxString sDstPath = m_pParamArr[1]->GetValue();
+    wxString sDstPath = m_paParam[1]->GetValue();
 
 	//check overwrite & do it!
 	if(!OverWriteGxObject(pGxObjectContainer->SearchChild(sDstPath), pTrackCancel))
 		return false;
 
-    wxFileName sDstFileName(sDstPath);
-    wxString sPath = sDstFileName.GetPath();
-    IGxObject* pGxDstObject = pGxObjectContainer->SearchChild(sPath);
+	IGxObject* pGxDstObject = GetParentGxObjectFromPath(sDstPath, pGxObjectContainer, pTrackCancel);
     if(!pGxDstObject)
-    {
-        //add messages to pTrackCancel
-        if(pTrackCancel)
-            pTrackCancel->PutMessage(_("Error get destination object"), -1, enumGISMessageErr);
         return false;
-    }
 
     CPLString szPath = pGxDstObject->GetInternalName();
+    wxFileName sDstFileName(sDstPath);
     wxString sName = sDstFileName.GetName();
     
-    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[1]->GetDomain());
-	IGxObjectFilter* pFilter = pDomain->GetFilter(m_pParamArr[1]->GetSelDomainValue());
+    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_paParam[1]->GetDomain());
+	IGxObjectFilter* pFilter = pDomain->GetFilter(m_paParam[1]->GetSelDomainValue());
     if(!pFilter)
     {
         //add messages to pTrackCancel
@@ -199,13 +191,8 @@ bool wxGISGPGeomVerticesToPointsTool::Execute(ITrackCancel* pTrackCancel)
         
     bool bRes = GeometryVerticesToPoints(pSrcDataSet, szPath, sName, pFilter, NULL, pTrackCancel);
 
-    IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
-    if(pCont)
-    {
-        IGxObject* pParentLoc = pCont->SearchChild(sPath);
-        if(pParentLoc)
-            pParentLoc->Refresh();
-    }
+    if(pGxDstObject)
+        pGxDstObject->Refresh();
 
     return bRes;
 }

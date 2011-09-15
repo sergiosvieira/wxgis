@@ -23,7 +23,7 @@
 
 //#define RENDERPOLYPOLY //slow??
 
-
+/*
 class WXDLLIMPEXP_GIS_DSP wxSimpleFillSymbol :
 	public ISymbol
 {
@@ -36,3 +36,4 @@ public:
 	//ISymbol
 	virtual void Draw(OGRGeometry* pGeometry, IDisplay* pwxGISDisplay);
 };
+*/

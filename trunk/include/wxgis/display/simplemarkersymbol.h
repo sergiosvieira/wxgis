@@ -21,6 +21,7 @@
 #pragma once
 #include "wxgis/display/display.h"
 
+/*
 class WXDLLIMPEXP_GIS_DSP wxSimpleMarkerSymbol :
 	public ISymbol
 {
@@ -34,3 +35,4 @@ protected:
 	wxPen m_Pen;
 	wxCoord m_Size;
 };
+*/

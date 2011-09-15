@@ -46,7 +46,7 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxbase28ud_xml.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib"
+				AdditionalDependencies="wxbase29ud.lib wxbase29ud_net.lib wxbase29ud_xml.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib"
 				GenerateDebugInformation="true"
@@ -123,7 +123,7 @@
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

@@ -56,7 +56,7 @@ class wxGISCatalogGeneralPropertyPage :
 public:
     wxGISCatalogGeneralPropertyPage(void);
 	~wxGISCatalogGeneralPropertyPage();
-    virtual bool Create(IApplication* application, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("General_Panel"));
+    virtual bool Create(IFrameApplication* application, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("General_Panel"));
 //  IPropertyPage    
     virtual wxString GetPageName(void){return wxString(_("General"));};
     virtual void Apply(void);

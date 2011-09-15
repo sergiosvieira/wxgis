@@ -46,7 +46,7 @@ bool wxGxArchive::Delete(void)
 {
 	wxCriticalSectionLocker locker(m_DestructCritSect);
 	int nCount = 0;
-    for(size_t i = 1; i < m_sPath.length(); i++)
+    for(size_t i = 1; i < m_sPath.length(); ++i)
     {
         nCount++;
         if(m_sPath[i] == '/')
@@ -66,7 +66,7 @@ bool wxGxArchive::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
     }
 }
@@ -75,7 +75,7 @@ bool wxGxArchive::Rename(wxString NewName)
 {
     CPLString szType("/");
     int nCount = 0;
-    for(size_t i = 1; i < m_sPath.length(); i++)
+    for(size_t i = 1; i < m_sPath.length(); ++i)
     {
         nCount++;
         szType += m_sPath[i];
@@ -105,7 +105,7 @@ bool wxGxArchive::Rename(wxString NewName)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Rename"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
     }
 	return false;
@@ -163,7 +163,7 @@ void wxGxArchiveFolder::LoadChildren(void)
 	GxObjectArray Array;	
 	if(m_pCatalog && m_pCatalog->GetChildren(m_sPath, papszFileList, Array))
 	{
-		for(size_t i = 0; i < Array.size(); i++)
+		for(size_t i = 0; i < Array.size(); ++i)
 		{
 			bool ret_code = AddChild(Array[i]);
 			if(!ret_code)

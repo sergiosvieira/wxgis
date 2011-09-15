@@ -21,9 +21,7 @@
 
 #pragma once
 
-#include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/geoprocessing/gptool.h"
-#include "wxgis/geoprocessing/gpvector.h"
 
 /** \class wxGISGPExportTool gpexporttool.h
     \brief The geoprocessing tool export vector data to various formats.
@@ -35,13 +33,13 @@ class WXDLLIMPEXP_GIS_GP wxGISGPExportTool :
 
 public:
     wxGISGPExportTool(void);
-    ~wxGISGPExportTool(void);
+    virtual ~wxGISGPExportTool(void);
     //IGPTool
-    virtual wxString GetDisplayName(void);
-    virtual wxString GetName(void);
-    virtual wxString GetCategory(void);
+    virtual const wxString GetDisplayName(void);
+    virtual const wxString GetName(void);
+    virtual const wxString GetCategory(void);
     virtual bool Execute(ITrackCancel* pTrackCancel);
     virtual bool Validate(void);
-    virtual GPParameters* GetParameterInfo(void);
+    virtual GPParameters GetParameterInfo(void);
     //virtual bool OnExport(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISEnumVectorDatasetType nNewSubType, ITrackCancel* pTrackCancel);
 };

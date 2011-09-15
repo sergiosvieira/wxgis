@@ -3,7 +3,7 @@
  * Purpose:  toolbox classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,7 +22,8 @@
 #include "wxgis/geoprocessingui/gptooldlg.h"
 #include "wxgis/geoprocessingui/gptaskexecdlg.h"
 #include "wxgis/catalogui/gxcatalogui.h"
-#include "wxgis/framework/application.h"
+//#include "wxgis/framework/application.h"
+#include "wxgis/core/globalfn.h"
 
 #include <wx/stdpaths.h>
 
@@ -49,7 +50,7 @@ wxGxToolbox::wxGxToolbox(wxGxRootToolbox* pRootToolbox, wxXmlNode* pDataNode, wx
     m_pRootToolbox = pRootToolbox;
     m_pDataNode = pDataNode;
     if(m_pDataNode)
-        m_sName = wxGetTranslation( m_pDataNode->GetPropVal(wxT("name"), NONAME) );
+        m_sName = wxGetTranslation( m_pDataNode->GetAttribute(wxT("name"), NONAME) );
     m_LargeToolboxIcon = LargeToolboxIcon;
     m_SmallToolboxIcon = SmallToolboxIcon;
     m_LargeToolIcon = LargeToolIcon;
@@ -73,6 +74,7 @@ wxIcon wxGxToolbox::GetSmallImage(void)
 void wxGxToolbox::Detach(void)
 {
 	EmptyChildren();
+    IGxObject::Detach();
 }
 
 void wxGxToolbox::Refresh(void)
@@ -84,7 +86,7 @@ void wxGxToolbox::Refresh(void)
 
 void wxGxToolbox::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
@@ -145,10 +147,9 @@ void wxGxToolbox::LoadChildrenFromXml(wxXmlNode* pNode)
 /////////////////////////////////////////////////////////////////////////
 IMPLEMENT_DYNAMIC_CLASS(wxGxRootToolbox, wxObject)
 
-wxGxRootToolbox::wxGxRootToolbox(void) : m_bIsChildrenLoaded(false), m_pConfig(NULL)
+wxGxRootToolbox::wxGxRootToolbox(void) : m_bIsChildrenLoaded(false)
 {
     m_pToolMngr = NULL;
-    m_pPropNode = NULL;
     m_LargeToolboxIcon = wxIcon(toolbox_48_xpm);
     m_SmallToolboxIcon = wxIcon(toolbox_16_xpm);
     m_LargeToolIcon = wxIcon(tool_48_xpm);
@@ -162,18 +163,11 @@ wxGxRootToolbox::~wxGxRootToolbox(void)
 void wxGxRootToolbox::Detach(void)
 {
 	EmptyChildren();
-    wxDELETE(m_pConfig);
+    IGxObject::Detach();
 }
 
 void wxGxRootToolbox::Init(wxXmlNode* const pConfigNode)
 {
-#ifdef WXGISPORTABLE
-    m_pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, true);
-#else
-	m_pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, false);
-#endif
-    m_pPropNode = new wxXmlNode(*pConfigNode);
-
     LoadChildren();
 }
 
@@ -181,15 +175,14 @@ void wxGxRootToolbox::LoadChildren(void)
 {
 	if(m_bIsChildrenLoaded)
 		return;
-
-    wxXmlNode *pToolsChild(NULL), *pToolboxesChild(NULL);
-    pToolsChild = m_pConfig->GetConfigNode(wxT("tools"), false, true);
-    pToolboxesChild = m_pConfig->GetConfigNode(wxT("toolboxes"), false, true);
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return;
 
     m_pRootToolbox = this;
 
     //Add task exec
-    wxGxToolExecute* pToolExecute = new wxGxToolExecute(m_pRootToolbox, pToolsChild);
+    wxGxToolExecute* pToolExecute = new wxGxToolExecute(m_pRootToolbox);
     IGxObject* pGxObj = static_cast<IGxObject*>(pToolExecute);
 
     if( !AddChild(pGxObj) )
@@ -202,26 +195,23 @@ void wxGxRootToolbox::LoadChildren(void)
     }
 
     //Add favorites
-    bool bShowFavorites = wxAtoi(pToolboxesChild->GetPropVal(wxT("show_favorites"), wxT("1")));
+	bool bShowFavorites = pConfig->ReadBool(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/toolboxes/show_favorites")), true);
     if(bShowFavorites)
     {
-        short nMax = wxAtoi(pToolboxesChild->GetPropVal(wxT("max_favorites"), wxT("10")));
+        short nMax = pConfig->ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/toolboxes/max_favorites")), 10);
         wxGxFavoritesToolbox* pToolbox = new wxGxFavoritesToolbox(m_pRootToolbox, nMax, m_LargeToolIcon, m_SmallToolIcon);
         IGxObject* pGxObj = static_cast<IGxObject*>(pToolbox);
         if(!AddChild(pGxObj))
             wxDELETE(pGxObj);
     }
+    wxXmlNode* pToolboxesChild = pConfig->GetConfigNode(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/toolboxes")));
     LoadChildrenFromXml(pToolboxesChild);
 
 	m_bIsChildrenLoaded = true;
 }
 
-wxXmlNode* wxGxRootToolbox::GetProperties(void)
+void wxGxRootToolbox::Serialize(wxXmlNode* pConfigNode)
 {
-    if(m_pPropNode->HasProp(wxT("is_enabled")))
-        m_pPropNode->DeleteProperty(wxT("is_enabled"));
-    m_pPropNode->AddProperty(wxT("is_enabled"), m_bEnabled == true ? wxT("1") : wxT("0"));    
-    return m_pPropNode;
 }
 
 wxGISGPToolManager* wxGxRootToolbox::GetGPToolManager(void)
@@ -234,7 +224,19 @@ IGPToolSPtr wxGxRootToolbox::GetGPTool(wxString sToolName)
     return m_pToolMngr->GetTool(sToolName, m_pCatalog);
 }
 
-bool wxGxRootToolbox::OnPrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync)
+long wxGxRootToolbox::Advise(wxEvtHandler* pEvtHandler)
+{
+	if(m_pToolMngr)
+		return m_pToolMngr->Advise(pEvtHandler);
+	return wxNOT_FOUND;
+}
+void wxGxRootToolbox::Unadvise(long nCookie)
+{
+	if(m_pToolMngr)
+		m_pToolMngr->Unadvise(nCookie);
+}
+
+bool wxGxRootToolbox::PrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, bool bSync)
 {
     if(!pTool)
     {
@@ -242,24 +244,26 @@ bool wxGxRootToolbox::OnPrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGP
         return false;
     }
     //create tool config dialog
-    wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(this, pTool, pCallBack, bSync, pParentWnd, wxID_ANY, pTool->GetDisplayName());
+    wxGISGPToolDlg* pDlg = new wxGISGPToolDlg(this, pTool, bSync, pParentWnd, wxID_ANY, pTool->GetDisplayName());
     pDlg->Show(true);
 
     return true;
 }
 
-void wxGxRootToolbox::OnExecuteTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync)
+void wxGxRootToolbox::ExecuteTool(wxWindow* pParentWnd, IGPToolSPtr pTool, bool bSync)
 {
     if(bSync)
     {
-        wxGxTaskExecDlg dlg(m_pToolMngr, pCallBack, pParentWnd, wxID_ANY, pTool->GetDisplayName());
-        int nTaskID = m_pToolMngr->OnExecute(pTool, static_cast<ITrackCancel*>(&dlg), static_cast<IGPCallBack*>(&dlg));
+        wxGxTaskExecDlg dlg(m_pToolMngr, pParentWnd, wxID_ANY, pTool->GetDisplayName());
+        int nTaskID = m_pToolMngr->Execute(pTool, static_cast<ITrackCancel*>(&dlg));
         dlg.SetTaskID(nTaskID);
+		long m_nCookie = m_pToolMngr->Advise(&dlg);
         dlg.ShowModal();
+		m_pToolMngr->Unadvise(m_nCookie);
     }
     else
     {
-        m_pToolMngr->OnExecute(pTool, NULL, pCallBack);
+        m_pToolMngr->Execute(pTool, NULL);
     }
 }
 
@@ -292,6 +296,7 @@ wxIcon wxGxFavoritesToolbox::GetSmallImage(void)
 void wxGxFavoritesToolbox::Detach(void)
 {
 	EmptyChildren();
+    IGxObject::Detach();
 }
 
 void wxGxFavoritesToolbox::Refresh(void)
@@ -303,7 +308,7 @@ void wxGxFavoritesToolbox::Refresh(void)
 
 void wxGxFavoritesToolbox::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
@@ -332,8 +337,8 @@ void wxGxFavoritesToolbox::LoadChildren(void)
         wxGISGPToolManager* pGPToolManager = m_pRootToolbox->GetGPToolManager();
         if(pGPToolManager)
         {
-            int nCount = MIN(pGPToolManager->GetToolCount(), m_nMaxCount);
-            for(size_t i = 0; i < nCount; i++)
+			int nCount = std::min(pGPToolManager->GetToolCount(), m_nMaxCount);
+            for(size_t i = 0; i < nCount; ++i)
             {
                 wxGxTool* pTool = new wxGxTool(m_pRootToolbox, pGPToolManager->GetPopularTool(i), m_LargeToolIcon, m_SmallToolIcon);
                 IGxObject* pGxObj = static_cast<IGxObject*>(pTool);
@@ -355,7 +360,7 @@ wxString wxGxFavoritesToolbox::GetName(void)
 // wxGxToolExecute
 /////////////////////////////////////////////////////////////////////////
 
-wxGxToolExecute::wxGxToolExecute(wxGxRootToolbox* pRootToolbox, wxXmlNode* pToolsNode) : wxGISGPToolManager(pToolsNode)
+wxGxToolExecute::wxGxToolExecute(wxGxRootToolbox* pRootToolbox) : wxGISGPToolManager()
 {
     m_pRootToolbox = pRootToolbox;
     m_LargeToolIcon = wxIcon(toolexec_48_xpm);
@@ -378,12 +383,13 @@ wxIcon wxGxToolExecute::GetSmallImage(void)
 
 void wxGxToolExecute::Detach(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
 	}
 	m_Children.clear();
+    IGxObject::Detach();
 }
 
 void wxGxToolExecute::Refresh(void)
@@ -393,31 +399,31 @@ void wxGxToolExecute::Refresh(void)
 
 wxString wxGxToolExecute::GetName(void)
 {
-    if(m_nRunningTasks)
+    if(m_nRunningTasks > 0)
         return wxString::Format(_("Executed list [%d]"), m_nRunningTasks);
     else
         return wxString(_("Executed list"));
 
 }
 
-int wxGxToolExecute::OnExecute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel, IGPCallBack* pCallBack)
+int wxGxToolExecute::Execute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel)
 {
 	int nTaskID = wxNOT_FOUND;
 	if(pTrackCancel)
 	{
-		nTaskID = wxGISGPToolManager::OnExecute(pTool, pTrackCancel, pCallBack);
+		nTaskID = wxGISGPToolManager::Execute(pTool, pTrackCancel);
 	}
 	else
 	{
 		wxWindow* pWnd = dynamic_cast<wxWindow*>(GetApplication());
-		wxGxTaskObject *pGxTaskObject = new wxGxTaskObject(this, pTool->GetDisplayName(), pCallBack, m_LargeToolIcon, m_SmallToolIcon);
-		nTaskID = wxGISGPToolManager::OnExecute(pTool, static_cast<ITrackCancel*>(pGxTaskObject), static_cast<IGPCallBack*>(pGxTaskObject));
+		wxGxTaskObject *pGxTaskObject = new wxGxTaskObject(this, pTool->GetDisplayName(), m_LargeToolIcon, m_SmallToolIcon);
+		nTaskID = wxGISGPToolManager::Execute(pTool, static_cast<ITrackCancel*>(pGxTaskObject));
 		pGxTaskObject->SetTaskID(nTaskID);
 		//add gxobj
         IGxObject* pGxObject = static_cast<IGxObject*>(pGxTaskObject);
 		if(!AddChild(pGxObject))
 		{
-			wxDELETE(pGxTaskObject)
+			wxDELETE(pGxTaskObject);
 			return wxNOT_FOUND;
 		}
         else
@@ -438,7 +444,7 @@ void wxGxToolExecute::StartProcess(size_t nIndex)
 
     if(!m_pCatalog)
         return;
-    for(size_t i = 0; i < m_Children.size(); i++)
+    for(size_t i = 0; i < m_Children.size(); ++i)
     {
         wxGxTaskObject* pGxTaskObject = dynamic_cast<wxGxTaskObject*>(m_Children[i]);
         if(pGxTaskObject && pGxTaskObject->GetTaskID() == nIndex && m_pCatalog)
@@ -458,10 +464,10 @@ void wxGxToolExecute::OnFinish(IProcess* pProcess, bool bHasErrors)
     if(!m_pCatalog)
         return;
 
-    for(size_t i = 0; i < m_Children.size(); i++)
+    for(size_t i = 0; i < m_Children.size(); ++i)
     {
         wxGxTaskObject* pGxTaskObject = dynamic_cast<wxGxTaskObject*>(m_Children[i]);
-        if(pGxTaskObject && pGxTaskObject->GetTaskID() == nIndex && m_pCatalog)
+        if(pGxTaskObject && pGxTaskObject->GetTaskID() == nIndex)
             m_pCatalog->ObjectChanged(m_Children[i]->GetID());
     }
     m_pCatalog->ObjectChanged(GetID());
@@ -486,7 +492,7 @@ wxGxTool::wxGxTool(wxGxRootToolbox* pRootToolbox, wxXmlNode* pDataNode, wxIcon L
     m_pDataNode = pDataNode;
     m_pRootToolbox = pRootToolbox;
     if(m_pDataNode && m_pRootToolbox)
-        m_sInternalName = m_pDataNode->GetPropVal(wxT("name"), NONAME);
+        m_sInternalName = m_pDataNode->GetAttribute(wxT("name"), NONAME);
 
     m_LargeToolIcon = LargeToolIcon;
     m_SmallToolIcon = SmallToolIcon;
@@ -519,9 +525,6 @@ wxIcon wxGxTool::GetSmallImage(void)
 bool wxGxTool::Invoke(wxWindow* pParentWnd)
 {
     //callback create/destroy gxtask
-    //m_pRootToolbox->OnPrepareTool(pParentWnd, m_sInternalName, wxEmptyString, NULL/*???*/, false);
-    //return false;
-
 	IGPToolSPtr pTool = m_pRootToolbox->GetGPTool(m_sInternalName);
 	if(!pTool)
 	{
@@ -529,10 +532,9 @@ bool wxGxTool::Invoke(wxWindow* pParentWnd)
 		wxMessageBox(wxString::Format(_("Error find %s tool!\nCannnot continue."), m_sInternalName.c_str()), _("Error"), wxICON_ERROR | wxOK );
         return false; 
 	}
-	//TODO: Callback to view?
-	m_pRootToolbox->OnPrepareTool(pParentWnd, pTool, NULL, false);
-    return true;
 
+	m_pRootToolbox->PrepareTool(pParentWnd, pTool, false);
+    return true;
 }
 
 bool wxGxTool::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
@@ -544,7 +546,6 @@ bool wxGxTool::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
     if(pTool)
     {
         m_sName = pTool->GetDisplayName();
-//        wxDELETE(pTool);
         return true;
     }
     else

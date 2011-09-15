@@ -3,7 +3,7 @@
  * Purpose:  wxGISNewMenu class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include "wxgis/catalogui/newmenu.h"
 #include "wxgis/catalogui/gxapplication.h"
 
-#include "../../art/mainframecat.xpm"
+//#include "../../art/mainframe.xpm"
 
 //----------------------------------------------------------------------
 // wxGISNewMenu
@@ -35,7 +35,7 @@ wxGISNewMenu::wxGISNewMenu(const wxString& sName, const wxString& sCaption, wxGI
 
 wxGISNewMenu::~wxGISNewMenu(void)
 {
-    for(size_t i = 0; i < m_delitems.size(); i++)
+    for(size_t i = 0; i < m_delitems.size(); ++i)
     {
         wxMenuItem* pItem = Remove(m_delitems[i]);
         wxDELETE(pItem);
@@ -82,9 +82,10 @@ void wxGISNewMenu::OnClick(void)
 {
 }
 
-bool wxGISNewMenu::OnCreate(IApplication* pApp)
+bool wxGISNewMenu::OnCreate(IFrameApplication* pApp)
 {
 	m_pApp = pApp;
+	//TODO: Advise ???
     return true;
 }
 
@@ -98,28 +99,8 @@ unsigned char wxGISNewMenu::GetCount(void)
 	return 1;
 }
 
-//void wxGISNewMenu::UnInit(void)
-//{
-//	if(m_ConnectionPointSelectionCookie != -1)
-//		m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
-//}
-//
-//void wxGISNewMenu::Init(void)
-//{
-//    IGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(m_pApp);
-//    wxMenu* pMenu = static_cast<wxMenu*>(this);
-//    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-//    m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( pGxCatalogUI->GetSelection() );
-//    if(m_pConnectionPointSelection != NULL)
-//	    m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(pMenu);
-//
-//    wxMenuItem* pItem = Append(ID_MENUCMD - 1, wxT(" "), wxEmptyString, wxITEM_NORMAL);
-//    pItem->Enable(false);
-//    m_delitems.push_back(pItem);
-//}
-//
-void wxGISNewMenu::Update(IGxSelection* Selection)
 //void wxGISNewMenu::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
+void wxGISNewMenu::Update(IGxSelection* Selection)
 {
 	if(!m_pCatalog)
     {
@@ -128,7 +109,7 @@ void wxGISNewMenu::Update(IGxSelection* Selection)
             m_pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApplication->GetCatalog());
     }
 
-    for(size_t i = 0; i < m_delitems.size(); i++)
+    for(size_t i = 0; i < m_delitems.size(); ++i)
     {
         wxMenuItem* pItem = Remove(m_delitems[i]);
         wxDELETE(pItem);

@@ -28,7 +28,7 @@ BEGIN_EVENT_TABLE(wxGxNoView, wxControl)
     EVT_ERASE_BACKGROUND(wxGxNoView::OnEraseBackground)
 END_EVENT_TABLE()
 
-bool wxGxNoView::Activate(IApplication* application, wxXmlNode* pConf)
+bool wxGxNoView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 {
 	if(!wxGxView::Activate(application, pConf))
 		return false;
@@ -76,27 +76,27 @@ void wxGxNoView::Serialize(wxXmlNode* pRootNode, bool bStore)
 		return;
 	if(bStore)
 	{
-		pRootNode->DeleteProperty(wxT("red"));
-		pRootNode->AddProperty(wxT("red"), wxString::Format(wxT("%d"), R));
-		pRootNode->DeleteProperty(wxT("green"));
-		pRootNode->AddProperty(wxT("green"), wxString::Format(wxT("%d"), G));
-		pRootNode->DeleteProperty(wxT("blue"));
-		pRootNode->AddProperty(wxT("blue"), wxString::Format(wxT("%d"), B));
-		pRootNode->DeleteProperty(wxT("bold"));
-		pRootNode->AddProperty(wxT("bold"), wxString::Format(wxT("%d"), IsBold));
-		pRootNode->DeleteProperty(wxT("italic"));
-		pRootNode->AddProperty(wxT("italic"), wxString::Format(wxT("%d"), IsItalic));
-		pRootNode->DeleteProperty(wxT("size"));
-		pRootNode->AddProperty(wxT("size"), wxString::Format(wxT("%d"), FontSize));
+		pRootNode->DeleteAttribute(wxT("red"));
+		pRootNode->AddAttribute(wxT("red"), wxString::Format(wxT("%d"), R));
+		pRootNode->DeleteAttribute(wxT("green"));
+		pRootNode->AddAttribute(wxT("green"), wxString::Format(wxT("%d"), G));
+		pRootNode->DeleteAttribute(wxT("blue"));
+		pRootNode->AddAttribute(wxT("blue"), wxString::Format(wxT("%d"), B));
+		pRootNode->DeleteAttribute(wxT("bold"));
+		pRootNode->AddAttribute(wxT("bold"), wxString::Format(wxT("%d"), IsBold));
+		pRootNode->DeleteAttribute(wxT("italic"));
+		pRootNode->AddAttribute(wxT("italic"), wxString::Format(wxT("%d"), IsItalic));
+		pRootNode->DeleteAttribute(wxT("size"));
+		pRootNode->AddAttribute(wxT("size"), wxString::Format(wxT("%d"), FontSize));
 	}
 	else
 	{
-		R = wxAtoi(pRootNode->GetPropVal(wxT("red"), wxT("255")));
-		G = wxAtoi(pRootNode->GetPropVal(wxT("green"), wxT("255")));
-		B = wxAtoi(pRootNode->GetPropVal(wxT("blue"), wxT("230")));
-		IsBold = wxAtoi(pRootNode->GetPropVal(wxT("bold"), wxT("1")));
-		IsItalic = wxAtoi(pRootNode->GetPropVal(wxT("italic"), wxT("0")));
-		FontSize = wxAtoi(pRootNode->GetPropVal(wxT("size"), wxT("10")));
+		R = wxAtoi(pRootNode->GetAttribute(wxT("red"), wxT("255")));
+		G = wxAtoi(pRootNode->GetAttribute(wxT("green"), wxT("255")));
+		B = wxAtoi(pRootNode->GetAttribute(wxT("blue"), wxT("230")));
+		IsBold = wxAtoi(pRootNode->GetAttribute(wxT("bold"), wxT("1"))) == 1;
+		IsItalic = wxAtoi(pRootNode->GetAttribute(wxT("italic"), wxT("0"))) == 1;
+		FontSize = wxAtoi(pRootNode->GetAttribute(wxT("size"), wxT("10")));
 	}
 }
 

@@ -21,34 +21,37 @@
 #include "wxgis/framework/accelerator.h"
 #include "wx/tokenzr.h"
 
-wxGISAcceleratorTable::wxGISAcceleratorTable(IApplication* pApp, IGISConfig* pConf) : bHasChanges(true)
+wxGISAcceleratorTable::wxGISAcceleratorTable(IFrameApplication* pApp) : bHasChanges(true)
 {
 	m_AccelEntryArray.reserve(20);
-	m_pConf = pConf;
 
-	wxXmlNode* pAcceleratorsNodeCU = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("accelerators")));
-	wxXmlNode* pAcceleratorsNodeLM = m_pConf->GetConfigNode(enumGISHKLM, wxString(wxT("accelerators")));
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return;
+
+	wxXmlNode* pAcceleratorsNodeCU = pConfig->GetConfigNode(enumGISHKCU, pApp->GetAppName() + wxString(wxT("/accelerators")));
+	wxXmlNode* pAcceleratorsNodeLM = pConfig->GetConfigNode(enumGISHKLM, pApp->GetAppName() + wxString(wxT("/accelerators")));
 	//merge two tables
 	m_pApp = pApp;
 	if(!pApp)
 		return;
 
-	//merge acc tables
-	//if user delete key - it must be mark as deleted to avoid adding it fron LM table
+	//TODO: merge acc tables
+	//TODO: if user delete key - it must be mark as deleted to avoid adding it fron LM table
 
 	if(pAcceleratorsNodeCU)
 	{
 		wxXmlNode *child = pAcceleratorsNodeCU->GetChildren();
 		while(child)
 		{
-			wxString sCmdName = child->GetPropVal(wxT("cmd_name"), NON);
-			unsigned char nSubtype = wxAtoi(child->GetPropVal(wxT("subtype"), wxT("0")));
+			wxString sCmdName = child->GetAttribute(wxT("cmd_name"), NON);
+			unsigned char nSubtype = wxAtoi(child->GetAttribute(wxT("subtype"), wxT("0")));
 			ICommand* pCmd = m_pApp->GetCommand(sCmdName, nSubtype);
 			if(pCmd)
 			{
-				wxString sFlags = child->GetPropVal(wxT("flags"), wxT("NORMAL"));
+				wxString sFlags = child->GetAttribute(wxT("flags"), wxT("NORMAL"));
 				WXDWORD Flags = GetFlags(sFlags);
-				wxString sKey = child->GetPropVal(wxT("keycode"), wxT("A"));
+				wxString sKey = child->GetAttribute(wxT("keycode"), wxT("A"));
 				int nKey = GetKeyCode(sKey);
 				Add(wxAcceleratorEntry(Flags, nKey, pCmd->GetID()));
 			}
@@ -60,14 +63,14 @@ wxGISAcceleratorTable::wxGISAcceleratorTable(IApplication* pApp, IGISConfig* pCo
 		wxXmlNode *child = pAcceleratorsNodeLM->GetChildren();
 		while(child)
 		{
-			wxString sCmdName = child->GetPropVal(wxT("cmd_name"), NON);
-			unsigned char nSubtype = wxAtoi(child->GetPropVal(wxT("subtype"), wxT("0")));
+			wxString sCmdName = child->GetAttribute(wxT("cmd_name"), NON);
+			unsigned char nSubtype = wxAtoi(child->GetAttribute(wxT("subtype"), wxT("0")));
 			ICommand* pCmd = m_pApp->GetCommand(sCmdName, nSubtype);
 			if(pCmd)
 			{
-				wxString sFlags = child->GetPropVal(wxT("flags"), wxT("NORMAL"));
+				wxString sFlags = child->GetAttribute(wxT("flags"), wxT("NORMAL"));
 				WXDWORD Flags = GetFlags(sFlags);
-				wxString sKey = child->GetPropVal(wxT("keycode"), wxT("A"));
+				wxString sKey = child->GetAttribute(wxT("keycode"), wxT("A"));
 				int nKey = GetKeyCode(sKey);
 				Add(wxAcceleratorEntry(Flags, nKey, pCmd->GetID()));
 			}
@@ -84,7 +87,7 @@ int wxGISAcceleratorTable::Add(wxAcceleratorEntry entry)
 {
 	int cmd(wxID_ANY);
 	bool bAdd(true);
-	for(size_t i = 0; i < m_AccelEntryArray.size(); i++)
+	for(size_t i = 0; i < m_AccelEntryArray.size(); ++i)
 	{
 		if(m_AccelEntryArray[i].GetKeyCode() == entry.GetKeyCode() && m_AccelEntryArray[i].GetFlags() == entry.GetFlags())
 		{
@@ -106,7 +109,7 @@ int wxGISAcceleratorTable::Add(wxAcceleratorEntry entry)
 
 void wxGISAcceleratorTable::Remove(wxAcceleratorEntry entry)
 {
-	for(size_t i = 0; i < m_AccelEntryArray.size(); i++)
+	for(size_t i = 0; i < m_AccelEntryArray.size(); ++i)
 	{
 		if(m_AccelEntryArray[i] == entry)
 		{
@@ -119,9 +122,10 @@ void wxGISAcceleratorTable::Remove(wxAcceleratorEntry entry)
 
 wxAcceleratorEntry wxGISAcceleratorTable::GetEntry(int cmd)
 {
-	for(size_t i = 0; i < m_AccelEntryArray.size(); i++)
+	for(size_t i = 0; i < m_AccelEntryArray.size(); ++i)
 		if(m_AccelEntryArray[i].GetCommand() == cmd)
             return m_AccelEntryArray[i];
+	return wxAcceleratorEntry();
 }
 
 wxAcceleratorTable wxGISAcceleratorTable::GetAcceleratorTable(void)
@@ -129,7 +133,7 @@ wxAcceleratorTable wxGISAcceleratorTable::GetAcceleratorTable(void)
 	if(bHasChanges)
 	{
 		wxAcceleratorEntry* entries = new wxAcceleratorEntry[m_AccelEntryArray.size()];
-		for(size_t i = 0; i < m_AccelEntryArray.size(); i++)
+		for(size_t i = 0; i < m_AccelEntryArray.size(); ++i)
 			entries[i] = m_AccelEntryArray[i];
 
 		wxAcceleratorTable ATab(m_AccelEntryArray.size(), entries);
@@ -145,7 +149,7 @@ wxAcceleratorTable wxGISAcceleratorTable::GetAcceleratorTable(void)
 
 wxString wxGISAcceleratorTable::GetText(int cmd)
 {
-	for(size_t i = 0; i < m_AccelEntryArray.size(); i++)
+	for(size_t i = 0; i < m_AccelEntryArray.size(); ++i)
 	{
 		if(m_AccelEntryArray[i].GetCommand() == cmd)
 		{
@@ -160,12 +164,16 @@ wxString wxGISAcceleratorTable::GetText(int cmd)
 
 void wxGISAcceleratorTable::Store(void)
 {
-	wxXmlNode* pAcceleratorsNodeCU = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("accelerators")));
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return;
+
+	wxXmlNode* pAcceleratorsNodeCU = pConfig->GetConfigNode(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/accelerators")));
 	if(pAcceleratorsNodeCU)
-		wxGISConfig::DeleteNodeChildren(pAcceleratorsNodeCU);
+		pConfig->DeleteNodeChildren(pAcceleratorsNodeCU);
 	else
-		pAcceleratorsNodeCU = m_pConf->CreateConfigNode(enumGISHKCU, wxString(wxT("accelerators")), true);
-	for(size_t i = 0; i < m_AccelEntryArray.size(); i++)
+		pAcceleratorsNodeCU = pConfig->CreateConfigNode(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/accelerators")));
+	for(size_t i = 0; i < m_AccelEntryArray.size(); ++i)
 	{
 		ICommand* pCmd = m_pApp->GetCommand(m_AccelEntryArray[i].GetCommand());
 		wxObject* pObj = dynamic_cast<wxObject*>(pCmd);
@@ -254,10 +262,10 @@ void wxGISAcceleratorTable::Store(void)
 			}
 
 			wxXmlNode* pNewNode = new wxXmlNode(pAcceleratorsNodeCU, wxXML_ELEMENT_NODE, wxString(wxT("Entry")));
-			pNewNode->AddProperty(wxT("cmd_name"), sClassName);
-			pNewNode->AddProperty(wxT("subtype"), wxString::Format(wxT("%u"), nSubType));
-			pNewNode->AddProperty(wxT("flags"), sFlags);
-			pNewNode->AddProperty(wxT("keycode"), sKeyCode);
+			pNewNode->AddAttribute(wxT("cmd_name"), sClassName);
+			pNewNode->AddAttribute(wxT("subtype"), wxString::Format(wxT("%u"), nSubType));
+			pNewNode->AddAttribute(wxT("flags"), sFlags);
+			pNewNode->AddAttribute(wxT("keycode"), sKeyCode);
 		}
 	}
 }

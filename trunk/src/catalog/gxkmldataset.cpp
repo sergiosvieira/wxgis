@@ -51,6 +51,7 @@ void wxGxKMLDataset::SetEncoding(wxFontEncoding Encoding)
 void wxGxKMLDataset::Detach(void)
 {
     EmptyChildren();
+    IGxObject::Detach();
 }
 
 wxString wxGxKMLDataset::GetBaseName(void)
@@ -69,7 +70,9 @@ wxString wxGxKMLDataset::GetCategory(void)
         return wxString(_("KML Dataset"));
     case enumVecGML:
         return wxString(_("GML Dataset"));
-    }
+ 	default:
+		return wxEmptyString;
+   }
 }
 
 bool wxGxKMLDataset::Delete(void)
@@ -105,7 +108,7 @@ bool wxGxKMLDataset::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
     }
     return false;
@@ -131,7 +134,7 @@ bool wxGxKMLDataset::Rename(wxString NewName)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Rename"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
     }
 	return false;
@@ -139,7 +142,7 @@ bool wxGxKMLDataset::Rename(wxString NewName)
 
 void wxGxKMLDataset::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		wxDELETE( m_Children[i] );
@@ -160,7 +163,7 @@ void wxGxKMLDataset::LoadChildren(void)
         if(!pwxGISFeatureDataset->Open())
         {
 		    const char* err = CPLGetLastErrorMsg();
-		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
+			wxString sErr = wxString::Format(_("%s failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
             wxLogError(sErr);
 
 			return;
@@ -171,7 +174,7 @@ void wxGxKMLDataset::LoadChildren(void)
         pwxGISFeatureDataset->SetEncoding(m_Encoding);
 	}
 
-    for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); i++)
+    for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); ++i)
     {
         wxGISFeatureDatasetSPtr pwxGISFeatureSuDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset->GetSubset(i));
         pwxGISFeatureSuDataset->SetSubType(m_type);
@@ -196,7 +199,7 @@ bool wxGxKMLDataset::DeleteChild(IGxObject* pChild)
 	return true;
 }
 
-wxGISDatasetSPtr wxGxKMLDataset::GetDataset(void)
+wxGISDatasetSPtr wxGxKMLDataset::GetDataset(bool bCached, ITrackCancel* pTrackCancel)
 {
     LoadChildren();
 	if(m_pwxGISDataset == NULL)
@@ -232,7 +235,7 @@ bool wxGxKMLDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(!bRet)
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Copy failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
+        wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Copy"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;	
     }
 
@@ -269,7 +272,7 @@ bool wxGxKMLDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(!bRet)
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Move failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Move"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;	
     }
 
@@ -306,25 +309,8 @@ wxString wxGxKMLSubDataset::GetCategory(void)
 	return wxString(_("KML Feature class"));
 }
 
-wxGISDatasetSPtr wxGxKMLSubDataset::GetDataset(void)
+wxGISDatasetSPtr wxGxKMLSubDataset::GetDataset(bool bCached, ITrackCancel* pTrackCancel)
 {
-	//if(m_pwxGISDataset == NULL)
- //       return wxGISDatasetSPtr();
-
-  //  if(!m_pwxGISDataset->Open())
-  //  {
-	 //   const char* err = CPLGetLastErrorMsg();
-	 //   wxString sErr = wxString::Format(_("Open failed! OGR error: %s"), wgMB2WX(err));
-	 //   wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
-		//return NULL;
-  //  }
-
-  //  m_pwxGISDataset->SetSubType(m_type);
-	//for storing internal pointer
-	//m_pwxGISDataset->Reference();
-
-    //for outer pointer
-	//m_pwxGISDataset->Reference();
 	return m_pwxGISDataset;
 }
 

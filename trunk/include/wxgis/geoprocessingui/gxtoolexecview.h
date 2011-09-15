@@ -23,6 +23,8 @@
 
 #include "wxgis/catalogui/gxview.h"
 #include "wxgis/catalogui/gxcatalogui.h"
+#include "wxgis/catalog/gxevent.h"
+#include "wxgis/catalogui/gxeventui.h"
 
 #include "wx/listctrl.h"
 #include "wx/imaglist.h"
@@ -46,8 +48,6 @@ typedef struct _sorttaskdata
 class WXDLLIMPEXP_GIS_GPU wxGxToolExecuteView :
 	public wxListCtrl,
 	public wxGxView,
-	public IGxSelectionEvents,
-	public IGxCatalogEvents,
     public IGxContentsView,
     public IViewDropTarget
 {
@@ -59,24 +59,17 @@ public:
 	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
 	virtual void AddObject(IGxObject* pObject);
 	virtual void ResetContents(void);
-    virtual IGxObject* const GetParentGxObject(void);
+    virtual IGxObjectSPtr const GetParentGxObject(void);
     virtual bool Show(bool show = true);
     virtual void HideDone(bool bHide = true);
 	virtual void SetGxToolExecute(IGxObject* pObject){m_nParentGxObjectID = pObject->GetID();};
+	virtual void RefreshAll(void);
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id = TOOLEXECUTECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = TOOLEXECVIEWSTYLE, const wxString& name = wxT("ToolExecuteView"));
-	virtual bool Activate(IApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 	virtual bool Applies(IGxSelection* Selection);
     virtual void BeginRename(IGxObject* pGxObject = NULL){};
-//IGxSelectionEvents
-	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
-//IGxCatalogEvents
-	virtual void OnObjectAdded(long nObjectID);
-	virtual void OnObjectChanged(long nObjectID);
-	virtual void OnObjectDeleted(long nObjectID);
-	virtual void OnObjectRefreshed(long nObjectID);
-	virtual void OnRefreshAll(void);
 // IGxContentsView
     virtual void SelectAll(void);
     virtual void SetStyle(wxGISEnumContentsViewStyle style){};
@@ -96,13 +89,18 @@ public:
 	virtual void OnDeselected(wxListEvent& event);
     virtual void OnChar(wxKeyEvent& event);
     virtual void OnBeginDrag(wxListEvent& event);
+	virtual void OnObjectRefreshed(wxGxCatalogEvent& event);
+	virtual void OnObjectAdded(wxGxCatalogEvent& event);
+	virtual void OnObjectChanged(wxGxCatalogEvent& event);
+	virtual void OnObjectDeleted(wxGxCatalogEvent& event);
+	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
 protected:
     virtual void FillDataArray(wxArrayString &saDataArr);
 protected:
 	bool m_bSortAsc, m_bHideDone;
 	short m_currentSortCol;
 	wxImageList m_ImageList;
-	IConnectionPointContainer* m_pConnectionPointCatalog;
+	wxGISConnectionPointContainer* m_pConnectionPointCatalog;
 	long m_ConnectionPointCatalogCookie;
 	IGxSelection* m_pSelection;
     wxGxCatalogUI* m_pCatalog;

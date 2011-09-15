@@ -22,22 +22,16 @@
 
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/catalogui/catalogui.h"
-//#include "wxgis/catalogui/gxapplication.h"
 #include "wxgis/catalog/gxdiscconnection.h"
 #include "wxgis/catalogui/gxlocationcombobox.h"
 
 #include "wxgis/framework/progressor.h"
-#include "wxgis/framework/messagedlg.h"
 
 #include "wxgis/datasource/datasource.h"
 #include "wxgis/datasource/datacontainer.h"
 #include "wxgis/datasource/sysop.h"
 
-//#include "wxgis/catalogui/gxobjdialog.h"
 #include "wxgis/catalogui/gxfolderui.h"
-//#include "wxgis/catalog/gxfilters.h"
-//#include "wxgis/catalog/gxfile.h"
-//#include "wxgis/carto/mapview.h"
 
 #include "../../art/delete.xpm"
 #include "../../art/edit.xpm"
@@ -61,6 +55,7 @@
 #include <wx/dirdlg.h>
 #include <wx/file.h>
 #include <wx/clipbrd.h>
+#include <wx/richmsgdlg.h> 
 
 //	0	Up One Level
 //	1	Connect Folder
@@ -82,27 +77,6 @@ IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogMainCmd, wxObject)
 
 wxGISCatalogMainCmd::wxGISCatalogMainCmd(void)
 {
-    m_IconFolderUp = wxIcon(folder_up_xpm);
-    m_IconFolderConn = wxIcon(folder_conn_new_xpm);
-    m_IconFolderConnDel = wxIcon(folder_conn_del_xpm);
-    m_IconDel = wxIcon(delete_xpm);
-	//
-	wxBitmap oGoOrigin(go_xpm);
-    wxImage oGoPrevious = oGoOrigin.ConvertToImage();
-    oGoPrevious = oGoPrevious.Mirror(true);
-
-    m_IconGoPrev.CopyFromBitmap(wxBitmap(oGoPrevious));
-    m_IconGoNext = wxIcon(go_xpm);
-	//
-    m_IconFolderNew = wxIcon(folder_new_xpm);
-    m_IconEdit = wxIcon(edit_xpm);
-    m_IconViewRefresh = wxIcon(view_refresh_xpm);
-    m_IconProps = wxIcon(properties_xpm);
-    m_LargeFolderIcon = wxIcon(folder_48_xpm);
-    m_SmallFolderIcon = wxIcon(folder_16_xpm);
-    m_CopyIcon = wxIcon(edit_copy_xpm);
-    m_CutIcon = wxIcon(edit_cut_xpm);
-    m_PasteIcon = wxIcon(edit_paste_xpm);
 }
 
 wxGISCatalogMainCmd::~wxGISCatalogMainCmd(void)
@@ -114,30 +88,62 @@ wxIcon wxGISCatalogMainCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
+			if(!m_IconFolderUp.IsOk())
+				m_IconFolderUp = wxIcon(folder_up_xpm);
 			return m_IconFolderUp;
 		case 1:
+			if(!m_IconFolderConn.IsOk())
+				m_IconFolderConn = wxIcon(folder_conn_new_xpm);
 			return m_IconFolderConn;
 		case 2:
+			if(!m_IconFolderConnDel.IsOk())
+				m_IconFolderConnDel = wxIcon(folder_conn_del_xpm);
 			return m_IconFolderConnDel;
 		case 4:
+			if(!m_IconDel.IsOk())
+				m_IconDel = wxIcon(delete_xpm);
 			return m_IconDel;
 		case 5:
+			if(!m_IconGoPrev.IsOk())
+			{
+				wxBitmap oGoOrigin(go_xpm);
+				wxImage oGoPrevious = oGoOrigin.ConvertToImage();
+				oGoPrevious = oGoPrevious.Mirror(true);
+
+				m_IconGoPrev.CopyFromBitmap(wxBitmap(oGoPrevious));
+			}
 			return m_IconGoPrev;
 		case 6:
+			if(!m_IconGoNext.IsOk())
+				m_IconGoNext = wxIcon(go_xpm);
 			return m_IconGoNext;
 		case 7:
+			if(!m_IconFolderNew.IsOk())
+				m_IconFolderNew = wxIcon(folder_new_xpm);
 			return m_IconFolderNew;
 		case 8:	
+			if(!m_IconEdit.IsOk())
+				m_IconEdit = wxIcon(edit_xpm);
 			return m_IconEdit;
 		case 9:
+			if(!m_IconViewRefresh.IsOk())
+				m_IconViewRefresh = wxIcon(view_refresh_xpm);
 			return m_IconViewRefresh;
 		case 10:
+			if(!m_IconProps.IsOk())
+				m_IconProps = wxIcon(properties_xpm);
 			return m_IconProps;
 		case 11:
+			if(!m_CopyIcon.IsOk())
+				m_CopyIcon = wxIcon(edit_copy_xpm);
 			return m_CopyIcon;
 		case 12:
+			if(!m_CutIcon.IsOk())
+				m_CutIcon = wxIcon(edit_cut_xpm);
 			return m_CutIcon;
 		case 13:
+			if(!m_PasteIcon.IsOk())
+				m_PasteIcon = wxIcon(edit_paste_xpm);
 			return m_PasteIcon;
 		case 3:
 		default:
@@ -225,6 +231,8 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			if(pGxApp)
 			{
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				if(!pGxCatalogUI)
+					return false;
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
 				if(pSel->GetCount() == 0)
 					return false;
@@ -246,6 +254,8 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			if(pGxApp)
 			{
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				if(!pGxCatalogUI)
+					return false;
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
 				if(pSel->GetCount() == 0)
 					return false;
@@ -264,8 +274,10 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			if(pGxApp)
 			{
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				if(!pGxCatalogUI)
+					return false;
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
 					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
 					IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
@@ -300,7 +312,9 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
                 if(pCatalog)
                 {
                     wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pCatalog);
-                    IGxSelection* pSel = pGxCatalogUI->GetSelection();
+ 					if(!pGxCatalogUI)
+						return false;
+                   IGxSelection* pSel = pGxCatalogUI->GetSelection();
                     if(pSel)
                         return pSel->CanRedo();
                 }
@@ -316,7 +330,9 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
                 if(pCatalog)
                 {
                     wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pCatalog);
-                    IGxSelection* pSel = pGxCatalogUI->GetSelection();
+ 					if(!pGxCatalogUI)
+						return false;
+                   IGxSelection* pSel = pGxCatalogUI->GetSelection();
                     if(pSel)
                     {
 						IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(0));
@@ -334,9 +350,11 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			if(pGxApp)
 			{
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				if(!pGxCatalogUI)
+					return false;
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
                 size_t nCounter(0);
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
 					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
@@ -353,6 +371,8 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			if(pGxApp)
 			{
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				if(!pGxCatalogUI)
+					return false;
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
 				if(pSel->GetCount() > 0)
 					return true;
@@ -365,6 +385,8 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			if(pGxApp)
 			{
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				if(!pGxCatalogUI)
+					return false;
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
 				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetLastSelectedObjectID());
 
@@ -380,6 +402,8 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			if(pGxApp)
 			{
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				if(!pGxCatalogUI)
+					return false;
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
 				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetLastSelectedObjectID());
                 IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
@@ -394,6 +418,8 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 			if(pGxApp)
 			{
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
+				if(!pGxCatalogUI)
+					return false;
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
 				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetLastSelectedObjectID());
                 IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
@@ -530,6 +556,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 				wxGxDiscConnection* pDiscConnection = dynamic_cast<wxGxDiscConnection*>(pGxObject.get());
 				if(pDiscConnection)
 				{
+					pGxObject.reset();
 					CPLString sPath = pDiscConnection->GetInternalName();
 					pGxApp->GetCatalog()->DisconnectFolder(sPath);
 				}
@@ -559,48 +586,30 @@ void wxGISCatalogMainCmd::OnClick(void)
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
             {
-                //ask to delete?
-                bool bAskToDelete(true);
-                wxXmlNode* pNode(NULL);
-                
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
                 IGxSelection* pSel = pGxCatalogUI->GetSelection();
-
-                IGxCatalog* pCat = pGxApp->GetCatalog();
-                if(pCat)
-                {
-                    IGISConfig*  pConfig = pCat->GetConfig();
-                    if(pConfig)
-                    {
-                        pNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("catalog")));
-                        if(pNode)
-                            bAskToDelete = wxAtoi(pNode->GetPropVal(wxT("ask_delete"), wxT("1")));
-                        else
-                            pNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog")), true);
-                    }
-                }
+                //ask to delete?
+                bool bAskToDelete(true);
+				wxGISAppConfigSPtr pConfig = GetConfig();
+				bAskToDelete = pConfig->ReadBool(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/catalog/ask_delete")), bAskToDelete);
                 if(bAskToDelete)
                 {
                     //show ask dialog
                     wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
-                    wxGISMessageDlg dlg(pWnd, wxID_ANY, 
-                        wxString(_("Delete confirm")),
-                        wxString::Format(_("Do you really want to delete %d item(s)"), pSel->GetCount()), 
-                        wxString(_("The result of operation cannot be undone!\nThe deleted items will remove from disk and will not put to the recycled bin.")),                         
-                        wxDefaultPosition, 
-                        wxSize( 400,160 ));
-                    
-                    if(dlg.ShowModal() == wxID_NO)
-                        return;
+					wxRichMessageDialog dlg(pWnd, wxString::Format(_("Do you really want to delete %d item(s)"), pSel->GetCount()), wxString(_("Delete confirm")), wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION | wxSTAY_ON_TOP | wxCENTRE);
+					dlg.SetExtendedMessage(wxString(_("The result of operation cannot be undone!\nThe deleted items will remove from disk and will not put to the recycled bin.")));
+					dlg.ShowCheckBox("Use my choice and do not show this dialog in future");
 
-                    if(!dlg.GetShowInFuture())
-                    {
-                        pNode->DeleteProperty(wxT("ask_delete"));
-                        pNode->AddProperty(wxT("ask_delete"), wxT("0"));
-                    }
+					int nRes = dlg.ShowModal();
+                    
+					if(pConfig)
+						pConfig->Write(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/catalog/ask_delete")), !dlg.IsCheckBoxChecked());
+
+                    if(nRes == wxID_NO)
+                        return;
                 }
 
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
 					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
@@ -642,7 +651,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 			{
                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
 					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     pGxObject->Refresh();
@@ -677,7 +686,7 @@ void wxGISCatalogMainCmd::OnClick(void)
                 pComp->Add(new wxTextDataObject(wxT("COPY")));
                 //! Create simple file data object
                 wxFileDataObject* fdo = new wxFileDataObject();
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
 					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
@@ -716,7 +725,7 @@ void wxGISCatalogMainCmd::OnClick(void)
                 pComp->Add(new wxTextDataObject(wxT("MOVE")));
                 //! Create simple file data object
                 wxFileDataObject* fdo = new wxFileDataObject();
-                for(size_t i = 0; i < pSel->GetCount(); i++)
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
 					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
                     IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
@@ -802,11 +811,18 @@ void wxGISCatalogMainCmd::OnClick(void)
                                 return;
                             }
                             //create GxObject
+							if(!m_LargeFolderIcon.IsOk())
+								m_LargeFolderIcon = wxIcon(folder_48_xpm);
+							if(!m_SmallFolderIcon.IsOk())
+								m_SmallFolderIcon = wxIcon(folder_16_xpm);
+
                             wxGxFolderUI* pFolder = new wxGxFolderUI(sFolderPath, wxString(_("New folder")), m_LargeFolderIcon, m_SmallFolderIcon);
                             IGxObject* pGxFolder = static_cast<IGxObject*>(pFolder);
                             IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
                             pObjCont->AddChild(pGxFolder);
                             pCatalog->ObjectAdded(pGxFolder->GetID());
+							//wait while added new GxObject to views
+							wxYield();
                             //begin rename GxObject
                             wxWindow* pFocusWnd = wxWindow::FindFocus();
                             IGxView* pGxView = dynamic_cast<IGxView*>(pFocusWnd);
@@ -823,7 +839,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 	}
 }
 
-bool wxGISCatalogMainCmd::OnCreate(IApplication* pApp)
+bool wxGISCatalogMainCmd::OnCreate(IFrameApplication* pApp)
 {
 	m_pApp = pApp;
 	return true;
@@ -908,7 +924,7 @@ IToolBarControl* wxGISCatalogMainCmd::GetControl(void)
 	switch(m_subtype)
 	{
 		case 3:	
-			//if(!m_pGxLocationComboBox)
+//			if(!m_pGxLocationComboBox)
 			{
 				wxArrayString PathArray;
 				wxGxLocationComboBox* pGxLocationComboBox = new wxGxLocationComboBox(dynamic_cast<wxWindow*>(m_pApp), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 400, 22 ), PathArray);
@@ -956,7 +972,7 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
 
                 wxMenu* pMenu = new wxMenu();
 
-                for(size_t i = nPos > 7 ? nPos - 7 : 0; i < nPos; i++)
+                for(size_t i = nPos > 7 ? nPos - 7 : 0; i < nPos; ++i)
                 {
 					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetDoID(i));//pSel->GetSelectedObjectID(
                     if(pGxObject)
@@ -987,7 +1003,7 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
 
                 wxMenu* pMenu = new wxMenu();
 
-                for(size_t i = nPos + 1; i < pSel->GetDoSize(); i++)
+                for(size_t i = nPos + 1; i < pSel->GetDoSize(); ++i)
                 {
                     if(i > nPos + 7)
                         break;
@@ -1045,7 +1061,7 @@ void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
     //                    return;
     //                if(pArr->size() < 0)
     //                     return;
-				////	for(size_t i = 0; i < pArr->size(); i++)
+				////	for(size_t i = 0; i < pArr->size(); ++i)
 				////	{
 				////		wxGxPrjFile* pGxPrjFile = dynamic_cast<wxGxPrjFile*>(pArr->at(i));
 				////		if(!pGxPrjFile)
@@ -1154,7 +1170,7 @@ void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
 				//	WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
 				//	if(pWinArr)
 				//	{
-				//		for(size_t i = 0; i < pWinArr->size(); i++)
+				//		for(size_t i = 0; i < pWinArr->size(); ++i)
 				//		{
 				//			pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
 				//			if(pMapView)
@@ -1195,7 +1211,7 @@ void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
 
     //    //            wxString sDirPath;
 
-    //    //            for(size_t i = 2213; i < 2214; i++)
+    //    //            for(size_t i = 2213; i < 2214; ++i)
     //    //            {
     //    //                OGRSpatialReference SpaRef;
     //    //                OGRErr err = SpaRef.importFromEPSG(i);

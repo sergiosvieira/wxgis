@@ -44,12 +44,14 @@ public:
 	virtual IGxCatalog* const GetCatalog(void);
     //events 
     virtual void OnClose(wxCloseEvent& event);
-	//IApplication
+	//IFrameApplication
     virtual wxString GetAppName(void){return wxString(wxT("wxGISCatalog"));};
-    virtual bool Create(IGISConfig* pConfig);
+    virtual bool Create(void);
+	virtual wxIcon GetAppIcon(void){return m_pAppIcon;};
 protected:
 	wxGxTreeView* m_pTreeView;
 	wxGxTabView* m_pTabView;
 	wxGxCatalogUI* m_pCatalog;
     wxGISNewMenu* m_pNewMenu;
+	wxIcon m_pAppIcon;
 };

@@ -88,7 +88,7 @@ wxString wxGISGridTable::GetColLabelValue(int col)
 {
     wxString label;
 	OGRFieldDefn* pOGRFieldDefn = m_pOGRFeatureDefn->GetFieldDefn(col);
-	label = wgMB2WX(pOGRFieldDefn->GetNameRef());
+	label = wxString(pOGRFieldDefn->GetNameRef(), wxConvLocal);
 	//if(!m_sFIDKeyName.IsEmpty())
 	//{
 	//	if(label == m_sFIDKeyName);
@@ -148,7 +148,7 @@ void wxGridCtrl::DrawRowLabel(wxDC& dc, int row)
 void wxGridCtrl::OnLabelLeftClick(wxGridEvent& event)
 {
     event.Skip();
-    if (event.GetRow() != -1)
+    if (event.GetRow() != wxNOT_FOUND)
 	{
         SetGridCursor(event.GetRow(),0);
     }

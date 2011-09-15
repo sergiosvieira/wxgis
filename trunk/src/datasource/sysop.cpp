@@ -49,7 +49,7 @@ bool DeleteFile(CPLString sPath)
 
 bool RenameFile(CPLString sOldPath, CPLString sNewPath)
 {
-    int result = VSIRename(sOldPath, sNewPath);
+	int result = VSIRename(sOldPath, sNewPath);
     if (result == -1)
         return false;
     return true;
@@ -57,8 +57,7 @@ bool RenameFile(CPLString sOldPath, CPLString sNewPath)
 
 wxString ClearExt(wxString sPath)
 {
-    wxStripExtension(sPath);
-    return sPath;
+	return wxFileName::StripExtension(sPath);
 }
 
 wxFontEncoding GetEncodingFromCpg(CPLString sPath)
@@ -78,7 +77,7 @@ wxFontEncoding GetEncodingFromCpg(CPLString sPath)
         return wxFONTENCODING_DEFAULT;
 	}
 
-    wxString sCP = wgMB2WX(pszWKT);
+    wxString sCP(pszWKT, wxConvLocal);
 	
 	CSLDestroy( papszLines );
     int pos;
@@ -239,25 +238,30 @@ wxString CheckUniqName(CPLString sPath, wxString sName, wxString sExt, int nCoun
         return sResultName;
 }
 
-CPLString CheckUniqPath(CPLString sPath, int nCounter)
+CPLString CheckUniqPath(CPLString sPath, CPLString sName, int nCounter)
 {
     CPLString sResultName;
     if(nCounter > 0)
     {
         CPLString szAdd;
         szAdd.Printf("_copy(%d)", nCounter);
-        CPLString szTmpName = CPLString(CPLGetBasename(sPath)) + szAdd;
-        sResultName = CPLString(CPLFormFilename(CPLGetPath(sPath), szTmpName, CPLGetExtension(sPath)));
+        CPLString szTmpName = sName + szAdd;
+        sResultName = CPLString(CPLFormFilename(CPLGetPath(sPath), szTmpName, GetExtension(sPath, sName)));
     }
     else
         sResultName = sPath;
 
     if(CPLCheckForFile((char*)sResultName.c_str(), NULL))
-        return CheckUniqPath(sPath, nCounter + 1);
+        return CheckUniqPath(sPath, sName, nCounter + 1);
     else
         return sResultName;
 }
 
+CPLString GetUniqPath(CPLString szOriginalFullPath, CPLString szNewPath, CPLString szNewName)
+{
+    CPLString szNewDestFileName(CPLFormFilename(szNewPath, szNewName, GetExtension(szOriginalFullPath, szNewName)));
+    return CheckUniqPath(szNewDestFileName, szNewName);
+}
 
 CPLString Transliterate(const char* str)
 {
@@ -376,7 +380,7 @@ bool CopyFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCance
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_FileIO, sFullErr);
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -390,7 +394,7 @@ bool CopyFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCance
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_FileIO, sFullErr);
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -461,10 +465,25 @@ CPLString GetExtension(CPLString sPath, CPLString sName)
 	if(sName.empty())
 		return CPLGetExtension(sPath);
 	size_t found = sPath.rfind(sName);
-	if(found != std::string::npos)
+	if( found != std::string::npos )
 	{
 		found += sName.length() + 1;
-		return sPath.substr(found);
+		if( found < sPath.size() - 1 )
+			return sPath.substr(found);
 	}
 	return CPLGetExtension(sPath);
 }
+//
+//CPLString GetFileName(CPLString sPath, CPLString sName)
+//{
+//	if(sName.empty())
+//		return CPLGetBasename(sPath);
+//	size_t found = sPath.rfind(sName);
+//	if( found != std::string::npos )
+//	{
+//		found += sName.length() + 1;
+//		if( found < sPath.size() - 1 )
+//			return sPath.substr(found);
+//	}
+//	return CPLGetBasename(sPath);
+//}

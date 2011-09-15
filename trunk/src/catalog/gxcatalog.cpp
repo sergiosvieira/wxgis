@@ -19,17 +19,14 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxcatalog.h"
+#include "wxgis/catalog/gxevent.h"
+#include "wxgis/core/globalfn.h"
 #include "wxgis/core/config.h"
-
-static IGxCatalog* m_pGlobalCat(NULL);
-extern WXDLLIMPEXP_GIS_CLT IGxCatalog* GetCatalog()
-{
-    return m_pGlobalCat;
-}
 
 // ----------------------------------------------------------------------------
 // wxGxCatalog
 // ----------------------------------------------------------------------------
+
 
 wxGxCatalog::wxGxCatalog(void) : m_bIsChildrenLoaded(false), m_pGxDiscConnections(NULL), m_nGlobalID(0)
 {
@@ -39,12 +36,7 @@ wxGxCatalog::wxGxCatalog(void) : m_bIsChildrenLoaded(false), m_pGxDiscConnection
     m_bShowHidden = false;
     m_bShowExt = true;
 
-	m_pConf = NULL;
-
 	RegisterObject(this); 
-
-	if(!m_pGlobalCat)
-		m_pGlobalCat = this;
 }
 
 wxGxCatalog::~wxGxCatalog(void)
@@ -60,35 +52,32 @@ bool wxGxCatalog::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
 
 void wxGxCatalog::Detach(void)
 {
+	m_pPointsArray.clear();
+
 	m_pCatalog->UnRegisterObject(m_nID);
-	if(m_pConf)
+
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(pConfig)
 	{
-		wxXmlNode* pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog")));
+		pConfig->Write(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/show_hidden")), m_bShowHidden);
+		pConfig->Write(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/show_ext")), m_bShowExt);
+
+		wxXmlNode* pNode = pConfig->GetConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/rootitems")));
 		if(!pNode)
-			pNode = m_pConf->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog")), true);
+			pNode = pConfig->CreateConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/rootitems")));
 		if(pNode)
 		{
-			if(pNode->HasProp(wxT("show_hidden")))
-				pNode->DeleteProperty(wxT("show_hidden"));
-			pNode->AddProperty(wxT("show_hidden"), wxString::Format(wxT("%u"), m_bShowHidden));
-			if(pNode->HasProp(wxT("show_ext")))
-				pNode->DeleteProperty(wxT("show_ext"));
-			pNode->AddProperty(wxT("show_ext"), wxString::Format(wxT("%u"), m_bShowExt));
+			pConfig->DeleteNodeChildren(pNode);
+			SerializePlugins(pNode, true);
 		}
 
-		pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/rootitems")));
-		if(pNode)
-			wxGISConfig::DeleteNodeChildren(pNode);
-
-		SerializePlugins(pNode, true);
-
-		pNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/objectfactories")));
+		pNode = pConfig->GetConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/objectfactories")));
 		if(!pNode)
-			pNode = m_pConf->CreateConfigNode(enumGISHKCU, wxString(wxT("catalog/objectfactories")), true);
+			pNode = pConfig->CreateConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/objectfactories")));
 		if(pNode)
 		{
-			wxGISConfig::DeleteNodeChildren(pNode);
-			for(size_t i = m_ObjectFactoriesArray.size(); i > 0; i--)
+			pConfig->DeleteNodeChildren(pNode);
+			for(size_t i = m_ObjectFactoriesArray.size(); i > 0; --i)
 			{
 				wxXmlNode* pFactoryNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("objectfactory"));
 				m_ObjectFactoriesArray[i - 1]->Serialize(pFactoryNode, true);
@@ -99,12 +88,11 @@ void wxGxCatalog::Detach(void)
 	EmptyObjectFactories();
 	EmptyChildren();
 	EmptyDisabledChildren();
-	wxDELETE(m_pConf);
 }
 
 void wxGxCatalog::Refresh(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 		m_Children[i]->Refresh();
 	if(m_pCatalog)
 		m_pCatalog->ObjectRefreshed(GetID());
@@ -112,7 +100,7 @@ void wxGxCatalog::Refresh(void)
 
 void wxGxCatalog::EmptyDisabledChildren(void)
 {
-	for(size_t i = 0; i < m_aRootItems.size(); i++)
+	for(size_t i = 0; i < m_aRootItems.size(); ++i)
 	{
 		m_aRootItems[i]->Detach();
 		delete m_aRootItems[i];
@@ -122,7 +110,7 @@ void wxGxCatalog::EmptyDisabledChildren(void)
 
 void wxGxCatalog::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		delete m_Children[i];
@@ -133,7 +121,7 @@ void wxGxCatalog::EmptyChildren(void)
 
 void wxGxCatalog::EmptyObjectFactories(void)
 {
-	for(size_t i = 0; i < m_ObjectFactoriesArray.size(); i++)
+	for(size_t i = 0; i < m_ObjectFactoriesArray.size(); ++i)
 	{
 		wxDELETE(m_ObjectFactoriesArray[i]);
 	}
@@ -145,22 +133,35 @@ void wxGxCatalog::Init(void)
 	if(m_bIsChildrenLoaded)
 		return;
 
-#ifdef WXGISPORTABLE
-	m_pConf = new wxGISConfig(wxString(wxT("wxCatalog")), CONFIG_DIR, true);
-#else
-	m_pConf = new wxGISConfig(wxString(wxT("wxCatalog")), CONFIG_DIR);
-#endif
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return;
 
-	//loads current user and when local machine items
-	wxXmlNode* pObjectFactoriesNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/objectfactories")));
-	LoadObjectFactories(pObjectFactoriesNode);
-	pObjectFactoriesNode = m_pConf->GetConfigNode(enumGISHKLM, wxString(wxT("catalog/objectfactories")));
-	LoadObjectFactories(pObjectFactoriesNode);
+	LoadObjectFactories();
+	LoadChildren();
+}
 
+void wxGxCatalog::LoadObjectFactories(void)
+{
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return;
 	//loads current user and when local machine items
-	wxXmlNode* pRootItemsNode = m_pConf->GetConfigNode(enumGISHKCU, wxString(wxT("catalog/rootitems")));
+	wxXmlNode* pObjectFactoriesNode = pConfig->GetConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/objectfactories")));
+	LoadObjectFactories(pObjectFactoriesNode);
+	pObjectFactoriesNode = pConfig->GetConfigNode(enumGISHKLM, GetConfigName() + wxString(wxT("/catalog/objectfactories")));
+	LoadObjectFactories(pObjectFactoriesNode);
+}
+
+void wxGxCatalog::LoadChildren(void)
+{
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return;
+	//loads current user and when local machine items
+	wxXmlNode* pRootItemsNode = pConfig->GetConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/rootitems")));
 	LoadChildren(pRootItemsNode);
-	pRootItemsNode = m_pConf->GetConfigNode(enumGISHKLM, wxString(wxT("catalog/rootitems")));
+	pRootItemsNode = pConfig->GetConfigNode(enumGISHKLM, GetConfigName() + wxString(wxT("/catalog/rootitems")));
 	LoadChildren(pRootItemsNode);
 }
 
@@ -172,9 +173,9 @@ void wxGxCatalog::LoadObjectFactories(wxXmlNode* const pNode)
 	wxXmlNode* pChildren = pNode->GetChildren();
 	while(pChildren)
 	{
-		wxString sName = pChildren->GetPropVal(wxT("factory_name"), wxT(""));
+		wxString sName = pChildren->GetAttribute(wxT("factory_name"), wxT(""));
 
-		for(size_t i = 0; i < m_ObjectFactoriesArray.size(); i++)
+		for(size_t i = 0; i < m_ObjectFactoriesArray.size(); ++i)
 		{
             if(m_ObjectFactoriesArray[i]->GetClassName() == sName)
 			{
@@ -209,11 +210,11 @@ void wxGxCatalog::LoadChildren(wxXmlNode* const pNode)
 	wxXmlNode* pChildren = pNode->GetChildren();
 	while(pChildren)
 	{
-		wxString sCatalogRootItemName = pChildren->GetPropVal(wxT("name"), NONAME);
-        bool bIsEnabled = wxAtoi(pChildren->GetPropVal(wxT("is_enabled"), wxT("1")));
+		wxString sCatalogRootItemName = pChildren->GetAttribute(wxT("name"), NONAME);
+        bool bIsEnabled = wxAtoi(pChildren->GetAttribute(wxT("is_enabled"), wxT("1"))) != 0;
         bool bContin = false;
 
-		for(size_t i = 0; i < m_CatalogRootItemArray.Count(); i++)
+		for(size_t i = 0; i < m_CatalogRootItemArray.Count(); ++i)
 		{
 			if(m_CatalogRootItemArray[i].IsSameAs(sCatalogRootItemName, false))
 			{
@@ -273,7 +274,7 @@ void wxGxCatalog::LoadChildren(wxXmlNode* const pNode)
 
 bool wxGxCatalog::GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray)
 {
-	for(size_t i = 0; i < m_ObjectFactoriesArray.size(); i++)
+	for(size_t i = 0; i < m_ObjectFactoriesArray.size(); ++i)
 	{
         if(m_ObjectFactoriesArray[i]->GetEnabled())
 			if(!m_ObjectFactoriesArray[i]->GetChildren(sParentDir, pFileNames, ObjArray))
@@ -284,51 +285,36 @@ bool wxGxCatalog::GetChildren(CPLString sParentDir, char** &pFileNames, GxObject
 
 void wxGxCatalog::ObjectDeleted(long nObjectID)
 {
-	for(size_t i = 0; i < m_pPointsArray.size(); i++)
-	{
-		IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
-		if(pGxCatalogEvents != NULL)
-			pGxCatalogEvents->OnObjectDeleted(nObjectID);
-	}
+	wxGxCatalogEvent event(wxGXOBJECT_DELETED, nObjectID);
+	PostEvent(event);
 }
 
 void  wxGxCatalog::ObjectAdded(long nObjectID)
 {
-	for(size_t i = 0; i < m_pPointsArray.size(); i++)
-	{
-		IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
-		if(pGxCatalogEvents != NULL)
-			pGxCatalogEvents->OnObjectAdded(nObjectID);
-	}
+	wxGxCatalogEvent event(wxGXOBJECT_ADDED, nObjectID);
+	PostEvent(event);
 }
 
 void  wxGxCatalog::ObjectChanged(long nObjectID)
 {
-	for(size_t i = 0; i < m_pPointsArray.size(); i++)
-	{
-		IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
-		if(pGxCatalogEvents != NULL)
-			pGxCatalogEvents->OnObjectChanged(nObjectID);
-	}
+	wxGxCatalogEvent event(wxGXOBJECT_CHANGED, nObjectID);
+	PostEvent(event);
 }
 
 void  wxGxCatalog::ObjectRefreshed(long nObjectID)
 {
-	for(size_t i = 0; i < m_pPointsArray.size(); i++)
-	{
-		IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(m_pPointsArray[i]);
-		if(pGxCatalogEvents != NULL)
-			pGxCatalogEvents->OnObjectRefreshed(nObjectID);
-	}
+	wxGxCatalogEvent event(wxGXOBJECT_REFRESHED, nObjectID);
+	PostEvent(event);
 }
-
-long wxGxCatalog::Advise(wxObject* pObject)
-{
-	IGxCatalogEvents* pGxCatalogEvents = dynamic_cast<IGxCatalogEvents*>(pObject);
-	if(pGxCatalogEvents == NULL)
-		return -1;
-	return IConnectionPointContainer::Advise(pObject);
-}
+//
+//void wxGxCatalog::PostEvent(wxGxCatalogEvent &event)
+//{
+//	for(size_t i = 0; i < m_pPointsArray.size(); ++i)
+//	{
+//		if(m_pPointsArray[i] != NULL)
+//			m_pPointsArray[i]->AddPendingEvent(event);
+//	}
+//}
 
 IGxObject* wxGxCatalog::ConnectFolder(wxString sPath, bool bSelect)
 {
@@ -371,11 +357,7 @@ void wxGxCatalog::DisconnectFolder(CPLString sPath)
 wxString wxGxCatalog::ConstructFullName(IGxObject* pObject)
 {
 	wxString sParentPath = pObject->GetParent()->GetFullName();
-    wxString sName;
-    if(m_bShowExt)
-        sName = pObject->GetName();
-    else
-        sName = pObject->GetBaseName();
+    wxString sName = pObject->GetName();
 
 	if(sParentPath.IsEmpty())
 		return sName;
@@ -388,31 +370,46 @@ wxString wxGxCatalog::ConstructFullName(IGxObject* pObject)
 	}
 }
 
-void wxGxCatalog::SerializePlugins(wxXmlNode* const pNode, bool bStore)
+void wxGxCatalog::SerializePlugins(wxXmlNode* pNode, bool bStore)
 {
 	if(bStore)
 	{
-        for(size_t i = 0; i < m_Children.size(); i++)
+        for(size_t i = 0; i < m_Children.size(); ++i)
 		{
             IGxRootObjectProperties* pProps = dynamic_cast<IGxRootObjectProperties*>(m_Children[i]);
             if(!pProps)
                 continue;
-            wxXmlNode* pConfigNode = pProps->GetProperties();
-            if(!pConfigNode)
+            wxObject* pObj = dynamic_cast<wxObject*>(m_Children[i]);
+			if(!pObj)
                 continue;
 
-            pNode->AddChild(pConfigNode);
+		    wxClassInfo* pInfo = pObj->GetClassInfo();
+			if(!pInfo)
+				continue;
+
+			wxXmlNode* pPluginNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("rootitem"));
+			pPluginNode->AddAttribute(wxT("name"), pInfo->GetClassName());
+			pPluginNode->AddAttribute(wxT("is_enabled"), pProps->GetEnabled() == true ? wxT("1") : wxT("0"));    
+			pProps->Serialize(pPluginNode);
         }
-        for(size_t i = 0; i < m_aRootItems.size(); i++)
+
+        for(size_t i = 0; i < m_aRootItems.size(); ++i)
 		{
             IGxRootObjectProperties* pProps = dynamic_cast<IGxRootObjectProperties*>(m_aRootItems[i]);
             if(!pProps)
                 continue;
-            wxXmlNode* pConfigNode = pProps->GetProperties();
-            if(!pConfigNode)
+            wxObject* pObj = dynamic_cast<wxObject*>(m_Children[i]);
+			if(!pObj)
                 continue;
 
-            pNode->AddChild(pConfigNode);
+		    wxClassInfo* pInfo = pObj->GetClassInfo();
+			if(!pInfo)
+				continue;
+
+			wxXmlNode* pPluginNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("rootitem"));
+			pPluginNode->AddAttribute(wxT("name"), pInfo->GetClassName());
+			pPluginNode->AddAttribute(wxT("is_enabled"), pProps->GetEnabled() == true ? wxT("1") : wxT("0"));    
+			pProps->Serialize(pPluginNode);
         }
     }
 }
@@ -424,7 +421,7 @@ void wxGxCatalog::EnableRootItem(IGxObject* pRootItem, bool bEnable)
 
     if(bEnable) //enable
     {
-        for(size_t i = 0; i < m_aRootItems.size(); i++)
+        for(size_t i = 0; i < m_aRootItems.size(); ++i)
         {
             if(m_aRootItems[i] == pRootItem)
             {
@@ -437,7 +434,7 @@ void wxGxCatalog::EnableRootItem(IGxObject* pRootItem, bool bEnable)
     }
     else        //disable
     {
-        for(size_t i = 0; i < m_Children.size(); i++)
+        for(size_t i = 0; i < m_Children.size(); ++i)
         {
             if(m_Children[i] == pRootItem)
             {
@@ -466,8 +463,14 @@ void wxGxCatalog::UnRegisterObject(long nID)
 
 IGxObjectSPtr wxGxCatalog::GetRegisterObject(long nID)
 {
+	wxCriticalSectionLocker locker(m_RegCritSect);
+	if(wxNOT_FOUND == nID)
+		return IGxObjectSPtr();
+
 	if(GxObjectMap[nID] != NULL)
 	{
+		//if(GxObjectMap[nID]->GetID() != nID)
+		//	return IGxObjectSPtr();
 		GxObjectMap[nID]->Lock();
 		return IGxObjectSPtr(GxObjectMap[nID], GxObjectDeleter);
 	}

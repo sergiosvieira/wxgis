@@ -3,7 +3,7 @@
  * Purpose:  geoprocessing header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -79,6 +79,7 @@ enum wxGISEnumGPParameterDataType
     enumGISGPParamDTStringList,
 	enumGISGPParamDTIntegerList,
 	enumGISGPParamDTDoubleList,
+	enumGISGPParamDTStringChoiceEditable,
 
 	enumGISGPParamDTSpatRef,
 	enumGISGPParamDTQuery,
@@ -118,9 +119,13 @@ public:
 	virtual int GetPosByName(wxString sName) = 0;
 	virtual int GetPosByValue(wxVariant oVal) = 0;
     virtual wxVariant GetValueByName(wxString soNameStr) = 0;
+    virtual void Clear(void) = 0;
+    virtual bool GetAltered(void) = 0;
+    virtual void SetAltered(bool bAltered) = 0;
 protected:
 	wxArrayString m_asoNames;
 	std::vector<wxVariant> m_asoData;
+	bool m_bAltered;
 };
 
 /** \class IGPParameter
@@ -144,7 +149,7 @@ public:
     virtual void SetDataType(wxGISEnumGPParameterDataType nType) = 0;
     virtual wxGISEnumGPParameterDirection GetDirection(void) = 0;
     virtual void SetDirection(wxGISEnumGPParameterDirection nDirection) = 0;
-    virtual wxArrayString GetParameterDependencies(void) = 0;
+    virtual wxArrayString* GetParameterDependencies(void) = 0;
     virtual void AddParameterDependency(wxString sDependency) = 0;
     virtual wxGISEnumGPParameterType GetParameterType(void) = 0;
     virtual void SetParameterType(wxGISEnumGPParameterType nType) = 0;
@@ -170,44 +175,38 @@ public:
 };
 
 /** \typedef GPParameters
- *  \brief An parameters array.
+ *  \brief The parameters array.
  */
-typedef std::vector<IGPParameter*> GPParameters;
+//typedef std::vector<IGPParameter*> GPParameters;
+WX_DEFINE_ARRAY(IGPParameter*, GPParameters);
 
 class IGPTool
 {
 public:
     virtual ~IGPTool(void){};
-    virtual wxString GetDisplayName(void) = 0;
-    virtual wxString GetName(void) = 0;
-    virtual wxString GetCategory(void) = 0;
+    virtual const wxString GetDisplayName(void) = 0;
+    virtual const wxString GetName(void) = 0;
+    virtual const wxString GetCategory(void) = 0;
     virtual bool Execute(ITrackCancel* pTrackCancel) = 0;
     virtual bool Validate(void) = 0;
-    virtual GPParameters* GetParameterInfo(void) = 0;
+    virtual GPParameters GetParameterInfo(void) = 0;
     /** \fn wxString GetAsString(void)
      *  \brief Serialize tool parameters to string.
      *  \return The string representation of tool parameters
      */	
-    virtual wxString GetAsString(void) = 0;
+    virtual const wxString GetAsString(void) = 0;
     /** \fn void SetFromString(wxString sParams)
      *  \brief Serialize tool parameters to string.
      *  \param sParams The string representation of tool parameters
      */	
-    virtual bool SetFromString(wxString sParams) = 0;
+    virtual bool SetFromString(const wxString& sParams) = 0;
     virtual void SetCatalog(IGxCatalog* pCatalog) = 0;
     virtual IGxCatalog* const GetCatalog(void) = 0;
     //virtual GetToolType(void) = 0;
-    virtual void Copy(IGPTool* pTool) = 0;
+    virtual void Copy(IGPTool* const pTool) = 0;
 };
 
 DEFINE_SHARED_PTR(IGPTool);
-
-class IGPCallBack
-{
-public:
-    virtual ~IGPCallBack(void){};
-    virtual void OnFinish(bool bHasErrors = false, IGPToolSPtr pTool = IGPToolSPtr()) = 0;
-};
 
 
 

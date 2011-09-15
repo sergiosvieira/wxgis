@@ -1,67 +1,50 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: wxGIS 0.3.0\n"
+"Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-06-15 21:13+0100\n"
-"PO-Revision-Date: 2011-06-15 21:14+0100\n"
+"POT-Creation-Date: 2011-02-21 22:11+0300\n"
+"PO-Revision-Date: 2011-04-16 22:20+0100\n"
 "Last-Translator: Jan Helebrant <jhelebrant@seznam.cz>\n"
-"Language-Team: Juhele <jan.helebrant@gmail.com>\n"
+"Language-Team: Juhele <www.juhele.webnode.cz>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
-"X-Poedit-Basepath: .C:\\Documents and Settings\\Honza\\Plocha\\Qt Linguist\\WXGIS\\src\\loc\n"
+"X-Poedit-Basepath: .\n"
 "X-Poedit-Language: Czech\n"
 "X-Poedit-Country: CZECH REPUBLIC\n"
-"X-Poedit-SourceCharset: utf-8\n"
-"X-Poedit-SearchPath-0: C:\\Documents and Settings\\Honza\\Plocha\\Qt Linguist\\WXGIS\\src\\include\\wxgis\n"
-"X-Poedit-SearchPath-1: C:\\Documents and Settings\\Honza\\Plocha\\Qt Linguist\\WXGIS\\src\\src\\srv_app\n"
+"X-Poedit-SearchPath-0: D:\\work\\Projects\\wxGIS\\include\\wxgissrv\\srv_app\n"
+"X-Poedit-SearchPath-1: D:\\work\\Projects\\wxGIS\\src\\srv_app\n"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/main.cpp:37
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:37
 msgid "Failed to initialize the wxWidgets library, aborting."
-msgstr "Selhalo spuštění knihovny wxWidgets, přerušuji."
+msgstr "Chyba spuštění knihovny wxWidgets, přerušuji."
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/main.cpp:64
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:64
 msgid "Show this help message"
-msgstr "Zobrazí tuto zprávu nápovědy"
+msgstr "Zobrazit tuto zprávu nápovědy"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/main.cpp:66
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:66
 msgid "The version of this program"
 msgstr "Verze tohoto programu"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/main.cpp:67
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:67
 msgid "Run the wxGIS Server in standalone mode. Press 'q' to quit."
-msgstr "Spustit službu wxGIS Server v samostatném režimu. Stiskněte 'q' pro vypnutí."
+msgstr "Spustit wxGIS server v samostatném režimu. Stiskněte 'q' pro ukončení."
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/main.cpp:68
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:68
 msgid "Install wxGIS Server as service"
-msgstr "Nainstalovat wxGIS Server jako službu"
+msgstr "Nainstalovat wxGIS server jako službu"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/main.cpp:69
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:69
 msgid "Uninstall wxGIS Server service"
-msgstr "Odinstalovat službu wxGIS Server"
+msgstr "Odinstalovat službu wxGIS server"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/main.cpp:70
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:70
 msgid "Start wxGIS Server service"
-msgstr "Spustit službu wxGIS Server"
+msgstr "Spustit službu wxGIS server"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/main.cpp:80
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:80
 #, c-format
 msgid ""
 "The wxGIS Server (%s)\n"
@@ -72,9 +55,7 @@ msgstr ""
 "Autor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\n"
 "Copyright (c) 2010-2011"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/main.cpp:96
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:96
 #, c-format
 msgid ""
 "The wxGIS Server (%s)\n"
@@ -85,52 +66,38 @@ msgstr ""
 "Autor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\n"
 "Copyright (c) 2010-2011\n"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/main.cpp:110
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:110
 msgid "Press 'q' to quit.\n"
-msgstr "Stiskněte 'q' pro vypnutí.\n"
+msgstr "Stiskněte 'q' pro ukončení.\n"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/main.cpp:139
+#: D:\work\Projects\wxGIS\src\srv_app/main.cpp:139
 msgid "Starting service..."
 msgstr "Spouštím službu..."
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/service.cpp:88
+#: D:\work\Projects\wxGIS\src\srv_app/service.cpp:88
 #, c-format
 msgid "%s is already installed\n"
 msgstr "%s je již nainstalován\n"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/service.cpp:97
-#: Linguist\WXGIS\src\src\srv_app/service.cpp:110
-#: Linguist\WXGIS\src\src\srv_app/service.cpp:123
+#: D:\work\Projects\wxGIS\src\srv_app/service.cpp:97
+#: D:\work\Projects\wxGIS\src\srv_app/service.cpp:110
+#: D:\work\Projects\wxGIS\src\srv_app/service.cpp:123
 #, c-format
 msgid "%s is not installed\n"
 msgstr "%s není nainstalován\n"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/service.cpp:140
+#: D:\work\Projects\wxGIS\src\srv_app/service.cpp:140
 #, c-format
 msgid "%s installed\n"
-msgstr "%s nainstalován\n"
+msgstr "%s instalován\n"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/service.cpp:151
+#: D:\work\Projects\wxGIS\src\srv_app/service.cpp:151
 #, c-format
 msgid "Could not remove %s. Error %d\n"
 msgstr "Nemohu odstranit %s. Chyba %d\n"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_app/service.cpp:178
+#: D:\work\Projects\wxGIS\src\srv_app/service.cpp:178
 #, c-format
 msgid "%s removed. (You must delete the file (%s) yourself.)\n"
-msgstr "%s odstraněno. (musíte ještě smazat přímo soubor (%s))\n"
+msgstr "%s odstraněno. (Musíte smazat přímo soubor file (%s))\n"
 

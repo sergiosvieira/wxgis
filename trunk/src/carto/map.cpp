@@ -1,9 +1,9 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  wxGISMap class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,21 +20,100 @@
  ****************************************************************************/
 #include "wxgis/carto/map.h"
 
+//////////////////////////////////////////////////////////////////////////////
+// wxGISMap
+//////////////////////////////////////////////////////////////////////////////
+
 wxGISMap::wxGISMap(void)
 {
-	Create();
+	m_sMapName = wxString(_("new map"));
+	m_bFullExtIsInit = false;
 }
 
 wxGISMap::~wxGISMap(void)
 {
-	ClearLayers();
+	Clear();
 }
 
-bool wxGISMap::Create(void)
+bool wxGISMap::AddLayer(wxGISLayerSPtr pLayer)
 {
-	m_sMapName = wxString(_("new map"));
-    m_pSpatialReference = NULL;
-    return true;
+	if(!pLayer)
+		return false;
+
+	if(m_pSpatialReference == NULL)
+    {
+        OGRSpatialReferenceSPtr pSpaRef = pLayer->GetSpatialReference();
+        if(pSpaRef)
+            m_pSpatialReference = pSpaRef;
+		if(!m_pSpatialReference)
+		{
+			OGREnvelope Env = pLayer->GetEnvelope();
+			if(Env.IsInit())
+			{
+				if(Env.MaxX <= ENVMAX_X && Env.MaxY <= ENVMAX_Y && Env.MinX >= ENVMIN_X && Env.MinY >= ENVMIN_Y)
+				{
+					m_pSpatialReference = boost::make_shared<OGRSpatialReference>();
+					m_pSpatialReference->importFromEPSG(4326);//SetWellKnownGeogCS("WGS84");
+				}
+			}
+		}
+    }
+	else
+	{
+		OGRSpatialReferenceSPtr pInputSpatialReference = pLayer->GetSpatialReference();
+		if(!m_pSpatialReference->IsSame(pInputSpatialReference.get()))
+			pLayer->SetSpatialReference(m_pSpatialReference);
+	}
+	//recalc full  envelope
+	OGREnvelope Env = pLayer->GetEnvelope();
+	if(!Env.IsInit())
+		return false;
+
+	if(m_bFullExtIsInit)
+		m_FullExtent.Merge(Env);
+	else
+	{
+		m_FullExtent = Env;
+		m_bFullExtIsInit = true;
+	}
+
+	m_paLayers.push_back(pLayer);
+	return true;
+}
+
+void wxGISMap::Clear(void)
+{
+	m_paLayers.clear();
+    m_pSpatialReference.reset();
+	m_FullExtent.MaxX = ENVMAX_X;
+	m_FullExtent.MinX = ENVMIN_X;
+	m_FullExtent.MaxY = ENVMAX_Y;
+	m_FullExtent.MinY = ENVMIN_Y;
+	m_bFullExtIsInit = false;
+}
+
+OGREnvelope wxGISMap::GetFullExtent(void)
+{
+	OGREnvelope OutputEnv = m_FullExtent;
+    //increase 10%
+	IncreaseEnvelope(OutputEnv, 0.1);
+	return OutputEnv;
+}
+
+void wxGISMap::SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference)
+{
+	if(NULL == pSpatialReference)
+		return;
+	if(m_pSpatialReference && m_pSpatialReference->IsSame(pSpatialReference.get()))
+		return;
+	for(size_t i = 0; i < m_paLayers.size(); ++i)
+		m_paLayers[i]->SetSpatialReference(pSpatialReference);
+	m_pSpatialReference = pSpatialReference;
+}
+
+OGRSpatialReferenceSPtr wxGISMap::GetSpatialReference(void)
+{
+	return m_pSpatialReference;
 }
 
 
@@ -49,75 +128,85 @@ bool wxGISMap::Create(void)
 //MapUnits to esriMeters and the DistanceUnits to esriMeters. 
 //The full extent is recalculated each time a layer added.
 
-void wxGISMap::AddLayer(wxGISLayer* pLayer)
+//////////////////////////////////////////////////////////////////////////////
+// wxGISExtentStack
+//////////////////////////////////////////////////////////////////////////////
+
+wxGISExtentStack::wxGISExtentStack() : wxGISMap()
 {
-	if(!pLayer)
-		return;
-
-	if(m_pSpatialReference == NULL)
-    {
-        OGRSpatialReference* pSpaRef = pLayer->GetSpatialReference();
-        if(pSpaRef)
-            m_pSpatialReference = pSpaRef->Clone();
-		if(!m_pSpatialReference)
-		{
-			const OGREnvelope* pEnv = pLayer->GetEnvelope();
-			if(pEnv)
-			{
-				if(pEnv->MaxX <= 180 && pEnv->MaxY <= 90 && pEnv->MinX >= -180 && pEnv->MinY >= -90)
-				{
-					m_pSpatialReference = new OGRSpatialReference();
-					m_pSpatialReference->importFromEPSG(4326);//SetWellKnownGeogCS("WGS84");
-				}
-			}
-		}
-    }
-
-	m_Layers.push_back(pLayer);
+	m_nPos = wxNOT_FOUND;
 }
 
-void wxGISMap::ClearLayers(void)
+wxGISExtentStack::~wxGISExtentStack()
 {
-	for(size_t i = 0; i < m_Layers.size(); i++)
-		delete m_Layers[i];
-	m_Layers.clear();
-
-    wxDELETE(m_pSpatialReference);
 }
 
-OGREnvelope wxGISMap::GetFullExtent(void)
+bool wxGISExtentStack::CanRedo()
 {
-	OGREnvelope res;
-	for(size_t i = 0; i < m_Layers.size(); i++)
+	if(m_staEnvelope.empty())
+		return false;
+	return m_nPos < m_staEnvelope.size() - 1;
+}
+
+bool wxGISExtentStack::CanUndo()
+{
+	if(m_staEnvelope.empty())
+		return false;
+	return m_nPos > 0;
+}
+
+void wxGISExtentStack::Do(OGREnvelope &NewEnv)
+{
+	m_nPos++;
+	if(m_nPos == m_staEnvelope.size())
+		m_staEnvelope.push_back(NewEnv);
+	else
 	{
-        const OGREnvelope* pEnv = m_Layers[i]->GetEnvelope();
-        res.Merge(*pEnv);
+		m_staEnvelope[m_nPos] = NewEnv;
+		m_staEnvelope.erase(m_staEnvelope.begin() + m_nPos + 1, m_staEnvelope.end());
 	}
-    //increase 10%
-    double fDeltaX = (res.MaxX - res.MinX) / 20;
-    double fDeltaY = (res.MaxY - res.MinY) / 20;
-    double fDelta = std::max(fDeltaX, fDeltaY);
-    res.MaxX += fDelta;
-    res.MinX -= fDelta;
-    res.MaxY += fDelta;
-    res.MinY -= fDelta;
-	return res;
+	SetExtent(NewEnv);
 }
 
-void wxGISMap::SetSpatialReference(OGRSpatialReference* pSpatialReference)
+void wxGISExtentStack::Redo()
 {
-	if(NULL == pSpatialReference)
-		return;
-	if(m_pSpatialReference && m_pSpatialReference->IsSame(pSpatialReference))
-		return;
-	for(size_t i = 0; i < m_Layers.size(); i++)
-		m_Layers[i]->SetSpatialReference(pSpatialReference);
-    wxDELETE(m_pSpatialReference);
-	m_pSpatialReference = pSpatialReference->Clone();
+	m_nPos++;
+	if(m_nPos < m_staEnvelope.size())
+	{
+		OGREnvelope Env = m_staEnvelope[m_nPos];
+		SetExtent(Env);
+	}
 }
 
-OGRSpatialReference* wxGISMap::GetSpatialReference(void)
+void wxGISExtentStack::Undo()
 {
-	return m_pSpatialReference;
+	m_nPos--;
+	if(m_nPos > wxNOT_FOUND)
+	{
+		OGREnvelope Env = m_staEnvelope[m_nPos];
+		SetExtent(Env);
+	}
 }
 
+void wxGISExtentStack::SetExtent(OGREnvelope &Env)
+{
+	m_CurrentExtent = Env;
+}
+
+void wxGISExtentStack::Clear()
+{
+	wxGISMap::Clear();
+	m_staEnvelope.clear();
+	m_nPos = wxNOT_FOUND;
+	m_CurrentExtent = m_FullExtent;
+}
+
+size_t wxGISExtentStack::GetSize()
+{
+	return m_staEnvelope.size();
+}
+
+OGREnvelope wxGISExtentStack::GetCurrentExtent(void)
+{
+	return m_CurrentExtent;
+}

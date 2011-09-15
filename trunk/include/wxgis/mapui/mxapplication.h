@@ -21,6 +21,7 @@
 #pragma once
 
 #include "wxgis/mapui/mapui.h"
+#include "wxgis/mapui/mxmapview.h"
 #include "wxgis/framework/applicationex.h"
 
 #include "wx/aui/aui.h"
@@ -37,7 +38,11 @@ class WXDLLIMPEXP_GIS_MAPU wxMxApplication :
 public:	
 	wxMxApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER);
 	virtual ~wxMxApplication(void);
-	//IApplication
+	//IFrameApplication
     virtual wxString GetAppName(void){return wxString(wxT("wxGISMap"));};
-    virtual bool Create(IGISConfig* pConfig);
+    virtual bool Create(void);
+	virtual wxIcon GetAppIcon(void){return m_pAppIcon;};
+protected:
+	wxIcon m_pAppIcon;
+	wxMxMapView* m_pMapView;
 };

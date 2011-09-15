@@ -32,6 +32,11 @@ BEGIN_EVENT_TABLE(wxGxTreeViewBase, wxTreeCtrl)
     EVT_TREE_ITEM_EXPANDING(TREECTRLID, wxGxTreeViewBase::OnItemExpanding)
     EVT_TREE_ITEM_RIGHT_CLICK(TREECTRLID, wxGxTreeViewBase::OnItemRightClick)
     EVT_CHAR(wxGxTreeViewBase::OnChar)
+	EVT_GXOBJECT_REFRESHED(wxGxTreeViewBase::OnObjectRefreshed)
+	EVT_GXOBJECT_ADDED(wxGxTreeViewBase::OnObjectAdded)
+	EVT_GXOBJECT_DELETED(wxGxTreeViewBase::OnObjectDeleted)
+	EVT_GXOBJECT_CHANGED(wxGxTreeViewBase::OnObjectChanged)
+	EVT_GXSELECTION_CHANGED(wxGxTreeViewBase::OnSelectionChanged)
 END_EVENT_TABLE()
 
 wxGxTreeViewBase::wxGxTreeViewBase(void) : wxTreeCtrl(), m_pConnectionPointCatalog(NULL), m_pConnectionPointSelection(NULL), m_ConnectionPointCatalogCookie(-1), m_ConnectionPointSelectionCookie(-1)
@@ -95,10 +100,10 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
 	if(pObjUI != NULL)
 		icon = pObjUI->GetSmallImage();
 
-	int pos(-1);
+	int pos(wxNOT_FOUND);
 	if(icon.IsOk())
     {
-        for(size_t i = 0; i < m_IconsArray.size(); i++)
+        for(size_t i = 0; i < m_IconsArray.size(); ++i)
         {
             if(m_IconsArray[i].oIcon.IsSameAs(icon))
             {
@@ -106,7 +111,7 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
                 break;
             }
         }
-        if(pos == -1)
+        if(pos == wxNOT_FOUND)
         {
             pos = m_TreeImageList.Add(icon);
             ICONDATA myicondata = {icon, pos};
@@ -125,7 +130,7 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
         sName = pGxObject->GetBaseName();
 
 
-	wxTreeItemId NewTreeItem = AppendItem(hParent, sName, pos, -1, pData);
+	wxTreeItemId NewTreeItem = AppendItem(hParent, sName, pos, wxNOT_FOUND, pData);
 	m_TreeMap[pGxObject->GetID()] = NewTreeItem;
 
 	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pGxObject);
@@ -137,7 +142,7 @@ void wxGxTreeViewBase::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
 	wxTreeCtrl::Refresh();
 }
 
-bool wxGxTreeViewBase::Activate(IApplication* application, wxXmlNode* pConf)
+bool wxGxTreeViewBase::Activate(IFrameApplication* application, wxXmlNode* pConf)
 {
 	if(!wxGxView::Activate(application, pConf))
 		return false;
@@ -150,31 +155,34 @@ bool wxGxTreeViewBase::Activate(IApplication* application, wxXmlNode* pConf)
 
     AddRoot(dynamic_cast<IGxObject*>(m_pCatalog));
 
-	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pGxApplication->GetCatalog() );
+	m_pConnectionPointCatalog = dynamic_cast<wxGISConnectionPointContainer*>( m_pGxApplication->GetCatalog() );
 	if(m_pConnectionPointCatalog != NULL)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
-	m_pSelection = m_pCatalog->GetSelection();
-	m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( m_pSelection );
-	if(m_pConnectionPointSelection != NULL)
-		m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
+	if(m_pCatalog)
+	{
+		m_pSelection = m_pCatalog->GetSelection();
+		m_pConnectionPointSelection = dynamic_cast<wxGISConnectionPointContainer*>( m_pSelection );
+		if(m_pConnectionPointSelection != NULL)
+			m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
+	}
 
 	return true;
 };
 
 void wxGxTreeViewBase::Deactivate(void)
 {
-	if(m_ConnectionPointSelectionCookie != -1)
+	if(m_ConnectionPointSelectionCookie != wxNOT_FOUND)
 		m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
-	if(m_ConnectionPointCatalogCookie != -1)
+	if(m_ConnectionPointCatalogCookie != wxNOT_FOUND)
 		m_pConnectionPointCatalog->Unadvise(m_ConnectionPointCatalogCookie);
 
 	wxGxView::Deactivate();
 }
 
-void wxGxTreeViewBase::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
+void wxGxTreeViewBase::OnSelectionChanged(wxGxSelectionEvent& event)
 {
-	if(nInitiator == GetId())
+	if(event.GetInitiator() == GetId())
 		return;
 
     long nSelID = m_pSelection->GetLastSelectedObjectID();
@@ -185,7 +193,11 @@ void wxGxTreeViewBase::OnSelectionChanged(IGxSelection* Selection, long nInitiat
 	wxTreeItemId ItemId = m_TreeMap[nSelID];
 	if(ItemId.IsOk())
 	{
-		wxTreeCtrl::SelectItem(ItemId/*, false*/);
+		//granted event fireing
+		if(wxTreeCtrl::GetSelection() == ItemId)
+			UpdateGxSelection();
+		else
+			wxTreeCtrl::SelectItem(ItemId, true);
 		SetFocus();
 	}
 	else
@@ -203,13 +215,171 @@ void wxGxTreeViewBase::OnSelectionChanged(IGxSelection* Selection, long nInitiat
 			else
 				pParentGxObj = pParentGxObj->GetParent();
 		}
-		OnSelectionChanged(Selection, nInitiator);
+		OnSelectionChanged(event);
 	}
 }
 
-void wxGxTreeViewBase::OnObjectAdded(long nObjectID)
+void wxGxTreeViewBase::UpdateGxSelection(void)
 {
-    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
+    wxTreeItemId TreeItemId = GetSelection();
+    m_pSelection->Clear(GetId());
+    if(TreeItemId.IsOk())
+    {
+        wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(TreeItemId);
+        if(pData != NULL)
+	        m_pSelection->Select(pData->m_nObjectID, true, GetId());
+    }
+	if(	m_pNewMenu )
+		m_pNewMenu->Update(m_pSelection);
+}
+
+int wxGxTreeViewBase::OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2)
+{
+    wxGxTreeItemData* pData1 = (wxGxTreeItemData*)GetItemData(item1);
+    wxGxTreeItemData* pData2 = (wxGxTreeItemData*)GetItemData(item2);
+    IGxObjectSPtr pGxObject1 = m_pCatalog->GetRegisterObject(pData1->m_nObjectID);
+    IGxObjectSPtr pGxObject2 = m_pCatalog->GetRegisterObject(pData2->m_nObjectID);
+    if(pGxObject1 != NULL && pGxObject2 != NULL)
+    {
+        return GxObjectCompareFunction(pGxObject1.get(), pGxObject2.get(), 1);
+    }
+    return 0;
+}
+
+void wxGxTreeViewBase::OnItemRightClick(wxTreeEvent& event)
+{
+	wxTreeItemId item = event.GetItem();
+
+	if(!item.IsOk())
+		return;
+	wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(item);
+	if(pData != NULL)
+	{
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID);
+        IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
+        if(pGxObjectUI)
+        {
+            wxString psContextMenu = pGxObjectUI->ContextMenu();
+			pGxObject.reset();
+            IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(m_pGxApplication);
+            if(pApp)
+            {
+                wxMenu* pMenu = dynamic_cast<wxMenu*>(pApp->GetCommandBar(psContextMenu));
+                if(pMenu)
+                {
+                    PopupMenu(pMenu, event.GetPoint());
+                }
+            }
+        }
+    }
+}
+
+void wxGxTreeViewBase::OnItemExpanding(wxTreeEvent& event)
+{
+	wxTreeItemId item = event.GetItem();
+
+	if(!item.IsOk())
+		return;
+
+	wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(item);
+	if(pData != NULL)
+	{
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID);
+		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
+		if(pGxObjectContainer != NULL)
+		{
+			wxBusyCursor wait;
+			if(pGxObjectContainer->HasChildren() && pGxObjectContainer->AreChildrenViewable())
+			{
+				if(pData->m_bExpandedOnce == false)
+				{
+					GxObjectArray* pArr = pGxObjectContainer->GetChildren();
+					if(pArr != NULL)
+					{
+						if(pArr->size() != 0)
+						{
+							for(size_t i = 0; i < pArr->size(); ++i)
+								AddTreeItem(pArr->at(i), item);//false
+							pData->m_bExpandedOnce = true;
+                            SetItemHasChildren(item, GetChildrenCount(item, false) > 0);
+                            SortChildren(item);
+							return;
+						}
+					}
+				}
+				else
+					return;
+			}
+			else
+			{
+				SetItemHasChildren(item, false);
+				return;
+			}
+		}
+	}
+	SetItemHasChildren(item, false);
+}
+
+
+void wxGxTreeViewBase::OnChar(wxKeyEvent& event)
+{
+	if(event.GetModifiers() & wxMOD_ALT)
+		return;
+	if(event.GetModifiers() & wxMOD_CONTROL)
+		return;
+	if(event.GetModifiers() & wxMOD_SHIFT)
+		return;
+    switch(event.GetKeyCode())
+    {
+    case WXK_DELETE:
+    case WXK_NUMPAD_DELETE:
+        if(m_pDeleteCmd)
+            m_pDeleteCmd->OnClick();
+        break;
+    default:
+        break;
+    }
+}
+
+void wxGxTreeViewBase::OnObjectRefreshed(wxGxCatalogEvent& event)
+{
+	wxTreeItemId TreeItemId = m_TreeMap[event.GetObjectID()];
+	if(TreeItemId.IsOk())
+	{
+		wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(TreeItemId);
+		if(pData != NULL)
+		{
+			if(pData->m_bExpandedOnce)
+			{
+				DeleteChildren(TreeItemId);
+				pData->m_bExpandedOnce = false;
+				Expand(TreeItemId);
+			}
+            else
+            {
+                IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(event.GetObjectID());
+			    IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
+				wxBusyCursor wait;
+			    if(pGxObjectContainer && pGxObjectContainer->HasChildren() && !ItemHasChildren(TreeItemId))
+                {
+                    SetItemHasChildren(TreeItemId);
+                }
+            }
+		}
+	}
+}
+
+void wxGxTreeViewBase::OnObjectDeleted(wxGxCatalogEvent& event)
+{
+	wxTreeItemId TreeItemId = m_TreeMap[event.GetObjectID()];
+	if(TreeItemId.IsOk())
+		Delete(TreeItemId);
+	m_TreeMap.erase(event.GetObjectID());
+}
+
+void wxGxTreeViewBase::OnObjectAdded(wxGxCatalogEvent& event)
+{
+    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(event.GetObjectID());
     IGxObject* pParentObject = pGxObject->GetParent();
 	wxTreeItemId TreeItemId = m_TreeMap[pParentObject->GetID()];
 	if(TreeItemId.IsOk())
@@ -228,9 +398,9 @@ void wxGxTreeViewBase::OnObjectAdded(long nObjectID)
 	}
 }
 
-void wxGxTreeViewBase::OnObjectChanged(long nObjectID)
+void wxGxTreeViewBase::OnObjectChanged(wxGxCatalogEvent& event)
 {
-	wxTreeItemId TreeItemId = m_TreeMap[nObjectID];
+	wxTreeItemId TreeItemId = m_TreeMap[event.GetObjectID()];
 	if(TreeItemId.IsOk())
 	{
 		wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(TreeItemId);
@@ -272,167 +442,10 @@ void wxGxTreeViewBase::OnObjectChanged(long nObjectID)
 	}
 }
 
-void wxGxTreeViewBase::UpdateGxSelection(void)
-{
-    wxTreeItemId TreeItemId = GetSelection();
-    m_pSelection->Clear(GetId());
-    if(TreeItemId.IsOk())
-    {
-        wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(TreeItemId);
-        if(pData != NULL)
-	        m_pSelection->Select(pData->m_nObjectID, true, GetId());
-    }
-	if(	m_pNewMenu )
-		m_pNewMenu->Update(m_pSelection);
-}
-
-void wxGxTreeViewBase::OnObjectDeleted(long nObjectID)
-{
-	wxTreeItemId TreeItemId = m_TreeMap[nObjectID];
-	if(TreeItemId.IsOk())
-		Delete(TreeItemId);
-	m_TreeMap.erase(nObjectID);
-}
-
-void wxGxTreeViewBase::OnObjectRefreshed(long nObjectID)
-{
-	wxTreeItemId TreeItemId = m_TreeMap[nObjectID];
-	if(TreeItemId.IsOk())
-	{
-		wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(TreeItemId);
-		if(pData != NULL)
-		{
-			if(pData->m_bExpandedOnce)
-			{
-				DeleteChildren(TreeItemId);
-				pData->m_bExpandedOnce = false;
-				Expand(TreeItemId);
-			}
-            else
-            {
-                IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
-			    IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
-				wxBusyCursor wait;
-			    if(pGxObjectContainer && pGxObjectContainer->HasChildren() && !ItemHasChildren(TreeItemId))
-                {
-                    SetItemHasChildren(TreeItemId);
-                }
-            }
-		}
-	}
-}
-
-void wxGxTreeViewBase::OnRefreshAll(void)
+void wxGxTreeViewBase::RefreshAll(void)
 {
 	DeleteAllItems();
 	AddRoot(dynamic_cast<IGxObject*>(m_pGxApplication->GetCatalog()));
-}
-
-int wxGxTreeViewBase::OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2)
-{
-    wxGxTreeItemData* pData1 = (wxGxTreeItemData*)GetItemData(item1);
-    wxGxTreeItemData* pData2 = (wxGxTreeItemData*)GetItemData(item2);
-    IGxObjectSPtr pGxObject1 = m_pCatalog->GetRegisterObject(pData1->m_nObjectID);
-    IGxObjectSPtr pGxObject2 = m_pCatalog->GetRegisterObject(pData2->m_nObjectID);
-    if(pGxObject1 != NULL && pGxObject2 != NULL)
-    {
-        return GxObjectCompareFunction(pGxObject1.get(), pGxObject2.get(), 1);
-    }
-    return 0;
-}
-
-void wxGxTreeViewBase::OnItemRightClick(wxTreeEvent& event)
-{
-	wxTreeItemId item = event.GetItem();
-
-	if(!item.IsOk())
-		return;
-	wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(item);
-	if(pData != NULL)
-	{
-        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID);
-        IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
-        if(pGxObjectUI)
-        {
-            wxString psContextMenu = pGxObjectUI->ContextMenu();
-            IApplication* pApp = dynamic_cast<IApplication*>(m_pGxApplication);
-            if(pApp)
-            {
-                wxMenu* pMenu = dynamic_cast<wxMenu*>(pApp->GetCommandBar(psContextMenu));
-                if(pMenu)
-                {
-                    PopupMenu(pMenu, event.GetPoint());
-                }
-            }
-        }
-    }
-}
-
-void wxGxTreeViewBase::OnItemExpanding(wxTreeEvent& event)
-{
-	wxTreeItemId item = event.GetItem();
-
-	if(!item.IsOk())
-		return;
-
-	wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(item);
-	if(pData != NULL)
-	{
-        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID);
-		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
-		if(pGxObjectContainer != NULL)
-		{
-			wxBusyCursor wait;
-			if(pGxObjectContainer->HasChildren() && pGxObjectContainer->AreChildrenViewable())
-			{
-				if(pData->m_bExpandedOnce == false)
-				{
-					GxObjectArray* pArr = pGxObjectContainer->GetChildren();
-					if(pArr != NULL)
-					{
-						if(pArr->size() != 0)
-						{
-							for(size_t i = 0; i < pArr->size(); i++)
-								AddTreeItem(pArr->at(i), item);//false
-							pData->m_bExpandedOnce = true;
-                            SetItemHasChildren(item, GetChildrenCount(item, false) > 0);
-                            SortChildren(item);
-							return;
-						}
-					}
-				}
-				else
-					return;
-			}
-			else
-			{
-				SetItemHasChildren(item, false);
-				return;
-			}
-		}
-	}
-	SetItemHasChildren(item, false);
-}
-
-
-void wxGxTreeViewBase::OnChar(wxKeyEvent& event)
-{
-	if(event.GetModifiers() & wxMOD_ALT)
-		return;
-	if(event.GetModifiers() & wxMOD_CONTROL)
-		return;
-	if(event.GetModifiers() & wxMOD_SHIFT)
-		return;
-    switch(event.GetKeyCode())
-    {
-    case WXK_DELETE:
-    case WXK_NUMPAD_DELETE:
-        if(m_pDeleteCmd)
-            m_pDeleteCmd->OnClick();
-        break;
-    default:
-        break;
-    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -532,7 +545,7 @@ void wxGxTreeView::OnSelChanged(wxTreeEvent& event)
 {
     //if(!event.GetOldItem())
     //    return;
-    //event.Skip();
+    event.Skip();
 
     UpdateGxSelection();
 
@@ -588,7 +601,7 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
     if(count == 0)
         return;
     IGxObject* pParentGxObject(NULL);
-    for(size_t i = 0; i < count; i++)
+    for(size_t i = 0; i < count; ++i)
     {
 	    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(treearray[i]);
 	    if(pData == NULL)

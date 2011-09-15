@@ -65,7 +65,7 @@ protected:
 	wxGISAnimation* m_pAni;
     wxGISProgressor* m_pProgressBar;
 	int m_MsgPos, m_AniPos, m_ProgressPos, m_PositionPos, m_ClockPos, m_PagePositionPos, m_SizePos, m_CapsLockPos, m_NumLockPos, m_ScrollLockPos;
-	IApplication* m_pApp;
+	IFrameApplication* m_pApp;
 
 	DECLARE_EVENT_TABLE()
 };

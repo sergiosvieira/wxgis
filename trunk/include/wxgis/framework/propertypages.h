@@ -51,7 +51,7 @@ class wxGISMiscPropertyPage :
 public:
     wxGISMiscPropertyPage(void);
 	~wxGISMiscPropertyPage();
-    virtual bool Create(IApplication* application, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Misc_Panel"));
+    virtual bool Create(IFrameApplication* application, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Misc_Panel"));
 //  IPropertyPage    
     virtual wxString GetPageName(void){return wxString(_("Miscellaneous"));};
     virtual void Apply(void);
@@ -89,8 +89,7 @@ protected:
 	wxStaticText* m_staticTextWarn;
     wxStaticLine* m_staticline;
 
-    IApplication* m_pApp;
-    wxGISAppConfig* m_pGISConfig;
+    IFrameApplication* m_pApp;
     wxArrayString m_aLangs;
     wxImageList m_ImageList;
 

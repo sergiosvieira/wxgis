@@ -57,7 +57,7 @@ bool wxGxFile::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
     }
 }
@@ -79,7 +79,7 @@ bool wxGxFile::Rename(wxString NewName)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Rename failed! GDAL error: %s, file '%s'"), wgMB2WX(err), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Rename"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
     }
 	return false;
@@ -90,8 +90,8 @@ bool wxGxFile::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(pTrackCancel)
         pTrackCancel->PutMessage(wxString(_("Copy file ")) + m_sName, -1, enumGISMessageInfo);
 
-    CPLString szNewDestFileName(CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL));
-    szNewDestFileName = CheckUniqPath(szNewDestFileName);
+	CPLString szFileName = CPLGetBasename(m_sPath);
+	CPLString szNewDestFileName = GetUniqPath(m_sPath, szDestPath, szFileName);
     if(!CopyFile(szNewDestFileName, m_sPath, pTrackCancel))
         return false;
     
@@ -106,8 +106,8 @@ bool wxGxFile::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(pTrackCancel)
         pTrackCancel->PutMessage(wxString(_("Move file ")) + m_sName, -1, enumGISMessageInfo);
 
-    CPLString szNewDestFileName(CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL));
-    szNewDestFileName = CheckUniqPath(szNewDestFileName);
+	CPLString szFileName = CPLGetBasename(m_sPath);
+	CPLString szNewDestFileName = GetUniqPath(m_sPath, szDestPath, szFileName);
     if(!MoveFile(szNewDestFileName, m_sPath, pTrackCancel))
         return false;
     
@@ -147,7 +147,7 @@ OGRSpatialReferenceSPtr wxGxPrjFile::GetSpatialReference(void)
             {
                 char *pszWKT, *pszWKT2;
                 pszWKT = CPLStrdup(papszLines[0]);
-                for(int i = 1; papszLines[i] != NULL; i++ )
+                for(int i = 1; papszLines[i] != NULL; ++i )
                 {
                     int npapszLinesSize = CPLStrnlen(papszLines[i], 1000);
                     int npszWKTSize = CPLStrnlen(pszWKT, 8000);
@@ -188,7 +188,7 @@ OGRSpatialReferenceSPtr wxGxPrjFile::GetSpatialReference(void)
 	else
 	{
 		const char* err = CPLGetLastErrorMsg();
-		wxString sErr = wxString::Format(_("wxGxPrjFile: GDAL error: %s"), wgMB2WX(err));
+		wxString sErr = wxString::Format(_("wxGxPrjFile: GDAL error: %s"), wxString(err, wxConvUTF8).c_str());
 		wxLogError(sErr);
 	}
 	return OGRSpatialReferenceSPtr();

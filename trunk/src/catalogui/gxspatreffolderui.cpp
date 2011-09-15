@@ -52,7 +52,7 @@ wxIcon wxGxSpatialReferencesFolderUI::GetSmallImage(void)
 
 void wxGxSpatialReferencesFolderUI::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
@@ -89,7 +89,7 @@ IGxObject* wxGxSpatialReferencesFolderUI::GetArchiveFolder(CPLString szPath, wxS
 //    {
 //        //wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
 //       	//wxArrayString FileNames;
-//        for(int i = 0; papszFileList[i] != NULL; i++ )
+//        for(int i = 0; papszFileList[i] != NULL; ++i )
 //		{
 //            wxString sFileName(papszFileList[i], wxCSConv(wxT("cp-866")));
 //			//wxString sFileName = wgMB2WX(papszFileList[i]);
@@ -125,7 +125,7 @@ IGxObject* wxGxSpatialReferencesFolderUI::GetArchiveFolder(CPLString szPath, wxS
 //	GxObjectArray Array;	
 //	if(m_pCatalog->GetChildren(m_sPath, &m_FileNames, &Array))
 //	{
-//		for(size_t i = 0; i < Array.size(); i++)
+//		for(size_t i = 0; i < Array.size(); ++i)
 //		{
 //			bool ret_code = AddChild(Array[i]);
 //			if(!ret_code)
@@ -183,7 +183,7 @@ IGxObject* wxGxPrjFolderUI::GetArchiveFolder(CPLString szPath, wxString soName)
 //    }
 //    else
 //    {
-//        for(int i = 0; papszFileList[i] != NULL; i++ )
+//        for(int i = 0; papszFileList[i] != NULL; ++i )
 //		{
 //            wxString sFileName(papszFileList[i], wxCSConv(wxT("cp-866")));
 //
@@ -217,7 +217,7 @@ IGxObject* wxGxPrjFolderUI::GetArchiveFolder(CPLString szPath, wxString soName)
 //	GxObjectArray Array;	
 //	if(m_pCatalog->GetChildren(sArchPath, &m_FileNames, &Array))
 //	{
-//		for(size_t i = 0; i < Array.size(); i++)
+//		for(size_t i = 0; i < Array.size(); ++i)
 //		{
 //			bool ret_code = AddChild(Array[i]);
 //			if(!ret_code)

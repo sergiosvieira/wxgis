@@ -22,19 +22,20 @@
 #pragma once
 
 #include "wxgis/base.h"
-#include "wxgis/core/config.h"
+#include "wxgis/core/init.h"
 
-#include "wx/app.h"
+#include <wx/app.h>
+
+#include <map>
 
 class wxGISCatalogApp :
-	public wxApp
+	public wxApp,
+	public wxGISAppWithLibs
 {
 public:
 	wxGISCatalogApp(void);
 	~wxGISCatalogApp(void);
 	virtual bool OnInit();
-private:
-	wxGISAppConfig* m_pConfig;
 };
 
 DECLARE_APP(wxGISCatalogApp);

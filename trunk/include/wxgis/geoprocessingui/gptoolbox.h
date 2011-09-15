@@ -3,7 +3,7 @@
  * Purpose:  toolbox classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -87,19 +87,19 @@ public:
     virtual wxString GetBaseName(void){return GetName();};
     //IGxRootObjectProperties
     virtual void Init(wxXmlNode* const pConfigNode);
-    virtual wxXmlNode* GetProperties(void);
+    virtual void Serialize(wxXmlNode* pConfigNode);
 	//wxGxRootToolbox
 	virtual void LoadChildren(void);
 	virtual wxGISGPToolManager* GetGPToolManager(void);
     //IToolManagerUI
 	virtual IGPToolSPtr GetGPTool(wxString sToolName);
-	virtual void OnExecuteTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync);
-    virtual bool OnPrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync);
+	virtual void ExecuteTool(wxWindow* pParentWnd, IGPToolSPtr pTool, bool bSync);
+    virtual bool PrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, bool bSync);
+	virtual long Advise(wxEvtHandler* pEvtHandler);
+	virtual void Unadvise(long nCookie);
 protected:
 	wxString m_sPath;
 	bool m_bIsChildrenLoaded;
-    wxXmlNode* m_pPropNode;
-    wxGISAppConfig* m_pConfig;
     wxGISGPToolManager* m_pToolMngr;
 };
 
@@ -140,7 +140,7 @@ public:
 protected:
 	bool m_bIsChildrenLoaded;
     wxGxRootToolbox* m_pRootToolbox;
-    short m_nMaxCount;
+    size_t m_nMaxCount;
     wxIcon m_LargeToolIcon, m_SmallToolIcon;
 };
 
@@ -155,7 +155,7 @@ class WXDLLIMPEXP_GIS_GPU wxGxToolExecute :
     public wxGISGPToolManager
 {
 public:
-	wxGxToolExecute(wxGxRootToolbox* pRootToolbox, wxXmlNode* pToolsNode);
+	wxGxToolExecute(wxGxRootToolbox* pRootToolbox);
 	virtual ~wxGxToolExecute(void);
 	//IGxObject
 	virtual void Detach(void);
@@ -177,13 +177,13 @@ public:
 	virtual bool AreChildrenViewable(void){return false;};
 	virtual bool HasChildren(void){return m_Children.size() > 0 ? true : false;};
     // wxGISGPToolManager
-    virtual int OnExecute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel = NULL, IGPCallBack* pCallBack = NULL);
+    virtual int Execute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel = NULL);
     virtual void StartProcess(size_t nIndex);
     //virtual void CancelProcess(size_t nIndex);
     virtual void OnFinish(IProcess* pProcess, bool bHasErrors);
-    virtual bool OnPrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, IGPCallBack* pCallBack, bool bSync)
+    virtual bool PrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, bool bSync)
 	{
-		return m_pRootToolbox->OnPrepareTool(pParentWnd, pTool, pCallBack, bSync);
+		return m_pRootToolbox->PrepareTool(pParentWnd, pTool, bSync);
 	}
 protected:
     wxGxRootToolbox* m_pRootToolbox;

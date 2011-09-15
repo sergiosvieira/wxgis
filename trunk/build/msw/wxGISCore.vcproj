@@ -40,13 +40,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(WXGISGDAL)\port&quot;;&quot;$(BOOST_ROOT)&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
+				AdditionalIncludeDirectories="&quot;$(BOOST_ROOT)&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CORE;BOOST_ALL_NO_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib"
+				AdditionalDependencies="wxbase29ud.lib wxbase29ud_net.lib wxmsw29ud_core.lib wxbase29ud_xml.lib wxgiscpld.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="0"
 				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;;$(WXGISGDAL)\lib"
@@ -125,7 +125,7 @@
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -186,6 +186,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\core\event.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\core\format.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\core\globalfn.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\core\init.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\core\process.cpp"
 				>
 			</File>
@@ -204,7 +220,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\wxgis\core\event.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\core\format.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\core\globalfn.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\core\init.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wxgis\core\process.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\core\process.hpp"
 				>
 			</File>
 		</Filter>

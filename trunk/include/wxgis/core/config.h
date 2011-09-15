@@ -21,21 +21,96 @@
 #pragma once
 
 #include "wxgis/core/core.h"
+
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
 
-//#define HKCU_CONFIG_NAME wxT("hkcu_config.xml")
-//#define HKLM_CONFIG_NAME wxT("hklm_config.xml")
+#define VENDOR wxT("wxGIS")
 
-//---------------------------------------------------------------
-// wxGISConfig
-//---------------------------------------------------------------
+WX_DECLARE_STRING_HASH_MAP( wxXmlNode*, wxGISConfigNodesMap );
+/** \class wxGISConfig config.h
+    \brief The config class
+*/
+class WXDLLIMPEXP_GIS_CORE wxGISConfig
+{
+public:
+	wxGISConfig(const wxString &sVendorName = VENDOR, bool bPortable = false);
+	virtual ~wxGISConfig(void);
+	virtual void Clean(bool bInstall = false);
+	virtual wxString Read(wxGISEnumConfigKey Key, const wxString &sPath, const wxString &sDefaultValue);
+	virtual int ReadInt(wxGISEnumConfigKey Key, const wxString &sPath, int nDefaultValue);
+	virtual double ReadDouble(wxGISEnumConfigKey Key, const wxString &sPath, double dDefaultValue);
+	virtual bool ReadBool(wxGISEnumConfigKey Key, const wxString &sPath, bool bDefaultValue);
+	virtual wxXmlNode *GetConfigNode(wxGISEnumConfigKey Key, const wxString &sPath);
+	virtual bool Write(wxGISEnumConfigKey Key, const wxString &sPath, const wxString &sValue);
+	virtual bool Write(wxGISEnumConfigKey Key, const wxString &sPath, bool bValue);
+	virtual bool Write(wxGISEnumConfigKey Key, const wxString &sPath, int nValue);
+	static void DeleteNodeChildren(wxXmlNode* pNode);
+	virtual wxXmlNode *CreateConfigNode(wxGISEnumConfigKey Key, const wxString &sPath);
+	virtual wxString GetLocalConfigDir(void){return m_sLocalConfigDirPath;};
+	virtual wxString GetGlobalConfigDir(void){return m_sGlobalConfigDirPath;};
+	//typedefs
+	typedef struct wxxmlconf
+	{
+		wxXmlDocument* pXmlDoc;
+        wxGISEnumConfigKey Key;
+        wxString sXmlFileName;
+		wxString sXmlFilePath;
+	}WXXMLCONF;
+protected:
+	bool SplitPathToXml(const wxString &  fullpath, wxString *psFileName, wxString *psPathInXml);
+	bool SplitPathToAttribute(const wxString &  fullpath, wxString *psPathToAttribute, wxString *psAttributeName);
+	wxXmlNode* GetConfigRootNode(wxGISEnumConfigKey Key, const wxString &sFileName);
+protected:
+	wxString m_sLocalConfigDirPath, m_sGlobalConfigDirPath, m_sAppExeDirPath;
+    bool m_bPortable;
+	std::vector<WXXMLCONF> m_paConfigFiles;
+	wxGISConfigNodesMap m_pmConfigNodes;
+};
 
+/** \class wxGISAppConfig config.h
+    \brief The extended config class
+
+	Added methods for Get/Set Locale, System Directory and Log Directory paths, Debug mode
+*/
+class WXDLLIMPEXP_GIS_CORE wxGISAppConfig : 
+	public wxGISConfig
+{
+public:
+	wxGISAppConfig(const wxString &sVendorName = VENDOR, bool bPortable = false);
+	virtual ~wxGISAppConfig(void);
+    virtual wxString GetLocale(void);
+    virtual wxString GetLocaleDir(void);
+    virtual wxString GetSysDir(void);
+    virtual wxString GetLogDir(void);
+    virtual bool GetDebugMode(void);
+    virtual void SetLocale(const wxString &sLocale);
+    virtual void SetLocaleDir(const wxString &sLocaleDir);
+    virtual void SetSysDir(const wxString &sSysDir);
+	virtual void SetLogDir(const wxString &sLogDir);
+    virtual void SetDebugMode(bool bDebug);
+};
+
+DEFINE_SHARED_PTR(wxGISAppConfig);
+
+/** \fn wxGISAppConfigSPtr GetConfig(void)
+    \brief Global config getter.
+	
+	If config object is not exist it created, otherwise - AddRef for pointer
+ */	
+WXDLLIMPEXP_GIS_CORE wxGISAppConfigSPtr GetConfig(void);
+/** \fn void ReleaseConfig(void)
+    \brief Release global config pointer.
+ */	
+WXDLLIMPEXP_GIS_CORE void ReleaseConfig(void);
+
+
+/*
 class WXDLLIMPEXP_GIS_CORE wxGISConfig : 
 	public IGISConfig
 {
 public:
-	wxGISConfig(wxString sAppName, wxString sConfigDir, bool bPortable = false);
+	wxGISConfig(const wxString &sAppName, const wxString &sConfigDir, bool bPortable = false);
 	virtual ~wxGISConfig(void);
 	//IGISConfig
     virtual wxXmlNode* GetConfigNode(wxGISEnumConfigKey Key, wxString sPath);
@@ -66,16 +141,18 @@ protected:
 	std::vector<WXXMLCONFNODE> m_confignodes_arr;
     bool m_bPortable;
 };
+*/
+/** \class wxGISAppConfig config.h
+    \brief The extended config class
 
-//---------------------------------------------------------------
-// wxGISAppConfig
-//---------------------------------------------------------------
-
+	Added methods for Get/Set Locale, System Directory and Log Directory paths, Debug mode
+*/
+/*
 class WXDLLIMPEXP_GIS_CORE wxGISAppConfig : 
 	public wxGISConfig
 {
 public:
-	wxGISAppConfig(wxString sAppName, wxString sConfigDir, bool bPortable = false);
+	wxGISAppConfig(const wxString &sAppName, const wxString &sConfigDir, bool bPortable = false);
 	virtual ~wxGISAppConfig(void);
 
     virtual wxString GetLocale(void);
@@ -90,3 +167,5 @@ public:
     virtual void SetDebugMode(bool bDebug);
 };
 
+DEFINE_SHARED_PTR(wxGISAppConfig);
+*/

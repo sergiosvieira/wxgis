@@ -46,7 +46,7 @@ public:
     virtual void SetDataType(wxGISEnumGPParameterDataType nType);
     virtual wxGISEnumGPParameterDirection GetDirection(void);
     virtual void SetDirection(wxGISEnumGPParameterDirection nDirection);
-    virtual wxArrayString GetParameterDependencies(void);
+    virtual wxArrayString* GetParameterDependencies(void);
     virtual void AddParameterDependency(wxString sDependency);
     virtual wxGISEnumGPParameterType GetParameterType(void);
     virtual void SetParameterType(wxGISEnumGPParameterType nType);
@@ -75,7 +75,7 @@ protected:
     wxString m_sMessage;
     wxGISEnumGPMessageType m_nMsgType;
 	int m_nSelection;
-    wxArrayString m_ParamDepStr;
+    //wxArrayString m_ParamDepStr;
 };
 
 /** \class wxGISGPMultiParameter gpparam.h

@@ -27,7 +27,7 @@
 // ----------------------------------------------------------------------------
 
 class WXDLLIMPEXP_GIS_CLU wxGxSelection :
-	public IConnectionPointContainer,
+	public wxGISConnectionPointContainer,
 	public IGxSelection
 {
 public:
@@ -47,18 +47,16 @@ public:
     virtual void Do( long nObjectID );
     virtual bool CanRedo();
 	virtual bool CanUndo();
-    virtual long Redo(int nPos = -1);
-    virtual long Undo(int nPos = -1);
+    virtual long Redo(int nPos = wxNOT_FOUND);
+    virtual long Undo(int nPos = wxNOT_FOUND);
 	virtual void RemoveDo(long nObjectID);
     virtual void Reset();
     virtual size_t GetDoSize();
     virtual int GetDoPos(void){return m_nPos;};
     virtual long GetDoID(size_t nIndex);
-    virtual wxSelLongArray GetDoArray(void){return m_DoArray;};
-    //IConnectionPointContainer
-	virtual long Advise(wxObject* pObject);
+    virtual wxArrayLong GetDoArray(void){return m_DoArray;};
 protected:
-	wxSelLongArray m_DoArray;
+	wxArrayLong m_DoArray;
 	int m_nPos;
     bool m_bDoOp;
 
@@ -66,6 +64,6 @@ protected:
     wxCriticalSection m_DoCritSect, m_CritSect;
 	//wxMutex m_Mutex;
 
-	std::map<long, wxSelLongArray> m_SelectionMap;
+	std::map<long, wxArrayLong> m_SelectionMap;
 	long m_currentInitiator;
 };

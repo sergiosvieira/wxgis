@@ -38,28 +38,26 @@ wxGISGPCompStatTool::wxGISGPCompStatTool(void) : wxGISGPTool()
 
 wxGISGPCompStatTool::~wxGISGPCompStatTool(void)
 {
-    for(size_t i = 0; i < m_pParamArr.size(); i++)
-        wxDELETE(m_pParamArr[i]);
 }
 
-wxString wxGISGPCompStatTool::GetDisplayName(void)
+const wxString wxGISGPCompStatTool::GetDisplayName(void)
 {
     return wxString(_("Compute statistics"));
 }
 
-wxString wxGISGPCompStatTool::GetName(void)
+const wxString wxGISGPCompStatTool::GetName(void)
 {
     return wxString(wxT("comp_stats"));
 }
 
-wxString wxGISGPCompStatTool::GetCategory(void)
+const wxString wxGISGPCompStatTool::GetCategory(void)
 {
     return wxString(_("Data Management Tools/Raster"));
 }
 
-GPParameters* wxGISGPCompStatTool::GetParameterInfo(void)
+GPParameters wxGISGPCompStatTool::GetParameterInfo(void)
 {
-    if(m_pParamArr.empty())
+    if(m_paParam.IsEmpty())
     {
         //src path
         wxGISGPParameter* pParam1 = new wxGISGPParameter();
@@ -73,7 +71,7 @@ GPParameters* wxGISGPCompStatTool::GetParameterInfo(void)
         pDomain1->AddFilter(new wxGxDatasetFilter(enumGISRasterDataset));
         pParam1->SetDomain(pDomain1);
 
-        m_pParamArr.push_back(pParam1);
+        m_paParam.Add(pParam1);
 
         //build approx
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
@@ -84,9 +82,9 @@ GPParameters* wxGISGPCompStatTool::GetParameterInfo(void)
         pParam2->SetDirection(enumGISGPParameterDirectionInput);
         pParam2->SetValue(false);
 
-        m_pParamArr.push_back(pParam2);
+        m_paParam.Add(pParam2);
     }
-    return &m_pParamArr;
+    return m_paParam;
 }
 
 bool wxGISGPCompStatTool::Validate(void)
@@ -113,7 +111,7 @@ bool wxGISGPCompStatTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
 
-    wxString sSrcPath = m_pParamArr[0]->GetValue();
+    wxString sSrcPath = m_paParam[0]->GetValue();
     IGxObject* pGxObject = pGxObjectContainer->SearchChild(sSrcPath);
     if(!pGxObject)
     {
@@ -153,7 +151,7 @@ bool wxGISGPCompStatTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
 
-    bool bApproxOK = m_pParamArr[1]->GetValue();
+    bool bApproxOK = m_paParam[1]->GetValue();
 
     for(int nBand = 0; nBand < poGDALDataset->GetRasterCount(); nBand++ )
     {
@@ -169,7 +167,7 @@ bool wxGISGPCompStatTool::Execute(ITrackCancel* pTrackCancel)
             if(pTrackCancel)
             {
                 const char* pszErr = CPLGetLastErrorMsg();
-                pTrackCancel->PutMessage(wxString::Format(_("ComputeStatistics failed! GDAL error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
+				pTrackCancel->PutMessage(wxString::Format(_("ComputeStatistics failed! GDAL error: %s"), wxString(pszErr, wxConvUTF8).c_str()), -1, enumGISMessageErr);
             }
             //wsDELETE(pSrcDataSet);
             return false;

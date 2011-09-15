@@ -44,6 +44,11 @@ BEGIN_EVENT_TABLE(wxGxToolExecuteView, wxListCtrl)
     EVT_LIST_COL_CLICK(TOOLEXECUTECTRLID, wxGxToolExecuteView::OnColClick)
     EVT_CONTEXT_MENU(wxGxToolExecuteView::OnContextMenu)
     EVT_CHAR(wxGxToolExecuteView::OnChar)
+	EVT_GXOBJECT_REFRESHED(wxGxToolExecuteView::OnObjectRefreshed)
+	EVT_GXOBJECT_ADDED(wxGxToolExecuteView::OnObjectAdded)
+	EVT_GXOBJECT_DELETED(wxGxToolExecuteView::OnObjectDeleted)
+	EVT_GXOBJECT_CHANGED(wxGxToolExecuteView::OnObjectChanged)
+	EVT_GXSELECTION_CHANGED(wxGxToolExecuteView::OnSelectionChanged)
 END_EVENT_TABLE()
 
 int wxCALLBACK TasksCompareFunction(long item1, long item2, long sortData)
@@ -90,8 +95,7 @@ wxGxToolExecuteView::wxGxToolExecuteView(void)
 	m_nParentGxObjectID = wxNOT_FOUND;
 }
 
-wxGxToolExecuteView::wxGxToolExecuteView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
-m_bSortAsc(true), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(-1), m_currentSortCol(0), m_pSelection(NULL), m_bHideDone(false)//wxListCtrl(parent, id, pos, size, style), 
+wxGxToolExecuteView::wxGxToolExecuteView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : m_bSortAsc(true), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(wxNOT_FOUND), m_currentSortCol(0), m_pSelection(NULL), m_bHideDone(false)//wxListCtrl(parent, id, pos, size, style), 
 {
     m_pXmlConf = NULL;
 	m_nParentGxObjectID = wxNOT_FOUND;
@@ -110,7 +114,7 @@ bool wxGxToolExecuteView::Create(wxWindow* parent, wxWindowID id, const wxPoint&
     m_bSortAsc = true;
     m_bHideDone = false;
     m_pConnectionPointCatalog = NULL;
-    m_ConnectionPointCatalogCookie = -1;
+    m_ConnectionPointCatalogCookie = wxNOT_FOUND;
     m_nParentGxObjectID = wxNOT_FOUND;
     m_currentSortCol = 0;
     m_pSelection = NULL;
@@ -146,7 +150,7 @@ bool wxGxToolExecuteView::Create(wxWindow* parent, wxWindowID id, const wxPoint&
     return true;
 }
 
-bool wxGxToolExecuteView::Activate(IApplication* application, wxXmlNode* pConf)
+bool wxGxToolExecuteView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 {
 	if(!wxGxView::Activate(application, pConf))
 		return false;
@@ -158,18 +162,19 @@ bool wxGxToolExecuteView::Activate(IApplication* application, wxXmlNode* pConf)
 	//delete
     m_pDeleteCmd = application->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
 
-	m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pCatalog );
+	m_pConnectionPointCatalog = dynamic_cast<wxGISConnectionPointContainer*>( m_pCatalog );
 	if(m_pConnectionPointCatalog != NULL)
 		m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
 
-	m_pSelection = m_pCatalog->GetSelection();
+	if(m_pCatalog)
+		m_pSelection = m_pCatalog->GetSelection();
 
 	return true;
 }
 
 void wxGxToolExecuteView::Deactivate(void)
 {
-	if(m_ConnectionPointCatalogCookie != -1)
+	if(m_ConnectionPointCatalogCookie != wxNOT_FOUND)
 		m_pConnectionPointCatalog->Unadvise(m_ConnectionPointCatalogCookie);
 
 	Serialize(m_pXmlConf, true);
@@ -183,30 +188,30 @@ void wxGxToolExecuteView::Serialize(wxXmlNode* pRootNode, bool bStore)
 
 	if(bStore)
 	{
-        if(pRootNode->HasProp(wxT("sort")))
-            pRootNode->DeleteProperty(wxT("sort"));
-        pRootNode->AddProperty(wxT("sort"), wxString::Format(wxT("%d"), m_bSortAsc));
-        if(pRootNode->HasProp(wxT("sort_col")))
-            pRootNode->DeleteProperty(wxT("sort_col"));
-        pRootNode->AddProperty(wxT("sort_col"), wxString::Format(wxT("%d"), m_currentSortCol));
+        if(pRootNode->HasAttribute(wxT("sort")))
+            pRootNode->DeleteAttribute(wxT("sort"));
+        pRootNode->AddAttribute(wxT("sort"), wxString::Format(wxT("%d"), m_bSortAsc));
+        if(pRootNode->HasAttribute(wxT("sort_col")))
+            pRootNode->DeleteAttribute(wxT("sort_col"));
+        pRootNode->AddAttribute(wxT("sort_col"), wxString::Format(wxT("%d"), m_currentSortCol));
 
         //store col width
         wxString sCols;
-        for(size_t i = 0; i < GetColumnCount(); i++)
+        for(size_t i = 0; i < GetColumnCount(); ++i)
         {
             sCols += wxString::Format(wxT("%d"), GetColumnWidth(i));
             sCols += wxT("|");
         }
-        if(pRootNode->HasProp(wxT("cols_width")))
-            pRootNode->DeleteProperty(wxT("cols_width"));
-        pRootNode->AddProperty(wxT("cols_width"), sCols);
+        if(pRootNode->HasAttribute(wxT("cols_width")))
+            pRootNode->DeleteAttribute(wxT("cols_width"));
+        pRootNode->AddAttribute(wxT("cols_width"), sCols);
 	}
 	else
 	{
-		m_bSortAsc = wxAtoi(pRootNode->GetPropVal(wxT("sort"), wxT("1")));
-		m_currentSortCol = wxAtoi(pRootNode->GetPropVal(wxT("sort_col"), wxT("0")));
+		m_bSortAsc = wxAtoi(pRootNode->GetAttribute(wxT("sort"), wxT("1"))) == 1;
+		m_currentSortCol = wxAtoi(pRootNode->GetAttribute(wxT("sort_col"), wxT("0")));
         //load col width
-        wxString sCol = pRootNode->GetPropVal(wxT("cols_width"), wxT(""));
+        wxString sCol = pRootNode->GetAttribute(wxT("cols_width"), wxT(""));
 	    wxStringTokenizer tkz(sCol, wxString(wxT("|")), wxTOKEN_RET_EMPTY );
         int col_counter(0);
 	    while ( tkz.HasMoreTokens() )
@@ -236,7 +241,7 @@ void wxGxToolExecuteView::AddObject(IGxObject* pObject)
 #ifdef __WXGTK__
         if(GetColumnCount() < 6)
         {
-		InsertColumn(0, _("Tool name"), wxLIST_FORMAT_LEFT, 150);    //priority
+		InsertColumn(0, _("Priority"), wxLIST_FORMAT_LEFT, 150);    //priority
         InsertColumn(1, _("Tool name"), wxLIST_FORMAT_LEFT, 150);    //toolname
         InsertColumn(2, _("Start"), wxLIST_FORMAT_LEFT, 100);        //begin
         InsertColumn(3, _("Finish"), wxLIST_FORMAT_LEFT, 100);       //end
@@ -246,7 +251,7 @@ void wxGxToolExecuteView::AddObject(IGxObject* pObject)
 #endif
         // enumGISTaskWork = 1,    enumGISTaskDone = 2,    enumGISTaskQuered = 3,     enumGISTaskPaused = 4,     enumGISTaskError = 5
         //4 - error, 5 - warning, 6 - work, 7 - queued, 8 - done, 9 - paused, 10 - deleted
-        char nIcon = -1;
+        char nIcon = wxNOT_FOUND;
         wxColor color;
         switch(pGxTask->GetState())
         {
@@ -288,9 +293,7 @@ void wxGxToolExecuteView::AddObject(IGxObject* pObject)
             SetItem(ListItemID, 5, sLastMsg);
 
         SetItemBackgroundColour(ListItemID, color);
-        SetItemData(ListItemID, (long)pObject);
-
-    	wxListCtrl::Refresh();
+        SetItemData(ListItemID, pObject->GetID());
 	}
 }
 
@@ -326,15 +329,15 @@ void wxGxToolExecuteView::OnSelected(wxListEvent& event)
 {
 	//event.Skip();
     m_pSelection->Clear(NOTFIRESELID);
-    long nItem = -1;
+    long nItem = wxNOT_FOUND;
 	size_t nCount(0);
     for ( ;; )
     {
         nItem = GetNextItem(nItem, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-        if ( nItem == -1 )
+        if ( nItem == wxNOT_FOUND )
             break;
-        IGxObject* pObject = (IGxObject*)GetItemData(nItem);
-	    if(pObject == NULL)
+		IGxObjectSPtr pObject = m_pCatalog->GetRegisterObject(GetItemData(nItem));
+	    if(!pObject)
             continue;
 		nCount++;
         m_pSelection->Select(pObject->GetID(), true, NOTFIRESELID);
@@ -347,11 +350,11 @@ bool wxGxToolExecuteView::Show(bool show)
     if(show)
     {
         //deselect all items
-        long nItem = -1;
+        long nItem = wxNOT_FOUND;
         for ( ;; )
         {
             nItem = GetNextItem(nItem, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-            if ( nItem == -1 )
+            if ( nItem == wxNOT_FOUND )
                 break;
             SetItemState(nItem, 0, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
         }
@@ -366,8 +369,8 @@ void wxGxToolExecuteView::OnDeselected(wxListEvent& event)
     if(GetSelectedItemCount() == 0)
         m_pSelection->Select(m_nParentGxObjectID, false, NOTFIRESELID);
 
-	IGxObject* pObject = (IGxObject*)event.GetData();
-	if(pObject == NULL)
+	IGxObjectSPtr pObject = m_pCatalog->GetRegisterObject(event.GetData());
+	if(!pObject)
 		return;
 
 	m_pSelection->Unselect(pObject->GetID(), NOTFIRESELID);
@@ -375,16 +378,16 @@ void wxGxToolExecuteView::OnDeselected(wxListEvent& event)
 
 void wxGxToolExecuteView::ShowContextMenu(const wxPoint& pos)
 {
-	long item = -1;
+	long item = wxNOT_FOUND;
     item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if(item == -1)
+	if(item == wxNOT_FOUND)
 	{
 		IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_nParentGxObjectID);
 		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
         if(pGxObjectUI)
         {
             wxString psContextMenu = pGxObjectUI->ContextMenu();
-            IApplication* pApp = dynamic_cast<IApplication*>(m_pGxApplication);
+            IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(m_pGxApplication);
             if(pApp)
             {
                 wxMenu* pMenu = dynamic_cast<wxMenu*>(pApp->GetCommandBar(psContextMenu));
@@ -397,26 +400,26 @@ void wxGxToolExecuteView::ShowContextMenu(const wxPoint& pos)
 		return;
 	}
 
-	IGxObject* pObject = (IGxObject*)GetItemData(item);
-	if(pObject != NULL)
-	{
-        bool bAdd = true;
-		m_pSelection->Select(pObject->GetID(), bAdd, NOTFIRESELID);
+	IGxObjectSPtr pObject = m_pCatalog->GetRegisterObject(GetItemData(item));
+	if(!pObject)
+		return;
 
-		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pObject);
-		if(pGxObjectUI != NULL)
-		{
-            wxString psContextMenu = pGxObjectUI->ContextMenu();
-            IApplication* pApp = dynamic_cast<IApplication*>(m_pGxApplication);
-            if(pApp)
+	bool bAdd = true;
+	m_pSelection->Select(pObject->GetID(), bAdd, NOTFIRESELID);
+
+	IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pObject.get());
+	if(pGxObjectUI != NULL)
+	{
+        wxString psContextMenu = pGxObjectUI->ContextMenu();
+        IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(m_pGxApplication);
+        if(pApp)
+        {
+            wxMenu* pMenu = dynamic_cast<wxMenu*>(pApp->GetCommandBar(psContextMenu));
+            if(pMenu)
             {
-                wxMenu* pMenu = dynamic_cast<wxMenu*>(pApp->GetCommandBar(psContextMenu));
-                if(pMenu)
-                {
-                    PopupMenu(pMenu, pos.x, pos.y);
-                }
+                PopupMenu(pMenu, pos.x, pos.y);
             }
-		}
+        }
 	}
 }
 
@@ -426,8 +429,8 @@ void wxGxToolExecuteView::SetColumnImage(int col, int image)
     item.SetMask(wxLIST_MASK_IMAGE);
 
     //reset image
-    item.SetImage(-1);
-    for(size_t i = 0; i < GetColumnCount(); i++)
+    item.SetImage(wxNOT_FOUND);
+    for(size_t i = 0; i < GetColumnCount(); ++i)
         SetColumn(i, item);
 
     item.SetImage(image);
@@ -437,56 +440,56 @@ void wxGxToolExecuteView::SetColumnImage(int col, int image)
 void wxGxToolExecuteView::OnActivated(wxListEvent& event)
 {
 	//event.Skip();
-	IGxObject* pObject = (IGxObject*)event.GetData();
-	if(pObject == NULL)
+	IGxObjectSPtr pObject = m_pCatalog->GetRegisterObject(event.GetData());
+	if(!pObject)
 		return;
 
-	IGxObjectWizard* pGxObjectWizard = dynamic_cast<IGxObjectWizard*>(pObject);
+	IGxObjectWizard* pGxObjectWizard = dynamic_cast<IGxObjectWizard*>(pObject.get());
 	if(pGxObjectWizard != NULL)
 		pGxObjectWizard->Invoke(this);
 }
 
-void wxGxToolExecuteView::OnObjectAdded(long nObjectID)
+void wxGxToolExecuteView::OnObjectAdded(wxGxCatalogEvent& event)
 {
-    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
-	if(pGxObject)
-	{
-		if(pGxObject->GetParent()->GetID() == m_nParentGxObjectID)
-		{
-			AddObject(pGxObject.get());
-			SORTTASKDATA sortdata = {m_bSortAsc, m_currentSortCol};
-			SortItems(TasksCompareFunction, (long)&sortdata);
-		}
-	}
-}
-
-void wxGxToolExecuteView::OnObjectDeleted(long nObjectID)
-{
-	for(long i = 0; i < GetItemCount(); i++)
-	{
-		IGxObject* pObject = (IGxObject*)GetItemData(i);
-		if(pObject == NULL)
-			continue;
-		IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
-		if(pObject != pGxObject.get())
-			continue;
-		
-		//delete pItemData;
-		DeleteItem(i);
-		//Refresh();
+	IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(event.GetObjectID());
+	if(!pGxObject)
 		return;
+
+	IGxObject* pParentGxObject = pGxObject->GetParent();
+	if(!pParentGxObject)
+		return;
+	if(pParentGxObject->GetID() == m_nParentGxObjectID)
+	{
+		AddObject(pGxObject.get());
+		//SORTTASKDATA sortdata = {m_bSortAsc, m_currentSortCol};
+		//SortItems(TasksCompareFunction, (long)&sortdata);
+	    //wxListCtrl::Refresh();
 	}
 }
 
-void wxGxToolExecuteView::OnObjectChanged(long nObjectID)
+void wxGxToolExecuteView::OnObjectDeleted(wxGxCatalogEvent& event)
 {
-	IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
+	IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(event.GetObjectID());
+	if(!pGxObject)
+		return;
+	for(long i = 0; i < GetItemCount(); ++i)
+	{
+		if(GetItemData(i) == pGxObject->GetID())
+			DeleteItem(i);
+	}
+	//wxListCtrl::Refresh();
+}
+
+void wxGxToolExecuteView::OnObjectChanged(wxGxCatalogEvent& event)
+{
+	IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(event.GetObjectID());
+	if(!pGxObject)
+		return;
     //find item
     int nItem = wxNOT_FOUND;
-    for(size_t i = 0; i < GetItemCount(); i++)
+    for(size_t i = 0; i < GetItemCount(); ++i)
     {
-        IGxObject* pObject = (IGxObject*)GetItemData(i);
-		if(pObject != pGxObject.get())
+		if(GetItemData(i) == pGxObject->GetID())
         {
             nItem = i;
             break;
@@ -500,7 +503,7 @@ void wxGxToolExecuteView::OnObjectChanged(long nObjectID)
     {
         // enumGISTaskWork = 1,    enumGISTaskDone = 2,    enumGISTaskQuered = 3,     enumGISTaskPaused = 4,     enumGISTaskError = 5
         //4 - error, 5 - warning, 6 - work, 7 - queued, 8 - done, 9 - paused, 10 - deleted
-        char nIcon = -1;
+        char nIcon = wxNOT_FOUND;
         wxColor color;
         switch(pGxTask->GetState())
         {
@@ -540,23 +543,29 @@ void wxGxToolExecuteView::OnObjectChanged(long nObjectID)
 
         SetItemBackgroundColour(nItem, color);
 
-	    wxListCtrl::Refresh();
+	    //wxListCtrl::Refresh();
     }
 }
 
-void wxGxToolExecuteView::OnObjectRefreshed(long nObjectID)
+void wxGxToolExecuteView::OnObjectRefreshed(wxGxCatalogEvent& event)
 {
-    if(m_nParentGxObjectID == nObjectID)
-        OnRefreshAll();
+    if(m_nParentGxObjectID == event.GetObjectID())
+        RefreshAll();
 
-	IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
-    if(pGxObject && pGxObject->GetParent()->GetID() == m_nParentGxObjectID)
+	IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(event.GetObjectID());
+	if(!pGxObject)
+		return;
+	IGxObject* pParentGxObject = pGxObject->GetParent();
+	if(!pParentGxObject)
+		return;
+
+    if(pParentGxObject->GetID() == m_nParentGxObjectID)
     {
-	    OnObjectChanged(nObjectID);
+	    OnObjectChanged(event);
     }
 }
 
-void wxGxToolExecuteView::OnRefreshAll(void)
+void wxGxToolExecuteView::RefreshAll(void)
 {
 	wxBusyCursor wait;
     ResetContents();
@@ -565,21 +574,23 @@ void wxGxToolExecuteView::OnRefreshAll(void)
 	if(pObjContainer == NULL || !pObjContainer->HasChildren())
 		return;
 	GxObjectArray* pArr = pObjContainer->GetChildren();
-	for(size_t i = 0; i < pArr->size(); i++)
+	for(size_t i = 0; i < pArr->size(); ++i)
 	{
 		AddObject(pArr->at(i));
 	}
+	    
+	wxListCtrl::Refresh();
 
-    SORTTASKDATA sortdata = {m_bSortAsc, m_currentSortCol};
-	SortItems(TasksCompareFunction, (long)&sortdata);
-	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+    //SORTTASKDATA sortdata = {m_bSortAsc, m_currentSortCol};
+	//SortItems(TasksCompareFunction, (long)&sortdata);
+	//SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 }
 
-void wxGxToolExecuteView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
+void wxGxToolExecuteView::OnSelectionChanged(wxGxSelectionEvent& event)
 {
-	if(nInitiator == GetId())
+	if(event.GetInitiator() == GetId())
 		return;
-    long nSelID = Selection->GetLastSelectedObjectID();
+    long nSelID = m_pSelection->GetLastSelectedObjectID();
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nSelID);
 	//IGxObject* pGxObj = m_pSelection->GetLastSelectedObject();
 	//if(m_pParentGxObject == pGxObj)
@@ -595,14 +606,16 @@ void wxGxToolExecuteView::OnSelectionChanged(IGxSelection* Selection, long nInit
 		return;
 
 	GxObjectArray* pArr = pObjContainer->GetChildren();
-	for(size_t i = 0; i < pArr->size(); i++)
+	for(size_t i = 0; i < pArr->size(); ++i)
 	{
 		AddObject(pArr->at(i));
 	}
 
-    SORTTASKDATA sortdata = {m_bSortAsc, m_currentSortCol};
-	SortItems(TasksCompareFunction, (long)&sortdata);
-	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+	wxListCtrl::Refresh();
+
+//    SORTTASKDATA sortdata = {m_bSortAsc, m_currentSortCol};
+//	SortItems(TasksCompareFunction, (long)&sortdata);
+//	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 }
 
 bool wxGxToolExecuteView::Applies(IGxSelection* Selection)
@@ -610,7 +623,7 @@ bool wxGxToolExecuteView::Applies(IGxSelection* Selection)
 	if(Selection == NULL)
 		return false;
 
-	for(size_t i = 0; i < Selection->GetCount(); i++)
+	for(size_t i = 0; i < Selection->GetCount(); ++i)
 	{
         IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(Selection->GetSelectedObjectID(i));
 		wxGxToolExecute* pGxToolExecute = dynamic_cast<wxGxToolExecute*>( pGxObject.get() );
@@ -654,24 +667,24 @@ void wxGxToolExecuteView::OnChar(wxKeyEvent& event)
 void wxGxToolExecuteView::HideDone(bool bHide)
 {
     m_bHideDone = bHide;
-    OnRefreshAll();
+    RefreshAll();
 }
 
 void wxGxToolExecuteView::OnBeginDrag(wxListEvent& event)
 {
-    long nItem = -1;
+    long nItem = wxNOT_FOUND;
 	wxArrayString saArr;
 	FillDataArray(saArr);
 	if(saArr.GetCount() > 0)
 	{
 		wxFileDataObject *pMyData = new wxFileDataObject();
-		for(size_t i = 0; i < saArr.GetCount(); i++)
+		for(size_t i = 0; i < saArr.GetCount(); ++i)
 			pMyData->AddFile(saArr[i]);
 
 	    wxDropSource dragSource( this );
 		dragSource.SetData( *pMyData );
 		wxDragResult result = dragSource.DoDragDrop( TRUE );  
-		wxDELETE(pMyData)
+		wxDELETE(pMyData);
 	}
 }
 
@@ -705,14 +718,14 @@ bool wxGxToolExecuteView::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString&
 	long nItemId = HitTest(pt, (int &)nFlags);
 	if(nItemId != wxNOT_FOUND && (nFlags & wxLIST_HITTEST_ONITEM))
 	{
-		IGxObject* pObject = (IGxObject*)GetItemData(nItemId);
-        wxGxTaskObject* pGxTask =  dynamic_cast<wxGxTaskObject*>(pObject);
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(GetItemData(nItemId));
+		wxGxTaskObject* pGxTask =  dynamic_cast<wxGxTaskObject*>(pGxObject.get());
 	    if(pGxTask == NULL)
             return false;
 
 		long nNewPriority = pGxTask->GetPriority();
 
-		for(size_t i = 0; i < filenames.GetCount(); i++)
+		for(size_t i = 0; i < filenames.GetCount(); ++i)
 		{
 			wxString sItem = filenames[i];
 			wxString sRest;
@@ -749,14 +762,14 @@ void wxGxToolExecuteView::OnLeave()
 
 void wxGxToolExecuteView::FillDataArray(wxArrayString &saDataArr)
 {
-	int nItem(-1);
+	int nItem(wxNOT_FOUND);
     for ( ;; )
     {
         nItem = GetNextItem(nItem, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-        if ( nItem == -1 )
+        if ( nItem == wxNOT_FOUND )
             break;
-        IGxObject* pObject = (IGxObject*)GetItemData(nItem);
-        wxGxTaskObject* pGxTask =  dynamic_cast<wxGxTaskObject*>(pObject);
+        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(GetItemData(nItem));
+		wxGxTaskObject* pGxTask =  dynamic_cast<wxGxTaskObject*>(pGxObject.get());
 	    if(pGxTask == NULL)
             continue;
         saDataArr.Add(wxString::Format(wxT("TaskID: %d"), pGxTask->GetTaskID()));
@@ -764,8 +777,7 @@ void wxGxToolExecuteView::FillDataArray(wxArrayString &saDataArr)
 }
 
 
-IGxObject* const wxGxToolExecuteView::GetParentGxObject(void)
+IGxObjectSPtr const wxGxToolExecuteView::GetParentGxObject(void)
 {
-    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_nParentGxObjectID);
-	return pGxObject.get();
-};
+    return m_pCatalog->GetRegisterObject(m_nParentGxObjectID);
+}

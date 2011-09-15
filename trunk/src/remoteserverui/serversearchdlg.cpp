@@ -45,7 +45,7 @@ wxGISSearchServerDlg::wxGISSearchServerDlg(INetConnFactory* pFactory, wxWindow* 
 
 wxGISSearchServerDlg::~wxGISSearchServerDlg()
 {
-	for(size_t i = 0; i < m_listCtrl->GetItemCount(); i++)
+	for(size_t i = 0; i < m_listCtrl->GetItemCount(); ++i)
 	{
 		wxXmlNode* pNode = (wxXmlNode*)m_listCtrl->GetItemData(i);
 		wxDELETE(pNode);
@@ -114,6 +114,7 @@ void wxGISSearchServerDlg::CreateControls(bool bShowGauge)
 
 void wxGISSearchServerDlg::OnClose(wxCloseEvent& event)
 {
+	event.Skip();
 	wxCommandEvent ev;
 	OnStop(ev);
 	Destroy();
@@ -153,20 +154,20 @@ void wxGISSearchServerDlg::OnSearch( wxCommandEvent& event )
 void wxGISSearchServerDlg::AddServer(wxXmlNode* pServerData)
 {
 	//check duplicates
-	for(size_t i = 0; i < m_listCtrl->GetItemCount(); i++)
+	for(size_t i = 0; i < m_listCtrl->GetItemCount(); ++i)
 	{
 		wxXmlNode* pNode = (wxXmlNode*)m_listCtrl->GetItemData(i);
-		bool bCmp1 = pServerData->GetPropVal(wxT("name"), NONAME) == pNode->GetPropVal(wxT("name"), NONAME);
-		bool bCmp2 = pServerData->GetPropVal(wxT("factory_name"), NONAME) == pNode->GetPropVal(wxT("factory_name"), NONAME);
-		bool bCmp3 = pServerData->GetPropVal(wxT("host"), NONAME) == pNode->GetPropVal(wxT("host"), NONAME);
+		bool bCmp1 = pServerData->GetAttribute(wxT("name"), NONAME) == pNode->GetAttribute(wxT("name"), NONAME);
+		bool bCmp2 = pServerData->GetAttribute(wxT("factory_name"), NONAME) == pNode->GetAttribute(wxT("factory_name"), NONAME);
+		bool bCmp3 = pServerData->GetAttribute(wxT("host"), NONAME) == pNode->GetAttribute(wxT("host"), NONAME);
 		if(bCmp1 && bCmp2 && bCmp3)
 			return;
 	}
 
-	long pos = m_listCtrl->InsertItem(-1, pServerData->GetPropVal(wxT("name"), NONAME), 0);	//Server name
-	m_listCtrl->SetItem(pos, 1, pServerData->GetPropVal(wxT("host"), NONAME));				//Host
-	m_listCtrl->SetItem(pos, 2, pServerData->GetPropVal(wxT("banner"), NONAME));			//Banner
-	m_listCtrl->SetItem(pos, 3, pServerData->GetPropVal(wxT("factory_name"), NONAME));		//Module
+	long pos = m_listCtrl->InsertItem(-1, pServerData->GetAttribute(wxT("name"), NONAME), 0);	//Server name
+	m_listCtrl->SetItem(pos, 1, pServerData->GetAttribute(wxT("host"), NONAME));				//Host
+	m_listCtrl->SetItem(pos, 2, pServerData->GetAttribute(wxT("banner"), NONAME));			//Banner
+	m_listCtrl->SetItem(pos, 3, pServerData->GetAttribute(wxT("factory_name"), NONAME));		//Module
 	m_listCtrl->SetItemData(pos, (long)pServerData);
 }
 
@@ -181,7 +182,7 @@ void wxGISSearchServerDlg::OnSearchUI( wxUpdateUIEvent& event )
 
 void wxGISSearchServerDlg::OnAccept( wxCommandEvent& event )
 {
-	long item = m_listCtrl->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	long item = m_listCtrl->GetNextItem(wxNOT_FOUND, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	m_pConnProps = (wxXmlNode*)m_listCtrl->GetItemData(item);
 	EndModal(ID_ACCEPT);
 }

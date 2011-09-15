@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxselection.h"
+#include "wxgis/catalogui/gxeventui.h"
 
 wxGxSelection::wxGxSelection(void) : m_nPos(wxNOT_FOUND), m_bDoOp(false), m_currentInitiator(wxNOT_FOUND)
 {
@@ -26,14 +27,6 @@ wxGxSelection::wxGxSelection(void) : m_nPos(wxNOT_FOUND), m_bDoOp(false), m_curr
 
 wxGxSelection::~wxGxSelection(void)
 {
-}
-
-long wxGxSelection::Advise(wxObject* pObject)
-{
-	IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(pObject);
-	if(pGxSelectionEvents == NULL)
-		return -1;
-	return IConnectionPointContainer::Advise(pObject);
 }
 
 void wxGxSelection::Select( long nObjectID,  bool appendToExistingSelection, long nInitiator )
@@ -73,11 +66,11 @@ void wxGxSelection::Select( long nObjectID,  bool appendToExistingSelection, lon
 
 	//fire event
 END:
-	for(size_t i = 0; i < m_pPointsArray.size(); i++)
+	wxGxSelectionEvent event(wxGXSELECTION_CHANGED, this, nInitiator);
+	for(size_t i = 0; i < m_pPointsArray.size(); ++i)
 	{
-		IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pPointsArray[i]);
-		if(pGxSelectionEvents != NULL)
-			pGxSelectionEvents->OnSelectionChanged(this, nInitiator);
+		if(m_pPointsArray[i] != NULL)
+			m_pPointsArray[i]->AddPendingEvent(event);
 	}
 }
 
@@ -101,11 +94,11 @@ void wxGxSelection::Select( long nObjectID )
     m_CritSect.Leave();
 
 	//fire event
-	for(size_t i = 0; i < m_pPointsArray.size(); i++)
+	wxGxSelectionEvent event(wxGXSELECTION_CHANGED, this, INIT_ALL);
+	for(size_t i = 0; i < m_pPointsArray.size(); ++i)
 	{
-		IGxSelectionEvents* pGxSelectionEvents = dynamic_cast<IGxSelectionEvents*>(m_pPointsArray[i]);
-		if(pGxSelectionEvents != NULL)
-			pGxSelectionEvents->OnSelectionChanged(this, INIT_ALL);
+		if(m_pPointsArray[i] != NULL)
+			m_pPointsArray[i]->AddPendingEvent(event);
 	}
 }
 
@@ -114,7 +107,7 @@ void wxGxSelection::Unselect( long nObjectID, long nInitiator )
     wxCriticalSectionLocker locker(m_CritSect);
 	if(nInitiator == INIT_ALL)
 	{
-		for(std::map<long, wxSelLongArray>::iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
+		for(std::map<long, wxArrayLong>::iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
 		{
 			int nIndex = CI->second.Index(nObjectID);
 			if(nIndex != wxNOT_FOUND)
@@ -125,7 +118,7 @@ void wxGxSelection::Unselect( long nObjectID, long nInitiator )
 	{
 		int nIndex = m_SelectionMap[nInitiator].Index(nObjectID);
 		if(nIndex != wxNOT_FOUND)
-			m_SelectionMap[nInitiator].Remove(nIndex);
+			m_SelectionMap[nInitiator].RemoveAt(nIndex);
 	}
 }
 
@@ -134,7 +127,7 @@ void wxGxSelection::Clear(long nInitiator)
     wxCriticalSectionLocker locker(m_CritSect);
 	if(nInitiator == INIT_ALL)
 	{
-		for(std::map<long, wxSelLongArray>::iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
+		for(std::map<long, wxArrayLong>::iterator CI = m_SelectionMap.begin(); CI != m_SelectionMap.end(); ++CI)
 			CI->second.Clear();
 	}
 	else
@@ -239,7 +232,7 @@ bool wxGxSelection::CanUndo()
 long wxGxSelection::Redo(int nPos)
 {
     wxCriticalSectionLocker locker(m_DoCritSect);
-    if(nPos == -1)
+    if(nPos == wxNOT_FOUND)
         m_nPos++;
     else
         m_nPos = nPos;
@@ -254,11 +247,11 @@ long wxGxSelection::Redo(int nPos)
 long wxGxSelection::Undo(int nPos)
 {
     wxCriticalSectionLocker locker(m_DoCritSect);
-    if(nPos == -1)
+    if(nPos == wxNOT_FOUND)
         m_nPos--;
     else
         m_nPos = nPos;
-    if(m_nPos > -1)
+    if(m_nPos > wxNOT_FOUND)
     {
         m_bDoOp = true;
         return m_DoArray[m_nPos];
@@ -269,7 +262,7 @@ long wxGxSelection::Undo(int nPos)
 void wxGxSelection::RemoveDo(long nObjectID)
 {
     wxCriticalSectionLocker locker(m_DoCritSect);
-    for(size_t i = 0; i < m_DoArray.GetCount(); i++)
+    for(size_t i = 0; i < m_DoArray.GetCount(); ++i)
     {
         //clean from doubles
         if(i > 0 && m_DoArray[i - 1] == m_DoArray[i])
@@ -290,7 +283,7 @@ void wxGxSelection::Reset()
     wxCriticalSectionLocker locker(m_DoCritSect);
     m_DoArray.Clear();
     m_bDoOp = false;
-    m_nPos = -1;
+    m_nPos = wxNOT_FOUND;
 }
 
 size_t wxGxSelection::GetDoSize()

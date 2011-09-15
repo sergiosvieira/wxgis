@@ -23,6 +23,7 @@
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/geoprocessing/gptoolmngr.h"
 #include "wxgis/framework/progressor.h"
+#include "wxgis/core/event.h"
 
 #include "wx/wxhtml.h"
 #include "wx/imaglist.h"
@@ -41,15 +42,14 @@ typedef std::vector<TASKMESSAGE> TaskMessageArray;
 
 class WXDLLIMPEXP_GIS_GPU wxGxTaskExecDlg :
 	public wxDialog,
-    public ITrackCancel,
-    public IGPCallBack
+    public ITrackCancel
 {
     enum
 	{
 		ID_CANCEL_PROCESS = wxID_HIGHEST + 30
 	};
 public:
-	wxGxTaskExecDlg(wxGISGPToolManager* pToolManager, IGPCallBack* pCallBack, wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+	wxGxTaskExecDlg(wxGISGPToolManager* pToolManager, wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
     virtual ~wxGxTaskExecDlg(void);
     virtual void SetTaskID(int nTaskID);
     virtual void FillHtmlWindow();
@@ -57,9 +57,9 @@ public:
     virtual void OnExpand(wxCommandEvent & event);
     virtual void OnCancel(wxCommandEvent & event);
     virtual void OnCancelTask(wxCommandEvent & event);
-    //IGPCallBack
-    virtual void OnFinish(bool bHasErrors = false, IGPToolSPtr pTool = IGPToolSPtr());
-    //ITrackCancel
+	virtual void OnClose(wxCloseEvent & event);
+	virtual void OnFinish(wxGISProcessEvent & event);
+	//ITrackCancel
 	virtual void PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType);
 protected:
     wxImageList m_ImageList;
@@ -80,7 +80,6 @@ protected:
     wxIcon m_Icon;
 
     int m_nTaskID;
-    IGPCallBack* m_pCallBack;
     wxGISGPToolManager* m_pToolManager;
 
     DECLARE_EVENT_TABLE();
@@ -100,6 +99,7 @@ public:
     //events
     virtual void OnCancel(wxCommandEvent & event);
     virtual void OnCancelTask(wxCommandEvent & event);
+	virtual void OnClose(wxCloseEvent& event);
 protected:
     wxGxTaskObject* m_pGxTaskObject;
 };
@@ -113,17 +113,18 @@ class WXDLLIMPEXP_GIS_GPU wxGxTaskObject :
     public IGxTask,
     public IGxObjectWizard,
     public ITrackCancel,
-    public IGPCallBack,
-    public IProgressor
+    public IProgressor,
+	public wxEvtHandler
 {
 public:
-	wxGxTaskObject(wxGISGPToolManager* pToolManager, wxString sName, IGPCallBack* pCallBack = NULL, wxIcon LargeToolIcon = wxNullIcon, wxIcon SmallToolIcon = wxNullIcon);
+	wxGxTaskObject(wxGISGPToolManager* pToolManager, wxString sName, wxIcon LargeToolIcon = wxNullIcon, wxIcon SmallToolIcon = wxNullIcon);
     virtual ~wxGxTaskObject(void);
 	//IGxObject
     virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void){return GetName();};
     virtual CPLString GetInternalName(void){return CPLString();};
 	virtual wxString GetCategory(void){return wxString(_("Task"));};
+	virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog);
 	virtual void Detach(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
@@ -140,6 +141,7 @@ public:
     virtual int GetValue(void){return m_nDonePercent;};
     virtual void Play(void){};
     virtual void Stop(void){};
+	virtual void SetYield(bool bYield = false){};
 //IGxTask
     virtual wxGISEnumTaskStateType GetState(void);
     virtual wxDateTime GetStart();
@@ -156,10 +158,11 @@ public:
     virtual void SetTaskID(int nTaskID);
 	virtual void ShowProcess(wxWindow* pParentWnd);
 	virtual void ShowToolConfig(wxWindow* pParentWnd);
-    //IGPCallBack
-    virtual void OnFinish(bool bHasErrors = false, IGPToolSPtr pTool = IGPToolSPtr());
     //ITrackCancel
 	virtual void PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType);
+	//events
+	void OnTaskStateChanged(wxGISProcessEvent & event);
+	void OnFinish(wxGISProcessEvent & event);
 protected:
     wxGxTaskObjectExecDlg *m_pTaskExecDlg;
     wxString m_sName;
@@ -167,7 +170,9 @@ protected:
     wxIcon m_LargeToolIcon, m_SmallToolIcon;
     TaskMessageArray m_MessageArray;
     int m_nTaskID;
-    IGPCallBack* m_pCallBack;
     wxGISGPToolManager* m_pToolManager;
+	long m_nCookie;
+
+    DECLARE_EVENT_TABLE();
 };
 

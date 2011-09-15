@@ -58,21 +58,21 @@ class INetClientConnection : public INetConnection
 public:
     virtual ~INetClientConnection(void){};
 	//pure virtual
-    /** \fn wxXmlNode* GetProperties(void)
+    /** \fn wxXmlNode* GetAttributes(void)
      *  \brief Get Properties of plugin.
      *  \return The properties of the plugin
 	 *
 	 *  It should be the new wxXmlNode (not a copy of setted properties)
      */	 	
-	virtual wxXmlNode* GetProperties(void) = 0;
-    /** \fn void SetProperties(wxXmlNode* pProp, INetCallback* pNetCallback)
+	virtual wxXmlNode* GetAttributes(void) = 0;
+    /** \fn void SetAttributes(wxXmlNode* pProp, INetCallback* pNetCallback)
      *  \brief Set Properties of plugin.
      *  \param pProp The properties of the plugin
      *  \param pNetCallback The callback pointer
 	 *
 	 *  Executed while LoadChildren (after connection class created). 
      */	  
-	virtual bool SetProperties(const wxXmlNode* pProp) = 0;
+	virtual bool SetAttributes(const wxXmlNode* pProp) = 0;
 	virtual void SetCallback(INetCallback* pNetCallback) = 0;
 	virtual wxString GetName(void) = 0;
     virtual wxString GetUser(void) = 0;
@@ -97,20 +97,12 @@ public:
 	virtual INetSearchCallback* GetCallback(void) = 0;
 	virtual wxString GetName(void) = 0;
     virtual INetClientConnection* GetConnection(wxXmlNode* pProp) = 0;
-    /** \fn wxXmlNode* GetProperties(void)
-     *  \brief Get Properties of Factory.
-     *  \return The properties of the Factory.
-	 *
-	 *  It should be the new wxXmlNode (not a pointer to other xml data)
+    /** \fn void Serialize(wxXmlNode* pConfigNode, bool bSave)
+     *  \brief Store Properties of Factory.
+     *  \param pConfigNode wxXmlNode to store params.
+     *  \param bSave Set or Get indicator.
      */	 	
-	virtual wxXmlNode* GetProperties(void) = 0;
-    /** \fn void SetProperties(wxXmlNode* pProp)
-     *  \brief Set Properties of plugin.
-     *  \param pProp The properties of the plugin
-	 *
-	 *  Executed while LoadPlugins (after flugin created). 
-     */	  
-	virtual void SetProperties(const wxXmlNode* pProp) = 0;
+    virtual void Serialize(wxXmlNode* pConfigNode, bool bSave = true) = 0;
 
 	//virtual char GetID(void) = 0;
 	//virtual void SetID(char nID) = 0;

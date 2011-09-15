@@ -25,7 +25,12 @@
 #include "wx/filename.h"
 #include "wx/tokenzr.h"
 
+int main(int argc, char **argv)
+{
+    return EXIT_SUCCESS;
 
+}
+/*
 int main(int argc, char **argv)
 {
 #if wxUSE_UNICODE
@@ -60,19 +65,19 @@ int main(int argc, char **argv)
     // Create the commandline parser
     static const wxCmdLineEntryDesc my_cmdline_desc[] =
     {
-        { wxCMD_LINE_SWITCH, wxT( "h" ), wxT( "help" ), _( "Show this help message" ), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
-        { wxCMD_LINE_SWITCH, wxT( "v" ), wxT( "version" ), _( "The version of this program" ) },
-		{ wxCMD_LINE_OPTION, wxT( "a" ), wxT( "add" ), _( "Add data to path in XML Config." ), wxCMD_LINE_VAL_STRING },
-		{ wxCMD_LINE_SWITCH, wxT( "d" ), wxT( "del" ), _( "Delete data from XML Config" ) },
-		{ wxCMD_LINE_OPTION, wxT( "n" ), wxT("name"), _( "The XMLNode name attribute" ), wxCMD_LINE_VAL_STRING },
-		{ wxCMD_LINE_OPTION, wxT( "p" ), wxT("path"), _( "The XMLNode path attribute" ), wxCMD_LINE_VAL_STRING },
-		{ wxCMD_LINE_OPTION, wxT( "e" ), wxT("is_enabled"), _( "The XMLNode is_enabled attribute. is_enabled choice: 1 for enabled or 0 for disabled" ), wxCMD_LINE_VAL_NUMBER },
-		{ wxCMD_LINE_OPTION, wxT( "c" ), wxT("class"), _( "The XMLNode class attribute" ), wxCMD_LINE_VAL_STRING },
-		{ wxCMD_LINE_OPTION, wxT( "t" ), wxT("type"), _( "The XMLNode type attribute. Type choice: sep, cmd, menu" ), wxCMD_LINE_VAL_STRING },
-		{ wxCMD_LINE_OPTION, wxT( "s" ), wxT("sub_type"), _( "The XMLNode sub_type attribute" ), wxCMD_LINE_VAL_NUMBER },
-		{ wxCMD_LINE_OPTION, wxT( "o" ), wxT("cmd_name"), _( "The XMLNode cmd_name attribute" ), wxCMD_LINE_VAL_STRING },
-		{ wxCMD_LINE_OPTION, wxT( "x" ), wxT("attributes"), _( "The XMLNode attributes <attr_name>=<attr_value> separated by comma" ), wxCMD_LINE_VAL_STRING },
-		{ wxCMD_LINE_OPTION, wxT( "enc" ), wxT("encode"), _( "encode password" ), wxCMD_LINE_VAL_STRING },
+        { wxCMD_LINE_SWITCH, "h", "help", _( "Show this help message" ), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
+        { wxCMD_LINE_SWITCH, "v", "version", _( "The version of this program" ) },
+		{ wxCMD_LINE_OPTION, "a", "add", _( "Add data to path in XML Config." ), wxCMD_LINE_VAL_STRING },
+		{ wxCMD_LINE_SWITCH, "d", "del", _( "Delete data from XML Config" ) },
+		{ wxCMD_LINE_OPTION, "n", "name", _( "The XMLNode name attribute" ), wxCMD_LINE_VAL_STRING },
+		{ wxCMD_LINE_OPTION, "p", "path", _( "The XMLNode path attribute" ), wxCMD_LINE_VAL_STRING },
+		{ wxCMD_LINE_OPTION, "e", "is_enabled", _( "The XMLNode is_enabled attribute. is_enabled choice: 1 for enabled or 0 for disabled" ), wxCMD_LINE_VAL_NUMBER },
+		{ wxCMD_LINE_OPTION, "c", "class", _( "The XMLNode class attribute" ), wxCMD_LINE_VAL_STRING },
+		{ wxCMD_LINE_OPTION, "t", "type", _( "The XMLNode type attribute. Type choice: sep, cmd, menu" ), wxCMD_LINE_VAL_STRING },
+		{ wxCMD_LINE_OPTION, "s", "sub_type", _( "The XMLNode sub_type attribute" ), wxCMD_LINE_VAL_NUMBER },
+		{ wxCMD_LINE_OPTION, "o", "cmd_name", _( "The XMLNode cmd_name attribute" ), wxCMD_LINE_VAL_STRING },
+		{ wxCMD_LINE_OPTION, "x", "attributes", _( "The XMLNode attributes <attr_name>=<attr_value> separated by comma" ), wxCMD_LINE_VAL_STRING },
+		{ wxCMD_LINE_OPTION, "enc", "encode", _( "encode password" ), wxCMD_LINE_VAL_STRING },
 		{ wxCMD_LINE_NONE }
     };
 
@@ -145,21 +150,21 @@ bool parse_commandline_parameters( wxCmdLineParser& parser )
 			return false;
 
 		if(bNameSet)
-			AddProperty(pNode, wxT("name"), sName);
+			AddAttribute(pNode, wxT("name"), sName);
 		if(bNameSet)
-			AddProperty(pNode, wxT("name"), sName);
+			AddAttribute(pNode, wxT("name"), sName);
 		if(bPathSet)
-			AddProperty(pNode, wxT("path"), sPath);
+			AddAttribute(pNode, wxT("path"), sPath);
 		if(bClassSet)
-			AddProperty(pNode, wxT("class"), sClass);
+			AddAttribute(pNode, wxT("class"), sClass);
 		if(bTypeSet)
-			AddProperty(pNode, wxT("type"), sType);
+			AddAttribute(pNode, wxT("type"), sType);
 		if(bCmdNameSet)
-			AddProperty(pNode, wxT("cmd_name"), sCmdName);
+			AddAttribute(pNode, wxT("cmd_name"), sCmdName);
 		if(bIsEnabledSet)
-			AddProperty(pNode, wxT("is_enabled"), nIsEnabled);
+			AddAttribute(pNode, wxT("is_enabled"), nIsEnabled);
 		if(bSubtypeSet)
-			AddProperty(pNode, wxT("sub_type"), nSubType);
+			AddAttribute(pNode, wxT("sub_type"), nSubType);
 		if(bAttributesSet)
 			AddProperties(pNode, sAttributes);
 
@@ -181,18 +186,18 @@ bool parse_commandline_parameters( wxCmdLineParser& parser )
 } 
 
 
-void AddProperty(wxXmlNode* pNode, wxString sParamName, wxString sParamValue)
+void AddAttribute(wxXmlNode* pNode, wxString sParamName, wxString sParamValue)
 {
-	if(pNode->HasProp(sParamName))
-		pNode->DeleteProperty(sParamName);
-	pNode->AddProperty(sParamName, sParamValue);
+	if(pNode->HasAttribute(sParamName))
+		pNode->DeleteAttribute(sParamName);
+	pNode->AddAttribute(sParamName, sParamValue);
 }
 
-void AddProperty(wxXmlNode* pNode, wxString sParamName, long nParamValue)
+void AddAttribute(wxXmlNode* pNode, wxString sParamName, long nParamValue)
 {
-	if(pNode->HasProp(sParamName))
-		pNode->DeleteProperty(sParamName);
-	pNode->AddProperty(sParamName, wxString::Format(wxT("%d"), nParamValue));
+	if(pNode->HasAttribute(sParamName))
+		pNode->DeleteAttribute(sParamName);
+	pNode->AddAttribute(sParamName, wxString::Format(wxT("%d"), nParamValue));
 }
 
 void AddProperties(wxXmlNode* pNode, wxString sAttributes)
@@ -209,7 +214,7 @@ void AddProperties(wxXmlNode* pNode, wxString sAttributes)
 			wxString sAttrValue = token.Right(token.Len() - nPos);
 			if(sAttrName.IsEmpty())
 				continue;
-			AddProperty(pNode, sAttrName, sAttrValue);
+			AddAttribute(pNode, sAttrName, sAttrValue);
 		}
 	}
 }
@@ -226,7 +231,7 @@ wxXmlNode* GetConfigNode(wxArrayString& aTokens, wxGISAppConfigSPtr& pConfig)
 	wxXmlNode* pChildNode = pRootNode->GetChildren();
     wxXmlNode* pParentNode = pRootNode;
 	wxString sPath, sAttrCmp, sAttrName, sAttrValue;
-	for (size_t i = 1; i < aTokens.GetCount(); i++ )
+	for (size_t i = 1; i < aTokens.GetCount(); ++i )
 	{
         wxString token = aTokens[i];
 		//search # in name
@@ -273,7 +278,7 @@ wxXmlNode* GetConfigNode(wxArrayString& aTokens, wxGISAppConfigSPtr& pConfig)
 				}
 				else
 				{
-					if(pChildNode->GetPropVal(sAttrName, wxT("")).CmpNoCase(sAttrValue) == 0)
+					if(pChildNode->GetAttribute(sAttrName, wxT("")).CmpNoCase(sAttrValue) == 0)
 					    break;
 				}
 			}
@@ -291,4 +296,4 @@ wxXmlNode* GetConfigNode(wxArrayString& aTokens, wxGISAppConfigSPtr& pConfig)
     return pChildNode;
     //return NULL;
 }
-
+*/

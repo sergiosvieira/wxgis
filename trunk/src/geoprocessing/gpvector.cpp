@@ -41,7 +41,6 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
        pTrackCancel->PutMessage(wxString::Format(_("Start CopyRows from '%s' to '%s'"), wxString(pSrcDataSet->GetPath(), wxConvUTF8).c_str(), wxString(pDstDataSet->GetPath(), wxConvUTF8).c_str()), -1, enumGISMessageNorm);
     }
     int nCounter(0);
-	size_t nStep = pSrcDataSet->GetFeatureCount() < 10 ? 1 : pSrcDataSet->GetFeatureCount() / 10;
     if(pProgressor)
         pProgressor->SetRange(pSrcDataSet->GetFeatureCount());
 
@@ -56,19 +55,20 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
             CPLError( CE_Warning, CPLE_AppDefined, sFullErr );
 
             if(pTrackCancel)
-                pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+                pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
             return false;
         }
         if( !bSame && poCT )
         {
-            OGRGeometry *pGeom = pFeature->GetGeometryRef()->clone();
+            OGRGeometry *pGeom = pFeature->GetGeometryRef();
             if(pGeom)
             {
-                OGRErr eErr = pGeom->transform(poCT);
+				OGRGeometry *pNewGeom = pGeom->clone();
+                OGRErr eErr = pNewGeom->transform(poCT);
                 if(eErr == OGRERR_NONE)
-                    pFeature->SetGeometryDirectly(pGeom);
+                    pFeature->SetGeometryDirectly(pNewGeom);
                 else
-                    wxDELETE(pGeom);
+                    wxDELETE(pNewGeom);
             }
         }
         //set encoding
@@ -84,7 +84,7 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
         CPLErrorReset();
         wxString sACText;
 
-        for(size_t i = 0; i < pFeatureDefn->GetFieldCount(); i++)
+        for(size_t i = 0; i < pFeatureDefn->GetFieldCount(); ++i)
         {
             OGRFieldDefn *pFieldDefn = pFeatureDefn->GetFieldDefn(i);
             if(pFieldDefn)
@@ -127,7 +127,7 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
         {
         //    //LABEL(f:"Arial, Helvetica", s:12pt, t:"Hello World!")
             wxString sStyleLabel = wxString::Format(wxT("LABEL(f:\"Arial, Helvetica\", s:12pt, t:\"%s\")"), sACText.c_str());
-            pFeature->SetStyleString(wgWX2MB(sStyleLabel));
+			pFeature->SetStyleString(sStyleLabel.mb_str(wxConvLocal));
         }
 
         OGRErr eErr = pDstDataSet->StoreFeature(pFeature);
@@ -138,10 +138,10 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
             sFullErr += CPLGetLastErrorMsg();
             CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
             if(pTrackCancel)
-                pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+                pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         }
         nCounter++;
-        if(pProgressor && nCounter % nStep == 0)
+        if(pProgressor)
             pProgressor->SetValue(nCounter);
     }
 
@@ -167,7 +167,7 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -179,7 +179,7 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_FileIO, sFullErr );
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
     return true;
@@ -199,12 +199,10 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
     const OGRSpatialReferenceSPtr pSrcSpaRef = pDSet->GetSpatialReference();
     if(!pSrcSpaRef)
     {
-        wxString sErr(_("Input spatial reference is not defined! OGR error: "));
-        CPLString sFullErr(sErr.mb_str());
-        sFullErr += CPLGetLastErrorMsg();
-        CPLError( CE_Failure, CPLE_AppDefined, sFullErr );
+        wxString sErr(_("Input spatial reference is not defined!"));
+        CPLError( CE_Failure, CPLE_AppDefined, sErr.mb_str() );
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
         return false;
     }
 
@@ -334,7 +332,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         CPLString sFullErr(sErr.mb_str());
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr );
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -352,7 +350,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr );
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -363,7 +361,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr );
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -374,18 +372,6 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         CPLError( CE_Failure, CPLE_AppDefined, sErr.mb_str() );
         if(pTrackCancel)
             pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
-        return false;
-    }
-
-    wxGISFeatureDatasetSPtr pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
-    if(!pNewDSet)
-    {
-        wxString sErr(_("Error creating new dataset! OGR error: "));
-        CPLString sFullErr(sErr.mb_str());
-        sFullErr += CPLGetLastErrorMsg();
-        CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
-        if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
         return false;
     }
 
@@ -407,11 +393,24 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
-    //get limits
+    wxGISFeatureDatasetSPtr pNewDSet = CreateVectorLayer(sPath, sName, sExt, sDriver, pDef, pNewSpaRef);
+    if(!pNewDSet)
+    {
+        wxString sErr(_("Error creating new dataset! OGR error: "));
+        CPLString sFullErr(sErr.mb_str());
+        sFullErr += CPLGetLastErrorMsg();
+        CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
+        return false;
+    }
+
+
+/*    //get limits
     OGRPolygon* pRgn1 = NULL;
     OGRPolygon* pRgn2 = NULL;
 
@@ -568,7 +567,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         //CPLErrorReset();
         //wxString sACText;
 
-        //for(size_t i = 0; i < pFeatureDefn->GetFieldCount(); i++)
+        //for(size_t i = 0; i < pFeatureDefn->GetFieldCount(); ++i)
         //{
         //    OGRFieldDefn *pFieldDefn = pFeatureDefn->GetFieldDefn(i);
         //    if(pFieldDefn)
@@ -629,7 +628,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
     wxDELETE(pRgnEnv2);
     wxDELETE(pRgn1);
     wxDELETE(pRgn2);
-
+*/
     return true;
 }
 
@@ -749,7 +748,7 @@ OGRGeometry* Intersection(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn, OGREnvelo
         {
         	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pFeatureGeom;
             OGRGeometryCollection* pNewOGRGeometryCollection = new OGRMultiPoint();
-            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); ++i)
             {
                 OGRGeometry* pGeom = (OGRGeometry*)pOGRGeometryCollection->getGeometryRef(i);
                 pGeom->assignSpatialReference(pFeatureGeom->getSpatialReference());
@@ -770,7 +769,7 @@ OGRGeometry* Intersection(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn, OGREnvelo
         {
         	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pFeatureGeom;
             OGRGeometryCollection* pNewOGRGeometryCollection = new OGRMultiLineString();
-            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); ++i)
             {
                 OGRGeometry* pGeom = (OGRGeometry*)pOGRGeometryCollection->getGeometryRef(i);
                 pGeom->assignSpatialReference(pFeatureGeom->getSpatialReference());
@@ -791,7 +790,7 @@ OGRGeometry* Intersection(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn, OGREnvelo
         {
         	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pFeatureGeom;
             OGRGeometryCollection* pNewOGRGeometryCollection = new OGRMultiPolygon();
-            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); ++i)
             {
                 OGRGeometry* pGeom = (OGRGeometry*)pOGRGeometryCollection->getGeometryRef(i);
                 pGeom->assignSpatialReference(pFeatureGeom->getSpatialReference());
@@ -812,7 +811,7 @@ OGRGeometry* Intersection(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn, OGREnvelo
         {
         	OGRGeometryCollection* pOGRGeometryCollection = (OGRGeometryCollection*)pFeatureGeom;
             OGRGeometryCollection* pNewOGRGeometryCollection = new OGRGeometryCollection();
-            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); i++)
+            for(size_t i = 0; i < pOGRGeometryCollection->getNumGeometries(); ++i)
             {
                 OGRGeometry* pGeom = (OGRGeometry*)pOGRGeometryCollection->getGeometryRef(i);
                 pGeom->assignSpatialReference(pFeatureGeom->getSpatialReference());
@@ -856,7 +855,7 @@ bool GeometryVerticesToPoints(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wx
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr );
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -894,7 +893,7 @@ bool GeometryVerticesToPoints(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wx
         sFullErr += CPLGetLastErrorMsg();
         CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
     }
 
@@ -909,7 +908,7 @@ bool GeometryVerticesToPoints(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wx
 			sFullErr += CPLGetLastErrorMsg();
 			CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
 			if(pTrackCancel)
-				pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+				pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
 			return false;
 		}
 	}
@@ -944,7 +943,7 @@ bool GeometryVerticesToPoints(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wx
 			if(pTrackCancel)
 				pTrackCancel->PutMessage(wxString::Format(_("Geometry No. %d added"), nCounter), -1, enumGISMessageInfo);
 		}
-		wxDELETE(pGeom)
+		wxDELETE(pGeom);
 	}
 
     if(poCT)
@@ -975,7 +974,7 @@ bool GeometryVerticesToPointsDataset(long nGeomFID, OGRGeometry* pGeom, wxGISFea
 			OGRPoint* pPrevPt(NULL);
 			double dDist(0);
 
-			for(size_t i = 0; i < nCount; i++)
+			for(size_t i = 0; i < nCount; ++i)
 			{
 				OGRPoint Point;
 				pLineString->getPoint(i, &Point);
@@ -1041,7 +1040,7 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
 {
     CPLErrorReset();
     poFields->Reference();
-    OGRSFDriver *poDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName( wgWX2MB(sDriver) );
+	OGRSFDriver *poDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName( sDriver.mb_str() );
     if(poDriver == NULL)
     {
         wxString sErr = wxString::Format(_("The driver '%s' is not available! OGR error: "), sDriver.c_str());
@@ -1111,7 +1110,7 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
             OGRFieldDefn *pField = poFields->GetFieldDefn(i);
             if(nSubType == enumVecKML || nSubType == enumVecKMZ)
             {
-                wxString sFieldName = wgMB2WX(pField->GetNameRef());
+                wxString sFieldName(pField->GetNameRef(), wxConvLocal);
                 pField->SetName(sFieldName.mb_str(wxConvUTF8));
 				OGRFieldType nType = pField->GetType();
 				if(OFTString == nType)
@@ -1147,4 +1146,169 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
 
     wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>(sFullPath, nSubType, poLayerDest, poDS);
     return pDataSet;
+}
+
+bool GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxGISCoordinatesFormat &oFrmt, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel)
+{
+	CPLErrorReset();
+
+    VSILFILE    *fpCoordsFile;
+
+    fpCoordsFile = VSIFOpenL( sPath, "wt" );
+    if( fpCoordsFile == NULL )
+	{
+		wxString sErr = wxString::Format(_("Error create text file! Path '%s'. OGR error: "), wxString(sPath, wxConvUTF8).c_str());
+        CPLString sFullErr(sErr.mb_str());
+        sFullErr += CPLGetLastErrorMsg();
+        CPLError( CE_Failure, CPLE_FileIO, sFullErr);
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
+        return false;
+	}
+
+
+    IProgressor* pProgressor(NULL);
+    if(pTrackCancel)
+		pProgressor = pTrackCancel->GetProgressor();
+    if(pProgressor)
+        pProgressor->SetRange(pDSet->GetFeatureCount());
+
+	int nCounter(0);
+	long nFidCounter(0);
+ 	OGRFeatureSPtr poFeature;
+	pDSet->Reset();
+    while((poFeature = pDSet->Next()) != NULL)	
+    {
+        if(pTrackCancel && !pTrackCancel->Continue())
+        {
+            wxString sErr(_("Interrupted by user"));
+            CPLString sFullErr(sErr.mb_str());
+            CPLError( CE_Warning, CPLE_AppDefined, sFullErr );
+
+            if(pTrackCancel)
+                pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
+            return false;
+        }
+
+		nCounter++;
+        if(pProgressor)
+            pProgressor->SetValue(nCounter);
+
+
+        OGRGeometry* pGeom = poFeature->GetGeometryRef();   
+        if(!pGeom)
+            continue;
+
+		CPLString osCoordText = GeometryToText(poFeature->GetFID(), pGeom, oFrmt, pTrackCancel);
+
+		if(osCoordText.size() > 0)
+		{
+			VSIFWriteL( (void *) osCoordText.c_str(), 1, osCoordText.size(), fpCoordsFile );
+			if(pTrackCancel)
+				pTrackCancel->PutMessage(wxString::Format(_("Geometry No. %d added"), nCounter), -1, enumGISMessageInfo);
+		}
+		else
+		{
+			if(pTrackCancel)
+				pTrackCancel->PutMessage(wxString(_("Unsupported geometry type")), -1, enumGISMessageWarning);
+		}
+	}
+
+    VSIFCloseL( fpCoordsFile );
+
+	return true;
+}
+
+CPLString GeometryToText(long nGeomFID, OGRGeometry* pGeom, wxGISCoordinatesFormat &oFrmt, ITrackCancel* pTrackCancel)
+{
+	CPLString osOutput;
+	if(!pGeom)
+		return osOutput;
+
+	CPLString osTmp;
+	osOutput += CPLSPrintf("Geometry %d (%s)\n", nGeomFID, pGeom->getGeometryName());//CPLString().Printf
+	OGRwkbGeometryType type = wkbFlatten(pGeom->getGeometryType());
+	switch(type)
+	{
+	case wkbPoint:
+		PointToText(osOutput, (OGRPoint*)pGeom, oFrmt);
+		break;
+	case wkbLineString:
+	case wkbLinearRing:
+		LineToText(osOutput, (OGRLineString*)pGeom, oFrmt);
+		break;
+	case wkbPolygon:
+		{
+            int nRings(0);
+            OGRPolygon* poPoly = (OGRPolygon*)pGeom;
+            OGRLinearRing* poRing = poPoly->getExteriorRing();
+            nRings = poPoly->getNumInteriorRings();
+            if (poRing == NULL)
+                osOutput += CPLString("empty");
+            else
+            {
+				osOutput += CPLString("Exterior ring\n");
+				LineToText(osOutput, (OGRLineString*)poRing, oFrmt);
+
+                if (nRings)
+                {
+                    osOutput += CPLSPrintf("%d inner rings\n", nRings);
+                    for(int ir = 0; ir < nRings; ++ir)
+                    {
+						osOutput += CPLSPrintf("%d inner ring\n", ir);
+						OGRLinearRing* poRing = poPoly->getInteriorRing(ir);
+						LineToText(osOutput, (OGRLineString*)poRing, oFrmt);
+                    }
+                }
+            }
+		}
+		break;
+	case wkbMultiPolygon:
+		//break;
+	case wkbMultiPoint:
+		//break;
+	case wkbMultiLineString:
+		//break;
+	case wkbGeometryCollection:
+		{
+            OGRGeometryCollection* poColl = (OGRGeometryCollection*)pGeom;
+            osOutput += CPLSPrintf("%d geometries:\n", poColl->getNumGeometries() );
+            for (int ig = 0; ig < poColl->getNumGeometries(); ++ig)
+            {
+                OGRGeometry * poChild = (OGRGeometry*)poColl->getGeometryRef(ig);
+                GeometryToText(nGeomFID, poChild, oFrmt, pTrackCancel);
+            }
+		}
+		break;
+	default:
+	case wkbUnknown:
+	case wkbNone:
+		break;
+	}
+	return osOutput;
+}
+
+void PointToText(CPLString &osData, OGRPoint* pPoint, wxGISCoordinatesFormat &oFrmt)
+{
+	wxString sFrmt = oFrmt.Format(pPoint->getX(), pPoint->getY());
+	sFrmt += wxString(wxT("\n"));
+	osData += sFrmt.mb_str();
+}
+
+void LineToText(CPLString &osData, OGRLineString* pLine, wxGISCoordinatesFormat &oFrmt)
+{
+	int nCount = pLine->getNumPoints();
+	if(nCount == 0)
+	{
+		osData += CPLString("empty\n");
+		return;
+	}
+
+    osData += CPLSPrintf("%d points\n", nCount );
+	for(size_t i = 0; i < nCount; ++i)
+	{
+		OGRPoint Pt;
+		pLine->getPoint(i, &Pt);
+		PointToText(osData, &Pt, oFrmt);
+	}
 }

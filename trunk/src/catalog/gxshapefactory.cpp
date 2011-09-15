@@ -42,14 +42,14 @@ bool wxGxShapeFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxO
 
         if(EQUAL(szExt, "shp"))
         {
-            bool bHasDbf(false), bHasPrj(false);
+            bool bHasDbf(false)/*, bHasPrj(false)*/;
             szPath = (char*)CPLResetExtension(pFileNames[i], "dbf");
             if(CPLCheckForFile((char*)szPath.c_str(), NULL))
                 bHasDbf = true;
-            szPath = (char*)CPLResetExtension(pFileNames[i], "prj");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                bHasPrj = true;
-            if(bHasDbf && bHasPrj)
+            //szPath = (char*)CPLResetExtension(pFileNames[i], "prj");
+            //if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            //    bHasPrj = true;
+            if(bHasDbf/* && bHasPrj*/)
                 pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumGISFeatureDataset);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
@@ -66,11 +66,14 @@ bool wxGxShapeFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxO
         else if(EQUAL(szExt, "prj"))
         {
             bool bHasShp(false);
-            szPath = (char*)CPLResetExtension(pFileNames[i], "shp");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                bHasShp = true;
-            if(bHasShp)
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "shp");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					bHasShp = true;
+				if(bHasShp)
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
         }
         else if(EQUAL(szExt, "sbn"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
@@ -95,16 +98,16 @@ void wxGxShapeFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
 {
     if(bStore)
     {
-        if(pConfig->HasProp(wxT("factory_name")))
-            pConfig->DeleteProperty(wxT("factory_name"));
-        pConfig->AddProperty(wxT("factory_name"), GetClassName());
-        if(pConfig->HasProp(wxT("is_enabled")))
-            pConfig->DeleteProperty(wxT("is_enabled"));
-        pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));
+        if(pConfig->HasAttribute(wxT("factory_name")))
+            pConfig->DeleteAttribute(wxT("factory_name"));
+        pConfig->AddAttribute(wxT("factory_name"), GetClassName());
+        if(pConfig->HasAttribute(wxT("is_enabled")))
+            pConfig->DeleteAttribute(wxT("is_enabled"));
+        pConfig->AddAttribute(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));
     }
     else
     {
-        m_bIsEnabled = wxAtoi(pConfig->GetPropVal(wxT("is_enabled"), wxT("1")));
+        m_bIsEnabled = wxAtoi(pConfig->GetAttribute(wxT("is_enabled"), wxT("1"))) != 0;
     }
 }
 

@@ -3,7 +3,7 @@
  * Purpose:  wxGISRubberBand class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -36,31 +36,32 @@ BEGIN_EVENT_TABLE(wxGISRubberBand, wxEvtHandler)
 	EVT_MOTION(wxGISRubberBand::OnMouseMove)
 	EVT_LEAVE_WINDOW(wxGISRubberBand::OnLeave)
 	EVT_ENTER_WINDOW(wxGISRubberBand::OnEnter)
+	EVT_MOUSE_CAPTURE_LOST(wxGISRubberBand::OnCaptureLost)
 END_EVENT_TABLE()
 
-wxGISRubberBand::wxGISRubberBand(void) :  m_pRetGeom(NULL), m_bLock(true)
+wxGISRubberBand::wxGISRubberBand(wxPen &oPen, wxWindow *pWnd, wxGISDisplay *pDisp) :  m_bLock(true)
 {
+	m_pWnd = pWnd;
+	m_pDisp = pDisp;
+	m_oPen = oPen;
 }
 
 wxGISRubberBand::~wxGISRubberBand(void)
 {
 }
 
-OGRGeometry* wxGISRubberBand::TrackNew(wxCoord x, wxCoord y, wxWindow *pWnd, ICachedDisplay* pCachedDisplay, ISymbol* pSymbol)
+OGREnvelope wxGISRubberBand::TrackNew(wxCoord x, wxCoord y)
 {
 	m_StartX = x;
 	m_StartY = y;
-	m_pWnd = pWnd;
-	m_pCachedDisplay = pCachedDisplay;
-	m_pSymbol = pSymbol;
 
 	wxRect ScrRect = m_pWnd->GetScreenRect();
 	wxRect Rect = m_pWnd->GetRect();
 	m_StartXScr = ScrRect.GetLeft() + m_StartX - Rect.GetLeft();
 	m_StartYScr = ScrRect.GetTop() + m_StartY - Rect.GetTop();
 
-	pWnd->CaptureMouse();
-	pWnd->PushEventHandler(this);
+	m_pWnd->CaptureMouse();
+	m_pWnd->PushEventHandler(this);
 
 	wxEventLoopBase* const loop = wxEventLoop::GetActive();
 	while(loop->IsRunning())
@@ -68,9 +69,9 @@ OGRGeometry* wxGISRubberBand::TrackNew(wxCoord x, wxCoord y, wxWindow *pWnd, ICa
 		loop->Dispatch();
 		if(!m_bLock) break;
 	}
-	pWnd->PopEventHandler();
-	pWnd->ReleaseMouse();
-	return m_pRetGeom;
+	m_pWnd->PopEventHandler();
+	m_pWnd->ReleaseMouse();
+	return m_RetEnv;
 }
 
 void wxGISRubberBand::OnUnlock(void)
@@ -83,10 +84,7 @@ void wxGISRubberBand::OnKeyDown(wxKeyEvent & event)
 	switch(event.GetKeyCode())
 	{
 	case WXK_ESCAPE:
-		{
-			wxClientDC CDC(m_pWnd);
-			m_pCachedDisplay->OnDraw(CDC);
-		}
+		m_pWnd->Refresh(false);
 		OnUnlock();
 		break;
 	default:
@@ -119,11 +117,17 @@ void wxGISRubberBand::OnEnter(wxMouseEvent& event)
 {
 }
 
+void wxGISRubberBand::OnCaptureLost(wxMouseCaptureLostEvent & event)
+{
+	event.Skip();
+	if( m_pWnd->HasCapture() )
+		m_pWnd->ReleaseMouse();
+}
 //----------------------------------------------------
 // class wxGISRubberEnvelope
 //----------------------------------------------------
 
-wxGISRubberEnvelope::wxGISRubberEnvelope() : wxGISRubberBand()
+wxGISRubberEnvelope::wxGISRubberEnvelope(wxPen &oPen, wxWindow *pWnd, wxGISDisplay *pDisp) : wxGISRubberBand(oPen, pWnd, pDisp)
 {
 }
 
@@ -137,43 +141,38 @@ void wxGISRubberEnvelope::OnMouseMove(wxMouseEvent& event)
 	int width, height, X, Y;
 	width = abs(EvX - m_StartX);
 	height = abs(EvY - m_StartY);
-	X = MIN(m_StartX, EvX);
-	Y = MIN(m_StartY, EvY);    
+	X = std::min(m_StartX, EvX);
+	Y = std::min(m_StartY, EvY);    
 
+	wxClientDC CDC(m_pWnd);
+	wxGISPointsArray ClipGeometry;
     if(!m_PrevRect.IsEmpty())
     {
         m_PrevRect.Inflate(2,2);
-        m_pCachedDisplay->AddInvalidRect(m_PrevRect);
+		ClipGeometry.Add(wxRealPoint(double(m_PrevRect.GetLeft()), double(m_PrevRect.GetTop())));//top-left
+		ClipGeometry.Add(wxRealPoint(double(m_PrevRect.GetRight()), double(m_PrevRect.GetTop())));//top-right
+		ClipGeometry.Add(wxRealPoint(double(m_PrevRect.GetRight()), double(m_PrevRect.GetBottom())));//bottom-right
+		ClipGeometry.Add(wxRealPoint(double(m_PrevRect.GetLeft()), double(m_PrevRect.GetBottom())));//bottom-left
+		m_pDisp->Output(&CDC, ClipGeometry);
     }
-	wxClientDC CDC(m_pWnd);
-    m_pCachedDisplay->OnDraw(CDC);
+	else
+		m_pDisp->Output(&CDC, ClipGeometry);
 
-
-//#if wxUSE_GRAPHICS_CONTEXT	
-//	wxGCDC GDC(CDC);
-//	GDC.SetPen(m_pSymbol->GetPen());
-//	GDC.SetBrush(m_pSymbol->GetBrush());
-//	GDC.DrawRectangle(X, Y, width, height);
-//#else
-	CDC.SetPen(m_pSymbol->GetPen());
-	CDC.SetBrush(wxBrush(m_pSymbol->GetBrush().GetColour(), wxTRANSPARENT));
+	CDC.SetPen(m_oPen);
+	CDC.SetBrush(wxBrush(m_oPen.GetColour(), wxTRANSPARENT));
 	CDC.SetLogicalFunction(wxOR_REVERSE);
 	CDC.DrawRectangle(X, Y, width, height);
     m_PrevRect = wxRect(X, Y, width, height);
-//#endif
 }
 
 void wxGISRubberEnvelope::OnMouseUp(wxMouseEvent& event)
 {
-	IDisplayTransformation* pDT = m_pCachedDisplay->GetDisplayTransformation();
-	wxPoint Points[2];
-	Points[0] = wxPoint(m_StartX, m_StartY);
-	Points[1] = wxPoint(event.GetX(), event.GetY());
-	OGRRawPoint* pOGRPoints = pDT->TransformCoordDC2World(Points, 2);
-	OGRLineString* pLine = new OGRLineString();
-	pLine->setPoints(2, pOGRPoints);
-	m_pRetGeom = static_cast<OGRGeometry*>(pLine);
-	delete [] pOGRPoints;
+	double dX1 = std::min(m_StartX, event.GetX());
+	double dY1 = std::max(m_StartY, event.GetY());
+	double dX2 = std::max(m_StartX, event.GetX());
+	double dY2 = std::min(m_StartY, event.GetY());
+	wxRect rc(wxPoint(dX1, dY1), wxPoint(dX2, dY2));
+	m_RetEnv = m_pDisp->TransformRect(rc);
 	OnUnlock();
     m_PrevRect.width = -1;
     m_PrevRect.height = -1;

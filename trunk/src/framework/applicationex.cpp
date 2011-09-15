@@ -35,30 +35,21 @@ wxGISApplicationEx::wxGISApplicationEx(wxWindow* parent, wxWindowID id, const wx
 
 wxGISApplicationEx::~wxGISApplicationEx(void)
 {
-    m_mgr.UnInit();
 }
 
 void wxGISApplicationEx::SerializeFramePosEx(bool bSave)
 {
-	wxXmlNode *pPerspectiveXmlNode = m_pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("frame/perspective")));
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return;
+
+	wxXmlNode *pPerspectiveXmlNode = pConfig->GetConfigNode(enumGISHKCU, GetAppName() + wxString(wxT("/frame/perspective")));
 	if(bSave)
-	{
-		if(pPerspectiveXmlNode)
-		{
-			if(pPerspectiveXmlNode->HasProp(wxT("data")))
-				pPerspectiveXmlNode->DeleteProperty(wxT("data"));
-		}
-		else
-			pPerspectiveXmlNode = m_pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("frame/perspective")), true);
-		pPerspectiveXmlNode->AddProperty(wxT("data"), m_mgr.SavePerspective());
-	}
+		pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/perspective/data")), m_mgr.SavePerspective());
 	else
 	{
-		if(pPerspectiveXmlNode)
-		{
-			wxString wxPerspective = pPerspectiveXmlNode->GetPropVal(wxT("data"), wxT(""));
-			m_mgr.LoadPerspective(wxPerspective);
-		}
+		wxString wxPerspective = pConfig->Read(enumGISHKCU, GetAppName() + wxString(wxT("/frame/perspective/data")), wxEmptyString);
+		m_mgr.LoadPerspective(wxPerspective);
 	}
 }
 
@@ -77,7 +68,7 @@ void wxGISApplicationEx::Customize(void)
 
 void wxGISApplicationEx::RemoveCommandBar(IGISCommandBar* pBar)
 {
-	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
+	for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
 	{
 		if(m_CommandBarArray[i] == pBar)
 		{
@@ -183,15 +174,16 @@ void wxGISApplicationEx::UnRegisterChildWindow(wxWindow* pWnd)
 		m_WindowArray.erase(pos);
 }
 
-bool wxGISApplicationEx::Create(IGISConfig* pConfig)
+bool wxGISApplicationEx::Create(void)
 {
-    wxGISApplication::Create(pConfig);
+	m_mgr.SetManagedWindow(this);
+
+    wxGISApplication::Create();
 
 	wxLogMessage(_("wxGISApplicationEx: Start. Creating main application frame..."));
 
-	m_mgr.SetManagedWindow(this);
 
-	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
+	for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
 	{
 		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
 		{
@@ -217,7 +209,7 @@ void wxGISApplicationEx::OnClose(wxCloseEvent& event)
 {
     event.Skip();
 
- 	for(size_t i = 0; i < m_CommandBarArray.size(); i++)
+ 	for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
 	{
 		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
 		{
@@ -227,34 +219,37 @@ void wxGISApplicationEx::OnClose(wxCloseEvent& event)
 		}
 	}
 
-    for(size_t i = 0; i < m_WindowArray.size(); i++)
+    for(size_t i = 0; i < m_WindowArray.size(); ++i)
     {
         IView* pView = dynamic_cast<IView*>(m_WindowArray[i]);
         if(pView)
             pView->Deactivate();
     }
 
-    wxGISApplication::OnClose(event);
 
-    while (!m_WindowArray.empty())
-    {
-        wxWindow* poWnd = m_WindowArray.back();
-        if(poWnd)
-        {
-            if(!poWnd->Destroy())
-                delete poWnd;
-        }
-        m_WindowArray.pop_back();
-    }
+	wxGISApplication::OnClose(event);
 
  	SerializeFramePosEx(true);
+    m_mgr.UnInit();
+
+  //  while (!m_WindowArray.empty())
+  //  {
+  //      wxWindow* poWnd = m_WindowArray.back();
+		//if( poWnd && !poWnd->IsBeingDeleted() )
+  //      {
+  //          if(!poWnd->Destroy())
+  //              delete poWnd;
+  //      }
+  //      m_WindowArray.pop_back();
+  //  }
 }
 
-bool wxGISApplicationEx::SetupSys(wxString sSysPath)
+bool wxGISApplicationEx::SetupSys(const wxString &sSysPath)
 {
     if(!wxGISApplication::SetupSys(sSysPath))
         return false;
-    CPLSetConfigOption("GDAL_DATA", wgWX2MB( (sSysPath + wxFileName::GetPathSeparator() + wxString(wxT("gdal")) + wxFileName::GetPathSeparator()).c_str() ) );
+	wxString sGdalDataDir = sSysPath + wxFileName::GetPathSeparator() + wxString(wxT("gdal")) + wxFileName::GetPathSeparator();
+	CPLSetConfigOption("GDAL_DATA", sGdalDataDir.mb_str(wxConvUTF8) );
     return true;
 }
 
@@ -265,12 +260,12 @@ void wxGISApplicationEx::SetDebugMode(bool bDebugMode)
 	CPLSetConfigOption("CPL_LOG_ERRORS", bDebugMode == true ? "ON" : "OFF");
 }
 
-bool wxGISApplicationEx::SetupLog(wxString sLogPath)
+bool wxGISApplicationEx::SetupLog(const wxString &sLogPath)
 {
     if(!wxGISApplication::SetupLog(sLogPath))
         return false;
 	wxString sCPLLogPath = sLogPath + wxFileName::GetPathSeparator() + wxString(wxT("gdal_log_cat.txt"));
-	CPLSetConfigOption("CPL_LOG", wgWX2MB(sCPLLogPath.c_str()) );
+	CPLSetConfigOption("CPL_LOG", sCPLLogPath.mb_str(wxConvUTF8) );
     return true;
 }
 

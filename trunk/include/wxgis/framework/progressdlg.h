@@ -3,7 +3,7 @@
  * Purpose:  wxGISProgressDlg class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,50 +22,34 @@
 
 #include "wxgis/framework/framework.h"
 
-#include <wx/intl.h>
+#include <wx/progdlg.h>
 
-#include <wx/string.h>
-#include <wx/stattext.h>
-#include <wx/gdicmn.h>
-#include <wx/font.h>
-#include <wx/colour.h>
-#include <wx/settings.h>
-//#include <wx/gauge.h>
-#include <wx/sizer.h>
-#include <wx/button.h>
-#include <wx/dialog.h>
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISProgressDlg
-///////////////////////////////////////////////////////////////////////////////
-
-class WXDLLIMPEXP_GIS_FRW wxGISProgressDlg : public wxDialog 
+/** \class wxGISProgressDlg progressdlg.h
+    \brief The dialog showing progress and some buttons.
+*/
+class WXDLLIMPEXP_GIS_FRW wxGISProgressDlg : 
+	public wxProgressDialog,
+	public ITrackCancel,
+	public IProgressor
 {
-private:
-
-protected:
-	wxStaticText* m_staticText1;
-	//wxGauge* m_gauge1;
-    IProgressor* m_pProgressBar1;
-	wxStaticText* m_staticText2;
-	//wxGauge* m_gauge2;
-    IProgressor* m_pProgressBar2;
-	wxStdDialogButtonSizer* m_sdbSizer1;
-	//wxButton* m_sdbSizer1OK;
-	wxButton* m_sdbSizer1Cancel;
-
 public:
-	wxGISProgressDlg( ITrackCancel* pTrackCancel, wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Progress..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 376,185 ), long style = wxDEFAULT_DIALOG_STYLE );
-	~wxGISProgressDlg();
-    virtual void SetText1(wxString sNewText);
-    virtual void SetText2(wxString sNewText);
-    virtual IProgressor* GetProgressor1(void){return m_pProgressBar1;};
-    virtual IProgressor* GetProgressor2(void){return m_pProgressBar2;};
-    //events
-    virtual void OnCancel( wxCommandEvent& event );
+	wxGISProgressDlg( const wxString &title, const wxString &message, int  maximum = 100, wxWindow *  parent = NULL, int style = wxPD_AUTO_HIDE|wxPD_APP_MODAL );
+	virtual ~wxGISProgressDlg(void);
+	//IProgressor
+    virtual bool Show(bool bShow);
+    virtual void SetRange(int range);
+    virtual int GetRange(void);
+    virtual void SetValue(int value);
+    virtual int GetValue(void);
+    virtual void Play(void);
+    virtual void Stop(void);
+	virtual void SetYield(bool bYield = false){};
+	//ITrackCancel
+	virtual void Cancel(void);
+	virtual bool Continue(void);
+	virtual void Reset(void);
+	virtual void PutMessage(wxString sMessage, size_t nIndex = wxNOT_FOUND, wxGISEnumMessageType nType = enumGISMessageUnk);
 protected:
-    ITrackCancel* m_pTrackCancel;
-
-    DECLARE_EVENT_TABLE()
+	int m_nValue;
+	wxString m_sLastMessage;
 };
-

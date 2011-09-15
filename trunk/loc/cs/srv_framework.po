@@ -1,262 +1,193 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: wxGIS 0.3.0\n"
+"Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-06-15 23:27+0100\n"
-"PO-Revision-Date: 2011-06-15 23:27+0100\n"
+"POT-Creation-Date: 2011-02-21 22:11+0300\n"
+"PO-Revision-Date: 2011-04-16 22:43+0100\n"
 "Last-Translator: Jan Helebrant <jhelebrant@seznam.cz>\n"
-"Language-Team: Juhele <jan.helebrant@gmail.com>\n"
+"Language-Team: Juhele <www.juhele.webnode.cz>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
-"X-Poedit-Basepath: .C:\\Documents and Settings\\Honza\\Plocha\\Qt Linguist\\WXGIS\\src\\loc\n"
+"X-Poedit-Basepath: .\n"
 "X-Poedit-Language: Czech\n"
 "X-Poedit-Country: CZECH REPUBLIC\n"
-"X-Poedit-SourceCharset: utf-8\n"
-"X-Poedit-SearchPath-0: C:\\Documents and Settings\\Honza\\Plocha\\Qt Linguist\\WXGIS\\src\\include\\wxgis\n"
-"X-Poedit-SearchPath-1: C:\\Documents and Settings\\Honza\\Plocha\\Qt Linguist\\WXGIS\\src\\src\\srv_framework\n"
+"X-Poedit-SearchPath-0: D:\\work\\Projects\\wxGIS\\include\\wxgissrv\\srv_framework\n"
+"X-Poedit-SearchPath-1: D:\\work\\Projects\\wxGIS\\src\\srv_framework\n"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/auth.cpp:57
+#: D:\work\Projects\wxGIS\src\srv_framework/auth.cpp:57
 #, c-format
 msgid "wxGISAuthService: Plugin %s initialize"
-msgstr "wxGISAuthService: Spouštění zásuvného modulu %s"
+msgstr "wxGISAuthService: Spuštění zásuvného modulu %s"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/auth.cpp:60
+#: D:\work\Projects\wxGIS\src\srv_framework/auth.cpp:60
 #, c-format
 msgid "wxGISAuthService: Error initializing plugin %s"
-msgstr "wxGISAuthService: Chyba spouštění zásuvného modulu %s"
+msgstr "wxGISAuthService: Chyba spuštění zásuvného modulu %s"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/auth.cpp:69
+#: D:\work\Projects\wxGIS\src\srv_framework/auth.cpp:69
 msgid "wxGISAuthService: Service started"
 msgstr "wxGISAuthService: Služba spuštěna"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/auth.cpp:82
+#: D:\work\Projects\wxGIS\src\srv_framework/auth.cpp:82
 msgid "wxGISAuthService: Service stopped"
-msgstr "wxGISAuthService: Služba zastavena"
+msgstr "wxGISAuthService: Služba vypnuta"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/auth.cpp:107
+#: D:\work\Projects\wxGIS\src\srv_framework/auth.cpp:107
 #, c-format
 msgid "Login failed: user '%s'"
 msgstr "Přihlášení selhalo: uživatel '%s'"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/catalog.cpp:73
+#: D:\work\Projects\wxGIS\src\srv_framework/catalog.cpp:73
 msgid "wxGxServerCatalog: Service started"
 msgstr "wxGxServerCatalog: Služba spuštěna"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/catalog.cpp:84
+#: D:\work\Projects\wxGIS\src\srv_framework/catalog.cpp:84
 msgid "wxGxServerCatalog: Service stopped"
-msgstr "wxGxServerCatalog: Služba zastavena"
+msgstr "wxGxServerCatalog: Služba vypnuta"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/catalog.cpp:205
+#: D:\work\Projects\wxGIS\src\srv_framework/catalog.cpp:205
 #, c-format
 msgid "wxRxCatalog: Root Object %s initialize"
-msgstr "wxRxCatalog: Spouštění kořenového objektu %s"
+msgstr "wxRxCatalog: Spuštění kořenového objektu %s"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/catalog.cpp:223
+#: D:\work\Projects\wxGIS\src\srv_framework/catalog.cpp:223
 #, c-format
 msgid "wxRxCatalog: Error initializing Root Object %s"
-msgstr "wxRxCatalog: Chyba spouštění kořenového objektu %s"
+msgstr "wxRxCatalog: Chyba spuštění kořenového objektu %s"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/network.cpp:86
+#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:86
 #, c-format
 msgid "wxGISNetworkService: %s Queue thread 0x%lx started"
 msgstr "wxGISNetworkService: %s Vlákno fronty 0x%lx spuštěno"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/network.cpp:102
+#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:102
 #, c-format
 msgid "wxGISNetworkService: Plugin %s initialize"
-msgstr "wxGISNetworkService: Spouštění zásuvného modulu %s"
+msgstr "wxGISNetworkService: Spuštění zásuvného modulu %s"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/network.cpp:105
+#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:105
 #, c-format
 msgid "wxGISNetworkService: Error initializing plugin %s"
-msgstr "wxGISNetworkService: Chyba spouštění zásuvného modulu %s"
+msgstr "wxGISNetworkService: Chyba spuštění zásuvného modulu %s"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/network.cpp:114
+#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:114
 msgid "wxGISNetworkService: Service started"
 msgstr "wxGISNetworkService: Služba spuštěna"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/network.cpp:135
+#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:135
 msgid "wxGISNetworkService: Service stopped"
-msgstr "wxGISNetworkService: Služba zastavena"
+msgstr "wxGISNetworkService: Služba vypnuta"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/network.cpp:167
+#: D:\work\Projects\wxGIS\src\srv_framework/network.cpp:167
 #, c-format
 msgid "Peer #%d disconected (%d peers is stil connected)"
-msgstr "Člen #%d odpojen (%d členů stále připojeno)"
+msgstr "Klient #%d odpojen (%d klientů stále připojeno)"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/plugin.cpp:101
+#: D:\work\Projects\wxGIS\src\srv_framework/plugin.cpp:101
 #, c-format
 msgid "wxGISWorkPlugin: Library %s loaded"
 msgstr "wxGISWorkPlugin: Knihovna %s načtena"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/plugin.cpp:105
+#: D:\work\Projects\wxGIS\src\srv_framework/plugin.cpp:105
 #, c-format
 msgid "wxGISWorkPlugin: Error loading library %s"
-msgstr "wxGISWorkPlugin: Chyba při načítání knihovny %s"
+msgstr "wxGISWorkPlugin: Chyba načítání knihovny %s"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/plugin.cpp:121
+#: D:\work\Projects\wxGIS\src\srv_framework/plugin.cpp:121
 #, c-format
 msgid "wxGISWorkPlugin: System dir is absent! Lookup path '%s'"
-msgstr "wxGISWorkPlugin: Systémová složka chybí! Prohledávaná cesta '%s'"
+msgstr "wxGISWorkPlugin: Chybí systémová složka! Prohledávaná cesta '%s'"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/plugin.cpp:135
+#: D:\work\Projects\wxGIS\src\srv_framework/plugin.cpp:135
 msgid "wxGISWorkPlugin: Failed to get log dir"
-msgstr "wxGISWorkPlugin: Selhalo získání složky výpisů"
+msgstr "wxGISWorkPlugin: Selhalo získání složky záznamů"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/plugin.cpp:145
+#: D:\work\Projects\wxGIS\src\srv_framework/plugin.cpp:145
 #, c-format
 msgid "wxGISWorkPlugin: Failed to open log file %s"
-msgstr "wxGISWorkPlugin: Selhalo otevření souboru výpisů %s"
+msgstr "wxGISWorkPlugin: Selhalo otevření souboru záznamů %s"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/plugin.cpp:153
+#: D:\work\Projects\wxGIS\src\srv_framework/plugin.cpp:153
 #, c-format
 msgid "HOST '%s': OS desc - %s, free memory - %u Mb"
-msgstr "HOST '%s': OS popis - %s, volná paměť - %u Mb"
+msgstr "HOST  '%s': Popis ОС - %s, volná paměť - %u Mb"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/plugin.cpp:155
+#: D:\work\Projects\wxGIS\src\srv_framework/plugin.cpp:155
 msgid "wxGISWorkPlugin: Initializing..."
 msgstr "wxGISWorkPlugin: Spouštím..."
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/plugin.cpp:156
+#: D:\work\Projects\wxGIS\src\srv_framework/plugin.cpp:156
 #, c-format
 msgid "wxGISWorkPlugin: Log file: %s"
-msgstr "wxGISWorkPlugin: Soubor výpisů: %s"
+msgstr "wxGISWorkPlugin: Soubor záznamů: %s"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/plugin.cpp:157
-#: Linguist\WXGIS\src\src\srv_framework/plugin.cpp:164
+#: D:\work\Projects\wxGIS\src\srv_framework/plugin.cpp:157
+#: D:\work\Projects\wxGIS\src\srv_framework/plugin.cpp:164
 msgid "wxGISWorkPlugin: Initialize locale"
 msgstr "wxGISWorkPlugin: Spouštím lokalizaci"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/plugin.cpp:179
+#: D:\work\Projects\wxGIS\src\srv_framework/plugin.cpp:179
 #, c-format
 msgid "wxGISWorkPlugin: Language set to %s"
-msgstr "wxGISWorkPlugin: Jazyk nastaven na %s"
+msgstr "wxGISWorkPlugin: Jazyk nastaven na: %s"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/server.cpp:85
+#: D:\work\Projects\wxGIS\src\srv_framework/server.cpp:85
 msgid "Start network service failed!"
 msgstr "Spuštění síťové služby selhalo!"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/tcpnetworkplugin.cpp:42
+#: D:\work\Projects\wxGIS\src\srv_framework/tcpnetworkplugin.cpp:42
 #, c-format
 msgid "wxTCPNetworkPlugin: Invalid address - %s"
 msgstr "wxTCPNetworkPlugin: Neplatná adresa - %s"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/tcpnetworkplugin.cpp:52
+#: D:\work\Projects\wxGIS\src\srv_framework/tcpnetworkplugin.cpp:52
 #, c-format
 msgid "wxTCPNetworkPlugin: Could not listen at the specified port! Port number - %d"
 msgstr "wxTCPNetworkPlugin: Nemohu naslouchat na určeném portu! Číslo portu - %d"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/tcpnetworkplugin.cpp:80
+#: D:\work\Projects\wxGIS\src\srv_framework/tcpnetworkplugin.cpp:80
 #, c-format
 msgid "wxTCPNetworkPlugin: New client connection accepted. Address - %s"
 msgstr "wxTCPNetworkPlugin: Připojení nového klienta přijato. Adresa - %s"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/tcpnetworkplugin.cpp:82
+#: D:\work\Projects\wxGIS\src\srv_framework/tcpnetworkplugin.cpp:82
 msgid "Connection accepted"
 msgstr "Připojení přijato"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/tcpnetworkplugin.cpp:100
+#: D:\work\Projects\wxGIS\src\srv_framework/tcpnetworkplugin.cpp:100
 msgid "wxTCPNetworkPlugin: To many connections! Connection is not established"
 msgstr "wxTCPNetworkPlugin: Příliš mnoho připojení! Připojení nebylo ustanoveno"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/tcpnetworkplugin.cpp:101
+#: D:\work\Projects\wxGIS\src\srv_framework/tcpnetworkplugin.cpp:101
 msgid "To many connections! Connection refused"
 msgstr "Příliš mnoho připojení! Připojení odmítnuto"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/tcpnetworkplugin.cpp:121
+#: D:\work\Projects\wxGIS\src\srv_framework/tcpnetworkplugin.cpp:121
 msgid "wxTCPNetworkPlugin: Couldn't accept a new connection"
 msgstr "wxTCPNetworkPlugin: Nemohu přijmout nové připojení"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/tcpnetworkplugin.cpp:153
+#: D:\work\Projects\wxGIS\src\srv_framework/tcpnetworkplugin.cpp:153
 msgid "Wait Connect"
-msgstr "Čekám na připojení"
+msgstr "Čekání připojení"
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/tcpnetworkplugin.cpp:155
+#: D:\work\Projects\wxGIS\src\srv_framework/tcpnetworkplugin.cpp:155
 #, c-format
 msgid "wxTCPNetworkPlugin: Wait Connect Thread 0x%lx started (priority = %u)."
-msgstr "wxTCPNetworkPlugin: Čekám na připojení. Vlákno 0x%lx spuštěno (priorita = %u)."
+msgstr "wxTCPNetworkPlugin: Vlákno čekání připojení 0x%lx spuštěno (priorita = %u)."
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/tcpnetworkplugin.cpp:157
+#: D:\work\Projects\wxGIS\src\srv_framework/tcpnetworkplugin.cpp:157
 msgid "wxTCPNetworkPlugin: Plugin is started..."
 msgstr "wxTCPNetworkPlugin: Zásuvný modul spuštěn..."
 
-#: C:\Documents
-#: and Settings\Honza\Plocha\Qt
-#: Linguist\WXGIS\src\src\srv_framework/tcpnetworkplugin.cpp:167
+#: D:\work\Projects\wxGIS\src\srv_framework/tcpnetworkplugin.cpp:167
 msgid "wxTCPNetworkPlugin: Plugin is shutdown..."
 msgstr "wxTCPNetworkPlugin: Zásuvný modul vypnut..."
 
+#~ msgid "wxTCPNetworkPlugin: Can't create Wait Connect Thread!"
+#~ msgstr "wxTCPNetworkPlugin: Невозможно создать поток ожидания подключений!"
+
+#~ msgid "wxTCPNetworkPlugin: Can't run Wait Connect Thread!"
+#~ msgstr ""
+#~ "wxTCPNetworkPlugin: Невозможно запустить поток ожидания подключений!"

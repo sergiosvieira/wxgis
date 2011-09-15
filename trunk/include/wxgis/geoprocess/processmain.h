@@ -3,7 +3,7 @@
  * Purpose:  Main application class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
  ****************************************************************************/
 #pragma once
 
+#include "wxgis/core/init.h"
 #include "wxgis/geoprocess/geoprocess.h"
 
 #include "wx/string.h"
@@ -36,7 +37,8 @@ int main(int argc, char** argv);
 
 class wxGPTaskExecutor : 
     public ITrackCancel,
-	public IProgressor
+	public IProgressor,
+	public wxGISInitializer
 {
 public:
     wxGPTaskExecutor(void);
@@ -53,6 +55,10 @@ public:
     virtual int GetRange(void){return m_nRange;};
     virtual void Play(void){};
     virtual void Stop(void){};
+	virtual void SetYield(bool bYield = false){};
+	//wxGISInitializer
+	virtual bool Initialize(const wxString &sAppName, const wxString &sLogFilePrefix, wxCmdLineParser& parser);
+	virtual void Uninitialize();
 protected:
     int m_nValue;
     int m_nRange;

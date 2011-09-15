@@ -3,7 +3,7 @@
  * Purpose:  wxGISAnimation class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -25,10 +25,9 @@ BEGIN_EVENT_TABLE(wxGISAnimation, wxControl)
 	EVT_ERASE_BACKGROUND(wxGISAnimation::OnEraseBackground)
 	EVT_TIMER( ATIMER_ID, wxGISAnimation::OnTimer )
 	//EVT_SIZE(wxGISAnimation::OnSize)
-	//EVT_TIMER(ID_PAINTING_TEST_CTRL_TIMER, wxGISAnimation::OnRefreshTimer)
 END_EVENT_TABLE()
 
-wxGISAnimation::wxGISAnimation(wxWindow * parent, wxWindowID id, const wxBitmap & bitmap, const int bitmap_size, const wxPoint & pos, const wxSize & size, long style, const wxString name) : wxControl(parent, id, pos, size, style, wxDefaultValidator, name), m_timer(this, ATIMER_ID)
+wxGISAnimation::wxGISAnimation(wxWindow * parent, wxWindowID id, const wxBitmap & bitmap, const int bitmap_size, const wxPoint & pos, const wxSize & size, long style, const wxString name) : wxControl(parent, id, pos, size, style, wxDefaultValidator, name), m_timer(this, ATIMER_ID), m_bYield(true)
 {
 	m_nImgPos = 0;
 	m_ImageList.Create(bitmap_size, bitmap_size);
@@ -94,7 +93,7 @@ void wxGISAnimation::OnPaint(wxPaintEvent & event)
 //	}
 //	wxPen linePen(*wxBLACK, 2, wxSOLID);
 //	dc.SetPen(linePen);
-//	for(i = 0; i < 12; i++)
+//	for(i = 0; i < 12; ++i)
 //	{
 //		angle = 2.0*3.1415926/12.0*(double)i;
 //		dc.DrawLine(cx+radius*cos(angle), cy+radius*sin(angle),
@@ -139,5 +138,11 @@ void wxGISAnimation::OnEraseBackground(wxEraseEvent & event)
 void wxGISAnimation::OnTimer( wxTimerEvent& event )
 {
 	Refresh();
-    ::wxSafeYield(NULL, true);
+    if(m_bYield)
+		::wxSafeYield(NULL, true);
+}
+
+void wxGISAnimation::SetYield(bool bYield)
+{
+    m_bYield = bYield;
 }

@@ -26,6 +26,7 @@
 #include "wxgis/catalogui/spatrefpropertypage.h"
 #include "wxgis/catalogui/rasterpropertypage.h"
 #include "wxgis/catalogui/vectorpropertypage.h"
+#include "wxgis/catalogui/tablepropertypage.h"
 
 #include "../../art/properties.xpm"
 
@@ -59,6 +60,22 @@ wxIcon wxGxTableDatasetUI::GetSmallImage(void)
 
 void wxGxTableDatasetUI::EditProperties(wxWindow *parent)
 {
+    wxPropertySheetDialog PropertySheetDialog;
+    if (!PropertySheetDialog.Create(parent, wxID_ANY, _("Properties"), wxDefaultPosition, wxSize( 480,640 ), wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER))
+        return;
+    PropertySheetDialog.SetIcon(properties_xpm);
+    PropertySheetDialog.CreateButtons(wxOK);
+    wxWindow* pParentWnd = static_cast<wxWindow*>(PropertySheetDialog.GetBookCtrl());
+
+    wxGISTablePropertyPage* TablePropertyPage = new wxGISTablePropertyPage(this, pParentWnd);
+    PropertySheetDialog.GetBookCtrl()->AddPage(TablePropertyPage, TablePropertyPage->GetPageName());
+
+    PropertySheetDialog.LayoutDialog();
+    //center?
+    PropertySheetDialog.SetSize(480,640);
+    PropertySheetDialog.Center();
+
+    PropertySheetDialog.ShowModal();
 }
 
 //--------------------------------------------------------------
@@ -112,13 +129,13 @@ void wxGxFeatureDatasetUI::EditProperties(wxWindow *parent)
     PropertySheetDialog.ShowModal();
 }
 
-wxGISDatasetSPtr wxGxFeatureDatasetUI::GetDataset(void)
+wxGISDatasetSPtr wxGxFeatureDatasetUI::GetDataset(bool bCache, ITrackCancel* pTrackCancel)
 {
-    wxGISDatasetSPtr pOut = wxGxFeatureDataset::GetDataset();
+    wxGISDatasetSPtr pOut = wxGxFeatureDataset::GetDataset(bCache, pTrackCancel);
     if(!pOut)
     {
         const char* err = CPLGetLastErrorMsg();
-        wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
+		wxString sErr = wxString::Format(_("%s failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
         wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
     }
     return pOut;
@@ -187,13 +204,13 @@ bool wxGxRasterDatasetUI::Invoke(wxWindow* pParentWnd)
 }
 
 
-wxGISDatasetSPtr wxGxRasterDatasetUI::GetDataset(void)
+wxGISDatasetSPtr wxGxRasterDatasetUI::GetDataset(bool bCached, ITrackCancel* pTrackCancel)
 {
-    wxGISDatasetSPtr pOut = wxGxRasterDataset::GetDataset();
+    wxGISDatasetSPtr pOut = wxGxRasterDataset::GetDataset(bCached, pTrackCancel);
     if(!pOut)
     {
         const char* err = CPLGetLastErrorMsg();
-        wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
+		wxString sErr = wxString::Format(_("%s failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
         wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
     }
     return pOut;

@@ -157,7 +157,7 @@ bool wxGISCurl::GetFile(wxString sURL, wxString sPath)
 	if(wxFileName::FileExists(sPath))
 		return true/*false*/;
 	curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
-	curl_easy_setopt(curl, CURLOPT_URL, wgWX2MB(sURL));
+	curl_easy_setopt(curl, CURLOPT_URL, sURL.mb_str());
 	//curl_easy_setopt(curl, CURLOPT_CAINFO, "curl-ca-bundle.crt");
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 	res = curl_easy_perform(curl);
@@ -189,7 +189,7 @@ PERFORMRESULT wxGISCurl::Post(wxString sURL, wxString sPostData)
 	const char *tmp_str = (const char*) tmp_buf;
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS , tmp_str);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
-	curl_easy_setopt(curl, CURLOPT_URL, wgWX2MB(sURL));
+	curl_easy_setopt(curl, CURLOPT_URL, sURL.mb_str(wxConvLocal));
 	//curl_easy_setopt(curl, CURLOPT_CAINFO, "curl-ca-bundle.crt");
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 	res = curl_easy_perform(curl);
