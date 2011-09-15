@@ -44,7 +44,7 @@ public:
 	virtual bool AddCommandBar(IGISCommandBar* pBar);
     //events 
     virtual void OnClose(wxCloseEvent& event);
-	//IApplication
+	//IFrameApplication
 	virtual void Customize(void);
 	virtual void ShowStatusBar(bool bShow);
 	virtual void ShowApplicationWindow(wxWindow* pWnd, bool bShow = true);
@@ -54,10 +54,10 @@ public:
 	virtual void UnRegisterChildWindow(wxWindow* pWnd);
     virtual wxString GetAppName(void) = 0;
     virtual wxString GetAppVersionString(void){return wxString(APP_VER);};
-    virtual bool Create(IGISConfig* pConfig);
-    virtual bool SetupSys(wxString sSysPath);
+    virtual bool Create(void);
+    virtual bool SetupSys(const wxString &sSysPath);
     virtual void SetDebugMode(bool bDebugMode);
-    virtual bool SetupLog(wxString sLogPath);
+    virtual bool SetupLog(const wxString &sLogPath);
 protected:
 	virtual void SerializeFramePosEx(bool bSave = false);
 protected:

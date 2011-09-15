@@ -3,7 +3,7 @@
  * Purpose:  Main application class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@
 
 #include "wx/defs.h"
 #include "wx/cmdline.h"
+
+#include <locale.h>
 
 int main(int argc, char **argv)
 {
@@ -62,10 +64,10 @@ int main(int argc, char **argv)
     // Create the commandline parser
     static const wxCmdLineEntryDesc my_cmdline_desc[] =
     {
-        { wxCMD_LINE_SWITCH, wxT( "h" ), wxT("help" ),      _( "Show this help message" ), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
-        { wxCMD_LINE_SWITCH, wxT( "v" ), wxT("version" ),   _( "The version of this program" ) },
-		{ wxCMD_LINE_OPTION, wxT( "n" ), wxT("name"),       _( "The tool name" ), wxCMD_LINE_VAL_STRING },
-		{ wxCMD_LINE_OPTION, wxT( "p" ), wxT("parameters"), _( "The tool parameters" ), wxCMD_LINE_VAL_STRING },
+        { wxCMD_LINE_SWITCH, "h", "help",       _( "Show this help message" ), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
+        { wxCMD_LINE_SWITCH, "v", "version",    _( "The version of this program" ) },
+		{ wxCMD_LINE_OPTION, "n", "name",       _( "The tool name" ), wxCMD_LINE_VAL_STRING },
+		{ wxCMD_LINE_OPTION, "p", "parameters", _( "The tool parameters" ), wxCMD_LINE_VAL_STRING },
 		{ wxCMD_LINE_NONE }
     };
 
@@ -108,14 +110,12 @@ bool parse_commandline_parameters( wxCmdLineParser& parser )
 	}
 
 
-    wxString sToolName, sToolParameters;
-    if(parser.Found( wxT( "n" ), &sToolName ) && parser.Found( wxT( "p" ), &sToolParameters ) )
+    if(parser.Found( wxT( "n" )) && parser.Found( wxT( "p" )) )
     {
         wxGPTaskExecutor executor;
-        sToolParameters = sToolParameters.Trim(true).Trim(false);
-        if(sToolParameters[0] == '"')
-            sToolParameters = sToolParameters.Mid(1, sToolParameters.Len() - 2);
-        return executor.OnExecute(sToolName.Trim(true).Trim(false), sToolParameters);
+		bool success = executor.Initialize(wxT("wxGISGeoprocess"), wxString(wxT("gp")), parser);
+		executor.Uninitialize();
+		return success;
     }
 
 	parser.Usage();
@@ -130,25 +130,14 @@ bool parse_commandline_parameters( wxCmdLineParser& parser )
 // wxGPTaskExecutor
 //////////////////////////////////////////////////////////////////////////////
 
-wxGPTaskExecutor::wxGPTaskExecutor() : ITrackCancel()
+wxGPTaskExecutor::wxGPTaskExecutor() : ITrackCancel(), wxGISInitializer()
 {
-    //TODO: Config support
-	//GDAL
-    CPLSetConfigOption( "GDAL_CACHEMAX", "128" );
-
-	OGRRegisterAll();
-	GDALAllRegister();
-	//END GDAL
-
+	m_nRange = 100;
     SetProgressor(this);
 }
 
 wxGPTaskExecutor::~wxGPTaskExecutor()
 {
-	//GDAL
-	GDALDestroyDriverManager();
-	OGRCleanupAll();
-	//END GDAL
 }
 
 bool wxGPTaskExecutor::OnExecute(wxString sToolName, wxString sToolParameters)
@@ -158,18 +147,18 @@ bool wxGPTaskExecutor::OnExecute(wxString sToolName, wxString sToolParameters)
 	wxFFileOutputStream OutStream(m_StdOutFile);
 	m_pOutTxtStream = new wxTextOutputStream(OutStream);
 
-    wxGISAppConfig* pConfig;
-#ifdef WXGISPORTABLE
-    pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, true);
-#else
-    pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, false);
-#endif
-    wxXmlNode* pToolsChild = pConfig->GetConfigNode(wxT("tools"), false, true);
-    if(!pToolsChild)
-    {
-        PutMessage(wxString(_("Get wxGISToolbox config failed!")), -1, enumGISMessageErr);
-        return false;
-    }
+//    wxGISAppConfig* pConfig;
+//#ifdef WXGISPORTABLE
+//    pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, true);
+//#else
+//    pConfig = new wxGISAppConfig(TOOLBX_NAME, CONFIG_DIR, false);
+//#endif
+//    wxXmlNode* pToolsChild = pConfig->GetConfigNode(wxT("tools"), false, true);
+//    if(!pToolsChild)
+//    {
+//        PutMessage(wxString(_("Get wxGISToolbox config failed!")), -1, enumGISMessageErr);
+//        return false;
+//    }
 
     //PutMessage(wxString::Format(_("tool - %s params - %s"), sToolName.c_str(), sToolParameters.c_str()), -1, enumGISMessageInfo);
     //PutMessage(wxString::Format(_("tool - %s"), sToolName.c_str()), -1, enumGISMessageInfo);
@@ -179,8 +168,14 @@ bool wxGPTaskExecutor::OnExecute(wxString sToolName, wxString sToolParameters)
     wxGxCatalog GxCatalog;
     GxCatalog.Init();
 
-    wxGISGPToolManager GISGPToolManager(pToolsChild);   
-    IGPToolSPtr pTool = GISGPToolManager.GetTool(sToolName, &GxCatalog);
+    wxGISGPToolManager oGISGPToolManager;   
+	if(!oGISGPToolManager.IsOk())
+	{
+        PutMessage(wxString(_("Get wxGISToolbox config failed!")), -1, enumGISMessageErr);
+		return false;
+	}
+
+    IGPToolSPtr pTool = oGISGPToolManager.GetTool(sToolName, &GxCatalog);
     if(!pTool)
     {
         PutMessage(wxString::Format(_("Get Geoprocessing tool %s failed!"), sToolName.c_str()), -1, enumGISMessageErr);
@@ -205,7 +200,7 @@ bool wxGPTaskExecutor::OnExecute(wxString sToolName, wxString sToolParameters)
 
     OutStream.Close();
     wxSleep(1);
-    wxDELETE(m_pOutTxtStream)
+    wxDELETE(m_pOutTxtStream);
     return bResult;
 }
 
@@ -238,15 +233,59 @@ void wxGPTaskExecutor::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMes
     sOut.Append(wxT("\r\n"));
     m_pOutTxtStream->WriteString(sOut);
 	m_StdOutFile.Flush();
+	//wxFprintf(stdout, sOut);
+	//wxPrintf(sOut);
     m_sPrevMsg = sMessage;
 }
 
 void wxGPTaskExecutor::SetValue(int value)
 {
-	int nPercent = value / m_nRange * 100;
+	int nPercent = double(value) * 100 / m_nRange;
     if(m_nValue == nPercent)
         return;
     m_nValue = nPercent;
-    m_pOutTxtStream->WriteString(wxString::Format(wxT("DONE: %d%%\r\n"), nPercent));
+	wxString sOut = wxString::Format(wxT("DONE: %d%%\r\n"), nPercent);
+	//wxFprintf(stdout, sOut);
+	//wxPrintf(sOut);
+
+    m_pOutTxtStream->WriteString(sOut);
 	m_StdOutFile.Flush();
+}
+
+bool wxGPTaskExecutor::Initialize(const wxString &sAppName, const wxString &sLogFilePrefix, wxCmdLineParser& parser)
+{
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return false;
+
+	//GDAL
+	wxString sGDALCacheMax = pConfig->Read(enumGISHKCU, wxString(wxT("wxGISCommon/GDAL/cachemax")), wxString(wxT("128")));
+	CPLSetConfigOption( "GDAL_CACHEMAX", sGDALCacheMax.mb_str() );
+
+	OGRRegisterAll();
+	GDALAllRegister();
+	//END GDAL
+
+	if(!wxGISInitializer::Initialize(sAppName, sLogFilePrefix, parser))
+		return false;
+
+    wxString sToolName, sToolParameters;
+    if(parser.Found( wxT( "n" ), &sToolName ) && parser.Found( wxT( "p" ), &sToolParameters ) )
+	{
+		sToolParameters = sToolParameters.Trim(true).Trim(false);
+		if(sToolParameters[0] == '"')
+			sToolParameters = sToolParameters.Mid(1, sToolParameters.Len() - 2);
+		return OnExecute(sToolName.Trim(true).Trim(false), sToolParameters);
+	}
+	return false;
+}
+
+void wxGPTaskExecutor::Uninitialize()
+{
+	//GDAL
+	GDALDestroyDriverManager();
+	OGRCleanupAll();
+	//END GDAL
+
+	wxGISInitializer::Uninitialize();
 }

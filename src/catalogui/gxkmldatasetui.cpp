@@ -86,7 +86,7 @@ void wxGxKMLDatasetUI::EditProperties(wxWindow *parent)
 
 void wxGxKMLDatasetUI::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		wxDELETE( m_Children[i] );
@@ -104,10 +104,10 @@ void wxGxKMLDatasetUI::LoadChildren(void)
 	{
         wxGISFeatureDatasetSPtr pwxGISFeatureDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_type);
 
-        if(!pwxGISFeatureDataset->Open())
+        if(!pwxGISFeatureDataset->Open(0,0,false))
         {
 		    const char* err = CPLGetLastErrorMsg();
-		    wxString sErr = wxString::Format(_("Open failed! GDAL error: %s"), wgMB2WX(err));
+		    wxString sErr = wxString::Format(_("%s failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
 		    wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
 
 			return;
@@ -118,7 +118,7 @@ void wxGxKMLDatasetUI::LoadChildren(void)
         pwxGISFeatureDataset->SetEncoding(m_Encoding);
 	}
 
-    for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); i++)
+    for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); ++i)
     {
         wxGISFeatureDatasetSPtr pwxGISFeatureSubDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset->GetSubset(i));
         pwxGISFeatureSubDataset->SetSubType(m_type);

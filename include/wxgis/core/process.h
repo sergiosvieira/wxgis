@@ -25,7 +25,7 @@
 #include "wx/txtstrm.h"
 #include "wx/thread.h"
 
-#include <boost/process.hpp> 
+#include "wxgis/core/process.hpp" 
 
 namespace bp = ::boost::process;
 
@@ -35,38 +35,22 @@ class wxProcessWaitThread;
  *  \brief The process class which stores the application execution data.
  */
 class WXDLLIMPEXP_GIS_CORE wxGISProcess : 
-	public IProcess
+	public IProcess,
+	public wxGISConnectionPointContainer
 {
 public:
     wxGISProcess(wxString sCommand, wxArrayString saParams, IProcessParent* pParent);
     virtual ~wxGISProcess(void);
     // IProcess
-    virtual void OnStart(void);
-    virtual void OnCancel(void);
+    virtual void Start(void);
+    virtual void Cancel(void);
     virtual void OnTerminate(int status);
-	//IStreamReader
+	//wxGISProcess
 	virtual void ProcessInput(wxString sInputData);
 protected:    
     IProcessParent* m_pParent;
     wxProcessWaitThread* m_pProcessWaitThread;
 };
-
-///** \class wxStreamReaderThread process.h
-// *  \brief The stream reader thread for process callback.
-// */
-//class wxStreamReaderThread : public wxThread
-//{
-//public:
-//    wxStreamReaderThread(wxGISProcess* pProc, bp::pistream &InputStream);
-//	virtual ~wxStreamReaderThread(void);
-//    virtual void *Entry();
-//    virtual void OnExit();
-//protected:
-//	wxGISProcess* m_pProc;
-//    bp::pistream &m_InputStream;
-//	//IStreamReader* m_pReader;
-//	//wxInputStream& m_InStream;
-//};
 
 /** \class wxProcessWaitThread process.h
  *  \brief The end of the process wait thread for process callback.

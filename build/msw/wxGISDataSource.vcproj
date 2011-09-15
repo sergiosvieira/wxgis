@@ -46,7 +46,7 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISCored.lib wxGISFrameworkd.lib wxGISGeometryd.lib libcurl_imp.lib"
+				AdditionalDependencies="wxbase29ud.lib wxbase29ud_net.lib wxmsw29ud_core.lib wxbase29ud_xml.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib libcurl_imp.lib wxGISCored.lib wxGISGeometryd.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				AdditionalLibraryDirectories="&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(WXGISGDAL)\lib&quot;;..\..\lib;&quot;$(CURL)\build\lib&quot;"
 				GenerateDebugInformation="true"
@@ -124,7 +124,7 @@
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -186,6 +186,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\datasource\cursor.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\datasource\datacontainer.cpp"
 				>
 			</File>
@@ -194,7 +198,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\datasource\filter.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\datasource\postgisdataset.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\datasource\quadtree.cpp"
 				>
 			</File>
 			<File
@@ -228,6 +240,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\wxgis\datasource\cursor.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wxgis\datasource\datacontainer.h"
 				>
 			</File>
@@ -240,7 +256,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\wxgis\datasource\filter.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wxgis\datasource\postgisdataset.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\datasource\quadtree.h"
 				>
 			</File>
 			<File

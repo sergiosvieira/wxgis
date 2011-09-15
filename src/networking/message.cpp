@@ -37,7 +37,7 @@ wxNetMessage::wxNetMessage(unsigned char* pBuff, size_t nSize) : m_bIsOk(false),
         //memcpy(pStrBuff, pBuff, nSize - sizeof(wxUint8));
         //m_sData.UngetWriteBuf(nSize);
 
-        //for(size_t i = 0; i < nSize; i++)
+        //for(size_t i = 0; i < nSize; ++i)
         //    m_sData += (wxChar)pBuff[i];
 		m_sData = wxString((const wxChar*)pBuff, nSize / sizeof(wxChar));
 	}
@@ -64,15 +64,16 @@ wxString wxNetMessage::StrFromBuff(unsigned char* pBuff, size_t nBuffByteSize, s
 	size_t nRealCount = nBuffByteSize / nValSize + 1;
     sData.Alloc(nRealCount);
 
-	wxChar* pchar = m_sData.GetWriteBuf(nRealCount);//new wxChar[nRealCount];
+	//wxStringCharType* pchar = sData.GetWriteBuf(nRealCount);//new wxChar[nRealCount];
 
-	for(int i = 0; i < nRealCount; i++)
+	for(int i = 0; i < nRealCount; ++i)
 	{
-		pchar[i] = pBuff[0];
+		//pchar[i] = pBuff[0];
+		sData.Append( pBuff[0] );
 		pBuff += nValSize;
 	}
-	pchar[nRealCount] = 0;
-    sData.UngetWriteBuf(nRealCount);
+	//pchar[nRealCount] = 0;
+    //sData.UngetWriteBuf();
 	return sData;//wxString(pchar, nRealCount);
 }
 
@@ -84,11 +85,11 @@ wxNetMessage::wxNetMessage(wxGISMessageState nState, short nPriority, wxString s
 
     m_pXmlDocument = new wxXmlDocument();
     wxXmlNode* pRootNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("msg"));
-    pRootNode->AddProperty(wxT("ver"), wxString::Format(wxT("%d"), WXNETVER));
-    pRootNode->AddProperty(wxT("prio"), wxString::Format(wxT("%d"), m_nPriority));
-    pRootNode->AddProperty(wxT("st"), wxString::Format(wxT("%d"), m_nState));
+    pRootNode->AddAttribute(wxT("ver"), wxString::Format(wxT("%d"), WXNETVER));
+    pRootNode->AddAttribute(wxT("prio"), wxString::Format(wxT("%d"), m_nPriority));
+    pRootNode->AddAttribute(wxT("st"), wxString::Format(wxT("%d"), m_nState));
     if(!m_sDst.IsEmpty())
-        pRootNode->AddProperty(wxT("dst"), m_sDst);
+        pRootNode->AddAttribute(wxT("dst"), m_sDst);
     m_pXmlDocument->SetRoot(pRootNode);
     m_bIsOk = true;
 }
@@ -121,9 +122,9 @@ void wxNetMessage::SetPriority(short nPriority)
         wxXmlNode* pRootNode = m_pXmlDocument->GetRoot();
         if(pRootNode)
         {
-            if(pRootNode->HasProp(wxT("prio")))
-                pRootNode->DeleteProperty(wxT("prio"));
-            pRootNode->AddProperty(wxT("prio"), wxString::Format(wxT("%d"), nPriority));
+            if(pRootNode->HasAttribute(wxT("prio")))
+                pRootNode->DeleteAttribute(wxT("prio"));
+            pRootNode->AddAttribute(wxT("prio"), wxString::Format(wxT("%d"), nPriority));
         }
     }
     m_nPriority = nPriority;
@@ -210,9 +211,9 @@ void wxNetMessage::SetState(wxGISMessageState nState)
         wxXmlNode* pRootNode = m_pXmlDocument->GetRoot();
         if(pRootNode)
         {
-            if(pRootNode->HasProp(wxT("st")))
-                pRootNode->DeleteProperty(wxT("st"));
-            pRootNode->AddProperty(wxT("st"), wxString::Format(wxT("%d"), nState));
+            if(pRootNode->HasAttribute(wxT("st")))
+                pRootNode->DeleteAttribute(wxT("st"));
+            pRootNode->AddAttribute(wxT("st"), wxString::Format(wxT("%d"), nState));
         }
     }
     m_nState = nState;
@@ -230,9 +231,9 @@ void wxNetMessage::SetDestination(wxString sDst)
         wxXmlNode* pRootNode = m_pXmlDocument->GetRoot();
         if(pRootNode)
         {
-            if(pRootNode->HasProp(wxT("st")))
-                pRootNode->DeleteProperty(wxT("st"));
-            pRootNode->AddProperty(wxT("st"), sDst);
+            if(pRootNode->HasAttribute(wxT("st")))
+                pRootNode->DeleteAttribute(wxT("st"));
+            pRootNode->AddAttribute(wxT("st"), sDst);
         }
     }
 	m_sDst = sDst;
@@ -253,14 +254,14 @@ bool wxNetMessage::LoadXMLFromStr(wxString sData)
 	if(pRoot && pRoot->GetName() != wxString(wxT("msg")))
 		return false;
 
-    if(wxAtoi(pRoot->GetPropVal(wxT("ver"), wxT("1"))) > WXNETVER)
+    if(wxAtoi(pRoot->GetAttribute(wxT("ver"), wxT("1"))) > WXNETVER)
 		return false;
 
     //header
-	m_nState = (wxGISMessageState)wxAtoi(pRoot->GetPropVal(wxT("st"), wxT("0")));
-	//m_sMessage = pRoot->GetPropVal(wxT("message"), wxT(""));
-	m_nPriority = wxAtoi(pRoot->GetPropVal(wxT("prio"), wxT("0")));
-	m_sDst = pRoot->GetPropVal(wxT("dst"), wxT("*"));
+	m_nState = (wxGISMessageState)wxAtoi(pRoot->GetAttribute(wxT("st"), wxT("0")));
+	//m_sMessage = pRoot->GetAttribute(wxT("message"), wxT(""));
+	m_nPriority = wxAtoi(pRoot->GetAttribute(wxT("prio"), wxT("0")));
+	m_sDst = pRoot->GetAttribute(wxT("dst"), wxT("*"));
 	return true;
 }
 

@@ -25,12 +25,13 @@
 //#include "vrt/vrtwarpedoverview.h"
 #include "gdal_rat.h"
 
-wxGISRasterDataset::wxGISRasterDataset(CPLString sPath, wxGISEnumRasterDatasetType nType) : wxGISDataset(sPath), m_psExtent(NULL), m_bHasOverviews(false), m_bHasStats(false), m_poMainDataset(NULL), m_poDataset(NULL), m_nBandCount(0)
+wxGISRasterDataset::wxGISRasterDataset(CPLString sPath, wxGISEnumRasterDatasetType nType) : wxGISDataset(sPath), m_bHasOverviews(false), m_bHasStats(false), m_poMainDataset(NULL), m_poDataset(NULL), m_nBandCount(0)
 {
 	m_bIsOpened = false;
     m_bIsReadOnly = true;
     m_nSubType = (int)nType;
 	m_nType = enumGISRasterDataset;
+	m_nDataType = GDT_Unknown;
 }
 
 wxGISRasterDataset::~wxGISRasterDataset(void)
@@ -43,7 +44,8 @@ void wxGISRasterDataset::Close(void)
 	if(m_bIsOpened)
     {
 		m_pSpaRef.reset();
-	    wxDELETE(m_psExtent);
+		m_stExtent.MinX = m_stExtent.MaxX = m_stExtent.MinY = m_stExtent.MaxY = 0;
+		m_nDataType = GDT_Unknown;
         m_bHasOverviews = false;
         m_bHasStats = false;
         m_nBandCount = 0;
@@ -91,10 +93,18 @@ char **wxGISRasterDataset::GetFileList()
     //papszFileList = CSLAddString( papszFileList, osIMDFile );
     switch(m_nSubType)
     {
-    case enumRasterBmp:
 	case enumRasterTiff:
-	case enumRasterImg:
+		szPath = (char*)CPLResetExtension(m_sPath, "tfw");
+		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+			papszFileList = CSLAddString( papszFileList, szPath );
+		break;
 	case enumRasterJpeg:
+		szPath = (char*)CPLResetExtension(m_sPath, "jpw");
+		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+			papszFileList = CSLAddString( papszFileList, szPath );
+		break;
+    case enumRasterBmp:
+	case enumRasterImg:
 	case enumRasterPng:
 	case enumRasterGif:
     case enumRasterUnknown:
@@ -131,6 +141,9 @@ char **wxGISRasterDataset::GetFileList()
     szPath = (char*)CPLResetExtension(m_sPath, "aux");
     if(CPLCheckForFile((char*)szPath.c_str(), NULL))
         papszFileList = CSLAddString( papszFileList, szPath );
+    szPath = (char*)CPLResetExtension(m_sPath, "aux.xml");
+    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+        papszFileList = CSLAddString( papszFileList, szPath );
     szPath = (char*)CPLResetExtension(m_sPath, "ovr");
     if(CPLCheckForFile((char*)szPath.c_str(), NULL))
         papszFileList = CSLAddString( papszFileList, szPath );
@@ -154,82 +167,30 @@ char **wxGISRasterDataset::GetFileList()
 bool wxGISRasterDataset::Rename(wxString sNewName)
 {
 	wxCriticalSectionLocker locker(m_CritSect);
+
+    CPLString szDirPath = CPLGetPath(m_sPath);
+    CPLString szName = CPLGetBasename(m_sPath);
+	CPLString szNewName = ClearExt(sNewName).mb_str(wxConvUTF8);
+
     Close();
 
-	wxFileName PathName(wxString(m_sPath, wxConvUTF8));
-	PathName.SetName(ClearExt(sNewName));
-
-	wxString sNewPath = PathName.GetFullPath();
-
-	Close();
-    CPLString szNewPath = sNewPath.mb_str(wxConvUTF8);
-
-    if( !RenameFile(m_sPath, szNewPath) )
+    char** papszFileList = GetFileList();
+    papszFileList = CSLAddString( papszFileList, m_sPath );
+    if(!papszFileList)
         return false;
 
-    CPLString szOldPathAdd, szNewPathAdd;
-
-    szOldPathAdd = m_sPath + CPLString("w");
-    szNewPathAdd = szNewPath + CPLString("w");
-    RenameFile(szOldPathAdd, szNewPathAdd);
-    szOldPathAdd = m_sPath + CPLString(".xml");
-    szNewPathAdd = szNewPath + CPLString(".xml");
-    RenameFile(szOldPathAdd, szNewPathAdd);
-    szOldPathAdd = m_sPath + CPLString(".aux");
-    szNewPathAdd = szNewPath + CPLString(".aux");
-    RenameFile(szOldPathAdd, szNewPathAdd);
-    szOldPathAdd = m_sPath + CPLString(".aux.xml");
-    szNewPathAdd = szNewPath + CPLString(".aux.xml");
-    RenameFile(szOldPathAdd, szNewPathAdd);
-    szOldPathAdd = m_sPath + CPLString(".ovr");
-    szNewPathAdd = szNewPath + CPLString(".ovr");
-    RenameFile(szOldPathAdd, szNewPathAdd);
-    szOldPathAdd = m_sPath + CPLString(".ovr.aux.xml");
-    szNewPathAdd = szNewPath + CPLString(".ovr.aux.xml");
-    RenameFile(szOldPathAdd, szNewPathAdd);
-
-    szOldPathAdd = (char*)CPLResetExtension(m_sPath, "xml");
-    szNewPathAdd = (char*)CPLResetExtension(szNewPath, "xml");
-    RenameFile(szOldPathAdd, szNewPathAdd);
-    szOldPathAdd = (char*)CPLResetExtension(m_sPath, "lgo");
-    szNewPathAdd = (char*)CPLResetExtension(szNewPath, "lgo");
-    RenameFile(szOldPathAdd, szNewPathAdd);
-    szOldPathAdd = (char*)CPLResetExtension(m_sPath, "aux");
-    szNewPathAdd = (char*)CPLResetExtension(szNewPath, "aux");
-    RenameFile(szOldPathAdd, szNewPathAdd);
-    szOldPathAdd = (char*)CPLResetExtension(m_sPath, "ovr");
-    szNewPathAdd = (char*)CPLResetExtension(szNewPath, "ovr");
-    RenameFile(szOldPathAdd, szNewPathAdd);
-    szOldPathAdd = (char*)CPLResetExtension(m_sPath, "rrd");
-    szNewPathAdd = (char*)CPLResetExtension(szNewPath, "rrd");
-    RenameFile(szOldPathAdd, szNewPathAdd);
-    szOldPathAdd = (char*)CPLResetExtension(m_sPath, "rpb");
-    szNewPathAdd = (char*)CPLResetExtension(szNewPath, "rpb");
-    RenameFile(szOldPathAdd, szNewPathAdd);
-    szOldPathAdd = (char*)CPLResetExtension(m_sPath, "rpc");
-    szNewPathAdd = (char*)CPLResetExtension(szNewPath, "rpc");
-    RenameFile(szOldPathAdd, szNewPathAdd);
-
-    CPLString szRpcName = CPLString(CPLGetBasename(m_sPath)) + CPLString("_rpc.txt");
-    szOldPathAdd = (char*)CPLFormFilename(CPLGetPath(m_sPath), (const char*)szRpcName.c_str(), NULL);
-    szRpcName = CPLString(CPLGetBasename(szNewPath)) + CPLString("_rpc.txt");
-    szNewPathAdd = (char*)CPLFormFilename(CPLGetPath(szNewPath), (const char*)szRpcName.c_str(), NULL);    
-    
-    RenameFile(szOldPathAdd, szNewPathAdd);
-
-    switch(m_nSubType)
-    {
-    case enumRasterBmp:
-	case enumRasterTiff:
-	case enumRasterImg:
-	case enumRasterJpeg:
-	case enumRasterPng:
-	case enumRasterGif:
-    case enumRasterUnknown:
-    default: 
-        break;
+    for(int i = 0; papszFileList[i] != NULL; ++i )
+    {		
+        CPLString szNewPath(CPLFormFilename(szDirPath, szNewName, GetExtension(papszFileList[i], szName)));
+        if(!RenameFile(papszFileList[i], szNewPath))
+		{
+			CSLDestroy( papszFileList );
+            return false;
+		}
     }
-	m_sPath = szNewPath;
+    
+	m_sPath = CPLString(CPLFormFilename(szDirPath, szNewName, CPLGetExtension(m_sPath)));
+	CSLDestroy( papszFileList );
 	return true;
 }
 
@@ -251,9 +212,8 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
     }
 	if( m_poDataset == NULL )
     {
-        //if ( CPLGetLastErrorNo() != CPLE_OpenFailed )
 		const char* err = CPLGetLastErrorMsg();
-		wxString sErr = wxString::Format(_("wxGISRasterDataset: Open failed! Path '%s'. GDAL error: %s"), m_sPath.c_str(), wgMB2WX(err));
+		wxString sErr = wxString::Format(_("wxGISRasterDataset: Open failed! Path '%s'. GDAL error: %s"), m_sPath.c_str(), wxString(err, wxConvUTF8).c_str());
 		wxLogError(sErr);
 
 		return false;
@@ -276,19 +236,6 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
                 m_poDataset = m_poMainDataset;
                 m_poMainDataset = NULL;
             }
-          //  else
-          //  {
-          //      //create pyramids
-          //      //int anOverviewList[9] = { 2, 4, 8, 16, 32, 64, 96, 128, 256 };
-          //      //CPLErr err = m_poDataset->BuildOverviews( "NEAREST", 9, anOverviewList, 0, NULL, GDALDummyProgress, NULL );
-		        ////"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE"
-
-          //      //get first overview
-          //      //GDALDataset* pDS = m_poMainDataset->GetRasterBand(1)->GetOverview(4)->GetDataset();
-          //      //VRTWarpedOverviewDataset* pOVDS = new  VRTWarpedOverviewDataset(pDS, m_poMainDataset);
-          //      ////m_poDataset = pDS;
-          //      //m_poDataset = (GDALDataset *) GDALAutoCreateWarpedVRT( pOVDS, NULL, NULL, GRA_NearestNeighbour, 0.5, NULL );
-          //  }
         }
     }
 
@@ -314,14 +261,14 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
         CPLErr eErr = pBand->GetStatistics(FALSE, FALSE, &dfMin, &dfMax, &dfMean, &dfStdDev ); 
         if( eErr == CE_None )
             m_bHasStats =  true;
+
+		m_nDataType = pBand->GetRasterDataType(); //Assumed that raster have the same datatype in all other bands
     }
 
-    if(m_nXSize < 2000 && m_nYSize < 2000)
+    if(m_nXSize < 2000 && m_nYSize < 2000)//for small rasters there is no need to create pyramids
         m_bHasOverviews = true;
 
     m_nBandCount = m_poDataset->GetRasterCount();
-
-	m_psExtent = new OGREnvelope();
 
     if(!bHasGeoTransform)
     {
@@ -344,30 +291,30 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
 		inX[3] = 0;
 		inY[3] = m_nYSize;
 
-		m_psExtent->MaxX = -1000000000;
-		m_psExtent->MaxY = -1000000000;
-		m_psExtent->MinX = 1000000000;
-		m_psExtent->MinY = 1000000000;
-		for(int i = 0; i < 4; i++)
+		m_stExtent.MaxX = -1000000000;
+		m_stExtent.MaxY = -1000000000;
+		m_stExtent.MinX = 1000000000;
+		m_stExtent.MinY = 1000000000;
+		for(int i = 0; i < 4; ++i)
 		{
 			double rX, rY;
 			GDALApplyGeoTransform( adfGeoTransform, inX[i], inY[i], &rX, &rY );
-			if(m_psExtent->MaxX < rX)
-				m_psExtent->MaxX = rX;
-			if(m_psExtent->MinX > rX)
-				m_psExtent->MinX = rX;
-			if(m_psExtent->MaxY < rY)
-				m_psExtent->MaxY = rY;
-			if(m_psExtent->MinY > rY)
-				m_psExtent->MinY = rY;
+			if(m_stExtent.MaxX < rX)
+				m_stExtent.MaxX = rX;
+			if(m_stExtent.MinX > rX)
+				m_stExtent.MinX = rX;
+			if(m_stExtent.MaxY < rY)
+				m_stExtent.MaxY = rY;
+			if(m_stExtent.MinY > rY)
+				m_stExtent.MinY = rY;
 		}
 	}
 	else
 	{
-		m_psExtent->MaxX = m_nXSize;
-		m_psExtent->MaxY = m_nYSize;
-		m_psExtent->MinX = 0;
-		m_psExtent->MinY = 0;
+		m_stExtent.MaxX = m_nXSize;
+		m_stExtent.MaxY = m_nYSize;
+		m_stExtent.MinX = 0;
+		m_stExtent.MinY = 0;
 	}
 
 	m_bIsOpened = true;
@@ -385,24 +332,26 @@ const OGRSpatialReferenceSPtr wxGISRasterDataset::GetSpatialReference(void)
 	if(	m_poDataset )
 	{
 		m_pSpaRef = boost::make_shared<OGRSpatialReference>(m_poDataset->GetProjectionRef());
-		//m_pSpaRef = OGRSpatialReferenceSPtr(new OGRSpatialReference(m_poDataset->GetProjectionRef()));
 		return m_pSpaRef;
 	}
 	return OGRSpatialReferenceSPtr();
 }
 
-const OGREnvelope* wxGISRasterDataset::GetEnvelope(void)
+OGREnvelope wxGISRasterDataset::GetEnvelope(void)
 {
-	if(m_psExtent)
-		return m_psExtent;
-	return NULL;
+	return m_stExtent;
+}
+
+GDALDataType wxGISRasterDataset::GetDataType(void)
+{
+	return m_nDataType;
 }
 
 wxString wxGISRasterDataset::GetName(void)
 {
     wxString sOut;
     if(EQUALN(m_sPath, "/vsizip", 7))
-        sOut = wxString(CPLGetFilename(m_sPath), wxCSConv(wxT("cp-866")));
+        sOut = wxString(CPLGetFilename(m_sPath), wxCSConv(wxT("cp-866")));//TODO: Get from config cp-866
     else
         sOut = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
 	return sOut;
@@ -419,18 +368,22 @@ bool wxGISRasterDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
         return false;
 
     CPLString szCopyFileName;
+	CPLString szFileName = CPLGetBasename(m_sPath);
 
     for(int i = 0; papszFileList[i] != NULL; ++i )
     {
-        CPLString szNewDestFileName(CPLFormFilename(szDestPath, CPLGetFilename(papszFileList[i]), NULL));
-        szNewDestFileName = CheckUniqPath(szNewDestFileName);
+		CPLString szNewDestFileName = GetUniqPath(papszFileList[i], szDestPath, szFileName);
         szCopyFileName = szNewDestFileName;
         if(!CopyFile(szNewDestFileName, papszFileList[i], pTrackCancel))
+		{
+			CSLDestroy( papszFileList );
             return false;
+		}
     }
     
     m_sPath = szCopyFileName;
 
+	CSLDestroy( papszFileList );
 	return true;
 }
 
@@ -444,14 +397,44 @@ bool wxGISRasterDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(!papszFileList)
         return false;
 
+	CPLString szFileName = CPLGetBasename(m_sPath);
+
     for(int i = 0; papszFileList[i] != NULL; ++i )
     {
-        const char* szNewDestFileName = CPLFormFilename(szDestPath, CPLGetFilename(papszFileList[i]), NULL);
+		CPLString szNewDestFileName = GetUniqPath(papszFileList[i], szDestPath, szFileName);
         if(!MoveFile(szNewDestFileName, papszFileList[i], pTrackCancel))
+		{
+			CSLDestroy( papszFileList );
             return false;
+		}
     }
 
     m_sPath = CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL);
 
+	CSLDestroy( papszFileList );
     return true;
 }
+
+bool wxGISRasterDataset::GetPixelData(void *data, int nXOff, int nYOff, int nXSize, int nYSize, int nBufXSize, int nBufYSize, GDALDataType eDT, int nBandCount, int *panBandList)
+{
+    CPLErrorReset();
+
+    CPLErr err = m_poDataset->AdviseRead(nXOff, nYOff, nXSize, nYSize, nBufXSize, nBufYSize, eDT, nBandCount, panBandList, NULL);
+    if(err != CE_None)
+    {
+        const char* pszerr = CPLGetLastErrorMsg();
+		wxLogError(_("AdviseRead failed! GDAL error: %s"), wxString(pszerr, *wxConvCurrent).c_str());
+        return false;
+    }
+
+	int nDataSize = GDALGetDataTypeSize(eDT) / 8;
+    err = m_poDataset->RasterIO(GF_Read, nXOff, nYOff, nXSize, nYSize, data, nBufXSize, nBufYSize, eDT, nBandCount, panBandList, nDataSize * nBandCount, 0, nDataSize);
+    if(err != CE_None)
+    {
+        const char* pszerr = CPLGetLastErrorMsg();
+        wxLogError(_("RasterIO failed! GDAL error: %s"), wxString(pszerr, *wxConvCurrent).c_str());
+        return false;
+    }
+	return true;
+}
+

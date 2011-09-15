@@ -24,41 +24,9 @@
 #include "cpl_string.h"
 #include "wx/filename.h"
 
-
-/////////////////////////////////////////////////////////////////////////////////
-///// Class wxStreamReaderThread
-/////////////////////////////////////////////////////////////////////////////////
-//
-//wxStreamReaderThread::wxStreamReaderThread(wxGISProcess* pProc, bp::pistream &InputStream) : wxThread(), m_InputStream(InputStream)
-//{
-//	m_pProc = pProc;
-//}
-//
-//wxStreamReaderThread::~wxStreamReaderThread(void)
-//{
-//}
-//
-//void *wxStreamReaderThread::Entry()
-//{
-//    if(!m_pProc)
-//        return (ExitCode)-1;
-//
-//    std::string line; 
-//    while(!TestDestroy() && std::getline(m_InputStream, line)) 
-//    {
-//        wxString sLine;//(line.c_str(), wxConvUTF8(), line.length());
-//        m_pProc->ProcessInput(sLine);
-//        wxThread::Sleep(85);
-//    }
-//	return NULL;
-//}
-//
-//void wxStreamReaderThread::OnExit()
-//{
-//}
-
+#define SLEEP_PROCWAIT 85
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxStreamReaderThread
+/// Class wxProcessWaitThread
 ///////////////////////////////////////////////////////////////////////////////
 
 wxProcessWaitThread::wxProcessWaitThread(wxGISProcess* pProc) : wxThread(), m_pChild(NULL)
@@ -85,10 +53,8 @@ void *wxProcessWaitThread::Entry()
 
     std::vector<std::string> args;
     wxArrayString saParams = m_pProc->GetParameters();
-    for(size_t i = 0; i < saParams.GetCount(); i++)
+    for(size_t i = 0; i < saParams.GetCount(); ++i)
         args.push_back(std::string(saParams[i].mb_str())); 
-
-    //"wxGISGeoprocess.exe -n create_ovr -p "My geodata\tsk_exe\08MAY01083427-S2AS_R1C1-005728810020_01_P001.TIF|GAUSS|JPEG|""
 
 //#if defined(BOOST_POSIX_API) 
     bp::context ctx; 
@@ -106,7 +72,7 @@ void *wxProcessWaitThread::Entry()
 //#endif
 
     ctx.environment = bp::self::get_environment(); 
-    ctx.stdout_behavior = bp::capture_stream(); 
+	ctx.stdout_behavior = bp::capture_stream(); 
     //wxFileName FName(wxString(exec.c_str(), wxConvUTF8));
     //ctx.work_directory = FName.GetPath().mb_str();
 
@@ -120,7 +86,7 @@ void *wxProcessWaitThread::Entry()
     {
         wxString sLine(line.c_str(), wxConvUTF8, line.length());
         m_pProc->ProcessInput(sLine);
-        wxThread::Sleep(85);
+        wxThread::Sleep(SLEEP_PROCWAIT);
     }
 
     //wait exit
@@ -154,7 +120,7 @@ wxGISProcess::~wxGISProcess(void)
 {
 }
 
-void wxGISProcess::OnStart(void)
+void wxGISProcess::Start(void)
 {
 	m_nState = enumGISTaskWork;
 	m_dtBeg = wxDateTime::Now();
@@ -176,7 +142,7 @@ void wxGISProcess::OnTerminate(int status)
     m_dtEstEnd = wxDateTime::Now();
 }
 
-void wxGISProcess::OnCancel(void)
+void wxGISProcess::Cancel(void)
 {
 	if(m_nState == enumGISTaskWork)
 	{

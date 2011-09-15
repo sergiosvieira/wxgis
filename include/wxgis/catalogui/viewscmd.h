@@ -3,7 +3,7 @@
  * Purpose:  Catalog Views Commands class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -40,14 +40,14 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IApplication* pApp);
+	virtual bool OnCreate(IFrameApplication* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
     //IDropDownCommand
    	virtual wxMenu* GetDropDownMenu(void);
     virtual void OnDropDownCommand(int nID);
 private:
-	IApplication* m_pApp;
+	IFrameApplication* m_pApp;
     std::vector<wxWindow*> m_apContentsWin;
     wxWindow* m_pTreeView;
 	wxIcon m_IconViews, m_IconSelAll, m_IconTreeView;

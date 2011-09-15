@@ -46,8 +46,8 @@ public:
 	virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true);
 	virtual void DisconnectFolder(CPLString sPath);
     //wxGxCatalogUI
-    virtual void Undo(int nPos = -1);
-    virtual void Redo(int nPos = -1);
+    virtual void Undo(int nPos = wxNOT_FOUND);
+    virtual void Redo(int nPos = wxNOT_FOUND);
 	virtual void SetLocation(wxString sPath);
     virtual void SetOpenLastPath(bool bOpenLast) {m_bOpenLastPath = bOpenLast;};
     virtual bool GetOpenLastPath(void){return m_bOpenLastPath;};
@@ -60,6 +60,8 @@ public:
             return &m_ImageListSmall;
     }
 	//wxGxCatalog
+	virtual wxString GetConfigName(void){return wxString(wxT("wxCatalogUI"));};
+	//
 	virtual void Init(IGxCatalog* pExtCat = NULL);
 protected:
 	bool m_bOpenLastPath, m_bHasInternal;

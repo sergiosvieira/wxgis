@@ -21,9 +21,7 @@
 
 #pragma once
 
-#include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/geoprocessing/gptool.h"
-#include "wxgis/geoprocessing/gptable.h"
 
 /** \class wxGISGPMeanByColumnTool gpsumtabletool.h
     \brief The geoprocessing tool calculate mean column data by other colum with equil data
@@ -35,14 +33,14 @@ class WXDLLIMPEXP_GIS_GP wxGISGPMeanByColumnTool :
 
 public:
     wxGISGPMeanByColumnTool(void);
-    ~wxGISGPMeanByColumnTool(void);
+    virtual ~wxGISGPMeanByColumnTool(void);
     //IGPTool
-    virtual wxString GetDisplayName(void);
-    virtual wxString GetName(void);
-    virtual wxString GetCategory(void);
+    virtual const wxString GetDisplayName(void);
+    virtual const wxString GetName(void);
+    virtual const wxString GetCategory(void);
     virtual bool Execute(ITrackCancel* pTrackCancel);
     virtual bool Validate(void);
-    virtual GPParameters* GetParameterInfo(void);
+    virtual GPParameters GetParameterInfo(void);
 protected:
 	wxString m_sInputPath;
 };

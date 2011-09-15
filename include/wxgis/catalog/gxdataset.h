@@ -50,7 +50,7 @@ public:
 	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
 	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
 	//IGxDataset
-	virtual wxGISDatasetSPtr GetDataset(void);
+	virtual wxGISDatasetSPtr GetDataset(bool bCache = true, ITrackCancel* pTrackCancel = NULL);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISTableDataset;};
     virtual int GetSubType(void){return m_type;};
 protected:
@@ -89,7 +89,7 @@ public:
 	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
 	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
 	//IGxDataset
-	virtual wxGISDatasetSPtr GetDataset(void);
+	virtual wxGISDatasetSPtr GetDataset(bool bCache = true, ITrackCancel* pTrackCancel = NULL);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
     virtual int GetSubType(void){return (int)m_type;};
 protected:
@@ -128,7 +128,7 @@ public:
 	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
 	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
 	//IGxDataset
-	virtual wxGISDatasetSPtr GetDataset(void);
+	virtual wxGISDatasetSPtr GetDataset(bool bCached = true, ITrackCancel* pTrackCancel = NULL);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
     virtual int GetSubType(void){return (int)m_type;};
 protected:

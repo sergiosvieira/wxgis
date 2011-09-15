@@ -3,7 +3,7 @@
  * Purpose:  wxGxDiscConnectionUI class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2010-2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxdiscconnectionui.h"
 #include "wxgis/framework/progressdlg.h"
+#include "wxgis/core/globalfn.h"
 
 wxGxDiscConnectionUI::wxGxDiscConnectionUI(CPLString Path, wxString Name, wxIcon SmallIco, wxIcon LargeIco, wxIcon SmallIcoDsbl, wxIcon LargeIcoDsbl) : wxGxDiscConnection(Path, Name)
 {
@@ -84,19 +85,16 @@ bool wxGxDiscConnectionUI::Drop(const wxArrayString& filenames, bool bMove)
     CSLDestroy( papszFileList );
 
     //create progress dialog
-    ITrackCancel TrackCancel;
-    wxGISProgressDlg ProgressDlg(&TrackCancel, NULL);
-    wxWindowDisabler disableAll(&ProgressDlg);
-    ProgressDlg.Show(true);
-    IProgressor* pProgr1 = ProgressDlg.GetProgressor1();
-    pProgr1->SetRange(Array.size());
-
-    TrackCancel.SetProgressor(ProgressDlg.GetProgressor2());
+	wxString sTitle = wxString::Format(_("%s %d objects (files)"), bMove == true ? _("Move") : _("Copy"), filenames.GetCount());
+	wxWindow* pParentWnd = dynamic_cast<wxWindow*>(GetApplication());
+	wxGISProgressDlg ProgressDlg(sTitle, _("Begin operation..."), 100, pParentWnd, wxPD_APP_MODAL | wxPD_AUTO_HIDE | wxPD_SMOOTH | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME | wxPD_ESTIMATED_TIME | wxPD_REMAINING_TIME);
 
     for(size_t i = 0; i < Array.size(); ++i)
     {
-        pProgr1->SetValue(i);
-        if(!TrackCancel.Continue())
+		wxString sMessage = wxString::Format(_("%s %d object (file) from %d"), bMove == true ? _("Move") : _("Copy"), i + 1, Array.size());
+		ProgressDlg.SetTitle(sMessage);
+		ProgressDlg.PutMessage(sMessage);
+        if(!ProgressDlg.Continue())
             break;
 
         IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(Array[i]);
@@ -104,7 +102,7 @@ bool wxGxDiscConnectionUI::Drop(const wxArrayString& filenames, bool bMove)
         {
             if(bMove && pGxObjectEdit->CanMove(m_sPath))
             {
-                if(pGxObjectEdit->Move(m_sPath, &TrackCancel))
+                if(pGxObjectEdit->Move(m_sPath, &ProgressDlg))
                 {
                     bool ret_code = AddChild(Array[i]);
                     if(!ret_code)
@@ -119,7 +117,7 @@ bool wxGxDiscConnectionUI::Drop(const wxArrayString& filenames, bool bMove)
             }
             else if(!bMove && pGxObjectEdit->CanCopy(m_sPath))
             {
-                if(pGxObjectEdit->Copy(m_sPath, &TrackCancel))
+                if(pGxObjectEdit->Copy(m_sPath, &ProgressDlg))
                 {
                     bool ret_code = AddChild(Array[i]);
                     if(!ret_code)

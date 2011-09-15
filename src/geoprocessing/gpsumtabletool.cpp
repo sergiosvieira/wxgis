@@ -22,6 +22,7 @@
 #include "wxgis/geoprocessing/gptoolmngr.h"
 #include "wxgis/geoprocessing/gpdomain.h"
 #include "wxgis/geoprocessing/gpparam.h"
+#include "wxgis/geoprocessing/gptable.h"
 #include "wxgis/catalog/gxfilters.h"
 #include "wxgis/catalog/catop.h"
 #include "wxgis/datasource/table.h"
@@ -38,28 +39,26 @@ wxGISGPMeanByColumnTool::wxGISGPMeanByColumnTool(void) : wxGISGPTool()
 
 wxGISGPMeanByColumnTool::~wxGISGPMeanByColumnTool(void)
 {
-    for(size_t i = 0; i < m_pParamArr.size(); i++)
-        wxDELETE(m_pParamArr[i]);
 }
 
-wxString wxGISGPMeanByColumnTool::GetDisplayName(void)
+const wxString wxGISGPMeanByColumnTool::GetDisplayName(void)
 {
     return wxString(_("Calculate mean column data"));
 }
 
-wxString wxGISGPMeanByColumnTool::GetName(void)
+const wxString wxGISGPMeanByColumnTool::GetName(void)
 {
     return wxString(wxT("mean_by_col"));
 }
 
-wxString wxGISGPMeanByColumnTool::GetCategory(void)
+const wxString wxGISGPMeanByColumnTool::GetCategory(void)
 {
     return wxString(_("Statistics Tools/Table"));
 }
 
-GPParameters* wxGISGPMeanByColumnTool::GetParameterInfo(void)
+GPParameters wxGISGPMeanByColumnTool::GetParameterInfo(void)
 {
-    if(m_pParamArr.empty())
+    if(m_paParam.IsEmpty())
     {
         //src path
         wxGISGPParameter* pParam1 = new wxGISGPParameter();
@@ -73,7 +72,7 @@ GPParameters* wxGISGPMeanByColumnTool::GetParameterInfo(void)
         pDomain1->AddFilter(new wxGxDatasetFilter(enumGISTableDataset));
         pParam1->SetDomain(pDomain1);
 
-        m_pParamArr.push_back(pParam1);
+        m_paParam.Add(pParam1);
 
 		//field map
 		wxGISGPMultiParameter* pParam2 = new wxGISGPMultiParameter();
@@ -84,7 +83,7 @@ GPParameters* wxGISGPMeanByColumnTool::GetParameterInfo(void)
 		pParam2->AddColumn(_("Field name"));
 		pParam2->AddColumn(_("Operation"));
 
-        m_pParamArr.push_back(pParam2);
+        m_paParam.Add(pParam2);
 
         //dst path
         wxGISGPParameter* pParam3 = new wxGISGPParameter();
@@ -98,59 +97,59 @@ GPParameters* wxGISGPMeanByColumnTool::GetParameterInfo(void)
 		pDomain3->AddFilter(new wxGxTableFilter(enumTableCSV));
         pParam3->SetDomain(pDomain3);
 
-        m_pParamArr.push_back(pParam3);
+        m_paParam.Add(pParam3);
 
     }
-    return &m_pParamArr;
+    return m_paParam;
 }
 
 bool wxGISGPMeanByColumnTool::Validate(void)
 {
-    wxString sPath = m_pParamArr[0]->GetValue();
+    wxString sPath = m_paParam[0]->GetValue();
 	if(sPath.CmpNoCase(m_sInputPath) != 0)
     {
-        if(m_pParamArr[0]->GetIsValid())
+        if(m_paParam[0]->GetIsValid())
         {
             wxFileName Name(sPath);
             Name.SetName(Name.GetName() + wxString(wxT("_")) + GetName());
-            m_pParamArr[2]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
-            m_pParamArr[2]->SetAltered(true);//??
+            m_paParam[2]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
+            m_paParam[2]->SetAltered(true);//??
 
 			//fill fields list
 			IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
 			if(!pGxObjectContainer)
 			{
-				m_pParamArr[0]->SetIsValid(false);
-				m_pParamArr[0]->SetMessage(wxGISEnumGPMessageError, _("The GxCatalog is undefined type (not inherited from IGxObjectContainer)"));
+				m_paParam[0]->SetIsValid(false);
+				m_paParam[0]->SetMessage(wxGISEnumGPMessageError, _("The GxCatalog is undefined type (not inherited from IGxObjectContainer)"));
 				return false;
 			}
 			IGxObject* pGxObject = pGxObjectContainer->SearchChild(sPath);
 			if(!pGxObject)
 			{
-				m_pParamArr[0]->SetIsValid(false);
-				m_pParamArr[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("There is no GxObject for path %s"), sPath.c_str()));
+				m_paParam[0]->SetIsValid(false);
+				m_paParam[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("There is no GxObject for path %s"), sPath.c_str()));
 				return false;
 			}
 			IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pGxObject);
 			if(!pGxDataset)
 			{
-				m_pParamArr[0]->SetIsValid(false);
-				m_pParamArr[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("The input path is not GxDataset (Path %s)"), sPath.c_str()));
+				m_paParam[0]->SetIsValid(false);
+				m_paParam[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("The input path is not GxDataset (Path %s)"), sPath.c_str()));
 				return false;
 			}
            	wxGISTableSPtr pSrcTable = boost::dynamic_pointer_cast<wxGISTable>(pGxDataset->GetDataset());
 			if(!pSrcTable)
 			{
-				m_pParamArr[0]->SetIsValid(false);
-				m_pParamArr[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("The input path is not wxGISTable (Path %s)"), sPath.c_str()));
+				m_paParam[0]->SetIsValid(false);
+				m_paParam[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("The input path is not wxGISTable (Path %s)"), sPath.c_str()));
 				return false;
 			}
 			if(!pSrcTable->IsOpened())
 			{
 				if(!pSrcTable->Open())
 				{
-					m_pParamArr[0]->SetIsValid(false);
-					m_pParamArr[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("Failed open input path: %s)"), sPath.c_str()));
+					m_paParam[0]->SetIsValid(false);
+					m_paParam[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("Failed open input path: %s)"), sPath.c_str()));
 					return false;
 				}
 			}
@@ -158,11 +157,11 @@ bool wxGISGPMeanByColumnTool::Validate(void)
 			OGRFeatureDefn *pDef = pSrcTable->GetDefinition();
 			if(!pDef)
 			{
-				m_pParamArr[0]->SetIsValid(false);
-				m_pParamArr[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("Failed get table structure (Path %s)"), sPath.c_str()));
+				m_paParam[0]->SetIsValid(false);
+				m_paParam[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("Failed get table structure (Path %s)"), sPath.c_str()));
 				return false;
 			}
-			wxGISGPMultiParameter* pParam2 = dynamic_cast<wxGISGPMultiParameter*>(m_pParamArr[1]);
+			wxGISGPMultiParameter* pParam2 = dynamic_cast<wxGISGPMultiParameter*>(m_paParam[1]);
 			pParam2->Clear();
 			for(size_t i = 0; i < pDef->GetFieldCount(); ++i)
 			{
@@ -200,16 +199,16 @@ bool wxGISGPMeanByColumnTool::Validate(void)
 
 				pParam2->AddParameter(1, i, pParamP2);
 			}
-			m_pParamArr[1]->SetHasBeenValidated(false);
-			m_pParamArr[1]->SetAltered(false);
+			m_paParam[1]->SetHasBeenValidated(false);
+			m_paParam[1]->SetAltered(false);
 			m_sInputPath = sPath;
 		}
     }
-    if(m_pParamArr[1]->GetAltered())
+    if(m_paParam[1]->GetAltered())
     {
 		//check column 1 have the only one base field value
 		int nBaseFieldCount = 0;
-		wxGISGPMultiParameter* pParam2 = dynamic_cast<wxGISGPMultiParameter*>(m_pParamArr[1]);
+		wxGISGPMultiParameter* pParam2 = dynamic_cast<wxGISGPMultiParameter*>(m_paParam[1]);
 		for(size_t i = 0; i < pParam2->GetRowCount(); ++i)
 		{
 			IGPParameter* pCellParam = pParam2->GetParameter(1, i);
@@ -218,14 +217,14 @@ bool wxGISGPMeanByColumnTool::Validate(void)
 		}
 		if(nBaseFieldCount != 1)
 		{
-            m_pParamArr[1]->SetIsValid(false);
-			m_pParamArr[1]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("The base field count should be 1 (current count is %d)"), nBaseFieldCount));
+            m_paParam[1]->SetIsValid(false);
+			m_paParam[1]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("The base field count should be 1 (current count is %d)"), nBaseFieldCount));
             return false;
 		}
 		else
 		{
-            m_pParamArr[1]->SetIsValid(true);
-			m_pParamArr[1]->SetMessage(wxGISEnumGPMessageOk);
+            m_paParam[1]->SetIsValid(true);
+			m_paParam[1]->SetMessage(wxGISEnumGPMessageOk);
 		}
 	}
     return true;
@@ -250,7 +249,7 @@ bool wxGISGPMeanByColumnTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
 
-    wxString sSrcPath = m_pParamArr[0]->GetValue();
+    wxString sSrcPath = m_paParam[0]->GetValue();
     IGxObject* pGxObject = pGxObjectContainer->SearchChild(sSrcPath);
     if(!pGxObject)
     {
@@ -287,29 +286,22 @@ bool wxGISGPMeanByColumnTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
     
-    wxString sDstPath = m_pParamArr[2]->GetValue();
+    wxString sDstPath = m_paParam[2]->GetValue();
 
 	//check overwrite & do it!
 	if(!OverWriteGxObject(pGxObjectContainer->SearchChild(sDstPath), pTrackCancel))
 		return false;
 
-    wxFileName sDstFileName(sDstPath);
-
-    wxString sPath = sDstFileName.GetPath();
-    IGxObject* pGxDstFolder = pGxObjectContainer->SearchChild(sPath);
-    if(!pGxDstFolder)
-    {
-        //add messages to pTrackCancel
-        if(pTrackCancel)
-            pTrackCancel->PutMessage(_("Failed get destination object"), -1, enumGISMessageErr);
+	IGxObject* pGxDstObject = GetParentGxObjectFromPath(sDstPath, pGxObjectContainer, pTrackCancel);
+    if(!pGxDstObject)
         return false;
-    }
 
-    CPLString szPath = pGxDstFolder->GetInternalName();
+    CPLString szPath = pGxDstObject->GetInternalName();
+    wxFileName sDstFileName(sDstPath);
     wxString sName = sDstFileName.GetName();
     
-    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[2]->GetDomain());
-	IGxObjectFilter* pFilter = pDomain->GetFilter(m_pParamArr[2]->GetSelDomainValue());
+    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_paParam[2]->GetDomain());
+	IGxObjectFilter* pFilter = pDomain->GetFilter(m_paParam[2]->GetSelDomainValue());
     if(!pFilter)
     {
         //add messages to pTrackCancel
@@ -319,7 +311,7 @@ bool wxGISGPMeanByColumnTool::Execute(ITrackCancel* pTrackCancel)
     }
 
 	std::vector<FIELDMERGEDATA> FieldMergeData;
-	wxGISGPMultiParameter* pParam2 = dynamic_cast<wxGISGPMultiParameter*>(m_pParamArr[1]);
+	wxGISGPMultiParameter* pParam2 = dynamic_cast<wxGISGPMultiParameter*>(m_paParam[1]);
 	for(size_t i = 0; i < pParam2->GetRowCount(); ++i)
 	{
 		IGPParameter* pCellParam = pParam2->GetParameter(1, i);
@@ -362,13 +354,8 @@ bool wxGISGPMeanByColumnTool::Execute(ITrackCancel* pTrackCancel)
 
     bool bRes = MeanValByColumn(pSrcTable, szPath, sName, FieldMergeData, pFilter, NULL, pTrackCancel);
 
-    IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
-    if(pCont)
-    {
-        IGxObject* pParentLoc = pCont->SearchChild(sPath);
-        if(pParentLoc)
-            pParentLoc->Refresh();
-    }
+    if(pGxDstObject)
+        pGxDstObject->Refresh();
 
     return bRes;
 }

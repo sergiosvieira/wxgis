@@ -25,8 +25,9 @@
 /// Class wxGISGPValueDomain
 ///////////////////////////////////////////////////////////////////////////////
 
-wxGISGPValueDomain::wxGISGPValueDomain(void)
+wxGISGPValueDomain::wxGISGPValueDomain(void) 
 {
+	m_bAltered = false;
 }
 
 wxGISGPValueDomain::~wxGISGPValueDomain(void)
@@ -53,6 +54,13 @@ wxVariant wxGISGPValueDomain::GetValue(size_t nIndex)
 wxString wxGISGPValueDomain::GetName(size_t nIndex)
 { 
 	return m_asoNames[nIndex]; 
+}
+
+void wxGISGPValueDomain::Clear(void)
+{
+	m_asoData.clear();
+	m_asoNames.Empty();
+	m_bAltered = true;
 }
 
 wxVariant wxGISGPValueDomain::GetValueByName(wxString soNameStr)

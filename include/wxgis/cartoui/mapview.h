@@ -20,137 +20,106 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/cartoui/cartoui.h"
+#include "wxgis/display/gisdisplay.h"
 #include "wxgis/carto/map.h"
-#include "wxgis/framework/animation.h"
-
-#include <wx/scrolwin.h>
-#include <wx/tipwin.h>
-
-///** \enum wxGISEnumMouseState
-//    \brief A mouse state.
-//*/
-//enum wxGISEnumMouseState
-//{
-//	enumGISMouseNone = 0x0000, 
-//	enumGISMouseLeftDown = 0x0001,
-//	enumGISMouseRightDown = 0x0002,
-//	enumGISMouseWheel = 0x0004
-//};
-
-class wxGISMapView;
-
-//wxDrawingThread
-class wxDrawingThread : public wxThread
-{
-public:
-	//wxDrawingThread(IwxGISCachedDisplay* pGISScreenDisplay, wxWindow* pWindow, std::vector<IwxGISLayer*>& Layers, ITrackCancel* pTrackCancel);
-	wxDrawingThread(wxGISMapView* pView, std::vector<wxGISLayer*>& Layers);
-    virtual void *Entry();
-    virtual void OnExit();
-private:
-    ITrackCancel* m_pTrackCancel;
-	ICachedDisplay* m_pGISScreenDisplay;
-	std::vector<wxGISLayer*>& m_Layers;
-	wxGISMapView* m_pView;
-};
+#include "wxgis/cartoui/cartoui.h"
 
 class WXDLLIMPEXP_GIS_CTU wxGISMapView;
 
-//ExtenStack
-class WXDLLIMPEXP_GIS_CTU ExtenStack
+/** \class wxMapDrawingThread mapview.h
+    \brief A Map Drawing thread class.
+
+    This is class for showing maps.
+*/
+
+class wxMapDrawingThread : public wxThread
 {
 public:
-	ExtenStack(wxGISMapView* pView);
-	virtual bool CanRedo();
-	virtual bool CanUndo();
-	virtual void Do(OGREnvelope NewEnv);
-	virtual void Redo();
-	virtual void Undo();
-	virtual void Reset();
-	virtual size_t GetSize();
-protected:
-	virtual void SetExtent(OGREnvelope Env);
-protected:
+	wxMapDrawingThread(wxGISMapView* pView);
+    virtual void *Entry();
+    virtual void OnExit();
+private:
+//    ITrackCancel* m_pTrackCancel;
 	wxGISMapView* m_pView;
-	std::vector<OGREnvelope> m_EnvelopeArray;
-	int m_Pos;
 };
 
-//wxGISMapView
+/** \class wxGISMapView mapview.h
+    \brief A Map View .
+
+    This is class for showing maps.
+*/
+
 class WXDLLIMPEXP_GIS_CTU wxGISMapView :
-	public wxScrolledWindow,
-	public wxGISMap
+	public wxWindow,
+	public wxGISExtentStack, 
+	public wxGISConnectionPointContainer
 {
     DECLARE_CLASS(wxGISMapView)
-    enum
+	enum
     {
-        TIMER_ID = 1013
+        TIMER_ID = 1015
     };
 public:
-	friend class ExtenStack;
+	friend class wxMapDrawingThread;
 public:
     wxGISMapView(void);
-	wxGISMapView(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxSTATIC_BORDER|wxTAB_TRAVERSAL);
+	wxGISMapView(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL);//wxSTATIC_BORDER|
 	virtual ~wxGISMapView(void);
-    bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxSTATIC_BORDER|wxTAB_TRAVERSAL, const wxString& name = wxT("GISMapView"));
-	virtual void OnDraw(wxDC& dc);
+    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("GISMapView"));//wxSTATIC_BORDER|
+	virtual void SetTrackCancel(ITrackCancel* pTrackCancel);
+	virtual wxGISDisplay* GetDisplay(void){return m_pGISDisplay;};
+	//wxGISExtentStack
+	virtual bool AddLayer(wxGISLayerSPtr pLayer);
+	virtual void Clear(void);
+	virtual void SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference);
+	virtual void SetExtent(OGREnvelope &Env);
+	virtual void SetFullExtent(void);
+	virtual OGREnvelope GetFullExtent(void);
+	//
+	virtual double GetScaleRatio(OGREnvelope &Bounds, wxDC &dc);
 	virtual void PanStart(wxPoint MouseLocation);
 	virtual void PanMoveTo(wxPoint MouseLocation);
 	virtual void PanStop(wxPoint MouseLocation);
-	//wxGISMap
-	virtual void AddLayer(wxGISLayer* pLayer);
-	virtual void ClearLayers(void);
-	virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference);
-	//wxGISMapView
-	void OnThreadExit(void);
-	virtual ICachedDisplay* GetCachedDisplay(void){return pGISScreenDisplay;};
-	virtual ITrackCancel* GetTrackCancel(void){return m_pTrackCancel;};
-	virtual void SetTrackCancel(ITrackCancel* pTrackCancel);
-	virtual void SetFullExtent(void);
-	virtual void SetExtent(OGREnvelope Env);
-	virtual ExtenStack* GetExtenStack(void){return m_pExtenStack;};
+	virtual void RotateStart(wxPoint MouseLocation);
+	virtual void RotateBy(wxPoint MouseLocation);
+	virtual void RotateStop(wxPoint MouseLocation);
+	virtual void SetRotate(double dAngleRad);
+	virtual double GetCurrentRotate(void);
 protected:
 	//events
+	virtual void OnPaint(wxPaintEvent & event);
 	virtual void OnEraseBackground(wxEraseEvent & event);
 	virtual void OnSize(wxSizeEvent & event);
-	virtual void OnKeyDown(wxKeyEvent & event);
-	virtual void OnMouseWheel(wxMouseEvent& event);
     virtual void OnTimer( wxTimerEvent & event);
+	virtual void OnKeyDown(wxKeyEvent & event);
     virtual void OnCaptureLost(wxMouseCaptureLostEvent & event);
+	virtual void OnMouseWheel(wxMouseEvent& event);
+	//
+	virtual void OnDrawThreadStart(void);
+	virtual void OnDrawThreadStop(void);
+	virtual void CancelDrawThread(void);
+	virtual void OnDraw(wxGISEnumDrawPhase nPhase);
+	//misc
+	virtual void DrawToolTip(wxClientDC &dc, wxString &sText);
+	virtual OGREnvelope CreateEnvelopeFromZoomFactor(double dZoom);
+	virtual void UpdateFrameCenter(void);
+	//virtual void FillClipGeometry(wxRect rect, wxCoord x, wxCoord y);
 protected:
-	ICachedDisplay* pGISScreenDisplay;
-	WXDWORD m_MouseState;
-	WXDWORD m_MapToolState;
-	ITrackCancel* m_pTrackCancel;
-	wxDrawingThread* m_pThread;
-	IProgressor* m_pAni;
-	wxCriticalSection m_CriticalSection;
+	wxGISDisplay *m_pGISDisplay;
 	wxTimer m_timer;
-	wxRect m_virtualrc;
-	OGREnvelope m_virtualbounds;
+	wxMapDrawingThread *m_pMapDrawingThread;
+	ITrackCancel *m_pTrackCancel; 
+	IProgressor *m_pAni;
+	WXDWORD m_nDrawingState;
+	double m_nFactor;
 	wxPoint m_StartMouseLocation;
-	bool m_bZoomIn;
-	ExtenStack* m_pExtenStack;
+	wxPoint m_FrameCenter;
+	double m_dOriginAngle;
+	double m_dCurrentAngle;
+
+	wxCriticalSection m_CritSect;
+
+	wxGISPointsArray m_ClipGeometry;
 
 	DECLARE_EVENT_TABLE()
 };
-
-//Here's the basic idea behind display caching. The main application window is controlled by a view (IActiveView).
-//There are currently two view coclasses implemented: Map (data view) and PageLayout (layout view).
-//ScreenDisplay makes it possible for clients to create any number of caches (a cache is just a device dependent bitmap).
-//When a cache is created, the client gets a cacheID. The id is used to specify the active cache (last argument of StartDrawing, i.e.,
-//where output is directed), invalidate the cache, or draw the cache to a destination HDC. In addition to dynamic caches, the
-//ScreenDisplay also provides a recording cache that accumulates all drawing that happens on the display.
-//Clients manage recording using the StartRecording and FinishRecording methods.
-
-//In the simplest case, Map creates one cache for all the layers, another cache if there are annotation or graphics, and a third cache if there's a feature selection. It also records all output. (In addition to these caches, it's also possible for individual layers to request a private cache by returning true for their Cached property. If a layer requests a cache, the Map creates a separate cache for the layer and groups the layers above and below it into different caches.) The IActiveView::PartialRefresh method uses it's knowledge of the cache layout to invalidate as little as possible so that we can draw as much as possible from cache. Given these caches, all of the following scenarios are possible:
-//
-//Use the recording cache to redraw when the application is moved or exposed or when drawing editing rubberbanding. This is very efficient since only one BitBlt is needed.
-//Select a new set of features, invalidate only the selection cache. Features draw from cache. Graphics and annotation draw from cache. Only the feature selection draws from scratch.
-//Move a graphic element or annotation over some features. Only invalidate the annotation cache. Features draw from cache. Feature selection draws from cache. Only the annotation draws from scratch.
-//Create a new kind of layer called a tracking layer. Always return true for it's cached property. To show vehicle movement when new GPS signals are received, move the markers in the layer and only invalidate the tracking layer. All other layers draw from cache. Only the vehicle layer draws from scratch. This makes it possible to animate a layer.
-//Create a basemap by moving several layers into a group layer and setting the group layer's Cached property to true. Now you can edit and interact with layers that draw on top of the basemap without having to redraw the basemap from scratch.
-//The concept of a display filter allows raster operations to be performed on any kind of layer including feature layers that use custom symbols. It will be possible to create a slider dialog that attaches to a layer. It sets the layer's Cached property to true and uses a transparency display filter to interactively control the layer's transparency using the slider. Other display filters can be created to implement clipping, contrast, brightness, etc.
-
-

@@ -3,7 +3,7 @@
  * Purpose:  wxGISSpatialReferenceValidator class. Return SpatialReference limits
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #pragma once
 
 #include "wxgis/datasource/datasource.h"
-
+/*
 class WXDLLIMPEXP_GIS_DS wxGISSpatialReferenceValidator
 {
 public:
@@ -38,3 +38,9 @@ protected:
     wxString m_sPath;
     std::map<wxString, LIMITS> m_DataMap;
 };
+
+//use hashmap
+//use EPSG ID
+//save changes
+//may be not in zip but still to save SP to zip should be there
+*/

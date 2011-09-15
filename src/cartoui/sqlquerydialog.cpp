@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  class wxGISSQLQueryDialog show SQL expression form.
+ * Purpose:  wxGISRasterDatasetCmd main header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
@@ -21,49 +21,38 @@
 
 #include "wxgis/cartoui/sqlquerydialog.h"
 
-BEGIN_EVENT_TABLE(wxGISSQLQueryDialog, wxDialog)
-    EVT_BUTTON(ID_GETUNIQVALUESBT, wxGISSQLQueryDialog::OnGetUniqValues)
-    EVT_UPDATE_UI(ID_GETUNIQVALUESBT, wxGISSQLQueryDialog::OnGetUniqValuesUI)
-END_EVENT_TABLE()
-
-wxGISSQLQueryDialog::wxGISSQLQueryDialog( wxWindow* parent, WXDWORD nButtons, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_bDocSet(false)
+wxGISSQLQueryDialog::wxGISSQLQueryDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
-
-	if(m_bDocSet)
-	{
 	
-		fgSizer1 = new wxFlexGridSizer( 2, 2, 0, 0 );
-		fgSizer1->AddGrowableCol( 1 );
-		fgSizer1->SetFlexibleDirection( wxHORIZONTAL );
-		fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-		
-		m_staticText1 = new wxStaticText( this, wxID_ANY, _("Layer:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-		m_staticText1->Wrap( -1 );
-		fgSizer1->Add( m_staticText1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
-		
-		m_SelLayerComboBox = new wxComboBox( this, ID_M_SELLAYERCOMBOBOX, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
-		fgSizer1->Add( m_SelLayerComboBox, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
-		
-		m_staticText2 = new wxStaticText( this, wxID_ANY, _("Method:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-		m_staticText2->Wrap( -1 );
-		fgSizer1->Add( m_staticText2, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-		
-		m_MethodSelComboBox = new wxComboBox( this, ID_M_METHODSELCOMBOBOX, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
-		fgSizer1->Add( m_MethodSelComboBox, 0, wxALL|wxEXPAND, 5 );
+	fgSizer1 = new wxFlexGridSizer( 2, 2, 0, 0 );
+	fgSizer1->AddGrowableCol( 1 );
+	fgSizer1->SetFlexibleDirection( wxHORIZONTAL );
+	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-		bMainSizer->Add( fgSizer1, 0, wxEXPAND, 5 );
-	}
-
+	m_staticText1 = new wxStaticText( this, wxID_ANY, _("Layer:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+	m_staticText1->Wrap( -1 );
+	fgSizer1->Add( m_staticText1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_SelLayerComboBox = new wxComboBox( this, ID_M_SELLAYERCOMBOBOX, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
+	fgSizer1->Add( m_SelLayerComboBox, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticText2 = new wxStaticText( this, wxID_ANY, _("Method:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+	m_staticText2->Wrap( -1 );
+	fgSizer1->Add( m_staticText2, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	m_MethodSelComboBox = new wxComboBox( this, ID_M_METHODSELCOMBOBOX, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
+	fgSizer1->Add( m_MethodSelComboBox, 0, wxALL|wxEXPAND, 5 );
+	
+	bMainSizer->Add( fgSizer1, 0, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer12;
 	bSizer12 = new wxBoxSizer( wxHORIZONTAL );
 	
-	wxArrayString FieldsArray;
-	m_FieldsList = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, FieldsArray, wxLC_SINGLE_SEL | wxLC_SORT_ASCENDING );
-	bSizer12->Add( m_FieldsList, 1, wxALL|wxEXPAND, 5 );
+	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer12->Add( m_textCtrl8, 1, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer13;
 	bSizer13 = new wxBoxSizer( wxVERTICAL );
@@ -167,25 +156,22 @@ wxGISSQLQueryDialog::wxGISSQLQueryDialog( wxWindow* parent, WXDWORD nButtons, wx
 	wxBoxSizer* bSizer15;
 	bSizer15 = new wxBoxSizer( wxVERTICAL );
 	
-	wxArrayString ValuesArray;
-	m_UniqValues = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ValuesArray, wxLC_SINGLE_SEL | wxLC_SORT_ASCENDING );
-	bSizer15->Add( m_UniqValues, 1, wxALL|wxEXPAND, 5 );
-	m_UniqValues->Disable();
+	m_textCtrl9 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer15->Add( m_textCtrl9, 1, wxALL|wxEXPAND, 5 );
 	
-	m_getuniqvalsbutton = new wxButton( this, ID_GETUNIQVALUESBT, _("Get values"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer15->Add( m_getuniqvalsbutton, 0, wxALL, 5 );
-	m_getuniqvalsbutton->Disable();
+	m_button33 = new wxButton( this, wxID_ANY, _("MyButton"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer15->Add( m_button33, 0, wxALL, 5 );
 	
 	bSizer14->Add( bSizer15, 1, wxEXPAND, 5 );
 	
 	bMainSizer->Add( bSizer14, 0, wxEXPAND, 5 );
 	
-	m_SelectStaticText = new wxStaticText( this, ID_M_SELECTSTATICTEXT, wxString::Format(_("SELECT * FROM %s WHERE:"), wxT("tablename")), wxDefaultPosition, wxDefaultSize, 0 );
+	m_SelectStaticText = new wxStaticText( this, ID_M_SELECTSTATICTEXT, _("SELECT * FROM tablename WHERE:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_SelectStaticText->Wrap( -1 );
 	bMainSizer->Add( m_SelectStaticText, 0, wxALL|wxEXPAND, 5 );
 	
-	m_Expression = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bMainSizer->Add( m_Expression, 1, wxALL|wxEXPAND, 5 );
+	m_textCtrl10 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bMainSizer->Add( m_textCtrl10, 1, wxALL|wxEXPAND, 5 );
 	
 	bButtonsSizer = new wxBoxSizer( wxHORIZONTAL );
 	
@@ -212,25 +198,14 @@ wxGISSQLQueryDialog::wxGISSQLQueryDialog( wxWindow* parent, WXDWORD nButtons, wx
 	bMainSizer->Add( m_staticline1, 0, wxEXPAND | wxALL, 5 );
 	
 	m_sdbSizer = new wxStdDialogButtonSizer();
-	if(nButtons & enumGISDBOK)
-	{
-		m_sdbSizerOK = new wxButton( this, wxID_OK );
-		m_sdbSizer->AddButton( m_sdbSizerOK );
-	}
-	if(nButtons & enumGISDBApply)
-	{
-		m_sdbSizerApply = new wxButton( this, wxID_APPLY );
-		m_sdbSizer->AddButton( m_sdbSizerApply );
-	}
-	if(nButtons & enumGISDBCancel)
-	{
-		m_sdbSizerCancel = new wxButton( this, wxID_CANCEL );
-		m_sdbSizer->AddButton( m_sdbSizerCancel );
-	}
+	m_sdbSizerOK = new wxButton( this, wxID_OK );
+	m_sdbSizer->AddButton( m_sdbSizerOK );
+	m_sdbSizerApply = new wxButton( this, wxID_APPLY );
+	m_sdbSizer->AddButton( m_sdbSizerApply );
+	m_sdbSizerCancel = new wxButton( this, wxID_CANCEL );
+	m_sdbSizer->AddButton( m_sdbSizerCancel );
 	m_sdbSizer->Realize();
 	bMainSizer->Add( m_sdbSizer, 0, wxEXPAND|wxALL, 5 );
-
-    SetMinSize(wxSize(320,520));
 	
 	this->SetSizer( bMainSizer );
 	this->Layout();
@@ -240,55 +215,4 @@ wxGISSQLQueryDialog::wxGISSQLQueryDialog( wxWindow* parent, WXDWORD nButtons, wx
 
 wxGISSQLQueryDialog::~wxGISSQLQueryDialog()
 {
-}
-
-void wxGISSQLQueryDialog::SetDataset( wxGISTableSPtr pDataset )
-{
-	m_pDataset = pDataset;
-	wxArrayString FieldsArray;
-	if(m_pDataset)
-	{
-		OGRFeatureDefn* pFeatureDefn = m_pDataset->GetDefinition();
-		if(pFeatureDefn)
-		{
-			for(size_t i = 0; i < pFeatureDefn->GetFieldCount(); ++i)
-			{
-				OGRFieldDefn *pFieldDefn = pFeatureDefn->GetFieldDefn(i);
-				if(pFieldDefn->GetType() == OFTBinary || pFieldDefn->GetType() >= OFTMaxType)
-					continue;
-				FieldsArray.Add(wxString(pFieldDefn->GetNameRef(), wxConvLocal));
-			}
-		}
-		m_SelectStaticText->SetLabel(wxString::Format(_("SELECT * FROM %s WHERE:"), m_pDataset->GetName().c_str()));
-	}
-	m_FieldsList->Set(FieldsArray);
-}
-
-wxString wxGISSQLQueryDialog::GetExpression(void)
-{
-	return m_Expression->GetValue();
-}
-
-void wxGISSQLQueryDialog::OnGetUniqValues(wxCommandEvent& event)
-{
-	wxString sSQLExpr = wxString::Format(wxT("SELECT DISTINCT %s FROM %s"), m_FieldsList->GetStringSelection().c_str(), m_pDataset->GetName().c_str());
-	wxGISTableSPtr pResTab = boost::dynamic_pointer_cast<wxGISTable>(m_pDataset->ExecuteSQL( sSQLExpr ) );
-	if(!pResTab)
-		return;
-
-	OGRFeatureSPtr pFeature;
-	wxArrayString ValuesArray;
-	while((pFeature = pResTab->Next()) != NULL)
-	{
-		wxString sUniqVal(pFeature->GetFieldAsString(0), wxConvLocal);
-		ValuesArray.Add(sUniqVal);
-	}
-	m_FieldsList->Set(ValuesArray);
-}
-
-void wxGISSQLQueryDialog::OnGetUniqValuesUI(wxUpdateUIEvent& event)
-{
-	bool bEnable = m_FieldsList->GetSelection() != wxNOT_FOUND;
-	m_UniqValues->Enable(bEnable);
-	event.Enable(bEnable);
 }

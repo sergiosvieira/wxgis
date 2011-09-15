@@ -21,5 +21,6 @@
 
 #include "wxgis/catalog/catalog.h"
 
-bool WXDLLIMPEXP_GIS_CLT OverWriteGxObject(IGxObject* pGxObject, ITrackCancel* pTrackCancel);
+bool WXDLLIMPEXP_GIS_CLT OverWriteGxObject(IGxObject* pGxObject, ITrackCancel* pTrackCancel = NULL);
+IGxObject WXDLLIMPEXP_GIS_CLT *GetParentGxObjectFromPath(const wxString &sFullPath, IGxObjectContainer* pGxObjectContainer, ITrackCancel* pTrackCancel = NULL);
 

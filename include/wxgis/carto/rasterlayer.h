@@ -1,9 +1,9 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  RasterLayer header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -23,23 +23,34 @@
 #include "wxgis/carto/carto.h"
 #include "wxgis/datasource/rasterdataset.h"
 
+/** \class wxGISRasterLayer rasterlayer.h
+    \brief The class represent raster datasource in map.
+*/
 class WXDLLIMPEXP_GIS_CRT wxGISRasterLayer :
 	public wxGISLayer
 {
 public:
 	wxGISRasterLayer(wxGISDatasetSPtr pwxGISDataset);
 	virtual ~wxGISRasterLayer(void);
-//IwxGISLayer
-	virtual void Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisplay, ITrackCancel* pTrackCancel);
-	virtual OGRSpatialReference* GetSpatialReference(void);
-    virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference){};
-	virtual const OGREnvelope* GetEnvelope(void);
+//wxGISLayer
+	virtual OGRSpatialReferenceSPtr GetSpatialReference(void);
+	virtual void SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference);
+	virtual bool Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
+	virtual OGREnvelope GetEnvelope(void);
 	virtual bool IsValid(void);
 //wxGISRasterLayer
-	virtual IRasterRenderer* GetRenderer(void){return m_pRasterRenderer;};
-	virtual void SetRenderer(IRasterRenderer* pRasterRenderer){m_pRasterRenderer = pRasterRenderer;};
+	virtual IRasterRendererSPtr GetRenderer(void){return m_pRasterRenderer;};
+	virtual void SetRenderer(IRasterRendererSPtr pRasterRenderer){m_pRasterRenderer = pRasterRenderer;};
+protected:
+	virtual bool GetPixelData(OGREnvelope& stEnvelope, RAWPIXELDATA &stPixelData, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
 protected:
 	wxGISRasterDatasetSPtr m_pwxGISRasterDataset;
-	IRasterRenderer* m_pRasterRenderer;
-	OGREnvelope m_pPreviousDisplayEnv;
+    OGRSpatialReferenceSPtr m_pSpatialReference;
+
+	OGREnvelope m_FullEnvelope;
+	//OGREnvelope m_PreviousEnvelope;
+
+	IRasterRendererSPtr m_pRasterRenderer;
 };
+
+DEFINE_SHARED_PTR(wxGISRasterLayer);

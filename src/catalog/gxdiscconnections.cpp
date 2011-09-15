@@ -19,11 +19,11 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxdiscconnections.h"
+#include "wxgis/core/config.h"
 #include "wxgis/catalog/gxdiscconnection.h"
 
 #include "wx/volume.h"
 #include "wx/dir.h"
-#include "wx/stdpaths.h"
 
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxDiscConnections, wxObject)
@@ -32,10 +32,12 @@ wxGxDiscConnections::wxGxDiscConnections(void) : m_bIsChildrenLoaded(false)
 {
     m_bEnabled = true;
     //get config path
-    wxStandardPaths stp;
-    m_sUserConfigDir = stp.GetUserConfigDir() + wxFileName::GetPathSeparator() + wxString(CONFIG_DIR) + wxFileName::GetPathSeparator() + wxString(CONNDIR);
-    m_sUserConfig = m_sUserConfigDir + wxFileName::GetPathSeparator() + wxString(CONNCONF);
-
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(pConfig)
+	{
+		m_sUserConfigDir = pConfig->GetLocalConfigDir() + wxFileName::GetPathSeparator() + wxString(CONNDIR);
+		m_sUserConfig = m_sUserConfigDir + wxFileName::GetPathSeparator() + wxString(CONNCONF);
+	}
 }
 
 wxGxDiscConnections::~wxGxDiscConnections(void)
@@ -45,6 +47,7 @@ wxGxDiscConnections::~wxGxDiscConnections(void)
 void wxGxDiscConnections::Detach(void)
 {
 	EmptyChildren();
+    IGxObject::Detach();
 }
 
 void wxGxDiscConnections::Refresh(void)
@@ -63,8 +66,8 @@ void wxGxDiscConnections::Init(wxXmlNode* const pConfigNode)
 		wxXmlNode* pDiscConn = pConnectionsNode->GetChildren();
 		while(pDiscConn)
 		{
-			wxString sName = pDiscConn->GetPropVal(wxT("name"), NONAME);
-			wxString sPath = pDiscConn->GetPropVal(wxT("path"), ERR);
+			wxString sName = pDiscConn->GetAttribute(wxT("name"), NONAME);
+			wxString sPath = pDiscConn->GetAttribute(wxT("path"), ERR);
 			if(sPath != ERR)
 			{
                 CONN_DATA data = {sName, sPath.mb_str(wxConvUTF8)};
@@ -86,7 +89,7 @@ void wxGxDiscConnections::Init(wxXmlNode* const pConfigNode)
         arr.Add(stp.GetUserConfigDir());
 //      arr.Add(stp.GetDataDir());
 #endif
-        for(size_t i = 0; i < arr.size(); i++)
+        for(size_t i = 0; i < arr.size(); ++i)
 		{
             CONN_DATA data = {arr[i], arr[i].mb_str(wxConvUTF8)};
             m_aConnections.push_back(data);
@@ -94,22 +97,15 @@ void wxGxDiscConnections::Init(wxXmlNode* const pConfigNode)
 	}
 }
 
-wxXmlNode* wxGxDiscConnections::GetProperties(void)
+void wxGxDiscConnections::Serialize(wxXmlNode* pConfigNode)
 {
-    wxXmlNode* pNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("rootitem"));
-    wxClassInfo* pInfo = GetClassInfo();
-    if(pInfo)
-        pNode->AddProperty(wxT("name"), pInfo->GetClassName());
-    pNode->AddProperty(wxT("is_enabled"), m_bEnabled == true ? wxT("1") : wxT("0"));    
     StoreConnections();
-
-    return pNode;
 }
 
 void wxGxDiscConnections::EmptyChildren(void)
 {
     m_aConnections.clear();
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
         wxGxDiscConnection* pwxGxDiscConnection = dynamic_cast<wxGxDiscConnection*>(m_Children[i]);
         if(pwxGxDiscConnection)
@@ -141,7 +137,7 @@ void wxGxDiscConnections::LoadChildren(void)
 	if(m_bIsChildrenLoaded)
 		return;	
 
-    for(size_t i = 0; i < m_aConnections.size(); i++)
+    for(size_t i = 0; i < m_aConnections.size(); ++i)
     {
         wxGxDiscConnection* pwxGxDiscConnection = new wxGxDiscConnection(m_aConnections[i].sPath, m_aConnections[i].sName);
         IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
@@ -156,7 +152,7 @@ IGxObject* wxGxDiscConnections::ConnectFolder(wxString sPath)
 {
     IGxObject* pReturnObj(NULL);
 
-    for(size_t i = 0; i < m_Children.size(); i++)
+    for(size_t i = 0; i < m_Children.size(); ++i)
     {
         wxGxDiscConnection* pConn = dynamic_cast<wxGxDiscConnection*>(m_Children[i]);
         if(pConn)
@@ -189,7 +185,7 @@ IGxObject* wxGxDiscConnections::ConnectFolder(wxString sPath)
 
 void wxGxDiscConnections::DisconnectFolder(CPLString sPath)
 {
-    for(size_t i = 0; i < m_Children.size(); i++)
+    for(size_t i = 0; i < m_Children.size(); ++i)
     {
         wxGxDiscConnection* pConn = dynamic_cast<wxGxDiscConnection*>(m_Children[i]);
         if(pConn)
@@ -213,23 +209,23 @@ void wxGxDiscConnections::StoreConnections(void)
     wxXmlDocument doc;
     wxXmlNode* pRootNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("DiscConnections"));
     doc.SetRoot(pRootNode);
-    for(size_t i = 0; i < m_Children.size(); i++)
+    for(size_t i = 0; i < m_Children.size(); ++i)
     {
         wxGxDiscConnection* pwxGxDiscConnection = dynamic_cast<wxGxDiscConnection*>(m_Children[i]);
         if(pwxGxDiscConnection)
         {
 	        wxXmlNode* pDiscConn = new wxXmlNode(pRootNode, wxXML_ELEMENT_NODE, wxT("DiscConnection"));
-	        pDiscConn->AddProperty(wxT("name"), pwxGxDiscConnection->GetName());
-	        pDiscConn->AddProperty(wxT("path"), wxString(pwxGxDiscConnection->GetInternalName(), wxConvUTF8));
+	        pDiscConn->AddAttribute(wxT("name"), pwxGxDiscConnection->GetName());
+	        pDiscConn->AddAttribute(wxT("path"), wxString(pwxGxDiscConnection->GetInternalName(), wxConvUTF8));
         }
     }
     if(m_Children.empty() && !m_aConnections.empty())
     {
-        for(size_t i = 0; i < m_aConnections.size(); i++)
+        for(size_t i = 0; i < m_aConnections.size(); ++i)
         {
 	        wxXmlNode* pDiscConn = new wxXmlNode(pRootNode, wxXML_ELEMENT_NODE, wxT("DiscConnection"));
-	        pDiscConn->AddProperty(wxT("name"), m_aConnections[i].sName);
-	        pDiscConn->AddProperty(wxT("path"), wxString(m_aConnections[i].sPath, wxConvUTF8));
+	        pDiscConn->AddAttribute(wxT("name"), m_aConnections[i].sName);
+	        pDiscConn->AddAttribute(wxT("path"), wxString(m_aConnections[i].sPath, wxConvUTF8));
         }
     }
     doc.Save(m_sUserConfig);

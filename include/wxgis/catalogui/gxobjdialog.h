@@ -42,8 +42,6 @@
 #include <wx/dialog.h>
 
 #include "wxgis/core/config.h"
-#include "wxgis/catalogui/catalogui.h"
-#include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/gxcontentview.h"
 #include "wxgis/catalogui/gxtreeview.h"
 
@@ -89,14 +87,15 @@ public:
     // Get list selection as a string
     virtual wxString GetStringValue() const;
     //
+//events
     // Do mouse hot-tracking (which is typical in list popups)
-    void OnMouseMove(wxMouseEvent& event);
+    virtual void OnMouseMove(wxMouseEvent& event);
      // On mouse left up, set the value and close the popup
-    void OnMouseClick(wxMouseEvent& event);
-    void OnDblClick(wxTreeEvent& event);
+    virtual void OnMouseClick(wxMouseEvent& event);
+    virtual void OnDblClick(wxTreeEvent& event);
+	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
+	//
     virtual wxSize GetAdjustedSize(int minWidth, int prefHeight, int maxHeight);
-//IGxSelectionEvents
-	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 //wxGxTreeViewBase
     virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent);
     //
@@ -123,13 +122,10 @@ public:
 	virtual ~wxGxDialogContentView();
 
 //IGxView
-	virtual bool Activate(IApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 // events
     virtual void OnActivated(wxListEvent& event);
-//IGxCatalogEvents
-	virtual void OnObjectAdded(long nObjectID);
-	virtual void OnObjectDeleted(long nObjectID);
 //
 	virtual void SetFilters(LPOBJECTFILTERS pFiltersArray){m_pFiltersArray = pFiltersArray;};
 	virtual void SetCurrentFilter(size_t nFilterIndex);
@@ -142,9 +138,12 @@ public:
         return m_pSelection;
     }
     virtual void SetExternalCatalog(IGxCatalog* pCatalog = NULL){m_pExternalCatalog = pCatalog;};
+//events
+	virtual void OnObjectAdded(wxGxCatalogEvent& event);
+	virtual void OnObjectDeleted(wxGxCatalogEvent& event);
 protected:
   	IGxCatalog* m_pExternalCatalog;
-	IConnectionPointContainer* m_pConnectionPointSelection;
+	wxGISConnectionPointContainer* m_pConnectionPointSelection;
 	long m_ConnectionPointSelectionCookie;
 	LPOBJECTFILTERS m_pFiltersArray;
 	size_t m_nFilterIndex;
@@ -157,7 +156,7 @@ protected:
 class WXDLLIMPEXP_GIS_CLU wxGxObjectDialog :
     public wxDialog,
     public IGxApplication,
-    public IApplication
+    public IFrameApplication
 {
 private:
 
@@ -183,15 +182,15 @@ public:
 	~wxGxObjectDialog();
 //IGxApplication
     virtual IGxCatalog* const GetCatalog(void){return static_cast<IGxCatalog*>(m_pCatalog);};
-//IApplication
+//IFrameApplication
 	virtual ICommand* GetCommand(long CmdID);
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
     virtual wxString GetAppName(void){return wxString(OBJDLG_NAME);};
-    virtual wxString GetAppVersionString(void){return wxString(wxT("0.0.0"));};
+    virtual wxString GetAppVersionString(void){return wxString(APP_VER);};
     virtual IStatusBar* GetStatusBar(void){return NULL;};
-    virtual IGISConfig* GetConfig(void){return m_pConfig;};
     virtual void OnAppAbout(void){};
     virtual void OnAppOptions(void){};
+	virtual wxIcon GetAppIcon(void){return wxNullIcon;};
     virtual IGISCommandBar* GetCommandBar(wxString sName){return NULL;};
     virtual void RemoveCommandBar(IGISCommandBar* pBar){};
     virtual bool AddCommandBar(IGISCommandBar* pBar){return false;};
@@ -208,10 +207,10 @@ public:
 	virtual void OnMouseUp(wxMouseEvent& event){};
 	virtual void OnMouseDoubleClick(wxMouseEvent& event){};
 	virtual void OnMouseMove(wxMouseEvent& event){};
-    virtual bool Create(IGISConfig* pConfig){return true;};
-    virtual bool SetupLog(wxString sLogPath){return true;};
-    virtual bool SetupLoc(wxString sLoc, wxString sLocPath){return true;};
-    virtual bool SetupSys(wxString sSysPath){return true;};
+    virtual bool Create(void){return true;};
+    virtual bool SetupLog(const wxString &sLogPath){return true;};
+    virtual bool SetupLoc(const wxString &sLoc, const wxString &sLocPath){return true;};
+    virtual bool SetupSys(const wxString &sSysPath){return true;};
     virtual void SetDebugMode(bool bDebugMode){};
 
 //wxGxObjectDialog
@@ -254,7 +253,6 @@ protected:
  	COMMANDARRAY m_CommandArray;
   	wxGxCatalogUI* m_pCatalog;
   	IGxCatalog* m_pExternalCatalog;
-    wxGISAppConfig* m_pConfig;
     wxGxDialogContentView* m_pwxGxContentView;
     wxTreeViewComboPopup* m_PopupCtrl;
     IDropDownCommand* m_pDropDownCommand;

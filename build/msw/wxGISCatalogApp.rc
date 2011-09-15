@@ -15,10 +15,10 @@
 /////////////////////////////////////////////////////////////////////////////
 // Russian resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+//#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
 //#ifdef _WIN32
 //LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
-//#pragma code_page(1251)
+#pragma code_page(1251)
 //#endif //_WIN32
 //
 //#ifdef APSTUDIO_INVOKED
@@ -56,7 +56,7 @@
 // remains consistent on all systems.
 MAINFRAMECAT           ICON                    "../../art/catalog.ico"
 MAINFRAMECAT_X         ICON                    "../../art/catalog_x.ico"
-#endif    // Russian resources
+//#endif    // Russian resources
 /////////////////////////////////////////////////////////////////////////////
 
 

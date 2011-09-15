@@ -32,9 +32,9 @@ int CPL_STDCALL ExecToolProgress( double dfComplete, const char *pszMessage, voi
     {
         if( pszMessage )
         {
-            wxString soMsg(wgMB2WX(pszMessage));
+            wxString soMsg(pszMessage, wxConvUTF8);
             if(!soMsg.IsEmpty())
-                pTrackCancel->PutMessage( wgMB2WX(pszMessage), -1, enumGISMessageNorm );
+                pTrackCancel->PutMessage( soMsg, -1, enumGISMessageNorm );
         }
         IProgressor* pRogress = pTrackCancel->GetProgressor();
         if( pRogress )
@@ -49,7 +49,7 @@ wxGISGPTool::wxGISGPTool(void) : m_pCatalog(NULL)
 {
 }
 
-void wxGISGPTool::Copy(IGPTool* pTool)
+void wxGISGPTool::Copy(IGPTool* const pTool)
 {
     if(pTool)
     {
@@ -62,8 +62,8 @@ void wxGISGPTool::Copy(IGPTool* pTool)
 
 wxGISGPTool::~wxGISGPTool(void)
 {
-    for(size_t i = 0; i < m_pParamArr.size(); i++)
-        wxDELETE(m_pParamArr[i]);
+	for(size_t i = 0; i < m_paParam.GetCount(); ++i)
+        wxDELETE(m_paParam[i]);
 }
 
 void wxGISGPTool::SetCatalog(IGxCatalog* pCatalog)
@@ -76,12 +76,12 @@ IGxCatalog* const wxGISGPTool::GetCatalog(void)
     return m_pCatalog;
 }
 
-wxString wxGISGPTool::GetAsString(void)
+const wxString wxGISGPTool::GetAsString(void)
 {
     wxString sOutParam;
-    for(size_t i = 0; i < m_pParamArr.size(); i++)
+    for(size_t i = 0; i < m_paParam.GetCount(); ++i)
     {
-        IGPParameter* pParam = m_pParamArr[i];
+        IGPParameter* pParam = m_paParam[i];
         if(pParam)
         {
             sOutParam += pParam->GetAsString();
@@ -91,7 +91,7 @@ wxString wxGISGPTool::GetAsString(void)
     return sOutParam;
 }
 
-bool wxGISGPTool::SetFromString(wxString sParams)
+bool wxGISGPTool::SetFromString(const wxString& sParams)
 {
     GetParameterInfo();
 	wxStringTokenizer tkz(sParams, wxString(GPTOOLSEPARATOR), wxTOKEN_RET_EMPTY );
@@ -99,9 +99,9 @@ bool wxGISGPTool::SetFromString(wxString sParams)
 	while ( tkz.HasMoreTokens() )
 	{
 		wxString token = tkz.GetNextToken();
-        if(counter >= m_pParamArr.size())
+        if(counter >= m_paParam.GetCount())
            return false;
-        IGPParameter* pParam = m_pParamArr[counter];
+        IGPParameter* pParam = m_paParam[counter];
         if(pParam)
         {
             if(!pParam->SetFromString(token))

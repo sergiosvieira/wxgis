@@ -20,10 +20,10 @@
  ****************************************************************************/
 
 #include "wxgis/framework/tooltip.h"
+/*
 #include "wxgis/framework/application.h"
+#include "wxgis/core/globalfn.h"
 
-//#include "../../art/close_16.xpm"
-//#include "../../art/close_bw_16.xpm"
 #include "../../art/process_stop.xpm"
 
 #define FRAMENAME wxT("baloontip")
@@ -86,7 +86,7 @@ wxGISBaloonTip::wxGISBaloonTip(wxString sTitle, wxIcon Icon, wxString sMessage) 
     //title->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(wxGISBaloonTip::OnEscape), NULL, this );
     
     //mainSizer->Add(fgSizer1,1,wxEXPAND | wxBOTTOM | wxLEFT | wxRIGHT, 5);
-    mainSizer->Add(fgSizer1,0,wxEXPAND/* | wxBOTTOM */| wxLEFT | wxRIGHT, 5);
+    mainSizer->Add(fgSizer1,0,wxEXPAND| wxLEFT | wxRIGHT, 5);
  
     wxStaticText * text = new wxStaticText(this, wxID_ANY, sMessage);
     mainSizer->Add(text,1,wxEXPAND | wxBOTTOM | wxLEFT | wxRIGHT, 5);
@@ -122,7 +122,7 @@ wxGISBaloonTip::wxGISBaloonTip(wxString sTitle, wxIcon Icon, wxString sMessage) 
         Move( iX, iY );
     }
 
-    IApplication* pApp = ::GetApplication();
+    IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(GetApplication());
     pApp->RegisterChildWindow(this);
 }
  
@@ -147,13 +147,13 @@ void wxGISBaloonTip::OnPaint(wxPaintEvent& event)
     dc.DrawRoundedRectangle(0,0,iWidth,iHeight, 3);
 }
  
-/** closing frame at end of timeout */
+// closing frame at end of timeout 
 void wxGISBaloonTip::OnTimerTick(wxTimerEvent & event)
 {
     Close();
 }
  
-/** showing frame and running timer */
+// showing frame and running timer 
 void wxGISBaloonTip::ShowBaloon(unsigned int iTimeout)
 {
     Show(false);
@@ -163,7 +163,8 @@ void wxGISBaloonTip::ShowBaloon(unsigned int iTimeout)
 
 void wxGISBaloonTip::Close(void)
 {
-    IApplication* pApp = ::GetApplication();
+    IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(GetApplication());
     pApp->UnRegisterChildWindow(this);
     Destroy();
 }
+*/

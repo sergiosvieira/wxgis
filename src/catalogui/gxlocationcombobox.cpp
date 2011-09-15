@@ -24,9 +24,10 @@
 BEGIN_EVENT_TABLE(wxGxLocationComboBox, wxComboBox)
 	EVT_TEXT_ENTER(wxID_ANY, wxGxLocationComboBox::OnTextEnter)
 	EVT_COMBOBOX(wxID_ANY, wxGxLocationComboBox::OnTextEnter)
+	EVT_GXSELECTION_CHANGED(wxGxLocationComboBox::OnSelectionChanged)
 END_EVENT_TABLE()
 
-wxGxLocationComboBox::wxGxLocationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name) : wxComboBox(parent, id, value, pos, size, choices, style, validator, name), m_pApp(NULL), m_pGxCatalogUI(NULL)
+wxGxLocationComboBox::wxGxLocationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name) : wxComboBox(parent, id, value, pos, size, choices, style, validator, name), m_pApp(NULL), m_pGxCatalogUI(NULL), m_pConnectionPointSelection(NULL), m_ConnectionPointSelectionCookie(wxNOT_FOUND)
 {
 }
 
@@ -43,7 +44,7 @@ void wxGxLocationComboBox::OnTextEnter(wxCommandEvent& event)
 		if(pCatalog)
 		{
 			pCatalog->SetLocation(GetValue());
-			for(size_t i = 0; i < m_ValuesArr.size(); i++)
+			for(size_t i = 0; i < m_ValuesArr.size(); ++i)
 				if(m_ValuesArr[i] == GetValue())
 					return;
 			Append(GetValue());
@@ -52,11 +53,11 @@ void wxGxLocationComboBox::OnTextEnter(wxCommandEvent& event)
 	}
 }
 
-void wxGxLocationComboBox::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
+void wxGxLocationComboBox::OnSelectionChanged(wxGxSelectionEvent& event)
 {
-	if(nInitiator != TREECTRLID)
+	if(event.GetInitiator() != TREECTRLID || !event.GetSelection())
 		return;
-    IGxObjectSPtr pGxObject = m_pGxCatalogUI->GetRegisterObject(Selection->GetLastSelectedObjectID());
+    IGxObjectSPtr pGxObject = m_pGxCatalogUI->GetRegisterObject(event.GetSelection()->GetLastSelectedObjectID());
     if(!pGxObject)
         return;
 	wxString sPath = pGxObject->GetFullName();
@@ -70,19 +71,22 @@ void wxGxLocationComboBox::OnSelectionChanged(IGxSelection* Selection, long nIni
     }
 }
 
-void wxGxLocationComboBox::Activate(IApplication* pApp)
+void wxGxLocationComboBox::Activate(IFrameApplication* pApp)
 {
 	m_pApp = pApp;
 	wxGxApplication* pGxApp = dynamic_cast<wxGxApplication*>(pApp);
     m_pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-	m_pConnectionPointSelection = dynamic_cast<IConnectionPointContainer*>( m_pGxCatalogUI->GetSelection() );
-	if(m_pConnectionPointSelection != NULL)
-		m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
+	if(m_pGxCatalogUI)
+	{
+		m_pConnectionPointSelection = dynamic_cast<wxGISConnectionPointContainer*>( m_pGxCatalogUI->GetSelection() );
+		if(m_pConnectionPointSelection)
+			m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
+	}
 }
 
 void wxGxLocationComboBox::Deactivate(void)
 {
-	if(m_ConnectionPointSelectionCookie != -1)
+	if(m_ConnectionPointSelectionCookie != wxNOT_FOUND)
 		m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
 }
 

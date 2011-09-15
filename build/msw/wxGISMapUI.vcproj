@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(BOOST_ROOT)&quot;;&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;&quot;$(WXPROPGRID)\include&quot;;..\..\include"
+				AdditionalIncludeDirectories="&quot;$(BOOST_ROOT)&quot;;&quot;$(WXGISGDAL)\alg&quot;;&quot;$(WXGISGDAL)\gcore&quot;;&quot;$(WXGISGDAL)\port&quot;;&quot;$(WXGISGDAL)\ogr&quot;;&quot;$(WXGISGDAL)\ogr\ogrsf_frmts&quot;;&quot;$(WXWIDGETS)\include&quot;;&quot;$(WXWIDGETS)\lib\vc_dll\mswud&quot;;..\..\include;&quot;$(CAIRO)\src&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;__WXMSW__;__WXDEBUG__;WXUSINGDLL;WXMAKINGDLL_GIS_MAPU"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -61,10 +61,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_core.lib wxbase28ud_xml.lib wxmsw28ud_aui.lib wxmsw28ud_adv.lib wxmsw28ud_html.lib wxcode_msw28ud_propgrid.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISCatalogd.lib wxGISFrameworkd.lib wxGISCored.lib wxGISCartod.lib"
+				AdditionalDependencies="wxbase29ud.lib wxbase29ud_net.lib wxmsw29ud_core.lib wxbase29ud_xml.lib wxmsw29ud_aui.lib wxmsw29ud_adv.lib wxmsw29ud_html.lib wxmsw29ud_propgrid.lib wxgiscpld.lib wxgisogrd.lib wxgisgdald.lib wxGISCatalogd.lib wxGISFrameworkd.lib wxGISCored.lib wxGISCartod.lib wxGISCartoUId.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;&quot;$(WXPROPGRID)\lib\vc_dll&quot;;..\..\lib"
+				AdditionalLibraryDirectories="&quot;$(WXGISGDAL)\lib&quot;;&quot;$(WXWIDGETS)\lib\vc_dll&quot;;..\..\lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
@@ -128,7 +128,7 @@
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -180,7 +180,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\src\mapui\mapcmd.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\mapui\mxapplication.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\mapui\mxmapview.cpp"
 				>
 			</File>
 		</Filter>
@@ -190,11 +198,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\include\wxgis\mapui\mapcmd.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wxgis\mapui\mapui.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\include\wxgis\mapui\mxapplication.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\wxgis\mapui\mxmapview.h"
 				>
 			</File>
 		</Filter>

@@ -36,7 +36,7 @@ wxGxView::~wxGxView(void)
 {
 }
 
-bool wxGxView::Activate(IApplication* application, wxXmlNode* pConf)
+bool wxGxView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 { 
 	m_pGxApplication = dynamic_cast<IGxApplication*>(application); 
 	if(!m_pGxApplication)
@@ -95,8 +95,8 @@ int GxObjectCompareFunction(IGxObject* pObject1, IGxObject* pObject2, long sortD
             return 0;
     }
 
-	bool bDiscConnection1 = dynamic_cast<wxGxDiscConnection*>(pObject1);
-    bool bDiscConnection2 = dynamic_cast<wxGxDiscConnection*>(pObject2);
+	bool bDiscConnection1 = dynamic_cast<wxGxDiscConnection*>(pObject1) != NULL;
+    bool bDiscConnection2 = dynamic_cast<wxGxDiscConnection*>(pObject2) != NULL;
     if(bDiscConnection1 && !bDiscConnection2)
 		return sortData == 0 ? 1 : -1;
     if(!bDiscConnection1 && bDiscConnection2)
@@ -111,10 +111,10 @@ int GxObjectCompareFunction(IGxObject* pObject1, IGxObject* pObject2, long sortD
             return 0;
     }
 
-	bool bContainerDst1 = dynamic_cast<IGxDataset*>(pObject1);
-    bool bContainerDst2 = dynamic_cast<IGxDataset*>(pObject2);
-	bool bContainer1 = dynamic_cast<IGxObjectContainer*>(pObject1);
-    bool bContainer2 = dynamic_cast<IGxObjectContainer*>(pObject2);
+	bool bContainerDst1 = dynamic_cast<IGxDataset*>(pObject1) != NULL;
+    bool bContainerDst2 = dynamic_cast<IGxDataset*>(pObject2) != NULL;
+	bool bContainer1 = dynamic_cast<IGxObjectContainer*>(pObject1) != NULL;
+    bool bContainer2 = dynamic_cast<IGxObjectContainer*>(pObject2) != NULL;
     if(bContainer1 && !bContainerDst1 && bContainerDst2)
 	    return sortData == 0 ? 1 : -1;
     if(bContainer2 && !bContainerDst2 && bContainerDst1)

@@ -22,14 +22,14 @@
 #include "wxgis/core/config.h"
 #include "wxgis/framework/toolbarmenu.h"
 
-wxGISMenuBar::wxGISMenuBar(long style, IApplication* pApp, wxXmlNode* pConf) : wxMenuBar(style)
+wxGISMenuBar::wxGISMenuBar(long style, IFrameApplication* pApp, wxXmlNode* pConf) : wxMenuBar(style)
 {
 	if(!pConf || pApp == NULL)
 		return;
 	wxXmlNode *child = pConf->GetChildren();
 	while(child)
 	{
-		wxString sMenuName = child->GetPropVal(wxT("name"), wxT(""));
+		wxString sMenuName = child->GetAttribute(wxT("name"), wxT(""));
 		AddMenu(pApp->GetCommandBar(sMenuName));
 		child = child->GetNext();
 	}
@@ -44,7 +44,7 @@ wxGISMenuBar::~wxGISMenuBar(void)
 
 bool wxGISMenuBar::IsMenuBarMenu(wxString sMenuName)
 {
-	for(size_t i = 0; i < m_MenubarArray.size(); i++)
+	for(size_t i = 0; i < m_MenubarArray.size(); ++i)
 	{
 		if(m_MenubarArray[i]->GetName() == sMenuName)
 			return true;
@@ -98,14 +98,15 @@ int wxGISMenuBar::GetMenuPos(IGISCommandBar* pBar)
 {
 	if(pBar == NULL)
 		return wxNOT_FOUND;
-	for(size_t i = 0; i < m_MenubarArray.size(); i++)
+	for(size_t i = 0; i < m_MenubarArray.size(); ++i)
 		if(m_MenubarArray[i] == pBar)
 			return i;
+	return wxNOT_FOUND;
 }
 
 void wxGISMenuBar::RemoveMenu(IGISCommandBar* pBar)
 {
-	for(size_t i = 0; i < m_MenubarArray.size(); i++)
+	for(size_t i = 0; i < m_MenubarArray.size(); ++i)
 	{
 		if(m_MenubarArray[i] == pBar)
 		{
@@ -136,7 +137,7 @@ void wxGISMenuBar::Serialize(wxXmlNode* pConf)
 	{
 		wxString sName = m_MenubarArray[i - 1]->GetName();
 		wxXmlNode* pNewNode = new wxXmlNode(pConf, wxXML_ELEMENT_NODE, wxString(wxT("menu")));
-		pNewNode->AddProperty(wxT("name"), sName);
+		pNewNode->AddAttribute(wxT("name"), sName);
 	}
 }
 

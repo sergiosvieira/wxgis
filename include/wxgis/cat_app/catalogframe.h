@@ -40,14 +40,13 @@
 class wxGISCatalogFrame :
 	public wxGxApplication
 {
+    DECLARE_CLASS(wxGISCatalogFrame)
 public:
 	wxGISCatalogFrame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER);//| wxWS_EX_VALIDATE_RECURSIVELY
 	~wxGISCatalogFrame(void);
-//IApplication
+//IFrameApplication
 	virtual void OnAppAbout(void);
 private:
 	wxXmlNode* m_pConfXmlNode;
-
-    DECLARE_EVENT_TABLE()
 };
 

@@ -23,6 +23,8 @@
 #include "wxgis/catalogui/gxview.h"
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/newmenu.h"
+#include "wxgis/catalog/gxevent.h"
+#include "wxgis/catalogui/gxeventui.h"
 
 #include "wx/listctrl.h"
 #include "wx/imaglist.h"
@@ -40,8 +42,6 @@ typedef struct _sortdata
 class WXDLLIMPEXP_GIS_CLU wxGxContentView :
 	public wxListCtrl,
 	public wxGxView,
-	public IGxSelectionEvents,
-	public IGxCatalogEvents,
     public IGxContentsView,
     public IViewDropTarget
 {
@@ -56,20 +56,13 @@ public:
     virtual IGxObject* const GetParentGxObject(void);
     virtual void SelectAll(void);
     virtual bool Show(bool show = true);
+	virtual void RefreshAll(void);
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxLC_LIST | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE, const wxString& name = wxT("ContentView"));
-	virtual bool Activate(IApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 	virtual bool Applies(IGxSelection* Selection);
     virtual void BeginRename(long nObjectID = wxNOT_FOUND);
-//IGxSelectionEvents
-	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
-//IGxCatalogEvents
-	virtual void OnObjectAdded(long nObjectID);
-	virtual void OnObjectChanged(long nObjectID);
-	virtual void OnObjectDeleted(long nObjectID);
-	virtual void OnObjectRefreshed(long nObjectID);
-	virtual void OnRefreshAll(void);
 // IGxContentsView
 	virtual void SetStyle(wxGISEnumContentsViewStyle style);
     virtual wxGISEnumContentsViewStyle GetStyle(void){return m_current_style;};
@@ -90,6 +83,11 @@ public:
 	virtual void OnDeselected(wxListEvent& event);
     virtual void OnBeginDrag(wxListEvent& event);
     virtual void OnChar(wxKeyEvent& event);
+	virtual void OnObjectRefreshed(wxGxCatalogEvent& event);
+	virtual void OnObjectAdded(wxGxCatalogEvent& event);
+	virtual void OnObjectChanged(wxGxCatalogEvent& event);
+	virtual void OnObjectDeleted(wxGxCatalogEvent& event);
+	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
 
 	typedef struct _itemdata
 	{
@@ -109,7 +107,7 @@ protected:
 	short m_currentSortCol;
 	wxGISEnumContentsViewStyle m_current_style;
 	wxImageList m_ImageListSmall, m_ImageListLarge;
-	IConnectionPointContainer* m_pConnectionPointCatalog;
+	wxGISConnectionPointContainer* m_pConnectionPointCatalog;
 	long m_ConnectionPointCatalogCookie;
 	IGxSelection* m_pSelection;
     wxGxCatalogUI* m_pCatalog;

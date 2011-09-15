@@ -3,7 +3,7 @@
  * Purpose:  wxGISScreenDisplay class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -59,89 +59,89 @@ private:
 };
 
 
-//-----------------------------------------------------
-// wxGISDisplay
-//-----------------------------------------------------
-
-class WXDLLIMPEXP_GIS_DSP wxGISDisplay :
-	public IDisplay
-{
-public:
-	wxGISDisplay(void);
-	virtual ~wxGISDisplay(void);
-	virtual bool IsDerty(void);
-	virtual void SetDerty(bool bIsDerty);
-	virtual IDisplayTransformation* GetDisplayTransformation(void);
-protected:
-	bool m_bIsDerty;
-	wxGISDisplayTransformation* m_pDisplayTransformation;
-};
-
-//-----------------------------------------------------
-// wxGISScreenDisplay
-//-----------------------------------------------------
-
-
-class WXDLLIMPEXP_GIS_DSP wxGISScreenDisplay :
-	public ICachedDisplay
-{
-public:
-	//wxGISScreenDisplay
-	wxGISScreenDisplay(void);
-	virtual ~wxGISScreenDisplay(void);
-    wxImage Scale(const unsigned char* pData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel = NULL);
-    wxImage Scale(wxImage SourceImage, int nDestWidth, int nDestHeight, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel = NULL);
-	//Stretch buffer to nDestWidth & nDestHeight and draw in x, y coordinates
-	//Drawing...
-	virtual void OnStretchDraw(wxDC &dc, wxCoord nDestWidth, wxCoord nDestHeight, wxCoord x = 0, wxCoord y = 0, bool bClearBackground = false, wxGISEnumDrawQuality quality = enumGISQualityNearest );
-	//cut buffer by Rect and stretch result in GetDeviceFrame()
-	virtual void OnStretchDraw2(wxDC &dc, wxRect Rect, bool bClearBackground = false, wxGISEnumDrawQuality quality = enumGISQualityNearest );
-	//
-	virtual void OnPanDraw(wxDC &dc, wxCoord x, wxCoord y);
-    virtual void OnPanStop(wxDC &dc);
-	//IDisplay
-	virtual void OnDraw(wxDC &dc, wxCoord x = 0, wxCoord y = 0, bool bClearBackground = false);
-	virtual void OnUpdate(void);
-    virtual void SetDC(wxDC *pdc){m_pDrawDC = pdc;};
-	virtual void SetBrush(wxBrush& Brush);
-	virtual void SetPen(wxPen& Pen);
-	virtual void SetFont(wxFont& Font);
-	virtual void DrawPolygon(int n, wxPoint points[], wxCoord xoffset = 0, wxCoord yoffset = 0, int fill_style = wxODDEVEN_RULE);
-	virtual void DrawPolyPolygon(int n, int count[], wxPoint points[], wxCoord xoffset = 0, wxCoord yoffset = 0, int fill_style = wxODDEVEN_RULE);
-	virtual void DrawPoint(wxCoord x, wxCoord y);
-	virtual void DrawLines(int n, wxPoint points[], wxCoord xoffset = 0, wxCoord yoffset = 0);
-	virtual void DrawCircle(wxCoord x, wxCoord y, wxCoord radius);
-	virtual void DrawRectangle(wxCoord x, wxCoord y, wxCoord width, wxCoord height);
-	virtual void DrawBitmap(const wxBitmap& bitmap, wxCoord x, wxCoord y, bool transparent = false);
-	virtual void SetDerty(bool bIsDerty);
-	virtual bool IsDerty(void);
-	virtual IDisplayTransformation* GetDisplayTransformation(void);
-    virtual RECTARARRAY* GetInvalidRect(void);
-    virtual void AddInvalidRect(wxRect Rect);
-
-	//ICachedDisplay
-	virtual bool IsCacheDerty(size_t cache_id);
-	virtual void SetCacheDerty(size_t cache_id, bool bIsDerty);
-	virtual size_t AddCache(void);
-	virtual void MergeCaches(size_t SrcCacheID, size_t DstCacheID);
-	virtual void StartDrawing(size_t CacheID);
-	virtual void FinishDrawing(void);
-	virtual void ClearCaches(void);
-	virtual size_t GetLastCacheID(void);
-	//
-	typedef struct _cachedata{
-		bool IsDerty;
-		wxBitmap bmp;
-	} CACHEDATA;
-protected:
-	std::vector<CACHEDATA> m_caches;
-	wxMemoryDC m_dc;
-    wxDC *m_pDrawDC;
-	//, m_GeoSelectionBuffer, m_AnnotationBuffer;
-	size_t m_nLastCacheID;
-    int m_nDrawCacheID;
-	bool m_bIsDerty;
-	wxGISDisplayTransformation* m_pDisplayTransformation;
-    wxCriticalSection m_CritSect;
-    RECTARARRAY m_InvalidRectArray;
-};
+////-----------------------------------------------------
+//// wxGISDisplay
+////-----------------------------------------------------
+//
+//class WXDLLIMPEXP_GIS_DSP wxGISDisplay :
+//	public IDisplay
+//{
+//public:
+//	wxGISDisplay(void);
+//	virtual ~wxGISDisplay(void);
+//	virtual bool IsDerty(void);
+//	virtual void SetDerty(bool bIsDerty);
+//	virtual IDisplayTransformation* GetDisplayTransformation(void);
+//protected:
+//	bool m_bIsDerty;
+//	wxGISDisplayTransformation* m_pDisplayTransformation;
+//};
+//
+////-----------------------------------------------------
+//// wxGISScreenDisplay
+////-----------------------------------------------------
+//
+//
+//class WXDLLIMPEXP_GIS_DSP wxGISScreenDisplay :
+//	public ICachedDisplay
+//{
+//public:
+//	//wxGISScreenDisplay
+//	wxGISScreenDisplay(void);
+//	virtual ~wxGISScreenDisplay(void);
+//    wxImage Scale(const unsigned char* pData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel = NULL);
+//    wxImage Scale(wxImage SourceImage, int nDestWidth, int nDestHeight, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel = NULL);
+//	//Stretch buffer to nDestWidth & nDestHeight and draw in x, y coordinates
+//	//Drawing...
+//	virtual void OnStretchDraw(wxDC &dc, wxCoord nDestWidth, wxCoord nDestHeight, wxCoord x = 0, wxCoord y = 0, bool bClearBackground = false, wxGISEnumDrawQuality quality = enumGISQualityNearest );
+//	//cut buffer by Rect and stretch result in GetDeviceFrame()
+//	virtual void OnStretchDraw2(wxDC &dc, wxRect Rect, bool bClearBackground = false, wxGISEnumDrawQuality quality = enumGISQualityNearest );
+//	//
+//	virtual void OnPanDraw(wxDC &dc, wxCoord x, wxCoord y);
+//    virtual void OnPanStop(wxDC &dc);
+//	//IDisplay
+//	virtual void OnDraw(wxDC &dc, wxCoord x = 0, wxCoord y = 0, bool bClearBackground = false);
+//	virtual void OnUpdate(void);
+//    virtual void SetDC(wxDC *pdc){m_pDrawDC = pdc;};
+//	virtual void SetBrush(wxBrush& Brush);
+//	virtual void SetPen(wxPen& Pen);
+//	virtual void SetFont(wxFont& Font);
+//	virtual void DrawPolygon(int n, wxPoint points[], wxCoord xoffset = 0, wxCoord yoffset = 0, int fill_style = wxODDEVEN_RULE);
+//	virtual void DrawPolyPolygon(int n, int count[], wxPoint points[], wxCoord xoffset = 0, wxCoord yoffset = 0, int fill_style = wxODDEVEN_RULE);
+//	virtual void DrawPoint(wxCoord x, wxCoord y);
+//	virtual void DrawLines(int n, wxPoint points[], wxCoord xoffset = 0, wxCoord yoffset = 0);
+//	virtual void DrawCircle(wxCoord x, wxCoord y, wxCoord radius);
+//	virtual void DrawRectangle(wxCoord x, wxCoord y, wxCoord width, wxCoord height);
+//	virtual void DrawBitmap(const wxBitmap& bitmap, wxCoord x, wxCoord y, bool transparent = false);
+//	virtual void SetDerty(bool bIsDerty);
+//	virtual bool IsDerty(void);
+//	virtual IDisplayTransformation* GetDisplayTransformation(void);
+//    virtual RECTARARRAY* GetInvalidRect(void);
+//    virtual void AddInvalidRect(wxRect Rect);
+//
+//	//ICachedDisplay
+//	virtual bool IsCacheDerty(size_t cache_id);
+//	virtual void SetCacheDerty(size_t cache_id, bool bIsDerty);
+//	virtual size_t AddCache(void);
+//	virtual void MergeCaches(size_t SrcCacheID, size_t DstCacheID);
+//	virtual void StartDrawing(size_t CacheID);
+//	virtual void FinishDrawing(void);
+//	virtual void ClearCaches(void);
+//	virtual size_t GetLastCacheID(void);
+//	//
+//	typedef struct _cachedata{
+//		bool IsDerty;
+//		wxBitmap bmp;
+//	} CACHEDATA;
+//protected:
+//	std::vector<CACHEDATA> m_caches;
+//	wxMemoryDC m_dc;
+//    wxDC *m_pDrawDC;
+//	//, m_GeoSelectionBuffer, m_AnnotationBuffer;
+//	size_t m_nLastCacheID;
+//    int m_nDrawCacheID;
+//	bool m_bIsDerty;
+//	wxGISDisplayTransformation* m_pDisplayTransformation;
+//    wxCriticalSection m_CritSect;
+//    RECTARARRAY m_InvalidRectArray;
+//};

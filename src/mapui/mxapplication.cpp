@@ -34,9 +34,42 @@ wxMxApplication::~wxMxApplication(void)
 {
 }
 
-bool wxMxApplication::Create(IGISConfig* pConfig)
+bool wxMxApplication::Create(void)
 {
-    wxGISApplicationEx::Create(pConfig);
+	m_mgr.SetManagedWindow(this);
+
+    wxGISApplication::Create();
+
+
+	m_pMapView = new wxMxMapView(this);
+	//if(m_pMapView->Activate(this, NULL))
+ //   {
+        m_mgr.AddPane(m_pMapView, wxAuiPaneInfo().Name(wxT("main_map_window")).CenterPane());//.PaneBorder(true)
+        RegisterChildWindow(m_pMapView);
+		m_pMapView->Activate(this);
+		//m_pTrackCancel = new ITrackCancel();
+		//m_pTrackCancel->SetProgressor(GetStatusBar()->GetAnimation());
+		//m_pMapView->SetTrackCancel(m_pTrackCancel);
+
+    //}
+    //else
+    //    wxDELETE(m_pMapView);
+	for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
+	{
+		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
+		{
+			wxGISToolBar* pToolBar = dynamic_cast<wxGISToolBar*>(m_CommandBarArray[i]);
+			if(pToolBar)
+			{
+				m_mgr.AddPane(pToolBar, wxAuiPaneInfo().Name(pToolBar->GetName()).Caption(pToolBar->GetCaption()).ToolbarPane().Top().Position(i).LeftDockable(pToolBar->GetLeftDockable()).RightDockable(pToolBar->GetRightDockable()).BestSize(-1,-1));
+				pToolBar->Activate(this);
+			}
+		}
+	}
+
+	SerializeFramePosEx(false);
+
+	m_mgr.Update();
 
 	wxLogMessage(_("wxMxApplication: Creation complete"));
 

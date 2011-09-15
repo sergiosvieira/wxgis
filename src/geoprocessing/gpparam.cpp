@@ -112,14 +112,13 @@ void wxGISGPParameter::SetDirection(wxGISEnumGPParameterDirection nDirection)
     m_Direction = nDirection;
 }
 
-wxArrayString wxGISGPParameter::GetParameterDependencies(void)
+wxArrayString* wxGISGPParameter::GetParameterDependencies(void)
 {
-    return m_ParamDepStr;
+    return NULL;
 }
 
 void wxGISGPParameter::AddParameterDependency(wxString sDependency)
 {
-	m_ParamDepStr.Add(sDependency);
 }
 
 wxGISEnumGPParameterType wxGISGPParameter::GetParameterType(void)
@@ -205,11 +204,14 @@ void wxGISGPParameter::SetSelDomainValue(int nNewSelection)
 wxString wxGISGPParameter::GetAsString(void)
 {
     wxString sStrPar = m_Value.MakeString();
+	sStrPar.Replace(wxT("\""), wxT("\\\""));
     return sStrPar;
 }
 
 bool wxGISGPParameter::SetFromString(wxString sParam)
 {
+	sParam.Replace(wxT("\\\""), wxT("\""));
+
 	wxVariant oDomStr;
 	if(m_pDomain)
 	{
@@ -302,7 +304,7 @@ size_t wxGISGPMultiParameter::GetRowCount(void)
 
 void wxGISGPMultiParameter::AddParameter(size_t nColIndex, size_t nRowIndex, IGPParameter* pParam)
 {
-	wxCHECK(pParam); 
+	wxCHECK_RET(pParam, "the param should be not NULL"); 
 	long nPos = nRowIndex * GetColumnCount() + nColIndex;
 	if(m_paParameters.size() <= nPos)
 	{
@@ -335,7 +337,7 @@ bool wxGISGPMultiParameter::SetFromString(wxString sParam)
 			m_paParameters.push_back(pParam);
 		else
 		{
-			wxDELETE(pParam)
+			wxDELETE(pParam);
 			return false;
 		}
 	}
@@ -371,7 +373,7 @@ IGPParameter* wxGISGPMultiParameter::GetParameter(size_t nCol, size_t nRow)
 void wxGISGPMultiParameter::Clear()
 {
 	for(size_t i = 0; i < m_paParameters.size(); ++i)
-		wxDELETE(m_paParameters[i])
-		m_paParameters.clear();
+		wxDELETE(m_paParameters[i]);
+	m_paParameters.clear();
 	//m_saColumnNames.Clear();
 }

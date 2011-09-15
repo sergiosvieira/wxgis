@@ -23,12 +23,21 @@
 
 #include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/datasource/featuredataset.h"
+#include "wxgis/core/format.h"
 
+/** \fn bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstDataSet, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL); 
+  *  \brief Copy rows from one format (file) to another.
+  *  \return True if success, false otherwise
+*/
 bool WXDLLIMPEXP_GIS_GP CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstDataSet, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL); 
 bool WXDLLIMPEXP_GIS_GP ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGxObjectFilter* pFilter, OGRFeatureDefn *pDef, OGRSpatialReference* pNewSpaRef, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
 bool WXDLLIMPEXP_GIS_GP ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGxObjectFilter* pFilter, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
 bool WXDLLIMPEXP_GIS_GP Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGxObjectFilter* pFilter, OGRSpatialReference* pNewSpaRef, ITrackCancel* pTrackCancel);
 OGRGeometry WXDLLIMPEXP_GIS_GP *Intersection(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn, OGREnvelope* pRgnEnv);
+/** \fn OGRGeometry *CheckRgnAndTransform(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn1, OGRPolygon* pRgn2, OGREnvelope* pRgnEnv1, OGREnvelope* pRgnEnv2, OGRCoordinateTransformation *poCT);
+  *  \brief Check if geometry intersects the Spatial Referense limits, cut it by this limits and reproject or return NULL geometry.
+  *  \return Projected geometry or NULL.
+*/
 OGRGeometry WXDLLIMPEXP_GIS_GP *CheckRgnAndTransform(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn1, OGRPolygon* pRgn2, OGREnvelope* pRgnEnv1, OGREnvelope* pRgnEnv2, OGRCoordinateTransformation *poCT);
 bool WXDLLIMPEXP_GIS_GP GeometryVerticesToPoints(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGxObjectFilter* pFilter, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
 bool GeometryVerticesToPointsDataset(long nGeomFID, OGRGeometry* pGeom, wxGISFeatureDatasetSPtr pDSet, OGRCoordinateTransformation *poCT, long &nFidCounter, ITrackCancel* pTrackCancel);
@@ -38,4 +47,14 @@ bool GeometryVerticesToPointsDataset(long nGeomFID, OGRGeometry* pGeom, wxGISFea
   *  \return The smart pointer on created layer
   */	
 wxGISFeatureDatasetSPtr WXDLLIMPEXP_GIS_GP CreateVectorLayer(CPLString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *poFields, OGRSpatialReference *poSpatialRef = NULL, OGRwkbGeometryType eGType = wkbUnknown, char ** papszDataSourceOptions = NULL, char ** papszLayerOptions = NULL); 
+
+/** \fn bool GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, const CPLString &osFrmt, bool bSwapXY = false, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL)
+  *  \brief Write shape coordinates to text file.
+  *  \return true if write is succeeded, false overwise
+  */	
+bool WXDLLIMPEXP_GIS_GP GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxGISCoordinatesFormat &oFrmt, wxGISQueryFilter* pQFilter = NULL, ITrackCancel* pTrackCancel = NULL);
+CPLString WXDLLIMPEXP_GIS_GP GeometryToText(long nGeomFID, OGRGeometry* pGeom, wxGISCoordinatesFormat &oFrmt, ITrackCancel* pTrackCancel = NULL);
+void WXDLLIMPEXP_GIS_GP PointToText(CPLString &osData, OGRPoint* pPoint, wxGISCoordinatesFormat &oFrmt);
+void WXDLLIMPEXP_GIS_GP LineToText(CPLString &osData, OGRLineString* pLine, wxGISCoordinatesFormat &oFrmt);
+
 

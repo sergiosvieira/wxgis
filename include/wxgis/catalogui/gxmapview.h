@@ -22,12 +22,13 @@
 #pragma once
 #include "wxgis/catalogui/gxview.h"
 #include "wxgis/catalogui/gxcatalogui.h"
-#include "wxgis/carto/mapview.h"
+#include "wxgis/catalogui/gxeventui.h"
+#include "wxgis/cartoui/mapview.h"
+#include "wxgis/core/format.h"
 
 class WXDLLIMPEXP_GIS_CLU wxGxMapView :
 	public wxGISMapView,
-	public wxGxView,
-	public IGxSelectionEvents
+	public wxGxView
 {
     DECLARE_DYNAMIC_CLASS(wxGxMapView)
 public:
@@ -35,7 +36,7 @@ public:
 	wxGxMapView(wxWindow* parent, wxWindowID id = MAPCTRLID, const wxPoint& pos = wxDefaultPosition,
 						 const wxSize& size = wxDefaultSize);
 	virtual ~wxGxMapView(void);
-    virtual void CheckOverviews(wxGISDatasetSPtr pwxGISDataset, wxString soFileName);
+    //virtual void CheckOverviews(wxGISDatasetSPtr pwxGISDataset, wxString soFileName);
     //events
 	void OnMouseMove(wxMouseEvent& event);
 	void OnMouseDown(wxMouseEvent& event);
@@ -43,17 +44,21 @@ public:
 	void OnMouseDoubleClick(wxMouseEvent& event);
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id = MAPCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("MapView"));
-	virtual bool Activate(IApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 	virtual bool Applies(IGxSelection* Selection);
-//IGxSelectionEvents
-	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
+//events
+	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
 private:
 	IGxSelection* m_pSelection;
     wxGxCatalogUI* m_pCatalog;
 	long m_nParentGxObjectID;
+
 	IStatusBar* m_pStatusBar;
-	IApplication* m_pApp;
+	IFrameApplication* m_pApp;
+	ITrackCancel *m_pTrackCancel;
+
+	wxGISCoordinatesFormat m_CFormat;
 
 	DECLARE_EVENT_TABLE()
 };

@@ -1,9 +1,9 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  wxGISCarto main header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,16 +21,13 @@
 
 #pragma once
 
-#include "wxgis/display/display.h"
-#include "wxgis/datasource/datasource.h"
+#include "wxgis/display/gisdisplay.h"
+#include "wxgis/datasource/quadtree.h"
+#include "wxgis/datasource/rasterdataset.h"
 
-enum wxGISEnumMapToolState
-{
-	enumGISMapNone = 0x0000, 
-	enumGISMapPanning = 0x0001,
-	enumGISMapZooming = 0x0002,
-	enumGISMapRotating = 0x0004
-};
+/** \class wxGISLayer carto.h
+    \brief The base class for map layers
+*/
 
 class wxGISLayer 
 {
@@ -38,19 +35,19 @@ public:
 	wxGISLayer(void)
 	{
 		m_sName = wxString(_("new layer"));
-		m_dMaxScale = -1;
-		m_dMinScale = -1;
+		m_dMaxScale = wxNOT_FOUND;
+		m_dMinScale = wxNOT_FOUND;
 		m_bVisible = true;
-		m_bCached = false;
-        m_iCacheID = 0;
+		//m_bCached = false;
+        m_nCacheID = 0;
 	}
 	virtual~wxGISLayer(void){};
 	//pure virtual
-	virtual OGRSpatialReference* GetSpatialReference(void) = 0;
-	virtual void SetSpatialReference(OGRSpatialReference* pSpatialReference) = 0;
-	virtual const OGREnvelope* GetEnvelope(void) = 0;
+	virtual OGRSpatialReferenceSPtr GetSpatialReference(void) = 0;
+	virtual void SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference) = 0;
+	virtual OGREnvelope GetEnvelope(void) = 0;
 	virtual bool IsValid(void) = 0;
-	virtual void Draw(wxGISEnumDrawPhase DrawPhase, ICachedDisplay* pDisplay, ITrackCancel* pTrackCancel) = 0;
+	virtual bool Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL) = 0;
 	//
 	virtual void SetMaximumScale(double dMaxScale){m_dMaxScale = dMaxScale;};
 	virtual double GetMaximumScale(void){return m_dMaxScale;};
@@ -60,18 +57,22 @@ public:
 	virtual void SetVisible(bool bVisible){m_bVisible = bVisible;};
 	virtual void SetName(wxString sName){m_sName = sName;};
 	virtual wxString GetName(wxString sName){return m_sName;};
-	virtual size_t GetCacheID(void){return m_iCacheID;};
-	virtual void SetCacheID(size_t iCacheID){m_iCacheID = iCacheID;};
-	virtual bool GetCached(void){return m_bCached;};
-	virtual void SetCached(bool bCached){m_bCached = bCached;};
+	virtual size_t GetCacheID(void){return m_nCacheID;};
+	virtual void SetCacheID(size_t nCacheID){m_nCacheID = nCacheID;};
+	virtual bool IsCacheNeeded(void){return true;};
+	//virtual bool GetCached(void){return m_bCached;};
+	//virtual void SetCached(bool bCached){m_bCached = bCached;};
 protected:
 	double m_dMaxScale, m_dMinScale;
 	wxString m_sName;
-	bool m_bVisible, m_bCached;
-	size_t m_iCacheID;
+	bool m_bVisible;//, m_bCached;
+	size_t m_nCacheID;
 };
+DEFINE_SHARED_PTR(wxGISLayer);
 
-
+/** \class IRenderer carto.h
+    \brief The base class for map layer renderer
+*/
 class IRenderer
 {
 public:
@@ -79,16 +80,33 @@ public:
 	virtual bool CanRender(wxGISDatasetSPtr pDataset) = 0;	
 };
 
+/** \class IFeatureRenderer carto.h
+    \brief The base class for map vector layer renderer
+*/
 class IFeatureRenderer : public IRenderer
 {
 public:
 	virtual ~IFeatureRenderer(void){};
-	virtual void Draw(wxGISGeometrySet* pSet, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel) = 0;
+	virtual void Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL) = 0;
 };
+DEFINE_SHARED_PTR(IFeatureRenderer);
 
+typedef struct _rawpixeldata
+{
+	void* pPixelData;
+	int nWidth, nHeight;
+	OGREnvelope PixelBounds;
+}RAWPIXELDATA;
+/** \class IRasterRenderer carto.h
+    \brief The base class for map raster layer renderer
+*/
 class IRasterRenderer : public IRenderer
 {
 public:
 	virtual ~IRasterRenderer(void){};
-	virtual void Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel) = 0;
+	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster) = 0;
+	virtual int *GetBandsCombination(void) = 0;
+	virtual void Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL) = 0;
 };
+DEFINE_SHARED_PTR(IRasterRenderer);
+

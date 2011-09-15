@@ -23,6 +23,11 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxTableView, wxGISTableView)
 
+BEGIN_EVENT_TABLE(wxGxTableView, wxGISTableView)
+	EVT_GXSELECTION_CHANGED(wxGxTableView::OnSelectionChanged)
+END_EVENT_TABLE()
+
+
 wxGxTableView::wxGxTableView(void)
 {
 }
@@ -47,28 +52,21 @@ bool wxGxTableView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
     return true;
 }
 
-bool wxGxTableView::Activate(IApplication* application, wxXmlNode* pConf)
+bool wxGxTableView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 {
 	if(!wxGxView::Activate(application, pConf))
 		return false;
 	//Serialize(m_pXmlConf, false);
 
-	//m_pConnectionPointCatalog = dynamic_cast<IConnectionPointContainer*>( m_pCatalog );
-	//if(m_pConnectionPointCatalog != NULL)
-	//	m_ConnectionPointCatalogCookie = m_pConnectionPointCatalog->Advise(this);
-
     m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pGxApplication->GetCatalog());
-	m_pSelection = m_pCatalog->GetSelection();
+	if(m_pCatalog)
+		m_pSelection = m_pCatalog->GetSelection();
+
 	return true;
 }
 
 void wxGxTableView::Deactivate(void)
 {
-	//if(m_ConnectionPointSelectionCookie != -1)
-	//	m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
-	//if(m_ConnectionPointCatalogCookie != -1)
-	//	m_pConnectionPointCatalog->Unadvise(m_ConnectionPointCatalogCookie);
-
 	//Serialize(m_pXmlConf, true);
 	wxGxView::Deactivate();
 }
@@ -78,7 +76,7 @@ bool wxGxTableView::Applies(IGxSelection* Selection)
 	if(Selection == NULL)
 		return false;
 
-	for(size_t i = 0; i < Selection->GetCount(); i++)
+	for(size_t i = 0; i < Selection->GetCount(); ++i)
 	{
 		IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject( Selection->GetSelectedObjectID(i) );
 		IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>( pGxObject.get() );
@@ -99,9 +97,9 @@ bool wxGxTableView::Applies(IGxSelection* Selection)
 	return false;
 }
 
-void wxGxTableView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
+void wxGxTableView::OnSelectionChanged(wxGxSelectionEvent& event)
 {
-	if(nInitiator == GetId())
+	if(event.GetInitiator() == GetId())
 		return;
 
 	if(m_pSelection->GetCount() == 0)
@@ -154,7 +152,7 @@ void wxGxTableView::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 	//if(pObjContainer == NULL || !pObjContainer->HasChildren())
 	//	return;
 	//GxObjectArray* pArr = pObjContainer->GetChildren();
-	//for(size_t i = 0; i < pArr->size(); i++)
+	//for(size_t i = 0; i < pArr->size(); ++i)
 	//{
 	//	AddObject(pArr->at(i));
 	//}

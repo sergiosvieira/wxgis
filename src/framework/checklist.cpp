@@ -36,7 +36,7 @@ wxGISCheckList::wxGISCheckList(wxWindow* parent, wxWindowID id, const wxPoint& p
 
 wxGISCheckList::~wxGISCheckList(void)
 {
-    for(size_t i = 0; i < GetItemCount(); i++)
+    for(size_t i = 0; i < GetItemCount(); ++i)
     {
         LPITEM_DATA pdata = (LPITEM_DATA)wxListView::GetItemData(i);
         wxDELETE(pdata);
@@ -79,7 +79,7 @@ void wxGISCheckList::OnLeftDown(wxMouseEvent& event)
         LPITEM_DATA pdata = (LPITEM_DATA)wxListView::GetItemData(nItemId);
         pdata->bChanged = !pdata->bChanged;
         pdata->nCheckState = !pdata->nCheckState;
-        bool bCheck = pdata->nCheckState;
+        bool bCheck = pdata->nCheckState != 0;
         SetItemImage(nItemId, bCheck == true ? 1 : 0, bCheck == true ? 1 : 0);
 	}
 }

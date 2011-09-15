@@ -23,6 +23,7 @@
 
 #include "wxgis/base.h"
 #include "wxgis/catalog/catalog.h"
+#include "wxgis/framework/framework.h"
 
 #include "wx/dnd.h"
 #include "wx/dataobj.h"
@@ -70,8 +71,6 @@ public:
 	virtual void EditProperties(wxWindow *parent){};
 };
 
-WX_DEFINE_ARRAY_INT(long, wxSelLongArray);
-
 class IGxSelection
 {
 public:
@@ -95,20 +94,13 @@ public:
     virtual bool CanRedo() = 0;
 	virtual bool CanUndo() = 0;
 	virtual void RemoveDo(long nObjectID) = 0;
-    virtual long Redo(int nPos = -1) = 0;
-    virtual long Undo(int nPos = -1) = 0;
+    virtual long Redo(int nPos = wxNOT_FOUND) = 0;
+    virtual long Undo(int nPos = wxNOT_FOUND) = 0;
     virtual void Reset() = 0;
     virtual size_t GetDoSize() = 0;
     virtual int GetDoPos(void) = 0;
     virtual long GetDoID(size_t nIndex) = 0;
-    virtual wxSelLongArray GetDoArray(void) = 0;
-};
-
-class IGxSelectionEvents
-{
-public:
-	virtual ~IGxSelectionEvents(void){};
-	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator) = 0;
+    virtual wxArrayLong GetDoArray(void) = 0;
 };
 
 class IGxView : public IView

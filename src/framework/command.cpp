@@ -20,7 +20,6 @@
  ****************************************************************************/
 #include "wxgis/framework/command.h"
 
-//#include "../../art/mainframe.xpm"
 #include "../../art/options.xpm"
 
 //	0	Exit
@@ -34,7 +33,7 @@
 IMPLEMENT_DYNAMIC_CLASS(wxGISCommonCmd, wxObject)
 
 
-wxGISCommonCmd::wxGISCommonCmd(void) : ICommand(), /*m_IconMain(mainframe_xpm), */m_IconOpt(options_xpm)
+wxGISCommonCmd::wxGISCommonCmd(void) : ICommand(), m_IconOpt(options_xpm)
 {
 }
 
@@ -47,7 +46,8 @@ wxIcon wxGISCommonCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 1:
-			return m_IconMain;
+			if(m_pApp)
+				return m_pApp->GetAppIcon();
 		case 5:	
 			return m_IconOpt;
 		case 0:	
@@ -57,6 +57,7 @@ wxIcon wxGISCommonCmd::GetBitmap(void)
 		default:
 			return wxNullIcon;
 	}
+	return wxNullIcon;
 }
 
 wxString wxGISCommonCmd::GetCaption(void)
@@ -208,7 +209,7 @@ void wxGISCommonCmd::OnClick(void)
 	}
 }
 
-bool wxGISCommonCmd::OnCreate(IApplication* pApp)
+bool wxGISCommonCmd::OnCreate(IFrameApplication* pApp)
 {
 	m_pApp = pApp;
 	return true;

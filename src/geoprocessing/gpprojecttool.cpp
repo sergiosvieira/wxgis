@@ -23,6 +23,7 @@
 //#include "wxgis/geoprocessing/gptoolmngr.h"
 #include "wxgis/geoprocessing/gpdomain.h"
 #include "wxgis/geoprocessing/gpparam.h"
+#include "wxgis/geoprocessing/gpvector.h"
 #include "wxgis/catalog/gxfilters.h"
 #include "wxgis/catalog/catop.h"
 
@@ -40,28 +41,26 @@ wxGISGPProjectVectorTool::wxGISGPProjectVectorTool(void) : wxGISGPTool()
 
 wxGISGPProjectVectorTool::~wxGISGPProjectVectorTool(void)
 {
-    for(size_t i = 0; i < m_pParamArr.size(); i++)
-        wxDELETE(m_pParamArr[i]);
 }
 
-wxString wxGISGPProjectVectorTool::GetDisplayName(void)
+const wxString wxGISGPProjectVectorTool::GetDisplayName(void)
 {
     return wxString(_("Project vector file (single)"));
 }
 
-wxString wxGISGPProjectVectorTool::GetName(void)
+const wxString wxGISGPProjectVectorTool::GetName(void)
 {
     return wxString(wxT("vproj_single"));
 }
 
-wxString wxGISGPProjectVectorTool::GetCategory(void)
+const wxString wxGISGPProjectVectorTool::GetCategory(void)
 {
     return wxString(_("Projections and Transformations/Vector"));
 }
 
-GPParameters* wxGISGPProjectVectorTool::GetParameterInfo(void)
+GPParameters wxGISGPProjectVectorTool::GetParameterInfo(void)
 {
-    if(m_pParamArr.empty())
+    if(m_paParam.IsEmpty())
     {
         //src path
         wxGISGPParameter* pParam1 = new wxGISGPParameter();
@@ -75,7 +74,7 @@ GPParameters* wxGISGPProjectVectorTool::GetParameterInfo(void)
         pDomain1->AddFilter(new wxGxDatasetFilter(enumGISFeatureDataset));
         pParam1->SetDomain(pDomain1);
 
-        m_pParamArr.push_back(pParam1);
+        m_paParam.Add(pParam1);
 
         //proj
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
@@ -85,7 +84,7 @@ GPParameters* wxGISGPProjectVectorTool::GetParameterInfo(void)
         pParam2->SetDataType(enumGISGPParamDTSpatRef);
         pParam2->SetDirection(enumGISGPParameterDirectionInput);
 
-        m_pParamArr.push_back(pParam2);
+        m_paParam.Add(pParam2);
 
         //dst path
         wxGISGPParameter* pParam3 = new wxGISGPParameter();
@@ -102,36 +101,36 @@ GPParameters* wxGISGPProjectVectorTool::GetParameterInfo(void)
         pDomain3->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoMif));
         pParam3->SetDomain(pDomain3);
 
-        m_pParamArr.push_back(pParam3);
+        m_paParam.Add(pParam3);
     }
-    return &m_pParamArr;
+    return m_paParam;
 }
 
 bool wxGISGPProjectVectorTool::Validate(void)
 {
-    if(!m_pParamArr[2]->GetAltered())
+    if(!m_paParam[2]->GetAltered())
     {
-        if(m_pParamArr[0]->GetIsValid())
+        if(m_paParam[0]->GetIsValid())
         {
             //generate temp name
-            wxFileName Name(m_pParamArr[0]->GetValue());
+            wxFileName Name(m_paParam[0]->GetValue());
             Name.SetName(Name.GetName() + wxT("_reproject"));
-            m_pParamArr[2]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
-            m_pParamArr[2]->SetAltered(true);//??
+            m_paParam[2]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
+            m_paParam[2]->SetAltered(true);//??
         }
     }
 
     //check if input & output types is same!
-    //if(m_pParamArr[0]->GetIsValid())
+    //if(m_paParam[0]->GetIsValid())
     //{
-    //    if(!m_pParamArr[2]->GetHasBeenValidated())
+    //    if(!m_paParam[2]->GetHasBeenValidated())
     //    {
-    //        wxFileName Name1(m_pParamArr[0]->GetValue());
-    //        wxFileName Name2(m_pParamArr[2]->GetValue());
+    //        wxFileName Name1(m_paParam[0]->GetValue());
+    //        wxFileName Name2(m_paParam[2]->GetValue());
     //        if(Name1.GetExt() != Name2.GetExt())
     //        {
-    //            m_pParamArr[2]->SetIsValid(false);
-    //            m_pParamArr[2]->SetMessage(wxGISEnumGPMessageError, _("Cannot project to the different format"));
+    //            m_paParam[2]->SetIsValid(false);
+    //            m_paParam[2]->SetMessage(wxGISEnumGPMessageError, _("Cannot project to the different format"));
     //            return false;
     //        }
     //    }
@@ -159,7 +158,7 @@ bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
     }
 
     //get source
-    wxString sSrcPath = m_pParamArr[0]->GetValue();
+    wxString sSrcPath = m_paParam[0]->GetValue();
     IGxObject* pGxObject = pGxObjectContainer->SearchChild(sSrcPath);
     if(!pGxObject)
     {
@@ -198,7 +197,7 @@ bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
     }
 
     //get spatial reference
-    wxString sWKT = m_pParamArr[1]->GetValue().MakeString();
+    wxString sWKT = m_paParam[1]->GetValue().MakeString();
     if(sWKT.IsEmpty())
     {
         if(pTrackCancel)
@@ -218,28 +217,22 @@ bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
     }
 
     //get destination
-    wxString sDstPath = m_pParamArr[2]->GetValue();
+    wxString sDstPath = m_paParam[2]->GetValue();
 
 	//check overwrite & do it!
 	if(!OverWriteGxObject(pGxObjectContainer->SearchChild(sDstPath), pTrackCancel))
 		return false;
 
-    wxFileName sDstFileName(sDstPath);
-    wxString sPath = sDstFileName.GetPath();
-    IGxObject* pGxDstObject = pGxObjectContainer->SearchChild(sPath);
+	IGxObject* pGxDstObject = GetParentGxObjectFromPath(sDstPath, pGxObjectContainer, pTrackCancel);
     if(!pGxDstObject)
-    {
-        //add messages to pTrackCancel
-        if(pTrackCancel)
-            pTrackCancel->PutMessage(_("Error get destination object"), -1, enumGISMessageErr);
         return false;
-    }
-    CPLString szDestPath = pGxDstObject->GetInternalName();
-//    szDestPath = CPLFormFilename(szDestPath, sDstFileName.GetFullName().mb_str(), NULL);
+
+	CPLString szDestPath = pGxDstObject->GetInternalName();
+    wxFileName sDstFileName(sDstPath);
     wxString sName = sDstFileName.GetName();
 
-    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[2]->GetDomain());
-	IGxObjectFilter* pFilter = pDomain->GetFilter(m_pParamArr[2]->GetSelDomainValue());
+    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_paParam[2]->GetDomain());
+	IGxObjectFilter* pFilter = pDomain->GetFilter(m_paParam[2]->GetSelDomainValue());
     if(!pFilter)
     {
         //add messages to pTrackCancel
@@ -254,7 +247,7 @@ bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
     //CPLString szPath = pGxDstObject->GetInternalName();
     //wxString sName = sDstFileName.GetName();
     //
-    //wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[1]->GetDomain());
+    //wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_paParam[1]->GetDomain());
     //IGxObjectFilter* pFilter = pDomain->GetFilter(pDomain->GetSelFilter());
     //if(!pFilter)
     //{
@@ -266,12 +259,8 @@ bool wxGISGPProjectVectorTool::Execute(ITrackCancel* pTrackCancel)
     //    
     //bool bHasErrors = ExportFormat(pSrcDataSet, szPath, sName, pFilter, NULL, pTrackCancel);
 
-    IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
-    if(pCont)
-    {
-        if(pGxDstObject)
-            pGxDstObject->Refresh();
-    }
+    if(pGxDstObject)
+        pGxDstObject->Refresh();
 
     return bRes;
 }

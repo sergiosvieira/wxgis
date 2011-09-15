@@ -1,9 +1,9 @@
 /******************************************************************************
- * Project:  wxGIS (GIS Catalog)
+ * Project:  wxGIS
  * Purpose:  wxGISSimpleRenderer class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,10 +20,14 @@
  ****************************************************************************/
 #pragma once
 
-#include <cstdlib>
 #include "wxgis/carto/carto.h"
+#include "wxgis/datasource/featuredataset.h"
 
+//#include <cstdlib>
 
+/** \class wxGISSimpleRenderer simplerenderer.h
+    \brief The vector layer renderer
+*/
 class wxGISSimpleRenderer :
 	public IFeatureRenderer
 {
@@ -32,10 +36,11 @@ public:
 	~wxGISSimpleRenderer(void);
 //IFeatureRenderer
 	virtual bool CanRender(wxGISDatasetSPtr pDataset);
-	virtual void Draw(wxGISGeometrySet* pSet, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel);
-	virtual void DrawGeometry(OGRGeometry *poGeometry, IDisplay* pDisplay);
+	virtual void Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = 0);
 protected:
-	ISymbol* m_pFillSymbol;
-	ISymbol* m_pLineSymbol;
-	ISymbol* m_pMarkerSymbol;
+	wxGISDatasetSPtr m_pDataset;
+	RGBA m_stFillColour, m_stLineColour, m_stPointColour;
+//	ISymbol* m_pFillSymbol;
+//	ISymbol* m_pLineSymbol;
+//	ISymbol* m_pMarkerSymbol;
 };

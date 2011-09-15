@@ -78,30 +78,54 @@ bool wxGxRasterFactory::GetChildren(CPLString sParentDir, char** &pFileNames, Gx
 
         else if(EQUAL(szExt, "prj"))
         {
-            szPath = (char*)CPLResetExtension(pFileNames[i], "bmp");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            szPath = (char*)CPLResetExtension(pFileNames[i], "jpg");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            szPath = (char*)CPLResetExtension(pFileNames[i], "jpeg");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            szPath = (char*)CPLResetExtension(pFileNames[i], "img");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            szPath = (char*)CPLResetExtension(pFileNames[i], "gif");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            szPath = (char*)CPLResetExtension(pFileNames[i], "tif");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            szPath = (char*)CPLResetExtension(pFileNames[i], "tiff");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            szPath = (char*)CPLResetExtension(pFileNames[i], "png");
-            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "bmp");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "jpg");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "jpeg");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "img");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "gif");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "tif");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "tiff");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
+			if(pFileNames)
+			{
+				szPath = (char*)CPLResetExtension(pFileNames[i], "png");
+				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			}
         }
         else if(EQUAL(szExt, "aux"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
@@ -136,16 +160,16 @@ void wxGxRasterFactory::Serialize(wxXmlNode* pConfig, bool bStore)
 {
     if(bStore)
     {
-        if(pConfig->HasProp(wxT("factory_name")))
-            pConfig->DeleteProperty(wxT("factory_name"));
-        pConfig->AddProperty(wxT("factory_name"), GetClassName());  
-        if(pConfig->HasProp(wxT("is_enabled")))
-            pConfig->DeleteProperty(wxT("is_enabled"));
-        pConfig->AddProperty(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
+        if(pConfig->HasAttribute(wxT("factory_name")))
+            pConfig->DeleteAttribute(wxT("factory_name"));
+        pConfig->AddAttribute(wxT("factory_name"), GetClassName());  
+        if(pConfig->HasAttribute(wxT("is_enabled")))
+            pConfig->DeleteAttribute(wxT("is_enabled"));
+        pConfig->AddAttribute(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
     }
     else
     {
-        m_bIsEnabled = wxAtoi(pConfig->GetPropVal(wxT("is_enabled"), wxT("1")));
+        m_bIsEnabled = wxAtoi(pConfig->GetAttribute(wxT("is_enabled"), wxT("1"))) != 0;
     }
 }
 

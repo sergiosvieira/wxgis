@@ -133,7 +133,7 @@ bool wxGISPostgresDataSource::Open()
 	CPLSetConfigOption("PGCLIENTENCODING", "UTF-8");
 
     //wxT("PG:host='127.0.0.1' dbname='db' port='5432' user='bishop' password='xxx'")
-	wxString Path = wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_sCursor.c_str(), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), m_sName.c_str(), Decode(m_sCryptPass, CONFIG_DIR));
+/*	wxString Path = wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_sCursor.c_str(), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), m_sName.c_str(), Decode(m_sCryptPass, CONFIG_DIR));
 	m_sPath = CPLString(Path.mb_str(wxConvUTF8));
     m_poDS = OGRSFDriverRegistrar::Open( m_sPath, FALSE );
     m_sPath.Clear();
@@ -144,7 +144,7 @@ bool wxGISPostgresDataSource::Open()
 		wxLogError(sErr);
 		return false;
 	}
-
+*/
 	m_bIsOpened = true;
 	return true;
 }
@@ -173,7 +173,7 @@ wxGISDatasetSPtr wxGISPostgresDataSource::ExecuteSQL(wxString sStatement, wxGISS
     if(m_poDS)
 	{
         CPLString szStatement = sStatement.mb_str();
-		OGRLayer * poLayer = m_poDS->ExecuteSQL(szStatement, NULL, wgWX2MB(sDialect));//TODO: implement spatial Filter
+		OGRLayer * poLayer = m_poDS->ExecuteSQL(szStatement, NULL, sDialect.mb_str());//TODO: implement spatial Filter
 		if(	poLayer )
 		{
 			m_poDS->Reference();

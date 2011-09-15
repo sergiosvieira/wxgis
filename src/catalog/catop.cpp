@@ -23,6 +23,8 @@
 
 bool OverWriteGxObject(IGxObject* pGxObject, ITrackCancel* pTrackCancel)
 {
+	if(!pGxObject) //the object is not exist
+		return true;
     IGxObjectEdit* pGxDstObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject);
     if(pGxDstObjectEdit)
     {
@@ -43,4 +45,19 @@ bool OverWriteGxObject(IGxObject* pGxObject, ITrackCancel* pTrackCancel)
         return false;
 	}
 	return true;
+}
+
+IGxObject* GetParentGxObjectFromPath(const wxString &sFullPath, IGxObjectContainer* pGxObjectContainer, ITrackCancel* pTrackCancel)
+{
+	if(!pGxObjectContainer)
+		return NULL;
+    wxFileName sDstFileName(sFullPath);
+    wxString sPath = sDstFileName.GetPath();
+    IGxObject* pGxDstObject = pGxObjectContainer->SearchChild(sPath);
+    if(!pGxDstObject)
+    {
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("Error get destination object"), -1, enumGISMessageErr);
+    }
+    return pGxDstObject;
 }

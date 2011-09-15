@@ -22,7 +22,7 @@
 
 #include "wxgis/base.h"
 
-#include "wx/process.h"
+#include <wx/process.h>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
@@ -30,51 +30,73 @@
 
 #define wgDELETE(p,func) if(p != NULL) {p->func; delete p; p = NULL;}
 #define wsDELETE(p) if(p != NULL) {p->Release(); p = NULL;}
-#define wgWX2MB(x)  wxConvCurrent->cWX2MB(x)
-#define wgMB2WX(x)  wxConvCurrent->cMB2WX(x)
+//#define wgWX2MB(x)  wxConvCurrent->cWX2MB(x)
+//#define wgMB2WX(x)  wxConvCurrent->cMB2WX(x)
 
 enum wxGISEnumConfigKey
 {
-	enumGISHKLM = 0x0000,
-	enumGISHKCU = 0x0001,
-	enumGISHKCC = 0x0002,
-	enumGISHKCR = 0x0004
+	enumGISHKLM = 0x0001,
+	enumGISHKCU = 0x0002
+	//,
+	//enumGISHKCC = 0x0004,
+	//enumGISHKCR = 0x0008,
+	//enumGISHKAny = enumGISHKLM & enumGISHKCU
 };
 
-class IGISConfig
+/** \class IApplication core.h
+    \brief Base class for wxGIS application.
+*/
+class IApplication
 {
 public:
-	virtual ~IGISConfig(void){};
+    /** \fn virtual ~IApplication(void)
+     *  \brief A destructor.
+     */
+    virtual ~IApplication(void) {};
 	//pure virtual
-    virtual wxXmlNode* GetConfigNode(wxGISEnumConfigKey Key, wxString sPath) = 0;
-	virtual wxXmlNode* CreateConfigNode(wxGISEnumConfigKey Key, wxString sPath, bool bUniq) = 0;
-    virtual wxXmlNode* GetConfigNode(wxString sPath, bool bCreateInCU, bool bUniq) = 0;
-
-	//virtual wxXmlNode* GetRootNodeByName(wxString sApp, bool bUser, wxString sName) = 0;
-	//virtual wxXmlNode* GetNodeByName(wxXmlNode* pRoot, wxString sName) = 0;
-	//virtual wxXmlNode* GetXmlConfig(wxString sApp, bool bUser) = 0;
+	virtual void OnAppAbout(void) = 0;
+    virtual void OnAppOptions(void) = 0;
+	virtual wxString GetAppName(void) = 0;
+	virtual wxString GetAppVersionString(void) = 0;
+    virtual bool Create(void) = 0;
+    virtual bool SetupLog(const wxString &sLogPath) = 0;
+    virtual bool SetupLoc(const wxString &sLoc, const wxString &sLocPath) = 0;
+    virtual bool SetupSys(const wxString &sSysPath) = 0;
+    virtual void SetDebugMode(bool bDebugMode) = 0;
 };
 
 
-class IConnectionPointContainer
+class wxGISConnectionPointContainer
 {
 public:
-	virtual ~IConnectionPointContainer(void){};
-	virtual long Advise(wxObject* pObject)
+	virtual ~wxGISConnectionPointContainer(void){};
+	virtual long Advise(wxEvtHandler* pEvtHandler)
 	{
-		if(pObject == NULL)
-			return -1;
-		m_pPointsArray.push_back(pObject);
+		wxCHECK(pEvtHandler, wxNOT_FOUND);
+
+		std::vector<wxEvtHandler*>::iterator pos = std::find(m_pPointsArray.begin(), m_pPointsArray.end(), pEvtHandler);
+		if(pos != m_pPointsArray.end())
+			return pos - m_pPointsArray.begin();
+		m_pPointsArray.push_back(pEvtHandler);
 		return m_pPointsArray.size() - 1;
 	}
+
 	virtual void Unadvise(long nCookie)
 	{
-		if(nCookie < 0 || m_pPointsArray.size() <= nCookie)
-			return;
+		wxCHECK_RET(nCookie >= 0 && nCookie < m_pPointsArray.size(), "wrong cookie index");
 		m_pPointsArray[nCookie] = NULL;
 	}
 protected:
-	std::vector<wxObject*> m_pPointsArray;
+	virtual void PostEvent(wxEvent &event)
+	{
+		for(size_t i = 0; i < m_pPointsArray.size(); ++i)
+		{
+			if(m_pPointsArray[i] != NULL)
+				m_pPointsArray[i]->AddPendingEvent(event);
+		}
+	};
+protected:
+	std::vector<wxEvtHandler*> m_pPointsArray;
 };
 
 class IPointer
@@ -160,6 +182,12 @@ public:
      *  \brief Stop undefined progressor state.
      */		
     virtual void Stop(void) = 0;
+    /** \fn void SetYield(bool bYield = false)
+     *  \brief SetYield Yields control to pending messages in the windowing system.
+
+	    This can be useful, for example, when a time-consuming process writes to a text window. Without an occasional yield, the text window will not be updated properly, and other processes will not respond.
+     */		
+	virtual void SetYield(bool bYield = false) = 0;
 };
 
 /** \class ITrackCancel core.h
@@ -190,7 +218,7 @@ protected:
 	IProgressor* m_pProgressor;
 };
 
-static bool CreateAndRunThread(wxThread* pThread, wxString sClassName = wxEmptyString, wxString sThreadName = wxEmptyString)
+static bool CreateAndRunThread(wxThread* pThread, wxString sClassName = wxEmptyString, wxString sThreadName = wxEmptyString, int nPriority = WXTHREAD_DEFAULT_PRIORITY)
 {
 	if(!pThread)
 		return false;
@@ -201,55 +229,13 @@ static bool CreateAndRunThread(wxThread* pThread, wxString sClassName = wxEmptyS
 		wxLogError(_("%s: Can't create %s Thread!"), sClassName.c_str(), sThreadName.c_str());
 		return false;
     }
+	pThread->SetPriority(nPriority);
 	if(pThread->Run() != wxTHREAD_NO_ERROR )
     {
 		wxLogError(_("%s: Can't run %s Thread!"), sClassName.c_str(), sThreadName.c_str());
 		return false;
     }
 	return true;
-}
-
-#define hibyte(a) ((a>>8) & 0xFF)
-#define lobyte(a) ((a) & 0xFF)
-
-static wxString Encode(wxString sInput, wxString sPass)
-{
-    wxString sRes;
-    size_t pos(0);
-    for(size_t i = 0; i < sInput.Len(); i++)
-    {
-        if(pos == sPass.Len())
-            pos = 0;
-        wxChar Symbol = sInput[i] ^ sPass[pos];
-        char SymbolHi = hibyte(Symbol);
-        char SymbolLo = lobyte(Symbol);//(Symbol >> 4) & 0xff;
-		sRes += wxDecToHex(SymbolHi);
-		sRes += wxDecToHex(SymbolLo);
-        pos++;
-    }
-    return sRes;
-}
-
-static wxString Decode(wxString sInput, wxString sPass)
-{
-    wxString sRes;
-    size_t pos(0);
-    for(size_t i = 0; i < sInput.Len(); i += 4)
-    {
-        if(pos == sPass.Len())
-            pos = 0;
-		wxString sHex = sInput[i];
-		sHex += sInput[i + 1]; 
-        char SymbolHi = wxHexToDec(sHex);
-        sHex = sInput[i + 2];
-		sHex += sInput[i + 3];
-        char SymbolLo = wxHexToDec(sHex);
-        wxChar Symbol = (SymbolHi << 8) + SymbolLo;
-        Symbol = Symbol ^ sPass[pos];
-        sRes += Symbol;
-        pos++;
-    }
-    return sRes;
 }
 
 /** \enum wxGISEnumTaskStateType core.h
@@ -288,8 +274,8 @@ public:
 		m_nState = enumGISTaskPaused;
 	}
 	virtual ~IProcess(void){};
-    virtual void OnStart(void) = 0;
-    virtual void OnCancel(void) = 0;
+    virtual void Start(void) = 0;
+    virtual void Cancel(void) = 0;
 	virtual void SetState(wxGISEnumTaskStateType nState){m_nState = nState;};
 	virtual wxGISEnumTaskStateType GetState(void){return m_nState;};
 	virtual wxString GetCommand(void){return m_sCommand;};
@@ -317,78 +303,6 @@ public:
 
 #define DEFINE_SHARED_PTR(x) typedef boost::shared_ptr<x> x##SPtr
 #define DEFINE_WEAK_PTR(x) typedef boost::weak_ptr<x> x##WPtr
-static void wxNotDeleter(void*);
-
-static wxString DoubleToString(double Val, bool IsLon)
-{
-	wxString znak;
-	if(Val < 0)
-	{
-		if(IsLon) znak = _(" W");
-		else znak = _(" S");
-	}
-	else
-	{
-		if(IsLon) znak = _(" E");
-		else znak = _(" N");
-	}
-	Val = fabs(Val);
-	int grad = floor(Val);
-	int min = floor((Val - grad) * 60);
-	int sec = floor((Val - grad - (double) min / 60) * 3600);
-	wxString str;
-	if(IsLon)
-		str.Printf(wxT("%.3d-%.2d-%.2d%s"), grad, min, sec, znak.c_str());
-	else
-		str.Printf(wxT("%.2d-%.2d-%.2d%s"), grad, min, sec, znak.c_str());
-	return str;
-};
-
-static double StringToDouble(wxString Val, wxString asterisk)
-{
-	wxString buff;
-	unsigned char counter = 0;
-	int grad, min, sec;
-	for(size_t i = 0; i < Val.Len(); i++)
-	{
-		wxChar ch = Val[i];
-		if(ch == '-' || ch == ' ')
-		{
-			switch(counter)
-			{
-				case 0:
-				grad = wxAtoi(buff.c_str());
-				break;
-				case 1:
-				min = wxAtoi(buff.c_str());
-				break;
-				case 2:
-				sec = wxAtoi(buff.c_str());
-				break;
-			}
-		}
-	}
-	int mul = -1;
-	if(buff == _(" E") || buff == _(" N"))
-		mul = 1;
-	return ((double) grad + (double)min / 60 + (double)sec / 3600) * mul;
-};
-
-static wxString NumberScale(double fScaleRatio)
-{
-	wxString str = wxString::Format(wxT("%.2f"), fScaleRatio);
-	int pos = str.Find(wxT("."));
-	if(pos == wxNOT_FOUND)
-		pos = str.Len();
-	wxString res = str.Right(str.Len() - pos);
-	for(size_t i = 1; i < pos + 1; i++)
-	{
-		res.Prepend(str[pos - i]);
-		if((i % 3) == 0)
-			res.Prepend(wxT(" "));
-	}
-	return res;
-};
 
 //std::numeric_limits<double>::epsilon() * 20
 //FLT_EPSILON
@@ -397,3 +311,5 @@ inline bool IsDoubleEquil( double a, double b, double epsilon = 16 * DBL_EPSILON
   const double diff = a - b;
   return diff > -epsilon && diff <= epsilon;
 }
+
+

@@ -39,9 +39,9 @@ bool wxRxObject::Init(wxGxRemoteServer* pGxRemoteServer, wxXmlNode* pProperties)
 	if(!pProperties && !pGxRemoteServer)
 		return false;
 	m_pGxRemoteServer = pGxRemoteServer;
-	if(pProperties->HasProp(wxT("dst"))) //set dst from xml
+	if(pProperties->HasAttribute(wxT("dst"))) //set dst from xml
 	{
-		m_sDst = pProperties->GetPropVal(wxT("dst"), ERR);
+		m_sDst = pProperties->GetAttribute(wxT("dst"), ERR);
 		INetMessageProcessor* pNetMessageProcessor = dynamic_cast<INetMessageProcessor*>(m_pGxRemoteServer);
 		if(pNetMessageProcessor)
 			pNetMessageProcessor->AddMessageReceiver(m_sDst, static_cast<INetMessageReceiver*>(this));
@@ -78,8 +78,8 @@ void wxRxObjectContainer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 {
 	if(pChildNode)
 	{
-		if(pChildNode->GetName().CmpNoCase(wxT("children")) == 0 && pChildNode->HasProp(wxT("count")))
-			m_nChildCount = wxAtoi(pChildNode->GetPropVal(wxT("count"), wxT("0")));
+		if(pChildNode->GetName().CmpNoCase(wxT("children")) == 0 && pChildNode->HasAttribute(wxT("count")))
+			m_nChildCount = wxAtoi(pChildNode->GetAttribute(wxT("count"), wxT("0")));
 		if(m_nChildCount == 0)
 		{
 			m_bIsChildrenLoaded = true;
@@ -90,9 +90,9 @@ void wxRxObjectContainer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 			//load items
 			while(pChildNode)
 			{
-				wxString sDst = pChildNode->GetPropVal(wxT("dst"), ERR);
+				wxString sDst = pChildNode->GetAttribute(wxT("dst"), ERR);
 				bool bAdd(true);
-				for(size_t i = 0; i < m_sDstArray.GetCount(); i++)
+				for(size_t i = 0; i < m_sDstArray.GetCount(); ++i)
 				{
 					if(sDst == m_sDstArray[i])
 					{
@@ -101,7 +101,7 @@ void wxRxObjectContainer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 					}
 				}
 
-				wxString sClassName = pChildNode->GetPropVal(wxT("class"), ERR);
+				wxString sClassName = pChildNode->GetAttribute(wxT("class"), ERR);
 				if(!sClassName.IsEmpty() && bAdd)
 				{
 					IGxObject *pObj = dynamic_cast<IGxObject*>(wxCreateDynamicObject(sClassName));
@@ -122,7 +122,7 @@ void wxRxObjectContainer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 
 void wxRxObjectContainer::EmptyChildren(void)
 {
-	for(size_t i = 0; i < m_Children.size(); i++)
+	for(size_t i = 0; i < m_Children.size(); ++i)
 	{
 		m_Children[i]->Detach();
 		wxDELETE(m_Children[i]);
@@ -146,7 +146,7 @@ bool wxRxObjectContainer::LoadChildren()
 		return true;
     }
     else
-        wxDELETE(pMsg)
+        wxDELETE(pMsg);
 	return false;
 }
 
@@ -182,9 +182,9 @@ bool wxRxObjectContainer::Init(wxGxRemoteServer* pGxRemoteServer, wxXmlNode* pPr
 	if(!pProperties && !pGxRemoteServer)
 		return false;
 	m_pGxRemoteServer = pGxRemoteServer;
-	if(pProperties->HasProp(wxT("dst"))) //set dst from xml
+	if(pProperties->HasAttribute(wxT("dst"))) //set dst from xml
 	{
-		m_sDst = pProperties->GetPropVal(wxT("dst"), ERR);
+		m_sDst = pProperties->GetAttribute(wxT("dst"), ERR);
 		INetMessageProcessor* pNetMessageProcessor = dynamic_cast<INetMessageProcessor*>(m_pGxRemoteServer);
 		if(pNetMessageProcessor)
 			pNetMessageProcessor->AddMessageReceiver(m_sDst, static_cast<INetMessageReceiver*>(this));

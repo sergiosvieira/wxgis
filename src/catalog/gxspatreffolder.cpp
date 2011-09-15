@@ -37,7 +37,7 @@ wxGxSpatialReferencesFolder::~wxGxSpatialReferencesFolder(void)
 
 void wxGxSpatialReferencesFolder::Init(wxXmlNode* const pConfigNode)
 {
-    m_sInternalPath = pConfigNode->GetPropVal(wxT("path"), NON);
+    m_sInternalPath = pConfigNode->GetAttribute(wxT("path"), NON);
     if(m_sInternalPath.IsEmpty() || m_sInternalPath == wxString(NON))
     {
         //example /vsizip/c:/wxGIS/sys/cs.zip/cs
@@ -47,25 +47,15 @@ void wxGxSpatialReferencesFolder::Init(wxXmlNode* const pConfigNode)
     }
 
     m_sInternalPath.Replace(wxT("\\"), wxT("/"));
-    wxLogMessage(_("wxGxSpatialReferencesFolder: The path is set to '%s'"), m_sPath.c_str());
+    wxLogMessage(_("wxGxSpatialReferencesFolder: The path is set to '%s'"), m_sInternalPath.c_str());
     CPLSetConfigOption("wxGxSpatialReferencesFolder", m_sInternalPath.mb_str(wxConvUTF8));
 
     m_sPath = CPLString(m_sInternalPath.mb_str(wxConvUTF8));
 }
 
-wxXmlNode* wxGxSpatialReferencesFolder::GetProperties(void)
+void wxGxSpatialReferencesFolder::Serialize(wxXmlNode* pConfigNode)
 {
-    wxXmlNode* pNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("rootitem"));
-    wxClassInfo* pInfo = GetClassInfo();
-    if(pInfo)
-        pNode->AddProperty(wxT("name"), pInfo->GetClassName());
-    pNode->AddProperty(wxT("is_enabled"), m_bEnabled == true ? wxT("1") : wxT("0"));    
-#ifndef WXGISPORTABLE
-    if(pNode->HasProp(wxT("path")))
-        pNode->DeleteProperty(wxT("path"));
-    pNode->AddProperty(wxT("path"), m_sInternalPath);
-#endif  
-    return pNode;
+    pConfigNode->AddAttribute(wxT("path"), m_sInternalPath);
 }
 
 //void wxGxSpatialReferencesFolder::LoadChildren(void)
@@ -86,7 +76,7 @@ wxXmlNode* wxGxSpatialReferencesFolder::GetProperties(void)
 //    {
 //        //wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
 //       	//wxArrayString FileNames;
-//        for(int i = 0; papszFileList[i] != NULL; i++ )
+//        for(int i = 0; papszFileList[i] != NULL; ++i )
 //		{
 //			wxString sFileName(papszFileList[i], wxConvUTF8);
 //            //if(i > 0)
@@ -116,7 +106,7 @@ wxXmlNode* wxGxSpatialReferencesFolder::GetProperties(void)
 //	GxObjectArray Array;	
 //	if(m_pCatalog->GetChildren(m_sPath, &m_FileNames, &Array))
 //	{
-//		for(size_t i = 0; i < Array.size(); i++)
+//		for(size_t i = 0; i < Array.size(); ++i)
 //		{
 //			bool ret_code = AddChild(Array[i]);
 //			if(!ret_code)

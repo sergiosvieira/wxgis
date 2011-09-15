@@ -20,10 +20,10 @@
  ****************************************************************************/
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalogui/gxapplication.h"
+#include "wxgis/catalogui/gxeventui.h"
 
 class wxGxLocationComboBox : 
 	public wxComboBox,
-	public IGxSelectionEvents,
 	public IToolBarControl
 {
 public:
@@ -31,15 +31,15 @@ public:
 	virtual ~wxGxLocationComboBox(void);
 	//events
 	void OnTextEnter(wxCommandEvent& event);
-	//IGxSelectionEvents
-	virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 	//IToolBarControl
-	virtual void Activate(IApplication* pApp);
+	virtual void Activate(IFrameApplication* pApp);
 	virtual void Deactivate(void);
+	//events
+	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
 protected:
-	IApplication* m_pApp;
+	IFrameApplication* m_pApp;
 	std::vector<wxString> m_ValuesArr;
-	IConnectionPointContainer* m_pConnectionPointSelection;
+	wxGISConnectionPointContainer* m_pConnectionPointSelection;
 	long m_ConnectionPointSelectionCookie;
     wxGxCatalogUI* m_pGxCatalogUI;
 

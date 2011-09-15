@@ -40,28 +40,26 @@ wxGISGPOrthoCorrectTool::wxGISGPOrthoCorrectTool(void) : wxGISGPTool()
 
 wxGISGPOrthoCorrectTool::~wxGISGPOrthoCorrectTool(void)
 {
-    for(size_t i = 0; i < m_pParamArr.size(); i++)
-        wxDELETE(m_pParamArr[i]);
 }
 
-wxString wxGISGPOrthoCorrectTool::GetDisplayName(void)
+const wxString wxGISGPOrthoCorrectTool::GetDisplayName(void)
 {
     return wxString(_("Create Ortho-Corrected Raster"));
 }
 
-wxString wxGISGPOrthoCorrectTool::GetName(void)
+const wxString wxGISGPOrthoCorrectTool::GetName(void)
 {
     return wxString(wxT("create_ortho"));
 }
 
-wxString wxGISGPOrthoCorrectTool::GetCategory(void)
+const wxString wxGISGPOrthoCorrectTool::GetCategory(void)
 {
     return wxString(_("Data Management Tools/Raster"));
 }
 
-GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
+GPParameters wxGISGPOrthoCorrectTool::GetParameterInfo(void)
 {
-    if(m_pParamArr.empty())
+    if(m_paParam.IsEmpty())
     {
         //src path
         wxGISGPParameter* pParam1 = new wxGISGPParameter();
@@ -76,7 +74,7 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         pDomain1->AddFilter(new wxGxRasterFilter(enumRasterTil));
         pParam1->SetDomain(pDomain1);
 
-        m_pParamArr.push_back(pParam1);
+        m_paParam.Add(pParam1);
 
         //dst path
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
@@ -92,7 +90,7 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
 
         //pParam2->AddParameterDependency(wxT("src_path"));
 
-        m_pParamArr.push_back(pParam2);
+        m_paParam.Add(pParam2);
 
         //DEM_raster
         wxGISGPParameter* pParam3 = new wxGISGPParameter();
@@ -106,7 +104,7 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         pDomain3->AddFilter(new wxGxDatasetFilter(enumGISRasterDataset));
         pParam3->SetDomain(pDomain3);
 
-        m_pParamArr.push_back(pParam3);
+        m_paParam.Add(pParam3);
 
         //constant_ elevation double
         wxGISGPParameter* pParam4 = new wxGISGPParameter();
@@ -117,7 +115,7 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         pParam4->SetDirection(enumGISGPParameterDirectionInput);
         pParam4->SetValue(0.0);
 
-        m_pParamArr.push_back(pParam4);
+        m_paParam.Add(pParam4);
 
         //constant_ elevation double
         wxGISGPParameter* pParam5 = new wxGISGPParameter();
@@ -128,7 +126,7 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         pParam5->SetDirection(enumGISGPParameterDirectionInput);
         pParam5->SetValue(1.0);
 
-        m_pParamArr.push_back(pParam5);
+        m_paParam.Add(pParam5);
 
         //elevation interpolation type
         wxGISGPParameter* pParam6 = new wxGISGPParameter();
@@ -145,26 +143,25 @@ GPParameters* wxGISGPOrthoCorrectTool::GetParameterInfo(void)
 
         pParam6->SetValue(_("Bilinear"));
 
-        m_pParamArr.push_back(pParam6);
+        m_paParam.Add(pParam6);
     }
-    return &m_pParamArr;
+    return m_paParam;
 }
 
 bool wxGISGPOrthoCorrectTool::Validate(void)
 {
-    if(!m_pParamArr[1]->GetAltered())
+    if(!m_paParam[1]->GetAltered())
     {
-        if(m_pParamArr[0]->GetIsValid())
+        if(m_paParam[0]->GetIsValid())
         {
             //generate temp name
-            wxString sPath = m_pParamArr[0]->GetValue();
+            wxString sPath = m_paParam[0]->GetValue();
             wxFileName Name(sPath);
             Name.SetName(Name.GetName() + wxT("_ortho"));
-            m_pParamArr[1]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
-            m_pParamArr[1]->SetAltered(true);//??
+            m_paParam[1]->SetValue(wxVariant(Name.GetFullPath(), wxT("path")));
+            m_paParam[1]->SetAltered(true);//??
         }
     }
-
     return true;
 }
 
@@ -187,7 +184,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
 
-    wxString sSrcPath = m_pParamArr[0]->GetValue();
+    wxString sSrcPath = m_paParam[0]->GetValue();
     IGxObject* pGxObject = pGxObjectContainer->SearchChild(sSrcPath);
     if(!pGxObject)
     {
@@ -216,7 +213,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
 		if(!pSrcDataSet->Open(true))
 			return false;
 
-    wxString sDstPath = m_pParamArr[1]->GetValue();
+    wxString sDstPath = m_paParam[1]->GetValue();
 
 	//check overwrite & do it!
 	if(!OverWriteGxObject(pGxObjectContainer->SearchChild(sDstPath), pTrackCancel))
@@ -236,8 +233,8 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     CPLString szPath = pGxDstObject->GetInternalName();
     wxString sName = sDstFileName.GetName();
 
-    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParamArr[1]->GetDomain());
-	IGxObjectFilter* pFilter = pDomain->GetFilter(m_pParamArr[1]->GetSelDomainValue());
+    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_paParam[1]->GetDomain());
+	IGxObjectFilter* pFilter = pDomain->GetFilter(m_paParam[1]->GetSelDomainValue());
     if(!pFilter)
     {
         //add messages to pTrackCancel
@@ -271,7 +268,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     }
     GDALDataType eDT = poGDALRasterBand->GetRasterDataType();
 
-    wxString soChoice = m_pParamArr[5]->GetValue();
+    wxString soChoice = m_paParam[5]->GetValue();
     if(soChoice == wxString(_("Cubic")))
         CPLSetConfigOption( "GDAL_RPCDEMINTERPOLATION", "CUBIC" ); //BILINEAR
 
@@ -282,7 +279,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     osDSTSRSOpt += poGDALDataset->GetProjectionRef();
 
     const char *apszOptions[6] = { osDSTSRSOpt.c_str(), "METHOD=RPC", NULL, NULL, NULL, NULL};//, NULL  osSRCSRSOpt.c_str(),
-    wxString soDEMPath = m_pParamArr[2]->GetValue();
+    wxString soDEMPath = m_paParam[2]->GetValue();
 
     CPLString soCPLDemPath;
     if(pGxObjectContainer)
@@ -298,14 +295,14 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     osDEMFileOpt += soCPLDemPath;
     apszOptions[2] = osDEMFileOpt.c_str();
 
-    wxString soHeight = m_pParamArr[3]->GetValue();
+    wxString soHeight = m_paParam[3]->GetValue();
     CPLString osHeightOpt = "RPC_HEIGHT=";
-    osHeightOpt += wgWX2MB(soHeight);
+    osHeightOpt += soHeight.mb_str();
     apszOptions[3] = osHeightOpt.c_str();
 
-    wxString soHeightScale = m_pParamArr[4]->GetValue();
+    wxString soHeightScale = m_paParam[4]->GetValue();
     CPLString osHeightScaleOpt = "RPC_HEIGHT_SCALE=";
-    osHeightScaleOpt += wgWX2MB(soHeightScale);
+	osHeightScaleOpt += soHeightScale.mb_str();
     apszOptions[4] = osHeightScaleOpt.c_str();
 
     //double dfPixErrThreshold = MIN(adfDstGeoTransform[1], adfDstGeoTransform[5]);
@@ -315,7 +312,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     {
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wxString::Format(_("Error CreateGenImgProjTransformer. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString::Format(_("Error CreateGenImgProjTransformer. GDAL Error: %s"), wxString(pszErr, wxConvUTF8).c_str()), -1, enumGISMessageErr);
         return false;
     }
 
@@ -327,7 +324,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     {
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wxString::Format(_("Error determining output raster size. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString::Format(_("Error determining output raster size. GDAL Error: %s"), wxString(pszErr, wxConvUTF8).c_str()), -1, enumGISMessageErr);
         return false;
     }
 
@@ -341,7 +338,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     {
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
-            pTrackCancel->PutMessage(wxString::Format(_("Error creating output raster. GDAL Error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString::Format(_("Error creating output raster. GDAL Error: %s"), wxString(pszErr, wxConvUTF8).c_str()), -1, enumGISMessageErr);
         return false;
     }
 
@@ -402,8 +399,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         const char* pszErr = CPLGetLastErrorMsg();
         if(pTrackCancel)
         {
-            wxString sErr = wgMB2WX(pszErr);
-            pTrackCancel->PutMessage(wxString::Format(_("OrthoCorrect failed! GDAL error: %s"), sErr.c_str()), -1, enumGISMessageErr);
+            pTrackCancel->PutMessage(wxString::Format(_("OrthoCorrect failed! GDAL error: %s"), wxString(pszErr, wxConvUTF8).c_str()), -1, enumGISMessageErr);
         }
         GDALClose(poOutputGDALDataset);
         //wsDELETE(pSrcDataSet);

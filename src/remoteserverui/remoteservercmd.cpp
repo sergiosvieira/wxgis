@@ -37,7 +37,7 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISRemoteCmd, wxObject)
 
-wxGISRemoteCmd::wxGISRemoteCmd(void) : m_IconRemServs(remoteservers_16_xpm), m_IconRemServ(remoteserver_16_xpm), m_IconRemServDiscon(remoteserver_discon_xpm)
+wxGISRemoteCmd::wxGISRemoteCmd(void)
 {
 }
 
@@ -50,12 +50,20 @@ wxIcon wxGISRemoteCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 0:
+			if(!m_IconRemServs.IsOk())
+				m_IconRemServs = wxIcon(remoteservers_16_xpm);
 			return m_IconRemServs;
 		case 1:
+			if(!m_IconRemServ.IsOk())
+				m_IconRemServ = wxIcon(remoteserver_16_xpm);
 			return m_IconRemServ;
 		case 2:
+			if(!m_IconRemServ.IsOk())
+				m_IconRemServ = wxIcon(remoteserver_16_xpm);
 			return m_IconRemServ;
 		case 3:
+			if(!m_IconRemServDiscon.IsOk())
+				m_IconRemServDiscon = wxIcon(remoteserver_discon_xpm);
 			return m_IconRemServDiscon;
 		default:
 			return wxNullIcon;
@@ -233,7 +241,7 @@ void wxGISRemoteCmd::OnClick(void)
 	}
 }
 
-bool wxGISRemoteCmd::OnCreate(IApplication* pApp)
+bool wxGISRemoteCmd::OnCreate(IFrameApplication* pApp)
 {
 	m_pApp = pApp;
 	return true;

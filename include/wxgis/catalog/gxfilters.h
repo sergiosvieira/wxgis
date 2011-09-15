@@ -137,7 +137,7 @@ protected:
 class WXDLLIMPEXP_GIS_CLT wxGxTextFilter : public wxGxObjectFilter
 {
 public:
-	wxGxTextFilter(wxString soName, wxString soExt);
+	wxGxTextFilter(const wxString &soName, const wxString &soExt);
 	virtual ~wxGxTextFilter(void);
 	virtual bool CanChooseObject( IGxObject* pObject );
 	virtual bool CanDisplayObject( IGxObject* pObject );
