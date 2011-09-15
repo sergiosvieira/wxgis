@@ -46,6 +46,7 @@ public:
 	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
     virtual bool Delete(void);
 	virtual OGREnvelope GetEnvelope(void);
+	virtual GDALDataType GetDataType(void);
 	virtual GDALDataset* GetRaster(void){return m_poDataset;};
 	virtual GDALDataset* GetMainRaster(void){return m_poMainDataset;};
 	virtual bool HasOverviews(void){return m_bHasOverviews;};
@@ -67,6 +68,7 @@ protected:
 	int m_nXSize;
 	int m_nYSize;
 	int m_nBandCount;
+	GDALDataType m_nDataType;
 };
 
 DEFINE_SHARED_PTR(wxGISRasterDataset);

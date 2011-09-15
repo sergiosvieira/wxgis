@@ -103,7 +103,7 @@ protected:
 	virtual void DrawToolTip(wxClientDC &dc, wxString &sText);
 	virtual OGREnvelope CreateEnvelopeFromZoomFactor(double dZoom);
 	virtual void UpdateFrameCenter(void);
-	virtual void FillClipGeometry(wxRect rect, wxCoord x, wxCoord y);
+	//virtual void FillClipGeometry(wxRect rect, wxCoord x, wxCoord y);
 protected:
 	wxGISDisplay *m_pGISDisplay;
 	wxTimer m_timer;

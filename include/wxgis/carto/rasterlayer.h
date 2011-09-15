@@ -41,13 +41,14 @@ public:
 //wxGISRasterLayer
 	virtual IRasterRendererSPtr GetRenderer(void){return m_pRasterRenderer;};
 	virtual void SetRenderer(IRasterRendererSPtr pRasterRenderer){m_pRasterRenderer = pRasterRenderer;};
-	virtual void GetSubRaster(OGREnvelope& Envelope, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
+protected:
+	virtual bool GetPixelData(OGREnvelope& stEnvelope, RAWPIXELDATA &stPixelData, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
 protected:
 	wxGISRasterDatasetSPtr m_pwxGISRasterDataset;
     OGRSpatialReferenceSPtr m_pSpatialReference;
 
 	OGREnvelope m_FullEnvelope;
-	OGREnvelope m_PreviousEnvelope;
+	//OGREnvelope m_PreviousEnvelope;
 
 	IRasterRendererSPtr m_pRasterRenderer;
 };

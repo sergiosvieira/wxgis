@@ -31,6 +31,7 @@ wxGISRasterDataset::wxGISRasterDataset(CPLString sPath, wxGISEnumRasterDatasetTy
     m_bIsReadOnly = true;
     m_nSubType = (int)nType;
 	m_nType = enumGISRasterDataset;
+	m_nDataType = GDT_Unknown;
 }
 
 wxGISRasterDataset::~wxGISRasterDataset(void)
@@ -44,6 +45,7 @@ void wxGISRasterDataset::Close(void)
     {
 		m_pSpaRef.reset();
 		m_stExtent.MinX = m_stExtent.MaxX = m_stExtent.MinY = m_stExtent.MaxY = 0;
+		m_nDataType = GDT_Unknown;
         m_bHasOverviews = false;
         m_bHasStats = false;
         m_nBandCount = 0;
@@ -259,9 +261,11 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
         CPLErr eErr = pBand->GetStatistics(FALSE, FALSE, &dfMin, &dfMax, &dfMean, &dfStdDev ); 
         if( eErr == CE_None )
             m_bHasStats =  true;
+
+		m_nDataType = pBand->GetRasterDataType(); //Assumed that raster have the same datatype in all other bands
     }
 
-    if(m_nXSize < 2000 && m_nYSize < 2000)
+    if(m_nXSize < 2000 && m_nYSize < 2000)//for small rasters there is no need to create pyramids
         m_bHasOverviews = true;
 
     m_nBandCount = m_poDataset->GetRasterCount();
@@ -336,6 +340,11 @@ const OGRSpatialReferenceSPtr wxGISRasterDataset::GetSpatialReference(void)
 OGREnvelope wxGISRasterDataset::GetEnvelope(void)
 {
 	return m_stExtent;
+}
+
+GDALDataType wxGISRasterDataset::GetDataType(void)
+{
+	return m_nDataType;
 }
 
 wxString wxGISRasterDataset::GetName(void)

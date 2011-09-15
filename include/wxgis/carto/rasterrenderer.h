@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS
- * Purpose:  RasterRGBRenderer classes.
+ * Purpose:  wxGISRasterRGBARenderer classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009,2011 Bishop
@@ -22,19 +22,34 @@
 
 #include "wxgis/carto/carto.h"
 
-/** \class wxGISRasterRGBRenderer rasterrenderer.h
-    \brief The raster layer renderer for RGB data
+/** \class wxGISRasterRGBARenderer rasterrenderer.h
+    \brief The raster layer renderer for RGB data and Alpha channel
 */
-class wxGISRasterRGBRenderer :
+class wxGISRasterRGBARenderer :
 	public IRasterRenderer
 {
 public:
-	wxGISRasterRGBRenderer(void);
-	~wxGISRasterRGBRenderer(void);
+	wxGISRasterRGBARenderer(void);
+	~wxGISRasterRGBARenderer(void);
 //IRasterRenderer
 	virtual bool CanRender(wxGISDatasetSPtr pDataset);
+	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster);
+	virtual int *GetBandsCombination(void);
+	virtual void Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
+/**
+    \brief Proceed two dim array multithreaded.
+*/
+protected:
+	virtual bool OnPixelProceed(void *pData, int nBufXSize, int nBufYSize, GDALDataType eSrcType, void *pTransformData );
+
 //	virtual void Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel);
 ////
 //	virtual OGREnvelope TransformEnvelope(const OGREnvelope* pEnvelope, OGRSpatialReference* pSrsSpatialReference, OGRSpatialReference* pDstSpatialReference);
 //    virtual wxImage Scale(unsigned char* pData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel);
+protected:
+	int m_nRedBand, m_nGreenBand, m_nBlueBand, m_nAlphaBand;
+	wxColour m_oBkColorGet, m_oBkColorSet, m_oNoDataColor; 
+	//stretch - none, custom, standard derivations, histogram equalize, min-max, histogram specification, percent clip
+	//statistics - current display extent, each raster dataset, custom settings
+	wxGISRasterDatasetSPtr m_pwxGISRasterDataset;
 };
