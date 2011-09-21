@@ -274,7 +274,8 @@ void wxGISGPMultiParameter::AddColumn(wxString sName)
 	for(size_t i = 0; i < nRowCount; ++i)
 	{
 		size_t nPos = i + nColCount;
-		m_paParameters.insert(m_paParameters.begin() + nPos, NULL);
+		m_paParameters.Insert(NULL, nPos);
+		//m_paParameters.insert(m_paParameters.begin() + nPos, NULL);
 	}
 }
 
@@ -285,7 +286,7 @@ void wxGISGPMultiParameter::RemoveColumn(size_t nIndex)
 	for(size_t i = nRowCount; i >= 0; --i)
 	{
 		size_t nPos = i * nOldColCount + nIndex;
-		m_paParameters.erase(m_paParameters.begin() + nPos);
+		m_paParameters.RemoveAt(nPos);//erase(m_paParameters.begin() + nPos);
 	}
 	m_saColumnNames.RemoveAt(nIndex);
 }
@@ -299,17 +300,17 @@ size_t wxGISGPMultiParameter::GetRowCount(void)
 {
 	if(GetColumnCount() == 0)
 		return 0;
-	return m_paParameters.size() / GetColumnCount();
+	return m_paParameters.GetCount() / GetColumnCount();
 }
 
 void wxGISGPMultiParameter::AddParameter(size_t nColIndex, size_t nRowIndex, IGPParameter* pParam)
 {
 	wxCHECK_RET(pParam, "the param should be not NULL"); 
 	long nPos = nRowIndex * GetColumnCount() + nColIndex;
-	if(m_paParameters.size() <= nPos)
+	if(m_paParameters.GetCount() <= nPos)
 	{
-		while(m_paParameters.size() <= nPos)
-			m_paParameters.push_back(NULL);
+		while(m_paParameters.GetCount() <= nPos)
+			m_paParameters.Add(NULL);
 	}
 	m_paParameters[nPos] = pParam;
 }
@@ -322,7 +323,7 @@ wxGISEnumGPParameterDataType wxGISGPMultiParameter::GetDataType(void)
 wxString wxGISGPMultiParameter::GetAsString(void)
 {
 	wxString sOutputStr;
-	for(size_t i = 0; i < m_paParameters.size(); ++i)
+	for(size_t i = 0; i < m_paParameters.GetCount(); ++i)
 		sOutputStr += m_paParameters[i]->GetAsString() + MULTI_PARAM_SEPARATOR;
 	return sOutputStr;
 }
@@ -334,7 +335,7 @@ bool wxGISGPMultiParameter::SetFromString(wxString sParam)
 	{
 		wxGISGPParameter* pParam = new wxGISGPParameter();
 		if(pParam->SetFromString(saParams[i]))
-			m_paParameters.push_back(pParam);
+			m_paParameters.Add(pParam);
 		else
 		{
 			wxDELETE(pParam);
@@ -352,7 +353,7 @@ wxString wxGISGPMultiParameter::GetColumnName(size_t nIndex)
 
 bool wxGISGPMultiParameter::GetIsValid(void)
 {
-	for(size_t i = 0; i < m_paParameters.size(); ++i)
+	for(size_t i = 0; i < m_paParameters.GetCount(); ++i)
 		if(!m_paParameters[i]->GetIsValid())
 			return false;
 	return true;
@@ -360,7 +361,7 @@ bool wxGISGPMultiParameter::GetIsValid(void)
 
 void wxGISGPMultiParameter::SetIsValid(bool bIsValid)
 {
-	for(size_t i = 0; i < m_paParameters.size(); ++i)
+	for(size_t i = 0; i < m_paParameters.GetCount(); ++i)
 		m_paParameters[i]->SetIsValid(bIsValid);
 }
 
@@ -372,8 +373,8 @@ IGPParameter* wxGISGPMultiParameter::GetParameter(size_t nCol, size_t nRow)
 
 void wxGISGPMultiParameter::Clear()
 {
-	for(size_t i = 0; i < m_paParameters.size(); ++i)
+	for(size_t i = 0; i < m_paParameters.GetCount(); ++i)
 		wxDELETE(m_paParameters[i]);
-	m_paParameters.clear();
+	m_paParameters.Clear();
 	//m_saColumnNames.Clear();
 }

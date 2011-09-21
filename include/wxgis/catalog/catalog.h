@@ -22,7 +22,8 @@
 #pragma once
 
 #include "wxgis/datasource/datasource.h"
-#include "wx/filename.h"
+
+#include <wx/filename.h>
 
 #define NOTFIRESELID    1010
 #define CONNDIR wxT("connections")

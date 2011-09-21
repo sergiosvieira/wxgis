@@ -70,9 +70,9 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
 	bSizer4 = new wxBoxSizer( wxVERTICAL );
 
     GPParameters Params = m_pTool->GetParameterInfo();
-    for(size_t i = 0; i < Params.GetCount(); ++i)
+	for(size_t i = 0; i < Params.GetCount(); ++i)
     {
-        IGPParameter* pParam = Params[i];
+		IGPParameter* pParam = Params[i];
         if(!pParam)
         {
             m_pControlsArray.push_back(NULL);

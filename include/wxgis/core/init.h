@@ -23,14 +23,15 @@
 #include "wxgis/core/core.h"
 #include "wxgis/core/config.h"
 
-#include "wx/dir.h"
-#include "wx/filename.h"
-#include "wx/file.h"
-#include "wx/ffile.h"
-#include "wx/datetime.h"
-#include "wx/intl.h"
-#include "wx/dynload.h"
-#include "wx/dynlib.h"
+#include <wx/dir.h>
+#include <wx/filename.h>
+#include <wx/file.h>
+#include <wx/ffile.h>
+#include <wx/datetime.h>
+#include <wx/intl.h>
+#include <wx/dynload.h>
+#include <wx/dynlib.h>
+#include <wx/cmdline.h> 
 
 /** \class wxGISAppWithLibs init.h
     \brief The library loader and unloader class.

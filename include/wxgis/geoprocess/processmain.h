@@ -23,10 +23,10 @@
 #include "wxgis/core/init.h"
 #include "wxgis/geoprocess/geoprocess.h"
 
-#include "wx/string.h"
-#include "wx/wfstream.h"
-#include "wx/txtstrm.h"
-#include "wx/ffile.h"
+#include <wx/string.h>
+#include <wx/wfstream.h>
+#include <wx/txtstrm.h>
+#include <wx/ffile.h>
 
 bool parse_commandline_parameters( wxCmdLineParser& parser );
 int main(int argc, char** argv);

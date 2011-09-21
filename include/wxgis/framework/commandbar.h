@@ -20,7 +20,9 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/framework/framework.h"
-#include "wx/aui/aui.h"
+
+#include <wx/aui/aui.h>
+#include <wx/menu.h> 
 
 #define STANDARDSTR _("Standard")
 #define LOCATIONSTR _("Location")

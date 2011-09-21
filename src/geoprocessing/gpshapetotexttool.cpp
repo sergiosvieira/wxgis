@@ -74,7 +74,7 @@ GPParameters wxGISGPShapeToTextTool::GetParameterInfo(void)
         pDomain1->AddFilter(new wxGxDatasetFilter(enumGISFeatureDataset));
         pParam1->SetDomain(pDomain1);
 
-        m_paParam.Add(pParam1);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam1));
 
 		//mask
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
@@ -124,7 +124,7 @@ GPParameters wxGISGPShapeToTextTool::GetParameterInfo(void)
 
         pParam2->SetValue(m_asCoordsMask[0]);
 
-        m_paParam.Add(pParam2);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam2));
 
 		//swap x y
         wxGISGPParameter* pParam3 = new wxGISGPParameter();
@@ -135,7 +135,7 @@ GPParameters wxGISGPShapeToTextTool::GetParameterInfo(void)
         pParam3->SetDirection(enumGISGPParameterDirectionInput);
         pParam3->SetValue(false);
 
-        m_paParam.Add(pParam3);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam3));
 
 		//dst path
         wxGISGPParameter* pParam4 = new wxGISGPParameter();
@@ -149,7 +149,7 @@ GPParameters wxGISGPShapeToTextTool::GetParameterInfo(void)
 		pDomain4->AddFilter(new wxGxTextFilter(wxString(_("Text file")), wxString(wxT(".txt"))));
         pParam4->SetDomain(pDomain4);
 
-        m_paParam.Add(pParam4);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam4));
 
     }
     return m_paParam;

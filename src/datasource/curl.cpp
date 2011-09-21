@@ -185,8 +185,9 @@ PERFORMRESULT wxGISCurl::Post(wxString sURL, wxString sPostData)
 	result.IsValid = false;
 	result.iSize = 0;
 	curl_easy_setopt(curl, CURLOPT_POST, 1);
-	const wxWX2MBbuf tmp_buf = wxConvCurrent->cWX2MB(sPostData);
-	const char *tmp_str = (const char*) tmp_buf;
+	//const wxWX2MBbuf tmp_buf = wxConvCurrent->cWX2MB(sPostData);
+	//const char *tmp_str = (const char*) tmp_buf;
+	const char *tmp_str = sPostData.mb_str(wxConvLocal);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS , tmp_str);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
 	curl_easy_setopt(curl, CURLOPT_URL, sURL.mb_str(wxConvLocal));

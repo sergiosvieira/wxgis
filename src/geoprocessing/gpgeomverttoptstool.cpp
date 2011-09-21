@@ -71,7 +71,7 @@ GPParameters wxGISGPGeomVerticesToPointsTool::GetParameterInfo(void)
         pDomain1->AddFilter(new wxGxDatasetFilter(enumGISFeatureDataset));
         pParam1->SetDomain(pDomain1);
 
-        m_paParam.Add(pParam1);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam1));
 
         //dst path
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
@@ -85,7 +85,7 @@ GPParameters wxGISGPGeomVerticesToPointsTool::GetParameterInfo(void)
         AddAllVectorFilters(pDomain2);
         pParam2->SetDomain(pDomain2);
 
-        m_paParam.Add(pParam2);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam2));
 
     }
     return m_paParam;

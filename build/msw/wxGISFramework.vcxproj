@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7503AD61-A5E6-4EB7-BC1A-DC98BDB258C2}</ProjectGuid>
+    <RootNamespace>wxGISFramework</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)Cli\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)d</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(WXGISGDAL)\port;$(ZLIB);$(EXPAT)\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_FRW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxmsw29ud_aui.lib;wxmsw29ud_adv.lib;wxmsw29ud_html.lib;zlibwapi.lib;wxregexud.lib;libexpat.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxGISCored.lib;wxgiscpld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(WXWIDGETS)\lib\vc_dll;..\..\lib;$(WXGISGDAL)\lib;$(ZLIB)\lib;$(EXPAT)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>..\..\lib\$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <Version>0.4</Version>
+    </Link>
+    <PostBuildEvent>
+      <Message>copy from debug to lib</Message>
+      <Command>copy ..\$(Configuration)\$(TargetName)$(TargetExt) ..\..\lib\</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;__WXMSW__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_FRW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wxbase28u.lib;wxbase28u_net.lib;wxmsw28u_core.lib;wxbase28u_xml.lib;wxmsw28u_aui.lib;wxmsw28u_adv.lib;wxmsw28u_html.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(WXWIDGETS)\lib\vc_dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>..\..\lib\$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Message>copy from release to lib</Message>
+      <Command>copy $(TargetPath) ..\..\lib\</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\framework\accelerator.cpp" />
+    <ClCompile Include="..\..\src\framework\addcommanddlg.cpp" />
+    <ClCompile Include="..\..\src\framework\animation.cpp" />
+    <ClCompile Include="..\..\src\framework\application.cpp" />
+    <ClCompile Include="..\..\src\framework\applicationex.cpp" />
+    <ClCompile Include="..\..\src\framework\checklist.cpp" />
+    <ClCompile Include="..\..\src\framework\command.cpp" />
+    <ClCompile Include="..\..\src\framework\commandbar.cpp" />
+    <ClCompile Include="..\..\src\framework\createcbdlg.cpp" />
+    <ClCompile Include="..\..\src\framework\customizedlg.cpp" />
+    <ClCompile Include="..\..\src\framework\droptarget.cpp" />
+    <ClCompile Include="..\..\src\framework\keycodedlg.cpp" />
+    <ClCompile Include="..\..\src\framework\menubar.cpp" />
+    <ClCompile Include="..\..\src\framework\progressdlg.cpp" />
+    <ClCompile Include="..\..\src\framework\progressor.cpp" />
+    <ClCompile Include="..\..\src\framework\propertypages.cpp" />
+    <ClCompile Include="..\..\src\framework\statusbar.cpp" />
+    <ClCompile Include="..\..\src\framework\toolbarmenu.cpp" />
+    <ClCompile Include="..\..\src\framework\tooltip.cpp" />
+    <ClCompile Include="..\..\src\framework\wxregexvalidator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\wxgis\framework\accelerator.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\addcommanddlg.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\animation.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\application.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\applicationex.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\checklist.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\command.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\commandbar.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\createcbdlg.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\customizedlg.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\droptarget.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\framework.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\keycodedlg.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\menubar.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\progressdlg.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\progressor.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\propertypages.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\statusbar.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\toolbarmenu.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\tooltip.h" />
+    <ClInclude Include="..\..\include\wxgis\framework\wxregexvalidator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="wxGISCore.vcxproj">
+      <Project>{d7c200ac-a29b-4894-b222-1c77030545be}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

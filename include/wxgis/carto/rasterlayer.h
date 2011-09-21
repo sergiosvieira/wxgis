@@ -42,7 +42,7 @@ public:
 	virtual IRasterRendererSPtr GetRenderer(void){return m_pRasterRenderer;};
 	virtual void SetRenderer(IRasterRendererSPtr pRasterRenderer){m_pRasterRenderer = pRasterRenderer;};
 protected:
-	virtual bool GetPixelData(OGREnvelope& stEnvelope, RAWPIXELDATA &stPixelData, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
+	virtual bool GetPixelData(RAWPIXELDATA &stPixelData, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
 protected:
 	wxGISRasterDatasetSPtr m_pwxGISRasterDataset;
     OGRSpatialReferenceSPtr m_pSpatialReference;

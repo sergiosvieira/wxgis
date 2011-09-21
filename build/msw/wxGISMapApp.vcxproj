@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E21E4448-784A-4DB6-9A4C-D24034171938}</ProjectGuid>
+    <RootNamespace>wxGISMap</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(PROJ)\src;$(GEOS)\capi;$(GEOS)\include;$(WXGISGDAL)\port;$(WXGISGDAL)\alg;$(WXGISGDAL)\gcore;$(WXGISGDAL)\ogr;$(WXGISGDAL)\ogr\ogrsf_frmts;$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(CAIRO)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;__WXMSW__;__WXDEBUG__;WXUSINGDLL;NOPCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <OpenMPSupport>false</OpenMPSupport>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxmsw29ud_aui.lib;wxmsw29ud_adv.lib;wxmsw29ud_html.lib;wxgiscpld.lib;wxgisogrd.lib;wxgisgdald.lib;proj4.lib;geos_c.lib;wxGISMapUId.lib;wxGISFrameworkd.lib;wxGISCored.lib;wxGISCartoUId.lib;cairo.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\$(Configuration)\wxGISMap.exe</OutputFile>
+      <AdditionalLibraryDirectories>$(PROJ)\wxGIS\lib;$(GEOS)\lib;..\..\lib;$(WXGISGDAL)\lib;$(WXWIDGETS)\lib\vc_dll;$(CAIRO)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+      <Version>0.4</Version>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\app\gisaboutdlg.cpp" />
+    <ClCompile Include="..\..\src\map_app\mapapp.cpp" />
+    <ClCompile Include="..\..\src\map_app\mapframe.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\wxgis\app\gisaboutdlg.h" />
+    <ClInclude Include="..\..\include\wxgis\map_app\mapapp.h" />
+    <ClInclude Include="..\..\include\wxgis\map_app\mapframe.h" />
+    <ClInclude Include="..\..\include\wxgis\map_app\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="map.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="wxGISMapApp.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="wxGISCatalogUI.vcxproj">
+      <Project>{6ab7b074-c3fb-4234-80e4-327acfeb2476}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="wxGISFramework.vcxproj">
+      <Project>{7503ad61-a5e6-4eb7-bc1a-dc98bdb258c2}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="wxGISMapUI.vcxproj">
+      <Project>{bf1aaa54-551e-4aa2-82c8-6f8015198e99}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

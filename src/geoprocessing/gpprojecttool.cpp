@@ -74,7 +74,7 @@ GPParameters wxGISGPProjectVectorTool::GetParameterInfo(void)
         pDomain1->AddFilter(new wxGxDatasetFilter(enumGISFeatureDataset));
         pParam1->SetDomain(pDomain1);
 
-        m_paParam.Add(pParam1);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam1));
 
         //proj
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
@@ -84,7 +84,7 @@ GPParameters wxGISGPProjectVectorTool::GetParameterInfo(void)
         pParam2->SetDataType(enumGISGPParamDTSpatRef);
         pParam2->SetDirection(enumGISGPParameterDirectionInput);
 
-        m_paParam.Add(pParam2);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam2));
 
         //dst path
         wxGISGPParameter* pParam3 = new wxGISGPParameter();
@@ -101,7 +101,7 @@ GPParameters wxGISGPProjectVectorTool::GetParameterInfo(void)
         pDomain3->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoMif));
         pParam3->SetDomain(pDomain3);
 
-        m_paParam.Add(pParam3);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam3));
     }
     return m_paParam;
 }

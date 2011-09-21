@@ -94,8 +94,9 @@ DEFINE_SHARED_PTR(IFeatureRenderer);
 typedef struct _rawpixeldata
 {
 	void* pPixelData;
-	int nWidth, nHeight;
-	OGREnvelope PixelBounds;
+	int nPixelDataWidth, nPixelDataHeight;
+	int nOutputWidth, nOutputHeight;
+	OGREnvelope stWorldBounds;
 }RAWPIXELDATA;
 /** \class IRasterRenderer carto.h
     \brief The base class for map raster layer renderer

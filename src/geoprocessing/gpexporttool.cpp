@@ -72,7 +72,7 @@ GPParameters wxGISGPExportTool::GetParameterInfo(void)
         pDomain1->AddFilter(new wxGxDatasetFilter(enumGISFeatureDataset));
         pParam1->SetDomain(pDomain1);
 
-        m_paParam.Add(pParam1);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam1));
 
         //SQL statement
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
@@ -82,7 +82,7 @@ GPParameters wxGISGPExportTool::GetParameterInfo(void)
         pParam2->SetDataType(enumGISGPParamDTQuery);
         pParam2->SetDirection(enumGISGPParameterDirectionInput);
 
-        m_paParam.Add(pParam2);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam2));
 
         //dst path
         wxGISGPParameter* pParam3 = new wxGISGPParameter();
@@ -98,7 +98,7 @@ GPParameters wxGISGPExportTool::GetParameterInfo(void)
 
         //pParam2->AddParameterDependency(wxT("src_path"));
 
-        m_paParam.Add(pParam3);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam3));
 
     }
     return m_paParam;

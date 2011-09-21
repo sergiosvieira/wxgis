@@ -22,6 +22,8 @@
 #include "wxgis/framework/framework.h"
 #include "wxgis/framework/commandbar.h"
 
+#include <wx/menu.h> 
+
 #define FILESTR _("&File")
 #define EDITSTR _("&Edit")
 #define GOSTR _("&Go")

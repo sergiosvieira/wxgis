@@ -72,7 +72,7 @@ GPParameters wxGISGPMeanByColumnTool::GetParameterInfo(void)
         pDomain1->AddFilter(new wxGxDatasetFilter(enumGISTableDataset));
         pParam1->SetDomain(pDomain1);
 
-        m_paParam.Add(pParam1);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam1));
 
 		//field map
 		wxGISGPMultiParameter* pParam2 = new wxGISGPMultiParameter();
@@ -83,7 +83,7 @@ GPParameters wxGISGPMeanByColumnTool::GetParameterInfo(void)
 		pParam2->AddColumn(_("Field name"));
 		pParam2->AddColumn(_("Operation"));
 
-        m_paParam.Add(pParam2);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam2));
 
         //dst path
         wxGISGPParameter* pParam3 = new wxGISGPParameter();
@@ -97,7 +97,7 @@ GPParameters wxGISGPMeanByColumnTool::GetParameterInfo(void)
 		pDomain3->AddFilter(new wxGxTableFilter(enumTableCSV));
         pParam3->SetDomain(pDomain3);
 
-        m_paParam.Add(pParam3);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam3));
 
     }
     return m_paParam;

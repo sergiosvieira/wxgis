@@ -25,8 +25,11 @@
 #include "wxgis/core/config.h"
 #include "wxgis/catalog/gxcatalog.h"
 
-#include "wx/defs.h"
-#include "wx/cmdline.h"
+#include <wx/app.h> 
+//#include <wx/defs.h>
+#include <wx/cmdline.h>
+//#include <wx/init.h> 
+//#include <wx/wxcrtvararg.h> 
 
 #include <locale.h>
 
@@ -55,7 +58,7 @@ int main(int argc, char **argv)
     wxInitializer initializer;
     if ( !initializer )
     {
-        wxFprintf(stderr, _("Failed to initialize the wxWidgets library, aborting."));
+        fprintf(stderr, _("Failed to initialize the wxWidgets library, aborting.").mb_str(wxConvLocal));
         return -1;
     }
 
@@ -64,10 +67,10 @@ int main(int argc, char **argv)
     // Create the commandline parser
     static const wxCmdLineEntryDesc my_cmdline_desc[] =
     {
-        { wxCMD_LINE_SWITCH, "h", "help",       _( "Show this help message" ), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
-        { wxCMD_LINE_SWITCH, "v", "version",    _( "The version of this program" ) },
-		{ wxCMD_LINE_OPTION, "n", "name",       _( "The tool name" ), wxCMD_LINE_VAL_STRING },
-		{ wxCMD_LINE_OPTION, "p", "parameters", _( "The tool parameters" ), wxCMD_LINE_VAL_STRING },
+        { wxCMD_LINE_SWITCH, "h", "help",       _( "Show this help message" ).mb_str(wxConvLocal), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
+        { wxCMD_LINE_SWITCH, "v", "version",    _( "The version of this program" ).mb_str(wxConvLocal) },
+		{ wxCMD_LINE_OPTION, "n", "name",       _( "The tool name" ).mb_str(wxConvLocal), wxCMD_LINE_VAL_STRING },
+		{ wxCMD_LINE_OPTION, "p", "parameters", _( "The tool parameters" ).mb_str(wxConvLocal), wxCMD_LINE_VAL_STRING },
 		{ wxCMD_LINE_NONE }
     };
 

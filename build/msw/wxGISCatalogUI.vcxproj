@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6AB7B074-C3FB-4234-80E4-327ACFEB2476}</ProjectGuid>
+    <RootNamespace>wxGISCatalogUI</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)Cli\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)d</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXGISGDAL)\alg;$(WXGISGDAL)\gcore;$(WXGISGDAL)\port;$(WXGISGDAL)\ogr;$(WXGISGDAL)\ogr\ogrsf_frmts;$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(CAIRO)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CLU;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxmsw29ud_aui.lib;wxmsw29ud_adv.lib;wxmsw29ud_html.lib;wxmsw29ud_propgrid.lib;wxgiscpld.lib;wxgisogrd.lib;wxgisgdald.lib;wxGISCatalogd.lib;wxGISFrameworkd.lib;wxGISCored.lib;wxGISCartod.lib;wxGISCartoUId.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(WXGISGDAL)\lib;$(WXWIDGETS)\lib\vc_dll;..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>..\..\lib\$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <Version>0.4</Version>
+    </Link>
+    <PostBuildEvent>
+      <Message>copy from debug to lib</Message>
+      <Command>copy ..\$(Configuration)\$(TargetName)$(TargetExt) ..\..\lib\</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXGISGDAL)\alg;$(WXGISGDAL)\gcore;$(WXGISGDAL)\port;$(WXGISGDAL)\ogr;$(WXGISGDAL)\ogr\ogrsf_frmts;$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;$(WXPROPGRID)\include;..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;__WXMSW__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CLU;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wxbase28u.lib;wxbase28u_net.lib;wxmsw28u_core.lib;wxbase28u_xml.lib;wxmsw28u_aui.lib;wxmsw28u_adv.lib;wxmsw28u_html.lib;wxcode_msw28u_propgrid.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxgiscpl.lib;wxgisogr.lib;wxgisgdal.lib;wxGISCatalog.lib;wxGISCore.lib;wxGISFramework.lib;wxGISCarto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(WXGISGDAL)\lib;$(WXWIDGETS)\lib\vc_dll;$(WXPROPGRID)\lib\vc_dll;..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>..\..\lib\$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Message>copy from release to lib</Message>
+      <Command>copy $(TargetPath) ..\..\lib\</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\catalogui\catalogcmd.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxapplication.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxarchfolderui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxarchivefactoryui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxcatalogui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxcontdialog.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxcontentview.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxcsvfactoryui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxdatasetui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxdiscconnectionsui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxdiscconnectionui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxeventui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxfilefactoryui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxfileui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxfolderfactoryui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxfolderui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxkmldatasetui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxlocationcombobox.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxmapinfofactoryui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxmapview.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxmlfactoryui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxnoview.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxobgdialog.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxpending.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxprjfactoryui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxpropertypages.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxrasterfactoryui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxselection.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxshapefactoryui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxspatreffolderui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxtableview.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxtabview.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxtreeview.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxview.cpp" />
+    <ClCompile Include="..\..\src\catalogui\newmenu.cpp" />
+    <ClCompile Include="..\..\src\catalogui\rasterpropertypage.cpp" />
+    <ClCompile Include="..\..\src\catalogui\spatrefpropertypage.cpp" />
+    <ClCompile Include="..\..\src\catalogui\tablepropertypage.cpp" />
+    <ClCompile Include="..\..\src\catalogui\vectorpropertypage.cpp" />
+    <ClCompile Include="..\..\src\catalogui\viewscmd.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\wxgis\catalogui\catalogcmd.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\catalogui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxapplication.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxarchfolderui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxarchivefactoryui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxcatalogui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxcontdialog.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxcontentview.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxcsvfactoryui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxdatasetui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxdiscconnectionsui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxdiscconnectionui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxeventui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxfilefactoryui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxfileui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxfolderfactoryui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxfolderui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxkmldatasetui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxlocationcombobox.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxmapinfofactoryui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxmapview.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxmlfactoryui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxnoview.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxobjdialog.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxpending.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxprjfactoryui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxpropertypages.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxrasterfactoryui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxselection.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxshapefactoryui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxspatreffolderui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxtableview.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxtabview.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxtreeview.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxview.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\newmenu.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\rasterpropertypage.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\spatrefpropertypage.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\tablepropertypage.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\vectorpropertypage.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\viewscmd.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="wxGISCatalog.vcxproj">
+      <Project>{0239e09e-e928-4064-b3e9-9340e4032384}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="wxGISCore.vcxproj">
+      <Project>{d7c200ac-a29b-4894-b222-1c77030545be}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="wxGISDataSource.vcxproj">
+      <Project>{0f6a3c59-9206-4987-9d82-b4725311fb57}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="wxGISDisplay.vcxproj">
+      <Project>{f88c8f1f-f939-441e-9f90-cf5fdc17da42}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="wxGISFramework.vcxproj">
+      <Project>{7503ad61-a5e6-4eb7-bc1a-dc98bdb258c2}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="wxGISGeometry.vcxproj">
+      <Project>{9fe95e21-0ca3-4f51-b8cc-31397652b12e}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
