@@ -21,14 +21,18 @@
 
 #pragma once
 
-#include "wx/wxprec.h"
+#include <wx/wxprec.h>
 
 #ifdef __BORLANDC__
     #pragma hdrstop
 #endif
 
 #ifndef WX_PRECOMP
-    #include "wx/wx.h"
+	#include <wx/wx.h>
+#endif
+
+#ifdef __WXMAC__
+    #include <wx/osx/private.h>
 #endif
 
 #if defined(HAVE_VISIBILITY)
@@ -329,3 +333,36 @@
     #define WXDWORD unsigned long
 #endif
 
+/*
+   MSVC up to 6.0 needs to be explicitly told to export template instantiations
+   used by the DLL clients, use this macro to do it like this:
+
+       template <typename T> class Foo { ... };
+       WXDLLIMPEXP_TEMPLATE_INSTANCE_BASE( Foo<int> )
+
+   (notice that currently we only need this for wxBase and wxCore libraries)
+ */
+#if defined(__VISUALC__) && (__VISUALC__ <= 1200)
+    #ifdef WXMAKINGDLL_BASE
+        #define WXDLLIMPEXP_TEMPLATE_INSTANCE_BASE(decl) \
+            template class WXDLLIMPEXP_BASE decl;
+        #define WXDLLIMPEXP_TEMPLATE_INSTANCE_CORE(decl) \
+            template class WXDLLIMPEXP_CORE decl;
+    #else
+        /*
+           We need to disable this warning when using this macro, as
+           recommended by Microsoft itself:
+
+           http://support.microsoft.com/default.aspx?scid=kb%3ben-us%3b168958
+         */
+        #pragma warning(disable:4231)
+
+        #define WXDLLIMPEXP_TEMPLATE_INSTANCE_BASE(decl) \
+            extern template class WXDLLIMPEXP_BASE decl;
+        #define WXDLLIMPEXP_TEMPLATE_INSTANCE_CORE(decl) \
+            extern template class WXDLLIMPEXP_CORE decl;
+    #endif
+#else /* not VC <= 6 */
+    #define WXDLLIMPEXP_TEMPLATE_INSTANCE_BASE(decl)
+    #define WXDLLIMPEXP_TEMPLATE_INSTANCE_CORE(decl)
+#endif /* VC6/others */

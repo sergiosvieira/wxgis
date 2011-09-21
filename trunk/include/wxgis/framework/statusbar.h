@@ -23,6 +23,8 @@
 #include "wxgis/framework/animation.h"
 #include "wxgis/framework/progressor.h"
 
+#include <wx/statusbr.h> 
+
 class WXDLLIMPEXP_GIS_FRW wxGISStatusBar :
 	public wxStatusBar,
 	public IStatusBar

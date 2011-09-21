@@ -45,8 +45,9 @@ int CPL_STDCALL ExecToolProgress( double dfComplete, const char *pszMessage, voi
 }
 
 
-wxGISGPTool::wxGISGPTool(void) : m_pCatalog(NULL)
+wxGISGPTool::wxGISGPTool(void)
 {
+	m_pCatalog = NULL;
 }
 
 void wxGISGPTool::Copy(IGPTool* const pTool)
@@ -62,7 +63,7 @@ void wxGISGPTool::Copy(IGPTool* const pTool)
 
 wxGISGPTool::~wxGISGPTool(void)
 {
-	for(size_t i = 0; i < m_paParam.GetCount(); ++i)
+	for(size_t i = 0; i < m_paParam.size(); ++i)
         wxDELETE(m_paParam[i]);
 }
 
@@ -79,7 +80,7 @@ IGxCatalog* const wxGISGPTool::GetCatalog(void)
 const wxString wxGISGPTool::GetAsString(void)
 {
     wxString sOutParam;
-    for(size_t i = 0; i < m_paParam.GetCount(); ++i)
+    for(size_t i = 0; i < m_paParam.size(); ++i)
     {
         IGPParameter* pParam = m_paParam[i];
         if(pParam)
@@ -99,7 +100,7 @@ bool wxGISGPTool::SetFromString(const wxString& sParams)
 	while ( tkz.HasMoreTokens() )
 	{
 		wxString token = tkz.GetNextToken();
-        if(counter >= m_paParam.GetCount())
+        if(counter >= m_paParam.size())
            return false;
         IGPParameter* pParam = m_paParam[counter];
         if(pParam)

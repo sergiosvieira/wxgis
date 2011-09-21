@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "wxgis/datasource/datasource.h"
 #include "wxgis/catalog/catalog.h"
 
 #define CTSTR _("Conversion Tools")
@@ -177,7 +176,8 @@ public:
 /** \typedef GPParameters
  *  \brief The parameters array.
  */
-//typedef std::vector<IGPParameter*> GPParameters;
+
+//typedef std::vector<const IGPParameter*> GPParameters;_PTR
 WX_DEFINE_ARRAY(IGPParameter*, GPParameters);
 
 class IGPTool
@@ -207,6 +207,3 @@ public:
 };
 
 DEFINE_SHARED_PTR(IGPTool);
-
-
-

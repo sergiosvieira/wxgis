@@ -221,7 +221,7 @@ bool IsFileHidden(CPLString sPath)
 {
 #ifdef __WXMSW__
     wxString sTestPath(sPath, wxConvUTF8);
-	DWORD dwAttrs = GetFileAttributes(sTestPath); 
+	DWORD dwAttrs = GetFileAttributes(sTestPath.wc_str()); 
     if (dwAttrs != INVALID_FILE_ATTRIBUTES)
 		return dwAttrs & FILE_ATTRIBUTE_HIDDEN;
 #endif

@@ -23,8 +23,9 @@
 
 #include "wxgis/core/core.h"
 
-#include "wx/dnd.h"
-#include "wx/dataobj.h"
+#include <wx/dnd.h>
+#include <wx/dataobj.h>
+#include <wx/panel.h> 
 
 #include "cpl_string.h"
 

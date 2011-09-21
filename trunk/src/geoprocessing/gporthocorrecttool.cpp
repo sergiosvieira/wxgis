@@ -74,7 +74,7 @@ GPParameters wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         pDomain1->AddFilter(new wxGxRasterFilter(enumRasterTil));
         pParam1->SetDomain(pDomain1);
 
-        m_paParam.Add(pParam1);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam1));
 
         //dst path
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
@@ -90,7 +90,7 @@ GPParameters wxGISGPOrthoCorrectTool::GetParameterInfo(void)
 
         //pParam2->AddParameterDependency(wxT("src_path"));
 
-        m_paParam.Add(pParam2);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam2));
 
         //DEM_raster
         wxGISGPParameter* pParam3 = new wxGISGPParameter();
@@ -104,7 +104,7 @@ GPParameters wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         pDomain3->AddFilter(new wxGxDatasetFilter(enumGISRasterDataset));
         pParam3->SetDomain(pDomain3);
 
-        m_paParam.Add(pParam3);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam3));
 
         //constant_ elevation double
         wxGISGPParameter* pParam4 = new wxGISGPParameter();
@@ -115,7 +115,7 @@ GPParameters wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         pParam4->SetDirection(enumGISGPParameterDirectionInput);
         pParam4->SetValue(0.0);
 
-        m_paParam.Add(pParam4);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam4));
 
         //constant_ elevation double
         wxGISGPParameter* pParam5 = new wxGISGPParameter();
@@ -126,7 +126,7 @@ GPParameters wxGISGPOrthoCorrectTool::GetParameterInfo(void)
         pParam5->SetDirection(enumGISGPParameterDirectionInput);
         pParam5->SetValue(1.0);
 
-        m_paParam.Add(pParam5);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam5));
 
         //elevation interpolation type
         wxGISGPParameter* pParam6 = new wxGISGPParameter();
@@ -143,7 +143,7 @@ GPParameters wxGISGPOrthoCorrectTool::GetParameterInfo(void)
 
         pParam6->SetValue(_("Bilinear"));
 
-        m_paParam.Add(pParam6);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam6));
     }
     return m_paParam;
 }

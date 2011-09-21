@@ -71,20 +71,33 @@ int *wxGISRasterRGBARenderer::GetBandsCombination(void)
 	return pBands;
 }
 
-bool wxGISRasterRGBARenderer::OnPixelProceed(void *pData, int nBufXSize, int nBufYSize, GDALDataType eSrcType, void *pTransformData )
+bool wxGISRasterRGBARenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, void *pTransformData )
 {
+	int nOutXSize, nOutYSize;
+	bool bScale = false;
+	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
+	{
+		bScale = true;
+		nOutXSize = stPixelData.nPixelDataWidth;
+		nOutYSize = stPixelData.nPixelDataHeight;
+	}
+	else
+	{
+		nOutXSize = stPixelData.nOutputWidth;
+		nOutYSize = stPixelData.nOutputHeight;
+	}
 	//сделать обратный обход массива
 	//pTransformData - если размер отличается 
-	//то запрашивать значение пиксела pData, прогонятье его через функции с гистограммой и затем помещать его в pTransformData
+	//то запрашивать значение пиксела pData, прогонять его через функции с гистограммой и затем помещать его в pTransformData
     //multithreaded
     int CPUCount = wxThread::GetCPUCount();
  //   std::vector<wxRasterDrawThread*> threadarray;
-    int nPartSize = nBufYSize / CPUCount;
+    int nPartSize = nOutYSize / CPUCount;
     int nBegY(0), nEndY;
     for(int i = 0; i < CPUCount; ++i)
     {        
         if(i == CPUCount - 1)
-            nEndY = nBufYSize;
+            nEndY = nOutYSize;
         else
             nEndY = nPartSize * (i + 1);
 
@@ -105,20 +118,20 @@ bool wxGISRasterRGBARenderer::OnPixelProceed(void *pData, int nBufXSize, int nBu
 
 void wxGISRasterRGBARenderer::Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel)
 {
-	int stride = cairo_format_stride_for_width (CAIRO_FORMAT_ARGB32, stPixelData.nWidth);
+	int stride = cairo_format_stride_for_width (CAIRO_FORMAT_ARGB32, stPixelData.nOutputWidth);
 	if(stride == -1)
 		return;//TODO: ERROR
-	void *pTransformPixelData = CPLMalloc (stride * stPixelData.nHeight);
+	void *pTransformPixelData = CPLMalloc (stride * stPixelData.nOutputHeight);
 
-	if(!OnPixelProceed(stPixelData.pPixelData, stPixelData.nWidth, stPixelData.nHeight, m_pwxGISRasterDataset->GetDataType(), pTransformPixelData))
+	if(!OnPixelProceed(stPixelData, m_pwxGISRasterDataset->GetDataType(), pTransformPixelData))
 		return;//TODO: ERROR
 	
 	cairo_surface_t *surface;
-	surface = cairo_image_surface_create_for_data ((unsigned char*)pTransformPixelData, CAIRO_FORMAT_ARGB32, stPixelData.nWidth, stPixelData.nHeight, stride);
+	surface = cairo_image_surface_create_for_data ((unsigned char*)pTransformPixelData, CAIRO_FORMAT_ARGB32, stPixelData.nOutputWidth, stPixelData.nOutputHeight, stride);
 	//TODO: Put UpperLeft coord to DrawRaster not bounds???
 	//double dX = DrawBounds.MinX + (DrawBounds.MaxX - DrawBounds.MinX) / 2;
 	//double dY = DrawBounds.MinY + (DrawBounds.MaxY - DrawBounds.MinY) / 2;
-	pDisplay->DrawRaster(surface, stPixelData.PixelBounds);
+	pDisplay->DrawRaster(surface, stPixelData.stWorldBounds);
 
 	cairo_surface_destroy(surface);
 }

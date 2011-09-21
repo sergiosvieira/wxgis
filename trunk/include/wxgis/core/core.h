@@ -23,6 +23,7 @@
 #include "wxgis/base.h"
 
 #include <wx/process.h>
+#include <wx/log.h> 
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>

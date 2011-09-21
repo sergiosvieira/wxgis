@@ -26,7 +26,7 @@
 /** \class wxGISGPParameter gpparam.h
  *  \brief A Geoprocessing tools parameter class.
  */
-class wxGISGPParameter : public IGPParameter
+class WXDLLIMPEXP_GIS_GP wxGISGPParameter : public IGPParameter
 {
 public:
     wxGISGPParameter(void);
@@ -83,7 +83,7 @@ protected:
  *
  *  This class store parameters in array. In tool dialog it show the grid filled with parmeter data.
  */
-class wxGISGPMultiParameter : public wxGISGPParameter
+class WXDLLIMPEXP_GIS_GP wxGISGPMultiParameter : public wxGISGPParameter
 {
 public:
 	wxGISGPMultiParameter(void);

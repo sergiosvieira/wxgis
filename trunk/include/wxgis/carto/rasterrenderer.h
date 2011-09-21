@@ -40,7 +40,7 @@ public:
     \brief Proceed two dim array multithreaded.
 */
 protected:
-	virtual bool OnPixelProceed(void *pData, int nBufXSize, int nBufYSize, GDALDataType eSrcType, void *pTransformData );
+	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, void *pTransformData );
 
 //	virtual void Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel);
 ////

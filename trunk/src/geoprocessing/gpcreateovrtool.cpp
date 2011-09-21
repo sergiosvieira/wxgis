@@ -70,7 +70,7 @@ GPParameters wxGISGPCreateOverviewsTool::GetParameterInfo(void)
         pDomain1->AddFilter(new wxGxDatasetFilter(enumGISRasterDataset));
         pParam1->SetDomain(pDomain1);
 
-        m_paParam.Add(pParam1);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam1));
 
         //overviews interpolation type
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
@@ -93,7 +93,7 @@ GPParameters wxGISGPCreateOverviewsTool::GetParameterInfo(void)
 
         pParam2->SetValue(wxT("NEAREST"));
 
-        m_paParam.Add(pParam2);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam2));
 
         //compression
         wxGISGPParameter* pParam3 = new wxGISGPParameter();
@@ -114,7 +114,7 @@ GPParameters wxGISGPCreateOverviewsTool::GetParameterInfo(void)
 
         pParam3->SetValue(wxT("NONE"));
 
-        m_paParam.Add(pParam3);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam3));
 
         //levels
         wxGISGPParameter* pParam4 = new wxGISGPParameter();
@@ -124,7 +124,7 @@ GPParameters wxGISGPCreateOverviewsTool::GetParameterInfo(void)
         pParam4->SetDataType(enumGISGPParamDTIntegerList);
         pParam4->SetDirection(enumGISGPParameterDirectionInput);
 
-        m_paParam.Add(pParam4);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam4));
 
         //PHOTOMETRIC_OVERVIEW {RGB,YCBCR,MINISBLACK,MINISWHITE,CMYK,CIELAB,ICCLAB,ITULAB}
         //INTERLEAVE_OVERVIEW {PIXEL|BAND}.

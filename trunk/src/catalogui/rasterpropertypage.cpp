@@ -564,13 +564,13 @@ void wxGISRasterPropertyPage::OnPropertyGridButtonClick ( wxCommandEvent& )
         return; 
 	}
     GPParameters Params = pTool->GetParameterInfo();
-    if(Params.GetCount() == 0)
+	if(Params.IsEmpty())
 	{
         //error msg
 		wxMessageBox(wxString::Format(_("Wrong tool (%s)!\nCannnot continue."), sToolName.c_str()), _("Error"), wxICON_ERROR | wxOK );
         return; 
 	}
-    IGPParameter* pParam = Params[0];
+	IGPParameter* pParam = Params[0];
     pParam->SetValue(wxVariant(m_pGxDataset->GetFullName()));
 
 	if(m_nCookie == wxNOT_FOUND)

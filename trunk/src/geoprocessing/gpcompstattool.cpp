@@ -71,7 +71,7 @@ GPParameters wxGISGPCompStatTool::GetParameterInfo(void)
         pDomain1->AddFilter(new wxGxDatasetFilter(enumGISRasterDataset));
         pParam1->SetDomain(pDomain1);
 
-        m_paParam.Add(pParam1);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam1));
 
         //build approx
         wxGISGPParameter* pParam2 = new wxGISGPParameter();
@@ -82,7 +82,7 @@ GPParameters wxGISGPCompStatTool::GetParameterInfo(void)
         pParam2->SetDirection(enumGISGPParameterDirectionInput);
         pParam2->SetValue(false);
 
-        m_paParam.Add(pParam2);
+        m_paParam.Add(static_cast<IGPParameter*>(pParam2));
     }
     return m_paParam;
 }
