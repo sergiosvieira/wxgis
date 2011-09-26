@@ -19,8 +19,60 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/carto/rasterrenderer.h"
+#include "wxgis/carto/interpolation.h"
 #include "wxgis/datasource/rasterdataset.h"
 #include "wxgis/display/screendisplay.h"
+//-----------------------------------
+// wxRasterDrawThread
+//-----------------------------------
+
+wxRasterDrawThread::wxRasterDrawThread(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, int nBandCount, unsigned char *pTransformData, wxGISEnumDrawQuality nQuality, int nOutXSize, int nOutYSize, int nBegY, int nEndY, IRasterRenderer *pRasterRenderer, ITrackCancel *pTrackCancel) : wxThread(wxTHREAD_JOINABLE), m_stPixelData(stPixelData)
+{
+    m_pTrackCancel = pTrackCancel;
+	m_eSrcType = eSrcType;
+	m_pTransformData = pTransformData;
+	m_nBandCount = nBandCount;
+	m_nQuality = nQuality;
+	m_nOutXSize = nOutXSize;
+	m_nOutYSize = nOutYSize;
+	m_nBegY = nBegY;
+	m_nEndY = nEndY;
+	m_pRasterRenderer = pRasterRenderer;
+}
+
+void *wxRasterDrawThread::Entry()
+{
+	//double rWRatio, rHRatio;
+	//rWRatio = m_rOrigX / m_nDestX;
+	//rHRatio = m_rOrigY / m_nDestY;
+	//switch(m_Quality)
+	//{
+	//case enumGISQualityBilinear:
+	//	OnBilinearInterpolation(m_pOrigData, m_pDestData, m_nYbeg, m_nYend, m_nOrigX, m_nOrigY, m_nDestX,  rWRatio, rHRatio, m_rDeltaX, m_rDeltaY, m_pTrackCancel);
+	//	break;
+	//case enumGISQualityHalfBilinear:
+	//	OnHalfBilinearInterpolation(m_pOrigData, m_pDestData, m_nYbeg, m_nYend, m_nOrigX, m_nOrigY, m_nDestX,  rWRatio, rHRatio, m_rDeltaX, m_rDeltaY, m_pTrackCancel);
+	//	break;
+	//case enumGISQualityHalfQuadBilinear:
+	//	OnHalfQuadBilinearInterpolation(m_pOrigData, m_pDestData, m_nYbeg, m_nYend, m_nOrigX, m_nOrigY, m_nDestX,  rWRatio, rHRatio, m_rDeltaX, m_rDeltaY, m_pTrackCancel);
+	//	break;
+	//case enumGISQualityBicubic:
+	//	OnBicubicInterpolation(m_pOrigData, m_pDestData, m_nYbeg, m_nYend, m_nOrigX, m_nOrigY, m_nDestX,  rWRatio, rHRatio, m_rDeltaX, m_rDeltaY, m_pTrackCancel);
+	//	break;
+	//case enumGISQualityNearest:
+	//default:
+	//	OnNearestNeighbourInterpolation(m_pOrigData, m_pDestData, m_nYbeg, m_nYend, m_nOrigX, m_nDestX,  rWRatio, rHRatio, m_rDeltaX, m_rDeltaY, m_pTrackCancel);
+	//	break;
+	//}
+		NearestNeighbourInterpolation(m_stPixelData.pPixelData, m_stPixelData.nPixelDataWidth, m_stPixelData.nPixelDataHeight, m_eSrcType, m_pTransformData, m_nOutXSize, m_nOutYSize, m_nBegY, m_nEndY, m_nBandCount, m_pRasterRenderer, m_pTrackCancel);
+
+	return NULL;
+}
+
+void wxRasterDrawThread::OnExit()
+{
+}
+
 
 //-----------------------------------
 // wxGISRasterRGBARenderer
@@ -34,6 +86,7 @@ wxGISRasterRGBARenderer::wxGISRasterRGBARenderer(void)
 	m_nAlphaBand = -1;
 	m_oBkColorGet = wxNullColour;//TODO: May be array of  ColorGet/ColorSet
 	m_oBkColorSet = m_oNoDataColor = wxTransparentColour;
+	m_nQuality = enumGISQualityNearest;
 }
 
 wxGISRasterRGBARenderer::~wxGISRasterRGBARenderer(void)
@@ -50,11 +103,12 @@ void wxGISRasterRGBARenderer::PutRaster(wxGISRasterDatasetSPtr pRaster)
 	m_pwxGISRasterDataset = pRaster;
 }	
 
-int *wxGISRasterRGBARenderer::GetBandsCombination(void)
+int *wxGISRasterRGBARenderer::GetBandsCombination(int *pnBandCount)
 {
 	int *pBands = NULL;
 	if(m_nAlphaBand == -1)
 	{
+		*pnBandCount = 3;
 		pBands = new int[3];
 		pBands[0] = m_nRedBand;
 		pBands[1] = m_nGreenBand;
@@ -62,6 +116,7 @@ int *wxGISRasterRGBARenderer::GetBandsCombination(void)
 	}
 	else
 	{
+		*pnBandCount = 4;
 		pBands = new int[4];
 		pBands[0] = m_nRedBand;
 		pBands[1] = m_nGreenBand;
@@ -71,7 +126,7 @@ int *wxGISRasterRGBARenderer::GetBandsCombination(void)
 	return pBands;
 }
 
-bool wxGISRasterRGBARenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, void *pTransformData )
+bool wxGISRasterRGBARenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel )
 {
 	int nOutXSize, nOutYSize;
 	bool bScale = false;
@@ -89,9 +144,10 @@ bool wxGISRasterRGBARenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALData
 	//сделать обратный обход массива
 	//pTransformData - если размер отличается 
 	//то запрашивать значение пиксела pData, прогонять его через функции с гистограммой и затем помещать его в pTransformData
+
     //multithreaded
-    int CPUCount = wxThread::GetCPUCount();
- //   std::vector<wxRasterDrawThread*> threadarray;
+    int CPUCount = wxThread::GetCPUCount();//1;//
+    std::vector<wxRasterDrawThread*> threadarray;
     int nPartSize = nOutYSize / CPUCount;
     int nBegY(0), nEndY;
     for(int i = 0; i < CPUCount; ++i)
@@ -101,41 +157,92 @@ bool wxGISRasterRGBARenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALData
         else
             nEndY = nPartSize * (i + 1);
 
- //       unsigned char* pDestInputData = pDestData  + (nDestX * nBegY * 3);
- //       wxRasterDrawThread *thread = new wxRasterDrawThread(pData, pDestInputData, nOrigX, nOrigY, rOrigX, rOrigY, nDestX, nDestY, rDeltaX, rDeltaY, Quality, pTrackCancel, nBegY, nEndY);
- //       thread->Create();
- //       thread->Run();
- //       threadarray.push_back(thread);
+		unsigned char* pDestInputData = pTransformData + (nBegY * 4 * nOutXSize);
+		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, m_nAlphaBand == -1 ? 3 : 4, pDestInputData, bScale == true ? m_nQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, static_cast<IRasterRenderer*>(this), pTrackCancel);
+		if(CreateAndRunThread(thread, wxT("wxRasterDrawThread"), wxT("RasterDrawThread")))
+	       threadarray.push_back(thread);
+
         nBegY = nEndY;
     }
 
- //   for(size_t i = 0; i < threadarray.size(); ++i)
- //   {
- //       wgDELETE(threadarray[i], Wait());
- //   }
+    for(size_t i = 0; i < threadarray.size(); ++i)
+    {
+        wgDELETE(threadarray[i], Wait());
+    }
 	return true;
 }
 
 void wxGISRasterRGBARenderer::Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel)
 {
-	int stride = cairo_format_stride_for_width (CAIRO_FORMAT_ARGB32, stPixelData.nOutputWidth);
+	int nOutXSize, nOutYSize;
+	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
+	{
+		nOutXSize = stPixelData.nPixelDataWidth;
+		nOutYSize = stPixelData.nPixelDataHeight;
+	}
+	else
+	{
+		nOutXSize = stPixelData.nOutputWidth;
+		nOutYSize = stPixelData.nOutputHeight;
+	}
+
+	int stride = cairo_format_stride_for_width (CAIRO_FORMAT_ARGB32/*CAIRO_FORMAT_RGB24*/, nOutXSize);
 	if(stride == -1)
 		return;//TODO: ERROR
-	void *pTransformPixelData = CPLMalloc (stride * stPixelData.nOutputHeight);
+	unsigned char *pTransformPixelData = (unsigned char *)CPLMalloc (stride * nOutYSize);
 
-	if(!OnPixelProceed(stPixelData, m_pwxGISRasterDataset->GetDataType(), pTransformPixelData))
+	if(!OnPixelProceed(stPixelData, m_pwxGISRasterDataset->GetDataType(), pTransformPixelData, pTrackCancel))
 		return;//TODO: ERROR
 	
 	cairo_surface_t *surface;
-	surface = cairo_image_surface_create_for_data ((unsigned char*)pTransformPixelData, CAIRO_FORMAT_ARGB32, stPixelData.nOutputWidth, stPixelData.nOutputHeight, stride);
+	surface = cairo_image_surface_create_for_data (pTransformPixelData, CAIRO_FORMAT_ARGB32/*CAIRO_FORMAT_RGB24*/, nOutXSize, nOutYSize, stride);
 	//TODO: Put UpperLeft coord to DrawRaster not bounds???
 	//double dX = DrawBounds.MinX + (DrawBounds.MaxX - DrawBounds.MinX) / 2;
 	//double dY = DrawBounds.MinY + (DrawBounds.MaxY - DrawBounds.MinY) / 2;
 	pDisplay->DrawRaster(surface, stPixelData.stWorldBounds);
 
 	cairo_surface_destroy(surface);
+
+	CPLFree((void*)pTransformPixelData);
 }
 
+void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA)
+{
+	if(pSrcValR == NULL)
+		return;
+	//wxBYTE_ORDER
+	//pOutputData[0] = 0;//A B
+	//pOutputData[1] = 0;//R   G
+	//pOutputData[2] = 255;//G   R
+	//pOutputData[3] = 255;//B   A
+	//return;
+
+	if(pSrcValA == NULL)
+		pOutputData[3] = 255;
+	else
+		pOutputData[3] = (unsigned char)SRCVAL(pSrcValA, m_pwxGISRasterDataset->GetDataType(), 0);//TODO: transform from pixel type to unsigned char
+	unsigned char RPixVal = (unsigned char)SRCVAL(pSrcValR, m_pwxGISRasterDataset->GetDataType(), 0);
+	pOutputData[2] = RPixVal;
+	//if(RPixVal > 128)
+	//{
+	//	pOutputData[0] = 0;
+	//	pOutputData[1] = 0;
+	//	pOutputData[2] = 0;
+	//	pOutputData[3] = 0;
+	//	return;
+	//}
+
+	if(pSrcValG == NULL || pSrcValB == NULL)
+	{
+		pOutputData[1] = RPixVal;
+		pOutputData[0] = RPixVal;
+	}
+	else
+	{
+		pOutputData[1] = (unsigned char)SRCVAL(pSrcValG, m_pwxGISRasterDataset->GetDataType(), 0);
+		pOutputData[0] = (unsigned char)SRCVAL(pSrcValB, m_pwxGISRasterDataset->GetDataType(), 0);
+	}
+}
 /*
 void wxGISRasterRGBRenderer::Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel)
 {

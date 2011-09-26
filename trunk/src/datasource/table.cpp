@@ -250,6 +250,10 @@ void wxGISTable::Close(void)
 			OGRDataSource::DestroyDataSource( m_poDS );
 	}
 	m_poDS = NULL;
+
+	m_Encoding = wxFONTENCODING_DEFAULT;
+    m_bIsOpened = false;
+	m_bHasFID = false;
 }
 
 size_t wxGISTable::GetFeatureCount(ITrackCancel* pTrackCancel)
@@ -832,12 +836,12 @@ bool wxGISTable::Rename(wxString sNewName)
     CPLString szName = CPLGetBasename(m_sPath);
 	CPLString szNewName = ClearExt(sNewName).mb_str(wxConvUTF8);
 
-	Close();
-
     char** papszFileList = GetFileList();
     papszFileList = CSLAddString( papszFileList, m_sPath );
     if(!papszFileList)
         return false;
+
+	Close();
 
     for(int i = 0; papszFileList[i] != NULL; ++i )
     {		

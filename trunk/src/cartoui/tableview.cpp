@@ -32,31 +32,25 @@
 
 wxGISGridTable::wxGISGridTable(wxGISDatasetSPtr pwxGISDataset)
 {
+    m_nRows = m_nCols = 0;
     m_pwxGISDataset = boost::dynamic_pointer_cast<wxGISTable>(pwxGISDataset);
     if(m_pwxGISDataset)
     {
 		if(!m_pwxGISDataset->IsOpened())
-			m_pwxGISDataset->Open();
+			if(!m_pwxGISDataset->Open())
+				return;
 
 		m_pOGRFeatureDefn = m_pwxGISDataset->GetDefinition();
-	    m_nCols = m_pOGRFeatureDefn->GetFieldCount();
-		m_nRows = m_pwxGISDataset->GetFeatureCount();
-	    //OGRLayer* pLayer = m_pwxGISDataset->GetLayerRef(0);
-     //   if(pLayer)
-     //   {
-	    //    m_sFIDKeyName = wgMB2WX(pLayer->GetFIDColumn());
-     //   }
-    }
-    else
-    {
-        m_nCols = 0;
-        m_nRows = 0;
+		if(m_pOGRFeatureDefn)
+		{
+			m_nCols = m_pOGRFeatureDefn->GetFieldCount();
+			m_nRows = m_pwxGISDataset->GetFeatureCount();
+		}
     }
 }
 
 wxGISGridTable::~wxGISGridTable()
 {
-	//wsDELETE(m_pwxGISDataset);
 }
 
 int wxGISGridTable::GetNumberCols()
@@ -88,7 +82,8 @@ wxString wxGISGridTable::GetColLabelValue(int col)
 {
     wxString label;
 	OGRFieldDefn* pOGRFieldDefn = m_pOGRFeatureDefn->GetFieldDefn(col);
-	label = wxString(pOGRFieldDefn->GetNameRef(), wxConvLocal);
+	if(pOGRFieldDefn)
+		label = wxString(pOGRFieldDefn->GetNameRef(), wxConvLocal);
 	//if(!m_sFIDKeyName.IsEmpty())
 	//{
 	//	if(label == m_sFIDKeyName);

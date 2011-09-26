@@ -106,8 +106,10 @@ class IRasterRenderer : public IRenderer
 public:
 	virtual ~IRasterRenderer(void){};
 	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster) = 0;
-	virtual int *GetBandsCombination(void) = 0;
+	virtual int *GetBandsCombination(int *pnBandCount) = 0;
 	virtual void Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL) = 0;
+	//transform pixel from raster value to display unsigned char and store it in pOutputData (ARGB32)
+	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA) = 0;
 };
 DEFINE_SHARED_PTR(IRasterRenderer);
 

@@ -33,6 +33,9 @@
     <ClCompile Include="..\..\src\carto\transformthreads.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\carto\interpolation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\wxgis\carto\carto.h">
@@ -54,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\wxgis\carto\transformthreads.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\wxgis\carto\interpolation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

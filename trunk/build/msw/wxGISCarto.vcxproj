@@ -107,6 +107,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\carto\featurelayer.cpp" />
+    <ClCompile Include="..\..\src\carto\interpolation.cpp" />
     <ClCompile Include="..\..\src\carto\map.cpp" />
     <ClCompile Include="..\..\src\carto\rasterlayer.cpp" />
     <ClCompile Include="..\..\src\carto\rasterrenderer.cpp" />
@@ -116,6 +117,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\wxgis\carto\carto.h" />
     <ClInclude Include="..\..\include\wxgis\carto\featurelayer.h" />
+    <ClInclude Include="..\..\include\wxgis\carto\interpolation.h" />
     <ClInclude Include="..\..\include\wxgis\carto\map.h" />
     <ClInclude Include="..\..\include\wxgis\carto\rasterlayer.h" />
     <ClInclude Include="..\..\include\wxgis\carto\rasterrenderer.h" />
