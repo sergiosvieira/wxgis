@@ -23,7 +23,7 @@
 //-----------------------------------
 // wxRasterDrawThread
 //-----------------------------------
-
+/*
 wxRasterDrawThread::wxRasterDrawThread(const unsigned char* pOrigData, unsigned char* pDestData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel, int nYbeg, int nYend) : wxThread(wxTHREAD_JOINABLE)
 {
     m_pTrackCancel = pTrackCancel;
@@ -477,7 +477,7 @@ void wxRasterDrawThread::OnBicubicInterpolation(const unsigned char* pOrigData, 
         }
     }
 }
-
+*/
 ////-----------------------------------------------------
 //// wxGISDisplay
 ////-----------------------------------------------------

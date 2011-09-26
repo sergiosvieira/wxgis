@@ -25,6 +25,29 @@
 /** \class wxGISRasterRGBARenderer rasterrenderer.h
     \brief The raster layer renderer for RGB data and Alpha channel
 */
+class wxRasterDrawThread : public wxThread
+{
+public:
+	wxRasterDrawThread(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, int nBandCount, unsigned char *pTransformData, wxGISEnumDrawQuality nQuality, int nOutXSize, int nOutYSize, int nBegY, int nEndY, IRasterRenderer *pRasterRenderer, ITrackCancel *pTrackCancel = NULL);
+    virtual void *Entry();
+    virtual void OnExit();
+private:
+    ITrackCancel* m_pTrackCancel;
+	IRasterRenderer *m_pRasterRenderer;
+	RAWPIXELDATA &m_stPixelData;
+	GDALDataType m_eSrcType;
+	unsigned char *m_pTransformData;
+	wxGISEnumDrawQuality m_nQuality;
+	int m_nOutXSize;
+	int m_nOutYSize;
+	int m_nBegY;
+	int m_nEndY;
+	int m_nBandCount;
+};
+
+/** \class wxGISRasterRGBARenderer rasterrenderer.h
+    \brief The raster layer renderer for RGB data and Alpha channel
+*/
 class wxGISRasterRGBARenderer :
 	public IRasterRenderer
 {
@@ -34,13 +57,14 @@ public:
 //IRasterRenderer
 	virtual bool CanRender(wxGISDatasetSPtr pDataset);
 	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster);
-	virtual int *GetBandsCombination(void);
+	virtual int *GetBandsCombination(int *pnBandCount);
 	virtual void Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
+	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA);
 /**
     \brief Proceed two dim array multithreaded.
 */
 protected:
-	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, void *pTransformData );
+	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel );
 
 //	virtual void Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel);
 ////
@@ -52,4 +76,5 @@ protected:
 	//stretch - none, custom, standard derivations, histogram equalize, min-max, histogram specification, percent clip
 	//statistics - current display extent, each raster dataset, custom settings
 	wxGISRasterDatasetSPtr m_pwxGISRasterDataset;
+	wxGISEnumDrawQuality m_nQuality;
 };

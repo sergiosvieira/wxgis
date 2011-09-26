@@ -36,6 +36,9 @@ wxGISRasterLayer::wxGISRasterLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer(
 
 		SetName(m_pwxGISRasterDataset->GetName());
 	}
+
+	if(m_pRasterRenderer)
+		m_pRasterRenderer->PutRaster(m_pwxGISRasterDataset);
 }
 
 wxGISRasterLayer::~wxGISRasterLayer(void)
@@ -189,12 +192,15 @@ bool wxGISRasterLayer::GetPixelData(RAWPIXELDATA &stPixelData, wxGISDisplay *pDi
 	double adfReverseGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
 	CPLErr err = pRaster->GetGeoTransform(adfGeoTransform);
 	bool bNoTransform(false);
+	double dHalfXRes(0.5), dHalfYRes(0.5);//
 	if(err != CE_None)
 	{
 		bNoTransform = true;
 	}
 	else
 	{
+		dHalfXRes = adfGeoTransform[1] / 2;
+		dHalfYRes = adfGeoTransform[5] / 2;
 		int nRes = GDALInvGeoTransform( adfGeoTransform, adfReverseGeoTransform );
 	}
 
@@ -238,21 +244,45 @@ bool wxGISRasterLayer::GetPixelData(RAWPIXELDATA &stPixelData, wxGISDisplay *pDi
     int nMinX = floor(stPixelBounds.MinX);//int(PixelBounds.MinX);//floor
     int nMinY = floor(stPixelBounds.MinY);//int(PixelBounds.MinY);//floor
 
+	//correct output world envelope to new pixel coords (stDrawBounds)
+	if(bNoTransform)
+	{
+		double dX = stPixelBounds.MinX - nMinX;
+		double dY = stPixelBounds.MinY - nMinY;
+
+		dHalfXRes += dX;
+		dHalfYRes += dY;
+		//add half a pixel
+		stDrawBounds.MinX -= dHalfXRes;
+		stDrawBounds.MaxX += dHalfXRes;
+		stDrawBounds.MinY -= dHalfYRes;
+		stDrawBounds.MaxY += dHalfYRes;
+	}
+	else
+	{
+		//add half a pixel
+		GDALApplyGeoTransform( adfGeoTransform, nMinX - dHalfXRes, nMinY - dHalfYRes, &stDrawBounds.MinX, &stDrawBounds.MaxY );
+		GDALApplyGeoTransform( adfGeoTransform, nMinX + nWidth + dHalfXRes, nMinY + nHeight + dHalfYRes, &stDrawBounds.MaxX, &stDrawBounds.MinY );
+	}
+
 	GDALDataType eDT = m_pwxGISRasterDataset->GetDataType();
 	int nDataSize = GDALGetDataTypeSize(eDT) / 8;
 
 	void *data = NULL;
+	int nBandCount(0);
+	int *panBands = m_pRasterRenderer->GetBandsCombination(&nBandCount); 
 	
 	if( nOutWidth > nWidth && nOutHeight > nHeight ) // not scale
 	{
+		//nWidth += 2;
+		//nHeight += 2;
 		stPixelData.nPixelDataWidth = nWidth;
 		stPixelData.nPixelDataHeight = nHeight;
-		stPixelData.nOutputWidth = nOutWidth;
-		stPixelData.nOutputHeight = nOutHeight;
+		stPixelData.nOutputWidth = nOutWidth// + 4;
+		stPixelData.nOutputHeight = nOutHeight// + 4;
 
-		data = CPLMalloc (nWidth * nHeight * nDataSize);
-		int *panBands = m_pRasterRenderer->GetBandsCombination(); 
-		if(!m_pwxGISRasterDataset->GetPixelData(data, nMinX, nMinY, nWidth, nHeight, nWidth, nHeight, eDT, WXSIZEOF(panBands), panBands))
+		data = CPLMalloc (nWidth * nHeight * nDataSize * nBandCount);
+		if(!m_pwxGISRasterDataset->GetPixelData(data, nMinX, nMinY, nWidth, nHeight, nWidth, nHeight, eDT, nBandCount, panBands))
 			return false;//the data is free outside
 	}
 	else
@@ -260,9 +290,8 @@ bool wxGISRasterLayer::GetPixelData(RAWPIXELDATA &stPixelData, wxGISDisplay *pDi
 		stPixelData.nPixelDataWidth = nOutWidth;
 		stPixelData.nPixelDataHeight = nOutHeight;
 
-		data = CPLMalloc (nOutWidth * nOutHeight * nDataSize);
-		int *panBands = m_pRasterRenderer->GetBandsCombination(); 
-		if(!m_pwxGISRasterDataset->GetPixelData(data, nMinX, nMinY, nWidth, nHeight, nOutWidth, nOutHeight, eDT, WXSIZEOF(panBands), panBands))
+		data = CPLMalloc (nOutWidth * nOutHeight * nDataSize * nBandCount);
+		if(!m_pwxGISRasterDataset->GetPixelData(data, nMinX, nMinY, nWidth, nHeight, nOutWidth, nOutHeight, eDT, nBandCount, panBands))
 			return false;//the data is free outside
 	}
 

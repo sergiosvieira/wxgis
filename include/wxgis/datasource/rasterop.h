@@ -24,3 +24,4 @@
 #include "wxgis/datasource/rasterdataset.h"
 
 int WXDLLIMPEXP_GIS_DS GetOverviewLevels(wxGISRasterDatasetSPtr pwxGISRasterDataset, int* anOverviewList);
+
