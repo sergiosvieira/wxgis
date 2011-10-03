@@ -20,21 +20,21 @@
  ****************************************************************************/
 #include "wxgis/carto/interpolation.h"
 
-void NearestNeighbourInterpolation(void *pInputData, int nInputXSize, int nInputYSize, GDALDataType eSrcType, unsigned char *pOutputData, int nOutXSize, int nOutYSize, int nBegY, int nEndY, int nBandCount, IRasterRenderer *pRasterRenderer, ITrackCancel *pTrackCancel)
+void NearestNeighbourInterpolation(void *pInputData, int nInputXSize, double dInputXSize, double dInputYSize, double dDeltaX, double dDeltaY , GDALDataType eSrcType, unsigned char *pOutputData, int nOutXSize, int nOutYSize, int nBegY, int nEndY, int nBandCount, IRasterRenderer *pRasterRenderer, ITrackCancel *pTrackCancel)
 {
 	if(nEndY > nOutYSize || pRasterRenderer == NULL)
 		return;
 
-	double dXRatio = (double)nInputXSize / nOutXSize;
-	double dYRatio = (double)nInputYSize / nOutYSize;
+	double dXRatio = dInputXSize / nOutXSize;
+	double dYRatio = dInputYSize / nOutYSize;
 
     for(int nDestPixY = nBegY; nDestPixY < nEndY; ++nDestPixY)
     {
-        int nOrigPixY = (int)(dYRatio * nDestPixY);
+        int nOrigPixY = (int)(dYRatio * double(nDestPixY) + dDeltaY);
         int scan_line = nOrigPixY * nInputXSize;
         for(int nDestPixX = 0; nDestPixX < nOutXSize; ++nDestPixX)
         {
-            int nOrigPixX = (int)(dXRatio * nDestPixX);
+            int nOrigPixX = (int)(dXRatio * double(nDestPixX) + dDeltaX);
             int src_pixel_index = scan_line + nOrigPixX;
 
             src_pixel_index *= nBandCount;

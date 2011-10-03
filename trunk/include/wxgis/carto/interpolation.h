@@ -56,5 +56,5 @@ inline void* GetValuePointer(void* pData, int nIndex, GDALDataType eSrcType)
 	return 0;
 }
 
-void WXDLLIMPEXP_GIS_CRT NearestNeighbourInterpolation(void *pInputData, int nInputXSize, int nInputYSize, GDALDataType eSrcType, unsigned char *pOutputData, int nOutXSize, int nOutYSize, int nBegY, int nEndY, int nBandCount, IRasterRenderer *pRasterRenderer, ITrackCancel *pTrackCancel = NULL);
+void WXDLLIMPEXP_GIS_CRT NearestNeighbourInterpolation(void *pInputData, int nInputXSize, double dInputXSize, double dInputYSize, double dDeltaX, double dDeltaY, GDALDataType eSrcType, unsigned char *pOutputData, int nOutXSize, int nOutYSize, int nBegY, int nEndY, int nBandCount, IRasterRenderer *pRasterRenderer, ITrackCancel *pTrackCancel = NULL);
 

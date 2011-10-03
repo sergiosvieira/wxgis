@@ -58,6 +58,7 @@ void wxGISQuadTree::AddItem(OGRGeometry* pGeom, long nOID, bool bOwnGeometry)
 
 wxGISQuadTreeCursorSPtr wxGISQuadTree::Search(const CPLRectObj* pAoi)
 {
+	wxCriticalSectionLocker locker(m_CritSect);
     bool bContains(false);
 	if(pAoi)
 	{
@@ -70,8 +71,6 @@ wxGISQuadTreeCursorSPtr wxGISQuadTree::Search(const CPLRectObj* pAoi)
 		if(!IsDoubleEquil(m_Envelope.MaxX, pInputEnv.MaxX) || !IsDoubleEquil(m_Envelope.MaxY, pInputEnv.MaxY) || !IsDoubleEquil(m_Envelope.MinX, pInputEnv.MinX) || !IsDoubleEquil(m_Envelope.MinY, pInputEnv.MinY))
 			bContains = m_Envelope.Contains(pInputEnv) != 0;
 	}
-
-	wxCriticalSectionLocker locker(m_CritSect);
 
 	wxGISQuadTreeCursorSPtr pResult = boost::make_shared<wxGISQuadTreeCursor>();
 	if(bContains)

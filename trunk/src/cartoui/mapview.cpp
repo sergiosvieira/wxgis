@@ -130,16 +130,14 @@ void wxGISMapView::OnPaint(wxPaintEvent & event)
         return;
     }
 
-	if(m_nDrawingState == enumGISMapZooming || m_nDrawingState == enumGISMapPanning || m_nDrawingState ==  enumGISMapRotating || m_nDrawingState ==  enumGISMapWheeling) //if zooming - exit immediatly
+	if(m_nDrawingState == enumGISMapZooming || m_nDrawingState == enumGISMapPanning || m_nDrawingState ==  enumGISMapRotating || m_nDrawingState ==  enumGISMapWheeling) //if operation - exit immediatly
 	{
-	//	//if(m_pGISDisplay)
-	//	//	m_pGISDisplay->ZoomingDraw(GetClientRect(), &paint_dc);
 		return;
 	}
 
-	wxCriticalSectionLocker locker(m_CritSect);
 	if(m_pGISDisplay)
 	{
+		wxCriticalSectionLocker locker(m_CritSect);
 		if(!m_pMapDrawingThread && m_pGISDisplay->IsDerty())//m_nDrawingState = enumGISMapDrawing
 		{
 			// 1. start drawing thread
@@ -162,11 +160,11 @@ void wxGISMapView::OnPaint(wxPaintEvent & event)
 		}
 		else
 		{
-			if(!m_pGISDisplay->IsDerty() && m_nDrawingState == enumGISMapDrawing)
-				m_nDrawingState = enumGISMapNone;
-
 			//draw contents of m_pGISDisplay
 			m_pGISDisplay->Output(&paint_dc, m_ClipGeometry);
+
+			if(!m_pGISDisplay->IsDerty() && m_nDrawingState == enumGISMapDrawing)
+				m_nDrawingState = enumGISMapNone;
 
 			if( m_nDrawingState == enumGISMapNone )
 			{
@@ -264,7 +262,9 @@ void wxGISMapView::OnTimer( wxTimerEvent& event )
 		m_timer.Stop();
 	}
 	else if( m_nDrawingState == enumGISMapNone )
+	{
 		m_timer.Stop();
+	}
 	Refresh(false);
 }
 
@@ -298,14 +298,18 @@ void wxGISMapView::CancelDrawThread(void)
 {
 	wxCriticalSectionLocker locker(m_CritSect);
 	if(m_pTrackCancel)
+	{
 		m_pTrackCancel->Cancel();
+	}
 	//wxMilliSleep(150);
-	//if(m_pMapDrawingThread)
-	//{
-	//	if(m_pMapDrawingThread->IsRunning())
-	//		m_pMapDrawingThread->Delete();
-	//	m_pMapDrawingThread = NULL;
-	//}
+	if(m_pMapDrawingThread)
+	{
+		//if(m_pMapDrawingThread->IsRunning())
+		//	m_pMapDrawingThread->Delete();
+		if(!m_pMapDrawingThread->IsDetached())
+			m_pMapDrawingThread->Wait();
+		m_pMapDrawingThread = NULL;
+	}
 }
 
 void wxGISMapView::OnDraw(wxGISEnumDrawPhase nPhase)
@@ -492,7 +496,7 @@ void wxGISMapView::SetFullExtent(void)
 
 void wxGISMapView::PanStart(wxPoint MouseLocation)
 {
-	//CancelDrawThread();
+	CancelDrawThread();
 	m_StartMouseLocation = MouseLocation;
     m_nDrawingState = enumGISMapPanning;
 	CaptureMouse();
@@ -518,8 +522,13 @@ void wxGISMapView::PanStop(wxPoint MouseLocation)
 	wxCoord y =  m_StartMouseLocation.y - MouseLocation.y;
 
 	wxRect rect = m_pGISDisplay->GetDeviceFrame();//GetClientRect();
+	if(x == 0 && y == 0)
+	{
+		x = m_StartMouseLocation.x - (rect.GetLeft() + rect.GetWidth() / 2);
+		y = m_StartMouseLocation.y - (rect.GetTop() + rect.GetHeight() / 2);
+	}
 	rect.Offset(x, y);
-	m_nDrawingState = enumGISMapDrawing;
+
 	if(m_pGISDisplay)
 	{
 		OGREnvelope Env = m_pGISDisplay->TransformRect(rect);
@@ -530,6 +539,7 @@ void wxGISMapView::PanStop(wxPoint MouseLocation)
 		m_pGISDisplay->SetDerty(true);
 		if(Env.IsInit())//set new bounds
 			Do(Env);
+		m_nDrawingState = enumGISMapDrawing;
 	}
 }
 

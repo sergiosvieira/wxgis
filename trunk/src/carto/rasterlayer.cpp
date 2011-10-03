@@ -192,15 +192,12 @@ bool wxGISRasterLayer::GetPixelData(RAWPIXELDATA &stPixelData, wxGISDisplay *pDi
 	double adfReverseGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
 	CPLErr err = pRaster->GetGeoTransform(adfGeoTransform);
 	bool bNoTransform(false);
-	double dHalfXRes(0.5), dHalfYRes(0.5);//
 	if(err != CE_None)
 	{
 		bNoTransform = true;
 	}
 	else
 	{
-		dHalfXRes = adfGeoTransform[1] / 2;
-		dHalfYRes = adfGeoTransform[5] / 2;
 		int nRes = GDALInvGeoTransform( adfGeoTransform, adfReverseGeoTransform );
 	}
 
@@ -214,8 +211,8 @@ bool wxGISRasterLayer::GetPixelData(RAWPIXELDATA &stPixelData, wxGISDisplay *pDi
 	if(dOutHeight < 0) dOutHeight *= -1;
 
 	//round float pixel to int using ceil
-	int nOutWidth = ceil(dOutWidth);//TODO: int(dOutWidth + 0.5);//ceil(dOutWidth) + 1;
-	int nOutHeight = ceil(dOutHeight);//TODO: int(dOutHeight + 0.5);//ceil(dOutHeight) + 1;
+	int nOutWidth = ceil(dOutWidth);
+	int nOutHeight = ceil(dOutHeight);
 
 	//raster size
     int nXSize = m_pwxGISRasterDataset->GetWidth();
@@ -239,31 +236,10 @@ bool wxGISRasterLayer::GetPixelData(RAWPIXELDATA &stPixelData, wxGISDisplay *pDi
     double dWidth = stPixelBounds.MaxX - stPixelBounds.MinX;
     double dHeight = stPixelBounds.MaxY - stPixelBounds.MinY;
 
-	int nWidth = ceil(dWidth);//int(dWidth);// + 0.5);//ceil(dWidth) + 1;
-	int nHeight = ceil(dHeight);//int(dHeight);// + 0.5);//ceil(dHeight) + 1;
-    int nMinX = floor(stPixelBounds.MinX);//int(PixelBounds.MinX);//floor
-    int nMinY = floor(stPixelBounds.MinY);//int(PixelBounds.MinY);//floor
-
-	//correct output world envelope to new pixel coords (stDrawBounds)
-	if(bNoTransform)
-	{
-		double dX = stPixelBounds.MinX - nMinX;
-		double dY = stPixelBounds.MinY - nMinY;
-
-		dHalfXRes += dX;
-		dHalfYRes += dY;
-		//add half a pixel
-		stDrawBounds.MinX -= dHalfXRes;
-		stDrawBounds.MaxX += dHalfXRes;
-		stDrawBounds.MinY -= dHalfYRes;
-		stDrawBounds.MaxY += dHalfYRes;
-	}
-	else
-	{
-		//add half a pixel
-		GDALApplyGeoTransform( adfGeoTransform, nMinX - dHalfXRes, nMinY - dHalfYRes, &stDrawBounds.MinX, &stDrawBounds.MaxY );
-		GDALApplyGeoTransform( adfGeoTransform, nMinX + nWidth + dHalfXRes, nMinY + nHeight + dHalfYRes, &stDrawBounds.MaxX, &stDrawBounds.MinY );
-	}
+	int nWidth = ceil(dWidth);
+	int nHeight = ceil(dHeight);
+    int nMinX = floor(stPixelBounds.MinX);
+    int nMinY = floor(stPixelBounds.MinY);
 
 	GDALDataType eDT = m_pwxGISRasterDataset->GetDataType();
 	int nDataSize = GDALGetDataTypeSize(eDT) / 8;
@@ -274,12 +250,19 @@ bool wxGISRasterLayer::GetPixelData(RAWPIXELDATA &stPixelData, wxGISDisplay *pDi
 	
 	if( nOutWidth > nWidth && nOutHeight > nHeight ) // not scale
 	{
-		//nWidth += 2;
-		//nHeight += 2;
+		//increase little in data
+		nWidth += 2; nHeight += 2;
+		if(nWidth > nXSize) nWidth = nXSize; 
+		if(nHeight > nYSize) nHeight = nYSize;
+
+		stPixelData.dPixelDeltaX = stPixelBounds.MinX - double(nMinX);// - 0.5;
+		stPixelData.dPixelDeltaY = stPixelBounds.MinY - double(nMinY);// - 0.5;
+		stPixelData.dPixelDataWidth = dWidth;
+		stPixelData.dPixelDataHeight = dHeight;
 		stPixelData.nPixelDataWidth = nWidth;
 		stPixelData.nPixelDataHeight = nHeight;
-		stPixelData.nOutputWidth = nOutWidth// + 4;
-		stPixelData.nOutputHeight = nOutHeight// + 4;
+		stPixelData.nOutputWidth = nOutWidth;
+		stPixelData.nOutputHeight = nOutHeight;
 
 		data = CPLMalloc (nWidth * nHeight * nDataSize * nBandCount);
 		if(!m_pwxGISRasterDataset->GetPixelData(data, nMinX, nMinY, nWidth, nHeight, nWidth, nHeight, eDT, nBandCount, panBands))
@@ -287,8 +270,13 @@ bool wxGISRasterLayer::GetPixelData(RAWPIXELDATA &stPixelData, wxGISDisplay *pDi
 	}
 	else
 	{
+		stPixelData.dPixelDeltaX = stPixelData.dPixelDeltaY = 0;
+		stPixelData.dPixelDataWidth = nOutWidth;
+		stPixelData.dPixelDataHeight = nOutHeight;
 		stPixelData.nPixelDataWidth = nOutWidth;
 		stPixelData.nPixelDataHeight = nOutHeight;
+		stPixelData.nOutputWidth = -1;
+		stPixelData.nOutputHeight = -1;
 
 		data = CPLMalloc (nOutWidth * nOutHeight * nDataSize * nBandCount);
 		if(!m_pwxGISRasterDataset->GetPixelData(data, nMinX, nMinY, nWidth, nHeight, nOutWidth, nOutHeight, eDT, nBandCount, panBands))

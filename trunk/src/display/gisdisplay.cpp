@@ -165,8 +165,8 @@ void wxGISDisplay::Output(wxDC* pDC, wxGISPointsArray ClipGeometry)
 	}
 	cairo_paint (cr);
 
-    cairo_destroy (cr);
     cairo_surface_destroy (surface);
+    cairo_destroy (cr);
 }
 
 void wxGISDisplay::ZoomingDraw(wxRect &rc, wxDC* pDC)
@@ -332,16 +332,19 @@ size_t wxGISDisplay::GetLastCacheID(void)
 
 bool wxGISDisplay::IsCacheDerty(size_t nCacheID)
 {
+	wxCriticalSectionLocker locker(m_CritSect);
 	return m_saLayerCaches[nCacheID].bIsDerty;
 }
 
 void wxGISDisplay::SetCacheDerty(size_t nCacheID, bool bIsDerty)
 {
+	wxCriticalSectionLocker locker(m_CritSect);
 	m_saLayerCaches[nCacheID].bIsDerty = bIsDerty;
 }
 
 void wxGISDisplay::SetDrawCache(size_t nCacheID)
 {
+	wxCriticalSectionLocker locker(m_CritSect);
 	//if(m_nCurrentLayer == nCacheID)
 	//	return;
 	//else 
@@ -352,7 +355,6 @@ void wxGISDisplay::SetDrawCache(size_t nCacheID)
 	}
 	else
 	{
-		wxCriticalSectionLocker locker(m_CritSect);
 		//merge previous cache
 		//TODO: clip by frame size cairo_clip()?
 		cairo_set_source_surface (m_saLayerCaches[nCacheID].pCairoContext, m_saLayerCaches[m_nCurrentLayer].pCairoSurface, 0, 0);
@@ -367,14 +369,16 @@ void wxGISDisplay::SetDrawCache(size_t nCacheID)
 
 void wxGISDisplay::SetDerty(bool bIsDerty)
 {
+	wxCriticalSectionLocker locker(m_CritSect);
 	for(size_t i = 0; i < m_saLayerCaches.size(); ++i)
 		m_saLayerCaches[i].bIsDerty = bIsDerty;
 }
 
 bool wxGISDisplay::IsDerty(void)
 {
+	wxCriticalSectionLocker locker(m_CritSect);
 	for(size_t i = 0; i < m_saLayerCaches.size(); ++i)
-		if(m_saLayerCaches[i].bIsDerty != false)
+		if(m_saLayerCaches[i].bIsDerty)
 			return true;
 	return false;
 }
@@ -800,7 +804,7 @@ void wxGISDisplay::DrawRaster(cairo_surface_t *surface, OGREnvelope& Envelope)
 //
 //	////cairo_scale  (m_saLayerCaches[m_nCurrentLayer].pCairoContext, 1.0, -1.0);
 //	//cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_FAST);
-//	//cairo_set_operator (cr, CAIRO_OPERATOR_SOURCE);
+	//cairo_set_operator (m_saLayerCaches[m_nCurrentLayer].pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
 //
 	cairo_pattern_destroy (pattern);

@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/cartoui/cartocmd.h"
 #include "wxgis/display/rubberband.h"
+#include "wxgis/core/config.h"
 //#include "wxgis/display/simplefillsymbol.h"
 
 #include "../../art/fullext.xpm"
@@ -472,7 +473,12 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 	{
 		case 0:	//z_in
 		{
-			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(0, 0, 255), 2), m_pMapView, m_pMapView->GetDisplay());
+			wxGISAppConfigSPtr pConfig = GetConfig();
+			int nR = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/rcolor")), 0);
+			int nG = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/gcolor")), 0);
+			int nB = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/bcolor")), 255);
+			int nWidth = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/width")), 2);
+			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(nR, nG, nB), nWidth), m_pMapView, m_pMapView->GetDisplay());
 			OGREnvelope Env = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
 			if(IsDoubleEquil(Env.MaxX, Env.MinX) || IsDoubleEquil(Env.MaxY, Env.MinY))
 			{
@@ -492,7 +498,12 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 		break;
 		case 1:	//z_out
 		{
-			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(0, 0, 255), 2), m_pMapView, m_pMapView->GetDisplay());
+			wxGISAppConfigSPtr pConfig = GetConfig();
+			int nR = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/rcolor")), 0);
+			int nG = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/gcolor")), 0);
+			int nB = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/bcolor")), 255);
+			int nWidth = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/width")), 2);
+			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(nR, nG, nB), nWidth), m_pMapView, m_pMapView->GetDisplay());
 			OGREnvelope Env = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
 			OGREnvelope CurrentEnv = m_pMapView->GetCurrentExtent();
 			OGREnvelope NewEnv;
@@ -516,7 +527,12 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 			break;
 		case 3:	//inf
 		{
-			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(0, 0, 255), 2), m_pMapView, m_pMapView->GetDisplay());
+			wxGISAppConfigSPtr pConfig = GetConfig();
+			int nR = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/rcolor")), 0);
+			int nG = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/gcolor")), 0);
+			int nB = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/bcolor")), 255);
+			int nWidth = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/width")), 2);
+			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(nR, nG, nB), nWidth), m_pMapView, m_pMapView->GetDisplay());
 			OGREnvelope Env = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
 			m_pMapView->Refresh(false);
 		}
