@@ -95,6 +95,8 @@ typedef struct _rawpixeldata
 {
 	void* pPixelData;
 	int nPixelDataWidth, nPixelDataHeight;
+	double dPixelDataWidth, dPixelDataHeight;
+	double dPixelDeltaX, dPixelDeltaY;
 	int nOutputWidth, nOutputHeight;
 	OGREnvelope stWorldBounds;
 }RAWPIXELDATA;

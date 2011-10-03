@@ -65,16 +65,29 @@ public:
 */
 protected:
 	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel );
+	virtual void OnFillStats(void);
+	virtual unsigned char wxGISRasterRGBARenderer::GetPixel(unsigned char nBand, void *pSrcVal);
+
 
 //	virtual void Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel);
 ////
 //	virtual OGREnvelope TransformEnvelope(const OGREnvelope* pEnvelope, OGRSpatialReference* pSrsSpatialReference, OGRSpatialReference* pDstSpatialReference);
 //    virtual wxImage Scale(unsigned char* pData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel);
+	typedef struct _bandstats{
+		double dfMin;
+		double dfMax;
+		double dfMean;
+		double dfStdDev;
+		double dfNoData;
+		//std::map<char, char>  
+	} BANDSTATS;
 protected:
 	int m_nRedBand, m_nGreenBand, m_nBlueBand, m_nAlphaBand;
-	wxColour m_oBkColorGet, m_oBkColorSet, m_oNoDataColor; 
+	wxColour m_oNoDataColor; //m_oBkColorGet, m_oBkColorSet, 
 	//stretch - none, custom, standard derivations, histogram equalize, min-max, histogram specification, percent clip
 	//statistics - current display extent, each raster dataset, custom settings
 	wxGISRasterDatasetSPtr m_pwxGISRasterDataset;
 	wxGISEnumDrawQuality m_nQuality;
+	BANDSTATS m_staBandStats[3];
+	bool m_bNodataNewBehaviour;
 };

@@ -171,8 +171,20 @@ void wxGISRubberEnvelope::OnMouseUp(wxMouseEvent& event)
 	double dY1 = std::max(m_StartY, event.GetY());
 	double dX2 = std::max(m_StartX, event.GetX());
 	double dY2 = std::min(m_StartY, event.GetY());
+
 	wxRect rc(wxPoint(dX1, dY1), wxPoint(dX2, dY2));
 	m_RetEnv = m_pDisp->TransformRect(rc);
+	if(IsDoubleEquil(dX1, dX2) || IsDoubleEquil(dY1, dY2))
+	{
+		m_RetEnv.MaxX = m_RetEnv.MinX;
+		m_RetEnv.MaxY = m_RetEnv.MinY;
+	}
+	//m_pDisp->DC2World(&dX1, &dY1);
+	//m_pDisp->DC2World(&dX2, &dY2);
+	//m_RetEnv.MinX = dX1;
+	//m_RetEnv.MinY = dY1;
+	//m_RetEnv.MaxX = dX2;
+	//m_RetEnv.MaxY = dY2;
 	OnUnlock();
     m_PrevRect.width = -1;
     m_PrevRect.height = -1;
