@@ -103,6 +103,26 @@ void WXDLLIMPEXP_GIS_DSP SetEnvelopeRatio(OGREnvelope &Env, double dRatio)
 	dEnvRatio = dWidth / dHeight;
 }
 
+//Sutherland-Hodgman Polygon Clipping
+//Adopted from (C) 2005 by Gavin Macaulay QGIS Project
+
+void ClipGeometryByEnvelope(OGRRawPoint* pOGRRawPoints, int *pnPointCount, const OGREnvelope &Env, bool shapeOpen)
+{
+	OGRRawPoint* pTmpOGRRawPoints = new OGRRawPoint[*pnPointCount * 2];
+	int nTmpPtCount(0);
+	TrimFeatureToBoundary( pOGRRawPoints, *pnPointCount, &pTmpOGRRawPoints, &nTmpPtCount, enumGISPtPosRight, Env, shapeOpen );
+
+	*pnPointCount = 0;
+	TrimFeatureToBoundary( pTmpOGRRawPoints, nTmpPtCount, &pOGRRawPoints, pnPointCount, enumGISPtPosTop, Env, shapeOpen );
+
+	nTmpPtCount = 0;
+	TrimFeatureToBoundary( pOGRRawPoints, *pnPointCount, &pTmpOGRRawPoints, &nTmpPtCount, enumGISPtPosLeft, Env, shapeOpen );
+
+	*pnPointCount = 0;
+	TrimFeatureToBoundary(  pTmpOGRRawPoints, nTmpPtCount, &pOGRRawPoints, pnPointCount, enumGISPtPosBottom, Env, shapeOpen );
+
+	delete [] pTmpOGRRawPoints;
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //wxGISDisplayTransformation::wxGISDisplayTransformation(void) : m_pSpatialReference(NULL)

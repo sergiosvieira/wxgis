@@ -54,7 +54,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxgiscpld.lib;wxgisogrd.lib;wxgisgdald.lib;libcurl_imp.lib;wxGISCored.lib;wxGISGeometryd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxgiscpld.lib;wxgisogrd.lib;wxgisgdald.lib;libcurl_imp.lib;wxGISCored.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(WXWIDGETS)\lib\vc_dll;$(WXGISGDAL)\lib;..\..\lib;$(CURL)\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>

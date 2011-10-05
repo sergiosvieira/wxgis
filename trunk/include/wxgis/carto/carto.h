@@ -28,7 +28,6 @@
 /** \class wxGISLayer carto.h
     \brief The base class for map layers
 */
-
 class wxGISLayer 
 {
 public:

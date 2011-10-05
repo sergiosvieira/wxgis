@@ -57,7 +57,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxmsw29ud_adv.lib;wxmsw29ud_aui.lib;wxmsw29ud_html.lib;wxgiscpld.lib;wxgisogrd.lib;wxgisgdald.lib;cairo.lib;wxGISCored.lib;wxGISFrameworkd.lib;wxGISDisplayd.lib;wxGISGeometryd.lib;wxGISDataSourced.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxmsw29ud_adv.lib;wxmsw29ud_aui.lib;wxmsw29ud_html.lib;wxgiscpld.lib;wxgisogrd.lib;wxgisgdald.lib;cairo.lib;wxGISCored.lib;wxGISFrameworkd.lib;wxGISDisplayd.lib;wxGISDataSourced.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(WXGISGDAL)\lib;$(WXWIDGETS)\lib\vc_dll;..\..\lib;$(CAIRO)\lib;$(ZLIB)\lib;$(LIBPNG)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -112,6 +112,7 @@
     <ClCompile Include="..\..\src\carto\rasterlayer.cpp" />
     <ClCompile Include="..\..\src\carto\rasterrenderer.cpp" />
     <ClCompile Include="..\..\src\carto\simplerenderer.cpp" />
+    <ClCompile Include="..\..\src\carto\stretch.cpp" />
     <ClCompile Include="..\..\src\carto\transformthreads.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -122,6 +123,7 @@
     <ClInclude Include="..\..\include\wxgis\carto\rasterlayer.h" />
     <ClInclude Include="..\..\include\wxgis\carto\rasterrenderer.h" />
     <ClInclude Include="..\..\include\wxgis\carto\simplerenderer.h" />
+    <ClInclude Include="..\..\include\wxgis\carto\stretch.h" />
     <ClInclude Include="..\..\include\wxgis\carto\transformthreads.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

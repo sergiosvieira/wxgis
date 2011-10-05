@@ -21,7 +21,7 @@
 
 #include "wxgis/geoprocessing/gpvector.h"
 #include "wxgis/datasource/sysop.h"
-#include "wxgis/geometry/algorithm.h"
+//#include "wxgis/geometry/algorithm.h"
 #include "wxgis/datasource/spvalidator.h"
 
 bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstDataSet, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel)

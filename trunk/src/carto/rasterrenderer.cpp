@@ -22,6 +22,9 @@
 #include "wxgis/carto/interpolation.h"
 #include "wxgis/datasource/rasterdataset.h"
 #include "wxgis/display/screendisplay.h"
+#include "wxgis/core/config.h"
+#include "wxgis/core/globalfn.h"
+
 //-----------------------------------
 // wxRasterDrawThread
 //-----------------------------------
@@ -38,11 +41,11 @@ wxRasterDrawThread::wxRasterDrawThread(RAWPIXELDATA &stPixelData, GDALDataType e
 	m_nBegY = nBegY;
 	m_nEndY = nEndY;
 	m_pRasterRenderer = pRasterRenderer;
-	m_bNodataNewBehaviour = GetConfig()->
 }
 
 void *wxRasterDrawThread::Entry()
 {
+    //RSP_Majority	3	Resample pixel by majority value.
 	//double rWRatio, rHRatio;
 	//rWRatio = m_rOrigX / m_nDestX;
 	//rHRatio = m_rOrigY / m_nDestY;
@@ -81,17 +84,21 @@ void wxRasterDrawThread::OnExit()
 
 wxGISRasterRGBARenderer::wxGISRasterRGBARenderer(void)
 {
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	wxString sAppName = GetApplication()->GetAppName();
+
 	m_nRedBand = 1;
 	m_nGreenBand = 2;
 	m_nBlueBand = 3;
 	m_nAlphaBand = -1;
-	m_nQuality = enumGISQualityNearest;
+	m_nQuality = (wxGISEnumDrawQuality)pConfig->ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/quality")), enumGISQualityNearest);	//wxString(wxT("wxGISCommon/coordinate_mask")));
 
-	BANDSTATS stDefault = {0, 255, 127.5, 180.3122292026, -99999.0};
-	m_staBandStats[0] = stDefault;
-	m_staBandStats[1] = stDefault;
-	m_staBandStats[2] = stDefault;
+	m_paStretch[0] = new wxGISStretch();
+	m_paStretch[1] = new wxGISStretch();
+	m_paStretch[2] = new wxGISStretch();
+	m_paStretch[3] = new wxGISStretch();
 
+	m_bNodataNewBehaviour = pConfig->ReadBool(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/nodata_newbehaviour")), true);
 	m_oNoDataColor = wxColor(0,0,0,0);
 	//m_oBkColorSet = 
 	//m_oBkColorGet = wxNullColour;//TODO: May be array of  ColorGet/ColorSet
@@ -99,6 +106,8 @@ wxGISRasterRGBARenderer::wxGISRasterRGBARenderer(void)
 
 wxGISRasterRGBARenderer::~wxGISRasterRGBARenderer(void)
 {
+    for(size_t i = 0; i < 4; ++i)
+        wxDELETE(m_paStretch[i]);
 }
 
 bool wxGISRasterRGBARenderer::CanRender(wxGISDatasetSPtr pDataset)
@@ -123,20 +132,63 @@ void wxGISRasterRGBARenderer::OnFillStats(void)
 			poGDALDataset = m_pwxGISRasterDataset->GetRaster();
 		if(!poGDALDataset)
 			return;
+
+        int         bGotNodata;
+        double      dfMin, dfMax, dfMean, dfStdDev, dfNoData;
 		GDALRasterBand* pRedBand = poGDALDataset->GetRasterBand(m_nRedBand);
-        pRedBand->GetStatistics(FALSE, FALSE, &m_staBandStats[0].dfMin, &m_staBandStats[0].dfMax, &m_staBandStats[0].dfMean, &m_staBandStats[0].dfStdDev);
-	    m_staBandStats[0].dfNoData = pRedBand->GetNoDataValue();
+ 
+        if(pRedBand->GetStatistics(FALSE, FALSE, &dfMin, &dfMax, &dfMean, &dfStdDev) == CE_None)
+        {
+            m_paStretch[0]->SetStats(dfMin, dfMax, dfMean, dfStdDev);
+        }
+
+		dfNoData = pRedBand->GetNoDataValue(&bGotNodata );
+        if( bGotNodata )
+        {
+            m_paStretch[0]->SetNoData(dfNoData);
+        }
 
 		GDALRasterBand* pGreenBand = poGDALDataset->GetRasterBand(m_nGreenBand);
-        pGreenBand->GetStatistics(FALSE, FALSE, &m_staBandStats[1].dfMin, &m_staBandStats[1].dfMax, &m_staBandStats[1].dfMean, &m_staBandStats[1].dfStdDev);
-	    m_staBandStats[1].dfNoData = pGreenBand->GetNoDataValue();
+        if(pGreenBand->GetStatistics(FALSE, FALSE, &dfMin, &dfMax, &dfMean, &dfStdDev) == CE_None)
+        {
+            m_paStretch[1]->SetStats(dfMin, dfMax, dfMean, dfStdDev);
+        }
+
+		dfNoData = pGreenBand->GetNoDataValue(&bGotNodata );
+        if( bGotNodata )
+        {
+            m_paStretch[1]->SetNoData(dfNoData);
+        }
 
 		GDALRasterBand* pBlueBand = poGDALDataset->GetRasterBand(m_nBlueBand);
-        pBlueBand->GetStatistics(FALSE, FALSE, &m_staBandStats[2].dfMin, &m_staBandStats[2].dfMax, &m_staBandStats[2].dfMean, &m_staBandStats[2].dfStdDev);
-	    m_staBandStats[2].dfNoData = pBlueBand->GetNoDataValue();
-	}
-}
+         if(pBlueBand->GetStatistics(FALSE, FALSE, &dfMin, &dfMax, &dfMean, &dfStdDev) == CE_None)
+        {
+            m_paStretch[2]->SetStats(dfMin, dfMax, dfMean, dfStdDev);
+        }
 
+		dfNoData = pBlueBand->GetNoDataValue(&bGotNodata );
+        if( bGotNodata )
+        {
+            m_paStretch[2]->SetNoData(dfNoData);
+        }
+
+        if(m_nAlphaBand != -1)
+        {
+ 		    GDALRasterBand* pAlphaBand = poGDALDataset->GetRasterBand(m_nAlphaBand);
+            if(pAlphaBand->GetStatistics(FALSE, FALSE, &dfMin, &dfMax, &dfMean, &dfStdDev) == CE_None)
+            {
+                m_paStretch[3]->SetStats(dfMin, dfMax, dfMean, dfStdDev);
+            }
+
+		    dfNoData = pAlphaBand->GetNoDataValue(&bGotNodata );
+            if( bGotNodata )
+            {
+                m_paStretch[3]->SetNoData(dfNoData);
+            }
+            //TODO: set stretch type to min-max
+        }
+	}	
+}
 
 int *wxGISRasterRGBARenderer::GetBandsCombination(int *pnBandCount)
 {
@@ -238,43 +290,11 @@ void wxGISRasterRGBARenderer::Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase
 	CPLFree((void*)pTransformPixelData);
 }
 
-unsigned char wxGISRasterRGBARenderer::GetPixel(unsigned char nBand, void *pSrcVal)
-{
-	//get result from function
-	switch(m_pwxGISRasterDataset->GetDataType())
-	{
-	case GDT_Byte:
-		return (void*)(pDataByte + nIndex * sizeof(GByte));
-	case GDT_Float32:
-		return (void*)(pDataByte + nIndex * sizeof(float));
-	case GDT_Float64:
-		return (void*)(pDataByte + nIndex * sizeof(double));
-	case GDT_Int32:
-		return (void*)(pDataByte + nIndex * sizeof(GInt32));
-	case GDT_UInt16:
-		return (void*)(pDataByte + nIndex * sizeof(GUInt16));
-	case GDT_Int16:
-		return (void*)(pDataByte + nIndex * sizeof(GInt16));
-	case GDT_UInt32:
-		return (void*)(pDataByte + nIndex * sizeof(GUInt32));
-	case GDT_CInt16:
-	case GDT_CInt32:
-	case GDT_CFloat32:
-	case GDT_CFloat64:
-	default:
-		return 0;
-	}
-
-	//http://www.calc.ru/103.html
-
-	return (unsigned char)SRCVAL(pSrcVal, m_pwxGISRasterDataset->GetDataType(), 0);//TODO: transform from pixel type to unsigned char
-}
-
 void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA)
 {
 	if(pSrcValR == NULL)
 		return;
-	//wxBYTE_ORDER
+	//wxBYTE_ORDER          //      x
 	//pOutputData[0] = 0;	//	A	B
 	//pOutputData[1] = 0;	//	R	G
 	//pOutputData[2] = 255;	//	G	R
@@ -283,9 +303,9 @@ void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, void *pSrcVa
 	if(pSrcValA == NULL)
 		pOutputData[3] = 255;
 	else
-		pOutputData[3] = GetPixel(3, pSrcValA);
-
-	unsigned char RPixVal = GetPixel(0, pSrcValR);
+		pOutputData[3] = m_paStretch[3]->GetValue((double)SRCVAL(pSrcValA, m_pwxGISRasterDataset->GetDataType(), 0));
+    
+	unsigned char RPixVal = m_paStretch[0]->GetValue((double)SRCVAL(pSrcValR, m_pwxGISRasterDataset->GetDataType(), 0));
 	pOutputData[2] = RPixVal;
 
 	if(pSrcValG == NULL || pSrcValB == NULL)
@@ -295,15 +315,15 @@ void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, void *pSrcVa
 	}
 	else
 	{
-		pOutputData[1] = GetPixel(1, pSrcValG);
-		pOutputData[0] = GetPixel(2, pSrcValB);
+		pOutputData[1] = m_paStretch[1]->GetValue((double)SRCVAL(pSrcValG, m_pwxGISRasterDataset->GetDataType(), 0));
+		pOutputData[0] = m_paStretch[2]->GetValue((double)SRCVAL(pSrcValB, m_pwxGISRasterDataset->GetDataType(), 0));
 	}
 
 	//check for nodata
 	bool bIsChanged(false);
 	if(m_bNodataNewBehaviour)
 	{
-		if(IsDoubleEquil(double(pOutputData[2]), m_staBandStats[0].dfNoData) && IsDoubleEquil(double(pOutputData[1]), m_staBandStats[1].dfNoData) && IsDoubleEquil(double(pOutputData[0]), m_staBandStats[2].dfNoData))
+        if(m_paStretch[0]->IsNoData(pOutputData[2]) && m_paStretch[1]->IsNoData(pOutputData[1]) && m_paStretch[2]->IsNoData(pOutputData[0]))
 		{
 			bIsChanged = true;
 			pOutputData[3] = m_oNoDataColor.Alpha();
@@ -314,7 +334,7 @@ void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, void *pSrcVa
 	}
 	else
 	{
-		if(IsDoubleEquil(double(pOutputData[2]), m_staBandStats[0].dfNoData) || IsDoubleEquil(double(pOutputData[1]), m_staBandStats[1].dfNoData) || IsDoubleEquil(double(pOutputData[0]), m_staBandStats[2].dfNoData))
+        if(m_paStretch[0]->IsNoData(pOutputData[2]) || m_paStretch[1]->IsNoData(pOutputData[1]) || m_paStretch[2]->IsNoData(pOutputData[0]))
 		{
 			bIsChanged = true;
 			pOutputData[3] = m_oNoDataColor.Alpha();
