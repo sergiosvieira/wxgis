@@ -20,7 +20,6 @@
  ****************************************************************************/
 #include "wxgis/display/gisdisplay.h"
 #include "wxgis/display/displaytransformation.h"
-#include "wxgis/geometry/algorithm.h"
 
 wxGISDisplay::wxGISDisplay(void)
 {

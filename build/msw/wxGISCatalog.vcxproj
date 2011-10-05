@@ -159,10 +159,6 @@
       <Project>{0f6a3c59-9206-4987-9d82-b4725311fb57}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="wxGISGeometry.vcxproj">
-      <Project>{9fe95e21-0ca3-4f51-b8cc-31397652b12e}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

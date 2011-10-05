@@ -35,7 +35,9 @@
 #define ENVMIN_X -179
 #define ENVMIN_Y -85
 
-
+/** \enum wxGISEnumDrawPhase
+    \brief The draw phase
+*/
 enum wxGISEnumDrawPhase
 {
 	wxGISDPGeography = 0x0001,
@@ -43,6 +45,9 @@ enum wxGISEnumDrawPhase
 	wxGISDPSelection = 0x0004
 };
 
+/** \enum wxGISEnumDrawQuality
+    \brief The raster interpolation quality
+*/
 enum wxGISEnumDrawQuality
 {
 	enumGISQualityNearest,
@@ -52,6 +57,20 @@ enum wxGISEnumDrawQuality
     enumGISQualityHalfQuadBilinear,
     enumGISQualityFourQuadBilinear
 };
+
+/** \enum wxGISEnumPointPosition
+    \brief The point position enumerator
+
+	This enumerator used in Sutherland-Hodgman Polygon Clipping 
+*/
+enum wxGISEnumPointPosition
+{
+	enumGISPtPosLeft = 0, 
+	enumGISPtPosRight,
+	enumGISPtPosBottom,
+	enumGISPtPosTop
+};
+
 
 //class IDisplayTransformation
 //{

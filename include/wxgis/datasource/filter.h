@@ -20,7 +20,7 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/geometry/algorithm.h"
+#include "wxgis/datasource/datasource.h"
 
 /** \class wxGISQueryFilter filter.h
     \brief Attributes query filter.
@@ -51,6 +51,14 @@ public:
 	virtual void SetGeometry(OGRGeometrySPtr pGeom);
 	virtual OGREnvelopeSPtr GetEnvelope(void);
 	virtual OGRGeometrySPtr GetGeometry(void);
+protected:
+/** \fn OGRGeometrySPtr EnvelopeToGeometry(OGREnvelopeSPtr pEnv, OGSSpatialReferensSPtr pSpaRef)
+ *  \brief Create OGRGeometry from OGREnvelope.
+ *  \param pEnv Input envelope
+ *  \param pSpaRef Spatial Refernce of output geometry
+ *  \return Geometry
+ */	
+	OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSPtr pSpaRef = OGRSpatialReferenceSPtr());
 protected:
 	OGRGeometrySPtr m_pGeom;
 };

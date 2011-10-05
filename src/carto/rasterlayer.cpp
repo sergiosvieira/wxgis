@@ -33,6 +33,7 @@ wxGISRasterLayer::wxGISRasterLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer(
 		if(m_pwxGISRasterDataset->GetBandCount() >= 3)
 			m_pRasterRenderer = boost::static_pointer_cast<IRasterRenderer>(boost::make_shared<wxGISRasterRGBARenderer>());
 		//TODO: else RasterStretchColorRampRenderer
+		//TODO: RasterColormapRenderer
 
 		SetName(m_pwxGISRasterDataset->GetName());
 	}
