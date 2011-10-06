@@ -61,6 +61,7 @@ public:
 	virtual int *GetBandsCombination(int *pnBandCount) = 0;
 	virtual void Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
 	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA) = 0;
+    virtual wxColor GetColorByIndex(int nIndex){return wxColor();};
 protected:
 	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel ) = 0;
 protected:
@@ -83,6 +84,7 @@ public:
 	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster);
 	virtual int *GetBandsCombination(int *pnBandCount);
 	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA);
+    virtual wxGISEnumRendererType GetDataType(void){return enumGISRenderTypeRGBA;};
 protected:
 	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel );
 	virtual void OnFillStats(void);
@@ -102,12 +104,14 @@ class wxGISRasterRasterColormapRenderer :
 {
 public:
 	wxGISRasterRasterColormapRenderer(void);
-	~wxGISRasterRasterColormapRenderer(void);
+	virtual ~wxGISRasterRasterColormapRenderer(void);
 //IRasterRenderer
 	virtual bool CanRender(wxGISDatasetSPtr pDataset);
 	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster);
 	virtual int *GetBandsCombination(int *pnBandCount);
 	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA);
+    virtual wxGISEnumRendererType GetDataType(void){return enumGISRenderTypeIndexed;};
+    virtual wxColor GetColorByIndex(int nIndex){return m_mColorTable[nIndex];};
 protected:
 	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel );
 	virtual void OnFillColorTable(void);
@@ -116,4 +120,6 @@ protected:
 protected:
 	std::map<int, wxColor> m_mColorTable;
 	int m_nBandNumber;
+    bool m_bHasNoData;
+    short m_nNoDataIndex;
 };

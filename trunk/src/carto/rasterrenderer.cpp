@@ -451,12 +451,12 @@ bool wxGISRasterRasterColormapRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData
 	bool bScale = false;
 	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
 	{
-		bScale = true;
 		nOutXSize = stPixelData.nPixelDataWidth;
 		nOutYSize = stPixelData.nPixelDataHeight;
 	}
 	else
 	{
+		bScale = true;
 		nOutXSize = stPixelData.nOutputWidth;
 		nOutYSize = stPixelData.nOutputHeight;
 	}
@@ -512,6 +512,15 @@ void wxGISRasterRasterColormapRenderer::OnFillColorTable(void)
 	GDALColorInterp eColorInterpretation = pBand->GetColorInterpretation();
 	GDALPaletteInterp ePaletteInterpretation = pGDALColorTable->GetPaletteInterpretation();
 
+    int         bGotNodata;
+    double      dfNoData;
+	dfNoData = pBand->GetNoDataValue( &bGotNodata );
+    if(bGotNodata)
+    {
+        m_nNoDataIndex = dfNoData;
+        m_bHasNoData = true;
+    }
+
     const GDALColorEntry* pstColorEntry = 0;
 	for(size_t i = 0; i < pGDALColorTable->GetColorEntryCount(); ++i )
     {
@@ -544,48 +553,24 @@ void wxGISRasterRasterColormapRenderer::OnFillColorTable(void)
 
 void wxGISRasterRasterColormapRenderer::FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA)
 {
-	//if(pSrcValR == NULL || m_pGDALColorTable == NULL)
-	//	return;
-	////wxBYTE_ORDER          //      x
-	////pOutputData[0] = 0;	//	A	B
-	////pOutputData[1] = 0;	//	R	G
-	////pOutputData[2] = 255;	//	G	R
-	////pOutputData[3] = 255;	//	B	A
+	if(pSrcValA == NULL)
+		pOutputData[3] = 255;
+	else
+		pOutputData[3] = (unsigned char)SRCVAL(pSrcValA, GDT_Byte, 0);
+    
+	unsigned char RPixVal = (unsigned char)SRCVAL(pSrcValR, GDT_Byte, 0);
+	pOutputData[2] = RPixVal;
 
- //   GDALColorEntry	stEntry;
-
- //   if(m_pGDALColorTable->GetColorEntryAsRGB(i, &stEntry) == FALSE)
- //   {
-	//	pOutputData[3] = m_oNoDataColor.Alpha();
-	//	pOutputData[2] = m_oNoDataColor.Red();
-	//	pOutputData[1] = m_oNoDataColor.Green();
-	//	pOutputData[0] = m_oNoDataColor.Blue();
- //       return;
- //   }
-
-	//pOutputData[3] = stEntry.c4;
-	//pOutputData[2] = stEntry.c1;
-	//pOutputData[1] = stEntry.c2;
-	//pOutputData[0] = stEntry.c3;
-
-	//if(pSrcValA == NULL)
-	//	pOutputData[3] = 255;
-	//else
-	//	pOutputData[3] = m_paStretch[3]->GetValue((double)SRCVAL(pSrcValA, m_pwxGISRasterDataset->GetDataType(), 0));
- //   
-	//unsigned char RPixVal = m_paStretch[0]->GetValue((double)SRCVAL(pSrcValR, m_pwxGISRasterDataset->GetDataType(), 0));
-	//pOutputData[2] = RPixVal;
-
-	//if(pSrcValG == NULL || pSrcValB == NULL)
-	//{
-	//	pOutputData[1] = RPixVal;
-	//	pOutputData[0] = RPixVal;
-	//}
-	//else
-	//{
-	//	pOutputData[1] = m_paStretch[1]->GetValue((double)SRCVAL(pSrcValG, m_pwxGISRasterDataset->GetDataType(), 0));
-	//	pOutputData[0] = m_paStretch[2]->GetValue((double)SRCVAL(pSrcValB, m_pwxGISRasterDataset->GetDataType(), 0));
-	//}
+	if(pSrcValG == NULL || pSrcValB == NULL)
+	{
+		pOutputData[1] = RPixVal;
+		pOutputData[0] = RPixVal;
+	}
+	else
+	{
+		pOutputData[1] = (unsigned char)SRCVAL(pSrcValG, GDT_Byte, 0);
+		pOutputData[0] = (unsigned char)SRCVAL(pSrcValB, GDT_Byte, 0);
+	}
 
 	////check for nodata
 	//bool bIsChanged(false);
@@ -615,16 +600,7 @@ void wxGISRasterRasterColormapRenderer::FillPixel(unsigned char* pOutputData, vo
 	//if(bIsChanged)
 	//	return;
 
-	////check for background data
-
-	////if(RPixVal > 128)
-	////{
-	////	pOutputData[0] = 0;
-	////	pOutputData[1] = 0;
-	////	pOutputData[2] = 0;
-	////	pOutputData[3] = 0;
-	////	return;
-	////}
+	//check for background data
 }
 
 wxColor wxGISRasterRasterColormapRenderer::HSVtoRGB( const short &h, const short &s, const short &v, const short &alpha )
@@ -636,13 +612,13 @@ wxColor wxGISRasterRasterColormapRenderer::HSVtoRGB( const short &h, const short
 		return wxColor(v, v, v, alpha);
 
 	f = ( (h % 60) * 255) / 60;
-	h /= 60;
+	long hh = h / 60;
 
-	p = (v * (256 – s)) / 256;
-	q = (v * ( 256 – (s * f) / 256 )) / 256;
-	t = (v * ( 256 – (s * ( 256 – f )) / 256)) / 256;
+	p = (v * ( 256 - s )) / 256;
+	q = (v * ( 256 - (s * f) / 256 )) / 256;
+	t = (v * ( 256 - (s * ( 256 - f )) / 256)) / 256;
 
-	switch( h )
+	switch( hh )
 	{
 	case 0:
 		return wxColor(v, t, p, alpha);
@@ -661,21 +637,13 @@ wxColor wxGISRasterRasterColormapRenderer::HSVtoRGB( const short &h, const short
 
 wxColor wxGISRasterRasterColormapRenderer::CMYKtoRGB( const short &c, const short &m, const short &y, const short &k )
 {
-	 (1.0 - color[3]) + color[3])
-	short nR = 1.0 - (c * (1.0 - color[3]) + color[3]);
-	return wxColor();
-}
-/*
- 
-void CMYKtoRGB(float color[4])
-{
-	color[0] = 1.0 - (color[0] * (1.0 - color[3]) + color[3]);
-	color[1] = 1.0 - (color[1] * (1.0 - color[3]) + color[3]);
-	color[2] = 1.0 - (color[2] * (1.0 - color[3]) + color[3]);
-	color[3] = 1.0;
-}
+    short nK = 255 - k;
+    short nR = ( (255 - c) * nK ) / 255;
+    short nG = ( (255 - m) * nK ) / 255;
+    short nB = ( (255 - y) * nK ) / 255;
 
-*/
+	return wxColor(nR, nG, nB);
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*

@@ -39,34 +39,50 @@ void NearestNeighbourInterpolation(void *pInputData, int nInputXSize, double dIn
 
             src_pixel_index *= nBandCount;
 
-			switch(nBandCount)
-			{
-			case 1:
-				{
-					void* pPixColor = GetValuePointer(pInputData, src_pixel_index, eSrcType);
-					pRasterRenderer->FillPixel(pOutputData, pPixColor, NULL, NULL, NULL);
-				}
-				break;
-			case 3:			
-				{
-					void* pPixColorR = GetValuePointer(pInputData, src_pixel_index, eSrcType);
-					void* pPixColorG = GetValuePointer(pInputData, src_pixel_index + 1, eSrcType);
-					void* pPixColorB = GetValuePointer(pInputData, src_pixel_index + 2, eSrcType);
-					pRasterRenderer->FillPixel(pOutputData, pPixColorR, pPixColorG, pPixColorB, NULL);
-				}
-				break;
-			case 4:
-				{
-					void* pPixColorR = GetValuePointer(pInputData, src_pixel_index, eSrcType);
-					void* pPixColorG = GetValuePointer(pInputData, src_pixel_index + 1, eSrcType);
-					void* pPixColorB = GetValuePointer(pInputData, src_pixel_index + 2, eSrcType);
-					void* pPixColorA = GetValuePointer(pInputData, src_pixel_index + 3, eSrcType);
-					pRasterRenderer->FillPixel(pOutputData, pPixColorR, pPixColorG, pPixColorB, pPixColorA);
-				}
-				break;
-			default:
-				break;	
-			}
+            switch(pRasterRenderer->GetDataType())
+            {
+            case enumGISRenderTypeIndexed:
+                {
+                    unsigned char nIndex = (unsigned char)SRCVAL(pInputData, src_pixel_index, eSrcType);
+                    wxColor oColor = pRasterRenderer->GetColorByIndex(nIndex);
+                    unsigned char nR = oColor.Red();
+                    unsigned char nG = oColor.Green();
+                    unsigned char nB = oColor.Blue();
+                    unsigned char nA = oColor.Alpha();
+                    pRasterRenderer->FillPixel(pOutputData, (void*)&nR, (void*)&nG, (void*)&nB, (void*)&nA);
+                }
+                break;
+            case enumGISRenderTypeRGBA:
+			    switch(nBandCount)
+			    {
+			    case 1:
+				    {
+					    void* pPixColor = GetValuePointer(pInputData, src_pixel_index, eSrcType);
+					    pRasterRenderer->FillPixel(pOutputData, pPixColor, NULL, NULL, NULL);
+				    }
+				    break;
+			    case 3:			
+				    {
+					    void* pPixColorR = GetValuePointer(pInputData, src_pixel_index, eSrcType);
+					    void* pPixColorG = GetValuePointer(pInputData, src_pixel_index + 1, eSrcType);
+					    void* pPixColorB = GetValuePointer(pInputData, src_pixel_index + 2, eSrcType);
+					    pRasterRenderer->FillPixel(pOutputData, pPixColorR, pPixColorG, pPixColorB, NULL);
+				    }
+				    break;
+			    case 4:
+				    {
+					    void* pPixColorR = GetValuePointer(pInputData, src_pixel_index, eSrcType);
+					    void* pPixColorG = GetValuePointer(pInputData, src_pixel_index + 1, eSrcType);
+					    void* pPixColorB = GetValuePointer(pInputData, src_pixel_index + 2, eSrcType);
+					    void* pPixColorA = GetValuePointer(pInputData, src_pixel_index + 3, eSrcType);
+					    pRasterRenderer->FillPixel(pOutputData, pPixColorR, pPixColorG, pPixColorB, pPixColorA);
+				    }
+				    break;
+			    default:
+				    break;	
+			    }
+                break;
+            };
 
             pOutputData += 4;//ARGB32
 

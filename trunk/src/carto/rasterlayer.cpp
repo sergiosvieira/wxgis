@@ -50,7 +50,8 @@ wxGISRasterLayer::wxGISRasterLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer(
             }
             else if( eColorInterpretation == GCI_GrayIndex )
             {
-    		//TODO: else RasterStretchColorRampRenderer
+    		    //TODO: else RasterStretchColorRampRenderer
+ 			    m_pRasterRenderer = boost::static_pointer_cast<IRasterRenderer>(boost::make_shared<wxGISRasterRGBARenderer>());
             }
         }
 		SetName(m_pwxGISRasterDataset->GetName());
@@ -259,6 +260,12 @@ bool wxGISRasterLayer::GetPixelData(RAWPIXELDATA &stPixelData, wxGISDisplay *pDi
 	int nHeight = ceil(dHeight);
     int nMinX = floor(stPixelBounds.MinX);
     int nMinY = floor(stPixelBounds.MinY);
+
+    //correct data
+    if(nWidth > nXSize) nWidth = nXSize;
+    if(nHeight > nYSize) nHeight = nYSize;
+    if(nMinX < 0) nMinX = 0;
+    if(nMinY < 0) nMinY = 0;
 
 	GDALDataType eDT = m_pwxGISRasterDataset->GetDataType();
 	int nDataSize = GDALGetDataTypeSize(eDT) / 8;
