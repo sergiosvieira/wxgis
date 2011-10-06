@@ -62,7 +62,7 @@ public:
 	virtual void Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
 	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA) = 0;
 protected:
-	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel );
+	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel ) = 0;
 protected:
 	wxColour m_oNoDataColor;
 	//statistics - current display extent, each raster dataset, custom settings
@@ -107,10 +107,13 @@ public:
 	virtual bool CanRender(wxGISDatasetSPtr pDataset);
 	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster);
 	virtual int *GetBandsCombination(int *pnBandCount);
-	virtual void Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
 	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA);
 protected:
 	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel );
+	virtual void OnFillColorTable(void);
+	wxColor HSVtoRGB( const short &h, const short &s, const short &v, const short &alpha );
+	wxColor CMYKtoRGB( const short &c, const short &m, const short &y, const short &k );
 protected:
-    GDALColorTable* m_pGDALColorTable;
+	std::map<int, wxColor> m_mColorTable;
+	int m_nBandNumber;
 };
