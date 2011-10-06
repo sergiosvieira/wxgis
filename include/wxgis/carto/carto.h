@@ -25,6 +25,19 @@
 #include "wxgis/datasource/quadtree.h"
 #include "wxgis/datasource/rasterdataset.h"
 
+
+/** \enum wxGISEnumRendererType
+    \brief A renderer color interpretation type
+*/
+enum wxGISEnumRendererType
+{
+	enumGISRenderTypeNone = 0,
+	//enumGISRenderTypeGreyScale,
+	enumGISRenderTypeRGBA,
+	enumGISRenderTypeIndexed
+};
+ 
+
 /** \class wxGISLayer carto.h
     \brief The base class for map layers
 */
@@ -111,6 +124,8 @@ public:
 	virtual void Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL) = 0;
 	//transform pixel from raster value to display unsigned char and store it in pOutputData (ARGB32)
 	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA) = 0;
+    virtual wxGISEnumRendererType GetDataType(void) = 0;
+    virtual wxColor GetColorByIndex(int nIndex) = 0;
 };
 DEFINE_SHARED_PTR(IRasterRenderer);
 

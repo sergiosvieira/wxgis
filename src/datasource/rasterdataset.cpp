@@ -428,7 +428,10 @@ bool wxGISRasterDataset::GetPixelData(void *data, int nXOff, int nYOff, int nXSi
     }
 
 	int nDataSize = GDALGetDataTypeSize(eDT) / 8;
-    err = m_poDataset->RasterIO(GF_Read, nXOff, nYOff, nXSize, nYSize, data, nBufXSize, nBufYSize, eDT, nBandCount, panBandList, nDataSize * nBandCount, 0, nDataSize);
+    int nPixelSpace = nDataSize * nBandCount;
+    int nLineSpace = nBufXSize * nPixelSpace;
+    int nBandSpace = nDataSize;
+    err = m_poDataset->RasterIO(GF_Read, nXOff, nYOff, nXSize, nYSize, data, nBufXSize, nBufYSize, eDT, nBandCount, panBandList, nPixelSpace, nLineSpace, nBandSpace);
     if(err != CE_None)
     {
         const char* pszerr = CPLGetLastErrorMsg();
