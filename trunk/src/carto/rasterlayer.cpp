@@ -30,11 +30,29 @@ wxGISRasterLayer::wxGISRasterLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer(
 		m_pSpatialReference = m_pwxGISRasterDataset->GetSpatialReference();
 		m_FullEnvelope = m_pwxGISRasterDataset->GetEnvelope();
 
+        //TODO: load or get all renderers and check if i render can draw this dataset. If yes - set it as current
 		if(m_pwxGISRasterDataset->GetBandCount() >= 3)
 			m_pRasterRenderer = boost::static_pointer_cast<IRasterRenderer>(boost::make_shared<wxGISRasterRGBARenderer>());
-		//TODO: else RasterStretchColorRampRenderer
-		//TODO: RasterColormapRenderer
+        else if(m_pwxGISRasterDataset->GetBandCount() == 1)
+        {
+		    GDALDataset* poGDALDataset = m_pwxGISRasterDataset->GetMainRaster();
+		    if(!poGDALDataset)
+			    poGDALDataset = m_pwxGISRasterDataset->GetRaster();
+		    if(!poGDALDataset)
+			    return;
 
+		    GDALRasterBand* pBand = poGDALDataset->GetRasterBand(1);
+            GDALColorInterp eColorInterpretation = pBand->GetColorInterpretation();
+            if( eColorInterpretation == GCI_PaletteIndex )
+            {
+	    	    //RasterColormapRenderer
+                m_pRasterRenderer = boost::static_pointer_cast<IRasterRenderer>(boost::make_shared<wxGISRasterRasterColormapRenderer>());
+            }
+            else if( eColorInterpretation == GCI_GrayIndex )
+            {
+    		//TODO: else RasterStretchColorRampRenderer
+            }
+        }
 		SetName(m_pwxGISRasterDataset->GetName());
 	}
 

@@ -77,12 +77,116 @@ void wxRasterDrawThread::OnExit()
 {
 }
 
+//-----------------------------------
+// wxGISRasterRGBARenderer
+//-----------------------------------
+
+wxGISRasterRenderer::wxGISRasterRenderer(void)
+{
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	wxString sAppName = GetApplication()->GetAppName();
+
+	m_nQuality = (wxGISEnumDrawQuality)pConfig->ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/quality")), enumGISQualityNearest);	//wxString(wxT("wxGISCommon/coordinate_mask")));
+
+	m_oNoDataColor = wxColor(0,0,0,0);
+}
+
+wxGISRasterRenderer::~wxGISRasterRenderer(void)
+{
+}
+
+bool wxGISRasterRenderer::CanRender(wxGISDatasetSPtr pDataset)
+{
+	return pDataset->GetType() == enumGISRasterDataset ? true : false;
+}
+
+void wxGISRasterRenderer::PutRaster(wxGISRasterDatasetSPtr pRaster)
+{
+	m_pwxGISRasterDataset = pRaster;
+}	
+
+bool wxGISRasterRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel )
+{
+	int nOutXSize, nOutYSize;
+	bool bScale = false;
+	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
+	{
+		bScale = true;
+		nOutXSize = stPixelData.nPixelDataWidth;
+		nOutYSize = stPixelData.nPixelDataHeight;
+	}
+	else
+	{
+		nOutXSize = stPixelData.nOutputWidth;
+		nOutYSize = stPixelData.nOutputHeight;
+	}
+
+    //multithreaded
+    int CPUCount = wxThread::GetCPUCount();//1;//
+    std::vector<wxRasterDrawThread*> threadarray;
+    int nPartSize = nOutYSize / CPUCount;
+    int nBegY(0), nEndY;
+    for(int i = 0; i < CPUCount; ++i)
+    {        
+        if(i == CPUCount - 1)
+            nEndY = nOutYSize;
+        else
+            nEndY = nPartSize * (i + 1);
+
+		unsigned char* pDestInputData = pTransformData + (nBegY * 4 * nOutXSize);
+		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, m_nAlphaBand == -1 ? 3 : 4, pDestInputData, bScale == true ? m_nQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, static_cast<IRasterRenderer*>(this), pTrackCancel);
+		if(CreateAndRunThread(thread, wxT("wxRasterDrawThread"), wxT("RasterDrawThread")))
+	       threadarray.push_back(thread);
+
+        nBegY = nEndY;
+    }
+
+    for(size_t i = 0; i < threadarray.size(); ++i)
+    {
+        wgDELETE(threadarray[i], Wait());
+    }
+	return true;
+}
+
+void wxGISRasterRenderer::Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel)
+{
+	int nOutXSize, nOutYSize;
+	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
+	{
+		nOutXSize = stPixelData.nPixelDataWidth;
+		nOutYSize = stPixelData.nPixelDataHeight;
+	}
+	else
+	{
+		nOutXSize = stPixelData.nOutputWidth;
+		nOutYSize = stPixelData.nOutputHeight;
+	}
+
+	int stride = cairo_format_stride_for_width (CAIRO_FORMAT_ARGB32, nOutXSize);
+	if(stride == -1)
+		return;//TODO: ERROR
+	unsigned char *pTransformPixelData = (unsigned char *)CPLMalloc (stride * nOutYSize);
+
+	if(!OnPixelProceed(stPixelData, m_pwxGISRasterDataset->GetDataType(), pTransformPixelData, pTrackCancel))
+		return;//TODO: ERROR
+	
+	cairo_surface_t *surface;
+	surface = cairo_image_surface_create_for_data (pTransformPixelData, CAIRO_FORMAT_ARGB32, nOutXSize, nOutYSize, stride);
+	//TODO: Put UpperLeft coord to DrawRaster not bounds???
+	//double dX = DrawBounds.MinX + (DrawBounds.MaxX - DrawBounds.MinX) / 2;
+	//double dY = DrawBounds.MinY + (DrawBounds.MaxY - DrawBounds.MinY) / 2;
+	pDisplay->DrawRaster(surface, stPixelData.stWorldBounds);
+
+	cairo_surface_destroy(surface);
+
+	CPLFree((void*)pTransformPixelData);
+}
 
 //-----------------------------------
 // wxGISRasterRGBARenderer
 //-----------------------------------
 
-wxGISRasterRGBARenderer::wxGISRasterRGBARenderer(void)
+wxGISRasterRGBARenderer::wxGISRasterRGBARenderer(void) : wxGISRasterRenderer()
 {
 	wxGISAppConfigSPtr pConfig = GetConfig();
 	wxString sAppName = GetApplication()->GetAppName();
@@ -91,7 +195,6 @@ wxGISRasterRGBARenderer::wxGISRasterRGBARenderer(void)
 	m_nGreenBand = 2;
 	m_nBlueBand = 3;
 	m_nAlphaBand = -1;
-	m_nQuality = (wxGISEnumDrawQuality)pConfig->ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/quality")), enumGISQualityNearest);	//wxString(wxT("wxGISCommon/coordinate_mask")));
 
 	m_paStretch[0] = new wxGISStretch();
 	m_paStretch[1] = new wxGISStretch();
@@ -99,7 +202,6 @@ wxGISRasterRGBARenderer::wxGISRasterRGBARenderer(void)
 	m_paStretch[3] = new wxGISStretch();
 
 	m_bNodataNewBehaviour = pConfig->ReadBool(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/nodata_newbehaviour")), true);
-	m_oNoDataColor = wxColor(0,0,0,0);
 	//m_oBkColorSet = 
 	//m_oBkColorGet = wxNullColour;//TODO: May be array of  ColorGet/ColorSet
 }
@@ -112,6 +214,7 @@ wxGISRasterRGBARenderer::~wxGISRasterRGBARenderer(void)
 
 bool wxGISRasterRGBARenderer::CanRender(wxGISDatasetSPtr pDataset)
 {
+    //TODO: check for more than 3 bands
 	return pDataset->GetType() == enumGISRasterDataset ? true : false;
 }
 
@@ -123,15 +226,39 @@ void wxGISRasterRGBARenderer::PutRaster(wxGISRasterDatasetSPtr pRaster)
 
 void wxGISRasterRGBARenderer::OnFillStats(void)
 {
+	GDALDataset* poGDALDataset = m_pwxGISRasterDataset->GetMainRaster();
+	if(!poGDALDataset)
+		poGDALDataset = m_pwxGISRasterDataset->GetRaster();
+	if(!poGDALDataset)
+		return;
+
+    for(size_t i = 1; i <= poGDALDataset->GetRasterCount(); ++i)
+    {
+        GDALRasterBand* pBand = poGDALDataset->GetRasterBand(i);
+        GDALColorInterp eColorInterpretation = pBand->GetColorInterpretation();
+        switch(eColorInterpretation)
+        {
+        case GCI_RedBand:
+            m_nRedBand = i;
+            break;
+        case GCI_GreenBand:
+            m_nGreenBand = i;
+            break;
+        case GCI_BlueBand:
+            m_nBlueBand = i;
+            break;
+        case GCI_AlphaBand:
+            m_nAlphaBand = i;
+            break;
+        default:
+            break;
+        };
+    }
+
 	//set min/max values
 	//set nodata color for each band
 	if(m_pwxGISRasterDataset->HasStatistics())
 	{
-		GDALDataset* poGDALDataset = m_pwxGISRasterDataset->GetMainRaster();
-		if(!poGDALDataset)
-			poGDALDataset = m_pwxGISRasterDataset->GetRaster();
-		if(!poGDALDataset)
-			return;
 
         int         bGotNodata;
         double      dfMin, dfMax, dfMean, dfStdDev, dfNoData;
@@ -213,83 +340,6 @@ int *wxGISRasterRGBARenderer::GetBandsCombination(int *pnBandCount)
 	return pBands;
 }
 
-bool wxGISRasterRGBARenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel )
-{
-	int nOutXSize, nOutYSize;
-	bool bScale = false;
-	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
-	{
-		bScale = true;
-		nOutXSize = stPixelData.nPixelDataWidth;
-		nOutYSize = stPixelData.nPixelDataHeight;
-	}
-	else
-	{
-		nOutXSize = stPixelData.nOutputWidth;
-		nOutYSize = stPixelData.nOutputHeight;
-	}
-
-    //multithreaded
-    int CPUCount = wxThread::GetCPUCount();//1;//
-    std::vector<wxRasterDrawThread*> threadarray;
-    int nPartSize = nOutYSize / CPUCount;
-    int nBegY(0), nEndY;
-    for(int i = 0; i < CPUCount; ++i)
-    {        
-        if(i == CPUCount - 1)
-            nEndY = nOutYSize;
-        else
-            nEndY = nPartSize * (i + 1);
-
-		unsigned char* pDestInputData = pTransformData + (nBegY * 4 * nOutXSize);
-		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, m_nAlphaBand == -1 ? 3 : 4, pDestInputData, bScale == true ? m_nQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, static_cast<IRasterRenderer*>(this), pTrackCancel);
-		if(CreateAndRunThread(thread, wxT("wxRasterDrawThread"), wxT("RasterDrawThread")))
-	       threadarray.push_back(thread);
-
-        nBegY = nEndY;
-    }
-
-    for(size_t i = 0; i < threadarray.size(); ++i)
-    {
-        wgDELETE(threadarray[i], Wait());
-    }
-	return true;
-}
-
-void wxGISRasterRGBARenderer::Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel)
-{
-	int nOutXSize, nOutYSize;
-	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
-	{
-		nOutXSize = stPixelData.nPixelDataWidth;
-		nOutYSize = stPixelData.nPixelDataHeight;
-	}
-	else
-	{
-		nOutXSize = stPixelData.nOutputWidth;
-		nOutYSize = stPixelData.nOutputHeight;
-	}
-
-	int stride = cairo_format_stride_for_width (CAIRO_FORMAT_ARGB32, nOutXSize);
-	if(stride == -1)
-		return;//TODO: ERROR
-	unsigned char *pTransformPixelData = (unsigned char *)CPLMalloc (stride * nOutYSize);
-
-	if(!OnPixelProceed(stPixelData, m_pwxGISRasterDataset->GetDataType(), pTransformPixelData, pTrackCancel))
-		return;//TODO: ERROR
-	
-	cairo_surface_t *surface;
-	surface = cairo_image_surface_create_for_data (pTransformPixelData, CAIRO_FORMAT_ARGB32, nOutXSize, nOutYSize, stride);
-	//TODO: Put UpperLeft coord to DrawRaster not bounds???
-	//double dX = DrawBounds.MinX + (DrawBounds.MaxX - DrawBounds.MinX) / 2;
-	//double dY = DrawBounds.MinY + (DrawBounds.MaxY - DrawBounds.MinY) / 2;
-	pDisplay->DrawRaster(surface, stPixelData.stWorldBounds);
-
-	cairo_surface_destroy(surface);
-
-	CPLFree((void*)pTransformPixelData);
-}
-
 void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA)
 {
 	if(pSrcValR == NULL)
@@ -358,6 +408,433 @@ void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, void *pSrcVa
 	//	return;
 	//}
 }
+
+//-----------------------------------
+// wxGISRasterRasterColormapRenderer
+//-----------------------------------
+
+wxGISRasterRasterColormapRenderer::wxGISRasterRasterColormapRenderer(void) : wxGISRasterRenderer()
+{
+}
+
+wxGISRasterRasterColormapRenderer::~wxGISRasterRasterColormapRenderer(void)
+{
+}
+
+bool wxGISRasterRasterColormapRenderer::CanRender(wxGISDatasetSPtr pDataset)
+{
+    //TODO: check for Palette & GDALPaletteInterp == GPI_RGB or 
+    //GPI_Gray 	 Grayscale (in GDALColorEntry.c1)
+    //GPI_RGB 	 Red, Green, Blue and Alpha in (in c1, c2, c3 and c4)
+    //GPI_CMYK 	 Cyan, Magenta, Yellow and Black (in c1, c2, c3 and c4)
+    //GPI_HLS 	 Hue, Lightness and Saturation (in c1, c2, and c3)
+    //static wxImage::RGBValue wxImage::HSVtoRGB  ( const wxImage::HSVValue &  hsv   )  [static] 
+
+	return pDataset->GetType() == enumGISRasterDataset ? true : false;
+}
+
+int *wxGISRasterRasterColormapRenderer::GetBandsCombination(int *pnBandCount)
+{
+	int *pBands = NULL;
+	*pnBandCount = 1;
+	pBands = new int[1];
+	pBands[0] = 1;
+	return pBands;
+}
+
+void wxGISRasterRasterColormapRenderer::PutRaster(wxGISRasterDatasetSPtr pRaster)
+{
+	m_pwxGISRasterDataset = pRaster;
+
+	GDALDataset* poGDALDataset = m_pwxGISRasterDataset->GetMainRaster();
+	if(!poGDALDataset)
+		poGDALDataset = m_pwxGISRasterDataset->GetRaster();
+	if(!poGDALDataset)
+		return;
+
+    GDALRasterBand* pBand = poGDALDataset->GetRasterBand(1);
+    m_pGDALColorTable = pBand->GetColorTable();
+}	
+
+void wxGISRasterRasterColormapRenderer::FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA)
+{
+	//if(pSrcValR == NULL || m_pGDALColorTable == NULL)
+	//	return;
+	////wxBYTE_ORDER          //      x
+	////pOutputData[0] = 0;	//	A	B
+	////pOutputData[1] = 0;	//	R	G
+	////pOutputData[2] = 255;	//	G	R
+	////pOutputData[3] = 255;	//	B	A
+
+ //   GDALColorEntry	stEntry;
+
+ //   if(m_pGDALColorTable->GetColorEntryAsRGB(i, &stEntry) == FALSE)
+ //   {
+	//	pOutputData[3] = m_oNoDataColor.Alpha();
+	//	pOutputData[2] = m_oNoDataColor.Red();
+	//	pOutputData[1] = m_oNoDataColor.Green();
+	//	pOutputData[0] = m_oNoDataColor.Blue();
+ //       return;
+ //   }
+
+	//pOutputData[3] = stEntry.c4;
+	//pOutputData[2] = stEntry.c1;
+	//pOutputData[1] = stEntry.c2;
+	//pOutputData[0] = stEntry.c3;
+
+	//if(pSrcValA == NULL)
+	//	pOutputData[3] = 255;
+	//else
+	//	pOutputData[3] = m_paStretch[3]->GetValue((double)SRCVAL(pSrcValA, m_pwxGISRasterDataset->GetDataType(), 0));
+ //   
+	//unsigned char RPixVal = m_paStretch[0]->GetValue((double)SRCVAL(pSrcValR, m_pwxGISRasterDataset->GetDataType(), 0));
+	//pOutputData[2] = RPixVal;
+
+	//if(pSrcValG == NULL || pSrcValB == NULL)
+	//{
+	//	pOutputData[1] = RPixVal;
+	//	pOutputData[0] = RPixVal;
+	//}
+	//else
+	//{
+	//	pOutputData[1] = m_paStretch[1]->GetValue((double)SRCVAL(pSrcValG, m_pwxGISRasterDataset->GetDataType(), 0));
+	//	pOutputData[0] = m_paStretch[2]->GetValue((double)SRCVAL(pSrcValB, m_pwxGISRasterDataset->GetDataType(), 0));
+	//}
+
+	////check for nodata
+	//bool bIsChanged(false);
+	//if(m_bNodataNewBehaviour)
+	//{
+ //       if(m_paStretch[0]->IsNoData(pOutputData[2]) && m_paStretch[1]->IsNoData(pOutputData[1]) && m_paStretch[2]->IsNoData(pOutputData[0]))
+	//	{
+	//		bIsChanged = true;
+	//		pOutputData[3] = m_oNoDataColor.Alpha();
+	//		pOutputData[2] = m_oNoDataColor.Red();
+	//		pOutputData[1] = m_oNoDataColor.Green();
+	//		pOutputData[0] = m_oNoDataColor.Blue();
+	//	}
+	//}
+	//else
+	//{
+ //       if(m_paStretch[0]->IsNoData(pOutputData[2]) || m_paStretch[1]->IsNoData(pOutputData[1]) || m_paStretch[2]->IsNoData(pOutputData[0]))
+	//	{
+	//		bIsChanged = true;
+	//		pOutputData[3] = m_oNoDataColor.Alpha();
+	//		pOutputData[2] = m_oNoDataColor.Red();
+	//		pOutputData[1] = m_oNoDataColor.Green();
+	//		pOutputData[0] = m_oNoDataColor.Blue();
+	//	}
+	//}
+
+	//if(bIsChanged)
+	//	return;
+
+	////check for background data
+
+	////if(RPixVal > 128)
+	////{
+	////	pOutputData[0] = 0;
+	////	pOutputData[1] = 0;
+	////	pOutputData[2] = 0;
+	////	pOutputData[3] = 0;
+	////	return;
+	////}
+}
+
+void RGBtoCMYK(float color[4])
+{
+	if (color[0]==0 && color[1]==0 && color[2]==0)
+	{
+		color[0] = 0;
+		color[1] = 0;
+		color[2] = 0;
+		color[3] = 1.0;
+	}
+	else if (color[0]==1.0 && color[1]==1.0 && color[2]==1.0)
+	{
+		color[0] = 0;
+		color[1] = 0;
+		color[2] = 0;
+		color[3] = 0;
+	}
+	else
+	{
+		color[0] = 1.0 - color[0];
+		color[1] = 1.0 - color[1];
+		color[2] = 1.0 - color[2];
+ 
+		float minK = MIN(color[0], MIN(color[1], color[2]));
+		color[0] = (color[0] - minK) / (1.0 - minK);
+		color[1] = (color[1] - minK) / (1.0 - minK);
+		color[2] = (color[2] - minK) / (1.0 - minK);
+		color[3] = minK;
+	}
+}
+ 
+void CMYKtoRGB(float color[4])
+{
+	color[0] = 1.0 - (color[0] * (1.0 - color[3]) + color[3]);
+	color[1] = 1.0 - (color[1] * (1.0 - color[3]) + color[3]);
+	color[2] = 1.0 - (color[2] * (1.0 - color[3]) + color[3]);
+	color[3] = 1.0;
+}
+
+void HSVtoRGB( int  *r, int *g,int *b, int h, int s, int v )
+{
+        int f;
+        long p, q, t;
+ 
+        if( s == 0 )
+        {
+                *r = *g = *b = v;
+                return;
+        }
+ 
+        f = ((h%60)*255)/60;
+        h /= 60;
+ 
+        p = (v * (256 – s))/256;
+        q = (v * ( 256 – (s * f)/256 ))/256;
+        t = (v * ( 256 – (s * ( 256 – f ))/256))/256;
+ 
+        switch( h ) {
+                case 0:
+                        *r = v;
+                        *g = t;
+                        *b = p;
+                        break;
+                case 1:
+                        *r = q;
+                        *g = v;
+                        *b = p;
+                        break;
+                case 2:
+                        *r = p;
+                        *g = v;
+                        *b = t;
+                        break;
+                case 3:
+                        *r = p;
+                        *g = q;
+                        *b = v;
+                        break;
+                case 4:
+                        *r = t;
+                        *g = p;
+                        *b = v;
+                        break;
+                default:
+                        *r = v;
+                        *g = p;
+                        *b = q;
+                        break;
+        }
+}
+
+'ve used these for a long time - no idea where they came from at this point... I have tried multiple times to get this formatted properly but cannot seem to accomplish it.
+
+typedef struct {
+double r;       // percent
+double g;       // percent
+double b;       // percent
+} rgb;
+
+typedef struct {
+double h;       // angle in degrees
+double s;       // percent
+double v;       // percent
+} hsv;
+
+static hsv      rgb2hsv(rgb in);
+static rgb      hsv2rgb(hsv in);
+
+    hsv
+rgb2hsv(rgb in) { hsv out; double min, max, delta;
+
+min = in.r < in.g ? in.r : in.g;
+min = min  < in.b ? min  : in.b;
+
+max = in.r > in.g ? in.r : in.g;
+max = max  > in.b ? max  : in.b;
+
+out.v = max;                                // v
+delta = max - min;
+if( max > 0.0 ) {
+    out.s = (delta / max);                  // s
+} else {
+    // r = g = b = 0                        // s = 0, v is undefined
+    out.s = 0.0;
+    out.h = NAN;                            // its now undefined
+    return out;
+}
+if( in.r >= max )                           // > is bogus, just keeps compilor happy
+    out.h = ( in.g - in.b ) / delta;        // between yellow & magenta
+else
+if( in.g >= max )
+    out.h = 2.0 + ( in.b - in.r ) / delta;  // between cyan & yellow
+else
+    out.h = 4.0 + ( in.r - in.g ) / delta;  // between magenta & cyan
+
+out.h *= 60.0;                              // degrees
+
+if( out.h < 0.0 )
+    out.h += 360.0;
+
+return out;
+}
+
+rgb
+hsv2rgb(hsv in) { double hh, p, q, t, ff; long i; rgb out;
+
+if(in.s <= 0.0) {       // < is bogus, just shuts up warnings
+    if(isnan(in.h)) {   // in.h == NAN
+        out.r = in.v;
+        out.g = in.v;
+        out.b = in.v;
+        return out;
+    }
+    // error - should never happen
+    out.r = 0.0;
+    out.g = 0.0;
+    out.b = 0.0;
+    return out;
+}
+hh = in.h;
+if(hh >= 360.0) hh = 0.0;
+hh /= 60.0;
+i = (long)hh;
+ff = hh - i;
+p = in.v * (1.0 - in.s);
+q = in.v * (1.0 - (in.s * ff));
+t = in.v * (1.0 - (in.s * (1.0 - ff)));
+
+switch(i) {
+case 0:
+    out.r = in.v;
+    out.g = t;
+    out.b = p;
+    break;
+case 1:
+    out.r = q;
+    out.g = in.v;
+    out.b = p;
+    break;
+case 2:
+    out.r = p;
+    out.g = in.v;
+    out.b = t;
+    break;
+
+case 3:
+    out.r = p;
+    out.g = q;
+    out.b = in.v;
+    break;
+case 4:
+    out.r = t;
+    out.g = p;
+    out.b = in.v;
+    break;
+case 5:
+default:
+    out.r = in.v;
+    out.g = p;
+    out.b = q;
+    break;
+}
+return out;     
+}
+
+/**
+ * @param theBandNumber the number of the band for which you want a color table
+ * @param theList a pointer the object that will hold the color table
+ * @return true of a color table was able to be read, false otherwise
+ */
+bool QgsRasterLayer::readColorTable( int theBandNumber, QList<QgsColorRampShader::ColorRampItem>* theList )
+{
+  QgsDebugMsg( "entered." );
+  //Invalid band number, segfault prevention
+  if ( 0 >= theBandNumber || 0 == theList )
+  {
+    QgsDebugMsg( "Invalid parameter" );
+    return false;
+  }
+
+  GDALRasterBandH myGdalBand = GDALGetRasterBand( mGdalDataset, theBandNumber );
+  GDALColorTableH myGdalColorTable = GDALGetRasterColorTable( myGdalBand );
+
+  if ( myGdalColorTable )
+  {
+    QgsDebugMsg( "Color table found" );
+    int myEntryCount = GDALGetColorEntryCount( myGdalColorTable );
+    GDALColorInterp myColorInterpretation =  GDALGetRasterColorInterpretation( myGdalBand );
+    QgsDebugMsg( "Color Interpretation: " + QString::number(( int )myColorInterpretation ) );
+    GDALPaletteInterp myPaletteInterpretation  = GDALGetPaletteInterpretation( myGdalColorTable );
+    QgsDebugMsg( "Palette Interpretation: " + QString::number(( int )myPaletteInterpretation ) );
+
+    const GDALColorEntry* myColorEntry = 0;
+    for ( int myIterator = 0; myIterator < myEntryCount; myIterator++ )
+    {
+      myColorEntry = GDALGetColorEntry( myGdalColorTable, myIterator );
+
+      if ( !myColorEntry )
+      {
+        continue;
+      }
+      else
+      {
+        //Branch on the color interpretation type
+        if ( myColorInterpretation == GCI_GrayIndex )
+        {
+          QgsColorRampShader::ColorRampItem myColorRampItem;
+          myColorRampItem.label = "";
+          myColorRampItem.value = ( double )myIterator;
+          myColorRampItem.color = QColor::fromRgb( myColorEntry->c1, myColorEntry->c1, myColorEntry->c1, myColorEntry->c4 );
+          theList->append( myColorRampItem );
+        }
+        else if ( myColorInterpretation == GCI_PaletteIndex )
+        {
+          QgsColorRampShader::ColorRampItem myColorRampItem;
+          myColorRampItem.label = "";
+          myColorRampItem.value = ( double )myIterator;
+          //Branch on palette interpretation
+          if ( myPaletteInterpretation  == GPI_RGB )
+          {
+            myColorRampItem.color = QColor::fromRgb( myColorEntry->c1, myColorEntry->c2, myColorEntry->c3, myColorEntry->c4 );
+          }
+          else if ( myPaletteInterpretation  == GPI_CMYK )
+          {
+            myColorRampItem.color = QColor::fromCmyk( myColorEntry->c1, myColorEntry->c2, myColorEntry->c3, myColorEntry->c4 );
+          }
+          else if ( myPaletteInterpretation  == GPI_HLS )
+          {
+            myColorRampItem.color = QColor::fromHsv( myColorEntry->c1, myColorEntry->c3, myColorEntry->c2, myColorEntry->c4 );
+          }
+          else
+          {
+            myColorRampItem.color = QColor::fromRgb( myColorEntry->c1, myColorEntry->c1, myColorEntry->c1, myColorEntry->c4 );
+          }
+          theList->append( myColorRampItem );
+        }
+        else
+        {
+          QgsDebugMsg( "Color interpretation type not supported yet" );
+          return false;
+        }
+      }
+    }
+  }
+  else
+  {
+    QgsDebugMsg( "No color table found for band " + QString::number( theBandNumber ) );
+    return false;
+  }
+
+  QgsDebugMsg( "Color table loaded sucessfully" );
+  return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
 void wxGISRasterRGBRenderer::Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel)
 {

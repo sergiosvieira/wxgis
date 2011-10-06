@@ -46,33 +46,71 @@ private:
 	int m_nBandCount;
 };
 
+/** \class wxGISRasterRenderer rasterrenderer.h
+    \brief The base class for renderers
+*/
+class wxGISRasterRenderer :
+	public IRasterRenderer
+{
+public:
+	wxGISRasterRenderer(void);
+	virtual ~wxGISRasterRenderer(void);
+//IRasterRenderer
+	virtual bool CanRender(wxGISDatasetSPtr pDataset);
+	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster);
+	virtual int *GetBandsCombination(int *pnBandCount) = 0;
+	virtual void Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
+	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA) = 0;
+protected:
+	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel );
+protected:
+	wxColour m_oNoDataColor;
+	//statistics - current display extent, each raster dataset, custom settings
+	wxGISRasterDatasetSPtr m_pwxGISRasterDataset;
+	wxGISEnumDrawQuality m_nQuality;
+};
 /** \class wxGISRasterRGBARenderer rasterrenderer.h
     \brief The raster layer renderer for RGB data and Alpha channel
 */
 class wxGISRasterRGBARenderer :
-	public IRasterRenderer
+	public wxGISRasterRenderer
 {
 public:
 	wxGISRasterRGBARenderer(void);
-	~wxGISRasterRGBARenderer(void);
+	virtual ~wxGISRasterRGBARenderer(void);
+//IRasterRenderer
+	virtual bool CanRender(wxGISDatasetSPtr pDataset);
+	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster);
+	virtual int *GetBandsCombination(int *pnBandCount);
+	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA);
+protected:
+	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel );
+	virtual void OnFillStats(void);
+protected:
+	int m_nRedBand, m_nGreenBand, m_nBlueBand, m_nAlphaBand;
+	//wxColour m_oBkColorGet, m_oBkColorSet, 
+	//statistics - current display extent, each raster dataset, custom settings
+    wxGISStretch *m_paStretch[4];
+	bool m_bNodataNewBehaviour;
+};
+
+/** \class wxGISRasterRasterColormapRenderer rasterrenderer.h
+    \brief The raster layer renderer for Palette Index data
+*/
+class wxGISRasterRasterColormapRenderer :
+	public wxGISRasterRenderer
+{
+public:
+	wxGISRasterRasterColormapRenderer(void);
+	~wxGISRasterRasterColormapRenderer(void);
 //IRasterRenderer
 	virtual bool CanRender(wxGISDatasetSPtr pDataset);
 	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster);
 	virtual int *GetBandsCombination(int *pnBandCount);
 	virtual void Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
 	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA);
-/**
-    \brief Proceed two dim array multithreaded.
-*/
 protected:
 	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel );
-	virtual void OnFillStats(void);
 protected:
-	int m_nRedBand, m_nGreenBand, m_nBlueBand, m_nAlphaBand;
-	wxColour m_oNoDataColor; //m_oBkColorGet, m_oBkColorSet, 
-	//statistics - current display extent, each raster dataset, custom settings
-	wxGISRasterDatasetSPtr m_pwxGISRasterDataset;
-	wxGISEnumDrawQuality m_nQuality;
-    wxGISStretch *m_paStretch[4];
-	bool m_bNodataNewBehaviour;
+    GDALColorTable* m_pGDALColorTable;
 };

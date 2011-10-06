@@ -27,6 +27,7 @@
 
 #include "ogrsf_frmts/ogrsf_frmts.h"
 #include "gdal_priv.h"
+#include "gdal.h"
 #include "gdalwarper.h"
 #include "gdal_alg_priv.h"
 #include "cpl_quad_tree.h"
