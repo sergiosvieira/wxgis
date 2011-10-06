@@ -105,49 +105,6 @@ void wxGISRasterRenderer::PutRaster(wxGISRasterDatasetSPtr pRaster)
 	m_pwxGISRasterDataset = pRaster;
 }	
 
-bool wxGISRasterRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel )
-{
-	int nOutXSize, nOutYSize;
-	bool bScale = false;
-	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
-	{
-		bScale = true;
-		nOutXSize = stPixelData.nPixelDataWidth;
-		nOutYSize = stPixelData.nPixelDataHeight;
-	}
-	else
-	{
-		nOutXSize = stPixelData.nOutputWidth;
-		nOutYSize = stPixelData.nOutputHeight;
-	}
-
-    //multithreaded
-    int CPUCount = wxThread::GetCPUCount();//1;//
-    std::vector<wxRasterDrawThread*> threadarray;
-    int nPartSize = nOutYSize / CPUCount;
-    int nBegY(0), nEndY;
-    for(int i = 0; i < CPUCount; ++i)
-    {        
-        if(i == CPUCount - 1)
-            nEndY = nOutYSize;
-        else
-            nEndY = nPartSize * (i + 1);
-
-		unsigned char* pDestInputData = pTransformData + (nBegY * 4 * nOutXSize);
-		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, m_nAlphaBand == -1 ? 3 : 4, pDestInputData, bScale == true ? m_nQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, static_cast<IRasterRenderer*>(this), pTrackCancel);
-		if(CreateAndRunThread(thread, wxT("wxRasterDrawThread"), wxT("RasterDrawThread")))
-	       threadarray.push_back(thread);
-
-        nBegY = nEndY;
-    }
-
-    for(size_t i = 0; i < threadarray.size(); ++i)
-    {
-        wgDELETE(threadarray[i], Wait());
-    }
-	return true;
-}
-
 void wxGISRasterRenderer::Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel)
 {
 	int nOutXSize, nOutYSize;
@@ -340,6 +297,50 @@ int *wxGISRasterRGBARenderer::GetBandsCombination(int *pnBandCount)
 	return pBands;
 }
 
+
+bool wxGISRasterRGBARenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel )
+{
+	int nOutXSize, nOutYSize;
+	bool bScale = false;
+	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
+	{
+		bScale = true;
+		nOutXSize = stPixelData.nPixelDataWidth;
+		nOutYSize = stPixelData.nPixelDataHeight;
+	}
+	else
+	{
+		nOutXSize = stPixelData.nOutputWidth;
+		nOutYSize = stPixelData.nOutputHeight;
+	}
+
+    //multithreaded
+    int CPUCount = wxThread::GetCPUCount();//1;//
+    std::vector<wxRasterDrawThread*> threadarray;
+    int nPartSize = nOutYSize / CPUCount;
+    int nBegY(0), nEndY;
+    for(int i = 0; i < CPUCount; ++i)
+    {        
+        if(i == CPUCount - 1)
+            nEndY = nOutYSize;
+        else
+            nEndY = nPartSize * (i + 1);
+
+		unsigned char* pDestInputData = pTransformData + (nBegY * 4 * nOutXSize);
+		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, m_nAlphaBand == -1 ? 3 : 4, pDestInputData, bScale == true ? m_nQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, static_cast<IRasterRenderer*>(this), pTrackCancel);
+		if(CreateAndRunThread(thread, wxT("wxRasterDrawThread"), wxT("RasterDrawThread")))
+	       threadarray.push_back(thread);
+
+        nBegY = nEndY;
+    }
+
+    for(size_t i = 0; i < threadarray.size(); ++i)
+    {
+        wgDELETE(threadarray[i], Wait());
+    }
+	return true;
+}
+
 void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA)
 {
 	if(pSrcValR == NULL)
@@ -415,6 +416,7 @@ void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, void *pSrcVa
 
 wxGISRasterRasterColormapRenderer::wxGISRasterRasterColormapRenderer(void) : wxGISRasterRenderer()
 {
+	m_nBandNumber = 1;
 }
 
 wxGISRasterRasterColormapRenderer::~wxGISRasterRasterColormapRenderer(void)
@@ -438,23 +440,107 @@ int *wxGISRasterRasterColormapRenderer::GetBandsCombination(int *pnBandCount)
 	int *pBands = NULL;
 	*pnBandCount = 1;
 	pBands = new int[1];
-	pBands[0] = 1;
+	pBands[0] = m_nBandNumber;
 	return pBands;
+}
+
+
+bool wxGISRasterRasterColormapRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel )
+{
+	int nOutXSize, nOutYSize;
+	bool bScale = false;
+	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
+	{
+		bScale = true;
+		nOutXSize = stPixelData.nPixelDataWidth;
+		nOutYSize = stPixelData.nPixelDataHeight;
+	}
+	else
+	{
+		nOutXSize = stPixelData.nOutputWidth;
+		nOutYSize = stPixelData.nOutputHeight;
+	}
+
+    //multithreaded
+    int CPUCount = wxThread::GetCPUCount();//1;//
+    std::vector<wxRasterDrawThread*> threadarray;
+    int nPartSize = nOutYSize / CPUCount;
+    int nBegY(0), nEndY;
+    for(int i = 0; i < CPUCount; ++i)
+    {        
+        if(i == CPUCount - 1)
+            nEndY = nOutYSize;
+        else
+            nEndY = nPartSize * (i + 1);
+
+		unsigned char* pDestInputData = pTransformData + (nBegY * 4 * nOutXSize);
+		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, 1, pDestInputData, bScale == true ? m_nQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, static_cast<IRasterRenderer*>(this), pTrackCancel);
+		if(CreateAndRunThread(thread, wxT("wxRasterDrawThread"), wxT("RasterDrawThread")))
+	       threadarray.push_back(thread);
+
+        nBegY = nEndY;
+    }
+
+    for(size_t i = 0; i < threadarray.size(); ++i)
+    {
+        wgDELETE(threadarray[i], Wait());
+    }
+	return true;
 }
 
 void wxGISRasterRasterColormapRenderer::PutRaster(wxGISRasterDatasetSPtr pRaster)
 {
 	m_pwxGISRasterDataset = pRaster;
+	OnFillColorTable();
+}	
 
+void wxGISRasterRasterColormapRenderer::OnFillColorTable(void)
+{
 	GDALDataset* poGDALDataset = m_pwxGISRasterDataset->GetMainRaster();
 	if(!poGDALDataset)
 		poGDALDataset = m_pwxGISRasterDataset->GetRaster();
 	if(!poGDALDataset)
 		return;
+    GDALRasterBand* pBand = poGDALDataset->GetRasterBand(m_nBandNumber);
+	if(!pBand)
+		return;
+    GDALColorTable* pGDALColorTable = pBand->GetColorTable();
+	if(!pGDALColorTable)
+		return;
+	m_mColorTable.clear();
 
-    GDALRasterBand* pBand = poGDALDataset->GetRasterBand(1);
-    m_pGDALColorTable = pBand->GetColorTable();
-}	
+	GDALColorInterp eColorInterpretation = pBand->GetColorInterpretation();
+	GDALPaletteInterp ePaletteInterpretation = pGDALColorTable->GetPaletteInterpretation();
+
+    const GDALColorEntry* pstColorEntry = 0;
+	for(size_t i = 0; i < pGDALColorTable->GetColorEntryCount(); ++i )
+    {
+		pstColorEntry = pGDALColorTable->GetColorEntry(i);
+		if( !pstColorEntry )
+			continue;
+
+        if( eColorInterpretation == GCI_GrayIndex )//TODO: think if needed
+        {
+			m_mColorTable[i] = wxColor( pstColorEntry->c1, pstColorEntry->c1, pstColorEntry->c1, pstColorEntry->c4 );
+        }
+        else if( eColorInterpretation == GCI_PaletteIndex )
+        {
+			switch(ePaletteInterpretation)
+			{
+			default:
+			case GPI_RGB:
+				m_mColorTable[i] = wxColor( pstColorEntry->c1, pstColorEntry->c2, pstColorEntry->c3, pstColorEntry->c4 );
+				break;
+			case GPI_CMYK:
+				m_mColorTable[i] = CMYKtoRGB( pstColorEntry->c1, pstColorEntry->c2, pstColorEntry->c3, pstColorEntry->c4 );
+				break;
+			case GPI_HLS:
+				m_mColorTable[i] = HSVtoRGB( pstColorEntry->c1, pstColorEntry->c3, pstColorEntry->c2, pstColorEntry->c4 );
+				break;
+			};
+		}
+	}
+}
 
 void wxGISRasterRasterColormapRenderer::FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA)
 {
@@ -541,35 +627,45 @@ void wxGISRasterRasterColormapRenderer::FillPixel(unsigned char* pOutputData, vo
 	////}
 }
 
-void RGBtoCMYK(float color[4])
+wxColor wxGISRasterRasterColormapRenderer::HSVtoRGB( const short &h, const short &s, const short &v, const short &alpha )
 {
-	if (color[0]==0 && color[1]==0 && color[2]==0)
+	int f;
+	long p, q, t;
+
+	if( s == 0 )
+		return wxColor(v, v, v, alpha);
+
+	f = ( (h % 60) * 255) / 60;
+	h /= 60;
+
+	p = (v * (256 – s)) / 256;
+	q = (v * ( 256 – (s * f) / 256 )) / 256;
+	t = (v * ( 256 – (s * ( 256 – f )) / 256)) / 256;
+
+	switch( h )
 	{
-		color[0] = 0;
-		color[1] = 0;
-		color[2] = 0;
-		color[3] = 1.0;
-	}
-	else if (color[0]==1.0 && color[1]==1.0 && color[2]==1.0)
-	{
-		color[0] = 0;
-		color[1] = 0;
-		color[2] = 0;
-		color[3] = 0;
-	}
-	else
-	{
-		color[0] = 1.0 - color[0];
-		color[1] = 1.0 - color[1];
-		color[2] = 1.0 - color[2];
- 
-		float minK = MIN(color[0], MIN(color[1], color[2]));
-		color[0] = (color[0] - minK) / (1.0 - minK);
-		color[1] = (color[1] - minK) / (1.0 - minK);
-		color[2] = (color[2] - minK) / (1.0 - minK);
-		color[3] = minK;
-	}
+	case 0:
+		return wxColor(v, t, p, alpha);
+	case 1:
+		return wxColor(q, v, p, alpha);
+	case 2:
+		return wxColor(p, v, t, alpha);
+	case 3:
+		return wxColor(p, q, v, alpha);
+	case 4:
+		return wxColor(t, p, v, alpha);
+	default:
+		return wxColor(v, p, q, alpha);
+	};
 }
+
+wxColor wxGISRasterRasterColormapRenderer::CMYKtoRGB( const short &c, const short &m, const short &y, const short &k )
+{
+	 (1.0 - color[3]) + color[3])
+	short nR = 1.0 - (c * (1.0 - color[3]) + color[3]);
+	return wxColor();
+}
+/*
  
 void CMYKtoRGB(float color[4])
 {
@@ -579,260 +675,7 @@ void CMYKtoRGB(float color[4])
 	color[3] = 1.0;
 }
 
-void HSVtoRGB( int  *r, int *g,int *b, int h, int s, int v )
-{
-        int f;
-        long p, q, t;
- 
-        if( s == 0 )
-        {
-                *r = *g = *b = v;
-                return;
-        }
- 
-        f = ((h%60)*255)/60;
-        h /= 60;
- 
-        p = (v * (256 – s))/256;
-        q = (v * ( 256 – (s * f)/256 ))/256;
-        t = (v * ( 256 – (s * ( 256 – f ))/256))/256;
- 
-        switch( h ) {
-                case 0:
-                        *r = v;
-                        *g = t;
-                        *b = p;
-                        break;
-                case 1:
-                        *r = q;
-                        *g = v;
-                        *b = p;
-                        break;
-                case 2:
-                        *r = p;
-                        *g = v;
-                        *b = t;
-                        break;
-                case 3:
-                        *r = p;
-                        *g = q;
-                        *b = v;
-                        break;
-                case 4:
-                        *r = t;
-                        *g = p;
-                        *b = v;
-                        break;
-                default:
-                        *r = v;
-                        *g = p;
-                        *b = q;
-                        break;
-        }
-}
-
-'ve used these for a long time - no idea where they came from at this point... I have tried multiple times to get this formatted properly but cannot seem to accomplish it.
-
-typedef struct {
-double r;       // percent
-double g;       // percent
-double b;       // percent
-} rgb;
-
-typedef struct {
-double h;       // angle in degrees
-double s;       // percent
-double v;       // percent
-} hsv;
-
-static hsv      rgb2hsv(rgb in);
-static rgb      hsv2rgb(hsv in);
-
-    hsv
-rgb2hsv(rgb in) { hsv out; double min, max, delta;
-
-min = in.r < in.g ? in.r : in.g;
-min = min  < in.b ? min  : in.b;
-
-max = in.r > in.g ? in.r : in.g;
-max = max  > in.b ? max  : in.b;
-
-out.v = max;                                // v
-delta = max - min;
-if( max > 0.0 ) {
-    out.s = (delta / max);                  // s
-} else {
-    // r = g = b = 0                        // s = 0, v is undefined
-    out.s = 0.0;
-    out.h = NAN;                            // its now undefined
-    return out;
-}
-if( in.r >= max )                           // > is bogus, just keeps compilor happy
-    out.h = ( in.g - in.b ) / delta;        // between yellow & magenta
-else
-if( in.g >= max )
-    out.h = 2.0 + ( in.b - in.r ) / delta;  // between cyan & yellow
-else
-    out.h = 4.0 + ( in.r - in.g ) / delta;  // between magenta & cyan
-
-out.h *= 60.0;                              // degrees
-
-if( out.h < 0.0 )
-    out.h += 360.0;
-
-return out;
-}
-
-rgb
-hsv2rgb(hsv in) { double hh, p, q, t, ff; long i; rgb out;
-
-if(in.s <= 0.0) {       // < is bogus, just shuts up warnings
-    if(isnan(in.h)) {   // in.h == NAN
-        out.r = in.v;
-        out.g = in.v;
-        out.b = in.v;
-        return out;
-    }
-    // error - should never happen
-    out.r = 0.0;
-    out.g = 0.0;
-    out.b = 0.0;
-    return out;
-}
-hh = in.h;
-if(hh >= 360.0) hh = 0.0;
-hh /= 60.0;
-i = (long)hh;
-ff = hh - i;
-p = in.v * (1.0 - in.s);
-q = in.v * (1.0 - (in.s * ff));
-t = in.v * (1.0 - (in.s * (1.0 - ff)));
-
-switch(i) {
-case 0:
-    out.r = in.v;
-    out.g = t;
-    out.b = p;
-    break;
-case 1:
-    out.r = q;
-    out.g = in.v;
-    out.b = p;
-    break;
-case 2:
-    out.r = p;
-    out.g = in.v;
-    out.b = t;
-    break;
-
-case 3:
-    out.r = p;
-    out.g = q;
-    out.b = in.v;
-    break;
-case 4:
-    out.r = t;
-    out.g = p;
-    out.b = in.v;
-    break;
-case 5:
-default:
-    out.r = in.v;
-    out.g = p;
-    out.b = q;
-    break;
-}
-return out;     
-}
-
-/**
- * @param theBandNumber the number of the band for which you want a color table
- * @param theList a pointer the object that will hold the color table
- * @return true of a color table was able to be read, false otherwise
- */
-bool QgsRasterLayer::readColorTable( int theBandNumber, QList<QgsColorRampShader::ColorRampItem>* theList )
-{
-  QgsDebugMsg( "entered." );
-  //Invalid band number, segfault prevention
-  if ( 0 >= theBandNumber || 0 == theList )
-  {
-    QgsDebugMsg( "Invalid parameter" );
-    return false;
-  }
-
-  GDALRasterBandH myGdalBand = GDALGetRasterBand( mGdalDataset, theBandNumber );
-  GDALColorTableH myGdalColorTable = GDALGetRasterColorTable( myGdalBand );
-
-  if ( myGdalColorTable )
-  {
-    QgsDebugMsg( "Color table found" );
-    int myEntryCount = GDALGetColorEntryCount( myGdalColorTable );
-    GDALColorInterp myColorInterpretation =  GDALGetRasterColorInterpretation( myGdalBand );
-    QgsDebugMsg( "Color Interpretation: " + QString::number(( int )myColorInterpretation ) );
-    GDALPaletteInterp myPaletteInterpretation  = GDALGetPaletteInterpretation( myGdalColorTable );
-    QgsDebugMsg( "Palette Interpretation: " + QString::number(( int )myPaletteInterpretation ) );
-
-    const GDALColorEntry* myColorEntry = 0;
-    for ( int myIterator = 0; myIterator < myEntryCount; myIterator++ )
-    {
-      myColorEntry = GDALGetColorEntry( myGdalColorTable, myIterator );
-
-      if ( !myColorEntry )
-      {
-        continue;
-      }
-      else
-      {
-        //Branch on the color interpretation type
-        if ( myColorInterpretation == GCI_GrayIndex )
-        {
-          QgsColorRampShader::ColorRampItem myColorRampItem;
-          myColorRampItem.label = "";
-          myColorRampItem.value = ( double )myIterator;
-          myColorRampItem.color = QColor::fromRgb( myColorEntry->c1, myColorEntry->c1, myColorEntry->c1, myColorEntry->c4 );
-          theList->append( myColorRampItem );
-        }
-        else if ( myColorInterpretation == GCI_PaletteIndex )
-        {
-          QgsColorRampShader::ColorRampItem myColorRampItem;
-          myColorRampItem.label = "";
-          myColorRampItem.value = ( double )myIterator;
-          //Branch on palette interpretation
-          if ( myPaletteInterpretation  == GPI_RGB )
-          {
-            myColorRampItem.color = QColor::fromRgb( myColorEntry->c1, myColorEntry->c2, myColorEntry->c3, myColorEntry->c4 );
-          }
-          else if ( myPaletteInterpretation  == GPI_CMYK )
-          {
-            myColorRampItem.color = QColor::fromCmyk( myColorEntry->c1, myColorEntry->c2, myColorEntry->c3, myColorEntry->c4 );
-          }
-          else if ( myPaletteInterpretation  == GPI_HLS )
-          {
-            myColorRampItem.color = QColor::fromHsv( myColorEntry->c1, myColorEntry->c3, myColorEntry->c2, myColorEntry->c4 );
-          }
-          else
-          {
-            myColorRampItem.color = QColor::fromRgb( myColorEntry->c1, myColorEntry->c1, myColorEntry->c1, myColorEntry->c4 );
-          }
-          theList->append( myColorRampItem );
-        }
-        else
-        {
-          QgsDebugMsg( "Color interpretation type not supported yet" );
-          return false;
-        }
-      }
-    }
-  }
-  else
-  {
-    QgsDebugMsg( "No color table found for band " + QString::number( theBandNumber ) );
-    return false;
-  }
-
-  QgsDebugMsg( "Color table loaded sucessfully" );
-  return true;
-}
+*/
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
