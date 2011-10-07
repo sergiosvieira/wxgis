@@ -427,10 +427,16 @@ bool wxGISRasterDataset::GetPixelData(void *data, int nXOff, int nYOff, int nXSi
         return false;
     }
 
-	int nDataSize = GDALGetDataTypeSize(eDT) / 8;
-    int nPixelSpace = nDataSize * nBandCount;
-    int nLineSpace = nBufXSize * nPixelSpace;
-    int nBandSpace = nDataSize;
+    int nPixelSpace(0);
+    int nLineSpace(0);
+	int nBandSpace(0);
+	if(nBandCount > 1)
+	{
+		int nDataSize = GDALGetDataTypeSize(eDT) / 8;
+		nPixelSpace = nDataSize * nBandCount;
+		nLineSpace = nBufXSize * nPixelSpace;
+		nBandSpace = nDataSize;
+	}
     err = m_poDataset->RasterIO(GF_Read, nXOff, nYOff, nXSize, nYSize, data, nBufXSize, nBufYSize, eDT, nBandCount, panBandList, nPixelSpace, nLineSpace, nBandSpace);
     if(err != CE_None)
     {

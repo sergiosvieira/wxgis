@@ -645,6 +645,160 @@ wxColor wxGISRasterRasterColormapRenderer::CMYKtoRGB( const short &c, const shor
 	return wxColor(nR, nG, nB);
 }
 
+
+//-----------------------------------
+// wxGISRasterGreyScaleRenderer
+//-----------------------------------
+
+wxGISRasterGreyScaleRenderer::wxGISRasterGreyScaleRenderer(void) : wxGISRasterRenderer()
+{
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	wxString sAppName = GetApplication()->GetAppName();
+
+	m_nBand = 1;
+}
+
+wxGISRasterGreyScaleRenderer::~wxGISRasterGreyScaleRenderer(void)
+{
+}
+
+bool wxGISRasterGreyScaleRenderer::CanRender(wxGISDatasetSPtr pDataset)
+{
+	return pDataset->GetType() == enumGISRasterDataset ? true : false;
+}
+
+void wxGISRasterGreyScaleRenderer::PutRaster(wxGISRasterDatasetSPtr pRaster)
+{
+	m_pwxGISRasterDataset = pRaster;
+	OnFillStats();
+}	
+
+void wxGISRasterGreyScaleRenderer::OnFillStats(void)
+{
+	GDALDataset* poGDALDataset = m_pwxGISRasterDataset->GetMainRaster();
+	if(!poGDALDataset)
+		poGDALDataset = m_pwxGISRasterDataset->GetRaster();
+	if(!poGDALDataset)
+		return;
+	
+	//set min/max values
+	//set nodata color for each band
+	if(m_pwxGISRasterDataset->HasStatistics())
+	{
+
+        int         bGotNodata;
+        double      dfMin, dfMax, dfMean, dfStdDev, dfNoData;
+		GDALRasterBand* pBand = poGDALDataset->GetRasterBand(m_nBand);
+ 
+        if(pBand->GetStatistics(FALSE, FALSE, &dfMin, &dfMax, &dfMean, &dfStdDev) == CE_None)
+        {
+            m_oStretch.SetStats(dfMin, dfMax, dfMean, dfStdDev);
+        }
+
+		dfNoData = pBand->GetNoDataValue(&bGotNodata );
+        if( bGotNodata )
+        {
+            m_oStretch.SetNoData(dfNoData);
+        }
+	}	
+}
+
+int *wxGISRasterGreyScaleRenderer::GetBandsCombination(int *pnBandCount)
+{
+	int *pBands = NULL;
+	*pnBandCount = 1;
+	pBands = new int[1];
+	pBands[0] = m_nBand;
+	return pBands;
+}
+
+
+bool wxGISRasterGreyScaleRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel )
+{
+	int nOutXSize, nOutYSize;
+	bool bScale = false;
+	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
+	{
+		bScale = true;
+		nOutXSize = stPixelData.nPixelDataWidth;
+		nOutYSize = stPixelData.nPixelDataHeight;
+	}
+	else
+	{
+		nOutXSize = stPixelData.nOutputWidth;
+		nOutYSize = stPixelData.nOutputHeight;
+	}
+
+    //multithreaded
+    int CPUCount = wxThread::GetCPUCount();//1;//
+    std::vector<wxRasterDrawThread*> threadarray;
+    int nPartSize = nOutYSize / CPUCount;
+    int nBegY(0), nEndY;
+    for(int i = 0; i < CPUCount; ++i)
+    {        
+        if(i == CPUCount - 1)
+            nEndY = nOutYSize;
+        else
+            nEndY = nPartSize * (i + 1);
+
+		unsigned char* pDestInputData = pTransformData + (nBegY * 4 * nOutXSize);
+		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, 1, pDestInputData, bScale == true ? m_nQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, static_cast<IRasterRenderer*>(this), pTrackCancel);
+		if(CreateAndRunThread(thread, wxT("wxRasterDrawThread"), wxT("RasterDrawThread")))
+	       threadarray.push_back(thread);
+
+        nBegY = nEndY;
+    }
+
+    for(size_t i = 0; i < threadarray.size(); ++i)
+    {
+        wgDELETE(threadarray[i], Wait());
+    }
+	return true;
+}
+
+void wxGISRasterGreyScaleRenderer::FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA)
+{
+	if(pSrcValR == NULL)
+		return;
+	//wxBYTE_ORDER          //      x
+	//pOutputData[0] = 0;	//	A	B
+	//pOutputData[1] = 0;	//	R	G
+	//pOutputData[2] = 255;	//	G	R
+	//pOutputData[3] = 255;	//	B	A
+
+	pOutputData[3] = 255;
+	unsigned char RPixVal = m_oStretch.GetValue((double)SRCVAL(pSrcValR, m_pwxGISRasterDataset->GetDataType(), 0));
+	pOutputData[2] = RPixVal;
+	pOutputData[1] = RPixVal;
+	pOutputData[0] = RPixVal;
+
+	//check for nodata
+	bool bIsChanged(false);
+    if( m_oStretch.IsNoData(pOutputData[2]) )
+	{
+		bIsChanged = true;
+		pOutputData[3] = m_oNoDataColor.Alpha();
+		pOutputData[2] = m_oNoDataColor.Red();
+		pOutputData[1] = m_oNoDataColor.Green();
+		pOutputData[0] = m_oNoDataColor.Blue();
+	}
+
+	if(bIsChanged)
+		return;
+
+	//check for background data
+
+	//if(RPixVal > 128)
+	//{
+	//	pOutputData[0] = 0;
+	//	pOutputData[1] = 0;
+	//	pOutputData[2] = 0;
+	//	pOutputData[3] = 0;
+	//	return;
+	//}
+}
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
 void wxGISRasterRGBRenderer::Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel)

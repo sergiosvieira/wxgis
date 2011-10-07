@@ -70,6 +70,7 @@ protected:
 	wxGISRasterDatasetSPtr m_pwxGISRasterDataset;
 	wxGISEnumDrawQuality m_nQuality;
 };
+
 /** \class wxGISRasterRGBARenderer rasterrenderer.h
     \brief The raster layer renderer for RGB data and Alpha channel
 */
@@ -122,4 +123,27 @@ protected:
 	int m_nBandNumber;
     bool m_bHasNoData;
     short m_nNoDataIndex;
+};
+
+/** \class wxGISRasterGreyScaleRenderer rasterrenderer.h
+    \brief The raster layer renderer for RGB data and Alpha channel
+*/
+class wxGISRasterGreyScaleRenderer :
+	public wxGISRasterRenderer
+{
+public:
+	wxGISRasterGreyScaleRenderer(void);
+	virtual ~wxGISRasterGreyScaleRenderer(void);
+//IRasterRenderer
+	virtual bool CanRender(wxGISDatasetSPtr pDataset);
+	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster);
+	virtual int *GetBandsCombination(int *pnBandCount);
+	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA);
+    virtual wxGISEnumRendererType GetDataType(void){return enumGISRenderTypeRGBA;};
+protected:
+	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel );
+	virtual void OnFillStats(void);
+protected:
+	int m_nBand;
+    wxGISStretch m_oStretch;
 };
