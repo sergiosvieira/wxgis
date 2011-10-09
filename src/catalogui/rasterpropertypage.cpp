@@ -166,9 +166,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
                 {
                     nSize += BufL.st_size;
                 }
-                //TODO: conv file name to zip coding
-			    wxString sFileName(CPLGetFilename(papszFileList[i]), wxConvLocal);
-
+		        wxString sFileName = GetConvName(papszFileList[i]);
 				AppendProperty(pfilesid, new wxStringProperty(wxString::Format(_("File %d"), i), wxPG_LABEL, sFileName) );  
 		    }
         }
@@ -357,8 +355,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
         {
             wxPGProperty* pbandid = AppendProperty(pstatid, new wxPropertyCategory(wxString::Format(_("Band %d"), nBand + 1)) );
 
-            double      dfNoData;
-            int         bGotNodata, bSuccess;
+            int         bSuccess;
             int         nBlockXSize, nBlockYSize, nMaskFlags;
             double      dfMin, dfMax, dfMean, dfStdDev;
             GDALColorTable*	hTable;
@@ -386,10 +383,9 @@ void wxGISRasterPropertyPage::FillGrid(void)
             //Checksum
             //   wxLogDebug( wxT("  Checksum=%d"), GDALChecksumImage(pBand, 0, 0, nXSize, nYSize));
 
-		    dfNoData = pBand->GetNoDataValue(&bGotNodata );
-            if( bGotNodata )
+            if(m_pDataset->HasNoData(nBand + 1) )
             {
-                AppendProperty( new wxFloatProperty(_("NoData Value"), wxString::Format(wxT("NoData Value_%d"), nBand), dfNoData ));
+                AppendProperty( new wxFloatProperty(_("NoData Value"), wxString::Format(wxT("NoData Value_%d"), nBand + 1), m_pDataset->GetNoData(nBand + 1) ));
             }
 
             //Band Overviews

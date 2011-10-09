@@ -46,7 +46,8 @@ wxGISRasterLayer::wxGISRasterLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer(
             if( eColorInterpretation == GCI_PaletteIndex )
             {
 	    	    //RasterColormapRenderer
-                m_pRasterRenderer = boost::static_pointer_cast<IRasterRenderer>(boost::make_shared<wxGISRasterRasterColormapRenderer>());
+//  			    m_pRasterRenderer = boost::static_pointer_cast<IRasterRenderer>(boost::make_shared<wxGISRasterGreyScaleRenderer>());
+               m_pRasterRenderer = boost::static_pointer_cast<IRasterRenderer>(boost::make_shared<wxGISRasterRasterColormapRenderer>());
             }
             else if( eColorInterpretation == GCI_GrayIndex )
             {
