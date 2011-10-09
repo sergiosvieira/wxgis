@@ -31,6 +31,8 @@
 //esriRasterStretch_HistogramSpecification	6	Stretch is a Histogram Specification type.
 //esriRasterStretch_Count	7	Stretch is a count type.
 
+#define DEFAULT_STDDEV 60.0
+
 /** \enum wxGISEnumRasterStretch
     \brief The raster pixel color stretch types.
 */
@@ -48,9 +50,9 @@ enum wxGISEnumRasterStretch
 class wxGISStretch
 {
 public:
-	wxGISStretch(double dfMin = 0.0, double dfMax = 255.0, double dfMean = 127.5, double dfStdDev = 180.3122292026, double dfNoData = -99999.0);
+	wxGISStretch(double dfMin = 0.0, double dfMax = 255.0, double dfMean = 127.5, double dfStdDev = DEFAULT_STDDEV, double dfNoData = NOTNODATA);
 	virtual ~wxGISStretch(void);
-	virtual unsigned char GetValue(double dfInput);
+	virtual unsigned char GetValue(const double *pdfInput);
     virtual bool IsNoData(const unsigned char& cVal);
     virtual void SetNoData(double dfNoData);
     virtual double GetNoData(void);
@@ -58,7 +60,7 @@ public:
     virtual bool GetInvert(void);
     virtual void SetStdDevParam(double dfStdDevParam);
     virtual double GetStdDevParam(void);
-    virtual void SetStats(double dfMin = 0.0, double dfMax = 255.0, double dfMean = 127.5, double dfStdDev = 180.3122292026);
+    virtual void SetStats(double dfMin = 0.0, double dfMax = 255.0, double dfMean = 127.5, double dfStdDev = DEFAULT_STDDEV);
 protected:
     virtual void RecalcEquation(void);
     virtual void CalcEquation(double dfMin, double dfMax);

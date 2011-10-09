@@ -58,6 +58,8 @@ public:
     virtual int GetBandCount(void){return m_nBandCount;};
     virtual char **GetFileList();
 	virtual bool GetPixelData(void *data, int nXOff, int nYOff, int nXSize, int nYSize, int nBufXSize, int nBufYSize, GDALDataType eDT, int nBandCount, int *panBandList);
+	virtual bool HasNoData(int nBand){return !IsDoubleEquil(m_paNoData[nBand - 1], NOTNODATA);};
+	virtual double GetNoData(int nBand){return m_paNoData[nBand - 1];};
 protected:
 	OGREnvelope m_stExtent;
 	GDALDataset  *m_poDataset;
@@ -69,6 +71,7 @@ protected:
 	int m_nYSize;
 	int m_nBandCount;
 	GDALDataType m_nDataType;
+    double *m_paNoData;
 };
 
 DEFINE_SHARED_PTR(wxGISRasterDataset);

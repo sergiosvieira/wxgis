@@ -29,7 +29,7 @@
 class wxRasterDrawThread : public wxThread
 {
 public:
-	wxRasterDrawThread(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, int nBandCount, unsigned char *pTransformData, wxGISEnumDrawQuality nQuality, int nOutXSize, int nOutYSize, int nBegY, int nEndY, IRasterRenderer *pRasterRenderer, ITrackCancel *pTrackCancel = NULL);
+	wxRasterDrawThread(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, int nBandCount, unsigned char *pTransformData, wxGISEnumDrawQuality eQuality, int nOutXSize, int nOutYSize, int nBegY, int nEndY, IRasterRenderer *pRasterRenderer, ITrackCancel *pTrackCancel = NULL);
     virtual void *Entry();
     virtual void OnExit();
 private:
@@ -38,7 +38,7 @@ private:
 	RAWPIXELDATA &m_stPixelData;
 	GDALDataType m_eSrcType;
 	unsigned char *m_pTransformData;
-	wxGISEnumDrawQuality m_nQuality;
+	wxGISEnumDrawQuality m_eQuality;
 	int m_nOutXSize;
 	int m_nOutYSize;
 	int m_nBegY;
@@ -60,15 +60,15 @@ public:
 	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster);
 	virtual int *GetBandsCombination(int *pnBandCount) = 0;
 	virtual void Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
-	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA) = 0;
-    virtual wxColor GetColorByIndex(int nIndex){return wxColor();};
+	virtual void FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA) = 0;
+    virtual const wxColor *GetColorByIndex(int nIndex){return NULL;};
 protected:
 	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel ) = 0;
 protected:
 	wxColour m_oNoDataColor;
 	//statistics - current display extent, each raster dataset, custom settings
 	wxGISRasterDatasetSPtr m_pwxGISRasterDataset;
-	wxGISEnumDrawQuality m_nQuality;
+	wxGISEnumDrawQuality m_eQuality;
 };
 
 /** \class wxGISRasterRGBARenderer rasterrenderer.h
@@ -84,7 +84,7 @@ public:
 	virtual bool CanRender(wxGISDatasetSPtr pDataset);
 	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster);
 	virtual int *GetBandsCombination(int *pnBandCount);
-	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA);
+	virtual void FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA);
     virtual wxGISEnumRendererType GetDataType(void){return enumGISRenderTypeRGBA;};
 protected:
 	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel );
@@ -110,9 +110,9 @@ public:
 	virtual bool CanRender(wxGISDatasetSPtr pDataset);
 	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster);
 	virtual int *GetBandsCombination(int *pnBandCount);
-	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA);
+	virtual void FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA);
     virtual wxGISEnumRendererType GetDataType(void){return enumGISRenderTypeIndexed;};
-    virtual wxColor GetColorByIndex(int nIndex){return m_mColorTable[nIndex];};
+    virtual const wxColor *GetColorByIndex(int nIndex);
 protected:
 	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel );
 	virtual void OnFillColorTable(void);
@@ -138,7 +138,7 @@ public:
 	virtual bool CanRender(wxGISDatasetSPtr pDataset);
 	virtual void PutRaster(wxGISRasterDatasetSPtr pRaster);
 	virtual int *GetBandsCombination(int *pnBandCount);
-	virtual void FillPixel(unsigned char* pOutputData, void *pSrcValR, void *pSrcValG, void *pSrcValB, void *pSrcValA);
+	virtual void FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA);
     virtual wxGISEnumRendererType GetDataType(void){return enumGISRenderTypeRGBA;};
 protected:
 	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel );

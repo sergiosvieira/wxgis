@@ -32,11 +32,14 @@ wxGISRasterDataset::wxGISRasterDataset(CPLString sPath, wxGISEnumRasterDatasetTy
     m_nSubType = (int)nType;
 	m_nType = enumGISRasterDataset;
 	m_nDataType = GDT_Unknown;
+    m_paNoData = NULL;
 }
 
 wxGISRasterDataset::~wxGISRasterDataset(void)
 {
 	Close();
+    if(m_paNoData)
+        delete [] m_paNoData;
 }
 
 void wxGISRasterDataset::Close(void)
@@ -316,6 +319,37 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
 		m_stExtent.MinX = 0;
 		m_stExtent.MinY = 0;
 	}
+
+    //nodata check
+    m_paNoData = new double[m_nBandCount];
+    for(size_t nBand = 0; nBand < m_nBandCount; ++nBand)
+    {
+        GDALRasterBand* pBand;
+        if(m_poMainDataset)
+            pBand = m_poMainDataset->GetRasterBand(nBand + 1);
+        else
+            pBand = m_poDataset->GetRasterBand(nBand + 1);
+        if(!pBand)
+            continue;
+
+        int         bGotNodata;
+	    m_paNoData[nBand] = pBand->GetNoDataValue(&bGotNodata );
+        if(bGotNodata)
+            continue;
+        else
+            m_paNoData[nBand] = NOTNODATA;
+        switch((wxGISEnumRasterDatasetType)m_nSubType)
+        {
+        case enumRasterGif:
+            {
+		        char** papszMetadata = pBand->GetMetadata();
+                const char* pszBk = CSLFetchNameValue(papszMetadata, "GIF_BACKGROUND");
+                if(pszBk)
+                    m_paNoData[nBand] = atof(pszBk);
+            }
+            break;
+        };
+    }
 
 	m_bIsOpened = true;
     m_bIsReadOnly = bReadOnly;

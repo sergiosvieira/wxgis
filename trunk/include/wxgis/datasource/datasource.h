@@ -33,6 +33,8 @@
 #include "cpl_quad_tree.h"
 #include "cpl_string.h"
 
+#define NOTNODATA -9999.0
+
 /** \enum wxGISEnumDatasetType
     \brief The dataset types 
 */

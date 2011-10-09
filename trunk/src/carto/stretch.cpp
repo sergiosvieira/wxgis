@@ -39,24 +39,26 @@ wxGISStretch::wxGISStretch(double dfMin, double dfMax, double dfMean, double dfS
     m_dfNoData = dfNoData;
     m_bInvert = false;
     m_dfStdDevParam = pConfig->ReadDouble(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/stretch_stddevparam")), 2.0);
-    m_eType = (wxGISEnumRasterStretch)pConfig->ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/stretch_type")),enumGISRasterStretchStdDev);  
+    m_eType = (wxGISEnumRasterStretch)pConfig->ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/stretch_type")),enumGISRasterStretchStdDev);  //enumGISRasterStretchNone;//
+
+    RecalcEquation();
 }
 
 wxGISStretch::~wxGISStretch()
 {
 }
 
-unsigned char wxGISStretch::GetValue(double dfInput)
+unsigned char wxGISStretch::GetValue(const double *pdfInput)
 {
     unsigned char cOutput;
     switch(m_eType)
     {
     case enumGISRasterStretchNone:
-        cOutput = (unsigned char)dfInput;
+        cOutput = (unsigned char)(*pdfInput);
         break;
     case enumGISRasterStretchStdDev:
         {
-            double dVal = m_dfM * (dfInput - m_dfDX);
+            double dVal = m_dfM * ((*pdfInput) - m_dfDX);
             if(dVal < 0)
                 cOutput = 0;
             else if(dVal > 255)
@@ -114,6 +116,8 @@ void wxGISStretch::SetStats(double dfMin, double dfMax, double dfMean, double df
     m_dfMax = dfMax;
     m_dfMean = dfMean;
     m_dfStdDev = dfStdDev;
+    if(IsDoubleEquil(m_dfStdDev, 0))
+        m_dfStdDev = DEFAULT_STDDEV;
     RecalcEquation();
 }
 
