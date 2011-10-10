@@ -142,7 +142,7 @@ void wxGISStretch::RecalcEquation(void)
 void wxGISStretch::CalcEquation(double dfMin, double dfMax)
 {
     if(dfMin < 0) dfMin = 0;
-    if(dfMin > 255) dfMax = 255;
+    if(dfMax > 255) dfMax = 255;
     //y = m(x - dfMin) + 0
     //y = m(x - ax) + ay
     //y = m(x - m_dfDX)
