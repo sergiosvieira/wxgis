@@ -60,6 +60,11 @@ bool wxGxRasterFactory::GetChildren(CPLString sParentDir, char** &pFileNames, Gx
 			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterGif);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 		}
+		else if(EQUAL(szExt, "sdat"))
+		{
+			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterSAGA);
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+		}
 		else if(EQUAL(szExt, "tif") || EQUAL(szExt, "tiff"))
 		{
 			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterTiff);
@@ -148,6 +153,12 @@ bool wxGxRasterFactory::GetChildren(CPLString sParentDir, char** &pFileNames, Gx
         else if(EQUAL(szExt, "jpegw"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         else if(EQUAL(szExt, "pngw"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "pngw"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "mgrd"))
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        else if(EQUAL(szExt, "sgrd"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 
 		if(pGxObj != NULL)

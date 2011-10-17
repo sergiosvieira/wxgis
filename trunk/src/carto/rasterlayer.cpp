@@ -49,7 +49,11 @@ wxGISRasterLayer::wxGISRasterLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer(
 //  			    m_pRasterRenderer = boost::static_pointer_cast<IRasterRenderer>(boost::make_shared<wxGISRasterGreyScaleRenderer>());
                m_pRasterRenderer = boost::static_pointer_cast<IRasterRenderer>(boost::make_shared<wxGISRasterRasterColormapRenderer>());
             }
-            else if( eColorInterpretation == GCI_GrayIndex )
+            else if(pBand->GetRasterDataType() == GDT_Int32)
+            {
+ 			    m_pRasterRenderer = boost::static_pointer_cast<IRasterRenderer>(boost::make_shared<wxGISRasterPackedRGBARenderer>());
+            }
+            else// if( eColorInterpretation == GCI_GrayIndex )
             {
     		    //TODO: else RasterStretchColorRampRenderer
  			    m_pRasterRenderer = boost::static_pointer_cast<IRasterRenderer>(boost::make_shared<wxGISRasterGreyScaleRenderer>());

@@ -34,7 +34,8 @@ enum wxGISEnumRendererType
 	enumGISRenderTypeNone = 0,
 	//enumGISRenderTypeGreyScale,
 	enumGISRenderTypeRGBA,
-	enumGISRenderTypeIndexed
+	enumGISRenderTypeIndexed,
+	enumGISRenderTypePackedRGBA
 };
  
 
@@ -112,6 +113,9 @@ typedef struct _rawpixeldata
 	int nOutputWidth, nOutputHeight;
 	OGREnvelope stWorldBounds;
 }RAWPIXELDATA;
+
+WX_DECLARE_HASH_MAP( int, wxColor, wxIntegerHash, wxIntegerEqual, wxGISColorTable );
+
 /** \class IRasterRenderer carto.h
     \brief The base class for map raster layer renderer
 */
@@ -125,7 +129,7 @@ public:
 	//transform pixel from raster value to display unsigned char and store it in pOutputData (ARGB32)
 	virtual void FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA) = 0;
     virtual wxGISEnumRendererType GetDataType(void) = 0;
-    virtual const wxColor *GetColorByIndex(int nIndex) = 0;
+    virtual wxGISColorTable GetColorTable(void) = 0;
 };
 DEFINE_SHARED_PTR(IRasterRenderer);
 

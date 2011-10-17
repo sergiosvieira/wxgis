@@ -143,7 +143,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
     //folder
 	//convert from internal representation UTF8 to wxConvCurrent
 
-	wxString sPath(CPLGetPath(soPath), wxConvLocal);
+	wxString sPath(CPLGetPath(soPath), wxConvUTF8);
     AppendProperty( new wxStringProperty(_("Folder"), wxPG_LABEL, sPath) );  
     //file list
     GDALDataset* poGDALDataset = m_pDataset->GetMainRaster();
@@ -151,15 +151,15 @@ void wxGISRasterPropertyPage::FillGrid(void)
         poGDALDataset = m_pDataset->GetRaster();
     if(poGDALDataset)
     {
-        char** papszFileList = poGDALDataset->GetFileList();
-        if( CSLCount(papszFileList) < 2 )
+        char** papszFileList = m_pDataset->GetFileList();//poGDALDataset->GetFileList();
+        if( !papszFileList || CSLCount(papszFileList) == 0 )
         {
             AppendProperty( new wxStringProperty(_("Files"), wxPG_LABEL, _("None associated")) );  
         }
         else
         {
             wxPGProperty* pfilesid = AppendProperty(pid, new wxPropertyCategory(_("Files")) );  
-            for(int i = 1; papszFileList[i] != NULL; ++i )
+            for(int i = 0; papszFileList[i] != NULL; ++i )
 		    {
                 ret = VSIStatL(papszFileList[i], &BufL);
                 if(ret == 0)

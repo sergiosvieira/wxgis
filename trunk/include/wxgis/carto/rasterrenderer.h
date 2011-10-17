@@ -61,7 +61,7 @@ public:
 	virtual int *GetBandsCombination(int *pnBandCount) = 0;
 	virtual void Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
 	virtual void FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA) = 0;
-    virtual const wxColor *GetColorByIndex(int nIndex){return NULL;};
+    virtual wxGISColorTable GetColorTable(void){return m_mColorTable;};
 protected:
 	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel ) = 0;
 protected:
@@ -69,6 +69,7 @@ protected:
 	//statistics - current display extent, each raster dataset, custom settings
 	wxGISRasterDatasetSPtr m_pwxGISRasterDataset;
 	wxGISEnumDrawQuality m_eQuality;
+    wxGISColorTable m_mColorTable;
 };
 
 /** \class wxGISRasterRGBARenderer rasterrenderer.h
@@ -112,21 +113,20 @@ public:
 	virtual int *GetBandsCombination(int *pnBandCount);
 	virtual void FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA);
     virtual wxGISEnumRendererType GetDataType(void){return enumGISRenderTypeIndexed;};
-    virtual const wxColor *GetColorByIndex(int nIndex);
+    //virtual const wxColor *GetColorByIndex(long nIndex);
 protected:
 	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel );
 	virtual void OnFillColorTable(void);
 	wxColor HSVtoRGB( const short &h, const short &s, const short &v, const short &alpha );
 	wxColor CMYKtoRGB( const short &c, const short &m, const short &y, const short &k );
 protected:
-	std::map<int, wxColor> m_mColorTable;
 	int m_nBandNumber;
     bool m_bHasNoData;
     short m_nNoDataIndex;
 };
 
 /** \class wxGISRasterGreyScaleRenderer rasterrenderer.h
-    \brief The raster layer renderer for RGB data and Alpha channel
+    \brief The raster layer renderer for grey scale data
 */
 class wxGISRasterGreyScaleRenderer :
 	public wxGISRasterRenderer
@@ -146,4 +146,23 @@ protected:
 protected:
 	int m_nBand;
     wxGISStretch m_oStretch;
+};
+
+/** \class wxGISRasterPackedRGBARenderer rasterrenderer.h
+    \brief The raster layer renderer for packed RGB data and Alpha channel
+*/
+class wxGISRasterPackedRGBARenderer :
+	public wxGISRasterGreyScaleRenderer
+{
+public:
+	wxGISRasterPackedRGBARenderer(void);
+	virtual ~wxGISRasterPackedRGBARenderer(void);
+//IRasterRenderer
+	virtual bool CanRender(wxGISDatasetSPtr pDataset);
+	virtual void FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA);
+    virtual wxGISEnumRendererType GetDataType(void){return enumGISRenderTypePackedRGBA;};
+protected:
+	virtual void OnFillStats(void);
+protected:
+	bool m_bNodataNewBehaviour;
 };
