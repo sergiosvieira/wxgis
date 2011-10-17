@@ -79,6 +79,7 @@ inline void WXDLLIMPEXP_GIS_GP AddAllRasterFilters(wxGISGPGxObjectDomain* pDomai
     pDomain->AddFilter(new wxGxRasterFilter(enumRasterJpeg));
     pDomain->AddFilter(new wxGxRasterFilter(enumRasterPng));
     pDomain->AddFilter(new wxGxRasterFilter(enumRasterGif));
+    pDomain->AddFilter(new wxGxRasterFilter(enumRasterSAGA));
 }
 
 /** \class wxGISGPStringDomain gpdomain.h

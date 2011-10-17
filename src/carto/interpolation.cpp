@@ -29,6 +29,7 @@ void NearestNeighbourInterpolation(void *pInputData, int nInputXSize, double dIn
 	double dYRatio = dInputYSize / nOutYSize;
     double dfR, dfG, dfB, dfA;
     int nIndex;
+    wxGISColorTable mColorTable = pRasterRenderer->GetColorTable();
 
     for(int nDestPixY = nBegY; nDestPixY < nEndY; ++nDestPixY)
     {
@@ -46,11 +47,11 @@ void NearestNeighbourInterpolation(void *pInputData, int nInputXSize, double dIn
             case enumGISRenderTypeIndexed:
                 {
                     nIndex = (int)SRCVAL(pInputData, eSrcType, src_pixel_index);
-                    const wxColor *pColor = pRasterRenderer->GetColorByIndex(nIndex);
-                    dfR = pColor->Red();
-                    dfG = pColor->Green();
-                    dfB = pColor->Blue();
-                    dfA = pColor->Alpha();
+                    wxColor Color = mColorTable[nIndex];
+                    dfR = Color.Red();
+                    dfG = Color.Green();
+                    dfB = Color.Blue();
+                    dfA = Color.Alpha();
                     pRasterRenderer->FillPixel(pOutputData, &dfR, &dfG, &dfB, &dfA);
                 }
                 break;
@@ -84,6 +85,16 @@ void NearestNeighbourInterpolation(void *pInputData, int nInputXSize, double dIn
 				    break;	
 			    }
                 break;
+            case enumGISRenderTypePackedRGBA:
+                {
+                    wxColor Color(SRCVAL(pInputData, eSrcType, src_pixel_index));
+                    dfR = Color.Red();
+                    dfG = Color.Green();
+                    dfB = Color.Blue();
+                    dfA = Color.Alpha();
+                    pRasterRenderer->FillPixel(pOutputData, &dfR, &dfG, &dfB, &dfA);
+                }
+                break;
             };
 
             pOutputData += 4;//ARGB32
@@ -114,7 +125,8 @@ void BilinearInterpolation(void *pInputData, int nInputXSize, int nInputYSize, d
     int x_offset1, x_offset2, y_offset1, y_offset2;
     int src_pixel_index00, src_pixel_index01, src_pixel_index10, src_pixel_index11;
     double dfR, dfG, dfB, dfA;
-    int nIndex1, nIndex2, nIndex3, nIndex4;
+    long nIndex1, nIndex2, nIndex3, nIndex4;
+    wxGISColorTable mColorTable = pRasterRenderer->GetColorTable();
 
      for(int nDestPixY = nBegY; nDestPixY < nEndY; ++nDestPixY)
      {
@@ -151,22 +163,22 @@ void BilinearInterpolation(void *pInputData, int nInputXSize, int nInputYSize, d
                     nIndex2 = (int)SRCVAL(pInputData, eSrcType, src_pixel_index01);
                     if(nIndex1 == nIndex2)
                     {
-                        const wxColor *pColor00 = pRasterRenderer->GetColorByIndex(nIndex1);
+                        wxColor Color00 = mColorTable[nIndex1];
                         //first line
-                        r1 = pColor00->Red() * dx1 + pColor00->Red() * dx;
-                        g1 = pColor00->Green() * dx1 + pColor00->Green() * dx;
-                        b1 = pColor00->Blue() * dx1 + pColor00->Blue() * dx;
-                        a1 = pColor00->Alpha() * dx1 + pColor00->Alpha() * dx;
+                        r1 = Color00.Red() * dx1 + Color00.Red() * dx;
+                        g1 = Color00.Green() * dx1 + Color00.Green() * dx;
+                        b1 = Color00.Blue() * dx1 + Color00.Blue() * dx;
+                        a1 = Color00.Alpha() * dx1 + Color00.Alpha() * dx;
                     }
                     else
                     {
-                        const wxColor *pColor00 = pRasterRenderer->GetColorByIndex(nIndex1);
-                        const wxColor *pColor01 = pRasterRenderer->GetColorByIndex(nIndex2);
+                        wxColor Color00 = mColorTable[nIndex1];
+                        wxColor Color01 = mColorTable[nIndex2];
                         //first line
-                        r1 = pColor00->Red() * dx1 + pColor01->Red() * dx;
-                        g1 = pColor00->Green() * dx1 + pColor01->Green() * dx;
-                        b1 = pColor00->Blue() * dx1 + pColor01->Blue() * dx;
-                        a1 = pColor00->Alpha() * dx1 + pColor01->Alpha() * dx;
+                        r1 = Color00.Red() * dx1 + Color01.Red() * dx;
+                        g1 = Color00.Green() * dx1 + Color01.Green() * dx;
+                        b1 = Color00.Blue() * dx1 + Color01.Blue() * dx;
+                        a1 = Color00.Alpha() * dx1 + Color01.Alpha() * dx;
                     }
 
                     nIndex3 = (int)SRCVAL(pInputData, eSrcType, src_pixel_index10);
@@ -180,22 +192,22 @@ void BilinearInterpolation(void *pInputData, int nInputXSize, int nInputYSize, d
                     }
                     else if(nIndex3 == nIndex4)
                     {
-                        const wxColor *pColor10 = pRasterRenderer->GetColorByIndex(nIndex3);
+                        wxColor Color10 = mColorTable[nIndex3];
 			            //second line
-                        r2 = pColor10->Red() * dx1 + pColor10->Red() * dx;
-                        g2 = pColor10->Green() * dx1 + pColor10->Green() * dx;
-                        b2 = pColor10->Blue() * dx1 + pColor10->Blue() * dx;
-                        a2 = pColor10->Alpha() * dx1 + pColor10->Alpha() * dx;
+                        r2 = Color10.Red() * dx1 + Color10.Red() * dx;
+                        g2 = Color10.Green() * dx1 + Color10.Green() * dx;
+                        b2 = Color10.Blue() * dx1 + Color10.Blue() * dx;
+                        a2 = Color10.Alpha() * dx1 + Color10.Alpha() * dx;
                     }
                     else
                     {
-                        const wxColor *pColor10 = pRasterRenderer->GetColorByIndex(nIndex3);
-                        const wxColor *pColor11 = pRasterRenderer->GetColorByIndex(nIndex4);
+                        wxColor Color10 = mColorTable[nIndex3];
+                        wxColor Color11 = mColorTable[nIndex4];
 			            //second line
-                        r2 = pColor10->Red() * dx1 + pColor11->Red() * dx;
-                        g2 = pColor10->Green() * dx1 + pColor11->Green() * dx;
-                        b2 = pColor10->Blue() * dx1 + pColor11->Blue() * dx;
-                        a2 = pColor10->Alpha() * dx1 + pColor11->Alpha() * dx;
+                        r2 = Color10.Red() * dx1 + Color11.Red() * dx;
+                        g2 = Color10.Green() * dx1 + Color11.Green() * dx;
+                        b2 = Color10.Blue() * dx1 + Color11.Blue() * dx;
+                        a2 = Color10.Alpha() * dx1 + Color11.Alpha() * dx;
                     }
 
                     if(IsDoubleEquil(r1, r2))
@@ -305,7 +317,33 @@ void BilinearInterpolation(void *pInputData, int nInputXSize, int nInputYSize, d
 				    break;	
 			    }
                 break;
-            };
+             case enumGISRenderTypePackedRGBA:
+                {
+                    wxColor Color00(SRCVAL(pInputData, eSrcType, src_pixel_index00));
+                    wxColor Color01(SRCVAL(pInputData, eSrcType, src_pixel_index01));
+                    wxColor Color10(SRCVAL(pInputData, eSrcType, src_pixel_index10));
+                    wxColor Color11(SRCVAL(pInputData, eSrcType, src_pixel_index11));
+
+                    //first line
+                    r1 = Color00.Red() * dx1 + Color01.Red() * dx;
+                    g1 = Color00.Green() * dx1 + Color01.Green() * dx;
+                    b1 = Color00.Blue() * dx1 + Color01.Blue() * dx;
+                    a1 = Color00.Alpha() * dx1 + Color01.Alpha() * dx;
+			        //second line
+                    r2 = Color10.Red() * dx1 + Color11.Red() * dx;
+                    g2 = Color10.Green() * dx1 + Color11.Green() * dx;
+                    b2 = Color10.Blue() * dx1 + Color11.Blue() * dx;
+                    a2 = Color10.Alpha() * dx1 + Color11.Alpha() * dx;
+
+                    dfR = r1 * dy1 + r2 * dy;
+                    dfG = g1 * dy1 + g2 * dy;
+                    dfB = b1 * dy1 + b2 * dy;
+                    dfA = a1 * dy1 + a2 * dy;
+
+                    pRasterRenderer->FillPixel(pOutputData, &dfR, &dfG, &dfB, &dfA);
+                }
+                break;
+           };
 
             pOutputData += 4;//ARGB32
 
@@ -328,6 +366,7 @@ void BicubicInterpolation(void *pInputData, int nInputXSize, int nInputYSize, do
 
     double srcpixy, dy;
     double srcpixx, dx;
+    wxGISColorTable mColorTable = pRasterRenderer->GetColorTable();
 
     double sum_r = 0, sum_g = 0, sum_b = 0, sum_a = 0;
 
@@ -372,12 +411,11 @@ void BicubicInterpolation(void *pInputData, int nInputXSize, int nInputYSize, do
                     {
                     case enumGISRenderTypeIndexed:
                         {
-                            int nIndex = (int)SRCVAL(pInputData, eSrcType, src_pixel_index);
-                            const wxColor *pColor = pRasterRenderer->GetColorByIndex(nIndex);
-                            sum_r += pColor->Red() * pixel_weight;
-                            sum_g += pColor->Green() * pixel_weight;
-                            sum_b += pColor->Blue() * pixel_weight;
-                            sum_a += pColor->Alpha() * pixel_weight;
+                            wxColor Color = mColorTable[SRCVAL(pInputData, eSrcType, src_pixel_index)];
+                            sum_r += Color.Red() * pixel_weight;
+                            sum_g += Color.Green() * pixel_weight;
+                            sum_b += Color.Blue() * pixel_weight;
+                            sum_a += Color.Alpha() * pixel_weight;
                         }
                         break;
                     case enumGISRenderTypeRGBA:
@@ -400,6 +438,15 @@ void BicubicInterpolation(void *pInputData, int nInputXSize, int nInputYSize, do
 			            default:
 				            break;	
 			            }
+                        break;
+                     case enumGISRenderTypePackedRGBA:
+                        {
+                            wxColor Color(SRCVAL(pInputData, eSrcType, src_pixel_index));
+                            sum_r += Color.Red() * pixel_weight;
+                            sum_g += Color.Green() * pixel_weight;
+                            sum_b += Color.Blue() * pixel_weight;
+                            sum_a += Color.Alpha() * pixel_weight;
+                       }
                         break;
                     };
                 }
@@ -425,6 +472,9 @@ void BicubicInterpolation(void *pInputData, int nInputXSize, int nInputYSize, do
 			    default:
 				    break;	
 			    }
+                break;
+            case enumGISRenderTypePackedRGBA:
+                pRasterRenderer->FillPixel(pOutputData, &sum_r, &sum_g, &sum_b, &sum_a);
                 break;
             };
 

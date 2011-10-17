@@ -575,7 +575,8 @@ void wxGISToolBar::Deactivate(void)
 {
 	for(std::map<size_t, IToolBarControl*>::const_iterator IT = m_RemControlMap.begin(); IT != m_RemControlMap.end(); ++IT)
 	{
-		IT->second->Deactivate();
+		if(IT->second) 
+            IT->second->Deactivate();
 	}
 }
 

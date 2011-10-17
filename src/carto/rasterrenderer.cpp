@@ -641,21 +641,12 @@ wxColor wxGISRasterRasterColormapRenderer::CMYKtoRGB( const short &c, const shor
 	return wxColor(nR, nG, nB);
 }
 
-const wxColor *wxGISRasterRasterColormapRenderer::GetColorByIndex(int nIndex)
-{
-    //wxCHECK(nIndex < m_mColorTable.size() && nIndex >= 0, NULL);
-    return &m_mColorTable[nIndex];
-}
-
 //-----------------------------------
 // wxGISRasterGreyScaleRenderer
 //-----------------------------------
 
 wxGISRasterGreyScaleRenderer::wxGISRasterGreyScaleRenderer(void) : wxGISRasterRenderer()
 {
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	wxString sAppName = GetApplication()->GetAppName();
-
 	m_nBand = 1;
 }
 
@@ -764,6 +755,11 @@ void wxGISRasterGreyScaleRenderer::FillPixel(unsigned char* pOutputData, const d
 	//pOutputData[2] = 255;	//	G	R
 	//pOutputData[3] = 255;	//	B	A
 
+    //wxColor color((unsigned long)*pSrcValR);
+    //int nR = color.Red();
+    //int nG = color.Green();
+    //int nB = color.Blue();
+
 	pOutputData[3] = 255;
 	unsigned char RPixVal = m_oStretch.GetValue(pSrcValR);
 	pOutputData[2] = RPixVal;
@@ -795,6 +791,131 @@ void wxGISRasterGreyScaleRenderer::FillPixel(unsigned char* pOutputData, const d
 	//	return;
 	//}
 }
+
+//-----------------------------------
+// wxGISRasterPackedRGBARenderer
+//-----------------------------------
+
+wxGISRasterPackedRGBARenderer::wxGISRasterPackedRGBARenderer(void)
+{
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	wxString sAppName = GetApplication()->GetAppName();
+
+    m_bNodataNewBehaviour = pConfig->ReadBool(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/nodata_newbehaviour")), true);
+
+	m_eQuality = (wxGISEnumDrawQuality)pConfig->ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/quality")), enumGISQualityBilinear);	//wxString(wxT("wxGISCommon/coordinate_mask")));
+
+	m_oNoDataColor = wxColor(0,0,0,0);
+	m_nBand = 1;
+}
+
+wxGISRasterPackedRGBARenderer::~wxGISRasterPackedRGBARenderer(void)
+{
+}
+
+bool wxGISRasterPackedRGBARenderer::CanRender(wxGISDatasetSPtr pDataset)
+{
+	return pDataset->GetType() == enumGISRasterDataset ? true : false;
+}
+
+void wxGISRasterPackedRGBARenderer::OnFillStats(void)
+{
+	GDALDataset* poGDALDataset = m_pwxGISRasterDataset->GetMainRaster();
+	if(!poGDALDataset)
+		poGDALDataset = m_pwxGISRasterDataset->GetRaster();
+	if(!poGDALDataset)
+		return;
+	
+	//set min/max values
+	//set nodata color for each band
+	if(m_pwxGISRasterDataset->HasStatistics())
+	{
+        double dfMin, dfMax, dfMean, dfStdDev;
+		GDALRasterBand* pBand = poGDALDataset->GetRasterBand(m_nBand);
+ 
+        if(pBand->GetStatistics(FALSE, FALSE, &dfMin, &dfMax, &dfMean, &dfStdDev) == CE_None)
+        {
+            int x = 0;
+            //m_oStretch.SetStats(dfMin, dfMax, dfMean, dfStdDev);
+        }
+
+        if(m_pwxGISRasterDataset->HasNoData(m_nBand) )
+        {
+            int x = 0;
+            //m_oStretch.SetNoData(m_pwxGISRasterDataset->GetNoData(m_nBand));
+        }
+	}	
+}
+
+void wxGISRasterPackedRGBARenderer::FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA)
+{
+	if(pSrcValR == NULL)
+		return;
+	//wxBYTE_ORDER          //      x
+	//pOutputData[0] = 0;	//	A	B
+	//pOutputData[1] = 0;	//	R	G
+	//pOutputData[2] = 255;	//	G	R
+	//pOutputData[3] = 255;	//	B	A
+
+	if(pSrcValA == NULL)
+		pOutputData[3] = 255;
+	else
+		pOutputData[3] = m_oStretch.GetValue(pSrcValA);
+    
+	unsigned char RPixVal = m_oStretch.GetValue(pSrcValR);
+	pOutputData[2] = RPixVal;
+
+	if(pSrcValG == NULL || pSrcValB == NULL)
+	{
+		pOutputData[1] = RPixVal;
+		pOutputData[0] = RPixVal;
+	}
+	else
+	{
+		pOutputData[1] = m_oStretch.GetValue(pSrcValG);
+		pOutputData[0] = m_oStretch.GetValue(pSrcValB);
+	}
+
+	//check for nodata
+	bool bIsChanged(false);
+	if(m_bNodataNewBehaviour)
+	{
+        if(m_oStretch.IsNoData(pOutputData[2]) && m_oStretch.IsNoData(pOutputData[1]) && m_oStretch.IsNoData(pOutputData[0]))
+		{
+			bIsChanged = true;
+			pOutputData[3] = m_oNoDataColor.Alpha();
+			pOutputData[2] = m_oNoDataColor.Red();
+			pOutputData[1] = m_oNoDataColor.Green();
+			pOutputData[0] = m_oNoDataColor.Blue();
+		}
+	}
+	else
+	{
+        if(m_oStretch.IsNoData(pOutputData[2]) || m_oStretch.IsNoData(pOutputData[1]) || m_oStretch.IsNoData(pOutputData[0]))
+		{
+			bIsChanged = true;
+			pOutputData[3] = m_oNoDataColor.Alpha();
+			pOutputData[2] = m_oNoDataColor.Red();
+			pOutputData[1] = m_oNoDataColor.Green();
+			pOutputData[0] = m_oNoDataColor.Blue();
+		}
+	}
+
+	if(bIsChanged)
+		return;
+
+	//check for background data
+
+	//if(RPixVal > 128)
+	//{
+	//	pOutputData[0] = 0;
+	//	pOutputData[1] = 0;
+	//	pOutputData[2] = 0;
+	//	pOutputData[3] = 0;
+	//	return;
+	//}
+}
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

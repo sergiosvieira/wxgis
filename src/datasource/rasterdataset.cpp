@@ -106,6 +106,14 @@ char **wxGISRasterDataset::GetFileList()
 		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
 			papszFileList = CSLAddString( papszFileList, szPath );
 		break;
+	case enumRasterSAGA:
+		szPath = (char*)CPLResetExtension(m_sPath, "sgrd");
+		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+			papszFileList = CSLAddString( papszFileList, szPath );
+		szPath = (char*)CPLResetExtension(m_sPath, "mgrd");
+		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+			papszFileList = CSLAddString( papszFileList, szPath );
+		break;
     case enumRasterBmp:
 	case enumRasterImg:
 	case enumRasterPng:
@@ -191,6 +199,8 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
             return false;
 		}
     }
+
+    //TODO: write some internal info to files (e.g. sgrd mgrd -> new file name
     
 	m_sPath = CPLString(CPLFormFilename(szDirPath, szNewName, CPLGetExtension(m_sPath)));
 	CSLDestroy( papszFileList );

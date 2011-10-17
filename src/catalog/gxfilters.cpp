@@ -405,6 +405,8 @@ wxString wxGxRasterFilter::GetName(void)
 	    return wxString(_("Portable Network Graphics (*.png)"));
     case enumRasterGif:
 	    return wxString(_("Graphics Interchange Format (*.gif)"));
+    case enumRasterSAGA:
+	    return wxString(_("SAGA GIS Binary Grid (*.sdat)"));
     case enumRasterTil:
 	    return wxString(_("EarthWatch raster (*.til)"));
 	default:
@@ -428,6 +430,8 @@ wxString wxGxRasterFilter::GetExt(void)
 	    return wxString(wxT("png"));
     case enumRasterGif:
 	    return wxString(wxT("gif"));
+    case enumRasterSAGA:
+	    return wxString(wxT("sdat"));
     case enumRasterTil:
 	    return wxString(wxT("til"));
  	default:
@@ -451,6 +455,8 @@ wxString wxGxRasterFilter::GetDriver(void)
 	    return wxString(wxT("PNG"));
     case enumRasterGif:
 	    return wxString(wxT("GIF"));
+    case enumRasterSAGA:
+	    return wxString(wxT("SAGA"));
     case enumRasterTil:
 	    return wxString(wxT("TIL"));
 	default:
