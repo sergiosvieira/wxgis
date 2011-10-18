@@ -213,30 +213,19 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
     {
 	case enumRasterSAGA://write some internal info to files (e.g. sgrd mgrd -> new file name
         {
-            bool bSave(false);
             CPLString sMGRDFileName(CPLFormFilename(szDirPath, szNewName, "mgrd"));
             CPLXMLNode *psXMLRoot = CPLParseXMLFile(sMGRDFileName);
             if(psXMLRoot)
             {
-                CPLXMLNode *pNode = psXMLRoot->psNext;
+                CPLXMLNode *pNode = psXMLRoot->psNext;//SAGA_METADATA
                 bRet = CPLSetXMLValue(pNode, "SOURCE.FILE", CPLFormFilename(szDirPath, szNewName, "sgrd"));
-
-                //for( pNode = psXMLRoot->psChild; pNode != NULL; pNode = pNode->psNext )
-                //{
-                //    if( !EQUAL(pNode->pszValue,"SOURCE") )
-                //        continue;
-
-                //    bRet = CPLSetXMLValue(pNode, "FILE", CPLFormFilename(szDirPath, szNewName, "sgrd"));
-                    if(bRet)//SAGA_METADATA.
-                        bRet = CPLSerializeXMLTreeToFile(psXMLRoot, sMGRDFileName);
-                //    break;
-                //}
+                if(bRet)
+                    bRet = CPLSerializeXMLTreeToFile(psXMLRoot, sMGRDFileName);
                 CPLDestroyXMLNode( psXMLRoot );
             }
             CPLString sSGRDFileName(CPLFormFilename(szDirPath, szNewName, "sgrd"));
             char** papszNameValues = CSLLoad(sSGRDFileName);
             papszNameValues[0] = (char*)CPLSPrintf("NAME\t= %s", szNewName.c_str() );
-            //papszNameValues = CSLSetNameValue(papszNameValues, "NAME", szNewName);
             bRet = CSLSave(papszNameValues, sSGRDFileName);
 
         }
@@ -477,11 +466,32 @@ bool wxGISRasterDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
 		}
     }
     
+    bool bRet = true;
+    switch(m_nSubType)
+    {
+	case enumRasterSAGA://write some internal info to files (e.g. sgrd mgrd -> new file name
+        {
+            CPLString sMGRDFileName(CPLFormFilename(szDestPath, CPLGetFilename(szCopyFileName), "mgrd"));
+            CPLXMLNode *psXMLRoot = CPLParseXMLFile(sMGRDFileName);
+            if(psXMLRoot)
+            {
+                CPLXMLNode *pNode = psXMLRoot->psNext;//SAGA_METADATA
+                bRet = CPLSetXMLValue(pNode, "SOURCE.FILE", CPLFormFilename(szDestPath, CPLGetFilename(szCopyFileName), "sgrd"));
+                if(bRet)
+                    bRet = CPLSerializeXMLTreeToFile(psXMLRoot, sMGRDFileName);
+                CPLDestroyXMLNode( psXMLRoot );
+            }
+        }
+		break;
+    default:
+		break;
+    };
+
     m_sPath = szCopyFileName;
 
 	CSLDestroy( papszFileList );
 	CSLDestroy( papszFileCopiedList );
-	return true;
+	return bRet;
 }
 
 bool wxGISRasterDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
@@ -515,11 +525,32 @@ bool wxGISRasterDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
 		}
     }
 
+    bool bRet = true;
+    switch(m_nSubType)
+    {
+	case enumRasterSAGA://write some internal info to files (e.g. sgrd mgrd -> new file name
+        {
+            CPLString sMGRDFileName(CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), "mgrd"));
+            CPLXMLNode *psXMLRoot = CPLParseXMLFile(sMGRDFileName);
+            if(psXMLRoot)
+            {
+                CPLXMLNode *pNode = psXMLRoot->psNext;//SAGA_METADATA
+                bRet = CPLSetXMLValue(pNode, "SOURCE.FILE", CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), "sgrd"));
+                if(bRet)
+                    bRet = CPLSerializeXMLTreeToFile(psXMLRoot, sMGRDFileName);
+                CPLDestroyXMLNode( psXMLRoot );
+            }
+        }
+		break;
+    default:
+		break;
+    };
+
     m_sPath = CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL);
 
 	CSLDestroy( papszFileList );
 	CSLDestroy( papszMovedFileList );
-    return true;
+    return bRet;
 }
 
 bool wxGISRasterDataset::GetPixelData(void *data, int nXOff, int nYOff, int nXSize, int nYSize, int nBufXSize, int nBufYSize, GDALDataType eDT, int nBandCount, int *panBandList)
