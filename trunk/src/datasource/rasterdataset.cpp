@@ -190,21 +190,65 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
     if(!papszFileList)
         return false;
 
+    char **papszNewFileList = NULL;
+
     for(int i = 0; papszFileList[i] != NULL; ++i )
     {		
         CPLString szNewPath(CPLFormFilename(szDirPath, szNewName, GetExtension(papszFileList[i], szName)));
-        if(!RenameFile(papszFileList[i], szNewPath))
+        papszNewFileList = CSLAddString(papszNewFileList, szNewPath);
+        if(!RenameFile(papszFileList[i], papszNewFileList[i]))
 		{
-			CSLDestroy( papszFileList );
+            // Try to put the ones we moved back. 
+            for( --i; i >= 0; i-- )
+                RenameFile( papszNewFileList[i], papszFileList[i]);
+
+ 			CSLDestroy( papszFileList );
+			CSLDestroy( papszNewFileList );
             return false;
 		}
     }
 
-    //TODO: write some internal info to files (e.g. sgrd mgrd -> new file name
+    bool bRet = true;
+    switch(m_nSubType)
+    {
+	case enumRasterSAGA://write some internal info to files (e.g. sgrd mgrd -> new file name
+        {
+            bool bSave(false);
+            CPLString sMGRDFileName(CPLFormFilename(szDirPath, szNewName, "mgrd"));
+            CPLXMLNode *psXMLRoot = CPLParseXMLFile(sMGRDFileName);
+            if(psXMLRoot)
+            {
+                CPLXMLNode *pNode = psXMLRoot->psNext;
+                bRet = CPLSetXMLValue(pNode, "SOURCE.FILE", CPLFormFilename(szDirPath, szNewName, "sgrd"));
+
+                //for( pNode = psXMLRoot->psChild; pNode != NULL; pNode = pNode->psNext )
+                //{
+                //    if( !EQUAL(pNode->pszValue,"SOURCE") )
+                //        continue;
+
+                //    bRet = CPLSetXMLValue(pNode, "FILE", CPLFormFilename(szDirPath, szNewName, "sgrd"));
+                    if(bRet)//SAGA_METADATA.
+                        bRet = CPLSerializeXMLTreeToFile(psXMLRoot, sMGRDFileName);
+                //    break;
+                //}
+                CPLDestroyXMLNode( psXMLRoot );
+            }
+            CPLString sSGRDFileName(CPLFormFilename(szDirPath, szNewName, "sgrd"));
+            char** papszNameValues = CSLLoad(sSGRDFileName);
+            papszNameValues[0] = (char*)CPLSPrintf("NAME\t= %s", szNewName.c_str() );
+            //papszNameValues = CSLSetNameValue(papszNameValues, "NAME", szNewName);
+            bRet = CSLSave(papszNameValues, sSGRDFileName);
+
+        }
+		break;
+    default:
+		break;
+    };
     
 	m_sPath = CPLString(CPLFormFilename(szDirPath, szNewName, CPLGetExtension(m_sPath)));
 	CSLDestroy( papszFileList );
-	return true;
+	CSLDestroy( papszNewFileList );
+	return bRet;
 }
 
 bool wxGISRasterDataset::Open(bool bReadOnly)
@@ -414,13 +458,21 @@ bool wxGISRasterDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
     CPLString szCopyFileName;
 	CPLString szFileName = CPLGetBasename(m_sPath);
 
+    char** papszFileCopiedList = NULL;
+
     for(int i = 0; papszFileList[i] != NULL; ++i )
     {
 		CPLString szNewDestFileName = GetUniqPath(papszFileList[i], szDestPath, szFileName);
+        papszFileCopiedList = CSLAddString(papszFileCopiedList, szNewDestFileName);
         szCopyFileName = szNewDestFileName;
         if(!CopyFile(szNewDestFileName, papszFileList[i], pTrackCancel))
 		{
+            // Try to put the ones we moved back. 
+            for( --i; i >= 0; i-- )
+                DeleteFile( papszFileCopiedList[i] );
+
 			CSLDestroy( papszFileList );
+			CSLDestroy( papszFileCopiedList );
             return false;
 		}
     }
@@ -428,6 +480,7 @@ bool wxGISRasterDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
     m_sPath = szCopyFileName;
 
 	CSLDestroy( papszFileList );
+	CSLDestroy( papszFileCopiedList );
 	return true;
 }
 
@@ -443,12 +496,21 @@ bool wxGISRasterDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
 
 	CPLString szFileName = CPLGetBasename(m_sPath);
 
+    char** papszMovedFileList = NULL;
+
     for(int i = 0; papszFileList[i] != NULL; ++i )
     {
 		CPLString szNewDestFileName = GetUniqPath(papszFileList[i], szDestPath, szFileName);
+        papszMovedFileList = CSLAddString(papszMovedFileList, szNewDestFileName);
         if(!MoveFile(szNewDestFileName, papszFileList[i], pTrackCancel))
 		{
+            // Try to put the ones we moved back. 
+            pTrackCancel->Reset();
+            for( --i; i >= 0; i-- )
+                MoveFile( papszFileList[i], papszMovedFileList[i], pTrackCancel);
+
 			CSLDestroy( papszFileList );
+			CSLDestroy( papszMovedFileList );
             return false;
 		}
     }
@@ -456,6 +518,7 @@ bool wxGISRasterDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     m_sPath = CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL);
 
 	CSLDestroy( papszFileList );
+	CSLDestroy( papszMovedFileList );
     return true;
 }
 
