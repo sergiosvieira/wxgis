@@ -702,13 +702,21 @@ bool wxGISTable::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
     CPLString szCopyFileName;
 	CPLString szFileName = CPLGetBasename(m_sPath);
 
+    char** papszFileCopiedList = NULL;
+
     for(int i = 0; papszFileList[i] != NULL; ++i )
     {
 		CPLString szNewDestFileName = GetUniqPath(papszFileList[i], szDestPath, szFileName);
+        papszFileCopiedList = CSLAddString(papszFileCopiedList, szNewDestFileName);
         szCopyFileName = szNewDestFileName;
         if(!CopyFile(szNewDestFileName, papszFileList[i], pTrackCancel))
 		{
+            // Try to put the ones we moved back. 
+            for( --i; i >= 0; i-- )
+                DeleteFile( papszFileCopiedList[i] );
+
 			CSLDestroy( papszFileList );
+			CSLDestroy( papszFileCopiedList );
             return false;
 		}
     }
@@ -716,6 +724,7 @@ bool wxGISTable::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
     m_sPath = szCopyFileName;
 
 	CSLDestroy( papszFileList );
+	CSLDestroy( papszFileCopiedList );
 	return true;
 }
 
@@ -731,12 +740,21 @@ bool wxGISTable::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
 
 	CPLString szFileName = CPLGetBasename(m_sPath);
 
+    char** papszMovedFileList = NULL;
+
 	for(int i = 0; papszFileList[i] != NULL; ++i )
     {
 		CPLString szNewDestFileName = GetUniqPath(papszFileList[i], szDestPath, szFileName);
+        papszMovedFileList = CSLAddString(papszMovedFileList, szNewDestFileName);
         if(!MoveFile(szNewDestFileName, papszFileList[i], pTrackCancel))
 		{
+            // Try to put the ones we moved back. 
+            pTrackCancel->Reset();
+            for( --i; i >= 0; i-- )
+                MoveFile( papszFileList[i], papszMovedFileList[i], pTrackCancel);
+
 			CSLDestroy( papszFileList );
+			CSLDestroy( papszMovedFileList );
             return false;
 		}
     }
@@ -744,6 +762,7 @@ bool wxGISTable::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     m_sPath = CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL);
 
 	CSLDestroy( papszFileList );
+	CSLDestroy( papszMovedFileList );
     return true;
 }
 
@@ -841,21 +860,30 @@ bool wxGISTable::Rename(wxString sNewName)
     if(!papszFileList)
         return false;
 
+    char **papszNewFileList = NULL;
+
 	Close();
 
     for(int i = 0; papszFileList[i] != NULL; ++i )
     {		
         CPLString szNewPath(CPLFormFilename(szDirPath, szNewName, GetExtension(papszFileList[i], szName)));
-        if(!RenameFile(papszFileList[i], szNewPath))
-		{
-			CSLDestroy( papszFileList );
+        papszNewFileList = CSLAddString(papszNewFileList, szNewPath);
+        if(!RenameFile(papszFileList[i], papszNewFileList[i]))
+        {
+            // Try to put the ones we moved back. 
+            for( --i; i >= 0; i-- )
+                RenameFile( papszNewFileList[i], papszFileList[i]);
+
+ 			CSLDestroy( papszFileList );
+			CSLDestroy( papszNewFileList );
             return false;
-		}
+        }
     }
     
 	m_sPath = CPLString(CPLFormFilename(szDirPath, szNewName, CPLGetExtension(m_sPath)));
 
 	CSLDestroy( papszFileList );
+	CSLDestroy( papszNewFileList );
 	return true;
 }
 
