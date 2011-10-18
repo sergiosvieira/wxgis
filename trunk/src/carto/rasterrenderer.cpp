@@ -820,31 +820,31 @@ bool wxGISRasterPackedRGBARenderer::CanRender(wxGISDatasetSPtr pDataset)
 
 void wxGISRasterPackedRGBARenderer::OnFillStats(void)
 {
-	GDALDataset* poGDALDataset = m_pwxGISRasterDataset->GetMainRaster();
-	if(!poGDALDataset)
-		poGDALDataset = m_pwxGISRasterDataset->GetRaster();
-	if(!poGDALDataset)
-		return;
-	
-	//set min/max values
-	//set nodata color for each band
-	if(m_pwxGISRasterDataset->HasStatistics())
-	{
-        double dfMin, dfMax, dfMean, dfStdDev;
-		GDALRasterBand* pBand = poGDALDataset->GetRasterBand(m_nBand);
- 
-        if(pBand->GetStatistics(FALSE, FALSE, &dfMin, &dfMax, &dfMean, &dfStdDev) == CE_None)
-        {
-            int x = 0;
-            //m_oStretch.SetStats(dfMin, dfMax, dfMean, dfStdDev);
-        }
+	//GDALDataset* poGDALDataset = m_pwxGISRasterDataset->GetMainRaster();
+	//if(!poGDALDataset)
+	//	poGDALDataset = m_pwxGISRasterDataset->GetRaster();
+	//if(!poGDALDataset)
+	//	return;
+	//
+	////set min/max values
+	////set nodata color for each band
+	//if(m_pwxGISRasterDataset->HasStatistics())
+	//{
+ //       double dfMin, dfMax, dfMean, dfStdDev;
+	//	GDALRasterBand* pBand = poGDALDataset->GetRasterBand(m_nBand);
+ //
+ //       if(pBand->GetStatistics(FALSE, FALSE, &dfMin, &dfMax, &dfMean, &dfStdDev) == CE_None)
+ //       {
+ //           int x = 0;
+ //           //m_oStretch.SetStats(dfMin, dfMax, dfMean, dfStdDev);
+ //       }
 
-        if(m_pwxGISRasterDataset->HasNoData(m_nBand) )
-        {
-            int x = 0;
-            //m_oStretch.SetNoData(m_pwxGISRasterDataset->GetNoData(m_nBand));
-        }
-	}	
+ //       if(m_pwxGISRasterDataset->HasNoData(m_nBand) )
+ //       {
+ //           int x = 0;
+ //           //m_oStretch.SetNoData(m_pwxGISRasterDataset->GetNoData(m_nBand));
+ //       }
+	//}	
 }
 
 void wxGISRasterPackedRGBARenderer::FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA)
