@@ -457,13 +457,13 @@ void wxGISDisplay::InitTransformMatrix(void)
 	//get scale
 	double dScaleX = fabs(m_dFrameCenterX / dWorldCenterX);
 	double dScaleY = fabs(m_dFrameCenterY / dWorldCenterY);
-	double dScale = std::min(dScaleX, dScaleY);
+	m_dScale = std::min(dScaleX, dScaleY);
 
 	double dWorldDeltaX = dWorldCenterX + m_CurrentBounds.MinX;
 	double dWorldDeltaY = dWorldCenterY + m_CurrentBounds.MinY;
 
-	double dWorldDeltaXSt = dScale * dWorldDeltaX;// + m_dAngleRad * dWorldDeltaY;
-	double dWorldDeltaYSt = dScale * dWorldDeltaY;//m_dAngleRad * dWorldDeltaX + 
+	double dWorldDeltaXSt = m_dScale * dWorldDeltaX;// + m_dAngleRad * dWorldDeltaY;
+	double dWorldDeltaYSt = m_dScale * dWorldDeltaY;//m_dAngleRad * dWorldDeltaX + 
 
 	double dCenterX = m_dCacheCenterX - dWorldDeltaXSt;//(dWorldCenterX + m_CurrentBounds.MinX) * dScale;//
 	double dCenterY = m_dCacheCenterY + dWorldDeltaYSt;//(dWorldCenterY + m_CurrentBounds.MinY) * dScale;//
@@ -484,19 +484,19 @@ void wxGISDisplay::InitTransformMatrix(void)
 	//else
 	cairo_matrix_translate(m_pMatrix, -dWorldDeltaXSt, dWorldDeltaYSt);
 
-	cairo_matrix_scale(m_pMatrix, dScale, -dScale);
+	cairo_matrix_scale(m_pMatrix, m_dScale, -m_dScale);
 
 	//init matrix for Wld2DC & DC2Wld
 	cairo_matrix_init_translate (m_pDisplayMatrix, m_dFrameCenterX, m_dFrameCenterY); 
 	if(!IsDoubleEquil(m_dAngleRad, 0.0))
 		cairo_matrix_rotate(m_pDisplayMatrix, m_dAngleRad);
 	cairo_matrix_translate(m_pDisplayMatrix, -dWorldDeltaXSt, dWorldDeltaYSt);
-	cairo_matrix_scale(m_pDisplayMatrix, dScale, -dScale);
+	cairo_matrix_scale(m_pDisplayMatrix, m_dScale, -m_dScale);
 
 	//init matrix for TransformRect
 	cairo_matrix_init_translate (m_pDisplayMatrixNoRotate, m_dFrameCenterX, m_dFrameCenterY); 
 	cairo_matrix_translate(m_pDisplayMatrixNoRotate, -dWorldDeltaXSt, dWorldDeltaYSt);
-	cairo_matrix_scale(m_pDisplayMatrixNoRotate, dScale, -dScale);
+	cairo_matrix_scale(m_pDisplayMatrixNoRotate, m_dScale, -m_dScale);
 
 	//set matrix to all caches
 	for(size_t i = 0; i < m_saLayerCaches.size(); ++i)
@@ -760,38 +760,40 @@ bool wxGISDisplay::CheckDrawAsPoint(const OGRGeometry* pGeometry, bool bCheckEnv
 
 void wxGISDisplay::DrawRaster(cairo_surface_t *surface, OGREnvelope& Envelope)
 {
-//	srand ( time(NULL) );
-//	int random_number1 = (rand() % 50); 
-//	int random_number2 = (rand() % 50); 
-//	int random_number3 = (rand() % 50); 
-//	m_stFillColour.dRed = double(205 + random_number1) / 255;
-//	m_stFillColour.dGreen = double(205 + random_number2) / 255;
-//	m_stFillColour.dBlue = double(205 + random_number3) / 255;
-//	m_stFillColour.dAlpha = 1.0;
-//
-//	SetColor(m_stFillColour);
-//	SetLineCap(CAIRO_LINE_CAP_ROUND);
-//	SetLineWidth(1.5);
-//	//SetPointRadius(5);
-//	cairo_set_line_width(m_saLayerCaches[m_nCurrentLayer].pCairoContext, m_dPointRadius + m_dPointRadius + m_dLineWidth);
-//	//DrawPointFast(dXOrigin, dYOrigin);
-//	//cairo_stroke (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
-//
-//	//cairo_translate (m_saLayerCaches[m_nCurrentLayer].pCairoContext, dXOrigin, dYOrigin);
-//
-//
-//	cairo_rectangle (m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MinX, Envelope.MinY, Envelope.MaxX - Envelope.MinX, Envelope.MaxY - Envelope.MinY);
-//	cairo_stroke (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
 
 	cairo_pattern_t *pattern = cairo_pattern_create_for_surface (surface);
 //	cairo_pattern_set_extend (pattern, CAIRO_EXTEND_REPEAT);
 	cairo_matrix_t   matrix;
-	double nPatternScaleX = m_pMatrix->xx;//1 / 
-	double nPatternScaleY = m_pMatrix->yy;//1 / 
+	//double nPatternScaleX = m_pMatrix->xx;//m_pMatrix->xx;//1 / 
+	//double nPatternScaleY = m_pMatrix->yy;//m_pMatrix->yy;//1 / 
 	//cairo_matrix_init_translate(&matrix, -Envelope.MinX, -Envelope.MinY);
 
-	cairo_matrix_init_scale (&matrix, nPatternScaleX, nPatternScaleY);
+	//cairo_matrix_init_scale (&matrix, nPatternScaleX, nPatternScaleY);
+	cairo_matrix_init_scale (&matrix, m_dScale, -m_dScale);
+
+	//rotate
+	//if(!IsDoubleEquil(m_dAngleRad, 0.0))
+	//	cairo_matrix_rotate(&matrix, -m_dAngleRad);
+	//cairo_matrix_translate(m_pMatrix, -dWorldDeltaXSt, dWorldDeltaYSt);
+
+	//cairo_matrix_scale(m_pMatrix, dScale, -dScale);
+
+
+	//cairo_matrix_init_translate (&matrix, -m_dCacheCenterX, -m_dCacheCenterY); 
+	////rotate
+	//if(!IsDoubleEquil(m_dAngleRad, 0.0))
+	//	cairo_matrix_rotate(m_pMatrix, -m_dAngleRad);
+	////cairo_matrix_translate(m_pMatrix, -dWorldDeltaXSt, dWorldDeltaYSt);
+	//cairo_matrix_translate(&matrix, -Envelope.MinX, -Envelope.MaxY);
+
+	//cairo_matrix_scale(&matrix, m_dScale, m_dScale);
+
+
 	cairo_matrix_translate(&matrix, -Envelope.MinX, -Envelope.MaxY);
+
+	//rotate
+	if(!IsDoubleEquil(m_dAngleRad, 0.0))
+		cairo_matrix_rotate(&matrix, m_dAngleRad);
 
 	cairo_pattern_set_matrix (pattern, &matrix);
 	//cairo_pattern_set_filter (pattern, CAIRO_FILTER_FAST);

@@ -145,6 +145,7 @@ protected:
 	double m_dPointRadius;
 	double m_dLineWidth;
 	double m_dFrameRatio;
+    double m_dScale;
 
 	//temp cairo for output double buffering
 	cairo_surface_t *m_surface_tmp;
