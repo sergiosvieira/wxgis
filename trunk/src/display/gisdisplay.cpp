@@ -760,71 +760,91 @@ bool wxGISDisplay::CheckDrawAsPoint(const OGRGeometry* pGeometry, bool bCheckEnv
 
 void wxGISDisplay::DrawRaster(cairo_surface_t *surface, OGREnvelope& Envelope)
 {
-	cairo_pattern_t *pattern = cairo_pattern_create_for_surface (surface);
-	cairo_pattern_set_extend (pattern, CAIRO_EXTEND_REPEAT);
-	cairo_matrix_t   matrix;
+	srand ( time(NULL) );
+	int random_number1 = (rand() % 50); 
+	int random_number2 = (rand() % 50); 
+	int random_number3 = (rand() % 50); 
+	m_stFillColour.dRed = double(205 + random_number1) / 255;
+	m_stFillColour.dGreen = double(205 + random_number2) / 255;
+	m_stFillColour.dBlue = double(205 + random_number3) / 255;
+	m_stFillColour.dAlpha = 1.0;
 
-	////double dfW = (cairo_image_surface_get_width (surface)) / 2;
-	////double dfH = (cairo_image_surface_get_height (surface)) / 2;
-	//double dfXDist = (Envelope.MaxX - Envelope.MinX) / 2;
-	//double dfYDist = (Envelope.MaxY - Envelope.MinY) / 2;
-	//double dfImgXCenter = Envelope.MinX + dfXDist;
-	//double dfImgYCenter = Envelope.MinY + dfYDist;
-	//double dfK = 1 / cos(m_dAngleRad);
-	double nPatternScaleX = m_pMatrix->xx;//m_pMatrix->xx;//1 / 
-	double nPatternScaleY = m_pMatrix->yy;//m_pMatrix->yy;//1 / 
+    cairo_pattern_t *pattern = cairo_pattern_create_for_surface (surface);
+	////cairo_pattern_set_extend (pattern, CAIRO_EXTEND_REPEAT);
+	//cairo_matrix_t   matrix;
+	//double dWorldCenterX = (m_CurrentBounds.MaxX - m_CurrentBounds.MinX) / 2;
+	//double dWorldCenterY = (m_CurrentBounds.MaxY - m_CurrentBounds.MinY) / 2;
 
-	cairo_matrix_init_scale(&matrix, nPatternScaleX, nPatternScaleY);
-
-	//cairo_matrix_translate (&matrix, -dfImgXCenter, -dfImgYCenter); 
-	////rotate
-	//if(!IsDoubleEquil(m_dAngleRad, 0.0))
-	//	cairo_matrix_rotate(&matrix, m_dAngleRad);
-
-	//cairo_matrix_translate(&matrix, dfXDist, -dfYDist);
-
+	//////double dfW = (cairo_image_surface_get_width (surface)) / 2;
+	//////double dfH = (cairo_image_surface_get_height (surface)) / 2;
+	////double dfXDist = (Envelope.MaxX - Envelope.MinX) / 2;
+	////double dfYDist = (Envelope.MaxY - Envelope.MinY) / 2;
+	////double dfImgXCenter = Envelope.MinX + dfXDist;
+	////double dfImgYCenter = Envelope.MinY + dfYDist;
+	////double dfK = 1 / cos(m_dAngleRad);
 	////double nPatternScaleX = m_pMatrix->xx;//m_pMatrix->xx;//1 / 
 	////double nPatternScaleY = m_pMatrix->yy;//m_pMatrix->yy;//1 / 
-	////cairo_matrix_init_translate(&matrix, -Envelope.MinX, -Envelope.MinY);
-
-	////cairo_matrix_init_scale (&matrix, nPatternScaleX, nPatternScaleY);
-	////cairo_matrix_init_scale (&matrix, m_dScale, -m_dScale);
-	////cairo_matrix_init_translate(&matrix, dfImgXCenter, dfImgYCenter);
-
-	////rotate
+	//
+ //   cairo_matrix_init_translate (&matrix, dWorldCenterX, dWorldCenterY); 
 	//if(!IsDoubleEquil(m_dAngleRad, 0.0))
-	//	cairo_matrix_rotate(&matrix, -m_dAngleRad);
-	////cairo_matrix_translate(m_pMatrix, -dWorldDeltaXSt, dWorldDeltaYSt);
+ //       cairo_matrix_rotate(&matrix, m_dAngleRad);
 
-	//cairo_matrix_scale(m_pMatrix, m_dScale, -m_dScale);
+	//cairo_matrix_translate(&matrix, m_CurrentBounds.MinX, m_CurrentBounds.MinY);
+	//cairo_matrix_translate(&matrix, -Envelope.MinX, -Envelope.MaxY);
+	////cairo_matrix_init_scale(&matrix, nPatternScaleX, nPatternScaleY);
+	//cairo_matrix_scale(&matrix, m_dScale, -m_dScale);
 
-
-	////cairo_matrix_init_translate (&matrix, -m_dCacheCenterX, -m_dCacheCenterY); 
+	////cairo_matrix_translate (&matrix, -dfImgXCenter, -dfImgYCenter); 
 	//////rotate
 	////if(!IsDoubleEquil(m_dAngleRad, 0.0))
-	////	cairo_matrix_rotate(m_pMatrix, -m_dAngleRad);
+	////	cairo_matrix_rotate(&matrix, m_dAngleRad);
+
+	////cairo_matrix_translate(&matrix, dfXDist, -dfYDist);
+
+	//////double nPatternScaleX = m_pMatrix->xx;//m_pMatrix->xx;//1 / 
+	//////double nPatternScaleY = m_pMatrix->yy;//m_pMatrix->yy;//1 / 
+	//////cairo_matrix_init_translate(&matrix, -Envelope.MinX, -Envelope.MinY);
+
+	//////cairo_matrix_init_scale (&matrix, nPatternScaleX, nPatternScaleY);
+	//////cairo_matrix_init_scale (&matrix, m_dScale, -m_dScale);
+	//////cairo_matrix_init_translate(&matrix, dfImgXCenter, dfImgYCenter);
+
+	//////rotate
+	////if(!IsDoubleEquil(m_dAngleRad, 0.0))
+	////	cairo_matrix_rotate(&matrix, -m_dAngleRad);
 	//////cairo_matrix_translate(m_pMatrix, -dWorldDeltaXSt, dWorldDeltaYSt);
+
+	////cairo_matrix_scale(m_pMatrix, m_dScale, -m_dScale);
+
+
+	//////cairo_matrix_init_translate (&matrix, -m_dCacheCenterX, -m_dCacheCenterY); 
+	////////rotate
+	//////if(!IsDoubleEquil(m_dAngleRad, 0.0))
+	//////	cairo_matrix_rotate(m_pMatrix, -m_dAngleRad);
+	////////cairo_matrix_translate(m_pMatrix, -dWorldDeltaXSt, dWorldDeltaYSt);
 	////cairo_matrix_translate(&matrix, -Envelope.MinX, -Envelope.MaxY);
 
-	////cairo_matrix_scale(&matrix, m_dScale, m_dScale);
+	//////cairo_matrix_scale(&matrix, m_dScale, m_dScale);
 
 
-	////cairo_matrix_translate(&matrix, -Envelope.MinX, -Envelope.MaxY);
+	//////cairo_matrix_translate(&matrix, -Envelope.MinX, -Envelope.MaxY);
 
-	////rotate
-	//if(!IsDoubleEquil(m_dAngleRad, 0.0))
-	//	cairo_matrix_rotate(&matrix, m_dAngleRad);
+	//////rotate
+	////if(!IsDoubleEquil(m_dAngleRad, 0.0))
+	////	cairo_matrix_rotate(&matrix, m_dAngleRad);
 
-	cairo_pattern_set_matrix (pattern, &matrix);
-	//cairo_pattern_set_filter (pattern, CAIRO_FILTER_FAST);
+	//cairo_pattern_set_matrix (pattern, &matrix);
+	////cairo_pattern_set_filter (pattern, CAIRO_FILTER_FAST);
 
-	cairo_set_source (m_saLayerCaches[m_nCurrentLayer].pCairoContext, pattern);
+	//cairo_set_source (m_saLayerCaches[m_nCurrentLayer].pCairoContext, pattern);
 
 //	//cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_FAST);
 	//cairo_set_operator (m_saLayerCaches[m_nCurrentLayer].pCairoContext, CAIRO_OPERATOR_SOURCE);
 	//cairo_paint (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
 //
 	cairo_rectangle (m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MinX, Envelope.MinY, Envelope.MaxX, Envelope.MaxY);
+
+    SetColor(m_stFillColour);
 	cairo_fill (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
 	//
 	cairo_pattern_destroy (pattern);
