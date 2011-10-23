@@ -54,7 +54,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxmsw29ud_aui.lib;wxmsw29ud_adv.lib;wxmsw29ud_html.lib;wxgiscpld.lib;wxgisogrd.lib;wxgisgdald.lib;proj4.lib;geos_c.lib;wxGISMapUId.lib;wxGISFrameworkd.lib;wxGISCored.lib;wxGISCartoUId.lib;cairo.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxmsw29ud_aui.lib;wxmsw29ud_adv.lib;wxmsw29ud_html.lib;wxgiscpld.lib;wxgisogrd.lib;wxgisgdald.lib;proj4.lib;geos_c.lib;wxGISMapUId.lib;wxGISFrameworkd.lib;wxGISCored.lib;wxGISCartod.lib;wxGISCartoUId.lib;cairo.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\$(Configuration)\wxGISMap.exe</OutputFile>
       <AdditionalLibraryDirectories>$(PROJ)\wxGIS\lib;$(GEOS)\lib;..\..\lib;$(WXGISGDAL)\lib;$(WXWIDGETS)\lib\vc_dll;$(CAIRO)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>

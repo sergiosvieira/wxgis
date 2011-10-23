@@ -69,14 +69,14 @@ public:
 	virtual wxRect GetDeviceFrame(void);
 	//current draw bounds
 	virtual void SetBounds(OGREnvelope &Env);
-	virtual OGREnvelope GetBounds(void);
+	virtual OGREnvelope GetBounds(bool bRotated = true);
 	//misc
 	virtual void SetRotate(double dAngleRad);
 	virtual double GetRotate(void){return m_dAngleRad;};
 	virtual void DC2World(double* pdX, double* pdY);
 	virtual void World2DC(double* pdX, double* pdY);
-	virtual void DC2WorldDist(double* pdX, double* pdY);
-	virtual void World2DCDist(double* pdX, double* pdY);
+	virtual void DC2WorldDist(double* pdX, double* pdY, bool bRotated = true);
+	virtual void World2DCDist(double* pdX, double* pdY, bool bRotated = true);
 	//
 	virtual void OnEraseBackground(void); //Fill #0 cache of background color
 	virtual void Output(wxDC* pDC, wxGISPointsArray ClipGeometry);
@@ -90,7 +90,7 @@ public:
 	virtual void SetFillRule(cairo_fill_rule_t fill_rule = CAIRO_FILL_RULE_WINDING);
 	//Draw
 	virtual void DrawGeometry(OGRGeometry* poGeometry);
-	virtual void DrawRaster(cairo_surface_t *surface, OGREnvelope& Envelope);
+	virtual void DrawRaster(cairo_surface_t *surface, OGREnvelope& Envelope, bool bDrawEnvelope = false);
 	virtual void ZoomingDraw(wxRect &rc, wxDC* pDC);
 	virtual void WheelingDraw(double dZoom, wxDC* pDC);
 	virtual void PanningDraw(wxCoord x, wxCoord y, wxDC* pDC);

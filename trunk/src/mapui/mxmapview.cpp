@@ -20,6 +20,8 @@
  ****************************************************************************/
 
 #include "wxgis/mapui/mxmapview.h"
+#include "wxgis/carto/featurelayer.h"
+#include "wxgis/carto/rasterlayer.h"
 
 BEGIN_EVENT_TABLE(wxMxMapView, wxGISMapView)
 	EVT_LEFT_DOWN(wxMxMapView::OnMouseDown)
@@ -70,6 +72,36 @@ bool wxMxMapView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 		m_pTrackCancel->SetProgressor(m_pStatusBar->GetAnimation());
 	SetTrackCancel(m_pTrackCancel);
 
+//tetst
+    Clear();
+
+	wxGISRasterDatasetSPtr pGISRasterDataset =  boost::make_shared<wxGISRasterDataset>("D:\\work\\bes.bmp", enumRasterBmp);
+	if(!pGISRasterDataset->IsOpened())
+		pGISRasterDataset->Open(false);
+	if(!pGISRasterDataset->IsCached())
+		pGISRasterDataset->Cache();
+	wxGISRasterLayerSPtr pGISRasterLayer = boost::make_shared<wxGISRasterLayer>(pGISRasterDataset);
+	AddLayer(boost::static_pointer_cast<wxGISLayer>(pGISRasterLayer));
+
+	//wxGISFeatureDatasetSPtr pGISFeatureDataset1 = boost::make_shared<wxGISFeatureDataset>("D:\\work\\Projects\\wxGIS\\gisdata\\continent.shp", enumVecESRIShapefile);
+	//if(!pGISFeatureDataset1->IsOpened())
+	//	pGISFeatureDataset1->Open(0, 0, true, m_pTrackCancel);
+	//if(!pGISFeatureDataset1->IsCached())
+	//	pGISFeatureDataset1->Cache();
+	//wxGISFeatureLayerSPtr pGISFeatureLayer1 = boost::make_shared<wxGISFeatureLayer>(pGISFeatureDataset1);
+	//AddLayer(boost::static_pointer_cast<wxGISLayer>(pGISFeatureLayer1));
+
+	//wxGISFeatureDatasetSPtr pGISFeatureDataset2 = boost::make_shared<wxGISFeatureDataset>("D:\\work\\Projects\\wxGIS\\gisdata\\continent.shp", enumVecESRIShapefile);
+	//if(!pGISFeatureDataset2->IsOpened())
+	//	pGISFeatureDataset2->Open(0, 0, true, m_pTrackCancel);
+	//if(!pGISFeatureDataset2->IsCached())
+	//	pGISFeatureDataset2->Cache();
+	//wxGISFeatureLayerSPtr pGISFeatureLayer2 = boost::make_shared<wxGISFeatureLayer>(pGISFeatureDataset2);
+	//AddLayer(boost::static_pointer_cast<wxGISLayer>(pGISFeatureLayer2));
+
+    SetFullExtent();
+
+//end test
 	return true;
 }
 
