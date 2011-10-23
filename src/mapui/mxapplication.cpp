@@ -44,7 +44,7 @@ bool wxMxApplication::Create(void)
 	m_pMapView = new wxMxMapView(this);
 	//if(m_pMapView->Activate(this, NULL))
  //   {
-        m_mgr.AddPane(m_pMapView, wxAuiPaneInfo().Name(wxT("main_map_window")).CenterPane());//.PaneBorder(true)
+        bool bAdd = m_mgr.AddPane(m_pMapView, wxAuiPaneInfo().Name(wxT("main_map_window")).CenterPane());//.PaneBorder(true)
         RegisterChildWindow(m_pMapView);
 		m_pMapView->Activate(this);
 		//m_pTrackCancel = new ITrackCancel();

@@ -35,9 +35,7 @@ public:
 	~wxGISMapFrame(void);
 //IFrameApplication
 	virtual void OnAppAbout(void);
-private:
-	wxXmlNode* m_pConfXmlNode;
 
-    DECLARE_EVENT_TABLE()
+	DECLARE_EVENT_TABLE()
 };
 

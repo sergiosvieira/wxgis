@@ -191,15 +191,16 @@ bool wxGISRasterLayer::GetPixelData(RAWPIXELDATA &stPixelData, wxGISDisplay *pDi
 	if(!pDisplay)
 		return false;
 	OGREnvelope stRasterExtent = m_pwxGISRasterDataset->GetEnvelope();
-	OGREnvelope stDisplayExtent = pDisplay->GetBounds();
-	//rotate raster extent
-	if(!IsDoubleEquil(pDisplay->GetRotate(), 0.0))
-	{
-		double dCenterX = stDisplayExtent.MinX + (stDisplayExtent.MaxX - stDisplayExtent.MinX) / 2;
-		double dCenterY = stDisplayExtent.MinY + (stDisplayExtent.MaxY - stDisplayExtent.MinY) / 2;
+	OGREnvelope stDisplayExtent = pDisplay->GetBounds(false);
+	OGREnvelope stDisplayExtentRotated = pDisplay->GetBounds(true);
+	////rotate raster extent
+	//if(!IsDoubleEquil(pDisplay->GetRotate(), 0.0))
+	//{
+	//	double dCenterX = stDisplayExtent.MinX + (stDisplayExtent.MaxX - stDisplayExtent.MinX) / 2;
+	//	double dCenterY = stDisplayExtent.MinY + (stDisplayExtent.MaxY - stDisplayExtent.MinY) / 2;
 
-		RotateEnvelope(stRasterExtent, pDisplay->GetRotate(), dCenterX, dCenterY);
-	}
+	//	RotateEnvelope(stRasterExtentRotated, pDisplay->GetRotate(), dCenterX, dCenterY);
+	//}
 
 	//if envelopes don't intersect exit
     if(!stDisplayExtent.Intersects(stRasterExtent))
@@ -210,6 +211,23 @@ bool wxGISRasterLayer::GetPixelData(RAWPIXELDATA &stPixelData, wxGISDisplay *pDi
 	stDrawBounds.Intersect(stDisplayExtent);
 	if(!stDrawBounds.IsInit())
 		return false;
+
+	if(!IsDoubleEquil(pDisplay->GetRotate(), 0.0))
+	{
+		double dCenterX = stDisplayExtent.MinX + (stDisplayExtent.MaxX - stDisplayExtent.MinX) / 2;
+		double dCenterY = stDisplayExtent.MinY + (stDisplayExtent.MaxY - stDisplayExtent.MinY) / 2;
+
+		OGREnvelope stDrawBoundsRotated = stDrawBounds;
+		RotateEnvelope(stDrawBoundsRotated, pDisplay->GetRotate(), dCenterX, dCenterY);
+
+		if(!stDisplayExtent.Contains(stDrawBoundsRotated))
+			stDrawBounds = stDrawBoundsRotated;
+	}
+
+	////check real raster borders
+	//stDrawBounds.Intersect(stRasterExtent);
+	//if(!stDrawBounds.IsInit())
+	//	return false;
 
 	GDALDataset* pRaster = m_pwxGISRasterDataset->GetRaster();
 	//create inverse geo transform to get pixel data
@@ -231,7 +249,7 @@ bool wxGISRasterLayer::GetPixelData(RAWPIXELDATA &stPixelData, wxGISDisplay *pDi
 	double dOutHeight = stDrawBounds.MaxY - stDrawBounds.MinY;
 
 	//get width & height in pixels of draw area
-	pDisplay->World2DCDist(&dOutWidth, &dOutHeight);
+	pDisplay->World2DCDist(&dOutWidth, &dOutHeight, false);
 	if(dOutWidth < 0) dOutWidth *= -1;
 	if(dOutHeight < 0) dOutHeight *= -1;
 

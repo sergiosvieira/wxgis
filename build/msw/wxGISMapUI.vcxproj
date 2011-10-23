@@ -59,7 +59,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxmsw29ud_aui.lib;wxmsw29ud_adv.lib;wxmsw29ud_html.lib;wxmsw29ud_propgrid.lib;wxgiscpld.lib;wxgisogrd.lib;wxgisgdald.lib;wxGISCatalogd.lib;wxGISFrameworkd.lib;wxGISCored.lib;wxGISCartod.lib;wxGISCartoUId.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxmsw29ud_aui.lib;wxmsw29ud_adv.lib;wxmsw29ud_html.lib;wxmsw29ud_propgrid.lib;wxgiscpld.lib;wxgisogrd.lib;wxgisgdald.lib;wxGISCatalogd.lib;wxGISFrameworkd.lib;wxGISCored.lib;wxGISCartod.lib;wxGISCartoUId.lib;wxGISDatasourced.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(WXGISGDAL)\lib;$(WXWIDGETS)\lib\vc_dll;..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>

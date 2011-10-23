@@ -46,7 +46,5 @@ public:
 	~wxGISCatalogFrame(void);
 //IFrameApplication
 	virtual void OnAppAbout(void);
-private:
-	wxXmlNode* m_pConfXmlNode;
 };
 

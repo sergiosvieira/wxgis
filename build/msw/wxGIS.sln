@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C++ Express 2010
+# Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISDisplay", "wxGISDisplay.vcxproj", "{F88C8F1F-F939-441E-9F90-CF5FDC17DA42}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxGISFramework", "wxGISFramework.vcxproj", "{7503AD61-A5E6-4EB7-BC1A-DC98BDB258C2}"
@@ -102,6 +102,7 @@ Global
 		{CDC27198-828F-45B3-BC3D-3CD22176FC61}.Release|Win32.ActiveCfg = Release|Win32
 		{CDC27198-828F-45B3-BC3D-3CD22176FC61}.Release|Win32.Build.0 = Release|Win32
 		{E21E4448-784A-4DB6-9A4C-D24034171938}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E21E4448-784A-4DB6-9A4C-D24034171938}.Debug|Win32.Build.0 = Debug|Win32
 		{E21E4448-784A-4DB6-9A4C-D24034171938}.Release|Win32.ActiveCfg = Release|Win32
 		{E21E4448-784A-4DB6-9A4C-D24034171938}.Release|Win32.Build.0 = Release|Win32
 		{796A3AA1-6A22-4CB8-A6DA-EF2D43C1C54D}.Debug|Win32.ActiveCfg = Debug|Win32
@@ -112,6 +113,7 @@ Global
 		{6FCAD4C3-B923-4934-9E99-1EC824E41FCF}.Release|Win32.ActiveCfg = Release|Win32
 		{6FCAD4C3-B923-4934-9E99-1EC824E41FCF}.Release|Win32.Build.0 = Release|Win32
 		{BF1AAA54-551E-4AA2-82C8-6F8015198E99}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BF1AAA54-551E-4AA2-82C8-6F8015198E99}.Debug|Win32.Build.0 = Debug|Win32
 		{BF1AAA54-551E-4AA2-82C8-6F8015198E99}.Release|Win32.ActiveCfg = Release|Win32
 		{BF1AAA54-551E-4AA2-82C8-6F8015198E99}.Release|Win32.Build.0 = Release|Win32
 		{6AB7B074-C3FB-4234-80E4-327ACFEB2476}.Debug|Win32.ActiveCfg = Debug|Win32
