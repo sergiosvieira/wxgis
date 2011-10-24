@@ -615,7 +615,7 @@ void wxGISMapView::RotateBy(wxPoint MouseLocation)
 			m_pGISDisplay->RotatingDraw(dAngle, &CDC);
 
 			m_dCurrentAngle = DOUBLEPI - m_pGISDisplay->GetRotate() - dAngle;
-			if(m_dCurrentAngle > DOUBLEPI)
+			if(m_dCurrentAngle >= DOUBLEPI)
 				m_dCurrentAngle -= DOUBLEPI;
 			if(m_dCurrentAngle < 0)
 				m_dCurrentAngle += DOUBLEPI;
@@ -641,7 +641,7 @@ void wxGISMapView::RotateStop(wxPoint MouseLocation)
 	//if(m_dCurrentAngle < 0)
 	//	m_dCurrentAngle += DOUBLEPI;
 
-	if(dfRotate > DOUBLEPI)
+	if(dfRotate >= DOUBLEPI)
 		dfRotate -= DOUBLEPI;
 	if(dfRotate < 0)
 		dfRotate += DOUBLEPI;
@@ -655,7 +655,7 @@ void wxGISMapView::SetRotate(double dAngleRad)
 	if(m_pGISDisplay)
 		m_pGISDisplay->SetRotate(dAngleRad);
 	m_dCurrentAngle = DOUBLEPI - dAngleRad;
-	if(m_dCurrentAngle > DOUBLEPI)
+	if(m_dCurrentAngle >= DOUBLEPI)
 		m_dCurrentAngle -= DOUBLEPI;
 	if(m_dCurrentAngle < 0)
 		m_dCurrentAngle += DOUBLEPI;

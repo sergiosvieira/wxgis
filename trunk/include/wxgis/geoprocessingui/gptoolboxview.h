@@ -32,7 +32,7 @@
     \brief The wxGxToolboxTreeView include tools hierarchy.
 */
 
-class wxGxToolboxTreeView : 
+class WXDLLIMPEXP_GIS_GPU wxGxToolboxTreeView : 
     public wxGxTreeView
 {
     DECLARE_DYNAMIC_CLASS(wxGxToolboxTreeView)
