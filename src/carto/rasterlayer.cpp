@@ -191,43 +191,31 @@ bool wxGISRasterLayer::GetPixelData(RAWPIXELDATA &stPixelData, wxGISDisplay *pDi
 	if(!pDisplay)
 		return false;
 	OGREnvelope stRasterExtent = m_pwxGISRasterDataset->GetEnvelope();
-	OGREnvelope stDisplayExtent = pDisplay->GetBounds(false);
 	OGREnvelope stDisplayExtentRotated = pDisplay->GetBounds(true);
-	////rotate raster extent
-	//if(!IsDoubleEquil(pDisplay->GetRotate(), 0.0))
-	//{
-	//	double dCenterX = stDisplayExtent.MinX + (stDisplayExtent.MaxX - stDisplayExtent.MinX) / 2;
-	//	double dCenterY = stDisplayExtent.MinY + (stDisplayExtent.MaxY - stDisplayExtent.MinY) / 2;
+	OGREnvelope stRasterExtentRotated = stRasterExtent;
 
-	//	RotateEnvelope(stRasterExtentRotated, pDisplay->GetRotate(), dCenterX, dCenterY);
-	//}
+	//rotate raster extent
+	if(!IsDoubleEquil(pDisplay->GetRotate(), 0.0))
+	{
+		double dCenterX = stDisplayExtentRotated.MinX + (stDisplayExtentRotated.MaxX - stDisplayExtentRotated.MinX) / 2;
+		double dCenterY = stDisplayExtentRotated.MinY + (stDisplayExtentRotated.MaxY - stDisplayExtentRotated.MinY) / 2;
+
+		RotateEnvelope(stRasterExtentRotated, pDisplay->GetRotate(), dCenterX, dCenterY);
+	}
 
 	//if envelopes don't intersect exit
-    if(!stDisplayExtent.Intersects(stRasterExtent))
+    if(!stDisplayExtentRotated.Intersects(stRasterExtentRotated))
         return false;
 
 	//get intersect envelope to fill raster data
-	OGREnvelope stDrawBounds = stRasterExtent;
-	stDrawBounds.Intersect(stDisplayExtent);
+	OGREnvelope stDrawBounds = stDisplayExtentRotated;
+	stDrawBounds.Intersect(stDisplayExtentRotated);
 	if(!stDrawBounds.IsInit())
 		return false;
 
-	if(!IsDoubleEquil(pDisplay->GetRotate(), 0.0))
-	{
-		double dCenterX = stDisplayExtent.MinX + (stDisplayExtent.MaxX - stDisplayExtent.MinX) / 2;
-		double dCenterY = stDisplayExtent.MinY + (stDisplayExtent.MaxY - stDisplayExtent.MinY) / 2;
+	if(!stRasterExtent.Contains(stDrawBounds))
+		stDrawBounds = stRasterExtent;
 
-		OGREnvelope stDrawBoundsRotated = stDrawBounds;
-		RotateEnvelope(stDrawBoundsRotated, pDisplay->GetRotate(), dCenterX, dCenterY);
-
-		if(!stDisplayExtent.Contains(stDrawBoundsRotated))
-			stDrawBounds = stDrawBoundsRotated;
-	}
-
-	////check real raster borders
-	//stDrawBounds.Intersect(stRasterExtent);
-	//if(!stDrawBounds.IsInit())
-	//	return false;
 
 	GDALDataset* pRaster = m_pwxGISRasterDataset->GetRaster();
 	//create inverse geo transform to get pixel data

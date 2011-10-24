@@ -104,7 +104,6 @@
     <ClCompile Include="..\..\src\display\displaytransformation.cpp" />
     <ClCompile Include="..\..\src\display\gisdisplay.cpp" />
     <ClCompile Include="..\..\src\display\rubberband.cpp" />
-    <ClCompile Include="..\..\src\display\screendisplay.cpp" />
     <ClCompile Include="..\..\src\display\simplefillsymbol.cpp" />
     <ClCompile Include="..\..\src\display\simplelinesymbol.cpp" />
     <ClCompile Include="..\..\src\display\simplemarkersymbol.cpp" />
@@ -114,7 +113,6 @@
     <ClInclude Include="..\..\include\wxgis\display\displaytransformation.h" />
     <ClInclude Include="..\..\include\wxgis\display\gisdisplay.h" />
     <ClInclude Include="..\..\include\wxgis\display\rubberband.h" />
-    <ClInclude Include="..\..\include\wxgis\display\screendisplay.h" />
     <ClInclude Include="..\..\include\wxgis\display\simplefillsymbol.h" />
     <ClInclude Include="..\..\include\wxgis\display\simplelinesymbol.h" />
     <ClInclude Include="..\..\include\wxgis\display\simplemarkersymbol.h" />

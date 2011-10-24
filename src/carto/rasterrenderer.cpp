@@ -21,7 +21,6 @@
 #include "wxgis/carto/rasterrenderer.h"
 #include "wxgis/carto/interpolation.h"
 #include "wxgis/datasource/rasterdataset.h"
-#include "wxgis/display/screendisplay.h"
 #include "wxgis/core/config.h"
 #include "wxgis/core/globalfn.h"
 
