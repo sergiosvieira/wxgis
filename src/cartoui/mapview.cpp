@@ -627,27 +627,38 @@ void wxGISMapView::RotateBy(wxPoint MouseLocation)
 void wxGISMapView::RotateStop(wxPoint MouseLocation)
 {
     ReleaseMouse();
-	if(m_pGISDisplay)
-	{
-		//compute angle
-		double dX = m_FrameCenter.x - MouseLocation.x;
-		double dY = m_FrameCenter.y - MouseLocation.y;
-		double dAngle = atan2(dY, dX);
-		dAngle -= m_dOriginAngle;
-		double dPrevRotate = m_pGISDisplay->GetRotate();
-		if(dPrevRotate > DOUBLEPI)
-			dPrevRotate -= DOUBLEPI;
-		m_pGISDisplay->SetRotate(dPrevRotate + dAngle);
-	}
+	//compute angle
+	double dX = m_FrameCenter.x - MouseLocation.x;
+	double dY = m_FrameCenter.y - MouseLocation.y;
+	double dAngle = atan2(dY, dX);
+	dAngle -= m_dOriginAngle;
+	double dPrevRotate = m_pGISDisplay->GetRotate();
+	double dfRotate = dPrevRotate + dAngle;
+
+	//m_dCurrentAngle = DOUBLEPI - m_pGISDisplay->GetRotate() - dAngle;
+	//if(m_dCurrentAngle > DOUBLEPI)
+	//	m_dCurrentAngle -= DOUBLEPI;
+	//if(m_dCurrentAngle < 0)
+	//	m_dCurrentAngle += DOUBLEPI;
+
+	if(dfRotate > DOUBLEPI)
+		dfRotate -= DOUBLEPI;
+	if(dfRotate < 0)
+		dfRotate += DOUBLEPI;
 	m_nDrawingState = enumGISMapDrawing;
-	Refresh(false);
+
+	SetRotate(dfRotate);//(dPrevRotate + dAngle);
 }
 
 void wxGISMapView::SetRotate(double dAngleRad)
 {
 	if(m_pGISDisplay)
 		m_pGISDisplay->SetRotate(dAngleRad);
-	m_dCurrentAngle = dAngleRad;
+	m_dCurrentAngle = DOUBLEPI - dAngleRad;
+	if(m_dCurrentAngle > DOUBLEPI)
+		m_dCurrentAngle -= DOUBLEPI;
+	if(m_dCurrentAngle < 0)
+		m_dCurrentAngle += DOUBLEPI;
 
 	wxMxMapViewEvent event(wxMXMAP_ROTATED, m_dCurrentAngle);
 	PostEvent(event);

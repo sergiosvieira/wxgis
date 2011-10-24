@@ -449,7 +449,30 @@ void wxGISToolBar::ReAddCommand(ICommand* pCmd)
 		}
 		break;
     case enumGISCommandControl:
-			return;
+		{
+			IToolControl* pToolCtrl = dynamic_cast<IToolControl*>(pCmd);
+			if(pToolCtrl)
+			{
+				IToolBarControl* pToolBarControl = pToolCtrl->GetControl();
+				wxControl* pControl = dynamic_cast<wxControl*>(pToolBarControl);
+				if(pControl)
+				{
+					if(pToolCtrl->HasToolLabel())
+					{
+						wxString sToolLabel = pToolCtrl->GetToolLabel();
+						AddLabel(wxID_ANY, sToolLabel, sToolLabel.Len() * 5);
+					}
+					pControl->Reparent(this);
+					AddControl(pControl);
+					//add ctrl to remove map
+					m_RemControlMap[m_CommandArray.size()] = pToolBarControl;
+				}
+				else return;
+			}
+			else return;
+		}
+		break;
+	default: return;
 	}
 }
 
@@ -509,6 +532,9 @@ void wxGISToolBar::MoveCommandLeft(size_t nIndex)
 {
 	wxGISCommandBar::MoveCommandLeft(nIndex);
 	wxAuiToolBar::Clear();
+	//delete Control
+	for(std::map<size_t, IToolBarControl*>::iterator IT = m_RemControlMap.begin(); IT != m_RemControlMap.end(); ++IT)
+		wxDELETE(IT->second);
 	for(size_t i = 0; i < m_CommandArray.size(); ++i)
 		ReAddCommand(m_CommandArray[i]);
 	wxAuiToolBar::Realize();
@@ -518,6 +544,9 @@ void wxGISToolBar::MoveCommandRight(size_t nIndex)
 {
 	wxGISCommandBar::MoveCommandRight(nIndex);
 	wxAuiToolBar::Clear();
+	//delete Control
+	for(std::map<size_t, IToolBarControl*>::iterator IT = m_RemControlMap.begin(); IT != m_RemControlMap.end(); ++IT)
+		wxDELETE(IT->second);
 	for(size_t i = 0; i < m_CommandArray.size(); ++i)
 		ReAddCommand(m_CommandArray[i]);
 	wxAuiToolBar::Realize();

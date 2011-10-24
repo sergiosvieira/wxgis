@@ -22,40 +22,6 @@
 
 #include "wxgis/carto/carto.h"
 
-//
-//inline double GetValuePointer(void* pData, int nIndex, GDALDataType eSrcType)
-//{
-//	unsigned char* pDataByte = (unsigned char*)pData;//uintptr_t
-//	switch(eSrcType)
-//	{
-//	case GDT_Byte:
-//		return (void*)(pDataByte + nIndex * sizeof(GByte));
-//	case GDT_Float32:
-//		return (void*)(pDataByte + nIndex * sizeof(float));
-//	case GDT_Float64:
-//		return (void*)(pDataByte + nIndex * sizeof(double));
-//	case GDT_Int32:
-//		return (void*)(pDataByte + nIndex * sizeof(GInt32));
-//	case GDT_UInt16:
-//		return (void*)(pDataByte + nIndex * sizeof(GUInt16));
-//	case GDT_Int16:
-//		return (void*)(pDataByte + nIndex * sizeof(GInt16));
-//	case GDT_UInt32:
-//		return (void*)(pDataByte + nIndex * sizeof(GUInt32));
-//	case GDT_CInt16:
-//		return (void*)(pDataByte + nIndex * sizeof(GInt16) * 2);
-//	case GDT_CInt32:
-//		return (void*)(pDataByte + nIndex * sizeof(GInt32) * 2);
-//	case GDT_CFloat32:
-//		return (void*)(pDataByte + nIndex * sizeof(float) * 2);
-//	case GDT_CFloat64:
-//		return (void*)(pDataByte + nIndex * sizeof(double) * 2);
-//	default:
-//		return 0;
-//	}
-//	return 0;
-//}
-
 inline double BiCubicKernel(double x)
 {
 	if ( x > 2.0 )
@@ -81,7 +47,7 @@ void WXDLLIMPEXP_GIS_CRT BilinearInterpolation(void *pInputData, int nInputXSize
 void WXDLLIMPEXP_GIS_CRT BicubicInterpolation(void *pInputData, int nInputXSize, int nInputYSize, double dInputXSize, double dInputYSize, double dDeltaX, double dDeltaY, GDALDataType eSrcType, unsigned char *pOutputData, int nOutXSize, int nOutYSize, int nBegY, int nEndY, int nBandCount, IRasterRenderer *pRasterRenderer, ITrackCancel *pTrackCancel = NULL);
 
 // static void OnHalfBilinearInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
-    // static void OnHalfQuadBilinearInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
-    // static void OnFourQuadBilinearInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
+// static void OnHalfQuadBilinearInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
+// static void OnFourQuadBilinearInterpolation(const unsigned char* pOrigData, unsigned char* pDestData, int nYbeg, int nYend, int nOrigWidth, int nOrigHeight, int nDestWidth, double rWRatio, double rHRatio, double rDeltaX, double rDeltaY, ITrackCancel* pTrackCancel);
 
 
