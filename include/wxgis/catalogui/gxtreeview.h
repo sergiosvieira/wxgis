@@ -65,7 +65,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxTreeViewBase :
     DECLARE_DYNAMIC_CLASS(wxGxTreeViewBase)
 public:
     wxGxTreeViewBase(void);
-	wxGxTreeViewBase(wxWindow* parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTR_HAS_BUTTONS );
+	wxGxTreeViewBase(wxWindow* parent, wxWindowID id = TREECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTR_HAS_BUTTONS );
 	virtual ~wxGxTreeViewBase(void);
 	virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent);
 	virtual void AddRoot(IGxObject* pGxObject);
