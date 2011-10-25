@@ -373,9 +373,9 @@ void wxGxDialogContentView::OnObjectDeleted(wxGxCatalogEvent& event)
 BEGIN_EVENT_TABLE(wxGxObjectDialog, wxDialog)
 	//EVT_LIST_ITEM_SELECTED(LISTCTRLID, wxGxObjectDialog::OnItemSelected)
 	//EVT_LIST_ITEM_DESELECTED(LISTCTRLID, wxGxObjectDialog::OnItemSelected)
-	EVT_MENU_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 10, wxGxObjectDialog::OnCommand)
-	EVT_MENU_RANGE(ID_MENUCMD, ID_MENUCMD + 128, wxGxObjectDialog::OnDropDownCommand)
-	EVT_UPDATE_UI_RANGE(ID_PLUGINCMD, ID_PLUGINCMD + 10, wxGxObjectDialog::OnCommandUI)
+	EVT_MENU_RANGE(ID_PLUGINCMD, ID_PLUGINCMDMAX, wxGxObjectDialog::OnCommand)
+	EVT_MENU_RANGE(ID_MENUCMD, ID_MENUCMDMAX, wxGxObjectDialog::OnDropDownCommand)
+	EVT_UPDATE_UI_RANGE(ID_PLUGINCMD, ID_PLUGINCMDMAX, wxGxObjectDialog::OnCommandUI)
     EVT_AUITOOLBAR_TOOL_DROPDOWN(wxID_ANY, wxGxObjectDialog::OnToolDropDown)
     EVT_COMBOBOX(FILTERCOMBO, wxGxObjectDialog::OnFilterSelect)
     EVT_BUTTON(wxID_OK, wxGxObjectDialog::OnOK)
@@ -428,7 +428,7 @@ wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, IGxCatalog* pExternalCatal
     //  6   Forward
     //  7   Create Folder
 
-        int IDs[8] = {5,0,-1,1,2,-1,4,7};
+        int IDs[8] = {5,0,wxNOT_FOUND,1,2,wxNOT_FOUND,4,7};
         ICommand *pCmd(NULL);
         wxGISCatalogMainCmd* pwxGISCatalogMainCmd(NULL);
         for(size_t i = 0; i < 8; ++i)

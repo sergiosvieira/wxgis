@@ -56,7 +56,7 @@ wxGxTreeViewBase::~wxGxTreeViewBase(void)
 
 bool wxGxTreeViewBase::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
-    bool result = wxTreeCtrl::Create(parent, TREECTRLID, pos, size, style);
+    bool result = wxTreeCtrl::Create(parent, id, pos, size, style);
     if(result)
     {
         m_TreeImageList.Create(16, 16);

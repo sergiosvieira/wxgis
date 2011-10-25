@@ -78,7 +78,7 @@ bool wxGxToolboxView::Activate(IFrameApplication* application, wxXmlNode* pConf)
         pConf->AddChild(pToolboxTreeConf);
     }
 
-    m_pGxToolboxView = new wxGxToolboxTreeView(this, TOOLBOXVIEWCTRLID);
+    m_pGxToolboxView = new wxGxToolboxTreeView(this, TREECTRLID);
     AddPage(m_pGxToolboxView, m_pGxToolboxView->GetViewName(), true, m_pGxToolboxView->GetViewIcon());
     m_pGxToolboxView->Activate(application, pToolboxTreeConf);
     m_pApp->RegisterChildWindow(m_pGxToolboxView);

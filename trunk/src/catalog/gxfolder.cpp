@@ -65,7 +65,7 @@ void wxGxFolder::LoadChildren(void)
 	if(m_bIsChildrenLoaded)
 		return;
 
-    EmptyChildren();
+    //EmptyChildren();
     char **papszItems = CPLReadDir(m_sPath);
     if(papszItems == NULL)
         return;
@@ -85,13 +85,23 @@ void wxGxFolder::LoadChildren(void)
     CSLDestroy( papszItems );
 
     //load names
+	size_t nChildrenCount = m_Children.size();
 	GxObjectArray Array;	
 	if(m_pCatalog && m_pCatalog->GetChildren(m_sPath, papszFileList, Array))
 	{
 		for(size_t i = 0; i < Array.size(); ++i)
 		{
-			bool ret_code = AddChild(Array[i]);
-			if(!ret_code)
+			bool bAdd(true);
+			for(size_t j = 0; j < nChildrenCount; ++j)
+			{
+				if(EQUAL(m_Children[j]->GetInternalName(), Array[i]->GetInternalName()))
+					bAdd = false;
+			}
+
+			bool ret_code(false);
+			if(bAdd)
+				ret_code = AddChild(Array[i]);
+			if(!ret_code || !bAdd)
 				wxDELETE(Array[i]);
 		}
 	}
