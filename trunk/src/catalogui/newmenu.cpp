@@ -117,52 +117,101 @@ void wxGISNewMenu::Update(IGxSelection* Selection)
 
     m_delitems.clear();
 
+    for(size_t i = 0; i < m_CommandArray.size(); ++i)
+        RemoveCommand(i);
+
+	for(size_t i = 0; i < m_SubmenuArray.size(); ++i)
+	{
+		Delete(m_SubmenuArray[i].pItem);
+		wsDELETE(m_SubmenuArray[i].pBar);
+	}
+
+
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(Selection->GetLastSelectedObjectID());
     IGxObjectUI* pGxObjUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
     if(pGxObjUI)
     {
-        wxMenu* pCmdMenu = dynamic_cast<wxMenu*>(m_pApp->GetCommandBar( pGxObjUI->NewMenu() ));
-        if(pCmdMenu)
+        IGISCommandBar* pCmdBar = m_pApp->GetCommandBar( pGxObjUI->NewMenu() );
+        if(pCmdBar)
         {
-            wxMenuItemList& pLst = pCmdMenu->GetMenuItems();
-            wxMenuItemList::iterator iter;
-            for (iter = pLst.begin(); iter != pLst.end(); ++iter)
+            for(size_t i = 0; i < pCmdBar->GetCommandCount(); ++i)
             {
-                //MyListElement *current = *iter;  
-                wxMenuItem* pAddItem = *iter;
-                wxMenuItem* pItem = pAddItem;
-                if(pAddItem->IsSubMenu())
-				{
-                    pItem = Append(pAddItem->GetId(), pAddItem->GetItemLabel(), pAddItem->GetSubMenu());
-				}
-                else
-				{
-					pItem = new wxMenuItem(this, pAddItem->GetId(), pAddItem->GetItemLabel(), wxEmptyString, pAddItem->GetKind());
-					if(pItem)
-					{
+                ICommand* pCmd = pCmdBar->GetCommand(i);
+                AddCommand(pCmd);
+                //if(pCmd)
+                //{
+                //    wxMenuItem* pItem(NULL);
+                //    switch(pCmd->GetKind())
+                //    {
+                //    case enumGISCommandSeparator:
+                //        pItem = AppendSeparator(); 
+                //        break;
+                //    case enumGISCommandCheck:
+                //        pItem = AppendCheckItem (pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage());
+                //        break;
+                //    case enumGISCommandRadio:
+                //        pItem = AppendRadioItem (pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage());
+                //        break;
+                //    case enumGISCommandNormal:
+                //        pItem = Append (pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), (wxItemKind )pCmd->GetKind());
+                //        pItem->SetBitmap(pCmd->GetBitmap());
+                //        break;
+                //    case enumGISCommandMax:
+                //    case enumGISCommandControl:
+                //    case enumGISCommandDropDown:
+                //    default:
+                //        break;
+                //    };
+                //    m_delitems.push_back(pItem);
+                //}
+            }
+        }
+//        //
+//        wxMenu* pCmdMenu = dynamic_cast<wxMenu*>(m_pApp->GetCommandBar( pGxObjUI->NewMenu() ));
+//        if(pCmdMenu)
+//        {
+//            wxMenuItemList& pLst = pCmdMenu->GetMenuItems();
+//            wxMenuItemList::iterator iter;
+//            for (iter = pLst.begin(); iter != pLst.end(); ++iter)
+//            {
+//                //MyListElement *current = *iter;  
+//                wxMenuItem* pAddItem = *iter;
+//                wxMenuItem* pItem = pAddItem;
+//                if(pAddItem->IsSubMenu())
+//				{
+//                    pItem = Append(pAddItem->GetId(), pAddItem->GetItemLabel(), pAddItem->GetSubMenu());
+//				}
+//                else
+//				{
+//					pItem = new wxMenuItem(this, pAddItem->GetId(), pAddItem->GetItemLabel(), wxEmptyString, pAddItem->GetKind());
+//					if(pItem)
+//					{
 //						wxBitmap Bmp = pAddItem->GetBitmap();
 //						if(Bmp.IsOk())
 //						{
-//#ifdef __WIN32__
-//							wxImage Img = Bmp.ConvertToImage();
-//							pItem->SetBitmaps(Img, Img.ConvertToGreyscale());
-//#else
+////#ifdef __WIN32__
+////							wxImage Img = Bmp.ConvertToImage();
+////							pItem->SetBitmaps(Bmp, Img.ConvertToGreyscale());
+////#else
 //			                pItem->SetBitmap(Bmp);
-//#endif
+////#endif
 //						}
-						Append(pItem);
-					}
-
-                    //pItem = Append(pAddItem->GetId(), pAddItem->GetItemLabel(), wxEmptyString, pAddItem->GetKind());
-				}
-                //wxMenuItem* pItem = Append(*iter);
-                m_delitems.push_back(pItem);
-            }
-            return;
-        }
+//						Append(pItem);
+//					}
+//
+//                    //pItem = Append(pAddItem->GetId(), pAddItem->GetItemLabel(), wxEmptyString, pAddItem->GetKind());
+//				}
+//                //wxMenuItem* pItem = Append(*iter);
+//                m_delitems.push_back(pItem);
+//            }
+//            return;
+//        }
     }
-    wxMenuItem* pItem = Append(ID_MENUCMDMAX, wxT(" "), wxEmptyString, wxITEM_NORMAL);
-    pItem->Enable(false);
-    m_delitems.push_back(pItem);
+    else
+    {
+        wxMenuItem* pItem = Append(ID_MENUCMDMAX, wxT(" "), wxEmptyString, wxITEM_NORMAL);
+        pItem->Enable(false);
+        m_delitems.push_back(pItem);
+    }
 }
 

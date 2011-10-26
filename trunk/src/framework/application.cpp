@@ -179,140 +179,178 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 {
     //event.Skip();
 
+    wxString sAcc = m_pGISAcceleratorTable->GetText(event.GetId());
 	ICommand* pCmd = GetCommand(event.GetId());
 	if(pCmd)
 	{
-        wxString sAcc = m_pGISAcceleratorTable->GetText(event.GetId());
-        event.Enable(pCmd->GetEnabled());
+        wxString sCaption = pCmd->GetCaption();
+        if(!sAcc.IsEmpty())
+        {
+#ifdef __WXGTK__
+			sCaption.Append( wxT("          ") );
+#else
+			sCaption.Append( wxT("\t") );
+#endif
+            sCaption.Append(sAcc);
+        }
+
+        event.SetText(sCaption);
 
 		if(pCmd->GetKind() == enumGISCommandCheck)
-		{
-			//wxMenuItem *pItem = pMenu->FindItem(event.GetId());
-			//if(pItem != NULL)
-   //             pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
+            event.Check(pCmd->GetChecked());
 
-            //if(event.GetChecked() != pCmd->GetChecked())
-                event.Check(pCmd->GetChecked());
-		}
-        //if(event.GetEnabled() != pCmd->GetEnabled())
-        //if(pCmd->GetKind() == enumGISCommandNormal)
-        //{
-        //    if(sAcc.IsEmpty())
-        //    //    event.SetText(pCmd->GetCaption() + wxT("\t"));//accelerator
-        //    //else
-        //        event.SetText(pCmd->GetCaption() + wxT("\t") + sAcc);//accelerator
-        //        //event.SetText(pCmd->GetCaption() + wxT(" ") + sAcc);//accelerator
-        //}
-        //if(pCmd->GetKind() != enumGISCommandNormal)
-        //return;
-		////set bitmap
-		for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
-		{
-			switch(m_CommandBarArray[i]->GetType())
-			{
-			case enumGISCBSubMenu:
-			case enumGISCBMenubar:
-				{
-					wxMenu* pMenu = dynamic_cast<wxMenu*>(m_CommandBarArray[i]);
-// dirty hack
-                    //wxMenuItemList& pLst = pMenu->GetMenuItems();
-                    //wxMenuItemList::iterator iter;
-                    //for (iter = pLst.begin(); iter != pLst.end(); ++iter)
-                    //{
-                    //    wxMenuItem* pItem = *iter;
-                    //    if(pItem->IsSubMenu())
-                    //    {
-                    //        pItem->SetBitmap(wxNullBitmap);
-                    //        //wxString sT = pItem->GetText();
-                    //        //pItem->SetItemLabel(wxT(" "));// derty hack
-                    //        //pItem->SetItemLabel(sT);
-                    //    }
-                    //}
-// dirty hack end
-					wxMenuItem *pItem = pMenu->FindItem(event.GetId());
-					if(pItem != NULL)
-					{
-                        if(pItem->IsSubMenu())
-                            break;
+        event.Enable(pCmd->GetEnabled());
+    }
+	for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
+	{
+		wxGISToolBar* pGISToolBar = dynamic_cast<wxGISToolBar*>(m_CommandBarArray[i]);
+		if(pGISToolBar)
+			pGISToolBar->UpdateControls();
+		wxAuiToolBar* pToolbar = dynamic_cast<wxAuiToolBar*>(m_CommandBarArray[i]);
+        if(pToolbar)
+        {
+		    wxAuiToolBarItem* pTool = pToolbar->FindTool(event.GetId());
+		    if(pTool != NULL)
+		    {
+                if(pTool->GetBitmap().IsOk())
+                    break;
+			    wxIcon Bmp = pCmd->GetBitmap();
+			    if(Bmp.IsOk())
+				    pTool->SetBitmap(Bmp);
+			    else
+				    pTool->SetBitmap(wxBitmap(tool_16_xpm));
+			    if(!sAcc.IsEmpty())
+				    pTool->SetShortHelp(pCmd->GetTooltip() + wxT(" (") + sAcc + wxT(")"));//accelerator
+                else
+				    pTool->SetShortHelp(pCmd->GetTooltip());
+		    }
+            continue;
+        }
+		//wxMenu* pMenu = dynamic_cast<wxMenu*>(m_CommandBarArray[i]);
+  //      if(pMenu)
+  //      {
+  //          wxMenuItem *pItem = pMenu->FindItem(event.GetId());
+  //          continue;
+  //      }
+    }
 
-						wxIcon Bmp = pCmd->GetBitmap();
-						//if(Bmp.IsOk())
-							pItem->SetBitmap(Bmp);//double text??
-						//pItem->SetItemLabel(wxT(" ")); // derty hack
-						pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
-					}
-				}
-				break;
-			case enumGISCBContextmenu:
-				{
-					wxMenu* pMenu = dynamic_cast<wxMenu*>(m_CommandBarArray[i]);
-// dirty hack
-                    //wxMenuItemList& pLst = pMenu->GetMenuItems();
-                    //wxMenuItemList::iterator iter;
-                    //for (iter = pLst.begin(); iter != pLst.end(); ++iter)
-                    //{
-                    //    wxMenuItem* pItem = *iter;
-                    //    if(pItem->IsSubMenu())
-                    //    {
-                    //        pItem->SetBitmap(wxNullBitmap);
-                    //        //wxString sT = pItem->GetText();
-                    //        //pItem->SetItemLabel(wxT(" "));// derty hack
-                    //        //pItem->SetItemLabel(sT);
-                    //    }
-                    //}
-// dirty hack end
-                    wxMenuItem *pItem = pMenu->FindItem(event.GetId());
-					if(pItem != NULL)
-					{
-                        if(pItem->IsSubMenu())
-                            break;
-						wxIcon Bmp = pCmd->GetBitmap();
-						//if(Bmp.IsOk())
-							pItem->SetBitmap(Bmp);//double text??
-						//pItem->SetItemLabel(wxT(" ")); // derty hack
-#ifdef __WXGTK__
-						if(sAcc.IsEmpty())
-							pItem->SetItemLabel(pCmd->GetCaption());
-						else
-							pItem->SetItemLabel(pCmd->GetCaption() + wxT("          ") + sAcc);
-#else
-						pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
-#endif
-                    }
-				}
-				break;
-            case enumGISCBToolbar:
-				{
-					wxAuiToolBar* pToolbar = dynamic_cast<wxAuiToolBar*>(m_CommandBarArray[i]);
-					wxGISToolBar* pGISToolBar = dynamic_cast<wxGISToolBar*>(m_CommandBarArray[i]);
-					if(pGISToolBar)
-						pGISToolBar->UpdateControls();
-					wxAuiToolBarItem* pTool = pToolbar->FindTool(event.GetId());
-					if(pTool != NULL)
-					{
-                        if(pTool->GetBitmap().IsOk())
-                            break;
-						wxIcon Bmp = pCmd->GetBitmap();
-						if(Bmp.IsOk())
-							pTool->SetBitmap(Bmp);
-						else
-							pTool->SetBitmap(wxBitmap(tool_16_xpm));
-						if(!sAcc.IsEmpty())
-							pTool->SetShortHelp(pCmd->GetTooltip() + wxT(" (") + sAcc + wxT(")"));//accelerator
-                        else
-							pTool->SetShortHelp(pCmd->GetTooltip());
-					}
-				}
-				break;
-			case enumGISCBNone:
-			default:
-				break;
-			}
-		}
-
-        return;
-	}
-    //event.Skip();
+//        return;
+//
+//		//set bitmap
+		//for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
+		//{
+//			switch(m_CommandBarArray[i]->GetType())
+//			{
+//			case enumGISCBSubMenu:
+//			case enumGISCBMenubar:
+//				{
+//					wxMenu* pMenu = dynamic_cast<wxMenu*>(m_CommandBarArray[i]);
+//// dirty hack
+//                    //wxMenuItemList& pLst = pMenu->GetMenuItems();
+//                    //wxMenuItemList::iterator iter;
+//                    //for (iter = pLst.begin(); iter != pLst.end(); ++iter)
+//                    //{
+//                    //    wxMenuItem* pItem = *iter;
+//                    //    if(pItem->IsSubMenu())
+//                    //    {
+//                    //        pItem->SetBitmap(wxNullBitmap);
+//                    //        //wxString sT = pItem->GetText();
+//                    //        //pItem->SetItemLabel(wxT(" "));// derty hack
+//                    //        //pItem->SetItemLabel(sT);
+//                    //    }
+//                    //}
+//// dirty hack end
+//					wxMenuItem *pItem = pMenu->FindItem(event.GetId());
+//					if(pItem != NULL)
+//					{
+//                        if(pItem->IsSubMenu())
+//                            break;
+//
+//						wxIcon Bmp = pCmd->GetBitmap();
+//						//if(Bmp.IsOk())
+//							pItem->SetBitmap(Bmp);//double text??
+//						//pItem->SetItemLabel(wxT(" ")); // derty hack
+//						if(sAcc.IsEmpty())
+//							pItem->SetItemLabel(pCmd->GetCaption());
+//						else
+//#ifdef __WXGTK__
+//							pItem->SetItemLabel(pCmd->GetCaption() + wxT("          ") + sAcc);
+//#else
+//						    pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
+//#endif
+//                    }
+//				}
+//				break;
+//			case enumGISCBContextmenu:
+//				{
+//					wxMenu* pMenu = dynamic_cast<wxMenu*>(m_CommandBarArray[i]);
+//// dirty hack
+//                    //wxMenuItemList& pLst = pMenu->GetMenuItems();
+//                    //wxMenuItemList::iterator iter;
+//                    //for (iter = pLst.begin(); iter != pLst.end(); ++iter)
+//                    //{
+//                    //    wxMenuItem* pItem = *iter;
+//                    //    if(pItem->IsSubMenu())
+//                    //    {
+//                    //        pItem->SetBitmap(wxNullBitmap);
+//                    //        //wxString sT = pItem->GetText();
+//                    //        //pItem->SetItemLabel(wxT(" "));// derty hack
+//                    //        //pItem->SetItemLabel(sT);
+//                    //    }
+//                    //}
+//// dirty hack end
+//                    wxMenuItem *pItem = pMenu->FindItem(event.GetId());
+//					if(pItem != NULL)
+//					{
+//                        if(pItem->IsSubMenu())
+//                            break;
+//						wxIcon Bmp = pCmd->GetBitmap();
+//						//if(Bmp.IsOk())
+//							pItem->SetBitmap(Bmp);//double text??
+//						//pItem->SetItemLabel(wxT(" ")); // derty hack
+//						if(sAcc.IsEmpty())
+//							pItem->SetItemLabel(pCmd->GetCaption());
+//						else
+//#ifdef __WXGTK__
+//							pItem->SetItemLabel(pCmd->GetCaption() + wxT("          ") + sAcc);
+//#else
+//						    pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
+//#endif
+//                    }
+//				}
+//				break;
+//            case enumGISCBToolbar:
+//				{
+//					wxAuiToolBar* pToolbar = dynamic_cast<wxAuiToolBar*>(m_CommandBarArray[i]);
+//					wxGISToolBar* pGISToolBar = dynamic_cast<wxGISToolBar*>(m_CommandBarArray[i]);
+//					if(pGISToolBar)
+//						pGISToolBar->UpdateControls();
+//					wxAuiToolBarItem* pTool = pToolbar->FindTool(event.GetId());
+//					if(pTool != NULL)
+//					{
+//                        if(pTool->GetBitmap().IsOk())
+//                            break;
+//						wxIcon Bmp = pCmd->GetBitmap();
+//						if(Bmp.IsOk())
+//							pTool->SetBitmap(Bmp);
+//						else
+//							pTool->SetBitmap(wxBitmap(tool_16_xpm));
+//						if(!sAcc.IsEmpty())
+//							pTool->SetShortHelp(pCmd->GetTooltip() + wxT(" (") + sAcc + wxT(")"));//accelerator
+//                        else
+//							pTool->SetShortHelp(pCmd->GetTooltip());
+//					}
+//				}
+//				break;
+//			case enumGISCBNone:
+//			default:
+//				break;
+//			}
+//		}
+//
+//        //return;
+//	}
+//    //event.Skip();
 }
 
 void wxGISApplication::SerializeFramePos(bool bSave)
