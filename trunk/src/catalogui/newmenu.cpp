@@ -130,19 +130,38 @@ void wxGISNewMenu::Update(IGxSelection* Selection)
             {
                 //MyListElement *current = *iter;  
                 wxMenuItem* pAddItem = *iter;
-                wxMenuItem* pItem;
+                wxMenuItem* pItem = pAddItem;
                 if(pAddItem->IsSubMenu())
+				{
                     pItem = Append(pAddItem->GetId(), pAddItem->GetItemLabel(), pAddItem->GetSubMenu());
+				}
                 else
-                    pItem = Append(pAddItem->GetId(), pAddItem->GetItemLabel(), wxEmptyString, pAddItem->GetKind());
+				{
+					pItem = new wxMenuItem(this, pAddItem->GetId(), pAddItem->GetItemLabel(), wxEmptyString, pAddItem->GetKind());
+					if(pItem)
+					{
+//						wxBitmap Bmp = pAddItem->GetBitmap();
+//						if(Bmp.IsOk())
+//						{
+//#ifdef __WIN32__
+//							wxImage Img = Bmp.ConvertToImage();
+//							pItem->SetBitmaps(Img, Img.ConvertToGreyscale());
+//#else
+//			                pItem->SetBitmap(Bmp);
+//#endif
+//						}
+						Append(pItem);
+					}
 
+                    //pItem = Append(pAddItem->GetId(), pAddItem->GetItemLabel(), wxEmptyString, pAddItem->GetKind());
+				}
                 //wxMenuItem* pItem = Append(*iter);
                 m_delitems.push_back(pItem);
             }
             return;
         }
     }
-    wxMenuItem* pItem = Append(ID_MENUCMD - 1, wxT(" "), wxEmptyString, wxITEM_NORMAL);
+    wxMenuItem* pItem = Append(ID_MENUCMDMAX, wxT(" "), wxEmptyString, wxITEM_NORMAL);
     pItem->Enable(false);
     m_delitems.push_back(pItem);
 }

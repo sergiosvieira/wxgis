@@ -40,7 +40,7 @@ void wxGxSpatialReferencesFolder::Init(wxXmlNode* const pConfigNode)
     m_sInternalPath = pConfigNode->GetAttribute(wxT("path"), NON);
     if(m_sInternalPath.IsEmpty() || m_sInternalPath == wxString(NON))
     {
-        //example /vsizip/c:/wxGIS/sys/cs.zip/cs
+        //example: /vsizip/c:/wxGIS/sys/cs.zip/cs
         wxStandardPaths stp;
         wxString sExeDirPath = wxPathOnly(stp.GetExecutablePath());
         m_sInternalPath = wxT("/vsizip/") + sExeDirPath + wxT("/sys/cs.zip/cs");
@@ -57,64 +57,6 @@ void wxGxSpatialReferencesFolder::Serialize(wxXmlNode* pConfigNode)
 {
     pConfigNode->AddAttribute(wxT("path"), m_sInternalPath);
 }
-
-//void wxGxSpatialReferencesFolder::LoadChildren(void)
-//{
-//	if(m_bIsChildrenLoaded)
-//		return;	
-//
-//    //VSIFilesystemHandler *poFSHandler = VSIFileManager::GetHandler( wgWX2MB(m_sPath) );
-//    //char **res = poFSHandler->ReadDir(wgWX2MB(m_sPath));
-//
-//    char **papszFileList = VSIReadDir(m_sPath.mb_str(wxConvUTF8));
-//
-//    if( CSLCount(papszFileList) == 0 )
-//    {
-//        wxLogMessage(wxT( "wxGxSpatialReferencesFolder: no files or directories" ));
-//    }
-//    else
-//    {
-//        //wxLogDebug(wxT("Files: %s"), wgMB2WX(papszFileList[0]) );
-//       	//wxArrayString FileNames;
-//        for(int i = 0; papszFileList[i] != NULL; ++i )
-//		{
-//			wxString sFileName(papszFileList[i], wxConvUTF8);
-//            //if(i > 0)
-//            //    wxLogDebug( wxT("       %s"), sFileName.c_str() );
-//            VSIStatBufL BufL;
-//			wxString sFolderPath = m_sPath + wxT("/") + sFileName;
-//            int ret = VSIStatL(sFolderPath.mb_str(wxConvUTF8), &BufL);
-//            if(ret == 0)
-//            {
-//                //int x = 0;
-//                if(VSI_ISDIR(BufL.st_mode))
-//                {
-//					wxGxPrjFolder* pFolder = new wxGxPrjFolder(sFolderPath, wxGetTranslation(sFileName));
-//					IGxObject* pGxObj = static_cast<IGxObject*>(pFolder);
-//					bool ret_code = AddChild(pGxObj);
-//                }
-//                else
-//                {
-//                    m_FileNames.Add(sFolderPath);
-//                }
-//            }
-//		}
-//    }
-//    CSLDestroy( papszFileList );
-//
-//	//load names
-//	GxObjectArray Array;	
-//	if(m_pCatalog->GetChildren(m_sPath, &m_FileNames, &Array))
-//	{
-//		for(size_t i = 0; i < Array.size(); ++i)
-//		{
-//			bool ret_code = AddChild(Array[i]);
-//			if(!ret_code)
-//				wxDELETE(Array[i]);
-//		}
-//	}
-//	m_bIsChildrenLoaded = true;
-//}
 
 /////////////////////////////////////////////////////////////////////////
 // wxGxPrjFolder
