@@ -81,6 +81,9 @@
     <ClCompile Include="..\..\src\catalog\gxdbconnections.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\catalog\gxdbconnfactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\wxgis\catalog\catalog.h">
@@ -150,6 +153,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\wxgis\catalog\gxdbconnections.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\wxgis\catalog\gxdbconnfactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

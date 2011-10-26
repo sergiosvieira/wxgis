@@ -138,6 +138,9 @@
     <ClCompile Include="..\..\src\catalogui\gxdbconnectionsui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\catalogui\gxdbconnfactoryui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\wxgis\catalogui\catalogcmd.h">
@@ -264,6 +267,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\wxgis\catalogui\gxdbconnectionsui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxdbconnfactoryui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

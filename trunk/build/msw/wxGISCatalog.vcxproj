@@ -111,6 +111,7 @@
     <ClCompile Include="..\..\src\catalog\gxcsvfactory.cpp" />
     <ClCompile Include="..\..\src\catalog\gxdataset.cpp" />
     <ClCompile Include="..\..\src\catalog\gxdbconnections.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxdbconnfactory.cpp" />
     <ClCompile Include="..\..\src\catalog\gxdiscconnection.cpp" />
     <ClCompile Include="..\..\src\catalog\gxdiscconnections.cpp" />
     <ClCompile Include="..\..\src\catalog\gxevent.cpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="..\..\include\wxgis\catalog\gxcsvfactory.h" />
     <ClInclude Include="..\..\include\wxgis\catalog\gxdataset.h" />
     <ClInclude Include="..\..\include\wxgis\catalog\gxdbconnections.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxdbconnfactory.h" />
     <ClInclude Include="..\..\include\wxgis\catalog\gxdiscconnection.h" />
     <ClInclude Include="..\..\include\wxgis\catalog\gxdiscconnections.h" />
     <ClInclude Include="..\..\include\wxgis\catalog\gxevent.h" />
