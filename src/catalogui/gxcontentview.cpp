@@ -358,13 +358,9 @@ void wxGxContentView::OnSelected(wxListEvent& event)
     }
 	if(	m_pNewMenu )
 	{
-		if(nCount > 0)
-			m_pNewMenu->Update(m_pSelection);
-		else
-		{
+		if(nCount <= 0)
 			m_pSelection->SetInitiator(TREECTRLID);
-			m_pNewMenu->Update(m_pSelection);
-		}
+		m_pNewMenu->Update(m_pSelection);
 	}
 }
 
@@ -400,13 +396,9 @@ void wxGxContentView::OnDeselected(wxListEvent& event)
 	m_pSelection->Unselect(pItemData->nObjectID, NOTFIRESELID);
 	if(	m_pNewMenu )
 	{
-		if(GetSelectedItemCount() > 0)
-			m_pNewMenu->Update(m_pSelection);
-		else
-		{
+		if(GetSelectedItemCount() <= 0)
 			m_pSelection->SetInitiator(TREECTRLID);
-			m_pNewMenu->Update(m_pSelection);
-		}
+		m_pNewMenu->Update(m_pSelection);
 	}
 }
 
