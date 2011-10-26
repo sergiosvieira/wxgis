@@ -210,21 +210,22 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
         if(pToolbar)
         {
 		    wxAuiToolBarItem* pTool = pToolbar->FindTool(event.GetId());
-		    if(pTool != NULL)
+		    if(pTool)
 		    {
+			    if(!sAcc.IsEmpty())
+				    pTool->SetShortHelp(pCmd->GetTooltip() + wxT(" (") + sAcc + wxT(")"));//accelerator
+                else
+				    pTool->SetShortHelp(pCmd->GetTooltip());
+
                 if(pTool->GetBitmap().IsOk())
-                    break;
+                    continue;
 			    wxIcon Bmp = pCmd->GetBitmap();
 			    if(Bmp.IsOk())
 				    pTool->SetBitmap(Bmp);
 			    else
 				    pTool->SetBitmap(wxBitmap(tool_16_xpm));
-			    if(!sAcc.IsEmpty())
-				    pTool->SetShortHelp(pCmd->GetTooltip() + wxT(" (") + sAcc + wxT(")"));//accelerator
-                else
-				    pTool->SetShortHelp(pCmd->GetTooltip());
 		    }
-            continue;
+            //continue;
         }
 		//wxMenu* pMenu = dynamic_cast<wxMenu*>(m_CommandBarArray[i]);
   //      if(pMenu)

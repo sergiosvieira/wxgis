@@ -99,7 +99,6 @@ unsigned char wxGISNewMenu::GetCount(void)
 	return 1;
 }
 
-//void wxGISNewMenu::OnSelectionChanged(IGxSelection* Selection, long nInitiator)
 void wxGISNewMenu::Update(IGxSelection* Selection)
 {
 	if(!m_pCatalog)

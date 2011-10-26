@@ -111,6 +111,7 @@
     <ClCompile Include="..\..\src\catalogui\gxcsvfactoryui.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxdatasetui.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxdbconnectionsui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxdbconnfactoryui.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxdiscconnectionsui.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxdiscconnectionui.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxeventui.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="..\..\include\wxgis\catalogui\gxcsvfactoryui.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxdatasetui.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxdbconnectionsui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxdbconnfactoryui.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxdiscconnectionsui.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxdiscconnectionui.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxeventui.h" />
