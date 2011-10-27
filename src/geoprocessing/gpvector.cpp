@@ -197,7 +197,7 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
     if(pTrackCancel)
         pTrackCancel->PutMessage(wxString::Format(_("Exporting %s to %s"), pDSet->GetName().c_str(), sName.c_str()), -1, enumGISMessageTitle);
     const OGRSpatialReferenceSPtr pSrcSpaRef = pDSet->GetSpatialReference();
-    if(!pSrcSpaRef)
+    if(!pSrcSpaRef && (nNewSubType == enumVecKML || nNewSubType == enumVecKMZ))
     {
         wxString sErr(_("Input spatial reference is not defined!"));
         CPLError( CE_Failure, CPLE_AppDefined, sErr.mb_str() );
@@ -209,7 +209,7 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
     OGRSpatialReference* pNewSpaRef(NULL);
     if(nNewSubType == enumVecKML || nNewSubType == enumVecKMZ)
         pNewSpaRef = new OGRSpatialReference(SRS_WKT_WGS84);
-    else
+    else if(pSrcSpaRef)
         pNewSpaRef = pSrcSpaRef->Clone();
 
     OGRFeatureDefn *pDef = pDSet->GetDefinition();

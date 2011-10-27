@@ -141,6 +141,7 @@
     <ClCompile Include="..\..\src\catalogui\gxview.cpp" />
     <ClCompile Include="..\..\src\catalogui\newmenu.cpp" />
     <ClCompile Include="..\..\src\catalogui\rasterpropertypage.cpp" />
+    <ClCompile Include="..\..\src\catalogui\remoteconndlg.cpp" />
     <ClCompile Include="..\..\src\catalogui\spatrefpropertypage.cpp" />
     <ClCompile Include="..\..\src\catalogui\tablepropertypage.cpp" />
     <ClCompile Include="..\..\src\catalogui\vectorpropertypage.cpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="..\..\include\wxgis\catalogui\gxview.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\newmenu.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\rasterpropertypage.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\remoteconndlg.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\spatrefpropertypage.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\tablepropertypage.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\vectorpropertypage.h" />

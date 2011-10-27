@@ -244,4 +244,3 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
 }
 
 
-

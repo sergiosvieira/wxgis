@@ -58,8 +58,8 @@ public:
 protected:
 	IFrameApplication* m_pApp;
 	wxGxCatalogUI* m_pCatalog;
-	wxGISConnectionPointContainer* m_pConnectionPointSelection;
-	long m_ConnectionPointSelectionCookie;
+	//wxGISConnectionPointContainer* m_pConnectionPointSelection;
+	//long m_ConnectionPointSelectionCookie;
 };
 
 

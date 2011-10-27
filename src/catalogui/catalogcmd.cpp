@@ -338,7 +338,7 @@ bool wxGISCatalogMainCmd::GetEnabled(void)
 						IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(0));
                         IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
                         if(pCont)
-                            return pCont->CanCreate(enumGISContainer, enumContUnknown);
+                            return pCont->CanCreate(enumGISContainer, enumContFolder);
                     }
                 }
             }
