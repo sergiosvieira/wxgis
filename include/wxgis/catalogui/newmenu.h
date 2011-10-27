@@ -37,8 +37,8 @@ public:
 	wxGISNewMenu(const wxString& sName = NEWMENUNAME, const wxString& sCaption = _("New"), wxGISEnumCommandBars type = enumGISCBSubMenu, const wxString& title = wxEmptyString, long style = 0);
 	~wxGISNewMenu(void);
 	//wxGISMenu
-	virtual void AddCommand(ICommand* pCmd){};
-	virtual void RemoveCommand(size_t nIndex){};
+	virtual void AddCommand(ICommand* pCmd);
+	//virtual void RemoveCommand(size_t nIndex){};
 	virtual void MoveCommandLeft(size_t nIndex){};
 	virtual void MoveCommandRight(size_t nIndex){};
 	//ICommand
@@ -55,10 +55,7 @@ public:
 	virtual unsigned char GetCount(void);
     //wxGISMenu
 	virtual void Update(IGxSelection* Selection);
-	////IGxSelectionEvents
-	//virtual void OnSelectionChanged(IGxSelection* Selection, long nInitiator);
 protected:
-    std::vector<wxMenuItem*> m_delitems;
 	IFrameApplication* m_pApp;
 	wxGxCatalogUI* m_pCatalog;
 	wxGISConnectionPointContainer* m_pConnectionPointSelection;

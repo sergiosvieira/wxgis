@@ -141,6 +141,12 @@
     <ClCompile Include="..\..\src\catalogui\gxdbconnfactoryui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\catalogui\gxremoteconnui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\catalogui\createnewcmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\wxgis\catalogui\catalogcmd.h">
@@ -270,6 +276,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\wxgis\catalogui\gxdbconnfactoryui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxremoteconnui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\wxgis\catalogui\createnewcmd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -91,7 +91,6 @@ enum wxGISEnumCommandKind
 	enumGISCommandRadio = wxITEM_RADIO,         /**< The type is radio */
 	enumGISCommandMax = wxITEM_MAX,             /**< The type is max available command from wxWidgets (the less command have no analogs in wxWidgets)*/
 	enumGISCommandMenu = wxITEM_MAX + 10,       /**< The type is menu */
-//    enumGISCommandNewMenu,                      /**< The type is new menu */
 	enumGISCommandControl,                      /**< The type is control */
     enumGISCommandDropDown                      /**< The type is drop down */
 };

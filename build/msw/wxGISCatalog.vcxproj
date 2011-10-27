@@ -125,6 +125,7 @@
     <ClCompile Include="..\..\src\catalog\gxmlfactory.cpp" />
     <ClCompile Include="..\..\src\catalog\gxprjfactory.cpp" />
     <ClCompile Include="..\..\src\catalog\gxrasterfactory.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxremoteconn.cpp" />
     <ClCompile Include="..\..\src\catalog\gxshapefactory.cpp" />
     <ClCompile Include="..\..\src\catalog\gxspatreffolder.cpp" />
   </ItemGroup>
@@ -151,6 +152,7 @@
     <ClInclude Include="..\..\include\wxgis\catalog\gxmlfactory.h" />
     <ClInclude Include="..\..\include\wxgis\catalog\gxprjfactory.h" />
     <ClInclude Include="..\..\include\wxgis\catalog\gxrasterfactory.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxremoteconn.h" />
     <ClInclude Include="..\..\include\wxgis\catalog\gxshapefactory.h" />
     <ClInclude Include="..\..\include\wxgis\catalog\gxspatreffolder.h" />
   </ItemGroup>

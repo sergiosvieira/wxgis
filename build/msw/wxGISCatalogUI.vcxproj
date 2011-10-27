@@ -102,6 +102,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\catalogui\catalogcmd.cpp" />
+    <ClCompile Include="..\..\src\catalogui\createnewcmd.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxapplication.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxarchfolderui.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxarchivefactoryui.cpp" />
@@ -130,6 +131,7 @@
     <ClCompile Include="..\..\src\catalogui\gxprjfactoryui.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxpropertypages.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxrasterfactoryui.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxremoteconnui.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxselection.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxshapefactoryui.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxspatreffolderui.cpp" />
@@ -147,6 +149,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\wxgis\catalogui\catalogcmd.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\catalogui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\createnewcmd.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxapplication.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxarchfolderui.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxarchivefactoryui.h" />
@@ -175,6 +178,7 @@
     <ClInclude Include="..\..\include\wxgis\catalogui\gxprjfactoryui.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxpropertypages.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxrasterfactoryui.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxremoteconnui.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxselection.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxshapefactoryui.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxspatreffolderui.h" />

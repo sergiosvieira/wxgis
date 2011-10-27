@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  Catalog Main Commands class.
+ * Purpose:  Catalog Create New Commands class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,22 +21,17 @@
 #pragma once
 #include "wxgis/framework/framework.h"
 
-
-/** \class wxGISCatalogMainCmd catalogcmd.h
-    \brief The main catalog commands.
-
-	The main catalog commands includes: "Up One Level", "Connect Folder", "Disconnect Folder", "Location", "Delete Item", "Back", "Forward", "Create Folder", "Rename", "Refresh", "Properties", "Copy", "Cut" and "Paste".
+/** \class wxGISCreateNewCmd createnewcmd.h
+    \brief The new commands for create various data types.
 */
-class wxGISCatalogMainCmd :
-    public ICommand,
-	public IToolControl,
-    public IDropDownCommand
+class wxGISCreateNewCmd :
+    public ICommand
 {
     DECLARE_DYNAMIC_CLASS(wxGISCatalogMainCmd)
 
 public:
-	wxGISCatalogMainCmd(void);
-	virtual ~wxGISCatalogMainCmd(void);
+	wxGISCreateNewCmd(void);
+	virtual ~wxGISCreateNewCmd(void);
 	//ICommand
 	virtual wxIcon GetBitmap(void);
 	virtual wxString GetCaption(void);
@@ -49,17 +44,7 @@ public:
 	virtual bool OnCreate(IFrameApplication* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
-	//IToolControl
-	virtual IToolBarControl* GetControl(void);
-	virtual wxString GetToolLabel(void);
-	virtual bool HasToolLabel(void);
-    //IDropDownCommand
-   	virtual wxMenu* GetDropDownMenu(void);
-    virtual void OnDropDownCommand(int nID);
 private:
 	IFrameApplication* m_pApp;
-	wxIcon m_IconFolderUp, m_IconFolderConn, m_IconFolderConnDel, m_IconDel, m_IconGoPrev, m_IconGoNext;
-    wxIcon m_IconFolderNew, m_IconEdit, m_IconViewRefresh, m_IconProps;
-    wxIcon m_LargeFolderIcon, m_SmallFolderIcon;
-    wxIcon m_CopyIcon, m_CutIcon, m_PasteIcon;
+	wxIcon m_IconCreateRemoteConn;
 };

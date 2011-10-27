@@ -19,10 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxdbconnfactory.h"
-
-//#include "wxgis/catalog/gxmlfactory.h"
-//#include "wxgis/catalog/gxdataset.h"
-//#include "wxgis/catalog/gxkmldataset.h"
+#include "wxgis/catalog/gxremoteconn.h"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionFactory, wxObject)
 
@@ -72,8 +69,7 @@ void wxGxDBConnectionFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
 
 IGxObject* wxGxDBConnectionFactory::GetGxDataset(CPLString path, wxString name)
 {
-    //wxGxKMLDataset* pDataset = new wxGxKMLDataset(path, name, type);
+    wxGxRemoteConnection* pDataset = new wxGxRemoteConnection(path, name);
     //pDataset->SetEncoding(wxFONTENCODING_UTF8);
-    //return static_cast<IGxObject*>(pDataset);
-    return NULL;
+    return static_cast<IGxObject*>(pDataset);
 }
