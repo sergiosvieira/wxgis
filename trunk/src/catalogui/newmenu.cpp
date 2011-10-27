@@ -28,7 +28,6 @@
 wxGISNewMenu::wxGISNewMenu(const wxString& sName, const wxString& sCaption, wxGISEnumCommandBars type, const wxString& title, long style) : wxGISMenu(sName, sCaption, type, title, style)
 {
 	m_pCatalog = NULL;
-	m_ConnectionPointSelectionCookie = wxNOT_FOUND;
 }
 
 wxGISNewMenu::~wxGISNewMenu(void)
@@ -100,15 +99,14 @@ void wxGISNewMenu::Update(IGxSelection* Selection)
             m_pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApplication->GetCatalog());
     }
 
-    for(size_t i = 0; i < m_CommandArray.size(); ++i)
-        RemoveCommand(i);
+    for(size_t i = m_CommandArray.size(); i > 0; --i)
+        RemoveCommand(i - 1);
 
 	for(size_t i = 0; i < m_SubmenuArray.size(); ++i)
 	{
 		Delete(m_SubmenuArray[i].pItem);
 		wsDELETE(m_SubmenuArray[i].pBar);
 	}
-
 
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(Selection->GetLastSelectedObjectID());
     IGxObjectUI* pGxObjUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
@@ -125,7 +123,6 @@ void wxGISNewMenu::Update(IGxSelection* Selection)
         }
 	}
 }
-
 
 void wxGISNewMenu::AddCommand(ICommand* pCmd)
 {
@@ -171,3 +168,4 @@ void wxGISNewMenu::AddCommand(ICommand* pCmd)
 	}
 	wxGISCommandBar::AddCommand(pCmd);
 }
+

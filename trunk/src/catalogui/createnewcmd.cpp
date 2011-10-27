@@ -19,8 +19,9 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/createnewcmd.h"
-#include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalogui/gxcatalogui.h"
+#include "wxgis/catalogui/remoteconndlg.h"
+
 
 #include "../../art/rdb_create.xpm"
 
@@ -135,7 +136,12 @@ void wxGISCreateNewCmd::OnClick(void)
 	switch(m_subtype)
 	{
 		case 0:	
-       //     {
+            {
+			    wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
+                wxGISRemoteConnDlg dlg(pWnd);
+                if(dlg.ShowModal() == wxID_OK)
+                {
+                }
 			    //IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			    //if(pGxApp)
 			    //{
@@ -176,7 +182,7 @@ void wxGISCreateNewCmd::OnClick(void)
        //                 }
        //             }
        //         }
-       //     }
+            }
             break;
 		default:
 			return;
