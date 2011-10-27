@@ -112,10 +112,11 @@ enum wxGISEnumPrjFileType
 enum wxGISEnumContainerType
 {
     enumContUnknown = 0,
-	enumContFolder = 1,
-	enumContGDBFolder = 2,
-    enumContDataset = 3,
-	enumContGDB = 4
+	enumContFolder,
+	enumContGDBFolder,
+    enumContDataset,
+	enumContGDB,
+	enumContRemoteConnection
 };
 
 

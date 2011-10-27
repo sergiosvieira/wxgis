@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDBConnectionFactoryUI class.
+ * Purpose:  wxGxRemoteConnection class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
@@ -18,31 +18,18 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#include "wxgis/catalogui/gxdbconnfactoryui.h"
-#include "wxgis/catalogui/gxremoteconnui.h"
 
-#include "../../art/rdb_conn_16.xpm"
-#include "../../art/rdb_conn_48.xpm"
-#include "../../art/rdb_disconn_16.xpm"
-#include "../../art/rdb_disconn_48.xpm"
+#include "wxgis/catalog/gxremoteconn.h"
 
-IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionFactoryUI, wxGxDBConnectionFactory)
+//--------------------------------------------------------------
+//class wxGxRemoteConnection
+//--------------------------------------------------------------
 
-wxGxDBConnectionFactoryUI::wxGxDBConnectionFactoryUI(void) : wxGxDBConnectionFactory()
-{
-    m_LargeIconConn = wxIcon(rdb_conn_48_xpm);
-    m_SmallIconConn = wxIcon(rdb_conn_16_xpm);
-    m_LargeIconDisconn = wxIcon(rdb_disconn_48_xpm);
-    m_SmallIconDisconn = wxIcon(rdb_disconn_16_xpm);
-}
-
-wxGxDBConnectionFactoryUI::~wxGxDBConnectionFactoryUI(void)
+wxGxRemoteConnection::wxGxRemoteConnection(CPLString Path, wxString Name) : wxGxFile(Path, Name)
 {
 }
 
-IGxObject* wxGxDBConnectionFactoryUI::GetGxDataset(CPLString path, wxString name)
+wxGxRemoteConnection::~wxGxRemoteConnection(void)
 {
-    wxGxRemoteConnectionUI* pDataset = new wxGxRemoteConnectionUI(path, name, m_LargeIconConn, m_SmallIconConn, m_LargeIconDisconn, m_SmallIconDisconn);
-    //pDataset->SetEncoding(wxFONTENCODING_UTF8);
-    return static_cast<IGxObject*>(pDataset);
 }
+

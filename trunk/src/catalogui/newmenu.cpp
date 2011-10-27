@@ -21,8 +21,6 @@
 #include "wxgis/catalogui/newmenu.h"
 #include "wxgis/catalogui/gxapplication.h"
 
-//#include "../../art/mainframe.xpm"
-
 //----------------------------------------------------------------------
 // wxGISNewMenu
 //----------------------------------------------------------------------
@@ -35,12 +33,6 @@ wxGISNewMenu::wxGISNewMenu(const wxString& sName, const wxString& sCaption, wxGI
 
 wxGISNewMenu::~wxGISNewMenu(void)
 {
-    for(size_t i = 0; i < m_delitems.size(); ++i)
-    {
-        wxMenuItem* pItem = Remove(m_delitems[i]);
-        wxDELETE(pItem);
-    }
-    m_delitems.clear();
 }
 
 wxIcon wxGISNewMenu::GetBitmap(void)
@@ -108,14 +100,6 @@ void wxGISNewMenu::Update(IGxSelection* Selection)
             m_pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApplication->GetCatalog());
     }
 
-    for(size_t i = 0; i < m_delitems.size(); ++i)
-    {
-        wxMenuItem* pItem = Remove(m_delitems[i]);
-        wxDELETE(pItem);
-    }
-
-    m_delitems.clear();
-
     for(size_t i = 0; i < m_CommandArray.size(); ++i)
         RemoveCommand(i);
 
@@ -137,80 +121,53 @@ void wxGISNewMenu::Update(IGxSelection* Selection)
             {
                 ICommand* pCmd = pCmdBar->GetCommand(i);
                 AddCommand(pCmd);
-                //if(pCmd)
-                //{
-                //    wxMenuItem* pItem(NULL);
-                //    switch(pCmd->GetKind())
-                //    {
-                //    case enumGISCommandSeparator:
-                //        pItem = AppendSeparator(); 
-                //        break;
-                //    case enumGISCommandCheck:
-                //        pItem = AppendCheckItem (pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage());
-                //        break;
-                //    case enumGISCommandRadio:
-                //        pItem = AppendRadioItem (pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage());
-                //        break;
-                //    case enumGISCommandNormal:
-                //        pItem = Append (pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), (wxItemKind )pCmd->GetKind());
-                //        pItem->SetBitmap(pCmd->GetBitmap());
-                //        break;
-                //    case enumGISCommandMax:
-                //    case enumGISCommandControl:
-                //    case enumGISCommandDropDown:
-                //    default:
-                //        break;
-                //    };
-                //    m_delitems.push_back(pItem);
-                //}
             }
         }
-//        //
-//        wxMenu* pCmdMenu = dynamic_cast<wxMenu*>(m_pApp->GetCommandBar( pGxObjUI->NewMenu() ));
-//        if(pCmdMenu)
-//        {
-//            wxMenuItemList& pLst = pCmdMenu->GetMenuItems();
-//            wxMenuItemList::iterator iter;
-//            for (iter = pLst.begin(); iter != pLst.end(); ++iter)
-//            {
-//                //MyListElement *current = *iter;  
-//                wxMenuItem* pAddItem = *iter;
-//                wxMenuItem* pItem = pAddItem;
-//                if(pAddItem->IsSubMenu())
-//				{
-//                    pItem = Append(pAddItem->GetId(), pAddItem->GetItemLabel(), pAddItem->GetSubMenu());
-//				}
-//                else
-//				{
-//					pItem = new wxMenuItem(this, pAddItem->GetId(), pAddItem->GetItemLabel(), wxEmptyString, pAddItem->GetKind());
-//					if(pItem)
-//					{
-//						wxBitmap Bmp = pAddItem->GetBitmap();
-//						if(Bmp.IsOk())
-//						{
-////#ifdef __WIN32__
-////							wxImage Img = Bmp.ConvertToImage();
-////							pItem->SetBitmaps(Bmp, Img.ConvertToGreyscale());
-////#else
-//			                pItem->SetBitmap(Bmp);
-////#endif
-//						}
-//						Append(pItem);
-//					}
-//
-//                    //pItem = Append(pAddItem->GetId(), pAddItem->GetItemLabel(), wxEmptyString, pAddItem->GetKind());
-//				}
-//                //wxMenuItem* pItem = Append(*iter);
-//                m_delitems.push_back(pItem);
-//            }
-//            return;
-//        }
-    }
-    else
-    {
-        wxMenuItem* pItem = Append(ID_MENUCMDMAX, wxT(" "), wxEmptyString, wxITEM_NORMAL);
-        pItem->Enable(false);
-        m_delitems.push_back(pItem);
-    }
+	}
 }
 
+
+void wxGISNewMenu::AddCommand(ICommand* pCmd)
+{
+	switch(pCmd->GetKind())
+	{
+	case enumGISCommandSeparator:
+		AppendSeparator();
+		break;
+	case enumGISCommandMenu:
+		{
+			IGISCommandBar* pGISCommandBar = dynamic_cast<IGISCommandBar*>(pCmd);
+			if(pGISCommandBar)
+			{
+				pGISCommandBar->Reference();
+				SUBMENUDATA data = {AppendSubMenu(dynamic_cast<wxMenu*>(pCmd), pCmd->GetCaption(), pCmd->GetMessage()), pGISCommandBar};
+				m_SubmenuArray.push_back(data);
+			}
+		}
+		break;
+	case enumGISCommandCheck:
+	case enumGISCommandRadio:
+    case enumGISCommandNormal:
+		{
+			wxMenuItem *item = new wxMenuItem(this, pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), (wxItemKind)pCmd->GetKind());
+//TODO: check if works in new wxWidgets release
+//			wxBitmap Bmp = pCmd->GetBitmap();
+//			if(Bmp.IsOk())
+//            {
+//#ifdef __WIN32__
+//                wxImage Img = Bmp.ConvertToImage();
+//				item->SetBitmaps(Bmp, Img.ConvertToGreyscale());
+//#else
+//                item->SetBitmap(Bmp);
+//#endif
+//            }
+			Append(item);
+		}
+		break;
+	case enumGISCommandDropDown:
+	case enumGISCommandControl:
+	default:
+		return;
+	}
+	wxGISCommandBar::AddCommand(pCmd);
+}

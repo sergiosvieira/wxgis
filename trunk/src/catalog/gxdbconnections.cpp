@@ -64,7 +64,9 @@ void wxGxDBConnections::Serialize(wxXmlNode* pConfigNode)
 
 bool wxGxDBConnections::CanCreate(long nDataType, long DataSubtype)
 {
-	//enumContFolder
-	//
+	if(nDataType != enumGISContainer)
+		return false;
+	if(DataSubtype != enumContFolder && DataSubtype != enumContRemoteConnection)
+		return false;
 	return wxIsWritable(wxString(m_sPath, wxConvUTF8));
 }
