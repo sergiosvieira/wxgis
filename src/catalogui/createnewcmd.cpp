@@ -21,9 +21,11 @@
 #include "wxgis/catalogui/createnewcmd.h"
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/remoteconndlg.h"
-
+#include "wxgis/catalogui/gxremoteconnui.h"
 
 #include "../../art/rdb_create.xpm"
+#include "../../art/rdb_disconn_16.xpm"
+#include "../../art/rdb_disconn_48.xpm"
 
 //	0	Create new remote connection
 //  1   ?
@@ -137,51 +139,46 @@ void wxGISCreateNewCmd::OnClick(void)
 	{
 		case 0:	
             {
-			    wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
-                wxGISRemoteConnDlg dlg(pWnd);
-                if(dlg.ShowModal() == wxID_OK)
-                {
-                }
-			    //IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			    //if(pGxApp)
-			    //{
-       //             IGxCatalog* pCatalog = pGxApp->GetCatalog();
-       //             if(pCatalog)
-       //             {
-       //                 wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pCatalog);
-       //                 IGxSelection* pSel = pGxCatalogUI->GetSelection();
-       //                 if(pSel)
-       //                 {
-       //                     //create folder
-							//IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
-       //                     CPLString sFolderPath = CPLFormFilename(pGxObject->GetInternalName(), wxString(_("New folder")).mb_str(wxConvUTF8), NULL);
-       //                     //CPLString sFolderPath = pObj->GetInternalName() + wxFileName::GetPathSeparator().mb_str(wxConvUTF8) + wxString(_("New folder")).mb_str(wxConvUTF8);
-       //                     if(!CreateDir(sFolderPath))
-       //                     {
-       //                         wxMessageBox(_("Create folder error!"), _("Error"), wxICON_ERROR | wxOK );
-       //                         return;
-       //                     }
-       //                     //create GxObject
-							//if(!m_LargeFolderIcon.IsOk())
-							//	m_LargeFolderIcon = wxIcon(folder_48_xpm);
-							//if(!m_SmallFolderIcon.IsOk())
-							//	m_SmallFolderIcon = wxIcon(folder_16_xpm);
+			    IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
+			    if(pGxApp)
+			    {
+                    IGxCatalog* pCatalog = pGxApp->GetCatalog();
+                    if(pCatalog)
+                    {
+                        wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pCatalog);
+                        IGxSelection* pSel = pGxCatalogUI->GetSelection();
+                        if(pSel)
+                        {
+                            //create folder
+							IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
+							CPLString pszConnPath = CheckUniqName(pGxObject->GetInternalName(), wxString(_("new remote connection")), wxString(wxT("xconn")));
 
-       //                     wxGxFolderUI* pFolder = new wxGxFolderUI(sFolderPath, wxString(_("New folder")), m_LargeFolderIcon, m_SmallFolderIcon);
-       //                     IGxObject* pGxFolder = static_cast<IGxObject*>(pFolder);
-       //                     IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
-       //                     pObjCont->AddChild(pGxFolder);
-       //                     pCatalog->ObjectAdded(pGxFolder->GetID());
-							////wait while added new GxObject to views
-							//wxYield();
-       //                     //begin rename GxObject
-       //                     wxWindow* pFocusWnd = wxWindow::FindFocus();
-       //                     IGxView* pGxView = dynamic_cast<IGxView*>(pFocusWnd);
-       //                     if(pGxView)
-       //                         pGxView->BeginRename(pGxFolder->GetID());
-       //                 }
-       //             }
-       //         }
+							wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
+							wxGISRemoteConnDlg dlg(pszConnPath, pWnd);
+							if(dlg.ShowModal() == wxID_OK)
+							{
+								//create GxObject
+								if(!m_LargeConnIcon.IsOk())
+									m_LargeConnIcon = wxIcon(rdb_disconn_48_xpm);
+								if(!m_SmallConnIcon.IsOk())
+									m_SmallConnIcon = wxIcon(rdb_disconn_16_xpm);
+
+								wxGxRemoteConnectionUI* pConn = new wxGxRemoteConnectionUI(dlg.GetPath(), dlg.GetName(), m_LargeConnIcon, m_SmallConnIcon);
+								IGxObject* pGxConn = static_cast<IGxObject*>(pConn);
+								IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
+								pObjCont->AddChild(pGxConn);
+								pCatalog->ObjectAdded(pGxConn->GetID());
+								//wait while added new GxObject to views
+								wxYield();
+								//begin rename GxObject
+								wxWindow* pFocusWnd = wxWindow::FindFocus();
+								IGxView* pGxView = dynamic_cast<IGxView*>(pFocusWnd);
+								if(pGxView)
+									pGxView->BeginRename(pGxConn->GetID());
+							}
+                        }
+                    }
+                }
             }
             break;
 		default:

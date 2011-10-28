@@ -69,7 +69,7 @@ void wxGPProcess::ProcessInput(wxString sInputData)
 			//wxTimeSpan Remains = Elapsed * (nPercentR / nPercent);
 			long dMSec = double(Elapsed.GetMilliseconds().ToDouble() * nPercentR) / nPercent;	
 			wxTimeSpan Remains = wxTimeSpan(0,0,0,dMSec);
-			m_dtEstEnd = m_dtBeg + Remains;
+			m_dtEstEnd = wxDateTime::Now() + Remains;
 			sTxt = wxString(_("Remains ")) + Remains.Format(_("%H hour(s) %M min. %S sec."));
 		}
 
