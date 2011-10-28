@@ -45,10 +45,13 @@ protected:
 		ID_TESTBUTTON,
 	};
 public:
-	wxGISRemoteConnDlg( wxWindow* parent, wxWindowID id = ID_REMOTECONNDLG, const wxString& title = _("Remote Database Connection"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 320,REMOTECONNDLG_MAX_HEIGHT ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+	wxGISRemoteConnDlg( CPLString pszConnPath, wxWindow* parent, wxWindowID id = ID_REMOTECONNDLG, const wxString& title = _("Remote Database Connection"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 320,REMOTECONNDLG_MAX_HEIGHT ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 	virtual ~wxGISRemoteConnDlg();
+	virtual CPLString GetPath(void);
+	virtual wxString GetName(void);
 protected:	//events	
     void OnTest(wxCommandEvent& event);	
+	void OnOK(wxCommandEvent& event);
 protected:		
 	wxBoxSizer* m_bMainSizer;
 	wxTextCtrl* m_ConnName;
@@ -77,6 +80,10 @@ protected:
 	wxString m_sUser; 
 	wxString m_sPass;
     bool m_bIsBinaryCursor;
+	bool m_bCreateNew;
+
+	wxString m_sOutputPath;
+	CPLString m_sOriginOutput;
 
     DECLARE_EVENT_TABLE()
 };

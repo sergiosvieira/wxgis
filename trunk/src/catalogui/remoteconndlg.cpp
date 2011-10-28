@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/remoteconndlg.h"
+#include "wxgis/datasource/sysop.h"
 
 #include <wx/valgen.h>
 #include <wx/valtext.h>
@@ -28,17 +29,40 @@
 //  wxGISRemoteConnDlg
 //-------------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(wxGISRemoteConnDlg, wxDialog)
-    //EVT_BUTTON(wxID_OK, wxGISRemoteConnDlg::OnOK)
+    EVT_BUTTON(wxID_OK, wxGISRemoteConnDlg::OnOK)
     EVT_BUTTON(ID_TESTBUTTON, wxGISRemoteConnDlg::OnTest)
 END_EVENT_TABLE()
 
-wxGISRemoteConnDlg::wxGISRemoteConnDlg( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+wxGISRemoteConnDlg::wxGISRemoteConnDlg( CPLString pszConnPath, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-    m_sConnName = wxString(_("new remote connection.xconn")); 
+	m_bCreateNew = CPLCheckForFile(pszConnPath, NULL);
+
+    m_sConnName = wxString(CPLGetFilename(pszConnPath), wxConvUTF8); 
+	m_sOutputPath = wxString(CPLGetPath(pszConnPath), wxConvUTF8); 
+	//set default values
 	m_sServer = wxString(wxT("localhost")); 
 	m_sPort = wxString(wxT("5432")); 
 	m_sDatabase = wxString(wxT("postgres")); 
-    m_bIsBinaryCursor = false;
+	m_bIsBinaryCursor = false;
+
+	//load values from xconn file
+	if(!m_bCreateNew)
+	{
+		wxXmlDocument doc(wxString(pszConnPath,  wxConvUTF8));
+		if(doc.IsOk())
+		{
+			wxXmlNode* pRootNode = doc.GetRoot();
+			if(pRootNode)
+			{
+				m_sServer = pRootNode->GetAttribute(wxT("server"), m_sServer);
+				m_sPort = pRootNode->GetAttribute(wxT("port"), m_sPort);
+				m_sDatabase = pRootNode->GetAttribute(wxT("db"), m_sDatabase);
+				m_sUser = pRootNode->GetAttribute(wxT("user"), m_sUser);
+				m_sPass = pRootNode->GetAttribute(wxT("pass"), m_sPass);//TOOD: crypt/decrypt
+				m_bIsBinaryCursor = pRootNode->GetAttribute(wxT("isbincursor"), m_bIsBinaryCursor == true ? wxT("yes"), wxT("no"));
+			}
+		}
+	}
 
     this->SetSizeHints( wxSize( 320,REMOTECONNDLG_MAX_HEIGHT ), wxSize( -1,REMOTECONNDLG_MAX_HEIGHT ) );
 	
@@ -133,6 +157,40 @@ wxGISRemoteConnDlg::~wxGISRemoteConnDlg()
 {
 }
 
+void wxGISRemoteConnDlg::OnOK(wxCommandEvent& event)
+{
+	if ( Validate() && TransferDataFromWindow() )
+	{
+		wxXmlDocument doc;
+		wxXmlNode* pRootNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("connection"));
+		pRootNode->AddAttribute(wxT("server"), m_sServer);
+		pRootNode->AddAttribute(wxT("port"), m_sPort);
+		pRootNode->AddAttribute(wxT("db"), m_sDatabase);
+		pRootNode->AddAttribute(wxT("user"), m_sUser);
+		pRootNode->AddAttribute(wxT("pass"), m_sPass);//TOOD: crypt/decrypt
+		pRootNode->AddAttribute(wxT("isbincursor"), m_bIsBinaryCursor == true ? wxT("yes"), wxT("no"));
+
+		doc.SetRoot(pRootNode);
+
+		wxString sFullPath = m_sOutputPath + wxFileName::GetPathSeparator() + GetName();
+		//compare if user changw name in changing mode
+		if(!m_bCreateNew && EQUAL(CPLString(sFullPath.mb_str(wxConvUTF8), m_sOriginOutput))
+		{
+			DeleteFile(m_sOriginOutput);
+		}
+		if(!doc.Save(sFullPath))
+		{
+			wxMessageBox(wxString(_("Connection create failed!")), wxString(_("Error")), wxICON_ERROR | wxOK ); 
+			return;
+		}
+		EndModal(wxID_OK);
+	}
+	else
+	{
+		wxMessageBox(wxString(_("Some input values are not correct!")), wxString(_("Error")), wxICON_ERROR | wxOK ); 
+	}
+}
+
 void wxGISRemoteConnDlg::OnTest(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
@@ -154,34 +212,15 @@ void wxGISRemoteConnDlg::OnTest(wxCommandEvent& event)
     }
 }
 
-//void wxGISTCPClientPanel::Load( wxCommandEvent& event )
-//{
-//	wxXmlNode* pProps = dlg.GetConnectionProperties();
-//	if(pProps)
-//	{
-//		m_sPort = pProps->GetAttribute(wxT("port"), m_sPort);
-//		m_sName = pProps->GetAttribute(wxT("name"), m_sName);
-//		m_IPAddress = pProps->GetAttribute(wxT("ip"), m_IPAddress);
-//	}
-//	TransferDataToWindow();
-//	event.Skip();
-//}
-//
-//INetClientConnection* wxGISTCPClientPanel::OnSave(void)
-//{
-//	if(!TransferDataFromWindow())
-//	{
-//		m_sErrorMsg = wxString(_("Some input values are not correct!"));
-//		return NULL;
-//	}
-//
-//	wxXmlNode* pConnNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("conn_info"));
-//	pConnNode->AddAttribute(wxT("port"), m_sPort);
-//	pConnNode->AddAttribute(wxT("name"), m_sName);
-//	pConnNode->AddAttribute(wxT("ip"), m_IPAddress);
-//	pConnNode->AddAttribute(wxT("user"), m_UserName);
-//    wxString sCryptPass;//TODO: = Encode(m_Password, CONFIG_DIR);//Crypt Passwd //wxString sTestPass = Decode(sCryptPass, CONFIG_DIR);    
-//	pConnNode->AddAttribute(wxT("pass"), sCryptPass);
-//	
-//	return m_pFactory->GetConnection(pConnNode);
-//}
+CPLString wxGISRemoteConnDlg::GetPath(void)
+{
+	return CPLString(wxString(m_sOutputPath + wxFileName::GetPathSeparator() + GetName()).mb_str(wxConvUTF8));
+}
+
+wxString wxGISRemoteConnDlg::GetName(void)
+{
+ 	if(!m_sConnName.Lower().EndsWith(wxT(".xconn")))
+		m_sConnName.Append(wxT(".xconn"));
+	return m_sConnName;
+}
+
