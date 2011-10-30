@@ -102,7 +102,7 @@ void wxGxKMLDatasetUI::LoadChildren(void)
 
 	if(m_pwxGISDataset == NULL)
 	{
-        wxGISFeatureDatasetSPtr pwxGISFeatureDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_type);
+        wxGISFeatureDatasetSPtr pwxGISFeatureDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_eType);
 
         if(!pwxGISFeatureDataset->Open(0,0,false))
         {
@@ -114,16 +114,16 @@ void wxGxKMLDatasetUI::LoadChildren(void)
         }
 
         m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(pwxGISFeatureDataset);
-        m_pwxGISDataset->SetSubType(m_type);
+        m_pwxGISDataset->SetSubType(m_eType);
         pwxGISFeatureDataset->SetEncoding(m_Encoding);
 	}
 
     for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); ++i)
     {
         wxGISFeatureDatasetSPtr pwxGISFeatureSubDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset->GetSubset(i));
-        pwxGISFeatureSubDataset->SetSubType(m_type);
+        pwxGISFeatureSubDataset->SetSubType(m_eType);
         pwxGISFeatureSubDataset->SetEncoding(m_Encoding);
-        wxGxKMLSubDatasetUI* pGxSubDataset = new wxGxKMLSubDatasetUI(m_sPath, pwxGISFeatureSubDataset->GetName(), boost::static_pointer_cast<wxGISDataset>(pwxGISFeatureSubDataset), m_type, m_LargeSubIcon, m_SmallSubIcon);
+        wxGxKMLSubDatasetUI* pGxSubDataset = new wxGxKMLSubDatasetUI(m_sPath, pwxGISFeatureSubDataset->GetName(), boost::static_pointer_cast<wxGISDataset>(pwxGISFeatureSubDataset), m_eType, m_LargeSubIcon, m_SmallSubIcon);
 		bool ret_code = AddChild(pGxSubDataset);
 		if(!ret_code)
 			wxDELETE(pGxSubDataset);

@@ -29,21 +29,26 @@ class WXDLLIMPEXP_GIS_DS wxGISPostgresDataSource :
 	public wxGISDataset
 {
 public:
-	wxGISPostgresDataSource(wxString sName, wxString sCryptPass, wxString sPGPort = wxT("5432"), wxString sPGAddres = wxT("localhost"), wxString sDBName = wxT("postgres"), wxString sCursor = wxT("PG"));
+	wxGISPostgresDataSource(wxString sName, wxString sPass, wxString sPort = wxT("5432"), wxString sAddres = wxT("localhost"), wxString sDBName = wxT("postgres"), bool bIsBinaryCursor = false);
 	virtual ~wxGISPostgresDataSource(void);
 	//wxGISDataset
     virtual size_t GetSubsetsCount(void);
     virtual wxGISDatasetSPtr GetSubset(size_t nIndex);
     virtual wxString GetName(void);
 	virtual void Close(void);
+	virtual bool IsCached(void){return true;};
+	virtual void Cache(ITrackCancel* pTrackCancel = NULL){};
 	//wxGISPostGISDataset
     virtual wxGISDatasetSPtr GetSubset(wxString sTablename);
 	virtual OGRDataSource* GetDataSource(void);
 	virtual bool Open(void);
 	virtual wxGISDatasetSPtr ExecuteSQL(wxString sStatement, wxGISSpatialFilter* pSpatialFilter = NULL, wxString sDialect = wxEmptyString);
 protected:
+	virtual wxGISDatasetSPtr GetDatasetFromOGRLayer(OGRLayer* poLayer);
+protected:
 	OGRDataSource *m_poDS;
-    wxString m_sName, m_sCryptPass, m_sPGPort, m_sPGAddres, m_sDBName, m_sCursor;
+    wxString m_sName, m_sPass, m_sPort, m_sAddres, m_sDBName;
+	bool m_bIsBinaryCursor;
 };
 
 DEFINE_SHARED_PTR(wxGISPostgresDataSource);

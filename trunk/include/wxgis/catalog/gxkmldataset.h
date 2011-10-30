@@ -52,7 +52,7 @@ public:
     //IGxDataset
     virtual wxGISDatasetSPtr GetDataset(bool bCached = true, ITrackCancel* pTrackCancel = NULL);
 	virtual wxGISEnumDatasetType GetType(void){return enumGISContainer;};
-    virtual int GetSubType(void){return (int)m_type;};
+    virtual int GetSubType(void){return (int)m_eType;};
 	virtual bool IsCached(void){return false;};
 	virtual void Cache(ITrackCancel* pTrackCancel = NULL){};
 	//IGxObjectContainer
@@ -67,7 +67,7 @@ protected:
 	CPLString m_sPath;
     wxFontEncoding m_Encoding;
 	wxGISDatasetSPtr m_pwxGISDataset;
-	wxGISEnumVectorDatasetType m_type;
+	wxGISEnumVectorDatasetType m_eType;
     bool m_bIsChildrenLoaded;
 };
 

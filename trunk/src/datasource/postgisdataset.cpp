@@ -22,18 +22,17 @@
 #include "wxgis/core/core.h"
 #include "wxgis/datasource/table.h"
 
-wxGISPostgresDataSource::wxGISPostgresDataSource(wxString sName, wxString sCryptPass, wxString sPGPort, wxString sPGAddres, wxString sDBName, wxString sCursor) : wxGISDataset(""), m_poDS(NULL)
+wxGISPostgresDataSource::wxGISPostgresDataSource(wxString sName, wxString sPass, wxString sPort, wxString sAddres, wxString sDBName, bool bIsBinaryCursor) : wxGISDataset(""), m_poDS(NULL)
 {
-    //m_RefCount = 0;
 	m_bIsOpened = false;
 	m_nType = enumGISContainer;
-	m_nSubType = enumContGDB;
+	m_nSubType = enumContRemoteConnection;
     m_sName = sName;
-    m_sCryptPass = sCryptPass;
-    m_sPGPort = sPGPort;
-    m_sPGAddres = sPGAddres;
+    m_sPass = sPass;
+    m_sPort = sPort;
+    m_sAddres = sAddres;
     m_sDBName = sDBName;
-	m_sCursor = sCursor;
+	m_bIsBinaryCursor = bIsBinaryCursor;
 }
 
 wxGISPostgresDataSource::~wxGISPostgresDataSource(void)
@@ -69,25 +68,7 @@ wxGISDatasetSPtr wxGISPostgresDataSource::GetSubset(size_t nIndex)
     if(m_poDS)
     {
 	    OGRLayer* poLayer = m_poDS->GetLayer(nIndex);
-        if(poLayer)
-        {
-            m_poDS->Reference();
-			wxGISDatasetSPtr pDataset;
-			//check the layer type
-			if(CPLStrnlen(poLayer->GetGeometryColumn(), 100))
-			{
-				m_poDS->Reference();
-                wxGISTableSPtr pTable = boost::make_shared<wxGISTable>("", enumTablePostgres, poLayer, m_poDS);//TODO: Think about it
-				pTable->SetEncoding(wxFONTENCODING_UTF8);
-				//pTable->Reference();
-                pDataset = boost::static_pointer_cast<wxGISDataset>(pTable);
-			}
-			else
-			{
-   //         wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, "", (wxGISEnumVectorDatasetType)m_nSubType);
-			}
-	        return pDataset;
-        }
+		return GetDatasetFromOGRLayer(poLayer);
     }
     return wxGISDatasetSPtr();
 }
@@ -101,26 +82,29 @@ wxGISDatasetSPtr wxGISPostgresDataSource::GetSubset(wxString sTablename)
     if(m_poDS)
     {
 	    OGRLayer* poLayer = m_poDS->GetLayerByName(sTablename.mb_str(wxConvUTF8));
-        if(poLayer)
-        {
-			wxGISDatasetSPtr pDataset;
-			//check the layer type
-			if(CPLStrnlen(poLayer->GetGeometryColumn(), 100))
-			{
-   //         wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, "", (wxGISEnumVectorDatasetType)m_nSubType);
-			}
-			else
-			{
-				m_poDS->Reference();
-                wxGISTableSPtr pTable = boost::make_shared<wxGISTable>("", enumTablePostgres, poLayer, m_poDS);
-				pTable->SetEncoding(wxFONTENCODING_UTF8);
-				//pTable->Reference();
-                pDataset = boost::static_pointer_cast<wxGISDataset>(pTable);
-			}
-	        return pDataset;
-        }
+		return GetDatasetFromOGRLayer(poLayer);
     }
     return wxGISDatasetSPtr();
+}
+
+wxGISDatasetSPtr wxGISPostgresDataSource::GetDatasetFromOGRLayer(OGRLayer* poLayer)
+{
+	wxGISDatasetSPtr pDataset;
+	wxCHECK(poLayer, pDataset);
+    m_poDS->Reference();
+	//check the layer type
+	if(CPLStrnlen(poLayer->GetGeometryColumn(), 100))
+	{
+//         wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, "", (wxGISEnumVectorDatasetType)m_nSubType);
+	}
+	else
+	{
+		m_poDS->Reference();
+        wxGISTableSPtr pTable = boost::make_shared<wxGISTable>("", enumTablePostgres, poLayer, m_poDS);//TODO: Think about it
+		pTable->SetEncoding(wxFONTENCODING_UTF8);
+        pDataset = boost::static_pointer_cast<wxGISDataset>(pTable);
+	}
+	return pDataset;
 }
 
 bool wxGISPostgresDataSource::Open()
@@ -132,19 +116,13 @@ bool wxGISPostgresDataSource::Open()
 	CPLSetConfigOption("PG_LIST_ALL_TABLES", "YES");
 	CPLSetConfigOption("PGCLIENTENCODING", "UTF-8");
 
-    //wxT("PG:host='127.0.0.1' dbname='db' port='5432' user='bishop' password='xxx'")
-/*	wxString Path = wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_sCursor.c_str(), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), m_sName.c_str(), Decode(m_sCryptPass, CONFIG_DIR));
-	m_sPath = CPLString(Path.mb_str(wxConvUTF8));
+    //"PG:host='127.0.0.1' dbname='db' port='5432' user='bishop' password='xxx'"
+	wxString sConnStr = wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_bIsBinaryCursor == true ? wxT("PG") : wxT("PGB"), m_sAddres.c_str(), m_sDBName.c_str(), m_sPort.c_str(), m_sName.c_str(), m_sPass.c_str());
+	m_sPath = CPLString(sConnStr.mb_str(wxConvUTF8));
     m_poDS = OGRSFDriverRegistrar::Open( m_sPath, FALSE );
     m_sPath.Clear();
 	if( m_poDS == NULL )
-	{
-		const char* err = CPLGetLastErrorMsg();
-		wxString sErr = wxString::Format(_("wxGISPostGISDataset: Open failed! Host '%s', Database name '%s', Port='%s'. OGR error: %s"), m_sPGAddres.c_str(), m_sDBName.c_str(), m_sPGPort.c_str(), wgMB2WX(err));
-		wxLogError(sErr);
 		return false;
-	}
-*/
 	m_bIsOpened = true;
 	return true;
 }

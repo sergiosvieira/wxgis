@@ -28,7 +28,7 @@
 
 wxGxKMLDataset::wxGxKMLDataset(CPLString Path, wxString Name, wxGISEnumVectorDatasetType Type)
 {
-	m_type = Type;
+	m_eType = Type;
 
 	m_sName = Name;
 	m_sPath = Path;
@@ -63,7 +63,7 @@ wxString wxGxKMLDataset::GetBaseName(void)
 
 wxString wxGxKMLDataset::GetCategory(void)
 {
-    switch(m_type)
+    switch(m_eType)
     {
     case enumVecKML:
     case enumVecKMZ:
@@ -87,7 +87,7 @@ bool wxGxKMLDataset::Delete(void)
     }
     else
     {
-        wxGISFeatureDatasetSPtr pwxGISFeatureDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_type);
+        wxGISFeatureDatasetSPtr pwxGISFeatureDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_eType);
         bRet = pwxGISFeatureDataset->Delete();
     }
 
@@ -158,7 +158,7 @@ void wxGxKMLDataset::LoadChildren(void)
 
 	if(m_pwxGISDataset == NULL)
 	{
-        wxGISFeatureDatasetSPtr pwxGISFeatureDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_type);
+        wxGISFeatureDatasetSPtr pwxGISFeatureDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_eType);
 
         if(!pwxGISFeatureDataset->Open())
         {
@@ -170,16 +170,16 @@ void wxGxKMLDataset::LoadChildren(void)
         }
 
         m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(pwxGISFeatureDataset);
-        m_pwxGISDataset->SetSubType(m_type);
+        m_pwxGISDataset->SetSubType(m_eType);
         pwxGISFeatureDataset->SetEncoding(m_Encoding);
 	}
 
     for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); ++i)
     {
         wxGISFeatureDatasetSPtr pwxGISFeatureSuDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset->GetSubset(i));
-        pwxGISFeatureSuDataset->SetSubType(m_type);
+        pwxGISFeatureSuDataset->SetSubType(m_eType);
         pwxGISFeatureSuDataset->SetEncoding(m_Encoding);
-        wxGxKMLSubDataset* pGxSubDataset = new wxGxKMLSubDataset(m_sPath, pwxGISFeatureSuDataset->GetName(), pwxGISFeatureSuDataset, m_type);
+        wxGxKMLSubDataset* pGxSubDataset = new wxGxKMLSubDataset(m_sPath, pwxGISFeatureSuDataset->GetName(), pwxGISFeatureSuDataset, m_eType);
 		bool ret_code = AddChild(pGxSubDataset);
 		if(!ret_code)
 			wxDELETE(pGxSubDataset);

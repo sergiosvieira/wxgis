@@ -22,6 +22,7 @@
 #pragma once
 
 #include "wxgis/datasource/datasource.h"
+#include "wxgis/core/config.h"
 
 #include <wx/filename.h>
 
@@ -222,17 +223,6 @@ protected:
     bool m_bIsEnabled;
 };
 
-//class IGxCatalogEvents
-//{
-//public:
-//	virtual ~IGxCatalogEvents(void){};
-//	virtual void OnObjectAdded(long nObjectID) = 0;
-//	virtual void OnObjectChanged(long nObjectID) = 0;
-//	virtual void OnObjectDeleted(long nObjectID) = 0;
-//	virtual void OnObjectRefreshed(long nObjectID) = 0;
-//	virtual void OnRefreshAll(void) = 0;
-////};
-
 class IGxDataset
 {
 public:
@@ -288,20 +278,18 @@ public:
 
 typedef std::vector<IGxObjectFilter*> OBJECTFILTERS, *LPOBJECTFILTERS;
 
-//
-//class IGxObjectFactories
-//{
-//public:
-//	virtual ~IGxObjectFactories(void){};
-//	virtual GxObjectFactoryArray* GetEnabledGxObjectFactories() = 0;
-//};
-
 static wxString GetConvName(CPLString szPath)
 {
     //name conv cp866 if zip
     wxString name;
     if( EQUALN(szPath,"/vsizip/",8) )
-        name = wxString(CPLGetFilename(szPath), wxCSConv(wxT("cp-866")));//TODO: conv name get from config
+	{
+		wxString sCharset(wxT("cp-866"));
+		wxGISAppConfigSPtr pConfig = GetConfig();
+		if(pConfig)
+			sCharset = pConfig->Read(enumGISHKCU, wxString(wxT("wxGISCommon/zip/charset")), sCharset);
+        name = wxString(CPLGetFilename(szPath), wxCSConv(sCharset));
+	}
     else
         name = wxString(CPLGetFilename(szPath), wxConvUTF8);
 	return name;
