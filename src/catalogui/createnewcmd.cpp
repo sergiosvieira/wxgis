@@ -22,8 +22,11 @@
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/remoteconndlg.h"
 #include "wxgis/catalogui/gxremoteconnui.h"
+#include "wxgis/datasource/sysop.h"
 
 #include "../../art/rdb_create.xpm"
+#include "../../art/rdb_conn_16.xpm"
+#include "../../art/rdb_conn_48.xpm"
 #include "../../art/rdb_disconn_16.xpm"
 #include "../../art/rdb_disconn_48.xpm"
 
@@ -151,19 +154,24 @@ void wxGISCreateNewCmd::OnClick(void)
                         {
                             //create folder
 							IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
-							CPLString pszConnPath = CheckUniqName(pGxObject->GetInternalName(), wxString(_("new remote connection")), wxString(wxT("xconn")));
+							CPLString pszConnFolder = pGxObject->GetInternalName();
+							CPLString pszConnName = CheckUniqName(pszConnFolder, wxString(_("new remote connection")), wxString(wxT("xconn")));
 
 							wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
-							wxGISRemoteConnDlg dlg(pszConnPath, pWnd);
+							wxGISRemoteConnDlg dlg(CPLFormFilename(pszConnFolder, pszConnName, "xconn"), pWnd);
 							if(dlg.ShowModal() == wxID_OK)
 							{
 								//create GxObject
 								if(!m_LargeConnIcon.IsOk())
-									m_LargeConnIcon = wxIcon(rdb_disconn_48_xpm);
+									m_LargeConnIcon = wxIcon(rdb_conn_48_xpm);
 								if(!m_SmallConnIcon.IsOk())
-									m_SmallConnIcon = wxIcon(rdb_disconn_16_xpm);
+									m_SmallConnIcon = wxIcon(rdb_conn_16_xpm);
+								if(!m_LargeDisconnIcon.IsOk())
+									m_LargeDisconnIcon = wxIcon(rdb_disconn_48_xpm);
+								if(!m_SmallDisconnIcon.IsOk())
+									m_SmallDisconnIcon = wxIcon(rdb_disconn_16_xpm);
 
-								wxGxRemoteConnectionUI* pConn = new wxGxRemoteConnectionUI(dlg.GetPath(), dlg.GetName(), m_LargeConnIcon, m_SmallConnIcon);
+								wxGxRemoteConnectionUI* pConn = new wxGxRemoteConnectionUI(dlg.GetPath(), dlg.GetName(), m_LargeConnIcon, m_SmallConnIcon, m_LargeDisconnIcon, m_SmallDisconnIcon);
 								IGxObject* pGxConn = static_cast<IGxObject*>(pConn);
 								IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 								pObjCont->AddChild(pGxConn);

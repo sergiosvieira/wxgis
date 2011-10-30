@@ -21,6 +21,7 @@
 
 #include "wxgis/catalogui/remoteconndlg.h"
 #include "wxgis/datasource/sysop.h"
+#include "wxgis/core/crypt.h"
 
 #include <wx/valgen.h>
 #include <wx/valtext.h>
@@ -35,7 +36,7 @@ END_EVENT_TABLE()
 
 wxGISRemoteConnDlg::wxGISRemoteConnDlg( CPLString pszConnPath, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-	m_bCreateNew = CPLCheckForFile(pszConnPath, NULL);
+	m_bCreateNew = !CPLCheckForFile((char*)pszConnPath.c_str(), NULL);
 
     m_sConnName = wxString(CPLGetFilename(pszConnPath), wxConvUTF8); 
 	m_sOutputPath = wxString(CPLGetPath(pszConnPath), wxConvUTF8); 
@@ -58,8 +59,8 @@ wxGISRemoteConnDlg::wxGISRemoteConnDlg( CPLString pszConnPath, wxWindow* parent,
 				m_sPort = pRootNode->GetAttribute(wxT("port"), m_sPort);
 				m_sDatabase = pRootNode->GetAttribute(wxT("db"), m_sDatabase);
 				m_sUser = pRootNode->GetAttribute(wxT("user"), m_sUser);
-				m_sPass = pRootNode->GetAttribute(wxT("pass"), m_sPass);//TOOD: crypt/decrypt
-				m_bIsBinaryCursor = pRootNode->GetAttribute(wxT("isbincursor"), m_bIsBinaryCursor == true ? wxT("yes"), wxT("no"));
+				Decrypt(pRootNode->GetAttribute(wxT("pass"), wxEmptyString), m_sPass);
+				m_bIsBinaryCursor = wxString(pRootNode->GetAttribute(wxT("isbincursor"), m_bIsBinaryCursor == true ? wxT("yes") : wxT("no"))).CmpNoCase(wxString(wxT("yes"))) == 0;
 			}
 		}
 	}
@@ -161,20 +162,27 @@ void wxGISRemoteConnDlg::OnOK(wxCommandEvent& event)
 {
 	if ( Validate() && TransferDataFromWindow() )
 	{
+		wxString sCryptPass;
+		if(!Crypt(m_sPass, sCryptPass))
+		{
+			wxMessageBox(wxString(_("Crypt password failed!")), wxString(_("Error")), wxICON_ERROR | wxOK ); 
+			return;
+		}
 		wxXmlDocument doc;
 		wxXmlNode* pRootNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("connection"));
 		pRootNode->AddAttribute(wxT("server"), m_sServer);
 		pRootNode->AddAttribute(wxT("port"), m_sPort);
 		pRootNode->AddAttribute(wxT("db"), m_sDatabase);
-		pRootNode->AddAttribute(wxT("user"), m_sUser);
-		pRootNode->AddAttribute(wxT("pass"), m_sPass);//TOOD: crypt/decrypt
-		pRootNode->AddAttribute(wxT("isbincursor"), m_bIsBinaryCursor == true ? wxT("yes"), wxT("no"));
+		pRootNode->AddAttribute(wxT("user"), m_sUser);		
+		pRootNode->AddAttribute(wxT("pass"), sCryptPass);
+		pRootNode->AddAttribute(wxT("isbincursor"), m_bIsBinaryCursor == true ? wxT("yes") : wxT("no"));
+		pRootNode->AddAttribute(wxT("type"), wxT("POSTGIS"));//store server type for future
 
 		doc.SetRoot(pRootNode);
 
 		wxString sFullPath = m_sOutputPath + wxFileName::GetPathSeparator() + GetName();
 		//compare if user changw name in changing mode
-		if(!m_bCreateNew && EQUAL(CPLString(sFullPath.mb_str(wxConvUTF8), m_sOriginOutput))
+		if(!m_bCreateNew && EQUAL(CPLString(sFullPath.mb_str(wxConvUTF8)), m_sOriginOutput))
 		{
 			DeleteFile(m_sOriginOutput);
 		}
@@ -193,6 +201,7 @@ void wxGISRemoteConnDlg::OnOK(wxCommandEvent& event)
 
 void wxGISRemoteConnDlg::OnTest(wxCommandEvent& event)
 {
+	wxBusyCursor bcur;
 	TransferDataFromWindow();
 	CPLSetConfigOption("PG_LIST_ALL_TABLES", "YES");
 	CPLSetConfigOption("PGCLIENTENCODING", "UTF-8");

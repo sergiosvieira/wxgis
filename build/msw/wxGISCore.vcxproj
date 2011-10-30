@@ -46,7 +46,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXGISGDAL)\port;$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OPENSSL_ROOT)\include;$(BOOST_ROOT);$(WXGISGDAL)\port;$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CORE;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -55,9 +55,9 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxgiscpld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxgiscpld.lib;libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>$(WXWIDGETS)\lib\vc_dll;$(WXGISGDAL)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(WXWIDGETS)\lib\vc_dll;$(WXGISGDAL)\lib;$(OPENSSL_ROOT)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -100,6 +100,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\core\config.cpp" />
+    <ClCompile Include="..\..\src\core\crypt.cpp" />
     <ClCompile Include="..\..\src\core\event.cpp" />
     <ClCompile Include="..\..\src\core\format.cpp" />
     <ClCompile Include="..\..\src\core\globalfn.cpp" />
@@ -109,6 +110,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\wxgis\core\config.h" />
     <ClInclude Include="..\..\include\wxgis\core\core.h" />
+    <ClInclude Include="..\..\include\wxgis\core\crypt.h" />
     <ClInclude Include="..\..\include\wxgis\core\event.h" />
     <ClInclude Include="..\..\include\wxgis\core\format.h" />
     <ClInclude Include="..\..\include\wxgis\core\globalfn.h" />
