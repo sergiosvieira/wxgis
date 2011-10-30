@@ -21,28 +21,47 @@
 #pragma once
 
 #include "wxgis/catalog/catalog.h"
-#include "wxgis/catalog/gxfile.h"
 
 /** \class wxGxRemoteConnection gxremoteconn.h
     \brief A Remote Connection GxObject.
 */
 
 class WXDLLIMPEXP_GIS_CLT wxGxRemoteConnection :
-	public wxGxFile/*,
-	public IGxDataset*/
+	public IGxObjectContainer,
+	public IGxDataset
 {
 public:
 	wxGxRemoteConnection(CPLString Path, wxString Name);
 	virtual ~wxGxRemoteConnection(void);
 	//IGxObject
+	virtual wxString GetName(void){return m_sName;};
+    virtual wxString GetBaseName(void);
+    virtual CPLString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void){return wxString(_("Remote Database Connection"));};
-	////IGxDataset
-	//virtual wxGISDatasetSPtr GetDataset(bool bCache = true, ITrackCancel* pTrackCancel = NULL);
-	//virtual wxGISEnumDatasetType GetType(void){return enumContRemoteConnection;};
- //   virtual int GetSubType(void){return m_type;};
-//protected:
-//	wxString m_sName;
-//    CPLString m_sPath;
-//	wxGISDatasetSPtr m_pwxGISDataset;
-//	wxGISEnumTableDatasetType m_type;
+	//IGxObjectEdit
+	virtual bool Delete(void);
+	virtual bool CanDelete(void){return true;};
+	virtual bool Rename(wxString NewName);
+	virtual bool CanRename(void){return true;};
+	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel);
+	virtual bool CanCopy(CPLString szDestPath){return true;};
+	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
+	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
+	//IGxDataset
+	virtual wxGISDatasetSPtr GetDataset(bool bCache = true, ITrackCancel* pTrackCancel = NULL);
+	virtual wxGISEnumDatasetType GetType(void){return enumGISContainer;};
+    virtual int GetSubType(void){return m_eType;};
+	//IGxObjectContainer
+	virtual bool DeleteChild(IGxObject* pChild);
+	virtual bool AreChildrenViewable(void){return true;};
+	virtual bool HasChildren(void){LoadChildren(); return m_Children.size() > 0 ? true : false;};
+	//wxGxRemoteConnection
+	virtual void LoadChildren(void);
+	virtual void EmptyChildren(void);
+protected:
+	wxGISDatasetSPtr m_pwxGISDataset;
+	wxGISEnumContainerType m_eType;
+    bool m_bIsChildrenLoaded;
+	wxString m_sName;
+    CPLString m_sPath;
 };
