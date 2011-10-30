@@ -47,4 +47,6 @@ public:
 private:
 	IFrameApplication* m_pApp;
 	wxIcon m_IconCreateRemoteConn;
+	wxIcon m_LargeConnIcon, m_SmallConnIcon;
+	wxIcon m_LargeDisconnIcon, m_SmallDisconnIcon;
 };

@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxremoteconnui.h"
+#include "wxgis/catalogui/remoteconndlg.h"
 
 //--------------------------------------------------------------
 //class wxGxRemoteConnectionUI
@@ -51,22 +52,13 @@ wxIcon wxGxRemoteConnectionUI::GetSmallImage(void)
 
 void wxGxRemoteConnectionUI::EditProperties(wxWindow *parent)
 {
-    //wxPropertySheetDialog PropertySheetDialog;
-    //if (!PropertySheetDialog.Create(parent, wxID_ANY, _("Properties"), wxDefaultPosition, wxSize( 480,640 ), wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER))
-    //    return;
-    //PropertySheetDialog.SetIcon(properties_xpm);
-    //PropertySheetDialog.CreateButtons(wxOK);
-    //wxWindow* pParentWnd = static_cast<wxWindow*>(PropertySheetDialog.GetBookCtrl());
-
-    //wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(GetSpatialReference(), pParentWnd);
-    //PropertySheetDialog.GetBookCtrl()->AddPage(SpatialReferencePropertyPage, SpatialReferencePropertyPage->GetPageName());
-
-    //PropertySheetDialog.LayoutDialog();
-    ////center?
-    //PropertySheetDialog.SetSize(480,640);
-    //PropertySheetDialog.Center();
-
-    //PropertySheetDialog.ShowModal();
+	wxGISRemoteConnDlg dlg(m_sPath, parent);
+	if(dlg.ShowModal() == wxID_OK)
+	{
+		m_sPath = dlg.GetPath();
+		m_sName = dlg.GetName();
+		m_pCatalog->ObjectChanged(GetID());
+	}
 }
 
 bool wxGxRemoteConnectionUI::Invoke(wxWindow* pParentWnd)
