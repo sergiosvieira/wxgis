@@ -28,10 +28,11 @@
 
 class WXDLLIMPEXP_GIS_CLT wxGxRemoteConnection :
 	public IGxObjectContainer,
+    public IGxObjectEdit,
 	public IGxDataset
 {
 public:
-	wxGxRemoteConnection(CPLString Path, wxString Name);
+	wxGxRemoteConnection(CPLString soPath, wxString Name);
 	virtual ~wxGxRemoteConnection(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};

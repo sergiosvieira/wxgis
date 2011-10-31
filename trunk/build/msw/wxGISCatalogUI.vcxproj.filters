@@ -150,6 +150,9 @@
     <ClCompile Include="..\..\src\catalogui\remoteconndlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\catalogui\gxpostgisdatasetui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\wxgis\catalogui\catalogcmd.h">
@@ -288,6 +291,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\wxgis\catalogui\remoteconndlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxpostgisdatasetui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

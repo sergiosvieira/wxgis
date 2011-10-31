@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDataset class.
+ * Purpose:  GxDataset classes.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop

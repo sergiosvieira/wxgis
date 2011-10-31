@@ -21,17 +21,23 @@
 
 #include "wxgis/catalogui/gxremoteconnui.h"
 #include "wxgis/catalogui/remoteconndlg.h"
+#include "wxgis/catalogui/gxpostgisdatasetui.h"
+#include "wxgis/core/globalfn.h"
 
 //--------------------------------------------------------------
 //class wxGxRemoteConnectionUI
 //--------------------------------------------------------------
 
-wxGxRemoteConnectionUI::wxGxRemoteConnectionUI(CPLString Path, wxString Name, wxIcon LargeIconConn, wxIcon SmallIconConn, wxIcon LargeIconDisconn, wxIcon SmallIconDisconn) : wxGxRemoteConnection(Path, Name)
+wxGxRemoteConnectionUI::wxGxRemoteConnectionUI(CPLString soPath, wxString Name, wxIcon LargeIconConn, wxIcon SmallIconConn, wxIcon LargeIconDisconn, wxIcon SmallIconDisconn, wxIcon LargeIconFeatureClass, wxIcon SmallIconFeatureClass, wxIcon LargeIconTable, wxIcon SmallIconTable) : wxGxRemoteConnection(soPath, Name)
 {
     m_oLargeIconConn = LargeIconConn;
     m_oSmallIconConn = SmallIconConn;
     m_oLargeIconDisconn = LargeIconDisconn;
     m_oSmallIconDisconn = SmallIconDisconn;
+    m_oLargeIconFeatureClass = LargeIconFeatureClass;
+    m_oSmallIconFeatureClass = SmallIconFeatureClass;
+    m_oLargeIconTable = LargeIconTable;
+    m_oSmallIconTable = SmallIconTable;
 }
 
 wxGxRemoteConnectionUI::~wxGxRemoteConnectionUI(void)
@@ -40,14 +46,18 @@ wxGxRemoteConnectionUI::~wxGxRemoteConnectionUI(void)
 
 wxIcon wxGxRemoteConnectionUI::GetLargeImage(void)
 {
-	//TODO: get connection state
-    return m_oLargeIconDisconn;
+    if(m_pwxGISDataset && m_pwxGISDataset->IsOpened())
+        return m_oLargeIconConn;
+    else
+        return m_oLargeIconDisconn;
 }
 
 wxIcon wxGxRemoteConnectionUI::GetSmallImage(void)
 {
-	//TODO: get connection state
-    return m_oSmallIconDisconn;
+    if(m_pwxGISDataset && m_pwxGISDataset->IsOpened())
+        return m_oSmallIconConn;
+    else
+        return m_oSmallIconDisconn;
 }
 
 void wxGxRemoteConnectionUI::EditProperties(wxWindow *parent)
@@ -63,6 +73,77 @@ void wxGxRemoteConnectionUI::EditProperties(wxWindow *parent)
 
 bool wxGxRemoteConnectionUI::Invoke(wxWindow* pParentWnd)
 {
-    EditProperties(pParentWnd);
+    //EditProperties(pParentWnd);
+    wxBusyCursor cur;
+    //connect
+    GetDataset();
+    m_pCatalog->ObjectChanged(GetID());
+
     return true;
+}
+
+void wxGxRemoteConnectionUI::LoadChildren(void)
+{
+	if(m_bIsChildrenLoaded)
+		return;
+
+	if(m_pwxGISDataset == NULL)
+		return;
+
+    IFrameApplication* pFApp = dynamic_cast<IFrameApplication*>(GetApplication());
+    IProgressor* pProgressor(NULL);
+    if(pFApp)
+    {
+        IStatusBar* pStatusBar = pFApp->GetStatusBar();
+        if(pStatusBar)
+            pProgressor = pStatusBar->GetProgressor();
+    }
+
+    if(pProgressor)
+    {
+        pProgressor->SetRange(m_pwxGISDataset->GetSubsetsCount());
+        pProgressor->Show(true);
+    }
+
+    for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); ++i)
+    {
+        if(pProgressor)
+            pProgressor->SetValue(i);
+
+        wxGISDatasetSPtr pGISDataset = m_pwxGISDataset->GetSubset(i);
+        wxGISEnumDatasetType eType = pGISDataset->GetType();
+        IGxObject* pGxObject(NULL);
+        switch(eType)
+        {
+        case enumGISFeatureDataset:
+            {
+                wxGxPostGISFeatureDatasetUI* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDatasetUI(m_sPath, pGISDataset, m_oLargeIconFeatureClass, m_oSmallIconFeatureClass);
+                pGxObject = static_cast<IGxObject*>(pGxPostGISFeatureDataset);
+            }
+            break;
+        case enumGISTableDataset:
+            {
+                wxGxPostGISTableDatasetUI* pGxPostGISTableDataset = new wxGxPostGISTableDatasetUI(m_sPath, pGISDataset, m_oLargeIconTable, m_oSmallIconTable);
+                pGxObject = static_cast<IGxObject*>(pGxPostGISTableDataset);
+            }
+            break;
+        case enumGISRasterDataset:
+            break;
+        default:
+        case enumGISContainer:
+            break;
+        };
+
+        if(pGxObject)
+        {
+		    bool ret_code = AddChild(pGxObject);
+		    if(!ret_code)
+			    wxDELETE(pGxObject);
+        }
+	}
+
+    if(pProgressor)
+        pProgressor->Show(false);
+
+	m_bIsChildrenLoaded = true;
 }

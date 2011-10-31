@@ -21,6 +21,7 @@
 #include "wxgis/datasource/postgisdataset.h"
 #include "wxgis/core/core.h"
 #include "wxgis/datasource/table.h"
+#include "wxgis/datasource/featuredataset.h"
 
 wxGISPostgresDataSource::wxGISPostgresDataSource(wxString sName, wxString sPass, wxString sPort, wxString sAddres, wxString sDBName, bool bIsBinaryCursor) : wxGISDataset(""), m_poDS(NULL)
 {
@@ -95,7 +96,10 @@ wxGISDatasetSPtr wxGISPostgresDataSource::GetDatasetFromOGRLayer(OGRLayer* poLay
 	//check the layer type
 	if(CPLStrnlen(poLayer->GetGeometryColumn(), 100))
 	{
-//         wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(m_poDS, poLayer, "", (wxGISEnumVectorDatasetType)m_nSubType);
+		m_poDS->Reference();
+        wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>("", emumVecPostGIS, poLayer, m_poDS);
+		pDataSet->SetEncoding(wxFONTENCODING_UTF8);
+        pDataset = boost::static_pointer_cast<wxGISDataset>(pDataSet);
 	}
 	else
 	{
@@ -117,7 +121,7 @@ bool wxGISPostgresDataSource::Open()
 	CPLSetConfigOption("PGCLIENTENCODING", "UTF-8");
 
     //"PG:host='127.0.0.1' dbname='db' port='5432' user='bishop' password='xxx'"
-	wxString sConnStr = wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_bIsBinaryCursor == true ? wxT("PG") : wxT("PGB"), m_sAddres.c_str(), m_sDBName.c_str(), m_sPort.c_str(), m_sName.c_str(), m_sPass.c_str());
+	wxString sConnStr = wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_bIsBinaryCursor == true ? wxT("PGB") : wxT("PG"), m_sAddres.c_str(), m_sDBName.c_str(), m_sPort.c_str(), m_sName.c_str(), m_sPass.c_str());
 	m_sPath = CPLString(sConnStr.mb_str(wxConvUTF8));
     m_poDS = OGRSFDriverRegistrar::Open( m_sPath, FALSE );
     m_sPath.Clear();
