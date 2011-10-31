@@ -123,6 +123,7 @@
     <ClCompile Include="..\..\src\catalog\gxkmldataset.cpp" />
     <ClCompile Include="..\..\src\catalog\gxmapinfofactory.cpp" />
     <ClCompile Include="..\..\src\catalog\gxmlfactory.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxpostgisdataset.cpp" />
     <ClCompile Include="..\..\src\catalog\gxprjfactory.cpp" />
     <ClCompile Include="..\..\src\catalog\gxrasterfactory.cpp" />
     <ClCompile Include="..\..\src\catalog\gxremoteconn.cpp" />
@@ -150,6 +151,7 @@
     <ClInclude Include="..\..\include\wxgis\catalog\gxkmldataset.h" />
     <ClInclude Include="..\..\include\wxgis\catalog\gxmapinfofactory.h" />
     <ClInclude Include="..\..\include\wxgis\catalog\gxmlfactory.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxpostgisdataset.h" />
     <ClInclude Include="..\..\include\wxgis\catalog\gxprjfactory.h" />
     <ClInclude Include="..\..\include\wxgis\catalog\gxrasterfactory.h" />
     <ClInclude Include="..\..\include\wxgis\catalog\gxremoteconn.h" />

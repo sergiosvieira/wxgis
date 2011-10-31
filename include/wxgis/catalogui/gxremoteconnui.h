@@ -33,7 +33,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxRemoteConnectionUI :
     public IGxObjectWizard
 {
 public:
-	wxGxRemoteConnectionUI(CPLString Path, wxString Name, wxIcon LargeIconConn = wxNullIcon, wxIcon SmallIconConn = wxNullIcon, wxIcon LargeIconDisconn = wxNullIcon, wxIcon SmallIconDisconn = wxNullIcon);
+	wxGxRemoteConnectionUI(CPLString soPath, wxString Name, wxIcon LargeIconConn = wxNullIcon, wxIcon SmallIconConn = wxNullIcon, wxIcon LargeIconDisconn = wxNullIcon, wxIcon SmallIconDisconn = wxNullIcon, wxIcon LargeIconFeatureClass = wxNullIcon, wxIcon SmallIconFeatureClass = wxNullIcon, wxIcon LargeIconTable = wxNullIcon, wxIcon SmallIconTable = wxNullIcon);
 	virtual ~wxGxRemoteConnectionUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
@@ -44,9 +44,14 @@ public:
 	virtual void EditProperties(wxWindow *parent);
     //IGxObjectWizard
     virtual bool Invoke(wxWindow* pParentWnd);
+    //wxGxRemoteConnection
+	virtual void LoadChildren(void);
 protected:
     wxIcon m_oLargeIconConn;
     wxIcon m_oSmallIconConn;
     wxIcon m_oLargeIconDisconn;
     wxIcon m_oSmallIconDisconn;
+    wxIcon m_oLargeIconFeatureClass, m_oSmallIconFeatureClass;
+    wxIcon m_oLargeIconTable, m_oSmallIconTable;
 };
+

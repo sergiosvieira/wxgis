@@ -23,17 +23,18 @@
 #include "wxgis/core/crypt.h"
 #include "wxgis/datasource/postgisdataset.h"
 #include "wxgis/datasource/sysop.h"
+#include "wxgis/catalog/gxpostgisdataset.h"
 
 //--------------------------------------------------------------
 //class wxGxRemoteConnection
 //--------------------------------------------------------------
 
-wxGxRemoteConnection::wxGxRemoteConnection(CPLString Path, wxString Name)
+wxGxRemoteConnection::wxGxRemoteConnection(CPLString soPath, wxString Name)
 {
 	m_eType = enumContRemoteConnection;
 	m_bIsChildrenLoaded = false;
 	m_sName = Name;
-	m_sPath = Path;
+	m_sPath = soPath;
 }
 
 wxGxRemoteConnection::~wxGxRemoteConnection(void)
@@ -112,13 +113,36 @@ void wxGxRemoteConnection::LoadChildren(void)
 
     for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); ++i)
     {
- //       wxGISFeatureDatasetSPtr pwxGISFeatureSuDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset->GetSubset(i));
- //       pwxGISFeatureSuDataset->SetSubType(m_type);
- //       pwxGISFeatureSuDataset->SetEncoding(m_Encoding);
- //       wxGxKMLSubDataset* pGxSubDataset = new wxGxKMLSubDataset(m_sPath, pwxGISFeatureSuDataset->GetName(), pwxGISFeatureSuDataset, m_type);
-	//	bool ret_code = AddChild(pGxSubDataset);
-	//	if(!ret_code)
-	//		wxDELETE(pGxSubDataset);
+        wxGISDatasetSPtr pGISDataset = m_pwxGISDataset->GetSubset(i);
+        wxGISEnumDatasetType eType = pGISDataset->GetType();
+        IGxObject* pGxObject(NULL);
+        switch(eType)
+        {
+        case enumGISFeatureDataset:
+            {
+                wxGxPostGISFeatureDataset* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDataset(m_sPath, pGISDataset);
+                pGxObject = static_cast<IGxObject*>(pGxPostGISFeatureDataset);
+            }
+            break;
+        case enumGISTableDataset:
+            {
+                wxGxPostGISTableDataset* pGxPostGISTableDataset = new wxGxPostGISTableDataset(m_sPath, pGISDataset);
+                pGxObject = static_cast<IGxObject*>(pGxPostGISTableDataset);
+            }
+            break;
+        case enumGISRasterDataset:
+            break;
+        default:
+        case enumGISContainer:
+            break;
+        };
+
+        if(pGxObject)
+        {
+		    bool ret_code = AddChild(pGxObject);
+		    if(!ret_code)
+			    wxDELETE(pGxObject);
+        }
 	}
 	m_bIsChildrenLoaded = true;
 }
