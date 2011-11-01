@@ -52,8 +52,12 @@ wxGxPostGISFeatureDataset::wxGxPostGISFeatureDataset(CPLString soPath, wxGISData
 
 	m_pwxGISDataset = pwxGISDataset;
 
+#ifndef PGTEST 
     m_sPath = soPath + " ";
     m_sPath += m_sName.mb_str(wxConvUTF8);
+#else
+    m_sPath = "dbname='firereporter' host=gis-lab.info port=5432 user='firereporter' sslmode=disable key='id' table=\"fires\" (geom) sql=";
+#endif
 }
 
 wxGxPostGISFeatureDataset::~wxGxPostGISFeatureDataset(void)

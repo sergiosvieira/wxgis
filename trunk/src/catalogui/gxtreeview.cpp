@@ -419,9 +419,27 @@ void wxGxTreeViewBase::OnObjectChanged(wxGxCatalogEvent& event)
                     sName = FileName.GetName();
                 }
 				wxIcon icon = pGxObjectUI->GetSmallImage();
-//TODO: Check if icon of this item is same to other items
+
+                int pos(wxNOT_FOUND);
 				if(icon.IsOk())
-					m_TreeImageList.Replace(pData->m_smallimage_index, icon);
+                {
+                    for(size_t i = 0; i < m_IconsArray.size(); ++i)
+                    {
+                        if(m_IconsArray[i].oIcon.IsSameAs(icon))
+                        {
+                            pos = m_IconsArray[i].iImageIndex;
+                            break;
+                        }
+                    }
+                    if(pos == wxNOT_FOUND)
+                    {
+                        pos = m_TreeImageList.Add(icon);
+                        ICONDATA myicondata = {icon, pos};
+                        m_IconsArray.push_back(myicondata);
+                    }
+                    SetItemImage(TreeItemId, pos);
+					//m_TreeImageList.Replace(pData->m_smallimage_index, icon);
+                }
 				SetItemText(TreeItemId, sName);
 				if(pGxObjectContainer != NULL)
 				{
@@ -612,6 +630,7 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
         wxString sSystemPath(pGxObject->GetInternalName(), wxConvUTF8);
         my_data.AddFile(sSystemPath);
     }
+    //my_data.SetFormat(wxDataFormat(wxT("application/x-vnd.qgis.qgis.uri")));
     wxDropSource dragSource( this );
 	dragSource.SetData( my_data );
 	wxDragResult result = dragSource.DoDragDrop( TRUE );  

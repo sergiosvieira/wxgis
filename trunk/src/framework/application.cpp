@@ -141,6 +141,7 @@ void wxGISApplication::OnSize(wxSizeEvent& event)
 
 void wxGISApplication::OnCommand(wxCommandEvent& event)
 {
+    event.Skip();
 	if(event.GetId() >= ID_PLUGINCMD && event.GetId() <= ID_PLUGINCMDMAX)
 		Command(GetCommand(event.GetId()));
 	else if(event.GetId() >= ID_TOOLBARCMD && event.GetId() <= ID_TOOLBARCMDMAX)
@@ -153,6 +154,7 @@ void wxGISApplication::OnCommand(wxCommandEvent& event)
 
 void wxGISApplication::OnDropDownCommand(wxCommandEvent& event)
 {
+    event.Skip();
     if(m_pDropDownCommand)
         m_pDropDownCommand->OnDropDownCommand(event.GetId());
 }
@@ -676,6 +678,7 @@ void wxGISApplication::LoadToolbars(wxXmlNode* pRootNode)
 
 void wxGISApplication::OnToolDropDown(wxAuiToolBarEvent& event)
 {
+    event.Skip();
     if(event.IsDropDownClicked())
     {
         ICommand* pCmd = GetCommand(event.GetToolId());
