@@ -26,10 +26,10 @@
 #include "../../art/rdb_disconn_16.xpm"
 #include "../../art/rdb_disconn_48.xpm"
 
-#include "../../art/shp_dset_16.xpm"
-#include "../../art/shp_dset_48.xpm"
-#include "../../art/table_dbf_16.xpm"
-#include "../../art/table_dbf_48.xpm"
+#include "../../art/pg_vec_16.xpm"
+#include "../../art/pg_vec_48.xpm"
+#include "../../art/table_pg_16.xpm"
+#include "../../art/table_pg_48.xpm"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionFactoryUI, wxGxDBConnectionFactory)
 
@@ -40,15 +40,10 @@ wxGxDBConnectionFactoryUI::wxGxDBConnectionFactoryUI(void) : wxGxDBConnectionFac
     m_LargeIconDisconn = wxIcon(rdb_disconn_48_xpm);
     m_SmallIconDisconn = wxIcon(rdb_disconn_16_xpm);
 
-    //wxImage ShpImage16 = wxBitmap(shp_dset_16_xpm).ConvertToImage().ConvertToGreyscale();
-    //wxImage ShpImage48 = wxBitmap(shp_dset_48_xpm).ConvertToImage().ConvertToGreyscale();
-    //wxImage DbfImage16 = wxBitmap(table_dbf_16_xpm).ConvertToImage().ConvertToGreyscale();
-    //wxImage DbfImage48 = wxBitmap(table_dbf_48_xpm).ConvertToImage().ConvertToGreyscale();
-
-    m_LargeIconFeatureClass = wxIcon(shp_dset_48_xpm);
-    m_SmallIconFeatureClass = wxIcon(shp_dset_16_xpm);
-    m_LargeIconTable = wxIcon(table_dbf_48_xpm);
-    m_SmallIconTable = wxIcon(table_dbf_16_xpm);
+    m_LargeIconFeatureClass = wxIcon(pg_vec_48_xpm);
+    m_SmallIconFeatureClass = wxIcon(pg_vec_16_xpm);
+    m_LargeIconTable = wxIcon(table_pg_48_xpm);
+    m_SmallIconTable = wxIcon(table_pg_16_xpm);
 }
 
 wxGxDBConnectionFactoryUI::~wxGxDBConnectionFactoryUI(void)

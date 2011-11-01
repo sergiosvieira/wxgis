@@ -84,6 +84,8 @@ bool wxGxRemoteConnectionUI::Invoke(wxWindow* pParentWnd)
 
 void wxGxRemoteConnectionUI::LoadChildren(void)
 {
+	wxBusyCursor bCur;
+
 	if(m_bIsChildrenLoaded)
 		return;
 
@@ -111,19 +113,22 @@ void wxGxRemoteConnectionUI::LoadChildren(void)
             pProgressor->SetValue(i);
 
         wxGISDatasetSPtr pGISDataset = m_pwxGISDataset->GetSubset(i);
+		if(!pGISDataset)
+			continue;
+
         wxGISEnumDatasetType eType = pGISDataset->GetType();
         IGxObject* pGxObject(NULL);
         switch(eType)
         {
         case enumGISFeatureDataset:
             {
-                wxGxPostGISFeatureDatasetUI* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDatasetUI(m_sPath, pGISDataset, m_oLargeIconFeatureClass, m_oSmallIconFeatureClass);
+                wxGxPostGISFeatureDatasetUI* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDatasetUI(pGISDataset->GetPath(), pGISDataset, m_oLargeIconFeatureClass, m_oSmallIconFeatureClass);
                 pGxObject = static_cast<IGxObject*>(pGxPostGISFeatureDataset);
             }
             break;
         case enumGISTableDataset:
             {
-                wxGxPostGISTableDatasetUI* pGxPostGISTableDataset = new wxGxPostGISTableDatasetUI(m_sPath, pGISDataset, m_oLargeIconTable, m_oSmallIconTable);
+                wxGxPostGISTableDatasetUI* pGxPostGISTableDataset = new wxGxPostGISTableDatasetUI(pGISDataset->GetPath(), pGISDataset, m_oLargeIconTable, m_oSmallIconTable);
                 pGxObject = static_cast<IGxObject*>(pGxPostGISTableDataset);
             }
             break;
