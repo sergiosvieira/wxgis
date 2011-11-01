@@ -43,6 +43,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxgisgdal", "..\..\..\wxgis
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxgiscpl", "..\..\..\wxgisgdal\build\msw\wxgiscpl.vcxproj", "{DEA7522C-C900-4B00-A0FD-180401975A88}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxgisogr", "..\..\..\wxGISGDAL\build\msw\wxgisogr.vcxproj", "{B55CF983-A77B-4F74-B1D4-CFB98CC149D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -126,6 +128,9 @@ Global
 		{DEA7522C-C900-4B00-A0FD-180401975A88}.Debug|Win32.ActiveCfg = Debug|Win32
 		{DEA7522C-C900-4B00-A0FD-180401975A88}.Release|Win32.ActiveCfg = Release|Win32
 		{DEA7522C-C900-4B00-A0FD-180401975A88}.Release|Win32.Build.0 = Release|Win32
+		{B55CF983-A77B-4F74-B1D4-CFB98CC149D2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B55CF983-A77B-4F74-B1D4-CFB98CC149D2}.Release|Win32.ActiveCfg = Release|Win32
+		{B55CF983-A77B-4F74-B1D4-CFB98CC149D2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

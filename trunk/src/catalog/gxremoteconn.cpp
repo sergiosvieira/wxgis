@@ -120,13 +120,13 @@ void wxGxRemoteConnection::LoadChildren(void)
         {
         case enumGISFeatureDataset:
             {
-                wxGxPostGISFeatureDataset* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDataset(m_sPath, pGISDataset);
+                wxGxPostGISFeatureDataset* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDataset(pGISDataset->GetPath(), pGISDataset);
                 pGxObject = static_cast<IGxObject*>(pGxPostGISFeatureDataset);
             }
             break;
         case enumGISTableDataset:
             {
-                wxGxPostGISTableDataset* pGxPostGISTableDataset = new wxGxPostGISTableDataset(m_sPath, pGISDataset);
+                wxGxPostGISTableDataset* pGxPostGISTableDataset = new wxGxPostGISTableDataset(pGISDataset->GetPath(), pGISDataset);
                 pGxObject = static_cast<IGxObject*>(pGxPostGISTableDataset);
             }
             break;

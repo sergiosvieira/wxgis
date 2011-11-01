@@ -94,17 +94,17 @@ wxGISDatasetSPtr wxGISPostgresDataSource::GetDatasetFromOGRLayer(OGRLayer* poLay
 	wxCHECK(poLayer, pDataset);
     m_poDS->Reference();
 	//check the layer type
-	if(CPLStrnlen(poLayer->GetGeometryColumn(), 100))
+	if(!CPLString(poLayer->GetGeometryColumn()).empty())
 	{
 		m_poDS->Reference();
-        wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>("", emumVecPostGIS, poLayer, m_poDS);
+        wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>(m_sPath, emumVecPostGIS, poLayer, m_poDS);//TODO: perfomance lack!!!
 		pDataSet->SetEncoding(wxFONTENCODING_UTF8);
         pDataset = boost::static_pointer_cast<wxGISDataset>(pDataSet);
 	}
 	else
 	{
 		m_poDS->Reference();
-        wxGISTableSPtr pTable = boost::make_shared<wxGISTable>("", enumTablePostgres, poLayer, m_poDS);//TODO: Think about it
+        wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(m_sPath, enumTablePostgres, poLayer, m_poDS);//TODO: Think about it
 		pTable->SetEncoding(wxFONTENCODING_UTF8);
         pDataset = boost::static_pointer_cast<wxGISDataset>(pTable);
 	}
@@ -124,7 +124,6 @@ bool wxGISPostgresDataSource::Open()
 	wxString sConnStr = wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_bIsBinaryCursor == true ? wxT("PGB") : wxT("PG"), m_sAddres.c_str(), m_sDBName.c_str(), m_sPort.c_str(), m_sName.c_str(), m_sPass.c_str());
 	m_sPath = CPLString(sConnStr.mb_str(wxConvUTF8));
     m_poDS = OGRSFDriverRegistrar::Open( m_sPath, FALSE );
-    m_sPath.Clear();
 	if( m_poDS == NULL )
 		return false;
 	m_bIsOpened = true;
