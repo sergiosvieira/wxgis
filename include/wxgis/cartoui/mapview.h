@@ -85,6 +85,7 @@ public:
 	virtual void RotateStop(wxPoint MouseLocation);
 	virtual void SetRotate(double dAngleRad);
 	virtual double GetCurrentRotate(void);
+	virtual void Identify(const OGREnvelope &Bounds);
 protected:
 	//events
 	virtual void OnPaint(wxPaintEvent & event);

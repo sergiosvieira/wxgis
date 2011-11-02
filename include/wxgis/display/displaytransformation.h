@@ -22,10 +22,7 @@
 
 #include "wxgis/display/display.h"
 
-void WXDLLIMPEXP_GIS_DSP IncreaseEnvelope(OGREnvelope &Env, double dSize);
 void WXDLLIMPEXP_GIS_DSP RotateEnvelope(OGREnvelope &Env, double dAngle, double dX, double dY);
-void WXDLLIMPEXP_GIS_DSP SetEnvelopeRatio(OGREnvelope &Env, double dRatio);
-void WXDLLIMPEXP_GIS_DSP ClipGeometryByEnvelope(OGRRawPoint* pOGRRawPoints, int *pnPointCount, const OGREnvelope &Env, bool shapeOpen);
 
 //Sutherland-Hodgman Polygon Clipping
 inline bool IsInsideEnvelope(const OGRRawPoint &pt, wxGISEnumPointPosition nPos, const OGREnvelope &Env)

@@ -62,6 +62,7 @@ public:
 	virtual wxIcon GetSmallImage(void) = 0;
 	virtual wxString ContextMenu(void) = 0;
 	virtual wxString NewMenu(void) = 0;
+	virtual wxDataFormat GetDataFormat(void){return wxDataFormat(wxDF_FILENAME);};
 };
 
 class IGxObjectEditUI

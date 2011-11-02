@@ -43,6 +43,7 @@ wxGISDatasetSPtr wxGxPostGISTableDataset::GetDataset(bool bCache, ITrackCancel* 
     return m_pwxGISDataset;
 }
 
+#define PGTEST
 //-----------------------------------------------------------------------------------
 // wxGxPostGISFeatureDataset
 //-----------------------------------------------------------------------------------
@@ -52,12 +53,19 @@ wxGxPostGISFeatureDataset::wxGxPostGISFeatureDataset(CPLString soPath, wxGISData
 
 	m_pwxGISDataset = pwxGISDataset;
 
-#ifndef PGTEST 
-    m_sPath = soPath + " ";
-    m_sPath += m_sName.mb_str(wxConvUTF8);
-#else
-    m_sPath = "dbname='firereporter' host=gis-lab.info port=5432 user='firereporter' sslmode=disable key='id' table=\"fires\" (geom) sql=";
-#endif
+//#ifndef PGTEST 
+//    m_sPath = soPath + " ";
+//    m_sPath += m_sName.mb_str(wxConvUTF8);
+//#else
+//	//"PG:host='gis-lab.info' dbname='firereporter' port='5432' user='firereporter' password='8QdA4'"
+	m_sPath = "vector:postgres:";
+	m_sPath += m_sName.mb_str(wxConvUTF8);
+	m_sPath += ":";
+	m_sPath += soPath;
+	m_sPath += " sslmode=disable table=";
+	m_sPath += m_sName.mb_str(wxConvUTF8);
+//    m_sPath = "vector:postgres:fire:dbname=firereporter host=gis-lab.info port=5432 user=firereporter password=8QdA4 sslmode=disable table=fires";
+//#endif
 }
 
 wxGxPostGISFeatureDataset::~wxGxPostGISFeatureDataset(void)

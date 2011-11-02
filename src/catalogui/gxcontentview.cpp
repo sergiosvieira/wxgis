@@ -774,6 +774,13 @@ void wxGxContentView::OnBeginDrag(wxListEvent& event)
         if(!pGxObject)
             continue;
         wxString sSystemPath(pGxObject->GetInternalName(), wxConvUTF8);
+ 		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
+		if(pGxObjectUI)
+		{
+			wxDataFormat frm = pGxObjectUI->GetDataFormat();
+			if(frm.GetType() != wxDF_INVALID)
+				my_data.SetFormat(frm);
+		}
         my_data.AddFile(sSystemPath);
         nCount++;
     }

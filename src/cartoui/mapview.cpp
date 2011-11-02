@@ -21,6 +21,7 @@
 #include "wxgis/cartoui/mapview.h"
 #include "wxgis/cartoui/mxeventui.h"
 #include "wxgis/datasource/featuredataset.h"
+#include "wxgis/datasource/vectorop.h"
 #include "wxgis/carto/featurelayer.h"
 #include "wxgis/core/format.h"
 
@@ -105,15 +106,6 @@ bool wxGISMapView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, c
     if(!wxWindow::Create(parent, id, pos, size, style ))
 		return false;
 	m_pGISDisplay = new wxGISDisplay();
-	////DEBUG: AddLayer
-	//wxGISFeatureDatasetSPtr pFeatureDataset = boost::make_shared<wxGISFeatureDataset>(CPLString("D:\\work\\projects\\testdata\\shp\\continent.shp"), (int)enumVecESRIShapefile);//gns-shp-win-rs\\gns-shp-win-rs pp_6 test_rus zpoly holes continent
-	//if(!pFeatureDataset->Open())
-	//	return false;
-	//wxGISFeatureLayerSPtr pGISFeatureLayer = boost::make_shared<wxGISFeatureLayer>(boost::static_pointer_cast<wxGISDataset>(pFeatureDataset));
-	//bool bRes = AddLayer(boost::static_pointer_cast<wxGISLayer>(pGISFeatureLayer));
-	////full ext
-	//SetFullExtent();
-	////END DEBUG
 
 	UpdateFrameCenter();
 
@@ -693,4 +685,28 @@ OGREnvelope wxGISMapView::GetFullExtent(void)
 	else
 		OutputEnv = wxGISMap::GetFullExtent();
 	return OutputEnv;
+}
+
+void wxGISMapView::Identify(const OGREnvelope &Bounds)
+{
+	wxBusyCursor wait;
+	//get top layer
+	wxGISLayerSPtr pTopLayer = m_paLayers[m_paLayers.size() - 1];
+	if(!pTopLayer)
+		return;
+	wxGISEnumDatasetType eType = pTopLayer->GetType();
+	switch(eType)
+	{
+	case enumGISFeatureDataset:
+		{
+			wxGISFeatureLayerSPtr pFLayer = boost::dynamic_pointer_cast<wxGISFeatureLayer>(pTopLayer);
+			if(!pFLayer)
+				return;
+			wxGISQuadTreeCursorSPtr pCursor = pFLayer->Idetify(EnvelopeToGeometry(Bounds));
+			//flash on map
+		}
+		break;
+	default:
+		break;
+	};
 }

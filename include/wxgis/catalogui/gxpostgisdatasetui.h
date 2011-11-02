@@ -61,6 +61,7 @@ public:
 	virtual wxIcon GetSmallImage(void);
 	virtual wxString ContextMenu(void){return wxString(wxT("wxGxPostGISFeatureDatasetUI.ContextMenu"));};
 	virtual wxString NewMenu(void){return wxEmptyString;};
+	virtual wxDataFormat GetDataFormat(void){return wxDataFormat(wxT("application/x-vnd.qgis.qgis.uri"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
 protected:

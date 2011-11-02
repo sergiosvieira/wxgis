@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS
- * Purpose:  Filter classes.
+ * Purpose:  vector operations.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
@@ -22,35 +22,13 @@
 
 #include "wxgis/datasource/datasource.h"
 
-/** \class wxGISQueryFilter filter.h
-    \brief Attributes query filter.
-*/
-class WXDLLIMPEXP_GIS_DS wxGISQueryFilter
-{
-public:
-    wxGISQueryFilter(void);
-    wxGISQueryFilter(wxString sWhereClause);
-	virtual ~wxGISQueryFilter(void);
-    virtual void SetWhereClause(wxString sWhereClause);
-    virtual wxString GetWhereClause(void);
-protected:
-    wxString m_sWhereClause;
-};
-
-/** \class wxGISQueryFilter filter.h
-    \brief Spatial (by geometry) query filter.
-*/
-class WXDLLIMPEXP_GIS_DS wxGISSpatialFilter : 
-	public wxGISQueryFilter
-{
-public:
-	wxGISSpatialFilter(OGRGeometrySPtr pGeom, wxString sWhereClause = wxEmptyString);
-	wxGISSpatialFilter(void);
-	virtual ~wxGISSpatialFilter(void);
-	virtual void SetEnvelope(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);
-	virtual void SetGeometry(OGRGeometrySPtr pGeom);
-	virtual OGREnvelopeSPtr GetEnvelope(void);
-	virtual OGRGeometrySPtr GetGeometry(void);
-protected:
-	OGRGeometrySPtr m_pGeom;
-};
+void WXDLLIMPEXP_GIS_DS IncreaseEnvelope(OGREnvelope &Env, double dSize);
+void WXDLLIMPEXP_GIS_DS SetEnvelopeRatio(OGREnvelope &Env, double dRatio);
+void WXDLLIMPEXP_GIS_DS ClipGeometryByEnvelope(OGRRawPoint* pOGRRawPoints, int *pnPointCount, const OGREnvelope &Env, bool shapeOpen);
+/** \fn OGRGeometrySPtr EnvelopeToGeometry(OGREnvelopeSPtr pEnv, OGSSpatialReferensSPtr pSpaRef)
+ *  \brief Create OGRGeometry from OGREnvelope.
+ *  \param pEnv Input envelope
+ *  \param pSpaRef Spatial Refernce of output geometry
+ *  \return Geometry
+ */
+OGRGeometrySPtr WXDLLIMPEXP_GIS_DS EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSPtr pSpaRef = OGRSpatialReferenceSPtr());

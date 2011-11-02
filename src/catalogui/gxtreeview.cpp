@@ -628,9 +628,15 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
         IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID);
         pParentGxObject = pGxObject->GetParent();
         wxString sSystemPath(pGxObject->GetInternalName(), wxConvUTF8);
+		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
+		if(pGxObjectUI)
+		{
+			wxDataFormat frm = pGxObjectUI->GetDataFormat();
+			if(frm.GetType() != wxDF_INVALID)
+				my_data.SetFormat(frm);
+		}
         my_data.AddFile(sSystemPath);
     }
-    //my_data.SetFormat(wxDataFormat(wxT("application/x-vnd.qgis.qgis.uri")));
     wxDropSource dragSource( this );
 	dragSource.SetData( my_data );
 	wxDragResult result = dragSource.DoDragDrop( TRUE );  
