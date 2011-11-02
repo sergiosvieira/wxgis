@@ -396,3 +396,21 @@ void wxGISFeatureLayer::LoadGeometry(void)
 	*/
 }
 
+wxGISQuadTreeCursorSPtr wxGISFeatureLayer::Idetify(OGRGeometrySPtr pGeom)
+{
+	CPLRectObj obj;
+	wxGISQuadTreeCursorSPtr pRet;
+
+	//fill cursor by rect
+	if(m_pQuadTree)
+	{
+		pRet = m_pQuadTree->Search(&obj)
+	}
+	else
+	{
+		pRet = m_pwxGISFeatureDataset->SearchGeometry(&obj);
+	}
+	//intersect geoms & set to NULL
+
+	return pRet;
+}

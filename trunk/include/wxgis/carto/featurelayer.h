@@ -39,9 +39,11 @@ public:
 	virtual OGREnvelope GetEnvelope(void);
 	virtual bool IsValid(void);
 	virtual bool IsCacheNeeded(void);
+	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
 //wxGISFeatureLayer
 	virtual IFeatureRendererSPtr GetRenderer(void){return m_pFeatureRenderer;};
 	virtual void SetRenderer(IFeatureRendererSPtr pFeatureRenderer){m_pFeatureRenderer = pFeatureRenderer;};
+	virtual wxGISQuadTreeCursorSPtr Idetify(OGRGeometrySPtr pGeom); 
 protected:
     virtual void LoadGeometry(void);
 	virtual long GetPointsInGeometry(OGRGeometry* pGeom);

@@ -74,7 +74,7 @@ void wxGxRemoteConnectionUI::EditProperties(wxWindow *parent)
 bool wxGxRemoteConnectionUI::Invoke(wxWindow* pParentWnd)
 {
     //EditProperties(pParentWnd);
-    wxBusyCursor cur;
+    wxBusyCursor wait;
     //connect
     GetDataset();
     m_pCatalog->ObjectChanged(GetID());
@@ -84,7 +84,7 @@ bool wxGxRemoteConnectionUI::Invoke(wxWindow* pParentWnd)
 
 void wxGxRemoteConnectionUI::LoadChildren(void)
 {
-	wxBusyCursor bCur;
+	wxBusyCursor wait;
 
 	if(m_bIsChildrenLoaded)
 		return;

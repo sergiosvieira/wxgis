@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/datasource/filter.h"
+#include "wxgis/datasource/vectorop.h"
 
 //----------------------------------------------------------------------------
 // wxGISQueryFilter
@@ -94,23 +95,4 @@ OGREnvelopeSPtr wxGISSpatialFilter::GetEnvelope(void)
 OGRGeometrySPtr wxGISSpatialFilter::GetGeometry(void)
 {
 	return m_pGeom;
-}
-
-OGRGeometrySPtr wxGISSpatialFilter::EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSPtr pSpaRef)
-{
-	if(!Env.IsInit())
-		return OGRGeometrySPtr();
-	OGRLinearRing ring;
-	ring.addPoint(Env.MinX, Env.MinY);
-	ring.addPoint(Env.MinX, Env.MaxY);
-	ring.addPoint(Env.MaxX, Env.MaxY);
-	ring.addPoint(Env.MaxX, Env.MinY);
-    ring.closeRings();
-
-    OGRPolygon* pRgn = new OGRPolygon();
-    pRgn->addRing(&ring);
-    pRgn->flattenTo2D();
-	if(pSpaRef)
-		pRgn->assignSpatialReference(pSpaRef->Clone());
-	return OGRGeometrySPtr(static_cast<OGRGeometry*>(pRgn));
 }

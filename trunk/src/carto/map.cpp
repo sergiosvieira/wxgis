@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/carto/map.h"
+#include "wxgis/datasource/vectorop.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // wxGISMap

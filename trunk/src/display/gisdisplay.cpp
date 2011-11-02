@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/display/gisdisplay.h"
+#include "wxgis/datasource/vectorop.h"
 #include "wxgis/display/displaytransformation.h"
 
 wxGISDisplay::wxGISDisplay(void)

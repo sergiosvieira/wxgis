@@ -75,6 +75,7 @@ public:
 	virtual bool IsCacheNeeded(void){return true;};
 	//virtual bool GetCached(void){return m_bCached;};
 	//virtual void SetCached(bool bCached){m_bCached = bCached;};
+	virtual wxGISEnumDatasetType GetType(void){return enumGISAny;};
 protected:
 	double m_dMaxScale, m_dMinScale;
 	wxString m_sName;

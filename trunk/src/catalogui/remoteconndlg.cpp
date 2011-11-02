@@ -201,7 +201,7 @@ void wxGISRemoteConnDlg::OnOK(wxCommandEvent& event)
 
 void wxGISRemoteConnDlg::OnTest(wxCommandEvent& event)
 {
-	wxBusyCursor bcur;
+	wxBusyCursor wait;
 	TransferDataFromWindow();
 	CPLSetConfigOption("PG_LIST_ALL_TABLES", "YES");
 	CPLSetConfigOption("PGCLIENTENCODING", "UTF-8");

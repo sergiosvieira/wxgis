@@ -111,6 +111,7 @@
     <ClCompile Include="..\..\src\datasource\spvalidator.cpp" />
     <ClCompile Include="..\..\src\datasource\sysop.cpp" />
     <ClCompile Include="..\..\src\datasource\table.cpp" />
+    <ClCompile Include="..\..\src\datasource\vectorop.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\wxgis\datasource\curl.h" />
@@ -126,6 +127,7 @@
     <ClInclude Include="..\..\include\wxgis\datasource\spvalidator.h" />
     <ClInclude Include="..\..\include\wxgis\datasource\sysop.h" />
     <ClInclude Include="..\..\include\wxgis\datasource\table.h" />
+    <ClInclude Include="..\..\include\wxgis\datasource\vectorop.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="wxGISCore.vcxproj">
