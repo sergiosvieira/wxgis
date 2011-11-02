@@ -49,6 +49,7 @@ protected:
 	OGRDataSource *m_poDS;
     wxString m_sName, m_sPass, m_sPort, m_sAddres, m_sDBName;
 	bool m_bIsBinaryCursor;
+    wxCriticalSection m_CritSect;
 };
 
 DEFINE_SHARED_PTR(wxGISPostgresDataSource);
