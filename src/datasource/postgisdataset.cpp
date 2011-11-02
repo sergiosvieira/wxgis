@@ -90,6 +90,7 @@ wxGISDatasetSPtr wxGISPostgresDataSource::GetSubset(wxString sTablename)
 
 wxGISDatasetSPtr wxGISPostgresDataSource::GetDatasetFromOGRLayer(OGRLayer* poLayer)
 {
+    wxCriticalSectionLocker locker(m_CritSect);
 	wxGISDatasetSPtr pDataset;
 	wxCHECK(poLayer, pDataset);
     m_poDS->Reference();

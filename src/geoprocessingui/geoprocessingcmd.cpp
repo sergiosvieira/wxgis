@@ -368,9 +368,10 @@ void wxGISGeoprocessingCmd::OnClick(void)
 
                             IGxObject* pGxSrcObj = dynamic_cast<IGxObject*>(DatasetArray[i]);
                             wxString sName = pGxSrcObj->GetName();
-                            sName = ClearExt(sName);
 
                             wxGISEnumVectorDatasetType nSubType = (wxGISEnumVectorDatasetType)DatasetArray[i]->GetSubType();
+                            if(emumVecPostGIS != nSubType)
+                                sName = ClearExt(sName);
                             //if types is same skip exporting
                             if(nSubType == pFilter->GetSubType())
                                 continue;

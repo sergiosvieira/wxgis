@@ -24,6 +24,38 @@
 #include "wxgis/catalogui/gxpostgisdatasetui.h"
 #include "wxgis/core/globalfn.h"
 
+//-----------------------------------
+// wxChildLoaderThread
+//-----------------------------------
+
+wxChildLoaderThread::wxChildLoaderThread(wxGxRemoteConnectionUI *pGxRemoteConnectionUI, int nBeg, int nEnd, IProgressor* pProgressor) : wxThread(wxTHREAD_JOINABLE)
+{
+	m_pGxRemoteConnectionUI = pGxRemoteConnectionUI;
+	m_nBeg = nBeg;
+	m_nEnd = nEnd;
+    m_pProgressor = pProgressor;
+}
+
+void *wxChildLoaderThread::Entry()
+{
+    if(!m_pGxRemoteConnectionUI)
+        return (ExitCode)-1;
+ 
+    for(int i = m_nBeg; i < m_nEnd; ++i)
+    {
+        m_pGxRemoteConnectionUI->AddSubDataset(i);
+        if(m_pProgressor)
+            m_pProgressor->SetValue(m_pProgressor->GetValue() + 1);
+    }
+	return NULL;
+}
+
+void wxChildLoaderThread::OnExit()
+{
+    if(m_pGxRemoteConnectionUI)
+        m_pGxRemoteConnectionUI->OnThreadExit(GetId());
+}
+
 //--------------------------------------------------------------
 //class wxGxRemoteConnectionUI
 //--------------------------------------------------------------
@@ -38,11 +70,24 @@ wxGxRemoteConnectionUI::wxGxRemoteConnectionUI(CPLString soPath, wxString Name, 
     m_oSmallIconFeatureClass = SmallIconFeatureClass;
     m_oLargeIconTable = LargeIconTable;
     m_oSmallIconTable = SmallIconTable;
+
+    m_pProgressor = NULL;
 }
 
 wxGxRemoteConnectionUI::~wxGxRemoteConnectionUI(void)
 {
 }
+
+void wxGxRemoteConnectionUI::Detach(void)
+{
+    for(auto itr = m_pmThreads.begin(); itr != m_pmThreads.end(); ++itr)
+    {
+        if(itr->second)
+            wgDELETE(itr->second, Wait());
+    }
+    wxGxRemoteConnection::Detach();
+}
+
 
 wxIcon wxGxRemoteConnectionUI::GetLargeImage(void)
 {
@@ -92,63 +137,113 @@ void wxGxRemoteConnectionUI::LoadChildren(void)
 	if(m_pwxGISDataset == NULL)
 		return;
 
-    IFrameApplication* pFApp = dynamic_cast<IFrameApplication*>(GetApplication());
-    IProgressor* pProgressor(NULL);
-    if(pFApp)
+    if(!m_pProgressor)
     {
-        IStatusBar* pStatusBar = pFApp->GetStatusBar();
-        if(pStatusBar)
-            pProgressor = pStatusBar->GetProgressor();
-    }
-
-    if(pProgressor)
-    {
-        pProgressor->SetRange(m_pwxGISDataset->GetSubsetsCount());
-        pProgressor->Show(true);
-    }
-
-    for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); ++i)
-    {
-        if(pProgressor)
-            pProgressor->SetValue(i);
-
-        wxGISDatasetSPtr pGISDataset = m_pwxGISDataset->GetSubset(i);
-		if(!pGISDataset)
-			continue;
-
-        wxGISEnumDatasetType eType = pGISDataset->GetType();
-        IGxObject* pGxObject(NULL);
-        switch(eType)
+        IFrameApplication* pFApp = dynamic_cast<IFrameApplication*>(GetApplication());
+        if(pFApp)
         {
-        case enumGISFeatureDataset:
-            {
-                wxGxPostGISFeatureDatasetUI* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDatasetUI(pGISDataset->GetPath(), pGISDataset, m_oLargeIconFeatureClass, m_oSmallIconFeatureClass);
-                pGxObject = static_cast<IGxObject*>(pGxPostGISFeatureDataset);
-            }
-            break;
-        case enumGISTableDataset:
-            {
-                wxGxPostGISTableDatasetUI* pGxPostGISTableDataset = new wxGxPostGISTableDatasetUI(pGISDataset->GetPath(), pGISDataset, m_oLargeIconTable, m_oSmallIconTable);
-                pGxObject = static_cast<IGxObject*>(pGxPostGISTableDataset);
-            }
-            break;
-        case enumGISRasterDataset:
-            break;
-        default:
-        case enumGISContainer:
-            break;
-        };
-
-        if(pGxObject)
-        {
-		    bool ret_code = AddChild(pGxObject);
-		    if(!ret_code)
-			    wxDELETE(pGxObject);
+            IStatusBar* pStatusBar = pFApp->GetStatusBar();
+            if(pStatusBar)
+                m_pProgressor = pStatusBar->GetProgressor();
         }
+    }
+
+    if(m_pProgressor)
+    {
+        m_pProgressor->SetRange(m_pwxGISDataset->GetSubsetsCount());
+        m_pProgressor->Show(true);
+    }
+
+    size_t nCountMax(m_pwxGISDataset->GetSubsetsCount()), nCount(0);
+    if(nCountMax > MAX_LAYERS)
+        nCount = MAX_LAYERS;
+    else
+        nCount = nCountMax;
+
+    for(size_t i = 0; i < nCount; ++i)
+    {
+        if(m_pProgressor)
+            m_pProgressor->SetValue(i);
+        AddSubDataset(i);
 	}
 
-    if(pProgressor)
-        pProgressor->Show(false);
+    //start threads to load layers
+    if(nCountMax > MAX_LAYERS)
+    {
+        int nCPUCount = wxThread::GetCPUCount();
+        size_t nBeg(MAX_LAYERS), nEnd;
+        size_t nPartSize = (nCountMax - nBeg) / nCPUCount;
+        m_nRunningThreads = 0;
+        for(int i = 0; i < nCPUCount; ++i)
+        {
+            if(i == nCPUCount - 1)
+                nEnd = nCountMax;
+            else
+                nEnd = nPartSize * (i + 1);
+            //create thread
+		    wxChildLoaderThread *thread = new wxChildLoaderThread(this, nBeg, nEnd, m_pProgressor);
+		    if(CreateAndRunThread(thread, wxT("wxChildLoaderThread"), wxT("ChildLoaderThread"))) 
+            {
+                m_nRunningThreads++;
+                m_pmThreads[thread->GetId()] = thread;//store thread in array
+            }
+            nBeg = nEnd;
+        }
+    }
+    else
+    {
+        if(m_pProgressor)
+            m_pProgressor->Show(false);
+    }
 
 	m_bIsChildrenLoaded = true;
+}
+
+void wxGxRemoteConnectionUI::OnThreadExit(wxThreadIdType nThreadID)
+{
+    m_pmThreads[nThreadID] = nullptr;
+    m_pCatalog->ObjectRefreshed(GetID());
+    m_nRunningThreads--;
+    if(m_nRunningThreads <= 0)
+    {
+        if(m_pProgressor)
+            m_pProgressor->Show(false);
+    }
+}
+
+void wxGxRemoteConnectionUI::AddSubDataset(size_t nIndex)
+{
+    wxGISDatasetSPtr pGISDataset = m_pwxGISDataset->GetSubset(nIndex);
+	if(!pGISDataset)
+		return;
+
+    wxGISEnumDatasetType eType = pGISDataset->GetType();
+    IGxObject* pGxObject(NULL);
+    switch(eType)
+    {
+    case enumGISFeatureDataset:
+        {
+            wxGxPostGISFeatureDatasetUI* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDatasetUI(pGISDataset->GetPath(), pGISDataset, m_oLargeIconFeatureClass, m_oSmallIconFeatureClass);
+            pGxObject = static_cast<IGxObject*>(pGxPostGISFeatureDataset);
+        }
+        break;
+    case enumGISTableDataset:
+        {
+            wxGxPostGISTableDatasetUI* pGxPostGISTableDataset = new wxGxPostGISTableDatasetUI(pGISDataset->GetPath(), pGISDataset, m_oLargeIconTable, m_oSmallIconTable);
+            pGxObject = static_cast<IGxObject*>(pGxPostGISTableDataset);
+        }
+        break;
+    case enumGISRasterDataset:
+        break;
+    default:
+    case enumGISContainer:
+        break;
+    };
+
+    if(pGxObject)
+    {
+		bool ret_code = AddChild(pGxObject);
+		if(!ret_code)
+			wxDELETE(pGxObject);
+    }
 }

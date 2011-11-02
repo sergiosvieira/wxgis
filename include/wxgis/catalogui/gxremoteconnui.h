@@ -23,6 +23,24 @@
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalog/gxremoteconn.h"
 
+class WXDLLIMPEXP_GIS_CLU wxGxRemoteConnectionUI;
+/** \class wxGISRasterRGBARenderer rasterrenderer.h
+    \brief The raster layer renderer for RGB data and Alpha channel
+*/
+class wxChildLoaderThread : public wxThread
+{
+public:
+	wxChildLoaderThread(wxGxRemoteConnectionUI *pGxRemoteConnectionUI, int nBeg, int nEnd, IProgressor* pProgressor = NULL);
+    virtual void *Entry();
+    virtual void OnExit();
+private:
+	wxGxRemoteConnectionUI *m_pGxRemoteConnectionUI;
+	int m_nBeg;
+	int m_nEnd;
+    IProgressor* m_pProgressor;
+};
+
+#define MAX_LAYERS 100
 /** \class wxGxRemoteConnectionUI gxfileui.h
     \brief A Remote Connection GxObjectUI.
 */
@@ -32,9 +50,12 @@ class WXDLLIMPEXP_GIS_CLU wxGxRemoteConnectionUI :
     public IGxObjectEditUI,
     public IGxObjectWizard
 {
+    friend class wxChildLoaderThread;
 public:
 	wxGxRemoteConnectionUI(CPLString soPath, wxString Name, wxIcon LargeIconConn = wxNullIcon, wxIcon SmallIconConn = wxNullIcon, wxIcon LargeIconDisconn = wxNullIcon, wxIcon SmallIconDisconn = wxNullIcon, wxIcon LargeIconFeatureClass = wxNullIcon, wxIcon SmallIconFeatureClass = wxNullIcon, wxIcon LargeIconTable = wxNullIcon, wxIcon SmallIconTable = wxNullIcon);
 	virtual ~wxGxRemoteConnectionUI(void);
+    //wxGxRemoteConnection
+    virtual void Detach(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
@@ -44,8 +65,11 @@ public:
 	virtual void EditProperties(wxWindow *parent);
     //IGxObjectWizard
     virtual bool Invoke(wxWindow* pParentWnd);
+protected:
     //wxGxRemoteConnection
 	virtual void LoadChildren(void);
+    virtual void AddSubDataset(size_t nIndex);
+    virtual void OnThreadExit(wxThreadIdType nThreadID);
 protected:
     wxIcon m_oLargeIconConn;
     wxIcon m_oSmallIconConn;
@@ -53,5 +77,9 @@ protected:
     wxIcon m_oSmallIconDisconn;
     wxIcon m_oLargeIconFeatureClass, m_oSmallIconFeatureClass;
     wxIcon m_oLargeIconTable, m_oSmallIconTable;
+    //
+    std::map<wxThreadIdType, wxChildLoaderThread*> m_pmThreads;
+    int m_nRunningThreads;
+    IProgressor* m_pProgressor;
 };
 

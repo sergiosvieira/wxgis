@@ -73,7 +73,7 @@ class wxGISQuadTree;
 */
 class wxGISQuadTreeCursor
 {
-	friend wxGISQuadTree;
+	friend class wxGISQuadTree;
 public:
 	wxGISQuadTreeCursor(void) : m_nItemCount(0), m_pData(NULL){};
 	virtual ~wxGISQuadTreeCursor(void){CPLFree(m_pData);};
