@@ -93,7 +93,6 @@ wxGISDatasetSPtr wxGISPostgresDataSource::GetDatasetFromOGRLayer(OGRLayer* poLay
     wxCriticalSectionLocker locker(m_CritSect);
 	wxGISDatasetSPtr pDataset;
 	wxCHECK(poLayer, pDataset);
-    m_poDS->Reference();
 	//check the layer type
 	if(!CPLString(poLayer->GetGeometryColumn()).empty())
 	{

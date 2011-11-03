@@ -85,6 +85,7 @@ void wxGxRemoteConnectionUI::Detach(void)
         if(itr->second)
             wgDELETE(itr->second, Wait());
     }
+	EmptyChildren();
     wxGxRemoteConnection::Detach();
 }
 

@@ -71,12 +71,6 @@ wxIcon wxGxToolbox::GetSmallImage(void)
 	return m_SmallToolboxIcon;
 }
 
-void wxGxToolbox::Detach(void)
-{
-	EmptyChildren();
-    IGxObject::Detach();
-}
-
 void wxGxToolbox::Refresh(void)
 {
 	EmptyChildren();
@@ -158,12 +152,6 @@ wxGxRootToolbox::wxGxRootToolbox(void) : m_bIsChildrenLoaded(false)
 
 wxGxRootToolbox::~wxGxRootToolbox(void)
 {
-}
-
-void wxGxRootToolbox::Detach(void)
-{
-	EmptyChildren();
-    IGxObject::Detach();
 }
 
 void wxGxRootToolbox::Init(wxXmlNode* const pConfigNode)
@@ -293,12 +281,6 @@ wxIcon wxGxFavoritesToolbox::GetSmallImage(void)
 	return wxIcon(toolboxfavor_16_xpm);
 }
 
-void wxGxFavoritesToolbox::Detach(void)
-{
-	EmptyChildren();
-    IGxObject::Detach();
-}
-
 void wxGxFavoritesToolbox::Refresh(void)
 {
 	EmptyChildren();
@@ -379,17 +361,6 @@ wxIcon wxGxToolExecute::GetLargeImage(void)
 wxIcon wxGxToolExecute::GetSmallImage(void)
 {
 	return m_SmallToolIcon;
-}
-
-void wxGxToolExecute::Detach(void)
-{
-	for(size_t i = 0; i < m_Children.size(); ++i)
-	{
-		m_Children[i]->Detach();
-		wxDELETE(m_Children[i]);
-	}
-	m_Children.clear();
-    IGxObject::Detach();
 }
 
 void wxGxToolExecute::Refresh(void)

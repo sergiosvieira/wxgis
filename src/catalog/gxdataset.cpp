@@ -74,12 +74,6 @@ bool wxGxTableDataset::Delete(void)
     }
 }
 
-	
-void wxGxTableDataset::Detach(void)
-{
-	IGxObject::Detach();
-}
-
 wxString wxGxTableDataset::GetBaseName(void)
 {
     wxFileName FileName(m_sName);
@@ -228,11 +222,6 @@ wxGxFeatureDataset::~wxGxFeatureDataset(void)
 wxString wxGxFeatureDataset::GetCategory(void)
 {
 	return wxString(_("Feature class"));
-}
-	
-void wxGxFeatureDataset::Detach(void)
-{
-	IGxObject::Detach();
 }
 
 wxString wxGxFeatureDataset::GetBaseName(void)
@@ -544,11 +533,6 @@ wxString wxGxRasterDataset::GetCategory(void)
 	default:
 		return wxString(_("Raster"));
 	}
-}
-	
-void wxGxRasterDataset::Detach(void)
-{
-	IGxObject::Detach();
 }
 
 wxGISDatasetSPtr wxGxRasterDataset::GetDataset(bool bCached, ITrackCancel* pTrackCancel)

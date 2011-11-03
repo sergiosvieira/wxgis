@@ -48,12 +48,6 @@ void wxGxKMLDataset::SetEncoding(wxFontEncoding Encoding)
     m_Encoding = Encoding;
 }
 
-void wxGxKMLDataset::Detach(void)
-{
-    EmptyChildren();
-    IGxObject::Detach();
-}
-
 wxString wxGxKMLDataset::GetBaseName(void)
 {
     wxFileName FileName(m_sName);

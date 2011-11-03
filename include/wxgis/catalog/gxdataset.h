@@ -39,7 +39,6 @@ public:
 	virtual wxString GetBaseName(void);
     virtual CPLString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void){return wxString(_("Table"));};
-	virtual void Detach(void);
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
@@ -77,7 +76,6 @@ public:
 	virtual wxString GetBaseName(void);
     virtual CPLString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void);
-	virtual void Detach(void);
 	//IGxObjectUI
 	//IGxObjectEdit
 	virtual bool Delete(void);
@@ -117,7 +115,6 @@ public:
 	virtual wxString GetBaseName(void);
     virtual CPLString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void);
-	virtual void Detach(void);
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};

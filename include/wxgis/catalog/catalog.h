@@ -150,6 +150,16 @@ class IGxObjectContainer :
 {
 public:
 	virtual ~IGxObjectContainer(void){};
+	virtual void Detach(void)
+	{
+		for(size_t i = 0; i < m_Children.size(); ++i)
+		{
+			m_Children[i]->Detach();
+			delete m_Children[i];
+		}
+		m_Children.clear();
+		IGxObject::Detach();
+	};
 	virtual bool AddChild(IGxObject* pChild)
 	{
 		if(pChild == NULL)

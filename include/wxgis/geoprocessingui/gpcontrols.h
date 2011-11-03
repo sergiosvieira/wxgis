@@ -48,13 +48,15 @@
 class wxGISDTBase : public wxPanel
 {
 public:
-	wxGISDTBase( IGPParameter* pParam, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
+	wxGISDTBase( IGPParameter* pParam, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCLIP_CHILDREN | wxCLIP_SIBLINGS | wxTAB_TRAVERSAL );
     virtual ~wxGISDTBase();
     virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString);
     virtual bool Validate(void) = 0;
     virtual void UpdateValues(void) = 0;
     virtual void UpdateControls(void) = 0;
     virtual IGPParameter* GetParameter(void);
+	virtual wxGISEnumGPMessageType GetCurrentMessageType(void){return m_nCurrentType;};
+	virtual wxString GetCurrentMessage(void){return m_sCurrentMsg;};
 protected:
 	wxStaticBitmap* m_StateBitmap;
 	wxStaticText* m_sParamDisplayName;

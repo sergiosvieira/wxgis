@@ -40,26 +40,13 @@
 #include <wx/dialog.h>
 
 #include <wx/scrolwin.h>
-
+#include <wx/infobar.h>
 
 /** \class wxGISGPToolDlg gptooldlg.h
  *  \brief The tool configuration dialog
  */
 class WXDLLIMPEXP_GIS_GPU wxGISGPToolDlg : public wxFrame
 {
-private:
-
-protected:
-    wxSplitterWindow* m_splitter;
-    wxPanel* m_toolpanel;
-    wxPanel* m_tools;
-    wxStdDialogButtonSizer* m_sdbSizer1;
-    wxButton* m_sdbSizer1OK;
-    wxButton* m_sdbSizer1Cancel;
-    wxButton* m_sdbSizer1Help;
-    //wxPanel* m_helppanel;
-    wxHtmlWindow* m_htmlWin;
-
 public:
     wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pTool, bool bSync = false, wxWindow* parent = NULL, wxWindowID id = wxID_ANY, const wxString& title = _("Tool name"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX|wxRESIZE_BORDER|wxSYSTEM_MENU|wxFRAME_FLOAT_ON_PARENT /*wxSTAY_ON_TOP|wxDIALOG_NO_PARENT|wxCLIP_CHILDREN*/ );
     ~wxGISGPToolDlg();
@@ -84,6 +71,19 @@ protected:
     std::vector<wxGISDTBase*> m_pControlsArray;
     wxGxRootToolbox* m_pGxRootToolbox;
     bool m_bSync;
+protected:
+    wxSplitterWindow* m_splitter;
+    wxPanel* m_toolpanel;
+    wxStdDialogButtonSizer* m_sdbSizer1;
+    wxButton* m_sdbSizer1OK;
+    wxButton* m_sdbSizer1Cancel;
+    wxButton* m_sdbSizer1Help;
+    //wxPanel* m_helppanel;
+    wxHtmlWindow* m_htmlWin;
+	wxInfoBar *m_pInfoBar;
+	wxString m_sCurrentErrMsg;
+	int m_nCurrentErrField;
+	wxBoxSizer *m_bSizer2;
 
     DECLARE_EVENT_TABLE()
 };
