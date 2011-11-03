@@ -30,7 +30,6 @@ public:
 	wxGxFolder(CPLString Path, wxString Name);
 	virtual ~wxGxFolder(void);
 	//IGxObject
-	virtual void Detach(void);
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void);
 	virtual CPLString GetInternalName(void){return m_sPath;};

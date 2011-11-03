@@ -39,7 +39,6 @@ public:
 	wxGxToolbox(wxGxRootToolbox* pRootToolbox, wxXmlNode* pDataNode = NULL, wxIcon LargeToolboxIcon = wxNullIcon, wxIcon SmallToolboxIcon = wxNullIcon, wxIcon LargeToolIcon = wxNullIcon, wxIcon SmallToolIcon = wxNullIcon);
 	virtual ~wxGxToolbox(void);
 	//IGxObject
-	virtual void Detach(void);
 	virtual wxString GetName(void);
     virtual wxString GetBaseName(void){return GetName();};
     virtual CPLString GetInternalName(void){return CPLString();};
@@ -82,7 +81,6 @@ public:
 	wxGxRootToolbox(void);
 	virtual ~wxGxRootToolbox(void);
 	//IGxObject
-	virtual void Detach(void);
 	virtual wxString GetName(void){return wxString(_("Toolboxes"));};
     virtual wxString GetBaseName(void){return GetName();};
     //IGxRootObjectProperties
@@ -116,7 +114,6 @@ public:
 	wxGxFavoritesToolbox(wxGxRootToolbox* pRootToolbox, short nMaxCount = 10, wxIcon LargeToolIcon = wxNullIcon, wxIcon SmallToolIcon = wxNullIcon);
 	virtual ~wxGxFavoritesToolbox(void);
 	//IGxObject
-	virtual void Detach(void);
 	virtual wxString GetName(void);
     virtual wxString GetBaseName(void){return GetName();};
     virtual CPLString GetInternalName(void){return CPLString();};
@@ -158,7 +155,6 @@ public:
 	wxGxToolExecute(wxGxRootToolbox* pRootToolbox);
 	virtual ~wxGxToolExecute(void);
 	//IGxObject
-	virtual void Detach(void);
 	virtual wxString GetName(void);
     virtual wxString GetBaseName(void){return GetName();};
     virtual CPLString GetInternalName(void){return CPLString();};

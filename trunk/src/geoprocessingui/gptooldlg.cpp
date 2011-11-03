@@ -61,13 +61,18 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
 	m_splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISGPToolDlg::m_splitterOnIdle ), NULL, this );
 
 	m_toolpanel = new wxPanel( m_splitter, wxID_ANY, wxDefaultPosition, wxSize(m_DataWidth, size.y)/*wxDefaultSize*/, wxTAB_TRAVERSAL );
-	wxBoxSizer* bSizer2 = new wxBoxSizer( wxVERTICAL );
+	m_bSizer2 = new wxBoxSizer( wxVERTICAL );
+	m_pInfoBar = new wxInfoBar(m_toolpanel);
+    m_pInfoBar->SetOwnBackgroundColour(0xc8ffff);
+    m_pInfoBar->SetFont(GetFont().Bold());//.Larger()
+    //m_pInfoBar->SetShowHideEffects(wxSHOW_EFFECT_EXPAND, wxSHOW_EFFECT_EXPAND);
+    //m_pInfoBar->SetEffectDuration(1500);
+	m_bSizer2->Add(m_pInfoBar, wxSizerFlags().Expand());//, 0, wxEXPAND, 5 );//
 
-    wxScrolledWindow* m_tools = new wxScrolledWindow(m_toolpanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxBORDER_SUNKEN|wxVSCROLL );
-    m_tools->SetScrollbars(1, 1, size.x, size.y);
+    wxScrolledWindow* pToolsWnd = new wxScrolledWindow(m_toolpanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxBORDER_SUNKEN|wxVSCROLL );
+    pToolsWnd->SetScrollbars(1, 1, size.x, size.y);
 
-	wxBoxSizer* bSizer4;
-	bSizer4 = new wxBoxSizer( wxVERTICAL );
+	wxBoxSizer* bSizer4 = new wxBoxSizer( wxVERTICAL );
 
     GPParameters Params = m_pTool->GetParameterInfo();
 	for(size_t i = 0; i < Params.GetCount(); ++i)
@@ -82,14 +87,14 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
         {
         case enumGISGPParamDTPath:
             {
-                wxGISDTPath* pPath = new wxGISDTPath(pParam, m_pTool->GetCatalog(), m_tools);
+                wxGISDTPath* pPath = new wxGISDTPath(pParam, m_pTool->GetCatalog(), pToolsWnd);
                 bSizer4->Add( pPath, 0, wxEXPAND, 5 );
                 m_pControlsArray.push_back(pPath);
             }
             break;
         case enumGISGPParamDTSpatRef:
             {
-                wxGISDTSpatRef* pSpatRef = new wxGISDTSpatRef(pParam, m_pTool->GetCatalog(), m_tools);
+                wxGISDTSpatRef* pSpatRef = new wxGISDTSpatRef(pParam, m_pTool->GetCatalog(), pToolsWnd);
                 bSizer4->Add( pSpatRef, 0, wxEXPAND, 5 );
                 m_pControlsArray.push_back(pSpatRef);
             }
@@ -98,7 +103,7 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
         case enumGISGPParamDTInteger:
         case enumGISGPParamDTDouble:
             {
-                wxGISDTDigit* poDigit = new wxGISDTDigit(pParam, m_pTool->GetCatalog(), m_tools);
+                wxGISDTDigit* poDigit = new wxGISDTDigit(pParam, m_pTool->GetCatalog(), pToolsWnd);
                 bSizer4->Add( poDigit, 0, wxEXPAND, 5 );
                 m_pControlsArray.push_back(poDigit);
             }
@@ -107,14 +112,14 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
         case enumGISGPParamDTIntegerChoice:
         case enumGISGPParamDTDoubleChoice:
             {
-                wxGISDTChoice* poChoice = new wxGISDTChoice(pParam, m_pTool->GetCatalog(), m_tools);
+                wxGISDTChoice* poChoice = new wxGISDTChoice(pParam, m_pTool->GetCatalog(), pToolsWnd);
                 bSizer4->Add( poChoice, 0, wxEXPAND, 5 );
                 m_pControlsArray.push_back(poChoice);
             }
             break;
         case enumGISGPParamDTStringChoiceEditable:
             {
-                wxGISDTChoiceEditable* poChoice = new wxGISDTChoiceEditable(pParam, m_pTool->GetCatalog(), m_tools);
+                wxGISDTChoiceEditable* poChoice = new wxGISDTChoiceEditable(pParam, m_pTool->GetCatalog(), pToolsWnd);
                 bSizer4->Add( poChoice, 0, wxEXPAND, 5 );
                 m_pControlsArray.push_back(poChoice);
             }
@@ -123,28 +128,28 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
 	   case enumGISGPParamDTIntegerList:
 	   case enumGISGPParamDTDoubleList:
             {
-                wxGISDTList* poList = new wxGISDTList(pParam, m_pTool->GetCatalog(), m_tools);
+                wxGISDTList* poList = new wxGISDTList(pParam, m_pTool->GetCatalog(), pToolsWnd);
                 bSizer4->Add( poList, 0, wxEXPAND, 5 );
                 m_pControlsArray.push_back(poList);
             }
             break;
        case enumGISGPParamDTBool:
             {
-                wxGISDTBool* poCheck = new wxGISDTBool(pParam, m_pTool->GetCatalog(), m_tools);
+                wxGISDTBool* poCheck = new wxGISDTBool(pParam, m_pTool->GetCatalog(), pToolsWnd);
                 bSizer4->Add( poCheck, 0, wxEXPAND, 5 );
                 m_pControlsArray.push_back(poCheck);
             }
             break;
         case enumGISGPParamDTParamArray:
             {
-                wxGISDTMultiParam* poMultiParam = new wxGISDTMultiParam(pParam, m_pTool->GetCatalog(), m_tools);
+                wxGISDTMultiParam* poMultiParam = new wxGISDTMultiParam(pParam, m_pTool->GetCatalog(), pToolsWnd);
                 bSizer4->Add( poMultiParam, 0, wxEXPAND, 5 );
                 m_pControlsArray.push_back(poMultiParam);
             }
             break;
         case enumGISGPParamDTQuery:
             {
-				wxGISSQLQueryCtrl* poSQLQueryParam = new wxGISSQLQueryCtrl(pParam, m_pTool->GetCatalog(), m_tools);
+				wxGISSQLQueryCtrl* poSQLQueryParam = new wxGISSQLQueryCtrl(pParam, m_pTool->GetCatalog(), pToolsWnd);
                 bSizer4->Add( poSQLQueryParam, 0, wxEXPAND, 5 );
                 m_pControlsArray.push_back(poSQLQueryParam);
             }
@@ -155,11 +160,11 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
         }
     }
 
-    m_tools->SetSizer( bSizer4 );
-	m_tools->Layout();
-	bSizer4->Fit( m_tools );
+    pToolsWnd->SetSizer( bSizer4 );
+	pToolsWnd->Layout();
+	bSizer4->Fit( pToolsWnd );
 
-	bSizer2->Add( m_tools, 1, wxEXPAND, 5 );
+	m_bSizer2->Add( pToolsWnd, 1, wxEXPAND, 5 );
 
 	m_sdbSizer1 = new wxStdDialogButtonSizer();
 	m_sdbSizer1OK = new wxButton( m_toolpanel, wxID_OK, wxString(_("OK")) );
@@ -171,11 +176,11 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
     m_sdbSizer1Help->Enable(false);
 	m_sdbSizer1->AddButton( m_sdbSizer1Help );
 	m_sdbSizer1->Realize();
-	bSizer2->Add( m_sdbSizer1, 0, wxEXPAND|wxALL, 5 );
+	m_bSizer2->Add( m_sdbSizer1, 0, wxEXPAND|wxALL, 5 );
 
-	m_toolpanel->SetSizer( bSizer2 );
+	m_toolpanel->SetSizer( m_bSizer2 );
 	m_toolpanel->Layout();
-	bSizer2->Fit( m_toolpanel );
+	m_bSizer2->Fit( m_toolpanel );
 
 	m_htmlWin = new wxHtmlWindow( m_splitter, wxID_ANY, wxDefaultPosition, wxSize(m_HtmlWidth, size.y), wxHW_SCROLLBAR_AUTO | wxBORDER_THEME  );
 	m_splitter->SetSashGravity(1.0);
@@ -267,6 +272,43 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
  //           m_pControlsArray[i]->Validate();
  //   }
 
+	GPParameters Params = m_pTool->GetParameterInfo();
+	int nErrCount(0);
+	for(size_t i = 0; i < Params.Count(); ++i)
+	{
+		wxGISEnumGPMessageType eType = Params[i]->GetMessageType();
+		int nIco;
+		switch(eType)
+		{
+		case wxGISEnumGPMessageRequired:
+		case wxGISEnumGPMessageOk:
+		case wxGISEnumGPMessageInformation:
+		case wxGISEnumGPMessageUnknown:
+		case wxGISEnumGPMessageNone:
+		default:
+			continue;
+		case wxGISEnumGPMessageError:
+			nIco = wxICON_ERROR;
+			break;
+		case wxGISEnumGPMessageWarning:
+			nIco = wxICON_WARNING;
+			break;
+		};
+		wxString sMsg = Params[i]->GetMessage();
+		nErrCount++;
+		if(sMsg == m_sCurrentErrMsg && m_nCurrentErrField == i)
+			continue;
+
+		m_pInfoBar->ShowMessage(sMsg + wxString(wxT(" ")) + wxString::Format(_("(Field No %d)"), i + 1), nIco);
+		m_sCurrentErrMsg = sMsg;
+		m_nCurrentErrField = i;
+		break;
+	}
+	if(nErrCount == 0)
+	{
+		m_pInfoBar->Hide();
+		m_bSizer2->Layout();
+	}
     //tool validate
     bool bIsValid = m_pTool->Validate();//validate user tool
 	if(!bIsValid)
@@ -274,18 +316,14 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
 
 	//update elements values set while validate user tool
     for(size_t i = 0; i < m_pControlsArray.size(); ++i)
-    {
         if(m_pControlsArray[i])
             m_pControlsArray[i]->UpdateControls();
-    }
 
 	//if any param not valid return
     for(size_t i = 0; i < m_pControlsArray.size(); ++i)
-    {
         if(m_pControlsArray[i])
             if(!m_pControlsArray[i]->Validate())
 				return;
-    }
 
 	//set OK button enabled 
     event.Enable(true);
