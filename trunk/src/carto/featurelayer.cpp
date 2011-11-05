@@ -398,19 +398,31 @@ void wxGISFeatureLayer::LoadGeometry(void)
 
 wxGISQuadTreeCursorSPtr wxGISFeatureLayer::Idetify(OGRGeometrySPtr pGeom)
 {
-	CPLRectObj obj;
+    OGREnvelope Env;
+    pGeom->getEnvelope(&Env);
+    CPLRectObj Rect = {Env.MinX, Env.MinY, Env.MaxX, Env.MaxY};
+
 	wxGISQuadTreeCursorSPtr pRet;
 
-	////fill cursor by rect
-	//if(m_pQuadTree)
-	//{
-	//	pRet = m_pQuadTree->Search(&obj);
-	//}
-	//else
-	//{
-	//	pRet = m_pwxGISFeatureDataset->SearchGeometry(&obj);
-	//}
-	////intersect geoms & set to NULL
+	//fill cursor by rect
+	if(m_pQuadTree)
+	{
+		pRet = m_pQuadTree->Search(&Rect);
+	}
+	else
+	{
+		pRet = m_pwxGISFeatureDataset->SearchGeometry(&Rect);
+	}
 
+	//intersect geoms & set to NULL
+    pRet->Reset();
+    for(size_t i = 0; i < pRet->GetCount(); ++i)
+    {
+        wxGISQuadTreeItem* pItem = pRet->at(i);
+        if(!pItem)
+            continue;
+        if(!pGeom->Intersects(pItem->GetGeometry()))
+            pRet->DeleteItem(i);
+    }
 	return pRet;
 }

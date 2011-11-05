@@ -58,9 +58,10 @@ public:
 	virtual size_t AddCache(void);
 	virtual void Clear();
 	virtual size_t GetLastCacheID(void);
+	virtual size_t GetFlashCacheID(void);
 	virtual bool IsCacheDerty(size_t nCacheID);
 	virtual void SetCacheDerty(size_t nCacheID, bool bIsDerty);
-	virtual void SetDrawCache(size_t nCacheID);
+	virtual void SetDrawCache(size_t nCacheID, bool bNoDerty = false);
 	virtual size_t GetDrawCache(void);
 	virtual void SetDerty(bool bIsDerty);
 	virtual bool IsDerty(void);
@@ -81,9 +82,9 @@ public:
 	virtual void OnEraseBackground(void); //Fill #0 cache of background color
 	virtual void Output(wxDC* pDC, wxGISPointsArray ClipGeometry);
 	//Styles
-	virtual void SetFillColor(RGBA Color){m_stFillColour = Color;};
-	virtual void SetLineColor(RGBA Color){m_stLineColour = Color;};
-	virtual void SetPointColor(RGBA Color){m_stPointColour = Color;};
+	virtual void SetFillColor(const RGBA Color){m_stFillColour = Color;};
+	virtual void SetLineColor(const RGBA Color){m_stLineColour = Color;};
+	virtual void SetPointColor(const RGBA Color){m_stPointColour = Color;};
 	virtual void SetLineCap(cairo_line_cap_t line_cap = CAIRO_LINE_CAP_BUTT);
 	virtual void SetLineWidth(double dWidth);
 	virtual void SetPointRadius(double dRadius);
@@ -98,12 +99,12 @@ public:
 	virtual OGREnvelope TransformRect(wxRect &rect);
 	//Testing
 	virtual void TestDraw(void);
-	typedef struct _layercachedata{
-		bool bIsDerty;
-		cairo_surface_t *pCairoSurface;
-		cairo_t *pCairoContext;
-	} LAYERCACHEDATA;
-
+    typedef struct _layercachedata
+    {
+	    bool bIsDerty;
+	    cairo_surface_t *pCairoSurface;
+	    cairo_t *pCairoContext;
+    } LAYERCACHEDATA;
 protected:
 	virtual void SetColor(double dRed, double dGreen, double dBlue, double dAlpha = 0);
 	virtual void SetColor(RGBA Color);

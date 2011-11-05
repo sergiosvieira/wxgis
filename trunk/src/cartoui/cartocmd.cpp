@@ -534,6 +534,14 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 			int nWidth = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/width")), 2);
 			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(nR, nG, nB), nWidth), m_pMapView, m_pMapView->GetDisplay());
 			OGREnvelope Env = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
+            if(IsDoubleEquil(Env.MaxX, Env.MinX) || IsDoubleEquil(Env.MaxY, Env.MinY))
+			{
+				Env.MinX -= widthdiv4;
+				Env.MinY -= heightdiv4;
+				Env.MaxX += widthdiv4;
+				Env.MaxY += heightdiv4;
+			}
+
 			m_pMapView->Identify(Env);
 			//m_pMapView->Refresh(false);
 		}
