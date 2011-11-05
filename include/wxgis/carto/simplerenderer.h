@@ -33,14 +33,19 @@ class wxGISSimpleRenderer :
 {
 public:
 	wxGISSimpleRenderer(void);
-	~wxGISSimpleRenderer(void);
+	virtual ~wxGISSimpleRenderer(void);
+	virtual void SetFillColor(const RGBA Color){m_stFillColour = Color;};
+	virtual void SetLineColor(const RGBA Color){m_stLineColour = Color;};
+	virtual void SetPointColor(const RGBA Color){m_stPointColour = Color;};
+    virtual void SetLineWidth(double dWidth){m_dWidth = dWidth;};
+    virtual void SetPointRadius(double dRadius){m_dRadius = dRadius;};
 //IFeatureRenderer
 	virtual bool CanRender(wxGISDatasetSPtr pDataset);
 	virtual void Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = 0);
 protected:
 	wxGISDatasetSPtr m_pDataset;
 	RGBA m_stFillColour, m_stLineColour, m_stPointColour;
-//	ISymbol* m_pFillSymbol;
-//	ISymbol* m_pLineSymbol;
-//	ISymbol* m_pMarkerSymbol;
+    double m_dWidth;
+    double m_dRadius;
 };
+

@@ -34,5 +34,6 @@ enum wxGISEnumMapToolState
 	enumGISMapRotating,
 	enumGISMapDrawing,
 	enumGISMapWheeling,
-	enumGISMapWheelingStop
+	enumGISMapWheelingStop,
+    enumGISMapFlashing
 };

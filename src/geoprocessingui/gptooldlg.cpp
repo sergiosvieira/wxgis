@@ -304,11 +304,6 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
 		m_nCurrentErrField = i;
 		break;
 	}
-	if(nErrCount == 0)
-	{
-		m_pInfoBar->Hide();
-		m_bSizer2->Layout();
-	}
     //tool validate
     bool bIsValid = m_pTool->Validate();//validate user tool
 	if(!bIsValid)
@@ -327,6 +322,15 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
 
 	//set OK button enabled 
     event.Enable(true);
+
+	if(nErrCount == 0)
+	{
+        if(m_pInfoBar->IsShown())
+        {
+    		m_pInfoBar->Hide();
+	    	m_bSizer2->Layout();
+        }
+	}
 
     //short nNonValid(0);
     //GPParameters* pParams = m_pTool->GetParameterInfo();

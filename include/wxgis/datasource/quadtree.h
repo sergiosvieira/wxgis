@@ -81,17 +81,21 @@ public:
 	virtual wxGISQuadTreeItem* const operator [](size_t nIndex)
 	{
 		if(!m_pData)
-			return NULL;
+			return nullptr;
 		if(nIndex >= m_nItemCount)
-			return NULL;
+			return nullptr;
 		return m_pData[nIndex];
+	}
+	virtual wxGISQuadTreeItem* const at(size_t nIndex)
+	{		
+		return operator [](nIndex);
 	}
 	virtual wxGISQuadTreeItem* const Next(void)
 	{
 		if(!m_pData)
-			return NULL;
+			return nullptr;
 		if(m_nCurrentItem == m_nItemCount)
-			return NULL;
+			return nullptr;
 		wxGISQuadTreeItem* pOut = m_pData[m_nCurrentItem];
 		m_nCurrentItem++;
 		return pOut;
@@ -99,6 +103,10 @@ public:
 	virtual void Reset(void)
 	{
 		m_nCurrentItem = 0;
+	}
+	virtual void DeleteItem(size_t nIndex)
+	{
+		m_pData[nIndex] = nullptr;
 	}
 protected:
 	wxGISQuadTreeItem** m_pData;

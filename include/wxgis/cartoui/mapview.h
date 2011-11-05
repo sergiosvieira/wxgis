@@ -20,9 +20,11 @@
  ****************************************************************************/
 #pragma once
 
+#include "wxgis/cartoui/cartoui.h"
 #include "wxgis/display/gisdisplay.h"
 #include "wxgis/carto/map.h"
-#include "wxgis/cartoui/cartoui.h"
+
+WX_DEFINE_ARRAY(OGRGeometry *, GeometryArray);
 
 class WXDLLIMPEXP_GIS_CTU wxGISMapView;
 
@@ -86,6 +88,7 @@ public:
 	virtual void SetRotate(double dAngleRad);
 	virtual double GetCurrentRotate(void);
 	virtual void Identify(const OGREnvelope &Bounds);
+    virtual void FlashGeometry(const GeometryArray &Geoms);
 protected:
 	//events
 	virtual void OnPaint(wxPaintEvent & event);

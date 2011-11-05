@@ -20,10 +20,6 @@
  ****************************************************************************/
 #include "wxgis/carto/simplerenderer.h"
 
-//#include "wxgis/display/simplefillsymbol.h"
-//#include "wxgis/display/simplelinesymbol.h"
-//#include "wxgis/display/simplemarkersymbol.h"
-
 wxGISSimpleRenderer::wxGISSimpleRenderer(void)
 {
 	//m_pFillSymbol = new wxSimpleFillSymbol();
@@ -34,24 +30,22 @@ wxGISSimpleRenderer::wxGISSimpleRenderer(void)
 	m_stLineColour.dBlue = 0.0;
 	m_stLineColour.dAlpha = 1.0;
 	m_stPointColour = m_stLineColour;
-	//m_stFillColour = m_stLineColour;
-	int random_number1 = (rand() % 50); 
+
+    int random_number1 = (rand() % 50); 
 	int random_number2 = (rand() % 50); 
 	int random_number3 = (rand() % 50); 
+
 	m_stFillColour.dRed = double(205 + random_number1) / 255;
 	m_stFillColour.dGreen = double(205 + random_number2) / 255;
 	m_stFillColour.dBlue = double(205 + random_number3) / 255;
-	//m_stFillColour.dRed = 0.0;
-	//m_stFillColour.dGreen = 0.0;
-	//m_stFillColour.dBlue = 0.7;
 	m_stFillColour.dAlpha = 1.0;
+
+    m_dWidth = 0.5;
+    m_dRadius = 1.5;
 }
 
 wxGISSimpleRenderer::~wxGISSimpleRenderer(void)
 {
-	//wxDELETE(m_pFillSymbol);
-	//wxDELETE(m_pLineSymbol);
-	//wxDELETE(m_pMarkerSymbol);
 }
 
 bool wxGISSimpleRenderer::CanRender(wxGISDatasetSPtr pDataset)
@@ -71,13 +65,14 @@ void wxGISSimpleRenderer::Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPha
 	pDisplay->SetFillColor(m_stFillColour);
 	pDisplay->SetLineColor(m_stLineColour);
 	pDisplay->SetPointColor(m_stPointColour);
-	//pDisplay->SetLineCap(CAIRO_LINE_CAP_ROUND);
 
-	pCursor->Reset();
-	wxGISQuadTreeItem* pItem;
-    while((pItem = pCursor->Next()) != NULL)	
+    for(size_t i = 0; i < pCursor->GetCount(); ++i)
     {
-		switch(DrawPhase)
+        wxGISQuadTreeItem* pItem = pCursor->at(i);
+        if(!pItem)
+            continue;
+
+        switch(DrawPhase)
 		{
 		case wxGISDPGeography:
 			{
@@ -90,19 +85,19 @@ void wxGISSimpleRenderer::Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPha
 				case wkbPoint:
 				case wkbMultiPoint:
 					pDisplay->SetLineCap(CAIRO_LINE_CAP_ROUND);
-					pDisplay->SetLineWidth(0.5);
-					pDisplay->SetPointRadius(1.5);
+					pDisplay->SetLineWidth(m_dWidth);
+					pDisplay->SetPointRadius(m_dRadius);
 					break;
 				case wkbLineString:
 				case wkbLinearRing:
 				case wkbMultiLineString:
 					pDisplay->SetLineCap(CAIRO_LINE_CAP_BUTT);
-					pDisplay->SetLineWidth(0.5);
+					pDisplay->SetLineWidth(m_dWidth);
 					break;
 				case wkbMultiPolygon:
 				case wkbPolygon:
 					pDisplay->SetLineCap(CAIRO_LINE_CAP_BUTT);
-					pDisplay->SetLineWidth(0.5);
+					pDisplay->SetLineWidth(m_dWidth);
 					break;
 				case wkbGeometryCollection:
 					break;
