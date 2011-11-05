@@ -163,7 +163,7 @@ bool wxGISFeatureDataset::Open(int iLayer, int bUpdate, bool bCache, ITrackCance
 	if(m_bIsOpened)
 		return true;
 
-	if(!wxGISTable::Open(iLayer, bUpdate, pTrackCancel))
+	if(!wxGISTable::Open(iLayer, bUpdate, bCache, pTrackCancel))
 		return false;
 
 	if(bCache)

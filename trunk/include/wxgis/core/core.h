@@ -305,9 +305,9 @@ public:
 #define DEFINE_SHARED_PTR(x) typedef boost::shared_ptr<x> x##SPtr
 #define DEFINE_WEAK_PTR(x) typedef boost::weak_ptr<x> x##WPtr
 
-//std::numeric_limits<double>::epsilon() * 20
-//FLT_EPSILON
-inline bool IsDoubleEquil( double a, double b, double epsilon = 16 * DBL_EPSILON )
+#define EPSILON std::numeric_limits<double>::epsilon() * 16
+//FLT_EPSILON DBL_EPSILON
+inline bool IsDoubleEquil( double a, double b, double epsilon = EPSILON )
 {
   const double diff = a - b;
   return diff > -epsilon && diff <= epsilon;

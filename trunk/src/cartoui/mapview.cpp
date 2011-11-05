@@ -751,10 +751,6 @@ void wxGISMapView::FlashGeometry(const GeometryArray &Geoms)
 	stFillColour.dBlue = double(pConfig->ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_fill_blue")), 255)) / 255;
 	stFillColour.dAlpha = 1.0;
 
-	m_pGISDisplay->SetFillColor(stFillColour);
-	m_pGISDisplay->SetLineColor(stLineColour);
-	m_pGISDisplay->SetPointColor(stLineColour);
-
     for(size_t i = 0; i < Geoms.GetCount(); ++i)
     {
 		OGRGeometry* pGeom = Geoms[i];
@@ -763,20 +759,28 @@ void wxGISMapView::FlashGeometry(const GeometryArray &Geoms)
 		{
 		case wkbPoint:
 		case wkbMultiPoint:
+	        m_pGISDisplay->SetPointColor(stLineColour);
+	        m_pGISDisplay->SetLineColor(stLineColour);
+	        m_pGISDisplay->SetFillColor(stFillColour);
 			m_pGISDisplay->SetLineCap(CAIRO_LINE_CAP_ROUND);
-			m_pGISDisplay->SetLineWidth(0.7);
+			m_pGISDisplay->SetLineWidth(1.0);
 			m_pGISDisplay->SetPointRadius(2.0);
 			break;
 		case wkbLineString:
 		case wkbLinearRing:
 		case wkbMultiLineString:
+	        m_pGISDisplay->SetPointColor(stFillColour);
+	        m_pGISDisplay->SetLineColor(stFillColour);
+	        m_pGISDisplay->SetFillColor(stFillColour);
 			m_pGISDisplay->SetLineCap(CAIRO_LINE_CAP_BUTT);
-			m_pGISDisplay->SetLineWidth(0.7);
+			m_pGISDisplay->SetLineWidth(2.0);
 			break;
 		case wkbMultiPolygon:
 		case wkbPolygon:
+	        m_pGISDisplay->SetLineColor(stLineColour);
+	        m_pGISDisplay->SetFillColor(stFillColour);
 			m_pGISDisplay->SetLineCap(CAIRO_LINE_CAP_BUTT);
-			m_pGISDisplay->SetLineWidth(0.7);
+			m_pGISDisplay->SetLineWidth(1.0);
 			break;
 		case wkbGeometryCollection:
 			break;
