@@ -536,10 +536,11 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 			OGREnvelope Env = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
             if(IsDoubleEquil(Env.MaxX, Env.MinX) || IsDoubleEquil(Env.MaxY, Env.MinY))
 			{
-				Env.MinX -= widthdiv4;
-				Env.MinY -= heightdiv4;
-				Env.MaxX += widthdiv4;
-				Env.MaxY += heightdiv4;
+                double dfDelta = EPSILON * 16;
+				Env.MinX -= dfDelta;
+				Env.MinY -= dfDelta;
+				Env.MaxX += dfDelta;
+				Env.MaxY += dfDelta;
 			}
 
 			m_pMapView->Identify(Env);
