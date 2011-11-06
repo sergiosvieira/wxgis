@@ -103,6 +103,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cartoui\cartocmd.cpp" />
+    <ClCompile Include="..\..\src\cartoui\identifydlg.cpp" />
     <ClCompile Include="..\..\src\cartoui\mapview.cpp" />
     <ClCompile Include="..\..\src\cartoui\mxeventui.cpp" />
     <ClCompile Include="..\..\src\cartoui\rasterdatasetcmd.cpp" />
@@ -112,6 +113,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\wxgis\cartoui\cartocmd.h" />
     <ClInclude Include="..\..\include\wxgis\cartoui\cartoui.h" />
+    <ClInclude Include="..\..\include\wxgis\cartoui\identifydlg.h" />
     <ClInclude Include="..\..\include\wxgis\cartoui\mapview.h" />
     <ClInclude Include="..\..\include\wxgis\cartoui\mxeventui.h" />
     <ClInclude Include="..\..\include\wxgis\cartoui\rasterdatasetcmd.h" />
