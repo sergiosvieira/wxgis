@@ -33,6 +33,9 @@
     <ClCompile Include="..\..\src\cartoui\tableview.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\cartoui\identifydlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\wxgis\cartoui\cartocmd.h">
@@ -54,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\wxgis\cartoui\tableview.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\wxgis\cartoui\identifydlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
