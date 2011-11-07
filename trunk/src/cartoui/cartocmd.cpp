@@ -239,7 +239,7 @@ unsigned char wxGISCartoMainCmd::GetCount(void)
 IMPLEMENT_DYNAMIC_CLASS(wxGISCartoMainTool, wxObject)
 
 
-wxGISCartoMainTool::wxGISCartoMainTool(void) : m_pMapView(NULL), m_bCheck(false)
+wxGISCartoMainTool::wxGISCartoMainTool(void) : m_pMapView(nullptr), m_pIdentifyView(nullptr), m_bCheck(false)
 {
 }
 
@@ -310,7 +310,7 @@ bool wxGISCartoMainTool::GetChecked(void)
 
 bool wxGISCartoMainTool::GetEnabled(void)
 {
-	if(!m_pMapView)
+	if(!m_pMapView || !m_pIdentifyView)
 	{
 		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
 		if(pWinArr)
@@ -319,10 +319,13 @@ bool wxGISCartoMainTool::GetEnabled(void)
 			{
 				wxGISMapView* pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
 				if(pMapView)
-				{
 					m_pMapView = pMapView;
-					break;
-				}
+                wxAxIdentifyView* pIdentifyView = dynamic_cast<wxAxIdentifyView*>(pWinArr->at(i));
+                if(pIdentifyView)
+                    m_pIdentifyView = pIdentifyView;
+                if(m_pMapView && m_pIdentifyView)
+                    break;
+
 			}
 		}
 	}
@@ -335,7 +338,7 @@ bool wxGISCartoMainTool::GetEnabled(void)
 		case 1:
 		case 2:
 		case 3:
-			return m_pMapView->IsShown();
+			return m_pMapView->IsShown() && m_pIdentifyView;
 		default:
 			return false;
 	}
@@ -543,8 +546,12 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 				Env.MaxY += dfDelta;
 			}
 
-			m_pMapView->Identify(Env);
-			//m_pMapView->Refresh(false);
+            wxWindow* pWnd = static_cast<wxWindow*>(m_pIdentifyView);
+            if(!m_pApp->IsApplicationWindowShown(pWnd))
+            {
+                m_pApp->ShowApplicationWindow(pWnd);
+            }
+			//m_pMapView->Identify(Env);
 		}
 		break;
 		default:

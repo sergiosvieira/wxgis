@@ -35,7 +35,7 @@ wxAxToolboxView::wxAxToolboxView(void)
 
 wxAxToolboxView::wxAxToolboxView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxAuiNotebook(parent, id, pos, size, wxAUI_NB_BOTTOM | wxNO_BORDER | wxAUI_NB_TAB_MOVE)
 {
-    m_sViewName = wxString(_("wxGISToolbox"));
+    Create(parent, id, pos, size);
 }
 
 wxAxToolboxView::~wxAxToolboxView(void)
@@ -44,7 +44,7 @@ wxAxToolboxView::~wxAxToolboxView(void)
 
 bool wxAxToolboxView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
-    m_sViewName = wxString(_("wxGISToolbox"));
+    m_sViewName = wxString(_("Toolbox"));
     return wxAuiNotebook::Create(parent, id, pos, size, wxAUI_NB_BOTTOM | wxNO_BORDER | wxAUI_NB_TAB_MOVE);
 }
 
