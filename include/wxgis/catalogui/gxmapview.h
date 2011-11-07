@@ -26,6 +26,9 @@
 #include "wxgis/cartoui/mapview.h"
 #include "wxgis/core/format.h"
 
+/** \class wxGxMapView gxmapview.h
+ *  \brief The view for map showing.
+ */
 class WXDLLIMPEXP_GIS_CLU wxGxMapView :
 	public wxGISMapView,
 	public wxGxView

@@ -29,12 +29,9 @@
 #include "wx/treectrl.h"
 #include "wx/imaglist.h"
 
-//#include <wx/msgdlg.h>
-
-//////////////////////////////////////////////////////////////////////////////
-// wxGxTreeItemData
-//////////////////////////////////////////////////////////////////////////////
-
+/** \class wxGxTreeItemData gxtreeview.h
+ *  \brief The tree view item data.
+ */
 class wxGxTreeItemData : public wxTreeItemData
 {
 public:
@@ -54,10 +51,9 @@ public:
 	bool m_bExpandedOnce;
 };
 
-//////////////////////////////////////////////////////////////////////////////
-// wxGxTreeViewBase
-//////////////////////////////////////////////////////////////////////////////
-
+/** \class wxGxTreeViewBase gxtreeview.h
+ *  \brief The base class for tree view of gxObjects.
+ */
 class WXDLLIMPEXP_GIS_CLU wxGxTreeViewBase :
 	public wxTreeCtrl,
 	public wxGxView
@@ -109,11 +105,9 @@ protected:
     DECLARE_EVENT_TABLE()
 };
 
-
-//////////////////////////////////////////////////////////////////////////////
-// wxGxTreeView
-//////////////////////////////////////////////////////////////////////////////
-
+/** \class wxGxTreeView gxtreeview.h
+ *  \brief The tree view in Catalog.
+ */
 class WXDLLIMPEXP_GIS_CLU wxGxTreeView :
 	public wxGxTreeViewBase,
     public IViewDropTarget

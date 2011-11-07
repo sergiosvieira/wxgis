@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
- * Purpose:  wxGxToolboxView class.
+ * Purpose:  wxAxToolboxView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2010 Bishop
@@ -24,31 +24,31 @@
 #include "wxgis/framework/droptarget.h"
 
 //-------------------------------------------------------------------
-// wxGxToolboxView
+// wxAxToolboxView
 //-------------------------------------------------------------------
 
-IMPLEMENT_DYNAMIC_CLASS(wxGxToolboxView, wxAuiNotebook)
+IMPLEMENT_DYNAMIC_CLASS(wxAxToolboxView, wxAuiNotebook)
 
-wxGxToolboxView::wxGxToolboxView(void)
+wxAxToolboxView::wxAxToolboxView(void)
 {
 }
 
-wxGxToolboxView::wxGxToolboxView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxAuiNotebook(parent, id, pos, size, wxAUI_NB_BOTTOM | wxNO_BORDER | wxAUI_NB_TAB_MOVE)
+wxAxToolboxView::wxAxToolboxView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxAuiNotebook(parent, id, pos, size, wxAUI_NB_BOTTOM | wxNO_BORDER | wxAUI_NB_TAB_MOVE)
 {
     m_sViewName = wxString(_("wxGISToolbox"));
 }
 
-wxGxToolboxView::~wxGxToolboxView(void)
+wxAxToolboxView::~wxAxToolboxView(void)
 {
 }
 
-bool wxGxToolboxView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+bool wxAxToolboxView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     m_sViewName = wxString(_("wxGISToolbox"));
     return wxAuiNotebook::Create(parent, id, pos, size, wxAUI_NB_BOTTOM | wxNO_BORDER | wxAUI_NB_TAB_MOVE);
 }
 
-bool wxGxToolboxView::Activate(IFrameApplication* application, wxXmlNode* pConf)
+bool wxAxToolboxView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 {
 	if(!wxGxView::Activate(application, pConf))
 		return false;
@@ -116,7 +116,7 @@ bool wxGxToolboxView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 	return true;
 }
 
-void wxGxToolboxView::Deactivate(void)
+void wxAxToolboxView::Deactivate(void)
 {
     m_pGxToolExecuteView->Deactivate();
     m_pApp->UnRegisterChildWindow(m_pGxToolExecuteView);
@@ -125,7 +125,7 @@ void wxGxToolboxView::Deactivate(void)
     m_pApp->UnRegisterChildWindow(m_pGxToolboxView);
 }
 
-wxWindow* wxGxToolboxView::GetCurrentWnd(void)
+wxWindow* wxAxToolboxView::GetCurrentWnd(void)
 {
 	//int nSelTab = GetSelection();
 	//wxASSERT(nSelTab >= 0 && nSelTab < m_Tabs.size());

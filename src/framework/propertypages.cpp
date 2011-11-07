@@ -43,7 +43,8 @@ wxGISMiscPropertyPage::~wxGISMiscPropertyPage()
 
 bool wxGISMiscPropertyPage::Create(IFrameApplication* application, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
-    wxPanel::Create(parent, id, pos, size, style, name);
+    if(!wxPanel::Create(parent, id, pos, size, style, name))
+		return false;
 
     m_pApp = application;
     if(!m_pApp)
