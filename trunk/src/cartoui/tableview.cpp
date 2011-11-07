@@ -188,7 +188,8 @@ wxGISTableView::~wxGISTableView(void)
 
 bool wxGISTableView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
-    wxPanel::Create( parent, id, pos, size, style, name );
+    if(!wxPanel::Create( parent, id, pos, size, style, name ))
+		return false;
 
 	wxBoxSizer* bSizerMain;
 	bSizerMain = new wxBoxSizer( wxVERTICAL );

@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
- * Purpose:  wxGxToolboxView class.
+ * Purpose:  wxAxToolboxView class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
@@ -31,7 +31,6 @@
 /** \class wxGxToolboxTreeView gptoolboxview.h
     \brief The wxGxToolboxTreeView include tools hierarchy.
 */
-
 class WXDLLIMPEXP_GIS_GPU wxGxToolboxTreeView : 
     public wxGxTreeView
 {
@@ -46,19 +45,18 @@ public:
     void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent);
 };
 
-/** \class wxGxToolboxView gptoolboxview.h
-    \brief The wxGxToolboxView show tool window with tabs(tools tree, tool exec view & etc.).
+/** \class wxAxToolboxView gptoolboxview.h
+    \brief The class wxAxToolboxView show tool window with tabs(tools tree, tool exec view & etc.).
 */
-
-class WXDLLIMPEXP_GIS_GPU wxGxToolboxView :
+class WXDLLIMPEXP_GIS_GPU wxAxToolboxView :
 	public wxAuiNotebook,
 	public wxGxView
 {
-    DECLARE_DYNAMIC_CLASS(wxGxToolboxView)
+    DECLARE_DYNAMIC_CLASS(wxAxToolboxView)
 public:
-    wxGxToolboxView(void);
-	wxGxToolboxView(wxWindow* parent, wxWindowID id = TOOLVIEWCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
-	virtual ~wxGxToolboxView(void);
+    wxAxToolboxView(void);
+	wxAxToolboxView(wxWindow* parent, wxWindowID id = TOOLVIEWCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
+	virtual ~wxAxToolboxView(void);
 	virtual wxWindow* GetCurrentWnd(void);
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id = TOOLVIEWCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxAUI_NB_BOTTOM | wxNO_BORDER | wxAUI_NB_TAB_MOVE, const wxString& name = wxT("ToolboxView"));

@@ -38,7 +38,8 @@ wxGISSpatialReferencePropertyPage::~wxGISSpatialReferencePropertyPage()
 
 bool wxGISSpatialReferencePropertyPage::Create(OGRSpatialReferenceSPtr poSRS, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
-    wxPanel::Create(parent, id, pos, size, style, name);
+    if(!wxPanel::Create(parent, id, pos, size, style, name))
+		return false;
 
     //if(!poSRS)
     //    return false;

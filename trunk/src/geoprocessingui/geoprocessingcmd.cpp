@@ -117,10 +117,10 @@ bool wxGISGeoprocessingCmd::GetEnabled(void)
 		{
 			for(size_t i = 0; i < pWinArr->size(); ++i)
 			{
-				wxGxToolboxView* pwxGxToolboxView = dynamic_cast<wxGxToolboxView*>(pWinArr->at(i));
-				if(pwxGxToolboxView)
+				wxAxToolboxView* pwxAxToolboxView = dynamic_cast<wxAxToolboxView*>(pWinArr->at(i));
+				if(pwxAxToolboxView)
 				{
-					m_pToolboxView = pwxGxToolboxView;
+					m_pToolboxView = pwxAxToolboxView;
 					break;
 				}
 			}

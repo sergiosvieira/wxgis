@@ -41,7 +41,8 @@ wxGISVectorPropertyPage::~wxGISVectorPropertyPage()
 
 bool wxGISVectorPropertyPage::Create(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
-    wxPanel::Create(parent, id, pos, size, style, name);
+    if(!wxPanel::Create(parent, id, pos, size, style, name))
+		return false;
 
     m_pGxDataset = pGxDataset;
 

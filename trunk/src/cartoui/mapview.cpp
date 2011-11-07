@@ -104,7 +104,7 @@ wxGISMapView::~wxGISMapView(void)
 
 bool wxGISMapView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
-    if(!wxWindow::Create(parent, id, pos, size, style ))
+    if(!wxWindow::Create(parent, id, pos, size, style, name ))
 		return false;
 	m_pGISDisplay = new wxGISDisplay();
 
