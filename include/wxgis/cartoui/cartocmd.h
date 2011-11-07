@@ -22,6 +22,7 @@
 #include "wxgis/framework/framework.h"
 #include "wxgis/cartoui/mapview.h"
 #include "wxgis/cartoui/mxeventui.h"
+#include "wxgis/cartoui/identifydlg.h"
 
 /** \class wxGISRotationComboBox cartocmd.h
     \brief The frame angle rotation input combobox.
@@ -110,6 +111,7 @@ private:
 	wxIcon m_IconZoomIn, m_IconZoomOut, m_IconPan, m_IconInfo;
 	wxCursor m_CurZoomIn, m_CurZoomOut, m_CurPan1, m_CurPan2, m_CurInfo;
 	wxGISMapView* m_pMapView;
+    wxAxIdentifyView* m_pIdentifyView;
 	bool m_bCheck;
 };
 

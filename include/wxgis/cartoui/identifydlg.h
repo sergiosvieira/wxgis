@@ -50,7 +50,8 @@ protected:
 	{
 		ID_WXGISIDENTIFYDLG = 1000,
 	};		
-	
+
+     DECLARE_DYNAMIC_CLASS(wxGISIdentifyDlg)
 public:
 	wxGISIdentifyDlg(void);
 	wxGISIdentifyDlg( wxWindow* parent, wxWindowID id = ID_WXGISIDENTIFYDLG, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );

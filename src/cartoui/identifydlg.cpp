@@ -23,6 +23,7 @@
 //-------------------------------------------------------------------
 // wxGISIdentifyDlg
 //-------------------------------------------------------------------
+IMPLEMENT_DYNAMIC_CLASS(wxGISIdentifyDlg, wxPanel)
 
 wxGISIdentifyDlg::wxGISIdentifyDlg( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style )
 {
@@ -66,6 +67,8 @@ bool wxGISIdentifyDlg::Create(wxWindow* parent, wxWindowID id, const wxPoint& po
 	
 	this->SetSizer( m_bMainSizer );
 	this->Layout();
+
+    return true;
 }
 
 wxGISIdentifyDlg::~wxGISIdentifyDlg()
@@ -75,7 +78,6 @@ wxGISIdentifyDlg::~wxGISIdentifyDlg()
 //-------------------------------------------------------------------
 // wxAxToolboxView
 //-------------------------------------------------------------------
-
 IMPLEMENT_DYNAMIC_CLASS(wxAxIdentifyView, wxGISIdentifyDlg)
 
 wxAxIdentifyView::wxAxIdentifyView(void)
@@ -84,7 +86,7 @@ wxAxIdentifyView::wxAxIdentifyView(void)
 
 wxAxIdentifyView::wxAxIdentifyView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxGISIdentifyDlg(parent, id, pos, size, wxNO_BORDER | wxTAB_TRAVERSAL)
 {
-    m_sViewName = wxString(_("wxGISIdentify"));
+    Create(parent, id, pos, size);
 }
 
 wxAxIdentifyView::~wxAxIdentifyView(void)
@@ -93,7 +95,7 @@ wxAxIdentifyView::~wxAxIdentifyView(void)
 
 bool wxAxIdentifyView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
-    m_sViewName = wxString(_("wxGISIdentify"));
+    m_sViewName = wxString(_("Identify"));
     return wxGISIdentifyDlg::Create(parent, id, pos, size, wxNO_BORDER, name);
 }
 
