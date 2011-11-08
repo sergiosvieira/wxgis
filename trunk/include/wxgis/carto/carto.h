@@ -69,7 +69,7 @@ public:
 	virtual bool GetVisible(void){return m_bVisible;};
 	virtual void SetVisible(bool bVisible){m_bVisible = bVisible;};
 	virtual void SetName(wxString sName){m_sName = sName;};
-	virtual wxString GetName(wxString sName){return m_sName;};
+	virtual wxString GetName(void){return m_sName;};
 	virtual size_t GetCacheID(void){return m_nCacheID;};
 	virtual void SetCacheID(size_t nCacheID){m_nCacheID = nCacheID;};
 	virtual bool IsCacheNeeded(void){return true;};

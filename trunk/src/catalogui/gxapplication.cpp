@@ -212,11 +212,19 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
 		}
 	}
 
+	int nBegSize = m_WindowArray.size();
     for(size_t i = 0; i < m_WindowArray.size(); ++i)
     {
         IView* pView = dynamic_cast<IView*>(m_WindowArray[i]);
         if(pView)
             pView->Deactivate();
+		//if during deactivation some windows would be unregistered and deleted from m_WindowArray
+		if(nBegSize != m_WindowArray.size())
+		{
+			int nStayCount = nBegSize - i - m_WindowArray.size();
+			i = i + nStayCount - 1;
+			nBegSize = m_WindowArray.size();
+		}
     }
 	UnRegisterChildWindow(m_pTreeView);
 	UnRegisterChildWindow(m_pTabView);

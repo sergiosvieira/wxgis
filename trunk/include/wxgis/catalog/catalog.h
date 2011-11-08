@@ -207,7 +207,7 @@ public:
 				}
 			}
 		}
-		return NULL;
+		return nullptr;
 	}
     virtual bool CanCreate(long nDataType, long DataSubtype){return false;}; 
 protected:

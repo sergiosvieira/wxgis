@@ -38,6 +38,7 @@ public:
 	virtual bool AddLayer(wxGISLayerSPtr pLayer);
 	virtual void Clear(void);
 	virtual size_t GetLayerCount(void){return m_paLayers.size();};
+	virtual wxGISLayerSPtr GetLayer(size_t nIndex);
 	virtual wxString GetDescription(void){return m_sDescription;};
 	virtual void SetDescription(wxString sDescription){m_sDescription = sDescription;};
 	virtual OGREnvelope GetFullExtent(void);
