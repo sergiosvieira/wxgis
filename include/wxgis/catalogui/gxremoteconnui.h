@@ -22,6 +22,7 @@
 
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalog/gxremoteconn.h"
+#include "wxgis/catalogui/gxpending.h"
 
 class WXDLLIMPEXP_GIS_CLU wxGxRemoteConnectionUI;
 /** \class wxGISRasterRGBARenderer rasterrenderer.h
@@ -81,5 +82,6 @@ protected:
     std::map<wxThreadIdType, wxChildLoaderThread*> m_pmThreads;
     int m_nRunningThreads;
     IProgressor* m_pProgressor;
+	wxGxPendingUI* m_pGxPendingUI;
 };
 

@@ -87,7 +87,6 @@ public:
 	virtual void RotateStop(wxPoint MouseLocation);
 	virtual void SetRotate(double dAngleRad);
 	virtual double GetCurrentRotate(void);
-	virtual void Identify(const OGREnvelope &Bounds);
     virtual void FlashGeometry(const GeometryArray &Geoms);
 protected:
 	//events

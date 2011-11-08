@@ -551,7 +551,8 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
             {
                 m_pApp->ShowApplicationWindow(pWnd);
             }
-			//m_pMapView->Identify(Env);
+			if(m_pIdentifyView)
+				m_pIdentifyView->Identify(Env);
 		}
 		break;
 		default:

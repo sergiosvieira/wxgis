@@ -117,6 +117,11 @@ OGRSpatialReferenceSPtr wxGISMap::GetSpatialReference(void)
 	return m_pSpatialReference;
 }
 
+wxGISLayerSPtr wxGISMap::GetLayer(size_t nIndex)
+{
+	wxCHECK(nIndex < m_paLayers.size(), wxGISLayerSPtr());
+	return m_paLayers[nIndex];
+};
 
 //The AddLayer method adds a layer to the Map. Use the LayerCount property to get the total number of layers in the map.
 //AddLayer automatically attempts to set the Map's SpatialReference property if a coordinate system has not yet been defined for the map.  

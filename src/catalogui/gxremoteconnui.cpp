@@ -71,7 +71,8 @@ wxGxRemoteConnectionUI::wxGxRemoteConnectionUI(CPLString soPath, wxString Name, 
     m_oLargeIconTable = LargeIconTable;
     m_oSmallIconTable = SmallIconTable;
 
-    m_pProgressor = NULL;
+    m_pProgressor = nullptr;
+	m_pGxPendingUI = nullptr;
 }
 
 wxGxRemoteConnectionUI::~wxGxRemoteConnectionUI(void)
@@ -138,6 +139,14 @@ void wxGxRemoteConnectionUI::LoadChildren(void)
 	if(m_pwxGISDataset == NULL)
 		return;
 
+	size_t nCountMax(m_pwxGISDataset->GetSubsetsCount());
+	if(nCountMax == 0)
+	{
+		m_bIsChildrenLoaded = true;
+		return;
+	}
+
+	//get statusbar progressor
     if(!m_pProgressor)
     {
         IFrameApplication* pFApp = dynamic_cast<IFrameApplication*>(GetApplication());
@@ -155,47 +164,65 @@ void wxGxRemoteConnectionUI::LoadChildren(void)
         m_pProgressor->Show(true);
     }
 
-    size_t nCountMax(m_pwxGISDataset->GetSubsetsCount()), nCount(0);
-    if(nCountMax > MAX_LAYERS)
-        nCount = MAX_LAYERS;
-    else
-        nCount = nCountMax;
 
-    for(size_t i = 0; i < nCount; ++i)
+	//add pending gxobject
+    if(!m_pGxPendingUI)
     {
-        if(m_pProgressor)
-            m_pProgressor->SetValue(i);
-        AddSubDataset(i);
-	}
+        m_pGxPendingUI = new wxGxPendingUI();
+        if(!AddChild(m_pGxPendingUI))
+            wxDELETE(m_pGxPendingUI);
+    }
 
-    //start threads to load layers
-    if(nCountMax > MAX_LAYERS)
+    m_nRunningThreads = 0;
+	wxChildLoaderThread *thread = new wxChildLoaderThread(this, 0, nCountMax, m_pProgressor);
+	if(CreateAndRunThread(thread, wxT("wxChildLoaderThread"), wxT("ChildLoaderThread"))) 
     {
-        int nCPUCount = wxThread::GetCPUCount();
-        size_t nBeg(MAX_LAYERS), nEnd;
-        size_t nPartSize = (nCountMax - nBeg) / nCPUCount;
-        m_nRunningThreads = 0;
-        for(int i = 0; i < nCPUCount; ++i)
-        {
-            if(i == nCPUCount - 1)
-                nEnd = nCountMax;
-            else
-                nEnd = nPartSize * (i + 1);
-            //create thread
-		    wxChildLoaderThread *thread = new wxChildLoaderThread(this, nBeg, nEnd, m_pProgressor);
-		    if(CreateAndRunThread(thread, wxT("wxChildLoaderThread"), wxT("ChildLoaderThread"))) 
-            {
-                m_nRunningThreads++;
-                m_pmThreads[thread->GetId()] = thread;//store thread in array
-            }
-            nBeg = nEnd;
-        }
+        m_nRunningThreads++;
+        m_pmThreads[thread->GetId()] = thread;//store thread in array
     }
-    else
-    {
-        if(m_pProgressor)
-            m_pProgressor->Show(false);
-    }
+
+
+ //   size_t nCountMax(m_pwxGISDataset->GetSubsetsCount()), nCount(0);
+ //   if(nCountMax > MAX_LAYERS)
+ //       nCount = MAX_LAYERS;
+ //   else
+ //       nCount = nCountMax;
+
+ //   for(size_t i = 0; i < nCount; ++i)
+ //   {
+ //       if(m_pProgressor)
+ //           m_pProgressor->SetValue(i);
+ //       AddSubDataset(i);
+	//}
+
+ //   //start threads to load layers
+ //   if(nCountMax > MAX_LAYERS)
+ //   {
+ //       int nCPUCount = wxThread::GetCPUCount();
+ //       size_t nBeg(MAX_LAYERS), nEnd;
+ //       size_t nPartSize = (nCountMax - nBeg) / nCPUCount;
+ //       m_nRunningThreads = 0;
+ //       for(int i = 0; i < nCPUCount; ++i)
+ //       {
+ //           if(i == nCPUCount - 1)
+ //               nEnd = nCountMax;
+ //           else
+ //               nEnd = nPartSize * (i + 1);
+ //           //create thread
+	//	    wxChildLoaderThread *thread = new wxChildLoaderThread(this, nBeg, nEnd, m_pProgressor);
+	//	    if(CreateAndRunThread(thread, wxT("wxChildLoaderThread"), wxT("ChildLoaderThread"))) 
+ //           {
+ //               m_nRunningThreads++;
+ //               m_pmThreads[thread->GetId()] = thread;//store thread in array
+ //           }
+ //           nBeg = nEnd;
+ //       }
+ //   }
+ //   else
+ //   {
+ //       if(m_pProgressor)
+ //           m_pProgressor->Show(false);
+ //   }
 
 	m_bIsChildrenLoaded = true;
 }
@@ -203,13 +230,16 @@ void wxGxRemoteConnectionUI::LoadChildren(void)
 void wxGxRemoteConnectionUI::OnThreadExit(wxThreadIdType nThreadID)
 {
     m_pmThreads[nThreadID] = nullptr;
-    m_pCatalog->ObjectRefreshed(GetID());
     m_nRunningThreads--;
     if(m_nRunningThreads <= 0)
     {
         if(m_pProgressor)
             m_pProgressor->Show(false);
+        if(m_pGxPendingUI)
+            if(DeleteChild(static_cast<IGxObject*>(m_pGxPendingUI)))
+                m_pGxPendingUI = nullptr;
     }
+    m_pCatalog->ObjectRefreshed(GetID());
 }
 
 void wxGxRemoteConnectionUI::AddSubDataset(size_t nIndex)

@@ -22,6 +22,8 @@
 
 #include "wxgis/cartoui/cartoui.h"
 #include "wxgis/framework/framework.h"
+#include "wxgis/cartoui/mapview.h"
+#include "wxgis/carto/featurelayer.h"
 
 #include <wx/intl.h>
 #include <wx/string.h>
@@ -39,6 +41,7 @@
 #include <wx/sizer.h>
 #include <wx/splitter.h>
 #include <wx/panel.h>
+#include <wx/treectrl.h>
 
 /** \class wxGISIdentifyDlg identifydlg.h
  *  \brief The wxGISIdentifyDlg class is dialog/dock window with the results of identify.
@@ -49,6 +52,8 @@ protected:
 	enum
 	{
 		ID_WXGISIDENTIFYDLG = 1000,
+		ID_WXGISTREECTRL,
+		ID_SWITCHSPLIT
 	};		
 
      DECLARE_DYNAMIC_CLASS(wxGISIdentifyDlg)
@@ -63,6 +68,8 @@ public:
 		m_splitter->SetSashPosition( 0 );
 		m_splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISIdentifyDlg::SplitterOnIdle ), NULL, this );
 	}	
+	//event
+	void OnSwitchSplit(wxCommandEvent& event);
 protected:
 	wxBoxSizer* m_bMainSizer;
 	wxFlexGridSizer* m_fgTopSizer;
@@ -70,6 +77,13 @@ protected:
 	wxChoice* m_LayerChoice;
 	wxBitmapButton* m_bpSplitButton;
 	wxSplitterWindow* m_splitter;
+	wxBitmap m_BmpVert, m_BmpHorz;
+	wxTreeCtrl *m_pTreeCtrl;
+	wxPanel* m_pNullPane;
+	wxImageList m_TreeImageList;
+	wxXmlNode* m_pConf;
+
+    DECLARE_EVENT_TABLE()
 };
 
 /** \class wxAxToolboxView gptoolboxview.h
@@ -91,16 +105,20 @@ public:
 	wxAxIdentifyView(wxWindow* parent, wxWindowID id = ID_WXGISIDENTIFYVIEW, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 	virtual ~wxAxIdentifyView(void);
 //IView
-    virtual bool Create(wxWindow* parent, wxWindowID id = ID_WXGISIDENTIFYVIEW, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxNO_BORDER | wxTAB_TRAVERSAL, const wxString& name = wxT("IdentifyView"));
+    virtual bool Create(wxWindow* parent, wxWindowID id = ID_WXGISIDENTIFYVIEW, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxBORDER_NONE | wxTAB_TRAVERSAL, const wxString& name = wxT("IdentifyView"));
 	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 	virtual void Refresh(void){};
 	virtual wxString GetViewName(void){return m_sViewName;};
 	virtual wxIcon GetViewIcon(void){return wxNullIcon;};
 	virtual void SetViewIcon(wxIcon Icon){};
+	//wxGISIdentifyDlg
+	virtual void Identify(const OGREnvelope &Bounds);
+	virtual void FillTree(wxGISFeatureLayerSPtr pFLayer, wxGISQuadTreeCursorSPtr pCursor);
 protected:
 	wxString m_sViewName;
     IFrameApplication* m_pApp;
+	wxGISMapView* m_pMapView;
     //wxGxToolboxTreeView* m_pGxToolboxView;
     //wxGxToolExecuteView *m_pGxToolExecuteView;
 };

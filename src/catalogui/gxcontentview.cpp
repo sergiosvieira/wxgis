@@ -618,7 +618,7 @@ void wxGxContentView::OnObjectDeleted(wxGxCatalogEvent& event)
 		//delete pItemData;
 		DeleteItem(i);
 		//Refresh();
-        wxListCtrl::Refresh();
+        //wxListCtrl::Refresh();
         return;
 	}
 }
@@ -676,7 +676,7 @@ void wxGxContentView::OnObjectChanged(wxGxCatalogEvent& event)
 			SetItem(i, 1, sType);
 		}
 	}
-	wxListCtrl::Refresh();
+	//wxListCtrl::Refresh();
 }
 
 void wxGxContentView::OnObjectRefreshed(wxGxCatalogEvent& event)

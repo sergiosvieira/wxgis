@@ -380,6 +380,8 @@ void wxGxTreeViewBase::OnObjectDeleted(wxGxCatalogEvent& event)
 void wxGxTreeViewBase::OnObjectAdded(wxGxCatalogEvent& event)
 {
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(event.GetObjectID());
+	if(!pGxObject)
+		return;
     IGxObject* pParentObject = pGxObject->GetParent();
 	wxTreeItemId TreeItemId = m_TreeMap[pParentObject->GetID()];
 	if(TreeItemId.IsOk())

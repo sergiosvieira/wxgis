@@ -22,7 +22,6 @@
 #include "wxgis/cartoui/mxeventui.h"
 #include "wxgis/datasource/featuredataset.h"
 #include "wxgis/datasource/vectorop.h"
-#include "wxgis/carto/featurelayer.h"
 #include "wxgis/core/format.h"
 #include "wxgis/core/config.h"
 
@@ -695,40 +694,6 @@ OGREnvelope wxGISMapView::GetFullExtent(void)
 	else
 		OutputEnv = wxGISMap::GetFullExtent();
 	return OutputEnv;
-}
-
-void wxGISMapView::Identify(const OGREnvelope &Bounds)
-{
-	wxBusyCursor wait;
-	//get top layer
-	wxGISLayerSPtr pTopLayer = m_paLayers[m_paLayers.size() - 1];
-	if(!pTopLayer)
-		return;
-	wxGISEnumDatasetType eType = pTopLayer->GetType();
-	switch(eType)
-	{
-	case enumGISFeatureDataset:
-		{
-			wxGISFeatureLayerSPtr pFLayer = boost::dynamic_pointer_cast<wxGISFeatureLayer>(pTopLayer);
-			if(!pFLayer)
-				return;
-			wxGISQuadTreeCursorSPtr pCursor = pFLayer->Idetify(EnvelopeToGeometry(Bounds));
-			//flash on map
-            GeometryArray Arr;
-            for(size_t i = 0; i < pCursor->GetCount(); ++i)
-            {
-                wxGISQuadTreeItem* pItem = pCursor->at(i);
-                if(!pItem)
-                    continue;
-                Arr.Add(pItem->GetGeometry());
-            }
-            FlashGeometry(Arr);
-            //fill IdentifyDlg
-		}
-		break;
-	default:
-		break;
-	};
 }
 
 void wxGISMapView::FlashGeometry(const GeometryArray &Geoms)
