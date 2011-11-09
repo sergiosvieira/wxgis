@@ -37,8 +37,10 @@ wxGISSimpleTextPanel::wxGISSimpleTextPanel( wxString soText, wxWindow* parent, w
 {
 	wxBoxSizer* bSizer = new wxBoxSizer( wxVERTICAL );
 
-    m_pStaticText = new wxStaticText( this, wxID_ANY, soText, wxDefaultPosition, wxDefaultSize, 0 );
-	m_pStaticText->Wrap( -1 );
+    //m_pStaticText = new wxStaticText( this, wxID_ANY, soText, wxDefaultPosition, wxDefaultSize, 0 );
+	m_pStaticText = new wxTextCtrl( this, wxID_ANY, soText, wxDefaultPosition, wxDefaultSize, wxTE_AUTO_URL|wxTE_RICH | wxTE_READONLY | wxTE_MULTILINE );
+	//m_pStaticText->Enable(false);
+	//m_pStaticText->Wrap( -1 );
 	bSizer->Add( m_pStaticText, 1, wxALL|wxEXPAND, 10 );
 
 	this->SetSizer( bSizer );

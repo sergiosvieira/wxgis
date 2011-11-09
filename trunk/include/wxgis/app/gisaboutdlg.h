@@ -48,7 +48,7 @@ public:
 	wxGISSimpleTextPanel( wxString soText, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,400 ), long style = wxTAB_TRAVERSAL );
 	~wxGISSimpleTextPanel();
 protected:
-	wxStaticText* m_pStaticText;
+	wxTextCtrl* m_pStaticText;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
