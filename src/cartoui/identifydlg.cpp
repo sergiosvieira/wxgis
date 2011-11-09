@@ -25,6 +25,60 @@
 #include "../../art/layers.xpm"
 #include "../../art/layer16.xpm"
 #include "../../art/id.xpm"
+
+#include "../../art/small_arrow.xpm"
+//-------------------------------------------------------------------
+// wxGISFeatureDetailsPanel
+//-------------------------------------------------------------------
+
+///////////////////////////////////////////////////////////////////////////
+
+wxGISFeatureDetailsPanel::wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxImage img = wxBitmap(small_arrow_xpm).ConvertToImage();
+	wxBitmap oDownArrow = img.Rotate90();
+	wxBoxSizer* bSizer1;
+	bSizer1 = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer1;
+	fgSizer1 = new wxFlexGridSizer( 1, 3, 0, 0 );
+	fgSizer1->AddGrowableCol( 1 );
+	fgSizer1->SetFlexibleDirection( wxBOTH );
+	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText1 = new wxStaticText( this, wxID_ANY, _("Location:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1->Wrap( -1 );
+	fgSizer1->Add( m_staticText1, 1, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
+	
+	m_textCtrl = new wxTextCtrl(  this, wxID_ANY, wxT("..."), wxDefaultPosition, wxDefaultSize, wxTE_READONLY, wxGenericValidator( &m_sLocation ));
+	m_textCtrl->Enable( false );
+
+	fgSizer1->Add( m_textCtrl, 1, wxALIGN_CENTER|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND|wxRIGHT|wxLEFT, 5 );
+	
+	m_bpSelStyleButton = new wxBitmapButton( this, wxID_ANY, oDownArrow, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	m_bpSelStyleButton->SetToolTip( _("Select location text style") );
+	
+	fgSizer1->Add( m_bpSelStyleButton, 0, wxRIGHT, 5 );
+	
+	bSizer1->Add( fgSizer1, 0, wxEXPAND, 5 );
+	
+	m_listCtrl = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT );
+	bSizer1->Add( m_listCtrl, 1, wxALL|wxEXPAND, 5 );
+	
+	this->SetSizer( bSizer1 );
+	this->Layout();
+	m_CFormat.Create(wxString(wxT("X: dd.dddd[ ]Y: dd.dddd")));//TODO: get/store from/in config, set from property page
+}
+
+wxGISFeatureDetailsPanel::~wxGISFeatureDetailsPanel()
+{
+}
+
+void wxGISFeatureDetailsPanel::FillPanel(const OGREnvelope &Bounds)
+{
+	m_sLocation = m_CFormat.Format(Bounds.MaxX, Bounds.MinY);
+	TransferDataToWindow();
+}
 //-------------------------------------------------------------------
 // wxGISIdentifyDlg
 //-------------------------------------------------------------------
@@ -89,8 +143,8 @@ bool wxGISIdentifyDlg::Create(wxWindow* parent, wxWindowID id, const wxPoint& po
 	m_pTreeCtrl->SetImageList(&m_TreeImageList);
 
 	m_splitter->SetSashGravity(0.5);
-	m_pNullPane = new wxPanel(m_splitter);
-	m_splitter->SplitVertically(m_pTreeCtrl, m_pNullPane, 100);
+	m_pFeatureDetailsPanel = new wxGISFeatureDetailsPanel(m_splitter);
+	m_splitter->SplitVertically(m_pTreeCtrl, m_pFeatureDetailsPanel, 100);
 
 	this->SetSizer( m_bMainSizer );
 	this->Layout();
@@ -107,7 +161,7 @@ void wxGISIdentifyDlg::OnSwitchSplit(wxCommandEvent& event)
 	wxSplitMode eMode = m_splitter->GetSplitMode();
 	int nSplitPos = m_splitter->GetSashPosition();
 	m_splitter->Unsplit(m_pTreeCtrl);
-	m_splitter->Unsplit(m_pNullPane);
+	m_splitter->Unsplit(m_pFeatureDetailsPanel);
 	if(eMode == wxSPLIT_HORIZONTAL)
 		eMode = wxSPLIT_VERTICAL;
 	else
@@ -117,11 +171,11 @@ void wxGISIdentifyDlg::OnSwitchSplit(wxCommandEvent& event)
 	{
 	case wxSPLIT_HORIZONTAL:
 		m_bpSplitButton->SetBitmap(m_BmpHorz);
-		m_splitter->SplitHorizontally(m_pTreeCtrl, m_pNullPane, nSplitPos);
+		m_splitter->SplitHorizontally(m_pTreeCtrl, m_pFeatureDetailsPanel, nSplitPos);
 		break;
 	case wxSPLIT_VERTICAL:
 		m_bpSplitButton->SetBitmap(m_BmpVert);
-		m_splitter->SplitVertically(m_pTreeCtrl, m_pNullPane, nSplitPos);
+		m_splitter->SplitVertically(m_pTreeCtrl, m_pFeatureDetailsPanel, nSplitPos);
 		break;
 	};
 }
@@ -165,16 +219,16 @@ bool wxAxIdentifyView::Activate(IFrameApplication* application, wxXmlNode* pConf
 	//SetClientSize(w, h);
 
 	m_splitter->Unsplit(m_pTreeCtrl);
-	m_splitter->Unsplit(m_pNullPane);
+	m_splitter->Unsplit(m_pFeatureDetailsPanel);
 	switch(eMode)
 	{
 	case wxSPLIT_HORIZONTAL:
 		m_bpSplitButton->SetBitmap(m_BmpHorz);
-		m_splitter->SplitHorizontally(m_pTreeCtrl, m_pNullPane, nSplitPos);
+		m_splitter->SplitHorizontally(m_pTreeCtrl, m_pFeatureDetailsPanel, nSplitPos);
 		break;
 	case wxSPLIT_VERTICAL:
 		m_bpSplitButton->SetBitmap(m_BmpVert);
-		m_splitter->SplitVertically(m_pTreeCtrl, m_pNullPane, nSplitPos);
+		m_splitter->SplitVertically(m_pTreeCtrl, m_pFeatureDetailsPanel, nSplitPos);
 		break;
 	};
 	return true;
@@ -249,6 +303,7 @@ void wxAxIdentifyView::Identify(const OGREnvelope &Bounds)
             m_pMapView->FlashGeometry(Arr);
             //fill IdentifyDlg
 			FillTree(pFLayer, pCursor);
+			m_pFeatureDetailsPanel->FillPanel(Bounds);
 		}
 		break;
 	default:

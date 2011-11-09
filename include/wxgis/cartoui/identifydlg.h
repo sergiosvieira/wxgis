@@ -24,6 +24,7 @@
 #include "wxgis/framework/framework.h"
 #include "wxgis/cartoui/mapview.h"
 #include "wxgis/carto/featurelayer.h"
+#include "wxgis/core/format.h"
 
 #include <wx/intl.h>
 #include <wx/string.h>
@@ -42,6 +43,26 @@
 #include <wx/splitter.h>
 #include <wx/panel.h>
 #include <wx/treectrl.h>
+#include <wx/listctrl.h>
+#include <wx/valgen.h>
+
+/** \class wxGISFeatureDetailsPanel identifydlg.h
+ *  \brief The wxGISFeatureDetailsPanel class show OGRFeature fields and values.
+ */
+class wxGISFeatureDetailsPanel : public wxPanel 
+{
+public:
+	wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
+	virtual ~wxGISFeatureDetailsPanel();
+	virtual void FillPanel(const OGREnvelope &Bounds);
+protected:
+	wxString m_sLocation; 
+	wxGISCoordinatesFormat m_CFormat;
+	wxStaticText* m_staticText1;
+	wxTextCtrl* m_textCtrl;
+	wxBitmapButton* m_bpSelStyleButton;
+	wxListCtrl* m_listCtrl;
+};
 
 /** \class wxGISIdentifyDlg identifydlg.h
  *  \brief The wxGISIdentifyDlg class is dialog/dock window with the results of identify.
@@ -79,7 +100,7 @@ protected:
 	wxSplitterWindow* m_splitter;
 	wxBitmap m_BmpVert, m_BmpHorz;
 	wxTreeCtrl *m_pTreeCtrl;
-	wxPanel* m_pNullPane;
+	wxGISFeatureDetailsPanel* m_pFeatureDetailsPanel;
 	wxImageList m_TreeImageList;
 	wxXmlNode* m_pConf;
 
