@@ -38,7 +38,7 @@ wxGISSimpleTextPanel::wxGISSimpleTextPanel( wxString soText, wxWindow* parent, w
 	wxBoxSizer* bSizer = new wxBoxSizer( wxVERTICAL );
 
     //m_pStaticText = new wxStaticText( this, wxID_ANY, soText, wxDefaultPosition, wxDefaultSize, 0 );
-	m_pStaticText = new wxTextCtrl( this, wxID_ANY, soText, wxDefaultPosition, wxDefaultSize, wxTE_AUTO_URL|wxTE_RICH | wxTE_READONLY | wxTE_MULTILINE );
+	m_pStaticText = new wxTextCtrl( this, wxID_ANY, soText, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH2|wxTE_AUTO_URL, wxDefaultValidator );
 	//m_pStaticText->Enable(false);
 	//m_pStaticText->Wrap( -1 );
 	bSizer->Add( m_pStaticText, 1, wxALL|wxEXPAND, 10 );
@@ -90,11 +90,25 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
     wxString sPrjStr = wxString(pj_get_release(), wxConvLocal);
     wxString sGDALStr = wxString(GDAL_RELEASE_NAME, wxConvLocal);
     wxString sWXStr = wxVERSION_STRING;	
+wxString wxVer( wxVERSION_STRING );
+
+#if defined(__WXMSW__)
+    sWXStr << wxT("-Windows");
+#elif defined(__UNIX__)
+    sWXStr << wxT("-Linux");
+#endif
+
+#if wxUSE_UNICODE
+    sWXStr << wxT("-Unicode build");
+#else
+    sWXStr << wxT("-ANSI build");
+#endif // wxUSE_UNICODE
+
     wxString sCAIROStr = wxString(cairo_version_string(), wxConvLocal);
 
 	m_AuiNotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE );
 
-    wxString sAboutApp = wxString::Format(_("wxGIS [%s]\n\nVersion: %s\n\n(c) 2009-2011 Dmitry Barishnikov (Bishop)"), pApp->GetAppName(), pApp->GetAppVersionString());
+    wxString sAboutApp = wxString::Format(_("wxGIS [%s]\n\nVersion: %s\n\Build: %s\n\n(c) 2009-2011 Dmitry Barishnikov (Bishop)\n\nhttp://wxgis.googlecode.com/"), pApp->GetAppName().c_str(), pApp->GetAppVersionString().c_str(), wxString(__DATE__,wxConvLibc).c_str());
 	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutApp, m_AuiNotebook), _("About application"));
 
     long dFreeMem =  wxMemorySize(wxGetFreeMemory() / 1048576).ToLong();
