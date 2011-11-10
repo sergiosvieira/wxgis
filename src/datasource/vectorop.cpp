@@ -84,3 +84,19 @@ OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSP
 		pRgn->assignSpatialReference(pSpaRef->Clone());
 	return OGRGeometrySPtr(static_cast<OGRGeometry*>(pRgn));
 }
+
+void MoveEnvelope(OGREnvelope &MoveEnv, const OGREnvelope &Env)
+{
+	double dMoveWidth = (MoveEnv.MaxX - MoveEnv.MinX) / 2;
+	double dMoveHeight = (MoveEnv.MaxY - MoveEnv.MinY) / 2;
+
+	double dWidth = (Env.MaxX - Env.MinX) / 2;
+	double dHeight = (Env.MaxY - Env.MinY) / 2;
+	double dCenterX = Env.MinX + dWidth;
+	double dCenterY = Env.MinY + dHeight;
+
+	MoveEnv.MinX = dCenterX - dMoveWidth;
+	MoveEnv.MaxX = dCenterX + dMoveWidth;
+	MoveEnv.MinY = dCenterY - dMoveHeight;
+	MoveEnv.MaxY = dCenterY + dMoveHeight;
+}

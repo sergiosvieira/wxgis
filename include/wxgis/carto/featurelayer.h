@@ -44,6 +44,7 @@ public:
 	virtual IFeatureRendererSPtr GetRenderer(void){return m_pFeatureRenderer;};
 	virtual void SetRenderer(IFeatureRendererSPtr pFeatureRenderer){m_pFeatureRenderer = pFeatureRenderer;};
 	virtual wxGISQuadTreeCursorSPtr Idetify(OGRGeometrySPtr pGeom); 
+	virtual wxGISFeatureDatasetSPtr GetDataset(void){return m_pwxGISFeatureDataset;};
 protected:
     virtual void LoadGeometry(void);
 	virtual long GetPointsInGeometry(OGRGeometry* pGeom);

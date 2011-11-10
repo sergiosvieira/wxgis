@@ -44,11 +44,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 class wxGISSimpleTextPanel : public wxPanel
 {
+	enum
+	{
+		ID_EDIT = wxID_HIGHEST + 1
+	};
 public:
 	wxGISSimpleTextPanel( wxString soText, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,400 ), long style = wxTAB_TRAVERSAL );
-	~wxGISSimpleTextPanel();
+	virtual ~wxGISSimpleTextPanel();//events
+	virtual void edtUrlClickUrl(wxTextUrlEvent& event);
 protected:
 	wxTextCtrl* m_pStaticText;
+
+    DECLARE_EVENT_TABLE()
 };
 
 ///////////////////////////////////////////////////////////////////////////////

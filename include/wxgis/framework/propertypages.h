@@ -64,7 +64,7 @@ public:
 protected:
 	enum
 	{
-		ID_LOCPATH = 1000,
+		ID_LOCPATH = wxID_HIGHEST + 1,
 		ID_OPENLOCPATH,
 		ID_LANGCHOICE,
 		ID_SYSPATH,
