@@ -68,6 +68,13 @@ public:
 	OGRGeometry* m_pGeometry;
 };
 
+typedef struct _fieldsortdata
+{
+    int nSortAsc;
+    short currentSortCol;
+    OGRFeatureSPtr pFeature;
+} FIELDSORTDATA, *LPFIELDSORTDATA;
+
 /** \class wxGISFeatureDetailsPanel identifydlg.h
  *  \brief The wxGISFeatureDetailsPanel class show OGRFeature fields and values.
  */
@@ -75,10 +82,12 @@ class wxGISFeatureDetailsPanel : public wxPanel
 {
 	enum
 	{
-		ID_WG_COPY_NAME = 1000,
+        ID_LISTCTRL = 1050,
+		ID_WG_COPY_NAME,
 		ID_WG_COPY_VALUE,
 		ID_WG_COPY,
-		ID_WG_HIDE
+		ID_WG_HIDE,
+        ID_WG_RESET_SORT
 	};
 public:
 	wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
@@ -89,6 +98,7 @@ public:
 	//events
 	void OnContextMenu(wxContextMenuEvent& event);
 	void OnMenu(wxCommandEvent& event);
+    void OnColClick(wxListEvent& event);
 protected:
 	void WriteStringToClipboard(const wxString &sData);
 protected:
@@ -101,6 +111,9 @@ protected:
 	wxMenu *m_pMenu;
 	wxArrayLong m_anExcludeFields;
 	OGRFeatureSPtr m_pFeature;
+	int m_nSortAsc;
+	short m_currentSortCol;
+	wxImageList m_ImageListSmall;
 
     DECLARE_EVENT_TABLE()
 };
