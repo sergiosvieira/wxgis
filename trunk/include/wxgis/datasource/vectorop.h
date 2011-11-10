@@ -25,6 +25,7 @@
 void WXDLLIMPEXP_GIS_DS IncreaseEnvelope(OGREnvelope &Env, double dSize);
 void WXDLLIMPEXP_GIS_DS SetEnvelopeRatio(OGREnvelope &Env, double dRatio);
 void WXDLLIMPEXP_GIS_DS ClipGeometryByEnvelope(OGRRawPoint* pOGRRawPoints, int *pnPointCount, const OGREnvelope &Env, bool shapeOpen);
+void WXDLLIMPEXP_GIS_DS MoveEnvelope(OGREnvelope &MoveEnv, const OGREnvelope &Env);
 /** \fn OGRGeometrySPtr EnvelopeToGeometry(OGREnvelopeSPtr pEnv, OGSSpatialReferensSPtr pSpaRef)
  *  \brief Create OGRGeometry from OGREnvelope.
  *  \param pEnv Input envelope

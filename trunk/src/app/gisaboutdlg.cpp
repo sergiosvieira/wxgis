@@ -29,18 +29,23 @@
 #include "proj_api.h"
 #include "cairo.h"
 
+#define __YEAR__ ((((__DATE__ [7] - '0') * 10 + (__DATE__ [8] - '0')) * 10 \
++ (__DATE__ [9] - '0')) * 10 + (__DATE__ [10] - '0'))
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISSimpleTextPanel
 ///////////////////////////////////////////////////////////////////////////////
+BEGIN_EVENT_TABLE(wxGISSimpleTextPanel, wxPanel)
+   EVT_TEXT_URL(ID_EDIT,wxGISSimpleTextPanel::edtUrlClickUrl)
+END_EVENT_TABLE()
 
 wxGISSimpleTextPanel::wxGISSimpleTextPanel( wxString soText, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxBoxSizer* bSizer = new wxBoxSizer( wxVERTICAL );
 
-    //m_pStaticText = new wxStaticText( this, wxID_ANY, soText, wxDefaultPosition, wxDefaultSize, 0 );
-	m_pStaticText = new wxTextCtrl( this, wxID_ANY, soText, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH2|wxTE_AUTO_URL, wxDefaultValidator );
+	m_pStaticText = new wxTextCtrl( this, ID_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_AUTO_URL, wxDefaultValidator, wxT("GISSimpleText") );
 	//m_pStaticText->Enable(false);
-	//m_pStaticText->Wrap( -1 );
+	m_pStaticText->AppendText(soText);//bug with wxTE_AUTO_URL
 	bSizer->Add( m_pStaticText, 1, wxALL|wxEXPAND, 10 );
 
 	this->SetSizer( bSizer );
@@ -51,6 +56,17 @@ wxGISSimpleTextPanel::~wxGISSimpleTextPanel()
 {
 }
 
+void wxGISSimpleTextPanel::edtUrlClickUrl(wxTextUrlEvent& event)
+{
+    if ( event.GetMouseEvent().LeftUp() ) // we open the browser only when the Left mouse button is pressed and then released  
+    {
+        wxString url = m_pStaticText->GetValue();
+        url = url.Mid( event.GetURLStart(), event.GetURLEnd() - event.GetURLStart() ); // we are extracting the clicked url
+        ::wxLaunchDefaultBrowser( url );
+    }
+    
+    event.Skip();
+}
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISAboutDialog
 ///////////////////////////////////////////////////////////////////////////////
@@ -108,7 +124,7 @@ wxString wxVer( wxVERSION_STRING );
 
 	m_AuiNotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE );
 
-    wxString sAboutApp = wxString::Format(_("wxGIS [%s]\n\nVersion: %s\n\Build: %s\n\n(c) 2009-2011 Dmitry Barishnikov (Bishop)\n\nhttp://wxgis.googlecode.com/"), pApp->GetAppName().c_str(), pApp->GetAppVersionString().c_str(), wxString(__DATE__,wxConvLibc).c_str());
+    wxString sAboutApp = wxString::Format(_("wxGIS [%s]\n\nVersion: %s\n\Build: %s\n\n(c) 2009-%d Dmitry Barishnikov (Bishop)\n\nhttp://wxgis.googlecode.com/"), pApp->GetAppName().c_str(), pApp->GetAppVersionString().c_str(), wxString(__DATE__,wxConvLibc).c_str(),  __YEAR__);
 	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutApp, m_AuiNotebook), _("About application"));
 
     long dFreeMem =  wxMemorySize(wxGetFreeMemory() / 1048576).ToLong();

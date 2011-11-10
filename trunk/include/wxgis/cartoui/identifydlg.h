@@ -46,15 +46,51 @@
 #include <wx/listctrl.h>
 #include <wx/valgen.h>
 
+/** \class wxIdentifyTreeItemData identifydlg.h
+ *  \brief The identify tree item data.
+ */
+class wxIdentifyTreeItemData : public wxTreeItemData
+{
+public:
+	wxIdentifyTreeItemData(wxGISFeatureDatasetSPtr pDataset, long nOID = wxNOT_FOUND, OGRGeometry* pGeometry = nullptr)
+	{
+		m_pDataset = pDataset;
+		m_nOID = nOID;
+		m_pGeometry = pGeometry;
+	}
+
+	~wxIdentifyTreeItemData(void)
+	{
+	}
+
+	long m_nOID;
+	wxGISFeatureDatasetSPtr m_pDataset;
+	OGRGeometry* m_pGeometry;
+};
+
 /** \class wxGISFeatureDetailsPanel identifydlg.h
  *  \brief The wxGISFeatureDetailsPanel class show OGRFeature fields and values.
  */
 class wxGISFeatureDetailsPanel : public wxPanel 
 {
+	enum
+	{
+		ID_WG_COPY_NAME = 1000,
+		ID_WG_COPY_VALUE,
+		ID_WG_COPY,
+		ID_WG_HIDE
+	};
 public:
 	wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISFeatureDetailsPanel();
 	virtual void FillPanel(const OGREnvelope &Bounds);
+	virtual void FillPanel(const OGRFeatureSPtr &pFeature);
+	virtual void Clear(bool bFull = false);
+	//events
+	void OnContextMenu(wxContextMenuEvent& event);
+	void OnMenu(wxCommandEvent& event);
+protected:
+	void WriteStringToClipboard(const wxString &sData);
 protected:
 	wxString m_sLocation; 
 	wxGISCoordinatesFormat m_CFormat;
@@ -62,6 +98,11 @@ protected:
 	wxTextCtrl* m_textCtrl;
 	wxBitmapButton* m_bpSelStyleButton;
 	wxListCtrl* m_listCtrl;
+	wxMenu *m_pMenu;
+	wxArrayLong m_anExcludeFields;
+	OGRFeatureSPtr m_pFeature;
+
+    DECLARE_EVENT_TABLE()
 };
 
 /** \class wxGISIdentifyDlg identifydlg.h
@@ -72,9 +113,12 @@ class WXDLLIMPEXP_GIS_CTU wxGISIdentifyDlg : public wxPanel
 protected:
 	enum
 	{
-		ID_WXGISIDENTIFYDLG = 1000,
+		ID_WXGISIDENTIFYDLG = 1001,
 		ID_WXGISTREECTRL,
-		ID_SWITCHSPLIT
+		ID_SWITCHSPLIT,
+		ID_WGMENU_FLASH,
+		ID_WGMENU_PAN,
+		ID_WGMENU_ZOOM
 	};		
 
      DECLARE_DYNAMIC_CLASS(wxGISIdentifyDlg)
@@ -90,7 +134,10 @@ public:
 		m_splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISIdentifyDlg::SplitterOnIdle ), NULL, this );
 	}	
 	//event
-	void OnSwitchSplit(wxCommandEvent& event);
+	virtual void OnSwitchSplit(wxCommandEvent& event);
+	virtual void OnSelChanged(wxTreeEvent& event);
+	virtual void OnMenu(wxCommandEvent& event);
+	virtual void OnItemRightClick(wxTreeEvent& event);
 protected:
 	wxBoxSizer* m_bMainSizer;
 	wxFlexGridSizer* m_fgTopSizer;
@@ -103,6 +150,7 @@ protected:
 	wxGISFeatureDetailsPanel* m_pFeatureDetailsPanel;
 	wxImageList m_TreeImageList;
 	wxXmlNode* m_pConf;
+	wxMenu *m_pMenu;
 
     DECLARE_EVENT_TABLE()
 };
@@ -118,7 +166,7 @@ protected:
 	enum
 	{
 		ID_WXGISIDENTIFYVIEW = 1000,
-	};		
+	};	
 
     DECLARE_DYNAMIC_CLASS(wxAxIdentifyView)
 public:
@@ -136,6 +184,9 @@ public:
 	//wxGISIdentifyDlg
 	virtual void Identify(const OGREnvelope &Bounds);
 	virtual void FillTree(wxGISFeatureLayerSPtr pFLayer, wxGISQuadTreeCursorSPtr pCursor);
+	//events
+	virtual void OnSelChanged(wxTreeEvent& event);
+	virtual void OnMenu(wxCommandEvent& event);
 protected:
 	wxString m_sViewName;
     IFrameApplication* m_pApp;
