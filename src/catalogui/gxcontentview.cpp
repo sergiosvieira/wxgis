@@ -48,7 +48,7 @@ BEGIN_EVENT_TABLE(wxGxContentView, wxListCtrl)
 	EVT_GXSELECTION_CHANGED(wxGxContentView::OnSelectionChanged)
 END_EVENT_TABLE()
 
-int wxCALLBACK MyCompareFunction(long item1, long item2, long sortData)
+int wxCALLBACK MyCompareFunction(wxIntPtr item1, wxIntPtr item2, wxIntPtr sortData)
 {
 	wxGxContentView::LPITEMDATA pItem1 = (wxGxContentView::LPITEMDATA)item1;
  	wxGxContentView::LPITEMDATA pItem2 = (wxGxContentView::LPITEMDATA)item2;

@@ -29,13 +29,37 @@
 #include "../../art/id.xpm"
 #include "../../art/small_arrow.xpm"
 
+int wxCALLBACK FieldValueCompareFunction(wxIntPtr item1, wxIntPtr item2, wxIntPtr sortData)
+{
+    LPFIELDSORTDATA psortdata = (LPFIELDSORTDATA)sortData;
+    if(psortdata->nSortAsc == 0)
+    {
+        return item1 - item2;
+    }
+    else
+    {
+        CPLString str1, str2;
+        if(psortdata->currentSortCol == 0)
+        {
+            str1 = CPLString(psortdata->pFeature->GetFieldDefnRef(item1)->GetNameRef());
+            str2 = CPLString(psortdata->pFeature->GetFieldDefnRef(item2)->GetNameRef());
+        }
+        else
+        {
+            str1 = CPLString(psortdata->pFeature->GetFieldAsString(item1));
+            str2 = CPLString(psortdata->pFeature->GetFieldAsString(item2));
+        }
+        return str1.compare(str2) * psortdata->nSortAsc;
+    }
+}
 //-------------------------------------------------------------------
 // wxGISFeatureDetailsPanel
 //-------------------------------------------------------------------
 
 BEGIN_EVENT_TABLE(wxGISFeatureDetailsPanel, wxPanel)
     EVT_CONTEXT_MENU(wxGISFeatureDetailsPanel::OnContextMenu)
-	EVT_MENU_RANGE(ID_WG_COPY_NAME, ID_WG_HIDE, wxGISFeatureDetailsPanel::OnMenu)
+	EVT_MENU_RANGE(ID_WG_COPY_NAME, ID_WG_RESET_SORT, wxGISFeatureDetailsPanel::OnMenu)
+    EVT_LIST_COL_CLICK(ID_LISTCTRL, wxGISFeatureDetailsPanel::OnColClick)
 END_EVENT_TABLE()
 
 wxGISFeatureDetailsPanel::wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
@@ -67,14 +91,26 @@ wxGISFeatureDetailsPanel::wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID
 	
 	bSizer1->Add( fgSizer1, 0, wxEXPAND, 5 );
 	
-	m_listCtrl = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_HRULES | wxLC_VRULES );
+	m_listCtrl = new wxListCtrl( this, ID_LISTCTRL, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_HRULES | wxLC_VRULES );
 	m_listCtrl->InsertColumn(0, _("Field"), wxLIST_FORMAT_LEFT, 90);
 	m_listCtrl->InsertColumn(1, _("Value"), wxLIST_FORMAT_LEFT, 120);
+
+	m_ImageListSmall.Create(16, 16);
+
+    wxBitmap SmallA(small_arrow_xpm);// > arrow
+    wxImage SmallImg = SmallA.ConvertToImage();
+    SmallImg = SmallImg.Rotate90();
+    wxBitmap SmallDown(SmallImg); 
+    SmallImg = SmallImg.Mirror(false);
+    wxBitmap SmallUp(SmallImg); 
+
+	m_ImageListSmall.Add(wxBitmap(SmallDown));
+	m_ImageListSmall.Add(wxBitmap(SmallUp));
+
+	m_listCtrl->SetImageList(&m_ImageListSmall, wxIMAGE_LIST_SMALL);
+
 	bSizer1->Add( m_listCtrl, 1, wxALL|wxEXPAND, 5 );
 	
-	//m_ImageList.Create(16, 16);
-	//m_listCtrl3->SetImageList(&m_ImageList, wxIMAGE_LIST_SMALL);
-
 	this->SetSizer( bSizer1 );
 	this->Layout();
 	m_CFormat.Create(wxString(wxT("X: dd.dddd[ ]Y: dd.dddd")));//TODO: get/store from/in config, set from property page
@@ -84,6 +120,11 @@ wxGISFeatureDetailsPanel::wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID
 	m_pMenu->Append(ID_WG_COPY_VALUE, wxString::Format(_("Copy %s"), _("Value")), wxString::Format(_("Copy '%s' value"), _("Value")), wxITEM_NORMAL);
 	m_pMenu->Append(ID_WG_COPY, wxString(_("Copy")), wxString(_("Copy")), wxITEM_NORMAL);
 	m_pMenu->Append(ID_WG_HIDE, wxString(_("Hide")), wxString(_("Hide rows")), wxITEM_NORMAL);
+	m_pMenu->AppendSeparator();
+	m_pMenu->Append(ID_WG_RESET_SORT, wxString(_("Remove sort")), wxString(_("Remove sort")), wxITEM_NORMAL);
+
+    m_currentSortCol = 0;
+    m_nSortAsc = 0;
 }
 
 wxGISFeatureDetailsPanel::~wxGISFeatureDetailsPanel()
@@ -110,11 +151,13 @@ void wxGISFeatureDetailsPanel::FillPanel(const OGRFeatureSPtr &pFeature)
 			continue;
 		wxString sName(pFieldDefn->GetNameRef(), wxConvLocal);
 		wxString sValue(pFeature->GetFieldAsString(i), wxConvLocal);
-		long pos = m_listCtrl->InsertItem(i, sName);
+		long pos = m_listCtrl->InsertItem(i, sName, wxNOT_FOUND);
 		m_listCtrl->SetItem(pos, 1, sValue);
 		m_listCtrl->SetItemData(pos, i);
 	}
-	m_listCtrl->Update();
+	//m_listCtrl->Update();
+    FIELDSORTDATA sortdata = {m_nSortAsc, m_currentSortCol, m_pFeature};
+	m_listCtrl->SortItems(FieldValueCompareFunction, (long)&sortdata);
 }
 
 void wxGISFeatureDetailsPanel::Clear(bool bFull)
@@ -206,10 +249,51 @@ void wxGISFeatureDetailsPanel::OnMenu(wxCommandEvent& event)
 		}
 		FillPanel(m_pFeature);
 		break;
+	case ID_WG_RESET_SORT:
+        {
+            m_nSortAsc = 0;
+
+            wxListItem item;
+            item.SetMask(wxLIST_MASK_IMAGE);
+
+            //reset image
+            item.SetImage(wxNOT_FOUND);
+            for(size_t i = 0; i < m_listCtrl->GetColumnCount(); ++i)
+                m_listCtrl->SetColumn(i, item);
+
+            FIELDSORTDATA sortdata = {m_nSortAsc, m_currentSortCol, m_pFeature};
+	        m_listCtrl->SortItems(FieldValueCompareFunction, (long)&sortdata);
+        }
+		break;
 	default:
 		break;
 	}
 }
+
+void wxGISFeatureDetailsPanel::OnColClick(wxListEvent& event)
+{
+    //event.Skip();
+    m_currentSortCol = event.GetColumn();
+    if(m_nSortAsc == 0)
+        m_nSortAsc = 1;
+    else
+        m_nSortAsc *= -1;
+
+    FIELDSORTDATA sortdata = {m_nSortAsc, m_currentSortCol, m_pFeature};
+	m_listCtrl->SortItems(FieldValueCompareFunction, (long)&sortdata);
+
+    wxListItem item;
+    item.SetMask(wxLIST_MASK_IMAGE);
+
+    //reset image
+    item.SetImage(wxNOT_FOUND);
+    for(size_t i = 0; i < m_listCtrl->GetColumnCount(); ++i)
+        m_listCtrl->SetColumn(i, item);
+
+    item.SetImage(m_nSortAsc == 1 ? 0 : 1);
+    m_listCtrl->SetColumn(m_currentSortCol, item);
+}
+
 
 //-------------------------------------------------------------------
 // wxGISIdentifyDlg
@@ -433,7 +517,7 @@ void wxAxIdentifyView::Deactivate(void)
 void wxAxIdentifyView::Identify(const OGREnvelope &Bounds)
 {
 	wxBusyCursor wait;
-	if(!m_pMapView)
+	if(!m_pMapView)//TODO: add/remove layer map events connection point
 	{
 		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
 		if(pWinArr)
