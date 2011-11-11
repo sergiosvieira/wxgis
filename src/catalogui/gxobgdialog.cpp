@@ -429,8 +429,8 @@ wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, IGxCatalog* pExternalCatal
     //  7   Create Folder
 
         int IDs[8] = {5,0,wxNOT_FOUND,1,2,wxNOT_FOUND,4,7};
-        ICommand *pCmd(NULL);
-        wxGISCatalogMainCmd* pwxGISCatalogMainCmd(NULL);
+        ICommand *pCmd(nullptr);
+        wxGISCatalogMainCmd* pwxGISCatalogMainCmd(nullptr);
         for(size_t i = 0; i < 8; ++i)
         {
             if(IDs[i] == wxNOT_FOUND)
@@ -568,6 +568,7 @@ wxGxObjectDialog::~wxGxObjectDialog()
 
 void wxGxObjectDialog::OnCommand(wxCommandEvent& event)
 {
+	event.Skip();
 	Command(GetCommand(event.GetId()));
 }
 
@@ -618,12 +619,14 @@ ICommand* wxGxObjectDialog::GetCommand(wxString sCmdName, unsigned char nCmdSubT
 
 void wxGxObjectDialog::OnDropDownCommand(wxCommandEvent& event)
 {
-    if(m_pDropDownCommand)
+	event.Skip();
+	if(m_pDropDownCommand)
         m_pDropDownCommand->OnDropDownCommand(event.GetId());
 }
 
 void wxGxObjectDialog::OnToolDropDown(wxAuiToolBarEvent& event)
 {
+	event.Skip();
     if(event.IsDropDownClicked())
     {
         ICommand* pCmd = GetCommand(event.GetToolId());
@@ -808,6 +811,7 @@ void wxGxObjectDialog::OnFilterSelect(wxCommandEvent& event)
 
 void wxGxObjectDialog::OnOK(wxCommandEvent& event)
 {
+	//TODO: if path in editbox goto path? not to Sopen
     m_nRetCode = wxID_OK;
     if ( Validate() && TransferDataFromWindow() )
     {

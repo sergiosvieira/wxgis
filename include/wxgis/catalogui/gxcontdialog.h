@@ -92,8 +92,8 @@ public:
 //IGxApplication
     virtual IGxCatalog* const GetCatalog(void){return static_cast<IGxCatalog*>(m_pCatalog);};
 //IFrameApplication
-    virtual ICommand* GetCommand(long CmdID){return NULL;};
-	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType){return NULL;};
+    virtual ICommand* GetCommand(long CmdID);
+	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
     virtual wxString GetAppName(void){return wxString(CONTDLG_NAME);};
     virtual wxString GetAppVersionString(void){return wxString(APP_VER);};
     virtual IStatusBar* GetStatusBar(void){return NULL;};
@@ -146,11 +146,15 @@ protected:
     virtual void OnOKUI(wxUpdateUIEvent& event);
     virtual void OnCreate(wxCommandEvent& event);
     virtual void OnCreateUI(wxUpdateUIEvent& event);
+    virtual void OnCommand(wxCommandEvent& event);
+	virtual void OnCommandUI(wxUpdateUIEvent& event);
+    virtual void Command(ICommand* pCmd);
 //wxGxContainerDialog
     virtual long GetLocation(void);
 	virtual void OnInit();
     virtual void SerializeFramePos(bool bSave);
 protected:
+ 	COMMANDARRAY m_CommandArray;
   	wxGxCatalogUI* m_pCatalog;
   	IGxCatalog* m_pExternalCatalog;
     wxTreeContainerView* m_pTree;
@@ -162,8 +166,8 @@ protected:
 	size_t m_nDefaultFilter;
     GxObjectArray m_ObjectArray;
     int m_nRetCode;
-    DEFINE_SHARED_PTR(ICommand);
-    ICommandSPtr m_pCreateCmd;
+    //DEFINE_SHARED_PTR(ICommand);
+    //ICommandSPtr m_pCreateCmd;
 
 protected:
 	wxBoxSizer* bMainSizer;

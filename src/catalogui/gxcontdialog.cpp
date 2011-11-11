@@ -21,6 +21,8 @@
 
 #include "wxgis/catalogui/gxcontdialog.h"
 #include "wxgis/catalogui/catalogcmd.h"
+#include "wxgis/core/globalfn.h"
+#include "wxgis/framework/application.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // wxTreeContainerView
@@ -110,6 +112,8 @@ BEGIN_EVENT_TABLE(wxGxContainerDialog, wxDialog)
     EVT_BUTTON(ID_CREATE, wxGxContainerDialog::OnCreate)
     EVT_UPDATE_UI(wxID_OK, wxGxContainerDialog::OnOKUI)
     EVT_UPDATE_UI(ID_CREATE, wxGxContainerDialog::OnCreateUI)
+	EVT_MENU_RANGE(ID_PLUGINCMD, ID_PLUGINCMDMAX, wxGxContainerDialog::OnCommand)
+	EVT_UPDATE_UI_RANGE(ID_PLUGINCMD, ID_PLUGINCMDMAX, wxGxContainerDialog::OnCommandUI)
 END_EVENT_TABLE()
 
 wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExternalCatalog, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pTree(NULL), m_bShowCreateButton(false), m_bAllFilters(true), m_nDefaultFilter(0), m_bShowExportFormats(false)/*m_bAllowMultiSelect(false)*/
@@ -165,10 +169,54 @@ wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExterna
 	this->SetSizer( bMainSizer );
 	this->Layout();
 
-    wxGISCatalogMainCmd* pwxGISCatalogMainCmd = new wxGISCatalogMainCmd();
-    pwxGISCatalogMainCmd->OnCreate(static_cast<IFrameApplication*>(this));
-    pwxGISCatalogMainCmd->SetSubType(7);//create folder
-    m_pCreateCmd = ICommandSPtr(static_cast<ICommand*>(pwxGISCatalogMainCmd));
+    wxGISApplication* pApp = dynamic_cast<wxGISApplication*>(GetApplication());
+    if(pApp)
+    {
+		ICommand *pCmd(nullptr);
+		wxGISCatalogMainCmd* pwxGISCatalogMainCmd(nullptr);
+
+		//create folder
+		pCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 7);
+		if(pCmd)
+		{
+			pwxGISCatalogMainCmd = new wxGISCatalogMainCmd();
+			pwxGISCatalogMainCmd->OnCreate(static_cast<IFrameApplication*>(this));
+			pwxGISCatalogMainCmd->SetID(pCmd->GetID());
+			pwxGISCatalogMainCmd->SetSubType(7);
+			m_CommandArray.push_back(pwxGISCatalogMainCmd);
+		}
+
+		//rename
+		pCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 8);
+		if(pCmd)
+		{
+			pwxGISCatalogMainCmd = new wxGISCatalogMainCmd();
+			pwxGISCatalogMainCmd->OnCreate(static_cast<IFrameApplication*>(this));
+			pwxGISCatalogMainCmd->SetID(pCmd->GetID());
+			pwxGISCatalogMainCmd->SetSubType(8);
+			m_CommandArray.push_back(pwxGISCatalogMainCmd);
+		}
+
+		//refresh
+		pCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 9);
+		if(pCmd)
+		{
+			pwxGISCatalogMainCmd = new wxGISCatalogMainCmd();
+			pwxGISCatalogMainCmd->OnCreate(static_cast<IFrameApplication*>(this));
+			pwxGISCatalogMainCmd->SetID(pCmd->GetID());
+			pwxGISCatalogMainCmd->SetSubType(9);
+			m_CommandArray.push_back(pwxGISCatalogMainCmd);
+		}
+
+		//load accelerators
+		if(pApp->GetGISAcceleratorTable())
+			SetAcceleratorTable(pApp->GetGISAcceleratorTable()->GetAcceleratorTable());
+	}
+
+    //wxGISCatalogMainCmd* pwxGISCatalogMainCmd = new wxGISCatalogMainCmd();
+    //pwxGISCatalogMainCmd->OnCreate(static_cast<IFrameApplication*>(this));
+    //pwxGISCatalogMainCmd->SetSubType(7);//create folder
+    //m_pCreateCmd = ICommandSPtr(static_cast<ICommand*>(pwxGISCatalogMainCmd));
 }
 
 wxGxContainerDialog::~wxGxContainerDialog()
@@ -177,6 +225,9 @@ wxGxContainerDialog::~wxGxContainerDialog()
 		m_pTree->Deactivate();
 
     SerializeFramePos(true);
+
+	for(size_t i = 0; i < m_CommandArray.size(); ++i)
+		wxDELETE(m_CommandArray[i]);
 
 	RemoveAllFilters();
 
@@ -187,6 +238,49 @@ wxGxContainerDialog::~wxGxContainerDialog()
 		m_pCatalog->Detach();
 		delete m_pCatalog;
 	}
+}
+
+void wxGxContainerDialog::OnCommand(wxCommandEvent& event)
+{
+	event.Skip();
+	Command(GetCommand(event.GetId()));
+}
+
+void wxGxContainerDialog::Command(ICommand* pCmd)
+{
+	pCmd->OnClick();
+}
+
+void wxGxContainerDialog::OnCommandUI(wxUpdateUIEvent& event)
+{
+	ICommand* pCmd = GetCommand(event.GetId());
+	if(pCmd)
+	{
+		if(pCmd->GetKind() == enumGISCommandCheck)
+			event.Check(pCmd->GetChecked());
+		event.Enable(pCmd->GetEnabled());
+    }
+}
+
+ICommand* wxGxContainerDialog::GetCommand(long CmdID)
+{
+	for(size_t i = 0; i < m_CommandArray.size(); ++i)
+		if(m_CommandArray[i]->GetID() == CmdID)
+			return m_CommandArray[i];
+	return NULL;
+}
+
+ICommand* wxGxContainerDialog::GetCommand(wxString sCmdName, unsigned char nCmdSubType)
+{
+	for(size_t i = 0; i < m_CommandArray.size(); ++i)
+	{
+        wxObject* pObj = dynamic_cast<wxObject*>(m_CommandArray[i]);
+		wxClassInfo * pInfo = pObj->GetClassInfo();
+		wxString sCommandName = pInfo->GetClassName();
+		if(sCommandName == sCmdName && m_CommandArray[i]->GetSubType() == nCmdSubType)
+			return m_CommandArray[i];
+	}
+	return NULL;
 }
 
 void wxGxContainerDialog::SetButtonCaption(wxString sOkBtLabel)
@@ -428,16 +522,16 @@ void wxGxContainerDialog::OnCreate(wxCommandEvent& event)
 {
     //focus tree view
     m_pTree->SetFocus();
-    if(m_pCreateCmd)
-        m_pCreateCmd->OnClick();
+    if(m_CommandArray[0])
+        m_CommandArray[0]->OnClick();
 }
 
 void wxGxContainerDialog::OnCreateUI(wxUpdateUIEvent& event)
 {
-    if(!m_pCreateCmd)
+    if(!m_CommandArray[0])
     {
         event.Enable(false);
         return;
     }
-    event.Enable(m_pCreateCmd->GetEnabled());
+    event.Enable(m_CommandArray[0]->GetEnabled());
 }
