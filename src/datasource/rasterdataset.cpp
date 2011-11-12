@@ -101,11 +101,6 @@ char **wxGISRasterDataset::GetFileList()
 		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
 			papszFileList = CSLAddString( papszFileList, szPath );
 		break;
-	case enumRasterJpeg:
-		szPath = (char*)CPLResetExtension(m_sPath, "jpw");
-		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-			papszFileList = CSLAddString( papszFileList, szPath );
-		break;
 	case enumRasterSAGA:
 		szPath = (char*)CPLResetExtension(m_sPath, "sgrd");
 		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
@@ -122,9 +117,23 @@ char **wxGISRasterDataset::GetFileList()
     default: 
         break;
     }
-    szPath = m_sPath + CPLString("w");
-    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-        papszFileList = CSLAddString( papszFileList, szPath );
+    //check for world file
+        //1. third char set w (e.g. jpw)
+        szPath[szPath.size() - 1] = 'w';
+	    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+		    papszFileList = CSLAddString( papszFileList, szPath );
+	    szPath = (char*)CPLResetExtension(m_sPath, "jpw");
+	    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+		    papszFileList = CSLAddString( papszFileList, szPath );
+        //2. wld
+        szPath = (char*)CPLResetExtension(m_sPath, "wld");
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+        //3. add w to ext
+        szPath = m_sPath + CPLString("w");
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+    //end check
     szPath = m_sPath + CPLString(".xml");
     if(CPLCheckForFile((char*)szPath.c_str(), NULL))
         papszFileList = CSLAddString( papszFileList, szPath );
