@@ -495,7 +495,7 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         pRgnEnv2 = new OGREnvelope();
         pRgn2->getEnvelope(pRgnEnv2);
     }
-
+*/
 
     //progress & messages
     IProgressor* pProgressor(NULL);
@@ -506,7 +506,6 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
     }
 
     int nCounter(0);
-    size_t nStep = pDSet->GetFeatureCount() < 10 ? 1 : pDSet->GetFeatureCount() / 10;
     if(pProgressor)
         pProgressor->SetRange(pDSet->GetFeatureCount());
 
@@ -521,15 +520,15 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
             CPLError( CE_Warning, CPLE_AppDefined, sFullErr );
 
             if(pTrackCancel)
-                pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+                pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
             return false;
         }
 
         OGRGeometry *pGeom = pFeature->GetGeometryRef()->clone();
         if(pGeom)
         {
-            if(pRgn1 == NULL && pRgn2 == NULL)
-            {
+            //if(pRgn1 == NULL && pRgn2 == NULL)
+            //{
                 if(pGeom->transform( poCT ) != OGRERR_NONE)
                 {
                     pTrackCancel->PutMessage(wxString::Format(_("Error project feature #%d"), pFeature->GetFID()), -1, enumGISMessageWarning);
@@ -538,19 +537,19 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
                 }
                 else
                     pFeature->SetGeometryDirectly(pGeom);
-            }
-            else
-            {
-                OGRGeometry* pCutGeom = CheckRgnAndTransform(pGeom, pRgn1, pRgn2, pRgnEnv1, pRgnEnv2, poCT);
-                if(pCutGeom)
-                    pFeature->SetGeometryDirectly(pCutGeom);
-                else
-                {
-                    pTrackCancel->PutMessage(wxString::Format(_("Error project feature #%d"), pFeature->GetFID()), -1, enumGISMessageWarning);
-                    wxDELETE(pGeom);
-                    continue;
-                }
-            }
+            //}
+            //else
+            //{
+            //    OGRGeometry* pCutGeom = CheckRgnAndTransform(pGeom, pRgn1, pRgn2, pRgnEnv1, pRgnEnv2, poCT);
+            //    if(pCutGeom)
+            //        pFeature->SetGeometryDirectly(pCutGeom);
+            //    else
+            //    {
+            //        pTrackCancel->PutMessage(wxString::Format(_("Error project feature #%d"), pFeature->GetFID()), -1, enumGISMessageWarning);
+            //        wxDELETE(pGeom);
+            //        continue;
+            //    }
+            //}
         }
 
         //////////////////////
@@ -614,21 +613,21 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
             sFullErr += CPLGetLastErrorMsg();
             CPLError( CE_Failure, CPLE_AppDefined, sFullErr);
             if(pTrackCancel)
-                pTrackCancel->PutMessage(wgMB2WX(sFullErr), -1, enumGISMessageErr);
+                pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         }
         nCounter++;
-        if(pProgressor && nCounter % nStep == 0)
+        if(pProgressor)
             pProgressor->SetValue(nCounter);
     }
 
     if(poCT)
         OCTDestroyCoordinateTransformation(poCT);
 
-    wxDELETE(pRgnEnv1);
-    wxDELETE(pRgnEnv2);
-    wxDELETE(pRgn1);
-    wxDELETE(pRgn2);
-*/
+    //wxDELETE(pRgnEnv1);
+    //wxDELETE(pRgnEnv2);
+    //wxDELETE(pRgn1);
+    //wxDELETE(pRgn2);
+
     return true;
 }
 

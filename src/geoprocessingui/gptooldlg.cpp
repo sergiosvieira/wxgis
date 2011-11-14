@@ -289,20 +289,25 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
 			continue;
 		case wxGISEnumGPMessageError:
 			nIco = wxICON_ERROR;
+		    nErrCount++;
 			break;
 		case wxGISEnumGPMessageWarning:
 			nIco = wxICON_WARNING;
+		    nErrCount++;
 			break;
 		};
-		wxString sMsg = Params[i]->GetMessage();
-		nErrCount++;
-		if(sMsg == m_sCurrentErrMsg && m_nCurrentErrField == i)
-			continue;
 
-		m_pInfoBar->ShowMessage(sMsg + wxString(wxT(" ")) + wxString::Format(_("(Field No %d)"), i + 1), nIco);
-		m_sCurrentErrMsg = sMsg;
-		m_nCurrentErrField = i;
-		break;
+        if(nErrCount > 0)
+        {
+		    wxString sMsg = Params[i]->GetMessage();
+		    if(sMsg == m_sCurrentErrMsg && m_nCurrentErrField == i)
+			    break;//continue;
+
+		    m_pInfoBar->ShowMessage(sMsg + wxString(wxT(" ")) + wxString::Format(_("(Field No %d)"), i + 1), nIco);
+		    m_sCurrentErrMsg = sMsg;
+		    m_nCurrentErrField = i;
+		    break;
+        }
 	}
     //tool validate
     bool bIsValid = m_pTool->Validate();//validate user tool

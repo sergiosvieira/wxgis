@@ -37,7 +37,6 @@ int main(int argc, char **argv)
 {
 #if wxUSE_UNICODE
     wxChar **wxArgv = new wxChar *[argc + 1];
-
     {
         int n;
 
@@ -47,7 +46,7 @@ int main(int argc, char **argv)
             wxArgv[n] = wxStrdup(warg);
         }
 
-        wxArgv[n] = NULL;
+        wxArgv[n] = nullptr;
     }
 #else
     #define wxArgv argv

@@ -419,6 +419,10 @@ bool wxGISDTDigit::Validate(void)
 
 void wxGISDTDigit::UpdateControls(void)
 {
+	if(!m_pParam->GetAltered())
+		return;
+	if(m_pParam->GetValue() == m_DigitTextCtrl->GetValue())
+		return;
     m_DigitTextCtrl->ChangeValue( m_pParam->GetValue() );
     SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
 }
@@ -626,8 +630,12 @@ void wxGISDTChoice::UpdateValues(void)
 
 void wxGISDTChoice::UpdateControls(void)
 {
+	if(!m_pParam->GetAltered())
+		return;
     int nPos = m_choice->GetCurrentSelection();
-	//
+	if(m_pParam->GetSelDomainValue() == nPos)
+		return;
+
     wxGISGPValueDomain* poGPValueDomain = dynamic_cast<wxGISGPValueDomain*>(m_pParam->GetDomain());
     if(poGPValueDomain)
 	{
@@ -926,9 +934,12 @@ bool wxGISDTSpatRef::Validate(void)
 
 void wxGISDTSpatRef::UpdateControls(void)
 {
+	if(!m_pParam->GetAltered())
+		return;
     wxString sWKT = m_pParam->GetValue().MakeString();
     if(sWKT.IsEmpty())
         return;
+
     CPLString szWKT(sWKT.mb_str());
     OGRSpatialReference SpaRef;
     
@@ -938,11 +949,14 @@ void wxGISDTSpatRef::UpdateControls(void)
     {
         char *pszWKT;
         SpaRef.exportToPrettyWkt( &pszWKT );
-        sWKT = wxString(pszWKT, *wxConvCurrent);
+        sWKT = wxString(pszWKT, wxConvLocal);
         OGRFree( pszWKT );
     }
-    m_SpaRefTextCtrl->ChangeValue( sWKT );
-    SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
+    if(m_SpaRefTextCtrl->GetValue() != sWKT)
+    {
+       m_SpaRefTextCtrl->ChangeValue( sWKT );
+        SetMessage(m_pParam->GetMessageType(), m_pParam->GetMessage());
+    }
 }
 
 void wxGISDTSpatRef::UpdateValues(void)
@@ -961,7 +975,7 @@ void wxGISDTSpatRef::OnTextChange(wxCommandEvent& event)
 {
 	m_pParam->SetHasBeenValidated(false);
     m_pParam->SetAltered(true);
-	UpdateValues();
+	//UpdateValues();
 }
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISDTMultiParam
@@ -1299,6 +1313,8 @@ bool wxGISDTList::Validate(void)
 
 void wxGISDTList::UpdateControls(void)
 {
+	if(!m_pParam->GetAltered())
+		return;
 	wxString sVal  = GetValue();
 	if(m_TextCtrl->GetValue().CmpNoCase(sVal) == 0)
 		return;
