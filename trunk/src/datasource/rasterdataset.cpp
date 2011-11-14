@@ -96,11 +96,6 @@ char **wxGISRasterDataset::GetFileList()
     //papszFileList = CSLAddString( papszFileList, osIMDFile );
     switch(m_nSubType)
     {
-	case enumRasterTiff:
-		szPath = (char*)CPLResetExtension(m_sPath, "tfw");
-		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-			papszFileList = CSLAddString( papszFileList, szPath );
-		break;
 	case enumRasterSAGA:
 		szPath = (char*)CPLResetExtension(m_sPath, "sgrd");
 		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
@@ -118,8 +113,13 @@ char **wxGISRasterDataset::GetFileList()
         break;
     }
     //check for world file
-        //1. third char set w (e.g. jpw)
-        szPath[szPath.size() - 1] = 'w';
+        //1. thirst and last char from ext and third char set w (e.g. jpw)
+        CPLString sExt = CPLGetExtension(m_sPath);
+        CPLString sNewExt;
+        sNewExt += sExt[0];
+        sNewExt += sExt[sExt.size() - 1];
+        sNewExt += 'w';
+        szPath = (char*)CPLResetExtension(m_sPath, sNewExt);
 	    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
 		    papszFileList = CSLAddString( papszFileList, szPath );
 	    szPath = (char*)CPLResetExtension(m_sPath, "jpw");

@@ -70,6 +70,7 @@ GPParameters wxGISGPMeanByColumnTool::GetParameterInfo(void)
 
         wxGISGPGxObjectDomain* pDomain1 = new wxGISGPGxObjectDomain();
         pDomain1->AddFilter(new wxGxDatasetFilter(enumGISTableDataset));
+        pDomain1->AddFilter(new wxGxDatasetFilter(enumGISFeatureDataset));
         pParam1->SetDomain(pDomain1);
 
         m_paParam.Add(static_cast<IGPParameter*>(pParam1));
