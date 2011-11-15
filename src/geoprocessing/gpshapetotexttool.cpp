@@ -198,12 +198,12 @@ bool wxGISGPShapeToTextTool::Validate(void)
     wxGISGPStringDomain* poGPStringDomain = dynamic_cast<wxGISGPStringDomain*>(m_paParam[1]->GetDomain());
     if(poGPStringDomain)
 	{
-		wxArrayString m_asNewCoordsMask;
+		wxArrayString asNewCoordsMask;
 		for(size_t i = 0; i < poGPStringDomain->GetCount(); ++i)
-			m_asNewCoordsMask.Add(poGPStringDomain->GetName(i));
-		if(m_asCoordsMask != m_asNewCoordsMask)
+			asNewCoordsMask.Add(poGPStringDomain->GetName(i));
+		if(m_asCoordsMask != asNewCoordsMask)
 		{
-			m_asCoordsMask = m_asNewCoordsMask;
+			m_asCoordsMask = asNewCoordsMask;
 			m_bEmptyCoordsMask = true;
 		}
 	}

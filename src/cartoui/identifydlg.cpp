@@ -59,7 +59,9 @@ int wxCALLBACK FieldValueCompareFunction(wxIntPtr item1, wxIntPtr item2, wxIntPt
 BEGIN_EVENT_TABLE(wxGISFeatureDetailsPanel, wxPanel)
     EVT_CONTEXT_MENU(wxGISFeatureDetailsPanel::OnContextMenu)
 	EVT_MENU_RANGE(ID_WG_COPY_NAME, ID_WG_RESET_SORT, wxGISFeatureDetailsPanel::OnMenu)
+ 	EVT_UPDATE_UI_RANGE(ID_WG_COPY_NAME, ID_WG_RESET_SORT, wxGISFeatureDetailsPanel::OnMenuUpdateUI)
     EVT_LIST_COL_CLICK(ID_LISTCTRL, wxGISFeatureDetailsPanel::OnColClick)
+	EVT_BUTTON(ID_MASKBTN, wxGISFeatureDetailsPanel::OnMaskMenu)
 END_EVENT_TABLE()
 
 wxGISFeatureDetailsPanel::wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
@@ -80,11 +82,11 @@ wxGISFeatureDetailsPanel::wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID
 	fgSizer1->Add( m_staticText1, 1, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
 	m_textCtrl = new wxTextCtrl(  this, wxID_ANY, wxT("..."), wxDefaultPosition, wxDefaultSize, wxTE_READONLY, wxGenericValidator( &m_sLocation ));
-	m_textCtrl->Enable( false );
+	//m_textCtrl->Enable( false );
 
 	fgSizer1->Add( m_textCtrl, 1, wxALIGN_CENTER|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND|wxRIGHT|wxLEFT, 5 );
 	
-	m_bpSelStyleButton = new wxBitmapButton( this, wxID_ANY, oDownArrow, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	m_bpSelStyleButton = new wxBitmapButton( this, ID_MASKBTN, oDownArrow, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	m_bpSelStyleButton->SetToolTip( _("Select location text style") );
 	
 	fgSizer1->Add( m_bpSelStyleButton, 0, wxRIGHT, 5 );
@@ -113,7 +115,8 @@ wxGISFeatureDetailsPanel::wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID
 	
 	this->SetSizer( bSizer1 );
 	this->Layout();
-	m_CFormat.Create(wxString(wxT("X: dd.dddd[ ]Y: dd.dddd")));//TODO: get/store from/in config, set from property page
+	m_pCFormat = new wxGISCoordinatesFormatMenu();
+	m_pCFormat->Create(wxString(wxT("X: dd.dddd[ ]Y: dd.dddd")));//TODO: get/store from/in config, set from property page
 
 	m_pMenu = new wxMenu;
 	m_pMenu->Append(ID_WG_COPY_NAME, wxString::Format(_("Copy %s"), _("Field")), wxString::Format(_("Copy '%s' value"), _("Field")), wxITEM_NORMAL);
@@ -125,16 +128,21 @@ wxGISFeatureDetailsPanel::wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID
 
     m_currentSortCol = 0;
     m_nSortAsc = 0;
+	m_dfX = 0;
+	m_dfY =	0;
 }
 
 wxGISFeatureDetailsPanel::~wxGISFeatureDetailsPanel()
 {
 	wxDELETE(m_pMenu);
+	wxDELETE(m_pCFormat);
 }
 
 void wxGISFeatureDetailsPanel::FillPanel(const OGREnvelope &Bounds)
 {
-	m_sLocation = m_CFormat.Format(Bounds.MinX + (Bounds.MaxX - Bounds.MinX) / 2, Bounds.MinY + (Bounds.MaxY - Bounds.MinY) / 2);
+	m_dfX = Bounds.MinX + (Bounds.MaxX - Bounds.MinX) / 2;
+	m_dfY = Bounds.MinY + (Bounds.MaxY - Bounds.MinY) / 2;
+	m_sLocation = m_pCFormat->Format(m_dfX, m_dfY);
 	TransferDataToWindow();
 }
 
@@ -169,20 +177,34 @@ void wxGISFeatureDetailsPanel::Clear(bool bFull)
 
 void wxGISFeatureDetailsPanel::OnContextMenu(wxContextMenuEvent& event)
 {
-    //event.Skip();
-    wxPoint point = event.GetPosition();
+	wxRect rc = m_listCtrl->GetRect();
+	wxPoint point = event.GetPosition();
     // If from keyboard
     if (point.x == -1 && point.y == -1)
 	{
         wxSize size = GetSize();
-        point.x = size.x / 2;
-        point.y = size.y / 2;
+		point.x = rc.GetLeft() + rc.GetWidth() / 2;
+		point.y = rc.GetTop() + rc.GetHeight() / 2;
     }
 	else
 	{
-        point = ScreenToClient(point);
+        point = m_listCtrl->ScreenToClient(point);
     }
+	if(!rc.Contains(point))
+	{
+		event.Skip();
+		return;
+	}
     PopupMenu(m_pMenu, point.x, point.y);
+}
+
+void wxGISFeatureDetailsPanel::OnMaskMenu(wxCommandEvent& event)
+{
+	wxRect rc = m_bpSelStyleButton->GetRect();
+	m_pCFormat->PrepareMenu();//fill new masks from config
+	PopupMenu(m_pCFormat, rc.GetBottomLeft());
+	m_sLocation = m_pCFormat->Format(m_dfX, m_dfY);
+	TransferDataToWindow();
 }
 
 void wxGISFeatureDetailsPanel::WriteStringToClipboard(const wxString &sData)
@@ -268,6 +290,16 @@ void wxGISFeatureDetailsPanel::OnMenu(wxCommandEvent& event)
 	default:
 		break;
 	}
+}
+
+void wxGISFeatureDetailsPanel::OnMenuUpdateUI(wxUpdateUIEvent& event)
+{
+	if(event.GetId() == ID_WG_RESET_SORT)
+		return;
+	if(m_listCtrl->GetSelectedItemCount() == 0)
+		event.Enable(false);
+	else
+		event.Enable(true);
 }
 
 void wxGISFeatureDetailsPanel::OnColClick(wxListEvent& event)
@@ -437,6 +469,7 @@ void wxGISIdentifyDlg::OnItemRightClick(wxTreeEvent& event)
     m_pTreeCtrl->SelectItem(item);
     PopupMenu(m_pMenu, event.GetPoint());
 }
+
 //-------------------------------------------------------------------
 // wxAxToolboxView
 //-------------------------------------------------------------------

@@ -57,7 +57,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxmsw29ud_aui.lib;wxmsw29ud_adv.lib;wxmsw29ud_html.lib;wxgiscpld.lib;wxgisogrd.lib;wxgisgdald.lib;wxGISCored.lib;wxGISDisplayd.lib;wxGISCartod.lib;wxGISDataSourced.lib;cairo.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxmsw29ud_aui.lib;wxmsw29ud_adv.lib;wxmsw29ud_html.lib;wxmsw29ud_propgrid.lib;wxgiscpld.lib;wxgisogrd.lib;wxgisgdald.lib;wxGISCored.lib;wxGISDisplayd.lib;wxGISCartod.lib;wxGISDataSourced.lib;cairo.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(WXGISGDAL)\lib;$(WXWIDGETS)\lib\vc_dll;..\..\lib;$(CAIRO)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -103,6 +103,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cartoui\cartocmd.cpp" />
+    <ClCompile Include="..\..\src\cartoui\formatmenu.cpp" />
     <ClCompile Include="..\..\src\cartoui\identifydlg.cpp" />
     <ClCompile Include="..\..\src\cartoui\mapview.cpp" />
     <ClCompile Include="..\..\src\cartoui\mxeventui.cpp" />
@@ -113,6 +114,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\wxgis\cartoui\cartocmd.h" />
     <ClInclude Include="..\..\include\wxgis\cartoui\cartoui.h" />
+    <ClInclude Include="..\..\include\wxgis\cartoui\formatmenu.h" />
     <ClInclude Include="..\..\include\wxgis\cartoui\identifydlg.h" />
     <ClInclude Include="..\..\include\wxgis\cartoui\mapview.h" />
     <ClInclude Include="..\..\include\wxgis\cartoui\mxeventui.h" />

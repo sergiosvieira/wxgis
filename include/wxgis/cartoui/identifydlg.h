@@ -24,7 +24,7 @@
 #include "wxgis/framework/framework.h"
 #include "wxgis/cartoui/mapview.h"
 #include "wxgis/carto/featurelayer.h"
-#include "wxgis/core/format.h"
+#include "wxgis/cartoui/formatmenu.h"
 
 #include <wx/intl.h>
 #include <wx/string.h>
@@ -82,7 +82,8 @@ class wxGISFeatureDetailsPanel : public wxPanel
 {
 	enum
 	{
-        ID_LISTCTRL = 1050,
+        ID_LISTCTRL = 3050,
+		ID_MASKBTN,
 		ID_WG_COPY_NAME,
 		ID_WG_COPY_VALUE,
 		ID_WG_COPY,
@@ -96,14 +97,16 @@ public:
 	virtual void FillPanel(const OGRFeatureSPtr &pFeature);
 	virtual void Clear(bool bFull = false);
 	//events
-	void OnContextMenu(wxContextMenuEvent& event);
-	void OnMenu(wxCommandEvent& event);
-    void OnColClick(wxListEvent& event);
+	virtual void OnContextMenu(wxContextMenuEvent& event);
+	virtual void OnMenu(wxCommandEvent& event);
+	virtual void OnMenuUpdateUI(wxUpdateUIEvent& event);
+    virtual void OnColClick(wxListEvent& event);
+	virtual void OnMaskMenu(wxCommandEvent& event);
 protected:
 	void WriteStringToClipboard(const wxString &sData);
 protected:
 	wxString m_sLocation; 
-	wxGISCoordinatesFormat m_CFormat;
+	wxGISCoordinatesFormatMenu *m_pCFormat;
 	wxStaticText* m_staticText1;
 	wxTextCtrl* m_textCtrl;
 	wxBitmapButton* m_bpSelStyleButton;
@@ -114,6 +117,7 @@ protected:
 	int m_nSortAsc;
 	short m_currentSortCol;
 	wxImageList m_ImageListSmall;
+	double m_dfX, m_dfY;
 
     DECLARE_EVENT_TABLE()
 };
