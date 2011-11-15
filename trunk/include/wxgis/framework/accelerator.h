@@ -21,8 +21,9 @@
 
 #pragma once
 #include "wxgis/framework/framework.h"
-#include <wx/accel.h>
 #include "wxgis/core/config.h"
+
+#include <wx/accel.h>
 
 class WXDLLIMPEXP_GIS_FRW wxGISAcceleratorTable
 {

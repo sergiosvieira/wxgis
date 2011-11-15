@@ -35,7 +35,7 @@ double WXDLLIMPEXP_GIS_CORE StringToDouble(const wxString &sVal, const wxString 
 */
 WXDLLIMPEXP_GIS_CORE wxString NumberScale(double dScaleRatio);
 
-/** \class wxGISCoordinatesFormat gpshapetotexttool.h
+/** \class wxGISCoordinatesFormat format.h
     \brief The class to format coordinates according different masks
 */
 class WXDLLIMPEXP_GIS_CORE wxGISCoordinatesFormat
