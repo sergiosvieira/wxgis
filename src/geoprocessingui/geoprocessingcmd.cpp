@@ -308,6 +308,8 @@ void wxGISGeoprocessingCmd::OnClick(void)
 							//ProgressDlg.PutMessage(wxString::Format(_("Export successful (%s.%s)!"), sName.c_str(), pFilter->GetExt().c_str()));
 							ProgressDlg.SetValue(ProgressDlg.GetValue() + 1);
 						}
+						ProgressDlg.Destroy();
+
                         //add new IGxObject's
                         IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
                         if(pGxApp)
@@ -399,6 +401,7 @@ void wxGISGeoprocessingCmd::OnClick(void)
 								ProgressDlg.SetValue(ProgressDlg.GetValue() + 1);
 							}
                         }
+						ProgressDlg.Destroy();
 
                         //add new IGxObject's
                         IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
