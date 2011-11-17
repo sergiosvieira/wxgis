@@ -35,7 +35,7 @@ wxGxDiscConnections::wxGxDiscConnections(void) : m_bIsChildrenLoaded(false)
 	wxGISAppConfigSPtr pConfig = GetConfig();
 	if(pConfig)
 	{
-		m_sUserConfigDir = pConfig->GetLocalConfigDir() + wxFileName::GetPathSeparator() + wxString(CONNDIR);
+		m_sUserConfigDir = pConfig->GetLocalConfigDirNonPortable() + wxFileName::GetPathSeparator() + wxString(CONNDIR);
 		m_sUserConfig = m_sUserConfigDir + wxFileName::GetPathSeparator() + wxString(CONNCONF);
 	}
 }

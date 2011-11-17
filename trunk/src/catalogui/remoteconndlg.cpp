@@ -207,6 +207,7 @@ void wxGISRemoteConnDlg::OnTest(wxCommandEvent& event)
 	CPLSetConfigOption("PGCLIENTENCODING", "UTF-8");
 
     wxString sPath = wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_bIsBinaryCursor == true ? wxT("PGB") : wxT("PG"), m_sServer.c_str(), m_sDatabase.c_str(), m_sPort.c_str(), m_sUser.c_str(), m_sPass.c_str());
+	CPLErrorReset();
     OGRDataSource* poDS = OGRSFDriverRegistrar::Open( sPath.mb_str(wxConvUTF8), FALSE );
 	if( poDS == NULL )
 	{

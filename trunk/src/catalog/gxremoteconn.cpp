@@ -49,7 +49,7 @@ wxGISDatasetSPtr wxGxRemoteConnection::GetDataset(bool bCache, ITrackCancel* pTr
 		wxXmlDocument doc(wxString(m_sPath,  wxConvUTF8));
 		if(!doc.IsOk())
 		{
-			wxString sErr(_("Error open connection file!"));
+			wxString sErr(_("Connection file open failed!"));
 			CPLString sFullErr(sErr.mb_str());
 			CPLError( CE_Failure, CPLE_FileIO, sFullErr);
 			return wxGISDatasetSPtr();

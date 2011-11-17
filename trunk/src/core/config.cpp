@@ -53,6 +53,9 @@ wxGISConfig::wxGISConfig(const wxString &sVendorName, bool bPortable)
 
     m_bPortable = bPortable;
 
+    wxString sExeAppName = wxFileNameFromPath(stp.GetExecutablePath());
+	sExeAppName = wxFileName::StripExtension(sExeAppName);
+
     if(bPortable)
     {
         //if potable - config path: [app.exe path\config]
@@ -62,9 +65,6 @@ wxGISConfig::wxGISConfig(const wxString &sVendorName, bool bPortable)
     }
     else
     {
-        wxString sExeAppName = wxFileNameFromPath(stp.GetExecutablePath());
-		sExeAppName = wxFileName::StripExtension(sExeAppName);
-
         m_sLocalConfigDirPath = stp.GetUserConfigDir() + wxFileName::GetPathSeparator() + sVendorName;
         m_sGlobalConfigDirPath = stp.GetConfigDir() + wxFileName::GetPathSeparator() + sVendorName;
         if(m_sGlobalConfigDirPath.Find(sExeAppName) != wxNOT_FOUND)
@@ -75,6 +75,8 @@ wxGISConfig::wxGISConfig(const wxString &sVendorName, bool bPortable)
 //	    if(!wxDirExists(m_sSysConfigDir))
 //		    wxFileName::Mkdir(m_sSysConfigDir, 0775, wxPATH_MKDIR_FULL);
     }
+
+	m_sLocalConfigDirPathNonPortable = stp.GetUserConfigDir() + wxFileName::GetPathSeparator() + sVendorName;
 }
 
 wxGISConfig::~wxGISConfig(void)

@@ -119,12 +119,16 @@ bool wxGISPostgresDataSource::Open()
 	wxCriticalSectionLocker locker(m_CritSect);
 	CPLSetConfigOption("PG_LIST_ALL_TABLES", "YES");
 	CPLSetConfigOption("PGCLIENTENCODING", "UTF-8");
+	CPLErrorReset();
 
     //"PG:host='127.0.0.1' dbname='db' port='5432' user='bishop' password='xxx'"
 	wxString sConnStr = wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_bIsBinaryCursor == true ? wxT("PGB") : wxT("PG"), m_sAddres.c_str(), m_sDBName.c_str(), m_sPort.c_str(), m_sName.c_str(), m_sPass.c_str());
+	wxLogMessage(_("Try to connect: host='%s' dbname='%s' port='%s' user='%s'"), m_sAddres.c_str(), m_sDBName.c_str(), m_sPort.c_str(), m_sName.c_str());
     m_poDS = OGRSFDriverRegistrar::Open( sConnStr.mb_str(wxConvUTF8), FALSE );
 	if( m_poDS == NULL )
+	{
 		return false;
+	}
 	wxString sPath = wxString::Format(wxT("host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_sAddres.c_str(), m_sDBName.c_str(), m_sPort.c_str(), m_sName.c_str(), m_sPass.c_str());
 	m_sPath = CPLString(sPath.mb_str(wxConvUTF8));
 	m_bIsOpened = true;
