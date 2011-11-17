@@ -124,6 +124,11 @@ bool wxGxRemoteConnectionUI::Invoke(wxWindow* pParentWnd)
     wxBusyCursor wait;
     //connect
     GetDataset();
+	if(m_pwxGISDataset == nullptr)
+	{
+		wxMessageBox(_("Connect failed!"), _("Error"), wxICON_ERROR | wxOK);
+		return false;
+	}
     m_pCatalog->ObjectChanged(GetID());
 
     return true;

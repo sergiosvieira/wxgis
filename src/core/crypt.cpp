@@ -89,6 +89,7 @@ bool Crypt(const wxString &sText, wxString &sCryptText)
 	bool bResult = EVP_EncryptInit(&ctx, cipher, pabyKey, pabyIV);
 	if(!bResult)
 	{
+		wxLogError(_("Crypt: Failed EVP_EncryptInit!"));
 		CPLFree( pabyKey );
 		CPLFree( pabyIV );
 		return bResult;
@@ -102,6 +103,7 @@ bool Crypt(const wxString &sText, wxString &sCryptText)
 
 	if(!bResult)
 	{
+		wxLogError(_("Crypt: Failed EVP_EncryptUpdate!"));
 		CPLFree( pabyKey );
 		CPLFree( pabyIV );
 		return bResult;
@@ -161,10 +163,11 @@ bool Decrypt(const wxString &sText, wxString &sDecryptText)
 	EVP_CIPHER_CTX_init(&ctx);
  
 	cipher = EVP_aes_256_cfb();
- 
-	bool bResult = EVP_DecryptInit(&ctx, cipher, pabyKey, pabyIV);
+
+ 	bool bResult = EVP_DecryptInit(&ctx, cipher, pabyKey, pabyIV);
 	if(!bResult)
 	{
+		wxLogError(_("Decrypt: Failed EVP_DecryptInit!"));
 		CPLFree( pabyKey );
 		CPLFree( pabyIV );
 		return bResult;
@@ -182,6 +185,7 @@ bool Decrypt(const wxString &sText, wxString &sDecryptText)
 
 	if(!bResult)
 	{
+		wxLogError(_("Decrypt: Failed EVP_DecryptUpdate!"));
 		CPLFree( pabyKey );
 		CPLFree( pabyIV );
 		CPLFree( pabyText );

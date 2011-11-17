@@ -49,6 +49,7 @@ public:
 	virtual wxXmlNode *CreateConfigNode(wxGISEnumConfigKey Key, const wxString &sPath);
 	virtual wxString GetLocalConfigDir(void){return m_sLocalConfigDirPath;};
 	virtual wxString GetGlobalConfigDir(void){return m_sGlobalConfigDirPath;};
+	virtual wxString GetLocalConfigDirNonPortable(void){return m_sLocalConfigDirPathNonPortable;};
 	//typedefs
 	typedef struct wxxmlconf
 	{
@@ -63,6 +64,7 @@ protected:
 	wxXmlNode* GetConfigRootNode(wxGISEnumConfigKey Key, const wxString &sFileName);
 protected:
 	wxString m_sLocalConfigDirPath, m_sGlobalConfigDirPath, m_sAppExeDirPath;
+	wxString m_sLocalConfigDirPathNonPortable;
     bool m_bPortable;
 	std::vector<WXXMLCONF> m_paConfigFiles;
 	wxGISConfigNodesMap m_pmConfigNodes;
