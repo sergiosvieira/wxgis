@@ -9,7 +9,7 @@ The 0.3 version of wxGIS introduce new and more simple mechanism of changing app
 
 From the beginning to create locale files you need:
   # Download and install poEdit (http://www.poedit.net/download.php)
-  # Download from download page archive of empty locale project files to translate of special wxGIS version (eg. 0.4)
+  # Download from download page archive of empty locale project files to translate of special wxGIS version (eg. for wxGIS v.0.4 http://wxgis.googlecode.com/files/Init_locale-0.4.0.7z)
 
 After downloading empty locale project files, you have to extract them to some folder (preferable your language two letter code, eg. 'ru' or 'en').
 
