@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-21 22:11+0300\n"
-"PO-Revision-Date: 2011-02-21 22:11+0300\n"
+"POT-Creation-Date: 2011-11-18 23:12+0400\n"
+"PO-Revision-Date: 2011-11-18 23:12+0400\n"
 "Last-Translator: Bishop <polimax@mail.ru>\n"
 "Language-Team: Bishop <polimax@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -16,13 +16,13 @@ msgstr ""
 "X-Poedit-SearchPath-0: D:\\work\\Projects\\wxGIS\\include\\wxgis\\networking\n"
 "X-Poedit-SearchPath-1: D:\\work\\Projects\\wxGIS\\src\\networking\n"
 
-#: D:\work\Projects\wxGIS\src\networking/processor.cpp:67
-#: D:\work\Projects\wxGIS\src\networking/processor.cpp:69
+#: D:\work\Projects\wxGIS\src\networking/processor.cpp:66
+#: D:\work\Projects\wxGIS\src\networking/processor.cpp:68
 #, c-format
 msgid "wxGISNetMessageProcessor: %s"
 msgstr "wxGISNetMessageProcessor: %s"
 
-#: D:\work\Projects\wxGIS\src\networking/processor.cpp:139
+#: D:\work\Projects\wxGIS\src\networking/processor.cpp:135
 #, c-format
 msgid "wxGISNetMessageProcessor: %s queue thread 0x%lx started"
 msgstr "wxGISNetMessageProcessor: очередь %s поток 0x%lx запущен"
