@@ -936,14 +936,15 @@ bool wxGISApplication::SetupLoc(const wxString &sLoc, const wxString &sLocPath)
 	{
 		wxLocale::AddCatalogLookupPathPrefix(sLocalePath);
 
-		wxString sWxLocPath = sLocalePath + wxFileName::GetPathSeparator() + sLoc + wxT(".mo");
-		m_pLocale->AddCatalog(sWxLocPath);
+		//wxString sWxLocPath = sLocalePath + wxFileName::GetPathSeparator() + sLoc + wxT(".mo");
+		//m_pLocale->AddCatalog(sWxLocPath);
 		
 
 		// Initialize the catalogs we'll be using
 		//load multicat from locale
 		wxArrayString trans_arr;
-		wxDir::GetAllFiles(sLocalePath, &trans_arr, wxT("*_cat.mo"));
+		wxDir::GetAllFiles(sLocalePath, &trans_arr, wxT("*.mo"));
+		//wxDir::GetAllFiles(sLocalePath, &trans_arr, wxT("*_cat.mo"));
 
 		for(size_t i = 0; i < trans_arr.size(); ++i)
 		{

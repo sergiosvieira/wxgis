@@ -20,6 +20,9 @@
  ****************************************************************************/
 #include "wxgis/cartoui/identifydlg.h"
 #include "wxgis/datasource/vectorop.h"
+#include "wxgis/core/config.h"
+
+#include "ogr_api.h"
 
 #include <wx/clipbrd.h> 
 
@@ -138,10 +141,10 @@ wxGISFeatureDetailsPanel::~wxGISFeatureDetailsPanel()
 	wxDELETE(m_pCFormat);
 }
 
-void wxGISFeatureDetailsPanel::FillPanel(const OGREnvelope &Bounds)
+void wxGISFeatureDetailsPanel::FillPanel(const OGRPoint &pt1)
 {
-	m_dfX = Bounds.MinX + (Bounds.MaxX - Bounds.MinX) / 2;
-	m_dfY = Bounds.MinY + (Bounds.MaxY - Bounds.MinY) / 2;
+	m_dfX = pt1.getX();
+	m_dfY = pt1.getY();
 	m_sLocation = m_pCFormat->Format(m_dfX, m_dfY);
 	TransferDataToWindow();
 }
@@ -547,7 +550,7 @@ void wxAxIdentifyView::Deactivate(void)
 }
 
 
-void wxAxIdentifyView::Identify(const OGREnvelope &Bounds)
+void wxAxIdentifyView::Identify(OGRGeometrySPtr pGeometryBounds)
 {
 	wxBusyCursor wait;
 	if(!m_pMapView)//TODO: add/remove layer map events connection point
@@ -568,6 +571,36 @@ void wxAxIdentifyView::Identify(const OGREnvelope &Bounds)
 	}
 	if(!m_pMapView)
         return;	
+	OGRSpatialReferenceSPtr pSpaRef = m_pMapView->GetSpatialReference();
+	OGRPolygon* pRgn = (OGRPolygon*)pGeometryBounds.get();
+	if(!pRgn)
+		return;
+	OGRLinearRing* pRing = pRgn->getExteriorRing();
+	if(!pRing)
+		return;
+	OGRPoint pt1, pt2;
+	pRing->getPoint(0, &pt1);
+	pRing->getPoint(3, &pt2);
+	//OGREnvelope Env = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
+    if(IsDoubleEquil(pt1.getX(), pt2.getX()) && IsDoubleEquil(pt1.getY(), pt2.getY()))
+	{
+		OGREnvelope Env;
+ 		wxGISAppConfigSPtr pConfig = GetConfig();
+        double dfDelta = pConfig->ReadDouble(enumGISHKCU, wxString(wxT("wxGISCommon/math/delta")), 0.0000001);//EPSILON * 10000
+		Env.MinX = pt1.getX() - dfDelta;
+		Env.MinY = pt1.getY() - dfDelta;
+		Env.MaxX = pt1.getX() + dfDelta;
+		Env.MaxY = pt1.getY() + dfDelta;
+		pGeometryBounds = EnvelopeToGeometry(Env, pSpaRef);
+	}
+	else
+	{
+		if(pSpaRef)
+			pGeometryBounds->assignSpatialReference(pSpaRef->Clone());
+	}
+	//set spatial reference from mapview to geometry and/or pt1
+	if(pSpaRef)
+		pt1.assignSpatialReference(pSpaRef->Clone());
 	//get top layer
 	wxGISLayerSPtr pTopLayer = m_pMapView->GetLayer(m_pMapView->GetLayerCount() - 1);
 	if(!pTopLayer)
@@ -580,7 +613,7 @@ void wxAxIdentifyView::Identify(const OGREnvelope &Bounds)
 			wxGISFeatureLayerSPtr pFLayer = boost::dynamic_pointer_cast<wxGISFeatureLayer>(pTopLayer);
 			if(!pFLayer)
 				return;
-			wxGISQuadTreeCursorSPtr pCursor = pFLayer->Idetify(EnvelopeToGeometry(Bounds));
+			wxGISQuadTreeCursorSPtr pCursor = pFLayer->Idetify(pGeometryBounds);
 			//flash on map
             GeometryArray Arr;
             for(size_t i = 0; i < pCursor->GetCount(); ++i)
@@ -593,7 +626,7 @@ void wxAxIdentifyView::Identify(const OGREnvelope &Bounds)
             m_pMapView->FlashGeometry(Arr);
             //fill IdentifyDlg
 			m_pFeatureDetailsPanel->Clear(true);
-			m_pFeatureDetailsPanel->FillPanel(Bounds);
+			m_pFeatureDetailsPanel->FillPanel(pt1);
 			FillTree(pFLayer, pCursor);
 		}
 		break;

@@ -212,7 +212,7 @@ void wxGISRemoteConnDlg::OnTest(wxCommandEvent& event)
 	if( poDS == NULL )
 	{
 		const char* err = CPLGetLastErrorMsg();
-		wxString sErr = wxString::Format(_("%s failed! Host '%s', Database name '%s', Port='%s'. OGR error: %s"), wxString(_("Open")), m_sServer.c_str(), m_sDatabase.c_str(), m_sPort.c_str(), wxString(err, wxConvLocal));
+		wxString sErr = wxString::Format(_("Operation '%s' failed! Host '%s', Database name '%s', Port='%s'. OGR error: %s"), wxString(_("Open")), m_sServer.c_str(), m_sDatabase.c_str(), m_sPort.c_str(), wxString(err, wxConvLocal));
 		wxMessageBox(sErr, wxString(_("Error")), wxICON_ERROR | wxOK, this );
 	}
     else

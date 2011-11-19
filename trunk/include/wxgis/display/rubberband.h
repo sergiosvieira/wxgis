@@ -30,7 +30,7 @@ class WXDLLIMPEXP_GIS_DSP wxGISRubberBand :
 public:
 	wxGISRubberBand(wxPen &oPen, wxWindow *pWnd, wxGISDisplay *pDisp);
 	virtual ~wxGISRubberBand(void);
-	virtual OGREnvelope TrackNew(wxCoord x, wxCoord y);
+	virtual OGRGeometrySPtr TrackNew(wxCoord x, wxCoord y);
 	virtual void OnUnlock(void);
 	//events
 	virtual void OnKeyDown(wxKeyEvent & event);
@@ -42,7 +42,7 @@ public:
 	virtual void OnEnter(wxMouseEvent& event);
     virtual void OnCaptureLost(wxMouseCaptureLostEvent & event);
 protected:
-	OGREnvelope m_RetEnv;
+	OGRGeometrySPtr m_RetGeom;
 	bool m_bLock;
 	wxCoord m_StartX;
 	wxCoord m_StartY;

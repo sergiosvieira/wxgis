@@ -178,7 +178,7 @@ bool wxGISGPCreateOverviewsTool::Validate(void)
 				if(!pSrcRaster->Open(true))
 				{
 					m_paParam[0]->SetIsValid(false);
-					m_paParam[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("Failed open input path: %s)"), sPath.c_str()));
+					m_paParam[0]->SetMessage(wxGISEnumGPMessageError, wxString::Format(_("Failed open input path: %s"), sPath.c_str()));
 					return false;
 				}
 			}

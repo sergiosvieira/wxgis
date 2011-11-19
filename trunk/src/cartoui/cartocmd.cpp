@@ -482,7 +482,11 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 			int nB = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/bcolor")), 255);
 			int nWidth = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/width")), 2);
 			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(nR, nG, nB), nWidth), m_pMapView, m_pMapView->GetDisplay());
-			OGREnvelope Env = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
+			OGREnvelope Env;
+			OGRGeometrySPtr pGeom = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
+			if(!pGeom)
+				break;
+			pGeom->getEnvelope(&Env);
 			if(IsDoubleEquil(Env.MaxX, Env.MinX) || IsDoubleEquil(Env.MaxY, Env.MinY))
 			{
 				OGREnvelope CurrentEnv = m_pMapView->GetCurrentExtent();
@@ -507,7 +511,11 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 			int nB = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/bcolor")), 255);
 			int nWidth = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/width")), 2);
 			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(nR, nG, nB), nWidth), m_pMapView, m_pMapView->GetDisplay());
-			OGREnvelope Env = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
+			OGREnvelope Env;
+			OGRGeometrySPtr pGeom = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
+			if(!pGeom)
+				break;
+			pGeom->getEnvelope(&Env);
 			OGREnvelope CurrentEnv = m_pMapView->GetCurrentExtent();
 			OGREnvelope NewEnv;
 			NewEnv.MinX = CurrentEnv.MinX + CurrentEnv.MinX - Env.MinX;
@@ -536,23 +544,14 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 			int nB = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/bcolor")), 255);
 			int nWidth = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/width")), 2);
 			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(nR, nG, nB), nWidth), m_pMapView, m_pMapView->GetDisplay());
-			OGREnvelope Env = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
-            if(IsDoubleEquil(Env.MaxX, Env.MinX) || IsDoubleEquil(Env.MaxY, Env.MinY))
-			{
-                double dfDelta = EPSILON * 512;
-				Env.MinX -= dfDelta;
-				Env.MinY -= dfDelta;
-				Env.MaxX += dfDelta;
-				Env.MaxY += dfDelta;
-			}
-
+			OGRGeometrySPtr pGeom = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
             wxWindow* pWnd = static_cast<wxWindow*>(m_pIdentifyView);
             if(!m_pApp->IsApplicationWindowShown(pWnd))
             {
                 m_pApp->ShowApplicationWindow(pWnd);
             }
 			if(m_pIdentifyView)
-				m_pIdentifyView->Identify(Env);
+				m_pIdentifyView->Identify(pGeom);
 		}
 		break;
 		default:

@@ -93,7 +93,7 @@ class wxGISFeatureDetailsPanel : public wxPanel
 public:
 	wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISFeatureDetailsPanel();
-	virtual void FillPanel(const OGREnvelope &Bounds);
+	virtual void FillPanel(const OGRPoint &pt1);
 	virtual void FillPanel(const OGRFeatureSPtr &pFeature);
 	virtual void Clear(bool bFull = false);
 	//events
@@ -199,7 +199,7 @@ public:
 	virtual wxIcon GetViewIcon(void){return wxNullIcon;};
 	virtual void SetViewIcon(wxIcon Icon){};
 	//wxGISIdentifyDlg
-	virtual void Identify(const OGREnvelope &Bounds);
+	virtual void Identify(OGRGeometrySPtr pGeometryBounds);
 	virtual void FillTree(wxGISFeatureLayerSPtr pFLayer, wxGISQuadTreeCursorSPtr pCursor);
 	//events
 	virtual void OnSelChanged(wxTreeEvent& event);
