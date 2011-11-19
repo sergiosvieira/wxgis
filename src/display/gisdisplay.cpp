@@ -409,7 +409,10 @@ void wxGISDisplay::SetDeviceFrame(wxRect &rc)
 	m_dRotatedBoundsCenterY = m_CurrentBounds.MinY + (m_CurrentBounds.MaxY - m_CurrentBounds.MinY) / 2;
 	m_CurrentBoundsRotated = m_CurrentBounds;
 	if(!IsDoubleEquil(m_dAngleRad, 0.0))
+	{
 		RotateEnvelope(m_CurrentBoundsRotated, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);	
+		SetEnvelopeRatio(m_CurrentBoundsRotated, m_dFrameRatio);//test
+	}
 	m_CurrentBoundsX8 = m_CurrentBoundsRotated;
 	IncreaseEnvelope(m_CurrentBoundsX8, 8);
 	
@@ -440,7 +443,10 @@ void wxGISDisplay::SetBounds(OGREnvelope& Bounds)
 	m_dRotatedBoundsCenterY = m_CurrentBounds.MinY + (m_CurrentBounds.MaxY - m_CurrentBounds.MinY) / 2;
 	m_CurrentBoundsRotated = m_CurrentBounds;
 	if(!IsDoubleEquil(m_dAngleRad, 0.0))
+	{
 		RotateEnvelope(m_CurrentBoundsRotated, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);	
+		SetEnvelopeRatio(m_CurrentBoundsRotated, m_dFrameRatio);//test
+	}
 	m_CurrentBoundsX8 = m_CurrentBoundsRotated;
 	IncreaseEnvelope(m_CurrentBoundsX8, 8);
 
@@ -887,7 +893,10 @@ void wxGISDisplay::SetRotate(double dAngleRad)
 	m_dRotatedBoundsCenterX = m_CurrentBoundsRotated.MinX + (m_CurrentBoundsRotated.MaxX - m_CurrentBoundsRotated.MinX) / 2;
 	m_dRotatedBoundsCenterY = m_CurrentBoundsRotated.MinY + (m_CurrentBoundsRotated.MaxY - m_CurrentBoundsRotated.MinY) / 2;
 	if(!IsDoubleEquil(m_dAngleRad, 0.0))
+	{
 		RotateEnvelope(m_CurrentBoundsRotated, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);
+		SetEnvelopeRatio(m_CurrentBoundsRotated, m_dFrameRatio);//test
+	}
 	m_CurrentBoundsX8 = m_CurrentBoundsRotated;
 	IncreaseEnvelope(m_CurrentBoundsX8, 8);
 

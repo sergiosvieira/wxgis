@@ -69,7 +69,7 @@ bool wxGxTableDataset::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-		wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Delete"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Delete"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;	
     }
 }
@@ -104,7 +104,7 @@ bool wxGxTableDataset::Rename(wxString NewName)
 	else
 	{
 		const char* err = CPLGetLastErrorMsg();
-		wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Rename"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Rename"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
 	}	
 }
@@ -118,7 +118,7 @@ wxGISDatasetSPtr wxGxTableDataset::GetDataset(bool bCache, ITrackCancel* pTrackC
         if(!pwxGISTable->Open(0, 0, bCache, pTrackCancel))
         {
 		    const char* err = CPLGetLastErrorMsg();
-			wxString sErr = wxString::Format(_("%s failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
+			wxString sErr = wxString::Format(_("Operation '%s' failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
             wxLogError(sErr);
 			if(pTrackCancel)
 				pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
@@ -156,7 +156,7 @@ bool wxGxTableDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(!bRet)
     {
         const char* err = CPLGetLastErrorMsg();
-		wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Copy"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Copy"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;	
     }
 	
@@ -193,7 +193,7 @@ bool wxGxTableDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(!bRet)
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Move"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+        wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Move"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;	
     }
 
@@ -259,7 +259,7 @@ bool wxGxFeatureDataset::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-		wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Delete"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Delete"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;	
     }
 }
@@ -288,7 +288,7 @@ bool wxGxFeatureDataset::Rename(wxString NewName)
 	else
 	{
 		const char* err = CPLGetLastErrorMsg();
-		wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Delete"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Delete"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
 	}	
 }
@@ -302,7 +302,7 @@ wxGISDatasetSPtr wxGxFeatureDataset::GetDataset(bool bCache, ITrackCancel* pTrac
         if(!pwxGISFeatureDataset->Open(0, 0, bCache, pTrackCancel))
         {
 		    const char* err = CPLGetLastErrorMsg();
-			wxString sErr = wxString::Format(_("%s failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
+			wxString sErr = wxString::Format(_("Operation '%s' failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
             wxLogError(sErr);
 			if(pTrackCancel)
 				pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
@@ -394,7 +394,7 @@ bool wxGxFeatureDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(!bRet)
     {
         const char* err = CPLGetLastErrorMsg();
-		wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Copy"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Copy"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;	
     }
 
@@ -431,7 +431,7 @@ bool wxGxFeatureDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(!bRet)
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Move"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+        wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Move"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;	
     }
 
@@ -485,7 +485,7 @@ bool wxGxRasterDataset::Delete(void)
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-		wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Delete"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Delete"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;	
     }
 }
@@ -520,7 +520,7 @@ bool wxGxRasterDataset::Rename(wxString NewName)
 	else
 	{
 		const char* err = CPLGetLastErrorMsg();
-		wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Delete"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Delete"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;
 	}	
 }
@@ -544,7 +544,7 @@ wxGISDatasetSPtr wxGxRasterDataset::GetDataset(bool bCached, ITrackCancel* pTrac
         if(!pwxGISRasterDataset->Open(true))
         {
 		    const char* err = CPLGetLastErrorMsg();
-			wxString sErr = wxString::Format(_("%s failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
+			wxString sErr = wxString::Format(_("Operation '%s' failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
             wxLogError(sErr);
 
 			return wxGISDatasetSPtr();
@@ -582,7 +582,7 @@ bool wxGxRasterDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(!bRet)
     {
         const char* err = CPLGetLastErrorMsg();
-		wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Copy"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Copy"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;	
     }
 
@@ -619,7 +619,7 @@ bool wxGxRasterDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(!bRet)
     {
         const char* err = CPLGetLastErrorMsg();
-		wxLogError(_("%s failed! GDAL error: %s, file '%s'"), _("Move"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Move"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;	
     }
 

@@ -23,7 +23,7 @@
 
 #include "wxgis/core/core.h"
 
-#include "wx/datetime.h"
+#include <wx/datetime.h>
 
 #include "ogrsf_frmts/ogrsf_frmts.h"
 #include "gdal_priv.h"

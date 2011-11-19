@@ -1009,7 +1009,7 @@ bool GeometryVerticesToPointsDataset(long nGeomFID, OGRGeometry* pGeom, wxGISFea
 
 					if(pDSet->StoreFeature(pFeature) != OGRERR_NONE)
 						if(pTrackCancel)
-							pTrackCancel->PutMessage(wxString::Format(_("Faild add point No. %d"), i), -1, enumGISMessageWarning);
+							pTrackCancel->PutMessage(wxString::Format(_("Failed add point No. %d"), i), -1, enumGISMessageWarning);
 				}
 
 				if(pProgressor)

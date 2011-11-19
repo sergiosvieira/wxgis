@@ -20,7 +20,8 @@
  ****************************************************************************/
 
 #include "wxgis/display/rubberband.h"
-#include "wx/evtloop.h"
+
+#include <wx/evtloop.h>
 
 BEGIN_EVENT_TABLE(wxGISRubberBand, wxEvtHandler)
 	EVT_KEY_DOWN(wxGISRubberBand::OnKeyDown)
@@ -50,7 +51,7 @@ wxGISRubberBand::~wxGISRubberBand(void)
 {
 }
 
-OGREnvelope wxGISRubberBand::TrackNew(wxCoord x, wxCoord y)
+OGRGeometrySPtr wxGISRubberBand::TrackNew(wxCoord x, wxCoord y)
 {
 	m_StartX = x;
 	m_StartY = y;
@@ -71,7 +72,7 @@ OGREnvelope wxGISRubberBand::TrackNew(wxCoord x, wxCoord y)
 	}
 	m_pWnd->PopEventHandler();
 	m_pWnd->ReleaseMouse();
-	return m_RetEnv;
+	return m_RetGeom;
 }
 
 void wxGISRubberBand::OnUnlock(void)
@@ -172,19 +173,43 @@ void wxGISRubberEnvelope::OnMouseUp(wxMouseEvent& event)
 	double dX2 = std::max(m_StartX, event.GetX());
 	double dY2 = std::min(m_StartY, event.GetY());
 
-	wxRect rc(wxPoint(dX1, dY1), wxPoint(dX2, dY2));
-	m_RetEnv = m_pDisp->TransformRect(rc);
-	if(IsDoubleEquil(dX1, dX2) || IsDoubleEquil(dY1, dY2))
-	{
-		m_RetEnv.MaxX = m_RetEnv.MinX;
-		m_RetEnv.MaxY = m_RetEnv.MinY;
-	}
+	double dfX1(dX1), dfX2(dX2), dfX3(dX2), dfX4(dX1);
+	double dfY1(dY1), dfY2(dY1), dfY3(dY2), dfY4(dY2);
+	m_pDisp->DC2World(&dfX1, &dfY1);
+	m_pDisp->DC2World(&dfX2, &dfY2);
+	m_pDisp->DC2World(&dfX3, &dfY3);
+	m_pDisp->DC2World(&dfX4, &dfY4);
+
+	OGRLinearRing ring;
+	ring.addPoint(dfX1, dfY1);
+	ring.addPoint(dfX2, dfY2);
+	ring.addPoint(dfX3, dfY3);
+	ring.addPoint(dfX4, dfY4);
+    ring.closeRings();
+
+    OGRPolygon* pRgn = new OGRPolygon();
+    pRgn->addRing(&ring);
+    pRgn->flattenTo2D();
+	//if(pSpaRef)
+	//	pRgn->assignSpatialReference(pSpaRef->Clone());
+	m_RetGeom = OGRGeometrySPtr(static_cast<OGRGeometry*>(pRgn));
+
+	//wxRect rc(wxPoint(dX1, dY1), wxPoint(dX2, dY2));
+	//m_RetEnv = m_pDisp->TransformRect(rc);
+	//if(IsDoubleEquil(dX1, dX2) || IsDoubleEquil(dY1, dY2))
+	//{
+	//	m_RetEnv.MaxX = m_RetEnv.MinX;
+	//	m_RetEnv.MaxY = m_RetEnv.MinY;
+	//}
 	//m_pDisp->DC2World(&dX1, &dY1);
 	//m_pDisp->DC2World(&dX2, &dY2);
 	//m_RetEnv.MinX = dX1;
 	//m_RetEnv.MinY = dY1;
 	//m_RetEnv.MaxX = dX2;
 	//m_RetEnv.MaxY = dY2;
+
+
+
 	OnUnlock();
     m_PrevRect.width = -1;
     m_PrevRect.height = -1;
