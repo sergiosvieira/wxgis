@@ -28,7 +28,7 @@
 // wxChildLoaderThread
 //-----------------------------------
 
-wxChildLoaderThread::wxChildLoaderThread(wxGxRemoteConnectionUI *pGxRemoteConnectionUI, int nBeg, int nEnd, IProgressor* pProgressor) : wxThread(wxTHREAD_JOINABLE)
+wxChildLoaderThread::wxChildLoaderThread(wxGxRemoteConnectionUI *pGxRemoteConnectionUI, int nBeg, int nEnd, IProgressor* pProgressor) : wxThread(wxTHREAD_DETACHED)
 {
 	m_pGxRemoteConnectionUI = pGxRemoteConnectionUI;
 	m_nBeg = nBeg;
@@ -43,6 +43,8 @@ void *wxChildLoaderThread::Entry()
  
     for(int i = m_nBeg; i < m_nEnd; ++i)
     {
+		if(TestDestroy())
+			return (ExitCode)-1;
         m_pGxRemoteConnectionUI->AddSubDataset(i);
         if(m_pProgressor)
             m_pProgressor->SetValue(m_pProgressor->GetValue() + 1);
@@ -84,7 +86,7 @@ void wxGxRemoteConnectionUI::Detach(void)
     for(auto itr = m_pmThreads.begin(); itr != m_pmThreads.end(); ++itr)
     {
         if(itr->second)
-            wgDELETE(itr->second, Wait());
+            wgDELETE(itr->second, Kill());
     }
 	EmptyChildren();
     wxGxRemoteConnection::Detach();

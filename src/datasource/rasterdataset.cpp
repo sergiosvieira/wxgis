@@ -250,8 +250,7 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
 }
 
 bool wxGISRasterDataset::Open(bool bReadOnly)
-{
-	if(m_bIsOpened)
+{	if(m_bIsOpened)
 		return true;
 
 	wxCriticalSectionLocker locker(m_CritSect);
@@ -262,7 +261,9 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
 	
 	if( m_poDataset == NULL )
     {
-        m_sPath.replace(m_sPath.begin(), m_sPath.end(), '\\', '/' );
+		for(size_t i = 0; i < m_sPath.size(); ++i)
+			if(m_sPath[i] == '/')
+				m_sPath[i] = '\\';
         m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath, bReadOnly == true ? GA_ReadOnly : GA_Update );
     }
 	if( m_poDataset == NULL )

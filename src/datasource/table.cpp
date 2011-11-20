@@ -60,7 +60,9 @@ bool wxGISTable::Open(int iLayer, int bUpdate, bool bCache, ITrackCancel* pTrack
 		//bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
 		if( m_poDS == NULL )
 		{
-			m_sPath.replace( m_sPath.begin(), m_sPath.end(), '\\', '/' );
+			for(size_t i = 0; i < m_sPath.size(); ++i)
+				if(m_sPath[i] == '/')
+					m_sPath[i] = '\\';
 			m_poDS = OGRSFDriverRegistrar::Open( m_sPath, FALSE );
 		}
 

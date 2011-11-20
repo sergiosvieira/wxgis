@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-18 23:12+0400\n"
-"PO-Revision-Date: 2011-11-18 23:32+0400\n"
+"POT-Creation-Date: 2011-11-20 04:24+0400\n"
+"PO-Revision-Date: 2011-11-20 04:24+0400\n"
 "Last-Translator: Bishop (aka Barishnikov Dmitriy) <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -14,351 +14,212 @@ msgstr ""
 "X-Poedit-Language: Russian\n"
 "X-Poedit-Country: RUSSIAN FEDERATION\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Poedit-SearchPath-0: D:\\work\\Projects\\wxGIS\\include\\wxgis\\cartoui\n"
-"X-Poedit-SearchPath-1: D:\\work\\Projects\\wxGIS\\src\\cartoui\n"
+"X-Poedit-SearchPath-0: D:\\work\\Projects\\wxGIS\\include\\wxgis\\core\n"
+"X-Poedit-SearchPath-1: D:\\work\\Projects\\wxGIS\\src\\core\n"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:90
-msgid "&Full Extent"
-msgstr "&Full Extent"
+#: D:\work\Projects\wxGIS\src\core/crypt.cpp:92
+msgid "Crypt: Failed EVP_EncryptInit!"
+msgstr "Crypt: Не удалось выполнить EVP_EncryptInit!"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:92
-msgid "&Previous Extent"
-msgstr "&Previous Extent"
+#: D:\work\Projects\wxGIS\src\core/crypt.cpp:106
+msgid "Crypt: Failed EVP_EncryptUpdate!"
+msgstr "Crypt: Не удалось выполнить EVP_EncryptUpdate!"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:94
-msgid "&Next Extent"
-msgstr "&Next Extent"
+#: D:\work\Projects\wxGIS\src\core/crypt.cpp:170
+msgid "Decrypt: Failed EVP_DecryptInit!"
+msgstr "Decrypt: Не удалось выполнить EVP_DecryptInit!"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:107
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:300
-msgid "Geography"
-msgstr "Geography"
+#: D:\work\Projects\wxGIS\src\core/crypt.cpp:188
+msgid "Decrypt: Failed EVP_DecryptUpdate!"
+msgstr "Decrypt: Не удалось выполнить EVP_DecryptUpdate!"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:109
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:302
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:670
-msgid "[No category]"
-msgstr "[No category]"
+#: D:\work\Projects\wxGIS\src\core/format.cpp:29
+#: D:\work\Projects\wxGIS\src\core/format.cpp:301
+msgid "W"
+msgstr "ЗД"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:178
-msgid "Full extent of the map"
-msgstr "Full extent of the map"
+#: D:\work\Projects\wxGIS\src\core/format.cpp:30
+#: D:\work\Projects\wxGIS\src\core/format.cpp:296
+msgid "S"
+msgstr "ЮШ"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:180
-msgid "Previous extent of the map"
-msgstr "Previous extent of the map"
+#: D:\work\Projects\wxGIS\src\core/format.cpp:34
+#: D:\work\Projects\wxGIS\src\core/format.cpp:76
+#: D:\work\Projects\wxGIS\src\core/format.cpp:299
+msgid "E"
+msgstr "ВД"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:182
-msgid "Next extent of the map"
-msgstr "Next extent of the map"
+#: D:\work\Projects\wxGIS\src\core/format.cpp:35
+#: D:\work\Projects\wxGIS\src\core/format.cpp:76
+#: D:\work\Projects\wxGIS\src\core/format.cpp:294
+msgid "N"
+msgstr "СШ"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:214
-msgid "Full Extent"
-msgstr "Full Extent"
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:216
-msgid "Previous Extent"
-msgstr "Previous Extent"
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:218
-msgid "Next Extent"
-msgstr "Next Extent"
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:280
-msgid "Zoom &In"
-msgstr "Zoom &In"
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:282
-msgid "Zoom &Out"
-msgstr "Zoom &Out"
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:284
-msgid "&Pan"
-msgstr "&Pan"
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:286
-msgid "&Information"
-msgstr "&Information"
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:366
-msgid "Zoom map in"
-msgstr "Zoom map in"
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:368
-msgid "Zoom map out"
-msgstr "Zoom map out"
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:370
-msgid "Pan map"
-msgstr "Pan map"
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:372
-msgid "Feature information"
-msgstr "Feature information"
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:403
-msgid "Zoom In"
-msgstr "Zoom In"
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:405
-msgid "Zoom Out"
-msgstr "Zoom Out"
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:407
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:405
-msgid "Pan"
-msgstr "Pan"
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:409
-msgid "Information"
-msgstr "Information"
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:651
-msgid "&Rotate"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:653
-msgid "Cancel rotate"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:655
-msgid "Input rotate angle"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:668
-msgid "View"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:734
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:775
-msgid "Rotate map frame"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:736
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:777
-msgid "Cancel rotate map frame"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:738
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:779
-msgid "Input map frame rotate angle"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/formatmenu.cpp:60
-msgid "Swap coordinates"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/formatmenu.cpp:69
-msgid "Change masks"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/formatmenu.cpp:142
-msgid "Change value list"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/formatmenu.cpp:142
-msgid "Value list"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:80
-msgid "Location:"
-msgstr "Location:"
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:90
-msgid "Select location text style"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:97
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:122
-msgid "Field"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:98
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:123
-msgid "Value"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:122
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:123
+#: D:\work\Projects\wxGIS\src\core/init.cpp:56
 #, c-format
-msgid "Copy %s"
-msgstr ""
+msgid "wxGISAppWithLibs: Library %s loaded"
+msgstr "wxGISAppWithLibs: Библиотека %s загружена"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:122
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:123
+#: D:\work\Projects\wxGIS\src\core/init.cpp:60
 #, c-format
-msgid "Copy '%s' value"
-msgstr ""
+msgid "wxGISAppWithLibs: Error loading library %s"
+msgstr "wxGISAppWithLibs: Ошибка загрузки библиотеки %s"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:124
-msgid "Copy"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:125
-msgid "Hide"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:125
-msgid "Hide rows"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:127
-msgid "Remove sort"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:364
-msgid "Identify from:"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:369
-msgid "<Top layer>"
-msgstr "<Top layer>"
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:404
-msgid "Flash"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:404
-msgid "Flash geometry"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:405
-msgid "Pan to geometry center"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:406
-msgid "Zoom"
-msgstr "Zoom"
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:406
-msgid "Zoom to geometry"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:494
-msgid "Identify"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/mapview.cpp:623
+#: D:\work\Projects\wxGIS\src\core/init.cpp:121
 #, c-format
-msgid "%.4f degree"
-msgstr ""
+msgid "wxGISInitializer: %s %s is initializing..."
+msgstr "wxGISInitializer: %s %s инициализируется..."
 
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:35
-msgid "Layer:"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:39
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:46
-msgid "Combo!"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:42
-msgid "Method:"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:60
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:63
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:66
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:162
-msgid "MyButton"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:79
-msgid "="
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:84
-msgid "<>"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:89
-msgid "Like"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:94
-msgid ">"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:99
-msgid ">="
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:104
-msgid "And"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:109
-msgid "<"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:114
-msgid "<="
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:119
-msgid "Or"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:124
-msgid "_"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:129
-msgid "( )"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:134
-msgid "Not"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:139
-msgid "%"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:144
-msgid "Is"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:149
-msgid "..."
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:169
-msgid "SELECT * FROM tablename WHERE:"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:178
-msgid "Clear"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:181
-msgid "Check"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:184
-msgid "Help"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:189
-msgid "Load..."
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/sqlquerydialog.cpp:192
-msgid "Save..."
-msgstr ""
-
-#: D:\work\Projects\wxGIS\src\cartoui/tableview.cpp:228
-msgid "Record:"
-msgstr "Record:"
-
-#: D:\work\Projects\wxGIS\include\wxgis\cartoui/sqlquerydialog.h:113
-msgid "Select by attributes"
-msgstr ""
-
-#: D:\work\Projects\wxGIS\include\wxgis\cartoui/tableview.h:125
+#: D:\work\Projects\wxGIS\src\core/init.cpp:167
 #, c-format
-msgid "of %u"
-msgstr "of %u"
+msgid "wxGISInitializer: System dir is absent! Lookup path '%s'"
+msgstr "wxGISInitializer: Не удалось найти директорию системных настроек! Путьпоиска '%s'"
+
+#: D:\work\Projects\wxGIS\src\core/init.cpp:181
+msgid "wxGISInitializer: Failed to get log dir"
+msgstr "wxGISInitializer: Не удалось получить директорию файлов журналов"
+
+#: D:\work\Projects\wxGIS\src\core/init.cpp:191
+#, c-format
+msgid "wxGISInitializer: Failed to open log file %s"
+msgstr "wxGISInitializer: Не удалось открыть файл журнала %s"
+
+#: D:\work\Projects\wxGIS\src\core/init.cpp:203
+#, c-format
+msgid "HOST '%s': OS desc - %s, free memory - %u Mb"
+msgstr "Хост  '%s': ОС - %s, свободная память - %u Mb"
+
+#: D:\work\Projects\wxGIS\src\core/init.cpp:204
+#, c-format
+msgid "wxGISInitializer: Log file: %s"
+msgstr "wxGISInitializer: Файл журнала: %s"
+
+#: D:\work\Projects\wxGIS\src\core/init.cpp:211
+msgid "wxGISInitializer: Initialize locale"
+msgstr "wxGISInitializer: Инициализация локализации"
+
+#: D:\work\Projects\wxGIS\src\core/init.cpp:226
+#, c-format
+msgid "wxGISInitializer: Language is set to %s"
+msgstr "wxGISInitializer: Выбран язык %s"
+
+#: D:\work\Projects\wxGIS\src\core/process.cpp:133
+msgid "Stream Wait"
+msgstr "Поток ожидания"
+
+#: D:\work\Projects\wxGIS\src\core/process.cpp:134
+msgid "The execution communication is unavalible!"
+msgstr "Команда недоступна!"
+
+#: D:\work\Projects\wxGIS\include\wxgis\core/core.h:227
+msgid "wxGISCore"
+msgstr "wxGISCore"
+
+#: D:\work\Projects\wxGIS\include\wxgis\core/core.h:230
+#, c-format
+msgid "%s: Can't create %s Thread!"
+msgstr "%s: Не возможно создать поток %s!"
+
+#: D:\work\Projects\wxGIS\include\wxgis\core/core.h:236
+#, c-format
+msgid "%s: Can't run %s Thread!"
+msgstr "%s: Не возможно запустить поток %s!"
+
+#~ msgid "&Full Extent"
+#~ msgstr "&Полный охват"
+
+#~ msgid "&Previous Extent"
+#~ msgstr "П&редыдущий охват"
+
+#~ msgid "&Next Extent"
+#~ msgstr "&Следующий охват"
+
+#~ msgid "Geography"
+#~ msgstr "География"
+
+#~ msgid "[No category]"
+#~ msgstr "[Без категории]"
+
+#~ msgid "Full extent of the map"
+#~ msgstr "Полный охват карты"
+
+#~ msgid "Previous extent of the map"
+#~ msgstr "Предыдущий охват карты"
+
+#~ msgid "Next extent of the map"
+#~ msgstr "Следующий охват карты"
+
+#~ msgid "Full Extent"
+#~ msgstr "Полный охват"
+
+#~ msgid "Previous Extent"
+#~ msgstr "Предыдущий охват"
+
+#~ msgid "Next Extent"
+#~ msgstr "Следующий охват"
+
+#~ msgid "Zoom &In"
+#~ msgstr "&Увеличить"
+
+#~ msgid "Zoom &Out"
+#~ msgstr "У&меньшить"
+
+#~ msgid "&Pan"
+#~ msgstr "&Сдвинуть"
+
+#~ msgid "&Information"
+#~ msgstr "&Информация"
+
+#~ msgid "Zoom map in"
+#~ msgstr "Увеличить карту"
+
+#~ msgid "Zoom map out"
+#~ msgstr "Уменьшить карту"
+
+#~ msgid "Pan map"
+#~ msgstr "Сдвинуть карту"
+
+#~ msgid "Feature information"
+#~ msgstr "Информация об объекте"
+
+#~ msgid "Zoom In"
+#~ msgstr "Увеличить"
+
+#~ msgid "Zoom Out"
+#~ msgstr "Уменьшить"
+
+#~ msgid "Pan"
+#~ msgstr "Сдвинуть"
+
+#~ msgid "Information"
+#~ msgstr "Информация"
+
+#~ msgid "&Rotate"
+#~ msgstr "Пов&ернуть"
+
+#~ msgid "Cancel rotate"
+#~ msgstr "Отменить поворот"
+
+#~ msgid "Input rotate angle"
+#~ msgstr "Ввести угол поворота"
+
+#, fuzzy
+#~ msgid "Location:"
+#~ msgstr "Информация"
+
+#, fuzzy
+#~ msgid "<Top layer>"
+#~ msgstr "новый слой"
+
+#, fuzzy
+#~ msgid "Zoom"
+#~ msgstr "Увеличить"
+
+#~ msgid "Record:"
+#~ msgstr "Запись:"
+
+#~ msgid "of %u"
+#~ msgstr "из %u"
 
 #~ msgid "new map"
 #~ msgstr "новая карта"
@@ -380,9 +241,6 @@ msgstr "of %u"
 
 #~ msgid " [*]"
 #~ msgstr " [*]"
-
-#~ msgid "wxGISMapView: Can't create wxDrawingThread!"
-#~ msgstr "wxGISMapView: Невозможно создать wxDrawingThread!"
 
 #~ msgid "wxGISMapView: Can't run wxDrawingThread!"
 #~ msgstr "wxGISMapView: Невозможно запустить wxDrawingThread!"

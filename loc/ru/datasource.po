@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-18 23:12+0400\n"
-"PO-Revision-Date: 2011-11-19 00:12+0400\n"
+"POT-Creation-Date: 2011-11-20 04:24+0400\n"
+"PO-Revision-Date: 2011-11-20 04:24+0400\n"
 "Last-Translator: Bishop (aka Barishnikov Dmitriy) <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -26,22 +26,22 @@ msgstr "Предварительная загрузка геометрии из 
 msgid "Try to connect: host='%s' dbname='%s' port='%s' user='%s'"
 msgstr "Попытка подключения: хост='%s' база данных='%s' порт='%s' логин='%s'"
 
-#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:271
+#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:272
 #, c-format
 msgid "wxGISRasterDataset: Open failed! Path '%s'. GDAL error: %s"
 msgstr "wxGISRasterDataset: Невозможно открыть! Путь '%s'. Ошибка GDAL: %s"
 
-#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:307
+#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:308
 #, c-format
 msgid "wxGISRasterDataset: Open failed! Path '%s'. Raster has no bands"
 msgstr "wxGISRasterDataset: Невозможно открыть! Путь '%s'. Нет каналов в растре"
 
-#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:573
+#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:574
 #, c-format
 msgid "AdviseRead failed! GDAL error: %s"
 msgstr "Не удалось выполнить AdviseRead! Ошибка GDAL: %s"
 
-#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:591
+#: D:\work\Projects\wxGIS\src\datasource/rasterdataset.cpp:592
 #, c-format
 msgid "RasterIO failed! GDAL error: %s"
 msgstr "Не удалось выполнить RasterIO! Ошибка GDAL: %s"
@@ -55,24 +55,24 @@ msgstr "Не возможно открыть входной файл! Ошибк
 msgid "Error create the output file '%s'! OGR error: "
 msgstr "Не возможно создать выходной файл '%s'! Ошибка OGR: "
 
-#: D:\work\Projects\wxGIS\src\datasource/table.cpp:70
+#: D:\work\Projects\wxGIS\src\datasource/table.cpp:72
 #, c-format
 msgid "wxGISTable: Open failed! Path '%s'. OGR error: %s"
 msgstr "wxGISTable: Невозможно открыть! Путь '%s'.Ошибка OGR: %s"
 
-#: D:\work\Projects\wxGIS\src\datasource/table.cpp:153
+#: D:\work\Projects\wxGIS\src\datasource/table.cpp:155
 msgid "PreLoad Features of "
 msgstr "Предварительная загрузка геоданных из "
 
-#: D:\work\Projects\wxGIS\src\datasource/table.cpp:413
+#: D:\work\Projects\wxGIS\src\datasource/table.cpp:415
 msgid "%d-%m-%Y"
 msgstr "%d-%m-%Y"
 
-#: D:\work\Projects\wxGIS\src\datasource/table.cpp:426
+#: D:\work\Projects\wxGIS\src\datasource/table.cpp:428
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
-#: D:\work\Projects\wxGIS\src\datasource/table.cpp:439
+#: D:\work\Projects\wxGIS\src\datasource/table.cpp:441
 msgid "%d-%m-%Y %H:%M:%S"
 msgstr "%d-%m-%Y %H:%M:%S"
 

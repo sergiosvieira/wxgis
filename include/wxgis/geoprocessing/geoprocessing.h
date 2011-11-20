@@ -27,6 +27,7 @@
 #define VECSTR _("Vector")
 #define DMTSTR _("Data Management Tools")
 #define RASSTR _("Raster")
+#define STATSTR _("Statistics Tools")
 
 #define TOOLBX_NAME wxT("wxGISToolbox")
 

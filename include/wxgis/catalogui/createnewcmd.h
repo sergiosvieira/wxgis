@@ -49,4 +49,6 @@ private:
 	wxIcon m_IconCreateRemoteConn;
 	wxIcon m_LargeConnIcon, m_SmallConnIcon;
 	wxIcon m_LargeDisconnIcon, m_SmallDisconnIcon;
+    wxIcon m_LargeIconFeatureClass, m_SmallIconFeatureClass;
+    wxIcon m_LargeIconTable, m_SmallIconTable;
 };
