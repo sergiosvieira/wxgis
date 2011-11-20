@@ -137,6 +137,8 @@ bool wxGxFolderUI::Drop(const wxArrayString& filenames, bool bMove)
                 return false;
         }
     }
+	ProgressDlg.SetValue(ProgressDlg.GetValue() + 1);
+	ProgressDlg.Destroy();
     return true;
 }
 
