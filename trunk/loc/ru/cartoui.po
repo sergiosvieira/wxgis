@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-18 23:12+0400\n"
-"PO-Revision-Date: 2011-11-19 16:59+0400\n"
+"POT-Creation-Date: 2011-11-20 04:24+0400\n"
+"PO-Revision-Date: 2011-11-20 04:24+0400\n"
 "Last-Translator: Bishop (aka Barishnikov Dmitriy) <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -36,7 +36,7 @@ msgstr "География"
 
 #: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:109
 #: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:302
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:670
+#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:669
 msgid "[No category]"
 msgstr "[Без категории]"
 
@@ -105,7 +105,7 @@ msgid "Zoom Out"
 msgstr "Уменьшить"
 
 #: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:407
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:405
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:408
 msgid "Pan"
 msgstr "Сдвинуть"
 
@@ -113,34 +113,34 @@ msgstr "Сдвинуть"
 msgid "Information"
 msgstr "Информация"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:651
+#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:650
 msgid "&Rotate"
 msgstr "По&вернуть"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:653
+#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:652
 msgid "Cancel rotate"
 msgstr "Отменить поворот"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:655
+#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:654
 msgid "Input rotate angle"
 msgstr "Ввести угол поворота"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:668
+#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:667
 msgid "View"
 msgstr "Вид"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:734
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:775
+#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:733
+#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:774
 msgid "Rotate map frame"
 msgstr "Повернуть окно карты"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:736
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:777
+#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:735
+#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:776
 msgid "Cancel rotate map frame"
 msgstr "Отменить поворот окна карты"
 
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:738
-#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:779
+#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:737
+#: D:\work\Projects\wxGIS\src\cartoui/cartocmd.cpp:778
 msgid "Input map frame rotate angle"
 msgstr "Ввести угол поворота окна карты"
 
@@ -160,81 +160,81 @@ msgstr "Изменить список значений"
 msgid "Value list"
 msgstr "Список значений"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:80
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:83
 msgid "Location:"
 msgstr "Местоположение:"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:90
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:93
 msgid "Select location text style"
 msgstr "Выберите шаблон вывода координат"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:97
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:122
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:100
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:125
 msgid "Field"
 msgstr "Поле"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:98
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:123
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:101
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:126
 msgid "Value"
 msgstr "Значение"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:122
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:123
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:125
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:126
 #, c-format
 msgid "Copy %s"
 msgstr "Копировать %s"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:122
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:123
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:125
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:126
 #, c-format
 msgid "Copy '%s' value"
 msgstr "Копировать значение '%s'"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:124
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:127
 msgid "Copy"
 msgstr "Копировать"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:125
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:128
 msgid "Hide"
 msgstr "Скрыть"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:125
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:128
 msgid "Hide rows"
 msgstr "Скрыть строки"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:127
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:130
 msgid "Remove sort"
 msgstr "Отменить сортировку"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:364
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:367
 msgid "Identify from:"
 msgstr "Идентифицировать из:"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:369
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:372
 msgid "<Top layer>"
 msgstr "<Верхний слой>"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:404
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:407
 msgid "Flash"
 msgstr "Подсветить"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:404
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:407
 msgid "Flash geometry"
 msgstr "Подсветить геометрию"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:405
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:408
 msgid "Pan to geometry center"
 msgstr "Перейти к центру геометрии"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:406
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:409
 msgid "Zoom"
 msgstr "Увеличить"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:406
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:409
 msgid "Zoom to geometry"
 msgstr "Приблизить к геометрии"
 
-#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:494
+#: D:\work\Projects\wxGIS\src\cartoui/identifydlg.cpp:497
 msgid "Identify"
 msgstr "Идентификация"
 

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-18 23:12+0400\n"
-"PO-Revision-Date: 2011-11-18 23:34+0400\n"
+"POT-Creation-Date: 2011-11-20 04:24+0400\n"
+"PO-Revision-Date: 2011-11-20 04:24+0400\n"
 "Last-Translator: Bishop (aka Barishnikov Dmitriy) <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -19,70 +19,70 @@ msgstr ""
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:77
 msgid "&Export"
-msgstr "&Export"
+msgstr "&Экспорт"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:79
 msgid "Show/Hide &Toolbox pane"
-msgstr "Show/Hide &Toolbox pane"
+msgstr "Показать/Скрыть панель &наборов инструментов"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:90
 #: D:\work\Projects\wxGIS\src\geoprocessingui/taskcmd.cpp:88
 msgid "Geoprocessing"
-msgstr "Geoprocessing"
+msgstr "Геопроцессинг"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:92
 msgid "View"
-msgstr "View"
+msgstr "Вид"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:94
 #: D:\work\Projects\wxGIS\src\geoprocessingui/taskcmd.cpp:90
 msgid "[No category]"
-msgstr "[No category]"
+msgstr "[Без категории]"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:173
 msgid "Export item to another format"
-msgstr "Export item to another format"
+msgstr "Экспорт в другой формат"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:175
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:443
 msgid "Show/Hide Toolbox pane"
-msgstr "Show/Hide Toolbox pane"
+msgstr "Показать/Скрыть панель наборов инструментов"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:236
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:333
 msgid "Select output"
-msgstr "Select output"
+msgstr "Выбрать выходной объект"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:256
 msgid "Export"
-msgstr "Export"
+msgstr "Экспорт"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:266
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:350
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:351
 msgid "Null IGxObjectFilter returned"
-msgstr "Null IGxObjectFilter returned"
+msgstr "Возвращен пустой IGxObjectFilter"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:274
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:359
 #, c-format
 msgid "%s %d objects (files)"
-msgstr ""
+msgstr "%s %d объектов (файлов)"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:274
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:359
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:365
 msgid "Process"
-msgstr "Process"
+msgstr "Процесс"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:276
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:361
 msgid "Begin operation..."
-msgstr ""
+msgstr "Начать операцию..."
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:280
 msgid "The dataset is empty"
-msgstr "The dataset is empty"
+msgstr "Пустой набор данных"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:280
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:350
@@ -90,29 +90,29 @@ msgstr "The dataset is empty"
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptoolbox.cpp:503
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:750
 msgid "Error"
-msgstr "Error"
+msgstr "Ошибка"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:281
 msgid "Null wxGISDataset returned"
-msgstr "Null wxGISDataset returned"
+msgstr "Возвращен пустой wxGISDataset"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:290
 msgid "Open dataset failed!"
-msgstr "Open dataset failed!"
+msgstr "Не удалось открыть набор данных!"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:365
 #, c-format
 msgid "%s %d object (file) from %d"
-msgstr ""
+msgstr "%s %d объект (файл) из %d"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:384
 #, c-format
 msgid "The %d dataset is empty"
-msgstr "The %d dataset is empty"
+msgstr "Набор данных %d пустой"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/geoprocessingcmd.cpp:441
 msgid "Export item"
-msgstr "Export item"
+msgstr "Экспорт элемента"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:115
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:349
@@ -123,91 +123,91 @@ msgstr "Export item"
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:1242
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:1383
 msgid "(optional)"
-msgstr "(optional)"
+msgstr " (опционально)"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:152
 msgid "Select input object"
-msgstr "Select input object"
+msgstr "Выбрать исходный объект"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:177
 msgid "Select output object"
-msgstr "Select output object"
+msgstr "Выбрать выходной объект"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:226
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:1071
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:1300
 msgid "The value is required"
-msgstr "The value is required"
+msgstr "Требуется значение"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:244
 msgid "The output object exists and will be overwritten!"
-msgstr "The output object exists and will be overwritten!"
+msgstr "Выходной объект существует и будет перезаписан!"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:253
 msgid "The input object doesn't exist"
-msgstr "The input object doesn't exist"
+msgstr "Исходный объект не существует"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:414
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:583
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:1302
 msgid "The input data are invalid"
-msgstr "The input data are invalid"
+msgstr "Неправильные исходные данные"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:710
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:1275
 msgid "Change value list"
-msgstr ""
+msgstr "Изменить список значений"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:710
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:1275
 msgid "Value list"
-msgstr "Value list"
+msgstr "Список значений"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:881
 msgid "Select Spatial Reference"
-msgstr "Select Spatial Reference"
+msgstr "Выбор Системы координат"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:885
 msgid "Coordinate Systems"
-msgstr "Coordinate Systems"
+msgstr "Системы координат"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gpcontrols.cpp:929
 msgid "Unsupported Spatial reference"
-msgstr "Unsupported Spatial reference"
+msgstr "Система координат не поддерживается"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptaskexecdlg.cpp:77
 msgid "Expand"
-msgstr "Expand"
+msgstr "Раскрыть"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptaskexecdlg.cpp:91
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptooldlg.cpp:173
 msgid "Cancel"
-msgstr "Cancel"
+msgstr "Отмена"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptaskexecdlg.cpp:212
 msgid "You mast stop task before closing dialog!"
-msgstr ""
+msgstr "Вы должны остановить задачу перед закрытием диалога!"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptaskexecdlg.cpp:212
 msgid "Warning"
-msgstr ""
+msgstr "Предупреждение"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptoolbox.cpp:231
 msgid "Wrong input tool!"
-msgstr "Wrong input tool!"
+msgstr "Неверный инструмент!"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptoolbox.cpp:338
 msgid "Recent"
-msgstr "Recent"
+msgstr "Часто используемые"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptoolbox.cpp:374
 #, c-format
 msgid "Executed list [%d]"
-msgstr "Executed list [%d]"
+msgstr "Список выполнения [%d]"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptoolbox.cpp:376
 msgid "Executed list"
-msgstr "Executed list"
+msgstr "Список выполнения"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptoolbox.cpp:503
 #, c-format
@@ -215,76 +215,76 @@ msgid ""
 "Error find %s tool!\n"
 "Cannnot continue."
 msgstr ""
-"Error find %s tool!\n"
-"Cannnot continue."
+"Ошибка поиска инструмента %s!\n"
+"Невозможно продолжить."
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptoolboxview.cpp:47
 #: D:\work\Projects\wxGIS\include\wxgis\geoprocessingui/gptoolbox.h:45
 #: D:\work\Projects\wxGIS\include\wxgis\geoprocessingui/gptoolbox.h:120
 #: D:\work\Projects\wxGIS\include\wxgis\geoprocessingui/gptoolbox.h:161
 msgid "Toolbox"
-msgstr "Toolbox"
+msgstr "Набор инструментов"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptoolboxview.cpp:91
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptoolboxview.cpp:153
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptoolboxview.cpp:173
 #: D:\work\Projects\wxGIS\include\wxgis\geoprocessingui/gptoolbox.h:84
 msgid "Toolboxes"
-msgstr "Toolboxes"
+msgstr "Наборы инструментов"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptooldlg.cpp:170
 msgid "OK"
-msgstr "OK"
+msgstr "ОК"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptooldlg.cpp:175
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptooldlg.cpp:234
 msgid "Show Help"
-msgstr "Show Help"
+msgstr "Показать справку"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptooldlg.cpp:234
 msgid "Hide Help"
-msgstr "Hide Help"
+msgstr "Скрыть справку"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gptooldlg.cpp:306
 #, c-format
 msgid "(Field No %d)"
-msgstr ""
+msgstr "(Поле № %d)"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:122
 msgid "Tool Execute View"
-msgstr "Tool Execute View"
+msgstr "Вид списка исполнения"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:127
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:244
 msgid "Priority"
-msgstr "Priority"
+msgstr "Приоритет"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:128
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:245
 #: D:\work\Projects\wxGIS\include\wxgis\geoprocessingui/gptooldlg.h:51
 msgid "Tool name"
-msgstr "Tool name"
+msgstr "Название инструмента"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:129
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:246
 #: D:\work\Projects\wxGIS\src\geoprocessingui/taskcmd.cpp:72
 msgid "Start"
-msgstr "Start"
+msgstr "Начало"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:130
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:247
 msgid "Finish"
-msgstr "Finish"
+msgstr "Конец"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:131
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:248
 msgid "Done %"
-msgstr "Done %"
+msgstr "Завершено %"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:132
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:249
 msgid "Last message"
-msgstr "Last message"
+msgstr "Последнее сообщение"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:286
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:289
@@ -301,47 +301,47 @@ msgstr "%.1f%%"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/gxtoolexecview.cpp:750
 msgid "Unsupported data!"
-msgstr "Unsupported data!"
+msgstr "Данные не поддерживаются!"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/taskcmd.cpp:68
 msgid "Show tool dialog"
-msgstr "Show tool dialog"
+msgstr "Показать диалог инструмента"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/taskcmd.cpp:70
 msgid "Show execution dialog"
-msgstr "Show execution dialog"
+msgstr "Показать диалог исполнения"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/taskcmd.cpp:74
 msgid "Stop"
-msgstr ""
+msgstr "Остановить"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/taskcmd.cpp:203
 #: D:\work\Projects\wxGIS\src\geoprocessingui/taskcmd.cpp:303
 msgid "Show tool config dialog"
-msgstr "Show tool config dialog"
+msgstr "Показать диалог настройки инструмента"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/taskcmd.cpp:205
 #: D:\work\Projects\wxGIS\src\geoprocessingui/taskcmd.cpp:305
 msgid "Show task execution dialog"
-msgstr "Show task execution dialog"
+msgstr "Показать диалог исполнения инструмента"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/taskcmd.cpp:207
 #: D:\work\Projects\wxGIS\src\geoprocessingui/taskcmd.cpp:307
 msgid "Start task"
-msgstr "Start task"
+msgstr "Запустить задачу"
 
 #: D:\work\Projects\wxGIS\src\geoprocessingui/taskcmd.cpp:209
 #: D:\work\Projects\wxGIS\src\geoprocessingui/taskcmd.cpp:309
 msgid "Stop task"
-msgstr ""
+msgstr "Остановить задачу"
 
 #: D:\work\Projects\wxGIS\include\wxgis\geoprocessingui/gptaskexecdlg.h:126
 msgid "Task"
-msgstr "Task"
+msgstr "Задача"
 
 #: D:\work\Projects\wxGIS\include\wxgis\geoprocessingui/gptoolbox.h:207
 msgid "Tool"
-msgstr "Tool"
+msgstr "Инструмент"
 
 #~ msgid "Please wait, working..."
 #~ msgstr "Дождитесь окончания процесса..."

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wxGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-18 23:12+0400\n"
-"PO-Revision-Date: 2011-11-19 17:02+0400\n"
+"POT-Creation-Date: 2011-11-20 04:24+0400\n"
+"PO-Revision-Date: 2011-11-20 04:24+0400\n"
 "Last-Translator: Bishop (aka Barishnikov Dmitriy) <polimax@mail.ru>\n"
 "Language-Team: gis-lab <sim@gis-lab.info>\n"
 "MIME-Version: 1.0\n"
@@ -84,7 +84,7 @@ msgid "Catalog"
 msgstr "Каталог"
 
 #: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:204
-#: D:\work\Projects\wxGIS\src\catalogui/createnewcmd.cpp:75
+#: D:\work\Projects\wxGIS\src\catalogui/createnewcmd.cpp:80
 msgid "New"
 msgstr "Новый"
 
@@ -97,7 +97,7 @@ msgid "Miscellaneous"
 msgstr "Прочее"
 
 #: D:\work\Projects\wxGIS\src\catalogui/catalogcmd.cpp:214
-#: D:\work\Projects\wxGIS\src\catalogui/createnewcmd.cpp:77
+#: D:\work\Projects\wxGIS\src\catalogui/createnewcmd.cpp:82
 msgid "[No category]"
 msgstr "[Без категории]"
 
@@ -264,16 +264,16 @@ msgstr "Вставить выбранный(е) элемент(ы)"
 msgid "Path:   "
 msgstr "Путь:"
 
-#: D:\work\Projects\wxGIS\src\catalogui/createnewcmd.cpp:64
+#: D:\work\Projects\wxGIS\src\catalogui/createnewcmd.cpp:69
 msgid "&Remote connection"
 msgstr "Подлючение к &удаленной базе"
 
-#: D:\work\Projects\wxGIS\src\catalogui/createnewcmd.cpp:133
-#: D:\work\Projects\wxGIS\src\catalogui/createnewcmd.cpp:208
+#: D:\work\Projects\wxGIS\src\catalogui/createnewcmd.cpp:138
+#: D:\work\Projects\wxGIS\src\catalogui/createnewcmd.cpp:221
 msgid "Create new remote connection"
 msgstr "Создать новое подключение"
 
-#: D:\work\Projects\wxGIS\src\catalogui/createnewcmd.cpp:158
+#: D:\work\Projects\wxGIS\src\catalogui/createnewcmd.cpp:163
 msgid "new remote connection"
 msgstr "новое подключение к удаленной базе"
 
@@ -461,7 +461,7 @@ msgstr "Переходить к последнему пути когда зап�
 msgid "Show hidden items"
 msgstr "Показать скрытые элементы"
 
-#: D:\work\Projects\wxGIS\src\catalogui/gxremoteconnui.cpp:129
+#: D:\work\Projects\wxGIS\src\catalogui/gxremoteconnui.cpp:131
 msgid "Connect failed!"
 msgstr "Подключение не удалось!"
 

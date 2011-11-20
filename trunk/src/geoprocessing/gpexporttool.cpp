@@ -74,15 +74,15 @@ GPParameters wxGISGPExportTool::GetParameterInfo(void)
 
         m_paParam.Add(static_cast<IGPParameter*>(pParam1));
 
-        //SQL statement
-        wxGISGPParameter* pParam2 = new wxGISGPParameter();
-        pParam2->SetName(wxT("sql_statement"));
-        pParam2->SetDisplayName(_("SQL statement"));
-        pParam2->SetParameterType(enumGISGPParameterTypeOptional);
-        pParam2->SetDataType(enumGISGPParamDTQuery);
-        pParam2->SetDirection(enumGISGPParameterDirectionInput);
+        ////SQL statement
+        //wxGISGPParameter* pParam2 = new wxGISGPParameter();
+        //pParam2->SetName(wxT("sql_statement"));
+        //pParam2->SetDisplayName(_("SQL statement"));
+        //pParam2->SetParameterType(enumGISGPParameterTypeOptional);
+        //pParam2->SetDataType(enumGISGPParamDTQuery);
+        //pParam2->SetDirection(enumGISGPParameterDirectionInput);
 
-        m_paParam.Add(static_cast<IGPParameter*>(pParam2));
+        //m_paParam.Add(static_cast<IGPParameter*>(pParam2));
 
         //dst path
         wxGISGPParameter* pParam3 = new wxGISGPParameter();
@@ -106,14 +106,41 @@ GPParameters wxGISGPExportTool::GetParameterInfo(void)
 
 bool wxGISGPExportTool::Validate(void)
 {
-    if(!m_paParam[2]->GetAltered())
+    //if(!m_paParam[2]->GetAltered())
+    //{
+    //    if(m_paParam[0]->GetIsValid())
+    //    {
+    //        //same name but different ext
+    //        wxString sPath = m_paParam[0]->GetValue();
+    //        m_paParam[2]->SetValue(wxVariant(sPath, wxT("path")));
+    //        m_paParam[2]->SetAltered(true);//??
+    //    }
+    //}
+
+    ////check if input & output types is same!
+    //if(m_paParam[0]->GetIsValid())
+    //{
+    //    //TODO: Maybe IGxDataset in future?
+    //    //IGxDataset* pDset1 = m_pCatalog->SearchChild()
+    //    wxFileName Name1(m_paParam[0]->GetValue());
+    //    wxFileName Name2(m_paParam[2]->GetValue());
+    //    if(Name1.GetExt() == Name2.GetExt())
+    //    {
+    //        m_paParam[2]->SetIsValid(false);
+    //        m_paParam[2]->SetMessage(wxGISEnumGPMessageError, _("Cannot export to the same format"));
+    //        return false;
+    //    }
+    //}
+    //return true;
+
+	if(!m_paParam[1]->GetAltered())
     {
         if(m_paParam[0]->GetIsValid())
         {
             //same name but different ext
             wxString sPath = m_paParam[0]->GetValue();
-            m_paParam[2]->SetValue(wxVariant(sPath, wxT("path")));
-            m_paParam[2]->SetAltered(true);//??
+            m_paParam[1]->SetValue(wxVariant(sPath, wxT("path")));
+            m_paParam[1]->SetAltered(true);//??
         }
     }
 
@@ -123,15 +150,16 @@ bool wxGISGPExportTool::Validate(void)
         //TODO: Maybe IGxDataset in future?
         //IGxDataset* pDset1 = m_pCatalog->SearchChild()
         wxFileName Name1(m_paParam[0]->GetValue());
-        wxFileName Name2(m_paParam[2]->GetValue());
+        wxFileName Name2(m_paParam[1]->GetValue());
         if(Name1.GetExt() == Name2.GetExt())
         {
-            m_paParam[2]->SetIsValid(false);
-            m_paParam[2]->SetMessage(wxGISEnumGPMessageError, _("Cannot export to the same format"));
+            m_paParam[1]->SetIsValid(false);
+            m_paParam[1]->SetMessage(wxGISEnumGPMessageError, _("Cannot export to the same format"));
             return false;
         }
     }
     return true;
+
 }
 
 bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
@@ -191,7 +219,8 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
     
-    wxString sDstPath = m_paParam[2]->GetValue();
+//    wxString sDstPath = m_paParam[2]->GetValue();
+    wxString sDstPath = m_paParam[1]->GetValue();
 
 	//check overwrite & do it!
 	if(!OverWriteGxObject(pGxObjectContainer->SearchChild(sDstPath), pTrackCancel))
@@ -205,8 +234,10 @@ bool wxGISGPExportTool::Execute(ITrackCancel* pTrackCancel)
     wxFileName sDstFileName(sDstPath);
     wxString sName = sDstFileName.GetName();
     
-    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_paParam[2]->GetDomain());
-	IGxObjectFilter* pFilter = pDomain->GetFilter(m_paParam[2]->GetSelDomainValue());
+    //wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_paParam[2]->GetDomain());
+	//IGxObjectFilter* pFilter = pDomain->GetFilter(m_paParam[2]->GetSelDomainValue());
+    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_paParam[1]->GetDomain());
+	IGxObjectFilter* pFilter = pDomain->GetFilter(m_paParam[1]->GetSelDomainValue());
     if(!pFilter)
     {
         //add messages to pTrackCancel

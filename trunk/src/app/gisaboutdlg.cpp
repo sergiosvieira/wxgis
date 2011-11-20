@@ -50,6 +50,8 @@ wxGISSimpleTextPanel::wxGISSimpleTextPanel( wxString soText, wxWindow* parent, w
 
 	this->SetSizer( bSizer );
 	this->Layout();
+
+	m_pStaticText->SetSelection(0,0);
 }
 
 wxGISSimpleTextPanel::~wxGISSimpleTextPanel()
@@ -124,15 +126,37 @@ wxString wxVer( wxVERSION_STRING );
 
 	m_AuiNotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE );
 
-    wxString sAboutApp = wxString::Format(_("wxGIS [%s]\n\nVersion: %s\n\Build: %s\n\n(c) 2009-%d Dmitry Barishnikov (Bishop)\n\nhttp://wxgis.googlecode.com/"), pApp->GetAppName().c_str(), pApp->GetAppVersionString().c_str(), wxString(__DATE__,wxConvLibc).c_str(),  __YEAR__);
+    wxString sAboutApp = wxString::Format(_("wxGIS [%s]\n\nVersion: %s\n\nBuild: %s\n\n(c) 2009-%d Dmitry Barishnikov (Bishop)\n\nhttp://wxgis.googlecode.com/"), pApp->GetAppName().c_str(), pApp->GetAppVersionString().c_str(), wxString(__DATE__,wxConvLibc).c_str(),  __YEAR__);
 	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutApp, m_AuiNotebook), _("About application"));
 
     long dFreeMem =  wxMemorySize(wxGetFreeMemory() / 1048576).ToLong();
-    wxString sAboutSys = wxString::Format(_("HOST '%s'\n\nOS desc - %s\n\nFree memory - %u Mb\n\nLibs:\n\nGDAL %s\nGEOS %s\nPROJ %s\n%s\nCAIRO %s"), wxGetFullHostName().c_str(), wxGetOsDescription().c_str(), dFreeMem, sGDALStr.c_str(), sGEOSStr.c_str(), sPrjStr.c_str(), sWXStr.c_str(), sCAIROStr.c_str() );
+	wxString sGdalDrivers;
+	for(size_t i = 0; i < GDALGetDriverCount(); ++i)
+	{
+		wxString sDrvName(GDALGetDriverLongName(GDALGetDriver(i)), wxConvUTF8);
+		sGdalDrivers += wxT("    - ");
+		sGdalDrivers += sDrvName;
+		sGdalDrivers += wxT("\n");
+	}
+	wxString sOgrDrivers;
+	for(size_t i = 0; i < OGRSFDriverRegistrar::GetRegistrar()->GetDriverCount(); ++i)
+	{
+		OGRSFDriver *pDrv = OGRSFDriverRegistrar::GetRegistrar()->GetDriver(i);		
+		wxString sDrvName(pDrv->GetName(), wxConvUTF8);
+		sOgrDrivers += wxT("    - ");
+		sOgrDrivers += sDrvName;
+		sOgrDrivers += wxT("\n");
+	}
+	wxString sAboutSys = wxString::Format(_("HOST '%s'\n\nOS desc - %s\n\nFree memory - %u Mb\n\nLibs:\n\nGDAL %s\nGEOS %s\nPROJ %s\n%s\nCAIRO %s"), wxGetFullHostName().c_str(), wxGetOsDescription().c_str(), dFreeMem, sGDALStr.c_str(), sGEOSStr.c_str(), sPrjStr.c_str(), sWXStr.c_str(), sCAIROStr.c_str() );
+	sAboutSys += wxString(_("\n\nGDAL Drivers:\n"));
+	sAboutSys += sGdalDrivers;
+	sAboutSys += wxString(_("\nOGR Drivers:\n"));
+	sAboutSys += sOgrDrivers;
+	sAboutSys += wxString(_("\n* - The drivers only compiled in GDAL lib and may not supported by wxGIS."));
     m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutSys, m_AuiNotebook), _("About system"));
 
 	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(_("Thanks GIS-LAB team for help in translating the interface, testing and searching for errors.\nSpecial thanks to Maxim Dubinin"), m_AuiNotebook), _("Thanks"));
-	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(_("This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\nSee the GNU General Public License for more details.\nYou should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>"), m_AuiNotebook), _("License"));//TODO: add here full localised license 
+	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(_("This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\nSee the GNU General Public License for more details.\nYou should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>"), m_AuiNotebook), _("License"));
 
 	bMainSizer->Add( m_AuiNotebook, 1, wxEXPAND | wxALL, 5 );
 
