@@ -1,5 +1,5 @@
 #summary This page describes translating locale files for wxGIS.
-#labels Phase-Design
+#labels Phase-Design,Featured
 
 = Introduction =
 
