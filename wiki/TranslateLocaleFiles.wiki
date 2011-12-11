@@ -3,7 +3,7 @@
 
 = Introduction =
 
-The 0.3 version of wxGIS introduce new and more simple mechanism of changing application localization (see [Localization] page). I provide now the empty locale files (ctalogs), so anybody can translate them.
+The 0.3 version of wxGIS introduce new and more simple mechanism of changing application localization (see [Localization] page). I provide now the empty locale files (catalogs), so anybody can translate them.
 
 = Details =
 
