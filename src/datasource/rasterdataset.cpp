@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/datasource/rasterdataset.h"
 #include "wxgis/datasource/sysop.h"
+#include "wxgis/datasource/rasterop.h"
 #include "wx/filename.h"
 
 //#include "vrt/vrtwarpedoverview.h"
@@ -113,27 +114,9 @@ char **wxGISRasterDataset::GetFileList()
         break;
     }
     //check for world file
-        //1. thirst and last char from ext and third char set w (e.g. jpw)
-        CPLString sExt = CPLGetExtension(m_sPath);
-        CPLString sNewExt;
-        sNewExt += sExt[0];
-        sNewExt += sExt[sExt.size() - 1];
-        sNewExt += 'w';
-        szPath = (char*)CPLResetExtension(m_sPath, sNewExt);
-	    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-		    papszFileList = CSLAddString( papszFileList, szPath );
-	    szPath = (char*)CPLResetExtension(m_sPath, "jpw");
-	    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-		    papszFileList = CSLAddString( papszFileList, szPath );
-        //2. wld
-        szPath = (char*)CPLResetExtension(m_sPath, "wld");
-        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-            papszFileList = CSLAddString( papszFileList, szPath );
-        //3. add w to ext
-        szPath = m_sPath + CPLString("w");
-        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-            papszFileList = CSLAddString( papszFileList, szPath );
-    //end check
+	CPLString soWldFilePath = GetWorldFilePath(m_sPath);
+	if(!soWldFilePath.empty())
+		papszFileList = CSLAddString( papszFileList, soWldFilePath );
     szPath = m_sPath + CPLString(".xml");
     if(CPLCheckForFile((char*)szPath.c_str(), NULL))
         papszFileList = CSLAddString( papszFileList, szPath );
@@ -593,5 +576,36 @@ bool wxGISRasterDataset::GetPixelData(void *data, int nXOff, int nYOff, int nXSi
         return false;
     }
 	return true;
+}
+
+bool wxGISRasterDataset::WriteWorldFile(wxGISEnumWldExtType eType)
+{
+    CPLString sExt = CPLGetExtension(m_sPath);
+    CPLString sNewExt;
+
+	switch(eType)
+	{
+	case enumGISWldExt_FirstLastW:
+		sNewExt += sExt[0];
+		sNewExt += sExt[sExt.size() - 1];
+		sNewExt += 'w';
+		break;
+	case enumGISWldExt_ExtPlusWX:
+		sNewExt += sExt[0];
+		sNewExt += sExt[sExt.size() - 1];
+		sNewExt += 'w';
+		sNewExt += 'x';
+		break;
+	case enumGISWldExt_Wld:
+		sNewExt.append("wld");
+		break;
+	case enumGISWldExt_ExtPlusW:
+		sNewExt = sExt + CPLString("w");
+		break;
+	};
+    double adfGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
+	if(m_poDataset->GetGeoTransform(adfGeoTransform) != CE_None)
+		return false;
+	return GDALWriteWorldFile(m_sPath, sNewExt, adfGeoTransform);
 }
 

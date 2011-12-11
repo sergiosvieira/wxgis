@@ -173,8 +173,6 @@ bool Decrypt(const wxString &sText, wxString &sDecryptText)
 		return bResult;
 	}
 
-	CPLString pszText(sText.mb_str(wxConvUTF8)); 
-
 	int nTextBytes;
 	GByte *pabyText = CPLHexToBinary( sText.mb_str(wxConvUTF8), &nTextBytes );
 

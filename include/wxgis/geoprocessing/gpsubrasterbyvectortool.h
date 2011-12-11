@@ -1,6 +1,6 @@
 /******************************************************************************
- * Project:  wxGIS
- * Purpose:  raster operations.
+ * Project:  wxGIS (GIS Toolbox)
+ * Purpose:  get subraster from vector cutline geoprocessing tool.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
@@ -18,12 +18,28 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+
 #pragma once
 
-#include "wxgis/datasource/datasource.h"
-#include "wxgis/datasource/rasterdataset.h"
+#include "wxgis/geoprocessing/gptool.h"
 
-int WXDLLIMPEXP_GIS_DS GetOverviewLevels(wxGISRasterDatasetSPtr pwxGISRasterDataset, int* anOverviewList);
-CPLString WXDLLIMPEXP_GIS_DS GetWorldFilePath(CPLString &soPath);
+/** \class wxGISGPSubRasterByVectorTool gpsubrasterbyvectortool.h
+    \brief The geoprocessing tool create subraster by vector cutline.
+*/
 
+class WXDLLIMPEXP_GIS_GP wxGISGPSubRasterByVectorTool : 
+    public wxGISGPTool
+{
+   DECLARE_DYNAMIC_CLASS(wxGISGPSubRasterByVectorTool)
 
+public:
+    wxGISGPSubRasterByVectorTool(void);
+    virtual ~wxGISGPSubRasterByVectorTool(void);
+    //IGPTool
+    virtual const wxString GetDisplayName(void);
+    virtual const wxString GetName(void);
+    virtual const wxString GetCategory(void);
+    virtual bool Execute(ITrackCancel* pTrackCancel);
+    virtual bool Validate(void);
+    virtual GPParameters GetParameterInfo(void);
+};

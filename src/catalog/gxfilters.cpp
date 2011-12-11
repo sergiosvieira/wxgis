@@ -248,7 +248,10 @@ wxString wxGxFeatureFileFilter::GetName(void)
  	    return wxString(_("KML file (*.kmz)"));
     case enumVecDXF:
 	    return wxString(_("AutoCAD DXF file (*.dxf)"));
-	//case emumVecPostGIS:
+	case emumVecPostGIS:
+	    return wxString(_("PostGIS Feature class"));
+	case enumVecGML:
+	    return wxString(_("GML file (*.gml)"));
     default:
 	    return wxString(_("Any feature classes (*.*)"));
     }
@@ -270,7 +273,10 @@ wxString wxGxFeatureFileFilter::GetExt(void)
         return wxString(wxT("kmz"));
     case enumVecDXF:
         return wxString(wxT("dxf"));
-	//case emumVecPostGIS:
+	case emumVecPostGIS:
+	    return wxEmptyString;
+	case enumVecGML:
+	    return wxString(wxT("gml"));
     default:
         return wxEmptyString;
     }
@@ -290,7 +296,10 @@ wxString wxGxFeatureFileFilter::GetDriver(void)
 	    return wxString(wxT("LIBKML"));
     case enumVecDXF:
 	    return wxString(wxT("DXF"));
-	//case emumVecPostGIS:
+	case emumVecPostGIS:
+	    return wxString(wxT("PostgreSQL"));
+	case enumVecGML:
+	    return wxString(wxT("GML"));
     default:
         return wxEmptyString;
     }

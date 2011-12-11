@@ -87,7 +87,7 @@ enum
 };
 public:
 	wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExternalCatalog = NULL, wxWindowID id = wxID_ANY, const wxString& title = _("Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,338 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
-	~wxGxContainerDialog();	
+	virtual ~wxGxContainerDialog();	
 
 //IGxApplication
     virtual IGxCatalog* const GetCatalog(void){return static_cast<IGxCatalog*>(m_pCatalog);};
@@ -132,6 +132,8 @@ public:
     virtual void ShowExportFormats(bool bShow = false);
 	virtual void SetAllFilters(bool bAllFilters);
 	virtual void AddFilter(IGxObjectFilter* pFilter, bool bDefault = false);
+    virtual void SetOwnsFilter(bool bOwnFilter){m_bOwnFilter = bOwnFilter;};
+    virtual void SetOwnsShowFilter(bool bOwnFilter){m_bOwnShowFilter = bOwnFilter;};
 	virtual void RemoveAllFilters(void);
 	virtual void AddShowFilter(IGxObjectFilter* pFilter);
 	virtual void RemoveAllShowFilters(void);
@@ -168,6 +170,7 @@ protected:
     int m_nRetCode;
     //DEFINE_SHARED_PTR(ICommand);
     //ICommandSPtr m_pCreateCmd;
+    bool m_bOwnFilter, m_bOwnShowFilter;
 
 protected:
 	wxBoxSizer* bMainSizer;

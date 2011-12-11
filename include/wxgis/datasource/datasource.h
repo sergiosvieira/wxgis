@@ -119,6 +119,18 @@ enum wxGISEnumContainerType
 	enumContRemoteConnection
 };
 
+/** \enum wxGISEnumWldExtType
+    \brief The world file ext type 
+*/
+
+enum wxGISEnumWldExtType
+{
+	enumGISWldExt_FirstLastW = 1,
+	enumGISWldExt_Wld = 2,
+	enumGISWldExt_ExtPlusW = 3,
+	enumGISWldExt_ExtPlusWX = 4
+};
+
 
 //GDAL SmartPointers
 DEFINE_SHARED_PTR(OGRSpatialReference);

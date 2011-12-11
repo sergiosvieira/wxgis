@@ -22,6 +22,7 @@
 #include "wxgis/geoprocessing/gpdomain.h"
 #include "wxgis/geoprocessing/gpparam.h"
 #include "wxgis/catalogui/gxobjdialog.h"
+#include "wxgis/catalogui/gxcontdialog.h"
 #include "wxgis/catalogui/gxfileui.h"
 #include "wxgis/cartoui/sqlquerydialog.h"
 
@@ -151,7 +152,7 @@ void wxGISDTPath::OnOpen(wxCommandEvent& event)
     {
         wxGxObjectDialog dlg(this, m_pCatalog, wxID_ANY, _("Select input object"));
         dlg.SetAllowMultiSelect(false);
-        dlg.SetAllFilters(false);
+        dlg.SetAllFilters(true);
         dlg.SetOwnsFilter(false);
         dlg.SetName( Name.GetFullName() );
         if(pDomain)
@@ -283,6 +284,7 @@ void wxGISDTPath::UpdateValues(void)
     switch(m_pParam->GetDataType())
     {
       case enumGISGPParamDTPath:
+      case enumGISGPParamDTFolderPath:
         m_pParam->SetValue(wxVariant(sData, wxT("path")));
 		break;
       default:
@@ -324,6 +326,113 @@ void wxGISDTPath::OnPathChange(wxCommandEvent& event)
     m_pParam->SetAltered(true);
 	UpdateValues();
 }
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGISDTFolderPath
+///////////////////////////////////////////////////////////////////////////////
+
+wxGISDTFolderPath::wxGISDTFolderPath( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxGISDTPath( pParam, pCatalog, parent, id, pos, size, style )
+{
+}
+
+wxGISDTFolderPath::~wxGISDTFolderPath()
+{
+}
+
+void wxGISDTFolderPath::OnOpen(wxCommandEvent& event)
+{
+    wxGISGPGxObjectDomain* pDomain = dynamic_cast<wxGISGPGxObjectDomain*>(m_pParam->GetDomain());
+    wxFileName Name(m_pParam->GetValue().MakeString());
+
+    wxGxContainerDialog dlg(this, m_pCatalog, wxID_ANY, m_pParam->GetDirection() == enumGISGPParameterDirectionInput ? _("Select input object") : _("Select output object"));
+	dlg.SetButtonCaption(_("Select"));
+	dlg.ShowCreateButton(true);
+    dlg.SetOwnsFilter(false);
+    dlg.SetOwnsShowFilter(false);
+	dlg.ShowExportFormats();
+    if(pDomain)
+    {
+        for(size_t i = 0; i < pDomain->GetCount(); ++i)
+        {
+			if(i == m_pParam->GetSelDomainValue())
+                dlg.AddFilter(pDomain->GetFilter(i), true);
+            else
+                dlg.AddFilter(pDomain->GetFilter(i), false);
+			dlg.AddShowFilter(pDomain->GetFilter(i));
+        }
+    }
+    dlg.SetAllFilters(false);
+    dlg.SetName( Name.GetFullName() );
+    if(dlg.ShowModal() == wxID_OK)
+    {
+        wxString sPath = dlg.GetPath();
+        m_pParam->SetValue(wxVariant(sPath, wxT("path")));
+    }
+
+    m_pParam->SetAltered(true);
+    m_pParam->SetHasBeenValidated(false);
+
+	UpdateControls();
+}
+
+//validate
+bool wxGISDTFolderPath::Validate(void)
+{
+    if(m_pParam->GetHasBeenValidated())
+		return m_pParam->GetIsValid();
+
+	m_pParam->SetHasBeenValidated(true);
+    wxString sPath = m_pParam->GetValue();
+    if(sPath.IsEmpty())
+    {
+        m_pParam->SetAltered(false);
+        if(m_pParam->GetParameterType() != enumGISGPParameterTypeRequired)
+        {
+            m_pParam->SetIsValid(true);
+            m_pParam->SetMessage(wxGISEnumGPMessageNone);
+            return true;
+        }
+        else
+        {
+            m_pParam->SetIsValid(false);
+            m_pParam->SetMessage(wxGISEnumGPMessageRequired, _("The value is required"));
+            return false;
+        }
+    }
+    if(m_pCatalog)
+    {
+        IGxObjectContainer* pGxContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
+        IGxObject* pGxObj = pGxContainer->SearchChild(sPath);
+        if(pGxObj)
+        {
+           if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
+           {
+               m_pParam->SetIsValid(true);
+               m_pParam->SetMessage(wxGISEnumGPMessageOk);
+           }
+           else
+           {
+               m_pParam->SetIsValid(true);
+               m_pParam->SetMessage(wxGISEnumGPMessageOk);
+           }
+        }
+        else
+        {
+           if(m_pParam->GetDirection() == enumGISGPParameterDirectionInput)
+           {
+               m_pParam->SetIsValid(true);
+               m_pParam->SetMessage(wxGISEnumGPMessageOk);
+           }
+           else
+           {
+               m_pParam->SetIsValid(true);
+               m_pParam->SetMessage(wxGISEnumGPMessageOk);
+           }
+        }
+    }
+    return true;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISDTDigit
@@ -1136,6 +1245,7 @@ void wxGISDTMultiParam::UpdateControls(void)
 					case enumGISGPParamDTSpatRef:
 					case enumGISGPParamDTQuery:
 					case enumGISGPParamDTPath:
+					case enumGISGPParamDTFolderPath:
 					case enumGISGPParamDTStringList:
 					case enumGISGPParamDTPathArray:
 						m_pg->SetCellValue(i, j, pCellParam->GetValue().GetString());
@@ -1193,6 +1303,7 @@ void wxGISDTMultiParam::OnCellChange(wxGridEvent &event)
 			case enumGISGPParamDTString:
 			case enumGISGPParamDTSpatRef:
 			case enumGISGPParamDTPath:
+			case enumGISGPParamDTFolderPath:
 			case enumGISGPParamDTPathArray:
 			case enumGISGPParamDTStringList:
 				pCellParam->SetValue( wxVariant(sCellValue) );

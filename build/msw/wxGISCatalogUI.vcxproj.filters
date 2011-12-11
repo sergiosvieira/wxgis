@@ -153,6 +153,9 @@
     <ClCompile Include="..\..\src\catalogui\gxpostgisdatasetui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\catalogui\gxobjcmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\wxgis\catalogui\catalogcmd.h">
@@ -294,6 +297,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\wxgis\catalogui\gxpostgisdatasetui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxobjcmd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

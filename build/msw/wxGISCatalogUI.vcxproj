@@ -131,6 +131,7 @@
     <ClCompile Include="..\..\src\catalogui\gxmlfactoryui.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxnoview.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxobgdialog.cpp" />
+    <ClCompile Include="..\..\src\catalogui\gxobjcmd.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxpending.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxpostgisdatasetui.cpp" />
     <ClCompile Include="..\..\src\catalogui\gxprjfactoryui.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="..\..\include\wxgis\catalogui\gxmapview.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxmlfactoryui.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxnoview.h" />
+    <ClInclude Include="..\..\include\wxgis\catalogui\gxobjcmd.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxobjdialog.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxpending.h" />
     <ClInclude Include="..\..\include\wxgis\catalogui\gxpostgisdatasetui.h" />

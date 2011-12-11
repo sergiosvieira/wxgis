@@ -42,7 +42,7 @@ wxTreeContainerView::wxTreeContainerView(wxWindow* parent, wxWindowID id, long s
 
 wxTreeContainerView::~wxTreeContainerView(void)
 {
-    RemoveAllShowFilters();
+    //RemoveAllShowFilters();
 }
 
 void wxTreeContainerView::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent)
@@ -70,8 +70,9 @@ void wxTreeContainerView::AddShowFilter(IGxObjectFilter* pFilter)
 
 void wxTreeContainerView::RemoveAllShowFilters(void)
 {
-	for(size_t i = 0; i < m_ShowFilterArray.size(); ++i)
-		wxDELETE(m_ShowFilterArray[i]);
+//	for(size_t i = 0; i < m_ShowFilterArray.size(); ++i)
+//		wxDELETE(m_ShowFilterArray[i]);
+	m_ShowFilterArray.clear();
 }
 
 bool wxTreeContainerView::CanChooseObject( IGxObject* pObject )
@@ -86,23 +87,6 @@ bool wxTreeContainerView::CanChooseObject( IGxObject* pObject )
     return false;
 }
 
-//void wxTreeContainerView::OnSelChanged(wxTreeEvent& event)
-//{
-////    event.Skip();
-//
-//    wxArrayTreeItemIds treearray;
-//    size_t count = GetSelections(treearray);
-//    m_pSelection->Clear(GetId());
-//    for(size_t i = 0; i < count; ++i)
-//    {
-//	    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(treearray[i]);
-//	    if(pData != NULL)
-//	    {
-//		    m_pSelection->Select(pData->m_pObject, true, GetId());
-//	    }
-//    }
-//}
-
 ////////////////////////////////////////////////////////////////////////////////
 //// wxGxContainerDialog
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +100,7 @@ BEGIN_EVENT_TABLE(wxGxContainerDialog, wxDialog)
 	EVT_UPDATE_UI_RANGE(ID_PLUGINCMD, ID_PLUGINCMDMAX, wxGxContainerDialog::OnCommandUI)
 END_EVENT_TABLE()
 
-wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExternalCatalog, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pTree(NULL), m_bShowCreateButton(false), m_bAllFilters(true), m_nDefaultFilter(0), m_bShowExportFormats(false)/*m_bAllowMultiSelect(false)*/
+wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExternalCatalog, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pTree(NULL), m_bShowCreateButton(false), m_bAllFilters(true), m_nDefaultFilter(0), m_bShowExportFormats(false), m_bOwnFilter(true), m_bOwnShowFilter(true)/*m_bAllowMultiSelect(false)*/
 {
 	this->SetSizeHints( wxSize( 400,300 ), wxDefaultSize );
 
@@ -313,8 +297,9 @@ void wxGxContainerDialog::AddFilter(IGxObjectFilter* pFilter, bool bDefault)
 
 void wxGxContainerDialog::RemoveAllFilters(void)
 {
-	for(size_t i = 0; i < m_FilterArray.size(); ++i)
-		wxDELETE(m_FilterArray[i]);
+    if(m_bOwnFilter)
+		for(size_t i = 0; i < m_FilterArray.size(); ++i)
+			wxDELETE(m_FilterArray[i]);
 }
 
 void wxGxContainerDialog::AddShowFilter(IGxObjectFilter* pFilter)
@@ -325,9 +310,10 @@ void wxGxContainerDialog::AddShowFilter(IGxObjectFilter* pFilter)
 
 void wxGxContainerDialog::RemoveAllShowFilters(void)
 {
-	for(size_t i = 0; i < m_paShowFilter.size(); ++i)
-		wxDELETE(m_paShowFilter[i]);
-    //m_pTree->RemoveAllShowFilters();
+    if(m_bOwnShowFilter)
+		for(size_t i = 0; i < m_paShowFilter.size(); ++i)
+			wxDELETE(m_paShowFilter[i]);
+    m_pTree->RemoveAllShowFilters();
 }
 
 int wxGxContainerDialog::ShowModal(void)

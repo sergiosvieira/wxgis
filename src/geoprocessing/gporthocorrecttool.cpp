@@ -402,7 +402,6 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
             pTrackCancel->PutMessage(wxString::Format(_("OrthoCorrect failed! GDAL error: %s"), wxString(pszErr, wxConvUTF8).c_str()), -1, enumGISMessageErr);
         }
         GDALClose(poOutputGDALDataset);
-        //wsDELETE(pSrcDataSet);
         return false;
     }
 
@@ -410,7 +409,6 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     GDALDestroyWarpOptions( psWarpOptions );
 
     GDALClose(poOutputGDALDataset);
-    //wsDELETE(pSrcDataSet);
 
     if(pGxObjectContainer)
     {
