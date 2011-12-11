@@ -44,7 +44,7 @@ public:
 	virtual bool Open(void);
 	virtual wxGISDatasetSPtr ExecuteSQL(wxString sStatement, wxGISSpatialFilter* pSpatialFilter = NULL, wxString sDialect = wxEmptyString);
 protected:
-	virtual wxGISDatasetSPtr GetDatasetFromOGRLayer(OGRLayer* poLayer);
+	virtual wxGISDatasetSPtr GetDatasetFromOGRLayer(CPLString &sPath, OGRLayer* poLayer, OGRDataSource *poDS);
 protected:
 	OGRDataSource *m_poDS;
     wxString m_sName, m_sPass, m_sPort, m_sAddres, m_sDBName;

@@ -48,6 +48,7 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
     OGRFeatureSPtr pFeature;
     while((pFeature = pSrcDataSet->Next()) != NULL)
     {
+
         if(pTrackCancel && !pTrackCancel->Continue())
         {
             wxString sErr(_("Interrupted by user"));
@@ -58,9 +59,12 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
                 pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
             return false;
         }
+        OGRGeometry *pGeom = pFeature->GetGeometryRef();
+		if(wkbFlatten(pDstDataSet->GetGeometryType()) != wkbUnknown && !pGeom)
+            continue;
+
         if( !bSame && poCT )
         {
-            OGRGeometry *pGeom = pFeature->GetGeometryRef();
             if(pGeom)
             {
 				OGRGeometry *pNewGeom = pGeom->clone();
@@ -224,14 +228,16 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
 
      //check multi geometry
     OGRwkbGeometryType nGeomType = pDSet->GetGeometryType();
+	size_t nFullCount = pDSet->GetFeatureCount();
     bool bIsMultigeom = nNewSubType == enumVecESRIShapefile && (wkbFlatten(nGeomType) == wkbUnknown || wkbFlatten(nGeomType) == wkbGeometryCollection);
+	bool bExported(false);
 
     if(bIsMultigeom)
     {
         wxGISQueryFilter Filter(wxString(wxT("OGR_GEOMETRY='POINT'")));
         if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
         {
-			int nCount = pDSet->GetFeatureCount();
+			size_t nCount = pDSet->GetFeatureCount();
             if(nCount > 0)
             {
                 wxString sNewName = CheckUniqName(sPath, sName + wxString(_("_point")), sExt);                
@@ -239,12 +245,13 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
                 pNewDef->SetGeomType( wkbPoint );
                 if( !ExportFormat(pDSet, sPath, sNewName, pFilter, pNewDef, pNewSpaRef, pQFilter, pTrackCancel) )
                     return false;
+				bExported = true;
             }
         }
         Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='POLYGON'")));
         if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
         {
-            int nCount = pDSet->GetFeatureCount();
+            size_t nCount = pDSet->GetFeatureCount();
             if(nCount > 0)
             {
                 wxString sNewName = CheckUniqName(sPath, sName + wxString(_("_polygon")), sExt); 
@@ -252,12 +259,13 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
                 pNewDef->SetGeomType( wkbPolygon );
                 if( !ExportFormat(pDSet, sPath, sNewName, pFilter, pNewDef, pNewSpaRef, pQFilter, pTrackCancel) )
                     return false;
+				bExported = true;
             }
         }
         Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='LINESTRING'")));
         if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
         {
-            int nCount = pDSet->GetFeatureCount();
+            size_t nCount = pDSet->GetFeatureCount();
             if(nCount > 0)
             {
                 wxString sNewName = CheckUniqName(sPath, sName + wxString(_("_line")), sExt);
@@ -265,12 +273,13 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
                 pNewDef->SetGeomType( wkbLineString );
                 if( !ExportFormat(pDSet, sPath, sNewName, pFilter, pNewDef, pNewSpaRef, pQFilter, pTrackCancel) )
                     return false;
+				bExported = true;
             }
         }
         Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTIPOINT'")));
         if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
         {
-            int nCount = pDSet->GetFeatureCount();
+            size_t nCount = pDSet->GetFeatureCount();
             if(nCount > 0)
             {
                 wxString sNewName = CheckUniqName(sPath, sName + wxString(_("_mpoint")), sExt);
@@ -278,12 +287,13 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
                 pNewDef->SetGeomType( wkbMultiPoint );
                 if( !ExportFormat(pDSet, sPath, sNewName, pFilter, pNewDef, pNewSpaRef, pQFilter, pTrackCancel) )
                     return false;
+				bExported = true;
             }
-        }
+       }
         Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTILINESTRING'")));
         if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
         {
-            int nCount = pDSet->GetFeatureCount();
+            size_t nCount = pDSet->GetFeatureCount();
             if(nCount > 0)
             {
                 wxString sNewName = CheckUniqName(sPath, sName + wxString(_("_mline")), sExt);
@@ -291,12 +301,13 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
                 pNewDef->SetGeomType( wkbMultiLineString );
                 if( !ExportFormat(pDSet, sPath, sNewName, pFilter, pNewDef, pNewSpaRef, pQFilter, pTrackCancel) )
                     return false;
+				bExported = true;
             }
-        }
+       }
         Filter.SetWhereClause(wxString(wxT("OGR_GEOMETRY='MULTIPOLYGON'")));
         if(pDSet->SetFilter(&Filter) == OGRERR_NONE)
         {
-            int nCount = pDSet->GetFeatureCount();
+            size_t nCount = pDSet->GetFeatureCount();
             if(nCount > 0)
             {
                 wxString sNewName = CheckUniqName(sPath, sName + wxString(_("_mpolygon")), sExt);
@@ -304,8 +315,29 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
                 pNewDef->SetGeomType( wkbMultiPolygon );
                 if( !ExportFormat(pDSet, sPath, sNewName, pFilter, pNewDef, pNewSpaRef, pQFilter, pTrackCancel) )
                     return false;
+	 			bExported = true;
             }
-        }
+		}
+
+		pDSet->SetFilter(NULL);
+		if(!bExported && nFullCount > 0) //assume we have only one type geometry
+		{
+			//set geometry type
+			pDSet->Reset();
+			OGRFeatureSPtr pFeature;
+			while((pFeature = pDSet->Next()) != NULL)
+			{
+				OGRGeometry* pG = pFeature->GetGeometryRef();
+				if(pG)
+				{
+					OGRwkbGeometryType eGType = pG->getGeometryType();
+					pDef->SetGeomType(eGType);
+					break;
+				}
+			}
+			if( !ExportFormat(pDSet, sPath, sName, pFilter, pDef, pNewSpaRef, pQFilter, pTrackCancel) )
+				return false;
+		}
     }
     else
     {

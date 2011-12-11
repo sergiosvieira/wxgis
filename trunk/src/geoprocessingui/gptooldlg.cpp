@@ -83,11 +83,19 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
             m_pControlsArray.push_back(NULL);
             continue;
         }
+		//TODO: check if group created
         switch(pParam->GetDataType())
         {
         case enumGISGPParamDTPath:
             {
                 wxGISDTPath* pPath = new wxGISDTPath(pParam, m_pTool->GetCatalog(), pToolsWnd);
+                bSizer4->Add( pPath, 0, wxEXPAND, 5 );
+                m_pControlsArray.push_back(pPath);
+            }
+            break;
+        case enumGISGPParamDTFolderPath:
+            {
+                wxGISDTFolderPath* pPath = new wxGISDTFolderPath(pParam, m_pTool->GetCatalog(), pToolsWnd);
                 bSizer4->Add( pPath, 0, wxEXPAND, 5 );
                 m_pControlsArray.push_back(pPath);
             }
@@ -309,15 +317,15 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
 		    break;
         }
 	}
-    //tool validate
-    bool bIsValid = m_pTool->Validate();//validate user tool
-	if(!bIsValid)
-		return;
-
 	//update elements values set while validate user tool
     for(size_t i = 0; i < m_pControlsArray.size(); ++i)
         if(m_pControlsArray[i])
             m_pControlsArray[i]->UpdateControls();
+
+    //tool validate
+    bool bIsValid = m_pTool->Validate();//validate user tool
+	if(!bIsValid)
+		return;
 
 	//if any param not valid return
     for(size_t i = 0; i < m_pControlsArray.size(); ++i)

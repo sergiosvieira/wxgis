@@ -57,6 +57,12 @@
     <ClCompile Include="..\..\src\geoprocessing\gpvector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\geoprocessing\gpsubrasterbyvectortool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\geoprocessing\gpraster.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\wxgis\geoprocessing\geoprocessing.h">
@@ -102,6 +108,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\wxgis\geoprocessing\gpvector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\wxgis\geoprocessing\gpsubrasterbyvectortool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\wxgis\geoprocessing\gpraster.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

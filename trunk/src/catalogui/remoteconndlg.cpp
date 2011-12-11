@@ -181,7 +181,7 @@ void wxGISRemoteConnDlg::OnOK(wxCommandEvent& event)
 		doc.SetRoot(pRootNode);
 
 		wxString sFullPath = m_sOutputPath + wxFileName::GetPathSeparator() + GetName();
-		//compare if user changw name in changing mode
+		//compare if user change name in changing mode
 		if(!m_bCreateNew && EQUAL(CPLString(sFullPath.mb_str(wxConvUTF8)), m_sOriginOutput))
 		{
 			DeleteFile(m_sOriginOutput);
@@ -191,6 +191,7 @@ void wxGISRemoteConnDlg::OnOK(wxCommandEvent& event)
 			wxMessageBox(wxString(_("Connection create failed!")), wxString(_("Error")), wxICON_ERROR | wxOK ); 
 			return;
 		}
+		m_sOriginOutput = CPLString(sFullPath.mb_str(wxConvUTF8));
 		EndModal(wxID_OK);
 	}
 	else
@@ -202,24 +203,30 @@ void wxGISRemoteConnDlg::OnOK(wxCommandEvent& event)
 void wxGISRemoteConnDlg::OnTest(wxCommandEvent& event)
 {
 	wxBusyCursor wait;
-	TransferDataFromWindow();
-	CPLSetConfigOption("PG_LIST_ALL_TABLES", "YES");
-	CPLSetConfigOption("PGCLIENTENCODING", "UTF-8");
-
-    wxString sPath = wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_bIsBinaryCursor == true ? wxT("PGB") : wxT("PG"), m_sServer.c_str(), m_sDatabase.c_str(), m_sPort.c_str(), m_sUser.c_str(), m_sPass.c_str());
-	CPLErrorReset();
-    OGRDataSource* poDS = OGRSFDriverRegistrar::Open( sPath.mb_str(wxConvUTF8), FALSE );
-	if( poDS == NULL )
+	if ( Validate() && TransferDataFromWindow() )
 	{
-		const char* err = CPLGetLastErrorMsg();
-		wxString sErr = wxString::Format(_("Operation '%s' failed! Host '%s', Database name '%s', Port='%s'. OGR error: %s"), wxString(_("Open")), m_sServer.c_str(), m_sDatabase.c_str(), m_sPort.c_str(), wxString(err, wxConvLocal));
-		wxMessageBox(sErr, wxString(_("Error")), wxICON_ERROR | wxOK, this );
+		CPLSetConfigOption("PG_LIST_ALL_TABLES", "YES");
+		CPLSetConfigOption("PGCLIENTENCODING", "UTF-8");
+
+		wxString sPath = wxString::Format(wxT("%s:host='%s' dbname='%s' port='%s' user='%s' password='%s'"), m_bIsBinaryCursor == true ? wxT("PGB") : wxT("PG"), m_sServer.c_str(), m_sDatabase.c_str(), m_sPort.c_str(), m_sUser.c_str(), m_sPass.c_str());
+		CPLErrorReset();
+		OGRDataSource* poDS = OGRSFDriverRegistrar::Open( sPath.mb_str(wxConvUTF8), FALSE );
+		if( poDS == NULL )
+		{
+			const char* err = CPLGetLastErrorMsg();
+			wxString sErr = wxString::Format(_("Operation '%s' failed! Host '%s', Database name '%s', Port='%s'. OGR error: %s"), wxString(_("Open")), m_sServer.c_str(), m_sDatabase.c_str(), m_sPort.c_str(), wxString(err, wxConvLocal));
+			wxMessageBox(sErr, wxString(_("Error")), wxICON_ERROR | wxOK, this );
+		}
+		else
+		{
+			wxMessageBox(wxString(_("Connected successufuly!")), wxString(_("Information")), wxICON_INFORMATION | wxOK, this );
+			OGRDataSource::DestroyDataSource( poDS );
+		}
 	}
-    else
-    {
-		wxMessageBox(wxString(_("Connected successuful!")), wxString(_("Information")), wxICON_INFORMATION | wxOK, this );
-        OGRDataSource::DestroyDataSource( poDS );
-    }
+	else
+	{
+		wxMessageBox(wxString(_("Some input values are not correct!")), wxString(_("Error")), wxICON_ERROR | wxOK ); 
+	}
 }
 
 CPLString wxGISRemoteConnDlg::GetPath(void)

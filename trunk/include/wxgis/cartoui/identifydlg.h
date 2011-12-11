@@ -96,6 +96,7 @@ public:
 	virtual void FillPanel(const OGRPoint &pt1);
 	virtual void FillPanel(const OGRFeatureSPtr &pFeature);
 	virtual void Clear(bool bFull = false);
+	virtual void SetEncoding(wxFontEncoding eEncoding){m_eEncoding = eEncoding;};
 	//events
 	virtual void OnContextMenu(wxContextMenuEvent& event);
 	virtual void OnMenu(wxCommandEvent& event);
@@ -118,6 +119,7 @@ protected:
 	short m_currentSortCol;
 	wxImageList m_ImageListSmall;
 	double m_dfX, m_dfY;
+	wxFontEncoding m_eEncoding;
 
     DECLARE_EVENT_TABLE()
 };

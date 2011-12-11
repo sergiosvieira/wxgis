@@ -85,6 +85,7 @@ enum wxGISEnumGPParameterDataType
 	enumGISGPParamDTQuery,
 
 	enumGISGPParamDTPath,
+	enumGISGPParamDTFolderPath,
 	enumGISGPParamDTPathArray,
 
 	enumGISGPParamDTParamArray, /**< The array of IGPParameter's*/

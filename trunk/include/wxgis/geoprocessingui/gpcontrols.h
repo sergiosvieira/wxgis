@@ -96,6 +96,21 @@ protected:
     DECLARE_EVENT_TABLE()
 };
 
+/** \class wxGISDTPath gpcontrols.h
+    \brief The tool dialog control for catalog path value representation.
+*/
+class wxGISDTFolderPath : public wxGISDTPath
+{
+
+public:
+	wxGISDTFolderPath( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
+	virtual ~wxGISDTFolderPath();
+	//wxGISDTBase
+    virtual bool Validate(void);
+    //events
+    virtual void OnOpen(wxCommandEvent& event);
+};
+
 /** \class wxGISDTDigit gpcontrols.h
     \brief The tool dialog control for digit value representation.
 */

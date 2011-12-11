@@ -53,6 +53,7 @@ m_bIsValid(false), m_bUseProxy(false), slist(NULL)
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA ,&bodystruct);
 		curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
 		curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, conntimeout);
+        curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "");
 
 		if(!proxy.IsEmpty())
 		{

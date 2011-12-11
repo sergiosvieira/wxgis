@@ -69,7 +69,7 @@ wxGISDatasetSPtr wxGISPostgresDataSource::GetSubset(size_t nIndex)
     if(m_poDS)
     {
 	    OGRLayer* poLayer = m_poDS->GetLayer(nIndex);
-		return GetDatasetFromOGRLayer(poLayer);
+		return GetDatasetFromOGRLayer(m_sPath, poLayer, m_poDS);
     }
     return wxGISDatasetSPtr();
 }
@@ -83,28 +83,28 @@ wxGISDatasetSPtr wxGISPostgresDataSource::GetSubset(wxString sTablename)
     if(m_poDS)
     {
 	    OGRLayer* poLayer = m_poDS->GetLayerByName(sTablename.mb_str(wxConvUTF8));
-		return GetDatasetFromOGRLayer(poLayer);
+		return GetDatasetFromOGRLayer(m_sPath, poLayer, m_poDS);
     }
     return wxGISDatasetSPtr();
 }
 
-wxGISDatasetSPtr wxGISPostgresDataSource::GetDatasetFromOGRLayer(OGRLayer* poLayer)
+wxGISDatasetSPtr wxGISPostgresDataSource::GetDatasetFromOGRLayer(CPLString &sPath, OGRLayer* poLayer, OGRDataSource *poDS)
 {
-    wxCriticalSectionLocker locker(m_CritSect);
+//    wxCriticalSectionLocker locker(m_CritSect);
 	wxGISDatasetSPtr pDataset;
 	wxCHECK(poLayer, pDataset);
 	//check the layer type
 	if(!CPLString(poLayer->GetGeometryColumn()).empty())
 	{
-		m_poDS->Reference();
-        wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>(m_sPath, emumVecPostGIS, poLayer, m_poDS);//TODO: perfomance lack!!!
+		poDS->Reference();
+        wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>(sPath, emumVecPostGIS, poLayer, poDS);
 		pDataSet->SetEncoding(wxFONTENCODING_UTF8);
         pDataset = boost::static_pointer_cast<wxGISDataset>(pDataSet);
 	}
 	else
 	{
-		m_poDS->Reference();
-        wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(m_sPath, enumTablePostgres, poLayer, m_poDS);//TODO: Think about it
+		poDS->Reference();
+        wxGISTableSPtr pTable = boost::make_shared<wxGISTable>(sPath, enumTablePostgres, poLayer, poDS);
 		pTable->SetEncoding(wxFONTENCODING_UTF8);
         pDataset = boost::static_pointer_cast<wxGISDataset>(pTable);
 	}

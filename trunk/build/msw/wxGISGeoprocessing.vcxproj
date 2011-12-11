@@ -110,7 +110,9 @@
     <ClCompile Include="..\..\src\geoprocessing\gporthocorrecttool.cpp" />
     <ClCompile Include="..\..\src\geoprocessing\gpparam.cpp" />
     <ClCompile Include="..\..\src\geoprocessing\gpprojecttool.cpp" />
+    <ClCompile Include="..\..\src\geoprocessing\gpraster.cpp" />
     <ClCompile Include="..\..\src\geoprocessing\gpshapetotexttool.cpp" />
+    <ClCompile Include="..\..\src\geoprocessing\gpsubrasterbyvectortool.cpp" />
     <ClCompile Include="..\..\src\geoprocessing\gpsumtabletool.cpp" />
     <ClCompile Include="..\..\src\geoprocessing\gptable.cpp" />
     <ClCompile Include="..\..\src\geoprocessing\gptool.cpp" />
@@ -127,7 +129,9 @@
     <ClInclude Include="..\..\include\wxgis\geoprocessing\gporthocorrecttool.h" />
     <ClInclude Include="..\..\include\wxgis\geoprocessing\gpparam.h" />
     <ClInclude Include="..\..\include\wxgis\geoprocessing\gpprojecttool.h" />
+    <ClInclude Include="..\..\include\wxgis\geoprocessing\gpraster.h" />
     <ClInclude Include="..\..\include\wxgis\geoprocessing\gpshapetotexttool.h" />
+    <ClInclude Include="..\..\include\wxgis\geoprocessing\gpsubrasterbyvectortool.h" />
     <ClInclude Include="..\..\include\wxgis\geoprocessing\gpsumtabletool.h" />
     <ClInclude Include="..\..\include\wxgis\geoprocessing\gptable.h" />
     <ClInclude Include="..\..\include\wxgis\geoprocessing\gptool.h" />

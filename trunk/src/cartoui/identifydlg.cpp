@@ -161,7 +161,8 @@ void wxGISFeatureDetailsPanel::FillPanel(const OGRFeatureSPtr &pFeature)
 		if(!pFieldDefn)
 			continue;
 		wxString sName(pFieldDefn->GetNameRef(), wxConvLocal);
-		wxString sValue(pFeature->GetFieldAsString(i), wxConvLocal);
+		wxString sValue = wxGISTable::GetAsString(pFeature, i, m_eEncoding);
+		//wxString sValue(pFeature->GetFieldAsString(i), wxConvLocal);
 		long pos = m_listCtrl->InsertItem(i, sName, wxNOT_FOUND);
 		m_listCtrl->SetItem(pos, 1, sValue);
 		m_listCtrl->SetItemData(pos, i);
@@ -636,9 +637,10 @@ void wxAxIdentifyView::Identify(OGRGeometrySPtr pGeometryBounds)
 }
 
 void wxAxIdentifyView::FillTree(wxGISFeatureLayerSPtr pFLayer, wxGISQuadTreeCursorSPtr pCursor)
-{
+{	
 	m_pTreeCtrl->DeleteAllItems();
 	m_pFeatureDetailsPanel->Clear();
+	m_pFeatureDetailsPanel->SetEncoding(pFLayer->GetDataset()->GetEncoding());
 	if(pCursor->GetCount() < 1)
 		return;
 

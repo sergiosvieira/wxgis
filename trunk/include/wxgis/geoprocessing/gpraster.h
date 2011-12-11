@@ -1,6 +1,6 @@
 /******************************************************************************
- * Project:  wxGIS
- * Purpose:  raster operations.
+ * Project:  wxGIS (GIS Toolbox)
+ * Purpose:  raster dataset functions.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
@@ -18,12 +18,20 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+
 #pragma once
 
-#include "wxgis/datasource/datasource.h"
+#include "wxgis/geoprocessing/geoprocessing.h"
+#include "wxgis/datasource/featuredataset.h"
 #include "wxgis/datasource/rasterdataset.h"
 
-int WXDLLIMPEXP_GIS_DS GetOverviewLevels(wxGISRasterDatasetSPtr pwxGISRasterDataset, int* anOverviewList);
-CPLString WXDLLIMPEXP_GIS_DS GetWorldFilePath(CPLString &soPath);
+/** \fn bool SubrasterByVector(wxGISFeatureDatasetSPtr pSrcFeatureDataSet, wxGISRasterDatasetSPtr pSrcRasterDataSet, CPLString &szDstFolderPath)
+ *  \brief Get subruster clipped by vector geometry.
+ *  \param pSrcFeatureDataSet The clip geometry source dataset
+ *  \param pSrcRasterDataSet The clipped raster
+ *  \param szDstFolderPath The subraster store path
+ *  \return False if any error or true
+ */	
+bool WXDLLIMPEXP_GIS_DS SubrasterByVector(wxGISFeatureDatasetSPtr pSrcFeatureDataSet, wxGISRasterDatasetSPtr pSrcRasterDataSet, CPLString &szDstFolderPath, ITrackCancel* pTrackCancel = NULL);
 
-
+GDALDataset* CreateOutputDataset();

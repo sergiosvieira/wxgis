@@ -49,3 +49,30 @@ int GetOverviewLevels(wxGISRasterDatasetSPtr pwxGISRasterDataset, int* anOvervie
 	}
 	return nLevelCount;
 }
+
+CPLString GetWorldFilePath(CPLString &soPath)
+{
+    //1. thirst and last char from ext and third char set w (e.g. jpw)
+    CPLString sExt = CPLGetExtension(soPath);
+    CPLString sNewExt;
+    sNewExt += sExt[0];
+    sNewExt += sExt[sExt.size() - 1];
+    sNewExt += 'w';
+    CPLString szPath = (char*)CPLResetExtension(soPath, sNewExt);
+	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+		return szPath;
+    //4. add wx to ext
+    sNewExt += 'x';
+    szPath = (char*)CPLResetExtension(soPath, sNewExt);
+	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+		return szPath;
+    //2. wld
+    szPath = (char*)CPLResetExtension(soPath, "wld");
+    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+		return szPath;
+    //3. add w to ext
+    szPath = soPath + CPLString("w");
+    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+		return szPath;
+    return CPLString();
+}
