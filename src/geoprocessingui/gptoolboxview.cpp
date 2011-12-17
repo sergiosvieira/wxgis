@@ -78,7 +78,9 @@ bool wxAxToolboxView::Activate(IFrameApplication* application, wxXmlNode* pConf)
         pConf->AddChild(pToolboxTreeConf);
     }
 
-    m_pGxToolboxView = new wxGxToolboxTreeView(this, TREECTRLID);
+    int nOSMajorVer(0);
+    wxGetOsVersion(&nOSMajorVer);
+    m_pGxToolboxView = new wxGxToolboxTreeView(this, TREECTRLID, wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS | wxBORDER_NONE | wxTR_EDIT_LABELS | (nOSMajorVer > 5 ? wxTR_NO_LINES : 0));
     AddPage(m_pGxToolboxView, m_pGxToolboxView->GetViewName(), true, m_pGxToolboxView->GetViewIcon());
     m_pGxToolboxView->Activate(application, pToolboxTreeConf);
     m_pApp->RegisterChildWindow(m_pGxToolboxView);

@@ -324,7 +324,7 @@ int wxGxContainerDialog::ShowModal(void)
 
 void wxGxContainerDialog::OnInit()
 {
-    m_pTree = new wxTreeContainerView( this, TREECTRLID);
+    m_pTree = new wxTreeContainerView( this, TREECTRLID, wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS | wxTR_NO_LINES | wxTR_SINGLE | wxTR_EDIT_LABELS );
 	m_pTree->Activate(this, NULL);//TODO !!!!
 
 	RegisterChildWindow(static_cast<wxWindow*>(m_pTree));

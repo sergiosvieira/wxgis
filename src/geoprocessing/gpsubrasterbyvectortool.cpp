@@ -104,13 +104,15 @@ GPParameters wxGISGPSubRasterByVectorTool::GetParameterInfo(void)
 
         //file name mask or field from vector file
 
-		//output raster type
+		//output raster type and parameters compres & etc.
 
 		//nodata value
 
 		//band list
 
 		//SQL select
+
+        //wxGxRasterFilter* pFilter = nullptr, GDALDataType eOutputType = GDT_Unknown, int nBandCount = 0, int *panBandList = nullptr, bool bUseCounter = true, int nCounterBegin = -1, int nFieldNo = -1, double dfOutResX = -1, double dfOutResY = -1, bool bCopyNodata = false, bool bSkipSourceMetadata = false, char** papszOptions = nullptr
 
     }
     return m_paParam;
@@ -220,7 +222,25 @@ bool wxGISGPSubRasterByVectorTool::Execute(ITrackCancel* pTrackCancel)
 
     CPLString szDstPath = pGxDstObject->GetInternalName();
 
-	bool bRes = SubrasterByVector(pSrcFeatureDataSet, pSrcRasterDataSet, szDstPath);
+    bool bRes = true;
+
+    wxGxRasterFilter* pFilter = new wxGxRasterFilter(enumRasterTiff); 
+    GDALDataType eOutputType = GDT_Byte; 
+    int nBandCount = 0;
+    int *panBandList = nullptr;
+    bool bUseCounter = false;
+    int nCounterBegin = -1; 
+    int nFieldNo = 0;
+    double dfOutResX = -1;
+    double dfOutResY = -1; 
+    bool bCopyNodata = false;
+    bool bSkipSourceMetadata = false;
+    char** papszOptions = nullptr;
+    papszOptions = CSLAddNameValue(papszOptions, "DEST_RESAMPLING", "near");
+    papszOptions = CSLAddNameValue(papszOptions, "COMPRESS", "LZW");
+    papszOptions = CSLAddNameValue(papszOptions, "PREDICTOR", "2");
+
+	bRes = SubrasterByVector(pSrcFeatureDataSet, pSrcRasterDataSet, szDstPath, pFilter, eOutputType, nBandCount, panBandList, bUseCounter, nCounterBegin, nFieldNo, dfOutResX, dfOutResY, bCopyNodata, bSkipSourceMetadata, papszOptions, pTrackCancel);
 
     if(pGxObjectContainer)
     {
@@ -229,6 +249,6 @@ bool wxGISGPSubRasterByVectorTool::Execute(ITrackCancel* pTrackCancel)
             pParentLoc->Refresh();
     }
 
-    return true;
+    return bRes;
 }
 

@@ -61,13 +61,13 @@ class WXDLLIMPEXP_GIS_CLU wxGxTreeViewBase :
     DECLARE_DYNAMIC_CLASS(wxGxTreeViewBase)
 public:
     wxGxTreeViewBase(void);
-	wxGxTreeViewBase(wxWindow* parent, wxWindowID id = TREECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTR_HAS_BUTTONS );
+	wxGxTreeViewBase(wxWindow* parent, wxWindowID id = TREECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS );
 	virtual ~wxGxTreeViewBase(void);
 	virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent);
 	virtual void AddRoot(IGxObject* pGxObject);
 	virtual void RefreshAll(void);
 //IGxView
-    virtual bool Create(wxWindow* parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTR_HAS_BUTTONS, const wxString& name = wxT("TreeView"));
+    virtual bool Create(wxWindow* parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS, const wxString& name = wxT("TreeView"));
 	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 //wxTreeCtrl
@@ -115,7 +115,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxTreeView :
     DECLARE_DYNAMIC_CLASS(wxGxTreeView)
 public:
     wxGxTreeView(void);
-	wxGxTreeView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxBORDER_NONE | wxTR_EDIT_LABELS /*| wxTR_MULTIPLE| wxTR_HIDE_ROOT | wxTR_LINES_AT_ROOT*/);
+	wxGxTreeView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS | wxBORDER_NONE | wxTR_EDIT_LABELS );//wxTR_MULTIPLE| wxTR_HIDE_ROOT | wxTR_LINES_AT_ROOT
 	virtual ~wxGxTreeView(void);
 //IGxDropTarget
     virtual wxDragResult OnDragOver(wxCoord x, wxCoord y, wxDragResult def);

@@ -394,7 +394,10 @@ bool wxGISIdentifyDlg::Create(wxWindow* parent, wxWindowID id, const wxPoint& po
 	m_TreeImageList.Add(wxBitmap(layers_xpm));
 	m_TreeImageList.Add(wxBitmap(layer16_xpm));
 	m_TreeImageList.Add(wxBitmap(id_xpm));
-	m_pTreeCtrl = new wxTreeCtrl( m_splitter, ID_WXGISTREECTRL, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS | wxTR_HIDE_ROOT | wxTR_LINES_AT_ROOT | wxSTATIC_BORDER );
+
+    int nOSMajorVer(0);
+    wxGetOsVersion(&nOSMajorVer);
+	m_pTreeCtrl = new wxTreeCtrl( m_splitter, ID_WXGISTREECTRL, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS | wxTR_HIDE_ROOT | wxSTATIC_BORDER | (nOSMajorVer > 5 ? wxTR_NO_LINES : wxTR_LINES_AT_ROOT) );
 	m_pTreeCtrl->SetImageList(&m_TreeImageList);
 
 	m_splitter->SetSashGravity(0.5);

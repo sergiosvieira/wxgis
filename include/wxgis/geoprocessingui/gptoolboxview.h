@@ -37,7 +37,7 @@ class WXDLLIMPEXP_GIS_GPU wxGxToolboxTreeView :
     DECLARE_DYNAMIC_CLASS(wxGxToolboxTreeView)
 public:
     wxGxToolboxTreeView(void);
-	wxGxToolboxTreeView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxBORDER_NONE | wxTR_EDIT_LABELS);
+	wxGxToolboxTreeView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS | wxBORDER_NONE | wxTR_EDIT_LABELS);
 	virtual ~wxGxToolboxTreeView(void);
     //wxGxTreeView
 	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
