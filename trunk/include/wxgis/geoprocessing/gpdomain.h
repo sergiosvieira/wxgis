@@ -62,24 +62,28 @@ public:
 
 inline void WXDLLIMPEXP_GIS_GP AddAllVectorFilters(wxGISGPGxObjectDomain* pDomain)
 {
-    pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecESRIShapefile));
-    pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoTab));
-    pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoMif));
-    pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecKML));
-    pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecKMZ));
-    pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecDXF));
-    pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecGML));
+    for(size_t i = enumVecUnknown + 1; i < emumVecMAX; i++)
+        pDomain->AddFilter(new wxGxFeatureFileFilter(wxGISEnumVectorDatasetType(i)));
+    //pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecESRIShapefile));
+    //pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoTab));
+    //pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoMif));
+    //pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecKML));
+    //pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecKMZ));
+    //pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecDXF));
+    //pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecGML));
 }
 
 inline void WXDLLIMPEXP_GIS_GP AddAllRasterFilters(wxGISGPGxObjectDomain* pDomain)
 {
-    pDomain->AddFilter(new wxGxRasterFilter(enumRasterTiff));
-    pDomain->AddFilter(new wxGxRasterFilter(enumRasterImg));
-    pDomain->AddFilter(new wxGxRasterFilter(enumRasterBmp));
-    pDomain->AddFilter(new wxGxRasterFilter(enumRasterJpeg));
-    pDomain->AddFilter(new wxGxRasterFilter(enumRasterPng));
-    pDomain->AddFilter(new wxGxRasterFilter(enumRasterGif));
-    pDomain->AddFilter(new wxGxRasterFilter(enumRasterSAGA));
+    for(size_t i = enumRasterUnknown + 1; i < enumRasterMAX; i++)
+        pDomain->AddFilter(new wxGxRasterFilter(wxGISEnumRasterDatasetType(i)));
+    //pDomain->AddFilter(new wxGxRasterFilter(enumRasterTiff));
+    //pDomain->AddFilter(new wxGxRasterFilter(enumRasterImg));
+    //pDomain->AddFilter(new wxGxRasterFilter(enumRasterBmp));
+    //pDomain->AddFilter(new wxGxRasterFilter(enumRasterJpeg));
+    //pDomain->AddFilter(new wxGxRasterFilter(enumRasterPng));
+    //pDomain->AddFilter(new wxGxRasterFilter(enumRasterGif));
+    //pDomain->AddFilter(new wxGxRasterFilter(enumRasterSAGA));
 }
 
 /** \class wxGISGPStringDomain gpdomain.h

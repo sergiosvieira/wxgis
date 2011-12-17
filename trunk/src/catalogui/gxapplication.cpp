@@ -80,7 +80,9 @@ bool wxGxApplication::Create(void)
     {
         if(pViewsChildNode->GetName().CmpNoCase(wxT("treeview")) == 0)
         {
-	        m_pTreeView = new wxGxTreeView(this, TREECTRLID);
+            int nOSMajorVer(0);
+            wxGetOsVersion(&nOSMajorVer);
+	        m_pTreeView = new wxGxTreeView(this, TREECTRLID, wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS | wxBORDER_NONE | wxTR_EDIT_LABELS | (nOSMajorVer > 5 ? wxTR_NO_LINES : 0) );
 	        if(m_pTreeView->Activate(this, pViewsChildNode))
 	        {
 		        m_mgr.AddPane(m_pTreeView, wxAuiPaneInfo().Name(wxT("tree_window")).Caption(_("Tree Pane")).BestSize(wxSize(280,128)).MinSize(wxSize(200,64)).Left().Layer(1).Position(1).CloseButton(true));//.MinimizeButton(true).MaximizeButton(true)

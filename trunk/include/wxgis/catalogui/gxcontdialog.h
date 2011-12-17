@@ -52,7 +52,7 @@ class wxTreeContainerView : public wxGxTreeView
     DECLARE_DYNAMIC_CLASS(wxTreeContainerView)
 public:
     wxTreeContainerView(void);
-    wxTreeContainerView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxTR_NO_LINES | wxTR_SINGLE | wxTR_EDIT_LABELS/* | wxTR_HIDE_ROOT*/);
+    wxTreeContainerView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS | wxTR_NO_LINES | wxTR_SINGLE | wxTR_EDIT_LABELS);// | wxTR_HIDE_ROOT
     virtual ~wxTreeContainerView(void);
 //wxGxTreeViewBase
     virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent);

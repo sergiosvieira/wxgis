@@ -233,13 +233,14 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
 }
 
 bool wxGISRasterDataset::Open(bool bReadOnly)
-{	if(m_bIsOpened)
+{	
+	if(m_bIsOpened)
 		return true;
 
 	wxCriticalSectionLocker locker(m_CritSect);
 
 
-    m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath, bReadOnly == true ? GA_ReadOnly : GA_Update );//m_sPath.mb_str(wxConvUTF8)
+    m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath, bReadOnly == true ? GA_ReadOnly : GA_Update );
     //bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
 	
 	if( m_poDataset == NULL )

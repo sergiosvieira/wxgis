@@ -23,6 +23,9 @@
 
 #include "../../art/document_16.xpm"
 
+//#ifdef __WXMSW__
+//#include "Uxtheme.h"
+//#endif
 //////////////////////////////////////////////////////////////////////////////
 // wxGxTreeViewBase
 //////////////////////////////////////////////////////////////////////////////
@@ -45,7 +48,7 @@ wxGxTreeViewBase::wxGxTreeViewBase(void) : wxTreeCtrl(), m_pConnectionPointCatal
 
 wxGxTreeViewBase::wxGxTreeViewBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxTreeCtrl(parent, id, pos, size, style, wxDefaultValidator, wxT("wxGxTreeViewBase")), m_pConnectionPointCatalog(NULL), m_pConnectionPointSelection(NULL), m_ConnectionPointCatalogCookie(-1), m_ConnectionPointSelectionCookie(-1), m_pDeleteCmd(NULL)
 {
-	m_TreeImageList.Create(16, 16);
+    m_TreeImageList.Create(16, 16);
 	SetImageList(&m_TreeImageList);
     m_TreeImageList.Add(wxIcon(document_16_xpm));
 }
