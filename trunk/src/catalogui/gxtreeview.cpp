@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxTreeView class.
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -609,6 +609,11 @@ void wxGxTreeView::OnItemRightClick(wxTreeEvent& event)
     wxGxTreeViewBase::OnItemRightClick(event);
 }
 
+#include <wx/datstrm.h> 
+#include <wx/stream.h> 
+#include <wx/sstream.h> 
+#include <wx/mstream.h> 
+
 void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
 {
     //event.Skip();
@@ -616,6 +621,46 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
 	if(!item.IsOk())
 		return;
     SelectItem(item);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//        wxDataObjectComposite* my_data = new wxDataObjectComposite();
+//        wxFileDataObject *pFileData = new wxFileDataObject();
+//        my_data->Add(pFileData, true);
+//        wxDataObjectSimple* pDataObjectSimple = new wxDataObjectSimple(wxDataFormat(wxT("application/x-vnd.qgis.qgis.uri")));
+//        my_data->Add(pDataObjectSimple);
+//
+//        wxMemoryOutputStream *pstream = new wxMemoryOutputStream();
+//        wxDataOutputStream dostr(*pstream);
+//
+//    wxArrayTreeItemIds treearray;
+//    size_t count = GetSelections(treearray);
+//    if(count == 0)
+//        return;
+//    IGxObject* pParentGxObject(NULL);
+//    for(size_t i = 0; i < count; ++i)
+//    {
+//	    wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(treearray[i]);
+//	    if(pData == NULL)
+//            continue;
+//
+//        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID);
+//        pParentGxObject = pGxObject->GetParent();
+//        wxString sSystemPath(pGxObject->GetInternalName(), wxConvUTF8);
+//        pFileData->AddFile(sSystemPath);
+//        dostr.WriteString(sSystemPath);
+//        wxStreamBuffer* theBuffer = pstream->GetOutputStreamBuffer();
+//
+//        pDataObjectSimple->SetData(theBuffer->GetBufferSize(), theBuffer->GetBufferStart());
+//    }
+  ////  		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
+		////if(pGxObjectUI)
+		////{
+		////	wxDataFormat frm = pGxObjectUI->GetDataFormat();
+		////	if(frm.GetType() != wxDF_INVALID)
+		////		my_data.SetFormat(frm);
+		////}
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     wxFileDataObject my_data;
 
@@ -633,13 +678,6 @@ void wxGxTreeView::OnBeginDrag(wxTreeEvent& event)
         IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID);
         pParentGxObject = pGxObject->GetParent();
         wxString sSystemPath(pGxObject->GetInternalName(), wxConvUTF8);
-		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
-		if(pGxObjectUI)
-		{
-			wxDataFormat frm = pGxObjectUI->GetDataFormat();
-			if(frm.GetType() != wxDF_INVALID)
-				my_data.SetFormat(frm);
-		}
         my_data.AddFile(sSystemPath);
     }
     wxDropSource dragSource( this );

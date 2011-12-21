@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDBConnectionFactoryUI class.
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -26,10 +26,6 @@
 #include "../../art/rdb_disconn_16.xpm"
 #include "../../art/rdb_disconn_48.xpm"
 
-#include "../../art/pg_vec_16.xpm"
-#include "../../art/pg_vec_48.xpm"
-#include "../../art/table_pg_16.xpm"
-#include "../../art/table_pg_48.xpm"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionFactoryUI, wxGxDBConnectionFactory)
 
@@ -39,11 +35,6 @@ wxGxDBConnectionFactoryUI::wxGxDBConnectionFactoryUI(void) : wxGxDBConnectionFac
     m_SmallIconConn = wxIcon(rdb_conn_16_xpm);
     m_LargeIconDisconn = wxIcon(rdb_disconn_48_xpm);
     m_SmallIconDisconn = wxIcon(rdb_disconn_16_xpm);
-
-    m_LargeIconFeatureClass = wxIcon(pg_vec_48_xpm);
-    m_SmallIconFeatureClass = wxIcon(pg_vec_16_xpm);
-    m_LargeIconTable = wxIcon(table_pg_48_xpm);
-    m_SmallIconTable = wxIcon(table_pg_16_xpm);
 }
 
 wxGxDBConnectionFactoryUI::~wxGxDBConnectionFactoryUI(void)
@@ -52,7 +43,7 @@ wxGxDBConnectionFactoryUI::~wxGxDBConnectionFactoryUI(void)
 
 IGxObject* wxGxDBConnectionFactoryUI::GetGxDataset(CPLString path, wxString name)
 {
-    wxGxRemoteConnectionUI* pDataset = new wxGxRemoteConnectionUI(path, name, m_LargeIconConn, m_SmallIconConn, m_LargeIconDisconn, m_SmallIconDisconn, m_LargeIconFeatureClass, m_SmallIconFeatureClass, m_LargeIconTable, m_SmallIconTable);
+    wxGxRemoteConnectionUI* pDataset = new wxGxRemoteConnectionUI(path, name, m_LargeIconConn, m_SmallIconConn, m_LargeIconDisconn, m_SmallIconDisconn);
     //pDataset->SetEncoding(wxFONTENCODING_UTF8);
     return static_cast<IGxObject*>(pDataset);
 }

@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxRemoteConnection class.
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -21,6 +21,11 @@
 #pragma once
 
 #include "wxgis/catalog/catalog.h"
+#include "wxgis/datasource/postgisdataset.h"
+
+#include "ogrsf_frmts/pg/ogr_pg.h"
+
+class wxGxRemoteDBSchema;
 
 /** \class wxGxRemoteConnection gxremoteconn.h
     \brief A Remote Connection GxObject.
@@ -56,13 +61,48 @@ public:
 	virtual bool DeleteChild(IGxObject* pChild);
 	virtual bool AreChildrenViewable(void){return true;};
 	virtual bool HasChildren(void){LoadChildren(); return m_Children.size() > 0 ? true : false;};
+protected:
 	//wxGxRemoteConnection
 	virtual void LoadChildren(void);
 	virtual void EmptyChildren(void);
+    virtual wxGxRemoteDBSchema* GetNewRemoteDBSchema(CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon);
 protected:
-	wxGISDatasetSPtr m_pwxGISDataset;
+    wxGISPostgresDataSourceSPtr m_pwxGISRemoteConn;
+    wxGISDatasetSPtr m_pwxGISDataset;
 	wxGISEnumContainerType m_eType;
     bool m_bIsChildrenLoaded;
+	wxString m_sName;
+    CPLString m_sPath;
+};
+
+/** \class wxGxRemoteDBSchema gxremoteconn.h
+    \brief A Remote Database schema GxObject.
+*/
+
+class WXDLLIMPEXP_GIS_CLT wxGxRemoteDBSchema :
+	public IGxObjectContainer
+{
+    friend class wxGxRemoteConnection;
+public:
+	wxGxRemoteDBSchema(wxString &sName, wxGISPostgresDataSourceSPtr pwxGISRemoteConn);
+	virtual ~wxGxRemoteDBSchema(void);
+	//IGxObject
+	virtual wxString GetName(void){return m_sName;};
+    virtual wxString GetBaseName(void){return m_sName;};
+    virtual CPLString GetInternalName(void){return m_sPath;};
+	virtual wxString GetCategory(void){return wxString(_("Remote Database Schema"));};
+	//IGxObjectContainer
+	virtual bool DeleteChild(IGxObject* pChild);
+	virtual bool AreChildrenViewable(void){return true;};
+	virtual bool HasChildren(void){return m_Children.size() > 0 ? true : false;};
+	////wxGxRemoteConnection
+	//virtual void LoadChildren(void);
+	//virtual void EmptyChildren(void);
+protected:
+    //wxGxRemoteDBSchema
+    virtual void AddTable(CPLString &szName, bool bHasGeometry);
+protected:
+    wxGISPostgresDataSourceSPtr m_pwxGISRemoteConn;
 	wxString m_sName;
     CPLString m_sPath;
 };

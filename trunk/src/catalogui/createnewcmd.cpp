@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  Catalog Create New Commands class.
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -29,11 +29,6 @@
 #include "../../art/rdb_conn_48.xpm"
 #include "../../art/rdb_disconn_16.xpm"
 #include "../../art/rdb_disconn_48.xpm"
-
-#include "../../art/pg_vec_16.xpm"
-#include "../../art/pg_vec_48.xpm"
-#include "../../art/table_pg_16.xpm"
-#include "../../art/table_pg_48.xpm"
 
 //	0	Create new remote connection
 //  1   ?
@@ -175,16 +170,8 @@ void wxGISCreateNewCmd::OnClick(void)
 									m_LargeDisconnIcon = wxIcon(rdb_disconn_48_xpm);
 								if(!m_SmallDisconnIcon.IsOk())
 									m_SmallDisconnIcon = wxIcon(rdb_disconn_16_xpm);
-								if(!m_LargeIconFeatureClass.IsOk())
-									m_LargeIconFeatureClass = wxIcon(pg_vec_48_xpm);
-								if(!m_SmallIconFeatureClass.IsOk())
-									m_SmallIconFeatureClass = wxIcon(pg_vec_16_xpm);
-								if(!m_LargeIconTable.IsOk())
-									m_LargeIconTable = wxIcon(table_pg_48_xpm);
-								if(!m_SmallIconTable.IsOk())
-									m_SmallIconTable = wxIcon(table_pg_16_xpm);
 
-								wxGxRemoteConnectionUI* pConn = new wxGxRemoteConnectionUI(dlg.GetPath(), dlg.GetName(), m_LargeConnIcon, m_SmallConnIcon, m_LargeDisconnIcon, m_SmallDisconnIcon, m_LargeIconFeatureClass, m_SmallIconFeatureClass, m_LargeIconTable, m_SmallIconTable);
+								wxGxRemoteConnectionUI* pConn = new wxGxRemoteConnectionUI(dlg.GetPath(), dlg.GetName(), m_LargeConnIcon, m_SmallConnIcon, m_LargeDisconnIcon, m_SmallDisconnIcon);
 								IGxObject* pGxConn = static_cast<IGxObject*>(pConn);
 								IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 								pObjCont->AddChild(pGxConn);
