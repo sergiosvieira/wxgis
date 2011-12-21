@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  cURL class. This is smart clas for cURL handler
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2008,2010,2011  Bishop
 *

@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  geoprocess main header. geoprocess is standalone console executable for multiprocess exec of geoprocessing tools
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
 *

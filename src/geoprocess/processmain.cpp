@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  Main application class.
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010,2011 Bishop
 *
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
     };
 
     wxCmdLineParser my_parser( my_cmdline_desc, argc, wxArgv );
-    my_parser.SetLogo(wxString::Format(_("The wxGISGeoprocess (%s)\nAuthor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010-2011"), APP_VER));
+    my_parser.SetLogo(wxString::Format(_("The wxGISGeoprocess (%s)\nAuthor: Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010-2011"), APP_VER));
 
     // Parse command line arguments
     success = parse_commandline_parameters(my_parser);
@@ -106,7 +106,7 @@ bool parse_commandline_parameters( wxCmdLineParser& parser )
 
 	if( parser.Found( wxT( "v" ) ) )
 	{
-	    wxString out = wxString::Format(_("The wxGISGeoprocess (%s)\nAuthor: Bishop (aka Barishnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010-2011\n"), APP_VER);
+	    wxString out = wxString::Format(_("The wxGISGeoprocess (%s)\nAuthor: Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010-2011\n"), APP_VER);
 	    wxFprintf(stdout, out);
 		return true;
 	}

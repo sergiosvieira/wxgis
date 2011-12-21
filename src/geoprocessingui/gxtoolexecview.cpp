@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISToolExecuteView class.
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -677,7 +677,12 @@ void wxGxToolExecuteView::OnBeginDrag(wxListEvent& event)
 	FillDataArray(saArr);
 	if(saArr.GetCount() > 0)
 	{
+
 		wxFileDataObject *pMyData = new wxFileDataObject();
+        //TODO: special task clipboard format support 
+        //wxDataFormat frm(wxT("application/x-vnd.wxgis.task.uri"));
+		//if(frm.GetType() != wxDF_INVALID)
+		//	pMyData->SetFormat(frm);
 		for(size_t i = 0; i < saArr.GetCount(); ++i)
 			pMyData->AddFile(saArr[i]);
 
@@ -712,6 +717,7 @@ wxDragResult wxGxToolExecuteView::OnDragOver(wxCoord x, wxCoord y, wxDragResult 
 
 bool wxGxToolExecuteView::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 {
+    //TODO: special task clipboard format support
 	SetItemState(m_HighLightItem, 0, wxLIST_STATE_DROPHILITED);
     wxPoint pt(x, y);
 	unsigned long nFlags(0);

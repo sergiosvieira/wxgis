@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxPendingUI class. Show pending item in tree or content view
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010  Bishop
 *

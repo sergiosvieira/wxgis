@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxArchiveFactoryUI class. Create new GxFolderUI objects
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *

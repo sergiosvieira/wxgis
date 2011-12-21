@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  GxPostGISDataset classes.
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -43,7 +43,7 @@ wxGISDatasetSPtr wxGxPostGISTableDataset::GetDataset(bool bCache, ITrackCancel* 
     return m_pwxGISDataset;
 }
 
-#define PGTEST
+//#define PGTEST
 //-----------------------------------------------------------------------------------
 // wxGxPostGISFeatureDataset
 //-----------------------------------------------------------------------------------

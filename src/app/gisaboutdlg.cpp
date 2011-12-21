@@ -1,7 +1,7 @@
-/******************************************************************************
+﻿/******************************************************************************
  * Project:  wxGIS
  * Purpose:  About Dialog class.
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -21,10 +21,13 @@
 
 #include "wxgis/app/gisaboutdlg.h"
 #include "wxgis/datasource/datasource.h"
+#include "wxgis/core/config.h"
 
 #include "../../art/logo.xpm"
 
-#include "wx/version.h"
+#include <wx/version.h>
+#include <wx/ffile.h> 
+
 #include "geos_c.h"
 #include "proj_api.h"
 #include "cairo.h"
@@ -126,7 +129,7 @@ wxString wxVer( wxVERSION_STRING );
 
 	m_AuiNotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE );
 
-    wxString sAboutApp = wxString::Format(_("wxGIS [%s]\n\nVersion: %s\n\nBuild: %s\n\n(c) 2009-%d Dmitry Barishnikov (Bishop)\n\nhttp://wxgis.googlecode.com/"), pApp->GetAppName().c_str(), pApp->GetAppVersionString().c_str(), wxString(__DATE__,wxConvLibc).c_str(),  __YEAR__);
+    wxString sAboutApp = wxString::Format(_("wxGIS [%s]\n\nVersion: %s\n\nBuild: %s\n\n(c) 2009-%d Dmitry Baryshnikov (Bishop)\n\nhttp://wxgis.googlecode.com/"), pApp->GetAppName().c_str(), pApp->GetAppVersionString().c_str(), wxString(__DATE__,wxConvLibc).c_str(),  __YEAR__);
 	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutApp, m_AuiNotebook), _("About application"));
 
     long dFreeMem =  wxMemorySize(wxGetFreeMemory() / 1048576).ToLong();
@@ -155,7 +158,32 @@ wxString wxVer( wxVERSION_STRING );
 	sAboutSys += wxString(_("\n* - The drivers only compiled in GDAL lib and may not supported by wxGIS."));
     m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutSys, m_AuiNotebook), _("About system"));
 
-	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(_("Thanks GIS-LAB team for help in translating the interface, testing and searching for errors.\nSpecial thanks to Maxim Dubinin"), m_AuiNotebook), _("Thanks"));
+    //add translation page
+    wxGISAppConfigSPtr pConfig = GetConfig();
+    if(pConfig)
+    {
+        wxString sTranslatorsFile = pConfig->GetLocaleDir() + wxFileName::GetPathSeparator() + wxString(wxT("TRANSLATORS.txt"));
+        wxFFile file(sTranslatorsFile, wxString(wxT("r")));
+	    if(file.IsOpened())
+	    {
+            wxString sTranslators;
+            if(file.ReadAll(&sTranslators, wxConvUTF8))
+            {
+                m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sTranslators, m_AuiNotebook), _("Translators"));
+            }
+        }
+        wxString sThanksFile = pConfig->GetLocaleDir() + wxFileName::GetPathSeparator() + wxString(wxT("THANKS.txt"));
+        wxFFile fanksfile(sThanksFile, wxString(wxT("r")));
+	    if(fanksfile.IsOpened())
+	    {
+            wxString sThanks;
+            if(fanksfile.ReadAll(&sThanks, wxConvUTF8))
+            {
+ 	            m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sThanks, m_AuiNotebook), _("Thanks"));
+            }
+        }
+    }
+
 	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(_("This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\nSee the GNU General Public License for more details.\nYou should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>"), m_AuiNotebook), _("License"));
 
 	bMainSizer->Add( m_AuiNotebook, 1, wxEXPAND | wxALL, 5 );
@@ -174,4 +202,3 @@ wxString wxVer( wxVERSION_STRING );
 wxGISAboutDialog::~wxGISAboutDialog()
 {
 }
-

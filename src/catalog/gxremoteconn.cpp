@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxRemoteConnection class.
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -21,9 +21,9 @@
 
 #include "wxgis/catalog/gxremoteconn.h"
 #include "wxgis/core/crypt.h"
-#include "wxgis/datasource/postgisdataset.h"
 #include "wxgis/datasource/sysop.h"
 #include "wxgis/catalog/gxpostgisdataset.h"
+#include "wxgis/datasource/table.h"
 
 //--------------------------------------------------------------
 //class wxGxRemoteConnection
@@ -64,8 +64,8 @@ wxGISDatasetSPtr wxGxRemoteConnection::GetDataset(bool bCache, ITrackCancel* pTr
 			wxString sPass;
 			Decrypt(pRootNode->GetAttribute(wxT("pass"), wxEmptyString), sPass);
 			bool bIsBinaryCursor = wxString(pRootNode->GetAttribute(wxT("isbincursor"), wxT("no"))).CmpNoCase(wxString(wxT("yes"))) == 0;
-			wxGISPostgresDataSourceSPtr pwxGISRemoteConn = boost::make_shared<wxGISPostgresDataSource>(sUser, sPass, sPort, sServer, sDatabase, bIsBinaryCursor);
-			if(!pwxGISRemoteConn->Open())
+			m_pwxGISRemoteConn = boost::make_shared<wxGISPostgresDataSource>(sUser, sPass, sPort, sServer, sDatabase, bIsBinaryCursor);
+			if(!m_pwxGISRemoteConn->Open())
 			{
 				const char* err = CPLGetLastErrorMsg();
 				wxString sErr = wxString::Format(_("Operation '%s' failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
@@ -74,7 +74,7 @@ wxGISDatasetSPtr wxGxRemoteConnection::GetDataset(bool bCache, ITrackCancel* pTr
 					pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
 				return wxGISDatasetSPtr();
 			}
-			m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(pwxGISRemoteConn);
+			m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(m_pwxGISRemoteConn);
 		}
 	}
 	return m_pwxGISDataset;
@@ -108,43 +108,121 @@ void wxGxRemoteConnection::LoadChildren(void)
 	if(m_bIsChildrenLoaded)
 		return;
 
-	if(m_pwxGISDataset == NULL)
+	if(m_pwxGISDataset == NULL || m_pwxGISRemoteConn == NULL)
 		return;
 
-    for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); ++i)
-    {
-        wxGISDatasetSPtr pGISDataset = m_pwxGISDataset->GetSubset(i);
-        wxGISEnumDatasetType eType = pGISDataset->GetType();
-        IGxObject* pGxObject(NULL);
-        switch(eType)
-        {
-        case enumGISFeatureDataset:
-            {
-                wxGxPostGISFeatureDataset* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDataset(pGISDataset->GetPath(), pGISDataset);
-                pGxObject = static_cast<IGxObject*>(pGxPostGISFeatureDataset);
-            }
-            break;
-        case enumGISTableDataset:
-            {
-                wxGxPostGISTableDataset* pGxPostGISTableDataset = new wxGxPostGISTableDataset(pGISDataset->GetPath(), pGISDataset);
-                pGxObject = static_cast<IGxObject*>(pGxPostGISTableDataset);
-            }
-            break;
-        case enumGISRasterDataset:
-            break;
-        default:
-        case enumGISContainer:
-            break;
-        };
+    OGRPGDataSource* pDS = dynamic_cast<OGRPGDataSource*>(m_pwxGISRemoteConn->GetDataSource());
+    Oid nGeogOID = pDS->GetGeographyOID();
+    Oid nGeomOID = pDS->GetGeometryOID();
+    wxGISTableSPtr pGeostruct;
+    if(nGeogOID != 0)
+        pGeostruct = boost::dynamic_pointer_cast<wxGISTable>(m_pwxGISRemoteConn->ExecuteSQL(wxT("SELECT f_table_schema,f_table_name from geography_columns")));//,f_geography_column,type
+    else if(nGeomOID != 0)
+        pGeostruct = boost::dynamic_pointer_cast<wxGISTable>(m_pwxGISRemoteConn->ExecuteSQL(wxT("SELECT f_table_schema,f_table_name from geometry_columns")));//,f_geography_column,type
 
-        if(pGxObject)
+    typedef struct _pgtabledata{
+        bool bHasGeometry;
+        CPLString sTableName;
+        CPLString sTableSchema;
+    }PGTABLEDATA;
+
+    std::vector<PGTABLEDATA> aDBStruct;
+    if(pGeostruct)
+    {
+        OGRFeatureSPtr pFeature;
+        while((pFeature = pGeostruct->Next()) != nullptr)
         {
-		    bool ret_code = AddChild(pGxObject);
-		    if(!ret_code)
-			    wxDELETE(pGxObject);
+            PGTABLEDATA data = {true, pFeature->GetFieldAsString(1), pFeature->GetFieldAsString(0)};
+            aDBStruct.push_back(data);
         }
-	}
+    }
+
+    std::vector<PGTABLEDATA> aDBStructOut;
+    OGRDataSource* poDS = m_pwxGISRemoteConn->GetDataSource();
+    for(size_t nIndex = 0; nIndex < m_pwxGISDataset->GetSubsetsCount(); ++nIndex)
+    {
+        OGRPGTableLayer* pPGTableLayer = dynamic_cast<OGRPGTableLayer*>(poDS->GetLayer(nIndex));
+        CPLString sTableName (pPGTableLayer->GetTableName());
+        CPLString sTableSchema (pPGTableLayer->GetSchemaName());
+        bool bAdd(false);
+        for(size_t j = 0; j < aDBStruct.size(); ++j)
+        {
+            if(aDBStruct[j].sTableName == sTableName && aDBStruct[j].sTableSchema == sTableSchema)
+            {
+                aDBStructOut.push_back( aDBStruct[j] );
+                bAdd = true;
+                break;
+            }
+        }
+        if(!bAdd)
+        {
+            PGTABLEDATA data = {false, sTableName, sTableSchema};
+            aDBStructOut.push_back( data );
+        }
+    }
+
+    std::map<CPLString, wxGxRemoteDBSchema*> DBSchema;
+
+    for(size_t i = 0; i < aDBStructOut.size(); ++i)
+    {
+        wxGxRemoteDBSchema* pGxRemoteDBSchema = DBSchema[aDBStructOut[i].sTableSchema];
+        if(pGxRemoteDBSchema)
+            pGxRemoteDBSchema->AddTable(aDBStructOut[i].sTableName, aDBStructOut[i].bHasGeometry);
+        else
+        {
+            pGxRemoteDBSchema = GetNewRemoteDBSchema(aDBStructOut[i].sTableSchema, m_pwxGISRemoteConn);
+            pGxRemoteDBSchema->AddTable(aDBStructOut[i].sTableName, aDBStructOut[i].bHasGeometry);
+            DBSchema[aDBStructOut[i].sTableSchema] = pGxRemoteDBSchema;
+        }
+    }
+
+    for(auto itr = DBSchema.begin(); itr != DBSchema.end(); ++itr)
+    {
+        bool ret_code = AddChild(static_cast<IGxObject*>(itr->second));
+		if(!ret_code)
+            wxDELETE(itr->second);
+    }
+ 
+
+    //for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); ++i)
+    //{
+    //    wxGISDatasetSPtr pGISDataset = m_pwxGISDataset->GetSubset(i);
+    //    wxGISEnumDatasetType eType = pGISDataset->GetType();
+    //    IGxObject* pGxObject(NULL);
+    //    switch(eType)
+    //    {
+    //    case enumGISFeatureDataset:
+    //        {
+    //            wxGxPostGISFeatureDataset* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDataset(pGISDataset->GetPath(), pGISDataset);
+    //            pGxObject = static_cast<IGxObject*>(pGxPostGISFeatureDataset);
+    //        }
+    //        break;
+    //    case enumGISTableDataset:
+    //        {
+    //            wxGxPostGISTableDataset* pGxPostGISTableDataset = new wxGxPostGISTableDataset(pGISDataset->GetPath(), pGISDataset);
+    //            pGxObject = static_cast<IGxObject*>(pGxPostGISTableDataset);
+    //        }
+    //        break;
+    //    case enumGISRasterDataset:
+    //        break;
+    //    default:
+    //    case enumGISContainer:
+    //        break;
+    //    };
+
+    //    if(pGxObject)
+    //    {
+		  //  bool ret_code = AddChild(pGxObject);
+		  //  if(!ret_code)
+			 //   wxDELETE(pGxObject);
+    //    }
+	//}
 	m_bIsChildrenLoaded = true;
+}
+
+wxGxRemoteDBSchema* wxGxRemoteConnection::GetNewRemoteDBSchema(CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon)
+{
+    return new wxGxRemoteDBSchema(wxString(szName, wxConvUTF8), pwxGISRemoteCon); 
 }
 
 wxString wxGxRemoteConnection::GetBaseName(void)
@@ -225,4 +303,34 @@ bool wxGxRemoteConnection::Move(CPLString szDestPath, ITrackCancel* pTrackCancel
     m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
 
     return true;
+}
+
+//--------------------------------------------------------------
+//class wxGxRemoteDBSchema
+//--------------------------------------------------------------
+
+wxGxRemoteDBSchema::wxGxRemoteDBSchema(wxString &sName, wxGISPostgresDataSourceSPtr pwxGISRemoteConn)
+{
+    m_sName = sName;
+    m_pwxGISRemoteConn = pwxGISRemoteConn;
+}
+
+wxGxRemoteDBSchema::~wxGxRemoteDBSchema(void)
+{
+}
+
+void wxGxRemoteDBSchema::AddTable(CPLString &szName, bool bHasGeometry)
+{
+}
+
+bool wxGxRemoteDBSchema::DeleteChild(IGxObject* pChild)
+{
+	bool bHasChildren = m_Children.size() > 0 ? true : false;
+    long nChildID = pChild->GetID();
+	if(!IGxObjectContainer::DeleteChild(pChild))
+		return false;
+    m_pCatalog->ObjectDeleted(nChildID);
+	if(bHasChildren != m_Children.size() > 0 ? true : false)
+		m_pCatalog->ObjectChanged(GetID());
+	return true;
 }

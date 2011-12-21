@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  Initializer class for logs, locale, libs and etc.
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *

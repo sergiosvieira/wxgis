@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  wxGISApplicationEx class. Add AUI managed frames & etc.
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *

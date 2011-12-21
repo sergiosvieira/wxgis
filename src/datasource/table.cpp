@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  Table class.
- * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
+ * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
