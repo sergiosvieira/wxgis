@@ -44,6 +44,7 @@ public:
     virtual wxString GetBaseName(void);
     virtual CPLString GetInternalName(void){return m_sPath;};
 	virtual wxString GetCategory(void){return wxString(_("Remote Database Connection"));};
+    virtual void Detach(void);
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
@@ -95,12 +96,9 @@ public:
 	virtual bool DeleteChild(IGxObject* pChild);
 	virtual bool AreChildrenViewable(void){return true;};
 	virtual bool HasChildren(void){return m_Children.size() > 0 ? true : false;};
-	////wxGxRemoteConnection
-	//virtual void LoadChildren(void);
-	//virtual void EmptyChildren(void);
 protected:
     //wxGxRemoteDBSchema
-    virtual void AddTable(CPLString &szName, bool bHasGeometry);
+    virtual void AddTable(CPLString &szName, CPLString &szSchema, bool bHasGeometry);
 protected:
     wxGISPostgresDataSourceSPtr m_pwxGISRemoteConn;
 	wxString m_sName;

@@ -35,7 +35,7 @@
 // wxGxPostGISTableDatasetUI
 //-----------------------------------------------------------------------------
 
-wxGxPostGISTableDatasetUI::wxGxPostGISTableDatasetUI(CPLString soPath, wxGISDatasetSPtr pwxGISDataset, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxPostGISTableDataset(soPath, pwxGISDataset)
+wxGxPostGISTableDatasetUI::wxGxPostGISTableDatasetUI(CPLString szName, CPLString szSchema, wxGISPostgresDataSourceSPtr pwxGISRemoteConn, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxPostGISTableDataset(szName, szSchema, pwxGISRemoteConn)
 {
     m_LargeIcon = LargeIcon;
     m_SmallIcon = SmallIcon;
@@ -80,7 +80,7 @@ void wxGxPostGISTableDatasetUI::EditProperties(wxWindow *parent)
 // wxGxPostGISFeatureDatasetUI
 //-----------------------------------------------------------------------------
 
-wxGxPostGISFeatureDatasetUI::wxGxPostGISFeatureDatasetUI(CPLString soPath, wxGISDatasetSPtr pwxGISDataset, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxPostGISFeatureDataset(soPath, pwxGISDataset)
+wxGxPostGISFeatureDatasetUI::wxGxPostGISFeatureDatasetUI(CPLString szName, CPLString szSchema, wxGISPostgresDataSourceSPtr pwxGISRemoteConn, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxPostGISFeatureDataset(szName, szSchema, pwxGISRemoteConn)
 {
     m_LargeIcon = LargeIcon;
     m_SmallIcon = SmallIcon;

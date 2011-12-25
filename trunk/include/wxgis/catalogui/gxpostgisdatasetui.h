@@ -32,7 +32,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxPostGISTableDatasetUI :
 	public IGxObjectEditUI
 {
 public:
-	wxGxPostGISTableDatasetUI(CPLString soPath, wxGISDatasetSPtr pwxGISDataset, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxPostGISTableDatasetUI(CPLString szName, CPLString szSchema, wxGISPostgresDataSourceSPtr pwxGISRemoteConn, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxPostGISTableDatasetUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
@@ -54,14 +54,14 @@ class WXDLLIMPEXP_GIS_CLU wxGxPostGISFeatureDatasetUI :
 	public IGxObjectEditUI
 {
 public:
-	wxGxPostGISFeatureDatasetUI(CPLString soPath, wxGISDatasetSPtr pwxGISDataset, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxPostGISFeatureDatasetUI(CPLString szName, CPLString szSchema, wxGISPostgresDataSourceSPtr pwxGISRemoteConn, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
 	virtual ~wxGxPostGISFeatureDatasetUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
 	virtual wxString ContextMenu(void){return wxString(wxT("wxGxPostGISFeatureDatasetUI.ContextMenu"));};
 	virtual wxString NewMenu(void){return wxEmptyString;};
-	virtual wxDataFormat GetDataFormat(void){return wxDataFormat(wxT("application/x-vnd.qgis.qgis.uri"));};
+	//virtual wxDataFormat GetDataFormat(void){return wxDataFormat(wxT("application/x-vnd.qgis.qgis.uri"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
 protected:

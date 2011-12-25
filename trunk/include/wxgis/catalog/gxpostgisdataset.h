@@ -21,6 +21,7 @@
 #pragma once
 
 #include "wxgis/catalog/catalog.h"
+#include "wxgis/datasource/postgisdataset.h"
 
 /** \class wxGxPostGISTableDataset gxpostgisdataset.h
     \brief A PostGIS Table Dataset GxObject.
@@ -31,12 +32,13 @@ class WXDLLIMPEXP_GIS_CLT wxGxPostGISTableDataset :
 	public IGxDataset
 {
 public:
-	wxGxPostGISTableDataset(CPLString soPath, wxGISDatasetSPtr pwxGISDataset);
+	//wxGxPostGISTableDataset(CPLString soPath, wxGISDatasetSPtr pwxGISDataset);
+	wxGxPostGISTableDataset(CPLString szName, CPLString szSchema, wxGISPostgresDataSourceSPtr pwxGISRemoteConn);
 	virtual ~wxGxPostGISTableDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void){return GetName();};
-    virtual CPLString GetInternalName(void){return m_sPath;};
+    virtual CPLString GetInternalName(void);
 	virtual wxString GetCategory(void){return wxString(_("PostGIS Table"));};
 	//IGxDataset
 	virtual wxGISDatasetSPtr GetDataset(bool bCache = true, ITrackCancel* pTrackCancel = NULL);
@@ -47,7 +49,9 @@ public:
 protected:
 	wxString m_sName;
     CPLString m_sPath;
+    CPLString m_szFullyQualifiedName;
 	wxGISDatasetSPtr m_pwxGISDataset;
+    wxGISPostgresDataSourceSPtr m_pwxGISRemoteConn;
 };
 
 /** \class wxGxPostGISFeatureDataset gxpostgisdataset.h
@@ -59,12 +63,12 @@ class WXDLLIMPEXP_GIS_CLT wxGxPostGISFeatureDataset :
 	public IGxDataset
 {
 public:
-	wxGxPostGISFeatureDataset(CPLString soPath, wxGISDatasetSPtr pwxGISDataset);
+	wxGxPostGISFeatureDataset(CPLString szName, CPLString szSchema, wxGISPostgresDataSourceSPtr pwxGISRemoteConn);
 	virtual ~wxGxPostGISFeatureDataset(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};
     virtual wxString GetBaseName(void){return GetName();};
-    virtual CPLString GetInternalName(void){return m_sPath;};
+    virtual CPLString GetInternalName(void);
 	virtual wxString GetCategory(void){return wxString(_("PostGIS Feature Dataset"));};
 	//IGxDataset
 	virtual wxGISDatasetSPtr GetDataset(bool bCache = true, ITrackCancel* pTrackCancel = NULL);
@@ -75,5 +79,7 @@ public:
 protected:
 	wxString m_sName;
     CPLString m_sPath;
+    CPLString m_szFullyQualifiedName;
 	wxGISDatasetSPtr m_pwxGISDataset;
+    wxGISPostgresDataSourceSPtr m_pwxGISRemoteConn;
 };
