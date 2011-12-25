@@ -678,7 +678,6 @@ void wxGISApplication::LoadToolbars(wxXmlNode* pRootNode)
 
 void wxGISApplication::OnToolDropDown(wxAuiToolBarEvent& event)
 {
-    event.Skip();
     if(event.IsDropDownClicked())
     {
         ICommand* pCmd = GetCommand(event.GetToolId());
@@ -688,17 +687,15 @@ void wxGISApplication::OnToolDropDown(wxAuiToolBarEvent& event)
             wxMenu* pMenu = m_pDropDownCommand->GetDropDownMenu();
             if(pMenu)
             {
-#ifdef __WXGTK__
                 PushEventHandler(pMenu);
                 PopupMenu(pMenu, event.GetItemRect().GetBottomLeft());
                 PopEventHandler();
-#else
-                PopupMenu(pMenu, event.GetItemRect().GetBottomLeft());
-#endif
+                delete pMenu;
+                return;
             }
-            wxDELETE(pMenu);
         }
     }
+    event.Skip();
 }
 
 bool wxGISApplication::Create(void)

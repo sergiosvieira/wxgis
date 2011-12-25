@@ -626,7 +626,6 @@ void wxGxObjectDialog::OnDropDownCommand(wxCommandEvent& event)
 
 void wxGxObjectDialog::OnToolDropDown(wxAuiToolBarEvent& event)
 {
-	event.Skip();
     if(event.IsDropDownClicked())
     {
         ICommand* pCmd = GetCommand(event.GetToolId());
@@ -636,11 +635,15 @@ void wxGxObjectDialog::OnToolDropDown(wxAuiToolBarEvent& event)
             wxMenu* pMenu = m_pDropDownCommand->GetDropDownMenu();
             if(pMenu)
             {
+                PushEventHandler(pMenu);
 				m_toolBar->PopupMenu(pMenu, event.GetItemRect().GetBottomLeft());
+                PopEventHandler();
+                delete pMenu;
+                return;
             }
-            wxDELETE(pMenu);
         }
     }
+	event.Skip();
 }
 
 void wxGxObjectDialog::SetButtonCaption(wxString sOkBtLabel)

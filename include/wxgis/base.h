@@ -325,9 +325,9 @@
 
 #define APP_VER wxT("0.4.0") //global for all apps
 
-#ifndef _DEBUG
+//#ifndef _DEBUG
    #define WXGISPORTABLE
-#endif
+//#endif
 
 #ifndef WXDWORD
     #define WXDWORD unsigned long

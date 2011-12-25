@@ -509,26 +509,26 @@ void wxGxContentView::SetStyle(wxGISEnumContentsViewStyle style)
 		//SetWindowStyleFlag(m_style | wxLC_LIST );
 		break;
 	}
-
-    switch(m_current_style)
-	{
-	case enumGISCVReport:
-        SetSingleStyle(wxLC_REPORT, false);
-		break;
-	case enumGISCVSmall:
-        SetSingleStyle(wxLC_SMALL_ICON, false);
-		break;
-	case enumGISCVLarge:
-        SetSingleStyle(wxLC_ICON, false);
-		break;
-	case enumGISCVList:
-        SetSingleStyle(wxLC_LIST, false);
-		break;
-	}
+//
+//    switch(m_current_style)
+//	{
+//	case enumGISCVReport:
+//        SetSingleStyle(wxLC_REPORT, false);
+//		break;
+//	case enumGISCVSmall:
+//        SetSingleStyle(wxLC_SMALL_ICON, false);
+//		break;
+//	case enumGISCVLarge:
+//        SetSingleStyle(wxLC_ICON, false);
+//		break;
+//	case enumGISCVList:
+//        SetSingleStyle(wxLC_LIST, false);
+//		break;
+//	}
 	m_current_style = style;
-#ifdef __WXGTK__
-    OnRefreshAll();
-#endif
+//#ifdef __WXGTK__
+//    OnRefreshAll();
+//#endif
 }
 
 void wxGxContentView::OnBeginLabelEdit(wxListEvent& event)
@@ -774,13 +774,13 @@ void wxGxContentView::OnBeginDrag(wxListEvent& event)
         if(!pGxObject)
             continue;
         wxString sSystemPath(pGxObject->GetInternalName(), wxConvUTF8);
- 		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
-		if(pGxObjectUI)
-		{
-			wxDataFormat frm = pGxObjectUI->GetDataFormat();
-			if(frm.GetType() != wxDF_INVALID)
-				my_data.SetFormat(frm);
-		}
+ 	//	IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
+		//if(pGxObjectUI)
+		//{
+		//	wxDataFormat frm = pGxObjectUI->GetDataFormat();
+		//	if(frm.GetType() != wxDF_INVALID)
+		//		my_data.SetFormat(frm);
+		//}
         my_data.AddFile(sSystemPath);
         nCount++;
     }

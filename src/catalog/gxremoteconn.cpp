@@ -41,6 +41,13 @@ wxGxRemoteConnection::~wxGxRemoteConnection(void)
 {
 }
 
+
+void wxGxRemoteConnection::Detach(void)
+{
+	EmptyChildren();
+    IGxObject::Detach();
+}
+
 wxGISDatasetSPtr wxGxRemoteConnection::GetDataset(bool bCache, ITrackCancel* pTrackCancel)
 {
 	if(m_pwxGISDataset == NULL)
@@ -116,9 +123,9 @@ void wxGxRemoteConnection::LoadChildren(void)
     Oid nGeomOID = pDS->GetGeometryOID();
     wxGISTableSPtr pGeostruct;
     if(nGeogOID != 0)
-        pGeostruct = boost::dynamic_pointer_cast<wxGISTable>(m_pwxGISRemoteConn->ExecuteSQL(wxT("SELECT f_table_schema,f_table_name from geography_columns")));//,f_geography_column,type
+        pGeostruct = boost::dynamic_pointer_cast<wxGISTable>(m_pwxGISRemoteConn->ExecuteSQL(wxString(wxT("SELECT f_table_schema,f_table_name from geography_columns"))));//,f_geography_column,type
     else if(nGeomOID != 0)
-        pGeostruct = boost::dynamic_pointer_cast<wxGISTable>(m_pwxGISRemoteConn->ExecuteSQL(wxT("SELECT f_table_schema,f_table_name from geometry_columns")));//,f_geography_column,type
+        pGeostruct = boost::dynamic_pointer_cast<wxGISTable>(m_pwxGISRemoteConn->ExecuteSQL(wxString(wxT("SELECT f_table_schema,f_table_name from geometry_columns"))));//,f_geography_column,type
 
     typedef struct _pgtabledata{
         bool bHasGeometry;
@@ -167,56 +174,28 @@ void wxGxRemoteConnection::LoadChildren(void)
     {
         wxGxRemoteDBSchema* pGxRemoteDBSchema = DBSchema[aDBStructOut[i].sTableSchema];
         if(pGxRemoteDBSchema)
-            pGxRemoteDBSchema->AddTable(aDBStructOut[i].sTableName, aDBStructOut[i].bHasGeometry);
+            pGxRemoteDBSchema->AddTable(aDBStructOut[i].sTableName, aDBStructOut[i].sTableSchema, aDBStructOut[i].bHasGeometry);
         else
         {
             pGxRemoteDBSchema = GetNewRemoteDBSchema(aDBStructOut[i].sTableSchema, m_pwxGISRemoteConn);
-            pGxRemoteDBSchema->AddTable(aDBStructOut[i].sTableName, aDBStructOut[i].bHasGeometry);
-            DBSchema[aDBStructOut[i].sTableSchema] = pGxRemoteDBSchema;
+            bool ret_code = AddChild(static_cast<IGxObject*>(pGxRemoteDBSchema));
+		    if(!ret_code)
+                wxDELETE(pGxRemoteDBSchema);
+            else
+            {
+                pGxRemoteDBSchema->AddTable(aDBStructOut[i].sTableName, aDBStructOut[i].sTableSchema, aDBStructOut[i].bHasGeometry);
+                DBSchema[aDBStructOut[i].sTableSchema] = pGxRemoteDBSchema;
+            }
         }
     }
 
-    for(auto itr = DBSchema.begin(); itr != DBSchema.end(); ++itr)
-    {
-        bool ret_code = AddChild(static_cast<IGxObject*>(itr->second));
-		if(!ret_code)
-            wxDELETE(itr->second);
-    }
+  //  for(auto itr = DBSchema.begin(); itr != DBSchema.end(); ++itr)
+  //  {
+  //      bool ret_code = AddChild(static_cast<IGxObject*>(itr->second));
+		//if(!ret_code)
+  //          wxDELETE(itr->second);
+  //  }
  
-
-    //for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); ++i)
-    //{
-    //    wxGISDatasetSPtr pGISDataset = m_pwxGISDataset->GetSubset(i);
-    //    wxGISEnumDatasetType eType = pGISDataset->GetType();
-    //    IGxObject* pGxObject(NULL);
-    //    switch(eType)
-    //    {
-    //    case enumGISFeatureDataset:
-    //        {
-    //            wxGxPostGISFeatureDataset* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDataset(pGISDataset->GetPath(), pGISDataset);
-    //            pGxObject = static_cast<IGxObject*>(pGxPostGISFeatureDataset);
-    //        }
-    //        break;
-    //    case enumGISTableDataset:
-    //        {
-    //            wxGxPostGISTableDataset* pGxPostGISTableDataset = new wxGxPostGISTableDataset(pGISDataset->GetPath(), pGISDataset);
-    //            pGxObject = static_cast<IGxObject*>(pGxPostGISTableDataset);
-    //        }
-    //        break;
-    //    case enumGISRasterDataset:
-    //        break;
-    //    default:
-    //    case enumGISContainer:
-    //        break;
-    //    };
-
-    //    if(pGxObject)
-    //    {
-		  //  bool ret_code = AddChild(pGxObject);
-		  //  if(!ret_code)
-			 //   wxDELETE(pGxObject);
-    //    }
-	//}
 	m_bIsChildrenLoaded = true;
 }
 
@@ -319,8 +298,48 @@ wxGxRemoteDBSchema::~wxGxRemoteDBSchema(void)
 {
 }
 
-void wxGxRemoteDBSchema::AddTable(CPLString &szName, bool bHasGeometry)
+void wxGxRemoteDBSchema::AddTable(CPLString &szName, CPLString &szSchema, bool bHasGeometry)
 {
+    IGxObject* pGxObject(nullptr);
+    if(bHasGeometry)
+    {
+        wxGxPostGISFeatureDataset* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDataset(szName, szSchema, m_pwxGISRemoteConn);
+        pGxObject = static_cast<IGxObject*>(pGxPostGISFeatureDataset);
+    }
+    else
+    {
+        wxGxPostGISTableDataset* pGxPostGISTableDataset = new wxGxPostGISTableDataset(szName, szSchema, m_pwxGISRemoteConn);
+        pGxObject = static_cast<IGxObject*>(pGxPostGISTableDataset);
+    }
+    //    wxGISEnumDatasetType eType = pGISDataset->GetType();
+    //    IGxObject* pGxObject(NULL);
+    //    switch(eType)
+    //    {
+    //    case enumGISFeatureDataset:
+    //        {
+    //            wxGxPostGISFeatureDataset* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDataset(pGISDataset->GetPath(), pGISDataset);
+    //            pGxObject = static_cast<IGxObject*>(pGxPostGISFeatureDataset);
+    //        }
+    //        break;
+    //    case enumGISTableDataset:
+    //        {
+    //            wxGxPostGISTableDataset* pGxPostGISTableDataset = new wxGxPostGISTableDataset(pGISDataset->GetPath(), pGISDataset);
+    //            pGxObject = static_cast<IGxObject*>(pGxPostGISTableDataset);
+    //        }
+    //        break;
+    //    case enumGISRasterDataset:
+    //        break;
+    //    default:
+    //    case enumGISContainer:
+    //        break;
+    //    };
+
+    if(pGxObject)
+    {
+	    bool ret_code = AddChild(pGxObject);
+	    if(!ret_code)
+		    wxDELETE(pGxObject);
+    }
 }
 
 bool wxGxRemoteDBSchema::DeleteChild(IGxObject* pChild)
@@ -334,3 +353,4 @@ bool wxGxRemoteDBSchema::DeleteChild(IGxObject* pChild)
 		m_pCatalog->ObjectChanged(GetID());
 	return true;
 }
+

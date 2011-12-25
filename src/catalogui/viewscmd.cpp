@@ -159,9 +159,7 @@ wxGISEnumCommandKind wxGISCatalogViewsCmd::GetKind(void)
 		case 0://View
 			return enumGISCommandDropDown;
 		case 2://Show/Hide Tree Pane
-#ifdef __WXMSW__
             return enumGISCommandCheck;
-#endif
         case 1://Select All
 		default:
 			return enumGISCommandNormal;
@@ -262,10 +260,10 @@ wxMenu* wxGISCatalogViewsCmd::GetDropDownMenu(void)
 			if(GetEnabled())
 			{
                 wxMenu* pMenu = new wxMenu();
-                pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVList, _("List"));
-                pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVLarge, _("Icons"));
-                pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVSmall, _("Smal Icons"));
-                pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVReport, _("Details"));
+                pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVList, wxString(_("List")));
+                pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVLarge, wxString(_("Icons")));
+                pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVSmall, wxString(_("Smal Icons")));
+                pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVReport, wxString(_("Details")));
                 //check
                 for(size_t i = 0; i < m_apContentsWin.size(); ++i)
 			    {
@@ -283,7 +281,6 @@ wxMenu* wxGISCatalogViewsCmd::GetDropDownMenu(void)
             }
             return NULL;
         }
-		case 1:
 		default:
 			return NULL;
 	}
