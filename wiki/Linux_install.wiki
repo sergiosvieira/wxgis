@@ -1,5 +1,5 @@
 #summary The wxGIS Linux install howto.
-#labels Featured,Phase-Deploy
+#labels Phase-Deploy
 
 = Introduction =
 
