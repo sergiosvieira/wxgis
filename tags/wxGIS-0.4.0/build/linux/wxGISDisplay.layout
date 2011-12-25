@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="../../include/wxgis/display/display.h" open="0" top="0" tabpos="0">
+		<Cursor position="1617" topLine="31" />
+	</File>
+	<File name="../../include/wxgis/display/screendisplay.h" open="0" top="0" tabpos="0">
+		<Cursor position="7326" topLine="114" />
+	</File>
+	<File name="../../src/display/screendisplay.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="22084" topLine="511" />
+	</File>
+</CodeBlocks_layout_file>

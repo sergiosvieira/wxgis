@@ -1,0 +1,352 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wxGIS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-02-21 22:17+0300\n"
+"PO-Revision-Date: 2011-04-15 00:51+0100\n"
+"Last-Translator: Jan Helebrant <jhelebrant@seznam.cz>\n"
+"Language-Team: Juhele <www.juhele.webnode.cz>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-Basepath: c:\\temp\\wxgis\\src\\\n"
+"X-Poedit-Language: Czech\n"
+"X-Poedit-Country: CZECH REPUBLIC\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-SearchPath-0: D:\\work\\Projects\\wxGIS\\src\\catalog\n"
+"X-Poedit-SearchPath-1: D:\\work\\Projects\\wxGIS\\include\\wxgis\\catalog\n"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxarchfolder.cpp:68
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:70
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:106
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:254
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:277
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:471
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:500
+#: D:\work\Projects\wxGIS\src\catalog/gxfile.cpp:59
+#: D:\work\Projects\wxGIS\src\catalog/gxfolder.cpp:113
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:108
+#, c-format
+msgid "Delete failed! GDAL error: %s, file '%s'"
+msgstr "Smazání selhalo! Chyba GDAL: %s, soubor '%s'"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxarchfolder.cpp:107
+#: D:\work\Projects\wxGIS\src\catalog/gxfile.cpp:82
+#: D:\work\Projects\wxGIS\src\catalog/gxfolder.cpp:138
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:135
+#, c-format
+msgid "Rename failed! GDAL error: %s, file '%s'"
+msgstr "Přejmenování selhalo! Chyba GDAL: %s, soubor '%s'"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:177
+#, c-format
+msgid "wxGxCatalog: ObjectFactory %s initialize"
+msgstr "wxGxCatalog: spuštění ObjectFactory %s"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:180
+#, c-format
+msgid "wxGxCatalog: Error initializing ObjectFactory %s"
+msgstr "wxGxCatalog: Chyba spouštění ObjectFactory %s"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:233
+#, c-format
+msgid "wxGxCatalog: Root Object %s initialize"
+msgstr "wxGxCatalog: spuštění kořenového objektu %s"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxcatalog.cpp:249
+#, c-format
+msgid "wxGxCatalog: Error initializing Root Object %s"
+msgstr "wxGxCatalog: Chyba spouštění kořenového objektu %s"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:123
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:357
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:211
+msgid "Copy table dataset "
+msgstr "Kopírovat tabulku dat"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:139
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:373
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:227
+#, c-format
+msgid "Copy table dataset %s failed!"
+msgstr "Kopírování tabulky dat %s selhalo!"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:147
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:381
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:567
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:235
+#, c-format
+msgid "Copy failed! GDAL error: %s, file '%s'"
+msgstr "Kopírování selhalo! Chyba GDAL: %s, soubor '%s'"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:160
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:248
+msgid "Move table dataset "
+msgstr "Přesunout tabulku dat"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:176
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:264
+#, c-format
+msgid "Move table dataset %s failed!"
+msgstr "Přesunutí tabulky dat %s selhalo!"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:184
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:418
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:604
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:272
+#, c-format
+msgid "Move failed! GDAL error: %s, file '%s'"
+msgstr "Přesunutí selhalo! Chyba GDAL: %s, soubor '%s'"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:212
+msgid "Feature class"
+msgstr "Třída prvků"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:291
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:529
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:164
+#, c-format
+msgid "Open failed! GDAL error: %s"
+msgstr "Otevření selhalo! Chyba GDAL: %s"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:394
+msgid "Move feature dataset "
+msgstr "Přesunout vektorový dataset"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:410
+#, c-format
+msgid "Move feature dataset %s failed!"
+msgstr "Přesunutí vektorového datasetu %s selhalo!"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:511
+msgid "Raster"
+msgstr "Rastr"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:543
+msgid "Copy raster dataset "
+msgstr "Kopírovat rastrový dataset"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:559
+#, c-format
+msgid "Copy raster dataset %s failed!"
+msgstr "Kopírování rastrového datasetu %s selhalo!"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:580
+msgid "Move raster dataset "
+msgstr "Přesunout rastrový dataset"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdataset.cpp:596
+#, c-format
+msgid "Move raster dataset %s failed!"
+msgstr "Přesunutí rastrového datasetu %s selhalo!"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdiscconnections.cpp:78
+msgid "wxGxDiscConnections: Start scan folder connections"
+msgstr "wxGxDiscConnections: Zahájit hledání připojení složek"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxdiscconnections.cpp:148
+#, c-format
+msgid "wxGxDiscConnections: Add folder connection [%s]"
+msgstr "wxGxDiscConnections: Přidat připojení složky [%s]"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfile.cpp:91
+msgid "Copy file "
+msgstr "Kopírovat soubor"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfile.cpp:107
+msgid "Move file "
+msgstr "Přesunout soubor"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfile.cpp:190
+#, c-format
+msgid "wxGxPrjFile: GDAL error: %s"
+msgstr "wxGxPrjFile: chyba GDAL: %s"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:66
+msgid "Any items (*.*)"
+msgstr "Všechny typy (*.*)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:124
+msgid "Coordinate Systems (*.prj, *.spr)"
+msgstr "Souřadnicové systémy (*.prj, *.spr)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:174
+msgid "Raster (*.img, *.tif, etc.)"
+msgstr "Rastrová data (*.img, *.tif, atd.)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:176
+msgid "Vector (*.shp, *.tab, etc.)"
+msgstr "Vektorová data (*.shp, *.tab, atd.)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:230
+msgid "ESRI Shapefile (*.shp)"
+msgstr "ESRI Shapefile (*.shp)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:232
+msgid "MapInfo File (*.tab)"
+msgstr "MapInfo soubor (*.tab)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:234
+msgid "MapInfo File (*.mid/*.mif)"
+msgstr "MapInfo soubor (*.mid/*.mif)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:236
+msgid "KML file (*.kml)"
+msgstr "KML soubor (*.kml)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:238
+msgid "KML file (*.kmz)"
+msgstr "KMZ soubor (*.kmz)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:240
+msgid "AutoCAD DXF file (*.dxf)"
+msgstr "AutoCAD DXF soubor (*.dxf)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:243
+msgid "Any feature classes (*.*)"
+msgstr "Všechny třídy prvků (*.*)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:311
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:330
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:339
+msgid "Folder"
+msgstr "Složka"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:313
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:332
+msgid "Folder connection"
+msgstr "Připojení složky"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:325
+msgid "Folder connections"
+msgstr "Připojení složek"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:387
+msgid "Windows Device Independent Bitmap (*.bmp)"
+msgstr "BMP obrázek (*.bmp)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:389
+msgid "GeoTIFF (*.tif, *.tiff)"
+msgstr "GeoTIFF soubor (*.tif, *.tiff)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:391
+msgid "JPEG image (*.jpeg, *.jfif, *.jpg, *.jpe)"
+msgstr "JPEG obrázek (*.jpeg, *.jfif, *.jpg, *.jpe)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:393
+msgid "Erdas IMAGINE image (*.img)"
+msgstr "Erdas IMAGINE obrázek (*.img)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:395
+msgid "Portable Network Graphics (*.png)"
+msgstr "Portable Network Graphics (*.png)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxfilters.cpp:397
+msgid "Graphics Interchange Format (*.gif)"
+msgstr "GIF obrázek (*.gif)"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:69
+msgid "KML Dataset"
+msgstr "KML Dataset"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:71
+msgid "GML Dataset"
+msgstr "GML Dataset"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxkmldataset.cpp:306
+msgid "KML Feature class"
+msgstr "KML třída prvků"
+
+#: D:\work\Projects\wxGIS\src\catalog/gxspatreffolder.cpp:50
+#, c-format
+msgid "wxGxSpatialReferencesFolder: The path is set to '%s'"
+msgstr "wxGxSpatialReferencesFolder: Cesta je nastavena na '%s'"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxarchfolder.h:35
+msgid "Archive folder"
+msgstr "Složka archivu"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxarchfolder.h:57
+msgid "Archive"
+msgstr "Archiv"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxarchivefactory.h:38
+msgid "Archives"
+msgstr "Archivy"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxcatalog.h:41
+msgid "Catalog"
+msgstr "Каtalog"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxdataset.h:41
+msgid "Table"
+msgstr "Таbulka"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxfile.h:64
+msgid "Coordinate System"
+msgstr "Souřadnicový systém"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxfile.h:82
+msgid "Text file"
+msgstr "Тextový soubor"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxfilefactory.h:37
+msgid "Files"
+msgstr "Soubory"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxfolderfactory.h:38
+msgid "Folders"
+msgstr "Složky"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxmapinfofactory.h:41
+msgid "Mapinfo files"
+msgstr "MapInfo soubory"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxmlfactory.h:40
+msgid "Markup Languages files"
+msgstr "Markup Languages soubory"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxprjfactory.h:38
+msgid "Coordiante systems"
+msgstr "Souřadnicové systémy"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxrasterfactory.h:40
+msgid "Raster files"
+msgstr "Rastrové soubory"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxshapefactory.h:40
+msgid "Shapefiles"
+msgstr "Shapefile soubory"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxspatreffolder.h:26
+msgid "Geographic Coordinate Systems"
+msgstr "Geografické souřadnicové systémy"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxspatreffolder.h:27
+msgid "Projected Coordinate Systems"
+msgstr "Promítnuté souřadnicové systémy"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxspatreffolder.h:39
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxspatreffolder.h:60
+msgid "Coordinate Systems Folder"
+msgstr "Složka souřadnicových systémů"
+
+#: D:\work\Projects\wxGIS\include\wxgis\catalog/gxspatreffolder.h:57
+msgid "Coordinate Systems"
+msgstr "Souřadnicové systémy"
+
+#~ msgid "Folders & archives"
+#~ msgstr "Папки и архивы"
+
+#~ msgid "Folder Connection"
+#~ msgstr "Подключение"
+
+#~ msgid "wxGxCatalog: Add new folder connection [%s]"
+#~ msgstr "wxGxCatalog: Добавить новое подключение к папке [%s]"
+
+#~ msgid "Error"
+#~ msgstr "Ошибка"
+
+#~ msgid "Delete failed! File '%s'"
+#~ msgstr "Ошибка удаления. Файл '%s'"

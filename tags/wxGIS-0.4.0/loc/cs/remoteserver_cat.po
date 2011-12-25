@@ -1,0 +1,70 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wxGIS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-02-21 22:11+0300\n"
+"PO-Revision-Date: 2011-04-16 00:26+0100\n"
+"Last-Translator: Jan Helebrant <jhelebrant@seznam.cz>\n"
+"Language-Team: Juhele <www.juhele.webnode.cz>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-Language: Czech\n"
+"X-Poedit-Country: CZECH REPUBLIC\n"
+"X-Poedit-SearchPath-0: D:\\work\\Projects\\wxGIS\\include\\wxgis\\remoteserver\n"
+"X-Poedit-SearchPath-1: D:\\work\\Projects\\wxGIS\\src\\remoteserver\n"
+
+#: D:\work\Projects\wxGIS\src\remoteserver/gxremoteservers.cpp:172
+#, c-format
+msgid "wxGxRemoteServers: Network connection factory %s loaded"
+msgstr "wxGxRemoteServers: Továrna síťových připojení %s načtena"
+
+#: D:\work\Projects\wxGIS\src\remoteserver/tcpnetfactory.cpp:41
+msgid "wxClientUDPNotifier: Invalid address"
+msgstr "wxClientUDPNotifier: Neplatná adresa"
+
+#: D:\work\Projects\wxGIS\src\remoteserver/tcpnetfactory.cpp:127
+msgid "255.255.255.255"
+msgstr "255.255.255.255"
+
+#: D:\work\Projects\wxGIS\src\remoteserver/tcpnetfactory.cpp:169
+#, c-format
+msgid "%s: Wait %s Thread 0x%lx started (priority = %u)"
+msgstr "%s: Čekám %s Vlákno 0x%lx spuštěno (priorita = %u)"
+
+#: D:\work\Projects\wxGIS\src\remoteserver/tcpnetfactory.cpp:278
+msgid "wxClientTCPNetConnection: Trying to connect (timeout = 5 sec) ..."
+msgstr "wxClientTCPNetConnection: Pokouším se připojit (časový limit = 5 sek) ..."
+
+#: D:\work\Projects\wxGIS\src\remoteserver/tcpnetfactory.cpp:300
+msgid "wxClientTCPNetFactory: Connected"
+msgstr "wxClientTCPNetFactory: Připojen"
+
+#: D:\work\Projects\wxGIS\src\remoteserver/tcpnetfactory.cpp:346
+#, c-format
+msgid "wxClientTCPNetFactory: Server %s disconnected"
+msgstr "wxClientTCPNetFactory: Server %s odpojen"
+
+#: D:\work\Projects\wxGIS\include\wxgis\remoteserver/gxremoteserver.h:43
+msgid "Remote Server"
+msgstr "Vzdálený server"
+
+#: D:\work\Projects\wxGIS\include\wxgis\remoteserver/gxremoteservers.h:38
+#: D:\work\Projects\wxGIS\include\wxgis\remoteserver/gxremoteservers.h:41
+msgid "Remote Servers"
+msgstr "Vzdálené servery"
+
+#: D:\work\Projects\wxGIS\include\wxgis\remoteserver/rxobjectclient.h:37
+msgid "Remote item"
+msgstr "Vzdálená položka"
+
+#: D:\work\Projects\wxGIS\include\wxgis\remoteserver/rxobjectclient.h:67
+msgid "Remote container"
+msgstr "Vzdálený kontejner"
+
+#: D:\work\Projects\wxGIS\include\wxgis\remoteserver/tcpnetfactory.h:55
+msgid "TCP/IP Network"
+msgstr "Síť TCP/IP"
+

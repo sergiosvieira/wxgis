@@ -1,0 +1,2 @@
+?package(wxgis):needs="X11" section="Applications/Science/Geoscience"\
+  title="wxGISCatalog" command="/usr/bin/wxgiscat" icon=""

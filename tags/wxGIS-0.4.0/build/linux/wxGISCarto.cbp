@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="wxGISCarto" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../debug/wxGISCartod" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-D__UNIX__" />
+					<Add option="-D__WXGTK__" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-D_USRDLL" />
+					<Add option="-DWXMAKINGDLL_GIS_CRT" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="../release/wxgiscarto" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="../../include" />
+			<Add directory="$(GDAL)/ogr" />
+			<Add directory="$(GDAL)/gcore" />
+			<Add directory="$(GDAL)/port" />
+			<Add directory="$(GDAL)/alg" />
+		</Compiler>
+		<Unit filename="../../include/wxgis/carto/carto.h" />
+		<Unit filename="../../include/wxgis/carto/cartocmd.h" />
+		<Unit filename="../../include/wxgis/carto/featurelayer.h" />
+		<Unit filename="../../include/wxgis/carto/map.h" />
+		<Unit filename="../../include/wxgis/carto/mapview.h" />
+		<Unit filename="../../include/wxgis/carto/rasterlayer.h" />
+		<Unit filename="../../include/wxgis/carto/rasterrenderer.h" />
+		<Unit filename="../../include/wxgis/carto/simplerenderer.h" />
+		<Unit filename="../../include/wxgis/carto/tableview.h" />
+		<Unit filename="../../include/wxgis/carto/transformthreads.h" />
+		<Unit filename="../../src/carto/cartocmd.cpp" />
+		<Unit filename="../../src/carto/featurelayer.cpp" />
+		<Unit filename="../../src/carto/map.cpp" />
+		<Unit filename="../../src/carto/mapview.cpp" />
+		<Unit filename="../../src/carto/rasterlayer.cpp" />
+		<Unit filename="../../src/carto/rasterrenderer.cpp" />
+		<Unit filename="../../src/carto/simplerenderer.cpp" />
+		<Unit filename="../../src/carto/tableview.cpp" />
+		<Unit filename="../../src/carto/transformthreads.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
