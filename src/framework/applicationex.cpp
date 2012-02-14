@@ -24,6 +24,10 @@
 #include "wxgis/framework/customizedlg.h"
 #include "wxgis/framework/toolbarmenu.h"
 
+#ifdef HAVE_PROJ
+    #include "proj_api.h"
+#endif
+
 //-----------------------------------------------
 // wxGISApplicationEx
 //-----------------------------------------------
@@ -250,6 +254,13 @@ bool wxGISApplicationEx::SetupSys(const wxString &sSysPath)
         return false;
 	wxString sGdalDataDir = sSysPath + wxFileName::GetPathSeparator() + wxString(wxT("gdal")) + wxFileName::GetPathSeparator();
 	CPLSetConfigOption("GDAL_DATA", sGdalDataDir.mb_str(wxConvUTF8) );
+#ifdef HAVE_PROJ
+	sGdalDataDir = sSysPath + wxFileName::GetPathSeparator() + wxString(wxT("proj")) + wxFileName::GetPathSeparator();
+	//CPLSetConfigOption("PROJ_LIB", sGdalDataDir.mb_str(wxConvUTF8) );    
+    CPLString pszPROJ_LIB = sGdalDataDir.mb_str(wxConvUTF8);
+    const char *path = pszPROJ_LIB.c_str();
+    pj_set_searchpath(1, &path);
+#endif
     return true;
 }
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wxCatalog>
+  <catalog>
+    <rootitems>
+      <rootitem name="wxGxDiscConnectionsUI" is_enabled="1"/>
+      <rootitem name="wxGxSpatialReferencesFolderUI" is_enabled="1" path="/vsizip/d:/work/Projects/wxGIS/build/debug/sys/cs.zip/cs"/>
+      <rootitem name="wxGxRemoteServersUI" is_enabled="1">
+        <factories>
+          <factory port="1976" adv_port="1977" addr="" name="wxClientTCPNetFactoryUI"/>
+        </factories>
+      </rootitem>
+      <rootitem name="wxGxRootToolbox" Height="515" Width="679" YPos="130" XPos="424" maxi="0" is_enabled="1"/>
+    </rootitems>
+    <objectfactories>
+      <objectfactory factory_name="wxGxArchiveFactoryUI" is_enabled="1"/>
+      <objectfactory factory_name="wxGxShapeFactoryUI" is_enabled="1"/>
+      <objectfactory factory_name="wxGxMapInfoFactoryUI" is_enabled="1"/>
+      <objectfactory factory_name="wxGxRasterFactoryUI" is_enabled="1"/>
+      <objectfactory factory_name="wxGxMLFactoryUI" is_enabled="1"/>
+      <objectfactory factory_name="wxGxFolderFactoryUI" is_enabled="1"/>
+      <objectfactory factory_name="wxGxFileFactoryUI" is_enabled="1" extensions="txt|log|nfo|asc|"/>
+    </objectfactories>
+  </catalog>
+</wxCatalog>

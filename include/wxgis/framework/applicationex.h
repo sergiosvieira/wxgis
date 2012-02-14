@@ -21,6 +21,7 @@
 #pragma once
 
 #include "wxgis/framework/application.h"
+#include "wxgis/version.h"
 
 #include "wx/aui/aui.h"
 #include "wx/artprov.h"
@@ -53,7 +54,7 @@ public:
 	virtual void RegisterChildWindow(wxWindow* pWnd);
 	virtual void UnRegisterChildWindow(wxWindow* pWnd);
     virtual wxString GetAppName(void) = 0;
-    virtual wxString GetAppVersionString(void){return wxString(APP_VER);};
+    virtual wxString GetAppVersionString(void){return wxString(wxGIS_VERSION_NUM_DOT_STRING_T);};
     virtual bool Create(void);
     virtual bool SetupSys(const wxString &sSysPath);
     virtual void SetDebugMode(bool bDebugMode);

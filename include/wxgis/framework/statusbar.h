@@ -34,21 +34,21 @@ class WXDLLIMPEXP_GIS_FRW wxGISStatusBar :
         TIMER_ID = 1011
     };
 public:
-	wxGISStatusBar(wxWindow *parent, wxWindowID id, long style = wxST_SIZEGRIP, const wxString& name = wxT("statusBar"), WXDWORD panesstyle = enumGISStatusMain | enumGISStatusProgress | enumGISStatusAnimation | enumGISStatusPosition | enumGISStatusClock);
+	wxGISStatusBar(wxWindow *parent, wxWindowID id, long style = wxST_SIZEGRIP, const wxString& name = wxT("statusBar"), WXDWORD panelsstyle = enumGISStatusMain | enumGISStatusProgress | enumGISStatusAnimation | enumGISStatusPosition | enumGISStatusClock);
 	virtual ~wxGISStatusBar(void);
 	void OnSize(wxSizeEvent &event);
 	virtual void SetMessage(const wxString& text, int i = 0);
 	virtual wxString GetMessage(int i = 0);
-    virtual int GetPanePos(wxGISEnumStatusBarPanes nPane);
+    virtual int GetPanelPos(wxGISEnumStatusBarPanels nPanel);
 	virtual IProgressor* GetAnimation(void)
 	{
-		if(m_Panes & enumGISStatusAnimation)
+		if(m_Panels & enumGISStatusAnimation)
 			return static_cast<IProgressor*>(m_pAni);
 		return NULL;
 	};
 	virtual IProgressor* GetProgressor(void)//???
 	{
-		if(m_Panes & enumGISStatusProgress)
+		if(m_Panels & enumGISStatusProgress)
 			return static_cast<IProgressor*>(m_pProgressBar);
 		return NULL;
 	};
@@ -56,11 +56,11 @@ public:
 	void OnRightDown(wxMouseEvent& event);
     void OnTimer( wxTimerEvent & event);
 
-typedef struct _statuspane
+typedef struct _statuspanel
 	{
 		int size;
 		long style;
-	}STATUSPANE;
+	}STATUSPANEL;
 
 protected:
 	wxTimer m_timer;

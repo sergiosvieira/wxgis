@@ -79,8 +79,7 @@ void wxGxPrjFileUI::EditProperties(wxWindow *parent)
     wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(GetSpatialReference(), pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(SpatialReferencePropertyPage, SpatialReferencePropertyPage->GetPageName());
 
-    PropertySheetDialog.LayoutDialog();
-    //center?
+    //PropertySheetDialog.LayoutDialog();
     PropertySheetDialog.SetSize(480,640);
     PropertySheetDialog.Center();
 

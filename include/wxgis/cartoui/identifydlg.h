@@ -155,6 +155,7 @@ public:
 	//event
 	virtual void OnSwitchSplit(wxCommandEvent& event);
 	virtual void OnSelChanged(wxTreeEvent& event);
+	virtual void OnLeftDown(wxMouseEvent& event);
 	virtual void OnMenu(wxCommandEvent& event);
 	virtual void OnItemRightClick(wxTreeEvent& event);
 protected:
@@ -205,6 +206,7 @@ public:
 	virtual void FillTree(wxGISFeatureLayerSPtr pFLayer, wxGISQuadTreeCursorSPtr pCursor);
 	//events
 	virtual void OnSelChanged(wxTreeEvent& event);
+	virtual void OnLeftDown(wxMouseEvent& event);
 	virtual void OnMenu(wxCommandEvent& event);
 protected:
 	wxString m_sViewName;

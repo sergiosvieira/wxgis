@@ -68,8 +68,7 @@ void wxGxPostGISTableDatasetUI::EditProperties(wxWindow *parent)
     wxGISTablePropertyPage* TablePropertyPage = new wxGISTablePropertyPage(this, pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(TablePropertyPage, TablePropertyPage->GetPageName());
 
-    PropertySheetDialog.LayoutDialog();
-    //center?
+    //PropertySheetDialog.LayoutDialog();
     PropertySheetDialog.SetSize(480,640);
     PropertySheetDialog.Center();
 
@@ -120,8 +119,7 @@ void wxGxPostGISFeatureDatasetUI::EditProperties(wxWindow *parent)
 		PropertySheetDialog.GetBookCtrl()->AddPage(SpatialReferencePropertyPage, SpatialReferencePropertyPage->GetPageName());
 	}
 
-    PropertySheetDialog.LayoutDialog();
-    //center?
+    //PropertySheetDialog.LayoutDialog();
     PropertySheetDialog.SetSize(480,640);
     PropertySheetDialog.Center();
 

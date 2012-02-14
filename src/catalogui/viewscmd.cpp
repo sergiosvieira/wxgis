@@ -71,7 +71,7 @@ wxString wxGISCatalogViewsCmd::GetCaption(void)
 		case 1:
 			return wxString(_("Select All"));
 		case 2:
-			return wxString(_("Show/Hide Tree pane"));
+			return wxString(_("Show/Hide Tree panel"));
 		default:
 			return wxEmptyString;
 	}
@@ -175,7 +175,7 @@ wxString wxGISCatalogViewsCmd::GetMessage(void)
 		case 1:
 			return wxString(_("Select All objects"));
 		case 2:
-			return wxString(_("Show/Hide Tree pane"));
+			return wxString(_("Show/Hide Tree panel"));
 		default:
 			return wxEmptyString;
 	}
@@ -240,7 +240,7 @@ wxString wxGISCatalogViewsCmd::GetTooltip(void)
 		case 1:
 			return wxString(_("Select All"));
 		case 2:
-			return wxString(_("Show/Hide Tree pane"));
+			return wxString(_("Show/Hide Tree panel"));
 		default:
 			return wxEmptyString;
 	}

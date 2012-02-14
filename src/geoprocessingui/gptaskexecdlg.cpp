@@ -209,7 +209,7 @@ void wxGxTaskExecDlg::OnClose(wxCloseEvent& event)
 	{
 		if(m_pToolManager->GetProcessState(m_nTaskID) == enumGISTaskWork)
 		{
-			wxMessageBox(wxString(_("You mast stop task before closing dialog!")), wxString(_("Warning")), wxCENTRE | wxICON_WARNING | wxOK );
+			wxMessageBox(wxString(_("You must stop task before closing dialog!")), wxString(_("Warning")), wxCENTRE | wxICON_WARNING | wxOK );
 			event.Veto();
 			return;
 		}

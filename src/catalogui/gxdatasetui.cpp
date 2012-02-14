@@ -70,8 +70,7 @@ void wxGxTableDatasetUI::EditProperties(wxWindow *parent)
     wxGISTablePropertyPage* TablePropertyPage = new wxGISTablePropertyPage(this, pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(TablePropertyPage, TablePropertyPage->GetPageName());
 
-    PropertySheetDialog.LayoutDialog();
-    //center?
+    //PropertySheetDialog.LayoutDialog();
     PropertySheetDialog.SetSize(480,640);
     PropertySheetDialog.Center();
 
@@ -121,8 +120,7 @@ void wxGxFeatureDatasetUI::EditProperties(wxWindow *parent)
 		PropertySheetDialog.GetBookCtrl()->AddPage(SpatialReferencePropertyPage, SpatialReferencePropertyPage->GetPageName());
 	}
 
-    PropertySheetDialog.LayoutDialog();
-    //center?
+    //PropertySheetDialog.LayoutDialog();
     PropertySheetDialog.SetSize(480,640);
     PropertySheetDialog.Center();
 
@@ -174,7 +172,7 @@ wxIcon wxGxRasterDatasetUI::GetSmallImage(void)
 void wxGxRasterDatasetUI::EditProperties(wxWindow *parent)
 {
     wxPropertySheetDialog PropertySheetDialog;
-    if (!PropertySheetDialog.Create(parent, wxID_ANY, _("Properties"), wxDefaultPosition, wxSize( 480,640 ), wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER))
+    if (!PropertySheetDialog.Create(parent, wxID_ANY, _("Properties"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER))
         return;
     PropertySheetDialog.SetIcon(properties_xpm);
     PropertySheetDialog.CreateButtons(wxOK);
@@ -189,8 +187,7 @@ void wxGxRasterDatasetUI::EditProperties(wxWindow *parent)
 		PropertySheetDialog.GetBookCtrl()->AddPage(SpatialReferencePropertyPage, SpatialReferencePropertyPage->GetPageName());
 	}
 
-    PropertySheetDialog.LayoutDialog();
-    //center?
+    //PropertySheetDialog.LayoutDialog();
     PropertySheetDialog.SetSize(480,640);
     PropertySheetDialog.Center();
 

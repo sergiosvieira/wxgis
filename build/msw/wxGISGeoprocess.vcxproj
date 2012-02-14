@@ -45,8 +45,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(WXGISGDAL)\alg;$(WXGISGDAL)\frmts;$(WXGISGDAL)\gcore;$(WXGISGDAL)\port;$(WXGISGDAL)\ogr;$(WXGISGDAL)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;__WXMSW__;__WXDEBUG__;WXUSINGDLL;NOPCH;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(WXGISGDAL)\alg;$(WXGISGDAL)\frmts;$(WXGISGDAL)\gcore;$(WXGISGDAL)\port;$(WXGISGDAL)\ogr;$(WXGISGDAL)\ogr\ogrsf_frmts;$(WXGISGDAL)\build\port;$(PROJ)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;__WXMSW__;__WXDEBUG__;WXUSINGDLL;NOPCH;BOOST_ALL_NO_LIB;HAVE_PROJ;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -54,8 +54,8 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxbase29ud_xml.lib;wxgiscpld.lib;wxgisogrd.lib;wxgisgdald.lib;wxGISCored.lib;wxGISDatasourced.lib;wxGISCatalogd.lib;wxGISGeoprocessingd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\lib;$(WXWIDGETS)\lib\vc_dll;$(WXGISGDAL)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxbase29ud_xml.lib;wxgisgdal19d.lib;wxGISCored.lib;wxGISDatasourced.lib;wxGISCatalogd.lib;wxGISGeoprocessingd.lib;proj4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\lib;$(WXWIDGETS)\lib\vc_dll;$(WXGISGDAL)\lib;$(PROJ)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -63,7 +63,7 @@
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
       <OutputFile>..\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
-      <Version>0.4</Version>
+      <Version>0.4.1</Version>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -72,8 +72,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(WXGISGDAL)\alg;$(WXGISGDAL)\frmts;$(WXGISGDAL)\gcore;$(WXGISGDAL)\port;$(WXGISGDAL)\ogr;$(WXGISGDAL)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;__WXMSW__;WXUSINGDLL;NOPCH;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(WXGISGDAL)\alg;$(WXGISGDAL)\frmts;$(WXGISGDAL)\gcore;$(WXGISGDAL)\port;$(WXGISGDAL)\ogr;$(WXGISGDAL)\ogr\ogrsf_frmts;$(WXGISGDAL)\build\port;$(PROJ)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;__WXMSW__;WXUSINGDLL;NOPCH;BOOST_ALL_NO_LIB;HAVE_PROJ;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
@@ -81,8 +81,8 @@
       </DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>wxbase29u.lib;wxbase29u_net.lib;wxbase29u_xml.lib;wxgiscpl.lib;wxgisogr.lib;wxgisgdal.lib;wxGISCore.lib;wxGISDatasource.lib;wxGISCatalog.lib;wxGISGeoprocessing.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\lib;$(WXWIDGETS)\lib\vc_dll;$(WXGISGDAL)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wxbase29u.lib;wxbase29u_net.lib;wxbase29u_xml.lib;wxgisgdal19.lib;wxGISCore.lib;wxGISDatasource.lib;wxGISCatalog.lib;wxGISGeoprocessing.lib;proj4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\lib;$(WXWIDGETS)\lib\vc_dll;$(WXGISGDAL)\lib;$(PROJ)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>

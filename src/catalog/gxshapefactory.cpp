@@ -46,6 +46,12 @@ bool wxGxShapeFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxO
             szPath = (char*)CPLResetExtension(pFileNames[i], "dbf");
             if(CPLCheckForFile((char*)szPath.c_str(), NULL))
                 bHasDbf = true;
+            if(!bHasDbf)
+            {
+                szPath = (char*)CPLResetExtension(pFileNames[i], "DBF");
+                if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                    bHasDbf = true;
+            }
             //szPath = (char*)CPLResetExtension(pFileNames[i], "prj");
             //if(CPLCheckForFile((char*)szPath.c_str(), NULL))
             //    bHasPrj = true;
@@ -59,6 +65,12 @@ bool wxGxShapeFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxO
             szPath = (char*)CPLResetExtension(pFileNames[i], "shp");
             if(CPLCheckForFile((char*)szPath.c_str(), NULL))
                 bHasShp = true;
+            if(!bHasShp)
+            {
+                szPath = (char*)CPLResetExtension(pFileNames[i], "SHP");
+                if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                    bHasShp = true;
+            }
             if(!bHasShp)
                 pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumGISTableDataset);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );

@@ -138,7 +138,7 @@ bool wxGISGPCompStatTool::Execute(ITrackCancel* pTrackCancel)
         return false;
     }
 
-	if(!pSrcDataSet->Open(true))
+	if(!pSrcDataSet->Open(false))
 		return false;
 
     GDALDataset* poGDALDataset = pSrcDataSet->GetRaster();
@@ -147,7 +147,6 @@ bool wxGISGPCompStatTool::Execute(ITrackCancel* pTrackCancel)
         //add messages to pTrackCancel
         if(pTrackCancel)
             pTrackCancel->PutMessage(_("Error getting raster"), -1, enumGISMessageErr);
-        //wsDELETE(pSrcDataSet);
         return false;
     }
 
@@ -169,7 +168,6 @@ bool wxGISGPCompStatTool::Execute(ITrackCancel* pTrackCancel)
                 const char* pszErr = CPLGetLastErrorMsg();
 				pTrackCancel->PutMessage(wxString::Format(_("ComputeStatistics failed! GDAL error: %s"), wxString(pszErr, wxConvUTF8).c_str()), -1, enumGISMessageErr);
             }
-            //wsDELETE(pSrcDataSet);
             return false;
         }
         pTrackCancel->PutMessage(wxString::Format(_("Band %d: min - %.2f, max - %.2f, mean - %.2f, StdDev - %.2f"), nBand + 1, dfMin, dfMax, dfMean, dfStdDev), -1, enumGISMessageNorm);
@@ -181,13 +179,12 @@ bool wxGISGPCompStatTool::Execute(ITrackCancel* pTrackCancel)
      //           const char* pszErr = CPLGetLastErrorMsg();
      //           pTrackCancel->PutMessage(wxString::Format(_("ComputeStatistics failed! GDAL error: %s"), wgMB2WX(pszErr)), -1, enumGISMessageErr);
      //       }
-     //       wsDELETE(pSrcDataSet);
      //       return false;
      //   }
     }
+    //poGDALDataset->FlushCache();
 
     pSrcDataSet->SetHasStatistics(true);
-    //wsDELETE(pSrcDataSet);
 
     return true;
 }

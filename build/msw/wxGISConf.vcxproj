@@ -62,7 +62,7 @@
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
       <OutputFile>..\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
-      <Version>0.4</Version>
+      <Version>0.4.1</Version>
     </Link>
     <PostBuildEvent>
       <Command>copy ..\$(Configuration)\$(TargetName)$(TargetExt) ..\..\lib\</Command>

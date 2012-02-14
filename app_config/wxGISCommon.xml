@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wxGISCommon>
+  <GDAL cachemax="128"/>
+  <debug mode="no"/>
+  <sys path="d:\work\projects\wxgis\build\Debug\sys"/>
+  <loc path="d:\work\projects\wxgis\build\Debug\locale" locale="ru"/>
+  <log path="d:\work\projects\wxgis\build\Debug\log"/>
+  <libs>
+    <lib path="wxGISRemoteServerUId.dll" name="wxGISRemoteServerUId"/>
+    <lib path="wxGISGeoprocessingUId.dll" name="wxGISGeoprocessingUId"/>
+  </libs>
+</wxGISCommon>

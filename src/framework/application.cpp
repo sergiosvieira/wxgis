@@ -828,7 +828,7 @@ void wxGISApplication::OnAppOptions(void)
         pPropPageNode = pPropPageNode->GetNext();
     }
 
-    PropertySheetDialog.LayoutDialog();
+    //PropertySheetDialog.LayoutDialog();
 
     if(PropertySheetDialog.ShowModal() == wxID_OK)
     {

@@ -76,8 +76,7 @@ void wxGxKMLDatasetUI::EditProperties(wxWindow *parent)
 		PropertySheetDialog.GetBookCtrl()->AddPage(SpatialReferencePropertyPage, SpatialReferencePropertyPage->GetPageName());
 	}
 
-    PropertySheetDialog.LayoutDialog();
-    //center?
+    //PropertySheetDialog.LayoutDialog();
     PropertySheetDialog.SetSize(480,640);
     PropertySheetDialog.Center();
 
@@ -174,8 +173,7 @@ void wxGxKMLSubDatasetUI::EditProperties(wxWindow *parent)
 		PropertySheetDialog.GetBookCtrl()->AddPage(SpatialReferencePropertyPage, SpatialReferencePropertyPage->GetPageName());
 	}
 
-    PropertySheetDialog.LayoutDialog();
-    //center?
+    //PropertySheetDialog.LayoutDialog();
     PropertySheetDialog.SetSize(480,640);
     PropertySheetDialog.Center();
 

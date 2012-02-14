@@ -156,7 +156,10 @@ bool wxGxTableDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
     if(!bRet)
     {
         const char* err = CPLGetLastErrorMsg();
-		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Copy"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+        wxString sErr = wxString::Format(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Copy"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(sErr);
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
 		return false;	
     }
 	
@@ -190,15 +193,32 @@ bool wxGxTableDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     }
 
     bool bRet = pDSet->Move(szDestPath, pTrackCancel);
-    if(!bRet)
+    if(bRet)
+	{
+		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
+		if(pGxObjectContainer == NULL)
+			return false;
+		return pGxObjectContainer->DeleteChild(this);		
+	}
+	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Move"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+        wxString sErr = wxString::Format(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Move"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(sErr);
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
 		return false;	
     }
 
-    m_sPath = pDSet->GetPath();
-    m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
+  //  if(!bRet)
+  //  {
+  //      const char* err = CPLGetLastErrorMsg();
+  //      wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Move"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		//return false;	
+  //  }
+
+  //  m_sPath = pDSet->GetPath();
+  //  m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
 
     return true;
 }
@@ -398,8 +418,8 @@ bool wxGxFeatureDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
 		return false;	
     }
 
-    m_sPath = pDSet->GetPath();
-    m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
+    //m_sPath = pDSet->GetPath();
+    //m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
 
     return true;
 }
@@ -428,15 +448,22 @@ bool wxGxFeatureDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     }
 
     bool bRet = pDSet->Move(szDestPath, pTrackCancel);
-    if(!bRet)
+    if(bRet)
+	{
+		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
+		if(pGxObjectContainer == NULL)
+			return false;
+		return pGxObjectContainer->DeleteChild(this);		
+	}
+	else
     {
         const char* err = CPLGetLastErrorMsg();
-        wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Move"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Move"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;	
     }
 
-    m_sPath = pDSet->GetPath();
-    m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
+    //m_sPath = pDSet->GetPath();
+    //m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
 
     return true;
 }
@@ -586,8 +613,8 @@ bool wxGxRasterDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
 		return false;	
     }
 
-    m_sPath = pDSet->GetPath();
-    m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
+    //m_sPath = pDSet->GetPath();
+    //m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
 
     return true;
 }
@@ -616,15 +643,29 @@ bool wxGxRasterDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     }
 
     bool bRet = pDSet->Move(szDestPath, pTrackCancel);
-    if(!bRet)
+    if(bRet)
+	{
+		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
+		if(pGxObjectContainer == NULL)
+			return false;
+		return pGxObjectContainer->DeleteChild(this);		
+	}
+	else
     {
         const char* err = CPLGetLastErrorMsg();
 		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Move"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
 		return false;	
     }
 
-    m_sPath = pDSet->GetPath();
-    m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
+  //  if(!bRet)
+  //  {
+  //      const char* err = CPLGetLastErrorMsg();
+		//wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Move"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		//return false;	
+  //  }
+
+  //  m_sPath = pDSet->GetPath();
+  //  m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
 
     return true;
 }

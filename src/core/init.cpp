@@ -21,6 +21,7 @@
 
 #include "wxgis/core/init.h"
 #include "wxgis/core/config.h"
+#include "wxgis/version.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // wxGISAppWithLibs
@@ -118,7 +119,7 @@ bool wxGISInitializer::Initialize(const wxString &sAppName, const wxString &sLog
 	wxString sLogDir = pConfig->GetLogDir();
 	if(!SetupLog(sLogDir, sLogFilePrefix))
         return false;
-	wxLogMessage(_("wxGISInitializer: %s %s is initializing..."), sAppName.c_str(), wxString(APP_VER).c_str());
+	wxLogMessage(_("wxGISInitializer: %s %s is initializing..."), sAppName.c_str(), wxString(wxGIS_VERSION_NUM_DOT_STRING_T).c_str());
 
 	if(!SetupLoc(pConfig->GetLocale(), pConfig->GetLocaleDir()))
         return false;
