@@ -66,31 +66,45 @@ wxDragResult wxGxFolderUI::CanDrop(wxDragResult def)
 
 bool wxGxFolderUI::Drop(const wxArrayString& filenames, bool bMove)
 {
-   if(filenames.GetCount() == 0)
+    if(filenames.GetCount() == 0)
         return false;
-    char **papszFileList = NULL;    
-    CPLString szPath;
-    for(size_t i = 0; i < filenames.GetCount(); ++i)
+    GxObjectArray Array;
+    //1. try to get initiated GxObjects
+	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
+	if(pGxObjectContainer)
     {
-        //Change to CPLString
-        CPLString szFilePath = filenames[i].mb_str(wxConvUTF8);
-        if(i == 0)
-            szPath = CPLGetPath(szFilePath);
-        papszFileList = CSLAddString( papszFileList, szFilePath );        
+        for(size_t i = 0; i < filenames.GetCount(); ++i)
+        {
+            IGxObject* pGxObj = pGxObjectContainer->SearchChild(filenames[i]);
+            if(pGxObj)
+                Array.push_back(pGxObj);
+        }
     }
 
-	GxObjectArray Array;	
-    if(!m_pCatalog->GetChildren(szPath, papszFileList, Array))
+    if(Array.empty())
     {
+        char **papszFileList = NULL;    
+        CPLString szPath;
+        for(size_t i = 0; i < filenames.GetCount(); ++i)
+        {
+            //Change to CPLString
+            CPLString szFilePath = filenames[i].mb_str(wxConvUTF8);
+            if(i == 0)
+                szPath = CPLGetPath(szFilePath);
+            papszFileList = CSLAddString( papszFileList, szFilePath );        
+        }
+	    	
+        if(!m_pCatalog->GetChildren(szPath, papszFileList, Array))
+        {
+            CSLDestroy( papszFileList );
+            return false;
+        }
         CSLDestroy( papszFileList );
-        return false;
     }
-    CSLDestroy( papszFileList );
-
     //create progress dialog
-	wxString sTitle = wxString::Format(_("%s %d objects (files)"), bMove == true ? _("Move") : _("Copy"), filenames.GetCount());
-	wxWindow* pParentWnd = dynamic_cast<wxWindow*>(GetApplication());
-	wxGISProgressDlg ProgressDlg(sTitle, _("Begin operation..."), 100, pParentWnd, wxPD_APP_MODAL | wxPD_AUTO_HIDE | wxPD_SMOOTH | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME | wxPD_ESTIMATED_TIME | wxPD_REMAINING_TIME);
+    wxString sTitle = wxString::Format(_("%s %d objects (files)"), bMove == true ? _("Move") : _("Copy"), filenames.GetCount());
+    wxWindow* pParentWnd = dynamic_cast<wxWindow*>(GetApplication());
+    wxGISProgressDlg ProgressDlg(sTitle, _("Begin operation..."), 100, pParentWnd, wxPD_APP_MODAL | wxPD_AUTO_HIDE | wxPD_SMOOTH | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME | wxPD_ESTIMATED_TIME | wxPD_REMAINING_TIME);
 
     for(size_t i = 0; i < Array.size(); ++i)
     {
@@ -103,40 +117,50 @@ bool wxGxFolderUI::Drop(const wxArrayString& filenames, bool bMove)
         IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(Array[i]);
         if(pGxObjectEdit)
         {
+            IGxObjectContainer* pGxParentObjectContainer = dynamic_cast<IGxObjectContainer*>(Array[i]->GetParent());
             if(bMove && pGxObjectEdit->CanMove(m_sPath))
             {
-                if(pGxObjectEdit->Move(m_sPath, &ProgressDlg))
+                if(!pGxObjectEdit->Move(m_sPath, &ProgressDlg))
                 {
-                    bool ret_code = AddChild(Array[i]);
-                    if(!ret_code)
-                    {
-                        wxDELETE(Array[i]);
-                    }
-                    else
-                    {
-                        m_pCatalog->ObjectAdded(Array[i]->GetID());
-                    }
+                    //pGxParentObjectContainer->DeleteChild(Array[i]);
+
+                    //bool ret_code = AddChild(Array[i]);
+                    //if(!ret_code)
+                    //{
+                    //    wxDELETE(Array[i]);
+                    //}
+                    //else
+                    //{
+                    //    m_pCatalog->ObjectAdded(Array[i]->GetID());
+                    //    m_pCatalog->ObjectRefreshed(pGxParentObj->GetID());
+                    //}
+                    return false;
                 }
             }
             else if(!bMove && pGxObjectEdit->CanCopy(m_sPath))
             {
-                if(pGxObjectEdit->Copy(m_sPath, &ProgressDlg))
+                if(!pGxObjectEdit->Copy(m_sPath, &ProgressDlg))
                 {
-                    bool ret_code = AddChild(Array[i]);
-                    if(!ret_code)
-                    {
-                        wxDELETE(Array[i]);
-                    }
-                    else
-                    {
-                        m_pCatalog->ObjectAdded(Array[i]->GetID());
-                    }
+                    //bool ret_code = AddChild(Array[i]);
+                    //if(!ret_code)
+                    //{
+                    //    wxDELETE(Array[i]);
+                    //}
+                    //else
+                    //{
+                    //    m_pCatalog->ObjectAdded(Array[i]->GetID());
+                    //}
+                    return false;
                 }
             }
             else
                 return false;
         }
     }
+    m_bIsChildrenLoaded = false;
+    LoadChildren();
+    m_pCatalog->ObjectRefreshed(GetID());
+
 	ProgressDlg.SetValue(ProgressDlg.GetValue() + 1);
 	ProgressDlg.Destroy();
     return true;

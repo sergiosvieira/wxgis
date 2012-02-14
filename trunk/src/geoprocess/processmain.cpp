@@ -33,6 +33,11 @@
 
 #include <locale.h>
 
+
+#ifdef HAVE_PROJ
+    #include "proj_api.h"
+#endif
+
 int main(int argc, char **argv)
 {
 #if wxUSE_UNICODE
@@ -263,6 +268,16 @@ bool wxGPTaskExecutor::Initialize(const wxString &sAppName, const wxString &sLog
 	//GDAL
 	wxString sGDALCacheMax = pConfig->Read(enumGISHKCU, wxString(wxT("wxGISCommon/GDAL/cachemax")), wxString(wxT("128")));
 	CPLSetConfigOption( "GDAL_CACHEMAX", sGDALCacheMax.mb_str() );
+    wxString sSysPath = pConfig->GetSysDir();
+	wxString sGdalDataDir = sSysPath + wxFileName::GetPathSeparator() + wxString(wxT("gdal")) + wxFileName::GetPathSeparator();
+	CPLSetConfigOption("GDAL_DATA", sGdalDataDir.mb_str(wxConvUTF8) );
+#ifdef HAVE_PROJ
+	sGdalDataDir = sSysPath + wxFileName::GetPathSeparator() + wxString(wxT("proj")) + wxFileName::GetPathSeparator();
+	//CPLSetConfigOption("PROJ_LIB", sGdalDataDir.mb_str(wxConvUTF8) );    
+    CPLString pszPROJ_LIB = sGdalDataDir.mb_str(wxConvUTF8);
+    const char *path = pszPROJ_LIB.c_str();
+    pj_set_searchpath(1, &path);
+#endif
 
 	OGRRegisterAll();
 	GDALAllRegister();

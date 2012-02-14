@@ -76,7 +76,7 @@ wxString wxGISGeoprocessingCmd::GetCaption(void)
 		case 0:
 			return wxString(_("&Export"));
 		case 1:
-			return wxString(_("Show/Hide &Toolbox pane"));
+			return wxString(_("Show/Hide &Toolbox panel"));
 		default:
 		return wxEmptyString;
 	}
@@ -146,7 +146,7 @@ bool wxGISGeoprocessingCmd::GetEnabled(void)
 			}
 			return false;
         }
-		case 1://Show/Hide Toolbox pane
+		case 1://Show/Hide Toolbox panel
             return m_pToolboxView != NULL;
 		default:
 			return false;
@@ -157,7 +157,7 @@ wxGISEnumCommandKind wxGISGeoprocessingCmd::GetKind(void)
 {
 	switch(m_subtype)
 	{
-		case 1://Show/hide toolbox pane
+		case 1://Show/hide toolbox panel
             return enumGISCommandCheck;
 		case 0://Export
 		default:
@@ -172,7 +172,7 @@ wxString wxGISGeoprocessingCmd::GetMessage(void)
 		case 0:
 			return wxString(_("Export item to another format"));
 		case 1:
-			return wxString(_("Show/Hide Toolbox pane"));
+			return wxString(_("Show/Hide Toolbox panel"));
 		default:
 			return wxEmptyString;
 	}
@@ -440,7 +440,7 @@ wxString wxGISGeoprocessingCmd::GetTooltip(void)
 		case 0:
 			return wxString(_("Export item"));
 		case 1:
-			return wxString(_("Show/Hide Toolbox pane"));
+			return wxString(_("Show/Hide Toolbox panel"));
 		default:
 			return wxEmptyString;
 	}

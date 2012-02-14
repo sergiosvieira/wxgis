@@ -46,15 +46,41 @@ bool wxGxMapInfoFactory::GetChildren(CPLString sParentDir, char** &pFileNames, G
             szPath = (char*)CPLResetExtension(pFileNames[i], "dat");
             if(CPLCheckForFile((char*)szPath.c_str(), NULL))
                 bHasDat = true;
+            if(!bHasDat)
+            {
+                szPath = (char*)CPLResetExtension(pFileNames[i], "DAT");
+                if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                    bHasDat = true;
+            }
+
             szPath = (char*)CPLResetExtension(pFileNames[i], "id");
             if(CPLCheckForFile((char*)szPath.c_str(), NULL))
                 bHasID = true;
+            if(!bHasID)
+            {
+                szPath = (char*)CPLResetExtension(pFileNames[i], "ID");
+                if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                    bHasID = true;
+            }
             szPath = (char*)CPLResetExtension(pFileNames[i], "ind");
             if(CPLCheckForFile((char*)szPath.c_str(), NULL))
                 bHasInd = true;
+            if(!bHasInd)
+            {
+                szPath = (char*)CPLResetExtension(pFileNames[i], "IND");
+                if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                    bHasInd = true;
+            }
             szPath = (char*)CPLResetExtension(pFileNames[i], "map");
             if(CPLCheckForFile((char*)szPath.c_str(), NULL))
                 bHasMap = true;
+            if(!bHasMap)
+            {
+                szPath = (char*)CPLResetExtension(pFileNames[i], "MAP");
+                if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                    bHasMap = true;
+            }
+
             if(bHasMap && bHasMap && bHasID && bHasDat)
                 pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumVecMapinfoTab);
             else if(bHasDat)

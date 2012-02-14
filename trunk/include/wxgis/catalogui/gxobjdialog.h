@@ -40,12 +40,13 @@
 #include <wx/textctrl.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
+#include <wx/aui/aui.h>
 
 #include "wxgis/core/config.h"
 #include "wxgis/catalogui/gxcontentview.h"
 #include "wxgis/catalogui/gxtreeview.h"
+#include "wxgis/version.h"
 
-#include "wx/aui/aui.h"
 
 #define OBJDLG_NAME wxT("wxGISObjDialog")
 
@@ -186,7 +187,7 @@ public:
 	virtual ICommand* GetCommand(long CmdID);
 	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
     virtual wxString GetAppName(void){return wxString(OBJDLG_NAME);};
-    virtual wxString GetAppVersionString(void){return wxString(APP_VER);};
+    virtual wxString GetAppVersionString(void){return wxString(wxGIS_VERSION_NUM_DOT_STRING_T);};
     virtual IStatusBar* GetStatusBar(void){return NULL;};
     virtual void OnAppAbout(void){};
     virtual void OnAppOptions(void){};

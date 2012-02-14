@@ -44,7 +44,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(PROJ)\src;$(GEOS)\capi;$(GEOS)\include;$(WXGISGDAL)\port;$(WXGISGDAL)\alg;$(WXGISGDAL)\gcore;$(WXGISGDAL)\ogr;$(WXGISGDAL)\ogr\ogrsf_frmts;$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(CAIRO)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(PROJ)\src;$(GEOS)\capi;$(GEOS)\include;$(WXGISGDAL)\port;$(WXGISGDAL)\alg;$(WXGISGDAL)\gcore;$(WXGISGDAL)\ogr;$(WXGISGDAL)\ogr\ogrsf_frmts;$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(CAIRO)\src;$(WXGISGDAL)\build\port;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;__WXMSW__;__WXDEBUG__;WXUSINGDLL;NOPCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -63,7 +63,7 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
-      <Version>0.4</Version>
+      <Version>0.4.1</Version>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

@@ -218,7 +218,7 @@ void wxGISTablePropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer, CPLStri
     OGRFeatureDefn *poDefn = poLayer->GetLayerDefn();
     if(poDefn)
     {
-        wxPGProperty* pfieldsid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Fields"), iLayer + 1)) );
+        wxPGProperty* pfieldsid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Fields (%d)"), iLayer + 1, poDefn->GetFieldCount())) );
         for( int iAttr = 0; iAttr < poDefn->GetFieldCount(); iAttr++ )
         {
             OGRFieldDefn    *poField = poDefn->GetFieldDefn( iAttr );

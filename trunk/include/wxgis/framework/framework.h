@@ -46,11 +46,11 @@ enum wxGISPluginIDs
 };	
 
 /** \enum wxGISEnumStatusBarPanes
-    \brief A statusbar panes.
+    \brief A statusbar panels.
 
-    This is predefined statusbar panes list.
+    This is predefined statusbar panels list.
 */
-enum wxGISEnumStatusBarPanes
+enum wxGISEnumStatusBarPanels
 {
 	enumGISStatusMain           = 0x0001, 
 	enumGISStatusAnimation      = 0x0002,
@@ -108,7 +108,7 @@ public:
      *  \brief A constructor.
      *  \param style Statusbar style (the combination of wxGISEnumStatusBarPanes)
      */	
-    IStatusBar(long style) : m_Panes(style){};
+    IStatusBar(long style) : m_Panels(style){};
     /** \fn virtual ~IStatusBar(void)
      *  \brief A destructor.
      */
@@ -137,23 +137,23 @@ public:
      */		
     virtual IProgressor* GetProgressor(void) = 0;
     /** \fn virtual int GetPanePos(wxGISEnumStatusBarPanes nPane)
-     *  \brief Get the pane pos by it's type.
-     *  \return The pane index
+     *  \brief Get the panel pos by it's type.
+     *  \return The panel index
      */	    
-    virtual int GetPanePos(wxGISEnumStatusBarPanes nPane) = 0;
+    virtual int GetPanelPos(wxGISEnumStatusBarPanels nPane) = 0;
 	//
     /** \fn virtual WXDWORD GetPanes(void)
      *  \brief Get the status bar style (the combination of wxGISEnumStatusBarPanes)
      *  \return The status bar style 
      */		
-    virtual WXDWORD GetPanes(void){return m_Panes;};
+    virtual WXDWORD GetPanels(void){return m_Panels;};
     /** \fn virtual void SetPanes(WXDWORD Panes)
-     *  \brief Set the pane style (the combination of wxGISEnumStatusBarPanes)
+     *  \brief Set the panel style (the combination of wxGISEnumStatusBarPanes)
      *  \param Panes The status bar style
      */		
-    virtual void SetPanes(WXDWORD Panes){m_Panes = Panes;};
+    virtual void SetPanels(WXDWORD Panels){m_Panels = Panels;};
 protected:
-	WXDWORD m_Panes;    /*!< a status bar style (the combination of wxGISEnumStatusBarPanes)*/
+	WXDWORD m_Panels;    /*!< a status bar style (the combination of wxGISEnumStatusBarPanes)*/
 };
 
 class ICommand;

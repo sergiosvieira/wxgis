@@ -46,7 +46,8 @@ public:
     virtual wxString GetPageName(void){return wxString(_("Raster"));};
     wxPGProperty* AppendProperty(wxPGProperty* pProp);
     wxPGProperty* AppendProperty(wxPGProperty* pid, wxPGProperty* pProp);
-    wxPGProperty* AppendMetadataProperty(wxString sMeta);
+    wxPGProperty* AppendMetadataProperty(wxPGProperty* pid, wxString sMeta);
+    wxPGProperty* GetSubProperty(wxPGProperty* pid, const wxString &sName, wxString &sResultName);
     void FillGrid(void);
     //events
     void OnPropertyGridButtonClick ( wxCommandEvent& );

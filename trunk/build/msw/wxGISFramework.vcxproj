@@ -48,8 +48,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(WXGISGDAL)\port;$(ZLIB);$(EXPAT)\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_FRW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(WXGISGDAL)\port;$(ZLIB);$(EXPAT)\lib;$(WXGISGDAL)\build\port;$(PROJ)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;HAVE_PROJ;WXMAKINGDLL_GIS_FRW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -57,9 +57,9 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxmsw29ud_aui.lib;wxmsw29ud_adv.lib;wxmsw29ud_html.lib;zlibwapi.lib;wxregexud.lib;libexpat.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxGISCored.lib;wxgiscpld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxmsw29ud_core.lib;wxbase29ud_xml.lib;wxmsw29ud_aui.lib;wxmsw29ud_adv.lib;wxmsw29ud_html.lib;zlibwapi.lib;wxregexud.lib;libexpat.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxGISCored.lib;wxgisgdal19d.lib;proj4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>$(WXWIDGETS)\lib\vc_dll;..\..\lib;$(WXGISGDAL)\lib;$(ZLIB)\lib;$(EXPAT)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(WXWIDGETS)\lib\vc_dll;..\..\lib;$(WXGISGDAL)\lib;$(ZLIB)\lib;$(EXPAT)\lib;$(PROJ)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -67,7 +67,7 @@
       </DataExecutionPrevention>
       <ImportLibrary>..\..\lib\$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
-      <Version>0.4</Version>
+      <Version>0.4.1</Version>
     </Link>
     <PostBuildEvent>
       <Message>copy from debug to lib</Message>
@@ -76,15 +76,15 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(WXGISGDAL)\port;$(ZLIB);$(EXPAT)\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;__WXMSW__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_FRW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(WXGISGDAL)\build\port;$(WXGISGDAL)\port;$(ZLIB);$(EXPAT)\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;__WXMSW__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_FRW;HAVE_PROJ;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>
       </DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>wxbase29u.lib;wxbase29u_net.lib;wxmsw29u_core.lib;wxbase29u_xml.lib;wxmsw29u_aui.lib;wxmsw29u_adv.lib;wxmsw29u_html.lib;zlibwapi.lib;wxregexu.lib;libexpat.lib;wxGISCore.lib;wxgiscpl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxbase29u.lib;wxbase29u_net.lib;wxmsw29u_core.lib;wxbase29u_xml.lib;wxmsw29u_aui.lib;wxmsw29u_adv.lib;wxmsw29u_html.lib;zlibwapi.lib;wxregexu.lib;libexpat.lib;wxGISCore.lib;wxgisgdal19.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(WXWIDGETS)\lib\vc_dll;..\..\lib;$(WXGISGDAL)\lib;$(ZLIB)\lib;$(EXPAT)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>

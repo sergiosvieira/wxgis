@@ -1,0 +1,23 @@
+#add data
+macro(add_files_macro FPATH FGROUP)
+    file(GLOB PROJECT_AHHEADERS ${FPATH}/*.h  ${FPATH}/*.hpp)
+    set(PROJECT_HHEADERS ${PROJECT_HHEADERS} ${PROJECT_AHHEADERS})
+    source_group("Header Files\\${FGROUP}" FILES ${PROJECT_AHHEADERS})
+    file(GLOB PROJECT_ACSOURCES ${FPATH}/*.cpp ${FPATH}/*.cc ${FPATH}/*.c)
+    set(PROJECT_CSOURCES ${PROJECT_CSOURCES} ${PROJECT_ACSOURCES})
+    source_group("Source Files\\${FGROUP}" FILES ${PROJECT_ACSOURCES})
+endmacro()
+
+if(WIN32)
+    set(LIB_INSTALL_PATH_DEBUG ${WXGIS_CURRENT_BINARY_DIR}/Debug/)
+    set(APP_INSTALL_PATH_DEBUG ${WXGIS_CURRENT_BINARY_DIR}/Debug/)
+    set(LIB_INSTALL_PATH_RELEASE ${WXGIS_CURRENT_BINARY_DIR}/Release/)
+    set(APP_INSTALL_PATH_RELEASE ${WXGIS_CURRENT_BINARY_DIR}/Release/)    
+    
+    mark_as_advanced(LIB_INSTALL_PATH_DEBUG LIB_INSTALL_PATH_RELEASE)
+    mark_as_advanced(APP_INSTALL_PATH_DEBUG APP_INSTALL_PATH_RELEASE)    
+elseif(UNIX)
+    set(LIB_INSTALL_PATH /usr/lib/wxgis/)
+    set(APP_INSTALL_PATH /usr/bin/wxgis/)
+    set(HEADERS_INSTALL_PATH /usr/include/wxgis/)
+endif()

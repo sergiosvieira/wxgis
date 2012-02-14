@@ -118,8 +118,8 @@ void wxMxMapView::OnMouseMove(wxMouseEvent& event)
 	{
 		double dX(event.m_x), dY(event.m_y);
 		m_pGISDisplay->DC2World(&dX, &dY);
-        int nPanePos = m_pStatusBar->GetPanePos(enumGISStatusPosition);
-		m_pStatusBar->SetMessage(wxString::Format(_("X: %.4f  Y: %.4f"), dX, dY), nPanePos);
+        int nPanelPos = m_pStatusBar->GetPanelPos(enumGISStatusPosition);
+		m_pStatusBar->SetMessage(wxString::Format(_("X: %.4f  Y: %.4f"), dX, dY), nPanelPos);
 	}
 
 	if(m_pApp)

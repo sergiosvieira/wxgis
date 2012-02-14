@@ -387,6 +387,7 @@ bool wxGISIdentifyDlg::Create(wxWindow* parent, wxWindowID id, const wxPoint& po
 
 	m_splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D );
 	m_splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISIdentifyDlg::SplitterOnIdle ), NULL, this );
+    //m_splitter->Bind(wxEVT_IDLE, &wxGISIdentifyDlg::SplitterOnIdle, this);
 	
 	m_bMainSizer->Add( m_splitter, 1, wxEXPAND, 5 );
 
@@ -399,10 +400,13 @@ bool wxGISIdentifyDlg::Create(wxWindow* parent, wxWindowID id, const wxPoint& po
     wxGetOsVersion(&nOSMajorVer);
 	m_pTreeCtrl = new wxTreeCtrl( m_splitter, ID_WXGISTREECTRL, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS | wxTR_HIDE_ROOT | wxSTATIC_BORDER | (nOSMajorVer > 5 ? wxTR_NO_LINES : wxTR_LINES_AT_ROOT) );
 	m_pTreeCtrl->SetImageList(&m_TreeImageList);
+	m_pTreeCtrl->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( wxGISIdentifyDlg::OnLeftDown ), NULL, this );
+    //m_pTreeCtrl->Bind(wxEVT_LEFT_UP, &wxGISIdentifyDlg::OnLeftUp, this);
+
 
 	m_splitter->SetSashGravity(0.5);
 	m_pFeatureDetailsPanel = new wxGISFeatureDetailsPanel(m_splitter);
-	m_splitter->SplitVertically(m_pTreeCtrl, m_pFeatureDetailsPanel, 100);
+	m_splitter->SplitVertically(m_pTreeCtrl, m_pFeatureDetailsPanel, 150);
 
 	this->SetSizer( m_bMainSizer );
 	this->Layout();
@@ -462,6 +466,10 @@ void wxGISIdentifyDlg::OnSelChanged(wxTreeEvent& event)
 		}
 		m_pFeatureDetailsPanel->FillPanel(pData->m_pDataset->GetFeature(pData->m_nOID));
     }
+}
+
+void wxGISIdentifyDlg::OnLeftDown(wxMouseEvent& event)
+{
 }
 
 void wxGISIdentifyDlg::OnMenu(wxCommandEvent& event)
@@ -670,6 +678,7 @@ void wxAxIdentifyView::FillTree(wxGISFeatureLayerSPtr pFLayer, wxGISQuadTreeCurs
 
 void wxAxIdentifyView::OnSelChanged(wxTreeEvent& event)
 {
+    event.Skip();
     wxTreeItemId TreeItemId = event.GetItem();
     if(TreeItemId.IsOk())
     {
@@ -688,6 +697,24 @@ void wxAxIdentifyView::OnSelChanged(wxTreeEvent& event)
 		Arr.Add(pData->m_pGeometry);
 		m_pMapView->FlashGeometry(Arr);
 		m_pFeatureDetailsPanel->FillPanel(pData->m_pDataset->GetFeature(pData->m_nOID));
+    }
+}
+
+void wxAxIdentifyView::OnLeftDown(wxMouseEvent& event)
+{
+	event.Skip();
+	wxPoint pt = event.GetPosition();
+	unsigned long nFlags(0);
+	wxTreeItemId TreeItemId = m_pTreeCtrl->HitTest(pt, (int &)nFlags);
+	if(TreeItemId.IsOk() && ((nFlags & wxTREE_HITTEST_ONITEMLABEL) || (nFlags & wxTREE_HITTEST_ONITEMICON)))
+	{
+        wxIdentifyTreeItemData* pData = (wxIdentifyTreeItemData*)m_pTreeCtrl->GetItemData(TreeItemId);
+        if(pData && pData->m_pGeometry)
+        {
+            GeometryArray Arr;
+	    	Arr.Add(pData->m_pGeometry);
+		    m_pMapView->FlashGeometry(Arr);
+        }
     }
 }
 

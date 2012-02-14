@@ -48,7 +48,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXGISGDAL)\alg;$(WXGISGDAL)\gcore;$(WXGISGDAL)\port;$(WXGISGDAL)\ogr;$(WXGISGDAL)\ogr\ogrsf_frmts;$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(CAIRO)\src;$(ZLIB);$(EXPAT)\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXGISGDAL)\alg;$(WXGISGDAL)\gcore;$(WXGISGDAL)\port;$(WXGISGDAL)\ogr;$(WXGISGDAL)\ogr\ogrsf_frmts;$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(CAIRO)\src;$(ZLIB);$(EXPAT)\lib;$(WXGISGDAL)\build\port;D:\work\projects\PostgreSQL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CLT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -57,7 +57,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxbase29ud_xml.lib;zlibwapi.lib;wxregexud.lib;libexpat.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxgiscpld.lib;wxgisogrd.lib;wxgisgdald.lib;wxGISCored.lib;wxGISDataSourced.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxbase29ud_xml.lib;zlibwapi.lib;wxregexud.lib;libexpat.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxgisgdal19d.lib;wxGISCored.lib;wxGISDataSourced.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(WXWIDGETS)\lib\vc_dll;$(WXGISGDAL)\lib;..\..\lib;$(ZLIB)\lib;$(EXPAT)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -70,7 +70,7 @@
       </DataExecutionPrevention>
       <ImportLibrary>..\..\lib\$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
-      <Version>0.4</Version>
+      <Version>0.4.1</Version>
     </Link>
     <PostBuildEvent>
       <Message>copy from debug to lib</Message>
@@ -79,7 +79,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXGISGDAL)\alg;$(WXGISGDAL)\gcore;$(WXGISGDAL)\port;$(WXGISGDAL)\ogr;$(WXGISGDAL)\ogr\ogrsf_frmts;$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(CAIRO)\src;$(ZLIB);$(EXPAT)\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXGISGDAL)\alg;$(WXGISGDAL)\gcore;$(WXGISGDAL)\build\port;$(WXGISGDAL)\port;$(WXGISGDAL)\ogr;$(WXGISGDAL)\ogr\ogrsf_frmts;$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(CAIRO)\src;$(ZLIB);$(EXPAT)\lib;D:\work\projects\PostgreSQL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;__WXMSW__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CLT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
@@ -87,7 +87,7 @@
       </DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>wxbase29u.lib;wxbase29u_net.lib;wxbase29u_xml.lib;zlibwapi.lib;wxregexu.lib;libexpat.lib;wxgiscpl.lib;wxgisogr.lib;wxgisgdal.lib;wxGISCore.lib;wxGISDataSource.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxbase29u.lib;wxbase29u_net.lib;wxbase29u_xml.lib;zlibwapi.lib;wxregexu.lib;libexpat.lib;wxgisgdal19.lib;wxGISCore.lib;wxGISDataSource.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(WXWIDGETS)\lib\vc_dll;$(WXGISGDAL)\lib;$(ZLIB)\lib;$(EXPAT)\lib;..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>

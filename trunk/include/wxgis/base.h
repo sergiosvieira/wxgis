@@ -323,10 +323,8 @@
 #define PIDEG 0.017453292519943295769236907684886
 #define DEGPI 57.295779513082320876798155633941
 
-#define APP_VER wxT("0.4.0") //global for all apps
-
 //#ifndef _DEBUG
-   #define WXGISPORTABLE
+//   #define WXGISPORTABLE
 //#endif
 
 #ifndef WXDWORD

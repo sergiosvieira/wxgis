@@ -144,7 +144,7 @@ wxString wxGISTable::GetName(void)
 
 void wxGISTable::LoadFeatures(ITrackCancel* pTrackCancel)
 {
-	wxCriticalSectionLocker locker(m_CritSect);
+	//wxCriticalSectionLocker locker(m_CritSect);
 	if( !m_bIsOpened || !m_poLayer )
 		return;
 
@@ -227,7 +227,7 @@ void wxGISTable::LoadFeatures(ITrackCancel* pTrackCancel)
 
 void wxGISTable::UnloadFeatures(void)
 {
-	wxCriticalSectionLocker locker(m_CritSect);
+	//wxCriticalSectionLocker locker(m_CritSect);
     //if(!m_FeaturesMap.empty())
     //{
     //    for(m_IT = m_FeaturesMap.begin(); m_IT != m_FeaturesMap.end(); ++m_IT)
@@ -250,8 +250,8 @@ void wxGISTable::Close(void)
 			m_poDS->ReleaseResultSet(m_poLayer);
 		if( m_poDS->Dereference() <= 0)
 			OGRDataSource::DestroyDataSource( m_poDS );
+	    m_poDS = NULL;
 	}
-	m_poDS = NULL;
 
 	m_Encoding = wxFONTENCODING_DEFAULT;
     m_bIsOpened = false;
@@ -693,9 +693,9 @@ OGRFeatureSPtr wxGISTable::GetFeature(long nFID)
 
 bool wxGISTable::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
 {
-	wxCriticalSectionLocker locker(m_CritSect);
     Close();
 
+	wxCriticalSectionLocker locker(m_CritSect);
     char** papszFileList = GetFileList();
     papszFileList = CSLAddString( papszFileList, m_sPath );
     if(!papszFileList)
@@ -723,7 +723,7 @@ bool wxGISTable::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
 		}
     }
     
-    m_sPath = szCopyFileName;
+    //m_sPath = szCopyFileName;
 
 	CSLDestroy( papszFileList );
 	CSLDestroy( papszFileCopiedList );
@@ -732,9 +732,9 @@ bool wxGISTable::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
 
 bool wxGISTable::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
 {
-	wxCriticalSectionLocker locker(m_CritSect);
     Close();
 
+	wxCriticalSectionLocker locker(m_CritSect);
     char** papszFileList = GetFileList();
     papszFileList = CSLAddString( papszFileList, m_sPath );
     if(!papszFileList)
@@ -770,9 +770,9 @@ bool wxGISTable::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
 
 bool wxGISTable::Delete(int iLayer, ITrackCancel* pTrackCancel)
 {
-	wxCriticalSectionLocker locker(m_CritSect);
     Close();
     
+	wxCriticalSectionLocker locker(m_CritSect);
     if(!DeleteFile(m_sPath))
         return false;
 	
@@ -851,6 +851,8 @@ char **wxGISTable::GetFileList()
 
 bool wxGISTable::Rename(wxString sNewName)
 {
+	Close();
+
 	wxCriticalSectionLocker locker(m_CritSect);
 
     CPLString szDirPath = CPLGetPath(m_sPath);
@@ -864,7 +866,6 @@ bool wxGISTable::Rename(wxString sNewName)
 
     char **papszNewFileList = NULL;
 
-	Close();
 
     for(int i = 0; papszFileList[i] != NULL; ++i )
     {		

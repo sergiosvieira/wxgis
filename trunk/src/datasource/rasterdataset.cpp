@@ -105,8 +105,36 @@ char **wxGISRasterDataset::GetFileList()
 		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
 			papszFileList = CSLAddString( papszFileList, szPath );
 		break;
-    case enumRasterBmp:
+    case enumRasterTiff:
+    case enumRasterTil:
+		szPath = (char*)CPLResetExtension(m_sPath, "imd");
+		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+			papszFileList = CSLAddString( papszFileList, szPath );
+		szPath = (char*)CPLResetExtension(m_sPath, "pvl");
+		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+			papszFileList = CSLAddString( papszFileList, szPath );
+		szPath = (char*)CPLResetExtension(m_sPath, "att");
+		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+			papszFileList = CSLAddString( papszFileList, szPath );
+		szPath = (char*)CPLResetExtension(m_sPath, "eph");
+		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+			papszFileList = CSLAddString( papszFileList, szPath );
+        //RPC specific
+        szPath = (char*)CPLResetExtension(m_sPath, "rpb");
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+        szPath = (char*)CPLResetExtension(m_sPath, "rpc");
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+        {
+        CPLString szRpcName = CPLString(CPLGetBasename(m_sPath)) + CPLString("_rpc.txt");
+        szPath = (char*)CPLFormFilename(CPLGetPath(m_sPath), (const char*)szRpcName.c_str(), NULL);
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+        }
+        break;
 	case enumRasterImg:
+    case enumRasterBmp:
 	case enumRasterPng:
 	case enumRasterGif:
     case enumRasterUnknown:
@@ -151,16 +179,6 @@ char **wxGISRasterDataset::GetFileList()
     if(CPLCheckForFile((char*)szPath.c_str(), NULL))
         papszFileList = CSLAddString( papszFileList, szPath );
     szPath = (char*)CPLResetExtension(m_sPath, "rrd");
-    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-        papszFileList = CSLAddString( papszFileList, szPath );
-    szPath = (char*)CPLResetExtension(m_sPath, "rpb");
-    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-        papszFileList = CSLAddString( papszFileList, szPath );
-    szPath = (char*)CPLResetExtension(m_sPath, "rpc");
-    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-        papszFileList = CSLAddString( papszFileList, szPath );
-    CPLString szRpcName = CPLString(CPLGetBasename(m_sPath)) + CPLString("_rpc.txt");
-    szPath = (char*)CPLFormFilename(CPLGetPath(m_sPath), (const char*)szRpcName.c_str(), NULL);
     if(CPLCheckForFile((char*)szPath.c_str(), NULL))
         papszFileList = CSLAddString( papszFileList, szPath );
 
@@ -234,6 +252,9 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
 
 bool wxGISRasterDataset::Open(bool bReadOnly)
 {	
+    if(bReadOnly != m_bIsReadOnly)
+        Close();
+
 	if(m_bIsOpened)
 		return true;
 
@@ -264,8 +285,191 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
     bool bHasGeoTransform = false;
     if(err != CE_Fatal)
     {
+        //look for metadata OV-3
+        char** papszMetadata = m_poDataset->GetMetadata("IMD");
+        //if(EQUAL(CSLFetchNameValue(papszMetadata, "sensorInfo.satelliteName"), "OV-3"))
+        if(papszMetadata && EQUAL(CSLFetchNameValue(papszMetadata, "md_type"), "pvl") && m_poDataset->GetGCPCount() == 0)
+        {
+            OGRSpatialReference oOGRSpatialReference(SRS_WKT_WGS84);   
+            double adfX[4], adfY[4], adfZ[4];
+            adfX[0] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.upperLeftCorner.longitude", "0.0"));
+            adfY[0] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.upperLeftCorner.latitude", "0.0"));
+            adfZ[0] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.upperLeftCorner.height", "0.0"));
+            adfX[1] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.upperRightCorner.longitude", "0.0"));
+            adfY[1] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.upperRightCorner.latitude", "0.0"));
+            adfZ[1] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.upperRightCorner.height", "0.0"));
+            adfX[2] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.lowerRightCorner.longitude", "0.0"));
+            adfY[2] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.lowerRightCorner.latitude", "0.0"));                    
+            adfZ[2] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.lowerRightCorner.height", "0.0"));
+            adfX[3] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.lowerLeftCorner.longitude", "0.0"));
+            adfY[3] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.lowerLeftCorner.latitude", "0.0"));   
+            adfZ[3] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.lowerLeftCorner.height", "0.0"));
+
+            //const char* pszSpacingUnits = CSLFetchNameValueDef(papszMetadata, "productInfo.spacingUnits", "meters");
+            //// trim double quotes. 
+            //if( pszSpacingUnits[0] == '"' )
+            //    pszSpacingUnits++;
+            //if( pszSpacingUnits[strlen(pszSpacingUnits)-1] == '"' )
+            //    ((char *) pszSpacingUnits)[strlen(pszSpacingUnits)-1] = '\0';
+
+            //if(EQUAL(pszSpacingUnits, "meters"))
+            //{
+            //    //if meters use spacing and transform upper left corner to WGS84/UTM
+            //    adfGeoTransform[1] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.pixelSpacing", "0.0"));
+            //    adfGeoTransform[5] = -CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.lineSpacing", "0.0"));
+            //    //calc UTM Zone
+                double dfXCenter = adfX[0] + (adfX[2] - adfX[0]) / 2.0;
+                int nZoneNo = ( 180 + dfXCenter ) / 6 + 0.5;
+                OGRSpatialReference oDstOGRSpatialReference(SRS_WKT_WGS84); 
+                oDstOGRSpatialReference.SetUTM(nZoneNo, adfY[0] > 0);
+
+                OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( &oOGRSpatialReference, &oDstOGRSpatialReference);
+                if(poCT)
+                {
+                    int nResult = poCT->Transform(4, adfX, adfY, adfZ);
+                    if(nResult)
+                    {
+                        if(bReadOnly)
+                        {
+                            GDALClose(m_poDataset);
+                            m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath, GA_Update );
+                        }
+
+            //            adfGeoTransform[0] = dfULX;
+            //            adfGeoTransform[3] = dfULY;
+            //            CPLErr eErr = m_poDataset->SetGeoTransform(adfGeoTransform);
+
+                        GDAL_GCP *pasGCPList = (GDAL_GCP *) CPLCalloc(sizeof(GDAL_GCP), 4);                
+                        GDALInitGCPs( 4, pasGCPList );
+                        char *pszProjection = NULL;
+
+                        if(m_poDataset)
+                        {                            
+                            if( oDstOGRSpatialReference.exportToWkt( &pszProjection ) == OGRERR_NONE )
+                            {
+                                m_poDataset->SetProjection(pszProjection);
+                            }
+
+                            m_nXSize = m_poDataset->GetRasterXSize();
+                            m_nYSize = m_poDataset->GetRasterYSize();
+                                            
+                            pasGCPList[0].pszId = CPLStrdup( "1" );
+                            pasGCPList[0].dfGCPX = adfX[0];
+                            pasGCPList[0].dfGCPY = adfY[0];
+                            pasGCPList[0].dfGCPZ = adfZ[0];
+                            pasGCPList[0].dfGCPLine = 0.5;
+                            pasGCPList[0].dfGCPPixel = 0.5;
+
+                            pasGCPList[1].pszId = CPLStrdup( "2" );
+                            pasGCPList[1].dfGCPX = adfX[1];
+                            pasGCPList[1].dfGCPY = adfY[1];
+                            pasGCPList[1].dfGCPZ = adfZ[1];
+                            pasGCPList[1].dfGCPLine = 0.5;
+                            pasGCPList[1].dfGCPPixel = m_nXSize - 0.5;
+
+                            pasGCPList[2].pszId = CPLStrdup( "3" );
+                            pasGCPList[2].dfGCPX = adfX[2];
+                            pasGCPList[2].dfGCPY = adfY[2];
+                            pasGCPList[2].dfGCPZ = adfZ[2];
+                            pasGCPList[2].dfGCPLine = m_nYSize - 0.5;
+                            pasGCPList[2].dfGCPPixel = m_nXSize - 0.5;
+
+                            pasGCPList[3].pszId = CPLStrdup( "4" );
+                            pasGCPList[3].dfGCPX = adfX[3];
+                            pasGCPList[3].dfGCPY = adfY[3];
+                            pasGCPList[3].dfGCPZ = adfZ[3];
+                            pasGCPList[3].dfGCPLine = m_nYSize - 0.5;
+                            pasGCPList[3].dfGCPPixel = 0.5;
+
+                            CPLErr eErr = m_poDataset->SetGCPs(4, pasGCPList, pszProjection);
+                            //nResult = GDALGCPsToGeoTransform(4, pasGCPList, adfGeoTransform, 1);
+                            //if(nResult)
+                            //    CPLErr eErr = m_poDataset->SetGeoTransform(adfGeoTransform);
+                        }
+
+                        if(bReadOnly)
+                        {
+                            GDALClose(m_poDataset);
+                            m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath, GA_ReadOnly );
+                        }
+
+                        GDALDeinitGCPs( 4, pasGCPList );
+
+                        CPLFree( pasGCPList );
+                        CPLFree( pszProjection );                    
+                    }
+                    OCTDestroyCoordinateTransformation(poCT);
+                }
+            //}
+            //else
+            //{
+                //if(bReadOnly)
+                //{
+                //    GDALClose(m_poDataset);
+                //    m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath, GA_Update );
+                //}                
+            //    //if degrees use spacing and use WGS84
+            //    adfGeoTransform[1] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.pixelSpacing", "0.0"));
+            //    adfGeoTransform[5] = -CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.lineSpacing", "0.0"));
+            //    adfGeoTransform[0] = dfULX;
+            //    adfGeoTransform[3] = dfULY;
+            //    CPLErr eErr = m_poDataset->SetGeoTransform(adfGeoTransform);
+                //char *pszProjection = NULL;
+                //if( oOGRSpatialReference.exportToWkt( &pszProjection ) == OGRERR_NONE )
+                //{
+                //    m_poDataset->SetProjection(pszProjection);                    
+                //}
+                
+                //m_nXSize = m_poDataset->GetRasterXSize();
+                //m_nYSize = m_poDataset->GetRasterYSize();
+
+                //int nGCPCount(4);
+                //GDAL_GCP *pasGCPList = (GDAL_GCP *) CPLCalloc(sizeof(GDAL_GCP),nGCPCount);                
+                //GDALInitGCPs( nGCPCount, pasGCPList );
+                //
+                //pasGCPList[0].pszId = CPLStrdup( "1" );
+                //pasGCPList[0].dfGCPX = dfULX;
+                //pasGCPList[0].dfGCPY = dfULY;
+                //pasGCPList[0].dfGCPZ = dfULZ;
+                //pasGCPList[0].dfGCPLine = 0.5;
+                //pasGCPList[0].dfGCPPixel = 0.5;
+
+                //pasGCPList[1].pszId = CPLStrdup( "2" );
+                //pasGCPList[1].dfGCPX = dfURX;
+                //pasGCPList[1].dfGCPY = dfURY;
+                //pasGCPList[1].dfGCPZ = dfURZ;
+                //pasGCPList[1].dfGCPLine = 0.5;
+                //pasGCPList[1].dfGCPPixel = m_nXSize - 0.5;
+
+                //pasGCPList[2].pszId = CPLStrdup( "3" );
+                //pasGCPList[2].dfGCPX = dfLRX;
+                //pasGCPList[2].dfGCPY = dfLRY;
+                //pasGCPList[2].dfGCPZ = dfLRZ;
+                //pasGCPList[2].dfGCPLine = m_nYSize - 0.5;
+                //pasGCPList[2].dfGCPPixel = m_nXSize - 0.5;
+
+                //pasGCPList[3].pszId = CPLStrdup( "4" );
+                //pasGCPList[3].dfGCPX = dfLLX;
+                //pasGCPList[3].dfGCPY = dfLLY;
+                //pasGCPList[3].dfGCPZ = dfLLZ;
+                //pasGCPList[3].dfGCPLine = m_nYSize - 0.5;
+                //pasGCPList[3].dfGCPPixel = 0.5;
+
+                //CPLErr eErr = m_poDataset->SetGCPs(nGCPCount, pasGCPList, pszProjection);
+                //GDALDeinitGCPs( nGCPCount, pasGCPList );
+                //CPLFree( pasGCPList );
+                //CPLFree( pszProjection );
+
+                //if(bReadOnly)
+                //{
+                //    GDALClose(m_poDataset);
+                //    m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath, GA_ReadOnly );
+                //} 
+            //}
+        }
+
         bHasGeoTransform = true;
-        if (( adfGeoTransform[1] < 0.0 || adfGeoTransform[2] != 0.0 || adfGeoTransform[4] != 0.0 || adfGeoTransform[5] > 0.0 ) || m_poDataset->GetGCPCount() > 0)
+        if ((adfGeoTransform[2] != 0.0 || adfGeoTransform[4] != 0.0 ) || m_poDataset->GetGCPCount() > 0)// adfGeoTransform[1] < 0.0 || adfGeoTransform[5] > 0.0 || 
         {
             bHasGeoTransform = false;
             m_poMainDataset = m_poDataset;
@@ -402,8 +606,12 @@ const OGRSpatialReferenceSPtr wxGISRasterDataset::GetSpatialReference(void)
 		return m_pSpaRef;
 	if(	m_poDataset )
 	{
-		m_pSpaRef = boost::make_shared<OGRSpatialReference>(m_poDataset->GetProjectionRef());
-		return m_pSpaRef;
+        const char* pszProjection = m_poDataset->GetProjectionRef();
+        if(CPLStrnlen(pszProjection, 10) > 0)
+        {
+            m_pSpaRef = boost::make_shared<OGRSpatialReference>(m_poDataset->GetProjectionRef());
+		    return m_pSpaRef;
+        }
 	}
 	return OGRSpatialReferenceSPtr();
 }
@@ -430,9 +638,9 @@ wxString wxGISRasterDataset::GetName(void)
 
 bool wxGISRasterDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
 {
-	wxCriticalSectionLocker locker(m_CritSect);
     Close();
 
+	wxCriticalSectionLocker locker(m_CritSect);
     char** papszFileList = GetFileList();
     papszFileList = CSLAddString( papszFileList, m_sPath );
     if(!papszFileList)
@@ -481,7 +689,7 @@ bool wxGISRasterDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
 		break;
     };
 
-    m_sPath = szCopyFileName;
+    //m_sPath = szCopyFileName;
 
 	CSLDestroy( papszFileList );
 	CSLDestroy( papszFileCopiedList );
@@ -490,9 +698,9 @@ bool wxGISRasterDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
 
 bool wxGISRasterDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
 {
-	wxCriticalSectionLocker locker(m_CritSect);
     Close();
 
+	wxCriticalSectionLocker locker(m_CritSect);
     char** papszFileList = GetFileList();
     papszFileList = CSLAddString( papszFileList, m_sPath );
     if(!papszFileList)
