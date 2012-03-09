@@ -1,5 +1,4 @@
-﻿ Language		 Translators
-
+﻿
 André Mano (Portuguese)
 Maxim Dubinin, Dmitry Baryshnikov (Russian)
 Miguel Sevilla-Callejo (Spain)

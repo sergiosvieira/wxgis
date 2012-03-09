@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <wxGISCommon>
+  <coordinate_mask>
+    <mask text="d.dddddd[tab]d.dddddd"/>
+    <mask text="dd-mm-ss.ss [W][ ]dd-mm-ss.ss [W]"/>
+    <mask text="dd°mm'ss.ss&quot; [W][ ]dd°mm'ss.ss&quot; [W]"/>
+    <mask text="dd-mm-ss.ss[ ]dd-mm-ss.ss"/>
+    <mask text="ddmmss[ ]ddmmss"/>
+    <mask text="d.ddd[tab]d.ddd"/>
+    <mask text="d.ddd[ ]d.ddd"/>
+  </coordinate_mask>
+  <loc locale="ru"/>
   <GDAL cachemax="128"/>
   <debug mode="no"/>
-  <sys path="d:\work\projects\wxgis\build\Debug\sys"/>
-  <loc path="d:\work\projects\wxgis\build\Debug\locale" locale="ru"/>
-  <log path="d:\work\projects\wxgis\build\Debug\log"/>
   <libs>
-    <lib path="wxGISRemoteServerUId.dll" name="wxGISRemoteServerUId"/>
-    <lib path="wxGISGeoprocessingUId.dll" name="wxGISGeoprocessingUId"/>
+    <lib path="wxgisgeoprocessingui04d.dll" name="wxgisgeoprocessingui04d"/>
   </libs>
 </wxGISCommon>

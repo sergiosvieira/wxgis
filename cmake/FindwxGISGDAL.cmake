@@ -1,4 +1,4 @@
-# - Try to find the WXGISGDAL encryption library
+# - Try to find the WXGISGDAL library
 # Once done this will define
 #
 #  WXGISGDAL_ROOT_DIR - Set this variable to the root installation of WXGISGDAL

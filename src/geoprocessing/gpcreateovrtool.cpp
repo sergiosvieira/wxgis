@@ -82,13 +82,13 @@ GPParameters wxGISGPCreateOverviewsTool::GetParameterInfo(void)
 
         wxGISGPStringDomain* pDomain2 = new wxGISGPStringDomain();
         //"NEAREST", "GAUSS", "CUBIC", "AVERAGE", "MODE", "AVERAGE_MAGPHASE" or "NONE"
-        pDomain2->AddString(_("Nearest"), wxT("NEAREST"));
-        pDomain2->AddString(_("Gauss"), wxT("GAUSS"));
-        pDomain2->AddString(_("Cubic"), wxT("CUBIC"));
-        pDomain2->AddString(_("Average"), wxT("AVERAGE"));
-        pDomain2->AddString(_("Mode"), wxT("MODE"));
-        pDomain2->AddString(_("Average magphase"), wxT("AVERAGE_MAGPHASE"));//averages complex data in mag/phase space
-        pDomain2->AddString(_("None"), wxT("NONE"));
+        pDomain2->AddString(wxT("NEAREST"), _("Nearest"));
+        pDomain2->AddString(wxT("GAUSS"), _("Gauss"));
+        pDomain2->AddString(wxT("CUBIC"), _("Cubic"));
+        pDomain2->AddString(wxT("AVERAGE"),_("Average"));
+        pDomain2->AddString(wxT("MODE"), _("Mode"));
+        pDomain2->AddString(wxT("AVERAGE_MAGPHASE"), _("Average magphase"));//averages complex data in mag/phase space
+        pDomain2->AddString(wxT("NONE"), _("None"));
         pParam2->SetDomain(pDomain2);
 
         pParam2->SetValue(wxT("NEAREST"));
@@ -105,11 +105,11 @@ GPParameters wxGISGPCreateOverviewsTool::GetParameterInfo(void)
 
         wxGISGPStringDomain* pDomain3 = new wxGISGPStringDomain();
         //"NONE", "LZW", "DEFLATE"
-        pDomain3->AddString(_("ZIP"), wxT("DEFLATE"));
-        pDomain3->AddString(_("JPEG"), wxT("JPEG"));
-        pDomain3->AddString(_("PACKBITS"), wxT("PACKBITS"));
-        pDomain3->AddString(_("LZW"), wxT("LZW"));
-        pDomain3->AddString(_("None"), wxT("NONE"));
+        pDomain3->AddString( wxT("DEFLATE"),_("ZIP") );
+        pDomain3->AddString( wxT("JPEG"),_("JPEG") );
+        pDomain3->AddString( wxT("PACKBITS"),_("PACKBITS") );
+        pDomain3->AddString( wxT("LZW"),_("LZW") );
+        pDomain3->AddString( wxT("NONE"), _("None"));
         pParam3->SetDomain(pDomain3);
 
         pParam3->SetValue(wxT("NONE"));

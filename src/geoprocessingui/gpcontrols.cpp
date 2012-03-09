@@ -631,7 +631,22 @@ wxGISDTChoice::wxGISDTChoice( IGPParameter* pParam, IGxCatalog* pCatalog, wxWind
     {
 		int nPos = wxNOT_FOUND;
 		if(poGPValueDomain)
-			nPos = poGPValueDomain->GetPosByValue(m_pParam->GetValue());
+            nPos = poGPValueDomain->GetPosByValue(m_pParam->GetValue());
+        //{
+            //switch(m_pParam->GetDataType())
+            //{
+            //case enumGISGPParamDTIntegerChoice:
+            //    nPos = poGPValueDomain->GetPosByValue(long(m_pParam->GetValue()));
+            //    break;
+            //case enumGISGPParamDTDoubleChoice:
+            //    nPos = poGPValueDomain->GetPosByValue(double(m_pParam->GetValue()));
+            //    break;
+            //default:
+            //case enumGISGPParamDTStringChoice:
+            //    
+            //    break;
+            //};
+        //}
 		if(nPos == wxNOT_FOUND)
 			m_choice->Select(0);
 		else
@@ -701,18 +716,43 @@ void wxGISDTChoice::UpdateValues(void)
     bool bValid(false);
     long dVal(0);
     double dfVal(0);
+    wxString sVal;
+
+    wxGISGPValueDomain* poGPValueDomain = dynamic_cast<wxGISGPValueDomain*>(m_pParam->GetDomain());
+
     switch(m_pParam->GetDataType())
     {
     case enumGISGPParamDTIntegerChoice:
-        bValid = sData.ToLong(&dVal);
+        if(poGPValueDomain)
+        {
+            dVal = poGPValueDomain->GetValueByName(sData).GetLong();
+            bValid = true;
+        }
+        else
+            bValid = sData.ToLong(&dVal);
         break;
     case enumGISGPParamDTDoubleChoice:
-        bValid = sData.ToDouble(&dfVal);
+        if(poGPValueDomain)
+        {
+            dfVal = poGPValueDomain->GetValueByName(sData).GetDouble();
+            bValid = true;
+        }
+        else       
+            bValid = sData.ToDouble(&dfVal);
         break;
     case enumGISGPParamDTStringChoice:
 	case enumGISGPParamDTStringChoiceEditable:
     default:
-        bValid = true;
+        if(poGPValueDomain)
+        {
+            sVal = poGPValueDomain->GetValueByName(sData).GetString();
+            bValid = true;
+        }
+        else 
+        {
+            sVal = sData;
+            bValid = true;
+        }
         break;
     }
 
@@ -731,7 +771,7 @@ void wxGISDTChoice::UpdateValues(void)
 		case enumGISGPParamDTStringChoice:
 		case enumGISGPParamDTStringChoiceEditable:
 		default:
-            m_pParam->SetValue(wxVariant(sData, wxT("string")));
+            m_pParam->SetValue(wxVariant(sVal, wxT("string")));
             return;
         }
     }
