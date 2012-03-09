@@ -364,12 +364,10 @@ void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, const double
 	}
 
 	//check for nodata
-	bool bIsChanged(false);
 	if(m_bNodataNewBehaviour)
 	{
         if(m_paStretch[0]->IsNoData(pOutputData[2]) && m_paStretch[1]->IsNoData(pOutputData[1]) && m_paStretch[2]->IsNoData(pOutputData[0]))
 		{
-			bIsChanged = true;
 			pOutputData[3] = m_oNoDataColor.Alpha();
 			pOutputData[2] = m_oNoDataColor.Red();
 			pOutputData[1] = m_oNoDataColor.Green();
@@ -380,7 +378,6 @@ void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, const double
 	{
         if(m_paStretch[0]->IsNoData(pOutputData[2]) || m_paStretch[1]->IsNoData(pOutputData[1]) || m_paStretch[2]->IsNoData(pOutputData[0]))
 		{
-			bIsChanged = true;
 			pOutputData[3] = m_oNoDataColor.Alpha();
 			pOutputData[2] = m_oNoDataColor.Red();
 			pOutputData[1] = m_oNoDataColor.Green();
@@ -388,19 +385,6 @@ void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, const double
 		}
 	}
 
-	if(bIsChanged)
-		return;
-
-	//check for background data
-
-	//if(RPixVal > 128)
-	//{
-	//	pOutputData[0] = 0;
-	//	pOutputData[1] = 0;
-	//	pOutputData[2] = 0;
-	//	pOutputData[3] = 0;
-	//	return;
-	//}
 }
 
 //-----------------------------------
@@ -754,41 +738,23 @@ void wxGISRasterGreyScaleRenderer::FillPixel(unsigned char* pOutputData, const d
 	//pOutputData[2] = 255;	//	G	R
 	//pOutputData[3] = 255;	//	B	A
 
-    //wxColor color((unsigned long)*pSrcValR);
-    //int nR = color.Red();
-    //int nG = color.Green();
-    //int nB = color.Blue();
-
-	pOutputData[3] = 255;
 	unsigned char RPixVal = m_oStretch.GetValue(pSrcValR);
-	pOutputData[2] = RPixVal;
-	pOutputData[1] = RPixVal;
-	pOutputData[0] = RPixVal;
 
 	//check for nodata
-	bool bIsChanged(false);
-    if( m_oStretch.IsNoData(pOutputData[2]) )
+    if( m_oStretch.IsNoData(RPixVal) )
 	{
-		bIsChanged = true;
 		pOutputData[3] = m_oNoDataColor.Alpha();
 		pOutputData[2] = m_oNoDataColor.Red();
 		pOutputData[1] = m_oNoDataColor.Green();
 		pOutputData[0] = m_oNoDataColor.Blue();
 	}
-
-	if(bIsChanged)
-		return;
-
-	//check for background data
-
-	//if(RPixVal > 128)
-	//{
-	//	pOutputData[0] = 0;
-	//	pOutputData[1] = 0;
-	//	pOutputData[2] = 0;
-	//	pOutputData[3] = 0;
-	//	return;
-	//}
+    else
+    {
+	    pOutputData[3] = 255;
+	    pOutputData[2] = RPixVal;
+	    pOutputData[1] = RPixVal;
+	    pOutputData[0] = RPixVal;   
+    }
 }
 
 //-----------------------------------
@@ -876,12 +842,10 @@ void wxGISRasterPackedRGBARenderer::FillPixel(unsigned char* pOutputData, const 
 	}
 
 	//check for nodata
-	bool bIsChanged(false);
 	if(m_bNodataNewBehaviour)
 	{
         if(m_oStretch.IsNoData(pOutputData[2]) && m_oStretch.IsNoData(pOutputData[1]) && m_oStretch.IsNoData(pOutputData[0]))
 		{
-			bIsChanged = true;
 			pOutputData[3] = m_oNoDataColor.Alpha();
 			pOutputData[2] = m_oNoDataColor.Red();
 			pOutputData[1] = m_oNoDataColor.Green();
@@ -892,27 +856,12 @@ void wxGISRasterPackedRGBARenderer::FillPixel(unsigned char* pOutputData, const 
 	{
         if(m_oStretch.IsNoData(pOutputData[2]) || m_oStretch.IsNoData(pOutputData[1]) || m_oStretch.IsNoData(pOutputData[0]))
 		{
-			bIsChanged = true;
 			pOutputData[3] = m_oNoDataColor.Alpha();
 			pOutputData[2] = m_oNoDataColor.Red();
 			pOutputData[1] = m_oNoDataColor.Green();
 			pOutputData[0] = m_oNoDataColor.Blue();
 		}
 	}
-
-	if(bIsChanged)
-		return;
-
-	//check for background data
-
-	//if(RPixVal > 128)
-	//{
-	//	pOutputData[0] = 0;
-	//	pOutputData[1] = 0;
-	//	pOutputData[2] = 0;
-	//	pOutputData[3] = 0;
-	//	return;
-	//}
 }
 
 

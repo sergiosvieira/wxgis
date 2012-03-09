@@ -212,14 +212,6 @@ bool wxGISGPParameter::SetFromString(wxString sParam)
 {
 	sParam.Replace(wxT("\\\""), wxT("\""));
 
-	wxVariant oDomStr;
-	if(m_pDomain)
-	{
-		int nPos = m_pDomain->GetPosByValue(wxVariant(sParam));
-		if(nPos != wxNOT_FOUND)
-			SetSelDomainValue(nPos);
-	}
-
     switch(m_DataType)
     {
     case enumGISGPParamDTBool:
@@ -236,10 +228,14 @@ bool wxGISGPParameter::SetFromString(wxString sParam)
 	case enumGISGPParamDTPath:
 	case enumGISGPParamDTPathArray:
     case enumGISGPParamDTStringChoice:
-	case enumGISGPParamDTIntegerChoice:
-	case enumGISGPParamDTDoubleChoice:
         m_Value = wxVariant(sParam);
         break;        
+	case enumGISGPParamDTIntegerChoice:
+        m_Value = wxVariant(wxAtoi(sParam));
+        break; 
+	case enumGISGPParamDTDoubleChoice:  
+        m_Value = wxVariant(wxAtof(sParam));
+        break; 
     case enumGISGPParamDTStringList:
 	case enumGISGPParamDTIntegerList:
 	case enumGISGPParamDTDoubleList:
@@ -250,6 +246,14 @@ bool wxGISGPParameter::SetFromString(wxString sParam)
         m_Value = wxVariant(sParam);
         break;        
     }
+
+	if(m_pDomain)
+	{
+		int nPos = m_pDomain->GetPosByValue(m_Value);
+		if(nPos != wxNOT_FOUND)
+			SetSelDomainValue(nPos);
+	}
+
     return true;
 }
 

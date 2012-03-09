@@ -134,6 +134,10 @@ char **wxGISRasterDataset::GetFileList()
         }
         break;
 	case enumRasterImg:
+        szPath = (char*)CPLResetExtension(m_sPath, "ige");
+		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+			papszFileList = CSLAddString( papszFileList, szPath );
+        break;
     case enumRasterBmp:
 	case enumRasterPng:
 	case enumRasterGif:

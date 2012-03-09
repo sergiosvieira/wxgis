@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project (wxgis)
 
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Configs" FORCE)
 set(CMAKE_COLOR_MAKEFILE ON)
 
 # parse the version number from gdal_version.h and include in wxGIS_MAJOR_VERSION and wxGIS_MINOR_VERSION
@@ -25,6 +26,7 @@ message(STATUS "c++ compiler ... " ${CMAKE_CXX_COMPILER})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(WXGIS_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(WXGIS_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
@@ -38,8 +40,6 @@ if(WIN32)
 endif(WIN32)
 
 add_definitions(-DSTRICT)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #find needed packages
 option(wxGIS_USE_WXGISGDAL "Set OFF to build using classical GDAL, else - adapted version wxGISGDAL" ON)
@@ -87,6 +87,24 @@ if(wxGIS_USE_POSTGRES)
     add_definitions(-DWXGISPORTABLE)
 endif(wxGIS_USE_POSTGRES)
 
+if(MSVC)
+    #string(REPLACE "/W4" "/W0" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    #string(REPLACE "/W4" "/W0" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    # string(REPLACE "/Gm" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+    #set(CMAKE_CXX_FLAGS_DEBUG "/Gm /ZI /W3 /Od")
+    # add_definitions(-DDISABLE_SOME_FLOATING_POINT)
+    # set_target_properties( ${the_target} PROPERTIES COMPILE_FLAGS "/Gm" )
+    if(CMAKE_CL_64)
+        set_target_properties(${the_target} PROPERTIES STATIC_LIBRARY_FLAGS "/machine:x64")
+    endif()
+endif()
+
+if(UNIX)
+     if(CMAKE_COMPILER_IS_GNUCXX OR CV_ICC)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+     endif()
+endif()
+
 #core
 set(WXGISCORE_LIB_NAME "")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/core/)
@@ -111,8 +129,16 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/catalog/)
 #catalogui
 set(WXGISCATALOGUI_LIB_NAME "")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/catalogui/)
+#geoprocessing
+set(WXGISGEOPROCESSING_LIB_NAME "")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/geoprocessing/)
+#geoprocessingui
+set(WXGISGEOPROCESSINGUI_LIB_NAME "")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/geoprocessingui/)
 #cat_app
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/cat_app/)
+#geoprocess
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/geoprocess/)
 
 if(WIN32)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_loc/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Debug/locale CONFIGURATIONS Debug FILES_MATCHING PATTERN "*.mo" PATTERN "*.txt")

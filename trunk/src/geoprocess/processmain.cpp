@@ -24,6 +24,7 @@
 #include "wxgis/geoprocessing/gptoolmngr.h"
 #include "wxgis/core/config.h"
 #include "wxgis/catalog/gxcatalog.h"
+#include "wxgis/version.h"
 
 #include <wx/app.h> 
 //#include <wx/defs.h>
@@ -79,7 +80,7 @@ int main(int argc, char **argv)
     };
 
     wxCmdLineParser my_parser( my_cmdline_desc, argc, wxArgv );
-    my_parser.SetLogo(wxString::Format(_("The wxGISGeoprocess (%s)\nAuthor: Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010-2011"), APP_VER));
+    my_parser.SetLogo(wxString::Format(_("The wxGISGeoprocess (%s)\nAuthor: Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010-2011"), wxGIS_VERSION_NUM_STRING_T));
 
     // Parse command line arguments
     success = parse_commandline_parameters(my_parser);
@@ -111,7 +112,7 @@ bool parse_commandline_parameters( wxCmdLineParser& parser )
 
 	if( parser.Found( wxT( "v" ) ) )
 	{
-	    wxString out = wxString::Format(_("The wxGISGeoprocess (%s)\nAuthor: Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010-2011\n"), APP_VER);
+	    wxString out = wxString::Format(_("The wxGISGeoprocess (%s)\nAuthor: Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru\nCopyright (c) 2010-2011\n"), wxGIS_VERSION_NUM_STRING_T);
 	    wxFprintf(stdout, out);
 		return true;
 	}

@@ -92,68 +92,89 @@ GPParameters wxGISGPOrthoCorrectTool::GetParameterInfo(void)
 
         m_paParam.Add(static_cast<IGPParameter*>(pParam2));
 
-        //DEM_raster
+        //elevation interpolation type
         wxGISGPParameter* pParam3 = new wxGISGPParameter();
-        pParam3->SetName(wxT("dem_path"));
-        pParam3->SetDisplayName(_("DEM raster"));
+        pParam3->SetName(wxT("pixel_interpol"));
+        pParam3->SetDisplayName(_("Output raster interpolation"));
         pParam3->SetParameterType(enumGISGPParameterTypeOptional);
-        pParam3->SetDataType(enumGISGPParamDTPath);
+        pParam3->SetDataType(enumGISGPParamDTIntegerChoice);
         pParam3->SetDirection(enumGISGPParameterDirectionInput);
 
-        wxGISGPGxObjectDomain* pDomain3 = new wxGISGPGxObjectDomain();
-        pDomain3->AddFilter(new wxGxDatasetFilter(enumGISRasterDataset));
+        wxGISGPValueDomain* pDomain3 = new wxGISGPValueDomain();
+        pDomain3->AddValue(wxVariant(GRA_NearestNeighbour), _("Nearest neighbour (select on one input pixel)"));
+        pDomain3->AddValue(wxVariant(GRA_Bilinear), _("Bilinear (2x2 kernel)"));
+        pDomain3->AddValue(wxVariant(GRA_Cubic), _("Cubic Convolution Approximation (4x4 kernel)"));
+        pDomain3->AddValue(wxVariant(GRA_CubicSpline), _("Cubic B-Spline Approximation (4x4 kernel)"));
+        pDomain3->AddValue(wxVariant(GRA_Lanczos), _("Lanczos windowed sinc interpolation (6x6 kernel)"));
         pParam3->SetDomain(pDomain3);
+
+        pParam3->SetValue(wxVariant(GRA_Bilinear));
 
         m_paParam.Add(static_cast<IGPParameter*>(pParam3));
 
-        //constant_ elevation double
+        //DEM_raster
         wxGISGPParameter* pParam4 = new wxGISGPParameter();
-        pParam4->SetName(wxT("cons_elev"));
-        pParam4->SetDisplayName(_("Constant elevation value or base value to the DEM"));
+        pParam4->SetName(wxT("dem_path"));
+        pParam4->SetDisplayName(_("DEM raster"));
         pParam4->SetParameterType(enumGISGPParameterTypeOptional);
-        pParam4->SetDataType(enumGISGPParamDTDouble);
+        pParam4->SetDataType(enumGISGPParamDTPath);
         pParam4->SetDirection(enumGISGPParameterDirectionInput);
-        pParam4->SetValue(0.0);
+
+        wxGISGPGxObjectDomain* pDomain4 = new wxGISGPGxObjectDomain();
+        pDomain4->AddFilter(new wxGxDatasetFilter(enumGISRasterDataset));
+        pParam4->SetDomain(pDomain4);
 
         m_paParam.Add(static_cast<IGPParameter*>(pParam4));
 
         //constant_ elevation double
         wxGISGPParameter* pParam5 = new wxGISGPParameter();
-        pParam5->SetName(wxT("elev_scale"));
-        pParam5->SetDisplayName(_("Scaling factor to convert elevation values"));
+        pParam5->SetName(wxT("cons_elev"));
+        pParam5->SetDisplayName(_("Constant elevation value or base value to the DEM"));
         pParam5->SetParameterType(enumGISGPParameterTypeOptional);
         pParam5->SetDataType(enumGISGPParamDTDouble);
         pParam5->SetDirection(enumGISGPParameterDirectionInput);
-        pParam5->SetValue(1.0);
+        pParam5->SetValue(0.0);
 
         m_paParam.Add(static_cast<IGPParameter*>(pParam5));
 
-        //elevation interpolation type
+        //constant_ elevation double
         wxGISGPParameter* pParam6 = new wxGISGPParameter();
-        pParam6->SetName(wxT("elev_interpol"));
-        pParam6->SetDisplayName(_("Elevation values interpolation"));
+        pParam6->SetName(wxT("elev_scale"));
+        pParam6->SetDisplayName(_("Scaling factor to convert elevation values"));
         pParam6->SetParameterType(enumGISGPParameterTypeOptional);
-        pParam6->SetDataType(enumGISGPParamDTStringChoice);
+        pParam6->SetDataType(enumGISGPParamDTDouble);
         pParam6->SetDirection(enumGISGPParameterDirectionInput);
-
-        wxGISGPStringDomain* pDomain6 = new wxGISGPStringDomain();
-        pDomain6->AddString(_("Bilinear"));
-        pDomain6->AddString(_("Cubic"));
-        pParam6->SetDomain(pDomain6);
-
-        pParam6->SetValue(_("Bilinear"));
+        pParam6->SetValue(1.0);
 
         m_paParam.Add(static_cast<IGPParameter*>(pParam6));
 
         //elevation interpolation type
         wxGISGPParameter* pParam7 = new wxGISGPParameter();
-        pParam7->SetName(wxT("geoid_corr"));
-        pParam7->SetDisplayName(_("Geoid correction"));
+        pParam7->SetName(wxT("elev_interpol"));
+        pParam7->SetDisplayName(_("Elevation values interpolation"));
         pParam7->SetParameterType(enumGISGPParameterTypeOptional);
-        pParam7->SetDataType(enumGISGPParamDTBool);
+        pParam7->SetDataType(enumGISGPParamDTStringChoice);
         pParam7->SetDirection(enumGISGPParameterDirectionInput);
-        pParam7->SetValue(wxVariant(false));
+
+        wxGISGPValueDomain* pDomain7 = new wxGISGPValueDomain();
+        pDomain7->AddValue(wxVariant(wxT("near")), _("Nearest Neighbour"));
+        pDomain7->AddValue(wxVariant(wxT("bilinear")), _("Bilinear"));
+        pDomain7->AddValue(wxVariant(wxT("cubic")), _("Cubic"));
+        pParam7->SetDomain(pDomain7);
+
+        pParam7->SetValue(wxVariant(wxT("bilinear")));
+
         m_paParam.Add(static_cast<IGPParameter*>(pParam7));
+
+        //elevation interpolation type
+        wxGISGPParameter* pParam8 = new wxGISGPParameter();
+        pParam8->SetName(wxT("geoid_corr"));
+        pParam8->SetDisplayName(_("Geoid correction"));
+        pParam8->SetParameterType(enumGISGPParameterTypeOptional);
+        pParam8->SetDataType(enumGISGPParamDTBool);
+        pParam8->SetDirection(enumGISGPParameterDirectionInput);
+        pParam8->SetValue(wxVariant(false));
+        m_paParam.Add(static_cast<IGPParameter*>(pParam8));
     }
     return m_paParam;
 }
@@ -282,9 +303,9 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     }
     GDALDataType eDT = poGDALRasterBand->GetRasterDataType();
 
-    wxString soChoice = m_paParam[5]->GetValue();
-    if(soChoice == wxString(_("Cubic")))
-        CPLSetConfigOption( "GDAL_RPCDEMINTERPOLATION", "CUBIC" ); //BILINEAR
+    //wxString soChoice = m_paParam[5]->GetValue();
+    //if(soChoice == wxString(_("Cubic")))
+    //    CPLSetConfigOption( "GDAL_RPCDEMINTERPOLATION", "CUBIC" ); //BILINEAR
 
 
     //CPLString osSRCSRSOpt = "SRC_SRS=";
@@ -304,8 +325,8 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
 
     osDSTSRSOpt += pszProjection;
 
-    const char *apszOptions[6] = { osDSTSRSOpt.c_str(), "METHOD=RPC", NULL, NULL, NULL, NULL};//, NULL  osSRCSRSOpt.c_str(),
-    wxString soDEMPath = m_paParam[2]->GetValue();
+    const char *apszOptions[7] = { osDSTSRSOpt.c_str(), "METHOD=RPC", NULL, NULL, NULL, NULL, NULL};//, NULL  osSRCSRSOpt.c_str(),
+    wxString soDEMPath = m_paParam[3]->GetValue();
 
     CPLString soCPLDemPath;
     if(pGxObjectContainer)
@@ -322,7 +343,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     apszOptions[2] = osDEMFileOpt.c_str();
 
 ///////////////////////////////////////////////////////////////////////
-    bool bGeoidCorr = m_paParam[6]->GetValue();
+    bool bGeoidCorr = m_paParam[7]->GetValue();
     double dfAdditionalHeight(0);
     if(bGeoidCorr)
     {
@@ -334,7 +355,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         //poTestOGRSpatialReference->
 
         OGRSpatialReference oTestOGRSpatialReference;
-        oTestOGRSpatialReference.SetFromUserInput("EPSG:4326+5773");//
+        oTestOGRSpatialReference.SetFromUserInput("EPSG:4326+5773");//TODO: set from config
         OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( oOGRSpatialReference.get(), &oTestOGRSpatialReference);
         if(poCT)
         {
@@ -358,7 +379,7 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
         }
     }
 ///////////////////////////////////////////////////////////////////////
-    double dfHeight = m_paParam[3]->GetValue();
+    double dfHeight = m_paParam[4]->GetValue();
     dfHeight -= dfAdditionalHeight;
     //wxString soHeight = m_paParam[3]->GetValue();
     CPLString osHeightOpt;
@@ -366,10 +387,15 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     //osHeightOpt += soHeight.mb_str();
     apszOptions[3] = osHeightOpt.c_str();
 
-    wxString soHeightScale = m_paParam[4]->GetValue();
+    wxString soHeightScale = m_paParam[5]->GetValue();
     CPLString osHeightScaleOpt = "RPC_HEIGHT_SCALE=";
 	osHeightScaleOpt += soHeightScale.mb_str();
     apszOptions[4] = osHeightScaleOpt.c_str();
+
+    wxString sChoice = m_paParam[6]->GetValue();
+    CPLString osInterpolOpt = "RPC_DEMINTERPOLATION=";
+    osInterpolOpt += sChoice.mb_str();
+    apszOptions[5] = osInterpolOpt.c_str();
 
     //double dfPixErrThreshold = MIN(adfDstGeoTransform[1], adfDstGeoTransform[5]);
 
@@ -447,156 +473,133 @@ bool wxGISGPOrthoCorrectTool::Execute(ITrackCancel* pTrackCancel)
     if(dfMemLim > 135000000) //128Mb in bytes
     {
         psWarpOptions->dfWarpMemoryLimit = dfMemLim;
-        wxLogDebug(wxT("wxGISGPOrthoCorrectTool: The dfWarpMemoryLimit set to %f Mb"), dfMemLim / 1048576);
+        double dfMemLimMb = dfMemLim / 1048576;
+        wxLogDebug(wxT("wxGISGPOrthoCorrectTool: The dfWarpMemoryLimit set to %f Mb"), dfMemLimMb);
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wxString::Format(_("The dfWarpMemoryLimit set to %f Mb"), dfMemLimMb), -1, enumGISMessageInfo);
     }
 
-    psWarpOptions->papszWarpOptions = CSLSetNameValue(psWarpOptions->papszWarpOptions, "SOURCE_EXTRA", "5" );
+    psWarpOptions->nBandCount = poGDALDataset->GetRasterCount();
+    
+    psWarpOptions->panSrcBands = (int *) CPLMalloc(psWarpOptions->nBandCount*sizeof(int));
+    psWarpOptions->panDstBands = (int *) CPLMalloc(psWarpOptions->nBandCount*sizeof(int));
+
+    for( int i = 0; i < psWarpOptions->nBandCount; ++i )
+    {
+        psWarpOptions->panSrcBands[i] = i + 1;
+        psWarpOptions->panDstBands[i] = i + 1;
+    }
+
+    psWarpOptions->papszWarpOptions = CSLSetNameValue(psWarpOptions->papszWarpOptions, "SOURCE_EXTRA", "5" );//TODO: Set from config
     psWarpOptions->papszWarpOptions = CSLSetNameValue(psWarpOptions->papszWarpOptions, "SAMPLE_STEPS", "101" );
     psWarpOptions->papszWarpOptions = CSLSetNameValue(psWarpOptions->papszWarpOptions, "INIT_DEST", "NO_DATA" );//INIT_DEST=[value]
-    if(soChoice == wxString(_("Cubic")))
-        psWarpOptions->eResampleAlg = GRA_Cubic;
-    else
-        psWarpOptions->eResampleAlg = GRA_Bilinear;
-
+    psWarpOptions->eResampleAlg = (GDALResampleAlg)m_paParam[2]->GetValue().GetLong();
 
 /* -------------------------------------------------------------------- */
-/*      If -srcnodata was not specified, but the data has nodata        */
-/*      values, use them.                                               */
+/*                     If the data has nodata values                    */
 /* -------------------------------------------------------------------- */
-        //if( pszSrcNodata == NULL )
-        //{
-        //    int bHaveNodata = FALSE;
-        //    double dfReal = 0.0;
+    int bHaveNodata = FALSE;
+    double dfReal = 0.0;
 
-        //    for( i = 0; !bHaveNodata && i < psWO->nBandCount; i++ )
-        //    {
-        //        GDALRasterBandH hBand = GDALGetRasterBand( hSrcDS, i+1 );
-        //        dfReal = GDALGetRasterNoDataValue( hBand, &bHaveNodata );
-        //    }
+    for( int i = 0; i < psWarpOptions->nBandCount; ++i )
+    {
+        GDALRasterBand* pBand = poGDALDataset->GetRasterBand( i + 1 );
+        dfReal = pBand->GetNoDataValue(&bHaveNodata);
+    }
 
-        //    if( bHaveNodata )
-        //    {
-        //        if( !bQuiet )
-        //        {
-        //            if (CPLIsNan(dfReal))
-        //                printf( "Using internal nodata values (eg. nan) for image %s.\n",
-        //                        papszSrcFiles[iSrc] );
-        //            else
-        //                printf( "Using internal nodata values (eg. %g) for image %s.\n",
-        //                        dfReal, papszSrcFiles[iSrc] );
-        //        }
-        //        psWO->padfSrcNoDataReal = (double *) 
-        //            CPLMalloc(psWO->nBandCount*sizeof(double));
-        //        psWO->padfSrcNoDataImag = (double *) 
-        //            CPLMalloc(psWO->nBandCount*sizeof(double));
-        //        
-        //        for( i = 0; i < psWO->nBandCount; i++ )
-        //        {
-        //            GDALRasterBandH hBand = GDALGetRasterBand( hSrcDS, i+1 );
+    if( bHaveNodata )
+    {
+        if (CPLIsNan(dfReal))
+        {
+            wxLogDebug(wxT("wxGISGPOrthoCorrectTool: Using internal nodata values (eg. nan) for source image"));
+            if(pTrackCancel)
+                pTrackCancel->PutMessage(_("Using internal nodata values (eg. nan) for source image"), -1, enumGISMessageInfo);
+        }            
+        else
+        {
+            wxLogDebug(wxT("wxGISGPOrthoCorrectTool: Using internal nodata values (eg. %g) for source image"), dfReal);
+            if(pTrackCancel)
+                pTrackCancel->PutMessage(wxString::Format(_("Using internal nodata values (eg. %g) for source image"), dfReal), -1, enumGISMessageInfo);
+        }
 
-        //            dfReal = GDALGetRasterNoDataValue( hBand, &bHaveNodata );
+        psWarpOptions->padfSrcNoDataReal = (double *) CPLMalloc(psWarpOptions->nBandCount*sizeof(double));
+        psWarpOptions->padfSrcNoDataImag = (double *) CPLMalloc(psWarpOptions->nBandCount*sizeof(double));
+                
+        for( int i = 0; i < psWarpOptions->nBandCount; ++i )
+        {
+            GDALRasterBand* pBand = poGDALDataset->GetRasterBand( i + 1 );
+            dfReal = pBand->GetNoDataValue(&bHaveNodata);
+            if( bHaveNodata )
+            {
+                psWarpOptions->padfSrcNoDataReal[i] = dfReal;
+                psWarpOptions->padfSrcNoDataImag[i] = 0.0;
+            }
+            else
+            {
+                psWarpOptions->padfSrcNoDataReal[i] = -123456.789;
+                psWarpOptions->padfSrcNoDataImag[i] = 0.0;
+            }
+        }
+    }
 
-        //            if( bHaveNodata )
-        //            {
-        //                psWO->padfSrcNoDataReal[i] = dfReal;
-        //                psWO->padfSrcNoDataImag[i] = 0.0;
-        //            }
-        //            else
-        //            {
-        //                psWO->padfSrcNoDataReal[i] = -123456.789;
-        //                psWO->padfSrcNoDataImag[i] = 0.0;
-        //            }
-        //        }
-        //    }
-        //}
-
-    /* -------------------------------------------------------------------- */
+/* -------------------------------------------------------------------- */
 /*      If the output dataset was created, and we have a destination    */
 /*      nodata value, go through marking the bands with the information.*/
 /* -------------------------------------------------------------------- */
-//        if( pszDstNodata != NULL )
-//        {
-//            char **papszTokens = CSLTokenizeString( pszDstNodata );
-//            int  nTokenCount = CSLCount(papszTokens);
-//
-//            psWO->padfDstNoDataReal = (double *) 
-//                CPLMalloc(psWO->nBandCount*sizeof(double));
-//            psWO->padfDstNoDataImag = (double *) 
-//                CPLMalloc(psWO->nBandCount*sizeof(double));
-//
-//            for( i = 0; i < psWO->nBandCount; i++ )
-//            {
-//                if( i < nTokenCount )
-//                {
-//                    CPLStringToComplex( papszTokens[i], 
-//                                        psWO->padfDstNoDataReal + i,
-//                                        psWO->padfDstNoDataImag + i );
-//                }
-//                else
-//                {
-//                    psWO->padfDstNoDataReal[i] = psWO->padfDstNoDataReal[i-1];
-//                    psWO->padfDstNoDataImag[i] = psWO->padfDstNoDataImag[i-1];
-//                }
-//                
-//                GDALRasterBandH hBand = GDALGetRasterBand( hDstDS, i+1 );
-//                int bClamped = FALSE, bRounded = FALSE;
-//
-//#define CLAMP(val,type,minval,maxval) \
-//    do { if (val < minval) { bClamped = TRUE; val = minval; } \
-//    else if (val > maxval) { bClamped = TRUE; val = maxval; } \
-//    else if (val != (type)val) { bRounded = TRUE; val = (type)(val + 0.5); } } \
-//    while(0)
-//
-//                switch(GDALGetRasterDataType(hBand))
-//                {
-//                    case GDT_Byte:
-//                        CLAMP(psWO->padfDstNoDataReal[i], GByte,
-//                              0.0, 255.0);
-//                        break;
-//                    case GDT_Int16:
-//                        CLAMP(psWO->padfDstNoDataReal[i], GInt16,
-//                              -32768.0, 32767.0);
-//                        break;
-//                    case GDT_UInt16:
-//                        CLAMP(psWO->padfDstNoDataReal[i], GUInt16,
-//                              0.0, 65535.0);
-//                        break;
-//                    case GDT_Int32:
-//                        CLAMP(psWO->padfDstNoDataReal[i], GInt32,
-//                              -2147483648.0, 2147483647.0);
-//                        break;
-//                    case GDT_UInt32:
-//                        CLAMP(psWO->padfDstNoDataReal[i], GUInt32,
-//                              0.0, 4294967295.0);
-//                        break;
-//                    default:
-//                        break;
-//                }
-//                    
-//                if (bClamped)
-//                {
-//                    printf( "for band %d, destination nodata value has been clamped "
-//                           "to %.0f, the original value being out of range.\n",
-//                           i + 1, psWO->padfDstNoDataReal[i]);
-//                }
-//                else if(bRounded)
-//                {
-//                    printf("for band %d, destination nodata value has been rounded "
-//                           "to %.0f, %s being an integer datatype.\n",
-//                           i + 1, psWO->padfDstNoDataReal[i],
-//                           GDALGetDataTypeName(GDALGetRasterDataType(hBand)));
-//                }
-//
-//                if( bCreateOutput )
-//                {
-//                    GDALSetRasterNoDataValue( 
-//                        GDALGetRasterBand( hDstDS, psWO->panDstBands[i] ), 
-//                        psWO->padfDstNoDataReal[i] );
-//                }
-//            }
-//
-//            CSLDestroy( papszTokens );
-//        }
+    psWarpOptions->padfDstNoDataReal = (double *) CPLMalloc(psWarpOptions->nBandCount*sizeof(double));
+    psWarpOptions->padfDstNoDataImag = (double *) CPLMalloc(psWarpOptions->nBandCount*sizeof(double));
+
+    for( int i = 0; i < psWarpOptions->nBandCount; ++i )
+    {
+        psWarpOptions->padfDstNoDataReal[i] = 0.0;
+        psWarpOptions->padfDstNoDataImag[i] = 0.0;
+
+
+        GDALRasterBand* pBand = poOutputGDALDataset->GetRasterBand( i + 1 );
+        int bClamped = FALSE, bRounded = FALSE;
+
+#define CLAMP(val,type,minval,maxval) \
+    do { if (val < minval) { bClamped = TRUE; val = minval; } \
+    else if (val > maxval) { bClamped = TRUE; val = maxval; } \
+    else if (val != (type)val) { bRounded = TRUE; val = (type)(val + 0.5); } } \
+    while(0)
+
+        switch(pBand->GetRasterDataType())
+        {
+        case GDT_Byte:
+            CLAMP(psWarpOptions->padfDstNoDataReal[i], GByte, 0.0, 255.0);
+            break;
+        case GDT_Int16:
+            CLAMP(psWarpOptions->padfDstNoDataReal[i], GInt16, -32768.0, 32767.0);
+            break;
+        case GDT_UInt16:
+            CLAMP(psWarpOptions->padfDstNoDataReal[i], GUInt16, 0.0, 65535.0);
+            break;
+        case GDT_Int32:
+            CLAMP(psWarpOptions->padfDstNoDataReal[i], GInt32, -2147483648.0, 2147483647.0);
+            break;
+        case GDT_UInt32:
+            CLAMP(psWarpOptions->padfDstNoDataReal[i], GUInt32, 0.0, 4294967295.0);
+            break;
+        default:
+            break;
+        }
+
+        if (bClamped)
+        {
+            wxLogDebug(wxT("wxGISGPOrthoCorrectTool: For band %d, destination nodata value has been clamped to %.0f, the original value being out of range"), i + 1, psWarpOptions->padfDstNoDataReal[i]);
+            if(pTrackCancel)
+                pTrackCancel->PutMessage(wxString::Format(_("For band %d, destination nodata value has been clamped to %.0f, the original value being out of range"), i + 1, psWarpOptions->padfDstNoDataReal[i]), -1, enumGISMessageInfo);
+        }
+        else if(bRounded)
+        {
+            wxLogDebug(wxT("wxGISGPOrthoCorrectTool: For band %d, destination nodata value has been rounded to %.0f, %s being an integer datatype"), i + 1, psWarpOptions->padfDstNoDataReal[i], GDALGetDataTypeName(pBand->GetRasterDataType()) );
+            if(pTrackCancel)
+                pTrackCancel->PutMessage(wxString::Format(_("For band %d, destination nodata value has been clamped to %.0f, the original value being out of range"), i + 1, psWarpOptions->padfDstNoDataReal[i], GDALGetDataTypeName(pBand->GetRasterDataType()) ), -1, enumGISMessageInfo); 
+        }
+
+        pBand->SetNoDataValue( psWarpOptions->padfDstNoDataReal[i] );
+    }
 
     // Initialize and execute the warp operation.
 
