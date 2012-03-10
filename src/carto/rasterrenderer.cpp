@@ -344,11 +344,21 @@ void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, const double
 	//pOutputData[2] = 255;	//	G	R
 	//pOutputData[3] = 255;	//	B	A
 
+    double dfR, dfG, dfB, dfA;
+
 	if(pSrcValA == NULL)
+    {
 		pOutputData[3] = 255;
+        dfA = 255;
+    }
 	else
+    {
 		pOutputData[3] = m_paStretch[3]->GetValue(pSrcValA);
-    
+        dfA = *pSrcValA;
+    }
+
+    dfR = *pSrcValR;
+
 	unsigned char RPixVal = m_paStretch[0]->GetValue(pSrcValR);
 	pOutputData[2] = RPixVal;
 
@@ -356,18 +366,22 @@ void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, const double
 	{
 		pOutputData[1] = RPixVal;
 		pOutputData[0] = RPixVal;
+        dfG = dfB = dfR;
 	}
 	else
 	{
 		pOutputData[1] = m_paStretch[1]->GetValue(pSrcValG);
 		pOutputData[0] = m_paStretch[2]->GetValue(pSrcValB);
+        dfG = *pSrcValG;
+        dfB = *pSrcValB;
 	}
 
 	//check for nodata
 	if(m_bNodataNewBehaviour)
 	{
-        if(m_paStretch[0]->IsNoData(pOutputData[2]) && m_paStretch[1]->IsNoData(pOutputData[1]) && m_paStretch[2]->IsNoData(pOutputData[0]))
-		{
+        //if(m_paStretch[0]->IsNoData(pOutputData[2]) && m_paStretch[1]->IsNoData(pOutputData[1]) && m_paStretch[2]->IsNoData(pOutputData[0]))
+		if(m_paStretch[0]->IsNoData(dfR) && m_paStretch[1]->IsNoData(dfG) && m_paStretch[2]->IsNoData(dfB))
+        {
 			pOutputData[3] = m_oNoDataColor.Alpha();
 			pOutputData[2] = m_oNoDataColor.Red();
 			pOutputData[1] = m_oNoDataColor.Green();
@@ -376,7 +390,8 @@ void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, const double
 	}
 	else
 	{
-        if(m_paStretch[0]->IsNoData(pOutputData[2]) || m_paStretch[1]->IsNoData(pOutputData[1]) || m_paStretch[2]->IsNoData(pOutputData[0]))
+        //if(m_paStretch[0]->IsNoData(pOutputData[2]) || m_paStretch[1]->IsNoData(pOutputData[1]) || m_paStretch[2]->IsNoData(pOutputData[0]))
+        if(m_paStretch[0]->IsNoData(dfR) || m_paStretch[1]->IsNoData(dfG) || m_paStretch[2]->IsNoData(dfB))
 		{
 			pOutputData[3] = m_oNoDataColor.Alpha();
 			pOutputData[2] = m_oNoDataColor.Red();
@@ -555,7 +570,7 @@ void wxGISRasterRasterColormapRenderer::FillPixel(unsigned char* pOutputData, co
 	//bool bIsChanged(false);
 	//if(m_bNodataNewBehaviour)
 	//{
- //       if(m_paStretch[0]->IsNoData(pOutputData[2]) && m_paStretch[1]->IsNoData(pOutputData[1]) && m_paStretch[2]->IsNoData(pOutputData[0]))
+ //       if(m_paStretch[0]->IsNoData(dfR) && m_paStretch[1]->IsNoData(dfG) && m_paStretch[2]->IsNoData(dfB))
 	//	{
 	//		bIsChanged = true;
 	//		pOutputData[3] = m_oNoDataColor.Alpha();
@@ -566,7 +581,7 @@ void wxGISRasterRasterColormapRenderer::FillPixel(unsigned char* pOutputData, co
 	//}
 	//else
 	//{
- //       if(m_paStretch[0]->IsNoData(pOutputData[2]) || m_paStretch[1]->IsNoData(pOutputData[1]) || m_paStretch[2]->IsNoData(pOutputData[0]))
+ //       if(m_paStretch[0]->IsNoData(dfR) || m_paStretch[1]->IsNoData(dfG) || m_paStretch[2]->IsNoData(dfB))
 	//	{
 	//		bIsChanged = true;
 	//		pOutputData[3] = m_oNoDataColor.Alpha();
@@ -741,7 +756,7 @@ void wxGISRasterGreyScaleRenderer::FillPixel(unsigned char* pOutputData, const d
 	unsigned char RPixVal = m_oStretch.GetValue(pSrcValR);
 
 	//check for nodata
-    if( m_oStretch.IsNoData(RPixVal) )
+    if( m_oStretch.IsNoData(*pSrcValR) )
 	{
 		pOutputData[3] = m_oNoDataColor.Alpha();
 		pOutputData[2] = m_oNoDataColor.Red();
@@ -822,10 +837,17 @@ void wxGISRasterPackedRGBARenderer::FillPixel(unsigned char* pOutputData, const 
 	//pOutputData[2] = 255;	//	G	R
 	//pOutputData[3] = 255;	//	B	A
 
-	if(pSrcValA == NULL)
+	double dfR, dfG, dfB, dfA;
+    if(pSrcValA == NULL)
+    {
 		pOutputData[3] = 255;
+        dfA = 255;
+    }
 	else
+    {
 		pOutputData[3] = m_oStretch.GetValue(pSrcValA);
+        dfA = *pSrcValA;
+    }
     
 	unsigned char RPixVal = m_oStretch.GetValue(pSrcValR);
 	pOutputData[2] = RPixVal;
@@ -834,17 +856,20 @@ void wxGISRasterPackedRGBARenderer::FillPixel(unsigned char* pOutputData, const 
 	{
 		pOutputData[1] = RPixVal;
 		pOutputData[0] = RPixVal;
+        dfG = dfB = *pSrcValR;
 	}
 	else
 	{
 		pOutputData[1] = m_oStretch.GetValue(pSrcValG);
 		pOutputData[0] = m_oStretch.GetValue(pSrcValB);
+        dfG = *pSrcValG;
+        dfB = *pSrcValB;
 	}
 
 	//check for nodata
 	if(m_bNodataNewBehaviour)
 	{
-        if(m_oStretch.IsNoData(pOutputData[2]) && m_oStretch.IsNoData(pOutputData[1]) && m_oStretch.IsNoData(pOutputData[0]))
+        if(m_oStretch.IsNoData(dfR) && m_oStretch.IsNoData(dfG) && m_oStretch.IsNoData(dfB))
 		{
 			pOutputData[3] = m_oNoDataColor.Alpha();
 			pOutputData[2] = m_oNoDataColor.Red();
@@ -854,7 +879,7 @@ void wxGISRasterPackedRGBARenderer::FillPixel(unsigned char* pOutputData, const 
 	}
 	else
 	{
-        if(m_oStretch.IsNoData(pOutputData[2]) || m_oStretch.IsNoData(pOutputData[1]) || m_oStretch.IsNoData(pOutputData[0]))
+        if(m_oStretch.IsNoData(dfR) || m_oStretch.IsNoData(dfG) || m_oStretch.IsNoData(dfB))
 		{
 			pOutputData[3] = m_oNoDataColor.Alpha();
 			pOutputData[2] = m_oNoDataColor.Red();

@@ -74,9 +74,9 @@ unsigned char wxGISStretch::GetValue(const double *pdfInput)
 	return cOutput;
 }
 
-bool wxGISStretch::IsNoData(const unsigned char& cVal)
+bool wxGISStretch::IsNoData(const double& cVal)
 {
-    return IsDoubleEquil(double(cVal), m_dfNoData);
+    return IsDoubleEquil(cVal, m_dfNoData);
 }
 
 void wxGISStretch::SetNoData(double dfNoData)

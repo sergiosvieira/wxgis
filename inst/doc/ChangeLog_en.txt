@@ -1,3 +1,14 @@
+Whats new v.0.4.1
+1. Add support of CMake
+2. Upgrade to GDAL 1.9.0
+3. Upgrade to GEOS 3.3.2
+4. Upgrade to Proj 4.8
+5. Add support OrbView-3 orthorectify and metadata
+6. While orthorectify set NoData for init image
+7. Fix error of viewing an image with NoData in map window
+8. In identify window the click selected feature makes it flash
+9. Fix error starting wxGIS under WindowsXP Pro SP3. Initialisiation error "0xc0150002". (#7)
+
 Whats new v.0.4.0
 1. Upgrade to wxWidgets 2.9.2
 2. Upgrade to GEOS 3.3.1

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <wxGISCatalog>
-  <lastpath path="D:\work\testgeodata\shp\holes.shp"/>
+  <lastpath path=""/>
   <catalog ask_delete="yes"/>
   <Commands>
     <Command name="wxGISCommonCmd"/>
