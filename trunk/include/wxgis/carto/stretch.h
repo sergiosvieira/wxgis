@@ -53,7 +53,7 @@ public:
 	wxGISStretch(double dfMin = 0.0, double dfMax = 255.0, double dfMean = 127.5, double dfStdDev = DEFAULT_STDDEV, double dfNoData = NOTNODATA);
 	virtual ~wxGISStretch(void);
 	virtual unsigned char GetValue(const double *pdfInput);
-    virtual bool IsNoData(const unsigned char& cVal);
+    virtual bool IsNoData(const double& cVal);
     virtual void SetNoData(double dfNoData);
     virtual double GetNoData(void);
     virtual void SetInvert(bool bInvert);
