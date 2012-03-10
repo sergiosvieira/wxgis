@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=wxGIS Catalog
+Comment=Simple GIS Viewer and GIS File Manager
+Exec=wxgiscat
+Icon=wxgiscat.png
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+Categories=Education;Geography;
+StartupNotify=true
+MimeType=
+GenericName[en_GR]=wGIS Catalog
+GenericName[ru_RU]=wGIS Каталог

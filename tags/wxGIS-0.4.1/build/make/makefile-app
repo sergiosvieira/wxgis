@@ -1,0 +1,17 @@
+DESTDIR =
+
+bin_dir := ../../tmp
+
+all: 
+	make -f wxgis.mak
+
+clean:
+	make -f wxgis.mak clean
+	-rmdir -p --ignore-fail-on-non-empty $(bin_dir)
+
+install_app:
+	-mkdir -p $(bin_dir)
+	cp -R ../../etc $(bin_dir)/
+	cp -R ../../usr $(bin_dir)/
+
+.PHONY: clean

@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0239E09E-E928-4064-B3E9-9340E4032384}</ProjectGuid>
+    <RootNamespace>wxCatalog</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)d</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXGISGDAL)\alg;$(WXGISGDAL)\gcore;$(WXGISGDAL)\port;$(WXGISGDAL)\ogr;$(WXGISGDAL)\ogr\ogrsf_frmts;$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(CAIRO)\src;$(ZLIB);$(EXPAT)\lib;$(WXGISGDAL)\build\port;D:\work\projects\PostgreSQL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;__WXDEBUG__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CLT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wxbase29ud.lib;wxbase29ud_net.lib;wxbase29ud_xml.lib;zlibwapi.lib;wxregexud.lib;libexpat.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxgisgdal19d.lib;wxGISCored.lib;wxGISDataSourced.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(WXWIDGETS)\lib\vc_dll;$(WXGISGDAL)\lib;..\..\lib;$(ZLIB)\lib;$(EXPAT)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <ProfileGuidedDatabase>
+      </ProfileGuidedDatabase>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>..\..\lib\$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <Version>0.4.1</Version>
+    </Link>
+    <PostBuildEvent>
+      <Message>copy from debug to lib</Message>
+      <Command>copy ..\$(Configuration)\$(TargetName)$(TargetExt) ..\..\lib\</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(WXGISGDAL)\alg;$(WXGISGDAL)\gcore;$(WXGISGDAL)\build\port;$(WXGISGDAL)\port;$(WXGISGDAL)\ogr;$(WXGISGDAL)\ogr\ogrsf_frmts;$(WXWIDGETS)\include;$(WXWIDGETS)\lib\vc_dll\mswud;..\..\include;$(CAIRO)\src;$(ZLIB);$(EXPAT)\lib;D:\work\projects\PostgreSQL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;__WXMSW__;WXUSINGDLL;_USRDLL;WXMAKINGDLL_GIS_CLT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wxbase29u.lib;wxbase29u_net.lib;wxbase29u_xml.lib;zlibwapi.lib;wxregexu.lib;libexpat.lib;wxgisgdal19.lib;wxGISCore.lib;wxGISDataSource.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(WXWIDGETS)\lib\vc_dll;$(WXGISGDAL)\lib;$(ZLIB)\lib;$(EXPAT)\lib;..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>..\..\lib\$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <Version>
+      </Version>
+      <OutputFile>..\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
+    <PostBuildEvent>
+      <Message>copy from release to lib</Message>
+      <Command>copy ..\$(Configuration)\$(TargetName)$(TargetExt) ..\..\lib\</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\catalog\catop.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxarchfolder.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxarchivefactory.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxcatalog.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxcsvfactory.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxdataset.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxdbconnections.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxdbconnfactory.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxdiscconnection.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxdiscconnections.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxevent.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxfile.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxfilefactory.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxfilters.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxfolder.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxfolderfactory.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxkmldataset.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxmapinfofactory.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxmlfactory.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxpostgisdataset.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxprjfactory.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxrasterfactory.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxremoteconn.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxshapefactory.cpp" />
+    <ClCompile Include="..\..\src\catalog\gxspatreffolder.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\wxgis\catalog\catalog.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\catop.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxarchfolder.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxarchivefactory.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxcatalog.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxcsvfactory.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxdataset.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxdbconnections.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxdbconnfactory.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxdiscconnection.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxdiscconnections.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxevent.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxfile.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxfilefactory.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxfilters.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxfolder.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxfolderfactory.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxkmldataset.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxmapinfofactory.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxmlfactory.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxpostgisdataset.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxprjfactory.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxrasterfactory.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxremoteconn.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxshapefactory.h" />
+    <ClInclude Include="..\..\include\wxgis\catalog\gxspatreffolder.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="wxGISCore.vcxproj">
+      <Project>{d7c200ac-a29b-4894-b222-1c77030545be}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="wxGISDataSource.vcxproj">
+      <Project>{0f6a3c59-9206-4987-9d82-b4725311fb57}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

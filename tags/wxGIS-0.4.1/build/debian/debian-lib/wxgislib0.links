@@ -1,0 +1,12 @@
+usr/lib/wxgis/wxgiscore.so.0.2.0 usr/lib/wxgis/wxgiscore.so
+usr/lib/wxgis/wxgiscarto.so.0.2.0 usr/lib/wxgis/wxgiscarto.so
+usr/lib/wxgis/wxgiscartoui.so.0.2.0 usr/lib/wxgis/wxgiscartoui.so
+usr/lib/wxgis/wxgiscatalog.so.0.2.0 usr/lib/wxgis/wxgiscatalog.so
+usr/lib/wxgis/wxgiscatalogui.so.0.2.0 usr/lib/wxgis/wxgiscatalogui.so
+usr/lib/wxgis/wxgisdatasource.so.0.2.0 usr/lib/wxgis/wxgisdatasource.so
+usr/lib/wxgis/wxgisdisplay.so.0.2.0 usr/lib/wxgis/wxgisdisplay.so
+usr/lib/wxgis/wxgisframework.so.0.2.0 usr/lib/wxgis/wxgisframework.so
+usr/lib/wxgis/wxgisgeometry.so.0.2.0 usr/lib/wxgis/wxgisgeometry.so
+usr/lib/wxgis/wxgisgeoprocessing.so.0.2.0 usr/lib/wxgis/wxgisgeoprocessing.so
+usr/lib/wxgis/wxgisgeoprocessingui.so.0.2.0 usr/lib/wxgis/wxgisgeoprocessingui.so
+

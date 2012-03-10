@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wxCatalog>
+  <catalog show_hidden="0" show_ext="1">
+    <rootitems>
+      <rootitem name="wxGxDBConnections" is_enabled="1"/>
+      <rootitem name="wxGxSpatialReferencesFolder" is_enabled="1"/>
+      <rootitem name="wxGxDiscConnections" is_enabled="1"/>
+    </rootitems>
+    <objectfactories>
+      <objectfactory factory_name="wxGxArchiveFactory" is_enabled="1"/>
+      <objectfactory factory_name="wxGxShapeFactory" is_enabled="1"/>
+      <objectfactory factory_name="wxGxMapInfoFactory" is_enabled="1"/>
+      <objectfactory factory_name="wxGxMLFactory" is_enabled="1"/>
+      <objectfactory factory_name="wxGxRasterFactory" is_enabled="1"/>
+      <objectfactory factory_name="wxGxFolderFactory" is_enabled="1"/>
+      <objectfactory factory_name="wxGxFileFactory" is_enabled="1" extensions="txt|log|nfo|asc|"/>
+      <objectfactory factory_name="wxGxCSVFileFactory" is_enabled="1"/>
+      <objectfactory factory_name="wxGxDBConnectionFactory" is_enabled="1"/>
+      <objectfactory factory_name="wxGxPrjFactory" is_enabled="1"/>
+    </objectfactories>
+  </catalog>
+</wxCatalog>
+
+
+
