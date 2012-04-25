@@ -39,7 +39,7 @@ bool wxGxFileFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxOb
     {
         CPLString szExt = CPLGetExtension(pFileNames[i]);
         wxString sExt(szExt, wxConvUTF8);
-        for(size_t j = 0; j < m_ExtArray.size(); j++)
+        for(size_t j = 0; j < m_ExtArray.size(); ++j)
         {
             if(m_ExtArray[j].CmpNoCase(sExt) == 0)
             {
@@ -64,7 +64,7 @@ void wxGxFileFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
             pConfig->DeleteAttribute(wxT("is_enabled"));
         pConfig->AddAttribute(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
         wxString sExt;
-        for(size_t j = 0; j < m_ExtArray.size(); j++)
+        for(size_t j = 0; j < m_ExtArray.size(); ++j)
         {
             sExt += m_ExtArray[j];
             sExt += wxT("|");

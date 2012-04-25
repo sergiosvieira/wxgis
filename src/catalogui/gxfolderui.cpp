@@ -69,15 +69,38 @@ bool wxGxFolderUI::Drop(const wxArrayString& filenames, bool bMove)
     if(filenames.GetCount() == 0)
         return false;
     GxObjectArray Array;
+    bool bValid(false);
     //1. try to get initiated GxObjects
 	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
 	if(pGxObjectContainer)
     {
         for(size_t i = 0; i < filenames.GetCount(); ++i)
         {
-            IGxObject* pGxObj = pGxObjectContainer->SearchChild(filenames[i]);
+            IGxObject* pGxObj(nullptr);
+            //as the names is internal check the /vsi
+            wxString sCatalogNameProb;
+            if(filenames[i].StartsWith(wxT("/vsi"), &sCatalogNameProb))
+            {
+                int nSlashPos = sCatalogNameProb.Find(wxT("/"));
+                if(nSlashPos != wxNOT_FOUND)
+                {
+                    sCatalogNameProb = sCatalogNameProb.Right(sCatalogNameProb.Len() - nSlashPos - 1);
+                    if(wxFileName::GetPathSeparator() == '/')
+                        sCatalogNameProb.Replace(wxT("\\"), wxFileName::GetPathSeparator());
+                    else
+                        sCatalogNameProb.Replace(wxT("/"), wxFileName::GetPathSeparator());
+                    pGxObj = pGxObjectContainer->SearchChild(sCatalogNameProb);                
+                }
+            }
+            else
+            {
+                pGxObj = pGxObjectContainer->SearchChild(filenames[i]);
+            }
             if(pGxObj)
+            {
+                bValid = true;
                 Array.push_back(pGxObj);
+            }
         }
     }
 
@@ -85,12 +108,32 @@ bool wxGxFolderUI::Drop(const wxArrayString& filenames, bool bMove)
     {
         char **papszFileList = NULL;    
         CPLString szPath;
+        CPLString szPathParent;
+        IGxObject* pGxParentObj(nullptr);
+
         for(size_t i = 0; i < filenames.GetCount(); ++i)
         {
             //Change to CPLString
             CPLString szFilePath = filenames[i].mb_str(wxConvUTF8);
             if(i == 0)
-                szPath = CPLGetPath(szFilePath);
+            {
+                szPath = CPLGetPath(szFilePath);                
+                //drop /vsi
+                if(szPath[0] == '/')
+                {
+                    for(size_t j = 1; j < szPath.length(); ++j)
+                    {
+                        if(szPath[j] == '/')
+                        {
+                            szPathParent = CPLString(&szPath[j + 1]);
+                            break;
+                        }
+                    }
+                }
+                else
+                    szPathParent = szPath;
+                //get GxObj
+            }
             papszFileList = CSLAddString( papszFileList, szFilePath );        
         }
 	    	
@@ -99,8 +142,25 @@ bool wxGxFolderUI::Drop(const wxArrayString& filenames, bool bMove)
             CSLDestroy( papszFileList );
             return false;
         }
+        else
+        {
+            //Attach - cat & parent
+            if(!szPathParent.empty())
+            {
+                pGxParentObj = pGxObjectContainer->SearchChild(wxString(szPathParent, wxConvUTF8));
+                if(pGxParentObj)
+                {
+                    bValid = true;
+                    for(size_t i = 0; i < Array.size(); ++i)
+                        Array[i]->Attach(pGxParentObj, m_pCatalog);
+                }
+            }
+        }
         CSLDestroy( papszFileList );
     }
+
+    if(!bValid)
+        return false;
     //create progress dialog
     wxString sTitle = wxString::Format(_("%s %d objects (files)"), bMove == true ? _("Move") : _("Copy"), filenames.GetCount());
     wxWindow* pParentWnd = dynamic_cast<wxWindow*>(GetApplication());
@@ -117,7 +177,7 @@ bool wxGxFolderUI::Drop(const wxArrayString& filenames, bool bMove)
         IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(Array[i]);
         if(pGxObjectEdit)
         {
-            IGxObjectContainer* pGxParentObjectContainer = dynamic_cast<IGxObjectContainer*>(Array[i]->GetParent());
+            //IGxObjectContainer* pGxParentObjectContainer = dynamic_cast<IGxObjectContainer*>(Array[i]->GetParent());
             if(bMove && pGxObjectEdit->CanMove(m_sPath))
             {
                 if(!pGxObjectEdit->Move(m_sPath, &ProgressDlg))

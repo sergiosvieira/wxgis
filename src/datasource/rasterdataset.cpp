@@ -323,7 +323,7 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
             //    adfGeoTransform[5] = -CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.lineSpacing", "0.0"));
             //    //calc UTM Zone
                 double dfXCenter = adfX[0] + (adfX[2] - adfX[0]) / 2.0;
-                int nZoneNo = ( 180 + dfXCenter ) / 6 + 0.5;
+                int nZoneNo = ceil( (180.0 + dfXCenter) / 6.0 );
                 OGRSpatialReference oDstOGRSpatialReference(SRS_WKT_WGS84); 
                 oDstOGRSpatialReference.SetUTM(nZoneNo, adfY[0] > 0);
 

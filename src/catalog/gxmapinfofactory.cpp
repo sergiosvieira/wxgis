@@ -106,7 +106,20 @@ bool wxGxMapInfoFactory::GetChildren(CPLString sParentDir, char** &pFileNames, G
         else if(EQUAL(szExt, "id"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         else if(EQUAL(szExt, "dat"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        {
+            bool bHasTab(false);
+            szPath = (char*)CPLResetExtension(pFileNames[i], "tab");
+            if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                bHasTab = true;
+            if(!bHasTab)
+            {
+                szPath = (char*)CPLResetExtension(pFileNames[i], "TAB");
+                if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                    bHasTab = true;
+            }
+            if(bHasTab)
+                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        }
         else if(EQUAL(szExt, "mid"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 

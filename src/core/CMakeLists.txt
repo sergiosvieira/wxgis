@@ -19,6 +19,12 @@ if(OPENSSL_FOUND)
     include_directories(${OPENSSL_INCLUDE_DIR})
 endif(OPENSSL_FOUND) 
 
+find_package(PROJ REQUIRED)
+if(PROJ_FOUND)
+    include_directories(${PROJ_INCLUDE_DIR})
+    add_definitions(-DHAVE_PROJ -DPROJ_STATIC)
+endif(PROJ_FOUND)
+
 include_directories(${LIB_HEADERS})
 
 set(PROJECT_HHEADERS ${PROJECT_HHEADERS}
@@ -63,5 +69,9 @@ endif(WXGISGDAL_FOUND)
 if(GDAL_FOUND)
     target_link_libraries(${LIB_NAME} ${GDAL_LIBRARIES})
 endif(GDAL_FOUND) 
+
+if(PROJ_FOUND)
+    target_link_libraries(${LIB_NAME} ${PROJ_LIBRARY})
+endif(PROJ_FOUND)
 
 include(installlib)

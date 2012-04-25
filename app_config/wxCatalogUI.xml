@@ -14,7 +14,7 @@
       <objectfactory factory_name="wxGxRasterFactoryUI" is_enabled="1"/>
       <objectfactory factory_name="wxGxMLFactoryUI" is_enabled="1"/>
       <objectfactory factory_name="wxGxFolderFactoryUI" is_enabled="1"/>
-      <objectfactory factory_name="wxGxFileFactoryUI" is_enabled="1" extensions="txt|log|nfo|asc|"/>
+      <objectfactory factory_name="wxGxFileFactoryUI" is_enabled="1" extensions="txt|log|nfo|asc|dat|"/>
       <objectfactory factory_name="wxGxCSVFileFactoryUI" is_enabled="1"/>
       <objectfactory factory_name="wxGxDBConnectionFactoryUI" is_enabled="1"/>
       <objectfactory factory_name="wxGxPrjFactoryUI" is_enabled="1"/>

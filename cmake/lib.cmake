@@ -19,5 +19,3 @@ endif(MSVC)
 if(WIN32)
   add_definitions(-DWIN32 -D__WXMSW__)
 endif(WIN32)
-
-

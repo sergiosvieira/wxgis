@@ -38,6 +38,7 @@ enum wxGISEnumSaveObjectResults
 };
 
 class IGxObject;
+
 typedef std::vector<IGxObject*> GxObjectArray;
 DEFINE_SHARED_PTR(IGxObject);
 
@@ -128,6 +129,7 @@ static void GxObjectDeleter(IGxObject *ptr)
     if(ptr)
         ptr->Unlock();
 }
+
 /** \class IGxObjectEdit catalog.h
     \brief A GxObject edit interface.
 */
@@ -145,6 +147,21 @@ public:
 	virtual bool CanMove(CPLString szDestPath){return false;};
 };
 
+/** \class IGxDataset catalog.h
+    \brief A Interface class which can return Dataset.
+*/
+class IGxDataset
+{
+public:
+	virtual ~IGxDataset(void){};
+	virtual wxGISDatasetSPtr GetDataset(bool bCached = true, ITrackCancel* pTrackCancel = NULL) = 0;
+	virtual wxGISEnumDatasetType GetType(void) = 0;
+	virtual int GetSubType(void) = 0;
+};
+
+/** \class IGxObjectContainer catalog.h
+    \brief A GxObject with other GxObjects inside interface.
+*/
 class IGxObjectContainer :
 	public IGxObject
 {
@@ -198,10 +215,13 @@ public:
             bool bHavePart = sPath.MakeLower().Find(sTestedPath.MakeLower()) != wxNOT_FOUND;
 			if(bHavePart )
 			{
-				IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(m_Children[i]);
-				if(pContainer && pContainer->HasChildren())
+				IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_Children[i]);
+	            IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pGxObjectContainer);
+                if(pGxDataset != nullptr)
+                    pGxDataset->GetDataset();
+				if(pGxObjectContainer && pGxObjectContainer->HasChildren())
 				{
-					IGxObject* pFoundChild = pContainer->SearchChild(sPath);
+					IGxObject* pFoundChild = pGxObjectContainer->SearchChild(sPath);
 					if(pFoundChild)
 						return pFoundChild;
 				}
@@ -231,15 +251,6 @@ public:
 protected:
 	IGxCatalog* m_pCatalog;
     bool m_bIsEnabled;
-};
-
-class IGxDataset
-{
-public:
-	virtual ~IGxDataset(void){};
-	virtual wxGISDatasetSPtr GetDataset(bool bCached = true, ITrackCancel* pTrackCancel = NULL) = 0;
-	virtual wxGISEnumDatasetType GetType(void) = 0;
-	virtual int GetSubType(void) = 0;
 };
 
 class IGxFile

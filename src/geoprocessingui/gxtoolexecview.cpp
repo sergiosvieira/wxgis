@@ -51,7 +51,7 @@ BEGIN_EVENT_TABLE(wxGxToolExecuteView, wxListCtrl)
 	EVT_GXSELECTION_CHANGED(wxGxToolExecuteView::OnSelectionChanged)
 END_EVENT_TABLE()
 
-int wxCALLBACK TasksCompareFunction(long item1, long item2, long sortData)
+int wxCALLBACK TasksCompareFunction(wxIntPtr item1, wxIntPtr item2, wxIntPtr sortData)
 {
 	IGxObject* pObject1 = (IGxObject*)item1;
  	IGxObject* pObject2 = (IGxObject*)item2;

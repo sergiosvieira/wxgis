@@ -21,7 +21,8 @@
 
 #include "wxgis/datasource/sysop.h"
 
-#include "wx/filename.h"
+#include <wx/filename.h>
+#include <wx/fontmap.h>
 
 bool DeleteDir(CPLString sPath)
 {
@@ -60,32 +61,211 @@ wxString ClearExt(wxString sPath)
 	return wxFileName::StripExtension(sPath);
 }
 
+//CPLString GetEncodingName(wxFontEncoding eEncoding)
+//{
+//    switch(eEncoding)
+//    {
+//    case wxFONTENCODING_SYSTEM:     // system default
+//    case wxFONTENCODING_DEFAULT:    // current default encoding
+//        {
+//             wxFontEncoding oDefaultEnc = wxLocale::GetSystemEncoding();
+//             if(oDefaultEnc > 0)
+//                 return GetEncodingName(oDefaultEnc);
+//             else
+//                 return CPLString();
+//        }
+//        break;
+//
+//    // ISO8859 standard defines a number of single-byte charsets
+//    case wxFONTENCODING_ISO8859_1:       // West European (Latin1)
+//        return CPLString("ISO8859_1");
+//    case wxFONTENCODING_ISO8859_2:       // Central and East European (Latin2)
+//        return CPLString("ISO8859_2");
+//    case wxFONTENCODING_ISO8859_3:       // Esperanto (Latin3)
+//        return CPLString("ISO8859_3");
+//    case wxFONTENCODING_ISO8859_4:       // Baltic (old) (Latin4)
+//        return CPLString("ISO8859_4");
+//    case wxFONTENCODING_ISO8859_5:       // Cyrillic
+//        return CPLString("ISO8859_5");
+//    case wxFONTENCODING_ISO8859_6:       // Arabic
+//        return CPLString("ISO8859_6");
+//    case wxFONTENCODING_ISO8859_7:       // Greek
+//        return CPLString("ISO8859_7");
+//    case wxFONTENCODING_ISO8859_8:       // Hebrew
+//        return CPLString("ISO8859_8");
+//    case wxFONTENCODING_ISO8859_9:       // Turkish (Latin5)
+//        return CPLString("ISO8859_9");
+//    case wxFONTENCODING_ISO8859_10:      // Variation of Latin4 (Latin6)
+//        return CPLString("ISO8859_10");
+//    case wxFONTENCODING_ISO8859_11:      // Thai
+//        return CPLString("ISO8859_11");
+//    case wxFONTENCODING_ISO8859_12:      // doesn't exist currently, but put it
+//        return CPLString("ISO8859_12");
+//                                    // here anyhow to make all ISO8859
+//                                    // consecutive numbers
+//    case wxFONTENCODING_ISO8859_13:      // Baltic (Latin7)
+//        return CPLString("ISO8859_13");
+//    case wxFONTENCODING_ISO8859_14:      // Latin8
+//        return CPLString("ISO8859_14");
+//    case wxFONTENCODING_ISO8859_15:      // Latin9 (a.k.a. Latin0, includes euro)
+//        return CPLString("ISO8859_15");
+//    //wxFONTENCODING_ISO8859_MAX,
+//
+//    // Cyrillic charset soup (see http://czyborra.com/charsets/cyrillic.html)
+//    case wxFONTENCODING_KOI8:            // KOI8 Russian
+//        return CPLString("KOI8-R");
+//    case wxFONTENCODING_KOI8_U:          // KOI8 Ukrainian
+//        return CPLString("KOI8-U");
+//    //case wxFONTENCODING_ALTERNATIVE:     // same as MS-DOS CP866
+//    //case wxFONTENCODING_BULGARIAN:       // used under Linux in Bulgaria
+//
+//    // what would we do without Microsoft? They have their own encodings
+//        // for DOS
+//    case wxFONTENCODING_CP437:           // original MS-DOS codepage
+//        return CPLString("CP437");
+//    case wxFONTENCODING_CP850:           // CP437 merged with Latin1
+//        return CPLString("CP850");
+//    case wxFONTENCODING_CP852:           // CP437 merged with Latin2
+//        return CPLString("CP852");
+//    case wxFONTENCODING_CP855:           // another cyrillic encoding
+//        return CPLString("CP855");
+//    case wxFONTENCODING_CP866:           // and another one
+//        return CPLString("CP866");
+//        // and for Windows
+//    case wxFONTENCODING_CP874:           // WinThai
+//        return CPLString("CP874");
+//    case wxFONTENCODING_CP932:           // Japanese (shift-JIS)
+//        return CPLString("CP932");
+//    case wxFONTENCODING_CP936:           // Chinese simplified (GB)
+//        return CPLString("CP936");
+//    case wxFONTENCODING_CP949:           // Korean (Hangul charset, a.k.a. EUC-KR)
+//        return CPLString("CP949");
+//    case wxFONTENCODING_CP950:           // Chinese (traditional - Big5)
+//        return CPLString("CP950");
+//    case wxFONTENCODING_CP1250:          // WinLatin2
+//        return CPLString("CP1250");
+//    case wxFONTENCODING_CP1251:          // WinCyrillic
+//        return CPLString("CP1251");
+//    case wxFONTENCODING_CP1252:          // WinLatin1
+//        return CPLString("CP1252");
+//    case wxFONTENCODING_CP1253:          // WinGreek (8859-7)
+//        return CPLString("CP1253");
+//    case wxFONTENCODING_CP1254:          // WinTurkish
+//        return CPLString("CP1254");
+//    case wxFONTENCODING_CP1255:          // WinHebrew
+//        return CPLString("CP1255");
+//    case wxFONTENCODING_CP1256:          // WinArabic
+//        return CPLString("CP1256");
+//    case wxFONTENCODING_CP1257:          // WinBaltic (same as Latin 7)
+//        return CPLString("CP1257");
+//    //wxFONTENCODING_CP12_MAX,
+//
+//    case wxFONTENCODING_UTF7:            // UTF-7 Unicode encoding
+//        return CPLString("UTF-7");
+//    case wxFONTENCODING_UTF8:            // UTF-8 Unicode encoding
+//        return CPLString("UTF-8");
+//    //wxFONTENCODING_EUC_JP:          // Extended Unix Codepage for Japanese
+//    //case wxFONTENCODING_UNICODE:
+//    case wxFONTENCODING_UTF16:         // UTF-16 Big Endian Unicode encoding
+//        return CPLString("UTF-16");
+//    case wxFONTENCODING_UTF32:         // UTF-32 Big Endian Unicode encoding
+//        return CPLString("UTF-32");
+//
+//    //wxFONTENCODING_MACROMAN;        // the standard mac encodings
+//    //wxFONTENCODING_MACJAPANESE:
+//    //wxFONTENCODING_MACCHINESETRAD:
+//    //wxFONTENCODING_MACKOREAN:
+//    //wxFONTENCODING_MACARABIC,
+//    //wxFONTENCODING_MACHEBREW,
+//    //wxFONTENCODING_MACGREEK,
+//    //wxFONTENCODING_MACCYRILLIC,
+//    //wxFONTENCODING_MACDEVANAGARI,
+//    //wxFONTENCODING_MACGURMUKHI,
+//    //wxFONTENCODING_MACGUJARATI,
+//    //wxFONTENCODING_MACORIYA,
+//    //wxFONTENCODING_MACBENGALI,
+//    //wxFONTENCODING_MACTAMIL,
+//    //wxFONTENCODING_MACTELUGU,
+//    //wxFONTENCODING_MACKANNADA,
+//    //wxFONTENCODING_MACMALAJALAM,
+//    //wxFONTENCODING_MACSINHALESE,
+//    //wxFONTENCODING_MACBURMESE,
+//    //wxFONTENCODING_MACKHMER,
+//    //wxFONTENCODING_MACTHAI,
+//    //wxFONTENCODING_MACLAOTIAN,
+//    //wxFONTENCODING_MACGEORGIAN,
+//    //wxFONTENCODING_MACARMENIAN,
+//    //wxFONTENCODING_MACCHINESESIMP,
+//    //wxFONTENCODING_MACTIBETAN,
+//    //wxFONTENCODING_MACMONGOLIAN,
+//    //wxFONTENCODING_MACETHIOPIC,
+//    //wxFONTENCODING_MACCENTRALEUR,
+//    //wxFONTENCODING_MACVIATNAMESE,
+//    //wxFONTENCODING_MACARABICEXT,
+//    //wxFONTENCODING_MACSYMBOL,
+//    //wxFONTENCODING_MACDINGBATS,
+//    //wxFONTENCODING_MACTURKISH,
+//    //wxFONTENCODING_MACCROATIAN,
+//    //wxFONTENCODING_MACICELANDIC,
+//    //wxFONTENCODING_MACROMANIAN,
+//    //wxFONTENCODING_MACCELTIC,
+//    //wxFONTENCODING_MACGAELIC,
+//    //wxFONTENCODING_MACKEYBOARD,
+//
+//    //// more CJK encodings (for historical reasons some are already declared
+//    //// above)
+//    //wxFONTENCODING_ISO2022_JP,      // ISO-2022-JP JIS encoding
+//
+//    //wxFONTENCODING_MAX,             // highest enumerated encoding value
+//
+//    //wxFONTENCODING_MACMIN = wxFONTENCODING_MACROMAN ,
+//    //wxFONTENCODING_MACMAX = wxFONTENCODING_MACKEYBOARD ,
+//
+//
+//    default:
+//        return CPLString(wxFontMapper::GetEncodingName(eEncoding).mb_str()); 
+//    };
+//    //wxString sEnc = wxFontMapper::GetEncodingName(eEncoding);
+//    //return CPLString(sEnc.mb_str());
+//}
+
 wxFontEncoding GetEncodingFromCpg(CPLString sPath)
 {
+    wxFontEncoding oDefaultEnc = wxLocale::GetSystemEncoding();
 	const char* szCPGPath = CPLResetExtension(sPath, "cpg");
     if(!CPLCheckForFile((char*)szCPGPath, NULL))
-        return wxFONTENCODING_DEFAULT;
+        return oDefaultEnc;
 
     char **papszLines = CSLLoad( szCPGPath);
     if(papszLines == NULL)
-        return wxFONTENCODING_DEFAULT;
+        return oDefaultEnc;
 
-    char *pszWKT = CPLStrdup(papszLines[0]);
-    if(CPLStrnlen(pszWKT, 10) <= 0)
-	{
-		CSLDestroy( papszLines );
-        return wxFONTENCODING_DEFAULT;
-	}
+    CPLString soCodePage(papszLines[0]);
+    if(soCodePage.empty())
+    {
+ 		CSLDestroy( papszLines );
+        return oDefaultEnc;   
+    }
 
-    wxString sCP(pszWKT, wxConvLocal);
-	
-	CSLDestroy( papszLines );
-    int pos;
-    if((pos = sCP.Find('\n')) != wxNOT_FOUND)
-        sCP = sCP.Left(pos);
-    if((pos = sCP.Find('/')) != wxNOT_FOUND)
-        sCP = sCP.Right(sCP.Len() - pos - 1);
-    int nCP = wxAtoi(sCP);
+    CSLDestroy( papszLines );
+    int nCP(-1);
+
+
+    if( EQUALN(soCodePage,"LDID/",5) )        
+    {
+        nCP = atoi( soCodePage.c_str() + 5 );
+        //if( nCP > 255 )
+        //    nCP = -1; // don't use 0 to indicate out of range as LDID/0 is a valid one
+    }
+    else if( EQUALN(soCodePage,"UTF-8",5) )
+        return wxFONTENCODING_UTF8;
+    else if( EQUALN(soCodePage,"UTF-7",5) )
+        return wxFONTENCODING_UTF7;
+    else if( EQUALN(soCodePage,"UTF-16",6) )
+        return wxFONTENCODING_UTF16;       
+    else
+        nCP = atoi( soCodePage );
+
     //check encoding from code http://en.wikipedia.org/wiki/Code_page
     if(nCP < 255)
     {
@@ -128,7 +308,7 @@ wxFontEncoding GetEncodingFromCpg(CPLString sPath)
             case 78: nCP = 949;     break;
             case 79: nCP = 950;     break;
             case 80: nCP = 874;     break;
-            case 87: nCP = 874;     return wxFONTENCODING_DEFAULT;
+            case 87: nCP = 874;     return oDefaultEnc;
             case 88: nCP = 1252;     break;
             case 89: nCP = 1252;     break;
             case 100: nCP = 852;     break;
@@ -214,7 +394,7 @@ wxFontEncoding GetEncodingFromCpg(CPLString sPath)
     case 65001: return wxFONTENCODING_UTF8;
     default: return wxFONTENCODING_DEFAULT;
     }
-    return wxFONTENCODING_DEFAULT;
+    return oDefaultEnc;
 }
 
 bool IsFileHidden(CPLString sPath)

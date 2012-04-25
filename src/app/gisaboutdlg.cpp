@@ -92,7 +92,12 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
 	
 	bHeadSizer->Add( m_bitmap, 0, 0, 5 );
 	
-	m_title = new wxStaticText( this, wxID_ANY, wxString::Format(_("\nwxGIS [%s]\nVersion: %s"), pApp->GetAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0 );
+#ifdef _WIN64
+    m_title = new wxStaticText( this, wxID_ANY, wxString::Format(_("\nwxGIS [%s] (x64)\nVersion: %s"), pApp->GetAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0 );
+#else
+     m_title = new wxStaticText( this, wxID_ANY, wxString::Format(_("\nwxGIS [%s] (x86)\nVersion: %s"), pApp->GetAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0 );
+#endif
+	
     wxFont titleFont = this->GetFont();
     titleFont.SetWeight(wxFONTWEIGHT_BOLD);
     m_title->SetFont(titleFont);
@@ -129,7 +134,12 @@ wxString wxVer( wxVERSION_STRING );
 
 	m_AuiNotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE );
 
-    wxString sAboutApp = wxString::Format(_("wxGIS [%s]\n\nVersion: %s\n\nBuild: %s\n\n(c) 2009-%d Dmitry Baryshnikov (Bishop)\n\nhttp://wxgis.googlecode.com/"), pApp->GetAppName().c_str(), pApp->GetAppVersionString().c_str(), wxString(__DATE__,wxConvLibc).c_str(),  __YEAR__);
+#ifdef _WIN64
+    wxString sAboutApp = wxString::Format(_("wxGIS [%s] (x64)\n\nVersion: %s\n\nBuild: %s\n\n(c) 2009-%d Dmitry Baryshnikov (Bishop)\n\nhttp://wxgis.googlecode.com/"), pApp->GetAppName().c_str(), pApp->GetAppVersionString().c_str(), wxString(__DATE__,wxConvLibc).c_str(),  __YEAR__);
+#else
+    wxString sAboutApp = wxString::Format(_("wxGIS [%s] (x86)\n\nVersion: %s\n\nBuild: %s\n\n(c) 2009-%d Dmitry Baryshnikov (Bishop)\n\nhttp://wxgis.googlecode.com/"), pApp->GetAppName().c_str(), pApp->GetAppVersionString().c_str(), wxString(__DATE__,wxConvLibc).c_str(),  __YEAR__);
+#endif
+
 	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutApp, m_AuiNotebook), _("About application"));
 
     long dFreeMem =  wxMemorySize(wxGetFreeMemory() / 1048576).ToLong();

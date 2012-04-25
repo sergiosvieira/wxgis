@@ -161,6 +161,36 @@ void wxGxRemoteConnection::LoadChildren(void)
                 break;
             }
         }
+
+        if(!bAdd)
+        {
+            //check inherits
+            CPLString osCommand;
+            osCommand.Printf("SELECT pg_class.relname FROM pg_class WHERE oid = "
+                                "(SELECT pg_inherits.inhparent FROM pg_inherits WHERE inhrelid = "
+                                "(SELECT c.oid FROM pg_class c, pg_namespace n WHERE c.relname = '%s' AND c.relnamespace=n.oid AND n.nspname = '%s'))",
+                                sTableName.c_str(), sTableSchema.c_str() );
+            wxString sSQLExpression(osCommand, wxConvUTF8);
+            wxGISTableSPtr pInherits = boost::dynamic_pointer_cast<wxGISTable>(m_pwxGISRemoteConn->ExecuteSQL(sSQLExpression)); 
+            if(pInherits)
+            {
+                OGRFeatureSPtr pFeature;
+                while((pFeature = pInherits->Next()) != nullptr)
+                {
+                    CPLString soParentName = pFeature->GetFieldAsString(0);
+                    for(size_t j = 0; j < aDBStruct.size(); ++j)
+                    {
+                        if(aDBStruct[j].sTableName == soParentName && aDBStruct[j].sTableSchema == sTableSchema)
+                        {
+                            PGTABLEDATA data = {true, sTableName, sTableSchema};
+                            aDBStructOut.push_back(data);
+                            bAdd = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         if(!bAdd)
         {
             PGTABLEDATA data = {false, sTableName, sTableSchema};

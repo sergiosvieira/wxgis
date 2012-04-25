@@ -29,6 +29,7 @@ bool WXDLLIMPEXP_GIS_DS RenameFile(CPLString sOldPath, CPLString sNewPath);
 bool WXDLLIMPEXP_GIS_DS CopyFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCancel);
 bool WXDLLIMPEXP_GIS_DS MoveFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCancel);
 wxFontEncoding WXDLLIMPEXP_GIS_DS GetEncodingFromCpg(CPLString sPath);
+//CPLString WXDLLIMPEXP_GIS_DS GetEncodingName(wxFontEncoding eEncoding);
 wxString WXDLLIMPEXP_GIS_DS ClearExt(wxString sPath);
 bool WXDLLIMPEXP_GIS_DS IsFileHidden(CPLString sPath);
 wxString  WXDLLIMPEXP_GIS_DS CheckUniqName(CPLString sPath, wxString sName, wxString sExt, int nCounter = 0);
