@@ -96,6 +96,7 @@ if(MSVC)
     # set_target_properties( ${the_target} PROPERTIES COMPILE_FLAGS "/Gm" )
     if(CMAKE_CL_64)
         set_target_properties(${the_target} PROPERTIES STATIC_LIBRARY_FLAGS "/machine:x64")
+        add_definitions(-D_WIN64)
     endif()
 endif()
 

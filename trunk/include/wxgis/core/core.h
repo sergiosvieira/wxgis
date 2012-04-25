@@ -214,6 +214,7 @@ public:
 	virtual IProgressor* GetProgressor(void){return m_pProgressor;};
 	virtual void SetProgressor(IProgressor* pProgressor){m_pProgressor = pProgressor; };
 	virtual void PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType){};
+    virtual wxString GetLastMessage(void){return wxEmptyString;};
 protected:
 	bool m_bIsCanceled;
 	IProgressor* m_pProgressor;

@@ -279,25 +279,23 @@ void wxGxDialogContentView::OnActivated(wxListEvent& event)
 	//event.Skip();
 	//dbl click
 	LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
-	if(pItemData == NULL)
+	if(pItemData == nullptr)
 		return;
-
-	//IGxObjectWizard* pGxObjectWizard = dynamic_cast<IGxObjectWizard*>(pItemData->pObject);
-	//if(pGxObjectWizard != NULL)
-	//	if(!pGxObjectWizard->Invoke(this))
-	//		return;
 
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pItemData->nObjectID);
 	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
-	if(pGxObjectContainer != NULL )
+	if(pGxObjectContainer != nullptr )
 	{
-		m_pSelection->Select(pItemData->nObjectID, false, IGxSelection::INIT_ALL);//GetId()
+	    IGxObjectWizard* pGxObjectWizard = dynamic_cast<IGxObjectWizard*>(pGxObjectContainer);
+	    if(pGxObjectWizard != nullptr)
+		    if(!pGxObjectWizard->Invoke(this))
+			    return;		
+        m_pSelection->Select(pItemData->nObjectID, false, IGxSelection::INIT_ALL);//GetId()
 		return;
 	}
 
 	wxCommandEvent butevent( wxEVT_COMMAND_BUTTON_CLICKED, wxID_OK );
     GetParent()->GetEventHandler()->ProcessEvent( butevent );
-
 }
 
 void wxGxDialogContentView::SetCurrentFilter(size_t nFilterIndex)

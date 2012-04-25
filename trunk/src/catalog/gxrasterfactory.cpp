@@ -85,52 +85,61 @@ bool wxGxRasterFactory::GetChildren(CPLString sParentDir, char** &pFileNames, Gx
         {
 			if(pFileNames)
 			{
-				szPath = (char*)CPLResetExtension(pFileNames[i], "bmp");
-				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-			}
-			if(pFileNames)
-			{
-				szPath = (char*)CPLResetExtension(pFileNames[i], "jpg");
-				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-			}
-			if(pFileNames)
-			{
-				szPath = (char*)CPLResetExtension(pFileNames[i], "jpeg");
-				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-			}
-			if(pFileNames)
-			{
-				szPath = (char*)CPLResetExtension(pFileNames[i], "img");
-				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-			}
-			if(pFileNames)
-			{
-				szPath = (char*)CPLResetExtension(pFileNames[i], "gif");
-				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-			}
-			if(pFileNames)
-			{
-				szPath = (char*)CPLResetExtension(pFileNames[i], "tif");
-				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-			}
-			if(pFileNames)
-			{
-				szPath = (char*)CPLResetExtension(pFileNames[i], "tiff");
-				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-			}
-			if(pFileNames)
-			{
-				szPath = (char*)CPLResetExtension(pFileNames[i], "png");
-				if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-			}
+                const char *apszExts[9] = {"bmp", "jpg", "jpeg", "img", "gif", "tif", "tiff", "png", NULL};
+                int j(0);
+                while(apszExts[j] != NULL)
+                {
+    				szPath = (char*)CPLResetExtension(pFileNames[i], apszExts[j]);
+	    			if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+                    {
+		    			pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+                        break;
+                    }
+                    j++;
+                }
+            }        
+   //             else
+   //             {
+   // 				szPath = (char*)CPLResetExtension(pFileNames[i], "jpg");
+	  //  			if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+		 //   			pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+   //                 else
+   //                 {
+   //         			szPath = (char*)CPLResetExtension(pFileNames[i], "jpeg");
+			//        	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+			//		        pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+   //                 }
+			//}
+			//if(pFileNames)
+			//{
+			//	szPath = (char*)CPLResetExtension(pFileNames[i], "img");
+			//	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+			//		pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			//}
+			//if(pFileNames)
+			//{
+			//	szPath = (char*)CPLResetExtension(pFileNames[i], "gif");
+			//	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+			//		pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			//}
+			//if(pFileNames)
+			//{
+			//	szPath = (char*)CPLResetExtension(pFileNames[i], "tif");
+			//	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+			//		pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			//}
+			//if(pFileNames)
+			//{
+			//	szPath = (char*)CPLResetExtension(pFileNames[i], "tiff");
+			//	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+			//		pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			//}
+			//if(pFileNames)
+			//{
+			//	szPath = (char*)CPLResetExtension(pFileNames[i], "png");
+			//	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+			//		pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+			//}
         }
         else if(EQUAL(szExt, "aux"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );

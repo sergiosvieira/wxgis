@@ -24,6 +24,8 @@
 //#include "wxgis/geometry/algorithm.h"
 #include "wxgis/datasource/spvalidator.h"
 
+#define ENCODE_STRINGS //encode string while copy records
+
 bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstDataSet, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel)
 {
     const OGRSpatialReferenceSPtr pSrsSRS = pSrcDataSet->GetSpatialReference();
@@ -76,11 +78,12 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
             }
         }
         //set encoding
+#ifdef ENCODE_STRINGS
+        //if(1)//OutputEncoding != InputEncoding)
+        //{
         //wxFontEncoding InputEncoding = pSrcDataSet->GetEncoding();
         wxFontEncoding OutputEncoding = pDstDataSet->GetEncoding();
 
-        //if(1)//OutputEncoding != InputEncoding)
-        //{
         OGRFeatureDefn *pFeatureDefn = pFeature->GetDefnRef();
         if(!pFeatureDefn)
             continue;
@@ -112,7 +115,7 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
                     //wxCSConv outconv(OutputEncoding);
                     //pFeature->SetField(i, sFieldString.mb_str(outconv));   
 
-                    if(OutputEncoding == wxFONTENCODING_DEFAULT)
+                    if(OutputEncoding <= wxFONTENCODING_DEFAULT)
 						pFeature->SetField(i, sFieldString.mb_str());
                     else            
                     {                
@@ -122,10 +125,14 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
                     if(pDstDataSet->GetSubType() == enumVecDXF)
                         sACText += sFieldString + wxT("\n");
                 }
+                else if(OFTTime == nType && pDstDataSet->GetSubType() == enumVecESRIShapefile)
+                {
+                    wxString sFieldString(pFeature->GetFieldAsString(i), wxConvLocal);
+    				pFeature->SetField(i, sFieldString.mb_str());
+                }
                 //TODO: OFTStringList 
             }
         }
-        //}
 
         if(pDstDataSet->GetSubType() == enumVecDXF)
         {
@@ -134,6 +141,8 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
 			pFeature->SetStyleString(sStyleLabel.mb_str(wxConvLocal));
         }
 
+        //}
+#endif
         OGRErr eErr = pDstDataSet->StoreFeature(pFeature);
         if(eErr != OGRERR_NONE)
         {
@@ -1151,6 +1160,14 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
 					if(szDescField.empty())
 						szDescField = pField->GetNameRef();
 				}
+            }
+            
+            if(nSubType == enumVecESRIShapefile && pField->GetType() == OFTTime)
+            {
+                pField->SetType(OFTString);
+                wxString sErr(_("Unsupported type for shape file - OFTTime. Change to OFTString."));
+                wxLogWarning(sErr);
+                CPLError( CE_Warning, CPLE_AppDefined, CPLString(sErr.mb_str()) );
             }
 
 	        if( poLayerDest->CreateField( pField ) != OGRERR_NONE )

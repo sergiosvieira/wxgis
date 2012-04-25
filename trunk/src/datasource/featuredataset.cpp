@@ -33,7 +33,7 @@ wxGISFeatureDataset::wxGISFeatureDataset(CPLString sPath, int nSubType, OGRLayer
     if(m_nSubType == enumVecKML || m_nSubType == enumVecKMZ)
         m_Encoding = wxFONTENCODING_UTF8;
     else
-        m_Encoding = wxFONTENCODING_DEFAULT;
+        m_Encoding = wxLocale::GetSystemEncoding();
 	m_bIsGeometryLoaded = false;
 }
 
@@ -140,9 +140,13 @@ char **wxGISFeatureDataset::GetFileList()
         if(CPLCheckForFile((char*)szPath.c_str(), NULL))
             papszFileList = CSLAddString( papszFileList, szPath );
         break;
-    case enumVecKML:
-    case enumVecKMZ:
     case enumVecDXF:
+        szPath = (char*)CPLResetExtension(m_sPath, "dxf.xml");
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+        break;
+    case enumVecKML:
+    case enumVecKMZ:    
     case enumVecUnknown:
     default: 
         break;

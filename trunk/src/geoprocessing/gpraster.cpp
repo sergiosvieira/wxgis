@@ -222,10 +222,10 @@ bool CreateSubRaster( wxGISRasterDatasetSPtr pSrcRasterDataSet, OGREnvelope &Env
     }
 	int anSrcWin[4] = {0, 0, 0, 0};
 	
-    anSrcWin[0] = (int) ((Env.MinX - adfGeoTransform[0]) / adfGeoTransform[1] + 0.001);
-    anSrcWin[1] = (int) ((Env.MaxY - adfGeoTransform[3]) / adfGeoTransform[5] + 0.001);
-	anSrcWin[2] = (int) ((Env.MaxX - Env.MinX) / adfGeoTransform[1] + 0.5);
-	anSrcWin[3] = (int) ((Env.MinY - Env.MaxY) / adfGeoTransform[5] + 0.5);
+    anSrcWin[0] = floor ((Env.MinX - adfGeoTransform[0]) / adfGeoTransform[1] + 0.001);
+    anSrcWin[1] = floor ((Env.MaxY - adfGeoTransform[3]) / adfGeoTransform[5] + 0.001);
+	anSrcWin[2] = ceil ((Env.MaxX - Env.MinX) / adfGeoTransform[1]);
+	anSrcWin[3] = ceil ((Env.MinY - Env.MaxY) / adfGeoTransform[5]);
 	if(pTrackCancel)
 		pTrackCancel->PutMessage(wxString::Format(_("Computed source pixel window %d %d %d %d from geographic window."), anSrcWin[0], anSrcWin[1], anSrcWin[2], anSrcWin[3] ), -1, enumGISMessageInfo);
 
@@ -245,8 +245,8 @@ bool CreateSubRaster( wxGISRasterDatasetSPtr pSrcRasterDataSet, OGREnvelope &Env
     }
     else
     {
-        nOXSize = (int) ((Env.MaxX - Env.MinX) / dfOutResX + 0.5);
-        nOYSize = (int) ((Env.MinY - Env.MaxY) / (adfGeoTransform[5] < 0 ? dfOutResY * -1 : dfOutResY) + 0.5);
+        nOXSize = ceil ((Env.MaxX - Env.MinX) / dfOutResX);
+        nOYSize = ceil ((Env.MinY - Env.MaxY) / (adfGeoTransform[5] < 0 ? dfOutResY * -1 : dfOutResY));
     }
 
 /* ==================================================================== */

@@ -261,6 +261,8 @@ bool wxGISApplicationEx::SetupSys(const wxString &sSysPath)
     const char *path = pszPROJ_LIB.c_str();
     pj_set_searchpath(1, &path);
 #endif
+    CPLSetConfigOption("SHAPE_ENCODING", CPL_ENC_ASCII);
+    CPLSetConfigOption("DXF_ENCODING", CPL_ENC_ASCII);
     return true;
 }
 

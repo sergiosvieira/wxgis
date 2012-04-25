@@ -49,6 +49,7 @@ public:
 	virtual bool Continue(void);
 	virtual void Reset(void);
 	virtual void PutMessage(wxString sMessage, size_t nIndex = wxNOT_FOUND, wxGISEnumMessageType nType = enumGISMessageUnk);
+    virtual wxString GetLastMessage(void){return m_sLastMessage;};
 protected:
 	int m_nValue;
 	wxString m_sLastMessage;

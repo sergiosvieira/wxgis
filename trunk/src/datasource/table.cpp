@@ -29,7 +29,7 @@ wxGISTable::wxGISTable(CPLString sPath, int nSubType, OGRLayer* poLayer, OGRData
     m_nType = enumGISTableDataset;
     m_nSubType = nSubType;
 	//
-	m_Encoding = wxFONTENCODING_DEFAULT;
+	m_Encoding = wxLocale::GetSystemEncoding();
 	m_bIsDataLoaded = false;
     m_bIsOpened = false;
 	m_bHasFID = false;
@@ -56,6 +56,32 @@ bool wxGISTable::Open(int iLayer, int bUpdate, bool bCache, ITrackCancel* pTrack
 		if(m_nSubType == enumTableQueryResult)
 			bUpdate = FALSE;
 
+        wxFontEncoding FEnc = GetEncodingFromCpg(m_sPath);
+		if(FEnc > wxFONTENCODING_DEFAULT)
+			m_Encoding = FEnc;
+
+        //if(m_nType == enumGISFeatureDataset)
+        //{
+        //    switch(m_nSubType)
+        //    {
+        //    //case enumVecESRIShapefile:
+        //    //    CPLSetConfigOption("SHAPE_ENCODING", CPL_ENC_ASCII);//GetEncodingName(m_Encoding));
+        //    //    //m_Encoding = wxFONTENCODING_UTF8;
+        //    //    break;
+        //    //case enumVecDXF:
+        //    //    CPLSetConfigOption("DXF_ENCODING", CPL_ENC_ASCII);//, GetEncodingName(m_Encoding));
+        //    //    //m_Encoding = wxFONTENCODING_UTF8;
+        //    //    break;
+        //    case enumVecKML:
+        //    case enumVecKMZ:
+        //    case enumVecGML:
+        //        m_Encoding = wxFONTENCODING_UTF8;
+        //        break;
+        //    default:
+        //        break;
+        //    }
+        //}
+
 		m_poDS = OGRSFDriverRegistrar::Open( m_sPath, bUpdate );
 		//bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
 		if( m_poDS == NULL )
@@ -76,9 +102,9 @@ bool wxGISTable::Open(int iLayer, int bUpdate, bool bCache, ITrackCancel* pTrack
 			return false;
 		}
 
-		wxFontEncoding FEnc = GetEncodingFromCpg(m_sPath);
-		if(FEnc != wxFONTENCODING_DEFAULT)
-			m_Encoding = FEnc;
+		//wxFontEncoding FEnc = GetEncodingFromCpg(m_sPath);
+		//if(FEnc != wxFONTENCODING_DEFAULT)
+		//	m_Encoding = FEnc;
 
 		int nLayerCount = m_poDS->GetLayerCount();
 		if(nLayerCount == 1)
@@ -253,7 +279,7 @@ void wxGISTable::Close(void)
 	    m_poDS = NULL;
 	}
 
-	m_Encoding = wxFONTENCODING_DEFAULT;
+	m_Encoding = wxLocale::GetSystemEncoding();
     m_bIsOpened = false;
 	m_bHasFID = false;
 }
@@ -480,19 +506,27 @@ wxString wxGISTable::GetAsString(OGRFeatureSPtr pFeature, int nField, wxFontEnco
 		}
 		break;
 	default:
-        if(Encoding == wxFONTENCODING_DEFAULT)
         {
-            sOut = wxString(pFeature->GetFieldAsString(nField), wxConvLocal);
-            //if(sOut == wxEmptyString)
-            //    sOut = wxT(" ");
-        }
-        else
-        {
-            sOut = wxString(pFeature->GetFieldAsString(nField), wxCSConv(Encoding));
-            if(sOut.IsEmpty())
-                sOut = wxString(pFeature->GetFieldAsString(nField), wxConvLocal);
-            //if(sOut == wxEmptyString)
-            //    sOut = wxT(" ");
+            const char* pszStringData = pFeature->GetFieldAsString(nField);
+            if(CPLStrnlen(pszStringData, 10) > 0)
+            {
+                if(Encoding <= wxFONTENCODING_DEFAULT)
+                {
+                    sOut = wxString(pFeature->GetFieldAsString(nField), wxConvLocal);
+                    //if(sOut == wxEmptyString)
+                    //    sOut = wxT(" ");
+                }
+                else if(Encoding == wxFONTENCODING_UTF8)
+                    sOut = wxString(pFeature->GetFieldAsString(nField), wxConvUTF8);
+                else
+                {
+                    sOut = wxString(pFeature->GetFieldAsString(nField), wxCSConv(Encoding));
+                    if(sOut.IsEmpty())
+                        sOut = wxString(pFeature->GetFieldAsString(nField), wxConvLocal);
+                    //if(sOut == wxEmptyString)
+                    //    sOut = wxT(" ");
+                }
+            }        
         }
 	}
 	return sOut;
