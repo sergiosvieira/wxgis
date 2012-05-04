@@ -35,6 +35,8 @@ SET(_CAIRO_ROOT_HINTS
   )
 SET(_CAIRO_ROOT_PATHS
   $ENV{CAIRO}/src
+  /usr
+  /usr/local
   )
 SET(_CAIRO_ROOT_HINTS_AND_PATHS
   HINTS ${_CAIRO_ROOT_HINTS}
@@ -49,6 +51,7 @@ FIND_PATH(CAIRO_INCLUDE_DIR
   ${_CAIRO_ROOT_HINTS_AND_PATHS}
   PATH_SUFFIXES
     include
+    "include/cairo"
 )
 
 IF(WIN32 AND NOT CYGWIN)
@@ -124,7 +127,8 @@ ELSE(WIN32 AND NOT CYGWIN)
       ${_CAIRO_LIBDIR}
     ${_CAIRO_ROOT_HINTS_AND_PATHS}
     PATH_SUFFIXES
-      lib
+      "lib"
+      "local/lib"
   ) 
 
   MARK_AS_ADVANCED(CAIRO_LIBRARY)

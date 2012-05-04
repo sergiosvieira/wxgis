@@ -53,7 +53,7 @@ set(PROJECT_CSOURCES ${PROJECT_CSOURCES}
 
 if(WIN32)
     add_executable(${APP_NAME} ${PROJECT_HHEADERS} ${PROJECT_CSOURCES})
-elseif(WIN32)
+else(WIN32)
     add_executable(${APP_NAME} ${PROJECT_HHEADERS} ${PROJECT_CSOURCES})
 endif(WIN32)
 
