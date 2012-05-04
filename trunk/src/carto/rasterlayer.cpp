@@ -33,7 +33,7 @@ wxGISRasterLayer::wxGISRasterLayer(wxGISDatasetSPtr pwxGISDataset) : wxGISLayer(
         //TODO: load or get all renderers and check if i render can draw this dataset. If yes - set it as current
 		if(m_pwxGISRasterDataset->GetBandCount() >= 3)
 			m_pRasterRenderer = boost::static_pointer_cast<IRasterRenderer>(boost::make_shared<wxGISRasterRGBARenderer>());
-        else if(m_pwxGISRasterDataset->GetBandCount() == 1)
+        else// if(m_pwxGISRasterDataset->GetBandCount() == 1)
         {
 		    GDALDataset* poGDALDataset = m_pwxGISRasterDataset->GetMainRaster();
 		    if(!poGDALDataset)
@@ -72,7 +72,7 @@ wxGISRasterLayer::~wxGISRasterLayer(void)
 
 bool wxGISRasterLayer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel)
 {
-	if(m_pRasterRenderer->CanRender(m_pwxGISRasterDataset))
+	if(m_pRasterRenderer && m_pRasterRenderer->CanRender(m_pwxGISRasterDataset))
 	{
 	    //bool bSetFilter(false);
 		////Check if get all features
