@@ -110,7 +110,9 @@ GPParameters wxGISGPShapeToTextTool::GetParameterInfo(void)
 		{
 			m_bEmptyCoordsMask = true;
 			m_asCoordsMask.Add(wxT("dd-mm-ss.ss [W][ ]dd-mm-ss.ss [W]"));
+#ifdef __WXMSW___
             m_asCoordsMask.Add(wxT("dd°mm'ss.ss\" [W][ ]dd°mm'ss.ss\" [W]"));
+#endif
             m_asCoordsMask.Add(wxT("dd-mm-ss.ss[ ]dd-mm-ss.ss"));
             m_asCoordsMask.Add(wxT("ddmmss[ ]ddmmss"));
             m_asCoordsMask.Add(wxT("d.ddd[tab]d.ddd"));
@@ -264,7 +266,7 @@ bool wxGISGPShapeToTextTool::Execute(ITrackCancel* pTrackCancel)
 	if(!pSrcDataSet->IsOpened())
 		if(!pSrcDataSet->Open())
 			return false;
-    
+
     OGRFeatureDefn *pDef = pSrcDataSet->GetDefinition();
     if(!pDef)
     {
@@ -295,7 +297,7 @@ bool wxGISGPShapeToTextTool::Execute(ITrackCancel* pTrackCancel)
 
     CPLString szPath = pGxDstObject->GetInternalName();
     wxFileName sDstFileName(sDstPath);
-    wxString sName = sDstFileName.GetFullName();	
+    wxString sName = sDstFileName.GetFullName();
 
     bool bRes = GeometryVerticesToTextFile(pSrcDataSet, CPLFormFilename(szPath, sName.mb_str(wxConvUTF8), NULL), m_CFormat, NULL, pTrackCancel);
 

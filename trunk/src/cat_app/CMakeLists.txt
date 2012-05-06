@@ -15,6 +15,10 @@ find_package(wxWidgets COMPONENTS core base REQUIRED)
 # wxWidgets include (this will do all the magic to configure everything)
 if(wxWidgets_FOUND)
     include(${wxWidgets_USE_FILE})
+#    if(UNIX)
+#      add_definitions("-D${wxWidgets_DEFINITIONS}") #wxWidgets_DEFINITIONS_DEBUG
+#      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${wxWidgets_CXX_FLAGS}")
+#    endif(UNIX)
 endif(wxWidgets_FOUND)
 
 find_package(GEOS REQUIRED)
@@ -102,3 +106,4 @@ install(TARGETS ${APP_NAME} DESTINATION ${APP_INSTALL_PATH_RELEASE} CONFIGURATIO
 if(NOT WIN32)
     install(FILES PROJECT_HHEADERS DESTINATION ${HEADERS_INSTALL_PATH})
 endif(NOT WIN32)
+

@@ -88,7 +88,7 @@ bool wxGxRemoteConnectionUI::Invoke(wxWindow* pParentWnd)
     wxBusyCursor wait;
     //connect
     GetDataset();
-	if(m_pwxGISDataset == nullptr)
+	if(m_pwxGISDataset == NULL)
 	{
 		wxMessageBox(_("Connect failed!"), _("Error"), wxICON_ERROR | wxOK);
 		return false;
@@ -99,7 +99,7 @@ bool wxGxRemoteConnectionUI::Invoke(wxWindow* pParentWnd)
 }
 
 
-wxGxRemoteDBSchema* wxGxRemoteConnectionUI::GetNewRemoteDBSchema(CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon)
+wxGxRemoteDBSchema* wxGxRemoteConnectionUI::GetNewRemoteDBSchema(const CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon)
 {
     if(!m_oLargeIconFeatureClass.IsOk())
         m_oLargeIconFeatureClass = wxIcon(pg_vec_48_xpm);
@@ -113,13 +113,13 @@ wxGxRemoteDBSchema* wxGxRemoteConnectionUI::GetNewRemoteDBSchema(CPLString &szNa
         m_oLargeIconSchema = wxIcon(dbschema_48_xpm);
     if(!m_oSmallIconSchema.IsOk())
         m_oSmallIconSchema = wxIcon(dbschema_16_xpm);
-    return static_cast<wxGxRemoteDBSchema*>(new wxGxRemoteDBSchemaUI(wxString(szName, wxConvUTF8), pwxGISRemoteCon, m_oLargeIconSchema, m_oSmallIconSchema, m_oLargeIconFeatureClass, m_oSmallIconFeatureClass, m_oLargeIconTable, m_oSmallIconTable)); 
+    return static_cast<wxGxRemoteDBSchema*>(new wxGxRemoteDBSchemaUI(wxString(szName, wxConvUTF8), pwxGISRemoteCon, m_oLargeIconSchema, m_oSmallIconSchema, m_oLargeIconFeatureClass, m_oSmallIconFeatureClass, m_oLargeIconTable, m_oSmallIconTable));
 }
 
 //--------------------------------------------------------------
 //class wxGxRemoteDBSchemaUI
 //--------------------------------------------------------------
-wxGxRemoteDBSchemaUI::wxGxRemoteDBSchemaUI(wxString &sName, wxGISPostgresDataSourceSPtr pwxGISRemoteConn, wxIcon LargeIcon, wxIcon SmallIcon, wxIcon LargeIconFeatureClass, wxIcon SmallIconFeatureClass, wxIcon LargeIconTable, wxIcon SmallIconTable) : wxGxRemoteDBSchema(sName, pwxGISRemoteConn)
+wxGxRemoteDBSchemaUI::wxGxRemoteDBSchemaUI(const wxString &sName, wxGISPostgresDataSourceSPtr pwxGISRemoteConn, wxIcon LargeIcon, wxIcon SmallIcon, wxIcon LargeIconFeatureClass, wxIcon SmallIconFeatureClass, wxIcon LargeIconTable, wxIcon SmallIconTable) : wxGxRemoteDBSchema(sName, pwxGISRemoteConn)
 {
     m_oLargeIcon = LargeIcon;
     m_oSmallIcon = SmallIcon;
@@ -149,7 +149,7 @@ wxIcon wxGxRemoteDBSchemaUI::GetSmallImage(void)
 
 void wxGxRemoteDBSchemaUI::AddTable(CPLString &szName, CPLString &szSchema, bool bHasGeometry)
 {
-    IGxObject* pGxObject(nullptr);
+    IGxObject* pGxObject(NULL);
     if(bHasGeometry)
     {
         wxGxPostGISFeatureDatasetUI* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDatasetUI(szName, szSchema, m_pwxGISRemoteConn, m_oLargeIconFeatureClass, m_oSmallIconFeatureClass);

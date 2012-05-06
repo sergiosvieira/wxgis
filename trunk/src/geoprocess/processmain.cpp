@@ -26,11 +26,11 @@
 #include "wxgis/catalog/gxcatalog.h"
 #include "wxgis/version.h"
 
-#include <wx/app.h> 
+#include <wx/app.h>
 //#include <wx/defs.h>
 #include <wx/cmdline.h>
-//#include <wx/init.h> 
-//#include <wx/wxcrtvararg.h> 
+//#include <wx/init.h>
+//#include <wx/wxcrtvararg.h>
 
 #include <locale.h>
 
@@ -52,12 +52,12 @@ int main(int argc, char **argv)
             wxArgv[n] = wxStrdup(warg);
         }
 
-        wxArgv[n] = nullptr;
+        wxArgv[n] = NULL;
     }
 #else
     #define wxArgv argv
 #endif // wxUSE_UNICODE
-	
+
 	wxApp::CheckBuildOptions(WX_BUILD_OPTIONS_SIGNATURE, "program");
 
     wxInitializer initializer;
@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 #endif // wxUSE_UNICODE
 
     wxUnusedVar(argc);
-    wxUnusedVar(argv);	
+    wxUnusedVar(argv);
 
 	return success == true ? EXIT_SUCCESS : EXIT_FAILURE;
 }
@@ -132,7 +132,7 @@ bool parse_commandline_parameters( wxCmdLineParser& parser )
 
     return true;
 
-} 
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // wxGPTaskExecutor
@@ -176,7 +176,7 @@ bool wxGPTaskExecutor::OnExecute(wxString sToolName, wxString sToolParameters)
     wxGxCatalog GxCatalog;
     GxCatalog.Init();
 
-    wxGISGPToolManager oGISGPToolManager;   
+    wxGISGPToolManager oGISGPToolManager;
 	if(!oGISGPToolManager.IsOk())
 	{
         PutMessage(wxString(_("Get wxGISToolbox config failed!")), -1, enumGISMessageErr);
@@ -274,8 +274,8 @@ bool wxGPTaskExecutor::Initialize(const wxString &sAppName, const wxString &sLog
 	CPLSetConfigOption("GDAL_DATA", sGdalDataDir.mb_str(wxConvUTF8) );
 #ifdef HAVE_PROJ
 	sGdalDataDir = sSysPath + wxFileName::GetPathSeparator() + wxString(wxT("proj")) + wxFileName::GetPathSeparator();
-	//CPLSetConfigOption("PROJ_LIB", sGdalDataDir.mb_str(wxConvUTF8) );    
-    CPLString pszPROJ_LIB = sGdalDataDir.mb_str(wxConvUTF8);
+	//CPLSetConfigOption("PROJ_LIB", sGdalDataDir.mb_str(wxConvUTF8) );
+    CPLString pszPROJ_LIB(sGdalDataDir.mb_str(wxConvUTF8));
     const char *path = pszPROJ_LIB.c_str();
     pj_set_searchpath(1, &path);
 #endif

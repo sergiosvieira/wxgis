@@ -124,14 +124,14 @@ wxGISLayerSPtr wxGISMap::GetLayer(size_t nIndex)
 };
 
 //The AddLayer method adds a layer to the Map. Use the LayerCount property to get the total number of layers in the map.
-//AddLayer automatically attempts to set the Map's SpatialReference property if a coordinate system has not yet been defined for the map.  
-//When the SpatialReference property is set, the Map's MapUnits and DistanceUnits properties are additionally set.  
-//AddLayer also sets the spatial reference of the layer (ILayer::SpatialReference ). 
-//If no layers have a spatial reference, AddLayer checks the extent of the first layer (ILayer::AreaOfInterest) and if it has coordinates 
-//that look like geographic coordinates (XMin >= -180 and XMax <= 180 and YMin >= -90 and YMax <= 90), ArcMap assumes the data is in decimal 
-//degrees and sets the MapUnits to esriDecimalDegrees and DistanceUnits to esriMiles. 
-//If no spatial reference is found and the coordinates do not look like geographic coordinates, ArcMap sets no spatial reference and sets the 
-//MapUnits to esriMeters and the DistanceUnits to esriMeters. 
+//AddLayer automatically attempts to set the Map's SpatialReference property if a coordinate system has not yet been defined for the map.
+//When the SpatialReference property is set, the Map's MapUnits and DistanceUnits properties are additionally set.
+//AddLayer also sets the spatial reference of the layer (ILayer::SpatialReference ).
+//If no layers have a spatial reference, AddLayer checks the extent of the first layer (ILayer::AreaOfInterest) and if it has coordinates
+//that look like geographic coordinates (XMin >= -180 and XMax <= 180 and YMin >= -90 and YMax <= 90), ArcMap assumes the data is in decimal
+//degrees and sets the MapUnits to esriDecimalDegrees and DistanceUnits to esriMiles.
+//If no spatial reference is found and the coordinates do not look like geographic coordinates, ArcMap sets no spatial reference and sets the
+//MapUnits to esriMeters and the DistanceUnits to esriMeters.
 //The full extent is recalculated each time a layer added.
 
 //////////////////////////////////////////////////////////////////////////////
@@ -161,7 +161,7 @@ bool wxGISExtentStack::CanUndo()
 	return m_nPos > 0;
 }
 
-void wxGISExtentStack::Do(OGREnvelope &NewEnv)
+void wxGISExtentStack::Do(const OGREnvelope &NewEnv)
 {
 	m_nPos++;
 	if(m_nPos == m_staEnvelope.size())
@@ -194,7 +194,7 @@ void wxGISExtentStack::Undo()
 	}
 }
 
-void wxGISExtentStack::SetExtent(OGREnvelope &Env)
+void wxGISExtentStack::SetExtent(const OGREnvelope &Env)
 {
 	m_CurrentExtent = Env;
 }

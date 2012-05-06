@@ -158,7 +158,7 @@ wxGISDatasetSPtr wxGISPostgresDataSource::ExecuteSQL(wxString sStatement, wxGISS
 	wxGISDatasetSPtr pDataset;
     if(m_poDS)
 	{
-        CPLString szStatement = sStatement.mb_str();
+        CPLString szStatement(sStatement.mb_str());
 		OGRLayer * poLayer = m_poDS->ExecuteSQL(szStatement, NULL, sDialect.mb_str());//TODO: implement spatial Filter
 		if(	poLayer )
 		{

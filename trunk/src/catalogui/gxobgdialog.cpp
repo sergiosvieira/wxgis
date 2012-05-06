@@ -279,17 +279,17 @@ void wxGxDialogContentView::OnActivated(wxListEvent& event)
 	//event.Skip();
 	//dbl click
 	LPITEMDATA pItemData = (LPITEMDATA)event.GetData();
-	if(pItemData == nullptr)
+	if(pItemData == NULL)
 		return;
 
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pItemData->nObjectID);
 	IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
-	if(pGxObjectContainer != nullptr )
+	if(pGxObjectContainer != NULL )
 	{
 	    IGxObjectWizard* pGxObjectWizard = dynamic_cast<IGxObjectWizard*>(pGxObjectContainer);
-	    if(pGxObjectWizard != nullptr)
+	    if(pGxObjectWizard != NULL)
 		    if(!pGxObjectWizard->Invoke(this))
-			    return;		
+			    return;
         m_pSelection->Select(pItemData->nObjectID, false, IGxSelection::INIT_ALL);//GetId()
 		return;
 	}
@@ -384,7 +384,7 @@ wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, IGxCatalog* pExternalCatal
 {
 	this->SetSizeHints( wxSize( 400,300 ), wxDefaultSize );
 
-    m_pExternalCatalog = pExternalCatalog; 
+    m_pExternalCatalog = pExternalCatalog;
     m_pCatalog = new wxGxCatalogUI(true);
 	m_pCatalog->Init(m_pExternalCatalog);
 	m_pCatalog->SetShowExt(true);
@@ -427,8 +427,8 @@ wxGxObjectDialog::wxGxObjectDialog( wxWindow* parent, IGxCatalog* pExternalCatal
     //  7   Create Folder
 
         int IDs[8] = {5,0,wxNOT_FOUND,1,2,wxNOT_FOUND,4,7};
-        ICommand *pCmd(nullptr);
-        wxGISCatalogMainCmd* pwxGISCatalogMainCmd(nullptr);
+        ICommand *pCmd(NULL);
+        wxGISCatalogMainCmd* pwxGISCatalogMainCmd(NULL);
         for(size_t i = 0; i < 8; ++i)
         {
             if(IDs[i] == wxNOT_FOUND)
@@ -556,7 +556,7 @@ wxGxObjectDialog::~wxGxObjectDialog()
 	RemoveAllFilters();
 
     wxDELETE(m_pwxGxContentView);
-    
+
     if(m_pCatalog)
     {
         m_pCatalog->Detach();
@@ -971,7 +971,7 @@ void wxGxObjectDialog::SerializeFramePos(bool bSave)
 			int y = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/ypos")), 50);
 			int w = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/width")), 450);
 			int h = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/height")), 650);
-			
+
 			Move(x, y);
 			SetClientSize(w, h);
 		}

@@ -256,8 +256,8 @@ bool wxGISApplicationEx::SetupSys(const wxString &sSysPath)
 	CPLSetConfigOption("GDAL_DATA", sGdalDataDir.mb_str(wxConvUTF8) );
 #ifdef HAVE_PROJ
 	sGdalDataDir = sSysPath + wxFileName::GetPathSeparator() + wxString(wxT("proj")) + wxFileName::GetPathSeparator();
-	//CPLSetConfigOption("PROJ_LIB", sGdalDataDir.mb_str(wxConvUTF8) );    
-    CPLString pszPROJ_LIB = sGdalDataDir.mb_str(wxConvUTF8);
+	//CPLSetConfigOption("PROJ_LIB", sGdalDataDir.mb_str(wxConvUTF8) );
+    CPLString pszPROJ_LIB(sGdalDataDir.mb_str(wxConvUTF8));
     const char *path = pszPROJ_LIB.c_str();
     pj_set_searchpath(1, &path);
 #endif

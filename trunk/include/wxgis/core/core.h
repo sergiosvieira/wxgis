@@ -23,7 +23,7 @@
 #include "wxgis/base.h"
 
 #include <wx/process.h>
-#include <wx/log.h> 
+#include <wx/log.h>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
@@ -139,7 +139,7 @@ enum wxGISEnumMessageType
 
     This is base class for progressors.
 */
-class IProgressor 
+class IProgressor
 {
 public:
     /** \fn virtual ~IProgressor(void)
@@ -151,50 +151,50 @@ public:
      *  \brief Show/hide progressor.
      *  \param bShow The indicator to show (true) or hide (false) progressor
      *  \return The success of function execution
-     */	
+     */
     virtual bool Show(bool bShow) = 0;
     //
     /** \fn virtual void SetRange(int range)
      *  \brief Set progressor range.
      *  \param range The progressor value range
-     */	
+     */
     virtual void SetRange(int range) = 0;
     /** \fn int GetRange(void)
      *  \brief Set progressor range.
      *  \return The current progressor range
-     */	
+     */
     virtual int GetRange(void) = 0;
     /** \fn void SetValue(int value)
      *  \brief Set progressor position.
      *  \param value The progressor current value
-     */	    
+     */
     virtual void SetValue(int value) = 0;
     /** \fn int GetValue(void)
      *  \brief Get progressor position.
      *  \return The current progressor position
-     */	   
+     */
     virtual int GetValue(void) = 0;
     //
     /** \fn void Play(void)
      *  \brief Start undefined progressor state.
-     */	 	
+     */
     virtual void Play(void) = 0;
     /** \fn void Stop(void)
      *  \brief Stop undefined progressor state.
-     */		
+     */
     virtual void Stop(void) = 0;
     /** \fn void SetYield(bool bYield = false)
      *  \brief SetYield Yields control to pending messages in the windowing system.
 
 	    This can be useful, for example, when a time-consuming process writes to a text window. Without an occasional yield, the text window will not be updated properly, and other processes will not respond.
-     */		
+     */
 	virtual void SetYield(bool bYield = false) = 0;
 };
 
 /** \class ITrackCancel core.h
     \brief A TrackCancel interface class.
 
-    This is base class for TrackCancel classes. 
+    This is base class for TrackCancel classes.
     The TrackCancel provide ability to stop by ESC, Cancel and etc. execution of some process or function
 */
 class ITrackCancel
@@ -202,7 +202,7 @@ class ITrackCancel
 public:
     /** \fn ITrackCancel(void)
      *  \brief A constructor.
-     */	
+     */
     ITrackCancel(void) : m_bIsCanceled(false), m_pProgressor(NULL){};
     /** \fn virtual ~ITrackCancel(void)
      *  \brief A destructor.
@@ -306,7 +306,6 @@ public:
 #define DEFINE_SHARED_PTR(x) typedef boost::shared_ptr<x> x##SPtr
 #define DEFINE_WEAK_PTR(x) typedef boost::weak_ptr<x> x##WPtr
 
-#define EPSILON std::numeric_limits<double>::epsilon() * 16
 //FLT_EPSILON DBL_EPSILON
 inline bool IsDoubleEquil( double a, double b, double epsilon = EPSILON )
 {

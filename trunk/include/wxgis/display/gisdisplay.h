@@ -29,7 +29,7 @@
 #endif
 
 #ifdef __WXGTK__
-	#include <gdk/gdk.h>
+    #include <gdk/gdk.h>
 	#include <gtk/gtk.h>
 #endif
 
@@ -44,10 +44,10 @@ typedef struct _rgba{
 /** \class wxGISDisplay gisdisplay.h
     \brief The class to draw map contents.
 
-    This class draw to virtual or real display. 
+    This class draw to virtual or real display.
 	It use some caches (memory rgba rasters) and output DC to draw.
 */
-WX_DEFINE_ARRAY(wxRealPoint, wxGISPointsArray);
+WX_DEFINE_ARRAY(wxRealPoint*, wxGISPointsArray);
 
 class WXDLLIMPEXP_GIS_DSP wxGISDisplay
 {
@@ -69,7 +69,7 @@ public:
 	virtual void SetDeviceFrame(wxRect &rc);
 	virtual wxRect GetDeviceFrame(void);
 	//current draw bounds
-	virtual void SetBounds(OGREnvelope &Env);
+	virtual void SetBounds(const OGREnvelope &Env);
 	virtual OGREnvelope GetBounds(bool bRotated = true);
 	//misc
 	virtual void SetRotate(double dAngleRad);
@@ -92,7 +92,7 @@ public:
 	//Draw
 	virtual void DrawGeometry(OGRGeometry* poGeometry);
 	virtual void DrawRaster(cairo_surface_t *surface, OGREnvelope& Envelope, bool bDrawEnvelope = false);
-	virtual void ZoomingDraw(wxRect &rc, wxDC* pDC);
+	virtual void ZoomingDraw(const wxRect& rc, wxDC* pDC);
 	virtual void WheelingDraw(double dZoom, wxDC* pDC);
 	virtual void PanningDraw(wxCoord x, wxCoord y, wxDC* pDC);
 	virtual void RotatingDraw(double dAngle, wxDC* pDC);

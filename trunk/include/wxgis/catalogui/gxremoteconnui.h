@@ -46,7 +46,7 @@ public:
     virtual bool Invoke(wxWindow* pParentWnd);
 protected:
     //wxGxRemoteConnection
-    virtual wxGxRemoteDBSchema* GetNewRemoteDBSchema(CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon);
+    virtual wxGxRemoteDBSchema* GetNewRemoteDBSchema(const CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon);
 protected:
     wxIcon m_oLargeIconConn, m_oSmallIconConn;
     wxIcon m_oLargeIconDisconn, m_oSmallIconDisconn;
@@ -64,7 +64,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxRemoteDBSchemaUI :
     public IGxObjectEditUI
 {
 public:
-	wxGxRemoteDBSchemaUI(wxString &sName, wxGISPostgresDataSourceSPtr pwxGISRemoteConn, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon, wxIcon LargeIconFeatureClass = wxNullIcon, wxIcon SmallIconFeatureClass = wxNullIcon, wxIcon LargeIconTable = wxNullIcon, wxIcon SmallIconTable = wxNullIcon);
+	wxGxRemoteDBSchemaUI(const wxString &sName, wxGISPostgresDataSourceSPtr pwxGISRemoteConn, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon, wxIcon LargeIconFeatureClass = wxNullIcon, wxIcon SmallIconFeatureClass = wxNullIcon, wxIcon LargeIconTable = wxNullIcon, wxIcon SmallIconTable = wxNullIcon);
 	virtual ~wxGxRemoteDBSchemaUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);

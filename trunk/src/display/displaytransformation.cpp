@@ -85,7 +85,7 @@ void ClipGeometryByEnvelope(OGRRawPoint* pOGRRawPoints, int *pnPointCount, const
 //	m_DeviceFrameRect.x = 0;
 //	m_DeviceFrameRect.y = 0;
 //	m_DeviceFrameRect.width = 800;
-//	m_DeviceFrameRect.height = 600;	
+//	m_DeviceFrameRect.height = 600;
 //	Reset();
 //}
 //
@@ -259,7 +259,7 @@ void ClipGeometryByEnvelope(OGRRawPoint* pOGRRawPoints, int *pnPointCount, const
 //}
 //
 //double wxGISDisplayTransformation::xWorld2DC(double x)
-//{ 
+//{
 //	return m_DCXDelta - (m_WorldXDelta - x + m_Bounds.MinX) * m_World2DC;
 //}
 //

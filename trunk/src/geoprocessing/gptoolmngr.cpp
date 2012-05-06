@@ -67,7 +67,7 @@ void wxGPProcess::ProcessInput(wxString sInputData)
 		if(nPercentR >= 0)
 		{
 			//wxTimeSpan Remains = Elapsed * (nPercentR / nPercent);
-			long dMSec = double(Elapsed.GetMilliseconds().ToDouble() * nPercentR) / nPercent;	
+			long dMSec = double(Elapsed.GetMilliseconds().ToDouble() * nPercentR) / nPercent;
 			wxTimeSpan Remains = wxTimeSpan(0,0,0,dMSec);
 			m_dtEstEnd = wxDateTime::Now() + Remains;
 			sTxt = wxString(_("Remains ")) + Remains.Format(_("%H hour(s) %M min. %S sec."));
@@ -113,12 +113,12 @@ wxGISGPToolManager::wxGISGPToolManager(void) : m_nRunningTasks(0)
 	wxGISAppConfigSPtr pConfig = GetConfig();
 	if(!pConfig)
 		return;
-	
+
     m_nMaxTasks = pConfig->ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/max_tasks")), wxThread::GetCPUCount());
 #ifdef __WXMSW__
     m_sGeoprocessPath = pConfig->Read(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/gp_exec")), wxString(wxT("wxGISGeoprocess.exe")));
 #else
-    m_sGeoprocessPath = pConfig->Read(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/gp_exec")), wxString(wxT("wxGISGeoprocess"));
+    m_sGeoprocessPath = pConfig->Read(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/gp_exec")), wxString(wxT("wxGISGeoprocess")));
 #endif
 	wxXmlNode *pToolsNode = pConfig->GetConfigNode(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools")));
 	if(!pToolsNode)
@@ -236,9 +236,9 @@ int wxGISGPToolManager::Execute(IGPToolSPtr pTool, ITrackCancel* pTrackCancel)
 
     wxString sToolParams = pTool->GetAsString();
     sToolParams.Replace(wxT("\""), wxT("\\\""));
-    
+
 	//wxString sCommand = wxString::Format(wxT("%s -n "), m_sGeoprocessPath.c_str()) + sToolName + wxT(" -p \"") + sToolParams + wxT("\"");
-    
+
 	wxFileName FName(m_sGeoprocessPath);
     wxArrayString saParams;
     saParams.Add(FName.GetName());
@@ -307,7 +307,7 @@ void wxGISGPToolManager::OnFinish(IProcess* pProcess, bool bHasErrors)
             m_ProcessArray[nIndex].pTrackCancel->PutMessage(wxString::Format(_("Executed (%s) successfully"), m_ProcessArray[nIndex].pTool->GetName().c_str()), -1, enumGISMessageInfo);
             m_ProcessArray[nIndex].pTrackCancel->PutMessage(_("Done"), -1, enumGISMessageTitle);
         }
-        
+
         wxTimeSpan span = end - m_ProcessArray[nIndex].pProcess->GetBeginTime();
         m_ProcessArray[nIndex].pTrackCancel->PutMessage(wxString::Format(_("End Time: %s (Elapsed Time: %s)"), end.Format().c_str(), span.Format(_("%H hours %M min. %S sec.")).c_str()), -1, enumGISMessageInfo);
     }
@@ -428,7 +428,7 @@ void wxGISGPToolManager::SetProcessPriority(size_t nIndex, int nPriority)
 
 int wxGISGPToolManager::GetPriorityTaskIndex()
 {
-	int nPriorityIndex = m_ProcessArray.size(); 
+	int nPriorityIndex = m_ProcessArray.size();
     for(size_t nIndex = 0; nIndex < m_aPriorityArray.size(); nIndex++)
     {
         if(m_ProcessArray[m_aPriorityArray[nIndex].nIndex].pProcess && m_ProcessArray[m_aPriorityArray[nIndex].nIndex].pProcess->GetState() == enumGISTaskQuered)

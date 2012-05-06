@@ -25,7 +25,7 @@
 #include "wx/file.h"
 #include "wx/ffile.h"
 
-wxGISCurl::wxGISCurl(wxString proxy, wxString sHeaders, int dnscachetimeout, int timeout, int conntimeout) : 
+wxGISCurl::wxGISCurl(wxString proxy, wxString sHeaders, int dnscachetimeout, int timeout, int conntimeout) :
 m_bIsValid(false), m_bUseProxy(false), slist(NULL)
 {
 	curl = curl_easy_init();
@@ -57,7 +57,7 @@ m_bIsValid(false), m_bUseProxy(false), slist(NULL)
 
 		if(!proxy.IsEmpty())
 		{
-			curl_easy_setopt(curl, CURLOPT_PROXY, proxy.mb_str());
+			curl_easy_setopt(curl, CURLOPT_PROXY, (const char*)proxy.mb_str());
 			m_bUseProxy = true;
 		}
 		m_bIsValid = true;
@@ -116,7 +116,7 @@ PERFORMRESULT wxGISCurl::Get(wxString sURL)
 	result.IsValid = false;
 	result.iSize = 0;
 	curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
-	curl_easy_setopt(curl, CURLOPT_URL, sURL.mb_str());
+	curl_easy_setopt(curl, CURLOPT_URL, (const char*)sURL.mb_str());
 	//curl_easy_setopt(curl, CURLOPT_CAINFO, "curl-ca-bundle.crt");
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 	res = curl_easy_perform(curl);
@@ -158,7 +158,7 @@ bool wxGISCurl::GetFile(wxString sURL, wxString sPath)
 	if(wxFileName::FileExists(sPath))
 		return true/*false*/;
 	curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
-	curl_easy_setopt(curl, CURLOPT_URL, sURL.mb_str());
+	curl_easy_setopt(curl, CURLOPT_URL, (const char*)sURL.mb_str());
 	//curl_easy_setopt(curl, CURLOPT_CAINFO, "curl-ca-bundle.crt");
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 	res = curl_easy_perform(curl);
@@ -191,7 +191,7 @@ PERFORMRESULT wxGISCurl::Post(wxString sURL, wxString sPostData)
 	const char *tmp_str = sPostData.mb_str(wxConvLocal);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS , tmp_str);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
-	curl_easy_setopt(curl, CURLOPT_URL, sURL.mb_str(wxConvLocal));
+	curl_easy_setopt(curl, CURLOPT_URL, (const char*)sURL.mb_str(wxConvLocal));
 	//curl_easy_setopt(curl, CURLOPT_CAINFO, "curl-ca-bundle.crt");
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 	res = curl_easy_perform(curl);

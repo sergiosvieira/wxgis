@@ -22,7 +22,7 @@
 #pragma once
 
 #include "wxgis/framework/framework.h"
-#include "../../art/character_map.xpm"
+#include "../../../art/character_map.xpm"
 
 #include <wx/intl.h>
 
@@ -60,14 +60,14 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxKeyCodeDlg
 ///////////////////////////////////////////////////////////////////////////////
-class WXDLLIMPEXP_GIS_FRW wxKeyCodeDlg : public wxDialog 
+class WXDLLIMPEXP_GIS_FRW wxKeyCodeDlg : public wxDialog
 {
 private:
 
 protected:
 	wxKeyCodeCtrl* m_textCtrl1;
 	wxButton* m_button;
-	
+
 public:
 	wxKeyCodeDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Enter key code"), const wxPoint& pos = wxPoint( -1,-1 ), const wxSize& size = wxSize( 260,70 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 	~wxKeyCodeDlg();

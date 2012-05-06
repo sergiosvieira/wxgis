@@ -316,7 +316,8 @@
 #define ERR wxT("~err~")
 #define NONAME _("no name")
 #define CACHE_SIZE 3000
-#define DELTA (FLT_EPSILON * 16)
+#define EPSILON std::numeric_limits<double>::epsilon() * 16
+#define DELTA (EPSILON * 16)
 //M_PI
 #define PI 3.1415926535897932384626433832795
 #define DOUBLEPI 6.283185307179586476925286766558

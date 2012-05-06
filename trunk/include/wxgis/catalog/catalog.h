@@ -217,7 +217,7 @@ public:
 			{
 				IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_Children[i]);
 	            IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pGxObjectContainer);
-                if(pGxDataset != nullptr)
+                if(pGxDataset != NULL)
                     pGxDataset->GetDataset();
 				if(pGxObjectContainer && pGxObjectContainer->HasChildren())
 				{
@@ -227,9 +227,9 @@ public:
 				}
 			}
 		}
-		return nullptr;
+		return NULL;
 	}
-    virtual bool CanCreate(long nDataType, long DataSubtype){return false;}; 
+    virtual bool CanCreate(long nDataType, long DataSubtype){return false;};
 protected:
 	GxObjectArray m_Children;
 };

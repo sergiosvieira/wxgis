@@ -73,7 +73,7 @@ bool wxGxDiscConnectionUI::Drop(const wxArrayString& filenames, bool bMove)
     {
         for(size_t i = 0; i < filenames.GetCount(); ++i)
         {
-            IGxObject* pGxObj(nullptr);
+            IGxObject* pGxObj(NULL);
             //as the names is internal check the /vsi
             wxString sCatalogNameProb;
             if(filenames[i].StartsWith(wxT("/vsi"), &sCatalogNameProb))
@@ -86,7 +86,7 @@ bool wxGxDiscConnectionUI::Drop(const wxArrayString& filenames, bool bMove)
                         sCatalogNameProb.Replace(wxT("\\"), wxFileName::GetPathSeparator());
                     else
                         sCatalogNameProb.Replace(wxT("/"), wxFileName::GetPathSeparator());
-                    pGxObj = pGxObjectContainer->SearchChild(sCatalogNameProb);                
+                    pGxObj = pGxObjectContainer->SearchChild(sCatalogNameProb);
                 }
             }
             else
@@ -103,18 +103,18 @@ bool wxGxDiscConnectionUI::Drop(const wxArrayString& filenames, bool bMove)
 
     if(Array.empty())
     {
-        char **papszFileList = NULL;    
+        char **papszFileList = NULL;
         CPLString szPath;
         CPLString szPathParent;
-        IGxObject* pGxParentObj(nullptr);
+        IGxObject* pGxParentObj(NULL);
 
         for(size_t i = 0; i < filenames.GetCount(); ++i)
         {
             //Change to CPLString
-            CPLString szFilePath = filenames[i].mb_str(wxConvUTF8);
+            CPLString szFilePath(filenames[i].mb_str(wxConvUTF8));
             if(i == 0)
             {
-                szPath = CPLGetPath(szFilePath);                
+                szPath = CPLGetPath(szFilePath);
                 //drop /vsi
                 if(szPath[0] == '/')
                 {
@@ -131,9 +131,9 @@ bool wxGxDiscConnectionUI::Drop(const wxArrayString& filenames, bool bMove)
                     szPathParent = szPath;
                 //get GxObj
             }
-            papszFileList = CSLAddString( papszFileList, szFilePath );        
+            papszFileList = CSLAddString( papszFileList, szFilePath );
         }
-	    	
+
         if(!m_pCatalog->GetChildren(szPath, papszFileList, Array))
         {
             CSLDestroy( papszFileList );

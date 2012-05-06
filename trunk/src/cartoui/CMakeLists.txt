@@ -14,6 +14,16 @@ if(wxWidgets_FOUND)
     include(${wxWidgets_USE_FILE})
 endif(wxWidgets_FOUND)
 
+if(UNIX)
+    find_package(GTK2 REQUIRED)
+    if(GTK2_FOUND)
+        include_directories(${GTK2_INCLUDE_DIRS})
+        add_definitions(-DHAVE_GTK2)
+    endif(GTK2_FOUND)
+    message(STATUS "GTK2 libs=[${GTK2_LIBRARIES}] headers=[${GTK2_INCLUDE_DIRS}]")
+endif()
+
+
 find_package(CAIRO REQUIRED)
 if(CAIRO_FOUND)
     include_directories(${CAIRO_INCLUDE_DIR})
@@ -65,6 +75,12 @@ endif(GDAL_FOUND)
 if(CAIRO_FOUND)
     target_link_libraries(${LIB_NAME} ${CAIRO_LIBRARIES})
 endif(CAIRO_FOUND)
+
+if(UNIX)
+    if(GTK2_FOUND)
+        target_link_libraries(${LIB_NAME} ${GTK2_LIBRARIES})
+    endif(GTK2_FOUND)
+endif(UNIX)
 
 target_link_libraries(${LIB_NAME} ${WXGISCARTO_LIB_NAME})
 

@@ -32,8 +32,8 @@
  *  \param pSrcRasterDataSet The clipped raster
  *  \param szDstFolderPath The subraster store path
  *  \return False if any error or true
- */	
-bool WXDLLIMPEXP_GIS_DS SubrasterByVector( wxGISFeatureDatasetSPtr pSrcFeatureDataSet, wxGISRasterDatasetSPtr pSrcRasterDataSet, CPLString &szDstFolderPath, wxGxRasterFilter* pFilter = nullptr, GDALDataType eOutputType = GDT_Unknown, int nBandCount = 0, int *panBandList = nullptr, bool bUseCounter = true, int nCounterBegin = -1, int nFieldNo = -1, double dfOutResX = -1, double dfOutResY = -1, bool bCopyNodata = false, bool bSkipSourceMetadata = false, char** papszOptions = nullptr, ITrackCancel* pTrackCancel = nullptr );
+ */
+bool WXDLLIMPEXP_GIS_DS SubrasterByVector( wxGISFeatureDatasetSPtr pSrcFeatureDataSet, wxGISRasterDatasetSPtr pSrcRasterDataSet, CPLString &szDstFolderPath, wxGxRasterFilter* pFilter = NULL, GDALDataType eOutputType = GDT_Unknown, int nBandCount = 0, int *panBandList = NULL, bool bUseCounter = true, int nCounterBegin = -1, int nFieldNo = -1, double dfOutResX = -1, double dfOutResY = -1, bool bCopyNodata = false, bool bSkipSourceMetadata = false, char** papszOptions = NULL, ITrackCancel* pTrackCancel = NULL );
 
-bool CreateSubRaster( wxGISRasterDatasetSPtr pSrcRasterDataSet, OGREnvelope &Env, const OGRGeometry *pGeom, GDALDriver* pDriver, CPLString &szDstPath, GDALDataType eOutputType = GDT_Unknown, int nBandCount = 0, int *panBandList = nullptr, double dfOutResX = -1, double dfOutResY = -1, bool bCopyNodata = false, bool bSkipSourceMetadata = false, char** papszOptions = nullptr, ITrackCancel* pTrackCancel = nullptr );
+bool CreateSubRaster( wxGISRasterDatasetSPtr pSrcRasterDataSet, OGREnvelope &Env, const OGRGeometry *pGeom, GDALDriver* pDriver, CPLString &szDstPath, GDALDataType eOutputType = GDT_Unknown, int nBandCount = 0, int *panBandList = NULL, double dfOutResX = -1, double dfOutResY = -1, bool bCopyNodata = false, bool bSkipSourceMetadata = false, char** papszOptions = NULL, ITrackCancel* pTrackCancel = NULL );
 void CopyBandInfo( GDALRasterBand * poSrcBand, GDALRasterBand * poDstBand, int bCopyNoData );

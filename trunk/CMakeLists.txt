@@ -102,8 +102,16 @@ endif()
 
 if(UNIX)
      if(CMAKE_COMPILER_IS_GNUCXX OR CV_ICC)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -fno-strict-aliasing")#-Wextra -Wall -W -pthread -O2 -fno-strict-aliasing -pthrea
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -fno-strict-aliasing")
      endif()
+    # Select flags.
+#    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O0 -g")
+#    set(CMAKE_CXX_FLAGS_RELEASE        "-O")
+#    set(CMAKE_CXX_FLAGS_DEBUG          "-Wall -g -O")
+#    set(CMAKE_C_FLAGS_RELWITHDEBINFO   "-O0 -g")
+#    set(CMAKE_C_FLAGS_RELEASE          "-O")
+#    set(CMAKE_C_FLAGS_DEBUG            "-Wall -g -O2")
 endif()
 
 #core

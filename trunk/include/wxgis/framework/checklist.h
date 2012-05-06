@@ -21,7 +21,8 @@
 #pragma once
 
 #include "wxgis/framework/framework.h"
-#include "wx/listctrl.h"
+#include <wx/listctrl.h>
+#include <wx/imaglist.h>
 
 /** \class wxGISCheckList framework.h
     \brief A List View with check box

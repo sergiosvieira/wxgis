@@ -116,7 +116,7 @@ bool wxGxKMLDataset::Rename(wxString NewName)
 	wxString sNewPath = PathName.GetFullPath();
 
 	EmptyChildren();
-    CPLString szNewPath = sNewPath.mb_str(wxConvUTF8);
+    CPLString szNewPath(sNewPath.mb_str(wxConvUTF8));
     if(RenameFile(m_sPath, szNewPath))
 	{
         m_sPath = szNewPath;
@@ -217,7 +217,7 @@ bool wxGxKMLDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
     {
         pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset);
     }
-    
+
     if(!pDSet)
     {
         if(pTrackCancel)
@@ -230,7 +230,7 @@ bool wxGxKMLDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
     {
         const char* err = CPLGetLastErrorMsg();
         wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Copy"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
-		return false;	
+		return false;
     }
 
     m_sPath = pDSet->GetPath();
@@ -254,7 +254,7 @@ bool wxGxKMLDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     {
         pDSet = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset);
     }
-    
+
     if(!pDSet)
     {
         if(pTrackCancel)
@@ -267,7 +267,7 @@ bool wxGxKMLDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
     {
         const char* err = CPLGetLastErrorMsg();
 		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Move"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
-		return false;	
+		return false;
     }
 
     m_sPath = pDSet->GetPath();

@@ -24,11 +24,11 @@
 #include "wxgis/display/display.h"
 #include "wxgis/display/gisdisplay.h"
 
-class WXDLLIMPEXP_GIS_DSP wxGISRubberBand : 
+class WXDLLIMPEXP_GIS_DSP wxGISRubberBand :
 	public wxEvtHandler
 {
 public:
-	wxGISRubberBand(wxPen &oPen, wxWindow *pWnd, wxGISDisplay *pDisp);
+	wxGISRubberBand(wxPen oPen, wxWindow *pWnd, wxGISDisplay *pDisp);
 	virtual ~wxGISRubberBand(void);
 	virtual OGRGeometrySPtr TrackNew(wxCoord x, wxCoord y);
 	virtual void OnUnlock(void);
@@ -65,7 +65,7 @@ class WXDLLIMPEXP_GIS_DSP wxGISRubberEnvelope :
 	public wxGISRubberBand
 {
 public:
-	wxGISRubberEnvelope(wxPen &oPen, wxWindow *pWnd, wxGISDisplay *pDisp);
+	wxGISRubberEnvelope(wxPen oPen, wxWindow *pWnd, wxGISDisplay *pDisp);
 	virtual ~wxGISRubberEnvelope(void);
 	virtual void OnMouseMove(wxMouseEvent& event);
 	virtual void OnMouseUp(wxMouseEvent& event);

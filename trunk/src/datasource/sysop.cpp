@@ -223,7 +223,7 @@ wxString ClearExt(wxString sPath)
 //
 //
 //    default:
-//        return CPLString(wxFontMapper::GetEncodingName(eEncoding).mb_str()); 
+//        return CPLString(wxFontMapper::GetEncodingName(eEncoding).mb_str());
 //    };
 //    //wxString sEnc = wxFontMapper::GetEncodingName(eEncoding);
 //    //return CPLString(sEnc.mb_str());
@@ -244,14 +244,14 @@ wxFontEncoding GetEncodingFromCpg(CPLString sPath)
     if(soCodePage.empty())
     {
  		CSLDestroy( papszLines );
-        return oDefaultEnc;   
+        return oDefaultEnc;
     }
 
     CSLDestroy( papszLines );
     int nCP(-1);
 
 
-    if( EQUALN(soCodePage,"LDID/",5) )        
+    if( EQUALN(soCodePage,"LDID/",5) )
     {
         nCP = atoi( soCodePage.c_str() + 5 );
         //if( nCP > 255 )
@@ -262,7 +262,7 @@ wxFontEncoding GetEncodingFromCpg(CPLString sPath)
     else if( EQUALN(soCodePage,"UTF-7",5) )
         return wxFONTENCODING_UTF7;
     else if( EQUALN(soCodePage,"UTF-16",6) )
-        return wxFONTENCODING_UTF16;       
+        return wxFONTENCODING_UTF16;
     else
         nCP = atoi( soCodePage );
 
@@ -401,7 +401,7 @@ bool IsFileHidden(CPLString sPath)
 {
 #ifdef __WXMSW__
     wxString sTestPath(sPath, wxConvUTF8);
-	DWORD dwAttrs = GetFileAttributes(sTestPath.wc_str()); 
+	DWORD dwAttrs = GetFileAttributes(sTestPath.wc_str());
     if (dwAttrs != INVALID_FILE_ATTRIBUTES)
 		return dwAttrs & FILE_ATTRIBUTE_HIDDEN;
 #endif
@@ -410,7 +410,7 @@ bool IsFileHidden(CPLString sPath)
 
 wxString CheckUniqName(CPLString sPath, wxString sName, wxString sExt, int nCounter)
 {
-    wxString sResultName = sName + (nCounter > 0 ? wxString::Format(wxT("_%d"), nCounter) : wxEmptyString);
+    wxString sResultName = sName + (nCounter > 0 ? wxString::Format(wxT("_%d"), nCounter) : wxString(wxT("")));
     CPLString szBaseName = (char*)CPLFormFilename(sPath, sResultName.mb_str(wxConvUTF8), sExt.mb_str(wxConvUTF8));
     if(CPLCheckForFile((char*)szBaseName.c_str(), NULL))
         return CheckUniqName(sPath, sName, sExt, nCounter + 1);

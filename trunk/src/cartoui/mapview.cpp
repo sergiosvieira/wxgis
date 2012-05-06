@@ -109,14 +109,14 @@ bool wxGISMapView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, c
 
 	UpdateFrameCenter();
 
-	return true; 
+	return true;
 }
 
 void wxGISMapView::OnPaint(wxPaintEvent & event)
 {
 	wxPaintDC paint_dc(this);
     wxRect rect = GetClientRect();
-    
+
     if(rect.width == 0 || rect.height == 0)
     {
         return;
@@ -220,7 +220,7 @@ void wxGISMapView::OnTimer( wxTimerEvent& event )
 		{
 			//stop zooming action
 			if(m_pGISDisplay)
-			{	
+			{
 				wxRect rc = GetClientRect();
 				m_pGISDisplay->SetDeviceFrame(rc);
 				m_pGISDisplay->SetDerty(true);
@@ -235,7 +235,7 @@ void wxGISMapView::OnTimer( wxTimerEvent& event )
     case enumGISMapWheelingStop:
 		//stop wheeling action
 		if(m_pGISDisplay)
-		{	
+		{
 			double dZoom = 1;
 			if(m_nFactor < 0)
 				dZoom = fabs(1.0 / (m_nFactor - 1));
@@ -327,8 +327,8 @@ void wxGISMapView::OnDraw(wxGISEnumDrawPhase nPhase)
 			if(m_pGISDisplay->GetDrawCache() != pLayer->GetCacheID())
 				m_pGISDisplay->SetDrawCache(pLayer->GetCacheID());
 			if(pLayer->Draw(nPhase, m_pGISDisplay, m_pTrackCancel))
-            { 
-                //SetCacheDerty if next cache is not same 
+            {
+                //SetCacheDerty if next cache is not same
                 if(i < m_paLayers.size() - 1 && m_paLayers[i + 1]->GetCacheID() != pLayer->GetCacheID())
                     m_pGISDisplay->SetCacheDerty(pLayer->GetCacheID(), false);
                 else if(i == m_paLayers.size() - 1)
@@ -361,7 +361,7 @@ bool wxGISMapView::AddLayer(wxGISLayerSPtr pLayer)
 		else
 			pLayer->SetCacheID(m_pGISDisplay->GetLastCacheID());
 	}
-	
+
 	return wxGISExtentStack::AddLayer(pLayer);
 }
 
@@ -409,7 +409,7 @@ void wxGISMapView::OnMouseWheel(wxMouseEvent& event)
 		m_timer.Start(TM_WHEELING);
 }
 
-void wxGISMapView::DrawToolTip(wxClientDC &dc, wxString &sText)
+void wxGISMapView::DrawToolTip(wxClientDC& dc, const wxString& sText)
 {
 	wxSize size = GetClientSize();
 	int nWidth, nHeight;
@@ -432,7 +432,7 @@ void wxGISMapView::DrawToolTip(wxClientDC &dc, wxString &sText)
 	dc.DrawText(sText, x1, y1);
 }
 
-double wxGISMapView::GetScaleRatio(OGREnvelope &Bounds, wxDC &dc)
+double wxGISMapView::GetScaleRatio(OGREnvelope& Bounds, wxDC& dc)
 {
 	wxCHECK(m_pGISDisplay, 0);
 
@@ -478,7 +478,7 @@ OGREnvelope wxGISMapView::CreateEnvelopeFromZoomFactor(double dZoom)
 	return Env;
 }
 
-void wxGISMapView::SetExtent(OGREnvelope &Env)
+void wxGISMapView::SetExtent(OGREnvelope& Env)
 {
 	CancelDrawThread();
 
@@ -609,7 +609,7 @@ void wxGISMapView::RotateBy(wxPoint MouseLocation)
 			double dY = m_FrameCenter.y - MouseLocation.y;
 			double dAngle = atan2(dY, dX);
 			dAngle -= m_dOriginAngle;
-			if(dAngle < 0) 
+			if(dAngle < 0)
 				dAngle += 2 * M_PI;
 
 			wxClientDC CDC(this);
@@ -696,14 +696,14 @@ OGREnvelope wxGISMapView::GetFullExtent(void)
 	return OutputEnv;
 }
 
-void wxGISMapView::FlashGeometry(const GeometryArray &Geoms)
+void wxGISMapView::FlashGeometry(const GeometryArray& Geoms)
 {
 	CancelDrawThread();
-    
+
     //draw geometries
     m_pGISDisplay->SetDrawCache(m_pGISDisplay->GetFlashCacheID());
     //set colors and etc.
-    wxGISAppConfigSPtr pConfig = GetConfig();    
+    wxGISAppConfigSPtr pConfig = GetConfig();
     //create vector flash renderer
     RGBA stFillColour, stLineColour;
 	stLineColour.dRed = double(pConfig->ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_line_red")), 0)) / 255;

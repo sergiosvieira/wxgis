@@ -23,6 +23,7 @@
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalogui/gxselection.h"
 #include "wxgis/catalog/gxcatalog.h"
+#include <wx/imaglist.h>
 
 class WXDLLIMPEXP_GIS_CLU wxGxCatalogUI :
     public wxGxCatalog,
@@ -53,8 +54,8 @@ public:
     virtual bool GetOpenLastPath(void){return m_bOpenLastPath;};
 	virtual IGxSelection* GetSelection(void){return m_pSelection;};
     virtual wxImageList* GetPendingImageList(bool bIsLarge)
-    { 
-        if(bIsLarge)  
+    {
+        if(bIsLarge)
             return &m_ImageListLarge;
         else
             return &m_ImageListSmall;

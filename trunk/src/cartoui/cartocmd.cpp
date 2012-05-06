@@ -239,7 +239,7 @@ unsigned char wxGISCartoMainCmd::GetCount(void)
 IMPLEMENT_DYNAMIC_CLASS(wxGISCartoMainTool, wxObject)
 
 
-wxGISCartoMainTool::wxGISCartoMainTool(void) : m_pMapView(nullptr), m_pIdentifyView(nullptr), m_bCheck(false)
+wxGISCartoMainTool::wxGISCartoMainTool(void) : m_pMapView(NULL), m_pIdentifyView(NULL), m_bCheck(false)
 {
 }
 
@@ -499,8 +499,10 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 				Env.MaxY += heightdiv4;
 			}
 
-			if(m_pMapView->GetScaleRatio(Env, wxClientDC(m_pMapView)) > 1.0)
+            wxDC* pDC = new wxClientDC(m_pMapView);
+			if(m_pMapView->GetScaleRatio(Env, *pDC) > 1.0)
                 m_pMapView->Do(Env);
+            wxDELETE(pDC);
 		}
 		break;
 		case 1:	//z_out
@@ -865,7 +867,7 @@ IToolBarControl* wxGISCartoFrameTool::GetControl(void)
 {
 	switch(m_subtype)
 	{
-		case 2:	
+		case 2:
 			//if(!m_pRotationComboBox)
 			{
 				wxArrayString ValuesArray;
@@ -881,7 +883,7 @@ wxString wxGISCartoFrameTool::GetToolLabel(void)
 {
 	switch(m_subtype)
 	{
-		case 2:	
+		case 2:
 			return wxEmptyString;
 		default:
 			return wxEmptyString;
@@ -892,7 +894,7 @@ bool wxGISCartoFrameTool::HasToolLabel(void)
 {
 	switch(m_subtype)
 	{
-		case 2:	
+		case 2:
 			return false;
 		default:
 			return false;
