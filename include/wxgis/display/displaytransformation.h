@@ -44,7 +44,7 @@ inline bool IsInsideEnvelope(const OGRRawPoint &pt, wxGISEnumPointPosition nPos,
 inline OGRRawPoint SolveIntersection(const OGRRawPoint &pt1, const OGRRawPoint &pt2, wxGISEnumPointPosition nPos, const OGREnvelope &Env)
 {
 	OGRRawPoint out;
-	double r_n = DBL_EPSILON, r_d = DBL_EPSILON;
+	double r_n = EPSILON, r_d = EPSILON;
 
 	switch ( nPos )
 	{
@@ -66,7 +66,7 @@ inline OGRRawPoint SolveIntersection(const OGRRawPoint &pt1, const OGRRawPoint &
 		break;
 	}
 
-	if ( fabs( r_d ) > DBL_EPSILON && fabs( r_n ) > DBL_EPSILON )
+	if ( fabs( r_d ) > EPSILON && fabs( r_n ) > EPSILON )
 	{ // they cross
 		double r = r_n / r_d;
 		out.x = pt1.x + r * ( pt2.x - pt1.x );
@@ -76,7 +76,7 @@ inline OGRRawPoint SolveIntersection(const OGRRawPoint &pt1, const OGRRawPoint &
 	{
 		// Should never get here, but if we do for some reason, cause a
 		// clunk because something else is wrong if we do.
-		wxASSERT( fabs( r_d ) > DBL_EPSILON && fabs( r_n ) > DBL_EPSILON );
+		wxASSERT( fabs( r_d ) > EPSILON && fabs( r_n ) > EPSILON );
 	}
 
 	return out;
@@ -119,9 +119,9 @@ inline void TrimFeatureToBoundary(OGRRawPoint* pOGRRawPointsIn, int nPointCountI
 	}
 }
 
-//DisplayTransformation – This object defines how real-world coordinates are mapped to a output device. Three rectangles define the transformation. 
-//The Bounds specifies the full extent in real-world coordinates. The VisibleBounds specifies what extent is currently visible. 
-//And the DeviceFrame specifies where the VisibleBounds appears on the output device. Since the aspect ratio of the DeviceFrame may not always match the aspect ratio of the specified VisibleBounds, the transformation calculates the actual visible bounds that fits the DeviceFrame. This is called the FittedBounds and is in real-world coordinates. All coordinates can be rotated about the center of the visible bounds by simply setting the transformation’s Rotation property. 
+//DisplayTransformation – This object defines how real-world coordinates are mapped to a output device. Three rectangles define the transformation.
+//The Bounds specifies the full extent in real-world coordinates. The VisibleBounds specifies what extent is currently visible.
+//And the DeviceFrame specifies where the VisibleBounds appears on the output device. Since the aspect ratio of the DeviceFrame may not always match the aspect ratio of the specified VisibleBounds, the transformation calculates the actual visible bounds that fits the DeviceFrame. This is called the FittedBounds and is in real-world coordinates. All coordinates can be rotated about the center of the visible bounds by simply setting the transformation’s Rotation property.
 
 //class wxGISDisplayTransformation :
 //	public IDisplayTransformation

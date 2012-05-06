@@ -41,19 +41,19 @@ wxGISCoordinatesFormatMenu::wxGISCoordinatesFormatMenu(const wxString& title, lo
 	//TODO:
 	/*
 	//add selectors m -> cm etc.
-	Append(wxID_ANY, _("Kilometers")); 
-	Append(wxID_ANY, _("Meters")); 
-	Append(wxID_ANY, _("Decimeters")); 
-	Append(wxID_ANY, _("Centimeters")); 
-	Append(wxID_ANY, _("Millimeters")); 
+	Append(wxID_ANY, _("Kilometers"));
+	Append(wxID_ANY, _("Meters"));
+	Append(wxID_ANY, _("Decimeters"));
+	Append(wxID_ANY, _("Centimeters"));
+	Append(wxID_ANY, _("Millimeters"));
 	AppendSeparator();
-	Append(wxID_ANY, _("Nautical miles")); 
-	Append(wxID_ANY, _("Miles")); 
-	Append(wxID_ANY, _("Yards")); 
-	Append(wxID_ANY, _("Feet")); 
-	Append(wxID_ANY, _("Inches")); 
+	Append(wxID_ANY, _("Nautical miles"));
+	Append(wxID_ANY, _("Miles"));
+	Append(wxID_ANY, _("Yards"));
+	Append(wxID_ANY, _("Feet"));
+	Append(wxID_ANY, _("Inches"));
 	AppendSeparator();
-	Append(wxID_ANY, _("Degrees")); 
+	Append(wxID_ANY, _("Degrees"));
 	*/
 	//add swp coords check mark
 	//TODO: AppendSeparator();
@@ -63,10 +63,10 @@ wxGISCoordinatesFormatMenu::wxGISCoordinatesFormatMenu(const wxString& title, lo
 	//add formats
 	AppendSeparator();
     for(size_t i = 0; i < m_asCoordsMask.GetCount(); ++i)
-		Append(ID_MASKBEG + i, m_asCoordsMask[i]); 
+		Append(ID_MASKBEG + i, m_asCoordsMask[i]);
 	//add change format list dialog
 	AppendSeparator();
-	Append(ID_CHANGEMASKS, _("Change masks")); 
+	Append(ID_CHANGEMASKS, _("Change masks"));
 }
 
 wxGISCoordinatesFormatMenu::~wxGISCoordinatesFormatMenu(void)
@@ -120,7 +120,9 @@ void wxGISCoordinatesFormatMenu::Serialize(bool bStore)
 		if(m_asCoordsMask.GetCount() == 0)
 		{
 			m_asCoordsMask.Add(wxT("dd-mm-ss.ss [W][ ]dd-mm-ss.ss [W]"));
+#ifdef __WXMSW__
 			m_asCoordsMask.Add(wxT("dd°mm'ss.ss\" [W][ ]dd°mm'ss.ss\" [W]"));
+#endif
 			m_asCoordsMask.Add(wxT("dd-mm-ss.ss[ ]dd-mm-ss.ss"));
 			m_asCoordsMask.Add(wxT("ddmmss[ ]ddmmss"));
 			m_asCoordsMask.Add(wxT("d.ddd[tab]d.ddd"));
@@ -151,7 +153,7 @@ void wxGISCoordinatesFormatMenu::OnChangeMasks(wxCommandEvent& event)
 				Delete(i + ID_MASKBEG);
 			m_asCoordsMask = value.GetArrayString();
 			for(size_t i = 0; i < m_asCoordsMask.GetCount(); ++i)
-				Insert(POS_TO_INSERT + i, ID_MASKBEG + i, m_asCoordsMask[i]); 
+				Insert(POS_TO_INSERT + i, ID_MASKBEG + i, m_asCoordsMask[i]);
 
 			Serialize(true);
         }
@@ -171,5 +173,5 @@ void wxGISCoordinatesFormatMenu::PrepareMenu(void)
 		Delete(i + ID_MASKBEG);
 	Serialize(false);
 	for(size_t i = 0; i < m_asCoordsMask.GetCount(); ++i)
-		Insert(POS_TO_INSERT + i, ID_MASKBEG + i, m_asCoordsMask[i]); 
+		Insert(POS_TO_INSERT + i, ID_MASKBEG + i, m_asCoordsMask[i]);
 }

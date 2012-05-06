@@ -76,10 +76,10 @@ bool wxGISRasterDataset::Delete(void)
 {
 	wxCriticalSectionLocker locker(m_CritSect);
     Close();
-    
+
     if(!DeleteFile(m_sPath))
         return false;
-	
+
     char** papszFileList = GetFileList();
     if(papszFileList)
     {
@@ -142,7 +142,7 @@ char **wxGISRasterDataset::GetFileList()
 	case enumRasterPng:
 	case enumRasterGif:
     case enumRasterUnknown:
-    default: 
+    default:
         break;
     }
     //check for world file
@@ -195,7 +195,7 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
 
     CPLString szDirPath = CPLGetPath(m_sPath);
     CPLString szName = CPLGetBasename(m_sPath);
-	CPLString szNewName = ClearExt(sNewName).mb_str(wxConvUTF8);
+	CPLString szNewName(ClearExt(sNewName).mb_str(wxConvUTF8));
 
     Close();
 
@@ -207,12 +207,12 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
     char **papszNewFileList = NULL;
 
     for(int i = 0; papszFileList[i] != NULL; ++i )
-    {		
+    {
         CPLString szNewPath(CPLFormFilename(szDirPath, szNewName, GetExtension(papszFileList[i], szName)));
         papszNewFileList = CSLAddString(papszNewFileList, szNewPath);
         if(!RenameFile(papszFileList[i], papszNewFileList[i]))
 		{
-            // Try to put the ones we moved back. 
+            // Try to put the ones we moved back.
             for( --i; i >= 0; i-- )
                 RenameFile( papszNewFileList[i], papszFileList[i]);
 
@@ -247,7 +247,7 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
     default:
 		break;
     };
-    
+
 	m_sPath = CPLString(CPLFormFilename(szDirPath, szNewName, CPLGetExtension(m_sPath)));
 	CSLDestroy( papszFileList );
 	CSLDestroy( papszNewFileList );
@@ -255,7 +255,7 @@ bool wxGISRasterDataset::Rename(wxString sNewName)
 }
 
 bool wxGISRasterDataset::Open(bool bReadOnly)
-{	
+{
     if(bReadOnly != m_bIsReadOnly)
         Close();
 
@@ -267,7 +267,7 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
 
     m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath, bReadOnly == true ? GA_ReadOnly : GA_Update );
     //bug in FindFileInZip() [gdal-1.6.3\port\cpl_vsil_gzip.cpp]
-	
+
 	if( m_poDataset == NULL )
     {
 		for(size_t i = 0; i < m_sPath.size(); ++i)
@@ -294,7 +294,7 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
         //if(EQUAL(CSLFetchNameValue(papszMetadata, "sensorInfo.satelliteName"), "OV-3"))
         if(papszMetadata && EQUAL(CSLFetchNameValue(papszMetadata, "md_type"), "pvl") && m_poDataset->GetGCPCount() == 0)
         {
-            OGRSpatialReference oOGRSpatialReference(SRS_WKT_WGS84);   
+            OGRSpatialReference oOGRSpatialReference(SRS_WKT_WGS84);
             double adfX[4], adfY[4], adfZ[4];
             adfX[0] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.upperLeftCorner.longitude", "0.0"));
             adfY[0] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.upperLeftCorner.latitude", "0.0"));
@@ -303,14 +303,14 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
             adfY[1] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.upperRightCorner.latitude", "0.0"));
             adfZ[1] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.upperRightCorner.height", "0.0"));
             adfX[2] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.lowerRightCorner.longitude", "0.0"));
-            adfY[2] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.lowerRightCorner.latitude", "0.0"));                    
+            adfY[2] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.lowerRightCorner.latitude", "0.0"));
             adfZ[2] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.lowerRightCorner.height", "0.0"));
             adfX[3] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.lowerLeftCorner.longitude", "0.0"));
-            adfY[3] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.lowerLeftCorner.latitude", "0.0"));   
+            adfY[3] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.lowerLeftCorner.latitude", "0.0"));
             adfZ[3] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.geodeticCorners.lowerLeftCorner.height", "0.0"));
 
             //const char* pszSpacingUnits = CSLFetchNameValueDef(papszMetadata, "productInfo.spacingUnits", "meters");
-            //// trim double quotes. 
+            //// trim double quotes.
             //if( pszSpacingUnits[0] == '"' )
             //    pszSpacingUnits++;
             //if( pszSpacingUnits[strlen(pszSpacingUnits)-1] == '"' )
@@ -324,7 +324,7 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
             //    //calc UTM Zone
                 double dfXCenter = adfX[0] + (adfX[2] - adfX[0]) / 2.0;
                 int nZoneNo = ceil( (180.0 + dfXCenter) / 6.0 );
-                OGRSpatialReference oDstOGRSpatialReference(SRS_WKT_WGS84); 
+                OGRSpatialReference oDstOGRSpatialReference(SRS_WKT_WGS84);
                 oDstOGRSpatialReference.SetUTM(nZoneNo, adfY[0] > 0);
 
                 OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( &oOGRSpatialReference, &oDstOGRSpatialReference);
@@ -343,12 +343,12 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
             //            adfGeoTransform[3] = dfULY;
             //            CPLErr eErr = m_poDataset->SetGeoTransform(adfGeoTransform);
 
-                        GDAL_GCP *pasGCPList = (GDAL_GCP *) CPLCalloc(sizeof(GDAL_GCP), 4);                
+                        GDAL_GCP *pasGCPList = (GDAL_GCP *) CPLCalloc(sizeof(GDAL_GCP), 4);
                         GDALInitGCPs( 4, pasGCPList );
                         char *pszProjection = NULL;
 
                         if(m_poDataset)
-                        {                            
+                        {
                             if( oDstOGRSpatialReference.exportToWkt( &pszProjection ) == OGRERR_NONE )
                             {
                                 m_poDataset->SetProjection(pszProjection);
@@ -356,7 +356,7 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
 
                             m_nXSize = m_poDataset->GetRasterXSize();
                             m_nYSize = m_poDataset->GetRasterYSize();
-                                            
+
                             pasGCPList[0].pszId = CPLStrdup( "1" );
                             pasGCPList[0].dfGCPX = adfX[0];
                             pasGCPList[0].dfGCPY = adfY[0];
@@ -400,7 +400,7 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
                         GDALDeinitGCPs( 4, pasGCPList );
 
                         CPLFree( pasGCPList );
-                        CPLFree( pszProjection );                    
+                        CPLFree( pszProjection );
                     }
                     OCTDestroyCoordinateTransformation(poCT);
                 }
@@ -411,7 +411,7 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
                 //{
                 //    GDALClose(m_poDataset);
                 //    m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath, GA_Update );
-                //}                
+                //}
             //    //if degrees use spacing and use WGS84
             //    adfGeoTransform[1] = CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.pixelSpacing", "0.0"));
             //    adfGeoTransform[5] = -CPLAtof(CSLFetchNameValueDef(papszMetadata, "productInfo.lineSpacing", "0.0"));
@@ -421,14 +421,14 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
                 //char *pszProjection = NULL;
                 //if( oOGRSpatialReference.exportToWkt( &pszProjection ) == OGRERR_NONE )
                 //{
-                //    m_poDataset->SetProjection(pszProjection);                    
+                //    m_poDataset->SetProjection(pszProjection);
                 //}
-                
+
                 //m_nXSize = m_poDataset->GetRasterXSize();
                 //m_nYSize = m_poDataset->GetRasterYSize();
 
                 //int nGCPCount(4);
-                //GDAL_GCP *pasGCPList = (GDAL_GCP *) CPLCalloc(sizeof(GDAL_GCP),nGCPCount);                
+                //GDAL_GCP *pasGCPList = (GDAL_GCP *) CPLCalloc(sizeof(GDAL_GCP),nGCPCount);
                 //GDALInitGCPs( nGCPCount, pasGCPList );
                 //
                 //pasGCPList[0].pszId = CPLStrdup( "1" );
@@ -468,12 +468,12 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
                 //{
                 //    GDALClose(m_poDataset);
                 //    m_poDataset = (GDALDataset *) GDALOpenShared( m_sPath, GA_ReadOnly );
-                //} 
+                //}
             //}
         }
 
         bHasGeoTransform = true;
-        if ((adfGeoTransform[2] != 0.0 || adfGeoTransform[4] != 0.0 ) || m_poDataset->GetGCPCount() > 0)// adfGeoTransform[1] < 0.0 || adfGeoTransform[5] > 0.0 || 
+        if ((adfGeoTransform[2] != 0.0 || adfGeoTransform[4] != 0.0 ) || m_poDataset->GetGCPCount() > 0)// adfGeoTransform[1] < 0.0 || adfGeoTransform[5] > 0.0 ||
         {
             bHasGeoTransform = false;
             m_poMainDataset = m_poDataset;
@@ -506,7 +506,7 @@ bool wxGISRasterDataset::Open(bool bReadOnly)
             m_bHasOverviews = true;
 
         double dfMin, dfMax, dfMean, dfStdDev;
-        CPLErr eErr = pBand->GetStatistics(FALSE, FALSE, &dfMin, &dfMax, &dfMean, &dfStdDev ); 
+        CPLErr eErr = pBand->GetStatistics(FALSE, FALSE, &dfMin, &dfMax, &dfMean, &dfStdDev );
         if( eErr == CE_None )
             m_bHasStats =  true;
 
@@ -662,7 +662,7 @@ bool wxGISRasterDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
         szCopyFileName = szNewDestFileName;
         if(!CopyFile(szNewDestFileName, papszFileList[i], pTrackCancel))
 		{
-            // Try to put the ones we moved back. 
+            // Try to put the ones we moved back.
             for( --i; i >= 0; i-- )
                 DeleteFile( papszFileCopiedList[i] );
 
@@ -671,7 +671,7 @@ bool wxGISRasterDataset::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
             return false;
 		}
     }
-    
+
     bool bRet = true;
     switch(m_nSubType)
     {
@@ -720,7 +720,7 @@ bool wxGISRasterDataset::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
         papszMovedFileList = CSLAddString(papszMovedFileList, szNewDestFileName);
         if(!MoveFile(szNewDestFileName, papszFileList[i], pTrackCancel))
 		{
-            // Try to put the ones we moved back. 
+            // Try to put the ones we moved back.
             pTrackCancel->Reset();
             for( --i; i >= 0; i-- )
                 MoveFile( papszFileList[i], papszMovedFileList[i], pTrackCancel);

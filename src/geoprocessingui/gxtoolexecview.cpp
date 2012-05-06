@@ -68,10 +68,10 @@ int wxCALLBACK TasksCompareFunction(wxIntPtr item1, wxIntPtr item2, wxIntPtr sor
     switch(psortdata->currentSortCol)
     {
     case 0:
-        nRes = (pTask1->GetPriority() > pTask2->GetPriority()) == true ? 1 : -1; 
+        nRes = (pTask1->GetPriority() > pTask2->GetPriority()) == true ? 1 : -1;
         break;
     case 1:
-        nRes = pObject1->GetName().CmpNoCase(pObject2->GetName()); 
+        nRes = pObject1->GetName().CmpNoCase(pObject2->GetName());
         break;
     case 2:
         nRes = (pTask1->GetStart() > pTask2->GetStart()) == true ? 1 : -1;
@@ -83,7 +83,7 @@ int wxCALLBACK TasksCompareFunction(wxIntPtr item1, wxIntPtr item2, wxIntPtr sor
         nRes = (pTask1->GetDonePercent() > pTask2->GetDonePercent()) == true ? 1 : -1;
         break;
     case 5:
-        nRes = pTask1->GetLastMessage().CmpNoCase(pTask2->GetLastMessage()); 
+        nRes = pTask1->GetLastMessage().CmpNoCase(pTask2->GetLastMessage());
         break;
     };
    return nRes * (psortdata->bSortAsc == 0 ? -1 : 1);
@@ -95,7 +95,7 @@ wxGxToolExecuteView::wxGxToolExecuteView(void)
 	m_nParentGxObjectID = wxNOT_FOUND;
 }
 
-wxGxToolExecuteView::wxGxToolExecuteView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : m_bSortAsc(true), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(wxNOT_FOUND), m_currentSortCol(0), m_pSelection(NULL), m_bHideDone(false)//wxListCtrl(parent, id, pos, size, style), 
+wxGxToolExecuteView::wxGxToolExecuteView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : m_bSortAsc(true), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(wxNOT_FOUND), m_currentSortCol(0), m_pSelection(NULL), m_bHideDone(false)//wxListCtrl(parent, id, pos, size, style),
 {
     m_pXmlConf = NULL;
 	m_nParentGxObjectID = wxNOT_FOUND;
@@ -118,12 +118,12 @@ bool wxGxToolExecuteView::Create(wxWindow* parent, wxWindowID id, const wxPoint&
     m_nParentGxObjectID = wxNOT_FOUND;
     m_currentSortCol = 0;
     m_pSelection = NULL;
-    
+
     m_sViewName = wxString(_("Tool Execute View"));
 
 
     wxListCtrl::Create(parent, TOOLEXECUTECTRLID, pos, size, TOOLEXECVIEWSTYLE);
-    
+
 	InsertColumn(0, _("Priority"), wxLIST_FORMAT_LEFT, 60);      //priority
     InsertColumn(1, _("Tool name"), wxLIST_FORMAT_LEFT, 150);    //toolname
     InsertColumn(2, _("Start"), wxLIST_FORMAT_LEFT, 100);        //begin
@@ -138,9 +138,9 @@ bool wxGxToolExecuteView::Create(wxWindow* parent, wxWindowID id, const wxPoint&
     wxBitmap SmallA(small_arrow_xpm);// > arrow
     wxImage SmallImg = SmallA.ConvertToImage();
     SmallImg = SmallImg.Rotate90();
-    wxBitmap SmallDown(SmallImg); 
+    wxBitmap SmallDown(SmallImg);
     SmallImg = SmallImg.Mirror(false);
-    wxBitmap SmallUp(SmallImg); 
+    wxBitmap SmallUp(SmallImg);
 
 	m_ImageList.Add(wxBitmap(SmallDown));
 	m_ImageList.Add(wxBitmap(SmallUp));
@@ -219,9 +219,9 @@ void wxGxToolExecuteView::Serialize(wxXmlNode* pRootNode, bool bStore)
             if(col_counter >= GetColumnCount())
                 break;
 		    wxString token = tkz.GetNextToken();
-		    //token.Replace(wxT("|"), wxT(""));	
+		    //token.Replace(wxT("|"), wxT(""));
 		    int nWidth = wxAtoi(token);
-            SetColumnWidth(col_counter, nWidth); 
+            SetColumnWidth(col_counter, nWidth);
             col_counter++;
 	    }
 
@@ -252,29 +252,29 @@ void wxGxToolExecuteView::AddObject(IGxObject* pObject)
         // enumGISTaskWork = 1,    enumGISTaskDone = 2,    enumGISTaskQuered = 3,     enumGISTaskPaused = 4,     enumGISTaskError = 5
         //4 - error, 5 - warning, 6 - work, 7 - queued, 8 - done, 9 - paused, 10 - deleted
         char nIcon = wxNOT_FOUND;
-        wxColor color;
+        wxColour color;
         switch(pGxTask->GetState())
         {
         case enumGISTaskWork:
-            color = wxColor(RGB(230,255,230));
+            color = wxColour(230,255,230);
             nIcon = 6;
             break;
         case enumGISTaskDone:
             if(m_bHideDone)
                 return;
-            color = wxColor(RGB(230,230,255));
+            color = wxColour(230,230,255);
             nIcon = 8;
             break;
         case enumGISTaskQuered:
-            color = wxColor(RGB(255,230,255));
+            color = wxColour(255,230,255);
             nIcon = 7;
             break;
         case enumGISTaskPaused:
-            color = wxColor(RGB(255,255,230));
+            color = wxColour(255,255,230);
             nIcon = 9;
             break;
         case enumGISTaskError:
-            color = wxColor(RGB(255,230,230));
+            color = wxColour(255,230,230);
             nIcon = 4;
             break;
         };
@@ -504,27 +504,27 @@ void wxGxToolExecuteView::OnObjectChanged(wxGxCatalogEvent& event)
         // enumGISTaskWork = 1,    enumGISTaskDone = 2,    enumGISTaskQuered = 3,     enumGISTaskPaused = 4,     enumGISTaskError = 5
         //4 - error, 5 - warning, 6 - work, 7 - queued, 8 - done, 9 - paused, 10 - deleted
         char nIcon = wxNOT_FOUND;
-        wxColor color;
+        wxColour color;
         switch(pGxTask->GetState())
         {
         case enumGISTaskWork:
-            color = wxColor(RGB(230,255,230));
+            color = wxColour(230,255,230);
             nIcon = 6;
             break;
         case enumGISTaskDone:
-            color = wxColor(RGB(230,230,255));
+            color = wxColour(230,230,255);
             nIcon = 8;
             break;
         case enumGISTaskQuered:
-            color = wxColor(RGB(255,230,255));
+            color = wxColour(255,230,255);
             nIcon = 7;
             break;
         case enumGISTaskPaused:
-            color = wxColor(RGB(255,255,230));
+            color = wxColour(255,255,230);
             nIcon = 9;
             break;
         case enumGISTaskError:
-            color = wxColor(RGB(255,230,230));
+            color = wxColour(255,230,230);
             nIcon = 4;
             break;
         };
@@ -578,7 +578,7 @@ void wxGxToolExecuteView::RefreshAll(void)
 	{
 		AddObject(pArr->at(i));
 	}
-	    
+
 	wxListCtrl::Refresh();
 
     //SORTTASKDATA sortdata = {m_bSortAsc, m_currentSortCol};
@@ -679,7 +679,7 @@ void wxGxToolExecuteView::OnBeginDrag(wxListEvent& event)
 	{
 
 		wxFileDataObject *pMyData = new wxFileDataObject();
-        //TODO: special task clipboard format support 
+        //TODO: special task clipboard format support
         //wxDataFormat frm(wxT("application/x-vnd.wxgis.task.uri"));
 		//if(frm.GetType() != wxDF_INVALID)
 		//	pMyData->SetFormat(frm);
@@ -688,19 +688,19 @@ void wxGxToolExecuteView::OnBeginDrag(wxListEvent& event)
 
 	    wxDropSource dragSource( this );
 		dragSource.SetData( *pMyData );
-		wxDragResult result = dragSource.DoDragDrop( TRUE );  
+		wxDragResult result = dragSource.DoDragDrop( TRUE );
 		wxDELETE(pMyData);
 	}
 }
 
 wxDragResult wxGxToolExecuteView::OnDragOver(wxCoord x, wxCoord y, wxDragResult def)
-{    
+{
     SetItemState(m_HighLightItem, 0, wxLIST_STATE_DROPHILITED);
     wxPoint pt(x, y);
 	unsigned long nFlags(0);
 	long nItemId = HitTest(pt, (int &)nFlags);
 	if(nItemId != wxNOT_FOUND && (nFlags & wxLIST_HITTEST_ONITEM))
-	{ 
+	{
         wxSize sz = GetClientSize();
         if(DNDSCROLL > y)//scroll up
             ScrollLines(-1);
@@ -779,7 +779,7 @@ void wxGxToolExecuteView::FillDataArray(wxArrayString &saDataArr)
 	    if(pGxTask == NULL)
             continue;
         saDataArr.Add(wxString::Format(wxT("TaskID: %d"), pGxTask->GetTaskID()));
-    }	
+    }
 }
 
 

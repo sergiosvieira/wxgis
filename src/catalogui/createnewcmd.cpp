@@ -60,7 +60,7 @@ wxString wxGISCreateNewCmd::GetCaption(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("&Remote connection"));
 		default:
 			return wxEmptyString;
@@ -71,7 +71,7 @@ wxString wxGISCreateNewCmd::GetCategory(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("New"));
 		default:
 			return wxString(_("[No category]"));
@@ -129,7 +129,7 @@ wxString wxGISCreateNewCmd::GetMessage(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("Create new remote connection"));
 		default:
 			return wxEmptyString;
@@ -140,7 +140,7 @@ void wxGISCreateNewCmd::OnClick(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
             {
 			    IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			    if(pGxApp)
@@ -155,7 +155,7 @@ void wxGISCreateNewCmd::OnClick(void)
                             //create folder
 							IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
 							CPLString pszConnFolder = pGxObject->GetInternalName();
-							CPLString pszConnName = CheckUniqName(pszConnFolder, wxString(_("new remote connection")), wxString(wxT("xconn")));
+							CPLString pszConnName(CheckUniqName(pszConnFolder, wxString(_("new remote connection")), wxString(wxT("xconn"))).mb_str(wxConvUTF8));
 
 							wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
 							wxGISRemoteConnDlg dlg(CPLFormFilename(pszConnFolder, pszConnName, "xconn"), pWnd);
@@ -204,7 +204,7 @@ wxString wxGISCreateNewCmd::GetTooltip(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("Create new remote connection"));
 		default:
 			return wxEmptyString;

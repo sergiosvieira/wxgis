@@ -100,7 +100,7 @@ GPParameters wxGISGPSubRasterByVectorTool::GetParameterInfo(void)
 
 		m_paParam.Add(static_cast<IGPParameter*>(pParam3));
 
-		//TODO: create group 
+		//TODO: create group
 
         //file name mask or field from vector file
 
@@ -112,7 +112,7 @@ GPParameters wxGISGPSubRasterByVectorTool::GetParameterInfo(void)
 
 		//SQL select
 
-        //wxGxRasterFilter* pFilter = nullptr, GDALDataType eOutputType = GDT_Unknown, int nBandCount = 0, int *panBandList = nullptr, bool bUseCounter = true, int nCounterBegin = -1, int nFieldNo = -1, double dfOutResX = -1, double dfOutResY = -1, bool bCopyNodata = false, bool bSkipSourceMetadata = false, char** papszOptions = nullptr
+        //wxGxRasterFilter* pFilter = NULL, GDALDataType eOutputType = GDT_Unknown, int nBandCount = 0, int *panBandList = NULL, bool bUseCounter = true, int nCounterBegin = -1, int nFieldNo = -1, double dfOutResX = -1, double dfOutResY = -1, bool bCopyNodata = false, bool bSkipSourceMetadata = false, char** papszOptions = NULL
 
     }
     return m_paParam;
@@ -224,18 +224,18 @@ bool wxGISGPSubRasterByVectorTool::Execute(ITrackCancel* pTrackCancel)
 
     bool bRes = true;
 
-    wxGxRasterFilter* pFilter = new wxGxRasterFilter(enumRasterTiff); 
-    GDALDataType eOutputType = GDT_Byte; 
+    wxGxRasterFilter* pFilter = new wxGxRasterFilter(enumRasterTiff);
+    GDALDataType eOutputType = GDT_Byte;
     int nBandCount = 0;
-    int *panBandList = nullptr;
+    int *panBandList = NULL;
     bool bUseCounter = false;
-    int nCounterBegin = -1; 
+    int nCounterBegin = -1;
     int nFieldNo = 0;
     double dfOutResX = -1;
-    double dfOutResY = -1; 
+    double dfOutResY = -1;
     bool bCopyNodata = false;
     bool bSkipSourceMetadata = false;
-    char** papszOptions = nullptr;
+    char** papszOptions = NULL;
     papszOptions = CSLAddNameValue(papszOptions, "DEST_RESAMPLING", "near");
     papszOptions = CSLAddNameValue(papszOptions, "COMPRESS", "LZW");
     papszOptions = CSLAddNameValue(papszOptions, "PREDICTOR", "2");

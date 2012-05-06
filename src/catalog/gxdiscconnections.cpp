@@ -56,7 +56,7 @@ void wxGxDiscConnections::Refresh(void)
 	LoadChildren();
     m_pCatalog->ObjectRefreshed(GetID());
 }
- 
+
 void wxGxDiscConnections::Init(wxXmlNode* const pConfigNode)
 {
     wxXmlDocument doc;
@@ -70,7 +70,7 @@ void wxGxDiscConnections::Init(wxXmlNode* const pConfigNode)
 			wxString sPath = pDiscConn->GetAttribute(wxT("path"), ERR);
 			if(sPath != ERR)
 			{
-                CONN_DATA data = {sName, sPath.mb_str(wxConvUTF8)};
+                CONN_DATA data = {sName, CPLString(sPath.mb_str(wxConvUTF8))};
                 m_aConnections.push_back(data);
 			}
 			pDiscConn = pDiscConn->GetNext();
@@ -82,7 +82,7 @@ void wxGxDiscConnections::Init(wxXmlNode* const pConfigNode)
         wxArrayString arr;
 #ifdef __WXMSW__
 		arr = wxFSVolumeBase::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE);//| wxFS_VOL_REMOTE
-#else 
+#else
         //linux paths
         wxStandardPaths stp;
         arr.Add(wxT("/"));
@@ -91,7 +91,7 @@ void wxGxDiscConnections::Init(wxXmlNode* const pConfigNode)
 #endif
         for(size_t i = 0; i < arr.size(); ++i)
 		{
-            CONN_DATA data = {arr[i], arr[i].mb_str(wxConvUTF8)};
+            CONN_DATA data = {arr[i], CPLString(arr[i].mb_str(wxConvUTF8))};
             m_aConnections.push_back(data);
 		}
 	}
@@ -135,7 +135,7 @@ bool wxGxDiscConnections::DeleteChild(IGxObject* pChild)
 void wxGxDiscConnections::LoadChildren(void)
 {
 	if(m_bIsChildrenLoaded)
-		return;	
+		return;
 
     for(size_t i = 0; i < m_aConnections.size(); ++i)
     {
@@ -169,7 +169,7 @@ IGxObject* wxGxDiscConnections::ConnectFolder(wxString sPath)
         IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
         if(AddChild(pGxObject))
         {
-		    m_pCatalog->ObjectAdded(pGxObject->GetID());            
+		    m_pCatalog->ObjectAdded(pGxObject->GetID());
             StoreConnections();
             return pGxObject;
         }
@@ -229,6 +229,6 @@ void wxGxDiscConnections::StoreConnections(void)
         }
     }
     doc.Save(m_sUserConfig);
-//#endif  
+//#endif
 }
 

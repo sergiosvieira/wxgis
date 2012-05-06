@@ -36,6 +36,11 @@ class WXDLLIMPEXP_GIS_CLT wxGxRemoteConnection :
     public IGxObjectEdit,
 	public IGxDataset
 {
+     typedef struct _pgtabledata{
+        bool bHasGeometry;
+        CPLString sTableName;
+        CPLString sTableSchema;
+    }PGTABLEDATA;
 public:
 	wxGxRemoteConnection(CPLString soPath, wxString Name);
 	virtual ~wxGxRemoteConnection(void);
@@ -66,7 +71,7 @@ protected:
 	//wxGxRemoteConnection
 	virtual void LoadChildren(void);
 	virtual void EmptyChildren(void);
-    virtual wxGxRemoteDBSchema* GetNewRemoteDBSchema(CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon);
+    virtual wxGxRemoteDBSchema* GetNewRemoteDBSchema(const CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon);
 protected:
     wxGISPostgresDataSourceSPtr m_pwxGISRemoteConn;
     wxGISDatasetSPtr m_pwxGISDataset;
@@ -85,7 +90,7 @@ class WXDLLIMPEXP_GIS_CLT wxGxRemoteDBSchema :
 {
     friend class wxGxRemoteConnection;
 public:
-	wxGxRemoteDBSchema(wxString &sName, wxGISPostgresDataSourceSPtr pwxGISRemoteConn);
+	wxGxRemoteDBSchema(const wxString &sName, wxGISPostgresDataSourceSPtr pwxGISRemoteConn);
 	virtual ~wxGxRemoteDBSchema(void);
 	//IGxObject
 	virtual wxString GetName(void){return m_sName;};

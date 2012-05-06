@@ -37,14 +37,16 @@
 #include "wx/sizer.h"
 #include "wx/choice.h"
 #include "wx/panel.h"
+#include <wx/imaglist.h>
 
 #include "wxgis/framework/framework.h"
 #include "wxgis/core/config.h"
 
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISMiscPropertyPage
 ///////////////////////////////////////////////////////////////////////////////
-class wxGISMiscPropertyPage : 
+class wxGISMiscPropertyPage :
     public IPropertyPage
 {
     DECLARE_DYNAMIC_CLASS(wxGISMiscPropertyPage)
@@ -52,7 +54,7 @@ public:
     wxGISMiscPropertyPage(void);
 	~wxGISMiscPropertyPage();
     virtual bool Create(IFrameApplication* application, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Misc_Panel"));
-//  IPropertyPage    
+//  IPropertyPage
     virtual wxString GetPageName(void){return wxString(_("Miscellaneous"));};
     virtual void Apply(void);
     //
@@ -72,7 +74,7 @@ protected:
 		ID_LOGPATH,
 		ID_OPENLOGPATH,
 	};
-	
+
 	wxStaticText* m_staticText1;
 	wxTextCtrl* m_LocalePath;
 	wxBitmapButton* m_bpOpenLocPath;

@@ -23,11 +23,13 @@
 
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 
+#include <wx/imaglist.h>
+
 class WXDLLIMPEXP_GIS_GPU wxGISTaskCmd :
     public ICommand
 {
     DECLARE_DYNAMIC_CLASS(wxGISTaskCmd)
-    
+
 public:
 	wxGISTaskCmd(void);
 	virtual ~wxGISTaskCmd(void);

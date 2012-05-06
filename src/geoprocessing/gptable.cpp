@@ -120,18 +120,11 @@ bool MeanValByColumn(wxGISTableSPtr pDSet, CPLString sPath, wxString sName, std:
         return false;
     }
 
-	struct Val
-	{
-		wxVariant sum; 
-		int count;
-		OGRFieldType nType;
-	};
-
-	std::map<CPLString, std::vector<Val>*> mapped_data;
+	std::map<CPLString, LPVALARRAY> mapped_data;
 
  	OGRFeatureSPtr poFeature;
 	pDSet->Reset();
-    while((poFeature = pDSet->Next()) != NULL)	
+    while((poFeature = pDSet->Next()) != NULL)
     {
         if(pTrackCancel && !pTrackCancel->Continue())
 			return false;
@@ -140,7 +133,7 @@ bool MeanValByColumn(wxGISTableSPtr pDSet, CPLString sPath, wxString sName, std:
 		bool bCreated = false;
 		if(mapped_data[szBase] == NULL)
 		{
-			mapped_data[szBase] = new std::vector<Val>;
+			mapped_data[szBase] = new VALARRAY;
 			bCreated = true;
 		}
 		for(size_t i = 0; i < FieldMergeData.size(); ++i)
@@ -174,7 +167,7 @@ bool MeanValByColumn(wxGISTableSPtr pDSet, CPLString sPath, wxString sName, std:
 					DefVal = wxVariant();
 					break;
 				}
-				struct Val in_v = {DefVal, 0, pFldDefn->GetType()};
+				VAL in_v = {DefVal, 0, pFldDefn->GetType()};
 				mapped_data[szBase]->push_back(in_v);
 			}
 			switch(pFldDefn->GetType())
@@ -321,7 +314,7 @@ bool MeanValByColumn(wxGISTableSPtr pDSet, CPLString sPath, wxString sName, std:
 		//	maped_data[dt].max_temp = dTMax;
 		//if(dRRR != 0 && (maped_data[dt].max_rrr == 0 || maped_data[dt].max_rrr < dRRR))
 		//	maped_data[dt].max_rrr = dRRR;
-		
+
 
 	}
 
@@ -332,7 +325,7 @@ bool MeanValByColumn(wxGISTableSPtr pDSet, CPLString sPath, wxString sName, std:
 		pProgress->SetRange(mapped_data.size());
 
 	int nCounter(0);
-	for(std::map<CPLString, std::vector<Val>*>::iterator it = mapped_data.begin(); it != mapped_data.end(); ++it)
+	for(std::map<CPLString, LPVALARRAY>::iterator it = mapped_data.begin(); it != mapped_data.end(); ++it)
 	{
 		if(pProgress)
 			pProgress->SetValue(nCounter);
@@ -375,7 +368,7 @@ bool MeanValByColumn(wxGISTableSPtr pDSet, CPLString sPath, wxString sName, std:
 			switch(it->second->operator [](i).nType)
 			{
 			case OFTInteger:
-				poFeature->SetField(i,Val.GetInteger());
+				poFeature->SetField(i, (int)Val.GetInteger());
 				break;
 			case OFTReal:
 				poFeature->SetField(i,Val.GetDouble());

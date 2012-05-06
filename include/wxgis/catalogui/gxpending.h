@@ -22,6 +22,8 @@
 
 #include "wxgis/catalogui/catalogui.h"
 
+#include <wx/imaglist.h>
+
 class WXDLLIMPEXP_GIS_CLU wxGxPendingUI;
 
 /** \class wxPendingUpdateThread gxpending.h
@@ -41,7 +43,7 @@ private:
     \brief The pending item in tree or content view
 */
 
-class WXDLLIMPEXP_GIS_CLU wxGxPendingUI : 
+class WXDLLIMPEXP_GIS_CLU wxGxPendingUI :
     public IGxObject,
     public IGxObjectUI
 {

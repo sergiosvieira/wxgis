@@ -41,5 +41,14 @@ typedef struct _FieldMergeData
 	wxGISFieldMergeOperator nOp;
 } FIELDMERGEDATA;
 
+typedef struct Val
+{
+	wxVariant sum;
+	int count;
+	OGRFieldType nType;
+} VAL;
+
+typedef std::vector<VAL> VALARRAY, *LPVALARRAY;
+
 wxGISTableSPtr WXDLLIMPEXP_GIS_GP CreateTable(CPLString sPath, wxString sName, wxString sExt, wxString sDriver, OGRFeatureDefn *poFields, wxGISEnumTableDatasetType nType = enumTableUnknown, char ** papszDataSourceOptions = NULL, char ** papszLayerOptions = NULL);
 bool WXDLLIMPEXP_GIS_GP MeanValByColumn(wxGISTableSPtr pDSet, CPLString sPath, wxString sName, std::vector<FIELDMERGEDATA> &FieldMergeData, IGxObjectFilter* pFilter, wxGISQueryFilter* pQFilter, ITrackCancel* pTrackCancel);

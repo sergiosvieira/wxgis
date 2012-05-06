@@ -92,7 +92,7 @@ bool wxGxArchive::Rename(wxString NewName)
 	wxString sNewPath = PathName.GetFullPath();
 
 	EmptyChildren();
-    CPLString szNewPath = sNewPath.mb_str(wxConvUTF8);
+    CPLString szNewPath(sNewPath.mb_str(wxConvUTF8));
     if(RenameFile(m_sPath, szNewPath))
 	{
 		m_sPath = szType;
@@ -160,7 +160,7 @@ void wxGxArchiveFolder::LoadChildren(void)
     CSLDestroy( papszItems );
 
     //load names
-	GxObjectArray Array;	
+	GxObjectArray Array;
 	if(m_pCatalog && m_pCatalog->GetChildren(m_sPath, papszFileList, Array))
 	{
 		for(size_t i = 0; i < Array.size(); ++i)
@@ -171,7 +171,7 @@ void wxGxArchiveFolder::LoadChildren(void)
 		}
 	}
     CSLDestroy( papszFileList );
-    
+
 	m_bIsChildrenLoaded = true;
 }
 

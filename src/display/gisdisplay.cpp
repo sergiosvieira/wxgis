@@ -22,6 +22,8 @@
 #include "wxgis/datasource/vectorop.h"
 #include "wxgis/display/displaytransformation.h"
 
+#include <wx/graphics.h>
+
 wxGISDisplay::wxGISDisplay(void)
 {
 	//default background color
@@ -70,7 +72,7 @@ wxGISDisplay::~wxGISDisplay(void)
     for(size_t i = 0; i < m_saLayerCaches.size(); ++i)
 	{
 		cairo_destroy(m_saLayerCaches[i].pCairoContext);
-		cairo_surface_destroy(m_saLayerCaches[i].pCairoSurface);		
+		cairo_surface_destroy(m_saLayerCaches[i].pCairoSurface);
 	}
 	wxDELETE(m_pMatrix);
 	wxDELETE(m_pDisplayMatrix);
@@ -86,7 +88,7 @@ void wxGISDisplay::Clear()
 	    for(size_t i = 1; i < m_nLastCacheID; ++i)
 	    {
 		    cairo_destroy(m_saLayerCaches[i].pCairoContext);
-		    cairo_surface_destroy(m_saLayerCaches[i].pCairoSurface);		
+		    cairo_surface_destroy(m_saLayerCaches[i].pCairoSurface);
 	    }
         m_saLayerCaches.erase(m_saLayerCaches.begin() + 1, m_saLayerCaches.begin() + m_nLastCacheID);
     }
@@ -129,24 +131,29 @@ void wxGISDisplay::Clear()
 
 cairo_t* wxGISDisplay::CreateContext(wxDC* dc)
 {
+    cairo_t *cr(NULL);
 #ifdef __WXMSW__
 //#if CAIRO_HAS_WIN32_SURFACE
      HDC hdc = (HDC)dc->GetHDC();
-     cairo_t *cr = cairo_create(cairo_win32_surface_create( hdc ));
+     cr = cairo_create(cairo_win32_surface_create( hdc ));
      return cr;
 #endif
 
 #ifdef __WXGTK__
 //#ifdef GDK_WINDOWING_X11
-     GdkDrawable *drawable = dc->m_window;
-     cairo_t *cr = gdk_cairo_create( drawable ) ;
-     return cr;
+     //wxGCDC gdc(dc);
+     wxGraphicsContext* gc = dc->GetGraphicsContext();
+     //wxGCDC* gcdc = wxDynamicCast(dc, wxGCDC);
+     if(gc)
+          cr =  (cairo_t*)gc->GetNativeContext();;
+     //GdkDrawable *drawable = dc->m_window;
+     //cr = gdk_cairo_create( drawable ) ;
 #endif
-     return NULL;
+     return cr;
 }
 
 void wxGISDisplay::OnEraseBackground(void)
-{	
+{
 	wxCriticalSectionLocker locker(m_CritSect);
 	cairo_set_source_rgb(m_saLayerCaches[0].pCairoContext, m_stBackGroudnColour.dRed, m_stBackGroudnColour.dGreen, m_stBackGroudnColour.dBlue);
 	cairo_paint(m_saLayerCaches[0].pCairoContext);
@@ -166,11 +173,11 @@ void wxGISDisplay::Output(wxDC* pDC, wxGISPointsArray ClipGeometry)
 	cairo_set_operator (cr, CAIRO_OPERATOR_SOURCE);
 	if(ClipGeometry.GetCount() > 0)//x1 && y1 && x2 && y2)
 	{
-		cairo_move_to(cr, ClipGeometry[0].x, ClipGeometry[0].y);
+		cairo_move_to(cr, ClipGeometry[0]->x, ClipGeometry[0]->y);
 		for(size_t i = 1; i < ClipGeometry.GetCount(); ++i)
-			cairo_line_to(cr, ClipGeometry[i].x, ClipGeometry[i].y);
+			cairo_line_to(cr, ClipGeometry[i]->x, ClipGeometry[i]->y);
 		//close path
-		cairo_line_to(cr, ClipGeometry[0].x, ClipGeometry[0].y);
+		cairo_line_to(cr, ClipGeometry[0]->x, ClipGeometry[0]->y);
 		cairo_clip(cr);
 		cairo_new_path (cr);
 	}
@@ -180,7 +187,7 @@ void wxGISDisplay::Output(wxDC* pDC, wxGISPointsArray ClipGeometry)
     cairo_destroy (cr);
 }
 
-void wxGISDisplay::ZoomingDraw(wxRect &rc, wxDC* pDC)
+void wxGISDisplay::ZoomingDraw(const wxRect& rc, wxDC* pDC)
 {
 	wxCriticalSectionLocker locker(m_CritSect);
 	cairo_surface_t *surface;
@@ -212,7 +219,7 @@ void wxGISDisplay::WheelingDraw(double dZoom, wxDC* pDC)
 	if(IsDoubleEquil(dZoom, 1)) // no zoom
 	{
 		cairo_set_source_surface (cr, m_saLayerCaches[m_nCurrentLayer].pCairoSurface, -m_dOrigin_X, -m_dOrigin_Y);
-		cairo_set_operator (cr, CAIRO_OPERATOR_SOURCE);	
+		cairo_set_operator (cr, CAIRO_OPERATOR_SOURCE);
 	}
 	else if(dZoom > 1) // zoom in
 	{
@@ -410,12 +417,12 @@ void wxGISDisplay::SetDeviceFrame(wxRect &rc)
 	m_CurrentBoundsRotated = m_CurrentBounds;
 	if(!IsDoubleEquil(m_dAngleRad, 0.0))
 	{
-		RotateEnvelope(m_CurrentBoundsRotated, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);	
+		RotateEnvelope(m_CurrentBoundsRotated, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);
 		SetEnvelopeRatio(m_CurrentBoundsRotated, m_dFrameRatio);//test
 	}
 	m_CurrentBoundsX8 = m_CurrentBoundsRotated;
 	IncreaseEnvelope(m_CurrentBoundsX8, 8);
-	
+
     cairo_destroy (m_cr_tmp);
     cairo_surface_destroy (m_surface_tmp);
 
@@ -432,7 +439,7 @@ wxRect wxGISDisplay::GetDeviceFrame(void)
 	return m_oDeviceFrameRect;
 }
 
-void wxGISDisplay::SetBounds(OGREnvelope& Bounds)
+void wxGISDisplay::SetBounds(const OGREnvelope& Bounds)
 {
 	//update bounds to frame ratio
 	m_RealBounds = Bounds;
@@ -444,7 +451,7 @@ void wxGISDisplay::SetBounds(OGREnvelope& Bounds)
 	m_CurrentBoundsRotated = m_CurrentBounds;
 	if(!IsDoubleEquil(m_dAngleRad, 0.0))
 	{
-		RotateEnvelope(m_CurrentBoundsRotated, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);	
+		RotateEnvelope(m_CurrentBoundsRotated, m_dAngleRad, m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);
 		SetEnvelopeRatio(m_CurrentBoundsRotated, m_dFrameRatio);//test
 	}
 	m_CurrentBoundsX8 = m_CurrentBoundsRotated;
@@ -482,16 +489,16 @@ void wxGISDisplay::InitTransformMatrix(void)
 	double dWorldDeltaY = dWorldCenterY + m_CurrentBounds.MinY;
 
 	double dWorldDeltaXSt = m_dScale * dWorldDeltaX;// + m_dAngleRad * dWorldDeltaY;
-	double dWorldDeltaYSt = m_dScale * dWorldDeltaY;//m_dAngleRad * dWorldDeltaX + 
+	double dWorldDeltaYSt = m_dScale * dWorldDeltaY;//m_dAngleRad * dWorldDeltaX +
 
 	double dCenterX = m_dCacheCenterX - dWorldDeltaXSt;//(dWorldCenterX + m_CurrentBounds.MinX) * dScale;//
 	double dCenterY = m_dCacheCenterY + dWorldDeltaYSt;//(dWorldCenterY + m_CurrentBounds.MinY) * dScale;//
 	m_dFrameXShift = m_dFrameCenterX - dWorldDeltaXSt;//(dWorldCenterX + m_CurrentBounds.MinX) * dScale;//
 	m_dFrameYShift = m_dFrameCenterY + dWorldDeltaYSt;//(dWorldCenterY + m_CurrentBounds.MinY) * dScale;//
 
-//	cairo_matrix_init (m_pMatrix, 1, 0, 0, 1, m_dCacheCenterX, m_dCacheCenterY); 
-	//cairo_matrix_init (m_pMatrix, dScale, 0.0, 0.0, -dScale, dCenterX, dCenterY); 
-	cairo_matrix_init_translate (m_pMatrix, m_dCacheCenterX, m_dCacheCenterY); 
+//	cairo_matrix_init (m_pMatrix, 1, 0, 0, 1, m_dCacheCenterX, m_dCacheCenterY);
+	//cairo_matrix_init (m_pMatrix, dScale, 0.0, 0.0, -dScale, dCenterX, dCenterY);
+	cairo_matrix_init_translate (m_pMatrix, m_dCacheCenterX, m_dCacheCenterY);
 	//rotate
 	//cairo_matrix_rotate(m_pMatrix, 45.0 * M_PI / 180.0);
 	if(!IsDoubleEquil(m_dAngleRad, 0.0))
@@ -506,14 +513,14 @@ void wxGISDisplay::InitTransformMatrix(void)
 	cairo_matrix_scale(m_pMatrix, m_dScale, -m_dScale);
 
 	//init matrix for Wld2DC & DC2Wld
-	cairo_matrix_init_translate (m_pDisplayMatrix, m_dFrameCenterX, m_dFrameCenterY); 
+	cairo_matrix_init_translate (m_pDisplayMatrix, m_dFrameCenterX, m_dFrameCenterY);
 	if(!IsDoubleEquil(m_dAngleRad, 0.0))
 		cairo_matrix_rotate(m_pDisplayMatrix, m_dAngleRad);
 	cairo_matrix_translate(m_pDisplayMatrix, -dWorldDeltaXSt, dWorldDeltaYSt);
 	cairo_matrix_scale(m_pDisplayMatrix, m_dScale, -m_dScale);
 
 	//init matrix for TransformRect
-	cairo_matrix_init_translate (m_pDisplayMatrixNoRotate, m_dFrameCenterX, m_dFrameCenterY); 
+	cairo_matrix_init_translate (m_pDisplayMatrixNoRotate, m_dFrameCenterX, m_dFrameCenterY);
 	cairo_matrix_translate(m_pDisplayMatrixNoRotate, -dWorldDeltaXSt, dWorldDeltaYSt);
 	cairo_matrix_scale(m_pDisplayMatrixNoRotate, m_dScale, -m_dScale);
 
@@ -569,9 +576,9 @@ void wxGISDisplay::TestDraw(void)
 	m_stLineColour.dAlpha = 1.0;
 	m_stPointColour = m_stLineColour;
 
-	int random_number1 = (rand() % 50); 
-	int random_number2 = (rand() % 50); 
-	int random_number3 = (rand() % 50); 
+	int random_number1 = (rand() % 50);
+	int random_number2 = (rand() % 50);
+	int random_number3 = (rand() % 50);
 	m_stFillColour.dRed = double(205 + random_number1) / 255;
 	m_stFillColour.dGreen = double(205 + random_number2) / 255;
 	m_stFillColour.dBlue = double(205 + random_number3) / 255;
@@ -685,7 +692,7 @@ bool wxGISDisplay::DrawLine(const OGRLineString* pLine, bool bIsRing)
 
 	for(int i = 1; i < nPointCount; ++i)
 	{
-        cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, pOGRRawPoints[i].x, pOGRRawPoints[i].y);	
+        cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, pOGRRawPoints[i].x, pOGRRawPoints[i].y);
 	}
 	wxDELETEA(pOGRRawPoints);
 	return true;
@@ -781,10 +788,10 @@ void wxGISDisplay::DrawRaster(cairo_surface_t *surface, OGREnvelope& Envelope, b
 
 		SetColor(m_stFillColour);
 		cairo_move_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MinX, Envelope.MinY);
-		cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MaxX, Envelope.MinY);	
-		cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MaxX, Envelope.MaxY);	
-		cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MinX, Envelope.MaxY);	
-		cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MinX, Envelope.MinY);	
+		cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MaxX, Envelope.MinY);
+		cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MaxX, Envelope.MaxY);
+		cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MinX, Envelope.MaxY);
+		cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MinX, Envelope.MinY);
 		cairo_stroke (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
 	}
 
@@ -862,10 +869,10 @@ void wxGISDisplay::DrawGeometry(OGRGeometry* poGeometry)
 OGREnvelope wxGISDisplay::TransformRect(wxRect &rect)
 {
 	OGREnvelope out;
-	double dX1, dX2, dY2, dY1; 
+	double dX1, dX2, dY2, dY1;
 	double dWHalf = double(rect.width) / 2;
 	double dHHalf = double(rect.height) / 2;
-	double dXCenter = rect.x + dWHalf, dYCenter = rect.y + dHHalf; 
+	double dXCenter = rect.x + dWHalf, dYCenter = rect.y + dHHalf;
 	DC2World(&dXCenter, &dYCenter);
 
 	cairo_matrix_t InvertMatrix = {m_pDisplayMatrixNoRotate->xx, m_pDisplayMatrixNoRotate->yx, m_pDisplayMatrixNoRotate->xy, m_pDisplayMatrixNoRotate->yy, m_pDisplayMatrixNoRotate->x0, m_pDisplayMatrixNoRotate->y0};

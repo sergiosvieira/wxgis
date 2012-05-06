@@ -80,7 +80,7 @@ void wxGxFolder::LoadChildren(void)
 
     //load names
 	size_t nChildrenCount = m_Children.size();
-	GxObjectArray Array;	
+	GxObjectArray Array;
 	if(m_pCatalog && m_pCatalog->GetChildren(m_sPath, papszFileList, Array))
 	{
 		for(size_t i = 0; i < Array.size(); ++i)
@@ -110,14 +110,14 @@ bool wxGxFolder::Delete(void)
 	{
 		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
 		if(pGxObjectContainer)
-    		return pGxObjectContainer->DeleteChild(this);		
+    		return pGxObjectContainer->DeleteChild(this);
 	}
 	else
     {
         const char* err = CPLGetLastErrorMsg();
 		wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
     }
-	return false;	
+	return false;
 }
 
 bool wxGxFolder::Rename(wxString NewName)
@@ -128,7 +128,7 @@ bool wxGxFolder::Rename(wxString NewName)
 	wxString sNewPath = PathName.GetFullPath();
 
 	EmptyChildren();
-    CPLString szNewPath = sNewPath.mb_str(wxConvUTF8);
+    CPLString szNewPath(sNewPath.mb_str(wxConvUTF8));
     if(RenameFile(m_sPath, szNewPath))
 	{
 		m_sPath = szNewPath;
@@ -155,7 +155,7 @@ bool wxGxFolder::DeleteChild(IGxObject* pChild)
     m_pCatalog->ObjectDeleted(nChildID);
 	if(bHasChildren != m_Children.size() > 0 ? true : false)
 		m_pCatalog->ObjectChanged(GetID());
-	return true;		
+	return true;
 }
 
 bool wxGxFolder::CanCreate(long nDataType, long DataSubtype)

@@ -45,6 +45,7 @@
 #include <wx/treectrl.h>
 #include <wx/listctrl.h>
 #include <wx/valgen.h>
+#include <wx/imaglist.h>
 
 /** \class wxIdentifyTreeItemData identifydlg.h
  *  \brief The identify tree item data.
@@ -52,7 +53,7 @@
 class wxIdentifyTreeItemData : public wxTreeItemData
 {
 public:
-	wxIdentifyTreeItemData(wxGISFeatureDatasetSPtr pDataset, long nOID = wxNOT_FOUND, OGRGeometry* pGeometry = nullptr)
+	wxIdentifyTreeItemData(wxGISFeatureDatasetSPtr pDataset, long nOID = wxNOT_FOUND, OGRGeometry* pGeometry = NULL)
 	{
 		m_pDataset = pDataset;
 		m_nOID = nOID;
@@ -78,7 +79,7 @@ typedef struct _fieldsortdata
 /** \class wxGISFeatureDetailsPanel identifydlg.h
  *  \brief The wxGISFeatureDetailsPanel class show OGRFeature fields and values.
  */
-class wxGISFeatureDetailsPanel : public wxPanel 
+class wxGISFeatureDetailsPanel : public wxPanel
 {
 	enum
 	{
@@ -106,7 +107,7 @@ public:
 protected:
 	void WriteStringToClipboard(const wxString &sData);
 protected:
-	wxString m_sLocation; 
+	wxString m_sLocation;
 	wxGISCoordinatesFormatMenu *m_pCFormat;
 	wxStaticText* m_staticText1;
 	wxTextCtrl* m_textCtrl;
@@ -127,7 +128,7 @@ protected:
 /** \class wxGISIdentifyDlg identifydlg.h
  *  \brief The wxGISIdentifyDlg class is dialog/dock window with the results of identify.
  */
-class WXDLLIMPEXP_GIS_CTU wxGISIdentifyDlg : public wxPanel 
+class WXDLLIMPEXP_GIS_CTU wxGISIdentifyDlg : public wxPanel
 {
 protected:
 	enum
@@ -138,7 +139,7 @@ protected:
 		ID_WGMENU_FLASH,
 		ID_WGMENU_PAN,
 		ID_WGMENU_ZOOM
-	};		
+	};
 
      DECLARE_DYNAMIC_CLASS(wxGISIdentifyDlg)
 public:
@@ -146,12 +147,12 @@ public:
 	wxGISIdentifyDlg( wxWindow* parent, wxWindowID id = ID_WXGISIDENTIFYDLG, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISIdentifyDlg();
     virtual bool Create(wxWindow* parent, wxWindowID id = ID_WXGISIDENTIFYDLG, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("IdentifyView"));
-		
+
 	void SplitterOnIdle( wxIdleEvent& )
 	{
 		m_splitter->SetSashPosition( 0 );
 		m_splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISIdentifyDlg::SplitterOnIdle ), NULL, this );
-	}	
+	}
 	//event
 	virtual void OnSwitchSplit(wxCommandEvent& event);
 	virtual void OnSelChanged(wxTreeEvent& event);
@@ -186,7 +187,7 @@ protected:
 	enum
 	{
 		ID_WXGISIDENTIFYVIEW = 1000,
-	};	
+	};
 
     DECLARE_DYNAMIC_CLASS(wxAxIdentifyView)
 public:

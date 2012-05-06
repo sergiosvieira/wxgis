@@ -25,7 +25,7 @@
 wxGISTable::wxGISTable(CPLString sPath, int nSubType, OGRLayer* poLayer, OGRDataSource* poDS) : wxGISDataset(sPath)
 {
 	m_poDS = poDS;
-	m_poLayer = poLayer;        
+	m_poLayer = poLayer;
     m_nType = enumGISTableDataset;
     m_nSubType = nSubType;
 	//
@@ -196,7 +196,7 @@ void wxGISTable::LoadFeatures(ITrackCancel* pTrackCancel)
 		bOLCFastFeatureCount = false;
 	bool bOLCRandomRead = m_poLayer->TestCapability(OLCRandomRead) != 0;
 
-	//check FIDs and bOLCRandomRead 
+	//check FIDs and bOLCRandomRead
 	if(/*!m_bHasFID || */!bOLCFastFeatureCount || !bOLCRandomRead)
 	{
         m_poLayer->ResetReading();
@@ -307,7 +307,7 @@ OGRFeatureSPtr wxGISTable::Next(void)
         return OGRFeatureSPtr();
 
  	//bool bOLCRandomRead = m_poLayer->TestCapability(OLCRandomRead);
- 
+
 	wxCriticalSectionLocker locker(m_CritSect);
     if(m_bIsDataLoaded)
     {
@@ -392,7 +392,7 @@ OGRFeatureSPtr wxGISTable::GetAt(size_t nIndex)
 {
 	wxASSERT(nIndex >= 0);
 	wxASSERT(nIndex < GetFeatureCount());
-	
+
 	if(!m_poLayer)
 		return OGRFeatureSPtr();
 
@@ -526,7 +526,7 @@ wxString wxGISTable::GetAsString(OGRFeatureSPtr pFeature, int nField, wxFontEnco
                     //if(sOut == wxEmptyString)
                     //    sOut = wxT(" ");
                 }
-            }        
+            }
         }
 	}
 	return sOut;
@@ -701,7 +701,7 @@ OGRErr wxGISTable::SetIgnoredFields(wxArrayString &saIgnoredFields)
 
         if(eErr != OGRERR_NONE)
             return eErr;
-        	
+
         UnloadFeatures();
 		LoadFeatures(NULL);
         return eErr;
@@ -747,7 +747,7 @@ bool wxGISTable::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
         szCopyFileName = szNewDestFileName;
         if(!CopyFile(szNewDestFileName, papszFileList[i], pTrackCancel))
 		{
-            // Try to put the ones we moved back. 
+            // Try to put the ones we moved back.
             for( --i; i >= 0; i-- )
                 DeleteFile( papszFileCopiedList[i] );
 
@@ -756,7 +756,7 @@ bool wxGISTable::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
             return false;
 		}
     }
-    
+
     //m_sPath = szCopyFileName;
 
 	CSLDestroy( papszFileList );
@@ -784,7 +784,7 @@ bool wxGISTable::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
         papszMovedFileList = CSLAddString(papszMovedFileList, szNewDestFileName);
         if(!MoveFile(szNewDestFileName, papszFileList[i], pTrackCancel))
 		{
-            // Try to put the ones we moved back. 
+            // Try to put the ones we moved back.
             pTrackCancel->Reset();
             for( --i; i >= 0; i-- )
                 MoveFile( papszFileList[i], papszMovedFileList[i], pTrackCancel);
@@ -805,11 +805,11 @@ bool wxGISTable::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
 bool wxGISTable::Delete(int iLayer, ITrackCancel* pTrackCancel)
 {
     Close();
-    
+
 	wxCriticalSectionLocker locker(m_CritSect);
     if(!DeleteFile(m_sPath))
         return false;
-	
+
     char** papszFileList = GetFileList();
     if(papszFileList)
     {
@@ -872,7 +872,7 @@ char **wxGISTable::GetFileList()
 	case enumTablePostgres:
 	case enumTableQueryResult:
 	case enumTableDBF:
-    default: 
+    default:
         break;
     }
 
@@ -891,7 +891,7 @@ bool wxGISTable::Rename(wxString sNewName)
 
     CPLString szDirPath = CPLGetPath(m_sPath);
     CPLString szName = CPLGetBasename(m_sPath);
-	CPLString szNewName = ClearExt(sNewName).mb_str(wxConvUTF8);
+	CPLString szNewName(ClearExt(sNewName).mb_str(wxConvUTF8));
 
     char** papszFileList = GetFileList();
     papszFileList = CSLAddString( papszFileList, m_sPath );
@@ -902,12 +902,12 @@ bool wxGISTable::Rename(wxString sNewName)
 
 
     for(int i = 0; papszFileList[i] != NULL; ++i )
-    {		
+    {
         CPLString szNewPath(CPLFormFilename(szDirPath, szNewName, GetExtension(papszFileList[i], szName)));
         papszNewFileList = CSLAddString(papszNewFileList, szNewPath);
         if(!RenameFile(papszFileList[i], papszNewFileList[i]))
         {
-            // Try to put the ones we moved back. 
+            // Try to put the ones we moved back.
             for( --i; i >= 0; i-- )
                 RenameFile( papszNewFileList[i], papszFileList[i]);
 
@@ -916,7 +916,7 @@ bool wxGISTable::Rename(wxString sNewName)
             return false;
         }
     }
-    
+
 	m_sPath = CPLString(CPLFormFilename(szDirPath, szNewName, CPLGetExtension(m_sPath)));
 
 	CSLDestroy( papszFileList );

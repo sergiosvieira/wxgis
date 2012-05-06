@@ -53,7 +53,7 @@ private:
 
 class WXDLLIMPEXP_GIS_CTU wxGISMapView :
 	public wxWindow,
-	public wxGISExtentStack, 
+	public wxGISExtentStack,
 	public wxGISConnectionPointContainer
 {
     DECLARE_CLASS(wxGISMapView)
@@ -74,11 +74,11 @@ public:
 	virtual bool AddLayer(wxGISLayerSPtr pLayer);
 	virtual void Clear(void);
 	virtual void SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference);
-	virtual void SetExtent(OGREnvelope &Env);
+	virtual void SetExtent(OGREnvelope& Env);
 	virtual void SetFullExtent(void);
 	virtual OGREnvelope GetFullExtent(void);
 	//
-	virtual double GetScaleRatio(OGREnvelope &Bounds, wxDC &dc);
+	virtual double GetScaleRatio(OGREnvelope& Bounds, wxDC& dc);
 	virtual void PanStart(wxPoint MouseLocation);
 	virtual void PanMoveTo(wxPoint MouseLocation);
 	virtual void PanStop(wxPoint MouseLocation);
@@ -87,7 +87,7 @@ public:
 	virtual void RotateStop(wxPoint MouseLocation);
 	virtual void SetRotate(double dAngleRad);
 	virtual double GetCurrentRotate(void);
-    virtual void FlashGeometry(const GeometryArray &Geoms);
+    virtual void FlashGeometry(const GeometryArray& Geoms);
 protected:
 	//events
 	virtual void OnPaint(wxPaintEvent & event);
@@ -103,7 +103,7 @@ protected:
 	virtual void CancelDrawThread(void);
 	virtual void OnDraw(wxGISEnumDrawPhase nPhase);
 	//misc
-	virtual void DrawToolTip(wxClientDC &dc, wxString &sText);
+	virtual void DrawToolTip(wxClientDC& dc, const wxString& sText);
 	virtual OGREnvelope CreateEnvelopeFromZoomFactor(double dZoom);
 	virtual void UpdateFrameCenter(void);
 	//virtual void FillClipGeometry(wxRect rect, wxCoord x, wxCoord y);
@@ -111,7 +111,7 @@ protected:
 	wxGISDisplay *m_pGISDisplay;
 	wxTimer m_timer;
 	wxMapDrawingThread *m_pMapDrawingThread;
-	ITrackCancel *m_pTrackCancel; 
+	ITrackCancel *m_pTrackCancel;
 	IProgressor *m_pAni;
 	WXDWORD m_nDrawingState;
 	double m_nFactor;

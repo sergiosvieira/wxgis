@@ -50,7 +50,7 @@ int GetOverviewLevels(wxGISRasterDatasetSPtr pwxGISRasterDataset, int* anOvervie
 	return nLevelCount;
 }
 
-CPLString GetWorldFilePath(CPLString &soPath)
+CPLString GetWorldFilePath(const CPLString &soPath)
 {
     //1. thirst and last char from ext and third char set w (e.g. jpw)
     CPLString sExt = CPLGetExtension(soPath);

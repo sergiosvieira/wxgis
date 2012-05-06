@@ -24,6 +24,6 @@
 #include "wxgis/datasource/rasterdataset.h"
 
 int WXDLLIMPEXP_GIS_DS GetOverviewLevels(wxGISRasterDatasetSPtr pwxGISRasterDataset, int* anOverviewList);
-CPLString WXDLLIMPEXP_GIS_DS GetWorldFilePath(CPLString &soPath);
+CPLString WXDLLIMPEXP_GIS_DS GetWorldFilePath(const CPLString &soPath);
 
 

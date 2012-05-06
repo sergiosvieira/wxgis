@@ -87,7 +87,7 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
         OGRFeatureDefn *pFeatureDefn = pFeature->GetDefnRef();
         if(!pFeatureDefn)
             continue;
-        
+
         CPLErrorReset();
         wxString sACText;
 
@@ -113,12 +113,12 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
                     //wxString sFieldString(cplstr.
                     ////wxString sFieldString(wgMB2WX(pFeature->GetFieldAsString(i)));
                     //wxCSConv outconv(OutputEncoding);
-                    //pFeature->SetField(i, sFieldString.mb_str(outconv));   
+                    //pFeature->SetField(i, sFieldString.mb_str(outconv));
 
                     if(OutputEncoding <= wxFONTENCODING_DEFAULT)
 						pFeature->SetField(i, sFieldString.mb_str());
-                    else            
-                    {                
+                    else
+                    {
                         wxCSConv outconv(OutputEncoding);
                         pFeature->SetField(i, sFieldString.mb_str(outconv));
                     }
@@ -130,7 +130,7 @@ bool CopyRows(wxGISFeatureDatasetSPtr pSrcDataSet, wxGISFeatureDatasetSPtr pDstD
                     wxString sFieldString(pFeature->GetFieldAsString(i), wxConvLocal);
     				pFeature->SetField(i, sFieldString.mb_str());
                 }
-                //TODO: OFTStringList 
+                //TODO: OFTStringList
             }
         }
 
@@ -249,7 +249,7 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
 			size_t nCount = pDSet->GetFeatureCount();
             if(nCount > 0)
             {
-                wxString sNewName = CheckUniqName(sPath, sName + wxString(_("_point")), sExt);                
+                wxString sNewName = CheckUniqName(sPath, sName + wxString(_("_point")), sExt);
                 OGRFeatureDefn *pNewDef = pDef->Clone();
                 pNewDef->SetGeomType( wkbPoint );
                 if( !ExportFormat(pDSet, sPath, sNewName, pFilter, pNewDef, pNewSpaRef, pQFilter, pTrackCancel) )
@@ -263,7 +263,7 @@ bool ExportFormat(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName
             size_t nCount = pDSet->GetFeatureCount();
             if(nCount > 0)
             {
-                wxString sNewName = CheckUniqName(sPath, sName + wxString(_("_polygon")), sExt); 
+                wxString sNewName = CheckUniqName(sPath, sName + wxString(_("_polygon")), sExt);
                 OGRFeatureDefn *pNewDef = pDef->Clone();
                 pNewDef->SetGeomType( wkbPolygon );
                 if( !ExportFormat(pDSet, sPath, sNewName, pFilter, pNewDef, pNewSpaRef, pQFilter, pTrackCancel) )
@@ -629,19 +629,19 @@ bool Project(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wxString sName, IGx
         //            //wxString sFieldString(cplstr.
         //            ////wxString sFieldString(wgMB2WX(pFeature->GetFieldAsString(i)));
         //            //wxCSConv outconv(OutputEncoding);
-        //            //pFeature->SetField(i, sFieldString.mb_str(outconv));   
+        //            //pFeature->SetField(i, sFieldString.mb_str(outconv));
 
         //            if(OutputEncoding == wxFONTENCODING_DEFAULT)
         //                pFeature->SetField(i, wgWX2MB(sFieldString));
-        //            else            
-        //            {                
+        //            else
+        //            {
         //                wxCSConv outconv(OutputEncoding);
         //                pFeature->SetField(i, sFieldString.mb_str(outconv));
         //            }
         //            if(pDstDataSet->GetSubType() == enumVecDXF)
         //                sACText += sFieldString + wxT("\n");
         //        }
-        //        //TODO: OFTStringList 
+        //        //TODO: OFTStringList
         //    }
         //}
         ////////////////
@@ -716,7 +716,7 @@ OGRGeometry* CheckRgnAndTransform(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn1, 
     }
 
     if(pGeom1 && !pGeom2)
-        pGeom = pGeom1; 
+        pGeom = pGeom1;
     else if(pGeom2 && !pGeom1)
         pGeom = pGeom2;
     else if(pGeom1 && pGeom2)
@@ -724,7 +724,7 @@ OGRGeometry* CheckRgnAndTransform(OGRGeometry* pFeatureGeom, OGRPolygon* pRgn1, 
         OGRGeometryCollection* pGeometryCollection = new OGRGeometryCollection();
         pGeometryCollection->addGeometryDirectly(pGeom1);
         pGeometryCollection->addGeometryDirectly(pGeom2);
-        pGeom = pGeometryCollection; 
+        pGeom = pGeometryCollection;
     }
 
 
@@ -739,7 +739,7 @@ PROCEED:
     {
         wxDELETE(pGeom);
         return NULL;
-    }  
+    }
     return pGeom;
 }
 
@@ -957,7 +957,7 @@ bool GeometryVerticesToPoints(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wx
 	long nFidCounter(0);
  	OGRFeatureSPtr poFeature;
 	pDSet->Reset();
-    while((poFeature = pDSet->Next()) != NULL)	
+    while((poFeature = pDSet->Next()) != NULL)
     {
 		nCounter++;
 
@@ -969,7 +969,7 @@ bool GeometryVerticesToPoints(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, wx
         }
 
 
-        OGRGeometry* pGeom = poFeature->StealGeometry();//GetGeometryRef();   
+        OGRGeometry* pGeom = poFeature->StealGeometry();//GetGeometryRef();
         if(!pGeom)
             continue;
 
@@ -1029,10 +1029,10 @@ bool GeometryVerticesToPointsDataset(long nGeomFID, OGRGeometry* pGeom, wxGISFea
 				OGRFeatureSPtr pFeature = pDSet->CreateFeature();
 				if(pFeature)
 				{
-					pFeature->SetField(0, nFidCounter); //geom_id
+					pFeature->SetField(0, (int)nFidCounter); //geom_id
 					nFidCounter++;
-					pFeature->SetField(1, nGeomFID); //geom_id
-					
+					pFeature->SetField(1, (int)nGeomFID); //geom_id
+
 					OGRPoint* pPt = new OGRPoint(dX, dY, dZ);
 					pPt->assignSpatialReference(pDSet->GetSpatialReference().get());
 					pPt->setCoordinateDimension(pLineString->getCoordinateDimension());
@@ -1161,7 +1161,7 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
 						szDescField = pField->GetNameRef();
 				}
             }
-            
+
             if(nSubType == enumVecESRIShapefile && pField->GetType() == OFTTime)
             {
                 pField->SetType(OFTString);
@@ -1225,7 +1225,7 @@ bool GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, 
 	long nFidCounter(0);
  	OGRFeatureSPtr poFeature;
 	pDSet->Reset();
-    while((poFeature = pDSet->Next()) != NULL)	
+    while((poFeature = pDSet->Next()) != NULL)
     {
         if(pTrackCancel && !pTrackCancel->Continue())
         {
@@ -1243,7 +1243,7 @@ bool GeometryVerticesToTextFile(wxGISFeatureDatasetSPtr pDSet, CPLString sPath, 
             pProgressor->SetValue(nCounter);
 
 
-        OGRGeometry* pGeom = poFeature->GetGeometryRef();   
+        OGRGeometry* pGeom = poFeature->GetGeometryRef();
         if(!pGeom)
             continue;
 

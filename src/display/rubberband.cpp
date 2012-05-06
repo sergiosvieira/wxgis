@@ -40,7 +40,7 @@ BEGIN_EVENT_TABLE(wxGISRubberBand, wxEvtHandler)
 	EVT_MOUSE_CAPTURE_LOST(wxGISRubberBand::OnCaptureLost)
 END_EVENT_TABLE()
 
-wxGISRubberBand::wxGISRubberBand(wxPen &oPen, wxWindow *pWnd, wxGISDisplay *pDisp) :  m_bLock(true)
+wxGISRubberBand::wxGISRubberBand(wxPen oPen, wxWindow *pWnd, wxGISDisplay *pDisp) :  m_bLock(true)
 {
 	m_pWnd = pWnd;
 	m_pDisp = pDisp;
@@ -128,7 +128,7 @@ void wxGISRubberBand::OnCaptureLost(wxMouseCaptureLostEvent & event)
 // class wxGISRubberEnvelope
 //----------------------------------------------------
 
-wxGISRubberEnvelope::wxGISRubberEnvelope(wxPen &oPen, wxWindow *pWnd, wxGISDisplay *pDisp) : wxGISRubberBand(oPen, pWnd, pDisp)
+wxGISRubberEnvelope::wxGISRubberEnvelope(wxPen oPen, wxWindow *pWnd, wxGISDisplay *pDisp) : wxGISRubberBand(oPen, pWnd, pDisp)
 {
 }
 
@@ -143,17 +143,17 @@ void wxGISRubberEnvelope::OnMouseMove(wxMouseEvent& event)
 	width = abs(EvX - m_StartX);
 	height = abs(EvY - m_StartY);
 	X = std::min(m_StartX, EvX);
-	Y = std::min(m_StartY, EvY);    
+	Y = std::min(m_StartY, EvY);
 
 	wxClientDC CDC(m_pWnd);
 	wxGISPointsArray ClipGeometry;
     if(!m_PrevRect.IsEmpty())
     {
         m_PrevRect.Inflate(2,2);
-		ClipGeometry.Add(wxRealPoint(double(m_PrevRect.GetLeft()), double(m_PrevRect.GetTop())));//top-left
-		ClipGeometry.Add(wxRealPoint(double(m_PrevRect.GetRight()), double(m_PrevRect.GetTop())));//top-right
-		ClipGeometry.Add(wxRealPoint(double(m_PrevRect.GetRight()), double(m_PrevRect.GetBottom())));//bottom-right
-		ClipGeometry.Add(wxRealPoint(double(m_PrevRect.GetLeft()), double(m_PrevRect.GetBottom())));//bottom-left
+		ClipGeometry.Add(new wxRealPoint(double(m_PrevRect.GetLeft()), double(m_PrevRect.GetTop())));//top-left
+		ClipGeometry.Add(new wxRealPoint(double(m_PrevRect.GetRight()), double(m_PrevRect.GetTop())));//top-right
+		ClipGeometry.Add(new wxRealPoint(double(m_PrevRect.GetRight()), double(m_PrevRect.GetBottom())));//bottom-right
+		ClipGeometry.Add(new wxRealPoint(double(m_PrevRect.GetLeft()), double(m_PrevRect.GetBottom())));//bottom-left
 		m_pDisp->Output(&CDC, ClipGeometry);
     }
 	else

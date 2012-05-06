@@ -74,4 +74,10 @@ if(PROJ_FOUND)
     target_link_libraries(${LIB_NAME} ${PROJ_LIBRARY})
 endif(PROJ_FOUND)
 
+if(Boost_FOUND)
+    if(UNIX)
+        target_link_libraries(${LIB_NAME} boost_system )#boost_filesystem
+    endif(UNIX)
+endif(Boost_FOUND)
+
 include(installlib)

@@ -66,10 +66,10 @@ public:
 	virtual void Undo(void);
 	virtual void Clear(void);
 	virtual size_t GetSize(void);
-	virtual void Do(OGREnvelope &Env);
+	virtual void Do(const OGREnvelope &Env);
 	virtual OGREnvelope GetCurrentExtent(void);
 protected:
-	virtual void SetExtent(OGREnvelope &Env);
+	virtual void SetExtent(const OGREnvelope &Env);
 protected:
 	std::vector<OGREnvelope> m_staEnvelope;
 	int m_nPos;

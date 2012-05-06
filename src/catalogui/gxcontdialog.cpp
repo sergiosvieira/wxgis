@@ -51,7 +51,7 @@ void wxTreeContainerView::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent
 		return;
 
     if(m_ShowFilterArray.size() > 0)
-    {        
+    {
 		for(size_t i = 0; i < m_ShowFilterArray.size(); ++i)
 			if(m_ShowFilterArray[i]->CanDisplayObject(pGxObject))
                 goto ADD;
@@ -104,7 +104,7 @@ wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExterna
 {
 	this->SetSizeHints( wxSize( 400,300 ), wxDefaultSize );
 
-    m_pExternalCatalog = pExternalCatalog; 
+    m_pExternalCatalog = pExternalCatalog;
     m_pCatalog = new wxGxCatalogUI(true);
 	m_pCatalog->Init(m_pExternalCatalog);
 
@@ -115,18 +115,18 @@ wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExterna
 	bMainSizer->Add( m_staticDescriptionText, 0, wxALL|wxEXPAND, 8 );//|wxALIGN_CENTER_VERTICAL
 
 	wxBoxSizer* bSizer = new wxBoxSizer( wxHORIZONTAL );
-	
+
 	m_staticWildText = new wxStaticText( this, wxID_ANY, _("Select export format"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticWildText->Wrap( -1 );
     m_staticWildText->Show(false);
 	bSizer->Add( m_staticWildText, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_WildcardCombo = new wxComboBox( this, FILTERCOMBO, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_DROPDOWN|wxCB_READONLY ); 
+
+	m_WildcardCombo = new wxComboBox( this, FILTERCOMBO, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_DROPDOWN|wxCB_READONLY );
     m_WildcardCombo->Show(false);
 	bSizer->Add( m_WildcardCombo, 1, wxALL|wxEXPAND, 8 );
-	
+
 	bMainSizer->Add( bSizer, 0, wxEXPAND, 5 );
-	
+
 
 	wxFlexGridSizer* bFooterSizer = new wxFlexGridSizer( 1, 4, 0, 0 );
 	bFooterSizer->AddGrowableCol( 1 );
@@ -142,22 +142,22 @@ wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExterna
 	bFooterSizer->Add( m_static, 1, wxALL, 8 );
 
 	m_OkButton = new wxButton( this, wxID_OK , _("Select"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_OkButton->SetDefault(); 
+	m_OkButton->SetDefault();
 	bFooterSizer->Add( m_OkButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 8 );
-	
+
 	m_CancelButton = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
 	bFooterSizer->Add( m_CancelButton, 0, wxALL, 8 );
-	
+
 	bMainSizer->Add( bFooterSizer, 0, wxEXPAND, 8 );
-	
+
 	this->SetSizer( bMainSizer );
 	this->Layout();
 
     wxGISApplication* pApp = dynamic_cast<wxGISApplication*>(GetApplication());
     if(pApp)
     {
-		ICommand *pCmd(nullptr);
-		wxGISCatalogMainCmd* pwxGISCatalogMainCmd(nullptr);
+		ICommand *pCmd(NULL);
+		wxGISCatalogMainCmd* pwxGISCatalogMainCmd(NULL);
 
 		//create folder
 		pCmd = pApp->GetCommand(wxT("wxGISCatalogMainCmd"), 7);
@@ -344,7 +344,7 @@ void wxGxContainerDialog::OnInit()
         m_WildcardCombo->Show(false);
     }
 
-    
+
 	for(size_t i = 0; i < m_FilterArray.size(); ++i)
 		m_WildcardCombo->AppendString(m_FilterArray[i]->GetName());
 	if(m_FilterArray.size() > 1 && m_bAllFilters)
@@ -409,7 +409,7 @@ void wxGxContainerDialog::SerializeFramePos(bool bSave)
 			int y = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/ypos")), 50);
 			int w = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/width")), 450);
 			int h = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/height")), 650);
-			
+
 			Move(x, y);
 			SetClientSize(w, h);
 		}
@@ -466,7 +466,7 @@ void wxGxContainerDialog::OnOKUI(wxUpdateUIEvent& event)
 {
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(GetLocation());
     bool bEnable = false;
-    if(m_pTree) 
+    if(m_pTree)
         bEnable = m_pTree->CanChooseObject(pGxObject.get());
     event.Enable(bEnable);
 }

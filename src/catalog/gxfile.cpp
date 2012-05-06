@@ -68,7 +68,7 @@ bool wxGxFile::Rename(wxString NewName)
 	PathName.SetName(ClearExt(NewName));
 
 	wxString sNewPath = PathName.GetFullPath();
-    CPLString szNewPath = sNewPath.mb_str(wxConvUTF8);
+    CPLString szNewPath(sNewPath.mb_str(wxConvUTF8));
     if(RenameFile(m_sPath, szNewPath))
 	{
         m_sPath = szNewPath;
@@ -94,7 +94,7 @@ bool wxGxFile::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
 	CPLString szNewDestFileName = GetUniqPath(m_sPath, szDestPath, szFileName);
     if(!CopyFile(szNewDestFileName, m_sPath, pTrackCancel))
         return false;
-    
+
     m_sPath = szNewDestFileName;
     m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
 
@@ -110,7 +110,7 @@ bool wxGxFile::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
 	CPLString szNewDestFileName = GetUniqPath(m_sPath, szDestPath, szFileName);
     if(!MoveFile(szNewDestFileName, m_sPath, pTrackCancel))
         return false;
-    
+
     m_sPath = szNewDestFileName;
     m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
 

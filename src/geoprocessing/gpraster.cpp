@@ -52,7 +52,7 @@ bool SubrasterByVector(wxGISFeatureDatasetSPtr pSrcFeatureDataSet, wxGISRasterDa
     if( !bSame )
 	{
         poCT = OGRCreateCoordinateTransformation( pSrsSRS.get(), pDstSRS.get() );
-		if(poCT == nullptr)
+		if(poCT == NULL)
 		{
 		    const char* err = CPLGetLastErrorMsg();
 			wxString sWarn = wxString::Format(_("Create OGRCreateCoordinateTransformation failed! GDAL error: %s"), wxString(err, wxConvUTF8).c_str());
@@ -104,18 +104,18 @@ bool SubrasterByVector(wxGISFeatureDatasetSPtr pSrcFeatureDataSet, wxGISRasterDa
     }
 
     bool bDefaultfilter(false);
-    if(pFilter == nullptr)
+    if(pFilter == NULL)
     {
         pFilter = new wxGxRasterFilter(enumRasterTiff);
         bDefaultfilter = true;
     }
 
-    CPLString szDriver = pFilter->GetDriver().mb_str();
-    CPLString szExt = pFilter->GetExt().mb_str();
+    CPLString szDriver(pFilter->GetDriver().mb_str());
+    CPLString szExt(pFilter->GetExt().mb_str());
     CPLString szBaseName = CPLGetBasename(pSrcRasterDataSet->GetPath());
 
 	GDALDriver* pDriver = (GDALDriver*)GDALGetDriverByName( szDriver );
-	if( pDriver == nullptr )
+	if( pDriver == NULL )
     {
 		if(pTrackCancel)
             pTrackCancel->PutMessage(wxString::Format(_("Output driver '%s' not recognised."), szDriver.c_str()), -1, enumGISMessageErr);
@@ -171,13 +171,13 @@ bool SubrasterByVector(wxGISFeatureDatasetSPtr pSrcFeatureDataSet, wxGISRasterDa
 			if(bUseCounter)
             {
                 szPath.Printf("%s_%d", szBaseName.c_str(), nNameCounter++);
-                CPLString sNewName = CheckUniqName(szDstFolderPath, szPath, szExt);
+                CPLString sNewName(CheckUniqName(szDstFolderPath, szPath, szExt).mb_str(wxConvUTF8));
                 szPath = CPLFormFilename(szDstFolderPath, sNewName, szExt);
             }
             else
             {
                 CPLString szName = pFeature->GetFieldAsString(nFieldNo);
-                CPLString sNewName = CheckUniqName(szDstFolderPath, szName, szExt);
+                CPLString sNewName(CheckUniqName(szDstFolderPath, szName, szExt).mb_str(wxConvUTF8));
                 szPath = CPLFormFilename(szDstFolderPath, sNewName, szExt);
             }
 			CreateSubRaster(pSrcRasterDataSet, GeomEnv, pNewGeom, pDriver, szPath, eOutputType, nBandCount, panBandList, dfOutResX, dfOutResY, bCopyNodata, bSkipSourceMetadata, papszOptions, pTrackCancel);
@@ -197,7 +197,7 @@ bool SubrasterByVector(wxGISFeatureDatasetSPtr pSrcFeatureDataSet, wxGISRasterDa
 }
 
 bool CreateSubRaster( wxGISRasterDatasetSPtr pSrcRasterDataSet, OGREnvelope &Env, const OGRGeometry *pGeom, GDALDriver* pDriver, CPLString &szDstPath, GDALDataType eOutputType, int nBandCount, int *panBandList, double dfOutResX, double dfOutResY, bool bCopyNodata, bool bSkipSourceMetadata, char** papszOptions, ITrackCancel* pTrackCancel )
-{    
+{
 	GDALDataset* pDset = pSrcRasterDataSet->GetRaster();
 	if(!pDset)
 	{
@@ -221,7 +221,7 @@ bool CreateSubRaster( wxGISRasterDatasetSPtr pSrcRasterDataSet, OGREnvelope &Env
 		return false;
     }
 	int anSrcWin[4] = {0, 0, 0, 0};
-	
+
     anSrcWin[0] = floor ((Env.MinX - adfGeoTransform[0]) / adfGeoTransform[1] + 0.001);
     anSrcWin[1] = floor ((Env.MaxY - adfGeoTransform[3]) / adfGeoTransform[5] + 0.001);
 	anSrcWin[2] = ceil ((Env.MaxX - Env.MinX) / adfGeoTransform[1]);
@@ -258,19 +258,19 @@ bool CreateSubRaster( wxGISRasterDatasetSPtr pSrcRasterDataSet, OGREnvelope &Env
 /* -------------------------------------------------------------------- */
     poVDS = (VRTDataset *) VRTCreate( nOXSize, nOYSize );
 
-    if( pSrcRasterDataSet->GetSpatialReference() != nullptr )
+    if( pSrcRasterDataSet->GetSpatialReference() != NULL )
     {
 		poVDS->SetProjection( pDset->GetProjectionRef() );
     }
-	
+
 	adfGeoTransform[0] += anSrcWin[0] * adfGeoTransform[1] + anSrcWin[1] * adfGeoTransform[2];
     adfGeoTransform[3] += anSrcWin[0] * adfGeoTransform[4] + anSrcWin[1] * adfGeoTransform[5];
-        
+
     adfGeoTransform[1] *= anSrcWin[2] / (double) nOXSize;
     adfGeoTransform[2] *= anSrcWin[3] / (double) nOYSize;
     adfGeoTransform[4] *= anSrcWin[2] / (double) nOXSize;
     adfGeoTransform[5] *= anSrcWin[3] / (double) nOYSize;
-        
+
     poVDS->SetGeoTransform( adfGeoTransform );
 
     int nGCPs = pDset->GetGCPCount();
@@ -285,7 +285,7 @@ bool CreateSubRaster( wxGISRasterDatasetSPtr pSrcRasterDataSet, OGREnvelope &Env
             pasGCPs[i].dfGCPPixel *= (nOXSize / (double) anSrcWin[2] );
             pasGCPs[i].dfGCPLine  *= (nOYSize / (double) anSrcWin[3] );
         }
-            
+
         poVDS->SetGCPs( nGCPs, pasGCPs, pDset->GetGCPProjection() );
         GDALDeinitGCPs( nGCPs, pasGCPs );
         CPLFree( pasGCPs );
@@ -328,8 +328,8 @@ bool CreateSubRaster( wxGISRasterDatasetSPtr pSrcRasterDataSet, OGREnvelope &Env
         //if( bUnscale || bScale || (nRGBExpand != 0 && i < nRGBExpand) )
         //{
         //    poVRTBand->AddComplexSource( poSrcBand,
-        //                                 anSrcWin[0], anSrcWin[1], 
-        //                                 anSrcWin[2], anSrcWin[3], 
+        //                                 anSrcWin[0], anSrcWin[1],
+        //                                 anSrcWin[2], anSrcWin[3],
         //                                 0, 0, nOXSize, nOYSize,
         //                                 dfOffset, dfScale,
         //                                 VRT_NODATA_UNSET,
@@ -377,7 +377,7 @@ bool CreateSubRaster( wxGISRasterDatasetSPtr pSrcRasterDataSet, OGREnvelope &Env
 //                default:
 //                    break;
 //            }
-//                
+//
 //            if (bClamped)
 //            {
 //                printf( "for band %d, nodata value has been clamped "
@@ -391,7 +391,7 @@ bool CreateSubRaster( wxGISRasterDatasetSPtr pSrcRasterDataSet, OGREnvelope &Env
 //                       i + 1, dfVal,
 //                       GDALGetDataTypeName(eBandType));
 //            }
-//            
+//
 //            poVRTBand->SetNoDataValue( dfVal );
 //        }
 
@@ -449,7 +449,7 @@ bool CreateSubRaster( wxGISRasterDatasetSPtr pSrcRasterDataSet, OGREnvelope &Env
 /* -------------------------------------------------------------------- */
 /*      Write to the output file using CopyCreate().                    */
 /* -------------------------------------------------------------------- */
-    GDALDataset* pOutDS = pDriver->CreateCopy(szDstPath, poVDS, false, papszOptions, GDALDummyProgress, nullptr);
+    GDALDataset* pOutDS = pDriver->CreateCopy(szDstPath, poVDS, false, papszOptions, GDALDummyProgress, NULL);
 
     //hOutDS = GDALCreateCopy( hDriver, pszDest, (GDALDatasetH) poVDS, bStrict, papszCreateOptions, pfnProgress, NULL );
     if( pOutDS )
@@ -466,13 +466,13 @@ bool CreateSubRaster( wxGISRasterDatasetSPtr pSrcRasterDataSet, OGREnvelope &Env
         GDALClose( poVDS );
         return true;
     }
-    else 
+    else
     {
         GDALClose( poVDS );
         return false;
     }
-    
-        
+
+
     //CPLFree( panBandList );
     //
     //CPLFree( pszOutputSRS );
@@ -483,7 +483,7 @@ bool CreateSubRaster( wxGISRasterDatasetSPtr pSrcRasterDataSet, OGREnvelope &Env
     //    GDALDestroyDriverManager();
     //}
     //CSLDestroy( papszCreateOptions );
-    
+
 	return true;
 }
 
@@ -671,7 +671,7 @@ void CopyBandInfo( GDALRasterBand * poSrcBand, GDALRasterBand * poDstBand, int b
 
  //   psWarpOptions->pTransformerArg = GDALCreateGenImgProjTransformer2( poGDALDataset, poOutputGDALDataset, (char **)apszOptions );
  //   psWarpOptions->pfnTransformer = GDALGenImgProjTransform;
- //   
+ //
  //   //TODO: Add to config memory limit in % of free memory
  //   double dfMemLim = wxMemorySize(wxGetFreeMemory() / wxThread::GetCPUCount()).ToDouble();
  //   if(dfMemLim > 135000000) //128Mb in bytes

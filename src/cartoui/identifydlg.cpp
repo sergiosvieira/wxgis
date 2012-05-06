@@ -24,7 +24,7 @@
 
 #include "ogr_api.h"
 
-#include <wx/clipbrd.h> 
+#include <wx/clipbrd.h>
 
 #include "../../art/splitter_switch.xpm"
 #include "../../art/layers.xpm"
@@ -73,29 +73,29 @@ wxGISFeatureDetailsPanel::wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID
 	wxBitmap oDownArrow = img.Rotate90();
 	wxBoxSizer* bSizer1;
 	bSizer1 = new wxBoxSizer( wxVERTICAL );
-	
+
 	wxFlexGridSizer* fgSizer1;
 	fgSizer1 = new wxFlexGridSizer( 1, 3, 0, 0 );
 	fgSizer1->AddGrowableCol( 1 );
 	fgSizer1->SetFlexibleDirection( wxBOTH );
 	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+
 	m_staticText1 = new wxStaticText( this, wxID_ANY, _("Location:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1->Wrap( -1 );
 	fgSizer1->Add( m_staticText1, 1, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
-	
+
 	m_textCtrl = new wxTextCtrl(  this, wxID_ANY, wxT("..."), wxDefaultPosition, wxDefaultSize, wxTE_READONLY, wxGenericValidator( &m_sLocation ));
 	//m_textCtrl->Enable( false );
 
 	fgSizer1->Add( m_textCtrl, 1, wxALIGN_CENTER|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND|wxRIGHT|wxLEFT, 5 );
-	
+
 	m_bpSelStyleButton = new wxBitmapButton( this, ID_MASKBTN, oDownArrow, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	m_bpSelStyleButton->SetToolTip( _("Select location text style") );
-	
+
 	fgSizer1->Add( m_bpSelStyleButton, 0, wxRIGHT, 5 );
-	
+
 	bSizer1->Add( fgSizer1, 0, wxEXPAND, 5 );
-	
+
 	m_listCtrl = new wxListCtrl( this, ID_LISTCTRL, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_HRULES | wxLC_VRULES );
 	m_listCtrl->InsertColumn(0, _("Field"), wxLIST_FORMAT_LEFT, 90);
 	m_listCtrl->InsertColumn(1, _("Value"), wxLIST_FORMAT_LEFT, 120);
@@ -105,9 +105,9 @@ wxGISFeatureDetailsPanel::wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID
     wxBitmap SmallA(small_arrow_xpm);// > arrow
     wxImage SmallImg = SmallA.ConvertToImage();
     SmallImg = SmallImg.Rotate90();
-    wxBitmap SmallDown(SmallImg); 
+    wxBitmap SmallDown(SmallImg);
     SmallImg = SmallImg.Mirror(false);
-    wxBitmap SmallUp(SmallImg); 
+    wxBitmap SmallUp(SmallImg);
 
 	m_ImageListSmall.Add(wxBitmap(SmallDown));
 	m_ImageListSmall.Add(wxBitmap(SmallUp));
@@ -115,7 +115,7 @@ wxGISFeatureDetailsPanel::wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID
 	m_listCtrl->SetImageList(&m_ImageListSmall, wxIMAGE_LIST_SMALL);
 
 	bSizer1->Add( m_listCtrl, 1, wxALL|wxEXPAND, 5 );
-	
+
 	this->SetSizer( bSizer1 );
 	this->Layout();
 	m_pCFormat = new wxGISCoordinatesFormatMenu();
@@ -359,36 +359,36 @@ bool wxGISIdentifyDlg::Create(wxWindow* parent, wxWindowID id, const wxPoint& po
 		return false;
 
 	m_bMainSizer = new wxBoxSizer( wxVERTICAL );
-	
+
 	m_fgTopSizer = new wxFlexGridSizer( 1, 3, 0, 0 );
 	m_fgTopSizer->AddGrowableCol( 1 );
 	m_fgTopSizer->SetFlexibleDirection( wxBOTH );
 	m_fgTopSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+
 	m_staticText1 = new wxStaticText( this, wxID_ANY, _("Identify from:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1->Wrap( -1 );
 	m_fgTopSizer->Add( m_staticText1, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
-	
+
 	wxArrayString m_LayerChoiceChoices;
 	m_LayerChoiceChoices.Add(_("<Top layer>"));
 	m_LayerChoice = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_LayerChoiceChoices, 0 );
 	m_LayerChoice->SetSelection( 0 );
 	m_LayerChoice->Enable(false);
 	m_fgTopSizer->Add( m_LayerChoice, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-	
+
 	m_BmpVert = wxBitmap(splitter_switch_xpm);
 	wxImage oImg = m_BmpVert.ConvertToImage().Rotate90();
 	m_BmpHorz = wxBitmap(oImg);
 	//get splitter from conf
 	m_bpSplitButton = new wxBitmapButton( this, ID_SWITCHSPLIT, m_BmpVert, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	m_fgTopSizer->Add( m_bpSplitButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
+
 	m_bMainSizer->Add( m_fgTopSizer, 0, wxEXPAND, 5 );
 
 	m_splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D );
 	m_splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISIdentifyDlg::SplitterOnIdle ), NULL, this );
     //m_splitter->Bind(wxEVT_IDLE, &wxGISIdentifyDlg::SplitterOnIdle, this);
-	
+
 	m_bMainSizer->Add( m_splitter, 1, wxEXPAND, 5 );
 
 	m_TreeImageList.Create(16, 16);
@@ -454,7 +454,7 @@ void wxGISIdentifyDlg::OnSelChanged(wxTreeEvent& event)
     if(TreeItemId.IsOk())
     {
         wxIdentifyTreeItemData* pData = (wxIdentifyTreeItemData*)m_pTreeCtrl->GetItemData(TreeItemId);
-        if(pData == nullptr)
+        if(pData == NULL)
 		{
 			m_pFeatureDetailsPanel->Clear();
 			return;
@@ -505,7 +505,7 @@ wxAxIdentifyView::~wxAxIdentifyView(void)
 
 bool wxAxIdentifyView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
-	m_pMapView = nullptr;
+	m_pMapView = NULL;
     m_sViewName = wxString(_("Identify"));
     return wxGISIdentifyDlg::Create(parent, id, pos, size, style, name);
 }
@@ -573,7 +573,7 @@ void wxAxIdentifyView::Identify(OGRGeometrySPtr pGeometryBounds)
 			for(size_t i = 0; i < pWinArr->size(); ++i)
 			{
 				wxGISMapView* pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
-				if(pMapView)					
+				if(pMapView)
 				{
 					m_pMapView = pMapView;
                     break;
@@ -582,7 +582,7 @@ void wxAxIdentifyView::Identify(OGRGeometrySPtr pGeometryBounds)
 		}
 	}
 	if(!m_pMapView)
-        return;	
+        return;
 	OGRSpatialReferenceSPtr pSpaRef = m_pMapView->GetSpatialReference();
 	OGRPolygon* pRgn = (OGRPolygon*)pGeometryBounds.get();
 	if(!pRgn)
@@ -598,7 +598,7 @@ void wxAxIdentifyView::Identify(OGRGeometrySPtr pGeometryBounds)
 	{
 		OGREnvelope Env;
  		wxGISAppConfigSPtr pConfig = GetConfig();
-        double dfDelta = pConfig->ReadDouble(enumGISHKCU, wxString(wxT("wxGISCommon/math/delta")), 0.0000001);//EPSILON * 10000
+        double dfDelta = pConfig->ReadDouble(enumGISHKCU, wxString(wxT("wxGISCommon/math/delta")), 0.000001);//EPSILON * 10000
 		Env.MinX = pt1.getX() - dfDelta;
 		Env.MinY = pt1.getY() - dfDelta;
 		Env.MaxX = pt1.getX() + dfDelta;
@@ -648,7 +648,7 @@ void wxAxIdentifyView::Identify(OGRGeometrySPtr pGeometryBounds)
 }
 
 void wxAxIdentifyView::FillTree(wxGISFeatureLayerSPtr pFLayer, wxGISQuadTreeCursorSPtr pCursor)
-{	
+{
 	m_pTreeCtrl->DeleteAllItems();
 	m_pFeatureDetailsPanel->Clear();
 	m_pFeatureDetailsPanel->SetEncoding(pFLayer->GetDataset()->GetEncoding());
@@ -668,7 +668,7 @@ void wxAxIdentifyView::FillTree(wxGISFeatureLayerSPtr pFLayer, wxGISQuadTreeCurs
         if(!pItem)
             continue;
 		wxTreeItemId nFeatureId = m_pTreeCtrl->AppendItem(nLayerId, wxString::Format(wxT("%d"), pItem->GetOID()), 2);
-		m_pTreeCtrl->SetItemData(nFeatureId, new wxIdentifyTreeItemData(pFLayer->GetDataset(), pItem->GetOID(), pItem->GetGeometry()));		
+		m_pTreeCtrl->SetItemData(nFeatureId, new wxIdentifyTreeItemData(pFLayer->GetDataset(), pItem->GetOID(), pItem->GetGeometry()));
 		if(i == 0)
 			nFirstFeatureId = nFeatureId;
     }
@@ -683,7 +683,7 @@ void wxAxIdentifyView::OnSelChanged(wxTreeEvent& event)
     if(TreeItemId.IsOk())
     {
         wxIdentifyTreeItemData* pData = (wxIdentifyTreeItemData*)m_pTreeCtrl->GetItemData(TreeItemId);
-        if(pData == nullptr)
+        if(pData == NULL)
 		{
 			m_pFeatureDetailsPanel->Clear();
 			return;
@@ -722,12 +722,12 @@ void wxAxIdentifyView::OnMenu(wxCommandEvent& event)
 {
 	wxTreeItemId TreeItemId = m_pTreeCtrl->GetSelection();
     wxIdentifyTreeItemData* pData = (wxIdentifyTreeItemData*)m_pTreeCtrl->GetItemData(TreeItemId);
-    if(pData == nullptr)
+    if(pData == NULL)
 		return;
 
 	switch(event.GetId())
 	{
-	case ID_WGMENU_FLASH:	
+	case ID_WGMENU_FLASH:
 	{
         GeometryArray Arr;
 		if(pData->m_pGeometry)

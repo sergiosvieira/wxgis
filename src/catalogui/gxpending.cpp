@@ -52,7 +52,7 @@ void wxPendingUpdateThread::OnExit()
 //---------------------------------------------------------------------
 
 
-wxGxPendingUI::wxGxPendingUI(void) : m_nCurrentImage(0), m_pThread(nullptr), m_pImageListSmall(nullptr), m_pImageListLarge(nullptr)
+wxGxPendingUI::wxGxPendingUI(void) : m_nCurrentImage(0), m_pThread(NULL), m_pImageListSmall(NULL), m_pImageListLarge(NULL)
 {
 }
 
@@ -87,7 +87,7 @@ void wxGxPendingUI::OnStopPending(void)
 {
     if(m_pThread)
         m_pThread->Delete();
-	m_pThread = nullptr;
+	m_pThread = NULL;
 }
 
 wxIcon wxGxPendingUI::GetLargeImage(void)
