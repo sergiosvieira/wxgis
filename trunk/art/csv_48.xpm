@@ -1,5 +1,5 @@
 /* XPM */
-static char * csv_48_xpm[] = {
+static const char * csv_48_xpm[] = {
 "48 48 397 2",
 "  	c None",
 ". 	c #4E9A06",

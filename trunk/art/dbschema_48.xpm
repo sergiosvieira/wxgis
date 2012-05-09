@@ -1,5 +1,5 @@
 /* XPM */
-static char * dbschema_48_xpm[] = {
+static const char * dbschema_48_xpm[] = {
 "48 48 42 1",
 " 	c None",
 ".	c #555753",

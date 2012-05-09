@@ -1,5 +1,5 @@
 /* XPM */
-static char * dxf_dset_48_xpm[] = {
+static const char * dxf_dset_48_xpm[] = {
 "48 48 530 2",
 "  	c None",
 ". 	c #709DCD",

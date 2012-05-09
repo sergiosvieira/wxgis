@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 set(PROJECT_NAME wxgiscatalogapp)
-set(APP_NAME wxgiscatalog)
+set(APP_NAME wxgiscat)
 set(wxGIS_MAINFAMEICON "${WXGIS_CURRENT_SOURCE_DIR}/art/catalog.ico")
 set(wxGIS_MAINFAMEICON_X "${WXGIS_CURRENT_SOURCE_DIR}/art/catalog_x.ico")
 
@@ -97,13 +97,5 @@ endif(CAIRO_FOUND)
 
 target_link_libraries(${APP_NAME} ${WXGISCORE_LIB_NAME} ${WXGISFRAMEWORK_LIB_NAME} ${WXGISCATALOGUI_LIB_NAME} )
 
-set_target_properties(${APP_NAME} PROPERTIES PROJECT_LABEL ${PROJECT_NAME})
-set_target_properties(${APP_NAME} PROPERTIES VERSION ${WXGIS_VERSION})
-set_target_properties(${APP_NAME} PROPERTIES SOVERSION 1)
-
-install(TARGETS ${APP_NAME} DESTINATION ${APP_INSTALL_PATH_DEBUG} CONFIGURATIONS Debug)
-install(TARGETS ${APP_NAME} DESTINATION ${APP_INSTALL_PATH_RELEASE} CONFIGURATIONS Release)
-if(NOT WIN32)
-    install(FILES PROJECT_HHEADERS DESTINATION ${HEADERS_INSTALL_PATH})
-endif(NOT WIN32)
+include(installapp)
 

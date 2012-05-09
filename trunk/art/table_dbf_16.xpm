@@ -1,5 +1,5 @@
 /* XPM */
-static char * table_dbf_16_xpm[] = {
+static const char * table_dbf_16_xpm[] = {
 "16 16 72 1",
 " 	c None",
 ".	c #121211",

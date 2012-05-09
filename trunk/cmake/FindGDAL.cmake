@@ -49,12 +49,15 @@ SET(_GDAL_ROOT_HINTS_AND_PATHS
 
 FIND_PATH(GDAL_INCLUDE_DIR
   NAMES
+    gdal.h
     gcore/gdal.h
   HINTS
-    ${_GDAL_INCLUDEDIR}
+    ${_GDAL_INCLUDE_DIR}
   ${_GDAL_ROOT_HINTS_AND_PATHS}
   PATH_SUFFIXES
-    include
+    "include"
+    "include/gdal"
+    "local/include/gdal"
 )
 
 IF(WIN32 AND NOT CYGWIN)
@@ -177,25 +180,13 @@ ELSE(WIN32 AND NOT CYGWIN)
 
   FIND_LIBRARY(GDAL_LIBRARY
     NAMES
-        gdal18
-        gdal19
-        gdal19
-        gdal20
-        gdal21
-        gdal22
-        gdal23
-        gdal24
-        gdal25
-        gdal26
-        gdal27
-        gdal28
-        gdal29
-        gdal30
+        gdal
     HINTS
       ${_GDAL_LIBDIR}
     ${_GDAL_ROOT_HINTS_AND_PATHS}
     PATH_SUFFIXES
-      lib
+      "lib"
+      "local/lib"
   ) 
 
   MARK_AS_ADVANCED(GDAL_LIBRARY)
@@ -206,7 +197,7 @@ ELSE(WIN32 AND NOT CYGWIN)
 ENDIF(WIN32 AND NOT CYGWIN)
 
  if (GDAL_INCLUDE_DIR) 
-    file(READ "${GDAL_INCLUDE_DIR}/gcore/gdal_version.h" _gdal_VERSION_H_CONTENTS)
+    file(READ "${GDAL_INCLUDE_DIR}/gdal_version.h" _gdal_VERSION_H_CONTENTS)
     string(REGEX REPLACE ".*#  define[ \t]+GDAL_RELEASE_NAME[ \t]+\"([0-9A-Za-z.]+)\".*"
     "\\1" GDAL_VERSION ${_gdal_VERSION_H_CONTENTS})
     set(GDAL_VERSION ${GDAL_VERSION} CACHE INTERNAL "The version number for gdal libraries")
@@ -231,4 +222,5 @@ else (GDAL_VERSION)
   )
 endif (GDAL_VERSION)
 
+message(STATUS "gdal libs=[${GDAL_LIBRARIES}] headers=[${GDAL_INCLUDE_DIR}]")
 MARK_AS_ADVANCED(GDAL_INCLUDE_DIR GDAL_LIBRARIES)

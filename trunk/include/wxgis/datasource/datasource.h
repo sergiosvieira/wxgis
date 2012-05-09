@@ -25,7 +25,8 @@
 
 #include <wx/datetime.h>
 
-#include "ogrsf_frmts/ogrsf_frmts.h"
+#include "ogrsf_frmts.h"
+//#include "ogrsf_frmts/ogrsf_frmts.h"
 #include "gdal_priv.h"
 #include "gdal.h"
 #include "gdalwarper.h"
@@ -36,7 +37,7 @@
 #define NOTNODATA -9999.0
 
 /** \enum wxGISEnumDatasetType
-    \brief The dataset types 
+    \brief The dataset types
 */
 
 enum wxGISEnumDatasetType
@@ -49,7 +50,7 @@ enum wxGISEnumDatasetType
 };
 
 /** \enum wxGISEnumVectorDatasetType
-    \brief The vector datasource types 
+    \brief The vector datasource types
 */
 enum wxGISEnumVectorDatasetType
 {
@@ -66,7 +67,7 @@ enum wxGISEnumVectorDatasetType
 };
 
 /** \enum wxGISEnumRasterDatasetType
-    \brief The raster datasource types 
+    \brief The raster datasource types
 */
 enum wxGISEnumRasterDatasetType
 {
@@ -83,7 +84,7 @@ enum wxGISEnumRasterDatasetType
 };
 
 /** \enum wxGISEnumTableDatasetType
-    \brief The table datasource types 
+    \brief The table datasource types
 */
 enum wxGISEnumTableDatasetType
 {
@@ -98,7 +99,7 @@ enum wxGISEnumTableDatasetType
 };
 
 /** \enum wxGISEnumPrjFileType
-    \brief The projection file types 
+    \brief The projection file types
 */
 enum wxGISEnumPrjFileType
 {
@@ -107,7 +108,7 @@ enum wxGISEnumPrjFileType
 };
 
 /** \enum wxGISEnumContainerType
-    \brief The container types 
+    \brief The container types
 */
 enum wxGISEnumContainerType
 {
@@ -120,7 +121,7 @@ enum wxGISEnumContainerType
 };
 
 /** \enum wxGISEnumWldExtType
-    \brief The world file ext type 
+    \brief The world file ext type
 */
 
 enum wxGISEnumWldExtType

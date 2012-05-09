@@ -1,5 +1,5 @@
 /* XPM */
-static char * folder_prj_48_xpm[] = {
+static const char * folder_prj_48_xpm[] = {
 "48 48 432 2",
 "  	c None",
 ". 	c #7A7A7A",

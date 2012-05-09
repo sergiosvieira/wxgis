@@ -81,3 +81,4 @@ if(Boost_FOUND)
 endif(Boost_FOUND)
 
 include(installlib)
+

@@ -1,5 +1,5 @@
 /* XPM */
-static char * mainframemap_xpm[] = {
+static const char * mainframemap_xpm[] = {
 "16 16 221 2",
 "  	c None",
 ". 	c #C0BEC0",

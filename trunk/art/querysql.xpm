@@ -1,5 +1,5 @@
 /* XPM */
-static char * querysql_xpm[] = {
+static const char * querysql_xpm[] = {
 "16 16 44 1",
 " 	c None",
 ".	c #FCEF86",

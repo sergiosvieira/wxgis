@@ -113,10 +113,8 @@ wxGxContentView::wxGxContentView(void)
 wxGxContentView::wxGxContentView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) :
 wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(enumGISCVList), m_pConnectionPointCatalog(NULL), m_ConnectionPointCatalogCookie(wxNOT_FOUND), m_nParentGxObjectID(wxNOT_FOUND), m_currentSortCol(0), m_pSelection(NULL), m_bDragging(false), m_pDeleteCmd(NULL)
 {
+    m_pCatalog = NULL;
     m_HighLightItem = wxNOT_FOUND;
-
-	InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150);
-	InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
 
 	m_ImageListSmall.Create(16, 16);
 	m_ImageListLarge.Create(48, 48);
@@ -130,9 +128,9 @@ wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(enum
     wxBitmap SmallA(small_arrow_xpm);// > arrow
     wxImage SmallImg = SmallA.ConvertToImage();
     SmallImg = SmallImg.Rotate90();
-    wxBitmap SmallDown(SmallImg); 
+    wxBitmap SmallDown(SmallImg);
     SmallImg = SmallImg.Mirror(false);
-    wxBitmap SmallUp(SmallImg); 
+    wxBitmap SmallUp(SmallImg);
 
 	m_ImageListSmall.Add(wxBitmap(SmallDown));
 	m_ImageListSmall.Add(wxBitmap(SmallUp));
@@ -140,6 +138,7 @@ wxListCtrl(parent, id, pos, size, style), m_bSortAsc(true), m_current_style(enum
 
 	SetImageList(&m_ImageListLarge, wxIMAGE_LIST_NORMAL);
 	SetImageList(&m_ImageListSmall, wxIMAGE_LIST_SMALL);
+
 }
 
 wxGxContentView::~wxGxContentView(void)
@@ -149,6 +148,7 @@ wxGxContentView::~wxGxContentView(void)
 
 bool wxGxContentView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
+    m_pCatalog = NULL;
     m_bSortAsc = true;
     m_current_style = enumGISCVList;
     m_pConnectionPointCatalog = NULL;
@@ -160,9 +160,6 @@ bool wxGxContentView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos
     m_pDeleteCmd = NULL;
 
     wxListCtrl::Create(parent, LISTCTRLID, pos, size, wxLC_LIST | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE);
-    
-    InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150);
-	InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
 
 	m_ImageListSmall.Create(16, 16);
 	m_ImageListLarge.Create(48, 48);
@@ -176,9 +173,9 @@ bool wxGxContentView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos
     wxBitmap SmallA(small_arrow_xpm);// > arrow
     wxImage SmallImg = SmallA.ConvertToImage();
     SmallImg = SmallImg.Rotate90();
-    wxBitmap SmallDown(SmallImg); 
+    wxBitmap SmallDown(SmallImg);
     SmallImg = SmallImg.Mirror(false);
-    wxBitmap SmallUp(SmallImg); 
+    wxBitmap SmallUp(SmallImg);
 
 	m_ImageListSmall.Add(wxBitmap(SmallDown));
 	m_ImageListSmall.Add(wxBitmap(SmallUp));
@@ -201,7 +198,7 @@ bool wxGxContentView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 
 	//delete
     m_pDeleteCmd = application->GetCommand(wxT("wxGISCatalogMainCmd"), 4);
-	//new 
+	//new
 	m_pNewMenu = dynamic_cast<wxGISNewMenu*>(application->GetCommandBar(NEWMENUNAME));
 
 	m_pConnectionPointCatalog = dynamic_cast<wxGISConnectionPointContainer*>( m_pCatalog );
@@ -258,14 +255,17 @@ void wxGxContentView::Serialize(wxXmlNode* pRootNode, bool bStore)
 		int tw = wxAtoi(pRootNode->GetAttribute(wxT("type_width"), wxT("250")));
 		if(tw == 0)
 			tw = 250;
-		SetColumnWidth(0, nw);
-		SetColumnWidth(1, tw);
+
+        SetStyle(style);
+		if(style == enumGISCVReport)
+		{
+            SetColumnWidth(0, nw);
+		    SetColumnWidth(1, tw);
+		    SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+		}
 
         SORTDATA sortdata = {m_bSortAsc, m_currentSortCol, m_pCatalog};
 		SortItems(MyCompareFunction, (long)&sortdata);
-		SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
-
-		SetStyle(style);
 	}
 }
 
@@ -296,15 +296,11 @@ void wxGxContentView::AddObject(IGxObject* pObject)
 
 	wxString sType = pObject->GetCategory();
 
-#ifdef __WXGTK__
-    if(GetColumnCount() < 2)
-    {
-        InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150);
-        InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
-    }
-#endif
 	long ListItemID = InsertItem(0, sName, pos);//GetItemCount()
-	SetItem(ListItemID, 1, sType);
+	if(m_current_style == enumGISCVReport)
+	{
+		SetItem(ListItemID, 1, sType);
+	}
 	SetItemPtrData(ListItemID, (wxUIntPtr) pData);
 
 	wxListCtrl::Refresh();
@@ -318,7 +314,8 @@ void wxGxContentView::OnColClick(wxListEvent& event)
 
     SORTDATA sortdata = {m_bSortAsc, m_currentSortCol, m_pCatalog};
 	SortItems(MyCompareFunction, (long)&sortdata);
-	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+	if(m_current_style == enumGISCVReport)
+		SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 }
 
 void wxGxContentView::OnContextMenu(wxContextMenuEvent& event)
@@ -454,6 +451,8 @@ void wxGxContentView::ShowContextMenu(const wxPoint& pos)
 
 void wxGxContentView::SetColumnImage(int col, int image)
 {
+    if(col >= GetColumnCount())
+        return;
     wxListItem item;
     item.SetMask(wxLIST_MASK_IMAGE);
 
@@ -494,10 +493,16 @@ void wxGxContentView::SetStyle(wxGISEnumContentsViewStyle style)
 	{
 	case enumGISCVReport:
         SetSingleStyle(wxLC_REPORT);
+        if(GetColumnCount() < 2)
+        {
+            InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150);
+            InsertColumn(1, _("Type"),  wxLIST_FORMAT_LEFT, 250);
+        }
 		//SetWindowStyleFlag(m_style | wxLC_REPORT);
 		break;
 	case enumGISCVSmall:
         SetSingleStyle(wxLC_SMALL_ICON);
+
 		//SetWindowStyleFlag(m_style | wxLC_SMALL_ICON );
 		break;
 	case enumGISCVLarge:
@@ -526,9 +531,9 @@ void wxGxContentView::SetStyle(wxGISEnumContentsViewStyle style)
 //		break;
 //	}
 	m_current_style = style;
-//#ifdef __WXGTK__
-//    OnRefreshAll();
-//#endif
+#ifdef __WXGTK__
+    RefreshAll();
+#endif
 }
 
 void wxGxContentView::OnBeginLabelEdit(wxListEvent& event)
@@ -539,7 +544,7 @@ void wxGxContentView::OnBeginLabelEdit(wxListEvent& event)
 		event.Veto();
 		return;
 	}
-    
+
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pItemData->nObjectID);
 	IGxObjectEdit* pObjEdit =  dynamic_cast<IGxObjectEdit*>(pGxObject.get());
 	if(pObjEdit == NULL)
@@ -568,7 +573,7 @@ void wxGxContentView::OnEndLabelEdit(wxListEvent& event)
 		event.Veto();
 		return;
 	}
-    
+
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(pItemData->nObjectID);
 	IGxObjectEdit* pObjEdit =  dynamic_cast<IGxObjectEdit*>(pGxObject.get());
 	if(pObjEdit == NULL)
@@ -590,7 +595,7 @@ void wxGxContentView::OnObjectAdded(wxGxCatalogEvent& event)
 {
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(event.GetObjectID());
     if(pGxObject)
-    {        
+    {
 		IGxObject* pParentGxObject = pGxObject->GetParent();
 		if(!pParentGxObject)
 			return;
@@ -614,7 +619,7 @@ void wxGxContentView::OnObjectDeleted(wxGxCatalogEvent& event)
 			continue;
 		if(pItemData->nObjectID != event.GetObjectID())
 			continue;
-        SetItemData(i, NULL);
+        SetItemData(i, 0);
 		//delete pItemData;
 		DeleteItem(i);
 		//Refresh();
@@ -649,7 +654,7 @@ void wxGxContentView::OnObjectChanged(wxGxCatalogEvent& event)
 			continue;
 		if(pItemData->nObjectID != event.GetObjectID())
 			continue;
-	
+
         IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(event.GetObjectID());
 		IGxObjectUI* pObjUI =  dynamic_cast<IGxObjectUI*>(pGxObject.get());
 		wxIcon icon_small, icon_large;
@@ -688,6 +693,8 @@ void wxGxContentView::OnObjectRefreshed(wxGxCatalogEvent& event)
 void wxGxContentView::RefreshAll(void)
 {
     ResetContents();
+    if(m_pCatalog == NULL)
+        return;
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_nParentGxObjectID);
 	IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(pGxObject.get());
 	wxBusyCursor wait;
@@ -710,7 +717,7 @@ void wxGxContentView::OnSelectionChanged(wxGxSelectionEvent& event)
 {
 	if(event.GetInitiator() == GetId())
 		return;
-    
+
     IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_pSelection->GetLastSelectedObjectID());
 	if(!pGxObject || m_nParentGxObjectID == pGxObject->GetID())
 		return;
@@ -881,13 +888,13 @@ int wxGxContentView::GetIconPos(wxIcon icon_small, wxIcon icon_large)
 }
 
 wxDragResult wxGxContentView::OnDragOver(wxCoord x, wxCoord y, wxDragResult def)
-{    
+{
     SetItemState(m_HighLightItem, 0, wxLIST_STATE_DROPHILITED);
     wxPoint pt(x, y);
 	unsigned long nFlags(0);
 	long nItemId = HitTest(pt, (int &)nFlags);
 	if(nItemId != wxNOT_FOUND && (nFlags & wxLIST_HITTEST_ONITEM))
-	{ 
+	{
         wxSize sz = GetClientSize();
         if(DNDSCROLL > y)//scroll up
             ScrollLines(-1);

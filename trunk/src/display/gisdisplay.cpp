@@ -23,6 +23,7 @@
 #include "wxgis/display/displaytransformation.h"
 
 #include <wx/graphics.h>
+#include <wx/dcgraph.h>
 
 wxGISDisplay::wxGISDisplay(void)
 {
@@ -140,14 +141,11 @@ cairo_t* wxGISDisplay::CreateContext(wxDC* dc)
 #endif
 
 #ifdef __WXGTK__
-//#ifdef GDK_WINDOWING_X11
-     //wxGCDC gdc(dc);
-     wxGraphicsContext* gc = dc->GetGraphicsContext();
-     //wxGCDC* gcdc = wxDynamicCast(dc, wxGCDC);
+     wxGraphicsRenderer * const renderer = wxGraphicsRenderer::GetCairoRenderer();
+     wxWindowDC* pwdc =  wxDynamicCast(dc, wxWindowDC);
+     wxGraphicsContext * gc = renderer->CreateContext(*pwdc);
      if(gc)
-          cr =  (cairo_t*)gc->GetNativeContext();;
-     //GdkDrawable *drawable = dc->m_window;
-     //cr = gdk_cairo_create( drawable ) ;
+          cr =  (cairo_t*)gc->GetNativeContext();
 #endif
      return cr;
 }
@@ -184,7 +182,9 @@ void wxGISDisplay::Output(wxDC* pDC, wxGISPointsArray ClipGeometry)
 	cairo_paint (cr);
 
     cairo_surface_destroy (surface);
+#ifdef __WXMSW__
     cairo_destroy (cr);
+#endif
 }
 
 void wxGISDisplay::ZoomingDraw(const wxRect& rc, wxDC* pDC)
@@ -203,8 +203,11 @@ void wxGISDisplay::ZoomingDraw(const wxRect& rc, wxDC* pDC)
 	cairo_set_source_surface (cr, m_saLayerCaches[m_nLastCacheID].pCairoSurface, -m_dOrigin_X, -m_dOrigin_Y);
 	cairo_paint (cr);
 
-    cairo_destroy (cr);
     cairo_surface_destroy (surface);
+#ifdef __WXMSW__
+    cairo_destroy (cr);
+
+#endif
 }
 
 void wxGISDisplay::WheelingDraw(double dZoom, wxDC* pDC)
@@ -249,8 +252,10 @@ void wxGISDisplay::WheelingDraw(double dZoom, wxDC* pDC)
 	}
 	cairo_paint (cr);
 
+	cairo_surface_destroy (surface);
+#ifdef __WXMSW__
     cairo_destroy (cr);
-    cairo_surface_destroy (surface);
+#endif
 }
 
 void wxGISDisplay::PanningDraw(wxCoord x, wxCoord y, wxDC* pDC)
@@ -275,8 +280,11 @@ void wxGISDisplay::PanningDraw(wxCoord x, wxCoord y, wxDC* pDC)
 	cairo_set_source_surface (cr, m_surface_tmp, 0, 0);
 	cairo_paint (cr);
 
-    cairo_destroy (cr);
     cairo_surface_destroy (surface);
+#ifdef __WXMSW__
+    cairo_destroy (cr);
+
+#endif
 }
 
 void wxGISDisplay::RotatingDraw(double dAngle, wxDC* pDC)
@@ -313,9 +321,10 @@ void wxGISDisplay::RotatingDraw(double dAngle, wxDC* pDC)
 	cairo_set_source_surface (cr, m_surface_tmp, 0, 0);
 	cairo_paint (cr);
 
-    cairo_destroy (cr);
     cairo_surface_destroy (surface);
-
+#ifdef __WXMSW__
+    cairo_destroy (cr);
+#endif
 	cairo_matrix_t mat = {1, 0, 0, 1, 0, 0};
 	cairo_set_matrix (m_cr_tmp, &mat);
 }

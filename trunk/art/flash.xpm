@@ -1,5 +1,5 @@
 /* XPM */
-static char * flash_xpm[] = {
+static const char * flash_xpm[] = {
 "16 16 76 1",
 " 	c None",
 ".	c #FCB03E",

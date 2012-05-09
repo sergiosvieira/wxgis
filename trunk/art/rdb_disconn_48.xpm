@@ -1,5 +1,5 @@
 /* XPM */
-static char * rdb_disconn_48_xpm[] = {
+static const char * rdb_disconn_48_xpm[] = {
 "48 48 396 2",
 "  	c None",
 ". 	c #585C56",

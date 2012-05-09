@@ -47,6 +47,9 @@ bool CreateRandomData(void)
 
 bool Crypt(const wxString &sText, wxString &sCryptText)
 {
+    sCryptText = sText;
+    return true;
+
 	wxGISAppConfigSPtr pConfig = GetConfig();
 	if(!pConfig)
 		return false;
@@ -81,11 +84,11 @@ bool Crypt(const wxString &sText, wxString &sCryptText)
 
 	EVP_CIPHER_CTX ctx;
 	const EVP_CIPHER * cipher;
- 
+
 	EVP_CIPHER_CTX_init(&ctx);
- 
+
 	cipher = EVP_aes_256_cfb();
- 
+
 	bool bResult = EVP_EncryptInit(&ctx, cipher, pabyKey, pabyIV);
 	if(!bResult)
 	{
@@ -95,7 +98,7 @@ bool Crypt(const wxString &sText, wxString &sCryptText)
 		return bResult;
 	}
 
-	CPLString pszText(sText.mb_str(wxConvUTF8)); 
+	CPLString pszText(sText.mb_str(wxConvUTF8));
 	int outlen;
 	unsigned char outbuf[BUFSIZE];
 
@@ -122,9 +125,12 @@ bool Crypt(const wxString &sText, wxString &sCryptText)
 
 	return bResult;
 }
- 
+
 bool Decrypt(const wxString &sText, wxString &sDecryptText)
 {
+    sDecryptText = sText;
+    return true;
+
 	wxGISAppConfigSPtr pConfig = GetConfig();
 	if(!pConfig)
 		return false;
@@ -159,9 +165,9 @@ bool Decrypt(const wxString &sText, wxString &sDecryptText)
 
 	EVP_CIPHER_CTX ctx;
 	const EVP_CIPHER * cipher;
- 
+
 	EVP_CIPHER_CTX_init(&ctx);
- 
+
 	cipher = EVP_aes_256_cfb();
 
  	bool bResult = EVP_DecryptInit(&ctx, cipher, pabyKey, pabyIV);
@@ -180,7 +186,6 @@ bool Decrypt(const wxString &sText, wxString &sDecryptText)
 	unsigned char outbuf[BUFSIZE];
 
 	bResult = EVP_DecryptUpdate(&ctx, outbuf, &outlen, pabyText, nTextBytes);
-
 	if(!bResult)
 	{
 		wxLogError(_("Decrypt: Failed EVP_DecryptUpdate!"));

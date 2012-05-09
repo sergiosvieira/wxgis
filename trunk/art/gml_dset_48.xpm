@@ -1,5 +1,5 @@
 /* XPM */
-static char * gml_dset_48_xpm[] = {
+static const char * gml_dset_48_xpm[] = {
 "48 48 408 2",
 "  	c None",
 ". 	c #CD5C00",

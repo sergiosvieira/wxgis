@@ -100,7 +100,9 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGISApplicationEx* pApp, wxWindow* parent,
 
 	m_pContextMenu = new wxMenu(/*_("Command menu")*/);
 	wxMenuItem *item = new wxMenuItem(m_pContextMenu, ID_ONSETKEYCODE, _("Set keycode"));
+#ifdef __WIN32__
 	item->SetBitmap(wxKeyCodeDlg::GetBitmap());
+#endif
 	m_pContextMenu->Append(item);
 
 	this->SetSizer( bSizer );
@@ -626,7 +628,7 @@ void wxGISToolBarPanel::OnLeftDown(wxMouseEvent& event)
 			m_pApp->ShowPane(pBar->GetName(), bCheck);
 			m_pTreeCtrl->SetItemImage(nItemId, bCheck == true ? 1 : 0);
 			m_pTreeCtrl->SetItemImage(nItemId, bCheck == true ? 1 : 0, wxTreeItemIcon_Selected);
-		}		
+		}
 	}
 }
 
@@ -691,7 +693,9 @@ wxGISCommandPanel::wxGISCommandPanel( wxGISApplicationEx* pApp, wxWindow* parent
 
 	m_pContextMenu = new wxMenu(/*_("Command menu")*/);
 	wxMenuItem *item = new wxMenuItem(m_pContextMenu, ID_ONSETKEYCODE, _("Set keycode"));
+#ifdef __WIN32__
 	item->SetBitmap(wxKeyCodeDlg::GetBitmap());
+#endif
 	m_pContextMenu->Append(item);
 
 	this->SetSizer( bSizer5 );

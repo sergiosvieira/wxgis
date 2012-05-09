@@ -1,5 +1,5 @@
 /* XPM */
-static char * toolboxfavor_48_xpm[] = {
+static const char * toolboxfavor_48_xpm[] = {
 "48 48 829 2",
 "  	c None",
 ". 	c #8A0202",

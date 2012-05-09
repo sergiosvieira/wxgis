@@ -1,5 +1,5 @@
 /* XPM */
-static char * kmz_dset_16_xpm[] = {
+static const char * kmz_dset_16_xpm[] = {
 "16 16 133 2",
 "  	c None",
 ". 	c #BBACBF",

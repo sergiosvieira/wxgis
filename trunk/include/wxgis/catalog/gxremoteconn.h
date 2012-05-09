@@ -23,7 +23,8 @@
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/datasource/postgisdataset.h"
 
-#include "ogrsf_frmts/pg/ogr_pg.h"
+#include "/home/bishop/projects/wxgisgdal/ogr/ogrsf_frmts/pg/ogr_pg.h"
+//#include "ogrsf_frmts/pg/ogr_pg.h"
 
 class wxGxRemoteDBSchema;
 
