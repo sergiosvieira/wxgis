@@ -1,5 +1,5 @@
 /* XPM */
-static char * db_connections_16_xpm[] = {
+static const char * db_connections_16_xpm[] = {
 "16 16 110 2",
 "  	c None",
 ". 	c #ADADAD",

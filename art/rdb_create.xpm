@@ -1,5 +1,5 @@
 /* XPM */
-static char * rdb_create_xpm[] = {
+static const char * rdb_create_xpm[] = {
 "16 16 90 1",
 " 	c None",
 ".	c #989A96",

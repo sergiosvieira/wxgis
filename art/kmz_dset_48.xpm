@@ -1,5 +1,5 @@
 /* XPM */
-static char * kmz_dset_48_xpm[] = {
+static const char * kmz_dset_48_xpm[] = {
 "48 48 238 2",
 "  	c None",
 ". 	c #5C3566",

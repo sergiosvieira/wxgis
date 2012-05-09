@@ -1,5 +1,5 @@
 /* XPM */
-static char * process_working_16_xpm[] = {
+static const char * process_working_16_xpm[] = {
 "496 16 204 2",
 "  	c None",
 ". 	c #DEDEDE",

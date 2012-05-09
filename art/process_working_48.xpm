@@ -1,5 +1,5 @@
 /* XPM */
-static char * process_working_48_xpm[] = {
+static const char * process_working_48_xpm[] = {
 "1488 48 256 2",
 "  	c None",
 ". 	c #8E8E8E",

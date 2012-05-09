@@ -1,5 +1,5 @@
 /* XPM */
-static char * md_dset_48_xpm[] = {
+static const char * md_dset_48_xpm[] = {
 "48 48 356 2",
 "  	c None",
 ". 	c #AB7DA6",

@@ -1,5 +1,5 @@
 /* XPM */
-static char * toolboxfavor_16_xpm[] = {
+static const char * toolboxfavor_16_xpm[] = {
 "16 16 147 2",
 "  	c None",
 ". 	c #C24E38",

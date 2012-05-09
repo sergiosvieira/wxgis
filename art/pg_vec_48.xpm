@@ -1,5 +1,5 @@
 /* XPM */
-static char * pg_vec_48_xpm[] = {
+static const char * pg_vec_48_xpm[] = {
 "48 48 533 2",
 "  	c None",
 ". 	c #D0D3CC",

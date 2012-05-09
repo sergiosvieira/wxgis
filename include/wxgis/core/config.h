@@ -25,7 +25,7 @@
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
 
-#define VENDOR wxT("wxGIS")
+#define VENDOR wxT("wxgis")
 
 WX_DECLARE_STRING_HASH_MAP( wxXmlNode*, wxGISConfigNodesMap );
 /** \class wxGISConfig config.h
@@ -75,7 +75,7 @@ protected:
 
 	Added methods for Get/Set Locale, System Directory and Log Directory paths, Debug mode
 */
-class WXDLLIMPEXP_GIS_CORE wxGISAppConfig : 
+class WXDLLIMPEXP_GIS_CORE wxGISAppConfig :
 	public wxGISConfig
 {
 public:
@@ -97,11 +97,11 @@ DEFINE_SHARED_PTR(wxGISAppConfig);
 
 /** \fn wxGISAppConfigSPtr GetConfig(void)
     \brief Global config getter.
-	
+
 	If config object is not exist it created, otherwise - AddRef for pointer
- */	
+ */
 WXDLLIMPEXP_GIS_CORE wxGISAppConfigSPtr GetConfig(void);
 /** \fn void ReleaseConfig(void)
     \brief Release global config pointer.
- */	
+ */
 WXDLLIMPEXP_GIS_CORE void ReleaseConfig(void);

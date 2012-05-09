@@ -1,5 +1,5 @@
 /* XPM */
-static char * swipe_cur_xpm[] = {
+static const char * swipe_cur_xpm[] = {
 "16 16 256 2",
 "  	c None",
 ". 	c #000000",

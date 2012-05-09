@@ -18,8 +18,6 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#pragma once
-
 #include "wxgis/framework/applicationex.h"
 #include "wxgis/framework/customizedlg.h"
 #include "wxgis/framework/toolbarmenu.h"
@@ -278,7 +276,8 @@ bool wxGISApplicationEx::SetupLog(const wxString &sLogPath)
     if(!wxGISApplication::SetupLog(sLogPath))
         return false;
 	wxString sCPLLogPath = sLogPath + wxFileName::GetPathSeparator() + wxString(wxT("gdal_log_cat.txt"));
-	CPLSetConfigOption("CPL_LOG", sCPLLogPath.mb_str(wxConvUTF8) );
+	CPLString szCPLLogPath(sCPLLogPath.mb_str(wxConvUTF8));
+	CPLSetConfigOption("CPL_LOG", szCPLLogPath );
     return true;
 }
 

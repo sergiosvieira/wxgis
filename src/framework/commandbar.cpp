@@ -255,9 +255,11 @@ void wxGISMenu::AddCommand(ICommand* pCmd)
 	case enumGISCommandDropDown:
 		{
 			wxMenuItem *item = new wxMenuItem(this, pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), (wxItemKind)enumGISCommandNormal);
+#ifdef __WIN32__
 			wxBitmap Bmp = pCmd->GetBitmap();
 			if(Bmp.IsOk())
 				item->SetBitmap(Bmp);
+#endif
 			Append(item);
 		}
 		break;
@@ -604,7 +606,7 @@ void wxGISToolBar::Deactivate(void)
 {
 	for(std::map<size_t, IToolBarControl*>::const_iterator IT = m_RemControlMap.begin(); IT != m_RemControlMap.end(); ++IT)
 	{
-		if(IT->second) 
+		if(IT->second)
             IT->second->Deactivate();
 	}
 }

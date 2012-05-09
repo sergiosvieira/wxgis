@@ -27,8 +27,12 @@
 /** \class wxGISRemoteConnDlg remoteconndlg.h
     \brief The dialog to configure remote database connection, test it and store in connection file (*.xconn)
 */
-#define REMOTECONNDLG_MAX_HEIGHT 400
-class wxGISRemoteConnDlg : public wxDialog 
+#ifdef __WXMSW___
+    #define REMOTECONNDLG_MAX_HEIGHT 400
+#else
+    #define REMOTECONNDLG_MAX_HEIGHT 440
+#endif
+class wxGISRemoteConnDlg : public wxDialog
 {
 protected:
 	enum
@@ -49,10 +53,10 @@ public:
 	virtual ~wxGISRemoteConnDlg();
 	virtual CPLString GetPath(void);
 	virtual wxString GetName(void);
-protected:	//events	
-    void OnTest(wxCommandEvent& event);	
+protected:	//events
+    void OnTest(wxCommandEvent& event);
 	void OnOK(wxCommandEvent& event);
-protected:		
+protected:
 	wxBoxSizer* m_bMainSizer;
 	wxTextCtrl* m_ConnName;
 	wxStaticLine* m_staticline1;
@@ -72,12 +76,12 @@ protected:
 	wxButton* m_sdbSizerOK;
 	wxButton* m_sdbSizerCancel;
     wxCheckBox* m_checkBoxBinaryCursor;
-	
-	wxString m_sConnName; 
-	wxString m_sServer; 
-	wxString m_sPort; 
-	wxString m_sDatabase; 
-	wxString m_sUser; 
+
+	wxString m_sConnName;
+	wxString m_sServer;
+	wxString m_sPort;
+	wxString m_sDatabase;
+	wxString m_sUser;
 	wxString m_sPass;
     bool m_bIsBinaryCursor;
 	bool m_bCreateNew;

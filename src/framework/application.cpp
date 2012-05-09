@@ -218,6 +218,7 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 				    pTool->SetShortHelp(pCmd->GetTooltip() + wxT(" (") + sAcc + wxT(")"));//accelerator
                 else
 				    pTool->SetShortHelp(pCmd->GetTooltip());
+#ifdef __WXMSW__
 
                 if(pTool->GetBitmap().IsOk())
                     continue;
@@ -226,6 +227,7 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 				    pTool->SetBitmap(Bmp);
 			    else
 				    pTool->SetBitmap(wxBitmap(tool_16_xpm));
+#endif
 		    }
             //continue;
         }
@@ -832,14 +834,14 @@ void wxGISApplication::OnAppOptions(void)
 
     if(PropertySheetDialog.ShowModal() == wxID_OK)
     {
-        //apply changes and exit        
+        //apply changes and exit
         for(size_t i = 0; i < PropertySheetDialog.GetBookCtrl()->GetPageCount(); ++i)
         {
             IPropertyPage *pPage = dynamic_cast<IPropertyPage*>(PropertySheetDialog.GetBookCtrl()->GetPage(i));
             if(pPage)
                 pPage->Apply();
         }
-    }    
+    }
 }
 
 bool wxGISApplication::SetupLog(const wxString &sLogPath)
@@ -935,7 +937,7 @@ bool wxGISApplication::SetupLoc(const wxString &sLoc, const wxString &sLocPath)
 
 		//wxString sWxLocPath = sLocalePath + wxFileName::GetPathSeparator() + sLoc + wxT(".mo");
 		//m_pLocale->AddCatalog(sWxLocPath);
-		
+
 
 		// Initialize the catalogs we'll be using
 		//load multicat from locale

@@ -59,7 +59,7 @@ wxGISConfig::wxGISConfig(const wxString &sVendorName, bool bPortable)
     if(bPortable)
     {
         //if potable - config path: [app.exe path\config]
-        m_sGlobalConfigDirPath = m_sLocalConfigDirPath = m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxT("config");
+        m_sGlobalConfigDirPath = m_sLocalConfigDirPath = m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxString(wxT("config"));
 	    if(!wxDirExists(m_sLocalConfigDirPath))
 		    wxFileName::Mkdir(m_sLocalConfigDirPath, 0755, wxPATH_MKDIR_FULL);
     }
@@ -480,7 +480,7 @@ wxString wxGISAppConfig::GetLocale(void)
 
 wxString wxGISAppConfig::GetLocaleDir(void)
 {
-    wxString sDefaultOut = m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxT("locale");
+    wxString sDefaultOut = m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxString(wxT("locale"));
     if(m_bPortable)
         return sDefaultOut;
 	return Read(enumGISHKCU, wxString(wxT("wxGISCommon/loc/path")), sDefaultOut);
@@ -489,14 +489,14 @@ wxString wxGISAppConfig::GetLocaleDir(void)
 wxString wxGISAppConfig::GetLogDir(void)
 {
 	wxLogNull noLog;
-    wxString sDefaultOut = m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxT("log");
+    wxString sDefaultOut = m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxString(wxT("log"));
 	return Read(enumGISHKCU, wxString(wxT("wxGISCommon/log/path")), sDefaultOut);
 }
 
 
 wxString wxGISAppConfig::GetSysDir(void)
 {
-    wxString sDefaultOut = m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxT("sys");
+    wxString sDefaultOut = m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxString(wxT("sys"));
     if(m_bPortable)
         return sDefaultOut;
 	return Read(enumGISHKCU, wxString(wxT("wxGISCommon/sys/path")), sDefaultOut);

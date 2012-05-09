@@ -18,6 +18,12 @@ string(REGEX MATCH "wxGIS_RELEASE_NUMBER[ \t]+([0-9]+)"
   wxGIS_RELEASE_NUMBER ${WXGIS_VERSION_H_CONTENTS})  
 string (REGEX MATCH "([0-9]+)"
   wxGIS_RELEASE_NUMBER ${wxGIS_RELEASE_NUMBER})
+
+# uninstall target
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+    IMMEDIATE @ONLY)
     
 # Setup package meta-data
 set(WXGIS_VERSION ${wxGIS_MAJOR_VERSION}.${wxGIS_MINOR_VERSION}.${wxGIS_RELEASE_NUMBER})
@@ -158,4 +164,14 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_sys/ DESTINATION ${WXGIS_CURRE
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_sys/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Release/sys CONFIGURATIONS Release)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_config/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Debug/config CONFIGURATIONS Debug)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_config/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Release/config CONFIGURATIONS Release)
-endif(WIN32)#in UNIX should install /.../LC...
+else(WIN32)#UNIX
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_loc/ DESTINATION share/locale/wxgis/ FILES_MATCHING PATTERN "*.mo" PATTERN "*.txt" )
+install(CODE "FILE(MAKE_DIRECTORY /var/log/wxgis)")
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_sys/ DESTINATION share/wxgis)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_config/ DESTINATION /etc/wxgis)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/wxgis DESTINATION include FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+endif(WIN32)
+
+add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+

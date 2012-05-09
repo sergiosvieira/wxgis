@@ -24,7 +24,8 @@
 #include "wxgis/cat_app/catalogframe.h"
 
 #include <locale.h>
-#include "ogrsf_frmts/ogrsf_frmts.h"
+//#include "ogrsf_frmts/ogrsf_frmts.h"
+#include "ogrsf_frmts.h"
 #include "ogr_api.h"
 
 IMPLEMENT_APP(wxGISCatalogApp);
@@ -45,12 +46,20 @@ wxGISCatalogApp::~wxGISCatalogApp(void)
 	UnLoadLibs();
 }
 
+#include "wxgis/core/crypt.h"
+
 bool wxGISCatalogApp::OnInit()
 {
-	wxGISCatalogFrame* frame = new wxGISCatalogFrame(NULL, wxID_ANY, _("wxGIS Catalog"), wxDefaultPosition, wxSize(800, 480) );
+    wxGISCatalogFrame* frame = new wxGISCatalogFrame(NULL, wxID_ANY, _("wxGIS Catalog"), wxDefaultPosition, wxSize(800, 480) );
 	wxGISAppConfigSPtr pConfig = GetConfig();
 	if(!pConfig)
 		return false;
+
+//    wxString sT(wxT("qqq")), sCT;
+//	bool bTest = Crypt(sT, sCT);
+//	const char* szT = sCT.mb_str(wxConvUTF8);
+//	bTest = Decrypt(sCT, sT);
+    //const char* szT1 = sT.mb_str(wxConvUTF8);
 
 	//setup loging
 	wxString sLogDir = pConfig->GetLogDir();

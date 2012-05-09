@@ -1,5 +1,5 @@
 /* XPM */
-static char * md_dset_16_xpm[] = {
+static const char * md_dset_16_xpm[] = {
 "16 16 135 2",
 "  	c None",
 ". 	c #AB7DA6",

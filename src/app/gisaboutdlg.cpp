@@ -26,7 +26,7 @@
 #include "../../art/logo.xpm"
 
 #include <wx/version.h>
-#include <wx/ffile.h> 
+#include <wx/ffile.h>
 
 #include "geos_c.h"
 #include "proj_api.h"
@@ -63,13 +63,13 @@ wxGISSimpleTextPanel::~wxGISSimpleTextPanel()
 
 void wxGISSimpleTextPanel::edtUrlClickUrl(wxTextUrlEvent& event)
 {
-    if ( event.GetMouseEvent().LeftUp() ) // we open the browser only when the Left mouse button is pressed and then released  
+    if ( event.GetMouseEvent().LeftUp() ) // we open the browser only when the Left mouse button is pressed and then released
     {
         wxString url = m_pStaticText->GetValue();
         url = url.Mid( event.GetURLStart(), event.GetURLEnd() - event.GetURLStart() ); // we are extracting the clicked url
         ::wxLaunchDefaultBrowser( url );
     }
-    
+
     event.Skip();
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -82,40 +82,40 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 
     wxColour BackColor( 255, 255, 255 );
-	
-	wxBoxSizer* bMainSizer = new wxBoxSizer( wxVERTICAL );	
+
+	wxBoxSizer* bMainSizer = new wxBoxSizer( wxVERTICAL );
 	wxBoxSizer* bHeadSizer = new wxBoxSizer( wxHORIZONTAL );
-	
+
 	m_bitmap = new wxStaticBitmap( this, wxID_ANY, wxBitmap(logo_xpm), wxPoint( -1,-1 ), wxDefaultSize, wxNO_BORDER );
 	m_bitmap->SetForegroundColour( BackColor );
 	m_bitmap->SetBackgroundColour( BackColor );
-	
+
 	bHeadSizer->Add( m_bitmap, 0, 0, 5 );
-	
+
 #ifdef _WIN64
     m_title = new wxStaticText( this, wxID_ANY, wxString::Format(_("\nwxGIS [%s] (x64)\nVersion: %s"), pApp->GetAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0 );
 #else
      m_title = new wxStaticText( this, wxID_ANY, wxString::Format(_("\nwxGIS [%s] (x86)\nVersion: %s"), pApp->GetAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0 );
 #endif
-	
+
     wxFont titleFont = this->GetFont();
     titleFont.SetWeight(wxFONTWEIGHT_BOLD);
     m_title->SetFont(titleFont);
 	m_title->Wrap( -1 );
 	m_title->SetBackgroundColour( BackColor );
  //   m_staticText1->
-	
+
 	bHeadSizer->Add( m_title, 1, wxEXPAND, 5 );
-	
+
 	bMainSizer->Add( bHeadSizer, 0, wxEXPAND, 5 );
-	
+
 	m_staticline1 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
 	bMainSizer->Add( m_staticline1, 0, wxEXPAND|wxALL, 5 );
 
     wxString sGEOSStr = wxString(GEOSversion(), wxConvLocal);
     wxString sPrjStr = wxString(pj_get_release(), wxConvLocal);
     wxString sGDALStr = wxString(GDAL_RELEASE_NAME, wxConvLocal);
-    wxString sWXStr = wxVERSION_STRING;	
+    wxString sWXStr = wxVERSION_STRING;
 wxString wxVer( wxVERSION_STRING );
 
 #if defined(__WXMSW__)
@@ -132,7 +132,7 @@ wxString wxVer( wxVERSION_STRING );
 
     wxString sCAIROStr = wxString(cairo_version_string(), wxConvLocal);
 
-	m_AuiNotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE );
+	m_AuiNotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS );
 
 #ifdef _WIN64
     wxString sAboutApp = wxString::Format(_("wxGIS [%s] (x64)\n\nVersion: %s\n\nBuild: %s\n\n(c) 2009-%d Dmitry Baryshnikov (Bishop)\n\nhttp://wxgis.googlecode.com/"), pApp->GetAppName().c_str(), pApp->GetAppVersionString().c_str(), wxString(__DATE__,wxConvLibc).c_str(),  __YEAR__);
@@ -154,7 +154,7 @@ wxString wxVer( wxVERSION_STRING );
 	wxString sOgrDrivers;
 	for(size_t i = 0; i < OGRSFDriverRegistrar::GetRegistrar()->GetDriverCount(); ++i)
 	{
-		OGRSFDriver *pDrv = OGRSFDriverRegistrar::GetRegistrar()->GetDriver(i);		
+		OGRSFDriver *pDrv = OGRSFDriverRegistrar::GetRegistrar()->GetDriver(i);
 		wxString sDrvName(pDrv->GetName(), wxConvUTF8);
 		sOgrDrivers += wxT("    - ");
 		sOgrDrivers += sDrvName;
@@ -203,7 +203,7 @@ wxString wxVer( wxVERSION_STRING );
 	m_sdbSizer->AddButton( m_sdbSizerOK );
 	m_sdbSizer->Realize();
 	bMainSizer->Add( m_sdbSizer, 0, wxALL|wxEXPAND, 5 );
-	
+
 	this->SetSizer( bMainSizer );
 	this->Layout();
 	this->Centre( wxBOTH );

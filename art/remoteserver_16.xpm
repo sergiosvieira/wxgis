@@ -1,5 +1,5 @@
 /* XPM */
-static char * remoteserver_16_xpm[] = {
+static const char * remoteserver_16_xpm[] = {
 "16 16 47 1",
 " 	c None",
 ".	c #82847F",
