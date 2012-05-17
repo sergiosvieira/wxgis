@@ -45,7 +45,7 @@ wxGISCheckList::~wxGISCheckList(void)
 
 long wxGISCheckList::InsertItem(const wxString& label, int nChecked)
 {
-    long nItem = wxListView::InsertItem(-1, label, nChecked);//some state data
+    long nItem = wxListView::InsertItem(wxListView::GetItemCount(), label, nChecked);//some state data
     LPITEM_DATA pdata = new ITEM_DATA;
     pdata->nCheckState = nChecked;
     pdata->bChanged = false;
@@ -57,14 +57,18 @@ long wxGISCheckList::InsertItem(const wxString& label, int nChecked)
 bool wxGISCheckList::SetItemData(long item, long data)
 {
     LPITEM_DATA pdata = (LPITEM_DATA)wxListView::GetItemData(item);
-    pdata->pUserData = data;
+    if(pdata)
+        pdata->pUserData = data;
     return true;
 }
 
 long wxGISCheckList::GetItemData(long item) const
 {
     LPITEM_DATA pdata = (LPITEM_DATA)wxListView::GetItemData(item);
-    return pdata->pUserData;
+    if(pdata)
+        return pdata->pUserData;
+    else
+        return 0;
 }
 
 void wxGISCheckList::OnLeftDown(wxMouseEvent& event)
@@ -75,12 +79,15 @@ void wxGISCheckList::OnLeftDown(wxMouseEvent& event)
 	unsigned long nFlags(0);
 	long nItemId = HitTest(pt, (int &)nFlags);
 	if(nItemId != wxNOT_FOUND && (nFlags & wxLIST_HITTEST_ONITEMICON))
-	{        
+	{
         LPITEM_DATA pdata = (LPITEM_DATA)wxListView::GetItemData(nItemId);
-        pdata->bChanged = !pdata->bChanged;
-        pdata->nCheckState = !pdata->nCheckState;
-        bool bCheck = pdata->nCheckState != 0;
-        SetItemImage(nItemId, bCheck == true ? 1 : 0, bCheck == true ? 1 : 0);
+        if(pdata)
+        {
+            pdata->bChanged = !pdata->bChanged;
+            pdata->nCheckState = !pdata->nCheckState;
+            bool bCheck = pdata->nCheckState != 0;
+            SetItemImage(nItemId, bCheck == true ? 1 : 0, bCheck == true ? 1 : 0);
+       }
 	}
 }
 

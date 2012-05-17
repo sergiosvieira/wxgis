@@ -59,7 +59,7 @@ bool wxGISCatalogApp::OnInit()
 //	bool bTest = Crypt(sT, sCT);
 //	const char* szT = sCT.mb_str(wxConvUTF8);
 //	bTest = Decrypt(sCT, sT);
-    //const char* szT1 = sT.mb_str(wxConvUTF8);
+//    const char* szT1 = sT.mb_str(wxConvUTF8);
 
 	//setup loging
 	wxString sLogDir = pConfig->GetLogDir();

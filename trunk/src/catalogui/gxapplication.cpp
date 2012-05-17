@@ -172,6 +172,12 @@ bool wxGxApplication::Create(void)
 			m_pCatalog->SetLocation(wxT(""));
 	}
 
+#ifdef __WXGTK__
+    for(size_t i = 0; i < m_CommandArray.size(); ++i)
+    {
+        m_CommandArray[i]->GetEnabled();
+    }
+#endif
 	wxLogMessage(_("wxGxApplication: Creation complete"));
 
 	return true;

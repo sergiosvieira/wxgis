@@ -1274,7 +1274,7 @@ CPLString GeometryToText(long nGeomFID, OGRGeometry* pGeom, wxGISCoordinatesForm
 		return osOutput;
 
 	CPLString osTmp;
-	osOutput += CPLSPrintf("Geometry %d (%s)\n", nGeomFID, pGeom->getGeometryName());//CPLString().Printf
+	osOutput += CPLSPrintf("Geometry %d (%s)\n", (int)nGeomFID, pGeom->getGeometryName());//CPLString().Printf
 	OGRwkbGeometryType type = wkbFlatten(pGeom->getGeometryType());
 	switch(type)
 	{

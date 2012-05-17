@@ -61,12 +61,12 @@ void wxGISMenuBar::MoveLeft(int pos)
 {
 	if(pos == 0)
 		return;
-	
+
 	//m_MenubarArray.swap(pos, pos - 1);
 	IGISCommandBar* val = m_MenubarArray[pos];
 	m_MenubarArray[pos] = m_MenubarArray[pos - 1];
 	m_MenubarArray[pos - 1] = val;
-	Insert(pos - 1, Remove(pos), m_MenubarArray[pos - 1]->GetCaption());	
+	Insert(pos - 1, Remove(pos), m_MenubarArray[pos - 1]->GetCaption());
 }
 
 void wxGISMenuBar::MoveRight(int pos)
@@ -77,7 +77,7 @@ void wxGISMenuBar::MoveRight(int pos)
 	IGISCommandBar* val = m_MenubarArray[pos];
 	m_MenubarArray[pos] = m_MenubarArray[pos + 1];
 	m_MenubarArray[pos + 1] = val;
-	Insert(pos + 1, Remove(pos), m_MenubarArray[pos + 1]->GetCaption());	
+	Insert(pos + 1, Remove(pos), m_MenubarArray[pos + 1]->GetCaption());
 }
 
 void wxGISMenuBar::MoveLeft(IGISCommandBar* pBar)
@@ -140,4 +140,3 @@ void wxGISMenuBar::Serialize(wxXmlNode* pConf)
 		pNewNode->AddAttribute(wxT("name"), sName);
 	}
 }
-

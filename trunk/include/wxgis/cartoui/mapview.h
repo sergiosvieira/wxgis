@@ -3,7 +3,7 @@
  * Purpose:  wxGISMapView class.
  * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -51,6 +51,9 @@ private:
     This is class for showing maps.
 */
 
+wxDECLARE_EVENT(wxEVT_COMMAND_STARTDRAWING, wxCommandEvent);
+//wxDECLARE_EVENT(wxEVT_COMMAND_ZOOMING, wxCommandEvent);
+
 class WXDLLIMPEXP_GIS_CTU wxGISMapView :
 	public wxWindow,
 	public wxGISExtentStack,
@@ -65,16 +68,16 @@ public:
 	friend class wxMapDrawingThread;
 public:
     wxGISMapView(void);
-	wxGISMapView(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL);//wxSTATIC_BORDER|
+	wxGISMapView(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL | wxCLIP_CHILDREN | wxNO_FULL_REPAINT_ON_RESIZE);//wxSTATIC_BORDER|
 	virtual ~wxGISMapView(void);
-    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("GISMapView"));//wxSTATIC_BORDER|
+    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL | wxCLIP_CHILDREN | wxNO_FULL_REPAINT_ON_RESIZE, const wxString& name = wxT("GISMapView"));//wxSTATIC_BORDER|
 	virtual void SetTrackCancel(ITrackCancel* pTrackCancel);
 	virtual wxGISDisplay* GetDisplay(void){return m_pGISDisplay;};
 	//wxGISExtentStack
 	virtual bool AddLayer(wxGISLayerSPtr pLayer);
 	virtual void Clear(void);
 	virtual void SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference);
-	virtual void SetExtent(OGREnvelope& Env);
+	virtual void SetExtent(const OGREnvelope& Env);
 	virtual void SetFullExtent(void);
 	virtual OGREnvelope GetFullExtent(void);
 	//
@@ -108,6 +111,10 @@ protected:
 	virtual void UpdateFrameCenter(void);
 	//virtual void FillClipGeometry(wxRect rect, wxCoord x, wxCoord y);
 protected:
+    void Refresh(void);
+    void OnStartDrawingThread( wxCommandEvent & event );
+    //void OnZooming( wxCommandEvent & event );
+protected:
 	wxGISDisplay *m_pGISDisplay;
 	wxTimer m_timer;
 	wxMapDrawingThread *m_pMapDrawingThread;
@@ -123,6 +130,8 @@ protected:
 	wxCriticalSection m_CritSect;
 
 	wxGISPointsArray m_ClipGeometry;
+
+	bool m_bFirstSize;
 
 	DECLARE_EVENT_TABLE()
 };

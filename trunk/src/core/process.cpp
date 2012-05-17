@@ -41,7 +41,7 @@ wxProcessWaitThread::~wxProcessWaitThread(void)
 void *wxProcessWaitThread::Entry()
 {
     if(!m_pProc)
-        return (ExitCode)-1;
+        return (wxThread::ExitCode)-1;
 
     wxString sCmd = m_pProc->GetCommand();
     wxFileName FName(sCmd);
@@ -51,38 +51,41 @@ void *wxProcessWaitThread::Entry()
     else
         exec = std::string(sCmd.mb_str());
 
+    if(exec.empty())
+        return (wxThread::ExitCode)-1;
+
     std::vector<std::string> args;
     wxArrayString saParams = m_pProc->GetParameters();
     for(size_t i = 0; i < saParams.GetCount(); ++i)
-        args.push_back(std::string(saParams[i].mb_str())); 
+        args.push_back(std::string(saParams[i].mb_str()));
 
-//#if defined(BOOST_POSIX_API) 
-    bp::context ctx; 
-//#elif defined(BOOST_WINDOWS_API) 
-//    bp::win32_context ctx; 
-//    STARTUPINFOA si; 
-//    ::ZeroMemory(&si, sizeof(si)); 
-//    si.cb = sizeof(si); 
+//#if defined(BOOST_POSIX_API)
+    bp::context ctx;
+//#elif defined(BOOST_WINDOWS_API)
+//    bp::win32_context ctx;
+//    STARTUPINFOA si;
+//    ::ZeroMemory(&si, sizeof(si));
+//    si.cb = sizeof(si);
  //   si.dwFlags |= STARTF_USESHOWWINDOW;
  //   si.wShowWindow = SW_HIDE;//SW_SHOW;//
 	//si.dwX = si.dwY = 5000;
 //    ctx.startupinfo = &si;
-//#else 
-//#  error "Unsupported platform." 
+//#else
+//#  error "Unsupported platform."
 //#endif
 
-    ctx.environment = bp::self::get_environment(); 
-	ctx.stdout_behavior = bp::capture_stream(); 
+    ctx.environment = bp::self::get_environment();
+	ctx.stdout_behavior = bp::capture_stream();
     //wxFileName FName(wxString(exec.c_str(), wxConvUTF8));
     //ctx.work_directory = FName.GetPath().mb_str();
 
     bp::child c = bp::launch(exec, args, ctx);
     m_pChild = &c;
 
-    bp::pistream &is = c.get_stdout(); 
+    bp::pistream &is = c.get_stdout();
 
     std::string line;
-    while(!TestDestroy() && std::getline(is, line)) 
+    while(!TestDestroy() && std::getline(is, line))
     {
         wxString sLine(line.c_str(), wxConvUTF8, line.length());
         m_pProc->ProcessInput(sLine);
@@ -93,7 +96,7 @@ void *wxProcessWaitThread::Entry()
     bp::status st = c.wait();
 
     m_pProc->OnTerminate( st.exited() ? st.exit_status() : EXIT_FAILURE );
-	return NULL;
+	return (wxThread::ExitCode)0;     // success
 }
 
 void wxProcessWaitThread::Terminate(void)
@@ -124,7 +127,7 @@ void wxGISProcess::Start(void)
 {
 	m_nState = enumGISTaskWork;
 	m_dtBeg = wxDateTime::Now();
-    
+
 	//create and start thread
 	if(m_pProcessWaitThread)
 		m_pProcessWaitThread->Delete();

@@ -42,6 +42,7 @@ BEGIN_EVENT_TABLE(wxGISApplication, wxFrame)
 	//EVT_COMMAND_RANGE(ID_PLUGINCMD, ID_TOOLBARCMDMAX, wxEVT_COMMAND_BUTTON_CLICKED, wxGISApplication::OnCommand)
 	//EVT_TOOL_RANGE(ID_PLUGINCMD, ID_TOOLBARCMDMAX, wxGISApplication::OnCommand)
 	EVT_UPDATE_UI_RANGE(ID_PLUGINCMD, ID_PLUGINCMDMAX, wxGISApplication::OnCommandUI)
+	//EVT_UPDATE_UI(-1, wxGISApplication::OnCommandUI)
     EVT_AUITOOLBAR_RIGHT_CLICK(wxID_ANY, wxGISApplication::OnAuiRightDown)
     EVT_AUITOOLBAR_TOOL_DROPDOWN(wxID_ANY, wxGISApplication::OnToolDropDown)
     EVT_CLOSE(wxGISApplication::OnClose)
@@ -80,7 +81,7 @@ void wxGISApplication::LoadCommands(wxXmlNode* pRootNode)
 			ICommand *pCmd = dynamic_cast<ICommand*>(obj);
 			if(pCmd)
 			{
-				for(unsigned char i = 0; i < pCmd->GetCount(); ++i)
+				for(unsigned char i = 0; i < pCmd->GetCount(); i++)
 				{
 					wxObject *newobj = wxCreateDynamicObject(sName);
 					ICommand *pNewCmd = dynamic_cast<ICommand*>(newobj);
@@ -180,76 +181,47 @@ void wxGISApplication::Command(ICommand* pCmd)
 void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 {
     //event.Skip();
-
-    wxString sAcc = m_pGISAcceleratorTable->GetText(event.GetId());
-	ICommand* pCmd = GetCommand(event.GetId());
+    int nCmdId = event.GetId();
+    wxString sAcc = m_pGISAcceleratorTable->GetText(nCmdId);
+	ICommand* pCmd = GetCommand(nCmdId);
 	if(pCmd)
 	{
         wxString sCaption = pCmd->GetCaption();
         if(!sAcc.IsEmpty())
         {
-#ifdef __WXGTK__
-			sCaption.Append( wxT("          ") );
-#else
 			sCaption.Append( wxT("\t") );
-#endif
             sCaption.Append(sAcc);
         }
 
         event.SetText(sCaption);
-
+#ifdef __WXMSW__
 		if(pCmd->GetKind() == enumGISCommandCheck)
+#endif
             event.Check(pCmd->GetChecked());
 
         event.Enable(pCmd->GetEnabled());
     }
-	for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
-	{
-		wxGISToolBar* pGISToolBar = dynamic_cast<wxGISToolBar*>(m_CommandBarArray[i]);
-		if(pGISToolBar)
-			pGISToolBar->UpdateControls();
-		wxAuiToolBar* pToolbar = dynamic_cast<wxAuiToolBar*>(m_CommandBarArray[i]);
-        if(pToolbar)
-        {
-		    wxAuiToolBarItem* pTool = pToolbar->FindTool(event.GetId());
-		    if(pTool)
-		    {
-			    if(!sAcc.IsEmpty())
-				    pTool->SetShortHelp(pCmd->GetTooltip() + wxT(" (") + sAcc + wxT(")"));//accelerator
-                else
-				    pTool->SetShortHelp(pCmd->GetTooltip());
-#ifdef __WXMSW__
 
-                if(pTool->GetBitmap().IsOk())
-                    continue;
-			    wxIcon Bmp = pCmd->GetBitmap();
-			    if(Bmp.IsOk())
-				    pTool->SetBitmap(Bmp);
-			    else
-				    pTool->SetBitmap(wxBitmap(tool_16_xpm));
-#endif
-		    }
-            //continue;
-        }
+//#ifdef __WXGTK__
+//    m_pMenuBar->UpdateMenus();
+//#endif
 		//wxMenu* pMenu = dynamic_cast<wxMenu*>(m_CommandBarArray[i]);
   //      if(pMenu)
   //      {
-  //          wxMenuItem *pItem = pMenu->FindItem(event.GetId());
+  //          wxMenuItem *pItem = pMenu->FindItem(nCmdId);
   //          continue;
   //      }
-    }
-
 //        return;
-//
-//		//set bitmap
-		//for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
-		//{
-//			switch(m_CommandBarArray[i]->GetType())
-//			{
-//			case enumGISCBSubMenu:
-//			case enumGISCBMenubar:
-//				{
-//					wxMenu* pMenu = dynamic_cast<wxMenu*>(m_CommandBarArray[i]);
+
+    for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
+    {
+        switch(m_CommandBarArray[i]->GetType())
+        {
+        case enumGISCBSubMenu:
+        case enumGISCBMenubar:
+#ifdef __WXGTK__
+            {
+                wxMenu* pMenu = dynamic_cast<wxMenu*>(m_CommandBarArray[i]);
 //// dirty hack
 //                    //wxMenuItemList& pLst = pMenu->GetMenuItems();
 //                    //wxMenuItemList::iterator iter;
@@ -265,27 +237,24 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 //                    //    }
 //                    //}
 //// dirty hack end
-//					wxMenuItem *pItem = pMenu->FindItem(event.GetId());
-//					if(pItem != NULL)
-//					{
-//                        if(pItem->IsSubMenu())
-//                            break;
-//
+                wxMenuItem *pItem = pMenu->FindItem(nCmdId);
+                if(pItem != NULL && pCmd)
+                {
+                    if(!pItem->IsSubMenu())
+                    {
 //						wxIcon Bmp = pCmd->GetBitmap();
 //						//if(Bmp.IsOk())
 //							pItem->SetBitmap(Bmp);//double text??
 //						//pItem->SetItemLabel(wxT(" ")); // derty hack
-//						if(sAcc.IsEmpty())
-//							pItem->SetItemLabel(pCmd->GetCaption());
-//						else
-//#ifdef __WXGTK__
-//							pItem->SetItemLabel(pCmd->GetCaption() + wxT("          ") + sAcc);
-//#else
-//						    pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
-//#endif
-//                    }
-//				}
-//				break;
+                    if(sAcc.IsEmpty())
+                        pItem->SetItemLabel(pCmd->GetCaption());
+                    else
+                        pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
+                    }
+                }
+            }
+#endif	//__WXGTK__
+            break;
 //			case enumGISCBContextmenu:
 //				{
 //					wxMenu* pMenu = dynamic_cast<wxMenu*>(m_CommandBarArray[i]);
@@ -304,7 +273,7 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 //                    //    }
 //                    //}
 //// dirty hack end
-//                    wxMenuItem *pItem = pMenu->FindItem(event.GetId());
+//                    wxMenuItem *pItem = pMenu->FindItem(nCmdId);
 //					if(pItem != NULL)
 //					{
 //                        if(pItem->IsSubMenu())
@@ -316,46 +285,45 @@ void wxGISApplication::OnCommandUI(wxUpdateUIEvent& event)
 //						if(sAcc.IsEmpty())
 //							pItem->SetItemLabel(pCmd->GetCaption());
 //						else
-//#ifdef __WXGTK__
-//							pItem->SetItemLabel(pCmd->GetCaption() + wxT("          ") + sAcc);
-//#else
 //						    pItem->SetItemLabel(pCmd->GetCaption() + wxT("\t") + sAcc);
-//#endif
 //                    }
 //				}
 //				break;
-//            case enumGISCBToolbar:
-//				{
-//					wxAuiToolBar* pToolbar = dynamic_cast<wxAuiToolBar*>(m_CommandBarArray[i]);
-//					wxGISToolBar* pGISToolBar = dynamic_cast<wxGISToolBar*>(m_CommandBarArray[i]);
-//					if(pGISToolBar)
-//						pGISToolBar->UpdateControls();
-//					wxAuiToolBarItem* pTool = pToolbar->FindTool(event.GetId());
-//					if(pTool != NULL)
-//					{
-//                        if(pTool->GetBitmap().IsOk())
-//                            break;
-//						wxIcon Bmp = pCmd->GetBitmap();
-//						if(Bmp.IsOk())
-//							pTool->SetBitmap(Bmp);
-//						else
-//							pTool->SetBitmap(wxBitmap(tool_16_xpm));
-//						if(!sAcc.IsEmpty())
-//							pTool->SetShortHelp(pCmd->GetTooltip() + wxT(" (") + sAcc + wxT(")"));//accelerator
-//                        else
-//							pTool->SetShortHelp(pCmd->GetTooltip());
-//					}
-//				}
-//				break;
-//			case enumGISCBNone:
-//			default:
-//				break;
-//			}
-//		}
-//
-//        //return;
-//	}
-//    //event.Skip();
+        case enumGISCBToolbar:
+            {
+                wxGISToolBar* pGISToolBar = dynamic_cast<wxGISToolBar*>(m_CommandBarArray[i]);
+                if(pGISToolBar)
+                    pGISToolBar->UpdateControls();
+                wxAuiToolBar* pToolbar = dynamic_cast<wxAuiToolBar*>(m_CommandBarArray[i]);
+                if(pToolbar && pCmd)
+                {
+                    wxAuiToolBarItem* pTool = pToolbar->FindTool(nCmdId);
+                    if(pTool)
+                    {
+                        if(!sAcc.IsEmpty())
+                            pTool->SetShortHelp(pCmd->GetTooltip() + wxT(" (") + sAcc + wxT(")"));
+                        else
+                            pTool->SetShortHelp(pCmd->GetTooltip());
+#ifdef __WXMSW__
+                        if(!pTool->GetBitmap().IsOk())
+                        {
+                            wxIcon Bmp = pCmd->GetBitmap();
+                            if(Bmp.IsOk())
+                                pTool->SetBitmap(Bmp);
+                            else
+                                pTool->SetBitmap(wxBitmap(tool_16_xpm));
+                        }
+#endif //__WXMSW__
+                    }
+                }
+            }
+            break;
+        case enumGISCBNone:
+        default:
+            break;
+		}
+	}
+	//event.Skip();
 }
 
 void wxGISApplication::SerializeFramePos(bool bSave)
@@ -721,7 +689,7 @@ bool wxGISApplication::Create(void)
     // create MenuBar
 	wxXmlNode* pMenuBarNode = pConfig->GetConfigNode(enumGISHKCU, GetAppName() + wxString(wxT("/frame/menubar")));
 
-    m_pMenuBar = new wxGISMenuBar(0, static_cast<IFrameApplication*>(this), pMenuBarNode); //wxMB_DOCKABLE
+    m_pMenuBar = new wxGISMenuBar(wxMB_DOCKABLE, static_cast<IFrameApplication*>(this), pMenuBarNode); //wxMB_DOCKABLE
     SetMenuBar(static_cast<wxMenuBar*>(m_pMenuBar));
 
 	//mark menues from menu bar as enumGISTAMMenubar
@@ -743,11 +711,14 @@ bool wxGISApplication::Create(void)
     pHtmlText->Show(false);
     RegisterChildWindow(pHtmlText);
 
-//#ifdef __WXGTK__
+#ifdef __WXGTK__
  //   wxGISToolBarMenu* pToolBarMenu =  dynamic_cast<wxGISToolBarMenu*>(GetCommandBar(TOOLBARMENUNAME));
 	//if(pToolBarMenu)
 	//    PushEventHandler(pToolBarMenu);
-//#endif
+//	m_pMenuBar->PushEventHandler(this);
+#endif
+
+
 
     return true;
 }
