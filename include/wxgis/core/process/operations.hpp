@@ -84,8 +84,8 @@ inline std::string find_executable_in_path(const std::string &file, std::string 
     if (path.empty())
     {
         const char *envpath = ::getenv("PATH");
-        if (!envpath)
-            boost::throw_exception(std::runtime_error("boost::process::find_executable_in_path: retrieving PATH failed"));
+//        if (!envpath)
+//            boost::throw_exception(std::runtime_error("boost::process::find_executable_in_path: retrieving PATH failed"));
             //boost::throw_exception(boost::system::system_error(boost::system::error_code(), "boost::process::find_executable_in_path: retrieving PATH failed"));
             //boost::throw_exception(boost::filesystem::filesystem_error("boost::process::find_executable_in_path: retrieving PATH failed", file, boost::system::errc::make_error_code(boost::system::errc::no_such_file_or_directory)));
 
@@ -131,8 +131,8 @@ inline std::string find_executable_in_path(const std::string &file, std::string 
     }
 #endif
 
-    if (result.empty())
-        boost::throw_exception(std::runtime_error("boost::process::find_executable_in_path: file not found"));
+//    if (result.empty())
+//        boost::throw_exception(std::runtime_error("boost::process::find_executable_in_path: file not found"));
 
     return result;
 }

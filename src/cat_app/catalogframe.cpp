@@ -24,6 +24,8 @@
 #include "../../art/mainframecat.xpm"
 #include "../../art/mainframecat_x.xpm"
 
+#include "../../art/shp_dset_48.xpm"
+
 #include <wx/datetime.h>
 
 //-----------------------------------------------------------
@@ -35,6 +37,7 @@ wxGISCatalogFrame::wxGISCatalogFrame(wxWindow* parent, wxWindowID id, const wxSt
 {
 	//set app main icon
     wxDateTime now = wxDateTime::Now();
+    //TODO: need 48x48 main app icon
     if((now.GetMonth() == wxDateTime::Dec && now.GetDay() > 15) || (now.GetMonth() == wxDateTime::Jan && now.GetDay() < 15))//wxDateTime::Month::
 	{
         m_pAppIcon = wxIcon(mainframecat_x_xpm);

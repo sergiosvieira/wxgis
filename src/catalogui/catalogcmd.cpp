@@ -55,7 +55,7 @@
 #include <wx/dirdlg.h>
 #include <wx/file.h>
 #include <wx/clipbrd.h>
-#include <wx/richmsgdlg.h> 
+#include <wx/richmsgdlg.h>
 
 //	0	Up One Level
 //	1	Connect Folder
@@ -121,7 +121,7 @@ wxIcon wxGISCatalogMainCmd::GetBitmap(void)
 			if(!m_IconFolderNew.IsOk())
 				m_IconFolderNew = wxIcon(folder_new_xpm);
 			return m_IconFolderNew;
-		case 8:	
+		case 8:
 			if(!m_IconEdit.IsOk())
 				m_IconEdit = wxIcon(edit_xpm);
 			return m_IconEdit;
@@ -155,33 +155,33 @@ wxString wxGISCatalogMainCmd::GetCaption(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("&Up One Level"));
-		case 1:	
+		case 1:
 			return wxString(_("&Connect folder"));
-		case 2:	
+		case 2:
 			return wxString(_("&Disconnect folder"));
-		case 3:	
+		case 3:
 			return wxString(_("Location"));
-		case 4:	
+		case 4:
 			return wxString(_("Delete"));
-		case 5:	
+		case 5:
 			return wxString(_("Back"));//
-		case 6:	
+		case 6:
 			return wxString(_("Forward"));//
-		case 7:	
+		case 7:
 			return wxString(_("Create folder"));
-		case 8:	
+		case 8:
 			return wxString(_("Rename"));
-		case 9:	
+		case 9:
 			return wxString(_("Refresh"));
-		case 10:	
+		case 10:
 			return wxString(_("Properties"));
-		case 11:	
+		case 11:
 			return wxString(_("Copy"));
-		case 12:	
+		case 12:
 			return wxString(_("Cut"));
-		case 13:	
+		case 13:
 			return wxString(_("Paste"));
 		default:
 			return wxEmptyString;
@@ -192,23 +192,23 @@ wxString wxGISCatalogMainCmd::GetCategory(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
-		case 1:	
-		case 2:	
-		case 3:	
-		case 5:	
-		case 6:	
-		case 9:	
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 5:
+		case 6:
+		case 9:
 			return wxString(_("Catalog"));
-		case 7:	
+		case 7:
 			return wxString(_("New"));
-		case 4:	
-		case 8:	
-		case 11:	
-		case 12:	
-		case 13:	
+		case 4:
+		case 8:
+		case 11:
+		case 12:
+		case 13:
 			return wxString(_("Edit"));
-		case 10:	
+		case 10:
 			return wxString(_("Miscellaneous"));
 		default:
 			return wxString(_("[No category]"));
@@ -469,33 +469,33 @@ wxString wxGISCatalogMainCmd::GetMessage(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("Select parent element"));
-		case 1:	
+		case 1:
 			return wxString(_("Connect folder"));
-		case 2:	
+		case 2:
 			return wxString(_("Disconnect folder"));
-		case 3:	
+		case 3:
 			return wxString(_("Set or get location"));
-		case 4:	
+		case 4:
 			return wxString(_("Delete item"));
-		case 5:	
+		case 5:
 			return wxString(_("Go to previous location"));
-		case 6:	
+		case 6:
 			return wxString(_("Go to next location"));
-		case 7:	
+		case 7:
 			return wxString(_("Create folder"));
-		case 8:	
+		case 8:
 			return wxString(_("Rename item"));
-		case 9:	
+		case 9:
 			return wxString(_("Refresh item"));
-		case 10:	
+		case 10:
 			return wxString(_("Item properties"));
-		case 11:	
+		case 11:
 			return wxString(_("Copy item(s)"));
-		case 12:	
+		case 12:
 			return wxString(_("Cut item(s)"));
-		case 13:	
+		case 13:
 			return wxString(_("Paste item(s)"));
 		default:
 			return wxEmptyString;
@@ -506,7 +506,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			{
 				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 				if(pGxApp)
@@ -531,7 +531,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 				}
 			}
 			break;
-		case 1:	
+		case 1:
 		{
 			wxDirDialog dlg(dynamic_cast<wxWindow*>(m_pApp), wxString(_("Choose a folder to connect")));
 			if(dlg.ShowModal() == wxID_OK)
@@ -540,12 +540,12 @@ void wxGISCatalogMainCmd::OnClick(void)
 				if(pGxApp)
 				{
 					wxString sPath = dlg.GetPath();
-					pGxApp->GetCatalog()->ConnectFolder(sPath);					
+					pGxApp->GetCatalog()->ConnectFolder(sPath);
 				}
 			}
 			return;
 		}
-		case 2:	
+		case 2:
 		{
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp)
@@ -567,7 +567,7 @@ void wxGISCatalogMainCmd::OnClick(void)
             {
                 wxWindow* pFocusWnd = wxWindow::FindFocus();
                 IGxView* pGxView = dynamic_cast<IGxView*>(pFocusWnd);
-                			
+
                 IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
                 IGxObject* pSelObj = NULL;
                 if(pGxApp)
@@ -579,7 +579,7 @@ void wxGISCatalogMainCmd::OnClick(void)
                 }
                 if(pGxView)
                     pGxView->BeginRename(pSelObj->GetID());
-            }			
+            }
 			break;
         case 4:
         {
@@ -601,7 +601,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 					dlg.ShowCheckBox("Use my choice and do not show this dialog in future");
 
 					int nRes = dlg.ShowModal();
-                    
+
 					if(pConfig)
 						pConfig->Write(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/catalog/ask_delete")), !dlg.IsCheckBoxChecked());
 
@@ -654,7 +654,8 @@ void wxGISCatalogMainCmd::OnClick(void)
                 for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
 					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
-                    pGxObject->Refresh();
+					if(pGxObject)
+                        pGxObject->Refresh();
                 }
 			}
     		break;
@@ -849,17 +850,17 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 {
 	switch(m_subtype)
 	{
-		case 0:	
+		case 0:
 			return wxString(_("Up One Level"));
-		case 1:	
+		case 1:
 			return wxString(_("Connect folder"));
-		case 2:	
+		case 2:
 			return wxString(_("Disconnect folder"));
-		case 3:	
+		case 3:
 			return wxString(_("Set or get location"));
-		case 4:	
+		case 4:
 			return wxString(_("Delete selected item"));
-		case 5:	
+		case 5:
         {
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp && GetEnabled())
@@ -877,7 +878,7 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
             }
 			return wxString(_("Go to previous location"));
         }
-		case 6:	
+		case 6:
         {
 			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp && GetEnabled())
@@ -895,19 +896,19 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
             }
 			return wxString(_("Go to next location"));//
         }
-		case 7:	
+		case 7:
 			return wxString(_("Create new folder"));
-		case 8:	
+		case 8:
 			return wxString(_("Rename selected item"));
-		case 9:	
+		case 9:
 			return wxString(_("Refresh selected item"));
-		case 10:	
+		case 10:
 			return wxString(_("Show properties of selected item"));
-		case 11:	
+		case 11:
 			return wxString(_("Copy selected item(s)"));
-		case 12:	
+		case 12:
 			return wxString(_("Cut selected item(s)"));
-		case 13:	
+		case 13:
 			return wxString(_("Paste selected item(s)"));
 		default:
 			return wxEmptyString;
@@ -923,7 +924,7 @@ IToolBarControl* wxGISCatalogMainCmd::GetControl(void)
 {
 	switch(m_subtype)
 	{
-		case 3:	
+		case 3:
 //			if(!m_pGxLocationComboBox)
 			{
 				wxArrayString PathArray;
@@ -939,7 +940,7 @@ wxString wxGISCatalogMainCmd::GetToolLabel(void)
 {
 	switch(m_subtype)
 	{
-		case 3:	
+		case 3:
 			return wxString(_("Path:   "));
 		default:
 			return wxEmptyString;
@@ -950,7 +951,7 @@ bool wxGISCatalogMainCmd::HasToolLabel(void)
 {
 	switch(m_subtype)
 	{
-		case 3:	
+		case 3:
 			return true;
 		default:
 			return false;
@@ -988,11 +989,11 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
                         }
                     }
                 }
-                return pMenu;                
+                return pMenu;
             }
             return NULL;
-        }            
-		case 6:	
+        }
+		case 6:
         {
             IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
 			if(pGxApp /*&& GetEnabled()*/)
@@ -1021,10 +1022,10 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
                         }
                     }
                 }
-                return pMenu;                
+                return pMenu;
             }
             return NULL;
-        }            
+        }
 		default:
 			return NULL;
 	}
@@ -1049,7 +1050,7 @@ void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
                 //cast ctrl
 
     //            wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
-    //            wxGxObjectDialog dlg(pWnd, wxID_ANY, _("Select projection")); 
+    //            wxGxObjectDialog dlg(pWnd, wxID_ANY, _("Select projection"));
 				//dlg.SetAllowMultiSelect(false);
 				//dlg.AddFilter(new wxGxPrjFileFilter(), true);
 				//dlg.SetButtonCaption(_("Select"));
@@ -1079,7 +1080,7 @@ void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
 				////			if(!wxDirExists(sLoclDir))
 				////				wxFileName::Mkdir(sLoclDir, 0755, wxPATH_MKDIR_FULL);
 
-				////			const char *pszProjection = pRef->GetAttrValue("PROJECTION"); 
+				////			const char *pszProjection = pRef->GetAttrValue("PROJECTION");
 				////			wxString sProjection;
 				////			if(pszProjection)
 				////				sProjection = wgMB2WX(pszProjection);
@@ -1097,8 +1098,8 @@ void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
 				////					if(!wxDirExists(sStorePath))
 				////						wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
 
-				////					sName.Replace(wxString(wxT("/")), wxString(wxT(""))); 
-				////					sName.Replace(wxString(wxT("  ")), wxString(wxT(" "))); 
+				////					sName.Replace(wxString(wxT("/")), wxString(wxT("")));
+				////					sName.Replace(wxString(wxT("  ")), wxString(wxT(" ")));
 				////					sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".spr");
 				////				}
 				////				else
@@ -1131,8 +1132,8 @@ void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
 				////					if(!wxDirExists(sStorePath))
 				////						wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
 
-				////					sName.Replace(wxString(wxT("/")), wxString(wxT(""))); 
-				////					sName.Replace(wxString(wxT("  ")), wxString(wxT(" "))); 
+				////					sName.Replace(wxString(wxT("/")), wxString(wxT("")));
+				////					sName.Replace(wxString(wxT("  ")), wxString(wxT(" ")));
 				////					sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".spr");
 				////				}
 				////				else
@@ -1202,7 +1203,7 @@ void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
     //    //        if(!wxDirExists(sLoclDir))
 		  //    //      wxFileName::Mkdir(sLoclDir, 0755, wxPATH_MKDIR_FULL);
 
-    //    //        IStatusBar* pStatusBar = m_pApp->GetStatusBar();  
+    //    //        IStatusBar* pStatusBar = m_pApp->GetStatusBar();
     //    //        wxGISProgressor* pProgressor = dynamic_cast<wxGISProgressor*>(pStatusBar->GetProgressor());
     //    //        if(pProgressor)
     //    //        {
@@ -1217,7 +1218,7 @@ void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
     //    //                OGRErr err = SpaRef.importFromEPSG(i);
     //    //                if(err == OGRERR_NONE)
     //    //                {
-    //    //                   const char *pszProjection = SpaRef.GetAttrValue("PROJECTION"); 
+    //    //                   const char *pszProjection = SpaRef.GetAttrValue("PROJECTION");
     //    //                   wxString sProjection;
     //    //                   if(pszProjection)
     //    //                       sProjection = wgMB2WX(pszProjection);
@@ -1237,8 +1238,8 @@ void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
     //    //                            if(!wxDirExists(sStorePath))
 		  //    //                          wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
 
-    //    //                            sName.Replace(wxString(wxT("/")), wxString(wxT(""))); 
-    //    //                            sName.Replace(wxString(wxT("  ")), wxString(wxT(" "))); 
+    //    //                            sName.Replace(wxString(wxT("/")), wxString(wxT("")));
+    //    //                            sName.Replace(wxString(wxT("  ")), wxString(wxT(" ")));
     //    //                            sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".spr");
     //    //                        }
     //    //                        else
@@ -1276,8 +1277,8 @@ void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
     //    //                            if(!wxDirExists(sStorePath))
 		  //    //                          wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
 
-    //    //                            sName.Replace(wxString(wxT("/")), wxString(wxT(""))); 
-    //    //                            sName.Replace(wxString(wxT("  ")), wxString(wxT(" "))); 
+    //    //                            sName.Replace(wxString(wxT("/")), wxString(wxT("")));
+    //    //                            sName.Replace(wxString(wxT("  ")), wxString(wxT(" ")));
     //    //                            sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".spr");
     //    //                        }
     //    //                        else

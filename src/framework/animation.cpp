@@ -137,9 +137,10 @@ void wxGISAnimation::OnEraseBackground(wxEraseEvent & event)
 
 void wxGISAnimation::OnTimer( wxTimerEvent& event )
 {
+    event.Skip();
 	Refresh();
     if(m_bYield)
-		::wxSafeYield(NULL, true);
+		wxSafeYield(this, true);
 }
 
 void wxGISAnimation::SetYield(bool bYield)

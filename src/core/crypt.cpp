@@ -22,9 +22,7 @@
 #include "wxgis/core/crypt.h"
 #include "wxgis/core/config.h"
 
-#include <openssl/evp.h>
 #include <openssl/rand.h>
-#include "cpl_string.h"
 
 bool CreateRandomData(void)
 {
@@ -32,77 +30,103 @@ bool CreateRandomData(void)
 	if(!pConfig)
 		return false;
 
-	unsigned char key[EVP_KEY_SIZE];
+	GByte key[EVP_KEY_SIZE];
 	if(!RAND_bytes(key, sizeof(key)))
 		return false;
 	CPLString pszKey(CPLBinaryToHex(EVP_KEY_SIZE, key));
 	if(!pConfig->Write(enumGISHKCU, wxString(wxT("wxGISCommon/crypt/key")), wxString(pszKey, wxConvUTF8)))
-		return false;
-	unsigned char iv[EVP_IV_SIZE];
+ 		return false;
+	GByte iv[EVP_IV_SIZE];
 	if(!RAND_bytes(iv, sizeof(iv)))
 		return false;
 	CPLString pszIV(CPLBinaryToHex(EVP_IV_SIZE, iv));
 	return pConfig->Write(enumGISHKCU, wxString(wxT("wxGISCommon/crypt/iv")), wxString(pszIV, wxConvUTF8));
 }
 
-bool Crypt(const wxString &sText, wxString &sCryptText)
+GByte *GetKey(void)
 {
-    sCryptText = sText;
-    return true;
-
 	wxGISAppConfigSPtr pConfig = GetConfig();
 	if(!pConfig)
-		return false;
-
-	//try get key data from config
+		return NULL;
+    //try get key data from config
 	wxString sKey = pConfig->Read(enumGISHKCU, wxString(wxT("wxGISCommon/crypt/key")), wxString(ERR));
 	if(sKey.CmpNoCase(wxString(ERR)) == 0)
 	{
-		CreateRandomData();//create random key data
+		if(!CreateRandomData())//create random key data
+            return NULL;
 		//second try get key data from config
 		sKey = pConfig->Read(enumGISHKCU, wxString(wxT("wxGISCommon/crypt/key")), wxString(ERR));
 		if(sKey.CmpNoCase(wxString(ERR)) == 0)
-			return false;
+			return NULL;
 	}
 
 	int nKeyBytes;
 	GByte *pabyKey = CPLHexToBinary( sKey.mb_str(wxConvUTF8), &nKeyBytes );
+    return pabyKey;
+}
+
+GByte *GetIV(void)
+{
+	wxGISAppConfigSPtr pConfig = GetConfig();
+	if(!pConfig)
+		return NULL;
 
 	//try get iv data from config
 	wxString sIV = pConfig->Read(enumGISHKCU, wxString(wxT("wxGISCommon/crypt/iv")), wxString(ERR));
 	if(sIV.CmpNoCase(wxString(ERR)) == 0)
 	{
-		CreateRandomData();//create random key data
+		if(!CreateRandomData())//create random key data
+            return NULL;
 		//second try get iv data from config
 		sIV = pConfig->Read(enumGISHKCU, wxString(wxT("wxGISCommon/crypt/iv")), wxString(ERR));
 		if(sIV.CmpNoCase(wxString(ERR)) == 0)
-			return false;
+			return NULL;
 	}
 
 	int nIVBytes;
 	GByte *pabyIV = CPLHexToBinary( sIV.mb_str(wxConvUTF8), &nIVBytes );
+	return pabyIV;
+}
 
-	EVP_CIPHER_CTX ctx;
+EVP_CIPHER_CTX* CreateCTX(GByte* pabyKey, GByte* pabyIV, bool bDecrypt)
+{
+    EVP_CIPHER_CTX* pstCTX = new EVP_CIPHER_CTX;
 	const EVP_CIPHER * cipher;
 
-	EVP_CIPHER_CTX_init(&ctx);
+	EVP_CIPHER_CTX_init(pstCTX);
 
-	cipher = EVP_aes_256_cfb();
+	cipher = EVP_des_cfb();//EVP_aes_256_cfb();
 
-	bool bResult = EVP_EncryptInit(&ctx, cipher, pabyKey, pabyIV);
+	bool bResult;
+	if(bDecrypt)
+	    bResult = EVP_EncryptInit(pstCTX, cipher, pabyKey, pabyIV);
+    else
+	    bResult = EVP_DecryptInit(pstCTX, cipher, pabyKey, pabyIV);
 	if(!bResult)
+		return NULL;
+	return pstCTX;
+}
+
+bool Crypt(const wxString &sText, wxString &sCryptText)
+{
+
+	GByte *pabyKey = GetKey();
+	GByte *pabyIV = GetIV();
+
+	EVP_CIPHER_CTX* ctx = CreateCTX(pabyKey, pabyIV, false);
+	if(!ctx)
 	{
 		wxLogError(_("Crypt: Failed EVP_EncryptInit!"));
 		CPLFree( pabyKey );
 		CPLFree( pabyIV );
-		return bResult;
+		return false;
 	}
 
 	CPLString pszText(sText.mb_str(wxConvUTF8));
 	int outlen;
 	unsigned char outbuf[BUFSIZE];
 
-	bResult = EVP_EncryptUpdate(&ctx, outbuf, &outlen, (const unsigned char*)pszText.c_str(), pszText.length());
+	bool bResult = EVP_EncryptUpdate(ctx, outbuf, &outlen, (const unsigned char*)pszText.data(), pszText.length() * sizeof(pszText[0]) + 1);
 
 	if(!bResult)
 	{
@@ -113,7 +137,7 @@ bool Crypt(const wxString &sText, wxString &sCryptText)
 	}
 
 	int nLen = outlen;
-	bResult = EVP_EncryptFinal(&ctx, &outbuf[outlen], &outlen);
+	bResult = EVP_EncryptFinal(ctx, &outbuf[outlen], &outlen);
 	nLen += outlen;
 
 	CPLString pszOutput(CPLBinaryToHex(nLen, outbuf));
@@ -121,62 +145,25 @@ bool Crypt(const wxString &sText, wxString &sCryptText)
 
 	CPLFree( pabyKey );
 	CPLFree( pabyIV );
-	EVP_CIPHER_CTX_cleanup(&ctx);
+	EVP_CIPHER_CTX_cleanup(ctx);
+	EVP_CIPHER_CTX_free(ctx);
 
 	return bResult;
 }
 
 bool Decrypt(const wxString &sText, wxString &sDecryptText)
 {
-    sDecryptText = sText;
-    return true;
 
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	if(!pConfig)
-		return false;
+	GByte *pabyKey = GetKey();
+	GByte *pabyIV = GetIV();
 
-	//try get key data from config
-	wxString sKey = pConfig->Read(enumGISHKCU, wxString(wxT("wxGISCommon/crypt/key")), wxString(ERR));
-	if(sKey.CmpNoCase(wxString(ERR)) == 0)
-	{
-		CreateRandomData();//create random key data
-		//second try get key data from config
-		sKey = pConfig->Read(enumGISHKCU, wxString(wxT("wxGISCommon/crypt/key")), wxString(ERR));
-		if(sKey.CmpNoCase(wxString(ERR)) == 0)
-			return false;
-	}
-
-	int nKeyBytes;
-	GByte *pabyKey = CPLHexToBinary( sKey.mb_str(wxConvUTF8), &nKeyBytes );
-
-	//try get iv data from config
-	wxString sIV = pConfig->Read(enumGISHKCU, wxString(wxT("wxGISCommon/crypt/iv")), wxString(ERR));
-	if(sIV.CmpNoCase(wxString(ERR)) == 0)
-	{
-		CreateRandomData();//create random key data
-		//second try get iv data from config
-		sIV = pConfig->Read(enumGISHKCU, wxString(wxT("wxGISCommon/crypt/iv")), wxString(ERR));
-		if(sIV.CmpNoCase(wxString(ERR)) == 0)
-			return false;
-	}
-
-	int nIVBytes;
-	GByte *pabyIV = CPLHexToBinary( sIV.mb_str(wxConvUTF8), &nIVBytes );
-
-	EVP_CIPHER_CTX ctx;
-	const EVP_CIPHER * cipher;
-
-	EVP_CIPHER_CTX_init(&ctx);
-
-	cipher = EVP_aes_256_cfb();
-
- 	bool bResult = EVP_DecryptInit(&ctx, cipher, pabyKey, pabyIV);
-	if(!bResult)
+	EVP_CIPHER_CTX* ctx = CreateCTX(pabyKey, pabyIV, true);
+	if(!ctx)
 	{
 		wxLogError(_("Decrypt: Failed EVP_DecryptInit!"));
 		CPLFree( pabyKey );
 		CPLFree( pabyIV );
-		return bResult;
+		return false;
 	}
 
 	int nTextBytes;
@@ -185,7 +172,7 @@ bool Decrypt(const wxString &sText, wxString &sDecryptText)
 	int outlen;
 	unsigned char outbuf[BUFSIZE];
 
-	bResult = EVP_DecryptUpdate(&ctx, outbuf, &outlen, pabyText, nTextBytes);
+	bool bResult = EVP_DecryptUpdate(ctx, outbuf, &outlen, pabyText, nTextBytes);
 	if(!bResult)
 	{
 		wxLogError(_("Decrypt: Failed EVP_DecryptUpdate!"));
@@ -196,16 +183,19 @@ bool Decrypt(const wxString &sText, wxString &sDecryptText)
 	}
 
 	int nLen = outlen;
-	bResult = EVP_DecryptFinal(&ctx, &outbuf[outlen], &outlen);
+	bResult = EVP_DecryptFinal(ctx, &outbuf[outlen], &outlen);
 	nLen += outlen;
+	outbuf[nLen] = 0;
 
-	sDecryptText = wxString(outbuf, wxConvUTF8, nLen);
+	CPLString szCryptText((const char*)outbuf);
+	sDecryptText = wxString(szCryptText, wxConvUTF8);
 
 	CPLFree( pabyKey );
 	CPLFree( pabyIV );
 	CPLFree( pabyText );
 
-	EVP_CIPHER_CTX_cleanup(&ctx);
+	EVP_CIPHER_CTX_cleanup(ctx);
+	EVP_CIPHER_CTX_free(ctx);
 
 	return bResult;
 }

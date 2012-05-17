@@ -3,7 +3,7 @@
  * Purpose:  wxGISCommandBar class, and diferent implementation - wxGISMneu, wxGISToolBar
  * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2012  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -238,17 +238,15 @@ void wxGISMenu::AddCommand(ICommand* pCmd)
     case enumGISCommandNormal:
 		{
 			wxMenuItem *item = new wxMenuItem(this, pCmd->GetID(), pCmd->GetCaption(), pCmd->GetMessage(), (wxItemKind)pCmd->GetKind());
-			wxBitmap Bmp = pCmd->GetBitmap();
+#ifdef __WIN32__
+            wxBitmap Bmp = pCmd->GetBitmap();
 			if(Bmp.IsOk())
             {
-#ifdef __WIN32__
-                wxImage Img = Bmp.ConvertToImage();
-                //Img.RotateHue(-0.1);
-				item->SetBitmaps(Bmp, Img.ConvertToGreyscale());//SetBitmap//
-#else
-                item->SetBitmap(Bmp);
-#endif
+
+                wxImage Img = Bmp.ConvertToImage();                //Img.RotateHue(-0.1);
+				item->SetBitmaps(Bmp, Img.ConvertToGreyscale());
             }
+ #endif
 			Append(item);
 		}
 		break;
@@ -300,7 +298,6 @@ void wxGISMenu::AddMenu(wxMenu* pMenu, wxString sName)
 	SUBMENUDATA data = {AppendSubMenu(pMenu, sName), pGISCommandBar};
 	m_SubmenuArray.push_back(data);
 }
-
 
 //----------------------------------------------------------------------
 // wxGISToolbar

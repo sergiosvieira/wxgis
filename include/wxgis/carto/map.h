@@ -68,7 +68,6 @@ public:
 	virtual size_t GetSize(void);
 	virtual void Do(const OGREnvelope &Env);
 	virtual OGREnvelope GetCurrentExtent(void);
-protected:
 	virtual void SetExtent(const OGREnvelope &Env);
 protected:
 	std::vector<OGREnvelope> m_staEnvelope;

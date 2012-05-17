@@ -23,7 +23,7 @@
 #include "wxgis/datasource/datasource.h"
 #include "wxgis/core/config.h"
 
-#include "../../art/logo.xpm"
+#include "../../../art/logo.xpm"
 
 #include <wx/version.h>
 #include <wx/ffile.h>
