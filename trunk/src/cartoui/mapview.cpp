@@ -125,12 +125,15 @@ bool wxGISMapView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, c
 
     m_timer.SetOwner(this, TIMER_ID);
 
+    //SetBackgroundStyle(wxBG_STYLE_CUSTOM);
+
 	return true;
 }
 
 void wxGISMapView::OnPaint(wxPaintEvent & event)
 {
     //event.Skip();
+    wxPaintDC paint_dc(this);
     wxRect rect = GetClientRect();
 
     if(rect.width == 0 || rect.height == 0)
@@ -155,7 +158,6 @@ void wxGISMapView::OnPaint(wxPaintEvent & event)
 //		    if(m_timer.IsRunning())
 //                return;
 			//draw contents of m_pGISDisplay
-            wxPaintDC paint_dc(this);
             m_pGISDisplay->Output(&paint_dc, m_ClipGeometry);
 
 		}
