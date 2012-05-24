@@ -58,18 +58,22 @@ endif(wxGIS_USE_WXGISGDAL)
 if(WXGISGDAL_FOUND)
     include_directories(${WXGISGDAL_INCLUDE_DIR})
     include_directories(${WXGISGDAL_INCLUDE_DIR}/ogr)
+    include_directories(${WXGISGDAL_INCLUDE_DIR}/ogr/ogrsf_frmts)
     include_directories(${WXGISGDAL_INCLUDE_DIR}/port)
     include_directories(${WXGISGDAL_INCLUDE_DIR}/gcore)
     include_directories(${WXGISGDAL_INCLUDE_DIR}/alg)
+    include_directories(${WXGISGDAL_INCLUDE_DIR}/frmts/vrt)
     include_directories(${WXGISGDAL_INCLUDE_DIR}/build/port) #assume that out of source build was in build dir
 endif(WXGISGDAL_FOUND) 
 
 if(GDAL_FOUND)
     include_directories(${GDAL_INCLUDE_DIR})
     include_directories(${GDAL_INCLUDE_DIR}/ogr)
+    include_directories(${GDAL_INCLUDE_DIR}/ogr/ogrsf_frmts)
     include_directories(${GDAL_INCLUDE_DIR}/port)
     include_directories(${GDAL_INCLUDE_DIR}/gcore)
     include_directories(${GDAL_INCLUDE_DIR}/alg)
+    include_directories(${GDAL_INCLUDE_DIR}/frmts/vrt)
     include_directories(${GDAL_INCLUDE_DIR}/build/port) #assume that out of source build was in build dir
 endif(GDAL_FOUND)
 
@@ -87,6 +91,8 @@ if(wxGIS_USE_POSTGRES)
         add_definitions(-DHAVE_PG)
     endif(POSTGRES_FOUND)
 endif(wxGIS_USE_POSTGRES)
+
+#set(wxWidgets_CONFIGURATION "mswd")
 
 option(wxGIS_PORTABLE "Set OFF to build non portable version" ON)
 if(wxGIS_USE_POSTGRES)

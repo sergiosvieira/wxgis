@@ -362,8 +362,8 @@ wxString wxGxCatalog::ConstructFullName(IGxObject* pObject)
 	if(sParentPath.IsEmpty())
 		return sName;
 	else
-	{
-		if(sParentPath[sParentPath.Len() - 1] == wxFileName::GetPathSeparator())
+	{        
+		if(sParentPath.EndsWith(wxFileName::GetPathSeparator()))
 			return sParentPath + sName;
 		else
 			return sParentPath + wxFileName::GetPathSeparator() + sName;

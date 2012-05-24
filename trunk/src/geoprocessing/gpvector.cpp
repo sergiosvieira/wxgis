@@ -1121,7 +1121,7 @@ wxGISFeatureDatasetSPtr CreateVectorLayer(CPLString sPath, wxString sName, wxStr
     sName.Replace(wxT(" "), wxT("_"));
     sName.Replace(wxT("&"), wxT("_"));
     sName.Truncate(27);
-	if(wxIsdigit(sName[0]))
+	if(wxIsdigit(sName.GetChar(0)))
 		sName.Prepend(_("Layer_"));
     CPLString szName;
     if(nSubType == enumVecKMZ)

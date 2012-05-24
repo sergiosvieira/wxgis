@@ -97,9 +97,9 @@ wxPGProperty* wxGISVectorPropertyPage::AppendMetadataProperty(wxString sMeta)
         wxString sCleanVal;
         for(size_t i = 0; i < sVal.Len(); ++i)
         {
-            char c = sVal[i];
-            if(sVal[i] > 31 && sVal[i] != 127)
-                sCleanVal += sVal[i];
+            char c = sVal.GetChar(i);
+            if(c > 31 && c != 127)
+                sCleanVal += c;
         }
         if(sCleanVal.Len() > 500)
             return m_pg->Append( new wxLongStringProperty(sName, wxString::Format(wxT("%s_%d"), sName.c_str(), ++m_nCounter), sCleanVal) );//??

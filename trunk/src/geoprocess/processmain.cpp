@@ -291,7 +291,7 @@ bool wxGPTaskExecutor::Initialize(const wxString &sAppName, const wxString &sLog
     if(parser.Found( wxT( "n" ), &sToolName ) && parser.Found( wxT( "p" ), &sToolParameters ) )
 	{
 		sToolParameters = sToolParameters.Trim(true).Trim(false);
-		if(sToolParameters[0] == '"')
+        if(sToolParameters.StartsWith(wxString("\"")))
 			sToolParameters = sToolParameters.Mid(1, sToolParameters.Len() - 2);
 		return OnExecute(sToolName.Trim(true).Trim(false), sToolParameters);
 	}

@@ -48,7 +48,7 @@ wxGISTableSPtr CreateTable(CPLString sPath, wxString sName, wxString sExt, wxStr
     sName.Replace(wxT("."), wxT("_"));
     sName.Replace(wxT(" "), wxT("_"));
     sName.Replace(wxT("&"), wxT("_"));
-	if(wxIsdigit(sName[0]))
+	if(wxIsdigit(sName.GetChar(0)))
 		sName.Prepend(_("Layer_"));
     sName.Truncate(27);
     CPLString szName = CPLString(sName.mb_str());
