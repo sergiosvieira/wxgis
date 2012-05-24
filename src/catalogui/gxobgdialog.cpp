@@ -1056,7 +1056,7 @@ wxString wxGxObjectDialog::GetFullPath(void)
 {
     wxString sPath = GetPath();
     wxString sFPath;
-    if(sPath[sPath.Len() - 1] == '\\')
+    if(sPath.EndsWith(wxString("\\")))
         sFPath = sPath + GetNameWithExt();
     else
         sFPath = sPath + wxFileName::GetPathSeparator() + GetNameWithExt();

@@ -111,9 +111,9 @@ wxPGProperty* wxGISRasterPropertyPage::AppendMetadataProperty(wxPGProperty* pid,
         wxString sCleanVal;
         for(size_t i = 0; i < sVal.Len(); ++i)
         {
-            char c = sVal[i];
-            if(sVal[i] > 31 && sVal[i] != 127)
-                sCleanVal += sVal[i];
+            char c = sVal.GetChar(i);
+            if(c > 31 && c != 127)
+                sCleanVal += c;
         }
 
         wxString sSubName1;

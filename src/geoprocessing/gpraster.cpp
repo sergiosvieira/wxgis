@@ -19,8 +19,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/geoprocessing/gpraster.h"
+#include "vrtdataset.h"
 //#include "vrt/vrtdataset.h"
-#include "/home/bishop/projects/wxgisgdal/frmts/vrt/vrtdataset.h"
 #include "wxgis/datasource/sysop.h"
 
 bool SubrasterByVector(wxGISFeatureDatasetSPtr pSrcFeatureDataSet, wxGISRasterDatasetSPtr pSrcRasterDataSet, CPLString &szDstFolderPath, wxGxRasterFilter* pFilter, GDALDataType eOutputType, int nBandCount, int *panBandList, bool bUseCounter, int nCounterBegin, int nFieldNo, double dfOutResX, double dfOutResY, bool bCopyNodata, bool bSkipSourceMetadata, char** papszOptions, ITrackCancel* pTrackCancel)

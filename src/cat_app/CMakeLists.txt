@@ -21,6 +21,11 @@ if(wxWidgets_FOUND)
 #    endif(UNIX)
 endif(wxWidgets_FOUND)
 
+find_package( OpenSSL )
+if(OPENSSL_FOUND)
+    include_directories(${OPENSSL_INCLUDE_DIR})
+endif(OPENSSL_FOUND)
+
 find_package(GEOS REQUIRED)
 if(GEOS_FOUND)
     #get GEOS root directory from GEOS_INCLUDE_DIR
@@ -75,6 +80,10 @@ endif(WIN32)
 if(wxWidgets_FOUND)
    target_link_libraries(${APP_NAME} ${wxWidgets_LIBRARIES})
 endif(wxWidgets_FOUND)
+
+if(OPENSSL_FOUND)
+    target_link_libraries(${APP_NAME} ${OPENSSL_LIBRARIES})
+endif(OPENSSL_FOUND) 
 
 if(WXGISGDAL_FOUND)
     target_link_libraries(${APP_NAME} ${WXGISGDAL_LIBRARIES})

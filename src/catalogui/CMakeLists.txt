@@ -14,6 +14,11 @@ if(wxWidgets_FOUND)
     include(${wxWidgets_USE_FILE})
 endif(wxWidgets_FOUND)
 
+find_package( OpenSSL )
+if(OPENSSL_FOUND)
+    include_directories(${OPENSSL_INCLUDE_DIR})
+endif(OPENSSL_FOUND) 
+
 if(WXGISGDAL_FOUND)
     include_directories(${WXGISGDAL_INCLUDE_DIR}/ogr/ogrsf_frmts)
 endif(WXGISGDAL_FOUND) 
@@ -158,6 +163,10 @@ add_library(${LIB_NAME} SHARED ${PROJECT_HHEADERS} ${PROJECT_CSOURCES})
 if(wxWidgets_FOUND)
    target_link_libraries(${LIB_NAME} ${wxWidgets_LIBRARIES})
 endif(wxWidgets_FOUND)
+
+if(OPENSSL_FOUND)
+    target_link_libraries(${LIB_NAME} ${OPENSSL_LIBRARIES})
+endif(OPENSSL_FOUND) 
 
 if(WXGISGDAL_FOUND)
     target_link_libraries(${LIB_NAME} ${WXGISGDAL_LIBRARIES})

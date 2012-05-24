@@ -275,7 +275,7 @@ int wxGISAcceleratorTable::GetKeyCode(wxString sKeyCode)
 	sKeyCode.MakeUpper();
 	int Key;
 	if(sKeyCode.Len() == 1)
-		Key = (int)sKeyCode[0];
+		Key = (int)sKeyCode.GetChar(0);
 	else
 	{
 		if(sKeyCode.Find(wxT("WXK_F")) != wxNOT_FOUND)

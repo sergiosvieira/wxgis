@@ -35,8 +35,6 @@ SET(_WXGISGDAL_ROOT_HINTS
   )
 SET(_WXGISGDAL_ROOT_PATHS
   $ENV{WXGISGDAL}
-  /usr
-  /usr/local
   )
 SET(_WXGISGDAL_ROOT_HINTS_AND_PATHS
   HINTS ${_WXGISGDAL_ROOT_HINTS}
@@ -50,9 +48,7 @@ FIND_PATH(WXGISGDAL_INCLUDE_DIR
     ${_WXGISGDAL_INCLUDEDIR}
   ${_WXGISGDAL_ROOT_HINTS_AND_PATHS}
   PATH_SUFFIXES
-    "include"
-    "include/gdal"
-    "local/include/gdal"
+    include
 )
 
 IF(WIN32 AND NOT CYGWIN)
@@ -175,15 +171,25 @@ ELSE(WIN32 AND NOT CYGWIN)
 
   FIND_LIBRARY(WXGISGDAL_LIBRARY
     NAMES
-        wxgisgdal
+        wxgisgdal18
+        wxgisgdal19
+        wxgisgdal19
+        wxgisgdal20
+        wxgisgdal21
+        wxgisgdal22
+        wxgisgdal23
+        wxgisgdal24
+        wxgisgdal25
+        wxgisgdal26
+        wxgisgdal27
+        wxgisgdal28
+        wxgisgdal29
+        wxgisgdal30
     HINTS
       ${_WXGISGDAL_LIBDIR}
     ${_WXGISGDAL_ROOT_HINTS_AND_PATHS}
     PATH_SUFFIXES
-      "lib"
-      "local/lib"
-      "local/lib/wxgis"
-      "lib/wxgis"
+      lib
   ) 
 
   MARK_AS_ADVANCED(WXGISGDAL_LIBRARY)
@@ -219,6 +225,4 @@ else (WXGISGDAL_VERSION)
   )
 endif (WXGISGDAL_VERSION)
 
-message(STATUS "wxgis libs=[${WXGISGDAL_LIBRARIES}] headers=[${WXGISGDAL_INCLUDE_DIR}]")
 MARK_AS_ADVANCED(WXGISGDAL_INCLUDE_DIR WXGISGDAL_LIBRARIES)
-

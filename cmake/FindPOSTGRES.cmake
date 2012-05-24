@@ -27,7 +27,18 @@ IF(WIN32 AND NOT ANDROID)
       c:/msys/local/include
       "$ENV{LIB_DIR}/include/postgresql"
       "$ENV{LIB_DIR}/include"
+      "$ENV{LIB_DIR}"
       )
+      FIND_PATH(POSTGRES_INCLUDE_DIR2 postgres_ext.h 
+      /usr/local/include 
+      /usr/include 
+      c:/msys/local/include
+      "$ENV{LIB_DIR}/include/postgresql"
+      "$ENV{LIB_DIR}/include"
+      "$ENV{LIB_DIR}"
+      )
+      
+      set(POSTGRES_INCLUDE_DIR ${POSTGRES_INCLUDE_DIR} ${POSTGRES_INCLUDE_DIR2})
   ENDIF (NOT POSTGRES_INCLUDE_DIR)
 
   IF (NOT POSTGRES_LIBRARY)
