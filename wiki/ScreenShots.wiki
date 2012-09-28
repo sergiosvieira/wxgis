@@ -13,9 +13,10 @@ http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/logo_catalog.png
 <p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/wxGIS[catalog]1.jpg </p>
 <p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/wxGIS[catalog]2.jpg </p>
 <p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/wxGIS[catalog]3.jpg </p>
+<p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/wxGIS(contents_view).jpg </p>
 <p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/wxGIS(Catalog_linux).jpg </p>
 <p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/wxGIS(select_dlg_linux).jpg </p>
-<p>http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/wxGIS(contents_view).jpg </p>
+
 
 Element properties
 ||http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/prop(raster).jpg||http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/prop(vector).jpg||http://wxgis.googlecode.com/svn/wiki/WikiPageName.attach/prop(sparef).jpg||
