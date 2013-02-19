@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxMapView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,13 +19,18 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxmapview.h"
+#include "wxgis/catalog/gxdataset.h"
 #include "wxgis/carto/featurelayer.h"
 #include "wxgis/carto/rasterlayer.h"
 #include "wxgis/framework/framework.h"
 #include "wxgis/framework/application.h"
 #include "wxgis/datasource/rasterop.h"
 
-#include "wx/msgdlg.h"
+#include <wx/msgdlg.h>
+
+//-------------------------------------------------------------------------
+// wxGxMapView
+//-------------------------------------------------------------------------
 
 BEGIN_EVENT_TABLE(wxGxMapView, wxGISMapView)
 	EVT_LEFT_DOWN(wxGxMapView::OnMouseDown)
@@ -43,15 +48,17 @@ END_EVENT_TABLE()
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxMapView, wxGISMapView)
 
-wxGxMapView::wxGxMapView(void)
+wxGxMapView::wxGxMapView(void) : wxGISMapView(), wxGxView()
 {
     m_nParentGxObjectID = wxNOT_FOUND;
+    m_ConnectionPointSelectionCookie = m_ConnectionPointCatalogCookie = wxNOT_FOUND;
 }
 
 wxGxMapView::wxGxMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxGISMapView(parent, id, pos, size), m_pStatusBar(NULL)
 {
     m_nParentGxObjectID = wxNOT_FOUND;
 	m_sViewName = wxString(_("Geography View"));
+    m_ConnectionPointSelectionCookie = m_ConnectionPointCatalogCookie = wxNOT_FOUND;
 }
 
 wxGxMapView::~wxGxMapView(void)
@@ -65,46 +72,63 @@ bool wxGxMapView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, co
     return wxGISMapView::Create(parent, MAPCTRLID, pos, size, style, name);
 }
 
-bool wxGxMapView::Activate(IFrameApplication* application, wxXmlNode* pConf)
+bool wxGxMapView::Activate(IApplication* const pApplication, wxXmlNode* const pConf)
 {
-	if(!wxGxView::Activate(application, pConf))
+	if(!wxGxView::Activate(pApplication, pConf))
 		return false;
 	//Serialize(m_pXmlConf, false);
+    
+    //TODO: get/store from/in config, set from property page
+	m_CFormat.Create(wxString(wxT("X: dd.dddd[ ]Y: dd.dddd")));
 
-	m_CFormat.Create(wxString(wxT("X: dd.dddd[ ]Y: dd.dddd")));//TODO: get/store from/in config, set from property page
-
-    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pGxApplication->GetCatalog());
-	if(m_pCatalog)
-		m_pSelection = m_pCatalog->GetSelection();
-
-    m_pApp = application;
+    m_pApp = dynamic_cast<wxGxApplication*>(pApplication);
     if(!m_pApp)
         return false;
+
+    m_pSelection = m_pApp->GetGxSelection();
+
+    if(!GetGxCatalog())
+		return false;
+    m_pCatalog = wxDynamicCast(GetGxCatalog(), wxGxCatalogUI);
+
+    if(!m_pCatalog || !m_pSelection)
+		return false;
+    m_ConnectionPointSelectionCookie = m_pSelection->Advise(this);
+    m_ConnectionPointCatalogCookie = m_pCatalog->Advise(this);
+
 	m_pStatusBar = m_pApp->GetStatusBar();
 
 	m_pTrackCancel = new ITrackCancel();
 	if(m_pStatusBar)
-		m_pTrackCancel->SetProgressor(m_pStatusBar->GetAnimation());
+    {
+        IProgressor* pAni = m_pStatusBar->GetAnimation();
+		m_pTrackCancel->SetProgressor(pAni);
+    }
 	SetTrackCancel(m_pTrackCancel);
 	return true;
 }
 
 void wxGxMapView::Deactivate(void)
 {
-	//Serialize(m_pXmlConf, true);
+	if(m_ConnectionPointCatalogCookie != wxNOT_FOUND)
+        m_pCatalog->Unadvise(m_ConnectionPointCatalogCookie);
+	if(m_ConnectionPointSelectionCookie != wxNOT_FOUND)
+        m_pSelection->Unadvise(m_ConnectionPointSelectionCookie);
+
+    //Serialize(m_pXmlConf, true);
 	wxDELETE(m_pTrackCancel);
 	wxGxView::Deactivate();
 }
 
-bool wxGxMapView::Applies(IGxSelection* Selection)
+bool wxGxMapView::Applies(wxGxSelection* const Selection)
 {
 	if(Selection == NULL)
 		return false;
 
 	for(size_t i = 0; i < Selection->GetCount(); ++i)
 	{
-        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(Selection->GetSelectedObjectID(i));
-		IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>( pGxObject.get() );
+        wxGxObject* pGxObject = m_pCatalog->GetRegisterObject(Selection->GetSelectedObjectId(i));
+		wxGxDataset* pGxDataset = wxDynamicCast(pGxObject, wxGxDataset);
 		if(pGxDataset != NULL)
 		{
 			wxGISEnumDatasetType type = pGxDataset->GetType();
@@ -124,13 +148,13 @@ bool wxGxMapView::Applies(IGxSelection* Selection)
 
 void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 {
-	wxCHECK_RET(event.GetSelection(), "the selection pointer is NULL");
-    long nLastSelID = event.GetSelection()->GetLastSelectedObjectID();
+	wxCHECK_RET(event.GetSelection(), wxT("the selection pointer is NULL"));
+    long nLastSelID = event.GetSelection()->GetLastSelectedObjectId();
 	if(m_nParentGxObjectID == nLastSelID)
 		return;
     	
-    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nLastSelID);
-	IGxDataset* pGxDataset =  dynamic_cast<IGxDataset*>(pGxObject.get());
+    wxGxObject* pGxObject = m_pCatalog->GetRegisterObject(nLastSelID);
+	wxGxDataset* pGxDataset = wxDynamicCast(pGxObject, wxGxDataset);
 	if(pGxDataset == NULL)
 		return;
 
@@ -138,83 +162,90 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 	if(m_pStatusBar)
 		m_pTrackCancel->SetProgressor(m_pStatusBar->GetProgressor());
 	m_pTrackCancel->Reset();
-	wxGISDatasetSPtr pwxGISDataset = pGxDataset->GetDataset(true, m_pTrackCancel);
+
+	wxGISDataset* pwxGISDataset = pGxDataset->GetDataset(true, m_pTrackCancel);
 	if(pwxGISDataset == NULL)
 		return;
 
 	if(m_pStatusBar)
 		m_pTrackCancel->SetProgressor(m_pStatusBar->GetAnimation());
 
-    m_nParentGxObjectID = pGxObject->GetID();    
+    m_nParentGxObjectID = pGxObject->GetId();    
 
 	wxGISEnumDatasetType type = pwxGISDataset->GetType();
-    std::vector<wxGISLayerSPtr> paLayers;
+    wxVector<wxGISLayer*> paLayers;
 
 	switch(type)
 	{
 	case enumGISFeatureDataset:
-		{
-			wxGISFeatureDatasetSPtr pGISFeatureDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pwxGISDataset);
-			if(!pGISFeatureDataset->IsOpened())
-				pGISFeatureDataset->Open(0, 0, true, m_pTrackCancel);
-			if(!pGISFeatureDataset->IsCached())
-				pGISFeatureDataset->Cache(m_pTrackCancel);
-			wxGISFeatureLayerSPtr pGISFeatureLayer = boost::make_shared<wxGISFeatureLayer>(pwxGISDataset);
-			paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISFeatureLayer));
-		}
+		//{
+		//	wxGISFeatureDatasetSPtr pGISFeatureDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pwxGISDataset);
+		//	if(!pGISFeatureDataset->IsOpened())
+		//		pGISFeatureDataset->Open(0, 0, true, m_pTrackCancel);
+		//	if(!pGISFeatureDataset->IsCached())
+		//		pGISFeatureDataset->Cache(m_pTrackCancel);
+		//	wxGISFeatureLayerSPtr pGISFeatureLayer = boost::make_shared<wxGISFeatureLayer>(pwxGISDataset);
+		//	paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISFeatureLayer));
+		//}
+        wsDELETE(pwxGISDataset);
 		break;
 	case enumGISRasterDataset:
 		{
         //CheckOverviews(pwxGISDataset, pGxObject->GetName());
 		//pwxGISLayers.push_back(new wxGISRasterLayer(pwxGISDataset));
         //pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISDataset->GetName());
-			wxGISRasterDatasetSPtr pGISRasterDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(pwxGISDataset);
+			wxGISRasterDataset* pGISRasterDataset = wxDynamicCast(pwxGISDataset, wxGISRasterDataset);
 			if(!pGISRasterDataset->IsOpened())
 				pGISRasterDataset->Open(false);
 			if(!pGISRasterDataset->IsCached())
 				pGISRasterDataset->Cache(m_pTrackCancel);
-			wxGISRasterLayerSPtr pGISRasterLayer = boost::make_shared<wxGISRasterLayer>(pwxGISDataset);
-			paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISRasterLayer));
+            wxGISRasterLayer* pGISRasterLayer = new wxGISRasterLayer(pwxGISDataset->GetName(), pwxGISDataset);
+			paLayers.push_back(pGISRasterLayer);
 		}
 		break;
 	case enumGISContainer:
         for(size_t i = 0; i < pwxGISDataset->GetSubsetsCount(); ++i)
         {
-            wxGISDatasetSPtr pwxGISSubDataset = pwxGISDataset->GetSubset(i);
+            wxGISDataset* pwxGISSubDataset = pwxGISDataset->GetSubset(i);
             if(!pwxGISSubDataset)
                 continue;
             wxGISEnumDatasetType subtype = pwxGISSubDataset->GetType();
 	        switch(subtype)
 	        {
 	        case enumGISFeatureDataset:
-				{
-					wxGISFeatureDatasetSPtr pGISFeatureDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pwxGISSubDataset);
-					if(!pGISFeatureDataset->IsOpened())
-						pGISFeatureDataset->Open(0, 0, true, m_pTrackCancel);
-					if(!pGISFeatureDataset->IsCached())
-						pGISFeatureDataset->Cache(m_pTrackCancel);
-					wxGISFeatureLayerSPtr pGISFeatureLayer = boost::make_shared<wxGISFeatureLayer>(pwxGISSubDataset);
-					paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISFeatureLayer));
-				}
+				//{
+				//	wxGISFeatureDatasetSPtr pGISFeatureDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pwxGISSubDataset);
+				//	if(!pGISFeatureDataset->IsOpened())
+				//		pGISFeatureDataset->Open(0, 0, true, m_pTrackCancel);
+				//	if(!pGISFeatureDataset->IsCached())
+				//		pGISFeatureDataset->Cache(m_pTrackCancel);
+				//	wxGISFeatureLayerSPtr pGISFeatureLayer = boost::make_shared<wxGISFeatureLayer>(pwxGISSubDataset);
+				//	paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISFeatureLayer));
+				//}
+                wsDELETE(pwxGISSubDataset);
 				break;
 	        case enumGISRasterDataset:
 				{
           //      CheckOverviews(pwxGISSubDataset, pGxObject->GetName());
 		        //pwxGISLayers.push_back(new wxGISRasterLayer(pwxGISSubDataset));
           //      pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISSubDataset->GetName());
-					wxGISRasterDatasetSPtr pGISRasterDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(pwxGISDataset);
+					wxGISRasterDataset* pGISRasterDataset = wxDynamicCast(pwxGISDataset, wxGISRasterDataset);
 					if(!pGISRasterDataset->IsOpened())
 						pGISRasterDataset->Open(false);
 					if(!pGISRasterDataset->IsCached())
 						pGISRasterDataset->Cache(m_pTrackCancel);
-					wxGISRasterLayerSPtr pGISRasterLayer = boost::make_shared<wxGISRasterLayer>(pwxGISDataset);
-					paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISRasterLayer));
+					wxGISRasterLayer* pGISRasterLayer = new wxGISRasterLayer(pwxGISDataset->GetName(), pwxGISDataset);
+                    paLayers.push_back(pGISRasterLayer);
 				}
+		        break;
+	        default:
+                wsDELETE(pwxGISSubDataset);
 		        break;
             }
         }
 		break;
 	default:
+        wsDELETE(pwxGISDataset);
 		break;
 	}
 
@@ -222,8 +253,17 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 
     for(size_t i = 0; i < paLayers.size(); ++i)
     {
-	    if(paLayers[i] && paLayers[i]->IsValid())
-		    AddLayer(paLayers[i]);
+	    if(paLayers[i])
+        {
+            if(paLayers[i]->IsValid())
+            {
+                AddLayer(paLayers[i]);
+            }
+            else
+            {
+                wxDELETE(paLayers[i]);
+            }
+        }
     }
 
     SetFullExtent();

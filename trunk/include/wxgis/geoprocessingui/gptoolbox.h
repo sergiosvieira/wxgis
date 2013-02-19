@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  toolbox classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-
+/*
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/geoprocessing/gptoolmngr.h"
@@ -104,7 +104,7 @@ protected:
 /** \class wxGxFavoritesToolbox gptoolbox.h
  *  \brief The most popular tools.
  */
-
+/*
 class WXDLLIMPEXP_GIS_GPU wxGxFavoritesToolbox :
 	public IGxObjectUI,
 	public IGxObjectContainer,
@@ -144,7 +144,7 @@ protected:
 /** \class wxGxToolExecute gptoolbox.h
  *  \brief The executed and pending tools.
  */
-
+/*
 class WXDLLIMPEXP_GIS_GPU wxGxToolExecute :
 	public IGxObjectUI,
     public IGxObjectSort,
@@ -220,4 +220,4 @@ protected:
     wxGxRootToolbox* m_pRootToolbox;
     wxIcon m_LargeToolIcon, m_SmallToolIcon;
 };
-
+*/

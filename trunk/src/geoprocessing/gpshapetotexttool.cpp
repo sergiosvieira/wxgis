@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  write shape cordinates to text file
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -86,10 +86,10 @@ GPParameters wxGISGPShapeToTextTool::GetParameterInfo(void)
 
         wxGISGPStringDomain* pDomain2 = new wxGISGPStringDomain();
 
-		wxGISAppConfigSPtr pConfig = GetConfig();
-		if(pConfig)
+		wxGISAppConfig oConfig = GetConfig();
+		if(oConfig.IsOk())
 		{
-			wxXmlNode* pToolsNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/coordinate_mask")));
+			wxXmlNode* pToolsNode = oConfig.GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/coordinate_mask")));
 			if(pToolsNode)
 			{
 				wxXmlNode* pChild = pToolsNode->GetChildren();
@@ -162,14 +162,14 @@ bool wxGISGPShapeToTextTool::Validate(void)
 	//store in config if not exist
 	if(m_bEmptyCoordsMask)
 	{
-		wxGISAppConfigSPtr pConfig = GetConfig();
-		if(pConfig)
+		wxGISAppConfig oConfig = GetConfig();
+		if(oConfig.IsOk())
 		{
-			wxXmlNode* pToolsNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/coordinate_mask")));
+			wxXmlNode* pToolsNode = oConfig.GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/coordinate_mask")));
 			if(pToolsNode)
-				pConfig->DeleteNodeChildren(pToolsNode);
+				oConfig.DeleteNodeChildren(pToolsNode);
 			else
-				pToolsNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/coordinate_mask")));
+				pToolsNode = oConfig.CreateConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/coordinate_mask")));
 			if(pToolsNode)
 			{
 				for(size_t i = 0; i < m_asCoordsMask.GetCount(); ++i)

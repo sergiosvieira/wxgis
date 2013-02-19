@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
  * Purpose:  wxGxRemoteServersUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,9 +18,10 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+
 #pragma once
 #include "wxgis/catalogui/catalogui.h"
-#include "wxgis/remoteserverui/remoteserverui.h"
+//#include "wxgis/remoteserverui/remoteserverui.h"
 #include "wxgis/remoteserver/gxremoteservers.h"
 
 /** \class wxGxRemoteServersUI gxremoteserversui.h
@@ -37,12 +38,19 @@ public:
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxRemoteServersUI.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxRemoteServersUI.NewMenu"));};
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxRemoteServersUI.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxString(wxT("wxGxRemoteServersUI.NewMenu"));};
 	//wxGxRemoteServersUI
-	virtual void LoadChildren();
+    virtual void CreateConnection(wxWindow* pParent);
+	/*virtual void LoadChildren();
 	virtual void EmptyChildren(void);
-    virtual void CreateConnection(wxWindow* pParent, bool bSearch = false);
+    */
+protected:
+    //wxGxXMLConnectionStorage
+    virtual wxGxObject* CreateChildGxObject(const wxXmlNode* pNode);
 protected:
 	wxIcon m_RemServs16, m_RemServs48;
+	wxIcon m_RemServ16, m_RemServ48;
+    wxIcon m_RemServDsbl16, m_RemServDsbl48;
+    wxIcon m_RemServAuth16, m_RemServAuth48;
 };

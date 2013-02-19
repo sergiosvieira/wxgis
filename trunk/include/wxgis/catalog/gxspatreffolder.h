@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxSpatialReferencesFolder class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009,2011 Bishop
 *
@@ -29,6 +29,7 @@
 /** \class wxGxPrjFolder gxspatreffolder.h
     \brief A projections folder root GxObject.
 */
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxPrjFolder :
 	public wxGxArchiveFolder
 {
@@ -40,10 +41,11 @@ public:
     //wxGxArchiveFolder
     virtual IGxObject* GetArchiveFolder(CPLString szPath, wxString soName);
 };
-
+*/
 /** \class wxGxSpatialReferencesFolder gxspatreffolder.h
     \brief A spatial reference root GxObject.
 */
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxSpatialReferencesFolder :
 	public wxGxPrjFolder,
     public IGxRootObjectProperties,
@@ -64,4 +66,4 @@ public:
 protected:
 	wxString m_sInternalPath;
 };
-
+*/

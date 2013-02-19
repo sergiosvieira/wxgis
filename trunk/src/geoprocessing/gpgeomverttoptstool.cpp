@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  convert geometry vertices to points
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *

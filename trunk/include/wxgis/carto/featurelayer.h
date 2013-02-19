@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  FeatureLayer header.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,14 +18,14 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#pragma once
+/*#pragma once
 
 #include "wxgis/carto/carto.h"
 #include "wxgis/datasource/featuredataset.h"
 
 /** \class wxGISFeatureLayer featurelayer.h
     \brief The class represent vector datasource in map.
-*/
+*//*
 class WXDLLIMPEXP_GIS_CRT wxGISFeatureLayer :
 	public wxGISLayer
 {
@@ -60,3 +60,4 @@ protected:
 };
 
 DEFINE_SHARED_PTR(wxGISFeatureLayer);
+*/

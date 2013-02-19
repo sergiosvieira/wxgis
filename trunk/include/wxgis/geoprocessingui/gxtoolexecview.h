@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxToolExecuteView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -25,25 +25,94 @@
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalog/gxevent.h"
 #include "wxgis/catalogui/gxeventui.h"
+#include "wxgis/catalog/gxobject.h"
+#include "wxgis/catalogui/gxapplication.h"
 
 #include "wx/listctrl.h"
 #include "wx/imaglist.h"
 
+#define TOOLEXECVIEWSTYLE (wxLC_REPORT | wxBORDER_NONE | wxLC_AUTOARRANGE)
+#define TOOLEXECUTECTRLID WXGISHIGHEST + 1
+
+WXDLLIMPEXP_GIS_GPU int wxCALLBACK GxTaskCompareFunction(wxIntPtr item1, wxIntPtr item2, wxIntPtr sortData);
+
 /** \class wxGISToolExecuteView gxtoolexecview.h
     \brief The tasks execution view class.
 */
-#define TOOLEXECVIEWSTYLE wxLC_REPORT | wxBORDER_NONE | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE | wxLC_VRULES | wxLC_HRULES
-#define TOOLEXECUTECTRLID WXGISHIGHEST + 1
+
+class WXDLLIMPEXP_GIS_GPU wxGISToolExecuteView :
+	public wxListCtrl,
+	public wxGxView,
+    public IGxContentsView
+{
+    DECLARE_CLASS(wxGISToolExecuteView)
+public:
+    wxGISToolExecuteView(void);
+	wxGISToolExecuteView(wxWindow* parent, wxWindowID id = TOOLEXECUTECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = TOOLEXECVIEWSTYLE);
+	virtual ~wxGISToolExecuteView(void);
+	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
+    //wxListCtrl
+    bool Show(bool show);
+//wxGxView
+    virtual bool Create(wxWindow* parent, wxWindowID id = TOOLEXECUTECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = TOOLEXECVIEWSTYLE, const wxString& name = wxT("ToolExecuteView"));
+	virtual bool Activate(IApplication* const pApplication, wxXmlNode* const pConf);
+	virtual void Deactivate(void);
+// IGxContentsView
+    virtual void SelectAll(void);
+    virtual void SetStyle(wxGISEnumContentsViewStyle style){};
+    virtual wxGISEnumContentsViewStyle GetStyle(void){return enumGISCVReport;};
+    virtual bool CanSetStyle(void){return false;};
+// DropTarget
+    virtual wxDragResult OnDragOver(wxCoord x, wxCoord y, wxDragResult def);
+    virtual wxDragResult OnEnter(wxCoord x, wxCoord y, wxDragResult def);
+    virtual void OnLeave();
+    virtual bool OnDropObjects(wxCoord x, wxCoord y, long nParentPointer, const wxArrayLong& TaskIds);
+//events
+    virtual void OnContextMenu(wxContextMenuEvent& event);
+	virtual void ShowContextMenu(const wxPoint& pos);
+    virtual void OnActivated(wxListEvent& event);
+	virtual void OnSelected(wxListEvent& event);
+	virtual void OnDeselected(wxListEvent& event);
+    virtual void OnChar(wxKeyEvent& event);
+    virtual void OnBeginDrag(wxListEvent& event);
+//events
+	virtual void OnObjectRefreshed(wxGxCatalogEvent& event);
+	virtual void OnObjectAdded(wxGxCatalogEvent& event);
+	virtual void OnObjectChanged(wxGxCatalogEvent& event) = 0;
+	virtual void OnObjectDeleted(wxGxCatalogEvent& event);
+	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
+protected:
+    virtual void AddObject(wxGxObject* pObject) = 0;
+    virtual void ResetContents(void);
+    virtual void RefreshAll(void);
+    virtual void InitColumns(void);
+protected:
+    wxGxApplication* m_pApp;    
+    long m_ConnectionPointCatalogCookie, m_ConnectionPointSelectionCookie;
+	wxGxSelection* m_pSelection;
+    wxGxCatalogUI* m_pCatalog;
+    wxGISCommand* m_pDeleteCmd;
+    long m_nParentGxObjectId;
+    wxImageList m_ImageList;
+    long m_HighLightItem;
+    bool m_bDropping;
+private:
+    DECLARE_EVENT_TABLE()
+};
 
 /** \class wxGxToolExecuteView gxtoolexecview.h
     \brief The tasks execution gxcatalog view class.
 */
 
-typedef struct _sorttaskdata
-{
-    bool bSortAsc;
-    short currentSortCol;
-} SORTTASKDATA, *LPSORTTASKDATA;
+//typedef struct _sorttaskdata
+//{
+//    bool bSortAsc;
+//    short currentSortCol;
+//} SORTTASKDATA, *LPSORTTASKDATA;
+
+/*
+
+#define TOOLEXECVIEWSTYLE wxLC_REPORT | wxBORDER_NONE | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE | wxLC_VRULES | wxLC_HRULES
 
 class WXDLLIMPEXP_GIS_GPU wxGxToolExecuteView :
 	public wxListCtrl,
@@ -57,7 +126,7 @@ public:
 	wxGxToolExecuteView(wxWindow* parent, wxWindowID id = TOOLEXECUTECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = TOOLEXECVIEWSTYLE);
 	virtual ~wxGxToolExecuteView(void);
 	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
-	virtual void AddObject(IGxObject* pObject);
+	virtual void AddObject(wxGxObject* pObject);
 	virtual void ResetContents(void);
     virtual IGxObjectSPtr const GetParentGxObject(void);
     virtual bool Show(bool show = true);
@@ -68,7 +137,7 @@ public:
     virtual bool Create(wxWindow* parent, wxWindowID id = TOOLEXECUTECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = TOOLEXECVIEWSTYLE, const wxString& name = wxT("ToolExecuteView"));
 	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
-	virtual bool Applies(IGxSelection* Selection);
+	virtual bool Applies(wxGxSelection* const pSelection);
     virtual void BeginRename(IGxObject* pGxObject = NULL){};
 // IGxContentsView
     virtual void SelectAll(void);
@@ -104,9 +173,10 @@ protected:
 	long m_ConnectionPointCatalogCookie;
 	IGxSelection* m_pSelection;
     wxGxCatalogUI* m_pCatalog;
-    ICommand* m_pDeleteCmd;
+    wxGISCommand* m_pDeleteCmd;
 	long m_nParentGxObjectID;
     long m_HighLightItem;
 
     DECLARE_EVENT_TABLE()
 };
+*/

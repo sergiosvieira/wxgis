@@ -1,6 +1,8 @@
-project (${PROJECT_NAME})
+project (wxgis${PROJECT_NAME})
 
 message(STATUS "${PROJECT_NAME} app name ${APP_NAME}")
+
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Configs" FORCE)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/version_app.h "//Copyright (C) 2012 Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru\n#pragma once\n#define wxGIS_FILENAME \"${APP_NAME}\"\n#define wxGIS_MAINFAMEICON \"${wxGIS_MAINFAMEICON}\"\n#define wxGIS_MAINFAMEICON_X \"${wxGIS_MAINFAMEICON_X}\"\n\n" )

@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxMapInfoFactoryUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -26,6 +26,7 @@
 /** \class wxGxMapInfoFactoryUI gxmapinfofactoryui.h
     \brief A kml dataset GxObject.
 */
+/*
 class wxGxMapInfoFactoryUI :
 	public wxGxMapInfoFactory
 {
@@ -40,3 +41,4 @@ protected:
     wxIcon m_LargeMifIcon, m_SmallMifIcon;
     wxIcon m_LargeTabTIcon, m_SmallTabTIcon;
 };
+*/

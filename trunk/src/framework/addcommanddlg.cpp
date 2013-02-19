@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  add command in command bar dialog.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2010  Bishop
 *
@@ -41,20 +41,16 @@ wxGISAddCommandDlg::wxGISAddCommandDlg( wxGISApplication* pGxApp, wxWindow* pare
 	wxBoxSizer* bSizer5 = new wxBoxSizer( wxVERTICAL );
 
 	m_Splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D | wxNO_BORDER );
-	m_Splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISAddCommandDlg::SplitterOnIdle ), NULL, this );
+	//m_Splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISAddCommandDlg::SplitterOnIdle ), NULL, this );
+	m_Splitter->Bind( wxEVT_IDLE, &wxGISAddCommandDlg::SplitterOnIdle, this );
 	bSizer5->Add( m_Splitter, 1, wxEXPAND, 5 );
 
 	//fill m_listBox1
-	COMMANDARRAY* pArr = m_pGxApp->GetCommands();
-	if(pArr)
+	wxCommandPtrArray CommandArr = m_pGxApp->GetCommands();
+	for(size_t i = 0; i < CommandArr.size(); ++i)
 	{
-		for(size_t i = 0; i < pArr->size(); ++i)
-		{
-			wxString sCat = pArr->at(i)->GetCategory();
-			if(m_CategoryMap[sCat] == NULL)
-				m_CategoryMap[sCat] = new COMMANDARRAY;
-			m_CategoryMap[sCat]->push_back(pArr->at(i));
-		}
+		wxString sCat = CommandArr[i]->GetCategory();
+		m_CategoryMap[sCat].Add(CommandArr[i]);
 	}
 
 	wxArrayString CatArray;
@@ -94,10 +90,6 @@ wxGISAddCommandDlg::wxGISAddCommandDlg( wxGISApplication* pGxApp, wxWindow* pare
 
 wxGISAddCommandDlg::~wxGISAddCommandDlg()
 {
-	for(CATEGORYMAP::iterator IT = m_CategoryMap.begin(); IT != m_CategoryMap.end(); ++IT)
-	{
-		wxDELETE(IT->second);
-	}
 }
 
 void wxGISAddCommandDlg::OnListboxSelect(wxCommandEvent& event)
@@ -107,24 +99,21 @@ void wxGISAddCommandDlg::OnListboxSelect(wxCommandEvent& event)
 		return;
 
 	wxString selName = m_ListBox->GetString(selpos);
-	COMMANDARRAY* pArr = m_CategoryMap[selName];
-	if(pArr != NULL)
+	wxCommandPtrArray CommandArr = m_CategoryMap[selName];
+	m_ListCtrl->DeleteAllItems();
+	m_ImageList.RemoveAll();
+	for(size_t i = 0; i < CommandArr.GetCount(); ++i)
 	{
-		m_ListCtrl->DeleteAllItems();
-		m_ImageList.RemoveAll();
-		for(size_t i = 0; i < pArr->size(); ++i)
-		{
-			wxString sName = wxStripMenuCodes(pArr->at(i)->GetCaption());
-			wxString sMessage = pArr->at(i)->GetMessage();
-			wxString sKeyCode = m_pGxApp->GetGISAcceleratorTable()->GetText(pArr->at(i)->GetID());
-			int nIndex = m_ImageList.Add(pArr->at(i)->GetBitmap());
-			long pos = m_ListCtrl->InsertItem(i, sName, nIndex);
-			m_ListCtrl->SetItem(pos, 1, sMessage);
-			m_ListCtrl->SetItem(pos, 2, sKeyCode);
-			m_ListCtrl->SetItemData(pos,  pArr->at(i)->GetID());
-		}
-		m_ListCtrl->Update();
+		wxString sName = wxStripMenuCodes(CommandArr[i]->GetCaption());
+		wxString sMessage = CommandArr[i]->GetMessage();
+		wxString sKeyCode = m_pGxApp->GetGISAcceleratorTable()->GetText(CommandArr[i]->GetID());
+		int nIndex = m_ImageList.Add(CommandArr[i]->GetBitmap());
+		long pos = m_ListCtrl->InsertItem(i, sName, nIndex);
+		m_ListCtrl->SetItem(pos, 1, sMessage);
+		m_ListCtrl->SetItem(pos, 2, sKeyCode);
+		m_ListCtrl->SetItemData(pos,  CommandArr[i]->GetID());
 	}
+	m_ListCtrl->Update();
 }
 
 void wxGISAddCommandDlg::OnDoubleClickSash(wxSplitterEvent& event)

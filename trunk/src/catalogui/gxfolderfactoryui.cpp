@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxFolderFactoryUI class. Create new GxFolderUI objects
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxfolderfactoryui.h"
+
 #include "wxgis/catalogui/gxfolderui.h"
 
 #include "wx/filename.h"
@@ -27,6 +28,9 @@
 #include "../../art/folder_16.xpm"
 #include "../../art/folder_48.xpm"
 
+//---------------------------------------------------------------------------
+// wxGxFolderFactoryUI
+//---------------------------------------------------------------------------
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxFolderFactoryUI, wxGxFolderFactory)
 
@@ -40,8 +44,8 @@ wxGxFolderFactoryUI::~wxGxFolderFactoryUI(void)
 {
 }
 
-IGxObject* wxGxFolderFactoryUI::GetGxObject(CPLString szPath, wxString soName)
+wxGxObject* wxGxFolderFactoryUI::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath)
 {
-	wxGxFolder* pFolder = new wxGxFolderUI(szPath, soName, m_oLargeFolderIcon, m_oSmallFolderIcon);
-	return static_cast<IGxObject*>(pFolder);
+	wxGxFolder* pFolder = new wxGxFolderUI(pParent, soName, szPath, m_oLargeFolderIcon, m_oSmallFolderIcon);
+	return static_cast<wxGxObject*>(pFolder);
 }

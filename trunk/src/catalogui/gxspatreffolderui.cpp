@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxSpatialReferencesFolderUI classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxspatreffolderui.h"
+/*
 #include "wxgis/catalogui/gxcatalogui.h"
 
 #include "../../art/folder_prj_16.xpm"
@@ -96,3 +97,4 @@ IGxObject* wxGxPrjFolderUI::GetArchiveFolder(CPLString szPath, wxString soName)
 	wxGxPrjFolderUI* pFolder = new wxGxPrjFolderUI(szPath, soName, m_LargeIcon, m_SmallIcon);
 	return static_cast<IGxObject*>(pFolder);
 }
+*/

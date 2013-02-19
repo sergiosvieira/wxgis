@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-
+/*
 #include "wxgissrv/srv_framework/framework.h"
 #include "wxgis/catalog/gxcatalog.h"
 #include "wxgis/networking/message.h"
@@ -29,7 +29,7 @@
 
 	The catalog calss stores root items of server. The server can sent to client the list of root items
 */
-
+/*
 class WXDLLIMPEXP_GIS_FRW wxRxCatalog :
 	public wxGxCatalog,
 	public IService,
@@ -50,3 +50,4 @@ public:
 protected:
     IServerApplication* m_pApp;
 };
+*/

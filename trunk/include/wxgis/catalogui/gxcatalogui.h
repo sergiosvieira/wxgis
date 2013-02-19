@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxCatalogUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,9 +21,43 @@
 #pragma once
 
 #include "wxgis/catalogui/catalogui.h"
-#include "wxgis/catalogui/gxselection.h"
+//#include "wxgis/catalogui/gxselection.h"
 #include "wxgis/catalog/gxcatalog.h"
+
 #include <wx/imaglist.h>
+
+/** \class wxGxCatalogUI gxcatalogui.h
+    \brief The GxCatalogUI class.
+*/
+class  WXDLLIMPEXP_GIS_CLU wxGxCatalogUI :
+    public wxGxCatalog,
+    public IGxObjectUI,
+	public IGxObjectEditUI
+{
+    wxDECLARE_DYNAMIC_CLASS_NO_COPY(wxGxCatalogUI);
+public:
+    wxGxCatalogUI(wxGxObject *oParent = NULL, const wxString &soName = _("Catalog"), const CPLString &soPath = "");
+    virtual ~wxGxCatalogUI(void);
+    virtual void SetOpenLastPath(bool bOpenLast) {m_bOpenLastPath = bOpenLast;};
+    virtual bool GetOpenLastPath(void){return m_bOpenLastPath;};
+    virtual long AddPending(long nParentId);
+    virtual void RemovePending(long nPendingId);
+	//wxGxCatalog
+	virtual wxString GetConfigName(void) const {return wxString(wxT("wxCatalogUI"));};
+    //IGxObjectUI
+	virtual wxIcon GetLargeImage(void);
+	virtual wxIcon GetSmallImage(void);
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxCatalog.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxString(wxT("wxGxCatalog.NewMenu"));};
+	//IGxObjectEditUI
+	virtual void EditProperties(wxWindow *parent);
+protected:
+    wxIcon m_oIcon;
+    bool m_bOpenLastPath;
+    wxImageList m_ImageListSmall, m_ImageListLarge;
+};
+
+/*
 
 class WXDLLIMPEXP_GIS_CLU wxGxCatalogUI :
     public wxGxCatalog,
@@ -70,3 +104,4 @@ protected:
     wxImageList m_ImageListSmall, m_ImageListLarge;
     IGxCatalog* m_pExtCat;
 };
+*/

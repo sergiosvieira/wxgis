@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  toolbar check menu class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,17 +26,18 @@
 
 class WXDLLIMPEXP_GIS_FRW wxGISToolBarMenu :
 	public wxGISMenu,
-	public ICommand
+	public wxGISCommand
 {
+    DECLARE_CLASS(wxGISToolBarMenu)
 public:
 	wxGISToolBarMenu(const wxString& sName = TOOLBARMENUNAME, const wxString& sCaption = _("Toolbars"), wxGISEnumCommandBars type = enumGISCBSubMenu, const wxString& title = wxEmptyString, long style = 0);
-	~wxGISToolBarMenu(void);
+	virtual ~wxGISToolBarMenu(void);
 	//wxGISMenu
-	virtual void AddCommand(ICommand* pCmd){};
+	virtual void AddCommand(wxGISCommand* pCmd){};
 	virtual void RemoveCommand(size_t nIndex){};
 	virtual void MoveCommandLeft(size_t nIndex){};
 	virtual void MoveCommandRight(size_t nIndex){};
-	//ICommand
+	//wxGISCommand
 	virtual wxIcon GetBitmap(void);
 	virtual wxString GetCaption(void);
 	virtual wxString GetCategory(void);
@@ -45,7 +46,7 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IFrameApplication* pApp);
+	virtual bool OnCreate(wxGISApplicationBase* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
     //wxGISToolBarMenu
@@ -54,7 +55,7 @@ public:
 	void OnCommand(wxCommandEvent& event);
 protected:
 	wxGISApplication* m_pApp;
-	std::vector<wxMenuItem*> m_delitems;
+	wxVector<wxMenuItem*> m_delitems;
 
 	DECLARE_EVENT_TABLE()
 };

@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxArchiveUI classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -26,7 +26,7 @@
 /** \class wxGxArchiveUI gxarchfolderui.h
     \brief An archive GxObject.
 */
-
+/*
 class WXDLLIMPEXP_GIS_CLU wxGxArchiveUI :
 	public wxGxArchive,
     public IGxObjectUI,
@@ -47,11 +47,11 @@ public:
 protected:
     wxIcon m_oLargeIcon, m_oSmallIcon;
 };
-
+*/
 /** \class wxGxArchiveFolderUI gxarchfolderui.h
     \brief An archive folder GxObject.
 */
-
+/*
 class WXDLLIMPEXP_GIS_CLU wxGxArchiveFolderUI :
 	public wxGxArchiveFolder,
     public IGxObjectUI,
@@ -70,4 +70,5 @@ public:
 protected:
     wxIcon m_oLargeIcon, m_oSmallIcon;
 };
+*/
 

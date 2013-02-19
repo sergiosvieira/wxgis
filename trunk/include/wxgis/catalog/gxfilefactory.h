@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxFileFactory class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -21,7 +21,7 @@
 #pragma once
 
 #include "wxgis/catalog/catalog.h"
-
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxFileFactory :
 	public IGxObjectFactory,
 	public wxObject
@@ -40,3 +40,4 @@ public:
 protected:
     wxArrayString m_ExtArray;
 };
+*/

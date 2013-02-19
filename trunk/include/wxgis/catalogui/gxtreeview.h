@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxTreeView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -29,9 +29,12 @@
 #include "wx/treectrl.h"
 #include "wx/imaglist.h"
 
+class WXDLLIMPEXP_GIS_CLU wxGxApplication;
+
 /** \class wxGxTreeItemData gxtreeview.h
  *  \brief The tree view item data.
  */
+
 class wxGxTreeItemData : public wxTreeItemData
 {
 public:
@@ -54,31 +57,35 @@ public:
 /** \class wxGxTreeViewBase gxtreeview.h
  *  \brief The base class for tree view of gxObjects.
  */
+
 class WXDLLIMPEXP_GIS_CLU wxGxTreeViewBase :
 	public wxTreeCtrl,
 	public wxGxView
 {
-    DECLARE_DYNAMIC_CLASS(wxGxTreeViewBase)
+    DECLARE_CLASS(wxGxTreeViewBase)
 public:
     wxGxTreeViewBase(void);
 	wxGxTreeViewBase(wxWindow* parent, wxWindowID id = TREECTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS );
 	virtual ~wxGxTreeViewBase(void);
-	virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent);
-	virtual void AddRoot(IGxObject* pGxObject);
+	virtual void AddTreeItem(wxGxObject* pGxObject, wxTreeItemId hParent);
 	virtual void RefreshAll(void);
-//IGxView
+//wxGxView
     virtual bool Create(wxWindow* parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS, const wxString& name = wxT("TreeView"));
-	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(IApplication* const pApplication, wxXmlNode* const pConf);
 	virtual void Deactivate(void);
+    virtual void BeginRename(long nObjectID = wxNOT_FOUND){};
+    virtual void Refresh(void){wxTreeCtrl::Refresh();};
 //wxTreeCtrl
     virtual int OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2);
 
-	typedef std::map<long, wxTreeItemId> WETREEMAP;
+	typedef std::map<long, wxTreeItemId> wxTreeItemMap;
 	typedef struct _icondata
 	{
 		wxIcon oIcon;
 		int iImageIndex;
 	} ICONDATA;
+protected:
+    virtual void AddRoot(wxGxObject* pGxObject);
 protected:
 //events
 	virtual void OnItemExpanding(wxTreeEvent& event);
@@ -93,15 +100,15 @@ protected:
     virtual void UpdateGxSelection(void);
 protected:
 	wxImageList m_TreeImageList;
-	WETREEMAP m_TreeMap;
-	wxGISConnectionPointContainer* m_pConnectionPointCatalog, *m_pConnectionPointSelection;
+	wxTreeItemMap m_TreeMap;
+    wxGISApplicationBase* m_pApp;
 	long m_ConnectionPointCatalogCookie, m_ConnectionPointSelectionCookie;
-	IGxSelection* m_pSelection;
+	wxGxSelection* m_pSelection;
     wxGxCatalogUI* m_pCatalog;
-    ICommand* m_pDeleteCmd;
-    std::vector<ICONDATA> m_IconsArray;
+    wxGISCommand* m_pDeleteCmd;
+    wxVector<ICONDATA> m_IconsArray;
 	wxGISNewMenu* m_pNewMenu;
-
+private:
     DECLARE_EVENT_TABLE()
 };
 
@@ -115,12 +122,15 @@ class WXDLLIMPEXP_GIS_CLU wxGxTreeView :
     DECLARE_DYNAMIC_CLASS(wxGxTreeView)
 public:
     wxGxTreeView(void);
-	wxGxTreeView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS | wxBORDER_NONE | wxTR_EDIT_LABELS );//wxTR_MULTIPLE| wxTR_HIDE_ROOT | wxTR_LINES_AT_ROOT
+	wxGxTreeView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS | wxBORDER_NONE | wxTR_EDIT_LABELS );//wxTR_MULTIPLE| wxTR_LINES_AT_ROOT
 	virtual ~wxGxTreeView(void);
+//wxGxTreeViewBase
+    virtual void AddTreeItem(wxGxObject* pGxObject, wxTreeItemId hParent);
 //IGxDropTarget
     virtual wxDragResult OnDragOver(wxCoord x, wxCoord y, wxDragResult def);
-    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames);
+    virtual bool OnDropObjects(wxCoord x, wxCoord y, const wxArrayString& GxObjects);
     virtual void OnLeave();
+    virtual bool CanPaste(void);
 //events
     virtual void OnBeginLabelEdit(wxTreeEvent& event);
     virtual void OnEndLabelEdit(wxTreeEvent& event);
@@ -132,6 +142,7 @@ public:
     virtual void BeginRename(long nObjectID = wxNOT_FOUND);
 protected:
     wxTreeItemId m_HighLightItemId;
+    long m_nBegRenameID;
 
     DECLARE_EVENT_TABLE()
 };

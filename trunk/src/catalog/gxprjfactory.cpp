@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxPrjFactory class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -23,7 +23,7 @@
 
 #include "wx/filename.h"
 #include "wx/dir.h"
-
+/*
 IMPLEMENT_DYNAMIC_CLASS(wxGxPrjFactory, wxObject)
 
 wxGxPrjFactory::wxGxPrjFactory(void)
@@ -39,7 +39,7 @@ bool wxGxPrjFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObj
     for(int i = CSLCount(pFileNames) - 1; i >= 0; i-- )
     {
         CPLString szExt = CPLGetExtension(pFileNames[i]);
-        if(EQUAL(szExt, "prj"))
+        if(wxGISEQUAL(szExt, "prj"))
         {
             int nRes(0);
             nRes += CPLCheckForFile((char*)CPLResetExtension(pFileNames[i], "shp"), NULL);
@@ -57,7 +57,7 @@ bool wxGxPrjFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObj
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
             continue;
         }
-        else if(EQUAL(szExt, "spr"))
+        else if(wxGISEQUAL(szExt, "spr"))
         {
             IGxObject* pGxObj = GetGxObject(pFileNames[i], GetConvName(pFileNames[i]), enumSPRfile);
             ObjArray.push_back(pGxObj);
@@ -92,3 +92,4 @@ IGxObject* wxGxPrjFactory::GetGxObject(CPLString szPath, wxString soName, wxGISE
     wxGxPrjFile* pFile = new wxGxPrjFile(szPath, soName, nType);
 	return static_cast<IGxObject*>(pFile);
 }
+*/

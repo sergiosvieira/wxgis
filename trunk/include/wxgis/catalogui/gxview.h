@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,35 +19,34 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-#include "wxgis/catalogui/catalogui.h"
+#include "wxgis/catalogui/gxselection.h"
 #include "wxgis/catalog/catalog.h"
+#include "wxgis/catalog/gxobject.h"
 
-//-----------------------------------------------
-// wxGxView
-//-----------------------------------------------
+/** \class wxGxView gxview.h
+ *  \brief The base class for views.
+ */
 
 class WXDLLIMPEXP_GIS_CLU wxGxView :
-    public IGxView
+    public IView
 {
 public:	
 	wxGxView(void);
 	virtual ~wxGxView(void);
-    virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("view")) = 0;
-	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
+    //IView
+    virtual bool Activate(IApplication* const pApplication, wxXmlNode* const pConf);
 	virtual void Deactivate(void);
-	virtual bool Applies(IGxSelection* Selection);
-	virtual void Refresh(void){};
-	virtual wxString GetViewName(void);
+	virtual wxString GetViewName(void) const;
 	virtual wxIcon GetViewIcon(void);
 	virtual void SetViewIcon(wxIcon Icon);
+    virtual void Refresh(void){};    
+    //wxGxView
+	virtual bool Applies(wxGxSelection* const Selection);
     virtual void BeginRename(long nObjectID = wxNOT_FOUND){};
 protected:
 	wxString m_sViewName;
-	//IGxCatalog* m_pCatalog;
-	IGxApplication* m_pGxApplication;
 	wxXmlNode* m_pXmlConf;
     wxIcon m_Icon;
 };
 
-int GxObjectCompareFunction(IGxObject* pObject1, IGxObject* pObject2, long sortData);
-
+int GxObjectCompareFunction(wxGxObject* const pObject1, wxGxObject* const pObject2, long sortData);

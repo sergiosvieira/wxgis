@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISTablePropertyPage class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,13 +21,15 @@
 #pragma once
 
 #include "wxgis/catalogui/catalogui.h"
-#include "wxgis/datasource/featuredataset.h"
+#include "wxgis/catalog/gxdataset.h"
+#include "wxgis/datasource/table.h"
 
 #include "wx/propgrid/propgrid.h"
 
 /** \class wxGISTablePropertyPage tablepropertypage.h
     \brief The tab of table properties.
 */
+
 class WXDLLIMPEXP_GIS_CLU wxGISTablePropertyPage : 
     public wxPanel
 {
@@ -39,9 +41,9 @@ class WXDLLIMPEXP_GIS_CLU wxGISTablePropertyPage :
 
 public:
     wxGISTablePropertyPage(void);
-    wxGISTablePropertyPage(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Table"));
+    wxGISTablePropertyPage(wxGxTableDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Table"));
 	~wxGISTablePropertyPage();
-    virtual bool Create(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Table"));
+    virtual bool Create(wxGxTableDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Table"));
     virtual wxString GetPageName(void){return wxString(_("Table"));};
     wxPGProperty* AppendProperty(wxPGProperty* pProp);
     wxPGProperty* AppendProperty(wxPGProperty* pid, wxPGProperty* pProp);
@@ -49,8 +51,9 @@ public:
     void FillGrid(void);
     void FillLayerDef(OGRLayer *poLayer, int iLayer, CPLString soPath);
 protected:
-    wxGISTableSPtr m_pDataset;
-    IGxDataset* m_pGxDataset;
+    wxGISTable* m_pDataset;
+    wxGxTableDataset* m_pGxDataset;
+
     wxPropertyGrid* m_pg;
 	long m_nCounter;
 

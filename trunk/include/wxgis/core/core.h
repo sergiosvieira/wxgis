@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS)
  * Purpose:  core header.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,60 +22,45 @@
 
 #include "wxgis/base.h"
 
-#include <wx/process.h>
-#include <wx/log.h>
-
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
-#include <boost/make_shared.hpp>
+//#include <wx/process.h>
+#include <wx/vector.h>
 
 #define wgDELETE(p,func) if(p != NULL) {p->func; delete p; p = NULL;}
 #define wsDELETE(p) if(p != NULL) {p->Release(); p = NULL;}
-//#define wgWX2MB(x)  wxConvCurrent->cWX2MB(x)
-//#define wgMB2WX(x)  wxConvCurrent->cMB2WX(x)
+#define RtlZeroMemory(Destination,Length) memset((Destination),0,(Length))
+
+#define __YEAR__ ((((__DATE__ [7] - '0') * 10 + (__DATE__ [8] - '0')) * 10 \
++ (__DATE__ [9] - '0')) * 10 + (__DATE__ [10] - '0'))
+
+/** \enum wxGISEnumConfigKey core.h
+ *  \brief The config key type.
+ */
 
 enum wxGISEnumConfigKey
 {
 	enumGISHKLM = 0x0001,
-	enumGISHKCU = 0x0002
+	enumGISHKCU = 0x0002,
 	//,
 	//enumGISHKCC = 0x0004,
 	//enumGISHKCR = 0x0008,
-	//enumGISHKAny = enumGISHKLM & enumGISHKCU
+	enumGISHKAny = enumGISHKLM | enumGISHKCU
 };
 
-/** \class IApplication core.h
-    \brief Base class for wxGIS application.
+/** \class wxGISConnectionPointContainer core.h
+    \brief The class for event connection store.
 */
-class IApplication
-{
-public:
-    /** \fn virtual ~IApplication(void)
-     *  \brief A destructor.
-     */
-    virtual ~IApplication(void) {};
-	//pure virtual
-	virtual void OnAppAbout(void) = 0;
-    virtual void OnAppOptions(void) = 0;
-	virtual wxString GetAppName(void) = 0;
-	virtual wxString GetAppVersionString(void) = 0;
-    virtual bool Create(void) = 0;
-    virtual bool SetupLog(const wxString &sLogPath) = 0;
-    virtual bool SetupLoc(const wxString &sLoc, const wxString &sLocPath) = 0;
-    virtual bool SetupSys(const wxString &sSysPath) = 0;
-    virtual void SetDebugMode(bool bDebugMode) = 0;
-};
-
 
 class wxGISConnectionPointContainer
 {
 public:
-	virtual ~wxGISConnectionPointContainer(void){};
+	virtual ~wxGISConnectionPointContainer(void)
+    {
+    }
 	virtual long Advise(wxEvtHandler* pEvtHandler)
 	{
 		wxCHECK(pEvtHandler, wxNOT_FOUND);
 
-		std::vector<wxEvtHandler*>::iterator pos = std::find(m_pPointsArray.begin(), m_pPointsArray.end(), pEvtHandler);
+		wxVector<wxEvtHandler*>::const_iterator pos = std::find(m_pPointsArray.begin(), m_pPointsArray.end(), pEvtHandler);
 		if(pos != m_pPointsArray.end())
 			return pos - m_pPointsArray.begin();
 		m_pPointsArray.push_back(pEvtHandler);
@@ -84,7 +69,7 @@ public:
 
 	virtual void Unadvise(long nCookie)
 	{
-		wxCHECK_RET(nCookie >= 0 && nCookie < m_pPointsArray.size(), "wrong cookie index");
+		wxCHECK_RET(nCookie >= 0 && nCookie < m_pPointsArray.size(), wxT("Wrong cookie index"));
 		m_pPointsArray[nCookie] = NULL;
 	}
 protected:
@@ -97,41 +82,25 @@ protected:
 		}
 	};
 protected:
-	std::vector<wxEvtHandler*> m_pPointsArray;
+	wxVector<wxEvtHandler*> m_pPointsArray;
 };
 
-class IPointer
-{
-public:
-	IPointer(void) : m_RefCount(0){};
-	virtual ~IPointer(void){};
-	virtual wxInt32 Reference(void){return m_RefCount++;};
-	virtual wxInt32 Dereference(void){return m_RefCount--;};
-	virtual wxInt32 Release(void)
-	{
-		Dereference();
-		if(m_RefCount <= 0)
-		{
-			delete this;
-			return 0;
-		}
-		else
-			return m_RefCount;
-	}
-protected:
-	wxInt32 m_RefCount;
-};
+/** \enum wxGISEnumMessageType core.h
+ *  \brief The process message type.
+ */
 
 enum wxGISEnumMessageType
 {
-	enumGISMessageUnk,
+	enumGISMessageUnk = 0,
 	enumGISMessageErr,
 	enumGISMessageNorm,
 	enumGISMessageQuestion,
     enumGISMessageInfo,
     enumGISMessageWarning,
     enumGISMessageTitle,
-    enumGISMessageOK
+    enumGISMessageOK,
+    enumGISMessageSend,
+    enumGISMessageReceive
 };
 
 /** \class IProgressor core.h
@@ -147,12 +116,12 @@ public:
      */
 	virtual ~IProgressor(void){};
 	//pure virtual
-    /** \fn bool Show(bool bShow)
+    /** \fn bool ShowProgressor(bool bShow)
      *  \brief Show/hide progressor.
      *  \param bShow The indicator to show (true) or hide (false) progressor
      *  \return The success of function execution
      */
-    virtual bool Show(bool bShow) = 0;
+    virtual bool ShowProgressor(bool bShow) = 0;
     //
     /** \fn virtual void SetRange(int range)
      *  \brief Set progressor range.
@@ -163,7 +132,7 @@ public:
      *  \brief Set progressor range.
      *  \return The current progressor range
      */
-    virtual int GetRange(void) = 0;
+    virtual int GetRange(void) const = 0;
     /** \fn void SetValue(int value)
      *  \brief Set progressor position.
      *  \param value The progressor current value
@@ -173,7 +142,7 @@ public:
      *  \brief Get progressor position.
      *  \return The current progressor position
      */
-    virtual int GetValue(void) = 0;
+    virtual int GetValue(void) const = 0;
     //
     /** \fn void Play(void)
      *  \brief Start undefined progressor state.
@@ -208,22 +177,25 @@ public:
      *  \brief A destructor.
      */
     virtual ~ITrackCancel(void){};
-	virtual void Cancel(void){m_bIsCanceled = true;};
+	virtual void Cancel(void)
+    {
+        m_bIsCanceled = true;
+    };
 	virtual bool Continue(void){return !m_bIsCanceled;};
 	virtual void Reset(void){m_bIsCanceled = false;};
-	virtual IProgressor* GetProgressor(void){return m_pProgressor;};
+	virtual IProgressor* const GetProgressor(void){return m_pProgressor;};
 	virtual void SetProgressor(IProgressor* pProgressor){m_pProgressor = pProgressor; };
-	virtual void PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType){};
+	virtual void PutMessage(const wxString &sMessage, size_t nIndex, wxGISEnumMessageType nType){};
     virtual wxString GetLastMessage(void){return wxEmptyString;};
 protected:
 	bool m_bIsCanceled;
 	IProgressor* m_pProgressor;
 };
 
-static bool CreateAndRunThread(wxThread* pThread, wxString sClassName = wxEmptyString, wxString sThreadName = wxEmptyString, int nPriority = WXTHREAD_DEFAULT_PRIORITY)
+static bool CreateAndRunThread(wxThread* const pThread, wxString sClassName = wxEmptyString, const wxString sThreadName = wxEmptyString, int nPriority = WXTHREAD_DEFAULT_PRIORITY)
 {
-	if(!pThread)
-		return false;
+    wxCHECK_MSG(pThread, false, wxT("Input wxThread pointer is null"));
+
 	if(sClassName.IsEmpty())
 		sClassName = wxString(_("wxGISCore"));
     if ( pThread->Create() != wxTHREAD_NO_ERROR )
@@ -253,58 +225,19 @@ enum wxGISEnumTaskStateType
     enumGISTaskError
 };
 
-///** \class IStreamReader core.h
-// *  \brief The stream reader receives data from reader thread.
-// */
-//class IStreamReader
-//{
-//public:
-//	virtual ~IStreamReader(void){};
-//	virtual void ProcessInput(wxString sInputData) = 0;
-//};
-
-/** \class IProcess core.h
- *  \brief The process interface class.
+/** \enum wxGISEnumReturnType core.h
+ *  \brief The function return state.
  */
-class IProcess
+enum wxGISEnumReturnType
 {
-public:
-	IProcess(wxString sCommand, wxArrayString saParams)
-	{
-		m_sCommand = sCommand;
-        m_saParams = saParams;
-		m_nState = enumGISTaskPaused;
-	}
-	virtual ~IProcess(void){};
-    virtual void Start(void) = 0;
-    virtual void Cancel(void) = 0;
-	virtual void SetState(wxGISEnumTaskStateType nState){m_nState = nState;};
-	virtual wxGISEnumTaskStateType GetState(void){return m_nState;};
-	virtual wxString GetCommand(void){return m_sCommand;};
-	virtual wxArrayString GetParameters(void){return m_saParams;};
-    virtual wxDateTime GetBeginTime(void){return m_dtBeg;};
-    virtual wxDateTime GetEndTime(void){return m_dtEstEnd;};
-protected:
-	wxDateTime m_dtBeg;
-	wxDateTime m_dtEstEnd;
-    wxGISEnumTaskStateType m_nState;
-    wxString m_sCommand;
-    wxArrayString m_saParams;
+    enumGISReturnkUnk = 0,
+    enumGISReturnOk,
+    enumGISReturnFailed,
+    enumGISReturnTimeout
 };
 
-/** \class IProcessParent core.h
- *  \brief The wxGISProcess parent interface class.
- */
-class IProcessParent
-{
-public:
-	virtual ~IProcessParent(void){};
-    virtual void OnFinish(IProcess* pProcess, bool bHasErrors) = 0;
-//    virtual void ProcessInput(wxString sInputData){};
-};
-
-#define DEFINE_SHARED_PTR(x) typedef boost::shared_ptr<x> x##SPtr
-#define DEFINE_WEAK_PTR(x) typedef boost::weak_ptr<x> x##WPtr
+//#define DEFINE_SHARED_PTR(x) typedef boost::shared_ptr<x> x##SPtr
+//#define DEFINE_WEAK_PTR(x) typedef boost::weak_ptr<x> x##WPtr
 
 //FLT_EPSILON DBL_EPSILON
 inline bool IsDoubleEquil( double a, double b, double epsilon = EPSILON )
@@ -314,3 +247,38 @@ inline bool IsDoubleEquil( double a, double b, double epsilon = EPSILON )
 }
 
 
+/** \class wxGISPointer core.h
+    \brief A simple smart pointer class.
+*/
+class wxGISPointer
+{
+public:    
+    wxGISPointer()
+    {
+        m_RefCount = 0;
+    }
+
+    virtual ~wxGISPointer(void)
+    {
+    }
+
+    //ref count
+	virtual wxInt32 Reference(void)
+    {
+        return m_RefCount++;
+    };
+	virtual wxInt32 Dereference(void){return m_RefCount--;};
+	virtual wxInt32 Release(void)
+	{
+		Dereference();
+		if(m_RefCount <= 0)
+		{
+			delete this;
+			return 0;
+		}
+		else
+			return m_RefCount;
+	};
+protected:
+	wxInt32 m_RefCount;
+};

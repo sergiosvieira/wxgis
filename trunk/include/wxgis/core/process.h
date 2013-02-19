@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  external process common classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,48 +22,90 @@
 
 #include "wxgis/core/core.h"
 
-#include "wx/txtstrm.h"
-#include "wx/thread.h"
+#include <wx/process.h>
+#include <wx/thread.h>
 
-#include "wxgis/core/process.hpp" 
+class WXDLLIMPEXP_GIS_CORE wxGISProcess;
 
-namespace bp = ::boost::process;
-
-class wxProcessWaitThread;
+/** \class IProcessParent core.h
+ *  \brief The wxGISProcess parent interface class.
+ */
+class IGISProcessParent
+{
+public:
+	virtual ~IGISProcessParent(void){};
+    virtual void OnFinish(wxGISProcess* pProcess, bool bHasErrors) = 0;
+};
 
 /** \class wxGISProcess process.h
  *  \brief The process class which stores the application execution data.
  */
 class WXDLLIMPEXP_GIS_CORE wxGISProcess : 
-	public IProcess,
-	public wxGISConnectionPointContainer
+	public wxProcess,
+    public wxThreadHelper
 {
 public:
-    wxGISProcess(wxString sCommand, wxArrayString saParams, IProcessParent* pParent);
+    wxGISProcess(IGISProcessParent* pParent);
     virtual ~wxGISProcess(void);
-    // IProcess
-    virtual void Start(void);
-    virtual void Cancel(void);
-    virtual void OnTerminate(int status);
-	//wxGISProcess
-	virtual void ProcessInput(wxString sInputData);
-protected:    
-    IProcessParent* m_pParent;
-    wxProcessWaitThread* m_pProcessWaitThread;
+    // wxProcess
+    virtual void OnTerminate(int pid, int status);
+    //wxGISProcess
+    virtual bool Start(void);
+    virtual void Stop(void);
+    //
+	virtual void ProcessInput(wxString & sInputData);
+    virtual void SetState(wxGISEnumTaskStateType nState){m_nState = nState;};
+	virtual wxGISEnumTaskStateType GetState(void){return m_nState;};
+    virtual wxDateTime GetStart(void){return m_dtBeg;};
+    virtual wxDateTime GetFinish(void){return m_dtEstEnd;};
+
+protected:
+    virtual wxThread::ExitCode Entry();
+    bool CreateAndRunReadThread(void);
+    void DestroyReadThread(void);
+    virtual long Execute(void) = 0;
+    virtual void UpdatePercent(const wxString &sPercentData);
+    virtual void AddInfo(wxGISEnumMessageType nType, const wxString &sInfoData) = 0;
+protected:
+    IGISProcessParent* m_pParent;
+    wxCriticalSection m_ExitLock;
+    //
+	wxDateTime m_dtBeg;
+	wxDateTime m_dtEstEnd;
+    wxGISEnumTaskStateType m_nState;
+    double m_dfDone;
 };
 
-/** \class wxProcessWaitThread process.h
- *  \brief The end of the process wait thread for process callback.
+/*
+/** \class IProcess core.h
+ *  \brief The process interface class.
  */
-class wxProcessWaitThread : public wxThread
+/*
+
+class IProcess
 {
 public:
-    wxProcessWaitThread(wxGISProcess* pProc);
-	virtual ~wxProcessWaitThread(void);
-    virtual void *Entry();
-    virtual void OnExit();
-    virtual void Terminate(void);
+	IProcess(wxString sCommand, wxArrayString saParams)
+	{
+		m_sCommand = sCommand;
+        m_saParams = saParams;
+		m_nState = enumGISTaskPaused;
+	}
+	virtual ~IProcess(void){};
+    virtual void Start(void) = 0;
+    virtual void Cancel(void) = 0;
+	virtual void SetState(wxGISEnumTaskStateType nState){m_nState = nState;};
+	virtual wxGISEnumTaskStateType GetState(void){return m_nState;};
+	virtual wxString GetCommand(void){return m_sCommand;};
+	virtual wxArrayString GetParameters(void){return m_saParams;};
+    virtual wxDateTime GetBeginTime(void){return m_dtBeg;};
+    virtual wxDateTime GetEndTime(void){return m_dtEstEnd;};
 protected:
-	wxGISProcess* m_pProc;
-    bp::child *m_pChild;
+	wxDateTime m_dtBeg;
+	wxDateTime m_dtEstEnd;
+    wxGISEnumTaskStateType m_nState;
+    wxString m_sCommand;
+    wxArrayString m_saParams;
 };
+
+*/

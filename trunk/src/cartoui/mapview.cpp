@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  wxGISMapView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011,2012 Bishop
+*   Copyright (C) 2009,2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,16 +21,17 @@
 #include "wxgis/cartoui/mapview.h"
 #include "wxgis/cartoui/mxeventui.h"
 #include "wxgis/datasource/featuredataset.h"
-#include "wxgis/datasource/vectorop.h"
+//#include "wxgis/datasource/vectorop.h"
 #include "wxgis/core/format.h"
 #include "wxgis/core/config.h"
+#include "wxgis/display/displayop.h"
 
 //#include <wx/sysopt.h>
 //#include <wx/thread.h>
 
 #define TM_REFRESH 3700
-#define TM_ZOOMING 300
-#define TM_WHEELING 650
+#define TM_ZOOMING 250
+#define TM_WHEELING 300
 #define UNITS_IN_INCH 2.54
 #define DEFAULT_FLASH_PERIOD 400
 
@@ -93,7 +94,6 @@ wxGISMapView::wxGISMapView(void) : wxGISExtentStack()
 	m_nDrawingState = enumGISMapNone;
 	m_nFactor = 0;
 	m_dCurrentAngle = 0;
-	m_bFirstSize = true;
 }
 
 wxGISMapView::wxGISMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxGISExtentStack()
@@ -105,7 +105,6 @@ wxGISMapView::wxGISMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 	m_nDrawingState = enumGISMapNone;
 	m_nFactor = 0;
 	m_dCurrentAngle = 0;
-	m_bFirstSize = true;
 	//
     Create(parent, id, pos, size, style);
 }
@@ -167,7 +166,9 @@ void wxGISMapView::OnPaint(wxPaintEvent & event)
 void wxGISMapView::OnStartDrawingThread( wxCommandEvent & event )
 {
     wxCriticalSectionLocker locker(m_CritSect);
+#ifdef __WXGTK__
     wxWakeUpIdle();
+#endif
     if(m_pMapDrawingThread || !m_pGISDisplay->IsDerty())
         return;
 //    CancelDrawThread();
@@ -187,47 +188,52 @@ void wxGISMapView::OnStartDrawingThread( wxCommandEvent & event )
 
     if(m_pAni)
     {
-        m_pAni->Show(true);
+        m_pAni->ShowProgressor(true);
         m_pAni->Play();
     }
     // start refresh timer
     //if(!m_timer.IsRunning())
-    //m_timer.Start(TM_REFRESH);
+    m_timer.Start(TM_REFRESH);
 //    #endif //THREAD_DRAW_BUG
  }
 
 void wxGISMapView::OnSize(wxSizeEvent & event)
 {
-    event.Skip(false);
+    if(m_PrevSize == event.GetSize())
+        return;
+
+    //event.Skip(false);
     CancelDrawThread();
 
-	if(m_nDrawingState == enumGISMapZooming)
-	{
-		wxClientDC CDC(this);
-		if(m_pGISDisplay)
-			m_pGISDisplay->ZoomingDraw(GetClientRect(), &CDC);
-		//wxCommandEvent evt(wxEVT_COMMAND_ZOOMING);
-        //GetEventHandler()->ProcessEvent( evt );
-	}
-	else
-	{
+    wxRect rc = GetClientRect();
 
-		//start zooming action
-		m_nDrawingState = enumGISMapZooming;
-		//if(!m_timer.IsRunning())
-			m_timer.Start(TM_ZOOMING);
-        //Freeze();
-    }
-    if(	m_bFirstSize == true)
+    if(IsShownOnScreen())
     {
-       	m_bFirstSize = false;
-
-        wxRect rc = GetClientRect();
+	    if(m_nDrawingState == enumGISMapZooming)
+	    {
+		    wxClientDC CDC(this);
+		    if(m_pGISDisplay)
+			    m_pGISDisplay->ZoomingDraw(GetClientRect(), &CDC);
+	    }
+	    else
+	    {
+		    //start zooming action
+		    m_nDrawingState = enumGISMapZooming;
+		    //if(!m_timer.IsRunning())
+            if(m_pGISDisplay)
+                m_pGISDisplay->SetDeviceFrame(rc);
+			m_timer.Start(TM_ZOOMING);
+        }
+    }
+    else
+    {
         if(m_pGISDisplay)
             m_pGISDisplay->SetDeviceFrame(rc);
     }
+
 	UpdateFrameCenter();
 	//wxWakeUpIdle();
+    m_PrevSize = event.GetSize();
 
 }
 
@@ -244,8 +250,7 @@ void wxGISMapView::OnEraseBackground(wxEraseEvent & event)
 
 void wxGISMapView::OnDrawThreadStart(void)
 {
-	m_nDrawingState = enumGISMapDrawing;
-	m_timer.Start(TM_REFRESH);
+	m_nDrawingState = enumGISMapDrawing;	
 }
 
 void wxGISMapView::OnDrawThreadStop(void)
@@ -262,7 +267,7 @@ void wxGISMapView::OnDrawThreadStop(void)
         if(m_pAni)
         {
             m_pAni->Stop();
-            m_pAni->Show(false);
+            m_pAni->ShowProgressor(false);
         }
     }
 
@@ -277,7 +282,10 @@ void wxGISMapView::OnTimer( wxTimerEvent& event )
 {
     //event.Skip();
     //wxSafeYield(this, true);
+#ifdef __WXGTK__
     wxWakeUpIdle();
+#endif
+
     switch(m_nDrawingState)
     {
     case enumGISMapZooming:
@@ -357,7 +365,11 @@ void wxGISMapView::SetTrackCancel(ITrackCancel* pTrackCancel)
 	m_pTrackCancel = pTrackCancel;
 	m_pAni = m_pTrackCancel->GetProgressor();
 	if(m_pAni)
+    {
 		m_pAni->SetYield();
+        //m_pAni->ShowProgressor(true);
+        //m_pAni->Play();
+    }
 	m_pTrackCancel->Reset();
 }
 
@@ -371,23 +383,27 @@ void wxGISMapView::CancelDrawThread(void)
 	//wxMilliSleep(150);
 	if(m_pMapDrawingThread)
 	{
-		//if(m_pMapDrawingThread->IsRunning())
-		//	m_pMapDrawingThread->Delete();
-		if(!m_pMapDrawingThread->IsDetached())
-			m_pMapDrawingThread->Wait();
+		if(m_pMapDrawingThread->IsRunning())
+			m_pMapDrawingThread->Delete();
+		//if(!m_pMapDrawingThread->IsDetached())
+		//	m_pMapDrawingThread->Wait();
 		m_pMapDrawingThread = NULL;
 	}
 }
 
 void wxGISMapView::OnDraw(wxGISEnumDrawPhase nPhase)
 {
+    wxCriticalSectionLocker locker(m_CritSect);
 	if(m_pTrackCancel)
 		m_pTrackCancel->Reset();
 	for(size_t i = 0; i < m_paLayers.size(); ++i)
 	{
 		if(m_pTrackCancel && !m_pTrackCancel->Continue())
 			break;
-		wxGISLayerSPtr pLayer = m_paLayers[i];
+		wxGISLayer* pLayer = m_paLayers[i];
+   		if(!pLayer)
+			continue; //not layer
+
 		if(!pLayer->GetVisible())
 			continue; //not visible
 		if(m_pGISDisplay && m_pGISDisplay->IsCacheDerty(pLayer->GetCacheID()))
@@ -401,19 +417,19 @@ void wxGISMapView::OnDraw(wxGISEnumDrawPhase nPhase)
 			if(pLayer->Draw(nPhase, m_pGISDisplay, m_pTrackCancel))
             {
                 //SetCacheDerty if next cache is not same
-                if(i < m_paLayers.size() - 1 && m_paLayers[i + 1]->GetCacheID() != pLayer->GetCacheID())
+                //if(i < m_paLayers.size() - 1 && m_paLayers[i + 1]->GetCacheID() != pLayer->GetCacheID())
                     m_pGISDisplay->SetCacheDerty(pLayer->GetCacheID(), false);
-                else if(i == m_paLayers.size() - 1)
-                    m_pGISDisplay->SetCacheDerty(pLayer->GetCacheID(), false);
+                //else if(i == m_paLayers.size() - 1)
+                //    m_pGISDisplay->SetCacheDerty(pLayer->GetCacheID(), false);
             }
 		}
 	}
 }
 
-void wxGISMapView::SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference)
+void wxGISMapView::SetSpatialReference(const wxGISSpatialReference &SpatialReference)
 {
 	//TODO: show dialog reprojections for different ellipsoids
-	wxGISExtentStack::SetSpatialReference(pSpatialReference);
+	wxGISExtentStack::SetSpatialReference(SpatialReference);
 }
 
 void wxGISMapView::OnCaptureLost(wxMouseCaptureLostEvent & event)
@@ -423,8 +439,9 @@ void wxGISMapView::OnCaptureLost(wxMouseCaptureLostEvent & event)
 		ReleaseMouse();
 }
 
-bool wxGISMapView::AddLayer(wxGISLayerSPtr pLayer)
+bool wxGISMapView::AddLayer(wxGISLayer* pLayer)
 {
+    wxCHECK_MSG(pLayer, false, wxT("The layer pointer is NULL"));
 	if(m_pGISDisplay)
 	{
 		//Create cache if needed
@@ -516,10 +533,10 @@ double wxGISMapView::GetScaleRatio(OGREnvelope& Bounds, wxDC& dc)
 	double w_w = fabs(Bounds.MaxX - Bounds.MinX);
 	double w_h = fabs(Bounds.MaxY - Bounds.MinY);
 
-	if(m_pSpatialReference && m_pSpatialReference->IsGeographic())
+	if(m_SpatialReference && m_SpatialReference->IsGeographic())
 	{
-		w_w = w_w * PIDEG * m_pSpatialReference->GetSemiMajor();
-		w_h = w_h * PIDEG * m_pSpatialReference->GetSemiMinor();
+		w_w = w_w * PIDEG * m_SpatialReference->GetSemiMajor();
+		w_h = w_h * PIDEG * m_SpatialReference->GetSemiMinor();
 	}
 
 	double screen = std::min(screen_w, screen_h);
@@ -779,7 +796,7 @@ OGREnvelope wxGISMapView::GetFullExtent(void)
 		OutputEnv = wxGISMap::GetFullExtent();
 	return OutputEnv;
 }
-
+/*
 void wxGISMapView::FlashGeometry(const GeometryArray& Geoms)
 {
 	CancelDrawThread();
@@ -787,17 +804,17 @@ void wxGISMapView::FlashGeometry(const GeometryArray& Geoms)
     //draw geometries
     m_pGISDisplay->SetDrawCache(m_pGISDisplay->GetFlashCacheID());
     //set colors and etc.
-    wxGISAppConfigSPtr pConfig = GetConfig();
+    wxGISAppConfig oConfig = GetConfig();
     //create vector flash renderer
     RGBA stFillColour, stLineColour;
-	stLineColour.dRed = double(pConfig->ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_line_red")), 0)) / 255;
-	stLineColour.dGreen = double(pConfig->ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_line_green")), 210)) / 255;
-	stLineColour.dBlue = double(pConfig->ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_line_blue")), 255)) / 255;
+	stLineColour.dRed = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_line_red")), 0)) / 255;
+	stLineColour.dGreen = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_line_green")), 210)) / 255;
+	stLineColour.dBlue = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_line_blue")), 255)) / 255;
 	stLineColour.dAlpha = 1.0;
 
-    stFillColour.dRed = double(pConfig->ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_fill_red")), 0)) / 255;
-	stFillColour.dGreen = double(pConfig->ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_fill_green")), 255)) / 255;
-	stFillColour.dBlue = double(pConfig->ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_fill_blue")), 255)) / 255;
+    stFillColour.dRed = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_fill_red")), 0)) / 255;
+	stFillColour.dGreen = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_fill_green")), 255)) / 255;
+	stFillColour.dBlue = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_fill_blue")), 255)) / 255;
 	stFillColour.dAlpha = 1.0;
 
     for(size_t i = 0; i < Geoms.GetCount(); ++i)
@@ -844,11 +861,11 @@ void wxGISMapView::FlashGeometry(const GeometryArray& Geoms)
 
 	wxGISMapView::Refresh();
     //clean flash layer
-    int nMilliSec = pConfig->ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_time")), DEFAULT_FLASH_PERIOD);
+    int nMilliSec = oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_time")), DEFAULT_FLASH_PERIOD);
     m_nDrawingState = enumGISMapFlashing;
     m_timer.Start(nMilliSec);
 }
-
+*/
 void wxGISMapView::Refresh(void)
 {
 //    wxPaintEvent event(GetId());

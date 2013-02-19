@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  toolbox classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -18,6 +18,7 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+/*
 #include "wxgis/geoprocessingui/gptoolbox.h"
 #include "wxgis/geoprocessingui/gptooldlg.h"
 #include "wxgis/geoprocessingui/gptaskexecdlg.h"
@@ -163,8 +164,8 @@ void wxGxRootToolbox::LoadChildren(void)
 {
 	if(m_bIsChildrenLoaded)
 		return;
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	if(!pConfig)
+	wxGISAppConfig oConfig = GetConfig();
+	if(!oConfig.IsOk())
 		return;
 
     m_pRootToolbox = this;
@@ -183,16 +184,16 @@ void wxGxRootToolbox::LoadChildren(void)
     }
 
     //Add favorites
-	bool bShowFavorites = pConfig->ReadBool(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/toolboxes/show_favorites")), true);
+	bool bShowFavorites = oConfig.ReadBool(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/toolboxes/show_favorites")), true);
     if(bShowFavorites)
     {
-        short nMax = pConfig->ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/toolboxes/max_favorites")), 10);
+        short nMax = oConfig.ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/toolboxes/max_favorites")), 10);
         wxGxFavoritesToolbox* pToolbox = new wxGxFavoritesToolbox(m_pRootToolbox, nMax, m_LargeToolIcon, m_SmallToolIcon);
         IGxObject* pGxObj = static_cast<IGxObject*>(pToolbox);
         if(!AddChild(pGxObj))
             wxDELETE(pGxObj);
     }
-    wxXmlNode* pToolboxesChild = pConfig->GetConfigNode(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/toolboxes")));
+    wxXmlNode* pToolboxesChild = oConfig.GetConfigNode(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/toolboxes")));
     LoadChildrenFromXml(pToolboxesChild);
 
 	m_bIsChildrenLoaded = true;
@@ -522,3 +523,4 @@ bool wxGxTool::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
     else
         return false;
 }
+*/

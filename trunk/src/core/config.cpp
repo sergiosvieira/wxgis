@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  wxGISConfig class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,36 +22,49 @@
 
 #include <wx/tokenzr.h>
 
+//TODO: memory leaks fix
+static wxGISAppConfig g_pConfig;
 
-static wxGISAppConfigSPtr g_pConfig;
-
-extern WXDLLIMPEXP_GIS_CORE wxGISAppConfigSPtr GetConfig(void)
+extern WXDLLIMPEXP_GIS_CORE wxGISAppConfig GetConfig(void)
 {
-	if(!g_pConfig)
-	{
+    if(g_pConfig.IsOk())
+        return g_pConfig;
+
 	#ifdef WXGISPORTABLE
-		g_pConfig = boost::make_shared<wxGISAppConfig>(VENDOR, true);
+		g_pConfig.Create(VENDOR, true);
 	#else
-		g_pConfig = boost::make_shared<wxGISAppConfig>(VENDOR, false);
+		g_pConfig.Create(VENDOR, false);
 	#endif
-	}
-	return g_pConfig;
-}
 
-extern WXDLLIMPEXP_GIS_CORE void ReleaseConfig(void)
-{
-	g_pConfig.reset();
+	return g_pConfig;
 }
 
 //---------------------------------------------------------------
 // wxGISConfig
 //---------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxGISConfig, wxObject)
+
+wxGISConfig::wxGISConfig()
+{    
+}
+
 wxGISConfig::wxGISConfig(const wxString &sVendorName, bool bPortable)
 {
- 	wxStandardPaths stp;
-	m_sAppExeDirPath = wxPathOnly(stp.GetExecutablePath());
+    Create(sVendorName, bPortable);
+}
 
-    m_bPortable = bPortable;
+void wxGISConfig::Create(const wxString &sVendorName, bool bPortable)
+{
+    if(m_refData)
+        return;
+
+ 	wxStandardPaths stp;    
+    m_refData = new wxGISConfigRefData();
+
+	((wxGISConfigRefData *)m_refData)->m_sAppExeDirPath = wxPathOnly(stp.GetExecutablePath());
+
+    ((wxGISConfigRefData *)m_refData)->m_bPortable = bPortable;
 
     wxString sExeAppName = wxFileNameFromPath(stp.GetExecutablePath());
 	sExeAppName = wxFileName::StripExtension(sExeAppName);
@@ -59,16 +72,16 @@ wxGISConfig::wxGISConfig(const wxString &sVendorName, bool bPortable)
     if(bPortable)
     {
         //if potable - config path: [app.exe path\config]
-        m_sGlobalConfigDirPath = m_sLocalConfigDirPath = m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxString(wxT("config"));
-	    if(!wxDirExists(m_sLocalConfigDirPath))
-		    wxFileName::Mkdir(m_sLocalConfigDirPath, 0755, wxPATH_MKDIR_FULL);
+        ((wxGISConfigRefData *)m_refData)->m_sGlobalConfigDirPath = ((wxGISConfigRefData *)m_refData)->m_sLocalConfigDirPath = ((wxGISConfigRefData *)m_refData)->m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxString(wxT("config"));
+	    if(!wxDirExists(((wxGISConfigRefData *)m_refData)->m_sLocalConfigDirPath))
+		    wxFileName::Mkdir(((wxGISConfigRefData *)m_refData)->m_sLocalConfigDirPath, 0755, wxPATH_MKDIR_FULL);
     }
     else
     {
-        m_sLocalConfigDirPath = stp.GetUserConfigDir() + wxFileName::GetPathSeparator() + sVendorName;
-        m_sGlobalConfigDirPath = stp.GetConfigDir() + wxFileName::GetPathSeparator() + sVendorName;
-        if(m_sGlobalConfigDirPath.Find(sExeAppName) != wxNOT_FOUND)
-            m_sGlobalConfigDirPath.Replace(sExeAppName + wxFileName::GetPathSeparator(), wxString(wxT("")));
+        ((wxGISConfigRefData *)m_refData)->m_sLocalConfigDirPath = stp.GetUserConfigDir() + wxFileName::GetPathSeparator() + sVendorName;
+        ((wxGISConfigRefData *)m_refData)->m_sGlobalConfigDirPath = stp.GetConfigDir() + wxFileName::GetPathSeparator() + sVendorName;
+        if(((wxGISConfigRefData *)m_refData)->m_sGlobalConfigDirPath.Find(sExeAppName) != wxNOT_FOUND)
+            ((wxGISConfigRefData *)m_refData)->m_sGlobalConfigDirPath.Replace(sExeAppName + wxFileName::GetPathSeparator(), wxString(wxT("")));
 
 	    //if(!wxDirExists(m_sUserConfigDir))
 		   // wxFileName::Mkdir(m_sUserConfigDir, 0755, wxPATH_MKDIR_FULL);
@@ -76,25 +89,27 @@ wxGISConfig::wxGISConfig(const wxString &sVendorName, bool bPortable)
 //		    wxFileName::Mkdir(m_sSysConfigDir, 0775, wxPATH_MKDIR_FULL);
     }
 
-	m_sLocalConfigDirPathNonPortable = stp.GetUserConfigDir() + wxFileName::GetPathSeparator() + sVendorName;
+	((wxGISConfigRefData *)m_refData)->m_sLocalConfigDirPathNonPortable = stp.GetUserConfigDir() + wxFileName::GetPathSeparator() + sVendorName;
 }
 
-wxGISConfig::~wxGISConfig(void)
+wxObjectRefData *wxGISConfig::CreateRefData() const
 {
-	Clean();
+    return new wxGISConfigRefData();
 }
 
-void wxGISConfig::Clean(bool bInstall)
+wxObjectRefData *wxGISConfig::CloneRefData(const wxObjectRefData *data) const
 {
-    wxGISEnumConfigKey CmpKey = bInstall == true ? enumGISHKLM : enumGISHKCU;
-	for(size_t i = 0; i < m_paConfigFiles.size(); ++i)
-	{
-        //Store only user settings. Common settings should be changed during install process
-        if(m_paConfigFiles[i].Key == CmpKey)
-            m_paConfigFiles[i].pXmlDoc->Save(m_paConfigFiles[i].sXmlFilePath);
-		wxDELETE(m_paConfigFiles[i].pXmlDoc);
-	}
-	m_paConfigFiles.clear();
+    return new wxGISConfigRefData(*(wxGISConfigRefData *)data);
+}
+
+bool wxGISConfig::operator == ( const wxGISConfig& obj ) const
+{
+    if (m_refData == obj.m_refData)
+        return true;
+    if (!m_refData || !obj.m_refData)
+        return false;
+
+    return ( *(wxGISConfigRefData*)m_refData == *(wxGISConfigRefData*)obj.m_refData );
 }
 
 //HKLM wxGISCatalog/Frame/Views
@@ -102,6 +117,7 @@ void wxGISConfig::Clean(bool bInstall)
 
 wxString wxGISConfig::Read(wxGISEnumConfigKey Key, const wxString &sPath, const wxString &sDefaultValue)
 {
+    wxCHECK_MSG( IsOk(), sDefaultValue, wxT("Invalid wxGISConfig") );
 	//split path
 	wxString sPathToAttribute, sAttributeName;
 	if(!SplitPathToAttribute(sPath, &sPathToAttribute, &sAttributeName))
@@ -115,6 +131,7 @@ wxString wxGISConfig::Read(wxGISEnumConfigKey Key, const wxString &sPath, const 
 
 int wxGISConfig::ReadInt(wxGISEnumConfigKey Key, const wxString &sPath, int nDefaultValue)
 {
+    wxCHECK_MSG( IsOk(), nDefaultValue, wxT("Invalid wxGISConfig") );
 	//split path
 	wxString sPathToAttribute, sAttributeName;
 	if(!SplitPathToAttribute(sPath, &sPathToAttribute, &sAttributeName))
@@ -128,6 +145,7 @@ int wxGISConfig::ReadInt(wxGISEnumConfigKey Key, const wxString &sPath, int nDef
 
 double wxGISConfig::ReadDouble(wxGISEnumConfigKey Key, const wxString &sPath, double dDefaultValue)
 {
+    wxCHECK_MSG( IsOk(), dDefaultValue, wxT("Invalid wxGISConfig") );
 	//split path
 	wxString sPathToAttribute, sAttributeName;
 	if(!SplitPathToAttribute(sPath, &sPathToAttribute, &sAttributeName))
@@ -141,6 +159,7 @@ double wxGISConfig::ReadDouble(wxGISEnumConfigKey Key, const wxString &sPath, do
 
 bool wxGISConfig::ReadBool(wxGISEnumConfigKey Key, const wxString &sPath, bool bDefaultValue)
 {
+    wxCHECK_MSG( IsOk(), bDefaultValue, wxT("Invalid wxGISConfig") );
 	//split path
 	wxString sPathToAttribute, sAttributeName;
 	if(!SplitPathToAttribute(sPath, &sPathToAttribute, &sAttributeName))
@@ -174,23 +193,24 @@ bool wxGISConfig::SplitPathToAttribute(const wxString &  fullpath, wxString *psP
 	*psAttributeName = fullpath.Right(fullpath.Len() - nPos - 1);
 	return true;
 }
-wxXmlNode *wxGISConfig::GetConfigRootNode(wxGISEnumConfigKey Key, const wxString &sFileName)
+wxXmlNode *wxGISConfig::GetConfigRootNode(wxGISEnumConfigKey Key, const wxString &sFileName) const
 {
-    wxXmlDocument* pDoc(NULL);
+    wxCHECK_MSG( IsOk(), NULL, wxT("Invalid wxGISConfig") );
 
+    wxXmlDocument *pXmlDoc(NULL);
     //search cached configs
-	for(size_t i = 0; i < m_paConfigFiles.size(); ++i)
-		if(m_paConfigFiles[i].sXmlFileName.CmpNoCase(sFileName) == 0 && m_paConfigFiles[i].Key == Key)
-			return m_paConfigFiles[i].pXmlDoc->GetRoot();
+	for(size_t i = 0; i < ((wxGISConfigRefData *)m_refData)->m_paConfigFiles.size(); ++i)
+		if(((wxGISConfigRefData *)m_refData)->m_paConfigFiles[i].sXmlFileName.CmpNoCase(sFileName) == 0 && ((wxGISConfigRefData *)m_refData)->m_paConfigFiles[i].eKey == Key)
+			return ((wxGISConfigRefData *)m_refData)->m_paConfigFiles[i].pXmlDoc->GetRoot();
 
 	wxString sConfigDirPath;
 	switch(Key)
 	{
 	case enumGISHKLM:
-		sConfigDirPath = m_sGlobalConfigDirPath;
+		sConfigDirPath = ((wxGISConfigRefData *)m_refData)->m_sGlobalConfigDirPath;
 		break;
 	case enumGISHKCU:
-		sConfigDirPath = m_sLocalConfigDirPath;
+		sConfigDirPath = ((wxGISConfigRefData *)m_refData)->m_sLocalConfigDirPath;
 		break;
 	default:
 		return NULL;
@@ -202,52 +222,53 @@ wxXmlNode *wxGISConfig::GetConfigRootNode(wxGISEnumConfigKey Key, const wxString
 	wxString sConfigFilePath = sConfigDirPath + wxFileName::GetPathSeparator() + sFileName;
 	if(wxFileName::FileExists(sConfigFilePath))
 	{
-		pDoc = new wxXmlDocument(sConfigFilePath);
+        pXmlDoc = new wxXmlDocument(sConfigFilePath);
 	}
 	else
 	{
 		//Get global config if local config is not available
 		if(Key == enumGISHKCU)
         {
-			if(!wxDirExists(m_sGlobalConfigDirPath))
+			if(!wxDirExists(((wxGISConfigRefData *)m_refData)->m_sGlobalConfigDirPath))
 				wxFileName::Mkdir(sConfigDirPath, 0755, wxPATH_MKDIR_FULL);
 			else
 			{
-				wxString sConfigFilePathNew = m_sGlobalConfigDirPath + wxFileName::GetPathSeparator() + sFileName;
+				wxString sConfigFilePathNew = ((wxGISConfigRefData *)m_refData)->m_sGlobalConfigDirPath + wxFileName::GetPathSeparator() + sFileName;
 				if(wxFileName::FileExists(sConfigFilePathNew))
-					pDoc = new wxXmlDocument(sConfigFilePathNew);
+					pXmlDoc = new wxXmlDocument(sConfigFilePathNew);
 			}
 		}
 
 		//last chance - load from config directory near pplication executable
-		if(!pDoc)
+        if(!pXmlDoc || !pXmlDoc->IsOk())
 		{
-			wxString sConfigFilePathNew = m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxT("config") +  wxFileName::GetPathSeparator() + sFileName;
+			wxString sConfigFilePathNew = ((wxGISConfigRefData *)m_refData)->m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxT("config") +  wxFileName::GetPathSeparator() + sFileName;
 			if(wxFileName::FileExists(sConfigFilePathNew))
-				pDoc = new wxXmlDocument(sConfigFilePathNew);
+				pXmlDoc = new wxXmlDocument(sConfigFilePathNew);
 		}
 
 		//create new config
-		if(!pDoc)
-		{
-			pDoc = new wxXmlDocument();
+		if(!pXmlDoc || !pXmlDoc->IsOk())
+		{			
 			wxString sRootNodeName = sFileName.Left(sFileName.Len() - 4);//trim ".xml"
-			pDoc->SetRoot(new wxXmlNode(wxXML_ELEMENT_NODE, sRootNodeName));
+            pXmlDoc = new wxXmlDocument();
+			pXmlDoc->SetRoot(new wxXmlNode(wxXML_ELEMENT_NODE, sRootNodeName));
 		}
 	}
 
-	if(!pDoc)
+	if(!pXmlDoc || !pXmlDoc->IsOk())
 		return NULL;
 
-	WXXMLCONF conf = {pDoc, Key, sFileName, sConfigFilePath};
-	m_paConfigFiles.push_back(conf);
+	wxGISConfigRefData::WXXMLCONF conf = {pXmlDoc, Key, sFileName, sConfigFilePath};
+	((wxGISConfigRefData *)m_refData)->m_paConfigFiles.push_back(conf);
 
-	return pDoc->GetRoot();
+    return pXmlDoc->GetRoot();
 }
 
 
 wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, const wxString &sPath)
 {
+    wxCHECK_MSG( IsOk(), NULL, wxT("Invalid wxGISConfig") );
 	wxString sFullPath;
 	switch(Key)
 	{
@@ -262,9 +283,10 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, const wxString &sP
 	};
 
 	sFullPath += sPath;
+    sFullPath = sFullPath.MakeLower();
 
     //search cached configs nodes
-	wxXmlNode* pOutputNode = m_pmConfigNodes[sFullPath];
+	wxXmlNode* pOutputNode = ((wxGISConfigRefData *)m_refData)->m_pmConfigNodes[sFullPath];
 	if(pOutputNode)
 		return pOutputNode;
 
@@ -272,7 +294,6 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, const wxString &sP
 	wxString sFileName, sPathInFile;
 	if(!SplitPathToXml(sPath, &sFileName, &sPathInFile))
 		return NULL;
-
 
 	//get config root
 	wxXmlNode* pRoot = GetConfigRootNode(Key, sFileName);
@@ -305,7 +326,7 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, const wxString &sP
 	if(token.CmpNoCase(sChildName) == 0)
     {
 		//store pointer for speed find
-		m_pmConfigNodes[sFullPath] = pChildNode;
+		((wxGISConfigRefData *)m_refData)->m_pmConfigNodes[sFullPath] = pChildNode;
         return pChildNode;
     }
     return NULL;
@@ -313,6 +334,7 @@ wxXmlNode* wxGISConfig::GetConfigNode(wxGISEnumConfigKey Key, const wxString &sP
 
 wxXmlNode* wxGISConfig::CreateConfigNode(wxGISEnumConfigKey Key, const wxString &sPath)
 {
+    wxCHECK_MSG( IsOk(), NULL, wxT("Invalid wxGISConfig") );
 	//split path
 	wxString sFileName, sPathInFile;
 	if(!SplitPathToXml(sPath, &sFileName, &sPathInFile))
@@ -444,15 +466,41 @@ bool wxGISConfig::Write(wxGISEnumConfigKey Key, const wxString &sPath, int nValu
 	return true;
 }
 
+wxString wxGISConfig::GetLocalConfigDir(void) const 
+{
+    wxCHECK_MSG( IsOk(), wxEmptyString, wxT("Invalid wxGISConfig") );
+    return ((wxGISConfigRefData *)m_refData)->m_sLocalConfigDirPath;
+}
+
+wxString wxGISConfig::GetGlobalConfigDir(void) const 
+{
+    wxCHECK_MSG( IsOk(), wxEmptyString, wxT("Invalid wxGISConfig") );
+    return ((wxGISConfigRefData *)m_refData)->m_sGlobalConfigDirPath;
+}
+
+wxString wxGISConfig::GetLocalConfigDirNonPortable(void) const 
+{
+    wxCHECK_MSG( IsOk(), wxEmptyString, wxT("Invalid wxGISConfig") );
+    return ((wxGISConfigRefData *)m_refData)->m_sLocalConfigDirPathNonPortable;
+}
+
+void wxGISConfig::Save(void)
+{
+    wxCHECK_RET( IsOk(), wxT("Invalid wxGISConfig") );
+    return ((wxGISConfigRefData *)m_refData)->Save();
+}
+
 //---------------------------------------------------------------
 // wxGISAppConfig
 //---------------------------------------------------------------
 
-wxGISAppConfig::wxGISAppConfig(const wxString &sVendorName, bool bPortable) : wxGISConfig(sVendorName, bPortable)
+IMPLEMENT_CLASS(wxGISAppConfig, wxGISConfig)
+
+wxGISAppConfig::wxGISAppConfig() : wxGISConfig()
 {
 }
 
-wxGISAppConfig::~wxGISAppConfig(void)
+wxGISAppConfig::wxGISAppConfig(const wxString &sVendorName, bool bPortable) : wxGISConfig(sVendorName, bPortable)
 {
 }
 
@@ -480,24 +528,27 @@ wxString wxGISAppConfig::GetLocale(void)
 
 wxString wxGISAppConfig::GetLocaleDir(void)
 {
-    wxString sDefaultOut = m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxString(wxT("locale"));
-    if(m_bPortable)
+    wxCHECK_MSG( IsOk(), wxEmptyString, wxT("Invalid wxGISConfig") );
+    wxString sDefaultOut = ((wxGISConfigRefData *)m_refData)->m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxString(wxT("locale"));
+    if(((wxGISConfigRefData *)m_refData)->m_bPortable)
         return sDefaultOut;
 	return Read(enumGISHKCU, wxString(wxT("wxGISCommon/loc/path")), sDefaultOut);
 }
 
 wxString wxGISAppConfig::GetLogDir(void)
 {
+    wxCHECK_MSG( IsOk(), wxEmptyString, wxT("Invalid wxGISConfig") );
 	wxLogNull noLog;
-    wxString sDefaultOut = m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxString(wxT("log"));
+    wxString sDefaultOut = ((wxGISConfigRefData *)m_refData)->m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxString(wxT("log"));
 	return Read(enumGISHKCU, wxString(wxT("wxGISCommon/log/path")), sDefaultOut);
 }
 
 
 wxString wxGISAppConfig::GetSysDir(void)
 {
-    wxString sDefaultOut = m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxString(wxT("sys"));
-    if(m_bPortable)
+    wxCHECK_MSG( IsOk(), wxEmptyString, wxT("Invalid wxGISConfig") );
+    wxString sDefaultOut = ((wxGISConfigRefData *)m_refData)->m_sAppExeDirPath + wxFileName::GetPathSeparator() + wxString(wxT("sys"));
+    if(((wxGISConfigRefData *)m_refData)->m_bPortable)
         return sDefaultOut;
 	return Read(enumGISHKCU, wxString(wxT("wxGISCommon/sys/path")), sDefaultOut);
 }
@@ -515,21 +566,24 @@ void wxGISAppConfig::SetLocale(const wxString &sLocale)
 
 void wxGISAppConfig::SetLocaleDir(const wxString &sLocaleDir)
 {
-    if(m_bPortable)
+    wxCHECK_RET( IsOk(), "Invalid wxGISConfig" );
+    if(((wxGISConfigRefData *)m_refData)->m_bPortable)
         return;
 	Write(enumGISHKCU, wxString(wxT("wxGISCommon/loc/path")), sLocaleDir);
 }
 
 void wxGISAppConfig::SetSysDir(const wxString &sSysDir)
 {
-    if(m_bPortable)
+    wxCHECK_RET( IsOk(), "Invalid wxGISConfig" );
+    if(((wxGISConfigRefData *)m_refData)->m_bPortable)
         return;
 	Write(enumGISHKCU, wxString(wxT("wxGISCommon/sys/path")), sSysDir);
 }
 
 void wxGISAppConfig::SetLogDir(const wxString &sLogDir)
 {
-    if(m_bPortable)
+    wxCHECK_RET( IsOk(), "Invalid wxGISConfig" );
+    if(((wxGISConfigRefData *)m_refData)->m_bPortable)
         return;
 	Write(enumGISHKCU, wxString(wxT("wxGISCommon/log/path")), sLogDir);
 }

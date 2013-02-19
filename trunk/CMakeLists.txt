@@ -1,4 +1,24 @@
-cmake_minimum_required (VERSION 2.6)
+# **************************************************************************** 
+# * Project:  wxGIS
+# * Purpose:  cmake script
+# * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
+# ****************************************************************************
+# *   Copyright (C) 2013 Bishop
+# *
+# *    This program is free software: you can redistribute it and/or modify
+# *    it under the terms of the GNU General Public License as published by
+# *    the Free Software Foundation, either version 3 of the License, or
+# *    (at your option) any later version.
+# *
+# *    This program is distributed in the hope that it will be useful,
+# *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+# *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# *    GNU General Public License for more details.
+# *
+# *    You should have received a copy of the GNU General Public License
+# *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# ****************************************************************************
+cmake_minimum_required (VERSION 2.8)
 project (wxgis)
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Configs" FORCE)
@@ -37,6 +57,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(WXGIS_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(WXGIS_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
+#configure_file(${WXGIS_CURRENT_SOURCE_DIR}/include/wxgis/defs.h.cmake ${WXGIS_CURRENT_BINARY_DIR}/wxgisdefs.h @ONLY)
+configure_file(${WXGIS_CURRENT_SOURCE_DIR}/include/wxgis/defs.h.cmake ${WXGIS_CURRENT_SOURCE_DIR}/include/wxgis/defs.h @ONLY)
+
 # set path to additional CMake modules
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
@@ -48,6 +71,7 @@ endif(WIN32)
 add_definitions(-DSTRICT)
 
 #find needed packages
+#wxgisgdal deprecated
 option(wxGIS_USE_WXGISGDAL "Set OFF to build using classical GDAL, else - adapted version wxGISGDAL" ON)
 if(wxGIS_USE_WXGISGDAL)
     find_package(WXGISGDAL REQUIRED)
@@ -77,27 +101,10 @@ if(GDAL_FOUND)
     include_directories(${GDAL_INCLUDE_DIR}/build/port) #assume that out of source build was in build dir
 endif(GDAL_FOUND)
 
-find_package( Boost )
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-    add_definitions(-DBOOST_ALL_NO_LIB)
-endif(Boost_FOUND)
-
-option(wxGIS_USE_POSTGRES "Set OFF to build without PostGIS support" ON)
-if(wxGIS_USE_POSTGRES)
-    find_package(POSTGRES REQUIRED)
-    if(POSTGRES_FOUND)
-        include_directories(${POSTGRES_INCLUDE_DIR})
-        add_definitions(-DHAVE_PG)
-    endif(POSTGRES_FOUND)
-endif(wxGIS_USE_POSTGRES)
-
-#set(wxWidgets_CONFIGURATION "mswd")
-
 option(wxGIS_PORTABLE "Set OFF to build non portable version" ON)
-if(wxGIS_USE_POSTGRES)
+if(wxGIS_PORTABLE)
     add_definitions(-DWXGISPORTABLE)
-endif(wxGIS_USE_POSTGRES)
+endif(wxGIS_PORTABLE)
 
 if(MSVC)
     #string(REPLACE "/W4" "/W0" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
@@ -129,9 +136,34 @@ endif()
 #core
 set(WXGISCORE_LIB_NAME "")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/core/)
-#datasource
-set(WXGISDATASOURCE_LIB_NAME "")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/datasource/)
+#networking
+set(WXGISNET_LIB_NAME "")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/net/)
+#task manager 
+option(wxGIS_HAVE_TASKMANAGER "Set ON to build gis task manager" ON)
+if(wxGIS_HAVE_TASKMANAGER)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/tskmngr_app/)
+endif(wxGIS_HAVE_TASKMANAGER)
+
+option(wxGIS_HAVE_CATALOG "Set ON to build catalog and datasource" ON)
+if(wxGIS_HAVE_CATALOG)
+    #datasource
+    set(WXGISDATASOURCE_LIB_NAME "")
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/datasource/)
+    #catalog
+    set(WXGISCATALOG_LIB_NAME "")
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/catalog/)
+    
+    option(wxGIS_HAVE_GEOPROCESSING "Set ON to build geoprocessing" ON)
+    if(wxGIS_HAVE_GEOPROCESSING)
+        #geoprocessing
+        set(WXGISGEOPROCESSING_LIB_NAME "")
+        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/geoprocessing/)
+    endif(wxGIS_HAVE_GEOPROCESSING)
+endif(wxGIS_HAVE_CATALOG)
+
+option(wxGIS_HAVE_DESKTOP "Set ON to build desktop version" ON)
+if(wxGIS_HAVE_DESKTOP)
 #display
 set(WXGISDISPLAY_LIB_NAME "")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/display/)
@@ -144,38 +176,62 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/carto/)
 #cartoui
 set(WXGISCARTOUI_LIB_NAME "")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/cartoui/)
-#catalog
-set(WXGISCATALOG_LIB_NAME "")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/catalog/)
+
 #catalogui
 set(WXGISCATALOGUI_LIB_NAME "")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/catalogui/)
-#geoprocessing
-set(WXGISGEOPROCESSING_LIB_NAME "")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/geoprocessing/)
-#geoprocessingui
-set(WXGISGEOPROCESSINGUI_LIB_NAME "")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/geoprocessingui/)
+
+if(wxGIS_HAVE_GEOPROCESSING)
+    #geoprocessingui
+    set(WXGISGEOPROCESSINGUI_LIB_NAME "")
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/geoprocessingui/)
+endif(wxGIS_HAVE_GEOPROCESSING)    
+
 #cat_app
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/cat_app/)
 #geoprocess
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/geoprocess/)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/geoprocess/)
+# === new ads ===
+
+option(wxGIS_HAVE_REMOTE "Set ON to build remote server support" OFF)
+if(wxGIS_HAVE_REMOTE)
+#remoteserver
+set(WXGISRS_LIB_NAME "")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/remoteserver/)
+#remoteserverui
+set(WXGISRSU_LIB_NAME "")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/remoteserverui/)
+endif(wxGIS_HAVE_REMOTE)
+endif(wxGIS_HAVE_DESKTOP)
+
+option(wxGIS_HAVE_SERVER "Set ON to build server version" ON)
+if(wxGIS_CATALOG AND wxGIS_HAVE_SERVER)
+#srv_framework
+set(WXGISSRVFRW_LIB_NAME "")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/srv_framework/)
+#srv_networking deprecated
+#set(WXGISSRVNET_LIB_NAME "")
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/srv_net/)
+#srv_app
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/srv_app/)
+endif(wxGIS_CATALOG AND wxGIS_HAVE_SERVER)
 
 if(WIN32)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_loc/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Debug/locale CONFIGURATIONS Debug FILES_MATCHING PATTERN "*.mo" PATTERN "*.txt")
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_loc/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Release/locale CONFIGURATIONS Release FILES_MATCHING PATTERN "*.mo" PATTERN "*.txt")
-install(CODE "FILE(MAKE_DIRECTORY ${WXGIS_CURRENT_BINARY_DIR}/Debug/log)"  CONFIGURATIONS Debug)
-install(CODE "FILE(MAKE_DIRECTORY ${WXGIS_CURRENT_BINARY_DIR}/Release/log)"  CONFIGURATIONS Release)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_sys/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Debug/sys CONFIGURATIONS Debug)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_sys/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Release/sys CONFIGURATIONS Release)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_config/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Debug/config CONFIGURATIONS Debug)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_config/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Release/config CONFIGURATIONS Release)
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_loc/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Debug/locale CONFIGURATIONS Debug FILES_MATCHING PATTERN "*.mo" PATTERN "*.txt")
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_loc/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Release/locale CONFIGURATIONS Release FILES_MATCHING PATTERN "*.mo" PATTERN "*.txt")
+    install(CODE "FILE(MAKE_DIRECTORY ${WXGIS_CURRENT_BINARY_DIR}/Debug/log)"  CONFIGURATIONS Debug)
+    install(CODE "FILE(MAKE_DIRECTORY ${WXGIS_CURRENT_BINARY_DIR}/Release/log)"  CONFIGURATIONS Release)
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_sys/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Debug/sys CONFIGURATIONS Debug)
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_sys/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Release/sys CONFIGURATIONS Release)
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_config/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Debug/config CONFIGURATIONS Debug)
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_config/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Release/config CONFIGURATIONS Release)
 else(WIN32)#UNIX
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_loc/ DESTINATION share/locale/wxgis/ FILES_MATCHING PATTERN "*.mo" PATTERN "*.txt" )
-install(CODE "FILE(MAKE_DIRECTORY /var/log/wxgis)")
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_sys/ DESTINATION share/wxgis)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_config/ DESTINATION /etc/wxgis)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/wxgis DESTINATION include FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_loc/ DESTINATION share/locale/wxgis/ FILES_MATCHING PATTERN "*.mo" PATTERN "*.txt" )
+    install(CODE "FILE(MAKE_DIRECTORY /var/log/wxgis)")
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_sys/ DESTINATION share/wxgis)
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_config/ DESTINATION /etc/wxgis)
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/wxgis DESTINATION include FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+    install(DIRECTORY ${WXGIS_CURRENT_BINARY_DIR} DESTINATION include FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
 endif(WIN32)
 
 add_custom_target(uninstall

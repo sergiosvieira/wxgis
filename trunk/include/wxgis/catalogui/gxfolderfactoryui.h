@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxFolderFactoryUI class. Create new GxFolderUI objects
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -23,7 +23,9 @@
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalog/gxfolderfactory.h"
 
-
+/** \class wxGxFolderFactoryUI gxfolderfactoryui.h
+    \brief A GxFolderUI factory.
+*/
 class WXDLLIMPEXP_GIS_CLU wxGxFolderFactoryUI :
 	public wxGxFolderFactory
 {
@@ -31,8 +33,8 @@ class WXDLLIMPEXP_GIS_CLU wxGxFolderFactoryUI :
 public:
 	wxGxFolderFactoryUI(void);
 	virtual ~wxGxFolderFactoryUI(void);
-	//IGxObjectFactory
-    virtual IGxObject* GetGxObject(CPLString szPath, wxString soName);
+	//wxGxObjectFactory
+    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath);
 protected:
     wxIcon m_oLargeFolderIcon, m_oSmallFolderIcon;
 };

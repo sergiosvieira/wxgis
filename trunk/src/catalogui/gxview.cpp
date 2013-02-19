@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,9 +19,13 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxview.h"
-#include "wxgis/catalog/gxcatalog.h"
 #include "wxgis/catalog/gxdiscconnection.h"
+#include "wxgis/catalog/gxdataset.h"
+
+/*
+#include "wxgis/catalog/gxcatalog.h"
 #include "wxgis/catalog/gxdiscconnections.h"
+*/
 
 //-----------------------------------------------
 // wxGxView
@@ -36,29 +40,23 @@ wxGxView::~wxGxView(void)
 {
 }
 
-bool wxGxView::Activate(IFrameApplication* application, wxXmlNode* pConf)
+bool wxGxView::Activate(IApplication* const pApplication, wxXmlNode* const pConf)
 { 
-	m_pGxApplication = dynamic_cast<IGxApplication*>(application); 
-	if(!m_pGxApplication)
-		return false;
-	//m_pCatalog = m_pApplication->GetCatalog(); 
 	m_pXmlConf = pConf;
 	return true; 
 }
 
 void wxGxView::Deactivate(void)
 {
-	m_pGxApplication = NULL;
-	//m_pCatalog = NULL;
 	m_pXmlConf = NULL;
 }
 
-bool wxGxView::Applies(IGxSelection* Selection)
+bool wxGxView::Applies(wxGxSelection* const pSelection)
 { 
-	return NULL == Selection ? false : true; 
+	return NULL == pSelection ? false : true; 
 };
 
-wxString wxGxView::GetViewName(void)
+wxString wxGxView::GetViewName(void) const
 {
 	return m_sViewName;
 }
@@ -73,8 +71,9 @@ void wxGxView::SetViewIcon(wxIcon Icon)
     m_Icon = Icon;
 }
 
-int GxObjectCompareFunction(IGxObject* pObject1, IGxObject* pObject2, long sortData)
+int GxObjectCompareFunction(wxGxObject* const pObject1, wxGxObject* const pObject2, long sortData)
 {
+    wxCHECK_MSG(pObject1 && pObject2, -1, wxT("some inpit pointers (pObject1 or pObject2) is null"));
 	IGxObjectSort* pGxObjectSort1 = dynamic_cast<IGxObjectSort*>(pObject1);
     IGxObjectSort* pGxObjectSort2 = dynamic_cast<IGxObjectSort*>(pObject2);
     if(pGxObjectSort1 && !pGxObjectSort2)
@@ -95,26 +94,28 @@ int GxObjectCompareFunction(IGxObject* pObject1, IGxObject* pObject2, long sortD
             return 0;
     }
 
-	bool bDiscConnection1 = dynamic_cast<wxGxDiscConnection*>(pObject1) != NULL;
-    bool bDiscConnection2 = dynamic_cast<wxGxDiscConnection*>(pObject2) != NULL;
+    bool bDiscConnection1 = pObject1->IsKindOf(wxCLASSINFO(wxGxDiscConnection));
+    bool bDiscConnection2 = pObject2->IsKindOf(wxCLASSINFO(wxGxDiscConnection));
     if(bDiscConnection1 && !bDiscConnection2)
 		return sortData == 0 ? 1 : -1;
     if(!bDiscConnection1 && bDiscConnection2)
 		return sortData == 0 ? -1 : 1;
     if(bDiscConnection1 && bDiscConnection2)
     {
-        bool bShare1 = pObject1->GetName().Left(2) == wxT("\\\\");
-        bool bShare2 = pObject2->GetName().Left(2) == wxT("\\\\");
+        wxString sShareBeg = wxFileName::GetPathSeparator();
+        sShareBeg += wxFileName::GetPathSeparator();
+        bool bShare1 = pObject1->GetName().Left(2) == sShareBeg;//wxT("\\\\") ;
+        bool bShare2 = pObject2->GetName().Left(2) == sShareBeg;//wxT("\\\\");
         if(bShare1 && !bShare2)
             return 1;
         if(!bShare1 && bShare2)
             return 0;
     }
 
-	bool bContainerDst1 = dynamic_cast<IGxDataset*>(pObject1) != NULL;
-    bool bContainerDst2 = dynamic_cast<IGxDataset*>(pObject2) != NULL;
-	bool bContainer1 = dynamic_cast<IGxObjectContainer*>(pObject1) != NULL;
-    bool bContainer2 = dynamic_cast<IGxObjectContainer*>(pObject2) != NULL;
+	bool bContainerDst1 = pObject1->IsKindOf(wxCLASSINFO(wxGxDataset));
+    bool bContainerDst2 = pObject2->IsKindOf(wxCLASSINFO(wxGxDataset));
+    bool bContainer1 = pObject1->IsKindOf(wxCLASSINFO(wxGxObjectContainer));
+    bool bContainer2 = pObject2->IsKindOf(wxCLASSINFO(wxGxObjectContainer));
     if(bContainer1 && !bContainerDst1 && bContainerDst2)
 	    return sortData == 0 ? 1 : -1;
     if(bContainer2 && !bContainerDst2 && bContainerDst1)

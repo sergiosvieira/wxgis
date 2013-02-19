@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  Catalog Views Commands class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,11 +19,13 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-#include "wxgis/framework/framework.h"
+
+#include "wxgis/framework/command.h"
+#include "wxgis/framework/applicationbase.h"
 #include "wxgis/catalogui/gxtabview.h"
 
 class wxGISCatalogViewsCmd :
-    public ICommand,
+    public wxGISCommand,
     public IDropDownCommand
 {
     DECLARE_DYNAMIC_CLASS(wxGISCatalogViewsCmd)
@@ -31,7 +33,7 @@ class wxGISCatalogViewsCmd :
 public:
 	wxGISCatalogViewsCmd(void);
 	virtual ~wxGISCatalogViewsCmd(void);
-	//ICommand
+	//wxGISCommand
 	virtual wxIcon GetBitmap(void);
 	virtual wxString GetCaption(void);
 	virtual wxString GetCategory(void);
@@ -40,15 +42,15 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IFrameApplication* pApp);
+	virtual bool OnCreate(wxGISApplicationBase* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
     //IDropDownCommand
    	virtual wxMenu* GetDropDownMenu(void);
     virtual void OnDropDownCommand(int nID);
 private:
-	IFrameApplication* m_pApp;
-    std::vector<wxWindow*> m_apContentsWin;
+	wxGISApplicationBase* m_pApp;
+    WINDOWARRAY m_anContentsWinIDs;
     wxWindow* m_pTreeView;
 	wxIcon m_IconViews, m_IconSelAll, m_IconTreeView;
 };

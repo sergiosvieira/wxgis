@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
  * Purpose:  Catalog Main Commands class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,8 +18,11 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+
 #pragma once
-#include "wxgis/framework/framework.h"
+
+#include "wxgis/framework/command.h"
+#include "wxgis/catalogui/gxapplication.h"
 
 /** \class wxGISRemoteCmd remoteservercmd.h
     \brief The Remote Server GxObject commands (in context menu and/or toolbar).
@@ -41,10 +44,10 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IFrameApplication* pApp);
+	virtual bool OnCreate(wxGISApplicationBase* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
 private:
-	IFrameApplication* m_pApp;
+	wxGxApplication* m_pApp;
 	wxIcon m_IconRemServs, m_IconRemServ, m_IconRemServDiscon;
 };

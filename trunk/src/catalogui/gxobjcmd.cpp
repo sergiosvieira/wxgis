@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  GxObject Commands
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxobjcmd.h"
+/*
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/datasource/rasterdataset.h"
@@ -92,7 +93,7 @@ bool wxGISRasterCmd::GetEnabled(void)
 				IGxSelection* pSel = pGxCatalogUI->GetSelection();
 				if(pSel->GetCount() == 0)
 					return false;
-				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
+				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));//TODO: for multiple rasters!!!
 				wxGxRasterDataset* pGxRasterDataset = dynamic_cast<wxGxRasterDataset*>(pGxObject.get());
 				if(pGxRasterDataset)
 				{
@@ -149,8 +150,8 @@ void wxGISRasterCmd::OnClick(void)
 					{
 						wxGISDatasetSPtr pGISDataset = pGxRasterDataset->GetDataset(false);
 						wxGISRasterDatasetSPtr pGISRasterDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(pGISDataset);
-						wxGISAppConfigSPtr pConfig = GetConfig();
-						wxGISEnumWldExtType eType = (wxGISEnumWldExtType)pConfig->ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/raster/worldfile_ext_type")), enumGISWldExt_ExtPlusWX);
+						wxGISAppConfig oConfig = GetConfig();
+						wxGISEnumWldExtType eType = (wxGISEnumWldExtType)oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/raster/worldfile_ext_type")), enumGISWldExt_ExtPlusWX);
 						if(pGISRasterDataset->WriteWorldFile(eType))
 							wxMessageBox(wxString(_("World file created successufuly!")), wxString(_("Information")), wxICON_INFORMATION | wxOK);
 						else
@@ -169,7 +170,7 @@ void wxGISRasterCmd::OnClick(void)
 	}
 }
 
-bool wxGISRasterCmd::OnCreate(IFrameApplication* pApp)
+bool wxGISRasterCmd::OnCreate(wxGISApplicationBase* pApp)
 {
 	m_pApp = pApp;
 	return true;
@@ -190,4 +191,4 @@ unsigned char wxGISRasterCmd::GetCount(void)
 {
 	return 1;
 }
-
+*/

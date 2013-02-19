@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxPendingUI class. Show pending item in tree or content view
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -23,43 +23,25 @@
 #include "wxgis/catalogui/gxcatalogui.h"
 
 //---------------------------------------------------------------------
-// wxPendingUpdateThread
-//---------------------------------------------------------------------
-
-wxPendingUpdateThread::wxPendingUpdateThread(wxGxPendingUI* pGxPendingUI) : wxThread()
-{
-    m_pGxPendingUI = pGxPendingUI;
-}
-
-void *wxPendingUpdateThread::Entry()
-{
-    if(!m_pGxPendingUI)
-		return (ExitCode)-1;
-	while(!TestDestroy())
-    {
-        m_pGxPendingUI->OnUpdate();
-        wxThread::Sleep(100);
-    }
-    return NULL;
-}
-
-void wxPendingUpdateThread::OnExit()
-{
-}
-
-//---------------------------------------------------------------------
 // wxGxPendingUI
 //---------------------------------------------------------------------
 
+IMPLEMENT_CLASS(wxGxPendingUI, wxGxObject)
 
-wxGxPendingUI::wxGxPendingUI(void) : m_nCurrentImage(0), m_pThread(NULL), m_pImageListSmall(NULL), m_pImageListLarge(NULL)
+BEGIN_EVENT_TABLE(wxGxPendingUI, wxGxObject)
+  EVT_TIMER(TIMER_ID, wxGxPendingUI::OnTimer)
+END_EVENT_TABLE()
+
+wxGxPendingUI::wxGxPendingUI(wxImageList *pImageListSmall, wxImageList  *pImageListLarge, wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxObject(oParent, soName, soPath), m_timer(this, TIMER_ID), m_nCurrentImage(0), m_pImageListSmall(pImageListSmall), m_pImageListLarge(pImageListLarge)
 {
+    m_timer.Start(150);
 }
 
 wxGxPendingUI::~wxGxPendingUI(void)
 {
 }
 
+/*
 bool wxGxPendingUI::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
 {
     IGxObject::Attach(pParent, pCatalog);
@@ -89,7 +71,7 @@ void wxGxPendingUI::OnStopPending(void)
         m_pThread->Delete();
 	m_pThread = NULL;
 }
-
+*/
 wxIcon wxGxPendingUI::GetLargeImage(void)
 {
     if(m_pImageListLarge)
@@ -106,6 +88,15 @@ wxIcon wxGxPendingUI::GetSmallImage(void)
         return wxNullIcon;
 }
 
+void wxGxPendingUI::OnTimer( wxTimerEvent& event )
+{
+    m_nCurrentImage++;
+    if(m_nCurrentImage >= m_pImageListSmall->GetImageCount())
+        m_nCurrentImage = 0;
+    wxGIS_GXCATALOG_EVENT(ObjectChanged);
+}
+
+/*
 void wxGxPendingUI::OnUpdate(void)
 {
     m_nCurrentImage++;
@@ -114,4 +105,4 @@ void wxGxPendingUI::OnUpdate(void)
     if(m_pCatalog)
         m_pCatalog->ObjectChanged(GetID());
 }
-
+*/

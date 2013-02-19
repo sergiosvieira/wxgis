@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxFileUI classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxfileui.h"
+/*
 #include "wxgis/framework/application.h"
 
 //propertypages
@@ -118,3 +119,4 @@ wxIcon wxGxTextFileUI::GetSmallImage(void)
 void wxGxTextFileUI::EditProperties(wxWindow *parent)
 {
 }
+*/

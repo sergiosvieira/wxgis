@@ -21,6 +21,11 @@
 #=============================================================================
 # (To distribute this file outside of CMake, substitute the full
 #  License text for the above reference.)
+MACRO(DBG_MSG _MSG)
+  MESSAGE(STATUS
+    "${CMAKE_CURRENT_LIST_FILE}(${CMAKE_CURRENT_LIST_LINE}): ${_MSG}")
+ENDMACRO(DBG_MSG)
+
 
 if (UNIX)
   find_package(PkgConfig)
@@ -29,25 +34,57 @@ if (UNIX)
   endif (PKG_CONFIG_FOUND)
 endif (UNIX)
 
-SET(_GDAL_ROOT_HINTS
-  $ENV{GDAL}
-  $ENV{GDAL_ROOT}
-  $ENV{LIB}
-  $ENV{LIB_HOME}/gdal
-  ${GDAL_ROOT_DIR}
-  )
-SET(_GDAL_ROOT_PATHS
-  $ENV{GDAL}
-  $ENV{GDAL_ROOT}
-  $ENV{LIB}
-  $ENV{LIB_HOME}/gdal
-  )
-SET(_GDAL_ROOT_HINTS_AND_PATHS
-  HINTS ${_GDAL_ROOT_HINTS}
-  PATHS ${_GDAL_ROOT_PATHS}
-  )
+set(_GDAL_ROOT_HINTS
+	$ENV{GDAL}
+	$ENV{GDAL_ROOT}
+	$ENV{LIB}
+	$ENV{LIB_HOME}/gdal
+	${GDAL_ROOT_DIR}
+	/usr/lib
+	/usr/local/lib
+)
+  
+set(_GDAL_ROOT_PATHS
+	$ENV{GDAL}
+	$ENV{GDAL_ROOT}
+	$ENV{LIB}
+	$ENV{LIB_HOME}/gdal
+	/usr/lib
+	/usr/local/lib
+)
 
-FIND_PATH(GDAL_INCLUDE_DIR
+if(MSVC)
+    set(P_SUFF "lib" "lib/Release" "lib/Debug")
+    if(CMAKE_CL_64)
+		set(P_SUFF ${P_SUFF} "lib/x64")
+		set(_GDAL_ROOT_HINTS ${_GDAL_ROOT_HINTS}
+			$ENV{GDAL}/lib/x64
+			$ENV{GDAL_ROOT}/lib/x64
+			${GDAL_ROOT_DIR}/lib/x64
+		)
+		
+		set(_GDAL_ROOT_PATHS ${_GDAL_ROOT_PATHS}
+			$ENV{GDAL}/lib/x64
+			$ENV{GDAL_ROOT}/lib/x64
+			${GDAL_ROOT_DIR}/lib/x64
+		)
+	else(CMAKE_CL_64)
+        set(P_SUFF ${P_SUFF} "lib/x86")
+		set(_GDAL_ROOT_HINTS ${_GDAL_ROOT_HINTS}
+			$ENV{GDAL}/lib/x86
+			$ENV{GDAL_ROOT}/lib/x86
+			${GDAL_ROOT_DIR}/lib/x86
+		)
+		
+		set(_GDAL_ROOT_PATHS ${_GDAL_ROOT_PATHS}
+			$ENV{GDAL}/lib/x86
+			$ENV{GDAL_ROOT}/lib/x86			
+			${GDAL_ROOT_DIR}/lib/x86
+		)    
+	endif(CMAKE_CL_64)
+endif()
+
+find_path(GDAL_INCLUDE_DIR
   NAMES
     gdal.h
     gcore/gdal.h
@@ -60,149 +97,56 @@ FIND_PATH(GDAL_INCLUDE_DIR
     "local/include/gdal"
 )
 
-IF(WIN32 AND NOT CYGWIN)
-  # MINGW should go here too
-  IF(MSVC)
-    # Implementation details:
-    # We are using the libraries located in the VC subdir instead of the parent directory eventhough :
-    FIND_LIBRARY(GDAL_DEBUG
-      NAMES
-        gdal18d
-        gdal19d
-        gdal19d
-        gdal20d
-        gdal21d
-        gdal22d
-        gdal23d
-        gdal24d
-        gdal25d
-        gdal26d
-        gdal27d
-        gdal28d
-        gdal29d
-        gdal30d
-      ${_GDAL_ROOT_HINTS_AND_PATHS}
-      PATH_SUFFIXES
-        "lib"
-        "VC"
-        "lib/VC"
-    )
+if (GDAL_INCLUDE_DIR) 
+    file(READ "${GDAL_INCLUDE_DIR}/gcore/gdal_version.h" _gdal_VERSION_H_CONTENTS)
+    string(REGEX MATCH "GDAL_VERSION_MAJOR[ \t]+([0-9]+)" GDAL_MAJOR_VERSION ${_gdal_VERSION_H_CONTENTS})
+    string(REGEX MATCH "([0-9]+)" GDAL_MAJOR_VERSION ${GDAL_MAJOR_VERSION})
+    string(REGEX MATCH "GDAL_VERSION_MINOR[ \t]+([0-9]+)" GDAL_MINOR_VERSION ${_gdal_VERSION_H_CONTENTS})
+    string(REGEX MATCH "([0-9]+)" GDAL_MINOR_VERSION ${GDAL_MINOR_VERSION})
+    string(REGEX MATCH "GDAL_VERSION_REV[ \t]+([0-9]+)" GDAL_RELEASE_NUMBER ${_gdal_VERSION_H_CONTENTS})  
+    string(REGEX MATCH "([0-9]+)" GDAL_RELEASE_NUMBER ${GDAL_RELEASE_NUMBER})
+        
+    # Setup package meta-data
+    set(GDAL_VERSION ${GDAL_MAJOR_VERSION}.${GDAL_MINOR_VERSION} CACHE INTERNAL "The version number for wxgis libraries")
+	DBG_MSG("GDAL_VERSION : ${GDAL_VERSION}")  
 
-    FIND_LIBRARY(GDAL_RELEASE
-      NAMES
-        gdal18
-        gdal19
-        gdal19
-        gdal20
-        gdal21
-        gdal22
-        gdal23
-        gdal24
-        gdal25
-        gdal26
-        gdal27
-        gdal28
-        gdal29
-        gdal30
-      ${_GDAL_ROOT_HINTS_AND_PATHS}
-      PATH_SUFFIXES
-        "lib"
-        "VC"
-        "lib/VC"
-    )
+endif (GDAL_INCLUDE_DIR)
 
-    if( CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE )
-        if(NOT GDAL_DEBUG)
-            set(GDAL_DEBUG ${GDAL_RELEASE})
-        endif(NOT GDAL_DEBUG)     
-      set( GDAL_LIBRARIES
-        optimized ${GDAL_RELEASE} debug ${GDAL_DEBUG}
-        )
-    else()
-      set( GDAL_LIBRARIES ${GDAL_RELEASE})
-    endif()
-    MARK_AS_ADVANCED(GDAL_DEBUG GDAL_RELEASE)
-  ELSEIF(MINGW)
-    # same player, for MingW
-    FIND_LIBRARY(GDAL
-      NAMES        
-        gdal18
-        gdal19
-        gdal19
-        gdal20
-        gdal21
-        gdal22
-        gdal23
-        gdal24
-        gdal25
-        gdal26
-        gdal27
-        gdal28
-        gdal29
-        gdal30
-      ${_GDAL_ROOT_HINTS_AND_PATHS}
-      PATH_SUFFIXES
-        "lib"
-        "lib/MinGW"
-    )
-
-    MARK_AS_ADVANCED(GDAL)
-    set( GDAL_LIBRARIES ${GDAL})
-  ELSE(MSVC)
-    # Not sure what to pick for -say- intel, let's use the toplevel ones and hope someone report issues:
-    FIND_LIBRARY(GDAL
-      NAMES
-        gdal18
-        gdal19
-        gdal19
-        gdal20
-        gdal21
-        gdal22
-        gdal23
-        gdal24
-        gdal25
-        gdal26
-        gdal27
-        gdal28
-        gdal29
-        gdal30
-      HINTS
-        ${_GDAL_LIBDIR}
-      ${_GDAL_ROOT_HINTS_AND_PATHS}
-      PATH_SUFFIXES
-        lib
-    ) 
-
-    MARK_AS_ADVANCED(GDAL)
-    set( GDAL_LIBRARIES ${GDAL} )
-  ENDIF(MSVC)
-ELSE(WIN32 AND NOT CYGWIN)
-
-  FIND_LIBRARY(GDAL_LIBRARY
+find_library(GDAL_RELEASE
     NAMES
-        gdal
-    HINTS
-      ${_GDAL_LIBDIR}
-    ${_GDAL_ROOT_HINTS_AND_PATHS}
-    PATH_SUFFIXES
-      "lib"
-      "local/lib"
-  ) 
-
-  MARK_AS_ADVANCED(GDAL_LIBRARY)
-
-  # compat defines
-  SET(GDAL_LIBRARIES ${GDAL_LIBRARY})
-
-ENDIF(WIN32 AND NOT CYGWIN)
-
- if (GDAL_INCLUDE_DIR) 
-    file(READ "${GDAL_INCLUDE_DIR}/gdal_version.h" _gdal_VERSION_H_CONTENTS)
-    string(REGEX REPLACE ".*#  define[ \t]+GDAL_RELEASE_NAME[ \t]+\"([0-9A-Za-z.]+)\".*"
-    "\\1" GDAL_VERSION ${_gdal_VERSION_H_CONTENTS})
-    set(GDAL_VERSION ${GDAL_VERSION} CACHE INTERNAL "The version number for gdal libraries")
- endif (GDAL_INCLUDE_DIR)
-
+      gdal${GDAL_MAJOR_VERSION}${GDAL_MINOR_VERSION}.lib      
+      gdal${GDAL_MAJOR_VERSION}${GDAL_MINOR_VERSION}.so          
+      gdal${GDAL_MAJOR_VERSION}${GDAL_MINOR_VERSION}.a          
+    PATHS 
+		${_GDAL_ROOT_PATHS}
+		${GDAL_INCLUDE_DIR}
+	PATH_SUFFIXES
+		${P_SUFF}
+    NO_DEFAULT_PATH
+)	
+find_library(GDAL_DEBUG
+    NAMES
+      gdal${GDAL_MAJOR_VERSION}${GDAL_MINOR_VERSION}d.lib   
+      gdal${GDAL_MAJOR_VERSION}${GDAL_MINOR_VERSION}d.so   
+      gdal${GDAL_MAJOR_VERSION}${GDAL_MINOR_VERSION}d.a   
+    PATHS
+		${_GDAL_ROOT_PATHS}
+		${GDAL_INCLUDE_DIR}
+	PATH_SUFFIXES
+		${P_SUFF}
+	NO_DEFAULT_PATH
+)
+	
+if(NOT GDAL_RELEASE AND GDAL_DEBUG)
+	set(GDAL_RELEASE ${GDAL_DEBUG})
+endif(NOT GDAL_RELEASE AND GDAL_DEBUG)
+	
+LIST(APPEND GDAL_LIBRARIES
+        debug ${GDAL_DEBUG} optimized ${GDAL_RELEASE}
+        )
+		
+DBG_MSG("GDAL_LIBRARIES : ${GDAL_LIBRARIES}")  
+		
 include(FindPackageHandleStandardArgs)
 
 if (GDAL_VERSION)
@@ -213,10 +157,10 @@ if (GDAL_VERSION)
     VERSION_VAR
       GDAL_VERSION
     FAIL_MESSAGE
-      "Could NOT find GDAL, try to set the path to GDAL root folder in the system variable GDAL_ROOT_DIR"
+      "Could NOT find GDAL, try to set the path to GDAL root folder in the system variable GDAL_ROOT"
   )
 else (GDAL_VERSION)
-  find_package_handle_standard_args(GDAL "Could NOT find GDAL, try to set the path to GDAL root folder in the system variable GDAL"
+  find_package_handle_standard_args(GDAL "Could NOT find GDAL, try to set the path to GDAL root folder in the system variable GDAL_ROOT"
     GDAL_LIBRARIES
     GDAL_INCLUDE_DIR
   )

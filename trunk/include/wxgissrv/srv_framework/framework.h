@@ -21,8 +21,11 @@
 #pragma once
 
 #include "wxgis/base.h"
+
+/*
 #include "wxgis/core/config.h"
-#include "wxgis/networking/networking.h"
+#include "wxgis/net/net.h"
+
 
 typedef struct _userinfo
 {
@@ -66,7 +69,7 @@ typedef std::vector<IService*> SERVICEARRAY;
 
 /** \class IRxObjectServer catalog.h
     \brief The main interface class for remote GxObjects.
-*/
+*//*
 class IRxObjectServer
 {
 public:
@@ -75,4 +78,4 @@ public:
 	virtual void SetApplication(IServerApplication* pApp) = 0;
 };
 
-
+*/

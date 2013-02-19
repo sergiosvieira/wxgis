@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxMapInfoFactory class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2010  Bishop
 *
@@ -25,7 +25,7 @@
 /** \class wxGxMapInfoFactory gxmapinfofactory.h
     \brief A MapInfo GxObject factory.
 */
-
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxMapInfoFactory :
 	public IGxObjectFactory,
 	public wxObject
@@ -42,3 +42,4 @@ public:
     //wxGxMapInfoFactory
     virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type);
 };
+*/

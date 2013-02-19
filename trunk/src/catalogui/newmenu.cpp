@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISNewMenu class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,7 +19,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/newmenu.h"
-#include "wxgis/catalogui/gxapplication.h"
+
+//#include "wxgis/catalogui/gxapplication.h"
 
 //----------------------------------------------------------------------
 // wxGISNewMenu
@@ -73,9 +74,13 @@ void wxGISNewMenu::OnClick(void)
 {
 }
 
-bool wxGISNewMenu::OnCreate(IFrameApplication* pApp)
+bool wxGISNewMenu::OnCreate(wxGISApplicationBase* pApp)
 {
 	m_pApp = pApp;
+    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(GetGxCatalog());
+    if(!m_pCatalog)
+        return false;
+
 	//TODO: Advise ???
     return true;
 }
@@ -90,17 +95,12 @@ unsigned char wxGISNewMenu::GetCount(void)
 	return 1;
 }
 
-void wxGISNewMenu::Update(IGxSelection* Selection)
+void wxGISNewMenu::Update(wxGxSelection* Selection)
 {
-	if(!m_pCatalog)
-    {
-        IGxApplication* pGxApplication = dynamic_cast<IGxApplication*>(m_pApp);
-        if(pGxApplication)
-            m_pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApplication->GetCatalog());
-    }
+    wxCHECK_RET(Selection && m_pApp && m_pCatalog, wxT("Null pointers"));
 
-    for(size_t i = m_CommandArray.size(); i > 0; --i)
-        RemoveCommand(i - 1);
+    for(int i = m_CommandArray.size() - 1; i >= 0; --i)
+        RemoveCommand(i);
 
 	for(size_t i = 0; i < m_SubmenuArray.size(); ++i)
 	{
@@ -108,23 +108,23 @@ void wxGISNewMenu::Update(IGxSelection* Selection)
 		wsDELETE(m_SubmenuArray[i].pBar);
 	}
 
-    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(Selection->GetLastSelectedObjectID());
-    IGxObjectUI* pGxObjUI = dynamic_cast<IGxObjectUI*>(pGxObject.get());
+    wxGxObject* pGxObject = m_pCatalog->GetRegisterObject(Selection->GetLastSelectedObjectId());
+    IGxObjectUI* pGxObjUI = dynamic_cast<IGxObjectUI*>(pGxObject);
     if(pGxObjUI)
     {
-        IGISCommandBar* pCmdBar = m_pApp->GetCommandBar( pGxObjUI->NewMenu() );
+        wxGISCommandBar* pCmdBar = m_pApp->GetCommandBar( pGxObjUI->NewMenu() );
         if(pCmdBar)
         {
             for(size_t i = 0; i < pCmdBar->GetCommandCount(); ++i)
             {
-                ICommand* pCmd = pCmdBar->GetCommand(i);
+                wxGISCommand* pCmd = pCmdBar->GetCommand(i);
                 AddCommand(pCmd);
             }
         }
 	}
 }
 
-void wxGISNewMenu::AddCommand(ICommand* pCmd)
+void wxGISNewMenu::AddCommand(wxGISCommand* pCmd)
 {
 	switch(pCmd->GetKind())
 	{
@@ -133,7 +133,7 @@ void wxGISNewMenu::AddCommand(ICommand* pCmd)
 		break;
 	case enumGISCommandMenu:
 		{
-			IGISCommandBar* pGISCommandBar = dynamic_cast<IGISCommandBar*>(pCmd);
+			wxGISCommandBar* pGISCommandBar = dynamic_cast<wxGISCommandBar*>(pCmd);
 			if(pGISCommandBar)
 			{
 				pGISCommandBar->Reference();

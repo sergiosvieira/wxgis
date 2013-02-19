@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "wxgissrv/srv_framework/catalog.h"
-
+/*
 wxRxCatalog::wxRxCatalog() : wxGxCatalog()
 {
 }
@@ -226,3 +226,4 @@ void wxRxCatalog::LoadChildren(wxXmlNode* pNode)
 	}
 	m_bIsChildrenLoaded = true;
 }
+*/

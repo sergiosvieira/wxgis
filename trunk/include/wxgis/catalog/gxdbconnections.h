@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDBConnections class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -28,7 +28,7 @@
 
 	This root item can held connections (*.xconn) and folders items
 */
-
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxDBConnections :
 	public wxGxFolder,
     public IGxRootObjectProperties,
@@ -56,4 +56,4 @@ public:
 protected:
 	wxString m_sInternalPath;
 };
-
+*/

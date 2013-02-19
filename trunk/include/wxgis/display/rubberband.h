@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISRubberBand class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 
 #include "wxgis/display/display.h"
 #include "wxgis/display/gisdisplay.h"
+#include "wxgis/datasource/gdalinh.h"
 
 class WXDLLIMPEXP_GIS_DSP wxGISRubberBand :
 	public wxEvtHandler
@@ -30,7 +31,7 @@ class WXDLLIMPEXP_GIS_DSP wxGISRubberBand :
 public:
 	wxGISRubberBand(wxPen oPen, wxWindow *pWnd, wxGISDisplay *pDisp);
 	virtual ~wxGISRubberBand(void);
-	virtual OGRGeometrySPtr TrackNew(wxCoord x, wxCoord y);
+	virtual wxGISGeometry TrackNew(wxCoord x, wxCoord y);
 	virtual void OnUnlock(void);
 	//events
 	virtual void OnKeyDown(wxKeyEvent & event);
@@ -42,7 +43,7 @@ public:
 	virtual void OnEnter(wxMouseEvent& event);
     virtual void OnCaptureLost(wxMouseCaptureLostEvent & event);
 protected:
-	OGRGeometrySPtr m_RetGeom;
+	wxGISGeometry m_RetGeom;
 	bool m_bLock;
 	wxCoord m_StartX;
 	wxCoord m_StartY;

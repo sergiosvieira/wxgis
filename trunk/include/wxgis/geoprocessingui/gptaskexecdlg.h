@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  wxGxTaskExecDlg class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-
+/*
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/geoprocessing/gptoolmngr.h"
 #include "wxgis/framework/progressor.h"
@@ -39,7 +39,7 @@ typedef std::vector<TASKMESSAGE> TaskMessageArray;
 /** \class wxGxTaskExecDlg gptaskexecdlg.h
  *  \brief The dialog showing execution process
  */
-
+/*
 class WXDLLIMPEXP_GIS_GPU wxGxTaskExecDlg :
 	public wxDialog,
     public ITrackCancel
@@ -89,7 +89,7 @@ class WXDLLIMPEXP_GIS_GPU wxGxTaskObject;
 /** \class wxGxTaskObjectExecDlg gptaskexecdlg.h
  *  \brief The GxObject showing execution process
  */
-
+/*
 class wxGxTaskObjectExecDlg : 
     public wxGxTaskExecDlg
 {
@@ -107,6 +107,7 @@ protected:
 /** \class wxGxTaskObject gptaskexecdlg.h
  *  \brief The GxObject showing execution process
  */
+/*
 class WXDLLIMPEXP_GIS_GPU wxGxTaskObject :
     public IGxObject,
 	public IGxObjectUI,
@@ -137,8 +138,8 @@ public:
     virtual void SetValue(int value);
     virtual bool Show(bool bShow){return true;};
     virtual void SetRange(int range){};
-    virtual int GetRange(void){return 100;};
-    virtual int GetValue(void){return m_nDonePercent;};
+    virtual int GetRange(void) const {return 100;};
+    virtual int GetValue(void) const {return m_nDonePercent;};
     virtual void Play(void){};
     virtual void Stop(void){};
 	virtual void SetYield(bool bYield = false){};
@@ -176,3 +177,4 @@ protected:
     DECLARE_EVENT_TABLE();
 };
 
+*/

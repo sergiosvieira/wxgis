@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxKMLDatasetUI classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxkmldatasetui.h"
+/*
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/datasource/featuredataset.h"
 
@@ -179,3 +180,4 @@ void wxGxKMLSubDatasetUI::EditProperties(wxWindow *parent)
 
     PropertySheetDialog.ShowModal();
 }
+*/

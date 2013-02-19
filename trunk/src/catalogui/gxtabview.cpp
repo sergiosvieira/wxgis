@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISTabView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxtabview.h"
 #include "wxgis/catalogui/gxapplication.h"
-#include "wxgis/catalogui/catalogui.h"
-#include "wxgis/framework/droptarget.h"
+#include "wxgis/catalogui/droptarget.h"
+
 
 //-------------------------------------------------------------------
 // wxGxTab
@@ -33,16 +33,14 @@ BEGIN_EVENT_TABLE(wxGxTab, wxPanel)
 	EVT_GXSELECTION_CHANGED(wxGxTab::OnSelectionChanged)
 END_EVENT_TABLE()
 
-wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style), m_bShowChoices(false), m_pCurrentWnd(NULL), m_pNoWnd(NULL)
+wxGxTab::wxGxTab(wxGxApplication* application, wxXmlNode* pTabDesc, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style), m_bShowChoices(false), m_pCurrentWnd(NULL), m_pNoWnd(NULL)
 {
 	m_tabwnd = NULL;
     SetDropTarget(new wxGISDropTarget(static_cast<IViewDropTarget*>(this)));
 
 	m_sName = wxGetTranslation( pTabDesc->GetAttribute(wxT("name"), NONAME) );
 	m_bShowChoices = pTabDesc->GetAttribute(wxT("show_choices"), wxT("f")) == wxT("f") ? false : true;
-    m_pApp = dynamic_cast<IFrameApplication*>(application);
-    if(!m_pApp)
-        return;
+    m_pApp = application;
 
 	wxXmlNode* pChild = pTabDesc->GetChildren();
 	while(pChild)
@@ -51,24 +49,32 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 		int nPriority = wxAtoi(pChild->GetAttribute(wxT("priority"), wxT("0")));
 
 		wxObject *obj = wxCreateDynamicObject(sClass);
-		IGxView *pGxView = dynamic_cast<IGxView*>(obj);
+		IView *pGxView = dynamic_cast<IView*>(obj);
 		wxWindow* pWnd = dynamic_cast<wxWindow*>(pGxView);
 		if(pGxView && pWnd)
 		{
-            pGxView->Create(this);
-			pWnd->Hide();
-			m_pApp->RegisterChildWindow(pWnd);
+            if(!pGxView->Create(this))
+		    {
+			    wxLogError(_("wxGxTab: Error creating view %s"), sClass.c_str());
+		        wxDELETE(obj);
+		    }
+            else
+            {
+			    pWnd->Hide();			
 
-			pGxView->Activate(m_pApp, pChild);
-			if(m_pWindows.size() <= nPriority)
-			for(size_t i = 0; i < nPriority + 1; ++i)
-				m_pWindows.push_back(NULL);
+			    if(pGxView->Activate(m_pApp, pChild))
+                    m_pApp->RegisterChildWindow(pWnd->GetId());
 
-			m_pWindows[nPriority] = pWnd;
-			wxLogMessage(_("wxGxTab: View class %s in '%s' tab initialise"), sClass.c_str(), m_sName.c_str());
-			//store NoView
-			if(sClass.CmpNoCase(wxT("wxGxNoView")) == 0)
-				m_pNoWnd = pWnd;
+			    if(m_pWindows.size() <= nPriority)
+			    for(size_t i = 0; i < nPriority + 1; ++i)
+				    m_pWindows.push_back(NULL);
+
+			    m_pWindows[nPriority] = pWnd;
+			    wxLogMessage(_("wxGxTab: View class %s in '%s' tab initialise"), sClass.c_str(), m_sName.c_str());
+			    //store NoView
+			    if(sClass.CmpNoCase(wxT("wxGxNoView")) == 0)
+				    m_pNoWnd = pWnd;
+            }
 		}
 		else
 		{
@@ -102,7 +108,7 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 
 		wxBoxSizer* bSizerMinor = new wxBoxSizer( wxHORIZONTAL );
 
-		m_staticText = new wxStaticText( m_tabselector, wxID_ANY, _("Preview: "), wxDefaultPosition, wxDefaultSize, 0 );
+		m_staticText = new wxStaticText( m_tabselector, wxID_ANY, _("Preview: ") + wxT("   "), wxDefaultPosition, wxDefaultSize, 0 );
 		m_staticText->Wrap( -1 );
 		bSizerMinor->Add( m_staticText, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
@@ -119,10 +125,6 @@ wxGxTab::wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* par
 	}
 	this->SetSizer( m_bSizerMain );
 	this->Layout();
-
-    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(application->GetCatalog());
-	if(pGxCatalogUI)
-		m_pSelection = pGxCatalogUI->GetSelection();
 }
 
 wxGxTab::~wxGxTab(void)
@@ -151,7 +153,7 @@ void wxGxTab::OnSelectionChanged(wxGxSelectionEvent& event)
     this->Layout();
 
 	//select in tree ctrl
-	//if(event.GetInitiator() != TREECTRLID/*  && event.GetInitiator() != LISTCTRLID&& event.GetInitiator() != IGxSelection::INIT_ALL*/)
+	//if(event.GetInitiator() != TREECTRLID) // && event.GetInitiator() != LISTCTRLID&& event.GetInitiator() != IGxSelection::INIT_ALL
 	//{
 	//	long nSelectedObjectID = m_pSelection->GetLastSelectedObjectID();
 	//	m_pSelection->Select(nSelectedObjectID, false, GetId());
@@ -266,7 +268,7 @@ void wxGxTab::OnChoice(wxCommandEvent& event)
 
 		this->Layout();
 
-		wxGxSelectionEvent sel_event(wxGXSELECTION_CHANGED, m_pSelection, GetId());
+		wxGxSelectionEvent sel_event(wxGXSELECTION_CHANGED, m_pApp->GetGxSelection(), GetId());
 		if(m_pCurrentWnd)
 			m_pCurrentWnd->ProcessWindowEventLocally(sel_event);
 	}
@@ -312,15 +314,9 @@ void wxGxTab::Deactivate(void)
 		if(pView != NULL)
 		{
 			pView->Deactivate();
-			m_pApp->UnRegisterChildWindow(m_pWindows[i]);
-	//		if(m_pCurrentWnd == m_pWindows[i])
-	//			continue;
-			//if( !m_pWindows[i]->IsBeingDeleted() )
-			//	if( !m_pWindows[i]->Destroy() )
-			//		wxDELETE( m_pWindows[i] );
+            m_pApp->UnRegisterChildWindow(m_pWindows[i]->GetId());
 		}
 	}
-	//m_pCurrentWnd = NULL;
 	m_pWindows.clear();
 }
 
@@ -332,12 +328,12 @@ wxDragResult wxGxTab::OnDragOver(wxCoord x, wxCoord y, wxDragResult def)
 	return pViewDropTarget->OnDragOver(x, y, def);
 }
 
-bool wxGxTab::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
+bool wxGxTab::OnDropObjects(wxCoord x, wxCoord y, const wxArrayString& GxObjects)
 {
 	IViewDropTarget* pViewDropTarget = dynamic_cast<IViewDropTarget*>(m_pCurrentWnd);
 	if(!pViewDropTarget)
 		return wxDragNone;
-	return pViewDropTarget->OnDropFiles(x, y, filenames);
+	return pViewDropTarget->OnDropObjects(x, y, GxObjects);
 }
 
 void wxGxTab::OnLeave()
@@ -348,6 +344,13 @@ void wxGxTab::OnLeave()
 	return pViewDropTarget->OnLeave();
 }
 
+bool wxGxTab::CanPaste()
+{
+	IViewDropTarget* pViewDropTarget = dynamic_cast<IViewDropTarget*>(m_pCurrentWnd);
+	if(!pViewDropTarget)
+		return false;
+	return pViewDropTarget->CanPaste();
+}
 
 //-------------------------------------------------------------------
 // wxGxTabView
@@ -359,8 +362,14 @@ BEGIN_EVENT_TABLE(wxGxTabView, wxAuiNotebook)
 	EVT_GXSELECTION_CHANGED(wxGxTabView::OnSelectionChanged)
 END_EVENT_TABLE()
 
-wxGxTabView::wxGxTabView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxAuiNotebook(parent, id, pos, size, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE), m_pSelection(NULL)
+wxGxTabView::wxGxTabView(void) : wxAuiNotebook()
 {
+    m_pSelection = NULL;
+}
+
+wxGxTabView::wxGxTabView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxAuiNotebook(parent, id, pos, size, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE)
+{
+    m_pSelection = NULL;
 }
 
 wxGxTabView::~wxGxTabView(void)
@@ -369,12 +378,14 @@ wxGxTabView::~wxGxTabView(void)
 
 bool wxGxTabView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
-    m_pSelection = NULL;
     return wxAuiNotebook::Create(parent, TABCTRLID, pos, size, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE);
 }
 
-bool wxGxTabView::Activate(IFrameApplication* application, wxXmlNode* pConf)
+bool wxGxTabView::Activate(IApplication* const application, wxXmlNode* const pConf)
 {
+    m_pApp = dynamic_cast<wxGxApplication*>(application);
+    if(!m_pApp)
+        return false;
 	if(!wxGxView::Activate(application, pConf))
 		return false;
 
@@ -382,33 +393,30 @@ bool wxGxTabView::Activate(IFrameApplication* application, wxXmlNode* pConf)
 	wxUint8 count(0);
 	while(pChild)
 	{
-		wxGxTab* pGxTab = new wxGxTab(m_pGxApplication, pChild, this);
-		m_Tabs.push_back(pGxTab);
+		wxGxTab* pGxTab = new wxGxTab(m_pApp, pChild, this);
+        m_Tabs.push_back(pGxTab);
 
-		AddPage(static_cast<wxWindow*>(pGxTab), pGxTab->GetName(), count == 0 ? true : false/*, m_ImageListSmall.GetBitmap(9)*/);
+		AddPage(static_cast<wxWindow*>(pGxTab), pGxTab->GetName(), count == 0 ? true : false);//, m_ImageListSmall.GetBitmap(9)
 
 		count++;
 
 		pChild = pChild->GetNext();
 	}
 
-    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(m_pGxApplication->GetCatalog());
-	if(pGxCatalogUI)
-		m_pSelection = pGxCatalogUI->GetSelection();
-	m_pConnectionPointSelection = dynamic_cast<wxGISConnectionPointContainer*>( m_pSelection );
-	if(m_pConnectionPointSelection != NULL)
-		m_ConnectionPointSelectionCookie = m_pConnectionPointSelection->Advise(this);
+    m_pSelection = m_pApp->GetGxSelection();
+	if(m_pSelection)
+        m_ConnectionPointSelectionCookie = m_pSelection->Advise(this);
 
 	return true;
 }
 
 void wxGxTabView::Deactivate(void)
 {
-	if(m_ConnectionPointSelectionCookie != wxNOT_FOUND)
-		m_pConnectionPointSelection->Unadvise(m_ConnectionPointSelectionCookie);
-
-	for(size_t i = 0; i < m_Tabs.size(); ++i)
-	{
+	if(m_ConnectionPointSelectionCookie != wxNOT_FOUND && m_pSelection)
+		m_pSelection->Unadvise(m_ConnectionPointSelectionCookie);
+    
+    for(size_t i = 0; i < m_Tabs.size(); ++i)
+    {
         m_Tabs[i]->Deactivate();
 	}
 
@@ -458,7 +466,7 @@ void wxGxTabView::OnAUINotebookPageChanged(wxAuiNotebookEvent& event)
 	//wxGxTab* pCurrTab = m_Tabs[event.GetOldSelection()];
 	//wxWindow* pWnd = pCurrTab->GetCurrentWindow();
 	//m_pSelection->SetInitiator(	pWnd->GetId() );
-	long nSelectedObjectID = m_pSelection->GetLastSelectedObjectID();
-	if(nSelectedObjectID != wxNOT_FOUND)
-		m_pSelection->Select(nSelectedObjectID, false, GetId());//WXGISHIGHEST pWnd->
+	long nSelectedObjectId = m_pSelection->GetLastSelectedObjectId();
+	if(nSelectedObjectId != wxNOT_FOUND)
+		m_pSelection->Select(nSelectedObjectId, false, GetId());//WXGISHIGHEST pWnd->
 }

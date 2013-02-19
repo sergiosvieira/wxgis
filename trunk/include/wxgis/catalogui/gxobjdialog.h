@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxObjectDialog class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -45,14 +45,16 @@
 #include "wxgis/core/config.h"
 #include "wxgis/catalogui/gxcontentview.h"
 #include "wxgis/catalogui/gxtreeview.h"
+#include "wxgis/framework/applicationbase.h"
 #include "wxgis/version.h"
-
+#include "wxgis/catalog/gxfilters.h"
+#include "wxgis/framework/accelerator.h"
 
 #define OBJDLG_NAME wxT("wxGISObjDialog")
 
-//////////////////////////////////////////////////////////////////////////////
-// wxGxToolBarArt
-//////////////////////////////////////////////////////////////////////////////
+/** \class wxGxToolBarArt gxobjdialog.h
+    \brief The class to make buttons on GxObjDialog more native.
+*/
 
 class wxGxToolBarArt : public wxAuiDefaultToolBarArt
 {
@@ -64,14 +66,14 @@ public:
 	}
 };
 
-//////////////////////////////////////////////////////////////////////////////
-// wxTreeViewComboPopup
-//////////////////////////////////////////////////////////////////////////////
-
-class wxTreeViewComboPopup : public wxGxTreeViewBase,
-                             public wxComboPopup
+/** \class wxTreeViewComboPopup gxobjdialog.h
+    \brief The tree view class on top of GxObjDialog.
+*/
+class wxTreeViewComboPopup : 
+    public wxGxTreeViewBase,
+    public wxComboPopup
 {
-    DECLARE_DYNAMIC_CLASS(wxTreeViewComboPopup)
+    DECLARE_CLASS(wxTreeViewComboPopup)
 public:
 
     // Initialize member variables
@@ -98,13 +100,9 @@ public:
 	//
     virtual wxSize GetAdjustedSize(int minWidth, int prefHeight, int maxHeight);
 //wxGxTreeViewBase
-    virtual void AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent);
+    virtual void AddTreeItem(wxGxObject* pGxObject, wxTreeItemId hParent);
     //
-    virtual IGxSelection* GetSelectedObjects(void)
-    {
-        m_pSelection->SetInitiator(TREECTRLID);
-        return m_pSelection;
-    }
+    virtual wxGxSelection* const GetSelectedObjects(void);
 protected:
     wxTreeItemId m_PrewItemId;
     bool m_bClicked;
@@ -112,129 +110,71 @@ private:
     DECLARE_EVENT_TABLE()
 };
 
-//////////////////////////////////////////////////////////////////////////////
-// wxGxDialogContentView
-//////////////////////////////////////////////////////////////////////////////
+/** \class wxGxDialogContentView gxobjdialog.h
+    \brief The content view class on center of GxObjDialog.
+*/
+#define OBJDLGLISTCTRLID	1012 //wxGxObjectDialog contents view
 
 class wxGxDialogContentView : public wxGxContentView
 {
+    DECLARE_CLASS(wxGxDialogContentView)
 public:
-	wxGxDialogContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxLC_LIST | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING);
+	wxGxDialogContentView(wxWindow* parent, wxWindowID id = OBJDLGLISTCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxLC_LIST | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING);
 	virtual ~wxGxDialogContentView();
-
-//IGxView
-	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
+    virtual bool Create(wxWindow* parent, wxWindowID id = OBJDLGLISTCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxLC_LIST | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING, const wxString& name = wxT("ContentView"));
+    //wxGxView
+	virtual bool Activate(wxGISApplicationBase* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
-// events
+    // events
     virtual void OnActivated(wxListEvent& event);
-//
-	virtual void SetFilters(LPOBJECTFILTERS pFiltersArray){m_pFiltersArray = pFiltersArray;};
-	virtual void SetCurrentFilter(size_t nFilterIndex);
-//wxGxContentView
-	virtual void AddObject(IGxObject* pObject);
     //
-    virtual IGxSelection* GetSelectedObjects(void)
-    {
-        m_pSelection->SetInitiator(NOTFIRESELID/*LISTCTRLID*/);
-        return m_pSelection;
-    }
-    virtual void SetExternalCatalog(IGxCatalog* pCatalog = NULL){m_pExternalCatalog = pCatalog;};
-//events
-	virtual void OnObjectAdded(wxGxCatalogEvent& event);
-	virtual void OnObjectDeleted(wxGxCatalogEvent& event);
+	virtual void SetFilters(const wxGxObjectFiltersArray &FiltersArray){m_FiltersArray = FiltersArray;};
+	virtual void SetCurrentFilter(size_t nFilterIndex);
+    virtual wxGxSelection* const GetSelectedObjects(void);
+    //wxGxContentView
+	virtual void AddObject(wxGxObject* const pObject);
 protected:
-  	IGxCatalog* m_pExternalCatalog;
-	wxGISConnectionPointContainer* m_pConnectionPointSelection;
 	long m_ConnectionPointSelectionCookie;
-	LPOBJECTFILTERS m_pFiltersArray;
+	wxGxObjectFiltersArray m_FiltersArray;
 	size_t m_nFilterIndex;
+private:
+    DECLARE_EVENT_TABLE()
 };
 
-//////////////////////////////////////////////////////////////////////////////
-// wxGxObjectDialog
-//////////////////////////////////////////////////////////////////////////////
+/** \class wxGxObjectDialog gxobjdialog.h
+    \brief The GxObjDialog class.
+*/
 
 class WXDLLIMPEXP_GIS_CLU wxGxObjectDialog :
     public wxDialog,
-    public IGxApplication,
-    public IFrameApplication
+    public wxGISApplicationBase,
+    public wxGxApplicationBase
 {
-private:
-
-protected:
-	wxBoxSizer* bMainSizer;
-	wxBoxSizer* bHeaderSizer;
-	wxStaticText* m_staticText1;
-	wxStaticText* m_staticText2;
-	wxComboCtrl* m_TreeCombo;
-	//wxToolBar* m_toolBar;
-	wxAuiToolBar* m_toolBar;
-	//wxListCtrl* m_listCtrl;
-	wxFlexGridSizer* fgCeilSizer;
-	wxStaticText* m_staticText4;
-	wxTextCtrl* m_NameTextCtrl;
-	wxButton* m_OkButton;
-	wxStaticText* m_staticText6;
-	wxComboBox* m_WildcardCombo;
-	wxButton* m_CancelButton;
-
+    DECLARE_CLASS(wxGxObjectDialog)
 public:
-	wxGxObjectDialog( wxWindow* parent, IGxCatalog* pExternalCatalog = NULL, wxWindowID id = wxID_ANY, const wxString& title = _("Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,338 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
-	~wxGxObjectDialog();
-//IGxApplication
-    virtual IGxCatalog* const GetCatalog(void){return static_cast<IGxCatalog*>(m_pCatalog);};
-//IFrameApplication
-	virtual ICommand* GetCommand(long CmdID);
-	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
-    virtual wxString GetAppName(void){return wxString(OBJDLG_NAME);};
-    virtual wxString GetAppVersionString(void){return wxString(wxGIS_VERSION_NUM_DOT_STRING_T);};
-    virtual IStatusBar* GetStatusBar(void){return NULL;};
-    virtual void OnAppAbout(void){};
-    virtual void OnAppOptions(void){};
-	virtual wxIcon GetAppIcon(void){return wxNullIcon;};
-    virtual IGISCommandBar* GetCommandBar(wxString sName){return NULL;};
-    virtual void RemoveCommandBar(IGISCommandBar* pBar){};
-    virtual bool AddCommandBar(IGISCommandBar* pBar){return false;};
-    virtual void ShowStatusBar(bool bShow){};
-    virtual bool IsStatusBarShown(void){return false;};
-    virtual void ShowToolBarMenu(void){};
-	virtual const WINDOWARRAY* const GetChildWindows(void);
-    virtual void RegisterChildWindow(wxWindow* pWnd);
-    virtual void UnRegisterChildWindow(wxWindow* pWnd);
-    virtual void Customize(void){};
-    virtual void ShowApplicationWindow(wxWindow* pWnd, bool bShow = true){};
-    virtual bool IsApplicationWindowShown(wxWindow* pWnd){return true;};
-	virtual void OnMouseDown(wxMouseEvent& event){};
-	virtual void OnMouseUp(wxMouseEvent& event){};
-	virtual void OnMouseDoubleClick(wxMouseEvent& event){};
-	virtual void OnMouseMove(wxMouseEvent& event){};
-    virtual bool Create(void){return true;};
-    virtual bool SetupLog(const wxString &sLogPath){return true;};
-    virtual bool SetupLoc(const wxString &sLoc, const wxString &sLocPath){return true;};
-    virtual bool SetupSys(const wxString &sSysPath){return true;};
-    virtual void SetDebugMode(bool bDebugMode){};
-
+	wxGxObjectDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,338 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+	virtual ~wxGxObjectDialog();
+//wxGISApplicationBase
+    virtual wxString GetAppName(void) const{return wxString(OBJDLG_NAME);};
 //wxGxObjectDialog
-	virtual void SetButtonCaption(wxString sOkBtLabel);
-	virtual void SetStartingLocation(wxString sStartPath);
-	virtual void SetName(wxString sName);
+	virtual void SetButtonCaption(const wxString &sOkBtLabel);
+	virtual void SetStartingLocation(const wxString &sStartPath);
+	virtual void SetName(const wxString &sName);
 	virtual void SetAllowMultiSelect(bool bAllowMultiSelect);
 	virtual void SetOverwritePrompt(bool bOverwritePrompt);
 	virtual void SetAllFilters(bool bAllFilters);
 	virtual int ShowModalOpen();
 	virtual int ShowModalSave();
-	virtual void AddFilter(IGxObjectFilter* pFilter, bool bDefault = false);
+	virtual void AddFilter(wxGxObjectFilter* pFilter, bool bDefault = false);
     virtual void SetOwnsFilter(bool bOwnFilter){m_bOwnFilter = bOwnFilter;};
 	virtual void RemoveAllFilters(void);
-    virtual GxObjectArray* GetSelectedObjects(void){return &m_ObjectArray;}
-    virtual wxString GetName(void);
-    virtual wxString GetNameWithExt(void);
-    virtual wxString GetFullPath(void);
-    virtual wxString GetPath(void);
-    virtual CPLString GetInternalPath(void);
-    virtual IGxObject* GetLocation(void);
-    virtual IGxObjectFilter* GetCurrentFilter(void);
-    virtual size_t GetCurrentFilterId(void);
+    const wxGxObjectList& GetChildren() const { return m_ObjectList; };
+    virtual wxString GetName(void) const;
+    virtual wxString GetFullName(void) const;
+    virtual CPLString GetPath(void) const;
+    virtual wxGxObject* const GetLocation(void) const;
+    virtual wxGxObjectFilter* GetCurrentFilter(void) const;
+    virtual size_t GetCurrentFilterId(void) const;
 protected:
 // events
     virtual void OnCommand(wxCommandEvent& event);
@@ -245,15 +185,14 @@ protected:
 	virtual void OnFilterSelect(wxCommandEvent& event);
     virtual void OnOK(wxCommandEvent& event);
     virtual void OnOKUI(wxUpdateUIEvent& event);
-    virtual void Command(ICommand* pCmd);
+    virtual void Command(wxGISCommand* pCmd);
 //wxGxObjectDialog
 	virtual void OnInit();
     virtual void SerializeFramePos(bool bSave);
     virtual bool DoSaveObject(wxGISEnumSaveObjectResults Result);
 protected:
- 	COMMANDARRAY m_CommandArray;
-  	wxGxCatalogUI* m_pCatalog;
-  	IGxCatalog* m_pExternalCatalog;
+    wxGISAcceleratorTable* m_pGISAcceleratorTable;
+    wxGxCatalogUI* m_pCatalog;
     wxGxDialogContentView* m_pwxGxContentView;
     wxTreeViewComboPopup* m_PopupCtrl;
     IDropDownCommand* m_pDropDownCommand;
@@ -262,12 +201,25 @@ protected:
 	wxString m_sName;
 	bool m_bAllowMultiSelect, m_bOverwritePrompt, m_bAllFilters;
     bool m_bIsSaveDlg;
-	OBJECTFILTERS m_FilterArray;
+	wxGxObjectFiltersArray m_FilterArray;
 	size_t m_nDefaultFilter;
-    GxObjectArray m_ObjectArray;
+    wxGxObjectList m_ObjectList;
     int m_nRetCode;
-   	WINDOWARRAY m_WindowArray;
     bool m_bOwnFilter;
+protected:
+	wxBoxSizer* bMainSizer;
+	wxBoxSizer* bHeaderSizer;
+	wxStaticText* m_staticText1;
+	wxStaticText* m_staticText2;
+	wxComboCtrl* m_TreeCombo;
+	wxAuiToolBar* m_toolBar;
+	wxFlexGridSizer* fgCeilSizer;
+	wxStaticText* m_staticText4;
+	wxTextCtrl* m_NameTextCtrl;
+	wxButton* m_OkButton;
+	wxStaticText* m_staticText6;
+	wxComboBox* m_WildcardCombo;
+	wxButton* m_CancelButton;
 
     DECLARE_EVENT_TABLE()
 };

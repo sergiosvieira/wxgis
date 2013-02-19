@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxArchive classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxarchfolderui.h"
+/*
 #include "wxgis/datasource/sysop.h"
 
 #include "cpl_vsi_virtual.h"
@@ -87,3 +88,4 @@ IGxObject* wxGxArchiveFolderUI::GetArchiveFolder(CPLString szPath, wxString soNa
 	return static_cast<IGxObject*>(pFolder);
 }
 
+*/

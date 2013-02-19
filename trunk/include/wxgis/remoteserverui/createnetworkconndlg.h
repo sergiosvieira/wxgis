@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
  * Purpose:  Create network connection dialog
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2008-2010 Bishop
+*   Copyright (C) 2008-2010,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,9 +18,11 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+
 #pragma once
 
 #include "wxgis/remoteserverui/remoteserverui.h"
+#include "wxgis/net/netfactory.h"
 
 #include <wx/wx.h>
 #include <wx/xml/xml.h>
@@ -42,24 +44,25 @@
 
 class wxGISCreateNetworkConnDlg : public wxDialog 
 {
+    DECLARE_CLASS(wxGISCreateNetworkConnDlg)
 public:
-	wxGISCreateNetworkConnDlg( NETCONNFACTORYARRAY& apNetConn, wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Create connection"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 350, 450 ), long style = wxCAPTION | wxCLOSE_BOX | wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxCLIP_CHILDREN );
+	wxGISCreateNetworkConnDlg( wxNetConnFactoryArray& apNetConn, wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Create connection"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 350, 450 ), long style = wxCAPTION | wxCLOSE_BOX | wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxCLIP_CHILDREN );
 	~wxGISCreateNetworkConnDlg();
-	INetClientConnection* GetConnection(void){return m_pConnObj;};
+	wxXmlNode* const GetConnectionProperties(void);
 protected:
 	void OnSaveBtnClick( wxCommandEvent& event );
-	INetClientConnection* m_pConnObj;
-
-private:
-	wxBoxSizer* bSizer;
-	wxImageList m_ImageList;
+protected:
+    wxXmlNode* m_pConnProps;
 protected:
 	wxChoicebook* m_choicebook;
 	wxStdDialogButtonSizer* m_sdbSizer;
 	wxStaticLine* m_staticline1;
 	wxButton* m_sdbSizerSave;
 	wxButton* m_sdbSizerCancel;
-
-	DECLARE_EVENT_TABLE()	
+	wxBoxSizer* bSizer;
+	wxImageList m_ImageList;
+private:	
+    DECLARE_EVENT_TABLE()	
 };
+
 

@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Map)
  * Purpose:  Main application class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 20011 Bishop
 *

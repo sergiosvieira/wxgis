@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  Catalog main header.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,8 +21,10 @@
 
 #pragma once
 
-#include "wxgis/datasource/datasource.h"
 #include "wxgis/core/config.h"
+
+#include "gdal_priv.h"
+#include "gdal.h"
 
 #include <wx/filename.h>
 
@@ -37,6 +39,37 @@ enum wxGISEnumSaveObjectResults
 	enumGISSaveObjectDeny = 0x0004
 };
 
+/** \class IGxObjectEdit catalog.h
+    \brief A GxObject edit interface.
+*/
+
+class IGxObjectEdit
+{
+public:
+	virtual ~IGxObjectEdit(void){};
+	virtual bool Delete(void){return false;};
+	virtual bool CanDelete(void){return false;};
+	virtual bool Rename(const wxString& NewName){return false;};
+	virtual bool CanRename(void){return false;};
+	virtual bool Copy(const CPLString &szDestPath, ITrackCancel* const pTrackCancel){return false;};
+	virtual bool CanCopy(const CPLString &szDestPath){return false;};
+	virtual bool Move(const CPLString &szDestPath, ITrackCancel* const pTrackCancel){return false;};
+	virtual bool CanMove(const CPLString &szDestPath){return false;};
+};
+
+/** \class IGxRootObjectProperties catalog.h
+    \brief A Interface class for Root GxObject.
+*/
+
+class IGxRootObjectProperties
+{
+public:
+	virtual ~IGxRootObjectProperties(void){};
+	virtual void Init(wxXmlNode* const pConfigNode) = 0;
+	virtual void Serialize(wxXmlNode* const pConfigNode) = 0;
+};
+
+/*
 class IGxObject;
 
 typedef std::vector<IGxObject*> GxObjectArray;
@@ -129,39 +162,11 @@ static void GxObjectDeleter(IGxObject *ptr)
     if(ptr)
         ptr->Unlock();
 }
-
-/** \class IGxObjectEdit catalog.h
-    \brief A GxObject edit interface.
 */
-class IGxObjectEdit
-{
-public:
-	virtual ~IGxObjectEdit(void){};
-	virtual bool Delete(void){return false;};
-	virtual bool CanDelete(void){return false;};
-	virtual bool Rename(wxString NewName){return false;};
-	virtual bool CanRename(void){return false;};
-	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel){return false;};
-	virtual bool CanCopy(CPLString szDestPath){return false;};
-	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel){return false;};
-	virtual bool CanMove(CPLString szDestPath){return false;};
-};
-
-/** \class IGxDataset catalog.h
-    \brief A Interface class which can return Dataset.
-*/
-class IGxDataset
-{
-public:
-	virtual ~IGxDataset(void){};
-	virtual wxGISDatasetSPtr GetDataset(bool bCached = true, ITrackCancel* pTrackCancel = NULL) = 0;
-	virtual wxGISEnumDatasetType GetType(void) = 0;
-	virtual int GetSubType(void) = 0;
-};
-
 /** \class IGxObjectContainer catalog.h
     \brief A GxObject with other GxObjects inside interface.
 */
+/*
 class IGxObjectContainer :
 	public IGxObject
 {
@@ -234,25 +239,6 @@ protected:
 	GxObjectArray m_Children;
 };
 
-class IGxObjectFactory
-{
-public:
-	IGxObjectFactory(void) : m_bIsEnabled(true){};
-	virtual ~IGxObjectFactory(void){};
-    //pure virtual
-	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray) = 0;
-    virtual void Serialize(wxXmlNode* const pConfig, bool bStore) = 0;
-    virtual wxString GetClassName(void) = 0;
-    virtual wxString GetName(void) = 0;
-    //
-    virtual bool GetEnabled(void){return m_bIsEnabled;};
-    virtual void SetEnabled(bool bIsEnabled){m_bIsEnabled = bIsEnabled;};
-	virtual void PutCatalogRef(IGxCatalog* pCatalog){m_pCatalog = pCatalog;};
-protected:
-	IGxCatalog* m_pCatalog;
-    bool m_bIsEnabled;
-};
-
 class IGxFile
 {
 public:
@@ -264,57 +250,6 @@ public:
 	//virtual bool Save(void) = 0;
 };
 
-class IGxRootObjectProperties
-{
-public:
-	virtual ~IGxRootObjectProperties(void){};
-	virtual void Init(wxXmlNode* const pConfigNode) = 0;
-	virtual void Serialize(wxXmlNode* pConfigNode) = 0;
-    virtual bool GetEnabled(void){return m_bEnabled;};
-    virtual void SetEnabled(bool bEnabled){m_bEnabled = bEnabled;};
-protected:
-    bool m_bEnabled;
-};
-
-class IGxObjectSort
-{
-public:
-	virtual ~IGxObjectSort(void){};
-	virtual bool IsAlwaysTop(void) = 0;
-	virtual bool IsSortEnabled(void) = 0;
-};
-
-class IGxObjectFilter
-{
-public:
-	virtual ~IGxObjectFilter(void){};
-	virtual bool CanChooseObject( IGxObject* pObject ) = 0;//, esriDoubleClickResult* result
-	virtual bool CanDisplayObject( IGxObject* pObject ) = 0;
-	virtual wxGISEnumSaveObjectResults CanSaveObject( IGxObject* pLocation, wxString sName ) = 0;
-	virtual wxString GetName(void) = 0;
-    virtual wxString GetExt(void) = 0;
-    virtual wxString GetDriver(void) = 0;
-    virtual int GetSubType(void) = 0;
-};
-
-typedef std::vector<IGxObjectFilter*> OBJECTFILTERS, *LPOBJECTFILTERS;
-
-static wxString GetConvName(CPLString szPath)
-{
-    //name conv cp866 if zip
-    wxString name;
-    if( EQUALN(szPath,"/vsizip/",8) )
-	{
-		wxString sCharset(wxT("cp-866"));
-		wxGISAppConfigSPtr pConfig = GetConfig();
-		if(pConfig)
-			sCharset = pConfig->Read(enumGISHKCU, wxString(wxT("wxGISCommon/zip/charset")), sCharset);
-        name = wxString(CPLGetFilename(szPath), wxCSConv(sCharset));
-	}
-    else
-        name = wxString(CPLGetFilename(szPath), wxConvUTF8);
-	return name;
-}
-
+*/
 
 

@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  Cursor class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -21,35 +21,75 @@
 
 #include "wxgis/datasource/cursor.h"
 
+//----------------------------------------------------------------------------
+// wxFeatureCursor
+//----------------------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxFeatureCursor, wxObject);
+
 wxFeatureCursor::wxFeatureCursor(void)
 {
-	Reset();
+    m_refData = new wxFeatureCursorRefData();
 }
 
 wxFeatureCursor::~wxFeatureCursor()
 {
 }
 
+wxObjectRefData *wxFeatureCursor::CreateRefData() const
+{
+    return new wxFeatureCursorRefData();
+}
+
+wxObjectRefData *wxFeatureCursor::CloneRefData(const wxObjectRefData *data) const
+{
+    return new wxFeatureCursorRefData(*(wxFeatureCursorRefData *)data);
+}
+
+bool wxFeatureCursor::IsOk() const
+{ 
+    return m_refData != NULL; 
+}
+
+bool wxFeatureCursor::operator == ( const wxFeatureCursor& obj ) const
+{
+    if (m_refData == obj.m_refData)
+        return true;
+    if (!m_refData || !obj.m_refData)
+        return false;
+
+    return ( *(wxFeatureCursorRefData*)m_refData == *(wxFeatureCursorRefData*)obj.m_refData );
+}
+
 void wxFeatureCursor::Reset()
 {
-	m_Iterator = m_pOIDs.begin();
+    wxFeatureCursorRefData* pRefData = dynamic_cast<wxFeatureCursorRefData*>(m_refData);
+    if( pRefData )
+    {
+        m_Iterator = pRefData->Begin();
+    }
 }
 
-void wxFeatureCursor::Add(OGRFeatureSPtr poFeature)
+void wxFeatureCursor::Add(wxGISFeature Feature)
 {
-	m_pOIDs.push_back(poFeature);
+	((wxFeatureCursorRefData *)m_refData)->m_olFeatures.push_back(Feature);
 }
 
-OGRFeatureSPtr wxFeatureCursor::Next()
+wxGISFeature wxFeatureCursor::Next()
 {
-	if(m_pOIDs.empty())
-		return OGRFeatureSPtr();
-	OGRFeatureSPtr poRet = *m_Iterator;
+	if(((wxFeatureCursorRefData *)m_refData)->m_olFeatures.empty() || m_Iterator == ((wxFeatureCursorRefData *)m_refData)->m_olFeatures.end())
+		return wxGISFeature();
+	wxGISFeature Feature = *m_Iterator;
 	++m_Iterator;
-	return poRet;
+	return Feature;
 }
 
 void wxFeatureCursor::Clear()
 {
-	m_pOIDs.clear();
+	((wxFeatureCursorRefData *)m_refData)->m_olFeatures.clear();
+}
+
+size_t wxFeatureCursor::GetCount() const
+{
+    return ((wxFeatureCursorRefData *)m_refData)->m_olFeatures.size();
 }

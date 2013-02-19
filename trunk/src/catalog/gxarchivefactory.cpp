@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxArchiveFactory class. Create new GxFolder objects
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -23,7 +23,7 @@
 
 #include "wx/filename.h"
 #include "wx/dir.h"
-
+/*
 IMPLEMENT_DYNAMIC_CLASS(wxGxArchiveFactory, wxObject)
 
 wxGxArchiveFactory::wxGxArchiveFactory(void)
@@ -44,7 +44,7 @@ bool wxGxArchiveFactory::GetChildren(CPLString sParentDir, char** &pFileNames, G
         wxString path(pFileNames[i], wxConvUTF8);
 
         CPLString szExt = CPLGetExtension(pFileNames[i]);
-        if(EQUAL(szExt, "zip"))
+        if(wxGISEQUAL(szExt, "zip"))
         {
             CPLString pArchiveName("/vsizip/");
             pArchiveName += pFileNames[i];
@@ -56,7 +56,7 @@ bool wxGxArchiveFactory::GetChildren(CPLString sParentDir, char** &pFileNames, G
             ObjArray.push_back(pGxObj);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
-		//else if(EQUAL(szExt, "gz"))
+		//else if(wxGISEQUAL(szExt, "gz"))
   //      {
   //          CPLString pArchiveName("/vsigzip/");
   //          pArchiveName += pFileNames[i];
@@ -95,3 +95,4 @@ IGxObject* wxGxArchiveFactory::GetGxObject(CPLString szPath, wxString soName)
 	wxGxArchive* pFolder = new wxGxArchive(szPath, soName);
 	return static_cast<IGxObject*>(pFolder);
 }
+*/

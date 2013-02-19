@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  toolbar check menu class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,6 +21,11 @@
 #include "wxgis/framework/toolbarmenu.h"
 #include "wxgis/framework/commandbar.h"
 
+//----------------------------------------------------------------------------
+// wxGISToolBarMenu
+//----------------------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxGISToolBarMenu, wxGISMenu)
 
 BEGIN_EVENT_TABLE(wxGISToolBarMenu, wxMenu)
 	EVT_MENU_RANGE(ID_TOOLBARCMD, ID_TOOLBARCMDMAX, wxGISToolBarMenu::OnCommand)
@@ -43,11 +48,10 @@ void wxGISToolBarMenu::Update(void)
 	m_delitems.clear();
 
 
-	COMMANDBARARRAY* pCommandBars = m_pApp->GetCommandBars();
-
-	for(size_t i = 0; i < pCommandBars->size(); ++i)
+	wxGISCommandBarPtrArray CommandBars = m_pApp->GetCommandBars();
+	for(size_t i = 0; i < CommandBars.GetCount(); ++i)
 	{
-		IGISCommandBar* pCmdBar = pCommandBars->at(i);
+		wxGISCommandBar* pCmdBar = CommandBars[i];
 		if(pCmdBar->GetType() == enumGISCBToolbar)
 		{
 			wxWindow* pWnd = dynamic_cast<wxWindow*>(pCmdBar);
@@ -59,7 +63,7 @@ void wxGISToolBarMenu::Update(void)
 		}
 	}
 	m_delitems.push_back(AppendSeparator());
-	ICommand* pCmd = m_pApp->GetCommand(wxT("wxGISCommonCmd"), 2);
+	wxGISCommand* pCmd = m_pApp->GetCommand(wxT("wxGISCommonCmd"), 2);
 	if(pCmd)
 		m_delitems.push_back(Append(pCmd->GetID(), pCmd->GetCaption(), pCmd->GetTooltip(), (wxItemKind)pCmd->GetKind()));
 }
@@ -67,8 +71,8 @@ void wxGISToolBarMenu::Update(void)
 void wxGISToolBarMenu::OnCommand(wxCommandEvent& event)
 {
 	int pos = event.GetId() - (ID_TOOLBARCMD);
-	COMMANDBARARRAY* pCommandBars = m_pApp->GetCommandBars();
-	wxWindow* pWnd = dynamic_cast<wxWindow*>(pCommandBars->at(pos));
+	wxGISCommandBarPtrArray CommandBars = m_pApp->GetCommandBars();
+	wxWindow* pWnd = dynamic_cast<wxWindow*>(CommandBars[pos]);
 	m_pApp->ShowApplicationWindow(pWnd, !pWnd->IsShown());
 }
 
@@ -111,7 +115,7 @@ void wxGISToolBarMenu::OnClick(void)
 {
 }
 
-bool wxGISToolBarMenu::OnCreate(IFrameApplication* pApp)
+bool wxGISToolBarMenu::OnCreate(wxGISApplicationBase* pApp)
 {
 	m_pApp = dynamic_cast<wxGISApplication*>(pApp);
 	return true;
@@ -126,4 +130,3 @@ unsigned char wxGISToolBarMenu::GetCount(void)
 {
 	return 1;
 }
-

@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxContainerDialog class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxcontdialog.h"
+/*
 #include "wxgis/catalogui/catalogcmd.h"
 #include "wxgis/core/globalfn.h"
 #include "wxgis/framework/application.h"
@@ -36,7 +37,7 @@ wxTreeContainerView::wxTreeContainerView(void) : wxGxTreeView()
 {
 }
 
-wxTreeContainerView::wxTreeContainerView(wxWindow* parent, wxWindowID id, long style) : wxGxTreeView(parent, id, /*wxDefaultPosition, wxDefaultSize, */style)
+wxTreeContainerView::wxTreeContainerView(wxWindow* parent, wxWindowID id, long style) : wxGxTreeView(parent, id, style)
 {
 }
 
@@ -90,6 +91,8 @@ bool wxTreeContainerView::CanChooseObject( IGxObject* pObject )
 ////////////////////////////////////////////////////////////////////////////////
 //// wxGxContainerDialog
 ////////////////////////////////////////////////////////////////////////////////
+IMPLEMENT_CLASS2(wxGxContainerDialog, wxDialog, wxGISApplicationBase)
+
 BEGIN_EVENT_TABLE(wxGxContainerDialog, wxDialog)
     EVT_COMBOBOX(FILTERCOMBO, wxGxContainerDialog::OnFilerSelect)
     EVT_BUTTON(wxID_OK, wxGxContainerDialog::OnOK)
@@ -100,7 +103,7 @@ BEGIN_EVENT_TABLE(wxGxContainerDialog, wxDialog)
 	EVT_UPDATE_UI_RANGE(ID_PLUGINCMD, ID_PLUGINCMDMAX, wxGxContainerDialog::OnCommandUI)
 END_EVENT_TABLE()
 
-wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExternalCatalog, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), m_pCatalog(NULL), m_pTree(NULL), m_bShowCreateButton(false), m_bAllFilters(true), m_nDefaultFilter(0), m_bShowExportFormats(false), m_bOwnFilter(true), m_bOwnShowFilter(true)/*m_bAllowMultiSelect(false)*/
+wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExternalCatalog, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style ), wxGISApplicationBase(), m_pCatalog(NULL), m_pTree(NULL), m_bShowCreateButton(false), m_bAllFilters(true), m_nDefaultFilter(0), m_bShowExportFormats(false), m_bOwnFilter(true), m_bOwnShowFilter(true)
 {
 	this->SetSizeHints( wxSize( 400,300 ), wxDefaultSize );
 
@@ -156,7 +159,7 @@ wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExterna
     wxGISApplication* pApp = dynamic_cast<wxGISApplication*>(GetApplication());
     if(pApp)
     {
-		ICommand *pCmd(NULL);
+		wxGISCommand *pCmd(NULL);
 		wxGISCatalogMainCmd* pwxGISCatalogMainCmd(NULL);
 
 		//create folder
@@ -164,7 +167,7 @@ wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExterna
 		if(pCmd)
 		{
 			pwxGISCatalogMainCmd = new wxGISCatalogMainCmd();
-			pwxGISCatalogMainCmd->OnCreate(static_cast<IFrameApplication*>(this));
+			pwxGISCatalogMainCmd->OnCreate(this);
 			pwxGISCatalogMainCmd->SetID(pCmd->GetID());
 			pwxGISCatalogMainCmd->SetSubType(7);
 			m_CommandArray.push_back(pwxGISCatalogMainCmd);
@@ -175,7 +178,7 @@ wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExterna
 		if(pCmd)
 		{
 			pwxGISCatalogMainCmd = new wxGISCatalogMainCmd();
-			pwxGISCatalogMainCmd->OnCreate(static_cast<IFrameApplication*>(this));
+			pwxGISCatalogMainCmd->OnCreate(this);
 			pwxGISCatalogMainCmd->SetID(pCmd->GetID());
 			pwxGISCatalogMainCmd->SetSubType(8);
 			m_CommandArray.push_back(pwxGISCatalogMainCmd);
@@ -186,7 +189,7 @@ wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExterna
 		if(pCmd)
 		{
 			pwxGISCatalogMainCmd = new wxGISCatalogMainCmd();
-			pwxGISCatalogMainCmd->OnCreate(static_cast<IFrameApplication*>(this));
+			pwxGISCatalogMainCmd->OnCreate(this);
 			pwxGISCatalogMainCmd->SetID(pCmd->GetID());
 			pwxGISCatalogMainCmd->SetSubType(9);
 			m_CommandArray.push_back(pwxGISCatalogMainCmd);
@@ -196,11 +199,6 @@ wxGxContainerDialog::wxGxContainerDialog( wxWindow* parent, IGxCatalog* pExterna
 		if(pApp->GetGISAcceleratorTable())
 			SetAcceleratorTable(pApp->GetGISAcceleratorTable()->GetAcceleratorTable());
 	}
-
-    //wxGISCatalogMainCmd* pwxGISCatalogMainCmd = new wxGISCatalogMainCmd();
-    //pwxGISCatalogMainCmd->OnCreate(static_cast<IFrameApplication*>(this));
-    //pwxGISCatalogMainCmd->SetSubType(7);//create folder
-    //m_pCreateCmd = ICommandSPtr(static_cast<ICommand*>(pwxGISCatalogMainCmd));
 }
 
 wxGxContainerDialog::~wxGxContainerDialog()
@@ -230,41 +228,20 @@ void wxGxContainerDialog::OnCommand(wxCommandEvent& event)
 	Command(GetCommand(event.GetId()));
 }
 
-void wxGxContainerDialog::Command(ICommand* pCmd)
+void wxGxContainerDialog::Command(wxGISCommand* pCmd)
 {
 	pCmd->OnClick();
 }
 
 void wxGxContainerDialog::OnCommandUI(wxUpdateUIEvent& event)
 {
-	ICommand* pCmd = GetCommand(event.GetId());
+	wxGISCommand* pCmd = GetCommand(event.GetId());
 	if(pCmd)
 	{
 		if(pCmd->GetKind() == enumGISCommandCheck)
 			event.Check(pCmd->GetChecked());
 		event.Enable(pCmd->GetEnabled());
     }
-}
-
-ICommand* wxGxContainerDialog::GetCommand(long CmdID)
-{
-	for(size_t i = 0; i < m_CommandArray.size(); ++i)
-		if(m_CommandArray[i]->GetID() == CmdID)
-			return m_CommandArray[i];
-	return NULL;
-}
-
-ICommand* wxGxContainerDialog::GetCommand(wxString sCmdName, unsigned char nCmdSubType)
-{
-	for(size_t i = 0; i < m_CommandArray.size(); ++i)
-	{
-        wxObject* pObj = dynamic_cast<wxObject*>(m_CommandArray[i]);
-		wxClassInfo * pInfo = pObj->GetClassInfo();
-		wxString sCommandName = pInfo->GetClassName();
-		if(sCommandName == sCmdName && m_CommandArray[i]->GetSubType() == nCmdSubType)
-			return m_CommandArray[i];
-	}
-	return NULL;
 }
 
 void wxGxContainerDialog::SetButtonCaption(wxString sOkBtLabel)
@@ -327,7 +304,7 @@ void wxGxContainerDialog::OnInit()
     m_pTree = new wxTreeContainerView( this, TREECTRLID, wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS | wxTR_NO_LINES | wxTR_SINGLE | wxTR_EDIT_LABELS );
 	m_pTree->Activate(this, NULL);//TODO !!!!
 
-	RegisterChildWindow(static_cast<wxWindow*>(m_pTree));
+    RegisterChildWindow(m_pTree->GetId());
 
 	bMainSizer->Insert(1, m_pTree, 1, wxALL|wxEXPAND, 8 );
 
@@ -361,9 +338,9 @@ void wxGxContainerDialog::OnInit()
 	{
 		IGxObject* pObj = dynamic_cast<IGxObject*>(m_pCatalog);
 		wxString sLastPath;
-		wxGISAppConfigSPtr pConfig = GetConfig();
-		if(pConfig)
-			sLastPath = pConfig->Read(enumGISHKCU, GetAppName() + wxString(wxT("/lastpath/path")), pObj->GetName());
+		wxGISAppConfig oConfig = GetConfig();
+		if(oConfig.IsOk())
+			sLastPath = oConfig.Read(enumGISHKCU, GetAppName() + wxString(wxT("/lastpath/path")), pObj->GetName());
 		else
 			sLastPath = pObj->GetName();
 		m_pCatalog->SetLocation(sLastPath);
@@ -376,15 +353,15 @@ void wxGxContainerDialog::OnInit()
 
 void wxGxContainerDialog::SerializeFramePos(bool bSave)
 {
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	if(!pConfig)
+	wxGISAppConfig oConfig = GetConfig();
+	if(!oConfig.IsOk())
         return;
 
 	if(bSave)
 	{
 		if( IsMaximized() )
 		{
-			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/maxi")), true);
+			oConfig.Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/maxi")), true);
 		}
 		else
 		{
@@ -392,23 +369,23 @@ void wxGxContainerDialog::SerializeFramePos(bool bSave)
 			GetClientSize(&w, &h);
 			GetPosition(&x, &y);
 
-			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/maxi")), false);
-			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/width")), w);
-			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/height")), h);
-			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/xpos")), x);
-			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/ypos")), y);
+			oConfig.Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/maxi")), false);
+			oConfig.Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/width")), w);
+			oConfig.Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/height")), h);
+			oConfig.Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/xpos")), x);
+			oConfig.Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/ypos")), y);
 		}
 	}
 	else
 	{
 		//load
-		bool bMaxi = pConfig->ReadBool(enumGISHKCU, GetAppName() + wxString(wxT("/frame/maxi")), false);
+		bool bMaxi = oConfig.ReadBool(enumGISHKCU, GetAppName() + wxString(wxT("/frame/maxi")), false);
 		if(!bMaxi)
 		{
-			int x = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/xpos")), 50);
-			int y = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/ypos")), 50);
-			int w = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/width")), 450);
-			int h = pConfig->ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/height")), 650);
+			int x = oConfig.ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/xpos")), 50);
+			int y = oConfig.ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/ypos")), 50);
+			int w = oConfig.ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/width")), 450);
+			int h = oConfig.ReadInt(enumGISHKCU, GetAppName() + wxString(wxT("/frame/height")), 650);
 
 			Move(x, y);
 			SetClientSize(w, h);
@@ -490,9 +467,9 @@ void wxGxContainerDialog::OnOK(wxCommandEvent& event)
             m_ObjectArray.push_back(pGxObject.get());
         }
 
-		wxGISAppConfigSPtr pConfig = GetConfig();
-		if(pConfig)
-			pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/lastpath/path")), GetPath());
+		wxGISAppConfig oConfig = GetConfig();
+		if(oConfig.IsOk())
+			oConfig.Write(enumGISHKCU, GetAppName() + wxString(wxT("/lastpath/path")), GetPath());
 
         if ( IsModal() )
             EndModal(m_nRetCode);
@@ -521,3 +498,4 @@ void wxGxContainerDialog::OnCreateUI(wxUpdateUIEvent& event)
     }
     event.Enable(m_CommandArray[0]->GetEnabled());
 }
+*/

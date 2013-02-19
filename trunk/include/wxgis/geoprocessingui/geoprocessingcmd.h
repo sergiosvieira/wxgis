@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  Geoprocessing Main Commands class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009  Bishop
 *
@@ -20,19 +20,19 @@
  ****************************************************************************/
 
 #pragma once
-
+/*
 #include "wxgis/framework/framework.h"
 #include "wxgis/datasource/featuredataset.h"
 
 class WXDLLIMPEXP_GIS_GPU wxGISGeoprocessingCmd :
-    public ICommand
+    public wxGISCommand
 {
     DECLARE_DYNAMIC_CLASS(wxGISGeoprocessingCmd)
     
 public:
 	wxGISGeoprocessingCmd(void);
 	virtual ~wxGISGeoprocessingCmd(void);
-	//ICommand
+	//wxGISCommand
 	virtual wxIcon GetBitmap(void);
 	virtual wxString GetCaption(void);
 	virtual wxString GetCategory(void);
@@ -50,3 +50,4 @@ protected:
     wxWindow* m_pToolboxView;
 	wxIcon m_IconGPMenu, m_IconToolview;
 };
+*/

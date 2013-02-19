@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  tool dialog class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -18,7 +18,7 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-
+/*
 #include "wxgis/geoprocessingui/gptooldlg.h"
 #include "wxgis/core/globalfn.h"
 
@@ -58,9 +58,9 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
 	wxBoxSizer* bMainSizer = new wxBoxSizer( wxVERTICAL );
 
 	m_splitter = new wxSplitterWindow( this, SASHCTRLID, wxDefaultPosition, wxDefaultSize, 0 );
-	m_splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISGPToolDlg::m_splitterOnIdle ), NULL, this );
+	m_splitter->Bind Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISGPToolDlg::m_splitterOnIdle ), NULL, this );
 
-	m_toolpanel = new wxPanel( m_splitter, wxID_ANY, wxDefaultPosition, wxSize(m_DataWidth, size.y)/*wxDefaultSize*/, wxTAB_TRAVERSAL );
+	m_toolpanel = new wxPanel( m_splitter, wxID_ANY, wxDefaultPosition, wxSize(m_DataWidth, size.y), wxTAB_TRAVERSAL );//wxDefaultSize
 	m_bSizer2 = new wxBoxSizer( wxVERTICAL );
 	m_pInfoBar = new wxInfoBar(m_toolpanel);
     m_pInfoBar->SetOwnBackgroundColour(0xc8ffff);
@@ -195,7 +195,7 @@ wxGISGPToolDlg::wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pToo
 	//m_splitter1->SplitVertically(m_commandbarlist, m_buttonslist, 100);
 
 
-	m_splitter->SplitVertically( m_toolpanel, m_htmlWin/*m_helppanel*/, m_DataWidth );
+	m_splitter->SplitVertically( m_toolpanel, m_htmlWin, m_DataWidth );//m_helppanel
 
 	bMainSizer->Add( m_splitter, 1, wxEXPAND, 5 );
 
@@ -374,15 +374,15 @@ void wxGISGPToolDlg::OnOkUI(wxUpdateUIEvent& event)
 
 void wxGISGPToolDlg::SerializeFramePos(bool bSave)
 {
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	if(!pConfig)
+	wxGISAppConfig oConfig = GetConfig();
+	if(!oConfig.IsOk())
         return;
 
 	if(bSave)
 	{
 		if( IsMaximized() )
 		{
-			pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/maxi")), true);
+			oConfig.Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/maxi")), true);
 		}
 		else
 		{
@@ -390,23 +390,23 @@ void wxGISGPToolDlg::SerializeFramePos(bool bSave)
 			GetClientSize(&w, &h);
 			GetPosition(&x, &y);
 
-			pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/maxi")), false);
-			pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/width")), w);
-			pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/height")), h);
-			pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/xpos")), x);
-			pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/ypos")), y);
+			oConfig.Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/maxi")), false);
+			oConfig.Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/width")), w);
+			oConfig.Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/height")), h);
+			oConfig.Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/xpos")), x);
+			oConfig.Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/ypos")), y);
 		}
 	}
 	else
 	{
 		//load
-		bool bMaxi = pConfig->ReadBool(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/maxi")), false);
+		bool bMaxi = oConfig.ReadBool(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/maxi")), false);
 		if(!bMaxi)
 		{
-			int x = pConfig->ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/xpos")), 50);
-			int y = pConfig->ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/ypos")), 50);
-			int w = pConfig->ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/width")), 450);
-			int h = pConfig->ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/height")), 650);
+			int x = oConfig.ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/xpos")), 50);
+			int y = oConfig.ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/ypos")), 50);
+			int w = oConfig.ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/width")), 450);
+			int h = oConfig.ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tooldlg/height")), 650);
 			
 			Move(x, y);
 			SetClientSize(w, h);
@@ -417,3 +417,4 @@ void wxGISGPToolDlg::SerializeFramePos(bool bSave)
 		}
 	}
 }
+*/

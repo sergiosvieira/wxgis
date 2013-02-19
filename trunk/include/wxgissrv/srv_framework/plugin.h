@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-
+/*
 #include "wxgissrv/srv_framework/framework.h"
 
 #include "wx/dir.h"
@@ -47,7 +47,7 @@
 	//do some other work
 	Server.Stop();
 */
-
+/*
 class WXDLLIMPEXP_GIS_FRW wxGISWorkPlugin
 {
 public:
@@ -70,3 +70,4 @@ protected:
     wxGISAppConfig* m_pConfig;
     LIBMAP m_LibMap;
 };
+*/

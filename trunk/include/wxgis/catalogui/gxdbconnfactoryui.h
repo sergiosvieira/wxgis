@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDBConnectionFactoryUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -26,6 +26,7 @@
 /** \class wxGxDBConnectionFactoryUI gxdbconnfactoryui.h
     \brief A DataBase connection (*.xconn) GxObjectUI factory.
 */
+/*
 class wxGxDBConnectionFactoryUI :
 	public wxGxDBConnectionFactory
 {
@@ -41,4 +42,5 @@ protected:
     wxIcon m_LargeIconFeatureClass, m_SmallIconFeatureClass;
     wxIcon m_LargeIconTable, m_SmallIconTable;
 };
+*/
 

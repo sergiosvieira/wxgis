@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISTableView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/cartoui/tableview.h"
-
+/*
 #include "../../art/full_arrow.xpm"
 #include "../../art/arrow.xpm"
 #include "../../art/small_arrow.xpm"
@@ -326,3 +326,4 @@ void wxGISTableView::OnSetPos(wxCommandEvent& event)
 	m_grid->SetGridCursor(pos - 1,0);
 	m_grid->MakeCellVisible(pos - 1,0);
 }
+*/

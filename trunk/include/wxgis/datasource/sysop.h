@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  system operations.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,21 +21,22 @@
 #pragma once
 
 #include "wxgis/datasource/datasource.h"
+#include "wxgis/datasource/gdalinh.h"
 
-bool WXDLLIMPEXP_GIS_DS DeleteDir(CPLString sPath);
-bool WXDLLIMPEXP_GIS_DS CreateDir(CPLString sPath, long mode = 0777); 
-bool WXDLLIMPEXP_GIS_DS DeleteFile(CPLString sPath);
-bool WXDLLIMPEXP_GIS_DS RenameFile(CPLString sOldPath, CPLString sNewPath);
-bool WXDLLIMPEXP_GIS_DS CopyFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCancel);
-bool WXDLLIMPEXP_GIS_DS MoveFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCancel);
-wxFontEncoding WXDLLIMPEXP_GIS_DS GetEncodingFromCpg(CPLString sPath);
+bool WXDLLIMPEXP_GIS_DS DeleteDir(const CPLString &sPath, ITrackCancel* const pTrackCancel = NULL);
+bool WXDLLIMPEXP_GIS_DS CreateDir(const CPLString &sPath, long mode = 0777, ITrackCancel* const pTrackCancel = NULL); 
+bool WXDLLIMPEXP_GIS_DS DeleteFile(const CPLString &sPath, ITrackCancel* const pTrackCancel = NULL);
+bool WXDLLIMPEXP_GIS_DS RenameFile(const CPLString &sOldPath, const CPLString &sNewPath, ITrackCancel* const pTrackCancel = NULL);
+bool WXDLLIMPEXP_GIS_DS CopyFile(const CPLString &sDestPath, const CPLString &sSrcPath, ITrackCancel* const pTrackCance = NULL);
+bool WXDLLIMPEXP_GIS_DS MoveFile(const CPLString &sDestPath, const CPLString &sSrcPath, ITrackCancel* const pTrackCancel = NULL);
+wxFontEncoding WXDLLIMPEXP_GIS_DS GetEncodingFromCpg(const CPLString &sPath);
 //CPLString WXDLLIMPEXP_GIS_DS GetEncodingName(wxFontEncoding eEncoding);
-wxString WXDLLIMPEXP_GIS_DS ClearExt(wxString sPath);
-bool WXDLLIMPEXP_GIS_DS IsFileHidden(CPLString sPath);
-wxString  WXDLLIMPEXP_GIS_DS CheckUniqName(CPLString sPath, wxString sName, wxString sExt, int nCounter = 0);
-CPLString WXDLLIMPEXP_GIS_DS CheckUniqPath(CPLString sPath, CPLString sName, int nCounter = 0);
-CPLString WXDLLIMPEXP_GIS_DS GetUniqPath(CPLString szOriginalFullPath, CPLString szNewPath, CPLString szNewName);
+wxString WXDLLIMPEXP_GIS_DS ClearExt(const wxString &sPath);
+bool WXDLLIMPEXP_GIS_DS IsFileHidden(const CPLString &sPath);
+wxString  WXDLLIMPEXP_GIS_DS CheckUniqName(const CPLString &sPath, const wxString &sName, const wxString &sExt, int nCounter = 0);
+CPLString WXDLLIMPEXP_GIS_DS CheckUniqPath(const CPLString &sPath, const CPLString &sName, const CPLString &sAdd = "_copy", int nCounter = 0);
+CPLString WXDLLIMPEXP_GIS_DS GetUniqPath(const CPLString &szOriginalFullPath, const CPLString &szNewPath, const CPLString &szNewName);
 CPLString WXDLLIMPEXP_GIS_DS Transliterate(const char* str);
-CPLString WXDLLIMPEXP_GIS_DS GetExtension(CPLString sPath, CPLString sName = "");
-
+CPLString WXDLLIMPEXP_GIS_DS GetExtension(const CPLString &sPath, const CPLString &sName = "");
+wxString WXDLLIMPEXP_GIS_DS GetConvName(const CPLString &szPath, bool bIsPath = true);
 

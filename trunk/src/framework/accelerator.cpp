@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  GIS application accelerator table header.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,16 +21,16 @@
 #include "wxgis/framework/accelerator.h"
 #include "wx/tokenzr.h"
 
-wxGISAcceleratorTable::wxGISAcceleratorTable(IFrameApplication* pApp) : bHasChanges(true)
+wxGISAcceleratorTable::wxGISAcceleratorTable(wxGISApplicationBase* pApp) : bHasChanges(true)
 {
 	m_AccelEntryArray.reserve(20);
 
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	if(!pConfig)
+	wxGISAppConfig oConfig = GetConfig();
+    if(!oConfig.IsOk())
 		return;
 
-	wxXmlNode* pAcceleratorsNodeCU = pConfig->GetConfigNode(enumGISHKCU, pApp->GetAppName() + wxString(wxT("/accelerators")));
-	wxXmlNode* pAcceleratorsNodeLM = pConfig->GetConfigNode(enumGISHKLM, pApp->GetAppName() + wxString(wxT("/accelerators")));
+	wxXmlNode* pAcceleratorsNodeCU = oConfig.GetConfigNode(enumGISHKCU, pApp->GetAppName() + wxString(wxT("/accelerators")));
+	wxXmlNode* pAcceleratorsNodeLM = oConfig.GetConfigNode(enumGISHKLM, pApp->GetAppName() + wxString(wxT("/accelerators")));
 	//merge two tables
 	m_pApp = pApp;
 	if(!pApp)
@@ -46,7 +46,7 @@ wxGISAcceleratorTable::wxGISAcceleratorTable(IFrameApplication* pApp) : bHasChan
 		{
 			wxString sCmdName = child->GetAttribute(wxT("cmd_name"), NON);
 			unsigned char nSubtype = wxAtoi(child->GetAttribute(wxT("subtype"), wxT("0")));
-			ICommand* pCmd = m_pApp->GetCommand(sCmdName, nSubtype);
+			wxGISCommand* pCmd = m_pApp->GetCommand(sCmdName, nSubtype);
 			if(pCmd)
 			{
 				wxString sFlags = child->GetAttribute(wxT("flags"), wxT("NORMAL"));
@@ -65,7 +65,7 @@ wxGISAcceleratorTable::wxGISAcceleratorTable(IFrameApplication* pApp) : bHasChan
 		{
 			wxString sCmdName = child->GetAttribute(wxT("cmd_name"), NON);
 			unsigned char nSubtype = wxAtoi(child->GetAttribute(wxT("subtype"), wxT("0")));
-			ICommand* pCmd = m_pApp->GetCommand(sCmdName, nSubtype);
+			wxGISCommand* pCmd = m_pApp->GetCommand(sCmdName, nSubtype);
 			if(pCmd)
 			{
 				wxString sFlags = child->GetAttribute(wxT("flags"), wxT("NORMAL"));
@@ -164,18 +164,18 @@ wxString wxGISAcceleratorTable::GetText(int cmd)
 
 void wxGISAcceleratorTable::Store(void)
 {
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	if(!pConfig)
+	wxGISAppConfig oConfig = GetConfig();
+    if(!oConfig.IsOk())
 		return;
 
-	wxXmlNode* pAcceleratorsNodeCU = pConfig->GetConfigNode(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/accelerators")));
+	wxXmlNode* pAcceleratorsNodeCU = oConfig.GetConfigNode(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/accelerators")));
 	if(pAcceleratorsNodeCU)
-		pConfig->DeleteNodeChildren(pAcceleratorsNodeCU);
+		oConfig.DeleteNodeChildren(pAcceleratorsNodeCU);
 	else
-		pAcceleratorsNodeCU = pConfig->CreateConfigNode(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/accelerators")));
+		pAcceleratorsNodeCU = oConfig.CreateConfigNode(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/accelerators")));
 	for(size_t i = 0; i < m_AccelEntryArray.size(); ++i)
 	{
-		ICommand* pCmd = m_pApp->GetCommand(m_AccelEntryArray[i].GetCommand());
+		wxGISCommand* pCmd = m_pApp->GetCommand(m_AccelEntryArray[i].GetCommand());
 		wxObject* pObj = dynamic_cast<wxObject*>(pCmd);
 		if(pObj)
 		{

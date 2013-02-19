@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-
+/*
 #include "wxgissrv/srv_framework/framework.h"
 
 #define WXNETVER 2
@@ -57,5 +57,5 @@ protected:
 };
 //
 ////std::priority_queue<Message, std::deque<Message> > pq;
-
+*/
 

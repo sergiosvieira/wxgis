@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxArchive classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009,2011 Bishop
 *
@@ -20,7 +20,7 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/catalog/gxfolder.h"
-
+/*
 /////////////////////////////////////////////////////////////////////////
 // wxGxArchiveFolder
 /////////////////////////////////////////////////////////////////////////
@@ -61,5 +61,5 @@ public:
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
 };
-
+*/
 

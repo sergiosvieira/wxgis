@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxPrjFactoryUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxprjfactoryui.h"
+/*
 #include "wxgis/catalogui/gxfileui.h"
 
 #include "../../art/sr_16.xpm"
@@ -42,3 +43,4 @@ IGxObject* wxGxPrjFactoryUI::GetGxObject(CPLString szPath, wxString soName, wxGI
     wxGxPrjFileUI* pFile = new wxGxPrjFileUI(szPath, soName, nType, m_LargePRJIcon, m_SmallPRJIcon);
     return dynamic_cast<IGxObject*>(pFile);
 }
+*/

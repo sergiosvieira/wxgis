@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  pixel field stretch classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -47,6 +47,7 @@ enum wxGISEnumRasterStretch
 
 	This is more close to compress because input pixels range may be from -100000 to 100000 and output - in 0 - 255 range
 */
+
 class wxGISStretch
 {
 public:

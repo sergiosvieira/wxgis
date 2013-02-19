@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxContentView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-
 #pragma once
+
 #include "wxgis/catalogui/gxview.h"
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/newmenu.h"
@@ -29,16 +29,24 @@
 #include "wx/listctrl.h"
 #include "wx/imaglist.h"
 
+class WXDLLIMPEXP_GIS_CLU wxGxApplication;
+
+#define LISTSTYLE (wxLC_REPORT | wxBORDER_NONE | wxLC_EDIT_LABELS |wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE) //wxLC_LIST
+
 //TODO: Fix mouse selection dragging linux
 
+/** \struct wxGxToolBarArt gxcontentview.h
+    \brief The struct needed for sort data in content view.
+*/
 typedef struct _sortdata
 {
     bool bSortAsc;
     short currentSortCol;
-    wxGxCatalogUI* pCatalog;
 } SORTDATA, *LPSORTDATA;
 
-
+/** \class wxGxContentView gxcontentview.h
+    \brief The catalog content view class.
+*/
 class WXDLLIMPEXP_GIS_CLU wxGxContentView :
 	public wxListCtrl,
 	public wxGxView,
@@ -48,30 +56,31 @@ class WXDLLIMPEXP_GIS_CLU wxGxContentView :
     DECLARE_DYNAMIC_CLASS(wxGxContentView)
 public:
     wxGxContentView(void);
-	wxGxContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxLC_LIST | wxBORDER_NONE | wxLC_EDIT_LABELS |wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE);//
+	wxGxContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = LISTSTYLE);
 	virtual ~wxGxContentView(void);
 	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
-	virtual void AddObject(IGxObject* pObject);
+	virtual void AddObject(wxGxObject* const pObject);
 	virtual void ResetContents(void);
-    virtual IGxObject* const GetParentGxObject(void);
+    virtual wxGxObject* const GetParentGxObject(void) const;
     virtual void SelectAll(void);
     virtual bool Show(bool show = true);
 	virtual void RefreshAll(void);
-//IGxView
-    virtual bool Create(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxLC_LIST | wxBORDER_NONE | wxLC_EDIT_LABELS | wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE, const wxString& name = wxT("ContentView"));
-	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
+// wxGxView
+    virtual bool Create(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = LISTSTYLE, const wxString& name = wxT("ContentView"));
+	virtual bool Activate(IApplication* const pApplication, wxXmlNode* const pConf);
 	virtual void Deactivate(void);
-	virtual bool Applies(IGxSelection* Selection);
+	virtual bool Applies(wxGxSelection* const pSelection);
     virtual void BeginRename(long nObjectID = wxNOT_FOUND);
 // IGxContentsView
 	virtual void SetStyle(wxGISEnumContentsViewStyle style);
     virtual wxGISEnumContentsViewStyle GetStyle(void){return m_current_style;};
     virtual bool CanSetStyle(void){return true;};
-//IGxDropTarget
+// IViewDropTarget
     virtual wxDragResult OnDragOver(wxCoord x, wxCoord y, wxDragResult def);
-    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames);
+    virtual bool OnDropObjects(wxCoord x, wxCoord y, const wxArrayString& GxObjects);
     virtual void OnLeave();
-//events
+    virtual bool CanPaste(void);
+// events
 	virtual void OnColClick(wxListEvent& event);
     virtual void OnContextMenu(wxContextMenuEvent& event);
 	virtual void ShowContextMenu(const wxPoint& pos);
@@ -102,23 +111,29 @@ public:
 	} ICONDATA;
 protected:
     int GetIconPos(wxIcon icon_small, wxIcon icon_large);
+    virtual void InitColumns(void);
 protected:
 	bool m_bSortAsc;
 	short m_currentSortCol;
 	wxGISEnumContentsViewStyle m_current_style;
+    wxArrayInt m_anOrder, m_anWidth;
 	wxImageList m_ImageListSmall, m_ImageListLarge;
-	wxGISConnectionPointContainer* m_pConnectionPointCatalog;
+
 	long m_ConnectionPointCatalogCookie;
-	IGxSelection* m_pSelection;
+
+	wxGxSelection* m_pSelection;
     wxGxCatalogUI* m_pCatalog;
-    ICommand* m_pDeleteCmd;
+    wxGISApplicationBase* m_pApp;
+
+    wxGISCommand* m_pDeleteCmd;
+
 	wxGISNewMenu* m_pNewMenu;
 	long m_nParentGxObjectID;
 	bool m_bDragging;
-    std::vector<ICONDATA> m_IconsArray;
+    wxVector<ICONDATA> m_IconsArray;
     wxCriticalSection m_CritSect;
     wxCriticalSection m_CritSectCont;
     long m_HighLightItem;
-
+private:
     DECLARE_EVENT_TABLE()
 };

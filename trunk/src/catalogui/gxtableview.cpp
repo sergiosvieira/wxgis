@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISTableView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxtableview.h"
+/*
 #include "wxgis/datasource/featuredataset.h"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxTableView, wxGISTableView)
@@ -52,7 +53,7 @@ bool wxGxTableView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
     return true;
 }
 
-bool wxGxTableView::Activate(IFrameApplication* application, wxXmlNode* pConf)
+bool wxGxTableView::Activate(wxGISApplicationBase* application, wxXmlNode* pConf)
 {
 	if(!wxGxView::Activate(application, pConf))
 		return false;
@@ -71,7 +72,7 @@ void wxGxTableView::Deactivate(void)
 	wxGxView::Deactivate();
 }
 
-bool wxGxTableView::Applies(IGxSelection* Selection)
+bool wxGxTableView::Applies(wxGxSelection* const pSelection)
 {
 	if(Selection == NULL)
 		return false;
@@ -163,3 +164,4 @@ void wxGxTableView::OnSelectionChanged(wxGxSelectionEvent& event)
 
 	wxWindow::Refresh();
 }
+*/

@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxMLFactory class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -22,7 +22,7 @@
 #include "wxgis/catalog/gxmlfactory.h"
 #include "wxgis/catalog/gxdataset.h"
 #include "wxgis/catalog/gxkmldataset.h"
-
+/*
 IMPLEMENT_DYNAMIC_CLASS(wxGxMLFactory, wxObject)
 
 wxGxMLFactory::wxGxMLFactory(void)
@@ -39,22 +39,22 @@ bool wxGxMLFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObje
     {
         IGxObject* pGxObj = NULL;
         CPLString szExt = CPLGetExtension(pFileNames[i]);
-        if(EQUAL(szExt, "kml"))
+        if(wxGISEQUAL(szExt, "kml"))
         {
 			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumVecKML);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
-        else if(EQUAL(szExt, "kmz"))
+        else if(wxGISEQUAL(szExt, "kmz"))
         {
 			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumVecKMZ);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
-        else if(EQUAL(szExt, "dxf"))
+        else if(wxGISEQUAL(szExt, "dxf"))
         {
 			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumVecDXF);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
-        else if(EQUAL(szExt, "gml"))
+        else if(wxGISEQUAL(szExt, "gml"))
         {
 			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumVecGML);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
@@ -121,3 +121,4 @@ IGxObject* wxGxMLFactory::GetGxDataset(CPLString path, wxString name, wxGISEnumV
     }
     return NULL;
 }
+*/

@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  wxGISDisplay class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "wxgis/display/gisdisplay.h"
 #include "wxgis/datasource/vectorop.h"
-#include "wxgis/display/displaytransformation.h"
+#include "wxgis/display/displayop.h"
 
 #include <wx/graphics.h>
 #include <wx/dcgraph.h>
@@ -229,24 +229,24 @@ void wxGISDisplay::WheelingDraw(double dZoom, wxDC* pDC)
 	}
 	else if(dZoom > 1) // zoom in
 	{
-		cairo_scale(cr, dZoom, dZoom);
-
 		double dDCXDelta = m_dFrameCenterX / dZoom;
 		double dDCYDelta = m_dFrameCenterY / dZoom;
 		double dOrigin_X = m_dCacheCenterX - dDCXDelta;
 		double dOrigin_Y = m_dCacheCenterY - dDCYDelta;
 
+		cairo_scale(cr, dZoom, dZoom);
+
 		cairo_set_source_surface (cr, m_saLayerCaches[m_nLastCacheID].pCairoSurface, -dOrigin_X, -dOrigin_Y);
 	}
 	else //zoom out
 	{
-		cairo_set_source_rgb(cr, m_stBackGroudnColour.dRed, m_stBackGroudnColour.dGreen, m_stBackGroudnColour.dBlue);
-		cairo_paint(cr);
-
 		double dDCXDelta = m_dFrameCenterX * dZoom;
 		double dDCYDelta = m_dFrameCenterY * dZoom;
 		double dOrigin_X = m_dFrameCenterX - dDCXDelta;
 		double dOrigin_Y = m_dFrameCenterY - dDCYDelta;
+
+		//cairo_set_source_rgb(cr, m_stBackGroudnColour.dRed, m_stBackGroudnColour.dGreen, m_stBackGroudnColour.dBlue);
+		//cairo_paint(cr);
 
 		cairo_translate (cr, dOrigin_X, dOrigin_Y);
 		cairo_scale(cr, dZoom, dZoom);

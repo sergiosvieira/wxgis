@@ -20,13 +20,13 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-
+/*
 #include "wxgissrv/srv_framework/framework.h"
 #include "wxgis/networking/message.h"
 
 /** \class IServerAuthPlugin auth.h
     \brief The base interface class for auth plugins.
-*/
+*//*
 class IServerAuthPlugin
 {
 public:
@@ -37,7 +37,7 @@ public:
 
 /** \class wxGISAuthService auth.h
     \brief A Server side Auth Service.
-*/
+*//*
 class WXDLLIMPEXP_GIS_FRW wxGISAuthService : 
 	public IService,
 	public INetMessageReceiver
@@ -55,4 +55,4 @@ protected:
     IServerApplication* m_pApp;
 	std::map<short, IServerAuthPlugin*> m_AuthPluginMap;// priority | plugin
 };
-
+*/

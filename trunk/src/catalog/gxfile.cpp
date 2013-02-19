@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxFile classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxfile.h"
-#include "wxgis/datasource/sysop.h"
+/*#include "wxgis/datasource/sysop.h"
 #include "cpl_vsi.h"
 
 
@@ -206,4 +206,4 @@ wxGxTextFile::~wxGxTextFile(void)
 {
 }
 
-
+*/

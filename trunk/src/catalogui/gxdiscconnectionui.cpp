@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDiscConnectionUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,11 +19,14 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxdiscconnectionui.h"
-#include "wxgis/framework/progressdlg.h"
-#include "wxgis/core/globalfn.h"
+#include "wxgis/catalog/gxcatalog.h"
 
-wxGxDiscConnectionUI::wxGxDiscConnectionUI(CPLString Path, wxString Name, wxIcon SmallIco, wxIcon LargeIco, wxIcon SmallIcoDsbl, wxIcon LargeIcoDsbl) : wxGxDiscConnection(Path, Name)
+//#include "wxgis/framework/progressdlg.h"
+//#include "wxgis/core/globalfn.h"
+
+wxGxDiscConnectionUI::wxGxDiscConnectionUI(wxGxObject *oParent, const wxString &soXmlConfPath, int nXmlId, const wxString &soName, const CPLString &soPath, const wxIcon &SmallIco, const wxIcon &LargeIco, const wxIcon &SmallIcoDsbl, const wxIcon &LargeIcoDsbl) : wxGxDiscConnection(oParent, soXmlConfPath, nXmlId, soName, soPath), wxThreadHelper()
 {
+    m_nIsReadable = wxNOT_FOUND;
 	m_Conn16 = SmallIco;
 	m_Conn48 = LargeIco;
 	m_ConnDsbld16 = SmallIcoDsbl;
@@ -32,12 +35,68 @@ wxGxDiscConnectionUI::wxGxDiscConnectionUI(CPLString Path, wxString Name, wxIcon
 
 wxGxDiscConnectionUI::~wxGxDiscConnectionUI(void)
 {
+    if (GetThread() && GetThread()->IsRunning())
+        GetThread()->Kill();
+}
+
+bool wxGxDiscConnectionUI::CheckReadable(void)
+{
+    if(m_nIsReadable == wxNOT_FOUND)
+    {
+        m_nIsReadable = 0;
+        CreateAndRunCheckThread();
+    }
+    return m_nIsReadable == 0 ? false: true;
+}
+
+//thread to check if remote folder is readable
+//before exit we assume that folder is not readable
+wxThread::ExitCode wxGxDiscConnectionUI::Entry()
+{
+    bool bIsOk = wxIsReadable(wxString(m_sPath, wxConvUTF8));
+    m_nIsReadable = bIsOk == true ? 1 : 0;
+
+    wxGIS_GXCATALOG_EVENT(ObjectChanged);
+
+    return (wxThread::ExitCode)0;
+}
+
+bool wxGxDiscConnectionUI::HasChildren(void)
+{
+    bool bHasChildren = wxGxDiscConnection::HasChildren();
+    if(bHasChildren && m_nIsReadable < 1)
+    {
+        m_nIsReadable = 1;
+        wxGIS_GXCATALOG_EVENT(ObjectChanged);
+    }
+    return bHasChildren;
+}
+
+void wxGxDiscConnectionUI::Refresh(void)
+{
+    m_nIsReadable = wxNOT_FOUND;
+    wxGxDiscConnection::Refresh();
+}
+
+bool wxGxDiscConnectionUI::CreateAndRunCheckThread(void)
+{
+    if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
+    {
+        wxLogError(_("Could not create the check thread!"));
+        return false;
+    }
+
+    if (GetThread()->Run() != wxTHREAD_NO_ERROR)
+    {
+        wxLogError(_("Could not run the check thread!"));
+        return false;
+    }
+    return true;
 }
 
 wxIcon wxGxDiscConnectionUI::GetLargeImage(void)
 {
-    bool bIsOk = wxIsReadable(wxString(m_sPath, wxConvUTF8));
-	if(bIsOk)
+	if(CheckReadable())
 		return m_Conn48;
 	else
 		return m_ConnDsbld48;
@@ -45,8 +104,7 @@ wxIcon wxGxDiscConnectionUI::GetLargeImage(void)
 
 wxIcon wxGxDiscConnectionUI::GetSmallImage(void)
 {
-    bool bIsOk = wxIsReadable(wxString(m_sPath, wxConvUTF8));
-	if(bIsOk)
+	if(CheckReadable())
 		return m_Conn16;
 	else
 		return m_ConnDsbld16;
@@ -63,6 +121,7 @@ wxDragResult wxGxDiscConnectionUI::CanDrop(wxDragResult def)
 
 bool wxGxDiscConnectionUI::Drop(const wxArrayString& filenames, bool bMove)
 {
+    /*
     if(filenames.GetCount() == 0)
         return false;
     GxObjectArray Array;
@@ -219,6 +278,6 @@ bool wxGxDiscConnectionUI::Drop(const wxArrayString& filenames, bool bMove)
     m_pCatalog->ObjectRefreshed(GetID());
 
 	ProgressDlg.SetValue(ProgressDlg.GetValue() + 1);
-	ProgressDlg.Destroy();
+	ProgressDlg.Destroy();*/
     return true;
 }

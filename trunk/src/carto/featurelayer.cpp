@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  FeatureLayer header.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/carto/featurelayer.h"
-#include "wxgis/carto/simplerenderer.h"
+/*#include "wxgis/carto/simplerenderer.h"
 #include "wxgis/display/displaytransformation.h"
 //#include "wxgis/geometry/algorithm.h"
 //#include "wxgis/datasource/spvalidator.h"
@@ -393,7 +393,7 @@ void wxGISFeatureLayer::LoadGeometry(void)
         pProgressor->Show(false);
     pStatusBar->SetMessage(_("Done"));
     m_bIsGeometryLoaded = true;
-	*/
+	*//*
 }
 
 wxGISQuadTreeCursorSPtr wxGISFeatureLayer::Idetify(OGRGeometrySPtr pGeom)
@@ -426,3 +426,4 @@ wxGISQuadTreeCursorSPtr wxGISFeatureLayer::Idetify(OGRGeometrySPtr pGeom)
     }
 	return pRet;
 }
+*/

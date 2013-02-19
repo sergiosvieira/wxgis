@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDiscConnectionsUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "wxgis/catalogui/gxdiscconnectionsui.h"
 #include "wxgis/catalogui/gxdiscconnectionui.h"
 #include "wxgis/catalogui/gxcatalogui.h"
+#include "wxgis/core/format.h"
 
 #include "../../art/folder_conns_16.xpm"
 #include "../../art/folder_conns_48.xpm"
@@ -37,10 +38,6 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxDiscConnectionsUI, wxGxDiscConnections)
 
 wxGxDiscConnectionsUI::wxGxDiscConnectionsUI(void) : wxGxDiscConnections()
 {
-	m_Conn16 = wxIcon(folder_conn_16_xpm);
-	m_Conn48 = wxIcon(folder_conn_48_xpm);
-	m_ConnDsbld16 = wxIcon(folder_conn_disbl_16_xpm);
-	m_ConnDsbld48 = wxIcon(folder_conn_disbl_48_xpm);
 }
 
 wxGxDiscConnectionsUI::~wxGxDiscConnectionsUI(void)
@@ -49,14 +46,36 @@ wxGxDiscConnectionsUI::~wxGxDiscConnectionsUI(void)
 
 wxIcon wxGxDiscConnectionsUI::GetLargeImage(void)
 {
-	return wxIcon(folder_conns_48_xpm);
+    if(!m_Conns48.IsOk())
+        m_Conns48 = wxIcon(folder_conns_48_xpm);
+	return m_Conns48;
 }
 
 wxIcon wxGxDiscConnectionsUI::GetSmallImage(void)
 {
-	return wxIcon(folder_conns_16_xpm);
+    if(!m_Conns16.IsOk())
+        m_Conns16 = wxIcon(folder_conns_16_xpm);
+	return m_Conns16;
 }
 
+wxGxObject *wxGxDiscConnectionsUI::CreateChildGxObject(const wxXmlNode* pNode)
+{
+    if(!m_Conn16.IsOk())
+        m_Conn16 = wxIcon(folder_conn_16_xpm);
+    if(!m_Conn48.IsOk())
+        m_Conn48 = wxIcon(folder_conn_48_xpm);
+    if(!m_ConnDsbld16.IsOk())
+        m_ConnDsbld16 = wxIcon(folder_conn_disbl_16_xpm);
+    if(!m_ConnDsbld48.IsOk())
+        m_ConnDsbld48 = wxIcon(folder_conn_disbl_48_xpm);
+
+    wxString soName = pNode->GetAttribute(wxT("name"), NONAME);
+    wxString sPath = pNode->GetAttribute(wxT("path"), NONAME);
+    CPLString soPath(sPath.mb_str(wxConvUTF8));
+    int nXmlId = GetDecimalValue(pNode, wxT("id"), wxNOT_FOUND);
+    return new wxGxDiscConnectionUI(this, m_sXmlStoragePath, nXmlId, soName, soPath, m_Conn16, m_Conn48, m_ConnDsbld16, m_ConnDsbld48);
+}
+/*
 void wxGxDiscConnectionsUI::EmptyChildren(void)
 {
     m_aConnections.clear();
@@ -125,3 +144,4 @@ IGxObject* wxGxDiscConnectionsUI::ConnectFolder(wxString sPath)
     }
 	return pReturnObj;
 }
+*/

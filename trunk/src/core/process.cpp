@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  stream common classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,100 +21,14 @@
 
 #include "wxgis/core/process.h"
 
-#include "cpl_string.h"
-#include "wx/filename.h"
+#include <wx/txtstrm.h>
 
-#define SLEEP_PROCWAIT 85
-///////////////////////////////////////////////////////////////////////////////
-// Class wxProcessWaitThread
-///////////////////////////////////////////////////////////////////////////////
+#define READ_LINE_DELAY 50
+//------------------------------------------------------------------------------
+// Class wxGISProcess
+//------------------------------------------------------------------------------
 
-wxProcessWaitThread::wxProcessWaitThread(wxGISProcess* pProc) : wxThread(), m_pChild(NULL)
-{
-	m_pProc = pProc;
-}
-
-wxProcessWaitThread::~wxProcessWaitThread(void)
-{
-}
-
-void *wxProcessWaitThread::Entry()
-{
-    if(!m_pProc)
-        return (wxThread::ExitCode)-1;
-
-    wxString sCmd = m_pProc->GetCommand();
-    wxFileName FName(sCmd);
-    std::string exec;
-    if(FName.GetPath().IsEmpty())
-        exec = bp::find_executable_in_path(std::string(sCmd.mb_str()));
-    else
-        exec = std::string(sCmd.mb_str());
-
-    if(exec.empty())
-        return (wxThread::ExitCode)-1;
-
-    std::vector<std::string> args;
-    wxArrayString saParams = m_pProc->GetParameters();
-    for(size_t i = 0; i < saParams.GetCount(); ++i)
-        args.push_back(std::string(saParams[i].mb_str()));
-
-//#if defined(BOOST_POSIX_API)
-    bp::context ctx;
-//#elif defined(BOOST_WINDOWS_API)
-//    bp::win32_context ctx;
-//    STARTUPINFOA si;
-//    ::ZeroMemory(&si, sizeof(si));
-//    si.cb = sizeof(si);
- //   si.dwFlags |= STARTF_USESHOWWINDOW;
- //   si.wShowWindow = SW_HIDE;//SW_SHOW;//
-	//si.dwX = si.dwY = 5000;
-//    ctx.startupinfo = &si;
-//#else
-//#  error "Unsupported platform."
-//#endif
-
-    ctx.environment = bp::self::get_environment();
-	ctx.stdout_behavior = bp::capture_stream();
-    //wxFileName FName(wxString(exec.c_str(), wxConvUTF8));
-    //ctx.work_directory = FName.GetPath().mb_str();
-
-    bp::child c = bp::launch(exec, args, ctx);
-    m_pChild = &c;
-
-    bp::pistream &is = c.get_stdout();
-
-    std::string line;
-    while(!TestDestroy() && std::getline(is, line))
-    {
-        wxString sLine(line.c_str(), wxConvUTF8, line.length());
-        m_pProc->ProcessInput(sLine);
-        wxThread::Sleep(SLEEP_PROCWAIT);
-    }
-
-    //wait exit
-    bp::status st = c.wait();
-
-    m_pProc->OnTerminate( st.exited() ? st.exit_status() : EXIT_FAILURE );
-	return (wxThread::ExitCode)0;     // success
-}
-
-void wxProcessWaitThread::Terminate(void)
-{
-    if(m_pChild)
-        m_pChild->terminate(true);
-}
-
-
-void wxProcessWaitThread::OnExit()
-{
-}
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISProcess
-///////////////////////////////////////////////////////////////////////////////
-
-wxGISProcess::wxGISProcess(wxString sCommand, wxArrayString saParams, IProcessParent* pParent) : IProcess(sCommand, saParams), m_pProcessWaitThread(NULL)
+wxGISProcess::wxGISProcess(IGISProcessParent* pParent) : wxProcess(wxPROCESS_REDIRECT)
 {
     m_pParent = pParent;
 }
@@ -123,39 +37,175 @@ wxGISProcess::~wxGISProcess(void)
 {
 }
 
-void wxGISProcess::Start(void)
+bool wxGISProcess::Start()
 {
+	m_pid = Execute();
+    if(m_pid == 0)
+        return false;
+
 	m_nState = enumGISTaskWork;
 	m_dtBeg = wxDateTime::Now();
-
-	//create and start thread
-	if(m_pProcessWaitThread)
-		m_pProcessWaitThread->Delete();
-
-	m_pProcessWaitThread = new wxProcessWaitThread(this);
-	if(!CreateAndRunThread(m_pProcessWaitThread, wxT("wxGISProcess"), _("Stream Wait")))
-		wxLogError(_("The execution communication is unavalible!"));
+    m_dfDone = 0;
+	//create and start read thread stdin
+	if(IsInputOpened())
+	{
+        return CreateAndRunReadThread();
+	}
+    
+    //start err thread ?
+    return true; //or false?
 }
 
-void wxGISProcess::OnTerminate(int status)
+void wxGISProcess::OnTerminate(int pid, int status)
 {
+    DestroyReadThread();
+    if(m_nState == enumGISTaskPaused)//process paused
+    {
+        m_dfDone = 0;
+        if(m_pParent)
+            m_pParent->OnFinish(this, false);
+        return;
+    }
+
     if(m_pParent && m_nState == enumGISTaskWork)
-        m_pParent->OnFinish(this, status != 0);
+    {
+        m_dfDone = 100.0;
+        if(m_pParent)
+            m_pParent->OnFinish(this, status != 0);
+    }
+
 	m_nState = status == 0 ? enumGISTaskDone : enumGISTaskError;
-    m_dtEstEnd = wxDateTime::Now();
+    m_dtEstEnd = wxDateTime::Now();    
 }
 
-void wxGISProcess::Cancel(void)
+void wxGISProcess::Stop(void)
 {
+    if(m_nState == enumGISTaskDone)
+        return;
+
 	if(m_nState == enumGISTaskWork)
 	{
-        if(m_pProcessWaitThread)
-            m_pProcessWaitThread->Terminate();
+		////send cancel code
+		//wxTextOutputStream OutStr(*GetOutputStream());
+		//wxString sStopCmd(wxT("STOP"));
+		//OutStr.WriteString(sStopCmd);
+
+	    m_nState = enumGISTaskPaused;
+
+		wxKillError eErr = Kill(m_pid, wxSIGKILL);// wxSIGINT wxSIGTERM
+ 
+        DestroyReadThread();
+	   //and detach
+		Detach();
 	}
 	m_nState = enumGISTaskPaused;
     m_dtEstEnd = wxDateTime::Now();
 }
 
-void wxGISProcess::ProcessInput(wxString sInputData)
+void wxGISProcess::UpdatePercent(const wxString &sPercentData)
 {
+	m_dfDone = wxAtof(sPercentData);
+	wxTimeSpan Elapsed = wxDateTime::Now() - m_dtBeg;//time left
+    wxString sTxt;
+
+    double nPercentR = 100.0 - m_dfDone;
+	if(nPercentR >= 0.0 && m_dfDone > 0.0)
+	{
+		long dMSec = double(Elapsed.GetMilliseconds().ToDouble() * nPercentR) / m_dfDone;
+		wxTimeSpan Remains = wxTimeSpan(0,0,0,dMSec);
+		m_dtEstEnd = wxDateTime::Now() + Remains;
+	}
 }
+
+void wxGISProcess::ProcessInput(wxString &sInputData)
+{
+	if(m_nState != enumGISTaskWork)
+        return;
+    sInputData = sInputData.Trim(true).Trim(false);
+
+	wxString sRest;
+	if( sInputData.StartsWith(wxT("DONE: "), &sRest) )
+	{
+        UpdatePercent(sRest.Trim(true).Trim(false).Truncate(sRest.Len() - 1));
+		return;
+	}
+	if( sInputData.StartsWith(wxT("INFO: "), &sRest) )
+	{
+        AddInfo(enumGISMessageNorm, sRest);
+		return;
+	}
+	if( sInputData.StartsWith(wxT("ERR: "), &sRest) )
+	{
+        AddInfo(enumGISMessageErr, sRest);
+		return;
+	}
+	if( sInputData.StartsWith(wxT("WARN: "), &sRest) )
+	{
+        AddInfo(enumGISMessageWarning, sRest);
+		return;
+	}
+	if( sInputData.StartsWith(wxT("SND: "), &sRest) )
+	{
+        AddInfo(enumGISMessageSend, sRest);
+		return;
+	}
+	if( sInputData.StartsWith(wxT("RCV: "), &sRest) )
+	{
+        AddInfo(enumGISMessageReceive, sRest);
+		return;
+	}    
+        
+    AddInfo(enumGISMessageUnk, sInputData);
+}
+
+wxThread::ExitCode wxGISProcess::Entry()
+{
+    // IMPORTANT:
+    // this function gets executed in the secondary thread context!
+
+    // here we do our long task, periodically calling TestDestroy():
+
+    //wxTextInputStream (wxInputStream &stream, const wxString &sep=" \t", const wxMBConv &conv=wxConvAuto())
+    wxInputStream &InStream = *GetInputStream();
+	wxTextInputStream InputStr(InStream, wxT(" \t"), *wxConvCurrent);
+	while(!GetThread()->TestDestroy())
+    {
+        if(InStream.Eof())
+            break;
+        if(InStream.IsOk() && InStream.CanRead())
+        {
+		    wxString line = InputStr.ReadLine();
+		    ProcessInput(line);
+        }
+		wxThread::Sleep(READ_LINE_DELAY);
+    }
+
+    // TestDestroy() returned true (which means the main thread asked us
+    // to terminate as soon as possible) or we ended the long task...
+    return (wxThread::ExitCode)0;
+}
+
+bool wxGISProcess::CreateAndRunReadThread(void)
+{
+    if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)//wxTHREAD_DETACHED//
+    {
+        wxLogError(_("Could not create the read thread!"));
+        return false;
+    }
+
+    // go!
+    if (GetThread()->Run() != wxTHREAD_NO_ERROR)
+    {
+        wxLogError(_("Could not run the read thread!"));
+        return false;
+    }
+    return true;
+}
+
+void wxGISProcess::DestroyReadThread(void)
+{
+    wxCriticalSectionLocker lock(m_ExitLock);
+    if (GetThread() && GetThread()->IsRunning())
+        GetThread()->Wait();//Delete();//
+}
+

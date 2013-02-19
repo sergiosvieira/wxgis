@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  GxDataset classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,41 +21,71 @@
 #pragma once
 
 #include "wxgis/catalog/catalog.h"
+#include "wxgis/catalog/gxobject.h"
+#include "wxgis/datasource/dataset.h"
+#include "wxgis/datasource/table.h"
+#include "wxgis/datasource/featuredataset.h"
+
+/** \class wxGxDataset gxdataset.h
+    \brief A base GxDataset class.
+*/
+
+class WXDLLIMPEXP_GIS_CLT wxGxDataset :
+	public wxGxObject,
+    public IGxObjectEdit
+{
+    DECLARE_ABSTRACT_CLASS(wxGxDataset)
+public:
+    wxGxDataset(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
+	virtual ~wxGxDataset(void);
+	virtual wxGISDataset* const GetDataset(bool bCached = true, ITrackCancel* const pTrackCancel = NULL) = 0;
+	virtual wxGISEnumDatasetType GetType(void) const = 0;
+	virtual int GetSubType(void) const = 0;
+    virtual wxULongLong GetSize(void) const {return m_nSize;};
+    virtual wxDateTime GetModificationDate(void) const {return m_dtMod;};
+    virtual void FillMetadata(bool bForce = false);
+    //wxGxObject
+    virtual void SetPath(const CPLString &soPath);
+    //IGxObjectEdit
+	virtual bool CanDelete(void){return true;};
+	virtual bool CanRename(void){return true;};
+    virtual bool CanCopy(const CPLString &szDestPath){return true;};
+	virtual bool CanMove(const CPLString &szDestPath) {return CanCopy(szDestPath) & CanDelete();};
+	virtual bool Delete(void);
+	virtual bool Rename(const wxString &sNewName);
+	virtual bool Copy(const CPLString &szDestPath, ITrackCancel* const pTrackCancel);
+	virtual bool Move(const CPLString &szDestPath, ITrackCancel* const pTrackCancel);
+protected:
+    //create wxGISDataset without openning it
+    virtual wxGISDataset* const GetDatasetFast(void) = 0;
+protected:
+	wxGISDataset* m_pwxGISDataset;
+    wxULongLong m_nSize;
+    wxDateTime m_dtMod;    
+    bool m_bIsMetadataFilled;
+};
 
 /** \class wxGxTableDataset gxdataset.h
     \brief A Table Dataset GxObject.
 */
 
 class WXDLLIMPEXP_GIS_CLT wxGxTableDataset :
-	public IGxObject,
-	public IGxObjectEdit,
-	public IGxDataset
+	public wxGxDataset
 {
+    DECLARE_CLASS(wxGxTableDataset)
 public:
-	wxGxTableDataset(CPLString Path, wxString Name, wxGISEnumTableDatasetType nType);
+	wxGxTableDataset(wxGISEnumTableDatasetType nType, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 	virtual ~wxGxTableDataset(void);
-	//IGxObject
-	virtual wxString GetName(void){return m_sName;};
-	virtual wxString GetBaseName(void);
-    virtual CPLString GetInternalName(void){return m_sPath;};
-	virtual wxString GetCategory(void){return wxString(_("Table"));};
-	//IGxObjectEdit
-	virtual bool Delete(void);
-	virtual bool CanDelete(void){return true;};
-	virtual bool Rename(wxString NewName);
-	virtual bool CanRename(void){return true;};
-	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel);
-    virtual bool CanCopy(CPLString szDestPath){return true;};//EQUALN(m_sPath, "/vsi", 4) ? false : true
-	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
-	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
-	//IGxDataset
-	virtual wxGISDatasetSPtr GetDataset(bool bCache = true, ITrackCancel* pTrackCancel = NULL);
-	virtual wxGISEnumDatasetType GetType(void){return enumGISTableDataset;};
-    virtual int GetSubType(void){return m_type;};
+	//wGxObject
+	virtual wxString GetCategory(void) const;
+	//wxGxDataset
+	virtual wxGISDataset* const GetDataset(bool bCache = true, ITrackCancel* const pTrackCancel = NULL);
+	virtual wxGISEnumDatasetType GetType(void) const {return enumGISTableDataset;};
+    virtual int GetSubType(void) const {return m_type;};
 protected:
-	wxString m_sName;
-    CPLString m_sPath;
-	wxGISDatasetSPtr m_pwxGISDataset;
+    //create wxGISDataset without openning it
+    virtual wxGISDataset* const GetDatasetFast(void);
+protected:
 	wxGISEnumTableDatasetType m_type;
 };
 
@@ -64,37 +94,22 @@ protected:
 */
 
 class WXDLLIMPEXP_GIS_CLT wxGxFeatureDataset :
-	public IGxObject,
-	public IGxObjectEdit,
-	public IGxDataset
+	public wxGxDataset
 {
+    DECLARE_CLASS(wxGxFeatureDataset)
 public:
-	wxGxFeatureDataset(CPLString Path, wxString Name, wxGISEnumVectorDatasetType nType);
+	wxGxFeatureDataset(wxGISEnumVectorDatasetType nType, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 	virtual ~wxGxFeatureDataset(void);
-	//IGxObject
-	virtual wxString GetName(void){return m_sName;};
-	virtual wxString GetBaseName(void);
-    virtual CPLString GetInternalName(void){return m_sPath;};
-	virtual wxString GetCategory(void);
-	//IGxObjectUI
-	//IGxObjectEdit
-	virtual bool Delete(void);
-	virtual bool CanDelete(void){return true;};
-	virtual bool Rename(wxString NewName);
-	virtual bool CanRename(void){return true;};
-	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel);
-	virtual bool CanCopy(CPLString szDestPath){return true;};
-	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
-	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
-	//IGxDataset
-	virtual wxGISDatasetSPtr GetDataset(bool bCache = true, ITrackCancel* pTrackCancel = NULL);
-	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
-    virtual int GetSubType(void){return (int)m_type;};
+	//wGxObject
+	virtual wxString GetCategory(void) const;
+	//wxGxDataset
+	virtual wxGISDataset* const GetDataset(bool bCache = true, ITrackCancel* const pTrackCancel = NULL);
+	virtual wxGISEnumDatasetType GetType(void) const {return enumGISFeatureDataset;};
+    virtual int GetSubType(void) const {return m_type;};
 protected:
-	wxString m_sName;
-    CPLString m_sPath;
+    virtual wxGISDataset* const GetDatasetFast(void);
+protected:
     wxFontEncoding m_Encoding;
-	wxGISDatasetSPtr m_pwxGISDataset;
 	wxGISEnumVectorDatasetType m_type;
 };
 
@@ -103,34 +118,20 @@ protected:
 */
 
 class WXDLLIMPEXP_GIS_CLT wxGxRasterDataset :
-	public IGxObject,
-	public IGxObjectEdit,
-	public IGxDataset
+	public wxGxDataset
 {
+    DECLARE_CLASS(wxGxRasterDataset)
 public:
-	wxGxRasterDataset(CPLString Path, wxString Name, wxGISEnumRasterDatasetType nType);
+	wxGxRasterDataset(wxGISEnumRasterDatasetType nType, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 	virtual ~wxGxRasterDataset(void);
-	//IGxObject
-	virtual wxString GetName(void){return m_sName;};
-	virtual wxString GetBaseName(void);
-    virtual CPLString GetInternalName(void){return m_sPath;};
-	virtual wxString GetCategory(void);
-	//IGxObjectEdit
-	virtual bool Delete(void);
-	virtual bool CanDelete(void){return true;};
-	virtual bool Rename(wxString NewName);
-	virtual bool CanRename(void){return true;};
-	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel);
-	virtual bool CanCopy(CPLString szDestPath){return true;};
-	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
-	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
-	//IGxDataset
-	virtual wxGISDatasetSPtr GetDataset(bool bCached = true, ITrackCancel* pTrackCancel = NULL);
-	virtual wxGISEnumDatasetType GetType(void){return enumGISRasterDataset;};
-    virtual int GetSubType(void){return (int)m_type;};
+	//wGxObject
+	virtual wxString GetCategory(void) const;
+	//wxGxDataset
+	virtual wxGISDataset* const GetDataset(bool bCache = true, ITrackCancel* const pTrackCancel = NULL);
+	virtual wxGISEnumDatasetType GetType(void) const {return enumGISRasterDataset;};
+    virtual int GetSubType(void) const {return m_type;};
 protected:
-	wxString m_sName;
-    CPLString m_sPath;
+    virtual wxGISDataset* const GetDatasetFast(void);
+protected:
     wxGISEnumRasterDatasetType m_type;
-	wxGISDatasetSPtr m_pwxGISDataset;
 };

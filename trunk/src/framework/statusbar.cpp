@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISStatusBar class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2012,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,7 +19,12 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/framework/statusbar.h"
+
+#include "wxgis/framework/applicationbase.h"
+
 #include "../../art/globe_imglst14.xpm"
+
+IMPLEMENT_DYNAMIC_CLASS(wxGISStatusBar, wxStatusBar)
 
 BEGIN_EVENT_TABLE(wxGISStatusBar, wxStatusBar)
 	EVT_SIZE(wxGISStatusBar::OnSize)
@@ -27,7 +32,11 @@ BEGIN_EVENT_TABLE(wxGISStatusBar, wxStatusBar)
 	EVT_RIGHT_DOWN(wxGISStatusBar::OnRightDown)
 END_EVENT_TABLE()
 
-wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, const wxString& name, WXDWORD panelsstyle) : wxStatusBar(parent, id, style, name), IStatusBar(panelsstyle), m_timer(this, TIMER_ID), m_pAni(NULL), m_pProgressBar(NULL)
+wxGISStatusBar::wxGISStatusBar() : wxStatusBar()
+{
+}
+
+wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, const wxString& name, WXDWORD panelsstyle) : wxStatusBar(parent, id, style, name), m_timer(this, TIMER_ID), m_pAni(NULL), m_pProgressBar(NULL)
 {
     m_MsgPos = wxNOT_FOUND;
     m_AniPos = wxNOT_FOUND;
@@ -39,8 +48,9 @@ wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, cons
     m_CapsLockPos = wxNOT_FOUND;
     m_NumLockPos = wxNOT_FOUND;
     m_ScrollLockPos = wxNOT_FOUND;
+    m_Panels = panelsstyle;
 
-	m_pApp = dynamic_cast<IFrameApplication*>(parent);
+	m_pApp = dynamic_cast<wxGISApplicationBase*>(parent);
 
 	std::vector<STATUSPANEL> panels;
 	int counter(0);
@@ -53,7 +63,7 @@ wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, cons
 	}
 	if(panelsstyle & enumGISStatusProgress)
 	{
-		STATUSPANEL data = {100, /*wxSB_NORMAL*/wxSB_FLAT};
+		STATUSPANEL data = {100, wxSB_FLAT};//wxSB_NORMAL
 		panels.push_back(data);
 		m_pProgressBar = new wxGISProgressor(this, wxID_ANY);
 		m_pProgressBar->Hide();
@@ -177,7 +187,7 @@ void wxGISStatusBar::SetMessage(const wxString& text, int i)
 	SetStatusText(text, i);
 }
 
-wxString wxGISStatusBar::GetMessage(int i)
+wxString wxGISStatusBar::GetMessage(int i) const
 {
 	return GetStatusText(i);
 }

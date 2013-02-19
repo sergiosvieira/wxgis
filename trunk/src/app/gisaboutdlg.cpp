@@ -1,9 +1,9 @@
 ﻿/******************************************************************************
  * Project:  wxGIS
  * Purpose:  About Dialog class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,21 +20,33 @@
  ****************************************************************************/
 
 #include "wxgis/app/gisaboutdlg.h"
-#include "wxgis/datasource/datasource.h"
+#include "wxgis/framework/applicationbase.h"
 #include "wxgis/core/config.h"
+#include "wxgis/defs.h"
 
 #include "../../../art/logo.xpm"
 
 #include <wx/version.h>
 #include <wx/ffile.h>
 
-#include "geos_c.h"
-#include "proj_api.h"
-#include "cairo.h"
+#include "gdal_priv.h"
+#include "ogrsf_frmts.h"
 
-#define __YEAR__ ((((__DATE__ [7] - '0') * 10 + (__DATE__ [8] - '0')) * 10 \
-+ (__DATE__ [9] - '0')) * 10 + (__DATE__ [10] - '0'))
+#ifdef wxGIS_USE_PROJ
+    #include "proj_api.h"
+#endif
 
+#ifdef wxGIS_USE_GEOS
+    #include "geos_c.h"
+#endif
+
+#ifdef wxGIS_USE_CAIRO
+    #include "cairo.h"
+#endif
+
+#ifdef wxGIS_USE_POSTGRES
+    #include "libpq-fe.h"
+#endif
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGISSimpleTextPanel
 ///////////////////////////////////////////////////////////////////////////////
@@ -47,8 +59,7 @@ wxGISSimpleTextPanel::wxGISSimpleTextPanel( wxString soText, wxWindow* parent, w
 	wxBoxSizer* bSizer = new wxBoxSizer( wxVERTICAL );
 
 	m_pStaticText = new wxTextCtrl( this, ID_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_AUTO_URL, wxDefaultValidator, wxT("GISSimpleText") );
-	//m_pStaticText->Enable(false);
-	m_pStaticText->AppendText(soText);//bug with wxTE_AUTO_URL
+	m_pStaticText->AppendText(soText);
 	bSizer->Add( m_pStaticText, 1, wxALL|wxEXPAND, 10 );
 
 	this->SetSizer( bSizer );
@@ -78,7 +89,7 @@ void wxGISSimpleTextPanel::edtUrlClickUrl(wxTextUrlEvent& event)
 
 wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-    IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(parent);
+    wxGISApplicationBase* pApp = dynamic_cast<wxGISApplicationBase*>(parent);
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 
     wxColour BackColor( 255, 255, 255 );
@@ -103,7 +114,6 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
     m_title->SetFont(titleFont);
 	m_title->Wrap( -1 );
 	m_title->SetBackgroundColour( BackColor );
- //   m_staticText1->
 
 	bHeadSizer->Add( m_title, 1, wxEXPAND, 5 );
 
@@ -112,11 +122,21 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
 	m_staticline1 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
 	bMainSizer->Add( m_staticline1, 0, wxEXPAND|wxALL, 5 );
 
+#ifdef wxGIS_USE_GEOS
     wxString sGEOSStr = wxString(GEOSversion(), wxConvLocal);
+#endif
+
+#ifdef wxGIS_USE_PROJ
     wxString sPrjStr = wxString(pj_get_release(), wxConvLocal);
+#endif
+
+#ifdef wxGIS_USE_POSTGRES
+    wxString sPQStr = wxString::Format(_("Version of the libpq library in use %d"), PQlibVersion());
+#endif
+
     wxString sGDALStr = wxString(GDAL_RELEASE_NAME, wxConvLocal);
     wxString sWXStr = wxVERSION_STRING;
-wxString wxVer( wxVERSION_STRING );
+    wxString wxVer( wxVERSION_STRING );
 
 #if defined(__WXMSW__)
     sWXStr << wxT("-Windows");
@@ -130,7 +150,9 @@ wxString wxVer( wxVERSION_STRING );
     sWXStr << wxT("-ANSI build");
 #endif // wxUSE_UNICODE
 
+#ifdef wxGIS_USE_CAIRO   
     wxString sCAIROStr = wxString(cairo_version_string(), wxConvLocal);
+#endif
 
 	m_AuiNotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS );
 
@@ -142,7 +164,9 @@ wxString wxVer( wxVERSION_STRING );
 
 	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutApp, m_AuiNotebook), _("About application"));
 
-    long dFreeMem =  wxMemorySize(wxGetFreeMemory() / 1048576).ToLong();
+    wxLongLong nFreeMem = wxGetFreeMemory();
+    wxString sFreeMem = wxFileName::GetHumanReadableSize(wxULongLong(nFreeMem.GetHi(), nFreeMem.GetLo()));
+    //long dFreeMem =  wxMemorySize(wxGetFreeMemory() / 1048576).ToLong();
 	wxString sGdalDrivers;
 	for(size_t i = 0; i < GDALGetDriverCount(); ++i)
 	{
@@ -160,7 +184,29 @@ wxString wxVer( wxVERSION_STRING );
 		sOgrDrivers += sDrvName;
 		sOgrDrivers += wxT("\n");
 	}
-	wxString sAboutSys = wxString::Format(_("HOST '%s'\n\nOS desc - %s\n\nFree memory - %u Mb\n\nLibs:\n\nGDAL %s\nGEOS %s\nPROJ %s\n%s\nCAIRO %s"), wxGetFullHostName().c_str(), wxGetOsDescription().c_str(), dFreeMem, sGDALStr.c_str(), sGEOSStr.c_str(), sPrjStr.c_str(), sWXStr.c_str(), sCAIROStr.c_str() );
+	wxString sAboutSys = wxString::Format(_("HOST '%s'\n\nOS desc - %s\n\nFree memory - %s\n\nLibs:\n\nGDAL %s"), wxGetFullHostName().c_str(), wxGetOsDescription().c_str(), sFreeMem.c_str(), sGDALStr.c_str() );
+#ifdef wxGIS_USE_GEOS
+    sAboutSys += wxT("\nGEOS ");
+    sAboutSys += sGEOSStr;
+#endif
+
+#ifdef wxGIS_USE_PROJ
+    sAboutSys += wxT("\nPROJ ");
+    sAboutSys += sPrjStr;
+#endif
+
+#ifdef wxGIS_USE_POSTGRES
+    sAboutSys += wxT("\nPostgreSQL: ");
+    sAboutSys += sPQStr;
+#endif
+
+#ifdef wxGIS_USE_CAIRO
+    sAboutSys += wxT("\nCAIRO ");
+    sAboutSys += sCAIROStr;
+#endif
+
+    sAboutSys += wxT("\n");
+    sAboutSys += sWXStr;
 	sAboutSys += wxString(_("\n\nGDAL Drivers:\n"));
 	sAboutSys += sGdalDrivers;
 	sAboutSys += wxString(_("\nOGR Drivers:\n"));
@@ -169,10 +215,10 @@ wxString wxVer( wxVERSION_STRING );
     m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutSys, m_AuiNotebook), _("About system"));
 
     //add translation page
-    wxGISAppConfigSPtr pConfig = GetConfig();
-    if(pConfig)
+    wxGISAppConfig oConfig = GetConfig();
+    if(oConfig.IsOk())
     {
-        wxString sTranslatorsFile = pConfig->GetLocaleDir() + wxFileName::GetPathSeparator() + wxString(wxT("TRANSLATORS.txt"));
+        wxString sTranslatorsFile = oConfig.GetLocaleDir() + wxFileName::GetPathSeparator() + wxString(wxT("TRANSLATORS.txt"));
         wxFFile file(sTranslatorsFile, wxString(wxT("r")));
 	    if(file.IsOpened())
 	    {
@@ -182,7 +228,7 @@ wxString wxVer( wxVERSION_STRING );
                 m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sTranslators, m_AuiNotebook), _("Translators"));
             }
         }
-        wxString sThanksFile = pConfig->GetLocaleDir() + wxFileName::GetPathSeparator() + wxString(wxT("THANKS.txt"));
+        wxString sThanksFile = oConfig.GetLocaleDir() + wxFileName::GetPathSeparator() + wxString(wxT("THANKS.txt"));
         wxFFile fanksfile(sThanksFile, wxString(wxT("r")));
 	    if(fanksfile.IsOpened())
 	    {

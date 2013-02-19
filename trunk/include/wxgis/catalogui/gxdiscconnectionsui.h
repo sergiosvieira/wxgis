@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDiscConnectionsUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2010,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 /** \class wxGxDiscConnectionsUI gxdiscconnectionsui.h
     \brief The Disc Connections GxRootObject.
 */
+
 class WXDLLIMPEXP_GIS_CLU wxGxDiscConnectionsUI :
     public wxGxDiscConnections,
 	public IGxObjectUI,
@@ -37,16 +38,19 @@ public:
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxDiscConnections.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxDiscConnections.NewMenu"));};
-	//wxGxDiscConnections
-	virtual void LoadChildren(void);
-	virtual void EmptyChildren(void);
-    virtual IGxObject* ConnectFolder(wxString sPath);
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxDiscConnections.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxString(wxT("wxGxDiscConnections.NewMenu"));};
+	//virtual void LoadChildren(void);
+	//virtual void EmptyChildren(void);
+ //   virtual IGxObject* ConnectFolder(wxString sPath);
 	//IGxObjectSort
     virtual bool IsAlwaysTop(void){return true;};
 	virtual bool IsSortEnabled(void){return false;};
 protected:
-	wxIcon m_Conn16, m_Conn48;
+    //wxGxXMLConnectionStorage
+    virtual wxGxObject* CreateChildGxObject(const wxXmlNode* pNode);
+protected:
+	wxIcon m_Conns16, m_Conns48;
+    wxIcon m_Conn16, m_Conn48;
 	wxIcon m_ConnDsbld16, m_ConnDsbld48;
 };

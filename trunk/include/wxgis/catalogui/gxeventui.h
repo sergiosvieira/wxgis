@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  event UI classes special for Selection events.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,8 +20,10 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/catalogui/catalogui.h"
-#include "wx/event.h"
+#include "wxgis/catalogui/gxselection.h"
+
+#include <wx/event.h>
+
 
 class WXDLLIMPEXP_FWD_GIS_CLU wxGxSelectionEvent;
 
@@ -31,10 +33,11 @@ wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_GIS_CLU, wxGXSELECTION_CHANGED, wxGxSelecti
 /** \class wxGxSelectionEvent gxeventui.h
     \brief The GxSelection class event.
 */
+
 class WXDLLIMPEXP_GIS_CLU wxGxSelectionEvent : public wxEvent
 {
 public:
-    wxGxSelectionEvent(wxEventType eventType = wxGXSELECTION_CHANGED, IGxSelection* pSelection = NULL, long nInitiator = wxNOT_FOUND) : wxEvent(0, eventType), m_nInitiator(nInitiator), m_pSelection(pSelection)
+    wxGxSelectionEvent(wxEventType eventType = wxGXSELECTION_CHANGED, wxGxSelection* pSelection = NULL, long nInitiator = wxNOT_FOUND) : wxEvent(0, eventType), m_nInitiator(nInitiator), m_pSelection(pSelection)
 	{
 	}
 	wxGxSelectionEvent(const wxGxSelectionEvent& event) : wxEvent(event), m_nInitiator(event.m_nInitiator), m_pSelection(event.m_pSelection)
@@ -43,14 +46,14 @@ public:
 
     void SetInitiator(long nInitiator) { m_nInitiator = nInitiator; }
     long GetInitiator() const { return m_nInitiator; }
-    void SetSelection(IGxSelection* pSelection) { m_pSelection = pSelection; }
-    IGxSelection* GetSelection() const { return m_pSelection; }
+    void SetSelection(wxGxSelection* pSelection) { m_pSelection = pSelection; }
+    wxGxSelection* GetSelection() const { return m_pSelection; }
 
     virtual wxEvent *Clone() const { return new wxGxSelectionEvent(*this); }
 
 protected:
     long m_nInitiator;
-	IGxSelection* m_pSelection;
+	wxGxSelection* m_pSelection;
 
 private:
     DECLARE_DYNAMIC_CLASS_NO_ASSIGN(wxGxSelectionEvent)
@@ -62,3 +65,4 @@ typedef void (wxEvtHandler::*wxGxSelectionEventFunction)(wxGxSelectionEvent&);
     wxEVENT_HANDLER_CAST(wxGxSelectionEventFunction, func)
 
 #define EVT_GXSELECTION_CHANGED(func)  wx__DECLARE_EVT0(wxGXSELECTION_CHANGED, wxGxSelectionEventHandler(func))
+

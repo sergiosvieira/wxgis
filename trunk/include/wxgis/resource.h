@@ -2,7 +2,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  resources def
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2012 Bishop
 *

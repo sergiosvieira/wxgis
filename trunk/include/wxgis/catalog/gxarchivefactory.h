@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxArchiveFactory class. Create new GxFolder objects
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-
+/*
 #include "wxgis/catalog/catalog.h"
 
 
@@ -38,3 +38,4 @@ public:
     virtual wxString GetName(void){return wxString(_("Archives"));};
     virtual IGxObject* GetGxObject(CPLString szPath, wxString soName);
 };
+*/

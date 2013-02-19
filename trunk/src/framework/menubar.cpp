@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISMenuBar class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2012  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,7 +22,9 @@
 #include "wxgis/core/config.h"
 #include "wxgis/framework/toolbarmenu.h"
 
-wxGISMenuBar::wxGISMenuBar(long style, IFrameApplication* pApp, wxXmlNode* pConf) : wxMenuBar(style)
+//IMPLEMENT_DYNAMIC_CLASS(wxGISMenuBar, wxGISMenuBar)
+
+wxGISMenuBar::wxGISMenuBar(long style, wxGISApplicationBase* pApp, wxXmlNode* pConf) : wxMenuBar(style)
 {
 	if(!pConf || pApp == NULL)
 		return;
@@ -37,8 +39,16 @@ wxGISMenuBar::wxGISMenuBar(long style, IFrameApplication* pApp, wxXmlNode* pConf
 
 wxGISMenuBar::~wxGISMenuBar(void)
 {
+    for(size_t i = 0; i < m_MenubarArray.size(); ++i)
+	{
+        m_MenubarArray[i]->Release();
+    }
+
 	//while(GetMenuCount() > 0)
+ //   {
 	//	Remove(0);
+ //   }
+
 	m_menus.Clear();
 }
 
@@ -52,9 +62,9 @@ bool wxGISMenuBar::IsMenuBarMenu(wxString sMenuName)
 	return false;
 }
 
-COMMANDBARARRAY* wxGISMenuBar::GetMenuBarArray(void)
+wxGISCommandBarPtrArray wxGISMenuBar::GetMenuBarArray(void) const
 {
-	return &m_MenubarArray;
+	return m_MenubarArray;
 }
 
 void wxGISMenuBar::MoveLeft(int pos)
@@ -63,7 +73,7 @@ void wxGISMenuBar::MoveLeft(int pos)
 		return;
 
 	//m_MenubarArray.swap(pos, pos - 1);
-	IGISCommandBar* val = m_MenubarArray[pos];
+	wxGISCommandBar* val = m_MenubarArray[pos];
 	m_MenubarArray[pos] = m_MenubarArray[pos - 1];
 	m_MenubarArray[pos - 1] = val;
 	Insert(pos - 1, Remove(pos), m_MenubarArray[pos - 1]->GetCaption());
@@ -74,27 +84,27 @@ void wxGISMenuBar::MoveRight(int pos)
 	if(pos == m_MenubarArray.size() - 1)
 		return;
 //	m_MenubarArray.swap(pos, pos + 1);
-	IGISCommandBar* val = m_MenubarArray[pos];
+	wxGISCommandBar* val = m_MenubarArray[pos];
 	m_MenubarArray[pos] = m_MenubarArray[pos + 1];
 	m_MenubarArray[pos + 1] = val;
 	Insert(pos + 1, Remove(pos), m_MenubarArray[pos + 1]->GetCaption());
 }
 
-void wxGISMenuBar::MoveLeft(IGISCommandBar* pBar)
+void wxGISMenuBar::MoveLeft(wxGISCommandBar* pBar)
 {
 	int nPos = GetMenuPos(pBar);
 	if(nPos != wxNOT_FOUND)
 		MoveLeft(nPos);
 }
 
-void wxGISMenuBar::MoveRight(IGISCommandBar* pBar)
+void wxGISMenuBar::MoveRight(wxGISCommandBar* pBar)
 {
 	int nPos = GetMenuPos(pBar);
 	if(nPos != wxNOT_FOUND)
 		MoveRight(nPos);
 }
 
-int wxGISMenuBar::GetMenuPos(IGISCommandBar* pBar)
+int wxGISMenuBar::GetMenuPos(wxGISCommandBar* pBar)
 {
 	if(pBar == NULL)
 		return wxNOT_FOUND;
@@ -104,23 +114,25 @@ int wxGISMenuBar::GetMenuPos(IGISCommandBar* pBar)
 	return wxNOT_FOUND;
 }
 
-void wxGISMenuBar::RemoveMenu(IGISCommandBar* pBar)
+void wxGISMenuBar::RemoveMenu(wxGISCommandBar* pBar)
 {
 	for(size_t i = 0; i < m_MenubarArray.size(); ++i)
 	{
 		if(m_MenubarArray[i] == pBar)
 		{
 			Remove(i);
+            m_MenubarArray[i]->Release();
 			m_MenubarArray.erase(m_MenubarArray.begin() + i);
 		}
 	}
 }
 
-bool wxGISMenuBar::AddMenu(IGISCommandBar* pBar)
+bool wxGISMenuBar::AddMenu(wxGISCommandBar* pBar)
 {
 	wxMenu* pMenu = dynamic_cast<wxMenu*>(pBar);
 	if(pMenu)
 	{
+        pBar->Reference();
 		Append(pMenu, pBar->GetCaption());
 		m_MenubarArray.push_back(pBar);
 		return true;

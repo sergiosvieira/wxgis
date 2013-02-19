@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  catalog operations.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/catalog/catop.h"
-
+/*
 bool OverWriteGxObject(IGxObject* pGxObject, ITrackCancel* pTrackCancel)
 {
 	if(!pGxObject) //the object is not exist
@@ -61,3 +61,4 @@ IGxObject* GetParentGxObjectFromPath(const wxString &sFullPath, IGxObjectContain
     }
     return pGxDstObject;
 }
+*/

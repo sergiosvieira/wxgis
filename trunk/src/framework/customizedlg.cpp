@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  customize dialog class. Customize menues & toolbars
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -53,17 +53,18 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGISApplicationEx* pApp, wxWindow* parent,
 	wxBoxSizer* bSizer = new wxBoxSizer( wxHORIZONTAL );
 
 	m_Splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D  | wxNO_BORDER);
-	m_Splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISToolBarPanel::SplitterOnIdle ), NULL, this );
+	//m_Splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISToolBarPanel::SplitterOnIdle ), NULL, this );
+	m_Splitter->Bind( wxEVT_IDLE, &wxGISToolBarPanel::SplitterOnIdle, this );
 	bSizer->Add( m_Splitter, 1, wxEXPAND, 5 );
 
 	//wxArrayString m_commandbarlistChoices;
 	//m_commandbarlist = new wxCheckListBox( m_Splitter, wxGISToolBarPanel::ID_CHKLSTBX, wxDefaultPosition, wxDefaultSize, m_commandbarlistChoices,  wxNO_BORDER );
 	m_TreeImageList.Create(16, 16);
 	m_TreeImageList.Add(wxBitmap(check_marks_xpm));
-	m_pTreeCtrl = new wxTreeCtrl( m_Splitter, wxGISToolBarPanel::ID_TREECTRL, wxDefaultPosition, wxDefaultSize, /*wxTR_NO_BUTTONS | */wxTR_NO_LINES | wxTR_HIDE_ROOT | wxBORDER_NONE );
+	m_pTreeCtrl = new wxTreeCtrl( m_Splitter, wxGISToolBarPanel::ID_TREECTRL, wxDefaultPosition, wxDefaultSize, wxTR_NO_LINES | wxTR_HIDE_ROOT | wxBORDER_NONE );//wxTR_NO_BUTTONS | 
 	m_pTreeCtrl->SetImageList(&m_TreeImageList);
 
-	m_buttonslist = new wxListView( m_Splitter, wxGISToolBarPanel::ID_BUTTONSLST, wxDefaultPosition, wxDefaultSize,/* wxLC_NO_SORT_HEADER|*/wxLC_REPORT|wxLC_SINGLE_SEL/*|wxLC_SORT_ASCENDING*/  | wxNO_BORDER);
+	m_buttonslist = new wxListView( m_Splitter, wxGISToolBarPanel::ID_BUTTONSLST, wxDefaultPosition, wxDefaultSize,wxLC_REPORT|wxLC_SINGLE_SEL  | wxNO_BORDER);// wxLC_NO_SORT_HEADER||wxLC_SORT_ASCENDING
 	m_buttonslist->InsertColumn(0, _("Command Name"), wxLIST_FORMAT_LEFT, 90);
 	m_buttonslist->InsertColumn(1, _("Description"), wxLIST_FORMAT_LEFT, 120);
 	m_buttonslist->InsertColumn(2, _("KeyCode"), wxLIST_FORMAT_LEFT, 60);
@@ -95,10 +96,11 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGISApplicationEx* pApp, wxWindow* parent,
 	m_Splitter->SetSashGravity(0.5);
 //	m_Splitter->SplitVertically(m_commandbarlist, m_buttonslist, 100);
 	m_Splitter->SplitVertically(m_pTreeCtrl, m_buttonslist, 100);
-	m_pTreeCtrl->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( wxGISToolBarPanel::OnLeftDown ), NULL, this );
+//	m_pTreeCtrl->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( wxGISToolBarPanel::OnLeftDown ), NULL, this );
+	m_pTreeCtrl->Bind( wxEVT_LEFT_DOWN, &wxGISToolBarPanel::OnLeftDown, this );
 
 
-	m_pContextMenu = new wxMenu(/*_("Command menu")*/);
+	m_pContextMenu = new wxMenu();//_("Command menu")
 	wxMenuItem *item = new wxMenuItem(m_pContextMenu, ID_ONSETKEYCODE, _("Set keycode"));
 #ifdef __WIN32__
 	item->SetBitmap(wxKeyCodeDlg::GetBitmap());
@@ -122,11 +124,11 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGISApplicationEx* pApp, wxWindow* parent,
 	m_nToolBarsId = m_pTreeCtrl->AppendItem(nRootId, _("ToolBars"), 3, 3);
 	m_pTreeCtrl->SetItemBold(m_nToolBarsId);
 
-	wxGISMenuBar* pwxGISMenuBar = m_pApp->GetMenuBar();
-	COMMANDBARARRAY* pMenuBarArray = pwxGISMenuBar->GetMenuBarArray();
-	for(size_t i = 0; i < pMenuBarArray->size(); ++i)
+	wxGISMenuBar* pwxGISMenuBar = m_pApp->GetGISMenuBar();
+	wxGISCommandBarPtrArray MenuBarArray = pwxGISMenuBar->GetMenuBarArray();
+	for(size_t i = 0; i < MenuBarArray.GetCount(); ++i)
 	{
-		IGISCommandBar* pBar = pMenuBarArray->at(i);
+		wxGISCommandBar* pBar = MenuBarArray[i];
 		wxString sCaption = pBar->GetCaption();
 		sCaption += wxString(wxT(" ")) + wxString(_("menu"));
 		sCaption.Replace(wxT("&"), wxT(""));
@@ -134,10 +136,10 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGISApplicationEx* pApp, wxWindow* parent,
 		m_pTreeCtrl->AppendItem(m_nMenubarId, sCaption, -1, -1, new wxBarTreeItemData(pBar));
 	}
 
-	COMMANDBARARRAY* pMenuArray = m_pApp->GetCommandBars();
-	for(size_t i = 0; i < pMenuArray->size(); ++i)
+	wxGISCommandBarPtrArray MenuArray = m_pApp->GetCommandBars();
+	for(size_t i = 0; i < MenuArray.GetCount(); ++i)
 	{
-		IGISCommandBar* pBar = pMenuArray->at(i);
+		wxGISCommandBar* pBar = MenuArray[i];
 		if(pBar->GetType() == enumGISCBContextmenu)
 		{
 			wxString sCaption = pBar->GetCaption();
@@ -187,25 +189,26 @@ void wxGISToolBarPanel::OnSelChanged(wxTreeEvent& event)
 
 void wxGISToolBarPanel::LoadCommands(void)
 {
-		m_buttonslist->DeleteAllItems();
-		m_ImageList.RemoveAll();
+	m_buttonslist->DeleteAllItems();
+	m_ImageList.RemoveAll();
 	wxTreeItemId nSelId = m_pTreeCtrl->GetSelection();
     if(nSelId.IsOk())
     {
 		wxBarTreeItemData* pData = (wxBarTreeItemData*)m_pTreeCtrl->GetItemData(nSelId);
 		if(pData == NULL)
 			return;
-		IGISCommandBar* pBar = pData->m_pBar;
+		wxGISCommandBar* pBar = pData->m_pBar;
 
 		for(size_t i = 0; i < pBar->GetCommandCount(); ++i)
 		{
-			ICommand* pCommand = pBar->GetCommand(i);
+			wxGISCommand* pCommand = pBar->GetCommand(i);
 			wxString sName = wxStripMenuCodes(pCommand->GetCaption());
 			wxString sMessage = pCommand->GetMessage();
 
 			wxString sKeyCode = m_pApp->GetGISAcceleratorTable()->GetText(pCommand->GetID());
 			int nIndex = m_ImageList.Add(pCommand->GetBitmap());
-			long pos = m_buttonslist->InsertItem(i, sName, nIndex);
+			long pos = m_buttonslist->InsertItem(i, sName);//, nIndex);
+            m_buttonslist->SetItemImage(pos, nIndex);
 			m_buttonslist->SetItem(pos, 1, sMessage);
 			m_buttonslist->SetItem(pos, 2, sKeyCode);
 			m_buttonslist->SetItemData(pos, pCommand->GetID());
@@ -276,13 +279,13 @@ void wxGISToolBarPanel::OnUpdateUI(wxUpdateUIEvent& event)
 		m_bCmdFocus = true;
 		m_bToolsFocus = false;
 	}
-	if(wxWindow::FindFocus() == m_pTreeCtrl/*m_commandbarlist*/)
+	if(wxWindow::FindFocus() == m_pTreeCtrl)//m_commandbarlist
 	{
 		m_bCmdFocus = false;
 		m_bToolsFocus = true;
 	}
 
-	IGISCommandBar* pBar(NULL);
+	wxGISCommandBar* pBar(NULL);
 	wxTreeItemId nSelId = m_pTreeCtrl->GetSelection();
 	if(nSelId.IsOk())
 	{
@@ -327,7 +330,7 @@ void wxGISToolBarPanel::OnUpdateUI(wxUpdateUIEvent& event)
 		{
 			if(pBar != NULL && pBar->GetType() == enumGISCBMenubar)
 			{
-				wxGISMenuBar* pwxGISMenuBar = m_pApp->GetMenuBar();
+				wxGISMenuBar* pwxGISMenuBar = m_pApp->GetGISMenuBar();
 				int nPos = pwxGISMenuBar->GetMenuPos(pBar);
 				if(nPos > 0)
 				{
@@ -352,7 +355,7 @@ void wxGISToolBarPanel::OnUpdateUI(wxUpdateUIEvent& event)
 		{
 			if(pBar != NULL && pBar->GetType() == enumGISCBMenubar)
 			{
-				wxGISMenuBar* pwxGISMenuBar = m_pApp->GetMenuBar();
+				wxGISMenuBar* pwxGISMenuBar = m_pApp->GetGISMenuBar();
 				int nPos = pwxGISMenuBar->GetMenuPos(pBar);
 				int nCount = m_pTreeCtrl->GetChildrenCount(m_nMenubarId);
 				if(nPos < nCount - 1)
@@ -377,13 +380,13 @@ void wxGISToolBarPanel::OnCreateCommandBar(wxCommandEvent& event)
 		case enumGISCBMenubar:
 			{
 			wxGISMenu* pMenu = new wxGISMenu(dlg.m_sCommandbarName, dlg.m_sCommandbarCaption, enumGISCBMenubar);
-			if(m_pApp->AddCommandBar(static_cast<IGISCommandBar*>(pMenu)))
+			if(m_pApp->AddCommandBar(static_cast<wxGISCommandBar*>(pMenu)))
 			{
 				wxString sCaption = pMenu->GetCaption();
 				sCaption += wxString(wxT(" ")) + wxString(_("menu"));
 				sCaption.Replace(wxT("&"), wxT(""));
 
-				IGISCommandBar* pBar = static_cast<IGISCommandBar*>(pMenu);
+				wxGISCommandBar* pBar = static_cast<wxGISCommandBar*>(pMenu);
 				m_pTreeCtrl->AppendItem(m_nMenubarId, sCaption, -1, -1, new wxBarTreeItemData(pBar));
 			}
 			}
@@ -391,13 +394,13 @@ void wxGISToolBarPanel::OnCreateCommandBar(wxCommandEvent& event)
 		case enumGISCBContextmenu:
 			{
 			wxGISMenu* pMenu = new wxGISMenu(dlg.m_sCommandbarName, dlg.m_sCommandbarCaption, enumGISCBContextmenu);
-			if(m_pApp->AddCommandBar(static_cast<IGISCommandBar*>(pMenu)))
+			if(m_pApp->AddCommandBar(static_cast<wxGISCommandBar*>(pMenu)))
 			{
 				wxString sCaption = pMenu->GetCaption();
 				sCaption.Replace(wxT("wxGx"), wxT(""));
 				sCaption.Replace(wxT("wxRx"), wxT(""));
 				sCaption.Replace(wxT("wxMx"), wxT(""));
-				IGISCommandBar* pBar = static_cast<IGISCommandBar*>(pMenu);
+				wxGISCommandBar* pBar = static_cast<wxGISCommandBar*>(pMenu);
 				if(sCaption.Find(wxT(".NewMenu")) != wxNOT_FOUND)
 				{
 					sCaption += wxString(wxT(" ")) + wxString(_("new menu"));
@@ -419,11 +422,11 @@ void wxGISToolBarPanel::OnCreateCommandBar(wxCommandEvent& event)
 			wxGISToolBar* pGISToolBar = new wxGISToolBar(m_pApp, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW, dlg.m_sCommandbarName, dlg.m_sCommandbarCaption, enumGISCBToolbar);
 			pGISToolBar->SetLeftDockable(dlg.m_bLeftDockable);
 			pGISToolBar->SetRightDockable(dlg.m_bRightDockable);
-			if(m_pApp->AddCommandBar(static_cast<IGISCommandBar*>(pGISToolBar)))
+			if(m_pApp->AddCommandBar(static_cast<wxGISCommandBar*>(pGISToolBar)))
 			{
 				wxAuiToolBarItemArray prepend_items;
 				wxAuiToolBarItemArray append_items;
-				ICommand* pCmd = m_pApp->GetCommand(wxT("wxGISCommonCmd"), 2);
+				wxGISCommand* pCmd = m_pApp->GetCommand(wxT("wxGISCommonCmd"), 2);
 				if(pCmd)
 				{
 					wxAuiToolBarItem item;
@@ -439,7 +442,7 @@ void wxGISToolBarPanel::OnCreateCommandBar(wxCommandEvent& event)
 				wxString sCaption = pGISToolBar->GetCaption();
 				sCaption += wxString(wxT(" ")) + wxString(_("toolbar"));
 
-				IGISCommandBar* pBar = static_cast<IGISCommandBar*>(pGISToolBar);
+				wxGISCommandBar* pBar = static_cast<wxGISCommandBar*>(pGISToolBar);
 				int nImgIndex = m_pApp->IsPaneShown(pBar->GetName()) == true ? 1 : 0;
 				m_pTreeCtrl->AppendItem(m_nToolBarsId, sCaption, nImgIndex, nImgIndex, new wxBarTreeItemData(pBar));
 			}
@@ -461,7 +464,7 @@ void wxGISToolBarPanel::OnDeleteCommandBar(wxCommandEvent& event)
 	wxBarTreeItemData* pData = (wxBarTreeItemData*)m_pTreeCtrl->GetItemData(nSelId);
 	if(pData == NULL)
 		return;
-	IGISCommandBar* pBar = pData->m_pBar;
+	wxGISCommandBar* pBar = pData->m_pBar;
 	m_pTreeCtrl->Delete(nSelId);
 	m_pApp->RemoveCommandBar(pBar);
 }
@@ -477,7 +480,7 @@ void wxGISToolBarPanel::OnAddButton(wxCommandEvent& event)
 		wxBarTreeItemData* pData = (wxBarTreeItemData*)m_pTreeCtrl->GetItemData(nSelId);
 		if(pData == NULL)
 			return;
-		IGISCommandBar* pBar = pData->m_pBar;
+		wxGISCommandBar* pBar = pData->m_pBar;
 		wxWindow* pWnd = dynamic_cast<wxWindow*>(pBar);
 
 		for(size_t i = 0; i < dlg.m_IDArray.size(); ++i)
@@ -506,7 +509,7 @@ void wxGISToolBarPanel::OnRemoveButton(wxCommandEvent& event)
 			wxBarTreeItemData* pData = (wxBarTreeItemData*)m_pTreeCtrl->GetItemData(nSelId);
 			if(pData != NULL)
 			{
-				IGISCommandBar* pBar = pData->m_pBar;
+				wxGISCommandBar* pBar = pData->m_pBar;
 				pBar->RemoveCommand(item);
 				wxWindow* pWnd = dynamic_cast<wxWindow*>(pBar);
 				if(pWnd)
@@ -528,14 +531,14 @@ void wxGISToolBarPanel::OnMoveUp(wxCommandEvent& event)
 	wxBarTreeItemData* pData = (wxBarTreeItemData*)m_pTreeCtrl->GetItemData(nSelId);
 	if(pData == NULL)
 		return;
-	IGISCommandBar* pBar = pData->m_pBar;
+	wxGISCommandBar* pBar = pData->m_pBar;
 	if(m_bToolsFocus)
 	{
 		wxString sCaption = pBar->GetCaption();
 		sCaption += wxString(wxT(" ")) + wxString(_("menu"));
 		sCaption.Replace(wxT("&"), wxT(""));
 
-		wxGISMenuBar* pwxGISMenuBar = m_pApp->GetMenuBar();
+		wxGISMenuBar* pwxGISMenuBar = m_pApp->GetGISMenuBar();
 		int nPos = pwxGISMenuBar->GetMenuPos(pBar);
 		if(nPos == wxNOT_FOUND)
 			return;
@@ -573,14 +576,14 @@ void wxGISToolBarPanel::OnMoveDown(wxCommandEvent& event)
 	wxBarTreeItemData* pData = (wxBarTreeItemData*)m_pTreeCtrl->GetItemData(nSelId);
 	if(pData == NULL)
 		return;
-	IGISCommandBar* pBar = pData->m_pBar;
+	wxGISCommandBar* pBar = pData->m_pBar;
 	if(m_bToolsFocus)
 	{
 		wxString sCaption = pBar->GetCaption();
 		sCaption += wxString(wxT(" ")) + wxString(_("menu"));
 		sCaption.Replace(wxT("&"), wxT(""));
 
-		wxGISMenuBar* pwxGISMenuBar = m_pApp->GetMenuBar();
+		wxGISMenuBar* pwxGISMenuBar = m_pApp->GetGISMenuBar();
 		int nPos = pwxGISMenuBar->GetMenuPos(pBar);
 		if(nPos == wxNOT_FOUND)
 			return;
@@ -620,7 +623,7 @@ void wxGISToolBarPanel::OnLeftDown(wxMouseEvent& event)
 		wxBarTreeItemData* pData = (wxBarTreeItemData*)m_pTreeCtrl->GetItemData(nItemId);
 		if(pData == NULL)
 			return;
-		IGISCommandBar* pBar = pData->m_pBar;
+		wxGISCommandBar* pBar = pData->m_pBar;
 		if(pBar->GetType() ==  enumGISCBToolbar)
 		{
 			bool bCheck = m_pApp->IsPaneShown(pBar->GetName());
@@ -656,21 +659,18 @@ wxGISCommandPanel::wxGISCommandPanel( wxGISApplicationEx* pApp, wxWindow* parent
 	bSizer5 = new wxBoxSizer( wxHORIZONTAL );
 
 	m_splitter2 = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D | wxNO_BORDER );
-	m_splitter2->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISCommandPanel::m_splitter2OnIdle ), NULL, this );
+	//m_splitter2->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISCommandPanel::m_splitter2OnIdle ), NULL, this );
+	m_splitter2->Bind( wxEVT_IDLE, &wxGISCommandPanel::m_splitter2OnIdle, this );
 	bSizer5->Add( m_splitter2, 1, wxEXPAND, 5 );
 
 	//fill m_listBox1
-	COMMANDARRAY* pArr = m_pApp->GetCommands();
-	if(pArr)
+	wxCommandPtrArray CommandArr = m_pApp->GetCommands();
+	for(size_t i = 0; i < CommandArr.GetCount(); ++i)
 	{
-		for(size_t i = 0; i < pArr->size(); ++i)
-		{
-			wxString sCat = pArr->at(i)->GetCategory();
-			if(m_CategoryMap[sCat] == NULL)
-				m_CategoryMap[sCat] = new COMMANDARRAY;
-			m_CategoryMap[sCat]->push_back(pArr->at(i));
-		}
+		wxString sCat = CommandArr[i]->GetCategory();
+        m_CategoryMap[sCat].Add(CommandArr[i]);
 	}
+	
 	wxArrayString CatArray;
 	for(CATEGORYMAP::iterator IT = m_CategoryMap.begin(); IT != m_CategoryMap.end(); ++IT)
 	{
@@ -681,7 +681,7 @@ wxGISCommandPanel::wxGISCommandPanel( wxGISApplicationEx* pApp, wxWindow* parent
 //	m_listBox1->InsertColumn(0, _("Category"));
 	//bSizer5->Add( m_listBox1, 0, wxALL, 5 );
 
-	m_listCtrl3 = new wxListCtrl( m_splitter2, wxGISCommandPanel::ID_LSTCTRL, wxDefaultPosition, wxDefaultSize, /*wxLC_EDIT_LABELS|wxLC_NO_HEADER|wxLC_VRULES*/wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_SORT_ASCENDING|wxNO_BORDER );
+	m_listCtrl3 = new wxListCtrl( m_splitter2, wxGISCommandPanel::ID_LSTCTRL, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_SORT_ASCENDING|wxNO_BORDER );//wxLC_EDIT_LABELS|wxLC_NO_HEADER|wxLC_VRULES
 	m_listCtrl3->InsertColumn(0, _("Command Name"), wxLIST_FORMAT_LEFT, 90);
 	m_listCtrl3->InsertColumn(1, _("Description"), wxLIST_FORMAT_LEFT, 120);
 	m_listCtrl3->InsertColumn(2, _("KeyCode"), wxLIST_FORMAT_LEFT, 60);
@@ -691,7 +691,7 @@ wxGISCommandPanel::wxGISCommandPanel( wxGISApplicationEx* pApp, wxWindow* parent
 	m_splitter2->SetSashGravity(0.5);
 	m_splitter2->SplitVertically(m_listBox1, m_listCtrl3, 150);
 
-	m_pContextMenu = new wxMenu(/*_("Command menu")*/);
+	m_pContextMenu = new wxMenu();//_("Command menu")
 	wxMenuItem *item = new wxMenuItem(m_pContextMenu, ID_ONSETKEYCODE, _("Set keycode"));
 #ifdef __WIN32__
 	item->SetBitmap(wxKeyCodeDlg::GetBitmap());
@@ -703,16 +703,12 @@ wxGISCommandPanel::wxGISCommandPanel( wxGISApplicationEx* pApp, wxWindow* parent
 
 	m_listBox1->Select(0);
 	wxCommandEvent event;
-	event.SetString(m_listBox1->GetString(0)/*CatArray[0]*/);
+	event.SetString(m_listBox1->GetString(0));//CatArray[0]
 	OnListboxSelect(event);
 }
 
 wxGISCommandPanel::~wxGISCommandPanel()
 {
-	for(CATEGORYMAP::iterator IT = m_CategoryMap.begin(); IT != m_CategoryMap.end(); ++IT)
-	{
-		wxDELETE(IT->second);
-	}
 	wxDELETE(m_pContextMenu);
 }
 
@@ -723,24 +719,22 @@ void wxGISCommandPanel::OnListboxSelect(wxCommandEvent& event)
 		return;
 
 	wxString selName = m_listBox1->GetString(selpos);
-	COMMANDARRAY* pArr = m_CategoryMap[selName];
-	if(pArr != NULL)
+	wxCommandPtrArray CommandArray = m_CategoryMap[selName];
+	m_listCtrl3->DeleteAllItems();
+	m_ImageList.RemoveAll();
+	for(size_t i = 0; i < CommandArray.GetCount(); ++i)
 	{
-		m_listCtrl3->DeleteAllItems();
-		m_ImageList.RemoveAll();
-		for(size_t i = 0; i < pArr->size(); ++i)
-		{
-			wxString sName = wxStripMenuCodes(pArr->at(i)->GetCaption());
-			wxString sMessage = pArr->at(i)->GetMessage();
-			wxString sKeyCode = m_pApp->GetGISAcceleratorTable()->GetText(pArr->at(i)->GetID());
-			int nIndex = m_ImageList.Add(pArr->at(i)->GetBitmap());
-			long pos = m_listCtrl3->InsertItem(i, sName, nIndex);
-			m_listCtrl3->SetItem(pos, 1, sMessage);
-			m_listCtrl3->SetItem(pos, 2, sKeyCode);
-			m_listCtrl3->SetItemData(pos,  pArr->at(i)->GetID());
-		}
-		m_listCtrl3->Update();
+		wxString sName = wxStripMenuCodes(CommandArray[i]->GetCaption());
+		wxString sMessage = CommandArray[i]->GetMessage();
+		wxString sKeyCode = m_pApp->GetGISAcceleratorTable()->GetText(CommandArray[i]->GetID());
+		int nIndex = m_ImageList.Add(CommandArray[i]->GetBitmap());
+		long pos = m_listCtrl3->InsertItem(i, sName);//, nIndex);
+        m_listCtrl3->SetItemImage(pos, nIndex);
+		m_listCtrl3->SetItem(pos, 1, sMessage);
+		m_listCtrl3->SetItem(pos, 2, sKeyCode);
+		m_listCtrl3->SetItemData(pos,  CommandArray[i]->GetID());
 	}
+	m_listCtrl3->Update();
 }
 
 void wxGISCommandPanel::OnDoubleClickSash(wxSplitterEvent& event)

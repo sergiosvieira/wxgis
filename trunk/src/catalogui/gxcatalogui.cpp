@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxCatalogUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,12 +20,73 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxcatalogui.h"
-#include "wxgis/core/config.h"
-#include "wxgis/core/globalfn.h"
+#include "wxgis/catalogui/gxpending.h"
 
 #include "../../art/mainframecat.xpm"
 #include "../../art/process_working_16.xpm"
 #include "../../art/process_working_48.xpm"
+
+// ----------------------------------------------------------------------------
+// wxGxCatalog
+// ----------------------------------------------------------------------------
+
+IMPLEMENT_DYNAMIC_CLASS(wxGxCatalogUI, wxGxCatalog); 
+
+wxGxCatalogUI::wxGxCatalogUI(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxCatalog(oParent, soName, soPath)
+{
+    m_oIcon = wxIcon(mainframecat_xpm);
+	m_ImageListSmall.Create(16, 16);
+	m_ImageListLarge.Create(48, 48);
+}
+
+wxGxCatalogUI::~wxGxCatalogUI(void)
+{
+}
+
+void wxGxCatalogUI::EditProperties(wxWindow *parent)
+{
+    //show options
+    IApplication* pApp = GetApplication();
+    if(pApp)
+        pApp->OnAppOptions();
+}
+
+wxIcon wxGxCatalogUI::GetLargeImage(void)
+{
+    return wxNullIcon;
+}
+
+wxIcon wxGxCatalogUI::GetSmallImage(void)
+{
+    return m_oIcon;
+}
+
+long wxGxCatalogUI::AddPending(long nParentId)
+{
+    wxGxObjectContainer *pGxObjectContainer = wxDynamicCast(GetRegisterObject(nParentId), wxGxObjectContainer);
+    wxCHECK_MSG(pGxObjectContainer, wxNOT_FOUND, wxT("The parent GxObject is not exist or not a container"));
+    //if not loaded load images to list
+    if(m_ImageListSmall.GetImageCount() == 0)
+        m_ImageListSmall.Add(wxBitmap(process_working_16_xpm));
+    if(m_ImageListLarge.GetImageCount() == 0)
+        m_ImageListLarge.Add(wxBitmap(process_working_48_xpm));
+
+    wxGxPendingUI *pPend = new wxGxPendingUI(&m_ImageListSmall, &m_ImageListLarge, pGxObjectContainer);
+    return pPend->GetId();
+}
+
+void wxGxCatalogUI::RemovePending(long nPendingId)
+{
+    wxGxPendingUI *pPend = wxDynamicCast(GetRegisterObject(nPendingId), wxGxPendingUI);
+    wxCHECK_RET(pPend, wxT("The Pending GxObject is not exist"));
+    wxGIS_GXCATALOG_EVENT_ID(ObjectDeleted, pPend->GetId());
+    pPend->Destroy();
+
+}
+
+/*
+#include "wxgis/core/config.h"
+#include "wxgis/core/globalfn.h"
 
 wxGxCatalogUI::wxGxCatalogUI(bool bFast) : wxGxCatalog()
 {
@@ -50,13 +111,13 @@ void wxGxCatalogUI::Detach(void)
 {
     if(m_bHasInternal)
     {
-		wxGISAppConfigSPtr pConfig = GetConfig();
-		if(pConfig)
+		wxGISAppConfig oConfig = GetConfig();
+		if(oConfig.IsOk())
 		{
-			wxXmlNode* pNode = pConfig->GetConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/rootitems")));
+			wxXmlNode* pNode = oConfig.GetConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/rootitems")));
 			if(pNode)
 			{
-				pConfig->DeleteNodeChildren(pNode);
+				oConfig.DeleteNodeChildren(pNode);
 				SerializePlugins(pNode, true);
 			}
 		}
@@ -70,9 +131,9 @@ void wxGxCatalogUI::Detach(void)
     }
     else
     {
-		wxGISAppConfigSPtr pConfig = GetConfig();
-		if(pConfig)
-			pConfig->Write(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/open_last_path")), m_bOpenLastPath);
+		wxGISAppConfig oConfig = GetConfig();
+		if(oConfig.IsOk())
+			oConfig.Write(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/open_last_path")), m_bOpenLastPath);
 
 	    wxDELETE(m_pSelection);
         wxGxCatalog::Detach();
@@ -126,13 +187,13 @@ void wxGxCatalogUI::Init(IGxCatalog* pExtCat)
 	    LoadObjectFactories();
 	    LoadChildren();
 
-		wxGISAppConfigSPtr pConfig = GetConfig();
-		if(!pConfig)
+		wxGISAppConfig oConfig = GetConfig();
+		if(!oConfig.IsOk())
 			return;
 
-		m_bShowHidden = pConfig->ReadBool(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/show_hidden")), false);
-	    m_bShowExt = pConfig->ReadBool(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/show_ext")), true);
-	    m_bOpenLastPath = pConfig->ReadBool(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/open_last_path")), true);
+		m_bShowHidden = oConfig.ReadBool(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/show_hidden")), false);
+	    m_bShowExt = oConfig.ReadBool(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/show_ext")), true);
+	    m_bOpenLastPath = oConfig.ReadBool(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/open_last_path")), true);
     }
 }
 
@@ -204,5 +265,5 @@ wxIcon wxGxCatalogUI::GetSmallImage(void)
 {
     return wxIcon(mainframecat_xpm);
 }
-
+*/
 

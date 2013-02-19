@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  Geoprocessing Main Commands class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -18,7 +18,7 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-
+/*
 #include "wxgis/geoprocessingui/geoprocessingcmd.h"
 #include "wxgis/geoprocessingui/gptoolboxview.h"
 #include "wxgis/datasource/sysop.h"
@@ -453,3 +453,4 @@ unsigned char wxGISGeoprocessingCmd::GetCount(void)
 {
 	return 2;
 }
+*/

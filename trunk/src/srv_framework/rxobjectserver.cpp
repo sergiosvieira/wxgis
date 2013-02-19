@@ -3,7 +3,7 @@
  * Purpose:  wxRxObjectContainer class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2010,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,109 @@
  ****************************************************************************/
 
 #include "wxgissrv/srv_framework/rxobjectserver.h"
-#include "wxgis/networking/message.h"
+#include "wxgis/net/servernet.h"
+#include "wxgis/geoprocessing/tskmngr.h"
+
+// ----------------------------------------------------------------------------
+// wxRxObjectContainer
+// ----------------------------------------------------------------------------    
+
+wxRxObjectContainer::~wxRxObjectContainer(void)
+{
+}
+
+void wxRxObjectContainer::SendChildren(const wxGxObjectList &Children, long nSourceId, int nClientId)
+{
+    wxGISNetworkService* pNetSrv = GetNetworkService();
+    wxCHECK_RET(pNetSrv, wxT("wxGISNetworkService pointer is null"));
+
+    wxNetMessage msgout(enumGISNetCmdCmd, enumGISCmdGetChildren, enumGISPriorityHighest, nSourceId);
+    wxXmlNode* pRootNode = msgout.GetXMLRoot();
+    wxXmlNode* pChildrenNode = new wxXmlNode(pRootNode, wxXML_ELEMENT_NODE, wxT("children"));
+    wxGxObjectList::const_iterator iter;
+    for(iter = Children.begin(); iter != Children.end(); ++iter)
+    {
+        wxGxObject *pGxObject = *iter;
+        wxRxObject *pRxObject = dynamic_cast<wxRxObject*>(pGxObject);
+        if(pGxObject && pRxObject)
+        {
+            wxXmlNode *pNode = new wxXmlNode(pChildrenNode, wxXML_ELEMENT_NODE, wxT("child"));
+            pNode->AddAttribute(wxT("class"), pRxObject->GetClassName()); 
+            pNode->AddAttribute(wxT("id"), wxString::Format(wxT("%d"), pGxObject->GetId())); 
+            pNode->AddAttribute(wxT("name"), pGxObject->GetName() ); 
+            pNode->AddAttribute(wxT("path"), wxString(pGxObject->GetPath(), wxConvUTF8) ); 
+
+            wxXmlNode* pDecNode = pRxObject->GetXmlDescription();
+            if(pDecNode)
+                pNode->AddChild(pDecNode);
+        }
+    }
+    pNetSrv->SendNetMessage(msgout, nClientId);
+}
+
+// ----------------------------------------------------------------------------
+// wxGxCatalog
+// ----------------------------------------------------------------------------
+
+IMPLEMENT_DYNAMIC_CLASS(wxRxCatalog, wxGxCatalog); 
+
+wxRxCatalog::wxRxCatalog(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxCatalog(oParent, soName, soPath)
+{
+    //create 
+    SetTaskManager(new wxGISTaskManager());
+}
+
+wxRxCatalog::~wxRxCatalog(void)
+{
+    //delete task manager object
+    SetTaskManager(NULL);
+}
+
+void wxRxCatalog::OnNetEvent(wxGISNetEvent& event) 
+{
+    wxASSERT_MSG(0, wxT("The function should never call"));
+}
+
+void wxRxCatalog::ProcessNetEvent(wxGISNetEvent& event)
+{
+    wxNetMessage msg = event.GetNetMessage();
+    long nlId = msg.GetId();
+    if(nlId == wxNOT_FOUND || nlId == GetId())
+    {
+        switch(msg.GetCommand())
+        {
+        case enumGISNetCmdCmd:
+            switch(msg.GetState())
+            {
+            case enumGISCmdGetChildren:
+                SendChildren(GetChildren(), GetId(), event.GetId());
+                break;
+            default:
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    else //sent it to recipient by id
+    {
+        wxRxObject* pRxObject = dynamic_cast<wxRxObject*>(GetRegisterObject(nlId));
+        if(pRxObject)
+            pRxObject->OnNetEvent(event);
+        else
+        {
+            //send it back
+            msg.SetState(enumGISNetCmdStErr);
+            msg.SetMessage(_("The destination wxRxObject is not found"));
+            wxGISNetworkService* pNetSrv = GetNetworkService();
+            if(pNetSrv)
+                pNetSrv->SendNetMessage(msg, event.GetId());
+        }
+    }
+}
+
+/*#include "wxgis/networking/message.h"
 
 //------------------------------------------------------------------
 // wxRxObjectContainer
@@ -182,3 +284,4 @@ void wxRxObject::Detach(void)
 		pNetMessageProcessor->DelMessageReceiver(GetFullName(), static_cast<INetMessageReceiver*>(this));
 	IGxObject::Detach();
 }
+*/

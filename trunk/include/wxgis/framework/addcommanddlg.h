@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  add command in command bar dialog.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2010  Bishop
 *
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-//#include "wxgis/framework/framework.h"
+#include "wxgis/framework/framework.h"
 #include "wxgis/framework/application.h"
 
 #include "wx/intl.h"
@@ -49,7 +49,7 @@ class WXDLLIMPEXP_GIS_FRW wxGISAddCommandDlg : public wxDialog
 		MENUID = ID_PLUGINCMD + 1200
 	};
 public:
-	typedef std::map<wxString, COMMANDARRAY*> CATEGORYMAP;
+	typedef std::map<wxString, wxCommandPtrArray> CATEGORYMAP;
 	std::vector<long> m_IDArray;
 
 private:

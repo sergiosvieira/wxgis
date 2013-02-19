@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDiscConnection class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009,2010,2012  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -25,16 +25,23 @@
 /** \class wxGxDiscConnection gxdiscconnection.h
     \brief A Disc Connection GxObject.
 */
+
 class WXDLLIMPEXP_GIS_CLT wxGxDiscConnection :
 	public wxGxFolder
 {
+    DECLARE_DYNAMIC_CLASS(wxGxDiscConnection)
 public:
-	wxGxDiscConnection(CPLString Path, wxString Name);
+    wxGxDiscConnection(void);
+	wxGxDiscConnection(wxGxObject *oParent, const wxString &soXmlConfPath, int nXmlId, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 	virtual ~wxGxDiscConnection(void);
-	//IGxObject
+	//wxGxObject
 	virtual wxString GetCategory(void){return wxString(_("Folder connection"));};
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return false;};
-	virtual bool Rename(wxString NewName);
+	virtual bool Rename(const wxString& NewName);
+    virtual int GetXmlId(void) const {return m_nXmlId;};
+protected:
+    int m_nXmlId;
+    wxString m_soXmlConfPath;
 };

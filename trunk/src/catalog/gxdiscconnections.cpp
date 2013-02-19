@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDiscConnections class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,89 +19,156 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxdiscconnections.h"
+#include "wxgis/catalog/gxcatalog.h"
 #include "wxgis/core/config.h"
+#include "wxgis/core/format.h"
 #include "wxgis/catalog/gxdiscconnection.h"
 
-#include "wx/volume.h"
-#include "wx/dir.h"
+#include <wx/volume.h>
+#include <wx/dir.h>
 
 
-IMPLEMENT_DYNAMIC_CLASS(wxGxDiscConnections, wxObject)
+IMPLEMENT_DYNAMIC_CLASS(wxGxDiscConnections, wxGxXMLConnectionStorage)
 
-wxGxDiscConnections::wxGxDiscConnections(void) : m_bIsChildrenLoaded(false)
+BEGIN_EVENT_TABLE(wxGxDiscConnections, wxGxXMLConnectionStorage)
+    EVT_FSWATCHER(wxID_ANY, wxGxXMLConnectionStorage::OnFileSystemEvent)
+END_EVENT_TABLE()
+
+wxGxDiscConnections::wxGxDiscConnections(void) : wxGxXMLConnectionStorage(), m_bIsChildrenLoaded(false)
 {
-    m_bEnabled = true;
+}
+
+bool wxGxDiscConnections::Create(wxGxObject *oParent, const wxString &soName, const CPLString &soPath)
+{
+    if( !wxGxObjectContainer::Create(oParent, wxString(_("Folder connections")), soPath) )
+    {
+        wxLogError(_("wxGxDiscConnections::Create failed. GxObject %s"), wxString(_("Folder connections")).c_str());
+        return false;
+    }
     //get config path
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	if(pConfig)
+    m_sXmlStorageName = wxString(CONNCONF);
+	wxGISAppConfig oConfig = GetConfig();
+	if(oConfig.IsOk())
 	{
-		m_sUserConfigDir = pConfig->GetLocalConfigDirNonPortable() + wxFileName::GetPathSeparator() + wxString(CONNDIR);
-		m_sUserConfig = m_sUserConfigDir + wxFileName::GetPathSeparator() + wxString(CONNCONF);
+		m_sUserConfigDir = oConfig.GetLocalConfigDirNonPortable() + wxFileName::GetPathSeparator() + wxString(CONNDIR);
+		m_sXmlStoragePath = m_sUserConfigDir + wxFileName::GetPathSeparator() + m_sXmlStorageName;
 	}
+    m_pWatcher = new wxFileSystemWatcher();
+    m_pWatcher->SetOwner(this);
+ 
+    wxFileName oFileName = wxFileName::DirName(m_sUserConfigDir);
+    //if dir is not exist create it
+    if(!wxDirExists(m_sUserConfigDir))
+        wxFileName::Mkdir(m_sUserConfigDir, 0755, wxPATH_MKDIR_FULL);
+
+    if(!m_pWatcher->AddTree(oFileName, wxFSW_EVENT_MODIFY))//bool bAdd = |wxFSW_EVENT_CREATE
+    {
+        wxLogError(_("Add File system watcher failed"));
+        return false;
+    }
+
+    return true;
 }
 
 wxGxDiscConnections::~wxGxDiscConnections(void)
 {
 }
 
-void wxGxDiscConnections::Detach(void)
+bool wxGxDiscConnections::Destroy(void)
 {
-	EmptyChildren();
-    IGxObject::Detach();
+    wxDELETE(m_pWatcher);
+    return wxGxXMLConnectionStorage::Destroy();
 }
 
 void wxGxDiscConnections::Refresh(void)
 {
-	EmptyChildren();
-	LoadChildren();
-    m_pCatalog->ObjectRefreshed(GetID());
+    if(DestroyChildren())
+        LoadConnectionsStorage();
+
+    wxGxXMLConnectionStorage::Refresh();
 }
 
 void wxGxDiscConnections::Init(wxXmlNode* const pConfigNode)
+{    
+    LoadConnectionsStorage();
+}
+
+void wxGxDiscConnections::Serialize(wxXmlNode* const pConfigNode)
 {
-    wxXmlDocument doc;
-    if (doc.Load(m_sUserConfig))
+    //Nothing to do. We edit connections xml from other functions
+    //StoreConnections();
+}
+
+bool wxGxDiscConnections::IsObjectExist(wxGxObject* const pObj, const wxXmlNode* pNode)
+{
+    int nXmlId = GetDecimalValue(pNode, wxT("id"), wxNOT_FOUND);
+    wxGxDiscConnection* pConn = wxDynamicCast(pObj, wxGxDiscConnection);
+    if(!pConn)
+        return false;
+
+    if(pConn->GetXmlId() != nXmlId)
+        return false;
+
+    //if exist control name and path
+
+    wxString sName = pNode->GetAttribute(wxT("name"), NONAME);
+	wxString sPath = pNode->GetAttribute(wxT("path"), NONAME);
+    CPLString szPath(sPath.mb_str(wxConvUTF8));
+
+    if(pObj->GetPath() != szPath)
     {
-        wxXmlNode* pConnectionsNode = doc.GetRoot();
-		wxXmlNode* pDiscConn = pConnectionsNode->GetChildren();
-		while(pDiscConn)
-		{
-			wxString sName = pDiscConn->GetAttribute(wxT("name"), NONAME);
-			wxString sPath = pDiscConn->GetAttribute(wxT("path"), ERR);
-			if(sPath != ERR)
-			{
-                CONN_DATA data = {sName, CPLString(sPath.mb_str(wxConvUTF8))};
-                m_aConnections.push_back(data);
-			}
-			pDiscConn = pDiscConn->GetNext();
-		}
+        pObj->SetPath(szPath);
+        //ObjectChanged event
+        wxGIS_GXCATALOG_EVENT_ID(ObjectRefreshed, pObj->GetId());
     }
-    else
+
+    if(!pObj->GetName().IsSameAs( sName, false))
     {
-        wxLogMessage(_("wxGxDiscConnections: Start scan folder connections"));
-        wxArrayString arr;
+        pObj->SetName(sName);
+        //ObjectChanged event
+        wxGIS_GXCATALOG_EVENT_ID(ObjectChanged, pObj->GetId());
+    }
+    return true;
+}
+
+void wxGxDiscConnections::CreateConnectionsStorage(void)
+{
+    wxLogMessage(_("wxGxDiscConnections: Start scan folder connections"));
+    wxArrayString arr;
 #ifdef __WXMSW__
-		arr = wxFSVolumeBase::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE);//| wxFS_VOL_REMOTE
+	arr = wxFSVolumeBase::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE);//| wxFS_VOL_REMOTE
 #else
-        //linux paths
-        wxStandardPaths stp;
-        arr.Add(wxT("/"));
-        arr.Add(stp.GetUserConfigDir());
+    //linux paths
+    wxStandardPaths stp;
+    arr.Add(wxT("/"));
+    arr.Add(stp.GetUserConfigDir());
 //      arr.Add(stp.GetDataDir());
 #endif
-        for(size_t i = 0; i < arr.size(); ++i)
-		{
-            CONN_DATA data = {arr[i], CPLString(arr[i].mb_str(wxConvUTF8))};
-            m_aConnections.push_back(data);
-		}
+    //create
+    wxXmlNode* pRootNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("DiscConnections"));
+    SetDecimalValue(pRootNode, wxT("ver"), 2);
+    wxXmlDocument doc;
+    doc.SetRoot(pRootNode);
+    for(size_t i = 0; i < arr.size(); ++i)
+	{
+ 	    wxXmlNode* pDiscConn = new wxXmlNode(pRootNode, wxXML_ELEMENT_NODE, wxT("DiscConnection"));
+	    pDiscConn->AddAttribute(wxT("name"), arr[i]);
+	    pDiscConn->AddAttribute(wxT("path"), arr[i]);
+        SetDecimalValue(pDiscConn, wxT("id"), (int)i);
 	}
+    doc.Save(m_sXmlStoragePath);
 }
 
-void wxGxDiscConnections::Serialize(wxXmlNode* pConfigNode)
+wxGxObject* wxGxDiscConnections::CreateChildGxObject(const wxXmlNode* pNode)
 {
-    StoreConnections();
+    wxString soName = pNode->GetAttribute(wxT("name"), NONAME);
+    wxString sPath = pNode->GetAttribute(wxT("path"), NONAME);
+    CPLString soPath(sPath.mb_str(wxConvUTF8));
+    int nXmlId = GetDecimalValue(pNode, wxT("id"), wxNOT_FOUND);
+    return new wxGxDiscConnection(this, m_sXmlStoragePath, nXmlId, soName, soPath);
 }
 
+/*
 void wxGxDiscConnections::EmptyChildren(void)
 {
     m_aConnections.clear();
@@ -142,64 +209,79 @@ void wxGxDiscConnections::LoadChildren(void)
         wxGxDiscConnection* pwxGxDiscConnection = new wxGxDiscConnection(m_aConnections[i].sPath, m_aConnections[i].sName);
         IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
         if(AddChild(pGxObject))
-            wxLogMessage(_("wxGxDiscConnections: Add folder connection [%s]"), m_aConnections[i].sName.c_str());
+            wxLogVerbose(_("wxGxDiscConnections: Add folder connection [%s]"), m_aConnections[i].sName.c_str());
     }
 
 	m_bIsChildrenLoaded = true;
 }
-
-IGxObject* wxGxDiscConnections::ConnectFolder(wxString sPath)
+*/
+bool wxGxDiscConnections::ConnectFolder(const wxString &sPath)
 {
-    IGxObject* pReturnObj(NULL);
-
-    for(size_t i = 0; i < m_Children.size(); ++i)
+    wxCriticalSectionLocker locker(m_oCritSect);     
+    if(!wxDir::Exists(sPath))
+        return false;
+    //find max id
+    int nMaxId(0);
+	wxGxObjectList ObjectList = GetChildren();
+    wxGxObjectList::iterator iter;
+    for (iter = ObjectList.begin(); iter != ObjectList.end(); ++iter)
     {
-        wxGxDiscConnection* pConn = dynamic_cast<wxGxDiscConnection*>(m_Children[i]);
-        if(pConn)
-        {
-            wxString sConnPath(pConn->GetInternalName(), wxConvUTF8);
-            if(sConnPath.CmpNoCase(sPath) == 0)
-                return dynamic_cast<IGxObject*>(pConn);
-        }
+        wxGxObject *current = *iter;
+		wxGxDiscConnection* pConn = wxDynamicCast(current, wxGxDiscConnection);
+        if(!pConn)
+            continue;
+        if(nMaxId < pConn->GetXmlId())
+            nMaxId = pConn->GetXmlId();
     }
-
-    if(wxDir::Exists(sPath)) 	//check if path is valid
-	{
-	    wxGxDiscConnection* pwxGxDiscConnection = new wxGxDiscConnection(CPLString(sPath.mb_str(wxConvUTF8)), sPath);
-        IGxObject* pGxObject = static_cast<IGxObject*>(pwxGxDiscConnection);
-        if(AddChild(pGxObject))
-        {
-		    m_pCatalog->ObjectAdded(pGxObject->GetID());
-            StoreConnections();
-            return pGxObject;
-        }
-        else
-		    pReturnObj = this;
-    }
-    else
+    nMaxId++;
+    //add
+    wxXmlDocument doc;
+    //try to load connections xml file
+    if(doc.Load(m_sXmlStoragePath))
     {
-		pReturnObj = this;
+        wxXmlNode* pConnectionsNode = doc.GetRoot();
+		wxXmlNode* pDiscConn = new wxXmlNode(pConnectionsNode, wxXML_ELEMENT_NODE, wxT("DiscConnection"));
+
+	    pDiscConn->AddAttribute(wxT("name"), sPath);
+	    pDiscConn->AddAttribute(wxT("path"), sPath);        
+        SetDecimalValue(pDiscConn, wxT("id"), nMaxId);
+
+        return doc.Save(m_sXmlStoragePath);
     }
-	return pReturnObj;
+    return false;
 }
 
-void wxGxDiscConnections::DisconnectFolder(CPLString sPath)
+bool wxGxDiscConnections::DisconnectFolder(int nXmlId)
 {
-    for(size_t i = 0; i < m_Children.size(); ++i)
+    wxCriticalSectionLocker locker(m_oCritSect);     
+    
+    wxXmlDocument doc;
+    //try to load connections xml file
+    if(doc.Load(m_sXmlStoragePath))
     {
-        wxGxDiscConnection* pConn = dynamic_cast<wxGxDiscConnection*>(m_Children[i]);
-        if(pConn)
-        {
-            if(pConn->GetInternalName() == sPath)
+        wxXmlNode* pConnectionsNode = doc.GetRoot();
+ 		wxXmlNode* pConnectionNode = pConnectionsNode->GetChildren();
+
+		while(pConnectionNode)
+		{
+            wxXmlNode* pCurConnectionNode = pConnectionNode;
+            int nNodeXmlId = GetDecimalValue(pCurConnectionNode, wxT("id"), wxNOT_FOUND);
+            pConnectionNode = pConnectionNode->GetNext();
+            if(nNodeXmlId == nXmlId)
             {
-                IGxObject* pOut = dynamic_cast<IGxObject*>(pConn);
-                DeleteChild(pOut);
+                if(pConnectionsNode->RemoveChild(pCurConnectionNode))
+                {
+                    wxDELETE(pCurConnectionNode);
+                    break;
+                }
             }
-        }
+		}
+        return doc.Save(m_sXmlStoragePath);
     }
-    StoreConnections();
+    return false;
 }
 
+/*
 void wxGxDiscConnections::StoreConnections(void)
 {
 //#ifndef WXGISPORTABLE
@@ -231,4 +313,5 @@ void wxGxDiscConnections::StoreConnections(void)
     doc.Save(m_sUserConfig);
 //#endif
 }
+*/
 

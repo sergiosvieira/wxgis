@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  Main frame class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2009-2010,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,11 +22,12 @@
 #pragma once
 
 #include "wxgis/framework/framework.h"
+
 #include "wxgis/catalogui/gxapplication.h"
 
-#include "wx/aui/aui.h"
-#include "wx/generic/logg.h"
-#include "wx/artprov.h"
+#include <wx/aui/aui.h>
+#include <wx/generic/logg.h>
+#include <wx/artprov.h>
 #include <wx/event.h>
 #include <wx/menu.h>
 
@@ -40,8 +41,8 @@ class wxGISCatalogFrame :
     DECLARE_CLASS(wxGISCatalogFrame)
 public:
 	wxGISCatalogFrame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER);//| wxWS_EX_VALIDATE_RECURSIVELY
-	~wxGISCatalogFrame(void);
-//IFrameApplication
+	virtual ~wxGISCatalogFrame(void);
+//wxGxApplication
 	virtual void OnAppAbout(void);
 };
 

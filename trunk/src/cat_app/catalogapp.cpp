@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  Main application class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,17 +18,18 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-
-#include "wxgis/catalog/catalog.h"
 #include "wxgis/cat_app/catalogapp.h"
 #include "wxgis/cat_app/catalogframe.h"
+//#include "wxgis/catalog/catalog.h"
+#include "wxgis/core/config.h"
 
 #include <locale.h>
-//#include "ogrsf_frmts/ogrsf_frmts.h"
-#include "ogrsf_frmts.h"
-#include "ogr_api.h"
 
-IMPLEMENT_APP(wxGISCatalogApp);
+//#include "ogrsf_frmts.h"
+#include "ogr_api.h"
+#include "gdal_priv.h"
+
+IMPLEMENT_APP(wxGISCatalogApp)
 
 wxGISCatalogApp::wxGISCatalogApp(void)
 {
@@ -41,79 +42,86 @@ wxGISCatalogApp::~wxGISCatalogApp(void)
 	GDALDestroyDriverManager();
 	OGRCleanupAll();
 
-	ReleaseConfig();
-
 	UnLoadLibs();
 }
 
-#include "wxgis/core/crypt.h"
+
 
 bool wxGISCatalogApp::OnInit()
 {
-    wxGISCatalogFrame* frame = new wxGISCatalogFrame(NULL, wxID_ANY, _("wxGIS Catalog"), wxDefaultPosition, wxSize(800, 480) );
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	if(!pConfig)
+    // call the base class initialization method, currently it only parses a
+    // few common command-line options but it could be do more in the future
+    if ( !wxApp::OnInit() )
+        return false;
+    wxGISAppConfig oConfig = GetConfig();
+	if(!oConfig.IsOk())
 		return false;
 
-//    wxString sT(wxT("qqq")), sCT;
-//	bool bTest = Crypt(sT, sCT);
-//	const char* szT = sCT.mb_str(wxConvUTF8);
-//	bTest = Decrypt(sCT, sT);
-//    const char* szT1 = sT.mb_str(wxConvUTF8);
+    //create application/main frame
+    wxGISCatalogFrame* frame = new wxGISCatalogFrame(NULL, wxID_ANY, wxString(_("wxGIS Catalog")), wxDefaultPosition, wxSize(800, 480) );
 
 	//setup loging
-	wxString sLogDir = pConfig->GetLogDir();
+	wxString sLogDir = oConfig.GetLogDir();
     if(!frame->SetupLog(sLogDir))
         return false;
 
 	//setup locale
-	wxString sLocale = pConfig->GetLocale();
-	wxString sLocaleDir = pConfig->GetLocaleDir();
+	wxString sLocale = oConfig.GetLocale();
+	wxString sLocaleDir = oConfig.GetLocaleDir();
     if(!frame->SetupLoc(sLocale, sLocaleDir))
         return false;
 
    	//setup sys
-    wxString sSysDir = pConfig->GetSysDir();
+    wxString sSysDir = oConfig.GetSysDir();
     if(!frame->SetupSys(sSysDir))
         return false;
 
    	//setup debug
-	bool bDebugMode = pConfig->GetDebugMode();
+	bool bDebugMode = oConfig.GetDebugMode();
     frame->SetDebugMode(bDebugMode);
 
     //some default GDAL
-	wxString sGDALCacheMax = pConfig->Read(enumGISHKCU, wxString(wxT("wxGISCommon/GDAL/cachemax")), wxString(wxT("128")));
-	CPLSetConfigOption( "GDAL_CACHEMAX", sGDALCacheMax.mb_str() );
-    //CPLSetConfigOption ( "LIBKML_USE_DOC.KML", "no" );
+	wxString sGDALCacheMax = oConfig.Read(enumGISHKCU, wxString(wxT("wxGISCommon/GDAL/cachemax")), wxString(wxT("128")));
+	CPLSetConfigOption ( "GDAL_CACHEMAX", sGDALCacheMax.mb_str() );
+    CPLSetConfigOption ( "LIBKML_USE_DOC.KML", "no" );
+    CPLSetConfigOption ( "GDAL_USE_SOURCE_OVERVIEWS", "ON" );
     //GDAL_MAX_DATASET_POOL_SIZE
     //OGR_ARC_STEPSIZE
 
 	OGRRegisterAll();
 	GDALAllRegister();
 
-	wxLogMessage(_("wxGISCatalogApp: Start main frame"));
+	wxLogVerbose(_("wxGISCatalogApp: Start main frame"));
 
 	//store values
-	pConfig->SetLogDir(sLogDir);
-	pConfig->SetLocale(sLocale);
-	pConfig->SetLocaleDir(sLocaleDir);
-	pConfig->SetSysDir(sSysDir);
-	pConfig->SetDebugMode(bDebugMode);
+
+	oConfig.SetLogDir(sLogDir);
+	oConfig.SetLocale(sLocale);
+	oConfig.SetLocaleDir(sLocaleDir);
+	oConfig.SetSysDir(sSysDir);
+	oConfig.SetDebugMode(bDebugMode);
+
 	//gdal
-	pConfig->Write(enumGISHKCU, wxString(wxT("wxGISCommon/GDAL/cachemax")), sGDALCacheMax);
+	oConfig.Write(enumGISHKCU, wxString(wxT("wxGISCommon/GDAL/cachemax")), sGDALCacheMax);
 
+    wxString sKey(wxT("wxGISCommon/libs"));
     //load libs
-	wxXmlNode* pLibsNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/libs")));
+	wxXmlNode* pLibsNode = oConfig.GetConfigNode(enumGISHKCU, sKey);
 	if(pLibsNode)
 		LoadLibs(pLibsNode);
-	pLibsNode = pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("wxGISCommon/libs")));
+	pLibsNode = oConfig.GetConfigNode(enumGISHKLM, sKey);
 	if(pLibsNode)
 		LoadLibs(pLibsNode);
 
-    if(!frame->Create())
+    if(!frame->CreateApp())
         return false;
-    SetTopWindow(frame);
-    frame->Show();
+
+    // and show it (the frames, unlike simple controls, are not shown when
+    // created initially)
+    frame->Show(true);
+    //SetTopWindow(frame);
 
 	return true;
 }
+
+

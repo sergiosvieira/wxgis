@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxKMLDataset class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -25,6 +25,7 @@
 /** \class wxGxKMLDataset gxkmldataset.h
     \brief A kml GxObject.
 */
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxKMLDataset :
 	public IGxObjectEdit,
     public IGxObjectContainer,
@@ -69,10 +70,11 @@ protected:
 	wxGISEnumVectorDatasetType m_eType;
     bool m_bIsChildrenLoaded;
 };
-
+*/
 /** \class wxGxKMLSubDataset gxkmldataset.h
     \brief A kml layer GxObject.
 */
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxKMLSubDataset :
 	public IGxObject,
 	public IGxDataset
@@ -99,3 +101,4 @@ protected:
 	wxGISDatasetSPtr m_pwxGISDataset;
 	wxGISEnumVectorDatasetType m_type;
 };
+*/

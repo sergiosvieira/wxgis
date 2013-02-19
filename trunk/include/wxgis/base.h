@@ -3,7 +3,7 @@
  * Purpose:  base header.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -268,6 +268,17 @@
 #    define WXDLLIMPEXP_DATA_GIS_MAP(type) type
 #endif
 
+#ifdef WXMAKINGDLL_GIS_SRVNET
+#    define WXDLLIMPEXP_GIS_SRVNET WXEXPORT
+#    define WXDLLIMPEXP_DATA_GIS_SRVNET(type) WXEXPORT type
+#elif defined(WXUSINGDLL)
+#    define WXDLLIMPEXP_GIS_SRVNET WXIMPORT
+#    define WXDLLIMPEXP_DATA_GIS_SRVNET(type) WXIMPORT type
+#else /* not making nor using DLL */
+#    define WXDLLIMPEXP_GIS_SRVNET
+#    define WXDLLIMPEXP_DATA_GIS_SRVNET(type) type
+#endif
+
 #if defined(HAVE_VISIBILITY) || (defined(__WINDOWS__) && defined(__GNUC__))
     #define WXDLLIMPEXP_FWD_GIS_CORE
     #define WXDLLIMPEXP_FWD_GIS_FRW
@@ -285,6 +296,7 @@
     #define WXDLLIMPEXP_FWD_GIS_NET
     #define WXDLLIMPEXP_FWD_GIS_MAPU
     #define WXDLLIMPEXP_FWD_GIS_MAP
+    #define WXDLLIMPEXP_FWD_GIS_SRVNET
 #else
     #define WXDLLIMPEXP_FWD_GIS_CORE	WXDLLIMPEXP_GIS_CORE
     #define WXDLLIMPEXP_FWD_GIS_FRW 	WXDLLIMPEXP_GIS_FRW
@@ -302,9 +314,8 @@
     #define WXDLLIMPEXP_FWD_GIS_NET 	WXDLLIMPEXP_GIS_NET
     #define WXDLLIMPEXP_FWD_GIS_MAPU	WXDLLIMPEXP_GIS_MAPU
     #define WXDLLIMPEXP_FWD_GIS_MAP		WXDLLIMPEXP_GIS_MAP
+    #define WXDLLIMPEXP_FWD_GIS_SRVNET	WXDLLIMPEXP_GIS_SRVNET
 #endif
-
-#include <wx/xml/xml.h>
 
 #include <algorithm>
 #include <map>

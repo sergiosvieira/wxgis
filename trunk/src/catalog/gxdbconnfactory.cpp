@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDBConnectionFactory class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -19,8 +19,10 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxdbconnfactory.h"
-#include "wxgis/catalog/gxremoteconn.h"
 
+
+/*
+#include "wxgis/catalog/gxremoteconn.h"
 IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionFactory, wxObject)
 
 wxGxDBConnectionFactory::wxGxDBConnectionFactory(void)
@@ -37,7 +39,7 @@ bool wxGxDBConnectionFactory::GetChildren(CPLString sParentDir, char** &pFileNam
     {
         IGxObject* pGxObj = NULL;
         CPLString szExt = CPLGetExtension(pFileNames[i]);
-        if(EQUAL(szExt, "xconn"))
+        if(wxGISEQUAL(szExt, "xconn"))
         {
 			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]));
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
@@ -73,3 +75,4 @@ IGxObject* wxGxDBConnectionFactory::GetGxDataset(CPLString path, wxString name)
     //pDataset->SetEncoding(wxFONTENCODING_UTF8);
     return static_cast<IGxObject*>(pDataset);
 }
+*/

@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISProgressDlg class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011, 2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -32,15 +32,16 @@ class WXDLLIMPEXP_GIS_FRW wxGISProgressDlg :
 	public ITrackCancel,
 	public IProgressor
 {
+    DECLARE_CLASS(wxGISProgressDlg)
 public:
 	wxGISProgressDlg( const wxString &title, const wxString &message, int  maximum = 100, wxWindow *  parent = NULL, int style = wxPD_AUTO_HIDE|wxPD_APP_MODAL );
 	virtual ~wxGISProgressDlg(void);
 	//IProgressor
     virtual bool Show(bool bShow);
     virtual void SetRange(int range);
-    virtual int GetRange(void);
+    virtual int GetRange(void) const ;
     virtual void SetValue(int value);
-    virtual int GetValue(void);
+    virtual int GetValue(void) const;
     virtual void Play(void);
     virtual void Stop(void);
 	virtual void SetYield(bool bYield = false){};
@@ -48,8 +49,8 @@ public:
 	virtual void Cancel(void);
 	virtual bool Continue(void);
 	virtual void Reset(void);
-	virtual void PutMessage(wxString sMessage, size_t nIndex = wxNOT_FOUND, wxGISEnumMessageType nType = enumGISMessageUnk);
-    virtual wxString GetLastMessage(void){return m_sLastMessage;};
+	virtual void PutMessage(const wxString &sMessage, size_t nIndex = wxNOT_FOUND, wxGISEnumMessageType nType = enumGISMessageUnk);
+    virtual wxString GetLastMessage(void) const {return m_sLastMessage;};
 protected:
 	int m_nValue;
 	wxString m_sLastMessage;

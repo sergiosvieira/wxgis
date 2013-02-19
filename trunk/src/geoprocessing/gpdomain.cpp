@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  geoprocessing tool parameters domains.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,37 +21,43 @@
 
 #include "wxgis/geoprocessing/gpdomain.h"
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISGPValueDomain
-///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// Class wxGISGPValueDomain
+//-----------------------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxGISGPValueDomain, wxObject)
 
 wxGISGPValueDomain::wxGISGPValueDomain(void) 
 {
 	m_bAltered = false;
+    m_pDomParet = NULL;
 }
 
 wxGISGPValueDomain::~wxGISGPValueDomain(void)
 {
 }
 
-void wxGISGPValueDomain::AddValue(const wxVariant& Element, wxString soNameStr)
+void wxGISGPValueDomain::AddValue(const wxVariant& Element, const wxString &soNameStr)
 {
 	m_asoData.push_back(Element);
 	m_asoNames.Add(soNameStr);
+    m_bAltered = true;
+    if(m_pDomParet)
+        m_pDomParet->OnValueAdded(Element, soNameStr);
 }
 
-size_t wxGISGPValueDomain::GetCount(void)
+size_t wxGISGPValueDomain::GetCount(void) const
 {
 	return m_asoData.size(); 
 }
 
-wxVariant wxGISGPValueDomain::GetValue(size_t nIndex)
+wxVariant wxGISGPValueDomain::GetValue(size_t nIndex) const
 { 
 	wxASSERT(nIndex < m_asoData.size());
 	return m_asoData[nIndex]; 
 }
 
-wxString wxGISGPValueDomain::GetName(size_t nIndex)
+wxString wxGISGPValueDomain::GetName(size_t nIndex) const
 { 
 	return m_asoNames[nIndex]; 
 }
@@ -61,9 +67,11 @@ void wxGISGPValueDomain::Clear(void)
 	m_asoData.clear();
 	m_asoNames.Empty();
 	m_bAltered = true;
+    if(m_pDomParet)
+        m_pDomParet->OnCleared();
 }
 
-wxVariant wxGISGPValueDomain::GetValueByName(wxString soNameStr)
+wxVariant wxGISGPValueDomain::GetValueByName(const wxString &soNameStr) const
 {
 	int nPos = m_asoNames.Index(soNameStr);
 	wxVariant result;
@@ -72,12 +80,12 @@ wxVariant wxGISGPValueDomain::GetValueByName(wxString soNameStr)
 	return result;
 }
 
-int wxGISGPValueDomain::GetPosByName(wxString sName)
+int wxGISGPValueDomain::GetPosByName(const wxString &sName) const
 {
 	return m_asoNames.Index(sName);
 }
 
-int wxGISGPValueDomain::GetPosByValue(wxVariant oVal)
+int wxGISGPValueDomain::GetPosByValue(const wxVariant &oVal) const
 {
 	int nPos = wxNOT_FOUND;
 	for(size_t i = 0; i < m_asoData.size(); ++i)
@@ -91,9 +99,11 @@ int wxGISGPValueDomain::GetPosByValue(wxVariant oVal)
 	return nPos;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISGPGxObjectDomain
-///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// Class wxGISGPGxObjectDomain
+//-----------------------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxGISGPGxObjectDomain, wxGISGPValueDomain)
 
 wxGISGPGxObjectDomain::wxGISGPGxObjectDomain(void) : wxGISGPValueDomain()
 {
@@ -103,32 +113,32 @@ wxGISGPGxObjectDomain::~wxGISGPGxObjectDomain(void)
 {
     for(size_t i = 0; i < m_asoData.size(); ++i)
 	{
-		IGxObjectFilter* pFil = (IGxObjectFilter*)m_asoData[i].GetVoidPtr();
+		wxGxObjectFilter* pFil = (wxGxObjectFilter*)m_asoData[i].GetVoidPtr();
 		wxDELETE(pFil);
 	}
 }
 
-void wxGISGPGxObjectDomain::AddFilter(IGxObjectFilter* pFilter)
+void wxGISGPGxObjectDomain::AddFilter(wxGxObjectFilter* pFilter)
 {
 	AddValue(wxVariant((void*)pFilter), pFilter->GetName());
 }
 
-IGxObjectFilter* wxGISGPGxObjectDomain::GetFilter(size_t nIndex)
+wxGxObjectFilter* const wxGISGPGxObjectDomain::GetFilter(size_t nIndex) const
 {
-	return (IGxObjectFilter*)GetValue(nIndex).GetVoidPtr();
+	return (wxGxObjectFilter*)GetValue(nIndex).GetVoidPtr();
 }
 
-int wxGISGPGxObjectDomain::GetPosByValue(wxVariant oVal)
+int wxGISGPGxObjectDomain::GetPosByValue(const wxVariant &oVal) const
 {
     if(!oVal.IsNull())
     {
 		wxFileName oName(oVal.GetString());
         for(size_t i = 0; i < m_asoData.size(); ++i)
         {
-            IGxObjectFilter* poFilter = GetFilter(i);
+            wxGxObjectFilter* poFilter = GetFilter(i);
             if(poFilter)
             {
-                if(oName.GetExt().CmpNoCase(poFilter->GetExt()) == 0 || poFilter->GetExt() == wxEmptyString)
+                if( oName.GetExt().IsSameAs(poFilter->GetExt(), false) || poFilter->GetExt().IsEmpty() )
                 {
                     return i;
                 }
@@ -137,9 +147,12 @@ int wxGISGPGxObjectDomain::GetPosByValue(wxVariant oVal)
     }
 	return wxNOT_FOUND;
 }
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISGPStringDomain
-///////////////////////////////////////////////////////////////////////////////
+
+//-----------------------------------------------------------------------------
+// Class wxGISGPStringDomain
+//-----------------------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxGISGPStringDomain, wxGISGPValueDomain)
 
 wxGISGPStringDomain::wxGISGPStringDomain(void) : wxGISGPValueDomain()
 {
@@ -149,7 +162,7 @@ wxGISGPStringDomain::~wxGISGPStringDomain(void)
 {
 }
 
-void wxGISGPStringDomain::AddString(wxString soStr, wxString soName)
+void wxGISGPStringDomain::AddString(const wxString &soStr, const wxString &soName)
 {
 	if(soName.IsEmpty())
 		AddValue(wxVariant(soStr), soStr);
@@ -157,7 +170,7 @@ void wxGISGPStringDomain::AddString(wxString soStr, wxString soName)
 		AddValue(wxVariant(soStr), soName);
 }
 
-wxString wxGISGPStringDomain::GetString(size_t nIndex)
+wxString wxGISGPStringDomain::GetString(size_t nIndex) const 
 {
 	return GetValue(nIndex).GetString();
 }

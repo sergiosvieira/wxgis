@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxCSVFileFactoryUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -26,6 +26,7 @@
 /** \class wxGxCSVFileFactoryUI gxcsvfactoryui.h
     \brief A csv dataset GxObject.
 */
+/*
 class wxGxCSVFileFactoryUI :
 	public wxGxCSVFileFactory
 {
@@ -39,3 +40,4 @@ protected:
     wxIcon m_LargeCSVIcon, m_SmallCSVIcon;
     //wxIcon m_LargeMifIcon, m_SmallMifIcon;
 };
+*/

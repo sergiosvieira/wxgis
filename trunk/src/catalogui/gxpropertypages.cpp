@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  PropertyPages of Catalog.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010,2011 Bishop
+*   Copyright (C) 2010,2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,9 +20,12 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxpropertypages.h"
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISCatalogGeneralPropertyPage
-///////////////////////////////////////////////////////////////////////////////
+/*
+    
+//-------------------------------------------------------------------------------
+// wxGISCatalogGeneralPropertyPage
+//-------------------------------------------------------------------------------
+
 IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogGeneralPropertyPage, wxPanel)
 
 wxGISCatalogGeneralPropertyPage::wxGISCatalogGeneralPropertyPage(void) : m_pCatalog(NULL)
@@ -33,7 +36,7 @@ wxGISCatalogGeneralPropertyPage::~wxGISCatalogGeneralPropertyPage()
 {
 }
 
-bool wxGISCatalogGeneralPropertyPage::Create(IFrameApplication* application, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+bool wxGISCatalogGeneralPropertyPage::Create(wxGISApplicationBase* application, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     if(!wxPanel::Create(parent, id, pos, size, style, name))
 		return false;
@@ -167,7 +170,7 @@ void wxGISCatalogGeneralPropertyPage::Apply(void)
     }
 
     //update root items
-    for(size_t i = 0; i < m_pRootItems->GetItemCount(); ++i)
+    for(size_t i = 0; i < m_pRootItems->8; ++i)
     {
         if(m_pRootItems->IsItemChanged(i))
         {
@@ -177,3 +180,4 @@ void wxGISCatalogGeneralPropertyPage::Apply(void)
         }
     }
 }
+*/

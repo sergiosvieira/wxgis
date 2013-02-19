@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxNoView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ BEGIN_EVENT_TABLE(wxGxNoView, wxControl)
     EVT_ERASE_BACKGROUND(wxGxNoView::OnEraseBackground)
 END_EVENT_TABLE()
 
-bool wxGxNoView::Activate(IFrameApplication* application, wxXmlNode* pConf)
+bool wxGxNoView::Activate(IApplication* const application, wxXmlNode* const pConf)
 {
 	if(!wxGxView::Activate(application, pConf))
 		return false;

@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDatasetUI classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -30,18 +30,24 @@
 class WXDLLIMPEXP_GIS_CLU wxGxTableDatasetUI :
 	public wxGxTableDataset,
 	public IGxObjectUI,
-	public IGxObjectEditUI
+	public IGxObjectEditUI,
+    public IGxObjectWizard
 {
+    DECLARE_CLASS(wxGxTableDatasetUI)
 public:
-	wxGxTableDatasetUI(CPLString Path, wxString Name, wxGISEnumTableDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxTableDatasetUI(wxGISEnumTableDatasetType nType, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon &LargeIcon = wxNullIcon, const wxIcon &SmallIcon = wxNullIcon);
 	virtual ~wxGxTableDatasetUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxDataset.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxDataset.NewMenu"));};
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxTableDataset.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxEmptyString;};//{return wxString(wxT("wxGxDataset.NewMenu"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
+    //wxGxTableDataset
+    virtual wxGISDataset* const GetDataset(bool bCached = true, ITrackCancel* const pTrackCancel = NULL);
+    //IGxObjectWizard
+    virtual bool Invoke(wxWindow* pParentWnd);
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
 };
@@ -56,20 +62,21 @@ class WXDLLIMPEXP_GIS_CLU wxGxFeatureDatasetUI :
 	public IGxObjectEditUI,
     public IGxObjectWizard
 {
+    DECLARE_CLASS(wxGxFeatureDatasetUI)
 public:
-	wxGxFeatureDatasetUI(CPLString Path, wxString Name, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxFeatureDatasetUI(wxGISEnumVectorDatasetType nType, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon &LargeIcon = wxNullIcon, const wxIcon &SmallIcon = wxNullIcon);
 	virtual ~wxGxFeatureDatasetUI(void);
-    //wxGxFeatureDataset
-    virtual wxGISDatasetSPtr GetDataset(bool bCache = true, ITrackCancel* pTrackCancel = NULL);
-	//IGxObjectUI
+ 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxShapefileDataset.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxEmptyString;};//wxString(wxT("wxGxShapefileDataset.NewMenu"))
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxFeatureDataset.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxEmptyString;};//wxString(wxT("wxGxShapefileDataset.NewMenu"))
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
     //IGxObjectWizard
     virtual bool Invoke(wxWindow* pParentWnd);
+    //wxGxTableDataset
+    virtual wxGISDataset* const GetDataset(bool bCached = true, ITrackCancel* const pTrackCancel = NULL);
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
 };
@@ -84,16 +91,17 @@ class WXDLLIMPEXP_GIS_CLU wxGxRasterDatasetUI :
 	public IGxObjectEditUI,
     public IGxObjectWizard
 {
+    DECLARE_CLASS(wxGxRasterDatasetUI)
 public:
-	wxGxRasterDatasetUI(CPLString Path, wxString Name, wxGISEnumRasterDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxRasterDatasetUI(wxGISEnumRasterDatasetType nType, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon & LargeIcon = wxNullIcon, const wxIcon & SmallIcon = wxNullIcon);
 	virtual ~wxGxRasterDatasetUI(void);
     //wxGxRasterDataset
-    virtual wxGISDatasetSPtr GetDataset(bool bCached = true, ITrackCancel* pTrackCancel = NULL);
+    virtual wxGISDataset* const GetDataset(bool bCached = true, ITrackCancel* const pTrackCancel = NULL);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxRasterDataset.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxRasterDataset.NewMenu"));};
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxRasterDataset.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxEmptyString;};//wxString(wxT("wxGxRasterDataset.NewMenu"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
     //IGxObjectWizard

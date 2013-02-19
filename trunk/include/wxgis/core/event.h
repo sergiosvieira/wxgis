@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  event classes special for Process events.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -60,8 +60,7 @@ private:
 
 typedef void (wxEvtHandler::*wxGISProcessEventFunction)(wxGISProcessEvent&);
 
-#define wxGISProcessEventHandler(func) \
-    wxEVENT_HANDLER_CAST(wxGISProcessEventFunction, func)
+#define wxGISProcessEventHandler(func) wxEVENT_HANDLER_CAST(wxGISProcessEventFunction, func)
 
 #define EVT_PROCESS_START(func)  wx__DECLARE_EVT0(wxPROCESS_START, wxGISProcessEventHandler(func))
 #define EVT_PROCESS_FINISH(func)  wx__DECLARE_EVT0(wxPROCESS_FINISH, wxGISProcessEventHandler(func))

@@ -1,0 +1,381 @@
+/******************************************************************************
+ * Project:  wxGIS (GIS Catalog)
+ * Purpose:  wxGxObject.
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
+ ******************************************************************************
+*   Copyright (C) 2012 Bishop
+*
+*    This program is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
+#include "wxgis/catalog/gxobject.h"
+
+static wxGxCatalogBase *g_pGxCatalog( NULL );
+
+extern WXDLLIMPEXP_GIS_CLT wxGxCatalogBase* const GetGxCatalog(void)
+{
+	return g_pGxCatalog;
+}
+
+extern WXDLLIMPEXP_GIS_CLT void SetGxCatalog(wxGxCatalogBase* pCat)
+{
+    if(g_pGxCatalog != NULL)
+        g_pGxCatalog->Destroy();
+	g_pGxCatalog = pCat;
+}
+
+//---------------------------------------------------------------------------
+// wxGxCatalogBase
+//---------------------------------------------------------------------------
+
+wxIMPLEMENT_ABSTRACT_CLASS(wxGxCatalogBase, wxGxObjectContainer);
+
+wxGxCatalogBase::wxGxCatalogBase(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxObjectContainer(oParent, soName, soPath)
+{
+    m_nGlobalId = 0;
+    m_bIsInitialized = false;
+
+    m_bShowHidden = false;
+    m_bShowExt = true;
+
+    RegisterObject(this);
+}
+
+wxGxCatalogBase::~wxGxCatalogBase(void)
+{
+}
+
+wxString wxGxCatalogBase::ConstructFullName(const wxGxObject* pObject) const
+{
+    wxCHECK_MSG( pObject, wxEmptyString, wxT("Cannot add a NULL child") );
+
+	wxString sParentPath;
+    if(pObject->GetParent())
+        sParentPath = pObject->GetParent()->GetFullName();
+    wxString sName = pObject->GetName();
+
+	if(sParentPath.IsEmpty())
+		return sName;
+	else
+	{        
+		if(sParentPath.EndsWith(wxFileName::GetPathSeparator()))
+			return sParentPath + sName;
+		else
+			return sParentPath + wxFileName::GetPathSeparator() + sName;
+    }
+}
+
+void wxGxCatalogBase::RegisterObject(wxGxObject* pObj)
+{
+	pObj->SetId(m_nGlobalId);
+	m_moGxObject[m_nGlobalId] = pObj;
+	m_nGlobalId++;
+}
+
+void wxGxCatalogBase::UnRegisterObject(long nId)
+{
+    m_moGxObject[nId] = NULL;
+}
+
+wxGxObject* const wxGxCatalogBase::GetRegisterObject(long nId)
+{
+    if( nId == wxNOT_FOUND )
+        return NULL;
+    return m_moGxObject[nId];
+}
+
+bool wxGxCatalogBase::Init(void)
+{
+	if(m_bIsInitialized)
+		return true;
+
+    wxGISAppConfig oConfig = GetConfig();
+	if(!oConfig.IsOk())
+		return false;
+
+	m_bShowHidden = oConfig.ReadBool(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/show_hidden")), false);
+	m_bShowExt = oConfig.ReadBool(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/show_ext")), true);
+
+    //load GxObject Factories
+	LoadObjectFactories();
+    //load Children
+	LoadChildren();
+
+    m_bIsInitialized = true;
+    return true;
+}
+
+bool wxGxCatalogBase::Destroy(void)
+{
+    wxGISAppConfig oConfig = GetConfig();
+	if(oConfig.IsOk())
+    {
+        oConfig.Write(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/show_hidden")), m_bShowHidden);
+        oConfig.Write(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/show_ext")), m_bShowExt);
+    }
+
+    return wxGxObjectContainer::Destroy();
+}
+
+wxGxObject *wxGxCatalogBase::FindGxObject(const wxString &sPath) const
+{
+    wxGxObject* pOutObj = wxGxObjectContainer::FindGxObject(sPath);
+    if(pOutObj)
+        return pOutObj;
+    return NULL;
+    /*
+    wxFileName oName(sPath);
+    //the container is exist but item is absent
+    pOutObj = wxGxObjectContainer::FindGxObject(oName.GetPath());
+    if(pOutObj)
+        return NULL;
+    //try connect path & search child
+    IGxObjectContainer* poObjCont = dynamic_cast<IGxObjectContainer*>(ConnectFolder(oName.GetPath(), false));
+    if(poObjCont == this)
+        return NULL;
+    if(!poObjCont)
+        return poObjCont;
+    return poObjCont->SearchChild(sPath);*/
+}
+
+//---------------------------------------------------------------------------
+// wxGxObject
+//---------------------------------------------------------------------------
+wxIMPLEMENT_ABSTRACT_CLASS(wxGxObject, wxEvtHandler);
+
+wxGxObject::wxGxObject(void) : wxEvtHandler()
+{
+}
+
+wxGxObject::wxGxObject(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxEvtHandler()
+{
+    Create(oParent, soName, soPath);
+}
+
+bool wxGxObject::Create(wxGxObject *oParent, const wxString &soName, const CPLString &soPath)
+{
+    m_sName = soName;
+    m_sPath = soPath;
+
+    if(GetGxCatalog())
+        GetGxCatalog()->RegisterObject(this);    
+    
+    if( oParent && oParent->IsKindOf(wxCLASSINFO(wxGxObjectContainer)) )
+    {
+        wxGxObjectContainer* pGxObjectContainer = wxDynamicCast(oParent, wxGxObjectContainer);
+        if(pGxObjectContainer)
+            pGxObjectContainer->AddChild(this);
+    }
+    else
+        m_oParent = oParent;
+
+    //m_nId = nId;    
+    return true;
+}
+
+wxGxObject::~wxGxObject(void)
+{
+    // notify the parent about this window destruction
+    if( m_oParent && m_oParent->IsKindOf(wxCLASSINFO(wxGxObjectContainer)) )
+    {
+        wxGxObjectContainer* pGxObjectContainer = wxDynamicCast(m_oParent, wxGxObjectContainer);
+        if(pGxObjectContainer)
+        {
+            pGxObjectContainer->RemoveChild(this);
+        }
+    }
+    if(GetGxCatalog() && this != GetGxCatalog())
+    {
+        GetGxCatalog()->UnRegisterObject(GetId());
+    }
+}
+
+wxString wxGxObject::GetBaseName(void) const
+{
+    wxFileName FileName(GetName());
+    FileName.SetEmptyExt();
+    return FileName.GetName();
+}
+
+bool wxGxObject::Destroy(void)
+{
+    if(GetGxCatalog())
+        GetGxCatalog()->ObjectDeleted(GetId());
+
+    delete this;
+    return true;
+}
+
+void wxGxObject::Refresh(void)
+{
+    if(GetGxCatalog())
+        GetGxCatalog()->ObjectRefreshed(GetId());
+}
+
+wxString wxGxObject::GetFullName(void) const
+{
+    if(GetGxCatalog())
+	    return GetGxCatalog()->ConstructFullName(this);
+    else
+        return wxEmptyString;
+};
+
+//---------------------------------------------------------------------------
+// wxGxObjectContainer
+//---------------------------------------------------------------------------
+
+#if wxUSE_STD_CONTAINERS
+
+#include "wx/listimpl.cpp"
+WX_DEFINE_LIST(wxGxObjectList)
+
+#else // !wxUSE_STD_CONTAINERS
+
+void wxGxObjectListNode::DeleteData()
+{
+    delete (wxGxObjectBase *)GetData();
+}
+
+#endif // wxUSE_STD_CONTAINERS/!wxUSE_STD_CONTAINERS
+
+wxIMPLEMENT_ABSTRACT_CLASS(wxGxObjectContainer, wxGxObject);
+
+wxGxObjectContainer::wxGxObjectContainer() : wxGxObject()
+{
+}
+
+wxGxObjectContainer::wxGxObjectContainer(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxObject(oParent, soName, soPath)
+{
+}
+
+wxGxObjectContainer::~wxGxObjectContainer(void)
+{
+    m_Children.Clear();
+}
+
+void wxGxObjectContainer::AddChild( wxGxObject *child )
+{
+    wxCHECK_RET( child, wxT("can't add a NULL child") );
+
+    // this should never happen and it will lead to a crash later if it does
+    // because RemoveChild() will remove only one node from the children list
+    // and the other(s) one(s) will be left with dangling pointers in them
+    wxASSERT_MSG( !GetChildren().Find(child), wxT("AddChild() called twice") );
+
+    GetChildren().Append(child);
+    child->SetParent(this);
+
+    //if(GetGxCatalog())
+    //    GetGxCatalog()->ObjectAdded(child->GetId());
+}
+
+void wxGxObjectContainer::RemoveChild( wxGxObject *child )
+{
+    wxCHECK_RET( child, wxT("can't remove a NULL child") );
+
+    GetChildren().DeleteObject(child);
+    child->SetParent(NULL);
+}
+
+bool wxGxObjectContainer::DestroyChild( wxGxObject *child )
+{
+    wxCHECK_MSG( child, false, wxT("can't remove a NULL child") );
+    GetChildren().DeleteObject(child);
+    child->Destroy();
+    return true;
+}
+
+bool wxGxObjectContainer::DestroyChildren()
+{
+    wxGxObjectList::compatibility_iterator node;
+    for ( ;; )
+    {
+        // we iterate until the list becomes empty
+        node = GetChildren().GetFirst();
+        if ( !node )
+            break;
+
+        wxGxObject *child = node->GetData();
+        child->Destroy();
+
+        wxASSERT_MSG( !GetChildren().Find(child), wxT("child didn't remove itself using RemoveChild()") );
+    }
+    return true;
+}
+
+wxGxObject *wxGxObjectContainer::FindGxObject(const wxString &sPath) const
+{
+	wxString sTestPath = sPath;
+	if(GetFullName().CmpNoCase(sPath) == 0)//GetName
+		return (wxGxObject *)this;
+
+    wxGxObjectList::const_iterator iter;
+    for(iter = GetChildren().begin(); iter != GetChildren().end(); ++iter)
+    {
+        wxGxObject *current = *iter;
+		wxString sTestedPath = current->GetFullName();
+		if(sTestedPath.CmpNoCase(sPath) == 0)
+			return current;
+        bool bHavePart = sPath.Lower().Find(sTestedPath.MakeLower()) != wxNOT_FOUND;
+		if(bHavePart )
+		{
+            if(current->IsKindOf(wxCLASSINFO(wxGxObjectContainer)))
+            {
+                wxGxObjectContainer* pGxObjectContainer = wxDynamicCast(current, wxGxObjectContainer);
+                if(pGxObjectContainer && pGxObjectContainer->HasChildren())
+                {
+                    wxGxObject *pFoundChild = pGxObjectContainer->FindGxObject(sPath);
+                    if(pFoundChild)
+                        return pFoundChild;
+                }
+            }
+	  //      IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pGxObjectContainer);
+   //         if(pGxDataset != NULL)
+   //             pGxDataset->GetDataset();
+
+		}
+	}
+	return NULL;
+}
+
+
+bool wxGxObjectContainer::IsNameExist(const wxString &sName) const
+{
+    wxGxObjectList::const_iterator iter;
+    for(iter = GetChildren().begin(); iter != GetChildren().end(); ++iter)
+    {
+        wxGxObject *current = *iter;
+        if( current->GetName().IsSameAs(sName) )
+            return true;
+	}
+	return false;
+}
+
+void wxGxObjectContainer::Refresh(void)
+{
+    wxGxObjectList::const_iterator iter;
+    for(iter = GetChildren().begin(); iter != GetChildren().end(); ++iter)
+    {
+        wxGxObject *current = *iter;
+        current->Refresh();
+    }
+
+    wxGxObject::Refresh();
+}
+
+bool wxGxObjectContainer::Destroy(void)
+{
+    if(DestroyChildren())
+        return wxGxObject::Destroy();
+    return false;
+}

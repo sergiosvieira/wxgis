@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxRemoteConnectionUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxremoteconnui.h"
+/*
 #include "wxgis/catalogui/remoteconndlg.h"
 #include "wxgis/catalogui/gxpostgisdatasetui.h"
 #include "wxgis/core/globalfn.h"
@@ -189,3 +190,4 @@ void wxGxRemoteDBSchemaUI::AddTable(CPLString &szName, CPLString &szSchema, bool
 		    wxDELETE(pGxObject);
     }
 }
+*/

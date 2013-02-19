@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISRasterPropertyPage class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,8 +20,10 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/rasterpropertypage.h"
+#include "wxgis/datasource/sysop.h"
 
 #include "gdal_rat.h"
+#include "wx/propgrid/advprops.h"
 
 #define STAT_TXT _("Statistics")
 #define OVR_TXT _("Overviews")
@@ -35,36 +37,38 @@ END_EVENT_TABLE()
 
 wxGISRasterPropertyPage::wxGISRasterPropertyPage(void)
 {
-	m_nCounter = 0;
-	m_nCookie = wxNOT_FOUND;
-	m_pToolManagerUI = NULL;
+	//m_nCounter = 0;
+	//m_nCookie = wxNOT_FOUND;
+//	m_pToolManagerUI = NULL;
 }
 
-wxGISRasterPropertyPage::wxGISRasterPropertyPage(wxGxRasterDataset* pGxDataset, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+wxGISRasterPropertyPage::wxGISRasterPropertyPage(wxGxRasterDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
 	m_nCounter = 0;
-	m_nCookie = wxNOT_FOUND;
-	m_pToolManagerUI = NULL;
-    Create(pGxDataset, pCatalog, parent, id, pos, size, style, name);
+	//m_nCookie = wxNOT_FOUND;
+	//m_pToolManagerUI = NULL;
+    Create(pGxDataset, parent, id, pos, size, style, name);
 }
 
 wxGISRasterPropertyPage::~wxGISRasterPropertyPage()
 {
-	if(m_nCookie != wxNOT_FOUND && m_pToolManagerUI)
-		m_pToolManagerUI->Unadvise(m_nCookie);
+    wsDELETE(m_pDataset);
+	//if(m_nCookie != wxNOT_FOUND && m_pToolManagerUI)
+	//	m_pToolManagerUI->Unadvise(m_nCookie);
 }
 
-bool wxGISRasterPropertyPage::Create(wxGxRasterDataset* pGxDataset, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+bool wxGISRasterPropertyPage::Create(wxGxRasterDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     if(!wxPanel::Create(parent, id, pos, size, style, name))
 		return false;
 
     m_pGxDataset = pGxDataset;
-    m_pCatalog = pCatalog;
-
-    m_pDataset = boost::dynamic_pointer_cast<wxGISRasterDataset>(m_pGxDataset->GetDataset(false));
+    m_pDataset = wxDynamicCast(m_pGxDataset->GetDataset(false), wxGISRasterDataset);
     if(!m_pDataset)
         return false;
+	if(!m_pDataset->IsOpened())
+		if(!m_pDataset->Open(true))
+			return false;
 
 	wxBoxSizer* bMainSizer;
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
@@ -152,8 +156,6 @@ wxPGProperty* wxGISRasterPropertyPage::GetSubProperty(wxPGProperty* pid, const w
 
 void wxGISRasterPropertyPage::FillGrid(void)
 {
-    m_pDataset->Open(true);
-
     wxString sTmp;
     //fill propertygrid
     wxPGProperty* pid = AppendProperty( new wxPropertyCategory(_("Data Source")) );
@@ -161,18 +163,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
 
     CPLString soPath(m_pDataset->GetPath());
 
-    VSIStatBufL BufL;
-    wxULongLong nSize(0);
-    int ret = VSIStatL(soPath, &BufL);
-    if(ret == 0)
-    {
-        nSize += BufL.st_size;
-    }
-    //wxULongLong nSize = wxFileName::GetSize(m_pDataset->GetPath());
-
     //folder
-	//convert from internal representation UTF8 to wxConvCurrent
-
 	wxString sPath(CPLGetPath(soPath), wxConvUTF8);
     AppendProperty( new wxStringProperty(_("Folder"), wxPG_LABEL, sPath) );
     //file list
@@ -191,19 +182,16 @@ void wxGISRasterPropertyPage::FillGrid(void)
             wxPGProperty* pfilesid = AppendProperty(pid, new wxPropertyCategory(_("Files")) );
             for(int i = 0; papszFileList[i] != NULL; ++i )
 		    {
-                ret = VSIStatL(papszFileList[i], &BufL);
-                if(ret == 0)
-                {
-                    nSize += BufL.st_size;
-                }
 		        wxString sFileName = GetConvName(papszFileList[i]);
 				AppendProperty(pfilesid, new wxStringProperty(wxString::Format(_("File %d"), i), wxPG_LABEL, sFileName) );
 		    }
         }
         CSLDestroy( papszFileList );
 
-        //size
-        AppendProperty(pid, new wxStringProperty(_("Total size"), wxPG_LABEL, wxFileName::GetHumanReadableSize(nSize)) );
+        //size    
+        m_pGxDataset->FillMetadata();
+        AppendProperty(pid, new wxStringProperty(_("Total size"), wxPG_LABEL, wxFileName::GetHumanReadableSize(m_pGxDataset->GetSize())) );
+        AppendProperty(pid, new wxDateProperty(_("Modification date"), wxPG_LABEL, m_pGxDataset->GetModificationDate()) );
 
         GDALDriver* pDrv = poGDALDataset->GetDriver();
 		sTmp = sTmp.Format(wxT("%s(%s)"), wxString(pDrv->GetMetadataItem( GDAL_DMD_LONGNAME ), wxConvLocal).c_str(), wxString(pDrv->GetDescription(), wxConvLocal).c_str() );
@@ -255,12 +243,52 @@ void wxGISRasterPropertyPage::FillGrid(void)
         pstatprop = m_pg->Append( new wxStringProperty(STAT_TXT, wxPG_LABEL, _("Absent (click to build)")) );
     m_pg->SetPropertyEditor(pstatprop, wxPG_EDITOR(TextCtrlAndButton));
 
-    AppendProperty( new wxPropertyCategory(_("Extent")));
-    OGREnvelope Env = m_pDataset->GetEnvelope();
-    AppendProperty( new wxFloatProperty(_("Top"), wxPG_LABEL, Env.MaxY));
-    AppendProperty( new wxFloatProperty(_("Left"), wxPG_LABEL, Env.MinX));
-    AppendProperty( new wxFloatProperty(_("Right"), wxPG_LABEL, Env.MaxX));
-    AppendProperty( new wxFloatProperty(_("Bottom"), wxPG_LABEL, Env.MinY));
+    OGREnvelope Extent = m_pDataset->GetEnvelope();
+    if(Extent.IsInit())
+    {
+        wxGISSpatialReference SpaRef = m_pDataset->GetSpatialReference();
+        bool bProjected(false);
+        if(SpaRef.IsOk() && SpaRef->IsProjected())
+            bProjected = true;
+
+        wxPGProperty* penvid(NULL);
+        if(bProjected)
+            penvid = AppendProperty(new wxPropertyCategory(wxString::Format(_("Extent %s"), _("(Projected)"))));
+        else
+            penvid = AppendProperty(new wxPropertyCategory(wxString::Format(_("Extent %s"), wxEmptyString)));
+        AppendProperty(penvid, new wxFloatProperty(_("Top"), wxPG_LABEL, Extent.MaxY));
+        AppendProperty(penvid, new wxFloatProperty(_("Left"), wxPG_LABEL, Extent.MinX));
+        AppendProperty(penvid, new wxFloatProperty(_("Right"), wxPG_LABEL, Extent.MaxX));
+        AppendProperty(penvid, new wxFloatProperty(_("Bottom"), wxPG_LABEL, Extent.MinY));
+
+        AppendProperty(penvid, new wxFloatProperty(_("Center X"), wxPG_LABEL, (Extent.MaxX + Extent.MinX) / 2.0));
+        AppendProperty(penvid, new wxFloatProperty(_("Center Y"), wxPG_LABEL, (Extent.MaxY + Extent.MinY) / 2.0));
+
+        if(bProjected)
+        {
+            wxGISSpatialReference GSSpaRef(SpaRef->CloneGeogCS());
+            if(GSSpaRef.IsOk())
+            {
+                OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( SpaRef, GSSpaRef );
+                if(poCT)
+                {
+                    poCT->Transform(1, &Extent.MaxX, &Extent.MaxY);
+                    poCT->Transform(1, &Extent.MinX, &Extent.MinY);
+                    wxPGProperty* penvidgc = AppendProperty(new wxPropertyCategory(wxString::Format(_("Extent %s"), _("(Geographic)"))));
+                    AppendProperty(penvidgc, new wxFloatProperty(_("Top"), wxT("TopGC"), Extent.MaxY));
+                    AppendProperty(penvidgc, new wxFloatProperty(_("Left"), wxT("LeftGC"), Extent.MinX));
+                    AppendProperty(penvidgc, new wxFloatProperty(_("Right"), wxT("RightGC"), Extent.MaxX));
+                    AppendProperty(penvidgc, new wxFloatProperty(_("Bottom"), wxT("BottomGC"), Extent.MinY));
+
+                    AppendProperty(penvidgc, new wxFloatProperty(_("Center X"), wxT("CenterXGC"), (Extent.MaxX + Extent.MinX) / 2.0));
+                    AppendProperty(penvidgc, new wxFloatProperty(_("Center Y"), wxT("CenterYGC"), (Extent.MaxY + Extent.MinY) / 2.0));
+
+                    OCTDestroyCoordinateTransformation(poCT);
+                }
+            }
+        }
+    }
+
 
     if(poGDALDataset)
     {
@@ -276,9 +304,9 @@ void wxGISRasterPropertyPage::FillGrid(void)
             }
         }
 
-	    /* -------------------------------------------------------------------- */
-	    /*      Report "IMAGE_STRUCTURE" metadata.                              */
-	    /* -------------------------------------------------------------------- */
+	    // -------------------------------------------------------------------- //
+	    //      Report "IMAGE_STRUCTURE" metadata.                              //
+	    // -------------------------------------------------------------------- //
         papszMetadata = poGDALDataset->GetMetadata("IMAGE_STRUCTURE");
         if( CSLCount(papszMetadata) > 0 )
         {
@@ -290,9 +318,9 @@ void wxGISRasterPropertyPage::FillGrid(void)
             }
         }
 
-	    /* -------------------------------------------------------------------- */
-	    /*      Report subdatasets.                                             */
-	    /* -------------------------------------------------------------------- */
+	    // -------------------------------------------------------------------- //
+	    //      Report subdatasets.                                             //
+	    // -------------------------------------------------------------------- //
         papszMetadata = poGDALDataset->GetMetadata("SUBDATASETS");
         if( CSLCount(papszMetadata) > 0 )
         {
@@ -304,9 +332,9 @@ void wxGISRasterPropertyPage::FillGrid(void)
             }
         }
 
-	    /* -------------------------------------------------------------------- */
-	    /*      Report IMD                                                     */
-	    /* -------------------------------------------------------------------- */
+	    // -------------------------------------------------------------------- //
+	    //      Report IMD                                                      //
+	    // -------------------------------------------------------------------- //
         papszMetadata = poGDALDataset->GetMetadata("IMD");
         if( CSLCount(papszMetadata) > 0 )
         {
@@ -318,9 +346,9 @@ void wxGISRasterPropertyPage::FillGrid(void)
             }
         }
 
-	    /* -------------------------------------------------------------------- */
-	    /*      Report geolocation.                                             */
-	    /* -------------------------------------------------------------------- */
+	    // -------------------------------------------------------------------- //
+	    //      Report geolocation.                                             //
+	    // -------------------------------------------------------------------- //
         papszMetadata = poGDALDataset->GetMetadata("GEOLOCATION");
         if( CSLCount(papszMetadata) > 0 )
         {
@@ -332,9 +360,9 @@ void wxGISRasterPropertyPage::FillGrid(void)
             }
         }
 
-	    /* -------------------------------------------------------------------- */
-	    /*      Report RPCs                                                     */
-	    /* -------------------------------------------------------------------- */
+	    // -------------------------------------------------------------------- //
+	    //      Report RPCs                                                     //
+	    // -------------------------------------------------------------------- //
         papszMetadata = poGDALDataset->GetMetadata("RPC");
         if( CSLCount(papszMetadata) > 0 )
         {
@@ -347,36 +375,34 @@ void wxGISRasterPropertyPage::FillGrid(void)
             m_pg->Collapse(pcpid);
         }
 
-        /* -------------------------------------------------------------------- */
-        /*      Report GCPs.                                                    */
-        /* -------------------------------------------------------------------- */
+        // -------------------------------------------------------------------- //
+        //      Report GCPs.                                                    //
+        // -------------------------------------------------------------------- //
         if( poGDALDataset->GetGCPCount() > 0 )
         {
             wxPGProperty* pcpid = AppendProperty( new wxPropertyCategory(_("GCP data")) );
-            OGRSpatialReferenceSPtr poSRS;
+            wxGISSpatialReference wxGISSRS;
             char* pszGCPProjection = (char*)poGDALDataset->GetGCPProjection();
             if (pszGCPProjection)
             {
-				poSRS = boost::make_shared<OGRSpatialReference>();
-                if( poSRS->importFromWkt(&pszGCPProjection ) == CE_None )
-					poSRS.reset();
+                wxGISSRS->importFromWkt(&pszGCPProjection );
             }
             else
             {
-                poSRS = m_pDataset->GetSpatialReference();
+                wxGISSRS = m_pDataset->GetSpatialReference();
             }
 
-            if(poSRS)
+            if(wxGISSRS.IsOk())
             {
                 const char *pszName;
-                if(poSRS->IsProjected())
+                if(wxGISSRS->IsProjected())
                 {
-                    pszName = poSRS->GetAttrValue("PROJCS");
+                    pszName = wxGISSRS->GetAttrValue("PROJCS");
                     AppendProperty(pcpid, new wxStringProperty(_("GCP Projection"), wxPG_LABEL, wxString(pszName, wxConvLocal)) );
                 }
-                else if(poSRS->IsGeographic())
+                else if(wxGISSRS->IsGeographic())
                 {
-                    pszName = poSRS->GetAttrValue("GEOGCS");
+                    pszName = wxGISSRS->GetAttrValue("GEOGCS");
                     AppendProperty(pcpid,  new wxStringProperty(_("GCP Projection"), wxPG_LABEL, wxString(pszName, wxConvLocal)) );
                 }
                 else
@@ -387,13 +413,12 @@ void wxGISRasterPropertyPage::FillGrid(void)
             {
                 const GDAL_GCP *psGCP = poGDALDataset->GetGCPs( ) + i;
                 m_pg->AppendIn(pcpid, new wxLongStringProperty(wxString::Format(wxT("GCP[%03d]"), i + 1), wxPG_LABEL, wxString::Format(_("Id='%s', Info='%s', (%.6g,%.6g) -> (%.6g,%.6g,%.6g)"), wxString(psGCP->pszId, wxConvLocal), wxString(psGCP->pszInfo, wxConvLocal), psGCP->dfGCPPixel, psGCP->dfGCPLine, psGCP->dfGCPX, psGCP->dfGCPY, psGCP->dfGCPZ)) );
-                //AppendProperty(pcpid,  new wxStringProperty(wxString::Format(wxT("GCP[%03d]"), i + 1), wxPG_LABEL, wxString::Format(_("Id='%s', Info='%s', (%.6g,%.6g) -> (%.6g,%.6g,%.6g)"), wxString(psGCP->pszId, wxConvLocal), wxString(psGCP->pszInfo, wxConvLocal), psGCP->dfGCPPixel, psGCP->dfGCPLine, psGCP->dfGCPX, psGCP->dfGCPY, psGCP->dfGCPZ)) );
             }
         }
 
-        /* ==================================================================== */
-        /*      Loop over bands.                                                */
-        /* ==================================================================== */
+        // ==================================================================== //
+        //      Loop over bands.                                                //
+        // ==================================================================== //
 
         wxPGProperty* pstatid = AppendProperty( new wxPropertyCategory(_("Statistics details")) );
 
@@ -573,6 +598,7 @@ void wxGISRasterPropertyPage::FillGrid(void)
 
 void wxGISRasterPropertyPage::OnPropertyGridButtonClick ( wxCommandEvent& )
 {
+    /*
     wxPGProperty* prop = m_pg->GetSelectedProperty();
     if (!prop )
         return;
@@ -597,7 +623,6 @@ void wxGISRasterPropertyPage::OnPropertyGridButtonClick ( wxCommandEvent& )
         return;
     }
 
-
 	IGPToolSPtr pTool = m_pToolManagerUI->GetGPTool(sToolName);
 	if(!pTool)
 	{
@@ -620,6 +645,7 @@ void wxGISRasterPropertyPage::OnPropertyGridButtonClick ( wxCommandEvent& )
 
 	m_pToolManagerUI->PrepareTool(this, pTool, true);
     m_pDataset->Close();
+    */
 }
 
 void wxGISRasterPropertyPage::OnFinish(wxGISProcessEvent& event)

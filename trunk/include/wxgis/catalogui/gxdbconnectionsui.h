@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDBConnectionsUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 /** \class wxGxDBConnectionsUI gxdbconnectionsui.h
     \brief The database connections root item in user interface.
 */
-
+/*
 class WXDLLIMPEXP_GIS_CLU wxGxDBConnectionsUI :
     public wxGxDBConnections,
 	public IGxObjectUI
@@ -43,3 +43,4 @@ public:
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
 };
+*/

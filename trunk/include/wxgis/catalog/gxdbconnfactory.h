@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDBConnectionFactory class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -25,6 +25,7 @@
 /** \class wxGxDBConnectionFactory gxdbconnfactory.h
     \brief A DataBase connection (*.xconn) GxObject factory.
 */
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxDBConnectionFactory :
 	public IGxObjectFactory,
 	public wxObject
@@ -41,3 +42,4 @@ public:
     //wxGxMLFactory
     virtual IGxObject* GetGxDataset(CPLString path, wxString name);
 };
+*/

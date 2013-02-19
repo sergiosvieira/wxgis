@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  wxGISDisplay class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 #pragma once
 
 #include "wxgis/display/display.h"
+
+#include "ogrsf_frmts.h"
 
 #include <cairo.h>
 
@@ -71,6 +73,7 @@ public:
 	//current draw bounds
 	virtual void SetBounds(const OGREnvelope &Env);
 	virtual OGREnvelope GetBounds(bool bRotated = true);
+    virtual wxRealPoint GetBoundsCenter(void) const {return wxRealPoint(m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);};
 	//misc
 	virtual void SetRotate(double dAngleRad);
 	virtual double GetRotate(void){return m_dAngleRad;};
@@ -99,6 +102,7 @@ public:
 	virtual OGREnvelope TransformRect(wxRect &rect);
 	//Testing
 	virtual void TestDraw(void);
+
     typedef struct _layercachedata
     {
 	    bool bIsDerty;
@@ -126,7 +130,7 @@ protected:
 		return (fabs(x_new) + fabs(y_new)) / 2;
 	}
 protected:
-	std::vector<LAYERCACHEDATA> m_saLayerCaches;
+	wxVector<LAYERCACHEDATA> m_saLayerCaches;
 	RGBA m_stBackGroudnColour;
 	RGBA m_stFillColour, m_stLineColour, m_stPointColour;
 	size_t m_nLastCacheID, m_nCurrentLayer;

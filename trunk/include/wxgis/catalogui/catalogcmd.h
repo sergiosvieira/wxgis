@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  Catalog Main Commands class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,16 +19,18 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-#include "wxgis/framework/framework.h"
 
+#include "wxgis/framework/command.h"
+#include "wxgis/catalogui/gxapplication.h"
 
 /** \class wxGISCatalogMainCmd catalogcmd.h
     \brief The main catalog commands.
 
 	The main catalog commands includes: "Up One Level", "Connect Folder", "Disconnect Folder", "Location", "Delete Item", "Back", "Forward", "Create Folder", "Rename", "Refresh", "Properties", "Copy", "Cut" and "Paste".
 */
+
 class wxGISCatalogMainCmd :
-    public ICommand,
+    public wxGISCommand,
 	public IToolControl,
     public IDropDownCommand
 {
@@ -37,7 +39,7 @@ class wxGISCatalogMainCmd :
 public:
 	wxGISCatalogMainCmd(void);
 	virtual ~wxGISCatalogMainCmd(void);
-	//ICommand
+	//wxGISCommand
 	virtual wxIcon GetBitmap(void);
 	virtual wxString GetCaption(void);
 	virtual wxString GetCategory(void);
@@ -46,7 +48,7 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IFrameApplication* pApp);
+	virtual bool OnCreate(wxGISApplicationBase* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
 	//IToolControl
@@ -57,9 +59,11 @@ public:
    	virtual wxMenu* GetDropDownMenu(void);
     virtual void OnDropDownCommand(int nID);
 private:
-	IFrameApplication* m_pApp;
+	wxGISApplicationBase* m_pApp;
+	wxGxApplicationBase* m_pGxApp;
 	wxIcon m_IconFolderUp, m_IconFolderConn, m_IconFolderConnDel, m_IconDel, m_IconGoPrev, m_IconGoNext;
     wxIcon m_IconFolderNew, m_IconEdit, m_IconViewRefresh, m_IconProps;
     wxIcon m_LargeFolderIcon, m_SmallFolderIcon;
     wxIcon m_CopyIcon, m_CutIcon, m_PasteIcon;
+    short m_nPrevNextSelCount;
 };

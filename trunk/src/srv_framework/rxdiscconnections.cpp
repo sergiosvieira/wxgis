@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgissrv/srv_framework/rxdiscconnections.h"
+/*
 #include "wxgis/networking/message.h"
 
 IMPLEMENT_DYNAMIC_CLASS(wxRxDiscConnections, wxGxDiscConnections)
@@ -61,5 +62,5 @@ void wxRxDiscConnections::Detach()
 	wxGxDiscConnections::Detach();
 }
 
-
+*/
 

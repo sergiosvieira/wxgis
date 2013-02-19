@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISRasterDatasetCmd main header.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/cartoui/sqlquerydialog.h"
-
+/*
 wxGISSQLQueryDialog::wxGISSQLQueryDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
@@ -216,3 +216,4 @@ wxGISSQLQueryDialog::wxGISSQLQueryDialog( wxWindow* parent, wxWindowID id, const
 wxGISSQLQueryDialog::~wxGISSQLQueryDialog()
 {
 }
+*/

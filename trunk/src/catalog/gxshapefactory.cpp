@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxShapeFactory class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,9 +20,16 @@
  ****************************************************************************/
 #include "wxgis/catalog/gxshapefactory.h"
 #include "wxgis/catalog/gxdataset.h"
+#include "wxgis/datasource/sysop.h"
+
 #include <wx/ffile.h>
 
-IMPLEMENT_DYNAMIC_CLASS(wxGxShapeFactory, wxObject)
+//------------------------------------------------------------------------------
+// wxGxShapeFactory
+//------------------------------------------------------------------------------
+
+
+IMPLEMENT_DYNAMIC_CLASS(wxGxShapeFactory, wxGxObjectFactory)
 
 wxGxShapeFactory::wxGxShapeFactory(void)
 {
@@ -32,17 +39,17 @@ wxGxShapeFactory::~wxGxShapeFactory(void)
 {
 }
 
-bool wxGxShapeFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray)
+bool wxGxShapeFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds)
 {
     for(int i = CSLCount(pFileNames) - 1; i >= 0; i-- )
     {
-        IGxObject* pGxObj = NULL;
+        wxGxObject* pGxObj = NULL;
         CPLString szExt = CPLGetExtension(pFileNames[i]);
         CPLString szPath;
 
-        if(EQUAL(szExt, "shp"))
+        if(wxGISEQUAL(szExt, "shp"))
         {
-            bool bHasDbf(false)/*, bHasPrj(false)*/;
+            bool bHasDbf(false);
             szPath = (char*)CPLResetExtension(pFileNames[i], "dbf");
             if(CPLCheckForFile((char*)szPath.c_str(), NULL))
                 bHasDbf = true;
@@ -55,11 +62,14 @@ bool wxGxShapeFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxO
             //szPath = (char*)CPLResetExtension(pFileNames[i], "prj");
             //if(CPLCheckForFile((char*)szPath.c_str(), NULL))
             //    bHasPrj = true;
-            if(bHasDbf/* && bHasPrj*/)
-                pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumGISFeatureDataset);
+            if(bHasDbf && OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName("ESRI Shapefile"))
+            {
+                pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], enumGISFeatureDataset);
+                pChildrenIds.Add(pGxObj->GetId());
+            }
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
-        else if(EQUAL(szExt, "dbf"))
+        else if(wxGISEQUAL(szExt, "dbf"))
         {
             bool bHasShp(false);
             szPath = (char*)CPLResetExtension(pFileNames[i], "shp");
@@ -71,11 +81,14 @@ bool wxGxShapeFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxO
                 if(CPLCheckForFile((char*)szPath.c_str(), NULL))
                     bHasShp = true;
             }
-            if(!bHasShp)
-                pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumGISTableDataset);
+            if(!bHasShp && OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName("ESRI Shapefile"))
+            {
+                pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], enumGISTableDataset);
+                pChildrenIds.Add(pGxObj->GetId());
+            }
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
-        else if(EQUAL(szExt, "prj"))
+        else if(wxGISEQUAL(szExt, "prj"))
         {
             bool bHasShp(false);
 			if(pFileNames)
@@ -87,55 +100,36 @@ bool wxGxShapeFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxO
 					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 			}
         }
-        else if(EQUAL(szExt, "sbn"))
+        else if(wxGISEQUAL(szExt, "sbn"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "sbx"))
+        else if(wxGISEQUAL(szExt, "sbx"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "shx"))
+        else if(wxGISEQUAL(szExt, "shx"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "cpg"))
+        else if(wxGISEQUAL(szExt, "cpg"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "qix"))
+        else if(wxGISEQUAL(szExt, "qix"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "osf"))
+        else if(wxGISEQUAL(szExt, "osf"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 
-		if(pGxObj != NULL)
-			ObjArray.push_back(pGxObj);
     }
 	return true;
 }
 
-void wxGxShapeFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
-{
-    if(bStore)
-    {
-        if(pConfig->HasAttribute(wxT("factory_name")))
-            pConfig->DeleteAttribute(wxT("factory_name"));
-        pConfig->AddAttribute(wxT("factory_name"), GetClassName());
-        if(pConfig->HasAttribute(wxT("is_enabled")))
-            pConfig->DeleteAttribute(wxT("is_enabled"));
-        pConfig->AddAttribute(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));
-    }
-    else
-    {
-        m_bIsEnabled = wxAtoi(pConfig->GetAttribute(wxT("is_enabled"), wxT("1"))) != 0;
-    }
-}
-
-IGxObject* wxGxShapeFactory::GetGxDataset(CPLString path, wxString name, wxGISEnumDatasetType type)
+wxGxObject* wxGxShapeFactory::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumDatasetType type)
 {
     switch(type)
     {
     case enumGISFeatureDataset:
         {
-	    wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, enumVecESRIShapefile);
-        return static_cast<IGxObject*>(pDataset);
+	    wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(enumVecESRIShapefile, pParent, soName, szPath);
+        return wxStaticCast(pDataset, wxGxObject);
         }
     case enumGISTableDataset:
         {
-        wxGxTableDataset* pDataset = new wxGxTableDataset(path, name, enumTableDBF);
-        return static_cast<IGxObject*>(pDataset);
+        wxGxTableDataset* pDataset = new wxGxTableDataset(enumTableDBF, pParent, soName, szPath);
+        return wxStaticCast(pDataset, wxGxObject);
         }
     }
     return NULL;

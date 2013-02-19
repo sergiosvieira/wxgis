@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxApplication main header.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,9 +22,10 @@
 
 #include "wxgis/framework/applicationex.h"
 #include "wxgis/catalogui/gxcatalogui.h"
+#include "wxgis/catalogui/gxselection.h"
 #include "wxgis/catalogui/gxtreeview.h"
-#include "wxgis/catalogui/gxtabview.h"
 #include "wxgis/catalogui/newmenu.h"
+#include "wxgis/catalogui/gxtabview.h"
 
 #include "wx/aui/aui.h"
 #include "wx/artprov.h"
@@ -32,26 +33,26 @@
 /** \class wxGxApplication gxapplication.h
  *   \brief A catalog application framework class.
  */
+
 class WXDLLIMPEXP_GIS_CLU wxGxApplication :
-	public wxGISApplicationEx,
-    public IGxApplication
+    public wxGxApplicationBase,
+	public wxGISApplicationEx
 {
     DECLARE_CLASS(wxGxApplication)
 public:	
 	wxGxApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER);
 	virtual ~wxGxApplication(void);
-    //IGxApplication
-	virtual IGxCatalog* const GetCatalog(void);
     //events 
     virtual void OnClose(wxCloseEvent& event);
-	//IFrameApplication
-    virtual wxString GetAppName(void){return wxString(wxT("wxGISCatalog"));};
-    virtual bool Create(void);
-	virtual wxIcon GetAppIcon(void){return m_pAppIcon;};
+    //wxGISApplicationBase
+    virtual wxString GetAppName(void) const{return wxString(wxT("wxGISCatalog"));};
+    virtual bool CreateApp(void);
+	virtual wxIcon GetAppIcon(void);
 protected:
 	wxGxTreeView* m_pTreeView;
 	wxGxTabView* m_pTabView;
 	wxGxCatalogUI* m_pCatalog;
     wxGISNewMenu* m_pNewMenu;
+    
 	wxIcon m_pAppIcon;
 };

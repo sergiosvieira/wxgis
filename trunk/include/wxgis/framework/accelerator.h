@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  GIS application accelerator table header.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #pragma once
-#include "wxgis/framework/framework.h"
+#include "wxgis/framework/applicationbase.h"
 #include "wxgis/core/config.h"
 
 #include <wx/accel.h>
@@ -28,7 +28,7 @@
 class WXDLLIMPEXP_GIS_FRW wxGISAcceleratorTable
 {
 public:
-	wxGISAcceleratorTable(IFrameApplication* pApp);
+	wxGISAcceleratorTable(wxGISApplicationBase* pApp);
 	virtual ~wxGISAcceleratorTable(void);
 	virtual int Add(wxAcceleratorEntry entry);
 	virtual void Remove(wxAcceleratorEntry entry);
@@ -41,8 +41,8 @@ protected:
 	int GetKeyCode(wxString sKeyCode);
 	WXDWORD GetFlags(wxString sFlags);
 private:
-	std::vector<wxAcceleratorEntry> m_AccelEntryArray;
+	wxVector<wxAcceleratorEntry> m_AccelEntryArray;
 	bool bHasChanges;
 	wxAcceleratorTable m_ATab;
-	IFrameApplication* m_pApp;
+	wxGISApplicationBase* m_pApp;
 };

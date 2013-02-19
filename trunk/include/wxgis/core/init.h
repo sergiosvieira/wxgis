@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  Initializer class for logs, locale, libs and etc.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #pragma once
 
 #include "wxgis/core/core.h"
+#include "wxgis/core/app.h"
 #include "wxgis/core/config.h"
 
 #include <wx/dir.h>
@@ -36,17 +37,20 @@
 /** \class wxGISAppWithLibs init.h
     \brief The library loader and unloader class.
 */
+
 class WXDLLIMPEXP_GIS_CORE wxGISAppWithLibs
 {
 public:
 	wxGISAppWithLibs(void);
 	virtual ~wxGISAppWithLibs(void);
     typedef std::map<wxString, wxDynamicLibrary*> LIBMAP;
+    virtual void LoadLib(const wxString &sPath, bool bStore = true);
 protected:
-	virtual void LoadLibs(wxXmlNode* pRootNode);
+	virtual void LoadLibs(const wxXmlNode* pRootNode);
 	virtual void SerializeLibs();
 	virtual void UnLoadLibs();
 protected:
+    wxArrayString m_asNoStore;
     LIBMAP m_LibMap;
 };
 
@@ -59,7 +63,7 @@ protected:
 /** \code The usage example of Initializer
     wxGISInitializer oInitializer;
 	wxCmdLineParser parser;
-	if(!oInitializer.Initialize(wxT("TestApplication"), wxT("FolderForApplicationConfigs"), parser))
+	if(!oInitializer.Initialize(wxT("TestApplication"), wxT("ta_"), parser))
 	{
         oInitializer.Uninitialize();
 		return false;
@@ -70,20 +74,26 @@ protected:
 
 
 class WXDLLIMPEXP_GIS_CORE wxGISInitializer :
-	public wxGISAppWithLibs
+	public wxGISAppWithLibs,
+    public IApplication
 {
 public:
 	wxGISInitializer(void);
 	virtual ~wxGISInitializer(void);
-	virtual bool Initialize(const wxString &sAppName, const wxString &sLogFilePrefix, wxCmdLineParser& parser);
+	virtual bool Initialize(const wxString &sAppName, const wxString &sLogFilePrefix);
 	virtual void Uninitialize();
-protected:
+    // IApplication
     virtual bool SetupSys(const wxString &sSysPath);
     virtual void SetDebugMode(bool bDebugMode);
     virtual bool SetupLog(const wxString &sLogPath, const wxString &sNamePrefix);
 	virtual bool SetupLoc(const wxString &sLoc, const wxString &sLocPath);
+    virtual wxString GetDecimalPoint(void) const{return m_sDecimalPoint;};
+    virtual bool CreateApp(void) {return true;};
 protected:
     wxLocale* m_pLocale; // locale we'll be using
-	char* m_pszOldLocale;
 	wxFFile m_LogFile;
+    wxString m_sDecimalPoint;
 };
+
+
+ 

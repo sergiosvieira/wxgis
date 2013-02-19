@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxCatalog class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,13 +20,59 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/catalog/catalog.h"
-#include "wxgis/catalog/gxdiscconnections.h"
+#include "wxgis/catalog/gxobject.h"
+#include "wxgis/catalog/gxobjectfactory.h"
+
+#include <wx/xml/xml.h>
 
 /** \class wxGxCatalog gxcatalog.h
-    \brief The Gx Catalog class.
+    \brief The GxCatalog class.
 */
+class WXDLLIMPEXP_GIS_CLT wxGxCatalog : 
+    public wxGxCatalogBase,
+	public wxGISConnectionPointContainer
+{
+    wxDECLARE_DYNAMIC_CLASS_NO_COPY(wxGxCatalog);
+public:
+    wxGxCatalog(wxGxObject *oParent = NULL, const wxString &soName = _("Catalog"), const CPLString &soPath = "");
+    virtual ~wxGxCatalog(void);
+    virtual void ObjectAdded(long nObjectID);
+	virtual void ObjectChanged(long nObjectID);
+	virtual void ObjectDeleted(long nObjectID);
+	virtual void ObjectRefreshed(long nObjectID);
+    virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
+    virtual void EnableRootItem(size_t nItemId, bool bEnable);
+    virtual bool Destroy(void);
+    virtual wxGxObject* const GetRootItemByType(const wxClassInfo * info) const;
 
+    typedef struct _root_item{
+        wxString sClassName;
+        wxString sName;
+        bool bEnabled;
+        wxXmlNode* pConfig;
+    } ROOTITEM;
+protected:
+    //wxGxCatalogBase
+	virtual void LoadObjectFactories(const wxXmlNode* pNode);
+	virtual void LoadObjectFactories(void);
+    virtual void LoadChildren(void);    
+    virtual void LoadChildren(wxXmlNode* const pNode);
+	virtual void EmptyObjectFactories(void);
+    virtual void SerializePlugins(wxXmlNode* pNode, bool bStore = false);
+protected:
+	virtual wxString GetConfigName(void) const {return wxString(wxT("wxCatalog"));};
+protected:
+    wxArrayString m_CatalogRootItemArray;
+    wxVector<wxGxObjectFactory*> m_ObjectFactoriesArray;
+    wxVector<ROOTITEM> m_staRootitems;
+};
+
+#define wxGIS_GXCATALOG_EVENT(x)  {  wxGxCatalogBase* pGxCatalog = GetGxCatalog(); \
+    if(pGxCatalog) pGxCatalog->x(GetId()); }
+#define wxGIS_GXCATALOG_EVENT_ID(x, id)   { wxGxCatalogBase* pGxCatalog = GetGxCatalog(); \
+    if(pGxCatalog) pGxCatalog->x(id); }
+
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxCatalog :
 	public IGxObjectContainer,
 	public IGxCatalog,
@@ -36,32 +82,32 @@ public:
 	wxGxCatalog(void);
 	virtual ~wxGxCatalog(void);
 	//IGxObject
-	virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog);
-	virtual void Detach(void);
-	virtual wxString GetName(void){return wxString(_("Catalog"));};
-    virtual wxString GetBaseName(void){return GetName();};
-	virtual wxString GetFullName(void){return wxEmptyString;}//wxString(_("Catalog"));};
-    virtual CPLString GetInternalName(void){return CPLString();};
-	virtual wxString GetCategory(void){return wxString(wxT("Root"));};
-	virtual IGxObject* const GetParent(void){return NULL;};
-	virtual void Refresh(void);
+	+virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog);
+	+virtual void Detach(void);
+	+virtual wxString GetName(void){return wxString(_("Catalog"));};
+    +virtual wxString GetBaseName(void){return GetName();};
+	+virtual wxString GetFullName(void){return wxEmptyString;}//wxString(_("Catalog"));};
+    +virtual CPLString GetInternalName(void){return CPLString();};
+	+virtual wxString GetCategory(void){return wxString(wxT("Root"));};
+	+virtual IGxObject* const GetParent(void){return NULL;};
+	+virtual void Refresh(void);
 	//IGxObjectContainer
-	virtual bool AreChildrenViewable(void){return true;};
-	virtual bool HasChildren(void){return true;};
-	virtual GxObjectArray* const GetChildren(void){return &m_Children;};
+	-virtual bool AreChildrenViewable(void){return true;};
+	+virtual bool HasChildren(void){return true;};
+	+virtual GxObjectArray* const GetChildren(void){return &m_Children;};
     virtual IGxObject* SearchChild(wxString sPath);
 	//IGxCatalog
-	virtual wxString ConstructFullName(IGxObject* pObject);
+	+virtual wxString ConstructFullName(IGxObject* pObject);
 	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray);
 	virtual void ObjectAdded(long nObjectID);
 	virtual void ObjectChanged(long nObjectID);
 	virtual void ObjectDeleted(long nObjectID);
 	virtual void ObjectRefreshed(long nObjectID);
-	virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true);
-	virtual void DisconnectFolder(CPLString sPath);
-	virtual void RegisterObject(IGxObject* pObj);
-	virtual void UnRegisterObject(long nID);
-	virtual IGxObjectSPtr GetRegisterObject(long nID);
+	-virtual IGxObject* ConnectFolder(wxString sPath, bool bSelect = true);
+	-virtual void DisconnectFolder(CPLString sPath);
+	+virtual void RegisterObject(IGxObject* pObj);
+	+virtual void UnRegisterObject(long nID);
+	+virtual IGxObjectSPtr GetRegisterObject(long nID);
 	//wxGxCatalog
 	virtual void EnableRootItem(IGxObject* pRootItem, bool bEnable);
 	virtual void Init(void);
@@ -69,12 +115,8 @@ protected:
 	virtual wxString GetConfigName(void){return wxString(wxT("wxCatalog"));};
 	virtual void LoadChildren(wxXmlNode* const pNode);
 	virtual void LoadChildren(void);
-	virtual void LoadObjectFactories(wxXmlNode* pNode);
-	virtual void LoadObjectFactories(void);
 	virtual void EmptyChildren(void);
 	virtual void EmptyDisabledChildren(void);
-	virtual void EmptyObjectFactories(void);
-    virtual void SerializePlugins(wxXmlNode* pNode, bool bStore = false);
 protected:
 	bool m_bIsChildrenLoaded;
 	wxArrayString m_CatalogRootItemArray;
@@ -82,5 +124,5 @@ protected:
 	long m_nGlobalID;
 	wxCriticalSection m_RegCritSect;
 };
+*/
 
-//WXDLL_ENTRY_FUNCTION();

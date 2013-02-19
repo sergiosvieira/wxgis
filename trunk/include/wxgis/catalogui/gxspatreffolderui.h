@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxSpatialReferencesFolderUI classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -27,7 +27,7 @@
 /** \class wxGxSpatialReferencesFolderUI gxspatreffolderui.h
     \brief A spatial reference root GxObject.
 */
-
+/*
 class WXDLLIMPEXP_GIS_CLU wxGxSpatialReferencesFolderUI :
     public wxGxSpatialReferencesFolder,
 	public IGxObjectUI
@@ -47,10 +47,11 @@ public:
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
 };
-
+*/
 /** \class wxGxPrjFolderUI gxspatreffolderui.h
     \brief A projections folder root GxObject.
 */
+/*
 class WXDLLIMPEXP_GIS_CLU wxGxPrjFolderUI :
 	public wxGxArchiveFolderUI
 {
@@ -67,3 +68,4 @@ public:
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
 };
+*/

@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  format clases (for format coordinates etc.).
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,6 +20,9 @@
  ****************************************************************************/
 
 #include "wxgis/core/format.h"
+#include "wxgis/core/app.h"
+
+#include <wx/numformatter.h>
 
 wxString DoubleToString(double dVal, bool bIsLon)
 {
@@ -78,25 +81,130 @@ double StringToDouble(const wxString &sVal, const wxString &sAsterisk)
 	return ((double) grad + (double)min / 60 + (double)sec / 3600) * mul;
 }
 
-wxString NumberScale(double dScaleRatio)
+void FloatStringToCLoc(wxString & str)
 {
-	wxString str = wxString::Format(wxT("%.2f"), dScaleRatio);
-	int pos = str.Find(wxT("."));
-	if(pos == wxNOT_FOUND)
-		pos = str.Len();
-	wxString res = str.Right(str.Len() - pos);
-	for(size_t i = 1; i < pos + 1; ++i)
-	{
-		res.Prepend(str[pos - i]);
-		if((i % 3) == 0)
-			res.Prepend(wxT(" "));
-	}
-	return res;
+    IApplication* const pApp = GetApplication();
+    if(pApp && !pApp->GetDecimalPoint().IsSameAs('.'))
+        str.Replace(pApp->GetDecimalPoint(), wxT("."));
 }
 
-///////////////////////////////////////////////////////////////////////////////////////
+void FloatStringFromCLoc(wxString & str)
+{
+    IApplication* const pApp = GetApplication();
+    if(pApp && !pApp->GetDecimalPoint().IsSameAs('.'))
+        str.Replace(wxT("."), pApp->GetDecimalPoint());
+}
+
+void SetFloatValue(wxXmlNode* pNode, const wxString &sAttrName, double dfVal)
+{
+    wxString sVal = wxString::Format(wxT("%f"), dfVal);
+    FloatStringToCLoc(sVal);
+    pNode->AddAttribute(sAttrName, sVal);
+}
+
+void SetFloatValue(wxXmlNode* pNode, const wxString &sAttrName, float dfVal)
+{
+    wxString sVal = wxString::Format(wxT("%f"), dfVal);
+    FloatStringToCLoc(sVal);
+    pNode->AddAttribute(sAttrName, sVal);
+}
+
+double GetFloatValue(const wxXmlNode* pNode, const wxString &sAttrName, double dfDefVal)
+{
+    wxString sDefVal = wxString::Format(wxT("%f"), dfDefVal);
+    FloatStringToCLoc(sDefVal);
+    wxString sVal = pNode->GetAttribute(sAttrName, sDefVal);
+    FloatStringFromCLoc(sVal);
+    return wxAtof(sVal);
+}
+
+float GetFloatValue(const wxXmlNode* pNode, const wxString &sAttrName, float dfDefVal)
+{
+    wxString sDefVal = wxString::Format(wxT("%f"), dfDefVal);
+    FloatStringToCLoc(sDefVal);
+    wxString sVal = pNode->GetAttribute(sAttrName, sDefVal);
+    FloatStringFromCLoc(sVal);
+    return wxAtof(sVal);
+}
+
+void SetDecimalValue(wxXmlNode* pNode, const wxString &sAttrName, long nVal)
+{
+    wxString sVal = wxString::Format(wxT("%d"), nVal);
+    pNode->AddAttribute(sAttrName, sVal);
+}
+
+void SetDecimalValue(wxXmlNode* pNode, const wxString &sAttrName, int nVal)
+{
+    wxString sVal = wxString::Format(wxT("%d"), nVal);
+    pNode->AddAttribute(sAttrName, sVal);
+}
+
+long GetDecimalValue(const wxXmlNode* pNode, const wxString &sAttrName, long nDefVal)
+{
+    wxString sDefVal = wxString::Format(wxT("%d"), nDefVal);
+    wxString sVal = pNode->GetAttribute(sAttrName, sDefVal);    
+    return wxAtol(sVal);
+}
+
+int GetDecimalValue(const wxXmlNode* pNode, const wxString &sAttrName, int nDefVal)
+{
+    wxString sDefVal = wxString::Format(wxT("%d"), nDefVal);
+    wxString sVal = pNode->GetAttribute(sAttrName, sDefVal);    
+    return wxAtoi(sVal);
+}
+
+void SetDateValue(wxXmlNode* pNode, const wxString &sAttrName, const wxDateTime &dtVal)
+{
+    pNode->AddAttribute(sAttrName, dtVal.Format(wxT("%d-%m-%Y %H:%M:%S")));
+}
+
+wxDateTime GetDateValue(const wxXmlNode* pNode, const wxString &sAttrName, const wxDateTime &dtDefVal)
+{
+    const wxString sVal = pNode->GetAttribute(sAttrName, dtDefVal.Format(wxT("%d-%m-%Y %H:%M:%S")));
+    wxDateTime dt;
+    wxString::const_iterator itEnd;
+    dt.ParseFormat(sVal, wxT("%d-%m-%Y %H:%M:%S"), dtDefVal, &itEnd);
+    return dt;
+}
+
+void SetBoolValue(wxXmlNode* pNode, const wxString &sAttrName, bool bVal)
+{
+     pNode->AddAttribute(sAttrName, bVal == true ? wxT("t") : wxT("f"));
+}
+
+bool GetBoolValue(const wxXmlNode* pNode, const wxString &sAttrName, bool bDefVal)
+{
+    wxString sVal = pNode->GetAttribute(sAttrName, bDefVal == true ? wxT("t") : wxT("f"));
+    if(sVal.IsSameAs(wxT("t"), false))
+        return true;
+    return false;
+}
+
+
+wxString NumberScale(double dScaleRatio)
+{
+    return wxNumberFormatter::ToString(dScaleRatio, 2, wxNumberFormatter::Style_WithThousandsSep);
+	//wxString str = wxString::Format(wxT("%.2f"), dScaleRatio);
+	//int pos = str.Find(wxT("."));
+	//if(pos == wxNOT_FOUND)
+	//	pos = str.Len();
+	//wxString res = str.Right(str.Len() - pos);
+	//for(size_t i = 1; i < pos + 1; ++i)
+	//{
+	//	res.Prepend(str[pos - i]);
+	//	if((i % 3) == 0)
+	//		res.Prepend(wxT(" "));
+	//}
+	//return res;
+}
+
+
+//-----------------------------------------------------------------------------
 // wxGISCoordinatesFormat
-///////////////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+
+//TODO: formt using geographic and projected spatial reference m -> deg and deg->m acording to format
+
 wxGISCoordinatesFormat::wxGISCoordinatesFormat(void)
 {
 }

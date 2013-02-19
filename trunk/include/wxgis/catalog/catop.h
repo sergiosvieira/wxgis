@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  catalog operations.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/catalog/catalog.h"
-
+/*
 bool WXDLLIMPEXP_GIS_CLT OverWriteGxObject(IGxObject* pGxObject, ITrackCancel* pTrackCancel = NULL);
 IGxObject WXDLLIMPEXP_GIS_CLT *GetParentGxObjectFromPath(const wxString &sFullPath, IGxObjectContainer* pGxObjectContainer, ITrackCancel* pTrackCancel = NULL);
-
+*/

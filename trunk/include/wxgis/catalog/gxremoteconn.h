@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxRemoteConnection class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,18 +20,22 @@
  ****************************************************************************/
 #pragma once
 
+#include "wxgis/defs.h"
+
+#ifdef wxGIS_USE_POSTGRES
+/*
 #include "wxgis/catalog/catalog.h"
-#include "wxgis/datasource/postgisdataset.h"
+//#include "wxgis/datasource/postgisdataset.h"
 
 //#include "ogrsf_frmts/pg/ogr_pg.h"
 #include "gdal/ogr_pg.h"
 
-class wxGxRemoteDBSchema;
+//class wxGxRemoteDBSchema;
 
 /** \class wxGxRemoteConnection gxremoteconn.h
     \brief A Remote Connection GxObject.
 */
-
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxRemoteConnection :
 	public IGxObjectContainer,
     public IGxObjectEdit,
@@ -81,11 +85,11 @@ protected:
 	wxString m_sName;
     CPLString m_sPath;
 };
-
+*/
 /** \class wxGxRemoteDBSchema gxremoteconn.h
     \brief A Remote Database schema GxObject.
 */
-
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxRemoteDBSchema :
 	public IGxObjectContainer
 {
@@ -110,3 +114,5 @@ protected:
 	wxString m_sName;
     CPLString m_sPath;
 };
+*/
+#endif //wxGIS_USE_POSTGRES

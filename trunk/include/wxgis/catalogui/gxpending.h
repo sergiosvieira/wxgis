@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxPendingUI class. Show pending item in tree or content view
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,52 +21,49 @@
 #pragma once
 
 #include "wxgis/catalogui/catalogui.h"
+#include "wxgis/catalog/gxobject.h"
 
 #include <wx/imaglist.h>
-
-class WXDLLIMPEXP_GIS_CLU wxGxPendingUI;
-
-/** \class wxPendingUpdateThread gxpending.h
-    \brief The pending item update thread
-*/
-class wxPendingUpdateThread : public wxThread
-{
-public:
-	wxPendingUpdateThread(wxGxPendingUI* pGxPendingUI);
-    virtual void *Entry();
-    virtual void OnExit();
-private:
-    wxGxPendingUI* m_pGxPendingUI;
-};
 
 /** \class wxGxPendingUI gxpending.h
     \brief The pending item in tree or content view
 */
 
 class WXDLLIMPEXP_GIS_CLU wxGxPendingUI :
-    public IGxObject,
+    public wxGxObject,
     public IGxObjectUI
 {
+    DECLARE_CLASS(wxGxPendingUI)
+    enum
+    {
+        TIMER_ID = 1014
+    };
 public:
-	wxGxPendingUI(void);
+	wxGxPendingUI(wxImageList *pImageListSmall, wxImageList *pImageListLarge, wxGxObject *oParent, const wxString &soName = wxString(_("Waiting...")), const CPLString &soPath = "");
 	virtual ~wxGxPendingUI(void);
 	//IGxObject
-	virtual wxString GetName(void){return wxString(_("Waiting..."));};
-    virtual wxString GetBaseName(void){return GetName();};
-    virtual CPLString GetInternalName(void){return CPLString();};
-	virtual wxString GetCategory(void){return wxString(_("Waiting..."));};
-	virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog);
-    virtual void Detach(void);
+//	virtual wxString GetName(void){return wxString(_("Waiting..."));};
+//    virtual wxString GetBaseName(void){return GetName();};
+//    virtual CPLString GetInternalName(void){return CPLString();};
+	virtual wxString GetCategory(void) const {return wxString(_("Waiting..."));};
+//	virtual bool Attach(IGxObject* pParent, IGxCatalog* pCatalog);
+//    virtual void Detach(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxEmptyString;};
-	virtual wxString NewMenu(void){return wxEmptyString;};
+	virtual wxString ContextMenu(void) const {return wxEmptyString;};
+	virtual wxString NewMenu(void) const {return wxEmptyString;};
     //
-    virtual void OnUpdate(void);
-    virtual void OnStopPending(void);
+//    virtual void OnUpdate(void);
+//    virtual void OnStopPending(void);
+protected:
+    //events
+    void OnTimer( wxTimerEvent & event);
 protected:
     wxImageList *m_pImageListSmall, *m_pImageListLarge;
     short m_nCurrentImage;
-    wxPendingUpdateThread *m_pThread;
+    wxTimer m_timer;
+private:
+    DECLARE_EVENT_TABLE()
 };
+

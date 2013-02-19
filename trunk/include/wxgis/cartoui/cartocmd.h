@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  Carto Main Commands & tools class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,7 +19,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-#include "wxgis/framework/framework.h"
+#include "wxgis/framework/command.h"
+#include "wxgis/framework/applicationbase.h"
 #include "wxgis/cartoui/mapview.h"
 #include "wxgis/cartoui/mxeventui.h"
 #include "wxgis/cartoui/identifydlg.h"
@@ -27,6 +28,7 @@
 /** \class wxGISRotationComboBox cartocmd.h
     \brief The frame angle rotation input combobox.
 */
+/*
 class wxGISRotationComboBox : 
 	public wxComboBox,
 	public IToolBarControl
@@ -39,7 +41,7 @@ public:
 	void OnTextEnter(wxCommandEvent& event);
 	void OnMapRotated(wxMxMapViewEvent& event);
 	//IToolBarControl
-	virtual void Activate(IFrameApplication* pApp);
+	virtual void Activate(wxGISApplicationBase* pApp);
 	virtual void Deactivate(void);
 protected:
 	wxGISMapView* m_pMapView;
@@ -48,10 +50,11 @@ protected:
 
     DECLARE_EVENT_TABLE()
 };
-
+*/
 /** \class wxGISCartoMainCmd cartocmd.h
     \brief The carto main commands.
 */
+/*
 class wxGISCartoMainCmd :
 	public ICommand
 {
@@ -68,11 +71,11 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IFrameApplication* pApp);
+	virtual bool OnCreate(wxGISApplicationBase* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
 private:
-	IFrameApplication* m_pApp;
+	wxGISApplicationBase* m_pApp;
 	wxIcon m_IconFullExt, m_IconNextExt, m_IconPrevExt;
 	wxGISMapView* m_pMapView;
 };
@@ -80,6 +83,7 @@ private:
 /** \class wxGISCartoMainTool cartocmd.h
     \brief The carto main tool.
 */
+/*
 class wxGISCartoMainTool :
 	public ITool
 {
@@ -96,7 +100,7 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IFrameApplication* pApp);
+	virtual bool OnCreate(wxGISApplicationBase* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
 	//ITool
@@ -107,7 +111,7 @@ public:
 	virtual void OnMouseDoubleClick(wxMouseEvent& event);
 	virtual void OnMouseMove(wxMouseEvent& event);
 private:
-	IFrameApplication* m_pApp;
+	wxGISApplicationBase* m_pApp;
 	wxIcon m_IconZoomIn, m_IconZoomOut, m_IconPan, m_IconInfo;
 	wxCursor m_CurZoomIn, m_CurZoomOut, m_CurPan1, m_CurPan2, m_CurInfo;
 	wxGISMapView* m_pMapView;
@@ -118,6 +122,7 @@ private:
 /** \class wxGISCartoFrameTool cartocmd.h
     \brief The carto frame tools and commands.
 */
+/*
 class wxGISCartoFrameTool :
 	public ITool,
 	public IToolControl
@@ -135,7 +140,7 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IFrameApplication* pApp);
+	virtual bool OnCreate(wxGISApplicationBase* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
 	//ITool
@@ -150,10 +155,10 @@ public:
 	virtual wxString GetToolLabel(void);
 	virtual bool HasToolLabel(void);
 private:
-	IFrameApplication* m_pApp;
+	wxGISApplicationBase* m_pApp;
 	wxIcon m_IconRotate, m_IconCancelRotate;
 	wxCursor m_CurRotate;
 	wxGISMapView* m_pMapView;
 	bool m_bCheck;
 };
-
+*/

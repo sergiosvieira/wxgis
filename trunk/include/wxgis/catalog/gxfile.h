@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxFile classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -24,6 +24,7 @@
 /** \class wxGxFile gxfileui.h
     \brief A file GxObject.
 */
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxFile :
 	public IGxObject,
     public IGxFile, 
@@ -49,10 +50,11 @@ protected:
 	wxString m_sName;
     CPLString m_sPath;
 };
-
+*/
 /** \class wxGxPrjFile gxfileui.h
     \brief A proj file GxObject.
 */
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxPrjFile :
     public wxGxFile
 {
@@ -67,10 +69,11 @@ protected:
     wxGISEnumPrjFileType m_Type;
 	OGRSpatialReferenceSPtr m_pOGRSpatialReference;
 };
-
+*/
 /** \class wxGxTextFile gxfileui.h
     \brief A text file GxObject.
 */
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxTextFile :
     public wxGxFile
 {
@@ -80,3 +83,4 @@ public:
 	//IGxObject
 	virtual wxString GetCategory(void){return wxString(_("Text file"));};
 };
+*/

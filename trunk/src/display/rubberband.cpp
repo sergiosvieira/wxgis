@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISRubberBand class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ wxGISRubberBand::~wxGISRubberBand(void)
 {
 }
 
-OGRGeometrySPtr wxGISRubberBand::TrackNew(wxCoord x, wxCoord y)
+wxGISGeometry wxGISRubberBand::TrackNew(wxCoord x, wxCoord y)
 {
 	m_StartX = x;
 	m_StartY = y;
@@ -68,7 +68,8 @@ OGRGeometrySPtr wxGISRubberBand::TrackNew(wxCoord x, wxCoord y)
 	while(loop->IsRunning())
 	{
 		loop->Dispatch();
-		if(!m_bLock) break;
+		if(!m_bLock) 
+            break;
 	}
 	m_pWnd->PopEventHandler();
 	m_pWnd->ReleaseMouse();
@@ -192,7 +193,7 @@ void wxGISRubberEnvelope::OnMouseUp(wxMouseEvent& event)
     pRgn->flattenTo2D();
 	//if(pSpaRef)
 	//	pRgn->assignSpatialReference(pSpaRef->Clone());
-	m_RetGeom = OGRGeometrySPtr(static_cast<OGRGeometry*>(pRgn));
+	m_RetGeom = wxGISGeometry(static_cast<OGRGeometry*>(pRgn));
 
 	//wxRect rc(wxPoint(dX1, dY1), wxPoint(dX2, dY2));
 	//m_RetEnv = m_pDisp->TransformRect(rc);

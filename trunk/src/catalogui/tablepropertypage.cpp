@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISTablePropertyPage class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,13 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/tablepropertypage.h"
+#include "wxgis/datasource/sysop.h"
+
+#include "wx/propgrid/advprops.h"
+
+//--------------------------------------------------------------------------
+// wxGISTablePropertyPage
+//--------------------------------------------------------------------------
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISTablePropertyPage, wxPanel)
 
@@ -28,26 +35,31 @@ END_EVENT_TABLE()
 wxGISTablePropertyPage::wxGISTablePropertyPage(void)
 {
 	m_nCounter = 0;
+    m_pDataset = NULL;
+    m_pGxDataset = NULL;
 }
 
-wxGISTablePropertyPage::wxGISTablePropertyPage(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+wxGISTablePropertyPage::wxGISTablePropertyPage(wxGxTableDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
 	m_nCounter = 0;
+    m_pDataset = NULL;
+    m_pGxDataset = NULL;    
     Create(pGxDataset, parent, id, pos, size, style, name);
 }
 
 wxGISTablePropertyPage::~wxGISTablePropertyPage()
 {
+    wsDELETE(m_pDataset);
 }
 
-bool wxGISTablePropertyPage::Create(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+bool wxGISTablePropertyPage::Create(wxGxTableDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     if(!wxPanel::Create(parent, id, pos, size, style, name))
 		return false;
 
     m_pGxDataset = pGxDataset;
 
-    m_pDataset = boost::dynamic_pointer_cast<wxGISTable>(m_pGxDataset->GetDataset(false));
+    m_pDataset = wxDynamicCast(m_pGxDataset->GetDataset(false), wxGISTable);
     if(!m_pDataset)
         return false;
 	if(!m_pDataset->IsOpened())
@@ -125,14 +137,6 @@ void wxGISTablePropertyPage::FillGrid(void)
 	wxString sPath(CPLGetPath(soPath), wxConvUTF8);
     AppendProperty( new wxStringProperty(_("Folder"), wxPG_LABEL, sPath) );  
     
-    VSIStatBufL BufL;
-    wxULongLong nSize(0);
-    int ret = VSIStatL(soPath, &BufL);
-    if(ret == 0)
-    {
-        nSize += BufL.st_size;
-    }
-
     char** papszFileList = m_pDataset->GetFileList();
     if( !papszFileList || CSLCount(papszFileList) == 0 )
     {
@@ -143,21 +147,18 @@ void wxGISTablePropertyPage::FillGrid(void)
         wxPGProperty* pfilesid = AppendProperty(pid, new wxPropertyCategory(_("Files")) );  
         for(int i = 0; papszFileList[i] != NULL; ++i )
 	    {
-            ret = VSIStatL(papszFileList[i], &BufL);
-            if(ret == 0)
-            {
-                nSize += BufL.st_size;
-            }
 		    wxString sFileName = GetConvName(papszFileList[i]);
 			AppendProperty(pfilesid, new wxStringProperty(wxString::Format(_("File %d"), i), wxPG_LABEL, sFileName) );  
 	    }
     }
     CSLDestroy( papszFileList );
     
+    m_pGxDataset->FillMetadata();
     //size    
-    AppendProperty(pid, new wxStringProperty(_("Total size"), wxPG_LABEL, wxFileName::GetHumanReadableSize(nSize)) );
+    AppendProperty(pid, new wxStringProperty(_("Total size"), wxPG_LABEL, wxFileName::GetHumanReadableSize(m_pGxDataset->GetSize())) );
+    AppendProperty(pid, new wxDateProperty(_("Modification date"), wxPG_LABEL, m_pGxDataset->GetModificationDate()) );
 
-    OGRDataSource *pDataSource = m_pDataset->GetDataSource();
+    OGRDataSource *pDataSource = m_pDataset->GetDataSourceRef();
     if(pDataSource)
     {
         OGRSFDriver* pDrv = pDataSource->GetDriver();
@@ -196,18 +197,12 @@ void wxGISTablePropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer, CPLStri
 {
     wxPGProperty* playid = AppendProperty( new wxPropertyCategory(wxString::Format(_("Layer #%d"), iLayer + 1) ));
 
-    wxString sOut;
-    if(EQUALN(soPath, "/vsizip", 7))
-        sOut = wxString(poLayer->GetName(), wxCSConv(wxT("cp-866")));//TODO: Get from config cp-866
-    else
-        sOut = wxString(poLayer->GetName(), wxConvUTF8);
+    wxString sOut = GetConvName(poLayer->GetName(), false);
 	if(sOut.IsEmpty())
 	{
-		if(EQUALN(soPath, "/vsizip", 7))
-            sOut = wxString(CPLGetBasename(soPath), wxCSConv(wxT("cp-866")));//TODO: Get from config cp-866
-        else
-            sOut = wxString(CPLGetBasename(soPath), wxConvUTF8);
+        sOut = GetConvName(CPLGetBasename(soPath), false);
 	}
+
     AppendProperty(playid, new wxStringProperty(_("Name"), wxPG_LABEL, sOut));  //GetConvName
 
 	AppendProperty(playid, new wxIntProperty(_("Feature count"), wxPG_LABEL, m_pDataset->GetFeatureCount() ));  

@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  wxGISApplication class. Base application functionality (commands, menues, etc.)
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,10 +20,8 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/framework/statusbar.h"
+#include "wxgis/framework/applicationbase.h"
 #include "wxgis/framework/accelerator.h"
-#include "wxgis/framework/menubar.h"
-#include "wxgis/framework/commandbar.h"
 
 #include "wx/ffile.h"
 #include "wx/dir.h"
@@ -32,51 +30,36 @@
 #include "wx/datetime.h"
 #include "wx/intl.h"
 
-
+/** \class wxGISApplication application.h
+    \brief A wxGISApplication class.  
+*/
 class WXDLLIMPEXP_GIS_FRW wxGISApplication :
-	public wxFrame,
-	public IFrameApplication
+	public wxFrame,	public wxGISApplicationBase
 {
     DECLARE_CLASS(wxGISApplication)
 public:
 	//constructor
-	wxGISApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER );//| wxWS_EX_VALIDATE_RECURSIVELY
+	wxGISApplication(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER );
 	//destructor
 	virtual ~wxGISApplication(void);
 	virtual wxStatusBar* OnCreateStatusBar(int number, long style, wxWindowID id, const wxString& name);
-	virtual COMMANDBARARRAY* GetCommandBars(void);
-	virtual COMMANDARRAY* GetCommands(void);
-	virtual wxGISMenuBar* GetMenuBar(void);
-	virtual wxGISAcceleratorTable* GetGISAcceleratorTable(void);
-//IFrameApplication
-	virtual ICommand* GetCommand(long CmdID);
-	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
-	virtual IStatusBar* GetStatusBar(void);
-	virtual IGISCommandBar* GetCommandBar(wxString sName);
-	virtual void RemoveCommandBar(IGISCommandBar* pBar);
-	virtual bool AddCommandBar(IGISCommandBar* pBar);
+	virtual wxGISAcceleratorTable* GetGISAcceleratorTable(void) const;
+//wxGISApplicationBase
+    wxGISStatusBar* GetStatusBar(void) const;
 	virtual void ShowStatusBar(bool bShow);
 	virtual bool IsStatusBarShown(void);
 	virtual void ShowToolBarMenu(void);
-	virtual wxString GetAppName(void) = 0;
-	virtual wxIcon GetAppIcon(void) = 0;
-	virtual void OnMouseDown(wxMouseEvent& event);
-	virtual void OnMouseUp(wxMouseEvent& event);
-	virtual void OnMouseDoubleClick(wxMouseEvent& event);
-	virtual void OnMouseMove(wxMouseEvent& event);
-    virtual bool Create(void);
+ //IApplication
+    virtual bool CreateApp(void);
     virtual void OnAppOptions(void);
-    virtual bool SetupLog(const wxString &sLogPath);
+    virtual bool SetupLog(const wxString &sLogPath, const wxString &sNamePrefix = wxEmptyString);
     virtual bool SetupSys(const wxString &sSysPath);
     virtual bool SetupLoc(const wxString &sLoc, const wxString &sLocPath);
-
+    virtual wxString GetDecimalPoint(void) const{return m_sDecimalPoint;};
 protected:
-	virtual void LoadCommands(wxXmlNode* pRootNode);
-	virtual void LoadMenues(wxXmlNode* pRootNode);
-	virtual void LoadToolbars(wxXmlNode* pRootNode);
 	virtual void SerializeFramePos(bool bSave = false);
-	virtual void SerializeCommandBars(bool bSave = false);
-	virtual void Command(ICommand* pCmd);
+    virtual void LoadToolbars(wxXmlNode* pRootNode);
+    virtual void SerializeCommandBars(bool bSave = false);
 	//events
     virtual void OnEraseBackground(wxEraseEvent& event);
     virtual void OnSize(wxSizeEvent& event);
@@ -89,17 +72,14 @@ protected:
 	virtual void OnClose(wxCloseEvent & event);
 //
 protected:
-	COMMANDARRAY m_CommandArray;
-	COMMANDBARARRAY m_CommandBarArray;
 	wxGISAcceleratorTable* m_pGISAcceleratorTable;
-	wxGISMenuBar* m_pMenuBar;
-	ITool* m_CurrentTool;
     IDropDownCommand* m_pDropDownCommand;
 	ITrackCancel* m_pTrackCancel;
     //
     wxFFile m_LogFile;
     wxLocale* m_pLocale; // locale we'll be using
-	char* m_pszOldLocale;
-
+	//char* m_pszOldLocale;
+    wxString m_sDecimalPoint;
+private:    
     DECLARE_EVENT_TABLE()
 };

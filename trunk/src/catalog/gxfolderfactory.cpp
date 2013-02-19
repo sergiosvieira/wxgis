@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxFolderFactory class. Create new GxFolder objects
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,11 @@
 #include "wx/filename.h"
 #include "wx/dir.h"
 
-IMPLEMENT_DYNAMIC_CLASS(wxGxFolderFactory, wxObject)
+//------------------------------------------------------------------------------
+// wxGxFolderFactory
+//------------------------------------------------------------------------------
+
+IMPLEMENT_DYNAMIC_CLASS(wxGxFolderFactory, wxGxObjectFactory)
 
 wxGxFolderFactory::wxGxFolderFactory(void)
 {
@@ -34,8 +38,9 @@ wxGxFolderFactory::~wxGxFolderFactory(void)
 {
 }
 
-bool wxGxFolderFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray)
+bool wxGxFolderFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds)
 {
+    wxGxCatalogBase* pCatalog = GetGxCatalog();
     for(int i = CSLCount(pFileNames) - 1; i >= 0; i-- )
     {
         wxString path(pFileNames[i], wxConvUTF8);
@@ -43,8 +48,10 @@ bool wxGxFolderFactory::GetChildren(CPLString sParentDir, char** &pFileNames, Gx
 		{
             wxFileName FName(path);
             wxString sName = FName.GetFullName();
-			IGxObject* pGxObj = GetGxObject(pFileNames[i], sName);
-			ObjArray.push_back(pGxObj);
+
+			wxGxObject* pObj = GetGxObject(pParent, sName, pFileNames[i]); 
+            if(pObj)
+                pChildrenIds.Add(pObj->GetId());
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 		}
     }
@@ -52,25 +59,8 @@ bool wxGxFolderFactory::GetChildren(CPLString sParentDir, char** &pFileNames, Gx
 }
 
 
-void wxGxFolderFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
+wxGxObject* wxGxFolderFactory::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath)
 {
-    if(bStore)
-    {
-        if(pConfig->HasAttribute(wxT("factory_name")))
-            pConfig->DeleteAttribute(wxT("factory_name"));
-        pConfig->AddAttribute(wxT("factory_name"), GetClassName());  
-        if(pConfig->HasAttribute(wxT("is_enabled")))
-            pConfig->DeleteAttribute(wxT("is_enabled"));
-        pConfig->AddAttribute(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
-    }
-    else
-    {
-        m_bIsEnabled = wxAtoi(pConfig->GetAttribute(wxT("is_enabled"), wxT("1"))) != 0;
-    }
-}
-
-IGxObject* wxGxFolderFactory::GetGxObject(CPLString szPath, wxString soName)
-{
-	wxGxFolder* pFolder = new wxGxFolder(szPath, soName);
-	return static_cast<IGxObject*>(pFolder);
+	wxGxFolder* pFolder = new wxGxFolder(pParent, soName, szPath);
+	return static_cast<wxGxObject*>(pFolder);
 }
