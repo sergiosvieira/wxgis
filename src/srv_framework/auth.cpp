@@ -21,7 +21,7 @@
  ****************************************************************************/
 
 #include "wxgissrv/srv_framework/auth.h"
-
+/*
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // wxGISAuthService
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,4 +111,4 @@ void wxGISAuthService::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
 	WXGISMSG outmsg = {INetMessageSPtr(static_cast<INetMessage*>(pMsg)), msg.nUserID};
 	m_pApp->PutOutMessage(outmsg);
 }
-
+*/

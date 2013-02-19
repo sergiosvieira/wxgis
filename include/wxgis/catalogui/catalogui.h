@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxCatalogUI main header.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/framework/framework.h"
 
-#include "wx/dnd.h"
-#include "wx/dataobj.h"
+#include <wx/dnd.h>
+#include <wx/dataobj.h>
 
 #define TREECTRLID	1005 //wxGxCatalog tree
 #define LISTCTRLID	1006 //wxGxCatalog contents view
@@ -37,15 +37,22 @@
 #define FILTERCOMBO	1011 //wxGxObjectDialog
 #define WXGISHIGHEST	1200 //
 
-
-class IGxApplication
+/** \class IGxObjectSort catalogui.h
+    \brief A Interface class for GxObject sort order in GxObjectContainer.
+*/
+class IGxObjectSort
 {
 public:
-	virtual ~IGxApplication(void){};
-	virtual IGxCatalog* const GetCatalog(void) = 0;
+	virtual ~IGxObjectSort(void){};
+	virtual bool IsAlwaysTop(void) = 0;
+	virtual bool IsSortEnabled(void) = 0;
 };
 
+/** \class IGxObjectWizard catalogui.h
+    \brief A Interface class for GxObject wisards.
 
+    If double clicked on gxobject inherited from this interface the Invoke method is executed
+*/
 class IGxObjectWizard
 {
 public:
@@ -53,25 +60,34 @@ public:
 	virtual bool Invoke(wxWindow* pParentWnd) = 0;
 };
 
+/** \class IGxObjectUI catalogui.h
+    \brief A Interface class for GxObject UI.
 
+    This interface class provides some UI onformation (icons, menues, etc.)
+*/
 class IGxObjectUI
 {
 public:
 	virtual ~IGxObjectUI(void){};
 	virtual wxIcon GetLargeImage(void) = 0;
 	virtual wxIcon GetSmallImage(void) = 0;
-	virtual wxString ContextMenu(void) = 0;
-	virtual wxString NewMenu(void) = 0;
+	virtual wxString ContextMenu(void) const = 0;
+	virtual wxString NewMenu(void) const = 0;
 	//virtual wxDataFormat GetDataFormat(void){return wxDataFormat(wxDF_FILENAME);};
 };
 
+/** \class IGxObjectEditUI catalogui.h
+    \brief A Interface class for GxObject UI edits.
+
+    This interface class provides edit properties dialog for "Properties" command
+*/
 class IGxObjectEditUI
 {
 public:
 	virtual ~IGxObjectEditUI(void){};
 	virtual void EditProperties(wxWindow *parent){};
 };
-
+/*
 class IGxSelection
 {
 public:
@@ -111,10 +127,11 @@ public:
 	virtual bool Applies(IGxSelection* Selection) = 0;
     virtual void BeginRename(long nObjectID = wxNOT_FOUND) = 0;
 };
-
+*/
 enum wxGISEnumContentsViewStyle
 {
-	enumGISCVReport = 0, 
+    enumGISCVUndefined = 0,
+	enumGISCVReport, 
 	enumGISCVSmall,
 	enumGISCVLarge,
 	enumGISCVList
@@ -145,5 +162,18 @@ class IGxDropTarget
 public:
 	virtual ~IGxDropTarget(void){};
     virtual wxDragResult CanDrop(wxDragResult def) = 0;
-    virtual bool Drop(const wxArrayString& filenames, bool bMove) = 0;
+    virtual bool Drop(const wxArrayString& GxObjects, bool bMove) = 0;
+};
+
+/** \class IGxObjectTreeAttr catalogui.h
+    \brief A Interface class for GxObject item view and behaviour in tree.
+*/
+class IGxObjectTreeAttr
+{
+public:
+	virtual ~IGxObjectTreeAttr(void){};
+	virtual bool IsBold(void) = 0;
+    virtual wxColour GetColor(void) = 0;
+    virtual bool ShowCount(void) = 0;
+    virtual size_t GetCount(void) = 0;
 };

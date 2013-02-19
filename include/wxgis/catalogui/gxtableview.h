@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISTableView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,9 +21,11 @@
 
 #pragma once
 #include "wxgis/catalogui/gxview.h"
+/*
 #include "wxgis/cartoui/tableview.h"
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/gxeventui.h"
+
 
 class WXDLLIMPEXP_GIS_CLU wxGxTableView :
 	public wxGISTableView, 
@@ -36,9 +38,9 @@ public:
 	virtual ~wxGxTableView(void);
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("TableView"));
-	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(wxGISApplicationBase* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
-	virtual bool Applies(IGxSelection* Selection);
+	virtual bool Applies(wxGxSelection* const pSelection);
 //events
 	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
 private:
@@ -48,3 +50,4 @@ private:
 
 	DECLARE_EVENT_TABLE()
 };
+*/

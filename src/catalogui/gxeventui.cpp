@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  event UI classes special for Selection events.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -24,3 +24,4 @@
 IMPLEMENT_DYNAMIC_CLASS(wxGxSelectionEvent, wxEvent)
 
 wxDEFINE_EVENT( wxGXSELECTION_CHANGED, wxGxSelectionEvent );
+

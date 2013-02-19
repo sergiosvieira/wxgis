@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  version functions
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -24,8 +24,8 @@
 
 /*  NB: this file is parsed by automatic tools so don't change its format! */
 #define wxGIS_MAJOR_VERSION      0
-#define wxGIS_MINOR_VERSION      4
-#define wxGIS_RELEASE_NUMBER     2
+#define wxGIS_MINOR_VERSION      5
+#define wxGIS_RELEASE_NUMBER     0
 #define wxGIS_SUBRELEASE_NUMBER  0
 
 /*  these are used by version.rc and should always be ASCII, not Unicode */

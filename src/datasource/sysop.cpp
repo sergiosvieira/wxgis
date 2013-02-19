@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  system operations.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,43 +20,104 @@
  ****************************************************************************/
 
 #include "wxgis/datasource/sysop.h"
+#include "wxgis/core/config.h"
 
 #include <wx/filename.h>
 #include <wx/fontmap.h>
 
-bool DeleteDir(CPLString sPath)
+bool DeleteDir(const CPLString &sPath, ITrackCancel* const pTrackCancel)
 {
     int result = CPLUnlinkTree(sPath);
     //int result = VSIRmdir(sPath);
     if (result == -1)
+    {
+        if(pTrackCancel)
+        { 
+            const char* szErr = CPLGetLastErrorMsg(); 
+            wxString sErr = wxString::Format(_("Delete folder failed! GDAL error: %s, folder '%s'"), wxString(szErr, wxConvUTF8).c_str(), wxString(sPath, wxConvUTF8).c_str());
+            wxLogError(sErr);
+            pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageErr);
+        }
         return false;
+    }
+    if(pTrackCancel)
+    {
+        wxString sErr = wxString::Format(_("Delete folder succeeded! Folder '%s'"), wxString(sPath, wxConvUTF8).c_str());
+        wxLogVerbose(sErr);
+        pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageInfo);
+    }
     return true;
 }
 
-bool CreateDir(CPLString sPath, long mode )
+bool CreateDir(const CPLString &sPath, long mode, ITrackCancel* const pTrackCancel)
 {
     if( VSIMkdir( sPath, mode ) != 0 )
+    {
+        if(pTrackCancel)
+        { 
+            const char* szErr = CPLGetLastErrorMsg(); 
+            wxString sErr = wxString::Format(_("Create folder failed! GDAL error: %s, folder '%s'"), wxString(szErr, wxConvUTF8).c_str(), wxString(sPath, wxConvUTF8).c_str());
+            wxLogError(sErr);
+            pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageErr);
+        }
         return false;
+    }
+    if(pTrackCancel)
+    {
+        wxString sErr = wxString::Format(_("Create folder succeeded! Folder '%s'"), wxString(sPath, wxConvUTF8).c_str());
+        wxLogVerbose(sErr);
+        pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageInfo);
+    }    
     return true;
 }
 
-bool DeleteFile(CPLString sPath)
+bool DeleteFile(const CPLString &sPath, ITrackCancel* const pTrackCancel)
 {
     int result = VSIUnlink(sPath);
     if (result == -1)
+    {
+        if(pTrackCancel)
+        { 
+            const char* szErr = CPLGetLastErrorMsg(); 
+            wxString sErr = wxString::Format(_("Delete file failed! GDAL error: %s, file '%s'"), wxString(szErr, wxConvUTF8).c_str(), wxString(sPath, wxConvUTF8).c_str());
+            wxLogError(sErr);
+            pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageErr);
+        }
         return false;
+    }
+    if(pTrackCancel)
+    {
+        wxString sErr = wxString::Format(_("Delete file succeeded! File '%s'"), wxString(sPath, wxConvUTF8).c_str());
+        wxLogVerbose(sErr);
+        pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageInfo);
+    }
     return true;
 }
 
-bool RenameFile(CPLString sOldPath, CPLString sNewPath)
+bool RenameFile(const CPLString &sOldPath, const CPLString &sNewPath, ITrackCancel* const pTrackCancel)
 {
 	int result = VSIRename(sOldPath, sNewPath);
     if (result == -1)
+    {
+        if(pTrackCancel)
+        { 
+            const char* szErr = CPLGetLastErrorMsg(); 
+            wxString sErr = wxString::Format(_("Rename file failed! GDAL error: %s, old path '%s', new path '%s'"), wxString(szErr, wxConvUTF8).c_str(), wxString(sOldPath, wxConvUTF8).c_str(), wxString(sNewPath, wxConvUTF8).c_str());
+            wxLogError(sErr);
+            pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageErr);
+        }
         return false;
+    }
+    if(pTrackCancel)
+    {
+        wxString sErr = wxString::Format(_("Rename file succeeded! Old path '%s', new path '%s'"), wxString(sOldPath, wxConvUTF8).c_str(), wxString(sNewPath, wxConvUTF8).c_str());
+        wxLogVerbose(sErr);
+        pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageInfo);
+    }
     return true;
 }
 
-wxString ClearExt(wxString sPath)
+wxString ClearExt(const wxString &sPath)
 {
 	return wxFileName::StripExtension(sPath);
 }
@@ -229,7 +290,7 @@ wxString ClearExt(wxString sPath)
 //    //return CPLString(sEnc.mb_str());
 //}
 
-wxFontEncoding GetEncodingFromCpg(CPLString sPath)
+wxFontEncoding GetEncodingFromCpg(const CPLString &sPath)
 {
     wxFontEncoding oDefaultEnc = wxLocale::GetSystemEncoding();
 	const char* szCPGPath = CPLResetExtension(sPath, "cpg");
@@ -397,7 +458,7 @@ wxFontEncoding GetEncodingFromCpg(CPLString sPath)
     return oDefaultEnc;
 }
 
-bool IsFileHidden(CPLString sPath)
+bool IsFileHidden(const CPLString &sPath)
 {
 #ifdef __WXMSW__
     wxString sTestPath(sPath, wxConvUTF8);
@@ -408,7 +469,7 @@ bool IsFileHidden(CPLString sPath)
 	return EQUALN(CPLGetFilename(sPath), ".", 1);
 }
 
-wxString CheckUniqName(CPLString sPath, wxString sName, wxString sExt, int nCounter)
+wxString CheckUniqName(const CPLString &sPath, const wxString &sName, const wxString &sExt, int nCounter)
 {
     wxString sResultName = sName + (nCounter > 0 ? wxString::Format(wxT("_%d"), nCounter) : wxString(wxT("")));
     CPLString szBaseName = (char*)CPLFormFilename(sPath, sResultName.mb_str(wxConvUTF8), sExt.mb_str(wxConvUTF8));
@@ -418,13 +479,13 @@ wxString CheckUniqName(CPLString sPath, wxString sName, wxString sExt, int nCoun
         return sResultName;
 }
 
-CPLString CheckUniqPath(CPLString sPath, CPLString sName, int nCounter)
+CPLString CheckUniqPath(const CPLString &sPath, const CPLString &sName, const CPLString &sAdd, int nCounter)
 {
     CPLString sResultName;
     if(nCounter > 0)
     {
         CPLString szAdd;
-        szAdd.Printf("_copy(%d)", nCounter);
+        szAdd.Printf("%s(%d)", sAdd, nCounter);
         CPLString szTmpName = sName + szAdd;
         sResultName = CPLString(CPLFormFilename(CPLGetPath(sPath), szTmpName, GetExtension(sPath, sName)));
     }
@@ -432,12 +493,12 @@ CPLString CheckUniqPath(CPLString sPath, CPLString sName, int nCounter)
         sResultName = sPath;
 
     if(CPLCheckForFile((char*)sResultName.c_str(), NULL))
-        return CheckUniqPath(sPath, sName, nCounter + 1);
+        return CheckUniqPath(sPath, sName, sAdd, nCounter + 1);
     else
         return sResultName;
 }
 
-CPLString GetUniqPath(CPLString szOriginalFullPath, CPLString szNewPath, CPLString szNewName)
+CPLString GetUniqPath(const CPLString &szOriginalFullPath, const CPLString &szNewPath, const CPLString &szNewName)
 {
     CPLString szNewDestFileName(CPLFormFilename(szNewPath, szNewName, GetExtension(szOriginalFullPath, szNewName)));
     return CheckUniqPath(szNewDestFileName, szNewName);
@@ -522,9 +583,9 @@ CPLString Transliterate(const char* str)
     return sOut;
 }
 
-bool CopyFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCancel)
+bool CopyFile(const CPLString &sDestPath, const CPLString &sSrcPath, ITrackCancel* const pTrackCancel)
 {
-    if(EQUAL(sDestPath, sSrcPath))
+    if(wxGISEQUAL(sDestPath, sSrcPath))
         return true;
 
     size_t nBufferSize = 1048576;//1024 * 1024;
@@ -612,12 +673,12 @@ bool CopyFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCance
     return nRet == 0;
 }
 
-bool MoveFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCancel)
+bool MoveFile(const CPLString &sDestPath, const CPLString &sSrcPath, ITrackCancel* const pTrackCancel)
 {
-    if(EQUAL(sDestPath, sSrcPath))
+    if(wxGISEQUAL(sDestPath, sSrcPath))
         return true;
 
-    if(EQUAL(CPLGetPath(sDestPath), CPLGetPath(sSrcPath)))
+    if(wxGISEQUAL(CPLGetPath(sDestPath), CPLGetPath(sSrcPath)))
     {
         //if in same directory - make copy
         return RenameFile(sSrcPath, sDestPath);
@@ -640,7 +701,7 @@ bool MoveFile(CPLString sDestPath, CPLString sSrcPath, ITrackCancel* pTrackCance
     return false;
 }
 
-CPLString GetExtension(CPLString sPath, CPLString sName)
+CPLString GetExtension(const CPLString &sPath, const CPLString &sName)
 {
 	if(sName.empty())
 		return CPLGetExtension(sPath);
@@ -667,3 +728,26 @@ CPLString GetExtension(CPLString sPath, CPLString sName)
 //	}
 //	return CPLGetBasename(sPath);
 //}
+
+wxString GetConvName(const CPLString &szPath, bool bIsPath)
+{
+    //name conv cp866 if zip
+    wxString name;
+    const char* szName(NULL);
+    if(bIsPath)
+        szName = CPLGetFilename(szPath);
+    else
+        szName = szPath;
+
+    if( EQUALN(szPath,"/vsizip/",8) )
+	{
+		wxString sCharset(wxT("cp-866"));
+		wxGISAppConfig oConfig = GetConfig();
+        if(oConfig.IsOk())
+			sCharset = oConfig.Read(enumGISHKCU, wxString(wxT("wxGISCommon/zip/charset")), sCharset);
+        name = wxString(szName, wxCSConv(sCharset));
+	}
+    else
+        name = wxString(szName, wxConvUTF8);
+	return name;
+}

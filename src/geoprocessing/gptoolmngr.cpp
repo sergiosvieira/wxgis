@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  tools manager.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -110,17 +110,17 @@ void wxGPProcess::ProcessInput(wxString sInputData)
 wxGISGPToolManager::wxGISGPToolManager(void) : m_nRunningTasks(0)
 {
 	m_bIsOk = false;
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	if(!pConfig)
+	wxGISAppConfig oConfig = GetConfig();
+	if(!oConfig.IsOk())
 		return;
 
-    m_nMaxTasks = pConfig->ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/max_tasks")), wxThread::GetCPUCount());
+    m_nMaxTasks = oConfig.ReadInt(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/max_tasks")), wxThread::GetCPUCount());
 #ifdef __WXMSW__
-    m_sGeoprocessPath = pConfig->Read(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/gp_exec")), wxString(wxT("wxGISGeoprocess.exe")));
+    m_sGeoprocessPath = oConfig.Read(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/gp_exec")), wxString(wxT("wxGISGeoprocess.exe")));
 #else
-    m_sGeoprocessPath = pConfig->Read(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/gp_exec")), wxString(wxT("wxGISGeoprocess")));
+    m_sGeoprocessPath = oConfig.Read(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/gp_exec")), wxString(wxT("/usr/local/bin/wxgis/wxGISGeoprocess")));
 #endif
-	wxXmlNode *pToolsNode = pConfig->GetConfigNode(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools")));
+	wxXmlNode *pToolsNode = oConfig.GetConfigNode(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools")));
 	if(!pToolsNode)
 		return;
 
@@ -155,27 +155,28 @@ wxGISGPToolManager::wxGISGPToolManager(void) : m_nRunningTasks(0)
 
 wxGISGPToolManager::~wxGISGPToolManager(void)
 {
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	if(pConfig)
+	wxGISAppConfig oConfig = GetConfig();
+	if(oConfig.IsOk())
 	{
-		pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/max_tasks")), m_nMaxTasks);
-		pConfig->Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/gp_exec")), m_sGeoprocessPath);
-	}
+		oConfig.Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/max_tasks")), m_nMaxTasks);
+		oConfig.Write(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools/gp_exec")), m_sGeoprocessPath);
 
-    //read tasks
-	wxXmlNode *pToolsNode = pConfig->GetConfigNode(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools")));
-	if(pToolsNode)
-	{
-		pConfig->DeleteNodeChildren(pToolsNode);
-		for(std::map<wxString, TOOLINFO>::const_iterator pos = m_ToolsMap.begin(); pos != m_ToolsMap.end(); ++pos)
-		{
-			if(pos->second.sClassName.IsEmpty())
-				continue;
-			wxXmlNode* pNewNode = new wxXmlNode(pToolsNode, wxXML_ELEMENT_NODE, wxString(wxT("tool")));
-			pNewNode->AddAttribute(wxT("object"), pos->second.sClassName);
-			pNewNode->AddAttribute(wxT("name"), pos->first);
-			pNewNode->AddAttribute(wxT("count"), wxString::Format(wxT("%d"), pos->second.nCount));
-		}
+        //read tasks
+	    wxXmlNode *pToolsNode = oConfig.GetConfigNode(enumGISHKCU, TOOLBX_NAME + wxString(wxT("/tools")));
+	    if(pToolsNode)
+	    {
+		    oConfig.DeleteNodeChildren(pToolsNode);
+		    for(std::map<wxString, TOOLINFO>::const_iterator pos = m_ToolsMap.begin(); pos != m_ToolsMap.end(); ++pos)
+		    {
+			    if(pos->second.sClassName.IsEmpty())
+				    continue;
+			    wxXmlNode* pNewNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxString(wxT("tool")));
+			    pNewNode->AddAttribute(wxT("object"), pos->second.sClassName);
+			    pNewNode->AddAttribute(wxT("name"), pos->first);
+			    pNewNode->AddAttribute(wxT("count"), wxString::Format(wxT("%d"), pos->second.nCount));
+                pToolsNode->AddChild(pNewNode);
+		    }
+	    }
 	}
 
     //kill all processes

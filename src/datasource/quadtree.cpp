@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  wxGISQuadTree class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -21,7 +21,7 @@
 
 #include "wxgis/datasource/quadtree.h"
 
-
+/*
 void GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds)
 {
 	wxGISQuadTreeItem* pQuadTreeItem = (wxGISQuadTreeItem*)hFeature;
@@ -93,3 +93,4 @@ wxGISQuadTreeCursorSPtr wxGISQuadTree::Search(const CPLRectObj* pAoi)
 		return pResult;
 	}
 }
+*/

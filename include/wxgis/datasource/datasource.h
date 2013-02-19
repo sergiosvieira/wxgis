@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  datasource header.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,17 +22,6 @@
 #pragma once
 
 #include "wxgis/core/core.h"
-
-#include <wx/datetime.h>
-
-#include "ogrsf_frmts.h"
-//#include "ogrsf_frmts/ogrsf_frmts.h"
-#include "gdal_priv.h"
-#include "gdal.h"
-#include "gdalwarper.h"
-#include "gdal_alg_priv.h"
-#include "cpl_quad_tree.h"
-#include "cpl_string.h"
 
 #define NOTNODATA -9999.0
 
@@ -63,6 +52,8 @@ enum wxGISEnumVectorDatasetType
     enumVecDXF,
 	emumVecPostGIS,
 	enumVecGML,
+    enumVecGeoJSON,
+    enumVecGeoWFS,
     emumVecMAX
 };
 
@@ -80,6 +71,7 @@ enum wxGISEnumRasterDatasetType
 	enumRasterPng,
     enumRasterGif,
     enumRasterSAGA,
+    enumRasterVRT,
     enumRasterMAX
 };
 
@@ -133,56 +125,4 @@ enum wxGISEnumWldExtType
 };
 
 
-//GDAL SmartPointers
-DEFINE_SHARED_PTR(OGRSpatialReference);
-DEFINE_SHARED_PTR(OGRFeature);
-DEFINE_SHARED_PTR(OGREnvelope);
-DEFINE_SHARED_PTR(OGRGeometry);
-
-static void OGRFeatureDeleter( OGRFeature* pFeature)
-{
-	OGRFeature::DestroyFeature(pFeature);
-}
-
-//typedef struct _Limits
-//{
-//    double minx, miny, maxx, maxy;
-//}
-//LIMITS, *LPLIMITS;
-
-class wxGISDataset;
-DEFINE_SHARED_PTR(wxGISDataset);
-
-/** \class wxGISDataset datasource.h
-    \brief The base class for datasets.
-*/
-class wxGISDataset
-{
-public:
-	wxGISDataset(CPLString sPath)
-    {
-        m_sPath = sPath;
-    };
-	virtual ~wxGISDataset(void){ };
-	virtual wxGISEnumDatasetType GetType(void){return m_nType;};
-    virtual int GetSubType(void){return m_nSubType;};
-    virtual void SetSubType(int nSubType){m_nSubType = nSubType;};
-	virtual CPLString GetPath(void){return m_sPath;};
-    virtual size_t GetSubsetsCount(void){return 0;};
-    virtual wxGISDatasetSPtr GetSubset(size_t nIndex){return wxGISDatasetSPtr();};
-    virtual wxString GetName(void){return wxEmptyString;};
-	virtual void Close(void){};
-	virtual const OGRSpatialReferenceSPtr GetSpatialReference(void){return OGRSpatialReferenceSPtr();};
-	virtual bool IsOpened(void){return m_bIsOpened;};
-	virtual bool IsReadOnly(void){return m_bIsReadOnly;};
-	virtual bool IsCached(void) = 0;
-	virtual void Cache(ITrackCancel* pTrackCancel = NULL) = 0;
-protected:
-	CPLString m_sPath;
-    wxCriticalSection m_CritSect;
-    int m_nSubType;
-	wxGISEnumDatasetType m_nType;
-	bool m_bIsOpened;
-	bool m_bIsReadOnly;
-};
 

@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISTabView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "wxgis/catalogui/gxview.h"
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/catalogui/gxeventui.h"
+//#include "wxgis/framework/applicationbase.h"
 
 #include <wx/aui/aui.h>
 #include <wx/artprov.h>
@@ -38,9 +39,11 @@
 #define LISTSTR _("List")
 #define PREVIEWSTR _("Preview")
 
-//-------------------------------------------------------------------
-// wxGxTab
-//-------------------------------------------------------------------
+class WXDLLIMPEXP_GIS_CLU wxGxApplication;
+
+/** \class wxGxTab gxtabview.h
+ *   \brief A tab in tab view.
+ */
 class wxGxTab : 
 	public wxPanel,
     public IViewDropTarget
@@ -53,7 +56,7 @@ class wxGxTab :
 	};
 
 public:
-	wxGxTab(IGxApplication* application, wxXmlNode* pTabDesc, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL);
+	wxGxTab(wxGxApplication* application, wxXmlNode* pTabDesc, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL);
 	virtual ~wxGxTab(void);
 	virtual wxString GetName(void);
 	virtual wxWindow* GetWindow(int iIndex);
@@ -64,13 +67,14 @@ public:
 	virtual void Deactivate(void);
 //IGxDropTarget
     virtual wxDragResult OnDragOver(wxCoord x, wxCoord y, wxDragResult def);
-    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames);
+    virtual bool OnDropObjects(wxCoord x, wxCoord y, const wxArrayString& GxObjects);
     virtual void OnLeave();
+    virtual bool CanPaste(void);
 //events
 	void OnChoice(wxCommandEvent& event);
 	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
-private:
-	std::vector<wxWindow*> m_pWindows;
+protected:
+	wxVector<wxWindow*> m_pWindows;
 	wxString m_sName;
 
 	wxPanel* m_tabwnd;
@@ -82,15 +86,14 @@ private:
 	bool m_bShowChoices;
 	wxWindow *m_pCurrentWnd, *m_pNoWnd;
 
-	IGxSelection* m_pSelection;
-    IFrameApplication* m_pApp;
+    wxGxApplication* m_pApp;
 
 DECLARE_EVENT_TABLE()
 };
 
-//-------------------------------------------------------------------
-// wxGxTabView
-//-------------------------------------------------------------------
+/** \class wxGxTabView gxtabview.h
+ *   \brief The tab view class.
+ */
 
 class WXDLLIMPEXP_GIS_CLU wxGxTabView : 
 	public wxAuiNotebook,
@@ -98,20 +101,21 @@ class WXDLLIMPEXP_GIS_CLU wxGxTabView :
 {
     DECLARE_CLASS(wxGxTabView)
 public:
+    wxGxTabView(void);
 	wxGxTabView(wxWindow* parent, wxWindowID id = TABCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
-	virtual ~wxGxTabView(void);
-//IGxView
+	virtual ~wxGxTabView(void); 
+    //IView
     virtual bool Create(wxWindow* parent, wxWindowID id = TABCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("TabView"));
-	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(IApplication* const application, wxXmlNode* const pConf);
 	virtual void Deactivate(void);
 //events
 	void OnAUINotebookPageChanged(wxAuiNotebookEvent& event);
 	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
 protected:
-	std::vector<wxGxTab*> m_Tabs;
-	wxGISConnectionPointContainer *m_pConnectionPointSelection;
+	wxVector<wxGxTab*> m_Tabs;
 	long m_ConnectionPointSelectionCookie;
-	IGxSelection* m_pSelection;
+	wxGxSelection* m_pSelection;
+    wxGxApplication* m_pApp;
 
 DECLARE_EVENT_TABLE()
 };

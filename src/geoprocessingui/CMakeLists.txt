@@ -1,5 +1,25 @@
-cmake_minimum_required (VERSION 2.6)
-set(PROJECT_NAME wxgisgeoprocessingui)
+# **************************************************************************** 
+# * Project:  wxGIS
+# * Purpose:  cmake script
+# * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
+# ****************************************************************************
+# *   Copyright (C) 2013 Bishop
+# *
+# *    This program is free software: you can redistribute it and/or modify
+# *    it under the terms of the GNU General Public License as published by
+# *    the Free Software Foundation, either version 3 of the License, or
+# *    (at your option) any later version.
+# *
+# *    This program is distributed in the hope that it will be useful,
+# *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+# *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# *    GNU General Public License for more details.
+# *
+# *    You should have received a copy of the GNU General Public License
+# *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# ****************************************************************************
+cmake_minimum_required (VERSION 2.8)
+set(PROJECT_NAME geoprocessingui)
 
 include(lib)
 include(common)
@@ -27,6 +47,7 @@ find_package(CAIRO REQUIRED)
 if(CAIRO_FOUND)
     include_directories(${CAIRO_INCLUDE_DIR})
     add_definitions(-DHAVE_CAIRO)
+    set(wxGIS_USE_CAIRO ON)
 endif(CAIRO_FOUND)
 
 include_directories(${LIB_HEADERS})
@@ -41,6 +62,7 @@ set(PROJECT_HHEADERS ${PROJECT_HHEADERS}
     ${LIB_HEADERS}/gptooldlg.h
     ${LIB_HEADERS}/gxtoolexecview.h
     ${LIB_HEADERS}/taskcmd.h
+    ${LIB_HEADERS}/droptarget.h
 )
 
 set(PROJECT_CSOURCES ${PROJECT_CSOURCES}   
@@ -52,6 +74,7 @@ set(PROJECT_CSOURCES ${PROJECT_CSOURCES}
     ${LIB_SOURCES}/gptooldlg.cpp
     ${LIB_SOURCES}/gxtoolexecview.cpp
     ${LIB_SOURCES}/taskcmd.cpp 
+    ${LIB_SOURCES}/droptarget.cpp 
 )
 
 add_definitions(-DWXMAKINGDLL_GIS_GPU)

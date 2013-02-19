@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  pixel field stretch classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,8 +20,9 @@
  ****************************************************************************/
 
 #include "wxgis/carto/stretch.h"
+
 #include "wxgis/core/config.h"
-#include "wxgis/core/globalfn.h"
+#include "wxgis/core/app.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // wxGISStretch
@@ -29,8 +30,18 @@
 
 wxGISStretch::wxGISStretch(double dfMin, double dfMax, double dfMean, double dfStdDev, double dfNoData)
 {
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	wxString sAppName = GetApplication()->GetAppName();
+	wxGISAppConfig oConfig = GetConfig();
+    if(oConfig.IsOk())
+    {
+	    wxString sAppName = GetApplication()->GetAppName();
+        m_dfStdDevParam = oConfig.ReadDouble(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/stretch_stddevparam")), 2.0);
+        m_eType = (wxGISEnumRasterStretch)oConfig.ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/stretch_type")), enumGISRasterStretchStdDev);  // enumGISRasterStretchNone;//   
+    }
+    else
+    {
+        m_dfStdDevParam = 2.0;
+        m_eType = enumGISRasterStretchStdDev;  
+    }
 
     m_dfMin = dfMin;
     m_dfMax = dfMax;
@@ -38,8 +49,6 @@ wxGISStretch::wxGISStretch(double dfMin, double dfMax, double dfMean, double dfS
     m_dfStdDev = dfStdDev;
     m_dfNoData = dfNoData;
     m_bInvert = false;
-    m_dfStdDevParam = pConfig->ReadDouble(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/stretch_stddevparam")), 2.0);
-    m_eType = (wxGISEnumRasterStretch)pConfig->ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/stretch_type")),enumGISRasterStretchStdDev);  //enumGISRasterStretchNone;//
 
     RecalcEquation();
 }

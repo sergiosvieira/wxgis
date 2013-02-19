@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  wxGISMap class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,11 +19,12 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/carto/map.h"
+
 #include "wxgis/datasource/vectorop.h"
 
-//////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------
 // wxGISMap
-//////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------
 
 wxGISMap::wxGISMap(void)
 {
@@ -36,34 +37,31 @@ wxGISMap::~wxGISMap(void)
 	Clear();
 }
 
-bool wxGISMap::AddLayer(wxGISLayerSPtr pLayer)
+bool wxGISMap::AddLayer(wxGISLayer* pLayer)
 {
-	if(!pLayer)
-		return false;
+    wxCHECK_MSG(pLayer, false, wxT("Add layer pointer is NULL"));
 
-	if(m_pSpatialReference == NULL)
+    if(!m_SpatialReference.IsOk())
     {
-        OGRSpatialReferenceSPtr pSpaRef = pLayer->GetSpatialReference();
-        if(pSpaRef)
-            m_pSpatialReference = pSpaRef;
-		if(!m_pSpatialReference)
+        m_SpatialReference = pLayer->GetSpatialReference();
+        //set default map spatial reference to wgs84
+		if(!m_SpatialReference.IsOk())
 		{
 			OGREnvelope Env = pLayer->GetEnvelope();
 			if(Env.IsInit())
 			{
 				if(Env.MaxX <= ENVMAX_X && Env.MaxY <= ENVMAX_Y && Env.MinX >= ENVMIN_X && Env.MinY >= ENVMIN_Y)
 				{
-					m_pSpatialReference = boost::make_shared<OGRSpatialReference>();
-					m_pSpatialReference->importFromEPSG(4326);//SetWellKnownGeogCS("WGS84");
+					m_SpatialReference = wxGISSpatialReference(new OGRSpatialReference(SRS_WKT_WGS84));
 				}
 			}
 		}
     }
 	else
 	{
-		OGRSpatialReferenceSPtr pInputSpatialReference = pLayer->GetSpatialReference();
-		if(!m_pSpatialReference->IsSame(pInputSpatialReference.get()))
-			pLayer->SetSpatialReference(m_pSpatialReference);
+		wxGISSpatialReference InputSpatialReference = pLayer->GetSpatialReference();
+		if(!m_SpatialReference->IsSame(InputSpatialReference))
+			pLayer->SetSpatialReference(m_SpatialReference);
 	}
 	//recalc full  envelope
 	OGREnvelope Env = pLayer->GetEnvelope();
@@ -84,8 +82,11 @@ bool wxGISMap::AddLayer(wxGISLayerSPtr pLayer)
 
 void wxGISMap::Clear(void)
 {
-	m_paLayers.clear();
-    m_pSpatialReference.reset();
+	for(size_t i = 0; i < m_paLayers.size(); ++i)
+		wxDELETE(m_paLayers[i]);
+    m_paLayers.clear();
+
+    m_SpatialReference = wxNullSpatialReference;
 	m_FullExtent.MaxX = ENVMAX_X;
 	m_FullExtent.MinX = ENVMIN_X;
 	m_FullExtent.MaxY = ENVMAX_Y;
@@ -93,7 +94,7 @@ void wxGISMap::Clear(void)
 	m_bFullExtIsInit = false;
 }
 
-OGREnvelope wxGISMap::GetFullExtent(void)
+OGREnvelope wxGISMap::GetFullExtent(void) const
 {
 	OGREnvelope OutputEnv = m_FullExtent;
     //increase 10%
@@ -101,42 +102,45 @@ OGREnvelope wxGISMap::GetFullExtent(void)
 	return OutputEnv;
 }
 
-void wxGISMap::SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference)
+void wxGISMap::SetSpatialReference(const wxGISSpatialReference &SpatialReference)
 {
-	if(NULL == pSpatialReference)
+    if(m_SpatialReference.IsOk() && m_SpatialReference->IsSame(SpatialReference))
 		return;
-	if(m_pSpatialReference && m_pSpatialReference->IsSame(pSpatialReference.get()))
-		return;
+    
 	for(size_t i = 0; i < m_paLayers.size(); ++i)
-		m_paLayers[i]->SetSpatialReference(pSpatialReference);
-	m_pSpatialReference = pSpatialReference;
+		m_paLayers[i]->SetSpatialReference(SpatialReference);
+	m_SpatialReference = SpatialReference;
 }
 
-OGRSpatialReferenceSPtr wxGISMap::GetSpatialReference(void)
+wxGISSpatialReference wxGISMap::GetSpatialReference(void) const
 {
-	return m_pSpatialReference;
+	return m_SpatialReference;
 }
 
-wxGISLayerSPtr wxGISMap::GetLayer(size_t nIndex)
+wxGISLayer* const wxGISMap::GetLayer(size_t nIndex)
 {
-	wxCHECK(nIndex < m_paLayers.size(), wxGISLayerSPtr());
+	wxCHECK(nIndex < m_paLayers.size(), NULL);
 	return m_paLayers[nIndex];
 };
 
-//The AddLayer method adds a layer to the Map. Use the LayerCount property to get the total number of layers in the map.
-//AddLayer automatically attempts to set the Map's SpatialReference property if a coordinate system has not yet been defined for the map.
-//When the SpatialReference property is set, the Map's MapUnits and DistanceUnits properties are additionally set.
-//AddLayer also sets the spatial reference of the layer (ILayer::SpatialReference ).
-//If no layers have a spatial reference, AddLayer checks the extent of the first layer (ILayer::AreaOfInterest) and if it has coordinates
+
+//The AddLayer method adds a layer to the Map. Use GetLayerCount to get the total number of layers in the map.
+//AddLayer automatically attempts to set the Map's SpatialReference if a coordinate system has not yet been defined for the map.
+
+//TODO: When the SpatialReference property is set, the Map's MapUnits and DistanceUnits properties are additionally set.
+
+//AddLayer also sets the spatial reference of the layer.
+
+//TODO: If no layers have a spatial reference, AddLayer checks the extent of the first layer (ILayer::AreaOfInterest) and if it has coordinates
 //that look like geographic coordinates (XMin >= -180 and XMax <= 180 and YMin >= -90 and YMax <= 90), ArcMap assumes the data is in decimal
 //degrees and sets the MapUnits to esriDecimalDegrees and DistanceUnits to esriMiles.
 //If no spatial reference is found and the coordinates do not look like geographic coordinates, ArcMap sets no spatial reference and sets the
 //MapUnits to esriMeters and the DistanceUnits to esriMeters.
 //The full extent is recalculated each time a layer added.
 
-//////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------
 // wxGISExtentStack
-//////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------
 
 wxGISExtentStack::wxGISExtentStack() : wxGISMap()
 {
@@ -207,12 +211,12 @@ void wxGISExtentStack::Clear()
 	m_CurrentExtent = m_FullExtent;
 }
 
-size_t wxGISExtentStack::GetSize()
+size_t wxGISExtentStack::GetSize() const
 {
 	return m_staEnvelope.size();
 }
 
-OGREnvelope wxGISExtentStack::GetCurrentExtent(void)
+OGREnvelope wxGISExtentStack::GetCurrentExtent(void) const
 {
 	return m_CurrentExtent;
 }

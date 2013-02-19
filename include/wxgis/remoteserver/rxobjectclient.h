@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
  * Purpose:  wxRxObject class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,69 +18,75 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+
 #pragma once
 
-#include "wxgis/remoteserver/gxremoteserver.h"
+#include "wxgis/catalog/gxobject.h"
+#include "wxgis/net/netconn.h"
+#include "wxgis/net/netevent.h"
+
+class WXDLLIMPEXP_GIS_RS wxRxCatalog;
 
 /** \class wxRxObject gxremoteserver.h
     \brief The base class for Remote GxObjects (RxObjects).
 */
-class WXDLLIMPEXP_GIS_RS wxRxObject : 
-	public IRxObjectClient,
-	public INetMessageReceiver,
-	public IGxObject
+class WXDLLIMPEXP_GIS_RS wxRxObject
 {
 public:
 	wxRxObject(void);
 	virtual ~wxRxObject(void);
-	//IGxObject
-	virtual wxString GetCategory(void){return wxString(_("Remote item"));};
-	virtual void Detach(void);
-	virtual wxString GetName(void){return m_sName;};
-    virtual wxString GetBaseName(void){return GetName();};
-    virtual CPLString GetInternalName(void){return CPLString();};
-	//IRxObjectClient
-	virtual bool Init(wxGxRemoteServer *pGxRemoteServer, wxXmlNode* pProperties);
-	//INetMessageReceiver
-    virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode);
-protected:
-    wxGxRemoteServer* m_pGxRemoteServer;
-	wxString m_sDst, m_sName;
+    virtual bool Create (wxRxCatalog* const pRxCatalog, long nId, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
+    virtual void OnNetEvent(wxGISNetEvent& event);
+    virtual void SetRemoteId(long nId);
+    virtual long GetRemoteId(void) const;
+protected:   
+    wxRxCatalog* m_pRxCatalog;
+    long m_nRemoteId;
 };
 
 /** \class wxRxObjectContainer gxremoteserver.h
     \brief The base class for Remote GxObjectContainers (RxObjectContainers).
 */
 class WXDLLIMPEXP_GIS_RS wxRxObjectContainer : 
-	public IRxObjectClient,
-	public INetMessageReceiver,
-	public IGxObjectContainer
+	public wxRxObject,
+    public wxGxObjectContainer
 {
+    DECLARE_CLASS(wxRxObjectContainer)
 public:
 	wxRxObjectContainer(void);
+    wxRxObjectContainer(wxRxCatalog* const pRxCatalog, long nId, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
+    virtual bool Create (wxRxCatalog* const pRxCatalog, long nId, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 	virtual ~wxRxObjectContainer(void);
-	//IGxObject
-	virtual void Detach(void);
-	virtual wxString GetName(void){return m_sName;};
-    virtual wxString GetBaseName(void){return GetName();};
-    virtual CPLString GetInternalName(void){return CPLString();};
-	virtual wxString GetCategory(void){return wxString(_("Remote container"));};
-	virtual void Refresh(void);
-	//IGxObjectContainer
-	virtual bool DeleteChild(IGxObject* pChild);
-	virtual bool AreChildrenViewable(void){return true;};
-	virtual bool HasChildren(void){LoadChildren(); return m_Children.size() > 0 ? true : false;};
-	//IRxObjectClient
-	virtual bool Init(wxGxRemoteServer *pGxRemoteServer, wxXmlNode* pProperties);
-	//INetMessageReceiver
-    virtual void ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode);
-	//wxRxMonitoringDatabases
-	virtual void EmptyChildren(void);
-	virtual bool LoadChildren(void);
+    //wxGxObject
+    virtual void Refresh(void);
+    //wxGxObjectContainer
+    virtual bool DestroyChildren();
+    virtual bool Destroy(void);
 protected:
-    wxGxRemoteServer* m_pGxRemoteServer;
-	wxString m_sDst, m_sName;
+    virtual void LoadRemoteChildren(const wxXmlNode* pChildrenNode);
+    virtual void GetRemoteChildren(void);
+protected:
 	bool m_bIsChildrenLoaded;
-	int m_nChildCount;
-	wxArrayString m_sDstArray;
+};
+
+/** \class wxRxCatalog gxremoteserver.h
+    \brief The root of Remote GxObjects (RxObjects).
+*/
+class WXDLLIMPEXP_GIS_RS wxRxCatalog : public wxRxObjectContainer
+{
+    DECLARE_CLASS(wxRxCatalog)
+public:
+	wxRxCatalog(void);
+    wxRxCatalog(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
+    virtual ~wxRxCatalog(void);
+    virtual bool Create (wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
+	//register / unregister pointer and uniq ID
+	virtual void RegisterRemoteObject(wxRxObject* pObj);
+	virtual void UnRegisterRemoteObject(long nId);
+	//get pointer by ID
+	virtual wxRxObject* const GetRegisterRemoteObject(long nId);
+    virtual void SendNetMessage(const wxNetMessage & msg);
+protected:
+    wxGISNetClientConnection* m_pNetConn;
+    std::map<long, wxRxObject*> m_moRxObject; //map of registered IGxObject pointers
 };

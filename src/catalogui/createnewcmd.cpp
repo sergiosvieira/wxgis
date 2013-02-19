@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  Catalog Create New Commands class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/createnewcmd.h"
+/*
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/remoteconndlg.h"
 #include "wxgis/catalogui/gxremoteconnui.h"
@@ -194,7 +195,7 @@ void wxGISCreateNewCmd::OnClick(void)
 	}
 }
 
-bool wxGISCreateNewCmd::OnCreate(IFrameApplication* pApp)
+bool wxGISCreateNewCmd::OnCreate(wxGISApplicationBase* pApp)
 {
 	m_pApp = pApp;
 	return true;
@@ -215,3 +216,4 @@ unsigned char wxGISCreateNewCmd::GetCount(void)
 {
 	return 1;
 }
+*/

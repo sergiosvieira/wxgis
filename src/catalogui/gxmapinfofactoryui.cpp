@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxMapInfoFactoryUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxmapinfofactoryui.h"
+/*
 #include "wxgis/catalogui/gxdatasetui.h"
 #include <wx/ffile.h>
 
@@ -65,4 +66,4 @@ IGxObject* wxGxMapInfoFactoryUI::GetGxDataset(CPLString path, wxString name, wxG
     }
     return static_cast<IGxObject*>(pDataset);
 }
-
+*/

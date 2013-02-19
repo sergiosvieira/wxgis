@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  geoprocessing tool parameters domains.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -25,25 +25,46 @@
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/catalog/gxfilters.h"
 
+
+class IGISGPDomainParent
+{
+public:
+    virtual ~IGISGPDomainParent(void){};
+    virtual void OnValueAdded(const wxVariant &Value, const wxString &sName) = 0;
+    virtual void OnCleared(void) = 0;
+};
+
+
+
 /** \class wxGISGPValueDomain gpdomain.h
     \brief The domain storing variant values
 */
-class WXDLLIMPEXP_GIS_GP wxGISGPValueDomain : public IGPDomain
+class WXDLLIMPEXP_GIS_GP wxGISGPValueDomain :
+    public wxObject,
+    public wxGISConnectionPointContainer
 {
+    DECLARE_CLASS(wxGISGPValueDomain)
 public:
 	wxGISGPValueDomain(void);
 	virtual ~wxGISGPValueDomain (void);
-	virtual void AddValue(const wxVariant& Element, wxString soNameStr);
-	virtual size_t GetCount(void);
-	virtual wxVariant GetValue(size_t nIndex);
-	virtual wxString GetName(size_t nIndex);
+	virtual void AddValue(const wxVariant& Element, const wxString &soNameStr);
+	virtual size_t GetCount(void) const;
+	virtual wxVariant GetValue(size_t nIndex) const;
+	virtual wxString GetName(size_t nIndex) const;
     virtual void Clear(void);
-	virtual bool GetAltered(void){return m_bAltered;};
+	virtual bool GetAltered(void) const {return m_bAltered;};
 	virtual void SetAltered(bool bAltered){m_bAltered = bAltered;};
 	//
-    virtual wxVariant GetValueByName(wxString soNameStr);
-	virtual int GetPosByName(wxString sName);
-	virtual int GetPosByValue(wxVariant oVal);
+    virtual wxVariant GetValueByName(const wxString &soNameStr) const;
+	virtual int GetPosByName(const wxString &sName) const;
+	virtual int GetPosByValue(const wxVariant &oVal) const;
+    //
+    virtual void SetParent(IGISGPDomainParent* const pDomParet){m_pDomParet = pDomParet;};
+protected:
+	wxArrayString m_asoNames;
+	wxVector<wxVariant> m_asoData;
+	bool m_bAltered;
+    IGISGPDomainParent* m_pDomParet;
 };
 
 /** \class wxGISGPGxObjectDomain gpdomain.h
@@ -52,50 +73,38 @@ public:
 
 class WXDLLIMPEXP_GIS_GP wxGISGPGxObjectDomain : public wxGISGPValueDomain
 {
+    DECLARE_CLASS(wxGISGPGxObjectDomain)
 public:
     wxGISGPGxObjectDomain (void);
     virtual ~wxGISGPGxObjectDomain (void);
-    virtual IGxObjectFilter* GetFilter(size_t nIndex);
-	virtual void AddFilter(IGxObjectFilter* pFilter);
-	virtual int GetPosByValue(wxVariant oVal);
+    virtual wxGxObjectFilter* const GetFilter(size_t nIndex) const;
+	virtual void AddFilter(wxGxObjectFilter* pFilter);
+	virtual int GetPosByValue(const wxVariant &oVal) const;
 };
 
 inline void WXDLLIMPEXP_GIS_GP AddAllVectorFilters(wxGISGPGxObjectDomain* pDomain)
 {
-    for(size_t i = enumVecUnknown + 1; i < emumVecMAX; i++)
-        pDomain->AddFilter(new wxGxFeatureFileFilter(wxGISEnumVectorDatasetType(i)));
-    //pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecESRIShapefile));
-    //pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoTab));
-    //pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecMapinfoMif));
-    //pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecKML));
-    //pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecKMZ));
-    //pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecDXF));
-    //pDomain->AddFilter(new wxGxFeatureFileFilter(enumVecGML));
+    for(size_t i = enumVecUnknown + 1; i < emumVecMAX; ++i)
+        pDomain->AddFilter(new wxGxFeatureDatasetFilter(wxGISEnumVectorDatasetType(i)));
 }
-
+/*
 inline void WXDLLIMPEXP_GIS_GP AddAllRasterFilters(wxGISGPGxObjectDomain* pDomain)
 {
     for(size_t i = enumRasterUnknown + 1; i < enumRasterMAX; i++)
         pDomain->AddFilter(new wxGxRasterFilter(wxGISEnumRasterDatasetType(i)));
-    //pDomain->AddFilter(new wxGxRasterFilter(enumRasterTiff));
-    //pDomain->AddFilter(new wxGxRasterFilter(enumRasterImg));
-    //pDomain->AddFilter(new wxGxRasterFilter(enumRasterBmp));
-    //pDomain->AddFilter(new wxGxRasterFilter(enumRasterJpeg));
-    //pDomain->AddFilter(new wxGxRasterFilter(enumRasterPng));
-    //pDomain->AddFilter(new wxGxRasterFilter(enumRasterGif));
-    //pDomain->AddFilter(new wxGxRasterFilter(enumRasterSAGA));
 }
-
+*/
 /** \class wxGISGPStringDomain gpdomain.h
     \brief The domain storing strings
 */
 class WXDLLIMPEXP_GIS_GP wxGISGPStringDomain : public wxGISGPValueDomain
 {
+    DECLARE_CLASS(wxGISGPStringDomain)
 public:
     wxGISGPStringDomain (void);
     virtual ~wxGISGPStringDomain (void);
-	virtual void AddString(wxString soStr, wxString soNameStr = wxEmptyString);
-    virtual wxString GetString(size_t nIndex);
+	virtual void AddString(const wxString &soStr, const wxString &soNameStr = wxEmptyString);
+    virtual wxString GetString(size_t nIndex) const;
 };
 
 

@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISMenuBar class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2012  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-#include "wxgis/framework/framework.h"
+
 #include "wxgis/framework/commandbar.h"
 
 #include <wx/menu.h>
@@ -32,22 +32,22 @@
 #define WINDOWSSTR _("&Windows")
 #define TOOLSSTR _("&Tools")
 
-class WXDLLIMPEXP_GIS_FRW wxGISMenuBar :
-	public wxMenuBar
+class WXDLLIMPEXP_GIS_FRW wxGISMenuBar : public wxMenuBar
 {
+    //DECLARE_DYNAMIC_CLASS_NO_COPY(wxGISMenuBar)
 public:
-	wxGISMenuBar(long style = 0, IFrameApplication* pApp = NULL, wxXmlNode* pConf = NULL);
+	wxGISMenuBar(long style = 0, wxGISApplicationBase* pApp = NULL, wxXmlNode* pConf = NULL);
 	virtual ~wxGISMenuBar(void);
 	virtual bool IsMenuBarMenu(wxString sMenuName);
-	virtual COMMANDBARARRAY* GetMenuBarArray(void);
+	virtual wxGISCommandBarPtrArray GetMenuBarArray(void) const;
 	virtual void MoveLeft(int pos);
 	virtual void MoveRight(int pos);
-	virtual void MoveLeft(IGISCommandBar* pBar);
-	virtual void MoveRight(IGISCommandBar* pBar);
-	virtual void RemoveMenu(IGISCommandBar* pBar);
-	virtual bool AddMenu(IGISCommandBar* pBar);
+	virtual void MoveLeft(wxGISCommandBar* pBar);
+	virtual void MoveRight(wxGISCommandBar* pBar);
+	virtual void RemoveMenu(wxGISCommandBar* pBar);
+	virtual bool AddMenu(wxGISCommandBar* pBar);
 	virtual void Serialize(wxXmlNode* pConf);
-	virtual int GetMenuPos(IGISCommandBar* pBar);
+	virtual int GetMenuPos(wxGISCommandBar* pBar);
 protected:
-	COMMANDBARARRAY m_MenubarArray;
+	wxGISCommandBarPtrArray m_MenubarArray;
 };

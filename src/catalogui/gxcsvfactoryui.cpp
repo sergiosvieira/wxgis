@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxCSVFileFactoryUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxcsvfactoryui.h"
+/*
 #include "wxgis/catalogui/gxdatasetui.h"
 #include <wx/ffile.h>
 
@@ -45,4 +46,4 @@ IGxObject* wxGxCSVFileFactoryUI::GetGxObject(CPLString path, wxString name)
 {
     return static_cast<IGxObject*>(new wxGxTableDatasetUI(path, name, enumTableCSV, m_LargeCSVIcon, m_SmallCSVIcon));
 }
-
+*/

@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxArchiveFactoryUI class. Create new GxFolderUI objects
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxarchivefactoryui.h"
 #include "wxgis/catalogui/gxarchfolderui.h"
-
+/*
 #include "wx/filename.h"
 #include "wx/dir.h"
 
@@ -45,3 +45,4 @@ IGxObject* wxGxArchiveFactoryUI::GetGxObject(CPLString szPath, wxString soName)
 	wxGxArchiveUI* pFolder = new wxGxArchiveUI(szPath, soName, m_oLargeAFolderIcon, m_oSmallAFolderIcon);
 	return static_cast<IGxObject*>(pFolder);
 }
+*/

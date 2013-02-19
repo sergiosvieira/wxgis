@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  wxGISApplicationEx class. Add AUI managed frames & etc.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,10 +21,14 @@
 #include "wxgis/framework/applicationex.h"
 #include "wxgis/framework/customizedlg.h"
 #include "wxgis/framework/toolbarmenu.h"
+#include "wxgis/version.h"
+#include "wxgis/defs.h"
 
-#ifdef HAVE_PROJ
+#ifdef wxGIS_USE_PROJ
     #include "proj_api.h"
 #endif
+
+#include "cpl_string.h"
 
 //-----------------------------------------------
 // wxGISApplicationEx
@@ -41,16 +45,16 @@ wxGISApplicationEx::~wxGISApplicationEx(void)
 
 void wxGISApplicationEx::SerializeFramePosEx(bool bSave)
 {
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	if(!pConfig)
+	wxGISAppConfig oConfig = GetConfig();
+	if(!oConfig.IsOk())
 		return;
 
-	wxXmlNode *pPerspectiveXmlNode = pConfig->GetConfigNode(enumGISHKCU, GetAppName() + wxString(wxT("/frame/perspective")));
+	wxXmlNode *pPerspectiveXmlNode = oConfig.GetConfigNode(enumGISHKCU, GetAppName() + wxString(wxT("/frame/perspective")));
 	if(bSave)
-		pConfig->Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/perspective/data")), m_mgr.SavePerspective());
+		oConfig.Write(enumGISHKCU, GetAppName() + wxString(wxT("/frame/perspective/data")), m_mgr.SavePerspective());
 	else
 	{
-		wxString wxPerspective = pConfig->Read(enumGISHKCU, GetAppName() + wxString(wxT("/frame/perspective/data")), wxEmptyString);
+		wxString wxPerspective = oConfig.Read(enumGISHKCU, GetAppName() + wxString(wxT("/frame/perspective/data")), wxEmptyString);
 		m_mgr.LoadPerspective(wxPerspective);
 	}
 }
@@ -62,15 +66,15 @@ void wxGISApplicationEx::Customize(void)
 	{
 		if(m_pGISAcceleratorTable->HasChanges())
 			SetAcceleratorTable(m_pGISAcceleratorTable->GetAcceleratorTable());
-		wxGISToolBarMenu* pToolBarMenu =  dynamic_cast<wxGISToolBarMenu*>(GetCommandBar(TOOLBARMENUNAME));
+		wxGISToolBarMenu* pToolBarMenu =  static_cast<wxGISToolBarMenu*>(GetCommandBar(TOOLBARMENUNAME));
 		if(pToolBarMenu)
 			pToolBarMenu->Update();
 	}
 }
 
-void wxGISApplicationEx::RemoveCommandBar(IGISCommandBar* pBar)
+void wxGISApplicationEx::RemoveCommandBar(wxGISCommandBar* pBar) 
 {
-	for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
+	for(size_t i = 0; i < m_CommandBarArray.GetCount(); ++i)
 	{
 		if(m_CommandBarArray[i] == pBar)
 		{
@@ -89,7 +93,7 @@ void wxGISApplicationEx::RemoveCommandBar(IGISCommandBar* pBar)
 				break;
 			}
 			wxDELETE(pBar);
-			m_CommandBarArray.erase(m_CommandBarArray.begin() + i);
+            m_CommandBarArray.RemoveAt(i);
 			break;
 		}
 	}
@@ -117,11 +121,11 @@ bool wxGISApplicationEx::IsApplicationWindowShown(wxWindow* pWnd)
 	return m_mgr.GetPane(pWnd).IsShown();
 }
 
-bool wxGISApplicationEx::AddCommandBar(IGISCommandBar* pBar)
+bool wxGISApplicationEx::AddCommandBar(wxGISCommandBar* pBar)
 {
 	if(!pBar)
 		return false;
-	m_CommandBarArray.push_back(pBar);
+	m_CommandBarArray.Add(pBar);
 	switch(pBar->GetType())
 	{
 	case enumGISCBMenubar:
@@ -129,7 +133,7 @@ bool wxGISApplicationEx::AddCommandBar(IGISCommandBar* pBar)
 		break;
 	case enumGISCBToolbar:
 		{
-			wxGISToolBar* pToolBar = dynamic_cast<wxGISToolBar*>(pBar);
+			wxGISToolBar* pToolBar = static_cast<wxGISToolBar*>(pBar);
 			if(pToolBar)
 			{
 				m_mgr.AddPane(pToolBar, wxAuiPaneInfo().Name(pToolBar->GetName()).Caption(pToolBar->GetCaption()).ToolbarPane().Top().Position(100).LeftDockable(pToolBar->GetLeftDockable()).RightDockable(pToolBar->GetRightDockable()));
@@ -156,40 +160,19 @@ void wxGISApplicationEx::ShowApplicationWindow(wxWindow* pWnd, bool bShow)
 	ShowPane(pWnd, bShow);
 }
 
-const WINDOWARRAY* const wxGISApplicationEx::GetChildWindows(void)
-{
-	return &m_WindowArray;
-}
-
-void wxGISApplicationEx::RegisterChildWindow(wxWindow* pWnd)
-{
-    WINDOWARRAY::iterator pos = std::find(m_WindowArray.begin(), m_WindowArray.end(), pWnd);
-	if(pos != m_WindowArray.end())
-        return;
-	m_WindowArray.push_back(pWnd);
-}
-
-void wxGISApplicationEx::UnRegisterChildWindow(wxWindow* pWnd)
-{
-    WINDOWARRAY::iterator pos = std::find(m_WindowArray.begin(), m_WindowArray.end(), pWnd);
-	if(pos != m_WindowArray.end())
-		m_WindowArray.erase(pos);
-}
-
-bool wxGISApplicationEx::Create(void)
+bool wxGISApplicationEx::CreateApp(void)
 {
 	m_mgr.SetManagedWindow(this);
 
-    wxGISApplication::Create();
+    wxGISApplication::CreateApp();
 
 	wxLogMessage(_("wxGISApplicationEx: Start. Creating main application frame..."));
 
-
-	for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
+	for(size_t i = 0; i < m_CommandBarArray.GetCount(); ++i)
 	{
 		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
 		{
-			wxGISToolBar* pToolBar = dynamic_cast<wxGISToolBar*>(m_CommandBarArray[i]);
+			wxGISToolBar* pToolBar = static_cast<wxGISToolBar*>(m_CommandBarArray[i]);
 			if(pToolBar)
 			{
 				m_mgr.AddPane(pToolBar, wxAuiPaneInfo().Name(pToolBar->GetName()).Caption(pToolBar->GetCaption()).ToolbarPane().Top().Position(i).LeftDockable(pToolBar->GetLeftDockable()).RightDockable(pToolBar->GetRightDockable()).BestSize(-1,-1));
@@ -211,39 +194,28 @@ void wxGISApplicationEx::OnClose(wxCloseEvent& event)
 {
     event.Skip();
 
- 	for(size_t i = 0; i < m_CommandBarArray.size(); ++i)
+ 	for(size_t i = 0; i < m_CommandBarArray.GetCount(); ++i)
 	{
 		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
 		{
-			wxGISToolBar* pToolBar = dynamic_cast<wxGISToolBar*>(m_CommandBarArray[i]);
+			wxGISToolBar* pToolBar = static_cast<wxGISToolBar*>(m_CommandBarArray[i]);
 			if(pToolBar)
 				pToolBar->Deactivate();
 		}
 	}
 
-    for(size_t i = 0; i < m_WindowArray.size(); ++i)
+    for(size_t i = 0; i < m_anWindowsIDs.GetCount(); ++i)
     {
-        IView* pView = dynamic_cast<IView*>(m_WindowArray[i]);
+        wxWindow* pWnd = wxWindow::FindWindowById(m_anWindowsIDs[i]);
+        IView* pView = dynamic_cast<IView*>(pWnd);
         if(pView)
             pView->Deactivate();
     }
-
 
 	wxGISApplication::OnClose(event);
 
  	SerializeFramePosEx(true);
     m_mgr.UnInit();
-
-  //  while (!m_WindowArray.empty())
-  //  {
-  //      wxWindow* poWnd = m_WindowArray.back();
-		//if( poWnd && !poWnd->IsBeingDeleted() )
-  //      {
-  //          if(!poWnd->Destroy())
-  //              delete poWnd;
-  //      }
-  //      m_WindowArray.pop_back();
-  //  }
 }
 
 bool wxGISApplicationEx::SetupSys(const wxString &sSysPath)
@@ -252,15 +224,20 @@ bool wxGISApplicationEx::SetupSys(const wxString &sSysPath)
         return false;
 	wxString sGdalDataDir = sSysPath + wxFileName::GetPathSeparator() + wxString(wxT("gdal")) + wxFileName::GetPathSeparator();
 	CPLSetConfigOption("GDAL_DATA", sGdalDataDir.mb_str(wxConvUTF8) );
-#ifdef HAVE_PROJ
+#ifdef wxGIS_USE_PROJ
 	sGdalDataDir = sSysPath + wxFileName::GetPathSeparator() + wxString(wxT("proj")) + wxFileName::GetPathSeparator();
 	//CPLSetConfigOption("PROJ_LIB", sGdalDataDir.mb_str(wxConvUTF8) );
     CPLString pszPROJ_LIB(sGdalDataDir.mb_str(wxConvUTF8));
     const char *path = pszPROJ_LIB.c_str();
     pj_set_searchpath(1, &path);
 #endif
+
+#ifndef CPL_RECODE_ICONV
+    //the gdal compiled without iconv support
+    //we should recode string by ourselthes
     CPLSetConfigOption("SHAPE_ENCODING", CPL_ENC_ASCII);
     CPLSetConfigOption("DXF_ENCODING", CPL_ENC_ASCII);
+#endif //CPL_RECODE_ICONV
     return true;
 }
 
@@ -271,9 +248,9 @@ void wxGISApplicationEx::SetDebugMode(bool bDebugMode)
 	CPLSetConfigOption("CPL_LOG_ERRORS", bDebugMode == true ? "ON" : "OFF");
 }
 
-bool wxGISApplicationEx::SetupLog(const wxString &sLogPath)
+bool wxGISApplicationEx::SetupLog(const wxString &sLogPath, const wxString &sNamePrefix)
 {
-    if(!wxGISApplication::SetupLog(sLogPath))
+    if(!wxGISApplication::SetupLog(sLogPath, sNamePrefix))
         return false;
 	wxString sCPLLogPath = sLogPath + wxFileName::GetPathSeparator() + wxString(wxT("gdal_log_cat.txt"));
 	CPLString szCPLLogPath(sCPLLogPath.mb_str(wxConvUTF8));
@@ -281,3 +258,7 @@ bool wxGISApplicationEx::SetupLog(const wxString &sLogPath)
     return true;
 }
 
+wxString wxGISApplicationEx::GetAppVersionString(void) const
+{
+    return wxString(wxGIS_VERSION_NUM_DOT_STRING_T);
+}

@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
  * Purpose:  wxRxObject class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,175 +20,184 @@
  ****************************************************************************/
 
 #include "wxgis/remoteserver/rxobjectclient.h"
-#include "wxgis/networking/message.h"
+#include "wxgis/net/message.h"
+#include "wxgis/catalog/gxcatalog.h"
 
 //------------------------------------------------------------
 // wxRxObject
 //------------------------------------------------------------
 
-wxRxObject::wxRxObject() : m_pGxRemoteServer(NULL)
+wxRxObject::wxRxObject()
 {
+    m_nRemoteId = wxNOT_FOUND;
+    m_pRxCatalog = NULL;
 }
 
 wxRxObject::~wxRxObject()
 {
+    if(m_pRxCatalog && m_pRxCatalog != this)//prevent self unregister of rxcatalog
+        m_pRxCatalog->UnRegisterRemoteObject(GetRemoteId());
 }
 
-bool wxRxObject::Init(wxGxRemoteServer* pGxRemoteServer, wxXmlNode* pProperties)
+void wxRxObject::SetRemoteId(long nId)
 {
-	if(!pProperties && !pGxRemoteServer)
-		return false;
-	m_pGxRemoteServer = pGxRemoteServer;
-	if(pProperties->HasAttribute(wxT("dst"))) //set dst from xml
-	{
-		m_sDst = pProperties->GetAttribute(wxT("dst"), ERR);
-		INetMessageProcessor* pNetMessageProcessor = dynamic_cast<INetMessageProcessor*>(m_pGxRemoteServer);
-		if(pNetMessageProcessor)
-			pNetMessageProcessor->AddMessageReceiver(m_sDst, static_cast<INetMessageReceiver*>(this));
-	}
-	return true;
+    m_nRemoteId = nId;
 }
 
-void wxRxObject::Detach(void)
+long wxRxObject::GetRemoteId(void) const
 {
-	INetMessageProcessor* pNetMessageProcessor = dynamic_cast<INetMessageProcessor*>(m_pGxRemoteServer);
-	if(pNetMessageProcessor)
-		pNetMessageProcessor->DelMessageReceiver(m_sDst, static_cast<INetMessageReceiver*>(this));
-	IGxObject::Detach();
+    return m_nRemoteId;
 }
 
-void wxRxObject::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
+bool wxRxObject::Create (wxRxCatalog* const pRxCatalog, long nId, wxGxObject *oParent, const wxString &soName, const CPLString &soPath)
 {
+    wxASSERT_MSG(0, wxT("Function should never run"));
+    return false;
 }
 
+void wxRxObject::OnNetEvent(wxGISNetEvent& event)
+{
+    wxASSERT_MSG(0, wxT("Function should never run"));
+}
 
 //------------------------------------------------------------
 // wxRxObjectContainer
 //------------------------------------------------------------
 
-wxRxObjectContainer::wxRxObjectContainer(void) : m_pGxRemoteServer(NULL), m_bIsChildrenLoaded(false), m_nChildCount(0)
+IMPLEMENT_CLASS(wxRxObjectContainer, wxGxObjectContainer)
+
+wxRxObjectContainer::wxRxObjectContainer(void) : wxGxObjectContainer(), wxRxObject()
 {
+    m_bIsChildrenLoaded = false;
+}
+
+wxRxObjectContainer::wxRxObjectContainer(wxRxCatalog* const pRxCatalog, long nId, wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxObjectContainer(oParent, soName, soPath), wxRxObject()
+{
+    m_bIsChildrenLoaded = false;
+    m_nRemoteId = nId;
+    m_pRxCatalog = pRxCatalog;
+    if(m_pRxCatalog)
+        m_pRxCatalog->RegisterRemoteObject(this);
 }
 
 wxRxObjectContainer::~wxRxObjectContainer(void)
 {
 }
 
-void wxRxObjectContainer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
-{
-	if(pChildNode)
-	{
-		if(pChildNode->GetName().CmpNoCase(wxT("children")) == 0 && pChildNode->HasAttribute(wxT("count")))
-			m_nChildCount = wxAtoi(pChildNode->GetAttribute(wxT("count"), wxT("0")));
-		if(m_nChildCount == 0)
-		{
-			m_bIsChildrenLoaded = true;
-			return;
-		}
-		if(pChildNode->GetName().CmpNoCase(wxT("child")) == 0)
-		{
-			//load items
-			while(pChildNode)
-			{
-				wxString sDst = pChildNode->GetAttribute(wxT("dst"), ERR);
-				bool bAdd(true);
-				for(size_t i = 0; i < m_sDstArray.GetCount(); ++i)
-				{
-					if(sDst == m_sDstArray[i])
-					{
-						bAdd = false;
-						break;
-					}
-				}
-
-				wxString sClassName = pChildNode->GetAttribute(wxT("class"), ERR);
-				if(!sClassName.IsEmpty() && bAdd)
-				{
-					IGxObject *pObj = dynamic_cast<IGxObject*>(wxCreateDynamicObject(sClassName));
-					IRxObjectClient* pRxObjectCli = dynamic_cast<IRxObjectClient*>(pObj);
-					if(pRxObjectCli)
-						pRxObjectCli->Init(m_pGxRemoteServer, pChildNode);
-					if(!AddChild(pObj))
-						wxDELETE(pObj);
-					m_sDstArray.Add(sDst);
-				}
-				pChildNode = pChildNode->GetNext();
-			}
-			m_bIsChildrenLoaded = m_nChildCount == m_Children.size();
-			m_pCatalog->ObjectChanged(GetID());
-		}
-	}
-}
-
-void wxRxObjectContainer::EmptyChildren(void)
-{
-	for(size_t i = 0; i < m_Children.size(); ++i)
-	{
-		m_Children[i]->Detach();
-		wxDELETE(m_Children[i]);
-	}
-	m_Children.clear();
-	m_bIsChildrenLoaded = false;
-}
-
-bool wxRxObjectContainer::LoadChildren()
+void wxRxObjectContainer::GetRemoteChildren()
 {
 	if(m_bIsChildrenLoaded)
-		return true;
-	//send child request
-	wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStGet, enumGISPriorityNormal, m_sDst, wxT("<children/>"));
-    wxNetMessage* pMsg = new wxNetMessage(sMsg);
-    if(pMsg->IsOk())
+		return;
+    wxCHECK_RET(m_pRxCatalog, wxT("the m_pRxCatalog is null"));
+    wxNetMessage msgout(enumGISNetCmdCmd, enumGISCmdGetChildren, enumGISPriorityHighest, m_nRemoteId);
+    m_pRxCatalog->SendNetMessage(msgout);
+}
+
+void wxRxObjectContainer::LoadRemoteChildren(const wxXmlNode* pChildrenNode)
+{
+    wxCHECK_RET(pChildrenNode, wxT("Input wxXmlNode pointer is null"));
+    wxXmlNode* pChild = pChildrenNode->GetChildren();
+    while(pChild)
     {
-        WXGISMSG msg = {INetMessageSPtr(static_cast<INetMessage*>(pMsg)), wxNOT_FOUND};
-        m_pGxRemoteServer->PutOutMessage(msg);
-		//add pending icon or item
-		return true;
+        wxString sClassName = pChild->GetAttribute(wxT("class"), NONAME);
+
+        wxObject *obj = wxCreateDynamicObject(sClassName);
+        wxGxObject* pGxObject = wxDynamicCast(obj, wxGxObject);
+        wxRxObject* pRxObject = dynamic_cast<wxRxObject*>(obj);
+        if(pGxObject && pRxObject)
+        {
+            long nId = wxAtol(pChild->GetAttribute(wxT("id"),wxT("-1")));
+            wxString sName = pChild->GetAttribute(wxT("name"), NONAME ); 
+            CPLString szPath( pChild->GetAttribute(wxT("path"), NONAME ).mb_str(wxConvUTF8)); 
+
+            if(!pRxObject->Create(m_pRxCatalog, nId, this, sName, szPath))
+                wxDELETE(obj);
+            else
+                wxGIS_GXCATALOG_EVENT_ID(ObjectAdded, pGxObject->GetId());
+        }
+        else
+        {
+            wxDELETE(obj);            
+        }
+        pChild = pChild->GetNext();
     }
-    else
-        wxDELETE(pMsg);
-	return false;
+
+    wxGIS_GXCATALOG_EVENT(ObjectChanged);
+    m_bIsChildrenLoaded = true;
 }
 
 void wxRxObjectContainer::Refresh(void)
 {
-	EmptyChildren();
-	LoadChildren();
+	DestroyChildren();
+    m_bIsChildrenLoaded = false;    
+    wxGIS_GXCATALOG_EVENT(ObjectChanged);
+	GetRemoteChildren();
 }
 
-void wxRxObjectContainer::Detach(void)
+bool wxRxObjectContainer::Create (wxRxCatalog* const pRxCatalog, long nId, wxGxObject *oParent, const wxString &soName, const CPLString &soPath)
 {
-	INetMessageProcessor* pNetMessageProcessor = dynamic_cast<INetMessageProcessor*>(m_pGxRemoteServer);
-	if(pNetMessageProcessor)
-		pNetMessageProcessor->DelMessageReceiver(m_sDst, static_cast<INetMessageReceiver*>(this));
-	EmptyChildren();
-	IGxObject::Detach();
+    m_nRemoteId = nId;
+    m_pRxCatalog = pRxCatalog;
+    if(m_pRxCatalog)
+        m_pRxCatalog->RegisterRemoteObject(this);
+    return wxGxObjectContainer::Create(oParent, soName, soPath);
 }
 
-bool wxRxObjectContainer::DeleteChild(IGxObject* pChild)
+bool wxRxObjectContainer::DestroyChildren()
 {
-	bool bHasChildren = m_Children.size() > 0 ? true : false;
-    long nChildID = pChild->GetID();
-	if(!IGxObjectContainer::DeleteChild(pChild))
-		return false;
-    m_pCatalog->ObjectDeleted(nChildID);
-	if(bHasChildren != m_Children.size() > 0 ? true : false)
-		m_pCatalog->ObjectChanged(GetID());
-	return true;
+    m_bIsChildrenLoaded = false;
+    return wxGxObjectContainer::DestroyChildren();
 }
 
-bool wxRxObjectContainer::Init(wxGxRemoteServer* pGxRemoteServer, wxXmlNode* pProperties)
+bool wxRxObjectContainer::Destroy(void)
 {
-	if(!pProperties && !pGxRemoteServer)
-		return false;
-	m_pGxRemoteServer = pGxRemoteServer;
-	if(pProperties->HasAttribute(wxT("dst"))) //set dst from xml
-	{
-		m_sDst = pProperties->GetAttribute(wxT("dst"), ERR);
-		INetMessageProcessor* pNetMessageProcessor = dynamic_cast<INetMessageProcessor*>(m_pGxRemoteServer);
-		if(pNetMessageProcessor)
-			pNetMessageProcessor->AddMessageReceiver(m_sDst, static_cast<INetMessageReceiver*>(this));
-		return true;
-	}
-	return true;
+    wxGIS_GXCATALOG_EVENT(ObjectDeleted);
+    return wxGxObjectContainer::Destroy();
+}
+
+//------------------------------------------------------------
+// wxRxCatalog
+//------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxRxCatalog, wxRxObjectContainer)
+
+wxRxCatalog::wxRxCatalog(void) : wxRxObjectContainer()
+{
+    m_pRxCatalog = this;
+}
+
+wxRxCatalog::wxRxCatalog(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxRxObjectContainer(NULL, wxNOT_FOUND, oParent, soName, soPath)
+{
+    m_pRxCatalog = this;
+}
+
+wxRxCatalog::~wxRxCatalog(void)
+{
+}
+
+bool wxRxCatalog::Create (wxGxObject *oParent, const wxString &soName, const CPLString &soPath)
+{
+    return wxRxObjectContainer::Create(this, wxNOT_FOUND, oParent, soName, soPath);
+}
+
+void wxRxCatalog::RegisterRemoteObject(wxRxObject* pObj)
+{
+	m_moRxObject[pObj->GetRemoteId()] = pObj;
+}
+
+void wxRxCatalog::UnRegisterRemoteObject(long nId)
+{
+    m_moRxObject[nId] = NULL;
+}
+
+wxRxObject* const wxRxCatalog::GetRegisterRemoteObject(long nId)
+{
+    wxCHECK( nId != wxNOT_FOUND, NULL );
+    return m_moRxObject[nId];
+}
+
+void wxRxCatalog::SendNetMessage(const wxNetMessage & msg)
+{
+    if(m_pNetConn)
+        m_pNetConn->SendNetMessage(msg);
 }

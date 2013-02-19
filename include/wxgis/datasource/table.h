@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  Table class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,8 +20,11 @@
  ****************************************************************************/
 #pragma once
 
+#include "wxgis/datasource/dataset.h"
 #include "wxgis/datasource/cursor.h"
 #include "wxgis/datasource/filter.h"
+
+#include <ogrsf_frmts.h>
 
 //#define MAXSTRINGSTORE 1000000
 
@@ -31,63 +34,77 @@
 
     This class support basic operations on datasource. No spatial daya avaliable, but the OGRFeature is main part of this class, so it's posible to get some spatial information (not recommendet).
 */
+
 class WXDLLIMPEXP_GIS_DS wxGISTable : public wxGISDataset
 {
+    DECLARE_CLASS(wxGISTable)
 public:
-	wxGISTable(CPLString sPath, int nSubType, OGRLayer* poLayer = NULL, OGRDataSource* poDS = NULL);
+	wxGISTable(const CPLString &sPath, int nSubType, OGRLayer* poLayer = NULL, OGRDataSource* poDS = NULL);
 	virtual ~wxGISTable(void);
 	//wxGISDataset
-    virtual wxString GetName(void);
+    virtual wxString GetName(void) const;
 	virtual void Close(void);
 	//wxGISTable
-    virtual wxFontEncoding GetEncoding(void){return m_Encoding;};
-    virtual void SetEncoding(wxFontEncoding Encoding){m_Encoding = Encoding;};
-	virtual wxString GetAsString(size_t row, int col);
-	static wxString GetAsString(OGRFeatureSPtr pFeature, int nField, wxFontEncoding Encoding);
+	virtual bool Open(int iLayer = 0, int bUpdate = 0, bool bCache = true, ITrackCancel* const pTrackCancel = NULL);
+    virtual size_t GetSubsetsCount(void) const;
+    virtual wxGISDataset* GetSubset(size_t nIndex);
+    virtual wxGISDataset* GetSubset(const wxString & sSubsetName);    
+    //sysop
+	virtual char **GetFileList();    
+	virtual void Cache(ITrackCancel* const pTrackCancel = NULL);
+    //rowop
+	virtual size_t GetFeatureCount(bool bForce = false, ITrackCancel* const pTrackCancel = NULL);	
+	virtual bool CanDeleteFeature(void);
+	virtual OGRErr DeleteFeature(long nFID);    
+    virtual OGRErr StoreFeature(wxGISFeature &Feature);
+	virtual wxGISFeature CreateFeature(void);
+    virtual OGRErr SetFeature(const wxGISFeature &Feature);    
+    virtual wxGISFeature GetFeatureByID(long nFID);
+    //
+    virtual wxFontEncoding GetEncoding(void) const;
+    virtual void SetEncoding(const wxFontEncoding &oEncoding);
+    //
+    virtual wxFeatureCursor Search(const wxGISQueryFilter &QFilter = wxGISNullQueryFilter, bool bOnlyFirst = false);
+    virtual wxGISFeature GetFeature(long nIndex);
+	/*    
 	virtual OGRFeatureSPtr Next(void);
 	virtual OGRFeatureSPtr operator [](size_t nIndex);
-	virtual OGRFeatureSPtr GetAt(size_t nIndex);
-	virtual OGRFeatureSPtr GetFeature(long nFID);
-	virtual OGRErr StoreFeature(OGRFeatureSPtr poFeature);
-	virtual OGRFeatureSPtr CreateFeature(void);
-	virtual bool CanDeleteFeature(void);
-	virtual OGRErr DeleteFeature(long nFID);
-    virtual OGRErr SetFeature(OGRFeatureSPtr poFeature);
+	virtual OGRFeatureSPtr GetAt(size_t nIndex);	
+
 	virtual OGRFeatureDefn* const GetDefinition(void);
 	virtual void Reset(void);
     virtual OGRErr SetFilter(wxGISQueryFilter* pQFilter);
-	virtual wxFeatureCursorSPtr Search(wxGISQueryFilter* pQFilter, bool bOnlyFirst = false);
+	
     virtual OGRErr SetIgnoredFields(wxArrayString &saIgnoredFields);
-	virtual size_t GetFeatureCount(ITrackCancel* pTrackCancel = NULL);
-	virtual bool Open(int iLayer = 0, int bUpdate = 0, bool bCache = true, ITrackCancel* pTrackCancel = NULL);
-	virtual bool Delete(int iLayer = 0, ITrackCancel* pTrackCancel = NULL);
-	virtual bool Rename(wxString sNewName);
-	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel = NULL);
-	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel = NULL);
-	virtual char **GetFileList();
-	virtual OGRDataSource* const GetDataSource(void){return m_poDS;};
-	virtual OGRLayer* const GetLayerRef(int iLayer = 0);
-	virtual bool IsCached(void){ return m_bIsDataLoaded; };
-	virtual void Cache(ITrackCancel* pTrackCancel = NULL);
+    */
+	virtual OGRDataSource* const GetDataSourceRef(void) const {return m_poDS;};
+    virtual OGRLayer* const GetLayerRef(int iLayer = 0) const {return m_poLayer;};
+    /*
 protected:
 	virtual void LoadFeatures(ITrackCancel* pTrackCancel = NULL);
-    virtual void UnloadFeatures(void);
+    virtual void UnloadFeatures(void);*/
+protected:
+    virtual void SetInternalValues(void);
 protected:
 	OGRDataSource* m_poDS;
 	OGRLayer* m_poLayer;
-	wxString m_sTableName;
 
     wxFontEncoding m_Encoding;
+    
+    long m_nFeatureCount;
+    bool m_bOLCStringsAsUTF8;
+    bool m_bOLCFastFeatureCount;
+    bool m_bHasFID;
+/*
+
 	bool m_bOLCStringsAsUTF8, m_bIsDataLoaded;
-	bool m_bHasFID;
-	long m_nFeatureCount;
+	
+	
 	long m_nFIDCounter;
     std::map<long, OGRFeatureSPtr> m_FeaturesMap;
     std::map<long, OGRFeatureSPtr>::iterator m_IT;
 
 	wxString m_sCurrentFilter;
 	//short m_FieldCount;
-    //wxArrayString m_FeatureStringData;
+    //wxArrayString m_FeatureStringData;*/
 };
-
-DEFINE_SHARED_PTR(wxGISTable);

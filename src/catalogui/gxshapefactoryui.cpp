@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxShapeFactoryUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010  Bishop
 *
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxshapefactoryui.h"
+
 #include "wxgis/catalogui/gxdatasetui.h"
 
 #include "../../art/shp_dset_16.xpm"
@@ -31,29 +32,33 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxShapeFactoryUI, wxGxShapeFactory)
 
 wxGxShapeFactoryUI::wxGxShapeFactoryUI(void) : wxGxShapeFactory()
 {
-    m_SmallSHPIcon = wxIcon(shp_dset_16_xpm);
-    m_LargeSHPIcon = wxIcon(shp_dset_48_xpm);
-    m_SmallDXFIcon = wxIcon(table_dbf_16_xpm);
-    m_LargeDXFIcon = wxIcon(table_dbf_48_xpm);
 }
 
 wxGxShapeFactoryUI::~wxGxShapeFactoryUI(void)
 {
 }
 
-IGxObject* wxGxShapeFactoryUI::GetGxDataset(CPLString path, wxString name, wxGISEnumDatasetType type)
+wxGxObject* wxGxShapeFactoryUI::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumDatasetType type)
 {
     switch(type)
     {
     case enumGISFeatureDataset:
         {
-	    wxGxFeatureDatasetUI* pDataset = new wxGxFeatureDatasetUI(path, name, enumVecESRIShapefile, m_LargeSHPIcon, m_SmallSHPIcon);
-        return static_cast<IGxObject*>(pDataset);
+            if(!m_SmallSHPIcon.IsOk())
+                m_SmallSHPIcon = wxIcon(shp_dset_16_xpm);
+            if(!m_LargeSHPIcon.IsOk())
+                m_LargeSHPIcon = wxIcon(shp_dset_48_xpm);
+	        wxGxFeatureDatasetUI* pDataset = new wxGxFeatureDatasetUI(enumVecESRIShapefile, pParent, soName, szPath, m_LargeSHPIcon, m_SmallSHPIcon);
+            return wxStaticCast(pDataset, wxGxObject);
         }
     case enumGISTableDataset:
         {
-        wxGxTableDatasetUI* pDataset = new wxGxTableDatasetUI(path, name, enumTableDBF, m_LargeDXFIcon, m_SmallDXFIcon);
-        return static_cast<IGxObject*>(pDataset);
+            if(!m_SmallDBFIcon.IsOk())
+                m_SmallDBFIcon = wxIcon(table_dbf_16_xpm);
+            if(!m_LargeDBFIcon.IsOk())
+                m_LargeDBFIcon = wxIcon(table_dbf_48_xpm);
+            wxGxTableDatasetUI* pDataset = new wxGxTableDatasetUI(enumTableDBF, pParent, soName, szPath, m_LargeDBFIcon, m_SmallDBFIcon);
+            return wxStaticCast(pDataset, wxGxObject);
         }
     }
     return NULL;

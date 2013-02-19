@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxMapInfoFactory class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2010  Bishop
 *
@@ -21,7 +21,7 @@
 #include "wxgis/catalog/gxmapinfofactory.h"
 #include "wxgis/catalog/gxdataset.h"
 #include <wx/ffile.h>
-
+/*
 IMPLEMENT_DYNAMIC_CLASS(wxGxMapInfoFactory, wxObject)
 
 wxGxMapInfoFactory::wxGxMapInfoFactory(void)
@@ -40,7 +40,7 @@ bool wxGxMapInfoFactory::GetChildren(CPLString sParentDir, char** &pFileNames, G
         CPLString szExt = CPLGetExtension(pFileNames[i]);
         CPLString szPath;
 
-        if(EQUAL(szExt, "tab"))
+        if(wxGISEQUAL(szExt, "tab"))
         {
             bool bHasMap(false), bHasInd(false), bHasID(false), bHasDat(false);
             szPath = (char*)CPLResetExtension(pFileNames[i], "dat");
@@ -87,7 +87,7 @@ bool wxGxMapInfoFactory::GetChildren(CPLString sParentDir, char** &pFileNames, G
                 pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), wxGISEnumVectorDatasetType(emumVecMAX + 1));
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
-        else if(EQUAL(szExt, "mif"))
+        else if(wxGISEQUAL(szExt, "mif"))
         {
             bool bHasMid(false);
             szPath = (char*)CPLResetExtension(pFileNames[i], "mid");
@@ -99,13 +99,13 @@ bool wxGxMapInfoFactory::GetChildren(CPLString sParentDir, char** &pFileNames, G
                 pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), wxGISEnumVectorDatasetType(emumVecMAX + 2));
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
-        else if(EQUAL(szExt, "map"))
+        else if(wxGISEQUAL(szExt, "map"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "ind"))
+        else if(wxGISEQUAL(szExt, "ind"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "id"))
+        else if(wxGISEQUAL(szExt, "id"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "dat"))
+        else if(wxGISEQUAL(szExt, "dat"))
         {
             bool bHasTab(false);
             szPath = (char*)CPLResetExtension(pFileNames[i], "tab");
@@ -120,7 +120,7 @@ bool wxGxMapInfoFactory::GetChildren(CPLString sParentDir, char** &pFileNames, G
             if(bHasTab)
                 pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
-        else if(EQUAL(szExt, "mid"))
+        else if(wxGISEQUAL(szExt, "mid"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 
 		if(pGxObj != NULL)
@@ -155,4 +155,4 @@ IGxObject* wxGxMapInfoFactory::GetGxDataset(CPLString path, wxString name, wxGIS
 	wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, type);
     return static_cast<IGxObject*>(pDataset);
 }
-
+*/

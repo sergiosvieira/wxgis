@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISSpatialReferencePropertyPage class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010,2012,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,8 +21,13 @@
 #pragma once
 
 #include "wxgis/catalogui/catalogui.h"
+#include "wxgis/datasource/gdalinh.h"
 
 #include "wx/propgrid/propgrid.h"
+
+/** \class wxGISSpatialReferencePropertyPage spatrefpropertypage.h
+    \brief The tab of spatial reference properties.
+*/
 
 class WXDLLIMPEXP_GIS_CLU wxGISSpatialReferencePropertyPage : 
     public wxPanel
@@ -35,15 +40,16 @@ class WXDLLIMPEXP_GIS_CLU wxGISSpatialReferencePropertyPage :
 
 public:
     wxGISSpatialReferencePropertyPage(void);
-    wxGISSpatialReferencePropertyPage(OGRSpatialReferenceSPtr poSRS, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Spatial Reference"));
+    wxGISSpatialReferencePropertyPage(const wxGISSpatialReference &oSRS, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Spatial Reference"));
 	~wxGISSpatialReferencePropertyPage();
-    virtual bool Create(OGRSpatialReferenceSPtr poSRS, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Spatial Reference"));
-    virtual wxString GetPageName(void){return wxString(_("Spatial Reference"));};
+    virtual bool Create(const wxGISSpatialReference &oSRS, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Spatial Reference"));
+    virtual wxString GetPageName(void) const {return wxString(_("Spatial Reference"));};
+protected:
     void FillUndefined(void);
-    void FillProjected(OGRSpatialReferenceSPtr poSRS);
-    void FillGeographic(OGRSpatialReferenceSPtr poSRS);
-    void FillLoclal(OGRSpatialReferenceSPtr poSRS);
-    void AppendProjParam(wxPGProperty* pid, const char *pszName, OGRSpatialReferenceSPtr poSRS);
+    void FillProjected(const wxGISSpatialReference &oSRS);
+    void FillGeographic(const wxGISSpatialReference &oSRS);
+    void FillLoclal(const wxGISSpatialReference &oSRS);
+    void AppendProjParam(wxPGProperty* pid, const char *pszName, const wxGISSpatialReference &oSRS);
     wxPGProperty* AppendProperty(wxPGProperty* pProp);
     wxPGProperty* AppendProperty(wxPGProperty* pid, wxPGProperty* pProp);
 protected:

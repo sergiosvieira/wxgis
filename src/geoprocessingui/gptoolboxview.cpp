@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  wxAxToolboxView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2010 Bishop
 *
@@ -18,7 +18,7 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-
+/*
 #include "wxgis/geoprocessingui/gptoolboxview.h"
 #include "wxgis/geoprocessingui/gptoolbox.h"
 #include "wxgis/framework/droptarget.h"
@@ -209,3 +209,4 @@ void wxGxToolboxTreeView::AddTreeItem(IGxObject* pGxObject, wxTreeItemId hParent
         return;
     wxGxTreeView::AddTreeItem(pGxObject, hParent);
 }
+*/

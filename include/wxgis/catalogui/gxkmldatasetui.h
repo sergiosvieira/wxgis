@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxKMLDatasetUI classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -26,6 +26,7 @@
 /** \class wxGxKMLDatasetUI gxkmldatasetui.h
     \brief A kml dataset GxObject.
 */
+/*
 class WXDLLIMPEXP_GIS_CLU wxGxKMLDatasetUI :
     public wxGxKMLDataset,
 	public IGxObjectUI,
@@ -48,10 +49,11 @@ protected:
     wxIcon m_LargeIcon, m_SmallIcon;
     wxIcon m_LargeSubIcon, m_SmallSubIcon;
 };
-
+*/
 /** \class wxGxKMLSubDatasetUI gxkmldatasetui.h
     \brief A kml layer GxObject.
 */
+/*
 class WXDLLIMPEXP_GIS_CLU wxGxKMLSubDatasetUI :
 	public wxGxKMLSubDataset,
 	public IGxObjectUI,
@@ -70,3 +72,4 @@ public:
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
 };
+*/

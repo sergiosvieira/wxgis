@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  RasterDataset class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,31 +20,33 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/datasource/datasource.h"
+#include "wxgis/datasource/dataset.h"
 
 /** \class wxGISRasterDataset rasterdataset.h
     \brief The GIS RasterDataset class.
 
     This class stores raster geographic data (imagery & etc.).
 */
+
 class WXDLLIMPEXP_GIS_DS wxGISRasterDataset :
 	public wxGISDataset
 {
+    DECLARE_CLASS(wxGISRasterDataset)
 public:
-	wxGISRasterDataset(CPLString sPath, wxGISEnumRasterDatasetType nType);
+	wxGISRasterDataset(const CPLString &sPath = "", wxGISEnumRasterDatasetType nType = enumRasterUnknown);
 	virtual ~wxGISRasterDataset(void);
     // wxGISDataset
-	virtual const OGRSpatialReferenceSPtr GetSpatialReference(void);
+	virtual const wxGISSpatialReference GetSpatialReference(void);
     virtual wxString GetName(void);
 	virtual void Close(void);
-	virtual bool IsCached(void){return false;};
-	virtual void Cache(ITrackCancel* pTrackCancel = NULL){};
+	virtual void Cache(ITrackCancel* const pTrackCancel = NULL){};
+	virtual bool Rename(const wxString &sNewName, ITrackCancel* const pTrackCancel = NULL);
+	virtual bool Copy(const CPLString &szDestPath, ITrackCancel* const pTrackCancel = NULL);
+	virtual bool Move(const CPLString &szDestPath, ITrackCancel* const pTrackCancel = NULL);    
+    virtual bool Delete(int iLayer = 0, ITrackCancel* const pTrackCancel = NULL);
+    virtual char **GetFileList();
     // wxGISRasterDataset
 	virtual bool Open(bool bReadOnly);
-	virtual bool Rename(wxString sNewName);
-	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel);
-	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
-    virtual bool Delete(void);
 	virtual OGREnvelope GetEnvelope(void);
 	virtual GDALDataType GetDataType(void);
 	virtual GDALDataset* GetRaster(void){return m_poDataset;};
@@ -56,16 +58,16 @@ public:
     virtual int GetWidth(void){return m_nXSize;};
     virtual int GetHeight(void){return m_nYSize;};
     virtual int GetBandCount(void){return m_nBandCount;};
-    virtual char **GetFileList();
 	virtual bool GetPixelData(void *data, int nXOff, int nYOff, int nXSize, int nYSize, int nBufXSize, int nBufYSize, GDALDataType eDT, int nBandCount, int *panBandList);
 	virtual bool HasNoData(int nBand){return !IsDoubleEquil(m_paNoData[nBand - 1], NOTNODATA);};
 	virtual double GetNoData(int nBand){return m_paNoData[nBand - 1];};
 	virtual bool WriteWorldFile(wxGISEnumWldExtType eType);
 protected:
+    bool FixSAGARaster(const CPLString &szDestPath, const CPLString &szDestName);
+protected:
 	OGREnvelope m_stExtent;
 	GDALDataset  *m_poDataset;
 	GDALDataset  *m_poMainDataset;
-	OGRSpatialReferenceSPtr m_pSpaRef;
     bool m_bHasOverviews;
     bool m_bHasStats;
 	int m_nXSize;
@@ -75,4 +77,3 @@ protected:
     double *m_paNoData;
 };
 
-DEFINE_SHARED_PTR(wxGISRasterDataset);

@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  wxGISQuadTree class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,6 +20,7 @@
  ****************************************************************************/
 #pragma once
 
+/*
 #include "wxgis/datasource/datasource.h"
 
 #include <list>
@@ -27,6 +28,7 @@
 /** \class wxGISQuadTreeItem quadtree.h
     \brief The class to represent geometry and OID in QuadTree.
 */
+/*
 class wxGISQuadTreeItem
 {
 public:
@@ -71,6 +73,7 @@ class wxGISQuadTree;
 /** \class wxGISQuadTreeCursor quadtree.h
     \brief The class to store Search results of wxGISQuadTree.
 */
+/*
 class wxGISQuadTreeCursor
 {
 	friend class wxGISQuadTree;
@@ -119,6 +122,7 @@ DEFINE_SHARED_PTR(wxGISQuadTreeCursor);
 /** \class wxGISQuadTree quadtree.h
     \brief The wxGIS QuadTree representation.
 */
+/*
 class WXDLLIMPEXP_GIS_DS wxGISQuadTree
 {
 public:
@@ -134,3 +138,4 @@ protected:
 };
 
 DEFINE_SHARED_PTR(wxGISQuadTree);
+*/

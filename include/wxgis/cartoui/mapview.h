@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  wxGISMapView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011,2012 Bishop
+*   Copyright (C) 2009,2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -24,14 +24,12 @@
 #include "wxgis/display/gisdisplay.h"
 #include "wxgis/carto/map.h"
 
-WX_DEFINE_ARRAY(OGRGeometry *, GeometryArray);
+//WX_DEFINE_ARRAY(OGRGeometry *, GeometryArray);
 
 class WXDLLIMPEXP_GIS_CTU wxGISMapView;
 
 /** \class wxMapDrawingThread mapview.h
     \brief A Map Drawing thread class.
-
-    This is class for showing maps.
 */
 
 class wxMapDrawingThread : public wxThread
@@ -46,7 +44,7 @@ private:
 };
 
 /** \class wxGISMapView mapview.h
-    \brief A Map View .
+    \brief A Map View.
 
     This is class for showing maps.
 */
@@ -74,9 +72,9 @@ public:
 	virtual void SetTrackCancel(ITrackCancel* pTrackCancel);
 	virtual wxGISDisplay* GetDisplay(void){return m_pGISDisplay;};
 	//wxGISExtentStack
-	virtual bool AddLayer(wxGISLayerSPtr pLayer);
+	virtual bool AddLayer(wxGISLayer* pLayer);
 	virtual void Clear(void);
-	virtual void SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference);
+	virtual void SetSpatialReference(const wxGISSpatialReference &SpatialReference);
 	virtual void SetExtent(const OGREnvelope& Env);
 	virtual void SetFullExtent(void);
 	virtual OGREnvelope GetFullExtent(void);
@@ -90,7 +88,7 @@ public:
 	virtual void RotateStop(wxPoint MouseLocation);
 	virtual void SetRotate(double dAngleRad);
 	virtual double GetCurrentRotate(void);
-    virtual void FlashGeometry(const GeometryArray& Geoms);
+    //virtual void FlashGeometry(const GeometryArray& Geoms);
 protected:
 	//events
 	virtual void OnPaint(wxPaintEvent & event);
@@ -130,8 +128,7 @@ protected:
 	wxCriticalSection m_CritSect;
 
 	wxGISPointsArray m_ClipGeometry;
-
-	bool m_bFirstSize;
+    wxSize m_PrevSize;
 
 	DECLARE_EVENT_TABLE()
 };

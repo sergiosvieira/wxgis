@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxArchiveFactoryUI class. Create new GxFolderUI objects
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -23,7 +23,7 @@
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalog/gxarchivefactory.h"
 
-
+/*
 class WXDLLIMPEXP_GIS_CLU wxGxArchiveFactoryUI :
 	public wxGxArchiveFactory
 {
@@ -36,3 +36,4 @@ public:
 protected:
     wxIcon m_oLargeAFolderIcon, m_oSmallAFolderIcon;
 };
+*/

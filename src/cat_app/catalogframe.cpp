@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  Main frame class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010 Bishop
+*   Copyright (C) 2009-2010,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,12 +19,13 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/cat_app/catalogframe.h"
+
 #include "wxgis/app/gisaboutdlg.h"
 
 #include "../../art/mainframecat.xpm"
 #include "../../art/mainframecat_x.xpm"
 
-#include "../../art/shp_dset_48.xpm"
+//#include "../../art/shp_dset_48.xpm"
 
 #include <wx/datetime.h>
 
@@ -38,7 +39,7 @@ wxGISCatalogFrame::wxGISCatalogFrame(wxWindow* parent, wxWindowID id, const wxSt
 	//set app main icon
     wxDateTime now = wxDateTime::Now();
     //TODO: need 48x48 main app icon
-    if((now.GetMonth() == wxDateTime::Dec && now.GetDay() > 15) || (now.GetMonth() == wxDateTime::Jan && now.GetDay() < 15))//wxDateTime::Month::
+    if((now.GetMonth() == wxDateTime::Dec && now.GetDay() > 15) || (now.GetMonth() == wxDateTime::Jan && now.GetDay() < 15))
 	{
         m_pAppIcon = wxIcon(mainframecat_x_xpm);
 #ifdef __WXMSW__

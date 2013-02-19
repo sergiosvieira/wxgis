@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxKMLDataset class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxkmldataset.h"
-#include "wxgis/datasource/featuredataset.h"
+/*#include "wxgis/datasource/featuredataset.h"
 #include "wxgis/datasource/sysop.h"
 
 //--------------------------------------------------------------
@@ -312,3 +312,4 @@ void wxGxKMLSubDataset::SetEncoding(wxFontEncoding Encoding)
 {
     m_Encoding = Encoding;
 }
+*/

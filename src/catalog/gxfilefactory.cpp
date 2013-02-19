@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxFileFactory class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -22,7 +22,7 @@
 #include "wxgis/catalog/gxfile.h"
 
 #include "wx/tokenzr.h"
-
+/*
 IMPLEMENT_DYNAMIC_CLASS(wxGxFileFactory, wxObject)
 
 wxGxFileFactory::wxGxFileFactory(void)
@@ -92,3 +92,4 @@ IGxObject* wxGxFileFactory::GetGxObject(CPLString path, wxString name)
     wxGxTextFile* pFile = new wxGxTextFile(path, name);
     return dynamic_cast<IGxObject*>(pFile);
 }
+*/

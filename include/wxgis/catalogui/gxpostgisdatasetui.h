@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  GxPostGISDatasetUI classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,12 +20,17 @@
  ****************************************************************************/
 #pragma once
 
+#include "wxgis/defs.h"
+
+#ifdef wxGIS_USE_POSTGRES
+/*
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalog/gxpostgisdataset.h"
 
 /** \class wxGxPostGISTableDatasetUI gxpostgisdatasetui.h
     \brief A PostGIS Table Dataset GxObjectUI.
 */
+/*
 class WXDLLIMPEXP_GIS_CLU wxGxPostGISTableDatasetUI :
 	public wxGxPostGISTableDataset,
 	public IGxObjectUI,
@@ -48,6 +53,7 @@ protected:
 /** \class wxGxPostGISFeatureDatasetUI gxpostgisdatasetui.h
     \brief A PostGIS Table Dataset GxObjectUI.
 */
+/*
 class WXDLLIMPEXP_GIS_CLU wxGxPostGISFeatureDatasetUI :
 	public wxGxPostGISFeatureDataset,
 	public IGxObjectUI,
@@ -67,5 +73,7 @@ public:
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
 };
+*/
+#endif //wxGIS_USE_POSTGRES
 
 

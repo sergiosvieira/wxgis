@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  wxGISMap class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,7 +21,9 @@
 #pragma once
 
 #include "wxgis/carto/carto.h"
-#include "wxgis/display/displaytransformation.h"
+#include "wxgis/carto/layer.h"
+
+//#include "wxgis/display/displaytransformation.h"
 
 /** \class wxGISMap map.h
     \brief The Map class - array of layers.
@@ -33,21 +35,21 @@ class WXDLLIMPEXP_GIS_CRT wxGISMap
 public:
 	wxGISMap(void);
 	virtual ~wxGISMap(void);
-	virtual void SetName(wxString sName){m_sMapName = sName;};
-	virtual wxString GetName(void){return m_sMapName;};
-	virtual bool AddLayer(wxGISLayerSPtr pLayer);
+	virtual void SetName(wxString sName) {m_sMapName = sName;};
+	virtual wxString GetName(void) const {return m_sMapName;};
+	virtual bool AddLayer(wxGISLayer* pLayer);
 	virtual void Clear(void);
-	virtual size_t GetLayerCount(void){return m_paLayers.size();};
-	virtual wxGISLayerSPtr GetLayer(size_t nIndex);
-	virtual wxString GetDescription(void){return m_sDescription;};
+	virtual size_t GetLayerCount(void) const {return m_paLayers.size();};
+	virtual wxGISLayer* const GetLayer(size_t nIndex);
+	virtual wxString GetDescription(void) const {return m_sDescription;};
 	virtual void SetDescription(wxString sDescription){m_sDescription = sDescription;};
-	virtual OGREnvelope GetFullExtent(void);
-	virtual void SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference);
-	virtual OGRSpatialReferenceSPtr GetSpatialReference(void);
+	virtual OGREnvelope GetFullExtent(void) const;
+	virtual void SetSpatialReference(const wxGISSpatialReference &SpatialReference);
+	virtual wxGISSpatialReference GetSpatialReference(void) const;
 protected:
 	wxString m_sMapName, m_sDescription;
-	std::vector<wxGISLayerSPtr> m_paLayers;
-	OGRSpatialReferenceSPtr m_pSpatialReference;
+	wxVector<wxGISLayer*> m_paLayers;
+	wxGISSpatialReference m_SpatialReference;
 	OGREnvelope m_FullExtent;
 	bool m_bFullExtIsInit;
 };
@@ -65,12 +67,12 @@ public:
 	virtual void Redo(void);
 	virtual void Undo(void);
 	virtual void Clear(void);
-	virtual size_t GetSize(void);
+	virtual size_t GetSize(void) const;
 	virtual void Do(const OGREnvelope &Env);
-	virtual OGREnvelope GetCurrentExtent(void);
+	virtual OGREnvelope GetCurrentExtent(void) const;
 	virtual void SetExtent(const OGREnvelope &Env);
 protected:
-	std::vector<OGREnvelope> m_staEnvelope;
+	wxVector<OGREnvelope> m_staEnvelope;
 	int m_nPos;
 	OGREnvelope m_CurrentExtent;
 };

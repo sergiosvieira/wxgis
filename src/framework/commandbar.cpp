@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISCommandBar class, and diferent implementation - wxGISMneu, wxGISToolBar
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2012  Bishop
 *
@@ -19,13 +19,16 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/framework/commandbar.h"
+#include "wxgis/framework/applicationbase.h"
+
 #include "../../art/tool_16.xpm"
 
 //----------------------------------------------------------------------
 // wxGISCommandBar
 //----------------------------------------------------------------------
+IMPLEMENT_CLASS(wxGISCommandBar, wxObject)
 
-wxGISCommandBar::wxGISCommandBar(const wxString& sName, const wxString& sCaption, wxGISEnumCommandBars type)
+wxGISCommandBar::wxGISCommandBar(const wxString& sName, const wxString& sCaption, wxGISEnumCommandBars type) : wxGISPointer()
 {
 	m_sName = sName;
 	m_sCaption = sCaption;
@@ -41,7 +44,7 @@ void wxGISCommandBar::SetName(const wxString& sName)
 	m_sName = sName;
 }
 
-wxString wxGISCommandBar::GetName(void)
+wxString wxGISCommandBar::GetName(void) const
 {
 	return m_sName;
 }
@@ -51,7 +54,7 @@ void wxGISCommandBar::SetCaption(const wxString& sCaption)
 	m_sCaption = sCaption;
 }
 
-wxString wxGISCommandBar::GetCaption(void)
+wxString wxGISCommandBar::GetCaption(void) const
 {
 	return wxGetTranslation(m_sCaption);
 }
@@ -66,7 +69,7 @@ wxGISEnumCommandBars wxGISCommandBar::GetType(void)
 	return m_type;
 }
 
-void wxGISCommandBar::AddCommand(ICommand* pCmd)
+void wxGISCommandBar::AddCommand(wxGISCommand* pCmd)
 {
 	m_CommandArray.push_back(pCmd);
 }
@@ -80,7 +83,7 @@ void wxGISCommandBar::RemoveCommand(size_t nIndex)
 void wxGISCommandBar::MoveCommandLeft(size_t nIndex)
 {
 	wxASSERT(nIndex >= 0 && nIndex < m_CommandArray.size());
-	ICommand* pCmd = m_CommandArray[nIndex];
+	wxGISCommand* pCmd = m_CommandArray[nIndex];
 	m_CommandArray[nIndex] = m_CommandArray[nIndex - 1];
 	m_CommandArray[nIndex - 1] = pCmd;
 }
@@ -88,7 +91,7 @@ void wxGISCommandBar::MoveCommandLeft(size_t nIndex)
 void wxGISCommandBar::MoveCommandRight(size_t nIndex)
 {
 	wxASSERT(nIndex >= 0 && nIndex < m_CommandArray.size());
-	ICommand* pCmd = m_CommandArray[nIndex];
+	wxGISCommand* pCmd = m_CommandArray[nIndex];
 	m_CommandArray[nIndex] = m_CommandArray[nIndex + 1];
 	m_CommandArray[nIndex + 1] = pCmd;
 }
@@ -98,13 +101,13 @@ size_t wxGISCommandBar::GetCommandCount(void)
 	return m_CommandArray.size();
 }
 
-ICommand* wxGISCommandBar::GetCommand(size_t nIndex)
+wxGISCommand* wxGISCommandBar::GetCommand(size_t nIndex) const
 {
 	wxASSERT(nIndex >= 0 && nIndex < m_CommandArray.size());
 	return m_CommandArray[nIndex];
 }
 
-void wxGISCommandBar::Serialize(IFrameApplication* pApp, wxXmlNode* pNode, bool bStore)
+void wxGISCommandBar::Serialize(wxGISApplicationBase* pApp, wxXmlNode* pNode, bool bStore)
 {
 	if(bStore)
 	{
@@ -112,7 +115,7 @@ void wxGISCommandBar::Serialize(IFrameApplication* pApp, wxXmlNode* pNode, bool 
 		pNode->AddAttribute(wxT("caption"), m_sCaption);
 		for(size_t i = m_CommandArray.size(); i > 0; i--)
 		{
-			ICommand* pCmd = m_CommandArray[i - 1];
+			wxGISCommand* pCmd = m_CommandArray[i - 1];
 			if(pCmd)
 			{
 				wxXmlNode* pNewNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxString(wxT("Item")));
@@ -143,7 +146,7 @@ void wxGISCommandBar::Serialize(IFrameApplication* pApp, wxXmlNode* pNode, bool 
 				case enumGISCommandMenu:
 				{
 					pNewNode->AddAttribute(wxT("type"), wxT("menu"));
-					IGISCommandBar* pCB = dynamic_cast<IGISCommandBar*>(pCmd);
+					wxGISCommandBar* pCB = dynamic_cast<wxGISCommandBar*>(pCmd);
 					if(pCB)
 					{
 						pNewNode->AddAttribute(wxT("cmd_name"), pCB->GetName());
@@ -170,7 +173,7 @@ void wxGISCommandBar::Serialize(IFrameApplication* pApp, wxXmlNode* pNode, bool 
 				wxString sCmdName = subchild->GetAttribute(wxT("cmd_name"), wxT("None"));
 				unsigned char nSubtype = wxAtoi(subchild->GetAttribute(wxT("subtype"), wxT("0")));
 				//wxString sName = subchild->GetAttribute(wxT("name"), NONAME);
-				ICommand* pSubCmd = pApp->GetCommand(sCmdName, nSubtype);
+				wxGISCommand* pSubCmd = pApp->GetCommand(sCmdName, nSubtype);
 				if(pSubCmd)
 					AddCommand(pSubCmd);
 			}
@@ -178,10 +181,10 @@ void wxGISCommandBar::Serialize(IFrameApplication* pApp, wxXmlNode* pNode, bool 
 			{
 				//the menu description must be exist in xml before using submenu
 				wxString sCmdName = subchild->GetAttribute(wxT("cmd_name"), ERR);
-				IGISCommandBar* pGISCommandBar = pApp->GetCommandBar(sCmdName);
+				wxGISCommandBar* pGISCommandBar = pApp->GetCommandBar(sCmdName);
 				if(pGISCommandBar)
 				{
-					ICommand* pSubCmd = dynamic_cast<ICommand*>(pGISCommandBar);
+					wxGISCommand* pSubCmd = dynamic_cast<wxGISCommand*>(pGISCommandBar);//wxDynamicCast(pGISCommandBar, wxGISCommand);//
 					if(pSubCmd)
 						AddCommand(pSubCmd);
 					else
@@ -190,7 +193,7 @@ void wxGISCommandBar::Serialize(IFrameApplication* pApp, wxXmlNode* pNode, bool 
 			}
 			else
 			{
-				ICommand* pSubCmd = pApp->GetCommand(wxT("wxGISCommonCmd"), 3);
+				wxGISCommand* pSubCmd = pApp->GetCommand(wxT("wxGISCommonCmd"), 3);
 				if(pSubCmd)
 					AddCommand(pSubCmd);
 			}
@@ -202,6 +205,9 @@ void wxGISCommandBar::Serialize(IFrameApplication* pApp, wxXmlNode* pNode, bool 
 //----------------------------------------------------------------------
 // wxGISMenu
 //----------------------------------------------------------------------
+IMPLEMENT_CLASS2(wxGISMenu, wxGISCommandBar, wxMenu)
+//IMPLEMENT_CLASS(wxGISMenu, wxGISCommandBar)
+
 wxGISMenu::wxGISMenu(const wxString& sName, const wxString& sCaption, wxGISEnumCommandBars type, const wxString& title, long style) : wxMenu(title, style), wxGISCommandBar(sName, sCaption, type)
 {
 }
@@ -215,7 +221,7 @@ wxGISMenu::~wxGISMenu(void)
 	}
 }
 
-void wxGISMenu::AddCommand(ICommand* pCmd)
+void wxGISMenu::AddCommand(wxGISCommand* pCmd)
 {
 	switch(pCmd->GetKind())
 	{
@@ -224,7 +230,7 @@ void wxGISMenu::AddCommand(ICommand* pCmd)
 		break;
 	case enumGISCommandMenu:
 		{
-			IGISCommandBar* pGISCommandBar = dynamic_cast<IGISCommandBar*>(pCmd);
+			wxGISCommandBar* pGISCommandBar = dynamic_cast<wxGISCommandBar*>(pCmd);
 			if(pGISCommandBar)
 			{
 				pGISCommandBar->Reference();
@@ -292,7 +298,7 @@ void wxGISMenu::MoveCommandRight(size_t nIndex)
 
 void wxGISMenu::AddMenu(wxMenu* pMenu, wxString sName)
 {
-	IGISCommandBar* pGISCommandBar = dynamic_cast<IGISCommandBar*>(pMenu);
+	wxGISCommandBar* pGISCommandBar = dynamic_cast<wxGISCommandBar*>(pMenu);
 	if(pGISCommandBar)
 		pGISCommandBar->Reference();
 	SUBMENUDATA data = {AppendSubMenu(pMenu, sName), pGISCommandBar};
@@ -302,6 +308,7 @@ void wxGISMenu::AddMenu(wxMenu* pMenu, wxString sName)
 //----------------------------------------------------------------------
 // wxGISToolbar
 //----------------------------------------------------------------------
+IMPLEMENT_CLASS2(wxGISToolBar, wxGISCommandBar, wxAuiToolBar)
 
 BEGIN_EVENT_TABLE(wxGISToolBar, wxAuiToolBar)
     EVT_MOTION(wxGISToolBar::OnMotion)
@@ -309,7 +316,7 @@ END_EVENT_TABLE()
 
 wxGISToolBar::wxGISToolBar(wxWindow* parent, wxWindowID id, const wxPoint& position, const wxSize& size, long style, const wxString& sName, const wxString& sCaption, wxGISEnumCommandBars type ) : wxAuiToolBar(parent, id, position, size, style), wxGISCommandBar(sName, sCaption, type), m_pStatusBar(NULL)
 {
-	IFrameApplication* pApp = dynamic_cast<IFrameApplication*>(parent);
+	wxGISApplicationBase* pApp = dynamic_cast<wxGISApplicationBase*>(parent);
 	if(pApp)
 	{
 		m_pStatusBar = pApp->GetStatusBar();
@@ -322,8 +329,7 @@ wxGISToolBar::~wxGISToolBar(void)
 
 void wxGISToolBar::OnMotion(wxMouseEvent& evt)
 {
-	if(!m_pStatusBar)
-		return;
+    wxCHECK_RET( m_pStatusBar, "Invalid wxGISStatusBar" );
     // figure out messages
     wxAuiToolBarItem* packing_hit_item = FindToolByPositionWithPacking(evt.GetX(), evt.GetY());
     if (packing_hit_item)
@@ -361,7 +367,7 @@ bool wxGISToolBar::GetRightDockable(void)
 	return m_bRDock;
 }
 
-void wxGISToolBar::AddCommand(ICommand* pCmd)
+void wxGISToolBar::AddCommand(wxGISCommand* pCmd)
 {
 	switch(pCmd->GetKind())
 	{
@@ -419,7 +425,7 @@ void wxGISToolBar::AddCommand(ICommand* pCmd)
 	Realize();
 }
 
-void wxGISToolBar::ReAddCommand(ICommand* pCmd)
+void wxGISToolBar::ReAddCommand(wxGISCommand* pCmd)
 {
 	switch(pCmd->GetKind())
 	{
@@ -551,7 +557,7 @@ void wxGISToolBar::MoveCommandRight(size_t nIndex)
 	wxAuiToolBar::Realize();
 }
 
-void wxGISToolBar::Serialize(IFrameApplication* pApp, wxXmlNode* pNode, bool bStore)
+void wxGISToolBar::Serialize(wxGISApplicationBase* pApp, wxXmlNode* pNode, bool bStore)
 {
 	if(bStore)
 	{
@@ -569,7 +575,7 @@ void wxGISToolBar::Serialize(IFrameApplication* pApp, wxXmlNode* pNode, bool bSt
 
 		wxAuiToolBarItemArray prepend_items;
 		wxAuiToolBarItemArray append_items;
-		ICommand* pCmd = pApp->GetCommand(wxT("wxGISCommonCmd"), 2);
+		wxGISCommand* pCmd = pApp->GetCommand(wxT("wxGISCommonCmd"), 2);
 		if(pCmd)
 		{
 			wxAuiToolBarItem item;
@@ -591,7 +597,7 @@ void wxGISToolBar::AddMenu(wxMenu* pMenu, wxString sName)
 	//m_SubmenuArray.push_back(AppendSubMenu(pMenu, sName);
 }
 
-void wxGISToolBar::Activate(IFrameApplication* pApp)
+void wxGISToolBar::Activate(wxGISApplicationBase* pApp)
 {
 	for(std::map<size_t, IToolBarControl*>::const_iterator IT = m_RemControlMap.begin(); IT != m_RemControlMap.end(); ++IT)
 	{

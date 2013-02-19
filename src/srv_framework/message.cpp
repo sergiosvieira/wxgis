@@ -18,7 +18,7 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-
+/*
 #include "wxgissrv/srv_framework/message.h"
 #include <wx/stream.h>
 #include <wx/sstream.h>
@@ -156,3 +156,4 @@ wxString wxNetMessage::GetData(void)
     return wxEmptyString;
 }
 
+*/

@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  wxGISApplicationEx class. Add AUI managed frames & etc.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 #pragma once
 
 #include "wxgis/framework/application.h"
-#include "wxgis/version.h"
 
 #include "wx/aui/aui.h"
 #include "wx/artprov.h"
@@ -29,39 +28,33 @@
 /** \class wxGISApplicationEx applicationex.h
  *   \brief An application framework class with aui mngr.
  */
-class WXDLLIMPEXP_GIS_FRW wxGISApplicationEx :
-	public wxGISApplication
+class WXDLLIMPEXP_GIS_FRW wxGISApplicationEx :	public wxGISApplication
 {
     DECLARE_CLASS(wxGISApplicationEx)
 public:	
 	wxGISApplicationEx(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE | wxSUNKEN_BORDER);
 	virtual ~wxGISApplicationEx(void);
-	virtual wxAuiManager* GetAuiManager(void){return &m_mgr;};
+	virtual wxAuiManager* GetAuiManager(void) const{return (wxAuiManager*)&m_mgr;};
 	virtual void ShowPane(wxWindow* pWnd, bool bShow = true);
 	virtual void ShowPane(const wxString& sName, bool bShow = true);
 	virtual bool IsPaneShown(const wxString& sName);
 	//wxGISApplication
-	virtual void RemoveCommandBar(IGISCommandBar* pBar);
-	virtual bool AddCommandBar(IGISCommandBar* pBar);
+	virtual void RemoveCommandBar(wxGISCommandBar* pBar);
+	virtual bool AddCommandBar(wxGISCommandBar* pBar);
     //events 
     virtual void OnClose(wxCloseEvent& event);
-	//IFrameApplication
+	//wxGISApplication
 	virtual void Customize(void);
 	virtual void ShowStatusBar(bool bShow);
 	virtual void ShowApplicationWindow(wxWindow* pWnd, bool bShow = true);
 	virtual bool IsApplicationWindowShown(wxWindow* pWnd);
-	virtual const WINDOWARRAY* const GetChildWindows(void);
-	virtual void RegisterChildWindow(wxWindow* pWnd);
-	virtual void UnRegisterChildWindow(wxWindow* pWnd);
-    virtual wxString GetAppName(void) = 0;
-    virtual wxString GetAppVersionString(void){return wxString(wxGIS_VERSION_NUM_DOT_STRING_T);};
-    virtual bool Create(void);
+    virtual wxString GetAppVersionString(void) const;
+    virtual bool CreateApp(void);
     virtual bool SetupSys(const wxString &sSysPath);
     virtual void SetDebugMode(bool bDebugMode);
-    virtual bool SetupLog(const wxString &sLogPath);
+    virtual bool SetupLog(const wxString &sLogPath, const wxString &sNamePrefix = wxEmptyString);
 protected:
 	virtual void SerializeFramePosEx(bool bSave = false);
 protected:
 	wxAuiManager m_mgr;
-	WINDOWARRAY m_WindowArray;
 };

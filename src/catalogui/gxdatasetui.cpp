@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDatasetUI classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,10 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxdatasetui.h"
+
 #include "wxgis/framework/application.h"
+#include "wxgis/datasource/featuredataset.h"
+#include "wxgis/datasource/rasterdataset.h"
 
 //propertypages
 #include "wxgis/catalogui/spatrefpropertypage.h"
@@ -38,7 +41,9 @@
 //class wxGxTableDatasetUI
 //--------------------------------------------------------------
 
-wxGxTableDatasetUI::wxGxTableDatasetUI(CPLString Path, wxString Name, wxGISEnumTableDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxTableDataset(Path, Name, nType)
+IMPLEMENT_CLASS(wxGxTableDatasetUI, wxGxTableDataset)
+
+wxGxTableDatasetUI::wxGxTableDatasetUI(wxGISEnumTableDatasetType nType, wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon &LargeIcon, const wxIcon &SmallIcon) : wxGxTableDataset(nType, oParent, soName, soPath)
 {
     m_LargeIcon = LargeIcon;
     m_SmallIcon = SmallIcon;
@@ -77,11 +82,31 @@ void wxGxTableDatasetUI::EditProperties(wxWindow *parent)
     PropertySheetDialog.ShowModal();
 }
 
+wxGISDataset* const wxGxTableDatasetUI::GetDataset(bool bCached, ITrackCancel* const pTrackCancel)
+{
+    wxGISDataset* const pOut = wxGxTableDataset::GetDataset(bCached, pTrackCancel);
+    if(!pOut)
+    {
+        const char* err = CPLGetLastErrorMsg();
+		wxString sErr = wxString::Format(_("Operation '%s' failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
+        wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
+    }
+    return pOut;
+}
+
+bool wxGxTableDatasetUI::Invoke(wxWindow* pParentWnd)
+{
+    EditProperties(pParentWnd);
+    return true;
+}
+
 //--------------------------------------------------------------
 //class wxGxFeatureDatasetUI
 //--------------------------------------------------------------
 
-wxGxFeatureDatasetUI::wxGxFeatureDatasetUI(CPLString Path, wxString Name, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxFeatureDataset(Path, Name, nType)
+IMPLEMENT_CLASS(wxGxFeatureDatasetUI, wxGxFeatureDataset)
+
+wxGxFeatureDatasetUI::wxGxFeatureDatasetUI(wxGISEnumVectorDatasetType nType, wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon & LargeIcon, const wxIcon & SmallIcon) : wxGxFeatureDataset(nType, oParent, soName, soPath)
 {
     m_LargeIcon = LargeIcon;
     m_SmallIcon = SmallIcon;
@@ -113,9 +138,11 @@ void wxGxFeatureDatasetUI::EditProperties(wxWindow *parent)
     wxGISVectorPropertyPage* VectorPropertyPage = new wxGISVectorPropertyPage(this, pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(VectorPropertyPage, VectorPropertyPage->GetPageName());
 
-	wxGISDatasetSPtr pDset = GetDataset();
+	wxGISFeatureDataset* pDset = wxDynamicCast(GetDataset(), wxGISFeatureDataset);
 	if(pDset)
 	{
+        if(pDset->IsOpened())
+            pDset->Open();
 		wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(pDset->GetSpatialReference(), pParentWnd);
 		PropertySheetDialog.GetBookCtrl()->AddPage(SpatialReferencePropertyPage, SpatialReferencePropertyPage->GetPageName());
 	}
@@ -127,9 +154,9 @@ void wxGxFeatureDatasetUI::EditProperties(wxWindow *parent)
     PropertySheetDialog.ShowModal();
 }
 
-wxGISDatasetSPtr wxGxFeatureDatasetUI::GetDataset(bool bCache, ITrackCancel* pTrackCancel)
+wxGISDataset* const wxGxFeatureDatasetUI::GetDataset(bool bCached, ITrackCancel* const pTrackCancel)
 {
-    wxGISDatasetSPtr pOut = wxGxFeatureDataset::GetDataset(bCache, pTrackCancel);
+    wxGISDataset* const pOut = wxGxFeatureDataset::GetDataset(bCached, pTrackCancel);
     if(!pOut)
     {
         const char* err = CPLGetLastErrorMsg();
@@ -149,7 +176,9 @@ bool wxGxFeatureDatasetUI::Invoke(wxWindow* pParentWnd)
 //class wxGxRasterDatasetUI
 //--------------------------------------------------------------
 
-wxGxRasterDatasetUI::wxGxRasterDatasetUI(CPLString Path, wxString Name, wxGISEnumRasterDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxRasterDataset(Path, Name, nType)
+IMPLEMENT_CLASS(wxGxRasterDatasetUI, wxGxRasterDataset)
+
+wxGxRasterDatasetUI::wxGxRasterDatasetUI(wxGISEnumRasterDatasetType nType, wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon & LargeIcon, const wxIcon & SmallIcon) : wxGxRasterDataset(nType, oParent, soName, soPath)
 {
     m_LargeIcon = LargeIcon;
     m_SmallIcon = SmallIcon;
@@ -178,14 +207,18 @@ void wxGxRasterDatasetUI::EditProperties(wxWindow *parent)
     PropertySheetDialog.CreateButtons(wxOK);
     wxWindow* pParentWnd = static_cast<wxWindow*>(PropertySheetDialog.GetBookCtrl());
 
-    wxGISRasterPropertyPage* RasterPropertyPage = new wxGISRasterPropertyPage(this, m_pCatalog, pParentWnd);
+    wxGISRasterPropertyPage* RasterPropertyPage = new wxGISRasterPropertyPage(this, pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(RasterPropertyPage, RasterPropertyPage->GetPageName());
-	wxGISDatasetSPtr pDset = GetDataset();
+	wxGISRasterDataset* pDset = wxDynamicCast(GetDataset(), wxGISRasterDataset);
 	if(pDset)
 	{
+        if(!pDset->IsOpened())
+            pDset->Open(true);
 		wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(pDset->GetSpatialReference(), pParentWnd);
 		PropertySheetDialog.GetBookCtrl()->AddPage(SpatialReferencePropertyPage, SpatialReferencePropertyPage->GetPageName());
 	}
+
+    //TODO: Additional page for virtual raster VRTSourcedDataset with sources files
 
     //PropertySheetDialog.LayoutDialog();
     PropertySheetDialog.SetSize(480,640);
@@ -200,10 +233,9 @@ bool wxGxRasterDatasetUI::Invoke(wxWindow* pParentWnd)
     return true;
 }
 
-
-wxGISDatasetSPtr wxGxRasterDatasetUI::GetDataset(bool bCached, ITrackCancel* pTrackCancel)
+wxGISDataset* const wxGxRasterDatasetUI::GetDataset(bool bCached, ITrackCancel* const pTrackCancel)
 {
-    wxGISDatasetSPtr pOut = wxGxRasterDataset::GetDataset(bCached, pTrackCancel);
+    wxGISDataset* const pOut = wxGxRasterDataset::GetDataset(bCached, pTrackCancel);
     if(!pOut)
     {
         const char* err = CPLGetLastErrorMsg();
@@ -212,3 +244,4 @@ wxGISDatasetSPtr wxGxRasterDatasetUI::GetDataset(bool bCached, ITrackCancel* pTr
     }
     return pOut;
 }
+

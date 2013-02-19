@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxRasterFactory class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010,2013  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,8 +20,37 @@
  ****************************************************************************/
 #include "wxgis/catalog/gxrasterfactory.h"
 #include "wxgis/catalog/gxdataset.h"
+#include "wxgis/datasource/sysop.h"
 
-IMPLEMENT_DYNAMIC_CLASS(wxGxRasterFactory, wxObject)
+//------------------------------------------------------------------------------
+// wxGxRasterFactory
+//------------------------------------------------------------------------------
+static const char *raster_add_exts[] = {
+    "aux", "rrd", "ovr", "w", "wld", "bpw", "bmpw", "gifw", "jpgw", "jpegw", "pngw", "pngw", "mgrd", "sgrd", "vrtw", "vtw", "tilw", "tlw", "sdatw", "stw", NULL
+};
+
+typedef struct _rformat
+{
+    const char* sExt;
+    wxGISEnumRasterDatasetType eType;
+    const char* sDriverName;
+} RFORMAT;
+
+static const RFORMAT raster_exts[] = {
+    { "bmp",    enumRasterBmp,  "BMP"   },
+    { "jpg",    enumRasterJpeg, "JPEG"  },
+    { "jpeg",   enumRasterJpeg, "JPEG"  },
+    { "img",    enumRasterImg,  "HFA"   },
+    { "gif",    enumRasterGif,  "GIF"   },
+    { "sdat",   enumRasterSAGA, "SAGA"  },
+    { "tif",    enumRasterTiff, "GTiff" },
+    { "tiff",   enumRasterTiff, "GTiff" },
+    { "png",    enumRasterPng,  "PNG"   },
+    { "til",    enumRasterTil,  "TIL"   },
+    { "vrt",    enumRasterVRT,  "VRT"   }
+};
+
+IMPLEMENT_DYNAMIC_CLASS(wxGxRasterFactory, wxGxObjectFactory)
 
 wxGxRasterFactory::wxGxRasterFactory(void)
 {
@@ -31,171 +60,68 @@ wxGxRasterFactory::~wxGxRasterFactory(void)
 {
 }
 
-bool wxGxRasterFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray)
+bool wxGxRasterFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds)
 {
     for(int i = CSLCount(pFileNames) - 1; i >= 0; i-- )
     {
-        IGxObject* pGxObj = NULL;
+        wxGxObject* pGxObj = NULL;
         CPLString szExt = CPLGetExtension(pFileNames[i]);
         CPLString szPath;
+        bool bContinue(false);
+
+        unsigned int j;
+        for(j = 0; j < sizeof(raster_exts) / sizeof(raster_exts[0]); ++j)
+        {
+            if(wxGISEQUAL(szExt, raster_exts[j].sExt) && GDALGetDriverByName(raster_exts[j].sDriverName))
+		    {
+                pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], raster_exts[j].eType);
+                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+                if(pGxObj != NULL)
+                    pChildrenIds.Add(pGxObj->GetId());
+                bContinue = true;
+                break;
+		    }
+        }
+
+        if(bContinue)
+            continue;
 
 
-		if(EQUAL(szExt, "bmp"))
-		{
-			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterBmp);
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-		}
-		else if(EQUAL(szExt, "jpg") || EQUAL(szExt, "jpeg"))
-		{
-			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterJpeg);
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-		}
-		else if(EQUAL(szExt, "img"))
-		{
-			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterImg);
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-		}
-		else if(EQUAL(szExt, "gif"))
-		{
-			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterGif);
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-		}
-		else if(EQUAL(szExt, "sdat"))
-		{
-			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterSAGA);
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-		}
-		else if(EQUAL(szExt, "tif") || EQUAL(szExt, "tiff"))
-		{
-			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterTiff);
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-		}
-		else if(EQUAL(szExt, "png"))
-		{
-			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterPng);
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-		}
-		else if(EQUAL(szExt, "til"))
-		{
-			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumRasterTil);
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-		}
-
-        else if(EQUAL(szExt, "prj"))
+        if(wxGISEQUAL(szExt, "prj"))
         {
 			if(pFileNames)
 			{
-                const char *apszExts[9] = {"bmp", "jpg", "jpeg", "img", "gif", "tif", "tiff", "png", NULL};
-                int j(0);
-                while(apszExts[j] != NULL)
+                unsigned int j;
+                for(j = 0; j < sizeof(raster_exts) / sizeof(raster_exts[0]); ++j)
                 {
-    				szPath = (char*)CPLResetExtension(pFileNames[i], apszExts[j]);
+    				szPath = (char*)CPLResetExtension(pFileNames[i], raster_exts[j].sExt);
 	    			if(CPLCheckForFile((char*)szPath.c_str(), NULL))
                     {
 		    			pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+                        bContinue = true;
                         break;
                     }
-                    j++;
                 }
-            }        
-   //             else
-   //             {
-   // 				szPath = (char*)CPLResetExtension(pFileNames[i], "jpg");
-	  //  			if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-		 //   			pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-   //                 else
-   //                 {
-   //         			szPath = (char*)CPLResetExtension(pFileNames[i], "jpeg");
-			//        	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-			//		        pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-   //                 }
-			//}
-			//if(pFileNames)
-			//{
-			//	szPath = (char*)CPLResetExtension(pFileNames[i], "img");
-			//	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-			//		pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-			//}
-			//if(pFileNames)
-			//{
-			//	szPath = (char*)CPLResetExtension(pFileNames[i], "gif");
-			//	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-			//		pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-			//}
-			//if(pFileNames)
-			//{
-			//	szPath = (char*)CPLResetExtension(pFileNames[i], "tif");
-			//	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-			//		pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-			//}
-			//if(pFileNames)
-			//{
-			//	szPath = (char*)CPLResetExtension(pFileNames[i], "tiff");
-			//	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-			//		pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-			//}
-			//if(pFileNames)
-			//{
-			//	szPath = (char*)CPLResetExtension(pFileNames[i], "png");
-			//	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-			//		pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-			//}
+            }
         }
-        else if(EQUAL(szExt, "aux"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "rrd"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "ovr"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "w"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "wld"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "bpw"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "bmpw"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "gifw"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "jpgw"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "jpegw"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "pngw"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "pngw"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "mgrd"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(EQUAL(szExt, "sgrd"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 
-		if(pGxObj != NULL)
-			ObjArray.push_back(pGxObj);
+        if(bContinue)
+            continue;
+        
+        for( j = 0; raster_add_exts[j] != NULL; ++j )
+        {
+            if(wxGISEQUAL(szExt, raster_add_exts[j]))
+            {
+                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+                break;
+            }
+        }
     }
 	return true;
 }
 
-void wxGxRasterFactory::Serialize(wxXmlNode* pConfig, bool bStore)
+wxGxObject* wxGxRasterFactory::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumRasterDatasetType type)
 {
-    if(bStore)
-    {
-        if(pConfig->HasAttribute(wxT("factory_name")))
-            pConfig->DeleteAttribute(wxT("factory_name"));
-        pConfig->AddAttribute(wxT("factory_name"), GetClassName());  
-        if(pConfig->HasAttribute(wxT("is_enabled")))
-            pConfig->DeleteAttribute(wxT("is_enabled"));
-        pConfig->AddAttribute(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
-    }
-    else
-    {
-        m_bIsEnabled = wxAtoi(pConfig->GetAttribute(wxT("is_enabled"), wxT("1"))) != 0;
-    }
+    wxGxRasterDataset* pDataset = new wxGxRasterDataset(type, pParent, soName, szPath);
+    return wxStaticCast(pDataset, wxGxObject);
 }
-
-IGxObject* wxGxRasterFactory::GetGxDataset(CPLString path, wxString name, wxGISEnumRasterDatasetType type)
-{
-    wxGxRasterDataset* pDataset = new wxGxRasterDataset(path, name, type);
-    return static_cast<IGxObject*>(pDataset);
-}
-

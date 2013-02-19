@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  Initializer class for logs, locale, libs and etc.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -20,12 +20,13 @@
  ****************************************************************************/
 
 #include "wxgis/core/init.h"
+
 #include "wxgis/core/config.h"
 #include "wxgis/version.h"
 
-////////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
 // wxGISAppWithLibs
-////////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
 
 wxGISAppWithLibs::wxGISAppWithLibs(void)
 {
@@ -36,13 +37,13 @@ wxGISAppWithLibs::~wxGISAppWithLibs(void)
 }
 
 
-void wxGISAppWithLibs::LoadLibs(wxXmlNode* pRootNode)
+void wxGISAppWithLibs::LoadLibs(const wxXmlNode* pRootNode)
 {
 	wxXmlNode *child = pRootNode->GetChildren();
 	while(child)
 	{
 		wxString sPath = child->GetAttribute(wxT("path"), wxEmptyString);
-		if(sPath.Len() > 0)
+        if(!sPath.IsEmpty())
 		{
 			//check for doubles
 			if(m_LibMap[sPath] != NULL)
@@ -51,37 +52,45 @@ void wxGISAppWithLibs::LoadLibs(wxXmlNode* pRootNode)
 				continue;
 			}
 
-			wxDynamicLibrary* pLib = new wxDynamicLibrary(sPath);
-			if(pLib != NULL)
-			{
-				wxLogMessage(_("wxGISAppWithLibs: Library %s loaded"), sPath.c_str());
-				m_LibMap[sPath] = pLib;
-			}
-			else
-				wxLogError(_("wxGISAppWithLibs: Error loading library %s"), sPath.c_str());
+			LoadLib(sPath);
 		}
 		child = child->GetNext();
 	}
 }
 
+void wxGISAppWithLibs::LoadLib(const wxString &sPath, bool bStore)
+{
+	wxDynamicLibrary* pLib = new wxDynamicLibrary(sPath);
+	if(pLib != NULL && pLib->IsLoaded())
+	{
+		wxLogMessage(_("wxGISAppWithLibs: Library %s loaded"), sPath.c_str());
+        if(!bStore)
+            m_asNoStore.Add(sPath);
+		m_LibMap[sPath] = pLib;
+	}
+	else
+		wxLogError(_("wxGISAppWithLibs: Error loading library %s"), sPath.c_str());
+}
+
 void wxGISAppWithLibs::SerializeLibs()
 {
-	wxGISAppConfigSPtr pConfig;
-	pConfig = GetConfig();
-	if(!pConfig)
+	wxGISAppConfig oConfig = GetConfig();
+    if(!oConfig.IsOk())
 		return;
 	wxXmlNode* pLibsNode(NULL);
-	pLibsNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/libs")));
+	pLibsNode = oConfig.GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/libs")));
 	if(pLibsNode)
-		pConfig->DeleteNodeChildren(pLibsNode);
+		oConfig.DeleteNodeChildren(pLibsNode);
 	else
-		pLibsNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/libs")));
+		pLibsNode = oConfig.CreateConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/libs")));
 
 	if(!pLibsNode)
 		return;
 
     for(LIBMAP::iterator item = m_LibMap.begin(); item != m_LibMap.end(); ++item)
 	{
+        if(m_asNoStore.Index(item->first, false) != wxNOT_FOUND)
+            continue;
 		wxXmlNode* pNewNode = new wxXmlNode(pLibsNode, wxXML_ELEMENT_NODE, wxString(wxT("lib")));
 		pNewNode->AddAttribute(wxT("path"), item->first);
 
@@ -98,11 +107,12 @@ void wxGISAppWithLibs::UnLoadLibs()
     for(LIBMAP::iterator item = m_LibMap.begin(); item != m_LibMap.end(); ++item)
 		wxDELETE(item->second);
 }
-////////////////////////////////////////////////////////////////////////////////
-// wxGISInitializer
-////////////////////////////////////////////////////////////////////////////////
 
-wxGISInitializer::wxGISInitializer(void) : m_pLocale(NULL), m_pszOldLocale(NULL)
+//-----------------------------------------------------------------------------
+// wxGISInitializer
+//-----------------------------------------------------------------------------
+
+wxGISInitializer::wxGISInitializer(void) : m_pLocale(NULL), m_sDecimalPoint(wxT("."))
 {
 }
 
@@ -110,26 +120,26 @@ wxGISInitializer::~wxGISInitializer(void)
 {
 }
 
-bool wxGISInitializer::Initialize(const wxString &sAppName, const wxString &sLogFilePrefix, wxCmdLineParser& parser)
+bool wxGISInitializer::Initialize(const wxString &sAppName, const wxString &sLogFilePrefix)
 {
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	if(!pConfig)
+	wxGISAppConfig oConfig = GetConfig();
+    if(!oConfig.IsOk())
         return false;
 
-	wxString sLogDir = pConfig->GetLogDir();
+	wxString sLogDir = oConfig.GetLogDir();
 	if(!SetupLog(sLogDir, sLogFilePrefix))
         return false;
 	wxLogMessage(_("wxGISInitializer: %s %s is initializing..."), sAppName.c_str(), wxString(wxGIS_VERSION_NUM_DOT_STRING_T).c_str());
 
-	if(!SetupLoc(pConfig->GetLocale(), pConfig->GetLocaleDir()))
+	if(!SetupLoc(oConfig.GetLocale(), oConfig.GetLocaleDir()))
         return false;
 
 	//setup sys dir
-	wxString sSysDir = pConfig->GetSysDir();
+	wxString sSysDir = oConfig.GetSysDir();
 	if(!SetupSys(sSysDir))
         return false;
 
-	bool bDebugMode = pConfig->GetDebugMode();
+	bool bDebugMode = oConfig.GetDebugMode();
 	SetDebugMode(bDebugMode);
 
 	//store values
@@ -140,24 +150,22 @@ bool wxGISInitializer::Initialize(const wxString &sAppName, const wxString &sLog
 	//m_pConfig->SetDebugMode(bDebugMode);
 
     //load libs
-	wxXmlNode* pLibsNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/libs")));
+	wxXmlNode* pLibsNode = oConfig.GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/libs")));
 	if(pLibsNode)
 		LoadLibs(pLibsNode);
-	pLibsNode = pConfig->GetConfigNode(enumGISHKLM, wxString(wxT("wxGISCommon/libs")));
+	pLibsNode = oConfig.GetConfigNode(enumGISHKLM, wxString(wxT("wxGISCommon/libs")));
 	if(pLibsNode)
 		LoadLibs(pLibsNode);
+
+    if(!GetApplication())
+        SetApplication(this);
+
 	return true;
 }
 
 void wxGISInitializer::Uninitialize()
 {
-    if(m_pszOldLocale != NULL)
-		setlocale(LC_NUMERIC, m_pszOldLocale);
     wxDELETE(m_pLocale);
-	wxDELETE(m_pszOldLocale);
-
-	ReleaseConfig();
-
 	UnLoadLibs();
 }
 
@@ -191,7 +199,7 @@ bool wxGISInitializer::SetupLog(const wxString &sLogPath, const wxString &sNameP
 	if(!m_LogFile.Open(logfilename.GetData(), wxT("a+")))
 		wxLogError(_("wxGISInitializer: Failed to open log file %s"), logfilename.c_str());
 
-	wxLog::SetActiveTarget(new wxLogStderr(m_LogFile.fp()));
+	delete wxLog::SetActiveTarget(new wxLogStderr(m_LogFile.fp()));
 
 #ifdef WXGISPORTABLE
 	wxLogMessage(wxT("Portable"));
@@ -200,8 +208,11 @@ bool wxGISInitializer::SetupLog(const wxString &sLogPath, const wxString &sNameP
 	wxLogMessage(wxT("####################################################################"));
 	wxLogMessage(wxT("##                    %s                    ##"),wxNow().c_str());
 	wxLogMessage(wxT("####################################################################"));
-	long dFreeMem =  wxMemorySize(wxGetFreeMemory() / 1048576).ToLong();
-	wxLogMessage(_("HOST '%s': OS desc - %s, free memory - %u Mb"), wxGetFullHostName().c_str(), wxGetOsDescription().c_str(), dFreeMem);
+    const wxLongLong nSize = wxGetFreeMemory();
+    wxULongLong nuSize;
+    nuSize.operator=(nSize);
+    const wxString sSize = wxFileName::GetHumanReadableSize(nuSize);
+	wxLogMessage(_("HOST '%s': OS desc - %s, free memory - %s"), wxGetFullHostName().c_str(), wxGetOsDescription().c_str(), sSize.c_str());
 	wxLogMessage(_("wxGISInitializer: Log file: %s"), logfilename.c_str());
 
     return true;
@@ -211,9 +222,6 @@ bool wxGISInitializer::SetupLoc(const wxString &sLoc, const wxString &sLocPath)
 {
     wxLogMessage(_("wxGISInitializer: Initialize locale"));
 
-    if(m_pszOldLocale != NULL)
-		setlocale(LC_NUMERIC, m_pszOldLocale);
-	wxDELETE(m_pszOldLocale);
     wxDELETE(m_pLocale);
 
 	//init locale
@@ -272,10 +280,7 @@ bool wxGISInitializer::SetupLoc(const wxString &sLoc, const wxString &sLocPath)
 	#endif
 	}
 
-	//support of dot in doubles and floats
-	m_pszOldLocale = strdup(setlocale(LC_NUMERIC, NULL));
-    if( setlocale(LC_NUMERIC,"C") == NULL )
-        m_pszOldLocale = NULL;
+    m_sDecimalPoint = wxLocale::GetInfo(wxLOCALE_DECIMAL_POINT, wxLOCALE_CAT_NUMBER);
 
     return true;
 }

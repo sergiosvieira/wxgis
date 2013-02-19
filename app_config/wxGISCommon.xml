@@ -12,7 +12,19 @@
   <GDAL cachemax="128"/>
   <debug mode="no"/>
   <libs>
-    <lib path="wxgisgeoprocessingui04d.dll" name="wxgisgeoprocessingui04d"/>    
-    <lib path="wxgisgeoprocessingui04.dll" name="wxgisgeoprocessingui04"/>
+    <lib path="wxgisgeoprocessing05d.dll" name="wxgisgeoprocessing"/>    
+    <lib path="wxgisgeoprocessing05.dll" name="wxgisgeoprocessing"/> 
+    <lib path="wxgisgeoprocessingui05d.dll" name="wxgisgeoprocessingui"/>    
+    <lib path="wxgisgeoprocessingui05.dll" name="wxgisgeoprocessingui"/>
+    <lib path="wxgisremoteserver05d.dll" name="wxgisremoteserverd"/>    
+    <lib path="wxgisremoteserver05.dll" name="wxgisremoteserver"/>
+    <lib path="wxgisremoteserverui05d.dll" name="wxgisremoteserveruid"/>    
+    <lib path="wxgisremoteserverui05.dll" name="wxgisremoteserverui"/>
+    <!--Debug purposes-->
+    <lib path="D:\work\projects\wxGISMon\lib\x32\wxgisbasemon05d.dll" name="wxgisbasemon"/>
+    <lib path="D:\work\projects\wxGISMon\lib\x32\wxgisremdb05d.dll" name="wxgisremdb"/>
+    <lib path="D:\work\projects\wxGISMon\lib\x32\wxgisremdbui05d.dll" name="wxgisremdbui"/>
+    <!--lib path="D:\work\projects\wxGISMon\lib\x32\wxgissrvremdb05d.dll" name="wxgissrvremdb"/-->    
   </libs>
+  <tasks exe_path="D:\work\projects\wxGIS\build4\Debug\wxgistaskmanager.exe"/>
 </wxGISCommon>

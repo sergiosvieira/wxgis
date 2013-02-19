@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxObjectDialog filters of GxObjects to show.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,13 +20,20 @@
  ****************************************************************************/
 
 #include "wxgis/catalog/gxfilters.h"
+#include "wxgis/catalog/gxdataset.h"
+#include "wxgis/catalog/gxfolder.h"
+/*
 #include "wxgis/catalog/gxfile.h"
 #include "wxgis/catalog/gxspatreffolder.h"
-#include "wxgis/datasource/datasource.h"
+*/
+
+//#include <wx/arrimpl.cpp> // This is a magic incantation which must be done!
+//WX_DEFINE_USER_EXPORTED_OBJARRAY(wxGxObjectFiltersArray);
 
 //------------------------------------------------------------
 // wxGxObjectFilter
 //------------------------------------------------------------
+IMPLEMENT_CLASS(wxGxObjectFilter, wxObject)
 
 wxGxObjectFilter::wxGxObjectFilter(void)
 {
@@ -36,24 +43,26 @@ wxGxObjectFilter::~wxGxObjectFilter(void)
 {
 }
 
-bool wxGxObjectFilter::CanChooseObject( IGxObject* pObject )
+bool wxGxObjectFilter::CanChooseObject( wxGxObject* const pObject )
 {
+    wxCHECK_MSG(pObject, false, wxT("Input pObject pointer is NULL"));
 	return true;
 }
 
-bool wxGxObjectFilter::CanDisplayObject( IGxObject* pObject )
+bool wxGxObjectFilter::CanDisplayObject( wxGxObject* const pObject )
 {
+    wxCHECK_MSG(pObject, false, wxT("Input pObject pointer is NULL"));
 	return true;
 }
 
-wxGISEnumSaveObjectResults wxGxObjectFilter::CanSaveObject( IGxObject* pLocation, wxString sName )
+wxGISEnumSaveObjectResults wxGxObjectFilter::CanSaveObject( wxGxObject* const pLocation, const wxString &sName )
 {
-	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pLocation);
+	wxGxObjectContainer* pContainer = wxDynamicCast(pLocation, wxGxObjectContainer);
 	if(!pContainer)
 		return enumGISSaveObjectDeny;
 	if(pContainer->CanCreate(GetType(), GetSubType()))
 	{
-		if(pContainer->SearchChild(pLocation->GetFullName() + wxFileName::GetPathSeparator() + sName) == NULL)
+        if(pContainer->FindGxObject(pLocation->GetFullName() + wxFileName::GetPathSeparator() + sName) == NULL)
 			return enumGISSaveObjectAccept;
 		else
 			return enumGISSaveObjectExists;
@@ -61,27 +70,27 @@ wxGISEnumSaveObjectResults wxGxObjectFilter::CanSaveObject( IGxObject* pLocation
 	return enumGISSaveObjectDeny;
 }
 
-wxString wxGxObjectFilter::GetName(void)
+wxString wxGxObjectFilter::GetName(void) const
 {
 	return wxString(_("Any items (*.*)"));
 }
 
-wxString wxGxObjectFilter::GetExt(void)
+wxString wxGxObjectFilter::GetExt(void) const
 {
 	return wxEmptyString;
 }
 
-wxString wxGxObjectFilter::GetDriver(void)
+wxString wxGxObjectFilter::GetDriver(void) const
 {
 	return wxEmptyString;
 }
 
-int wxGxObjectFilter::GetSubType(void)
+int wxGxObjectFilter::GetSubType(void) const
 {
     return 0;
 }
 
-wxGISEnumDatasetType wxGxObjectFilter::GetType(void)
+wxGISEnumDatasetType wxGxObjectFilter::GetType(void) const
 {
     return enumGISAny;
 }
@@ -89,6 +98,8 @@ wxGISEnumDatasetType wxGxObjectFilter::GetType(void)
 //------------------------------------------------------------
 // wxGxPrjFileFilter
 //------------------------------------------------------------
+/*
+IMPLEMENT_CLASS(wxGxPrjFileFilter, wxGxObjectFilter)
 
 wxGxPrjFileFilter::wxGxPrjFileFilter(void)
 {
@@ -98,7 +109,7 @@ wxGxPrjFileFilter::~wxGxPrjFileFilter(void)
 {
 }
 
-bool wxGxPrjFileFilter::CanChooseObject( IGxObject* pObject )
+bool wxGxPrjFileFilter::CanChooseObject( wxGxObject* const pObject )
 {
 	wxGxPrjFile* pGxPrjFile = dynamic_cast<wxGxPrjFile*>(pObject);
 	if(pGxPrjFile)
@@ -107,7 +118,7 @@ bool wxGxPrjFileFilter::CanChooseObject( IGxObject* pObject )
 		return false;
 }
 
-bool wxGxPrjFileFilter::CanDisplayObject( IGxObject* pObject )
+bool wxGxPrjFileFilter::CanDisplayObject( wxGxObject* const pObject )
 {
 	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
 	if(pContainer)
@@ -119,20 +130,22 @@ bool wxGxPrjFileFilter::CanDisplayObject( IGxObject* pObject )
 		return false;
 }
 
-wxString wxGxPrjFileFilter::GetName(void)
+wxString wxGxPrjFileFilter::GetName(void) const
 {
 	return wxString(_("Coordinate Systems (*.prj, *.spr)"));
 }
 
-wxString wxGxPrjFileFilter::GetExt(void)
+wxString wxGxPrjFileFilter::GetExt(void)) const
 {
 	return wxString(wxT("spr"));
 }
-
+*/
 
 //------------------------------------------------------------
 // wxGxDatasetFilter
 //------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxGxDatasetFilter, wxGxObjectFilter)
 
 wxGxDatasetFilter::wxGxDatasetFilter(wxGISEnumDatasetType nType, int nSubType)
 {
@@ -145,9 +158,10 @@ wxGxDatasetFilter::~wxGxDatasetFilter(void)
 {
 }
 
-bool wxGxDatasetFilter::CanChooseObject( IGxObject* pObject )
+bool wxGxDatasetFilter::CanChooseObject( wxGxObject* const pObject )
 {
-	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
+    wxCHECK_MSG(pObject, false, wxT("Input pObject pointer is NULL"));
+	wxGxDataset* pGxDataset = wxDynamicCast(pObject, wxGxDataset);
 	if(!pGxDataset)
 		return false;
     if(pGxDataset->GetType() != m_nType)
@@ -158,12 +172,12 @@ bool wxGxDatasetFilter::CanChooseObject( IGxObject* pObject )
     return true;
 }
 
-bool wxGxDatasetFilter::CanDisplayObject( IGxObject* pObject )
+bool wxGxDatasetFilter::CanDisplayObject( wxGxObject* const pObject )
 {
-	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
-	if(pContainer)
+    wxCHECK_MSG(pObject, false, wxT("Input pObject pointer is NULL"));
+	if(pObject->IsKindOf(wxCLASSINFO(wxGxObjectContainer)))
 		return true;
-	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
+	wxGxDataset* pGxDataset = wxDynamicCast(pObject, wxGxDataset);
 	if(!pGxDataset)
 		return false;
     if(pGxDataset->GetType() != m_nType)
@@ -174,7 +188,7 @@ bool wxGxDatasetFilter::CanDisplayObject( IGxObject* pObject )
     return true;
 }
 
-wxString wxGxDatasetFilter::GetName(void)
+wxString wxGxDatasetFilter::GetName(void) const
 {
     switch(m_nType)
     {
@@ -192,18 +206,21 @@ wxString wxGxDatasetFilter::GetName(void)
 // wxGxFeatureFileFilter
 //------------------------------------------------------------
 
-wxGxFeatureFileFilter::wxGxFeatureFileFilter(wxGISEnumVectorDatasetType nSubType)
+IMPLEMENT_CLASS(wxGxFeatureDatasetFilter, wxGxObjectFilter)
+
+wxGxFeatureDatasetFilter::wxGxFeatureDatasetFilter(wxGISEnumVectorDatasetType nSubType)
 {
     m_nSubType = nSubType;
 }
 
-wxGxFeatureFileFilter::~wxGxFeatureFileFilter(void)
+wxGxFeatureDatasetFilter::~wxGxFeatureDatasetFilter(void)
 {
 }
 
-bool wxGxFeatureFileFilter::CanChooseObject( IGxObject* pObject )
+bool wxGxFeatureDatasetFilter::CanChooseObject( wxGxObject* const pObject )
 {
-	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
+    wxCHECK_MSG(pObject, false, wxT("Input pObject pointer is NULL"));
+	wxGxDataset* pGxDataset = wxDynamicCast(pObject, wxGxDataset);
 	if(!pGxDataset)
 		return false;
     if(pGxDataset->GetType() != GetType())
@@ -215,12 +232,12 @@ bool wxGxFeatureFileFilter::CanChooseObject( IGxObject* pObject )
     return true;
 }
 
-bool wxGxFeatureFileFilter::CanDisplayObject( IGxObject* pObject )
+bool wxGxFeatureDatasetFilter::CanDisplayObject( wxGxObject* const pObject )
 {
-	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
-	if(pContainer)
+    wxCHECK_MSG(pObject, false, wxT("Input pObject pointer is NULL"));
+	if(pObject->IsKindOf(wxCLASSINFO(wxGxObjectContainer)))
 		return true;
-	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
+	wxGxDataset* pGxDataset = wxDynamicCast(pObject, wxGxDataset);
 	if(!pGxDataset)
 		return false;
     if(pGxDataset->GetType() != GetType())
@@ -232,7 +249,7 @@ bool wxGxFeatureFileFilter::CanDisplayObject( IGxObject* pObject )
     return true;
 }
 
-wxString wxGxFeatureFileFilter::GetName(void)
+wxString wxGxFeatureDatasetFilter::GetName(void) const
 {
     switch(m_nSubType)
     {
@@ -257,7 +274,7 @@ wxString wxGxFeatureFileFilter::GetName(void)
     }
 }
 
-wxString wxGxFeatureFileFilter::GetExt(void)
+wxString wxGxFeatureDatasetFilter::GetExt(void) const
 {
     switch(m_nSubType)
     {
@@ -282,7 +299,7 @@ wxString wxGxFeatureFileFilter::GetExt(void)
     }
 }
 
-wxString wxGxFeatureFileFilter::GetDriver(void)
+wxString wxGxFeatureDatasetFilter::GetDriver(void) const
 {
     switch(m_nSubType)
     {
@@ -305,7 +322,7 @@ wxString wxGxFeatureFileFilter::GetDriver(void)
     }
 }
 
-int wxGxFeatureFileFilter::GetSubType(void)
+int wxGxFeatureDatasetFilter::GetSubType(void) const
 {
     return m_nSubType;
 }
@@ -313,6 +330,8 @@ int wxGxFeatureFileFilter::GetSubType(void)
 //------------------------------------------------------------
 // wxGxFolderFilter
 //------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxGxFolderFilter, wxGxObjectFilter)
 
 wxGxFolderFilter::wxGxFolderFilter(void)
 {
@@ -322,10 +341,10 @@ wxGxFolderFilter::~wxGxFolderFilter(void)
 {
 }
 
-bool wxGxFolderFilter::CanChooseObject( IGxObject* pObject )
+bool wxGxFolderFilter::CanChooseObject( wxGxObject* const pObject )
 {
-	wxGxFolder* pGxFolder = dynamic_cast<wxGxFolder*>(pObject);
-	if(!pGxFolder)
+    wxCHECK_MSG(pObject, false, wxT("Input pObject pointer is NULL"));
+   if(!pObject->IsKindOf(wxCLASSINFO(wxGxFolder)))
 		return false;
     if(pObject->GetCategory() == wxString(_("Folder")))
         return true;
@@ -334,18 +353,16 @@ bool wxGxFolderFilter::CanChooseObject( IGxObject* pObject )
     return false;
 }
 
-bool wxGxFolderFilter::CanDisplayObject( IGxObject* pObject )
+bool wxGxFolderFilter::CanDisplayObject( wxGxObject* const pObject )
 {
+    wxCHECK_MSG(pObject, false, wxT("Input pObject pointer is NULL"));
 	//IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
 	//if(pContainer)
 	//	return true;
     if(pObject->GetCategory() == wxString(wxT("Root")))
         return true;
-    if(pObject->GetCategory() == wxString(_("Folder connections")))
-        return true;
-	//wxGxFolder* pGxFolder = dynamic_cast<wxGxFolder*>(pObject);
-	//if(!pGxFolder)
-	//	return false;
+    if(!pObject->IsKindOf(wxCLASSINFO(wxGxFolder)))
+		return false;
     if(pObject->GetCategory() == wxString(_("Folder")))
         return true;
     if(pObject->GetCategory() == wxString(_("Folder connection")))
@@ -353,7 +370,7 @@ bool wxGxFolderFilter::CanDisplayObject( IGxObject* pObject )
     return false;
 }
 
-wxString wxGxFolderFilter::GetName(void)
+wxString wxGxFolderFilter::GetName(void) const
 {
 	return wxString(_("Folder"));
 }
@@ -361,7 +378,7 @@ wxString wxGxFolderFilter::GetName(void)
 //------------------------------------------------------------
 // wxGxRasterFilter
 //------------------------------------------------------------
-
+/*
 wxGxRasterFilter::wxGxRasterFilter(wxGISEnumRasterDatasetType nSubType)
 {
     m_nSubType = nSubType;
@@ -499,7 +516,7 @@ bool wxGxTextFilter::CanChooseObject( IGxObject* pObject )
 	wxGxTextFile* poGxTextFile = dynamic_cast<wxGxTextFile*>(pObject);
 	if(!poGxTextFile)
 		return false;    
-    if(EQUAL(CPLGetExtension(poGxTextFile->GetInternalName()), m_soExtCmp.mb_str(wxConvUTF8)))
+    if(wxGISEQUAL(CPLGetExtension(poGxTextFile->GetInternalName()), m_soExtCmp.mb_str(wxConvUTF8)))
 		return true;
 	return false;
 }
@@ -512,7 +529,7 @@ bool wxGxTextFilter::CanDisplayObject( IGxObject* pObject )
 	wxGxTextFile* poGxTextFile = dynamic_cast<wxGxTextFile*>(pObject);
 	if(!poGxTextFile)
 		return false;
-    if(EQUAL(CPLGetExtension(poGxTextFile->GetInternalName()), m_soExtCmp.mb_str(wxConvUTF8)))
+    if(wxGISEQUAL(CPLGetExtension(poGxTextFile->GetInternalName()), m_soExtCmp.mb_str(wxConvUTF8)))
 		return true;
 	return false;
 }
@@ -526,23 +543,27 @@ wxString wxGxTextFilter::GetExt(void)
 {
 	return m_soExt;
 }
+*/
 
 //------------------------------------------------------------
-// wxGxTableFilter
+// wxGxTableDatasetFilter
 //------------------------------------------------------------
 
-wxGxTableFilter::wxGxTableFilter(wxGISEnumTableDatasetType nSubType)
+IMPLEMENT_CLASS(wxGxTableDatasetFilter, wxGxObjectFilter)
+
+wxGxTableDatasetFilter::wxGxTableDatasetFilter(wxGISEnumTableDatasetType nSubType)
 {
     m_nSubType = nSubType;
 }
 
-wxGxTableFilter::~wxGxTableFilter(void)
+wxGxTableDatasetFilter::~wxGxTableDatasetFilter(void)
 {
 }
 
-bool wxGxTableFilter::CanChooseObject( IGxObject* pObject )
+bool wxGxTableDatasetFilter::CanChooseObject( wxGxObject* const pObject )
 {
-	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
+    wxCHECK_MSG(pObject, false, wxT("Input pObject pointer is NULL"));
+	wxGxDataset* pGxDataset = wxDynamicCast(pObject, wxGxDataset);
 	if(!pGxDataset)
 		return false;
     if(pGxDataset->GetType() != GetType())
@@ -554,12 +575,13 @@ bool wxGxTableFilter::CanChooseObject( IGxObject* pObject )
     return true;
 }
 
-bool wxGxTableFilter::CanDisplayObject( IGxObject* pObject )
+bool wxGxTableDatasetFilter::CanDisplayObject( wxGxObject* const pObject )
 {
-	IGxObjectContainer* pContainer = dynamic_cast<IGxObjectContainer*>(pObject);
+    wxCHECK_MSG(pObject, false, wxT("Input pObject pointer is NULL"));
+	wxGxObjectContainer* pContainer = wxDynamicCast(pObject, wxGxObjectContainer);
 	if(pContainer)
 		return true;
-	IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pObject);
+	wxGxDataset* pGxDataset = wxDynamicCast(pObject, wxGxDataset);
 	if(!pGxDataset)
 		return false;
     if(pGxDataset->GetType() != GetType())
@@ -571,7 +593,7 @@ bool wxGxTableFilter::CanDisplayObject( IGxObject* pObject )
     return true;
 }
 
-wxString wxGxTableFilter::GetName(void)
+wxString wxGxTableDatasetFilter::GetName(void) const
 {
     switch(m_nSubType)
     {
@@ -590,7 +612,7 @@ wxString wxGxTableFilter::GetName(void)
     }
 }
 
-wxString wxGxTableFilter::GetExt(void)
+wxString wxGxTableDatasetFilter::GetExt(void) const
 {
     switch(m_nSubType)
     {
@@ -609,7 +631,7 @@ wxString wxGxTableFilter::GetExt(void)
     }
 }
 
-wxString wxGxTableFilter::GetDriver(void)
+wxString wxGxTableDatasetFilter::GetDriver(void) const
 {
     switch(m_nSubType)
     {
@@ -628,7 +650,7 @@ wxString wxGxTableFilter::GetDriver(void)
     }
 }
 
-int wxGxTableFilter::GetSubType(void)
+int wxGxTableDatasetFilter::GetSubType(void) const
 {
     return m_nSubType;
 }

@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
- * Purpose:  wxGISRasterRGBARenderer classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Purpose:  wxGISRasterRenderer classes.
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,18 +19,497 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/carto/rasterrenderer.h"
-#include "wxgis/carto/interpolation.h"
-#include "wxgis/datasource/rasterdataset.h"
 #include "wxgis/core/config.h"
-#include "wxgis/core/globalfn.h"
+#include "wxgis/core/app.h"
+#include "wxgis/display/displayop.h"
+
+/*
+#include "wxgis/datasource/rasterdataset.h"
+
+*/
+
+//-----------------------------------
+// Interpolation functions
+//-----------------------------------
+
+void NearestNeighbourInterpolation(void *pInputData, int nInputXSize, double dInputXSize, double dInputYSize, double dDeltaX, double dDeltaY , GDALDataType eSrcType, unsigned char *pOutputData, int nOutXSize, int nOutYSize, int nBegY, int nEndY, int nBandCount, wxGISRasterRenderer* const pRasterRenderer, ITrackCancel* const pTrackCancel)
+{
+	if(nEndY > nOutYSize || pRasterRenderer == NULL)
+		return;
+
+	double dXRatio = dInputXSize / nOutXSize;
+	double dYRatio = dInputYSize / nOutYSize;
+    double dfR, dfG, dfB, dfA;
+    int nIndex;
+    wxGISColorTable mColorTable = pRasterRenderer->GetColorTable();
+
+    for(int nDestPixY = nBegY; nDestPixY < nEndY; ++nDestPixY)
+    {
+        int nOrigPixY = (int)(dYRatio * double(nDestPixY) + dDeltaY);
+        int scan_line = nOrigPixY * nInputXSize;
+        for(int nDestPixX = 0; nDestPixX < nOutXSize; ++nDestPixX)
+        {
+            int nOrigPixX = (int)(dXRatio * double(nDestPixX) + dDeltaX);
+            int src_pixel_index = scan_line + nOrigPixX;
+
+            src_pixel_index *= nBandCount;
+
+            switch(pRasterRenderer->GetRasterRenderType())
+            {
+            case enumGISRasterRenderTypeIndexed:
+                {
+                    nIndex = (int)SRCVAL(pInputData, eSrcType, src_pixel_index);
+                    wxColor Color = mColorTable[nIndex];
+                    dfR = Color.Red();
+                    dfG = Color.Green();
+                    dfB = Color.Blue();
+                    dfA = Color.Alpha();
+                    pRasterRenderer->FillPixel(pOutputData, &dfR, &dfG, &dfB, &dfA);
+                }
+                break;
+            case enumGISRasterRenderTypeGreyScale:
+				{
+                    dfR = (double)SRCVAL(pInputData, eSrcType, src_pixel_index);
+					pRasterRenderer->FillPixel(pOutputData, &dfR, NULL, NULL, NULL);
+				}
+				break;
+            case enumGISRasterRenderTypeRGBA:
+			    switch(nBandCount)
+			    {
+			    case 1:
+				    {
+                        dfR = (double)SRCVAL(pInputData, eSrcType, src_pixel_index);
+					    pRasterRenderer->FillPixel(pOutputData, &dfR, NULL, NULL, NULL);
+				    }
+				    break;
+			    case 3:			
+				    {
+					    dfR = (double)SRCVAL(pInputData, eSrcType, src_pixel_index);
+					    dfG = (double)SRCVAL(pInputData, eSrcType, src_pixel_index + 1);
+					    dfB = (double)SRCVAL(pInputData, eSrcType, src_pixel_index + 2);
+					    pRasterRenderer->FillPixel(pOutputData, &dfR, &dfG, &dfB, NULL);
+				    }
+				    break;
+			    case 4:
+				    {
+					    dfR = (double)SRCVAL(pInputData, eSrcType, src_pixel_index);
+					    dfG = (double)SRCVAL(pInputData, eSrcType, src_pixel_index + 1);
+					    dfB = (double)SRCVAL(pInputData, eSrcType, src_pixel_index + 2);
+					    dfA = (double)SRCVAL(pInputData, eSrcType, src_pixel_index + 3);
+					    pRasterRenderer->FillPixel(pOutputData, &dfR, &dfG, &dfB, &dfA);
+				    }
+				    break;
+			    default:
+				    break;	
+			    }
+                break;
+            case enumGISRasterRenderTypePackedRGBA:
+                {
+                    wxColor Color(SRCVAL(pInputData, eSrcType, src_pixel_index));
+                    dfR = Color.Red();
+                    dfG = Color.Green();
+                    dfB = Color.Blue();
+                    dfA = Color.Alpha();
+                    pRasterRenderer->FillPixel(pOutputData, &dfR, &dfG, &dfB, &dfA);
+                }
+                break;
+            };
+
+            pOutputData += 4;//ARGB32
+
+            if(pTrackCancel && !pTrackCancel->Continue())
+                return;//TODO: return false to indicate not to draw anything on layer
+		}
+	}
+}
+
+
+void BilinearInterpolation(void *pInputData, int nInputXSize, int nInputYSize, double dInputXSize, double dInputYSize, double dDeltaX, double dDeltaY , GDALDataType eSrcType, unsigned char *pOutputData, int nOutXSize, int nOutYSize, int nBegY, int nEndY, int nBandCount, wxGISRasterRenderer* const pRasterRenderer, ITrackCancel* const pTrackCancel)
+{
+	if(nEndY > nOutYSize || pRasterRenderer == NULL)
+		return;
+
+	double dXRatio = dInputXSize / nOutXSize;
+	double dYRatio = dInputYSize / nOutYSize;
+
+	int srcpixymax = nInputYSize - 1;
+	int srcpixxmax = nInputXSize - 1;
+
+    double srcpixy, srcpixy2, dy, dy1;
+    double srcpixx, srcpixx2, dx, dx1;
+    int srcpixy1, srcpixx1;
+	double r1, g1, b1, a1;
+	double r2, g2, b2, a2;
+    int x_offset1, x_offset2, y_offset1, y_offset2;
+    int src_pixel_index00, src_pixel_index01, src_pixel_index10, src_pixel_index11;
+    double dfR, dfG, dfB, dfA;
+    long nIndex1, nIndex2, nIndex3, nIndex4;
+    wxGISColorTable mColorTable = pRasterRenderer->GetColorTable();
+
+     for(int nDestPixY = nBegY; nDestPixY < nEndY; ++nDestPixY)
+     {
+        srcpixy = dYRatio * double(nDestPixY) + dDeltaY;
+        srcpixy1 = (int)(srcpixy);
+        srcpixy2 = ( srcpixy1 == srcpixymax ) ? srcpixy1 : srcpixy1 + 1.0;
+        dy = srcpixy - srcpixy1;
+        dy1 = 1.0 - dy;
+
+        for(int nDestPixX = 0; nDestPixX < nOutXSize; ++nDestPixX)
+        {
+            // X-axis of pixel to interpolate from
+            srcpixx = dXRatio * double(nDestPixX) + dDeltaX;
+			srcpixx1 = (int)(srcpixx);
+			srcpixx2 = ( srcpixx1 == srcpixxmax ) ? srcpixx1 : srcpixx1 + 1.0;
+			dx = srcpixx - srcpixx1;
+			dx1 = 1.0 - dx;
+
+			x_offset1 = srcpixx1 < 0 ? 0 : srcpixx1 > srcpixxmax ? srcpixxmax : srcpixx1;
+			x_offset2 = srcpixx2 < 0 ? 0 : srcpixx2 > srcpixxmax ? srcpixxmax : srcpixx2;
+			y_offset1 = srcpixy1 < 0 ? 0 : srcpixy1 > srcpixymax ? srcpixymax : srcpixy1;
+			y_offset2 = srcpixy2 < 0 ? 0 : srcpixy2 > srcpixymax ? srcpixymax : srcpixy2;
+
+			src_pixel_index00 = (y_offset1 * nInputXSize + x_offset1) * nBandCount;
+			src_pixel_index01 = (y_offset1 * nInputXSize + x_offset2) * nBandCount;
+			src_pixel_index10 = (y_offset2 * nInputXSize + x_offset1) * nBandCount;
+			src_pixel_index11 = (y_offset2 * nInputXSize + x_offset2) * nBandCount;
+
+            switch(pRasterRenderer->GetRasterRenderType())
+            {
+            case enumGISRasterRenderTypeIndexed:
+                {
+                    nIndex1 = (int)SRCVAL(pInputData, eSrcType, src_pixel_index00);
+                    nIndex2 = (int)SRCVAL(pInputData, eSrcType, src_pixel_index01);
+                    if(nIndex1 == nIndex2)
+                    {
+                        wxColor Color00 = mColorTable[nIndex1];
+                        //first line
+                        r1 = Color00.Red() * dx1 + Color00.Red() * dx;
+                        g1 = Color00.Green() * dx1 + Color00.Green() * dx;
+                        b1 = Color00.Blue() * dx1 + Color00.Blue() * dx;
+                        a1 = Color00.Alpha() * dx1 + Color00.Alpha() * dx;
+                    }
+                    else
+                    {
+                        wxColor Color00 = mColorTable[nIndex1];
+                        wxColor Color01 = mColorTable[nIndex2];
+                        //first line
+                        r1 = Color00.Red() * dx1 + Color01.Red() * dx;
+                        g1 = Color00.Green() * dx1 + Color01.Green() * dx;
+                        b1 = Color00.Blue() * dx1 + Color01.Blue() * dx;
+                        a1 = Color00.Alpha() * dx1 + Color01.Alpha() * dx;
+                    }
+
+                    nIndex3 = (int)SRCVAL(pInputData, eSrcType, src_pixel_index10);
+                    nIndex4 = (int)SRCVAL(pInputData, eSrcType, src_pixel_index11);
+                    if(nIndex1 == nIndex3 && nIndex2 == nIndex4)
+                    {
+                        r2 = r1;
+                        g2 = g1;
+                        b2 = b1;
+                        a2 = a1;
+                    }
+                    else if(nIndex3 == nIndex4)
+                    {
+                        wxColor Color10 = mColorTable[nIndex3];
+			            //second line
+                        r2 = Color10.Red() * dx1 + Color10.Red() * dx;
+                        g2 = Color10.Green() * dx1 + Color10.Green() * dx;
+                        b2 = Color10.Blue() * dx1 + Color10.Blue() * dx;
+                        a2 = Color10.Alpha() * dx1 + Color10.Alpha() * dx;
+                    }
+                    else
+                    {
+                        wxColor Color10 = mColorTable[nIndex3];
+                        wxColor Color11 = mColorTable[nIndex4];
+			            //second line
+                        r2 = Color10.Red() * dx1 + Color11.Red() * dx;
+                        g2 = Color10.Green() * dx1 + Color11.Green() * dx;
+                        b2 = Color10.Blue() * dx1 + Color11.Blue() * dx;
+                        a2 = Color10.Alpha() * dx1 + Color11.Alpha() * dx;
+                    }
+
+                    if(IsDoubleEquil(r1, r2))
+                        dfR = r1;
+                    else
+                        dfR = r1 * dy1 + r2 * dy;
+                    if(IsDoubleEquil(g1, g2))
+                        dfG = g1;
+                    else
+                        dfG = g1 * dy1 + g2 * dy;
+                    if(IsDoubleEquil(b1, b2))
+                        dfB = b1;
+                    else
+                        dfB = b1 * dy1 + b2 * dy;
+                    if(IsDoubleEquil(a1, a2))
+                        dfA = a1;
+                    else
+                        dfA = a1 * dy1 + a2 * dy;
+
+                    pRasterRenderer->FillPixel(pOutputData, &dfR, &dfG, &dfB, &dfA);
+                }
+                break;
+            case enumGISRasterRenderTypeRGBA:
+			    switch(nBandCount)
+			    {
+			    case 1:
+				    {
+                        //first line
+                        r1 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index00) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index01) * dx;
+
+                        //second line
+                        r2 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index10) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index11) * dx;
+
+
+                        if(IsDoubleEquil(r1, r2))
+                            dfR = r1;
+                        else
+                            dfR = r1 * dy1 + r2 * dy;
+
+					    pRasterRenderer->FillPixel(pOutputData, &dfR, NULL, NULL, NULL);
+				    }
+				    break;
+			    case 3:			
+				    {
+                        //first line
+                        r1 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index00) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index01) * dx;
+                        g1 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index00 + 1) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index01 + 1) * dx;
+                        b1 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index00 + 2) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index01 + 2) * dx;
+
+                        //second line
+                        r2 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index10) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index11) * dx;
+                        g2 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index10 + 1) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index11 + 1) * dx;
+                        b2 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index10 + 2) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index11 + 2) * dx;
+
+ 
+                        if(IsDoubleEquil(r1, r2))
+                            dfR = r1;
+                        else
+                            dfR = r1 * dy1 + r2 * dy;
+                        if(IsDoubleEquil(g1, g2))
+                            dfG = g1;
+                        else
+                            dfG = g1 * dy1 + g2 * dy;
+                        if(IsDoubleEquil(b1, b2))
+                            dfB = b1;
+                        else
+                            dfB = b1 * dy1 + b2 * dy;
+					    pRasterRenderer->FillPixel(pOutputData, &dfR, &dfG, &dfB, NULL);
+				    }
+				    break;
+			    case 4:
+				    {
+                        //first line
+                        r1 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index00) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index01) * dx;
+                        g1 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index00 + 1) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index01 + 1) * dx;
+                        b1 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index00 + 2) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index01 + 2) * dx;
+                        a1 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index00 + 3) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index01 + 3) * dx;
+
+                        //second line
+                        r2 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index10) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index11) * dx;
+                        g2 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index10 + 1) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index11 + 1) * dx;
+                        b2 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index10 + 2) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index11 + 2) * dx;
+                        a2 = (double)SRCVAL(pInputData, eSrcType, src_pixel_index10 + 3) * dx1 + (double)SRCVAL(pInputData, eSrcType, src_pixel_index11 + 3) * dx;
+
+
+                        if(IsDoubleEquil(r1, r2))
+                            dfR = r1;
+                        else
+                            dfR = r1 * dy1 + r2 * dy;
+                        if(IsDoubleEquil(g1, g2))
+                            dfG = g1;
+                        else
+                            dfG = g1 * dy1 + g2 * dy;
+                        if(IsDoubleEquil(b1, b2))
+                            dfB = b1;
+                        else
+                            dfB = b1 * dy1 + b2 * dy;
+                        if(IsDoubleEquil(a1, a2))
+                            dfA = a1;
+                        else
+                            dfA = a1 * dy1 + a2 * dy;
+                    
+					    pRasterRenderer->FillPixel(pOutputData, &dfR, &dfG, &dfB, &dfA);
+				    }
+				    break;
+			    default:
+				    break;	
+			    }
+                break;
+             case enumGISRasterRenderTypePackedRGBA:
+                {
+                    wxColor Color00(SRCVAL(pInputData, eSrcType, src_pixel_index00));
+                    wxColor Color01(SRCVAL(pInputData, eSrcType, src_pixel_index01));
+                    wxColor Color10(SRCVAL(pInputData, eSrcType, src_pixel_index10));
+                    wxColor Color11(SRCVAL(pInputData, eSrcType, src_pixel_index11));
+
+                    //first line
+                    r1 = Color00.Red() * dx1 + Color01.Red() * dx;
+                    g1 = Color00.Green() * dx1 + Color01.Green() * dx;
+                    b1 = Color00.Blue() * dx1 + Color01.Blue() * dx;
+                    a1 = Color00.Alpha() * dx1 + Color01.Alpha() * dx;
+			        //second line
+                    r2 = Color10.Red() * dx1 + Color11.Red() * dx;
+                    g2 = Color10.Green() * dx1 + Color11.Green() * dx;
+                    b2 = Color10.Blue() * dx1 + Color11.Blue() * dx;
+                    a2 = Color10.Alpha() * dx1 + Color11.Alpha() * dx;
+
+                    dfR = r1 * dy1 + r2 * dy;
+                    dfG = g1 * dy1 + g2 * dy;
+                    dfB = b1 * dy1 + b2 * dy;
+                    dfA = a1 * dy1 + a2 * dy;
+
+                    pRasterRenderer->FillPixel(pOutputData, &dfR, &dfG, &dfB, &dfA);
+                }
+                break;
+           };
+
+            pOutputData += 4;//ARGB32
+
+            if(pTrackCancel && !pTrackCancel->Continue())
+                return;//TODO: return false to indicate not to draw anything on layer
+		}
+	}
+}
+
+void BicubicInterpolation(void *pInputData, int nInputXSize, int nInputYSize, double dInputXSize, double dInputYSize, double dDeltaX, double dDeltaY , GDALDataType eSrcType, unsigned char *pOutputData, int nOutXSize, int nOutYSize, int nBegY, int nEndY, int nBandCount, wxGISRasterRenderer* const pRasterRenderer, ITrackCancel* const pTrackCancel)
+{
+	if(nEndY > nOutYSize || pRasterRenderer == NULL)
+		return;
+
+	double dXRatio = dInputXSize / nOutXSize;
+	double dYRatio = dInputYSize / nOutYSize;
+
+	int srcpixymax = nInputYSize - 1;
+	int srcpixxmax = nInputXSize - 1;
+
+    double srcpixy, dy;
+    double srcpixx, dx;
+    wxGISColorTable mColorTable = pRasterRenderer->GetColorTable();
+
+    double sum_r = 0, sum_g = 0, sum_b = 0, sum_a = 0;
+
+     for(int nDestPixY = nBegY; nDestPixY < nEndY; ++nDestPixY)
+     {
+        srcpixy = dYRatio * double(nDestPixY) + dDeltaY;
+        dy = srcpixy - (int)srcpixy;
+
+        for(int nDestPixX = 0; nDestPixX < nOutXSize; ++nDestPixX)
+        {
+            // X-axis of pixel to interpolate from
+            srcpixx = dXRatio * double(nDestPixX) + dDeltaX;
+			dx = srcpixx - (int)srcpixx;
+
+            sum_r = sum_g = sum_b = sum_a = 0;
+
+            // Here we actually determine the RGBA values for the destination pixel
+            for ( int k = -1; k <= 2; k++ )
+            {
+                // Y offset
+                int y_offset = srcpixy + k < 0.0 ? 0 : srcpixy + k >= nInputYSize ? nInputYSize - 1 : (int)(srcpixy + k);
+
+                // Loop across the X axis
+                for ( int i = -1; i <= 2; ++i )
+                {
+                    // X offset
+                    int x_offset = srcpixx + i < 0.0 ? 0 : srcpixx + i >= nInputXSize ? nInputXSize - 1 : (int)(srcpixx + i);
+
+                    // Calculate the exact position where the source data
+                    // should be pulled from based on the x_offset and y_offset
+                    int src_pixel_index = (y_offset * nInputXSize + x_offset) * nBandCount;
+
+                    // Calculate the weight for the specified pixel according
+                    // to the bicubic b-spline kernel we're using for
+                    // interpolation
+                    double pixel_weight = BiCubicKernel(i - dx) * BiCubicKernel(k - dy);
+
+                    // Create a sum of all velues for each color channel
+                    // adjusted for the pixel's calculated weight
+
+                    switch(pRasterRenderer->GetRasterRenderType())
+                    {
+                    case enumGISRasterRenderTypeIndexed:
+                        {
+                            wxColor Color = mColorTable[SRCVAL(pInputData, eSrcType, src_pixel_index)];
+                            sum_r += Color.Red() * pixel_weight;
+                            sum_g += Color.Green() * pixel_weight;
+                            sum_b += Color.Blue() * pixel_weight;
+                            sum_a += Color.Alpha() * pixel_weight;
+                        }
+                        break;
+                    case enumGISRasterRenderTypeRGBA:
+			            switch(nBandCount)
+			            {
+			            case 1:
+                            sum_r += (double)SRCVAL(pInputData, eSrcType, src_pixel_index) * pixel_weight;
+				            break;
+			            case 3:			
+                            sum_r += (double)SRCVAL(pInputData, eSrcType, src_pixel_index) * pixel_weight;
+                            sum_g += (double)SRCVAL(pInputData, eSrcType, src_pixel_index + 1) * pixel_weight;
+                            sum_b += (double)SRCVAL(pInputData, eSrcType, src_pixel_index + 2) * pixel_weight;
+				            break;
+			            case 4:
+                            sum_r += (double)SRCVAL(pInputData, eSrcType, src_pixel_index) * pixel_weight;
+                            sum_g += (double)SRCVAL(pInputData, eSrcType, src_pixel_index + 1) * pixel_weight;
+                            sum_b += (double)SRCVAL(pInputData, eSrcType, src_pixel_index + 2) * pixel_weight;
+                            sum_a += (double)SRCVAL(pInputData, eSrcType, src_pixel_index + 3) * pixel_weight;
+				            break;
+			            default:
+				            break;	
+			            }
+                        break;
+                     case enumGISRasterRenderTypePackedRGBA:
+                        {
+                            wxColor Color(SRCVAL(pInputData, eSrcType, src_pixel_index));
+                            sum_r += Color.Red() * pixel_weight;
+                            sum_g += Color.Green() * pixel_weight;
+                            sum_b += Color.Blue() * pixel_weight;
+                            sum_a += Color.Alpha() * pixel_weight;
+                       }
+                        break;
+                    };
+                }
+            }
+
+            switch(pRasterRenderer->GetRasterRenderType())
+            {
+            case enumGISRasterRenderTypeIndexed:
+                pRasterRenderer->FillPixel(pOutputData, &sum_r, &sum_g, &sum_b, &sum_a);
+                break;
+            case enumGISRasterRenderTypeRGBA:
+			    switch(nBandCount)
+			    {
+			    case 1:
+                    pRasterRenderer->FillPixel(pOutputData, &sum_r, NULL, NULL, NULL);
+				    break;
+			    case 3:			
+                    pRasterRenderer->FillPixel(pOutputData, &sum_r, &sum_g, &sum_b, NULL);
+				    break;
+			    case 4:
+                    pRasterRenderer->FillPixel(pOutputData, &sum_r, &sum_g, &sum_b, &sum_a);
+				    break;
+			    default:
+				    break;	
+			    }
+                break;
+            case enumGISRasterRenderTypePackedRGBA:
+                pRasterRenderer->FillPixel(pOutputData, &sum_r, &sum_g, &sum_b, &sum_a);
+                break;
+            };
+
+            pOutputData += 4;//ARGB32
+
+            if(pTrackCancel && !pTrackCancel->Continue())
+                return;//TODO: return false to indicate not to draw anything on layer
+		}
+	}
+}
 
 //-----------------------------------
 // wxRasterDrawThread
 //-----------------------------------
 
-wxRasterDrawThread::wxRasterDrawThread(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, int nBandCount, unsigned char *pTransformData, wxGISEnumDrawQuality eQuality, int nOutXSize, int nOutYSize, int nBegY, int nEndY, IRasterRenderer *pRasterRenderer, ITrackCancel *pTrackCancel) : wxThread(wxTHREAD_JOINABLE), m_stPixelData(stPixelData)
+wxRasterDrawThread::wxRasterDrawThread(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, int nBandCount, unsigned char *pTransformData, wxGISEnumDrawQuality eQuality, int nOutXSize, int nOutYSize, int nBegY, int nEndY, wxGISRasterRenderer *pRasterRenderer, ITrackCancel * const pTrackCancel) : wxThread(wxTHREAD_JOINABLE), m_stPixelData(stPixelData), m_pTrackCancel(pTrackCancel)
 {
-    m_pTrackCancel = pTrackCancel;
 	m_eSrcType = eSrcType;
 	m_pTransformData = pTransformData;
 	m_nBandCount = nBandCount;
@@ -44,10 +523,6 @@ wxRasterDrawThread::wxRasterDrawThread(RAWPIXELDATA &stPixelData, GDALDataType e
 
 void *wxRasterDrawThread::Entry()
 {
-    //RSP_Majority	3	Resample pixel by majority value.
-	//double rWRatio, rHRatio;
-	//rWRatio = m_rOrigX / m_nDestX;
-	//rHRatio = m_rOrigY / m_nDestY;
 	switch(m_eQuality)
 	{
 	case enumGISQualityBilinear:
@@ -76,34 +551,196 @@ void wxRasterDrawThread::OnExit()
 }
 
 //-----------------------------------
-// wxGISRasterRGBARenderer
+// wxGISRasterRenderer
 //-----------------------------------
 
-wxGISRasterRenderer::wxGISRasterRenderer(void)
+IMPLEMENT_ABSTRACT_CLASS(wxGISRasterRenderer, wxGISRenderer)
+
+wxGISRasterRenderer::wxGISRasterRenderer(wxGISDataset* pwxGISDataset) : wxGISRenderer(pwxGISDataset)
 {
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	wxString sAppName = GetApplication()->GetAppName();
+    m_nTileSizeX = m_nTileSizeY = 256;
+	wxGISAppConfig oConfig = GetConfig();
 
-	m_eQuality = (wxGISEnumDrawQuality)pConfig->ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/quality")), enumGISQualityBilinear);	//wxString(wxT("wxGISCommon/coordinate_mask")));
+    if(oConfig.IsOk())
+    {
+    	wxString sAppName = GetApplication()->GetAppName();
 
+    	m_eQuality = (wxGISEnumDrawQuality)oConfig.ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/quality")), enumGISQualityBilinear);
+        m_nTileSizeX = oConfig.ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/tile_size_x")), m_nTileSizeX);
+        m_nTileSizeY = oConfig.ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/tile_size_y")), m_nTileSizeY);
+    }
+    else
+        m_eQuality = enumGISQualityBilinear;
 	m_oNoDataColor = wxColor(0,0,0,0);
+
+    m_pwxGISRasterDataset = wxDynamicCast(pwxGISDataset, wxGISRasterDataset);
 }
 
 wxGISRasterRenderer::~wxGISRasterRenderer(void)
 {
 }
 
-bool wxGISRasterRenderer::CanRender(wxGISDatasetSPtr pDataset)
+bool wxGISRasterRenderer::CanRender(wxGISDataset* pwxGISDataset) const
 {
-	return pDataset->GetType() == enumGISRasterDataset ? true : false;
+    wxCHECK_MSG(pwxGISDataset, false, wxT("Input dataset pointer is NULL"));
+	return pwxGISDataset->GetType() == enumGISRasterDataset ? true : false;
 }
 
-void wxGISRasterRenderer::PutRaster(wxGISRasterDatasetSPtr pRaster)
+bool wxGISRasterRenderer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay* const pDisplay, ITrackCancel* const pTrackCancel)
 {
-	m_pwxGISRasterDataset = pRaster;
-}	
+    wxCHECK_MSG(pDisplay, false, wxT("Display pointer is NULL"));
 
-void wxGISRasterRenderer::Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel)
+	OGREnvelope stRasterExtent = m_pwxGISRasterDataset->GetEnvelope();
+	OGREnvelope stDisplayExtentRotated = pDisplay->GetBounds(true);
+	OGREnvelope stRasterExtentRotated = stRasterExtent;
+
+	//rotate raster extent
+	if(!IsDoubleEquil(pDisplay->GetRotate(), 0.0))
+	{
+        wxRealPoint dfCenter = pDisplay->GetBoundsCenter();
+		//double dCenterX = stDisplayExtentRotated.MinX + (stDisplayExtentRotated.MaxX - stDisplayExtentRotated.MinX) / 2;
+		//double dCenterY = stDisplayExtentRotated.MinY + (stDisplayExtentRotated.MaxY - stDisplayExtentRotated.MinY) / 2;
+
+		RotateEnvelope(stRasterExtentRotated, pDisplay->GetRotate(), dfCenter.x, dfCenter.y);//dCenterX, dCenterY);
+	}
+
+	//if envelopes don't intersect exit
+    if(!stDisplayExtentRotated.Intersects(stRasterExtentRotated))
+        return false;
+
+	//get intersect envelope to fill raster data
+	OGREnvelope stDrawBounds = stDisplayExtentRotated;
+	stDrawBounds.Intersect(stDisplayExtentRotated);
+	if(!stDrawBounds.IsInit())
+		return false;
+
+	if(!stRasterExtent.Contains(stDrawBounds))
+		stDrawBounds = stRasterExtent;
+
+
+	GDALDataset* pRaster = m_pwxGISRasterDataset->GetRaster();
+	//create inverse geo transform to get pixel data
+	double adfGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
+	double adfReverseGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
+	CPLErr err = pRaster->GetGeoTransform(adfGeoTransform);
+	bool bNoTransform(false);
+	if(err != CE_None)
+	{
+		bNoTransform = true;
+	}
+	else
+	{
+		int nRes = GDALInvGeoTransform( adfGeoTransform, adfReverseGeoTransform );
+	}
+
+	//width & height of extent
+	double dOutWidth = stDrawBounds.MaxX - stDrawBounds.MinX;
+	double dOutHeight = stDrawBounds.MaxY - stDrawBounds.MinY;
+
+	//get width & height in pixels of draw area
+	pDisplay->World2DCDist(&dOutWidth, &dOutHeight, false);
+	if(dOutWidth < 0) dOutWidth *= -1;
+	if(dOutHeight < 0) dOutHeight *= -1;
+
+	//round float pixel to int using ceil
+	int nOutWidth = ceil(dOutWidth);
+	int nOutHeight = ceil(dOutHeight);
+
+	//raster size
+    int nXSize = m_pwxGISRasterDataset->GetWidth();
+    int nYSize = m_pwxGISRasterDataset->GetHeight();
+	    
+	//transform from world extent to pixel bounds
+	OGREnvelope stPixelBounds = stDrawBounds;
+    if(bNoTransform)
+    {
+		//swap min/max
+        stPixelBounds.MaxY = nYSize - stDrawBounds.MinY;
+        stPixelBounds.MinY = nYSize - stDrawBounds.MaxY;
+    }
+    else
+    {
+		GDALApplyGeoTransform( adfReverseGeoTransform, stDrawBounds.MinX, stDrawBounds.MinY, &stPixelBounds.MinX, &stPixelBounds.MaxY );
+		GDALApplyGeoTransform( adfReverseGeoTransform, stDrawBounds.MaxX, stDrawBounds.MaxY, &stPixelBounds.MaxX, &stPixelBounds.MinY );
+    }
+
+	//get width & height in pixels of raster area
+    double dWidth = stPixelBounds.MaxX - stPixelBounds.MinX;
+    double dHeight = stPixelBounds.MaxY - stPixelBounds.MinY;
+
+	int nWidth = ceil(dWidth);
+	int nHeight = ceil(dHeight);
+    int nMinX = floor(stPixelBounds.MinX);
+    int nMinY = floor(stPixelBounds.MinY);
+
+    //correct data
+    if(nWidth > nXSize) nWidth = nXSize;
+    if(nHeight > nYSize) nHeight = nYSize;
+    if(nMinX < 0) nMinX = 0;
+    if(nMinY < 0) nMinY = 0;
+        
+	GDALDataType eDT = m_pwxGISRasterDataset->GetDataType();
+	int nDataSize = GDALGetDataTypeSize(eDT) / 8;
+
+	void *data = NULL;
+	int nBandCount(0);
+	int *panBands = GetBandsCombination(&nBandCount); 
+
+	RAWPIXELDATA stPixelData;
+	stPixelData.pPixelData = NULL;
+	stPixelData.nOutputWidth = stPixelData.nOutputHeight = -1;
+	stPixelData.nPixelDataWidth = stPixelData.nPixelDataHeight = -1;
+	
+	if( nOutWidth > nWidth && nOutHeight > nHeight ) // not scale
+	{
+		//increase little in data
+		nWidth += 2; nHeight += 2;
+		if(nWidth > nXSize) nWidth = nXSize; 
+		if(nHeight > nYSize) nHeight = nYSize;
+
+		stPixelData.dPixelDeltaX = stPixelBounds.MinX - double(nMinX);// - 0.5;
+		stPixelData.dPixelDeltaY = stPixelBounds.MinY - double(nMinY);// - 0.5;
+		stPixelData.dPixelDataWidth = dWidth;
+		stPixelData.dPixelDataHeight = dHeight;
+		stPixelData.nPixelDataWidth = nWidth;
+		stPixelData.nPixelDataHeight = nHeight;
+		stPixelData.nOutputWidth = nOutWidth;
+		stPixelData.nOutputHeight = nOutHeight;
+
+		data = CPLMalloc (nWidth * nHeight * nDataSize * nBandCount);
+		if(!m_pwxGISRasterDataset->GetPixelData(data, nMinX, nMinY, nWidth, nHeight, nWidth, nHeight, eDT, nBandCount, panBands))
+        {
+            CPLFree (data);
+			return false;
+        }
+	}
+	else
+	{
+		stPixelData.dPixelDeltaX = stPixelData.dPixelDeltaY = 0;
+		stPixelData.dPixelDataWidth = nOutWidth;
+		stPixelData.dPixelDataHeight = nOutHeight;
+		stPixelData.nPixelDataWidth = nOutWidth;
+		stPixelData.nPixelDataHeight = nOutHeight;
+		stPixelData.nOutputWidth = -1;
+		stPixelData.nOutputHeight = -1;
+
+		data = CPLMalloc (nOutWidth * nOutHeight * nDataSize * nBandCount);
+		if(!m_pwxGISRasterDataset->GetPixelData(data, nMinX, nMinY, nWidth, nHeight, nOutWidth, nOutHeight, eDT, nBandCount, panBands))
+        {
+            CPLFree (data);
+			return false;
+        }
+	}
+
+	stPixelData.pPixelData = data;
+	stPixelData.stWorldBounds = stDrawBounds;
+
+    bool bRes = Draw(stPixelData, DrawPhase, pDisplay, pTrackCancel);
+    CPLFree (data);
+	return bRes;
+}
+
+bool wxGISRasterRenderer::Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay * const pDisplay, ITrackCancel * const pTrackCancel)
 {
 	int nOutXSize, nOutYSize;
 	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
@@ -119,32 +756,45 @@ void wxGISRasterRenderer::Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase Dra
 
 	int stride = cairo_format_stride_for_width (CAIRO_FORMAT_ARGB32, nOutXSize);
 	if(stride == -1)
-		return;//TODO: ERROR
+    {
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(_("cairo_format_stride_for_width failed"), wxNOT_FOUND, enumGISMessageErr);
+		return false;
+    }
 	unsigned char *pTransformPixelData = (unsigned char *)CPLMalloc (stride * nOutYSize);
 
 	if(!OnPixelProceed(stPixelData, m_pwxGISRasterDataset->GetDataType(), pTransformPixelData, pTrackCancel))
-		return;//TODO: ERROR
+		return false;
 	
 	cairo_surface_t *surface;
 	surface = cairo_image_surface_create_for_data (pTransformPixelData, CAIRO_FORMAT_ARGB32, nOutXSize, nOutYSize, stride);
-	//TODO: Put UpperLeft coord to DrawRaster not bounds???
-	//double dX = DrawBounds.MinX + (DrawBounds.MaxX - DrawBounds.MinX) / 2;
-	//double dY = DrawBounds.MinY + (DrawBounds.MaxY - DrawBounds.MinY) / 2;
+
+	//TODO: Draw 128 x 128 parts from threads not the whole raster
 	pDisplay->DrawRaster(surface, stPixelData.stWorldBounds);
 
 	cairo_surface_destroy(surface);
 
 	CPLFree((void*)pTransformPixelData);
+
+    return true;
 }
 
 //-----------------------------------
 // wxGISRasterRGBARenderer
 //-----------------------------------
 
-wxGISRasterRGBARenderer::wxGISRasterRGBARenderer(void) : wxGISRasterRenderer()
+IMPLEMENT_DYNAMIC_CLASS(wxGISRasterRGBARenderer, wxGISRasterRenderer)
+
+wxGISRasterRGBARenderer::wxGISRasterRGBARenderer(wxGISDataset* pwxGISDataset) : wxGISRasterRenderer(pwxGISDataset)
 {
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	wxString sAppName = GetApplication()->GetAppName();
+	wxGISAppConfig oConfig = GetConfig();
+    if(oConfig.IsOk())
+    {
+        wxString sAppName = GetApplication()->GetAppName();
+        m_bNodataNewBehaviour = oConfig.ReadBool(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/nodata_newbehaviour")), true);
+    }
+    else
+        m_bNodataNewBehaviour = true;
 
 	m_nRedBand = 1;
 	m_nGreenBand = 2;
@@ -156,9 +806,10 @@ wxGISRasterRGBARenderer::wxGISRasterRGBARenderer(void) : wxGISRasterRenderer()
 	m_paStretch[2] = new wxGISStretch();
 	m_paStretch[3] = new wxGISStretch();
 
-	m_bNodataNewBehaviour = pConfig->ReadBool(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/nodata_newbehaviour")), true);
 	//m_oBkColorSet = 
 	//m_oBkColorGet = wxNullColour;//TODO: May be array of  ColorGet/ColorSet
+
+    OnFillStats();
 }
 
 wxGISRasterRGBARenderer::~wxGISRasterRGBARenderer(void)
@@ -167,17 +818,23 @@ wxGISRasterRGBARenderer::~wxGISRasterRGBARenderer(void)
         wxDELETE(m_paStretch[i]);
 }
 
-bool wxGISRasterRGBARenderer::CanRender(wxGISDatasetSPtr pDataset)
+bool wxGISRasterRGBARenderer::CanRender(wxGISDataset* pwxGISDataset) const
 {
-    //TODO: check for more than 3 bands
-	return pDataset->GetType() == enumGISRasterDataset ? true : false;
+    if(wxGISRasterRenderer::CanRender(pwxGISDataset))
+    {
+        //check for more than 3 bands
+        wxGISRasterDataset* pwxGISRasterDataset = wxDynamicCast(pwxGISDataset, wxGISRasterDataset);
+        if(pwxGISRasterDataset)
+        {
+            GDALDataset* poGDALDataset = pwxGISRasterDataset->GetRaster();
+            if(poGDALDataset)
+            {
+                return poGDALDataset->GetRasterCount() > 2;
+            }
+        }
+    }
+	return false;
 }
-
-void wxGISRasterRGBARenderer::PutRaster(wxGISRasterDatasetSPtr pRaster)
-{
-	m_pwxGISRasterDataset = pRaster;
-	OnFillStats();
-}	
 
 void wxGISRasterRGBARenderer::OnFillStats(void)
 {
@@ -291,7 +948,7 @@ int *wxGISRasterRGBARenderer::GetBandsCombination(int *pnBandCount)
 }
 
 
-bool wxGISRasterRGBARenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel )
+bool wxGISRasterRGBARenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel* const pTrackCancel )
 {
 	int nOutXSize, nOutYSize;
 	bool bScale = false;
@@ -308,8 +965,9 @@ bool wxGISRasterRGBARenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALData
 	}
 
     //multithreaded
+    //TODO: more parts
     int CPUCount = wxThread::GetCPUCount();//1;//
-    std::vector<wxRasterDrawThread*> threadarray;
+    wxVector<wxRasterDrawThread*> threadarray;
     int nPartSize = nOutYSize / CPUCount;
     int nBegY(0), nEndY;
     for(int i = 0; i < CPUCount; ++i)
@@ -320,7 +978,7 @@ bool wxGISRasterRGBARenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALData
             nEndY = nPartSize * (i + 1);
 
 		unsigned char* pDestInputData = pTransformData + (nBegY * 4 * nOutXSize);
-		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, m_nAlphaBand == -1 ? 3 : 4, pDestInputData, bScale == true ? m_eQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, static_cast<IRasterRenderer*>(this), pTrackCancel);
+		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, m_nAlphaBand == -1 ? 3 : 4, pDestInputData, bScale == true ? m_eQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, this, pTrackCancel);
 		if(CreateAndRunThread(thread, wxT("wxRasterDrawThread"), wxT("RasterDrawThread")))
 	       threadarray.push_back(thread);
 
@@ -330,6 +988,7 @@ bool wxGISRasterRGBARenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALData
     for(size_t i = 0; i < threadarray.size(); ++i)
     {
         wgDELETE(threadarray[i], Wait());
+        //TODO: draw raster and start new thread if not end
     }
 	return true;
 }
@@ -406,25 +1065,48 @@ void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, const double
 // wxGISRasterRasterColormapRenderer
 //-----------------------------------
 
-wxGISRasterRasterColormapRenderer::wxGISRasterRasterColormapRenderer(void) : wxGISRasterRenderer()
+IMPLEMENT_DYNAMIC_CLASS(wxGISRasterRasterColormapRenderer, wxGISRasterRenderer)
+
+wxGISRasterRasterColormapRenderer::wxGISRasterRasterColormapRenderer(wxGISDataset* pwxGISDataset) : wxGISRasterRenderer(pwxGISDataset)
 {
 	m_nBandNumber = 1;
+    OnFillColorTable();
 }
 
 wxGISRasterRasterColormapRenderer::~wxGISRasterRasterColormapRenderer(void)
 {
 }
 
-bool wxGISRasterRasterColormapRenderer::CanRender(wxGISDatasetSPtr pDataset)
+bool wxGISRasterRasterColormapRenderer::CanRender(wxGISDataset* pwxGISDataset) const
 {
-    //TODO: check for Palette & GDALPaletteInterp == GPI_RGB or 
-    //GPI_Gray 	 Grayscale (in GDALColorEntry.c1)
-    //GPI_RGB 	 Red, Green, Blue and Alpha in (in c1, c2, c3 and c4)
-    //GPI_CMYK 	 Cyan, Magenta, Yellow and Black (in c1, c2, c3 and c4)
-    //GPI_HLS 	 Hue, Lightness and Saturation (in c1, c2, and c3)
-    //static wxImage::RGBValue wxImage::HSVtoRGB  ( const wxImage::HSVValue &  hsv   )  [static] 
-
-	return pDataset->GetType() == enumGISRasterDataset ? true : false;
+    if(wxGISRasterRenderer::CanRender(pwxGISDataset))
+    {
+        //check for Palette & GDALPaletteInterp == GPI_RGB or 
+        //GPI_Gray 	 Grayscale (in GDALColorEntry.c1)
+        //GPI_RGB 	 Red, Green, Blue and Alpha in (in c1, c2, c3 and c4)
+        //GPI_CMYK 	 Cyan, Magenta, Yellow and Black (in c1, c2, c3 and c4)
+        //GPI_HLS 	 Hue, Lightness and Saturation (in c1, c2, and c3)
+        wxGISRasterDataset* pwxGISRasterDataset = wxDynamicCast(pwxGISDataset, wxGISRasterDataset);
+        if(pwxGISRasterDataset)
+        {
+            GDALDataset* poGDALDataset = pwxGISRasterDataset->GetRaster();
+            if(poGDALDataset)
+            {
+                GDALRasterBand* pBand = poGDALDataset->GetRasterBand(1);
+	            if(pBand)
+                {
+                    GDALColorTable* pGDALColorTable = pBand->GetColorTable();
+	                if(pGDALColorTable)
+                    {
+                        GDALColorInterp eColorInterpretation = pBand->GetColorInterpretation();
+                        GDALPaletteInterp ePaletteInterpretation = pGDALColorTable->GetPaletteInterpretation();
+                        return eColorInterpretation == GCI_PaletteIndex && (ePaletteInterpretation == GPI_RGB || ePaletteInterpretation == GPI_CMYK || ePaletteInterpretation == GPI_HLS);
+                    }
+                }
+            }
+        }
+    }
+	return false;
 }
 
 int *wxGISRasterRasterColormapRenderer::GetBandsCombination(int *pnBandCount)
@@ -437,7 +1119,7 @@ int *wxGISRasterRasterColormapRenderer::GetBandsCombination(int *pnBandCount)
 }
 
 
-bool wxGISRasterRasterColormapRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel )
+bool wxGISRasterRasterColormapRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel* const pTrackCancel )
 {
 	int nOutXSize, nOutYSize;
 	bool bScale = false;
@@ -454,8 +1136,9 @@ bool wxGISRasterRasterColormapRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData
 	}
 
     //multithreaded
+    //TODO: more parts
     int CPUCount = wxThread::GetCPUCount();//1;//
-    std::vector<wxRasterDrawThread*> threadarray;
+    wxVector<wxRasterDrawThread*> threadarray;
     int nPartSize = nOutYSize / CPUCount;
     int nBegY(0), nEndY;
     for(int i = 0; i < CPUCount; ++i)
@@ -466,7 +1149,7 @@ bool wxGISRasterRasterColormapRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData
             nEndY = nPartSize * (i + 1);
 
 		unsigned char* pDestInputData = pTransformData + (nBegY * 4 * nOutXSize);
-		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, 1, pDestInputData, bScale == true ? m_eQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, static_cast<IRasterRenderer*>(this), pTrackCancel);
+		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, 1, pDestInputData, bScale == true ? m_eQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, this, pTrackCancel);
 		if(CreateAndRunThread(thread, wxT("wxRasterDrawThread"), wxT("RasterDrawThread")))
 	       threadarray.push_back(thread);
 
@@ -476,15 +1159,10 @@ bool wxGISRasterRasterColormapRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData
     for(size_t i = 0; i < threadarray.size(); ++i)
     {
         wgDELETE(threadarray[i], Wait());
+        //draw raster and start new thread if needed
     }
 	return true;
 }
-
-void wxGISRasterRasterColormapRenderer::PutRaster(wxGISRasterDatasetSPtr pRaster)
-{
-	m_pwxGISRasterDataset = pRaster;
-	OnFillColorTable();
-}	
 
 void wxGISRasterRasterColormapRenderer::OnFillColorTable(void)
 {
@@ -639,32 +1317,27 @@ wxColor wxGISRasterRasterColormapRenderer::CMYKtoRGB( const short &c, const shor
 	return wxColor(nR, nG, nB);
 }
 
+
 //-----------------------------------
 // wxGISRasterGreyScaleRenderer
 //-----------------------------------
 
-wxGISRasterGreyScaleRenderer::wxGISRasterGreyScaleRenderer(void) : wxGISRasterRenderer()
+IMPLEMENT_DYNAMIC_CLASS(wxGISRasterGreyScaleRenderer, wxGISRasterRenderer)
+
+wxGISRasterGreyScaleRenderer::wxGISRasterGreyScaleRenderer(wxGISDataset* pwxGISDataset) : wxGISRasterRenderer(pwxGISDataset)
 {
 	m_nBand = 1;
+    OnFillStats();
 }
 
 wxGISRasterGreyScaleRenderer::~wxGISRasterGreyScaleRenderer(void)
 {
 }
 
-bool wxGISRasterGreyScaleRenderer::CanRender(wxGISDatasetSPtr pDataset)
-{
-	return pDataset->GetType() == enumGISRasterDataset ? true : false;
-}
-
-void wxGISRasterGreyScaleRenderer::PutRaster(wxGISRasterDatasetSPtr pRaster)
-{
-	m_pwxGISRasterDataset = pRaster;
-	OnFillStats();
-}	
-
 void wxGISRasterGreyScaleRenderer::OnFillStats(void)
 {
+    wxCHECK_RET(m_pwxGISRasterDataset, wxT("Raster dataset pointer is NULL"));
+
 	GDALDataset* poGDALDataset = m_pwxGISRasterDataset->GetMainRaster();
 	if(!poGDALDataset)
 		poGDALDataset = m_pwxGISRasterDataset->GetRaster();
@@ -700,7 +1373,7 @@ int *wxGISRasterGreyScaleRenderer::GetBandsCombination(int *pnBandCount)
 }
 
 
-bool wxGISRasterGreyScaleRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel *pTrackCancel )
+bool wxGISRasterGreyScaleRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel* const pTrackCancel )
 {
 	int nOutXSize, nOutYSize;
 	bool bScale = false;
@@ -717,8 +1390,9 @@ bool wxGISRasterGreyScaleRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDA
 	}
 
     //multithreaded
+    //TODO: more parts
     int CPUCount = wxThread::GetCPUCount();//1;//
-    std::vector<wxRasterDrawThread*> threadarray;
+    wxVector<wxRasterDrawThread*> threadarray;
     int nPartSize = nOutYSize / CPUCount;
     int nBegY(0), nEndY;
     for(int i = 0; i < CPUCount; ++i)
@@ -729,7 +1403,7 @@ bool wxGISRasterGreyScaleRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDA
             nEndY = nPartSize * (i + 1);
 
 		unsigned char* pDestInputData = pTransformData + (nBegY * 4 * nOutXSize);
-		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, 1, pDestInputData, bScale == true ? m_eQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, static_cast<IRasterRenderer*>(this), pTrackCancel);
+		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, 1, pDestInputData, bScale == true ? m_eQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, this, pTrackCancel);
 		if(CreateAndRunThread(thread, wxT("wxRasterDrawThread"), wxT("RasterDrawThread")))
 	       threadarray.push_back(thread);
 
@@ -739,6 +1413,7 @@ bool wxGISRasterGreyScaleRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDA
     for(size_t i = 0; i < threadarray.size(); ++i)
     {
         wgDELETE(threadarray[i], Wait());
+        //TODO: draw part raster to map and start new thread
     }
 	return true;
 }
@@ -772,18 +1447,29 @@ void wxGISRasterGreyScaleRenderer::FillPixel(unsigned char* pOutputData, const d
     }
 }
 
+
 //-----------------------------------
 // wxGISRasterPackedRGBARenderer
 //-----------------------------------
 
-wxGISRasterPackedRGBARenderer::wxGISRasterPackedRGBARenderer(void)
+IMPLEMENT_DYNAMIC_CLASS(wxGISRasterPackedRGBARenderer, wxGISRasterGreyScaleRenderer)
+
+wxGISRasterPackedRGBARenderer::wxGISRasterPackedRGBARenderer(wxGISDataset* pwxGISDataset) : wxGISRasterGreyScaleRenderer(pwxGISDataset)
 {
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	wxString sAppName = GetApplication()->GetAppName();
+	wxGISAppConfig oConfig = GetConfig();
+    if(oConfig.IsOk())
+    {
+    	wxString sAppName = GetApplication()->GetAppName();
 
-    m_bNodataNewBehaviour = pConfig->ReadBool(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/nodata_newbehaviour")), true);
+        m_bNodataNewBehaviour = oConfig.ReadBool(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/nodata_newbehaviour")), true);
 
-	m_eQuality = (wxGISEnumDrawQuality)pConfig->ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/quality")), enumGISQualityBilinear);	//wxString(wxT("wxGISCommon/coordinate_mask")));
+	    m_eQuality = (wxGISEnumDrawQuality)oConfig.ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/quality")), enumGISQualityBilinear);	
+    }
+    else
+    {
+        m_bNodataNewBehaviour = true;
+	    m_eQuality = enumGISQualityBilinear;	
+    }
 
 	m_oNoDataColor = wxColor(0,0,0,0);
 	m_nBand = 1;
@@ -791,40 +1477,6 @@ wxGISRasterPackedRGBARenderer::wxGISRasterPackedRGBARenderer(void)
 
 wxGISRasterPackedRGBARenderer::~wxGISRasterPackedRGBARenderer(void)
 {
-}
-
-bool wxGISRasterPackedRGBARenderer::CanRender(wxGISDatasetSPtr pDataset)
-{
-	return pDataset->GetType() == enumGISRasterDataset ? true : false;
-}
-
-void wxGISRasterPackedRGBARenderer::OnFillStats(void)
-{
-	//GDALDataset* poGDALDataset = m_pwxGISRasterDataset->GetMainRaster();
-	//if(!poGDALDataset)
-	//	poGDALDataset = m_pwxGISRasterDataset->GetRaster();
-	//if(!poGDALDataset)
-	//	return;
-	//
-	////set min/max values
-	////set nodata color for each band
-	//if(m_pwxGISRasterDataset->HasStatistics())
-	//{
- //       double dfMin, dfMax, dfMean, dfStdDev;
-	//	GDALRasterBand* pBand = poGDALDataset->GetRasterBand(m_nBand);
- //
- //       if(pBand->GetStatistics(FALSE, FALSE, &dfMin, &dfMax, &dfMean, &dfStdDev) == CE_None)
- //       {
- //           int x = 0;
- //           //m_oStretch.SetStats(dfMin, dfMax, dfMean, dfStdDev);
- //       }
-
- //       if(m_pwxGISRasterDataset->HasNoData(m_nBand) )
- //       {
- //           int x = 0;
- //           //m_oStretch.SetNoData(m_pwxGISRasterDataset->GetNoData(m_nBand));
- //       }
-	//}	
 }
 
 void wxGISRasterPackedRGBARenderer::FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA)
@@ -888,453 +1540,3 @@ void wxGISRasterPackedRGBARenderer::FillPixel(unsigned char* pOutputData, const 
 		}
 	}
 }
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void wxGISRasterRGBRenderer::Draw(wxGISDatasetSPtr pRasterDataset, wxGISEnumDrawPhase DrawPhase, IDisplay* pDisplay, ITrackCancel* pTrackCancel)
-{
-    wxGISRasterDatasetSPtr pRaster = boost::dynamic_pointer_cast<wxGISRasterDataset>(pRasterDataset);
-	if(!pRaster)
-		return;
-    pRaster->Open(true);
-	IDisplayTransformation* pDisplayTransformation = pDisplay->GetDisplayTransformation();
-    if(!pDisplayTransformation)
-        return;
-
-    OGRSpatialReference* pDisplaySpatialReference = pDisplayTransformation->GetSpatialReference();
-	const OGRSpatialReferenceSPtr pRasterSpatialReference = pRaster->GetSpatialReference();
-	bool IsSpaRefSame(true);
-	if(pDisplaySpatialReference && pRasterSpatialReference)
-		IsSpaRefSame = pDisplaySpatialReference->IsSame(pRasterSpatialReference.get());
-	
-    //OGREnvelope VisibleBounds = pDisplayTransformation->GetVisibleBounds();
-    RECTARARRAY* pInvalidrectArray = pDisplay->GetInvalidRect();
-    OGREnvelope Envs[10];
-    size_t EnvCount = pInvalidrectArray->size();
-    if(EnvCount > 10)
-        EnvCount = 10;
-
-    if(EnvCount == 0)
-    {
-        Envs[0] = pDisplayTransformation->GetVisibleBounds();
-        EnvCount = 1;
-    }
-    else
-    {
-        for(size_t i = 0; i < EnvCount; ++i)
-        {
-            wxRect Rect = pInvalidrectArray->operator[](i);   
-            Rect.Inflate(1,1);
-            Envs[i] = pDisplayTransformation->TransformRect(Rect);
-        }
-    }
-
-	const OGREnvelope* pRasterExtent = pRaster->GetEnvelope();
-    //calc envelopes
-	OGREnvelope RasterEnvelope;
-	if(!IsSpaRefSame)
-	{
-		RasterEnvelope = TransformEnvelope(pRasterExtent, pRasterSpatialReference.get(), pDisplaySpatialReference);
-	}
-	else
-	{
-		RasterEnvelope = *pRasterExtent;
-	}
-
-    for(size_t i = 0; i < EnvCount; ++i)
-    {
-	    //1. get envelope
-	    OGREnvelope VisibleBounds = Envs[i];//pDisplayTransformation->GetVisibleBounds();
-
-        if(!VisibleBounds.Intersects(RasterEnvelope))
-            continue;
-
-	    bool IsZoomIn(false);
-	    //IsZoomIn = RasterEnvelope.Contains(VisibleBounds);
-	    IsZoomIn = RasterEnvelope.MaxX > VisibleBounds.MaxX || RasterEnvelope.MaxY > VisibleBounds.MaxY || RasterEnvelope.MinX < VisibleBounds.MinX || RasterEnvelope.MinY < VisibleBounds.MinY;
-	    if(IsZoomIn)
-	    {
-		    //intersect bounds
-		    OGREnvelope DrawBounds = RasterEnvelope;
-//            DrawBounds.Intersect(VisibleBounds);
-		    DrawBounds.MinX = MAX(RasterEnvelope.MinX, VisibleBounds.MinX);
-		    DrawBounds.MinY = MAX(RasterEnvelope.MinY, VisibleBounds.MinY);
-		    DrawBounds.MaxX = MIN(RasterEnvelope.MaxX, VisibleBounds.MaxX);
-		    DrawBounds.MaxY = MIN(RasterEnvelope.MaxY, VisibleBounds.MaxY);
-            //convert draw bounds to DC coords
-		    OGRRawPoint OGRRawPoints[2];
-		    OGRRawPoints[0].x = DrawBounds.MinX;
-		    OGRRawPoints[0].y = DrawBounds.MinY;
-		    OGRRawPoints[1].x = DrawBounds.MaxX;
-		    OGRRawPoints[1].y = DrawBounds.MaxY;
-		    wxPoint* pDCPoints = pDisplayTransformation->TransformCoordWorld2DC(OGRRawPoints, 2);	
-
-		    if(!pDCPoints)
-		    {
-			    wxDELETEA(pDCPoints);
-			    return;
-		    }
-
-		    int nDCXOrig = pDCPoints[0].x;
-		    int nDCYOrig = pDCPoints[1].y;
-		    int nWidth = pDCPoints[1].x - pDCPoints[0].x;
-		    int nHeight = pDCPoints[0].y - pDCPoints[1].y;
-		    wxDELETEA(pDCPoints);
-
-       //     if(nWidth <= 20 || nHeight <= 20)
-			    //return;
-
-		    GDALDataset* pGDALDataset = pRaster->GetRaster();
-
-		    int nBandCount = pGDALDataset->GetRasterCount();
-		    //hack! should check user configuration
-		    int bands[3];
-		    if(nBandCount < 3)
-		    {
-			    bands[0] = 1;
-			    bands[1] = 1;
-			    bands[2] = 1;	
-		    }
-		    else
-		    {
-			    bands[0] = 1;
-			    bands[1] = 2;
-			    bands[2] = 3;		
-		    }
-
-		    double adfGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
-            double adfReverseGeoTransform[6] = { 0, 0, 0, 0, 0, 0 };
-		    CPLErr err = pGDALDataset->GetGeoTransform(adfGeoTransform);
-            bool bNoTransform(false);
-            if(err != CE_None)
-            {
-                bNoTransform = true;
-            }
-            else
-            {
-                int nRes = GDALInvGeoTransform( adfGeoTransform, adfReverseGeoTransform );
-            }
-
-		    //2. get image data from raster - draw part of the raster
-		    if(IsSpaRefSame)
-		    {
-			    double rMinX, rMinY, rMaxX, rMaxY;
-
-                int nXSize = pGDALDataset->GetRasterXSize();
-                int nYSize = pGDALDataset->GetRasterYSize();
-
-                if(bNoTransform)
-                {
-                    rMinX = DrawBounds.MinX;
-                    rMaxX = DrawBounds.MaxX;
-                    rMaxY = nYSize - DrawBounds.MinY;
-                    rMinY = nYSize - DrawBounds.MaxY;
-                }
-                else
-                {
-    			    GDALApplyGeoTransform( adfReverseGeoTransform, DrawBounds.MinX, DrawBounds.MinY, &rMinX, &rMaxY );
-	    		    GDALApplyGeoTransform( adfReverseGeoTransform, DrawBounds.MaxX, DrawBounds.MaxY, &rMaxX, &rMinY );
-                }
-
-                double rImgWidth = rMaxX - rMinX;
-                double rImgHeight = rMaxY - rMinY;
-			    int nImgWidth = ceil(rImgWidth) + 1;
-			    int nImgHeight = ceil(rImgHeight) + 1;
-                
-			    //read in buffer
-                int nMinX = int(rMinX);//floor
-                int nMinY = int(rMinY);//floor
-			    if(nMinX < 0) nMinX = 0;
-			    if(nMinY < 0) nMinY = 0;
-
-                if(nImgWidth > nXSize - nMinX) nImgWidth = nXSize - nMinX;
-                if(nImgHeight > nYSize - nMinY) nImgHeight = nYSize - nMinY;
-
-		        //create buffer
-                int nWidthOut, nHeightOut;
-                double rImgWidthOut, rImgHeightOut;
-                if(nWidth > nImgWidth)
-                {
-			        nWidthOut = nImgWidth;
-			        rImgWidthOut = rImgWidth;
-                }
-                else
-                {
-			        nWidthOut = nWidth;
-			        rImgWidthOut = (double)nWidthOut * rImgWidth / nImgWidth;
-			        //nWidthOut++;
-                }
-                
-                if(nHeight > nImgHeight)
-                {
-			        nHeightOut = nImgHeight;
-			        rImgHeightOut = rImgHeight;
-                }
-                else
-                {
-			        nHeightOut = nHeight;
-			        rImgHeightOut = (double)nHeightOut * rImgHeight / nImgHeight;
-                    //nHeightOut++;
-                }
-
-
-		        unsigned char* data = new unsigned char[nWidthOut * nHeightOut * 3];
-
-		        err = pGDALDataset->AdviseRead(nMinX, nMinY, nImgWidth, nImgHeight, nWidthOut, nHeightOut, GDT_Byte, 3, bands, NULL);
-		        if(err != CE_None)
-		        {
-                    const char* pszerr = CPLGetLastErrorMsg();
-                    wxLogError(_("AdviseRead failed! GDAL error: %s"), wgMB2WX(pszerr));
-
-			        wxDELETEA(data);
-			        return;
-		        }
-
-		        err = pGDALDataset->RasterIO(GF_Read, nMinX, nMinY, nImgWidth, nImgHeight, data, nWidthOut, nHeightOut, GDT_Byte, 3, bands, sizeof(unsigned char) * 3, 0, sizeof(unsigned char));
-		        if(err != CE_None)
-		        {
-                    const char* pszerr = CPLGetLastErrorMsg();
-                    wxLogError(_("RasterIO failed! GDAL error: %s"), wgMB2WX(pszerr));
-
-			        wxDELETEA(data);
-			        return;
-		        }
-		        //scale pTempData to data using interpolation methods
-		        pDisplay->DrawBitmap(Scale(data, nWidthOut, nHeightOut, rImgWidthOut, rImgHeightOut, nWidth, nHeight, rMinX - nMinX, rMinY - nMinY, enumGISQualityBilinear, pTrackCancel), nDCXOrig, nDCYOrig); //enumGISQualityNearest
-
-                wxDELETEA(data);
-		    }
-		    else
-		    {
-		    //void *hTransformArg = GDALCreateGenImgProjTransformer( hSrcDS, pszSrcWKT, NULL, pszDstWKT, FALSE, 0, 1 );
-		    //GDALDestroyGenImgProjTransformer( hTransformArg );
-	    ////		//get new envelope - it may rotate
-	    ////		OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pDisplaySpatialReference, pRasterSpatialReference);
-	    //////		get real envelope
-	    //////		poCT->Transform(1, &pRasterExtent->MaxX, &pRasterExtent->MaxY);
-	    //////		poCT->Transform(1, &pRasterExtent->MinX, &pRasterExtent->MinY);
-	    //////		poCT->Transform(1, &pRasterExtent->MaxX, &pRasterExtent->MinY);
-	    //////		poCT->Transform(1, &pRasterExtent->MinX, &pRasterExtent->MaxY);
-	    ////		OCTDestroyCoordinateTransformation(poCT);
-		    }
-	    }
-	    else
-	    {
-		    //1. convert newrasterenvelope to DC		
-		    OGRRawPoint OGRRawPoints[2];
-		    OGRRawPoints[0].x = RasterEnvelope.MinX;
-		    OGRRawPoints[0].y = RasterEnvelope.MinY;
-		    OGRRawPoints[1].x = RasterEnvelope.MaxX;
-		    OGRRawPoints[1].y = RasterEnvelope.MaxY;
-		    wxPoint* pDCPoints = pDisplayTransformation->TransformCoordWorld2DC(OGRRawPoints, 2);	
-
-		    //2. get image data from raster - buffer size = DC_X and DC_Y - draw full raster
-		    if(!pDCPoints)
-		    {
-			    wxDELETEA(pDCPoints);
-			    return;
-		    }
-		    int nDCXOrig = pDCPoints[0].x;
-		    int nDCYOrig = pDCPoints[1].y;
-		    int nWidth = pDCPoints[1].x - pDCPoints[0].x;
-		    int nHeight = pDCPoints[0].y - pDCPoints[1].y;
-		    delete[](pDCPoints);
-
-		    GDALDataset* pGDALDataset = pRaster->GetRaster();
-		    int nImgWidth = pGDALDataset->GetRasterXSize();
-		    int nImgHeight = pGDALDataset->GetRasterYSize();
-
-		    int nBandCount = pGDALDataset->GetRasterCount();
-		    //hack!
-		    int bands[3];
-		    if(nBandCount < 3)
-		    {
-			    bands[0] = 1;
-			    bands[1] = 1;
-			    bands[2] = 1;	
-		    }
-		    else
-		    {
-			    bands[0] = 1;
-			    bands[1] = 2;
-			    bands[2] = 3;		
-		    }
-
-		    //create buffer
-		    unsigned char* data = new unsigned char[nWidth * nHeight * 3];
-		    if(IsSpaRefSame)
-		    {
-		        CPLErr err = pGDALDataset->AdviseRead(0, 0, nImgWidth, nImgHeight, nWidth, nHeight, GDT_Byte, 3, bands, NULL);
-		        if(err != CE_None)
-		        {
-                    const char* pszerr = CPLGetLastErrorMsg();
-                    wxLogError(_("AdviseRead failed! GDAL error: %s"), wgMB2WX(pszerr));
-				    wxDELETEA(data);
-				    return;
-		        }
-
-			    //read in buffer
-			    err = pGDALDataset->RasterIO(GF_Read, 0, 0, nImgWidth, nImgHeight, data, nWidth, nHeight, GDT_Byte, 3, bands, sizeof(unsigned char) * 3, 0, sizeof(unsigned char));
-			    if(err != CE_None)
-			    {
-                    const char* pszerr = CPLGetLastErrorMsg();
-                    wxLogError(_("RasterIO failed! GDAL error: %s"), wgMB2WX(pszerr));
-				    wxDELETEA(data);
-				    return;
-			    }
-		    }
-		    else
-		    {
-			    //1. calc Width & Height of TempData with same aspect ratio of raster
-			    //2. create pTempData buffer
-			    unsigned char* pTempData;
-			    //3. fill data
-			    //4. for each pixel of data buffer get pixel from pTempData using OGRCreateCoordinateTransformation
-			    //delete[](data);
-		    }
-		    //3. draw //think about transparancy!
-		    wxImage ResultImage(nWidth, nHeight, data);
-		    pDisplay->DrawBitmap(ResultImage, nDCXOrig, nDCYOrig);
-
-		    //delete[](data);
-	    }
-    }
-}
-
-//wxImage wxGISRasterDataset::GetSubimage(IDisplayTransformation* pDisplayTransformation, IQueryFilter* pQFilter, ITrackCancel* pTrackCancel)
-//{
-//	if(!m_bIsOpened)
-//		if(!Open())
-//			return wxImage();
-//	//pyramids!!! in scale and descale	
-//	wxGISSpatialFilter* pSpaFil = dynamic_cast<wxGISSpatialFilter*>(pQFilter);
-//	if(!pSpaFil)
-//	{
-//		wxLogError(_("The spatial filter is null!"));
-//		return wxImage();
-//	}
-//	OGREnvelope Env = pSpaFil->GetEnvelope();
-//	bool bDownsample = m_psExtent->Contains(Env);
-//	//if(!bDownsample)
-//	//	bDownsample = m_psExtent->MaxX == Env.MaxX && m_psExtent->MaxY == Env.MaxY && m_psExtent->MinX == Env.MinX && m_psExtent->MinY == Env.MinY;
-//
-//	if(!bDownsample)
-//	{
-//		//input size - whole image
-//		//TransformCoordWorld2DC - output size		
-//		OGRRawPoint world_points[2];
-//		world_points[0].x = Env.MinX;
-//		world_points[0].y = Env.MinY;
-//		world_points[1].x = Env.MaxX;
-//		world_points[1].y = Env.MaxY;
-//		wxPoint* dc_points = pDisplayTransformation->TransformCoordWorld2DC(world_points, 2);
-//		if(!dc_points)
-//			return wxImage();
-//		int nWidth = dc_points[1].x - dc_points[0].x;
-//		int nHeight = dc_points[0].y - dc_points[1].y;
-//		int nImgWidth = m_poDataset->GetRasterXSize();
-//		int nImgHeight = m_poDataset->GetRasterYSize();
-//
-//		int nTestHeight = double(nWidth) / nImgWidth * nImgHeight;
-//		if(nTestHeight > nHeight)
-//			nWidth = double(nHeight) / nImgHeight * nImgWidth;
-//		else
-//			nHeight = nTestHeight;
-//
-//		delete [] dc_points;
-//		int nBandCount = m_poDataset->GetRasterCount();
-//		//hack!
-//		if(nBandCount > 3)
-//			nBandCount = 3; 
-//		//create buffer
-//		unsigned char* data = new unsigned char[nWidth * nHeight * nBandCount];
-//		//read in buffer
-//		int bands[3];
-//		bands[0] = 1;
-//		bands[1] = 1;
-//		bands[2] = 1;
-//
-//		CPLErr err = m_poDataset->RasterIO(GF_Read, 0, 0, nImgWidth, nImgHeight, data, nWidth, nHeight, GDT_Byte, nBandCount, NULL, sizeof(unsigned char) * nBandCount, 0, sizeof(unsigned char));//bands
-//		if(err != CE_None)
-//			return wxImage();
-//
-//		//transfer to image
-//		wxImage ResultImage(nWidth, nHeight, data);
-//		////display pixel size -> image size -> downsample
-//		return ResultImage;
-//	}
-//	else
-//	{
-//		//convert from geo coord to pixel coord (adfGeoTransform)
-//		//read pixels to image
-//		//resample image to display extent
-//
-//	}
-//
-//	//m_poDataset->RasterIO(GF_Read, 
-//	return wxImage();
-//}
-
-OGREnvelope wxGISRasterRGBRenderer::TransformEnvelope(const OGREnvelope* pEnvelope, OGRSpatialReference* pSrsSpatialReference, OGRSpatialReference* pDstSpatialReference)
-{
-	//get new envelope - it may rotate
-	OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( pSrsSpatialReference, pDstSpatialReference);
-	double pointsx[4];
-	double pointsy[4];
-	pointsx[0] = pEnvelope->MaxX;
-	pointsy[0] = pEnvelope->MaxY;
-	pointsx[1] = pEnvelope->MinX;
-	pointsy[1] = pEnvelope->MinY;
-	pointsx[2] = pEnvelope->MaxX;
-	pointsy[2] = pEnvelope->MinY;
-	pointsx[3] = pEnvelope->MinX;
-	pointsy[3] = pEnvelope->MaxY;
-	//get real envelope
-	poCT->Transform(4, pointsx, pointsy);
-	OCTDestroyCoordinateTransformation(poCT);
-	OGREnvelope out;
-	out.MinX = MIN(pointsx[0], MIN(pointsx[1], MIN(pointsx[2], pointsx[3])));
-	out.MaxX = MAX(pointsx[0], MAX(pointsx[1], MAX(pointsx[2], pointsx[3])));
-	out.MinY = MIN(pointsy[0], MIN(pointsy[1], MIN(pointsy[2], pointsy[3])));
-	out.MaxY = MAX(pointsy[0], MAX(pointsy[1], MAX(pointsy[2], pointsy[3])));
-	return out;
-}
-
-wxImage wxGISRasterRGBRenderer::Scale(unsigned char* pData, int nOrigX, int nOrigY, double rOrigX, double rOrigY, int nDestX, int nDestY, double rDeltaX, double rDeltaY, wxGISEnumDrawQuality Quality, ITrackCancel* pTrackCancel)
-{
-    ////simple way
-    //wxImage ResultImage1(nOrigX, nOrigY, pData);
-    //ResultImage1 = ResultImage1.Scale(nDestX, nDestY);
-    //return ResultImage1;
-
-    wxImage ResultImage(nDestX, nDestY, false);
-    unsigned char* pDestData = ResultImage.GetData();
-    //multithreaded
-    int CPUCount = wxThread::GetCPUCount();
-    std::vector<wxRasterDrawThread*> threadarray;
-    int nPartSize = nDestY / CPUCount;
-    int nBegY(0), nEndY;
-    for(int i = 0; i < CPUCount; ++i)
-    {        
-        if(i == CPUCount - 1)
-            nEndY = nDestY;
-        else
-            nEndY = nPartSize * (i + 1);
-
-        unsigned char* pDestInputData = pDestData  + (nDestX * nBegY * 3);
-        wxRasterDrawThread *thread = new wxRasterDrawThread(pData, pDestInputData, nOrigX, nOrigY, rOrigX, rOrigY, nDestX, nDestY, rDeltaX, rDeltaY, Quality, pTrackCancel, nBegY, nEndY);
-        thread->Create();
-        thread->Run();
-        threadarray.push_back(thread);
-        nBegY = nEndY;
-    }
-
-    for(size_t i = 0; i < threadarray.size(); ++i)
-    {
-        wgDELETE(threadarray[i], Wait());
-    }
-    return ResultImage;
-}
-*/

@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxRasterFactoryUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -29,17 +29,19 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxRasterFactoryUI, wxGxRasterFactory)
 
 wxGxRasterFactoryUI::wxGxRasterFactoryUI(void) : wxGxRasterFactory()
 {
-    m_SmallIcon = wxIcon(raster_16_xpm);
-    m_LargeIcon = wxIcon(raster_48_xpm);
 }
 
 wxGxRasterFactoryUI::~wxGxRasterFactoryUI(void)
 {
 }
 
-IGxObject* wxGxRasterFactoryUI::GetGxDataset(CPLString path, wxString name, wxGISEnumRasterDatasetType type)
+wxGxObject* wxGxRasterFactoryUI::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumRasterDatasetType type)
 {
-    wxGxRasterDatasetUI* pDataset = new wxGxRasterDatasetUI(path, name, type, m_LargeIcon, m_SmallIcon);
-    return static_cast<IGxObject*>(pDataset);
+    if(!m_SmallIcon.IsOk())
+        m_SmallIcon = wxIcon(raster_16_xpm);
+    if(!m_LargeIcon.IsOk())
+        m_LargeIcon = wxIcon(raster_48_xpm);
+    wxGxRasterDatasetUI* pDataset = new wxGxRasterDatasetUI(type, pParent, soName, szPath, m_LargeIcon, m_SmallIcon);
+    return wxStaticCast(pDataset, wxGxObject);
 }
 

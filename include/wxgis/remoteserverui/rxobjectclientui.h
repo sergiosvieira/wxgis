@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
  * Purpose:  RxObjectUI classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -18,6 +18,7 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+/*
 #pragma once
 
 #include "wxgis/remoteserverui/gxremoteserverui.h"
@@ -27,7 +28,7 @@
 
 /** \class wxRxObjectContainer gxremoteserver.h
     \brief The base class for Remote GxObjectContainers (RxObjectContainers).
-*/
+*//*
 class WXDLLIMPEXP_GIS_RSU wxRxObjectContainerUI : 
 	public wxRxObjectContainer
 {
@@ -41,3 +42,4 @@ public:
 protected:
     wxGxPendingUI* m_pGxPendingUI;
 };
+*/

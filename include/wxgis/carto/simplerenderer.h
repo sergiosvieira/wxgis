@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  wxGISSimpleRenderer class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-
+/*
 #include "wxgis/carto/carto.h"
 #include "wxgis/datasource/featuredataset.h"
 
@@ -27,7 +27,7 @@
 
 /** \class wxGISSimpleRenderer simplerenderer.h
     \brief The vector layer renderer
-*/
+*//*
 class wxGISSimpleRenderer :
 	public IFeatureRenderer
 {
@@ -49,3 +49,4 @@ protected:
     double m_dRadius;
 };
 
+*/

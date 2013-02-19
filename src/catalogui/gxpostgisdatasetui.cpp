@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  GxPostGISDatasetUI classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -19,6 +19,9 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxpostgisdatasetui.h"
+
+#ifdef wxGIS_USE_POSTGRES
+/*
 #include "wxgis/framework/application.h"
 
 //propertypages
@@ -125,3 +128,5 @@ void wxGxPostGISFeatureDatasetUI::EditProperties(wxWindow *parent)
 
     PropertySheetDialog.ShowModal();
 }
+*/
+#endif //wxGIS_USE_POSTGRES

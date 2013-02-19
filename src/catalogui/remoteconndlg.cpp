@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  Create Remote Database connection dialog.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,6 +20,9 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/remoteconndlg.h"
+
+#ifdef wxGIS_USE_POSTGRES
+/*
 #include "wxgis/datasource/sysop.h"
 #include "wxgis/core/crypt.h"
 
@@ -182,7 +185,7 @@ void wxGISRemoteConnDlg::OnOK(wxCommandEvent& event)
 
 		wxString sFullPath = m_sOutputPath + wxFileName::GetPathSeparator() + GetName();
 		//compare if user change name in changing mode
-		if(!m_bCreateNew && EQUAL(CPLString(sFullPath.mb_str(wxConvUTF8)), m_sOriginOutput))
+		if(!m_bCreateNew && wxGISEQUAL(CPLString(sFullPath.mb_str(wxConvUTF8)), m_sOriginOutput))
 		{
 			DeleteFile(m_sOriginOutput);
 		}
@@ -240,4 +243,5 @@ wxString wxGISRemoteConnDlg::GetName(void)
 		m_sConnName.Append(wxT(".xconn"));
 	return m_sConnName;
 }
-
+*/
+#endif //wxGIS_USE_POSTGRES

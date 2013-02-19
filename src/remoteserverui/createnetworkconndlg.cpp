@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
  * Purpose:  Create network connection dialog
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2008-2010 Bishop
+*   Copyright (C) 2008-2010,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,29 +20,35 @@
  ****************************************************************************/
 
 #include "wxgis/remoteserverui/createnetworkconndlg.h"
+#include "wxgis/remoteserverui/netfactoryui.h"
+
 #include "../../art/remoteserver_16.xpm"
 
-///////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------
+// wxGISCreateNetworkConnDlg
+//---------------------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxGISCreateNetworkConnDlg, wxDialog)
+
 BEGIN_EVENT_TABLE( wxGISCreateNetworkConnDlg, wxDialog )
 	EVT_BUTTON( wxID_SAVE, wxGISCreateNetworkConnDlg::OnSaveBtnClick )
 END_EVENT_TABLE()
 
-wxGISCreateNetworkConnDlg::wxGISCreateNetworkConnDlg( NETCONNFACTORYARRAY& apNetConn, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+wxGISCreateNetworkConnDlg::wxGISCreateNetworkConnDlg( wxNetConnFactoryArray& apNetConn, wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
 	bSizer = new wxBoxSizer( wxVERTICAL );
 	
 	m_choicebook = new wxChoicebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT|wxCLIP_CHILDREN );
-	m_choicebook->SetMinSize( wxSize( 300,300 ) );
-	for(size_t i = 0; i < apNetConn.size(); ++i)
+    for(size_t i = 0; i < apNetConn.GetCount(); ++i)
 	{
-		wxString sName = apNetConn[i]->GetName();
-		INetConnFactoryUI* pConnFactUI = dynamic_cast<INetConnFactoryUI*>(apNetConn[i]);
+		wxString sName = apNetConn[i].GetName();
+		INetConnFactoryUI* pConnFactUI = dynamic_cast<INetConnFactoryUI*>(&apNetConn[i]);
         if(pConnFactUI)
-            m_choicebook->AddPage(pConnFactUI->GetPropertyPage(m_choicebook), sName);
+            m_choicebook->AddPage(pConnFactUI->GetPropertyPage(m_choicebook), sName, i == 0 ? true : false);
 	}
-	
+
 	bSizer->Add( m_choicebook, 1, wxEXPAND|wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_staticline1 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
@@ -63,26 +69,33 @@ wxGISCreateNetworkConnDlg::wxGISCreateNetworkConnDlg( NETCONNFACTORYARRAY& apNet
 
     // set icon
 	SetIcon(remoteserver_16_xpm);
+
+    m_pConnProps = NULL;
 }
 
 wxGISCreateNetworkConnDlg::~wxGISCreateNetworkConnDlg()
 {
+    wxDELETE(m_pConnProps);
 }
 
 void wxGISCreateNetworkConnDlg::OnSaveBtnClick( wxCommandEvent& evt )
 {
-	wxNetPropertyPage* pPPage = static_cast<wxNetPropertyPage*>(m_choicebook->GetCurrentPage());
+ 	wxNetPropertyPage* pPPage = static_cast<wxNetPropertyPage*>(m_choicebook->GetCurrentPage());
 	if(pPPage != NULL)
 	{
-		m_pConnObj = pPPage->OnSave();
-		if(m_pConnObj)
+		m_pConnProps = pPPage->OnSave();
+        if(m_pConnProps)
 			EndModal(wxID_SAVE);
 		else
-		{
-			
+		{			
 			wxMessageBox(wxString::Format(_("%s\nCreate network connection failed!"), pPPage->GetLastError().c_str()), _("Error"), wxICON_ERROR | wxOK );
 			wxLogError(_("wxGISCreateNetworkConnDlg: Create network connection failed!"));
 		}
 	}
 //	Close();
+}
+
+wxXmlNode* const wxGISCreateNetworkConnDlg::GetConnectionProperties(void)
+{
+    return m_pConnProps;
 }

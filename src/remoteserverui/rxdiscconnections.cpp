@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
  * Purpose:  wxRxDiscConnections class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010 Bishop
 *
@@ -18,6 +18,7 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+/*
 #include "wxgis/remoteserverui/rxdiscconnections.h"
 
 IMPLEMENT_DYNAMIC_CLASS(wxRxDiscConnections, wxGxDiscConnectionsUI)
@@ -30,3 +31,4 @@ wxRxDiscConnections::~wxRxDiscConnections(void)
 {
 }
 
+*/

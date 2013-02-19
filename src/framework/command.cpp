@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISCommonCmd class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
  ****************************************************************************/
 #include "wxgis/framework/command.h"
 
+#include "wxgis/framework/applicationbase.h"
+
 #include "../../art/options.xpm"
 
 //	0	Exit
@@ -30,10 +32,47 @@
 //  5   Options
 //  6   ?
 
-IMPLEMENT_DYNAMIC_CLASS(wxGISCommonCmd, wxObject)
+//---------------------------------------------------------------------------------
+// wxGISCommand
+//---------------------------------------------------------------------------------
 
+//IMPLEMENT_ABSTRACT_CLASS(wxGISCommand, wxObject)
 
-wxGISCommonCmd::wxGISCommonCmd(void) : ICommand(), m_IconOpt(options_xpm)
+wxGISCommand::wxGISCommand(void) : m_subtype(0)
+{
+}
+
+wxGISCommand::~wxGISCommand(void)
+{
+}
+
+void wxGISCommand::SetID(long nID)
+{
+    m_CommandID = nID;
+}
+
+long wxGISCommand::GetID(void) const 
+{
+    return m_CommandID;
+}
+
+void wxGISCommand::SetSubType(unsigned char SubType)
+{
+    m_subtype = SubType;
+}
+
+unsigned char wxGISCommand::GetSubType(void) const 
+{
+    return m_subtype;
+}
+
+//---------------------------------------------------------------------------------
+// wxGISCommonCmd
+//---------------------------------------------------------------------------------
+
+IMPLEMENT_DYNAMIC_CLASS(wxGISCommonCmd, wxGISCommand)
+
+wxGISCommonCmd::wxGISCommonCmd(void) : wxGISCommand(), m_IconOpt(options_xpm)
 {
 }
 
@@ -209,7 +248,7 @@ void wxGISCommonCmd::OnClick(void)
 	}
 }
 
-bool wxGISCommonCmd::OnCreate(IFrameApplication* pApp)
+bool wxGISCommonCmd::OnCreate(wxGISApplicationBase* pApp)
 {
 	m_pApp = pApp;
 	return true;

@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  GxPostGISDataset classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -21,6 +21,8 @@
 
 #include "wxgis/catalog/gxpostgisdataset.h"
 
+#ifdef wxGIS_USE_POSTGRES
+/*
 //-----------------------------------------------------------------------------------
 // wxGxPostGISTableDataset
 //-----------------------------------------------------------------------------------
@@ -119,3 +121,5 @@ CPLString wxGxPostGISFeatureDataset::GetInternalName(void)
     }
     return m_sPath;
 }
+*/
+#endif //wxGIS_USE_POSTGRES

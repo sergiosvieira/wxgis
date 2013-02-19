@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  About Dialog class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -39,9 +39,9 @@
 #include <wx/dialog.h>
 #include <wx/button.h> 
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISSimpleTextPanel
-///////////////////////////////////////////////////////////////////////////////
+/** \class wxGISSimpleTextPanel gisaboutdlg.h
+ *   \brief Information tab in About dialog
+ */
 class wxGISSimpleTextPanel : public wxPanel
 {
 	enum
@@ -58,9 +58,10 @@ protected:
     DECLARE_EVENT_TABLE()
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISAboutDialog
-///////////////////////////////////////////////////////////////////////////////
+
+/** \class wxGISAboutDialog gisaboutdlg.h
+ *   \brief About dialog class
+ */
 class wxGISAboutDialog: public wxDialog
 {
 public:

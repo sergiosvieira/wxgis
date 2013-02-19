@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISIdentifyDlg class - dialog/dock window with the results of identify.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/cartoui/identifydlg.h"
+/*
 #include "wxgis/datasource/vectorop.h"
 #include "wxgis/core/config.h"
 
@@ -386,8 +387,8 @@ bool wxGISIdentifyDlg::Create(wxWindow* parent, wxWindowID id, const wxPoint& po
 	m_bMainSizer->Add( m_fgTopSizer, 0, wxEXPAND, 5 );
 
 	m_splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D );
-	m_splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISIdentifyDlg::SplitterOnIdle ), NULL, this );
-    //m_splitter->Bind(wxEVT_IDLE, &wxGISIdentifyDlg::SplitterOnIdle, this);
+	//m_splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISIdentifyDlg::SplitterOnIdle ), NULL, this );
+    m_splitter->Bind(wxEVT_IDLE, &wxGISIdentifyDlg::SplitterOnIdle, this);
 
 	m_bMainSizer->Add( m_splitter, 1, wxEXPAND, 5 );
 
@@ -400,8 +401,8 @@ bool wxGISIdentifyDlg::Create(wxWindow* parent, wxWindowID id, const wxPoint& po
     wxGetOsVersion(&nOSMajorVer);
 	m_pTreeCtrl = new wxTreeCtrl( m_splitter, ID_WXGISTREECTRL, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS | wxTR_HIDE_ROOT | wxSTATIC_BORDER | (nOSMajorVer > 5 ? wxTR_NO_LINES : wxTR_LINES_AT_ROOT) );
 	m_pTreeCtrl->SetImageList(&m_TreeImageList);
-	m_pTreeCtrl->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( wxGISIdentifyDlg::OnLeftDown ), NULL, this );
-    //m_pTreeCtrl->Bind(wxEVT_LEFT_UP, &wxGISIdentifyDlg::OnLeftUp, this);
+	//m_pTreeCtrl->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( wxGISIdentifyDlg::OnLeftDown ), NULL, this );
+    m_pTreeCtrl->Bind(wxEVT_LEFT_DOWN, &wxGISIdentifyDlg::OnLeftUp, this);
 
 
 	m_splitter->SetSashGravity(0.5);
@@ -510,7 +511,7 @@ bool wxAxIdentifyView::Create(wxWindow* parent, wxWindowID id, const wxPoint& po
     return wxGISIdentifyDlg::Create(parent, id, pos, size, style, name);
 }
 
-bool wxAxIdentifyView::Activate(IFrameApplication* application, wxXmlNode* pConf)
+bool wxAxIdentifyView::Activate(wxGISApplicationBase* application, wxXmlNode* pConf)
 {
     m_pApp = application;
 
@@ -567,19 +568,8 @@ void wxAxIdentifyView::Identify(OGRGeometrySPtr pGeometryBounds)
 	wxBusyCursor wait;
 	if(!m_pMapView)//TODO: add/remove layer map events connection point
 	{
-		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
-		if(pWinArr)
-		{
-			for(size_t i = 0; i < pWinArr->size(); ++i)
-			{
-				wxGISMapView* pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
-				if(pMapView)
-				{
-					m_pMapView = pMapView;
-                    break;
-				}
-			}
-		}
+        wxWindow* pWnd = m_pApp->GetRegisteredWindowByType(wxCLASSINFO(wxGISMapView));
+        m_pMapView = dynamic_cast<wxGISMapView*>(pWnd);
 	}
 	if(!m_pMapView)
         return;
@@ -597,8 +587,10 @@ void wxAxIdentifyView::Identify(OGRGeometrySPtr pGeometryBounds)
     if(IsDoubleEquil(pt1.getX(), pt2.getX()) && IsDoubleEquil(pt1.getY(), pt2.getY()))
 	{
 		OGREnvelope Env;
- 		wxGISAppConfigSPtr pConfig = GetConfig();
-        double dfDelta = pConfig->ReadDouble(enumGISHKCU, wxString(wxT("wxGISCommon/math/delta")), 0.000001);//EPSILON * 10000
+ 		wxGISAppConfig oConfig = GetConfig();
+        double dfDelta(0.000001);
+        if(oConfig.IsOk())
+            dfDelta = oConfig.ReadDouble(enumGISHKCU, wxString(wxT("wxGISCommon/math/delta")), 0.000001);//EPSILON * 10000
 		Env.MinX = pt1.getX() - dfDelta;
 		Env.MinY = pt1.getY() - dfDelta;
 		Env.MaxX = pt1.getX() + dfDelta;
@@ -803,3 +795,4 @@ void wxAxIdentifyView::OnMenu(wxCommandEvent& event)
 	break;
 	}
 }
+*/

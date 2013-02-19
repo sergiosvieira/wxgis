@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  wxGxTaskExecDlg class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -24,7 +24,7 @@
 
 #include "../../art/process_stop.xpm"
 #include "../../art/state.xpm"
-
+/*
 //////////////////////////////////////////////////////////////////
 // wxGxTaskPanel
 //////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ wxGxTaskExecDlg::wxGxTaskExecDlg(wxGISGPToolManager* pToolManager, wxWindow* par
     m_bpCloseButton->SetToolTip(_("Cancel"));
     fgSizer1->Add( m_bpCloseButton, 0, wxALL, 5 );
 
-    m_bMainSizer->Add(fgSizer1, 0 ,wxEXPAND/* | wxBOTTOM */| wxLEFT | wxRIGHT, 5);
+    m_bMainSizer->Add(fgSizer1, 0 ,wxEXPAND | wxLEFT | wxRIGHT, 5);// | wxBOTTOM 
 
     m_Text = new wxStaticText(this, wxID_ANY, wxEmptyString);
     m_Text->Wrap( -1 );
@@ -174,7 +174,7 @@ void wxGxTaskExecDlg::FillHtmlWindow()
         sText += wxString(wxT("<br>"));
     }
     sText += wxString(wxT("</body></html>"));
-    /*bool bTest = */m_pHtmlWindow->SetPage(sText);
+    m_pHtmlWindow->SetPage(sText);//bool bTest = 
     m_pHtmlWindow->Scroll(-1, 5000);
 }
 
@@ -504,3 +504,4 @@ void wxGxTaskObject::SetPriority(int nNewPriority)
 		m_pCatalog->ObjectRefreshed(m_pParent->GetID());
 	}
 }
+*/

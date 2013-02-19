@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxFileFactoryUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -23,6 +23,7 @@
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalog/gxfilefactory.h"
 
+/*
 class wxGxFileFactoryUI :
 	public wxGxFileFactory
 {
@@ -35,3 +36,4 @@ public:
 protected:
     wxIcon m_LargePRJIcon, m_SmallPRJIcon;
 };
+*/

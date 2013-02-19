@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISVectorPropertyPage class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #pragma once
 
 #include "wxgis/catalogui/catalogui.h"
+#include "wxgis/catalogui/gxdatasetui.h"
 #include "wxgis/datasource/featuredataset.h"
 
 #include "wx/propgrid/propgrid.h"
@@ -28,6 +29,7 @@
 /** \class wxGISVectorPropertyPage vectorpropertypage.h
     \brief The tab of vector dataset properties.
 */
+
 class WXDLLIMPEXP_GIS_CLU wxGISVectorPropertyPage : 
     public wxPanel
 {
@@ -39,18 +41,18 @@ class WXDLLIMPEXP_GIS_CLU wxGISVectorPropertyPage :
 
 public:
     wxGISVectorPropertyPage(void);
-    wxGISVectorPropertyPage(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Vector"));
+    wxGISVectorPropertyPage(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Vector"));
 	~wxGISVectorPropertyPage();
-    virtual bool Create(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Vector"));
-    virtual wxString GetPageName(void){return wxString(_("Vector"));};
+    virtual bool Create(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Vector"));
+    virtual wxString GetPageName(void) const {return wxString(_("Vector"));};
     wxPGProperty* AppendProperty(wxPGProperty* pProp);
     wxPGProperty* AppendProperty(wxPGProperty* pid, wxPGProperty* pProp);
     wxPGProperty* AppendMetadataProperty(wxString sMeta);
     void FillGrid(void);
     void FillLayerDef(OGRLayer *poLayer, int iLayer, CPLString soPath);
 protected:
-    wxGISFeatureDatasetSPtr m_pDataset;
-    IGxDataset* m_pGxDataset;
+    wxGISFeatureDataset* m_pDataset;
+    wxGxFeatureDataset* m_pGxDataset;
     wxPropertyGrid* m_pg;
 	long m_nCounter;
 

@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDiscConnectionUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,26 +26,37 @@
 /** \class wxGxDiscConnectionUI gxdiscconnectionui.h
     \brief A Disc Connection GxObject.
 */
+
 class WXDLLIMPEXP_GIS_CLU wxGxDiscConnectionUI :
 	public wxGxDiscConnection,
     public IGxObjectUI,
     public IGxObjectEditUI,
-    public IGxDropTarget
+    public IGxDropTarget,
+    public wxThreadHelper
 {
 public:
-	wxGxDiscConnectionUI(CPLString Path, wxString Name, wxIcon SmallIco, wxIcon LargeIco, wxIcon SmallIcoDsbl, wxIcon LargeIcoDsbl);
+	wxGxDiscConnectionUI(wxGxObject *oParent, const wxString &soXmlConfPath, int nXmlId, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon &SmallIco = wxNullIcon, const wxIcon &LargeIco = wxNullIcon, const wxIcon &SmallIcoDsbl = wxNullIcon, const wxIcon &LargeIcoDsbl = wxNullIcon);
 	virtual ~wxGxDiscConnectionUI(void);
+    //wxGxObjectContainer
+    virtual bool HasChildren(void);
+    virtual void Refresh(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxDiscConnection.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxDiscConnection.NewMenu"));};
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxDiscConnection.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxString(wxT("wxGxDiscConnection.NewMenu"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
     //IGxDropTarget
     virtual wxDragResult CanDrop(wxDragResult def);
     virtual bool Drop(const wxArrayString& filenames, bool bMove);
 protected:
+    bool CheckReadable(void);
+    virtual wxThread::ExitCode Entry();
+    bool CreateAndRunCheckThread(void);
+protected:
 	wxIcon m_Conn16, m_Conn48;
 	wxIcon m_ConnDsbld16, m_ConnDsbld48;
+    char m_nIsReadable;
 };
+

@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  controls classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 #pragma once
 
 #include "wxgis/geoprocessingui/geoprocessingui.h"
-#include "wxgis/geoprocessing/geoprocessing.h"
-#include "wxgis/cartoui/tableview.h"
+#include "wxgis/geoprocessing/gpparam.h"
+//#include "wxgis/cartoui/tableview.h"
 
 #include <wx/intl.h>
 #include <wx/bitmap.h>
@@ -39,71 +39,75 @@
 #include <wx/sizer.h>
 #include <wx/panel.h>
 #include <wx/grid.h>
-
-#include  "wx/imaglist.h"
+#include  <wx/imaglist.h>
 
 /** \class wxGISDTBase gpcontrols.h
     \brief The base class for tool dialog controls.
 */
-class wxGISDTBase : public wxPanel
+class WXDLLIMPEXP_GIS_GPU wxGISDTBase : public wxPanel
 {
+    DECLARE_ABSTRACT_CLASS(wxGISDTBase)
 public:
-	wxGISDTBase( IGPParameter* pParam, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCLIP_CHILDREN | wxCLIP_SIBLINGS | wxTAB_TRAVERSAL );
+	wxGISDTBase( const wxGISGPParameterArray &Params, int nParamIndex, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCLIP_CHILDREN | wxCLIP_SIBLINGS | wxTAB_TRAVERSAL );
     virtual ~wxGISDTBase();
-    virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, wxString sMsg = wxEmptyString);
+    virtual void SetMessage(wxGISEnumGPMessageType nType = wxGISEnumGPMessageUnknown, const wxString &sMsg = wxEmptyString);
     virtual bool Validate(void) = 0;
-    virtual void UpdateValues(void) = 0;
-    virtual void UpdateControls(void) = 0;
-    virtual IGPParameter* GetParameter(void);
-	virtual wxGISEnumGPMessageType GetCurrentMessageType(void){return m_nCurrentType;};
-	virtual wxString GetCurrentMessage(void){return m_sCurrentMsg;};
-protected:
-	wxStaticBitmap* m_StateBitmap;
+    virtual wxGISGPParameter* GetParameter(void) const;
+	virtual wxGISEnumGPMessageType GetCurrentMessageType(void) const {return m_nCurrentType;};
+	virtual wxString GetCurrentMessage(void) const {return m_sCurrentMsg;};
+    virtual void OnParamChanged(wxGISGPParamEvent &event) = 0;    
+    virtual void OnParamMsgSet(wxGISGPParamEvent &event);
+protected:	
+    wxStaticBitmap* m_StateBitmap;
 	wxStaticText* m_sParamDisplayName;
 	wxString m_sFullDisplayName;
 	wxStaticBitmap* m_bitmap;
-    IGPParameter* m_pParam;
+    wxGISGPParameter* m_pParam;
 	wxImageList m_ImageList;
 	wxGISEnumGPMessageType m_nCurrentType;
 	wxString m_sCurrentMsg;
-};
-
-/** \class wxGISDTPath gpcontrols.h
-    \brief The tool dialog control for catalog path value representation.
-*/
-class wxGISDTPath : public wxGISDTBase
-{
-    enum
-	{
-		ID_PATHCTRL = wxID_HIGHEST + 3603
-	};
-public:
-	wxGISDTPath( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
-	virtual ~wxGISDTPath();
-	//wxGISDTBase
-    virtual bool Validate(void);
-    virtual void UpdateValues(void);
-    virtual void UpdateControls(void);
-    //events
-    virtual void OnOpen(wxCommandEvent& event);
-	virtual void OnUpdateUI(wxUpdateUIEvent &event);
-	virtual void OnPathChange(wxCommandEvent& event);
-protected:
-    wxTextCtrl* m_PathTextCtrl;
-	wxBitmapButton* m_bpButton;
-    IGxCatalog* m_pCatalog;
-
+    wxGISGPParameterArray m_Params;
+    int m_nParamIndex;
+    long m_nAdvCookie;
+private:
     DECLARE_EVENT_TABLE()
 };
 
 /** \class wxGISDTPath gpcontrols.h
     \brief The tool dialog control for catalog path value representation.
 */
-class wxGISDTFolderPath : public wxGISDTPath
+class WXDLLIMPEXP_GIS_GPU wxGISDTPath : public wxGISDTBase
 {
-
+    DECLARE_CLASS(wxGISDTPath)
+    enum
+	{
+		ID_PATHCTRL = wxID_HIGHEST + 3603
+	};
 public:
-	wxGISDTFolderPath( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
+	wxGISDTPath(  const wxGISGPParameterArray &Params, int nParamIndex, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
+	virtual ~wxGISDTPath();
+	//wxGISDTBase
+    virtual bool Validate(void);
+    //events
+    virtual void OnOpen(wxCommandEvent& event);
+	virtual void OnUpdateUI(wxUpdateUIEvent &event);
+	virtual void OnPathChange(wxCommandEvent& event);
+    virtual void OnParamChanged(wxGISGPParamEvent &event);
+protected:
+    wxTextCtrl* m_PathTextCtrl;
+	wxBitmapButton* m_bpButton;
+private:
+    DECLARE_EVENT_TABLE()
+};
+
+/** \class wxGISDTPath gpcontrols.h
+    \brief The tool dialog control for catalog path value representation.
+*/
+class WXDLLIMPEXP_GIS_GPU wxGISDTFolderPath : public wxGISDTPath
+{
+    DECLARE_CLASS(wxGISDTFolderPath)
+public:
+	wxGISDTFolderPath( const wxGISGPParameterArray &Params, int nParamIndex, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISDTFolderPath();
 	//wxGISDTBase
     virtual bool Validate(void);
@@ -114,58 +118,76 @@ public:
 /** \class wxGISDTDigit gpcontrols.h
     \brief The tool dialog control for digit value representation.
 */
-class wxGISDTDigit : public wxGISDTBase
+class WXDLLIMPEXP_GIS_GPU wxGISDTDigit : public wxGISDTBase
 {
+    DECLARE_CLASS(wxGISDTDigit)
     enum
 	{
 		ID_DIGITCTRL = wxID_HIGHEST + 3604
 	};
 public:
-	wxGISDTDigit( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
+	wxGISDTDigit( const wxGISGPParameterArray &Params, int nParamIndex, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISDTDigit();
 	//wxGISDTBase
     virtual bool Validate(void);
-    virtual void UpdateValues(void);
-    virtual void UpdateControls(void);
     //events
 	virtual void OnUpdateUI(wxUpdateUIEvent &event);
 	virtual void OnDigitChange(wxCommandEvent& event);
+    virtual void OnParamChanged(wxGISGPParamEvent &event);
 protected:
     wxTextCtrl* m_DigitTextCtrl;
-    IGxCatalog* m_pCatalog;
-
+private:
 	DECLARE_EVENT_TABLE()
 };
 
 /** \class wxGISDTChoice gpcontrols.h
     \brief The tool dialog control for choice value representation.
 */
-class wxGISDTChoice : public wxGISDTBase
+class WXDLLIMPEXP_GIS_GPU wxGISDTChoice : public wxGISDTBase
 {
+    DECLARE_CLASS(wxGISDTChoice)
 protected:
 	enum
 	{
 		ID_CHOICESTR = wxID_HIGHEST + 3605
 	};
 public:
-	wxGISDTChoice( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
-	~wxGISDTChoice();
+	wxGISDTChoice( const wxGISGPParameterArray &Params, int nParamIndex, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
+	virtual ~wxGISDTChoice();
 	//wxGISDTBase
     virtual bool Validate(void);
-    virtual void UpdateValues(void);
-    virtual void UpdateControls(void);
     //events
     virtual void OnChoice(wxCommandEvent& event);
 	virtual void OnUpdateUI(wxUpdateUIEvent &event);
+    virtual void OnParamChanged(wxGISGPParamEvent &event);
+    virtual void OnParamDomAddVal(wxGISGPParamEvent &event);
+    virtual void OnParamDomClear(wxGISGPParamEvent &event);
 protected:
 	wxChoice* m_choice;
 	wxBoxSizer* m_bPathSizer;
-DECLARE_EVENT_TABLE()
+private:
+    DECLARE_EVENT_TABLE()
+};
+
+/** \class wxGISDTFieldChoice gpcontrols.h
+    \brief The tool dialog control for choice fields of ogr vector layer.
+*/
+class WXDLLIMPEXP_GIS_GPU wxGISDTFieldChoice : public wxGISDTChoice
+{
+    DECLARE_CLASS(wxGISDTFieldChoice)
+public:
+	wxGISDTFieldChoice( const wxGISGPParameterArray &Params, int nParamIndex, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
+	virtual ~wxGISDTFieldChoice();
+    //wxGISDTBase
+    virtual bool Validate(void);
+    //events
+    virtual void OnChoice(wxCommandEvent& event);
+    virtual void OnParamChanged(wxGISGPParamEvent &event);
 };
 
 /** \class wxGISDTChoiceEditable gpcontrols.h
     \brief The tool dialog control for choice value representation. User can change choices list.
-*/
+*//*
 class wxGISDTChoiceEditable : public wxGISDTChoice
 {
 public:
@@ -182,34 +204,59 @@ DECLARE_EVENT_TABLE()
 /** \class wxGISDTBool gpcontrols.h
     \brief The tool dialog control for bool value representation.
 */
-class wxGISDTBool : public wxGISDTBase
+class WXDLLIMPEXP_GIS_GPU wxGISDTBool : public wxGISDTBase
 {
+    DECLARE_CLASS(wxGISDTBool)
     enum
 	{
 		ID_CHECKBOOL = wxID_HIGHEST + 3606
 	};
 public:
-	wxGISDTBool( IGPParameter* pParam, IGxCatalog* pCatalog, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
+	wxGISDTBool( const wxGISGPParameterArray &Params, int nParamIndex, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISDTBool();
 	//wxGISDTBase
     virtual bool Validate(void);
-    virtual void UpdateValues(void);
-    virtual void UpdateControls(void);
     //events
-    virtual void OnClick( wxCommandEvent& event );
+    virtual void OnClick(wxCommandEvent& event);
     virtual void OnSize( wxSizeEvent& event );
 	virtual void OnUpdateUI(wxUpdateUIEvent &event);
+    virtual void OnParamChanged(wxGISGPParamEvent &event);
 protected:
     wxCheckBox* m_pCheckBox;
-    IGxCatalog* m_pCatalog;
 	wxString m_sFullText;
+private:
+    DECLARE_EVENT_TABLE()
+};
 
-DECLARE_EVENT_TABLE()
+/** \class wxGISDTText gpcontrols.h
+    \brief The tool dialog control for string value representation.
+*/
+class WXDLLIMPEXP_GIS_GPU wxGISDTText : public wxGISDTBase
+{
+    DECLARE_CLASS(wxGISDTString)
+    enum
+	{
+		ID_EDITBOX = wxID_HIGHEST + 3607
+	};
+public:
+	wxGISDTText( const wxGISGPParameterArray &Params, int nParamIndex, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
+	virtual ~wxGISDTText();
+	//wxGISDTBase
+    virtual bool Validate(void);
+    //events
+    virtual void OnTextChange(wxCommandEvent& event);
+	virtual void OnUpdateUI(wxUpdateUIEvent &event);
+    virtual void OnParamChanged(wxGISGPParamEvent &event);
+protected:
+    wxTextCtrl* m_TextCtrl;
+	wxString m_sFullText;
+private:
+    DECLARE_EVENT_TABLE()
 };
 
 /** \class wxGISDTSpatRef gpcontrols.h
     \brief The tool dialog control for spatial reference value representation.
-*/
+*//*
 class wxGISDTSpatRef : public wxGISDTBase
 {
     enum
@@ -239,7 +286,7 @@ protected:
     \brief The tool dialog control for multiple parameters.
 
 	The multiple parameters stores in grid.
-*/
+*//*
 class wxGISDTMultiParam : public wxGISDTBase
 {
 	enum
@@ -265,7 +312,7 @@ protected:
 
 /** \class wxGISDTList gpcontrols.h
     \brief The tool dialog control the list of values.
-*/
+*//*
 class wxGISDTList : public wxGISDTBase
 {
 	enum
@@ -294,7 +341,7 @@ protected:
 
 /** \class wxGISSQLQueryCtrl gpcontrols.h
     \brief The tool dialog control SQL query representation.
-*/
+*//*
 class wxGISSQLQueryCtrl : public wxGISDTBase
 {
 	enum
@@ -318,3 +365,4 @@ protected:
 
     DECLARE_EVENT_TABLE()
 };
+*/

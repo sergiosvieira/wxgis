@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  Filter classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -19,19 +19,24 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/datasource/filter.h"
-#include "wxgis/datasource/vectorop.h"
 
 //----------------------------------------------------------------------------
 // wxGISQueryFilter
 //----------------------------------------------------------------------------
+wxGISQueryFilter wxGISNullQueryFilter;
 
 wxGISQueryFilter::wxGISQueryFilter(void)
 {
 }
     
-wxGISQueryFilter::wxGISQueryFilter(wxString sWhereClause)
+wxGISQueryFilter::wxGISQueryFilter(const wxString &sWhereClause)
 {
 	m_sWhereClause = sWhereClause;
+}
+
+wxGISQueryFilter::wxGISQueryFilter( const wxGISQueryFilter& obj )
+{
+   m_sWhereClause = obj.m_sWhereClause;
 }
 
 wxGISQueryFilter::~wxGISQueryFilter(void)
@@ -43,18 +48,24 @@ void wxGISQueryFilter::SetWhereClause(wxString sWhereClause)
 	m_sWhereClause = sWhereClause;
 }
     
-wxString wxGISQueryFilter::GetWhereClause(void)
+wxString wxGISQueryFilter::GetWhereClause(void) const
 {
 	return m_sWhereClause;
+}
+
+wxGISQueryFilter& wxGISQueryFilter::operator = ( const wxGISQueryFilter& obj )
+{
+    m_sWhereClause = obj.m_sWhereClause;
+    return *this;
 }
 
 //----------------------------------------------------------------------------
 // wxGISSpatialFilter
 //----------------------------------------------------------------------------
 
-wxGISSpatialFilter::wxGISSpatialFilter(OGRGeometrySPtr pGeom, wxString sWhereClause) : wxGISQueryFilter(sWhereClause)
+wxGISSpatialFilter::wxGISSpatialFilter(const wxGISGeometry &Geom, const wxString &sWhereClause) : wxGISQueryFilter(sWhereClause)
 {
-	m_pGeom = pGeom;
+	m_Geom = Geom;
 }
 	
 wxGISSpatialFilter::wxGISSpatialFilter() : wxGISQueryFilter()
@@ -65,6 +76,19 @@ wxGISSpatialFilter::~wxGISSpatialFilter()
 {
 }
 
+wxGISSpatialFilter& wxGISSpatialFilter::operator = ( const wxGISSpatialFilter& obj )
+{
+    m_Geom = obj.m_Geom;
+    m_sWhereClause = obj.m_sWhereClause;
+    return *this;
+}
+
+wxGISSpatialFilter::wxGISSpatialFilter( const wxGISSpatialFilter& obj )
+{
+    m_Geom = obj.m_Geom;
+    m_sWhereClause = obj.m_sWhereClause;
+}
+
 void wxGISSpatialFilter::SetEnvelope(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY)
 {
 	OGREnvelope Envelope;
@@ -72,27 +96,32 @@ void wxGISSpatialFilter::SetEnvelope(double dfMinX, double dfMinY, double dfMaxX
 	Envelope.MaxX = dfMaxX;
 	Envelope.MinY = dfMinY;
 	Envelope.MaxY = dfMaxY;
-	m_pGeom = EnvelopeToGeometry(Envelope);
+	m_Geom = EnvelopeToGeometry(Envelope);
 }
 
-void wxGISSpatialFilter::SetGeometry(OGRGeometrySPtr pGeom)
+void wxGISSpatialFilter::SetEnvelope(const OGREnvelope &Env)
 {
-	m_pGeom = pGeom;
+	m_Geom = EnvelopeToGeometry(Env);
+}
+
+void wxGISSpatialFilter::SetGeometry(const wxGISGeometry &Geom)
+{
+	m_Geom = Geom;
 }
 	
-OGREnvelopeSPtr wxGISSpatialFilter::GetEnvelope(void)
+OGREnvelope wxGISSpatialFilter::GetEnvelope(void)
 {
-	if(m_pGeom)
+	if(m_Geom.IsOk())
 	{
-		OGREnvelopeSPtr pEnvelope = boost::make_shared<OGREnvelope>();
-		m_pGeom->getEnvelope(pEnvelope.get());
-		return pEnvelope;
+		return m_Geom.GetEnvelope();
 	}
 	else
-		return OGREnvelopeSPtr();
+    {
+		return OGREnvelope();
+    }
 }
 	
-OGRGeometrySPtr wxGISSpatialFilter::GetGeometry(void)
+wxGISGeometry wxGISSpatialFilter::GetGeometry(void) const
 {
-	return m_pGeom;
+	return m_Geom;
 }

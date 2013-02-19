@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISIdentifyDlg class - dialog/dock window with the results of identify.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,9 +19,10 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-
+/*
 #include "wxgis/cartoui/cartoui.h"
-#include "wxgis/framework/framework.h"
+#include "wxgis/framework/view.h"
+#include "wxgis/framework/applicationbase.h"
 #include "wxgis/cartoui/mapview.h"
 #include "wxgis/carto/featurelayer.h"
 #include "wxgis/cartoui/formatmenu.h"
@@ -46,10 +47,11 @@
 #include <wx/listctrl.h>
 #include <wx/valgen.h>
 #include <wx/imaglist.h>
-
+*/
 /** \class wxIdentifyTreeItemData identifydlg.h
  *  \brief The identify tree item data.
  */
+/*
 class wxIdentifyTreeItemData : public wxTreeItemData
 {
 public:
@@ -75,10 +77,11 @@ typedef struct _fieldsortdata
     short currentSortCol;
     OGRFeatureSPtr pFeature;
 } FIELDSORTDATA, *LPFIELDSORTDATA;
-
+*/
 /** \class wxGISFeatureDetailsPanel identifydlg.h
  *  \brief The wxGISFeatureDetailsPanel class show OGRFeature fields and values.
  */
+/*
 class wxGISFeatureDetailsPanel : public wxPanel
 {
 	enum
@@ -124,10 +127,11 @@ protected:
 
     DECLARE_EVENT_TABLE()
 };
-
+*/
 /** \class wxGISIdentifyDlg identifydlg.h
  *  \brief The wxGISIdentifyDlg class is dialog/dock window with the results of identify.
  */
+/*
 class WXDLLIMPEXP_GIS_CTU wxGISIdentifyDlg : public wxPanel
 {
 protected:
@@ -175,10 +179,11 @@ protected:
 
     DECLARE_EVENT_TABLE()
 };
-
+*/
 /** \class wxAxToolboxView gptoolboxview.h
     \brief The wxAxToolboxView show tool window with tabs(tools tree, tool exec view & etc.).
 */
+/*
 class WXDLLIMPEXP_GIS_CTU wxAxIdentifyView :
 	public wxGISIdentifyDlg,
 	public IView
@@ -196,7 +201,7 @@ public:
 	virtual ~wxAxIdentifyView(void);
 //IView
     virtual bool Create(wxWindow* parent, wxWindowID id = ID_WXGISIDENTIFYVIEW, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxBORDER_NONE | wxTAB_TRAVERSAL, const wxString& name = wxT("IdentifyView"));
-	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(wxGISApplicationBase* application, wxXmlNode* pConf);
 	virtual void Deactivate(void);
 	virtual void Refresh(void){};
 	virtual wxString GetViewName(void){return m_sViewName;};
@@ -211,8 +216,9 @@ public:
 	virtual void OnMenu(wxCommandEvent& event);
 protected:
 	wxString m_sViewName;
-    IFrameApplication* m_pApp;
+    wxGISApplicationBase* m_pApp;
 	wxGISMapView* m_pMapView;
     //wxGxToolboxTreeView* m_pGxToolboxView;
     //wxGxToolExecuteView *m_pGxToolExecuteView;
 };
+*/

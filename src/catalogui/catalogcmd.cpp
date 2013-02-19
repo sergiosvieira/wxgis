@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  Catalog Main Commands class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,16 +22,17 @@
 
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/catalogui/catalogui.h"
+#include "wxgis/catalogui/gxselection.h"
 #include "wxgis/catalog/gxdiscconnection.h"
-#include "wxgis/catalogui/gxlocationcombobox.h"
-
-#include "wxgis/framework/progressor.h"
-
 #include "wxgis/datasource/datasource.h"
-#include "wxgis/datasource/datacontainer.h"
 #include "wxgis/datasource/sysop.h"
-
 #include "wxgis/catalogui/gxfolderui.h"
+#include "wxgis/catalog/gxdiscconnections.h"
+#include "wxgis/catalogui/droptarget.h"
+#include "wxgis/framework/dataobject.h"
+#include "wxgis/catalogui/gxlocationcombobox.h"
+//
+//#include "wxgis/framework/progressor.h"
 
 #include "../../art/delete.xpm"
 #include "../../art/edit.xpm"
@@ -45,21 +46,19 @@
 #include "../../art/go.xpm"
 #include "../../art/properties.xpm"
 
-#include "../../art/folder_16.xpm"
-#include "../../art/folder_48.xpm"
-
 #include "../../art/edit_copy.xpm"
 #include "../../art/edit_cut.xpm"
 #include "../../art/edit_paste.xpm"
 
 #include <wx/dirdlg.h>
 #include <wx/file.h>
-#include <wx/clipbrd.h>
 #include <wx/richmsgdlg.h>
+#include <wx/clipbrd.h>
+#include <wx/dataobj.h>
 
 //	0	Up One Level
 //	1	Connect Folder
-//	2	Disconnect Folder
+//	2	Disconnect Folder - duplicate Delete command 
 //	3	Location
 //  4   Delete Item
 //  5   Back
@@ -73,9 +72,13 @@
 //  13  Paste
 //  14  ?
 
-IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogMainCmd, wxObject)
+//-----------------------------------------------------------------------------------
+// wxGISCatalogMainCmd
+//-----------------------------------------------------------------------------------
 
-wxGISCatalogMainCmd::wxGISCatalogMainCmd(void)
+IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogMainCmd, wxGISCommand)
+
+wxGISCatalogMainCmd::wxGISCatalogMainCmd(void) : wxGISCommand()
 {
 }
 
@@ -166,9 +169,9 @@ wxString wxGISCatalogMainCmd::GetCaption(void)
 		case 4:
 			return wxString(_("Delete"));
 		case 5:
-			return wxString(_("Back"));//
+			return wxString(_("Back"));
 		case 6:
-			return wxString(_("Forward"));//
+			return wxString(_("Forward"));
 		case 7:
 			return wxString(_("Create folder"));
 		case 8:
@@ -222,217 +225,145 @@ bool wxGISCatalogMainCmd::GetChecked(void)
 
 bool wxGISCatalogMainCmd::GetEnabled(void)
 {
-	switch(m_subtype)
+    wxCHECK_MSG(m_pGxApp, false, wxT("Application pointer is null"));
+
+    wxGxSelection* pSel = m_pGxApp->GetGxSelection();
+    wxGxCatalogBase* pCat = GetGxCatalog();
+
+    switch(m_subtype)
 	{
 		case 0://Up One Level
-		{
-			//check if not root
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				if(!pGxCatalogUI)
-					return false;
-				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-				if(pSel->GetCount() == 0)
-					return false;
-				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
-				if(!pGxObject)
-					return false;
-				IGxObject* pParentGxObject = pGxObject->GetParent();
-				if(!pParentGxObject)
-					return false;
-			}
-			return true;
-		}
+            if(pCat && pSel)
+            {
+                wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetFirstSelectedObjectId());
+                return pGxObject != NULL && pGxObject->GetParent();
+            }
+            return false;
 		case 1:
 			return true;
 		case 2:
-		{
-			//check if dynamic_cast<wxGxDiscConnection*>
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				if(!pGxCatalogUI)
-					return false;
-				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-				if(pSel->GetCount() == 0)
-					return false;
-
-				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
-				if(dynamic_cast<wxGxDiscConnection*>(pGxObject.get()))
-					return true;
-			}
+			//check if wxGxDiscConnection
+            if(pCat && pSel)
+            {
+                wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetFirstSelectedObjectId());
+                return pGxObject != NULL && pGxObject->IsKindOf(wxCLASSINFO(wxGxDiscConnection));
+            }
 			return false;
-		}
 		case 3:
 			return true;
-		case 4:
-        {
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				if(!pGxCatalogUI)
-					return false;
-				IGxSelection* pSel = pGxCatalogUI->GetSelection();
+		case 4://delete
+             if(pCat && pSel)
+             {
                 for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
-					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
-					IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
+                    wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
+					IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject);
 					if(pGxObjectEdit && pGxObjectEdit->CanDelete())
 						return true;
                 }
-            }
-			return false;
-        }
+             }
+             return false;
 		case 5:
-        {
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                IGxCatalog* pCatalog = pGxApp->GetCatalog();
-                if(pCatalog)
-                {
-                    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pCatalog);
-                    IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                    if(pSel)
-                        return pSel->CanUndo();
-                }
-            }
+            if(pSel)
+                return pSel->CanUndo();
 			return false;
-        }
 		case 6:
-        {
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                IGxCatalog* pCatalog = pGxApp->GetCatalog();
-                if(pCatalog)
-                {
-                    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pCatalog);
- 					if(!pGxCatalogUI)
-						return false;
-                   IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                    if(pSel)
-                        return pSel->CanRedo();
-                }
-            }
+            if(pSel)
+                return pSel->CanRedo();
 			return false;
-        }
         case 7:
-        {
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                IGxCatalog* pCatalog = pGxApp->GetCatalog();
-                if(pCatalog)
-                {
-                    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pCatalog);
- 					if(!pGxCatalogUI)
-						return false;
-                   IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                    if(pSel)
-                    {
-						IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(0));
-                        IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
-                        if(pCont)
-                            return pCont->CanCreate(enumGISContainer, enumContFolder);
-                    }
-                }
+            if(pCat && pSel)
+            {
+                wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetFirstSelectedObjectId());
+                wxGxObjectContainer* pCont = wxDynamicCast(pGxObject, wxGxObjectContainer);
+                if(pCont)
+                    return pCont->CanCreate(enumGISContainer, enumContFolder);
             }
 			return false;
-        }
 		case 8://Rename
-        {
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				if(!pGxCatalogUI)
-					return false;
-				IGxSelection* pSel = pGxCatalogUI->GetSelection();
+            if(pCat && pSel)
+            {
                 size_t nCounter(0);
                 for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
-					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
-                    IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
-                    if(pGxObjectEdit && pGxObjectEdit->CanRename())
+                    wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
+	                IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject);
+	                if(pGxObjectEdit && pGxObjectEdit->CanRename())
                         nCounter++;
                 }
                 return nCounter == 1 ? true : false;
             }
-			return false;
-        }
+            return false;
 		case 9://Refresh
-		{
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				if(!pGxCatalogUI)
-					return false;
-				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-				if(pSel->GetCount() > 0)
-					return true;
-			}
+            if(pSel)
+                return pSel->GetCount() > 0;
 			return false;
-		}
 		case 10://Properties
-		{
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				if(!pGxCatalogUI)
-					return false;
-				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetLastSelectedObjectID());
-
-                IGxObjectEditUI* pGxObjectEditUI = dynamic_cast<IGxObjectEditUI*>(pGxObject.get());
-                if(pGxObjectEditUI)
-                    return true;
+			//check if IGxObjectEditUI
+            if(pCat && pSel)
+            {
+                wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetLastSelectedObjectId());
+                return dynamic_cast<IGxObjectEditUI*>(pGxObject);
             }
 			return false;
-		}
         case 11://Copy
-        {
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				if(!pGxCatalogUI)
-					return false;
-				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetLastSelectedObjectID());
-                IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
-                if(pGxObjectEdit)
-                    return pGxObjectEdit->CanCopy("");
-            }
-			return false;
-        }
+             if(pCat && pSel)
+             {
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
+                {
+                    wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
+					IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject);
+                    if(pGxObjectEdit && pGxObjectEdit->CanCopy(""))
+                        return true;
+                }
+             }
+             return false;
         case 12://Cut
-        {
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				if(!pGxCatalogUI)
-					return false;
-				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetLastSelectedObjectID());
-                IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
-                if(pGxObjectEdit)
-                    return pGxObjectEdit->CanMove("");
-            }
-			return false;
-        }
+             if(pCat && pSel)
+             {
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
+                {
+                    wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
+					IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject);
+                    if(pGxObjectEdit && pGxObjectEdit->CanMove(""))
+                        return true;
+                }
+             }
+             return false;
         case 13://Paste
         {
-            wxClipboardLocker lockClip;
-            return wxTheClipboard->IsSupported(wxDF_FILENAME) & wxTheClipboard->IsSupported(wxDF_TEXT);// | wxDF_BITMAP | wxDF_TIFF | wxDF_DIB | wxDF_UNICODETEXT | wxDF_HTML
+            IViewDropTarget* pViewDropTarget = dynamic_cast<IViewDropTarget*>(wxWindow::FindFocus());
+            if(pViewDropTarget)
+            {
+                if( pViewDropTarget->CanPaste() )
+                {
+                    wxClipboardLocker locker;
+                    bool bMove(false);
+                    if(!locker)
+                    {
+                        //
+                    }
+                    else
+                    {
+                    
+                        wxTextDataObject data;                        
+                        if(wxTheClipboard->GetData( data ))
+                        {
+                            if(data.GetText() == wxString(wxT("cut")))
+                                bMove = true;
+                        }                    
+                    }
+
+                    for(size_t i = 0; i < pSel->GetCount(); ++i)
+                    {
+                        IGxDropTarget* pGxDropTarget = dynamic_cast<IGxDropTarget*>(pCat->GetRegisterObject(pSel->GetSelectedObjectId(i)));
+                        if(pGxDropTarget && wxIsDragResultOk(pGxDropTarget->CanDrop(bMove == true ? wxDragMove : wxDragCopy)))
+                            return true;
+                    }
+                }
+            }
         }
+             return false;
 		default:
 			return false;
 	}
@@ -504,94 +435,77 @@ wxString wxGISCatalogMainCmd::GetMessage(void)
 
 void wxGISCatalogMainCmd::OnClick(void)
 {
-	switch(m_subtype)
+    wxCHECK_RET(m_pGxApp && m_pApp, wxT("Application pointer is null"));
+
+    wxGxSelection* pSel = m_pGxApp->GetGxSelection();
+    wxGxCatalogBase* pCat = GetGxCatalog();
+    
+    switch(m_subtype)
 	{
 		case 0:
-			{
-				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-				if(pGxApp)
+            if(pSel && pCat)
+            {
+                wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetFirstSelectedObjectId());
+                if(!pGxObject)
+                    return; 
+				wxGxObject* pParentGxObject = pGxObject->GetParent();
+				if(wxIsKindOf(pParentGxObject, wxGxObjectContainer))
+                {
+                    pSel->Select(pParentGxObject->GetId(), false, wxGxSelection::INIT_ALL);
+                }
+				else
 				{
-                    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-					IGxSelection* pSel = pGxCatalogUI->GetSelection();
-					if(pSel->GetCount() == 0)
-						break;
-					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
-                    if(!pGxObject)
-                        return;
-					IGxObject* pParentGxObject = pGxObject->GetParent();
-					if(dynamic_cast<IGxObjectContainer*>(pParentGxObject))
-					{
-						pSel->Select(pParentGxObject->GetID(), false, IGxSelection::INIT_ALL);
-					}
-					else
-					{
-						IGxObject* pGrandParentGxObject = pParentGxObject->GetParent();
-						pSel->Select(pGrandParentGxObject->GetID(), false, IGxSelection::INIT_ALL);
-					}
+					wxGxObject* pGrandParentGxObject = pParentGxObject->GetParent();
+					pSel->Select(pGrandParentGxObject->GetId(), false, wxGxSelection::INIT_ALL);
 				}
-			}
+            }
 			break;
-		case 1:
+		case 1://	1	Connect Folder
 		{
 			wxDirDialog dlg(dynamic_cast<wxWindow*>(m_pApp), wxString(_("Choose a folder to connect")));
-			if(dlg.ShowModal() == wxID_OK)
+			if(pSel && pCat && dlg.ShowModal() == wxID_OK)
 			{
-				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-				if(pGxApp)
-				{
-					wxString sPath = dlg.GetPath();
-					pGxApp->GetCatalog()->ConnectFolder(sPath);
-				}
+                wxGxCatalog* pGxCatalog = wxDynamicCast(pCat, wxGxCatalog);
+                if(pGxCatalog)
+                {
+                    wxGxDiscConnections* pGxDiscConnections = wxDynamicCast(pGxCatalog->GetRootItemByType(wxCLASSINFO(wxGxDiscConnections)), wxGxDiscConnections);
+                    if(pGxDiscConnections && pGxDiscConnections->ConnectFolder(dlg.GetPath()))
+                        return;
+                    else
+                        wxMessageBox(_("Cannot connect folder"), _("Error"), wxOK | wxICON_ERROR);
+                }
 			}
 			return;
 		}
-		case 2:
+		case 2://	2	Disconnect Folder - duplicate Delete command 
 		{
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
-				wxGxDiscConnection* pDiscConnection = dynamic_cast<wxGxDiscConnection*>(pGxObject.get());
-				if(pDiscConnection)
-				{
-					pGxObject.reset();
-					CPLString sPath = pDiscConnection->GetInternalName();
-					pGxApp->GetCatalog()->DisconnectFolder(sPath);
-				}
-			}
+            if(pSel && pCat)
+            {
+                wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetFirstSelectedObjectId());
+                wxGxDiscConnection* pGxDiscConnection = wxDynamicCast(pGxObject, wxGxDiscConnection);
+                if(pGxDiscConnection && pGxDiscConnection->Delete())
+                    return;
+                else
+                    wxMessageBox(_("Cannot disconnect folder"), _("Error"), wxOK | wxICON_ERROR);
+            }
 			return;
 		}
 		case 8:
+            if(pSel && pCat)
             {
-                wxWindow* pFocusWnd = wxWindow::FindFocus();
-                IGxView* pGxView = dynamic_cast<IGxView*>(pFocusWnd);
-
-                IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-                IGxObject* pSelObj = NULL;
-                if(pGxApp)
-                {
-                    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-                    IGxSelection* pSel = pGxCatalogUI->GetSelection();
-					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetLastSelectedObjectID());
-                    pSelObj = pGxObject.get();
-                }
-                if(pGxView)
-                    pGxView->BeginRename(pSelObj->GetID());
+                wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetLastSelectedObjectId());
+                wxGxView* pGxView = dynamic_cast<wxGxView*>(wxWindow::FindFocus());
+                if(pGxView && pGxObject)
+                    pGxView->BeginRename(pGxObject->GetId());
             }
 			break;
         case 4:
-        {
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
+            if(pSel && pCat)
             {
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-                IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                //ask to delete?
                 bool bAskToDelete(true);
-				wxGISAppConfigSPtr pConfig = GetConfig();
-				bAskToDelete = pConfig->ReadBool(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/catalog/ask_delete")), bAskToDelete);
+
+				wxGISAppConfig oConfig = GetConfig();
+				bAskToDelete = oConfig.ReadBool(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/catalog/ask_delete")), bAskToDelete);
                 if(bAskToDelete)
                 {
                     //show ask dialog
@@ -602,8 +516,8 @@ void wxGISCatalogMainCmd::OnClick(void)
 
 					int nRes = dlg.ShowModal();
 
-					if(pConfig)
-						pConfig->Write(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/catalog/ask_delete")), !dlg.IsCheckBoxChecked());
+					if(oConfig.IsOk())
+						oConfig.Write(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/catalog/ask_delete")), !dlg.IsCheckBoxChecked());
 
                     if(nRes == wxID_NO)
                         return;
@@ -611,11 +525,10 @@ void wxGISCatalogMainCmd::OnClick(void)
 
                 for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
-					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
-                    IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
+					wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
+                    IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject);
                     if(pGxObjectEdit && pGxObjectEdit->CanDelete())
                     {
-						pGxObject.reset();
                         if(!pGxObjectEdit->Delete())
                         {
                             wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
@@ -626,80 +539,77 @@ void wxGISCatalogMainCmd::OnClick(void)
                     }
                 }
             }
-			return;
-        }
+            return;
         case 5:
-        {
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-            wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-			if(pGxCatalogUI && GetEnabled())
-                return pGxCatalogUI->Undo();
-			return;
-        }
+            if(pSel && pCat)
+            {
+                long nSelId = wxNOT_FOUND;
+                if(pSel->CanUndo())
+                {
+                    nSelId = pSel->Undo(wxNOT_FOUND);
+                } 
+                if(pCat->GetRegisterObject(nSelId))
+		        {
+			        pSel->Select(nSelId, false, wxGxSelection::INIT_ALL);
+		        }
+            }
+            return;
         case 6:
-        {
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-            wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-			if(pGxCatalogUI && GetEnabled())
-                return pGxCatalogUI->Redo();
-			return;
-        }
+            if(pSel && pCat)
+            {
+                long nSelId = wxNOT_FOUND;
+                if(pSel->CanRedo())
+                {
+                    nSelId = pSel->Redo(wxNOT_FOUND);
+                } 
+                if(pCat->GetRegisterObject(nSelId))
+		        {
+			        pSel->Select(nSelId, false, wxGxSelection::INIT_ALL);
+		        }
+            }
+            return; 
         case 9:
-		{
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				IGxSelection* pSel = pGxCatalogUI->GetSelection();
+            if(pSel && pCat)
+            {
                 for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
-					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
+					wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
 					if(pGxObject)
                         pGxObject->Refresh();
-                }
-			}
-    		break;
-		}
+                }           
+            }
+            return;
         case 10:
-		{
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetLastSelectedObjectID());
-                IGxObjectEditUI* pGxObjectEdit = dynamic_cast<IGxObjectEditUI*>(pGxObject.get());
+            if(pSel && pCat)
+            {
+				wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetLastSelectedObjectId());
+                IGxObjectEditUI* pGxObjectEdit = dynamic_cast<IGxObjectEditUI*>(pGxObject);
                 if(pGxObjectEdit)
                     pGxObjectEdit->EditProperties(dynamic_cast<wxWindow*>(m_pApp));
-			}
-    		break;
-		}
+            }
+            return;
         case 11://copy
-		{
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                if(!pSel)
-                    return;
-                wxDataObjectComposite* pComp = new wxDataObjectComposite();
-                pComp->Add(new wxTextDataObject(wxT("COPY")));
-                //! Create simple file data object
-                wxFileDataObject* fdo = new wxFileDataObject();
+            if(pSel && pCat)
+            {
+                wxDataObjectComposite *pDragData = new wxDataObjectComposite();
+
+                wxGISStringDataObject *pNamesData = new wxGISStringDataObject(wxDataFormat(wxT("application/x-vnd.wxgis.gxobject-name")));
+                pDragData->Add(pNamesData, true);
+
+                wxFileDataObject *pFileData = new wxFileDataObject();
+                pDragData->Add(pFileData, false);
+
                 for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
-					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
-                    IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
-                    if(pGxObjectEdit && pGxObjectEdit->CanCopy(""))
+					wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
+					if(pGxObject)
                     {
-                        wxString sSystemPath(pGxObject->GetInternalName(), wxConvUTF8);
-                        fdo->AddFile(sSystemPath);
+                        wxString sSystemPath(pGxObject->GetPath(), wxConvUTF8);
+
+                        pFileData->AddFile(sSystemPath);
+                        pNamesData->AddString(pGxObject->GetFullName());
                     }
                 }
-
-                pComp->Add(fdo);
-
                 //! Lock clipboard
                 wxClipboardLocker locker;
                 if(!locker)
@@ -707,38 +617,36 @@ void wxGISCatalogMainCmd::OnClick(void)
                 else
                 {
                     //! Put data to clipboard
-                    if(!wxTheClipboard->AddData(pComp))
+                    if(!wxTheClipboard->AddData(pDragData))
                         wxMessageBox(_("Can't copy file(s) to the clipboard"), _("Error"), wxOK | wxICON_ERROR);
                 }
+
             }
-    		break;
-		}
+    		return;
         case 12://cut
-		{
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                if(!pSel)
-                    return;
-                wxDataObjectComposite* pComp = new wxDataObjectComposite();
-                pComp->Add(new wxTextDataObject(wxT("MOVE")));
-                //! Create simple file data object
-                wxFileDataObject* fdo = new wxFileDataObject();
+            if(pSel && pCat)
+            {
+                wxDataObjectComposite *pDragData = new wxDataObjectComposite();
+
+                wxGISStringDataObject *pNamesData = new wxGISStringDataObject(wxDataFormat(wxT("application/x-vnd.wxgis.gxobject-name")));
+                pDragData->Add(pNamesData, true);
+
+                wxFileDataObject *pFileData = new wxFileDataObject();
+                pDragData->Add(pFileData, false);
+
+                pDragData->Add(new wxTextDataObject(wxT("cut")));
+
                 for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
-					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(i));
-                    IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObject.get());
-                    if(pGxObjectEdit && pGxObjectEdit->CanMove(""))
+					wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
+					if(pGxObject)
                     {
-                        wxString sSystemPath(pGxObject->GetInternalName(), wxConvUTF8);
-                        fdo->AddFile(sSystemPath);
+                        wxString sSystemPath(pGxObject->GetPath(), wxConvUTF8);
+
+                        pFileData->AddFile(sSystemPath);
+                        pNamesData->AddString(pGxObject->GetFullName());
                     }
                 }
-
-                pComp->Add(fdo);
-
                 //! Lock clipboard
                 wxClipboardLocker locker;
                 if(!locker)
@@ -746,108 +654,94 @@ void wxGISCatalogMainCmd::OnClick(void)
                 else
                 {
                     //! Put data to clipboard
-                    if(!wxTheClipboard->AddData(pComp))
-                        wxMessageBox(_("Can't move file(s) to the clipboard"), _("Error"), wxOK | wxICON_ERROR);
+                    if(!wxTheClipboard->AddData(pDragData))
+                        wxMessageBox(_("Can't copy file(s) to the clipboard"), _("Error"), wxOK | wxICON_ERROR);
                 }
+
             }
-    		break;
-		}
+    		return;
         case 13://paste
-		{
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                if(!pSel)
-                    return;
-				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
-                IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pGxObject.get());
+            if(pSel && pCat)
+            {
+                IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pCat->GetRegisterObject(pSel->GetFirstSelectedObjectId()));
                 if(!pTarget)
                     return;
-
                 wxClipboardLocker locker;
                 if(!locker)
                     wxMessageBox(_("Can't open clipboard"), _("Error"), wxOK | wxICON_ERROR);
                 else
                 {
                     wxTextDataObject data;
-                    wxTheClipboard->GetData( data );
                     bool bMove(false);
-                    if(data.GetText() == wxString(wxT("MOVE")))
-                        bMove = true;
-                    else if(data.GetText() == wxString(wxT("COPY")))
-                        bMove = false;
-                    else
-                        return;
+                    if(wxTheClipboard->GetData( data ))
+                    {
+                        if(data.GetText() == wxString(wxT("cut")))
+                            bMove = true;
+                    }
+
+                    wxGISStringDataObject data_names(wxDataFormat(wxT("application/x-vnd.wxgis.gxobject-name")));
+                    if(wxTheClipboard->GetData( data_names ))
+                    {
+                        pTarget->Drop(data_names.GetStrings(), bMove);
+                    }                    
 
                     wxFileDataObject filedata;
-                    wxTheClipboard->GetData( filedata );
-                    wxArrayString filenames = filedata.GetFilenames();
-
-                    pTarget->Drop(filenames, bMove);
-                }
-            }
-    		break;
-		}
-        case 7:
-            {
-			    IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			    if(pGxApp)
-			    {
-                    IGxCatalog* pCatalog = pGxApp->GetCatalog();
-                    if(pCatalog)
+                    if( wxTheClipboard->GetData( filedata ) )
                     {
-                        wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pCatalog);
-                        IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                        if(pSel)
-                        {
-                            //create folder
-							IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
-                            CPLString sFolderPath = CPLFormFilename(pGxObject->GetInternalName(), wxString(_("New folder")).mb_str(wxConvUTF8), NULL);
-                            //CPLString sFolderPath = pObj->GetInternalName() + wxFileName::GetPathSeparator().mb_str(wxConvUTF8) + wxString(_("New folder")).mb_str(wxConvUTF8);
-                            if(!CreateDir(sFolderPath))
-                            {
-                                wxMessageBox(_("Create folder error!"), _("Error"), wxICON_ERROR | wxOK );
-                                return;
-                            }
-                            //create GxObject
-							if(!m_LargeFolderIcon.IsOk())
-								m_LargeFolderIcon = wxIcon(folder_48_xpm);
-							if(!m_SmallFolderIcon.IsOk())
-								m_SmallFolderIcon = wxIcon(folder_16_xpm);
-
-                            wxGxFolderUI* pFolder = new wxGxFolderUI(sFolderPath, wxString(_("New folder")), m_LargeFolderIcon, m_SmallFolderIcon);
-                            IGxObject* pGxFolder = static_cast<IGxObject*>(pFolder);
-                            IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
-                            pObjCont->AddChild(pGxFolder);
-                            pCatalog->ObjectAdded(pGxFolder->GetID());
-							//wait while added new GxObject to views
-							wxYield();
-                            //begin rename GxObject
-                            wxWindow* pFocusWnd = wxWindow::FindFocus();
-                            IGxView* pGxView = dynamic_cast<IGxView*>(pFocusWnd);
-                            if(pGxView)
-                                pGxView->BeginRename(pGxFolder->GetID());
-                        }
+                        pTarget->Drop(wxGISDropTarget::PathsToNames(filedata.GetFilenames()), bMove);
                     }
                 }
             }
-            break;
+            return;
+        case 7:
+            if(pSel && pCat)
+            {
+                //create folder
+                wxGxFolderUI* pGxObject = wxDynamicCast(pCat->GetRegisterObject(pSel->GetFirstSelectedObjectId()), wxGxFolderUI);
+                if(!pGxObject)
+                    return;
+
+                wxGxView* pGxView = dynamic_cast<wxGxView*>(wxWindow::FindFocus());
+
+                CPLString sFolderPath = CheckUniqPath(pGxObject->GetPath(), CPLString(wxString(_("New folder")).mb_str(wxConvUTF8)));
+                pGxObject->BeginRenameOnAdd(pGxView, sFolderPath);
+                if(!CreateDir(sFolderPath))
+                {
+                    wxMessageBox(_("Create folder error!"), _("Error"), wxICON_ERROR | wxOK );
+                    pGxObject->BeginRenameOnAdd(NULL, "");
+                    return;
+                }
+            }
+            return;
         case 3:
 		default:
 			return;
 	}
 }
 
-bool wxGISCatalogMainCmd::OnCreate(IFrameApplication* pApp)
+bool wxGISCatalogMainCmd::OnCreate(wxGISApplicationBase* pApp)
 {
 	m_pApp = pApp;
+    m_pGxApp = dynamic_cast<wxGxApplicationBase*>(pApp);
+    if(m_pApp)
+    {
+        wxGISAppConfig oConfig = GetConfig();
+        if(oConfig.IsOk())
+            m_nPrevNextSelCount = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/catalog/prev_next_sel_count")), 7);
+    }
+    else
+        m_nPrevNextSelCount = 7;
+
 	return true;
 }
 
 wxString wxGISCatalogMainCmd::GetTooltip(void)
 {
+    wxCHECK_MSG(m_pGxApp, wxEmptyString, wxT("Application pointer is null"));
+
+    wxGxSelection* pSel = m_pGxApp->GetGxSelection();
+    wxGxCatalogBase* pCat = GetGxCatalog();
+
 	switch(m_subtype)
 	{
 		case 0:
@@ -861,32 +755,23 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
 		case 4:
 			return wxString(_("Delete selected item"));
 		case 5:
-        {
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp && GetEnabled())
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-                IGxSelection* pSel = pGxCatalogUI->GetSelection();
+            if(pSel && pCat && GetEnabled())
+            {
                 int nPos = pSel->GetDoPos();
-				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetDoID(nPos - 1));
+                wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetDoId(nPos - 1));
                 if(pGxObject)
                 {
                     wxString sPath = pGxObject->GetFullName();
                     if(!sPath.IsEmpty())
                         return sPath;
-                }
+                }            
             }
 			return wxString(_("Go to previous location"));
-        }
 		case 6:
-        {
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp && GetEnabled())
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-                IGxSelection* pSel = pGxCatalogUI->GetSelection();
+            if(pSel && pCat && GetEnabled())
+            {
                 int nPos = pSel->GetDoPos();
-				IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetDoID(nPos + 1 == pSel->GetDoSize() ? nPos : nPos + 1));
+                wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetDoId(nPos - 1));
                 if(pGxObject)
                 {
                     wxString sPath = pGxObject->GetFullName();
@@ -894,8 +779,7 @@ wxString wxGISCatalogMainCmd::GetTooltip(void)
                         return sPath;
                 }
             }
-			return wxString(_("Go to next location"));//
-        }
+			return wxString(_("Go to next location"));
 		case 7:
 			return wxString(_("Create new folder"));
 		case 8:
@@ -925,10 +809,8 @@ IToolBarControl* wxGISCatalogMainCmd::GetControl(void)
 	switch(m_subtype)
 	{
 		case 3:
-//			if(!m_pGxLocationComboBox)
 			{
-				wxArrayString PathArray;
-				wxGxLocationComboBox* pGxLocationComboBox = new wxGxLocationComboBox(dynamic_cast<wxWindow*>(m_pApp), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 400, 22 ), PathArray);
+				wxGxLocationComboBox* pGxLocationComboBox = new wxGxLocationComboBox(dynamic_cast<wxWindow*>(m_pApp), wxID_ANY, wxSize( 400, 22 ));
 				return static_cast<IToolBarControl*>(pGxLocationComboBox);
 			}
 		default:
@@ -960,22 +842,23 @@ bool wxGISCatalogMainCmd::HasToolLabel(void)
 
 wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
 {
+    wxCHECK_MSG(m_pGxApp, NULL, wxT("Application pointer is null"));
+
+    wxGxSelection* pSel = m_pGxApp->GetGxSelection();
+    wxGxCatalogBase* pCat = GetGxCatalog();
+
 	switch(m_subtype)
 	{
 		case 5:
-        {
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-                IGxSelection* pSel = pGxCatalogUI->GetSelection();
+            if(pSel && pCat)
+            {
                 int nPos = pSel->GetDoPos();
 
                 wxMenu* pMenu = new wxMenu();
 
-                for(size_t i = nPos > 7 ? nPos - 7 : 0; i < nPos; ++i)
+                for(size_t i = nPos > m_nPrevNextSelCount ? nPos - m_nPrevNextSelCount : 0; i < nPos; ++i)// last x steps
                 {
-					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetDoID(i));//pSel->GetSelectedObjectID(
+					wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetDoId(i));
                     if(pGxObject)
                     {
                         wxString sPath = pGxObject->GetFullName();
@@ -992,23 +875,18 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
                 return pMenu;
             }
             return NULL;
-        }
 		case 6:
-        {
-            IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp /*&& GetEnabled()*/)
-			{
-                wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-                IGxSelection* pSel = pGxCatalogUI->GetSelection();
+            if(pSel && pCat)
+            {
                 int nPos = pSel->GetDoPos();
 
                 wxMenu* pMenu = new wxMenu();
 
                 for(size_t i = nPos + 1; i < pSel->GetDoSize(); ++i)
                 {
-                    if(i > nPos + 7)
+                    if(i > nPos + m_nPrevNextSelCount)// last x steps
                         break;
-					IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetDoID(i));//pSel->GetSelectedObjectID(
+					wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetDoId(i));
                     if(pGxObject)
                     {
                         wxString sPath = pGxObject->GetFullName();
@@ -1025,7 +903,6 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
                 return pMenu;
             }
             return NULL;
-        }
 		default:
 			return NULL;
 	}
@@ -1033,282 +910,34 @@ wxMenu* wxGISCatalogMainCmd::GetDropDownMenu(void)
 
 void wxGISCatalogMainCmd::OnDropDownCommand(int nID)
 {
-	IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-	if(pGxApp && GetEnabled())
-	{
-        wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-        IGxSelection* pSel = pGxCatalogUI->GetSelection();
+    wxCHECK_RET(m_pGxApp, wxT("Application pointer is null"));
+
+    wxGxSelection* pSel = m_pGxApp->GetGxSelection();
+    wxGxCatalogBase* pCat = GetGxCatalog();
+
+    if(pSel && pCat && GetEnabled())
+    {
         int nPos = pSel->GetDoPos();
         int nNewPos = nID - ID_MENUCMD;
+        long nSelId = wxNOT_FOUND; 
         if(nNewPos > nPos)
-            pGxCatalogUI->Redo(nNewPos);
+        {
+            if(pSel->CanRedo())
+            {
+                nSelId = pSel->Redo(nNewPos);
+            }
+        }
         else
-            pGxCatalogUI->Undo(nNewPos);
+        {
+            if(pSel->CanUndo())
+            {
+                nSelId = pSel->Undo(nNewPos);
+            }
+        }
+
+        if(pCat->GetRegisterObject(nSelId))
+		{
+			pSel->Select(nSelId, false, wxGxSelection::INIT_ALL);
+		}
     }
 }
-
-                //cast ctrl
-
-    //            wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
-    //            wxGxObjectDialog dlg(pWnd, wxID_ANY, _("Select projection"));
-				//dlg.SetAllowMultiSelect(false);
-				//dlg.AddFilter(new wxGxPrjFileFilter(), true);
-				//dlg.SetButtonCaption(_("Select"));
-				//dlg.SetStartingLocation(_("Coordinate Systems"));
-    //            if(dlg.ShowModalOpen() == wxID_OK)
-    //            {
-    //                GxObjectArray* pArr = dlg.GetSelectedObjects();
-    //                if(!pArr)
-    //                    return;
-    //                if(pArr->size() < 0)
-    //                     return;
-				////	for(size_t i = 0; i < pArr->size(); ++i)
-				////	{
-				////		wxGxPrjFile* pGxPrjFile = dynamic_cast<wxGxPrjFile*>(pArr->at(i));
-				////		if(!pGxPrjFile)
-				////			return;
-				////		OGRSpatialReference* pRef = pGxPrjFile->GetSpatialReference();
-				////		if(pRef)
-				////		{
-				////			wxString sProjDir = wxString(wxT("d:\\temp\\srs\\Projected Coordinate Systems"));
-				////			if(!wxDirExists(sProjDir))
-				////				wxFileName::Mkdir(sProjDir, 0755, wxPATH_MKDIR_FULL);
-				////			wxString sGeogDir = wxString(wxT("d:\\temp\\srs\\Geographic Coordinate Systems"));
-				////			if(!wxDirExists(sGeogDir))
-				////				wxFileName::Mkdir(sGeogDir, 0755, wxPATH_MKDIR_FULL);
-				////			wxString sLoclDir = wxString(wxT("d:\\temp\\srs\\Vertical Coordinate Systems"));
-				////			if(!wxDirExists(sLoclDir))
-				////				wxFileName::Mkdir(sLoclDir, 0755, wxPATH_MKDIR_FULL);
-
-				////			const char *pszProjection = pRef->GetAttrValue("PROJECTION");
-				////			wxString sProjection;
-				////			if(pszProjection)
-				////				sProjection = wgMB2WX(pszProjection);
-				////			if(pRef->IsProjected())
-				////			{
-				////				const char *pszProjcs = pRef->GetAttrValue("PROJCS");
-				////				wxString sName = wgMB2WX(pszProjcs);
-				////				wxString sFileName;
-				////				int pos = sName.Find('/');
-				////				if(pos != wxNOT_FOUND)
-				////				{
-				////					wxString sSubFldr = sName.Right(sName.Len() - pos - 1);
-				////					sSubFldr.Trim(true); sSubFldr.Trim(false);
-				////					wxString sStorePath = sProjDir + wxFileName::GetPathSeparator() + sSubFldr;
-				////					if(!wxDirExists(sStorePath))
-				////						wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
-
-				////					sName.Replace(wxString(wxT("/")), wxString(wxT("")));
-				////					sName.Replace(wxString(wxT("  ")), wxString(wxT(" ")));
-				////					sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".spr");
-				////				}
-				////				else
-				////				{
-				////					sFileName = sProjDir + wxFileName::GetPathSeparator() + sName + wxT(".spr");
-				////				}
-				////				FILE *fp = VSIFOpenL( wgWX2MB(sFileName), "w");
-				////				if( fp != NULL )
-				////				{
-				////					char* pData(NULL);
-				////					pRef->exportToWkt(&pData);
-				////					VSIFWriteL( pData, 1, strlen(pData), fp );
-				////					CPLFree(pData);
-				////					VSIFCloseL(fp);
-				////				}
-				////			}
-				////			else if(pRef->IsGeographic())
-				////			{
-				////				const char *pszProjcs = pRef->GetAttrValue("GEOGCS");
-				////				wxString sName = wgMB2WX(pszProjcs);
-				////				if(sName.Find(wxT("depre")) != wxNOT_FOUND)
-				////					continue;
-				////				wxString sFileName;
-				////				int pos = sName.Find('/');
-				////				if(pos != wxNOT_FOUND)
-				////				{
-				////					wxString sSubFldr = sName.Right(sName.Len() - pos - 1);
-				////					sSubFldr.Trim(true); sSubFldr.Trim(false);
-				////					wxString sStorePath = sGeogDir + wxFileName::GetPathSeparator() + sSubFldr;
-				////					if(!wxDirExists(sStorePath))
-				////						wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
-
-				////					sName.Replace(wxString(wxT("/")), wxString(wxT("")));
-				////					sName.Replace(wxString(wxT("  ")), wxString(wxT(" ")));
-				////					sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".spr");
-				////				}
-				////				else
-				////				{
-				////					sFileName = sGeogDir + wxFileName::GetPathSeparator() + sName + wxT(".spr");
-				////				}
-				////				FILE *fp = VSIFOpenL( wgWX2MB(sFileName), "w");
-				////				if( fp != NULL )
-				////				{
-				////					char* pData(NULL);
-				////					pRef->exportToWkt(&pData);
-				////					VSIFWriteL( pData, 1, strlen(pData), fp );
-				////					CPLFree(pData);
-				////					VSIFCloseL(fp);
-				////				}
-				////			}
-				////		}
-
-				////		//const char *pszProjcs = pRef->GetAttrValue("PROJCS");
-				////		//wxString sName = wgMB2WX(pszProjcs);
-				////		//wxString sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".spr");
-				////		//FILE *fp = VSIFOpenL( wgWX2MB(sFileName), "w");
-				////		//if( fp != NULL )
-				////		//{
-				////		//	char* pData(NULL);
-				////		//	SpaRef.exportToWkt(&pData);
-				////		//	VSIFWriteL( pData, 1, strlen(pData), fp );
-
-				////		//	CPLFree(pData);
-				////		//	VSIFCloseL(fp);
-				////		//}
-				////	}
-
-				//	wxGISMapView* pMapView(NULL);
-				//	WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
-				//	if(pWinArr)
-				//	{
-				//		for(size_t i = 0; i < pWinArr->size(); ++i)
-				//		{
-				//			pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
-				//			if(pMapView)
-				//				break;
-				//		}
-				//	}
-				//	if(pMapView)
-    //                {
-				//		wxGxPrjFile* pGxPrjFile = dynamic_cast<wxGxPrjFile*>(pArr->at(0));
-				//		if(!pGxPrjFile)
-				//			return;
-    //                    OGRSpatialReference* pRef = pGxPrjFile->GetSpatialReference();
-    //                    if(pRef)
-    //                    {
-    //                        pMapView->SetSpatialReference(pRef);
-    //                        pMapView->SetFullExtent();
-    //                    }
-    //                }
-    //            }
-
-
-    //    //        wxString sProjDir = wxString(wxT("d:\\temp\\srs\\Projected Coordinate Systems"));
-    //    //        if(!wxDirExists(sProjDir))
-		  //    //      wxFileName::Mkdir(sProjDir, 0755, wxPATH_MKDIR_FULL);
-    //    //        wxString sGeogDir = wxString(wxT("d:\\temp\\srs\\Geographic Coordinate Systems"));
-    //    //        if(!wxDirExists(sGeogDir))
-		  //    //      wxFileName::Mkdir(sGeogDir, 0755, wxPATH_MKDIR_FULL);
-    //    //        wxString sLoclDir = wxString(wxT("d:\\temp\\srs\\Vertical Coordinate Systems"));
-    //    //        if(!wxDirExists(sLoclDir))
-		  //    //      wxFileName::Mkdir(sLoclDir, 0755, wxPATH_MKDIR_FULL);
-
-    //    //        IStatusBar* pStatusBar = m_pApp->GetStatusBar();
-    //    //        wxGISProgressor* pProgressor = dynamic_cast<wxGISProgressor*>(pStatusBar->GetProgressor());
-    //    //        if(pProgressor)
-    //    //        {
-    //    //            pProgressor->Show(true);
-    //    //            pProgressor->SetRange(70000);
-
-    //    //            wxString sDirPath;
-
-    //    //            for(size_t i = 2213; i < 2214; ++i)
-    //    //            {
-    //    //                OGRSpatialReference SpaRef;
-    //    //                OGRErr err = SpaRef.importFromEPSG(i);
-    //    //                if(err == OGRERR_NONE)
-    //    //                {
-    //    //                   const char *pszProjection = SpaRef.GetAttrValue("PROJECTION");
-    //    //                   wxString sProjection;
-    //    //                   if(pszProjection)
-    //    //                       sProjection = wgMB2WX(pszProjection);
-    //    //                   if(SpaRef.IsProjected())
-    //    //                    {
-    //    //                        const char *pszProjcs = SpaRef.GetAttrValue("PROJCS");
-    //    //                        wxString sName = wgMB2WX(pszProjcs);
-    //    //                        if(sName.Find(wxT("depre")) != wxNOT_FOUND)
-    //    //                            continue;
-    //    //                        wxString sFileName;
-    //    //                        int pos = sName.Find('/');
-    //    //                        if(pos != wxNOT_FOUND)
-    //    //                        {
-    //    //                            wxString sSubFldr = sName.Right(sName.Len() - pos - 1);
-    //    //                            sSubFldr.Trim(true); sSubFldr.Trim(false);
-    //    //                            wxString sStorePath = sProjDir + wxFileName::GetPathSeparator() + sSubFldr;
-    //    //                            if(!wxDirExists(sStorePath))
-		  //    //                          wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
-
-    //    //                            sName.Replace(wxString(wxT("/")), wxString(wxT("")));
-    //    //                            sName.Replace(wxString(wxT("  ")), wxString(wxT(" ")));
-    //    //                            sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".spr");
-    //    //                        }
-    //    //                        else
-    //    //                        {
-    //    //                            sFileName = sProjDir + wxFileName::GetPathSeparator() + sName + wxT(".spr");
-    //    //                        }
-				//				//FILE *fp = VSIFOpenL( wgWX2MB(sFileName), "w");
-				//				//if( fp != NULL )
-    //    //                        //wxFile file;
-    //    //                        //if(file.Create(sFileName))
-    //    //                        {
-    //    //                            char* pData(NULL);
-    //    //                            SpaRef.exportToWkt(&pData);
-    //    //                            //wxString Data = wgMB2WX(pData);
-    //    //                            //file.Write(Data);
-				//				//    VSIFWriteL( pData, 1, strlen(pData), fp );
-
-    //    //                            CPLFree(pData);
-				//				//	VSIFCloseL(fp);
-    //    //                        }
-    //    //                    }
-    //    //                    else if(SpaRef.IsGeographic())
-    //    //                    {
-    //    //                        const char *pszProjcs = SpaRef.GetAttrValue("GEOGCS");
-    //    //                        wxString sName = wgMB2WX(pszProjcs);
-    //    //                        if(sName.Find(wxT("depre")) != wxNOT_FOUND)
-    //    //                            continue;
-    //    //                        wxString sFileName;
-    //    //                        int pos = sName.Find('/');
-    //    //                        if(pos != wxNOT_FOUND)
-    //    //                        {
-    //    //                            wxString sSubFldr = sName.Right(sName.Len() - pos - 1);
-    //    //                            sSubFldr.Trim(true); sSubFldr.Trim(false);
-    //    //                            wxString sStorePath = sGeogDir + wxFileName::GetPathSeparator() + sSubFldr;
-    //    //                            if(!wxDirExists(sStorePath))
-		  //    //                          wxFileName::Mkdir(sStorePath, 0755, wxPATH_MKDIR_FULL);
-
-    //    //                            sName.Replace(wxString(wxT("/")), wxString(wxT("")));
-    //    //                            sName.Replace(wxString(wxT("  ")), wxString(wxT(" ")));
-    //    //                            sFileName = sStorePath + wxFileName::GetPathSeparator() + sName + wxT(".spr");
-    //    //                        }
-    //    //                        else
-    //    //                        {
-    //    //                            sFileName = sGeogDir + wxFileName::GetPathSeparator() + sName + wxT(".spr");
-    //    //                        }
-    //    //                        //wxFile file;
-    //    //                        //if(file.Create(sFileName))
-				//				//FILE *fp = VSIFOpenL( wgWX2MB(sFileName), "w");
-				//				//if( fp != NULL )
-    //    //                        {
-    //    //                            char* pData(NULL);
-    //    //                            SpaRef.exportToWkt(&pData);
-    //    //                            //wxString Data = wgMB2WX(pData);
-    //    //                            //file.Write(Data);
-				//				//    VSIFWriteL( pData, 1, strlen(pData), fp );
-    //    //                            CPLFree(pData);
-				//				//	VSIFCloseL(fp);
-    //    //                        }
-    //    //                    }
-    //    //                    else
-    //    //                    {
-    //    //                        sDirPath = wxString(wxT("d:\\temp\\srs\\Vertical Coordinate Systems"));
-    //    //                    //bool bLoc = SpaRef.IsLocal();
-    //    //                    }
-    //    //                }
-    //    //                pProgressor->SetValue(i);
-    //    //            }
-    //    //            pProgressor->Show(false);
-    //    //        }
-    //    //        pStatusBar->SetMessage(_("Done"));
-
-

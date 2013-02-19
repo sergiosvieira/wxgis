@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDBConnections class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -21,7 +21,7 @@
 
 #include "wxgis/catalog/gxdbconnections.h"
 #include "wxgis/core/config.h"
-
+/*
 /////////////////////////////////////////////////////////////////////////
 // wxGxDBConnections
 /////////////////////////////////////////////////////////////////////////
@@ -40,11 +40,11 @@ void wxGxDBConnections::Init(wxXmlNode* const pConfigNode)
     m_sInternalPath = pConfigNode->GetAttribute(wxT("path"), NON);
     if(m_sInternalPath.IsEmpty() || m_sInternalPath == wxString(NON))
     {
-		wxGISAppConfigSPtr pConfig = GetConfig();
-		if(!pConfig)
+		wxGISAppConfig oConfig = GetConfig();
+		if(!oConfig.IsOk())
 			return;
 
-		m_sInternalPath = pConfig->GetLocalConfigDir() + wxFileName::GetPathSeparator() + wxString(wxT("dbconnections"));
+		m_sInternalPath = oConfig.GetLocalConfigDir() + wxFileName::GetPathSeparator() + wxString(wxT("dbconnections"));
     }
 
     m_sInternalPath.Replace(wxT("\\"), wxT("/"));
@@ -70,3 +70,4 @@ bool wxGxDBConnections::CanCreate(long nDataType, long DataSubtype)
 		return false;
 	return wxIsWritable(wxString(m_sPath, wxConvUTF8));
 }
+*/

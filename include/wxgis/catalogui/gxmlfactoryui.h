@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxMLFactoryUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -26,6 +26,7 @@
 /** \class wxGxMLFactoryUI gxmlfactory.h
     \brief A markup lang GxObject factory.
 */
+/*
 class wxGxMLFactoryUI :
 	public wxGxMLFactory
 {
@@ -42,3 +43,5 @@ protected:
     wxIcon m_LargeGMLIcon, m_SmallGMLIcon;
     wxIcon m_LargeSubKMLIcon, m_SmallSubKMLIcon;
 };
+
+*/

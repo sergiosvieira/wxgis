@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxCSVFileFactory class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -21,7 +21,7 @@
 #pragma once
 
 #include "wxgis/catalog/catalog.h"
-
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxCSVFileFactory :
 	public IGxObjectFactory,
 	public wxObject
@@ -38,3 +38,4 @@ public:
     //wxGxFileFactory
     virtual IGxObject* GetGxObject(CPLString path, wxString name);
 };
+*/

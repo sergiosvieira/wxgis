@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  Catalog Views Commands class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/viewscmd.h"
+
 #include "wxgis/catalogui/gxtreeview.h"
 
 #include "../../art/views.xpm"
@@ -30,11 +31,15 @@
 //  2   Show/hide tree view
 //  3   ?
 
+//------------------------------------------------------------------------
+// wxGISCatalogViewsCmd
+//------------------------------------------------------------------------
 
-IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogViewsCmd, wxObject)
+IMPLEMENT_DYNAMIC_CLASS(wxGISCatalogViewsCmd, wxGISCommand)
 
-wxGISCatalogViewsCmd::wxGISCatalogViewsCmd(void) : m_pTreeView(NULL)
+wxGISCatalogViewsCmd::wxGISCatalogViewsCmd(void) : wxGISCommand()
 {
+     m_pTreeView = NULL;
 }
 
 wxGISCatalogViewsCmd::~wxGISCatalogViewsCmd(void)
@@ -96,7 +101,8 @@ bool wxGISCatalogViewsCmd::GetChecked(void)
 	switch(m_subtype)
 	{
 		case 2:
-            return m_pApp->IsApplicationWindowShown(m_pTreeView);
+            if(m_pTreeView)
+                return m_pApp->IsApplicationWindowShown(m_pTreeView);
 		case 0:
 		case 1:
 		default:
@@ -109,32 +115,18 @@ bool wxGISCatalogViewsCmd::GetEnabled(void)
 {
 	if(!m_pTreeView)
 	{
-		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
-		if(pWinArr)
-		{
-			for(size_t i = 0; i < pWinArr->size(); ++i)
-			{
-				wxGxTreeView* pTreeView = dynamic_cast<wxGxTreeView*>(pWinArr->at(i));
-				if(pTreeView)
-				{
-					m_pTreeView = pTreeView;
-					break;
-				}
-			}
-		}
+        m_pTreeView = m_pApp->GetRegisteredWindowByType(wxCLASSINFO(wxGxTreeView));
 	}
 
-	if(m_apContentsWin.empty())
+	if(m_anContentsWinIDs.empty())
 	{
-		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
-		if(pWinArr)
+		WINDOWARRAY WinIDsArr = m_pApp->GetChildWindows();
+        for(size_t i = 0; i < WinIDsArr.GetCount(); ++i)
 		{
-			for(size_t i = 0; i < pWinArr->size(); ++i)
-			{
-				IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(pWinArr->at(i));
-                if(pGxContentsView)
-                    m_apContentsWin.push_back(pWinArr->at(i));
-			}
+            wxWindow* pWnd = wxWindow::FindWindowById(WinIDsArr[i]);
+			IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(pWnd);
+            if(pGxContentsView)
+                m_anContentsWinIDs.Add(WinIDsArr[i]);
 		}
 	}
 
@@ -144,9 +136,12 @@ bool wxGISCatalogViewsCmd::GetEnabled(void)
             return m_pTreeView != NULL;
 		case 0:
 		case 1:
-            for(size_t i = 0; i < m_apContentsWin.size(); ++i)
-                if(m_apContentsWin[i]->IsShown())
+            for(size_t i = 0; i < m_anContentsWinIDs.GetCount(); ++i)
+            {
+                wxWindow* pWnd = wxWindow::FindWindowById(m_anContentsWinIDs[i]);
+                if(pWnd && pWnd->IsShown())
                     return true;
+            }
  		default:
 			return false;
 	}
@@ -186,11 +181,12 @@ void wxGISCatalogViewsCmd::OnClick(void)
 	switch(m_subtype)
 	{
 		case 0:
-            for(size_t i = 0; i < m_apContentsWin.size(); ++i)
-			{
-                if(m_apContentsWin[i]->IsShown())
+            for(size_t i = 0; i < m_anContentsWinIDs.GetCount(); ++i)
+            {
+                wxWindow* pWnd = wxWindow::FindWindowById(m_anContentsWinIDs[i]);
+                if(pWnd && pWnd->IsShown())
                 {
-                    IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_apContentsWin[i]);
+                    IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(pWnd);
                     if(pGxContentsView)
                     {
                         if(pGxContentsView->CanSetStyle())
@@ -205,15 +201,16 @@ void wxGISCatalogViewsCmd::OnClick(void)
             }
 			break;
 		case 1:
-            for(size_t i = 0; i < m_apContentsWin.size(); ++i)
-			{
-                if(m_apContentsWin[i]->IsShown())
+            for(size_t i = 0; i < m_anContentsWinIDs.GetCount(); ++i)
+            {
+                wxWindow* pWnd = wxWindow::FindWindowById(m_anContentsWinIDs[i]);
+                if(pWnd && pWnd->IsShown())
                 {
-                    IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_apContentsWin[i]);
+                    IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(pWnd);                    
                     if(pGxContentsView)
                     {
                         pGxContentsView->SelectAll();
-                        m_apContentsWin[i]->SetFocus();
+                        pWnd->SetFocus();
                     }
                 }
             }
@@ -225,7 +222,7 @@ void wxGISCatalogViewsCmd::OnClick(void)
 	}
 }
 
-bool wxGISCatalogViewsCmd::OnCreate(IFrameApplication* pApp)
+bool wxGISCatalogViewsCmd::OnCreate(wxGISApplicationBase* pApp)
 {
 	m_pApp = pApp;
 	return true;
@@ -264,12 +261,12 @@ wxMenu* wxGISCatalogViewsCmd::GetDropDownMenu(void)
                 pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVLarge, wxString(_("Icons")));
                 pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVSmall, wxString(_("Smal Icons")));
                 pMenu->AppendCheckItem(ID_MENUCMD + (int)enumGISCVReport, wxString(_("Details")));
-                //check
-                for(size_t i = 0; i < m_apContentsWin.size(); ++i)
-			    {
-                    if(m_apContentsWin[i]->IsShown())
+                for(size_t i = 0; i < m_anContentsWinIDs.GetCount(); ++i)
+                {
+                    wxWindow* pWnd = wxWindow::FindWindowById(m_anContentsWinIDs[i]);
+                    if(pWnd && pWnd->IsShown())
                     {
-                        IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_apContentsWin[i]);
+                        IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(pWnd);
                         if(pGxContentsView)
                         {
                             wxGISEnumContentsViewStyle nStyle = pGxContentsView->GetStyle();
@@ -290,11 +287,12 @@ void wxGISCatalogViewsCmd::OnDropDownCommand(int nID)
 {
     if(GetEnabled())
     {
-        for(size_t i = 0; i < m_apContentsWin.size(); ++i)
-	    {
-            if(m_apContentsWin[i]->IsShown())
+        for(size_t i = 0; i < m_anContentsWinIDs.GetCount(); ++i)
+        {
+            wxWindow* pWnd = wxWindow::FindWindowById(m_anContentsWinIDs[i]);
+            if(pWnd && pWnd->IsShown())
             {
-                IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(m_apContentsWin[i]);
+                IGxContentsView* pGxContentsView = dynamic_cast<IGxContentsView*>(pWnd);
                 if(pGxContentsView)
                     pGxContentsView->SetStyle((wxGISEnumContentsViewStyle)(nID - ID_MENUCMD));
             }

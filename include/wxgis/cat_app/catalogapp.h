@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  Main application class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009  Bishop
+*   Copyright (C) 2009,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,16 +26,19 @@
 
 #include <wx/app.h>
 
-#include <map>
-
+/** \class wxGISCatalogApp catalogapp.h
+    \brief Main Catalog class.
+*/
 class wxGISCatalogApp :
 	public wxApp,
 	public wxGISAppWithLibs
 {
 public:
 	wxGISCatalogApp(void);
-	~wxGISCatalogApp(void);
+	virtual ~wxGISCatalogApp(void);
 	virtual bool OnInit();
 };
 
-DECLARE_APP(wxGISCatalogApp);
+wxDECLARE_APP(wxGISCatalogApp);
+
+

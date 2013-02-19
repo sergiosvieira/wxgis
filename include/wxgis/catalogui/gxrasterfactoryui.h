@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxRasterFactoryUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 /** \class wxGxRasterFactoryUI gxrasterfactoryui.h
     \brief A raster GxObject factory.
 */
+
 class wxGxRasterFactoryUI :
 	public wxGxRasterFactory
 {
@@ -34,7 +35,7 @@ public:
 	wxGxRasterFactoryUI(void);
 	virtual ~wxGxRasterFactoryUI(void);
     //wxGxRasterFactory
-    virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumRasterDatasetType type);
+    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumRasterDatasetType type);
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
 };

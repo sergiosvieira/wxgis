@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISVectorPropertyPage class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,6 +20,13 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/vectorpropertypage.h"
+#include "wxgis/datasource/sysop.h"
+
+#include "wx/propgrid/advprops.h"
+
+//--------------------------------------------------------------------------
+// wxGISVectorPropertyPage
+//--------------------------------------------------------------------------
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISVectorPropertyPage, wxPanel)
 
@@ -30,23 +37,24 @@ wxGISVectorPropertyPage::wxGISVectorPropertyPage(void)
 {
 }
 
-wxGISVectorPropertyPage::wxGISVectorPropertyPage(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+wxGISVectorPropertyPage::wxGISVectorPropertyPage(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     Create(pGxDataset, parent, id, pos, size, style, name);
 }
 
 wxGISVectorPropertyPage::~wxGISVectorPropertyPage()
 {
+    wsDELETE(m_pDataset);
 }
 
-bool wxGISVectorPropertyPage::Create(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+bool wxGISVectorPropertyPage::Create(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     if(!wxPanel::Create(parent, id, pos, size, style, name))
 		return false;
 
     m_pGxDataset = pGxDataset;
 
-    m_pDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pGxDataset->GetDataset(false));
+    m_pDataset = wxDynamicCast(m_pGxDataset->GetDataset(false), wxGISFeatureDataset);
     if(!m_pDataset)
         return false;
 	if(!m_pDataset->IsOpened())
@@ -124,14 +132,6 @@ void wxGISVectorPropertyPage::FillGrid(void)
 	wxString sPath(CPLGetPath(soPath), wxConvUTF8);
     AppendProperty( new wxStringProperty(_("Folder"), wxPG_LABEL, sPath) );  
     
-    VSIStatBufL BufL;
-    wxULongLong nSize(0);
-    int ret = VSIStatL(soPath, &BufL);
-    if(ret == 0)
-    {
-        nSize += BufL.st_size;
-    }
-
     char** papszFileList = m_pDataset->GetFileList();
     if( !papszFileList || CSLCount(papszFileList) == 0 )
     {
@@ -142,21 +142,19 @@ void wxGISVectorPropertyPage::FillGrid(void)
         wxPGProperty* pfilesid = AppendProperty(pid, new wxPropertyCategory(_("Files")) );  
         for(int i = 0; papszFileList[i] != NULL; ++i )
 	    {
-            ret = VSIStatL(papszFileList[i], &BufL);
-            if(ret == 0)
-            {
-                nSize += BufL.st_size;
-            }
-		    wxString sFileName = GetConvName(papszFileList[i]);
+ 		    wxString sFileName = GetConvName(papszFileList[i]);
 			AppendProperty(pfilesid, new wxStringProperty(wxString::Format(_("File %d"), i), wxPG_LABEL, sFileName) );  
 	    }
     }
     CSLDestroy( papszFileList );
     
     //size    
-    AppendProperty(pid, new wxStringProperty(_("Total size"), wxPG_LABEL, wxFileName::GetHumanReadableSize(nSize)) );
+    m_pGxDataset->FillMetadata();
+    //size    
+    AppendProperty(pid, new wxStringProperty(_("Total size"), wxPG_LABEL, wxFileName::GetHumanReadableSize(m_pGxDataset->GetSize())) );
+    AppendProperty(pid, new wxDateProperty(_("Modification date"), wxPG_LABEL, m_pGxDataset->GetModificationDate()) );
 
-    OGRDataSource *pDataSource = m_pDataset->GetDataSource();
+    OGRDataSource *pDataSource = m_pDataset->GetDataSourceRef();
     if(pDataSource)
     {
         OGRSFDriver* pDrv = pDataSource->GetDriver();
@@ -195,18 +193,12 @@ void wxGISVectorPropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer, CPLStr
 {
     wxPGProperty* playid = AppendProperty( new wxPropertyCategory(wxString::Format(_("Layer #%d"), iLayer + 1) ));
 
-    wxString sOut;
-    if(EQUALN(soPath, "/vsizip", 7))
-        sOut = wxString(poLayer->GetName(), wxCSConv(wxT("cp-866")));//TODO: Get from config cp-866
-    else
-        sOut = wxString(poLayer->GetName(), wxConvUTF8);
+    wxString sOut = GetConvName(poLayer->GetName(), false);
 	if(sOut.IsEmpty())
 	{
-		if(EQUALN(soPath, "/vsizip", 7))
-            sOut = wxString(CPLGetBasename(soPath), wxCSConv(wxT("cp-866")));//TODO: Get from config cp-866
-        else
-            sOut = wxString(CPLGetBasename(soPath), wxConvUTF8);
+        sOut = GetConvName(CPLGetBasename(soPath), false);
 	}
+
 	AppendProperty(playid, new wxStringProperty(_("Name"), wxString::Format(wxT("Name_%d"), iLayer), sOut));  //GetConvName
 
     AppendProperty(playid, new wxStringProperty(_("Geometry type"), wxString::Format(wxT("Geometry type_%d"), iLayer), wxString(OGRGeometryTypeToName( m_pDataset->GetGeometryType() ), wxConvLocal)));  
@@ -259,13 +251,60 @@ void wxGISVectorPropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer, CPLStr
     AppendProperty(pcapid, new wxStringProperty(_("Strings As UTF8"), wxString::Format(wxT("Strings As UTF8_%d"), iLayer), poLayer->TestCapability(OLCStringsAsUTF8) == TRUE ? _("true") : _("false")) );  
     AppendProperty(pcapid, new wxStringProperty(_("Transactions"), wxString::Format(wxT("Transactions_%d"), iLayer), poLayer->TestCapability(OLCTransactions) == TRUE ? _("true") : _("false")) );  
     AppendProperty(pcapid, new wxStringProperty(_("Ignore Fields"), wxString::Format(wxT("Ignore Fields_%d"), iLayer), poLayer->TestCapability(OLCIgnoreFields) == TRUE ? _("true") : _("false")) ); 
-    OGREnvelope Extent;
-    if(poLayer->GetExtent(&Extent, true) == OGRERR_NONE)
+
+    OGREnvelope Extent = m_pDataset->GetEnvelope();
+    if(Extent.IsInit())
     {
-        wxPGProperty* penvid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Extent"), iLayer + 1)));
+        wxGISSpatialReference SpaRef = m_pDataset->GetSpatialReference();
+        bool bProjected(false);
+        if(SpaRef.IsOk() && SpaRef->IsProjected())
+            bProjected = true;
+
+        wxPGProperty* penvid(NULL);
+        if(bProjected)
+            penvid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Extent %s"), iLayer + 1, _("(Projected)"))));
+        else
+            penvid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Extent %s"), iLayer + 1, wxEmptyString)));
         AppendProperty(penvid, new wxFloatProperty(_("Top"), wxString::Format(wxT("Top_%d"), iLayer), Extent.MaxY));
         AppendProperty(penvid, new wxFloatProperty(_("Left"), wxString::Format(wxT("Left_%d"), iLayer), Extent.MinX));
         AppendProperty(penvid, new wxFloatProperty(_("Right"), wxString::Format(wxT("Right_%d"), iLayer), Extent.MaxX));
         AppendProperty(penvid, new wxFloatProperty(_("Bottom"), wxString::Format(wxT("Bottom_%d"), iLayer), Extent.MinY));
+
+        AppendProperty(penvid, new wxFloatProperty(_("Center X"), wxString::Format(wxT("CenterX_%d"), iLayer), (Extent.MaxX + Extent.MinX) / 2.0));
+        AppendProperty(penvid, new wxFloatProperty(_("Center Y"), wxString::Format(wxT("CenterY_%d"), iLayer), (Extent.MaxY + Extent.MinY) / 2.0));
+
+        if(bProjected)
+        {
+            wxGISSpatialReference GSSpaRef(SpaRef->CloneGeogCS());
+            if(GSSpaRef.IsOk())
+            {
+                OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( SpaRef, GSSpaRef );
+                if(poCT)
+                {
+                    poCT->Transform(1, &Extent.MaxX, &Extent.MaxY);
+                    poCT->Transform(1, &Extent.MinX, &Extent.MinY);
+                    wxPGProperty* penvidgc = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Extent %s"), iLayer + 1, _("(Geographic)"))));
+                    AppendProperty(penvidgc, new wxFloatProperty(_("Top"), wxString::Format(wxT("TopGC_%d"), iLayer), Extent.MaxY));
+                    AppendProperty(penvidgc, new wxFloatProperty(_("Left"), wxString::Format(wxT("LeftGC_%d"), iLayer), Extent.MinX));
+                    AppendProperty(penvidgc, new wxFloatProperty(_("Right"), wxString::Format(wxT("RightGC_%d"), iLayer), Extent.MaxX));
+                    AppendProperty(penvidgc, new wxFloatProperty(_("Bottom"), wxString::Format(wxT("BottomGC_%d"), iLayer), Extent.MinY));
+
+                    AppendProperty(penvidgc, new wxFloatProperty(_("Center X"), wxString::Format(wxT("CenterXGC_%d"), iLayer), (Extent.MaxX + Extent.MinX) / 2.0));
+                    AppendProperty(penvidgc, new wxFloatProperty(_("Center Y"), wxString::Format(wxT("CenterYGC_%d"), iLayer), (Extent.MaxY + Extent.MinY) / 2.0));
+
+                    OCTDestroyCoordinateTransformation(poCT);
+                }
+            }
+        }
     }
+
+    //OGREnvelope Extent;
+    //if(poLayer->GetExtent(&Extent, true) == OGRERR_NONE)
+    //{
+    //    wxPGProperty* penvid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Extent"), iLayer + 1)));
+    //    AppendProperty(penvid, new wxFloatProperty(_("Top"), wxString::Format(wxT("Top_%d"), iLayer), Extent.MaxY));
+    //    AppendProperty(penvid, new wxFloatProperty(_("Left"), wxString::Format(wxT("Left_%d"), iLayer), Extent.MinX));
+    //    AppendProperty(penvid, new wxFloatProperty(_("Right"), wxString::Format(wxT("Right_%d"), iLayer), Extent.MaxX));
+    //    AppendProperty(penvid, new wxFloatProperty(_("Bottom"), wxString::Format(wxT("Bottom_%d"), iLayer), Extent.MinY));
+    //}
 }

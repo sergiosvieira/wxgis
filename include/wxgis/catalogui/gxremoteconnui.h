@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxRemoteConnectionUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -26,6 +26,7 @@
 /** \class wxGxRemoteConnectionUI gxfileui.h
     \brief A Remote Connection GxObjectUI.
 */
+/*
 class WXDLLIMPEXP_GIS_CLU wxGxRemoteConnectionUI :
     public wxGxRemoteConnection,
 	public IGxObjectUI,
@@ -54,10 +55,11 @@ protected:
     wxIcon m_oLargeIconTable, m_oSmallIconTable;
     wxIcon m_oLargeIconSchema, m_oSmallIconSchema;
 };
-
+*/
 /** \class wxGxRemoteDBSchemaUI gxfileui.h
     \brief A Remote Database schema GxObjectUI.
 */
+/*
 class WXDLLIMPEXP_GIS_CLU wxGxRemoteDBSchemaUI :
     public wxGxRemoteDBSchema,
 	public IGxObjectUI,
@@ -81,4 +83,5 @@ protected:
     wxIcon m_oLargeIconFeatureClass, m_oSmallIconFeatureClass;
     wxIcon m_oLargeIconTable, m_oSmallIconTable;
 };
+*/
 

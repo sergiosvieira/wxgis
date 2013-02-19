@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxContainerDialog class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -39,8 +39,9 @@
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/gxcontentview.h"
 #include "wxgis/catalogui/gxtreeview.h"
+#include "wxgis/framework/applicationbase.h"
 #include "wxgis/version.h"
-
+/*
 #define CONTDLG_NAME wxT("wxGISContDialog") 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -79,8 +80,9 @@ protected:
 class WXDLLIMPEXP_GIS_CLU wxGxContainerDialog : 
     public wxDialog,
     public IGxApplication,
-    public IFrameApplication
+    public wxGISApplicationBase
 {
+    DECLARE_CLASS(wxGxContainerDialog)
 enum
 {
     ID_CREATE = wxID_HIGHEST + 4001
@@ -91,37 +93,9 @@ public:
 
 //IGxApplication
     virtual IGxCatalog* const GetCatalog(void){return static_cast<IGxCatalog*>(m_pCatalog);};
-//IFrameApplication
-    virtual ICommand* GetCommand(long CmdID);
-	virtual ICommand* GetCommand(wxString sCmdName, unsigned char nCmdSubType);
-    virtual wxString GetAppName(void){return wxString(CONTDLG_NAME);};
-    virtual wxString GetAppVersionString(void){return wxString(wxGIS_VERSION_NUM_DOT_STRING_T);};
-    virtual IStatusBar* GetStatusBar(void){return NULL;};
-    virtual void OnAppAbout(void){};
-    virtual void OnAppOptions(void){};
-	virtual wxIcon GetAppIcon(void){return wxNullIcon;};
-	virtual IGISCommandBar* GetCommandBar(wxString sName){return NULL;};
-    virtual void RemoveCommandBar(IGISCommandBar* pBar){};
-    virtual bool AddCommandBar(IGISCommandBar* pBar){return false;};
-    virtual void ShowStatusBar(bool bShow){};
-    virtual bool IsStatusBarShown(void){return false;};
-    virtual void ShowToolBarMenu(void){};
-	virtual const WINDOWARRAY* const GetChildWindows(void){return NULL;};
-    virtual void RegisterChildWindow(wxWindow* pWnd){};
-    virtual void UnRegisterChildWindow(wxWindow* pWnd){};
-    virtual void Customize(void){};
-    virtual void ShowApplicationWindow(wxWindow* pWnd, bool bShow = true){};
-    virtual bool IsApplicationWindowShown(wxWindow* pWnd){return true;};
-	virtual void OnMouseDown(wxMouseEvent& event){};
-	virtual void OnMouseUp(wxMouseEvent& event){};
-	virtual void OnMouseDoubleClick(wxMouseEvent& event){};
-	virtual void OnMouseMove(wxMouseEvent& event){};
-    virtual bool Create(void){return true;};
-    virtual bool SetupLog(const wxString &sLogPath){return true;};
-    virtual bool SetupLoc(const wxString &sLoc, const wxString &sLocPath){return true;};
-    virtual bool SetupSys(const wxString &sSysPath){return true;};
-    virtual void SetDebugMode(bool bDebugMode){};
-
+//wxGISApplicationBase
+    virtual wxString GetAppName(void) const{return wxString(CONTDLG_NAME);};
+    virtual wxString GetAppVersionString(void) const{return wxString(wxGIS_VERSION_NUM_DOT_STRING_T);};
 //wxDialog
     int ShowModal(void);
 //wxGxContainerDialog
@@ -150,13 +124,12 @@ protected:
     virtual void OnCreateUI(wxUpdateUIEvent& event);
     virtual void OnCommand(wxCommandEvent& event);
 	virtual void OnCommandUI(wxUpdateUIEvent& event);
-    virtual void Command(ICommand* pCmd);
+    virtual void Command(wxGISCommand* pCmd);
 //wxGxContainerDialog
     virtual long GetLocation(void);
 	virtual void OnInit();
     virtual void SerializeFramePos(bool bSave);
 protected:
- 	COMMANDARRAY m_CommandArray;
   	wxGxCatalogUI* m_pCatalog;
   	IGxCatalog* m_pExternalCatalog;
     wxTreeContainerView* m_pTree;
@@ -168,8 +141,6 @@ protected:
 	size_t m_nDefaultFilter;
     GxObjectArray m_ObjectArray;
     int m_nRetCode;
-    //DEFINE_SHARED_PTR(ICommand);
-    //ICommandSPtr m_pCreateCmd;
     bool m_bOwnFilter, m_bOwnShowFilter;
 
 protected:
@@ -185,3 +156,4 @@ protected:
     DECLARE_EVENT_TABLE()
 };
 
+*/

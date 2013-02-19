@@ -31,22 +31,24 @@
       <TreeView/>
       <TabView>
         <View name="List" show_choices="f">
-          <Item class="wxGxNoView" name="NoView" priority="4" red="255" green="255" blue="230" bold="1" italic="0" size="12"/>
-          <Item class="wxGxContentView" name="ContentsView" priority="3" style="0" sort="1" sort_col="0" name_width="150" type_width="250"/>
-          <Item class="wxGxRemoteTableView" name="RemoteTableView" priority="2" style="0" sort="1" sort_col="0" cols_width="100|163|279|100|100|150|150|"/>
-          <Item class="wxGxToolExecuteView" name="ToolExecuteView" priority="1" sort="1" sort_col="0" cols_width="51|140|120|116|125|379|"/>
+          <Item class="wxGxNoView" name="NoView" priority="5" red="255" green="255" blue="230" bold="1" italic="0" size="12"/>
+          <Item class="wxGxContentView" name="ContentsView" priority="4" style="0" sort="1" sort_col="0" name_width="150" type_width="250"/>
+          <Item class="wxGxRemoteTableView" name="RemoteTableView" priority="3" style="0" sort="1" sort_col="0" cols_width="100|163|279|100|100|150|150|"/>
+          <Item class="wxGxToolExecuteView" name="ToolExecuteView" priority="2" sort="1" sort_col="0" cols_width="51|140|120|116|125|379|"/>
+          <Item class="wxGxMonTasksView" name="Monitoring tasks view" priority="1"/>
         </View>
         <View name="Preview" show_choices="t">
-          <Item class="wxGxNoView" name="NoView" priority="3" red="255" green="230" blue="255" bold="1" italic="0" size="12"/>
-          <Item class="wxGxTableView" name="TableView" priority="2"/>
-          <Item class="wxGxMapView" name="GeographicView" priority="1"/>
+          <Item class="wxGxNoView" name="NoView" priority="4" red="255" green="230" blue="255" bold="1" italic="0" size="12"/>
+          <Item class="wxGxTableView" name="TableView" priority="3"/>
+          <Item class="wxGxMapView" name="GeographicView" priority="2"/>
+          <Item class="wxGxMonTasksDetailView" name="Monitoring tasks detail view" priority="1"/>
         </View>
       </TabView>
       <ToolboxView class="wxAxToolboxView" name="ToolboxView">
         <wxGxToolExecuteView sort="0" sort_col="0" cols_width="99|150|100|174|165|350|"/>
         <wxGxToolboxTreeView/>
       </ToolboxView>
-      <IdentifyView class="wxAxIdentifyView" name="IdentifyView" width="246" height="305" split_mode="1" split_pos="133"/>
+      <IdentifyView class="wxAxIdentifyView" name="IdentifyView" width="246" height="305" split_mode="1" split_pos="133"/>      
     </Views>
     <Menues>
       <menu name="MenuBar.File" caption="&amp;File">
@@ -110,7 +112,7 @@
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="8" name="Переименовать"/>
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="9" name="Обновить"/>
       </menu>
-      <menu name="wxGxDataset.ContextMenu" caption="wxGxDataset.ContextMenu">
+      <menu name="wxGxTableDataset.ContextMenu" caption="wxGxTableDataset.ContextMenu">
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="11" name="Копировать"/>
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="12" name="Вырезать"/>
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="4" name="Удалить"/>
@@ -118,7 +120,7 @@
         <Item type="sep"/>
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="10" name="Свойства"/>
       </menu>
-      <menu name="wxGxShapefileDataset.ContextMenu" caption="wxGxShapefileDataset.ContextMenu">
+      <menu name="wxGxFeatureDataset.ContextMenu" caption="wxGxFeatureDataset.ContextMenu">
         <Item type="cmd" cmd_name="wxGISGeoprocessingCmd" subtype="0" name="&amp;Экспорт"/>
         <Item type="sep"/>
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="11" name="Копировать"/>
@@ -156,13 +158,17 @@
       <menu name="wxGxRemoteServerUI.ContextMenu" caption="wxGxRemoteServerUI.ContextMenu">
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="9" name="Обновить"/>
         <Item type="sep"/>
+        <Item type="cmd" cmd_name="wxGISRemoteCmd" subtype="1"/>
+        <Item type="cmd" cmd_name="wxGISRemoteCmd" subtype="2"/>
       </menu>
       <menu name="wxGxRemoteServersUI.ContextMenu" caption="wxGxRemoteServersUI.ContextMenu">
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="9" name="Обновить"/>
         <Item type="sep"/>
         <Item type="menu" cmd_name="Application.NewMenu" name="Новый"/>
       </menu>
-      <menu name="wxGxRemoteServersUI.NewMenu" caption="wxGxRemoteServersUI.NewMenu"/>
+      <menu name="wxGxRemoteServersUI.NewMenu" caption="wxGxRemoteServersUI.NewMenu">
+        <Item type="cmd" cmd_name="wxGISRemoteCmd" subtype="0" name="Create new connection"/>
+      </menu>
       <menu name="wxRxMonitoringDatabases.ContextMenu" caption="wxRxMonitoringDatabases.ContextMenu"/>
       <menu name="MenuBar.Tools" caption="&amp;Tools">
         <Item type="cmd" cmd_name="wxGISCommonCmd" subtype="5" name="Параметры..."/>
@@ -201,6 +207,12 @@
         <Item type="sep"/>
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="10" name="Свойства"/>
       </menu>
+      <menu name="wxGxSatDBMonDispTasksUI.ContextMenu" caption="wxGxSatDBMonDispTasksUI.ContextMenu">
+        <Item type="menu" cmd_name="Application.NewMenu" name="Новый"/>
+      </menu>
+      <menu name="wxGxSatDBMonDispTasksUI.NewMenu" caption="wxGxSatDBMonDispTasksUI.NewMenu">
+        <Item type="cmd" cmd_name="wxGISRemoteDBCmd" subtype="0" name="add task"/>
+      </menu>      
     </Menues>
     <MenuBar>
       <menu name="MenuBar.File"/>

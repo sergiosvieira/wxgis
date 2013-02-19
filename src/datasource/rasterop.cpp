@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  raster operations.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,6 +21,34 @@
 
 #include "wxgis/datasource/rasterop.h"
 
+CPLString GetWorldFilePath(const CPLString &soPath)
+{
+    //1. thirst and last char from ext and third char set w (e.g. jpw)
+    CPLString sExt = CPLGetExtension(soPath);
+    CPLString sNewExt;
+    sNewExt += sExt[0];
+    sNewExt += sExt[sExt.size() - 1];
+    sNewExt += 'w';
+    CPLString szPath = (char*)CPLResetExtension(soPath, sNewExt);
+	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+		return szPath;
+    //4. add wx to ext
+    sNewExt += 'x';
+    szPath = (char*)CPLResetExtension(soPath, sNewExt);
+	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+		return szPath;
+    //2. wld
+    szPath = (char*)CPLResetExtension(soPath, "wld");
+    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+		return szPath;
+    //3. add w to ext
+    szPath = soPath + CPLString("w");
+    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+		return szPath;
+    return CPLString();
+}
+
+/*
 #define OVR_MAX_LEVEL_SIZE 256
 
 int GetOverviewLevels(wxGISRasterDatasetSPtr pwxGISRasterDataset, int* anOverviewList)
@@ -50,29 +78,4 @@ int GetOverviewLevels(wxGISRasterDatasetSPtr pwxGISRasterDataset, int* anOvervie
 	return nLevelCount;
 }
 
-CPLString GetWorldFilePath(const CPLString &soPath)
-{
-    //1. thirst and last char from ext and third char set w (e.g. jpw)
-    CPLString sExt = CPLGetExtension(soPath);
-    CPLString sNewExt;
-    sNewExt += sExt[0];
-    sNewExt += sExt[sExt.size() - 1];
-    sNewExt += 'w';
-    CPLString szPath = (char*)CPLResetExtension(soPath, sNewExt);
-	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-		return szPath;
-    //4. add wx to ext
-    sNewExt += 'x';
-    szPath = (char*)CPLResetExtension(soPath, sNewExt);
-	if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-		return szPath;
-    //2. wld
-    szPath = (char*)CPLResetExtension(soPath, "wld");
-    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-		return szPath;
-    //3. add w to ext
-    szPath = soPath + CPLString("w");
-    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
-		return szPath;
-    return CPLString();
-}
+*/

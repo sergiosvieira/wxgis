@@ -19,12 +19,13 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
+/*
 #include "wxgissrv/srv_framework/framework.h"
 #include "wxgis/catalog/gxdiscconnections.h"
 
 /** \class wxRxDiscConnections rxdiscconnections.h
     \brief A Disc Connections RxRootObject.
-*/
+*//*
 class WXDLLIMPEXP_GIS_FRW wxRxDiscConnections :
     public wxGxDiscConnections,
 	public IRxObjectServer,
@@ -45,3 +46,4 @@ public:
 protected:
     IServerApplication* m_pApp;
 };
+*/

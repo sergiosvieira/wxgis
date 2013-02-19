@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  customize dialog class. Customize menues & toolbars
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,11 +20,8 @@
  ****************************************************************************/
 #pragma once
 
+#include "wxgis/framework/framework.h"
 #include "wxgis/framework/applicationex.h"
-
-//#include "wxgis/framework/framework.h"
-//#include "wxgis/catalogui/gxapplication.h"
-//#include "wxgis/catalogui/catalogui.h"
 
 #include "wx/intl.h"
 
@@ -42,17 +39,14 @@
 #include "wx/listctrl.h"
 #include "wx/treectrl.h"
 #include "wx/panel.h"
-//#include "wx/listbox.h"
 
-///////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-// wxBarTreeItemData
-//////////////////////////////////////////////////////////////////////////////
-
+/** \class wxBarTreeItemData customizedlg.h
+    \brief wxBarTreeItemData class. 
+*/
 class wxBarTreeItemData : public wxTreeItemData
 {
 public:
-	wxBarTreeItemData(IGISCommandBar* pBar)
+	wxBarTreeItemData(wxGISCommandBar* pBar)
 	{
 		m_pBar = pBar;
 	}
@@ -61,12 +55,12 @@ public:
 	{
 	}
 
-	IGISCommandBar* m_pBar;
+	wxGISCommandBar* m_pBar;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISToolBarPanel
-///////////////////////////////////////////////////////////////////////////////
+/** \class wxGISToolBarPanel customizedlg.h
+    \brief wxGISToolBarPanel class. 
+*/
 class wxGISToolBarPanel : public wxPanel
 {
 	enum
@@ -133,9 +127,9 @@ protected:
     DECLARE_EVENT_TABLE()
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISCommandPanel
-///////////////////////////////////////////////////////////////////////////////
+/** \class wxGISCommandPanel customizedlg.h
+    \brief wxGISCommandPanel class. 
+*/
 class wxGISCommandPanel : public wxPanel
 {
 	enum
@@ -145,7 +139,7 @@ class wxGISCommandPanel : public wxPanel
 		ID_ONSETKEYCODE
 	};
 public:
-	typedef std::map<wxString, COMMANDARRAY*> CATEGORYMAP;
+	typedef std::map<wxString, wxCommandPtrArray> CATEGORYMAP;
 
 private:
 	CATEGORYMAP m_CategoryMap;
@@ -179,9 +173,9 @@ public:
     DECLARE_EVENT_TABLE()
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISCustomizeDlg
-///////////////////////////////////////////////////////////////////////////////
+/** \class wxGISCustomizeDlg customizedlg.h
+    \brief wxGISCustomizeDlg class. 
+*/
 class WXDLLIMPEXP_GIS_FRW wxGISCustomizeDlg : public wxDialog
 {
 public:

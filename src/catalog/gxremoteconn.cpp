@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxRemoteConnection class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,6 +20,9 @@
  ****************************************************************************/
 
 #include "wxgis/catalog/gxremoteconn.h"
+
+#ifdef wxGIS_USE_POSTGRES
+/*
 #include "wxgis/core/crypt.h"
 #include "wxgis/datasource/sysop.h"
 #include "wxgis/catalog/gxpostgisdataset.h"
@@ -377,4 +380,5 @@ bool wxGxRemoteDBSchema::DeleteChild(IGxObject* pChild)
 		m_pCatalog->ObjectChanged(GetID());
 	return true;
 }
-
+*/
+#endif //wxGIS_USE_POSTGRES

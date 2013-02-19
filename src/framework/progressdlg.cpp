@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISProgressDlg class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011, 2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,13 @@
  ****************************************************************************/
 #include "wxgis/framework/progressdlg.h"
 
-wxGISProgressDlg::wxGISProgressDlg( const wxString &title, const wxString &message, int  maximum, wxWindow *  parent, int style ) : wxProgressDialog(title, message, maximum, parent, style)
+//------------------------------------------------------------------------------
+// wxGISProgressDlg
+//------------------------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxGISProgressDlg, wxProgressDialog)
+
+wxGISProgressDlg::wxGISProgressDlg( const wxString &title, const wxString &message, int  maximum, wxWindow *  parent, int style ) : wxProgressDialog(title, message, maximum, parent, style), ITrackCancel()
 {
 	m_sLastMessage = message;
 	m_nValue = 0;
@@ -38,15 +44,15 @@ bool wxGISProgressDlg::Show(bool bShow)
 
 void wxGISProgressDlg::SetRange(int range)
 {
-	wxProgressDialog::SetRange(range + 1);
+	wxProgressDialog::SetRange(range/* + 1*/);
 }
 
-int wxGISProgressDlg::GetRange(void)
+int wxGISProgressDlg::GetRange(void) const
 {
-	return wxProgressDialog::GetRange() - 1;
+	return wxProgressDialog::GetRange()/* - 1*/;
 }
 
-int wxGISProgressDlg::GetValue(void)
+int wxGISProgressDlg::GetValue(void) const
 {
 	return wxProgressDialog::GetValue();
 }
@@ -83,7 +89,7 @@ void wxGISProgressDlg::Reset(void)
 	wxProgressDialog::Resume();
 }
 
-void wxGISProgressDlg::PutMessage(wxString sMessage, size_t nIndex, wxGISEnumMessageType nType)
+void wxGISProgressDlg::PutMessage(const wxString &sMessage, size_t nIndex, wxGISEnumMessageType nType)
 {
 	m_sLastMessage = sMessage;
 	m_bIsCanceled = !wxProgressDialog::Update(m_nValue, m_sLastMessage);

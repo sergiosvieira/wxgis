@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  menu to show format clases (for format coordinates etc.).
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/cartoui/formatmenu.h"
+/*
 #include "wxgis/core/config.h"
 #include "wxgis/core/globalfn.h"
 
@@ -54,7 +55,7 @@ wxGISCoordinatesFormatMenu::wxGISCoordinatesFormatMenu(const wxString& title, lo
 	Append(wxID_ANY, _("Inches"));
 	AppendSeparator();
 	Append(wxID_ANY, _("Degrees"));
-	*/
+	*//*
 	//add swp coords check mark
 	//TODO: AppendSeparator();
 	AppendCheckItem(ID_SWAPCOORS, _("Swap coordinates"));
@@ -80,16 +81,16 @@ void wxGISCoordinatesFormatMenu::OnSwapCoords(wxCommandEvent& event)
 
 void wxGISCoordinatesFormatMenu::Serialize(bool bStore)
 {
-	wxGISAppConfigSPtr pConfig = GetConfig();
-	if(!pConfig)
+	wxGISAppConfig oConfig = GetConfig();
+	if(!oConfig.IsOk())
 		return;
 	if(bStore)
 	{
-		wxXmlNode* pToolsNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/coordinate_mask")));
+		wxXmlNode* pToolsNode = oConfig.GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/coordinate_mask")));
 		if(pToolsNode)
-			pConfig->DeleteNodeChildren(pToolsNode);
+			oConfig.DeleteNodeChildren(pToolsNode);
 		else
-			pToolsNode = pConfig->CreateConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/coordinate_mask")));
+			pToolsNode = oConfig.CreateConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/coordinate_mask")));
 		if(pToolsNode)
 		{
 			for(size_t i = 0; i < m_asCoordsMask.GetCount(); ++i)
@@ -102,7 +103,7 @@ void wxGISCoordinatesFormatMenu::Serialize(bool bStore)
 	else
 	{
 		m_asCoordsMask.Clear();
-		wxXmlNode* pToolsNode = pConfig->GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/coordinate_mask")));
+		wxXmlNode* pToolsNode = oConfig.GetConfigNode(enumGISHKCU, wxString(wxT("wxGISCommon/coordinate_mask")));
 		if(pToolsNode)
 		{
 			wxXmlNode* pChild = pToolsNode->GetChildren();
@@ -175,3 +176,4 @@ void wxGISCoordinatesFormatMenu::PrepareMenu(void)
 	for(size_t i = 0; i < m_asCoordsMask.GetCount(); ++i)
 		Insert(POS_TO_INSERT + i, ID_MASKBEG + i, m_asCoordsMask[i]);
 }
+*/

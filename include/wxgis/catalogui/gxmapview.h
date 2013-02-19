@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxMapView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,14 +21,18 @@
 
 #pragma once
 #include "wxgis/catalogui/gxview.h"
+
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/gxeventui.h"
 #include "wxgis/cartoui/mapview.h"
 #include "wxgis/core/format.h"
+#include "wxgis/framework/statusbar.h"
+#include "wxgis/catalogui/gxapplication.h"
 
 /** \class wxGxMapView gxmapview.h
  *  \brief The view for map showing.
  */
+
 class WXDLLIMPEXP_GIS_CLU wxGxMapView :
 	public wxGISMapView,
 	public wxGxView
@@ -36,8 +40,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxMapView :
     DECLARE_DYNAMIC_CLASS(wxGxMapView)
 public:
 	wxGxMapView(void);
-	wxGxMapView(wxWindow* parent, wxWindowID id = MAPCTRLID, const wxPoint& pos = wxDefaultPosition,
-						 const wxSize& size = wxDefaultSize);
+	wxGxMapView(wxWindow* parent, wxWindowID id = MAPCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 	virtual ~wxGxMapView(void);
     //virtual void CheckOverviews(wxGISDatasetSPtr pwxGISDataset, wxString soFileName);
     //events
@@ -47,21 +50,23 @@ public:
 	void OnMouseDoubleClick(wxMouseEvent& event);
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id = MAPCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("MapView"));
-	virtual bool Activate(IFrameApplication* application, wxXmlNode* pConf);
+	virtual bool Activate(IApplication* const pApplication, wxXmlNode* const pConf);
 	virtual void Deactivate(void);
-	virtual bool Applies(IGxSelection* Selection);
+	virtual bool Applies(wxGxSelection* const Selection);
 //events
 	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
 private:
-	IGxSelection* m_pSelection;
+    long m_ConnectionPointCatalogCookie, m_ConnectionPointSelectionCookie;
+	wxGxSelection* m_pSelection;
     wxGxCatalogUI* m_pCatalog;
-	long m_nParentGxObjectID;
 
-	IStatusBar* m_pStatusBar;
-	IFrameApplication* m_pApp;
+    long m_nParentGxObjectID;
+
+	wxGISStatusBar* m_pStatusBar;
+	wxGxApplication* m_pApp;
 	ITrackCancel *m_pTrackCancel;
 
 	wxGISCoordinatesFormat m_CFormat;
-
+private:
 	DECLARE_EVENT_TABLE()
 };

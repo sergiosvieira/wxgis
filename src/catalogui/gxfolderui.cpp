@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxFolderUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,15 +19,22 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxfolderui.h"
+
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/framework/progressdlg.h"
-#include "wxgis/core/globalfn.h"
 
+//---------------------------------------------------------------------------
+// wxGxFolderUI
+//---------------------------------------------------------------------------
 
-wxGxFolderUI::wxGxFolderUI(CPLString Path, wxString Name, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxFolder(Path, Name)
+IMPLEMENT_CLASS(wxGxFolderUI, wxGxFolder)
+
+wxGxFolderUI::wxGxFolderUI(wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon & LargeIcon, const wxIcon & SmallIcon) : wxGxFolder(oParent, soName, soPath)
 {
     m_oLargeIcon = LargeIcon;
     m_oSmallIcon = SmallIcon;
+
+    m_pGxViewToRename = NULL;
 }
 
 wxGxFolderUI::~wxGxFolderUI(void)
@@ -46,17 +53,40 @@ wxIcon wxGxFolderUI::GetSmallImage(void)
 
 void wxGxFolderUI::EditProperties(wxWindow *parent)
 {
+    //TODO: Linux folder props
+#ifdef __WXMSW__
+    SHELLEXECUTEINFO SEInf = {0};
+    SEInf.cbSize = sizeof(SEInf);    
+    SEInf.hwnd = parent->GetHWND();
+    SEInf.lpVerb = wxT("properties");
+    SEInf.fMask = SEE_MASK_INVOKEIDLIST;
+
+    wxString myString(m_sPath, wxConvUTF8);
+    LPCWSTR pszPathStr = myString.wc_str();
+
+    SEInf.lpFile = pszPathStr;
+    SEInf.nShow = SW_SHOW;
+    ShellExecuteEx(&SEInf);
+#endif
 }
 
-void wxGxFolderUI::EmptyChildren(void)
+void wxGxFolderUI::BeginRenameOnAdd(wxGxView* const pGxView, const CPLString &szPath)
 {
-	for(size_t i = 0; i < m_Children.size(); ++i)
-	{
-		m_Children[i]->Detach();
-		wxDELETE( m_Children[i] );
-	}
-    m_Children.clear();
-	m_bIsChildrenLoaded = false;
+    m_pGxViewToRename = pGxView;
+    m_szPathToRename = szPath;
+    m_szPathToRename = m_szPathToRename.tolower();
+}
+
+void wxGxFolderUI::AddChild( wxGxObject *child )
+{
+    wxGxFolder::AddChild(child);
+    if(child->GetPath().tolower() == m_szPathToRename)
+    {
+        m_pGxViewToRename->BeginRename(child->GetId());
+
+        m_szPathToRename.clear();
+        m_pGxViewToRename = NULL;
+    }
 }
 
 wxDragResult wxGxFolderUI::CanDrop(wxDragResult def)
@@ -64,10 +94,11 @@ wxDragResult wxGxFolderUI::CanDrop(wxDragResult def)
     return def;
 }
 
-bool wxGxFolderUI::Drop(const wxArrayString& filenames, bool bMove)
+bool wxGxFolderUI::Drop(const wxArrayString& GxObjects, bool bMove)
 {
-    if(filenames.GetCount() == 0)
+    if(GxObjects.GetCount() == 0)
         return false;
+    /*
     GxObjectArray Array;
     bool bValid(false);
     //1. try to get initiated GxObjects
@@ -219,10 +250,10 @@ bool wxGxFolderUI::Drop(const wxArrayString& filenames, bool bMove)
     }
     m_bIsChildrenLoaded = false;
     LoadChildren();
-    m_pCatalog->ObjectRefreshed(GetID());
+    m_pCatalog->ObjectRefreshed(GetId());
 
 	ProgressDlg.SetValue(ProgressDlg.GetValue() + 1);
-	ProgressDlg.Destroy();
+	ProgressDlg.Destroy();*/
     return true;
 }
 

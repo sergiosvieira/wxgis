@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  Carto Main Commands class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/cartoui/cartocmd.h"
+/*
 #include "wxgis/display/rubberband.h"
 #include "wxgis/core/config.h"
 //#include "wxgis/display/simplefillsymbol.h"
@@ -127,19 +128,8 @@ bool wxGISCartoMainCmd::GetEnabled(void)
 {
 	if(!m_pMapView)
 	{
-		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
-		if(pWinArr)
-		{
-			for(size_t i = 0; i < pWinArr->size(); ++i)
-			{
-				wxGISMapView* pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
-				if(pMapView)
-				{
-					m_pMapView = pMapView;
-					break;
-				}
-			}
-		}
+        wxWindow* pWnd = m_pApp->GetRegisteredWindowByType(wxCLASSINFO(wxGISMapView));
+        m_pMapView = dynamic_cast<wxGISMapView*>(pWnd);
 	}
 	if(!m_pMapView)
         return false;
@@ -200,7 +190,7 @@ void wxGISCartoMainCmd::OnClick(void)
 	}
 }
 
-bool wxGISCartoMainCmd::OnCreate(IFrameApplication* pApp)
+bool wxGISCartoMainCmd::OnCreate(wxGISApplicationBase* pApp)
 {
 	m_pApp = pApp;
 	return true;
@@ -312,21 +302,22 @@ bool wxGISCartoMainTool::GetEnabled(void)
 {
 	if(!m_pMapView || !m_pIdentifyView)
 	{
-		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
-		if(pWinArr)
+		WINDOWARRAY oWinArr = m_pApp->GetChildWindows();
+		for(size_t i = 0; i < oWinArr.GetCount(); ++i)
 		{
-			for(size_t i = 0; i < pWinArr->size(); ++i)
-			{
-				wxGISMapView* pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
-				if(pMapView)
-					m_pMapView = pMapView;
-                wxAxIdentifyView* pIdentifyView = dynamic_cast<wxAxIdentifyView*>(pWinArr->at(i));
-                if(pIdentifyView)
-                    m_pIdentifyView = pIdentifyView;
-                if(m_pMapView && m_pIdentifyView)
-                    break;
+            wxWindow* pWnd = wxWindow::FindWindowById(oWinArr[i]);
+            if(!pWnd)
+                continue;
 
-			}
+			wxGISMapView* pMapView = dynamic_cast<wxGISMapView*>(pWnd);
+			if(pMapView)
+				m_pMapView = pMapView;
+            wxAxIdentifyView* pIdentifyView = dynamic_cast<wxAxIdentifyView*>(pWnd);
+            if(pIdentifyView)
+                m_pIdentifyView = pIdentifyView;
+            if(m_pMapView && m_pIdentifyView)
+                break;
+
 		}
 	}
 	if(!m_pMapView)
@@ -389,7 +380,7 @@ void wxGISCartoMainTool::OnClick(void)
 	}
 }
 
-bool wxGISCartoMainTool::OnCreate(IFrameApplication* pApp)
+bool wxGISCartoMainTool::OnCreate(wxGISApplicationBase* pApp)
 {
 	m_pApp = pApp;
 	return true;
@@ -476,11 +467,16 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 	{
 		case 0:	//z_in
 		{
-			wxGISAppConfigSPtr pConfig = GetConfig();
-			int nR = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/rcolor")), 0);
-			int nG = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/gcolor")), 0);
-			int nB = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/bcolor")), 255);
-			int nWidth = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/width")), 2);
+			wxGISAppConfig oConfig = GetConfig();
+            int nR(0), nG(0), nB (255), nWidth(2);
+            if(oConfig.IsOk())
+            {
+    			int nR = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/rcolor")), 0);
+	    		int nG = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/gcolor")), 0);
+		    	int nB = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/bcolor")), 255);
+			    int nWidth = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/width")), 2);
+            }
+
 			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(nR, nG, nB), nWidth), m_pMapView, m_pMapView->GetDisplay());
 			OGREnvelope Env;
 			OGRGeometrySPtr pGeom = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
@@ -507,11 +503,16 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 		break;
 		case 1:	//z_out
 		{
-			wxGISAppConfigSPtr pConfig = GetConfig();
-			int nR = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/rcolor")), 0);
-			int nG = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/gcolor")), 0);
-			int nB = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/bcolor")), 255);
-			int nWidth = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/width")), 2);
+			wxGISAppConfig oConfig = GetConfig();
+            int nR(0), nG(0), nB (255), nWidth(2);
+            if(oConfig.IsOk())
+            {
+    			int nR = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/rcolor")), 0);
+	    		int nG = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/gcolor")), 0);
+		    	int nB = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/bcolor")), 255);
+			    int nWidth = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/width")), 2);
+            }
+
 			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(nR, nG, nB), nWidth), m_pMapView, m_pMapView->GetDisplay());
 			OGREnvelope Env;
 			OGRGeometrySPtr pGeom = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
@@ -540,11 +541,16 @@ void wxGISCartoMainTool::OnMouseDown(wxMouseEvent& event)
 			break;
 		case 3:	//inf
 		{
-			wxGISAppConfigSPtr pConfig = GetConfig();
-			int nR = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/rcolor")), 0);
-			int nG = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/gcolor")), 0);
-			int nB = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/bcolor")), 255);
-			int nWidth = pConfig->ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/width")), 2);
+			wxGISAppConfig oConfig = GetConfig();
+            int nR(0), nG(0), nB (255), nWidth(2);
+            if(oConfig.IsOk())
+            {
+    			int nR = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/rcolor")), 0);
+	    		int nG = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/gcolor")), 0);
+		    	int nB = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/bcolor")), 255);
+			    int nWidth = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/rabberband/width")), 2);
+            }
+
 			wxGISRubberEnvelope RubberEnvelope(wxPen(wxColour(nR, nG, nB), nWidth), m_pMapView, m_pMapView->GetDisplay());
 			OGRGeometrySPtr pGeom = RubberEnvelope.TrackNew( event.GetX(), event.GetY() );
             wxWindow* pWnd = static_cast<wxWindow*>(m_pIdentifyView);
@@ -615,7 +621,7 @@ void wxGISCartoMainTool::OnMouseDoubleClick(wxMouseEvent& event)
 //	2	//Input Rotate Angle
 //	3	//?
 
-IMPLEMENT_DYNAMIC_CLASS(wxGISCartoFrameTool, wxObject)
+IMPLEMENT_DYNAMIC_CLASS(wxGISCartoFrameTool, ICommand)
 
 
 wxGISCartoFrameTool::wxGISCartoFrameTool(void) : m_pMapView(NULL), m_bCheck(false)
@@ -681,19 +687,8 @@ bool wxGISCartoFrameTool::GetEnabled(void)
 {
 	if(!m_pMapView)
 	{
-		const WINDOWARRAY* pWinArr = m_pApp->GetChildWindows();
-		if(pWinArr)
-		{
-			for(size_t i = 0; i < pWinArr->size(); ++i)
-			{
-				wxGISMapView* pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
-				if(pMapView)
-				{
-					m_pMapView = pMapView;
-					break;
-				}
-			}
-		}
+        wxWindow* pWnd = m_pApp->GetRegisteredWindowByType(wxCLASSINFO(wxGISMapView));
+        m_pMapView = dynamic_cast<wxGISMapView*>(pWnd);
 	}
 	if(!m_pMapView)
         return false;
@@ -761,7 +756,7 @@ void wxGISCartoFrameTool::OnClick(void)
 	}
 }
 
-bool wxGISCartoFrameTool::OnCreate(IFrameApplication* pApp)
+bool wxGISCartoFrameTool::OnCreate(wxGISApplicationBase* pApp)
 {
 	m_pApp = pApp;
 
@@ -951,21 +946,10 @@ void wxGISRotationComboBox::OnMapRotated(wxMxMapViewEvent& event)
 	UpdateAngle();
 }
 
-void wxGISRotationComboBox::Activate(IFrameApplication* pApp)
+void wxGISRotationComboBox::Activate(wxGISApplicationBase* pApp)
 {
-	const WINDOWARRAY* pWinArr = pApp->GetChildWindows();
-	if(pWinArr)
-	{
-		for(size_t i = 0; i < pWinArr->size(); ++i)
-		{
-			wxGISMapView* pMapView = dynamic_cast<wxGISMapView*>(pWinArr->at(i));
-			if(pMapView)
-			{
-				m_pMapView = pMapView;
-				break;
-			}
-		}
-	}
+    wxWindow* pWnd = pApp->GetRegisteredWindowByType(wxCLASSINFO(wxGISMapView));
+    m_pMapView = dynamic_cast<wxGISMapView*>(pWnd);
 
 	m_pConnectionPointMap = dynamic_cast<wxGISConnectionPointContainer*>( m_pMapView );
 	if(m_pConnectionPointMap != NULL)
@@ -987,4 +971,4 @@ void wxGISRotationComboBox::UpdateAngle(void)
 		SetValue(sVal);
 	}
 }
-
+*/

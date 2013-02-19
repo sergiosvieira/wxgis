@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  Task Commands class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -21,19 +21,21 @@
 
 #pragma once
 
-#include "wxgis/geoprocessingui/geoprocessingui.h"
+//#include "wxgis/geoprocessingui/geoprocessingui.h"
+#include "wxgis/framework/command.h"
+#include "wxgis/catalogui/gxapplication.h"
 
-#include <wx/imaglist.h>
+//#include <wx/imaglist.h>
 
 class WXDLLIMPEXP_GIS_GPU wxGISTaskCmd :
-    public ICommand
+    public wxGISCommand
 {
     DECLARE_DYNAMIC_CLASS(wxGISTaskCmd)
 
 public:
 	wxGISTaskCmd(void);
 	virtual ~wxGISTaskCmd(void);
-	//ICommand
+	//wxGISCommand
 	virtual wxIcon GetBitmap(void);
 	virtual wxString GetCaption(void);
 	virtual wxString GetCategory(void);
@@ -42,11 +44,10 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IFrameApplication* pApp);
+	virtual bool OnCreate(wxGISApplicationBase* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
 protected:
-	IFrameApplication* m_pApp;
-    wxImageList m_ImageList;
-//	wxIcon m_IconGPMenu, m_IconToolview;
+	wxGxApplication* m_pApp;
+    wxIcon m_IconStart, m_IconStop, m_IconInfo;
 };

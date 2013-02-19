@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  Filter classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,37 +20,46 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/datasource/datasource.h"
+#include "wxgis/datasource/vectorop.h"
 
 /** \class wxGISQueryFilter filter.h
     \brief Attributes query filter.
 */
+
 class WXDLLIMPEXP_GIS_DS wxGISQueryFilter
 {
 public:
     wxGISQueryFilter(void);
-    wxGISQueryFilter(wxString sWhereClause);
+    wxGISQueryFilter(const wxString &sWhereClause);
+    wxGISQueryFilter& operator = ( const wxGISQueryFilter& obj );
+    wxGISQueryFilter( const wxGISQueryFilter& obj );
 	virtual ~wxGISQueryFilter(void);
     virtual void SetWhereClause(wxString sWhereClause);
-    virtual wxString GetWhereClause(void);
+    virtual wxString GetWhereClause(void) const;
 protected:
     wxString m_sWhereClause;
 };
 
+extern WXDLLIMPEXP_DATA_GIS_DS(wxGISQueryFilter) wxGISNullQueryFilter;
+
 /** \class wxGISQueryFilter filter.h
     \brief Spatial (by geometry) query filter.
 */
+
 class WXDLLIMPEXP_GIS_DS wxGISSpatialFilter : 
 	public wxGISQueryFilter
 {
 public:
-	wxGISSpatialFilter(OGRGeometrySPtr pGeom, wxString sWhereClause = wxEmptyString);
+	wxGISSpatialFilter(const wxGISGeometry &Geom, const wxString &sWhereClause = wxEmptyString);
 	wxGISSpatialFilter(void);
+    wxGISSpatialFilter& operator = ( const wxGISSpatialFilter& obj );
+    wxGISSpatialFilter( const wxGISSpatialFilter& obj );
 	virtual ~wxGISSpatialFilter(void);
 	virtual void SetEnvelope(double dfMinX, double dfMinY, double dfMaxX, double dfMaxY);
-	virtual void SetGeometry(OGRGeometrySPtr pGeom);
-	virtual OGREnvelopeSPtr GetEnvelope(void);
-	virtual OGRGeometrySPtr GetGeometry(void);
+	virtual void SetEnvelope(const OGREnvelope &Env);
+	virtual void SetGeometry(const wxGISGeometry &Geom);
+	virtual OGREnvelope GetEnvelope(void);
+	virtual wxGISGeometry GetGeometry(void) const;
 protected:
-	OGRGeometrySPtr m_pGeom;
+	wxGISGeometry m_Geom;
 };

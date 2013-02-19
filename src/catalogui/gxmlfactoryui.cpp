@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxMLFactoryUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010-2011 Bishop
 *
@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxmlfactoryui.h"
+/*
 #include "wxgis/catalogui/gxkmldatasetui.h"
 #include "wxgis/catalogui/gxdatasetui.h"
 
@@ -86,3 +87,4 @@ IGxObject* wxGxMLFactoryUI::GetGxDataset(CPLString path, wxString name, wxGISEnu
     }
     return NULL;
 }
+*/

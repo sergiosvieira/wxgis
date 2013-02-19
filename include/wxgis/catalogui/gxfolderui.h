@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxFolderUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,31 +21,38 @@
 #pragma once
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalog/gxfolder.h"
+#include "wxgis/catalogui/gxview.h"
 
 /** \class wxGxFolderUI gxfolderui.h
     \brief A folder GxObject.
 */
+
 class WXDLLIMPEXP_GIS_CLU wxGxFolderUI :
     public wxGxFolder,
 	public IGxObjectUI,
 	public IGxObjectEditUI,
     public IGxDropTarget
 {
+    DECLARE_CLASS(wxGxFolderUI)
 public:
-	wxGxFolderUI(CPLString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxFolderUI(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon & LargeIcon = wxNullIcon, const wxIcon & SmallIcon = wxNullIcon);
 	virtual ~wxGxFolderUI(void);
+    //wxGxObjectContainer
+    virtual void AddChild( wxGxObject *child );
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxFolder.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxFolder.NewMenu"));};
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxFolder.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxString(wxT("wxGxFolder.NewMenu"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
     //IGxDropTarget
     virtual wxDragResult CanDrop(wxDragResult def);
-    virtual bool Drop(const wxArrayString& filenames, bool bMove);
-	//wxGxFolder
-	virtual void EmptyChildren(void);
+    virtual bool Drop(const wxArrayString& GxObjects, bool bMove);
+    //wxGxFolderUI
+    virtual void BeginRenameOnAdd(wxGxView* const pGxView, const CPLString &szPath);
 protected:
     wxIcon m_oLargeIcon, m_oSmallIcon;
+    wxGxView* m_pGxViewToRename;
+    CPLString m_szPathToRename;
 };

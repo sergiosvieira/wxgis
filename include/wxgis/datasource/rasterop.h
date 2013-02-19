@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  raster operations.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,9 +21,16 @@
 #pragma once
 
 #include "wxgis/datasource/datasource.h"
+
+#include "gdal_priv.h"
+
+/** \fn CPLString GetWorldFilePath(const CPLString &soPath);
+ *  \brief Get the path for world file if exist
+ */	
+CPLString WXDLLIMPEXP_GIS_DS GetWorldFilePath(const CPLString &soPath);
+/*
 #include "wxgis/datasource/rasterdataset.h"
 
 int WXDLLIMPEXP_GIS_DS GetOverviewLevels(wxGISRasterDatasetSPtr pwxGISRasterDataset, int* anOverviewList);
-CPLString WXDLLIMPEXP_GIS_DS GetWorldFilePath(const CPLString &soPath);
-
+*/
 

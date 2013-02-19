@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  GxPostGISDataset classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,13 +20,17 @@
  ****************************************************************************/
 #pragma once
 
+#include "wxgis/defs.h"
+
+#ifdef wxGIS_USE_POSTGRES
+/*
 #include "wxgis/catalog/catalog.h"
-#include "wxgis/datasource/postgisdataset.h"
+//#include "wxgis/datasource/postgisdataset.h"
 
 /** \class wxGxPostGISTableDataset gxpostgisdataset.h
     \brief A PostGIS Table Dataset GxObject.
 */
-
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxPostGISTableDataset :
 	public IGxObject,
 	public IGxDataset
@@ -57,7 +61,7 @@ protected:
 /** \class wxGxPostGISFeatureDataset gxpostgisdataset.h
     \brief A PostGIS Feature Dataset GxObject.
 */
-
+/*
 class WXDLLIMPEXP_GIS_CLT wxGxPostGISFeatureDataset :
 	public IGxObject,
 	public IGxDataset
@@ -83,3 +87,5 @@ protected:
 	wxGISDatasetSPtr m_pwxGISDataset;
     wxGISPostgresDataSourceSPtr m_pwxGISRemoteConn;
 };
+*/
+#endif //wxGIS_USE_POSTGRES

@@ -18,7 +18,7 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-
+/*
 #include "wxgissrv/srv_framework/plugin.h"
 
 wxGISWorkPlugin::wxGISWorkPlugin(void) : m_pLocale(NULL), m_pszOldLocale(NULL), m_pConfig(NULL)
@@ -231,3 +231,4 @@ bool wxGISWorkPlugin::SetupLoc(wxString sLoc, wxString sLocPath)
 
     return true;
 }
+*/

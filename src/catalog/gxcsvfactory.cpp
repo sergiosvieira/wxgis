@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxCSVFileFactory class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "wxgis/catalog/gxcsvfactory.h"
 #include "wxgis/catalog/gxdataset.h"
-
+/*
 IMPLEMENT_DYNAMIC_CLASS(wxGxCSVFileFactory, wxObject)
 
 wxGxCSVFileFactory::wxGxCSVFileFactory(void)
@@ -39,12 +39,12 @@ bool wxGxCSVFileFactory::GetChildren(CPLString sParentDir, char** &pFileNames, G
         CPLString szExt = CPLGetExtension(pFileNames[i]);
         CPLString szPath;
 
-        if(EQUAL(szExt, "csv"))
+        if(wxGISEQUAL(szExt, "csv"))
         {
             pGxObj = GetGxObject(pFileNames[i], GetConvName(pFileNames[i]));
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
-        else if(EQUAL(szExt, "csvt"))
+        else if(wxGISEQUAL(szExt, "csvt"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 
 		if(pGxObj != NULL)
@@ -74,3 +74,4 @@ IGxObject* wxGxCSVFileFactory::GetGxObject(CPLString path, wxString name)
 {
     return static_cast<IGxObject*>( new wxGxTableDataset(path, name, enumTableCSV) );
 }
+*/

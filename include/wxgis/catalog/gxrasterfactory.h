@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxRasterFactory class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010,2013  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,24 +20,24 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/catalog/catalog.h"
+#include "wxgis/catalog/gxobjectfactory.h"
+#include "wxgis/datasource/datasource.h"
 
 /** \class wxGxRasterFactory gxrasterfactory.h
     \brief A raster GxObject factory.
 */
+
 class WXDLLIMPEXP_GIS_CLT wxGxRasterFactory :
-	public IGxObjectFactory,
-	public wxObject
+	public wxGxObjectFactory
 {
 	DECLARE_DYNAMIC_CLASS(wxGxRasterFactory)
 public:
 	wxGxRasterFactory(void);
 	virtual ~wxGxRasterFactory(void);
 	//IGxObjectFactory
-	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray);
-    virtual void Serialize(wxXmlNode* const pConfig, bool bStore);
-    virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
-    virtual wxString GetName(void){return wxString(_("Raster files"));};
+	virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
+    virtual wxString GetName(void) const {return wxString(_("Raster files"));};
     //wxGxRasterFactory
-    virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumRasterDatasetType type);
+    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumRasterDatasetType type);
 };
+

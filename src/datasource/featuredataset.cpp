@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  FeatureDataset class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/datasource/featuredataset.h"
+
 //#include "wxgis/datasource/sysop.h"
 //
 //#include "wx/filename.h"
@@ -27,14 +28,15 @@
 //---------------------------------------
 // wxGISFeatureDataset
 //---------------------------------------
-wxGISFeatureDataset::wxGISFeatureDataset(CPLString sPath, int nSubType, OGRLayer* poLayer, OGRDataSource* poDS) : wxGISTable(sPath, nSubType, poLayer, poDS)
+
+IMPLEMENT_CLASS(wxGISFeatureDataset, wxGISTable)
+
+wxGISFeatureDataset::wxGISFeatureDataset(const CPLString &sPath, int nSubType, OGRLayer* poLayer, OGRDataSource* poDS) : wxGISTable(sPath, nSubType, poLayer, poDS)
 {
     m_nType = enumGISFeatureDataset;
-    if(m_nSubType == enumVecKML || m_nSubType == enumVecKMZ)
-        m_Encoding = wxFONTENCODING_UTF8;
-    else
-        m_Encoding = wxLocale::GetSystemEncoding();
-	m_bIsGeometryLoaded = false;
+    m_eGeomType = wkbUnknown;
+    /*
+	m_bIsGeometryLoaded = false;*/
 }
 
 wxGISFeatureDataset::~wxGISFeatureDataset(void)
@@ -44,19 +46,12 @@ wxGISFeatureDataset::~wxGISFeatureDataset(void)
 
 void wxGISFeatureDataset::Close(void)
 {
-	m_pQuadTree.reset();
-    m_bIsGeometryLoaded = false;
+	/*m_pQuadTree.reset();
+    m_bIsGeometryLoaded = false;*/
 	wxGISTable::Close();
 }
 
-size_t wxGISFeatureDataset::GetSubsetsCount(void)
-{
-    if(m_poDS)
-        return  m_poDS->GetLayerCount();
-    return 0;
-}
-
-wxGISDatasetSPtr wxGISFeatureDataset::GetSubset(size_t nIndex)
+wxGISDataset* wxGISFeatureDataset::GetSubset(size_t nIndex)
 {
     if(m_poDS)
     {
@@ -66,12 +61,32 @@ wxGISDatasetSPtr wxGISFeatureDataset::GetSubset(size_t nIndex)
             m_poDS->Reference();
 			CPLString szPath;
 			szPath.Printf("%s#%d", m_sPath.c_str(), nIndex);
-			wxGISFeatureDatasetSPtr pDataSet = boost::make_shared<wxGISFeatureDataset>(szPath, m_nSubType, poLayer, m_poDS);
+			wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(szPath, m_nSubType, poLayer, m_poDS);
             pDataSet->SetEncoding(m_Encoding);
-            return boost::static_pointer_cast<wxGISDataset>(pDataSet);
+            return static_cast<wxGISDataset*>(pDataSet);
         }
     }
-    return wxGISDatasetSPtr();
+    return NULL;
+}
+
+wxGISDataset* wxGISFeatureDataset::GetSubset(const wxString & sSubsetName)
+{
+    if(m_poDS)
+    {
+        CPLString szSubsetName(sSubsetName.mb_str(wxConvUTF8));
+        OGRLayer* poLayer = m_poDS->GetLayerByName(szSubsetName);
+        if(poLayer)
+        {
+            m_poDS->Reference();
+			CPLString szPath;
+            szPath.Printf("%s#%s", m_sPath.c_str(), szSubsetName.c_str());
+			wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(szPath, m_nSubType, poLayer, m_poDS);
+            pDataSet->SetEncoding(m_Encoding);
+            return static_cast<wxGISDataset*>(pDataSet);
+        }
+    }
+    return NULL;
+
 }
 
 char **wxGISFeatureDataset::GetFileList()
@@ -162,67 +177,36 @@ char **wxGISFeatureDataset::GetFileList()
     return papszFileList;
 }
 
-bool wxGISFeatureDataset::Open(int iLayer, int bUpdate, bool bCache, ITrackCancel* pTrackCancel)
+const wxGISSpatialReference wxGISFeatureDataset::GetSpatialReference(void)
 {
-	if(m_bIsOpened)
+	if(m_SpatialReference.IsOk() || !IsOpened())
+		return m_SpatialReference;
+
+	OGRSpatialReference* pSpaRef = m_poLayer->GetSpatialRef();
+	if(!pSpaRef)
+		return m_SpatialReference;
+	m_SpatialReference = wxGISSpatialReference(pSpaRef->Clone());
+	return m_SpatialReference;
+}
+
+bool wxGISFeatureDataset::Open(int iLayer, int bUpdate, bool bCache, ITrackCancel* const pTrackCancel)
+{
+	if(IsOpened())
 		return true;
 
 	if(!wxGISTable::Open(iLayer, bUpdate, bCache, pTrackCancel))
 		return false;
 
-	if(bCache)
-		LoadGeometry(pTrackCancel);
+//TODO:
+//1. Load quad tree file from disk (if WFS and etc. store file neare connection file and check count of features, think about PG spatial index and etc.)
+//2. Read all id's from file using extent and max square of extent - we dont need extents like point or less
+//3. In other thread check quad tree for differences and update it if need - send event for redraw
+//4.
 
-	return true;
-}
-
-void wxGISFeatureDataset::Cache(ITrackCancel* pTrackCancel)
-{
-	wxGISTable::Cache(pTrackCancel);
-	LoadGeometry(pTrackCancel);
-}
-
-const OGRSpatialReferenceSPtr wxGISFeatureDataset::GetSpatialReference(void)
-{
-	if(m_pSpatialReference)
-		return m_pSpatialReference;
-	if(	!m_poLayer )
-		return OGRSpatialReferenceSPtr();
-
-	OGRSpatialReference* pSpaRef = m_poLayer->GetSpatialRef();
-	if(!pSpaRef)
-		return OGRSpatialReferenceSPtr();
-	m_pSpatialReference = OGRSpatialReferenceSPtr(pSpaRef->Clone());
-	return m_pSpatialReference;
-}
-
-OGREnvelope wxGISFeatureDataset::GetEnvelope(void)
-{
-	if(m_stExtent.IsInit())
-        return m_stExtent;
-    if(!m_poLayer )
-		return OGREnvelope();
-
-	bool bOLCFastGetExtent = m_poLayer->TestCapability(OLCFastGetExtent) != 0;
-    if(bOLCFastGetExtent)
-    {
-        if(m_poLayer->GetExtent(&m_stExtent, true) == OGRERR_NONE)
-        {
-            if(IsDoubleEquil(m_stExtent.MinX, m_stExtent.MaxX))
-            {
-                m_stExtent.MaxX += 1;
-                m_stExtent.MinX -= 1;
-            }
-            if(IsDoubleEquil(m_stExtent.MinY, m_stExtent.MaxY))
-            {
-                m_stExtent.MaxY += 1;
-                m_stExtent.MinY -= 1;
-            }
-            return m_stExtent;
-        }
-    }
   //  //load all features
   //  LoadGeometry();
+    //TODO: Increase extent while loading
+
   //  if(m_bIsGeometryLoaded)
   //      return m_psExtent;
   //  else
@@ -245,9 +229,54 @@ OGREnvelope wxGISFeatureDataset::GetEnvelope(void)
   //      }
   //      return OGREnvelopeSPtr();
   //  }
-    return OGREnvelope();
+
+	//if(bCache)
+	//	LoadGeometry(pTrackCancel);
+
+	return true;
 }
 
+void wxGISFeatureDataset::SetInternalValues()
+{
+    if(NULL == m_poLayer)
+        return;
+
+    OGRFeatureDefn *pDef = m_poLayer->GetLayerDefn();
+    if(pDef)
+        m_eGeomType = pDef->GetGeomType();
+
+    //fill extent if fast
+	bool bOLCFastGetExtent = m_poLayer->TestCapability(OLCFastGetExtent) != 0;
+    if(bOLCFastGetExtent)
+    {
+        if(m_poLayer->GetExtent(&m_stExtent, false) == OGRERR_NONE)
+        {
+            if(IsDoubleEquil(m_stExtent.MinX, m_stExtent.MaxX))
+            {
+                m_stExtent.MaxX += 1;
+                m_stExtent.MinX -= 1;
+            }
+            if(IsDoubleEquil(m_stExtent.MinY, m_stExtent.MaxY))
+            {
+                m_stExtent.MaxY += 1;
+                m_stExtent.MinY -= 1;
+            }
+        }
+    }
+    wxGISTable::SetInternalValues();
+}
+
+//void wxGISFeatureDataset::Cache(ITrackCancel* pTrackCancel)
+//{
+//	wxGISTable::Cache(pTrackCancel);
+//	LoadGeometry(pTrackCancel);
+//}
+
+OGREnvelope wxGISFeatureDataset::GetEnvelope(void) const
+{
+    return m_stExtent;
+}
+/*
 void wxGISFeatureDataset::LoadGeometry(ITrackCancel* pTrackCancel)
 {
 	wxCriticalSectionLocker locker(m_CritSect);
@@ -376,7 +405,7 @@ void wxGISFeatureDataset::LoadGeometry(ITrackCancel* pTrackCancel)
 
     m_bIsGeometryLoaded = true;
 }
-
+*/
 //void wxGISFeatureDataset::UnloadGeometry(void)
 //{
 //    if(!m_bIsGeometryLoaded)
@@ -385,14 +414,28 @@ void wxGISFeatureDataset::LoadGeometry(ITrackCancel* pTrackCancel)
 //    m_bIsGeometryLoaded = false;
 //}
 
-const OGRwkbGeometryType wxGISFeatureDataset::GetGeometryType(void)
+OGRwkbGeometryType wxGISFeatureDataset::GetGeometryType(void) const
 {
-    OGRFeatureDefn *pDef = GetDefinition();
-    if(pDef)
-        return pDef->GetGeomType();
-    return wkbUnknown;
+    return m_eGeomType;
 }
 
+
+wxFeatureCursor wxGISFeatureDataset::Search(const wxGISSpatialFilter &SpaFilter, bool bOnlyFirst)
+{
+    if(SpaFilter.GetGeometry().IsOk())
+	{
+        m_poLayer->SetSpatialFilter(SpaFilter.GetGeometry());
+	}
+	else
+    {
+        m_poLayer->SetSpatialFilter(NULL);
+    }
+
+    wxFeatureCursor oOutCursor = wxGISTable::Search(SpaFilter, bOnlyFirst);
+    m_poLayer->SetSpatialFilter(NULL);
+    return oOutCursor;
+}
+/*
 wxGISQuadTreeCursorSPtr wxGISFeatureDataset::SearchGeometry(const CPLRectObj* pAoi)
 {
 	if(m_pQuadTree)
@@ -747,4 +790,3 @@ wxFeatureCursorSPtr wxGISFeatureDataset::Search(wxGISQueryFilter* pQFilter, bool
 8. При отрисовке: запрашивается по охвату (для окна или выделения) массив структуры геометрия* + ОИД. Если перепроецирование врублено - запрос идет у локальной копии массива
 9. По ОИД можно получить быстро геометрию или атрибуты.
 */
-

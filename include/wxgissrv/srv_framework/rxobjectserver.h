@@ -3,7 +3,7 @@
  * Purpose:  wxRxObjectContainer class.
  * Author:   Bishop (aka Barishnikov Dmitriy), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2010,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,12 +20,62 @@
  ****************************************************************************/
 #pragma once
 
+#include "wxgis/net/netevent.h"
+#include "wxgis/catalog/gxcatalog.h"
+
+/** \class wxRxObject rxobjectserver.h
+    \brief The interface class for remote objects.
+*/
+
+class wxRxObject
+{
+public:
+    virtual ~wxRxObject(void){};
+    virtual void OnNetEvent(wxGISNetEvent& event) = 0;
+    virtual wxString GetClassName(void) const = 0;
+    //virtual wxXmlNode* GetXmlDescription(void) const = 0;
+    virtual wxXmlNode* GetXmlDescription(void) const {return NULL;};
+};
+
+/** \class wxRxObjectContainer rxobjectserver.h
+    \brief The interface class for remote objects container.
+*/
+
+class WXDLLIMPEXP_GIS_FRW wxRxObjectContainer : public wxRxObject
+{
+public:
+    virtual ~wxRxObjectContainer(void);
+    virtual void SendChildren(const wxGxObjectList &Children, long nSourceId, int nNetClientId);
+};
+
+/** \class wxRxCatalog rxobjectserver.h
+    \brief The remote catalog class.
+*/
+class WXDLLIMPEXP_GIS_FRW wxRxCatalog : 
+    public wxGxCatalog,
+	public wxRxObjectContainer,
+    public INetEventProcessor
+{
+    wxDECLARE_DYNAMIC_CLASS_NO_COPY(wxRxCatalog);
+public:
+    wxRxCatalog(wxGxObject *oParent = NULL, const wxString &soName = _("Catalog"), const CPLString &soPath = "");
+    virtual ~wxRxCatalog(void);
+    virtual wxString GetClassName(void) const {return wxString(wxT("wxRxCatalog"));};
+    //INetEventProcessor
+    virtual void ProcessNetEvent(wxGISNetEvent& event);
+    //wxRxObjectContainer
+    virtual void OnNetEvent(wxGISNetEvent& event);    
+protected:
+	virtual wxString GetConfigName(void) const {return wxString(wxT("wxServerCatalog"));};
+};
+
+/*
 #include "wxgissrv/srv_framework/framework.h"
 #include "wxgis/catalog/catalog.h"
 
 /** \class wxRxObjectContainer rxobjectserver.h
     \brief The basic class for remote containers.
-*/
+*//*
 class WXDLLIMPEXP_GIS_FRW wxRxObjectContainer :
 	public IGxObjectContainer,
 	public IRxObjectServer,
@@ -58,7 +108,7 @@ protected:
 
 /** \class wxRxObjectContainer rxobjectserver.h
     \brief The basic class for remote containers.
-*/
+*//*
 class WXDLLIMPEXP_GIS_FRW wxRxObject :
 	public IGxObject,
 	public IRxObjectServer,
@@ -81,3 +131,4 @@ public:
 protected:
     IServerApplication* m_pApp;
 };
+*/

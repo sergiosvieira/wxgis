@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISRasterDatasetCmd main header.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-
+/*
 #include "wxgis/cartoui/cartoui.h"
 
 #include <wx/intl.h>
@@ -39,7 +39,7 @@
 
 /** \class wxGISSQLQueryDialog sqlquerydialog.h
     \brief The SQL Query construct dialog.
-*/
+*//*
 class WXDLLIMPEXP_GIS_CTU wxGISSQLQueryDialog : public wxDialog 
 {
 private:
@@ -114,4 +114,4 @@ public:
 	~wxGISSQLQueryDialog();
 	
 };
-
+*/

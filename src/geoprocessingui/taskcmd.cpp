@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  Task Commands class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,8 +20,9 @@
  ****************************************************************************/
 
 #include "wxgis/geoprocessingui/taskcmd.h"
-#include "wxgis/geoprocessingui/gptaskexecdlg.h"
-#include "wxgis/catalogui/gxcatalogui.h"
+#include "wxgis/geoprocessing/geoprocessing.h"
+//#include "wxgis/geoprocessingui/gptaskexecdlg.h"
+//#include "wxgis/catalogui/gxcatalogui.h"
 
 #include "../../art/state.xpm"
 
@@ -32,12 +33,14 @@
 //  4   Show exec process
 //  5   ?
 
-IMPLEMENT_DYNAMIC_CLASS(wxGISTaskCmd, wxObject)
+//----------------------------------------------------------------------------
+// wxGISTaskCmd
+//----------------------------------------------------------------------------
 
-wxGISTaskCmd::wxGISTaskCmd(void)
+IMPLEMENT_DYNAMIC_CLASS(wxGISTaskCmd, wxGISCommand)
+
+wxGISTaskCmd::wxGISTaskCmd(void) : wxGISCommand()
 {
-    m_ImageList.Create(16, 16);
-	m_ImageList.Add(wxBitmap(state_xpm));
 }
 
 wxGISTaskCmd::~wxGISTaskCmd(void)
@@ -49,11 +52,29 @@ wxIcon wxGISTaskCmd::GetBitmap(void)
 	switch(m_subtype)
 	{
 		case 2:
-            return m_ImageList.GetIcon(4);
+            if(!m_IconStart.IsOk())
+            {
+                wxImageList ImageList(16, 16, true, 10);
+                ImageList.Add(wxBitmap(state_xpm));
+                m_IconStart = ImageList.GetIcon(4);
+            }
+            return m_IconStart;
 		case 3:
-            return m_ImageList.GetIcon(7);
+            if(!m_IconStop.IsOk())
+            {
+                wxImageList ImageList(16, 16, true, 10);
+                ImageList.Add(wxBitmap(state_xpm));
+                m_IconStop = ImageList.GetIcon(7);
+            }
+            return m_IconStop;
 		case 1:
-            return m_ImageList.GetIcon(0);
+            if(!m_IconInfo.IsOk())
+            {
+                wxImageList ImageList(16, 16, true, 10);
+                ImageList.Add(wxBitmap(state_xpm));
+                m_IconInfo = ImageList.GetIcon(0);
+            }
+            return m_IconInfo;
 		case 0:
 		default:
 			return wxNullIcon;
@@ -107,76 +128,69 @@ bool wxGISTaskCmd::GetChecked(void)
 
 bool wxGISTaskCmd::GetEnabled(void)
 {
+    wxGxSelection* pSel = m_pApp->GetGxSelection();
+    wxGxCatalogBase* pCat = GetGxCatalog();
+
     switch(m_subtype)
 	{
 		case 0: //Show task config dialog
-		{
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				IGxSelection* pSel = pCatalog->GetSelection();
+            if(pCat && pSel)
+            {
                 for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
-                    IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
-                    IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject.get());
-                    if(pGxTask && pGxTask->GetState() != enumGISTaskWork)
+                    wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
+                    IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject);
+                    if(!pGxTask)
+                        return false;
+                    if(pGxTask->GetState() != enumGISTaskWork)
                         return true;
                 }
-			}
-			return false;
-        }
+            }
+            return false;
 		case 1: //Show task execution dialog
-		{
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				IGxSelection* pSel = pCatalog->GetSelection();
+            if(pCat && pSel)
+            {
                 for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
-                    IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
-                    IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject.get());
-                    if(pGxTask && (pGxTask->GetState() == enumGISTaskWork || pGxTask->GetState() == enumGISTaskDone || pGxTask->GetState() == enumGISTaskError))
+                    wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
+                    IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject);
+                    if(!pGxTask)
+                        return false;
+                    if(pGxTask->GetState() == enumGISTaskWork || pGxTask->GetState() == enumGISTaskDone || pGxTask->GetState() == enumGISTaskError)
                         return true;
                 }
-			}
-			return false;
-        }
+            }
+            return false;
 		case 2: //Start task
-		{
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				IGxSelection* pSel = pCatalog->GetSelection();
-                for(size_t i = 0; i < pSel->GetCount(); ++i)
-                {                                        
-                    IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
-                    IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject.get());
-                    if(pGxTask && (pGxTask->GetState() == enumGISTaskPaused))
-                        return true;
-                }
-			}
-			return false;
-        }
-		case 3: //Stop task
-		{
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-				IGxSelection* pSel = pCatalog->GetSelection();
+            if(pCat && pSel)
+            {
                 for(size_t i = 0; i < pSel->GetCount(); ++i)
                 {
-                    IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
-                    IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject.get());
-                    if(pGxTask && (pGxTask->GetState() == enumGISTaskWork))
-                        return true;
+                    wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
+                    IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject);
+                    if(!pGxTask)
+                        return false;
+                    return !(pGxTask->GetState() == enumGISTaskQuered || pGxTask->GetState() == enumGISTaskWork);
+                    //if(pGxTask->GetState() != enumGISTaskQuered && pGxTask->GetState() != enumGISTaskWork)
+                    //    return true;
                 }
-			}
-			return false;
-        }
+            }
+            return false;
+		case 3: //Stop task
+            if(pCat && pSel)
+            {
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
+                {
+                    wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
+                    IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject);
+                    if(!pGxTask)
+                        return false;
+                    return !(pGxTask->GetState() == enumGISTaskPaused || pGxTask->GetState() == enumGISTaskError || pGxTask->GetState() == enumGISTaskDone);
+                    //if(pGxTask->GetState() != enumGISTaskPaused)
+                    //    return true;
+                }
+            }
+            return false;
 		default:
 			return false;
 	}
@@ -214,84 +228,67 @@ wxString wxGISTaskCmd::GetMessage(void)
 
 void wxGISTaskCmd::OnClick(void)
 {
+    wxGxSelection* pSel = m_pApp->GetGxSelection();
+    wxGxCatalogBase* pCat = GetGxCatalog();
+
 	switch(m_subtype)
 	{
 		case 0:
-			{
-				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-				if(pGxApp)
-				{
-					wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-					IGxSelection* pSel = pCatalog->GetSelection();
-					for(size_t i = 0; i < pSel->GetCount(); ++i)
-					{
-                        IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
-						wxGxTaskObject* pGxTask = dynamic_cast<wxGxTaskObject*>(pGxObject.get());
-						if(pGxTask)
-							pGxTask->ShowToolConfig(dynamic_cast<wxWindow*>(m_pApp));
-					}
-				}
-			}
+            if(pCat && pSel)
+            {
+                //for(size_t i = 0; i < pSel->GetCount(); ++i)
+                //{
+                //    wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
+                //    IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject);
+                //    if(pGxTask)
+                //        pGxTask->ShowToolConfig(dynamic_cast<wxWindow*>(m_pApp));
+                //}
+            }
 			break;
 		case 1:
-			{
-				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-				if(pGxApp)
-				{
-					wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-					IGxSelection* pSel = pCatalog->GetSelection();
-					for(size_t i = 0; i < pSel->GetCount(); ++i)
-					{
-                        IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
-						wxGxTaskObject* pGxTask = dynamic_cast<wxGxTaskObject*>(pGxObject.get());
-						if(pGxTask)
-							pGxTask->ShowProcess(dynamic_cast<wxWindow*>(m_pApp));
-					}
-				}
-			}
+            if(pCat && pSel)
+            {
+                //for(size_t i = 0; i < pSel->GetCount(); ++i)
+                //{
+                //    wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
+                //    IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject);
+                //    if(pGxTask)
+                //        pGxTask->ShowProcess(dynamic_cast<wxWindow*>(m_pApp));
+                //}
+            }
 			break;
 		case 2:
-			{
-				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-				if(pGxApp)
-				{
-					wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-					IGxSelection* pSel = pCatalog->GetSelection();
-					for(size_t i = 0; i < pSel->GetCount(); ++i)
-					{
-                        IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
-						wxGxTaskObject* pGxTask = dynamic_cast<wxGxTaskObject*>(pGxObject.get());
-						if(pGxTask)
-							pGxTask->StartTask();
-					}
-				}
-			}
+            if(pCat && pSel)
+            {
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
+                {
+                    wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
+                    IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject);
+                    if(pGxTask)
+                        pGxTask->StartTask();
+                }
+            }
 			break;
 		case 3:
-			{
-				IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-				if(pGxApp)
-				{
-					wxGxCatalogUI* pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApp->GetCatalog());
-					IGxSelection* pSel = pCatalog->GetSelection();
-					for(size_t i = 0; i < pSel->GetCount(); ++i)
-					{
-                        IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(i));
-						wxGxTaskObject* pGxTask = dynamic_cast<wxGxTaskObject*>(pGxObject.get());
-						if(pGxTask)
-							pGxTask->StopTask();
-					}
-				}
-			}
+            if(pCat && pSel)
+            {
+                for(size_t i = 0; i < pSel->GetCount(); ++i)
+                {
+                    wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetSelectedObjectId(i));
+                    IGxTask* pGxTask = dynamic_cast<IGxTask*>(pGxObject);
+                    if(pGxTask)
+                        pGxTask->StopTask();
+                }
+            }
 			break;
 		default:
 			return;
 	}
 }
 
-bool wxGISTaskCmd::OnCreate(IFrameApplication* pApp)
+bool wxGISTaskCmd::OnCreate(wxGISApplicationBase* pApp)
 {
-	m_pApp = pApp;
+	m_pApp = dynamic_cast<wxGxApplication*>(pApp);
 	return true;
 }
 

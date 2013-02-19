@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
  * Purpose:  wxGxRemoteServer class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,210 +18,124 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+
 #include "wxgis/remoteserver/gxremoteserver.h"
-#include "wxgis/networking/message.h"
+#include "wxgis/catalog/gxcatalog.h"
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
 // wxGxRemoteServer
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
+IMPLEMENT_CLASS(wxGxRemoteServer, wxRxCatalog)
 
-wxGxRemoteServer::wxGxRemoteServer(INetClientConnection* pNetConn) : m_bIsChildrenLoaded(false), m_bAuth(false)
+BEGIN_EVENT_TABLE(wxGxRemoteServer, wxRxCatalog)
+  EVT_GISNET_MSG(wxGxRemoteServer::OnGisNetEvent)
+END_EVENT_TABLE()
+
+wxGxRemoteServer::wxGxRemoteServer(void) : wxRxCatalog()
 {
-	m_pNetConn = pNetConn;
-	m_nChildCount = 0;
+    m_bAuth = false;
+    m_nRemoteId = 0;
+}
+
+wxGxRemoteServer::wxGxRemoteServer(wxGISNetClientConnection* const pNetConn, wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxRxCatalog(oParent, soName, soPath)
+{    
+    m_bAuth = false;
+    m_nRemoteId = 0;
+    m_pNetConn = pNetConn;
+    if(pNetConn)
+        m_ConnectionPointNetCookie = m_pNetConn->Advise(this);
 }
 
 wxGxRemoteServer::~wxGxRemoteServer(void)
 {
+    m_pNetConn->Unadvise(m_ConnectionPointNetCookie);
     wxDELETE(m_pNetConn);
-}
-
-bool wxGxRemoteServer::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
-{
-	if(!IGxObject::Attach(pParent, pCatalog))
-		return false;
-
-	return true;
-}
-
-
-void wxGxRemoteServer::Detach(void)
-{
-	if(IsConnected())
-		Disconnect();
-	IGxObject::Detach();
-}
-
-void wxGxRemoteServer::Refresh(void)
-{
-	EmptyChildren();
-	LoadChildren();
-}
- 
-bool wxGxRemoteServer::DeleteChild(IGxObject* pChild)
-{
-	bool bHasChildren = m_Children.size() > 0 ? true : false;
-    long nChildID = pChild->GetID();
-	if(!IGxObjectContainer::DeleteChild(pChild))
-		return false;
-    m_pCatalog->ObjectDeleted(nChildID);
-	if(bHasChildren != m_Children.size() > 0 ? true : false)
-		m_pCatalog->ObjectChanged(GetID());
-	return true;
-}
-
-wxXmlNode* wxGxRemoteServer::GetAttributes(void)
-{
-	if(m_pNetConn)
-		return m_pNetConn->GetAttributes();
-    return NULL;
 }
 
 bool wxGxRemoteServer::Connect(void)
 {
- 	if(m_pNetConn && !m_pNetConn->IsConnected())
-		return m_pNetConn->Connect();
+    wxCHECK_MSG(m_pNetConn, false, wxT("connection pointer is null"));
+ 	if(!m_pNetConn->IsConnected())
+		return m_pNetConn->Connect(); //start connection - notifications by events
     return false;
 }
 
 bool wxGxRemoteServer::Disconnect(void)
 {
- 	if(m_pNetConn && m_pNetConn->IsConnected())
-		return m_pNetConn->Disconnect();
+    wxCHECK_MSG(m_pNetConn, false, wxT("connection pointer is null"));    
+ 	if(m_pNetConn->IsConnected())
+    {
+        bool bRes = m_pNetConn->Disconnect();
+        bool bRes2 = DestroyChildren();
+        wxGIS_GXCATALOG_EVENT(ObjectChanged);
+		return bRes & bRes2;
+    }
     return false;
 }
 
 bool wxGxRemoteServer::IsConnected(void)
 {
- 	if(m_pNetConn)
-		return m_pNetConn->IsConnected();
-	return false;
+    wxCHECK_MSG(m_pNetConn, false, wxT("connection pointer is null"));
+    return m_pNetConn->IsConnected();
 }
 
-wxString wxGxRemoteServer::GetName(void)
+void wxGxRemoteServer::OnGisNetEvent(wxGISNetEvent& event)
 {
- 	if(m_pNetConn)
-		return m_pNetConn->GetName();
-	return NONAME;
-}
-
-
-void wxGxRemoteServer::OnConnect(void)
-{
-	AddMessageReceiver(wxT("auth"), static_cast<INetMessageReceiver*>(this));
-	AddMessageReceiver(wxT("info"), static_cast<INetMessageReceiver*>(this));
-	AddMessageReceiver(wxT("bye"), static_cast<INetMessageReceiver*>(this));
-
-	OnStartMessageThread();
-	m_pCatalog->ObjectChanged(GetID());
-}
-
-void wxGxRemoteServer::OnDisconnect(void)
-{
-	OnStopMessageThread();
-	EmptyChildren();
-	m_bAuth = false;
-	m_nChildCount = 0;
-	m_bIsChildrenLoaded = false;
-}
-
-void wxGxRemoteServer::ProcessMessage(WXGISMSG msg, wxXmlNode* pChildNode)
-{
-	if(msg.pMsg->GetState() == enumGISMsgStAlive)
-	{
-        wxNetMessage* pMsg = new wxNetMessage(wxString::Format(WXNETMESSAGE2, WXNETVER, enumGISMsgStAlive, enumGISPriorityHighest, wxT("bye")));
-        if(pMsg->IsOk())
-        {
-	        WXGISMSG msg = {INetMessageSPtr(static_cast<INetMessage*>(pMsg)), wxNOT_FOUND};
-	        m_pNetConn->PutOutMessage(msg);
-        }
-        else
-            wxDELETE(pMsg);
-	}
-
-    wxString sName = msg.pMsg->GetDestination();
-    if(sName.CmpNoCase(wxT("auth")) == 0)
+    wxNetMessage msg = event.GetNetMessage();
+    long nlId = msg.GetId();
+    if(nlId == wxNOT_FOUND || nlId == GetRemoteId())
     {
-		if(msg.pMsg->GetState() == enumGISMsgStOk)
-		{
-			m_bAuth = true;
-			m_pCatalog->ObjectChanged(GetID());
-
-			LoadChildren();
-		}
-		return;
-    }
-
-	if(sName.CmpNoCase(wxT("info")) == 0)
-	{
-        if(msg.pMsg->GetState() == enumGISMsgStOk)
+        switch(msg.GetCommand())
         {
-            //log text
-			if(pChildNode)
-			{
-				wxString sServer = pChildNode->GetAttribute(wxT("name"), wxT(""));
-				wxString sBanner = pChildNode->GetAttribute(wxT("banner"), wxT(""));
-				wxLogMessage(wxT("wxGxRemoteServer: Connected to server - %s; %s"), sServer.c_str(), sBanner.c_str());
-			}
-
-            if(m_pNetConn)
+        case enumGISNetCmdBye: //server disconnected
+            DestroyChildren();
+            wxGIS_GXCATALOG_EVENT(ObjectChanged);
+            break;
+        case enumGISNetCmdHello: 
+            wxGIS_GXCATALOG_EVENT(ObjectChanged); 
+            if(msg.GetState() == enumGISNetCmdStAccept)//connection accepted
             {
-                wxString sUserName = m_pNetConn->GetUser();
-                wxString sCryptPass = m_pNetConn->GetCryptPasswd();
-		        wxString sAuth = wxString::Format(wxT("<auth user=\"%s\" pass=\"%s\" />"), wxNetMessage::FormatXmlString(sUserName).c_str(), sCryptPass.c_str());
-		        wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStHello, enumGISPriorityHigh, wxT("auth"), sAuth.c_str());
-		        wxNetMessage* pMsg = new wxNetMessage(sMsg);
-		        if(pMsg->IsOk())
-		        {
-			        WXGISMSG msg = {INetMessageSPtr(static_cast<INetMessage*>(pMsg)), wxNOT_FOUND};
-			        m_pNetConn->PutOutMessage(msg);
-		        }
-                else
-                    wxDELETE(pMsg);
+                GetRemoteChildren();
             }
-		    return;
+            else //connection refused
+            {      
+                wxLogMessage(_("Connection refused with message: %s"), msg.GetMessage().c_str());
+            }
+            break;
+        case enumGISNetCmdNote:
+            switch(msg.GetState())
+            {
+            case enumGISNetCmdStOk:
+                wxLogMessage(msg.GetMessage());
+                break;
+            case enumGISNetCmdStErr:
+                wxLogError(msg.GetMessage());
+                break;
+            default:
+                wxLogVerbose(msg.GetMessage());
+                break;
+            }
+            break;
+        case enumGISNetCmdCmd: //do something usefull
+            if(msg.GetState() == enumGISCmdGetChildren && msg.GetXMLRoot())
+            {
+                LoadRemoteChildren(msg.GetXMLRoot()->GetChildren());
+            }
+            break;
+        default:
+            break;
         }
-	}
-}
-
-void wxGxRemoteServer::PutInMessage(WXGISMSG msg)
-{
-	//proceed message in separate thread
-	wxCriticalSectionLocker locker(m_CriticalSection);
-    m_MsgQueue.push(msg);
-}
-
-void wxGxRemoteServer::PutOutMessage(WXGISMSG msg)
-{
-	if(m_pNetConn)
-		m_pNetConn->PutOutMessage(msg);
-}
-
-void wxGxRemoteServer::EmptyChildren(void)
-{
-	for(size_t i = 0; i < m_Children.size(); ++i)
-	{
-		m_Children[i]->Detach();
-		delete m_Children[i];
-	}
-	m_Children.clear();
-	m_bIsChildrenLoaded = false;
-	m_pCatalog->ObjectChanged(GetID());
-}
-
-void wxGxRemoteServer::LoadChildren()
-{
-	if(m_bIsChildrenLoaded)
-		return;
-    Connect();
-    //request children
-    wxString sMsg = wxString::Format(WXNETMESSAGE1, WXNETVER, enumGISMsgStGet, enumGISPriorityNormal, wxT("root"), wxT("<children/>"));
-    wxNetMessage* pMsg = new wxNetMessage(sMsg);
-    if(pMsg->IsOk())
-    {
-        WXGISMSG msg = {INetMessageSPtr(static_cast<INetMessage*>(pMsg)), wxNOT_FOUND};
-        m_pNetConn->PutOutMessage(msg);
     }
     else
-        wxDELETE(pMsg);
+    {
+        wxRxObject* pObj = GetRegisterRemoteObject(nlId);
+        if(pObj)
+            pObj->OnNetEvent(event);
+    }
+}
+
+bool wxGxRemoteServer::Destroy(void)
+{
+    wxGIS_GXCATALOG_EVENT(ObjectDeleted);
+    return wxRxCatalog::Destroy();
 }

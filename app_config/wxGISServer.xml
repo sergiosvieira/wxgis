@@ -8,7 +8,7 @@
     <lib path="D:\work\Projects\wxGISRemoteDB\build\debug\wxGISRemoteDBServerd.dll" name="wxGISRemoteDBServer"/>
   </libs>
   <network max_conn="5" server_name="bishop_server">
-    <plugin name="wxServerTCPNetworkPlugin" addr="" port="1976" adv_port="1977"/>
+    <plugin name="wxServerTCPNetworkPlugin" port="9976" adv_port="9977"/>
   </network>
   <auth>
     <plugin name="wxGISXmlAuthPlugin">

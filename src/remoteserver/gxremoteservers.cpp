@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
  * Purpose:  wxGxRemoteServers class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,211 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/remoteserver/gxremoteservers.h"
+#include "wxgis/remoteserver/gxremoteserver.h"
+#include "wxgis/catalog/gxcatalog.h"
+#include "wxgis/core/config.h"
+
+//#include "wx/socket.h"
+
+IMPLEMENT_DYNAMIC_CLASS(wxGxRemoteServers, wxGxXMLConnectionStorage)
+
+BEGIN_EVENT_TABLE(wxGxRemoteServers, wxGxXMLConnectionStorage)
+    EVT_FSWATCHER(wxID_ANY, wxGxXMLConnectionStorage::OnFileSystemEvent)
+END_EVENT_TABLE()
+
+wxGxRemoteServers::wxGxRemoteServers(void) : wxGxXMLConnectionStorage(), m_bIsChildrenLoaded(false)
+{
+}
+
+bool wxGxRemoteServers::Create(wxGxObject *oParent, const wxString &soName, const CPLString &soPath)
+{
+    if( !wxGxObjectContainer::Create(oParent, wxString(_("Remote Servers")), soPath) )
+    {
+        wxLogError(_("wxGxDiscConnections::Create failed. GxObject %s"), wxString(_("Remote Servers")).c_str());
+        return false;
+    }
+
+    m_bEnabled = true;
+    m_sXmlStorageName = wxString(RCONNCONF);
+    //get config path
+	wxGISAppConfig oConfig = GetConfig();
+	if(oConfig.IsOk())
+	{
+		m_sUserConfigDir = oConfig.GetLocalConfigDirNonPortable() + wxFileName::GetPathSeparator() + wxString(CONNDIR);
+		m_sXmlStoragePath = m_sUserConfigDir + wxFileName::GetPathSeparator() + m_sXmlStorageName;
+	}
+    m_pWatcher = new wxFileSystemWatcher();
+    m_pWatcher->SetOwner(this);
+
+    if(!wxDirExists(m_sUserConfigDir))
+        wxFileName::Mkdir(m_sUserConfigDir, 0755, wxPATH_MKDIR_FULL);
+ 
+    wxFileName oFileName = wxFileName::DirName(m_sUserConfigDir);
+    if(!m_pWatcher->AddTree(oFileName, wxFSW_EVENT_MODIFY))//bool bAdd = |wxFSW_EVENT_CREATE
+    {
+        wxLogError(_("Add File system watcher failed"));
+        return false;
+    }
+
+    return true;
+}
+
+wxGxRemoteServers::~wxGxRemoteServers(void)
+{
+}
+
+bool wxGxRemoteServers::Destroy(void)
+{
+    wxGIS_GXCATALOG_EVENT(ObjectDeleted);
+    wxDELETE(m_pWatcher);
+    return wxGxXMLConnectionStorage::Destroy();
+}
+
+void wxGxRemoteServers::Refresh(void)
+{
+    if(DestroyChildren())
+        LoadConnectionsStorage();
+
+    wxGIS_GXCATALOG_EVENT(ObjectRefreshed);
+}
+
+void wxGxRemoteServers::Init(wxXmlNode* const pConfigNode)
+{    
+    LoadFactories(pConfigNode);
+    LoadConnectionsStorage();
+}
+
+void wxGxRemoteServers::Serialize(wxXmlNode* const pConfigNode)
+{
+    wxXmlNode* pFactoriesNode = new wxXmlNode(pConfigNode, wxXML_ELEMENT_NODE, wxT("factories"));
+    for(size_t i = 0; i < m_apNetConnFact.GetCount(); ++i)
+	{
+		wxClassInfo *pInfo = m_apNetConnFact[i].GetClassInfo();
+		if(!pInfo)
+			continue;
+
+		wxXmlNode* pNode = new wxXmlNode(pFactoriesNode, wxXML_ELEMENT_NODE, wxT("factory"));
+		pNode->AddAttribute(wxT("name"), pInfo->GetClassName());
+
+		m_apNetConnFact[i].Serialize(pNode);
+	}
+        
+    //StoreConnections();
+}
+
+
+bool wxGxRemoteServers::IsObjectExist(wxGxObject* pObj, const wxXmlNode* pNode)
+{
+    //compare each gxobject name with name from storage
+    wxString sName = pNode->GetAttribute(wxT("name"), NONAME);
+	wxString sPrevName = pNode->GetAttribute(wxT("pervname"), NONAME);
+
+    if(pObj->GetName().IsSameAs( sName, false))
+    {
+        return true;
+    }
+
+    if(pObj->GetName().IsSameAs( sPrevName, false))
+    {
+        pObj->SetName(sName);
+        //ObjectChanged event
+        wxGIS_GXCATALOG_EVENT_ID(ObjectChanged, pObj->GetId());
+        return true;
+
+    }
+    return false;
+}
+
+void wxGxRemoteServers::CreateConnectionsStorage(void)
+{
+    wxLogMessage(_("wxGxRemoteServers: Create remote servers connection storage"));
+    //create
+    wxXmlDocument doc;
+    wxXmlNode* pRootNode = new wxXmlNode(wxXML_ELEMENT_NODE, wxT("RemoteConnections"));
+    doc.SetRoot(pRootNode);
+    doc.Save(m_sXmlStoragePath);
+}
+
+wxGxObject* wxGxRemoteServers::CreateChildGxObject(const wxXmlNode* pNode)
+{
+    wxString soName = pNode->GetAttribute(wxT("name"), NONAME);
+    wxString soClass = pNode->GetAttribute(wxT("class"), NONAME);
+    for(size_t i = 0; i < m_apNetConnFact.GetCount(); ++i)
+    {
+        if(soClass.IsSameAs(m_apNetConnFact[i].GetClassInfo()->GetClassName()))
+        {
+            wxGISNetClientConnection* pConn = m_apNetConnFact[i].GetConnection(pNode);
+            if(pConn)
+                return new wxGxRemoteServer(pConn, this, soName);
+        }
+    }
+    return NULL;
+}
+
+void wxGxRemoteServers::LoadFactories(wxXmlNode* pConf)
+{
+    wxCHECK_RET(pConf, wxT("config xml node is null"));
+	wxXmlNode* pChild = pConf->GetChildren();
+	while(pChild)
+	{
+        wxString sName = pChild->GetAttribute(wxT("name"), NONAME);
+        if(sName.IsEmpty() || sName.CmpNoCase(NONAME) == 0)
+        {
+            pChild = pChild->GetNext();
+            continue;
+        }
+
+		wxObject *pObj = wxCreateDynamicObject(sName);
+		INetConnFactory *pNetConnFactory = wxDynamicCast(pObj, INetConnFactory);//dynamic_cast<INetConnFactory*>(pObj);
+	    if(pNetConnFactory)
+	    {
+			pNetConnFactory->Serialize(pChild, false);
+            m_apNetConnFact.Add(pNetConnFactory);
+			wxLogMessage(_("wxGxRemoteServers: Network connection factory %s loaded"), pNetConnFactory->GetName().c_str());
+        }
+		else
+		{
+			wxLogError(_("wxGxRemoteServers: Network connection factory %s load failed!"), sName.c_str());
+		}
+		pChild = pChild->GetNext();
+	}
+}
+
+bool wxGxRemoteServers::IsUniqName(const wxString & sName)
+{
+    wxGxObjectList::iterator iter;
+    for(iter = GetChildren().begin(); iter != GetChildren().end(); ++iter)
+    {
+        wxGxObject *current = *iter;
+        if(current->GetName().CmpNoCase( sName ) == 0)
+            return false;
+    }
+    return true;
+}
+
+bool wxGxRemoteServers::StoreConnectionProperties(const wxXmlNode* pConnProp)
+{
+    wxCHECK_MSG(pConnProp, false, wxT("The wxXmlNode pointer is null"));
+
+    wxXmlDocument doc;
+    //try to load connections xml file
+    if(doc.Load(m_sXmlStoragePath))
+    {
+        wxXmlNode* pConnectionsNode = doc.GetRoot();
+        pConnectionsNode->AddChild(new wxXmlNode(*pConnProp));
+        return doc.Save(m_sXmlStoragePath);
+    }
+    return false;
+}
+
+
+/*
+void wxGxRemoteServers::UnLoadFactories()
+{
+	for(size_t i = 0; i < m_apNetConnFact.size(); ++i)
+		wxDELETE(m_apNetConnFact[i]);
+}
+
 #include "wxgis/core/config.h"
 #include "wxgis/remoteserver/gxremoteserver.h"
 
@@ -70,27 +275,6 @@ void wxGxRemoteServers::Init(wxXmlNode* pConfigNode)
 	}
     LoadFactories(pFactories);
 	LoadChildren();
-}
-
-void wxGxRemoteServers::Serialize(wxXmlNode* pConfigNode)
-{
-    wxXmlNode* pFactoriesNode = new wxXmlNode(pConfigNode, wxXML_ELEMENT_NODE, wxT("factories"));
-	for(size_t i = 0; i < m_apNetConnFact.size(); ++i)
-	{
-		wxObject* pObj = dynamic_cast<wxObject*>(m_apNetConnFact[i]);
-		if(!pObj)
-			continue;
-		wxClassInfo *pInfo = pObj->GetClassInfo();
-		if(!pInfo)
-			continue;
-
-		wxXmlNode* pNode = new wxXmlNode(pFactoriesNode, wxXML_ELEMENT_NODE, wxT("factory"));
-		pNode->AddAttribute(wxT("name"), pInfo->GetClassName());
-
-		m_apNetConnFact[i]->Serialize(pNode);
-	}
-        
-    StoreConnections();
 }
 
 void wxGxRemoteServers::EmptyChildren(void)
@@ -154,42 +338,6 @@ void wxGxRemoteServers::LoadChildren()
 	m_bIsChildrenLoaded = true;
 }
 
-void wxGxRemoteServers::LoadFactories(wxXmlNode* pConf)
-{
-    if(!pConf)
-        return;
-	wxXmlNode* pChild = pConf->GetChildren();
-	while(pChild)
-	{
-        wxString sName = pChild->GetAttribute(wxT("name"), NONAME);
-        if(sName.IsEmpty() || sName.CmpNoCase(NONAME) == 0)
-        {
-            pChild = pChild->GetNext();
-            continue;
-        }
-
-		wxObject *pObj = wxCreateDynamicObject(sName);
-		INetConnFactory *pNetConnFactory = dynamic_cast<INetConnFactory*>(pObj);
-	    if(pNetConnFactory)
-	    {
-			pNetConnFactory->Serialize(pChild, false);
-			m_apNetConnFact.push_back(pNetConnFactory);
-			wxLogMessage(_("wxGxRemoteServers: Network connection factory %s loaded"), pNetConnFactory->GetName().c_str());
-        }
-		else
-		{
-			wxLogError(_("wxGxRemoteServers: Network connection factory %s load failed!"), sName.c_str());
-		}
-		pChild = pChild->GetNext();
-	}
-}
-
-void wxGxRemoteServers::UnLoadFactories()
-{
-	for(size_t i = 0; i < m_apNetConnFact.size(); ++i)
-		wxDELETE(m_apNetConnFact[i]);
-}
-
 void wxGxRemoteServers::StoreConnections(void)
 {
     if(!wxDirExists(m_sUserConfigDir))
@@ -215,4 +363,4 @@ void wxGxRemoteServers::StoreConnections(void)
     }
     doc.Save(m_sUserConfig);
 }
-
+*/

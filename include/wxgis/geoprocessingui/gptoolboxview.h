@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  wxAxToolboxView class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-
+/*
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/catalogui/gxview.h"
 #include "wxgis/catalogui/gxtreeview.h"
@@ -30,7 +30,7 @@
 
 /** \class wxGxToolboxTreeView gptoolboxview.h
     \brief The wxGxToolboxTreeView include tools hierarchy.
-*/
+*//*
 class WXDLLIMPEXP_GIS_GPU wxGxToolboxTreeView : 
     public wxGxTreeView
 {
@@ -47,7 +47,7 @@ public:
 
 /** \class wxAxToolboxView gptoolboxview.h
     \brief The class wxAxToolboxView show tool window with tabs(tools tree, tool exec view & etc.).
-*/
+*//*
 class WXDLLIMPEXP_GIS_GPU wxAxToolboxView :
 	public wxAuiNotebook,
 	public wxGxView
@@ -67,3 +67,4 @@ protected:
     wxGxToolboxTreeView* m_pGxToolboxView;
     wxGxToolExecuteView *m_pGxToolExecuteView;
 };
+*/

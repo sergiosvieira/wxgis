@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxArchive classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009,2011  Bishop
 *
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxarchfolder.h"
+/*
 #include "wxgis/datasource/sysop.h"
 
 #include "cpl_vsi_virtual.h"
@@ -135,7 +136,7 @@ void wxGxArchiveFolder::LoadChildren(void)
     //remove unused items
     for(int i = CSLCount(papszItems) - 1; i >= 0; i-- )
     {
-        if( EQUAL(papszItems[i],".") || EQUAL(papszItems[i],"..") )
+        if( wxGISEQUAL(papszItems[i],".") || wxGISEQUAL(papszItems[i],"..") )
             continue;
         CPLString szFileName = m_sPath;
         szFileName += "/";
@@ -180,4 +181,4 @@ IGxObject* wxGxArchiveFolder::GetArchiveFolder(CPLString szPath, wxString soName
 	wxGxArchiveFolder* pFolder = new wxGxArchiveFolder(szPath, soName);
 	return static_cast<IGxObject*>(pFolder);
 }
-
+*/

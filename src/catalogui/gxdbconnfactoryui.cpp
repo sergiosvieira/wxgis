@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDBConnectionFactoryUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxdbconnfactoryui.h"
+/*
 #include "wxgis/catalogui/gxremoteconnui.h"
 
 #include "../../art/rdb_conn_16.xpm"
@@ -47,3 +48,4 @@ IGxObject* wxGxDBConnectionFactoryUI::GetGxDataset(CPLString path, wxString name
     //pDataset->SetEncoding(wxFONTENCODING_UTF8);
     return static_cast<IGxObject*>(pDataset);
 }
+*/

@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxShapeFactoryUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010  Bishop
+*   Copyright (C) 2010,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 /** \class wxGxShapeFactoryUI gxshapefactoryui.h
     \brief A shape file GxObject factory.
 */
+
 class wxGxShapeFactoryUI :
 	public wxGxShapeFactory
 {
@@ -34,8 +35,9 @@ public:
 	wxGxShapeFactoryUI(void);
 	virtual ~wxGxShapeFactoryUI(void);
     //wxGxShapeFactory
-    virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumDatasetType type);
+    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumDatasetType type);
 protected:
     wxIcon m_LargeSHPIcon, m_SmallSHPIcon;
-    wxIcon m_LargeDXFIcon, m_SmallDXFIcon;
+    wxIcon m_LargeDBFIcon, m_SmallDBFIcon;
 };
+

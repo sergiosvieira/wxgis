@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  geoprocessingui header.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2010  Bishop
 *
@@ -32,7 +32,7 @@
 /** \class IToolManagerUI
  *  \brief A base class (virtual) for config and run tool from UI.
  */
-
+/*
 class IToolManagerUI
 {
 public:
@@ -41,26 +41,26 @@ public:
      *  \brief Return tool by name.
      *  \param sToolName Tool name
      *  \return IGPTool pointer or NULL.
-     */		
+     */		/*
 	virtual IGPToolSPtr GetGPTool(wxString sToolName) = 0;
 /** \fn void ExecuteTool(wxWindow* pParentWnd, IGPTool* pTool, bool bSync)
      *  \brief Execute passed preconfig tool
      *  \param pParentWnd The Parent wxWindow created dialogs
      *  \param pTool The preconfigured tool to execute
      *  \param bSync If bSync parameter is true, shows Execution dialog, and interface blocked. If bSync parameter is false, created GxTask Object and inserted to wxGxToolExecuteView.
-     */		
+     */		/*
 	virtual void ExecuteTool(wxWindow* pParentWnd, IGPToolSPtr pTool, bool bSync) = 0;
 /** \fn bool PrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, bool bSync)
      *  \brief Show tool config dialog
      *  \param pParentWnd The Parent wxWindow created dialogs
      *  \param pTool The tool to configure
      *  \param bSync If bSync parameter is true, shows Execution dialog, and interface blocked. If bSync parameter is false, created GxTask Object and inserted to wxGxToolExecuteView.
-     */		
+     */		/*
 	virtual bool PrepareTool(wxWindow* pParentWnd, IGPToolSPtr pTool, bool bSync) = 0;
 	//TODO: brief advise or unadvise event receiver for process events -> to task_manager
 	virtual long Advise(wxEvtHandler* pEvtHandler) = 0;
 	virtual void Unadvise(long nCookie) = 0;
 };
-
+*/
 
 

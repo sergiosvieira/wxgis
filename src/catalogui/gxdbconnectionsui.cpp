@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxDBConnectionsUI class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxdbconnectionsui.h"
-
+/*
 #include "../../art/db_connections_16.xpm"
 #include "../../art/db_connections_48.xpm"
 
@@ -48,5 +48,5 @@ wxIcon wxGxDBConnectionsUI::GetSmallImage(void)
 {
 	return m_SmallIcon;
 }
-
+*/
 

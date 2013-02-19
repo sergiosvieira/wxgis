@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  vector operations.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "wxgis/datasource/vectorop.h"
 
+
 void IncreaseEnvelope(OGREnvelope &Env, double dSize)
 {
 	double dRatio = dSize / 2;
@@ -30,7 +31,6 @@ void IncreaseEnvelope(OGREnvelope &Env, double dSize)
 	Env.MaxX += dWidth;
 	Env.MaxY += dHeight;
 }
-
 
 void SetEnvelopeRatio(OGREnvelope &Env, double dRatio)
 {
@@ -66,10 +66,10 @@ void SetEnvelopeRatio(OGREnvelope &Env, double dRatio)
 	dEnvRatio = dWidth / dHeight;
 }
 
-OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSPtr pSpaRef)
+wxGISGeometry EnvelopeToGeometry(const OGREnvelope &Env, const wxGISSpatialReference &SpaRef)
 {
 	if(!Env.IsInit())
-		return OGRGeometrySPtr();
+		return wxGISGeometry();
 	OGRLinearRing ring;
 	ring.addPoint(Env.MinX, Env.MinY);
 	ring.addPoint(Env.MinX, Env.MaxY);
@@ -80,9 +80,9 @@ OGRGeometrySPtr EnvelopeToGeometry(const OGREnvelope &Env, OGRSpatialReferenceSP
     OGRPolygon* pRgn = new OGRPolygon();
     pRgn->addRing(&ring);
     pRgn->flattenTo2D();
-	if(pSpaRef)
-		pRgn->assignSpatialReference(pSpaRef->Clone());
-	return OGRGeometrySPtr(static_cast<OGRGeometry*>(pRgn));
+    if(SpaRef.IsOk())
+		pRgn->assignSpatialReference(SpaRef.Clone());
+	return wxGISGeometry(static_cast<OGRGeometry*>(pRgn));
 }
 
 void MoveEnvelope(OGREnvelope &MoveEnv, const OGREnvelope &Env)
@@ -100,3 +100,4 @@ void MoveEnvelope(OGREnvelope &MoveEnv, const OGREnvelope &Env)
 	MoveEnv.MinY = dCenterY - dMoveHeight;
 	MoveEnv.MaxY = dCenterY + dMoveHeight;
 }
+

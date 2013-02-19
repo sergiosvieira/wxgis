@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGISNewMenu class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,8 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/catalogui/gxcatalogui.h"
-#include "wxgis/framework/framework.h"
+#include "wxgis/catalogui/gxselection.h"
+#include "wxgis/framework/applicationbase.h"
 #include "wxgis/framework/commandbar.h"
 
 #define NEWMENUNAME wxT("Application.NewMenu")
@@ -28,20 +29,25 @@
 //----------------------------------------------------------------------
 // wxGISNewMenu
 //----------------------------------------------------------------------
+/** \class wxGISNewMenu newmenu.h
+    \brief The new menu class
+
+    Consist of create new objects items
+*/
 
 class WXDLLIMPEXP_GIS_CLU wxGISNewMenu :
 	public wxGISMenu,
-	public ICommand
+	public wxGISCommand
 {
 public:
 	wxGISNewMenu(const wxString& sName = NEWMENUNAME, const wxString& sCaption = _("New"), wxGISEnumCommandBars type = enumGISCBSubMenu, const wxString& title = wxEmptyString, long style = 0);
-	~wxGISNewMenu(void);
+	virtual ~wxGISNewMenu(void);
 	//wxGISMenu
-	virtual void AddCommand(ICommand* pCmd);
+	virtual void AddCommand(wxGISCommand* pCmd);
 	//virtual void RemoveCommand(size_t nIndex){};
 	virtual void MoveCommandLeft(size_t nIndex){};
 	virtual void MoveCommandRight(size_t nIndex){};
-	//ICommand
+	//wxGISCommand
 	virtual wxIcon GetBitmap(void);
 	virtual wxString GetCaption(void);
 	virtual wxString GetCategory(void);
@@ -50,13 +56,13 @@ public:
 	virtual wxString GetMessage(void);
 	virtual wxGISEnumCommandKind GetKind(void);
 	virtual void OnClick(void);
-	virtual bool OnCreate(IFrameApplication* pApp);
+	virtual bool OnCreate(wxGISApplicationBase* pApp);
 	virtual wxString GetTooltip(void);
 	virtual unsigned char GetCount(void);
     //wxGISMenu
-	virtual void Update(IGxSelection* Selection);
+	virtual void Update(wxGxSelection* Selection);
 protected:
-	IFrameApplication* m_pApp;
+	wxGISApplicationBase* m_pApp;
 	wxGxCatalogUI* m_pCatalog;
 	//wxGISConnectionPointContainer* m_pConnectionPointSelection;
 	//long m_ConnectionPointSelectionCookie;

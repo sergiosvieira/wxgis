@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS
  * Purpose:  format clases (for format coordinates etc.).
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011 Bishop
 *
@@ -22,6 +22,8 @@
 
 #include "wxgis/core/core.h"
 
+#include <wx/xml/xml.h>
+
 /** \fn wxString DoubleToString(double Val, bool IsLon) format.h
     \brief Format double value as string coordinate
 */
@@ -30,6 +32,23 @@ wxString WXDLLIMPEXP_GIS_CORE DoubleToString(double dVal, bool bIsLon);
     \brief Format string coordinate as double value 
 */
 double WXDLLIMPEXP_GIS_CORE StringToDouble(const wxString &sVal, const wxString &sAsterisk);
+
+void WXDLLIMPEXP_GIS_CORE SetFloatValue(wxXmlNode* pNode, const wxString &sAttrName, double dfVal);
+void WXDLLIMPEXP_GIS_CORE SetFloatValue(wxXmlNode* pNode, const wxString &sAttrName, float dfVal);
+double WXDLLIMPEXP_GIS_CORE GetFloatValue(const wxXmlNode* pNode, const wxString &sAttrName, double dfDefVal);
+float WXDLLIMPEXP_GIS_CORE GetFloatValue(const wxXmlNode* pNode, const wxString &sAttrName, float dfDefVal);
+void WXDLLIMPEXP_GIS_CORE SetDateValue(wxXmlNode* pNode, const wxString &sAttrName, const wxDateTime &dtVal);
+wxDateTime WXDLLIMPEXP_GIS_CORE GetDateValue(const wxXmlNode* pNode, const wxString &sAttrName, const wxDateTime &dtDefVal);
+void WXDLLIMPEXP_GIS_CORE SetBoolValue(wxXmlNode* pNode, const wxString &sAttrName, bool bVal);
+bool WXDLLIMPEXP_GIS_CORE GetBoolValue(const wxXmlNode* pNode, const wxString &sAttrName, bool bDefVal);
+void WXDLLIMPEXP_GIS_CORE SetDecimalValue(wxXmlNode* pNode, const wxString &sAttrName, long nVal);
+void WXDLLIMPEXP_GIS_CORE SetDecimalValue(wxXmlNode* pNode, const wxString &sAttrName, int nVal);
+long WXDLLIMPEXP_GIS_CORE GetDecimalValue(const wxXmlNode* pNode, const wxString &sAttrName, long nDefVal);
+int WXDLLIMPEXP_GIS_CORE GetDecimalValue(const wxXmlNode* pNode, const wxString &sAttrName, int nDefVal);
+
+void WXDLLIMPEXP_GIS_CORE FloatStringToCLoc(wxString & str);
+void WXDLLIMPEXP_GIS_CORE FloatStringFromCLoc(wxString & str);
+
 /** \fn static wxString NumberScale(double fScaleRatio) format.h
     \brief Format map scale text
 */
@@ -68,3 +87,4 @@ protected:
     COORD_FORMAT m_CoordFormatX, m_CoordFormatY;
     bool m_bSign;
 };
+

@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
  * Purpose:  wxGxSelection class. Selection of IGxObjects in tree or list views
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,48 +22,70 @@
 
 #include "wxgis/catalogui/catalogui.h"
 
-// ----------------------------------------------------------------------------
-// wxGxSelection
-// ----------------------------------------------------------------------------
+
+/** \class wxGxSelection gxselection.h
+ *  \brief The GxObject Selection class.
+ */
 
 class WXDLLIMPEXP_GIS_CLU wxGxSelection :
-	public wxGISConnectionPointContainer,
-	public IGxSelection
+	public wxGISConnectionPointContainer
 {
+public:
+	enum wxGISEnumInitiators
+	{
+		INIT_ALL = -2,
+		INIT_NONE = -1
+	} Initiator;
 public:
 	wxGxSelection(void);
 	virtual ~wxGxSelection(void);
 	//IGxSelection
-	virtual void Select( long nObjectID,  bool appendToExistingSelection, long nInitiator );
-    virtual void Select( long nObjectID );
-	virtual void Unselect( long nObjectID, long nInitiator );
+	virtual void Select( long nObjectId,  bool appendToExistingSelection, long nInitiator );
+    virtual void Select( long nObjectId );
+	virtual void Unselect( long nObjectId, long nInitiator );
 	virtual void Clear(long nInitiator);
     virtual size_t GetCount(void);
     virtual size_t GetCount(long nInitiator);
-	virtual long GetSelectedObjectID(size_t nIndex);
-	virtual long GetSelectedObjectID(long nInitiator, size_t nIndex);
-    virtual long GetLastSelectedObjectID(void);
+	virtual long GetSelectedObjectId(size_t nIndex);
+	virtual long GetSelectedObjectId(long nInitiator, size_t nIndex);
+    virtual long GetLastSelectedObjectId(void);
+    virtual long GetFirstSelectedObjectId(void);
 	virtual void SetInitiator(long nInitiator);
-    virtual void Do( long nObjectID );
+    virtual void Do( long nObjectId );
     virtual bool CanRedo();
 	virtual bool CanUndo();
     virtual long Redo(int nPos = wxNOT_FOUND);
     virtual long Undo(int nPos = wxNOT_FOUND);
-	virtual void RemoveDo(long nObjectID);
+	virtual void RemoveDo(long nObjectId);
     virtual void Reset();
     virtual size_t GetDoSize();
     virtual int GetDoPos(void){return m_nPos;};
-    virtual long GetDoID(size_t nIndex);
+    virtual long GetDoId(size_t nIndex);
     virtual wxArrayLong GetDoArray(void){return m_DoArray;};
 protected:
 	wxArrayLong m_DoArray;
 	int m_nPos;
     bool m_bDoOp;
 
-    long m_pPrevID;
+    long m_pPrevId;
     wxCriticalSection m_DoCritSect, m_CritSect;
-	//wxMutex m_Mutex;
 
 	std::map<long, wxArrayLong> m_SelectionMap;
 	long m_currentInitiator;
+};
+
+/** \class wxGxApplicationBase gxselection.h
+    \brief An Interface class for GxApplication.
+*/
+class WXDLLIMPEXP_GIS_CLU wxGxApplicationBase
+{
+public:
+    wxGxApplicationBase(void);
+	virtual ~wxGxApplicationBase(void);
+    wxGxSelection* const GetGxSelection(void);
+    virtual void SetLocation(const wxString &sPath);
+    virtual void Undo(int nPos);
+    virtual void Redo(int nPos);
+protected:
+    wxGxSelection* m_pSelection;
 };

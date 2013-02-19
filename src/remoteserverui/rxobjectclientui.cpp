@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Remote)
  * Purpose:  RxObjectUI classes.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2010 Bishop
 *
@@ -18,7 +18,7 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-
+/*
 #include "wxgis/remoteserverui/rxobjectclientui.h"
 
 //------------------------------------------------------------
@@ -106,4 +106,4 @@ bool wxRxObjectContainerUI::LoadChildren()
     }
 	return wxRxObjectContainer::LoadChildren();
 }
-
+*/

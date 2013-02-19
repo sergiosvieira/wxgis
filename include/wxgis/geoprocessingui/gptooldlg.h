@@ -1,7 +1,7 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Toolbox)
  * Purpose:  tool dialog class.
- * Author:   Bishop (aka Baryshnikov Dmitriy), polimax@mail.ru
+ * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2009-2011 Bishop
 *
@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-
+/*
 #include "wxgis/geoprocessing/geoprocessing.h"
 #include "wxgis/geoprocessingui/geoprocessingui.h"
 #include "wxgis/geoprocessingui/gpcontrols.h"
@@ -44,11 +44,11 @@
 
 /** \class wxGISGPToolDlg gptooldlg.h
  *  \brief The tool configuration dialog
- */
+ *//*
 class WXDLLIMPEXP_GIS_GPU wxGISGPToolDlg : public wxFrame
 {
 public:
-    wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pTool, bool bSync = false, wxWindow* parent = NULL, wxWindowID id = wxID_ANY, const wxString& title = _("Tool name"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX|wxRESIZE_BORDER|wxSYSTEM_MENU|wxFRAME_FLOAT_ON_PARENT /*wxSTAY_ON_TOP|wxDIALOG_NO_PARENT|wxCLIP_CHILDREN*/ );
+    wxGISGPToolDlg(wxGxRootToolbox* pGxRootToolbox, IGPToolSPtr pTool, bool bSync = false, wxWindow* parent = NULL, wxWindowID id = wxID_ANY, const wxString& title = _("Tool name"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX|wxRESIZE_BORDER|wxSYSTEM_MENU|wxFRAME_FLOAT_ON_PARENT );//wxSTAY_ON_TOP|wxDIALOG_NO_PARENT|wxCLIP_CHILDREN
     ~wxGISGPToolDlg();
     void m_splitterOnIdle( wxIdleEvent& )
     {
@@ -87,4 +87,4 @@ protected:
 
     DECLARE_EVENT_TABLE()
 };
-
+*/
