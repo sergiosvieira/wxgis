@@ -3,7 +3,7 @@
  * Purpose:  event UI classes special for MapView events.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -23,3 +23,5 @@
 IMPLEMENT_DYNAMIC_CLASS(wxMxMapViewEvent, wxEvent)
 
 wxDEFINE_EVENT( wxMXMAP_ROTATED, wxMxMapViewEvent );
+wxDEFINE_EVENT( wxMXMAP_DRAWING_START, wxMxMapViewEvent );
+wxDEFINE_EVENT( wxMXMAP_DRAWING_STOP, wxMxMapViewEvent );

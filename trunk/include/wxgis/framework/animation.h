@@ -50,7 +50,7 @@ public:
 	void OnEraseBackground(wxEraseEvent & event);
     void OnTimer( wxTimerEvent & event);
 	//IProgressor
-	virtual bool ShowProgressor(bool bShow);
+	virtual bool ShowProgress(bool bShow);
 	virtual void Play(void){ m_timer.Start(50); };
 	virtual void Stop(void){ m_timer.Stop(); };
     virtual void SetRange(int range){};

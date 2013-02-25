@@ -116,6 +116,7 @@ void wxGxMapView::Deactivate(void)
         m_pSelection->Unadvise(m_ConnectionPointSelectionCookie);
 
     //Serialize(m_pXmlConf, true);
+    DestroyDrawThread();
 	wxDELETE(m_pTrackCancel);
 	wxGxView::Deactivate();
 }

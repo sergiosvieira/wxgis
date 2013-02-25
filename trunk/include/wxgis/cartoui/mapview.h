@@ -23,39 +23,13 @@
 #include "wxgis/cartoui/cartoui.h"
 #include "wxgis/display/gisdisplay.h"
 #include "wxgis/carto/map.h"
-
-//WX_DEFINE_ARRAY(OGRGeometry *, GeometryArray);
-
-class WXDLLIMPEXP_GIS_CTU wxGISMapView;
-
-/** \class wxMapDrawingThread mapview.h
-    \brief A Map Drawing thread class.
-*/
-
-class wxMapDrawingThread : public wxThread
-{
-public:
-	wxMapDrawingThread(wxGISMapView* pView);
-    virtual void *Entry();
-    virtual void OnExit();
-private:
-//    ITrackCancel* m_pTrackCancel;
-	wxGISMapView* m_pView;
-};
-
-/** \class wxGISMapView mapview.h
-    \brief A Map View.
-
-    This is class for showing maps.
-*/
-
-wxDECLARE_EVENT(wxEVT_COMMAND_STARTDRAWING, wxCommandEvent);
-//wxDECLARE_EVENT(wxEVT_COMMAND_ZOOMING, wxCommandEvent);
+#include "wxgis/cartoui/mxeventui.h"
 
 class WXDLLIMPEXP_GIS_CTU wxGISMapView :
 	public wxWindow,
 	public wxGISExtentStack,
-	public wxGISConnectionPointContainer
+	public wxGISConnectionPointContainer,
+    public wxThreadHelper
 {
     DECLARE_CLASS(wxGISMapView)
 	enum
@@ -99,10 +73,11 @@ protected:
     virtual void OnCaptureLost(wxMouseCaptureLostEvent & event);
 	virtual void OnMouseWheel(wxMouseEvent& event);
 	//
-	virtual void OnDrawThreadStart(void);
-	virtual void OnDrawThreadStop(void);
-	virtual void CancelDrawThread(void);
+	//virtual void OnDrawThreadStart(void);
+	//virtual void OnDrawThreadStop(void);
+	//virtual void CancelDrawThread(void);
 	virtual void OnDraw(wxGISEnumDrawPhase nPhase);
+    virtual void OnMapDrawing(wxMxMapViewEvent& event);
 	//misc
 	virtual void DrawToolTip(wxClientDC& dc, const wxString& sText);
 	virtual OGREnvelope CreateEnvelopeFromZoomFactor(double dZoom);
@@ -110,12 +85,16 @@ protected:
 	//virtual void FillClipGeometry(wxRect rect, wxCoord x, wxCoord y);
 protected:
     void Refresh(void);
-    void OnStartDrawingThread( wxCommandEvent & event );
+    //void OnStartDrawingThread( wxCommandEvent & event );
     //void OnZooming( wxCommandEvent & event );
+protected:
+    virtual wxThread::ExitCode Entry();
+    bool CreateAndRunDrawThread(void);
+    void DestroyDrawThread(void);
 protected:
 	wxGISDisplay *m_pGISDisplay;
 	wxTimer m_timer;
-	wxMapDrawingThread *m_pMapDrawingThread;
+	//wxMapDrawingThread *m_pMapDrawingThread;
 	ITrackCancel *m_pTrackCancel;
 	IProgressor *m_pAni;
 	WXDWORD m_nDrawingState;

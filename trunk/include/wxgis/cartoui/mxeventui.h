@@ -3,7 +3,7 @@
  * Purpose:  event UI classes special for MapView events.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@
 class WXDLLIMPEXP_FWD_GIS_CTU wxMxMapViewEvent;
 
 wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_GIS_CTU, wxMXMAP_ROTATED, wxMxMapViewEvent);
+wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_GIS_CTU, wxMXMAP_DRAWING_START, wxMxMapViewEvent);
+wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_GIS_CTU, wxMXMAP_DRAWING_STOP, wxMxMapViewEvent);
 //wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_GIS_CTU, wxMXMAP_REFRESHED, wxGxMapViewEvent);
  //AfterDraw Fired after the specified phase is drawn. 
  //AfterItemDraw Fired after an individual view item is drawn. Example: view items include layers in a map or elements in a page layout. 
@@ -72,3 +74,5 @@ typedef void (wxEvtHandler::*wxMxMapViewEventFunction)(wxMxMapViewEvent&);
     wxEVENT_HANDLER_CAST(wxMxMapViewEventFunction, func)
 
 #define EVT_MXMAP_ROTATED(func)  wx__DECLARE_EVT0(wxMXMAP_ROTATED, wxMxMapViewEventHandler(func))
+#define EVT_MXMAP_DRAWING_START(func)  wx__DECLARE_EVT0(wxMXMAP_DRAWING_START, wxMxMapViewEventHandler(func))
+#define EVT_MXMAP_DRAWING_STOP(func)  wx__DECLARE_EVT0(wxMXMAP_DRAWING_STOP, wxMxMapViewEventHandler(func))

@@ -116,12 +116,12 @@ public:
      */
 	virtual ~IProgressor(void){};
 	//pure virtual
-    /** \fn bool ShowProgressor(bool bShow)
+    /** \fn bool ShowProgress(bool bShow)
      *  \brief Show/hide progressor.
      *  \param bShow The indicator to show (true) or hide (false) progressor
      *  \return The success of function execution
      */
-    virtual bool ShowProgressor(bool bShow) = 0;
+    virtual bool ShowProgress(bool bShow) = 0;
     //
     /** \fn virtual void SetRange(int range)
      *  \brief Set progressor range.
