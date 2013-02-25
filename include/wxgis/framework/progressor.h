@@ -34,7 +34,7 @@ public:
 	wxGISProgressor(wxWindow * parent, wxWindowID id = wxID_ANY, int range = 100, const wxPoint & pos = wxDefaultPosition, const wxSize & size = wxDefaultSize, long style = wxGA_HORIZONTAL | wxGA_SMOOTH, const wxString name = wxT("GISProgressor"));
 	virtual ~wxGISProgressor(void);
 	//IProgressor
-	virtual bool ShowProgressor(bool bShow);
+	virtual bool ShowProgress(bool bShow);
     virtual void SetRange(int range);
     virtual int GetRange() const;
     virtual void SetValue(int value);

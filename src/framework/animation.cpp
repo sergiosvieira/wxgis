@@ -76,9 +76,7 @@ void wxGISAnimation::SetYield(bool bYield)
     m_bYield = bYield;
 }
 
-bool wxGISAnimation::ShowProgressor(bool bShow)
+bool wxGISAnimation::ShowProgress(bool bShow)
 {
-    if(!bShow)
-        return false;
     return Show(bShow);
 }

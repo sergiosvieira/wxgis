@@ -32,7 +32,7 @@ wxGISProgressor::~wxGISProgressor()
 {
 }
 
-bool wxGISProgressor::ShowProgressor(bool bShow)
+bool wxGISProgressor::ShowProgress(bool bShow)
 {
 	return Show(bShow);
 }

@@ -355,7 +355,7 @@ bool wxGISGDALConfPropertyPage::Create(wxGISApplicationBase* application, wxWind
     AppendProperty(prop, new wxIntProperty(wxString(wxT("GDAL_MAX_BAND_COUNT")), wxPG_LABEL, atoi(CPLGetConfigOption( "GDAL_MAX_BAND_COUNT", "-1" ))));
     AppendProperty(prop, new wxBoolProperty(wxString(wxT("GDAL_USE_SSE")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GDAL_USE_SSE", "YES" ) )));
     AppendProperty(prop, new wxBoolProperty(wxString(wxT("USE_RRD")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "USE_RRD", "NO" ) )));        
-    AppendProperty(prop, new wxIntProperty(wxString(wxT("GDAL_NUM_THREADS")), wxPG_LABEL, atoi(CPLGetConfigOption( "GDAL_NUM_THREADS", wxString::Format(wxT("%d"), CPLGetNumCPUs()).c_str() ))));
+    AppendProperty(prop, new wxIntProperty(wxString(wxT("GDAL_NUM_THREADS")), wxPG_LABEL, atoi(CPLGetConfigOption( "GDAL_NUM_THREADS", wxString::Format(wxT("%d"), wxThread::GetCPUCount()).c_str() ))));
     AppendProperty(prop, new wxDirProperty(wxString(wxT("TMPDIR")), wxPG_LABEL, wxString(CPLGetConfigOption( "TMPDIR", "" ), wxConvUTF8)));
     AppendProperty(prop, new wxDirProperty(wxString(wxT("TEMP")), wxPG_LABEL, wxString(CPLGetConfigOption( "TEMP", "" ), wxConvUTF8)));
     AppendProperty(prop, new wxIntProperty(wxString(wxT("VSI_CACHE_SIZE")), wxPG_LABEL, atoi(CPLGetConfigOption( "VSI_CACHE_SIZE", "25000000" ))));
