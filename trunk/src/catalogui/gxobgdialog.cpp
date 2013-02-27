@@ -1006,8 +1006,11 @@ wxString wxGxObjectDialog::GetName(void) const
 	{
         if(GetChildren().GetCount() > 0)
 		{
-            wxGxObject *current = GetChildren().GetFirst().GetData();
-            return current->GetName();
+            wxGxObjectList::compatibility_iterator node = GetChildren().GetFirst();
+            if(!node)
+                return wxEmptyString; 
+            wxGxObject *current = node->GetData();
+            return current->GetName();            
 		}
 	}
 	return wxEmptyString;
