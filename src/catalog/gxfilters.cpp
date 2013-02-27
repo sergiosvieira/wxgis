@@ -28,7 +28,7 @@
 */
 
 //#include <wx/arrimpl.cpp> // This is a magic incantation which must be done!
-//WX_DEFINE_USER_EXPORTED_OBJARRAY(wxGxObjectFiltersArray);
+//WX_DEFINE_USER_EXPORTED_ARRAY(wxGxObjectFiltersArray);
 
 //------------------------------------------------------------
 // wxGxObjectFilter

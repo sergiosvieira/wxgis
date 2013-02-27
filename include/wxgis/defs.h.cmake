@@ -29,8 +29,6 @@
 
 #cmakedefine wxGIS_HAVE_DESKTOP
 
-#cmakedefine wxGIS_HAVE_GEOPROCESSING
-
 #cmakedefine wxGIS_HAVE_REMOTE
 
 #cmakedefine wxGIS_HAVE_SERVER

@@ -57,9 +57,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(WXGIS_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(WXGIS_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
-#configure_file(${WXGIS_CURRENT_SOURCE_DIR}/include/wxgis/defs.h.cmake ${WXGIS_CURRENT_BINARY_DIR}/wxgisdefs.h @ONLY)
-configure_file(${WXGIS_CURRENT_SOURCE_DIR}/include/wxgis/defs.h.cmake ${WXGIS_CURRENT_SOURCE_DIR}/include/wxgis/defs.h @ONLY)
-
 # set path to additional CMake modules
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
@@ -71,25 +68,7 @@ endif(WIN32)
 add_definitions(-DSTRICT)
 
 #find needed packages
-#wxgisgdal deprecated
-option(wxGIS_USE_WXGISGDAL "Set OFF to build using classical GDAL, else - adapted version wxGISGDAL" ON)
-if(wxGIS_USE_WXGISGDAL)
-    find_package(WXGISGDAL REQUIRED)
-else(wxGIS_USE_WXGISGDAL)
-    find_package(GDAL REQUIRED)
-endif(wxGIS_USE_WXGISGDAL)
-
-if(WXGISGDAL_FOUND)
-    include_directories(${WXGISGDAL_INCLUDE_DIR})
-    include_directories(${WXGISGDAL_INCLUDE_DIR}/ogr)
-    include_directories(${WXGISGDAL_INCLUDE_DIR}/ogr/ogrsf_frmts)
-    include_directories(${WXGISGDAL_INCLUDE_DIR}/port)
-    include_directories(${WXGISGDAL_INCLUDE_DIR}/gcore)
-    include_directories(${WXGISGDAL_INCLUDE_DIR}/alg)
-    include_directories(${WXGISGDAL_INCLUDE_DIR}/frmts/vrt)
-    include_directories(${WXGISGDAL_INCLUDE_DIR}/build/port) #assume that out of source build was in build dir
-endif(WXGISGDAL_FOUND) 
-
+find_package(GDAL REQUIRED)
 if(GDAL_FOUND)
     include_directories(${GDAL_INCLUDE_DIR})
     include_directories(${GDAL_INCLUDE_DIR}/ogr)
@@ -135,86 +114,109 @@ endif()
 
 #core
 set(WXGISCORE_LIB_NAME "")
+mark_as_advanced(WXGISCORE_LIB_NAME)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/core/)
 #networking
 set(WXGISNET_LIB_NAME "")
+mark_as_advanced(WXGISNET_LIB_NAME)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/net/)
 #task manager 
-option(wxGIS_HAVE_TASKMANAGER "Set ON to build gis task manager" ON)
-if(wxGIS_HAVE_TASKMANAGER)
+option(wxGIS_BUILD_TASKMANAGER "Set ON to build gis task manager" ON)
+if(wxGIS_BUILD_TASKMANAGER)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/tskmngr_app/)
-endif(wxGIS_HAVE_TASKMANAGER)
+    set(wxGIS_HAVE_TASKMANAGER ON)
+    mark_as_advanced(wxGIS_HAVE_TASKMANAGER)
+endif(wxGIS_BUILD_TASKMANAGER)
 
-option(wxGIS_HAVE_CATALOG "Set ON to build catalog and datasource" ON)
-if(wxGIS_HAVE_CATALOG)
+option(wxGIS_BUILD_CATALOG "Set ON to build catalog and datasource" ON)
+if(wxGIS_BUILD_CATALOG)
     #datasource
     set(WXGISDATASOURCE_LIB_NAME "")
+    mark_as_advanced(WXGISDATASOURCE_LIB_NAME)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/datasource/)
     #catalog
     set(WXGISCATALOG_LIB_NAME "")
+    mark_as_advanced(WXGISCATALOG_LIB_NAME)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/catalog/)
     
-    option(wxGIS_HAVE_GEOPROCESSING "Set ON to build geoprocessing" ON)
-    if(wxGIS_HAVE_GEOPROCESSING)
-        #geoprocessing
-        set(WXGISGEOPROCESSING_LIB_NAME "")
-        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/geoprocessing/)
-    endif(wxGIS_HAVE_GEOPROCESSING)
-endif(wxGIS_HAVE_CATALOG)
+    set(wxGIS_HAVE_CATALOG ON)
+    mark_as_advanced(wxGIS_HAVE_CATALOG)
+    set(wxGIS_HAVE_DATASOURCE ON)
+    mark_as_advanced(wxGIS_HAVE_DATASOURCE)
+   
+endif(wxGIS_BUILD_CATALOG)
 
-option(wxGIS_HAVE_DESKTOP "Set ON to build desktop version" ON)
-if(wxGIS_HAVE_DESKTOP)
-#display
-set(WXGISDISPLAY_LIB_NAME "")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/display/)
-#framework
-set(WXGISFRAMEWORK_LIB_NAME "")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/framework/)
-#carto
-set(WXGISCARTO_LIB_NAME "")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/carto/)
-#cartoui
-set(WXGISCARTOUI_LIB_NAME "")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/cartoui/)
+option(wxGIS_BUILD_DESKTOP "Set ON to build desktop version" ON)
+if(wxGIS_BUILD_DESKTOP)
+    #display
+    set(WXGISDISPLAY_LIB_NAME "")
+    mark_as_advanced(WXGISDISPLAY_LIB_NAME)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/display/)
+    #framework
+    set(WXGISFRAMEWORK_LIB_NAME "")
+    mark_as_advanced(WXGISFRAMEWORK_LIB_NAME)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/framework/)
+    #carto
+    set(WXGISCARTO_LIB_NAME "")
+    mark_as_advanced(WXGISCARTO_LIB_NAME)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/carto/)
+    #cartoui
+    set(WXGISCARTOUI_LIB_NAME "")
+    mark_as_advanced(WXGISCARTOUI_LIB_NAME)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/cartoui/)
 
-#catalogui
-set(WXGISCATALOGUI_LIB_NAME "")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/catalogui/)
+    #catalogui
+    set(WXGISCATALOGUI_LIB_NAME "")
+    mark_as_advanced(WXGISCATALOGUI_LIB_NAME)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/catalogui/)
+ 
+    #cat_app
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/cat_app/)
+    #geoprocess
+    #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/geoprocess/)
+    # === new ads ===
 
-if(wxGIS_HAVE_GEOPROCESSING)
-    #geoprocessingui
-    set(WXGISGEOPROCESSINGUI_LIB_NAME "")
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/geoprocessingui/)
-endif(wxGIS_HAVE_GEOPROCESSING)    
+    #option(wxGIS_HAVE_REMOTE "Set ON to build remote server support" OFF)
+    #if(wxGIS_HAVE_REMOTE)
+    #remoteserver
+    #set(WXGISRS_LIB_NAME "")
+    #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/remoteserver/)
+    #remoteserverui
+    #set(WXGISRSU_LIB_NAME "")
+    #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/remoteserverui/)
+    #endif(wxGIS_HAVE_REMOTE)
 
-#cat_app
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/cat_app/)
-#geoprocess
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/geoprocess/)
-# === new ads ===
+    set(wxGIS_HAVE_DESKTOP ON)
+    mark_as_advanced(wxGIS_HAVE_DESKTOP)
+    
+endif(wxGIS_BUILD_DESKTOP)
 
-option(wxGIS_HAVE_REMOTE "Set ON to build remote server support" OFF)
-if(wxGIS_HAVE_REMOTE)
-#remoteserver
-set(WXGISRS_LIB_NAME "")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/remoteserver/)
-#remoteserverui
-set(WXGISRSU_LIB_NAME "")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/remoteserverui/)
-endif(wxGIS_HAVE_REMOTE)
-endif(wxGIS_HAVE_DESKTOP)
+INCLUDE(CMakeDependentOption)
 
-option(wxGIS_HAVE_SERVER "Set ON to build server version" ON)
-if(wxGIS_CATALOG AND wxGIS_HAVE_SERVER)
+CMAKE_DEPENDENT_OPTION(wxGIS_BUILD_GEOPROCESSING "Set ON to build geoprocessing" ON "wxGIS_BUILD_DESKTOP OR wxGIS_BUILD_CATALOG" ON)
+if(wxGIS_BUILD_GEOPROCESSING)
+    #geoprocessing
+    set(WXGISGEOPROCESSING_LIB_NAME "")
+    mark_as_advanced(WXGISGEOPROCESSING_LIB_NAME)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/geoprocessing/)
+    
+    set(wxGIS_HAVE_GEOPROCESSING ON)
+    mark_as_advanced(wxGIS_HAVE_GEOPROCESSING)
+endif(wxGIS_BUILD_GEOPROCESSING)
+    
+#option(wxGIS_HAVE_SERVER "Set ON to build server version" ON)
+#if(wxGIS_CATALOG AND wxGIS_HAVE_SERVER)
 #srv_framework
-set(WXGISSRVFRW_LIB_NAME "")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/srv_framework/)
+#set(WXGISSRVFRW_LIB_NAME "")
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/srv_framework/)
 #srv_networking deprecated
 #set(WXGISSRVNET_LIB_NAME "")
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/srv_net/)
 #srv_app
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/srv_app/)
-endif(wxGIS_CATALOG AND wxGIS_HAVE_SERVER)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/srv_app/)
+#endif(wxGIS_CATALOG AND wxGIS_HAVE_SERVER)
+
+configure_file(${WXGIS_CURRENT_SOURCE_DIR}/include/wxgis/defs.h.cmake ${WXGIS_CURRENT_SOURCE_DIR}/include/wxgis/defs.h @ONLY)
 
 if(WIN32)
     install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/app_loc/ DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Debug/locale CONFIGURATIONS Debug FILES_MATCHING PATTERN "*.mo" PATTERN "*.txt")

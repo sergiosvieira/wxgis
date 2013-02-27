@@ -147,7 +147,8 @@ protected:
 /** \typedef GPParameters
  *  \brief The parameters array.
  */
-WX_DECLARE_USER_EXPORTED_BASEARRAY(wxGISGPParameter *, wxGISGPParamArray, WXDLLIMPEXP_GIS_GP);
+//WX_DECLARE_USER_EXPORTED_BASEARRAY(wxGISGPParameter *, wxGISGPParamArray, WXDLLIMPEXP_GIS_GP);
+WX_DEFINE_USER_EXPORTED_ARRAY(wxGISGPParameter*, wxGISGPParamArray, class WXDLLIMPEXP_GIS_GP);
 
 class WXDLLIMPEXP_GIS_GP wxGISGPParameterArray : public wxGISGPParamArray
 {

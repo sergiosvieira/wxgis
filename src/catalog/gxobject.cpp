@@ -243,7 +243,7 @@ WX_DEFINE_LIST(wxGxObjectList)
 
 void wxGxObjectListNode::DeleteData()
 {
-    delete (wxGxObjectBase *)GetData();
+    delete (wxGxObject *)GetData();
 }
 
 #endif // wxUSE_STD_CONTAINERS/!wxUSE_STD_CONTAINERS

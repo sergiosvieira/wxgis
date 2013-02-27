@@ -44,8 +44,8 @@ public:
 };
 
 //typedef wxVector<wxGxObjectFilter*> wxGxObjectFiltersArray;
-//WX_DECLARE_USER_EXPORTED_OBJARRAY(wxGxObjectFilter, wxGxObjectFiltersArray, WXDLLIMPEXP_GIS_CLT);
-WX_DECLARE_USER_EXPORTED_BASEARRAY(wxGxObjectFilter *, wxGxObjectFiltersArray, WXDLLIMPEXP_GIS_CLT);
+WX_DEFINE_USER_EXPORTED_ARRAY(wxGxObjectFilter*, wxGxObjectFiltersArray, class WXDLLIMPEXP_GIS_CLT);
+//WX_DECLARE_USER_EXPORTED_BASEARRAY(wxGxObjectFilter *, wxGxObjectFiltersArray, WXDLLIMPEXP_GIS_CLT);
 
 /** \class wxGxPrjFileFilter gxfilters.h
  *  \brief The Spatial reference GxObject Filters.
