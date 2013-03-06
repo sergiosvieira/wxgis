@@ -69,6 +69,18 @@ public:
 	virtual void Serialize(wxXmlNode* const pConfigNode) = 0;
 };
 
+/** \class IGxRemoteConnection catalog.h
+    \brief A GxObject remote connection interface.
+*/
+
+class IGxRemoteConnection
+{
+public:
+	virtual ~IGxRemoteConnection(void){};
+	virtual bool Connect(void) = 0;
+	virtual bool Disconnect(void) = 0;
+};
+
 /*
 class IGxObject;
 

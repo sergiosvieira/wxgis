@@ -3,7 +3,7 @@
  * Purpose:  PosGISDataset class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2012 Bishop
+*   Copyright (C) 2010-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@
 #include "wxgis/datasource/featuredataset.h"
 #include "wxgis/core/config.h"
 #include "wxgis/defs.h"
+#include "wxgis/core/crypt.h"
+#include "wxgis/core/format.h"
 
 //------------------------------------------------------------------------------
 // wxGISPostgresDataSource
@@ -35,6 +37,7 @@ IMPLEMENT_CLASS(wxGISPostgresDataSource, wxGISDataset)
 
 wxGISPostgresDataSource::wxGISPostgresDataSource(const wxString &sName, const wxString &sPass, const wxString &sPort, const wxString &sAddres, const wxString &sDBName, bool bIsBinaryCursor) : wxGISDataset(""), m_poDS(NULL)
 {
+    m_bPathPresent = false;
 	m_bIsOpened = false;
 	m_nType = enumGISContainer;
 	m_nSubType = enumContRemoteConnection;
@@ -45,6 +48,30 @@ wxGISPostgresDataSource::wxGISPostgresDataSource(const wxString &sName, const wx
     m_sDBName = sDBName;
 	m_bIsBinaryCursor = bIsBinaryCursor;
 
+    m_Encoding = wxFONTENCODING_UTF8;
+}
+
+wxGISPostgresDataSource::wxGISPostgresDataSource(const CPLString &szPath) : wxGISDataset(szPath), m_poDS(NULL)
+{
+    m_bPathPresent = true;
+	m_bIsOpened = false;
+	m_nType = enumGISContainer;
+	m_nSubType = enumContRemoteConnection;
+
+	wxXmlDocument doc(wxString(szPath,  wxConvUTF8));
+	if(doc.IsOk())
+    {
+		wxXmlNode* pRootNode = doc.GetRoot();
+		if(pRootNode)
+		{
+			m_sAddres = pRootNode->GetAttribute(wxT("server"), wxEmptyString);
+			m_sPort = pRootNode->GetAttribute(wxT("port"), wxEmptyString);
+			m_sDBName = pRootNode->GetAttribute(wxT("db"), wxEmptyString);
+			m_sName = pRootNode->GetAttribute(wxT("user"), wxEmptyString);
+			Decrypt(pRootNode->GetAttribute(wxT("pass"), wxEmptyString), m_sPass);
+			m_bIsBinaryCursor = GetBoolValue(pRootNode, wxT("isbincursor"), false);
+        }
+    }
     m_Encoding = wxFONTENCODING_UTF8;
 }
 
@@ -280,22 +307,34 @@ PGresult *wxGISPostgresDataSource::OGRPG_PQexec(PGconn *conn, const char *query,
 
 bool wxGISPostgresDataSource::Delete(int iLayer, ITrackCancel* const pTrackCancel)
 {
-    return false;
+    if(m_bPathPresent)
+        wxGISDataset::Delete(iLayer, pTrackCancel);
+    else
+        return false;
 }
 
 bool wxGISPostgresDataSource::Rename(const wxString &sNewName)
 {
-    return false;
+    if(m_bPathPresent)
+        wxGISDataset::Rename(sNewName);
+    else
+        return false;
 }
 
 bool wxGISPostgresDataSource::Copy(const CPLString &szDestPath, ITrackCancel* const pTrackCancel)
 {
-    return false;
+    if(m_bPathPresent)
+        wxGISDataset::Copy(szDestPath, pTrackCancel);
+    else
+        return false;
 }
 
 bool wxGISPostgresDataSource::Move(const CPLString &szDestPath, ITrackCancel* const pTrackCancel)
 {
-    return false;
+    if(m_bPathPresent)
+        wxGISDataset::Move(szDestPath, pTrackCancel);
+    else
+        return false;
 }
     
 void wxGISPostgresDataSource::Cache(ITrackCancel* const pTrackCancel)

@@ -34,13 +34,27 @@ if(wxWidgets_FOUND)
     include(${wxWidgets_USE_FILE})
 endif(wxWidgets_FOUND)
 
-if(WXGISGDAL_FOUND)
-    include_directories(${WXGISGDAL_INCLUDE_DIR}/ogr/ogrsf_frmts)
-endif(WXGISGDAL_FOUND) 
-
 if(GDAL_FOUND)
     include_directories(${GDAL_INCLUDE_DIR}/ogr/ogrsf_frmts)
 endif(GDAL_FOUND)
+
+option(wxGIS_USE_POSTGRES "Set OFF to build without PostGIS support" OFF)
+if(wxGIS_USE_POSTGRES)
+    find_package(POSTGRES REQUIRED)
+    if(POSTGRES_FOUND)
+        include_directories(${POSTGRES_INCLUDE_DIR})
+        add_definitions(-DHAVE_PG)
+    endif(POSTGRES_FOUND)
+endif(wxGIS_USE_POSTGRES)
+
+option(wxGIS_USE_OPENSSL "Set OFF to build without OpenSSL support" OFF)
+if(wxGIS_USE_OPENSSL)
+    find_package( OpenSSL )
+    if(OPENSSL_FOUND)
+        include_directories(${OPENSSL_INCLUDE_DIR})
+        add_definitions(-DHAVE_OPENSSL)
+    endif(OPENSSL_FOUND) 
+endif(wxGIS_USE_OPENSSL)
 
 if(UNIX)
     find_package(GTK2 REQUIRED)
@@ -109,6 +123,8 @@ set(PROJECT_HHEADERS ${PROJECT_HHEADERS}
     ${LIB_HEADERS}/gxpostgisdatasetui.h
     ${LIB_HEADERS}/gxdbconnectionsui.h
     ${LIB_HEADERS}/gxdbconnfactoryui.h
+    ${LIB_HEADERS}/gxwebconnectionsui.h
+    ${LIB_HEADERS}/gxwebconnfactoryui.h
     ${LIB_HEADERS}/droptarget.h
 )
 
@@ -157,6 +173,8 @@ set(PROJECT_CSOURCES ${PROJECT_CSOURCES}
     ${LIB_SOURCES}/viewscmd.cpp    
     ${LIB_SOURCES}/gxdbconnectionsui.cpp
     ${LIB_SOURCES}/gxdbconnfactoryui.cpp
+    ${LIB_SOURCES}/gxwebconnectionsui.cpp
+    ${LIB_SOURCES}/gxwebconnfactoryui.cpp
     ${LIB_SOURCES}/remoteconndlg.cpp
     ${LIB_SOURCES}/gxremoteconnui.cpp
     ${LIB_SOURCES}/gxpostgisdatasetui.cpp
@@ -171,10 +189,6 @@ add_library(${LIB_NAME} SHARED ${PROJECT_HHEADERS} ${PROJECT_CSOURCES})
 if(wxWidgets_FOUND)
    target_link_libraries(${LIB_NAME} ${wxWidgets_LIBRARIES})
 endif(wxWidgets_FOUND)
-
-if(WXGISGDAL_FOUND)
-    target_link_libraries(${LIB_NAME} ${WXGISGDAL_LIBRARIES})
-endif(WXGISGDAL_FOUND) 
 
 if(GDAL_FOUND)
     target_link_libraries(${LIB_NAME} ${GDAL_LIBRARIES})

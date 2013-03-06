@@ -3,7 +3,7 @@
  * Purpose:  wxGxDBConnections class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011,2013 Bishop
+*   Copyright (C) 2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,26 +21,14 @@
 
 #include "wxgis/catalog/gxdbconnections.h"
 #include "wxgis/core/config.h"
-#include "wxgis/datasource/datasource.h"
-
-//---------------------------------------------------------------------------
+/*
+/////////////////////////////////////////////////////////////////////////
 // wxGxDBConnections
-//---------------------------------------------------------------------------
+/////////////////////////////////////////////////////////////////////////
+IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnections, wxObject)
 
-IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnections, wxGxFolder)
-
-wxGxDBConnections::wxGxDBConnections(void) : wxGxFolder()
+wxGxDBConnections::wxGxDBConnections(void) : wxGxFolder(CPLString(), GetName())
 {
-}
-
-bool wxGxDBConnections::Create(wxGxObject *oParent, const wxString &soName, const CPLString &soPath)
-{
-    if( !wxGxFolder::Create(oParent, _("DataBase connections"), soPath) )
-    {
-        wxLogError(_("wxGxDBConnections::Create failed. GxObject %s"), wxString(_("DataBase connections")).c_str());
-        return false;
-    }
-    return true;
 }
 
 wxGxDBConnections::~wxGxDBConnections(void)
@@ -80,6 +68,6 @@ bool wxGxDBConnections::CanCreate(long nDataType, long DataSubtype)
 		return false;
 	if(DataSubtype != enumContFolder && DataSubtype != enumContRemoteConnection)
 		return false;
-	return wxGxFolder::CanCreate(nDataType, DataSubtype);
+	return wxIsWritable(wxString(m_sPath, wxConvUTF8));
 }
-
+*/

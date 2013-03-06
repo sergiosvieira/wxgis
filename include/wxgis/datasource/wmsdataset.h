@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDBConnectionFactory class.
+ * Purpose:  WMS DataSource class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011,2013 Bishop
+*   Copyright (C) 2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,21 +20,28 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/catalog/gxobjectfactory.h"
+#include "wxgis/defs.h"
 
-/** \class wxGxDBConnectionFactory gxdbconnfactory.h
-    \brief A DataBase connection (*.xconn) GxObject factory.
+#ifdef wxGIS_USE_CURL
+
+#include "wxgis/datasource/rasterdataset.h"
+
+/** \class wxGISWMSDataSource wmsdataset.h
+    \brief The WMS DataSource class.
 */
-
-class WXDLLIMPEXP_GIS_CLT wxGxDBConnectionFactory :
-	public wxGxObjectFactory
+class WXDLLIMPEXP_GIS_DS wxGISWMSDataSource :
+	public wxGISRasterDataset
 {
-	DECLARE_DYNAMIC_CLASS(wxGxDBConnectionFactory)
+    DECLARE_CLASS(wxGISWMSDataSource)
 public:
-	wxGxDBConnectionFactory(void);
-	virtual ~wxGxDBConnectionFactory(void);
-	//IGxObjectFactory
-	virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
-    virtual wxString GetName(void) const {return wxString(_("DataBase connections"));};
-    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath);
+	wxGISWMSDataSource(const CPLString &sPath = "", wxGISEnumRasterDatasetType nType = enumRasterUnknown);
+    //TODO: read from descript file and control it delete/rename/move/etc.
+    //wxGISPostgresDataSource(const CPLString &szPath);
+	virtual ~wxGISWMSDataSource(void);
+
+	//wxGISRasterDataset
+
 };
+
+#endif //wxGIS_USE_CURL
+

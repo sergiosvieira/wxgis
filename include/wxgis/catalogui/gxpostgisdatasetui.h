@@ -42,7 +42,7 @@ public:
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxPostGISTableDatasetUI.ContextMenu"));};
+	virtual wxString ContextMenu(void){return wxString(wxT("wxGxPostGISTableDataset.ContextMenu"));};
 	virtual wxString NewMenu(void){return wxEmptyString;};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
@@ -65,7 +65,7 @@ public:
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxPostGISFeatureDatasetUI.ContextMenu"));};
+	virtual wxString ContextMenu(void){return wxString(wxT("wxGxPostGISFeatureDataset.ContextMenu"));};
 	virtual wxString NewMenu(void){return wxEmptyString;};
 	//virtual wxDataFormat GetDataFormat(void){return wxDataFormat(wxT("application/x-vnd.qgis.qgis.uri"));};
 	//IGxObjectEditUI

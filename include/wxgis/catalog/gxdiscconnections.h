@@ -48,7 +48,7 @@ public:
 	virtual void Refresh(void);
 	//wxGxObjectContainer
 	//virtual bool DeleteChild(IGxObject* pChild);
-	virtual bool AreChildrenViewable(void){return true;};
+	virtual bool AreChildrenViewable(void) const {return true;};
     //IGxRootObjectProperties
     virtual void Init(wxXmlNode* const pConfigNode);
     virtual void Serialize(wxXmlNode* const pConfigNode);

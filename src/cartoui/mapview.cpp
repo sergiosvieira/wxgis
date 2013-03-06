@@ -29,7 +29,7 @@
 //#include <wx/sysopt.h>
 //#include <wx/thread.h>
 
-#define TM_REFRESH 3700
+#define TM_REFRESH 1700//3700
 #define TM_ZOOMING 250
 #define TM_WHEELING 300
 #define UNITS_IN_INCH 2.54
@@ -269,8 +269,10 @@ void wxGISMapView::OnTimer( wxTimerEvent& event )
         m_pGISDisplay->SetDrawCache(m_pGISDisplay->GetLastCacheID(), true);
 		m_timer.Stop();
     break;
-    default:
+    case enumGISMapDrawing:
+        break;//not stop timer
     case enumGISMapNone:
+    default:
 		m_timer.Stop();
     break;
     };

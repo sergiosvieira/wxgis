@@ -3,7 +3,7 @@
  * Purpose:  wxGxDBConnectionFactory class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,11 +19,16 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxdbconnfactory.h"
-
-
-/*
 #include "wxgis/catalog/gxremoteconn.h"
-IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionFactory, wxObject)
+
+#include "wxgis/datasource/gdalinh.h"
+#include "wxgis/datasource/sysop.h"
+
+//------------------------------------------------------------------------------
+// wxGxDBConnectionFactory
+//------------------------------------------------------------------------------
+
+IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionFactory, wxGxObjectFactory)
 
 wxGxDBConnectionFactory::wxGxDBConnectionFactory(void)
 {
@@ -33,46 +38,26 @@ wxGxDBConnectionFactory::~wxGxDBConnectionFactory(void)
 {
 }
 
-bool wxGxDBConnectionFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray)
+bool wxGxDBConnectionFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds)
 {
-    for(int i = CSLCount(pFileNames) - 1; i >= 0; --i )
+    wxGxCatalogBase* pCatalog = GetGxCatalog();
+    for(int i = CSLCount(pFileNames) - 1; i >= 0; i-- )
     {
-        IGxObject* pGxObj = NULL;
         CPLString szExt = CPLGetExtension(pFileNames[i]);
-        if(wxGISEQUAL(szExt, "xconn"))
-        {
-			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]));
+		if(wxGISEQUAL(szExt, "xconn"))
+		{
+			wxGxObject* pObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i]); 
+            if(pObj)
+                pChildrenIds.Add(pObj->GetId());
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        }
-		if(pGxObj != NULL)
-			ObjArray.push_back(pGxObj);
+		}
     }
-
 	return true;
 }
 
- 
-void wxGxDBConnectionFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
+wxGxObject* wxGxDBConnectionFactory::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath)
 {
-    if(bStore)
-    {
-        if(pConfig->HasAttribute(wxT("factory_name")))
-            pConfig->DeleteAttribute(wxT("factory_name"));
-        pConfig->AddAttribute(wxT("factory_name"), GetClassName());  
-        if(pConfig->HasAttribute(wxT("is_enabled")))
-            pConfig->DeleteAttribute(wxT("is_enabled"));
-        pConfig->AddAttribute(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
-    }
-    else
-    {
-        m_bIsEnabled = wxAtoi(pConfig->GetAttribute(wxT("is_enabled"), wxT("1"))) != 0;
-    }
+	wxGxRemoteConnection* pDataset = new wxGxRemoteConnection(pParent, soName, szPath);
+	return static_cast<wxGxObject*>(pDataset);
 }
 
-IGxObject* wxGxDBConnectionFactory::GetGxDataset(CPLString path, wxString name)
-{
-    wxGxRemoteConnection* pDataset = new wxGxRemoteConnection(path, name);
-    //pDataset->SetEncoding(wxFONTENCODING_UTF8);
-    return static_cast<IGxObject*>(pDataset);
-}
-*/

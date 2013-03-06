@@ -3,7 +3,7 @@
  * Purpose:  wxGxRemoteConnection class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,85 +22,177 @@
 #include "wxgis/catalog/gxremoteconn.h"
 
 #ifdef wxGIS_USE_POSTGRES
-/*
-#include "wxgis/core/crypt.h"
+
 #include "wxgis/datasource/sysop.h"
 #include "wxgis/catalog/gxpostgisdataset.h"
-#include "wxgis/datasource/table.h"
+#include "wxgis/datasource/postgisdataset.h"
+#include "wxgis/catalog/gxcatalog.h"
 
 //--------------------------------------------------------------
 //class wxGxRemoteConnection
 //--------------------------------------------------------------
+IMPLEMENT_CLASS(wxGxRemoteConnection, wxGxObjectContainer)
 
-wxGxRemoteConnection::wxGxRemoteConnection(CPLString soPath, wxString Name)
+wxGxRemoteConnection::wxGxRemoteConnection(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxObjectContainer(oParent, soName, soPath)
 {
-	m_eType = enumContRemoteConnection;
 	m_bIsChildrenLoaded = false;
-	m_sName = Name;
-	m_sPath = soPath;
+    m_pwxGISDataset = NULL;
 }
 
 wxGxRemoteConnection::~wxGxRemoteConnection(void)
 {
+    wsDELETE(m_pwxGISDataset);
 }
 
-
-void wxGxRemoteConnection::Detach(void)
+bool wxGxRemoteConnection::HasChildren()
 {
-	EmptyChildren();
-    IGxObject::Detach();
+    if(!Connect())
+        return false;
+    else
+        return wxGxObjectContainer::HasChildren();
 }
 
-wxGISDatasetSPtr wxGxRemoteConnection::GetDataset(bool bCache, ITrackCancel* pTrackCancel)
+wxGISDataset* const wxGxRemoteConnection::GetDatasetFast(void)
 {
-	if(m_pwxGISDataset == NULL)
+ 	if(m_pwxGISDataset == NULL)
+    {
+        wxGISPostgresDataSource* pDSet = new wxGISPostgresDataSource(m_sPath);
+        m_pwxGISDataset = wxStaticCast(pDSet, wxGISDataset);
+        m_pwxGISDataset->Reference();
+    }
+    m_pwxGISDataset->Reference();
+    return m_pwxGISDataset;
+}
+
+bool wxGxRemoteConnection::Delete(void)
+{
+	wxGISDataset* pDSet = GetDatasetFast();
+    
+    if(!pDSet)
+        return false;
+
+    bool bRet = pDSet->Delete();
+    wsDELETE(pDSet);
+
+    if( !bRet )
+    {
+        const char* err = CPLGetLastErrorMsg();
+		wxLogError(_("Operation '%s' failed! GDAL error: %s, %s '%s'"), _("Delete"), wxString(err, wxConvUTF8).c_str(), GetCategory().c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		return false;	
+    }
+    return true;
+}
+
+bool wxGxRemoteConnection::Rename(const wxString &sNewName)
+{
+	wxGISDataset* pDSet = GetDatasetFast();
+    
+    if(!pDSet)
+        return false;
+
+	if(pDSet->IsOpened())
+		pDSet->Close();
+
+    bool bRet = pDSet->Rename(sNewName);
+    wsDELETE(pDSet);
+
+	if( !bRet )
 	{
-		CPLErrorReset();
-		wxXmlDocument doc(wxString(m_sPath,  wxConvUTF8));
-		if(!doc.IsOk())
-		{
-			wxString sErr(_("Connection file open failed!"));
-			CPLString sFullErr(sErr.mb_str());
-			CPLError( CE_Failure, CPLE_FileIO, sFullErr);
-			return wxGISDatasetSPtr();
-		}
-		wxXmlNode* pRootNode = doc.GetRoot();
-		if(pRootNode)
-		{
-			wxString sServer = pRootNode->GetAttribute(wxT("server"), wxEmptyString);
-			wxString sPort = pRootNode->GetAttribute(wxT("port"), wxEmptyString);
-			wxString sDatabase = pRootNode->GetAttribute(wxT("db"), wxEmptyString);
-			wxString sUser = pRootNode->GetAttribute(wxT("user"), wxEmptyString);
-			wxString sPass;
-			Decrypt(pRootNode->GetAttribute(wxT("pass"), wxEmptyString), sPass);
-			bool bIsBinaryCursor = wxString(pRootNode->GetAttribute(wxT("isbincursor"), wxT("no"))).CmpNoCase(wxString(wxT("yes"))) == 0;
-			m_pwxGISRemoteConn = boost::make_shared<wxGISPostgresDataSource>(sUser, sPass, sPort, sServer, sDatabase, bIsBinaryCursor);
-			if(!m_pwxGISRemoteConn->Open())
-			{
-				const char* err = CPLGetLastErrorMsg();
-				wxString sErr = wxString::Format(_("Operation '%s' failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
-				wxLogError(sErr);
-				if(pTrackCancel)
-					pTrackCancel->PutMessage(sErr, -1, enumGISMessageErr);
-				return wxGISDatasetSPtr();
-			}
-			m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(m_pwxGISRemoteConn);
-		}
-	}
-	return m_pwxGISDataset;
+		const char* err = CPLGetLastErrorMsg();
+		wxLogError(_("Operation '%s' failed! GDAL error: %s, %s '%s'"), _("Rename"), wxString(err, wxConvUTF8).c_str(), GetCategory().c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		return false;
+	}	
+    return true;
 }
 
-bool wxGxRemoteConnection::DeleteChild(IGxObject* pChild)
+
+bool wxGxRemoteConnection::Copy(const CPLString &szDestPath, ITrackCancel* const pTrackCancel)
 {
-	bool bHasChildren = m_Children.size() > 0 ? true : false;
-    long nChildID = pChild->GetID();
-	if(!IGxObjectContainer::DeleteChild(pChild))
-		return false;
-    m_pCatalog->ObjectDeleted(nChildID);
-	if(bHasChildren != m_Children.size() > 0 ? true : false)
-		m_pCatalog->ObjectChanged(GetID());
-	return true;
+    if(pTrackCancel)
+        pTrackCancel->PutMessage(wxString::Format(_("%s %s %s"), _("Copy"), GetCategory().c_str(), m_sName.c_str()), wxNOT_FOUND, enumGISMessageInfo);
+
+	wxGISDataset* pDSet = GetDatasetFast();
+    
+    if(!pDSet)
+    {
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wxString::Format(_("%s %s %s failed!"), _("Copy"), GetCategory().c_str(), m_sName.c_str()), wxNOT_FOUND, enumGISMessageErr);
+        return false;
+    }
+
+    bool bRet = pDSet->Copy(szDestPath, pTrackCancel);
+    wsDELETE(pDSet);
+
+    if(!bRet)
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxString sErr = wxString::Format(_("Operation '%s' failed! GDAL error: %s, %s '%s'"), _("Copy"), wxString(err, wxConvUTF8).c_str(), GetCategory().c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(sErr);
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageErr);
+		return false;	
+    }
+	
+    return true;
 }
+
+bool wxGxRemoteConnection::Move(const CPLString &szDestPath, ITrackCancel* const pTrackCancel)
+{
+    if(pTrackCancel)
+		pTrackCancel->PutMessage(wxString::Format(_("%s %s %s"), _("Move"), GetCategory().c_str(), m_sName.c_str()), wxNOT_FOUND, enumGISMessageInfo);
+
+	wxGISDataset* pDSet = GetDatasetFast();
+    
+    if(!pDSet)
+    {
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(wxString::Format(_("%s %s %s failed!"), _("Move"), GetCategory().c_str(), m_sName.c_str()), wxNOT_FOUND, enumGISMessageErr);
+        return false;
+    }
+
+    bool bRet = pDSet->Move(szDestPath, pTrackCancel);
+    wsDELETE(pDSet);
+
+    if(!bRet)
+    {
+        const char* err = CPLGetLastErrorMsg();
+        wxString sErr = wxString::Format(_("Operation '%s' failed! GDAL error: %s, %s '%s'"), _("Move"), GetCategory().c_str(), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+		wxLogError(sErr);
+        if(pTrackCancel)
+            pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageErr);
+		return false;	
+    } 
+
+    return true;
+}
+
+bool wxGxRemoteConnection::Connect(void)
+{
+    bool bRes = true;
+    wxGISDataset* pDSet = GetDatasetFast();
+    if(pDSet && !pDSet->IsOpened())
+    {
+        //bRes = Open
+        wxGIS_GXCATALOG_EVENT(ObjectChanged);
+    }
+    wsDELETE(pDSet);
+    return bRes;
+}
+
+bool wxGxRemoteConnection::Disconnect(void)
+{
+    wxGISDataset* pDSet = GetDatasetFast();
+    if(pDSet && pDSet->IsOpened())
+    {
+        pDSet->Close();
+        wxGIS_GXCATALOG_EVENT(ObjectChanged);
+
+    }
+    wsDELETE(pDSet);
+    return true;
+}
+
+/*
 
 void wxGxRemoteConnection::EmptyChildren(void)
 {
@@ -231,92 +323,14 @@ wxGxRemoteDBSchema* wxGxRemoteConnection::GetNewRemoteDBSchema(const CPLString &
     return new wxGxRemoteDBSchema(wxString(szName, wxConvUTF8), pwxGISRemoteCon);
 }
 
-wxString wxGxRemoteConnection::GetBaseName(void)
-{
-    wxFileName FileName(m_sName);
-    FileName.SetEmptyExt();
-    return FileName.GetName();
-}
-
-bool wxGxRemoteConnection::Delete(void)
-{
-	wxCriticalSectionLocker locker(m_DestructCritSect);
-    if(DeleteFile(m_sPath))
-	{
-		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
-		if(pGxObjectContainer == NULL)
-			return false;
-		return pGxObjectContainer->DeleteChild(this);
-	}
-	else
-    {
-        const char* err = CPLGetLastErrorMsg();
-		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Delete"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
-		return false;
-    }
-}
-
-bool wxGxRemoteConnection::Rename(wxString NewName)
-{
-	wxFileName PathName(wxString(m_sPath, wxConvUTF8));
-	PathName.SetName(ClearExt(NewName));
-
-	wxString sNewPath = PathName.GetFullPath();
-    CPLString szNewPath(sNewPath.mb_str(wxConvUTF8));
-    if(RenameFile(m_sPath, szNewPath))
-	{
-        m_sPath = szNewPath;
-		m_sName = NewName;
-		m_pCatalog->ObjectChanged(GetID());
-		return true;
-	}
-	else
-    {
-        const char* err = CPLGetLastErrorMsg();
-		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Rename"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
-		return false;
-    }
-	return false;
-}
-
-bool wxGxRemoteConnection::Copy(CPLString szDestPath, ITrackCancel* pTrackCancel)
-{
-    if(pTrackCancel)
-        pTrackCancel->PutMessage(wxString(_("Copy file ")) + m_sName, -1, enumGISMessageInfo);
-
-	CPLString szFileName = CPLGetBasename(m_sPath);
-	CPLString szNewDestFileName = GetUniqPath(m_sPath, szDestPath, szFileName);
-    if(!CopyFile(szNewDestFileName, m_sPath, pTrackCancel))
-        return false;
-
-    m_sPath = szNewDestFileName;
-    m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
-
-    return true;
-}
-
-bool wxGxRemoteConnection::Move(CPLString szDestPath, ITrackCancel* pTrackCancel)
-{
-    if(pTrackCancel)
-        pTrackCancel->PutMessage(wxString(_("Move file ")) + m_sName, -1, enumGISMessageInfo);
-
-	CPLString szFileName = CPLGetBasename(m_sPath);
-	CPLString szNewDestFileName = GetUniqPath(m_sPath, szDestPath, szFileName);
-    if(!MoveFile(szNewDestFileName, m_sPath, pTrackCancel))
-        return false;
-
-    m_sPath = szNewDestFileName;
-    m_sName = wxString(CPLGetFilename(m_sPath), wxConvUTF8);
-
-    return true;
-}
-
+*/
 //--------------------------------------------------------------
 //class wxGxRemoteDBSchema
 //--------------------------------------------------------------
-
+/*
 wxGxRemoteDBSchema::wxGxRemoteDBSchema(const wxString &sName, wxGISPostgresDataSourceSPtr pwxGISRemoteConn)
 {
+	m_eType = enumContRemoteConnection;
     m_sName = sName;
     m_pwxGISRemoteConn = pwxGISRemoteConn;
 }

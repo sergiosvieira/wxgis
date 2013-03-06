@@ -3,7 +3,7 @@
  * Purpose:  wxGxDBConnectionFactoryUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011,2013 Bishop
+*   Copyright (C) 2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,29 +18,34 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#pragma once
+#include "wxgis/catalogui/gxdbconnfactoryui.h"
+/*
+#include "wxgis/catalogui/gxremoteconnui.h"
 
-#include "wxgis/catalogui/catalogui.h"
-#include "wxgis/catalog/gxdbconnfactory.h"
+#include "../../art/rdb_conn_16.xpm"
+#include "../../art/rdb_conn_48.xpm"
+#include "../../art/rdb_disconn_16.xpm"
+#include "../../art/rdb_disconn_48.xpm"
 
-/** \class wxGxDBConnectionFactoryUI gxdbconnfactoryui.h
-    \brief A DataBase connection (*.xconn) GxObjectUI factory.
-*/
 
-class wxGxDBConnectionFactoryUI :
-	public wxGxDBConnectionFactory
+IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionFactoryUI, wxGxDBConnectionFactory)
+
+wxGxDBConnectionFactoryUI::wxGxDBConnectionFactoryUI(void) : wxGxDBConnectionFactory()
 {
-	DECLARE_DYNAMIC_CLASS(wxGxDBConnectionFactoryUI)
-public:
-	wxGxDBConnectionFactoryUI(void);
-	virtual ~wxGxDBConnectionFactoryUI(void);
-	//wxGxDBConnectionFactory
-    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath);
-protected:
-    wxIcon m_LargeIconConn, m_SmallIconConn;
-    wxIcon m_LargeIconDisconn, m_SmallIconDisconn;
-    wxIcon m_LargeIconFeatureClass, m_SmallIconFeatureClass;
-    wxIcon m_LargeIconTable, m_SmallIconTable;
-};
+    m_LargeIconConn = wxIcon(rdb_conn_48_xpm);
+    m_SmallIconConn = wxIcon(rdb_conn_16_xpm);
+    m_LargeIconDisconn = wxIcon(rdb_disconn_48_xpm);
+    m_SmallIconDisconn = wxIcon(rdb_disconn_16_xpm);
+}
 
+wxGxDBConnectionFactoryUI::~wxGxDBConnectionFactoryUI(void)
+{
+}
 
+IGxObject* wxGxDBConnectionFactoryUI::GetGxDataset(CPLString path, wxString name)
+{
+    wxGxRemoteConnectionUI* pDataset = new wxGxRemoteConnectionUI(path, name, m_LargeIconConn, m_SmallIconConn, m_LargeIconDisconn, m_SmallIconDisconn);
+    //pDataset->SetEncoding(wxFONTENCODING_UTF8);
+    return static_cast<IGxObject*>(pDataset);
+}
+*/

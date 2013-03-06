@@ -72,6 +72,8 @@ enum wxGISEnumRasterDatasetType
     enumRasterGif,
     enumRasterSAGA,
     enumRasterVRT,
+    enumRasterWMS,
+    enumRasterWMSTMS,
     enumRasterMAX
 };
 

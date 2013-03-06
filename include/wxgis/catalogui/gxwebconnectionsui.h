@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDBConnectionFactory class.
+ * Purpose:  wxGxDBConnectionsUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011,2013 Bishop
+*   Copyright (C) 2011,2012 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,21 +20,27 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/catalog/gxobjectfactory.h"
+#include "wxgis/catalogui/catalogui.h"
+#include "wxgis/catalog/gxdbconnections.h"
 
-/** \class wxGxDBConnectionFactory gxdbconnfactory.h
-    \brief A DataBase connection (*.xconn) GxObject factory.
+/** \class wxGxDBConnectionsUI gxdbconnectionsui.h
+    \brief The database connections root item in user interface.
 */
-
-class WXDLLIMPEXP_GIS_CLT wxGxDBConnectionFactory :
-	public wxGxObjectFactory
+/*
+class WXDLLIMPEXP_GIS_CLU wxGxDBConnectionsUI :
+    public wxGxDBConnections,
+	public IGxObjectUI
 {
-	DECLARE_DYNAMIC_CLASS(wxGxDBConnectionFactory)
+   DECLARE_DYNAMIC_CLASS(wxGxDBConnectionsUI)
 public:
-	wxGxDBConnectionFactory(void);
-	virtual ~wxGxDBConnectionFactory(void);
-	//IGxObjectFactory
-	virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
-    virtual wxString GetName(void) const {return wxString(_("DataBase connections"));};
-    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath);
+	wxGxDBConnectionsUI(void);
+	virtual ~wxGxDBConnectionsUI(void);
+	//IGxObjectUI
+	virtual wxIcon GetLargeImage(void);
+	virtual wxIcon GetSmallImage(void);
+	virtual wxString ContextMenu(void){return wxString(wxT("wxGxDBConnections.ContextMenu"));};
+	virtual wxString NewMenu(void){return wxString(wxT("wxGxDBConnections.NewMenu"));};
+protected:
+    wxIcon m_LargeIcon, m_SmallIcon;
 };
+*/

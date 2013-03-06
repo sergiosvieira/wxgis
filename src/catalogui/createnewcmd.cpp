@@ -19,11 +19,12 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/createnewcmd.h"
-/*
+
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/remoteconndlg.h"
-#include "wxgis/catalogui/gxremoteconnui.h"
 #include "wxgis/datasource/sysop.h"
+#include "wxgis/catalogui/gxselection.h"
+#include "wxgis/catalogui/gxdbconnectionsui.h"
 
 #include "../../art/rdb_create.xpm"
 #include "../../art/rdb_conn_16.xpm"
@@ -86,31 +87,24 @@ bool wxGISCreateNewCmd::GetChecked(void)
 
 bool wxGISCreateNewCmd::GetEnabled(void)
 {
-	switch(m_subtype)
+    wxCHECK_MSG(m_pGxApp && m_pApp, false, wxT("Application pointer is null"));
+
+    wxGxSelection* pSel = m_pGxApp->GetGxSelection();
+    wxGxCatalogBase* pCat = GetGxCatalog();
+
+    switch(m_subtype)
 	{
 		case 0://Create new remote connection
-        {
-			IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			if(pGxApp)
-			{
-                IGxCatalog* pCatalog = pGxApp->GetCatalog();
-                if(pCatalog)
+            if(pCat && pSel)
+            {
+                wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetFirstSelectedObjectId());
+                wxGxObjectContainer* pGxObjectContainer = wxDynamicCast(pGxObject, wxGxObjectContainer);
+                if(pGxObjectContainer && pGxObjectContainer->CanCreate(enumGISContainer, enumContRemoteConnection))
                 {
-                    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pCatalog);
- 					if(!pGxCatalogUI)
-						return false;
-                   IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                    if(pSel)
-                    {
-						IGxObjectSPtr pGxObject = pCatalog->GetRegisterObject(pSel->GetSelectedObjectID(0));
-                        IGxObjectContainer* pCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
-                        if(pCont)
-                            return pCont->CanCreate(enumGISContainer, enumContRemoteConnection);
-                    }
+                    return true;
                 }
             }
-			return false;
-        }
+            return false;
 		default:
 			return false;
 	}
@@ -139,56 +133,35 @@ wxString wxGISCreateNewCmd::GetMessage(void)
 
 void wxGISCreateNewCmd::OnClick(void)
 {
+    wxCHECK_RET(m_pGxApp && m_pApp, wxT("Application pointer is null"));
+
+    wxGxSelection* pSel = m_pGxApp->GetGxSelection();
+    wxGxCatalogBase* pCat = GetGxCatalog();
+    
 	switch(m_subtype)
 	{
 		case 0:
+#ifdef wxGIS_USE_POSTGRES
+            if(pCat && pSel)
             {
-			    IGxApplication* pGxApp = dynamic_cast<IGxApplication*>(m_pApp);
-			    if(pGxApp)
-			    {
-                    IGxCatalog* pCatalog = pGxApp->GetCatalog();
-                    if(pCatalog)
+                wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetFirstSelectedObjectId());
+                wxGxDBConnectionsUI* pGxDBConnectionsUI = wxDynamicCast(pGxObject, wxGxDBConnectionsUI);
+                if(pGxDBConnectionsUI)
+                {
+                    CPLString pszConnFolder = pGxDBConnectionsUI->GetPath();
+                    CPLString pszConnName(CheckUniqName(pszConnFolder, wxString(_("new DB connection")), wxString(wxT("xconn"))).mb_str(wxConvUTF8));
+
+                    wxGxView* pGxView = dynamic_cast<wxGxView*>(wxWindow::FindFocus());
+                    pGxDBConnectionsUI->BeginRenameOnAdd(pGxView, pszConnName);
+
+					wxGISRemoteConnDlg dlg(CPLFormFilename(pszConnFolder, pszConnName, "xconn"), dynamic_cast<wxWindow*>(m_pApp));
+					if(dlg.ShowModal() != wxID_OK)
                     {
-                        wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pCatalog);
-                        IGxSelection* pSel = pGxCatalogUI->GetSelection();
-                        if(pSel)
-                        {
-                            //create folder
-							IGxObjectSPtr pGxObject = pGxCatalogUI->GetRegisterObject(pSel->GetSelectedObjectID(0));
-							CPLString pszConnFolder = pGxObject->GetInternalName();
-							CPLString pszConnName(CheckUniqName(pszConnFolder, wxString(_("new remote connection")), wxString(wxT("xconn"))).mb_str(wxConvUTF8));
-
-							wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
-							wxGISRemoteConnDlg dlg(CPLFormFilename(pszConnFolder, pszConnName, "xconn"), pWnd);
-							if(dlg.ShowModal() == wxID_OK)
-							{
-								//create GxObject
-								if(!m_LargeConnIcon.IsOk())
-									m_LargeConnIcon = wxIcon(rdb_conn_48_xpm);
-								if(!m_SmallConnIcon.IsOk())
-									m_SmallConnIcon = wxIcon(rdb_conn_16_xpm);
-								if(!m_LargeDisconnIcon.IsOk())
-									m_LargeDisconnIcon = wxIcon(rdb_disconn_48_xpm);
-								if(!m_SmallDisconnIcon.IsOk())
-									m_SmallDisconnIcon = wxIcon(rdb_disconn_16_xpm);
-
-								wxGxRemoteConnectionUI* pConn = new wxGxRemoteConnectionUI(dlg.GetPath(), dlg.GetName(), m_LargeConnIcon, m_SmallConnIcon, m_LargeDisconnIcon, m_SmallDisconnIcon);
-								IGxObject* pGxConn = static_cast<IGxObject*>(pConn);
-								IGxObjectContainer* pObjCont = dynamic_cast<IGxObjectContainer*>(pGxObject.get());
-								pObjCont->AddChild(pGxConn);
-								pCatalog->ObjectAdded(pGxConn->GetID());
-								//wait while added new GxObject to views
-								wxYield();
-								//begin rename GxObject
-								wxWindow* pFocusWnd = wxWindow::FindFocus();
-								IGxView* pGxView = dynamic_cast<IGxView*>(pFocusWnd);
-								if(pGxView)
-									pGxView->BeginRename(pGxConn->GetID());
-							}
-                        }
+                        pGxDBConnectionsUI->BeginRenameOnAdd(NULL, "");
                     }
                 }
             }
+#endif //wxGIS_USE_POSTGRES
             break;
 		default:
 			return;
@@ -198,6 +171,7 @@ void wxGISCreateNewCmd::OnClick(void)
 bool wxGISCreateNewCmd::OnCreate(wxGISApplicationBase* pApp)
 {
 	m_pApp = pApp;
+    m_pGxApp = dynamic_cast<wxGxApplicationBase*>(pApp);
 	return true;
 }
 
@@ -216,4 +190,3 @@ unsigned char wxGISCreateNewCmd::GetCount(void)
 {
 	return 1;
 }
-*/

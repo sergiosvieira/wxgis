@@ -3,7 +3,7 @@
  * Purpose:  wxGxRemoteConnectionUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 /** \class wxGxRemoteConnectionUI gxfileui.h
     \brief A Remote Connection GxObjectUI.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLU wxGxRemoteConnectionUI :
     public wxGxRemoteConnection,
 	public IGxObjectUI,
@@ -34,20 +34,20 @@ class WXDLLIMPEXP_GIS_CLU wxGxRemoteConnectionUI :
     public IGxObjectWizard
 {
 public:
-	wxGxRemoteConnectionUI(CPLString soPath, wxString Name, wxIcon LargeIconConn = wxNullIcon, wxIcon SmallIconConn = wxNullIcon, wxIcon LargeIconDisconn = wxNullIcon, wxIcon SmallIconDisconn = wxNullIcon);
+	wxGxRemoteConnectionUI(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", wxIcon LargeIconConn = wxNullIcon, wxIcon SmallIconConn = wxNullIcon, wxIcon LargeIconDisconn = wxNullIcon, wxIcon SmallIconDisconn = wxNullIcon);
 	virtual ~wxGxRemoteConnectionUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxRemoteConnectionUI.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxRemoteConnectionUI.NewMenu"));};
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxRemoteConnection.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxString(wxT("wxGxRemoteConnection.NewMenu"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
     //IGxObjectWizard
     virtual bool Invoke(wxWindow* pParentWnd);
 protected:
     //wxGxRemoteConnection
-    virtual wxGxRemoteDBSchema* GetNewRemoteDBSchema(const CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon);
+//    virtual wxGxRemoteDBSchema* GetNewRemoteDBSchema(const CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon);
 protected:
     wxIcon m_oLargeIconConn, m_oSmallIconConn;
     wxIcon m_oLargeIconDisconn, m_oSmallIconDisconn;
@@ -55,7 +55,7 @@ protected:
     wxIcon m_oLargeIconTable, m_oSmallIconTable;
     wxIcon m_oLargeIconSchema, m_oSmallIconSchema;
 };
-*/
+
 /** \class wxGxRemoteDBSchemaUI gxfileui.h
     \brief A Remote Database schema GxObjectUI.
 */

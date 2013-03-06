@@ -67,7 +67,8 @@ set(PROJECT_HHEADERS ${PROJECT_HHEADERS}
     ${LIB_HEADERS}/sysop.h
     ${LIB_HEADERS}/table.h
     ${LIB_HEADERS}/vectorop.h
-    ${LIB_HEADERS}/gdalinh.h
+    ${LIB_HEADERS}/gdalinh.h    
+    ${LIB_HEADERS}/wmsdataset.h
 )
 
 set(PROJECT_CSOURCES ${PROJECT_CSOURCES}
@@ -85,6 +86,7 @@ set(PROJECT_CSOURCES ${PROJECT_CSOURCES}
     ${LIB_SOURCES}/table.cpp
     ${LIB_SOURCES}/vectorop.cpp
     ${LIB_SOURCES}/gdalinh.cpp
+    ${LIB_SOURCES}/wmsdataset.cpp
 )
 
 add_definitions(-DWXMAKINGDLL_GIS_DS)
