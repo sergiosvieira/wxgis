@@ -155,18 +155,18 @@
         <Item type="sep"/>
         <Item type="cmd" cmd_name="wxGISGeoprocessingCmd" subtype="1" name="Show/Hide &amp;Toolbox panel"/>
       </menu>
-      <menu name="wxGxRemoteServerUI.ContextMenu" caption="wxGxRemoteServerUI.ContextMenu">
+      <menu name="wxGxRemoteServer.ContextMenu" caption="wxGxRemoteServer.ContextMenu">
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="9" name="Обновить"/>
         <Item type="sep"/>
         <Item type="cmd" cmd_name="wxGISRemoteCmd" subtype="1"/>
         <Item type="cmd" cmd_name="wxGISRemoteCmd" subtype="2"/>
       </menu>
-      <menu name="wxGxRemoteServersUI.ContextMenu" caption="wxGxRemoteServersUI.ContextMenu">
+      <menu name="wxGxRemoteServers.ContextMenu" caption="wxGxRemoteServers.ContextMenu">
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="9" name="Обновить"/>
         <Item type="sep"/>
         <Item type="menu" cmd_name="Application.NewMenu" name="Новый"/>
       </menu>
-      <menu name="wxGxRemoteServersUI.NewMenu" caption="wxGxRemoteServersUI.NewMenu">
+      <menu name="wxGxRemoteServers.NewMenu" caption="wxGxRemoteServers.NewMenu">
         <Item type="cmd" cmd_name="wxGISRemoteCmd" subtype="0" name="Create new connection"/>
       </menu>
       <menu name="wxRxMonitoringDatabases.ContextMenu" caption="wxRxMonitoringDatabases.ContextMenu"/>
@@ -183,34 +183,34 @@
         <Item type="cmd" cmd_name="wxGISTaskCmd" subtype="0" name="Показать диалог инструмента"/>
         <Item type="cmd" cmd_name="wxGISTaskCmd" subtype="1" name="Показать диалог исполнения"/>
       </menu>
-      <menu name="wxGxDBConnectionsUI.NewMenu" caption="wxGxDBConnectionsUI.NewMenu">
+      <menu name="wxGxDBConnections.NewMenu" caption="wxGxDBConnections.NewMenu">
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="7" name="Создать папку"/>
         <Item type="cmd" cmd_name="wxGISCreateNewCmd" subtype="0" name="Подлючение к &amp;удаленной базе"/>
       </menu>
-      <menu name="wxGxDBConnectionsUI.ContextMenu" caption="wxGxDBConnectionsUI.ContextMenu">
+      <menu name="wxGxDBConnections.ContextMenu" caption="wxGxDBConnections.ContextMenu">
         <Item type="menu" cmd_name="Application.NewMenu" name="Новый"/>
         <Item type="sep"/>
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="13" name="Вставить"/>
         <Item type="sep"/>
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="9" name="Обновить"/>
       </menu>
-      <menu name="wxGxRemoteConnectionUI.ContextMenu" caption="wxGxRemoteConnectionUI.ContextMenu">
+      <menu name="wxGxRemoteConnection.ContextMenu" caption="wxGxRemoteConnection.ContextMenu">
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="4" name="Удалить"/>
         <Item type="sep"/>
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="10" name="Свойства"/>
       </menu>
-      <menu name="wxGxPostGISTableDatasetUI.ContextMenu" caption="wxGxPostGISTableDatasetUI.ContextMenu">
+      <menu name="wxGxPostGISTableDataset.ContextMenu" caption="wxGxPostGISTableDataset.ContextMenu">
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="10" name="Свойства"/>
       </menu>
-      <menu name="wxGxPostGISFeatureDatasetUI.ContextMenu" caption="wxGxPostGISFeatureDatasetUI.ContextMenu">
+      <menu name="wxGxPostGISFeatureDataset.ContextMenu" caption="wxGxPostGISFeatureDataset.ContextMenu">
         <Item type="cmd" cmd_name="wxGISGeoprocessingCmd" subtype="0" name="&amp;Экспорт"/>
         <Item type="sep"/>
         <Item type="cmd" cmd_name="wxGISCatalogMainCmd" subtype="10" name="Свойства"/>
       </menu>
-      <menu name="wxGxSatDBMonDispTasksUI.ContextMenu" caption="wxGxSatDBMonDispTasksUI.ContextMenu">
+      <menu name="wxGxSatDBMonDispTasks.ContextMenu" caption="wxGxSatDBMonDispTasks.ContextMenu">
         <Item type="menu" cmd_name="Application.NewMenu" name="Новый"/>
       </menu>
-      <menu name="wxGxSatDBMonDispTasksUI.NewMenu" caption="wxGxSatDBMonDispTasksUI.NewMenu">
+      <menu name="wxGxSatDBMonDispTasks.NewMenu" caption="wxGxSatDBMonDispTasks.NewMenu">
         <Item type="cmd" cmd_name="wxGISRemoteDBCmd" subtype="0" name="add task"/>
       </menu>      
     </Menues>

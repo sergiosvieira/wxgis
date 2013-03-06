@@ -3,7 +3,7 @@
  * Purpose:  wxGxDBConnectionFactoryUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxdbconnfactoryui.h"
-/*
 #include "wxgis/catalogui/gxremoteconnui.h"
 
 #include "../../art/rdb_conn_16.xpm"
@@ -27,6 +26,9 @@
 #include "../../art/rdb_disconn_16.xpm"
 #include "../../art/rdb_disconn_48.xpm"
 
+//------------------------------------------------------------------------------
+// wxGxDBConnectionFactoryUI
+//------------------------------------------------------------------------------
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionFactoryUI, wxGxDBConnectionFactory)
 
@@ -42,10 +44,8 @@ wxGxDBConnectionFactoryUI::~wxGxDBConnectionFactoryUI(void)
 {
 }
 
-IGxObject* wxGxDBConnectionFactoryUI::GetGxDataset(CPLString path, wxString name)
+wxGxObject* wxGxDBConnectionFactoryUI::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath)
 {
-    wxGxRemoteConnectionUI* pDataset = new wxGxRemoteConnectionUI(path, name, m_LargeIconConn, m_SmallIconConn, m_LargeIconDisconn, m_SmallIconDisconn);
-    //pDataset->SetEncoding(wxFONTENCODING_UTF8);
-    return static_cast<IGxObject*>(pDataset);
+	wxGxRemoteConnectionUI* pDataset = new wxGxRemoteConnectionUI(pParent, soName, szPath, m_LargeIconConn, m_SmallIconConn, m_LargeIconDisconn, m_SmallIconDisconn);
+	return static_cast<wxGxObject*>(pDataset);
 }
-*/

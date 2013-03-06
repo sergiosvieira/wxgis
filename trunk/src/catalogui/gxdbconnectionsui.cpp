@@ -3,7 +3,7 @@
  * Purpose:  wxGxDBConnectionsUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,13 +20,14 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxdbconnectionsui.h"
-/*
+
 #include "../../art/db_connections_16.xpm"
 #include "../../art/db_connections_48.xpm"
 
-/////////////////////////////////////////////////////////////////////////
-// wxGxSpatialReferencesFolder
-/////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------
+// wxGxDBConnectionsUI
+//---------------------------------------------------------------------------
+
 IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionsUI, wxGxDBConnections)
 
 wxGxDBConnectionsUI::wxGxDBConnectionsUI(void) : wxGxDBConnections()
@@ -48,5 +49,22 @@ wxIcon wxGxDBConnectionsUI::GetSmallImage(void)
 {
 	return m_SmallIcon;
 }
-*/
 
+void wxGxDBConnectionsUI::BeginRenameOnAdd(wxGxView* const pGxView, const CPLString &szPath)
+{
+    m_pGxViewToRename = pGxView;
+    m_szPathToRename = szPath;
+    m_szPathToRename = m_szPathToRename.tolower();
+}
+
+void wxGxDBConnectionsUI::AddChild( wxGxObject *child )
+{
+    wxGxDBConnections::AddChild(child);
+    if(child->GetPath().tolower() == m_szPathToRename)
+    {
+        m_pGxViewToRename->BeginRename(child->GetId());
+
+        m_szPathToRename.clear();
+        m_pGxViewToRename = NULL;
+    }
+}

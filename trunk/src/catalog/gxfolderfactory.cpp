@@ -58,7 +58,6 @@ bool wxGxFolderFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxA
 	return true;
 }
 
-
 wxGxObject* wxGxFolderFactory::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath)
 {
 	wxGxFolder* pFolder = new wxGxFolder(pParent, soName, szPath);

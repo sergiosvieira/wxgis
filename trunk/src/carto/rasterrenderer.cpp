@@ -742,6 +742,7 @@ bool wxGISRasterRenderer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay* const
 
 bool wxGISRasterRenderer::Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay * const pDisplay, ITrackCancel * const pTrackCancel)
 {
+    bool bScale = false;
 	int nOutXSize, nOutYSize;
 	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
 	{
@@ -750,6 +751,7 @@ bool wxGISRasterRenderer::Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase Dra
 	}
 	else
 	{
+        bScale = true;
 		nOutXSize = stPixelData.nOutputWidth;
 		nOutYSize = stPixelData.nOutputHeight;
 	}
@@ -763,14 +765,38 @@ bool wxGISRasterRenderer::Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase Dra
     }
 	unsigned char *pTransformPixelData = (unsigned char *)CPLMalloc (stride * nOutYSize);
 
-	if(!OnPixelProceed(stPixelData, m_pwxGISRasterDataset->GetDataType(), pTransformPixelData, pTrackCancel))
-		return false;
-	
 	cairo_surface_t *surface;
 	surface = cairo_image_surface_create_for_data (pTransformPixelData, CAIRO_FORMAT_ARGB32, nOutXSize, nOutYSize, stride);
 
-	//TODO: Draw 128 x 128 parts from threads not the whole raster
-	pDisplay->DrawRaster(surface, stPixelData.stWorldBounds);
+    //TODO: more parts
+    int CPUCount = wxThread::GetCPUCount();//1;//
+    wxVector<wxRasterDrawThread*> threadarray;
+    int nPartSize = nOutYSize / CPUCount;
+    int nBegY(0), nEndY;
+    for(int i = 0; i < CPUCount; ++i)
+    {        
+        if(i == CPUCount - 1)
+            nEndY = nOutYSize;
+        else
+            nEndY = nPartSize * (i + 1);
+
+		unsigned char* pDestInputData = pTransformPixelData + (nBegY * 4 * nOutXSize);
+		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, m_pwxGISRasterDataset->GetDataType(), GetBandCount(), pDestInputData, bScale == true ? m_eQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, this, pTrackCancel);
+		if(CreateAndRunThread(thread, wxT("wxRasterDrawThread"), wxT("RasterDrawThread")))
+            threadarray.push_back(thread);
+        nBegY = nEndY;
+    }
+
+    for(size_t i = 0; i < threadarray.size(); ++i)
+    {
+        wgDELETE(threadarray[i], Wait());
+
+        cairo_surface_mark_dirty(surface);
+        pDisplay->DrawRaster(surface, stPixelData.stWorldBounds);
+        cairo_surface_flush(surface);
+    }	
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//pDisplay->DrawRaster(surface, stPixelData.stWorldBounds);
 
 	cairo_surface_destroy(surface);
 
@@ -947,50 +973,9 @@ int *wxGISRasterRGBARenderer::GetBandsCombination(int *pnBandCount)
 	return pBands;
 }
 
-
-bool wxGISRasterRGBARenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel* const pTrackCancel )
+short wxGISRasterRGBARenderer::GetBandCount() const
 {
-	int nOutXSize, nOutYSize;
-	bool bScale = false;
-	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
-	{
-		nOutXSize = stPixelData.nPixelDataWidth;
-		nOutYSize = stPixelData.nPixelDataHeight;
-	}
-	else
-	{
-		bScale = true;
-		nOutXSize = stPixelData.nOutputWidth;
-		nOutYSize = stPixelData.nOutputHeight;
-	}
-
-    //multithreaded
-    //TODO: more parts
-    int CPUCount = wxThread::GetCPUCount();//1;//
-    wxVector<wxRasterDrawThread*> threadarray;
-    int nPartSize = nOutYSize / CPUCount;
-    int nBegY(0), nEndY;
-    for(int i = 0; i < CPUCount; ++i)
-    {        
-        if(i == CPUCount - 1)
-            nEndY = nOutYSize;
-        else
-            nEndY = nPartSize * (i + 1);
-
-		unsigned char* pDestInputData = pTransformData + (nBegY * 4 * nOutXSize);
-		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, m_nAlphaBand == -1 ? 3 : 4, pDestInputData, bScale == true ? m_eQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, this, pTrackCancel);
-		if(CreateAndRunThread(thread, wxT("wxRasterDrawThread"), wxT("RasterDrawThread")))
-	       threadarray.push_back(thread);
-
-        nBegY = nEndY;
-    }
-
-    for(size_t i = 0; i < threadarray.size(); ++i)
-    {
-        wgDELETE(threadarray[i], Wait());
-        //TODO: draw raster and start new thread if not end
-    }
-	return true;
+    return m_nAlphaBand == -1 ? 3 : 4;
 }
 
 void wxGISRasterRGBARenderer::FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA)
@@ -1118,50 +1103,9 @@ int *wxGISRasterRasterColormapRenderer::GetBandsCombination(int *pnBandCount)
 	return pBands;
 }
 
-
-bool wxGISRasterRasterColormapRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel* const pTrackCancel )
+short wxGISRasterRasterColormapRenderer::GetBandCount() const
 {
-	int nOutXSize, nOutYSize;
-	bool bScale = false;
-	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
-	{
-		nOutXSize = stPixelData.nPixelDataWidth;
-		nOutYSize = stPixelData.nPixelDataHeight;
-	}
-	else
-	{
-		bScale = true;
-		nOutXSize = stPixelData.nOutputWidth;
-		nOutYSize = stPixelData.nOutputHeight;
-	}
-
-    //multithreaded
-    //TODO: more parts
-    int CPUCount = wxThread::GetCPUCount();//1;//
-    wxVector<wxRasterDrawThread*> threadarray;
-    int nPartSize = nOutYSize / CPUCount;
-    int nBegY(0), nEndY;
-    for(int i = 0; i < CPUCount; ++i)
-    {        
-        if(i == CPUCount - 1)
-            nEndY = nOutYSize;
-        else
-            nEndY = nPartSize * (i + 1);
-
-		unsigned char* pDestInputData = pTransformData + (nBegY * 4 * nOutXSize);
-		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, 1, pDestInputData, bScale == true ? m_eQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, this, pTrackCancel);
-		if(CreateAndRunThread(thread, wxT("wxRasterDrawThread"), wxT("RasterDrawThread")))
-	       threadarray.push_back(thread);
-
-        nBegY = nEndY;
-    }
-
-    for(size_t i = 0; i < threadarray.size(); ++i)
-    {
-        wgDELETE(threadarray[i], Wait());
-        //draw raster and start new thread if needed
-    }
-	return true;
+    return 1;
 }
 
 void wxGISRasterRasterColormapRenderer::OnFillColorTable(void)
@@ -1372,50 +1316,9 @@ int *wxGISRasterGreyScaleRenderer::GetBandsCombination(int *pnBandCount)
 	return pBands;
 }
 
-
-bool wxGISRasterGreyScaleRenderer::OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel* const pTrackCancel )
+short wxGISRasterGreyScaleRenderer::GetBandCount() const
 {
-	int nOutXSize, nOutYSize;
-	bool bScale = false;
-	if(stPixelData.nOutputHeight == -1 || stPixelData.nOutputWidth == -1)
-	{
-		nOutXSize = stPixelData.nPixelDataWidth;
-		nOutYSize = stPixelData.nPixelDataHeight;
-	}
-	else
-	{
-		bScale = true;
-		nOutXSize = stPixelData.nOutputWidth;
-		nOutYSize = stPixelData.nOutputHeight;
-	}
-
-    //multithreaded
-    //TODO: more parts
-    int CPUCount = wxThread::GetCPUCount();//1;//
-    wxVector<wxRasterDrawThread*> threadarray;
-    int nPartSize = nOutYSize / CPUCount;
-    int nBegY(0), nEndY;
-    for(int i = 0; i < CPUCount; ++i)
-    {        
-        if(i == CPUCount - 1)
-            nEndY = nOutYSize;
-        else
-            nEndY = nPartSize * (i + 1);
-
-		unsigned char* pDestInputData = pTransformData + (nBegY * 4 * nOutXSize);
-		wxRasterDrawThread *thread = new wxRasterDrawThread(stPixelData, eSrcType, 1, pDestInputData, bScale == true ? m_eQuality : enumGISQualityNearest, nOutXSize, nOutYSize, nBegY, nEndY, this, pTrackCancel);
-		if(CreateAndRunThread(thread, wxT("wxRasterDrawThread"), wxT("RasterDrawThread")))
-	       threadarray.push_back(thread);
-
-        nBegY = nEndY;
-    }
-
-    for(size_t i = 0; i < threadarray.size(); ++i)
-    {
-        wgDELETE(threadarray[i], Wait());
-        //TODO: draw part raster to map and start new thread
-    }
-	return true;
+    return 1;
 }
 
 void wxGISRasterGreyScaleRenderer::FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA)

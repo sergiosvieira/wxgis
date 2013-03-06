@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDBConnectionFactory class.
+ * Purpose:  wxGxDBConnectionsUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011,2013 Bishop
+*   Copyright (C) 2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,23 +18,35 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#pragma once
 
-#include "wxgis/catalog/gxobjectfactory.h"
+#include "wxgis/catalogui/gxdbconnectionsui.h"
+/*
+#include "../../art/db_connections_16.xpm"
+#include "../../art/db_connections_48.xpm"
 
-/** \class wxGxDBConnectionFactory gxdbconnfactory.h
-    \brief A DataBase connection (*.xconn) GxObject factory.
+/////////////////////////////////////////////////////////////////////////
+// wxGxSpatialReferencesFolder
+/////////////////////////////////////////////////////////////////////////
+IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionsUI, wxGxDBConnections)
+
+wxGxDBConnectionsUI::wxGxDBConnectionsUI(void) : wxGxDBConnections()
+{
+    m_LargeIcon = wxIcon(db_connections_48_xpm);
+    m_SmallIcon = wxIcon(db_connections_16_xpm);
+}
+
+wxGxDBConnectionsUI::~wxGxDBConnectionsUI(void)
+{
+}
+
+wxIcon wxGxDBConnectionsUI::GetLargeImage(void)
+{
+	return m_LargeIcon;
+}
+
+wxIcon wxGxDBConnectionsUI::GetSmallImage(void)
+{
+	return m_SmallIcon;
+}
 */
 
-class WXDLLIMPEXP_GIS_CLT wxGxDBConnectionFactory :
-	public wxGxObjectFactory
-{
-	DECLARE_DYNAMIC_CLASS(wxGxDBConnectionFactory)
-public:
-	wxGxDBConnectionFactory(void);
-	virtual ~wxGxDBConnectionFactory(void);
-	//IGxObjectFactory
-	virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
-    virtual wxString GetName(void) const {return wxString(_("DataBase connections"));};
-    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath);
-};

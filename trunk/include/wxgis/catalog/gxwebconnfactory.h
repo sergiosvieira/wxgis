@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDBConnectionFactory class.
+ * Purpose:  wxGxWebConnectionFactory class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011,2013 Bishop
+*   Copyright (C) 2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,19 +22,19 @@
 
 #include "wxgis/catalog/gxobjectfactory.h"
 
-/** \class wxGxDBConnectionFactory gxdbconnfactory.h
-    \brief A DataBase connection (*.xconn) GxObject factory.
+/** \class wxGxWebConnectionFactory gxwebconnfactory.h
+    \brief A Web service connection (*.wconn) GxObject factory.
 */
 
-class WXDLLIMPEXP_GIS_CLT wxGxDBConnectionFactory :
+class WXDLLIMPEXP_GIS_CLT wxGxWebConnectionFactory :
 	public wxGxObjectFactory
 {
-	DECLARE_DYNAMIC_CLASS(wxGxDBConnectionFactory)
+	DECLARE_DYNAMIC_CLASS(wxGxWebConnectionFactory)
 public:
-	wxGxDBConnectionFactory(void);
-	virtual ~wxGxDBConnectionFactory(void);
-	//IGxObjectFactory
+	wxGxWebConnectionFactory(void);
+	virtual ~wxGxWebConnectionFactory(void);
+	//wxGxObjectFactory
 	virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
-    virtual wxString GetName(void) const {return wxString(_("DataBase connections"));};
+    virtual wxString GetName(void) const {return wxString(_("Web services"));};
     virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath);
 };

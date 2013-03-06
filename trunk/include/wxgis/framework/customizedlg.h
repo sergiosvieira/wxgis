@@ -81,8 +81,9 @@ public:
 	~wxGISToolBarPanel();
 	void SplitterOnIdle( wxIdleEvent& )
 	{
-		m_Splitter->SetSashPosition( 150 );
-		m_Splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISToolBarPanel::SplitterOnIdle ), NULL, this );
+		m_Splitter->SetSashPosition( m_nSashPos );
+        m_Splitter->Unbind( wxEVT_IDLE, &wxGISToolBarPanel::SplitterOnIdle, this );
+		//m_Splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISToolBarPanel::SplitterOnIdle ), NULL, this );
 	}
 	//events
 	void OnSelChanged(wxTreeEvent& event);
@@ -123,7 +124,11 @@ protected:
 	bool m_bToolsFocus, m_bCmdFocus;
 	//int m_nContextMenuPos, m_nMenubarPos, m_nToolbarPos;
 	wxTreeItemId m_nMenubarId, m_nContextMenuesId, m_nNewMenuesId, m_nToolBarsId;
-
+protected:
+    virtual void SerializePanel(bool bSave = false);
+protected:
+    int m_nSashPos;
+private:  
     DECLARE_EVENT_TABLE()
 };
 
@@ -158,8 +163,9 @@ public:
 	~wxGISCommandPanel();
 	void m_splitter2OnIdle( wxIdleEvent& )
 	{
-	m_splitter2->SetSashPosition( 150 );
-	m_splitter2->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISCommandPanel::m_splitter2OnIdle ), NULL, this );
+	    m_splitter2->SetSashPosition( m_nSashPos );
+        m_splitter2->Unbind( wxEVT_IDLE, &wxGISCommandPanel::m_splitter2OnIdle, this );
+	    //m_splitter2->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISCommandPanel::m_splitter2OnIdle ), NULL, this );
 	}
 	//events
 	void OnListboxSelect(wxCommandEvent& event);
@@ -169,7 +175,11 @@ public:
 	void OnSetKeyCode(wxCommandEvent& event);
 
 	void SetKeyCode(int pos);
-
+protected:
+    virtual void SerializePanel(bool bSave = false);
+protected:
+    int m_nSashPos;
+private:  
     DECLARE_EVENT_TABLE()
 };
 
@@ -181,6 +191,10 @@ class WXDLLIMPEXP_GIS_FRW wxGISCustomizeDlg : public wxDialog
 public:
 	wxGISCustomizeDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Customize"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,400 ), long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
 	~wxGISCustomizeDlg();
+    //events
+    virtual void EndModal (int retCode);
+protected:
+    virtual void SerializeFramePos(bool bSave = false);
 protected:
 	wxAuiNotebook* m_AuiNotebook;
 	wxStdDialogButtonSizer* m_sdbSizer;

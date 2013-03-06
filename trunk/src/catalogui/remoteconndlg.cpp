@@ -22,9 +22,10 @@
 #include "wxgis/catalogui/remoteconndlg.h"
 
 #ifdef wxGIS_USE_POSTGRES
-/*
+
 #include "wxgis/datasource/sysop.h"
 #include "wxgis/core/crypt.h"
+#include "wxgis/core/format.h"
 
 #include <wx/valgen.h>
 #include <wx/valtext.h>
@@ -32,6 +33,7 @@
 //-------------------------------------------------------------------------------
 //  wxGISRemoteConnDlg
 //-------------------------------------------------------------------------------
+
 BEGIN_EVENT_TABLE(wxGISRemoteConnDlg, wxDialog)
     EVT_BUTTON(wxID_OK, wxGISRemoteConnDlg::OnOK)
     EVT_BUTTON(ID_TESTBUTTON, wxGISRemoteConnDlg::OnTest)
@@ -52,6 +54,7 @@ wxGISRemoteConnDlg::wxGISRemoteConnDlg( CPLString pszConnPath, wxWindow* parent,
 	//load values from xconn file
 	if(!m_bCreateNew)
 	{
+        m_sOriginOutput = pszConnPath;
 		wxXmlDocument doc(wxString(pszConnPath,  wxConvUTF8));
 		if(doc.IsOk())
 		{
@@ -63,7 +66,7 @@ wxGISRemoteConnDlg::wxGISRemoteConnDlg( CPLString pszConnPath, wxWindow* parent,
 				m_sDatabase = pRootNode->GetAttribute(wxT("db"), m_sDatabase);
 				m_sUser = pRootNode->GetAttribute(wxT("user"), m_sUser);
 				Decrypt(pRootNode->GetAttribute(wxT("pass"), wxEmptyString), m_sPass);
-				m_bIsBinaryCursor = wxString(pRootNode->GetAttribute(wxT("isbincursor"), m_bIsBinaryCursor == true ? wxT("yes") : wxT("no"))).CmpNoCase(wxString(wxT("yes"))) == 0;
+				m_bIsBinaryCursor = GetBoolValue(pRootNode, wxT("isbincursor"), m_bIsBinaryCursor);
 			}
 		}
 	}
@@ -178,23 +181,26 @@ void wxGISRemoteConnDlg::OnOK(wxCommandEvent& event)
 		pRootNode->AddAttribute(wxT("db"), m_sDatabase);
 		pRootNode->AddAttribute(wxT("user"), m_sUser);		
 		pRootNode->AddAttribute(wxT("pass"), sCryptPass);
-		pRootNode->AddAttribute(wxT("isbincursor"), m_bIsBinaryCursor == true ? wxT("yes") : wxT("no"));
+
+        SetBoolValue(pRootNode, wxT("isbincursor"), m_bIsBinaryCursor);
+
 		pRootNode->AddAttribute(wxT("type"), wxT("POSTGIS"));//store server type for future
 
 		doc.SetRoot(pRootNode);
 
 		wxString sFullPath = m_sOutputPath + wxFileName::GetPathSeparator() + GetName();
-		//compare if user change name in changing mode
-		if(!m_bCreateNew && wxGISEQUAL(CPLString(sFullPath.mb_str(wxConvUTF8)), m_sOriginOutput))
+		if(!m_bCreateNew)// && wxGISEQUAL(CPLString(sFullPath.mb_str(wxConvUTF8)), m_sOriginOutput))
 		{
-			DeleteFile(m_sOriginOutput);
-		}
-		if(!doc.Save(sFullPath))
+            RenameFile(m_sOriginOutput, CPLString(sFullPath.mb_str(wxConvUTF8)));
+		}			
+        
+        if(!doc.Save(sFullPath))
 		{
 			wxMessageBox(wxString(_("Connection create failed!")), wxString(_("Error")), wxICON_ERROR | wxOK ); 
 			return;
 		}
-		m_sOriginOutput = CPLString(sFullPath.mb_str(wxConvUTF8));
+
+        //m_sOriginOutput = CPLString(sFullPath.mb_str(wxConvUTF8));
 		EndModal(wxID_OK);
 	}
 	else
@@ -243,5 +249,5 @@ wxString wxGISRemoteConnDlg::GetName(void)
 		m_sConnName.Append(wxT(".xconn"));
 	return m_sConnName;
 }
-*/
+
 #endif //wxGIS_USE_POSTGRES

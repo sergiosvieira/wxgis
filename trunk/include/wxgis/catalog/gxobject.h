@@ -81,7 +81,7 @@ public:
     bool IsNameExist(const wxString &sName) const;
     virtual bool DestroyChildren();
     virtual bool HasChildren(void){return !m_Children.IsEmpty();};
-    virtual bool AreChildrenViewable(void) = 0;
+    virtual bool AreChildrenViewable(void)  const = 0;
     const wxGxObjectList& GetChildren() const { return m_Children; };
     virtual bool CanCreate(long nDataType, long DataSubtype){return false;};
     //wxGxObject
@@ -106,7 +106,7 @@ public:
     virtual wxString GetFullName(void) const {return wxEmptyString;}    
     virtual wxString GetCategory(void) const {return wxString(wxT("Root"));};
     //wxGxObjectContainer
-    virtual bool AreChildrenViewable(void){return true;};
+    virtual bool AreChildrenViewable(void) const {return true;};
     wxGxObject *FindGxObject(const wxString &sPath) const;
     //wxGxCatalog
     virtual wxString ConstructFullName(const wxGxObject* pObject) const;

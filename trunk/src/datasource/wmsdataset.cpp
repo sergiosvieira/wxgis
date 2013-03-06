@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDBConnectionFactory class.
+ * Purpose:  WMS DataSource class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011,2013 Bishop
+*   Copyright (C) 2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,23 +18,30 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#pragma once
+#include "wxgis/datasource/wmsdataset.h"
 
-#include "wxgis/catalog/gxobjectfactory.h"
+#ifdef wxGIS_USE_CURL
 
-/** \class wxGxDBConnectionFactory gxdbconnfactory.h
-    \brief A DataBase connection (*.xconn) GxObject factory.
-*/
+#include "wxgis/datasource/table.h"
+#include "wxgis/datasource/featuredataset.h"
+#include "wxgis/core/config.h"
+#include "wxgis/defs.h"
 
-class WXDLLIMPEXP_GIS_CLT wxGxDBConnectionFactory :
-	public wxGxObjectFactory
+//------------------------------------------------------------------------------
+// wxGISWMSDataSource
+//------------------------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxGISWMSDataSource, wxGISRasterDataset)
+
+wxGISWMSDataSource::wxGISWMSDataSource(const CPLString &sPath, wxGISEnumRasterDatasetType nType) : wxGISRasterDataset(sPath, nType)
 {
-	DECLARE_DYNAMIC_CLASS(wxGxDBConnectionFactory)
-public:
-	wxGxDBConnectionFactory(void);
-	virtual ~wxGxDBConnectionFactory(void);
-	//IGxObjectFactory
-	virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
-    virtual wxString GetName(void) const {return wxString(_("DataBase connections"));};
-    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath);
-};
+
+
+}
+
+wxGISWMSDataSource::~wxGISWMSDataSource(void)
+{
+}
+
+
+#endif //wxGIS_USE_CURL

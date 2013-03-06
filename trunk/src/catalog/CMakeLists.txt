@@ -34,10 +34,6 @@ if(wxWidgets_FOUND)
     include(${wxWidgets_USE_FILE})
 endif(wxWidgets_FOUND)
 
-if(WXGISGDAL_FOUND)
-    include_directories(${WXGISGDAL_INCLUDE_DIR}/ogr/ogrsf_frmts)
-endif(WXGISGDAL_FOUND) 
-
 if(GDAL_FOUND)
     include_directories(${GDAL_INCLUDE_DIR}/ogr/ogrsf_frmts)
 endif(GDAL_FOUND)
@@ -87,7 +83,9 @@ set(PROJECT_HHEADERS ${PROJECT_HHEADERS}
     ${LIB_HEADERS}/gxxmlconnstor.h
     ${LIB_HEADERS}/gxpostgisdataset.h
     ${LIB_HEADERS}/gxdbconnections.h
-    ${LIB_HEADERS}/gxdbconnfactory.h
+    ${LIB_HEADERS}/gxdbconnfactory.h    
+    ${LIB_HEADERS}/gxwebconnections.h
+    ${LIB_HEADERS}/gxwebconnfactory.h
     ${LIB_HEADERS}/gxremoteconn.h
     ${LIB_HEADERS}/gxobjectfactory.h
 )
@@ -118,7 +116,9 @@ set(PROJECT_CSOURCES ${PROJECT_CSOURCES}
     ${LIB_SOURCES}/gxxmlconnstor.cpp    
     ${LIB_SOURCES}/gxpostgisdataset.cpp
     ${LIB_SOURCES}/gxdbconnections.cpp
-    ${LIB_SOURCES}/gxdbconnfactory.cpp
+    ${LIB_SOURCES}/gxdbconnfactory.cpp    
+    ${LIB_SOURCES}/gxwebconnections.cpp
+    ${LIB_SOURCES}/gxwebconnfactory.cpp
     ${LIB_SOURCES}/gxremoteconn.cpp
     ${LIB_SOURCES}/gxobjectfactory.cpp
 )
@@ -131,10 +131,6 @@ add_library(${LIB_NAME} SHARED ${PROJECT_HHEADERS} ${PROJECT_CSOURCES})
 if(wxWidgets_FOUND)
    target_link_libraries(${LIB_NAME} ${wxWidgets_LIBRARIES})
 endif(wxWidgets_FOUND)
-
-if(WXGISGDAL_FOUND)
-    target_link_libraries(${LIB_NAME} ${WXGISGDAL_LIBRARIES})
-endif(WXGISGDAL_FOUND) 
 
 if(GDAL_FOUND)
     target_link_libraries(${LIB_NAME} ${GDAL_LIBRARIES})

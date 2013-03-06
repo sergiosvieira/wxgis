@@ -23,14 +23,14 @@
 #include "wxgis/defs.h"
 
 #ifdef wxGIS_USE_POSTGRES
-/*
+
 #include "wxgis/catalogui/catalogui.h"
 
 #include <wx/statline.h>
 
 /** \class wxGISRemoteConnDlg remoteconndlg.h
     \brief The dialog to configure remote database connection, test it and store in connection file (*.xconn)
-*//*
+*/
 #ifdef __WXMSW___
     #define REMOTECONNDLG_MAX_HEIGHT 400
 #else
@@ -96,5 +96,5 @@ protected:
 
     DECLARE_EVENT_TABLE()
 };
-*/
+
 #endif //wxGIS_USE_POSTGRES

@@ -55,7 +55,7 @@ public:
 	virtual bool CanRename(void){return true;};
 	//wxGxObjectContainer    
 	//virtual bool DeleteChild(IGxObject* pChild);
-	virtual bool AreChildrenViewable(void){return true;};
+	virtual bool AreChildrenViewable(void) const {return true;};
 	virtual bool HasChildren(void);
     virtual bool CanCreate(long nDataType, long DataSubtype); 
 //events

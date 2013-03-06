@@ -3,7 +3,7 @@
  * Purpose:  add command in command bar dialog.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010,2013  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -72,15 +72,21 @@ public:
 	void FillIDArray(void);
 	void SplitterOnIdle( wxIdleEvent& )
 	{
-		m_Splitter->SetSashPosition( 150 );
-		m_Splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISAddCommandDlg::SplitterOnIdle ), NULL, this );
+		m_Splitter->SetSashPosition( m_nSashPos );
+        m_Splitter->Unbind(wxEVT_IDLE, &wxGISAddCommandDlg::SplitterOnIdle, this );
+        //m_Splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISAddCommandDlg::SplitterOnIdle ), NULL, this );
 	}	
+    virtual void EndModal(int retCode);
 	//events
 	void OnListboxSelect(wxCommandEvent& event);
 	void OnDoubleClickSash(wxSplitterEvent& event);
 	void OnListctrlActivated(wxListEvent& event);
 	void OnUpdateOKUI(wxUpdateUIEvent& event);
 	void OnOk(wxCommandEvent& event);
-
+protected:
+    virtual void SerializeDialogPos(bool bSave = false);
+protected:
+    int m_nSashPos;
+private:
     DECLARE_EVENT_TABLE()
 };

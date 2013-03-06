@@ -20,10 +20,9 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxremoteconnui.h"
-/*
 #include "wxgis/catalogui/remoteconndlg.h"
 #include "wxgis/catalogui/gxpostgisdatasetui.h"
-#include "wxgis/core/globalfn.h"
+#include "wxgis/catalog/gxcatalog.h"
 
 
 #include "../../art/pg_vec_16.xpm"
@@ -37,7 +36,7 @@
 //class wxGxRemoteConnectionUI
 //--------------------------------------------------------------
 
-wxGxRemoteConnectionUI::wxGxRemoteConnectionUI(CPLString soPath, wxString Name, wxIcon LargeIconConn, wxIcon SmallIconConn, wxIcon LargeIconDisconn, wxIcon SmallIconDisconn) : wxGxRemoteConnection(soPath, Name)
+wxGxRemoteConnectionUI::wxGxRemoteConnectionUI(wxGxObject *oParent, const wxString &soName, const CPLString &soPath, wxIcon LargeIconConn, wxIcon SmallIconConn, wxIcon LargeIconDisconn, wxIcon SmallIconDisconn) : wxGxRemoteConnection(oParent, soName, soPath)
 {
     m_oLargeIconConn = LargeIconConn;
     m_oSmallIconConn = SmallIconConn;
@@ -70,17 +69,15 @@ void wxGxRemoteConnectionUI::EditProperties(wxWindow *parent)
 	wxGISRemoteConnDlg dlg(m_sPath, parent);
 	if(dlg.ShowModal() == wxID_OK)
 	{
-		m_sPath = dlg.GetPath();
-		m_sName = dlg.GetName();
-		m_pCatalog->ObjectChanged(GetID());
-        if(m_pwxGISDataset && m_pwxGISDataset->IsOpened())
-        {
-            EmptyChildren();
-            m_pwxGISDataset->Close();
-            m_pwxGISDataset.reset();
-            m_pCatalog->ObjectRefreshed(GetID());
-            //GetDataset(false);
-        }
+        Disconnect();
+        //if(m_pwxGISDataset && m_pwxGISDataset->IsOpened())
+        //{
+        //    EmptyChildren();
+        //    m_pwxGISDataset->Close();
+        //    m_pwxGISDataset.reset();
+        //    wxGIS_GXCATALOG_EVENT(ObjectRefreshed);
+        //    //GetDataset(false);
+        //}
 	}
 }
 
@@ -88,18 +85,16 @@ bool wxGxRemoteConnectionUI::Invoke(wxWindow* pParentWnd)
 {
     wxBusyCursor wait;
     //connect
-    GetDataset();
-	if(m_pwxGISDataset == NULL)
+	if(!Connect())
 	{
 		wxMessageBox(_("Connect failed!"), _("Error"), wxICON_ERROR | wxOK);
 		return false;
 	}
-    m_pCatalog->ObjectChanged(GetID());
 
     return true;
 }
 
-
+/*
 wxGxRemoteDBSchema* wxGxRemoteConnectionUI::GetNewRemoteDBSchema(const CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon)
 {
     if(!m_oLargeIconFeatureClass.IsOk())

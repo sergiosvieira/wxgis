@@ -241,9 +241,6 @@ bool wxGxContentView::Activate(IApplication* const pApplication, wxXmlNode* cons
 
 void wxGxContentView::InitColumns(void)
 {
-
-    if(m_current_style != enumGISCVReport)
-        return;
     if(GetColumnCount() < 4)
     {
         InsertColumn(0, _("Name"),	wxLIST_FORMAT_LEFT, 150);

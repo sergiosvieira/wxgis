@@ -124,8 +124,8 @@ public:
     virtual wxGISEnumRendererType GetType(void) const {return enumGISRenderTypeRaster;};
 	virtual void FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA) = 0;
 protected:
-	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel* const pTrackCancel = NULL) = 0;
 	virtual bool Draw(RAWPIXELDATA &stPixelData, wxGISEnumDrawPhase DrawPhase, wxGISDisplay* const pDisplay, ITrackCancel * const pTrackCancel = NULL);
+    virtual short GetBandCount() const = 0;
 protected:
 	wxColour m_oNoDataColor;
 	//statistics - current display extent, each raster dataset, custom settings
@@ -152,8 +152,8 @@ public:
 	virtual void FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA);
     virtual wxGISEnumRasterRendererType GetRasterRenderType(void) const {return enumGISRasterRenderTypeRGBA;};
 protected:
-	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel* const pTrackCancel = NULL);
 	virtual void OnFillStats(void);
+    virtual short GetBandCount() const;
 protected:
 	int m_nRedBand, m_nGreenBand, m_nBlueBand, m_nAlphaBand;
 	//wxColour m_oBkColorGet, m_oBkColorSet, 
@@ -180,8 +180,8 @@ public:
     virtual wxGISEnumRasterRendererType GetRasterRenderType(void) const {return enumGISRasterRenderTypeIndexed;};
     //virtual const wxColor *GetColorByIndex(long nIndex);
 protected:
-	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel* const pTrackCancel = NULL);
 	virtual void OnFillColorTable(void);
+    virtual short GetBandCount() const;
 	wxColor HSVtoRGB( const short &h, const short &s, const short &v, const short &alpha );
 	wxColor CMYKtoRGB( const short &c, const short &m, const short &y, const short &k );
 protected:
@@ -205,8 +205,8 @@ public:
 	virtual void FillPixel(unsigned char* pOutputData, const double *pSrcValR, const double *pSrcValG, const double *pSrcValB, const double *pSrcValA);
     virtual wxGISEnumRasterRendererType GetRasterRenderType(void) const {return enumGISRasterRenderTypeGreyScale;};
 protected:
-	virtual bool OnPixelProceed(RAWPIXELDATA &stPixelData, GDALDataType eSrcType, unsigned char *pTransformData, ITrackCancel* const pTrackCancel = NULL);
 	virtual void OnFillStats(void);
+    virtual short GetBandCount() const;
 protected:
 	int m_nBand;
     wxGISStretch m_oStretch;

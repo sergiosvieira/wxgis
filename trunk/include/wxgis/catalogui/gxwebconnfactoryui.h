@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDBConnectionFactory class.
+ * Purpose:  wxGxDBConnectionFactoryUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011,2013 Bishop
+*   Copyright (C) 2011 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,21 +20,27 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/catalog/gxobjectfactory.h"
+#include "wxgis/catalogui/catalogui.h"
+#include "wxgis/catalog/gxdbconnfactory.h"
 
-/** \class wxGxDBConnectionFactory gxdbconnfactory.h
-    \brief A DataBase connection (*.xconn) GxObject factory.
+/** \class wxGxDBConnectionFactoryUI gxdbconnfactoryui.h
+    \brief A DataBase connection (*.xconn) GxObjectUI factory.
+*/
+/*
+class wxGxDBConnectionFactoryUI :
+	public wxGxDBConnectionFactory
+{
+	DECLARE_DYNAMIC_CLASS(wxGxDBConnectionFactoryUI)
+public:
+	wxGxDBConnectionFactoryUI(void);
+	virtual ~wxGxDBConnectionFactoryUI(void);
+	//wxGxDBConnectionFactory
+    virtual IGxObject* GetGxDataset(CPLString path, wxString name);
+protected:
+    wxIcon m_LargeIconConn, m_SmallIconConn;
+    wxIcon m_LargeIconDisconn, m_SmallIconDisconn;
+    wxIcon m_LargeIconFeatureClass, m_SmallIconFeatureClass;
+    wxIcon m_LargeIconTable, m_SmallIconTable;
+};
 */
 
-class WXDLLIMPEXP_GIS_CLT wxGxDBConnectionFactory :
-	public wxGxObjectFactory
-{
-	DECLARE_DYNAMIC_CLASS(wxGxDBConnectionFactory)
-public:
-	wxGxDBConnectionFactory(void);
-	virtual ~wxGxDBConnectionFactory(void);
-	//IGxObjectFactory
-	virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
-    virtual wxString GetName(void) const {return wxString(_("DataBase connections"));};
-    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath);
-};

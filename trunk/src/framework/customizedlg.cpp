@@ -3,7 +3,7 @@
  * Purpose:  customize dialog class. Customize menues & toolbars
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011,2012 Bishop
+*   Copyright (C) 2009,2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -28,9 +28,10 @@
 
 #include "../../art/check_marks.xpm"
 
-///////////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
 /// Class wxGISToolBarPanel
-///////////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
+
 BEGIN_EVENT_TABLE(wxGISToolBarPanel, wxPanel)
 	EVT_LEFT_DOWN( wxGISToolBarPanel::OnLeftDown )
 	EVT_TREE_SEL_CHANGED(wxGISToolBarPanel::ID_TREECTRL, wxGISToolBarPanel::OnSelChanged)
@@ -49,7 +50,11 @@ END_EVENT_TABLE()
 
 wxGISToolBarPanel::wxGISToolBarPanel(wxGISApplicationEx* pApp, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style ), m_bToolsFocus(false), m_bCmdFocus(false)
 {
-	m_pApp = pApp;
+    m_pApp = pApp;
+
+    m_nSashPos = 150;
+    SerializePanel(false);
+    
 	wxBoxSizer* bSizer = new wxBoxSizer( wxHORIZONTAL );
 
 	m_Splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D  | wxNO_BORDER);
@@ -175,6 +180,25 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGISApplicationEx* pApp, wxWindow* parent,
 wxGISToolBarPanel::~wxGISToolBarPanel()
 {
 	wxDELETE(m_pContextMenu);
+    SerializePanel(true);
+}
+
+
+void wxGISToolBarPanel::SerializePanel(bool bSave)
+{
+	wxGISAppConfig oConfig = GetConfig();
+	if(!oConfig.IsOk())
+		return;
+
+	if(bSave)
+	{
+        oConfig.Write(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/customizedlg/sashpos1")), m_Splitter->GetSashPosition());
+	}
+	else
+	{
+		//load
+		m_nSashPos = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/customizedlg/sashpos1")), m_nSashPos);
+	}
 }
 
 void wxGISToolBarPanel::OnDoubleClickSash(wxSplitterEvent& event)
@@ -641,9 +665,10 @@ long wxGISToolBarPanel::GetSelectedCommandItem(void)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------
 /// Class wxGISCommandPanel
-///////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------
+
 BEGIN_EVENT_TABLE(wxGISCommandPanel, wxPanel)
 	EVT_LISTBOX(wxGISCommandPanel::ID_LSTBX, wxGISCommandPanel::OnListboxSelect)
 	EVT_SPLITTER_DCLICK(wxID_ANY, wxGISCommandPanel::OnDoubleClickSash)
@@ -655,6 +680,10 @@ END_EVENT_TABLE()
 wxGISCommandPanel::wxGISCommandPanel( wxGISApplicationEx* pApp, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	m_pApp = pApp;
+
+    m_nSashPos = 150;
+    SerializePanel(false);
+
 	wxBoxSizer* bSizer5;
 	bSizer5 = new wxBoxSizer( wxHORIZONTAL );
 
@@ -710,6 +739,24 @@ wxGISCommandPanel::wxGISCommandPanel( wxGISApplicationEx* pApp, wxWindow* parent
 wxGISCommandPanel::~wxGISCommandPanel()
 {
 	wxDELETE(m_pContextMenu);
+    SerializePanel(true);
+}
+
+void wxGISCommandPanel::SerializePanel(bool bSave)
+{
+	wxGISAppConfig oConfig = GetConfig();
+	if(!oConfig.IsOk())
+		return;
+
+	if(bSave)
+	{
+        oConfig.Write(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/customizedlg/sashpos2")), m_splitter2->GetSashPosition());
+	}
+	else
+	{
+		//load
+		m_nSashPos = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/customizedlg/sashpos2")), m_nSashPos);
+	}
 }
 
 void wxGISCommandPanel::OnListboxSelect(wxCommandEvent& event)
@@ -796,9 +843,9 @@ void wxGISCommandPanel::OnSetKeyCode(wxCommandEvent& event)
 	SetKeyCode(m_CurSelection);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------------
 /// Class wxGISCustomizeDlg
-///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------------
 
 wxGISCustomizeDlg::wxGISCustomizeDlg( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
@@ -823,8 +870,58 @@ wxGISCustomizeDlg::wxGISCustomizeDlg( wxWindow* parent, wxWindowID id, const wxS
 
 	this->SetSizer( bSizerMain );
 	this->Layout();
+
+    SerializeFramePos(false);
 }
 
 wxGISCustomizeDlg::~wxGISCustomizeDlg()
 {
+}
+
+void wxGISCustomizeDlg::SerializeFramePos(bool bSave)
+{
+	wxGISAppConfig oConfig = GetConfig();
+	if(!oConfig.IsOk())
+		return;
+
+	if(bSave)
+	{
+		if( IsMaximized() )
+			oConfig.Write(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/customizedlg/maxi")), true);
+		else
+		{
+			int x, y, w, h;
+			GetClientSize(&w, &h);
+			GetPosition(&x, &y);
+			oConfig.Write(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/customizedlg/maxi")), false);
+			oConfig.Write(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/customizedlg/width")), w);
+			oConfig.Write(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/customizedlg/height")), h);
+			oConfig.Write(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/customizedlg/xpos")), x);
+			oConfig.Write(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/customizedlg/ypos")), y);
+		}
+	}
+	else
+	{
+		//load
+		bool bMaxi = oConfig.ReadBool(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/customizedlg/maxi")), false);
+		if(!bMaxi)
+		{
+			int x = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/customizedlg/xpos")), 50);
+			int y = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/customizedlg/ypos")), 50);
+			int w = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/customizedlg/width")), 850);
+			int h = oConfig.ReadInt(enumGISHKCU, m_pApp->GetAppName() + wxString(wxT("/customizedlg/height")), 530);
+			Move(x, y);
+			SetClientSize(w, h);
+		}
+		else
+		{
+			Maximize();
+		}
+	}
+}
+
+void wxGISCustomizeDlg::EndModal(int retCode)
+{
+    SerializeFramePos(true);
+    wxDialog::EndModal(retCode);
 }

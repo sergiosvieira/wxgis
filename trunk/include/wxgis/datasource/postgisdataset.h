@@ -3,7 +3,7 @@
  * Purpose:  PostresDataSource class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2012 Bishop
+*   Copyright (C) 2010-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -38,8 +38,7 @@ class WXDLLIMPEXP_GIS_DS wxGISPostgresDataSource :
     DECLARE_CLASS(wxGISPostgresDataSource)
 public:
 	wxGISPostgresDataSource(const wxString &sName, const wxString &sPass, const wxString &sPort = wxT("5432"), const wxString &sAddres = wxT("localhost"), const wxString &sDBName = wxT("postgres"), bool bIsBinaryCursor = false);
-    //TODO: read from descript file and control it delete/rename/move/etc.
-    //wxGISPostgresDataSource(const CPLString &szPath);
+    wxGISPostgresDataSource(const CPLString &szPath);
 	virtual ~wxGISPostgresDataSource(void);
 
 	//wxGISDataset
@@ -75,7 +74,7 @@ protected:
 protected:
 	OGRDataSource *m_poDS;
     wxString m_sName, m_sPass, m_sPort, m_sAddres, m_sDBName;
-	bool m_bIsBinaryCursor;
+	bool m_bIsBinaryCursor, m_bPathPresent;
     wxFontEncoding m_Encoding;
 };
 

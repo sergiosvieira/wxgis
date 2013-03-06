@@ -3,7 +3,7 @@
  * Purpose:  add command in command bar dialog.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010,2013  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -37,12 +37,15 @@ wxGISAddCommandDlg::wxGISAddCommandDlg( wxGISApplication* pGxApp, wxWindow* pare
 	if(!m_pGxApp)
 		return;
 
+    m_nSashPos = 150;
+    SerializeDialogPos(false);
+
 	this->SetSizeHints( wxSize( 540,400 ), wxDefaultSize );
 	wxBoxSizer* bSizer5 = new wxBoxSizer( wxVERTICAL );
 
 	m_Splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D | wxNO_BORDER );
 	//m_Splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISAddCommandDlg::SplitterOnIdle ), NULL, this );
-	m_Splitter->Bind( wxEVT_IDLE, &wxGISAddCommandDlg::SplitterOnIdle, this );
+	m_Splitter->Bind( wxEVT_IDLE, &wxGISAddCommandDlg::SplitterOnIdle, this ); //don't work?
 	bSizer5->Add( m_Splitter, 1, wxEXPAND, 5 );
 
 	//fill m_listBox1
@@ -91,6 +94,52 @@ wxGISAddCommandDlg::wxGISAddCommandDlg( wxGISApplication* pGxApp, wxWindow* pare
 wxGISAddCommandDlg::~wxGISAddCommandDlg()
 {
 }
+
+
+void wxGISAddCommandDlg::SerializeDialogPos(bool bSave)
+{
+	wxGISAppConfig oConfig = GetConfig();
+	if(!oConfig.IsOk())
+		return;
+
+	if(bSave)
+	{
+		if( IsMaximized() )
+			oConfig.Write(enumGISHKCU, m_pGxApp->GetAppName() + wxString(wxT("/addcommanddlg/maxi")), true);
+		else
+		{
+			int x, y, w, h;
+			GetClientSize(&w, &h);
+			GetPosition(&x, &y);
+			oConfig.Write(enumGISHKCU, m_pGxApp->GetAppName() + wxString(wxT("/addcommanddlg/maxi")), false);
+			oConfig.Write(enumGISHKCU, m_pGxApp->GetAppName() + wxString(wxT("/addcommanddlg/width")), w);
+			oConfig.Write(enumGISHKCU, m_pGxApp->GetAppName() + wxString(wxT("/addcommanddlg/height")), h);
+			oConfig.Write(enumGISHKCU, m_pGxApp->GetAppName() + wxString(wxT("/addcommanddlg/xpos")), x);
+			oConfig.Write(enumGISHKCU, m_pGxApp->GetAppName() + wxString(wxT("/addcommanddlg/ypos")), y);
+		}
+        oConfig.Write(enumGISHKCU, m_pGxApp->GetAppName() + wxString(wxT("/addcommanddlg/sashpos1")), m_Splitter->GetSashPosition());
+	}
+	else
+	{
+		//load
+		bool bMaxi = oConfig.ReadBool(enumGISHKCU, m_pGxApp->GetAppName() + wxString(wxT("/addcommanddlg/maxi")), false);
+		if(!bMaxi)
+		{
+			int x = oConfig.ReadInt(enumGISHKCU, m_pGxApp->GetAppName() + wxString(wxT("/addcommanddlg/xpos")), 50);
+			int y = oConfig.ReadInt(enumGISHKCU, m_pGxApp->GetAppName() + wxString(wxT("/addcommanddlg/ypos")), 50);
+			int w = oConfig.ReadInt(enumGISHKCU, m_pGxApp->GetAppName() + wxString(wxT("/addcommanddlg/width")), 850);
+			int h = oConfig.ReadInt(enumGISHKCU, m_pGxApp->GetAppName() + wxString(wxT("/addcommanddlg/height")), 530);
+			Move(x, y);
+			SetClientSize(w, h);
+		}
+		else
+		{
+			Maximize();
+		}
+		m_nSashPos = oConfig.ReadInt(enumGISHKCU, m_pGxApp->GetAppName() + wxString(wxT("/addcommanddlg/sashpos1")), m_nSashPos);
+	}
+}
+
 
 void wxGISAddCommandDlg::OnListboxSelect(wxCommandEvent& event)
 {
@@ -152,3 +201,9 @@ void wxGISAddCommandDlg::FillIDArray(void)
 	}
 }
 
+
+void wxGISAddCommandDlg::EndModal(int retCode)
+{
+    SerializeDialogPos(true);
+    wxDialog::EndModal(retCode);
+}
