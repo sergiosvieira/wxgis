@@ -32,8 +32,11 @@
 #include "../../art/rdb_disconn_16.xpm"
 #include "../../art/rdb_disconn_48.xpm"
 
-//	0	Create new remote connection
-//  1   ?
+#include "../../art/web_conn_create.xpm"
+
+//	0	Create new remote DB connection
+//  1   Create new web service connection
+
 
 IMPLEMENT_DYNAMIC_CLASS(wxGISCreateNewCmd, wxObject)
 
@@ -53,7 +56,11 @@ wxIcon wxGISCreateNewCmd::GetBitmap(void)
 			if(!m_IconCreateRemoteConn.IsOk())
 				m_IconCreateRemoteConn = wxIcon(rdb_create_xpm);
 			return m_IconCreateRemoteConn;
-		default:
+		case 1:
+			if(!m_IconCreateWebConn.IsOk())
+				m_IconCreateWebConn = wxIcon(web_conn_create_xpm);
+			return m_IconCreateWebConn;
+        default:
 			return wxNullIcon;
 	}
 }
@@ -63,7 +70,9 @@ wxString wxGISCreateNewCmd::GetCaption(void)
 	switch(m_subtype)
 	{
 		case 0:
-			return wxString(_("&Remote connection"));
+			return wxString(_("&Remote database connection"));
+		case 1:
+			return wxString(_("&Web service connection"));
 		default:
 			return wxEmptyString;
 	}
@@ -74,7 +83,8 @@ wxString wxGISCreateNewCmd::GetCategory(void)
 	switch(m_subtype)
 	{
 		case 0:
-			return wxString(_("New"));
+		case 1:
+            return wxString(_("New"));
 		default:
 			return wxString(_("[No category]"));
 	}
@@ -99,13 +109,24 @@ bool wxGISCreateNewCmd::GetEnabled(void)
             {
                 wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetFirstSelectedObjectId());
                 wxGxObjectContainer* pGxObjectContainer = wxDynamicCast(pGxObject, wxGxObjectContainer);
-                if(pGxObjectContainer && pGxObjectContainer->CanCreate(enumGISContainer, enumContRemoteConnection))
+                if(pGxObjectContainer && pGxObjectContainer->CanCreate(enumGISContainer, enumContRemoteDBConnection))
                 {
                     return true;
                 }
             }
             return false;
-		default:
+		case 1://Create new web connection
+            if(pCat && pSel)
+            {
+                wxGxObject* pGxObject = pCat->GetRegisterObject(pSel->GetFirstSelectedObjectId());
+                wxGxObjectContainer* pGxObjectContainer = wxDynamicCast(pGxObject, wxGxObjectContainer);
+                if(pGxObjectContainer && pGxObjectContainer->CanCreate(enumGISContainer, enumContWebServiceConnection))
+                {
+                    return true;
+                }
+            }
+            return false;		
+        default:
 			return false;
 	}
 }
@@ -115,6 +136,7 @@ wxGISEnumCommandKind wxGISCreateNewCmd::GetKind(void)
 	switch(m_subtype)
 	{
 		case 0://Create new remote connection
+        case 1://Create new web connection
 		default:
 			return enumGISCommandNormal;
 	}
@@ -125,7 +147,9 @@ wxString wxGISCreateNewCmd::GetMessage(void)
 	switch(m_subtype)
 	{
 		case 0:
-			return wxString(_("Create new remote connection"));
+			return wxString(_("Create new remote DB connection"));
+		case 1:
+			return wxString(_("Create new web service connection"));
 		default:
 			return wxEmptyString;
 	}
@@ -180,7 +204,9 @@ wxString wxGISCreateNewCmd::GetTooltip(void)
 	switch(m_subtype)
 	{
 		case 0:
-			return wxString(_("Create new remote connection"));
+			return wxString(_("Create new remote DB connection"));
+		case 1:
+			return wxString(_("Create new web service connection"));
 		default:
 			return wxEmptyString;
 	}
@@ -188,5 +214,5 @@ wxString wxGISCreateNewCmd::GetTooltip(void)
 
 unsigned char wxGISCreateNewCmd::GetCount(void)
 {
-	return 1;
+	return 2;
 }

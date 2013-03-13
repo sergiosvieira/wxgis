@@ -86,10 +86,6 @@ if(wxWidgets_FOUND)
    target_link_libraries(${LIB_NAME} ${wxWidgets_LIBRARIES})
 endif(wxWidgets_FOUND)
 
-if(WXGISGDAL_FOUND)
-    target_link_libraries(${LIB_NAME} ${WXGISGDAL_LIBRARIES})
-endif(WXGISGDAL_FOUND) 
-
 if(GDAL_FOUND)
     target_link_libraries(${LIB_NAME} ${GDAL_LIBRARIES})
 endif(GDAL_FOUND) 

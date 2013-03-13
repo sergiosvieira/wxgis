@@ -79,6 +79,7 @@ public:
 	virtual ~IGxRemoteConnection(void){};
 	virtual bool Connect(void) = 0;
 	virtual bool Disconnect(void) = 0;
+    virtual bool IsConnected(void) = 0;
 };
 
 /*

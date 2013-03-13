@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDBConnectionsUI class.
+ * Purpose:  wxGxWebConnectionsUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,34 +19,55 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#include "wxgis/catalogui/gxdbconnectionsui.h"
-/*
-#include "../../art/db_connections_16.xpm"
-#include "../../art/db_connections_48.xpm"
+#include "wxgis/catalogui/gxwebconnectionsui.h"
 
-/////////////////////////////////////////////////////////////////////////
-// wxGxSpatialReferencesFolder
-/////////////////////////////////////////////////////////////////////////
-IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionsUI, wxGxDBConnections)
+#include "../../art/web_connections_16.xpm"
+#include "../../art/web_connections_48.xpm"
 
-wxGxDBConnectionsUI::wxGxDBConnectionsUI(void) : wxGxDBConnections()
-{
-    m_LargeIcon = wxIcon(db_connections_48_xpm);
-    m_SmallIcon = wxIcon(db_connections_16_xpm);
-}
+//---------------------------------------------------------------------------
+// wxGxWebConnectionsUI
+//---------------------------------------------------------------------------
 
-wxGxDBConnectionsUI::~wxGxDBConnectionsUI(void)
+IMPLEMENT_DYNAMIC_CLASS(wxGxWebConnectionsUI, wxGxWebConnections)
+
+wxGxWebConnectionsUI::wxGxWebConnectionsUI(void) : wxGxWebConnections()
 {
 }
 
-wxIcon wxGxDBConnectionsUI::GetLargeImage(void)
+wxGxWebConnectionsUI::~wxGxWebConnectionsUI(void)
 {
-	return m_LargeIcon;
 }
 
-wxIcon wxGxDBConnectionsUI::GetSmallImage(void)
+wxIcon wxGxWebConnectionsUI::GetLargeImage(void)
 {
+    if(!m_LargeIcon.IsOk())
+        m_LargeIcon = wxIcon(web_connections_48_xpm);
+    return m_LargeIcon;
+}
+
+wxIcon wxGxWebConnectionsUI::GetSmallImage(void)
+{
+    if(!m_SmallIcon.IsOk())
+        m_SmallIcon = wxIcon(web_connections_16_xpm);
 	return m_SmallIcon;
 }
-*/
+
+void wxGxWebConnectionsUI::BeginRenameOnAdd(wxGxView* const pGxView, const CPLString &szPath)
+{
+    m_pGxViewToRename = pGxView;
+    m_szPathToRename = szPath;
+    m_szPathToRename = m_szPathToRename.tolower();
+}
+
+void wxGxWebConnectionsUI::AddChild( wxGxObject *child )
+{
+    wxGxWebConnections::AddChild(child);
+    if(child->GetPath().tolower() == m_szPathToRename)
+    {
+        m_pGxViewToRename->BeginRename(child->GetId());
+
+        m_szPathToRename.clear();
+        m_pGxViewToRename = NULL;
+    }
+}
 

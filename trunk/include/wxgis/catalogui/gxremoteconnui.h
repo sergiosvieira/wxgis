@@ -31,7 +31,8 @@ class WXDLLIMPEXP_GIS_CLU wxGxRemoteConnectionUI :
     public wxGxRemoteConnection,
 	public IGxObjectUI,
     public IGxObjectEditUI,
-    public IGxObjectWizard
+    public IGxObjectWizard,
+    public wxThreadHelper
 {
 public:
 	wxGxRemoteConnectionUI(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", wxIcon LargeIconConn = wxNullIcon, wxIcon SmallIconConn = wxNullIcon, wxIcon LargeIconDisconn = wxNullIcon, wxIcon SmallIconDisconn = wxNullIcon);
@@ -41,6 +42,8 @@ public:
 	virtual wxIcon GetSmallImage(void);
 	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxRemoteConnection.ContextMenu"));};
 	virtual wxString NewMenu(void) const {return wxString(wxT("wxGxRemoteConnection.NewMenu"));};
+    //IGxRemoteConnection
+	virtual bool Connect(void);
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
     //IGxObjectWizard
@@ -48,12 +51,15 @@ public:
 protected:
     //wxGxRemoteConnection
 //    virtual wxGxRemoteDBSchema* GetNewRemoteDBSchema(const CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon);
+    virtual wxThread::ExitCode Entry();
+    bool CreateAndRunCheckThread(void);
 protected:
     wxIcon m_oLargeIconConn, m_oSmallIconConn;
     wxIcon m_oLargeIconDisconn, m_oSmallIconDisconn;
     wxIcon m_oLargeIconFeatureClass, m_oSmallIconFeatureClass;
     wxIcon m_oLargeIconTable, m_oSmallIconTable;
     wxIcon m_oLargeIconSchema, m_oSmallIconSchema;
+    long m_PendingId;
 };
 
 /** \class wxGxRemoteDBSchemaUI gxfileui.h

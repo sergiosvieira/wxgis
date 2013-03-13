@@ -3,7 +3,7 @@
  * Purpose:  wxGxPendingUI class. Show pending item in tree or content view
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010,2012 Bishop
+*   Copyright (C) 2010,2012,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -41,37 +41,6 @@ wxGxPendingUI::~wxGxPendingUI(void)
 {
 }
 
-/*
-bool wxGxPendingUI::Attach(IGxObject* pParent, IGxCatalog* pCatalog)
-{
-    IGxObject::Attach(pParent, pCatalog);
-    wxGxCatalogUI* pGxCatalogUI = dynamic_cast<wxGxCatalogUI*>(pCatalog);
-    if(pGxCatalogUI)
-    {
-        m_pImageListLarge = pGxCatalogUI->GetPendingImageList(true);
-        m_pImageListSmall = pGxCatalogUI->GetPendingImageList(false);
-    }
-    // start update thread
-	m_pThread = new wxPendingUpdateThread(this);
-	if(!CreateAndRunThread(m_pThread, wxT("wxPendingUpdateThread"), wxT("PendingUpdate")))
-		return false;
-	return true;
-}
-
-void wxGxPendingUI::Detach(void)
-{
-    // stop update thread
-	OnStopPending();
-    IGxObject::Detach();
-}
-
-void wxGxPendingUI::OnStopPending(void)
-{
-    if(m_pThread)
-        m_pThread->Delete();
-	m_pThread = NULL;
-}
-*/
 wxIcon wxGxPendingUI::GetLargeImage(void)
 {
     if(m_pImageListLarge)
@@ -90,19 +59,11 @@ wxIcon wxGxPendingUI::GetSmallImage(void)
 
 void wxGxPendingUI::OnTimer( wxTimerEvent& event )
 {
+    m_sName = wxString(_("Waiting...")) + wxString::Format(_(" (%d sec)"), m_sw.Time() / 1000); //sec.
+
     m_nCurrentImage++;
     if(m_nCurrentImage >= m_pImageListSmall->GetImageCount())
         m_nCurrentImage = 0;
     wxGIS_GXCATALOG_EVENT(ObjectChanged);
 }
 
-/*
-void wxGxPendingUI::OnUpdate(void)
-{
-    m_nCurrentImage++;
-    if(m_nCurrentImage >= m_pImageListSmall->GetImageCount())
-        m_nCurrentImage = 0;
-    if(m_pCatalog)
-        m_pCatalog->ObjectChanged(GetID());
-}
-*/

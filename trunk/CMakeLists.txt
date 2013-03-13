@@ -39,9 +39,12 @@ string(REGEX MATCH "wxGIS_RELEASE_NUMBER[ \t]+([0-9]+)"
 string (REGEX MATCH "([0-9]+)"
   wxGIS_RELEASE_NUMBER ${wxGIS_RELEASE_NUMBER})
 
+# set path to additional CMake modules
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+
 # uninstall target
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
     IMMEDIATE @ONLY)
     
@@ -56,9 +59,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(WXGIS_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(WXGIS_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
-
-# set path to additional CMake modules
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 # For windows, do not allow the compiler to use default target (Vista).
 if(WIN32)
@@ -203,6 +203,17 @@ if(wxGIS_BUILD_GEOPROCESSING)
     set(wxGIS_HAVE_GEOPROCESSING ON)
     mark_as_advanced(wxGIS_HAVE_GEOPROCESSING)
 endif(wxGIS_BUILD_GEOPROCESSING)
+
+CMAKE_DEPENDENT_OPTION(wxGIS_BUILD_GEOPROCESSINGUI "Set ON to build geoprocessing UI" ON "wxGIS_BUILD_DESKTOP" ON)
+if(wxGIS_BUILD_GEOPROCESSINGUI)
+    #geoprocessingui
+    set(WXGISGEOPROCESSINGUI_LIB_NAME "")
+    mark_as_advanced(WXGISGEOPROCESSINGUI_LIB_NAME)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/geoprocessingui/)
+    
+    set(wxGIS_HAVE_GEOPROCESSINGUI ON)
+    mark_as_advanced(wxGIS_HAVE_GEOPROCESSINGUI)
+endif(wxGIS_BUILD_GEOPROCESSINGUI)
     
 #option(wxGIS_HAVE_SERVER "Set ON to build server version" ON)
 #if(wxGIS_CATALOG AND wxGIS_HAVE_SERVER)

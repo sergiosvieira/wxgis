@@ -39,4 +39,6 @@ public:
     virtual wxString GetName(void) const {return wxString(_("Shapefiles"));};
     //wxGxShapeFactory
     virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumDatasetType type);
+protected:
+    bool m_bHasDriver;
 };

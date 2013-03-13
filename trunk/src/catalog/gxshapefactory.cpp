@@ -33,6 +33,7 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxShapeFactory, wxGxObjectFactory)
 
 wxGxShapeFactory::wxGxShapeFactory(void)
 {
+    m_bHasDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName("ESRI Shapefile");
 }
 
 wxGxShapeFactory::~wxGxShapeFactory(void)
@@ -62,7 +63,7 @@ bool wxGxShapeFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxAr
             //szPath = (char*)CPLResetExtension(pFileNames[i], "prj");
             //if(CPLCheckForFile((char*)szPath.c_str(), NULL))
             //    bHasPrj = true;
-            if(bHasDbf && OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName("ESRI Shapefile"))
+            if(bHasDbf && m_bHasDriver)
             {
                 pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], enumGISFeatureDataset);
                 pChildrenIds.Add(pGxObj->GetId());
@@ -81,7 +82,7 @@ bool wxGxShapeFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxAr
                 if(CPLCheckForFile((char*)szPath.c_str(), NULL))
                     bHasShp = true;
             }
-            if(!bHasShp && OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName("ESRI Shapefile"))
+            if(!bHasShp && m_bHasDriver)
             {
                 pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], enumGISTableDataset);
                 pChildrenIds.Add(pGxObj->GetId());

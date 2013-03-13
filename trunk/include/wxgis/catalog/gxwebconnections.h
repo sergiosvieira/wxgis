@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDBConnections class.
+ * Purpose:  wxGxWebConnections class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,40 +20,38 @@
  ****************************************************************************/
 #pragma once
 
+
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/catalog/gxfolder.h"
 
-/** \class wxGxDBConnections gxdbconnections.h
-    \brief The database connections root item.
+/** \class wxGxWebConnections gxwebconnections.h
+    \brief The web services connections root item.
 
-	This root item can held connections (*.xconn) and folders items
+	This root item can held connections (*.wconn) and folders items
 */
-/*
-class WXDLLIMPEXP_GIS_CLT wxGxDBConnections :
+
+class WXDLLIMPEXP_GIS_CLT wxGxWebConnections :
 	public wxGxFolder,
-    public IGxRootObjectProperties,
-    public wxObject
+    public IGxRootObjectProperties
 {
-   DECLARE_DYNAMIC_CLASS(wxGxDBConnections)
+   DECLARE_DYNAMIC_CLASS(wxGxWebConnections)
 public:
-	wxGxDBConnections(void);//wxString Path, wxString Name, bool bShowHidden
-	virtual ~wxGxDBConnections(void);
-	//IGxObject
-	virtual wxString GetName(void){return wxString(_("DataBase connections"));};
-    virtual wxString GetBaseName(void){return GetName();};
-	virtual CPLString GetInternalName(void){return m_sPath;};
-	virtual wxString GetCategory(void){return wxString(_("DataBase connections Folder"));};
+	wxGxWebConnections(void);
+	virtual ~wxGxWebConnections(void);
+	//wxGxObject
+    virtual bool Create(wxGxObject *oParent = NULL, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
+	virtual wxString GetCategory(void) const {return wxString(_("Web services folder"));};
+	//wxGxObjectContainer
+    virtual bool CanCreate(long nDataType, long DataSubtype);     
+    //wxGxObjectContainer
+    virtual bool AreChildrenViewable(void) const {return true;};
     //IGxRootObjectProperties
     virtual void Init(wxXmlNode* const pConfigNode);
-    virtual void Serialize(wxXmlNode* pConfigNode);
-	//IGxObjectEdit
-	virtual bool Delete(void){return false;};
-	virtual bool CanDelete(void){return false;};
-	virtual bool Rename(wxString NewName){return false;};
-	virtual bool CanRename(void){return false;};
-	//IGxObjectContainer
-    virtual bool CanCreate(long nDataType, long DataSubtype); 
+    virtual void Serialize(wxXmlNode* const pConfigNode);
+//protected:
+//    virtual void LoadChildren(void);
 protected:
-	wxString m_sInternalPath;
+    wxString m_sInternalPath;
 };
-*/
+
+

@@ -35,7 +35,6 @@ IMPLEMENT_CLASS(wxGxRemoteConnection, wxGxObjectContainer)
 
 wxGxRemoteConnection::wxGxRemoteConnection(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxObjectContainer(oParent, soName, soPath)
 {
-	m_bIsChildrenLoaded = false;
     m_pwxGISDataset = NULL;
 }
 
@@ -168,11 +167,18 @@ bool wxGxRemoteConnection::Move(const CPLString &szDestPath, ITrackCancel* const
 
 bool wxGxRemoteConnection::Connect(void)
 {
+    if(IsConnected())
+        return true;
     bool bRes = true;
-    wxGISDataset* pDSet = GetDatasetFast();
-    if(pDSet && !pDSet->IsOpened())
+    wxGISPostgresDataSource* pDSet = wxDynamicCast(GetDatasetFast(), wxGISPostgresDataSource);
+    if(pDSet)
     {
-        //bRes = Open
+        bRes = pDSet->Open();
+        if(!bRes)
+            return bRes;
+
+        LoadChildren();
+
         wxGIS_GXCATALOG_EVENT(ObjectChanged);
     }
     wsDELETE(pDSet);
@@ -181,38 +187,79 @@ bool wxGxRemoteConnection::Connect(void)
 
 bool wxGxRemoteConnection::Disconnect(void)
 {
+    if(!IsConnected())
+        return true;
     wxGISDataset* pDSet = GetDatasetFast();
-    if(pDSet && pDSet->IsOpened())
+    if(pDSet)
     {
         pDSet->Close();
+        DestroyChildren();
         wxGIS_GXCATALOG_EVENT(ObjectChanged);
-
     }
     wsDELETE(pDSet);
     return true;
 }
 
-/*
-
-void wxGxRemoteConnection::EmptyChildren(void)
+bool wxGxRemoteConnection::IsConnected()
 {
-	for(size_t i = 0; i < m_Children.size(); ++i)
-	{
-		m_Children[i]->Detach();
-		wxDELETE( m_Children[i] );
-	}
-    m_Children.clear();
-	m_bIsChildrenLoaded = false;
+    wxGISDataset* pDSet = GetDatasetFast();
+    return pDSet && pDSet->IsOpened();
 }
+
+void wxGxRemoteConnection::Refresh(void)
+{
+    DestroyChildren();
+    LoadChildren();
+    wxGxObject::Refresh();
+}
+
 
 void wxGxRemoteConnection::LoadChildren(void)
 {
-	if(m_bIsChildrenLoaded)
-		return;
+    wxGISPostgresDataSource* pDSet = wxDynamicCast(GetDatasetFast(), wxGISPostgresDataSource);
+    wxGISTable* pInfoScheme = wxDynamicCast(pDSet->ExecuteSQL(wxT("SELECT table_schema, table_name from information_schema.tables WHERE table_schema NOT LIKE 'pg_%' AND table_schema NOT LIKE 'information_schema'")), wxGISTable);//maybe more columns
 
-	if(m_pwxGISDataset == NULL || m_pwxGISRemoteConn == NULL)
-		return;
+    //create arraystring of table names for each scheme
+    std::map<wxString, wxArrayString> DBSchema;
 
+    wxFeatureCursor Cursor = pInfoScheme->Search();
+    wxGISFeature Feature;
+    wxArrayString saGeomCol, saGeogCol; 
+    while( (Feature = Cursor.Next()).IsOk() )
+    {
+        wxString sScheme = Feature.GetFieldAsString(0);
+        wxString sTable = Feature.GetFieldAsString(0);
+        if(sTable.IsSameAs("geometry_columns", false))
+        {
+            saGeomCol.Add(sScheme + wxT(".") + sTable);
+        }
+        else if(sTable.IsSameAs("geography_columns", false))
+        {
+            saGeogCol.Add(sScheme + wxT(".") + sTable);
+        }
+        else
+        {
+            DBSchema[sScheme].Add(sTable);
+        }
+    }
+
+    wxDELETE(pInfoScheme);
+
+
+
+        ////get all schemes
+        //SELECT * from information_schema.tables WHERE table_schema NOT LIKE 'pg_%' AND table_schema NOT LIKE 'information_schema';
+
+        ////get geometry tables names and schemes
+        //select * from geography_columns;
+        //select * from public.geometry_columns;
+        ////get inherits
+        //
+        //wxGISDataset* pGeoMetaData = pDSet->ExecuteSQL(wxT("SELECT f_table_schema,f_table_name from geography_columns"));
+ 
+        //SELECT * FROM pg_class WHERE relname LIKE '%_columns';
+
+/*
     OGRPGDataSource* pDS = dynamic_cast<OGRPGDataSource*>(m_pwxGISRemoteConn->GetDataSource());
     Oid nGeogOID = pDS->GetGeographyOID();
     Oid nGeomOID = pDS->GetGeometryOID();
@@ -313,11 +360,10 @@ void wxGxRemoteConnection::LoadChildren(void)
   //      bool ret_code = AddChild(static_cast<IGxObject*>(itr->second));
 		//if(!ret_code)
   //          wxDELETE(itr->second);
-  //  }
-
-	m_bIsChildrenLoaded = true;
+  //  }*/
 }
 
+/*
 wxGxRemoteDBSchema* wxGxRemoteConnection::GetNewRemoteDBSchema(const CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon)
 {
     return new wxGxRemoteDBSchema(wxString(szName, wxConvUTF8), pwxGISRemoteCon);
