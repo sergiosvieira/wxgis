@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDBConnectionFactoryUI class.
+ * Purpose:  wxGxWebConnectionFactoryUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,26 +21,24 @@
 #pragma once
 
 #include "wxgis/catalogui/catalogui.h"
-#include "wxgis/catalog/gxdbconnfactory.h"
+#include "wxgis/catalog/gxwebconnfactory.h"
 
-/** \class wxGxDBConnectionFactoryUI gxdbconnfactoryui.h
-    \brief A DataBase connection (*.xconn) GxObjectUI factory.
+/** \class wxGxWebConnectionFactoryUI gxwebconnfactoryui.h
+    \brief A Web service connection (*.wconn) GxObjectUI factory.
 */
-/*
-class wxGxDBConnectionFactoryUI :
-	public wxGxDBConnectionFactory
+
+class wxGxWebConnectionFactoryUI :
+	public wxGxWebConnectionFactory
 {
-	DECLARE_DYNAMIC_CLASS(wxGxDBConnectionFactoryUI)
+	DECLARE_DYNAMIC_CLASS(wxGxWebConnectionFactoryUI)
 public:
-	wxGxDBConnectionFactoryUI(void);
-	virtual ~wxGxDBConnectionFactoryUI(void);
+	wxGxWebConnectionFactoryUI(void);
+	virtual ~wxGxWebConnectionFactoryUI(void);
 	//wxGxDBConnectionFactory
-    virtual IGxObject* GetGxDataset(CPLString path, wxString name);
+    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath);
 protected:
     wxIcon m_LargeIconConn, m_SmallIconConn;
     wxIcon m_LargeIconDisconn, m_SmallIconDisconn;
     wxIcon m_LargeIconFeatureClass, m_SmallIconFeatureClass;
     wxIcon m_LargeIconTable, m_SmallIconTable;
 };
-*/
-

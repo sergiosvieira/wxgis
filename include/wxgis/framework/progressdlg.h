@@ -3,7 +3,7 @@
  * Purpose:  wxGISProgressDlg class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011, 2012 Bishop
+*   Copyright (C) 2009,2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ public:
 	wxGISProgressDlg( const wxString &title, const wxString &message, int  maximum = 100, wxWindow *  parent = NULL, int style = wxPD_AUTO_HIDE|wxPD_APP_MODAL );
 	virtual ~wxGISProgressDlg(void);
 	//IProgressor
-    virtual bool Show(bool bShow);
+    virtual bool ShowProgress(bool);
     virtual void SetRange(int range);
     virtual int GetRange(void) const ;
     virtual void SetValue(int value);

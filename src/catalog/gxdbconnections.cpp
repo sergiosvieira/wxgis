@@ -78,7 +78,7 @@ bool wxGxDBConnections::CanCreate(long nDataType, long DataSubtype)
 {
 	if(nDataType != enumGISContainer)
 		return false;
-	if(DataSubtype != enumContFolder && DataSubtype != enumContRemoteConnection)
+	if(DataSubtype != enumContFolder && DataSubtype != enumContRemoteDBConnection)
 		return false;
 	return wxGxFolder::CanCreate(nDataType, DataSubtype);
 }

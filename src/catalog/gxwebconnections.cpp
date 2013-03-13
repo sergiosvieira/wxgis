@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxDBConnections class.
+ * Purpose:  wxGxWebConnections class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,23 +19,35 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#include "wxgis/catalog/gxdbconnections.h"
+#include "wxgis/catalog/gxwebconnections.h"
 #include "wxgis/core/config.h"
-/*
-/////////////////////////////////////////////////////////////////////////
-// wxGxDBConnections
-/////////////////////////////////////////////////////////////////////////
-IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnections, wxObject)
+#include "wxgis/datasource/datasource.h"
 
-wxGxDBConnections::wxGxDBConnections(void) : wxGxFolder(CPLString(), GetName())
+//---------------------------------------------------------------------------
+// wxGxWebConnections
+//---------------------------------------------------------------------------
+
+IMPLEMENT_DYNAMIC_CLASS(wxGxWebConnections, wxGxFolder)
+
+wxGxWebConnections::wxGxWebConnections(void) : wxGxFolder()
 {
 }
 
-wxGxDBConnections::~wxGxDBConnections(void)
+bool wxGxWebConnections::Create(wxGxObject *oParent, const wxString &soName, const CPLString &soPath)
+{
+    if( !wxGxFolder::Create(oParent, _("Web service connections"), soPath) )
+    {
+        wxLogError(_("wxGxWebConnections::Create failed. GxObject %s"), wxString(_("Web service connections")).c_str());
+        return false;
+    }
+    return true;
+}
+
+wxGxWebConnections::~wxGxWebConnections(void)
 {
 }
 
-void wxGxDBConnections::Init(wxXmlNode* const pConfigNode)
+void wxGxWebConnections::Init(wxXmlNode* const pConfigNode)
 {
     m_sInternalPath = pConfigNode->GetAttribute(wxT("path"), NON);
     if(m_sInternalPath.IsEmpty() || m_sInternalPath == wxString(NON))
@@ -44,12 +56,12 @@ void wxGxDBConnections::Init(wxXmlNode* const pConfigNode)
 		if(!oConfig.IsOk())
 			return;
 
-		m_sInternalPath = oConfig.GetLocalConfigDir() + wxFileName::GetPathSeparator() + wxString(wxT("dbconnections"));
+		m_sInternalPath = oConfig.GetLocalConfigDir() + wxFileName::GetPathSeparator() + wxString(wxT("webconnections"));
     }
 
     m_sInternalPath.Replace(wxT("\\"), wxT("/"));
-    wxLogMessage(_("wxGxDBConnections: The path is set to '%s'"), m_sInternalPath.c_str());
-    CPLSetConfigOption("wxGxDBConnections", m_sInternalPath.mb_str(wxConvUTF8));
+    wxLogMessage(_("wxGxWebConnections: The path is set to '%s'"), m_sInternalPath.c_str());
+    CPLSetConfigOption("wxGxWebConnections", m_sInternalPath.mb_str(wxConvUTF8));
 
     m_sPath = CPLString(m_sInternalPath.mb_str(wxConvUTF8));
 
@@ -57,17 +69,16 @@ void wxGxDBConnections::Init(wxXmlNode* const pConfigNode)
 		wxFileName::Mkdir(m_sInternalPath, 0755, wxPATH_MKDIR_FULL);
 }
 
-void wxGxDBConnections::Serialize(wxXmlNode* pConfigNode)
+void wxGxWebConnections::Serialize(wxXmlNode* pConfigNode)
 {
     pConfigNode->AddAttribute(wxT("path"), m_sInternalPath);
 }
 
-bool wxGxDBConnections::CanCreate(long nDataType, long DataSubtype)
+bool wxGxWebConnections::CanCreate(long nDataType, long DataSubtype)
 {
 	if(nDataType != enumGISContainer)
 		return false;
-	if(DataSubtype != enumContFolder && DataSubtype != enumContRemoteConnection)
+	if(DataSubtype != enumContFolder && DataSubtype != enumContWebServiceConnection)
 		return false;
-	return wxIsWritable(wxString(m_sPath, wxConvUTF8));
+	return wxGxFolder::CanCreate(nDataType, DataSubtype);
 }
-*/

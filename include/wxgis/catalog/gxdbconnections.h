@@ -39,7 +39,7 @@ public:
 	virtual ~wxGxDBConnections(void);
 	//wxGxObject
     virtual bool Create(wxGxObject *oParent = NULL, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
-	virtual wxString GetCategory(void) const {return wxString(_("Database connections Folder"));};
+	virtual wxString GetCategory(void) const {return wxString(_("Database connections folder"));};
 	//wxGxObjectContainer
     virtual bool CanCreate(long nDataType, long DataSubtype);     
     //wxGxObjectContainer

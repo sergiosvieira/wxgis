@@ -40,7 +40,7 @@ wxGISPostgresDataSource::wxGISPostgresDataSource(const wxString &sName, const wx
     m_bPathPresent = false;
 	m_bIsOpened = false;
 	m_nType = enumGISContainer;
-	m_nSubType = enumContRemoteConnection;
+	m_nSubType = enumContRemoteDBConnection;
     m_sName = sName;
     m_sPass = sPass;
     m_sPort = sPort;
@@ -56,7 +56,7 @@ wxGISPostgresDataSource::wxGISPostgresDataSource(const CPLString &szPath) : wxGI
     m_bPathPresent = true;
 	m_bIsOpened = false;
 	m_nType = enumGISContainer;
-	m_nSubType = enumContRemoteConnection;
+	m_nSubType = enumContRemoteDBConnection;
 
 	wxXmlDocument doc(wxString(szPath,  wxConvUTF8));
 	if(doc.IsOk())

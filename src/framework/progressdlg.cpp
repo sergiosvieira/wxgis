@@ -3,7 +3,7 @@
  * Purpose:  wxGISProgressDlg class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011, 2012 Bishop
+*   Copyright (C) 2009,2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ wxGISProgressDlg::~wxGISProgressDlg(void)
 {
 }
 
-bool wxGISProgressDlg::Show(bool bShow)
+bool wxGISProgressDlg::ShowProgress(bool bShow)
 {
 	return wxProgressDialog::Show(bShow);
 }

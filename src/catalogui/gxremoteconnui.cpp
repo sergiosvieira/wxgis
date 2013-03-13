@@ -22,8 +22,7 @@
 #include "wxgis/catalogui/gxremoteconnui.h"
 #include "wxgis/catalogui/remoteconndlg.h"
 #include "wxgis/catalogui/gxpostgisdatasetui.h"
-#include "wxgis/catalog/gxcatalog.h"
-
+#include "wxgis/catalogui/gxcatalogui.h"
 
 #include "../../art/pg_vec_16.xpm"
 #include "../../art/pg_vec_48.xpm"
@@ -42,6 +41,8 @@ wxGxRemoteConnectionUI::wxGxRemoteConnectionUI(wxGxObject *oParent, const wxStri
     m_oSmallIconConn = SmallIconConn;
     m_oLargeIconDisconn = LargeIconDisconn;
     m_oSmallIconDisconn = SmallIconDisconn;
+
+    m_PendingId = wxNOT_FOUND;
 }
 
 wxGxRemoteConnectionUI::~wxGxRemoteConnectionUI(void)
@@ -70,14 +71,6 @@ void wxGxRemoteConnectionUI::EditProperties(wxWindow *parent)
 	if(dlg.ShowModal() == wxID_OK)
 	{
         Disconnect();
-        //if(m_pwxGISDataset && m_pwxGISDataset->IsOpened())
-        //{
-        //    EmptyChildren();
-        //    m_pwxGISDataset->Close();
-        //    m_pwxGISDataset.reset();
-        //    wxGIS_GXCATALOG_EVENT(ObjectRefreshed);
-        //    //GetDataset(false);
-        //}
 	}
 }
 
@@ -92,6 +85,55 @@ bool wxGxRemoteConnectionUI::Invoke(wxWindow* pParentWnd)
 	}
 
     return true;
+}
+
+bool wxGxRemoteConnectionUI::Connect(void)
+{
+    if(IsConnected())
+        return true;
+    bool bRes = true;
+    wxGISPostgresDataSource* pDSet = wxDynamicCast(GetDatasetFast(), wxGISPostgresDataSource);
+    if(pDSet)
+    {
+        bRes = pDSet->Open();
+        if(!bRes)
+            return bRes;
+        //add pending item
+        wxGxCatalogUI* pCat = wxDynamicCast(GetGxCatalog(), wxGxCatalogUI);
+        if(pCat)
+            m_PendingId = pCat->AddPending(GetId());
+
+        //start thread to load schemes
+    }
+    wsDELETE(pDSet);
+    return bRes;
+}
+
+bool wxGxRemoteConnectionUI::CreateAndRunCheckThread(void)
+{
+    if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
+    {
+        wxLogError(_("Could not create the load thread!"));
+        return false;
+    }
+
+    if (GetThread()->Run() != wxTHREAD_NO_ERROR)
+    {
+        wxLogError(_("Could not run the load thread!"));
+        return false;
+    }
+    return true;
+}
+
+//thread to load remote DB tables
+//before exit we assume that no tables exist
+wxThread::ExitCode wxGxRemoteConnectionUI::Entry()
+{
+    LoadChildren();
+
+    wxGIS_GXCATALOG_EVENT(ObjectChanged);
+
+    return (wxThread::ExitCode)0;
 }
 
 /*

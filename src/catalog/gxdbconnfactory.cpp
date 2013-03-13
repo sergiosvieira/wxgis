@@ -32,6 +32,7 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionFactory, wxGxObjectFactory)
 
 wxGxDBConnectionFactory::wxGxDBConnectionFactory(void)
 {
+    m_bHasDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName("PostgreSQL") || GDALGetDriverByName("PostGISRaster");
 }
 
 wxGxDBConnectionFactory::~wxGxDBConnectionFactory(void)
@@ -46,9 +47,12 @@ bool wxGxDBConnectionFactory::GetChildren(wxGxObject* pParent, char** &pFileName
         CPLString szExt = CPLGetExtension(pFileNames[i]);
 		if(wxGISEQUAL(szExt, "xconn"))
 		{
-			wxGxObject* pObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i]); 
-            if(pObj)
-                pChildrenIds.Add(pObj->GetId());
+            if( m_bHasDriver )
+            {
+    			wxGxObject* pObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i]); 
+                if(pObj)
+                    pChildrenIds.Add(pObj->GetId());
+            }
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 		}
     }

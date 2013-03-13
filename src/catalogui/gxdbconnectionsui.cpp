@@ -31,9 +31,7 @@
 IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionsUI, wxGxDBConnections)
 
 wxGxDBConnectionsUI::wxGxDBConnectionsUI(void) : wxGxDBConnections()
-{
-    m_LargeIcon = wxIcon(db_connections_48_xpm);
-    m_SmallIcon = wxIcon(db_connections_16_xpm);
+{    
 }
 
 wxGxDBConnectionsUI::~wxGxDBConnectionsUI(void)
@@ -42,11 +40,15 @@ wxGxDBConnectionsUI::~wxGxDBConnectionsUI(void)
 
 wxIcon wxGxDBConnectionsUI::GetLargeImage(void)
 {
-	return m_LargeIcon;
+    if(!m_LargeIcon.IsOk())
+        m_LargeIcon = wxIcon(db_connections_48_xpm);
+    return m_LargeIcon;
 }
 
 wxIcon wxGxDBConnectionsUI::GetSmallImage(void)
 {
+    if(!m_SmallIcon.IsOk())
+        m_SmallIcon = wxIcon(db_connections_16_xpm);
 	return m_SmallIcon;
 }
 

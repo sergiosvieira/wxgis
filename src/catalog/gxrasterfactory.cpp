@@ -34,26 +34,34 @@ typedef struct _rformat
     const char* sExt;
     wxGISEnumRasterDatasetType eType;
     const char* sDriverName;
+    bool bAvailable;
 } RFORMAT;
 
-static const RFORMAT raster_exts[] = {
-    { "bmp",    enumRasterBmp,  "BMP"   },
-    { "jpg",    enumRasterJpeg, "JPEG"  },
-    { "jpeg",   enumRasterJpeg, "JPEG"  },
-    { "img",    enumRasterImg,  "HFA"   },
-    { "gif",    enumRasterGif,  "GIF"   },
-    { "sdat",   enumRasterSAGA, "SAGA"  },
-    { "tif",    enumRasterTiff, "GTiff" },
-    { "tiff",   enumRasterTiff, "GTiff" },
-    { "png",    enumRasterPng,  "PNG"   },
-    { "til",    enumRasterTil,  "TIL"   },
-    { "vrt",    enumRasterVRT,  "VRT"   }
+static RFORMAT raster_exts[] = {
+    { "bmp",    enumRasterBmp,  "BMP",    false},
+    { "jpg",    enumRasterJpeg, "JPEG",   false},
+    { "jpeg",   enumRasterJpeg, "JPEG",   false},
+    { "img",    enumRasterImg,  "HFA",    false},
+    { "gif",    enumRasterGif,  "GIF",    false},
+    { "sdat",   enumRasterSAGA, "SAGA",   false},
+    { "tif",    enumRasterTiff, "GTiff",  false},
+    { "tiff",   enumRasterTiff, "GTiff",  false},
+    { "png",    enumRasterPng,  "PNG",    false},
+    { "til",    enumRasterTil,  "TIL",    false},
+    { "vrt",    enumRasterVRT,  "VRT",    false}
 };
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxRasterFactory, wxGxObjectFactory)
 
 wxGxRasterFactory::wxGxRasterFactory(void)
 {
+    for(int j = 0; j < sizeof(raster_exts) / sizeof(raster_exts[0]); ++j)
+    {
+        if(GDALGetDriverByName(raster_exts[j].sDriverName))
+        {
+            raster_exts[j].bAvailable = true;
+        }
+    }
 }
 
 wxGxRasterFactory::~wxGxRasterFactory(void)
@@ -72,12 +80,15 @@ bool wxGxRasterFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxA
         unsigned int j;
         for(j = 0; j < sizeof(raster_exts) / sizeof(raster_exts[0]); ++j)
         {
-            if(wxGISEQUAL(szExt, raster_exts[j].sExt) && GDALGetDriverByName(raster_exts[j].sDriverName))
+            if(wxGISEQUAL(szExt, raster_exts[j].sExt) )
 		    {
-                pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], raster_exts[j].eType);
+                if(raster_exts[j].bAvailable)
+                {
+                    pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], raster_exts[j].eType);
+                    if(pGxObj != NULL)
+                        pChildrenIds.Add(pGxObj->GetId());
+                }
                 pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-                if(pGxObj != NULL)
-                    pChildrenIds.Add(pGxObj->GetId());
                 bContinue = true;
                 break;
 		    }

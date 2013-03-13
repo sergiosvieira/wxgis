@@ -50,9 +50,11 @@ public:
 	virtual ~wxGxRemoteConnection(void);
 	//wxGxObject
 	virtual wxString GetCategory(void) const {return wxString(_("Database Connection"));};
+    virtual void Refresh(void);
     //IGxRemoteConnection
 	virtual bool Connect(void);
 	virtual bool Disconnect(void);
+    virtual bool IsConnected(void);
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
@@ -67,15 +69,13 @@ public:
 	virtual bool HasChildren(void);
 protected:
 	//wxGxRemoteConnection
-	//virtual void LoadChildren(void);
-	//virtual void EmptyChildren(void);
+	virtual void LoadChildren(void);
 //    virtual wxGxRemoteDBSchema* GetNewRemoteDBSchema(const CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon);
     //create wxGISDataset without openning it
     virtual wxGISDataset* const GetDatasetFast(void);
 protected:
- //   wxGISPostgresDataSourceSPtr m_pwxGISRemoteConn;
     wxGISDataset* m_pwxGISDataset;
-    bool m_bIsChildrenLoaded;
+    bool m_bIsConnected;
 };
 
 /** \class wxGxRemoteDBSchema gxremoteconn.h
