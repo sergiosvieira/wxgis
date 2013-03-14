@@ -61,7 +61,12 @@ bool wxGxDBConnectionFactory::GetChildren(wxGxObject* pParent, char** &pFileName
 
 wxGxObject* wxGxDBConnectionFactory::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath)
 {
+    //TODO: other DB like MySQL my have different ifdefs
+#ifdef wxGIS_USE_POSTGRES
 	wxGxRemoteConnection* pDataset = new wxGxRemoteConnection(pParent, soName, szPath);
 	return static_cast<wxGxObject*>(pDataset);
+#else
+    return NULL;
+#endif //wxGIS_USE_POSTGRES
 }
 
