@@ -20,6 +20,9 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxremoteconnui.h"
+
+#ifdef wxGIS_USE_POSTGRES
+
 #include "wxgis/catalogui/remoteconndlg.h"
 #include "wxgis/catalogui/gxpostgisdatasetui.h"
 #include "wxgis/catalogui/gxcatalogui.h"
@@ -135,6 +138,8 @@ wxThread::ExitCode wxGxRemoteConnectionUI::Entry()
 
     return (wxThread::ExitCode)0;
 }
+
+#endif //wxGIS_USE_POSTGRES
 
 /*
 wxGxRemoteDBSchema* wxGxRemoteConnectionUI::GetNewRemoteDBSchema(const CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon)

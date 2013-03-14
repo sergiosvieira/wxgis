@@ -46,6 +46,11 @@ wxGxDBConnectionFactoryUI::~wxGxDBConnectionFactoryUI(void)
 
 wxGxObject* wxGxDBConnectionFactoryUI::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath)
 {
+    //TODO: other DB like MySQL my have different ifdefs
+#ifdef wxGIS_USE_POSTGRES
 	wxGxRemoteConnectionUI* pDataset = new wxGxRemoteConnectionUI(pParent, soName, szPath, m_LargeIconConn, m_SmallIconConn, m_LargeIconDisconn, m_SmallIconDisconn);
 	return static_cast<wxGxObject*>(pDataset);
+#else
+    return NULL;
+#endif //wxGIS_USE_POSTGRES
 }

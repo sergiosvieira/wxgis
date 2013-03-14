@@ -23,6 +23,8 @@
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalog/gxremoteconn.h"
 
+#ifdef wxGIS_USE_POSTGRES
+
 /** \class wxGxRemoteConnectionUI gxfileui.h
     \brief A Remote Connection GxObjectUI.
 */
@@ -61,6 +63,8 @@ protected:
     wxIcon m_oLargeIconSchema, m_oSmallIconSchema;
     long m_PendingId;
 };
+
+#endif // wxGIS_USE_POSTGRES
 
 /** \class wxGxRemoteDBSchemaUI gxfileui.h
     \brief A Remote Database schema GxObjectUI.
