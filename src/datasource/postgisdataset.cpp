@@ -145,6 +145,46 @@ wxString wxGISPostgresDataSource::GetName(void) const
     return m_sDBName;
 }
 
+//wxGISDataset* wxGISPostgresDataSource::PGExecuteSQL( const wxString &sStatement, bool bMultipleCommandAllowed )
+//{
+//    OGRPGDataSource* pDS = dynamic_cast<OGRPGDataSource*>(m_poDS);
+//    if(!pDS)
+//        return NULL;
+//
+//    CPLErrorReset();
+//    PGconn* hPGConn = pDS->GetPGConn();
+//
+//    PGresult    *hResult;        
+//
+//    wxString sCursorName = wxString::Format(wxT("cur_%d"), wxNewId());
+//    wxString sFullSQLCommand = wxString::Format(wxT("DECLARE %s CURSOR FOR %s"), sCursorName.c_str(), sStatement.c_str());
+//
+//    hResult =  OGRPG_PQexec( hPGConn, sFullSQLCommand.mb_str(wxConvUTF8), bMultipleCommandAllowed );
+//    if(hResult && PQresultStatus(hResult) == PGRES_COMMAND_OK)
+//    {
+//        OGRPGClearResult( hResult );
+//
+//        sFullSQLCommand = wxString::Format(wxT("FETCH 0 in %s"), sCursorName.c_str() );
+//        CPLString szFullSQLCommand(sFullSQLCommand.mb_str(wxConvUTF8));
+//        hResult = OGRPG_PQexec(hPGConn, szFullSQLCommand );
+//
+//        OGRPGResultLayer *poLayer = new OGRPGResultLayer( pDS, szFullSQLCommand, hResult );
+//        
+//        OGRPGClearResult( hResult );
+//
+//        m_poDS->Reference();
+//        wxGISTable* pTable = new wxGISTable(szFullSQLCommand, enumTableQueryResult, poLayer, m_poDS);
+//		pTable->SetEncoding(m_Encoding);
+//        return wxStaticCast(pTable, wxGISDataset);
+//    }
+//
+//    CPLError( CE_Failure, CPLE_AppDefined, "%s", PQerrorMessage( hPGConn ) );
+//    wxLogError(wxT("wxGISPostgresDataSource: %s"), PQerrorMessage( hPGConn ));
+//     
+//    OGRPGClearResult( hResult );
+//    return NULL;
+//}
+
 bool wxGISPostgresDataSource::PGExecuteSQL(const wxString &sStatement)
 {
     OGRPGDataSource* pDS = dynamic_cast<OGRPGDataSource*>(m_poDS);
@@ -155,7 +195,7 @@ bool wxGISPostgresDataSource::PGExecuteSQL(const wxString &sStatement)
     PGconn* hPGConn = pDS->GetPGConn();
 
     PGresult    *hResult;           
-    hResult =  OGRPG_PQexec( hPGConn, sStatement.mb_str(), TRUE );
+    hResult =  OGRPG_PQexec( hPGConn, sStatement.mb_str(wxConvUTF8), TRUE );
     ExecStatusType status = PQresultStatus(hResult);
     if (status == PGRES_COMMAND_OK)
     {
@@ -186,7 +226,12 @@ wxGISDataset* wxGISPostgresDataSource::ExecuteSQL(const wxString &sStatement, co
 			pTable->SetEncoding(m_Encoding);
             pDataset = static_cast<wxGISDataset*>(pTable);
 		}
-	}
+        else
+        {
+            const char* err = CPLGetLastErrorMsg();
+            wxLogError(_("ExecuteSQL failed! GDAL error: %s"), wxString(err, wxConvUTF8).c_str());
+        }
+    }
 	return pDataset;
 }
 
@@ -204,6 +249,11 @@ wxGISDataset* wxGISPostgresDataSource::ExecuteSQL(const wxGISSpatialFilter &Spat
 			pTable->SetEncoding(m_Encoding);
             pDataset = static_cast<wxGISDataset*>(pTable);
 		}
+        else
+        {
+            const char* err = CPLGetLastErrorMsg();
+            wxLogError(_("ExecuteSQL failed! GDAL error: %s"), wxString(err, wxConvUTF8).c_str());
+        }
 	}
 	return pDataset;
 }

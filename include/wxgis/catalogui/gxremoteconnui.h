@@ -36,8 +36,13 @@ class WXDLLIMPEXP_GIS_CLU wxGxRemoteConnectionUI :
     public IGxObjectWizard,
     public wxThreadHelper
 {
+    DECLARE_CLASS(wxGxRemoteConnectionUI)
+    enum
+    {
+        EXIT_EVENT = wxID_HIGHEST+1
+    };
 public:
-	wxGxRemoteConnectionUI(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", wxIcon LargeIconConn = wxNullIcon, wxIcon SmallIconConn = wxNullIcon, wxIcon LargeIconDisconn = wxNullIcon, wxIcon SmallIconDisconn = wxNullIcon);
+	wxGxRemoteConnectionUI(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon &LargeIconConn = wxNullIcon, const wxIcon &SmallIconConn = wxNullIcon, const wxIcon &LargeIconDisconn = wxNullIcon, const wxIcon &SmallIconDisconn = wxNullIcon);
 	virtual ~wxGxRemoteConnectionUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
@@ -50,10 +55,12 @@ public:
 	virtual void EditProperties(wxWindow *parent);
     //IGxObjectWizard
     virtual bool Invoke(wxWindow* pParentWnd);
+    //events
+    void OnThreadFinished(wxThreadEvent& event);
 protected:
     //wxGxRemoteConnection
-//    virtual wxGxRemoteDBSchema* GetNewRemoteDBSchema(const CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon);
-    virtual wxThread::ExitCode Entry();
+    virtual wxGxRemoteDBSchema* GetNewRemoteDBSchema(const wxString &sName, const wxArrayString &saTables, bool bHasGeom, bool bHasGeog, bool bHasRaster, wxGISPostgresDataSource *pwxGISRemoteConn);
+    virtual wxThread::ExitCode Entry();    
     bool CreateAndRunCheckThread(void);
 protected:
     wxIcon m_oLargeIconConn, m_oSmallIconConn;
@@ -62,36 +69,52 @@ protected:
     wxIcon m_oLargeIconTable, m_oSmallIconTable;
     wxIcon m_oLargeIconSchema, m_oSmallIconSchema;
     long m_PendingId;
+private:
+    DECLARE_EVENT_TABLE()
 };
-
-#endif // wxGIS_USE_POSTGRES
 
 /** \class wxGxRemoteDBSchemaUI gxfileui.h
     \brief A Remote Database schema GxObjectUI.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLU wxGxRemoteDBSchemaUI :
     public wxGxRemoteDBSchema,
 	public IGxObjectUI,
-    public IGxObjectEditUI
+    public IGxObjectEditUI,
+    public wxThreadHelper
 {
+    DECLARE_CLASS(wxGxRemoteDBSchemaUI)
+    enum
+    {
+        EXIT_EVENT = wxID_HIGHEST+1
+    };
 public:
-	wxGxRemoteDBSchemaUI(const wxString &sName, wxGISPostgresDataSourceSPtr pwxGISRemoteConn, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon, wxIcon LargeIconFeatureClass = wxNullIcon, wxIcon SmallIconFeatureClass = wxNullIcon, wxIcon LargeIconTable = wxNullIcon, wxIcon SmallIconTable = wxNullIcon);
+	wxGxRemoteDBSchemaUI(const wxArrayString &saTables, bool bHasGeom, bool bHasGeog, bool bHasRaster, wxGISPostgresDataSource* pwxGISRemoteConn, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon &LargeIcon = wxNullIcon, const wxIcon &SmallIcon = wxNullIcon, const wxIcon &LargeIconFeatureClass = wxNullIcon, const wxIcon &SmallIconFeatureClass = wxNullIcon, const wxIcon &LargeIconTable = wxNullIcon, const wxIcon &SmallIconTable = wxNullIcon);
 	virtual ~wxGxRemoteDBSchemaUI(void);
+    //wxGxObjectContainer
+    virtual bool HasChildren(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxEmptyString;};
-	virtual wxString NewMenu(void){return wxEmptyString;};
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxRemoteDBSchema.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxString(wxT("wxGxRemoteDBSchema.NewMenu"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
+    //events
+    void OnThreadFinished(wxThreadEvent& event);
 protected:
     //wxGxRemoteDBSchema
-    virtual void AddTable(CPLString &szName, CPLString &szSchema, bool bHasGeometry);
+    virtual void AddTable(const wxString &sTableName, const wxGISEnumDatasetType eType);
+    virtual wxThread::ExitCode Entry();    
+    bool CreateAndRunLoadChildrenThread(void);
 protected:
     wxIcon m_oLargeIcon, m_oSmallIcon;
     wxIcon m_oLargeIconFeatureClass, m_oSmallIconFeatureClass;
     wxIcon m_oLargeIconTable, m_oSmallIconTable;
+    long m_PendingId;
+private:
+    DECLARE_EVENT_TABLE()
 };
-*/
+
+#endif // wxGIS_USE_POSTGRES
 

@@ -3,7 +3,7 @@
  * Purpose:  GxPostGISDatasetUI classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,29 +21,30 @@
 #pragma once
 
 #include "wxgis/defs.h"
+#include "wxgis/catalogui/catalogui.h"
 
 #ifdef wxGIS_USE_POSTGRES
-/*
-#include "wxgis/catalogui/catalogui.h"
+
 #include "wxgis/catalog/gxpostgisdataset.h"
 
 /** \class wxGxPostGISTableDatasetUI gxpostgisdatasetui.h
     \brief A PostGIS Table Dataset GxObjectUI.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLU wxGxPostGISTableDatasetUI :
 	public wxGxPostGISTableDataset,
 	public IGxObjectUI,
 	public IGxObjectEditUI
 {
+    DECLARE_CLASS(wxGxPostGISTableDatasetUI)
 public:
-	wxGxPostGISTableDatasetUI(CPLString szName, CPLString szSchema, wxGISPostgresDataSourceSPtr pwxGISRemoteConn, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxPostGISTableDatasetUI(const wxString &sSchema, wxGISPostgresDataSource* pwxGISRemoteConn, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon &LargeIcon = wxNullIcon, const wxIcon &SmallIcon = wxNullIcon);
 	virtual ~wxGxPostGISTableDatasetUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxPostGISTableDataset.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxEmptyString;};
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxPostGISTableDataset.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxEmptyString;};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
 protected:
@@ -53,27 +54,27 @@ protected:
 /** \class wxGxPostGISFeatureDatasetUI gxpostgisdatasetui.h
     \brief A PostGIS Table Dataset GxObjectUI.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLU wxGxPostGISFeatureDatasetUI :
 	public wxGxPostGISFeatureDataset,
 	public IGxObjectUI,
 	public IGxObjectEditUI
 {
+    DECLARE_CLASS(wxGxPostGISFeatureDatasetUI)
 public:
-	wxGxPostGISFeatureDatasetUI(CPLString szName, CPLString szSchema, wxGISPostgresDataSourceSPtr pwxGISRemoteConn, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxPostGISFeatureDatasetUI(const wxString &sSchema, wxGISPostgresDataSource* pwxGISRemoteConn, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon &LargeIcon = wxNullIcon, const wxIcon &SmallIcon = wxNullIcon);
 	virtual ~wxGxPostGISFeatureDatasetUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxPostGISFeatureDataset.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxEmptyString;};
-	//virtual wxDataFormat GetDataFormat(void){return wxDataFormat(wxT("application/x-vnd.qgis.qgis.uri"));};
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxPostGISFeatureDataset.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxEmptyString;};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
 };
-*/
+
 #endif //wxGIS_USE_POSTGRES
 
 

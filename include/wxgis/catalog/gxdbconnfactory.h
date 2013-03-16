@@ -37,6 +37,11 @@ public:
 	virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
     virtual wxString GetName(void) const {return wxString(_("DataBase connections"));};
     virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath);
+    virtual void Serialize(wxXmlNode* const pConfig, bool bStore);
+    //wxGxDBConnectionFactory
+    virtual bool GetLoadSystemTablesAndShemes(void){return m_bLoadSystemTablesAndSchemes;};
+    virtual void SetLoadSystemTablesAndShemes(bool bLoadSystemTablesAndSchemes){m_bLoadSystemTablesAndSchemes = bLoadSystemTablesAndSchemes;};
 protected:
     bool m_bHasDriver;
+    bool m_bLoadSystemTablesAndSchemes;
 };

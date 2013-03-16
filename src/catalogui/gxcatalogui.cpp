@@ -35,8 +35,6 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxCatalogUI, wxGxCatalog);
 wxGxCatalogUI::wxGxCatalogUI(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxCatalog(oParent, soName, soPath)
 {
     m_oIcon = wxIcon(mainframecat_xpm);
-	m_ImageListSmall.Create(16, 16);
-	m_ImageListLarge.Create(48, 48);
 }
 
 wxGxCatalogUI::~wxGxCatalogUI(void)
@@ -66,22 +64,32 @@ long wxGxCatalogUI::AddPending(long nParentId)
     wxGxObjectContainer *pGxObjectContainer = wxDynamicCast(GetRegisterObject(nParentId), wxGxObjectContainer);
     wxCHECK_MSG(pGxObjectContainer, wxNOT_FOUND, wxT("The parent GxObject is not exist or not a container"));
     //if not loaded load images to list
-    if(m_ImageListSmall.GetImageCount() == 0)
-        m_ImageListSmall.Add(wxBitmap(process_working_16_xpm));
-    if(m_ImageListLarge.GetImageCount() == 0)
-        m_ImageListLarge.Add(wxBitmap(process_working_48_xpm));
+    if(m_oaPendingIconsSmall.empty())
+    {
+        wxImageList lst(16, 16);
+        lst.Add(wxBitmap(process_working_16_xpm));
+        for(size_t i = 0; i < lst.GetImageCount(); i++)
+            m_oaPendingIconsSmall.push_back(lst.GetIcon(i));
+    }
+    if(m_oaPendingIconsLarge.empty())
+    {
+        wxImageList lst(48, 48);
+        lst.Add(wxBitmap(process_working_48_xpm));
+        for(size_t i = 0; i < lst.GetImageCount(); i++)
+            m_oaPendingIconsLarge.push_back(lst.GetIcon(i));
+    }
 
-    wxGxPendingUI *pPend = new wxGxPendingUI(&m_ImageListSmall, &m_ImageListLarge, pGxObjectContainer);
+    wxGxPendingUI *pPend = new wxGxPendingUI(&m_oaPendingIconsSmall, &m_oaPendingIconsLarge, pGxObjectContainer);
     return pPend->GetId();
 }
 
 void wxGxCatalogUI::RemovePending(long nPendingId)
 {
+    if(nPendingId == wxNOT_FOUND)
+        return;
     wxGxPendingUI *pPend = wxDynamicCast(GetRegisterObject(nPendingId), wxGxPendingUI);
     wxCHECK_RET(pPend, wxT("The Pending GxObject is not exist"));
-    wxGIS_GXCATALOG_EVENT_ID(ObjectDeleted, pPend->GetId());
     pPend->Destroy();
-
 }
 
 /*

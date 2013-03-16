@@ -354,14 +354,14 @@ void wxGxContentView::AddObject(wxGxObject* const pObject)
 		return;
 
     //check doubles
-	for(long i = 0; i < GetItemCount(); ++i)
-	{
-		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
-		if(pItemData == NULL)
-			continue;
-        if(pItemData->nObjectID == pObject->GetId())
-			return;
-    }
+	//for(long i = 0; i < GetItemCount(); ++i)
+	//{
+	//	LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
+	//	if(pItemData == NULL)
+	//		continue;
+ //       if(pItemData->nObjectID == pObject->GetId())
+	//		return;
+ //   }
 
     IGxObjectUI* pObjUI =  dynamic_cast<IGxObjectUI*>(pObject);
 	wxIcon icon_small, icon_large;
@@ -400,10 +400,6 @@ void wxGxContentView::AddObject(wxGxObject* const pObject)
         }
 	}
 	SetItemPtrData(ListItemID, (wxUIntPtr) pData);
-
-    SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
-	SortItems(GxObjectCVCompareFunction, (long)&sortdata);
-	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
 
 	//wxListCtrl::Refresh();
 }
@@ -726,7 +722,7 @@ void wxGxContentView::OnObjectAdded(wxGxCatalogEvent& event)
 		    AddObject(pGxObject);
             SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
 	        SortItems(GxObjectCVCompareFunction, (long)&sortdata);
-	        //SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+	        SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
         }
     }
 }
@@ -769,6 +765,8 @@ void wxGxContentView::OnObjectChanged(wxGxCatalogEvent& event)
 		}
 	}
 
+    bool bItemsHaveChanges = false;
+
 	for(long i = 0; i < GetItemCount(); ++i)
 	{
 		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
@@ -799,6 +797,7 @@ void wxGxContentView::OnObjectChanged(wxGxCatalogEvent& event)
 
 		if(i < GetItemCount())
 		{
+            bItemsHaveChanges = true;
 			SetItem(i, 0, sName, pos);
             if(m_current_style == enumGISCVReport)
 	        {
@@ -814,9 +813,12 @@ void wxGxContentView::OnObjectChanged(wxGxCatalogEvent& event)
 		}
 	}
 
-    SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
-	SortItems(GxObjectCVCompareFunction, (long)&sortdata);
-	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+    if(bItemsHaveChanges)
+    {
+        SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
+	    SortItems(GxObjectCVCompareFunction, (long)&sortdata);
+    	SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+    }
 
 	//wxListCtrl::Refresh();
 }
