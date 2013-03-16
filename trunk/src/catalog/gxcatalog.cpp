@@ -3,7 +3,7 @@
  * Purpose:  wxGxCatalog class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2012 Bishop
+*   Copyright (C) 2009-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -35,36 +35,6 @@ wxGxCatalog::wxGxCatalog(wxGxObject *oParent, const wxString &soName, const CPLS
 
 wxGxCatalog::~wxGxCatalog(void)
 {
-    //store to config values
-	wxGISAppConfig oConfig = GetConfig();
-	if(oConfig.IsOk())
-	{
-		oConfig.Write(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/show_hidden")), m_bShowHidden);
-		oConfig.Write(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/show_ext")), m_bShowExt);
-
-		wxXmlNode* pNode = oConfig.GetConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/rootitems")));
-		if(!pNode)
-			pNode = oConfig.CreateConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/rootitems")));
-		if(pNode)
-		{
-			SerializePlugins(pNode, true);
-		}
-
-		pNode = oConfig.GetConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/objectfactories")));
-		if(!pNode)
-			pNode = oConfig.CreateConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/objectfactories")));
-		if(pNode)
-		{
-			oConfig.DeleteNodeChildren(pNode);
-			for(int i = m_ObjectFactoriesArray.size() - 1; i >= 0; --i)
-			{
-				wxXmlNode* pFactoryNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("objectfactory"));
-				m_ObjectFactoriesArray[i]->Serialize(pFactoryNode, true);
-			}
-		}
-	}
-
-	EmptyObjectFactories();
 }
 
 void wxGxCatalog::ObjectDeleted(long nObjectID)
@@ -278,6 +248,38 @@ void wxGxCatalog::EnableRootItem(size_t nItemId, bool bEnable)
 bool wxGxCatalog::Destroy(void)
 {
     m_pPointsArray.clear();
+
+    //store to config values
+	wxGISAppConfig oConfig = GetConfig();
+	if(oConfig.IsOk())
+	{
+		oConfig.Write(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/show_hidden")), m_bShowHidden);
+		oConfig.Write(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/show_ext")), m_bShowExt);
+
+		wxXmlNode* pNode = oConfig.GetConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/rootitems")));
+		if(!pNode)
+			pNode = oConfig.CreateConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/rootitems")));
+		if(pNode)
+		{
+			SerializePlugins(pNode, true);
+		}
+
+		pNode = oConfig.GetConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/objectfactories")));
+		if(!pNode)
+			pNode = oConfig.CreateConfigNode(enumGISHKCU, GetConfigName() + wxString(wxT("/catalog/objectfactories")));
+		if(pNode)
+		{
+			oConfig.DeleteNodeChildren(pNode);
+			for(int i = m_ObjectFactoriesArray.size() - 1; i >= 0; --i)
+			{
+				wxXmlNode* pFactoryNode = new wxXmlNode(pNode, wxXML_ELEMENT_NODE, wxT("objectfactory"));
+				m_ObjectFactoriesArray[i]->Serialize(pFactoryNode, true);
+			}
+		}
+	}
+
+	EmptyObjectFactories();
+
     return wxGxCatalogBase::Destroy();
 }
 
@@ -292,6 +294,28 @@ wxGxObject* const wxGxCatalog::GetRootItemByType(const wxClassInfo * info) const
     }
     return NULL;
 }
+
+wxGxObjectFactory* const wxGxCatalog::GetObjectFactoryByClassName(const wxString &sClassName)
+{
+    for(size_t i = 0; i < m_ObjectFactoriesArray.size(); ++i)
+    {
+        if(m_ObjectFactoriesArray[i]->GetClassName().IsSameAs(sClassName))
+            return m_ObjectFactoriesArray[i];
+    }
+    return NULL;
+}
+
+wxGxObjectFactory* const wxGxCatalog::GetObjectFactoryByName(const wxString &sFactoryName)
+{
+    for(size_t i = 0; i < m_ObjectFactoriesArray.size(); ++i)
+    {
+        if(m_ObjectFactoriesArray[i]->GetName().IsSameAs(sFactoryName))
+            return m_ObjectFactoriesArray[i];
+    }
+    return NULL;
+}
+
+
 
 /*
 #include "wxgis/core/globalfn.h"

@@ -3,7 +3,7 @@
  * Purpose:  GxPostGISDatasetUI classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 #include "wxgis/catalogui/gxpostgisdatasetui.h"
 
 #ifdef wxGIS_USE_POSTGRES
-/*
-#include "wxgis/framework/application.h"
+
+//#include "wxgis/framework/application.h"
 
 //propertypages
 #include "wxgis/catalogui/spatrefpropertypage.h"
@@ -33,12 +33,15 @@
 
 #include "wx/utils.h"
 #include "wx/propdlg.h"
+#include "wx/bookctrl.h"
 
 //-----------------------------------------------------------------------------
 // wxGxPostGISTableDatasetUI
 //-----------------------------------------------------------------------------
 
-wxGxPostGISTableDatasetUI::wxGxPostGISTableDatasetUI(CPLString szName, CPLString szSchema, wxGISPostgresDataSourceSPtr pwxGISRemoteConn, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxPostGISTableDataset(szName, szSchema, pwxGISRemoteConn)
+IMPLEMENT_CLASS(wxGxPostGISTableDatasetUI, wxGxPostGISTableDataset)
+
+wxGxPostGISTableDatasetUI::wxGxPostGISTableDatasetUI(const wxString &sSchema, wxGISPostgresDataSource* pwxGISRemoteConn, wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon &LargeIcon, const wxIcon &SmallIcon) : wxGxPostGISTableDataset(sSchema, pwxGISRemoteConn, oParent, soName, soPath)
 {
     m_LargeIcon = LargeIcon;
     m_SmallIcon = SmallIcon;
@@ -66,7 +69,7 @@ void wxGxPostGISTableDatasetUI::EditProperties(wxWindow *parent)
         return;
     PropertySheetDialog.SetIcon(properties_xpm);
     PropertySheetDialog.CreateButtons(wxOK);
-    wxWindow* pParentWnd = static_cast<wxWindow*>(PropertySheetDialog.GetBookCtrl());
+    wxWindow* pParentWnd = wxStaticCast(PropertySheetDialog.GetBookCtrl(), wxWindow);
 
     wxGISTablePropertyPage* TablePropertyPage = new wxGISTablePropertyPage(this, pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(TablePropertyPage, TablePropertyPage->GetPageName());
@@ -82,7 +85,9 @@ void wxGxPostGISTableDatasetUI::EditProperties(wxWindow *parent)
 // wxGxPostGISFeatureDatasetUI
 //-----------------------------------------------------------------------------
 
-wxGxPostGISFeatureDatasetUI::wxGxPostGISFeatureDatasetUI(CPLString szName, CPLString szSchema, wxGISPostgresDataSourceSPtr pwxGISRemoteConn, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxPostGISFeatureDataset(szName, szSchema, pwxGISRemoteConn)
+IMPLEMENT_CLASS(wxGxPostGISFeatureDatasetUI, wxGxPostGISFeatureDataset)
+
+wxGxPostGISFeatureDatasetUI::wxGxPostGISFeatureDatasetUI(const wxString &sSchema, wxGISPostgresDataSource* pwxGISRemoteConn, wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon &LargeIcon, const wxIcon &SmallIcon) : wxGxPostGISFeatureDataset(sSchema, pwxGISRemoteConn, oParent, soName, soPath)
 {
     m_LargeIcon = LargeIcon;
     m_SmallIcon = SmallIcon;
@@ -115,7 +120,7 @@ void wxGxPostGISFeatureDatasetUI::EditProperties(wxWindow *parent)
     wxGISVectorPropertyPage* VectorPropertyPage = new wxGISVectorPropertyPage(this, pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(VectorPropertyPage, VectorPropertyPage->GetPageName());
 
-	wxGISDatasetSPtr pDset = GetDataset();
+	wxGISDataset* pDset = GetDataset();
 	if(pDset)
 	{
 		wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(pDset->GetSpatialReference(), pParentWnd);
@@ -128,5 +133,5 @@ void wxGxPostGISFeatureDatasetUI::EditProperties(wxWindow *parent)
 
     PropertySheetDialog.ShowModal();
 }
-*/
+
 #endif //wxGIS_USE_POSTGRES

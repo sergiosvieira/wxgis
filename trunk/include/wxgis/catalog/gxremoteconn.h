@@ -28,7 +28,7 @@
 #include "wxgis/catalog/gxdataset.h"
 #include "wxgis/datasource/postgisdataset.h"
 
-//class wxGxRemoteDBSchema;
+class wxGxRemoteDBSchema;
 
 /** \class wxGxRemoteConnection gxremoteconn.h
     \brief A Remote Connection GxObject.
@@ -70,7 +70,7 @@ public:
 protected:
 	//wxGxRemoteConnection
 	virtual void LoadChildren(void);
-//    virtual wxGxRemoteDBSchema* GetNewRemoteDBSchema(const CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon);
+    virtual wxGxRemoteDBSchema* GetNewRemoteDBSchema(const wxString &sName, const wxArrayString &saTables, bool bHasGeom, bool bHasGeog, bool bHasRaster, wxGISPostgresDataSource *pwxGISRemoteConn);
     //create wxGISDataset without openning it
     virtual wxGISDataset* const GetDatasetFast(void);
 protected:
@@ -81,32 +81,42 @@ protected:
 /** \class wxGxRemoteDBSchema gxremoteconn.h
     \brief A Remote Database schema GxObject.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLT wxGxRemoteDBSchema :	
 	public wxGxObjectContainer,
     public IGxObjectEdit
 {
     DECLARE_CLASS(wxGxRemoteDBSchema)
-    friend class wxGxRemoteConnection;
 public:
-	wxGxRemoteDBSchema(const wxString &sName, wxGISPostgresDataSource* pwxGISRemoteConn);
+	wxGxRemoteDBSchema(const wxArrayString &saTables, bool bHasGeom, bool bHasGeog, bool bHasRaster, wxGISPostgresDataSource* pwxGISRemoteConn, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 	virtual ~wxGxRemoteDBSchema(void);
-	//IGxObject
-	virtual wxString GetName(void){return m_sName;};
-    virtual wxString GetBaseName(void){return m_sName;};
-    virtual CPLString GetInternalName(void){return m_sPath;};
+	//wxGxObject
 	virtual wxString GetCategory(void){return wxString(_("Remote Database Schema"));};
-	//IGxObjectContainer
-	virtual bool DeleteChild(IGxObject* pChild);
+    virtual void Refresh(void);
+	//wxGxObjectContainer
 	virtual bool AreChildrenViewable(void) const {return true;};
-	virtual bool HasChildren(void){return m_Children.size() > 0 ? true : false;};
+	virtual bool HasChildren(void);
+    //IGxObjectEdit
+	virtual bool Delete(void);
+	virtual bool CanDelete(void){return false;};//TODO: depend on user permissions
+	virtual bool Rename(const wxString& NewName);
+	virtual bool CanRename(void){return false;};//TODO: depend on user permissions
+	virtual bool Copy(const CPLString &szDestPath, ITrackCancel* const pTrackCancel){return false;};
+    //TODO: check posibility to release copy and move db schema
+	virtual bool CanCopy(const CPLString &szDestPath){return false;};//The table schema cannot be copied 
+	virtual bool Move(const CPLString &szDestPath, ITrackCancel* const pTrackCancel){return false;};
+	virtual bool CanMove(const CPLString &szDestPath){return false;};//The table schema cannot be moved
+
 protected:
     //wxGxRemoteDBSchema
-    virtual void AddTable(CPLString &szName, CPLString &szSchema, bool bHasGeometry);
+    virtual void LoadChildren(void);
+    virtual void AddTable(const wxString &sTableName, const wxGISEnumDatasetType eType);
 protected:
-    wxGISPostgresDataSourceSPtr m_pwxGISRemoteConn;
-	wxString m_sName;
-    CPLString m_sPath;
+    wxGISPostgresDataSource* m_pwxGISRemoteConn;
+    bool m_bChildrenLoaded;
+    wxCriticalSection m_CritSect;
+    wxArrayString m_saTables;
+    bool m_bHasGeom, m_bHasGeog, m_bHasRaster;
 };
-*/
+
 #endif //wxGIS_USE_POSTGRES

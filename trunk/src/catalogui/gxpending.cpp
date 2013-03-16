@@ -32,9 +32,16 @@ BEGIN_EVENT_TABLE(wxGxPendingUI, wxGxObject)
   EVT_TIMER(TIMER_ID, wxGxPendingUI::OnTimer)
 END_EVENT_TABLE()
 
-wxGxPendingUI::wxGxPendingUI(wxImageList *pImageListSmall, wxImageList  *pImageListLarge, wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxObject(oParent, soName, soPath), m_timer(this, TIMER_ID), m_nCurrentImage(0), m_pImageListSmall(pImageListSmall), m_pImageListLarge(pImageListLarge)
+wxGxPendingUI::wxGxPendingUI(wxVector<wxIcon> *pImageListSmall, wxVector<wxIcon> *pImageListLarge, wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxObject(oParent, soName, soPath), m_timer(this, TIMER_ID)
 {
-    m_timer.Start(150);
+    m_nCurrentImage = 0;
+    m_pImageListSmall = pImageListSmall;
+    m_pImageListLarge = pImageListLarge;
+    if(m_pImageListSmall && m_pImageListLarge)
+        m_nImageCount = MIN(m_pImageListSmall->size(), m_pImageListLarge->size());
+    else
+        m_nImageCount = 0;
+    m_timer.Start(150);    
 }
 
 wxGxPendingUI::~wxGxPendingUI(void)
@@ -43,18 +50,26 @@ wxGxPendingUI::~wxGxPendingUI(void)
 
 wxIcon wxGxPendingUI::GetLargeImage(void)
 {
-    if(m_pImageListLarge)
-        return m_pImageListLarge->GetIcon(m_nCurrentImage);
+    if(m_pImageListLarge && m_pImageListLarge->size() > m_nCurrentImage)
+    {
+        return m_pImageListLarge->at(m_nCurrentImage);
+    }
     else
+    {
         return wxNullIcon;
+    }
 }
 
 wxIcon wxGxPendingUI::GetSmallImage(void)
 {
-    if(m_pImageListSmall)
-        return m_pImageListSmall->GetIcon(m_nCurrentImage);
+    if(m_pImageListSmall && m_pImageListSmall->size() > m_nCurrentImage)
+    {
+        return m_pImageListSmall->at(m_nCurrentImage);
+    }
     else
+    {
         return wxNullIcon;
+    }
 }
 
 void wxGxPendingUI::OnTimer( wxTimerEvent& event )
@@ -62,7 +77,7 @@ void wxGxPendingUI::OnTimer( wxTimerEvent& event )
     m_sName = wxString(_("Waiting...")) + wxString::Format(_(" (%d sec)"), m_sw.Time() / 1000); //sec.
 
     m_nCurrentImage++;
-    if(m_nCurrentImage >= m_pImageListSmall->GetImageCount())
+    if(m_nCurrentImage >= m_nImageCount)
         m_nCurrentImage = 0;
     wxGIS_GXCATALOG_EVENT(ObjectChanged);
 }

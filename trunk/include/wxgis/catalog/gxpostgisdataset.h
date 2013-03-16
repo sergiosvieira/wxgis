@@ -3,7 +3,7 @@
  * Purpose:  GxPostGISDataset classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,71 +21,57 @@
 #pragma once
 
 #include "wxgis/defs.h"
+#include "wxgis/catalog/catalog.h"
 
 #ifdef wxGIS_USE_POSTGRES
-/*
-#include "wxgis/catalog/catalog.h"
-//#include "wxgis/datasource/postgisdataset.h"
+
+#include "wxgis/datasource/postgisdataset.h"
+#include "wxgis/catalog/gxdataset.h"
 
 /** \class wxGxPostGISTableDataset gxpostgisdataset.h
     \brief A PostGIS Table Dataset GxObject.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLT wxGxPostGISTableDataset :
-	public IGxObject,
-	public IGxDataset
+	public wxGxTableDataset
 {
+    DECLARE_CLASS(wxGxPostGISTableDataset)
 public:
-	//wxGxPostGISTableDataset(CPLString soPath, wxGISDatasetSPtr pwxGISDataset);
-	wxGxPostGISTableDataset(CPLString szName, CPLString szSchema, wxGISPostgresDataSourceSPtr pwxGISRemoteConn);
+	wxGxPostGISTableDataset(const wxString &sSchema, wxGISPostgresDataSource* pwxGISRemoteConn, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 	virtual ~wxGxPostGISTableDataset(void);
-	//IGxObject
-	virtual wxString GetName(void){return m_sName;};
-    virtual wxString GetBaseName(void){return GetName();};
-    virtual CPLString GetInternalName(void);
-	virtual wxString GetCategory(void){return wxString(_("PostGIS Table"));};
-	//IGxDataset
-	virtual wxGISDatasetSPtr GetDataset(bool bCache = true, ITrackCancel* pTrackCancel = NULL);
-	virtual wxGISEnumDatasetType GetType(void){return enumGISTableDataset;};
-    virtual int GetSubType(void){return enumTablePostgres;};
-	virtual bool IsCached(void){return false;};
-	virtual void Cache(ITrackCancel* pTrackCancel = NULL){};
+	//wxGxObject
+	virtual wxString GetCategory(void) const {return wxString(_("PostGIS Table"));};
+    //wxGxDataset
+    virtual void FillMetadata(bool bForce);
 protected:
-	wxString m_sName;
-    CPLString m_sPath;
-    CPLString m_szFullyQualifiedName;
-	wxGISDatasetSPtr m_pwxGISDataset;
-    wxGISPostgresDataSourceSPtr m_pwxGISRemoteConn;
+    //create wxGISDataset without openning it
+    virtual wxGISDataset* const GetDatasetFast(void);
+protected:
+    wxString m_sFullyQualifiedName;
+    wxGISPostgresDataSource* m_pwxGISRemoteConn;
 };
 
 /** \class wxGxPostGISFeatureDataset gxpostgisdataset.h
     \brief A PostGIS Feature Dataset GxObject.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLT wxGxPostGISFeatureDataset :
-	public IGxObject,
-	public IGxDataset
+	public wxGxFeatureDataset
 {
+    DECLARE_CLASS(wxGxPostGISFeatureDataset)
 public:
-	wxGxPostGISFeatureDataset(CPLString szName, CPLString szSchema, wxGISPostgresDataSourceSPtr pwxGISRemoteConn);
+	wxGxPostGISFeatureDataset(const wxString &sSchema, wxGISPostgresDataSource* pwxGISRemoteConn, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 	virtual ~wxGxPostGISFeatureDataset(void);
-	//IGxObject
-	virtual wxString GetName(void){return m_sName;};
-    virtual wxString GetBaseName(void){return GetName();};
-    virtual CPLString GetInternalName(void);
-	virtual wxString GetCategory(void){return wxString(_("PostGIS Feature Dataset"));};
-	//IGxDataset
-	virtual wxGISDatasetSPtr GetDataset(bool bCache = true, ITrackCancel* pTrackCancel = NULL);
-	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
-    virtual int GetSubType(void){return emumVecPostGIS;};
-	virtual bool IsCached(void){return false;};
-	virtual void Cache(ITrackCancel* pTrackCancel = NULL){};
+	//wxGxObject
+	virtual wxString GetCategory(void) const {return wxString(_("PostGIS Feature Dataset"));};
+    //wxGxDataset
+    virtual void FillMetadata(bool bForce);
 protected:
-	wxString m_sName;
-    CPLString m_sPath;
-    CPLString m_szFullyQualifiedName;
-	wxGISDatasetSPtr m_pwxGISDataset;
-    wxGISPostgresDataSourceSPtr m_pwxGISRemoteConn;
+    //create wxGISDataset without openning it
+    virtual wxGISDataset* const GetDatasetFast(void);
+protected:
+    wxString m_sFullyQualifiedName;
+    wxGISPostgresDataSource* m_pwxGISRemoteConn;
 };
-*/
+
 #endif //wxGIS_USE_POSTGRES

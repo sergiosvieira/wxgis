@@ -38,7 +38,13 @@
 //class wxGxRemoteConnectionUI
 //--------------------------------------------------------------
 
-wxGxRemoteConnectionUI::wxGxRemoteConnectionUI(wxGxObject *oParent, const wxString &soName, const CPLString &soPath, wxIcon LargeIconConn, wxIcon SmallIconConn, wxIcon LargeIconDisconn, wxIcon SmallIconDisconn) : wxGxRemoteConnection(oParent, soName, soPath)
+IMPLEMENT_CLASS(wxGxRemoteConnectionUI, wxGxRemoteConnection)
+
+BEGIN_EVENT_TABLE(wxGxRemoteConnectionUI, wxGxRemoteConnection)
+    EVT_THREAD(EXIT_EVENT, wxGxRemoteConnectionUI::OnThreadFinished)
+END_EVENT_TABLE()
+
+wxGxRemoteConnectionUI::wxGxRemoteConnectionUI(wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon &LargeIconConn, const wxIcon &SmallIconConn, const wxIcon &LargeIconDisconn, const wxIcon &SmallIconDisconn) : wxGxRemoteConnection(oParent, soName, soPath)
 {
     m_oLargeIconConn = LargeIconConn;
     m_oSmallIconConn = SmallIconConn;
@@ -95,20 +101,16 @@ bool wxGxRemoteConnectionUI::Connect(void)
     if(IsConnected())
         return true;
     bool bRes = true;
-    wxGISPostgresDataSource* pDSet = wxDynamicCast(GetDatasetFast(), wxGISPostgresDataSource);
-    if(pDSet)
+    //add pending item
+    wxGxCatalogUI* pCat = wxDynamicCast(GetGxCatalog(), wxGxCatalogUI);
+    if(pCat)
     {
-        bRes = pDSet->Open();
-        if(!bRes)
-            return bRes;
-        //add pending item
-        wxGxCatalogUI* pCat = wxDynamicCast(GetGxCatalog(), wxGxCatalogUI);
-        if(pCat)
-            m_PendingId = pCat->AddPending(GetId());
-
-        //start thread to load schemes
+        m_PendingId = pCat->AddPending(GetId());
+        //pCat->ObjectRefreshed(GetId());
     }
-    wsDELETE(pDSet);
+    //start thread to load schemes
+    if(!CreateAndRunCheckThread())
+        return false;
     return bRes;
 }
 
@@ -132,17 +134,39 @@ bool wxGxRemoteConnectionUI::CreateAndRunCheckThread(void)
 //before exit we assume that no tables exist
 wxThread::ExitCode wxGxRemoteConnectionUI::Entry()
 {
+    wxGISPostgresDataSource* pDSet = wxDynamicCast(GetDatasetFast(), wxGISPostgresDataSource);
+    if(pDSet)
+    {        
+        if(!pDSet->Open())
+        {
+            wxThreadEvent event( wxEVT_THREAD, EXIT_EVENT );
+            wxQueueEvent( this, event.Clone() );
+            return (wxThread::ExitCode)1;
+        }
+    }
+    wsDELETE(pDSet);
+
     LoadChildren();
 
-    wxGIS_GXCATALOG_EVENT(ObjectChanged);
+    wxThreadEvent event( wxEVT_THREAD, EXIT_EVENT );
+    wxQueueEvent( this, event.Clone() );
 
     return (wxThread::ExitCode)0;
 }
 
-#endif //wxGIS_USE_POSTGRES
+void wxGxRemoteConnectionUI::OnThreadFinished(wxThreadEvent& event)
+{
+    wxGxCatalogUI* pCat = wxDynamicCast(GetGxCatalog(), wxGxCatalogUI);
+    if(pCat)
+    {
+        pCat->RemovePending(m_PendingId);
+        m_PendingId = wxNOT_FOUND;
+        pCat->ObjectRefreshed(GetId());
+        pCat->ObjectChanged(GetId());
+    }
+}
 
-/*
-wxGxRemoteDBSchema* wxGxRemoteConnectionUI::GetNewRemoteDBSchema(const CPLString &szName, wxGISPostgresDataSourceSPtr pwxGISRemoteCon)
+wxGxRemoteDBSchema* wxGxRemoteConnectionUI::GetNewRemoteDBSchema(const wxString &sName, const wxArrayString &saTables, bool bHasGeom, bool bHasGeog, bool bHasRaster, wxGISPostgresDataSource *pwxGISRemoteConn)
 {
     if(!m_oLargeIconFeatureClass.IsOk())
         m_oLargeIconFeatureClass = wxIcon(pg_vec_48_xpm);
@@ -156,13 +180,20 @@ wxGxRemoteDBSchema* wxGxRemoteConnectionUI::GetNewRemoteDBSchema(const CPLString
         m_oLargeIconSchema = wxIcon(dbschema_48_xpm);
     if(!m_oSmallIconSchema.IsOk())
         m_oSmallIconSchema = wxIcon(dbschema_16_xpm);
-    return static_cast<wxGxRemoteDBSchema*>(new wxGxRemoteDBSchemaUI(wxString(szName, wxConvUTF8), pwxGISRemoteCon, m_oLargeIconSchema, m_oSmallIconSchema, m_oLargeIconFeatureClass, m_oSmallIconFeatureClass, m_oLargeIconTable, m_oSmallIconTable));
+    return wxStaticCast(new wxGxRemoteDBSchemaUI(saTables, bHasGeom, bHasGeog, bHasRaster, pwxGISRemoteConn, this, sName, "", m_oLargeIconSchema, m_oSmallIconSchema, m_oLargeIconFeatureClass, m_oSmallIconFeatureClass, m_oLargeIconTable, m_oSmallIconTable), wxGxRemoteDBSchema);
 }
 
 //--------------------------------------------------------------
 //class wxGxRemoteDBSchemaUI
 //--------------------------------------------------------------
-wxGxRemoteDBSchemaUI::wxGxRemoteDBSchemaUI(const wxString &sName, wxGISPostgresDataSourceSPtr pwxGISRemoteConn, wxIcon LargeIcon, wxIcon SmallIcon, wxIcon LargeIconFeatureClass, wxIcon SmallIconFeatureClass, wxIcon LargeIconTable, wxIcon SmallIconTable) : wxGxRemoteDBSchema(sName, pwxGISRemoteConn)
+
+IMPLEMENT_CLASS(wxGxRemoteDBSchemaUI, wxGxRemoteDBSchema)
+
+BEGIN_EVENT_TABLE(wxGxRemoteDBSchemaUI, wxGxRemoteDBSchema)
+    EVT_THREAD(EXIT_EVENT, wxGxRemoteDBSchemaUI::OnThreadFinished)
+END_EVENT_TABLE()
+
+wxGxRemoteDBSchemaUI::wxGxRemoteDBSchemaUI(const wxArrayString &saTables, bool bHasGeom, bool bHasGeog, bool bHasRaster, wxGISPostgresDataSource* pwxGISRemoteConn, wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon &LargeIcon, const wxIcon &SmallIcon, const wxIcon &LargeIconFeatureClass, const wxIcon &SmallIconFeatureClass, const wxIcon &LargeIconTable, const wxIcon &SmallIconTable) : wxGxRemoteDBSchema(saTables, bHasGeom, bHasGeog, bHasRaster, pwxGISRemoteConn, oParent, soName, soPath)
 {
     m_oLargeIcon = LargeIcon;
     m_oSmallIcon = SmallIcon;
@@ -170,6 +201,8 @@ wxGxRemoteDBSchemaUI::wxGxRemoteDBSchemaUI(const wxString &sName, wxGISPostgresD
     m_oSmallIconFeatureClass = SmallIconFeatureClass;
     m_oLargeIconTable = LargeIconTable;
     m_oSmallIconTable = SmallIconTable;
+    
+    m_PendingId = wxNOT_FOUND;
 }
 
 wxGxRemoteDBSchemaUI::~wxGxRemoteDBSchemaUI(void)
@@ -178,6 +211,7 @@ wxGxRemoteDBSchemaUI::~wxGxRemoteDBSchemaUI(void)
 
 void wxGxRemoteDBSchemaUI::EditProperties(wxWindow *parent)
 {
+    //TODO: change permissions and properties
 }
 
 wxIcon wxGxRemoteDBSchemaUI::GetLargeImage(void)
@@ -190,6 +224,83 @@ wxIcon wxGxRemoteDBSchemaUI::GetSmallImage(void)
     return m_oSmallIcon;
 }
 
+bool wxGxRemoteDBSchemaUI::HasChildren(void)
+{
+    if(m_bChildrenLoaded)
+        return wxGxObjectContainer::HasChildren(); 
+    if(GetThread() && GetThread()->IsRunning())
+        return wxGxObjectContainer::HasChildren(); 
+
+    wxGxCatalogUI* pCat = wxDynamicCast(GetGxCatalog(), wxGxCatalogUI);
+    if(pCat)
+    {
+        m_PendingId = pCat->AddPending(GetId());
+        //pCat->ObjectRefreshed(GetId());
+    }
+    //start thread to load schemes
+    if(!CreateAndRunLoadChildrenThread())
+        return false;
+
+    return wxGxObjectContainer::HasChildren(); 
+}
+
+bool wxGxRemoteDBSchemaUI::CreateAndRunLoadChildrenThread(void)
+{
+    if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
+    {
+        wxLogError(_("Could not create the load thread!"));
+        return false;
+    }
+
+    if (GetThread()->Run() != wxTHREAD_NO_ERROR)
+    {
+        wxLogError(_("Could not run the load thread!"));
+        return false;
+    }
+    return true;
+}
+
+//thread to load remote DB tables
+//before exit we assume that no tables exist
+wxThread::ExitCode wxGxRemoteDBSchemaUI::Entry()
+{
+    LoadChildren();
+
+    wxThreadEvent event( wxEVT_THREAD, EXIT_EVENT );
+    wxQueueEvent( this, event.Clone() );
+
+    return (wxThread::ExitCode)0;
+}
+
+void wxGxRemoteDBSchemaUI::OnThreadFinished(wxThreadEvent& event)
+{
+    wxGxCatalogUI* pCat = wxDynamicCast(GetGxCatalog(), wxGxCatalogUI);
+    if(pCat)
+    {
+        pCat->RemovePending(m_PendingId);
+        m_PendingId = wxNOT_FOUND;
+        pCat->ObjectRefreshed(GetId());
+        pCat->ObjectChanged(GetId());
+    }
+}
+
+void wxGxRemoteDBSchemaUI::AddTable(const wxString &sTableName, const wxGISEnumDatasetType eType)
+{
+    switch(eType)
+    {
+    case enumGISFeatureDataset:
+        m_pwxGISRemoteConn->Reference();
+        new wxGxPostGISFeatureDatasetUI(GetName(), m_pwxGISRemoteConn, this, sTableName, "", m_oLargeIconFeatureClass, m_oSmallIconFeatureClass);
+        break;
+    case enumGISRasterDataset:
+        break;
+    case enumGISTableDataset:
+    default:
+        m_pwxGISRemoteConn->Reference();
+        new wxGxPostGISTableDatasetUI(GetName(), m_pwxGISRemoteConn, this, sTableName, "", m_oLargeIconTable, m_oSmallIconTable);
+        break;
+    };
+/*
 void wxGxRemoteDBSchemaUI::AddTable(CPLString &szName, CPLString &szSchema, bool bHasGeometry)
 {
     IGxObject* pGxObject(NULL);
@@ -230,6 +341,7 @@ void wxGxRemoteDBSchemaUI::AddTable(CPLString &szName, CPLString &szSchema, bool
 	    bool ret_code = AddChild(pGxObject);
 	    if(!ret_code)
 		    wxDELETE(pGxObject);
-    }
+    }*/
 }
-*/
+
+#endif //wxGIS_USE_POSTGRES

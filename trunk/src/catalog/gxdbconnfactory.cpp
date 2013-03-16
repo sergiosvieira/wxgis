@@ -23,6 +23,7 @@
 
 #include "wxgis/datasource/gdalinh.h"
 #include "wxgis/datasource/sysop.h"
+#include "wxgis/core/format.h"
 
 //------------------------------------------------------------------------------
 // wxGxDBConnectionFactory
@@ -33,6 +34,7 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionFactory, wxGxObjectFactory)
 wxGxDBConnectionFactory::wxGxDBConnectionFactory(void)
 {
     m_bHasDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName("PostgreSQL") || GDALGetDriverByName("PostGISRaster");
+    m_bLoadSystemTablesAndSchemes = false;
 }
 
 wxGxDBConnectionFactory::~wxGxDBConnectionFactory(void)
@@ -70,3 +72,17 @@ wxGxObject* wxGxDBConnectionFactory::GetGxObject(wxGxObject* pParent, const wxSt
 #endif //wxGIS_USE_POSTGRES
 }
 
+void wxGxDBConnectionFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
+{
+    wxGxObjectFactory::Serialize(pConfig, bStore);
+    if(bStore)
+    {
+        if(pConfig->HasAttribute(wxT("load_system_tables_schemes")))
+            pConfig->DeleteAttribute(wxT("load_system_tables_schemes"));
+        SetBoolValue(pConfig, wxT("load_system_tables_schemes"), m_bLoadSystemTablesAndSchemes);    
+    }
+    else
+    {
+        m_bLoadSystemTablesAndSchemes = GetBoolValue(pConfig, wxT("load_system_tables_schemes"), m_bLoadSystemTablesAndSchemes);
+    }
+}

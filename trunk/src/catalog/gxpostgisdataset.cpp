@@ -3,7 +3,7 @@
  * Purpose:  GxPostGISDataset classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,53 +22,44 @@
 #include "wxgis/catalog/gxpostgisdataset.h"
 
 #ifdef wxGIS_USE_POSTGRES
-/*
+
 //-----------------------------------------------------------------------------------
 // wxGxPostGISTableDataset
 //-----------------------------------------------------------------------------------
-//wxGxPostGISTableDataset::wxGxPostGISTableDataset(CPLString soPath, wxGISDatasetSPtr pwxGISDataset)
-//{
-//	m_pwxGISDataset = pwxGISDataset;
-//
-//	m_sName = pwxGISDataset->GetName();
-//}
 
-wxGxPostGISTableDataset::wxGxPostGISTableDataset(CPLString szName, CPLString szSchema, wxGISPostgresDataSourceSPtr pwxGISRemoteConn)
+IMPLEMENT_CLASS(wxGxPostGISTableDataset, wxGxTableDataset)
+
+wxGxPostGISTableDataset::wxGxPostGISTableDataset(const wxString &sSchema, wxGISPostgresDataSource* pwxGISRemoteConn, wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxTableDataset(enumTablePostgres, oParent, soName, soPath)
 {
     m_pwxGISRemoteConn = pwxGISRemoteConn;
-    m_sName = wxString(szName, wxConvUTF8);
-    m_szFullyQualifiedName.Printf("%s.%s", szSchema.c_str(), szName.c_str());
+    m_sFullyQualifiedName = sSchema + wxT(".") + soName;
 }
 
 wxGxPostGISTableDataset::~wxGxPostGISTableDataset(void)
 {
 }
 
-wxGISDatasetSPtr wxGxPostGISTableDataset::GetDataset(bool bCache, ITrackCancel* pTrackCancel)
+wxGISDataset* const wxGxPostGISTableDataset::GetDatasetFast(void)
 {
-    if(m_pwxGISDataset)
-        return m_pwxGISDataset;
-    else
+ 	if(m_pwxGISDataset == NULL)
     {
-        m_pwxGISDataset = m_pwxGISRemoteConn->GetSubset(m_szFullyQualifiedName);
-        return m_pwxGISDataset;
+        m_pwxGISDataset = m_pwxGISRemoteConn->GetSubset(m_sFullyQualifiedName);
+        m_pwxGISDataset->Reference();
     }
+    m_pwxGISDataset->Reference();
+    return m_pwxGISDataset;
 }
 
-CPLString wxGxPostGISTableDataset::GetInternalName(void)
+void wxGxPostGISTableDataset::FillMetadata(bool bForce)
 {
-    if(m_sPath.empty())
-    {
-        //m_sPath = soPath + " ";
-        m_sPath += GetName().mb_str(wxConvUTF8);
-    }
-    return m_sPath;
 }
 
-//#define PGTEST
 //-----------------------------------------------------------------------------------
 // wxGxPostGISFeatureDataset
 //-----------------------------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxGxPostGISFeatureDataset, wxGxFeatureDataset)
+
 //wxGxPostGISFeatureDataset::wxGxPostGISFeatureDataset(CPLString soPath, wxGISDatasetSPtr pwxGISDataset)
 //{
 //	m_sName = pwxGISDataset->GetName();
@@ -90,36 +81,29 @@ CPLString wxGxPostGISTableDataset::GetInternalName(void)
 ////#endif
 //}
 
-wxGxPostGISFeatureDataset::wxGxPostGISFeatureDataset(CPLString szName, CPLString szSchema, wxGISPostgresDataSourceSPtr pwxGISRemoteConn)
+wxGxPostGISFeatureDataset::wxGxPostGISFeatureDataset(const wxString &sSchema, wxGISPostgresDataSource* pwxGISRemoteConn, wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxFeatureDataset(emumVecPostGIS, oParent, soName, soPath)
 {
     m_pwxGISRemoteConn = pwxGISRemoteConn;
-    m_sName = wxString(szName, wxConvUTF8);
-    m_szFullyQualifiedName.Printf("%s.%s", szSchema.c_str(), szName.c_str());
+    m_sFullyQualifiedName = sSchema + wxT(".") + soName;
 }
 
 wxGxPostGISFeatureDataset::~wxGxPostGISFeatureDataset(void)
 {
 }
 
-wxGISDatasetSPtr wxGxPostGISFeatureDataset::GetDataset(bool bCache, ITrackCancel* pTrackCancel)
+wxGISDataset* const wxGxPostGISFeatureDataset::GetDatasetFast(void)
 {
-    if(m_pwxGISDataset)
-        return m_pwxGISDataset;
-    else
+ 	if(m_pwxGISDataset == NULL)
     {
-        m_pwxGISDataset = m_pwxGISRemoteConn->GetSubset(m_szFullyQualifiedName);
-        return m_pwxGISDataset;
+        m_pwxGISDataset = m_pwxGISRemoteConn->GetSubset(m_sFullyQualifiedName);
+        m_pwxGISDataset->Reference();
     }
+    m_pwxGISDataset->Reference();
+    return m_pwxGISDataset;
 }
 
-CPLString wxGxPostGISFeatureDataset::GetInternalName(void)
+void wxGxPostGISFeatureDataset::FillMetadata(bool bForce)
 {
-    if(m_sPath.empty())
-    {
-        //m_sPath = soPath + " ";
-        m_sPath += GetName().mb_str(wxConvUTF8);
-    }
-    return m_sPath;
 }
-*/
+
 #endif //wxGIS_USE_POSTGRES

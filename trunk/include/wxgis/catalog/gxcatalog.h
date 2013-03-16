@@ -3,7 +3,7 @@
  * Purpose:  wxGxCatalog class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2012 Bishop
+*   Copyright (C) 2009-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -44,6 +44,8 @@ public:
     virtual void EnableRootItem(size_t nItemId, bool bEnable);
     virtual bool Destroy(void);
     virtual wxGxObject* const GetRootItemByType(const wxClassInfo * info) const;
+    virtual wxGxObjectFactory* const GetObjectFactoryByClassName(const wxString &sClassName);
+    virtual wxGxObjectFactory* const GetObjectFactoryByName(const wxString &sFactoryName);
 
     typedef struct _root_item{
         wxString sClassName;

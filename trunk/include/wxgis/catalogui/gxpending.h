@@ -40,7 +40,7 @@ class WXDLLIMPEXP_GIS_CLU wxGxPendingUI :
         TIMER_ID = 1014
     };
 public:
-	wxGxPendingUI(wxImageList *pImageListSmall = NULL, wxImageList *pImageListLarge = NULL, wxGxObject *oParent = NULL, const wxString &soName = wxString(_("Waiting...")), const CPLString &soPath = "");
+	wxGxPendingUI(wxVector<wxIcon> *pImageListSmall = NULL, wxVector<wxIcon> *pImageListLarge = NULL, wxGxObject *oParent = NULL, const wxString &soName = wxString(_("Waiting...")), const CPLString &soPath = "");
 	virtual ~wxGxPendingUI(void);
 	//IGxObject
 	virtual wxString GetCategory(void) const {return wxString(_("Waiting..."));};
@@ -53,10 +53,12 @@ protected:
     //events
     void OnTimer( wxTimerEvent & event);
 protected:
-    wxImageList *m_pImageListSmall, *m_pImageListLarge;
     short m_nCurrentImage;
     wxTimer m_timer;
     wxStopWatch m_sw;
+    wxVector<wxIcon> *m_pImageListLarge;
+    wxVector<wxIcon> *m_pImageListSmall;
+    short m_nImageCount;
 private:
     DECLARE_EVENT_TABLE()
 };

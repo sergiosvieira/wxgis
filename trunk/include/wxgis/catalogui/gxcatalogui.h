@@ -42,8 +42,6 @@ public:
     virtual bool GetOpenLastPath(void){return m_bOpenLastPath;};
     virtual long AddPending(long nParentId);
     virtual void RemovePending(long nPendingId);
-	//wxGxCatalog
-	virtual wxString GetConfigName(void) const {return wxString(wxT("wxCatalogUI"));};
     //IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
@@ -52,9 +50,11 @@ public:
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
 protected:
+	virtual wxString GetConfigName(void) const {return wxString(wxT("wxCatalogUI"));};
+protected:
     wxIcon m_oIcon;
     bool m_bOpenLastPath;
-    wxImageList m_ImageListSmall, m_ImageListLarge;
+    wxVector<wxIcon> m_oaPendingIconsLarge, m_oaPendingIconsSmall;
 };
 
 /*

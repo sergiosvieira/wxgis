@@ -53,6 +53,7 @@ public:
     //the geometry in spatial filter should have the same SpaRef as the target layer 
     wxGISDataset* ExecuteSQL(const wxGISSpatialFilter &SpatialFilter, const wxString &sDialect = wxT("OGRSQL"));
     bool PGExecuteSQL(const wxString &sStatement);
+    //wxGISDataset* PGExecuteSQL( const wxString &sStatement, bool bMultipleCommandAllowed = FALSE );
     //wxGISDataset
 	virtual bool Delete(int iLayer = 0, ITrackCancel* const pTrackCancel = NULL);
 	virtual bool Rename(const wxString &sNewName);
