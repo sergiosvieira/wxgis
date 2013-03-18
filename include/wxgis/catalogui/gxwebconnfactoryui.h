@@ -39,6 +39,4 @@ public:
 protected:
     wxIcon m_LargeIconConn, m_SmallIconConn;
     wxIcon m_LargeIconDisconn, m_SmallIconDisconn;
-    wxIcon m_LargeIconFeatureClass, m_SmallIconFeatureClass;
-    wxIcon m_LargeIconTable, m_SmallIconTable;
 };

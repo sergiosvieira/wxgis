@@ -19,12 +19,12 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxwebconnfactoryui.h"
-//#include "wxgis/catalogui/gxremoteconnui.h"
+#include "wxgis/catalogui/gxremoteconnui.h"
 
-//#include "../../art/web_conn_16.xpm"
-//#include "../../art/web_conn_48.xpm"
-//#include "../../art/web_disconn_16.xpm"
-//#include "../../art/web_disconn_48.xpm"
+#include "../../art/web_tms_conn_16.xpm"
+#include "../../art/web_tms_conn_48.xpm"
+#include "../../art/web_tms_disconn_16.xpm"
+#include "../../art/web_tms_disconn_48.xpm"
 
 //------------------------------------------------------------------------------
 // wxGxWebConnectionFactoryUI
@@ -34,10 +34,11 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxWebConnectionFactoryUI, wxGxWebConnectionFactory)
 
 wxGxWebConnectionFactoryUI::wxGxWebConnectionFactoryUI(void) : wxGxWebConnectionFactory()
 {
-    //m_LargeIconConn = wxIcon(rdb_conn_48_xpm);
-    //m_SmallIconConn = wxIcon(rdb_conn_16_xpm);
-    //m_LargeIconDisconn = wxIcon(rdb_disconn_48_xpm);
-    //m_SmallIconDisconn = wxIcon(rdb_disconn_16_xpm);
+
+    m_LargeIconConn = wxIcon(web_tms_conn_48_xpm);
+    m_SmallIconConn = wxIcon(web_tms_conn_16_xpm);
+    m_LargeIconDisconn = wxIcon(web_tms_disconn_48_xpm);
+    m_SmallIconDisconn = wxIcon(web_tms_disconn_16_xpm);    
 }
 
 wxGxWebConnectionFactoryUI::~wxGxWebConnectionFactoryUI(void)
@@ -46,7 +47,6 @@ wxGxWebConnectionFactoryUI::~wxGxWebConnectionFactoryUI(void)
 
 wxGxObject* wxGxWebConnectionFactoryUI::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath)
 {
-	//wxGxRemoteConnectionUI* pDataset = new wxGxRemoteConnectionUI(pParent, soName, szPath, m_LargeIconConn, m_SmallIconConn, m_LargeIconDisconn, m_SmallIconDisconn);
-	//return static_cast<wxGxObject*>(pDataset);
-    return NULL;
+	wxGxTMSWebServiceUI* pDataset = new wxGxTMSWebServiceUI(pParent, soName, szPath, m_LargeIconConn, m_SmallIconConn, m_LargeIconDisconn, m_SmallIconDisconn);
+	return wxStaticCast(pDataset, wxGxObject);
 }

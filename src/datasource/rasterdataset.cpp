@@ -102,6 +102,9 @@ char **wxGISRasterDataset::GetFileList()
 		if(CPLCheckForFile((char*)szPath.c_str(), NULL))
 			papszFileList = CSLAddString( papszFileList, szPath );
 		break;
+    case enumRasterWMSTMS:
+    case enumRasterWMS:
+        return papszFileList;
     case enumRasterTiff:
     case enumRasterTil:
 		szPath = (char*)CPLResetExtension(m_sPath, "imd");
@@ -610,13 +613,15 @@ bool wxGISRasterDataset::GetPixelData(void *data, int nXOff, int nYOff, int nXSi
 {
     CPLErrorReset();
 
-    CPLErr err = m_poDataset->AdviseRead(nXOff, nYOff, nXSize, nYSize, nBufXSize, nBufYSize, eDT, nBandCount, panBandList, NULL);
-    if(err != CE_None)
-    {
-        const char* pszerr = CPLGetLastErrorMsg();
-		wxLogError(_("AdviseRead failed! GDAL error: %s"), wxString(pszerr, wxConvUTF8).c_str());
-        return false;
-    }
+    CPLErr err = CE_None;
+
+  //  CPLErr err = m_poDataset->AdviseRead(nXOff, nYOff, nXSize, nYSize, nBufXSize, nBufYSize, eDT, nBandCount, panBandList, NULL);
+  //  if(err != CE_None)
+  //  {
+  //      const char* pszerr = CPLGetLastErrorMsg();
+		//wxLogError(_("AdviseRead failed! GDAL error: %s"), wxString(pszerr, wxConvUTF8).c_str());
+  //      return false;
+  //  }
 
     int nPixelSpace(0);
     int nLineSpace(0);

@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/catalog/gxdataset.h"
+#include "wxgis/catalog/gxcatalog.h"
 
 #include "wxgis/datasource/featuredataset.h"
 #include "wxgis/datasource/rasterdataset.h"
@@ -242,6 +243,7 @@ wxGISDataset* const wxGxTableDataset::GetDataset(bool bCache, ITrackCancel* cons
 				pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageErr);
 			return NULL;
         }
+        wxGIS_GXCATALOG_EVENT(ObjectChanged);
 	}
 
 	return m_pwxGISDataset;
@@ -296,6 +298,7 @@ wxGISDataset* const wxGxFeatureDataset::GetDataset(bool bCache, ITrackCancel* co
 				pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageErr);
 			return NULL;
         }
+        wxGIS_GXCATALOG_EVENT(ObjectChanged);
 	}
 
 	return m_pwxGISDataset;
@@ -402,6 +405,7 @@ wxGISDataset* const wxGxRasterDataset::GetDataset(bool bCache, ITrackCancel* con
 				pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageErr);
 			return NULL;
         }
+        wxGIS_GXCATALOG_EVENT(ObjectChanged);
 	}
 
 	return m_pwxGISDataset;

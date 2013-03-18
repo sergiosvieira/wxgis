@@ -27,8 +27,6 @@
 #include "../../art/folder_conns_48.xpm"
 #include "../../art/folder_conn_16.xpm"
 #include "../../art/folder_conn_48.xpm"
-#include "../../art/folder_conn_disbl_16.xpm"
-#include "../../art/folder_conn_disbl_48.xpm"
 
 #include "wx/volume.h"
 #include "wx/msgdlg.h"
@@ -65,9 +63,15 @@ wxGxObject *wxGxDiscConnectionsUI::CreateChildGxObject(const wxXmlNode* pNode)
     if(!m_Conn48.IsOk())
         m_Conn48 = wxIcon(folder_conn_48_xpm);
     if(!m_ConnDsbld16.IsOk())
-        m_ConnDsbld16 = wxIcon(folder_conn_disbl_16_xpm);
+    {
+        wxImage Img(folder_conn_16_xpm);
+        m_ConnDsbld16.CopyFromBitmap(Img.ConvertToGreyscale());
+    }
     if(!m_ConnDsbld48.IsOk())
-        m_ConnDsbld48 = wxIcon(folder_conn_disbl_48_xpm);
+    {
+        wxImage Img(folder_conn_48_xpm);
+        m_ConnDsbld48.CopyFromBitmap(Img.ConvertToGreyscale());
+    }
 
     wxString soName = pNode->GetAttribute(wxT("name"), NONAME);
     wxString sPath = pNode->GetAttribute(wxT("path"), NONAME);
