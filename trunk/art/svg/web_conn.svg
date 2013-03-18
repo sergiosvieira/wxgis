@@ -16,9 +16,9 @@
    sodipodi:version="0.32"
    inkscape:version="0.48.4 r9939"
    sodipodi:docname="web_conn.svg"
-   inkscape:export-filename="D:\work\projects\art\png\web_conn_create.png"
-   inkscape:export-xdpi="30"
-   inkscape:export-ydpi="30"
+   inkscape:export-filename="D:\work\projects\art\png\web_disconn_48.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.1">
   <defs
@@ -1406,12 +1406,12 @@
      inkscape:zoom="6.025139"
      inkscape:cx="40.711646"
      inkscape:cy="27.335407"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer4"
      showgrid="false"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
-     inkscape:window-width="1600"
-     inkscape:window-height="838"
+     inkscape:window-width="1680"
+     inkscape:window-height="988"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:showpageshadow="true"
@@ -1427,7 +1427,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
         <dc:date />
         <dc:creator>
           <cc:Agent>
@@ -1734,7 +1734,7 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="create"
-     style="display:inline">
+     style="display:none">
     <path
        sodipodi:type="star"
        style="color:#000000;fill:url(#radialGradient19538);fill-opacity:1;fill-rule:nonzero;stroke:#ce5c00;stroke-width:3.24622941;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
@@ -1756,7 +1756,7 @@
      inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="disconn"
-     style="display:none">
+     style="display:inline">
     <g
        transform="translate(0.49930173,23.714514)"
        style="display:inline"
@@ -1819,7 +1819,7 @@
      id="layer7"
      inkscape:label="type_TMS"
      sodipodi:insensitive="true"
-     style="display:none">
+     style="display:inline">
     <rect
        style="fill:#ce5c00;fill-opacity:1;stroke:none;display:inline"
        id="rect20258-9-5"

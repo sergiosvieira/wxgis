@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxRemoteConnectionUI class.
+ * Purpose:  Remote Connection UI classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011,2013 Bishop
@@ -118,3 +118,27 @@ private:
 
 #endif // wxGIS_USE_POSTGRES
 
+/** \class wxGxTMSWebServiceUI gxremoteconnui.h
+    \brief A TMS Web Service GxObjectUI.
+*/
+
+class WXDLLIMPEXP_GIS_CLU wxGxTMSWebServiceUI :
+	public wxGxTMSWebService,
+	public IGxObjectUI,
+    public IGxObjectEditUI
+{
+    DECLARE_CLASS(wxGxTMSWebServiceUI)
+public:
+	wxGxTMSWebServiceUI(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon &icLargeIcon = wxNullIcon, const wxIcon &icSmallIcon = wxNullIcon, const wxIcon &icLargeIconDsbl = wxNullIcon, const wxIcon &icSmallIconDsbl = wxNullIcon);
+	virtual ~wxGxTMSWebServiceUI(void);
+	//IGxObjectUI
+	virtual wxIcon GetLargeImage(void);
+	virtual wxIcon GetSmallImage(void);
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxTMSWebService.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxEmptyString;};
+	//IGxObjectEditUI
+	virtual void EditProperties(wxWindow *parent);
+protected:
+    wxIcon m_icLargeIcon, m_icSmallIcon;
+    wxIcon m_icLargeIconDsbl, m_icSmallIconDsbl;
+};

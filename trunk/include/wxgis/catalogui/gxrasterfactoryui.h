@@ -37,5 +37,14 @@ public:
     //wxGxRasterFactory
     virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumRasterDatasetType type);
 protected:
-    wxIcon m_LargeIcon, m_SmallIcon;
+    wxIcon m_icLargeIcon, m_icSmallIcon;
+    wxIcon m_icBMPLargeIcon, m_icBMPSmallIcon;
+    wxIcon m_icTIFLargeIcon, m_icTIFSmallIcon;
+    wxIcon m_icTILLargeIcon, m_icTILSmallIcon;
+    wxIcon m_icIMGLargeIcon, m_icIMGSmallIcon;
+    wxIcon m_icJPGLargeIcon, m_icJPGSmallIcon;
+    wxIcon m_icPNGLargeIcon, m_icPNGSmallIcon;
+    wxIcon m_icGIFLargeIcon, m_icGIFSmallIcon;
+    wxIcon m_icSAGALargeIcon, m_icSAGASmallIcon;
+    wxIcon m_icVRTLargeIcon, m_icVRTSmallIcon;
 };

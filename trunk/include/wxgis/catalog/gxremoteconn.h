@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxRemoteConnection class.
+ * Purpose:  Remote Connection classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011,2013 Bishop
@@ -22,10 +22,11 @@
 
 #include "wxgis/defs.h"
 
-#ifdef wxGIS_USE_POSTGRES
-
 #include "wxgis/catalog/gxobject.h"
 #include "wxgis/catalog/gxdataset.h"
+
+#ifdef wxGIS_USE_POSTGRES
+
 #include "wxgis/datasource/postgisdataset.h"
 
 class wxGxRemoteDBSchema;
@@ -40,11 +41,6 @@ class WXDLLIMPEXP_GIS_CLT wxGxRemoteConnection :
     public IGxRemoteConnection
 {
     DECLARE_CLASS(wxGxRemoteConnection)
-    typedef struct _pgtabledata{
-        bool bHasGeometry;
-        CPLString sTableName;
-        CPLString sTableSchema;
-    }PGTABLEDATA;
 public:
 	wxGxRemoteConnection(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 	virtual ~wxGxRemoteConnection(void);
@@ -120,3 +116,21 @@ protected:
 };
 
 #endif //wxGIS_USE_POSTGRES
+
+
+/** \class wxGxTMSWebService gxremoteconn.h
+    \brief A TMS Web Service GxObject.
+*/
+
+class WXDLLIMPEXP_GIS_CLT wxGxTMSWebService :
+	public wxGxRasterDataset
+{
+    DECLARE_CLASS(wxGxRemoteConnection)
+public:
+	wxGxTMSWebService(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
+	virtual ~wxGxTMSWebService(void);
+	//wxGxObject
+	virtual wxString GetCategory(void) const {return wxString(_("Web service"));};
+    //wxGxDataset
+    virtual void FillMetadata(bool bForce = false);
+};

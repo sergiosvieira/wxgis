@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxRemoteConnectionUI class.
+ * Purpose:  Remote Connection UI classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -33,6 +33,19 @@
 #include "../../art/table_pg_48.xpm"
 #include "../../art/dbschema_16.xpm"
 #include "../../art/dbschema_48.xpm"
+
+//propertypages
+#include "wxgis/catalogui/spatrefpropertypage.h"
+#include "wxgis/catalogui/rasterpropertypage.h"
+#include "wxgis/catalogui/vectorpropertypage.h"
+#include "wxgis/catalogui/tablepropertypage.h"
+
+#include "../../art/properties.xpm"
+
+#include "wx/busyinfo.h"
+#include "wx/utils.h"
+#include "wx/propdlg.h"
+#include "wx/bookctrl.h"
 
 //--------------------------------------------------------------
 //class wxGxRemoteConnectionUI
@@ -103,7 +116,7 @@ bool wxGxRemoteConnectionUI::Connect(void)
     bool bRes = true;
     //add pending item
     wxGxCatalogUI* pCat = wxDynamicCast(GetGxCatalog(), wxGxCatalogUI);
-    if(pCat)
+    if(pCat && m_PendingId == wxNOT_FOUND)
     {
         m_PendingId = pCat->AddPending(GetId());
         //pCat->ObjectRefreshed(GetId());
@@ -116,11 +129,17 @@ bool wxGxRemoteConnectionUI::Connect(void)
 
 bool wxGxRemoteConnectionUI::CreateAndRunCheckThread(void)
 {
-    if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
+    if(!GetThread())
     {
-        wxLogError(_("Could not create the load thread!"));
-        return false;
+        if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
+        {
+            wxLogError(_("Could not create the load thread!"));
+            return false;
+        }
     }
+
+    if(GetThread()->IsRunning())
+        return true;
 
     if (GetThread()->Run() != wxTHREAD_NO_ERROR)
     {
@@ -232,7 +251,7 @@ bool wxGxRemoteDBSchemaUI::HasChildren(void)
         return wxGxObjectContainer::HasChildren(); 
 
     wxGxCatalogUI* pCat = wxDynamicCast(GetGxCatalog(), wxGxCatalogUI);
-    if(pCat)
+    if(pCat && m_PendingId == wxNOT_FOUND)
     {
         m_PendingId = pCat->AddPending(GetId());
         //pCat->ObjectRefreshed(GetId());
@@ -246,11 +265,17 @@ bool wxGxRemoteDBSchemaUI::HasChildren(void)
 
 bool wxGxRemoteDBSchemaUI::CreateAndRunLoadChildrenThread(void)
 {
-    if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
+    if(!GetThread())
     {
-        wxLogError(_("Could not create the load thread!"));
-        return false;
+        if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
+        {
+            wxLogError(_("Could not create the load thread!"));
+            return false;
+        }
     }
+
+    if(GetThread()->IsRunning())
+        return true;
 
     if (GetThread()->Run() != wxTHREAD_NO_ERROR)
     {
@@ -300,48 +325,87 @@ void wxGxRemoteDBSchemaUI::AddTable(const wxString &sTableName, const wxGISEnumD
         new wxGxPostGISTableDatasetUI(GetName(), m_pwxGISRemoteConn, this, sTableName, "", m_oLargeIconTable, m_oSmallIconTable);
         break;
     };
-/*
-void wxGxRemoteDBSchemaUI::AddTable(CPLString &szName, CPLString &szSchema, bool bHasGeometry)
-{
-    IGxObject* pGxObject(NULL);
-    if(bHasGeometry)
-    {
-        wxGxPostGISFeatureDatasetUI* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDatasetUI(szName, szSchema, m_pwxGISRemoteConn, m_oLargeIconFeatureClass, m_oSmallIconFeatureClass);
-        pGxObject = static_cast<IGxObject*>(pGxPostGISFeatureDataset);
-    }
-    else
-    {
-        wxGxPostGISTableDatasetUI* pGxPostGISTableDataset = new wxGxPostGISTableDatasetUI(szName, szSchema, m_pwxGISRemoteConn, m_oLargeIconTable, m_oSmallIconTable);
-        pGxObject = static_cast<IGxObject*>(pGxPostGISTableDataset);
-    }
-//    switch(eType)
-//    {
-//    case enumGISFeatureDataset:
-//        {
-//            wxGxPostGISFeatureDatasetUI* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDatasetUI(pGISDataset->GetPath(), pGISDataset, m_oLargeIconFeatureClass, m_oSmallIconFeatureClass);
-//            pGxObject = static_cast<IGxObject*>(pGxPostGISFeatureDataset);
-//        }
-//        break;
-//    case enumGISTableDataset:
-//        {
-//            wxGxPostGISTableDatasetUI* pGxPostGISTableDataset = new wxGxPostGISTableDatasetUI(pGISDataset->GetPath(), pGISDataset, m_oLargeIconTable, m_oSmallIconTable);
-//            pGxObject = static_cast<IGxObject*>(pGxPostGISTableDataset);
-//        }
-//        break;
-//    case enumGISRasterDataset:
-//        break;
-//    default:
-//    case enumGISContainer:
-//        break;
-//    };
-
-
-    if(pGxObject)
-    {
-	    bool ret_code = AddChild(pGxObject);
-	    if(!ret_code)
-		    wxDELETE(pGxObject);
-    }*/
 }
 
 #endif //wxGIS_USE_POSTGRES
+
+//--------------------------------------------------------------
+//class wxGxTMSWebServiceUI
+//--------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxGxTMSWebServiceUI, wxGxTMSWebService)
+
+wxGxTMSWebServiceUI::wxGxTMSWebServiceUI(wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon &icLargeIcon, const wxIcon &icSmallIcon, const wxIcon &icLargeIconDsbl, const wxIcon &icSmallIconDsbl) : wxGxTMSWebService(oParent, soName, soPath)
+{
+    m_icLargeIcon = icLargeIcon;
+    m_icSmallIcon = icSmallIcon;
+    m_icLargeIconDsbl = icLargeIconDsbl;
+    m_icSmallIconDsbl = icSmallIconDsbl;
+}
+
+wxGxTMSWebServiceUI::~wxGxTMSWebServiceUI(void)
+{
+}
+
+wxIcon wxGxTMSWebServiceUI::GetLargeImage(void)
+{
+    if(m_pwxGISDataset && m_pwxGISDataset->IsOpened())
+    {
+        return m_icLargeIcon;
+    }
+    else
+    {
+        return m_icLargeIconDsbl;
+    }
+}
+
+wxIcon wxGxTMSWebServiceUI::GetSmallImage(void)
+{
+    if(m_pwxGISDataset && m_pwxGISDataset->IsOpened())
+    {
+        return m_icSmallIcon;
+    }
+    else
+    {
+        return m_icSmallIconDsbl;
+    }
+}
+
+void wxGxTMSWebServiceUI::EditProperties(wxWindow *parent)
+{
+	//wxGISRemoteConnDlg dlg(m_sPath, parent);
+	//if(dlg.ShowModal() == wxID_OK)
+	//{
+ //       if(!m_pwxGISDataset)
+ //           return;
+ //       if(m_pwxGISDataset->IsOpened())
+ //           m_pwxGISDataset->Close();
+ //       wxGIS_GXCATALOG_EVENT(ObjectChanged);
+	//}
+
+    wxPropertySheetDialog PropertySheetDialog;
+    if (!PropertySheetDialog.Create(parent, wxID_ANY, _("Properties"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER))
+        return;
+    PropertySheetDialog.SetIcon(properties_xpm);
+    PropertySheetDialog.CreateButtons(wxOK);
+    wxWindow* pParentWnd = static_cast<wxWindow*>(PropertySheetDialog.GetBookCtrl());
+
+    wxGISRasterPropertyPage* RasterPropertyPage = new wxGISRasterPropertyPage(this, pParentWnd);
+    PropertySheetDialog.GetBookCtrl()->AddPage(RasterPropertyPage, RasterPropertyPage->GetPageName());
+	wxGISRasterDataset* pDset = wxDynamicCast(GetDataset(), wxGISRasterDataset);
+	if(pDset)
+	{
+        if(!pDset->IsOpened())
+            pDset->Open(true);
+		wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(pDset->GetSpatialReference(), pParentWnd);
+		PropertySheetDialog.GetBookCtrl()->AddPage(SpatialReferencePropertyPage, SpatialReferencePropertyPage->GetPageName());
+	}
+
+    //TODO: Additional page for virtual raster VRTSourcedDataset with sources files
+
+    //PropertySheetDialog.LayoutDialog();
+    PropertySheetDialog.SetSize(480,640);
+    PropertySheetDialog.Center();
+
+    PropertySheetDialog.ShowModal();
+}

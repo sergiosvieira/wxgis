@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxwebconnfactory.h"
+#include "wxgis/catalog/gxremoteconn.h"
 
 #include "wxgis/datasource/gdalinh.h"
 #include "wxgis/datasource/sysop.h"
@@ -60,7 +61,6 @@ bool wxGxWebConnectionFactory::GetChildren(wxGxObject* pParent, char** &pFileNam
 
 wxGxObject* wxGxWebConnectionFactory::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath)
 {
-	//wxGxRemoteConnection* pDataset = new wxGxRemoteConnection(pParent, soName, szPath);
-	//return static_cast<wxGxObject*>(pDataset);
-    return NULL;
+	wxGxTMSWebService* pDataset = new wxGxTMSWebService(pParent, soName, szPath);
+	return wxStaticCast(pDataset, wxGxObject);
 }

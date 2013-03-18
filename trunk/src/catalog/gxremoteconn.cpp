@@ -1,6 +1,6 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxRemoteConnection class.
+ * Purpose:  Remote Connection classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
 *   Copyright (C) 2011,2013 Bishop
@@ -460,139 +460,8 @@ void wxGxRemoteDBSchema::AddTable(const wxString &sTableName, const wxGISEnumDat
         new wxGxPostGISTableDataset(GetName(), m_pwxGISRemoteConn, this, sTableName, "");
         break;
     };
-
-    //IGxObject* pGxObject(NULL);
-    //if(bHasGeometry)
-    //{
-    //    wxGxPostGISFeatureDataset* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDataset(szName, szSchema, m_pwxGISRemoteConn);
-    //    pGxObject = static_cast<IGxObject*>(pGxPostGISFeatureDataset);
-    //}
-    //else
-    //{
-    //    wxGxPostGISTableDataset* pGxPostGISTableDataset = new wxGxPostGISTableDataset(szName, szSchema, m_pwxGISRemoteConn);
-    //    pGxObject = static_cast<IGxObject*>(pGxPostGISTableDataset);
-    //}
-    //    wxGISEnumDatasetType eType = pGISDataset->GetType();
-    //    IGxObject* pGxObject(NULL);
-    //    switch(eType)
-    //    {
-    //    case enumGISFeatureDataset:
-    //        {
-    //            wxGxPostGISFeatureDataset* pGxPostGISFeatureDataset = new wxGxPostGISFeatureDataset(pGISDataset->GetPath(), pGISDataset);
-    //            pGxObject = static_cast<IGxObject*>(pGxPostGISFeatureDataset);
-    //        }
-    //        break;
-    //    case enumGISTableDataset:
-    //        {
-    //            wxGxPostGISTableDataset* pGxPostGISTableDataset = new wxGxPostGISTableDataset(pGISDataset->GetPath(), pGISDataset);
-    //            pGxObject = static_cast<IGxObject*>(pGxPostGISTableDataset);
-    //        }
-    //        break;
-    //    case enumGISRasterDataset:
-    //        break;
-    //    default:
-    //    case enumGISContainer:
-    //        break;
-    //    };
-
-    //if(pGxObject)
-    //{
-	   // bool ret_code = AddChild(pGxObject);
-	   // if(!ret_code)
-		  //  wxDELETE(pGxObject);
-    //}
-
-    //    pDSet->Reference();
-    //    GetNewRemoteDBSchema(sScheme, pDSet);
-
-
-    //wxGISTable* pInfoScheme = wxDynamicCast(pDSet->ExecuteSQL(wxT("SELECT table_schema, table_name from information_schema.tables WHERE table_schema NOT LIKE 'pg_%' AND table_schema NOT LIKE 'information_schema'")), wxGISTable);//maybe more columns
-
-    ////create arraystring of table names for each scheme
-    //std::map<wxString, wxArrayString> DBSchema;
-
-    //wxFeatureCursor Cursor = pInfoScheme->Search();
-    //wxGISFeature Feature;
-    ////wxArrayString saGeomCol, saGeogCol; 
-    //while( (Feature = Cursor.Next()).IsOk() )
-    //{
-    //    wxString sScheme = Feature.GetFieldAsString(0);
-    //    pDSet->Reference();
-    //    new wxGxRemoteDBSchema(this, sScheme, "", pDSet);
-    ////    wxString sTable = Feature.GetFieldAsString(0);
-    ////    if(sTable.IsSameAs("geometry_columns", false))
-    ////    {
-    ////        saGeomCol.Add(sScheme + wxT(".") + sTable);
-    ////    }
-    ////    else if(sTable.IsSameAs("geography_columns", false))
-    ////    {
-    ////        saGeogCol.Add(sScheme + wxT(".") + sTable);
-    ////    }
-    ////    else
-    ////    {
-    ////        DBSchema[sScheme].Add(sTable);
-    ////    }
-    //}
-
-    //wxDELETE(pInfoScheme);
-
-    //wsDELETE(pDSet);
-
-
-        ////get all schemes
-        //SELECT * from information_schema.tables WHERE table_schema NOT LIKE 'pg_%' AND table_schema NOT LIKE 'information_schema';
-
-        ////get geometry tables names and schemes
-        //select * from geography_columns;
-        //select * from public.geometry_columns;
-        ////get inherits
-        //
-        //wxGISDataset* pGeoMetaData = pDSet->ExecuteSQL(wxT("SELECT f_table_schema,f_table_name from geography_columns"));
- 
-        //SELECT * FROM pg_class WHERE relname LIKE '%_columns';
-
-/*
-    OGRPGDataSource* pDS = dynamic_cast<OGRPGDataSource*>(m_pwxGISRemoteConn->GetDataSource());
-    Oid nGeogOID = pDS->GetGeographyOID();
-    Oid nGeomOID = pDS->GetGeometryOID();
-    wxGISTableSPtr pGeostruct;
-    if(nGeogOID != 0)
-        pGeostruct = boost::dynamic_pointer_cast<wxGISTable>(m_pwxGISRemoteConn->ExecuteSQL(wxString(wxT("SELECT f_table_schema,f_table_name from geography_columns"))));//,f_geography_column,type
-    else if(nGeomOID != 0)
-        pGeostruct = boost::dynamic_pointer_cast<wxGISTable>(m_pwxGISRemoteConn->ExecuteSQL(wxString(wxT("SELECT f_table_schema,f_table_name from geometry_columns"))));//,f_geography_column,type
-
-    std::vector<PGTABLEDATA> aDBStruct;
-    if(pGeostruct)
-    {
-        OGRFeatureSPtr pFeature;
-        while((pFeature = pGeostruct->Next()) != NULL)
-        {
-            PGTABLEDATA data = {true, pFeature->GetFieldAsString(1), pFeature->GetFieldAsString(0)};
-            aDBStruct.push_back(data);
-        }
-    }
-
-    std::vector<PGTABLEDATA> aDBStructOut;
-    OGRDataSource* poDS = m_pwxGISRemoteConn->GetDataSource();
-    for(size_t nIndex = 0; nIndex < m_pwxGISDataset->GetSubsetsCount(); ++nIndex)
-    {
-        OGRPGTableLayer* pPGTableLayer = dynamic_cast<OGRPGTableLayer*>(poDS->GetLayer(nIndex));
-        CPLString sTableName (pPGTableLayer->GetTableName());
-        CPLString sTableSchema (pPGTableLayer->GetSchemaName());
-        bool bAdd(false);
-        for(size_t j = 0; j < aDBStruct.size(); ++j)
-        {
-            if(aDBStruct[j].sTableName == sTableName && aDBStruct[j].sTableSchema == sTableSchema)
-            {
-                aDBStructOut.push_back( aDBStruct[j] );
-                bAdd = true;
-                break;
-            }
-        }
-
-        if(!bAdd)
-        {
-            //check inherits
+    /*
+//TODO: check inherits
             CPLString osCommand;
             osCommand.Printf("SELECT pg_class.relname FROM pg_class WHERE oid = "
                                 "(SELECT pg_inherits.inhparent FROM pg_inherits WHERE inhrelid = "
@@ -618,43 +487,37 @@ void wxGxRemoteDBSchema::AddTable(const wxString &sTableName, const wxGISEnumDat
                     }
                 }
             }
-        }
-        if(!bAdd)
-        {
-            PGTABLEDATA data = {false, sTableName, sTableSchema};
-            aDBStructOut.push_back( data );
-        }
-    }
-
-    std::map<CPLString, wxGxRemoteDBSchema*> DBSchema;
-
-    for(size_t i = 0; i < aDBStructOut.size(); ++i)
-    {
-        wxGxRemoteDBSchema* pGxRemoteDBSchema = DBSchema[aDBStructOut[i].sTableSchema];
-        if(pGxRemoteDBSchema)
-            pGxRemoteDBSchema->AddTable(aDBStructOut[i].sTableName, aDBStructOut[i].sTableSchema, aDBStructOut[i].bHasGeometry);
-        else
-        {
-            pGxRemoteDBSchema = GetNewRemoteDBSchema(aDBStructOut[i].sTableSchema, m_pwxGISRemoteConn);
-            bool ret_code = AddChild(static_cast<IGxObject*>(pGxRemoteDBSchema));
-		    if(!ret_code)
-                wxDELETE(pGxRemoteDBSchema);
-            else
-            {
-                pGxRemoteDBSchema->AddTable(aDBStructOut[i].sTableName, aDBStructOut[i].sTableSchema, aDBStructOut[i].bHasGeometry);
-                DBSchema[aDBStructOut[i].sTableSchema] = pGxRemoteDBSchema;
-            }
-        }
-    }
-
-  //  for(auto itr = DBSchema.begin(); itr != DBSchema.end(); ++itr)
-  //  {
-  //      bool ret_code = AddChild(static_cast<IGxObject*>(itr->second));
-		//if(!ret_code)
-  //          wxDELETE(itr->second);
-  //  }*/
+        }*/
 }
 
-
-
 #endif //wxGIS_USE_POSTGRES
+
+//--------------------------------------------------------------
+//class wxGxTMSWebService
+//--------------------------------------------------------------
+IMPLEMENT_CLASS(wxGxTMSWebService, wxGxRasterDataset)
+
+wxGxTMSWebService::wxGxTMSWebService(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxRasterDataset(enumRasterWMSTMS, oParent, soName, soPath)
+{
+}
+
+wxGxTMSWebService::~wxGxTMSWebService(void)
+{
+}
+
+void wxGxTMSWebService::FillMetadata(bool bForce)
+{
+    if(m_bIsMetadataFilled && !bForce)
+        return;
+    m_bIsMetadataFilled = true;
+
+    VSIStatBufL BufL;
+    wxULongLong nSize(0);
+    wxDateTime dt;
+    int ret = VSIStatL(m_sPath, &BufL);
+    if(ret == 0)
+    {
+        m_nSize += BufL.st_size;
+        m_dtMod = wxDateTime(BufL.st_mtime);
+    } 
+}
