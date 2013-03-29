@@ -81,6 +81,14 @@ protected:
 				m_pPointsArray[i]->AddPendingEvent(event);
 		}
 	};
+    virtual void QueueEvent(wxEvent *event)
+    {
+		for(size_t i = 0; i < m_pPointsArray.size(); ++i)
+		{
+			if(m_pPointsArray[i] != NULL)
+				m_pPointsArray[i]->QueueEvent(event);
+		}    
+    };
 protected:
 	wxVector<wxEvtHandler*> m_pPointsArray;
 };

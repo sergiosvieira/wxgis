@@ -24,11 +24,12 @@
 #include "wx/event.h"
 
 
-class WXDLLIMPEXP_FWD_GIS_CTU wxMxMapViewEvent;
+class WXDLLIMPEXP_FWD_GIS_CTU wxMxMapViewUIEvent;
 
-wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_GIS_CTU, wxMXMAP_ROTATED, wxMxMapViewEvent);
-wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_GIS_CTU, wxMXMAP_DRAWING_START, wxMxMapViewEvent);
-wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_GIS_CTU, wxMXMAP_DRAWING_STOP, wxMxMapViewEvent);
+wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_GIS_CTU, wxMXMAP_ROTATED, wxMxMapViewUIEvent);
+wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_GIS_CTU, wxMXMAP_DRAWING_START, wxMxMapViewUIEvent);
+wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_GIS_CTU, wxMXMAP_DRAWING_STOP, wxMxMapViewUIEvent);
+
 //wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_GIS_CTU, wxMXMAP_REFRESHED, wxGxMapViewEvent);
  //AfterDraw Fired after the specified phase is drawn. 
  //AfterItemDraw Fired after an individual view item is drawn. Example: view items include layers in a map or elements in a page layout. 
@@ -46,33 +47,35 @@ wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_GIS_CTU, wxMXMAP_DRAWING_STOP, wxMxMapViewE
 /** \class wxGxMapViewEvent mxeventui.h
     \brief The MapView class event.
 */
-class WXDLLIMPEXP_GIS_CTU wxMxMapViewEvent : public wxEvent
+class WXDLLIMPEXP_GIS_CTU wxMxMapViewUIEvent : public wxEvent
 {
 public:
-    wxMxMapViewEvent(wxEventType eventType = wxMXMAP_ROTATED, double dAngleRad = 0) : wxEvent(0, eventType), m_dRotation(dAngleRad)
+    wxMxMapViewUIEvent(wxEventType eventType = wxMXMAP_ROTATED, double dAngleRad = 0) : wxEvent(0, eventType)
 	{
+        m_dRotation = dAngleRad;
 	}
-	wxMxMapViewEvent(const wxMxMapViewEvent& event) : wxEvent(event), m_dRotation(event.m_dRotation)
+	wxMxMapViewUIEvent(const wxMxMapViewUIEvent& event) : wxEvent(event)
 	{
+        m_dRotation = event.m_dRotation;
 	}
 
 	void SetRotate(double dAngleRad){m_dRotation = dAngleRad;};
 	double GetRotate(void){return m_dRotation;};
 
-    virtual wxEvent *Clone() const { return new wxMxMapViewEvent(*this); }
+    virtual wxEvent *Clone() const { return new wxMxMapViewUIEvent(*this); }
 
 protected:
     double m_dRotation;
 
 private:
-    DECLARE_DYNAMIC_CLASS_NO_ASSIGN(wxMxMapViewEvent)
+    DECLARE_DYNAMIC_CLASS_NO_ASSIGN(wxMxMapViewUIEvent)
 };
 
-typedef void (wxEvtHandler::*wxMxMapViewEventFunction)(wxMxMapViewEvent&);
+typedef void (wxEvtHandler::*wxMxMapViewUIEventFunction)(wxMxMapViewUIEvent&);
 
-#define wxMxMapViewEventHandler(func) \
-    wxEVENT_HANDLER_CAST(wxMxMapViewEventFunction, func)
+#define wxMxMapViewUIEventHandler(func) \
+    wxEVENT_HANDLER_CAST(wxMxMapViewUIEventFunction, func)
 
-#define EVT_MXMAP_ROTATED(func)  wx__DECLARE_EVT0(wxMXMAP_ROTATED, wxMxMapViewEventHandler(func))
-#define EVT_MXMAP_DRAWING_START(func)  wx__DECLARE_EVT0(wxMXMAP_DRAWING_START, wxMxMapViewEventHandler(func))
-#define EVT_MXMAP_DRAWING_STOP(func)  wx__DECLARE_EVT0(wxMXMAP_DRAWING_STOP, wxMxMapViewEventHandler(func))
+#define EVT_MXMAP_ROTATED(func)  wx__DECLARE_EVT0(wxMXMAP_ROTATED, wxMxMapViewUIEventHandler(func))
+#define EVT_MXMAP_DRAWING_START(func)  wx__DECLARE_EVT0(wxMXMAP_DRAWING_START, wxMxMapViewUIEventHandler(func))
+#define EVT_MXMAP_DRAWING_STOP(func)  wx__DECLARE_EVT0(wxMXMAP_DRAWING_STOP, wxMxMapViewUIEventHandler(func))

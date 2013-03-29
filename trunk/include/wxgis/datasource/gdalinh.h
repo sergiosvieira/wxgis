@@ -112,6 +112,7 @@ protected:
 };
 
 class WXDLLIMPEXP_GIS_DS wxGISGeometry;
+WX_DECLARE_USER_EXPORTED_OBJARRAY(wxGISGeometry, wxGISGeometryArray, WXDLLIMPEXP_GIS_DS);
 
 /** \class wxGISFeature gdalinh.h
     \brief The OGRFeature wrapper class.
@@ -219,10 +220,12 @@ public:
     bool operator != (const wxGISGeometry& obj) const { return !(*this == obj); };
     operator OGRGeometry*() const;
 
-    OGREnvelope GetEnvelope(void);
+    OGREnvelope GetEnvelope(void) const;
     OGRGeometry* Copy(void) const;
 
-    wxGISGeometry Intersection(wxGISGeometry Geom) const;
+    wxGISGeometry Intersection(const wxGISGeometry &Geom) const;
+    bool Intersects(const wxGISGeometry &Geom) const;
+    OGRwkbGeometryType GetType() const;
 protected:
     virtual wxObjectRefData *CreateRefData() const;
     virtual wxObjectRefData *CloneRefData(const wxObjectRefData *data) const;    

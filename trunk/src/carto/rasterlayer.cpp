@@ -23,6 +23,13 @@
 /*
 #include "wxgis/display/displaytransformation.h"
 */
+
+//----------------------------------------------------------------------------
+// wxGISRasterLayer
+//----------------------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxGISRasterLayer, wxGISLayer)
+
 wxGISRasterLayer::wxGISRasterLayer(const wxString &sName, wxGISDataset* pwxGISDataset) : wxGISLayer(sName, pwxGISDataset)
 {
     wxGISRasterDataset* pwxGISRasterDataset = wxDynamicCast(pwxGISDataset, wxGISRasterDataset);
@@ -72,7 +79,7 @@ wxGISRasterLayer::~wxGISRasterLayer(void)
 
 bool wxGISRasterLayer::IsValid(void) const
 {
-    return m_pRenderer && m_pwxGISDataset;
+    return m_pRenderer && m_pwxGISDataset && m_pwxGISDataset->IsOpened();
 }
 
 
@@ -80,10 +87,10 @@ bool wxGISRasterLayer::IsValid(void) const
 	////GDALCreateGenImgProjTransformer
 	////GDALCreateReprojectionTransformer
 
-bool wxGISRasterLayer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel * const pTrackCancel)
+bool wxGISRasterLayer::Draw(wxGISEnumDrawPhase DrawPhase, ITrackCancel * const pTrackCancel)
 {
     wxCHECK_MSG(m_pRenderer, false, wxT("The current renderer point is NULL"));
-    return m_pRenderer->Draw(DrawPhase, pDisplay, pTrackCancel);
+    return m_pRenderer->Draw(DrawPhase, m_pDisplay, pTrackCancel);
     /*
 	//if(m_pRasterRenderer && m_pRasterRenderer->CanRender(m_pwxGISRasterDataset))
 	//{

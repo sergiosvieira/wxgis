@@ -22,9 +22,8 @@
 
 #include "wxgis/datasource/table.h"
 #include "wxgis/datasource/gdalinh.h"
+#include "wxgis/datasource/quadtree.h"
 
-/*#include "wxgis/datasource/quadtree.h"
-*/
 /** \class wxGISFeatureDataset featuredataset.h
     \brief The GIS FeatureDataset class.
 
@@ -35,6 +34,7 @@ class WXDLLIMPEXP_GIS_DS wxGISFeatureDataset :
 	public wxGISTable
 {
     DECLARE_CLASS(wxGISFeatureDataset)
+    friend class wxGISQuadTree;
 public:
 	wxGISFeatureDataset(const CPLString &sPath, int nSubType, OGRLayer* poLayer = NULL, OGRDataSource* poDS = NULL);
 	virtual ~wxGISFeatureDataset(void);
@@ -49,11 +49,11 @@ public:
 	virtual bool IsCached(void){ return m_bIsDataLoaded & m_bIsGeometryLoaded; };
 	virtual void Cache(ITrackCancel* pTrackCancel = NULL);*/
 //wxGISFeatureDataset
-	virtual OGREnvelope GetEnvelope(void) const;
+	virtual OGREnvelope GetEnvelope(void);
     virtual OGRwkbGeometryType GetGeometryType(void) const;
     virtual wxFeatureCursor Search(const wxGISSpatialFilter &SpaFilter, bool bOnlyFirst = false);
+ 	virtual wxGISQuadTreeCursor SearchGeometry(const CPLRectObj* pAoi = 0);
     /*
- 	virtual wxGISQuadTreeCursorSPtr SearchGeometry(const CPLRectObj* pAoi = 0);
     virtual OGRErr SetFilter(wxGISQueryFilter* pQFilter);
 	virtual wxFeatureCursorSPtr Search(wxGISQueryFilter* pQFilter, bool bOnlyFirst = false);
 
@@ -73,14 +73,16 @@ protected:
 protected:	
     OGREnvelope m_stExtent;
     OGRwkbGeometryType m_eGeomType;
+	wxGISQuadTree* m_pQuadTree;
     /*
 	
     bool m_bIsGeometryLoaded;
 
-	wxGISQuadTreeSPtr m_pQuadTree;
 
     //wxGISGeometrySet *m_pGeometrySet;
 //    wxArrayString m_FeatureStringData;
 */
+private:
+
 };
 

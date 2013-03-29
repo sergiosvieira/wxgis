@@ -20,8 +20,9 @@
  ****************************************************************************/
 #include "wxgis/cartoui/mxeventui.h"
 
-IMPLEMENT_DYNAMIC_CLASS(wxMxMapViewEvent, wxEvent)
+IMPLEMENT_DYNAMIC_CLASS(wxMxMapViewUIEvent, wxEvent)
 
-wxDEFINE_EVENT( wxMXMAP_ROTATED, wxMxMapViewEvent );
-wxDEFINE_EVENT( wxMXMAP_DRAWING_START, wxMxMapViewEvent );
-wxDEFINE_EVENT( wxMXMAP_DRAWING_STOP, wxMxMapViewEvent );
+wxDEFINE_EVENT( wxMXMAP_ROTATED, wxMxMapViewUIEvent );
+wxDEFINE_EVENT( wxMXMAP_DRAWING_START, wxMxMapViewUIEvent );
+wxDEFINE_EVENT( wxMXMAP_DRAWING_STOP, wxMxMapViewUIEvent );
+

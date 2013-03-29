@@ -3,7 +3,7 @@
  * Purpose:  wxGISQuadTree class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,51 +20,63 @@
  ****************************************************************************/
 #pragma once
 
-/*
-#include "wxgis/datasource/datasource.h"
+#include "wxgis/datasource/gdalinh.h"
 
+#include "wx/thread.h"
+#include "cpl_quad_tree.h"
 #include <list>
+
+class WXDLLIMPEXP_GIS_DS wxGISFeatureDataset;
 
 /** \class wxGISQuadTreeItem quadtree.h
     \brief The class to represent geometry and OID in QuadTree.
 */
-/*
-class wxGISQuadTreeItem
+
+class WXDLLIMPEXP_GIS_DS wxGISQuadTreeItem
 {
 public:
-	wxGISQuadTreeItem(OGRGeometry* pGeom, long nOID, bool bOwnGeometry = false)
+	wxGISQuadTreeItem(const wxGISGeometry &oGeom, long nOID)
 	{
-		m_pGeom = pGeom;
+		m_oGeom = oGeom;
 		m_nOID = nOID;
-		m_bOwnGeometry = bOwnGeometry;
 	}
+
+	wxGISQuadTreeItem(const OGREnvelope &Env, long nOID)
+	{
+		m_nOID = nOID;
+        m_Env = Env;
+	}
+
 	virtual ~wxGISQuadTreeItem(void)
 	{
-		if(m_bOwnGeometry)
-			wxDELETE(m_pGeom);
 	}
+
 	virtual void FillBounds(CPLRectObj* pBounds)
 	{
-		if(!m_pGeom)
-			return;
-		OGREnvelope Env;
-		m_pGeom->getEnvelope(&Env);
-		if(IsDoubleEquil(Env.MinX, Env.MaxX))
-			Env.MaxX += DELTA;
-		if(IsDoubleEquil(Env.MinY, Env.MaxY))
-			Env.MaxY += DELTA;
+        if(!m_Env.IsInit())
+        {
+            if(!m_oGeom.IsOk())
+			    return;
+		    m_Env = m_oGeom.GetEnvelope();
+		    if(IsDoubleEquil(m_Env.MinX, m_Env.MaxX))
+			    m_Env.MaxX += DELTA;
+		    if(IsDoubleEquil(m_Env.MinY, m_Env.MaxY))
+			    m_Env.MaxY += DELTA;
+        }
 
-		pBounds->minx = Env.MinX;
-		pBounds->maxx = Env.MaxX;
-		pBounds->miny = Env.MinY;
-		pBounds->maxy = Env.MaxY;
+		pBounds->minx = m_Env.MinX;
+		pBounds->maxx = m_Env.MaxX;
+		pBounds->miny = m_Env.MinY;
+		pBounds->maxy = m_Env.MaxY;
+
 	}
 	virtual long GetOID(void){ return m_nOID; };
-	virtual OGRGeometry* GetGeometry(void){ return m_pGeom; };
+	virtual wxGISGeometry GetGeometry(void) const { return m_oGeom; };
+	virtual void SetGeometry(const wxGISGeometry &oGeom) { m_oGeom = oGeom; };
 protected:
-	OGRGeometry* m_pGeom;
+	wxGISGeometry m_oGeom;
+    OGREnvelope m_Env;
 	long m_nOID;
-	bool m_bOwnGeometry;
 };
 
 void GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds);
@@ -73,69 +85,128 @@ class wxGISQuadTree;
 /** \class wxGISQuadTreeCursor quadtree.h
     \brief The class to store Search results of wxGISQuadTree.
 */
-/*
-class wxGISQuadTreeCursor
+
+class WXDLLIMPEXP_GIS_DS wxGISQuadTreeCursor : public wxObject
 {
+    DECLARE_CLASS(wxGISQuadTreeCursor)
 	friend class wxGISQuadTree;
 public:
-	wxGISQuadTreeCursor(void) : m_nItemCount(0), m_pData(NULL){};
-	virtual ~wxGISQuadTreeCursor(void){CPLFree(m_pData);};
-	virtual int GetCount(void){return m_nItemCount;};
-	virtual wxGISQuadTreeItem* const operator [](size_t nIndex)
-	{
-		if(!m_pData)
-			return NULL;
-		if(nIndex >= m_nItemCount)
-			return NULL;
-		return m_pData[nIndex];
-	}
-	virtual wxGISQuadTreeItem* const at(size_t nIndex)
-	{
-		return operator [](nIndex);
-	}
-	virtual wxGISQuadTreeItem* const Next(void)
-	{
-		if(!m_pData)
-			return NULL;
-		if(m_nCurrentItem == m_nItemCount)
-			return NULL;
-		wxGISQuadTreeItem* pOut = m_pData[m_nCurrentItem];
-		m_nCurrentItem++;
-		return pOut;
-	}
-	virtual void Reset(void)
-	{
-		m_nCurrentItem = 0;
-	}
-	virtual void DeleteItem(size_t nIndex)
-	{
-		m_pData[nIndex] = NULL;
-	}
+	wxGISQuadTreeCursor(void);
+	wxGISQuadTreeCursor(wxGISQuadTreeItem** ppTreeItems, int nCount);
+	virtual ~wxGISQuadTreeCursor(void);
+
+    bool IsOk() const;
+
+    bool operator == ( const wxGISQuadTreeCursor& obj ) const;
+    bool operator != (const wxGISQuadTreeCursor& obj) const { return !(*this == obj); };
+
+	virtual int GetCount(void) const;
+	virtual wxGISQuadTreeItem* operator [](size_t nIndex) const;
+	virtual wxGISQuadTreeItem* at(size_t nIndex) const;
+	virtual wxGISQuadTreeItem* const Next(void);
+	virtual void Reset(void);
+	virtual void DeleteItem(size_t nIndex);
 protected:
-	wxGISQuadTreeItem** m_pData;
-	int m_nItemCount;
+    virtual wxObjectRefData *CreateRefData() const;
+    virtual wxObjectRefData *CloneRefData(const wxObjectRefData *data) const;    
+protected:
 	int m_nCurrentItem;
 };
 
-DEFINE_SHARED_PTR(wxGISQuadTreeCursor);
+/** \class wxGISQuadTreeCursorRefData quadtree.h
+    \brief The reference data class for wxGISQuadTreeCursor
+*/
+
+class wxGISQuadTreeCursorRefData : public wxObjectRefData
+{
+    friend class wxGISQuadTreeCursor;
+public:
+    wxGISQuadTreeCursorRefData(wxGISQuadTreeItem** ppTreeItems, int nCount)
+    {        
+        m_pData = ppTreeItems;
+        m_nItemCount = nCount;
+    }
+
+    wxGISQuadTreeCursorRefData()
+    {        
+        m_pData = NULL;
+        m_nItemCount = 0;
+    }
+
+    virtual ~wxGISQuadTreeCursorRefData(void)
+    {
+        if(m_pData)
+            CPLFree(m_pData);
+    }
+
+    virtual int GetCount(void) const
+    {
+        return m_nItemCount;
+    }
+
+	virtual wxGISQuadTreeItem* const operator [](size_t nIndex)
+    {
+	    if(!IsValid())
+		    return NULL;
+	    if(nIndex >= GetCount())
+		    return NULL;
+	    return m_pData[nIndex];
+    }
+
+	virtual void DeleteItem(size_t nIndex)
+    {
+        m_pData[nIndex] = NULL;
+    }
+
+    wxGISQuadTreeCursorRefData( const wxGISQuadTreeCursorRefData& data )
+        : wxObjectRefData()
+    {
+        m_pData = data.m_pData;
+        m_nItemCount = data.m_nItemCount;
+    }
+
+    bool operator == (const wxGISQuadTreeCursorRefData& data) const
+    {
+        wxCHECK_MSG(m_pData && data.m_pData, false, wxT("m_pData or data.m_pData is null"));
+        return m_pData == data.m_pData && m_nItemCount == data.m_nItemCount;
+    }
+
+    virtual bool IsValid(void) const {return m_pData != NULL;};
+
+protected:
+	wxGISQuadTreeItem** m_pData;
+	int m_nItemCount;
+}; 
+
+extern WXDLLIMPEXP_DATA_GIS_DS(wxGISQuadTreeCursor) wxNullQuadTreeCursor;
+
 
 /** \class wxGISQuadTree quadtree.h
     \brief The wxGIS QuadTree representation.
 */
-/*
-class WXDLLIMPEXP_GIS_DS wxGISQuadTree
+
+class WXDLLIMPEXP_GIS_DS wxGISQuadTree :
+    public wxThreadHelper
 {
 public:
-	wxGISQuadTree(const OGREnvelope &Env);
+	wxGISQuadTree(wxGISFeatureDataset* pDSet);
 	virtual ~wxGISQuadTree(void);
-    virtual void AddItem(OGRGeometry* pGeom, long nOID, bool bOwnGeometry = false);
-	virtual wxGISQuadTreeCursorSPtr Search(const CPLRectObj* pAoi = 0);
+	virtual wxGISQuadTreeCursor Search(const CPLRectObj* pAoi = 0);
+    virtual bool Load(ITrackCancel* const pTrackCancel);
+protected:    
+    virtual void AddItem(wxGISQuadTreeItem* pItem);
+protected:
+    virtual wxThread::ExitCode Entry();
+    bool CreateAndRunLoadGeometryThread(void);
+    void DestroyLoadGeometryThread(void);
 protected:
     CPLQuadTree* m_pQuadTree;
 	std::list<wxGISQuadTreeItem*> m_QuadTreeItemList;
 	OGREnvelope m_Envelope;
 	wxCriticalSection m_CritSect;
-};
+    wxGISFeatureDataset* m_pDSet;
+    ITrackCancel* m_pTrackCancel;
+    IProgressor* m_pProgress;
 
-DEFINE_SHARED_PTR(wxGISQuadTree);
-*/
+    short m_nPreloadItemCount;
+};

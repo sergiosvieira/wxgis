@@ -189,14 +189,14 @@ bool wxGISProcess::CreateAndRunReadThread(void)
 {
     if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)//wxTHREAD_DETACHED//
     {
-        wxLogError(_("Could not create the read thread!"));
+        wxLogError(_("Could not create the thread!"));
         return false;
     }
 
     // go!
     if (GetThread()->Run() != wxTHREAD_NO_ERROR)
     {
-        wxLogError(_("Could not run the read thread!"));
+        wxLogError(_("Could not run the thread!"));
         return false;
     }
     return true;

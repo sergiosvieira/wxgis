@@ -33,6 +33,38 @@
  *  \brief The view for map showing.
  */
 
+class wxGxTrackCancel :
+    public ITrackCancel
+{
+public:
+    wxGxTrackCancel(wxGISStatusBar* pStatusBar)
+    {
+        m_pStatusBar = pStatusBar;
+    	if(m_pStatusBar)
+        {
+            IProgressor* pAni = m_pStatusBar->GetAnimation();
+    		SetProgressor(pAni);
+        }
+    }
+    virtual ~wxGxTrackCancel(void)
+    {
+    }
+	virtual void PutMessage(const wxString &sMessage, size_t nIndex, wxGISEnumMessageType nType)
+    {
+    	if(m_pStatusBar)
+        {
+            m_pStatusBar->SetMessage(sMessage);
+        }
+    }
+protected:
+    wxGISStatusBar* m_pStatusBar;
+};
+
+
+/** \class wxGxMapView gxmapview.h
+ *  \brief The view for map showing.
+ */
+
 class WXDLLIMPEXP_GIS_CLU wxGxMapView :
 	public wxGISMapView,
 	public wxGxView
@@ -64,7 +96,6 @@ private:
 
 	wxGISStatusBar* m_pStatusBar;
 	wxGxApplication* m_pApp;
-	ITrackCancel *m_pTrackCancel;
 
 	wxGISCoordinatesFormat m_CFormat;
 private:

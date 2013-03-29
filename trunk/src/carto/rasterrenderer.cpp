@@ -23,11 +23,6 @@
 #include "wxgis/core/app.h"
 #include "wxgis/display/displayop.h"
 
-/*
-#include "wxgis/datasource/rasterdataset.h"
-
-*/
-
 //-----------------------------------
 // Interpolation functions
 //-----------------------------------
@@ -566,6 +561,7 @@ wxGISRasterRenderer::wxGISRasterRenderer(wxGISDataset* pwxGISDataset) : wxGISRen
     	wxString sAppName = GetApplication()->GetAppName();
 
     	m_eQuality = (wxGISEnumDrawQuality)oConfig.ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/quality")), enumGISQualityBilinear);
+        //TODO: tiled draw
         m_nTileSizeX = oConfig.ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/tile_size_x")), m_nTileSizeX);
         m_nTileSizeY = oConfig.ReadInt(enumGISHKCU, sAppName + wxString(wxT("/renderer/raster/tile_size_y")), m_nTileSizeY);
     }
@@ -610,7 +606,7 @@ bool wxGISRasterRenderer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay* const
 
 	//get intersect envelope to fill raster data
 	OGREnvelope stDrawBounds = stDisplayExtentRotated;
-	stDrawBounds.Intersect(stDisplayExtentRotated);
+	stDrawBounds.Intersect(stRasterExtentRotated);
 	if(!stDrawBounds.IsInit())
 		return false;
 
@@ -689,7 +685,7 @@ bool wxGISRasterRenderer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay* const
 	RAWPIXELDATA stPixelData;
 	stPixelData.pPixelData = NULL;
 	stPixelData.nOutputWidth = stPixelData.nOutputHeight = -1;
-	stPixelData.nPixelDataWidth = stPixelData.nPixelDataHeight = -1;
+	//stPixelData.nPixelDataWidth = stPixelData.nPixelDataHeight = -1;
 	
 	if( nOutWidth > nWidth && nOutHeight > nHeight ) // not scale
 	{
@@ -707,30 +703,42 @@ bool wxGISRasterRenderer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay* const
 		stPixelData.nOutputWidth = nOutWidth;
 		stPixelData.nOutputHeight = nOutHeight;
 
-		data = CPLMalloc (nWidth * nHeight * nDataSize * nBandCount);
-		if(!m_pwxGISRasterDataset->GetPixelData(data, nMinX, nMinY, nWidth, nHeight, nWidth, nHeight, eDT, nBandCount, panBands))
-        {
-            CPLFree (data);
-			return false;
-        }
 	}
 	else
 	{
-		stPixelData.dPixelDeltaX = stPixelData.dPixelDeltaY = 0;
-		stPixelData.dPixelDataWidth = nOutWidth;
-		stPixelData.dPixelDataHeight = nOutHeight;
-		stPixelData.nPixelDataWidth = nOutWidth;
-		stPixelData.nPixelDataHeight = nOutHeight;
-		stPixelData.nOutputWidth = -1;
-		stPixelData.nOutputHeight = -1;
+        //get closest overview and get overview data
+        int nMinXTmp = nMinX;
+        int nMinYTmp = nMinY;
+        int nOutWidthOv = nWidth;
+        int nOutHeightOv = nHeight;
 
-		data = CPLMalloc (nOutWidth * nOutHeight * nDataSize * nBandCount);
-		if(!m_pwxGISRasterDataset->GetPixelData(data, nMinX, nMinY, nWidth, nHeight, nOutWidth, nOutHeight, eDT, nBandCount, panBands))
+        int nOverview = GDALBandGetBestOverviewLevel(pRaster->GetRasterBand(panBands[0]), nMinXTmp, nMinYTmp, nOutWidthOv, nOutHeightOv, nOutWidth, nOutHeight);
+        if (nOverview >= 0)
         {
-            CPLFree (data);
-			return false;
+    		stPixelData.dPixelDeltaX = stPixelData.dPixelDeltaY = 0;
+		    stPixelData.dPixelDataWidth = nOutWidthOv;
+		    stPixelData.dPixelDataHeight = nOutHeightOv;
+		    stPixelData.nPixelDataWidth = nOutWidthOv;
+		    stPixelData.nPixelDataHeight = nOutHeightOv;
+		    stPixelData.nOutputWidth = nOutWidth;
+		    stPixelData.nOutputHeight = nOutHeight;
+        }
+        else
+        {
+		    stPixelData.dPixelDeltaX = stPixelData.dPixelDeltaY = 0;
+		    stPixelData.dPixelDataWidth = nOutWidth;
+		    stPixelData.dPixelDataHeight = nOutHeight;
+		    stPixelData.nPixelDataWidth = nOutWidth;
+		    stPixelData.nPixelDataHeight = nOutHeight;
         }
 	}
+
+	data = CPLMalloc (stPixelData.nPixelDataWidth * stPixelData.nPixelDataHeight * nDataSize * nBandCount);
+	if(!m_pwxGISRasterDataset->GetPixelData(data, nMinX, nMinY, nWidth, nHeight, stPixelData.nPixelDataWidth, stPixelData.nPixelDataHeight, eDT, nBandCount, panBands))
+    {
+        CPLFree (data);
+		return false;
+    }
 
 	stPixelData.pPixelData = data;
 	stPixelData.stWorldBounds = stDrawBounds;

@@ -18,9 +18,16 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#include "wxgis/carto/simplerenderer.h"
-/*
-wxGISSimpleRenderer::wxGISSimpleRenderer(void)
+#include "wxgis/carto/featurerenderer.h"
+#include "wxgis/display/displayop.h"
+
+//-----------------------------------------------------------------------------
+// wxGISFeatureRenderer
+//-----------------------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxGISFeatureRenderer, wxGISRenderer)
+
+wxGISFeatureRenderer::wxGISFeatureRenderer(wxGISDataset* pwxGISDataset) : wxGISRenderer(pwxGISDataset)
 {
 	//m_pFillSymbol = new wxSimpleFillSymbol();
  //   m_pLineSymbol = new wxSimpleLineSymbol();
@@ -42,33 +49,78 @@ wxGISSimpleRenderer::wxGISSimpleRenderer(void)
 
     m_dWidth = 0.5;
     m_dRadius = 1.5;
+
+    m_pwxGISFeatureDataset = wxDynamicCast(pwxGISDataset, wxGISFeatureDataset);
 }
 
-wxGISSimpleRenderer::~wxGISSimpleRenderer(void)
+wxGISFeatureRenderer::~wxGISFeatureRenderer(void)
 {
 }
 
-bool wxGISSimpleRenderer::CanRender(wxGISDatasetSPtr pDataset)
+bool wxGISFeatureRenderer::CanRender(wxGISDataset* pwxGISDataset) const
 {
-	bool bRet = pDataset->GetType() == enumGISFeatureDataset ? true : false;
-	if(bRet)
-		m_pDataset = pDataset;
-	return bRet;
+    wxCHECK_MSG(pwxGISDataset, false, wxT("Input dataset pointer is NULL"));
+	return pwxGISDataset->GetType() == enumGISFeatureDataset ? true : false;
 }
 
-void wxGISSimpleRenderer::Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel)
+bool wxGISFeatureRenderer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay* const pDisplay, ITrackCancel* const pTrackCancel)
 {
-	if(NULL == pCursor)
-		return;
+    wxCHECK_MSG(pDisplay && m_pwxGISFeatureDataset, false, wxT("Display or FeatureDataset pointer is NULL"));
 
+	OGREnvelope stFeatureDatasetExtent = m_pwxGISFeatureDataset->GetEnvelope();
+	OGREnvelope stDisplayExtentRotated = pDisplay->GetBounds(true);
+	OGREnvelope stFeatureDatasetExtentRotated = stFeatureDatasetExtent;
+
+	//rotate featureclass extent
+	if(!IsDoubleEquil(pDisplay->GetRotate(), 0.0))
+	{
+        wxRealPoint dfCenter = pDisplay->GetBoundsCenter();
+		RotateEnvelope(stFeatureDatasetExtentRotated, pDisplay->GetRotate(), dfCenter.x, dfCenter.y);//dCenterX, dCenterY);
+	}
+
+	//if envelopes don't intersect exit
+    if(!stDisplayExtentRotated.Intersects(stFeatureDatasetExtentRotated))
+        return false;
+
+	//get intersect envelope to fill vector data
+	OGREnvelope stDrawBounds = stDisplayExtentRotated;
+	stDrawBounds.Intersect(stFeatureDatasetExtentRotated);
+	if(!stDrawBounds.IsInit())
+		return false;
+
+    bool bAllFeatures = stDrawBounds.Contains(stFeatureDatasetExtent);
+	//if(!stFeatureDatasetExtent.Contains(stDrawBounds))
+	//	stDrawBounds = stFeatureDatasetExtent;
+
+    wxGISQuadTreeCursor QTCursor;
+	if(bAllFeatures)
+	{
+		QTCursor = m_pwxGISFeatureDataset->SearchGeometry();
+	}
+	else
+	{
+		const CPLRectObj Rect = {stDrawBounds.MinX, stDrawBounds.MinY, stDrawBounds.MaxX, stDrawBounds.MaxY};
+		QTCursor = m_pwxGISFeatureDataset->SearchGeometry(&Rect);
+	}
+
+    if(!QTCursor.IsOk())
+        return false;
+
+    Draw(QTCursor, DrawPhase, pDisplay, pTrackCancel);
+
+    return true;
+}
+
+void wxGISFeatureRenderer::Draw(const wxGISQuadTreeCursor& Cursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel)
+{
 	//set colors and etc.
 	pDisplay->SetFillColor(m_stFillColour);
 	pDisplay->SetLineColor(m_stLineColour);
 	pDisplay->SetPointColor(m_stPointColour);
 
-    for(size_t i = 0; i < pCursor->GetCount(); ++i)
+    for(size_t i = 0; i < Cursor.GetCount(); ++i)
     {
-        wxGISQuadTreeItem* pItem = pCursor->at(i);
+        wxGISQuadTreeItem* pItem = Cursor[i];
         if(!pItem)
             continue;
 
@@ -76,10 +128,10 @@ void wxGISSimpleRenderer::Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPha
 		{
 		case wxGISDPGeography:
 			{
-				OGRGeometry* pGeom = pItem->GetGeometry();
-				if(!pGeom)
+				wxGISGeometry Geom = pItem->GetGeometry();
+                if(!Geom.IsOk())
 					break;
-				OGRwkbGeometryType type = wkbFlatten(pGeom->getGeometryType());
+				OGRwkbGeometryType type = wkbFlatten(Geom.GetType());
 				switch(type)
 				{
 				case wkbPoint:
@@ -107,7 +159,7 @@ void wxGISSimpleRenderer::Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPha
 					break;
 				}
 
-				pDisplay->DrawGeometry(pGeom);
+				pDisplay->DrawGeometry(Geom);
 			}
 			break;
 		case wxGISDPAnnotation:
@@ -122,6 +174,3 @@ void wxGISSimpleRenderer::Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPha
 			break;
 	}
 }
-
-
-*/

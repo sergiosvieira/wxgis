@@ -60,9 +60,10 @@ set(PROJECT_HHEADERS ${PROJECT_HHEADERS}
     ${LIB_HEADERS}/map.h
     ${LIB_HEADERS}/rasterlayer.h
     ${LIB_HEADERS}/rasterrenderer.h
-    ${LIB_HEADERS}/simplerenderer.h
+    ${LIB_HEADERS}/featurerenderer.h
     ${LIB_HEADERS}/stretch.h
     ${LIB_HEADERS}/transformthreads.h    
+    ${LIB_HEADERS}/mxevent.h    
 )
 
 set(PROJECT_CSOURCES ${PROJECT_CSOURCES}
@@ -72,9 +73,10 @@ set(PROJECT_CSOURCES ${PROJECT_CSOURCES}
     ${LIB_SOURCES}/map.cpp
     ${LIB_SOURCES}/rasterlayer.cpp
     ${LIB_SOURCES}/rasterrenderer.cpp
-    ${LIB_SOURCES}/simplerenderer.cpp
+    ${LIB_SOURCES}/featurerenderer.cpp
     ${LIB_SOURCES}/stretch.cpp
     ${LIB_SOURCES}/transformthreads.cpp    
+    ${LIB_SOURCES}/mxevent.cpp    
 )
 
 add_definitions(-DWXMAKINGDLL_GIS_CRT)

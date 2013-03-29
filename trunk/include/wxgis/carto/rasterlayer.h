@@ -21,7 +21,6 @@
 #pragma once
 
 #include "wxgis/carto/layer.h"
-
 #include "wxgis/datasource/rasterdataset.h"
 
 /** \class wxGISRasterLayer rasterlayer.h
@@ -31,11 +30,12 @@
 class WXDLLIMPEXP_GIS_CRT wxGISRasterLayer :
 	public wxGISLayer
 {
+    DECLARE_CLASS(wxGISRasterLayer)
 public:
 	wxGISRasterLayer(const wxString &sName = _("new layer"), wxGISDataset* pwxGISDataset = NULL);
 	virtual ~wxGISRasterLayer(void);
 //wxGISLayer
-	virtual bool Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel * const pTrackCancel = NULL);
+	virtual bool Draw(wxGISEnumDrawPhase DrawPhase, ITrackCancel * const pTrackCancel = NULL);
 	virtual bool IsValid(void) const;
 //wxGISRasterLayer
 	//virtual IRasterRendererSPtr GetRenderer(void){return m_pRasterRenderer;};
@@ -47,6 +47,4 @@ public:
 
 	//OGREnvelope m_FullEnvelope;
 	//OGREnvelope m_PreviousEnvelope;
-
-	//IRasterRendererSPtr m_pRasterRenderer;
 };

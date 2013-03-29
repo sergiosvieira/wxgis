@@ -22,19 +22,21 @@
 
 #include "wxgis/carto/renderer.h"
 
+#include <wx/event.h>
+
 /** \class wxGISLayer layer.h
     \brief The base class for map layers.
 */
 
 class WXDLLIMPEXP_GIS_CRT wxGISLayer :
-	public wxObject
+	public wxEvtHandler,
+    public wxGISConnectionPointContainer
 {
     DECLARE_ABSTRACT_CLASS(wxGISLayer)
 public:
 	wxGISLayer(const wxString &sName = _("new layer"), wxGISDataset* pwxGISDataset = NULL);
 	virtual ~wxGISLayer(void);
 	virtual wxGISSpatialReference GetSpatialReference(void) const;
-	virtual void SetSpatialReference(const wxGISSpatialReference &SpatialReference);
 	virtual OGREnvelope GetEnvelope(void) const;
 	virtual void SetMaximumScale(double dMaxScale){m_dMaxScale = dMaxScale;};
 	virtual double GetMaximumScale(void) const {return m_dMaxScale;};
@@ -44,17 +46,20 @@ public:
 	virtual void SetVisible(bool bVisible){m_bVisible = bVisible;};
 	virtual void SetName(const wxString &sName){m_sName = sName;};
 	virtual wxString GetName(void) const {return m_sName;};
-	virtual size_t GetCacheID(void) const {return m_nCacheID;};
-	virtual void SetCacheID(size_t nCacheID){m_nCacheID = nCacheID;};
 	virtual bool IsCacheNeeded(void) const {return true;};
 	virtual wxGISEnumDatasetType GetType(void) const {return enumGISAny;};
 	virtual bool IsValid(void) const;
-	virtual bool Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel* const pTrackCancel = NULL) = 0;
+	virtual bool Draw(wxGISEnumDrawPhase DrawPhase, ITrackCancel* const pTrackCancel = NULL) = 0;
     virtual void SetRenderer(wxGISRenderer* pRenderer);
     virtual wxGISRenderer* GetRenderer(void);
+	virtual size_t GetCacheID(void) const {return m_nCacheID;};
+	virtual void SetCacheID(size_t nCacheID){m_nCacheID = nCacheID;};
+	virtual void SetSpatialReference(const wxGISSpatialReference &SpatialReference);
+    virtual void SetDispaly(wxGISDisplay *pDisplay) { m_pDisplay = pDisplay; };
 protected:
     wxGISDataset* m_pwxGISDataset;
     wxGISSpatialReference m_SpatialReference;
+    wxGISDisplay *m_pDisplay;
     OGREnvelope m_FullEnvelope;
     double m_dMaxScale, m_dMinScale;
     bool m_bVisible;
