@@ -3,7 +3,7 @@
  * Purpose:  wxGISQuadTree class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,8 +20,11 @@
  ****************************************************************************/
 
 #include "wxgis/datasource/quadtree.h"
+#include "wxgis/datasource/featuredataset.h"
+#include "wxgis/datasource/vectorop.h"
 
-/*
+#define PRELOAD_GEOM_COUNT 2000
+
 void GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds)
 {
 	wxGISQuadTreeItem* pQuadTreeItem = (wxGISQuadTreeItem*)hFeature;
@@ -30,15 +33,107 @@ void GetGeometryBoundsFunc(const void* hFeature, CPLRectObj* pBounds)
 	return pQuadTreeItem->FillBounds(pBounds);
 }
 
-wxGISQuadTree::wxGISQuadTree(const OGREnvelope &Env)
+//-----------------------------------------------------------------------------
+// wxGISQuadTreeCursor
+//-----------------------------------------------------------------------------
+
+wxGISQuadTreeCursor wxNullQuadTreeCursor;
+
+IMPLEMENT_CLASS(wxGISQuadTreeCursor, wxObject)
+
+wxGISQuadTreeCursor::wxGISQuadTreeCursor() : wxObject()
 {
-	m_Envelope = Env;
-    CPLRectObj Rect = {Env.MinX, Env.MinY, Env.MaxX, Env.MaxY};
-    m_pQuadTree = CPLQuadTreeCreate(&Rect, GetGeometryBoundsFunc);
+    m_nCurrentItem = 0;
+    m_refData = new wxGISQuadTreeCursorRefData();
+}
+
+wxGISQuadTreeCursor::wxGISQuadTreeCursor(wxGISQuadTreeItem** ppTreeItems, int nCount)
+{
+    m_nCurrentItem = 0;
+    m_refData = new wxGISQuadTreeCursorRefData(ppTreeItems, nCount);
+}
+
+
+wxGISQuadTreeCursor::~wxGISQuadTreeCursor()
+{
+}
+
+wxObjectRefData *wxGISQuadTreeCursor::CreateRefData() const
+{
+    return new wxGISQuadTreeCursorRefData();
+}
+
+wxObjectRefData *wxGISQuadTreeCursor::CloneRefData(const wxObjectRefData *data) const
+{
+    return new wxGISQuadTreeCursorRefData(*(wxGISQuadTreeCursorRefData *)data);
+}
+
+bool wxGISQuadTreeCursor::IsOk() const
+{ 
+    return m_refData != NULL && ((wxGISQuadTreeCursorRefData *)m_refData)->IsValid();//; 
+}
+
+bool wxGISQuadTreeCursor::operator == ( const wxGISQuadTreeCursor& obj ) const
+{
+    if (m_refData == obj.m_refData)
+        return true;
+    if (!m_refData || !obj.m_refData)
+        return false;
+
+    return ( *(wxGISQuadTreeCursorRefData*)m_refData == *(wxGISQuadTreeCursorRefData*)obj.m_refData );
+}
+
+int wxGISQuadTreeCursor::GetCount(void) const
+{
+    return ((wxGISQuadTreeCursorRefData *)m_refData)->GetCount();
+}
+
+wxGISQuadTreeItem* wxGISQuadTreeCursor::operator [](size_t nIndex) const
+{
+    return ((wxGISQuadTreeCursorRefData *)m_refData)->operator [](nIndex);
+}
+
+wxGISQuadTreeItem* wxGISQuadTreeCursor::at(size_t nIndex) const
+{
+	return operator [](nIndex);
+}
+
+wxGISQuadTreeItem* const wxGISQuadTreeCursor::Next(void)
+{
+	if(!((wxGISQuadTreeCursorRefData *)m_refData)->IsValid())
+		return NULL;
+
+    if(m_nCurrentItem == GetCount())
+		return NULL;
+	return ((wxGISQuadTreeCursorRefData *)m_refData)->m_pData[m_nCurrentItem++];
+}
+	
+void wxGISQuadTreeCursor::Reset(void)
+{
+    m_nCurrentItem = 0;
+}
+
+void wxGISQuadTreeCursor::DeleteItem(size_t nIndex)
+{
+	((wxGISQuadTreeCursorRefData *)m_refData)->DeleteItem(nIndex);
+}
+
+//-----------------------------------------------------------------------------
+// wxGISQuadTree
+//-----------------------------------------------------------------------------
+
+wxGISQuadTree::wxGISQuadTree(wxGISFeatureDataset* pDSet)
+{
+    m_pDSet = pDSet;
+    m_nPreloadItemCount = PRELOAD_GEOM_COUNT;
+    //if(m_pDSet)
+        //m_szPath = (char*)CPLResetExtension(m_pDSet->GetPath(), "sif");
 }
 
 wxGISQuadTree::~wxGISQuadTree(void)
 {
+    DestroyLoadGeometryThread();
+
 	if(m_pQuadTree)
     {
 		CPLQuadTreeDestroy(m_pQuadTree);
@@ -48,17 +143,20 @@ wxGISQuadTree::~wxGISQuadTree(void)
 		wxDELETE(*it);
 }
 
-void wxGISQuadTree::AddItem(OGRGeometry* pGeom, long nOID, bool bOwnGeometry)
+void wxGISQuadTree::AddItem(wxGISQuadTreeItem* pItem)
 {
-	wxCriticalSectionLocker locker(m_CritSect);
-	wxGISQuadTreeItem* pItem = new wxGISQuadTreeItem(pGeom, nOID, bOwnGeometry);
+	//wxCriticalSectionLocker locker(m_CritSect);
 	CPLQuadTreeInsert(m_pQuadTree, (void*)pItem);
 	m_QuadTreeItemList.push_back(pItem);
 }
 
-wxGISQuadTreeCursorSPtr wxGISQuadTree::Search(const CPLRectObj* pAoi)
+wxGISQuadTreeCursor wxGISQuadTree::Search(const CPLRectObj* pAoi)
 {
 	wxCriticalSectionLocker locker(m_CritSect);
+
+    if (GetThread() && GetThread()->IsRunning())
+        return wxGISQuadTreeCursor();
+
     bool bContains(false);
 	if(pAoi)
 	{
@@ -72,25 +170,208 @@ wxGISQuadTreeCursorSPtr wxGISQuadTree::Search(const CPLRectObj* pAoi)
 			bContains = m_Envelope.Contains(pInputEnv) != 0;
 	}
 
-	wxGISQuadTreeCursorSPtr pResult = boost::make_shared<wxGISQuadTreeCursor>();
 	if(bContains)
 	{
-		pResult->m_pData = (wxGISQuadTreeItem**)CPLQuadTreeSearch(m_pQuadTree, pAoi, &pResult->m_nItemCount);
-		pResult->Reset();
-		return pResult;
+        int nItemCount(0);
+		wxGISQuadTreeItem** ppData = (wxGISQuadTreeItem**)CPLQuadTreeSearch(m_pQuadTree, pAoi, &nItemCount);
+		return wxGISQuadTreeCursor(ppData, nItemCount);
 	}
 	else
 	{
-		pResult->m_pData = (wxGISQuadTreeItem**)CPLMalloc(sizeof(wxGISQuadTreeItem*) * m_QuadTreeItemList.size());
-		pResult->m_nItemCount = m_QuadTreeItemList.size();
-		pResult->m_nCurrentItem = 0;
+        int nItemCount = m_QuadTreeItemList.size();
+        int nCurrentItem = 0;
+        size_t nSize = sizeof(wxGISQuadTreeItem*) * nItemCount;
+		wxGISQuadTreeItem** ppData = (wxGISQuadTreeItem**)CPLMalloc(nSize);
+        RtlZeroMemory(ppData, nSize );
 		for(std::list<wxGISQuadTreeItem*>::iterator it = m_QuadTreeItemList.begin(); it != m_QuadTreeItemList.end(); ++it)
 		{
-			pResult->m_pData[pResult->m_nCurrentItem] = *it;
-			pResult->m_nCurrentItem++;
+			ppData[nCurrentItem++] = *it;
 		}
-		pResult->Reset();
-		return pResult;
+		return wxGISQuadTreeCursor(ppData, nItemCount);
 	}
 }
-*/
+
+bool wxGISQuadTree::Load(ITrackCancel* const pTrackCancel)
+{    
+    m_pTrackCancel = pTrackCancel;
+    if(m_pTrackCancel)
+	{
+        m_pProgress = m_pTrackCancel->GetProgressor();
+    }
+    else
+    {
+        m_pProgress = NULL;
+    }
+    //create quad tree
+    if(m_pDSet != NULL)
+    {
+        return CreateAndRunLoadGeometryThread();
+
+/*            m_Envelope = m_pDSet->GetEnvelope();
+        IProgressor* pProgress(NULL);
+	    if(pTrackCancel)
+	    {
+		    pTrackCancel->Reset();
+		    pTrackCancel->PutMessage(wxString(_("PreLoad Geometry of ")) + m_pDSet->GetName(), -1, enumGISMessageInfo);
+		    pProgress = pTrackCancel->GetProgressor();
+		    if(pProgress)
+                pProgress->ShowProgress(true);
+	    }            
+            
+        CPLRectObj Rect = {m_Envelope.MinX, m_Envelope.MinY, m_Envelope.MaxX, m_Envelope.MaxY};
+        m_pQuadTree = CPLQuadTreeCreate(&Rect, GetGeometryBoundsFunc);
+
+        if(pProgress)
+            pProgress->SetRange(m_pDSet->GetFeatureCount(TRUE, pTrackCancel));
+
+        int nCounter(0);
+        m_pDSet->Reset();
+        wxGISFeature Feature;
+        while((Feature = m_pDSet->Next()).IsOk())
+        {
+            if(pProgress)
+                pProgress->SetValue(nCounter++);
+            //check if Feature will destroy by Ref Count
+            wxGISQuadTreeItem* pItem = NULL;
+            if(Feature.GetRefData()->GetRefCount() > 1)
+                pItem = new wxGISQuadTreeItem(Feature.GetGeometry(), Feature.GetFID());//appologise the feature is buffered in m_pDSet
+            else
+                pItem = new wxGISQuadTreeItem(Feature.GetGeometry().Copy(), Feature.GetFID());
+            AddItem(pItem);
+
+            //TODO: wxFeatureDSEvent event(wxFEATURES_ADDED);
+            //TODO: m_pDSet->PostEvent(event);
+        }
+
+        if(pProgress)
+            pProgress->ShowProgress(false);
+
+	    if(pTrackCancel)
+	    {
+		    pTrackCancel->PutMessage(_("Done"), -1, enumGISMessageInfo);
+        }
+            
+        return true;*/
+    }
+    else
+    {
+        m_pQuadTree = NULL;            
+    }
+    return false;
+}
+
+wxThread::ExitCode wxGISQuadTree::Entry()
+{
+    m_Envelope = m_pDSet->GetEnvelope();
+
+	if(m_pTrackCancel)
+	{
+		m_pTrackCancel->Reset();
+		m_pTrackCancel->PutMessage(wxString(_("PreLoad Geometry of ")) + m_pDSet->GetName(), -1, enumGISMessageInfo);
+	}  
+
+	if(m_pProgress)
+    {
+        m_pProgress->ShowProgress(true);
+    }     
+
+    CPLRectObj Rect = {m_Envelope.MinX, m_Envelope.MinY, m_Envelope.MaxX, m_Envelope.MaxY};
+    m_pQuadTree = CPLQuadTreeCreate(&Rect, GetGeometryBoundsFunc);
+
+    size_t nSize = sizeof(wxGISQuadTreeItem*) * m_nPreloadItemCount;
+    wxGISQuadTreeItem** ppData = (wxGISQuadTreeItem**)CPLMalloc(nSize);
+    RtlZeroMemory(ppData, nSize);
+
+    if(m_pProgress)
+        m_pProgress->SetRange(m_pDSet->GetFeatureCount(TRUE, m_pTrackCancel));
+
+    int nCounter(0), nItemCounter(0);
+    //get only geometries
+    wxArrayString saIgnoredFields;
+    OGRFeatureDefn * const pDef = m_pDSet->GetDefinition();
+    if(pDef)
+    {
+        for(size_t i = 0; i < pDef->GetFieldCount(); ++i)
+        {
+            saIgnoredFields.Add(wxString(pDef->GetFieldDefn(i)->GetNameRef(), wxConvUTF8));
+        }
+    }
+    saIgnoredFields.Add(wxT("OGR_STYLE"));
+
+    m_pDSet->Reset();
+    m_pDSet->SetIgnoredFields(saIgnoredFields);
+    wxGISFeature Feature;
+    while((Feature = m_pDSet->Next()).IsOk())
+    {
+        //check if Feature will destroy by Ref Count
+        wxGISQuadTreeItem* pItem = NULL;
+        if(Feature.GetRefData()->GetRefCount() > 1)
+            pItem = new wxGISQuadTreeItem(Feature.GetGeometry(), Feature.GetFID());//appologise the feature is buffered in m_pDSet
+        else
+            pItem = new wxGISQuadTreeItem(Feature.GetGeometry().Copy(), Feature.GetFID());
+        
+        CPLQuadTreeInsert(m_pQuadTree, (void*)pItem);
+        m_QuadTreeItemList.push_back(pItem);
+
+        ppData[nItemCounter++] = pItem;
+
+        if(nItemCounter == m_nPreloadItemCount)
+        {
+             m_pDSet->QueueEvent(new wxFeatureDSEvent(wxDS_FEATURES_ADDED, wxGISQuadTreeCursor(ppData, nItemCounter)));
+             nItemCounter = 0;
+             ppData = (wxGISQuadTreeItem**)CPLMalloc(nSize);
+             RtlZeroMemory(ppData, nSize);
+        }
+
+        if(m_pProgress)
+            m_pProgress->SetValue(nCounter++);
+
+    }
+
+    if(nItemCounter > 0)
+    {
+        m_pDSet->QueueEvent(new wxFeatureDSEvent(wxDS_FEATURES_ADDED, wxGISQuadTreeCursor(ppData, nItemCounter))); 
+    }
+
+    if(m_pProgress)
+        m_pProgress->ShowProgress(false);
+
+	if(m_pTrackCancel)
+	{
+		m_pTrackCancel->PutMessage(_("Done"), -1, enumGISMessageInfo);
+    }
+
+    saIgnoredFields.Clear();
+    m_pDSet->SetIgnoredFields(saIgnoredFields);
+
+
+	return (wxThread::ExitCode)0;     // success
+}
+
+bool wxGISQuadTree::CreateAndRunLoadGeometryThread(void)
+{
+    if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
+    {
+        wxLogError(_("Could not create the thread!"));
+        return false;
+    }
+
+    if (GetThread()->Run() != wxTHREAD_NO_ERROR)
+    {
+        wxLogError(_("Could not run the thread!"));
+        return false;
+    }
+
+    return true;
+}
+
+void wxGISQuadTree::DestroyLoadGeometryThread(void)
+{
+	if(m_pTrackCancel)
+	{
+		m_pTrackCancel->Cancel();
+	}
+
+    if (GetThread() && GetThread()->IsRunning())
+        GetThread()->Wait();
+}

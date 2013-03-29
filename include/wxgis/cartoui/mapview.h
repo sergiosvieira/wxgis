@@ -24,6 +24,11 @@
 #include "wxgis/display/gisdisplay.h"
 #include "wxgis/carto/map.h"
 #include "wxgis/cartoui/mxeventui.h"
+#include "wxgis/carto/mxevent.h"
+
+/** \class wxGISMapView mapview.h
+    \brief The MapView class draw layers to wxWindow.
+*/
 
 class WXDLLIMPEXP_GIS_CTU wxGISMapView :
 	public wxWindow,
@@ -36,8 +41,6 @@ class WXDLLIMPEXP_GIS_CTU wxGISMapView :
     {
         TIMER_ID = 1015
     };
-public:
-	friend class wxMapDrawingThread;
 public:
     wxGISMapView(void);
 	wxGISMapView(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL | wxCLIP_CHILDREN | wxNO_FULL_REPAINT_ON_RESIZE);//wxSTATIC_BORDER|
@@ -62,7 +65,7 @@ public:
 	virtual void RotateStop(wxPoint MouseLocation);
 	virtual void SetRotate(double dAngleRad);
 	virtual double GetCurrentRotate(void);
-    //virtual void FlashGeometry(const GeometryArray& Geoms);
+    virtual void FlashGeometry(const wxGISGeometryArray& Geoms);
 protected:
 	//events
 	virtual void OnPaint(wxPaintEvent & event);
@@ -73,11 +76,9 @@ protected:
     virtual void OnCaptureLost(wxMouseCaptureLostEvent & event);
 	virtual void OnMouseWheel(wxMouseEvent& event);
 	//
-	//virtual void OnDrawThreadStart(void);
-	//virtual void OnDrawThreadStop(void);
-	//virtual void CancelDrawThread(void);
 	virtual void OnDraw(wxGISEnumDrawPhase nPhase);
-    virtual void OnMapDrawing(wxMxMapViewEvent& event);
+    virtual void OnMapDrawing(wxMxMapViewUIEvent& event);
+    virtual void OnLayerChanged(wxMxMapViewEvent& event);
 	//misc
 	virtual void DrawToolTip(wxClientDC& dc, const wxString& sText);
 	virtual OGREnvelope CreateEnvelopeFromZoomFactor(double dZoom);
@@ -85,16 +86,13 @@ protected:
 	//virtual void FillClipGeometry(wxRect rect, wxCoord x, wxCoord y);
 protected:
     void Refresh(void);
-    //void OnStartDrawingThread( wxCommandEvent & event );
     //void OnZooming( wxCommandEvent & event );
 protected:
     virtual wxThread::ExitCode Entry();
     bool CreateAndRunDrawThread(void);
     void DestroyDrawThread(void);
 protected:
-	wxGISDisplay *m_pGISDisplay;
 	wxTimer m_timer;
-	//wxMapDrawingThread *m_pMapDrawingThread;
 	ITrackCancel *m_pTrackCancel;
 	IProgressor *m_pAni;
 	WXDWORD m_nDrawingState;
@@ -104,10 +102,10 @@ protected:
 	double m_dOriginAngle;
 	double m_dCurrentAngle;
 
-	wxCriticalSection m_CritSect;
+	wxCriticalSection m_CritSect, m_KeysCritSect;
 
 	wxGISPointsArray m_ClipGeometry;
     wxSize m_PrevSize;
-
+private:
 	DECLARE_EVENT_TABLE()
 };

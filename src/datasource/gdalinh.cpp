@@ -431,6 +431,9 @@ int wxGISFeature::GetFieldIndex(const wxString &sFieldName)
 // wxGISGeometry
 //-----------------------------------------------------------------------------
 
+#include <wx/arrimpl.cpp> // This is a magic incantation which must be done!
+WX_DEFINE_USER_EXPORTED_OBJARRAY(wxGISGeometryArray);
+
 IMPLEMENT_CLASS(wxGISGeometry, wxObject)
 
 wxGISGeometry::wxGISGeometry(OGRGeometry *poGeom, bool bOwnGeom) 
@@ -468,10 +471,10 @@ wxGISGeometry::operator OGRGeometry*() const
     return ((wxGISGeometryRefData *)m_refData)->m_poGeom;
 }
 
-OGREnvelope wxGISGeometry::GetEnvelope(void)
+OGREnvelope wxGISGeometry::GetEnvelope(void) const
 {
-    wxCHECK_MSG(((wxGISGeometryRefData *)m_refData)->m_poGeom, OGREnvelope(), wxT("OGRGeometry pointer is null"));
     OGREnvelope Env;
+    wxCHECK_MSG(((wxGISGeometryRefData *)m_refData)->m_poGeom, Env, wxT("OGRGeometry pointer is null"));
     ((wxGISGeometryRefData *)m_refData)->m_poGeom->getEnvelope(&Env);
     return Env;
 }
@@ -481,8 +484,21 @@ OGRGeometry* wxGISGeometry::Copy(void) const
     return ((wxGISGeometryRefData *)m_refData)->m_poGeom->clone();
 }
 
-wxGISGeometry wxGISGeometry::Intersection(wxGISGeometry Geom) const
+wxGISGeometry wxGISGeometry::Intersection(const wxGISGeometry &Geom) const
 {
     wxCHECK_MSG(((wxGISGeometryRefData *)m_refData)->m_poGeom && Geom.IsOk(), wxGISGeometry(), wxT("OGRGeometry pointer is null"));
     return wxGISGeometry( ((wxGISGeometryRefData *)m_refData)->m_poGeom->Intersection(Geom) );
+}
+
+
+bool wxGISGeometry::Intersects(const wxGISGeometry &Geom) const
+{
+    wxCHECK_MSG(((wxGISGeometryRefData *)m_refData)->m_poGeom && Geom.IsOk(), false, wxT("OGRGeometry pointer is null"));
+    return bool( ((wxGISGeometryRefData *)m_refData)->m_poGeom->Intersects(Geom) );
+}
+
+OGRwkbGeometryType wxGISGeometry::GetType() const
+{
+    wxCHECK_MSG(((wxGISGeometryRefData *)m_refData)->m_poGeom, wkbUnknown, wxT("OGRGeometry pointer is null"));
+    return ((wxGISGeometryRefData *)m_refData)->m_poGeom->getGeometryType();
 }

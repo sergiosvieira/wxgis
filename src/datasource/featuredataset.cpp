@@ -19,6 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/datasource/featuredataset.h"
+#include "wxgis/datasource/quadtree.h"
 
 //#include "wxgis/datasource/sysop.h"
 //
@@ -35,6 +36,8 @@ wxGISFeatureDataset::wxGISFeatureDataset(const CPLString &sPath, int nSubType, O
 {
     m_nType = enumGISFeatureDataset;
     m_eGeomType = wkbUnknown;
+    m_pQuadTree = NULL;
+
     /*
 	m_bIsGeometryLoaded = false;*/
 }
@@ -46,7 +49,8 @@ wxGISFeatureDataset::~wxGISFeatureDataset(void)
 
 void wxGISFeatureDataset::Close(void)
 {
-	/*m_pQuadTree.reset();
+    wxDELETE(m_pQuadTree);
+	/*
     m_bIsGeometryLoaded = false;*/
 	wxGISTable::Close();
 }
@@ -160,6 +164,8 @@ char **wxGISFeatureDataset::GetFileList()
         if(CPLCheckForFile((char*)szPath.c_str(), NULL))
             papszFileList = CSLAddString( papszFileList, szPath );
         break;
+    case emumVecPostGIS:
+        return papszFileList;
     case enumVecKML:
     case enumVecKMZ:    
     case enumVecUnknown:
@@ -171,6 +177,9 @@ char **wxGISFeatureDataset::GetFileList()
     if(CPLCheckForFile((char*)szPath.c_str(), NULL))
         papszFileList = CSLAddString( papszFileList, szPath );
     szPath = (char*)CPLResetExtension(m_sPath, "osf");
+    if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+        papszFileList = CSLAddString( papszFileList, szPath );
+    szPath = (char*)CPLResetExtension(m_sPath, "sif");
     if(CPLCheckForFile((char*)szPath.c_str(), NULL))
         papszFileList = CSLAddString( papszFileList, szPath );
 
@@ -197,11 +206,11 @@ bool wxGISFeatureDataset::Open(int iLayer, int bUpdate, bool bCache, ITrackCance
 	if(!wxGISTable::Open(iLayer, bUpdate, bCache, pTrackCancel))
 		return false;
 
-//TODO:
-//1. Load quad tree file from disk (if WFS and etc. store file neare connection file and check count of features, think about PG spatial index and etc.)
-//2. Read all id's from file using extent and max square of extent - we dont need extents like point or less
-//3. In other thread check quad tree for differences and update it if need - send event for redraw
-//4.
+    m_pQuadTree = new wxGISQuadTree(this);
+    if(!m_pQuadTree->Load(pTrackCancel))
+    {
+        return false;
+    }
 
   //  //load all features
   //  LoadGeometry();
@@ -249,7 +258,7 @@ void wxGISFeatureDataset::SetInternalValues()
 	bool bOLCFastGetExtent = m_poLayer->TestCapability(OLCFastGetExtent) != 0;
     if(bOLCFastGetExtent)
     {
-        if(m_poLayer->GetExtent(&m_stExtent, false) == OGRERR_NONE)
+        if(m_poLayer->GetExtent(&m_stExtent, FALSE) == OGRERR_NONE)
         {
             if(IsDoubleEquil(m_stExtent.MinX, m_stExtent.MaxX))
             {
@@ -272,8 +281,28 @@ void wxGISFeatureDataset::SetInternalValues()
 //	LoadGeometry(pTrackCancel);
 //}
 
-OGREnvelope wxGISFeatureDataset::GetEnvelope(void) const
+OGREnvelope wxGISFeatureDataset::GetEnvelope(void)
 {
+    if(!IsOpened())
+    if(m_stExtent.IsInit())
+        return m_stExtent;
+	//bool bOLCFastGetExtent = m_poLayer->TestCapability(OLCFastGetExtent);
+ //   if(bOLCFastGetExtent)
+ //   {
+        if(m_poLayer->GetExtent(&m_stExtent) == OGRERR_NONE)
+        {
+            if(IsDoubleEquil(m_stExtent.MinX, m_stExtent.MaxX))
+            {
+                m_stExtent.MaxX += 1;
+                m_stExtent.MinX -= 1;
+            }
+            if(IsDoubleEquil(m_stExtent.MinY, m_stExtent.MaxY))
+            {
+                m_stExtent.MaxY += 1;
+                m_stExtent.MinY -= 1;
+            }
+		}
+    //}
     return m_stExtent;
 }
 /*
@@ -435,15 +464,15 @@ wxFeatureCursor wxGISFeatureDataset::Search(const wxGISSpatialFilter &SpaFilter,
     m_poLayer->SetSpatialFilter(NULL);
     return oOutCursor;
 }
-/*
-wxGISQuadTreeCursorSPtr wxGISFeatureDataset::SearchGeometry(const CPLRectObj* pAoi)
+
+wxGISQuadTreeCursor wxGISFeatureDataset::SearchGeometry(const CPLRectObj* pAoi)
 {
 	if(m_pQuadTree)
 		return m_pQuadTree->Search(pAoi);
 	else
-		return wxGISQuadTreeCursorSPtr();
+		return wxGISQuadTreeCursor();
 }
-
+/*
 OGRErr wxGISFeatureDataset::SetFilter(wxGISQueryFilter* pQFilter)
 {
     if(	!m_poLayer )

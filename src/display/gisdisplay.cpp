@@ -245,13 +245,26 @@ void wxGISDisplay::WheelingDraw(double dZoom, wxDC* pDC)
 		double dOrigin_X = m_dFrameCenterX - dDCXDelta;
 		double dOrigin_Y = m_dFrameCenterY - dDCYDelta;
 
+        cairo_set_source_rgb(m_cr_tmp, m_stBackGroudnColour.dRed, m_stBackGroudnColour.dGreen, m_stBackGroudnColour.dBlue);
+	    cairo_paint(m_cr_tmp);
+
+        cairo_translate (m_cr_tmp, dOrigin_X, dOrigin_Y);
+		cairo_scale(m_cr_tmp, dZoom, dZoom);
+
+		cairo_set_source_surface (m_cr_tmp, m_saLayerCaches[m_nLastCacheID].pCairoSurface, -m_dOrigin_X, -m_dOrigin_Y);
+
+
 		//cairo_set_source_rgb(cr, m_stBackGroudnColour.dRed, m_stBackGroudnColour.dGreen, m_stBackGroudnColour.dBlue);
-		//cairo_paint(cr);
+		//cairo_paint(cr); //comment to prevent flickering
+ 
+		//cairo_translate (cr, dOrigin_X, dOrigin_Y);
+		//cairo_scale(cr, dZoom, dZoom);
 
-		cairo_translate (cr, dOrigin_X, dOrigin_Y);
-		cairo_scale(cr, dZoom, dZoom);
+		//cairo_set_source_surface (cr, m_saLayerCaches[m_nLastCacheID].pCairoSurface, -m_dOrigin_X, -m_dOrigin_Y);
 
-		cairo_set_source_surface (cr, m_saLayerCaches[m_nLastCacheID].pCairoSurface, -m_dOrigin_X, -m_dOrigin_Y);
+        cairo_paint (m_cr_tmp);
+
+    	cairo_set_source_surface (cr, m_surface_tmp, 0, 0);
 	}
 	cairo_paint (cr);
 
@@ -259,6 +272,8 @@ void wxGISDisplay::WheelingDraw(double dZoom, wxDC* pDC)
 	cairo_surface_destroy (surface);
     cairo_destroy (cr);
 #endif
+    cairo_matrix_t mat = {1, 0, 0, 1, 0, 0};
+	cairo_set_matrix (m_cr_tmp, &mat);
 }
 
 void wxGISDisplay::PanningDraw(wxCoord x, wxCoord y, wxDC* pDC)
@@ -348,19 +363,18 @@ size_t wxGISDisplay::AddCache(void)
 	return m_nLastCacheID;
 }
 
-size_t wxGISDisplay::GetLastCacheID(void)
+size_t wxGISDisplay::GetLastCacheID(void) const
 {
 	return m_nLastCacheID;
 }
 
-size_t wxGISDisplay::GetFlashCacheID(void)
+size_t wxGISDisplay::GetFlashCacheID(void) const
 {
 	return m_saLayerCaches.size() - 1;
 }
 
-bool wxGISDisplay::IsCacheDerty(size_t nCacheID)
+bool wxGISDisplay::IsCacheDerty(size_t nCacheID) const
 {
-	wxCriticalSectionLocker locker(m_CritSect);
 	return m_saLayerCaches[nCacheID].bIsDerty;
 }
 
@@ -401,9 +415,17 @@ void wxGISDisplay::SetDerty(bool bIsDerty)
 		m_saLayerCaches[i].bIsDerty = bIsDerty;
 }
 
-bool wxGISDisplay::IsDerty(void)
+void wxGISDisplay::SetDertyUpperCache(size_t nFromCacheNo, bool bIsDerty)
 {
 	wxCriticalSectionLocker locker(m_CritSect);
+    if(nFromCacheNo >= m_nLastCacheID + 1)
+        return;
+	for(size_t i = nFromCacheNo; i < m_nLastCacheID + 1; ++i)
+        m_saLayerCaches[i].bIsDerty = bIsDerty;
+}
+
+bool wxGISDisplay::IsDerty(void) const
+{
 	for(size_t i = 0; i < m_nLastCacheID + 1; ++i)
 		if(m_saLayerCaches[i].bIsDerty)
 			return true;
@@ -445,7 +467,7 @@ void wxGISDisplay::SetDeviceFrame(wxRect &rc)
 	InitTransformMatrix();
 }
 
-wxRect wxGISDisplay::GetDeviceFrame(void)
+wxRect wxGISDisplay::GetDeviceFrame(void) const
 {
 	return m_oDeviceFrameRect;
 }
@@ -473,7 +495,7 @@ void wxGISDisplay::SetBounds(const OGREnvelope& Bounds)
 	InitTransformMatrix();
 }
 
-OGREnvelope wxGISDisplay::GetBounds(bool bRotated)
+OGREnvelope wxGISDisplay::GetBounds(bool bRotated) const
 {
 	if(bRotated)
 		return m_CurrentBoundsRotated;
@@ -624,7 +646,7 @@ void wxGISDisplay::TestDraw(void)
 	cairo_stroke (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
 }
 
-size_t wxGISDisplay::GetDrawCache(void)
+size_t wxGISDisplay::GetDrawCache(void) const
 {
 	return m_nCurrentLayer;
 }
@@ -776,6 +798,11 @@ bool wxGISDisplay::CheckDrawAsPoint(const OGRGeometry* pGeometry, bool bCheckEnv
 			cairo_move_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MinX, Envelope.MinY);
 			cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MaxX, Envelope.MaxY);
 		}
+        else
+        {
+			cairo_move_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MinX, Envelope.MinY);
+			cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MinX + 0.2, Envelope.MinY + 0.5);
+        }
 		return true;
 	}
 	return false;

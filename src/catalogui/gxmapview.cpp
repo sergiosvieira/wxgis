@@ -32,6 +32,8 @@
 // wxGxMapView
 //-------------------------------------------------------------------------
 
+IMPLEMENT_DYNAMIC_CLASS(wxGxMapView, wxGISMapView)
+
 BEGIN_EVENT_TABLE(wxGxMapView, wxGISMapView)
 	EVT_LEFT_DOWN(wxGxMapView::OnMouseDown)
 	EVT_MIDDLE_DOWN(wxGxMapView::OnMouseDown)
@@ -45,8 +47,6 @@ BEGIN_EVENT_TABLE(wxGxMapView, wxGISMapView)
 	EVT_MOTION(wxGxMapView::OnMouseMove)
 	EVT_GXSELECTION_CHANGED(wxGxMapView::OnSelectionChanged)
 END_EVENT_TABLE()
-
-IMPLEMENT_DYNAMIC_CLASS(wxGxMapView, wxGISMapView)
 
 wxGxMapView::wxGxMapView(void) : wxGISMapView(), wxGxView()
 {
@@ -98,13 +98,7 @@ bool wxGxMapView::Activate(IApplication* const pApplication, wxXmlNode* const pC
 
 	m_pStatusBar = m_pApp->GetStatusBar();
 
-	m_pTrackCancel = new ITrackCancel();
-	if(m_pStatusBar)
-    {
-        IProgressor* pAni = m_pStatusBar->GetAnimation();
-		m_pTrackCancel->SetProgressor(pAni);
-    }
-	SetTrackCancel(m_pTrackCancel);
+	SetTrackCancel(new wxGxTrackCancel(m_pStatusBar));
 	return true;
 }
 
@@ -179,16 +173,15 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 	switch(type)
 	{
 	case enumGISFeatureDataset:
-		//{
-		//	wxGISFeatureDatasetSPtr pGISFeatureDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pwxGISDataset);
-		//	if(!pGISFeatureDataset->IsOpened())
-		//		pGISFeatureDataset->Open(0, 0, true, m_pTrackCancel);
+		{
+			wxGISFeatureDataset* pGISFeatureDataset = wxDynamicCast(pwxGISDataset, wxGISFeatureDataset);
+			if(!pGISFeatureDataset->IsOpened())
+				pGISFeatureDataset->Open(0, 0, true, m_pTrackCancel);
 		//	if(!pGISFeatureDataset->IsCached())
 		//		pGISFeatureDataset->Cache(m_pTrackCancel);
-		//	wxGISFeatureLayerSPtr pGISFeatureLayer = boost::make_shared<wxGISFeatureLayer>(pwxGISDataset);
-		//	paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISFeatureLayer));
-		//}
-        wsDELETE(pwxGISDataset);
+			wxGISFeatureLayer* pGISFeatureLayer = new wxGISFeatureLayer(pwxGISDataset->GetName(), pwxGISDataset);
+			paLayers.push_back(pGISFeatureLayer);
+		}
 		break;
 	case enumGISRasterDataset:
 		{
@@ -198,8 +191,8 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 			wxGISRasterDataset* pGISRasterDataset = wxDynamicCast(pwxGISDataset, wxGISRasterDataset);
 			if(!pGISRasterDataset->IsOpened())
 				pGISRasterDataset->Open(false);
-			if(!pGISRasterDataset->IsCached())
-				pGISRasterDataset->Cache(m_pTrackCancel);
+			//if(!pGISRasterDataset->IsCached())
+			//	pGISRasterDataset->Cache(m_pTrackCancel);
             wxGISRasterLayer* pGISRasterLayer = new wxGISRasterLayer(pwxGISDataset->GetName(), pwxGISDataset);
 			paLayers.push_back(pGISRasterLayer);
 		}
@@ -214,16 +207,15 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 	        switch(subtype)
 	        {
 	        case enumGISFeatureDataset:
-				//{
-				//	wxGISFeatureDatasetSPtr pGISFeatureDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(pwxGISSubDataset);
-				//	if(!pGISFeatureDataset->IsOpened())
-				//		pGISFeatureDataset->Open(0, 0, true, m_pTrackCancel);
-				//	if(!pGISFeatureDataset->IsCached())
-				//		pGISFeatureDataset->Cache(m_pTrackCancel);
-				//	wxGISFeatureLayerSPtr pGISFeatureLayer = boost::make_shared<wxGISFeatureLayer>(pwxGISSubDataset);
-				//	paLayers.push_back(boost::static_pointer_cast<wxGISLayer>(pGISFeatureLayer));
-				//}
-                wsDELETE(pwxGISSubDataset);
+				{
+			        wxGISFeatureDataset* pGISFeatureDataset = wxDynamicCast(pwxGISDataset, wxGISFeatureDataset);
+			        if(!pGISFeatureDataset->IsOpened())
+				        pGISFeatureDataset->Open(0, 0, true, m_pTrackCancel);
+		        //	if(!pGISFeatureDataset->IsCached())
+		        //		pGISFeatureDataset->Cache(m_pTrackCancel);
+			        wxGISFeatureLayer* pGISFeatureLayer = new wxGISFeatureLayer(pwxGISDataset->GetName(), pwxGISDataset);
+			        paLayers.push_back(pGISFeatureLayer);
+				}
 				break;
 	        case enumGISRasterDataset:
 				{
@@ -233,8 +225,8 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 					wxGISRasterDataset* pGISRasterDataset = wxDynamicCast(pwxGISDataset, wxGISRasterDataset);
 					if(!pGISRasterDataset->IsOpened())
 						pGISRasterDataset->Open(false);
-					if(!pGISRasterDataset->IsCached())
-						pGISRasterDataset->Cache(m_pTrackCancel);
+					//if(!pGISRasterDataset->IsCached())
+					//	pGISRasterDataset->Cache(m_pTrackCancel);
 					wxGISRasterLayer* pGISRasterLayer = new wxGISRasterLayer(pwxGISDataset->GetName(), pwxGISDataset);
                     paLayers.push_back(pGISRasterLayer);
 				}

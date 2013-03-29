@@ -82,13 +82,13 @@ bool wxGxDiscConnectionUI::CreateAndRunCheckThread(void)
 {
     if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
     {
-        wxLogError(_("Could not create the check thread!"));
+        wxLogError(_("Could not create the thread!"));
         return false;
     }
 
     if (GetThread()->Run() != wxTHREAD_NO_ERROR)
     {
-        wxLogError(_("Could not run the check thread!"));
+        wxLogError(_("Could not run the thread!"));
         return false;
     }
     return true;

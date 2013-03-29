@@ -19,34 +19,34 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-/*
-#include "wxgis/carto/carto.h"
+
+#include "wxgis/carto/renderer.h"
 #include "wxgis/datasource/featuredataset.h"
 
-//#include <cstdlib>
-
-/** \class wxGISSimpleRenderer simplerenderer.h
+/** \class wxGISSimpleRenderer featurerenderer.h
     \brief The vector layer renderer
-*//*
-class wxGISSimpleRenderer :
-	public IFeatureRenderer
+*/
+
+class wxGISFeatureRenderer :
+	public wxGISRenderer
 {
+    DECLARE_CLASS(wxGISFeatureRenderer)
 public:
-	wxGISSimpleRenderer(void);
-	virtual ~wxGISSimpleRenderer(void);
+	wxGISFeatureRenderer(wxGISDataset* pwxGISDataset = NULL);
+	virtual ~wxGISFeatureRenderer(void);
+    virtual bool CanRender(wxGISDataset* pwxGISDataset) const;
+    virtual bool Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay* const pDisplay, ITrackCancel* const pTrackCancel = NULL);
+
 	virtual void SetFillColor(const RGBA Color){m_stFillColour = Color;};
 	virtual void SetLineColor(const RGBA Color){m_stLineColour = Color;};
 	virtual void SetPointColor(const RGBA Color){m_stPointColour = Color;};
     virtual void SetLineWidth(double dWidth){m_dWidth = dWidth;};
     virtual void SetPointRadius(double dRadius){m_dRadius = dRadius;};
-//IFeatureRenderer
-	virtual bool CanRender(wxGISDatasetSPtr pDataset);
-	virtual void Draw(wxGISQuadTreeCursorSPtr pCursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = 0);
+	virtual void Draw(const wxGISQuadTreeCursor& Cursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = 0);
 protected:
-	wxGISDatasetSPtr m_pDataset;
+	wxGISFeatureDataset* m_pwxGISFeatureDataset;
 	RGBA m_stFillColour, m_stLineColour, m_stPointColour;
     double m_dWidth;
     double m_dRadius;
 };
 
-*/

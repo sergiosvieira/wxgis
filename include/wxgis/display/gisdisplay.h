@@ -59,24 +59,26 @@ public:
 	//
 	virtual size_t AddCache(void);
 	virtual void Clear();
-	virtual size_t GetLastCacheID(void);
-	virtual size_t GetFlashCacheID(void);
-	virtual bool IsCacheDerty(size_t nCacheID);
+	virtual size_t GetLastCacheID(void) const;
+	virtual size_t GetFlashCacheID(void) const;
+	virtual bool IsCacheDerty(size_t nCacheID) const;
 	virtual void SetCacheDerty(size_t nCacheID, bool bIsDerty);
 	virtual void SetDrawCache(size_t nCacheID, bool bNoDerty = false);
-	virtual size_t GetDrawCache(void);
+	virtual size_t GetDrawCache(void) const;
 	virtual void SetDerty(bool bIsDerty);
-	virtual bool IsDerty(void);
+	virtual void SetDertyUpperCache(size_t nFromCacheNo, bool bIsDerty = true);
+	virtual bool IsDerty(void) const;
+    virtual size_t GetCacheCount(void) const {return m_saLayerCaches.size();};
 	//frame
 	virtual void SetDeviceFrame(wxRect &rc);
-	virtual wxRect GetDeviceFrame(void);
+	virtual wxRect GetDeviceFrame(void) const;
 	//current draw bounds
 	virtual void SetBounds(const OGREnvelope &Env);
-	virtual OGREnvelope GetBounds(bool bRotated = true);
+	virtual OGREnvelope GetBounds(bool bRotated = true) const;
     virtual wxRealPoint GetBoundsCenter(void) const {return wxRealPoint(m_dRotatedBoundsCenterX, m_dRotatedBoundsCenterY);};
 	//misc
 	virtual void SetRotate(double dAngleRad);
-	virtual double GetRotate(void){return m_dAngleRad;};
+	virtual double GetRotate(void) const {return m_dAngleRad;};
 	virtual void DC2World(double* pdX, double* pdY);
 	virtual void World2DC(double* pdX, double* pdY);
 	virtual void DC2WorldDist(double* pdX, double* pdY, bool bRotated = true);

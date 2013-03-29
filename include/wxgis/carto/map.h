@@ -23,8 +23,6 @@
 #include "wxgis/carto/carto.h"
 #include "wxgis/carto/layer.h"
 
-//#include "wxgis/display/displaytransformation.h"
-
 /** \class wxGISMap map.h
     \brief The Map class - array of layers.
 
@@ -35,7 +33,7 @@ class WXDLLIMPEXP_GIS_CRT wxGISMap
 public:
 	wxGISMap(void);
 	virtual ~wxGISMap(void);
-	virtual void SetName(wxString sName) {m_sMapName = sName;};
+	virtual void SetName(const wxString &sName) {m_sMapName = sName;};
 	virtual wxString GetName(void) const {return m_sMapName;};
 	virtual bool AddLayer(wxGISLayer* pLayer);
 	virtual void Clear(void);
@@ -50,6 +48,7 @@ protected:
 	wxString m_sMapName, m_sDescription;
 	wxVector<wxGISLayer*> m_paLayers;
 	wxGISSpatialReference m_SpatialReference;
+    wxGISDisplay *m_pGISDisplay; 
 	OGREnvelope m_FullExtent;
 	bool m_bFullExtIsInit;
 };
@@ -57,7 +56,8 @@ protected:
 /** \class wxGISExtentStack map.h
     \brief The class keep history of map bounds changes.
 */
-class WXDLLIMPEXP_GIS_CRT wxGISExtentStack : public wxGISMap
+class WXDLLIMPEXP_GIS_CRT wxGISExtentStack : 
+    public wxGISMap
 {
 public:
 	wxGISExtentStack(void);

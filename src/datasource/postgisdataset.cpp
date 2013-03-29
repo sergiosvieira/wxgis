@@ -358,7 +358,7 @@ PGresult *wxGISPostgresDataSource::OGRPG_PQexec(PGconn *conn, const char *query,
 bool wxGISPostgresDataSource::Delete(int iLayer, ITrackCancel* const pTrackCancel)
 {
     if(m_bPathPresent)
-        wxGISDataset::Delete(iLayer, pTrackCancel);
+        return wxGISDataset::Delete(iLayer, pTrackCancel);
     else
         return false;
 }
@@ -366,7 +366,7 @@ bool wxGISPostgresDataSource::Delete(int iLayer, ITrackCancel* const pTrackCance
 bool wxGISPostgresDataSource::Rename(const wxString &sNewName)
 {
     if(m_bPathPresent)
-        wxGISDataset::Rename(sNewName);
+        return wxGISDataset::Rename(sNewName);
     else
         return false;
 }
@@ -374,7 +374,7 @@ bool wxGISPostgresDataSource::Rename(const wxString &sNewName)
 bool wxGISPostgresDataSource::Copy(const CPLString &szDestPath, ITrackCancel* const pTrackCancel)
 {
     if(m_bPathPresent)
-        wxGISDataset::Copy(szDestPath, pTrackCancel);
+        return wxGISDataset::Copy(szDestPath, pTrackCancel);
     else
         return false;
 }
@@ -382,7 +382,7 @@ bool wxGISPostgresDataSource::Copy(const CPLString &szDestPath, ITrackCancel* co
 bool wxGISPostgresDataSource::Move(const CPLString &szDestPath, ITrackCancel* const pTrackCancel)
 {
     if(m_bPathPresent)
-        wxGISDataset::Move(szDestPath, pTrackCancel);
+        return wxGISDataset::Move(szDestPath, pTrackCancel);
     else
         return false;
 }

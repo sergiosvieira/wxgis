@@ -121,14 +121,14 @@ bool wxGISTaskManagerApp::CreateAndRunExitThread(void)
 {
     if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
     {
-        wxLogError(_("Could not create the exit thread!"));
+        wxLogError(_("Could not create the thread!"));
         return false;
     }
 
     // go!
     if (GetThread()->Run() != wxTHREAD_NO_ERROR)
     {
-        wxLogError(_("Could not run the exit thread!"));
+        wxLogError(_("Could not run the thread!"));
         return false;
     }
     return true;

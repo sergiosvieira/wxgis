@@ -18,46 +18,42 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-/*#pragma once
+#pragma once
 
-#include "wxgis/carto/carto.h"
+#include "wxgis/carto/layer.h"
 #include "wxgis/datasource/featuredataset.h"
+#include "wxgis/datasource/vectorop.h"
+#include "wxgis/carto/featurerenderer.h"
 
 /** \class wxGISFeatureLayer featurelayer.h
     \brief The class represent vector datasource in map.
-*//*
+*/
+
 class WXDLLIMPEXP_GIS_CRT wxGISFeatureLayer :
 	public wxGISLayer
 {
+    DECLARE_CLASS(wxGISFeatureLayer)
 public:
-	wxGISFeatureLayer(wxGISDatasetSPtr pwxGISDataset);
+	wxGISFeatureLayer(const wxString &sName = _("new layer"), wxGISDataset* pwxGISDataset = NULL);
 	virtual ~wxGISFeatureLayer(void);
 //wxGISLayer
-	virtual OGRSpatialReferenceSPtr GetSpatialReference(void);
-	virtual void SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference);
-	virtual bool Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = NULL);
-	virtual OGREnvelope GetEnvelope(void);
-	virtual bool IsValid(void);
-	virtual bool IsCacheNeeded(void);
-	virtual wxGISEnumDatasetType GetType(void){return enumGISFeatureDataset;};
+	virtual bool Draw(wxGISEnumDrawPhase DrawPhase, ITrackCancel* const pTrackCancel = NULL);
+	virtual bool IsValid(void) const;
+	virtual bool IsCacheNeeded(void) const;
+	virtual wxGISEnumDatasetType GetType(void) const {return enumGISFeatureDataset;};
 //wxGISFeatureLayer
-	virtual IFeatureRendererSPtr GetRenderer(void){return m_pFeatureRenderer;};
-	virtual void SetRenderer(IFeatureRendererSPtr pFeatureRenderer){m_pFeatureRenderer = pFeatureRenderer;};
-	virtual wxGISQuadTreeCursorSPtr Idetify(OGRGeometrySPtr pGeom); 
-	virtual wxGISFeatureDatasetSPtr GetDataset(void){return m_pwxGISFeatureDataset;};
+	virtual wxGISQuadTreeCursor Idetify(const wxGISGeometry &Geom); 
+    //events
+    void OnDSClosed(wxFeatureDSEvent& event);
+    void OnDSFeaturesAdded(wxFeatureDSEvent& event);
 protected:
-    virtual void LoadGeometry(void);
-	virtual long GetPointsInGeometry(OGRGeometry* pGeom);
+    //virtual void LoadGeometry(void);
+	virtual long GetPointsInGeometry(const wxGISGeometry& Geom) const;
 protected:
-	wxGISFeatureDatasetSPtr m_pwxGISFeatureDataset;
-    OGRSpatialReferenceSPtr m_pSpatialReference;
-
-    OGREnvelope m_FullEnvelope;
-	OGREnvelope m_PreviousEnvelope;
-
-	wxGISQuadTreeSPtr m_pQuadTree;
-	IFeatureRendererSPtr m_pFeatureRenderer;
+    wxGISFeatureDataset* m_pwxGISFeatureDataset;
+    wxGISFeatureRenderer* m_pFeatureRenderer;
+    long m_nConnectionPointDSCookie;
+//	wxGISQuadTree* m_pQuadTree;
+private:
+	DECLARE_EVENT_TABLE()
 };
-
-DEFINE_SHARED_PTR(wxGISFeatureLayer);
-*/

@@ -21,6 +21,13 @@
 #include "wxgis/datasource/vectorop.h"
 
 
+IMPLEMENT_DYNAMIC_CLASS(wxFeatureDSEvent, wxEvent)
+
+wxDEFINE_EVENT( wxDS_FEATURES_ADDED, wxFeatureDSEvent );
+wxDEFINE_EVENT( wxDS_CLOSED, wxFeatureDSEvent );
+
+//--------------------------------------------------------------------------
+
 void IncreaseEnvelope(OGREnvelope &Env, double dSize)
 {
 	double dRatio = dSize / 2;

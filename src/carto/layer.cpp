@@ -24,7 +24,7 @@
 // wxGISLayer
 //---------------------------------------------------------------------------
 
-IMPLEMENT_ABSTRACT_CLASS(wxGISLayer, wxObject)
+IMPLEMENT_ABSTRACT_CLASS(wxGISLayer, wxEvtHandler)
 
 wxGISLayer::wxGISLayer(const wxString &sName, wxGISDataset* pwxGISDataset)
 {

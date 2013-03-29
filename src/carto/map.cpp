@@ -29,6 +29,7 @@
 wxGISMap::wxGISMap(void)
 {
 	m_sMapName = wxString(_("new map"));
+    m_pGISDisplay = NULL;
 	m_bFullExtIsInit = false;
 }
 
@@ -39,7 +40,7 @@ wxGISMap::~wxGISMap(void)
 
 bool wxGISMap::AddLayer(wxGISLayer* pLayer)
 {
-    wxCHECK_MSG(pLayer, false, wxT("Add layer pointer is NULL"));
+    wxCHECK_MSG(pLayer, false, wxT("Layer pointer is NULL"));
 
     if(!m_SpatialReference.IsOk())
     {
@@ -75,6 +76,8 @@ bool wxGISMap::AddLayer(wxGISLayer* pLayer)
 		m_FullExtent = Env;
 		m_bFullExtIsInit = true;
 	}
+
+    pLayer->SetDispaly(m_pGISDisplay);
 
 	m_paLayers.push_back(pLayer);
 	return true;
