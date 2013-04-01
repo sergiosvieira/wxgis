@@ -28,41 +28,41 @@
 /** \class wxGISRotationComboBox cartocmd.h
     \brief The frame angle rotation input combobox.
 */
-/*
+
 class wxGISRotationComboBox : 
 	public wxComboBox,
 	public IToolBarControl
 {
+    DECLARE_CLASS(wxGISRotationComboBox)
 public:
 	wxGISRotationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style = 0, const wxValidator& validator = wxDefaultValidator, const wxString& name = wxT("LocationComboBox"));
 	virtual ~wxGISRotationComboBox(void);
 	virtual void UpdateAngle(void);
 	//events
 	void OnTextEnter(wxCommandEvent& event);
-	void OnMapRotated(wxMxMapViewEvent& event);
+	void OnMapRotated(wxMxMapViewUIEvent& event);
 	//IToolBarControl
 	virtual void Activate(wxGISApplicationBase* pApp);
 	virtual void Deactivate(void);
 protected:
 	wxGISMapView* m_pMapView;
-	wxGISConnectionPointContainer* m_pConnectionPointMap;
 	long m_nConnectionPointMapCookie;
-
+private:
     DECLARE_EVENT_TABLE()
 };
-*/
+
 /** \class wxGISCartoMainCmd cartocmd.h
     \brief The carto main commands.
 */
-/*
+
 class wxGISCartoMainCmd :
-	public ICommand
+	public wxGISCommand
 {
 	DECLARE_DYNAMIC_CLASS(wxGISCartoMainCmd)
 public:
 	wxGISCartoMainCmd(void);
 	virtual ~wxGISCartoMainCmd(void);
-	//ICommand
+	//wxGISCommand
 	virtual wxIcon GetBitmap(void);
 	virtual wxString GetCaption(void);
 	virtual wxString GetCategory(void);

@@ -153,17 +153,17 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 	if(pGxDataset == NULL)
 		return;
 
-//    wxBusyCursor wait;
 	if(m_pStatusBar)
-		m_pTrackCancel->SetProgressor(m_pStatusBar->GetProgressor());
+    {
+        IProgressor* pProgressor = m_pStatusBar->GetProgressor();
+        //pProgressor->SetYield(true);
+		m_pTrackCancel->SetProgressor(pProgressor);
+    }
 	m_pTrackCancel->Reset();
 
 	wxGISDataset* pwxGISDataset = pGxDataset->GetDataset(true, m_pTrackCancel);
 	if(pwxGISDataset == NULL)
 		return;
-
-	if(m_pStatusBar)
-		m_pTrackCancel->SetProgressor(m_pStatusBar->GetAnimation());
 
     m_nParentGxObjectID = pGxObject->GetId();    
 
@@ -177,8 +177,8 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 			wxGISFeatureDataset* pGISFeatureDataset = wxDynamicCast(pwxGISDataset, wxGISFeatureDataset);
 			if(!pGISFeatureDataset->IsOpened())
 				pGISFeatureDataset->Open(0, 0, true, m_pTrackCancel);
-		//	if(!pGISFeatureDataset->IsCached())
-		//		pGISFeatureDataset->Cache(m_pTrackCancel);
+			if(!pGISFeatureDataset->IsCached())
+				pGISFeatureDataset->Cache(m_pTrackCancel);
 			wxGISFeatureLayer* pGISFeatureLayer = new wxGISFeatureLayer(pwxGISDataset->GetName(), pwxGISDataset);
 			paLayers.push_back(pGISFeatureLayer);
 		}
@@ -211,8 +211,8 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 			        wxGISFeatureDataset* pGISFeatureDataset = wxDynamicCast(pwxGISDataset, wxGISFeatureDataset);
 			        if(!pGISFeatureDataset->IsOpened())
 				        pGISFeatureDataset->Open(0, 0, true, m_pTrackCancel);
-		        //	if(!pGISFeatureDataset->IsCached())
-		        //		pGISFeatureDataset->Cache(m_pTrackCancel);
+		        	if(!pGISFeatureDataset->IsCached())
+		        		pGISFeatureDataset->Cache(m_pTrackCancel);
 			        wxGISFeatureLayer* pGISFeatureLayer = new wxGISFeatureLayer(pwxGISDataset->GetName(), pwxGISDataset);
 			        paLayers.push_back(pGISFeatureLayer);
 				}
@@ -260,6 +260,9 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
     }
 
     SetFullExtent();
+
+	if(m_pStatusBar)
+		m_pTrackCancel->SetProgressor(m_pStatusBar->GetAnimation());
 }
 
 void wxGxMapView::OnMouseMove(wxMouseEvent& event)

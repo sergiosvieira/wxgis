@@ -539,12 +539,7 @@ void wxGISMapView::SetExtent(const OGREnvelope& Env)
 		m_pGISDisplay->SetBounds(Env);
 
 	//wxGISMapView::Refresh();
-//    if(!m_pMapDrawingThread && m_pGISDisplay->IsDerty())//m_nDrawingState = enumGISMapDrawing
-//    {
-//        StartDraingThread();
-//    }
-    //wxCommandEvent evt(wxEVT_COMMAND_STARTDRAWING);
-    //GetEventHandler()->ProcessEvent( evt );
+
     CreateAndRunDrawThread();
 }
 
@@ -722,12 +717,7 @@ void wxGISMapView::SetRotate(double dAngleRad)
 	PostEvent(event);
 
 	//wxGISMapView::Refresh();
-//    if(!m_pMapDrawingThread && m_pGISDisplay->IsDerty())//m_nDrawingState = enumGISMapDrawing
-//    {
-//        StartDraingThread();
-//    }
-    ////wxCommandEvent evt(wxEVT_COMMAND_STARTDRAWING);
-    ////GetEventHandler()->ProcessEvent( evt );
+
     CreateAndRunDrawThread();
 }
 

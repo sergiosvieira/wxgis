@@ -363,8 +363,7 @@ size_t wxGISTable::GetFeatureCount(bool bForce, ITrackCancel* const pTrackCancel
   //          m_nFeatureCount = m_poLayer->GetFeatureCount(true);
         }
 
-		if(m_nFeatureCount == wxNOT_FOUND)
-			m_nFeatureCount = 0;
+		m_nFeatureCount = m_poLayer->GetFeatureCount(0);
 
 		return m_nFeatureCount;
     }

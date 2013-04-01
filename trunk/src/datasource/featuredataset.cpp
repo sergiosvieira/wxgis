@@ -38,8 +38,10 @@ wxGISFeatureDataset::wxGISFeatureDataset(const CPLString &sPath, int nSubType, O
     m_eGeomType = wkbUnknown;
     m_pQuadTree = NULL;
 
-    /*
-	m_bIsGeometryLoaded = false;*/
+    if(m_bIsOpened)
+        SetInternalValues();
+
+    m_bIsGeometryLoaded = false;
 }
 
 wxGISFeatureDataset::~wxGISFeatureDataset(void)
@@ -50,8 +52,7 @@ wxGISFeatureDataset::~wxGISFeatureDataset(void)
 void wxGISFeatureDataset::Close(void)
 {
     wxDELETE(m_pQuadTree);
-	/*
-    m_bIsGeometryLoaded = false;*/
+    m_bIsGeometryLoaded = false;
 	wxGISTable::Close();
 }
 
@@ -201,43 +202,23 @@ const wxGISSpatialReference wxGISFeatureDataset::GetSpatialReference(void)
 bool wxGISFeatureDataset::Open(int iLayer, int bUpdate, bool bCache, ITrackCancel* const pTrackCancel)
 {
 	if(IsOpened())
+    {
 		return true;
+    }
 
 	if(!wxGISTable::Open(iLayer, bUpdate, bCache, pTrackCancel))
 		return false;
 
-    m_pQuadTree = new wxGISQuadTree(this);
-    if(!m_pQuadTree->Load(pTrackCancel))
-    {
-        return false;
-    }
+    SetInternalValues();
+
+    if(bCache)
+        Cache(pTrackCancel);
+
+	m_bIsOpened = true;
 
   //  //load all features
   //  LoadGeometry();
     //TODO: Increase extent while loading
-
-  //  if(m_bIsGeometryLoaded)
-  //      return m_psExtent;
-  //  else
-  //  {
-		//OGREnvelope* pEnv = new OGREnvelope();
-  //      if(m_poLayer->GetExtent(&pEnv, true) == OGRERR_NONE)
-  //      {
-  //          if(IsDoubleEquil(pEnv->MinX, pEnv->MaxX))
-  //          {
-  //              pEnv->MaxX += 1;
-  //              pEnv->MinX -= 1;
-  //          }
-  //          if(IsDoubleEquil(pEnv->MinY, pEnv->MaxY))
-  //          {
-  //              pEnv->MaxY += 1;
-  //              pEnv->MinY -= 1;
-  //          }
-		//	m_psExtent = OGREnvelopeSPtr(pEnv);
-  //          return m_psExtent;
-  //      }
-  //      return OGREnvelopeSPtr();
-  //  }
 
 	//if(bCache)
 	//	LoadGeometry(pTrackCancel);
@@ -272,23 +253,36 @@ void wxGISFeatureDataset::SetInternalValues()
             }
         }
     }
+
     wxGISTable::SetInternalValues();
 }
 
-//void wxGISFeatureDataset::Cache(ITrackCancel* pTrackCancel)
-//{
-//	wxGISTable::Cache(pTrackCancel);
+void wxGISFeatureDataset::Cache(ITrackCancel* const pTrackCancel)
+{
+	wxGISTable::Cache(pTrackCancel);
+
+    if(m_bIsGeometryLoaded)
+        return;
+
+    if(!m_pQuadTree)
+    {
+        m_pQuadTree = new wxGISQuadTree(this);
+        if(m_pQuadTree->Load(pTrackCancel))
+        {
+            m_bIsGeometryLoaded = true;
+        }
+    }
 //	LoadGeometry(pTrackCancel);
-//}
+}
 
 OGREnvelope wxGISFeatureDataset::GetEnvelope(void)
 {
-    if(!IsOpened())
     if(m_stExtent.IsInit())
         return m_stExtent;
 	//bool bOLCFastGetExtent = m_poLayer->TestCapability(OLCFastGetExtent);
  //   if(bOLCFastGetExtent)
- //   {
+    if(IsOpened())
+    {
         if(m_poLayer->GetExtent(&m_stExtent) == OGRERR_NONE)
         {
             if(IsDoubleEquil(m_stExtent.MinX, m_stExtent.MaxX))
@@ -302,7 +296,7 @@ OGREnvelope wxGISFeatureDataset::GetEnvelope(void)
                 m_stExtent.MinY -= 1;
             }
 		}
-    //}
+    }
     return m_stExtent;
 }
 /*
