@@ -19,9 +19,10 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/cartoui/cartocmd.h"
-/*
+#include "wxgis/cartoui/mxeventui.h"
+
 #include "wxgis/display/rubberband.h"
-#include "wxgis/core/config.h"
+//#include "wxgis/core/config.h"
 //#include "wxgis/display/simplefillsymbol.h"
 
 #include "../../art/fullext.xpm"
@@ -54,8 +55,9 @@
 IMPLEMENT_DYNAMIC_CLASS(wxGISCartoMainCmd, wxObject)
 
 
-wxGISCartoMainCmd::wxGISCartoMainCmd(void) : m_pMapView(NULL)
+wxGISCartoMainCmd::wxGISCartoMainCmd(void) : wxGISCommand()
 {
+    m_pMapView = NULL;
 }
 
 wxGISCartoMainCmd::~wxGISCartoMainCmd(void)
@@ -126,12 +128,15 @@ bool wxGISCartoMainCmd::GetChecked(void)
 
 bool wxGISCartoMainCmd::GetEnabled(void)
 {
-	if(!m_pMapView)
-	{
+    wxCHECK_MSG(m_pApp, false, wxT("Application pointer is null"));
+
+    if(!m_pMapView)
+    {
         wxWindow* pWnd = m_pApp->GetRegisteredWindowByType(wxCLASSINFO(wxGISMapView));
-        m_pMapView = dynamic_cast<wxGISMapView*>(pWnd);
-	}
-	if(!m_pMapView)
+        m_pMapView = wxDynamicCast(pWnd, wxGISMapView);
+    }
+
+    if(!m_pMapView)
         return false;
 
 	switch(m_subtype)
@@ -177,6 +182,8 @@ wxString wxGISCartoMainCmd::GetMessage(void)
 
 void wxGISCartoMainCmd::OnClick(void)
 {
+    wxCHECK_RET(m_pMapView, wxT("MapView pointer is null"));
+
 	switch(m_subtype)
 	{
 		case 0:
@@ -215,7 +222,7 @@ unsigned char wxGISCartoMainCmd::GetCount(void)
 {
 	return 3;
 }
-
+/*
 //--------------------------------------------------
 // wxGISCartoMainTool
 //--------------------------------------------------
@@ -895,10 +902,13 @@ bool wxGISCartoFrameTool::HasToolLabel(void)
 			return false;
 	}
 }
+*/
 
-////////////////////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------------------
 // wxGISRotationComboBox
-////////////////////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------------------
+
+IMPLEMENT_CLASS(wxGISRotationComboBox, wxComboBox)
 
 BEGIN_EVENT_TABLE(wxGISRotationComboBox, wxComboBox)
 	EVT_TEXT_ENTER(wxID_ANY, wxGISRotationComboBox::OnTextEnter)
@@ -906,8 +916,9 @@ BEGIN_EVENT_TABLE(wxGISRotationComboBox, wxComboBox)
 	EVT_MXMAP_ROTATED(wxGISRotationComboBox::OnMapRotated)
 END_EVENT_TABLE()
 
-wxGISRotationComboBox::wxGISRotationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name) : wxComboBox(parent, id, value, pos, size, choices, style, validator, name), m_nConnectionPointMapCookie(wxNOT_FOUND)
+wxGISRotationComboBox::wxGISRotationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name) : wxComboBox(parent, id, value, pos, size, choices, style, validator, name)
 {
+    m_nConnectionPointMapCookie = wxNOT_FOUND;
 	m_pMapView = NULL;
 	AppendString(wxT("0.00"));
 	AppendString(wxT("45.00"));
@@ -941,7 +952,7 @@ void wxGISRotationComboBox::OnTextEnter(wxCommandEvent& event)
 	}
 }
 
-void wxGISRotationComboBox::OnMapRotated(wxMxMapViewEvent& event)
+void wxGISRotationComboBox::OnMapRotated(wxMxMapViewUIEvent& event)
 {
 	UpdateAngle();
 }
@@ -949,17 +960,14 @@ void wxGISRotationComboBox::OnMapRotated(wxMxMapViewEvent& event)
 void wxGISRotationComboBox::Activate(wxGISApplicationBase* pApp)
 {
     wxWindow* pWnd = pApp->GetRegisteredWindowByType(wxCLASSINFO(wxGISMapView));
-    m_pMapView = dynamic_cast<wxGISMapView*>(pWnd);
-
-	m_pConnectionPointMap = dynamic_cast<wxGISConnectionPointContainer*>( m_pMapView );
-	if(m_pConnectionPointMap != NULL)
-		m_nConnectionPointMapCookie = m_pConnectionPointMap->Advise(this);
+    m_pMapView = wxDynamicCast(pWnd, wxGISMapView);
+    m_nConnectionPointMapCookie = m_pMapView->Advise(this);
 }
 
 void wxGISRotationComboBox::Deactivate(void)
 {
 	if(m_nConnectionPointMapCookie != wxNOT_FOUND)
-		m_pConnectionPointMap->Unadvise(m_nConnectionPointMapCookie);
+		m_pMapView->Unadvise(m_nConnectionPointMapCookie);
 }
 
 void wxGISRotationComboBox::UpdateAngle(void)
@@ -971,4 +979,4 @@ void wxGISRotationComboBox::UpdateAngle(void)
 		SetValue(sVal);
 	}
 }
-*/
+

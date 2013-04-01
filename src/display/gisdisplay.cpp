@@ -800,8 +800,8 @@ bool wxGISDisplay::CheckDrawAsPoint(const OGRGeometry* pGeometry, bool bCheckEnv
 		}
         else
         {
-			cairo_move_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MinX, Envelope.MinY);
-			cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MinX + 0.2, Envelope.MinY + 0.5);
+//			cairo_move_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MinX, Envelope.MinY);
+//			cairo_line_to(m_saLayerCaches[m_nCurrentLayer].pCairoContext, Envelope.MaxX, Envelope.MaxY);
         }
 		return true;
 	}

@@ -44,10 +44,8 @@ public:
 	virtual bool Open(int iLayer = 0, int bUpdate = 0, bool bCache = true, ITrackCancel* const pTrackCancel = NULL);
     virtual wxGISDataset* GetSubset(size_t nIndex);	
     virtual wxGISDataset* GetSubset(const wxString & sSubsetName); 
-    /*    
-	
-	virtual bool IsCached(void){ return m_bIsDataLoaded & m_bIsGeometryLoaded; };
-	virtual void Cache(ITrackCancel* pTrackCancel = NULL);*/
+	virtual bool IsCached(void){ return  m_bIsGeometryLoaded; };//m_bIsDataLoaded &
+	virtual void Cache(ITrackCancel* const pTrackCancel = NULL);
 //wxGISFeatureDataset
 	virtual OGREnvelope GetEnvelope(void);
     virtual OGRwkbGeometryType GetGeometryType(void) const;
@@ -74,9 +72,9 @@ protected:
     OGREnvelope m_stExtent;
     OGRwkbGeometryType m_eGeomType;
 	wxGISQuadTree* m_pQuadTree;
+    bool m_bIsGeometryLoaded;
     /*
 	
-    bool m_bIsGeometryLoaded;
 
 
     //wxGISGeometrySet *m_pGeometrySet;

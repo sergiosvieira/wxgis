@@ -26,8 +26,8 @@
 
 #include "wx/image.h"
 
-#define MINPOLYAREA 2
-#define MINPOLYDRAWAREA 5
+#define MINPOLYAREA 0.25
+#define MINPOLYDRAWAREA 2.2
 #define ZOOM_FACTOR 0.4
 
 #define ENVMAX_X 179
