@@ -50,7 +50,7 @@ class WXDLLIMPEXP_GIS_FRW wxGISAddCommandDlg : public wxDialog
 	};
 public:
 	typedef std::map<wxString, wxCommandPtrArray> CATEGORYMAP;
-	std::vector<long> m_IDArray;
+	wxVector<long> m_IDArray;
 
 private:
 	CATEGORYMAP m_CategoryMap;

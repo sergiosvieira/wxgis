@@ -3,7 +3,7 @@
  * Purpose:  Carto Main Commands & tools class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2012 Bishop
+*   Copyright (C) 2009,2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ private:
 /** \class wxGISCartoMainTool cartocmd.h
     \brief The carto main tool.
 */
-/*
+
 class wxGISCartoMainTool :
 	public ITool
 {

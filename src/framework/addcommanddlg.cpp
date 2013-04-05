@@ -45,7 +45,7 @@ wxGISAddCommandDlg::wxGISAddCommandDlg( wxGISApplication* pGxApp, wxWindow* pare
 
 	m_Splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D | wxNO_BORDER );
 	//m_Splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( wxGISAddCommandDlg::SplitterOnIdle ), NULL, this );
-	m_Splitter->Bind( wxEVT_IDLE, &wxGISAddCommandDlg::SplitterOnIdle, this ); //don't work?
+	m_Splitter->Bind( wxEVT_IDLE, &wxGISAddCommandDlg::SplitterOnIdle, this ); 
 	bSizer5->Add( m_Splitter, 1, wxEXPAND, 5 );
 
 	//fill m_listBox1

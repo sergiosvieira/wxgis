@@ -64,12 +64,16 @@ public:
     wxGISSpatialReferenceRefData(OGRSpatialReference *poSRS = NULL)
     {
         m_poSRS = poSRS;
+        if( m_poSRS )
+            m_poSRS->Reference();
     }
 
     virtual ~wxGISSpatialReferenceRefData(void)
-    {
+    {        
         if(m_poSRS)
-            OGRSpatialReference::DestroySpatialReference(m_poSRS);
+        {
+            m_poSRS->Release();
+        }
     }
 
     wxGISSpatialReferenceRefData( const wxGISSpatialReferenceRefData& data )
@@ -132,6 +136,7 @@ public:
 
     //get
     wxString GetFieldAsString(int nField);
+    wxString GetFieldAsString(int nField) const;
     wxString GetFieldAsString(const wxString &sFieldName);
     int GetFieldAsDateTime (int i, int *pnYear, int *pnMonth, int *pnDay, int *pnHour, int *pnMinute, int *pnSecond, int *pnTZFlag);
     double GetFieldAsDouble (int i);
@@ -143,6 +148,8 @@ public:
     int GetFieldAsInteger(const wxString &sFieldName);
     int GetFieldAsInteger(int i);
     int GetFieldIndex(const wxString &sFieldName);
+    wxString GetFieldName(int nIndex) const;
+    int GetFieldCount(void) const;
     long GetFID(void) const;
     //set
     OGRErr SetFID(long nFID);
@@ -222,6 +229,9 @@ public:
 
     OGREnvelope GetEnvelope(void) const;
     OGRGeometry* Copy(void) const;
+    OGRPoint* GetCentroid(void);
+    wxGISSpatialReference GetSpatialReference() const;
+    void SetSpatialReference(const wxGISSpatialReference &SpaRef);
 
     wxGISGeometry Intersection(const wxGISGeometry &Geom) const;
     bool Intersects(const wxGISGeometry &Geom) const;
@@ -267,3 +277,5 @@ protected:
 	OGRGeometry *m_poGeom;
     bool m_bOwnGeom;
 };
+
+extern WXDLLIMPEXP_DATA_GIS_DS(wxGISGeometry) wxNullGeometry;

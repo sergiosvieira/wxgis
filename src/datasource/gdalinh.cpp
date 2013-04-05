@@ -172,7 +172,7 @@ char ** wxGISFeature::GetFieldAsStringList (int i) const
 wxString wxGISFeature::GetFieldAsString(const wxString &sFieldName)
 {
     wxCHECK_MSG(((wxGISFeatureRefData *)m_refData)->m_poFeature, wxEmptyString, wxT("The OGRFeature pointer is null"));
-    int nField = GetFieldIndex(sFieldName);;
+    int nField = GetFieldIndex(sFieldName);
     if(nField == -1)
         return wxEmptyString;
     return GetFieldAsString(nField);
@@ -427,9 +427,22 @@ int wxGISFeature::GetFieldIndex(const wxString &sFieldName)
     return ((wxGISFeatureRefData *)m_refData)->m_poFeature->GetFieldIndex(sFieldName.mb_str());
 }
 
+wxString wxGISFeature::GetFieldName(int nIndex) const
+{
+    wxCHECK_MSG(((wxGISFeatureRefData *)m_refData)->m_poFeature, wxEmptyString, wxT("The OGRFeature pointer is null"));
+    return wxString(((wxGISFeatureRefData *)m_refData)->m_poFeature->GetFieldDefnRef(nIndex)->GetNameRef());
+}
+
+int wxGISFeature::GetFieldCount(void) const
+{
+    wxCHECK_MSG(((wxGISFeatureRefData *)m_refData)->m_poFeature, 0, wxT("The OGRFeature pointer is null"));
+    return ((wxGISFeatureRefData *)m_refData)->m_poFeature->GetFieldCount();
+}
+
 //-----------------------------------------------------------------------------
 // wxGISGeometry
 //-----------------------------------------------------------------------------
+wxGISGeometry wxNullGeometry;
 
 #include <wx/arrimpl.cpp> // This is a magic incantation which must be done!
 WX_DEFINE_USER_EXPORTED_OBJARRAY(wxGISGeometryArray);
@@ -481,8 +494,37 @@ OGREnvelope wxGISGeometry::GetEnvelope(void) const
 
 OGRGeometry* wxGISGeometry::Copy(void) const
 {
+    wxCHECK_MSG(((wxGISGeometryRefData *)m_refData)->m_poGeom, NULL, wxT("OGRGeometry pointer is null"));
     return ((wxGISGeometryRefData *)m_refData)->m_poGeom->clone();
 }
+
+wxGISSpatialReference wxGISGeometry::GetSpatialReference() const
+{
+    wxCHECK_MSG(((wxGISGeometryRefData *)m_refData)->m_poGeom, wxNullSpatialReference, wxT("OGRGeometry pointer is null"));
+    OGRSpatialReference *pSpaRef = ((wxGISGeometryRefData *)m_refData)->m_poGeom->getSpatialReference();
+    return wxGISSpatialReference(pSpaRef);
+}
+
+void wxGISGeometry::SetSpatialReference(const wxGISSpatialReference &SpaRef)
+{
+    wxCHECK_RET(((wxGISGeometryRefData *)m_refData)->m_poGeom, wxT("OGRGeometry pointer is null"));
+    ((wxGISGeometryRefData *)m_refData)->m_poGeom->assignSpatialReference(SpaRef);
+}
+
+OGRPoint* wxGISGeometry::GetCentroid(void)
+{
+    wxCHECK_MSG(((wxGISGeometryRefData *)m_refData)->m_poGeom, NULL, wxT("OGRGeometry pointer is null"));
+    OGRPoint* pt = new OGRPoint();
+    if(((wxGISGeometryRefData *)m_refData)->m_poGeom->Centroid(pt) == OGRERR_NONE)
+    {
+        wxGISSpatialReference SpaRef = GetSpatialReference();
+        if(SpaRef.IsOk())
+            pt->assignSpatialReference(SpaRef);
+        return pt;
+    }
+    return NULL;
+}
+
 
 wxGISGeometry wxGISGeometry::Intersection(const wxGISGeometry &Geom) const
 {

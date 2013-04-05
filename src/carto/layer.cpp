@@ -35,7 +35,14 @@ wxGISLayer::wxGISLayer(const wxString &sName, wxGISDataset* pwxGISDataset)
     m_bVisible = true;
     m_nCacheID = 0;
 
-    m_SpatialReference = wxNullSpatialReference;
+    if(m_pwxGISDataset)
+    {
+        m_SpatialReference = m_pwxGISDataset->GetSpatialReference();
+    }
+    else
+    {
+        m_SpatialReference = wxNullSpatialReference;
+    }
     m_pRenderer = NULL;
 }
 

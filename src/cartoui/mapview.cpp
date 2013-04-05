@@ -752,7 +752,11 @@ OGREnvelope wxGISMapView::GetFullExtent(void)
 
 void wxGISMapView::FlashGeometry(const wxGISGeometryArray& Geoms)
 {
-    DestroyDrawThread();
+    //wait drawings end to flash
+    if (GetThread() && GetThread()->IsRunning())
+        GetThread()->Wait();
+
+//    DestroyDrawThread();
 
     //draw geometries
     m_pGISDisplay->SetDrawCache(m_pGISDisplay->GetFlashCacheID());
@@ -773,6 +777,8 @@ void wxGISMapView::FlashGeometry(const wxGISGeometryArray& Geoms)
     for(size_t i = 0; i < Geoms.GetCount(); ++i)
     {
         wxGISGeometry Geom = Geoms[i];
+        if(!Geom.IsOk())
+            continue;
 		OGRwkbGeometryType type = wkbFlatten(Geom.GetType());
 		switch(type)
 		{
@@ -813,6 +819,13 @@ void wxGISMapView::FlashGeometry(const wxGISGeometryArray& Geoms)
 	}
 
 	Refresh();
+
+    //wait drawings end to flash
+    if (GetThread() && GetThread()->IsRunning())
+    {
+        GetThread()->Wait();
+    }
+
     //clean flash layer
     int nMilliSec = oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_time")), DEFAULT_FLASH_PERIOD);
     m_nDrawingState = enumGISMapFlashing;
@@ -830,6 +843,7 @@ void wxGISMapView::OnMapDrawing(wxMxMapViewUIEvent& event)
     wxEventType eType = event.GetEventType();
     if(eType == wxMXMAP_DRAWING_START)
     {
+        if(m_nDrawingState != enumGISMapFlashing) //maybe m_nDrawingState == enumGISMapNone
         m_nDrawingState = enumGISMapDrawing;
 
         wxCHECK_RET(m_pAni, wxT("Animation progress is not initiated"));
@@ -846,7 +860,7 @@ void wxGISMapView::OnMapDrawing(wxMxMapViewUIEvent& event)
             m_ClipGeometry.Clear();
         }
 
-	    m_nDrawingState = enumGISMapNone;
+	    //m_nDrawingState = enumGISMapNone;
 	    Refresh();
 
         wxCHECK_RET(m_pAni, wxT("Animation progress is not initiated"));

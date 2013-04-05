@@ -140,6 +140,8 @@ bool wxGxApplication::CreateApp(void)
         pViewsChildNode = pViewsChildNode->GetNext();
     }
 
+    //TODO: second call - first call from wxGISApplicationEx::CreateApp();
+    SerializeFramePosEx(false);
     m_mgr.Update();
 
 	wxString sLastPath;

@@ -56,6 +56,7 @@ public:
 	virtual void SetCacheID(size_t nCacheID){m_nCacheID = nCacheID;};
 	virtual void SetSpatialReference(const wxGISSpatialReference &SpatialReference);
     virtual void SetDispaly(wxGISDisplay *pDisplay) { m_pDisplay = pDisplay; };
+    virtual wxGISDataset* GetDataset() {return m_pwxGISDataset;};
 protected:
     wxGISDataset* m_pwxGISDataset;
     wxGISSpatialReference m_SpatialReference;

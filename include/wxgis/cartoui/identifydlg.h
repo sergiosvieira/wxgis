@@ -3,7 +3,7 @@
  * Purpose:  wxGISIdentifyDlg class - dialog/dock window with the results of identify.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011-2012 Bishop
+*   Copyright (C) 2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,13 +19,14 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-/*
+
 #include "wxgis/cartoui/cartoui.h"
-#include "wxgis/framework/view.h"
+//#include "wxgis/framework/view.h"
 #include "wxgis/framework/applicationbase.h"
 #include "wxgis/cartoui/mapview.h"
 #include "wxgis/carto/featurelayer.h"
 #include "wxgis/cartoui/formatmenu.h"
+#include "wxgis/datasource/gdalinh.h"
 
 #include <wx/intl.h>
 #include <wx/string.h>
@@ -47,19 +48,19 @@
 #include <wx/listctrl.h>
 #include <wx/valgen.h>
 #include <wx/imaglist.h>
-*/
+
 /** \class wxIdentifyTreeItemData identifydlg.h
  *  \brief The identify tree item data.
  */
-/*
+
 class wxIdentifyTreeItemData : public wxTreeItemData
 {
 public:
-	wxIdentifyTreeItemData(wxGISFeatureDatasetSPtr pDataset, long nOID = wxNOT_FOUND, OGRGeometry* pGeometry = NULL)
+	wxIdentifyTreeItemData(wxGISFeatureDataset* pDataset, long nOID = wxNOT_FOUND, const wxGISGeometry &Geometry = wxNullGeometry)
 	{
-		m_pDataset = pDataset;
+         m_pDataset = pDataset;
 		m_nOID = nOID;
-		m_pGeometry = pGeometry;
+		m_Geometry = Geometry;
 	}
 
 	~wxIdentifyTreeItemData(void)
@@ -67,21 +68,21 @@ public:
 	}
 
 	long m_nOID;
-	wxGISFeatureDatasetSPtr m_pDataset;
-	OGRGeometry* m_pGeometry;
+	wxGISFeatureDataset* m_pDataset;
+	wxGISGeometry m_Geometry;
 };
 
 typedef struct _fieldsortdata
 {
     int nSortAsc;
     short currentSortCol;
-    OGRFeatureSPtr pFeature;
+    wxGISFeature Feature;
 } FIELDSORTDATA, *LPFIELDSORTDATA;
-*/
+
 /** \class wxGISFeatureDetailsPanel identifydlg.h
  *  \brief The wxGISFeatureDetailsPanel class show OGRFeature fields and values.
  */
-/*
+
 class wxGISFeatureDetailsPanel : public wxPanel
 {
 	enum
@@ -92,23 +93,27 @@ class wxGISFeatureDetailsPanel : public wxPanel
 		ID_WG_COPY_VALUE,
 		ID_WG_COPY,
 		ID_WG_HIDE,
-        ID_WG_RESET_SORT
+        ID_WG_RESET_SORT,
+        ID_WG_RESET_HIDE
 	};
 public:
 	wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL );
 	virtual ~wxGISFeatureDetailsPanel();
-	virtual void FillPanel(const OGRPoint &pt1);
-	virtual void FillPanel(const OGRFeatureSPtr &pFeature);
+	virtual void FillPanel(const OGRPoint *pPt);
+	virtual void FillPanel(wxGISFeature &Feature);
 	virtual void Clear(bool bFull = false);
-	virtual void SetEncoding(wxFontEncoding eEncoding){m_eEncoding = eEncoding;};
 	//events
 	virtual void OnContextMenu(wxContextMenuEvent& event);
 	virtual void OnMenu(wxCommandEvent& event);
 	virtual void OnMenuUpdateUI(wxUpdateUIEvent& event);
     virtual void OnColClick(wxListEvent& event);
 	virtual void OnMaskMenu(wxCommandEvent& event);
+    virtual void OnMouseLeftUp(wxMouseEvent& event);
+    virtual void OnSetCursor(wxSetCursorEvent& event);
 protected:
 	void WriteStringToClipboard(const wxString &sData);
+    bool IsURL(const wxString &sText);
+    bool IsLocalURL(const wxString &sText);
 protected:
 	wxString m_sLocation;
 	wxGISCoordinatesFormatMenu *m_pCFormat;
@@ -118,20 +123,21 @@ protected:
 	wxListCtrl* m_listCtrl;
 	wxMenu *m_pMenu;
 	wxArrayLong m_anExcludeFields;
-	OGRFeatureSPtr m_pFeature;
+	wxGISFeature m_Feature;
 	int m_nSortAsc;
 	short m_currentSortCol;
 	wxImageList m_ImageListSmall;
 	double m_dfX, m_dfY;
-	wxFontEncoding m_eEncoding;
-
+private:
+    wxString m_sAppName;
+private:
     DECLARE_EVENT_TABLE()
 };
-*/
+
 /** \class wxGISIdentifyDlg identifydlg.h
  *  \brief The wxGISIdentifyDlg class is dialog/dock window with the results of identify.
  */
-/*
+
 class WXDLLIMPEXP_GIS_CTU wxGISIdentifyDlg : public wxPanel
 {
 protected:
@@ -154,8 +160,11 @@ public:
 
 	void SplitterOnIdle( wxIdleEvent& )
 	{
-		m_splitter->SetSashPosition( 0 );
-		m_splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISIdentifyDlg::SplitterOnIdle ), NULL, this );
+		//m_splitter->SetSashPosition( 0 );
+		//m_splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxGISIdentifyDlg::SplitterOnIdle ), NULL, this );
+
+		m_splitter->SetSashPosition( m_nSashPos );
+        m_splitter->Unbind(wxEVT_IDLE, &wxGISIdentifyDlg::SplitterOnIdle, this );
 	}
 	//event
 	virtual void OnSwitchSplit(wxCommandEvent& event);
@@ -163,6 +172,7 @@ public:
 	virtual void OnLeftDown(wxMouseEvent& event);
 	virtual void OnMenu(wxCommandEvent& event);
 	virtual void OnItemRightClick(wxTreeEvent& event);
+	virtual void OnDoubleClickSash(wxSplitterEvent& event);
 protected:
 	wxBoxSizer* m_bMainSizer;
 	wxFlexGridSizer* m_fgTopSizer;
@@ -176,14 +186,17 @@ protected:
 	wxImageList m_TreeImageList;
 	wxXmlNode* m_pConf;
 	wxMenu *m_pMenu;
-
+protected:
+    int m_nSashPos;
+    wxString m_sAppName;
+private:
     DECLARE_EVENT_TABLE()
 };
-*/
+
 /** \class wxAxToolboxView gptoolboxview.h
     \brief The wxAxToolboxView show tool window with tabs(tools tree, tool exec view & etc.).
 */
-/*
+
 class WXDLLIMPEXP_GIS_CTU wxAxIdentifyView :
 	public wxGISIdentifyDlg,
 	public IView
@@ -201,15 +214,15 @@ public:
 	virtual ~wxAxIdentifyView(void);
 //IView
     virtual bool Create(wxWindow* parent, wxWindowID id = ID_WXGISIDENTIFYVIEW, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxBORDER_NONE | wxTAB_TRAVERSAL, const wxString& name = wxT("IdentifyView"));
-	virtual bool Activate(wxGISApplicationBase* application, wxXmlNode* pConf);
+	virtual bool Activate(IApplication* const pApplication, wxXmlNode* const pConf);
 	virtual void Deactivate(void);
 	virtual void Refresh(void){};
-	virtual wxString GetViewName(void){return m_sViewName;};
+	virtual wxString GetViewName(void) const {return m_sViewName;};
 	virtual wxIcon GetViewIcon(void){return wxNullIcon;};
 	virtual void SetViewIcon(wxIcon Icon){};
 	//wxGISIdentifyDlg
-	virtual void Identify(OGRGeometrySPtr pGeometryBounds);
-	virtual void FillTree(wxGISFeatureLayerSPtr pFLayer, wxGISQuadTreeCursorSPtr pCursor);
+	virtual void Identify(wxGISGeometry &GeometryBounds);
+	virtual void FillTree(wxGISFeatureLayer* const pFLayer, const wxGISQuadTreeCursor &Cursor);
 	//events
 	virtual void OnSelChanged(wxTreeEvent& event);
 	virtual void OnLeftDown(wxMouseEvent& event);
@@ -221,4 +234,3 @@ protected:
     //wxGxToolboxTreeView* m_pGxToolboxView;
     //wxGxToolExecuteView *m_pGxToolExecuteView;
 };
-*/

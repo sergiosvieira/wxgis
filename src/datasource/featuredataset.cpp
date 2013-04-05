@@ -195,7 +195,7 @@ const wxGISSpatialReference wxGISFeatureDataset::GetSpatialReference(void)
 	OGRSpatialReference* pSpaRef = m_poLayer->GetSpatialRef();
 	if(!pSpaRef)
 		return m_SpatialReference;
-	m_SpatialReference = wxGISSpatialReference(pSpaRef->Clone());
+	m_SpatialReference = wxGISSpatialReference(pSpaRef);
 	return m_SpatialReference;
 }
 
