@@ -181,9 +181,9 @@ bool wxGISApplicationEx::CreateApp(void)
 		}
 	}
 
-	SerializeFramePosEx(false);
+	//SerializeFramePosEx(false);
 
-	m_mgr.Update();
+	//m_mgr.Update();
 
 	wxLogMessage(_("wxGISApplicationEx: Creation complete"));
 

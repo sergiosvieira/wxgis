@@ -25,11 +25,18 @@
 #include "wxgis/display/gisdisplay.h"
 #include "wxgis/datasource/gdalinh.h"
 
+/** \class wxGISRubberBand rubberband.h
+    \brief The class to drawing rectangles on display while mouse dragging
+
+    The class functionality uses in identify, ZoomIn and ZoomOut tools
+*/
+
 class WXDLLIMPEXP_GIS_DSP wxGISRubberBand :
 	public wxEvtHandler
 {
+    DECLARE_CLASS(wxGISRubberBand)
 public:
-	wxGISRubberBand(wxPen oPen, wxWindow *pWnd, wxGISDisplay *pDisp);
+	wxGISRubberBand(wxPen oPen, wxWindow *pWnd, wxGISDisplay *pDisp, const wxGISSpatialReference &SpaRef = wxNullSpatialReference);
 	virtual ~wxGISRubberBand(void);
 	virtual wxGISGeometry TrackNew(wxCoord x, wxCoord y);
 	virtual void OnUnlock(void);
@@ -54,19 +61,21 @@ protected:
 	wxPen m_oPen;
 
     wxRect m_PrevRect;
-
+    wxGISSpatialReference m_SpaRef;
+private:
 	DECLARE_EVENT_TABLE()
 };
 
-//----------------------------------------------------
-// class wxGISRubberEnvelope
-//----------------------------------------------------
+/** \class wxGISRubberEnvelope rubberband.h
+    \brief The special version with clip drawing
+*/
 
 class WXDLLIMPEXP_GIS_DSP wxGISRubberEnvelope :
 	public wxGISRubberBand
 {
+    DECLARE_CLASS(wxGISRubberEnvelope)
 public:
-	wxGISRubberEnvelope(wxPen oPen, wxWindow *pWnd, wxGISDisplay *pDisp);
+	wxGISRubberEnvelope(wxPen oPen, wxWindow *pWnd, wxGISDisplay *pDisp, const wxGISSpatialReference &SpaRef = wxNullSpatialReference);
 	virtual ~wxGISRubberEnvelope(void);
 	virtual void OnMouseMove(wxMouseEvent& event);
 	virtual void OnMouseUp(wxMouseEvent& event);

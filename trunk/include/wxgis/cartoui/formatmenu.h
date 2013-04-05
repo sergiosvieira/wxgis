@@ -19,14 +19,14 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-/*
+
 #include "wxgis/cartoui/cartoui.h"
 #include "wxgis/core/format.h"
 #include "wxgis/framework/framework.h"
 
 /** \class wxGISCoordinatesFormatMenu formatmenu.h
     \brief The class to format coordinates according different masks
-*//*
+*/
 class WXDLLIMPEXP_GIS_CTU wxGISCoordinatesFormatMenu :
 	public wxMenu,
 	public wxGISCoordinatesFormat
@@ -50,7 +50,6 @@ protected:
 	virtual void Serialize(bool bStore);
 protected:
 	wxArrayString m_asCoordsMask;
-
+private:
     DECLARE_EVENT_TABLE()
 };
-*/

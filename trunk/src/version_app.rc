@@ -91,7 +91,7 @@ BEGIN
 #endif
             VALUE "FileVersion", wxGIS_VERSION_NUM_DOT_STRING "\0"
             VALUE "InternalName", wxGIS_FILENAME "\0"
-            VALUE "LegalCopyright", "Copyright 2009-2012 wxGIS development team\0"
+            VALUE "LegalCopyright", "Copyright 2009-2013 wxGIS development team\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", wxGIS_FILENAME ".exe\0"
             VALUE "PrivateBuild", "\0"

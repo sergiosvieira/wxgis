@@ -19,9 +19,9 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/cartoui/formatmenu.h"
-/*
+
 #include "wxgis/core/config.h"
-#include "wxgis/core/globalfn.h"
+//#include "wxgis/core/globalfn.h"
 
 #include "wx/propgrid/propgrid.h"
 
@@ -55,7 +55,7 @@ wxGISCoordinatesFormatMenu::wxGISCoordinatesFormatMenu(const wxString& title, lo
 	Append(wxID_ANY, _("Inches"));
 	AppendSeparator();
 	Append(wxID_ANY, _("Degrees"));
-	*//*
+	*/
 	//add swp coords check mark
 	//TODO: AppendSeparator();
 	AppendCheckItem(ID_SWAPCOORS, _("Swap coordinates"));
@@ -176,4 +176,3 @@ void wxGISCoordinatesFormatMenu::PrepareMenu(void)
 	for(size_t i = 0; i < m_asCoordsMask.GetCount(); ++i)
 		Insert(POS_TO_INSERT + i, ID_MASKBEG + i, m_asCoordsMask[i]);
 }
-*/

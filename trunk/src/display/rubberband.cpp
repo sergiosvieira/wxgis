@@ -23,6 +23,12 @@
 
 #include <wx/evtloop.h>
 
+//----------------------------------------------------
+// class wxGISRubberBand
+//----------------------------------------------------
+
+IMPLEMENT_CLASS(wxGISRubberBand, wxEvtHandler)
+
 BEGIN_EVENT_TABLE(wxGISRubberBand, wxEvtHandler)
 	EVT_KEY_DOWN(wxGISRubberBand::OnKeyDown)
 	EVT_LEFT_DOWN(wxGISRubberBand::OnMouseDown)
@@ -40,11 +46,12 @@ BEGIN_EVENT_TABLE(wxGISRubberBand, wxEvtHandler)
 	EVT_MOUSE_CAPTURE_LOST(wxGISRubberBand::OnCaptureLost)
 END_EVENT_TABLE()
 
-wxGISRubberBand::wxGISRubberBand(wxPen oPen, wxWindow *pWnd, wxGISDisplay *pDisp) :  m_bLock(true)
+wxGISRubberBand::wxGISRubberBand(wxPen oPen, wxWindow *pWnd, wxGISDisplay *pDisp, const wxGISSpatialReference &SpaRef) :  m_bLock(true)
 {
 	m_pWnd = pWnd;
 	m_pDisp = pDisp;
 	m_oPen = oPen;
+    m_SpaRef = SpaRef;
 }
 
 wxGISRubberBand::~wxGISRubberBand(void)
@@ -97,26 +104,32 @@ void wxGISRubberBand::OnKeyDown(wxKeyEvent & event)
 
 void wxGISRubberBand::OnMouseMove(wxMouseEvent& event)
 {
+    event.Skip();
 }
 
 void wxGISRubberBand::OnMouseDown(wxMouseEvent& event)
 {
+    event.Skip();
 }
 
 void wxGISRubberBand::OnMouseUp(wxMouseEvent& event)
 {
+    event.Skip();
 }
 
 void wxGISRubberBand::OnMouseDoubleClick(wxMouseEvent& event)
 {
+    event.Skip();
 }
 
 void wxGISRubberBand::OnLeave(wxMouseEvent& event)
 {
+    event.Skip();
 }
 
 void wxGISRubberBand::OnEnter(wxMouseEvent& event)
 {
+    event.Skip();
 }
 
 void wxGISRubberBand::OnCaptureLost(wxMouseCaptureLostEvent & event)
@@ -125,11 +138,13 @@ void wxGISRubberBand::OnCaptureLost(wxMouseCaptureLostEvent & event)
 	if( m_pWnd->HasCapture() )
 		m_pWnd->ReleaseMouse();
 }
+
 //----------------------------------------------------
 // class wxGISRubberEnvelope
 //----------------------------------------------------
+IMPLEMENT_CLASS(wxGISRubberEnvelope, wxGISRubberBand)
 
-wxGISRubberEnvelope::wxGISRubberEnvelope(wxPen oPen, wxWindow *pWnd, wxGISDisplay *pDisp) : wxGISRubberBand(oPen, pWnd, pDisp)
+wxGISRubberEnvelope::wxGISRubberEnvelope(wxPen oPen, wxWindow *pWnd, wxGISDisplay *pDisp, const wxGISSpatialReference &SpaRef) : wxGISRubberBand(oPen, pWnd, pDisp, SpaRef)
 {
 }
 
@@ -139,6 +154,8 @@ wxGISRubberEnvelope::~wxGISRubberEnvelope()
 
 void wxGISRubberEnvelope::OnMouseMove(wxMouseEvent& event)
 {
+    event.Skip();
+
 	int EvX = event.GetX(), EvY = event.GetY();
 	int width, height, X, Y;
 	width = abs(EvX - m_StartX);
@@ -169,6 +186,8 @@ void wxGISRubberEnvelope::OnMouseMove(wxMouseEvent& event)
 
 void wxGISRubberEnvelope::OnMouseUp(wxMouseEvent& event)
 {
+    event.Skip();
+
 	double dX1 = std::min(m_StartX, event.GetX());
 	double dY1 = std::max(m_StartY, event.GetY());
 	double dX2 = std::max(m_StartX, event.GetX());
@@ -191,8 +210,8 @@ void wxGISRubberEnvelope::OnMouseUp(wxMouseEvent& event)
     OGRPolygon* pRgn = new OGRPolygon();
     pRgn->addRing(&ring);
     pRgn->flattenTo2D();
-	//if(pSpaRef)
-	//	pRgn->assignSpatialReference(pSpaRef->Clone());
+    if(m_SpaRef.IsOk())
+		pRgn->assignSpatialReference(m_SpaRef);
 	m_RetGeom = wxGISGeometry(static_cast<OGRGeometry*>(pRgn));
 
 	//wxRect rc(wxPoint(dX1, dY1), wxPoint(dX2, dY2));

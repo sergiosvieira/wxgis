@@ -66,6 +66,7 @@ public:
 	virtual wxString Format(double dX, double dY);
 	virtual bool IsOk(void){return m_bIsOk;};
 	virtual void Create(const wxString &sMask, bool bSwap = false);
+    virtual wxString GetMask() const {return m_sMask;};
 public:
 	typedef enum coord_format {  
             D,
