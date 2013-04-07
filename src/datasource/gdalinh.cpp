@@ -327,9 +327,9 @@ void wxGISFeature::SetField (int i, const wxArrayString &asValues)
     wxCHECK_RET(((wxGISFeatureRefData *)m_refData)->m_poFeature, wxT("The OGRFeature pointer is null"));
 
     char **papszValues = NULL;
-    for(size_t i = 0; i < asValues.GetCount(); ++i)
+    for(size_t j = 0; j < asValues.GetCount(); ++j)
     {
-        CPLString szData = asValues[i].mb_str(wxCSConv(((wxGISFeatureRefData *)m_refData)->m_oEncoding));
+        CPLString szData = asValues[j].mb_str(wxCSConv(((wxGISFeatureRefData *)m_refData)->m_oEncoding));
         papszValues = CSLAddString(papszValues, szData);
     }
 
@@ -537,6 +537,12 @@ bool wxGISGeometry::Intersects(const wxGISGeometry &Geom) const
 {
     wxCHECK_MSG(((wxGISGeometryRefData *)m_refData)->m_poGeom && Geom.IsOk(), false, wxT("OGRGeometry pointer is null"));
     return bool( ((wxGISGeometryRefData *)m_refData)->m_poGeom->Intersects(Geom) );
+}
+
+wxGISGeometry wxGISGeometry::Buffer(double dfBuff, int nQuadSegs) const
+{
+    wxCHECK_MSG(((wxGISGeometryRefData *)m_refData)->m_poGeom, wxGISGeometry(), wxT("OGRGeometry pointer is null"));
+    return wxGISGeometry( ((wxGISGeometryRefData *)m_refData)->m_poGeom->Buffer(dfBuff, nQuadSegs) );
 }
 
 OGRwkbGeometryType wxGISGeometry::GetType() const

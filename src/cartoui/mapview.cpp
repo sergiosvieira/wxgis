@@ -233,9 +233,16 @@ void wxGISMapView::OnTimer( wxTimerEvent& event )
 		return;
     break;
     case enumGISMapFlashing:
-        m_nDrawingState = enumGISMapDrawing;
-        m_pGISDisplay->SetDrawCache(m_pGISDisplay->GetLastCacheID(), true);
-		m_timer.Stop();
+        if(m_staFlashGeoms.empty())
+        {
+            m_nDrawingState = enumGISMapDrawing;
+            m_pGISDisplay->SetDrawCache(m_pGISDisplay->GetLastCacheID(), true);
+		    m_timer.Stop();
+        }
+        else
+        {
+            Flash(m_eFlashStyle);
+        }
     break;
     case enumGISMapDrawing:
         break;//not stop timer
@@ -750,6 +757,156 @@ OGREnvelope wxGISMapView::GetFullExtent(void)
 	return OutputEnv;
 }
 
+void wxGISMapView::AddFlashGeometry(const wxGISGeometry& Geometry, WXGISRGBA stFillColour, WXGISRGBA stLineColour, unsigned char nPhase)
+{
+    wxCriticalSectionLocker locker(m_FlashCritSect);
+    FLASH_GEOMETRY fgeom = {Geometry, nPhase, stFillColour, stLineColour};
+    m_staFlashGeoms.push_back(fgeom);
+}
+
+void wxGISMapView::StartFlashing(wxGISEnumFlashStyle eFlashStyle)
+{
+    m_eFlashStyle = eFlashStyle;
+
+    Flash(eFlashStyle);
+
+    Refresh();
+
+    //wait drawings end to flash
+    if (GetThread() && GetThread()->IsRunning())
+    {
+        GetThread()->Wait();
+    }
+
+    int nMilliSec = DEFAULT_FLASH_PERIOD;
+    switch(eFlashStyle)
+    {
+    case enumGISMapFlashWaves:
+        nMilliSec /= 2;
+        {
+        wxGISAppConfig oConfig = GetConfig();
+        if(oConfig.IsOk())
+            nMilliSec = oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_waves_time")), nMilliSec);
+        }    
+        break;
+    default:
+    case enumGISMapFlashNewColor:
+        {
+        wxGISAppConfig oConfig = GetConfig();
+        if(oConfig.IsOk())
+            nMilliSec = oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_newcolor_time")), nMilliSec);
+        }
+        break;
+    };
+    m_nDrawingState = enumGISMapFlashing;
+    m_timer.Start(nMilliSec);
+}
+
+void wxGISMapView::DrawGeometry(const wxGISGeometry &Geometry, WXGISRGBA stFillColour, WXGISRGBA stLineColour, double dfLineWidth)
+{
+    wxCHECK_RET(Geometry.IsOk(), wxT("Input geometry is not valid"));
+    
+	OGRwkbGeometryType type = wkbFlatten(Geometry.GetType());
+	switch(type)
+	{
+	case wkbPoint:
+	case wkbMultiPoint:
+	    m_pGISDisplay->SetColor(enumGISDrawStylePoint, stLineColour);
+	    m_pGISDisplay->SetColor(enumGISDrawStyleOutline, stLineColour);
+	    m_pGISDisplay->SetColor(enumGISDrawStyleFill, stFillColour);
+		m_pGISDisplay->SetLineCap(CAIRO_LINE_CAP_ROUND);
+		m_pGISDisplay->SetLineWidth(dfLineWidth);
+		m_pGISDisplay->SetPointRadius(2.0);
+		break;
+	case wkbLineString:
+	case wkbLinearRing:
+	case wkbMultiLineString:
+	    m_pGISDisplay->SetColor(enumGISDrawStylePoint, stFillColour);
+	    m_pGISDisplay->SetColor(enumGISDrawStyleOutline, stFillColour);
+	    m_pGISDisplay->SetColor(enumGISDrawStyleFill, stFillColour);
+		m_pGISDisplay->SetLineCap(CAIRO_LINE_CAP_BUTT);
+		m_pGISDisplay->SetLineWidth(2.0);
+		break;
+	case wkbMultiPolygon:
+	case wkbPolygon:
+	    m_pGISDisplay->SetColor(enumGISDrawStyleOutline, stLineColour);
+	    m_pGISDisplay->SetColor(enumGISDrawStyleFill, stFillColour);
+		m_pGISDisplay->SetLineCap(CAIRO_LINE_CAP_BUTT);
+		m_pGISDisplay->SetLineWidth(dfLineWidth);
+		break;
+	case wkbGeometryCollection:
+		break;
+	default:
+	case wkbUnknown:
+	case wkbNone:
+		break;
+	}
+	m_pGISDisplay->DrawGeometry( Geometry );
+}
+
+
+void wxGISMapView::Flash(wxGISEnumFlashStyle eFlashStyle)
+{
+    wxCriticalSectionLocker locker(m_FlashCritSect);
+    //wait drawings end to flash
+    if (GetThread() && GetThread()->IsRunning())
+    {
+        GetThread()->Wait();    	
+    }
+
+    //draw geometries
+    m_pGISDisplay->SetDrawCache(m_pGISDisplay->GetFlashCacheID());
+
+    switch(eFlashStyle)
+    {
+    case enumGISMapFlashWaves:
+        {
+            double dfX(10), dfY(10);
+            m_pGISDisplay->DC2WorldDist(&dfX, &dfY);
+            double dfDist = (std::abs(dfX) + std::abs(dfY)) * 0.5;
+            for(size_t i = 0; i < m_staFlashGeoms.size(); ++i)
+            {
+                if(m_staFlashGeoms[i].nPhase < 1)
+                {
+                    m_staFlashGeoms.erase(m_staFlashGeoms.begin() + i);
+                    i--;
+                    continue;
+                }
+                else if(m_staFlashGeoms[i].nPhase == 1)
+                {
+                    DrawGeometry(m_staFlashGeoms[i].Geometry, m_staFlashGeoms[i].stFillColour, m_staFlashGeoms[i].stLineColour);
+                }
+                else
+                {
+                    WXGISRGBA fill = {0,0,0,0};
+                    double dfBuff = dfDist * m_staFlashGeoms[i].nPhase;
+                    DrawGeometry(m_staFlashGeoms[i].Geometry.Buffer(dfBuff, 7), fill, m_staFlashGeoms[i].stLineColour, 0.5 * m_staFlashGeoms[i].nPhase); 
+                }
+                m_staFlashGeoms[i].nPhase--;
+            }
+        }
+        break;
+    default:
+    case enumGISMapFlashNewColor:
+        for(size_t i = 0; i < m_staFlashGeoms.size(); ++i)
+        {
+            if(m_staFlashGeoms[i].nPhase < 1)
+            {
+                m_staFlashGeoms.erase(m_staFlashGeoms.begin() + i);
+                i--;
+                continue;
+            }
+            else
+            {
+                DrawGeometry(m_staFlashGeoms[i].Geometry, m_staFlashGeoms[i].stFillColour, m_staFlashGeoms[i].stLineColour);
+                m_staFlashGeoms[i].nPhase--;
+            }
+        }
+        break;
+    };
+}
+
+/*
 void wxGISMapView::FlashGeometry(const wxGISGeometryArray& Geoms)
 {
     //wait drawings end to flash
@@ -831,6 +988,7 @@ void wxGISMapView::FlashGeometry(const wxGISGeometryArray& Geoms)
     m_nDrawingState = enumGISMapFlashing;
     m_timer.Start(nMilliSec);
 }
+*/
 
 void wxGISMapView::Refresh(void)
 {

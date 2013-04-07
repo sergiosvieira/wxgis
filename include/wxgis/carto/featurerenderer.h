@@ -37,15 +37,15 @@ public:
     virtual bool CanRender(wxGISDataset* pwxGISDataset) const;
     virtual bool Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay* const pDisplay, ITrackCancel* const pTrackCancel = NULL);
 
-	virtual void SetFillColor(const RGBA Color){m_stFillColour = Color;};
-	virtual void SetLineColor(const RGBA Color){m_stLineColour = Color;};
-	virtual void SetPointColor(const RGBA Color){m_stPointColour = Color;};
+	virtual void SetFillColor(const WXGISRGBA Color){m_stFillColour = Color;};
+	virtual void SetLineColor(const WXGISRGBA Color){m_stLineColour = Color;};
+	virtual void SetPointColor(const WXGISRGBA Color){m_stPointColour = Color;};
     virtual void SetLineWidth(double dWidth){m_dWidth = dWidth;};
     virtual void SetPointRadius(double dRadius){m_dRadius = dRadius;};
 	virtual void Draw(const wxGISQuadTreeCursor& Cursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel = 0);
 protected:
 	wxGISFeatureDataset* m_pwxGISFeatureDataset;
-	RGBA m_stFillColour, m_stLineColour, m_stPointColour;
+	WXGISRGBA m_stFillColour, m_stLineColour, m_stPointColour;
     double m_dWidth;
     double m_dRadius;
 };

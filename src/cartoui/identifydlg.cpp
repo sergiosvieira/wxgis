@@ -697,6 +697,40 @@ void wxAxIdentifyView::Deactivate(void)
 	//m_pConf->AddAttribute(wxT("split_pos"), wxString::Format(wxT("%d"), nSplitPos));
 }
 
+WXGISRGBA wxAxIdentifyView::GetDrawStyle(wxGISEnumDrawStyle eDrawStyle)
+{
+
+    wxGISAppConfig oConfig = GetConfig();
+    WXGISRGBA ret = {1.0, 1.0, 1.0, 1.0};
+    switch(eDrawStyle)
+    {
+    case enumGISDrawStyleOutline:
+        ret.dRed = 0;
+        ret.dGreen = 0.8235294117647059;
+        ret.dBlue = 1.0;
+        if(oConfig.IsOk())
+        {
+	        ret.dRed = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_line_red")), 0)) / 255;
+	        ret.dGreen = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_line_green")), 210)) / 255;
+	        ret.dBlue = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_line_blue")), 255)) / 255;
+        }
+        break;
+    case enumGISDrawStyleFill:
+        ret.dRed = 0;
+        ret.dGreen = 1.0;
+        ret.dBlue = 1.0;
+        if(oConfig.IsOk())
+        {
+	        ret.dRed = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_fill_red")), 0)) / 255;
+	        ret.dGreen = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_fill_green")), 255)) / 255;
+	        ret.dBlue = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_fill_blue")), 255)) / 255;
+        }
+        break;
+    case enumGISDrawStylePoint:
+        break;
+    };
+    return ret;
+}
 
 void wxAxIdentifyView::Identify(wxGISGeometry &GeometryBounds)
 {
@@ -758,15 +792,16 @@ void wxAxIdentifyView::Identify(wxGISGeometry &GeometryBounds)
 
 			wxGISQuadTreeCursor Cursor = pFLayer->Idetify(GeometryBounds);
 			//flash on map
-            wxGISGeometryArray Arr;
+            WXGISRGBA stFillColor = GetDrawStyle(enumGISDrawStyleFill);
+            WXGISRGBA stLineColor = GetDrawStyle(enumGISDrawStyleOutline);
             for(size_t i = 0; i < Cursor.GetCount(); ++i)
             {
                 wxGISQuadTreeItem* pItem = Cursor[i];
                 if(!pItem)
                     continue;
-                Arr.Add(pItem->GetGeometry());
+                m_pMapView->AddFlashGeometry(pItem->GetGeometry(), stFillColor, stLineColor);
             }
-            m_pMapView->FlashGeometry(Arr);
+            m_pMapView->StartFlashing();
 
             //fill IdentifyDlg
 			m_pFeatureDetailsPanel->Clear(true);
@@ -827,9 +862,9 @@ void wxAxIdentifyView::OnSelChanged(wxTreeEvent& event)
 			m_pFeatureDetailsPanel->Clear();
 			return;
 		}
-        wxGISGeometryArray Arr;
-		Arr.Add(pData->m_Geometry);
-		m_pMapView->FlashGeometry(Arr);
+        
+        m_pMapView->AddFlashGeometry(pData->m_Geometry, GetDrawStyle(enumGISDrawStyleFill), GetDrawStyle(enumGISDrawStyleOutline));
+        m_pMapView->StartFlashing();
 		m_pFeatureDetailsPanel->FillPanel(pData->m_pDataset->GetFeatureByID(pData->m_nOID));
     }
 }
@@ -845,9 +880,8 @@ void wxAxIdentifyView::OnLeftDown(wxMouseEvent& event)
         wxIdentifyTreeItemData* pData = (wxIdentifyTreeItemData*)m_pTreeCtrl->GetItemData(TreeItemId);
         if(pData && pData->m_Geometry.IsOk())
         {
-            wxGISGeometryArray Arr;
-	    	Arr.Add(pData->m_Geometry);
-		    m_pMapView->FlashGeometry(Arr);
+            m_pMapView->AddFlashGeometry(pData->m_Geometry, GetDrawStyle(enumGISDrawStyleFill), GetDrawStyle(enumGISDrawStyleOutline));
+            m_pMapView->StartFlashing();
         }
     }
 }
@@ -863,35 +897,38 @@ void wxAxIdentifyView::OnMenu(wxCommandEvent& event)
 	{
 	case ID_WGMENU_FLASH:
 	{
-        wxGISGeometryArray Arr;
 		if(pData->m_Geometry.IsOk())
-			Arr.Add(pData->m_Geometry);
+		    m_pMapView->AddFlashGeometry(pData->m_Geometry, GetDrawStyle(enumGISDrawStyleFill), GetDrawStyle(enumGISDrawStyleOutline));
 		else
 		{
+            WXGISRGBA stFillColor = GetDrawStyle(enumGISDrawStyleFill);
+            WXGISRGBA stLineColor = GetDrawStyle(enumGISDrawStyleOutline);
 			wxTreeItemIdValue cookie;
 			for ( wxTreeItemId item = m_pTreeCtrl->GetFirstChild(TreeItemId, cookie); item.IsOk(); item = m_pTreeCtrl->GetNextChild(TreeItemId, cookie) )
 			{
 				pData = (wxIdentifyTreeItemData*)m_pTreeCtrl->GetItemData(item);
 				if(pData)
-					Arr.Add(pData->m_Geometry);
+                    m_pMapView->AddFlashGeometry(pData->m_Geometry, stFillColor, stLineColor);
 			}
 		}
-		m_pMapView->FlashGeometry(Arr);
+        m_pMapView->StartFlashing();
 	}
 	break;
 	case ID_WGMENU_PAN:
 	{
         wxGISGeometryArray Arr;
 		if(pData->m_Geometry.IsOk())
-			Arr.Add(pData->m_Geometry);
+		    m_pMapView->AddFlashGeometry(pData->m_Geometry, GetDrawStyle(enumGISDrawStyleFill), GetDrawStyle(enumGISDrawStyleOutline));
 		else
 		{
+            WXGISRGBA stFillColor = GetDrawStyle(enumGISDrawStyleFill);
+            WXGISRGBA stLineColor = GetDrawStyle(enumGISDrawStyleOutline);
 			wxTreeItemIdValue cookie;
 			for ( wxTreeItemId item = m_pTreeCtrl->GetFirstChild(TreeItemId, cookie); item.IsOk(); item = m_pTreeCtrl->GetNextChild(TreeItemId, cookie) )
 			{
 				pData = (wxIdentifyTreeItemData*)m_pTreeCtrl->GetItemData(item);
 				if(pData)
-					Arr.Add(pData->m_Geometry);
+                    m_pMapView->AddFlashGeometry(pData->m_Geometry, stFillColor, stLineColor);
 			}
 		}
 		OGREnvelope Env;
@@ -903,22 +940,24 @@ void wxAxIdentifyView::OnMenu(wxCommandEvent& event)
 		OGREnvelope CurrentEnv = m_pMapView->GetCurrentExtent();
 		MoveEnvelope(CurrentEnv, Env);
 		m_pMapView->Do(CurrentEnv);
-		m_pMapView->FlashGeometry(Arr);
+        m_pMapView->StartFlashing();
 	}
 	break;
 	case ID_WGMENU_ZOOM:
 	{
         wxGISGeometryArray Arr;
 		if(pData->m_Geometry.IsOk())
-			Arr.Add(pData->m_Geometry);
+		    m_pMapView->AddFlashGeometry(pData->m_Geometry, GetDrawStyle(enumGISDrawStyleFill), GetDrawStyle(enumGISDrawStyleOutline));
 		else
 		{
+            WXGISRGBA stFillColor = GetDrawStyle(enumGISDrawStyleFill);
+            WXGISRGBA stLineColor = GetDrawStyle(enumGISDrawStyleOutline);
 			wxTreeItemIdValue cookie;
 			for ( wxTreeItemId item = m_pTreeCtrl->GetFirstChild(TreeItemId, cookie); item.IsOk(); item = m_pTreeCtrl->GetNextChild(TreeItemId, cookie) )
 			{
 				pData = (wxIdentifyTreeItemData*)m_pTreeCtrl->GetItemData(item);
 				if(pData)
-					Arr.Add(pData->m_Geometry);
+                    m_pMapView->AddFlashGeometry(pData->m_Geometry, stFillColor, stLineColor);
 			}
 		}
 		OGREnvelope Env;
@@ -928,7 +967,7 @@ void wxAxIdentifyView::OnMenu(wxCommandEvent& event)
 			Env.Merge(TempEnv);
 		}
 		m_pMapView->Do(Env);
-		m_pMapView->FlashGeometry(Arr);
+        m_pMapView->StartFlashing();
 	}
 	break;
 	default:

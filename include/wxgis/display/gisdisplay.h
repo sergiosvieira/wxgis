@@ -35,13 +35,17 @@
 	#include <gtk/gtk.h>
 #endif
 
-typedef struct _rgba{
-	double dRed;
-	double dGreen;
-	double dBlue;
-	double dAlpha;
-	//_rgba(double dRedIn, double dGreenIn, double dBlueIn, double dAlphaIn) : dRed(dRedIn), dGreen(dGreenIn), dBlue(dBlueIn), dAlpha(dAlphaIn) {}
-} RGBA;
+inline WXDLLIMPEXP_GIS_DSP WXGISRGBA ToRGBA(unsigned char nR, unsigned char nG, unsigned char nB, unsigned char nA)
+{
+    WXGISRGBA ret = {double(nR) / 255, double(nG) / 255, double(nB) / 255, double(nA) / 255};
+    return ret;
+};
+
+inline WXDLLIMPEXP_GIS_DSP WXGISRGBA ToRGBA(const wxColour &Color)
+{
+    WXGISRGBA ret = {double(Color.Red()) / 255, double(Color.Green()) / 255, double(Color.Blue()) / 255, double(Color.Alpha()) / 255};
+    return ret;
+};
 
 /** \class wxGISDisplay gisdisplay.h
     \brief The class to draw map contents.
@@ -87,9 +91,7 @@ public:
 	virtual void OnEraseBackground(void); //Fill #0 cache of background color
 	virtual void Output(wxDC* pDC, wxGISPointsArray ClipGeometry);
 	//Styles
-	virtual void SetFillColor(const RGBA Color){m_stFillColour = Color;};
-	virtual void SetLineColor(const RGBA Color){m_stLineColour = Color;};
-	virtual void SetPointColor(const RGBA Color){m_stPointColour = Color;};
+    virtual void SetColor(wxGISEnumDrawStyle eStyle, const WXGISRGBA &Color);
 	virtual void SetLineCap(cairo_line_cap_t line_cap = CAIRO_LINE_CAP_BUTT);
 	virtual void SetLineWidth(double dWidth);
 	virtual void SetPointRadius(double dRadius);
@@ -113,7 +115,7 @@ public:
     } LAYERCACHEDATA;
 protected:
 	virtual void SetColor(double dRed, double dGreen, double dBlue, double dAlpha = 0);
-	virtual void SetColor(RGBA Color);
+	virtual void SetColor(WXGISRGBA Color);
 	virtual bool DrawPoint(double dX, double dY);
 	virtual bool DrawPointFast(double dX, double dY);
 	virtual bool DrawPoint(const OGRPoint* pPoint);
@@ -133,8 +135,8 @@ protected:
 	}
 protected:
 	wxVector<LAYERCACHEDATA> m_saLayerCaches;
-	RGBA m_stBackGroudnColour;
-	RGBA m_stFillColour, m_stLineColour, m_stPointColour;
+	WXGISRGBA m_stBackGroudnColour;
+	WXGISRGBA m_stFillColour, m_stLineColour, m_stPointColour;
 	size_t m_nLastCacheID, m_nCurrentLayer;
 	int m_nMax_X, m_nMax_Y;
 	wxRect m_oDeviceFrameRect;

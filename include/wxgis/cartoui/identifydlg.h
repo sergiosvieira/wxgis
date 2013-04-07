@@ -21,7 +21,7 @@
 #pragma once
 
 #include "wxgis/cartoui/cartoui.h"
-//#include "wxgis/framework/view.h"
+#include "wxgis/display/display.h"
 #include "wxgis/framework/applicationbase.h"
 #include "wxgis/cartoui/mapview.h"
 #include "wxgis/carto/featurelayer.h"
@@ -227,6 +227,8 @@ public:
 	virtual void OnSelChanged(wxTreeEvent& event);
 	virtual void OnLeftDown(wxMouseEvent& event);
 	virtual void OnMenu(wxCommandEvent& event);
+protected:
+    virtual WXGISRGBA GetDrawStyle(wxGISEnumDrawStyle eDrawStyle);
 protected:
 	wxString m_sViewName;
     wxGISApplicationBase* m_pApp;

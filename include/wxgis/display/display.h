@@ -35,7 +35,7 @@
 #define ENVMIN_X -179
 #define ENVMIN_Y -85
 
-/** \enum wxGISEnumDrawPhase
+/** \enum wxGISEnumDrawPhase display.h
     \brief The draw phase
 */
 enum wxGISEnumDrawPhase
@@ -45,7 +45,7 @@ enum wxGISEnumDrawPhase
 	wxGISDPSelection = 0x0004
 };
 
-/** \enum wxGISEnumDrawQuality
+/** \enum wxGISEnumDrawQuality display.h
     \brief The raster interpolation quality
 */
 enum wxGISEnumDrawQuality
@@ -58,7 +58,7 @@ enum wxGISEnumDrawQuality
     enumGISQualityFourQuadBilinear
 };
 
-/** \enum wxGISEnumPointPosition
+/** \enum wxGISEnumPointPosition display.h
     \brief The point position enumerator
 
 	This enumerator used in Sutherland-Hodgman Polygon Clipping 
@@ -71,6 +71,23 @@ enum wxGISEnumPointPosition
 	enumGISPtPosTop
 };
 
+/** \enum wxGISEnumDrawStyle display.h
+    \brief The styles to be get o set
+*/
+enum wxGISEnumDrawStyle
+{
+	enumGISDrawStyleNone		= 0, 
+	enumGISDrawStyleFill,
+	enumGISDrawStyleOutline,
+	enumGISDrawStylePoint
+};
+
+typedef struct _wxgisrgba{
+	double dRed;
+	double dGreen;
+	double dBlue;
+	double dAlpha;
+} WXGISRGBA;
 
 //class IDisplayTransformation
 //{

@@ -114,9 +114,9 @@ bool wxGISFeatureRenderer::Draw(wxGISEnumDrawPhase DrawPhase, wxGISDisplay* cons
 void wxGISFeatureRenderer::Draw(const wxGISQuadTreeCursor& Cursor, wxGISEnumDrawPhase DrawPhase, wxGISDisplay *pDisplay, ITrackCancel *pTrackCancel)
 {
 	//set colors and etc.
-	pDisplay->SetFillColor(m_stFillColour);
-	pDisplay->SetLineColor(m_stLineColour);
-	pDisplay->SetPointColor(m_stPointColour);
+	pDisplay->SetColor(enumGISDrawStyleFill, m_stFillColour);
+	pDisplay->SetColor(enumGISDrawStyleOutline, m_stLineColour);
+	pDisplay->SetColor(enumGISDrawStylePoint, m_stPointColour);
 
     for(size_t i = 0; i < Cursor.GetCount(); ++i)
     {

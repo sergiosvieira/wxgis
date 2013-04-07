@@ -656,7 +656,7 @@ void wxGISDisplay::SetColor(double dRed, double dGreen, double dBlue, double dAl
 	cairo_set_source_rgba(m_saLayerCaches[m_nCurrentLayer].pCairoContext, dRed, dGreen, dBlue, dAlpha);
 }
 
-void wxGISDisplay::SetColor(RGBA Color)
+void wxGISDisplay::SetColor(WXGISRGBA Color)
 {
 	SetColor(Color.dRed, Color.dGreen, Color.dBlue, Color.dAlpha);
 }
@@ -765,10 +765,13 @@ bool wxGISDisplay::DrawPolygon(const OGRPolygon* pPolygon)
 		if(!CheckDrawAsPoint((OGRGeometry*)pRing, true))
 			DrawRing(pRing);
 	}
-	SetFillRule( CAIRO_FILL_RULE_EVEN_ODD );
-	SetColor(m_stFillColour);
-	cairo_fill_preserve (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
 
+    if(!IsDoubleEquil(m_stFillColour.dAlpha, 0.0))
+    {
+	    SetFillRule( CAIRO_FILL_RULE_EVEN_ODD );
+	    SetColor(m_stFillColour);
+	    cairo_fill_preserve (m_saLayerCaches[m_nCurrentLayer].pCairoContext);
+    }
 	return true;
 }
 
@@ -950,3 +953,23 @@ void wxGISDisplay::SetRotate(double dAngleRad)
 
 	SetDerty(true);
 }
+
+void wxGISDisplay::SetColor(wxGISEnumDrawStyle eStyle, const WXGISRGBA &Color)
+{
+    switch(eStyle)
+    {
+    case enumGISDrawStyleFill:
+        m_stFillColour = Color;
+        break;
+    case enumGISDrawStyleOutline:
+        m_stLineColour = Color;
+        break;
+    case enumGISDrawStylePoint:
+        m_stPointColour = Color;
+        break;
+    default:
+    case enumGISDrawStyleNone:
+        break;
+    };
+}
+
