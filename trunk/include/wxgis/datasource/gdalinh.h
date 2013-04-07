@@ -235,6 +235,7 @@ public:
 
     wxGISGeometry Intersection(const wxGISGeometry &Geom) const;
     bool Intersects(const wxGISGeometry &Geom) const;
+    wxGISGeometry Buffer(double dfBuff, int nQuadSegs = 30) const;
     OGRwkbGeometryType GetType() const;
 protected:
     virtual wxObjectRefData *CreateRefData() const;

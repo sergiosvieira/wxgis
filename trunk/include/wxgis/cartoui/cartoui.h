@@ -37,3 +37,15 @@ enum wxGISEnumMapToolState
 	enumGISMapWheelingStop,
     enumGISMapFlashing
 };
+
+/** \enum wxGISEnumFlashStyle
+    \brief The map geometry flash styles.
+
+    While identify or any othe operations map can be 
+*/
+enum wxGISEnumFlashStyle
+{
+	enumGISMapFlashNone		= 0, 
+	enumGISMapFlashNewColor,
+	enumGISMapFlashWaves
+};

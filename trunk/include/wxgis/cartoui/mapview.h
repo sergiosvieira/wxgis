@@ -65,7 +65,23 @@ public:
 	virtual void RotateStop(wxPoint MouseLocation);
 	virtual void SetRotate(double dAngleRad);
 	virtual double GetCurrentRotate(void);
-    virtual void FlashGeometry(const wxGISGeometryArray& Geoms);
+    //virtual void FlashGeometry(const wxGISGeometryArray& Geoms);
+    virtual void AddFlashGeometry(const wxGISGeometry& Geometry, WXGISRGBA stFillColour, WXGISRGBA stLineColour, unsigned char nPhase = 1);
+    virtual void StartFlashing(wxGISEnumFlashStyle eFlashStyle = enumGISMapFlashNewColor);
+
+    /** \struct _flash_geometry mapview.h
+        \brief The geometry needed to be flashed on map.
+
+        stFillColour and stLineColour set drawing style and phase used in multistep flashing
+    */
+
+    typedef struct _flash_geometry
+    {
+        wxGISGeometry Geometry;
+        unsigned char nPhase;
+        WXGISRGBA stFillColour;
+        WXGISRGBA stLineColour; 
+    }FLASH_GEOMETRY;
 protected:
 	//events
 	virtual void OnPaint(wxPaintEvent & event);
@@ -84,6 +100,8 @@ protected:
 	virtual OGREnvelope CreateEnvelopeFromZoomFactor(double dZoom);
 	virtual void UpdateFrameCenter(void);
 	//virtual void FillClipGeometry(wxRect rect, wxCoord x, wxCoord y);
+    virtual void Flash(wxGISEnumFlashStyle eFlashStyle = enumGISMapFlashNewColor);
+    virtual void DrawGeometry(const wxGISGeometry &Geometry, WXGISRGBA stFillColour, WXGISRGBA stLineColour, double dfLineWidth = 1.0);
 protected:
     void Refresh(void);
     //void OnZooming( wxCommandEvent & event );
@@ -101,8 +119,11 @@ protected:
 	wxPoint m_FrameCenter;
 	double m_dOriginAngle;
 	double m_dCurrentAngle;
+    //flash
+    wxVector<FLASH_GEOMETRY> m_staFlashGeoms;
+    wxGISEnumFlashStyle m_eFlashStyle;
 
-	wxCriticalSection m_CritSect, m_KeysCritSect;
+	wxCriticalSection m_CritSect, m_KeysCritSect, m_FlashCritSect;
 
 	wxGISPointsArray m_ClipGeometry;
     wxSize m_PrevSize;
