@@ -30,8 +30,11 @@ include(common)
 set(APP_HEADERS ${WXGIS_CURRENT_SOURCE_DIR}/include/wxgissrv/srv_app)
 set(APP_SOURCES ${WXGIS_CURRENT_SOURCE_DIR}/src/srv_app)
 
-set(wxWidgets_EXCLUDE_COMMON_LIBRARIES ON)
-find_package(wxWidgets 2.9 COMPONENTS base net REQUIRED)
+if(WIN32)
+    set(wxWidgets_EXCLUDE_COMMON_LIBRARIES TRUE)
+endif(WIN32)
+
+find_package(wxWidgets 2.9 REQUIRED base net)
 # wxWidgets include (this will do all the magic to configure everything)
 if(wxWidgets_FOUND)
     include(${wxWidgets_USE_FILE})
