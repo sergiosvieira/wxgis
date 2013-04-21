@@ -31,7 +31,7 @@ set(APP_HEADERS ${WXGIS_CURRENT_SOURCE_DIR}/include/wxgis/cat_app)
 set(APP_SOURCES ${WXGIS_CURRENT_SOURCE_DIR}/src/cat_app)
 
 set(wxWidgets_EXCLUDE_COMMON_LIBRARIES ON)
-find_package(wxWidgets COMPONENTS core base REQUIRED)
+find_package(wxWidgets 2.9 COMPONENTS core base REQUIRED)
 # wxWidgets include (this will do all the magic to configure everything)
 if(wxWidgets_FOUND)
     include(${wxWidgets_USE_FILE})

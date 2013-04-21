@@ -27,7 +27,7 @@ set(LIB_HEADERS ${WXGIS_CURRENT_SOURCE_DIR}/include/wxgis/remoteserver)
 set(LIB_SOURCES ${WXGIS_CURRENT_SOURCE_DIR}/src/remoteserver)
 
 set(wxWidgets_EXCLUDE_COMMON_LIBRARIES ON)
-find_package(wxWidgets COMPONENTS core base xml net REQUIRED)
+find_package(wxWidgets 2.9 COMPONENTS core base xml net REQUIRED)
 # wxWidgets include (this will do all the magic to configure everything)
 if(wxWidgets_FOUND)
     include(${wxWidgets_USE_FILE})

@@ -28,7 +28,7 @@ set(LIB_HEADERS ${WXGIS_CURRENT_SOURCE_DIR}/include/wxgis/cartoui)
 set(LIB_SOURCES ${WXGIS_CURRENT_SOURCE_DIR}/src/cartoui)
 
 set(wxWidgets_EXCLUDE_COMMON_LIBRARIES ON)
-find_package(wxWidgets COMPONENTS core base propgrid REQUIRED)
+find_package(wxWidgets 2.9 COMPONENTS core base propgrid REQUIRED)
 # wxWidgets include (this will do all the magic to configure everything)
 if(wxWidgets_FOUND)
     include(${wxWidgets_USE_FILE})
