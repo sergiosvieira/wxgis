@@ -66,7 +66,7 @@ wxGISMapView::wxGISMapView(void) : wxGISExtentStack()
 	m_dCurrentAngle = 0;
 }
 
-wxGISMapView::wxGISMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxGISExtentStack()
+wxGISMapView::wxGISMapView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxGISExtentStack(), wxThreadHelper()
 {
 	m_pGISDisplay = NULL;
 	m_pTrackCancel = NULL;
@@ -408,6 +408,8 @@ void wxGISMapView::OnCaptureLost(wxMouseCaptureLostEvent & event)
 
 bool wxGISMapView::AddLayer(wxGISLayer* pLayer)
 {
+    wxCriticalSectionLocker locker(m_CritSect); //cannot add layer while drawing
+
     wxCHECK_MSG(pLayer, false, wxT("The layer pointer is NULL"));
 	if(m_pGISDisplay)
 	{
@@ -425,6 +427,7 @@ bool wxGISMapView::AddLayer(wxGISLayer* pLayer)
 
 void wxGISMapView::Clear(void)
 {
+    wxCriticalSectionLocker locker(m_CritSect); //cannot remove layer while drawing
 	//Clear caches
 	m_pGISDisplay->Clear();
 	wxGISExtentStack::Clear();

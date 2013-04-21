@@ -37,11 +37,13 @@ wxGISTaskManager::wxGISTaskManager(void)
     m_pNetworkService = NULL;
 
     m_nExitState = enumGISNetCmdStExit;
+    m_nMaxExecTasks = wxThread::GetCPUCount() * 2;
     wxGISAppConfig oConfig = GetConfig();
 	if(oConfig.IsOk())
     {
         m_nExitState = (wxGISNetCommandState)oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISMon/app/exit_state")), enumGISNetCmdStExit);//<wxGISMon><app exit_state="9"/></wxGISMon>
-    }
+        m_nMaxExecTasks = oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISMon/app/max_exec_tasks")), m_nMaxExecTasks);
+   }
     m_nIdCounter = 0;
 }
 
@@ -157,14 +159,14 @@ void wxGISTaskManager::ProcessNetEvent(wxGISNetEvent& event)
                     SendNetMessage(msgout, event.GetId());                
                 }
                 break;             
-            case enumGISCmdStPriority:
+/*            case enumGISCmdStPriority: TODO:
                 if(!ChangeTaskPriority(msg.GetXMLRoot()->GetChildren(), msg.GetId(), sErr))
                 {
                     wxNetMessage msgout(enumGISNetCmdNote, enumGISNetCmdStErr, enumGISPriorityLow, msg.GetId());
                     msgout.SetMessage(sErr);
                     SendNetMessage(msgout, event.GetId());                
                 }
-                break;             
+                break; */            
             case enumGISCmdGetChildren://Get tasks lits
                 if(!GetTasks(msg.GetXMLRoot(), msg.GetId(), sErr))
                 {
@@ -270,6 +272,7 @@ wxString wxGISTaskManager::ReplaceForbiddenCharsInFileName(const wxString & name
     int size=forbidden.Length();
     for (int i = 0; i < size; ++i)
         sOutput.Replace( wxString(forbidden[i]), ch, true);
+    sOutput.Replace( ch + ch, ch, true);
     return sOutput.MakeLower();
 }
 
@@ -324,7 +327,8 @@ bool wxGISTaskManager::StopTask(const wxXmlNode* pTaskNode, int nId, wxString &s
     return false;
 }
 
-bool wxGISTaskManager::ChangeTaskPriority(const wxXmlNode* pTaskNode, int nId, wxString &sErrMsg)
+/* TODO:
+bool wxGISTaskManager::ChangeTasksPriority(const wxXmlNode* pTaskNode, int nId, wxString &sErrMsg)
 {
     wxCHECK_MSG(pTaskNode, false, wxT("Input wxXmlNode* is null"));
     if(!pTaskNode->HasAttribute(wxT("id")))
@@ -341,7 +345,7 @@ bool wxGISTaskManager::ChangeTaskPriority(const wxXmlNode* pTaskNode, int nId, w
     sErrMsg = wxString::Format(_("The category '%s' is undefined"), sCat.c_str());
     return false;
 }
-
+*/
 bool wxGISTaskManager::ChangeTask(const wxXmlNode* pTaskNode, int nId, wxString &sErrMsg)
 {
     wxCHECK_MSG(pTaskNode, false, wxT("Input wxXmlNode* is null"));
@@ -449,3 +453,6 @@ void wxGISTaskManager::GetTaskDetails(const wxXmlNode* pTaskNode, int nId)
         m_omCategories[sCat]->GetTaskMessages(nTaskId, nId);
     }
 }
+
+//TODO: timer for task execution (look for categories where no running task and task quered)
+//If found - it->second->StartNextQueredTask();

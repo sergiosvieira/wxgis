@@ -57,7 +57,7 @@ BEGIN_EVENT_TABLE(wxGxRemoteConnectionUI, wxGxRemoteConnection)
     EVT_THREAD(EXIT_EVENT, wxGxRemoteConnectionUI::OnThreadFinished)
 END_EVENT_TABLE()
 
-wxGxRemoteConnectionUI::wxGxRemoteConnectionUI(wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon &LargeIconConn, const wxIcon &SmallIconConn, const wxIcon &LargeIconDisconn, const wxIcon &SmallIconDisconn) : wxGxRemoteConnection(oParent, soName, soPath)
+wxGxRemoteConnectionUI::wxGxRemoteConnectionUI(wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon &LargeIconConn, const wxIcon &SmallIconConn, const wxIcon &LargeIconDisconn, const wxIcon &SmallIconDisconn) : wxGxRemoteConnection(oParent, soName, soPath), wxThreadHelper()
 {
     m_oLargeIconConn = LargeIconConn;
     m_oSmallIconConn = SmallIconConn;
@@ -212,7 +212,7 @@ BEGIN_EVENT_TABLE(wxGxRemoteDBSchemaUI, wxGxRemoteDBSchema)
     EVT_THREAD(EXIT_EVENT, wxGxRemoteDBSchemaUI::OnThreadFinished)
 END_EVENT_TABLE()
 
-wxGxRemoteDBSchemaUI::wxGxRemoteDBSchemaUI(const wxArrayString &saTables, bool bHasGeom, bool bHasGeog, bool bHasRaster, wxGISPostgresDataSource* pwxGISRemoteConn, wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon &LargeIcon, const wxIcon &SmallIcon, const wxIcon &LargeIconFeatureClass, const wxIcon &SmallIconFeatureClass, const wxIcon &LargeIconTable, const wxIcon &SmallIconTable) : wxGxRemoteDBSchema(saTables, bHasGeom, bHasGeog, bHasRaster, pwxGISRemoteConn, oParent, soName, soPath)
+wxGxRemoteDBSchemaUI::wxGxRemoteDBSchemaUI(const wxArrayString &saTables, bool bHasGeom, bool bHasGeog, bool bHasRaster, wxGISPostgresDataSource* pwxGISRemoteConn, wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon &LargeIcon, const wxIcon &SmallIcon, const wxIcon &LargeIconFeatureClass, const wxIcon &SmallIconFeatureClass, const wxIcon &LargeIconTable, const wxIcon &SmallIconTable) : wxGxRemoteDBSchema(saTables, bHasGeom, bHasGeog, bHasRaster, pwxGISRemoteConn, oParent, soName, soPath), wxThreadHelper()
 {
     m_oLargeIcon = LargeIcon;
     m_oSmallIcon = SmallIcon;

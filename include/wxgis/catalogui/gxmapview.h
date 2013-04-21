@@ -87,7 +87,7 @@ public:
 	virtual bool Applies(wxGxSelection* const Selection);
 //events
 	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
-private:
+protected:
     long m_ConnectionPointCatalogCookie, m_ConnectionPointSelectionCookie;
 	wxGxSelection* m_pSelection;
     wxGxCatalogUI* m_pCatalog;

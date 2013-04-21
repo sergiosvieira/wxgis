@@ -29,6 +29,7 @@
 /** \class wxGISWMSDataSource wmsdataset.h
     \brief The WMS DataSource class.
 */
+/*
 class WXDLLIMPEXP_GIS_DS wxGISWMSDataSource :
 	public wxGISRasterDataset
 {
@@ -42,6 +43,6 @@ public:
 	//wxGISRasterDataset
 
 };
-
+*/
 #endif //wxGIS_USE_CURL
 

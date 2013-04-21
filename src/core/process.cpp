@@ -28,7 +28,7 @@
 // Class wxGISProcess
 //------------------------------------------------------------------------------
 
-wxGISProcess::wxGISProcess(IGISProcessParent* pParent) : wxProcess(wxPROCESS_REDIRECT)
+wxGISProcess::wxGISProcess(IGISProcessParent* pParent) : wxProcess(wxPROCESS_REDIRECT), wxThreadHelper()
 {
     m_pParent = pParent;
 }

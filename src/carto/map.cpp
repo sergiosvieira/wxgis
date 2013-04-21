@@ -77,7 +77,7 @@ bool wxGISMap::AddLayer(wxGISLayer* pLayer)
 		m_bFullExtIsInit = true;
 	}
 
-    pLayer->SetDispaly(m_pGISDisplay);
+    pLayer->SetDisplay(m_pGISDisplay);
 
 	m_paLayers.push_back(pLayer);
 	return true;

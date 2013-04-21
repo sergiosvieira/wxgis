@@ -531,13 +531,13 @@ void wxGISTaskManager::OnGisNetEvent(wxGISNetEvent& event)
                 break;
             case enumGISCmdStStart:
             case enumGISCmdStStop:
-            case enumGISCmdStPriority:
             case enumGISCmdStChng:
                 ChangeTask(msg.GetXMLRoot()->GetChildren());
                 break;
             case enumGISCmdGetChildren:
                 LoadTasks(msg.GetXMLRoot()->GetChildren());
                 break;
+            case enumGISCmdStPriority://TODO: change priority for all task simultaniasly
             default:
                 break;
             }  
@@ -817,8 +817,8 @@ wxGISEnumReturnType wxGISTaskManager::StopTask(int nTaskId, wxString & sMsg)
     }
     return Wait(nId, sMsg);
 }
-
-wxGISEnumReturnType wxGISTaskManager::ChangeTaskPriority(int nTaskId, long nPriority, wxString & sMsg)
+/* TODO: Add const array id <-> priority
+wxGISEnumReturnType wxGISTaskManager::ChangeTasksPriority(int nTaskId, long nPriority, wxString & sMsg)
 {
     long nId = wxNewId();
     wxNetMessage msg(enumGISNetCmdCmd, enumGISCmdStPriority, enumGISPriorityHigh, nId);
@@ -839,7 +839,7 @@ wxGISEnumReturnType wxGISTaskManager::ChangeTaskPriority(int nTaskId, long nPrio
     }
     return Wait(nId, sMsg);
 }
-
+*/
 int wxGISTaskManager::GetRunTaskCount(const wxString& sCat)
 {
     int nCount(0);
