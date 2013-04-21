@@ -582,6 +582,10 @@ void wxGISTaskCategory::OnFinish(wxGISProcess* pProcess, bool bHasErrors)
 void wxGISTaskCategory::StartNextQueredTask()
 {
     wxCriticalSectionLocker lock(m_CritSect);
+
+    if(m_pTaskManager->GetExecTaskCount() >= m_pTaskManager->GetMaxExecTaskCount())
+        return;
+
     for(short i = 0; i < m_nMaxTasks; ++i)
     {
         if(m_nRunningTasks >= m_nMaxTasks)
@@ -593,6 +597,10 @@ void wxGISTaskCategory::StartNextQueredTask()
             if(m_omTasks[nTaskId]->Start())
                 m_nRunningTasks++;
         }
+
+        //the max exec task total count in categories may be grater than max exec task in manager
+        if(m_pTaskManager->GetExecTaskCount() >= m_pTaskManager->GetMaxExecTaskCount())
+            return;
     }
 }
 

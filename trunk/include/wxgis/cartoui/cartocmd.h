@@ -77,7 +77,8 @@ public:
 private:
 	wxGISApplicationBase* m_pApp;
 	wxIcon m_IconFullExt, m_IconNextExt, m_IconPrevExt;
-	wxGISMapView* m_pMapView;
+	wxGISMapView* m_pMapView;    
+    WINDOWARRAY m_anMapWinIDs;
 };
 
 /** \class wxGISCartoMainTool cartocmd.h
@@ -115,6 +116,7 @@ private:
 	wxIcon m_IconZoomIn, m_IconZoomOut, m_IconPan, m_IconInfo;
 	wxCursor m_CurZoomIn, m_CurZoomOut, m_CurPan1, m_CurPan2, m_CurInfo;
 	wxGISMapView* m_pMapView;
+    WINDOWARRAY m_anMapWinIDs;
     wxAxIdentifyView* m_pIdentifyView;
 	bool m_bCheck;
 };

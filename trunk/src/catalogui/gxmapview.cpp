@@ -144,6 +144,10 @@ bool wxGxMapView::Applies(wxGxSelection* const Selection)
 void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
 {
 	wxCHECK_RET(event.GetSelection(), wxT("the selection pointer is NULL"));
+    
+    if(!Applies(event.GetSelection()))
+        return;
+
     long nLastSelID = event.GetSelection()->GetLastSelectedObjectId();
 	if(m_nParentGxObjectID == nLastSelID)
 		return;
@@ -190,7 +194,7 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
         //pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISDataset->GetName());
 			wxGISRasterDataset* pGISRasterDataset = wxDynamicCast(pwxGISDataset, wxGISRasterDataset);
 			if(!pGISRasterDataset->IsOpened())
-				pGISRasterDataset->Open(false);
+				pGISRasterDataset->Open(true);
 			//if(!pGISRasterDataset->IsCached())
 			//	pGISRasterDataset->Cache(m_pTrackCancel);
             wxGISRasterLayer* pGISRasterLayer = new wxGISRasterLayer(pwxGISDataset->GetName(), pwxGISDataset);

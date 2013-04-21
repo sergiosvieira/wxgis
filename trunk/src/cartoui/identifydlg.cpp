@@ -710,9 +710,9 @@ WXGISRGBA wxAxIdentifyView::GetDrawStyle(wxGISEnumDrawStyle eDrawStyle)
         ret.dBlue = 1.0;
         if(oConfig.IsOk())
         {
-	        ret.dRed = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_line_red")), 0)) / 255;
-	        ret.dGreen = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_line_green")), 210)) / 255;
-	        ret.dBlue = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_line_blue")), 255)) / 255;
+	        ret.dRed = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/identify/flash_line/red")), 0)) / 255;
+	        ret.dGreen = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/identify/flash_line/green")), 210)) / 255;
+	        ret.dBlue = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/identify/flash_line/blue")), 255)) / 255;
         }
         break;
     case enumGISDrawStyleFill:
@@ -721,9 +721,9 @@ WXGISRGBA wxAxIdentifyView::GetDrawStyle(wxGISEnumDrawStyle eDrawStyle)
         ret.dBlue = 1.0;
         if(oConfig.IsOk())
         {
-	        ret.dRed = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_fill_red")), 0)) / 255;
-	        ret.dGreen = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_fill_green")), 255)) / 255;
-	        ret.dBlue = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_fill_blue")), 255)) / 255;
+	        ret.dRed = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/identify/flash_fill/red")), 0)) / 255;
+	        ret.dGreen = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/identify/flash_fill/green")), 255)) / 255;
+	        ret.dBlue = double(oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/identify/flash_fill/blue")), 255)) / 255;
         }
         break;
     case enumGISDrawStylePoint:
@@ -744,7 +744,15 @@ void wxAxIdentifyView::Identify(wxGISGeometry &GeometryBounds)
 
 	wxBusyCursor wait;
 	wxGISSpatialReference SpaRef = m_pMapView->GetSpatialReference();
-    double dfWidth(1.5), dfHeight(1.5);
+    double dfWidth(3), dfHeight(3);
+
+    wxGISAppConfig oConfig = GetConfig();
+    if(oConfig.IsOk())
+    {
+        dfWidth = oConfig.ReadDouble(enumGISHKCU, wxString(wxT("wxGISCommon/identify/search_width")), dfWidth);
+        dfHeight = oConfig.ReadDouble(enumGISHKCU, wxString(wxT("wxGISCommon/identify/search_height")), dfHeight);
+    }
+
     if(m_pMapView->GetDisplay())
     {
         m_pMapView->GetDisplay()->DC2WorldDist(&dfWidth, &dfHeight);

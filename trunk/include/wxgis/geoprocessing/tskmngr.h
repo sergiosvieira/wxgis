@@ -181,7 +181,7 @@ public:
     wxGISEnumReturnType DeleteTask(int nTaskId, wxString & sMsg);
     wxGISEnumReturnType StartTask(int nTaskId, wxString & sMsg);
     wxGISEnumReturnType StopTask(int nTaskId, wxString & sMsg);
-    wxGISEnumReturnType ChangeTaskPriority(int nTaskId, long nPriority, wxString & sMsg);
+    //wxGISEnumReturnType ChangeTaskPriority(int nTaskId, long nPriority, wxString & sMsg); TODO:
     
     int GetRunTaskCount(const wxString& sCat);
     wxGISEnumReturnType SetMaxTaskExec(const wxString &sCategory, int nMaxExecTaskCount, wxString & sMsg);

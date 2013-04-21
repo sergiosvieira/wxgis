@@ -139,7 +139,7 @@ bool wxGISCatalogViewsCmd::GetEnabled(void)
             for(size_t i = 0; i < m_anContentsWinIDs.GetCount(); ++i)
             {
                 wxWindow* pWnd = wxWindow::FindWindowById(m_anContentsWinIDs[i]);
-                if(pWnd && pWnd->IsShown())
+                if(pWnd && pWnd->IsShown())// && pWnd->HasFocus()
                     return true;
             }
  		default:

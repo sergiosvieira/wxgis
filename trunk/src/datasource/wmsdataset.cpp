@@ -21,7 +21,7 @@
 #include "wxgis/datasource/wmsdataset.h"
 
 #ifdef wxGIS_USE_CURL
-
+/*
 #include "wxgis/datasource/table.h"
 #include "wxgis/datasource/featuredataset.h"
 #include "wxgis/core/config.h"
@@ -42,6 +42,6 @@ wxGISWMSDataSource::wxGISWMSDataSource(const CPLString &sPath, wxGISEnumRasterDa
 wxGISWMSDataSource::~wxGISWMSDataSource(void)
 {
 }
-
+*/
 
 #endif //wxGIS_USE_CURL

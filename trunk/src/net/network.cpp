@@ -103,7 +103,9 @@ bool INetConnection::CreateAndRunThreads(void)
 	m_pOutThread = new wxNetWriterThread(this);
 	if(!CreateAndRunThread(m_pOutThread, wxT("wxNetWriterThread"), wxT("NetWriterThread")))
 		return false;	
-    
+
+    wxMilliSleep(SLEEP);
+
     m_pInThread = new wxNetReaderThread(this);
 	if(!CreateAndRunThread(m_pInThread, wxT("wxNetReaderThread"), wxT("NetReaderThread")))
 		return false;

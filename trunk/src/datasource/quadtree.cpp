@@ -122,7 +122,7 @@ void wxGISQuadTreeCursor::DeleteItem(size_t nIndex)
 // wxGISQuadTree
 //-----------------------------------------------------------------------------
 
-wxGISQuadTree::wxGISQuadTree(wxGISFeatureDataset* pDSet)
+wxGISQuadTree::wxGISQuadTree(wxGISFeatureDataset* pDSet) : wxThreadHelper()
 {
     m_pDSet = pDSet;
     m_nPreloadItemCount = PRELOAD_GEOM_COUNT;
@@ -270,11 +270,6 @@ wxThread::ExitCode wxGISQuadTree::Entry()
 		m_pTrackCancel->PutMessage(wxString(_("PreLoad Geometry of ")) + m_pDSet->GetName(), -1, enumGISMessageInfo);
 	}  
 
-	if(m_pProgress)
-    {
-        m_pProgress->ShowProgress(true);
-    }     
-
     CPLRectObj Rect = {m_Envelope.MinX, m_Envelope.MinY, m_Envelope.MaxX, m_Envelope.MaxY};
     m_pQuadTree = CPLQuadTreeCreate(&Rect, GetGeometryBoundsFunc);
 
@@ -282,8 +277,15 @@ wxThread::ExitCode wxGISQuadTree::Entry()
     wxGISQuadTreeItem** ppData = (wxGISQuadTreeItem**)CPLMalloc(nSize);
     RtlZeroMemory(ppData, nSize);
 
-    if(m_pProgress)
-        m_pProgress->SetRange(m_pDSet->GetFeatureCount(TRUE, m_pTrackCancel));
+    if((m_pTrackCancel && !m_pTrackCancel->Continue()) || GetThread()->TestDestroy())
+    {
+	    if(m_pTrackCancel)
+	    {
+		    m_pTrackCancel->PutMessage(_("Cancel"), -1, enumGISMessageInfo);
+        }
+        m_pTrackCancel = NULL;
+        return (wxThread::ExitCode)0;     // success
+    }
 
     int nCounter(0), nItemCounter(0);
     //get only geometries
@@ -297,6 +299,13 @@ wxThread::ExitCode wxGISQuadTree::Entry()
         }
     }
     saIgnoredFields.Add(wxT("OGR_STYLE"));
+
+	if(m_pProgress)
+    {
+        int nRange = m_pDSet->GetFeatureCount(TRUE, m_pTrackCancel);
+        m_pProgress->SetRange(nRange);
+        m_pProgress->ShowProgress(true);
+    } 
 
     m_pDSet->Reset();
     m_pDSet->SetIgnoredFields(saIgnoredFields);
@@ -326,6 +335,16 @@ wxThread::ExitCode wxGISQuadTree::Entry()
         if(m_pProgress)
             m_pProgress->SetValue(nCounter++);
 
+        if((m_pTrackCancel && !m_pTrackCancel->Continue()) || GetThread()->TestDestroy())
+        {
+	        if(m_pTrackCancel)
+	        {
+		        m_pTrackCancel->PutMessage(_("Cancel"), -1, enumGISMessageInfo);
+            }
+            m_pTrackCancel = NULL;
+            return (wxThread::ExitCode)0;     // success
+        }
+
     }
 
     if(nItemCounter > 0)
@@ -344,17 +363,24 @@ wxThread::ExitCode wxGISQuadTree::Entry()
     saIgnoredFields.Clear();
     m_pDSet->SetIgnoredFields(saIgnoredFields);
 
+    m_pTrackCancel = NULL;
 
 	return (wxThread::ExitCode)0;     // success
 }
 
 bool wxGISQuadTree::CreateAndRunLoadGeometryThread(void)
 {
-    if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
+    if(!GetThread())
     {
-        wxLogError(_("Could not create the thread!"));
-        return false;
+        if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
+        {
+            wxLogError(_("Could not create the thread!"));
+            return false;
+        }
     }
+
+    if(GetThread()->IsRunning())
+        return true;
 
     if (GetThread()->Run() != wxTHREAD_NO_ERROR)
     {
@@ -367,11 +393,15 @@ bool wxGISQuadTree::CreateAndRunLoadGeometryThread(void)
 
 void wxGISQuadTree::DestroyLoadGeometryThread(void)
 {
-	if(m_pTrackCancel)
+    if(m_pTrackCancel)
 	{
 		m_pTrackCancel->Cancel();
 	}
 
-    if (GetThread() && GetThread()->IsRunning())
-        GetThread()->Wait();
+    if(m_pProgress)
+        m_pProgress = NULL;
+
+    wxThread* pThread = GetThread();
+    if (pThread && pThread->IsRunning())
+        pThread->Wait();
 }

@@ -35,15 +35,16 @@ void wxGxSelection::Select( long nObjectId,  bool appendToExistingSelection, lon
 	wxCriticalSectionLocker locker(m_CritSect);
 
     //check for duplicates
-	int nIndex = m_SelectionMap[nInitiator].Index(nObjectId);
-	if(nIndex != wxNOT_FOUND)
-	{
-        //m_CritSect.Leave();
-        //not fire event id NOTFIRESELId
-        if(nInitiator != NOTFIRESELID)
-            goto END;
-        return;
-	}
+	//int nIndex = m_SelectionMap[nInitiator].Index(nObjectId);
+	//if(nIndex != wxNOT_FOUND)
+	//{
+ //       //m_CritSect.Leave();
+ //       //not fire event id NOTFIRESELId
+ //       //if(nInitiator != NOTFIRESELID)
+ //       //    goto END;
+ //       if(nInitiator == NOTFIRESELID)
+ //           return;
+	//}
     m_currentInitiator = nInitiator;
 
     if(!appendToExistingSelection)

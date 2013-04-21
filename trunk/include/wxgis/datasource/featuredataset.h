@@ -79,8 +79,8 @@ protected:
 
     //wxGISGeometrySet *m_pGeometrySet;
 //    wxArrayString m_FeatureStringData;
-*/
-private:
 
+private:
+*/
 };
 

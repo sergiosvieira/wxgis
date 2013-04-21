@@ -449,6 +449,11 @@ void wxGISCatalogMainCmd::OnClick(void)
                 if(!pGxObject)
                     return; 
 				wxGxObject* pParentGxObject = pGxObject->GetParent();
+                if(pParentGxObject)
+                {
+                    pSel->Select(pParentGxObject->GetId(), false, wxGxSelection::INIT_ALL);
+                }
+                /*
 				if(wxIsKindOf(pParentGxObject, wxGxObjectContainer))
                 {
                     pSel->Select(pParentGxObject->GetId(), false, wxGxSelection::INIT_ALL);
@@ -458,6 +463,7 @@ void wxGISCatalogMainCmd::OnClick(void)
 					wxGxObject* pGrandParentGxObject = pParentGxObject->GetParent();
 					pSel->Select(pGrandParentGxObject->GetId(), false, wxGxSelection::INIT_ALL);
 				}
+                */
             }
 			break;
 		case 1://	1	Connect Folder

@@ -129,26 +129,61 @@ bool wxGISCartoMainCmd::GetEnabled(void)
 {
     wxCHECK_MSG(m_pApp, false, wxT("Application pointer is null"));
 
-    if(!m_pMapView)
-    {
-        wxWindow* pWnd = m_pApp->GetRegisteredWindowByType(wxCLASSINFO(wxGISMapView));
-        m_pMapView = wxDynamicCast(pWnd, wxGISMapView);
-    }
+	if(m_anMapWinIDs.empty())
+	{
+		WINDOWARRAY WinIDsArr = m_pApp->GetChildWindows();
+        for(size_t i = 0; i < WinIDsArr.GetCount(); ++i)
+		{
+            wxWindow* pWnd = wxWindow::FindWindowById(WinIDsArr[i]);
+            if(pWnd && pWnd->IsKindOf(wxCLASSINFO(wxGISMapView)))
+            {
+                m_anMapWinIDs.Add(WinIDsArr[i]);
+            }
+		}
+	}
 
-    if(!m_pMapView)
-        return false;
+    //if(!m_pMapView)
+    //{
+    //    wxWindow* pWnd = m_pApp->GetRegisteredWindowByType(wxCLASSINFO(wxGISMapView));
+    //    m_pMapView = wxDynamicCast(pWnd, wxGISMapView);
+    //}
+
+    //if(!m_pMapView)
+    //    return false;
 
 	switch(m_subtype)
 	{
 		case 0:
-			return m_pMapView->IsShown();
+            for(size_t i = 0; i < m_anMapWinIDs.GetCount(); ++i)
+            {
+                wxWindow* pWnd = wxWindow::FindWindowById(m_anMapWinIDs[i]);
+                m_pMapView = wxDynamicCast(pWnd, wxGISMapView);
+                if(m_pMapView && m_pMapView->IsShown())// && pWnd->HasFocus()
+                    return true;
+            }
+			return false;
 		case 1:
-			return m_pMapView->IsShown() && m_pMapView->CanUndo();
+            for(size_t i = 0; i < m_anMapWinIDs.GetCount(); ++i)
+            {
+                wxWindow* pWnd = wxWindow::FindWindowById(m_anMapWinIDs[i]);
+                m_pMapView = wxDynamicCast(pWnd, wxGISMapView);
+                if(m_pMapView && m_pMapView->IsShown() && m_pMapView->CanUndo())// && pWnd->HasFocus()
+                    return true;
+            }			
+            return false;
 		case 2:
-			return m_pMapView->IsShown() && m_pMapView->CanRedo();
-		default:
+            for(size_t i = 0; i < m_anMapWinIDs.GetCount(); ++i)
+            {
+                wxWindow* pWnd = wxWindow::FindWindowById(m_anMapWinIDs[i]);
+                m_pMapView = wxDynamicCast(pWnd, wxGISMapView);
+                if(m_pMapView && m_pMapView->IsShown() && m_pMapView->CanUndo())// && pWnd->HasFocus()
+                    return true;
+            }			
+            return false;
+        default:
 			return false;
 	}
+    return false;
 }
 
 wxGISEnumCommandKind wxGISCartoMainCmd::GetKind(void)
@@ -186,11 +221,14 @@ void wxGISCartoMainCmd::OnClick(void)
 	switch(m_subtype)
 	{
 		case 0:
-			return m_pMapView->SetFullExtent();
+            if(m_pMapView)// && pWnd->HasFocus()
+                return m_pMapView->SetFullExtent();
 		case 1:
-			return m_pMapView->Undo();
+            if(m_pMapView)// && m_pMapView->IsShown() && pMapView->CanUndo())// && pWnd->HasFocus()
+                return m_pMapView->Undo();
 		case 2:
-			return m_pMapView->Redo();
+            if(m_pMapView)// && m_pMapView->IsShown() && m_pMapView->CanRedo())// && pWnd->HasFocus()
+                return m_pMapView->Redo();
 		default:
 			break;
 	}
@@ -310,11 +348,24 @@ bool wxGISCartoMainTool::GetChecked(void)
 
 bool wxGISCartoMainTool::GetEnabled(void)
 {
-	if(NULL == m_pMapView)
+	if(m_anMapWinIDs.empty())
 	{
-        wxWindow* pWnd = m_pApp->GetRegisteredWindowByType(wxCLASSINFO(wxGISMapView));
-        m_pMapView = dynamic_cast<wxGISMapView*>(pWnd);
+		WINDOWARRAY WinIDsArr = m_pApp->GetChildWindows();
+        for(size_t i = 0; i < WinIDsArr.GetCount(); ++i)
+		{
+            wxWindow* pWnd = wxWindow::FindWindowById(WinIDsArr[i]);
+            if(pWnd && pWnd->IsKindOf(wxCLASSINFO(wxGISMapView)))
+            {
+                m_anMapWinIDs.Add(WinIDsArr[i]);
+            }
+		}
 	}
+    
+    //if(NULL == m_pMapView)
+	//{
+ //       wxWindow* pWnd = m_pApp->GetRegisteredWindowByType(wxCLASSINFO(wxGISMapView));
+ //       m_pMapView = dynamic_cast<wxGISMapView*>(pWnd);
+	//}
 
 	if(NULL == m_pIdentifyView)
 	{
@@ -324,15 +375,30 @@ bool wxGISCartoMainTool::GetEnabled(void)
 
 	switch(m_subtype)
 	{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-            if(m_pMapView)
-                return m_pMapView->IsShown() && m_pIdentifyView;
+		case 0://zoom in
+		case 1://zoom out
+		case 2://pan
+            for(size_t i = 0; i < m_anMapWinIDs.GetCount(); ++i)
+            {
+                wxWindow* pWnd = wxWindow::FindWindowById(m_anMapWinIDs[i]);
+                m_pMapView = wxDynamicCast(pWnd, wxGISMapView);
+                if(m_pMapView && m_pMapView->IsShown())// && pWnd->HasFocus()
+                    return true;
+            }
+            return false;
+		case 3://info
+             for(size_t i = 0; i < m_anMapWinIDs.GetCount(); ++i)
+            {
+                wxWindow* pWnd = wxWindow::FindWindowById(m_anMapWinIDs[i]);
+                m_pMapView = wxDynamicCast(pWnd, wxGISMapView);
+                if(m_pMapView && m_pMapView->IsShown() && m_pIdentifyView)// && pWnd->HasFocus()
+                    return true;
+            }
+            return false;          
 		default:
 			return false;
 	}
+    return false;
 }
 
 wxGISEnumCommandKind wxGISCartoMainTool::GetKind(void)
@@ -904,6 +970,7 @@ BEGIN_EVENT_TABLE(wxGISRotationComboBox, wxComboBox)
 	EVT_TEXT_ENTER(wxID_ANY, wxGISRotationComboBox::OnTextEnter)
 	EVT_COMBOBOX(wxID_ANY, wxGISRotationComboBox::OnTextEnter)
 	EVT_MXMAP_ROTATED(wxGISRotationComboBox::OnMapRotated)
+    //EVT_SET_FOCUS//EVT_KILL_FOCUS
 END_EVENT_TABLE()
 
 wxGISRotationComboBox::wxGISRotationComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size, const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name) : wxComboBox(parent, id, value, pos, size, choices, style, validator, name)

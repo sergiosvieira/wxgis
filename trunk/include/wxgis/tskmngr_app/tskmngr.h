@@ -56,6 +56,8 @@ public:
     //INetEventProcessor
     virtual void ProcessNetEvent(wxGISNetEvent& event);
     void SendNetMessage(wxNetMessage & msg, int nId = wxNOT_FOUND); 
+    int GetExecTaskCount(void);
+    int GetMaxExecTaskCount(void) const {return m_nMaxExecTasks;};
 protected:
     void OnExit(void);
     bool AddTask(const wxXmlNode* pTaskNode, int nId, wxString &sErrMsg);
@@ -63,7 +65,7 @@ protected:
     bool ChangeTask(const wxXmlNode* pTaskNode, int nId, wxString &sErrMsg);
     bool StartTask(const wxXmlNode* pTaskNode, int nId, wxString &sErrMsg);
     bool StopTask(const wxXmlNode* pTaskNode, int nId, wxString &sErrMsg);
-    bool ChangeTaskPriority(const wxXmlNode* pTaskNode, int nId, wxString &sErrMsg);
+    //bool ChangeTasksPriority(const wxXmlNode* pTaskNode, int nId, wxString &sErrMsg); TODO:
     bool GetTasks(const wxXmlNode* pTaskNode, int nId, wxString &sErrMsg);
     void GetTaskDetails(const wxXmlNode* pTaskNode, int nId);
     bool ValidateTask(const wxXmlNode* pTaskNode);
@@ -71,7 +73,6 @@ protected:
     int GetNewId(void);
     wxString GetTaskConfigPath(const wxString& sCatName);
     wxString ReplaceForbiddenCharsInFileName(const wxString & name, const wxString ch = wxT("_") );
-    int GetExecTaskCount(void);
 protected:
     wxFFile m_LogFile;
     wxLocale* m_pLocale; // locale we'll be using
@@ -83,4 +84,5 @@ protected:
     wxCriticalSection m_CounterLock;
     int m_nIdCounter;
     wxGISTaskCategoryMap m_omCategories;
+    int m_nMaxExecTasks;
 };
