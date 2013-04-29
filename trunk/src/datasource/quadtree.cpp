@@ -277,7 +277,7 @@ wxThread::ExitCode wxGISQuadTree::Entry()
     wxGISQuadTreeItem** ppData = (wxGISQuadTreeItem**)CPLMalloc(nSize);
     RtlZeroMemory(ppData, nSize);
 
-    if((m_pTrackCancel && !m_pTrackCancel->Continue()) || GetThread()->TestDestroy())
+    if(GetThread()->TestDestroy())//(m_pTrackCancel && !m_pTrackCancel->Continue()) || 
     {
 	    if(m_pTrackCancel)
 	    {
@@ -335,7 +335,9 @@ wxThread::ExitCode wxGISQuadTree::Entry()
         if(m_pProgress)
             m_pProgress->SetValue(nCounter++);
 
-        if((m_pTrackCancel && !m_pTrackCancel->Continue()) || GetThread()->TestDestroy())
+        //bool bCancel = m_pTrackCancel && !m_pTrackCancel->Continue();bCancel || 
+
+        if( GetThread()->TestDestroy())
         {
 	        if(m_pTrackCancel)
 	        {
@@ -393,10 +395,10 @@ bool wxGISQuadTree::CreateAndRunLoadGeometryThread(void)
 
 void wxGISQuadTree::DestroyLoadGeometryThread(void)
 {
-    if(m_pTrackCancel)
-	{
-		m_pTrackCancel->Cancel();
-	}
+    //if(m_pTrackCancel)
+ 	//{
+	//	m_pTrackCancel->Cancel();
+	//}
 
     if(m_pProgress)
         m_pProgress = NULL;
