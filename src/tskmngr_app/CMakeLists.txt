@@ -39,11 +39,14 @@ find_package(wxWidgets 2.9 REQUIRED base net xml)
 # wxWidgets include (this will do all the magic to configure everything)
 if(wxWidgets_FOUND)
     include(${wxWidgets_USE_FILE})
+    add_definitions("-DwxUSE_GUI=0")
 #    if(UNIX)
 #      add_definitions("-D${wxWidgets_DEFINITIONS}") #wxWidgets_DEFINITIONS_DEBUG
 #      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${wxWidgets_CXX_FLAGS}")
 #    endif(UNIX)
 endif(wxWidgets_FOUND)
+
+
 
 include_directories(${APP_HEADERS})
 
