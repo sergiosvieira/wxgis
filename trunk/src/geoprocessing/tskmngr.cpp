@@ -78,7 +78,7 @@ wxGISTask::wxGISTask(const wxXmlNode* pIniNode)
     long nVolumeHi = GetDecimalValue(pIniNode, wxT("vol_hi"), 0);
     long nVolumeLo = GetDecimalValue(pIniNode, wxT("vol_lo"), 0);
     m_nVolume = wxULongLong(nVolumeHi, nVolumeLo);
-    m_dfDone = GetFloatValue(pIniNode, wxT("done"), 0.0);   
+    m_dfDone = GetFloatValue(pIniNode, wxT("done"), 0.0);
 
     m_pParams = NULL;
 
@@ -88,7 +88,7 @@ wxGISTask::wxGISTask(const wxXmlNode* pIniNode)
         if(Children->GetName().IsSameAs(wxT("params"), false))
         {
             if(m_pParams)
-                wxDELETE(m_pParams);            
+                wxDELETE(m_pParams);
             m_pParams = new wxXmlNode(*Children);
         }
         //else if(Children->GetName().IsSameAs(wxT("messages"), false))
@@ -96,7 +96,7 @@ wxGISTask::wxGISTask(const wxXmlNode* pIniNode)
         //    LoadMessages(Children);
         //}
         Children = Children->GetNext();
-    }         
+    }
 }
 
 wxGISTask::~wxGISTask(void)
@@ -204,15 +204,15 @@ void wxGISTask::ChangeTask(const wxXmlNode* pTaskNode)
     long nVolHi = GetDecimalValue(pTaskNode, wxT("vol_hi"), (long)m_nVolume.GetHi());
     long nVolLo = GetDecimalValue(pTaskNode, wxT("vol_lo"), (long)m_nVolume.GetLo());
     m_nVolume = wxULongLong(nVolHi, nVolLo);
-    m_dfDone = GetFloatValue(pTaskNode, wxT("done"), m_dfDone);    
-    
+    m_dfDone = GetFloatValue(pTaskNode, wxT("done"), m_dfDone);
+
     wxXmlNode *Children = pTaskNode->GetChildren();
     while(Children)
     {
         if(Children->GetName().IsSameAs(wxT("params"), false))
         {
             if(m_pParams)
-                wxDELETE(m_pParams);            
+                wxDELETE(m_pParams);
             m_pParams = new wxXmlNode(*Children);
         }
         //else if(Children->GetName().IsSameAs(wxT("messages"), false))
@@ -232,7 +232,7 @@ wxGISTaskMessage wxGISTask::GetMessage(long nMessageId) const
             return m_oaMessages[i];
         }
     }
-    return NULL;
+    return wxGISTaskMessage(wxNOT_FOUND);
 }
 
 void wxGISTask::AddMessage(wxGISTaskMessage* pMessage)
@@ -376,7 +376,7 @@ void wxGISLocalClientConnection::OnSocketEvent(wxSocketEvent& event)
         case wxSOCKET_INPUT:
             wxLogDebug(wxT("wxClientTCPNetConnection: INPUT"));
         break;
-        case wxSOCKET_OUTPUT:            
+        case wxSOCKET_OUTPUT:
             wxLogDebug(wxT("wxClientTCPNetConnection: OUTPUT"));
             break;
         case wxSOCKET_CONNECTION:
@@ -458,7 +458,7 @@ void wxGISTaskManager::StartTaskManagerServer()
     if(wxExecute(sTaskMngrServerPath + wxT(" -a"), wxEXEC_ASYNC | wxEXEC_HIDE_CONSOLE ) == 0)
     {
         wxLogError(_("Task Manager Server start failed. Path '%s'"), sTaskMngrServerPath.c_str());
-    }    
+    }
 }
 
 void wxGISTaskManager::OnGisNetEvent(wxGISNetEvent& event)
@@ -472,7 +472,7 @@ void wxGISTaskManager::OnGisNetEvent(wxGISNetEvent& event)
         //start task manager server
         StartTaskManagerServer();
         //start timer to connect task server
-        m_timer.Start(5000, false);       
+        m_timer.Start(5000, false);
         break;
     case enumGISNetCmdHello:
         {
@@ -503,10 +503,10 @@ void wxGISTaskManager::OnGisNetEvent(wxGISNetEvent& event)
             //    break;
             //case enumGISCmdNotePercent:
             //    UpdatePercent(msg.GetXMLRoot()->GetChildren());
-            //    break;            
+            //    break;
             case enumGISCmdNoteMsg:
                 AddMessage(msg.GetXMLRoot()->GetChildren());
-                break;  
+                break;
             default:
                 wxLogVerbose(msg.GetMessage());
                 break;
@@ -540,7 +540,7 @@ void wxGISTaskManager::OnGisNetEvent(wxGISNetEvent& event)
             case enumGISCmdStPriority://TODO: change priority for all task simultaniasly
             default:
                 break;
-            }  
+            }
         }
         break;
     default:
@@ -581,7 +581,7 @@ wxGISEnumReturnType wxGISTaskManager::AddTask(const wxString &sCategory, int nMa
         m_pConn->SendNetMessage(msg);
     }
 
-    return Wait(nId, sMsg);  
+    return Wait(nId, sMsg);
 }
 
 wxGISEnumReturnType wxGISTaskManager::SetMaxTaskExec(const wxString &sCategory, int nMaxExecTaskCount, wxString & sMsg)
@@ -598,7 +598,7 @@ wxGISEnumReturnType wxGISTaskManager::SetMaxTaskExec(const wxString &sCategory, 
         m_pConn->SendNetMessage(msg);
     }
 
-    return Wait(nId, sMsg);  
+    return Wait(nId, sMsg);
 }
 
 wxGISEnumReturnType wxGISTaskManager::Wait(int nId, wxString & sMsg)
@@ -614,7 +614,7 @@ wxGISEnumReturnType wxGISTaskManager::Wait(int nId, wxString & sMsg)
             sMsg = Res.sMsg;
             if(Res.nSate == enumGISNetCmdStErr)
             {
-                return enumGISReturnFailed;                 
+                return enumGISReturnFailed;
             }
             else
             {
@@ -625,7 +625,7 @@ wxGISEnumReturnType wxGISTaskManager::Wait(int nId, wxString & sMsg)
         wxTheApp->Yield(true);
         sp = wxDateTime::Now() - dtNow;
     };
-    return enumGISReturnTimeout;  
+    return enumGISReturnTimeout;
 }
 
 void wxGISTaskManager::PushResult(TSKMNGR_RESULT Res)
@@ -657,7 +657,7 @@ void wxGISTaskManager::AddTask(const wxXmlNode* pIniNode)
     if(m_moTasks[nId])
         //the task is already exist
         return;
-    
+
     wxGISTask* pTask = new wxGISTask(pIniNode);
     m_moTasks[pTask->GetId()] = pTask;
     //notify
@@ -863,7 +863,7 @@ int wxGISTaskManager::GetRunTaskCount(const wxString& sCat)
 //    wxGISTask* pTasks = m_moTasks[nTaskId];
 //    if(pTasks == NULL)
 //        return;
-//   
+//
 //    long nNewVolume = GetDecimalValue(pIniNode, wxT("vol"), pTasks->GetVolume());
 //    pTasks->SetVolume(nNewVolume);
 //    //notify
@@ -887,7 +887,7 @@ int wxGISTaskManager::GetRunTaskCount(const wxString& sCat)
 //    pTasks->SetDone(dfDone);
 //    pTasks->SetDateEnd(dtEnd);
 //    pTasks->SetState(eState);
-//        
+//
 //    //notify
 //    wxGISTaskEvent event(nTaskId, wxGISTASK_PERCENTCHNG);
 //    PostEvent(event);

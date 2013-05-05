@@ -28,6 +28,7 @@
 
 //#include <wx/sysopt.h>
 //#include <wx/thread.h>
+#include <cmath>
 
 #define TM_REFRESH 1700//3700
 #define TM_ZOOMING 250
@@ -790,7 +791,7 @@ void wxGISMapView::StartFlashing(wxGISEnumFlashStyle eFlashStyle)
         wxGISAppConfig oConfig = GetConfig();
         if(oConfig.IsOk())
             nMilliSec = oConfig.ReadInt(enumGISHKCU, wxString(wxT("wxGISCommon/map/flash_waves_time")), nMilliSec);
-        }    
+        }
         break;
     default:
     case enumGISMapFlashNewColor:
@@ -808,7 +809,7 @@ void wxGISMapView::StartFlashing(wxGISEnumFlashStyle eFlashStyle)
 void wxGISMapView::DrawGeometry(const wxGISGeometry &Geometry, WXGISRGBA stFillColour, WXGISRGBA stLineColour, double dfLineWidth)
 {
     wxCHECK_RET(Geometry.IsOk(), wxT("Input geometry is not valid"));
-    
+
 	OGRwkbGeometryType type = wkbFlatten(Geometry.GetType());
 	switch(type)
 	{
@@ -854,7 +855,7 @@ void wxGISMapView::Flash(wxGISEnumFlashStyle eFlashStyle)
     //wait drawings end to flash
     if (GetThread() && GetThread()->IsRunning())
     {
-        GetThread()->Wait();    	
+        GetThread()->Wait();
     }
 
     //draw geometries
@@ -866,7 +867,7 @@ void wxGISMapView::Flash(wxGISEnumFlashStyle eFlashStyle)
         {
             double dfX(10), dfY(10);
             m_pGISDisplay->DC2WorldDist(&dfX, &dfY);
-            double dfDist = (std::abs(dfX) + std::abs(dfY)) * 0.5;
+            double dfDist = (std::fabs(dfX) + std::fabs(dfY)) * 0.5;
             for(size_t i = 0; i < m_staFlashGeoms.size(); ++i)
             {
                 if(m_staFlashGeoms[i].nPhase < 1)
@@ -883,7 +884,7 @@ void wxGISMapView::Flash(wxGISEnumFlashStyle eFlashStyle)
                 {
                     WXGISRGBA fill = {0,0,0,0};
                     double dfBuff = dfDist * m_staFlashGeoms[i].nPhase;
-                    DrawGeometry(m_staFlashGeoms[i].Geometry.Buffer(dfBuff, 7), fill, m_staFlashGeoms[i].stLineColour, 0.5 * m_staFlashGeoms[i].nPhase); 
+                    DrawGeometry(m_staFlashGeoms[i].Geometry.Buffer(dfBuff, 7), fill, m_staFlashGeoms[i].stLineColour, 0.5 * m_staFlashGeoms[i].nPhase);
                 }
                 m_staFlashGeoms[i].nPhase--;
             }

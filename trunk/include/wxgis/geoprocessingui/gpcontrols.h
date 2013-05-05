@@ -55,9 +55,10 @@ public:
     virtual wxGISGPParameter* GetParameter(void) const;
 	virtual wxGISEnumGPMessageType GetCurrentMessageType(void) const {return m_nCurrentType;};
 	virtual wxString GetCurrentMessage(void) const {return m_sCurrentMsg;};
-    virtual void OnParamChanged(wxGISGPParamEvent &event) = 0;    
+	//events
+    virtual void OnParamChanged(wxGISGPParamEvent &event) = 0;
     virtual void OnParamMsgSet(wxGISGPParamEvent &event);
-protected:	
+protected:
     wxStaticBitmap* m_StateBitmap;
 	wxStaticText* m_sParamDisplayName;
 	wxString m_sFullDisplayName;

@@ -53,11 +53,11 @@ public:
 	virtual bool CanDelete(void){return true;};
 	virtual bool Rename(wxString NewName);
 	virtual bool CanRename(void){return true;};
-	//wxGxObjectContainer    
+	//wxGxObjectContainer
 	//virtual bool DeleteChild(IGxObject* pChild);
 	virtual bool AreChildrenViewable(void) const {return true;};
 	virtual bool HasChildren(void);
-    virtual bool CanCreate(long nDataType, long DataSubtype); 
+    virtual bool CanCreate(long nDataType, long DataSubtype);
 //events
     virtual void OnFileSystemEvent(wxFileSystemWatcherEvent& event);
 protected:

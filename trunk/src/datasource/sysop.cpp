@@ -485,7 +485,7 @@ CPLString CheckUniqPath(const CPLString &sPath, const CPLString &sName, const CP
     if(nCounter > 0)
     {
         CPLString szAdd;
-        szAdd.Printf("%s(%d)", sAdd, nCounter);
+        szAdd.Printf("%s(%d)", sAdd.c_str(), nCounter);
         CPLString szTmpName = sName + szAdd;
         sResultName = CPLString(CPLFormFilename(CPLGetPath(sPath), szTmpName, GetExtension(sPath, sName)));
     }

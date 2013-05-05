@@ -42,9 +42,9 @@ class WXDLLIMPEXP_GIS_CLT wxGxXMLConnectionStorage :
 public:
     wxGxXMLConnectionStorage(void);
     ~wxGxXMLConnectionStorage(void);
-protected:
     //events
     virtual void OnFileSystemEvent(wxFileSystemWatcherEvent& event);
+protected:
     virtual void LoadConnectionsStorage(void);
     virtual bool IsObjectExist(wxGxObject* const pObj, const wxXmlNode* pNode) = 0;
     virtual void CreateConnectionsStorage(void) = 0;

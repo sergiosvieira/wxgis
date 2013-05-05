@@ -111,7 +111,7 @@ bool wxGISFeatureLayer::Draw(wxGISEnumDrawPhase DrawPhase, ITrackCancel* const p
 		}
 		m_pFeatureRenderer->Draw(pCursor, DrawPhase, pDisplay, pTrackCancel);
 	}
-    
+
 	return true;*/
 }
 
@@ -218,7 +218,7 @@ wxGISQuadTreeCursor wxGISFeatureLayer::Idetify(const wxGISGeometry &Geom)
 		Cursor = m_pwxGISFeatureDataset->SearchGeometry(&Rect);
 	//}
 
-	//intersect geoms & set to NULL    
+	//intersect geoms & set to NULL
     for(size_t i = 0; i < Cursor.GetCount(); ++i)
     {
         wxGISQuadTreeItem* pItem = Cursor[i];
@@ -232,7 +232,8 @@ wxGISQuadTreeCursor wxGISFeatureLayer::Idetify(const wxGISGeometry &Geom)
 
 void wxGISFeatureLayer::OnDSClosed(wxFeatureDSEvent& event)
 {
-    PostEvent(wxMxMapViewEvent(wxMXMAP_LAYER_CHANGED, GetCacheID()));
+    wxMxMapViewEvent evt(wxMXMAP_LAYER_CHANGED, GetCacheID());
+    PostEvent(evt);
 }
 
 void wxGISFeatureLayer::OnDSFeaturesAdded(wxFeatureDSEvent& event)
@@ -240,9 +241,10 @@ void wxGISFeatureLayer::OnDSFeaturesAdded(wxFeatureDSEvent& event)
     wxCHECK_RET(m_pFeatureRenderer, wxT("The current renderer point is NULL"));
     m_pFeatureRenderer->Draw(event.GetCursor(), wxGISDPGeography, m_pDisplay);
     //send event that layer is changed and redraw needed to upper layers and whole map
-    PostEvent(wxMxMapViewEvent(wxMXMAP_LAYER_CHANGED, GetCacheID()));
+    wxMxMapViewEvent evt(wxMXMAP_LAYER_CHANGED, GetCacheID());
+    PostEvent(evt);
 }
-/* 
+/*
 void wxGISFeatureLayer::SetSpatialReference(OGRSpatialReferenceSPtr pSpatialReference)
 {
     if(NULL == pSpatialReference)
@@ -250,11 +252,11 @@ void wxGISFeatureLayer::SetSpatialReference(OGRSpatialReferenceSPtr pSpatialRefe
     if(m_pSpatialReference && m_pSpatialReference->IsSame(pSpatialReference.get()))
         return;
     m_pSpatialReference = pSpatialReference;
-	//project and load to quadtree    
+	//project and load to quadtree
 	LoadGeometry();
 }
 
- 
+
 void wxGISFeatureLayer::LoadGeometry(void)
 {
   if(!IsValid() && m_bIsGeometryLoaded)
@@ -455,6 +457,6 @@ void wxGISFeatureLayer::LoadGeometry(void)
         pProgressor->Show(false);
     pStatusBar->SetMessage(_("Done"));
     m_bIsGeometryLoaded = true;
-	
+
 }
 */
