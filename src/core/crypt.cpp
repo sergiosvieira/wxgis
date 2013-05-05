@@ -124,7 +124,7 @@ GByte *GetIV(void)
 EVP_CIPHER_CTX* CreateCTX(GByte* pabyKey, GByte* pabyIV, bool bDecrypt)
 {
     EVP_CIPHER_CTX* pstCTX = new EVP_CIPHER_CTX;
-	const EVP_CIPHER * cipher;
+	const EVP_CIPHER * cipher = NULL;
 
 	EVP_CIPHER_CTX_init(pstCTX);
 
@@ -132,25 +132,41 @@ EVP_CIPHER_CTX* CreateCTX(GByte* pabyKey, GByte* pabyIV, bool bDecrypt)
    	if(oConfig.IsOk())
     {
         wxString sMode = oConfig.Read(enumGISHKCU, wxString(wxT("wxGISCommon/crypt/mode")), wxString(ERR));
-        if(sMode.IsSameAs(wxString(ERR)))
-            cipher = EVP_des_cfb();
-        else if(sMode.IsSameAs(wxString(wxT("DES")), fasle))
-            cipher = EVP_des_cfb();
-        else if(sMode.IsSameAs(wxString(wxT("AES")), fasle))
+
+#ifndef OPENSSL_NO_AES
+        if(sMode.IsSameAs(wxString(wxT("AES")), false))
             cipher = EVP_aes_256_cfb();
-        else if(sMode.IsSameAs(wxString(wxT("IDEA")), fasle))
+#endif
+#ifndef OPENSSL_NO_IDEA
+        if(sMode.IsSameAs(wxString(wxT("IDEA")), false))
             cipher = EVP_idea_cbc();
-        else if(sMode.IsSameAs(wxString(wxT("RC2")), fasle))
+#endif
+#ifndef OPENSSL_NO_RC2
+        if(sMode.IsSameAs(wxString(wxT("RC2")), false))
             cipher = EVP_rc2_cbc();
-        else if(sMode.IsSameAs(wxString(wxT("BF")), fasle))
+#endif
+#ifndef OPENSSL_NO_BF
+        if(sMode.IsSameAs(wxString(wxT("BF")), false))
             cipher = EVP_bf_cbc();
-        else if(sMode.IsSameAs(wxString(wxT("CAST5")), fasle))
+#endif
+#ifndef OPENSSL_NO_CAST
+        if(sMode.IsSameAs(wxString(wxT("CAST5")), false))
             cipher = EVP_cast5_cbc();
-        else
+#endif
+#ifndef OPENSSL_NO_DES
+        if(NULL == cipher || sMode.IsSameAs(wxString(ERR)) || sMode.IsSameAs(wxString(wxT("DES")), false))
             cipher = EVP_des_cfb();
+#endif
     }
     else
+#ifndef OPENSSL_NO_DES
         cipher = EVP_des_cfb();
+#else
+        return NULL;
+#endif
+
+    if(NULL == cipher)
+        return NULL;
 
 	bool bResult;
 	if(bDecrypt)
@@ -311,7 +327,7 @@ bool Decrypt(const wxString &sText, wxString &sDecryptText)
         if(pos == sPass.Len())
             pos = 0;
 		wxString sHex = sText[i];
-		sHex += sText[i + 1]; 
+		sHex += sText[i + 1];
         char SymbolHi = wxHexToDec(sHex);
         sHex = sText[i + 2];
 		sHex += sText[i + 3];

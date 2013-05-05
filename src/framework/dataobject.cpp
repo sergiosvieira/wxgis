@@ -39,13 +39,13 @@ bool wxGISStringDataObject::SetData(size_t len, const void *buf)
 {
     m_oaStrings.Empty();
 
-    BYTE * pbuf = (BYTE*)buf;
+    unsigned char * pbuf = (unsigned char*)buf;
     size_t nCount(0);
 
     BUF2VALMEMCOPY(&nCount, pbuf, sizeOfsize_t);
 
     size_t nStrLen(0), nStrSize(0);
-    for (size_t n = 0; n < nCount; ++n ) 
+    for (size_t n = 0; n < nCount; ++n )
     {
         BUF2VALMEMCOPY(&nStrLen, pbuf, sizeOfsize_t);
 
@@ -83,7 +83,7 @@ bool wxGISStringDataObject::GetDataHere(void *pData) const
     if ( !pData || m_oaStrings.IsEmpty() )
         return false;
 
-    BYTE * pbuf = (BYTE*)pData;
+    unsigned char * pbuf = (unsigned char*)pData;
 
     const size_t nCount = m_oaStrings.GetCount();
     VAL2BUFMEMCOPY(pbuf, &nCount, sizeOfsize_t);
@@ -94,7 +94,7 @@ bool wxGISStringDataObject::GetDataHere(void *pData) const
         size_t nStrLen = m_oaStrings[i].Len();
         size_t nStrSize = nStrLen * sizeOfChar;
         VAL2BUFMEMCOPY(pbuf, &nStrLen, sizeOfsize_t);
-                
+
         VAL2BUFMEMCOPY(pbuf, m_oaStrings[i].wc_str(), nStrSize);//t_str
     }
 
@@ -114,12 +114,12 @@ bool wxGISDecimalDataObject::SetData(size_t len, const void *buf)
 {
     m_oaDecimals.Empty();
 
-    BYTE * pbuf = (BYTE*)buf;
+    unsigned char * pbuf = (unsigned char*)buf;
     size_t nCount(0);
 
     BUF2VALMEMCOPY(&nCount, pbuf, sizeOfsize_t);
 
-    for (size_t n = 0; n < nCount; ++n ) 
+    for (size_t n = 0; n < nCount; ++n )
     {
         long nValue;
         BUF2VALMEMCOPY(&nValue, pbuf, sizeOfLong);
@@ -148,7 +148,7 @@ bool wxGISDecimalDataObject::GetDataHere(void *pData) const
     if ( !pData || m_oaDecimals.IsEmpty() )
         return false;
 
-    BYTE * pbuf = (BYTE*)pData;
+    unsigned char * pbuf = (unsigned char*)pData;
 
     const size_t nCount = m_oaDecimals.GetCount();
 
@@ -176,7 +176,7 @@ bool wxGISTaskDataObject::SetData(size_t len, const void *buf)
     m_oaDecimals.Empty();
     m_nParentPointer = wxNOT_FOUND;
 
-    BYTE * pbuf = (BYTE*)buf;
+    unsigned char * pbuf = (unsigned char*)buf;
 
     size_t nStrLen(0);
     BUF2VALMEMCOPY(&m_nParentPointer, pbuf, sizeOfLong);
@@ -185,7 +185,7 @@ bool wxGISTaskDataObject::SetData(size_t len, const void *buf)
 
     BUF2VALMEMCOPY(&nCount, pbuf, sizeOfsize_t);
 
-    for (size_t n = 0; n < nCount; ++n ) 
+    for (size_t n = 0; n < nCount; ++n )
     {
         long nValue;
         BUF2VALMEMCOPY(&nValue, pbuf, sizeOfLong);
@@ -210,10 +210,10 @@ bool wxGISTaskDataObject::GetDataHere(void *pData) const
     if ( !pData || m_oaDecimals.IsEmpty() )
         return false;
 
-    BYTE * pbuf = (BYTE*)pData;
+    unsigned char * pbuf = (unsigned char*)pData;
 
     VAL2BUFMEMCOPY(pbuf, &m_nParentPointer, sizeOfLong);
-                
+
     const size_t nCount = m_oaDecimals.GetCount();
 
     VAL2BUFMEMCOPY(pbuf, &nCount, sizeOfsize_t);

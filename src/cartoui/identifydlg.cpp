@@ -22,6 +22,7 @@
 #include "wxgis/core/config.h"
 
 #include <wx/clipbrd.h>
+#include <cmath>
 
 #include "../../art/splitter_switch.xpm"
 #include "../../art/layers.xpm"
@@ -159,7 +160,7 @@ void wxGISFeatureDetailsPanel::FillPanel(const OGRPoint *pPt)
 {
     if(!pPt)
         return;
-    //TODO: OGRPoint has spatial reference. This should be used in m->deg and vice versa transform 
+    //TODO: OGRPoint has spatial reference. This should be used in m->deg and vice versa transform
 	m_dfX = pPt->getX();
 	m_dfY = pPt->getY();
 	m_sLocation = m_pCFormat->Format(m_dfX, m_dfY);
@@ -379,7 +380,7 @@ void wxGISFeatureDetailsPanel::OnSetCursor(wxSetCursorEvent& event)
     long item = m_listCtrl->HitTest(pt, flags);
     if (item > -1 && (flags & wxLIST_HITTEST_ONITEM))
     {
-        wxListItem row_info;  
+        wxListItem row_info;
         row_info.m_itemId = item;
         row_info.m_col = 1;
         row_info.m_mask = wxLIST_MASK_TEXT;
@@ -401,7 +402,7 @@ void wxGISFeatureDetailsPanel::OnMouseLeftUp(wxMouseEvent& event)
     long item = m_listCtrl->HitTest(pt, flags);
     if (item > -1 && (flags & wxLIST_HITTEST_ONITEM))
     {
-        wxListItem row_info;  
+        wxListItem row_info;
         row_info.m_itemId = item;
         row_info.m_col = 1;
         row_info.m_mask = wxLIST_MASK_TEXT;
@@ -592,7 +593,8 @@ void wxGISIdentifyDlg::OnSelChanged(wxTreeEvent& event)
 			m_pFeatureDetailsPanel->Clear();
 			return;
 		}
-		m_pFeatureDetailsPanel->FillPanel(pData->m_pDataset->GetFeature(pData->m_nOID));
+		wxGISFeature Feature = pData->m_pDataset->GetFeature(pData->m_nOID);
+		m_pFeatureDetailsPanel->FillPanel(Feature);
     }
 }
 
@@ -756,8 +758,8 @@ void wxAxIdentifyView::Identify(wxGISGeometry &GeometryBounds)
     if(m_pMapView->GetDisplay())
     {
         m_pMapView->GetDisplay()->DC2WorldDist(&dfWidth, &dfHeight);
-        dfWidth = std::abs(dfWidth);
-        dfHeight = std::abs(dfHeight);
+        dfWidth = std::fabs(dfWidth);
+        dfHeight = std::fabs(dfHeight);
     }
 
     OGREnvelope Env = GeometryBounds.GetEnvelope();
@@ -870,10 +872,11 @@ void wxAxIdentifyView::OnSelChanged(wxTreeEvent& event)
 			m_pFeatureDetailsPanel->Clear();
 			return;
 		}
-        
+
         m_pMapView->AddFlashGeometry(pData->m_Geometry, GetDrawStyle(enumGISDrawStyleFill), GetDrawStyle(enumGISDrawStyleOutline));
         m_pMapView->StartFlashing();
-		m_pFeatureDetailsPanel->FillPanel(pData->m_pDataset->GetFeatureByID(pData->m_nOID));
+        wxGISFeature Feature = pData->m_pDataset->GetFeatureByID(pData->m_nOID);
+		m_pFeatureDetailsPanel->FillPanel(Feature);
     }
 }
 

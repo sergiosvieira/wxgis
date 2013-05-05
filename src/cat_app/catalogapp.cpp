@@ -45,8 +45,6 @@ wxGISCatalogApp::~wxGISCatalogApp(void)
 	UnLoadLibs();
 }
 
-
-
 bool wxGISCatalogApp::OnInit()
 {
     // call the base class initialization method, currently it only parses a

@@ -50,7 +50,7 @@ wxGISTask::wxGISTask(const wxXmlNode* pIniNode, IGISProcessParent* pProcessParen
         wxString sCat = pIniNode->GetAttribute(wxT("cat"), wxT("default"));
         if(m_pTaskCategory)
             m_sExeConfPath = pIniNode->GetAttribute(wxT("execonf"), m_pTaskCategory->GetTaskConfigPath(sCat));
-        
+
         if(pIniNode->GetChildren())
             m_pParams = new wxXmlNode(*pIniNode->GetChildren());
         else
@@ -61,7 +61,7 @@ wxGISTask::wxGISTask(const wxXmlNode* pIniNode, IGISProcessParent* pProcessParen
         else
             m_dfDone = 0;//wxNetMessage::GetFloatValue(pIniNode, wxT("done"), 0.0);
         m_dfPrevDone = m_dfDone;
-    }   
+    }
 }
 
 wxGISTask::~wxGISTask(void)
@@ -90,7 +90,7 @@ wxXmlNode* wxGISTask::GetAsXml(void)
 
     pNode->AddChild(new wxXmlNode(*m_pParams));
     //wxNetMessage::SetFloatValue(pNode, wxT("done"), m_dfDone);
- 
+
     return pNode;
 }
 
@@ -147,7 +147,7 @@ void wxGISTask::ChangeTask(const wxXmlNode* pTaskNode)
     if(m_nState == enumGISTaskWork)
         m_nState = enumGISTaskQuered;
     m_nPriority = GetDecimalValue(pTaskNode, wxT("prio"), m_nPriority);
-    wxRemoveFile(m_sExeConfPath);        
+    wxRemoveFile(m_sExeConfPath);
     if(pTaskNode->GetChildren())
         m_pParams = new wxXmlNode(*pTaskNode->GetChildren());
     else
@@ -251,7 +251,7 @@ wxGISTaskCategory::wxGISTaskCategory(wxString sPath, wxGISTaskManager* pTaskMana
     m_sXmlDocPath = sPath;
     m_nMaxTasks = wxThread::GetCPUCount();
     m_nRunningTasks = 0;
-    m_sName = sCatName;    
+    m_sName = sCatName;
     //try to load xml
     wxXmlDocument doc(m_sXmlDocPath);
     if(doc.IsOk())
@@ -319,7 +319,7 @@ bool wxGISTaskCategory::AddTask(const wxXmlNode* pTaskNode, int nId, wxString &s
         wxXmlNode* pTaskNode = pTask->GetXmlDescription();
         pTaskNode->AddAttribute(wxT("cat"), m_sName);
         pRootNode->AddChild(pTaskNode);
-        
+
         m_pTaskManager->SendNetMessage(msgout);
 
         StartNextQueredTask();
@@ -363,8 +363,8 @@ bool wxGISTaskCategory::DelTask(int nTaskId, int nId, wxString &sErrMsg)
         pTaskNode->AddAttribute(wxT("cat"), m_sName);
         SetDecimalValue(pTaskNode, wxT("id"), nTaskId);
         pRootNode->AddChild(pTaskNode);
-        
-        m_pTaskManager->SendNetMessage(msgout); 
+
+        m_pTaskManager->SendNetMessage(msgout);
 
         StartNextQueredTask();
 
@@ -385,7 +385,7 @@ bool wxGISTaskCategory::StartTask(int nTaskId, int nId, wxString &sErrMsg)
         return false;
     }
 
-    if( m_omTasks[nTaskId] ) 
+    if( m_omTasks[nTaskId] )
     {
         m_omTasks[nTaskId]->SetState(enumGISTaskQuered);
     }
@@ -402,8 +402,8 @@ bool wxGISTaskCategory::StartTask(int nTaskId, int nId, wxString &sErrMsg)
         SetDecimalValue(pTaskNode, wxT("id"), nTaskId);
         SetDecimalValue(pTaskNode, wxT("state"), enumGISTaskQuered);
         pRootNode->AddChild(pTaskNode);
-        
-        m_pTaskManager->SendNetMessage(msgout); 
+
+        m_pTaskManager->SendNetMessage(msgout);
 
         StartNextQueredTask();
 
@@ -424,10 +424,10 @@ bool wxGISTaskCategory::StopTask(int nTaskId, int nId, wxString &sErrMsg)
         return false;
     }
 
-    if( m_omTasks[nTaskId] ) 
+    if( m_omTasks[nTaskId] )
     {
         m_omTasks[nTaskId]->Stop();
-        m_nRunningTasks--;        
+        m_nRunningTasks--;
     }
 
     //store in xml
@@ -442,8 +442,8 @@ bool wxGISTaskCategory::StopTask(int nTaskId, int nId, wxString &sErrMsg)
         SetDecimalValue(pTaskNode, wxT("id"), nTaskId);
         SetDecimalValue(pTaskNode, wxT("state"), enumGISTaskPaused);
         pRootNode->AddChild(pTaskNode);
-        
-        m_pTaskManager->SendNetMessage(msgout); 
+
+        m_pTaskManager->SendNetMessage(msgout);
 
         StartNextQueredTask();
 
@@ -469,7 +469,7 @@ bool wxGISTaskCategory::ChangeTaskPriority(int nTaskId, long nPriority, int nId,
         return false;
     }
 
-    if( m_omTasks[nTaskId] ) 
+    if( m_omTasks[nTaskId] )
     {
         m_omTasks[nTaskId]->SetPriority(nPriority);
     }
@@ -485,8 +485,8 @@ bool wxGISTaskCategory::ChangeTaskPriority(int nTaskId, long nPriority, int nId,
         SetDecimalValue(pTaskNode, wxT("id"), nTaskId);
         SetDecimalValue(pTaskNode, wxT("prio"), nPriority);
         pRootNode->AddChild(pTaskNode);
-        
-        m_pTaskManager->SendNetMessage(msgout); 
+
+        m_pTaskManager->SendNetMessage(msgout);
 
         return true;
     }
@@ -523,8 +523,8 @@ bool wxGISTaskCategory::ChangeTask(const wxXmlNode* pTaskNode, int nId, wxString
             pTaskNode->AddAttribute(wxT("cat"), m_sName);
             pRootNode->AddChild(pTaskNode);
         }
-        
-        m_pTaskManager->SendNetMessage(msgout); 
+
+        m_pTaskManager->SendNetMessage(msgout);
 
         StartNextQueredTask();
 
@@ -545,12 +545,12 @@ bool wxGISTaskCategory::GetTasks(int nId, wxString &sErrMsg)
     wxXmlNode* pRootNode = msgout.GetXMLRoot();
     wxXmlNode* pTasksNode = new wxXmlNode(pRootNode, wxXML_ELEMENT_NODE, wxT("tasks"));
     for(wxGISTaskMap::iterator it = m_omTasks.begin(); it != m_omTasks.end(); ++it)
-    { 
+    {
         if(it->second)
         {
             wxXmlNode* pTaskNode = it->second->GetXmlDescription();
             pTaskNode->AddAttribute(wxT("cat"), m_sName);
-            pTasksNode->AddChild(pTaskNode); 
+            pTasksNode->AddChild(pTaskNode);
         }
     }
     m_pTaskManager->SendNetMessage(msgout);
@@ -606,10 +606,10 @@ void wxGISTaskCategory::StartNextQueredTask()
 
 int wxGISTaskCategory::GetQueredTaskId()
 {
-    long nMinPriority = 10000000000;
+    long nMinPriority = LONG_MAX;
     int nOutTaskId = wxNOT_FOUND;
     for(wxGISTaskMap::iterator it = m_omTasks.begin(); it != m_omTasks.end(); ++it)
-    { 
+    {
         //get next task by priority
         if(it->second && it->second->GetState() == enumGISTaskQuered)
         {
@@ -644,8 +644,8 @@ void wxGISTaskCategory::ChangeTask(int nTaskId)
         wxXmlNode* pTaskNode = m_omTasks[nTaskId]->GetXmlDescription();
         pTaskNode->AddAttribute(wxT("cat"), m_sName);
         pRootNode->AddChild(pTaskNode);
-        
-        m_pTaskManager->SendNetMessage(msgout); 
+
+        m_pTaskManager->SendNetMessage(msgout);
     }
 }
 
@@ -660,8 +660,8 @@ void wxGISTaskCategory::ChangeTask(int nTaskId)
 //        SetDecimalValue(pTaskNode,wxT("id"), m_omTasks[nTaskId]->GetId());
 //        SetDecimalValue(pTaskNode, wxT("vol"), nVolume);
 //        //pTaskNode->AddAttribute(wxT("cat"), m_sName);
-//        
-//        m_pTaskManager->SendNetMessage(msgout); 
+//
+//        m_pTaskManager->SendNetMessage(msgout);
 //    }
 //}
 
@@ -679,8 +679,8 @@ void wxGISTaskCategory::ChangeTask(int nTaskId)
 //            SetDateValue(pTaskNode, wxT("end"), m_omTasks[nTaskId]->GetFinish());
 //        SetDecimalValue(pTaskNode, wxT("state"), m_omTasks[nTaskId]->GetState());
 //        //pTaskNode->AddAttribute(wxT("cat"), m_sName);
-//        
-//        m_pTaskManager->SendNetMessage(msgout); 
+//
+//        m_pTaskManager->SendNetMessage(msgout);
 //    }
 //}
 
@@ -700,12 +700,12 @@ void wxGISTaskCategory::ChangeTaskMsg(wxGISEnumMessageType nType, const wxString
     SetDateValue(pTaskNode, wxT("msg_dt"), dt);
     pTaskNode->AddAttribute(wxT("msg"), sInfoData);
     //pTaskNode->AddAttribute(wxT("task_cat"), m_sName);
-        
-    m_pTaskManager->SendNetMessage(msgout); 
+
+    m_pTaskManager->SendNetMessage(msgout);
 }
 
 void wxGISTaskCategory::GetTaskMessages(int nTaskId, int nId)
-{    
+{
     wxCriticalSectionLocker lock(m_MsgCritSect);
     for(size_t i = 0; i < m_omTasks[nTaskId]->GetMessageCount(); ++i)
         ChangeTaskMsg(m_omTasks[nTaskId]->GetMessage(i).m_nType, m_omTasks[nTaskId]->GetMessage(i).m_sMessage, m_omTasks[nTaskId]->GetMessage(i).m_dt, i, nTaskId);
