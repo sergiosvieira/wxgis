@@ -67,7 +67,7 @@ wxString wxGxCatalogBase::ConstructFullName(const wxGxObject* pObject) const
 	if(sParentPath.IsEmpty())
 		return sName;
 	else
-	{        
+	{
 		if(sParentPath.EndsWith(wxFileName::GetPathSeparator()))
 			return sParentPath + sName;
 		else
@@ -155,6 +155,8 @@ wxIMPLEMENT_ABSTRACT_CLASS(wxGxObject, wxEvtHandler);
 
 wxGxObject::wxGxObject(void) : wxEvtHandler()
 {
+    m_oParent = NULL;
+    m_nId = wxNOT_FOUND;
 }
 
 wxGxObject::wxGxObject(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxEvtHandler()
@@ -168,8 +170,8 @@ bool wxGxObject::Create(wxGxObject *oParent, const wxString &soName, const CPLSt
     m_sPath = soPath;
 
     if(GetGxCatalog())
-        GetGxCatalog()->RegisterObject(this);    
-    
+        GetGxCatalog()->RegisterObject(this);
+
     if( oParent && oParent->IsKindOf(wxCLASSINFO(wxGxObjectContainer)) )
     {
         wxGxObjectContainer* pGxObjectContainer = wxDynamicCast(oParent, wxGxObjectContainer);
@@ -179,7 +181,7 @@ bool wxGxObject::Create(wxGxObject *oParent, const wxString &soName, const CPLSt
     else
         m_oParent = oParent;
 
-    //m_nId = nId;    
+    //m_nId = nId;
     return true;
 }
 
