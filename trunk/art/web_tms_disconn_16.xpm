@@ -1,5 +1,5 @@
 /* XPM */
-static char * web_tms_disconn_16_xpm[] = {
+static const char * web_tms_disconn_16_xpm[] = {
 "16 16 137 2",
 "  	c None",
 ". 	c #CE5C00",

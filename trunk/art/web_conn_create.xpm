@@ -1,5 +1,5 @@
 /* XPM */
-static char * web_conn_create_xpm[] = {
+static const char * web_conn_create_xpm[] = {
 "16 16 75 1",
 " 	c None",
 ".	c #D87724",

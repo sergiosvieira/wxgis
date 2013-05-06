@@ -1,5 +1,5 @@
 /* XPM */
-static char * web_tms_disconn_48_xpm[] = {
+static const char * web_tms_disconn_48_xpm[] = {
 "48 48 330 2",
 "  	c None",
 ". 	c #444444",
