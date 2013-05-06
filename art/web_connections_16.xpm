@@ -1,5 +1,5 @@
 /* XPM */
-static char * web_connections_16_xpm[] = {
+static const char * web_connections_16_xpm[] = {
 "16 16 111 2",
 "  	c None",
 ". 	c #ADADAD",

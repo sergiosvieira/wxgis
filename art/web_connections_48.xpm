@@ -1,5 +1,5 @@
 /* XPM */
-static char * web_connections_48_xpm[] = {
+static const char * web_connections_48_xpm[] = {
 "48 48 349 2",
 "  	c None",
 ". 	c #7A7A7A",
