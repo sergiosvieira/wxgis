@@ -19,8 +19,6 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/cat_app/catalogapp.h"
-#include "wxgis/cat_app/catalogframe.h"
-//#include "wxgis/catalog/catalog.h"
 #include "wxgis/core/config.h"
 
 #include <locale.h>
@@ -31,7 +29,7 @@
 
 IMPLEMENT_APP(wxGISCatalogApp)
 
-wxGISCatalogApp::wxGISCatalogApp(void)
+wxGISCatalogApp::wxGISCatalogApp(void) : wxApp()
 {
 }
 
@@ -56,27 +54,27 @@ bool wxGISCatalogApp::OnInit()
 		return false;
 
     //create application/main frame
-    wxGISCatalogFrame* frame = new wxGISCatalogFrame(NULL, wxID_ANY, wxString(_("wxGIS Catalog")), wxDefaultPosition, wxSize(800, 480) );
+    m_pMainFrame = new wxGISCatalogFrame(NULL, wxID_ANY, wxString(_("wxGIS Catalog")), wxDefaultPosition, wxSize(800, 480) );
 
 	//setup loging
 	wxString sLogDir = oConfig.GetLogDir();
-    if(!frame->SetupLog(sLogDir))
+    if(!m_pMainFrame->SetupLog(sLogDir))
         return false;
 
 	//setup locale
 	wxString sLocale = oConfig.GetLocale();
 	wxString sLocaleDir = oConfig.GetLocaleDir();
-    if(!frame->SetupLoc(sLocale, sLocaleDir))
+    if(!m_pMainFrame->SetupLoc(sLocale, sLocaleDir))
         return false;
 
    	//setup sys
     wxString sSysDir = oConfig.GetSysDir();
-    if(!frame->SetupSys(sSysDir))
+    if(!m_pMainFrame->SetupSys(sSysDir))
         return false;
 
    	//setup debug
 	bool bDebugMode = oConfig.GetDebugMode();
-    frame->SetDebugMode(bDebugMode);
+    m_pMainFrame->SetDebugMode(bDebugMode);
 
     //some default GDAL
 	wxString sGDALCacheMax = oConfig.Read(enumGISHKCU, wxString(wxT("wxGISCommon/GDAL/cachemax")), wxString(wxT("128")));
@@ -111,15 +109,21 @@ bool wxGISCatalogApp::OnInit()
 	if(pLibsNode)
 		LoadLibs(pLibsNode);
 
-    if(!frame->CreateApp())
-        return false;
-
     // and show it (the frames, unlike simple controls, are not shown when
     // created initially)
-    frame->Show(true);
     //SetTopWindow(frame);
 
 	return true;
 }
 
+// create the file system watcher here, because it needs an active loop
+void wxGISCatalogApp::OnEventLoopEnter(wxEventLoopBase* loop)
+{
+    if(m_pMainFrame)
+    {
+        if(!m_pMainFrame->CreateApp())
+            return;
 
+        m_pMainFrame->Show(true);
+    }
+}

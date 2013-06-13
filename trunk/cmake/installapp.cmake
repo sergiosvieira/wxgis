@@ -15,8 +15,8 @@ if(WIN32)
     install(TARGETS ${APP_NAME} DESTINATION ${WXGIS_CURRENT_BINARY_DIR}/Release/ CONFIGURATIONS Release)
 else()
     install(TARGETS ${APP_NAME}
-        RUNTIME DESTINATION bin/wxgis
+        RUNTIME DESTINATION bin
         ARCHIVE DESTINATION lib/wxgis
-        LIBRARY DESTINATION lib/wxgis )
+        LIBRARY DESTINATION lib/wxgis)
 endif() 
 
