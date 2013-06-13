@@ -1,5 +1,5 @@
 /* XPM */
-static char * raster_unk48_xpm[] = {
+static const char * raster_unk48_xpm[] = {
 "48 48 124 2",
 "  	c None",
 ". 	c #F0FCCE",

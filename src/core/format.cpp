@@ -142,14 +142,14 @@ void SetDecimalValue(wxXmlNode* pNode, const wxString &sAttrName, int nVal)
 long GetDecimalValue(const wxXmlNode* pNode, const wxString &sAttrName, long nDefVal)
 {
     wxString sDefVal = wxString::Format(wxT("%d"), nDefVal);
-    wxString sVal = pNode->GetAttribute(sAttrName, sDefVal);    
+    wxString sVal = pNode->GetAttribute(sAttrName, sDefVal);
     return wxAtol(sVal);
 }
 
 int GetDecimalValue(const wxXmlNode* pNode, const wxString &sAttrName, int nDefVal)
 {
     wxString sDefVal = wxString::Format(wxT("%d"), nDefVal);
-    wxString sVal = pNode->GetAttribute(sAttrName, sDefVal);    
+    wxString sVal = pNode->GetAttribute(sAttrName, sDefVal);
     return wxAtoi(sVal);
 }
 
@@ -175,7 +175,7 @@ void SetBoolValue(wxXmlNode* pNode, const wxString &sAttrName, bool bVal)
 bool GetBoolValue(const wxXmlNode* pNode, const wxString &sAttrName, bool bDefVal)
 {
     wxString sVal = pNode->GetAttribute(sAttrName, bDefVal == true ? wxT("t") : wxT("f"));
-    if(sVal.IsSameAs(wxT("t"), false))
+    if(sVal.IsSameAs(wxT("t"), false) || sVal.IsSameAs(wxT("1"), false) || sVal.IsSameAs(wxT("y"), false) || sVal.IsSameAs(wxT("yes"), false) || sVal.IsSameAs(wxT("true"), false))
         return true;
     return false;
 }
@@ -387,7 +387,7 @@ wxString wxGISCoordinatesFormat::ParseString(const wxString &sMask, COORD_FORMAT
 wxString wxGISCoordinatesFormat::FormatString(double dCoord, const wxString &sFormat, COORD_FORMAT nCoordFormat, bool bLat)
 {
     wxString sOut, sSign;
-    
+
     int nZnak(1);
     if(dCoord < 0)
     {

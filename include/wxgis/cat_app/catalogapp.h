@@ -23,6 +23,7 @@
 
 #include "wxgis/base.h"
 #include "wxgis/core/init.h"
+#include "wxgis/cat_app/catalogframe.h"
 
 #include <wx/app.h>
 
@@ -37,6 +38,9 @@ public:
 	wxGISCatalogApp(void);
 	virtual ~wxGISCatalogApp(void);
 	virtual bool OnInit();
+	virtual void OnEventLoopEnter(wxEventLoopBase* loop);
+protected:
+    wxGISCatalogFrame* m_pMainFrame;
 };
 
 wxDECLARE_APP(wxGISCatalogApp);

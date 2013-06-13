@@ -15,8 +15,8 @@ if(WIN32)
      endif()
 else()
     install(TARGETS ${LIB_NAME}
-        RUNTIME DESTINATION bin/wxgis
+        RUNTIME DESTINATION bin
         ARCHIVE DESTINATION lib/wxgis
-        LIBRARY DESTINATION lib/wxgis )
+        LIBRARY DESTINATION lib/wxgis)
 endif() 
 

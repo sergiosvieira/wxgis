@@ -1,5 +1,5 @@
 /* XPM */
-static char * raster_tif48_xpm[] = {
+static const char * raster_tif48_xpm[] = {
 "48 48 123 2",
 "  	c None",
 ". 	c #D2CEFC",
