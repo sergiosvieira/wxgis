@@ -37,26 +37,34 @@ IMPLEMENT_CLASS(wxGISCatalogFrame, wxGxApplication)
 wxGISCatalogFrame::wxGISCatalogFrame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxGxApplication(parent, id, title, pos, size, style)
 {
 	//set app main icon
+
+	wxIconBundle iconBundle;
+
     wxDateTime now = wxDateTime::Now();
     //TODO: need 48x48 main app icon
     if((now.GetMonth() == wxDateTime::Dec && now.GetDay() > 15) || (now.GetMonth() == wxDateTime::Jan && now.GetDay() < 15))
 	{
         m_pAppIcon = wxIcon(mainframecat_x_xpm);
 #ifdef __WXMSW__
-		SetIcon(wxICON(MAINFRAME_X));
+		iconBundle.AddIcon(wxICON(MAINFRAME_X));
 #else
-        SetIcon(m_pAppIcon);
+        iconBundle.AddIcon(m_pAppIcon));
+        iconBundle.AddIcon(wxIcon(rapidsvn_32x32_xpm));
+        iconBundle.AddIcon(wxIcon(rapidsvn_48x48_xpm));
 #endif
 	}
     else
 	{
         m_pAppIcon = wxIcon(mainframecat_xpm);
 #ifdef __WXMSW__
-		SetIcon(wxICON(MAINFRAME));
+		iconBundle.AddIcon(wxICON(MAINFRAME));
 #else
-        SetIcon(m_pAppIcon);
+        iconBundle.AddIcon(m_pAppIcon));
+        iconBundle.AddIcon(wxIcon(rapidsvn_32x32_xpm));
+        iconBundle.AddIcon(wxIcon(rapidsvn_48x48_xpm));
 #endif
 	}
+    SetIcons(iconBundle);
 }
 
 wxGISCatalogFrame::~wxGISCatalogFrame(void)

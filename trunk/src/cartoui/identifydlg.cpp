@@ -178,7 +178,7 @@ void wxGISFeatureDetailsPanel::FillPanel(wxGISFeature &Feature)
 
         wxString sName = Feature.GetFieldName(i);
 
-		long pos = m_listCtrl->InsertItem(i, sName, 2);
+		long pos = m_listCtrl->InsertItem(i, sName, wxNOT_FOUND);
 
         wxListItem item_val;
         item_val.SetColumn(1);

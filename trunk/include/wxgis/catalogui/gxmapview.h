@@ -51,7 +51,7 @@ public:
     }
 	virtual void PutMessage(const wxString &sMessage, size_t nIndex, wxGISEnumMessageType nType)
     {
-    	if(m_pStatusBar)
+    	if(m_pStatusBar && !sMessage.IsEmpty())
         {
             m_pStatusBar->SetMessage(sMessage);
         }

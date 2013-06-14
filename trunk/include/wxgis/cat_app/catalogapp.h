@@ -41,6 +41,7 @@ public:
 	virtual void OnEventLoopEnter(wxEventLoopBase* loop);
 protected:
     wxGISCatalogFrame* m_pMainFrame;
+    bool m_bMainFrameCreated;
 };
 
 wxDECLARE_APP(wxGISCatalogApp);
