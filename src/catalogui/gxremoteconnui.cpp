@@ -21,10 +21,6 @@
 
 #include "wxgis/catalogui/gxremoteconnui.h"
 
-#ifdef wxGIS_USE_POSTGRES
-
-#include "wxgis/catalogui/remoteconndlg.h"
-#include "wxgis/catalogui/gxpostgisdatasetui.h"
 #include "wxgis/catalogui/gxcatalogui.h"
 
 #include "../../art/pg_vec_16.xpm"
@@ -46,6 +42,11 @@
 #include "wx/utils.h"
 #include "wx/propdlg.h"
 #include "wx/bookctrl.h"
+
+#ifdef wxGIS_USE_POSTGRES
+
+#include "wxgis/catalogui/remoteconndlg.h"
+#include "wxgis/catalogui/gxpostgisdatasetui.h"
 
 //--------------------------------------------------------------
 //class wxGxRemoteConnectionUI
