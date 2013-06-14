@@ -31,6 +31,7 @@ IMPLEMENT_APP(wxGISCatalogApp)
 
 wxGISCatalogApp::wxGISCatalogApp(void) : wxApp()
 {
+    m_bMainFrameCreated = false;
 }
 
 wxGISCatalogApp::~wxGISCatalogApp(void)
@@ -119,11 +120,13 @@ bool wxGISCatalogApp::OnInit()
 // create the file system watcher here, because it needs an active loop
 void wxGISCatalogApp::OnEventLoopEnter(wxEventLoopBase* loop)
 {
-    if(m_pMainFrame)
+
+    if(m_pMainFrame && !m_bMainFrameCreated)
     {
         if(!m_pMainFrame->CreateApp())
             return;
 
+        m_bMainFrameCreated = true;
         m_pMainFrame->Show(true);
     }
 }
