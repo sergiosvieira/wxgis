@@ -48,8 +48,8 @@ void wxGxXMLConnectionStorage::OnFileSystemEvent(wxFileSystemWatcherEvent& event
 
 void wxGxXMLConnectionStorage::LoadConnectionsStorage(void)
 {
-    wxCriticalSectionLocker locker(m_oCritSect);     
-    
+    wxCriticalSectionLocker locker(m_oCritSect);
+
     wxXmlDocument doc;
     //try to load connections xml file
     if(doc.Load(m_sXmlStoragePath))
@@ -70,13 +70,13 @@ void wxGxXMLConnectionStorage::LoadConnectionsStorage(void)
 
  		wxXmlNode* pConnectionNode = pConnectionsNode->GetChildren();
 
-        wxGxCatalog* pGxCatalog = wxDynamicCast(GetGxCatalog(), wxGxCatalog); 
+        wxGxCatalog* pGxCatalog = wxDynamicCast(GetGxCatalog(), wxGxCatalog);
         std::map<long, bool> mnIds;
 
 		while(pConnectionNode)
 		{
             bool bFoundKey = false;
-            
+
             wxGxObjectList::const_iterator iter;
             for(iter = GetChildren().begin(); iter != GetChildren().end(); ++iter)
             {
@@ -90,8 +90,10 @@ void wxGxXMLConnectionStorage::LoadConnectionsStorage(void)
                     mnIds[current->GetId()] = true;
                     break;
                 }
-                if(!mnIds[current->GetId()])
+                if(mnIds[current->GetId()] == false)
+                {
                     mnIds[current->GetId()] = false;
+                }
             }
 
             if(!bFoundKey)

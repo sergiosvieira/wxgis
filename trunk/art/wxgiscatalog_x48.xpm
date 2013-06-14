@@ -1,5 +1,5 @@
 /* XPM */
-static char * D:\work\projects\wxGIS\art\wxgiscatalog_x48_xpm[] = {
+static const char * wxgiscatalog_x48_xpm[] = {
 "48 48 368 2",
 "  	c None",
 ". 	c #484429",
