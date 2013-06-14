@@ -1,5 +1,5 @@
 /* XPM */
-static char * D:\work\projects\wxGIS\art\wxgiscatalog64_xpm[] = {
+static const char * wxgiscatalog64_xpm[] = {
 "64 64 474 2",
 "  	c None",
 ". 	c #44442A",

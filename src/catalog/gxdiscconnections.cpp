@@ -55,13 +55,14 @@ bool wxGxDiscConnections::Create(wxGxObject *oParent, const wxString &soName, co
 	}
     m_pWatcher = new wxFileSystemWatcher();
     m_pWatcher->SetOwner(this);
- 
+
     wxFileName oFileName = wxFileName::DirName(m_sUserConfigDir);
     //if dir is not exist create it
     if(!wxDirExists(m_sUserConfigDir))
         wxFileName::Mkdir(m_sUserConfigDir, 0755, wxPATH_MKDIR_FULL);
 
-    if(!m_pWatcher->AddTree(oFileName, wxFSW_EVENT_MODIFY))//bool bAdd = |wxFSW_EVENT_CREATE
+    wxLogDebug(wxT("monitoring dir is: %s"), oFileName.GetFullPath().c_str());
+    if(!m_pWatcher->Add(oFileName, wxFSW_EVENT_MODIFY))//Tree bool bAdd = |wxFSW_EVENT_CREATE
     {
         wxLogError(_("Add File system watcher failed"));
         return false;
@@ -89,7 +90,7 @@ void wxGxDiscConnections::Refresh(void)
 }
 
 void wxGxDiscConnections::Init(wxXmlNode* const pConfigNode)
-{    
+{
     LoadConnectionsStorage();
 }
 
@@ -217,7 +218,7 @@ void wxGxDiscConnections::LoadChildren(void)
 */
 bool wxGxDiscConnections::ConnectFolder(const wxString &sPath)
 {
-    wxCriticalSectionLocker locker(m_oCritSect);     
+    wxCriticalSectionLocker locker(m_oCritSect);
     if(!wxDir::Exists(sPath))
         return false;
     //find max id
@@ -243,7 +244,7 @@ bool wxGxDiscConnections::ConnectFolder(const wxString &sPath)
 		wxXmlNode* pDiscConn = new wxXmlNode(pConnectionsNode, wxXML_ELEMENT_NODE, wxT("DiscConnection"));
 
 	    pDiscConn->AddAttribute(wxT("name"), sPath);
-	    pDiscConn->AddAttribute(wxT("path"), sPath);        
+	    pDiscConn->AddAttribute(wxT("path"), sPath);
         SetDecimalValue(pDiscConn, wxT("id"), nMaxId);
 
         return doc.Save(m_sXmlStoragePath);
@@ -253,8 +254,8 @@ bool wxGxDiscConnections::ConnectFolder(const wxString &sPath)
 
 bool wxGxDiscConnections::DisconnectFolder(int nXmlId)
 {
-    wxCriticalSectionLocker locker(m_oCritSect);     
-    
+    wxCriticalSectionLocker locker(m_oCritSect);
+
     wxXmlDocument doc;
     //try to load connections xml file
     if(doc.Load(m_sXmlStoragePath))
