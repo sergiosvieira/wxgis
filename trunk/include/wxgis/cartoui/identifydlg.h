@@ -109,7 +109,10 @@ public:
     virtual void OnColClick(wxListEvent& event);
 	virtual void OnMaskMenu(wxCommandEvent& event);
     virtual void OnMouseLeftUp(wxMouseEvent& event);
-    virtual void OnSetCursor(wxSetCursorEvent& event);
+    virtual void OnMouseMove(wxMouseEvent& event);
+
+    //not work on GTK
+    //virtual void OnSetCursor(wxSetCursorEvent& event);
 protected:
 	void WriteStringToClipboard(const wxString &sData);
     bool IsURL(const wxString &sText);
