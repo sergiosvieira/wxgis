@@ -46,7 +46,7 @@ extern WXDLLIMPEXP_GIS_CORE wxGISAppConfig GetConfig(void)
 IMPLEMENT_CLASS(wxGISConfig, wxObject)
 
 wxGISConfig::wxGISConfig()
-{    
+{
 }
 
 wxGISConfig::wxGISConfig(const wxString &sVendorName, bool bPortable)
@@ -59,7 +59,7 @@ void wxGISConfig::Create(const wxString &sVendorName, bool bPortable)
     if(m_refData)
         return;
 
- 	wxStandardPaths stp;    
+ 	wxStandardPaths stp;
     m_refData = new wxGISConfigRefData();
 
 	((wxGISConfigRefData *)m_refData)->m_sAppExeDirPath = wxPathOnly(stp.GetExecutablePath());
@@ -249,7 +249,7 @@ wxXmlNode *wxGISConfig::GetConfigRootNode(wxGISEnumConfigKey Key, const wxString
 
 		//create new config
 		if(!pXmlDoc || !pXmlDoc->IsOk())
-		{			
+		{
 			wxString sRootNodeName = sFileName.Left(sFileName.Len() - 4);//trim ".xml"
             pXmlDoc = new wxXmlDocument();
 			pXmlDoc->SetRoot(new wxXmlNode(wxXML_ELEMENT_NODE, sRootNodeName));
@@ -466,28 +466,28 @@ bool wxGISConfig::Write(wxGISEnumConfigKey Key, const wxString &sPath, int nValu
 	return true;
 }
 
-wxString wxGISConfig::GetLocalConfigDir(void) const 
+wxString wxGISConfig::GetLocalConfigDir(void) const
 {
     wxCHECK_MSG( IsOk(), wxEmptyString, wxT("Invalid wxGISConfig") );
     return ((wxGISConfigRefData *)m_refData)->m_sLocalConfigDirPath;
 }
 
-wxString wxGISConfig::GetGlobalConfigDir(void) const 
+wxString wxGISConfig::GetGlobalConfigDir(void) const
 {
     wxCHECK_MSG( IsOk(), wxEmptyString, wxT("Invalid wxGISConfig") );
     return ((wxGISConfigRefData *)m_refData)->m_sGlobalConfigDirPath;
 }
 
-wxString wxGISConfig::GetLocalConfigDirNonPortable(void) const 
+wxString wxGISConfig::GetLocalConfigDirNonPortable(void) const
 {
     wxCHECK_MSG( IsOk(), wxEmptyString, wxT("Invalid wxGISConfig") );
     return ((wxGISConfigRefData *)m_refData)->m_sLocalConfigDirPathNonPortable;
 }
 
-void wxGISConfig::Save(void)
+void wxGISConfig::Save(const wxGISEnumConfigKey Key)
 {
     wxCHECK_RET( IsOk(), wxT("Invalid wxGISConfig") );
-    return ((wxGISConfigRefData *)m_refData)->Save();
+    return ((wxGISConfigRefData *)m_refData)->Save(Key);
 }
 
 //---------------------------------------------------------------

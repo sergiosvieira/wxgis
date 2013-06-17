@@ -29,7 +29,7 @@
 #include "wx/listctrl.h"
 #include "wx/imaglist.h"
 
-class WXDLLIMPEXP_GIS_CLU wxGxApplication;
+class wxGxApplication;
 
 #define LISTSTYLE (wxLC_REPORT | wxBORDER_NONE | wxLC_EDIT_LABELS |wxLC_SORT_ASCENDING | wxLC_AUTOARRANGE) //wxLC_LIST
 

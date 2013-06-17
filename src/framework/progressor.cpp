@@ -49,6 +49,8 @@ int wxGISProgressor::GetRange() const
 
 void wxGISProgressor::SetValue(int value)
 {
+    if(GetRange() < value)
+        return;
 	m_nValue = value;
 	wxGauge::SetValue(value);
     if(m_bYield)

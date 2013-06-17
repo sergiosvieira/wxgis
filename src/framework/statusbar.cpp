@@ -30,6 +30,7 @@ BEGIN_EVENT_TABLE(wxGISStatusBar, wxStatusBar)
 	EVT_SIZE(wxGISStatusBar::OnSize)
 	EVT_TIMER( TIMER_ID, wxGISStatusBar::OnTimer )
 	EVT_RIGHT_DOWN(wxGISStatusBar::OnRightDown)
+	 EVT_COMMAND(wxID_ANY, wxEVT_COMMAND_BUTTON_CLICKED, wxGISStatusBar::OnMessage)
 END_EVENT_TABLE()
 
 wxGISStatusBar::wxGISStatusBar() : wxStatusBar()
@@ -128,7 +129,11 @@ wxGISStatusBar::wxGISStatusBar(wxWindow *parent, wxWindowID id, long style, cons
 	}
 	if(panelsstyle & enumGISStatusClock)
 	{
+#ifdef __WXGTK__
+		STATUSPANEL data = {64, wxSB_NORMAL};
+#else
 		STATUSPANEL data = {48, wxSB_NORMAL};
+#endif
 		panels.push_back(data);
 		m_ClockPos = counter;
 		counter++;
@@ -184,7 +189,15 @@ void wxGISStatusBar::OnSize(wxSizeEvent &event)
 
 void wxGISStatusBar::SetMessage(const wxString& text, int i)
 {
-	SetStatusText(text, i);
+    wxCommandEvent MessageEvent( wxEVT_COMMAND_BUTTON_CLICKED ); // Keep it simple, don't give a specific event ID
+    MessageEvent.SetString(text);
+    MessageEvent.SetInt(i);
+    wxPostEvent(this, MessageEvent);
+}
+
+void wxGISStatusBar::OnMessage(wxCommandEvent &event)
+{
+	SetStatusText(event.GetString(), event.GetInt());
 }
 
 wxString wxGISStatusBar::GetMessage(int i) const
