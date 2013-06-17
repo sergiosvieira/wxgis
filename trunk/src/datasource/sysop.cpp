@@ -32,8 +32,8 @@ bool DeleteDir(const CPLString &sPath, ITrackCancel* const pTrackCancel)
     if (result == -1)
     {
         if(pTrackCancel)
-        { 
-            const char* szErr = CPLGetLastErrorMsg(); 
+        {
+            const char* szErr = CPLGetLastErrorMsg();
             wxString sErr = wxString::Format(_("Delete folder failed! GDAL error: %s, folder '%s'"), wxString(szErr, wxConvUTF8).c_str(), wxString(sPath, wxConvUTF8).c_str());
             wxLogError(sErr);
             pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageErr);
@@ -54,8 +54,8 @@ bool CreateDir(const CPLString &sPath, long mode, ITrackCancel* const pTrackCanc
     if( VSIMkdir( sPath, mode ) != 0 )
     {
         if(pTrackCancel)
-        { 
-            const char* szErr = CPLGetLastErrorMsg(); 
+        {
+            const char* szErr = CPLGetLastErrorMsg();
             wxString sErr = wxString::Format(_("Create folder failed! GDAL error: %s, folder '%s'"), wxString(szErr, wxConvUTF8).c_str(), wxString(sPath, wxConvUTF8).c_str());
             wxLogError(sErr);
             pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageErr);
@@ -67,7 +67,7 @@ bool CreateDir(const CPLString &sPath, long mode, ITrackCancel* const pTrackCanc
         wxString sErr = wxString::Format(_("Create folder succeeded! Folder '%s'"), wxString(sPath, wxConvUTF8).c_str());
         wxLogVerbose(sErr);
         pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageInfo);
-    }    
+    }
     return true;
 }
 
@@ -77,8 +77,8 @@ bool DeleteFile(const CPLString &sPath, ITrackCancel* const pTrackCancel)
     if (result == -1)
     {
         if(pTrackCancel)
-        { 
-            const char* szErr = CPLGetLastErrorMsg(); 
+        {
+            const char* szErr = CPLGetLastErrorMsg();
             wxString sErr = wxString::Format(_("Delete file failed! GDAL error: %s, file '%s'"), wxString(szErr, wxConvUTF8).c_str(), wxString(sPath, wxConvUTF8).c_str());
             wxLogError(sErr);
             pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageErr);
@@ -100,8 +100,8 @@ bool RenameFile(const CPLString &sOldPath, const CPLString &sNewPath, ITrackCanc
     if (result == -1)
     {
         if(pTrackCancel)
-        { 
-            const char* szErr = CPLGetLastErrorMsg(); 
+        {
+            const char* szErr = CPLGetLastErrorMsg();
             wxString sErr = wxString::Format(_("Rename file failed! GDAL error: %s, old path '%s', new path '%s'"), wxString(szErr, wxConvUTF8).c_str(), wxString(sOldPath, wxConvUTF8).c_str(), wxString(sNewPath, wxConvUTF8).c_str());
             wxLogError(sErr);
             pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageErr);
@@ -619,7 +619,7 @@ bool CopyFile(const CPLString &sDestPath, const CPLString &sSrcPath, ITrackCance
         wxString sErr(_("Error open input file! OGR error: "));
         CPLString sFullErr(sErr.mb_str());
         sFullErr += CPLGetLastErrorMsg();
-        CPLError( CE_Failure, CPLE_FileIO, sFullErr);
+        CPLError( CE_Failure, CPLE_FileIO, "%s", (const char *)sFullErr);
         if(pTrackCancel)
             pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;
@@ -633,7 +633,7 @@ bool CopyFile(const CPLString &sDestPath, const CPLString &sSrcPath, ITrackCance
         wxString sErr(_("Error create the output file '%s'! OGR error: "));
         CPLString sFullErr(sErr.mb_str());
         sFullErr += CPLGetLastErrorMsg();
-        CPLError( CE_Failure, CPLE_FileIO, sFullErr);
+        CPLError( CE_Failure, CPLE_FileIO, "%s", (const char *)sFullErr);
         if(pTrackCancel)
             pTrackCancel->PutMessage(wxString(sFullErr, wxConvLocal), -1, enumGISMessageErr);
         return false;

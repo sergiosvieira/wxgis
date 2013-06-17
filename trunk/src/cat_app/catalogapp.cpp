@@ -36,12 +36,20 @@ wxGISCatalogApp::wxGISCatalogApp(void) : wxApp()
 
 wxGISCatalogApp::~wxGISCatalogApp(void)
 {
-	SerializeLibs();
+    wxGISAppConfig oConfig = GetConfig();
+
+    SerializeLibs();
 
 	GDALDestroyDriverManager();
 	OGRCleanupAll();
 
 	UnLoadLibs();
+
+//the config state storing to files while destruction config class (smart pointer)
+//on linux saving file in destructor produce segmentation fault
+	if(oConfig.IsOk())
+		oConfig.Save(enumGISHKCU);
+
 }
 
 bool wxGISCatalogApp::OnInit()
@@ -100,6 +108,8 @@ bool wxGISCatalogApp::OnInit()
 
 	//gdal
 	oConfig.Write(enumGISHKCU, wxString(wxT("wxGISCommon/GDAL/cachemax")), sGDALCacheMax);
+
+	oConfig.Save();
 
     wxString sKey(wxT("wxGISCommon/libs"));
     //load libs

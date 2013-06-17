@@ -23,7 +23,7 @@
 #include "wxgis/framework/animation.h"
 #include "wxgis/framework/progressor.h"
 
-#include <wx/statusbr.h> 
+#include <wx/statusbr.h>
 
 class WXDLLIMPEXP_GIS_FRW wxGISApplicationBase;
 
@@ -34,7 +34,7 @@ class WXDLLIMPEXP_GIS_FRW wxGISApplicationBase;
 */
 enum wxGISEnumStatusBarPanels
 {
-	enumGISStatusMain           = 0x0001, 
+	enumGISStatusMain           = 0x0001,
 	enumGISStatusAnimation      = 0x0002,
 	enumGISStatusPosition       = 0x0004,
 	enumGISStatusPagePosition   = 0x0008,
@@ -44,7 +44,7 @@ enum wxGISEnumStatusBarPanels
 	enumGISStatusScrollLock     = 0x0080,
 	enumGISStatusClock          = 0x0100,
 	enumGISStatusProgress       = 0x0200
-}; 
+};
 
 /** \class wxGISStatusBar statusbar.h
     \brief wxGIS statusbar class.
@@ -68,23 +68,23 @@ public:
      *  \brief Put message to the status bar.
      *  \param text The message text
      *  \param i The panel index (default 0 - the first panel)
-     */	
+     */
 	void SetMessage(const wxString& text, int i = 0);
     /** \fn virtual wxString GetMessage
      *  \brief Get message from the status bar.
      *  \param i The panel index (default 0 - the first panel)
      *  \return The message in i-th panel of status bar
-     */	
+     */
 	wxString GetMessage(int i = 0) const;
     /** \fn virtual int GetPanePos(wxGISEnumStatusBarPanes nPane)
      *  \brief Get the panel pos by it's type.
      *  \return The panel index
-     */	  
+     */
     int GetPanelPos(wxGISEnumStatusBarPanels nPanel);
     /** \fn virtual IProgressor* GetAnimation(void)
      *  \brief Get the animated progressor (rotating globe).
      *  \return The IProgressor pointer
-     */	
+     */
 	IProgressor* GetAnimation(void) const
 	{
 		if(m_Panels & enumGISStatusAnimation)
@@ -94,7 +94,7 @@ public:
     /** \fn virtual IProgressor* GetProgressor(void)
      *  \brief Get the progressor (progress bar).
      *  \return The IProgressor pointer
-     */	
+     */
 	IProgressor* GetProgressor(void) const
 	{
 		if(m_Panels & enumGISStatusProgress)
@@ -104,19 +104,19 @@ public:
 
     /** \fn virtual WXDWORD GetPanes(void)
      *  \brief Get the status bar style (the combination of wxGISEnumStatusBarPanes)
-     *  \return The status bar style 
-     */		
+     *  \return The status bar style
+     */
     WXDWORD GetPanels(void) const {return m_Panels;};
     /** \fn virtual void SetPanes(WXDWORD Panes)
      *  \brief Set the panel style (the combination of wxGISEnumStatusBarPanes)
      *  \param Panes The status bar style
-     */		
+     */
     void SetPanels(WXDWORD Panels){m_Panels = Panels;};
 	//events
 	void OnSize(wxSizeEvent &event);
 	void OnRightDown(wxMouseEvent& event);
     void OnTimer( wxTimerEvent & event);
-
+    void OnMessage(wxCommandEvent &event);
 typedef struct _statuspanel
 	{
 		int size;

@@ -63,14 +63,14 @@ public:
 	wxString GetGlobalConfigDir(void) const;
 	wxString GetLocalConfigDirNonPortable(void) const;
 
-    void Save(void);
+    void Save(const wxGISEnumConfigKey Key = enumGISHKAny);
 protected:
 	bool SplitPathToXml(const wxString &  fullpath, wxString *psFileName, wxString *psPathInXml);
 	bool SplitPathToAttribute(const wxString &  fullpath, wxString *psPathToAttribute, wxString *psAttributeName);
 	wxXmlNode* GetConfigRootNode(wxGISEnumConfigKey Key, const wxString &sFileName) const;
 protected:
     virtual wxObjectRefData *CreateRefData() const;
-    virtual wxObjectRefData *CloneRefData(const wxObjectRefData *data) const;    
+    virtual wxObjectRefData *CloneRefData(const wxObjectRefData *data) const;
 };
 
 /** \class wxGISConfigRefData config.h
@@ -89,15 +89,18 @@ public:
     virtual ~wxGISConfigRefData()
     {
         wxGISEnumConfigKey CmpKey = enumGISHKCU;//bInstall == true ? enumGISHKLM : enumGISHKCU;
-	    for(size_t i = 0; i < m_paConfigFiles.size(); ++i)
+ 	    for(size_t i = 0; i < m_paConfigFiles.size(); ++i)
 	    {
-            //Store only user settings. Common settings should be changed during install process
-            if(m_paConfigFiles[i].eKey == CmpKey)
-            {
-                wxString sXmlFilePath = m_paConfigFiles[i].sXmlFilePath;
-            //if(wxFileName::IsFileWritable(sXmlFilePath))
-                m_paConfigFiles[i].pXmlDoc->Save(sXmlFilePath);
-            }
+//the config state storing to files while destruction config class (smart pointer)
+//on linux saving file in destructor produce segmentation fault
+//#ifdef __WXMSW__
+//            //Store only user settings. Common settings should be changed during install process
+//            if(m_paConfigFiles[i].eKey == CmpKey)
+//            {
+//                wxString sXmlFilePath = m_paConfigFiles[i].sXmlFilePath;
+//                m_paConfigFiles[i].pXmlDoc->Save(sXmlFilePath);
+//            }
+//#endif
             wxDELETE(m_paConfigFiles[i].pXmlDoc);
 	    }
 	    m_paConfigFiles.clear();
@@ -109,8 +112,12 @@ public:
         {
 	        for(size_t i = 0; i < m_paConfigFiles.size(); ++i)
             {
-                //if(wxFileName::IsFileWritable(m_paConfigFiles[i].sXmlFilePath))
-                    m_paConfigFiles[i].pXmlDoc->Save(m_paConfigFiles[i].sXmlFilePath);
+                if(Key == enumGISHKAny || m_paConfigFiles[i].eKey & Key)
+                {
+                    //if(wxFileName::IsFileWritable(m_paConfigFiles[i].sXmlFilePath))
+                    wxString sXmlFilePath = m_paConfigFiles[i].sXmlFilePath;
+                    m_paConfigFiles[i].pXmlDoc->Save(sXmlFilePath);
+                }
 	        }
         }
         else
@@ -119,7 +126,7 @@ public:
             {
                 if(m_paConfigFiles[i].eKey & Key && m_paConfigFiles[i].sXmlFileName.CmpNoCase(sXmlFileName) == 0)
                     m_paConfigFiles[i].pXmlDoc->Save(m_paConfigFiles[i].sXmlFilePath);
-	        }      
+	        }
         }
     }
 
@@ -136,11 +143,11 @@ public:
 
     bool operator == (const wxGISConfigRefData& data) const
     {
-        return m_sLocalConfigDirPath == data.m_sLocalConfigDirPath && 
-            m_sGlobalConfigDirPath == data.m_sGlobalConfigDirPath && 
-            m_sLocalConfigDirPathNonPortable == data.m_sLocalConfigDirPathNonPortable && 
-            m_bPortable == data.m_bPortable && 
-            m_pmConfigNodes.size() == data.m_pmConfigNodes.size() && 
+        return m_sLocalConfigDirPath == data.m_sLocalConfigDirPath &&
+            m_sGlobalConfigDirPath == data.m_sGlobalConfigDirPath &&
+            m_sLocalConfigDirPathNonPortable == data.m_sLocalConfigDirPathNonPortable &&
+            m_bPortable == data.m_bPortable &&
+            m_pmConfigNodes.size() == data.m_pmConfigNodes.size() &&
             m_paConfigFiles.size() == data.m_paConfigFiles.size();
     }
 
@@ -183,7 +190,7 @@ public:
     void SetLocaleDir(const wxString &sLocaleDir);
     void SetSysDir(const wxString &sSysDir);
 	void SetLogDir(const wxString &sLogDir);
-    void SetDebugMode(bool bDebug);   
+    void SetDebugMode(bool bDebug);
 };
 
 /** \fn wxGISAppConfig GetConfig(void)
