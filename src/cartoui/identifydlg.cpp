@@ -25,10 +25,11 @@
 #include <cmath>
 
 #include "../../art/splitter_switch.xpm"
-#include "../../art/layers.xpm"
-#include "../../art/layer16.xpm"
+#include "../../art/layers_16.xpm"
+#include "../../art/layer_16.xpm"
 #include "../../art/id.xpm"
 #include "../../art/small_arrow.xpm"
+#include "../../art/field_16.xpm"
 
 int wxCALLBACK FieldValueCompareFunction(wxIntPtr item1, wxIntPtr item2, wxIntPtr sortData)
 {
@@ -109,6 +110,7 @@ wxGISFeatureDetailsPanel::wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID
 
 	m_ImageListSmall.Add(wxBitmap(SmallDown));
 	m_ImageListSmall.Add(wxBitmap(SmallUp));
+    m_ImageListSmall.Add(wxBitmap(field_16_xpm));
 
 	m_listCtrl->SetImageList(&m_ImageListSmall, wxIMAGE_LIST_SMALL);
 
@@ -178,7 +180,7 @@ void wxGISFeatureDetailsPanel::FillPanel(wxGISFeature &Feature)
 
         wxString sName = Feature.GetFieldName(i);
 
-		long pos = m_listCtrl->InsertItem(i, sName, wxNOT_FOUND);
+		long pos = m_listCtrl->InsertItem(i, sName, 2);
 
         wxListItem item_val;
         item_val.SetColumn(1);
@@ -501,8 +503,8 @@ bool wxGISIdentifyDlg::Create(wxWindow* parent, wxWindowID id, const wxPoint& po
 	m_bMainSizer->Add( m_splitter, 1, wxEXPAND, 5 );
 
 	m_TreeImageList.Create(16, 16);
-	m_TreeImageList.Add(wxBitmap(layers_xpm));
-	m_TreeImageList.Add(wxBitmap(layer16_xpm));
+	m_TreeImageList.Add(wxBitmap(layers_16_xpm));
+	m_TreeImageList.Add(wxBitmap(layer_16_xpm));
 	m_TreeImageList.Add(wxBitmap(id_xpm));
 
     int nOSMajorVer(0);
