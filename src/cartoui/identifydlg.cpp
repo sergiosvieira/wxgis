@@ -391,20 +391,13 @@ void wxGISFeatureDetailsPanel::OnMouseMove(wxMouseEvent& event)
         row_info.m_col = 1;
         row_info.m_mask = wxLIST_MASK_TEXT;
         m_listCtrl->GetItem( row_info );
-    wxLogDebug(wxT("OnSetCursor %s flags %d item %d"), row_info.m_text, flags, item);
         if(IsURL(row_info.m_text) || IsLocalURL(row_info.m_text))
         {
             m_listCtrl->SetCursor(wxCursor(wxCURSOR_HAND));
-        }
-        else
-        {
-            m_listCtrl->SetCursor(wxCursor(wxCURSOR_RIGHT_ARROW));
+            return;
         }
     }
-    else
-    {
-        m_listCtrl->SetCursor(wxCursor(wxCURSOR_ARROW));
-    }
+    m_listCtrl->SetCursor(wxCursor(wxCURSOR_ARROW));
 }
 
 //not work on GTK
