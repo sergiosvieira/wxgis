@@ -115,7 +115,11 @@ wxGISFeatureDetailsPanel::wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID
 	m_listCtrl->SetImageList(&m_ImageListSmall, wxIMAGE_LIST_SMALL);
 
     m_listCtrl->Bind(wxEVT_LEFT_DOWN, &wxGISFeatureDetailsPanel::OnMouseLeftUp, this);
-    m_listCtrl->Bind(wxEVT_SET_CURSOR, &wxGISFeatureDetailsPanel::OnSetCursor, this);
+
+    //not work on GTK
+    //m_listCtrl->Bind(wxEVT_SET_CURSOR, &wxGISFeatureDetailsPanel::OnSetCursor, this);
+
+    m_listCtrl->Bind(wxEVT_MOTION, &wxGISFeatureDetailsPanel::OnMouseMove, this);
 
 	bSizer1->Add( m_listCtrl, 1, wxALL|wxEXPAND, 5 );
 
@@ -372,27 +376,61 @@ void wxGISFeatureDetailsPanel::OnColClick(wxListEvent& event)
     m_listCtrl->SetColumn(m_currentSortCol, item);
 }
 
-void wxGISFeatureDetailsPanel::OnSetCursor(wxSetCursorEvent& event)
+void wxGISFeatureDetailsPanel::OnMouseMove(wxMouseEvent& event)
 {
-    //event.Skip();
+    event.Skip();
     wxPoint pt(event.GetX(), event.GetY());
     //pt = ClientToScreen(pt);
     //pt = m_listCtrl->ScreenToClient(pt);
     int flags;
     long item = m_listCtrl->HitTest(pt, flags);
-    if (item > -1 && (flags & wxLIST_HITTEST_ONITEM))
+    if ((item > -1) && (flags & wxLIST_HITTEST_ONITEM))
     {
         wxListItem row_info;
         row_info.m_itemId = item;
         row_info.m_col = 1;
         row_info.m_mask = wxLIST_MASK_TEXT;
         m_listCtrl->GetItem( row_info );
+    wxLogDebug(wxT("OnSetCursor %s flags %d item %d"), row_info.m_text, flags, item);
         if(IsURL(row_info.m_text) || IsLocalURL(row_info.m_text))
         {
-            event.SetCursor(wxCursor(wxCURSOR_HAND));
+            m_listCtrl->SetCursor(wxCursor(wxCURSOR_HAND));
+        }
+        else
+        {
+            m_listCtrl->SetCursor(wxCursor(wxCURSOR_RIGHT_ARROW));
         }
     }
+    else
+    {
+        m_listCtrl->SetCursor(wxCursor(wxCURSOR_ARROW));
+    }
 }
+
+//not work on GTK
+//void wxGISFeatureDetailsPanel::OnSetCursor(wxSetCursorEvent& event)
+//{
+//    //event.Skip();
+//    wxPoint pt(event.GetX(), event.GetY());
+//    //pt = ClientToScreen(pt);
+//    //pt = m_listCtrl->ScreenToClient(pt);
+//    int flags;
+//    long item = m_listCtrl->HitTest(pt, flags);
+//    if ((item > -1) && (flags & wxLIST_HITTEST_ONITEM))
+//    {
+//        wxListItem row_info;
+//        row_info.m_itemId = item;
+//        row_info.m_col = 1;
+//        row_info.m_mask = wxLIST_MASK_TEXT;
+//        m_listCtrl->GetItem( row_info );
+//    wxLogDebug(wxT("OnSetCursor %s flags %d item %d"), row_info.m_text, flags, item);
+//        if(IsURL(row_info.m_text) || IsLocalURL(row_info.m_text))
+//        {
+//            event.SetCursor(wxCursor(wxCURSOR_HAND));
+//            m_listCtrl->SetFocus();
+//        }
+//    }
+//}
 
 void wxGISFeatureDetailsPanel::OnMouseLeftUp(wxMouseEvent& event)
 {
