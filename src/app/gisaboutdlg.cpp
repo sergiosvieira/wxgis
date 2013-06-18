@@ -103,10 +103,12 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
 
 	bHeadSizer->Add( m_bitmap, 0, 0, 5 );
 
+	//wxGenericStaticText* pTitle = new wxGenericStaticText(this, wxID_ANY, wxString::Format(_("\nwxGIS [%s] (x64)\nVersion: %s"), pApp->GetAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0);
+
 #ifdef _WIN64
-    m_title = new wxStaticText( this, wxID_ANY, wxString::Format(_("\nwxGIS [%s] (x64)\nVersion: %s"), pApp->GetAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0 );
+    m_title = new wxGenericStaticText( this, wxID_ANY, wxString::Format(_("\nwxGIS [%s] (x64)\nVersion: %s"), pApp->GetAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0 );
 #else
-     m_title = new wxStaticText( this, wxID_ANY, wxString::Format(_("\nwxGIS [%s] (x86)\nVersion: %s"), pApp->GetAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0 );
+     m_title = new wxGenericStaticText( this, wxID_ANY, wxString::Format(_("\nwxGIS [%s] (x86)\nVersion: %s"), pApp->GetAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0 );
 #endif
 
     wxFont titleFont = this->GetFont();
@@ -150,7 +152,7 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
     sWXStr << wxT("-ANSI build");
 #endif // wxUSE_UNICODE
 
-#ifdef wxGIS_USE_CAIRO   
+#ifdef wxGIS_USE_CAIRO
     wxString sCAIROStr = wxString(cairo_version_string(), wxConvLocal);
 #endif
 
