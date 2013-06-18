@@ -25,6 +25,12 @@
 
 #include "../../art/document_16.xpm"
 
+#ifdef __WXMSW__
+    #define wxGIS_LIST_STATE_DROPHILITED wxLIST_STATE_DROPHILITED
+#else
+    #define wxGIS_LIST_STATE_DROPHILITED wxLIST_STATE_SELECTED
+#endif
+
 //---------------------------------------------------------------------------------
 // wxGxPathsListView
 //---------------------------------------------------------------------------------
@@ -52,7 +58,9 @@ wxGxPathsListView::wxGxPathsListView(wxWindow* parent, wxWindowID id, const wxPo
 wxGxPathsListView::~wxGxPathsListView(void)
 {
     for(long i = 0; i < GetItemCount(); ++i)
+    {
 		delete (LPITEMDATA)GetItemData(i);
+    }
 }
 
 bool wxGxPathsListView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
@@ -74,7 +82,7 @@ void wxGxPathsListView::Activate()
 
 void wxGxPathsListView::OnMouseMove(wxMouseEvent& event)
 {
-    SetItemState(m_HighLightItem, 0, wxLIST_STATE_DROPHILITED);
+    SetItemState(m_HighLightItem, 0, wxGIS_LIST_STATE_DROPHILITED);
     wxPoint pt = event.GetPosition();
 	unsigned long nFlags(0);
 	long nItemId = HitTest(pt, (int &)nFlags);
@@ -87,7 +95,7 @@ void wxGxPathsListView::OnMouseMove(wxMouseEvent& event)
  //           ScrollLines(1);
 
         m_HighLightItem = nItemId;
-        SetItemState(m_HighLightItem, wxLIST_STATE_DROPHILITED, wxLIST_STATE_DROPHILITED);
+        SetItemState(m_HighLightItem, wxGIS_LIST_STATE_DROPHILITED, wxGIS_LIST_STATE_DROPHILITED);
 
     }
     event.Skip();
@@ -95,13 +103,13 @@ void wxGxPathsListView::OnMouseMove(wxMouseEvent& event)
 
 void wxGxPathsListView::OnMouseClick(wxMouseEvent& event)
 {
-    SetItemState(m_HighLightItem, 0, wxLIST_STATE_DROPHILITED);
+    SetItemState(m_HighLightItem, 0, wxGIS_LIST_STATE_DROPHILITED);
     wxPoint pt = event.GetPosition();
 	unsigned long nFlags(0);
 	long nItemId = HitTest(pt, (int &)nFlags);
 	if(nItemId != wxNOT_FOUND && (nFlags & wxLIST_HITTEST_ONITEM))
 	{
-        SetItemState(nItemId, wxLIST_STATE_DROPHILITED, wxLIST_STATE_DROPHILITED);
+        SetItemState(nItemId, wxGIS_LIST_STATE_DROPHILITED, wxGIS_LIST_STATE_DROPHILITED);
     }
     event.Skip();
 }
@@ -167,49 +175,49 @@ void wxGxPathsListView::OnChar(wxKeyEvent& event)
     {
     case WXK_UP:
         {
-            long nSelItem = GetNextItem(wxNOT_FOUND, wxLIST_NEXT_ALL, wxLIST_STATE_DROPHILITED);
+            long nSelItem = GetNextItem(wxNOT_FOUND, wxLIST_NEXT_ALL, wxGIS_LIST_STATE_DROPHILITED);
             if(nSelItem == wxNOT_FOUND)
             {
                 m_HighLightItem = 0;
-                SetItemState(m_HighLightItem, wxLIST_STATE_DROPHILITED, wxLIST_STATE_DROPHILITED);
+                SetItemState(m_HighLightItem, wxGIS_LIST_STATE_DROPHILITED, wxGIS_LIST_STATE_DROPHILITED);
             }
-            else 
+            else
             {
-                SetItemState(nSelItem, 0, wxLIST_STATE_DROPHILITED);
+                SetItemState(nSelItem, 0, wxGIS_LIST_STATE_DROPHILITED);
                 if(nSelItem == 0)
-                {           
+                {
                     m_HighLightItem = GetItemCount() - 1;
-                    SetItemState(m_HighLightItem, wxLIST_STATE_DROPHILITED, wxLIST_STATE_DROPHILITED);
+                    SetItemState(m_HighLightItem, wxGIS_LIST_STATE_DROPHILITED, wxGIS_LIST_STATE_DROPHILITED);
                 }
                 else
                 {
                     m_HighLightItem = nSelItem - 1;
-                    SetItemState(m_HighLightItem, wxLIST_STATE_DROPHILITED, wxLIST_STATE_DROPHILITED);
+                    SetItemState(m_HighLightItem, wxGIS_LIST_STATE_DROPHILITED, wxGIS_LIST_STATE_DROPHILITED);
                 }
-            }            
+            }
         }
         event.Skip(false);
         break;
     case WXK_DOWN:
         {
-            long nSelItem = GetNextItem(wxNOT_FOUND, wxLIST_NEXT_ALL, wxLIST_STATE_DROPHILITED);
+            long nSelItem = GetNextItem(wxNOT_FOUND, wxLIST_NEXT_ALL, wxGIS_LIST_STATE_DROPHILITED);
             if(nSelItem == wxNOT_FOUND)
             {
                 m_HighLightItem = 0;
-                SetItemState(m_HighLightItem, wxLIST_STATE_DROPHILITED, wxLIST_STATE_DROPHILITED);
+                SetItemState(m_HighLightItem, wxGIS_LIST_STATE_DROPHILITED, wxGIS_LIST_STATE_DROPHILITED);
             }
             else
             {
-                SetItemState(nSelItem, 0, wxLIST_STATE_DROPHILITED);
+                SetItemState(nSelItem, 0, wxGIS_LIST_STATE_DROPHILITED);
                 if(nSelItem == GetItemCount() - 1)
-                {            
+                {
                     m_HighLightItem = 0;
-                    SetItemState(m_HighLightItem, wxLIST_STATE_DROPHILITED, wxLIST_STATE_DROPHILITED);
+                    SetItemState(m_HighLightItem, wxGIS_LIST_STATE_DROPHILITED, wxGIS_LIST_STATE_DROPHILITED);
                 }
                 else
                 {
                     m_HighLightItem = nSelItem + 1;
-                    SetItemState(m_HighLightItem, wxLIST_STATE_DROPHILITED, wxLIST_STATE_DROPHILITED);
+                    SetItemState(m_HighLightItem, wxGIS_LIST_STATE_DROPHILITED, wxGIS_LIST_STATE_DROPHILITED);
                 }
             }
         }
@@ -238,7 +246,7 @@ bool wxListViewComboPopup::Create(wxWindow* parent, wxWindowID id, const wxPoint
 }
 
 void wxListViewComboPopup::Init()
-{	
+{
 }
 
 void wxListViewComboPopup::OnPopup()
@@ -331,11 +339,11 @@ void wxListViewComboPopup::OnChar(wxKeyEvent& event)
                 m_HighLightItem = 0;
                 SetItemState(m_HighLightItem, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
             }
-            else 
+            else
             {
                 SetItemState(nSelItem, 0, wxLIST_STATE_SELECTED);
                 if(nSelItem == 0)
-                {           
+                {
                     m_HighLightItem = GetItemCount() - 1;
                     SetItemState(m_HighLightItem, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
                 }
@@ -344,7 +352,7 @@ void wxListViewComboPopup::OnChar(wxKeyEvent& event)
                     m_HighLightItem = nSelItem - 1;
                     SetItemState(m_HighLightItem, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
                 }
-            }            
+            }
         }
         if(m_HighLightItem != wxNOT_FOUND)
         {
@@ -364,7 +372,7 @@ void wxListViewComboPopup::OnChar(wxKeyEvent& event)
             {
                 SetItemState(nSelItem, 0, wxLIST_STATE_SELECTED);
                 if(nSelItem == GetItemCount() - 1)
-                {            
+                {
                     m_HighLightItem = 0;
                     SetItemState(m_HighLightItem, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
                 }
@@ -445,7 +453,7 @@ wxRect wxGxPathsListViewPopup::GetViewRect() const
 void wxGxPathsListViewPopup::Show(const wxString &sPath)
 {
     Update(sPath);
-    
+
     //m_pGxPathsListView->CaptureMouse();
     wxPopupWindow::Show();
 }
@@ -456,7 +464,7 @@ void wxGxPathsListViewPopup::Update(const wxString &sPath)
 
     wxFileName name(sPath);
 
-    wxString sVal = name.GetPath(wxPATH_GET_VOLUME | wxPATH_NO_SEPARATOR); 
+    wxString sVal = name.GetPath(wxPATH_GET_VOLUME | wxPATH_NO_SEPARATOR);
     wxGxCatalogBase* pCatalog = GetGxCatalog();
     wxGxObjectContainer* pGxObjectCont = wxDynamicCast(pCatalog->FindGxObject(sVal), wxGxObjectContainer);
     if(pGxObjectCont && pGxObjectCont->HasChildren())
@@ -465,19 +473,19 @@ void wxGxPathsListViewPopup::Update(const wxString &sPath)
         for(iter = pGxObjectCont->GetChildren().begin(); iter != pGxObjectCont->GetChildren().end(); ++iter)
         {
             wxGxObject *current = *iter;
-            
+
             wxString sName = current->GetName();
             if(sName.MakeLower().StartsWith(name.GetName().MakeLower()))
                 Append(current->GetFullName());
         }
     }
-    
+
     wxRect rect = m_pParent->GetControlRect();
     wxPoint pt = rect.GetBottomLeft();
     wxSize size = m_pParent->GetControlSize();
 
     int nH = m_nItemHeight * m_pGxPathsListView->GetItemCount();
-    SetSize(pt.x, pt.y, size.GetWidth(), nH < m_nMaxHeight ? nH : m_nMaxHeight); 
+    SetSize(pt.x, pt.y, size.GetWidth(), nH < m_nMaxHeight ? nH : m_nMaxHeight);
 }
 
 void wxGxPathsListViewPopup::OnMouseWheel(wxMouseEvent& event)
@@ -490,7 +498,7 @@ void wxGxPathsListViewPopup::OnMouseWheel(wxMouseEvent& event)
 
 void wxGxPathsListViewPopup::OnMouseClick(wxMouseEvent& event)
 {
-    long nSelItem = m_pGxPathsListView->GetNextItem(wxNOT_FOUND, wxLIST_NEXT_ALL, wxLIST_STATE_DROPHILITED);
+    long nSelItem = m_pGxPathsListView->GetNextItem(wxNOT_FOUND, wxLIST_NEXT_ALL, wxGIS_LIST_STATE_DROPHILITED);
     if(nSelItem != wxNOT_FOUND)
     {
         m_pParent->SetControlText(m_pGxPathsListView->GetItemText(nSelItem), true);
@@ -500,14 +508,14 @@ void wxGxPathsListViewPopup::OnMouseClick(wxMouseEvent& event)
 
 void wxGxPathsListViewPopup::OnChar(wxKeyEvent& event)
 {
-    m_pGxPathsListView->GetEventHandler()->ProcessEvent(event);
 
     switch(event.GetKeyCode())
     {
     case WXK_UP:
     case WXK_DOWN:
-        {            
-            long nSelItem = m_pGxPathsListView->GetNextItem(wxNOT_FOUND, wxLIST_NEXT_ALL, wxLIST_STATE_DROPHILITED);
+    m_pGxPathsListView->GetEventHandler()->ProcessEvent(event);
+        {
+            long nSelItem = m_pGxPathsListView->GetNextItem(wxNOT_FOUND, wxLIST_NEXT_ALL, wxGIS_LIST_STATE_DROPHILITED);
             if(nSelItem != wxNOT_FOUND)
             {
                 m_pParent->SetControlText(m_pGxPathsListView->GetItemText(nSelItem), false);
@@ -520,8 +528,8 @@ void wxGxPathsListViewPopup::OnChar(wxKeyEvent& event)
     case WXK_EXECUTE:
     case WXK_NUMPAD_ENTER:
     case WXK_SELECT:
-        {            
-            long nSelItem = m_pGxPathsListView->GetNextItem(wxNOT_FOUND, wxLIST_NEXT_ALL, wxLIST_STATE_DROPHILITED);
+        {
+            long nSelItem = m_pGxPathsListView->GetNextItem(wxNOT_FOUND, wxLIST_NEXT_ALL, wxGIS_LIST_STATE_DROPHILITED);
             if(nSelItem != wxNOT_FOUND)
             {
                 m_pParent->SetControlText(m_pGxPathsListView->GetItemText(nSelItem), true);
@@ -564,10 +572,14 @@ void wxGxPathsListViewPopupParent::OnChar(wxKeyEvent& event)
     {
     case WXK_UP:
     case WXK_DOWN:
+    case WXK_RETURN:
+    case WXK_EXECUTE:
+    case WXK_NUMPAD_ENTER:
+    case WXK_SELECT:
         if(m_pProbablePathsPopup)
         {
             m_pProbablePathsPopup->GetEventHandler()->ProcessEvent(event);
-        }    
+        }
         return;
     default:
         break;
@@ -685,10 +697,9 @@ void wxGxLocationComboBox::OnSelectionChanged(wxGxSelectionEvent& event)
 	if(sPath.IsEmpty())
 		sPath = pGxObject->GetName();
 	SetControlText(sPath);
-    wxFrame* pFrame = dynamic_cast<wxFrame*>(m_pApp);
-    if(pFrame)
+    if(m_pApp)
     {
-        pFrame->SetTitle(m_pApp->GetAppName() + wxT(" - [") + sPath + wxT("]"));
+        m_pApp->UpdateTitle(sPath);
     }
 }
 
@@ -702,11 +713,11 @@ void wxGxLocationComboBox::Activate(wxGISApplicationBase* pApp)
 
     m_pCatalog = wxDynamicCast(GetGxCatalog(), wxGxCatalogUI);
 
-#ifdef __WXMSW__
+//#ifdef __WXMSW__
     UseAltPopupWindow(true);
-#else
-    UseAltPopupWindow(false);
-#endif
+//#else
+//    UseAltPopupWindow(false);
+//#endif
 
     m_pListViewComboPopup = new wxListViewComboPopup();
     SetPopupControl(m_pListViewComboPopup);

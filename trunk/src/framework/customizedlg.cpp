@@ -54,7 +54,7 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGISApplicationEx* pApp, wxWindow* parent,
 
     m_nSashPos = 150;
     SerializePanel(false);
-    
+
 	wxBoxSizer* bSizer = new wxBoxSizer( wxHORIZONTAL );
 
 	m_Splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D  | wxNO_BORDER);
@@ -66,7 +66,7 @@ wxGISToolBarPanel::wxGISToolBarPanel(wxGISApplicationEx* pApp, wxWindow* parent,
 	//m_commandbarlist = new wxCheckListBox( m_Splitter, wxGISToolBarPanel::ID_CHKLSTBX, wxDefaultPosition, wxDefaultSize, m_commandbarlistChoices,  wxNO_BORDER );
 	m_TreeImageList.Create(16, 16);
 	m_TreeImageList.Add(wxBitmap(check_marks_xpm));
-	m_pTreeCtrl = new wxTreeCtrl( m_Splitter, wxGISToolBarPanel::ID_TREECTRL, wxDefaultPosition, wxDefaultSize, wxTR_NO_LINES | wxTR_HIDE_ROOT | wxBORDER_NONE );//wxTR_NO_BUTTONS | 
+	m_pTreeCtrl = new wxTreeCtrl( m_Splitter, wxGISToolBarPanel::ID_TREECTRL, wxDefaultPosition, wxDefaultSize, wxTR_NO_LINES | wxTR_HIDE_ROOT | wxBORDER_NONE );//wxTR_NO_BUTTONS |
 	m_pTreeCtrl->SetImageList(&m_TreeImageList);
 
 	m_buttonslist = new wxListView( m_Splitter, wxGISToolBarPanel::ID_BUTTONSLST, wxDefaultPosition, wxDefaultSize,wxLC_REPORT|wxLC_SINGLE_SEL  | wxNO_BORDER);// wxLC_NO_SORT_HEADER||wxLC_SORT_ASCENDING
@@ -230,9 +230,13 @@ void wxGISToolBarPanel::LoadCommands(void)
 			wxString sMessage = pCommand->GetMessage();
 
 			wxString sKeyCode = m_pApp->GetGISAcceleratorTable()->GetText(pCommand->GetID());
-			int nIndex = m_ImageList.Add(pCommand->GetBitmap());
-			long pos = m_buttonslist->InsertItem(i, sName);//, nIndex);
-            m_buttonslist->SetItemImage(pos, nIndex);
+			long pos = m_buttonslist->InsertItem(i, sName);
+			wxIcon oIcon = pCommand->GetBitmap();
+			if(oIcon.IsOk())
+			{
+			    int nIndex = m_ImageList.Add(oIcon);
+                m_buttonslist->SetItemImage(pos, nIndex);
+			}
 			m_buttonslist->SetItem(pos, 1, sMessage);
 			m_buttonslist->SetItem(pos, 2, sKeyCode);
 			m_buttonslist->SetItemData(pos, pCommand->GetID());
@@ -699,7 +703,7 @@ wxGISCommandPanel::wxGISCommandPanel( wxGISApplicationEx* pApp, wxWindow* parent
 		wxString sCat = CommandArr[i]->GetCategory();
         m_CategoryMap[sCat].Add(CommandArr[i]);
 	}
-	
+
 	wxArrayString CatArray;
 	for(CATEGORYMAP::iterator IT = m_CategoryMap.begin(); IT != m_CategoryMap.end(); ++IT)
 	{
@@ -774,9 +778,13 @@ void wxGISCommandPanel::OnListboxSelect(wxCommandEvent& event)
 		wxString sName = wxStripMenuCodes(CommandArray[i]->GetCaption());
 		wxString sMessage = CommandArray[i]->GetMessage();
 		wxString sKeyCode = m_pApp->GetGISAcceleratorTable()->GetText(CommandArray[i]->GetID());
-		int nIndex = m_ImageList.Add(CommandArray[i]->GetBitmap());
-		long pos = m_listCtrl3->InsertItem(i, sName);//, nIndex);
-        m_listCtrl3->SetItemImage(pos, nIndex);
+		long pos = m_listCtrl3->InsertItem(i, sName);
+		wxIcon oIcon = CommandArray[i]->GetBitmap();
+		if(oIcon.IsOk())
+		{
+            int nIndex = m_ImageList.Add(oIcon);
+            m_listCtrl3->SetItemImage(pos, nIndex);
+		}
 		m_listCtrl3->SetItem(pos, 1, sMessage);
 		m_listCtrl3->SetItem(pos, 2, sKeyCode);
 		m_listCtrl3->SetItemData(pos,  CommandArray[i]->GetID());

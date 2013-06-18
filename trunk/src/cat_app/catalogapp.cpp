@@ -31,6 +31,10 @@ IMPLEMENT_APP(wxGISCatalogApp)
 
 wxGISCatalogApp::wxGISCatalogApp(void) : wxApp()
 {
+
+#if defined __WXGTK__ && !wxCHECK_VERSION(2, 9, 5)
+    wxSetEnv(wxT("UBUNTU_MENUPROXY"), wxT("0"));
+#endif
     m_bMainFrameCreated = false;
 }
 

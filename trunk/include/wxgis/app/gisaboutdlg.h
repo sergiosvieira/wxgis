@@ -37,7 +37,8 @@
 #include <wx/statline.h>
 #include <wx/notebook.h>
 #include <wx/dialog.h>
-#include <wx/button.h> 
+#include <wx/button.h>
+#include <wx/generic/stattextg.h>
 
 /** \class wxGISSimpleTextPanel gisaboutdlg.h
  *   \brief Information tab in About dialog
@@ -69,7 +70,7 @@ public:
     ~wxGISAboutDialog();
 protected:
 	wxStaticBitmap* m_bitmap;
-	wxStaticText* m_title;
+	wxGenericStaticText* m_title;
 	wxStaticLine* m_staticline1;
 	wxStdDialogButtonSizer* m_sdbSizer;
 	wxButton* m_sdbSizerOK;

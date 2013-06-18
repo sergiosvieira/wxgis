@@ -31,7 +31,7 @@
 #include "wx/intl.h"
 
 /** \class wxGISApplication application.h
-    \brief A wxGISApplication class.  
+    \brief A wxGISApplication class.
 */
 class WXDLLIMPEXP_GIS_FRW wxGISApplication :
 	public wxFrame,	public wxGISApplicationBase
@@ -44,6 +44,7 @@ public:
 	virtual ~wxGISApplication(void);
 	virtual wxStatusBar* OnCreateStatusBar(int number, long style, wxWindowID id, const wxString& name);
 	virtual wxGISAcceleratorTable* GetGISAcceleratorTable(void) const;
+	virtual void UpdateTitle(const wxString & sPath);
 //wxGISApplicationBase
     wxGISStatusBar* GetStatusBar(void) const;
 	virtual void ShowStatusBar(bool bShow);
@@ -80,6 +81,6 @@ protected:
     wxLocale* m_pLocale; // locale we'll be using
 	//char* m_pszOldLocale;
     wxString m_sDecimalPoint;
-private:    
+private:
     DECLARE_EVENT_TABLE()
 };
