@@ -38,4 +38,5 @@ public:
     virtual int FilterEvent(wxEvent& event);
 protected:
     wxCheckBox* m_checkBoxShow;
+    IApplication* m_pApp;
 };

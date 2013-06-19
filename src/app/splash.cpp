@@ -32,67 +32,38 @@
 
 wxGISSplashScreen::wxGISSplashScreen(int milliseconds, wxWindow *parent, wxWindowID id, const wxPoint &pos, const wxSize &size, long style) : wxSplashScreen(wxBitmap(splash_xpm), wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT, milliseconds, parent, id, pos, size, style)
 {
-    IApplication* pApp = dynamic_cast<IApplication*>(parent);
+    m_checkBoxShow = NULL;
+
+    m_pApp = dynamic_cast<IApplication*>(parent);
     wxWindow *win = GetSplashWindow();
 
+#ifdef __WXMSW__
     wxWindowDC dc(win);
     int width, height;
 
-	//wxString s(_("build by"));
-	//wxFont font(18, wxFONTFAMILY_DEFAULT , wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Sans");
- //   dc.SetFont(font);
- //   dc.SetBackgroundMode(wxTRANSPARENT); 
- //   dc.GetTextExtent(s, &width, &height);
- //   //110 x 200 = center
+    wxSize sz = GetSize();
+    int nHCenter = sz.GetWidth() / 2;
+    int nVCenter = sz.GetHeight() / 2;
 
- //   dc.DrawText(s, wxPoint(200  - width / 2, 110 - height / 2));
-
-	//wxFont font_t(10, wxFONTFAMILY_DEFAULT , wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Sans");
- //   dc.SetFont(font_t);
-	//wxString t(_("o p e n    g e o t e c n o l o g y"));
- //   dc.GetTextExtent(t, &width, &height);
- //   dc.DrawText(t, wxPoint(200  - width / 2, 170 - height / 2));
-
-	wxFont font_n(18, wxFONTFAMILY_DEFAULT , wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, "Sans");
+	wxFont font_n(18, wxFONTFAMILY_DEFAULT , wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false);
     dc.SetFont(font_n);
-    wxString sName = wxString::Format(wxT("%s"), pApp->GetUserAppNameShort().c_str());
+    wxString sName = wxString::Format(wxT("%s"), m_pApp->GetUserAppNameShort().c_str());
     dc.GetTextExtent(sName, &width, &height);
-    dc.DrawText(sName, wxPoint(200  - width / 2, 110 - height / 2));
+    dc.DrawText(sName, wxPoint(nHCenter  - width / 2, nVCenter + 10 - height / 2));
 
-	wxFont font_v(12, wxFONTFAMILY_DEFAULT , wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Sans");
+	wxFont font_v(12, wxFONTFAMILY_DEFAULT , wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false);
     dc.SetFont(font_v);
-    wxString v = wxString::Format(_T("Version: %s"), pApp->GetAppVersionString().c_str());
+    wxString v = wxString::Format(_T("Version: %s"), m_pApp->GetAppVersionString().c_str());
     dc.GetTextExtent(v, &width, &height);
-    dc.DrawText(v, wxPoint(200  - width / 2, 150 - height / 2));
+    dc.DrawText(v, wxPoint(nHCenter  - width / 2, nVCenter + 50 - height / 2));
     wxString d = wxString::Format(_T("Build: %s"), wxString(__DATE__,wxConvLibc).c_str());
     dc.GetTextExtent(d, &width, &height);
-    dc.DrawText(d, wxPoint(200  - width / 2, 170 - height / 2));    
-
-    m_checkBoxShow = new wxCheckBox( win, ID_CHECK, _("Don't show this screen in future"), wxPoint(10, 195) );
+    dc.DrawText(d, wxPoint(nHCenter  - width / 2, nVCenter + 70 - height / 2));
+    m_checkBoxShow = new wxCheckBox( win, ID_CHECK, _("Don't show this screen in future"), wxPoint(10, sz.GetHeight() - 20) );
+#else
+    m_checkBoxShow = new wxCheckBox( win, ID_CHECK, _("Don't show this screen in future"), wxPoint(10, GetSize().GetHeight() - 60) );
+#endif
     m_checkBoxShow->SetBackgroundColour(*wxWHITE);
-//    wxStaticText *text = new wxStaticText( win, wxID_EXIT|wxTE_READONLY, s, wxPoint(200,100) );//wxPoint(200 - width, 100 - height)
-//    text->SetFont(font);
-//    text->SetBackgroundColour( wxBG_STYLE_TRANSPARENT );
- //   wxFont f(30, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Sans");
- //   wxFont titleFont = this->GetFont();
- //   titleFont.SetWeight(wxFONTWEIGHT_BOLD);
- //   m_title->SetFont(titleFont);
-	//m_title->Wrap( -1 );
-	//m_title->SetBackgroundColour( BackColor );
-
- //   m_title = new wxGenericStaticText( this, wxID_ANY, wxString::Format(_("\nwxGIS [%s] (x86)\nVersion: %s"), pApp->GetAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0 );
-
- //  
- //   wxStaticText *text = new wxStaticText( win, wxID_EXIT, wxT("click somewhere\non this image"), wxPoint(m_isPda ? 0 : 13, m_isPda ? 0 : 11) );
- //   text->SetBackgroundColour(*wxWHITE);
- //   text->SetForegroundColour(*wxBLACK);
- //   wxFont font = text->GetFont();
- //   font.SetPointSize(2 * font.GetPointSize() / 3);
- //   text->SetFont(font);
-
- //   	m_pStaticText = new wxTextCtrl( this, ID_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_AUTO_URL, wxDefaultValidator, wxT("GISSimpleText") );
-
-
 }
 
 wxGISSplashScreen::~wxGISSplashScreen()
@@ -104,13 +75,47 @@ int wxGISSplashScreen::FilterEvent(wxEvent& event)
     if(event.GetId() == ID_CHECK)
     {
         wxGISAppConfig oConfig = GetConfig();
-	    if(!oConfig.IsOk())
+	    if(!oConfig.IsOk() || m_checkBoxShow == NULL)
             return -1;
         wxCheckBoxState st = m_checkBoxShow->Get3StateValue();
         oConfig.Write(enumGISHKCU, wxT("wxGISCommon/splash/show"), st == wxCHK_CHECKED ? false : true);
 
         return -1;
     }
+
+     wxWindow *win = GetSplashWindow();
+
+#ifdef __WXGTK__
+    wxWindowDC dc(win);
+    int width, height;
+
+    wxSize sz = GetSize();
+    int nHCenter = sz.GetWidth() / 2;
+    int nVCenter = sz.GetHeight() / 2;
+    int nWidth = sz.GetWidth() - 3;
+    int nHeight = sz.GetHeight() - 30;
+
+    wxFont font_n(15, wxFONTFAMILY_DEFAULT , wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false);
+    dc.SetFont(font_n);
+    wxString sName = wxString::Format(wxT("%s"), m_pApp->GetUserAppNameShort().c_str());
+    dc.GetTextExtent(sName, &width, &height);
+    dc.DrawText(sName, wxPoint(nHCenter  - width / 2, nVCenter - height / 2 - 5));
+
+    wxFont font_v(10, wxFONTFAMILY_DEFAULT , wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false);
+    dc.SetFont(font_v);
+    wxString v = wxString::Format(_T("Version: %s"), m_pApp->GetAppVersionString().c_str());
+    dc.GetTextExtent(v, &width, &height);
+    dc.DrawText(v, wxPoint(nHCenter  - width / 2, nVCenter + 15 - height / 2));
+    wxString d = wxString::Format(_T("Build: %s"), wxString(__DATE__,wxConvLibc).c_str());
+    dc.GetTextExtent(d, &width, &height);
+    dc.DrawText(d, wxPoint(nHCenter  - width / 2, nVCenter + 30 - height / 2));
+
+    dc.DrawLine(0, 0, nWidth, 0);
+    dc.DrawLine(nWidth, 0, nWidth, nHeight);
+    dc.DrawLine(nWidth, nHeight, 0, nHeight);
+    dc.DrawLine(0, nHeight, 0, 0);
+#endif
+
     return wxSplashScreen::FilterEvent(event);
 
     //const wxEventType t = event.GetEventType();
@@ -119,3 +124,5 @@ int wxGISSplashScreen::FilterEvent(wxEvent& event)
 
     //return -1;
 }
+
+
