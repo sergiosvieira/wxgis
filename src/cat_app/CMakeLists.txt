@@ -106,12 +106,14 @@ set(PROJECT_HHEADERS ${PROJECT_HHEADERS}
     ${APP_HEADERS}/catalogapp.h
     ${APP_HEADERS}/catalogframe.h
     ${WXGIS_CURRENT_SOURCE_DIR}/include/wxgis/app/gisaboutdlg.h
+    ${WXGIS_CURRENT_SOURCE_DIR}/include/wxgis/app/splash.h
 )
 
 set(PROJECT_CSOURCES ${PROJECT_CSOURCES}
     ${APP_SOURCES}/catalogapp.cpp
     ${APP_SOURCES}/catalogframe.cpp
     ${WXGIS_CURRENT_SOURCE_DIR}/src/app/gisaboutdlg.cpp
+    ${WXGIS_CURRENT_SOURCE_DIR}/src/app/splash.cpp
 )
 
 if(WIN32)

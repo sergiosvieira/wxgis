@@ -20,6 +20,8 @@
  ****************************************************************************/
 #include "wxgis/cat_app/catalogapp.h"
 #include "wxgis/core/config.h"
+#include "wxgis/app/splash.h"
+#include "wxgis/core/format.h"
 
 #include <locale.h>
 
@@ -68,6 +70,19 @@ bool wxGISCatalogApp::OnInit()
 
     //create application/main frame
     m_pMainFrame = new wxGISCatalogFrame(NULL, wxID_ANY, wxString(_("wxGIS Catalog")), wxDefaultPosition, wxSize(800, 480) );
+
+    //check time out and show splash
+    wxXmlNode* pSplashNode = oConfig.GetConfigNode(enumGISHKCU, wxT("wxGISCommon/splash"));
+    bool bShowSplash = GetBoolValue(pSplashNode, wxT("show"), true);
+    if(bShowSplash)
+    {
+        long nTimeout = GetDecimalValue(pSplashNode, wxT("timeout"), 20000);
+        wxGISSplashScreen *pSplash = new wxGISSplashScreen(nTimeout, m_pMainFrame);
+    #if !defined(__WXGTK20__)
+        // we don't need it at least on wxGTK with GTK+ 2.12.9
+        wxYield();
+    #endif
+    }
 
 	//setup loging
 	wxString sLogDir = oConfig.GetLogDir();

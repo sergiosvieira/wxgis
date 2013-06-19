@@ -111,6 +111,8 @@ void SetFloatValue(wxXmlNode* pNode, const wxString &sAttrName, float dfVal)
 
 double GetFloatValue(const wxXmlNode* pNode, const wxString &sAttrName, double dfDefVal)
 {
+    if(!pNode)
+        return dfDefVal;
     wxString sDefVal = wxString::Format(wxT("%f"), dfDefVal);
     FloatStringToCLoc(sDefVal);
     wxString sVal = pNode->GetAttribute(sAttrName, sDefVal);
@@ -120,6 +122,8 @@ double GetFloatValue(const wxXmlNode* pNode, const wxString &sAttrName, double d
 
 float GetFloatValue(const wxXmlNode* pNode, const wxString &sAttrName, float dfDefVal)
 {
+    if(!pNode)
+        return dfDefVal;
     wxString sDefVal = wxString::Format(wxT("%f"), dfDefVal);
     FloatStringToCLoc(sDefVal);
     wxString sVal = pNode->GetAttribute(sAttrName, sDefVal);
@@ -141,6 +145,8 @@ void SetDecimalValue(wxXmlNode* pNode, const wxString &sAttrName, int nVal)
 
 long GetDecimalValue(const wxXmlNode* pNode, const wxString &sAttrName, long nDefVal)
 {
+    if(!pNode)
+        return nDefVal;
     wxString sDefVal = wxString::Format(wxT("%d"), nDefVal);
     wxString sVal = pNode->GetAttribute(sAttrName, sDefVal);
     return wxAtol(sVal);
@@ -148,6 +154,8 @@ long GetDecimalValue(const wxXmlNode* pNode, const wxString &sAttrName, long nDe
 
 int GetDecimalValue(const wxXmlNode* pNode, const wxString &sAttrName, int nDefVal)
 {
+    if(!pNode)
+        return nDefVal;
     wxString sDefVal = wxString::Format(wxT("%d"), nDefVal);
     wxString sVal = pNode->GetAttribute(sAttrName, sDefVal);
     return wxAtoi(sVal);
@@ -160,6 +168,8 @@ void SetDateValue(wxXmlNode* pNode, const wxString &sAttrName, const wxDateTime 
 
 wxDateTime GetDateValue(const wxXmlNode* pNode, const wxString &sAttrName, const wxDateTime &dtDefVal)
 {
+    if(!pNode)
+        return dtDefVal;
     const wxString sVal = pNode->GetAttribute(sAttrName, dtDefVal.Format(wxT("%d-%m-%Y %H:%M:%S")));
     wxDateTime dt;
     wxString::const_iterator itEnd;
@@ -174,6 +184,8 @@ void SetBoolValue(wxXmlNode* pNode, const wxString &sAttrName, bool bVal)
 
 bool GetBoolValue(const wxXmlNode* pNode, const wxString &sAttrName, bool bDefVal)
 {
+    if(!pNode)
+        return bDefVal;
     wxString sVal = pNode->GetAttribute(sAttrName, bDefVal == true ? wxT("t") : wxT("f"));
     if(sVal.IsSameAs(wxT("t"), false) || sVal.IsSameAs(wxT("1"), false) || sVal.IsSameAs(wxT("y"), false) || sVal.IsSameAs(wxT("yes"), false) || sVal.IsSameAs(wxT("true"), false))
         return true;
