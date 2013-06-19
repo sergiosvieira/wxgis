@@ -3,7 +3,7 @@
  * Purpose:  About Dialog class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2012 Bishop
+*   Copyright (C) 2010-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
  ****************************************************************************/
 
 #include "wxgis/app/gisaboutdlg.h"
-#include "wxgis/framework/applicationbase.h"
 #include "wxgis/core/config.h"
 #include "wxgis/defs.h"
 
@@ -89,7 +88,7 @@ void wxGISSimpleTextPanel::edtUrlClickUrl(wxTextUrlEvent& event)
 
 wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-    wxGISApplicationBase* pApp = dynamic_cast<wxGISApplicationBase*>(parent);
+    IApplication* pApp = dynamic_cast<IApplication*>(parent);
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 
     wxColour BackColor( 255, 255, 255 );
@@ -106,9 +105,9 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
 	//wxGenericStaticText* pTitle = new wxGenericStaticText(this, wxID_ANY, wxString::Format(_("\nwxGIS [%s] (x64)\nVersion: %s"), pApp->GetAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0);
 
 #ifdef _WIN64
-    m_title = new wxGenericStaticText( this, wxID_ANY, wxString::Format(_("\nwxGIS [%s] (x64)\nVersion: %s"), pApp->GetAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0 );
+    m_title = new wxGenericStaticText( this, wxID_ANY, wxString::Format(_("\n%s (x64)\nVersion: %s"), pApp->GetUserAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0 );
 #else
-     m_title = new wxGenericStaticText( this, wxID_ANY, wxString::Format(_("\nwxGIS [%s] (x86)\nVersion: %s"), pApp->GetAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0 );
+     m_title = new wxGenericStaticText( this, wxID_ANY, wxString::Format(_("\n%s (x86)\nVersion: %s"), pApp->GetUserAppName(), pApp->GetAppVersionString()), wxDefaultPosition, wxDefaultSize, 0 );
 #endif
 
     wxFont titleFont = this->GetFont();
@@ -159,9 +158,9 @@ wxGISAboutDialog::wxGISAboutDialog( wxWindow* parent, wxWindowID id, const wxStr
 	m_AuiNotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxNO_BORDER | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS );
 
 #ifdef _WIN64
-    wxString sAboutApp = wxString::Format(_("wxGIS [%s] (x64)\n\nVersion: %s\n\nBuild: %s\n\n(c) 2009-%d Dmitry Baryshnikov (Bishop)\n\nhttp://wxgis.googlecode.com/"), pApp->GetAppName().c_str(), pApp->GetAppVersionString().c_str(), wxString(__DATE__,wxConvLibc).c_str(),  __YEAR__);
+    wxString sAboutApp = wxString::Format(_("%s (x64)\n\nVersion: %s\n\nBuild: %s\n\n(c) 2009-%d Dmitry Baryshnikov (Bishop)\n\nhttp://wxgis.googlecode.com/"), pApp->GetUserAppName().c_str(), pApp->GetAppVersionString().c_str(), wxString(__DATE__,wxConvLibc).c_str(),  __YEAR__);
 #else
-    wxString sAboutApp = wxString::Format(_("wxGIS [%s] (x86)\n\nVersion: %s\n\nBuild: %s\n\n(c) 2009-%d Dmitry Baryshnikov (Bishop)\n\nhttp://wxgis.googlecode.com/"), pApp->GetAppName().c_str(), pApp->GetAppVersionString().c_str(), wxString(__DATE__,wxConvLibc).c_str(),  __YEAR__);
+    wxString sAboutApp = wxString::Format(_("%s (x86)\n\nVersion: %s\n\nBuild: %s\n\n(c) 2009-%d Dmitry Baryshnikov (Bishop)\n\nhttp://wxgis.googlecode.com/"), pApp->GetUserAppName().c_str(), pApp->GetAppVersionString().c_str(), wxString(__DATE__,wxConvLibc).c_str(),  __YEAR__);
 #endif
 
 	m_AuiNotebook->AddPage(new wxGISSimpleTextPanel(sAboutApp, m_AuiNotebook), _("About application"));

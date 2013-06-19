@@ -155,7 +155,9 @@ public:
 	wxGxObjectDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,338 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 	virtual ~wxGxObjectDialog();
 //wxGISApplicationBase
-    virtual wxString GetAppName(void) const{return wxString(OBJDLG_NAME);};
+    virtual wxString GetAppName(void) const {return wxString(OBJDLG_NAME);};
+	virtual wxString GetUserAppName(void) const {return wxString(_("NextGIS Object Dialog"));};
+	virtual wxString GetUserAppNameShort(void) const {return wxString(_("Object Dialog"));};
 //wxGxObjectDialog
 	virtual void SetButtonCaption(const wxString &sOkBtLabel);
 	virtual void SetStartingLocation(const wxString &sStartPath);

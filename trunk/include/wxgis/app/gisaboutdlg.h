@@ -3,7 +3,7 @@
  * Purpose:  About Dialog class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2012 Bishop
+*   Copyright (C) 2010-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/framework/framework.h"
+#include "wxgis/core/app.h"
 
 #include <wx/aui/auibook.h>
 #include <wx/bitmap.h>
@@ -51,7 +51,7 @@ class wxGISSimpleTextPanel : public wxPanel
 	};
 public:
 	wxGISSimpleTextPanel( wxString soText, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 540,400 ), long style = wxTAB_TRAVERSAL );
-	virtual ~wxGISSimpleTextPanel();//events
+	virtual ~wxGISSimpleTextPanel();
 	virtual void edtUrlClickUrl(wxTextUrlEvent& event);
 protected:
 	wxTextCtrl* m_pStaticText;

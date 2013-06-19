@@ -716,5 +716,5 @@ void wxGISApplication::SerializeCommandBars(bool bSave)
 
 void wxGISApplication::UpdateTitle(const wxString & sPath)
 {
-    SetTitle(GetAppName() + wxT(" - [") + sPath + wxT("]"));
+    SetTitle(GetUserAppName() + wxT(" - [") + sPath + wxT("]"));
 }

@@ -38,6 +38,8 @@ public:
 	virtual void OnAppAbout(void) = 0;
     virtual void OnAppOptions(void) = 0;
 	virtual wxString GetAppName(void) const = 0;
+	virtual wxString GetUserAppName(void) const = 0;
+	virtual wxString GetUserAppNameShort(void) const = 0;
 	virtual wxString GetAppVersionString(void) const = 0;
     virtual bool CreateApp(void) = 0;
     virtual bool SetupLog(const wxString &sLogPath, const wxString &sNamePrefix = wxEmptyString) = 0;

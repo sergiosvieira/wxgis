@@ -45,7 +45,9 @@ public:
     //events 
     virtual void OnClose(wxCloseEvent& event);
     //wxGISApplicationBase
-    virtual wxString GetAppName(void) const{return wxString(wxT("wxGISCatalog"));};
+    virtual wxString GetAppName(void) const {return wxString(wxT("wxGISCatalog"));};
+	virtual wxString GetUserAppName(void) const {return wxString(_("NextGIS Manager"));};
+	virtual wxString GetUserAppNameShort(void) const {return wxString(_("Manager"));};
     virtual bool CreateApp(void);
 	virtual wxIcon GetAppIcon(void);
 protected:

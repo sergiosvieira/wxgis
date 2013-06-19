@@ -54,6 +54,8 @@ public:
     // IApplication
     virtual bool SetupSys(const wxString &sSysPath);
     virtual wxString GetAppName(void) const {return m_appName;};
+	virtual wxString GetUserAppName(void) const{return m_appDisplayName;};
+    virtual wxString GetUserAppNameShort(void) const {return wxString(_("Task Manager"));};
     virtual wxString GetAppVersionString(void) const {return wxString(wxGIS_VERSION_NUM_DOT_STRING_T);};
     virtual void OnAppAbout(void);
     virtual void OnAppOptions(void);
