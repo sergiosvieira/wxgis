@@ -3,7 +3,7 @@
  * Purpose:  wxGxTreeView class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2012 Bishop
+*   Copyright (C) 2009-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -537,12 +537,10 @@ END_EVENT_TABLE()
 
 wxGxTreeView::wxGxTreeView(void) : wxGxTreeViewBase()
 {
-    m_nBegRenameID = wxNOT_FOUND;
 }
 
 wxGxTreeView::wxGxTreeView(wxWindow* parent, wxWindowID id, long style) : wxGxTreeViewBase(parent, id, wxDefaultPosition, wxDefaultSize, style)
 {
-    m_nBegRenameID = wxNOT_FOUND;
     SetDropTarget(new wxGISDropTarget(static_cast<IViewDropTarget*>(this)));
 }
 
@@ -764,30 +762,58 @@ void wxGxTreeView::BeginRename(long nObjectID)
 	wxTreeItemId ItemId = m_TreeMap[nObjectID];
 	if(!ItemId.IsOk())
     {
-        wxTreeCtrl::SetItemHasChildren(GetSelection());
-        wxTreeCtrl::Expand(GetSelection());  
+        SetItemHasChildren(GetSelection());
+        Expand(GetSelection());  
         ItemId = m_TreeMap[nObjectID];
     }
 
 	if(ItemId.IsOk())
 	{
-		wxTreeCtrl::SelectItem(ItemId);//, false
+		SelectItem(ItemId);//, false
 		SetFocus();
         m_pSelection->Select(nObjectID, true, GetId());
         EditLabel(GetSelection());
-        m_nBegRenameID = wxNOT_FOUND;
 	}
-    else
-    {
-        //when object added rename it
-        m_nBegRenameID = nObjectID;
-    }
 }
 
-void wxGxTreeView::AddTreeItem(wxGxObject* pGxObject, wxTreeItemId hParent)
+void wxGxTreeView::OnObjectAdded(wxGxCatalogEvent& event)
 {
-    wxGxTreeViewBase::AddTreeItem(pGxObject, hParent);
-    BeginRename(m_nBegRenameID);
+    wxGxObject* pGxObject = m_pCatalog->GetRegisterObject(event.GetObjectID());
+	if(!pGxObject)
+		return;
+    wxGxObject* pParentObject = pGxObject->GetParent();
+	wxTreeItemId ParentTreeItemId = m_TreeMap[pParentObject->GetId()];
+	if(ParentTreeItemId.IsOk())
+	{
+		wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(ParentTreeItemId);
+		if(pData != NULL)
+		{
+            wxGxAutoRenamer* pGxAutoRenamer = dynamic_cast<wxGxAutoRenamer*>(pParentObject);
+			if(pData->m_bExpandedOnce)
+            {
+				AddTreeItem(pGxObject, ParentTreeItemId);
+                SortChildren(ParentTreeItemId);
+                if(pGxAutoRenamer && pGxAutoRenamer->IsBeginRename(this, pGxObject->GetPath()))
+                {
+                    BeginRename(pGxObject->GetId());
+                }
+            }
+			else
+            {
+                if(pGxAutoRenamer && pGxAutoRenamer->IsBeginRename(this, pGxObject->GetPath()))
+                {
+                    Expand(ParentTreeItemId);
+				    AddTreeItem(pGxObject, ParentTreeItemId);
+                    SortChildren(ParentTreeItemId);
+                    BeginRename(pGxObject->GetId());
+                }
+                else
+                {
+				    SetItemHasChildren(ParentTreeItemId, true);
+                }
+            }
+		}
+	}
 }
 
 wxDragResult wxGxTreeView::OnDragOver(wxCoord x, wxCoord y, wxDragResult def)

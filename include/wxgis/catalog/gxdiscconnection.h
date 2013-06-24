@@ -3,7 +3,7 @@
  * Purpose:  wxGxDiscConnection class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2010,2012  Bishop
+*   Copyright (C) 2009,2010,2012,2013  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -22,6 +22,14 @@
 
 #include "wxgis/catalog/gxfolder.h"
 
+#include <wx/event.h>
+#include <wx/fswatcher.h>
+
+#if wxVERSION_NUMBER <= 2903// && !defined EVT_FSWATCHER(winid, func)
+#define EVT_FSWATCHER(winid, func) \
+    wx__DECLARE_EVT1(wxEVT_FSWATCHER, winid, wxFileSystemWatcherEventHandler(func))
+#endif
+
 /** \class wxGxDiscConnection gxdiscconnection.h
     \brief A Disc Connection GxObject.
 */
@@ -36,12 +44,21 @@ public:
 	virtual ~wxGxDiscConnection(void);
 	//wxGxObject
 	virtual wxString GetCategory(void){return wxString(_("Folder connection"));};
+    virtual bool Destroy(void);
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return false;};
 	virtual bool Rename(const wxString& NewName);
     virtual int GetXmlId(void) const {return m_nXmlId;};
+//events
+    virtual void OnFileSystemEvent(wxFileSystemWatcherEvent& event);
+protected:
+    virtual void StartWatcher(void);
+	virtual void LoadChildren(void);
 protected:
     int m_nXmlId;
     wxString m_soXmlConfPath;
+    wxFileSystemWatcher *m_pWatcher;
+private:
+    DECLARE_EVENT_TABLE()
 };

@@ -34,7 +34,7 @@ wxFontEncoding WXDLLIMPEXP_GIS_DS GetEncodingFromCpg(const CPLString &sPath);
 wxString WXDLLIMPEXP_GIS_DS ClearExt(const wxString &sPath);
 bool WXDLLIMPEXP_GIS_DS IsFileHidden(const CPLString &sPath);
 wxString  WXDLLIMPEXP_GIS_DS CheckUniqName(const CPLString &sPath, const wxString &sName, const wxString &sExt, int nCounter = 0);
-CPLString WXDLLIMPEXP_GIS_DS CheckUniqPath(const CPLString &sPath, const CPLString &sName, const CPLString &sAdd = "_copy", int nCounter = 0);
+CPLString WXDLLIMPEXP_GIS_DS CheckUniqPath(const CPLString &sPath, const CPLString &sName, bool bIsFolder = false, const CPLString &sAdd = "_copy", int nCounter = 0);
 CPLString WXDLLIMPEXP_GIS_DS GetUniqPath(const CPLString &szOriginalFullPath, const CPLString &szNewPath, const CPLString &szNewName);
 CPLString WXDLLIMPEXP_GIS_DS Transliterate(const char* str);
 CPLString WXDLLIMPEXP_GIS_DS GetExtension(const CPLString &sPath, const CPLString &sName = "");

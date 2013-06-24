@@ -22,13 +22,6 @@
 #include "wxgis/catalog/gxobject.h"
 
 #include <wx/dir.h>
-#include <wx/event.h>
-#include <wx/fswatcher.h>
-
-#if wxVERSION_NUMBER <= 2903// && !defined EVT_FSWATCHER(winid, func)
-#define EVT_FSWATCHER(winid, func) \
-    wx__DECLARE_EVT1(wxEVT_FSWATCHER, winid, wxFileSystemWatcherEventHandler(func))
-#endif
 
 /** \class wxGxFolder gxfolder.h
     \brief The Folder GxObject.
@@ -47,25 +40,18 @@ public:
     virtual wxString GetBaseName(void) const;
 	virtual wxString GetCategory(void) const {return wxString(_("Folder"));};
 	virtual void Refresh(void);
-    virtual bool Destroy(void);
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
-	virtual bool Rename(wxString NewName);
+	virtual bool Rename(const wxString &sNewName);
 	virtual bool CanRename(void){return true;};
 	//wxGxObjectContainer
-	//virtual bool DeleteChild(IGxObject* pChild);
 	virtual bool AreChildrenViewable(void) const {return true;};
 	virtual bool HasChildren(void);
     virtual bool CanCreate(long nDataType, long DataSubtype);
-//events
-    virtual void OnFileSystemEvent(wxFileSystemWatcherEvent& event);
 protected:
 	//wxGxFolder
-	virtual void LoadChildren(void);
+	virtual void LoadChildren(void);    
 protected:
 	bool m_bIsChildrenLoaded;
-    wxFileSystemWatcher *m_pWatcher;
-private:
-    DECLARE_EVENT_TABLE()
 };

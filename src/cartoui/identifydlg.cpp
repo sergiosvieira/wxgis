@@ -153,11 +153,6 @@ wxGISFeatureDetailsPanel::wxGISFeatureDetailsPanel( wxWindow* parent, wxWindowID
 
 wxGISFeatureDetailsPanel::~wxGISFeatureDetailsPanel()
 {
-	wxGISAppConfig oConfig = GetConfig();
-	if(oConfig.IsOk() && m_pCFormat)
-    {
-        oConfig.Write(enumGISHKCU, m_sAppName + wxString(wxT("/identifydlg/format_mask")), m_pCFormat->GetMask());
-    }
 	wxDELETE(m_pMenu);
 	wxDELETE(m_pCFormat);
 }
@@ -251,6 +246,12 @@ void wxGISFeatureDetailsPanel::OnMaskMenu(wxCommandEvent& event)
 	PopupMenu(m_pCFormat, rc.GetBottomLeft());
 	m_sLocation = m_pCFormat->Format(m_dfX, m_dfY);
 	TransferDataToWindow();
+
+    wxGISAppConfig oConfig = GetConfig();
+	if(oConfig.IsOk() && m_pCFormat)
+    {
+        oConfig.Write(enumGISHKCU, m_sAppName + wxString(wxT("/identifydlg/format_mask")), m_pCFormat->GetMask());
+    }
 }
 
 void wxGISFeatureDetailsPanel::WriteStringToClipboard(const wxString &sData)

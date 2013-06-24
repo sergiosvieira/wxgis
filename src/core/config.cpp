@@ -3,7 +3,7 @@
  * Purpose:  wxGISConfig class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011,2012 Bishop
+*   Copyright (C) 2009,2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -372,7 +372,8 @@ wxXmlNode* wxGISConfig::CreateConfigNode(wxGISEnumConfigKey Key, const wxString 
         }
 		if(bCreate)
 		{
-			pChildNode = new wxXmlNode(pChildNode == 0 ? pRoot : pChildNode, wxXML_ELEMENT_NODE, token);
+            wxXmlNode *pParent = pChildNode == 0 ? pRoot : pChildNode;
+			pChildNode = new wxXmlNode(pParent, wxXML_ELEMENT_NODE, token);
 			if(tkz.HasMoreTokens())
 			{
 				pRoot = pChildNode;
@@ -397,7 +398,8 @@ void wxGISConfig::DeleteNodeChildren(wxXmlNode* pNode)
 
 bool wxGISConfig::Write(wxGISEnumConfigKey Key, const wxString &sPath, const wxString &sValue)
 {
-	//split path
+    wxCriticalSectionLocker locker(((wxGISConfigRefData *)m_refData)->m_oCritSect);
+    //split path
 	wxString sPathToAttribute, sAttributeName;
 	if(!SplitPathToAttribute(sPath, &sPathToAttribute, &sAttributeName))
 		return false;
@@ -420,7 +422,8 @@ bool wxGISConfig::Write(wxGISEnumConfigKey Key, const wxString &sPath, const wxS
 
 bool wxGISConfig::Write(wxGISEnumConfigKey Key, const wxString &sPath, bool bValue)
 {
-	//split path
+    wxCriticalSectionLocker locker(((wxGISConfigRefData *)m_refData)->m_oCritSect);
+    //split path
 	wxString sPathToAttribute, sAttributeName;
 	if(!SplitPathToAttribute(sPath, &sPathToAttribute, &sAttributeName))
 		return false;
@@ -444,7 +447,8 @@ bool wxGISConfig::Write(wxGISEnumConfigKey Key, const wxString &sPath, bool bVal
 
 bool wxGISConfig::Write(wxGISEnumConfigKey Key, const wxString &sPath, int nValue)
 {
-	//split path
+    wxCriticalSectionLocker locker(((wxGISConfigRefData *)m_refData)->m_oCritSect);
+    //split path
 	wxString sPathToAttribute, sAttributeName;
 	if(!SplitPathToAttribute(sPath, &sPathToAttribute, &sAttributeName))
 		return false;
@@ -488,6 +492,81 @@ void wxGISConfig::Save(const wxGISEnumConfigKey Key)
 {
     wxCHECK_RET( IsOk(), wxT("Invalid wxGISConfig") );
     return ((wxGISConfigRefData *)m_refData)->Save(Key);
+}
+
+//---------------------------------------------------------------
+// wxGISConfigRefData
+//---------------------------------------------------------------
+
+wxGISConfigRefData::wxGISConfigRefData()
+{
+}
+
+wxGISConfigRefData::~wxGISConfigRefData()
+{
+    wxGISEnumConfigKey CmpKey = enumGISHKCU;//bInstall == true ? enumGISHKLM : enumGISHKCU;
+ 	for(size_t i = 0; i < m_paConfigFiles.size(); ++i)
+	{
+//the config state storing to files while destruction config class (smart pointer)
+//on linux saving file in destructor produce segmentation fault
+//#ifdef __WXMSW__
+//            //Store only user settings. Common settings should be changed during install process
+//            if(m_paConfigFiles[i].eKey == CmpKey)
+//            {
+//                wxString sXmlFilePath = m_paConfigFiles[i].sXmlFilePath;
+//                m_paConfigFiles[i].pXmlDoc->Save(sXmlFilePath);
+//            }
+//#endif
+        wxDELETE(m_paConfigFiles[i].pXmlDoc);
+	}
+	m_paConfigFiles.clear();
+}
+
+void wxGISConfigRefData::Save(const wxGISEnumConfigKey Key, const wxString&  sXmlFileName)
+{
+    wxCriticalSectionLocker locker(m_oCritSect);
+    if(sXmlFileName.IsEmpty())
+    {
+	    for(size_t i = 0; i < m_paConfigFiles.size(); ++i)
+        {
+            if(Key == enumGISHKAny || m_paConfigFiles[i].eKey & Key)
+            {
+                //if(wxFileName::IsFileWritable(m_paConfigFiles[i].sXmlFilePath))
+                wxString sXmlFilePath = m_paConfigFiles[i].sXmlFilePath;
+                bool bSave = m_paConfigFiles[i].pXmlDoc->Save(sXmlFilePath);
+                if(!bSave)
+                    wxLogError(_("Failed to save config '%s'"), sXmlFilePath.c_str());
+            }
+	    }
+    }
+    else
+    {
+ 	    for(size_t i = 0; i < m_paConfigFiles.size(); ++i)
+        {
+            if(m_paConfigFiles[i].eKey & Key && m_paConfigFiles[i].sXmlFileName.CmpNoCase(sXmlFileName) == 0)
+                m_paConfigFiles[i].pXmlDoc->Save(m_paConfigFiles[i].sXmlFilePath);
+	    }
+    }
+}
+
+wxGISConfigRefData::wxGISConfigRefData( const wxGISConfigRefData& data ) : wxObjectRefData()
+{
+    m_sLocalConfigDirPath = data.m_sLocalConfigDirPath;
+    m_sGlobalConfigDirPath = data.m_sGlobalConfigDirPath;
+    m_sLocalConfigDirPathNonPortable = data.m_sLocalConfigDirPathNonPortable;
+    m_bPortable = data.m_bPortable;
+    m_pmConfigNodes = data.m_pmConfigNodes;
+    m_paConfigFiles = data.m_paConfigFiles;
+}
+
+bool wxGISConfigRefData::operator == (const wxGISConfigRefData& data) const
+{
+    return m_sLocalConfigDirPath == data.m_sLocalConfigDirPath &&
+        m_sGlobalConfigDirPath == data.m_sGlobalConfigDirPath &&
+        m_sLocalConfigDirPathNonPortable == data.m_sLocalConfigDirPathNonPortable &&
+        m_bPortable == data.m_bPortable &&
+        m_pmConfigNodes.size() == data.m_pmConfigNodes.size() &&
+        m_paConfigFiles.size() == data.m_paConfigFiles.size();
 }
 
 //---------------------------------------------------------------

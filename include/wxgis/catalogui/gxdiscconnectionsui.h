@@ -3,7 +3,7 @@
  * Purpose:  wxGxDiscConnectionsUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010,2012 Bishop
+*   Copyright (C) 2010-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/catalogui/catalogui.h"
+#include "wxgis/catalogui/gxfolderui.h"
 #include "wxgis/catalog/gxdiscconnections.h"
 
 /** \class wxGxDiscConnectionsUI gxdiscconnectionsui.h
@@ -29,7 +30,8 @@
 class WXDLLIMPEXP_GIS_CLU wxGxDiscConnectionsUI :
     public wxGxDiscConnections,
 	public IGxObjectUI,
-    public IGxObjectSort
+    public IGxObjectSort,
+    public wxGxAutoRenamer
 {
    DECLARE_DYNAMIC_CLASS(wxGxDiscConnectionsUI)
 public:

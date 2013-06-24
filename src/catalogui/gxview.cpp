@@ -27,6 +27,36 @@
 #include "wxgis/catalog/gxdiscconnections.h"
 */
 
+//---------------------------------------------------------------------------
+// wxGxAutoRenamer
+//---------------------------------------------------------------------------
+wxGxAutoRenamer::wxGxAutoRenamer()
+{
+    m_pGxViewToRename = NULL;
+}
+
+wxGxAutoRenamer::~wxGxAutoRenamer()
+{
+}
+
+void wxGxAutoRenamer::BeginRenameOnAdd(wxGxView* const pGxView, const CPLString &szPath)
+{
+    m_pGxViewToRename = pGxView;
+    m_szPathToRename = szPath;
+    m_szPathToRename = m_szPathToRename.tolower();
+}
+
+bool wxGxAutoRenamer::IsBeginRename(wxGxView* const pGxView, const CPLString &szPath)
+{
+    CPLString szCmpPath = szPath;
+    if(m_pGxViewToRename == pGxView && m_szPathToRename == szCmpPath.tolower())
+    {
+        m_pGxViewToRename = NULL;
+        return true;
+    }
+    return false;
+}
+
 //-----------------------------------------------
 // wxGxView
 //-----------------------------------------------

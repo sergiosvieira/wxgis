@@ -27,26 +27,16 @@
 //---------------------------------------------------------------------------
 IMPLEMENT_CLASS(wxGxFolder, wxGxObjectContainer)
 
-BEGIN_EVENT_TABLE(wxGxFolder, wxGxObjectContainer)
-    EVT_FSWATCHER(wxID_ANY, wxGxFolder::OnFileSystemEvent)
-END_EVENT_TABLE()
-
-wxGxFolder::wxGxFolder(void) : wxGxObjectContainer(), m_bIsChildrenLoaded(false), m_pWatcher(NULL)
+wxGxFolder::wxGxFolder(void) : wxGxObjectContainer(), m_bIsChildrenLoaded(false)
 {
 }
 
-wxGxFolder::wxGxFolder(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxObjectContainer(oParent, soName, soPath), m_bIsChildrenLoaded(false), m_pWatcher(NULL)
+wxGxFolder::wxGxFolder(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxObjectContainer(oParent, soName, soPath), m_bIsChildrenLoaded(false)
 {
 }
 
 wxGxFolder::~wxGxFolder(void)
 {
-}
-
-bool wxGxFolder::Destroy(void)
-{
-    wxDELETE(m_pWatcher);
-    return wxGxObjectContainer::Destroy();
 }
 
 wxString wxGxFolder::GetBaseName(void) const 
@@ -58,8 +48,6 @@ void wxGxFolder::Refresh(void)
 {
 	DestroyChildren();
     m_bIsChildrenLoaded = false;
-    wxDELETE(m_pWatcher);
-    //delete watcher
 	LoadChildren();
     wxGIS_GXCATALOG_EVENT(ObjectRefreshed);
 }
@@ -100,22 +88,12 @@ void wxGxFolder::LoadChildren(void)
 	}
     CSLDestroy( papszFileList );
 
-    //start watcher
-    m_pWatcher = new wxFileSystemWatcher();
-    m_pWatcher->SetOwner(this);
-
-    wxFileName oFileName = wxFileName::DirName(wxString(m_sPath, wxConvUTF8));
-    if(!m_pWatcher->Add(oFileName, wxFSW_EVENT_ALL))
-    {
-        wxLogError(_("Add File system watcher failed"));
-    }
-
 	m_bIsChildrenLoaded = true;
 }
 
 bool wxGxFolder::Delete(void)
 {
-	if(DeleteDir(m_sPath))
+ 	if(DeleteDir(m_sPath))
 	{
         return true;
 	}
@@ -128,21 +106,16 @@ bool wxGxFolder::Delete(void)
 	return false;
 }
 
-bool wxGxFolder::Rename(wxString NewName)
+bool wxGxFolder::Rename(const wxString &sNewName)
 {
 	wxFileName PathName(wxString(m_sPath, wxConvUTF8));
-	PathName.SetName(NewName);
+	PathName.SetName(sNewName);
 
 	wxString sNewPath = PathName.GetFullPath();
 
-	//EmptyChildren();
     CPLString szNewPath(sNewPath.mb_str(wxConvUTF8));
     if(RenameFile(m_sPath, szNewPath))
 	{
-		//m_sPath = szNewPath;
-		//m_sName = NewName;
-		//m_pCatalog->ObjectChanged(GetID());
-		//Refresh();
 		return true;
 	}
 	else
@@ -153,19 +126,7 @@ bool wxGxFolder::Rename(wxString NewName)
     }
 	return false;
 }
-/*
-bool wxGxFolder::DeleteChild(IGxObject* pChild)
-{
-	bool bHasChildren = m_Children.size() > 0 ? true : false;
-    long nChildID = pChild->GetID();
-	if(!IGxObjectContainer::DeleteChild(pChild))
-		return false;
-    m_pCatalog->ObjectDeleted(nChildID);
-	if(bHasChildren != m_Children.size() > 0 ? true : false)
-		m_pCatalog->ObjectChanged(GetID());
-	return true;
-}
-*/
+
 bool wxGxFolder::CanCreate(long nDataType, long DataSubtype)
 {
 	return wxIsWritable(wxString(m_sPath, wxConvUTF8));
@@ -177,71 +138,3 @@ bool wxGxFolder::HasChildren(void)
     return wxGxObjectContainer::HasChildren();
 }
 
-void wxGxFolder::OnFileSystemEvent(wxFileSystemWatcherEvent& event)
-{
-    //reread conn.xml file
-    wxLogDebug(wxT("*** %s ***"), event.ToString().c_str());
-    switch(event.GetChangeType())
-    {
-    case wxFSW_EVENT_CREATE:
-        {
-            CPLString szPath(event.GetPath().GetFullPath().mb_str(wxConvUTF8));
-            char **papszFileList = NULL;  
-            papszFileList = CSLAddString( papszFileList, szPath );
-            wxGxCatalogBase* pCatalog = GetGxCatalog();
-	        if(pCatalog)
-            {
-                wxArrayLong ChildrenIds;
-                pCatalog->GetChildren(this, papszFileList, ChildrenIds);
-                for(size_t i = 0; i < ChildrenIds.GetCount(); ++i)
-                    pCatalog->ObjectAdded(ChildrenIds[i]);
-	        }
-            CSLDestroy( papszFileList );
-        }
-        break;
-    case wxFSW_EVENT_DELETE:
-        {
-            //search gxobject
-            wxGxObjectList::const_iterator iter;
-            for(iter = GetChildren().begin(); iter != GetChildren().end(); ++iter)
-            {
-                wxGxObject *current = *iter;
-                if(current)
-                {
-                    if(current->GetName() == event.GetPath().GetFullName())
-                    {
-                        current->Destroy();
-                        break;
-                    }
-                }
-            }
-        }
-        break;
-    case wxFSW_EVENT_RENAME:
-        {
-            wxGxObjectList::const_iterator iter;
-            for(iter = GetChildren().begin(); iter != GetChildren().end(); ++iter)
-            {
-                wxGxObject *current = *iter;
-                if(current)
-                {
-                    if(current->GetName() == event.GetPath().GetFullName())
-                    {
-                        current->SetName(event.GetNewPath().GetFullName());
-                        current->SetPath( CPLString( event.GetNewPath().GetFullPath().mb_str(wxConvUTF8) ) );
-                        wxGIS_GXCATALOG_EVENT_ID(ObjectChanged, current->GetId());
-                        break;
-                    }
-                }
-            }
-        }
-        break;
-    case wxFSW_EVENT_MODIFY:
-        break;
-    default:
-    case wxFSW_EVENT_ACCESS:
-    case wxFSW_EVENT_WARNING:
-    case wxFSW_EVENT_ERROR:
-        break;
-    };
-}

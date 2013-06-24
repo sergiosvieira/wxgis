@@ -3,7 +3,7 @@
  * Purpose:  wxGxFolderUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2012 Bishop
+*   Copyright (C) 2009-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -31,14 +31,13 @@ class WXDLLIMPEXP_GIS_CLU wxGxFolderUI :
     public wxGxFolder,
 	public IGxObjectUI,
 	public IGxObjectEditUI,
-    public IGxDropTarget
+    public IGxDropTarget,
+    public wxGxAutoRenamer
 {
     DECLARE_CLASS(wxGxFolderUI)
 public:
 	wxGxFolderUI(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon & LargeIcon = wxNullIcon, const wxIcon & SmallIcon = wxNullIcon);
 	virtual ~wxGxFolderUI(void);
-    //wxGxObjectContainer
-    virtual void AddChild( wxGxObject *child );
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
@@ -49,10 +48,6 @@ public:
     //IGxDropTarget
     virtual wxDragResult CanDrop(wxDragResult def);
     virtual bool Drop(const wxArrayString& GxObjects, bool bMove);
-    //wxGxFolderUI
-    virtual void BeginRenameOnAdd(wxGxView* const pGxView, const CPLString &szPath);
 protected:
     wxIcon m_oLargeIcon, m_oSmallIcon;
-    wxGxView* m_pGxViewToRename;
-    CPLString m_szPathToRename;
 };

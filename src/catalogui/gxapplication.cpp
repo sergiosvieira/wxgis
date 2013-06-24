@@ -172,6 +172,7 @@ bool wxGxApplication::CreateApp(void)
 
 void wxGxApplication::OnClose(wxCloseEvent& event)
 {
+	wxGISAppConfig oConfig = GetConfig();
 	//should remove toolbars from commandbar array as m_mgr manage toolbars by itself
 	if(m_pCatalog)
 	{
@@ -186,7 +187,6 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
 				if(sLastPath.IsEmpty())
 					sLastPath = pGxObject->GetName();
 
-				wxGISAppConfig oConfig = GetConfig();
 				if(oConfig.IsOk())
 					oConfig.Write(enumGISHKCU, GetAppName() + wxString(wxT("/lastpath/path")), sLastPath);
 			}

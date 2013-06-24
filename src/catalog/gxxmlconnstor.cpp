@@ -73,11 +73,17 @@ void wxGxXMLConnectionStorage::LoadConnectionsStorage(void)
         wxGxCatalog* pGxCatalog = wxDynamicCast(GetGxCatalog(), wxGxCatalog);
         std::map<long, bool> mnIds;
 
+        wxGxObjectList::const_iterator iter;
+        for(iter = GetChildren().begin(); iter != GetChildren().end(); ++iter)
+        {
+            wxGxObject *current = *iter;
+             mnIds[current->GetId()] = false;
+        }
+
 		while(pConnectionNode)
 		{
             bool bFoundKey = false;
 
-            wxGxObjectList::const_iterator iter;
             for(iter = GetChildren().begin(); iter != GetChildren().end(); ++iter)
             {
                 wxGxObject *current = *iter;
@@ -89,10 +95,6 @@ void wxGxXMLConnectionStorage::LoadConnectionsStorage(void)
                     bFoundKey = true;
                     mnIds[current->GetId()] = true;
                     break;
-                }
-                if(mnIds[current->GetId()] == false)
-                {
-                    mnIds[current->GetId()] = false;
                 }
             }
 

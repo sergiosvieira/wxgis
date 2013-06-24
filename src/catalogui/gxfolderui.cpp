@@ -3,7 +3,7 @@
  * Purpose:  wxGxFolderUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2012 Bishop
+*   Copyright (C) 2009-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 
 IMPLEMENT_CLASS(wxGxFolderUI, wxGxFolder)
 
-wxGxFolderUI::wxGxFolderUI(wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon & LargeIcon, const wxIcon & SmallIcon) : wxGxFolder(oParent, soName, soPath)
+wxGxFolderUI::wxGxFolderUI(wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon & LargeIcon, const wxIcon & SmallIcon) : wxGxFolder(oParent, soName, soPath), wxGxAutoRenamer()
 {
     m_oLargeIcon = LargeIcon;
     m_oSmallIcon = SmallIcon;
@@ -68,25 +68,6 @@ void wxGxFolderUI::EditProperties(wxWindow *parent)
     SEInf.nShow = SW_SHOW;
     ShellExecuteEx(&SEInf);
 #endif
-}
-
-void wxGxFolderUI::BeginRenameOnAdd(wxGxView* const pGxView, const CPLString &szPath)
-{
-    m_pGxViewToRename = pGxView;
-    m_szPathToRename = szPath;
-    m_szPathToRename = m_szPathToRename.tolower();
-}
-
-void wxGxFolderUI::AddChild( wxGxObject *child )
-{
-    wxGxFolder::AddChild(child);
-    if(child->GetPath().tolower() == m_szPathToRename)
-    {
-        m_pGxViewToRename->BeginRename(child->GetId());
-
-        m_szPathToRename.clear();
-        m_pGxViewToRename = NULL;
-    }
 }
 
 wxDragResult wxGxFolderUI::CanDrop(wxDragResult def)

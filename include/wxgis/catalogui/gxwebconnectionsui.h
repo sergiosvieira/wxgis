@@ -22,6 +22,7 @@
 
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalog/gxwebconnections.h"
+#include "wxgis/catalogui/gxfolderui.h"
 #include "wxgis/catalogui/gxview.h"
 
 /** \class wxGxWebConnectionsUI gxwebconnectionsui.h
@@ -30,23 +31,18 @@
 
 class WXDLLIMPEXP_GIS_CLU wxGxWebConnectionsUI :
     public wxGxWebConnections,
-	public IGxObjectUI
+	public IGxObjectUI,
+    public wxGxAutoRenamer
 {
     DECLARE_DYNAMIC_CLASS(wxGxWebConnectionsUI)
 public:
 	wxGxWebConnectionsUI(void);
 	virtual ~wxGxWebConnectionsUI(void);
-    //wxGxDBConnections
-    virtual void AddChild( wxGxObject *child );
     //IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
 	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxWebConnections.ContextMenu"));};
 	virtual wxString NewMenu(void) const {return wxString(wxT("wxGxWebConnections.NewMenu"));};
-    //wxGxDBConnectionsUI
-    virtual void BeginRenameOnAdd(wxGxView* const pGxView, const CPLString &szPath);
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
-    wxGxView* m_pGxViewToRename;
-    CPLString m_szPathToRename;
 };

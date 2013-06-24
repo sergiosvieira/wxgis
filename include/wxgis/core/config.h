@@ -3,7 +3,7 @@
  * Purpose:  wxGISConfig class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011,2012 Bishop
+*   Copyright (C) 2009,2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -82,74 +82,11 @@ class  wxGISConfigRefData : public wxObjectRefData
     friend class wxGISConfig;
     friend class wxGISAppConfig;
 public:
-    wxGISConfigRefData()
-    {
-    }
-
-    virtual ~wxGISConfigRefData()
-    {
-        wxGISEnumConfigKey CmpKey = enumGISHKCU;//bInstall == true ? enumGISHKLM : enumGISHKCU;
- 	    for(size_t i = 0; i < m_paConfigFiles.size(); ++i)
-	    {
-//the config state storing to files while destruction config class (smart pointer)
-//on linux saving file in destructor produce segmentation fault
-//#ifdef __WXMSW__
-//            //Store only user settings. Common settings should be changed during install process
-//            if(m_paConfigFiles[i].eKey == CmpKey)
-//            {
-//                wxString sXmlFilePath = m_paConfigFiles[i].sXmlFilePath;
-//                m_paConfigFiles[i].pXmlDoc->Save(sXmlFilePath);
-//            }
-//#endif
-            wxDELETE(m_paConfigFiles[i].pXmlDoc);
-	    }
-	    m_paConfigFiles.clear();
-    }
-
-    void Save(const wxGISEnumConfigKey Key = enumGISHKAny, const wxString&  sXmlFileName = wxEmptyString)
-    {
-        if(sXmlFileName.IsEmpty())
-        {
-	        for(size_t i = 0; i < m_paConfigFiles.size(); ++i)
-            {
-                if(Key == enumGISHKAny || m_paConfigFiles[i].eKey & Key)
-                {
-                    //if(wxFileName::IsFileWritable(m_paConfigFiles[i].sXmlFilePath))
-                    wxString sXmlFilePath = m_paConfigFiles[i].sXmlFilePath;
-                    m_paConfigFiles[i].pXmlDoc->Save(sXmlFilePath);
-                }
-	        }
-        }
-        else
-        {
- 	        for(size_t i = 0; i < m_paConfigFiles.size(); ++i)
-            {
-                if(m_paConfigFiles[i].eKey & Key && m_paConfigFiles[i].sXmlFileName.CmpNoCase(sXmlFileName) == 0)
-                    m_paConfigFiles[i].pXmlDoc->Save(m_paConfigFiles[i].sXmlFilePath);
-	        }
-        }
-    }
-
-    wxGISConfigRefData( const wxGISConfigRefData& data )
-        : wxObjectRefData()
-    {
-        m_sLocalConfigDirPath = data.m_sLocalConfigDirPath;
-        m_sGlobalConfigDirPath = data.m_sGlobalConfigDirPath;
-        m_sLocalConfigDirPathNonPortable = data.m_sLocalConfigDirPathNonPortable;
-        m_bPortable = data.m_bPortable;
-        m_pmConfigNodes = data.m_pmConfigNodes;
-        m_paConfigFiles = data.m_paConfigFiles;
-    }
-
-    bool operator == (const wxGISConfigRefData& data) const
-    {
-        return m_sLocalConfigDirPath == data.m_sLocalConfigDirPath &&
-            m_sGlobalConfigDirPath == data.m_sGlobalConfigDirPath &&
-            m_sLocalConfigDirPathNonPortable == data.m_sLocalConfigDirPathNonPortable &&
-            m_bPortable == data.m_bPortable &&
-            m_pmConfigNodes.size() == data.m_pmConfigNodes.size() &&
-            m_paConfigFiles.size() == data.m_paConfigFiles.size();
-    }
+    wxGISConfigRefData();
+    virtual ~wxGISConfigRefData();
+    void Save(const wxGISEnumConfigKey Key = enumGISHKAny, const wxString&  sXmlFileName = wxEmptyString);
+    wxGISConfigRefData( const wxGISConfigRefData& data );
+    bool operator == (const wxGISConfigRefData& data) const;
 
 	//typedefs
 	typedef struct wxxmlconf
@@ -166,6 +103,8 @@ protected:
     bool m_bPortable;
 	wxVector<WXXMLCONF> m_paConfigFiles;
 	wxGISConfigNodesMap m_pmConfigNodes;
+protected:
+    wxCriticalSection m_oCritSect;
 };
 
 /** \class wxGISAppConfig config.h

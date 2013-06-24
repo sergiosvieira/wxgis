@@ -3,7 +3,7 @@
  * Purpose:  Catalog Main Commands class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2012 Bishop
+*   Copyright (C) 2009-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -538,7 +538,13 @@ void wxGISCatalogMainCmd::OnClick(void)
                         if(!pGxObjectEdit->Delete())
                         {
                             wxWindow* pWnd = dynamic_cast<wxWindow*>(m_pApp);
-                            int nRes = wxMessageBox(wxString::Format(_("Cannot delete '%s'\nContinue?"),pGxObject->GetName().c_str()), _("Error"), wxYES_NO | wxICON_QUESTION, pWnd);
+                            if(i == pSel->GetCount() - 1)
+                            {
+                                wxMessageBox(wxString::Format(_("Delete '%s'failed"), pGxObject->GetName().c_str()), _("Error"), wxOK | wxICON_ERROR, pWnd);
+                                return;
+                            }
+
+                            int nRes = wxMessageBox(wxString::Format(_("Cannot delete '%s'\nContinue?"), pGxObject->GetName().c_str()), _("Error"), wxYES_NO | wxICON_QUESTION, pWnd);
                             if(nRes == wxNO)
                                 return;
                         }
@@ -703,18 +709,20 @@ void wxGISCatalogMainCmd::OnClick(void)
             if(pSel && pCat)
             {
                 //create folder
-                wxGxFolderUI* pGxObject = wxDynamicCast(pCat->GetRegisterObject(pSel->GetFirstSelectedObjectId()), wxGxFolderUI);
-                if(!pGxObject)
+                long nSelId = pSel->GetFirstSelectedObjectId();
+                wxGxObject* pGxObject = pCat->GetRegisterObject(nSelId);
+                wxGxAutoRenamer* pGxFolder = dynamic_cast<wxGxAutoRenamer*>(pGxObject);
+                if(!pGxFolder)
                     return;
 
                 wxGxView* pGxView = dynamic_cast<wxGxView*>(wxWindow::FindFocus());
 
-                CPLString sFolderPath = CheckUniqPath(pGxObject->GetPath(), CPLString(wxString(_("New folder")).mb_str(wxConvUTF8)));
-                pGxObject->BeginRenameOnAdd(pGxView, sFolderPath);
+                CPLString sFolderPath = CheckUniqPath(pGxObject->GetPath(), CPLString(wxString(_("New folder")).mb_str(wxConvUTF8)), true, " ");
+                pGxFolder->BeginRenameOnAdd(pGxView, sFolderPath);
                 if(!CreateDir(sFolderPath))
                 {
                     wxMessageBox(_("Create folder error!"), _("Error"), wxICON_ERROR | wxOK );
-                    pGxObject->BeginRenameOnAdd(NULL, "");
+                    pGxFolder->BeginRenameOnAdd(NULL, "");
                     return;
                 }
             }

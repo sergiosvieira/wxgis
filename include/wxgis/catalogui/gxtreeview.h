@@ -3,7 +3,7 @@
  * Purpose:  wxGxTreeView class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2012 Bishop
+*   Copyright (C) 2009-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -124,8 +124,6 @@ public:
     wxGxTreeView(void);
 	wxGxTreeView(wxWindow* parent, wxWindowID id = TREECTRLID, long style = wxTR_HAS_BUTTONS | wxTR_TWIST_BUTTONS | wxBORDER_NONE | wxTR_EDIT_LABELS );//wxTR_MULTIPLE| wxTR_LINES_AT_ROOT
 	virtual ~wxGxTreeView(void);
-//wxGxTreeViewBase
-    virtual void AddTreeItem(wxGxObject* pGxObject, wxTreeItemId hParent);
 //IGxDropTarget
     virtual wxDragResult OnDragOver(wxCoord x, wxCoord y, wxDragResult def);
     virtual bool OnDropObjects(wxCoord x, wxCoord y, const wxArrayString& GxObjects);
@@ -138,11 +136,12 @@ public:
 	virtual void OnItemRightClick(wxTreeEvent& event);
 	virtual void OnBeginDrag(wxTreeEvent& event);
 	virtual void OnActivated(wxTreeEvent& event);
+//wxGxTreeViewBase
+    virtual void OnObjectAdded(wxGxCatalogEvent& event);
 //wxGxTreeView
     virtual void BeginRename(long nObjectID = wxNOT_FOUND);
 protected:
     wxTreeItemId m_HighLightItemId;
-    long m_nBegRenameID;
 
     DECLARE_EVENT_TABLE()
 };
