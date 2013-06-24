@@ -3,7 +3,7 @@
  * Purpose:  Main application class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2012 Bishop
+*   Copyright (C) 2009,2012,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -42,20 +42,10 @@ wxGISCatalogApp::wxGISCatalogApp(void) : wxApp()
 
 wxGISCatalogApp::~wxGISCatalogApp(void)
 {
-    wxGISAppConfig oConfig = GetConfig();
-
-    SerializeLibs();
-
-	GDALDestroyDriverManager();
+ 	GDALDestroyDriverManager();
 	OGRCleanupAll();
 
 	UnLoadLibs();
-
-//the config state storing to files while destruction config class (smart pointer)
-//on linux saving file in destructor produce segmentation fault
-	if(oConfig.IsOk())
-		oConfig.Save(enumGISHKCU);
-
 }
 
 bool wxGISCatalogApp::OnInit()
@@ -128,8 +118,6 @@ bool wxGISCatalogApp::OnInit()
 	//gdal
 	oConfig.Write(enumGISHKCU, wxString(wxT("wxGISCommon/GDAL/cachemax")), sGDALCacheMax);
 
-	oConfig.Save();
-
     wxString sKey(wxT("wxGISCommon/libs"));
     //load libs
 	wxXmlNode* pLibsNode = oConfig.GetConfigNode(enumGISHKCU, sKey);
@@ -144,6 +132,19 @@ bool wxGISCatalogApp::OnInit()
     //SetTopWindow(frame);
 
 	return true;
+}
+
+int wxGISCatalogApp::OnExit()
+{
+	wxGISAppConfig oConfig = GetConfig();
+
+    SerializeLibs();
+//the config state storing to files while destruction config class (smart pointer)
+//on linux saving file in destructor produce segmentation fault
+	if(oConfig.IsOk())
+		oConfig.Save(enumGISHKCU);
+
+    return 0;
 }
 
 // create the file system watcher here, because it needs an active loop

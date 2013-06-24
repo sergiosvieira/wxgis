@@ -30,7 +30,7 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxWebConnectionsUI, wxGxWebConnections)
 
-wxGxWebConnectionsUI::wxGxWebConnectionsUI(void) : wxGxWebConnections()
+wxGxWebConnectionsUI::wxGxWebConnectionsUI(void) : wxGxWebConnections(), wxGxAutoRenamer()
 {
 }
 
@@ -50,24 +50,5 @@ wxIcon wxGxWebConnectionsUI::GetSmallImage(void)
     if(!m_SmallIcon.IsOk())
         m_SmallIcon = wxIcon(web_connections_16_xpm);
 	return m_SmallIcon;
-}
-
-void wxGxWebConnectionsUI::BeginRenameOnAdd(wxGxView* const pGxView, const CPLString &szPath)
-{
-    m_pGxViewToRename = pGxView;
-    m_szPathToRename = szPath;
-    m_szPathToRename = m_szPathToRename.tolower();
-}
-
-void wxGxWebConnectionsUI::AddChild( wxGxObject *child )
-{
-    wxGxWebConnections::AddChild(child);
-    if(child->GetPath().tolower() == m_szPathToRename)
-    {
-        m_pGxViewToRename->BeginRename(child->GetId());
-
-        m_szPathToRename.clear();
-        m_pGxViewToRename = NULL;
-    }
 }
 

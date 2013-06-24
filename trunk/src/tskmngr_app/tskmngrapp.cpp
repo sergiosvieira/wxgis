@@ -37,7 +37,7 @@ wxGISTaskManagerApp::wxGISTaskManagerApp(void) : wxAppConsole(), wxThreadHelper(
     m_vendorName = wxString(wxT("wxGIS"));
     m_vendorDisplayName = wxString(wxT("wxGIS"));
 
-    m_appName = wxString(wxT("NextGISTaskManager"));
+    m_appName = wxString(wxT("wxGISTaskManager"));
     m_appDisplayName = wxString(wxT("NextGIS Task Manager"));
     m_className = wxString(wxT("wxGISTaskManagerApp"));
 

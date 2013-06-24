@@ -54,6 +54,8 @@ public:
     virtual void Refresh(void);
 	virtual long GetId(void) const {return m_nId;};
 	virtual void SetId(long nId){m_nId = nId;};
+    virtual wxGxObject *FindGxObjectByPath(const wxString &sPath) const;
+    virtual wxGxObject *FindGxObject(const wxString &sPath) const;
 protected:
     wxString m_sName;
     CPLString m_sPath;
@@ -77,8 +79,7 @@ public:
     virtual void AddChild( wxGxObject *child );
     virtual void RemoveChild( wxGxObject *child );
     virtual bool DestroyChild( wxGxObject *child );
-    wxGxObject *FindGxObject(const wxString &sPath) const;
-    bool IsNameExist(const wxString &sName) const;
+    virtual bool IsNameExist(const wxString &sName) const;
     virtual bool DestroyChildren();
     virtual bool HasChildren(void){return !m_Children.IsEmpty();};
     virtual bool AreChildrenViewable(void)  const = 0;
@@ -88,6 +89,8 @@ public:
     virtual bool Destroy(void);
     virtual wxGxObjectList& GetChildren() { return m_Children; }
     virtual void Refresh(void);
+    virtual wxGxObject *FindGxObjectByPath(const wxString &sPath) const;
+    virtual wxGxObject *FindGxObject(const wxString &sPath) const;
 protected:
     wxGxObjectList m_Children;
 };

@@ -108,7 +108,7 @@ bool wxGxKMLDataset::Delete(void)
     return false;
 }
 
-bool wxGxKMLDataset::Rename(wxString NewName)
+bool wxGxKMLDataset::Rename(const wxString &sNewName)
 {
 	wxFileName PathName(wxString(m_sPath, wxConvUTF8));
 	PathName.SetName(ClearExt(NewName));

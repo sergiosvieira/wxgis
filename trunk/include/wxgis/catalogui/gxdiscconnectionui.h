@@ -3,7 +3,7 @@
  * Purpose:  wxGxDiscConnectionUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2012 Bishop
+*   Copyright (C) 2010-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -32,7 +32,8 @@ class WXDLLIMPEXP_GIS_CLU wxGxDiscConnectionUI :
     public IGxObjectUI,
     public IGxObjectEditUI,
     public IGxDropTarget,
-    public wxThreadHelper
+    public wxThreadHelper,
+    public wxGxAutoRenamer
 {
 public:
 	wxGxDiscConnectionUI(wxGxObject *oParent, const wxString &soXmlConfPath, int nXmlId, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon &SmallIco = wxNullIcon, const wxIcon &LargeIco = wxNullIcon, const wxIcon &SmallIcoDsbl = wxNullIcon, const wxIcon &LargeIcoDsbl = wxNullIcon);

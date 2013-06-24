@@ -30,7 +30,7 @@
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnectionsUI, wxGxDBConnections)
 
-wxGxDBConnectionsUI::wxGxDBConnectionsUI(void) : wxGxDBConnections()
+wxGxDBConnectionsUI::wxGxDBConnectionsUI(void) : wxGxDBConnections(), wxGxAutoRenamer()
 {    
 }
 
@@ -52,21 +52,4 @@ wxIcon wxGxDBConnectionsUI::GetSmallImage(void)
 	return m_SmallIcon;
 }
 
-void wxGxDBConnectionsUI::BeginRenameOnAdd(wxGxView* const pGxView, const CPLString &szPath)
-{
-    m_pGxViewToRename = pGxView;
-    m_szPathToRename = szPath;
-    m_szPathToRename = m_szPathToRename.tolower();
-}
 
-void wxGxDBConnectionsUI::AddChild( wxGxObject *child )
-{
-    wxGxDBConnections::AddChild(child);
-    if(child->GetPath().tolower() == m_szPathToRename)
-    {
-        m_pGxViewToRename->BeginRename(child->GetId());
-
-        m_szPathToRename.clear();
-        m_pGxViewToRename = NULL;
-    }
-}

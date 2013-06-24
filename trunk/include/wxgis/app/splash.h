@@ -33,7 +33,7 @@ class wxGISSplashScreen : public wxSplashScreen
 		ID_CHECK = wxID_HIGHEST + 1
 	};
 public:
-	wxGISSplashScreen( int milliseconds = 6000, wxWindow *parent = NULL, wxWindowID id = wxID_ANY, const wxPoint &pos = wxDefaultPosition, const wxSize &size = wxDefaultSize, long style = wxBORDER_SIMPLE|wxFRAME_NO_TASKBAR|wxSTAY_ON_TOP );
+	wxGISSplashScreen( int milliseconds = 6000, wxWindow *parent = NULL, wxWindowID id = wxID_ANY, const wxPoint &pos = wxDefaultPosition, const wxSize &size = wxDefaultSize, long style = wxBORDER_NONE|wxFRAME_NO_TASKBAR|wxSTAY_ON_TOP );
 	virtual ~wxGISSplashScreen();
     virtual int FilterEvent(wxEvent& event);
 protected:

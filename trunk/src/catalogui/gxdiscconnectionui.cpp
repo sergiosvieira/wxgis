@@ -3,7 +3,7 @@
  * Purpose:  wxGxDiscConnectionUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2012 Bishop
+*   Copyright (C) 2010-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 //#include "wxgis/framework/progressdlg.h"
 //#include "wxgis/core/globalfn.h"
 
-wxGxDiscConnectionUI::wxGxDiscConnectionUI(wxGxObject *oParent, const wxString &soXmlConfPath, int nXmlId, const wxString &soName, const CPLString &soPath, const wxIcon &SmallIco, const wxIcon &LargeIco, const wxIcon &SmallIcoDsbl, const wxIcon &LargeIcoDsbl) : wxGxDiscConnection(oParent, soXmlConfPath, nXmlId, soName, soPath), wxThreadHelper()
+wxGxDiscConnectionUI::wxGxDiscConnectionUI(wxGxObject *oParent, const wxString &soXmlConfPath, int nXmlId, const wxString &soName, const CPLString &soPath, const wxIcon &SmallIco, const wxIcon &LargeIco, const wxIcon &SmallIcoDsbl, const wxIcon &LargeIcoDsbl) : wxGxAutoRenamer(), wxGxDiscConnection(oParent, soXmlConfPath, nXmlId, soName, soPath), wxThreadHelper()
 {
     m_nIsReadable = wxNOT_FOUND;
 	m_Conn16 = SmallIco;

@@ -232,6 +232,23 @@ wxString wxGxObject::GetFullName(void) const
         return wxEmptyString;
 };
 
+
+wxGxObject *wxGxObject::FindGxObject(const wxString &sPath) const
+{
+	wxString sTestPath = sPath;
+	if(GetFullName().IsSameAs(sPath, false))
+		return (wxGxObject *)this;
+    return NULL;
+}
+
+wxGxObject *wxGxObject::FindGxObjectByPath(const wxString &sPath) const
+{
+    wxString sThisPath(m_sPath, wxConvUTF8);
+    if(sThisPath.IsSameAs(sPath, false))
+        return (wxGxObject *)this;
+    return NULL;
+}
+
 //---------------------------------------------------------------------------
 // wxGxObjectContainer
 //---------------------------------------------------------------------------
@@ -317,37 +334,25 @@ bool wxGxObjectContainer::DestroyChildren()
 
 wxGxObject *wxGxObjectContainer::FindGxObject(const wxString &sPath) const
 {
-	wxString sTestPath = sPath;
-	if(GetFullName().CmpNoCase(sPath) == 0)//GetName
-		return (wxGxObject *)this;
+    wxGxObject *ret = wxGxObject::FindGxObject(sPath);
+    if(ret)
+        return ret;
 
-    wxGxObjectList::const_iterator iter;
-    for(iter = GetChildren().begin(); iter != GetChildren().end(); ++iter)
+    wxString sThisPath(m_sPath, wxConvUTF8);
+    bool bHavePart = sPath.Lower().Find(GetFullName().MakeLower()) != wxNOT_FOUND;
+    if(bHavePart)
     {
-        wxGxObject *current = *iter;
-		wxString sTestedPath = current->GetFullName();
-		if(sTestedPath.CmpNoCase(sPath) == 0)
-			return current;
-        bool bHavePart = sPath.Lower().Find(sTestedPath.MakeLower()) != wxNOT_FOUND;
-		if(bHavePart )
-		{
-            if(current->IsKindOf(wxCLASSINFO(wxGxObjectContainer)))
-            {
-                wxGxObjectContainer* pGxObjectContainer = wxDynamicCast(current, wxGxObjectContainer);
-                if(pGxObjectContainer && pGxObjectContainer->HasChildren())
-                {
-                    wxGxObject *pFoundChild = pGxObjectContainer->FindGxObject(sPath);
-                    if(pFoundChild)
-                        return pFoundChild;
-                }
-            }
-	  //      IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>(pGxObjectContainer);
-   //         if(pGxDataset != NULL)
-   //             pGxDataset->GetDataset();
+        wxGxObjectList::const_iterator iter;
+        for(iter = GetChildren().begin(); iter != GetChildren().end(); ++iter)
+        {
+            wxGxObject *current = *iter;
 
-		}
-	}
-	return NULL;
+            wxGxObject *ret = current->FindGxObject(sPath);
+            if(ret)
+                return ret;
+        }
+    }
+    return NULL;
 }
 
 
@@ -380,4 +385,27 @@ bool wxGxObjectContainer::Destroy(void)
     if(DestroyChildren())
         return wxGxObject::Destroy();
     return false;
+}
+
+wxGxObject *wxGxObjectContainer::FindGxObjectByPath(const wxString &sPath) const
+{
+    wxGxObject *ret = wxGxObject::FindGxObjectByPath(sPath);
+    if(ret)
+        return ret;
+
+    wxString sThisPath(m_sPath, wxConvUTF8);
+    bool bHavePart = sPath.Lower().Find(sThisPath.MakeLower()) != wxNOT_FOUND;
+    if(bHavePart)
+    {
+        wxGxObjectList::const_iterator iter;
+        for(iter = GetChildren().begin(); iter != GetChildren().end(); ++iter)
+        {
+            wxGxObject *current = *iter;
+
+            wxGxObject *ret = current->FindGxObjectByPath(sPath);
+            if(ret)
+                return ret;
+        }
+    }
+    return NULL;
 }

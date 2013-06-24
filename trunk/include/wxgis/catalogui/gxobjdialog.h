@@ -156,8 +156,8 @@ public:
 	virtual ~wxGxObjectDialog();
 //wxGISApplicationBase
     virtual wxString GetAppName(void) const {return wxString(OBJDLG_NAME);};
-	virtual wxString GetUserAppName(void) const {return wxString(_("NextGIS Object Dialog"));};
-	virtual wxString GetUserAppNameShort(void) const {return wxString(_("Object Dialog"));};
+	virtual wxString GetAppDisplayName(void) const {return wxString(_("NextGIS Object Dialog"));};
+	virtual wxString GetAppDisplayNameShort(void) const {return wxString(_("Object Dialog"));};
 //wxGxObjectDialog
 	virtual void SetButtonCaption(const wxString &sOkBtLabel);
 	virtual void SetStartingLocation(const wxString &sStartPath);

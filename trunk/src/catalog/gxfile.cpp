@@ -62,7 +62,7 @@ bool wxGxFile::Delete(void)
     }
 }
 
-bool wxGxFile::Rename(wxString NewName)
+bool wxGxFile::Rename(const wxString &sNewName)
 {
 	wxFileName PathName(wxString(m_sPath, wxConvUTF8));
 	PathName.SetName(ClearExt(NewName));

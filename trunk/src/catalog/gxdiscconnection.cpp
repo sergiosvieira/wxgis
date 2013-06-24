@@ -3,7 +3,7 @@
  * Purpose:  wxGxDiscConnection class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010,2012  Bishop
+*   Copyright (C) 2009-2010,2012,2013  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -27,18 +27,33 @@
 //---------------------------------------------------------------------------
 IMPLEMENT_DYNAMIC_CLASS(wxGxDiscConnection, wxGxFolder)
 
+BEGIN_EVENT_TABLE(wxGxDiscConnection, wxGxFolder)
+    EVT_FSWATCHER(wxID_ANY, wxGxDiscConnection::OnFileSystemEvent)
+END_EVENT_TABLE()
+
+
 wxGxDiscConnection::wxGxDiscConnection(void) : wxGxFolder()
 {
+    m_pWatcher = new wxFileSystemWatcher();
+    m_pWatcher->SetOwner(this);
 }
 
 wxGxDiscConnection::wxGxDiscConnection(wxGxObject *oParent, const wxString &soXmlConfPath, int nXmlId, const wxString &soName, const CPLString &soPath) : wxGxFolder(oParent, soName, soPath)
 {
     m_nXmlId = nXmlId;
     m_soXmlConfPath = soXmlConfPath;
+    m_pWatcher = new wxFileSystemWatcher();
+    m_pWatcher->SetOwner(this);
 }
 
 wxGxDiscConnection::~wxGxDiscConnection(void)
 {
+}
+
+bool wxGxDiscConnection::Destroy(void)
+{
+    wxDELETE(m_pWatcher);
+    return wxGxObjectContainer::Destroy();
 }
 
 bool wxGxDiscConnection::Delete(void)
@@ -92,3 +107,111 @@ bool wxGxDiscConnection::Rename(const wxString& NewName)
 	return false;
 }
 
+void wxGxDiscConnection::StartWatcher(void)
+{
+    //add itself
+    wxFileName oFileName = wxFileName::DirName(wxString(m_sPath, wxConvUTF8));
+    if(!m_pWatcher->Add(oFileName, wxFSW_EVENT_ALL))
+    {
+        wxLogError(_("Add File system watcher failed"));
+    }
+    
+    //add children
+    wxGxObjectList::const_iterator iter;
+    for(iter = GetChildren().begin(); iter != GetChildren().end(); ++iter)
+    {
+        wxGxObject *current = *iter;
+        if(current)
+        {
+            oFileName = wxFileName::DirName(wxString(current->GetPath(), wxConvUTF8));
+            if(!m_pWatcher->Add(oFileName, wxFSW_EVENT_ALL))
+            {
+                wxLogError(_("Add File system watcher failed"));
+            }
+        }
+    }
+
+    wxArrayString saPaths;
+    m_pWatcher->GetWatchedPaths(&saPaths);
+    for(size_t i = 0; i < saPaths.GetCount(); ++i)
+        wxLogDebug(wxT("path = '%s'"), saPaths[i]);
+} 
+
+void wxGxDiscConnection::OnFileSystemEvent(wxFileSystemWatcherEvent& event)
+{
+    wxLogDebug(wxT("*** %s ***"), event.ToString().c_str());
+    switch(event.GetChangeType())
+    {
+    case wxFSW_EVENT_CREATE:
+        {
+            //get object parent
+            wxFileName oName = event.GetPath();
+            wxGxObjectContainer *parent = wxDynamicCast(FindGxObjectByPath(oName.GetPath()), wxGxObjectContainer);
+            if(!parent)
+                return;
+            //check doubles
+            if(parent->IsNameExist(event.GetPath().GetFullName()))
+                return;
+
+            CPLString szPath(event.GetPath().GetFullPath().mb_str(wxConvUTF8));
+            char **papszFileList = NULL;  
+            papszFileList = CSLAddString( papszFileList, szPath );
+            wxGxCatalogBase* pCatalog = GetGxCatalog();
+	        if(pCatalog)
+            {
+                wxArrayLong ChildrenIds;
+                pCatalog->GetChildren(parent, papszFileList, ChildrenIds);
+                for(size_t i = 0; i < ChildrenIds.GetCount(); ++i)
+                    pCatalog->ObjectAdded(ChildrenIds[i]);
+                if(ChildrenIds.GetCount() > 0)
+                    m_pWatcher->Add(event.GetPath());
+	        }
+            CSLDestroy( papszFileList );
+        }
+        break;
+    case wxFSW_EVENT_DELETE:
+        {
+            //search gxobject
+            wxGxObject *current = FindGxObjectByPath(event.GetPath().GetFullPath());
+            if(current)
+            {
+                current->Destroy();
+                return;
+            }
+        }
+        break;
+    case wxFSW_EVENT_RENAME:
+        {
+            wxGxObject *current = FindGxObjectByPath(event.GetPath().GetFullPath());
+            if(current)
+            {
+                m_pWatcher->Remove(event.GetPath());
+
+                current->SetName(event.GetNewPath().GetFullName());
+                current->SetPath( CPLString( event.GetNewPath().GetFullPath().mb_str(wxConvUTF8) ) );
+                wxGIS_GXCATALOG_EVENT_ID(ObjectChanged, current->GetId());
+                m_pWatcher->Add(event.GetNewPath());
+
+                return;
+            }
+        }
+        break;
+    case wxFSW_EVENT_MODIFY:
+        break;
+    default:
+    case wxFSW_EVENT_ACCESS:
+    case wxFSW_EVENT_WARNING:
+    case wxFSW_EVENT_ERROR:
+        break;
+    };
+}
+
+void wxGxDiscConnection::LoadChildren(void)
+{
+	if(m_bIsChildrenLoaded)
+		return;
+
+    m_pWatcher->RemoveAll();
+    wxGxFolder::LoadChildren();
+    StartWatcher();
+}

@@ -62,7 +62,7 @@ bool wxGxDiscConnections::Create(wxGxObject *oParent, const wxString &soName, co
         wxFileName::Mkdir(m_sUserConfigDir, 0755, wxPATH_MKDIR_FULL);
 
     wxLogDebug(wxT("monitoring dir is: %s"), oFileName.GetFullPath().c_str());
-    if(!m_pWatcher->Add(oFileName, wxFSW_EVENT_MODIFY))//Tree bool bAdd = |wxFSW_EVENT_CREATE
+    if(!m_pWatcher->Add(oFileName, wxFSW_EVENT_MODIFY))//bool bAdd = |wxFSW_EVENT_CREATE
     {
         wxLogError(_("Add File system watcher failed"));
         return false;
@@ -166,6 +166,8 @@ wxGxObject* wxGxDiscConnections::CreateChildGxObject(const wxXmlNode* pNode)
     wxString sPath = pNode->GetAttribute(wxT("path"), NONAME);
     CPLString soPath(sPath.mb_str(wxConvUTF8));
     int nXmlId = GetDecimalValue(pNode, wxT("id"), wxNOT_FOUND);
+    if(sPath == NONAME || nXmlId == wxNOT_FOUND)
+        return NULL;
     return new wxGxDiscConnection(this, m_sXmlStoragePath, nXmlId, soName, soPath);
 }
 
@@ -234,7 +236,6 @@ bool wxGxDiscConnections::ConnectFolder(const wxString &sPath)
         if(nMaxId < pConn->GetXmlId())
             nMaxId = pConn->GetXmlId();
     }
-    nMaxId++;
     //add
     wxXmlDocument doc;
     //try to load connections xml file
@@ -245,7 +246,7 @@ bool wxGxDiscConnections::ConnectFolder(const wxString &sPath)
 
 	    pDiscConn->AddAttribute(wxT("name"), sPath);
 	    pDiscConn->AddAttribute(wxT("path"), sPath);
-        SetDecimalValue(pDiscConn, wxT("id"), nMaxId);
+        SetDecimalValue(pDiscConn, wxT("id"), nMaxId + 1);
 
         return doc.Save(m_sXmlStoragePath);
     }

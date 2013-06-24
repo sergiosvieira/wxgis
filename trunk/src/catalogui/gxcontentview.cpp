@@ -723,6 +723,12 @@ void wxGxContentView::OnObjectAdded(wxGxCatalogEvent& event)
             SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
 	        SortItems(GxObjectCVCompareFunction, (long)&sortdata);
 	        SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+
+            wxGxAutoRenamer* pGxAutoRenamer = dynamic_cast<wxGxAutoRenamer*>(pGxObject->GetParent());
+            if(pGxAutoRenamer && pGxAutoRenamer->IsBeginRename(this, pGxObject->GetPath()))
+            {
+                BeginRename(pGxObject->GetId());
+            }
         }
     }
 }

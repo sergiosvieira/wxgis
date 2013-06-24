@@ -479,7 +479,7 @@ wxString CheckUniqName(const CPLString &sPath, const wxString &sName, const wxSt
         return sResultName;
 }
 
-CPLString CheckUniqPath(const CPLString &sPath, const CPLString &sName, const CPLString &sAdd, int nCounter)
+CPLString CheckUniqPath(const CPLString &sPath, const CPLString &sName, bool bIsFolder, const CPLString &sAdd, int nCounter)
 {
     CPLString sResultName;
     if(nCounter > 0)
@@ -487,13 +487,21 @@ CPLString CheckUniqPath(const CPLString &sPath, const CPLString &sName, const CP
         CPLString szAdd;
         szAdd.Printf("%s(%d)", sAdd.c_str(), nCounter);
         CPLString szTmpName = sName + szAdd;
-        sResultName = CPLString(CPLFormFilename(CPLGetPath(sPath), szTmpName, GetExtension(sPath, sName)));
+        if(bIsFolder)
+            sResultName = CPLString(CPLFormFilename(sPath, szTmpName, ""));
+        else
+            sResultName = CPLString(CPLFormFilename(sPath, szTmpName, GetExtension(sPath, sName)));
     }
     else
-        sResultName = sPath;
+    {
+        if(bIsFolder)
+            sResultName = CPLString(CPLFormFilename(sPath, sName, ""));
+        else
+            sResultName = CPLString(CPLFormFilename(sPath, sName, GetExtension(sPath, sName)));
+    }
 
     if(CPLCheckForFile((char*)sResultName.c_str(), NULL))
-        return CheckUniqPath(sPath, sName, sAdd, nCounter + 1);
+        return CheckUniqPath(sPath, sName, bIsFolder, sAdd, nCounter + 1);
     else
         return sResultName;
 }

@@ -3,7 +3,7 @@
  * Purpose:  Main application class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2012 Bishop
+*   Copyright (C) 2009,2012,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ public:
 	wxGISCatalogApp(void);
 	virtual ~wxGISCatalogApp(void);
 	virtual bool OnInit();
+    virtual int OnExit();
 	virtual void OnEventLoopEnter(wxEventLoopBase* loop);
 protected:
     wxGISCatalogFrame* m_pMainFrame;

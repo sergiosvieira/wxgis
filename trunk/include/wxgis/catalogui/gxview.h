@@ -23,6 +23,8 @@
 #include "wxgis/catalog/catalog.h"
 #include "wxgis/catalog/gxobject.h"
 
+
+
 /** \class wxGxView gxview.h
  *  \brief The base class for views.
  */
@@ -47,6 +49,22 @@ protected:
 	wxString m_sViewName;
 	wxXmlNode* m_pXmlConf;
     wxIcon m_Icon;
+};
+
+/** \class wxGxAutoRenamer gxview.h
+    \brief Begin Rename created object.
+*/
+
+class wxGxAutoRenamer
+{
+public:
+    wxGxAutoRenamer(void);
+    virtual ~wxGxAutoRenamer(void);
+    virtual void BeginRenameOnAdd(wxGxView* const pGxView, const CPLString &szPath);
+    virtual bool IsBeginRename(wxGxView* const pGxView, const CPLString &szPath);
+protected:
+    wxGxView* m_pGxViewToRename;
+    CPLString m_szPathToRename;
 };
 
 int GxObjectCompareFunction(wxGxObject* const pObject1, wxGxObject* const pObject2, long sortData);

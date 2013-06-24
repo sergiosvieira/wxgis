@@ -72,7 +72,7 @@ bool wxGxArchive::Delete(void)
     }
 }
 
-bool wxGxArchive::Rename(wxString NewName)
+bool wxGxArchive::Rename(const wxString &sNewName)
 {
     CPLString szType("/");
     int nCount = 0;
