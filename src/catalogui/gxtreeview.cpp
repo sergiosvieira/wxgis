@@ -47,12 +47,12 @@ BEGIN_EVENT_TABLE(wxGxTreeViewBase, wxTreeCtrl)
 	EVT_GXSELECTION_CHANGED(wxGxTreeViewBase::OnSelectionChanged)
 END_EVENT_TABLE()
 
-wxGxTreeViewBase::wxGxTreeViewBase(void) : wxTreeCtrl(), m_ConnectionPointCatalogCookie(-1), m_ConnectionPointSelectionCookie(-1)
+wxGxTreeViewBase::wxGxTreeViewBase(void) : wxTreeCtrl(), m_ConnectionPointCatalogCookie(wxNOT_FOUND), m_ConnectionPointSelectionCookie(wxNOT_FOUND)
 {
     m_sViewName = wxString(_("Tree view"));
 }
 
-wxGxTreeViewBase::wxGxTreeViewBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxTreeCtrl(parent, id, pos, size, style, wxDefaultValidator, wxT("wxGxTreeViewBase")), m_ConnectionPointCatalogCookie(-1), m_ConnectionPointSelectionCookie(-1), m_pDeleteCmd(NULL)
+wxGxTreeViewBase::wxGxTreeViewBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style) : wxTreeCtrl(parent, id, pos, size, style, wxDefaultValidator, wxT("wxGxTreeViewBase")), m_ConnectionPointCatalogCookie(wxNOT_FOUND), m_ConnectionPointSelectionCookie(wxNOT_FOUND), m_pDeleteCmd(NULL)
 {
     m_TreeImageList.Create(16, 16);
 	SetImageList(&m_TreeImageList);
@@ -337,6 +337,7 @@ void wxGxTreeViewBase::OnItemExpanding(wxTreeEvent& event)
                     {
                         wxGxObject *current = *iter;
 						AddTreeItem(current, item);//false
+                        m_pCatalog->ObjectAdded(current->GetId());
                     }
 					pData->m_bExpandedOnce = true;
                     SetItemHasChildren(item, GetChildrenCount(item, false) > 0);
@@ -431,13 +432,19 @@ void wxGxTreeViewBase::OnObjectAdded(wxGxCatalogEvent& event)
 		wxGxTreeItemData* pData = (wxGxTreeItemData*)GetItemData(ParentTreeItemId);
 		if(pData != NULL)
 		{
-			if(pData->m_bExpandedOnce)
+            wxGxObjectContainer* pGxObjectContainer = wxDynamicCast(pParentObject, wxGxObjectContainer);
+            if(pGxObjectContainer->AreChildrenViewable())
             {
-				AddTreeItem(pGxObject, ParentTreeItemId);
-                SortChildren(ParentTreeItemId);
+			    if(pData->m_bExpandedOnce)
+                {
+				    AddTreeItem(pGxObject, ParentTreeItemId);
+                    SortChildren(ParentTreeItemId);
+                }
+			    else
+                {
+				    SetItemHasChildren(ParentTreeItemId, true);
+                }
             }
-			else
-				SetItemHasChildren(ParentTreeItemId, true);
 		}
 	}
 }
@@ -864,9 +871,13 @@ bool wxGxTreeView::OnDropObjects(wxCoord x, wxCoord y, const wxArrayString& GxOb
 		    return wxDragNone;
         wxGxObject* pGxObject = m_pCatalog->GetRegisterObject(pData->m_nObjectID);
         IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pGxObject);
-        if(pTarget == NULL)
-		    return false;
-        return pTarget->Drop(GxObjects, bMove);
+
+        if(pTarget)
+        {
+            wxDragResult res(bMove == true ? wxDragMove : wxDragCopy);
+            if(wxIsDragResultOk(pTarget->CanDrop(res)))
+                return pTarget->Drop(GxObjects, bMove);
+        } 
     }
     return false;
 }

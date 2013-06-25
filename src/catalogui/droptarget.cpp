@@ -3,7 +3,7 @@
  * Purpose:  DropTarget implementations.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -122,18 +122,10 @@ wxArrayString wxGISDropTarget::PathsToNames(const wxArrayString saPaths)
             for(iter = pConnections->GetChildren().begin(); iter != pConnections->GetChildren().end(); ++iter)
             {
                 wxGxObject *current = *iter;
-                wxString sConnPath(current->GetPath(), wxConvUTF8);
-
-                //if user change connection name to something
-                wxString sRestPath;
-                if(saPaths[i].StartsWith(sConnPath, &sRestPath))
+                wxGxObject *searched = current->FindGxObjectByPath(saPaths[i]);
+                if(searched)
                 {
-                    wxString sSearchPath;
-                    wxString sConnName = current->GetName();
-                    if(sConnName[sConnName.Len() - 1] != wxFileName::GetPathSeparator())
-                        sConnName += wxFileName::GetPathSeparator();
-                    sSearchPath = current->GetName() + sRestPath;
-                    asObjects.Add(sSearchPath);
+                    asObjects.Add(searched->GetFullName());
                     break;
                 }
             }

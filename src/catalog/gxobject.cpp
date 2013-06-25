@@ -181,6 +181,11 @@ bool wxGxObject::Create(wxGxObject *oParent, const wxString &soName, const CPLSt
     else
         m_oParent = oParent;
 
+    //Problems with treectrl and AreChildrenViewable
+    //if(GetGxCatalog())
+    //    GetGxCatalog()->ObjectAdded(GetId());
+
+
     //m_nId = nId;
     return true;
 }

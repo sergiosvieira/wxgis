@@ -21,6 +21,7 @@
 
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/gxpending.h"
+#include "wxgis/framework/progressdlg.h"
 
 #include "../../art/mainframecat.xpm"
 #include "../../art/process_working_16.xpm"
@@ -91,6 +92,61 @@ void wxGxCatalogUI::RemovePending(long nPendingId)
     wxCHECK_RET(pPend, wxT("The Pending GxObject is not exist"));
     pPend->Destroy();
 }
+
+//------------------------------------------------------------------------------------------
+// separate ops
+//------------------------------------------------------------------------------------------
+bool FolderDrop(const CPLString& pPath, const wxArrayString& GxObjectPaths, bool bMove)
+{
+    if(GxObjectPaths.GetCount() == 0)
+        return false;
+
+    //create progress dialog
+    wxString sTitle = wxString::Format(_("%s %d objects (files)"), bMove == true ? _("Move") : _("Copy"), GxObjectPaths.GetCount());
+    wxWindow* pParentWnd = dynamic_cast<wxWindow*>(GetApplication());
+
+    wxGISProgressDlg ProgressDlg(sTitle, _("Begin operation..."), GxObjectPaths.GetCount(), pParentWnd, wxPD_APP_MODAL | wxPD_AUTO_HIDE | wxPD_SMOOTH | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME | wxPD_ESTIMATED_TIME | wxPD_REMAINING_TIME);
+
+    for(size_t i = 0; i < GxObjectPaths.GetCount(); ++i)
+    {
+		wxString sMessage = wxString::Format(_("%s %d object (file) from %d"), bMove == true ? _("Move") : _("Copy"), i + 1, GxObjectPaths.GetCount());
+//		ProgressDlg.SetTitle(sMessage);
+		ProgressDlg.PutMessage(sMessage);
+        if(!ProgressDlg.Continue())
+            break;
+
+        wxGxCatalogBase* pCatalog = GetGxCatalog();
+        wxGxObject* pGxObj = pCatalog->FindGxObject(GxObjectPaths[i]);
+        IGxObjectEdit* pGxObjectEdit = dynamic_cast<IGxObjectEdit*>(pGxObj);
+        if(pGxObjectEdit)
+        {
+            if(bMove && pGxObjectEdit->CanMove(pPath))
+            {
+                if(!pGxObjectEdit->Move(pPath, &ProgressDlg))
+                {
+                    wxMessageBox(wxString::Format(_("%s failed. Path: %s"), _("Move"), pGxObj->GetFullName()), _("Error"), wxOK | wxICON_ERROR);
+                    return false;
+                }
+            }
+            else if(!bMove && pGxObjectEdit->CanCopy(pPath))
+            {
+                if(!pGxObjectEdit->Copy(pPath, &ProgressDlg))
+                {
+                     wxMessageBox(wxString::Format(_("%s failed. Path: %s"), _("Copy"), pGxObj->GetFullName()), _("Error"), wxOK | wxICON_ERROR);
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        ProgressDlg.SetValue(i);
+    }
+
+    return true;
+}
+
 
 /*
 #include "wxgis/core/config.h"

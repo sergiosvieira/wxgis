@@ -24,6 +24,8 @@
 #include "wxgis/datasource/gdalinh.h"
 
 bool WXDLLIMPEXP_GIS_DS DeleteDir(const CPLString &sPath, ITrackCancel* const pTrackCancel = NULL);
+bool WXDLLIMPEXP_GIS_DS MoveDir(const CPLString &sPathFrom, const CPLString &sPathTo, long mode, ITrackCancel* const pTrackCancel = NULL);
+bool WXDLLIMPEXP_GIS_DS CopyDir(const CPLString &sPathFrom, const CPLString &sPathTo, long mode, ITrackCancel* const pTrackCancel = NULL);
 bool WXDLLIMPEXP_GIS_DS CreateDir(const CPLString &sPath, long mode = 0777, ITrackCancel* const pTrackCancel = NULL); 
 bool WXDLLIMPEXP_GIS_DS DeleteFile(const CPLString &sPath, ITrackCancel* const pTrackCancel = NULL);
 bool WXDLLIMPEXP_GIS_DS RenameFile(const CPLString &sOldPath, const CPLString &sNewPath, ITrackCancel* const pTrackCancel = NULL);

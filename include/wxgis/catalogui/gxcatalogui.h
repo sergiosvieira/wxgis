@@ -3,7 +3,7 @@
  * Purpose:  wxGxCatalogUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2012 Bishop
+*   Copyright (C) 2010-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 #pragma once
 
 #include "wxgis/catalogui/catalogui.h"
-//#include "wxgis/catalogui/gxselection.h"
 #include "wxgis/catalog/gxcatalog.h"
 
 #include <wx/imaglist.h>
@@ -56,6 +55,8 @@ protected:
     bool m_bOpenLastPath;
     wxVector<wxIcon> m_oaPendingIconsLarge, m_oaPendingIconsSmall;
 };
+
+bool WXDLLIMPEXP_GIS_CLU FolderDrop(const CPLString& pPath, const wxArrayString& GxObjectPaths, bool bMove);
 
 /*
 

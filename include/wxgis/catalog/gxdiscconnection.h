@@ -21,6 +21,8 @@
 #pragma once
 
 #include "wxgis/catalog/gxfolder.h"
+#include "wxgis/catalog/gxevent.h"
+#include "wxgis/catalog/gxcatalog.h"
 
 #include <wx/event.h>
 #include <wx/fswatcher.h>
@@ -45,6 +47,7 @@ public:
 	//wxGxObject
 	virtual wxString GetCategory(void){return wxString(_("Folder connection"));};
     virtual bool Destroy(void);
+    virtual void Refresh(void);
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return false;};
@@ -52,13 +55,21 @@ public:
     virtual int GetXmlId(void) const {return m_nXmlId;};
 //events
     virtual void OnFileSystemEvent(wxFileSystemWatcherEvent& event);
+#ifdef __WXGTK__
+    virtual void OnObjectAdded(wxGxCatalogEvent& event);
+#endif
 protected:
     virtual void StartWatcher(void);
 	virtual void LoadChildren(void);
+    virtual bool IsPathWatched(const wxString& sPath);
 protected:
     int m_nXmlId;
     wxString m_soXmlConfPath;
     wxFileSystemWatcher *m_pWatcher;
+    wxGxCatalog* m_pCatalog;
+#ifdef __WXGTK__
+    long m_ConnectionPointCatalogCookie;
+#endif
 private:
     DECLARE_EVENT_TABLE()
 };
