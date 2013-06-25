@@ -348,20 +348,20 @@ void wxGxContentView::Serialize(wxXmlNode* pRootNode, bool bStore)
 	}
 }
 
-void wxGxContentView::AddObject(wxGxObject* const pObject)
+bool wxGxContentView::AddObject(wxGxObject* const pObject)
 {
-	if(pObject == NULL)
-		return;
+    if(pObject == NULL)
+		return false;
 
     //check doubles
-	//for(long i = 0; i < GetItemCount(); ++i)
-	//{
-	//	LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
-	//	if(pItemData == NULL)
-	//		continue;
- //       if(pItemData->nObjectID == pObject->GetId())
-	//		return;
- //   }
+	for(long i = 0; i < GetItemCount(); ++i)
+	{
+		LPITEMDATA pItemData = (LPITEMDATA)GetItemData(i);
+		if(pItemData == NULL)
+			continue;
+        if(pItemData->nObjectID == pObject->GetId())
+			return false;
+    }
 
     IGxObjectUI* pObjUI =  dynamic_cast<IGxObjectUI*>(pObject);
 	wxIcon icon_small, icon_large;
@@ -402,6 +402,8 @@ void wxGxContentView::AddObject(wxGxObject* const pObject)
 	SetItemPtrData(ListItemID, (wxUIntPtr) pData);
 
 	//wxListCtrl::Refresh();
+
+    return true;
 }
 
 void wxGxContentView::OnColClick(wxListEvent& event)
@@ -551,8 +553,8 @@ void wxGxContentView::ShowContextMenu(const wxPoint& pos)
 	LPITEMDATA pItemData = (LPITEMDATA)GetItemData(item);
 	if(pItemData != NULL)
 	{
-        bool bAdd = true;
-        m_pSelection->Select(pItemData->nObjectID, bAdd, NOTFIRESELID);
+        //bool bAdd = true;
+        //m_pSelection->Select(pItemData->nObjectID, bAdd, NOTFIRESELID);
 
         wxGxObject* pGxObject = m_pCatalog->GetRegisterObject(pItemData->nObjectID);
 		IGxObjectUI* pGxObjectUI = dynamic_cast<IGxObjectUI*>(pGxObject);
@@ -719,15 +721,17 @@ void wxGxContentView::OnObjectAdded(wxGxCatalogEvent& event)
 			return;
 	    if(pParentGxObject->GetId() == m_nParentGxObjectID)
         {
-		    AddObject(pGxObject);
-            SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
-	        SortItems(GxObjectCVCompareFunction, (long)&sortdata);
-	        SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
-
-            wxGxAutoRenamer* pGxAutoRenamer = dynamic_cast<wxGxAutoRenamer*>(pGxObject->GetParent());
-            if(pGxAutoRenamer && pGxAutoRenamer->IsBeginRename(this, pGxObject->GetPath()))
+		    if(AddObject(pGxObject))
             {
-                BeginRename(pGxObject->GetId());
+                SORTDATA sortdata = {m_bSortAsc, m_currentSortCol};
+	            SortItems(GxObjectCVCompareFunction, (long)&sortdata);
+	            SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
+
+                wxGxAutoRenamer* pGxAutoRenamer = dynamic_cast<wxGxAutoRenamer*>(pGxObject->GetParent());
+                if(pGxAutoRenamer && pGxAutoRenamer->IsBeginRename(this, pGxObject->GetPath()))
+                {
+                    BeginRename(pGxObject->GetId());
+                }
             }
         }
     }
@@ -1128,9 +1132,13 @@ bool wxGxContentView::OnDropObjects(wxCoord x, wxCoord y, const wxArrayString& G
 
     wxGxObject* pGxObject = m_pCatalog->GetRegisterObject(nObjectID);
     IGxDropTarget* pTarget = dynamic_cast<IGxDropTarget*>(pGxObject);
-    if(pTarget == NULL)
-	    return false;
-    return pTarget->Drop(GxObjects, bMove);
+    if(pTarget)
+    {
+        wxDragResult res(bMove == true ? wxDragMove : wxDragCopy);
+        if(wxIsDragResultOk(pTarget->CanDrop(res)))
+            return pTarget->Drop(GxObjects, bMove);
+    }
+	return false;
 }
 
 void wxGxContentView::OnLeave()

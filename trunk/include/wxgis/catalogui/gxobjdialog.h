@@ -132,7 +132,7 @@ public:
 	virtual void SetCurrentFilter(size_t nFilterIndex);
     virtual wxGxSelection* const GetSelectedObjects(void);
     //wxGxContentView
-	virtual void AddObject(wxGxObject* const pObject);
+	virtual bool AddObject(wxGxObject* const pObject);
 protected:
 	long m_ConnectionPointSelectionCookie;
 	wxGxObjectFiltersArray m_FiltersArray;

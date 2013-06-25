@@ -47,7 +47,7 @@ public:
 	virtual void EditProperties(wxWindow *parent);
     //IGxDropTarget
     virtual wxDragResult CanDrop(wxDragResult def);
-    virtual bool Drop(const wxArrayString& GxObjects, bool bMove);
+    virtual bool Drop(const wxArrayString& saGxObjectPaths, bool bMove);
 protected:
     wxIcon m_oLargeIcon, m_oSmallIcon;
 };

@@ -50,7 +50,7 @@ public:
 	virtual void EditProperties(wxWindow *parent);
     //IGxDropTarget
     virtual wxDragResult CanDrop(wxDragResult def);
-    virtual bool Drop(const wxArrayString& filenames, bool bMove);
+    virtual bool Drop(const wxArrayString& saGxObjectPaths, bool bMove);
 protected:
     bool CheckReadable(void);
     virtual wxThread::ExitCode Entry();

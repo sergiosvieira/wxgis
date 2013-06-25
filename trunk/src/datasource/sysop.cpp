@@ -71,6 +71,78 @@ bool CreateDir(const CPLString &sPath, long mode, ITrackCancel* const pTrackCanc
     return true;
 }
 
+bool MoveDir(const CPLString &sPathFrom, const CPLString &sPathTo, long mode, ITrackCancel* const pTrackCancel)
+{
+    if(wxGISEQUAL(sPathFrom, sPathTo))
+        return true;
+
+#ifdef __WXMSW__
+    if(!EQUALN(sPathTo,"/vsi",4) && EQUALN(sPathFrom, sPathTo, 3))
+    {
+        //if in same disc - copy/rename
+        return RenameFile(sPathFrom, sPathTo, pTrackCancel);
+    }
+#endif
+    else
+    {
+        //if in different discs - copy/move
+        bool bRes = CopyDir(sPathFrom, sPathTo, mode, pTrackCancel);
+        if(bRes)
+            DeleteDir(sPathFrom);
+        return bRes;
+    }
+    return false;
+}
+
+bool CopyDir(const CPLString &sPathFrom, const CPLString &sPathTo, long mode, ITrackCancel* const pTrackCancel)
+{
+    if(wxGISEQUAL(sPathFrom, sPathTo))
+        return true;
+
+    if(!CPLCheckForFile((char*)sPathTo.c_str(), NULL))
+    {
+        if(!CreateDir(sPathTo, mode, pTrackCancel))
+        {
+            return false;
+        }
+    }
+
+    char **papszItems = CPLReadDir(sPathFrom);
+    if(papszItems == NULL)
+        return true;
+
+    for(int i = CSLCount(papszItems) - 1; i >= 0; i-- )
+    {
+        if(pTrackCancel && !pTrackCancel->Continue())
+            return true;
+
+        if( wxGISEQUAL(papszItems[i], ".") || wxGISEQUAL(papszItems[i], "..") )
+            continue;
+
+        CPLString szFullPathFrom = CPLFormFilename(sPathFrom, papszItems[i], NULL);
+
+        VSIStatBufL BufL;
+        int ret = VSIStatL(szFullPathFrom, &BufL);
+        if(ret == 0)
+        {
+            CPLString szFullPathTo = CPLFormFilename(sPathTo, papszItems[i], NULL);
+            if(VSI_ISDIR(BufL.st_mode))
+		    {
+                if(!CopyDir(szFullPathFrom, szFullPathTo, mode, pTrackCancel))
+                    return false;
+            }
+            else
+            {
+                if(!CopyFile(szFullPathFrom,szFullPathTo, pTrackCancel))
+                    return false;
+            }
+        }
+    }
+    CSLDestroy( papszItems );
+
+    return true;
+}
+
 bool DeleteFile(const CPLString &sPath, ITrackCancel* const pTrackCancel)
 {
     int result = VSIUnlink(sPath);
@@ -515,79 +587,79 @@ CPLString GetUniqPath(const CPLString &szOriginalFullPath, const CPLString &szNe
 CPLString Transliterate(const char* str)
 {
     CPLString sOut;
-    for (; *str != 0; str++)
-    {
-        switch (str[0])
-        {
-        case 'à': sOut += "a"; break;
-        case 'á': sOut += "b"; break;
-        case 'â': sOut += "v"; break;
-        case 'ã': sOut += "g"; break;
-        case 'ä': sOut += "d"; break;
-        case 'å': sOut += "e"; break;
-        case '¸': sOut += "ye"; break;
-        case 'æ': sOut += "zh"; break;
-        case 'ç': sOut += "z"; break;
-        case 'è': sOut += "i"; break;
-        case 'é': sOut += "y"; break;
-        case 'ê': sOut += "k"; break;
-        case 'ë': sOut += "l"; break;
-        case 'ì': sOut += "m"; break;
-        case 'í': sOut += "n"; break;
-        case 'î': sOut += "o"; break;
-        case 'ï': sOut += "p"; break;
-        case 'ð': sOut += "r"; break;
-        case 'ñ': sOut += "s"; break;
-        case 'ò': sOut += "t"; break;
-        case 'ó': sOut += "u"; break;
-        case 'ô': sOut += "f"; break;
-        case 'õ': sOut += "ch"; break;
-        case 'ö': sOut += "z"; break;
-        case '÷': sOut += "ch"; break;
-        case 'ø': sOut += "sh"; break;
-        case 'ù': sOut += "ch"; break;
-        case 'ú': sOut += "''"; break;
-        case 'û': sOut += "y"; break;
-        case 'ü': sOut += "''"; break;
-        case 'ý': sOut += "e"; break;
-        case 'þ': sOut += "yu"; break;
-        case 'ÿ': sOut += "ya"; break;
-        case 'À': sOut += "A"; break;
-        case 'Á': sOut += "B"; break;
-        case 'Â': sOut += "V"; break;
-        case 'Ã': sOut += "G"; break;
-        case 'Ä': sOut += "D"; break;
-        case 'Å': sOut += "E"; break;
-        case '¨': sOut += "Ye"; break;
-        case 'Æ': sOut += "Zh"; break;
-        case 'Ç': sOut += "Z"; break;
-        case 'È': sOut += "I"; break;
-        case 'É': sOut += "Y"; break;
-        case 'Ê': sOut += "K"; break;
-        case 'Ë': sOut += "L"; break;
-        case 'Ì': sOut += "M"; break;
-        case 'Í': sOut += "N"; break;
-        case 'Î': sOut += "O"; break;
-        case 'Ï': sOut += "P"; break;
-        case 'Ð': sOut += "R"; break;
-        case 'Ñ': sOut += "S"; break;
-        case 'Ò': sOut += "T"; break;
-        case 'Ó': sOut += "U"; break;
-        case 'Ô': sOut += "F"; break;
-        case 'Õ': sOut += "Ch"; break;
-        case 'Ö': sOut += "Z"; break;
-        case '×': sOut += "Ch"; break;
-        case 'Ø': sOut += "Sh"; break;
-        case 'Ù': sOut += "Ch"; break;
-        case 'Ú': sOut += "''"; break;
-        case 'Û': sOut += "Y"; break;
-        case 'Ü': sOut += "''"; break;
-        case 'Ý': sOut += "E"; break;
-        case 'Þ': sOut += "Yu"; break;
-        case 'ß': sOut += "Ya"; break;
-        default: { char Temp[2] = { str[0], 0} ; sOut += &Temp[0]; }
-        }
-    }
+//    for (; *str != 0; str++)
+//    {
+//        switch (str[0])
+//        {
+//        case 'à': sOut += "a"; break;
+//        case 'á': sOut += "b"; break;
+//        case 'â': sOut += "v"; break;
+//        case 'ã': sOut += "g"; break;
+//        case 'ä': sOut += "d"; break;
+//        case 'å': sOut += "e"; break;
+//        case '¸': sOut += "ye"; break;
+//        case 'æ': sOut += "zh"; break;
+//        case 'ç': sOut += "z"; break;
+//        case 'è': sOut += "i"; break;
+//        case 'é': sOut += "y"; break;
+//        case 'ê': sOut += "k"; break;
+//        case 'ë': sOut += "l"; break;
+//        case 'ì': sOut += "m"; break;
+//        case 'í': sOut += "n"; break;
+//        case 'î': sOut += "o"; break;
+//        case 'ï': sOut += "p"; break;
+//        case 'ð': sOut += "r"; break;
+//        case 'ñ': sOut += "s"; break;
+//        case 'ò': sOut += "t"; break;
+//        case 'ó': sOut += "u"; break;
+//        case 'ô': sOut += "f"; break;
+//        case 'õ': sOut += "ch"; break;
+//        case 'ö': sOut += "z"; break;
+//        case '÷': sOut += "ch"; break;
+//        case 'ø': sOut += "sh"; break;
+//        case 'ù': sOut += "ch"; break;
+//        case 'ú': sOut += "''"; break;
+//        case 'û': sOut += "y"; break;
+//        case 'ü': sOut += "''"; break;
+//        case 'ý': sOut += "e"; break;
+//        case 'þ': sOut += "yu"; break;
+//        case 'ÿ': sOut += "ya"; break;
+//        case 'À': sOut += "A"; break;
+//        case 'Á': sOut += "B"; break;
+//        case 'Â': sOut += "V"; break;
+//        case 'Ã': sOut += "G"; break;
+//        case 'Ä': sOut += "D"; break;
+//        case 'Å': sOut += "E"; break;
+//        case '¨': sOut += "Ye"; break;
+//        case 'Æ': sOut += "Zh"; break;
+//        case 'Ç': sOut += "Z"; break;
+//        case 'È': sOut += "I"; break;
+//        case 'É': sOut += "Y"; break;
+//        case 'Ê': sOut += "K"; break;
+//        case 'Ë': sOut += "L"; break;
+//        case 'Ì': sOut += "M"; break;
+//        case 'Í': sOut += "N"; break;
+//        case 'Î': sOut += "O"; break;
+//        case 'Ï': sOut += "P"; break;
+//        case 'Ð': sOut += "R"; break;
+//        case 'Ñ': sOut += "S"; break;
+//        case 'Ò': sOut += "T"; break;
+//        case 'Ó': sOut += "U"; break;
+//        case 'Ô': sOut += "F"; break;
+//        case 'Õ': sOut += "Ch"; break;
+//        case 'Ö': sOut += "Z"; break;
+//        case '×': sOut += "Ch"; break;
+//        case 'Ø': sOut += "Sh"; break;
+//        case 'Ù': sOut += "Ch"; break;
+//        case 'Ú': sOut += "''"; break;
+//        case 'Û': sOut += "Y"; break;
+//        case 'Ü': sOut += "''"; break;
+//        case 'Ý': sOut += "E"; break;
+//        case 'Þ': sOut += "Yu"; break;
+//        case 'ß': sOut += "Ya"; break;
+//        default: { char Temp[2] = { str[0], 0} ; sOut += &Temp[0]; }
+//        }
+//    }
     return sOut;
 }
 
@@ -689,13 +761,13 @@ bool MoveFile(const CPLString &sDestPath, const CPLString &sSrcPath, ITrackCance
     if(wxGISEQUAL(CPLGetPath(sDestPath), CPLGetPath(sSrcPath)))
     {
         //if in same directory - make copy
-        return RenameFile(sSrcPath, sDestPath);
+        return RenameFile(sSrcPath, sDestPath, pTrackCancel);
     }
 #ifdef __WXMSW__
     else if(!EQUALN(sDestPath,"/vsi",4) && EQUALN(sDestPath, sSrcPath, 3))
     {
         //if in same disc - copy/rename
-        return RenameFile(sSrcPath, sDestPath);
+        return RenameFile(sSrcPath, sDestPath, pTrackCancel);
     }
 #endif
     else

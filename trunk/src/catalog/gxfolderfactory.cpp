@@ -3,7 +3,7 @@
  * Purpose:  wxGxFolderFactory class. Create new GxFolder objects
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2012 Bishop
+*   Copyright (C) 2009-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -43,17 +43,18 @@ bool wxGxFolderFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxA
     wxGxCatalogBase* pCatalog = GetGxCatalog();
     for(int i = CSLCount(pFileNames) - 1; i >= 0; i-- )
     {
-        wxString path(pFileNames[i], wxConvUTF8);
-		if(wxFileName::DirExists(path))
-		{
-            wxFileName FName(path);
-            wxString sName = FName.GetFullName();
-
-			wxGxObject* pObj = GetGxObject(pParent, sName, pFileNames[i]); 
-            if(pObj)
-                pChildrenIds.Add(pObj->GetId());
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-		}
+        VSIStatBufL BufL;
+        int ret = VSIStatL(pFileNames[i], &BufL);
+        if(ret == 0)
+        {
+            if(VSI_ISDIR(BufL.st_mode))
+		    {
+			    wxGxObject* pObj = GetGxObject(pParent, wxString(CPLGetFilename(pFileNames[i]), wxConvUTF8), pFileNames[i]); 
+                if(pObj)
+                    pChildrenIds.Add(pObj->GetId());
+                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+		    }
+        }
     }
 	return true;
 }

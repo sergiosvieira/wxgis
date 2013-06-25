@@ -3,7 +3,7 @@
  * Purpose:  wxGxFolder class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011,2012 Bishop
+*   Copyright (C) 2009,2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -45,6 +45,10 @@ public:
 	virtual bool CanDelete(void){return true;};
 	virtual bool Rename(const wxString &sNewName);
 	virtual bool CanRename(void){return true;};
+    virtual bool Copy(const CPLString &szDestPath, ITrackCancel* const pTrackCancel);
+	virtual bool CanCopy(const CPLString &szDestPath){return true;};
+	virtual bool Move(const CPLString &szDestPath, ITrackCancel* const pTrackCancel);
+	virtual bool CanMove(const CPLString &szDestPath){return CanCopy(szDestPath) & CanDelete();};
 	//wxGxObjectContainer
 	virtual bool AreChildrenViewable(void) const {return true;};
 	virtual bool HasChildren(void);

@@ -369,7 +369,7 @@ void wxGxDialogContentView::SetCurrentFilter(size_t nFilterIndex)
 	m_nFilterIndex = nFilterIndex;
 }
 
-void wxGxDialogContentView::AddObject(wxGxObject* const pObject)
+bool wxGxDialogContentView::AddObject(wxGxObject* const pObject)
 {
     if(m_FiltersArray.IsEmpty())
 		return wxGxContentView::AddObject(pObject);

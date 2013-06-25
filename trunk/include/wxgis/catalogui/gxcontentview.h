@@ -59,7 +59,7 @@ public:
 	wxGxContentView(wxWindow* parent, wxWindowID id = LISTCTRLID, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = LISTSTYLE);
 	virtual ~wxGxContentView(void);
 	virtual void Serialize(wxXmlNode* pRootNode, bool bStore);
-	virtual void AddObject(wxGxObject* const pObject);
+	virtual bool AddObject(wxGxObject* const pObject);
 	virtual void ResetContents(void);
     virtual wxGxObject* const GetParentGxObject(void) const;
     virtual void SelectAll(void);
