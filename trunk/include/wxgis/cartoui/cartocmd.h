@@ -124,7 +124,7 @@ private:
 /** \class wxGISCartoFrameTool cartocmd.h
     \brief The carto frame tools and commands.
 */
-/*
+
 class wxGISCartoFrameTool :
 	public ITool,
 	public IToolControl
@@ -163,4 +163,4 @@ private:
 	wxGISMapView* m_pMapView;
 	bool m_bCheck;
 };
-*/
+

@@ -31,6 +31,7 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxWebConnections, wxGxFolder)
 
 wxGxWebConnections::wxGxWebConnections(void) : wxGxFolder()
 {
+    m_sName = wxString(_("Web service connections"));
 }
 
 bool wxGxWebConnections::Create(wxGxObject *oParent, const wxString &soName, const CPLString &soPath)

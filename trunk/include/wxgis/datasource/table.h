@@ -66,10 +66,12 @@ public:
     virtual wxGISFeature Next(void);
     virtual wxGISFeature GetFeatureByID(long nFID);
     virtual wxGISFeature GetFeature(long nIndex);
+    virtual int GetFIDColumn(void);
     //
     virtual wxFontEncoding GetEncoding(void) const;
     virtual void SetEncoding(const wxFontEncoding &oEncoding);
     virtual bool HasFID(void) const {return m_bHasFID;};
+    virtual wxArrayString GetFieldNames(void);
     //
     virtual wxFeatureCursor Search(const wxGISQueryFilter &QFilter = wxGISNullQueryFilter, bool bOnlyFirst = false);
 	/*    

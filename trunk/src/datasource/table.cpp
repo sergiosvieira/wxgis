@@ -208,11 +208,30 @@ void wxGISTable::SetInternalValues(void)
         }
     }
 
-    m_bHasFID = !CPLString(m_poLayer->GetFIDColumn()).empty();
+    if(m_bOLCFastFeatureCount)
+    {
+        m_nFeatureCount = m_poLayer->GetFeatureCount(0);
+    }
+
+    m_bHasFID = GetFIDColumn() != wxNOT_FOUND;
+}
+
+int wxGISTable::GetFIDColumn(void)
+{
+    if(m_bHasFID)
+    {
+        OGRFeatureDefn* pDefn = GetDefinition();
+        if(pDefn)   
+        {
+            return pDefn->GetFieldIndex(m_poLayer->GetFIDColumn());
+        }
+    }
+    return wxNOT_FOUND;
 }
 
 void wxGISTable::Cache(ITrackCancel* pTrackCancel)
 {
+    m_bIsCached = true;
 	//LoadFeatures(pTrackCancel);
 }
 /*
@@ -504,7 +523,9 @@ wxGISFeature wxGISTable::Next(void)
     if(!m_poLayer)
         return wxGISFeature();
     OGRFeature* pFeature = m_poLayer->GetNextFeature();
-    if(!HasFID() && pFeature)
+    if(!pFeature)
+        return wxGISFeature();
+    if(!HasFID())
         pFeature->SetFID(m_nCurrentFID++);
     return wxGISFeature(pFeature, m_Encoding);
 }
@@ -569,6 +590,21 @@ OGRFeatureDefn* const wxGISTable::GetDefinition(void)
     if(	m_poLayer )
         return m_poLayer->GetLayerDefn();
     return NULL;
+}
+
+wxArrayString wxGISTable::GetFieldNames()
+{
+    wxArrayString saFields;
+    OGRFeatureDefn * const pDef = GetDefinition();
+    if(pDef)
+    {
+        for(size_t i = 0; i < pDef->GetFieldCount(); ++i)
+        {
+            saFields.Add(wxString(pDef->GetFieldDefn(i)->GetNameRef(), wxConvUTF8));
+        }
+    }
+
+    return saFields;
 }
 
 /*

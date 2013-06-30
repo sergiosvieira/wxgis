@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/cartoui/tableview.h"
-/*
+
 #include "../../art/full_arrow.xpm"
 #include "../../art/arrow.xpm"
 #include "../../art/small_arrow.xpm"
@@ -29,24 +29,18 @@
 //------------------------------------------------------------------
 // wxGISGridTable
 //------------------------------------------------------------------
+IMPLEMENT_CLASS(wxGISGridTable, wxGridTableBase)
 
-wxGISGridTable::wxGISGridTable(wxGISDatasetSPtr pwxGISDataset)
+wxGISGridTable::wxGISGridTable(wxGISDataset* pGISDataset)
 {
     m_nRows = m_nCols = 0;
-    m_pwxGISDataset = boost::dynamic_pointer_cast<wxGISTable>(pwxGISDataset);
-    if(m_pwxGISDataset)
-    {
-		if(!m_pwxGISDataset->IsOpened())
-			if(!m_pwxGISDataset->Open())
-				return;
-
-		m_pOGRFeatureDefn = m_pwxGISDataset->GetDefinition();
-		if(m_pOGRFeatureDefn)
-		{
-			m_nCols = m_pOGRFeatureDefn->GetFieldCount();
-			m_nRows = m_pwxGISDataset->GetFeatureCount();
-		}
-    }
+    m_pGISDataset = wxDynamicCast(pGISDataset, wxGISTable);
+	OGRFeatureDefn* pOGRFeatureDefn = m_pGISDataset->GetDefinition();
+	if(pOGRFeatureDefn)
+	{
+		m_nCols = pOGRFeatureDefn->GetFieldCount();
+		m_nRows = m_pGISDataset->GetFeatureCount();
+	}
 }
 
 wxGISGridTable::~wxGISGridTable()
@@ -70,8 +64,10 @@ wxString wxGISGridTable::GetValue(int row, int col)
 		return wxEmptyString;
 
 	//fetch more data
-	wxBusyCursor wait;
-	return m_pwxGISDataset->GetAsString(row, col);
+    wxGISFeature Feature = m_pGISDataset->GetFeature(row);
+    if(Feature.IsOk())
+        return Feature.GetFieldAsString(col);
+	return wxEmptyString;
 }
 
 void wxGISGridTable::SetValue(int row, int col, const wxString &value)
@@ -81,14 +77,18 @@ void wxGISGridTable::SetValue(int row, int col, const wxString &value)
 wxString wxGISGridTable::GetColLabelValue(int col)
 {
     wxString label;
-	OGRFieldDefn* pOGRFieldDefn = m_pOGRFeatureDefn->GetFieldDefn(col);
+    OGRFeatureDefn* pOGRFeatureDefn = m_pGISDataset->GetDefinition();
+    if(!pOGRFeatureDefn)
+        return wxEmptyString;
+
+	OGRFieldDefn* pOGRFieldDefn = pOGRFeatureDefn->GetFieldDefn(col);
 	if(pOGRFieldDefn)
-		label = wxString(pOGRFieldDefn->GetNameRef(), wxConvLocal);
-	//if(!m_sFIDKeyName.IsEmpty())
-	//{
-	//	if(label == m_sFIDKeyName);
-	//		label += _(" [*]");
-	//}
+		label = wxString(pOGRFieldDefn->GetNameRef(), wxConvUTF8);
+
+    if(label.IsSameAs(m_pGISDataset->GetFIDColumn(), false))
+    {
+        label.Append(_(" [*]"));
+	}
     return label;
 }
 
@@ -96,6 +96,17 @@ wxString wxGISGridTable::GetRowLabelValue(int row)
 {
 	return wxEmptyString;
 }
+
+wxGISTable* wxGISGridTable::GetDataset() const
+{
+    return m_pGISDataset;
+}
+
+bool wxGISGridTable::IsEmptyCell(int row, int col)
+{ 
+    return false; 
+}
+
 
 //-------------------------------------
 // wxGridCtrl
@@ -158,8 +169,6 @@ void wxGridCtrl::OnSelectCell(wxGridEvent& event)
 //-------------------------------------
 // wxGISTableView
 //-------------------------------------
-
-#define BITBUTTONSIZE 18
 
 IMPLEMENT_CLASS(wxGISTableView, wxPanel)
 
@@ -326,4 +335,26 @@ void wxGISTableView::OnSetPos(wxCommandEvent& event)
 	m_grid->SetGridCursor(pos - 1,0);
 	m_grid->MakeCellVisible(pos - 1,0);
 }
-*/
+
+void wxGISTableView::SetTable(wxGridTableBase* table, bool takeOwnership, wxGrid::wxGridSelectionModes selmode)
+{
+	if(m_grid)
+	{
+		m_grid->SetTable(table, takeOwnership, selmode);
+		m_grid->SetGridCursor(0,0);
+		m_grid->MakeCellVisible(0,0);
+		m_position->Clear();
+		(*m_position) << 1;
+
+		m_staticText2->SetLabel(wxString::Format(_("of %u"), m_grid->GetNumberRows()));
+	}
+}
+
+wxGridTableBase* wxGISTableView::GetTable(void) const
+{
+	if(m_grid)
+	{
+        return m_grid->GetTable();
+    }
+    return NULL;
+}

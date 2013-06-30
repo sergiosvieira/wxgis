@@ -3,7 +3,7 @@
  * Purpose:  wxGISTableView class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011,2012 Bishop
+*   Copyright (C) 2009,2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,8 +19,9 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxtableview.h"
-/*
+#include "wxgis/catalog/gxdataset.h"
 #include "wxgis/datasource/featuredataset.h"
+#include "wxgis/catalogui/gxapplication.h"
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxTableView, wxGISTableView)
 
@@ -29,13 +30,16 @@ BEGIN_EVENT_TABLE(wxGxTableView, wxGISTableView)
 END_EVENT_TABLE()
 
 
-wxGxTableView::wxGxTableView(void)
+wxGxTableView::wxGxTableView(void) : wxGISTableView(), wxGxView()
 {
+    m_nParentGxObjectID = wxNOT_FOUND;
+    m_ConnectionPointSelectionCookie = wxNOT_FOUND;
 }
 
 wxGxTableView::wxGxTableView(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size) : wxGISTableView(parent, id, pos, size)
 {
-	m_nParentGxObjectID = wxNOT_FOUND;
+    m_nParentGxObjectID = wxNOT_FOUND;
+    m_ConnectionPointSelectionCookie = wxNOT_FOUND;
 	m_sViewName = wxString(_("Table View"));
 	SetReadOnly(true);
 }
@@ -53,46 +57,56 @@ bool wxGxTableView::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
     return true;
 }
 
-bool wxGxTableView::Activate(wxGISApplicationBase* application, wxXmlNode* pConf)
+bool wxGxTableView::Activate(IApplication* const pApplication, wxXmlNode* const pConf)
 {
-	if(!wxGxView::Activate(application, pConf))
+	if(!wxGxView::Activate(pApplication, pConf))
 		return false;
 	//Serialize(m_pXmlConf, false);
 
-    m_pCatalog = dynamic_cast<wxGxCatalogUI*>(m_pGxApplication->GetCatalog());
-	if(m_pCatalog)
-		m_pSelection = m_pCatalog->GetSelection();
+    wxGxApplication* pApp = dynamic_cast<wxGxApplication*>(pApplication);
+    if(!pApp)
+        return false;
+
+    m_pSelection = pApp->GetGxSelection();
+
+        if(!GetGxCatalog())
+		return false;
+    m_pCatalog = wxDynamicCast(GetGxCatalog(), wxGxCatalogUI);
+
+    m_ConnectionPointSelectionCookie = m_pSelection->Advise(this);
 
 	return true;
 }
 
 void wxGxTableView::Deactivate(void)
 {
+	if(m_ConnectionPointSelectionCookie != wxNOT_FOUND)
+        m_pSelection->Unadvise(m_ConnectionPointSelectionCookie);
 	//Serialize(m_pXmlConf, true);
 	wxGxView::Deactivate();
 }
 
-bool wxGxTableView::Applies(wxGxSelection* const pSelection)
+bool wxGxTableView::Applies(wxGxSelection* const Selection)
 {
 	if(Selection == NULL)
 		return false;
 
 	for(size_t i = 0; i < Selection->GetCount(); ++i)
 	{
-		IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject( Selection->GetSelectedObjectID(i) );
-		IGxDataset* pGxDataset = dynamic_cast<IGxDataset*>( pGxObject.get() );
+        wxGxObject* pGxObject = m_pCatalog->GetRegisterObject(Selection->GetSelectedObjectId(i));
+		wxGxDataset* pGxDataset = wxDynamicCast(pGxObject, wxGxDataset);
 		if(pGxDataset != NULL)
-		{			
+		{
 			wxGISEnumDatasetType type = pGxDataset->GetType();
 			switch(type)
 			{
-			case enumGISTableDataset:
 			case enumGISFeatureDataset:
+			case enumGISTableDataset:
 				return true;
 			case enumGISRasterDataset:
+			case enumGISContainer:
 				break;
 			}
-
 		}
 	}
 	return false;
@@ -100,68 +114,54 @@ bool wxGxTableView::Applies(wxGxSelection* const pSelection)
 
 void wxGxTableView::OnSelectionChanged(wxGxSelectionEvent& event)
 {
-	if(event.GetInitiator() == GetId())
-		return;
+	wxCHECK_RET(event.GetSelection(), wxT("the selection pointer is NULL"));
+    
+    if(!Applies(event.GetSelection()))
+        return;
 
-	if(m_pSelection->GetCount() == 0)
-		return;
-    long nSelID = m_pSelection->GetLastSelectedObjectID();
-	if(m_nParentGxObjectID == nSelID)
-		return;
+    if(!IsShown())
+        return;
 
-    IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(nSelID);
-	IGxDataset* pGxDataset =  dynamic_cast<IGxDataset*>(pGxObject.get());
+    long nLastSelID = event.GetSelection()->GetLastSelectedObjectId();
+	if(m_nParentGxObjectID == nLastSelID)
+    {
+        wxGISGridTable* pTable = wxDynamicCast( GetTable(), wxGISGridTable);
+        if(pTable)
+        {
+            wxGISTable* pDs = pTable->GetDataset();
+            if(pDs && pDs->IsCaching())
+            {
+                pDs->StopCaching();
+            }
+        }
+        return;
+    }
+    	
+    LoadData(nLastSelID);
+}
+
+void wxGxTableView::LoadData(long nGxObjectId)
+{
+    wxGxObject* pGxObject = m_pCatalog->GetRegisterObject(nGxObjectId);
+	wxGxDataset* pGxDataset = wxDynamicCast(pGxObject, wxGxDataset);
 	if(pGxDataset == NULL)
 		return;
 
     wxBusyCursor wait;
-	wxGISDatasetSPtr pwxGISDataset = pGxDataset->GetDataset();
-	if(pwxGISDataset == NULL)
+	wxGISDataset* pwxGISDataset = pGxDataset->GetDataset(false);
+    wxGISTable* pGISTable = wxDynamicCast(pwxGISDataset, wxGISTable);
+
+	if(pGISTable == NULL)
 		return;
 
-	//wxGISEnumDatasetType type = pwxGISDataset->GetType();
-	//OGRLayer* pOGRLayer(NULL);
+	m_nParentGxObjectID = pGxObject->GetId();    
 
-	//switch(type)
-	//{
-	//case enumGISTableDataset:
-	//case enumGISFeatureDataset:
-	//	{
-	//	wxGISFeatureDataset* pwxGISFeatureDataset = dynamic_cast<wxGISFeatureDataset*>(pwxGISDataset);
-	//	if(pwxGISFeatureDataset)
-	//		pOGRLayer = pwxGISFeatureDataset->GetLayer();
-	//	}
-	//	break;
-	//default:
-	//case enumGISRasterDataset:
-	//	break;
-	//}
-
-	////the pOGRLayer will live while IGxObject live. IGxObject( from IGxSelection ) store IwxGISDataset, and destroy it then catalog destroyed 
-	//pwxGISDataset->Release();
-
-	//if(pOGRLayer == NULL)
-	//	return;
-
+    if(!pGISTable->IsOpened())
+        pGISTable->Open(0, 0, false);
+    if(pGISTable->IsCaching())
+        pGISTable->StopCaching();
 	wxGISGridTable* pTable = new wxGISGridTable(pwxGISDataset);
 	wxGISTableView::SetTable(pTable, true);
 
-	////reset 
-	//ResetContents();
-
-	//IGxObjectContainer* pObjContainer =  dynamic_cast<IGxObjectContainer*>(pGxObj);
-	//if(pObjContainer == NULL || !pObjContainer->HasChildren())
-	//	return;
-	//GxObjectArray* pArr = pObjContainer->GetChildren();
-	//for(size_t i = 0; i < pArr->size(); ++i)
-	//{
-	//	AddObject(pArr->at(i));
-	//}
-
-	//SortItems(MyCompareFunction, m_bSortAsc);
- //   SetColumnImage(m_currentSortCol, m_bSortAsc ? 0 : 1);
-	m_nParentGxObjectID = nSelID;
-
 	wxWindow::Refresh();
 }
-*/

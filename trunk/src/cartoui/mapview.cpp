@@ -744,6 +744,22 @@ void wxGISMapView::UpdateFrameCenter(void)
 	m_FrameCenter.y = rc.y + rc.height / 2;
 }
 
+bool wxGISMapView::CanRotate(void)
+{
+    for(size_t i = 0; i < GetLayerCount(); ++i)
+    {
+        wxGISLayer* const pLayer = GetLayer(i);
+        if(pLayer)
+        {
+            wxGISDataset* const pDSet = pLayer->GetDataset();
+            if(pDSet && pDSet->IsCaching())
+            {
+               return false;
+            }
+        }
+    }
+    return true;
+}
 
 OGREnvelope wxGISMapView::GetFullExtent(void)
 {
@@ -1043,7 +1059,7 @@ wxThread::ExitCode wxGISMapView::Entry()
 	//draw selection
 	//draw anno
     wxQueueEvent(pEHandle, new wxMxMapViewEvent(wxMXMAP_DRAWING_STOP));
-	return (wxThread::ExitCode)0;     // success
+	return (wxThread::ExitCode)wxTHREAD_NO_ERROR;     // success
 }
 
 bool wxGISMapView::CreateAndRunDrawThread(void)

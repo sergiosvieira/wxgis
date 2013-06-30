@@ -22,6 +22,7 @@
 
 #include "wxgis/carto/carto.h"
 
+//TODO:
 //esriRasterStretch_NONE	0	Stretch is not applied.
 //esriRasterStretch_DefaultFromSource	1	Stretch is default type.
 //esriRasterStretch_Custom	2	Stretch is a custom type.
@@ -79,9 +80,8 @@ protected:
     double m_dfM, m_dfDX;
 };
 
-//esriRasterStretchStatsTypeEnum Constants
+//TODO: esriRasterStretchStatsTypeEnum Constants
 //Raster stretch statistics types.
-//Constant	Value	Description
 //esriRasterStretchStats_AreaOfView	0	Stretch stats from current Area Of View.
 //esriRasterStretchStats_Dataset	1	Stretch stats from current Dataset being rendered.
 //esriRasterStretchStats_GlobalStats	2	Stretch stats from global stats definition.

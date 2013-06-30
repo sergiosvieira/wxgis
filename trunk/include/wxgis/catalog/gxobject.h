@@ -54,8 +54,8 @@ public:
     virtual void Refresh(void);
 	virtual long GetId(void) const {return m_nId;};
 	virtual void SetId(long nId){m_nId = nId;};
-    virtual wxGxObject *FindGxObjectByPath(const wxString &sPath) const;
-    virtual wxGxObject *FindGxObject(const wxString &sPath) const;
+    virtual wxGxObject *FindGxObjectByPath(const wxString &sPath);
+    virtual wxGxObject *FindGxObject(const wxString &sPath);
 protected:
     wxString m_sName;
     CPLString m_sPath;
@@ -89,8 +89,8 @@ public:
     virtual bool Destroy(void);
     virtual wxGxObjectList& GetChildren() { return m_Children; }
     virtual void Refresh(void);
-    virtual wxGxObject *FindGxObjectByPath(const wxString &sPath) const;
-    virtual wxGxObject *FindGxObject(const wxString &sPath) const;
+    virtual wxGxObject *FindGxObjectByPath(const wxString &sPath);
+    virtual wxGxObject *FindGxObject(const wxString &sPath);
 protected:
     wxGxObjectList m_Children;
 };
@@ -110,7 +110,6 @@ public:
     virtual wxString GetCategory(void) const {return wxString(wxT("Root"));};
     //wxGxObjectContainer
     virtual bool AreChildrenViewable(void) const {return true;};
-    wxGxObject *FindGxObject(const wxString &sPath) const;
     //wxGxCatalog
     virtual wxString ConstructFullName(const wxGxObject* pObject) const;
     virtual bool Destroy(void);
@@ -127,7 +126,7 @@ public:
 	virtual void SetShowHidden(bool bShowHidden){m_bShowHidden = bShowHidden;};
 	virtual void SetShowExt(bool bShowExt){m_bShowExt = bShowExt;};
     //gxobject children factory
-    virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds) = 0;
+    virtual bool CreateChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds) = 0;
     //events
     virtual void ObjectAdded(long nObjectID) = 0;
 	virtual void ObjectChanged(long nObjectID) = 0;

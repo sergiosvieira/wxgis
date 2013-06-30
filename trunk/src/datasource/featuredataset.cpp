@@ -37,11 +37,10 @@ wxGISFeatureDataset::wxGISFeatureDataset(const CPLString &sPath, int nSubType, O
     m_nType = enumGISFeatureDataset;
     m_eGeomType = wkbUnknown;
     m_pQuadTree = NULL;
+    m_bIsCached = false;
 
     if(m_bIsOpened)
         SetInternalValues();
-
-    m_bIsGeometryLoaded = false;
 }
 
 wxGISFeatureDataset::~wxGISFeatureDataset(void)
@@ -52,7 +51,6 @@ wxGISFeatureDataset::~wxGISFeatureDataset(void)
 void wxGISFeatureDataset::Close(void)
 {
     wxDELETE(m_pQuadTree);
-    m_bIsGeometryLoaded = false;
 	wxGISTable::Close();
 }
 
@@ -259,26 +257,53 @@ void wxGISFeatureDataset::SetInternalValues()
 
 void wxGISFeatureDataset::Cache(ITrackCancel* const pTrackCancel)
 {
-	wxGISTable::Cache(pTrackCancel);
+	//wxGISTable::Cache(pTrackCancel);
 
-    if(m_bIsGeometryLoaded)
+    if(m_bIsCached)
         return;
 
     if(!m_pQuadTree)
     {
         m_pQuadTree = new wxGISQuadTree(this);
-        if(m_pQuadTree->Load(pTrackCancel))
-        {
-            m_bIsGeometryLoaded = true;
-        }
     }
+
+    if(IsCaching())
+        return;
+
+    m_pQuadTree->Load(pTrackCancel);
+
 //	LoadGeometry(pTrackCancel);
+}
+
+bool wxGISFeatureDataset::IsCached(void) const
+{
+    if(m_pQuadTree && m_pQuadTree->IsLoading())
+       return false;
+
+    return m_bIsCached;
+}
+
+bool wxGISFeatureDataset::IsCaching(void) const
+{
+    if(m_pQuadTree)
+       return m_pQuadTree->IsLoading();
+    return false;
+}
+
+void wxGISFeatureDataset::StopCaching(void)
+{
+    if(m_pQuadTree && m_pQuadTree->IsLoading())
+    {
+        m_pQuadTree->DestroyLoadGeometryThread();
+    }
 }
 
 OGREnvelope wxGISFeatureDataset::GetEnvelope(void)
 {
-    if(m_stExtent.IsInit())
+    if(m_stExtent.IsInit() || m_nFeatureCount == 0)
         return m_stExtent;
+
+
 	//bool bOLCFastGetExtent = m_poLayer->TestCapability(OLCFastGetExtent);
  //   if(bOLCFastGetExtent)
     if(IsOpened())
@@ -299,149 +324,11 @@ OGREnvelope wxGISFeatureDataset::GetEnvelope(void)
     }
     return m_stExtent;
 }
-/*
-void wxGISFeatureDataset::LoadGeometry(ITrackCancel* pTrackCancel)
-{
-	wxCriticalSectionLocker locker(m_CritSect);
-    if(m_bIsGeometryLoaded || !m_bIsOpened || !m_poLayer)
-        return;
-
-	IProgressor* pProgress(NULL);
-	if(pTrackCancel)
-	{
-		pTrackCancel->Reset();
-		pTrackCancel->PutMessage(wxString(_("PreLoad Geometry of ")) + m_sTableName, -1, enumGISMessageInfo);
-		pProgress = pTrackCancel->GetProgressor();
-		if(pProgress)
-			pProgress->Show(true);
-	}
-
-	bool bOLCFastGetExtent = m_poLayer->TestCapability(OLCFastGetExtent) || m_stExtent.IsInit();
-    if(bOLCFastGetExtent)
-    {
-        if(m_poLayer->GetExtent(&m_stExtent, true) == OGRERR_NONE)
-        {
-            if(IsDoubleEquil(m_stExtent.MinX, m_stExtent.MaxX))
-            {
-                m_stExtent.MaxX += 1;
-                m_stExtent.MinX -= 1;
-            }
-            if(IsDoubleEquil(m_stExtent.MinY, m_stExtent.MaxY))
-            {
-                m_stExtent.MaxY += 1;
-                m_stExtent.MinY -= 1;
-            }
-			m_pQuadTree = boost::make_shared<wxGISQuadTree>(m_stExtent);
-			if(pProgress)
-				pProgress->SetRange(GetFeatureCount());
-		}
-    }
-	else
-	{
-		if(pProgress)
-			pProgress->SetRange(GetFeatureCount() * 2);
-	}
-
-	long nCounter(0);
-	Reset();
-
-	OGRFeatureSPtr poFeature;
-	long nFID(0);
-	while((poFeature = Next()) != NULL )
-	{
-		if(pProgress)
-		{
-			pProgress->SetValue(nCounter);
-			nCounter++;
-		}
-        OGRGeometry* pGeom = poFeature->GetGeometryRef();
-        if(poFeature && !m_bHasFID)
-			poFeature->SetFID(++nFID);
-        else
-            nFID = poFeature->GetFID();
-
-        //store features in array for speed
-		if(!m_bIsDataLoaded)
-			m_FeaturesMap[nFID] = poFeature;
-
-        if(bOLCFastGetExtent)
-		{
-			if(pGeom && m_pQuadTree)
-				m_pQuadTree->AddItem(pGeom, poFeature->GetFID());
-		}
-        else
-        {
-            if(pGeom)
-            {
-                OGREnvelope Env;
-                pGeom->getEnvelope(&Env);
-                m_stExtent.Merge(Env);
-            }
-        }
-		if(pTrackCancel && !pTrackCancel->Continue())
-		{
-			if(pProgress)
-				pProgress->Show(false);
-			return;
-		}
-	}
-
-	m_bIsDataLoaded = true;
-	m_nFeatureCount = m_FeaturesMap.size();
-
-    if(IsDoubleEquil(m_stExtent.MinX, m_stExtent.MaxX))
-    {
-        m_stExtent.MaxX += 1;
-        m_stExtent.MinX -= 1;
-    }
-    if(IsDoubleEquil(m_stExtent.MinY, m_stExtent.MaxY))
-    {
-        m_stExtent.MaxY += 1;
-        m_stExtent.MinY -= 1;
-    }
-
-    if(!bOLCFastGetExtent)
-    {
-        m_pQuadTree = boost::make_shared<wxGISQuadTree>(m_stExtent);
-		Reset();
-		while((poFeature = Next()) != NULL )
-		{
-			if(pProgress)
-			{
-				pProgress->SetValue(nCounter);
-				nCounter++;
-			}
-			OGRGeometry* pGeom = poFeature->GetGeometryRef();
-			if(pGeom && m_pQuadTree)
-				m_pQuadTree->AddItem(pGeom, poFeature->GetFID());
-
-			if(pTrackCancel && !pTrackCancel->Continue())
-			{
-				if(pProgress)
-					pProgress->Show(false);
-				return;
-			}
-		}
-    }
-	if(pProgress)
-		pProgress->Show(false);
-
-    m_bIsGeometryLoaded = true;
-}
-*/
-//void wxGISFeatureDataset::UnloadGeometry(void)
-//{
-//    if(!m_bIsGeometryLoaded)
-//        return;
-//
-//    m_bIsGeometryLoaded = false;
-//}
 
 OGRwkbGeometryType wxGISFeatureDataset::GetGeometryType(void) const
 {
     return m_eGeomType;
 }
-
 
 wxFeatureCursor wxGISFeatureDataset::Search(const wxGISSpatialFilter &SpaFilter, bool bOnlyFirst)
 {

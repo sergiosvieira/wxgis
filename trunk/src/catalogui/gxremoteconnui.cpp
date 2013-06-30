@@ -161,7 +161,7 @@ wxThread::ExitCode wxGxRemoteConnectionUI::Entry()
         {
             wxThreadEvent event( wxEVT_THREAD, EXIT_EVENT );
             wxQueueEvent( this, event.Clone() );
-            return (wxThread::ExitCode)1;
+            return (wxThread::ExitCode)wxTHREAD_MISC_ERROR;
         }
     }
     wsDELETE(pDSet);
@@ -171,7 +171,7 @@ wxThread::ExitCode wxGxRemoteConnectionUI::Entry()
     wxThreadEvent event( wxEVT_THREAD, EXIT_EVENT );
     wxQueueEvent( this, event.Clone() );
 
-    return (wxThread::ExitCode)0;
+    return (wxThread::ExitCode)wxTHREAD_NO_ERROR;
 }
 
 void wxGxRemoteConnectionUI::OnThreadFinished(wxThreadEvent& event)
@@ -295,7 +295,7 @@ wxThread::ExitCode wxGxRemoteDBSchemaUI::Entry()
     wxThreadEvent event( wxEVT_THREAD, EXIT_EVENT );
     wxQueueEvent( this, event.Clone() );
 
-    return (wxThread::ExitCode)0;
+    return (wxThread::ExitCode)wxTHREAD_NO_ERROR;
 }
 
 void wxGxRemoteDBSchemaUI::OnThreadFinished(wxThreadEvent& event)

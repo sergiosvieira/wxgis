@@ -538,7 +538,7 @@ void *wxRasterDrawThread::Entry()
 		break;
 	};
 
-	return NULL;
+	return (wxThread::ExitCode)wxTHREAD_NO_ERROR; 
 }
 
 void wxRasterDrawThread::OnExit()

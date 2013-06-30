@@ -385,6 +385,7 @@ bool wxGxDialogContentView::AddObject(wxGxObject* const pObject)
 			if(m_FiltersArray[i]->CanDisplayObject(pObject))
 				return wxGxContentView::AddObject(pObject);
 	}
+    return false;
 }
 
 wxGxSelection* const wxGxDialogContentView::GetSelectedObjects(void)

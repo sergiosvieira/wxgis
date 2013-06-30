@@ -88,6 +88,8 @@ public:
 //events
 	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
 protected:
+    virtual void LoadData(long nGxObjectId);
+protected:
     long m_ConnectionPointCatalogCookie, m_ConnectionPointSelectionCookie;
 	wxGxSelection* m_pSelection;
     wxGxCatalogUI* m_pCatalog;

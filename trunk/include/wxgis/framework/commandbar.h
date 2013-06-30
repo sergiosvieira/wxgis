@@ -148,6 +148,7 @@ protected:
 	wxGISStatusBar* m_pStatusBar;
 	bool m_bLDock;
 	bool m_bRDock;
+    bool m_bActive;
 
 	std::map<size_t, IToolBarControl*> m_RemControlMap;
 private:

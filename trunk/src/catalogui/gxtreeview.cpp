@@ -331,8 +331,8 @@ void wxGxTreeViewBase::OnItemExpanding(wxTreeEvent& event)
 			{
 				if(pData->m_bExpandedOnce == false)
 				{
-					wxGxObjectList ObjectList = pGxObjectContainer->GetChildren();
-                    wxGxObjectList::iterator iter;
+					const wxGxObjectList ObjectList = pGxObjectContainer->GetChildren();
+                    wxGxObjectList::const_iterator iter;
                     for (iter = ObjectList.begin(); iter != ObjectList.end(); ++iter)
                     {
                         wxGxObject *current = *iter;
@@ -394,7 +394,8 @@ void wxGxTreeViewBase::OnObjectRefreshed(wxGxCatalogEvent& event)
 		{
 			if(pData->m_bExpandedOnce)
 			{
-				DeleteChildren(TreeItemId);
+                //deleted via refresh
+				//DeleteChildren(TreeItemId);
 				pData->m_bExpandedOnce = false;
 				Expand(TreeItemId);
 			}

@@ -180,25 +180,46 @@ protected:
 
 extern WXDLLIMPEXP_DATA_GIS_DS(wxGISQuadTreeCursor) wxNullQuadTreeCursor;
 
+/** \class wxGISQuadTreeFillThread quadtree.h
+    \brief The wxGIS QuadTree fill data thread.
+*/
+class wxGISQuadTreeFillThread : public wxThread
+{
+public:
+	wxGISQuadTreeFillThread(wxGISQuadTree* pQuadTree, ITrackCancel * const pTrackCancel = NULL);
+    virtual void *Entry();
+    virtual void OnExit();
+private:
+    ITrackCancel* const m_pTrackCancel;
+    wxGISQuadTree* m_pQuadTree;
+};
+
 
 /** \class wxGISQuadTree quadtree.h
     \brief The wxGIS QuadTree representation.
 */
 
-class WXDLLIMPEXP_GIS_DS wxGISQuadTree :
-    public wxThreadHelper
+class WXDLLIMPEXP_GIS_DS wxGISQuadTree
 {
+    friend class wxGISQuadTreeFillThread;
 public:
 	wxGISQuadTree(wxGISFeatureDataset* pDSet);
 	virtual ~wxGISQuadTree(void);
 	virtual wxGISQuadTreeCursor Search(const CPLRectObj* pAoi = 0);
     virtual bool Load(ITrackCancel* const pTrackCancel);
+    virtual bool IsLoading(void) const;
+    void DestroyLoadGeometryThread(void);
 protected:    
     virtual void AddItem(wxGISQuadTreeItem* pItem);
-protected:
-    virtual wxThread::ExitCode Entry();
+    virtual void OnThreadExit();
     bool CreateAndRunLoadGeometryThread(void);
-    void DestroyLoadGeometryThread(void);
+    void DestroyQuadTree();
+    wxGISFeatureDataset* GetDataset() const {return m_pDSet;};
+    short GetPreloadItemCount(void) const {return m_nPreloadItemCount;};
+    void CreateQuadTree(void);
+    void QueueEvent(wxEvent *event);
+    long GetReadPos(void) const {return m_nReadPos;};
+    void SetReadPos(long nReadPos) {m_nReadPos = nReadPos;};
 protected:
     CPLQuadTree* m_pQuadTree;
 	std::list<wxGISQuadTreeItem*> m_QuadTreeItemList;
@@ -206,7 +227,10 @@ protected:
 	wxCriticalSection m_CritSect;
     wxGISFeatureDataset* m_pDSet;
     ITrackCancel* m_pTrackCancel;
-    IProgressor* m_pProgress;
 
     short m_nPreloadItemCount;
+
+    wxGISQuadTreeFillThread* m_pThread;
+
+    long m_nReadPos;
 };

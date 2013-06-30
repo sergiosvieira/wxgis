@@ -59,7 +59,7 @@ wxThread::ExitCode wxGxDiscConnectionUI::Entry()
 
     wxGIS_GXCATALOG_EVENT(ObjectChanged);
 
-    return (wxThread::ExitCode)0;
+    return (wxThread::ExitCode)wxTHREAD_NO_ERROR;
 }
 
 bool wxGxDiscConnectionUI::HasChildren(void)

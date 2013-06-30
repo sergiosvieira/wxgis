@@ -39,13 +39,11 @@
 #include <wx/checkbox.h>
 #include <wx/panel.h>
 
-/*
-///////////////////////////////////////////////////////////////////////////
+/** \class wxGISCatalogGeneralPropertyPage gxpropertypages.h
+    \brief The catalog application propeties.
+*/
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxGISCatalogGeneralPropertyPage
-///////////////////////////////////////////////////////////////////////////////
-class wxGISCatalogGeneralPropertyPage : 
+class WXDLLIMPEXP_GIS_CLU wxGISCatalogGeneralPropertyPage : 
     public IPropertyPage
 {
     DECLARE_DYNAMIC_CLASS(wxGISCatalogGeneralPropertyPage)
@@ -72,4 +70,3 @@ protected:
 	wxCheckBox* m_checkBoxHidden;
     wxGxCatalogUI* m_pCatalog;
 };
-*/

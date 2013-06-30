@@ -182,7 +182,7 @@ wxThread::ExitCode wxGISProcess::Entry()
 
     // TestDestroy() returned true (which means the main thread asked us
     // to terminate as soon as possible) or we ended the long task...
-    return (wxThread::ExitCode)0;
+    return (wxThread::ExitCode)wxTHREAD_NO_ERROR;
 }
 
 bool wxGISProcess::CreateAndRunReadThread(void)

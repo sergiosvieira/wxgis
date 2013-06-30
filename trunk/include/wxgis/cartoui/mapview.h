@@ -61,6 +61,7 @@ public:
 	virtual void PanMoveTo(wxPoint MouseLocation);
 	virtual void PanStop(wxPoint MouseLocation);
 	virtual void RotateStart(wxPoint MouseLocation);
+    virtual bool CanRotate(void);
 	virtual void RotateBy(wxPoint MouseLocation);
 	virtual void RotateStop(wxPoint MouseLocation);
 	virtual void SetRotate(double dAngleRad);

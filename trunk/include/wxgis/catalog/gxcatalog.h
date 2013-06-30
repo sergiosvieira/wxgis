@@ -40,7 +40,7 @@ public:
 	virtual void ObjectChanged(long nObjectID);
 	virtual void ObjectDeleted(long nObjectID);
 	virtual void ObjectRefreshed(long nObjectID);
-    virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
+    virtual bool CreateChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
     virtual void EnableRootItem(size_t nItemId, bool bEnable);
     virtual bool Destroy(void);
     virtual wxGxObject* const GetRootItemByType(const wxClassInfo * info) const;
@@ -53,6 +53,8 @@ public:
         bool bEnabled;
         wxXmlNode* pConfig;
     } ROOTITEM;
+
+    virtual wxVector<wxGxCatalog::ROOTITEM>* const GetRootItems(void);
 protected:
     //wxGxCatalogBase
 	virtual void LoadObjectFactories(const wxXmlNode* pNode);

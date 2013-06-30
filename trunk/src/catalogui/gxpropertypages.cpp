@@ -20,8 +20,6 @@
  ****************************************************************************/
 #include "wxgis/catalogui/gxpropertypages.h"
 
-/*
-    
 //-------------------------------------------------------------------------------
 // wxGISCatalogGeneralPropertyPage
 //-------------------------------------------------------------------------------
@@ -41,15 +39,9 @@ bool wxGISCatalogGeneralPropertyPage::Create(wxGISApplicationBase* application, 
     if(!wxPanel::Create(parent, id, pos, size, style, name))
 		return false;
 
-    IGxApplication* pGxApplication = dynamic_cast<IGxApplication*>(application);
-    if(!pGxApplication)
-        return false;
-
-	m_pCatalog = dynamic_cast<wxGxCatalogUI*>(pGxApplication->GetCatalog());
+	m_pCatalog = wxDynamicCast(GetGxCatalog(), wxGxCatalogUI);
 	if(!m_pCatalog)
         return false;
-
-    IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pCatalog);
 
 	wxBoxSizer* bMainSizer;
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
@@ -58,23 +50,13 @@ bool wxGISCatalogGeneralPropertyPage::Create(wxGISApplicationBase* application, 
 	
     //fill root items
     m_pRootItems = new wxGISCheckList( this, ID_ROOTLISTCTRL);
-	//m_pRootItems->InsertColumn(0, wxT("..."), wxLIST_FORMAT_LEFT, 250);
     //fill code
-    GxObjectArray* pRootItems = pGxObjectContainer->GetChildren();
-    for(size_t i = 0; i < pRootItems->size(); ++i)
+    wxVector<wxGxCatalog::ROOTITEM>* const m_staRootItems = m_pCatalog->GetRootItems();
+    for (size_t i = 0; i < m_staRootItems->size(); ++i)
     {
-        IGxObject* pGxObj = pRootItems->operator[](i);
-        wxString sName = pGxObj->GetName();
-        int nPos = m_pRootItems->InsertItem(sName, 1);
-        m_pRootItems->SetItemData(nPos, (long)pGxObj);
-    }
-    pRootItems = m_pCatalog->GetDisabledRootItems();
-    for(size_t i = 0; i < pRootItems->size(); ++i)
-    {
-        IGxObject* pGxObj = pRootItems->operator[](i);
-        wxString sName = pGxObj->GetName();
-        int nPos = m_pRootItems->InsertItem(sName, 0);
-        m_pRootItems->SetItemData(nPos, (long)pGxObj);
+        wxString sName = m_staRootItems->operator[](i).sName;
+        int nPos = m_pRootItems->InsertItem(sName,  m_staRootItems->operator[](i).bEnabled == true ? 1 : 0);
+        m_pRootItems->SetItemData(nPos, i);
     }
 
 	sbRootSizer->Add( m_pRootItems, 1, wxALL | wxEXPAND, 5 );
@@ -83,11 +65,11 @@ bool wxGISCatalogGeneralPropertyPage::Create(wxGISApplicationBase* application, 
 	
 	m_button3 = new wxButton( this, wxID_ANY, _("Properties"), wxDefaultPosition, wxDefaultSize, 0 );
     m_button3->Enable(false);
-	bSizer1->Add( m_button3, 0, wxALL|wxALIGN_RIGHT, 5 );
+	bSizer1->Add( m_button3, 0, wxALL | wxALIGN_RIGHT, 5 );
 
-	sbRootSizer->Add( bSizer1, 0, wxEXPAND, 5 );
+	sbRootSizer->Add( bSizer1, 0, wxALL | wxEXPAND, 5 );
 
-	bMainSizer->Add( sbRootSizer, 1, wxEXPAND, 5 );
+	bMainSizer->Add( sbRootSizer, 1, wxALL | wxEXPAND, 5 );
 
     //===================================================================
 
@@ -97,26 +79,26 @@ bool wxGISCatalogGeneralPropertyPage::Create(wxGISApplicationBase* application, 
 
     m_pFactoryItems = new wxGISCheckList( this, ID_FACTORYLISTCTRL);
     //fill code
-    GxObjectFactoryArray* pFactories = m_pCatalog->GetObjectFactories();
-    for(size_t i = 0; i < pFactories->size(); ++i)
-    {
-        IGxObjectFactory* pGxObjectFactory = pFactories->operator[](i);
-        wxString sName = pGxObjectFactory->GetName();
-        long nPos = m_pFactoryItems->InsertItem(sName, pGxObjectFactory->GetEnabled());
-        m_pFactoryItems->SetItemData(nPos, (long)pGxObjectFactory);
-    }
+    //GxObjectFactoryArray* pFactories = m_pCatalog->GetObjectFactories();
+    //for(size_t i = 0; i < pFactories->size(); ++i)
+    //{
+    //    IGxObjectFactory* pGxObjectFactory = pFactories->operator[](i);
+    //    wxString sName = pGxObjectFactory->GetName();
+    //    long nPos = m_pFactoryItems->InsertItem(sName, pGxObjectFactory->GetEnabled());
+    //    m_pFactoryItems->SetItemData(nPos, (long)pGxObjectFactory);
+    //}
 
-    sbFactorySizer->Add( m_pFactoryItems, 1, wxALL|wxEXPAND, 5 );
+    sbFactorySizer->Add( m_pFactoryItems, 1, wxALL | wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer2 = new wxBoxSizer( wxVERTICAL );
 	
 	m_button2 = new wxButton( this, wxID_ANY, _("Properties"), wxDefaultPosition, wxDefaultSize, 0 );
     m_button2->Enable(false);
-	bSizer2->Add( m_button2, 0, wxALL|wxALIGN_RIGHT, 5 );
+	bSizer2->Add( m_button2, 0, wxALL | wxALIGN_RIGHT, 5 );
 	
-	sbFactorySizer->Add( bSizer2, 0, wxEXPAND, 5 );
+	sbFactorySizer->Add( bSizer2, 0, wxALL | wxEXPAND, 5 );
 	
-	bMainSizer->Add( sbFactorySizer, 1, wxEXPAND, 5 );
+	bMainSizer->Add( sbFactorySizer, 1, wxALL | wxEXPAND, 5 );
 	
 	m_checkBoxHideExt = new wxCheckBox( this, wxID_ANY, _("Hide file extensions"), wxDefaultPosition, wxDefaultSize, 0 );
     m_checkBoxHideExt->SetValue(!m_pCatalog->GetShowExt());
@@ -151,33 +133,30 @@ void wxGISCatalogGeneralPropertyPage::Apply(void)
     m_pCatalog->SetOpenLastPath(bOpenLast);
 
     //update object factories
-    for(size_t i = 0; i < m_pFactoryItems->GetItemCount(); ++i)
-    {
-        if(m_pFactoryItems->IsItemChanged(i))
-        {
-            if(!bHaveChanges)
-                bHaveChanges = true;
-            IGxObjectFactory* pGxObjectFactory = (IGxObjectFactory*)m_pFactoryItems->GetItemData(i);
-            pGxObjectFactory->SetEnabled(m_pFactoryItems->GetItemCheckState(i) != 0);
-        }
-    }
+    //for(size_t i = 0; i < m_pFactoryItems->GetItemCount(); ++i)
+    //{
+    //    if(m_pFactoryItems->IsItemChanged(i))
+    //    {
+    //        if(!bHaveChanges)
+    //            bHaveChanges = true;
+    //        IGxObjectFactory* pGxObjectFactory = (IGxObjectFactory*)m_pFactoryItems->GetItemData(i);
+    //        pGxObjectFactory->SetEnabled(m_pFactoryItems->GetItemCheckState(i) != 0);
+    //    }
+    //}
 
     if(bHaveChanges)
     {
-        IGxObjectSPtr pGxObject = m_pCatalog->GetRegisterObject(m_pCatalog->GetSelection()->GetLastSelectedObjectID());
-        if(pGxObject)
-            pGxObject->Refresh();
+        m_pCatalog->Refresh();
     }
 
     //update root items
-    for(size_t i = 0; i < m_pRootItems->8; ++i)
+    for(size_t i = 0; i < m_pRootItems->GetItemCount(); ++i)
     {
         if(m_pRootItems->IsItemChanged(i))
         {
-            IGxObject* pGxObject = (IGxObject*)m_pRootItems->GetItemData(i);
+            int nIndex = m_pRootItems->GetItemData(i);
             bool bChecked = m_pRootItems->GetItemCheckState(i) != 0;
-            m_pCatalog->EnableRootItem(pGxObject, bChecked);
+            m_pCatalog->EnableRootItem(nIndex, bChecked);
         }
     }
 }
-*/
