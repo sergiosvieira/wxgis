@@ -91,7 +91,9 @@ bool wxGxApplication::CreateApp(void)
 		        RegisterChildWindow(m_pTreeView->GetId());
 	        }
 	        else
+            {
 		        wxDELETE(m_pTreeView);
+            }
         }
         else if(pViewsChildNode->GetName().CmpNoCase(wxT("tabview")) == 0)
         {
@@ -102,7 +104,9 @@ bool wxGxApplication::CreateApp(void)
 		        RegisterChildWindow(m_pTabView->GetId());
 	        }
 	        else
+            {
 		        wxDELETE(m_pTabView);
+            }
         }
         else
         {
@@ -140,7 +144,18 @@ bool wxGxApplication::CreateApp(void)
         pViewsChildNode = pViewsChildNode->GetNext();
     }
 
-    //TODO: second call - first call from wxGISApplicationEx::CreateApp();
+	for(size_t i = 0; i < m_CommandBarArray.GetCount(); ++i)
+	{
+		if(m_CommandBarArray[i]->GetType() == enumGISCBToolbar)
+		{
+			wxGISToolBar* pToolBar = static_cast<wxGISToolBar*>(m_CommandBarArray[i]);
+			if(pToolBar)
+			{
+				pToolBar->Activate(this);
+			}
+		}
+	}
+
     SerializeFramePosEx(false);
     m_mgr.Update();
 
@@ -192,31 +207,19 @@ void wxGxApplication::OnClose(wxCloseEvent& event)
 			}
 		}
 	}
-    
-    if(m_pTreeView)
-    {
-        UnRegisterChildWindow(m_pTreeView->GetId());
-        m_pTreeView->Deactivate();
-    }
-    if(m_pTabView)
-    {
-        UnRegisterChildWindow(m_pTabView->GetId());
-        m_pTabView->Deactivate();
-    }
 
     wxGISApplicationEx::OnClose(event);
-
-  //  while (!m_WindowArray.empty())
-  //  {
-  //      wxWindow* poWnd = m_WindowArray.back();
-		//if( poWnd && !poWnd->IsBeingDeleted() )
-  //      {
-		//	RemoveChild(poWnd);
-  //          if(!poWnd->Destroy())
-  //              delete poWnd;
-  //      }
-  //      m_WindowArray.pop_back();
-  //  }
+    
+    //if(m_pTreeView)
+    //{
+    //    UnRegisterChildWindow(m_pTreeView->GetId());
+    //    m_pTreeView->Deactivate();
+    //}
+    //if(m_pTabView)
+    //{
+    //    UnRegisterChildWindow(m_pTabView->GetId());
+    //    m_pTabView->Deactivate();
+    //}
 
     if(m_pCatalog)
     {

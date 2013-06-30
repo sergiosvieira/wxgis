@@ -30,7 +30,7 @@ BEGIN_EVENT_TABLE(wxGISStatusBar, wxStatusBar)
 	EVT_SIZE(wxGISStatusBar::OnSize)
 	EVT_TIMER( TIMER_ID, wxGISStatusBar::OnTimer )
 	EVT_RIGHT_DOWN(wxGISStatusBar::OnRightDown)
-	 EVT_COMMAND(wxID_ANY, wxEVT_COMMAND_BUTTON_CLICKED, wxGISStatusBar::OnMessage)
+	EVT_COMMAND(wxID_ANY, wxEVT_COMMAND_BUTTON_CLICKED, wxGISStatusBar::OnMessage)
 END_EVENT_TABLE()
 
 wxGISStatusBar::wxGISStatusBar() : wxStatusBar()

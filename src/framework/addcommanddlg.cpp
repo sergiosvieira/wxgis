@@ -156,12 +156,21 @@ void wxGISAddCommandDlg::OnListboxSelect(wxCommandEvent& event)
 		wxString sName = wxStripMenuCodes(CommandArr[i]->GetCaption());
 		wxString sMessage = CommandArr[i]->GetMessage();
 		wxString sKeyCode = m_pGxApp->GetGISAcceleratorTable()->GetText(CommandArr[i]->GetID());
-		int nIndex = m_ImageList.Add(CommandArr[i]->GetBitmap());
-		long pos = m_ListCtrl->InsertItem(i, sName, nIndex);
+		long pos = m_ListCtrl->InsertItem(i, sName);
 		m_ListCtrl->SetItem(pos, 1, sMessage);
 		m_ListCtrl->SetItem(pos, 2, sKeyCode);
 		m_ListCtrl->SetItemData(pos,  CommandArr[i]->GetID());
-	}
+		wxIcon oIcon = CommandArr[i]->GetBitmap();
+		if(oIcon.IsOk())
+		{
+			int nIndex = m_ImageList.Add(oIcon);
+            m_ListCtrl->SetItemImage(pos, nIndex);
+		}
+        else
+        {
+            m_ListCtrl->SetItemImage(pos, wxNOT_FOUND);
+        }	
+    }
 	m_ListCtrl->Update();
 }
 

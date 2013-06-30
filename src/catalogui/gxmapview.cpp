@@ -148,11 +148,53 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
     if(!Applies(event.GetSelection()))
         return;
 
+    if(!IsShown())
+        return;
+
     long nLastSelID = event.GetSelection()->GetLastSelectedObjectId();
 	if(m_nParentGxObjectID == nLastSelID)
-		return;
+    {
+        //check if data is cached
+        bool bIsCached = true;
+        for(size_t i = 0; i < GetLayerCount(); ++i)
+        {
+            wxGISLayer* const pLayer = GetLayer(i);
+            if(pLayer)
+            {
+                wxGISDataset* const pDSet = pLayer->GetDataset();
+                if(pDSet && !pDSet->IsCached() && !pDSet->IsCaching())
+                {
+                    bIsCached = false;
+                    break;
+                }
+            }
+        }
+        
+        if(bIsCached)
+            return;
+    }
+    else
+    {
+        for(size_t i = 0; i < GetLayerCount(); ++i)
+        {
+            wxGISLayer* const pLayer = GetLayer(i);
+            if(pLayer)
+            {
+                wxGISDataset* const pDSet = pLayer->GetDataset();
+                if(pDSet && pDSet->IsCaching())
+                {
+                    pDSet->StopCaching();
+                }
+            }
+        }
+    }
     	
-    wxGxObject* pGxObject = m_pCatalog->GetRegisterObject(nLastSelID);
+    LoadData(nLastSelID);
+}
+
+void wxGxMapView::LoadData(long nGxObjectId)
+{
+    wxGxObject* pGxObject = m_pCatalog->GetRegisterObject(nGxObjectId);
 	wxGxDataset* pGxDataset = wxDynamicCast(pGxObject, wxGxDataset);
 	if(pGxDataset == NULL)
 		return;

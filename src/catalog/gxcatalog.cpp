@@ -165,7 +165,7 @@ void wxGxCatalog::LoadObjectFactories(const wxXmlNode* pNode)
 	}
 }
 
-bool wxGxCatalog::GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds)
+bool wxGxCatalog::CreateChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds)
 {
 	for(size_t i = 0; i < m_ObjectFactoriesArray.size(); ++i)
 	{
@@ -313,6 +313,11 @@ wxGxObjectFactory* const wxGxCatalog::GetObjectFactoryByName(const wxString &sFa
             return m_ObjectFactoriesArray[i];
     }
     return NULL;
+}
+
+wxVector<wxGxCatalog::ROOTITEM>* const wxGxCatalog::GetRootItems(void)
+{
+    return &m_staRootitems;
 }
 
 

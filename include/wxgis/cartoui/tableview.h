@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-/*
+
 #include <wx/colour.h>
 #include <wx/settings.h>
 #include <wx/string.h>
@@ -49,21 +49,22 @@
 class WXDLLIMPEXP_GIS_CTU wxGISGridTable :
 	public wxGridTableBase
 {
+    DECLARE_CLASS(wxGISGridTable)
 public:
-    wxGISGridTable(wxGISDatasetSPtr pwxGISDataset);
-    ~wxGISGridTable();
+    wxGISGridTable(wxGISDataset* pGISDataset);
+    virtual ~wxGISGridTable();
 
 	//overrides
     virtual int GetNumberRows();
     virtual int GetNumberCols();
-    virtual bool IsEmptyCell(int row, int col) { return false; }
+    virtual bool IsEmptyCell(int row, int col);
     virtual wxString GetValue(int row, int col);
     virtual void SetValue(int row, int col, const wxString &value);
     virtual wxString GetColLabelValue(int col);
 	virtual wxString GetRowLabelValue(int row);
+    virtual wxGISTable* GetDataset() const;
 private:
-	wxGISTableSPtr m_pwxGISDataset;
-	OGRFeatureDefn* m_pOGRFeatureDefn;
+	wxGISTable* m_pGISDataset;	
 	//wxString m_sFIDKeyName;
 	int m_nCols;          // columns from dataSet
     int m_nRows;          // rows initially returned by dataSet
@@ -90,7 +91,7 @@ public:
 };
 
 #ifdef __WXMSW__
-    #define WXGISBITBUTTONSIZE BITBUTTONSIZE
+    #define WXGISBITBUTTONSIZE 18
 #else
     #define WXGISBITBUTTONSIZE 24
 #endif
@@ -98,33 +99,22 @@ public:
 class WXDLLIMPEXP_GIS_CTU wxGISTableView :
 	public wxPanel
 {
-enum
-{
-    ID_FIRST = wxID_HIGHEST + 4001,
-    ID_PREV,
-    ID_NEXT,
-    ID_LAST,
-	ID_POS
-};
+    enum
+    {
+        ID_FIRST = wxID_HIGHEST + 4001,
+        ID_PREV,
+        ID_NEXT,
+        ID_LAST,
+	    ID_POS
+    };
     DECLARE_CLASS(wxGISTableView)
 public:
     wxGISTableView(void);
 	wxGISTableView(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxSTATIC_BORDER|wxTAB_TRAVERSAL);
 	virtual ~wxGISTableView(void);
     bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxSTATIC_BORDER|wxTAB_TRAVERSAL, const wxString& name = wxT("GISTableView"));
-	virtual void SetTable(wxGridTableBase* table, bool takeOwnership = false, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells)
-	{
-		if(m_grid)
-		{
-			m_grid->SetTable(table, takeOwnership, selmode);
-			m_grid->SetGridCursor(0,0);
-			m_grid->MakeCellVisible(0,0);
-			m_position->Clear();
-			(*m_position) << 1;
-
-			m_staticText2->SetLabel(wxString::Format(_("of %u"), m_grid->GetNumberRows()));
-		}
-	}
+    virtual void SetTable(wxGridTableBase* table, bool takeOwnership = false, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
+    virtual wxGridTableBase* GetTable(void) const;
 	virtual void SetReadOnly(bool bIsReadOnly){if(m_grid) m_grid->EnableEditing( bIsReadOnly );};
 	void OnLabelLeftClick(wxGridEvent& event);
 	void OnSelectCell(wxGridEvent& event);
@@ -133,7 +123,7 @@ public:
 	void OnBtnPrev(wxCommandEvent& event);
 	void OnBtnLast(wxCommandEvent& event);
 	void OnSetPos(wxCommandEvent& event);
-private:
+protected:
 	wxGridCtrl* m_grid;
 	wxStaticText* m_staticText1, *m_staticText2;
 	wxBitmapButton* m_bpFirst;
@@ -141,7 +131,6 @@ private:
 	wxTextCtrl* m_position;
 	wxBitmapButton* m_bpNext;
 	wxBitmapButton* m_bpLast;
-
-DECLARE_EVENT_TABLE()
+private:
+    DECLARE_EVENT_TABLE()
 };
-*/

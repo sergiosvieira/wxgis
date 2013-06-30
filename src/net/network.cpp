@@ -41,7 +41,7 @@ void *wxNetReaderThread::Entry()
         m_pNetConnection->ProcessInputNetMessage(buff);
 		wxThread::Sleep(SLEEP);
 	}
-	return (wxThread::ExitCode)0;
+	return (wxThread::ExitCode)wxTHREAD_NO_ERROR;
 }
 
 void wxNetReaderThread::OnExit()
@@ -59,7 +59,7 @@ wxNetWriterThread::wxNetWriterThread(INetConnection* pNetConnection) : wxThread(
 void *wxNetWriterThread::Entry()
 {
 	if(!m_pNetConnection)
-		return (wxThread::ExitCode)-1;
+		return (wxThread::ExitCode)wxTHREAD_MISC_ERROR;
 
 	while(!TestDestroy())
 	{
@@ -67,7 +67,7 @@ void *wxNetWriterThread::Entry()
         m_pNetConnection->ProcessOutputNetMessage();
         wxThread::Sleep(SLEEP);
 	}
-	return (wxThread::ExitCode)0;
+	return (wxThread::ExitCode)wxTHREAD_NO_ERROR;
 }
 
 void wxNetWriterThread::OnExit()

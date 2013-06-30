@@ -321,6 +321,7 @@ wxGISToolBar::wxGISToolBar(wxWindow* parent, wxWindowID id, const wxPoint& posit
 	{
 		m_pStatusBar = pApp->GetStatusBar();
 	}
+    m_bActive = false;
 }
 
 wxGISToolBar::~wxGISToolBar(void)
@@ -599,6 +600,7 @@ void wxGISToolBar::AddMenu(wxMenu* pMenu, wxString sName)
 
 void wxGISToolBar::Activate(wxGISApplicationBase* pApp)
 {
+    m_bActive = true;
 	for(std::map<size_t, IToolBarControl*>::const_iterator IT = m_RemControlMap.begin(); IT != m_RemControlMap.end(); ++IT)
 	{
 		IT->second->Activate(pApp);
@@ -607,6 +609,7 @@ void wxGISToolBar::Activate(wxGISApplicationBase* pApp)
 
 void wxGISToolBar::Deactivate(void)
 {
+    m_bActive = false;
 	for(std::map<size_t, IToolBarControl*>::const_iterator IT = m_RemControlMap.begin(); IT != m_RemControlMap.end(); ++IT)
 	{
 		if(IT->second)
@@ -616,16 +619,19 @@ void wxGISToolBar::Deactivate(void)
 
 void wxGISToolBar::UpdateControls(void)
 {
-	for(size_t i = 0; i < m_CommandArray.size(); ++i)
-	{
-		if(m_CommandArray[i]->GetKind() == enumGISCommandControl)
-		{
-			wxWindow* pWnd = dynamic_cast<wxWindow*>(m_RemControlMap[i]);
-			if(pWnd)
-			{
-				bool bEnable = m_CommandArray[i]->GetEnabled();
-				pWnd->Enable(bEnable);
-			}
-		}
-	}
+    if(m_bActive)
+    {
+	    for(size_t i = 0; i < m_CommandArray.size(); ++i)
+	    {
+		    if(m_CommandArray[i]->GetKind() == enumGISCommandControl)
+		    {
+			    wxWindow* pWnd = dynamic_cast<wxWindow*>(m_RemControlMap[i]);
+			    if(pWnd)
+			    {
+				    bool bEnable = m_CommandArray[i]->GetEnabled();
+				    pWnd->Enable(bEnable);
+			    }
+		    }
+	    }
+    }
 }

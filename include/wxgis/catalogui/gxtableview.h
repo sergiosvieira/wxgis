@@ -3,7 +3,7 @@
  * Purpose:  wxGISTableView class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011,2012 Bishop
+*   Copyright (C) 2009,2011-2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 
 #pragma once
 #include "wxgis/catalogui/gxview.h"
-/*
 #include "wxgis/cartoui/tableview.h"
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/gxeventui.h"
@@ -38,16 +37,19 @@ public:
 	virtual ~wxGxTableView(void);
 //IGxView
     virtual bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("TableView"));
-	virtual bool Activate(wxGISApplicationBase* application, wxXmlNode* pConf);
+	virtual bool Activate(IApplication* const pApplication, wxXmlNode* const pConf);
 	virtual void Deactivate(void);
-	virtual bool Applies(wxGxSelection* const pSelection);
+	virtual bool Applies(wxGxSelection* const Selection);
 //events
 	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
-private:
-	IGxSelection* m_pSelection;
-	long m_nParentGxObjectID;
-	wxGxCatalogUI* m_pCatalog;
+protected:
+    virtual void LoadData(long nGxObjectId);
+protected:
+    long m_ConnectionPointSelectionCookie;
+	wxGxSelection* m_pSelection;
+    wxGxCatalogUI* m_pCatalog;
+
+    long m_nParentGxObjectID;
 
 	DECLARE_EVENT_TABLE()
 };
-*/

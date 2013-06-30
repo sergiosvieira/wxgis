@@ -476,7 +476,7 @@ void wxGISApplication::OnAppOptions(void)
         //apply changes and exit
         for(size_t i = 0; i < PropertySheetDialog.GetBookCtrl()->GetPageCount(); ++i)
         {
-            IPropertyPage *pPage = wxDynamicCast(PropertySheetDialog.GetBookCtrl()->GetPage(i), IPropertyPage);//dynamic_cast<IPropertyPage*>(PropertySheetDialog.GetBookCtrl()->GetPage(i));
+            IPropertyPage *pPage = dynamic_cast<IPropertyPage*>(PropertySheetDialog.GetBookCtrl()->GetPage(i));// wxDynamicCast(PropertySheetDialog.GetBookCtrl()->GetPage(i), IPropertyPage);//
             if(pPage)
                 pPage->Apply();
         }

@@ -84,7 +84,7 @@ void wxGxFolder::LoadChildren(void)
 	if(pCatalog)
     {
         wxArrayLong ChildrenIds;
-        pCatalog->GetChildren(this, papszFileList, ChildrenIds);
+        pCatalog->CreateChildren(this, papszFileList, ChildrenIds);
 	}
     CSLDestroy( papszFileList );
 

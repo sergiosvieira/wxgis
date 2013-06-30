@@ -33,7 +33,7 @@ wxGISDataset::wxGISDataset(const CPLString &sPath) : wxGISPointer()
     m_sPath = sPath;
     m_bIsOpened = false;
     m_bIsReadOnly = true;
-    m_bIsCached = false;
+    m_bIsCached = true;
 }
 
 wxGISDataset::~wxGISDataset()
@@ -76,7 +76,7 @@ void wxGISDataset::Close(void)
     {
         m_bIsOpened = false;
         m_bIsReadOnly = true;
-        m_bIsCached = false;
+        m_bIsCached = true;
         m_SpatialReference = wxNullSpatialReference;
     }
 }
@@ -94,6 +94,15 @@ bool wxGISDataset::IsReadOnly(void) const
 bool wxGISDataset::IsCached(void) const
 {
     return m_bIsCached;
+}
+
+bool wxGISDataset::IsCaching(void) const
+{
+    return false;
+}
+
+void wxGISDataset::StopCaching(void)
+{
 }
 
 wxGISDataset* wxGISDataset::GetSubset(size_t nIndex)

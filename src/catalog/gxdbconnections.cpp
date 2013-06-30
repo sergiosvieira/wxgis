@@ -31,6 +31,7 @@ IMPLEMENT_DYNAMIC_CLASS(wxGxDBConnections, wxGxFolder)
 
 wxGxDBConnections::wxGxDBConnections(void) : wxGxFolder()
 {
+    m_sName = wxString(_("DataBase connections"));
 }
 
 bool wxGxDBConnections::Create(wxGxObject *oParent, const wxString &soName, const CPLString &soPath)

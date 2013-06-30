@@ -193,7 +193,7 @@ void wxGxDiscConnection::OnFileSystemEvent(wxFileSystemWatcherEvent& event)
 	        if(m_pCatalog)
             {
                 wxArrayLong ChildrenIds;
-                m_pCatalog->GetChildren(parent, papszFileList, ChildrenIds);
+                m_pCatalog->CreateChildren(parent, papszFileList, ChildrenIds);
                 for(size_t i = 0; i < ChildrenIds.GetCount(); ++i)
                     m_pCatalog->ObjectAdded(ChildrenIds[i]);
 	        }

@@ -176,7 +176,7 @@ bool wxGISApplicationEx::CreateApp(void)
 			if(pToolBar)
 			{
 				m_mgr.AddPane(pToolBar, wxAuiPaneInfo().Name(pToolBar->GetName()).Caption(pToolBar->GetCaption()).ToolbarPane().Top().Position(i).LeftDockable(pToolBar->GetLeftDockable()).RightDockable(pToolBar->GetRightDockable()).BestSize(-1,-1));
-				pToolBar->Activate(this);
+				//pToolBar->Activate(this);
 			}
 		}
 	}

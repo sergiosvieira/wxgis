@@ -121,7 +121,8 @@ wxGISDataset* wxGISPostgresDataSource::GetDatasetFromOGRLayer(const CPLString &s
 	//check the layer type
 
     wxGISDataset* pDataset(NULL);
-	if(!CPLString(poLayer->GetGeometryColumn()).empty())
+    CPLString szGeomColumn(poLayer->GetGeometryColumn());
+	if(!szGeomColumn.empty())
 	{
 		m_poDS->Reference();
         wxGISFeatureDataset* pFeatureDataset = new wxGISFeatureDataset(sPath, emumVecPostGIS, poLayer, m_poDS);

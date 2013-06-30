@@ -36,11 +36,12 @@ END_EVENT_TABLE()
 
 wxGxDiscConnections::wxGxDiscConnections(void) : wxGxXMLConnectionStorage(), m_bIsChildrenLoaded(false)
 {
+    m_sName = wxString(_("Folder connections"));
 }
 
 bool wxGxDiscConnections::Create(wxGxObject *oParent, const wxString &soName, const CPLString &soPath)
 {
-    if( !wxGxObjectContainer::Create(oParent, wxString(_("Folder connections")), soPath) )
+    if( !wxGxObjectContainer::Create(oParent, _("Folder connections"), soPath) )
     {
         wxLogError(_("wxGxDiscConnections::Create failed. GxObject %s"), wxString(_("Folder connections")).c_str());
         return false;
@@ -85,8 +86,8 @@ void wxGxDiscConnections::Refresh(void)
 {
     if(DestroyChildren())
         LoadConnectionsStorage();
-
-    wxGxXMLConnectionStorage::Refresh();
+    else
+        wxGxXMLConnectionStorage::Refresh();
 }
 
 void wxGxDiscConnections::Init(wxXmlNode* const pConfigNode)

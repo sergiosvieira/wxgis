@@ -267,8 +267,8 @@ void wxGISVectorPropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer, CPLStr
             penvid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Extent %s"), iLayer + 1, wxEmptyString)));
         AppendProperty(penvid, new wxFloatProperty(_("Top"), wxString::Format(wxT("Top_%d"), iLayer), Extent.MaxY));
         AppendProperty(penvid, new wxFloatProperty(_("Left"), wxString::Format(wxT("Left_%d"), iLayer), Extent.MinX));
-        AppendProperty(penvid, new wxFloatProperty(_("Right"), wxString::Format(wxT("Right_%d"), iLayer), Extent.MaxX));
         AppendProperty(penvid, new wxFloatProperty(_("Bottom"), wxString::Format(wxT("Bottom_%d"), iLayer), Extent.MinY));
+        AppendProperty(penvid, new wxFloatProperty(_("Right"), wxString::Format(wxT("Right_%d"), iLayer), Extent.MaxX));
 
         AppendProperty(penvid, new wxFloatProperty(_("Center X"), wxString::Format(wxT("CenterX_%d"), iLayer), (Extent.MaxX + Extent.MinX) / 2.0));
         AppendProperty(penvid, new wxFloatProperty(_("Center Y"), wxString::Format(wxT("CenterY_%d"), iLayer), (Extent.MaxY + Extent.MinY) / 2.0));
@@ -286,8 +286,8 @@ void wxGISVectorPropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer, CPLStr
                     wxPGProperty* penvidgc = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Extent %s"), iLayer + 1, _("(Geographic)"))));
                     AppendProperty(penvidgc, new wxFloatProperty(_("Top"), wxString::Format(wxT("TopGC_%d"), iLayer), Extent.MaxY));
                     AppendProperty(penvidgc, new wxFloatProperty(_("Left"), wxString::Format(wxT("LeftGC_%d"), iLayer), Extent.MinX));
-                    AppendProperty(penvidgc, new wxFloatProperty(_("Right"), wxString::Format(wxT("RightGC_%d"), iLayer), Extent.MaxX));
                     AppendProperty(penvidgc, new wxFloatProperty(_("Bottom"), wxString::Format(wxT("BottomGC_%d"), iLayer), Extent.MinY));
+                    AppendProperty(penvidgc, new wxFloatProperty(_("Right"), wxString::Format(wxT("RightGC_%d"), iLayer), Extent.MaxX));
 
                     AppendProperty(penvidgc, new wxFloatProperty(_("Center X"), wxString::Format(wxT("CenterXGC_%d"), iLayer), (Extent.MaxX + Extent.MinX) / 2.0));
                     AppendProperty(penvidgc, new wxFloatProperty(_("Center Y"), wxString::Format(wxT("CenterYGC_%d"), iLayer), (Extent.MaxY + Extent.MinY) / 2.0));

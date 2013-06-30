@@ -143,7 +143,6 @@ int wxGISCatalogApp::OnExit()
 //on linux saving file in destructor produce segmentation fault
 	if(oConfig.IsOk())
 		oConfig.Save(enumGISHKCU);
-
     return 0;
 }
 

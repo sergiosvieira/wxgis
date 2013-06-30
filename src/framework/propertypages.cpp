@@ -505,7 +505,7 @@ bool wxGISGDALConfPropertyPage::Create(wxGISApplicationBase* application, wxWind
     chs7.Add(wxT("SKIP"), 1);
     chs7.Add(wxT("ONLY_CCW"), 2);    
     chs7.Add(wxT("DEFAULT"), 3);    
-    AppendProperty(prop, new wxEnumProperty(wxString(wxT("GTIFF_LINEAR_UNITS")), wxPG_LABEL, chs7, chs7.GetValue(chs7.Index(sCurrentVal))));
+    AppendProperty(prop, new wxEnumProperty(wxString(wxT("OGR_ORGANIZE_POLYGONS")), wxPG_LABEL, chs7, chs7.GetValue(chs7.Index(sCurrentVal))));
     AppendProperty(prop, new wxBoolProperty(wxString(wxT("OGR_ENABLE_PARTIAL_REPROJECTION")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "OGR_ENABLE_PARTIAL_REPROJECTION",  "NO" ) )));
     AppendProperty(prop, new wxBoolProperty(wxString(wxT("OGR_FORCE_ASCII")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "OGR_FORCE_ASCII",  "YES" ) )));   
     saParams = wxStringTokenize(wxString(CPLGetConfigOption( "OGR_SKIP", "" ), wxConvUTF8), wxT(" "), wxTOKEN_RET_EMPTY);
@@ -513,7 +513,6 @@ bool wxGISGDALConfPropertyPage::Create(wxGISApplicationBase* application, wxWind
     AppendProperty(prop, new wxDirProperty(wxString(wxT("OGR_DRIVER_PATH")), wxPG_LABEL, wxString(CPLGetConfigOption( "OGR_DRIVER_PATH", "" ), wxConvUTF8)));
     AppendProperty(prop, new wxBoolProperty(wxString(wxT("GEOMETRY_AS_COLLECTION")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GEOMETRY_AS_COLLECTION",  "NO" ) )));
     AppendProperty(prop, new wxBoolProperty(wxString(wxT("ATTRIBUTES_SKIP")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "ATTRIBUTES_SKIP",  "NO" ) )));
-    AppendProperty(prop, new wxBoolProperty(wxString(wxT("OGR_FORCE_ASCII")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "OGR_FORCE_ASCII",  "YES" ) )));
     AppendProperty(prop, new wxBoolProperty(wxString(wxT("GEOJSON_FLATTEN_GEOCOUCH")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GEOJSON_FLATTEN_GEOCOUCH",  "TRUE" ) )));
 
     //OGR Options
@@ -527,9 +526,8 @@ bool wxGISGDALConfPropertyPage::Create(wxGISApplicationBase* application, wxWind
     sub_prop = AppendProperty(prop, new wxPropertyCategory(_("GML driver options")) );
     AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("GMLJP2OVERRIDE")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GMLJP2OVERRIDE", "OFF" ) )));
     AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("GML_FACE_HOLE_NEGATIVE")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GML_FACE_HOLE_NEGATIVE", "NO" ) )));
-    AppendProperty(sub_prop, new wxStringProperty(wxString(wxT("GMLJP2OVERRIDE")), wxPG_LABEL, wxString(CPLGetConfigOption( "GMLJP2OVERRIDE", "r" ), wxConvUTF8)));
+    //AppendProperty(sub_prop, new wxStringProperty(wxString(wxT("GMLJP2OVERRIDE")), wxPG_LABEL, wxString(CPLGetConfigOption( "GMLJP2OVERRIDE", "r" ), wxConvUTF8)));
     AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("GML_GET_SECONDARY_GEOM")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GML_GET_SECONDARY_GEOM", "NO" ) )));
-    AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("GML_FACE_HOLE_NEGATIVE")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GML_FACE_HOLE_NEGATIVE", "NO" ) )));
     AppendProperty(sub_prop, new wxStringProperty(wxString(wxT("GML_FIELDTYPES")), wxPG_LABEL, wxString(CPLGetConfigOption( "GML_FIELDTYPES", "" ), wxConvUTF8)));
     AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("GML_EXPOSE_GML_ID")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GML_EXPOSE_GML_ID", "NO" ) )));
     AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("GML_EXPOSE_FID")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GML_EXPOSE_FID", "NO" ) )));
@@ -539,10 +537,9 @@ bool wxGISGDALConfPropertyPage::Create(wxGISApplicationBase* application, wxWind
     chs8.Add(wxT("STANDARD"), 1);
     chs8.Add(wxT("SEQUENTIAL_LAYERS"), 2);    
     chs8.Add(wxT("INTERLEAVED_LAYERS"), 3);    
-    AppendProperty(sub_prop, new wxEnumProperty(wxString(wxT("GTIFF_LINEAR_UNITS")), wxPG_LABEL, chs8, chs8.GetValue(chs8.Index(sCurrentVal))));
+    AppendProperty(sub_prop, new wxEnumProperty(wxString(wxT("GML_READ_MODE")), wxPG_LABEL, chs8, chs8.GetValue(chs8.Index(sCurrentVal))));
     AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("GML_INVERT_AXIS_ORDER_IF_LAT_LONG")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GML_INVERT_AXIS_ORDER_IF_LAT_LONG", "YES" ) )));
     AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("GML_CONSIDER_EPSG_AS_URN")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GML_CONSIDER_EPSG_AS_URN", "NO" ) )));
-    AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("GML_GET_SECONDARY_GEOM")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GML_GET_SECONDARY_GEOM", "NO" ) )));
 
     //EXPAT/XERCES
     sCurrentVal = wxString(CPLGetConfigOption( "GML_PARSER", "EXPAT" ), wxConvUTF8);
@@ -564,7 +561,6 @@ bool wxGISGDALConfPropertyPage::Create(wxGISApplicationBase* application, wxWind
     AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("GML_HUGE_TEMPFILE")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GML_HUGE_TEMPFILE", "YES" ) )));
     AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("GML_DOWNLOAD_WFS_SCHEMA")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GML_DOWNLOAD_WFS_SCHEMA", "YES" ) )));
     AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("GML_USE_OLD_FID_FORMAT")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GML_USE_OLD_FID_FORMAT", "FALSE" ) )));
-    AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("GML_FACE_HOLE_NEGATIVE")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GML_FACE_HOLE_NEGATIVE", "NO" ) )));
     AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("GML_FETCH_ALL_GEOMETRIES")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "GML_FETCH_ALL_GEOMETRIES", "NO" ) )));
 
     sub_prop = AppendProperty(prop, new wxPropertyCategory(_("GPX driver options")) );
@@ -592,7 +588,7 @@ bool wxGISGDALConfPropertyPage::Create(wxGISApplicationBase* application, wxWind
     AppendProperty(sub_prop, new wxStringProperty(wxString(wxT("LIBKML_ICON_FIELD")), wxPG_LABEL, wxString(CPLGetConfigOption( "LIBKML_ICON_FIELD", "icon" ), wxConvUTF8)));
     AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("LIBKML_LAUNDER_FIELD_NAMES")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "LIBKML_LAUNDER_FIELD_NAMES", "YES" ) )));
     AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("LIBKML_WRAPDATELINE")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "LIBKML_WRAPDATELINE", "NO" ) )));
-    AppendProperty(sub_prop, new wxBoolProperty(wxString(wxT("LIBKML_READ_GROUND_OVERLAY")), wxPG_LABEL, CSLTestBoolean( CPLGetConfigOption( "LIBKML_READ_GROUND_OVERLAY", "YES" ) )));
+
 
     //normal/highlight
     sCurrentVal = wxString(CPLGetConfigOption( "LIBKML_STYLEMAP_KEY", "normal" ), wxConvUTF8);

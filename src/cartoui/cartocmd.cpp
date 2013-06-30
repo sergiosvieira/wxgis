@@ -675,7 +675,7 @@ void wxGISCartoMainTool::OnMouseDoubleClick(wxMouseEvent& event)
 {
     event.Skip();
 }
-/*
+
 //--------------------------------------------------
 // wxGISCartoFrameTool
 //--------------------------------------------------
@@ -685,7 +685,7 @@ void wxGISCartoMainTool::OnMouseDoubleClick(wxMouseEvent& event)
 //	2	//Input Rotate Angle
 //	3	//?
 
-IMPLEMENT_DYNAMIC_CLASS(wxGISCartoFrameTool, ICommand)
+IMPLEMENT_DYNAMIC_CLASS(wxGISCartoFrameTool, wxObject)
 
 
 wxGISCartoFrameTool::wxGISCartoFrameTool(void) : m_pMapView(NULL), m_bCheck(false)
@@ -752,7 +752,7 @@ bool wxGISCartoFrameTool::GetEnabled(void)
 	if(!m_pMapView)
 	{
         wxWindow* pWnd = m_pApp->GetRegisteredWindowByType(wxCLASSINFO(wxGISMapView));
-        m_pMapView = dynamic_cast<wxGISMapView*>(pWnd);
+        m_pMapView = wxDynamicCast(pWnd, wxGISMapView);
 	}
 
 
@@ -763,7 +763,9 @@ bool wxGISCartoFrameTool::GetEnabled(void)
 			//check if angle == 0
 		case 2:
 			if(m_pMapView)
-				return m_pMapView->IsShown();
+            {
+                return m_pMapView->IsShown() && m_pMapView->GetParent()->IsShown() && m_pMapView->CanRotate();
+            }
 			return false;
 		default:
 			return false;
@@ -958,7 +960,7 @@ bool wxGISCartoFrameTool::HasToolLabel(void)
 			return false;
 	}
 }
-*/
+
 
 //-----------------------------------------------------------------------------------------
 // wxGISRotationComboBox
@@ -1018,7 +1020,8 @@ void wxGISRotationComboBox::Activate(wxGISApplicationBase* pApp)
 {
     wxWindow* pWnd = pApp->GetRegisteredWindowByType(wxCLASSINFO(wxGISMapView));
     m_pMapView = wxDynamicCast(pWnd, wxGISMapView);
-    m_nConnectionPointMapCookie = m_pMapView->Advise(this);
+    if(m_pMapView)
+        m_nConnectionPointMapCookie = m_pMapView->Advise(this);
 }
 
 void wxGISRotationComboBox::Deactivate(void)

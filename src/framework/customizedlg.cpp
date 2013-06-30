@@ -237,6 +237,10 @@ void wxGISToolBarPanel::LoadCommands(void)
 			    int nIndex = m_ImageList.Add(oIcon);
                 m_buttonslist->SetItemImage(pos, nIndex);
 			}
+            else
+            {
+                m_buttonslist->SetItemImage(pos, wxNOT_FOUND);
+            }
 			m_buttonslist->SetItem(pos, 1, sMessage);
 			m_buttonslist->SetItem(pos, 2, sKeyCode);
 			m_buttonslist->SetItemData(pos, pCommand->GetID());
@@ -785,6 +789,10 @@ void wxGISCommandPanel::OnListboxSelect(wxCommandEvent& event)
             int nIndex = m_ImageList.Add(oIcon);
             m_listCtrl3->SetItemImage(pos, nIndex);
 		}
+        else
+        {
+            m_listCtrl3->SetItemImage(pos, wxNOT_FOUND);
+        }
 		m_listCtrl3->SetItem(pos, 1, sMessage);
 		m_listCtrl3->SetItem(pos, 2, sKeyCode);
 		m_listCtrl3->SetItemData(pos,  CommandArray[i]->GetID());
