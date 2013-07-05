@@ -3,7 +3,7 @@
  * Purpose:  wxGxCSVFileFactoryUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011.2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,9 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxcsvfactoryui.h"
-/*
 #include "wxgis/catalogui/gxdatasetui.h"
-#include <wx/ffile.h>
 
 #include "../../art/csv_48.xpm"
 #include "../../art/csv_16.xpm"
@@ -42,8 +40,9 @@ wxGxCSVFileFactoryUI::~wxGxCSVFileFactoryUI(void)
 {
 }
 
-IGxObject* wxGxCSVFileFactoryUI::GetGxObject(CPLString path, wxString name)
+wxGxObject* wxGxCSVFileFactoryUI::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath)
 {
-    return static_cast<IGxObject*>(new wxGxTableDatasetUI(path, name, enumTableCSV, m_LargeCSVIcon, m_SmallCSVIcon));
+    wxGxTableDatasetUI* pDataset = new wxGxTableDatasetUI(enumTableCSV, pParent, soName, szPath, m_LargeCSVIcon, m_SmallCSVIcon);
+    return wxStaticCast(pDataset, wxGxObject);
 }
-*/
+

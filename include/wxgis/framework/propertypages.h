@@ -113,6 +113,7 @@ protected:
 		ID_OPENSYSPATH,
 		ID_LOGPATH,
 		ID_OPENLOGPATH,
+        ID_SSTIMEOUT
 	};
 
 	wxStaticText* m_staticText1;
@@ -127,13 +128,17 @@ protected:
 	wxTextCtrl* m_LogPath;
 	wxBitmapButton* m_bpOpenLogPath;
     wxCheckBox* m_checkDebug;
+    wxCheckBox* m_checkShowSS;
 	wxStaticBitmap* m_bitmapwarn;
 	wxStaticText* m_staticTextWarn;
     wxStaticLine* m_staticline;
+	wxTextCtrl* m_Timeout;
 
     wxGISApplicationBase* m_pApp;
     wxArrayString m_aLangs;
     wxImageList m_ImageList;
+
+    int m_nTimeout;
 
     DECLARE_EVENT_TABLE()
 };

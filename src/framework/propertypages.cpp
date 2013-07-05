@@ -19,6 +19,10 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/framework/propertypages.h"
+#include "wxgis/core/format.h"
+
+
+#include "wx/valnum.h"
 
 #include "../../art/open.xpm"
 #include "../../art/state.xpm"
@@ -71,6 +75,28 @@ bool wxGISMiscPropertyPage::Create(wxGISApplicationBase* application, wxWindow* 
 
     wxBoxSizer* bMainSizer;
 	bMainSizer = new wxBoxSizer( wxVERTICAL );
+
+    wxStaticBoxSizer* sbRootSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Splash screen") ), wxVERTICAL );
+    m_checkShowSS = new wxCheckBox( this, wxID_ANY, _("Show"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxXmlNode* pSplashNode = oConfig.GetConfigNode(enumGISHKCU, wxT("wxGISCommon/splash"));
+    bool bShowSplash = GetBoolValue(pSplashNode, wxT("show"), true);
+
+    m_checkShowSS->SetValue(bShowSplash);
+	sbRootSizer->Add( m_checkShowSS, 0, wxALL | wxEXPAND, 5 );
+
+	wxBoxSizer* bSizer011 = new wxBoxSizer( wxHORIZONTAL );	
+	wxStaticText* pStaticText = new wxStaticText( this, wxID_ANY, _("Time out (sec.):"), wxDefaultPosition, wxDefaultSize, 0 );
+	pStaticText->Wrap( -1 );
+	bSizer011->Add( pStaticText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    m_nTimeout = GetDecimalValue(pSplashNode, wxT("timeout"), 20000) / 1000;
+    m_Timeout = new wxTextCtrl( this, ID_SSTIMEOUT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxMakeIntegerValidator(&m_nTimeout) );
+	bSizer011->Add( m_Timeout, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	
+	sbRootSizer->Add( bSizer011, 0, wxALL | wxEXPAND, 5 );
+
+	bMainSizer->Add( sbRootSizer, 0, wxALL | wxEXPAND, 5 );
+
 	
 	m_staticText1 = new wxStaticText( this, wxID_ANY, _("Locale files folder path"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1->Wrap( -1 );
@@ -123,9 +149,7 @@ bool wxGISMiscPropertyPage::Create(wxGISApplicationBase* application, wxWindow* 
 	m_staticText4->Wrap( -1 );
 	bMainSizer->Add( m_staticText4, 0, wxALL|wxEXPAND, 5 );
 	
-	wxBoxSizer* bSizer211;
-	bSizer211 = new wxBoxSizer( wxHORIZONTAL );
-	
+	wxBoxSizer* bSizer211 = new wxBoxSizer( wxHORIZONTAL );	
 	m_LogPath = new wxTextCtrl( this, ID_LOGPATH, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
     m_LogPath->ChangeValue( oConfig.GetLogDir() );
 	bSizer211->Add( m_LogPath, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
@@ -136,6 +160,7 @@ bool wxGISMiscPropertyPage::Create(wxGISApplicationBase* application, wxWindow* 
 	bMainSizer->Add( bSizer211, 0, wxEXPAND, 5 );
 
     m_checkDebug = new wxCheckBox( this, wxID_ANY, _("Log debug GDAL messages"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_checkDebug->SetValue(oConfig.GetDebugMode());
 
 	bMainSizer->Add( m_checkDebug, 0, wxALL|wxEXPAND, 5 );
 
@@ -164,34 +189,53 @@ bool wxGISMiscPropertyPage::Create(wxGISApplicationBase* application, wxWindow* 
 	this->SetSizer( bMainSizer );
 	this->Layout();
 
+    TransferDataToWindow();
+
     return true;
 }
 
 void wxGISMiscPropertyPage::Apply(void)
 {
-	wxGISAppConfig oConfig = GetConfig();
-	if(!oConfig.IsOk())
-		return;
-    if(m_LangChoice->GetStringSelection() != oConfig.GetLocale() && m_LangChoice->GetStringSelection().IsEmpty() == false)
+    if ( Validate() && TransferDataFromWindow() )
     {
-        m_pApp->SetupLoc(m_LangChoice->GetStringSelection(), m_LocalePath->GetValue());
-		oConfig.SetLocale(m_LangChoice->GetStringSelection());
-		oConfig.SetLocaleDir(m_LocalePath->GetValue());
-    }
-    if(m_LogPath->IsModified())
-    {
-        m_pApp->SetupLog(m_LogPath->GetValue());
-    	oConfig.SetLogDir(m_LogPath->GetValue());
-    }
-    if(m_SysPath->IsModified())
-    {
-        m_pApp->SetupSys(m_SysPath->GetValue());
-		oConfig.SetSysDir(m_SysPath->GetValue());
-    }
-    if(m_checkDebug->GetValue() != oConfig.GetDebugMode())
-    {
-        m_pApp->SetDebugMode(m_checkDebug->GetValue());
-		oConfig.SetDebugMode(m_checkDebug->GetValue());
+        wxGISAppConfig oConfig = GetConfig();
+	    if(!oConfig.IsOk())
+		    return;
+        if(m_LangChoice->GetStringSelection() != oConfig.GetLocale() && m_LangChoice->GetStringSelection().IsEmpty() == false)
+        {
+            m_pApp->SetupLoc(m_LangChoice->GetStringSelection(), m_LocalePath->GetValue());
+		    oConfig.SetLocale(m_LangChoice->GetStringSelection());
+		    oConfig.SetLocaleDir(m_LocalePath->GetValue());
+        }
+        if(m_LogPath->IsModified())
+        {
+            m_pApp->SetupLog(m_LogPath->GetValue());
+    	    oConfig.SetLogDir(m_LogPath->GetValue());
+        }
+        if(m_SysPath->IsModified())
+        {
+            m_pApp->SetupSys(m_SysPath->GetValue());
+		    oConfig.SetSysDir(m_SysPath->GetValue());
+        }
+        if(m_checkDebug->GetValue() != oConfig.GetDebugMode())
+        {
+            m_pApp->SetDebugMode(m_checkDebug->GetValue());
+		    oConfig.SetDebugMode(m_checkDebug->GetValue());
+        }
+
+        wxXmlNode* pSplashNode = oConfig.GetConfigNode(enumGISHKCU, wxT("wxGISCommon/splash"));
+        bool bShowSplash = GetBoolValue(pSplashNode, wxT("show"), true);
+        if(m_checkShowSS->GetValue() != bShowSplash)
+        {
+            oConfig.Write(enumGISHKCU, wxT("wxGISCommon/splash/show"), m_checkShowSS->GetValue());
+        }
+
+        int nTimeout = GetDecimalValue(pSplashNode, wxT("timeout"), 20000) / 1000;
+
+        if(m_nTimeout != nTimeout)
+        {
+            oConfig.Write(enumGISHKCU, wxT("wxGISCommon/splash/timeout"), int(m_nTimeout * 1000));
+        }
     }
 }
 

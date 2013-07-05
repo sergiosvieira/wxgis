@@ -55,6 +55,7 @@ public:
     } ROOTITEM;
 
     virtual wxVector<wxGxCatalog::ROOTITEM>* const GetRootItems(void);
+    virtual wxVector<wxGxObjectFactory*>* const GetObjectFactories(void);
 protected:
     //wxGxCatalogBase
 	virtual void LoadObjectFactories(const wxXmlNode* pNode);

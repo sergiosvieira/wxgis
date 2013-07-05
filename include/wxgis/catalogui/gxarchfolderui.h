@@ -3,7 +3,7 @@
  * Purpose:  wxGxArchiveUI classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,49 +26,53 @@
 /** \class wxGxArchiveUI gxarchfolderui.h
     \brief An archive GxObject.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLU wxGxArchiveUI :
 	public wxGxArchive,
     public IGxObjectUI,
     public IGxObjectEditUI
 {
+    DECLARE_CLASS(wxGxArchiveUI)
 public:
-	wxGxArchiveUI(CPLString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxArchiveUI(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon & LargeIcon = wxNullIcon, const wxIcon & SmallIcon = wxNullIcon);
 	virtual ~wxGxArchiveUI(void);
     //IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxArchive.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxArchive.NewMenu"));};
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxArchive.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxString(wxT("wxGxArchive.NewMenu"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
+protected:
     //wxGxArchive
-    virtual IGxObject* GetArchiveFolder(CPLString szPath, wxString soName);
+    virtual wxGxObject* GetArchiveFolder(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 protected:
     wxIcon m_oLargeIcon, m_oSmallIcon;
 };
-*/
+
 /** \class wxGxArchiveFolderUI gxarchfolderui.h
     \brief An archive folder GxObject.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLU wxGxArchiveFolderUI :
 	public wxGxArchiveFolder,
     public IGxObjectUI,
     public IGxObjectEditUI
 {
+    DECLARE_CLASS(wxGxArchiveFolderUI)
 public:
-	wxGxArchiveFolderUI(CPLString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxArchiveFolderUI(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon & LargeIcon = wxNullIcon, const wxIcon & SmallIcon = wxNullIcon);
 	virtual ~wxGxArchiveFolderUI(void);
     //IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxArchiveFolder.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxArchiveFolder.NewMenu"));};
-    //wxGxArchiveFolder
-    virtual IGxObject* GetArchiveFolder(CPLString szPath, wxString soName);
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxArchiveFolder.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxString(wxT("wxGxArchiveFolder.NewMenu"));};
+protected:
+    //wxGxArchive
+    virtual wxGxObject* GetArchiveFolder(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 protected:
     wxIcon m_oLargeIcon, m_oSmallIcon;
 };
-*/
+
 
