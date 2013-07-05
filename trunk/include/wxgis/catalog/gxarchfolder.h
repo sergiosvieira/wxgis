@@ -3,7 +3,7 @@
  * Purpose:  wxGxArchive classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011 Bishop
+*   Copyright (C) 2009,2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,46 +20,48 @@
  ****************************************************************************/
 #pragma once
 #include "wxgis/catalog/gxfolder.h"
-/*
-/////////////////////////////////////////////////////////////////////////
-// wxGxArchiveFolder
-/////////////////////////////////////////////////////////////////////////
+
+/** \class wxGxArchiveFolder gxarchfolder.h
+    \brief The Archive Folder GxObject.
+*/
 
 class WXDLLIMPEXP_GIS_CLT wxGxArchiveFolder :
 	public wxGxFolder
 {
+    DECLARE_CLASS(wxGxArchiveFolder)
 public:
-	wxGxArchiveFolder(CPLString Path, wxString Name);
+	wxGxArchiveFolder(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 	virtual ~wxGxArchiveFolder(void);
-	//IGxObject
-	virtual wxString GetCategory(void){return wxString(_("Archive folder"));};
-	//wxGxFolder
-	virtual void LoadChildren(void);
+	//wxGxObject
+	virtual wxString GetCategory(void) const {return wxString(_("Archive folder"));};
 	//IGxObjectEdit unsupported yet
 	virtual bool CanDelete(void){return false;};
 	virtual bool CanRename(void){return false;};
     //wxGxArchiveFolder
-    virtual IGxObject* GetArchiveFolder(CPLString szPath, wxString soName);
+protected:
+    virtual wxGxObject* GetArchiveFolder(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
+	virtual void LoadChildren(void);
 };
 
-/////////////////////////////////////////////////////////////////////////
-// wxGxArchive
-/////////////////////////////////////////////////////////////////////////
+/** \class wxGxArchive gxarchfolder.h
+    \brief The Archive GxObject.
+*/
 
 class WXDLLIMPEXP_GIS_CLT wxGxArchive :
 	public wxGxArchiveFolder
 {
+    DECLARE_CLASS(wxGxArchive)
 public:
-	wxGxArchive(CPLString Path, wxString Name);
+	wxGxArchive(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 	virtual ~wxGxArchive(void);
 	//IGxObject
-    virtual wxString GetBaseName(void);
-	virtual wxString GetCategory(void){return wxString(_("Archive"));};
+    virtual wxString GetBaseName(void) const;
+	virtual wxString GetCategory(void) const {return wxString(_("Archive"));};
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
-	virtual bool Rename(wxString NewName);
+	virtual bool Rename(const wxString &sNewName);
 	virtual bool CanRename(void){return true;};
 };
-*/
+
 

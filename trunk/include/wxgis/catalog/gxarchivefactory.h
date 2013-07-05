@@ -3,7 +3,7 @@
  * Purpose:  wxGxArchiveFactory class. Create new GxFolder objects
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,23 +19,23 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-/*
-#include "wxgis/catalog/catalog.h"
 
+#include "wxgis/catalog/gxobjectfactory.h"
 
+/** \class wxGxArchiveFactory gxarchivefactory.h
+    \brief A GxArchive factory.
+*/
 class WXDLLIMPEXP_GIS_CLT wxGxArchiveFactory :
-	public IGxObjectFactory,
-	public wxObject
+	public wxGxObjectFactory
 {
 	DECLARE_DYNAMIC_CLASS(wxGxArchiveFactory)
 public:
 	wxGxArchiveFactory(void);
 	virtual ~wxGxArchiveFactory(void);
-	//IGxObjectFactory
-	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray);
-    virtual void Serialize(wxXmlNode* const pConfig, bool bStore);
-    virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
-    virtual wxString GetName(void){return wxString(_("Archives"));};
-    virtual IGxObject* GetGxObject(CPLString szPath, wxString soName);
+	//wxGxObjectFactory
+	virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
+    virtual wxString GetName(void) const {return wxString(_("Archives"));};
+    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath);
+protected:
+    bool m_bHasDriver;
 };
-*/

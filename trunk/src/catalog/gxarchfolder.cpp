@@ -3,7 +3,7 @@
  * Purpose:  wxGxArchive classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009,2011  Bishop
+*   Copyright (C) 2009,2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,16 +19,17 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalog/gxarchfolder.h"
-/*
+#include "wxgis/catalog/gxcatalog.h"
 #include "wxgis/datasource/sysop.h"
 
 #include "cpl_vsi_virtual.h"
 
-/////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // wxGxArchive
-/////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
+IMPLEMENT_CLASS(wxGxArchive, wxGxFolder)
 
-wxGxArchive::wxGxArchive(CPLString Path, wxString Name) : wxGxArchiveFolder(Path, Name)
+wxGxArchive::wxGxArchive(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxArchiveFolder(oParent, soName, soPath)
 {
 }
 
@@ -36,7 +37,7 @@ wxGxArchive::~wxGxArchive(void)
 {
 }
 
-wxString wxGxArchive::GetBaseName(void)
+wxString wxGxArchive::GetBaseName(void) const
 {
     wxFileName FileName(m_sName);
     FileName.SetEmptyExt();
@@ -45,7 +46,6 @@ wxString wxGxArchive::GetBaseName(void)
 
 bool wxGxArchive::Delete(void)
 {
-	wxCriticalSectionLocker locker(m_DestructCritSect);
 	int nCount = 0;
     for(size_t i = 1; i < m_sPath.length(); ++i)
     {
@@ -56,20 +56,17 @@ bool wxGxArchive::Delete(void)
 
     m_sPath.erase(0, nCount + 1);
 
-	EmptyChildren();
     if(DeleteFile(m_sPath))
 	{
-		IGxObjectContainer* pGxObjectContainer = dynamic_cast<IGxObjectContainer*>(m_pParent);
-		if(pGxObjectContainer == NULL)
-			return false;
-		return pGxObjectContainer->DeleteChild(this);
+        return true;
 	}
 	else
     {
         const char* err = CPLGetLastErrorMsg();
-		wxLogError(_("Delete failed! GDAL error: %s, file '%s'"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
-		return false;
+		wxLogError(_("Operation '%s' failed! GDAL error: %s, file '%s'"), _("Delete"), wxString(err, wxConvUTF8).c_str(), wxString(m_sPath, wxConvUTF8).c_str());
+        return false;
     }
+    return false;
 }
 
 bool wxGxArchive::Rename(const wxString &sNewName)
@@ -86,21 +83,14 @@ bool wxGxArchive::Rename(const wxString &sNewName)
 
     m_sPath.erase(0, nCount + 1);
 
-    NewName = ClearExt(NewName);
 	wxFileName PathName(wxString(m_sPath, wxConvUTF8));
-	PathName.SetName(NewName);
+	PathName.SetName(ClearExt(sNewName));
 
 	wxString sNewPath = PathName.GetFullPath();
 
-	EmptyChildren();
     CPLString szNewPath(sNewPath.mb_str(wxConvUTF8));
     if(RenameFile(m_sPath, szNewPath))
 	{
-		m_sPath = szType;
-        m_sPath += szNewPath;
-		m_sName = NewName;
-		m_pCatalog->ObjectChanged(GetID());
-		Refresh();
 		return true;
 	}
 	else
@@ -112,11 +102,12 @@ bool wxGxArchive::Rename(const wxString &sNewName)
 	return false;
 }
 
-/////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // wxGxArchiveFolder
-/////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
+IMPLEMENT_CLASS(wxGxArchiveFolder, wxGxFolder)
 
-wxGxArchiveFolder::wxGxArchiveFolder(CPLString Path, wxString Name) : wxGxFolder(Path, Name)
+wxGxArchiveFolder::wxGxArchiveFolder(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxFolder(oParent, soName, soPath)
 {
 }
 
@@ -148,9 +139,12 @@ void wxGxArchiveFolder::LoadChildren(void)
         {
             if(VSI_ISDIR(BufL.st_mode))
             {
-                wxString sFileName(papszItems[i], wxCSConv(wxT("cp-866")));
-				IGxObject* pGxObj = GetArchiveFolder(szFileName, sFileName);
-				AddChild(pGxObj);
+		        wxString sCharset(wxT("cp-866"));
+		        wxGISAppConfig oConfig = GetConfig();
+                if(oConfig.IsOk())
+			        sCharset = oConfig.Read(enumGISHKCU, wxString(wxT("wxGISCommon/zip/charset")), sCharset);
+                wxString sFileName(papszItems[i], wxCSConv(sCharset));
+				GetArchiveFolder(this, sFileName, szFileName);
             }
             else
             {
@@ -161,24 +155,24 @@ void wxGxArchiveFolder::LoadChildren(void)
     CSLDestroy( papszItems );
 
     //load names
-	GxObjectArray Array;
-	if(m_pCatalog && m_pCatalog->GetChildren(m_sPath, papszFileList, Array))
-	{
-		for(size_t i = 0; i < Array.size(); ++i)
-		{
-			bool ret_code = AddChild(Array[i]);
-			if(!ret_code)
-				wxDELETE(Array[i]);
-		}
+    wxGxCatalog *pCatalog = wxDynamicCast(GetGxCatalog(), wxGxCatalog);
+
+	if(pCatalog)
+    {
+        wxArrayLong ChildrenIds;
+        pCatalog->CreateChildren(this, papszFileList, ChildrenIds);
+        for(size_t i = 0; i < ChildrenIds.GetCount(); ++i)
+            pCatalog->ObjectAdded(ChildrenIds[i]);
 	}
+
     CSLDestroy( papszFileList );
 
 	m_bIsChildrenLoaded = true;
 }
 
-IGxObject* wxGxArchiveFolder::GetArchiveFolder(CPLString szPath, wxString soName)
+wxGxObject* wxGxArchiveFolder::GetArchiveFolder(wxGxObject *oParent, const wxString &soName, const CPLString &soPath)
 {
-	wxGxArchiveFolder* pFolder = new wxGxArchiveFolder(szPath, soName);
-	return static_cast<IGxObject*>(pFolder);
+	wxGxArchiveFolder* pFolder = new wxGxArchiveFolder(oParent, soName, soPath);
+	return wxStaticCast(pFolder, wxGxObject);
 }
-*/
+

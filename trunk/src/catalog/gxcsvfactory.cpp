@@ -3,7 +3,7 @@
  * Purpose:  wxGxCSVFileFactory class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,58 +20,46 @@
  ****************************************************************************/
 #include "wxgis/catalog/gxcsvfactory.h"
 #include "wxgis/catalog/gxdataset.h"
-/*
-IMPLEMENT_DYNAMIC_CLASS(wxGxCSVFileFactory, wxObject)
+#include "wxgis/datasource/sysop.h"
+
+//------------------------------------------------------------------------------
+// wxGxCSVFileFactory
+//------------------------------------------------------------------------------
+
+IMPLEMENT_DYNAMIC_CLASS(wxGxCSVFileFactory, wxGxObjectFactory)
 
 wxGxCSVFileFactory::wxGxCSVFileFactory(void)
 {
+    m_bHasDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName("CSV");
 }
 
 wxGxCSVFileFactory::~wxGxCSVFileFactory(void)
 {
 }
 
-bool wxGxCSVFileFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray)
+bool wxGxCSVFileFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds)
 {
     for(int i = CSLCount(pFileNames) - 1; i >= 0; i-- )
     {
-        IGxObject* pGxObj = NULL;
+        wxGxObject* pGxObj = NULL;
         CPLString szExt = CPLGetExtension(pFileNames[i]);
         CPLString szPath;
 
         if(wxGISEQUAL(szExt, "csv"))
         {
-            pGxObj = GetGxObject(pFileNames[i], GetConvName(pFileNames[i]));
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+            pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i]);
+            if(pGxObj)
+                pChildrenIds.Add(pGxObj->GetId());
         }
         else if(wxGISEQUAL(szExt, "csvt"))
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 
-		if(pGxObj != NULL)
-			ObjArray.push_back(pGxObj);
     }
 	return true;
 }
 
-void wxGxCSVFileFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
+wxGxObject* wxGxCSVFileFactory::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath)
 {
-    if(bStore)
-    {
-        if(pConfig->HasAttribute(wxT("factory_name")))
-            pConfig->DeleteAttribute(wxT("factory_name"));
-        pConfig->AddAttribute(wxT("factory_name"), GetClassName());    
-        if(pConfig->HasAttribute(wxT("is_enabled")))
-            pConfig->DeleteAttribute(wxT("is_enabled"));
-        pConfig->AddAttribute(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
-    }
-    else
-    {
-        m_bIsEnabled = wxAtoi(pConfig->GetAttribute(wxT("is_enabled"), wxT("1"))) != 0;
-    }
+    wxGxTableDataset* pDataset = new wxGxTableDataset(enumTableCSV, pParent, soName, szPath);
+    return wxStaticCast(pDataset, wxGxObject);
 }
-
-IGxObject* wxGxCSVFileFactory::GetGxObject(CPLString path, wxString name)
-{
-    return static_cast<IGxObject*>( new wxGxTableDataset(path, name, enumTableCSV) );
-}
-*/

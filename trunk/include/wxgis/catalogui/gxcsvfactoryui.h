@@ -3,7 +3,7 @@
  * Purpose:  wxGxCSVFileFactoryUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@
 #include "wxgis/catalog/gxcsvfactory.h"
 
 /** \class wxGxCSVFileFactoryUI gxcsvfactoryui.h
-    \brief A csv dataset GxObject.
+    \brief A GxCSVFile UI object factory.
 */
-/*
+
 class wxGxCSVFileFactoryUI :
 	public wxGxCSVFileFactory
 {
@@ -35,9 +35,8 @@ public:
 	wxGxCSVFileFactoryUI(void);
 	virtual ~wxGxCSVFileFactoryUI(void);
     //wxGxCSVFileFactory
-    virtual IGxObject* GetGxObject(CPLString path, wxString name);
+    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath);
 protected:
     wxIcon m_LargeCSVIcon, m_SmallCSVIcon;
     //wxIcon m_LargeMifIcon, m_SmallMifIcon;
 };
-*/

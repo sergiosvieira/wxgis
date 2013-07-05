@@ -143,7 +143,8 @@ bool wxGxFolder::Copy(const CPLString &szDestPath, ITrackCancel* const pTrackCan
     if(pTrackCancel)
 		pTrackCancel->PutMessage(wxString::Format(_("%s %s %s"), _("Move"), GetCategory().c_str(), m_sName.c_str()), wxNOT_FOUND, enumGISMessageInfo);
 
-    CPLString szFullDestPath = CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL);
+    //CPLString szFullDestPath = CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL);
+    CPLString szFullDestPath = CheckUniqPath(szDestPath, CPLGetFilename(m_sPath), true, " ");
 
     bool bRet = CopyDir(m_sPath, szFullDestPath, 777, pTrackCancel);
     if(!bRet)
@@ -164,7 +165,8 @@ bool wxGxFolder::Move(const CPLString &szDestPath, ITrackCancel* const pTrackCan
     if(pTrackCancel)
 		pTrackCancel->PutMessage(wxString::Format(_("%s %s %s"), _("Move"), GetCategory().c_str(), m_sName.c_str()), wxNOT_FOUND, enumGISMessageInfo);
     
-    CPLString szFullDestPath = CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL);
+    //CPLString szFullDestPath = CPLFormFilename(szDestPath, CPLGetFilename(m_sPath), NULL);
+    CPLString szFullDestPath = CheckUniqPath(szDestPath, CPLGetFilename(m_sPath), true, " ");
 
     bool bRet = MoveDir(m_sPath, szFullDestPath, 777, pTrackCancel);
     if(!bRet)

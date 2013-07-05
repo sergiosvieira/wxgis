@@ -81,7 +81,7 @@ public:
     virtual bool DestroyChild( wxGxObject *child );
     virtual bool IsNameExist(const wxString &sName) const;
     virtual bool DestroyChildren();
-    virtual bool HasChildren(void){return !m_Children.IsEmpty();};
+    virtual bool HasChildren(void);
     virtual bool AreChildrenViewable(void)  const = 0;
     const wxGxObjectList& GetChildren() const { return m_Children; };
     virtual bool CanCreate(long nDataType, long DataSubtype){return false;};

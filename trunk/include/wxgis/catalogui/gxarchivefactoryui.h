@@ -3,7 +3,7 @@
  * Purpose:  wxGxArchiveFactoryUI class. Create new GxFolderUI objects
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -23,7 +23,10 @@
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalog/gxarchivefactory.h"
 
-/*
+/** \class wxGxArchiveFactoryUI gxarchivefactoryui.h
+    \brief A GxArchiveUI factory.
+*/
+
 class WXDLLIMPEXP_GIS_CLU wxGxArchiveFactoryUI :
 	public wxGxArchiveFactory
 {
@@ -32,8 +35,7 @@ public:
 	wxGxArchiveFactoryUI(void);
 	virtual ~wxGxArchiveFactoryUI(void);
 	//IGxObjectFactory
-    virtual IGxObject* GetGxObject(CPLString szPath, wxString soName);
+    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath);
 protected:
     wxIcon m_oLargeAFolderIcon, m_oSmallAFolderIcon;
 };
-*/

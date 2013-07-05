@@ -3,7 +3,7 @@
  * Purpose:  wxGxArchiveFactory class. Create new GxFolder objects
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,21 +20,29 @@
  ****************************************************************************/
 #include "wxgis/catalog/gxarchivefactory.h"
 #include "wxgis/catalog/gxarchfolder.h"
+#include "wxgis/datasource/gdalinh.h"
 
 #include "wx/filename.h"
 #include "wx/dir.h"
-/*
-IMPLEMENT_DYNAMIC_CLASS(wxGxArchiveFactory, wxObject)
+
+#include "cpl_vsi_virtual.h"
+
+//------------------------------------------------------------------------------
+// wxGxArchiveFactory
+//------------------------------------------------------------------------------
+
+IMPLEMENT_DYNAMIC_CLASS(wxGxArchiveFactory, wxGxObjectFactory)
 
 wxGxArchiveFactory::wxGxArchiveFactory(void)
 {
+    m_bHasDriver = VSIFileManager::GetHandler("/vsizip/") != NULL;
 }
 
 wxGxArchiveFactory::~wxGxArchiveFactory(void)
 {
 }
 
-bool wxGxArchiveFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray)
+bool wxGxArchiveFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds)
 {
     for(int i = CSLCount(pFileNames) - 1; i >= 0; i-- )
     {
@@ -46,14 +54,15 @@ bool wxGxArchiveFactory::GetChildren(CPLString sParentDir, char** &pFileNames, G
         CPLString szExt = CPLGetExtension(pFileNames[i]);
         if(wxGISEQUAL(szExt, "zip"))
         {
-            CPLString pArchiveName("/vsizip/");
-            pArchiveName += pFileNames[i];
+            if(m_bHasDriver)
+            {
+                CPLString pArchiveName("/vsizip/");
+                pArchiveName += pFileNames[i];
 
-            wxFileName FName(path);
-            wxString sName = FName.GetFullName();
-
-            IGxObject* pGxObj = GetGxObject(pArchiveName, sName);
-            ObjArray.push_back(pGxObj);
+                wxGxObject* pGxObj = GetGxObject(pParent, wxString(CPLGetFilename(pFileNames[i]), wxConvUTF8), pArchiveName);
+                if(pGxObj)
+                    pChildrenIds.Add(pGxObj->GetId());
+            }
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
 		//else if(wxGISEQUAL(szExt, "gz"))
@@ -72,27 +81,8 @@ bool wxGxArchiveFactory::GetChildren(CPLString sParentDir, char** &pFileNames, G
 	return true;
 }
 
-
-void wxGxArchiveFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
+wxGxObject* wxGxArchiveFactory::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath)
 {
-    if(bStore)
-    {
-        if(pConfig->HasAttribute(wxT("factory_name")))
-            pConfig->DeleteAttribute(wxT("factory_name"));
-        pConfig->AddAttribute(wxT("factory_name"), GetClassName());  
-        if(pConfig->HasAttribute(wxT("is_enabled")))
-            pConfig->DeleteAttribute(wxT("is_enabled"));
-        pConfig->AddAttribute(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
-    }
-    else
-    {
-        m_bIsEnabled = wxAtoi(pConfig->GetAttribute(wxT("is_enabled"), wxT("1"))) != 0;
-    }
+	wxGxArchive* pFolder = new wxGxArchive(pParent, soName, szPath);
+	return wxStaticCast(pFolder, wxGxObject);
 }
-
-IGxObject* wxGxArchiveFactory::GetGxObject(CPLString szPath, wxString soName)
-{
-	wxGxArchive* pFolder = new wxGxArchive(szPath, soName);
-	return static_cast<IGxObject*>(pFolder);
-}
-*/

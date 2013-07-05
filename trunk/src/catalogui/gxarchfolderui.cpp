@@ -3,7 +3,7 @@
  * Purpose:  wxGxArchive classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,16 +19,17 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxarchfolderui.h"
-/*
+
 #include "wxgis/datasource/sysop.h"
 
 #include "cpl_vsi_virtual.h"
 
-/////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------
 // wxGxArchiveUI
-/////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------
+IMPLEMENT_CLASS(wxGxArchiveUI, wxGxArchive)
 
-wxGxArchiveUI::wxGxArchiveUI(CPLString Path, wxString Name, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxArchive(Path, Name)
+wxGxArchiveUI::wxGxArchiveUI(wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon & LargeIcon, const wxIcon & SmallIcon) : wxGxArchive(oParent, soName, soPath)
 {
     m_oLargeIcon = LargeIcon;
     m_oSmallIcon = SmallIcon;
@@ -48,21 +49,22 @@ wxIcon wxGxArchiveUI::GetSmallImage(void)
 	return m_oSmallIcon;
 }
 
-IGxObject* wxGxArchiveUI::GetArchiveFolder(CPLString szPath, wxString soName)
+wxGxObject* wxGxArchiveUI::GetArchiveFolder(wxGxObject *oParent, const wxString &soName, const CPLString &soPath)
 {
-	wxGxArchiveFolderUI* pFolder = new wxGxArchiveFolderUI(szPath, soName, m_oLargeIcon, m_oSmallIcon);
-	return static_cast<IGxObject*>(pFolder);
+	wxGxArchiveFolderUI* pFolder = new wxGxArchiveFolderUI(oParent, soName, soPath, m_oLargeIcon, m_oSmallIcon);
+	return static_cast<wxGxObject*>(pFolder);
 }
 
 void wxGxArchiveUI::EditProperties(wxWindow *parent)
 {
 }
 
-/////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------
 // wxGxArchiveFolderUI
-/////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------
+IMPLEMENT_CLASS(wxGxArchiveFolderUI, wxGxArchiveFolder)
 
-wxGxArchiveFolderUI::wxGxArchiveFolderUI(CPLString Path, wxString Name, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxArchiveFolder(Path, Name)
+wxGxArchiveFolderUI::wxGxArchiveFolderUI(wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon & LargeIcon, const wxIcon & SmallIcon) : wxGxArchiveFolder(oParent, soName, soPath)
 {
     m_oLargeIcon = LargeIcon;
     m_oSmallIcon = SmallIcon;
@@ -82,10 +84,8 @@ wxIcon wxGxArchiveFolderUI::GetSmallImage(void)
 	return m_oSmallIcon;
 }
 
-IGxObject* wxGxArchiveFolderUI::GetArchiveFolder(CPLString szPath, wxString soName)
+wxGxObject* wxGxArchiveFolderUI::GetArchiveFolder(wxGxObject *oParent, const wxString &soName, const CPLString &soPath)
 {
-	wxGxArchiveFolderUI* pFolder = new wxGxArchiveFolderUI(szPath, soName, m_oLargeIcon, m_oSmallIcon);
-	return static_cast<IGxObject*>(pFolder);
+	wxGxArchiveFolderUI* pFolder = new wxGxArchiveFolderUI(oParent, soName, soPath, m_oLargeIcon, m_oSmallIcon);
+	return wxStaticCast(pFolder, wxGxObject);
 }
-
-*/

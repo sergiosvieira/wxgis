@@ -3,7 +3,7 @@
  * Purpose:  wxGxCSVFileFactory class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,22 +20,22 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/catalog/catalog.h"
-/*
+#include "wxgis/catalog/gxobjectfactory.h"
+
+/** \class wxGxCSVFileFactory gxcsvfactory.h
+    \brief A GxCSVFile object factory.
+*/
 class WXDLLIMPEXP_GIS_CLT wxGxCSVFileFactory :
-	public IGxObjectFactory,
-	public wxObject
+	public wxGxObjectFactory
 {
 	DECLARE_DYNAMIC_CLASS(wxGxCSVFileFactory)
 public:
 	wxGxCSVFileFactory(void);
 	virtual ~wxGxCSVFileFactory(void);
-	//IGxObjectFactory
-	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray);
-    virtual void Serialize(wxXmlNode* const pConfig, bool bStore);
-    virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
-    virtual wxString GetName(void){return wxString(_("CSV Files"));};
-    //wxGxFileFactory
-    virtual IGxObject* GetGxObject(CPLString path, wxString name);
+	//wxGxObjectFactory
+	virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
+    virtual wxString GetName(void) const {return wxString(_("CSV Files"));};
+    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath);
+protected:
+    bool m_bHasDriver;
 };
-*/

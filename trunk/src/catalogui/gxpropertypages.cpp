@@ -79,14 +79,14 @@ bool wxGISCatalogGeneralPropertyPage::Create(wxGISApplicationBase* application, 
 
     m_pFactoryItems = new wxGISCheckList( this, ID_FACTORYLISTCTRL);
     //fill code
-    //GxObjectFactoryArray* pFactories = m_pCatalog->GetObjectFactories();
-    //for(size_t i = 0; i < pFactories->size(); ++i)
-    //{
-    //    IGxObjectFactory* pGxObjectFactory = pFactories->operator[](i);
-    //    wxString sName = pGxObjectFactory->GetName();
-    //    long nPos = m_pFactoryItems->InsertItem(sName, pGxObjectFactory->GetEnabled());
-    //    m_pFactoryItems->SetItemData(nPos, (long)pGxObjectFactory);
-    //}
+    wxVector<wxGxObjectFactory*>* const pFactories = m_pCatalog->GetObjectFactories();
+    for(size_t i = 0; i < pFactories->size(); ++i)
+    {
+        wxGxObjectFactory* pGxObjectFactory = pFactories->operator[](i);
+        wxString sName = pGxObjectFactory->GetName();
+        long nPos = m_pFactoryItems->InsertItem(sName, pGxObjectFactory->GetEnabled());
+        m_pFactoryItems->SetItemData(nPos, (long)pGxObjectFactory);
+    }
 
     sbFactorySizer->Add( m_pFactoryItems, 1, wxALL | wxEXPAND, 5 );
 	
@@ -133,16 +133,16 @@ void wxGISCatalogGeneralPropertyPage::Apply(void)
     m_pCatalog->SetOpenLastPath(bOpenLast);
 
     //update object factories
-    //for(size_t i = 0; i < m_pFactoryItems->GetItemCount(); ++i)
-    //{
-    //    if(m_pFactoryItems->IsItemChanged(i))
-    //    {
-    //        if(!bHaveChanges)
-    //            bHaveChanges = true;
-    //        IGxObjectFactory* pGxObjectFactory = (IGxObjectFactory*)m_pFactoryItems->GetItemData(i);
-    //        pGxObjectFactory->SetEnabled(m_pFactoryItems->GetItemCheckState(i) != 0);
-    //    }
-    //}
+    for(size_t i = 0; i < m_pFactoryItems->GetItemCount(); ++i)
+    {
+        if(m_pFactoryItems->IsItemChanged(i))
+        {
+            if(!bHaveChanges)
+                bHaveChanges = true;
+            wxGxObjectFactory* pGxObjectFactory = (wxGxObjectFactory*)m_pFactoryItems->GetItemData(i);
+            pGxObjectFactory->SetEnabled(m_pFactoryItems->GetItemCheckState(i) != 0);
+        }
+    }
 
     if(bHaveChanges)
     {

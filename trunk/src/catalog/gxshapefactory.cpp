@@ -66,7 +66,8 @@ bool wxGxShapeFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxAr
             if(bHasDbf && m_bHasDriver)
             {
                 pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], enumGISFeatureDataset);
-                pChildrenIds.Add(pGxObj->GetId());
+                if(pGxObj)
+                    pChildrenIds.Add(pGxObj->GetId());
             }
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
@@ -85,7 +86,8 @@ bool wxGxShapeFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxAr
             if(!bHasShp && m_bHasDriver)
             {
                 pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], enumGISTableDataset);
-                pChildrenIds.Add(pGxObj->GetId());
+                if(pGxObj)
+                    pChildrenIds.Add(pGxObj->GetId());
             }
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }

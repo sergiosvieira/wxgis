@@ -695,12 +695,14 @@ void wxGISCatalogMainCmd::OnClick(void)
                     if(wxTheClipboard->GetData( data_names ))
                     {
                         pTarget->Drop(data_names.GetStrings(), bMove);
+                        return;
                     }                    
 
                     wxFileDataObject filedata;
                     if( wxTheClipboard->GetData( filedata ) )
                     {
                         pTarget->Drop(wxGISDropTarget::PathsToNames(filedata.GetFilenames()), bMove);
+                        return;
                     }
                 }
             }

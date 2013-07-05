@@ -316,6 +316,11 @@ bool wxGxObjectContainer::DestroyChildren()
     return true;
 }
 
+bool wxGxObjectContainer::HasChildren(void)
+{
+    return !m_Children.IsEmpty();
+}
+
 wxGxObject *wxGxObjectContainer::FindGxObject(const wxString &sPath)
 {
     wxGxObject *ret = wxGxObject::FindGxObject(sPath);
