@@ -3,7 +3,7 @@
  * Purpose:  wxGxMLFactory class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,104 +21,87 @@
 
 #include "wxgis/catalog/gxmlfactory.h"
 #include "wxgis/catalog/gxdataset.h"
-#include "wxgis/catalog/gxkmldataset.h"
-/*
+#include "wxgis/catalog/gxmldataset.h"
+#include "wxgis/datasource/sysop.h"
+
+//---------------------------------------------------------------------------
+// wxGxMLFactory
+//---------------------------------------------------------------------------
+
 IMPLEMENT_DYNAMIC_CLASS(wxGxMLFactory, wxObject)
 
 wxGxMLFactory::wxGxMLFactory(void)
 {
+    m_bHasKMLDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName("KML");
+    m_bHasLIBKMLDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName("LIBKML");
+    m_bHasDXFDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName("DXF");
+    m_bHasGMLDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName("GML");
 }
 
 wxGxMLFactory::~wxGxMLFactory(void)
 {
 }
 
-bool wxGxMLFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray)
+bool wxGxMLFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds)
 {
     for(int i = CSLCount(pFileNames) - 1; i >= 0; i-- )
     {
-        IGxObject* pGxObj = NULL;
+        wxGxObject* pGxObj = NULL;
         CPLString szExt = CPLGetExtension(pFileNames[i]);
-        if(wxGISEQUAL(szExt, "kml"))
+        CPLString szPath;
+
+        if(wxGISEQUAL(szExt, "kml") && (m_bHasKMLDriver || m_bHasLIBKMLDriver) )
         {
-			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumVecKML);
+            pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], enumVecKML);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
-        else if(wxGISEQUAL(szExt, "kmz"))
+        else if(wxGISEQUAL(szExt, "kmz") && m_bHasLIBKMLDriver)
         {
-			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumVecKMZ);
+            pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], enumVecKMZ);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
-        else if(wxGISEQUAL(szExt, "dxf"))
+        else if(wxGISEQUAL(szExt, "dxf") && m_bHasDXFDriver)
         {
-			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumVecDXF);
+            pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], enumVecDXF);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
-        else if(wxGISEQUAL(szExt, "gml"))
+        else if(wxGISEQUAL(szExt, "gml") && m_bHasGMLDriver)
         {
-			pGxObj = GetGxDataset(pFileNames[i], GetConvName(pFileNames[i]), enumVecGML);
+            pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], enumVecGML);
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
 
 		if(pGxObj != NULL)
-			ObjArray.push_back(pGxObj);
+        {
+			pChildrenIds.Add(pGxObj->GetId());
+            pGxObj = NULL;
+        }
     }
-
-		//if(ext == wxString(wxT("gml")))
-		//{
-		//	//if(m_pCatalog->GetShowExt())
-		//	//	name += wxT(".") + ext;
-		//	//wxGxPrjFile* pFile = new wxGxPrjFile(path, name, enumESRIPrjFile);
-		//	//pGxObj = dynamic_cast<IGxObject*>(pFile);
-		//	goto REMOVE;
-		//}
 
 	return true;
 }
 
- 
-void wxGxMLFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
-{
-    if(bStore)
-    {
-        if(pConfig->HasAttribute(wxT("factory_name")))
-            pConfig->DeleteAttribute(wxT("factory_name"));
-        pConfig->AddAttribute(wxT("factory_name"), GetClassName());  
-        if(pConfig->HasAttribute(wxT("is_enabled")))
-            pConfig->DeleteAttribute(wxT("is_enabled"));
-        pConfig->AddAttribute(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
-    }
-    else
-    {
-        m_bIsEnabled = wxAtoi(pConfig->GetAttribute(wxT("is_enabled"), wxT("1"))) != 0;
-    }
-}
-
-IGxObject* wxGxMLFactory::GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type)
+wxGxObject* wxGxMLFactory::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumVectorDatasetType type)
 {
     if(type == enumVecKML)
     {
-        wxGxKMLDataset* pDataset = new wxGxKMLDataset(path, name, type);
-        pDataset->SetEncoding(wxFONTENCODING_UTF8);
-        return static_cast<IGxObject*>(pDataset);
+        wxGxMLDataset* pDataset = new wxGxMLDataset(type, pParent, soName, szPath);
+        return wxStaticCast(pDataset, wxGxObject);
     }
     else if(type == enumVecKMZ)
     {
-        wxGxKMLDataset* pDataset = new wxGxKMLDataset(path, name, type);
-        pDataset->SetEncoding(wxFONTENCODING_UTF8);
-        return static_cast<IGxObject*>(pDataset);
+        wxGxMLDataset* pDataset = new wxGxMLDataset(type, pParent, soName, szPath);
+        return wxStaticCast(pDataset, wxGxObject);
     }
     else if(type == enumVecGML)
     {
-        wxGxKMLDataset* pDataset = new wxGxKMLDataset(path, name, type);
-        //pDataset->SetEncoding(wxFONTENCODING_UTF8);
-        return static_cast<IGxObject*>(pDataset);
+        wxGxMLDataset* pDataset = new wxGxMLDataset(type, pParent, soName, szPath);
+        return wxStaticCast(pDataset, wxGxObject);
     }
     else
     {
-	    wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(path, name, type);
-        return static_cast<IGxObject*>(pDataset);
+	    wxGxFeatureDataset* pDataset = new wxGxFeatureDataset(type, pParent, soName, szPath);
+        return wxStaticCast(pDataset, wxGxObject);
     }
     return NULL;
 }
-*/

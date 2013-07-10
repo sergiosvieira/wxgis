@@ -19,7 +19,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxmapinfofactoryui.h"
-/*
+
 #include "wxgis/catalogui/gxdatasetui.h"
 #include <wx/ffile.h>
 
@@ -29,6 +29,10 @@
 #include "../../art/md_dset_48.xpm"
 #include "../../art/table_tab_16.xpm"
 #include "../../art/table_tab_48.xpm"
+
+//------------------------------------------------------------------------------
+// wxGxMapInfoFactoryUI
+//------------------------------------------------------------------------------
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxMapInfoFactoryUI, wxGxMapInfoFactory)
 
@@ -46,24 +50,22 @@ wxGxMapInfoFactoryUI::~wxGxMapInfoFactoryUI(void)
 {
 }
 
-IGxObject* wxGxMapInfoFactoryUI::GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type)
+wxGxObject* wxGxMapInfoFactoryUI::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumVectorDatasetType type)
 {
-    wxGxFeatureDatasetUI* pDataset = NULL;
+    if(!m_bHasDriver)
+        return NULL;
     switch(type)
     {
     case enumVecMapinfoTab:
-	    pDataset = new wxGxFeatureDatasetUI(path, name, type, m_LargeTabIcon, m_SmallTabIcon);
-        break;
+        return wxStaticCast(new wxGxFeatureDatasetUI(type, pParent, soName, szPath, m_LargeTabIcon, m_SmallTabIcon), wxGxObject);
     case enumVecMapinfoMif:
-	    pDataset = new wxGxFeatureDatasetUI(path, name, type, m_LargeMifIcon, m_SmallMifIcon);
-        break;
+        return wxStaticCast(new wxGxFeatureDatasetUI(type, pParent, soName, szPath, m_LargeMifIcon, m_SmallMifIcon), wxGxObject);
     case emumVecMAX + 1:
-	    return static_cast<IGxObject*>(new wxGxTableDatasetUI(path, name, enumTableMapinfoTab, m_LargeTabTIcon, m_SmallTabTIcon));
+        return wxStaticCast(new wxGxTableDatasetUI(enumTableMapinfoTab, pParent, soName, szPath, m_LargeTabTIcon, m_SmallTabTIcon), wxGxObject);
     case emumVecMAX + 2:
-	    return static_cast<IGxObject*>(new wxGxTableDatasetUI(path, name, enumTableMapinfoMif, m_LargeTabTIcon, m_SmallTabTIcon));
+        return wxStaticCast(new wxGxTableDatasetUI(enumTableMapinfoMif, pParent, soName, szPath, m_LargeTabTIcon, m_SmallTabTIcon), wxGxObject);
     default:
         return NULL;
     }
-    return static_cast<IGxObject*>(pDataset);
 }
-*/
+

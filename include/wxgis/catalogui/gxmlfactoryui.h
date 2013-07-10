@@ -3,7 +3,7 @@
  * Purpose:  wxGxMLFactoryUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 /** \class wxGxMLFactoryUI gxmlfactory.h
     \brief A markup lang GxObject factory.
 */
-/*
+
 class wxGxMLFactoryUI :
 	public wxGxMLFactory
 {
@@ -35,7 +35,7 @@ public:
 	wxGxMLFactoryUI(void);
 	virtual ~wxGxMLFactoryUI(void);
 	//wxGxMLFactory
-    virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type);
+    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumVectorDatasetType type);
 protected:
     wxIcon m_LargeDXFIcon, m_SmallDXFIcon;
     wxIcon m_LargeKMLIcon, m_SmallKMLIcon;
@@ -44,4 +44,3 @@ protected:
     wxIcon m_LargeSubKMLIcon, m_SmallSubKMLIcon;
 };
 
-*/

@@ -180,21 +180,25 @@ void *wxGISQuadTreeFillThread::Entry()
     {
         //check if Feature will destroy by Ref Count
         wxGISQuadTreeItem* pItem = NULL;
-        if(Feature.GetRefData()->GetRefCount() > 1)
-            pItem = new wxGISQuadTreeItem(Feature.GetGeometry(), Feature.GetFID());//appologise the feature is buffered in m_pDSet
-        else
-            pItem = new wxGISQuadTreeItem(Feature.GetGeometry().Copy(), Feature.GetFID());
-        
-        m_pQuadTree->AddItem(pItem);
-
-        ppData[nItemCounter++] = pItem;
-
-        if(nItemCounter == m_pQuadTree->GetPreloadItemCount())
+        wxGISGeometry Geom = Feature.GetGeometry();
+        if(Geom.IsOk())
         {
-             m_pQuadTree->QueueEvent(new wxFeatureDSEvent(wxDS_FEATURES_ADDED, wxGISQuadTreeCursor(ppData, nItemCounter)));
-             nItemCounter = 0;
-             ppData = (wxGISQuadTreeItem**)CPLMalloc(nSize);
-             RtlZeroMemory(ppData, nSize);
+            if(Feature.GetRefData()->GetRefCount() > 1)
+                pItem = new wxGISQuadTreeItem(Geom, Feature.GetFID());//appologise the feature is buffered in m_pDSet
+            else
+                pItem = new wxGISQuadTreeItem(Geom.Copy(), Feature.GetFID());
+        
+            m_pQuadTree->AddItem(pItem);
+
+            ppData[nItemCounter++] = pItem;
+
+            if(nItemCounter == m_pQuadTree->GetPreloadItemCount())
+            {
+                 m_pQuadTree->QueueEvent(new wxFeatureDSEvent(wxDS_FEATURES_ADDED, wxGISQuadTreeCursor(ppData, nItemCounter)));
+                 nItemCounter = 0;
+                 ppData = (wxGISQuadTreeItem**)CPLMalloc(nSize);
+                 RtlZeroMemory(ppData, nSize);
+            }
         }
 
         nCounter++;

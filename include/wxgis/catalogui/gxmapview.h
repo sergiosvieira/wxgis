@@ -21,7 +21,7 @@
 
 #pragma once
 #include "wxgis/catalogui/gxview.h"
-
+#include "wxgis/catalog/gxdataset.h"
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/catalogui/gxeventui.h"
 #include "wxgis/cartoui/mapview.h"
@@ -89,6 +89,9 @@ public:
 	virtual void OnSelectionChanged(wxGxSelectionEvent& event);
 protected:
     virtual void LoadData(long nGxObjectId);
+    virtual void LoadLayer(wxGxDataset* const pGxDataset);
+    virtual void LoadLayers(wxGxDatasetContainer* const pGxDataset);
+    virtual wxGISLayer* GetLayerFromDataset(wxGxDataset* const pGxDataset);
 protected:
     long m_ConnectionPointCatalogCookie, m_ConnectionPointSelectionCookie;
 	wxGxSelection* m_pSelection;

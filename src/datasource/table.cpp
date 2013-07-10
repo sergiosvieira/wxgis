@@ -44,7 +44,7 @@ wxGISTable::wxGISTable(const CPLString &sPath, int nSubType, OGRLayer* poLayer, 
     m_bIsCached = false;
 
 	m_bHasFID = false;
-    m_nCurrentFID = 0;
+    m_nCurrentFID = 1;
     m_nFeatureCount = wxNOT_FOUND;
 
     m_bOLCFastFeatureCount = false;
@@ -365,6 +365,7 @@ void wxGISTable::Close(void)
 
 size_t wxGISTable::GetFeatureCount(bool bForce, ITrackCancel* const pTrackCancel)
 {
+    wxCriticalSectionLocker locker(m_CritSect);
 	if(m_nFeatureCount != wxNOT_FOUND)
 		return m_nFeatureCount;
     if(	m_poLayer )
@@ -383,7 +384,10 @@ size_t wxGISTable::GetFeatureCount(bool bForce, ITrackCancel* const pTrackCancel
         }
 
 		m_nFeatureCount = m_poLayer->GetFeatureCount(0);
-
+        if(m_nFeatureCount == -1)
+            m_nFeatureCount = m_poLayer->GetFeatureCount(1);
+        if(m_nFeatureCount == -1)
+            return 0;
 		return m_nFeatureCount;
     }
     return 0;
@@ -504,29 +508,44 @@ wxGISFeature wxGISTable::GetFeatureByID(long nFID)
 wxGISFeature wxGISTable::GetFeature(long nIndex)
 {
     if(!m_poLayer)
+    {
         return wxGISFeature();
+    }
     if(m_poLayer->SetNextByIndex(nIndex) != OGRERR_NONE)
+    {
         return wxGISFeature();
-    return wxGISFeature(m_poLayer->GetNextFeature(), m_Encoding);
+    }
+    if(!HasFID())
+    {
+        m_nCurrentFID = nIndex + 1;
+    }
+
+    return Next();
 }
 
 void wxGISTable::Reset(void)
 {
     if(!m_poLayer)
         return;
-    m_nCurrentFID = 0;
+    m_nCurrentFID = 1;
     m_poLayer->ResetReading();
 }
 
 wxGISFeature wxGISTable::Next(void)
 {
     if(!m_poLayer)
+    {
         return wxGISFeature();
+    }
     OGRFeature* pFeature = m_poLayer->GetNextFeature();
     if(!pFeature)
+    {
         return wxGISFeature();
+    }
     if(!HasFID())
+    {
         pFeature->SetFID(m_nCurrentFID++);
+    }
     return wxGISFeature(pFeature, m_Encoding);
 }
 

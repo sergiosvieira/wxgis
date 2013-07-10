@@ -75,7 +75,7 @@ set(PROJECT_HHEADERS ${PROJECT_HHEADERS}
     ${LIB_HEADERS}/gxfilters.h
     ${LIB_HEADERS}/gxfolder.h
     ${LIB_HEADERS}/gxfolderfactory.h
-    ${LIB_HEADERS}/gxkmldataset.h
+    ${LIB_HEADERS}/gxmldataset.h
     ${LIB_HEADERS}/gxmapinfofactory.h
     ${LIB_HEADERS}/gxmlfactory.h
     ${LIB_HEADERS}/gxprjfactory.h
@@ -108,7 +108,7 @@ set(PROJECT_CSOURCES ${PROJECT_CSOURCES}
     ${LIB_SOURCES}/gxfilters.cpp
     ${LIB_SOURCES}/gxfolder.cpp
     ${LIB_SOURCES}/gxfolderfactory.cpp
-    ${LIB_SOURCES}/gxkmldataset.cpp
+    ${LIB_SOURCES}/gxmldataset.cpp
     ${LIB_SOURCES}/gxmapinfofactory.cpp
     ${LIB_SOURCES}/gxmlfactory.cpp
     ${LIB_SOURCES}/gxprjfactory.cpp

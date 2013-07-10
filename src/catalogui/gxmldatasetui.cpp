@@ -3,7 +3,7 @@
  * Purpose:  wxGxKMLDatasetUI classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#include "wxgis/catalogui/gxkmldatasetui.h"
-/*
+#include "wxgis/catalogui/gxmldatasetui.h"
+
 #include "wxgis/catalogui/gxcatalogui.h"
 #include "wxgis/datasource/featuredataset.h"
 
@@ -35,8 +35,9 @@
 //--------------------------------------------------------------
 //class wxGxKMLDatasetUI
 //--------------------------------------------------------------
+IMPLEMENT_CLASS(wxGxMLDatasetUI, wxGxMLDataset)
 
-wxGxKMLDatasetUI::wxGxKMLDatasetUI(CPLString Path, wxString Name, wxGISEnumVectorDatasetType Type, wxIcon LargeIcon, wxIcon SmallIcon, wxIcon SubLargeIcon, wxIcon SubSmallIcon) : wxGxKMLDataset(Path, Name, Type)
+wxGxMLDatasetUI::wxGxMLDatasetUI(wxGISEnumVectorDatasetType eType, wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon &LargeIcon, const wxIcon &SmallIcon, const wxIcon &SubLargeIcon, const wxIcon &SubSmallIcon) : wxGxMLDataset(eType, oParent, soName, soPath)
 {
     m_LargeIcon = LargeIcon;
     m_SmallIcon = SmallIcon;
@@ -44,21 +45,21 @@ wxGxKMLDatasetUI::wxGxKMLDatasetUI(CPLString Path, wxString Name, wxGISEnumVecto
     m_SmallSubIcon = SubSmallIcon;
 }
 
-wxGxKMLDatasetUI::~wxGxKMLDatasetUI(void)
+wxGxMLDatasetUI::~wxGxMLDatasetUI(void)
 {
 }
 
-wxIcon wxGxKMLDatasetUI::GetLargeImage(void)
+wxIcon wxGxMLDatasetUI::GetLargeImage(void)
 {
 	return m_LargeIcon;
 }
 
-wxIcon wxGxKMLDatasetUI::GetSmallImage(void)
+wxIcon wxGxMLDatasetUI::GetSmallImage(void)
 {
 	return m_SmallIcon;
 }
 
-void wxGxKMLDatasetUI::EditProperties(wxWindow *parent)
+void wxGxMLDatasetUI::EditProperties(wxWindow *parent)
 {
     wxPropertySheetDialog PropertySheetDialog;
     if (!PropertySheetDialog.Create(parent, wxID_ANY, _("Properties"), wxDefaultPosition, wxSize( 480,640 ), wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER))
@@ -70,8 +71,8 @@ void wxGxKMLDatasetUI::EditProperties(wxWindow *parent)
     wxGISVectorPropertyPage* VectorPropertyPage = new wxGISVectorPropertyPage(this, pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(VectorPropertyPage, VectorPropertyPage->GetPageName());
 
-	wxGISDatasetSPtr pDset = GetDataset();
-	if(pDset)
+	wxGISDataset* const pDset = GetDatasetFast();
+    if(pDset && pDset->GetType() == enumGISFeatureDataset)
 	{
 		wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(pDset->GetSpatialReference(), pParentWnd);
 		PropertySheetDialog.GetBookCtrl()->AddPage(SpatialReferencePropertyPage, SpatialReferencePropertyPage->GetPageName());
@@ -84,78 +85,76 @@ void wxGxKMLDatasetUI::EditProperties(wxWindow *parent)
     PropertySheetDialog.ShowModal();
 }
 
-void wxGxKMLDatasetUI::EmptyChildren(void)
-{
-	for(size_t i = 0; i < m_Children.size(); ++i)
-	{
-		m_Children[i]->Detach();
-		wxDELETE( m_Children[i] );
-	}
-    m_Children.clear();
-	m_bIsChildrenLoaded = false;
-}
-
-void wxGxKMLDatasetUI::LoadChildren(void)
+void wxGxMLDatasetUI::LoadChildren(void)
 {
 	if(m_bIsChildrenLoaded)
 		return;
 
-	if(m_pwxGISDataset == NULL)
-	{
-        wxGISFeatureDatasetSPtr pwxGISFeatureDataset = boost::make_shared<wxGISFeatureDataset>(m_sPath, m_eType);
-
-        if(!pwxGISFeatureDataset->Open(0,0,false))
-        {
-		    const char* err = CPLGetLastErrorMsg();
-		    wxString sErr = wxString::Format(_("Operation '%s' failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
-		    wxMessageBox(sErr, _("Error"), wxOK | wxICON_ERROR);
-
-			return;
-        }
-
-        m_pwxGISDataset = boost::static_pointer_cast<wxGISDataset>(pwxGISFeatureDataset);
-        m_pwxGISDataset->SetSubType(m_eType);
-        pwxGISFeatureDataset->SetEncoding(m_Encoding);
-	}
-
-    for(size_t i = 0; i < m_pwxGISDataset->GetSubsetsCount(); ++i)
+    //ITrackCancel trackcancel;
+	wxGISDataset* pDSet = GetDataset(false);
+    if(pDSet)
     {
-        wxGISFeatureDatasetSPtr pwxGISFeatureSubDataset = boost::dynamic_pointer_cast<wxGISFeatureDataset>(m_pwxGISDataset->GetSubset(i));
-        pwxGISFeatureSubDataset->SetSubType(m_eType);
-        pwxGISFeatureSubDataset->SetEncoding(m_Encoding);
-        wxGxKMLSubDatasetUI* pGxSubDataset = new wxGxKMLSubDatasetUI(m_sPath, pwxGISFeatureSubDataset->GetName(), boost::static_pointer_cast<wxGISDataset>(pwxGISFeatureSubDataset), m_eType, m_LargeSubIcon, m_SmallSubIcon);
-		bool ret_code = AddChild(pGxSubDataset);
-		if(!ret_code)
-			wxDELETE(pGxSubDataset);
-	}
+        for(size_t i = 0; i < pDSet->GetSubsetsCount(); ++i)
+        {
+            wxGISDataset* pwxGISFeatureSuDataset = m_pwxGISDataset->GetSubset(i);
+            new wxGxMLSubDatasetUI((wxGISEnumVectorDatasetType)GetSubType(), pwxGISFeatureSuDataset, wxStaticCast(this, wxGxObject), pwxGISFeatureSuDataset->GetName(), wxGxObjectContainer::GetPath(), m_LargeSubIcon, m_SmallSubIcon);
+	    }
+    }
+    else
+    {
+        //wxMessageBox(trackcancel.GetLastMessage(), _("Error"), wxOK | wxICON_ERROR);
+    }
 	m_bIsChildrenLoaded = true;
+}
+
+wxGISDataset* const wxGxMLDatasetUI::GetDataset(bool bCache, ITrackCancel* const pTrackCancel)
+{
+    wxGISFeatureDataset* pwxGISFeatureDataset = wxDynamicCast(GetDatasetFast(), wxGISFeatureDataset);
+
+    if(pwxGISFeatureDataset && !pwxGISFeatureDataset->IsOpened())
+    {
+        if(!pwxGISFeatureDataset->Open(0, 0, bCache, pTrackCancel))
+        {
+            pwxGISFeatureDataset->Release();
+		    const char* err = CPLGetLastErrorMsg();
+			wxString sErr = wxString::Format(_("Operation '%s' failed! GDAL error: %s"), _("Open"), wxString(err, wxConvUTF8).c_str());
+            wxLogError(sErr);
+			if(pTrackCancel)
+				pTrackCancel->PutMessage(sErr, wxNOT_FOUND, enumGISMessageErr);
+			return NULL;
+        }
+        wxGIS_GXCATALOG_EVENT(ObjectChanged);
+	}
+
+	return m_pwxGISDataset;
 }
 
 //--------------------------------------------------------------
 //class wxGxKMLSubDatasetUI
 //--------------------------------------------------------------
+IMPLEMENT_CLASS(wxGxMLSubDatasetUI, wxGxMLSubDataset)
 
-wxGxKMLSubDatasetUI::wxGxKMLSubDatasetUI(CPLString Path, wxString sName, wxGISDatasetSPtr pwxGISDataset, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxKMLSubDataset(Path, sName, pwxGISDataset, nType)
+wxGxMLSubDatasetUI::wxGxMLSubDatasetUI(wxGISEnumVectorDatasetType nType, wxGISDataset* pwxGISDataset, wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon &LargeIcon, const wxIcon &SmallIcon) : wxGxMLSubDataset(nType, pwxGISDataset, oParent, soName, soPath)
 {
     m_LargeIcon = LargeIcon;
     m_SmallIcon = SmallIcon;
 }
 
-wxGxKMLSubDatasetUI::~wxGxKMLSubDatasetUI(void)
+wxGxMLSubDatasetUI::~wxGxMLSubDatasetUI(void)
 {
 }
 
-wxIcon wxGxKMLSubDatasetUI::GetLargeImage(void)
+wxIcon wxGxMLSubDatasetUI::GetLargeImage(void)
 {
 	return m_LargeIcon;
 }
 
-wxIcon wxGxKMLSubDatasetUI::GetSmallImage(void)
+wxIcon wxGxMLSubDatasetUI::GetSmallImage(void)
 {
 	return m_SmallIcon;
 }
 
-void wxGxKMLSubDatasetUI::EditProperties(wxWindow *parent)
+void wxGxMLSubDatasetUI::EditProperties(wxWindow *parent)
 {
     wxPropertySheetDialog PropertySheetDialog;
     if (!PropertySheetDialog.Create(parent, wxID_ANY, _("Properties"), wxDefaultPosition, wxSize( 480,640 ), wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER))
@@ -167,10 +166,10 @@ void wxGxKMLSubDatasetUI::EditProperties(wxWindow *parent)
     wxGISVectorPropertyPage* VectorPropertyPage = new wxGISVectorPropertyPage(this, pParentWnd);
     PropertySheetDialog.GetBookCtrl()->AddPage(VectorPropertyPage, VectorPropertyPage->GetPageName());
 
-	wxGISDatasetSPtr pDset = GetDataset();
-	if(pDset)
+	wxGISDataset* pDSet = GetDatasetFast();
+	if(pDSet)
 	{
-		wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(pDset->GetSpatialReference(), pParentWnd);
+		wxGISSpatialReferencePropertyPage* SpatialReferencePropertyPage = new wxGISSpatialReferencePropertyPage(pDSet->GetSpatialReference(), pParentWnd);
 		PropertySheetDialog.GetBookCtrl()->AddPage(SpatialReferencePropertyPage, SpatialReferencePropertyPage->GetPageName());
 	}
 
@@ -180,4 +179,3 @@ void wxGxKMLSubDatasetUI::EditProperties(wxWindow *parent)
 
     PropertySheetDialog.ShowModal();
 }
-*/

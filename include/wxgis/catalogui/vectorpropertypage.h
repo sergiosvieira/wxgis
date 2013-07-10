@@ -41,9 +41,9 @@ class WXDLLIMPEXP_GIS_CLU wxGISVectorPropertyPage :
 
 public:
     wxGISVectorPropertyPage(void);
-    wxGISVectorPropertyPage(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Vector"));
+    wxGISVectorPropertyPage(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Vector"));
 	~wxGISVectorPropertyPage();
-    virtual bool Create(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Vector"));
+    virtual bool Create(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,540 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("Vector"));
     virtual wxString GetPageName(void) const {return wxString(_("Vector"));};
     wxPGProperty* AppendProperty(wxPGProperty* pProp);
     wxPGProperty* AppendProperty(wxPGProperty* pid, wxPGProperty* pProp);
@@ -52,7 +52,7 @@ public:
     void FillLayerDef(OGRLayer *poLayer, int iLayer, CPLString soPath);
 protected:
     wxGISFeatureDataset* m_pDataset;
-    wxGxFeatureDataset* m_pGxDataset;
+    IGxDataset* m_pGxDataset;
     wxPropertyGrid* m_pg;
 	long m_nCounter;
 

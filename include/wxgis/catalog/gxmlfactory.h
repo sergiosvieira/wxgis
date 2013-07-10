@@ -3,7 +3,7 @@
  * Purpose:  wxGxMLFactory class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,26 +20,27 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/catalog/catalog.h"
+#include "wxgis/catalog/gxobjectfactory.h"
+#include "wxgis/datasource/datasource.h"
 
 /** \class wxGxMLFactory gxmlfactory.h
     \brief A markup lang GxObject factory.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLT wxGxMLFactory :
-	public IGxObjectFactory,
-	public wxObject
+	public wxGxObjectFactory
 {
 	DECLARE_DYNAMIC_CLASS(wxGxMLFactory)
 public:
 	wxGxMLFactory(void);
 	virtual ~wxGxMLFactory(void);
-	//IGxObjectFactory
-	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray);
-    virtual void Serialize(wxXmlNode* const pConfig, bool bStore);
-	virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
-    virtual wxString GetName(void){return wxString(_("Markup Languages files"));};
-    //wxGxMLFactory
-    virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type);
+	//wxGxObjectFactory
+	virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
+    virtual wxString GetName(void) const {return wxString(_("Markup Languages files"));};
+    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumVectorDatasetType type);
+protected:
+    bool m_bHasKMLDriver;
+    bool m_bHasLIBKMLDriver;
+    bool m_bHasDXFDriver;
+    bool m_bHasGMLDriver;
 };
-*/

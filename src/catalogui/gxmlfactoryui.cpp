@@ -20,8 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxmlfactoryui.h"
-/*
-#include "wxgis/catalogui/gxkmldatasetui.h"
+#include "wxgis/catalogui/gxmldatasetui.h"
 #include "wxgis/catalogui/gxdatasetui.h"
 
 #include "../../art/dxf_dset_16.xpm"
@@ -56,35 +55,32 @@ wxGxMLFactoryUI::~wxGxMLFactoryUI(void)
 {
 }
 
-IGxObject* wxGxMLFactoryUI::GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type)
+wxGxObject* wxGxMLFactoryUI::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumVectorDatasetType type)
 {
     switch(type)
     {
     case enumVecKML:
         {
-        wxGxKMLDatasetUI* pDataset = new wxGxKMLDatasetUI(path, name, enumVecKML, m_LargeKMLIcon, m_SmallKMLIcon, m_LargeSubKMLIcon, m_SmallSubKMLIcon);
-        pDataset->SetEncoding(wxFONTENCODING_UTF8);
-        return static_cast<IGxObject*>(pDataset);
+        wxGxMLDatasetUI* pDataset = new wxGxMLDatasetUI(type, pParent, soName, szPath, m_LargeKMLIcon, m_SmallKMLIcon, m_LargeSubKMLIcon, m_SmallSubKMLIcon);
+        return wxStaticCast(pDataset, wxGxObject);
         }
     case enumVecKMZ:
         {
-        wxGxKMLDatasetUI* pDataset = new wxGxKMLDatasetUI(path, name, enumVecKMZ, m_LargeKMZIcon, m_SmallKMZIcon, m_LargeSubKMLIcon, m_SmallSubKMLIcon);
-        pDataset->SetEncoding(wxFONTENCODING_UTF8);
-        return static_cast<IGxObject*>(pDataset);
-        }
-    case enumVecDXF:
-        {
-	    wxGxFeatureDatasetUI* pDataset = new wxGxFeatureDatasetUI(path, name, enumVecDXF, m_LargeDXFIcon, m_SmallDXFIcon);
-        return static_cast<IGxObject*>(pDataset);
+        wxGxMLDatasetUI* pDataset = new wxGxMLDatasetUI(type, pParent, soName, szPath, m_LargeKMZIcon, m_SmallKMZIcon, m_LargeSubKMLIcon, m_SmallSubKMLIcon);
+        return wxStaticCast(pDataset, wxGxObject);
         }
     case enumVecGML:
         {
-	    wxGxKMLDatasetUI* pDataset = new wxGxKMLDatasetUI(path, name, enumVecGML, m_LargeGMLIcon, m_SmallGMLIcon, m_LargeGMLIcon, m_SmallGMLIcon);
-        return static_cast<IGxObject*>(pDataset);
+	    wxGxMLDatasetUI* pDataset = new wxGxMLDatasetUI(type, pParent, soName, szPath, m_LargeGMLIcon, m_SmallGMLIcon, m_LargeGMLIcon, m_SmallGMLIcon);
+        return wxStaticCast(pDataset, wxGxObject);
+        }
+    case enumVecDXF:
+        {
+	    wxGxFeatureDatasetUI* pDataset = new wxGxFeatureDatasetUI(type, pParent, soName, szPath, m_LargeDXFIcon, m_SmallDXFIcon);
+        return wxStaticCast(pDataset, wxGxObject);
         }
     default:
-        return NULL;
+        break;
     }
     return NULL;
 }
-*/

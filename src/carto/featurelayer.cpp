@@ -144,7 +144,8 @@ bool wxGISFeatureLayer::IsCacheNeeded(void) const
 
 long wxGISFeatureLayer::GetPointsInGeometry(const wxGISGeometry& Geom) const
 {
-    wxCHECK(Geom.IsOk(), 0);
+    if(!Geom.IsOk())
+        return 0;
 
 	OGRwkbGeometryType type = wkbFlatten(Geom.GetType());
 	switch(type)

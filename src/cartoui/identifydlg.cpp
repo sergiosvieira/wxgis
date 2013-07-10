@@ -963,7 +963,10 @@ void wxAxIdentifyView::OnMenu(wxCommandEvent& event)
 	{
         wxGISGeometryArray Arr;
 		if(pData->m_Geometry.IsOk())
+        {
 		    m_pMapView->AddFlashGeometry(pData->m_Geometry, GetDrawStyle(enumGISDrawStyleFill), GetDrawStyle(enumGISDrawStyleOutline));
+            Arr.Add(pData->m_Geometry);
+        }
 		else
 		{
             WXGISRGBA stFillColor = GetDrawStyle(enumGISDrawStyleFill);
@@ -973,9 +976,16 @@ void wxAxIdentifyView::OnMenu(wxCommandEvent& event)
 			{
 				pData = (wxIdentifyTreeItemData*)m_pTreeCtrl->GetItemData(item);
 				if(pData)
+                {
                     m_pMapView->AddFlashGeometry(pData->m_Geometry, stFillColor, stLineColor);
+                    Arr.Add(pData->m_Geometry);
+                }
 			}
 		}
+
+        if(Arr.IsEmpty())
+            return;
+
 		OGREnvelope Env;
 		for(size_t i = 0; i < Arr.GetCount(); ++i)
 		{
@@ -991,8 +1001,12 @@ void wxAxIdentifyView::OnMenu(wxCommandEvent& event)
 	case ID_WGMENU_ZOOM:
 	{
         wxGISGeometryArray Arr;
+
 		if(pData->m_Geometry.IsOk())
+        {
 		    m_pMapView->AddFlashGeometry(pData->m_Geometry, GetDrawStyle(enumGISDrawStyleFill), GetDrawStyle(enumGISDrawStyleOutline));
+            Arr.Add(pData->m_Geometry);
+        }
 		else
 		{
             WXGISRGBA stFillColor = GetDrawStyle(enumGISDrawStyleFill);
@@ -1002,9 +1016,16 @@ void wxAxIdentifyView::OnMenu(wxCommandEvent& event)
 			{
 				pData = (wxIdentifyTreeItemData*)m_pTreeCtrl->GetItemData(item);
 				if(pData)
+                {
                     m_pMapView->AddFlashGeometry(pData->m_Geometry, stFillColor, stLineColor);
+                    Arr.Add(pData->m_Geometry);
+                }
 			}
 		}
+
+        if(Arr.IsEmpty())
+            return;
+
 		OGREnvelope Env;
 		for(size_t i = 0; i < Arr.GetCount(); ++i)
 		{

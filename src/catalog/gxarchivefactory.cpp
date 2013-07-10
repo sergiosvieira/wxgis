@@ -50,6 +50,7 @@ bool wxGxArchiveFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wx
             continue;
         
         wxString path(pFileNames[i], wxConvUTF8);
+        wxGxObject* pGxObj = NULL;
 
         CPLString szExt = CPLGetExtension(pFileNames[i]);
         if(wxGISEQUAL(szExt, "zip"))
@@ -59,9 +60,7 @@ bool wxGxArchiveFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wx
                 CPLString pArchiveName("/vsizip/");
                 pArchiveName += pFileNames[i];
 
-                wxGxObject* pGxObj = GetGxObject(pParent, wxString(CPLGetFilename(pFileNames[i]), wxConvUTF8), pArchiveName);
-                if(pGxObj)
-                    pChildrenIds.Add(pGxObj->GetId());
+                pGxObj = GetGxObject(pParent, wxString(CPLGetFilename(pFileNames[i]), wxConvUTF8), pArchiveName);
             }
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
@@ -77,6 +76,11 @@ bool wxGxArchiveFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wx
   //          ObjArray.push_back(pGxObj);
   //          pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
   //      }
+        if(pGxObj)
+        {
+            pChildrenIds.Add(pGxObj->GetId());
+            pGxObj = NULL;
+        }
     }
 	return true;
 }

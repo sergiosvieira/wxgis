@@ -27,7 +27,9 @@
 //------------------------------------------------------------------------------
 // wxGxShapeFactory
 //------------------------------------------------------------------------------
-
+static const char *shape_add_exts[] = {
+    "sbn", "sbx", "shx", "cpg", "qix", "osf", NULL
+};
 
 IMPLEMENT_DYNAMIC_CLASS(wxGxShapeFactory, wxGxObjectFactory)
 
@@ -91,7 +93,7 @@ bool wxGxShapeFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxAr
             }
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
-        else if(wxGISEQUAL(szExt, "prj"))
+        else if(wxGISEQUAL(szExt, "prj") || wxGISEQUAL(szExt, "qrj"))
         {
             bool bHasShp(false);
 			if(pFileNames)
@@ -103,18 +105,15 @@ bool wxGxShapeFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxAr
 					pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
 			}
         }
-        else if(wxGISEQUAL(szExt, "sbn"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(wxGISEQUAL(szExt, "sbx"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(wxGISEQUAL(szExt, "shx"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(wxGISEQUAL(szExt, "cpg"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(wxGISEQUAL(szExt, "qix"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-        else if(wxGISEQUAL(szExt, "osf"))
-            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+
+        for(int j = 0; shape_add_exts[j] != NULL; ++j )
+        {
+            if(wxGISEQUAL(szExt, shape_add_exts[j]))
+            {
+                pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+                break;
+            }
+        }
 
     }
 	return true;

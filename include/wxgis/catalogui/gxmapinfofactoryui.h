@@ -24,9 +24,9 @@
 #include "wxgis/catalog/gxmapinfofactory.h"
 
 /** \class wxGxMapInfoFactoryUI gxmapinfofactoryui.h
-    \brief A kml dataset GxObject.
+    \brief A MapInfo dataset GxObjectUI factory.
 */
-/*
+
 class wxGxMapInfoFactoryUI :
 	public wxGxMapInfoFactory
 {
@@ -35,10 +35,10 @@ public:
 	wxGxMapInfoFactoryUI(void);
 	virtual ~wxGxMapInfoFactoryUI(void);
     //wxGxMapInfoFactory
-    virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type);
+    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumVectorDatasetType type);
 protected:
     wxIcon m_LargeTabIcon, m_SmallTabIcon;
     wxIcon m_LargeMifIcon, m_SmallMifIcon;
     wxIcon m_LargeTabTIcon, m_SmallTabTIcon;
 };
-*/
+

@@ -96,7 +96,7 @@ set(PROJECT_HHEADERS ${PROJECT_HHEADERS}
     ${LIB_HEADERS}/gxfileui.h
     ${LIB_HEADERS}/gxfolderfactoryui.h
     ${LIB_HEADERS}/gxfolderui.h
-    ${LIB_HEADERS}/gxkmldatasetui.h
+    ${LIB_HEADERS}/gxmldatasetui.h
     ${LIB_HEADERS}/gxlocationcombobox.h
     ${LIB_HEADERS}/gxmapinfofactoryui.h
     ${LIB_HEADERS}/gxmapview.h
@@ -149,7 +149,7 @@ set(PROJECT_CSOURCES ${PROJECT_CSOURCES}
     ${LIB_SOURCES}/gxfileui.cpp
     ${LIB_SOURCES}/gxfolderfactoryui.cpp
     ${LIB_SOURCES}/gxfolderui.cpp
-    ${LIB_SOURCES}/gxkmldatasetui.cpp
+    ${LIB_SOURCES}/gxmldatasetui.cpp
     ${LIB_SOURCES}/gxlocationcombobox.cpp
     ${LIB_SOURCES}/gxmapinfofactoryui.cpp
     ${LIB_SOURCES}/gxmapview.cpp

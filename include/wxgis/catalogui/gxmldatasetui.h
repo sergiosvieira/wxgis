@@ -1,9 +1,9 @@
 /******************************************************************************
  * Project:  wxGIS (GIS Catalog)
- * Purpose:  wxGxKMLDatasetUI classes.
+ * Purpose:  Markup language object classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,55 +21,56 @@
 #pragma once
 
 #include "wxgis/catalogui/catalogui.h"
-#include "wxgis/catalog/gxkmldataset.h"
+#include "wxgis/catalog/gxmldataset.h"
 
-/** \class wxGxKMLDatasetUI gxkmldatasetui.h
-    \brief A kml dataset GxObject.
+/** \class wxGxMLDatasetUI gxmldatasetui.h
+    \brief A markup language (kml, gml, etc.) dataset GxObject.
 */
-/*
-class WXDLLIMPEXP_GIS_CLU wxGxKMLDatasetUI :
-    public wxGxKMLDataset,
+
+class WXDLLIMPEXP_GIS_CLU wxGxMLDatasetUI :
+    public wxGxMLDataset,
 	public IGxObjectUI,
 	public IGxObjectEditUI
 {
+    DECLARE_CLASS(wxGxMLDatasetUI)
 public:
-	wxGxKMLDatasetUI(CPLString Path, wxString Name, wxGISEnumVectorDatasetType Type, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon, wxIcon SubLargeIcon = wxNullIcon, wxIcon SubSmallIcon = wxNullIcon);
-	virtual ~wxGxKMLDatasetUI(void);
+	wxGxMLDatasetUI(wxGISEnumVectorDatasetType eType, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon &LargeIcon = wxNullIcon, const wxIcon &SmallIcon = wxNullIcon, const wxIcon &SubLargeIcon = wxNullIcon, const wxIcon &SubSmallIcon = wxNullIcon);
+	virtual ~wxGxMLDatasetUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxShapefileDataset.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxKMLDataset.NewMenu"));};
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxFeatureDataset.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxString(wxT("wxGxKMLDataset.NewMenu"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
 	//wxGxKMLDataset
+    virtual wxGISDataset* const GetDataset(bool bCache, ITrackCancel* const pTrackCancel = NULL);
 	virtual void LoadChildren(void);
-	virtual void EmptyChildren(void);
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
     wxIcon m_LargeSubIcon, m_SmallSubIcon;
 };
-*/
-/** \class wxGxKMLSubDatasetUI gxkmldatasetui.h
+
+/** \class wxGxMLSubDatasetUI gxmldatasetui.h
     \brief A kml layer GxObject.
 */
-/*
-class WXDLLIMPEXP_GIS_CLU wxGxKMLSubDatasetUI :
-	public wxGxKMLSubDataset,
+
+class WXDLLIMPEXP_GIS_CLU wxGxMLSubDatasetUI :
+	public wxGxMLSubDataset,
 	public IGxObjectUI,
 	public IGxObjectEditUI
 {
+    DECLARE_CLASS(wxGxMLSubDatasetUI)
 public:
-	wxGxKMLSubDatasetUI(CPLString Path, wxString sName, wxGISDatasetSPtr pwxGISDataset, wxGISEnumVectorDatasetType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
-	virtual ~wxGxKMLSubDatasetUI(void);
+	wxGxMLSubDatasetUI(wxGISEnumVectorDatasetType nType, wxGISDataset* pwxGISDataset, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon &LargeIcon = wxNullIcon, const wxIcon &SmallIcon = wxNullIcon);
+	virtual ~wxGxMLSubDatasetUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxKMLSubDataset.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxEmptyString;};
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxKMLSubDataset.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxEmptyString;};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
 protected:
     wxIcon m_LargeIcon, m_SmallIcon;
 };
-*/

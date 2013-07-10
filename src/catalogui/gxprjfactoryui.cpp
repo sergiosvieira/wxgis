@@ -3,7 +3,7 @@
  * Purpose:  wxGxPrjFactoryUI class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxprjfactoryui.h"
-/*
 #include "wxgis/catalogui/gxfileui.h"
 
 #include "../../art/sr_16.xpm"
@@ -38,9 +37,8 @@ wxGxPrjFactoryUI::~wxGxPrjFactoryUI(void)
 {
 }
 
-IGxObject* wxGxPrjFactoryUI::GetGxObject(CPLString szPath, wxString soName, wxGISEnumPrjFileType nType)
+wxGxObject* wxGxPrjFactoryUI::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumPrjFileType nType)
 {
-    wxGxPrjFileUI* pFile = new wxGxPrjFileUI(szPath, soName, nType, m_LargePRJIcon, m_SmallPRJIcon);
-    return dynamic_cast<IGxObject*>(pFile);
+    wxGxPrjFileUI* pFile = new wxGxPrjFileUI(nType, pParent, soName, szPath, m_LargePRJIcon, m_SmallPRJIcon);
+	return wxStaticCast(pFile, wxGxObject);
 }
-*/

@@ -32,7 +32,8 @@
 
 class WXDLLIMPEXP_GIS_CLT wxGxDataset :
 	public wxGxObject,
-    public IGxObjectEdit
+    public IGxObjectEdit,
+    public IGxDataset
 {
     DECLARE_ABSTRACT_CLASS(wxGxDataset)
 public:
@@ -47,10 +48,50 @@ public:
     //wxGxObject
     virtual void SetPath(const CPLString &soPath);
     //IGxObjectEdit
-	virtual bool CanDelete(void){return true;};
-	virtual bool CanRename(void){return true;};
-    virtual bool CanCopy(const CPLString &szDestPath){return true;};
-	virtual bool CanMove(const CPLString &szDestPath) {return CanCopy(szDestPath) & CanDelete();};
+	virtual bool CanDelete(void);
+	virtual bool CanRename(void);
+    virtual bool CanCopy(const CPLString &szDestPath);
+	virtual bool CanMove(const CPLString &szDestPath);
+	virtual bool Delete(void);
+	virtual bool Rename(const wxString &sNewName);
+	virtual bool Copy(const CPLString &szDestPath, ITrackCancel* const pTrackCancel);
+	virtual bool Move(const CPLString &szDestPath, ITrackCancel* const pTrackCancel);
+protected:
+    //create wxGISDataset without openning it
+    virtual wxGISDataset* const GetDatasetFast(void) = 0;
+protected:
+	wxGISDataset* m_pwxGISDataset;
+    wxULongLong m_nSize;
+    wxDateTime m_dtMod;    
+    bool m_bIsMetadataFilled;
+};
+
+/** \class wxGxContainerDataset gxdataset.h
+    \brief A base container GxDataset class.
+*/
+
+class WXDLLIMPEXP_GIS_CLT wxGxDatasetContainer :
+	public wxGxObjectContainer,
+    public IGxObjectEdit,
+    public IGxDataset
+{
+    DECLARE_ABSTRACT_CLASS(wxGxDatasetContainer)
+public:
+    wxGxDatasetContainer(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
+	virtual ~wxGxDatasetContainer(void);
+	virtual wxGISDataset* const GetDataset(bool bCached = true, ITrackCancel* const pTrackCancel = NULL) = 0;
+	virtual wxGISEnumDatasetType GetType(void) const = 0;
+	virtual int GetSubType(void) const = 0;
+    virtual wxULongLong GetSize(void) const {return m_nSize;};
+    virtual wxDateTime GetModificationDate(void) const {return m_dtMod;};
+    virtual void FillMetadata(bool bForce = false);
+    //wxGxObject
+    virtual void SetPath(const CPLString &soPath);
+    //IGxObjectEdit
+	virtual bool CanDelete(void);
+	virtual bool CanRename(void);
+    virtual bool CanCopy(const CPLString &szDestPath);
+	virtual bool CanMove(const CPLString &szDestPath);
 	virtual bool Delete(void);
 	virtual bool Rename(const wxString &sNewName);
 	virtual bool Copy(const CPLString &szDestPath, ITrackCancel* const pTrackCancel);
@@ -109,7 +150,6 @@ public:
 protected:
     virtual wxGISDataset* const GetDatasetFast(void);
 protected:
-    wxFontEncoding m_Encoding;
 	wxGISEnumVectorDatasetType m_type;
 };
 

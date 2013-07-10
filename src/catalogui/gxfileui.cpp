@@ -3,7 +3,7 @@
  * Purpose:  wxGxFileUI classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2010-2011 Bishop
+*   Copyright (C) 2010-2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "wxgis/catalogui/gxfileui.h"
-/*
+
 #include "wxgis/framework/application.h"
 
 //propertypages
@@ -34,8 +34,9 @@
 //--------------------------------------------------------------
 //class wxGxFileUI
 //--------------------------------------------------------------
+IMPLEMENT_CLASS(wxGxFileUI, wxGxFile)
 
-wxGxFileUI::wxGxFileUI(CPLString Path, wxString Name) : wxGxFile(Path, Name)
+wxGxFileUI::wxGxFileUI(wxGxObject *oParent, const wxString &soName, const CPLString &soPath) : wxGxFile(oParent, soName, soPath)
 {
 }
 
@@ -47,8 +48,9 @@ wxGxFileUI::~wxGxFileUI(void)
 //--------------------------------------------------------------
 //class wxGxPrjFileUI
 //--------------------------------------------------------------
+IMPLEMENT_CLASS(wxGxPrjFileUI, wxGxPrjFile)
 
-wxGxPrjFileUI::wxGxPrjFileUI(CPLString Path, wxString Name, wxGISEnumPrjFileType nType, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxPrjFile(Path, Name, nType)
+wxGxPrjFileUI::wxGxPrjFileUI(wxGISEnumPrjFileType eType, wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon &LargeIcon, const wxIcon &SmallIcon) : wxGxPrjFile(eType, oParent, soName, soPath)
 {
     m_oLargeIcon = LargeIcon;
     m_oSmallIcon = SmallIcon;
@@ -95,8 +97,9 @@ bool wxGxPrjFileUI::Invoke(wxWindow* pParentWnd)
 //--------------------------------------------------------------
 //class wxGxTextFileUI
 //--------------------------------------------------------------
+IMPLEMENT_CLASS(wxGxTextFileUI, wxGxTextFile)
 
-wxGxTextFileUI::wxGxTextFileUI(CPLString Path, wxString Name, wxIcon LargeIcon, wxIcon SmallIcon) : wxGxTextFile(Path, Name)
+wxGxTextFileUI::wxGxTextFileUI(wxGxObject *oParent, const wxString &soName, const CPLString &soPath, const wxIcon &LargeIcon, const wxIcon &SmallIcon) : wxGxTextFile(oParent, soName, soPath)
 {
     m_oLargeIcon = LargeIcon;
     m_oSmallIcon = SmallIcon;
@@ -119,4 +122,3 @@ wxIcon wxGxTextFileUI::GetSmallImage(void)
 void wxGxTextFileUI::EditProperties(wxWindow *parent)
 {
 }
-*/

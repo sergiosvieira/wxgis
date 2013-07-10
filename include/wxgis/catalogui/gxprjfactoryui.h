@@ -22,7 +22,11 @@
 
 #include "wxgis/catalogui/catalogui.h"
 #include "wxgis/catalog/gxprjfactory.h"
-/*
+
+/** \class wxGxPrjFactoryUI gxprjfactoryui.h
+    \brief A Projection definition GxObjectUI factory.
+*/
+
 class wxGxPrjFactoryUI :
 	public wxGxPrjFactory
 {
@@ -30,9 +34,9 @@ class wxGxPrjFactoryUI :
 public:
 	wxGxPrjFactoryUI(void);
 	virtual ~wxGxPrjFactoryUI(void);
-    //wxGxFileFactory
-    virtual IGxObject* GetGxObject(CPLString szPath, wxString soName, wxGISEnumPrjFileType nType);
+protected:
+    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumPrjFileType nType);
 protected:
     wxIcon m_LargePRJIcon, m_SmallPRJIcon;
 };
-*/
+

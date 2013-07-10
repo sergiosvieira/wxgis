@@ -19,7 +19,6 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "wxgis/catalogui/gxmapview.h"
-#include "wxgis/catalog/gxdataset.h"
 #include "wxgis/carto/featurelayer.h"
 #include "wxgis/carto/rasterlayer.h"
 #include "wxgis/framework/framework.h"
@@ -137,6 +136,21 @@ bool wxGxMapView::Applies(wxGxSelection* const Selection)
 				break;
 			}
 		}
+ 		wxGxDatasetContainer* pGxDatasetContainer = wxDynamicCast(pGxObject, wxGxDatasetContainer);
+		if(pGxDatasetContainer != NULL)
+		{
+			wxGISEnumDatasetType type = pGxDatasetContainer->GetType();
+			switch(type)
+			{
+			case enumGISRasterDataset:
+			case enumGISFeatureDataset:
+			case enumGISContainer:
+				return true;
+			case enumGISTableDataset:
+				break;
+			}
+		}
+       
 	}
 	return false;
 }
@@ -192,29 +206,14 @@ void wxGxMapView::OnSelectionChanged(wxGxSelectionEvent& event)
     LoadData(nLastSelID);
 }
 
-void wxGxMapView::LoadData(long nGxObjectId)
+wxGISLayer* wxGxMapView::GetLayerFromDataset(wxGxDataset* const pGxDataset)
 {
-    wxGxObject* pGxObject = m_pCatalog->GetRegisterObject(nGxObjectId);
-	wxGxDataset* pGxDataset = wxDynamicCast(pGxObject, wxGxDataset);
-	if(pGxDataset == NULL)
-		return;
-
-	if(m_pStatusBar)
-    {
-        IProgressor* pProgressor = m_pStatusBar->GetProgressor();
-        //pProgressor->SetYield(true);
-		m_pTrackCancel->SetProgressor(pProgressor);
-    }
-	m_pTrackCancel->Reset();
-
 	wxGISDataset* pwxGISDataset = pGxDataset->GetDataset(true, m_pTrackCancel);
 	if(pwxGISDataset == NULL)
-		return;
-
-    m_nParentGxObjectID = pGxObject->GetId();    
+		return NULL;
 
 	wxGISEnumDatasetType type = pwxGISDataset->GetType();
-    wxVector<wxGISLayer*> paLayers;
+    wxGISLayer* pLayer(NULL);
 
 	switch(type)
 	{
@@ -226,7 +225,7 @@ void wxGxMapView::LoadData(long nGxObjectId)
 			if(!pGISFeatureDataset->IsCached())
 				pGISFeatureDataset->Cache(m_pTrackCancel);
 			wxGISFeatureLayer* pGISFeatureLayer = new wxGISFeatureLayer(pwxGISDataset->GetName(), pwxGISDataset);
-			paLayers.push_back(pGISFeatureLayer);
+			pLayer = wxStaticCast(pGISFeatureLayer, wxGISLayer);
 		}
 		break;
 	case enumGISRasterDataset:
@@ -240,53 +239,64 @@ void wxGxMapView::LoadData(long nGxObjectId)
 			//if(!pGISRasterDataset->IsCached())
 			//	pGISRasterDataset->Cache(m_pTrackCancel);
             wxGISRasterLayer* pGISRasterLayer = new wxGISRasterLayer(pwxGISDataset->GetName(), pwxGISDataset);
-			paLayers.push_back(pGISRasterLayer);
+			pLayer = wxStaticCast(pGISRasterLayer, wxGISLayer);
 		}
-		break;
-	case enumGISContainer:
-        for(size_t i = 0; i < pwxGISDataset->GetSubsetsCount(); ++i)
-        {
-            wxGISDataset* pwxGISSubDataset = pwxGISDataset->GetSubset(i);
-            if(!pwxGISSubDataset)
-                continue;
-            wxGISEnumDatasetType subtype = pwxGISSubDataset->GetType();
-	        switch(subtype)
-	        {
-	        case enumGISFeatureDataset:
-				{
-			        wxGISFeatureDataset* pGISFeatureDataset = wxDynamicCast(pwxGISDataset, wxGISFeatureDataset);
-			        if(!pGISFeatureDataset->IsOpened())
-				        pGISFeatureDataset->Open(0, 0, true, m_pTrackCancel);
-		        	if(!pGISFeatureDataset->IsCached())
-		        		pGISFeatureDataset->Cache(m_pTrackCancel);
-			        wxGISFeatureLayer* pGISFeatureLayer = new wxGISFeatureLayer(pwxGISDataset->GetName(), pwxGISDataset);
-			        paLayers.push_back(pGISFeatureLayer);
-				}
-				break;
-	        case enumGISRasterDataset:
-				{
-          //      CheckOverviews(pwxGISSubDataset, pGxObject->GetName());
-		        //pwxGISLayers.push_back(new wxGISRasterLayer(pwxGISSubDataset));
-          //      pwxGISLayers[pwxGISLayers.size() - 1]->SetName(pwxGISSubDataset->GetName());
-					wxGISRasterDataset* pGISRasterDataset = wxDynamicCast(pwxGISDataset, wxGISRasterDataset);
-					if(!pGISRasterDataset->IsOpened())
-						pGISRasterDataset->Open(false);
-					//if(!pGISRasterDataset->IsCached())
-					//	pGISRasterDataset->Cache(m_pTrackCancel);
-					wxGISRasterLayer* pGISRasterLayer = new wxGISRasterLayer(pwxGISDataset->GetName(), pwxGISDataset);
-                    paLayers.push_back(pGISRasterLayer);
-				}
-		        break;
-	        default:
-                wsDELETE(pwxGISSubDataset);
-		        break;
-            }
-        }
 		break;
 	default:
         wsDELETE(pwxGISDataset);
 		break;
 	}
+    return pLayer;
+}
+
+void wxGxMapView::LoadLayer(wxGxDataset* const pGxDataset)
+{
+    wxCHECK_RET(pGxDataset, wxT("Input wxGxDataset pointer is NULL"));
+
+    wxGISLayer* pLayer = GetLayerFromDataset(pGxDataset);
+
+    Clear();
+
+    if(pLayer && pLayer->IsValid())
+    {
+        AddLayer(pLayer);
+    }
+    else
+    {
+        wxDELETE(pLayer);
+    }
+}
+
+void wxGxMapView::LoadLayers(wxGxDatasetContainer* const pGxDataset)
+{
+    wxCHECK_RET(pGxDataset, wxT("Input wxGxDataset pointer is NULL"));
+    
+    wxVector<wxGISLayer*> paLayers;
+    wxBusyCursor wait;
+    if(pGxDataset->HasChildren())
+    {
+	    wxGxObjectList ObjectList = pGxDataset->GetChildren();
+        wxGxObjectList::iterator iter;
+        for (iter = ObjectList.begin(); iter != ObjectList.end(); ++iter)
+        {
+            wxGxObject *current = *iter;
+            if(current && current->IsKindOf(wxCLASSINFO(wxGxDataset)))
+            {
+                wxGISLayer* pLayer = GetLayerFromDataset(wxDynamicCast(current, wxGxDataset));
+                if(pLayer)
+                {
+                    if(pLayer->IsValid())
+                    {
+                        paLayers.push_back(pLayer);
+                    }
+                    else
+                    {
+                        wxDELETE(pLayer);
+                    }
+                }
+            }
+        }
+    }
 
     Clear();
 
@@ -304,6 +314,33 @@ void wxGxMapView::LoadData(long nGxObjectId)
             }
         }
     }
+}
+
+void wxGxMapView::LoadData(long nGxObjectId)
+{
+    wxGxObject* pGxObject = m_pCatalog->GetRegisterObject(nGxObjectId);
+
+	if(m_pStatusBar)
+    {
+        IProgressor* pProgressor = m_pStatusBar->GetProgressor();
+        //pProgressor->SetYield(true);
+		m_pTrackCancel->SetProgressor(pProgressor);
+    }
+	m_pTrackCancel->Reset();
+
+
+    if(pGxObject->IsKindOf(wxCLASSINFO(wxGxDataset)))
+    {
+        LoadLayer(wxDynamicCast(pGxObject, wxGxDataset));
+    }
+    else if(pGxObject->IsKindOf(wxCLASSINFO(wxGxDatasetContainer)))
+    {
+        LoadLayers(wxDynamicCast(pGxObject, wxGxDatasetContainer));
+    }
+    else
+        return;
+
+    m_nParentGxObjectID = pGxObject->GetId();    
 
     SetFullExtent();
 
