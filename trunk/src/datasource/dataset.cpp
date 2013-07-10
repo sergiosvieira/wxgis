@@ -212,13 +212,13 @@ bool wxGISDataset::Move(const CPLString &szDestPath, ITrackCancel* const pTrackC
         return false;
     }
 
-    CPLString szFileName = GetUniqPath(m_sPath, szDestPath, CPLGetBasename(m_sPath));//CPLString szFileName = CPLGetBasename(m_sPath);
+    CPLString szFileName = CPLGetBasename(GetUniqPath(m_sPath, szDestPath, CPLGetBasename(m_sPath)));
 
     char** papszMovedFileList = NULL;
 
 	for(int i = 0; papszFileList[i] != NULL; ++i )
     {
-		CPLString szNewDestFileName(CPLFormFilename(szDestPath, szFileName, GetExtension(papszFileList[i], szFileName)));	//CPLString szNewDestFileName = GetUniqPath(papszFileList[i], szDestPath, szFileName);
+		CPLString szNewDestFileName(CPLFormFilename(szDestPath, szFileName, GetExtension(papszFileList[i], szFileName)));
         papszMovedFileList = CSLAddString(papszMovedFileList, szNewDestFileName);
         if(!MoveFile(szNewDestFileName, papszFileList[i], pTrackCancel))
 		{
@@ -257,13 +257,13 @@ bool wxGISDataset::Copy(const CPLString &szDestPath, ITrackCancel* const pTrackC
     }
 
     CPLString szCopyFileName;	
-    CPLString szFileName = GetUniqPath(m_sPath, szDestPath, CPLGetBasename(m_sPath));//CPLString szFileName = CPLGetBasename(m_sPath);
+    CPLString szFileName = CPLGetBasename(GetUniqPath(m_sPath, szDestPath, CPLGetBasename(m_sPath)));
 
     char** papszFileCopiedList = NULL;
 
     for(int i = 0; papszFileList[i] != NULL; ++i )
     {
-        CPLString szNewDestFileName(CPLFormFilename(szDestPath, szFileName, GetExtension(papszFileList[i], szFileName)));	//CPLString szNewDestFileName = GetUniqPath(papszFileList[i], szDestPath, szFileName);
+        CPLString szNewDestFileName(CPLFormFilename(szDestPath, szFileName, GetExtension(papszFileList[i], szFileName)));
         papszFileCopiedList = CSLAddString(papszFileCopiedList, szNewDestFileName);
         szCopyFileName = szNewDestFileName;
         if(!CopyFile(szNewDestFileName, papszFileList[i], pTrackCancel))

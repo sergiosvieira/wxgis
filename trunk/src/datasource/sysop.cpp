@@ -558,18 +558,19 @@ CPLString CheckUniqPath(const CPLString &sPath, const CPLString &sName, bool bIs
     {
         CPLString szAdd;
         szAdd.Printf("%s(%d)", sAdd.c_str(), nCounter);
-        CPLString szTmpName = sName + szAdd;
+        CPLString szTmpName = CPLGetBasename(sName) + szAdd;
         if(bIsFolder)
+        {
             sResultName = CPLString(CPLFormFilename(sPath, szTmpName, ""));
+        }
         else
-            sResultName = CPLString(CPLFormFilename(sPath, szTmpName, GetExtension(sPath, sName)));
+        {
+            sResultName = CPLString(CPLFormFilename(sPath, szTmpName, CPLGetExtension(sName)));
+        }
     }
     else
     {
-        if(bIsFolder)
-            sResultName = CPLString(CPLFormFilename(sPath, sName, ""));
-        else
-            sResultName = CPLString(CPLFormFilename(sPath, sName, GetExtension(sPath, sName)));
+        sResultName = CPLString(CPLFormFilename(sPath, sName, ""));
     }
 
     if(CPLCheckForFile((char*)sResultName.c_str(), NULL))
@@ -580,8 +581,8 @@ CPLString CheckUniqPath(const CPLString &sPath, const CPLString &sName, bool bIs
 
 CPLString GetUniqPath(const CPLString &szOriginalFullPath, const CPLString &szNewPath, const CPLString &szNewName)
 {
-    CPLString szNewDestFileName(CPLFormFilename(szNewPath, szNewName, GetExtension(szOriginalFullPath, szNewName)));
-    return CheckUniqPath(szNewDestFileName, szNewName);
+    CPLString szNewDestFileName(CPLFormFilename("", szNewName, CPLGetExtension(szOriginalFullPath)));
+    return CheckUniqPath(szNewPath, szNewDestFileName);
 }
 
 CPLString Transliterate(const char* str)
@@ -678,9 +679,16 @@ bool CopyFile(const CPLString &sDestPath, const CPLString &sSrcPath, ITrackCance
         VSIStatBufL sStatBuf;
         int ret = VSIStatL(sSrcPath, &sStatBuf);
         if(ret == 0)
-            pProgr->SetRange(sStatBuf.st_size / nBufferSize);
+        {
+            int nRange = sStatBuf.st_size / nBufferSize;
+            if(nRange < 1)
+                nRange = 1;
+            pProgr->SetRange(nRange);
+        }
         else
+        {
             pProgr->SetRange(100);
+        }
     }
 
     VSILFILE *fpOld, *fpNew;
