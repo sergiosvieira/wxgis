@@ -3,7 +3,7 @@
  * Purpose:  wxGxFile classes.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2011 Bishop
+*   Copyright (C) 2009-2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -19,68 +19,64 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #pragma once
-#include "wxgis/catalog/catalog.h"
+#include "wxgis/catalog/gxobject.h"
+#include "wxgis/datasource/datasource.h"
+#include "wxgis/datasource/gdalinh.h"
 
 /** \class wxGxFile gxfileui.h
     \brief A file GxObject.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLT wxGxFile :
-	public IGxObject,
-    public IGxFile, 
+	public wxGxObject,
     public IGxObjectEdit
 {
+    DECLARE_CLASS(wxGxFile)
 public:
-	wxGxFile(CPLString Path, wxString Name);
+	wxGxFile(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 	virtual ~wxGxFile(void);
-	//IGxObject
-	virtual wxString GetName(void){return m_sName;};
-    virtual wxString GetBaseName(void);
-    virtual CPLString GetInternalName(void){return m_sPath;};
 	//IGxObjectEdit
 	virtual bool Delete(void);
 	virtual bool CanDelete(void){return true;};
-	virtual bool Rename(wxString NewName);
+	virtual bool Rename(const wxString& NewName);
 	virtual bool CanRename(void){return true;};
-	virtual bool Copy(CPLString szDestPath, ITrackCancel* pTrackCancel);
-	virtual bool CanCopy(CPLString szDestPath){return true;};
-	virtual bool Move(CPLString szDestPath, ITrackCancel* pTrackCancel);
-	virtual bool CanMove(CPLString szDestPath){return CanCopy(szDestPath) & CanDelete();};
-protected:
-	wxString m_sName;
-    CPLString m_sPath;
+	virtual bool Copy(const CPLString &szDestPath, ITrackCancel* const pTrackCancel);
+	virtual bool CanCopy(const CPLString &szDestPath){return true;};
+	virtual bool Move(const CPLString &szDestPath, ITrackCancel* const pTrackCancel);
+	virtual bool CanMove(const CPLString &szDestPath){return CanCopy(szDestPath) & CanDelete();};
 };
-*/
+
 /** \class wxGxPrjFile gxfileui.h
     \brief A proj file GxObject.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLT wxGxPrjFile :
     public wxGxFile
 {
+    DECLARE_CLASS(wxGxPrjFile)
 public:
-	wxGxPrjFile(CPLString Path, wxString Name, wxGISEnumPrjFileType nType);
+	wxGxPrjFile(wxGISEnumPrjFileType eType, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 	virtual ~wxGxPrjFile(void);
-	//IGxObject
-	virtual wxString GetCategory(void){return wxString(_("Coordinate System"));};
+	//wxGxObject
+	virtual wxString GetCategory(void) const {return wxString(_("Coordinate System"));};
 	//wxGxPrjFile
-	virtual OGRSpatialReferenceSPtr GetSpatialReference(void);
+	virtual wxGISSpatialReference GetSpatialReference(void);
 protected:
-    wxGISEnumPrjFileType m_Type;
-	OGRSpatialReferenceSPtr m_pOGRSpatialReference;
+    wxGISEnumPrjFileType m_eType;
+	wxGISSpatialReference m_SpatialReference;
 };
-*/
+
 /** \class wxGxTextFile gxfileui.h
     \brief A text file GxObject.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLT wxGxTextFile :
     public wxGxFile
 {
+    DECLARE_CLASS(wxGxTextFile)
 public:
-	wxGxTextFile(CPLString Path, wxString Name);
+	wxGxTextFile(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 	virtual ~wxGxTextFile(void);
-	//IGxObject
-	virtual wxString GetCategory(void){return wxString(_("Text file"));};
+	//wxGxObject
+	virtual wxString GetCategory(void) const {return wxString(_("Text file"));};
 };
-*/

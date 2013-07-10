@@ -3,7 +3,7 @@
  * Purpose:  wxGxPrjFactory class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,23 +20,24 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/catalog/catalog.h"
+#include "wxgis/catalog/gxobjectfactory.h"
+#include "wxgis/datasource/datasource.h"
 
-/*
+/** \class wxGxPrjFactory gxprjfactory.h
+    \brief A Projection definition GxObject factory.
+*/
+
+
 class WXDLLIMPEXP_GIS_CLT wxGxPrjFactory :
-	public IGxObjectFactory,
-	public wxObject
+	public wxGxObjectFactory
 {
 	DECLARE_DYNAMIC_CLASS(wxGxPrjFactory)
 public:
 	wxGxPrjFactory(void);
 	virtual ~wxGxPrjFactory(void);
-	//IGxObjectFactory
-	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray);
-    virtual void Serialize(wxXmlNode* const pConfig, bool bStore);
-    virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
-    virtual wxString GetName(void){return wxString(_("Coordiante systems"));};
-    //wxGxPrjFactory
-    virtual IGxObject* GetGxObject(CPLString szPath, wxString soName, wxGISEnumPrjFileType nType);
+	//wxGxObjectFactory
+	virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
+    virtual wxString GetName(void) const {return wxString(_("Coordiante systems"));};
+protected:
+    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumPrjFileType nType);
 };
-*/

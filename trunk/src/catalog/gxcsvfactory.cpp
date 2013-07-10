@@ -47,12 +47,19 @@ bool wxGxCSVFileFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wx
 
         if(wxGISEQUAL(szExt, "csv"))
         {
-            pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i]);
-            if(pGxObj)
-                pChildrenIds.Add(pGxObj->GetId());
+            if(m_bHasDriver)
+                pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i]);
         }
         else if(wxGISEQUAL(szExt, "csvt"))
+        {
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
+        }
+
+        if(pGxObj)
+        {
+            pChildrenIds.Add(pGxObj->GetId());
+            pGxObj = NULL;
+        }
 
     }
 	return true;

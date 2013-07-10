@@ -99,7 +99,8 @@ enum wxGISEnumTableDatasetType
 enum wxGISEnumPrjFileType
 {
 	enumESRIPrjFile = 1,
-	enumSPRfile = 2
+	enumSPRfile = 2,
+	enumQPJfile = 3
 };
 
 /** \enum wxGISEnumContainerType

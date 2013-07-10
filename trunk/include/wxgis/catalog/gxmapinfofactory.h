@@ -3,7 +3,7 @@
  * Purpose:  wxGxMapInfoFactory class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2009-2010  Bishop
+*   Copyright (C) 2009-2010,2013  Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,26 +20,24 @@
  ****************************************************************************/
 #pragma once
 
-#include "wxgis/catalog/catalog.h"
+#include "wxgis/catalog/gxobjectfactory.h"
+#include "wxgis/datasource/datasource.h"
 
 /** \class wxGxMapInfoFactory gxmapinfofactory.h
     \brief A MapInfo GxObject factory.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLT wxGxMapInfoFactory :
-	public IGxObjectFactory,
-	public wxObject
+	public wxGxObjectFactory
 {
 	DECLARE_DYNAMIC_CLASS(wxGxMapInfoFactory)
 public:
 	wxGxMapInfoFactory(void);
 	virtual ~wxGxMapInfoFactory(void);
-	//IGxObjectFactory
-	virtual bool GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray);
-    virtual void Serialize(wxXmlNode* const pConfig, bool bStore);
-	virtual wxString GetClassName(void){return GetClassInfo()->GetClassName();};
-    virtual wxString GetName(void){return wxString(_("Mapinfo files"));};
-    //wxGxMapInfoFactory
-    virtual IGxObject* GetGxDataset(CPLString path, wxString name, wxGISEnumVectorDatasetType type);
+	//wxGxObjectFactory
+	virtual bool GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds);
+    virtual wxString GetName(void) const {return wxString(_("Mapinfo files"));};
+    virtual wxGxObject* GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumVectorDatasetType type);
+protected:
+    bool m_bHasDriver;
 };
-*/

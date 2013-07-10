@@ -26,35 +26,37 @@
 /** \class wxGxFile gxfileui.h
     \brief A file GxObject.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLU wxGxFileUI :
 	public wxGxFile,
 	public IGxObjectUI,
     public IGxObjectEditUI
 {
+    DECLARE_CLASS(wxGxFileUI)
 public:
-	wxGxFileUI(CPLString Path, wxString Name);
+	wxGxFileUI(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "");
 	virtual ~wxGxFileUI(void);
 };
-*/
+
 /** \class wxGxPrjFileUI gxfileui.h
     \brief A proj file GxObject.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLU wxGxPrjFileUI :
     public wxGxPrjFile,
 	public IGxObjectUI,
     public IGxObjectEditUI,
     public IGxObjectWizard
 {
+    DECLARE_CLASS(wxGxPrjFileUI)
 public:
-	wxGxPrjFileUI(CPLString Path, wxString Name, wxGISEnumPrjFileType nType, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxPrjFileUI(wxGISEnumPrjFileType eType, wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon &LargeIcon = wxNullIcon, const wxIcon &SmallIcon = wxNullIcon);
 	virtual ~wxGxPrjFileUI(void);
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxPrjFile.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxPrjFile.NewMenu"));};
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxPrjFile.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxString(wxT("wxGxPrjFile.NewMenu"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
     //IGxObjectWizard
@@ -63,28 +65,26 @@ protected:
     wxIcon m_oLargeIcon;
     wxIcon m_oSmallIcon;
 };
-*/
+
 /** \class wxGxTextFileUI gxfileui.h
     \brief A text file GxObject.
 */
-/*
+
 class WXDLLIMPEXP_GIS_CLU wxGxTextFileUI :
     public wxGxTextFile
 {
+    DECLARE_CLASS(wxGxTextFileUI)
 public:
-	wxGxTextFileUI(CPLString Path, wxString Name, wxIcon LargeIcon = wxNullIcon, wxIcon SmallIcon = wxNullIcon);
+	wxGxTextFileUI(wxGxObject *oParent, const wxString &soName = wxEmptyString, const CPLString &soPath = "", const wxIcon &LargeIcon = wxNullIcon, const wxIcon &SmallIcon = wxNullIcon);
 	virtual ~wxGxTextFileUI(void);
-	//IGxObject
-	virtual wxString GetCategory(void){return wxString(_("Text file"));};
 	//IGxObjectUI
 	virtual wxIcon GetLargeImage(void);
 	virtual wxIcon GetSmallImage(void);
-	virtual wxString ContextMenu(void){return wxString(wxT("wxGxTextFile.ContextMenu"));};
-	virtual wxString NewMenu(void){return wxString(wxT("wxGxTextFile.NewMenu"));};
+	virtual wxString ContextMenu(void) const {return wxString(wxT("wxGxTextFile.ContextMenu"));};
+	virtual wxString NewMenu(void) const {return wxString(wxT("wxGxTextFile.NewMenu"));};
 	//IGxObjectEditUI
 	virtual void EditProperties(wxWindow *parent);
 protected:
     wxIcon m_oLargeIcon;
     wxIcon m_oSmallIcon;
 };
-*/

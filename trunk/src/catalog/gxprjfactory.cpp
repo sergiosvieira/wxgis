@@ -3,7 +3,7 @@
  * Purpose:  wxGxPrjFactory class.
  * Author:   Baryshnikov Dmitriy (aka Bishop), polimax@mail.ru
  ******************************************************************************
-*   Copyright (C) 2011 Bishop
+*   Copyright (C) 2011,2013 Bishop
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -20,11 +20,20 @@
  ****************************************************************************/
 #include "wxgis/catalog/gxprjfactory.h"
 #include "wxgis/catalog/gxfile.h"
+#include "wxgis/catalog/gxdataset.h"
+#include "wxgis/datasource/sysop.h"
 
 #include "wx/filename.h"
 #include "wx/dir.h"
-/*
-IMPLEMENT_DYNAMIC_CLASS(wxGxPrjFactory, wxObject)
+
+//----------------------------------------------------------------------------
+// wxGxPrjFactory
+//----------------------------------------------------------------------------
+static const char *prj_notadd_exts[] = {
+    "shp", "bmp", "gif", "jpg", "png", NULL
+};
+
+IMPLEMENT_DYNAMIC_CLASS(wxGxPrjFactory, wxGxObjectFactory)
 
 wxGxPrjFactory::wxGxPrjFactory(void)
 {
@@ -34,62 +43,71 @@ wxGxPrjFactory::~wxGxPrjFactory(void)
 {
 }
 
-bool wxGxPrjFactory::GetChildren(CPLString sParentDir, char** &pFileNames, GxObjectArray &ObjArray)
+bool wxGxPrjFactory::GetChildren(wxGxObject* pParent, char** &pFileNames, wxArrayLong & pChildrenIds)
 {
     for(int i = CSLCount(pFileNames) - 1; i >= 0; i-- )
     {
         CPLString szExt = CPLGetExtension(pFileNames[i]);
+
+        wxGxObject* pGxObj = NULL;
+ 
         if(wxGISEQUAL(szExt, "prj"))
         {
-            int nRes(0);
-            nRes += CPLCheckForFile((char*)CPLResetExtension(pFileNames[i], "shp"), NULL);
-            nRes += CPLCheckForFile((char*)CPLResetExtension(pFileNames[i], "bmp"), NULL);
-            nRes += CPLCheckForFile((char*)CPLResetExtension(pFileNames[i], "gif"), NULL);
-            nRes += CPLCheckForFile((char*)CPLResetExtension(pFileNames[i], "jpg"), NULL);
-            nRes += CPLCheckForFile((char*)CPLResetExtension(pFileNames[i], "png"), NULL);
-
-            if(nRes == 0)
+            bool bAdd = true;
+            for(int j = 0; prj_notadd_exts[j] != NULL; ++j )
             {
-                IGxObject* pGxObj = GetGxObject(pFileNames[i], GetConvName(pFileNames[i]), enumESRIPrjFile);
-                ObjArray.push_back(pGxObj);
+                if(CPLCheckForFile((char*)CPLResetExtension(pFileNames[i], prj_notadd_exts[j]), NULL))
+                {
+                    bAdd = false;
+                    break;
+                }
+            }
+
+            if(bAdd)
+            {
+                pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], enumESRIPrjFile);
             }
 
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            continue;
+        }
+        else if(wxGISEQUAL(szExt, "qpj"))
+        {
+            bool bAdd = true;
+            for(int j = 0; prj_notadd_exts[j] != NULL; ++j )
+            {
+                if(CPLCheckForFile((char*)CPLResetExtension(pFileNames[i], prj_notadd_exts[j]), NULL))
+                {
+                    bAdd = false;
+                    break;
+                }
+            }
+
+            if(bAdd)
+            {
+                pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], enumQPJfile);
+            }
+
+            pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
         }
         else if(wxGISEQUAL(szExt, "spr"))
         {
-            IGxObject* pGxObj = GetGxObject(pFileNames[i], GetConvName(pFileNames[i]), enumSPRfile);
-            ObjArray.push_back(pGxObj);
+            pGxObj = GetGxObject(pParent, GetConvName(pFileNames[i]), pFileNames[i], enumSPRfile);
 
             pFileNames = CSLRemoveStrings( pFileNames, i, 1, NULL );
-            continue;
+        }
+
+        if(pGxObj)
+        {
+            pChildrenIds.Add(pGxObj->GetId());
+            pGxObj = NULL;
         }
     }
 	return true;
 }
 
 
-void wxGxPrjFactory::Serialize(wxXmlNode* const pConfig, bool bStore)
+wxGxObject* wxGxPrjFactory::GetGxObject(wxGxObject* pParent, const wxString &soName, const CPLString &szPath, wxGISEnumPrjFileType nType)
 {
-    if(bStore)
-    {
-        if(pConfig->HasAttribute(wxT("factory_name")))
-            pConfig->DeleteAttribute(wxT("factory_name"));
-        pConfig->AddAttribute(wxT("factory_name"), GetClassName());  
-        if(pConfig->HasAttribute(wxT("is_enabled")))
-            pConfig->DeleteAttribute(wxT("is_enabled"));
-        pConfig->AddAttribute(wxT("is_enabled"), m_bIsEnabled == true ? wxT("1") : wxT("0"));    
-    }
-    else
-    {
-        m_bIsEnabled = wxAtoi(pConfig->GetAttribute(wxT("is_enabled"), wxT("1"))) != 0;
-    }
+    wxGxPrjFile* pFile = new wxGxPrjFile(nType, pParent, soName, szPath);
+	return wxStaticCast(pFile, wxGxObject);
 }
-
-IGxObject* wxGxPrjFactory::GetGxObject(CPLString szPath, wxString soName, wxGISEnumPrjFileType nType)
-{
-    wxGxPrjFile* pFile = new wxGxPrjFile(szPath, soName, nType);
-	return static_cast<IGxObject*>(pFile);
-}
-*/

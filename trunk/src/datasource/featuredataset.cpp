@@ -63,10 +63,10 @@ wxGISDataset* wxGISFeatureDataset::GetSubset(size_t nIndex)
         {
             m_poDS->Reference();
 			CPLString szPath;
-			szPath.Printf("%s#%d", m_sPath.c_str(), nIndex);
+			szPath.Printf("%s?index=%d", m_sPath.c_str(), nIndex);
 			wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(szPath, m_nSubType, poLayer, m_poDS);
-            pDataSet->SetEncoding(m_Encoding);
-            return static_cast<wxGISDataset*>(pDataSet);
+            //pDataSet->SetInternalValues();//SetEncoding(m_Encoding);
+            return wxStaticCast(pDataSet, wxGISDataset);
         }
     }
     return NULL;
@@ -82,9 +82,9 @@ wxGISDataset* wxGISFeatureDataset::GetSubset(const wxString & sSubsetName)
         {
             m_poDS->Reference();
 			CPLString szPath;
-            szPath.Printf("%s#%s", m_sPath.c_str(), szSubsetName.c_str());
+            szPath.Printf("%s?name=%s", m_sPath.c_str(), szSubsetName.c_str());
 			wxGISFeatureDataset* pDataSet = new wxGISFeatureDataset(szPath, m_nSubType, poLayer, m_poDS);
-            pDataSet->SetEncoding(m_Encoding);
+            //pDataSet->SetInternalValues();//SetEncoding(m_Encoding);
             return static_cast<wxGISDataset*>(pDataSet);
         }
     }
@@ -107,6 +107,9 @@ char **wxGISFeatureDataset::GetFileList()
         if(CPLCheckForFile((char*)szPath.c_str(), NULL))
             papszFileList = CSLAddString( papszFileList, szPath );
         szPath = (char*)CPLResetExtension(m_sPath, "prj");
+        if(CPLCheckForFile((char*)szPath.c_str(), NULL))
+            papszFileList = CSLAddString( papszFileList, szPath );
+        szPath = (char*)CPLResetExtension(m_sPath, "qpj");
         if(CPLCheckForFile((char*)szPath.c_str(), NULL))
             papszFileList = CSLAddString( papszFileList, szPath );
         szPath = (char*)CPLResetExtension(m_sPath, "qix");
@@ -300,6 +303,7 @@ void wxGISFeatureDataset::StopCaching(void)
 
 OGREnvelope wxGISFeatureDataset::GetEnvelope(void)
 {
+    wxCriticalSectionLocker locker(m_CritSect);
     if(m_stExtent.IsInit() || m_nFeatureCount == 0)
         return m_stExtent;
 

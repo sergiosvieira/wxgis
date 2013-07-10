@@ -37,7 +37,7 @@ wxGISVectorPropertyPage::wxGISVectorPropertyPage(void)
 {
 }
 
-wxGISVectorPropertyPage::wxGISVectorPropertyPage(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+wxGISVectorPropertyPage::wxGISVectorPropertyPage(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     Create(pGxDataset, parent, id, pos, size, style, name);
 }
@@ -47,7 +47,7 @@ wxGISVectorPropertyPage::~wxGISVectorPropertyPage()
     wsDELETE(m_pDataset);
 }
 
-bool wxGISVectorPropertyPage::Create(wxGxFeatureDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+bool wxGISVectorPropertyPage::Create(IGxDataset* pGxDataset, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 {
     if(!wxPanel::Create(parent, id, pos, size, style, name))
 		return false;
@@ -174,17 +174,20 @@ void wxGISVectorPropertyPage::FillGrid(void)
     {
         AppendProperty( new wxPropertyCategory(_("Information")) );
         if(m_pGxDataset->GetType() == enumGISContainer)
+        //if(pDataSource->GetLayerCount() > 0)
         {
-            for( int iLayer = 0; iLayer < pDataSource->GetLayerCount(); iLayer++ )
+            for( int iLayer = 0; iLayer < pDataSource->GetLayerCount(); ++iLayer )
             {
                 OGRLayer *poLayer = pDataSource->GetLayer(iLayer);
-                FillLayerDef(poLayer, iLayer, soPath);
+                if(poLayer)
+                    FillLayerDef(poLayer, iLayer, soPath);
             }
         }
         else
         {
             OGRLayer *poLayer = m_pDataset->GetLayerRef();
-            FillLayerDef(poLayer, 0, soPath);
+            if(poLayer)
+                FillLayerDef(poLayer, 0, soPath);
         }
     }
 }
@@ -199,10 +202,10 @@ void wxGISVectorPropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer, CPLStr
         sOut = GetConvName(CPLGetBasename(soPath), false);
 	}
 
-	AppendProperty(playid, new wxStringProperty(_("Name"), wxString::Format(wxT("Name_%d"), iLayer), sOut));  //GetConvName
-
-    AppendProperty(playid, new wxStringProperty(_("Geometry type"), wxString::Format(wxT("Geometry type_%d"), iLayer), wxString(OGRGeometryTypeToName( m_pDataset->GetGeometryType() ), wxConvLocal)));  
-	AppendProperty(playid, new wxIntProperty(_("Feature count"), wxString::Format(wxT("Feature count_%d"), iLayer), m_pDataset->GetFeatureCount() ));  
+	AppendProperty(playid, new wxStringProperty(_("Name"), wxString::Format(wxT("Name_%d"), iLayer), sOut));  //GetConvName    
+    AppendProperty(playid, new wxStringProperty(_("Geometry type"), wxString::Format(wxT("Geometry type_%d"), iLayer), wxString(OGRGeometryTypeToName( poLayer->GetGeomType() ), wxConvLocal)));  
+    
+	AppendProperty(playid, new wxIntProperty(_("Feature count"), wxString::Format(wxT("Feature count_%d"), iLayer), poLayer->GetFeatureCount() ));  
 
     if( CPLStrnlen(poLayer->GetFIDColumn(), 100) > 0 )
         AppendProperty(playid, new wxStringProperty(_("FID Column"), wxString::Format(wxT("FID Column_%d"), iLayer), wxString( poLayer->GetFIDColumn(), wxConvLocal ))); 
@@ -252,14 +255,19 @@ void wxGISVectorPropertyPage::FillLayerDef(OGRLayer *poLayer, int iLayer, CPLStr
     AppendProperty(pcapid, new wxStringProperty(_("Transactions"), wxString::Format(wxT("Transactions_%d"), iLayer), poLayer->TestCapability(OLCTransactions) == TRUE ? _("true") : _("false")) );  
     AppendProperty(pcapid, new wxStringProperty(_("Ignore Fields"), wxString::Format(wxT("Ignore Fields_%d"), iLayer), poLayer->TestCapability(OLCIgnoreFields) == TRUE ? _("true") : _("false")) ); 
 
-    OGREnvelope Extent = m_pDataset->GetEnvelope();
-    if(Extent.IsInit())
+    OGREnvelope Extent;
+    OGRErr eErr = poLayer->GetExtent(&Extent);
+    if(eErr == OGRERR_NONE)
     {
-        wxGISSpatialReference SpaRef = m_pDataset->GetSpatialReference();
+        OGRSpatialReference* pSpaRef = poLayer->GetSpatialRef();
+        wxGISSpatialReference SpaRef;
         bool bProjected(false);
-        if(SpaRef.IsOk() && SpaRef->IsProjected())
-            bProjected = true;
-
+        if(pSpaRef)
+        {
+            SpaRef = wxGISSpatialReference(pSpaRef->Clone());
+            if(SpaRef.IsOk() && SpaRef->IsProjected())
+                bProjected = true;
+        }
         wxPGProperty* penvid(NULL);
         if(bProjected)
             penvid = AppendProperty(playid, new wxPropertyCategory(wxString::Format(_("Layer #%d Extent %s"), iLayer + 1, _("(Projected)"))));

@@ -22,6 +22,7 @@
 #pragma once
 
 #include "wxgis/core/config.h"
+#include "wxgis/datasource/dataset.h"
 
 #include "gdal_priv.h"
 #include "gdal.h"
@@ -80,6 +81,22 @@ public:
 	virtual bool Connect(void) = 0;
 	virtual bool Disconnect(void) = 0;
     virtual bool IsConnected(void) = 0;
+};
+
+/** \class IGxDataset catalog.h
+    \brief A GxObject dataset interface.
+*/
+
+class IGxDataset
+{
+public:
+	virtual ~IGxDataset(void){};
+	virtual wxGISDataset* const GetDataset(bool bCached = true, ITrackCancel* const pTrackCancel = NULL) = 0;
+	virtual wxGISEnumDatasetType GetType(void) const = 0;
+	virtual int GetSubType(void) const = 0;
+    virtual wxULongLong GetSize(void) const = 0;
+    virtual wxDateTime GetModificationDate(void) const = 0;
+    virtual void FillMetadata(bool bForce = false) = 0;
 };
 
 /*
